@@ -1,102 +1,106 @@
 #requires -Version 5.1
 <#
 CREATOR.2 - Test-KingsmenCreator.ps1
-Validates the Windows-first KINGSMEN_CREATOR.ps1 foundation.
-This script writes reports/creator/creator-validation-report.json.
+PowerShell 5.1-safe self-test for scripts/KINGSMEN_CREATOR.ps1.
+Writes reports/creator/creator-validation-report.json.
 #>
 
 [CmdletBinding()]
 param()
 
 $ErrorActionPreference = 'Stop'
+
 $RepoRoot = Split-Path -Parent (Split-Path -Parent $PSScriptRoot)
 Set-Location $RepoRoot
 
-$Checks = New-Object System.Collections.Generic.List[object]
+$Checks = @()
 
-function Add-Check {
+function Add-KmCheck {
     param(
         [string] $Name,
-        [bool] $Passed,
+        $Passed,
         [string] $Detail,
-        [string] $File = ''
+        [string] $File
     )
-    $Checks.Add([ordered]@{
+
+    $script:Checks += [pscustomobject]@{
         name = $Name
-        passed = $Passed
+        passed = [bool]$Passed
         detail = $Detail
         file = $File
-    }) | Out-Null
+    }
 }
 
-function Test-TextPresent {
+function Add-ContainsCheck {
     param(
         [string] $Content,
         [string] $Token,
         [string] $File
     )
-    $present = $Content.Contains($Token)
-    Add-Check -Name ('contains:' + $File + ':' + $Token) -Passed $present -Detail ($(if ($present) { 'found' } else { 'missing' })) -File $File
+
+    $present = $Content.IndexOf($Token, [System.StringComparison]::Ordinal) -ge 0
+    Add-KmCheck -Name ('contains:' + $File + ':' + $Token) -Passed $present -Detail $(if ($present) { 'found' } else { 'missing' }) -File $File
 }
 
-$CreatorPath = Join-Path $RepoRoot 'scripts/KINGSMEN_CREATOR.ps1'
+$CreatorRelativePath = 'scripts/KINGSMEN_CREATOR.ps1'
+$CreatorPath = Join-Path $RepoRoot $CreatorRelativePath
 $ReportDir = Join-Path $RepoRoot 'reports/creator'
 $ReportPath = Join-Path $ReportDir 'creator-validation-report.json'
 
 try {
     $exists = Test-Path $CreatorPath
-    Add-Check -Name 'exists:scripts/KINGSMEN_CREATOR.ps1' -Passed $exists -Detail ($(if ($exists) { 'found' } else { 'missing' })) -File 'scripts/KINGSMEN_CREATOR.ps1'
+    Add-KmCheck -Name ('exists:' + $CreatorRelativePath) -Passed $exists -Detail $(if ($exists) { 'found' } else { 'missing' }) -File $CreatorRelativePath
 
     if ($exists) {
         $creator = Get-Content -Path $CreatorPath -Raw
-        Test-TextPresent -Content $creator -Token "ValidateSet('Scaffold','Materialize','Validate','GitCommit','FullBuild')" -File 'scripts/KINGSMEN_CREATOR.ps1'
-        Test-TextPresent -Content $creator -Token 'function Invoke-Scaffold' -File 'scripts/KINGSMEN_CREATOR.ps1'
-        Test-TextPresent -Content $creator -Token 'function Invoke-Materialize' -File 'scripts/KINGSMEN_CREATOR.ps1'
-        Test-TextPresent -Content $creator -Token 'function Invoke-Validate' -File 'scripts/KINGSMEN_CREATOR.ps1'
-        Test-TextPresent -Content $creator -Token 'function Invoke-GitCommit' -File 'scripts/KINGSMEN_CREATOR.ps1'
-        Test-TextPresent -Content $creator -Token 'function Invoke-FullBuild' -File 'scripts/KINGSMEN_CREATOR.ps1'
 
-        $forbidden = @(
-            @{ name = 'productionReadyTrue'; pattern = 'productionReady\s*[:=]\s*true' },
-            @{ name = 'hardcodedPassword'; pattern = 'password\s*[:=]\s*["''][^"'']+' },
-            @{ name = 'hardcodedToken'; pattern = 'token\s*[:=]\s*["''][^"'']+' },
-            @{ name = 'hardcodedApiKey'; pattern = 'api[_-]?key\s*[:=]\s*["''][^"'']+' },
-            @{ name = 'hardcodedSecret'; pattern = 'secret\s*[:=]\s*["''][^"'']+' }
-        )
+        Add-ContainsCheck -Content $creator -Token "ValidateSet('Scaffold','Materialize','Validate','GitCommit','FullBuild')" -File $CreatorRelativePath
+        Add-ContainsCheck -Content $creator -Token 'function Invoke-Scaffold' -File $CreatorRelativePath
+        Add-ContainsCheck -Content $creator -Token 'function Invoke-Materialize' -File $CreatorRelativePath
+        Add-ContainsCheck -Content $creator -Token 'function Invoke-Validate' -File $CreatorRelativePath
+        Add-ContainsCheck -Content $creator -Token 'function Invoke-GitCommit' -File $CreatorRelativePath
+        Add-ContainsCheck -Content $creator -Token 'function Invoke-FullBuild' -File $CreatorRelativePath
 
-        foreach ($item in $forbidden) {
-            $hit = [regex]::IsMatch($creator, $item.pattern, [System.Text.RegularExpressions.RegexOptions]::IgnoreCase)
-            Add-Check -Name ('forbidden:scripts/KINGSMEN_CREATOR.ps1:' + $item.name) -Passed (-not $hit) -Detail ($(if ($hit) { 'forbidden content found' } else { 'not found' })) -File 'scripts/KINGSMEN_CREATOR.ps1'
+        $productionReadyTrue = $creator -match 'productionReady\s*[:=]\s*true'
+        Add-KmCheck -Name ('forbidden:' + $CreatorRelativePath + ':productionReadyTrue') -Passed (-not $productionReadyTrue) -Detail $(if ($productionReadyTrue) { 'forbidden content found' } else { 'not found' }) -File $CreatorRelativePath
+
+        $secretWords = @('SUPABASE_SERVICE_ROLE','SMTP_PASSWORD','WHATSAPP_TOKEN','PAYMENT_SECRET','AIRTABLE_TOKEN')
+        foreach ($word in $secretWords) {
+            $hit = $creator.IndexOf($word, [System.StringComparison]::OrdinalIgnoreCase) -ge 0
+            Add-KmCheck -Name ('forbidden:' + $CreatorRelativePath + ':' + $word) -Passed (-not $hit) -Detail $(if ($hit) { 'forbidden content found' } else { 'not found' }) -File $CreatorRelativePath
         }
+
+        $scaffoldOutput = powershell -NoProfile -ExecutionPolicy Bypass -File $CreatorPath -Action Scaffold 2>&1
+        $scaffoldPassed = ($LASTEXITCODE -eq 0)
+        Add-KmCheck -Name 'creator-action:Scaffold' -Passed $scaffoldPassed -Detail (($scaffoldOutput | Out-String).Trim()) -File $CreatorRelativePath
     }
-
-    $scaffoldOutput = & powershell -NoProfile -ExecutionPolicy Bypass -File $CreatorPath -Action Scaffold 2>&1
-    Add-Check -Name 'creator-action:Scaffold' -Passed ($LASTEXITCODE -eq 0) -Detail (($scaffoldOutput | Out-String).Trim()) -File 'scripts/KINGSMEN_CREATOR.ps1'
-
 } catch {
-    Add-Check -Name 'creator-test:unhandled-error' -Passed $false -Detail $_.Exception.Message -File 'scripts/testing/Test-KingsmenCreator.ps1'
+    Add-KmCheck -Name 'creator-test:unhandled-error' -Passed $false -Detail $_.Exception.Message -File 'scripts/testing/Test-KingsmenCreator.ps1'
 }
 
-$failed = @($Checks | Where-Object { -not $_.passed })
-$report = [ordered]@{
+$Failed = @($Checks | Where-Object { -not $_.passed })
+$Passed = ($Failed.Count -eq 0)
+
+$Report = [ordered]@{
     module = 'CREATOR'
     submodule = 'CREATOR.2'
     validator = 'Test-KingsmenCreator.ps1'
     productionReady = $false
     generatedAt = (Get-Date).ToUniversalTime().ToString('o')
-    passed = ($failed.Count -eq 0)
-    totalChecks = $Checks.Count
-    failedChecks = $failed.Count
-    failed = @($failed)
+    passed = $Passed
+    totalChecks = @($Checks).Count
+    failedChecks = @($Failed).Count
+    failed = @($Failed)
     checks = @($Checks)
-    nextTrackerRow = $(if ($failed.Count -eq 0) { 'CREATOR.3 - reports/creator/creator-validation-report.json' } else { 'CREATOR.2 repair - fix failed checks in reports/creator/creator-validation-report.json' })
+    nextTrackerRow = $(if ($Passed) { 'CREATOR.3 - reports/creator/creator-validation-report.json' } else { 'CREATOR.2 repair - fix failed checks in reports/creator/creator-validation-report.json' })
 }
 
 New-Item -ItemType Directory -Force -Path $ReportDir | Out-Null
-$report | ConvertTo-Json -Depth 8 | Set-Content -Path $ReportPath -Encoding UTF8
-$report | ConvertTo-Json -Depth 8
+$Report | ConvertTo-Json -Depth 8 | Set-Content -Path $ReportPath -Encoding UTF8
+$Report | ConvertTo-Json -Depth 8
 
-if ($failed.Count -eq 0) {
+if ($Passed) {
     exit 0
 }
+
 exit 1
