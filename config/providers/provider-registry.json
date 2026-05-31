@@ -1,0 +1,239 @@
+{
+  "module": "N01",
+  "submodule": "N01.5.1",
+  "name": "Kingsmen Provider Registry",
+  "version": "0.1.0",
+  "productionReady": false,
+  "status": "built_pending_provider_health_validation",
+  "doctrine": {
+    "oracleLiteFirst": true,
+    "postgresqlTruth": true,
+    "airtableMirrorOnly": true,
+    "emailPrimary": true,
+    "whatsappUrgentOnly": true,
+    "smsBackupOnly": true,
+    "playwrightScoutOnly": true,
+    "noHardcodedSecrets": true,
+    "missingOptionalProvidersDegradeGracefully": true
+  },
+  "providerGroups": {
+    "database": {
+      "requiredForLocalRuntime": true,
+      "authority": "postgresql_truth",
+      "providers": [
+        {
+          "key": "postgres_local",
+          "kind": "postgresql",
+          "mode": "local_placeholder",
+          "enabledByDefault": true,
+          "envRequired": ["PG_HOST", "PG_PORT", "PG_DB", "PG_USER"],
+          "envForbiddenInRepo": ["PG_PASSWORD", "DATABASE_URL"],
+          "candidateDataRisk": "high",
+          "failurePolicy": "block_backend_boot",
+          "safeFallback": "Do not start backend without PostgreSQL truth storage."
+        },
+        {
+          "key": "supabase_managed_postgres",
+          "kind": "supabase_postgres",
+          "mode": "optional_remote_truth_or_dev",
+          "enabledByDefault": false,
+          "envRequired": ["SUPABASE_URL", "SUPABASE_ANON_KEY"],
+          "envForbiddenInBrowser": ["SUPABASE_SERVICE_ROLE"],
+          "envForbiddenInRepo": ["SUPABASE_SERVICE_ROLE", "DATABASE_URL"],
+          "candidateDataRisk": "high",
+          "failurePolicy": "degrade_to_local_postgres_when_available",
+          "safeFallback": "Use local PostgreSQL until Supabase runtime health is configured."
+        }
+      ]
+    },
+    "queue": {
+      "requiredForLocalRuntime": true,
+      "authority": "backend_command_bus",
+      "providers": [
+        {
+          "key": "redis_local",
+          "kind": "redis",
+          "mode": "local_placeholder",
+          "enabledByDefault": true,
+          "envRequired": ["REDIS_HOST", "REDIS_PORT", "REDIS_QUEUE_PREFIX"],
+          "envForbiddenInRepo": ["REDIS_PASSWORD", "REDIS_URL"],
+          "candidateDataRisk": "medium",
+          "failurePolicy": "block_worker_dispatch_but_keep_read_models_safe",
+          "safeFallback": "Show provider health alert and keep API read-only where possible."
+        }
+      ]
+    },
+    "storage": {
+      "requiredForDocumentUploads": true,
+      "authority": "signed_upload_url_only",
+      "providers": [
+        {
+          "key": "supabase_storage_documents",
+          "kind": "object_storage",
+          "mode": "disabled_until_configured",
+          "enabledByDefault": false,
+          "envRequired": ["SUPABASE_URL", "SUPABASE_ANON_KEY", "SUPABASE_STORAGE_BUCKET_DOCUMENTS"],
+          "envForbiddenInBrowser": ["SUPABASE_SERVICE_ROLE"],
+          "envForbiddenInRepo": ["SUPABASE_SERVICE_ROLE", "STORAGE_SECRET_KEY"],
+          "candidateDataRisk": "high",
+          "failurePolicy": "disable_uploads_generate_action_packet",
+          "safeFallback": "Candidate sees upload temporarily unavailable and founder receives storage health action packet."
+        },
+        {
+          "key": "oracle_object_storage_future",
+          "kind": "object_storage",
+          "mode": "future_optional",
+          "enabledByDefault": false,
+          "envRequired": [],
+          "envForbiddenInRepo": ["OCI_PRIVATE_KEY", "OCI_FINGERPRINT", "OCI_USER_OCID", "OCI_TENANCY_OCID"],
+          "candidateDataRisk": "high",
+          "failurePolicy": "not_required_for_initial_oracle_lite",
+          "safeFallback": "Remain on configured signed-upload provider."
+        }
+      ]
+    },
+    "email": {
+      "requiredForCandidateCommunication": true,
+      "authority": "email_primary",
+      "providers": [
+        {
+          "key": "no_send_email",
+          "kind": "email",
+          "mode": "preview_only",
+          "enabledByDefault": true,
+          "envRequired": ["EMAIL_NO_SEND_MODE", "EMAIL_PREVIEW_MODE"],
+          "envForbiddenInRepo": [],
+          "candidateDataRisk": "low",
+          "failurePolicy": "safe_preview_only",
+          "safeFallback": "Write message preview/evidence but do not send externally."
+        },
+        {
+          "key": "smtp_provider",
+          "kind": "email",
+          "mode": "disabled_until_credentials",
+          "enabledByDefault": false,
+          "envRequired": ["SMTP_HOST", "SMTP_PORT", "SMTP_USER"],
+          "envForbiddenInRepo": ["SMTP_PASSWORD", "SMTP_TOKEN"],
+          "candidateDataRisk": "medium",
+          "failurePolicy": "switch_to_no_send_and_alert_founder",
+          "safeFallback": "Queue message, generate founder action packet, and keep candidate portal status visible."
+        }
+      ]
+    },
+    "whatsapp": {
+      "requiredForLaunch": false,
+      "authority": "urgent_only",
+      "providers": [
+        {
+          "key": "whatsapp_disabled",
+          "kind": "whatsapp",
+          "mode": "disabled_until_approved_templates",
+          "enabledByDefault": true,
+          "envRequired": ["WHATSAPP_PROVIDER_MODE", "WHATSAPP_URGENT_ONLY", "WHATSAPP_BULK_BLOCKED"],
+          "envForbiddenInRepo": ["WHATSAPP_TOKEN", "WHATSAPP_SECRET", "WHATSAPP_ACCESS_TOKEN"],
+          "candidateDataRisk": "medium",
+          "failurePolicy": "use_email_primary_and_portal_status",
+          "safeFallback": "Do not send WhatsApp. Use email and portal status unless emergency channel is configured."
+        }
+      ],
+      "blockedUses": ["bulk_reminders", "marketing_blasts", "routine_status_updates", "unverified_fee_instructions"]
+    },
+    "sms": {
+      "requiredForLaunch": false,
+      "authority": "backup_only",
+      "providers": [
+        {
+          "key": "sms_disabled",
+          "kind": "sms",
+          "mode": "disabled_until_configured",
+          "enabledByDefault": true,
+          "envRequired": ["SMS_PROVIDER_MODE", "SMS_BACKUP_ONLY", "SMS_BULK_BLOCKED"],
+          "envForbiddenInRepo": ["SMS_TOKEN", "SMS_SECRET", "SMS_API_KEY"],
+          "candidateDataRisk": "medium",
+          "failurePolicy": "use_email_primary_and_portal_status",
+          "safeFallback": "Do not send SMS. Use email and portal status unless backup channel is configured."
+        }
+      ],
+      "blockedUses": ["bulk_messaging", "marketing", "detailed_instructions", "unverified_fee_instructions"]
+    },
+    "payments": {
+      "requiredForPaidOrders": true,
+      "authority": "hosted_or_manual_proof_only",
+      "providers": [
+        {
+          "key": "manual_eft_proof",
+          "kind": "payment",
+          "mode": "manual_proof_review",
+          "enabledByDefault": true,
+          "envRequired": ["PAYMENT_PROVIDER_MODE", "PAYMENT_MANUAL_PROOF_REVIEW_REQUIRED", "PAYMENT_CURRENCY"],
+          "envForbiddenInRepo": [],
+          "candidateDataRisk": "medium",
+          "failurePolicy": "operator_or_founder_review_required",
+          "safeFallback": "Candidate uploads proof, payment remains pending until reviewed."
+        },
+        {
+          "key": "hosted_checkout_future",
+          "kind": "payment",
+          "mode": "future_disabled_until_provider_contract",
+          "enabledByDefault": false,
+          "envRequired": ["PAYMENT_HOSTED_CHECKOUT_ONLY"],
+          "envForbiddenInRepo": ["PAYMENT_SECRET", "PAYFAST_PASSPHRASE", "YOCO_SECRET_KEY", "STRIPE_SECRET_KEY"],
+          "candidateDataRisk": "high",
+          "failurePolicy": "disable_checkout_keep_manual_proof",
+          "safeFallback": "Manual proof review remains available. No raw card data is handled by Kingsmen."
+        }
+      ],
+      "lockedCurrency": "ZAR",
+      "rawCardDataAllowed": false
+    },
+    "airtable": {
+      "requiredForLaunch": false,
+      "authority": "mirror_only",
+      "providers": [
+        {
+          "key": "airtable_mirror_disabled",
+          "kind": "airtable",
+          "mode": "disabled_until_token",
+          "enabledByDefault": true,
+          "envRequired": ["AIRTABLE_MIRROR_MODE", "AIRTABLE_SYNC_INTERVAL_MINUTES", "AIRTABLE_BATCH_LIMIT"],
+          "envForbiddenInRepo": ["AIRTABLE_TOKEN", "AIRTABLE_API_KEY"],
+          "candidateDataRisk": "medium",
+          "failurePolicy": "skip_mirror_keep_postgresql_truth",
+          "safeFallback": "PostgreSQL remains truth. Mirror jobs remain paused."
+        }
+      ]
+    },
+    "playwright": {
+      "requiredForLaunch": false,
+      "authority": "scout_probe_not_crutch",
+      "providers": [
+        {
+          "key": "playwright_disabled",
+          "kind": "browser_automation",
+          "mode": "disabled_until_route_adapter_ready",
+          "enabledByDefault": true,
+          "envRequired": ["PLAYWRIGHT_MODE", "PLAYWRIGHT_MAX_CONCURRENCY", "PLAYWRIGHT_BLOCK_ON_CAPTCHA", "PLAYWRIGHT_BLOCK_ON_OTP", "PLAYWRIGHT_MAP_FALLBACK_ENABLED"],
+          "envForbiddenInRepo": ["PORTAL_PASSWORD", "CANDIDATE_PASSWORD", "INSTITUTION_CREDENTIAL"],
+          "candidateDataRisk": "high",
+          "failurePolicy": "generate_map_manual_application_package",
+          "safeFallback": "Use verified official link, route checklist, proof-upload instruction, and MAP evidence ledger."
+        }
+      ],
+      "blockedUses": ["captcha_bypass", "otp_bypass", "aggressive_third_party_scanning", "credential_storage"]
+    }
+  },
+  "providerHealthRules": {
+    "mustReportMissingRequiredProviders": true,
+    "optionalProviderMissingIsNotFatal": true,
+    "candidateCoreMustNotSilentlyFail": true,
+    "founderActionPacketOnProviderFailure": true,
+    "candidateSafeMessageOnProviderFailure": true,
+    "noRawProviderPayloadInCandidateResponse": true
+  },
+  "validation": {
+    "validatorPath": "scripts/validators/validate-provider-health.mjs",
+    "reportPath": "reports/validation/provider-health-report.json",
+    "requiredBeforeRuntimeClaim": true
+  },
+  "nextTrackerRow": "N01.5.2 - scripts/validators/validate-provider-health.mjs"
+}
