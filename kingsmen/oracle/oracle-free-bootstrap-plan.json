@@ -1,0 +1,218 @@
+{
+  "module": "ORACLE",
+  "submodule": "ORACLE.1",
+  "name": "Kingsmen Oracle Free Bootstrap Plan",
+  "status": "built_pending_validation",
+  "productionReady": false,
+  "purpose": "Prepare Kingsmen for Oracle Cloud Free Tier / Oracle Lite deployment while protecting candidate safety, repo proof discipline, OpenClaw boundaries, and free-tier resource limits.",
+  "officialSourceNotes": {
+    "oracleCloudFreeTierPage": "https://www.oracle.com/cloud/free/",
+    "sourceVerifiedAt": "2026-06-01",
+    "officialAlwaysFreeCategoriesSeen": [
+      "Arm-based Ampere A1 Compute",
+      "Block Volume",
+      "Object Storage",
+      "Flexible Load Balancer",
+      "Virtual Cloud Networks",
+      "Monitoring",
+      "Notifications",
+      "Logging",
+      "Vault",
+      "Bastions",
+      "Security Advisor",
+      "Email Delivery"
+    ],
+    "mustReverifyBeforeSpendOrProduction": true,
+    "capacityWarning": "Free resources depend on account, region, signup, service, and live capacity. Kingsmen must not assume capacity until the founder account and region confirm it."
+  },
+  "kingsmenDoctrine": {
+    "oracleLiteFirst": true,
+    "dockerComposeFirst": true,
+    "postgresqlTruth": true,
+    "redisPrivateQueue": true,
+    "backendGovernsRuntime": true,
+    "powershellCreatorMaterializes": true,
+    "validatorsProve": true,
+    "githubPreservesHistory": true,
+    "openClawGovernedHelperOnly": true,
+    "candidateSafetyWins": true,
+    "productionReadyMustRemainFalse": true
+  },
+  "deploymentIntent": {
+    "stage": "bootstrap_planning_only",
+    "defaultRegionPolicy": "Founder chooses the nearest available OCI commercial region during signup; adjacent region is acceptable when first choice is unavailable.",
+    "targetUse": "single-founder low-concurrency Kingsmen build, validation, demo, and first Oracle Lite runtime proof",
+    "notYetAllowed": [
+      "production candidate traffic",
+      "real payment provider runtime",
+      "bulk outreach",
+      "unvalidated document storage",
+      "paid resource creation without founder approval",
+      "OpenClaw competing with candidate runtime"
+    ]
+  },
+  "resourcePlan": {
+    "preferredCoreVm": {
+      "provider": "OCI Compute",
+      "shapeFamily": "Arm Ampere A1 where available",
+      "role": "Kingsmen Core Oracle Lite host",
+      "workloads": [
+        "backend API",
+        "web app",
+        "PostgreSQL",
+        "Redis",
+        "thin worker processes",
+        "Nginx reverse proxy",
+        "validator reports"
+      ],
+      "discipline": [
+        "low concurrency",
+        "Docker Compose first",
+        "log pruning",
+        "worker queue limits",
+        "Playwright max concurrency one",
+        "Airtable mirror interval fifteen minutes or longer"
+      ]
+    },
+    "openClawPlacement": {
+      "default": "same repo, local or development helper only until Oracle capacity is proven",
+      "oracleOption": "separate small worker VM or paused local helper when capacity permits",
+      "hardRule": "If OpenClaw competes with Kingsmen core resources, pause OpenClaw first. Candidate runtime wins."
+    },
+    "storage": {
+      "blockVolume": "local Docker volumes for PostgreSQL, Redis, logs, and reports during bootstrap",
+      "objectStorage": "future evidence or document backup only after signed upload and privacy validation",
+      "documentRule": "No real candidate documents until N05 and N03 storage, RLS, signed upload, and audit gates pass."
+    },
+    "network": {
+      "vcn": "private network first",
+      "publicIngress": ["80", "443"],
+      "adminAccess": "restricted founder administration only",
+      "databaseExposure": "PostgreSQL and Redis must not be publicly exposed"
+    },
+    "security": {
+      "vaultPreferred": true,
+      "noSecretsInGit": true,
+      "founderMfaRequired": true,
+      "serviceRoleBrowserExposureAllowed": false,
+      "signedUploadsRequired": true,
+      "auditAppendOnly": true
+    }
+  },
+  "bootstrapSteps": [
+    {
+      "step": 1,
+      "name": "Create or confirm OCI Free account",
+      "owner": "Founder",
+      "proof": "OCI tenancy created or confirmed, region selected, and signup completed only through Oracle official flow."
+    },
+    {
+      "step": 2,
+      "name": "Create compartment and network shell",
+      "owner": "Founder or future script",
+      "proof": "Compartment, VCN, subnet, ingress rules, and admin fingerprint recorded in masked report."
+    },
+    {
+      "step": 3,
+      "name": "Create Oracle Lite VM",
+      "owner": "Founder approval required",
+      "proof": "VM created with chosen free-eligible shape where available; public IP and OS recorded without sensitive values."
+    },
+    {
+      "step": 4,
+      "name": "Install base runtime",
+      "owner": "PowerShell and future Linux script",
+      "proof": "Docker, Docker Compose, Git, Node, Nginx, log pruning, and firewall status report generated."
+    },
+    {
+      "step": 5,
+      "name": "Clone repo and run validators",
+      "owner": "PowerShell Creator",
+      "proof": "N09, Creator, provider health, OpenClaw, and Oracle bootstrap validators pass with productionReady=false."
+    },
+    {
+      "step": 6,
+      "name": "Run Docker Compose boot proof",
+      "owner": "Future N01 and N02 runtime validators",
+      "proof": "Backend, web, PostgreSQL, Redis, and health endpoints pass local Oracle Lite report."
+    }
+  ],
+  "environmentMapping": {
+    "requiredEnvTemplate": "config/environment/.env.template",
+    "providerRegistry": "config/providers/provider-registry.json",
+    "requiredDefaults": {
+      "KINGSMEN_PRODUCTION_READY": "false",
+      "KINGSMEN_DEFAULT_DEPLOY_TARGET": "oracle_lite",
+      "KINGSMEN_ORACLE_LITE_MODE": "true",
+      "KINGSMEN_ACTIVE_CANDIDATE_CAP": "500",
+      "KINGSMEN_READY_CAP_TARGET": "1000",
+      "KINGSMEN_PREPARE_CAP_TARGET": "5000",
+      "KINGSMEN_LOW_CONCURRENCY_MODE": "true",
+      "KINGSMEN_WORKER_CONCURRENCY": "2",
+      "PLAYWRIGHT_MAX_CONCURRENCY": "1",
+      "EMAIL_PROVIDER": "no_send",
+      "PAYMENT_PROVIDER": "manual_eft_proof"
+    },
+    "blockedInGit": [
+      "database credential values",
+      "mail provider credential values",
+      "message provider credential values",
+      "payment provider credential values",
+      "mirror provider credential values",
+      "workflow provider credential values",
+      "administrator credential material"
+    ]
+  },
+  "healthReports": {
+    "oracleBootstrapReport": "reports/oracle/oracle-free-bootstrap-report.json",
+    "oracleCapacityReport": "reports/oracle/oracle-lite-capacity-report.json",
+    "oracleSecurityReport": "reports/oracle/oracle-security-report.json",
+    "oracleCostGuardReport": "reports/oracle/oracle-cost-guard-report.json",
+    "openClawSafetyReport": "reports/openclaw/openclaw-safety-report.json",
+    "providerHealthReport": "reports/validation/provider-health-report.json"
+  },
+  "costGuard": {
+    "paidResourcesDefault": false,
+    "budgetAlarmRequiredBeforePaidUpgrade": true,
+    "founderApprovalRequiredForAnyPaidChange": true,
+    "stopIfEstimatedMonthlyCostAboveZar": 0,
+    "allowedWithoutFounderApproval": [
+      "planning files",
+      "validators",
+      "reports",
+      "free-tier documentation checks",
+      "local-only Docker validation"
+    ]
+  },
+  "openClawBoundary": {
+    "canHelp": [
+      "read masked reports",
+      "summarize failed validators",
+      "draft Oracle action packets",
+      "monitor local CPU RAM disk after permission",
+      "suggest low-concurrency tuning"
+    ],
+    "cannotDo": [
+      "create paid Oracle resources automatically",
+      "read sensitive values",
+      "deploy production without founder approval",
+      "send real candidate messages",
+      "change caps or pricing",
+      "access real candidate documents"
+    ]
+  },
+  "validationExpectation": {
+    "validator": "scripts/validators/validate-oracle-bootstrap.mjs",
+    "mustCheck": [
+      "productionReady false",
+      "official source notes present",
+      "Oracle Lite doctrine present",
+      "cost guard present",
+      "OpenClaw boundary present",
+      "required env mapping present",
+      "no sensitive values committed",
+      "next tracker row correct"
+    ]
+  },
+  "nextTrackerRow": "ORACLE.2 - scripts/validators/validate-oracle-bootstrap.mjs"
+}
