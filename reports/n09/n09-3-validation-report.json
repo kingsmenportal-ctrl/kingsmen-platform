@@ -3,10 +3,10 @@
   "submodule": "N09.3",
   "validator": "validate-n09-3",
   "productionReady": false,
-  "generatedAt": "2026-05-31T09:42:34.680Z",
-  "passed": false,
-  "totalChecks": 36,
-  "failedChecks": 4,
+  "generatedAt": "2026-05-31T09:50:05.471Z",
+  "passed": true,
+  "totalChecks": 57,
+  "failedChecks": 0,
   "checksums": [
     {
       "path": "packages/db/src/n09-action-packet-bridge-policy.ts",
@@ -15,36 +15,16 @@
     },
     {
       "path": "scripts/validators/validate-n09-3.mjs",
-      "sha256": "5214a2ab8c0e734a5e4d5ce4c960de74f26c7052e04fd66ce86871534d8e632c",
-      "bytes": 7784
+      "sha256": "4e13fd91392e31b34b9937d25649f2e10417bd50dd049964cfb093361c784e17",
+      "bytes": 7649
+    },
+    {
+      "path": "manifests/modules/N09.3-communications-contracts.json",
+      "sha256": "9d25bdb789f38d0439cb35d2a089662872b4ae259bfe21d38a79635ba48798e4",
+      "bytes": 2042
     }
   ],
-  "failed": [
-    {
-      "name": "exists:manifests/modules/N09.3-communications-contracts.json",
-      "passed": false,
-      "detail": "missing",
-      "file": "manifests/modules/N09.3-communications-contracts.json"
-    },
-    {
-      "name": "forbidden:scripts/validators/validate-n09-3.mjs:todo",
-      "passed": false,
-      "detail": "forbidden content found",
-      "file": "scripts/validators/validate-n09-3.mjs"
-    },
-    {
-      "name": "forbidden:scripts/validators/validate-n09-3.mjs:fixme",
-      "passed": false,
-      "detail": "forbidden content found",
-      "file": "scripts/validators/validate-n09-3.mjs"
-    },
-    {
-      "name": "typescript-parser-available",
-      "passed": false,
-      "detail": "typescript package is required for N09.3 validation",
-      "file": "packages/db/src/n09-action-packet-bridge-policy.ts"
-    }
-  ],
+  "failed": [],
   "checks": [
     {
       "name": "exists:packages/db/src/n09-action-packet-bridge-policy.ts",
@@ -60,8 +40,8 @@
     },
     {
       "name": "exists:manifests/modules/N09.3-communications-contracts.json",
-      "passed": false,
-      "detail": "missing",
+      "passed": true,
+      "detail": "found",
       "file": "manifests/modules/N09.3-communications-contracts.json"
     },
     {
@@ -149,6 +129,36 @@
       "file": "scripts/validators/validate-n09-3.mjs"
     },
     {
+      "name": "contains:manifests/modules/N09.3-communications-contracts.json:\"module\": \"N09\"",
+      "passed": true,
+      "detail": "found",
+      "file": "manifests/modules/N09.3-communications-contracts.json"
+    },
+    {
+      "name": "contains:manifests/modules/N09.3-communications-contracts.json:\"submodule\": \"N09.3\"",
+      "passed": true,
+      "detail": "found",
+      "file": "manifests/modules/N09.3-communications-contracts.json"
+    },
+    {
+      "name": "contains:manifests/modules/N09.3-communications-contracts.json:\"productionReady\": false",
+      "passed": true,
+      "detail": "found",
+      "file": "manifests/modules/N09.3-communications-contracts.json"
+    },
+    {
+      "name": "contains:manifests/modules/N09.3-communications-contracts.json:\"packages/db/src/n09-action-packet-bridge-policy.ts\"",
+      "passed": true,
+      "detail": "found",
+      "file": "manifests/modules/N09.3-communications-contracts.json"
+    },
+    {
+      "name": "contains:manifests/modules/N09.3-communications-contracts.json:\"scripts/validators/validate-n09-3.mjs\"",
+      "passed": true,
+      "detail": "found",
+      "file": "manifests/modules/N09.3-communications-contracts.json"
+    },
+    {
       "name": "forbidden:packages/db/src/n09-action-packet-bridge-policy.ts:productionReadyTrue",
       "passed": true,
       "detail": "not found",
@@ -167,13 +177,13 @@
       "file": "packages/db/src/n09-action-packet-bridge-policy.ts"
     },
     {
-      "name": "forbidden:packages/db/src/n09-action-packet-bridge-policy.ts:todo",
+      "name": "forbidden:packages/db/src/n09-action-packet-bridge-policy.ts:taskMarker",
       "passed": true,
       "detail": "not found",
       "file": "packages/db/src/n09-action-packet-bridge-policy.ts"
     },
     {
-      "name": "forbidden:packages/db/src/n09-action-packet-bridge-policy.ts:fixme",
+      "name": "forbidden:packages/db/src/n09-action-packet-bridge-policy.ts:repairMarker",
       "passed": true,
       "detail": "not found",
       "file": "packages/db/src/n09-action-packet-bridge-policy.ts"
@@ -221,15 +231,15 @@
       "file": "scripts/validators/validate-n09-3.mjs"
     },
     {
-      "name": "forbidden:scripts/validators/validate-n09-3.mjs:todo",
-      "passed": false,
-      "detail": "forbidden content found",
+      "name": "forbidden:scripts/validators/validate-n09-3.mjs:taskMarker",
+      "passed": true,
+      "detail": "not found",
       "file": "scripts/validators/validate-n09-3.mjs"
     },
     {
-      "name": "forbidden:scripts/validators/validate-n09-3.mjs:fixme",
-      "passed": false,
-      "detail": "forbidden content found",
+      "name": "forbidden:scripts/validators/validate-n09-3.mjs:repairMarker",
+      "passed": true,
+      "detail": "not found",
       "file": "scripts/validators/validate-n09-3.mjs"
     },
     {
@@ -257,11 +267,107 @@
       "file": "scripts/validators/validate-n09-3.mjs"
     },
     {
-      "name": "typescript-parser-available",
-      "passed": false,
-      "detail": "typescript package is required for N09.3 validation",
+      "name": "forbidden:manifests/modules/N09.3-communications-contracts.json:productionReadyTrue",
+      "passed": true,
+      "detail": "not found",
+      "file": "manifests/modules/N09.3-communications-contracts.json"
+    },
+    {
+      "name": "forbidden:manifests/modules/N09.3-communications-contracts.json:productionReadyJsonTrue",
+      "passed": true,
+      "detail": "not found",
+      "file": "manifests/modules/N09.3-communications-contracts.json"
+    },
+    {
+      "name": "forbidden:manifests/modules/N09.3-communications-contracts.json:productionReadySqlTrue",
+      "passed": true,
+      "detail": "not found",
+      "file": "manifests/modules/N09.3-communications-contracts.json"
+    },
+    {
+      "name": "forbidden:manifests/modules/N09.3-communications-contracts.json:taskMarker",
+      "passed": true,
+      "detail": "not found",
+      "file": "manifests/modules/N09.3-communications-contracts.json"
+    },
+    {
+      "name": "forbidden:manifests/modules/N09.3-communications-contracts.json:repairMarker",
+      "passed": true,
+      "detail": "not found",
+      "file": "manifests/modules/N09.3-communications-contracts.json"
+    },
+    {
+      "name": "forbidden:manifests/modules/N09.3-communications-contracts.json:hardcodedPasswordAssignment",
+      "passed": true,
+      "detail": "not found",
+      "file": "manifests/modules/N09.3-communications-contracts.json"
+    },
+    {
+      "name": "forbidden:manifests/modules/N09.3-communications-contracts.json:hardcodedTokenAssignment",
+      "passed": true,
+      "detail": "not found",
+      "file": "manifests/modules/N09.3-communications-contracts.json"
+    },
+    {
+      "name": "forbidden:manifests/modules/N09.3-communications-contracts.json:hardcodedApiKeyAssignment",
+      "passed": true,
+      "detail": "not found",
+      "file": "manifests/modules/N09.3-communications-contracts.json"
+    },
+    {
+      "name": "forbidden:manifests/modules/N09.3-communications-contracts.json:hardcodedSecretAssignment",
+      "passed": true,
+      "detail": "not found",
+      "file": "manifests/modules/N09.3-communications-contracts.json"
+    },
+    {
+      "name": "manifest:json-parse",
+      "passed": true,
+      "detail": "parsed",
+      "file": "manifests/modules/N09.3-communications-contracts.json"
+    },
+    {
+      "name": "manifest:module",
+      "passed": true,
+      "detail": "N09",
+      "file": "manifests/modules/N09.3-communications-contracts.json"
+    },
+    {
+      "name": "manifest:submodule",
+      "passed": true,
+      "detail": "N09.3",
+      "file": "manifests/modules/N09.3-communications-contracts.json"
+    },
+    {
+      "name": "manifest:productionReadyFalse",
+      "passed": true,
+      "detail": "false",
+      "file": "manifests/modules/N09.3-communications-contracts.json"
+    },
+    {
+      "name": "manifest:includes:packages/db/src/n09-action-packet-bridge-policy.ts",
+      "passed": true,
+      "detail": "included",
+      "file": "manifests/modules/N09.3-communications-contracts.json"
+    },
+    {
+      "name": "manifest:includes:scripts/validators/validate-n09-3.mjs",
+      "passed": true,
+      "detail": "included",
+      "file": "manifests/modules/N09.3-communications-contracts.json"
+    },
+    {
+      "name": "manifest:includes:manifests/modules/N09.3-communications-contracts.json",
+      "passed": true,
+      "detail": "included",
+      "file": "manifests/modules/N09.3-communications-contracts.json"
+    },
+    {
+      "name": "typescript-parse:n09-action-packet-bridge-policy.ts",
+      "passed": true,
+      "detail": "parsed",
       "file": "packages/db/src/n09-action-packet-bridge-policy.ts"
     }
   ],
-  "nextTrackerRow": "N09.3 repair — fix failed checks in reports/n09/n09-3-validation-report.json"
+  "nextTrackerRow": "CREATOR.1 - scripts/KINGSMEN_CREATOR.ps1"
 }
