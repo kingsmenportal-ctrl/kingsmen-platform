@@ -1,0 +1,135 @@
+{
+  "module": "CREATOR",
+  "submodule": "CREATOR.4",
+  "name": "Kingsmen Creator Configuration",
+  "version": "0.1.0",
+  "productionReady": false,
+  "status": "built_pending_tracker_validation",
+  "repo": {
+    "name": "kingsmen-platform",
+    "owner": "kingsmenportal-ctrl",
+    "defaultBranch": "main",
+    "rootDetection": ".git",
+    "windowsFirst": true,
+    "canonicalCreator": "scripts/KINGSMEN_CREATOR.ps1"
+  },
+  "proofDoctrine": {
+    "noClaimWithoutFilePath": true,
+    "noFilePathWithoutContent": true,
+    "noContentWithoutValidator": true,
+    "noValidatorWithoutReport": true,
+    "noUiClaimWithoutClickableInteraction": true,
+    "noProductionClaimWithoutRuntimeProof": true,
+    "trackerIsBuildStatusAuthority": true,
+    "chatIsSpecificationNotProof": true,
+    "githubCommitIsProofMemory": true
+  },
+  "actions": {
+    "Scaffold": {
+      "description": "Create canonical Kingsmen repository directories and .gitkeep placeholders.",
+      "allowed": true,
+      "writesFiles": true,
+      "requiresClipboard": false,
+      "safeForFounder": true
+    },
+    "Materialize": {
+      "description": "Read FILE blocks from clipboard and write exact repo files.",
+      "allowed": true,
+      "writesFiles": true,
+      "requiresClipboard": true,
+      "fileBlockFormat": "FILE: path/to/file.ext\n---\ncontent\n---",
+      "safeForFounder": true
+    },
+    "Validate": {
+      "description": "Run scripts/validators/validate-<module>.mjs for a selected module.",
+      "allowed": true,
+      "writesFiles": true,
+      "requiresModuleName": true,
+      "reportRequired": true,
+      "safeForFounder": true
+    },
+    "GitCommit": {
+      "description": "Commit and push current repo changes after validation or approved build step.",
+      "allowed": true,
+      "writesGitHistory": true,
+      "requiresCommitMessage": false,
+      "safeForFounder": true
+    },
+    "FullBuild": {
+      "description": "Materialize FILE blocks, optionally validate, then commit/push.",
+      "allowed": true,
+      "writesFiles": true,
+      "writesGitHistory": true,
+      "requiresClipboard": true,
+      "safeForFounder": true
+    }
+  },
+  "phaseRegistry": [
+    {
+      "phase": 1,
+      "phaseName": "Close_Open_Wound",
+      "modules": ["N09.3.1", "N09.3.2", "N09.3.3"],
+      "status": "validated",
+      "reportPath": "reports/n09/n09-3-validation-report.json"
+    },
+    {
+      "phase": 2,
+      "phaseName": "Build_Materializer",
+      "modules": ["CREATOR.1", "CREATOR.2", "CREATOR.3", "CREATOR.4", "CREATOR.5"],
+      "status": "in_progress",
+      "reportPath": "reports/creator/creator-validation-report.json"
+    },
+    {
+      "phase": 3,
+      "phaseName": "Infrastructure_Gate",
+      "modules": ["N01.5", "N01.5.1", "N01.5.2", "N01.6", "N01.6.1", "N01.7", "N01.7.1", "N01.8", "N01.8.1", "N01.9"],
+      "status": "not_started"
+    },
+    {
+      "phase": 4,
+      "phaseName": "First_Clickable_Surface",
+      "modules": ["UI.1", "UI.1.1", "UI.1.2", "UI.1.3", "UI.2", "UI.2.1", "UI.2.2", "UI.2.3", "UI.3", "UI.3.1", "UI.3.2", "UI.3.3"],
+      "status": "not_started"
+    }
+  ],
+  "lockedPaths": {
+    "tracker": "Kingsmen_Build_Tracker.csv",
+    "creator": "scripts/KINGSMEN_CREATOR.ps1",
+    "creatorTest": "scripts/testing/Test-KingsmenCreator.ps1",
+    "creatorReport": "reports/creator/creator-validation-report.json",
+    "n09Report": "reports/n09/n09-3-validation-report.json",
+    "moduleManifests": "manifests/modules",
+    "validators": "scripts/validators",
+    "reports": "reports"
+  },
+  "blockedContent": {
+    "hardcodedSecrets": true,
+    "supabaseServiceRoleInRepo": true,
+    "smtpPasswordInRepo": true,
+    "whatsappTokenInRepo": true,
+    "paymentSecretInRepo": true,
+    "airtableTokenInRepo": true,
+    "candidateDocumentsInRepo": true,
+    "rawEvidenceInRepo": true,
+    "productionReadyTrue": true
+  },
+  "oracleLiteDiscipline": {
+    "defaultDeploymentTarget": "Oracle Cloud Free Tier / Oracle Lite",
+    "dockerComposeFirst": true,
+    "lowConcurrencyFirst": true,
+    "postgresTruth": true,
+    "airtableMirrorOnly": true,
+    "emailPrimary": true,
+    "whatsappUrgentOnly": true,
+    "smsBackupOnly": true
+  },
+  "trackerUpdateRules": {
+    "notStartedMeans": "File is not yet materialized in repo.",
+    "builtMeans": "File content exists in repo and has commit proof.",
+    "validatedMeans": "Validator/report passed and commit proof exists.",
+    "reportGeneratedRequired": true,
+    "gitCommitHashRequired": true,
+    "reviewerRequiredForAcceptance": true
+  },
+  "nextTrackerRow": "CREATOR.5 - scripts/install-git-hooks.ps1"
+}
