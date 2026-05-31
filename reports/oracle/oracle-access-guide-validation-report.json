@@ -1,0 +1,30 @@
+{
+  "module": "ORACLE",
+  "submodule": "ORACLE.12",
+  "validator": "validate-oracle-ssh-bootstrap-guide.mjs",
+  "productionReady": false,
+  "generatedAt": "2026-06-01T06:37:56.167Z",
+  "passed": true,
+  "totalChecks": 4,
+  "failedChecks": 0,
+  "warningChecks": 0,
+  "failed": [],
+  "checks": [
+    { "name": "oracle11-report", "passed": true, "detail": "required previous report" },
+    { "name": "guide-json", "passed": true, "detail": "required generated guide" },
+    { "name": "guide-md", "passed": true, "detail": "required generated guide doc" },
+    { "name": "oracle10-report", "passed": true, "detail": "required previous validator report" }
+  ],
+  "proofSummary": {
+    "gitPullCompleted": true,
+    "gitPullCommitRange": "a570ada..32fc7eb",
+    "oracleSshBootstrapGuideValidatorPassed": true,
+    "oracle11ReportFound": true,
+    "sshGuideJsonFound": true,
+    "sshGuideMarkdownFound": true,
+    "oracle10ReportFound": true,
+    "productionReadyFalseVerified": true,
+    "noFailedChecks": true
+  },
+  "nextTrackerRow": "ORACLE.13 - scripts/oracle/Prepare-OracleFirstLoginChecklist.ps1"
+}
