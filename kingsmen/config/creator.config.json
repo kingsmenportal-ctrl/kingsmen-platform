@@ -1,0 +1,160 @@
+{
+  "module": "CREATOR",
+  "submodule": "CREATOR.4",
+  "name": "Kingsmen Creator Configuration",
+  "status": "built_pending_validation",
+  "productionReady": false,
+  "version": "0.1.0",
+  "purpose": "Configure KINGSMEN_CREATOR.ps1 as the Windows-first proof runner for repo audit, validation, reports, and tracker discipline without claiming production readiness.",
+  "authorityHierarchy": {
+    "chatgpt": "specifies_files_and_logic",
+    "powershellCreator": "materializes_runs_validates_reports_and_prepares_git_checkpoints",
+    "backendPolicies": "runtime_authority",
+    "postgresql": "truth_store",
+    "reports": "proof_evidence",
+    "git": "history_and_checkpoint_memory",
+    "oracleLite": "first_deployment_constraint"
+  },
+  "proofLaw": {
+    "noClaimWithoutFilePath": true,
+    "noFilePathWithoutContent": true,
+    "noContentWithoutValidator": true,
+    "noValidatorWithoutReport": true,
+    "noReportWithoutNextAction": true,
+    "noUiClaimWithoutClickableInteraction": true,
+    "noProductionClaimWithoutLocalRunProviderHealthSecurityAuditAndInteractionProof": true
+  },
+  "phaseRunner": {
+    "script": "scripts/KINGSMEN_CREATOR.ps1",
+    "testScript": "scripts/testing/Test-KingsmenCreator.ps1",
+    "supportedPhases": [
+      "Help",
+      "Doctor",
+      "AuditExisting",
+      "N09.3Complete",
+      "Validate",
+      "Report"
+    ],
+    "requiredCommands": [
+      ".\\scripts\\KINGSMEN_CREATOR.ps1 -Phase Help",
+      ".\\scripts\\KINGSMEN_CREATOR.ps1 -Phase Doctor",
+      ".\\scripts\\KINGSMEN_CREATOR.ps1 -Phase AuditExisting",
+      ".\\scripts\\KINGSMEN_CREATOR.ps1 -Phase N09.3Complete",
+      ".\\scripts\\KINGSMEN_CREATOR.ps1 -Phase Validate",
+      ".\\scripts\\KINGSMEN_CREATOR.ps1 -Phase Report",
+      ".\\scripts\\testing\\Test-KingsmenCreator.ps1"
+    ]
+  },
+  "reportRegistry": {
+    "creatorDoctor": "reports/creator/creator-doctor-report.json",
+    "creatorAuditExisting": "reports/creator/creator-audit-existing-report.json",
+    "creatorN09Bridge": "reports/creator/creator-n09-3-validation-bridge-report.json",
+    "creatorReportIndex": "reports/creator/creator-report-index.json",
+    "creatorValidation": "reports/creator/creator-validation-report.json",
+    "n09Validation": "reports/n09/n09-3-validation-report.json"
+  },
+  "trackedFiles": [
+    {
+      "trackerRow": "N09.3.1",
+      "path": "packages/db/src/n09-action-packet-bridge-policy.ts",
+      "required": true,
+      "currentMinimumStatus": "Validated"
+    },
+    {
+      "trackerRow": "N09.3.2",
+      "path": "scripts/validators/validate-n09-3.mjs",
+      "required": true,
+      "currentMinimumStatus": "Validated"
+    },
+    {
+      "trackerRow": "N09.3.3",
+      "path": "manifests/modules/N09.3-communications-contracts.json",
+      "required": true,
+      "currentMinimumStatus": "Validated"
+    },
+    {
+      "trackerRow": "CREATOR.1",
+      "path": "scripts/KINGSMEN_CREATOR.ps1",
+      "required": true,
+      "currentMinimumStatus": "Validated"
+    },
+    {
+      "trackerRow": "CREATOR.2",
+      "path": "scripts/testing/Test-KingsmenCreator.ps1",
+      "required": true,
+      "currentMinimumStatus": "Validated"
+    },
+    {
+      "trackerRow": "CREATOR.3",
+      "path": "reports/creator/creator-validation-report.json",
+      "required": true,
+      "currentMinimumStatus": "Built"
+    },
+    {
+      "trackerRow": "CREATOR.4",
+      "path": "kingsmen/config/creator.config.json",
+      "required": true,
+      "currentMinimumStatus": "Built"
+    }
+  ],
+  "requiredDirectories": [
+    "scripts",
+    "scripts/testing",
+    "scripts/validators",
+    "reports",
+    "reports/creator",
+    "reports/n09",
+    "manifests/modules",
+    "kingsmen/config",
+    "packages/contracts/src",
+    "packages/db/src"
+  ],
+  "forbiddenContentPolicy": {
+    "productionReadyTrue": true,
+    "hardcodedSecrets": true,
+    "serviceRoleExposure": true,
+    "rawDocumentExposure": true,
+    "rawEvidenceExposure": true,
+    "providerTokenExposure": true,
+    "paymentSecretExposure": true,
+    "todoMarkersInValidatedFiles": true,
+    "fixmeMarkersInValidatedFiles": true
+  },
+  "blockedSecretNames": [
+    "SUPABASE_SERVICE_ROLE",
+    "SMTP_PASSWORD",
+    "WHATSAPP_TOKEN",
+    "PAYMENT_SECRET",
+    "AIRTABLE_TOKEN",
+    "DATABASE_URL",
+    "JWT_SECRET",
+    "API_KEY"
+  ],
+  "statusDefinitions": {
+    "Not_Started": "File is not accepted as repo materialized.",
+    "Built": "File content exists in the repo or was produced for exact repo path.",
+    "Validated": "Validator ran, report exists, failedChecks is 0, and productionReady remains false.",
+    "Preserved": "GitHub commit or local git checkpoint preserved the proof artifact."
+  },
+  "currentProofStatus": {
+    "n09_3": "Validated by local report and creator bridge proof",
+    "creator_1": "Built and validated through CREATOR.2 self-test phases",
+    "creator_2": "Validated by reports/creator/creator-validation-report.json",
+    "creator_3": "Preserved in GitHub as proof report",
+    "creator_4": "Built pending validation"
+  },
+  "oracleLiteDiscipline": {
+    "defaultDeploymentConstraint": "Oracle Free Tier / Oracle Lite",
+    "dockerComposeFirst": true,
+    "lowConcurrencyFirst": true,
+    "noAwsStyleAssumption": true,
+    "noProductionClaimWithoutOracleHealthReport": true
+  },
+  "nextTrackerRow": "CREATOR.5 - Git proof hooks / checkpoint guard",
+  "validationExpectation": {
+    "command": ".\\scripts\\testing\\Test-KingsmenCreator.ps1",
+    "mustProduce": "reports/creator/creator-validation-report.json",
+    "mustPass": true,
+    "expectedFailedChecks": 0
+  }
+}
