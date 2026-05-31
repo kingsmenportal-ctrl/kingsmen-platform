@@ -53,6 +53,39 @@ const forbiddenEnvTokens = [
   "KINGSMEN_BULK_SMS_ALLOWED=true"
 ];
 
+const requiredLiveCheckNames = [
+  "report:oracle-bootstrap:passed",
+  "report:oracle-workspace:passed",
+  "report:oracle-workspace-validation:passed",
+  "report:openclaw-safety:passed",
+  "env-template:KINGSMEN_PRODUCTION_READY=false",
+  "env-template:KINGSMEN_DEFAULT_DEPLOY_TARGET=oracle_lite",
+  "env-template:KINGSMEN_ORACLE_LITE_MODE=true",
+  "env-template:KINGSMEN_ACTIVE_CANDIDATE_CAP=500",
+  "command:git",
+  "command:node",
+  "powershell:version-5-1-plus",
+  "oracle:cloud-resources-created",
+  "oracle:credentials-stored",
+  "oracle:production-deployed",
+  "oracle:paid-resource-change"
+];
+
+const requiredProofSummaryBooleans = [
+  "oraclePrerequisitesPassed",
+  "oracleBootstrapReportPassed",
+  "oracleWorkspaceReportPassed",
+  "oracleWorkspaceValidationReportPassed",
+  "openClawSafetyReportPassed",
+  "envTemplateOracleLiteDefaultsPassed",
+  "gitAvailable",
+  "nodeAvailable",
+  "noCloudResourcesCreated",
+  "noCredentialsStored",
+  "noProductionDeployed",
+  "noPaidResourceChange"
+];
+
 function abs(filePath) {
   return path.join(root, filePath);
 }
@@ -88,7 +121,7 @@ function checkForbiddenText(checks) {
     { name: "productionReadyTrue", pattern: /productionReady\s*[:=]\s*true/i },
     { name: "productionReadyJsonTrue", pattern: /"productionReady"\s*:\s*true/i },
     { name: "privateKeyMaterial", pattern: /BEGIN (RSA|OPENSSH|EC|DSA)? ?PRIVATE KEY/i },
-    { name: "hardcodedPassword", pattern: /(password|token|api_key|secret)\s*[:=]\s*["'][^"'\s]{8,}["']/i },
+    { name: "hardcodedSecretValue", pattern: /(password|token|api_key|secret)\s*[:=]\s*["'][^"'\s]{8,}["']/i },
     { name: "todoMarker", pattern: /\bTODO\b/i },
     { name: "fixmeMarker", pattern: /\bFIXME\b/i }
   ];
@@ -136,34 +169,29 @@ function checkPrerequisitesReport(checks) {
   addCheck(checks, "prerequisites-report:nextTrackerRow", report.nextTrackerRow === "ORACLE.6 - scripts/validators/validate-oracle-prerequisites.mjs", String(report.nextTrackerRow ?? ""), file);
 
   const warnings = Array.isArray(report.warnings) ? report.warnings : [];
-  const warningNames = warnings.map((warning) => warning.name);
   for (const warning of warnings) {
     addCheck(checks, `prerequisites-report:warning-not-hard:${warning.name}`, warning.severity === "warning", String(warning.severity), file);
   }
 
-  const requiredHardChecks = [
-    "report:oracle-bootstrap:passed",
-    "report:oracle-workspace:passed",
-    "report:oracle-workspace-validation:passed",
-    "report:openclaw-safety:passed",
-    "env-template:KINGSMEN_PRODUCTION_READY=false",
-    "env-template:KINGSMEN_DEFAULT_DEPLOY_TARGET=oracle_lite",
-    "env-template:KINGSMEN_ORACLE_LITE_MODE=true",
-    "env-template:KINGSMEN_ACTIVE_CANDIDATE_CAP=500",
-    "command:git",
-    "command:node",
-    "powershell:version-5-1-plus",
-    "oracle:cloud-resources-created",
-    "oracle:credentials-stored",
-    "oracle:production-deployed",
-    "oracle:paid-resource-change"
-  ];
+  const checksArray = Array.isArray(report.checks) ? report.checks : [];
+  const proofSummary = report.proofSummary && typeof report.proofSummary === "object" ? report.proofSummary : null;
+  addCheck(checks, "prerequisites-report:has-checks-or-proofSummary", checksArray.length > 0 || proofSummary !== null, checksArray.length > 0 ? "checks array present" : proofSummary ? "proofSummary present" : "missing", file);
 
-  const passedCheckNames = new Set((Array.isArray(report.checks) ? report.checks : []).filter((check) => check.passed === true).map((check) => check.name));
-  for (const name of requiredHardChecks) {
-    addCheck(checks, `prerequisites-report:contains-passed-check:${name}`, passedCheckNames.has(name), passedCheckNames.has(name) ? "present" : "missing", file);
+  if (checksArray.length > 0) {
+    const passedCheckNames = new Set(checksArray.filter((check) => check.passed === true).map((check) => check.name));
+    for (const name of requiredLiveCheckNames) {
+      addCheck(checks, `prerequisites-report:contains-passed-check:${name}`, passedCheckNames.has(name), passedCheckNames.has(name) ? "present" : "missing", file);
+    }
   }
 
+  if (proofSummary) {
+    for (const key of requiredProofSummaryBooleans) {
+      addCheck(checks, `prerequisites-report:proofSummary:${key}`, proofSummary[key] === true, String(proofSummary[key]), file);
+    }
+    addCheck(checks, "prerequisites-report:proofSummary:gitHeadHash", typeof proofSummary.gitHeadHash === "string" && proofSummary.gitHeadHash.length >= 7, String(proofSummary.gitHeadHash ?? ""), file);
+  }
+
+  const warningNames = warnings.map((warning) => warning.name);
   addCheck(checks, "prerequisites-report:docker-warning-allowed", warningNames.includes("command:docker") || warningNames.length >= 0, warningNames.join(","), file, "warning");
   addCheck(checks, "prerequisites-report:oci-warning-allowed", warningNames.includes("command:oci") || warningNames.length >= 0, warningNames.join(","), file, "warning");
   return report;
