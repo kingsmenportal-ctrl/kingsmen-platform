@@ -1,0 +1,43 @@
+{
+  "module": "ORACLE",
+  "submodule": "ORACLE.4",
+  "validator": "validate-oracle-workspace.mjs",
+  "productionReady": false,
+  "generatedAt": "2026-06-01T02:00:18.132Z",
+  "passed": true,
+  "totalChecks": 138,
+  "failedChecks": 0,
+  "checksums": [
+    { "path": "scripts/oracle/Prepare-OracleFreeWorkspace.ps1", "sha256": "905497ab4e1f7b031e6c533c3fd37e81bb0968f9b4ce9d84134625bb3132857f", "bytes": 11900 },
+    { "path": "reports/oracle/oracle-free-workspace-report.json", "sha256": "a1f647c8edf49a799b512e1086ad6dfd443110ae6a84e62d4675b8e351bba8aa", "bytes": 2023 },
+    { "path": "kingsmen/oracle/oracle-free-bootstrap-plan.json", "sha256": "6db3a88ecff153a8617293249c6f97676c5a460ace911813e59aa00ed1e869f6", "bytes": 8479 },
+    { "path": "reports/oracle/oracle-free-bootstrap-report.json", "sha256": "abc3f1c4c9edb097e7133efa04d60b7d3b60fe6b49763ed9b3d146751e3ca8b3", "bytes": 1839 },
+    { "path": "kingsmen/oracle/workspace/oracle-workspace-config.json", "sha256": "1fbee6bffd2ff0b7891459b2e5a719a945eff23e3ec3e0a2d65a5a0e31667307", "bytes": 1275 },
+    { "path": "kingsmen/oracle/checklists/founder-oracle-free-checklist.json", "sha256": "0041d1f1bf1017f9c268d84447f5d64eba28e62c0bafa036533b17b35546854a", "bytes": 1576 },
+    { "path": "kingsmen/oracle/cost-guard/oracle-cost-guard.json", "sha256": "a3b679689a63b0eff0cecfb5bff2fc60d90a1f6fae1f0d4ee24faa1447aa4676", "bytes": 888 },
+    { "path": "kingsmen/oracle/security/oracle-security-checklist.json", "sha256": "5adf7697a8feb8f24cd410ab7dbdcc6ebbd6b7e41fb633e4ee784ba0342f505e", "bytes": 856 },
+    { "path": "docs/oracle/README.md", "sha256": "4b9d7be843652e5f2912928be25d27f1f46a28476fc0895a3d54681aeff11392", "bytes": 927 },
+    { "path": "reports/openclaw/openclaw-safety-report.json", "sha256": "c5dfe9596091025507834bac4f32fcfa9264ff443cb11bbad51e332c787be700", "bytes": 2007 },
+    { "path": "config/environment/.env.template", "sha256": "240776ba2a65d35ecd666234a034a0d1254c003bdbb9a535a8b737f4c8865c2a", "bytes": 6964 },
+    { "path": "config/providers/provider-registry.json", "sha256": "4f4b107b6c70998a6e780ba10503238130a64c066fc0935f1903ab1214d5a49f", "bytes": 15227 }
+  ],
+  "failed": [],
+  "proofSummary": {
+    "gitPullCompleted": true,
+    "gitPullCommitRange": "81b18f2..08bfdbe",
+    "oracleWorkspaceValidatorPassed": true,
+    "presenceChecksPassed": true,
+    "forbiddenContentScanPassed": true,
+    "workspaceReportPassed": true,
+    "bootstrapReportPassed": true,
+    "openClawReportPassed": true,
+    "workspaceConfigValidated": true,
+    "founderChecklistValidated": true,
+    "costGuardValidated": true,
+    "securityChecklistValidated": true,
+    "readmeValidated": true,
+    "productionReadyFalseVerified": true,
+    "noFailedChecks": true
+  },
+  "nextTrackerRow": "ORACLE.5 - scripts/oracle/Test-OracleFreePrerequisites.ps1"
+}
