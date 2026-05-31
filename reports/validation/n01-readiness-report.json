@@ -1,0 +1,2652 @@
+{
+  "module": "N01",
+  "submodule": "N01.9",
+  "validator": "validate-n01-readiness.mjs",
+  "productionReady": false,
+  "generatedAt": "2026-05-31T10:52:35.764Z",
+  "passed": false,
+  "totalChecks": 417,
+  "failedChecks": 2,
+  "readinessScope": [
+    "creator",
+    "provider-health",
+    "phase-runner",
+    "nginx",
+    "docker-compose",
+    "maintenance",
+    "health-validator",
+    "master-build-index",
+    "tracker-presence"
+  ],
+  "checksums": [
+    {
+      "path": "Kingsmen_Build_Tracker.csv",
+      "sha256": "f56ef07fc65b007b787de16fbfc382a197f2fa692fc44e5bf543e5a2779eba25",
+      "bytes": 28202
+    },
+    {
+      "path": "config/environment/.env.template",
+      "sha256": "4b3f9a21d1719b115a2d1e052db88b934d53c9c2971709b76d1f35e8510b7f7d",
+      "bytes": 2997
+    },
+    {
+      "path": "config/providers/provider-registry.json",
+      "sha256": "23f350e86744fa14259e94d6bd4f4cf51eb33d94004f600d413b35373da2afd8",
+      "bytes": 10119
+    },
+    {
+      "path": "config/creator.config.json",
+      "sha256": "4d74245b8176599bdbd4892c295469f3e115b3ca084dbe9854d52c5547e715f4",
+      "bytes": 4710
+    },
+    {
+      "path": "manifests/master-build-index.json",
+      "sha256": "b0b3a18e85dd8cff0e90f7a10e884a1df06371d2b59c03c372e82d27faad5296",
+      "bytes": 8860
+    },
+    {
+      "path": "scripts/KINGSMEN_CREATOR.ps1",
+      "sha256": "0e5078c8d259656af8c24ee1e2f424f51073b0362308e54572c14733cbb9b743",
+      "bytes": 10338
+    },
+    {
+      "path": "scripts/testing/Test-KingsmenCreator.ps1",
+      "sha256": "5d4a94bdd537bd544c441a2ee6d6e1d98744fed00229004904b6205a86d6826c",
+      "bytes": 4391
+    },
+    {
+      "path": "scripts/install-git-hooks.ps1",
+      "sha256": "6b1431cf5ab0f653ad8e488edbf81242d7ba42e50997783c14a2ac24a1f799f3",
+      "bytes": 6282
+    },
+    {
+      "path": "scripts/phases/Invoke-KingsmenPhase.ps1",
+      "sha256": "9af54e7f18b30435d3b6725650f2465978d0aaad78fb29e5c2f655e938425ea9",
+      "bytes": 11300
+    },
+    {
+      "path": "scripts/maintenance/prune-logs.ps1",
+      "sha256": "bb62a1688020f5f9d7e773deb730d087366e96729892d2ccb62b91fff9ae3ef6",
+      "bytes": 8313
+    },
+    {
+      "path": "scripts/validators/validate-n09-3.mjs",
+      "sha256": "4e13fd91392e31b34b9937d25649f2e10417bd50dd049964cfb093361c784e17",
+      "bytes": 7649
+    },
+    {
+      "path": "scripts/validators/validate-provider-health.mjs",
+      "sha256": "c09a8492d4d1298abc940eb50a6064a45b240002072d5a3afd65e232e1ab7227",
+      "bytes": 11343
+    },
+    {
+      "path": "scripts/validators/validate-health.mjs",
+      "sha256": "bc328a9edf38bf0e9dcbeebb0b222de805f99a7e6662e7597a3570357383efb9",
+      "bytes": 10280
+    },
+    {
+      "path": "scripts/validators/validate-n01-readiness.mjs",
+      "sha256": "9f528de9f8e3d06134c99c5ee6b2c85e25669766a2678e92291550e8bd79f651",
+      "bytes": 14517
+    },
+    {
+      "path": "infrastructure/nginx/nginx.conf",
+      "sha256": "4d4bead298e76c8ed5940cf646008f3850427e9aa9d28ad88a215337f2bbaa43",
+      "bytes": 6590
+    },
+    {
+      "path": "docker-compose.yml",
+      "sha256": "4eddf81d2239ddaecce348c0fa4392d8783214920a54c343cd6303643ff9ba56",
+      "bytes": 7020
+    },
+    {
+      "path": "reports/n09/n09-3-validation-report.json",
+      "sha256": "54212a072f4f759e7fcb531e7878fc57626f36791a315fe0c9f4590f01e2bccc",
+      "bytes": 13404
+    },
+    {
+      "path": "reports/creator/creator-validation-report.json",
+      "sha256": "fedad0e78f401a7b45c3b31ff7da44c02201dd6a42fbc6c5f7960e8b5cbfd6fa",
+      "bytes": 4655
+    },
+    {
+      "path": "reports/validation/provider-health-report.json",
+      "sha256": "405391751bedcba49c3a0cc6dc6143c3bf26ce2d05e0065c507a834454c39f94",
+      "bytes": 37391
+    },
+    {
+      "path": "reports/phases/n01-6-phase-runner-report.json",
+      "sha256": "ff4c4cdc99f5d0a6e606052bdc69baf9255a60aee557a5b89b41ac45dde3df7d",
+      "bytes": 46254
+    },
+    {
+      "path": "reports/maintenance/prune-logs-report.json",
+      "sha256": "ba8ad340a6b46b67cc4507c5036f83d43411bde833d513148e421607d81fbd5f",
+      "bytes": 8648
+    },
+    {
+      "path": "reports/validation/health-report.json",
+      "sha256": "e7c1123a3b2f6e3c80923f1d51f7d1800fd8ea5422447faece7285faddae0607",
+      "bytes": 21306
+    }
+  ],
+  "failed": [
+    {
+      "name": "forbidden:scripts/install-git-hooks.ps1:privateKeyMaterial",
+      "passed": false,
+      "detail": "forbidden content found",
+      "file": "scripts/install-git-hooks.ps1"
+    },
+    {
+      "name": "forbidden:scripts/install-git-hooks.ps1:rawCandidateDocumentPath",
+      "passed": false,
+      "detail": "forbidden content found",
+      "file": "scripts/install-git-hooks.ps1"
+    }
+  ],
+  "checks": [
+    {
+      "name": "exists:Kingsmen_Build_Tracker.csv",
+      "passed": true,
+      "detail": "found",
+      "file": "Kingsmen_Build_Tracker.csv"
+    },
+    {
+      "name": "exists:config/environment/.env.template",
+      "passed": true,
+      "detail": "found",
+      "file": "config/environment/.env.template"
+    },
+    {
+      "name": "exists:config/providers/provider-registry.json",
+      "passed": true,
+      "detail": "found",
+      "file": "config/providers/provider-registry.json"
+    },
+    {
+      "name": "exists:config/creator.config.json",
+      "passed": true,
+      "detail": "found",
+      "file": "config/creator.config.json"
+    },
+    {
+      "name": "exists:manifests/master-build-index.json",
+      "passed": true,
+      "detail": "found",
+      "file": "manifests/master-build-index.json"
+    },
+    {
+      "name": "exists:scripts/KINGSMEN_CREATOR.ps1",
+      "passed": true,
+      "detail": "found",
+      "file": "scripts/KINGSMEN_CREATOR.ps1"
+    },
+    {
+      "name": "exists:scripts/testing/Test-KingsmenCreator.ps1",
+      "passed": true,
+      "detail": "found",
+      "file": "scripts/testing/Test-KingsmenCreator.ps1"
+    },
+    {
+      "name": "exists:scripts/install-git-hooks.ps1",
+      "passed": true,
+      "detail": "found",
+      "file": "scripts/install-git-hooks.ps1"
+    },
+    {
+      "name": "exists:scripts/phases/Invoke-KingsmenPhase.ps1",
+      "passed": true,
+      "detail": "found",
+      "file": "scripts/phases/Invoke-KingsmenPhase.ps1"
+    },
+    {
+      "name": "exists:scripts/maintenance/prune-logs.ps1",
+      "passed": true,
+      "detail": "found",
+      "file": "scripts/maintenance/prune-logs.ps1"
+    },
+    {
+      "name": "exists:scripts/validators/validate-n09-3.mjs",
+      "passed": true,
+      "detail": "found",
+      "file": "scripts/validators/validate-n09-3.mjs"
+    },
+    {
+      "name": "exists:scripts/validators/validate-provider-health.mjs",
+      "passed": true,
+      "detail": "found",
+      "file": "scripts/validators/validate-provider-health.mjs"
+    },
+    {
+      "name": "exists:scripts/validators/validate-health.mjs",
+      "passed": true,
+      "detail": "found",
+      "file": "scripts/validators/validate-health.mjs"
+    },
+    {
+      "name": "exists:scripts/validators/validate-n01-readiness.mjs",
+      "passed": true,
+      "detail": "found",
+      "file": "scripts/validators/validate-n01-readiness.mjs"
+    },
+    {
+      "name": "exists:infrastructure/nginx/nginx.conf",
+      "passed": true,
+      "detail": "found",
+      "file": "infrastructure/nginx/nginx.conf"
+    },
+    {
+      "name": "exists:docker-compose.yml",
+      "passed": true,
+      "detail": "found",
+      "file": "docker-compose.yml"
+    },
+    {
+      "name": "forbidden:Kingsmen_Build_Tracker.csv:productionReadyTrue",
+      "passed": true,
+      "detail": "not found",
+      "file": "Kingsmen_Build_Tracker.csv"
+    },
+    {
+      "name": "forbidden:Kingsmen_Build_Tracker.csv:productionReadyJsonTrue",
+      "passed": true,
+      "detail": "not found",
+      "file": "Kingsmen_Build_Tracker.csv"
+    },
+    {
+      "name": "forbidden:Kingsmen_Build_Tracker.csv:productionReadyEnvTrue",
+      "passed": true,
+      "detail": "not found",
+      "file": "Kingsmen_Build_Tracker.csv"
+    },
+    {
+      "name": "forbidden:Kingsmen_Build_Tracker.csv:databaseUrlAssignment",
+      "passed": true,
+      "detail": "not found",
+      "file": "Kingsmen_Build_Tracker.csv"
+    },
+    {
+      "name": "forbidden:Kingsmen_Build_Tracker.csv:postgresPasswordAssignment",
+      "passed": true,
+      "detail": "not found",
+      "file": "Kingsmen_Build_Tracker.csv"
+    },
+    {
+      "name": "forbidden:Kingsmen_Build_Tracker.csv:supabaseServiceRole",
+      "passed": true,
+      "detail": "not found",
+      "file": "Kingsmen_Build_Tracker.csv"
+    },
+    {
+      "name": "forbidden:Kingsmen_Build_Tracker.csv:smtpPassword",
+      "passed": true,
+      "detail": "not found",
+      "file": "Kingsmen_Build_Tracker.csv"
+    },
+    {
+      "name": "forbidden:Kingsmen_Build_Tracker.csv:whatsappToken",
+      "passed": true,
+      "detail": "not found",
+      "file": "Kingsmen_Build_Tracker.csv"
+    },
+    {
+      "name": "forbidden:Kingsmen_Build_Tracker.csv:smsToken",
+      "passed": true,
+      "detail": "not found",
+      "file": "Kingsmen_Build_Tracker.csv"
+    },
+    {
+      "name": "forbidden:Kingsmen_Build_Tracker.csv:paymentSecret",
+      "passed": true,
+      "detail": "not found",
+      "file": "Kingsmen_Build_Tracker.csv"
+    },
+    {
+      "name": "forbidden:Kingsmen_Build_Tracker.csv:airtableToken",
+      "passed": true,
+      "detail": "not found",
+      "file": "Kingsmen_Build_Tracker.csv"
+    },
+    {
+      "name": "forbidden:Kingsmen_Build_Tracker.csv:privateKeyMaterial",
+      "passed": true,
+      "detail": "not found",
+      "file": "Kingsmen_Build_Tracker.csv"
+    },
+    {
+      "name": "forbidden:Kingsmen_Build_Tracker.csv:rawCandidateDocumentPath",
+      "passed": true,
+      "detail": "not found",
+      "file": "Kingsmen_Build_Tracker.csv"
+    },
+    {
+      "name": "forbidden:config/environment/.env.template:productionReadyTrue",
+      "passed": true,
+      "detail": "not found",
+      "file": "config/environment/.env.template"
+    },
+    {
+      "name": "forbidden:config/environment/.env.template:productionReadyJsonTrue",
+      "passed": true,
+      "detail": "not found",
+      "file": "config/environment/.env.template"
+    },
+    {
+      "name": "forbidden:config/environment/.env.template:productionReadyEnvTrue",
+      "passed": true,
+      "detail": "not found",
+      "file": "config/environment/.env.template"
+    },
+    {
+      "name": "forbidden:config/environment/.env.template:databaseUrlAssignment",
+      "passed": true,
+      "detail": "not found",
+      "file": "config/environment/.env.template"
+    },
+    {
+      "name": "forbidden:config/environment/.env.template:postgresPasswordAssignment",
+      "passed": true,
+      "detail": "not found",
+      "file": "config/environment/.env.template"
+    },
+    {
+      "name": "forbidden:config/environment/.env.template:supabaseServiceRole",
+      "passed": true,
+      "detail": "not found",
+      "file": "config/environment/.env.template"
+    },
+    {
+      "name": "forbidden:config/environment/.env.template:smtpPassword",
+      "passed": true,
+      "detail": "not found",
+      "file": "config/environment/.env.template"
+    },
+    {
+      "name": "forbidden:config/environment/.env.template:whatsappToken",
+      "passed": true,
+      "detail": "not found",
+      "file": "config/environment/.env.template"
+    },
+    {
+      "name": "forbidden:config/environment/.env.template:smsToken",
+      "passed": true,
+      "detail": "not found",
+      "file": "config/environment/.env.template"
+    },
+    {
+      "name": "forbidden:config/environment/.env.template:paymentSecret",
+      "passed": true,
+      "detail": "not found",
+      "file": "config/environment/.env.template"
+    },
+    {
+      "name": "forbidden:config/environment/.env.template:airtableToken",
+      "passed": true,
+      "detail": "not found",
+      "file": "config/environment/.env.template"
+    },
+    {
+      "name": "forbidden:config/environment/.env.template:privateKeyMaterial",
+      "passed": true,
+      "detail": "not found",
+      "file": "config/environment/.env.template"
+    },
+    {
+      "name": "forbidden:config/environment/.env.template:rawCandidateDocumentPath",
+      "passed": true,
+      "detail": "not found",
+      "file": "config/environment/.env.template"
+    },
+    {
+      "name": "forbidden:config/providers/provider-registry.json:productionReadyTrue",
+      "passed": true,
+      "detail": "not found",
+      "file": "config/providers/provider-registry.json"
+    },
+    {
+      "name": "forbidden:config/providers/provider-registry.json:productionReadyJsonTrue",
+      "passed": true,
+      "detail": "not found",
+      "file": "config/providers/provider-registry.json"
+    },
+    {
+      "name": "forbidden:config/providers/provider-registry.json:productionReadyEnvTrue",
+      "passed": true,
+      "detail": "not found",
+      "file": "config/providers/provider-registry.json"
+    },
+    {
+      "name": "forbidden:config/providers/provider-registry.json:databaseUrlAssignment",
+      "passed": true,
+      "detail": "not found",
+      "file": "config/providers/provider-registry.json"
+    },
+    {
+      "name": "forbidden:config/providers/provider-registry.json:postgresPasswordAssignment",
+      "passed": true,
+      "detail": "not found",
+      "file": "config/providers/provider-registry.json"
+    },
+    {
+      "name": "forbidden:config/providers/provider-registry.json:supabaseServiceRole",
+      "passed": true,
+      "detail": "not found",
+      "file": "config/providers/provider-registry.json"
+    },
+    {
+      "name": "forbidden:config/providers/provider-registry.json:smtpPassword",
+      "passed": true,
+      "detail": "not found",
+      "file": "config/providers/provider-registry.json"
+    },
+    {
+      "name": "forbidden:config/providers/provider-registry.json:whatsappToken",
+      "passed": true,
+      "detail": "not found",
+      "file": "config/providers/provider-registry.json"
+    },
+    {
+      "name": "forbidden:config/providers/provider-registry.json:smsToken",
+      "passed": true,
+      "detail": "not found",
+      "file": "config/providers/provider-registry.json"
+    },
+    {
+      "name": "forbidden:config/providers/provider-registry.json:paymentSecret",
+      "passed": true,
+      "detail": "not found",
+      "file": "config/providers/provider-registry.json"
+    },
+    {
+      "name": "forbidden:config/providers/provider-registry.json:airtableToken",
+      "passed": true,
+      "detail": "not found",
+      "file": "config/providers/provider-registry.json"
+    },
+    {
+      "name": "forbidden:config/providers/provider-registry.json:privateKeyMaterial",
+      "passed": true,
+      "detail": "not found",
+      "file": "config/providers/provider-registry.json"
+    },
+    {
+      "name": "forbidden:config/providers/provider-registry.json:rawCandidateDocumentPath",
+      "passed": true,
+      "detail": "not found",
+      "file": "config/providers/provider-registry.json"
+    },
+    {
+      "name": "forbidden:config/creator.config.json:productionReadyTrue",
+      "passed": true,
+      "detail": "not found",
+      "file": "config/creator.config.json"
+    },
+    {
+      "name": "forbidden:config/creator.config.json:productionReadyJsonTrue",
+      "passed": true,
+      "detail": "not found",
+      "file": "config/creator.config.json"
+    },
+    {
+      "name": "forbidden:config/creator.config.json:productionReadyEnvTrue",
+      "passed": true,
+      "detail": "not found",
+      "file": "config/creator.config.json"
+    },
+    {
+      "name": "forbidden:config/creator.config.json:databaseUrlAssignment",
+      "passed": true,
+      "detail": "not found",
+      "file": "config/creator.config.json"
+    },
+    {
+      "name": "forbidden:config/creator.config.json:postgresPasswordAssignment",
+      "passed": true,
+      "detail": "not found",
+      "file": "config/creator.config.json"
+    },
+    {
+      "name": "forbidden:config/creator.config.json:supabaseServiceRole",
+      "passed": true,
+      "detail": "not found",
+      "file": "config/creator.config.json"
+    },
+    {
+      "name": "forbidden:config/creator.config.json:smtpPassword",
+      "passed": true,
+      "detail": "not found",
+      "file": "config/creator.config.json"
+    },
+    {
+      "name": "forbidden:config/creator.config.json:whatsappToken",
+      "passed": true,
+      "detail": "not found",
+      "file": "config/creator.config.json"
+    },
+    {
+      "name": "forbidden:config/creator.config.json:smsToken",
+      "passed": true,
+      "detail": "not found",
+      "file": "config/creator.config.json"
+    },
+    {
+      "name": "forbidden:config/creator.config.json:paymentSecret",
+      "passed": true,
+      "detail": "not found",
+      "file": "config/creator.config.json"
+    },
+    {
+      "name": "forbidden:config/creator.config.json:airtableToken",
+      "passed": true,
+      "detail": "not found",
+      "file": "config/creator.config.json"
+    },
+    {
+      "name": "forbidden:config/creator.config.json:privateKeyMaterial",
+      "passed": true,
+      "detail": "not found",
+      "file": "config/creator.config.json"
+    },
+    {
+      "name": "forbidden:config/creator.config.json:rawCandidateDocumentPath",
+      "passed": true,
+      "detail": "not found",
+      "file": "config/creator.config.json"
+    },
+    {
+      "name": "forbidden:manifests/master-build-index.json:productionReadyTrue",
+      "passed": true,
+      "detail": "not found",
+      "file": "manifests/master-build-index.json"
+    },
+    {
+      "name": "forbidden:manifests/master-build-index.json:productionReadyJsonTrue",
+      "passed": true,
+      "detail": "not found",
+      "file": "manifests/master-build-index.json"
+    },
+    {
+      "name": "forbidden:manifests/master-build-index.json:productionReadyEnvTrue",
+      "passed": true,
+      "detail": "not found",
+      "file": "manifests/master-build-index.json"
+    },
+    {
+      "name": "forbidden:manifests/master-build-index.json:databaseUrlAssignment",
+      "passed": true,
+      "detail": "not found",
+      "file": "manifests/master-build-index.json"
+    },
+    {
+      "name": "forbidden:manifests/master-build-index.json:postgresPasswordAssignment",
+      "passed": true,
+      "detail": "not found",
+      "file": "manifests/master-build-index.json"
+    },
+    {
+      "name": "forbidden:manifests/master-build-index.json:supabaseServiceRole",
+      "passed": true,
+      "detail": "not found",
+      "file": "manifests/master-build-index.json"
+    },
+    {
+      "name": "forbidden:manifests/master-build-index.json:smtpPassword",
+      "passed": true,
+      "detail": "not found",
+      "file": "manifests/master-build-index.json"
+    },
+    {
+      "name": "forbidden:manifests/master-build-index.json:whatsappToken",
+      "passed": true,
+      "detail": "not found",
+      "file": "manifests/master-build-index.json"
+    },
+    {
+      "name": "forbidden:manifests/master-build-index.json:smsToken",
+      "passed": true,
+      "detail": "not found",
+      "file": "manifests/master-build-index.json"
+    },
+    {
+      "name": "forbidden:manifests/master-build-index.json:paymentSecret",
+      "passed": true,
+      "detail": "not found",
+      "file": "manifests/master-build-index.json"
+    },
+    {
+      "name": "forbidden:manifests/master-build-index.json:airtableToken",
+      "passed": true,
+      "detail": "not found",
+      "file": "manifests/master-build-index.json"
+    },
+    {
+      "name": "forbidden:manifests/master-build-index.json:privateKeyMaterial",
+      "passed": true,
+      "detail": "not found",
+      "file": "manifests/master-build-index.json"
+    },
+    {
+      "name": "forbidden:manifests/master-build-index.json:rawCandidateDocumentPath",
+      "passed": true,
+      "detail": "not found",
+      "file": "manifests/master-build-index.json"
+    },
+    {
+      "name": "forbidden:scripts/KINGSMEN_CREATOR.ps1:productionReadyTrue",
+      "passed": true,
+      "detail": "not found",
+      "file": "scripts/KINGSMEN_CREATOR.ps1"
+    },
+    {
+      "name": "forbidden:scripts/KINGSMEN_CREATOR.ps1:productionReadyJsonTrue",
+      "passed": true,
+      "detail": "not found",
+      "file": "scripts/KINGSMEN_CREATOR.ps1"
+    },
+    {
+      "name": "forbidden:scripts/KINGSMEN_CREATOR.ps1:productionReadyEnvTrue",
+      "passed": true,
+      "detail": "not found",
+      "file": "scripts/KINGSMEN_CREATOR.ps1"
+    },
+    {
+      "name": "forbidden:scripts/KINGSMEN_CREATOR.ps1:databaseUrlAssignment",
+      "passed": true,
+      "detail": "not found",
+      "file": "scripts/KINGSMEN_CREATOR.ps1"
+    },
+    {
+      "name": "forbidden:scripts/KINGSMEN_CREATOR.ps1:postgresPasswordAssignment",
+      "passed": true,
+      "detail": "not found",
+      "file": "scripts/KINGSMEN_CREATOR.ps1"
+    },
+    {
+      "name": "forbidden:scripts/KINGSMEN_CREATOR.ps1:supabaseServiceRole",
+      "passed": true,
+      "detail": "not found",
+      "file": "scripts/KINGSMEN_CREATOR.ps1"
+    },
+    {
+      "name": "forbidden:scripts/KINGSMEN_CREATOR.ps1:smtpPassword",
+      "passed": true,
+      "detail": "not found",
+      "file": "scripts/KINGSMEN_CREATOR.ps1"
+    },
+    {
+      "name": "forbidden:scripts/KINGSMEN_CREATOR.ps1:whatsappToken",
+      "passed": true,
+      "detail": "not found",
+      "file": "scripts/KINGSMEN_CREATOR.ps1"
+    },
+    {
+      "name": "forbidden:scripts/KINGSMEN_CREATOR.ps1:smsToken",
+      "passed": true,
+      "detail": "not found",
+      "file": "scripts/KINGSMEN_CREATOR.ps1"
+    },
+    {
+      "name": "forbidden:scripts/KINGSMEN_CREATOR.ps1:paymentSecret",
+      "passed": true,
+      "detail": "not found",
+      "file": "scripts/KINGSMEN_CREATOR.ps1"
+    },
+    {
+      "name": "forbidden:scripts/KINGSMEN_CREATOR.ps1:airtableToken",
+      "passed": true,
+      "detail": "not found",
+      "file": "scripts/KINGSMEN_CREATOR.ps1"
+    },
+    {
+      "name": "forbidden:scripts/KINGSMEN_CREATOR.ps1:privateKeyMaterial",
+      "passed": true,
+      "detail": "not found",
+      "file": "scripts/KINGSMEN_CREATOR.ps1"
+    },
+    {
+      "name": "forbidden:scripts/KINGSMEN_CREATOR.ps1:rawCandidateDocumentPath",
+      "passed": true,
+      "detail": "not found",
+      "file": "scripts/KINGSMEN_CREATOR.ps1"
+    },
+    {
+      "name": "forbidden:scripts/testing/Test-KingsmenCreator.ps1:productionReadyTrue",
+      "passed": true,
+      "detail": "not found",
+      "file": "scripts/testing/Test-KingsmenCreator.ps1"
+    },
+    {
+      "name": "forbidden:scripts/testing/Test-KingsmenCreator.ps1:productionReadyJsonTrue",
+      "passed": true,
+      "detail": "not found",
+      "file": "scripts/testing/Test-KingsmenCreator.ps1"
+    },
+    {
+      "name": "forbidden:scripts/testing/Test-KingsmenCreator.ps1:productionReadyEnvTrue",
+      "passed": true,
+      "detail": "not found",
+      "file": "scripts/testing/Test-KingsmenCreator.ps1"
+    },
+    {
+      "name": "forbidden:scripts/testing/Test-KingsmenCreator.ps1:databaseUrlAssignment",
+      "passed": true,
+      "detail": "not found",
+      "file": "scripts/testing/Test-KingsmenCreator.ps1"
+    },
+    {
+      "name": "forbidden:scripts/testing/Test-KingsmenCreator.ps1:postgresPasswordAssignment",
+      "passed": true,
+      "detail": "not found",
+      "file": "scripts/testing/Test-KingsmenCreator.ps1"
+    },
+    {
+      "name": "forbidden:scripts/testing/Test-KingsmenCreator.ps1:supabaseServiceRole",
+      "passed": true,
+      "detail": "not found",
+      "file": "scripts/testing/Test-KingsmenCreator.ps1"
+    },
+    {
+      "name": "forbidden:scripts/testing/Test-KingsmenCreator.ps1:smtpPassword",
+      "passed": true,
+      "detail": "not found",
+      "file": "scripts/testing/Test-KingsmenCreator.ps1"
+    },
+    {
+      "name": "forbidden:scripts/testing/Test-KingsmenCreator.ps1:whatsappToken",
+      "passed": true,
+      "detail": "not found",
+      "file": "scripts/testing/Test-KingsmenCreator.ps1"
+    },
+    {
+      "name": "forbidden:scripts/testing/Test-KingsmenCreator.ps1:smsToken",
+      "passed": true,
+      "detail": "not found",
+      "file": "scripts/testing/Test-KingsmenCreator.ps1"
+    },
+    {
+      "name": "forbidden:scripts/testing/Test-KingsmenCreator.ps1:paymentSecret",
+      "passed": true,
+      "detail": "not found",
+      "file": "scripts/testing/Test-KingsmenCreator.ps1"
+    },
+    {
+      "name": "forbidden:scripts/testing/Test-KingsmenCreator.ps1:airtableToken",
+      "passed": true,
+      "detail": "not found",
+      "file": "scripts/testing/Test-KingsmenCreator.ps1"
+    },
+    {
+      "name": "forbidden:scripts/testing/Test-KingsmenCreator.ps1:privateKeyMaterial",
+      "passed": true,
+      "detail": "not found",
+      "file": "scripts/testing/Test-KingsmenCreator.ps1"
+    },
+    {
+      "name": "forbidden:scripts/testing/Test-KingsmenCreator.ps1:rawCandidateDocumentPath",
+      "passed": true,
+      "detail": "not found",
+      "file": "scripts/testing/Test-KingsmenCreator.ps1"
+    },
+    {
+      "name": "forbidden:scripts/install-git-hooks.ps1:productionReadyTrue",
+      "passed": true,
+      "detail": "not found",
+      "file": "scripts/install-git-hooks.ps1"
+    },
+    {
+      "name": "forbidden:scripts/install-git-hooks.ps1:productionReadyJsonTrue",
+      "passed": true,
+      "detail": "not found",
+      "file": "scripts/install-git-hooks.ps1"
+    },
+    {
+      "name": "forbidden:scripts/install-git-hooks.ps1:productionReadyEnvTrue",
+      "passed": true,
+      "detail": "not found",
+      "file": "scripts/install-git-hooks.ps1"
+    },
+    {
+      "name": "forbidden:scripts/install-git-hooks.ps1:databaseUrlAssignment",
+      "passed": true,
+      "detail": "not found",
+      "file": "scripts/install-git-hooks.ps1"
+    },
+    {
+      "name": "forbidden:scripts/install-git-hooks.ps1:postgresPasswordAssignment",
+      "passed": true,
+      "detail": "not found",
+      "file": "scripts/install-git-hooks.ps1"
+    },
+    {
+      "name": "forbidden:scripts/install-git-hooks.ps1:supabaseServiceRole",
+      "passed": true,
+      "detail": "not found",
+      "file": "scripts/install-git-hooks.ps1"
+    },
+    {
+      "name": "forbidden:scripts/install-git-hooks.ps1:smtpPassword",
+      "passed": true,
+      "detail": "not found",
+      "file": "scripts/install-git-hooks.ps1"
+    },
+    {
+      "name": "forbidden:scripts/install-git-hooks.ps1:whatsappToken",
+      "passed": true,
+      "detail": "not found",
+      "file": "scripts/install-git-hooks.ps1"
+    },
+    {
+      "name": "forbidden:scripts/install-git-hooks.ps1:smsToken",
+      "passed": true,
+      "detail": "not found",
+      "file": "scripts/install-git-hooks.ps1"
+    },
+    {
+      "name": "forbidden:scripts/install-git-hooks.ps1:paymentSecret",
+      "passed": true,
+      "detail": "not found",
+      "file": "scripts/install-git-hooks.ps1"
+    },
+    {
+      "name": "forbidden:scripts/install-git-hooks.ps1:airtableToken",
+      "passed": true,
+      "detail": "not found",
+      "file": "scripts/install-git-hooks.ps1"
+    },
+    {
+      "name": "forbidden:scripts/install-git-hooks.ps1:privateKeyMaterial",
+      "passed": false,
+      "detail": "forbidden content found",
+      "file": "scripts/install-git-hooks.ps1"
+    },
+    {
+      "name": "forbidden:scripts/install-git-hooks.ps1:rawCandidateDocumentPath",
+      "passed": false,
+      "detail": "forbidden content found",
+      "file": "scripts/install-git-hooks.ps1"
+    },
+    {
+      "name": "forbidden:scripts/phases/Invoke-KingsmenPhase.ps1:productionReadyTrue",
+      "passed": true,
+      "detail": "not found",
+      "file": "scripts/phases/Invoke-KingsmenPhase.ps1"
+    },
+    {
+      "name": "forbidden:scripts/phases/Invoke-KingsmenPhase.ps1:productionReadyJsonTrue",
+      "passed": true,
+      "detail": "not found",
+      "file": "scripts/phases/Invoke-KingsmenPhase.ps1"
+    },
+    {
+      "name": "forbidden:scripts/phases/Invoke-KingsmenPhase.ps1:productionReadyEnvTrue",
+      "passed": true,
+      "detail": "not found",
+      "file": "scripts/phases/Invoke-KingsmenPhase.ps1"
+    },
+    {
+      "name": "forbidden:scripts/phases/Invoke-KingsmenPhase.ps1:databaseUrlAssignment",
+      "passed": true,
+      "detail": "not found",
+      "file": "scripts/phases/Invoke-KingsmenPhase.ps1"
+    },
+    {
+      "name": "forbidden:scripts/phases/Invoke-KingsmenPhase.ps1:postgresPasswordAssignment",
+      "passed": true,
+      "detail": "not found",
+      "file": "scripts/phases/Invoke-KingsmenPhase.ps1"
+    },
+    {
+      "name": "forbidden:scripts/phases/Invoke-KingsmenPhase.ps1:supabaseServiceRole",
+      "passed": true,
+      "detail": "not found",
+      "file": "scripts/phases/Invoke-KingsmenPhase.ps1"
+    },
+    {
+      "name": "forbidden:scripts/phases/Invoke-KingsmenPhase.ps1:smtpPassword",
+      "passed": true,
+      "detail": "not found",
+      "file": "scripts/phases/Invoke-KingsmenPhase.ps1"
+    },
+    {
+      "name": "forbidden:scripts/phases/Invoke-KingsmenPhase.ps1:whatsappToken",
+      "passed": true,
+      "detail": "not found",
+      "file": "scripts/phases/Invoke-KingsmenPhase.ps1"
+    },
+    {
+      "name": "forbidden:scripts/phases/Invoke-KingsmenPhase.ps1:smsToken",
+      "passed": true,
+      "detail": "not found",
+      "file": "scripts/phases/Invoke-KingsmenPhase.ps1"
+    },
+    {
+      "name": "forbidden:scripts/phases/Invoke-KingsmenPhase.ps1:paymentSecret",
+      "passed": true,
+      "detail": "not found",
+      "file": "scripts/phases/Invoke-KingsmenPhase.ps1"
+    },
+    {
+      "name": "forbidden:scripts/phases/Invoke-KingsmenPhase.ps1:airtableToken",
+      "passed": true,
+      "detail": "not found",
+      "file": "scripts/phases/Invoke-KingsmenPhase.ps1"
+    },
+    {
+      "name": "forbidden:scripts/phases/Invoke-KingsmenPhase.ps1:privateKeyMaterial",
+      "passed": true,
+      "detail": "not found",
+      "file": "scripts/phases/Invoke-KingsmenPhase.ps1"
+    },
+    {
+      "name": "forbidden:scripts/phases/Invoke-KingsmenPhase.ps1:rawCandidateDocumentPath",
+      "passed": true,
+      "detail": "not found",
+      "file": "scripts/phases/Invoke-KingsmenPhase.ps1"
+    },
+    {
+      "name": "forbidden:scripts/maintenance/prune-logs.ps1:productionReadyTrue",
+      "passed": true,
+      "detail": "not found",
+      "file": "scripts/maintenance/prune-logs.ps1"
+    },
+    {
+      "name": "forbidden:scripts/maintenance/prune-logs.ps1:productionReadyJsonTrue",
+      "passed": true,
+      "detail": "not found",
+      "file": "scripts/maintenance/prune-logs.ps1"
+    },
+    {
+      "name": "forbidden:scripts/maintenance/prune-logs.ps1:productionReadyEnvTrue",
+      "passed": true,
+      "detail": "not found",
+      "file": "scripts/maintenance/prune-logs.ps1"
+    },
+    {
+      "name": "forbidden:scripts/maintenance/prune-logs.ps1:databaseUrlAssignment",
+      "passed": true,
+      "detail": "not found",
+      "file": "scripts/maintenance/prune-logs.ps1"
+    },
+    {
+      "name": "forbidden:scripts/maintenance/prune-logs.ps1:postgresPasswordAssignment",
+      "passed": true,
+      "detail": "not found",
+      "file": "scripts/maintenance/prune-logs.ps1"
+    },
+    {
+      "name": "forbidden:scripts/maintenance/prune-logs.ps1:supabaseServiceRole",
+      "passed": true,
+      "detail": "not found",
+      "file": "scripts/maintenance/prune-logs.ps1"
+    },
+    {
+      "name": "forbidden:scripts/maintenance/prune-logs.ps1:smtpPassword",
+      "passed": true,
+      "detail": "not found",
+      "file": "scripts/maintenance/prune-logs.ps1"
+    },
+    {
+      "name": "forbidden:scripts/maintenance/prune-logs.ps1:whatsappToken",
+      "passed": true,
+      "detail": "not found",
+      "file": "scripts/maintenance/prune-logs.ps1"
+    },
+    {
+      "name": "forbidden:scripts/maintenance/prune-logs.ps1:smsToken",
+      "passed": true,
+      "detail": "not found",
+      "file": "scripts/maintenance/prune-logs.ps1"
+    },
+    {
+      "name": "forbidden:scripts/maintenance/prune-logs.ps1:paymentSecret",
+      "passed": true,
+      "detail": "not found",
+      "file": "scripts/maintenance/prune-logs.ps1"
+    },
+    {
+      "name": "forbidden:scripts/maintenance/prune-logs.ps1:airtableToken",
+      "passed": true,
+      "detail": "not found",
+      "file": "scripts/maintenance/prune-logs.ps1"
+    },
+    {
+      "name": "forbidden:scripts/maintenance/prune-logs.ps1:privateKeyMaterial",
+      "passed": true,
+      "detail": "not found",
+      "file": "scripts/maintenance/prune-logs.ps1"
+    },
+    {
+      "name": "forbidden:scripts/maintenance/prune-logs.ps1:rawCandidateDocumentPath",
+      "passed": true,
+      "detail": "not found",
+      "file": "scripts/maintenance/prune-logs.ps1"
+    },
+    {
+      "name": "forbidden:scripts/validators/validate-n09-3.mjs:productionReadyTrue",
+      "passed": true,
+      "detail": "not found",
+      "file": "scripts/validators/validate-n09-3.mjs"
+    },
+    {
+      "name": "forbidden:scripts/validators/validate-n09-3.mjs:productionReadyJsonTrue",
+      "passed": true,
+      "detail": "not found",
+      "file": "scripts/validators/validate-n09-3.mjs"
+    },
+    {
+      "name": "forbidden:scripts/validators/validate-n09-3.mjs:productionReadyEnvTrue",
+      "passed": true,
+      "detail": "not found",
+      "file": "scripts/validators/validate-n09-3.mjs"
+    },
+    {
+      "name": "forbidden:scripts/validators/validate-n09-3.mjs:databaseUrlAssignment",
+      "passed": true,
+      "detail": "not found",
+      "file": "scripts/validators/validate-n09-3.mjs"
+    },
+    {
+      "name": "forbidden:scripts/validators/validate-n09-3.mjs:postgresPasswordAssignment",
+      "passed": true,
+      "detail": "not found",
+      "file": "scripts/validators/validate-n09-3.mjs"
+    },
+    {
+      "name": "forbidden:scripts/validators/validate-n09-3.mjs:supabaseServiceRole",
+      "passed": true,
+      "detail": "not found",
+      "file": "scripts/validators/validate-n09-3.mjs"
+    },
+    {
+      "name": "forbidden:scripts/validators/validate-n09-3.mjs:smtpPassword",
+      "passed": true,
+      "detail": "not found",
+      "file": "scripts/validators/validate-n09-3.mjs"
+    },
+    {
+      "name": "forbidden:scripts/validators/validate-n09-3.mjs:whatsappToken",
+      "passed": true,
+      "detail": "not found",
+      "file": "scripts/validators/validate-n09-3.mjs"
+    },
+    {
+      "name": "forbidden:scripts/validators/validate-n09-3.mjs:smsToken",
+      "passed": true,
+      "detail": "not found",
+      "file": "scripts/validators/validate-n09-3.mjs"
+    },
+    {
+      "name": "forbidden:scripts/validators/validate-n09-3.mjs:paymentSecret",
+      "passed": true,
+      "detail": "not found",
+      "file": "scripts/validators/validate-n09-3.mjs"
+    },
+    {
+      "name": "forbidden:scripts/validators/validate-n09-3.mjs:airtableToken",
+      "passed": true,
+      "detail": "not found",
+      "file": "scripts/validators/validate-n09-3.mjs"
+    },
+    {
+      "name": "forbidden:scripts/validators/validate-n09-3.mjs:privateKeyMaterial",
+      "passed": true,
+      "detail": "not found",
+      "file": "scripts/validators/validate-n09-3.mjs"
+    },
+    {
+      "name": "forbidden:scripts/validators/validate-n09-3.mjs:rawCandidateDocumentPath",
+      "passed": true,
+      "detail": "not found",
+      "file": "scripts/validators/validate-n09-3.mjs"
+    },
+    {
+      "name": "forbidden:scripts/validators/validate-provider-health.mjs:productionReadyTrue",
+      "passed": true,
+      "detail": "not found",
+      "file": "scripts/validators/validate-provider-health.mjs"
+    },
+    {
+      "name": "forbidden:scripts/validators/validate-provider-health.mjs:productionReadyJsonTrue",
+      "passed": true,
+      "detail": "not found",
+      "file": "scripts/validators/validate-provider-health.mjs"
+    },
+    {
+      "name": "forbidden:scripts/validators/validate-provider-health.mjs:productionReadyEnvTrue",
+      "passed": true,
+      "detail": "not found",
+      "file": "scripts/validators/validate-provider-health.mjs"
+    },
+    {
+      "name": "forbidden:scripts/validators/validate-provider-health.mjs:databaseUrlAssignment",
+      "passed": true,
+      "detail": "not found",
+      "file": "scripts/validators/validate-provider-health.mjs"
+    },
+    {
+      "name": "forbidden:scripts/validators/validate-provider-health.mjs:postgresPasswordAssignment",
+      "passed": true,
+      "detail": "not found",
+      "file": "scripts/validators/validate-provider-health.mjs"
+    },
+    {
+      "name": "forbidden:scripts/validators/validate-provider-health.mjs:supabaseServiceRole",
+      "passed": true,
+      "detail": "not found",
+      "file": "scripts/validators/validate-provider-health.mjs"
+    },
+    {
+      "name": "forbidden:scripts/validators/validate-provider-health.mjs:smtpPassword",
+      "passed": true,
+      "detail": "not found",
+      "file": "scripts/validators/validate-provider-health.mjs"
+    },
+    {
+      "name": "forbidden:scripts/validators/validate-provider-health.mjs:whatsappToken",
+      "passed": true,
+      "detail": "not found",
+      "file": "scripts/validators/validate-provider-health.mjs"
+    },
+    {
+      "name": "forbidden:scripts/validators/validate-provider-health.mjs:smsToken",
+      "passed": true,
+      "detail": "not found",
+      "file": "scripts/validators/validate-provider-health.mjs"
+    },
+    {
+      "name": "forbidden:scripts/validators/validate-provider-health.mjs:paymentSecret",
+      "passed": true,
+      "detail": "not found",
+      "file": "scripts/validators/validate-provider-health.mjs"
+    },
+    {
+      "name": "forbidden:scripts/validators/validate-provider-health.mjs:airtableToken",
+      "passed": true,
+      "detail": "not found",
+      "file": "scripts/validators/validate-provider-health.mjs"
+    },
+    {
+      "name": "forbidden:scripts/validators/validate-provider-health.mjs:privateKeyMaterial",
+      "passed": true,
+      "detail": "not found",
+      "file": "scripts/validators/validate-provider-health.mjs"
+    },
+    {
+      "name": "forbidden:scripts/validators/validate-provider-health.mjs:rawCandidateDocumentPath",
+      "passed": true,
+      "detail": "not found",
+      "file": "scripts/validators/validate-provider-health.mjs"
+    },
+    {
+      "name": "forbidden:scripts/validators/validate-health.mjs:productionReadyTrue",
+      "passed": true,
+      "detail": "not found",
+      "file": "scripts/validators/validate-health.mjs"
+    },
+    {
+      "name": "forbidden:scripts/validators/validate-health.mjs:productionReadyJsonTrue",
+      "passed": true,
+      "detail": "not found",
+      "file": "scripts/validators/validate-health.mjs"
+    },
+    {
+      "name": "forbidden:scripts/validators/validate-health.mjs:productionReadyEnvTrue",
+      "passed": true,
+      "detail": "not found",
+      "file": "scripts/validators/validate-health.mjs"
+    },
+    {
+      "name": "forbidden:scripts/validators/validate-health.mjs:databaseUrlAssignment",
+      "passed": true,
+      "detail": "not found",
+      "file": "scripts/validators/validate-health.mjs"
+    },
+    {
+      "name": "forbidden:scripts/validators/validate-health.mjs:postgresPasswordAssignment",
+      "passed": true,
+      "detail": "not found",
+      "file": "scripts/validators/validate-health.mjs"
+    },
+    {
+      "name": "forbidden:scripts/validators/validate-health.mjs:supabaseServiceRole",
+      "passed": true,
+      "detail": "not found",
+      "file": "scripts/validators/validate-health.mjs"
+    },
+    {
+      "name": "forbidden:scripts/validators/validate-health.mjs:smtpPassword",
+      "passed": true,
+      "detail": "not found",
+      "file": "scripts/validators/validate-health.mjs"
+    },
+    {
+      "name": "forbidden:scripts/validators/validate-health.mjs:whatsappToken",
+      "passed": true,
+      "detail": "not found",
+      "file": "scripts/validators/validate-health.mjs"
+    },
+    {
+      "name": "forbidden:scripts/validators/validate-health.mjs:smsToken",
+      "passed": true,
+      "detail": "not found",
+      "file": "scripts/validators/validate-health.mjs"
+    },
+    {
+      "name": "forbidden:scripts/validators/validate-health.mjs:paymentSecret",
+      "passed": true,
+      "detail": "not found",
+      "file": "scripts/validators/validate-health.mjs"
+    },
+    {
+      "name": "forbidden:scripts/validators/validate-health.mjs:airtableToken",
+      "passed": true,
+      "detail": "not found",
+      "file": "scripts/validators/validate-health.mjs"
+    },
+    {
+      "name": "forbidden:scripts/validators/validate-health.mjs:privateKeyMaterial",
+      "passed": true,
+      "detail": "not found",
+      "file": "scripts/validators/validate-health.mjs"
+    },
+    {
+      "name": "forbidden:scripts/validators/validate-health.mjs:rawCandidateDocumentPath",
+      "passed": true,
+      "detail": "not found",
+      "file": "scripts/validators/validate-health.mjs"
+    },
+    {
+      "name": "forbidden:scripts/validators/validate-n01-readiness.mjs:productionReadyTrue",
+      "passed": true,
+      "detail": "not found",
+      "file": "scripts/validators/validate-n01-readiness.mjs"
+    },
+    {
+      "name": "forbidden:scripts/validators/validate-n01-readiness.mjs:productionReadyJsonTrue",
+      "passed": true,
+      "detail": "not found",
+      "file": "scripts/validators/validate-n01-readiness.mjs"
+    },
+    {
+      "name": "forbidden:scripts/validators/validate-n01-readiness.mjs:productionReadyEnvTrue",
+      "passed": true,
+      "detail": "not found",
+      "file": "scripts/validators/validate-n01-readiness.mjs"
+    },
+    {
+      "name": "forbidden:scripts/validators/validate-n01-readiness.mjs:databaseUrlAssignment",
+      "passed": true,
+      "detail": "not found",
+      "file": "scripts/validators/validate-n01-readiness.mjs"
+    },
+    {
+      "name": "forbidden:scripts/validators/validate-n01-readiness.mjs:postgresPasswordAssignment",
+      "passed": true,
+      "detail": "not found",
+      "file": "scripts/validators/validate-n01-readiness.mjs"
+    },
+    {
+      "name": "forbidden:scripts/validators/validate-n01-readiness.mjs:supabaseServiceRole",
+      "passed": true,
+      "detail": "not found",
+      "file": "scripts/validators/validate-n01-readiness.mjs"
+    },
+    {
+      "name": "forbidden:scripts/validators/validate-n01-readiness.mjs:smtpPassword",
+      "passed": true,
+      "detail": "not found",
+      "file": "scripts/validators/validate-n01-readiness.mjs"
+    },
+    {
+      "name": "forbidden:scripts/validators/validate-n01-readiness.mjs:whatsappToken",
+      "passed": true,
+      "detail": "not found",
+      "file": "scripts/validators/validate-n01-readiness.mjs"
+    },
+    {
+      "name": "forbidden:scripts/validators/validate-n01-readiness.mjs:smsToken",
+      "passed": true,
+      "detail": "not found",
+      "file": "scripts/validators/validate-n01-readiness.mjs"
+    },
+    {
+      "name": "forbidden:scripts/validators/validate-n01-readiness.mjs:paymentSecret",
+      "passed": true,
+      "detail": "not found",
+      "file": "scripts/validators/validate-n01-readiness.mjs"
+    },
+    {
+      "name": "forbidden:scripts/validators/validate-n01-readiness.mjs:airtableToken",
+      "passed": true,
+      "detail": "not found",
+      "file": "scripts/validators/validate-n01-readiness.mjs"
+    },
+    {
+      "name": "forbidden:scripts/validators/validate-n01-readiness.mjs:privateKeyMaterial",
+      "passed": true,
+      "detail": "not found",
+      "file": "scripts/validators/validate-n01-readiness.mjs"
+    },
+    {
+      "name": "forbidden:scripts/validators/validate-n01-readiness.mjs:rawCandidateDocumentPath",
+      "passed": true,
+      "detail": "not found",
+      "file": "scripts/validators/validate-n01-readiness.mjs"
+    },
+    {
+      "name": "forbidden:infrastructure/nginx/nginx.conf:productionReadyTrue",
+      "passed": true,
+      "detail": "not found",
+      "file": "infrastructure/nginx/nginx.conf"
+    },
+    {
+      "name": "forbidden:infrastructure/nginx/nginx.conf:productionReadyJsonTrue",
+      "passed": true,
+      "detail": "not found",
+      "file": "infrastructure/nginx/nginx.conf"
+    },
+    {
+      "name": "forbidden:infrastructure/nginx/nginx.conf:productionReadyEnvTrue",
+      "passed": true,
+      "detail": "not found",
+      "file": "infrastructure/nginx/nginx.conf"
+    },
+    {
+      "name": "forbidden:infrastructure/nginx/nginx.conf:databaseUrlAssignment",
+      "passed": true,
+      "detail": "not found",
+      "file": "infrastructure/nginx/nginx.conf"
+    },
+    {
+      "name": "forbidden:infrastructure/nginx/nginx.conf:postgresPasswordAssignment",
+      "passed": true,
+      "detail": "not found",
+      "file": "infrastructure/nginx/nginx.conf"
+    },
+    {
+      "name": "forbidden:infrastructure/nginx/nginx.conf:supabaseServiceRole",
+      "passed": true,
+      "detail": "not found",
+      "file": "infrastructure/nginx/nginx.conf"
+    },
+    {
+      "name": "forbidden:infrastructure/nginx/nginx.conf:smtpPassword",
+      "passed": true,
+      "detail": "not found",
+      "file": "infrastructure/nginx/nginx.conf"
+    },
+    {
+      "name": "forbidden:infrastructure/nginx/nginx.conf:whatsappToken",
+      "passed": true,
+      "detail": "not found",
+      "file": "infrastructure/nginx/nginx.conf"
+    },
+    {
+      "name": "forbidden:infrastructure/nginx/nginx.conf:smsToken",
+      "passed": true,
+      "detail": "not found",
+      "file": "infrastructure/nginx/nginx.conf"
+    },
+    {
+      "name": "forbidden:infrastructure/nginx/nginx.conf:paymentSecret",
+      "passed": true,
+      "detail": "not found",
+      "file": "infrastructure/nginx/nginx.conf"
+    },
+    {
+      "name": "forbidden:infrastructure/nginx/nginx.conf:airtableToken",
+      "passed": true,
+      "detail": "not found",
+      "file": "infrastructure/nginx/nginx.conf"
+    },
+    {
+      "name": "forbidden:infrastructure/nginx/nginx.conf:privateKeyMaterial",
+      "passed": true,
+      "detail": "not found",
+      "file": "infrastructure/nginx/nginx.conf"
+    },
+    {
+      "name": "forbidden:infrastructure/nginx/nginx.conf:rawCandidateDocumentPath",
+      "passed": true,
+      "detail": "not found",
+      "file": "infrastructure/nginx/nginx.conf"
+    },
+    {
+      "name": "forbidden:docker-compose.yml:productionReadyTrue",
+      "passed": true,
+      "detail": "not found",
+      "file": "docker-compose.yml"
+    },
+    {
+      "name": "forbidden:docker-compose.yml:productionReadyJsonTrue",
+      "passed": true,
+      "detail": "not found",
+      "file": "docker-compose.yml"
+    },
+    {
+      "name": "forbidden:docker-compose.yml:productionReadyEnvTrue",
+      "passed": true,
+      "detail": "not found",
+      "file": "docker-compose.yml"
+    },
+    {
+      "name": "forbidden:docker-compose.yml:databaseUrlAssignment",
+      "passed": true,
+      "detail": "not found",
+      "file": "docker-compose.yml"
+    },
+    {
+      "name": "forbidden:docker-compose.yml:postgresPasswordAssignment",
+      "passed": true,
+      "detail": "not found",
+      "file": "docker-compose.yml"
+    },
+    {
+      "name": "forbidden:docker-compose.yml:supabaseServiceRole",
+      "passed": true,
+      "detail": "not found",
+      "file": "docker-compose.yml"
+    },
+    {
+      "name": "forbidden:docker-compose.yml:smtpPassword",
+      "passed": true,
+      "detail": "not found",
+      "file": "docker-compose.yml"
+    },
+    {
+      "name": "forbidden:docker-compose.yml:whatsappToken",
+      "passed": true,
+      "detail": "not found",
+      "file": "docker-compose.yml"
+    },
+    {
+      "name": "forbidden:docker-compose.yml:smsToken",
+      "passed": true,
+      "detail": "not found",
+      "file": "docker-compose.yml"
+    },
+    {
+      "name": "forbidden:docker-compose.yml:paymentSecret",
+      "passed": true,
+      "detail": "not found",
+      "file": "docker-compose.yml"
+    },
+    {
+      "name": "forbidden:docker-compose.yml:airtableToken",
+      "passed": true,
+      "detail": "not found",
+      "file": "docker-compose.yml"
+    },
+    {
+      "name": "forbidden:docker-compose.yml:privateKeyMaterial",
+      "passed": true,
+      "detail": "not found",
+      "file": "docker-compose.yml"
+    },
+    {
+      "name": "forbidden:docker-compose.yml:rawCandidateDocumentPath",
+      "passed": true,
+      "detail": "not found",
+      "file": "docker-compose.yml"
+    },
+    {
+      "name": "forbidden:reports/n09/n09-3-validation-report.json:productionReadyTrue",
+      "passed": true,
+      "detail": "not found",
+      "file": "reports/n09/n09-3-validation-report.json"
+    },
+    {
+      "name": "forbidden:reports/n09/n09-3-validation-report.json:productionReadyJsonTrue",
+      "passed": true,
+      "detail": "not found",
+      "file": "reports/n09/n09-3-validation-report.json"
+    },
+    {
+      "name": "forbidden:reports/n09/n09-3-validation-report.json:productionReadyEnvTrue",
+      "passed": true,
+      "detail": "not found",
+      "file": "reports/n09/n09-3-validation-report.json"
+    },
+    {
+      "name": "forbidden:reports/n09/n09-3-validation-report.json:databaseUrlAssignment",
+      "passed": true,
+      "detail": "not found",
+      "file": "reports/n09/n09-3-validation-report.json"
+    },
+    {
+      "name": "forbidden:reports/n09/n09-3-validation-report.json:postgresPasswordAssignment",
+      "passed": true,
+      "detail": "not found",
+      "file": "reports/n09/n09-3-validation-report.json"
+    },
+    {
+      "name": "forbidden:reports/n09/n09-3-validation-report.json:supabaseServiceRole",
+      "passed": true,
+      "detail": "not found",
+      "file": "reports/n09/n09-3-validation-report.json"
+    },
+    {
+      "name": "forbidden:reports/n09/n09-3-validation-report.json:smtpPassword",
+      "passed": true,
+      "detail": "not found",
+      "file": "reports/n09/n09-3-validation-report.json"
+    },
+    {
+      "name": "forbidden:reports/n09/n09-3-validation-report.json:whatsappToken",
+      "passed": true,
+      "detail": "not found",
+      "file": "reports/n09/n09-3-validation-report.json"
+    },
+    {
+      "name": "forbidden:reports/n09/n09-3-validation-report.json:smsToken",
+      "passed": true,
+      "detail": "not found",
+      "file": "reports/n09/n09-3-validation-report.json"
+    },
+    {
+      "name": "forbidden:reports/n09/n09-3-validation-report.json:paymentSecret",
+      "passed": true,
+      "detail": "not found",
+      "file": "reports/n09/n09-3-validation-report.json"
+    },
+    {
+      "name": "forbidden:reports/n09/n09-3-validation-report.json:airtableToken",
+      "passed": true,
+      "detail": "not found",
+      "file": "reports/n09/n09-3-validation-report.json"
+    },
+    {
+      "name": "forbidden:reports/n09/n09-3-validation-report.json:privateKeyMaterial",
+      "passed": true,
+      "detail": "not found",
+      "file": "reports/n09/n09-3-validation-report.json"
+    },
+    {
+      "name": "forbidden:reports/n09/n09-3-validation-report.json:rawCandidateDocumentPath",
+      "passed": true,
+      "detail": "not found",
+      "file": "reports/n09/n09-3-validation-report.json"
+    },
+    {
+      "name": "forbidden:reports/creator/creator-validation-report.json:productionReadyTrue",
+      "passed": true,
+      "detail": "not found",
+      "file": "reports/creator/creator-validation-report.json"
+    },
+    {
+      "name": "forbidden:reports/creator/creator-validation-report.json:productionReadyJsonTrue",
+      "passed": true,
+      "detail": "not found",
+      "file": "reports/creator/creator-validation-report.json"
+    },
+    {
+      "name": "forbidden:reports/creator/creator-validation-report.json:productionReadyEnvTrue",
+      "passed": true,
+      "detail": "not found",
+      "file": "reports/creator/creator-validation-report.json"
+    },
+    {
+      "name": "forbidden:reports/creator/creator-validation-report.json:databaseUrlAssignment",
+      "passed": true,
+      "detail": "not found",
+      "file": "reports/creator/creator-validation-report.json"
+    },
+    {
+      "name": "forbidden:reports/creator/creator-validation-report.json:postgresPasswordAssignment",
+      "passed": true,
+      "detail": "not found",
+      "file": "reports/creator/creator-validation-report.json"
+    },
+    {
+      "name": "forbidden:reports/creator/creator-validation-report.json:supabaseServiceRole",
+      "passed": true,
+      "detail": "not found",
+      "file": "reports/creator/creator-validation-report.json"
+    },
+    {
+      "name": "forbidden:reports/creator/creator-validation-report.json:smtpPassword",
+      "passed": true,
+      "detail": "not found",
+      "file": "reports/creator/creator-validation-report.json"
+    },
+    {
+      "name": "forbidden:reports/creator/creator-validation-report.json:whatsappToken",
+      "passed": true,
+      "detail": "not found",
+      "file": "reports/creator/creator-validation-report.json"
+    },
+    {
+      "name": "forbidden:reports/creator/creator-validation-report.json:smsToken",
+      "passed": true,
+      "detail": "not found",
+      "file": "reports/creator/creator-validation-report.json"
+    },
+    {
+      "name": "forbidden:reports/creator/creator-validation-report.json:paymentSecret",
+      "passed": true,
+      "detail": "not found",
+      "file": "reports/creator/creator-validation-report.json"
+    },
+    {
+      "name": "forbidden:reports/creator/creator-validation-report.json:airtableToken",
+      "passed": true,
+      "detail": "not found",
+      "file": "reports/creator/creator-validation-report.json"
+    },
+    {
+      "name": "forbidden:reports/creator/creator-validation-report.json:privateKeyMaterial",
+      "passed": true,
+      "detail": "not found",
+      "file": "reports/creator/creator-validation-report.json"
+    },
+    {
+      "name": "forbidden:reports/creator/creator-validation-report.json:rawCandidateDocumentPath",
+      "passed": true,
+      "detail": "not found",
+      "file": "reports/creator/creator-validation-report.json"
+    },
+    {
+      "name": "forbidden:reports/validation/provider-health-report.json:productionReadyTrue",
+      "passed": true,
+      "detail": "not found",
+      "file": "reports/validation/provider-health-report.json"
+    },
+    {
+      "name": "forbidden:reports/validation/provider-health-report.json:productionReadyJsonTrue",
+      "passed": true,
+      "detail": "not found",
+      "file": "reports/validation/provider-health-report.json"
+    },
+    {
+      "name": "forbidden:reports/validation/provider-health-report.json:productionReadyEnvTrue",
+      "passed": true,
+      "detail": "not found",
+      "file": "reports/validation/provider-health-report.json"
+    },
+    {
+      "name": "forbidden:reports/validation/provider-health-report.json:databaseUrlAssignment",
+      "passed": true,
+      "detail": "not found",
+      "file": "reports/validation/provider-health-report.json"
+    },
+    {
+      "name": "forbidden:reports/validation/provider-health-report.json:postgresPasswordAssignment",
+      "passed": true,
+      "detail": "not found",
+      "file": "reports/validation/provider-health-report.json"
+    },
+    {
+      "name": "forbidden:reports/validation/provider-health-report.json:supabaseServiceRole",
+      "passed": true,
+      "detail": "not found",
+      "file": "reports/validation/provider-health-report.json"
+    },
+    {
+      "name": "forbidden:reports/validation/provider-health-report.json:smtpPassword",
+      "passed": true,
+      "detail": "not found",
+      "file": "reports/validation/provider-health-report.json"
+    },
+    {
+      "name": "forbidden:reports/validation/provider-health-report.json:whatsappToken",
+      "passed": true,
+      "detail": "not found",
+      "file": "reports/validation/provider-health-report.json"
+    },
+    {
+      "name": "forbidden:reports/validation/provider-health-report.json:smsToken",
+      "passed": true,
+      "detail": "not found",
+      "file": "reports/validation/provider-health-report.json"
+    },
+    {
+      "name": "forbidden:reports/validation/provider-health-report.json:paymentSecret",
+      "passed": true,
+      "detail": "not found",
+      "file": "reports/validation/provider-health-report.json"
+    },
+    {
+      "name": "forbidden:reports/validation/provider-health-report.json:airtableToken",
+      "passed": true,
+      "detail": "not found",
+      "file": "reports/validation/provider-health-report.json"
+    },
+    {
+      "name": "forbidden:reports/validation/provider-health-report.json:privateKeyMaterial",
+      "passed": true,
+      "detail": "not found",
+      "file": "reports/validation/provider-health-report.json"
+    },
+    {
+      "name": "forbidden:reports/validation/provider-health-report.json:rawCandidateDocumentPath",
+      "passed": true,
+      "detail": "not found",
+      "file": "reports/validation/provider-health-report.json"
+    },
+    {
+      "name": "forbidden:reports/phases/n01-6-phase-runner-report.json:productionReadyTrue",
+      "passed": true,
+      "detail": "not found",
+      "file": "reports/phases/n01-6-phase-runner-report.json"
+    },
+    {
+      "name": "forbidden:reports/phases/n01-6-phase-runner-report.json:productionReadyJsonTrue",
+      "passed": true,
+      "detail": "not found",
+      "file": "reports/phases/n01-6-phase-runner-report.json"
+    },
+    {
+      "name": "forbidden:reports/phases/n01-6-phase-runner-report.json:productionReadyEnvTrue",
+      "passed": true,
+      "detail": "not found",
+      "file": "reports/phases/n01-6-phase-runner-report.json"
+    },
+    {
+      "name": "forbidden:reports/phases/n01-6-phase-runner-report.json:databaseUrlAssignment",
+      "passed": true,
+      "detail": "not found",
+      "file": "reports/phases/n01-6-phase-runner-report.json"
+    },
+    {
+      "name": "forbidden:reports/phases/n01-6-phase-runner-report.json:postgresPasswordAssignment",
+      "passed": true,
+      "detail": "not found",
+      "file": "reports/phases/n01-6-phase-runner-report.json"
+    },
+    {
+      "name": "forbidden:reports/phases/n01-6-phase-runner-report.json:supabaseServiceRole",
+      "passed": true,
+      "detail": "not found",
+      "file": "reports/phases/n01-6-phase-runner-report.json"
+    },
+    {
+      "name": "forbidden:reports/phases/n01-6-phase-runner-report.json:smtpPassword",
+      "passed": true,
+      "detail": "not found",
+      "file": "reports/phases/n01-6-phase-runner-report.json"
+    },
+    {
+      "name": "forbidden:reports/phases/n01-6-phase-runner-report.json:whatsappToken",
+      "passed": true,
+      "detail": "not found",
+      "file": "reports/phases/n01-6-phase-runner-report.json"
+    },
+    {
+      "name": "forbidden:reports/phases/n01-6-phase-runner-report.json:smsToken",
+      "passed": true,
+      "detail": "not found",
+      "file": "reports/phases/n01-6-phase-runner-report.json"
+    },
+    {
+      "name": "forbidden:reports/phases/n01-6-phase-runner-report.json:paymentSecret",
+      "passed": true,
+      "detail": "not found",
+      "file": "reports/phases/n01-6-phase-runner-report.json"
+    },
+    {
+      "name": "forbidden:reports/phases/n01-6-phase-runner-report.json:airtableToken",
+      "passed": true,
+      "detail": "not found",
+      "file": "reports/phases/n01-6-phase-runner-report.json"
+    },
+    {
+      "name": "forbidden:reports/phases/n01-6-phase-runner-report.json:privateKeyMaterial",
+      "passed": true,
+      "detail": "not found",
+      "file": "reports/phases/n01-6-phase-runner-report.json"
+    },
+    {
+      "name": "forbidden:reports/phases/n01-6-phase-runner-report.json:rawCandidateDocumentPath",
+      "passed": true,
+      "detail": "not found",
+      "file": "reports/phases/n01-6-phase-runner-report.json"
+    },
+    {
+      "name": "forbidden:reports/maintenance/prune-logs-report.json:productionReadyTrue",
+      "passed": true,
+      "detail": "not found",
+      "file": "reports/maintenance/prune-logs-report.json"
+    },
+    {
+      "name": "forbidden:reports/maintenance/prune-logs-report.json:productionReadyJsonTrue",
+      "passed": true,
+      "detail": "not found",
+      "file": "reports/maintenance/prune-logs-report.json"
+    },
+    {
+      "name": "forbidden:reports/maintenance/prune-logs-report.json:productionReadyEnvTrue",
+      "passed": true,
+      "detail": "not found",
+      "file": "reports/maintenance/prune-logs-report.json"
+    },
+    {
+      "name": "forbidden:reports/maintenance/prune-logs-report.json:databaseUrlAssignment",
+      "passed": true,
+      "detail": "not found",
+      "file": "reports/maintenance/prune-logs-report.json"
+    },
+    {
+      "name": "forbidden:reports/maintenance/prune-logs-report.json:postgresPasswordAssignment",
+      "passed": true,
+      "detail": "not found",
+      "file": "reports/maintenance/prune-logs-report.json"
+    },
+    {
+      "name": "forbidden:reports/maintenance/prune-logs-report.json:supabaseServiceRole",
+      "passed": true,
+      "detail": "not found",
+      "file": "reports/maintenance/prune-logs-report.json"
+    },
+    {
+      "name": "forbidden:reports/maintenance/prune-logs-report.json:smtpPassword",
+      "passed": true,
+      "detail": "not found",
+      "file": "reports/maintenance/prune-logs-report.json"
+    },
+    {
+      "name": "forbidden:reports/maintenance/prune-logs-report.json:whatsappToken",
+      "passed": true,
+      "detail": "not found",
+      "file": "reports/maintenance/prune-logs-report.json"
+    },
+    {
+      "name": "forbidden:reports/maintenance/prune-logs-report.json:smsToken",
+      "passed": true,
+      "detail": "not found",
+      "file": "reports/maintenance/prune-logs-report.json"
+    },
+    {
+      "name": "forbidden:reports/maintenance/prune-logs-report.json:paymentSecret",
+      "passed": true,
+      "detail": "not found",
+      "file": "reports/maintenance/prune-logs-report.json"
+    },
+    {
+      "name": "forbidden:reports/maintenance/prune-logs-report.json:airtableToken",
+      "passed": true,
+      "detail": "not found",
+      "file": "reports/maintenance/prune-logs-report.json"
+    },
+    {
+      "name": "forbidden:reports/maintenance/prune-logs-report.json:privateKeyMaterial",
+      "passed": true,
+      "detail": "not found",
+      "file": "reports/maintenance/prune-logs-report.json"
+    },
+    {
+      "name": "forbidden:reports/maintenance/prune-logs-report.json:rawCandidateDocumentPath",
+      "passed": true,
+      "detail": "not found",
+      "file": "reports/maintenance/prune-logs-report.json"
+    },
+    {
+      "name": "forbidden:reports/validation/health-report.json:productionReadyTrue",
+      "passed": true,
+      "detail": "not found",
+      "file": "reports/validation/health-report.json"
+    },
+    {
+      "name": "forbidden:reports/validation/health-report.json:productionReadyJsonTrue",
+      "passed": true,
+      "detail": "not found",
+      "file": "reports/validation/health-report.json"
+    },
+    {
+      "name": "forbidden:reports/validation/health-report.json:productionReadyEnvTrue",
+      "passed": true,
+      "detail": "not found",
+      "file": "reports/validation/health-report.json"
+    },
+    {
+      "name": "forbidden:reports/validation/health-report.json:databaseUrlAssignment",
+      "passed": true,
+      "detail": "not found",
+      "file": "reports/validation/health-report.json"
+    },
+    {
+      "name": "forbidden:reports/validation/health-report.json:postgresPasswordAssignment",
+      "passed": true,
+      "detail": "not found",
+      "file": "reports/validation/health-report.json"
+    },
+    {
+      "name": "forbidden:reports/validation/health-report.json:supabaseServiceRole",
+      "passed": true,
+      "detail": "not found",
+      "file": "reports/validation/health-report.json"
+    },
+    {
+      "name": "forbidden:reports/validation/health-report.json:smtpPassword",
+      "passed": true,
+      "detail": "not found",
+      "file": "reports/validation/health-report.json"
+    },
+    {
+      "name": "forbidden:reports/validation/health-report.json:whatsappToken",
+      "passed": true,
+      "detail": "not found",
+      "file": "reports/validation/health-report.json"
+    },
+    {
+      "name": "forbidden:reports/validation/health-report.json:smsToken",
+      "passed": true,
+      "detail": "not found",
+      "file": "reports/validation/health-report.json"
+    },
+    {
+      "name": "forbidden:reports/validation/health-report.json:paymentSecret",
+      "passed": true,
+      "detail": "not found",
+      "file": "reports/validation/health-report.json"
+    },
+    {
+      "name": "forbidden:reports/validation/health-report.json:airtableToken",
+      "passed": true,
+      "detail": "not found",
+      "file": "reports/validation/health-report.json"
+    },
+    {
+      "name": "forbidden:reports/validation/health-report.json:privateKeyMaterial",
+      "passed": true,
+      "detail": "not found",
+      "file": "reports/validation/health-report.json"
+    },
+    {
+      "name": "forbidden:reports/validation/health-report.json:rawCandidateDocumentPath",
+      "passed": true,
+      "detail": "not found",
+      "file": "reports/validation/health-report.json"
+    },
+    {
+      "name": "report-exists:reports/n09/n09-3-validation-report.json",
+      "passed": true,
+      "detail": "found",
+      "file": "reports/n09/n09-3-validation-report.json"
+    },
+    {
+      "name": "report-json:reports/n09/n09-3-validation-report.json",
+      "passed": true,
+      "detail": "parsed",
+      "file": "reports/n09/n09-3-validation-report.json"
+    },
+    {
+      "name": "report-module:reports/n09/n09-3-validation-report.json",
+      "passed": true,
+      "detail": "N09",
+      "file": "reports/n09/n09-3-validation-report.json"
+    },
+    {
+      "name": "report-submodule:reports/n09/n09-3-validation-report.json",
+      "passed": true,
+      "detail": "N09.3",
+      "file": "reports/n09/n09-3-validation-report.json"
+    },
+    {
+      "name": "report-passed:reports/n09/n09-3-validation-report.json",
+      "passed": true,
+      "detail": "true",
+      "file": "reports/n09/n09-3-validation-report.json"
+    },
+    {
+      "name": "report-failedChecks-zero:reports/n09/n09-3-validation-report.json",
+      "passed": true,
+      "detail": "0",
+      "file": "reports/n09/n09-3-validation-report.json"
+    },
+    {
+      "name": "report-productionReady-false:reports/n09/n09-3-validation-report.json",
+      "passed": true,
+      "detail": "false",
+      "file": "reports/n09/n09-3-validation-report.json"
+    },
+    {
+      "name": "report-exists:reports/creator/creator-validation-report.json",
+      "passed": true,
+      "detail": "found",
+      "file": "reports/creator/creator-validation-report.json"
+    },
+    {
+      "name": "report-json:reports/creator/creator-validation-report.json",
+      "passed": true,
+      "detail": "parsed",
+      "file": "reports/creator/creator-validation-report.json"
+    },
+    {
+      "name": "report-module:reports/creator/creator-validation-report.json",
+      "passed": true,
+      "detail": "CREATOR",
+      "file": "reports/creator/creator-validation-report.json"
+    },
+    {
+      "name": "report-submodule:reports/creator/creator-validation-report.json",
+      "passed": true,
+      "detail": "CREATOR.2",
+      "file": "reports/creator/creator-validation-report.json"
+    },
+    {
+      "name": "report-passed:reports/creator/creator-validation-report.json",
+      "passed": true,
+      "detail": "true",
+      "file": "reports/creator/creator-validation-report.json"
+    },
+    {
+      "name": "report-failedChecks-zero:reports/creator/creator-validation-report.json",
+      "passed": true,
+      "detail": "0",
+      "file": "reports/creator/creator-validation-report.json"
+    },
+    {
+      "name": "report-productionReady-false:reports/creator/creator-validation-report.json",
+      "passed": true,
+      "detail": "false",
+      "file": "reports/creator/creator-validation-report.json"
+    },
+    {
+      "name": "report-exists:reports/validation/provider-health-report.json",
+      "passed": true,
+      "detail": "found",
+      "file": "reports/validation/provider-health-report.json"
+    },
+    {
+      "name": "report-json:reports/validation/provider-health-report.json",
+      "passed": true,
+      "detail": "parsed",
+      "file": "reports/validation/provider-health-report.json"
+    },
+    {
+      "name": "report-module:reports/validation/provider-health-report.json",
+      "passed": true,
+      "detail": "N01",
+      "file": "reports/validation/provider-health-report.json"
+    },
+    {
+      "name": "report-submodule:reports/validation/provider-health-report.json",
+      "passed": true,
+      "detail": "N01.5.2",
+      "file": "reports/validation/provider-health-report.json"
+    },
+    {
+      "name": "report-passed:reports/validation/provider-health-report.json",
+      "passed": true,
+      "detail": "true",
+      "file": "reports/validation/provider-health-report.json"
+    },
+    {
+      "name": "report-failedChecks-zero:reports/validation/provider-health-report.json",
+      "passed": true,
+      "detail": "0",
+      "file": "reports/validation/provider-health-report.json"
+    },
+    {
+      "name": "report-productionReady-false:reports/validation/provider-health-report.json",
+      "passed": true,
+      "detail": "false",
+      "file": "reports/validation/provider-health-report.json"
+    },
+    {
+      "name": "report-exists:reports/phases/n01-6-phase-runner-report.json",
+      "passed": true,
+      "detail": "found",
+      "file": "reports/phases/n01-6-phase-runner-report.json"
+    },
+    {
+      "name": "report-json:reports/phases/n01-6-phase-runner-report.json",
+      "passed": true,
+      "detail": "parsed",
+      "file": "reports/phases/n01-6-phase-runner-report.json"
+    },
+    {
+      "name": "report-module:reports/phases/n01-6-phase-runner-report.json",
+      "passed": true,
+      "detail": "N01",
+      "file": "reports/phases/n01-6-phase-runner-report.json"
+    },
+    {
+      "name": "report-submodule:reports/phases/n01-6-phase-runner-report.json",
+      "passed": true,
+      "detail": "N01.6",
+      "file": "reports/phases/n01-6-phase-runner-report.json"
+    },
+    {
+      "name": "report-passed:reports/phases/n01-6-phase-runner-report.json",
+      "passed": true,
+      "detail": "true",
+      "file": "reports/phases/n01-6-phase-runner-report.json"
+    },
+    {
+      "name": "report-failedChecks-zero:reports/phases/n01-6-phase-runner-report.json",
+      "passed": true,
+      "detail": "0",
+      "file": "reports/phases/n01-6-phase-runner-report.json"
+    },
+    {
+      "name": "report-productionReady-false:reports/phases/n01-6-phase-runner-report.json",
+      "passed": true,
+      "detail": "false",
+      "file": "reports/phases/n01-6-phase-runner-report.json"
+    },
+    {
+      "name": "report-exists:reports/maintenance/prune-logs-report.json",
+      "passed": true,
+      "detail": "found",
+      "file": "reports/maintenance/prune-logs-report.json"
+    },
+    {
+      "name": "report-json:reports/maintenance/prune-logs-report.json",
+      "passed": true,
+      "detail": "parsed",
+      "file": "reports/maintenance/prune-logs-report.json"
+    },
+    {
+      "name": "report-module:reports/maintenance/prune-logs-report.json",
+      "passed": true,
+      "detail": "N01",
+      "file": "reports/maintenance/prune-logs-report.json"
+    },
+    {
+      "name": "report-submodule:reports/maintenance/prune-logs-report.json",
+      "passed": true,
+      "detail": "N01.8",
+      "file": "reports/maintenance/prune-logs-report.json"
+    },
+    {
+      "name": "report-passed:reports/maintenance/prune-logs-report.json",
+      "passed": true,
+      "detail": "true",
+      "file": "reports/maintenance/prune-logs-report.json"
+    },
+    {
+      "name": "report-failedChecks-zero:reports/maintenance/prune-logs-report.json",
+      "passed": true,
+      "detail": "0",
+      "file": "reports/maintenance/prune-logs-report.json"
+    },
+    {
+      "name": "report-productionReady-false:reports/maintenance/prune-logs-report.json",
+      "passed": true,
+      "detail": "false",
+      "file": "reports/maintenance/prune-logs-report.json"
+    },
+    {
+      "name": "report-exists:reports/validation/health-report.json",
+      "passed": true,
+      "detail": "found",
+      "file": "reports/validation/health-report.json"
+    },
+    {
+      "name": "report-json:reports/validation/health-report.json",
+      "passed": true,
+      "detail": "parsed",
+      "file": "reports/validation/health-report.json"
+    },
+    {
+      "name": "report-module:reports/validation/health-report.json",
+      "passed": true,
+      "detail": "N01",
+      "file": "reports/validation/health-report.json"
+    },
+    {
+      "name": "report-submodule:reports/validation/health-report.json",
+      "passed": true,
+      "detail": "N01.8.1",
+      "file": "reports/validation/health-report.json"
+    },
+    {
+      "name": "report-passed:reports/validation/health-report.json",
+      "passed": true,
+      "detail": "true",
+      "file": "reports/validation/health-report.json"
+    },
+    {
+      "name": "report-failedChecks-zero:reports/validation/health-report.json",
+      "passed": true,
+      "detail": "0",
+      "file": "reports/validation/health-report.json"
+    },
+    {
+      "name": "report-productionReady-false:reports/validation/health-report.json",
+      "passed": true,
+      "detail": "false",
+      "file": "reports/validation/health-report.json"
+    },
+    {
+      "name": "env:contains:KINGSMEN_PRODUCTION_READY=false",
+      "passed": true,
+      "detail": "found",
+      "file": "config/environment/.env.template"
+    },
+    {
+      "name": "env:contains:KINGSMEN_DEFAULT_DEPLOY_TARGET=oracle_lite",
+      "passed": true,
+      "detail": "found",
+      "file": "config/environment/.env.template"
+    },
+    {
+      "name": "env:contains:KINGSMEN_ACTIVE_CANDIDATE_CAP=500",
+      "passed": true,
+      "detail": "found",
+      "file": "config/environment/.env.template"
+    },
+    {
+      "name": "env:contains:KINGSMEN_READY_CAP_TARGET=1000",
+      "passed": true,
+      "detail": "found",
+      "file": "config/environment/.env.template"
+    },
+    {
+      "name": "env:contains:KINGSMEN_PREPARE_CAP_TARGET=5000",
+      "passed": true,
+      "detail": "found",
+      "file": "config/environment/.env.template"
+    },
+    {
+      "name": "env:contains:KINGSMEN_EMAIL_PRIMARY=true",
+      "passed": true,
+      "detail": "found",
+      "file": "config/environment/.env.template"
+    },
+    {
+      "name": "env:contains:KINGSMEN_WHATSAPP_URGENT_ONLY=true",
+      "passed": true,
+      "detail": "found",
+      "file": "config/environment/.env.template"
+    },
+    {
+      "name": "env:contains:KINGSMEN_SMS_BACKUP_ONLY=true",
+      "passed": true,
+      "detail": "found",
+      "file": "config/environment/.env.template"
+    },
+    {
+      "name": "env:contains:KINGSMEN_AIRTABLE_MIRROR_ONLY=true",
+      "passed": true,
+      "detail": "found",
+      "file": "config/environment/.env.template"
+    },
+    {
+      "name": "env:contains:KINGSMEN_PLAYWRIGHT_SCOUT_ONLY=true",
+      "passed": true,
+      "detail": "found",
+      "file": "config/environment/.env.template"
+    },
+    {
+      "name": "env:contains:FOUNDER_MFA_REQUIRED=true",
+      "passed": true,
+      "detail": "found",
+      "file": "config/environment/.env.template"
+    },
+    {
+      "name": "env:contains:OPERATOR_MFA_REQUIRED=true",
+      "passed": true,
+      "detail": "found",
+      "file": "config/environment/.env.template"
+    },
+    {
+      "name": "env:contains:APPEND_ONLY_AUDIT_ENABLED=true",
+      "passed": true,
+      "detail": "found",
+      "file": "config/environment/.env.template"
+    },
+    {
+      "name": "env:contains:POPIA_ACCESS_LOG_ENABLED=true",
+      "passed": true,
+      "detail": "found",
+      "file": "config/environment/.env.template"
+    },
+    {
+      "name": "creator-config:json",
+      "passed": true,
+      "detail": "parsed",
+      "file": "config/creator.config.json"
+    },
+    {
+      "name": "creator-config:productionReadyFalse",
+      "passed": true,
+      "detail": "false",
+      "file": "config/creator.config.json"
+    },
+    {
+      "name": "creator-config:canonicalCreator",
+      "passed": true,
+      "detail": "scripts/KINGSMEN_CREATOR.ps1",
+      "file": "config/creator.config.json"
+    },
+    {
+      "name": "creator-config:trackerAuthority",
+      "passed": true,
+      "detail": "true",
+      "file": "config/creator.config.json"
+    },
+    {
+      "name": "creator-config:oracleLite",
+      "passed": true,
+      "detail": "Oracle Cloud Free Tier / Oracle Lite",
+      "file": "config/creator.config.json"
+    },
+    {
+      "name": "provider-registry:json",
+      "passed": true,
+      "detail": "parsed",
+      "file": "config/providers/provider-registry.json"
+    },
+    {
+      "name": "provider-registry:doctrine:oracleLiteFirst",
+      "passed": true,
+      "detail": "true",
+      "file": "config/providers/provider-registry.json"
+    },
+    {
+      "name": "provider-registry:doctrine:postgresqlTruth",
+      "passed": true,
+      "detail": "true",
+      "file": "config/providers/provider-registry.json"
+    },
+    {
+      "name": "provider-registry:doctrine:airtableMirrorOnly",
+      "passed": true,
+      "detail": "true",
+      "file": "config/providers/provider-registry.json"
+    },
+    {
+      "name": "provider-registry:doctrine:emailPrimary",
+      "passed": true,
+      "detail": "true",
+      "file": "config/providers/provider-registry.json"
+    },
+    {
+      "name": "provider-registry:doctrine:whatsappUrgentOnly",
+      "passed": true,
+      "detail": "true",
+      "file": "config/providers/provider-registry.json"
+    },
+    {
+      "name": "provider-registry:doctrine:smsBackupOnly",
+      "passed": true,
+      "detail": "true",
+      "file": "config/providers/provider-registry.json"
+    },
+    {
+      "name": "provider-registry:doctrine:playwrightScoutOnly",
+      "passed": true,
+      "detail": "true",
+      "file": "config/providers/provider-registry.json"
+    },
+    {
+      "name": "provider-registry:doctrine:noHardcodedSecrets",
+      "passed": true,
+      "detail": "true",
+      "file": "config/providers/provider-registry.json"
+    },
+    {
+      "name": "provider-registry:group:database",
+      "passed": true,
+      "detail": "found",
+      "file": "config/providers/provider-registry.json"
+    },
+    {
+      "name": "provider-registry:group:queue",
+      "passed": true,
+      "detail": "found",
+      "file": "config/providers/provider-registry.json"
+    },
+    {
+      "name": "provider-registry:group:storage",
+      "passed": true,
+      "detail": "found",
+      "file": "config/providers/provider-registry.json"
+    },
+    {
+      "name": "provider-registry:group:email",
+      "passed": true,
+      "detail": "found",
+      "file": "config/providers/provider-registry.json"
+    },
+    {
+      "name": "provider-registry:group:whatsapp",
+      "passed": true,
+      "detail": "found",
+      "file": "config/providers/provider-registry.json"
+    },
+    {
+      "name": "provider-registry:group:sms",
+      "passed": true,
+      "detail": "found",
+      "file": "config/providers/provider-registry.json"
+    },
+    {
+      "name": "provider-registry:group:payments",
+      "passed": true,
+      "detail": "found",
+      "file": "config/providers/provider-registry.json"
+    },
+    {
+      "name": "provider-registry:group:airtable",
+      "passed": true,
+      "detail": "found",
+      "file": "config/providers/provider-registry.json"
+    },
+    {
+      "name": "provider-registry:group:playwright",
+      "passed": true,
+      "detail": "found",
+      "file": "config/providers/provider-registry.json"
+    },
+    {
+      "name": "master-index:json",
+      "passed": true,
+      "detail": "parsed",
+      "file": "manifests/master-build-index.json"
+    },
+    {
+      "name": "master-index:productionReadyFalse",
+      "passed": true,
+      "detail": "false",
+      "file": "manifests/master-build-index.json"
+    },
+    {
+      "name": "master-index:oracleLiteFirst",
+      "passed": true,
+      "detail": "true",
+      "file": "manifests/master-build-index.json"
+    },
+    {
+      "name": "master-index:postgresTruth",
+      "passed": true,
+      "detail": "true",
+      "file": "manifests/master-build-index.json"
+    },
+    {
+      "name": "master-index:allSixGates",
+      "passed": true,
+      "detail": "true",
+      "file": "manifests/master-build-index.json"
+    },
+    {
+      "name": "master-index:nextN01Readiness",
+      "passed": true,
+      "detail": "N01.7 - infrastructure/nginx/nginx.conf",
+      "file": "manifests/master-build-index.json"
+    },
+    {
+      "name": "master-index:validated-evidence:N09.3",
+      "passed": true,
+      "detail": "N09.3,CREATOR.2,N01.5.2,N01.6",
+      "file": "manifests/master-build-index.json"
+    },
+    {
+      "name": "master-index:validated-evidence:CREATOR.2",
+      "passed": true,
+      "detail": "N09.3,CREATOR.2,N01.5.2,N01.6",
+      "file": "manifests/master-build-index.json"
+    },
+    {
+      "name": "master-index:validated-evidence:N01.5.2",
+      "passed": true,
+      "detail": "N09.3,CREATOR.2,N01.5.2,N01.6",
+      "file": "manifests/master-build-index.json"
+    },
+    {
+      "name": "master-index:validated-evidence:N01.6",
+      "passed": true,
+      "detail": "N09.3,CREATOR.2,N01.5.2,N01.6",
+      "file": "manifests/master-build-index.json"
+    },
+    {
+      "name": "compose:service:postgres",
+      "passed": true,
+      "detail": "service check",
+      "file": "docker-compose.yml"
+    },
+    {
+      "name": "compose:service:redis",
+      "passed": true,
+      "detail": "service check",
+      "file": "docker-compose.yml"
+    },
+    {
+      "name": "compose:service:api",
+      "passed": true,
+      "detail": "service check",
+      "file": "docker-compose.yml"
+    },
+    {
+      "name": "compose:service:web",
+      "passed": true,
+      "detail": "service check",
+      "file": "docker-compose.yml"
+    },
+    {
+      "name": "compose:service:worker",
+      "passed": true,
+      "detail": "service check",
+      "file": "docker-compose.yml"
+    },
+    {
+      "name": "compose:service:nginx",
+      "passed": true,
+      "detail": "service check",
+      "file": "docker-compose.yml"
+    },
+    {
+      "name": "compose:postgres-password-required",
+      "passed": true,
+      "detail": "local secret required",
+      "file": "docker-compose.yml"
+    },
+    {
+      "name": "compose:private-network-internal",
+      "passed": true,
+      "detail": "internal network",
+      "file": "docker-compose.yml"
+    },
+    {
+      "name": "compose:healthchecks",
+      "passed": true,
+      "detail": "5",
+      "file": "docker-compose.yml"
+    },
+    {
+      "name": "compose:oracle-lite-resource-limits",
+      "passed": true,
+      "detail": "6",
+      "file": "docker-compose.yml"
+    },
+    {
+      "name": "nginx:contains:server_tokens off;",
+      "passed": true,
+      "detail": "found",
+      "file": "infrastructure/nginx/nginx.conf"
+    },
+    {
+      "name": "nginx:contains:location = /health/nginx",
+      "passed": true,
+      "detail": "found",
+      "file": "infrastructure/nginx/nginx.conf"
+    },
+    {
+      "name": "nginx:contains:X-Kingsmen-Production-Ready",
+      "passed": true,
+      "detail": "found",
+      "file": "infrastructure/nginx/nginx.conf"
+    },
+    {
+      "name": "nginx:contains:oracle_lite",
+      "passed": true,
+      "detail": "found",
+      "file": "infrastructure/nginx/nginx.conf"
+    },
+    {
+      "name": "nginx:contains:limit_req_zone $binary_remote_addr zone=kingsmen_api",
+      "passed": true,
+      "detail": "found",
+      "file": "infrastructure/nginx/nginx.conf"
+    },
+    {
+      "name": "nginx:contains:limit_req_zone $binary_remote_addr zone=kingsmen_upload",
+      "passed": true,
+      "detail": "found",
+      "file": "infrastructure/nginx/nginx.conf"
+    },
+    {
+      "name": "tracker:has-row:N01.5",
+      "passed": true,
+      "detail": "found",
+      "file": "Kingsmen_Build_Tracker.csv"
+    },
+    {
+      "name": "tracker:has-row:N01.5.1",
+      "passed": true,
+      "detail": "found",
+      "file": "Kingsmen_Build_Tracker.csv"
+    },
+    {
+      "name": "tracker:has-row:N01.5.2",
+      "passed": true,
+      "detail": "found",
+      "file": "Kingsmen_Build_Tracker.csv"
+    },
+    {
+      "name": "tracker:has-row:N01.6",
+      "passed": true,
+      "detail": "found",
+      "file": "Kingsmen_Build_Tracker.csv"
+    },
+    {
+      "name": "tracker:has-row:N01.6.1",
+      "passed": true,
+      "detail": "found",
+      "file": "Kingsmen_Build_Tracker.csv"
+    },
+    {
+      "name": "tracker:has-row:N01.7",
+      "passed": true,
+      "detail": "found",
+      "file": "Kingsmen_Build_Tracker.csv"
+    },
+    {
+      "name": "tracker:has-row:N01.7.1",
+      "passed": true,
+      "detail": "found",
+      "file": "Kingsmen_Build_Tracker.csv"
+    },
+    {
+      "name": "tracker:has-row:N01.8",
+      "passed": true,
+      "detail": "found",
+      "file": "Kingsmen_Build_Tracker.csv"
+    },
+    {
+      "name": "tracker:has-row:N01.8.1",
+      "passed": true,
+      "detail": "found",
+      "file": "Kingsmen_Build_Tracker.csv"
+    },
+    {
+      "name": "tracker:has-row:N01.9",
+      "passed": true,
+      "detail": "found",
+      "file": "Kingsmen_Build_Tracker.csv"
+    }
+  ],
+  "nextTrackerRow": "N01.9 repair - fix failed checks in reports/validation/n01-readiness-report.json"
+}
