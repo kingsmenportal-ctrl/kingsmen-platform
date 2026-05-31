@@ -1,0 +1,100 @@
+﻿{
+    "module":  "CREATOR",
+    "submodule":  "CREATOR.2",
+    "validator":  "Test-KingsmenCreator.ps1",
+    "productionReady":  false,
+    "generatedAt":  "2026-05-31T10:08:59.1247616Z",
+    "passed":  true,
+    "totalChecks":  14,
+    "failedChecks":  0,
+    "failed":  [
+
+               ],
+    "checks":  [
+                   {
+                       "name":  "exists:scripts/KINGSMEN_CREATOR.ps1",
+                       "passed":  true,
+                       "detail":  "found",
+                       "file":  "scripts/KINGSMEN_CREATOR.ps1"
+                   },
+                   {
+                       "name":  "contains:scripts/KINGSMEN_CREATOR.ps1:ValidateSet(\u0027Scaffold\u0027,\u0027Materialize\u0027,\u0027Validate\u0027,\u0027GitCommit\u0027,\u0027FullBuild\u0027)",
+                       "passed":  true,
+                       "detail":  "found",
+                       "file":  "scripts/KINGSMEN_CREATOR.ps1"
+                   },
+                   {
+                       "name":  "contains:scripts/KINGSMEN_CREATOR.ps1:function Invoke-Scaffold",
+                       "passed":  true,
+                       "detail":  "found",
+                       "file":  "scripts/KINGSMEN_CREATOR.ps1"
+                   },
+                   {
+                       "name":  "contains:scripts/KINGSMEN_CREATOR.ps1:function Invoke-Materialize",
+                       "passed":  true,
+                       "detail":  "found",
+                       "file":  "scripts/KINGSMEN_CREATOR.ps1"
+                   },
+                   {
+                       "name":  "contains:scripts/KINGSMEN_CREATOR.ps1:function Invoke-Validate",
+                       "passed":  true,
+                       "detail":  "found",
+                       "file":  "scripts/KINGSMEN_CREATOR.ps1"
+                   },
+                   {
+                       "name":  "contains:scripts/KINGSMEN_CREATOR.ps1:function Invoke-GitCommit",
+                       "passed":  true,
+                       "detail":  "found",
+                       "file":  "scripts/KINGSMEN_CREATOR.ps1"
+                   },
+                   {
+                       "name":  "contains:scripts/KINGSMEN_CREATOR.ps1:function Invoke-FullBuild",
+                       "passed":  true,
+                       "detail":  "found",
+                       "file":  "scripts/KINGSMEN_CREATOR.ps1"
+                   },
+                   {
+                       "name":  "forbidden:scripts/KINGSMEN_CREATOR.ps1:productionReadyTrue",
+                       "passed":  true,
+                       "detail":  "not found",
+                       "file":  "scripts/KINGSMEN_CREATOR.ps1"
+                   },
+                   {
+                       "name":  "forbidden:scripts/KINGSMEN_CREATOR.ps1:SUPABASE_SERVICE_ROLE",
+                       "passed":  true,
+                       "detail":  "not found",
+                       "file":  "scripts/KINGSMEN_CREATOR.ps1"
+                   },
+                   {
+                       "name":  "forbidden:scripts/KINGSMEN_CREATOR.ps1:SMTP_PASSWORD",
+                       "passed":  true,
+                       "detail":  "not found",
+                       "file":  "scripts/KINGSMEN_CREATOR.ps1"
+                   },
+                   {
+                       "name":  "forbidden:scripts/KINGSMEN_CREATOR.ps1:WHATSAPP_TOKEN",
+                       "passed":  true,
+                       "detail":  "not found",
+                       "file":  "scripts/KINGSMEN_CREATOR.ps1"
+                   },
+                   {
+                       "name":  "forbidden:scripts/KINGSMEN_CREATOR.ps1:PAYMENT_SECRET",
+                       "passed":  true,
+                       "detail":  "not found",
+                       "file":  "scripts/KINGSMEN_CREATOR.ps1"
+                   },
+                   {
+                       "name":  "forbidden:scripts/KINGSMEN_CREATOR.ps1:AIRTABLE_TOKEN",
+                       "passed":  true,
+                       "detail":  "not found",
+                       "file":  "scripts/KINGSMEN_CREATOR.ps1"
+                   },
+                   {
+                       "name":  "creator-action:Scaffold",
+                       "passed":  true,
+                       "detail":  "KINGSMEN CREATOR | SCAFFOLD\r\nSCAFFOLD COMPLETE | Created directories: 0 | Ensured placeholders: 86\r\nDONE",
+                       "file":  "scripts/KINGSMEN_CREATOR.ps1"
+                   }
+               ],
+    "nextTrackerRow":  "CREATOR.3 - reports/creator/creator-validation-report.json"
+}
