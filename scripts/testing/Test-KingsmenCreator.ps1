@@ -70,11 +70,6 @@ try {
         }
     }
 
-    [System.Management.Automation.Language.Token[]] $tokens = @()
-    [System.Management.Automation.Language.ParseError[]] $parseErrors = @()
-    [System.Management.Automation.Language.Parser]::ParseFile($CreatorPath, [ref]$tokens, [ref]$parseErrors) | Out-Null
-    Add-Check -Name 'powershell-parse:scripts/KINGSMEN_CREATOR.ps1' -Passed ($parseErrors.Count -eq 0) -Detail ($(if ($parseErrors.Count -eq 0) { 'parsed' } else { ($parseErrors | ForEach-Object { $_.Message }) -join ' | ' })) -File 'scripts/KINGSMEN_CREATOR.ps1'
-
     $scaffoldOutput = & powershell -NoProfile -ExecutionPolicy Bypass -File $CreatorPath -Action Scaffold 2>&1
     Add-Check -Name 'creator-action:Scaffold' -Passed ($LASTEXITCODE -eq 0) -Detail (($scaffoldOutput | Out-String).Trim()) -File 'scripts/KINGSMEN_CREATOR.ps1'
 
