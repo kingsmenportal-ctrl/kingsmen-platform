@@ -1,0 +1,65 @@
+{
+  "module": "N09",
+  "submodule": "N09.3",
+  "name": "Communications Contracts Proof Completion",
+  "productionReady": false,
+  "status": "built_pending_local_validator_run",
+  "checksumAlgorithm": "sha256",
+  "reportPath": "reports/n09/n09-3-validation-report.json",
+  "files": [
+    {
+      "path": "packages/db/src/n09-action-packet-bridge-policy.ts",
+      "type": "typescript",
+      "sha256": "computed_by_validator",
+      "bytes": "computed_by_validator",
+      "requiredExports": [
+        "n09AssertBridgeSafe",
+        "n09BuildActionPacketBridgePublic"
+      ]
+    },
+    {
+      "path": "scripts/validators/validate-n09-3.mjs",
+      "type": "validator",
+      "sha256": "computed_by_validator",
+      "bytes": "computed_by_validator",
+      "writesReport": "reports/n09/n09-3-validation-report.json"
+    },
+    {
+      "path": "manifests/modules/N09.3-communications-contracts.json",
+      "type": "manifest",
+      "sha256": "computed_by_validator",
+      "bytes": "computed_by_validator"
+    }
+  ],
+  "validationCommand": "node scripts/validators/validate-n09-3.mjs",
+  "mustBlock": {
+    "productionReadyTrue": true,
+    "hardcodedSecrets": true,
+    "serviceRoleExposure": true,
+    "rawDocumentExposure": true,
+    "rawEvidenceExposure": true,
+    "unsafeProviderPayload": true,
+    "bulkWhatsapp": true,
+    "smsOutsideBackupBoundary": true,
+    "statusWithoutProof": true,
+    "candidateDataShareWithoutConsent": true
+  },
+  "trackerRows": [
+    {
+      "module": "N09.3.1",
+      "path": "packages/db/src/n09-action-packet-bridge-policy.ts",
+      "targetStatus": "Built -> Validated"
+    },
+    {
+      "module": "N09.3.2",
+      "path": "scripts/validators/validate-n09-3.mjs",
+      "targetStatus": "Built -> Validated"
+    },
+    {
+      "module": "N09.3.3",
+      "path": "manifests/modules/N09.3-communications-contracts.json",
+      "targetStatus": "Built -> Validated"
+    }
+  ],
+  "nextTrackerRow": "CREATOR.1 - scripts/KINGSMEN_CREATOR.ps1"
+}
