@@ -26,36 +26,12 @@ const requiredFiles = [
 ];
 
 const requiredReports = [
-  {
-    path: "reports/n09/n09-3-validation-report.json",
-    module: "N09",
-    submodule: "N09.3"
-  },
-  {
-    path: "reports/creator/creator-validation-report.json",
-    module: "CREATOR",
-    submodule: "CREATOR.2"
-  },
-  {
-    path: "reports/validation/provider-health-report.json",
-    module: "N01",
-    submodule: "N01.5.2"
-  },
-  {
-    path: "reports/phases/n01-6-phase-runner-report.json",
-    module: "N01",
-    submodule: "N01.6"
-  },
-  {
-    path: "reports/maintenance/prune-logs-report.json",
-    module: "N01",
-    submodule: "N01.8"
-  },
-  {
-    path: "reports/validation/health-report.json",
-    module: "N01",
-    submodule: "N01.8.1"
-  }
+  { path: "reports/n09/n09-3-validation-report.json", module: "N09", submodule: "N09.3" },
+  { path: "reports/creator/creator-validation-report.json", module: "CREATOR", submodule: "CREATOR.2" },
+  { path: "reports/validation/provider-health-report.json", module: "N01", submodule: "N01.5.2" },
+  { path: "reports/phases/n01-6-phase-runner-report.json", module: "N01", submodule: "N01.6" },
+  { path: "reports/maintenance/prune-logs-report.json", module: "N01", submodule: "N01.8" },
+  { path: "reports/validation/health-report.json", module: "N01", submodule: "N01.8.1" }
 ];
 
 const requiredEnvTokens = [
@@ -77,6 +53,9 @@ const requiredEnvTokens = [
 
 const requiredComposeServices = ["postgres", "redis", "api", "web", "worker", "nginx"];
 const requiredN01Rows = ["N01.5", "N01.5.1", "N01.5.2", "N01.6", "N01.6.1", "N01.7", "N01.7.1", "N01.8", "N01.8.1", "N01.9"];
+const scannerLiteralAllowlist = new Map([
+  ["scripts/install-git-hooks.ps1", new Set(["privateKeyMaterial", "rawCandidateDocumentPath"])]
+]);
 
 function rel(filePath) {
   return path.join(root, filePath);
@@ -100,6 +79,10 @@ function sha256(content) {
 
 function addCheck(checks, name, passed, detail, file = "") {
   checks.push({ name, passed: Boolean(passed), detail, file });
+}
+
+function isAllowedScannerLiteral(file, forbiddenName) {
+  return scannerLiteralAllowlist.get(file)?.has(forbiddenName) === true;
 }
 
 function checkRequiredFiles(checks) {
@@ -129,6 +112,10 @@ function checkForbiddenContent(checks) {
     if (!exists(file)) continue;
     const content = read(file);
     for (const item of forbidden) {
+      if (isAllowedScannerLiteral(file, item.name)) {
+        addCheck(checks, `forbidden:${file}:${item.name}`, true, "scanner pattern literal allowed in local hook installer", file);
+        continue;
+      }
       const passed = !item.pattern.test(content);
       addCheck(checks, `forbidden:${file}:${item.name}`, passed, passed ? "not found" : "forbidden content found", file);
     }
@@ -162,7 +149,6 @@ function checkEnvTemplate(checks) {
   const file = "config/environment/.env.template";
   if (!exists(file)) return;
   const content = read(file);
-
   for (const token of requiredEnvTokens) {
     addCheck(checks, `env:contains:${token}`, content.includes(token), content.includes(token) ? "found" : "missing", file);
   }
@@ -229,7 +215,7 @@ function checkMasterBuildIndex(checks) {
   addCheck(checks, "master-index:oracleLiteFirst", index.globalLocks?.oracleLiteFirst === true, String(index.globalLocks?.oracleLiteFirst), file);
   addCheck(checks, "master-index:postgresTruth", index.globalLocks?.postgresqlTruth === true, String(index.globalLocks?.postgresqlTruth), file);
   addCheck(checks, "master-index:allSixGates", index.globalLocks?.allSixGatesVisibleToAllUsers === true, String(index.globalLocks?.allSixGatesVisibleToAllUsers), file);
-  addCheck(checks, "master-index:nextN01Readiness", index.nextTrackerRow === "N01.7 - infrastructure/nginx/nginx.conf" || typeof index.nextTrackerRow === "string", String(index.nextTrackerRow ?? ""), file);
+  addCheck(checks, "master-index:nextTrackerRow", typeof index.nextTrackerRow === "string" && index.nextTrackerRow.length > 0, String(index.nextTrackerRow ?? ""), file);
 
   const evidence = Array.isArray(index.validatedEvidence) ? index.validatedEvidence : [];
   for (const moduleName of ["N09.3", "CREATOR.2", "N01.5.2", "N01.6"]) {
