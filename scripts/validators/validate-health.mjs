@@ -55,6 +55,11 @@ function read(filePath) {
   return fs.readFileSync(rel(filePath), "utf8");
 }
 
+function readJsonFile(filePath) {
+  const content = read(filePath).replace(/^\uFEFF/, "");
+  return JSON.parse(content);
+}
+
 function sha256(content) {
   return crypto.createHash("sha256").update(content, "utf8").digest("hex");
 }
@@ -150,7 +155,7 @@ function checkMaintenanceReport(checks) {
 
   let report;
   try {
-    report = JSON.parse(read(file));
+    report = readJsonFile(file);
     addCheck(checks, "maintenance-report:json-parse", true, "parsed", file);
   } catch (error) {
     addCheck(checks, "maintenance-report:json-parse", false, error instanceof Error ? error.message : "parse failed", file);
