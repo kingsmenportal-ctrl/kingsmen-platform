@@ -63,7 +63,7 @@ function existsDir(filePath) {
 }
 
 function read(filePath) {
-  return fs.readFileSync(abs(filePath), "utf8");
+  return fs.readFileSync(abs(filePath), "utf8").replace(/^\uFEFF/, "");
 }
 
 function readJson(filePath) {
