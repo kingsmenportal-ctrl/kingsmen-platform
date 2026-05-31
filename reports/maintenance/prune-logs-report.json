@@ -1,0 +1,201 @@
+﻿{
+    "module":  "N01",
+    "submodule":  "N01.8",
+    "maintenanceJob":  "scripts/maintenance/prune-logs.ps1",
+    "productionReady":  false,
+    "generatedAt":  "2026-05-31T10:38:59.9793013Z",
+    "dryRun":  false,
+    "keepDays":  30,
+    "maxLogMb":  500,
+    "passed":  true,
+    "totalChecks":  19,
+    "failedChecks":  0,
+    "deletedBytes":  0,
+    "prunableRoots":  [
+                          "logs",
+                          "tmp",
+                          "reports/maintenance",
+                          "reports/validation",
+                          "reports/phases",
+                          "reports/oracle",
+                          "reports/security",
+                          "reports/ui",
+                          "reports/tracker"
+                      ],
+    "protectedProofReports":  [
+                                  "reports/n09/n09-3-validation-report.json",
+                                  "reports/creator/creator-validation-report.json",
+                                  "reports/validation/provider-health-report.json",
+                                  "reports/phases/n01-6-phase-runner-report.json"
+                              ],
+    "failed":  [
+
+               ],
+    "checks":  [
+                   {
+                       "name":  "productionReady:false",
+                       "passed":  true,
+                       "detail":  "maintenance script is non-production proof mode",
+                       "file":  "scripts/maintenance/prune-logs.ps1"
+                   },
+                   {
+                       "name":  "repo-root:exists",
+                       "passed":  true,
+                       "detail":  "C:\\Users\\dell\\Documents\\kingsmen-platform",
+                       "file":  ".git"
+                   },
+                   {
+                       "name":  "keep-days:positive",
+                       "passed":  true,
+                       "detail":  "KeepDays=30",
+                       "file":  "scripts/maintenance/prune-logs.ps1"
+                   },
+                   {
+                       "name":  "max-log-mb:positive",
+                       "passed":  true,
+                       "detail":  "MaxLogMb=500",
+                       "file":  "scripts/maintenance/prune-logs.ps1"
+                   },
+                   {
+                       "name":  "protected-root-not-targeted:candidate_documents",
+                       "passed":  true,
+                       "detail":  "not in prune target list",
+                       "file":  "candidate_documents"
+                   },
+                   {
+                       "name":  "protected-root-not-targeted:raw_evidence",
+                       "passed":  true,
+                       "detail":  "not in prune target list",
+                       "file":  "raw_evidence"
+                   },
+                   {
+                       "name":  "protected-root-not-targeted:documents",
+                       "passed":  true,
+                       "detail":  "not in prune target list",
+                       "file":  "documents"
+                   },
+                   {
+                       "name":  "protected-root-not-targeted:evidence",
+                       "passed":  true,
+                       "detail":  "not in prune target list",
+                       "file":  "evidence"
+                   },
+                   {
+                       "name":  "prune-root:missing-ok:logs",
+                       "passed":  true,
+                       "detail":  "root does not exist yet",
+                       "file":  "logs"
+                   },
+                   {
+                       "name":  "prune-root:missing-ok:tmp",
+                       "passed":  true,
+                       "detail":  "root does not exist yet",
+                       "file":  "tmp"
+                   },
+                   {
+                       "name":  "prune-root:exists:reports/maintenance",
+                       "passed":  true,
+                       "detail":  "found",
+                       "file":  "reports/maintenance"
+                   },
+                   {
+                       "name":  "prune-root:exists:reports/validation",
+                       "passed":  true,
+                       "detail":  "found",
+                       "file":  "reports/validation"
+                   },
+                   {
+                       "name":  "prune-root:exists:reports/phases",
+                       "passed":  true,
+                       "detail":  "found",
+                       "file":  "reports/phases"
+                   },
+                   {
+                       "name":  "prune-root:exists:reports/oracle",
+                       "passed":  true,
+                       "detail":  "found",
+                       "file":  "reports/oracle"
+                   },
+                   {
+                       "name":  "prune-root:exists:reports/security",
+                       "passed":  true,
+                       "detail":  "found",
+                       "file":  "reports/security"
+                   },
+                   {
+                       "name":  "prune-root:exists:reports/ui",
+                       "passed":  true,
+                       "detail":  "found",
+                       "file":  "reports/ui"
+                   },
+                   {
+                       "name":  "prune-root:exists:reports/tracker",
+                       "passed":  true,
+                       "detail":  "found",
+                       "file":  "reports/tracker"
+                   },
+                   {
+                       "name":  "candidate-documents-not-deleted",
+                       "passed":  true,
+                       "detail":  "candidate document/evidence roots are never in prune target list",
+                       "file":  "scripts/maintenance/prune-logs.ps1"
+                   },
+                   {
+                       "name":  "tracker-not-deleted",
+                       "passed":  true,
+                       "detail":  "tracker remains present",
+                       "file":  "Kingsmen_Build_Tracker.csv"
+                   }
+               ],
+    "actions":  [
+                    {
+                        "path":  "reports/maintenance/prune-logs-report.json",
+                        "action":  "kept",
+                        "bytes":  8353,
+                        "reason":  "not old/oversized or extension not prunable"
+                    },
+                    {
+                        "path":  "reports/validation/.gitkeep",
+                        "action":  "kept",
+                        "bytes":  0,
+                        "reason":  "not old/oversized or extension not prunable"
+                    },
+                    {
+                        "path":  "reports/validation/provider-health-report.json",
+                        "action":  "kept",
+                        "bytes":  37391,
+                        "reason":  "protected proof report"
+                    },
+                    {
+                        "path":  "reports/phases/n01-6-phase-runner-report.json",
+                        "action":  "kept",
+                        "bytes":  46254,
+                        "reason":  "protected proof report"
+                    },
+                    {
+                        "path":  "reports/oracle/.gitkeep",
+                        "action":  "kept",
+                        "bytes":  5,
+                        "reason":  "not old/oversized or extension not prunable"
+                    },
+                    {
+                        "path":  "reports/security/.gitkeep",
+                        "action":  "kept",
+                        "bytes":  5,
+                        "reason":  "not old/oversized or extension not prunable"
+                    },
+                    {
+                        "path":  "reports/ui/.gitkeep",
+                        "action":  "kept",
+                        "bytes":  5,
+                        "reason":  "not old/oversized or extension not prunable"
+                    },
+                    {
+                        "path":  "reports/tracker/.gitkeep",
+                        "action":  "kept",
+                        "bytes":  5,
+                        "reason":  "not old/oversized or extension not prunable"
+                    }
+                ],
+    "nextTrackerRow":  "N01.8.1 - scripts/validators/validate-health.mjs"
+}
