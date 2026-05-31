@@ -1,0 +1,38 @@
+{
+  "module": "ORACLE",
+  "submodule": "ORACLE.2",
+  "validator": "validate-oracle-bootstrap.mjs",
+  "productionReady": false,
+  "generatedAt": "2026-06-01T01:35:44.068Z",
+  "passed": true,
+  "totalChecks": 122,
+  "failedChecks": 0,
+  "checksums": [
+    { "path": "kingsmen/oracle/oracle-free-bootstrap-plan.json", "sha256": "6db3a88ecff153a8617293249c6f97676c5a460ace911813e59aa00ed1e869f6", "bytes": 8479 },
+    { "path": "config/environment/.env.template", "sha256": "240776ba2a65d35ecd666234a034a0d1254c003bdbb9a535a8b737f4c8865c2a", "bytes": 6964 },
+    { "path": "config/providers/provider-registry.json", "sha256": "4f4b107b6c70998a6e780ba10503238130a64c066fc0935f1903ab1214d5a49f", "bytes": 15227 },
+    { "path": "reports/openclaw/openclaw-safety-report.json", "sha256": "c5dfe9596091025507834bac4f32fcfa9264ff443cb11bbad51e332c787be700", "bytes": 2007 },
+    { "path": "scripts/validators/validate-oracle-bootstrap.mjs", "sha256": "ef89f13be54608bf350136fdb215eea9cc5806461b40713898d9055dc97b5ed5", "bytes": 15513 }
+  ],
+  "failed": [],
+  "proofSummary": {
+    "gitPullCompleted": true,
+    "gitPullCommitRange": "920c8fe..66c94a9",
+    "oraclePlanPulled": true,
+    "validatorPulled": true,
+    "openClawSafetyReportPulled": true,
+    "oracleBootstrapValidatorPassed": true,
+    "forbiddenContentScanPassed": true,
+    "productionReadyFalseVerified": true,
+    "oracleLiteFirstVerified": true,
+    "dockerComposeFirstVerified": true,
+    "postgresqlTruthVerified": true,
+    "redisPrivateQueueVerified": true,
+    "candidateSafetyWinsVerified": true,
+    "openClawGovernedHelperOnlyVerified": true,
+    "costGuardVerified": true,
+    "envTemplateCompatibilityVerified": true,
+    "noFailedChecks": true
+  },
+  "nextTrackerRow": "ORACLE.3 - scripts/oracle/Prepare-OracleFreeWorkspace.ps1"
+}
