@@ -21,36 +21,74 @@ const requiredProviderGroups = [
   "sms",
   "payments",
   "airtable",
-  "playwright"
+  "n8n",
+  "playwright",
+  "ai"
 ];
 
-const requiredEnvKeys = [
+const requiredEnvTokens = [
   "KINGSMEN_PRODUCTION_READY=false",
   "KINGSMEN_DEFAULT_DEPLOY_TARGET=oracle_lite",
+  "KINGSMEN_ORACLE_LITE_MODE=true",
+  "KINGSMEN_DOCKER_COMPOSE_FIRST=true",
+  "KINGSMEN_LOW_CONCURRENCY_MODE=true",
   "KINGSMEN_ACTIVE_CANDIDATE_CAP=500",
+  "KINGSMEN_READY_CAP_TARGET=1000",
+  "KINGSMEN_PREPARE_CAP_TARGET=5000",
   "KINGSMEN_EMAIL_PRIMARY=true",
   "KINGSMEN_WHATSAPP_URGENT_ONLY=true",
   "KINGSMEN_SMS_BACKUP_ONLY=true",
-  "KINGSMEN_AIRTABLE_MIRROR_ONLY=true",
-  "KINGSMEN_PLAYWRIGHT_SCOUT_ONLY=true",
-  "EMAIL_PROVIDER_MODE=disabled",
-  "EMAIL_NO_SEND_MODE=true",
-  "EMAIL_PREVIEW_MODE=true",
-  "WHATSAPP_URGENT_ONLY=true",
-  "WHATSAPP_BULK_BLOCKED=true",
+  "KINGSMEN_BULK_WHATSAPP_ALLOWED=false",
+  "KINGSMEN_BULK_SMS_ALLOWED=false",
+  "KINGSMEN_ROUTINE_WHATSAPP_ALLOWED=false",
+  "EMAIL_PROVIDER=no_send",
+  "SMTP_PASSWORD=",
+  "WHATSAPP_PROVIDER=disabled",
+  "WHATSAPP_TOKEN=",
+  "WHATSAPP_URGENT_TEMPLATE_ONLY=true",
+  "SMS_PROVIDER=disabled",
+  "SMS_API_KEY=",
   "SMS_BACKUP_ONLY=true",
-  "SMS_BULK_BLOCKED=true",
-  "PAYMENT_PROVIDER_MODE=manual_proof",
-  "PAYMENT_MANUAL_PROOF_REVIEW_REQUIRED=true",
-  "AIRTABLE_MIRROR_MODE=disabled",
-  "PLAYWRIGHT_BLOCK_ON_CAPTCHA=true",
-  "PLAYWRIGHT_BLOCK_ON_OTP=true",
-  "PLAYWRIGHT_MAP_FALLBACK_ENABLED=true",
+  "DATABASE_PROVIDER=postgres",
+  "DATABASE_URL=",
+  "POSTGRES_PASSWORD=",
+  "REDIS_URL=redis://localhost:6379",
+  "REDIS_PASSWORD=",
+  "SUPABASE_SERVICE_ROLE=",
+  "SUPABASE_RLS_REQUIRED=true",
+  "PAYMENT_PROVIDER=manual_eft_proof",
+  "MANUAL_EFT_ENABLED=true",
+  "MANUAL_PAYMENT_PROOF_REVIEW_REQUIRED=true",
+  "PAYMENT_PROVIDER_SECRET_KEY=",
+  "PAYMENT_SUCCESS_WEBHOOK_SECRET=",
+  "AIRTABLE_ENABLED=false",
+  "AIRTABLE_TOKEN=",
+  "AIRTABLE_MIRROR_ONLY=true",
+  "N8N_ENABLED=false",
+  "N8N_WEBHOOK_SECRET=",
+  "N8N_THIN_WRAPPER_ONLY=true",
+  "PLAYWRIGHT_ENABLED=false",
+  "PLAYWRIGHT_SCOUT_NOT_CRUTCH=true",
+  "PLAYWRIGHT_CAPTCHA_BYPASS_ALLOWED=false",
+  "PLAYWRIGHT_OTP_BYPASS_ALLOWED=false",
+  "PLAYWRIGHT_MAP_FALLBACK_ON_BLOCK=true",
+  "POPIA_MODE=true",
   "FOUNDER_MFA_REQUIRED=true",
-  "OPERATOR_MFA_REQUIRED=true",
-  "APPEND_ONLY_AUDIT_ENABLED=true",
-  "POPIA_ACCESS_LOG_ENABLED=true",
-  "KINGSMEN_GIT_REQUIRED=true"
+  "SECRETS_IN_GIT_ALLOWED=false"
+];
+
+const blockedSecretAssignments = [
+  "DATABASE_URL",
+  "POSTGRES_PASSWORD",
+  "REDIS_PASSWORD",
+  "SUPABASE_SERVICE_ROLE",
+  "SMTP_PASSWORD",
+  "WHATSAPP_TOKEN",
+  "SMS_API_KEY",
+  "PAYMENT_PROVIDER_SECRET_KEY",
+  "PAYMENT_SUCCESS_WEBHOOK_SECRET",
+  "AIRTABLE_TOKEN",
+  "N8N_WEBHOOK_SECRET"
 ];
 
 function rel(filePath) {
@@ -73,6 +111,18 @@ function addCheck(checks, name, passed, detail, file = "") {
   checks.push({ name, passed: Boolean(passed), detail, file });
 }
 
+function parseEnv(content) {
+  const env = new Map();
+  for (const line of content.split(/\r?\n/)) {
+    const trimmed = line.trim();
+    if (!trimmed || trimmed.startsWith("#")) continue;
+    const eq = trimmed.indexOf("=");
+    if (eq < 0) continue;
+    env.set(trimmed.slice(0, eq), trimmed.slice(eq + 1));
+  }
+  return env;
+}
+
 function checkRequiredFiles(checks) {
   for (const file of requiredFiles) {
     addCheck(checks, `exists:${file}`, exists(file), exists(file) ? "found" : "missing", file);
@@ -80,25 +130,19 @@ function checkRequiredFiles(checks) {
 }
 
 function checkForbiddenContent(checks) {
-  const forbidden = [
+  const forbiddenPatterns = [
     { name: "productionReadyTrue", pattern: /productionReady\s*[:=]\s*true/i },
     { name: "productionReadyJsonTrue", pattern: /"productionReady"\s*:\s*true/i },
     { name: "productionReadyEnvTrue", pattern: /^\s*KINGSMEN_PRODUCTION_READY\s*=\s*true\s*$/im },
-    { name: "databaseUrlAssignment", pattern: /^\s*DATABASE_URL\s*=\s*\S+/im },
-    { name: "postgresPasswordAssignment", pattern: /^\s*PG_PASSWORD\s*=\s*\S+/im },
-    { name: "supabaseServiceRoleAssignment", pattern: /^\s*SUPABASE_SERVICE_ROLE\s*=\s*\S+/im },
-    { name: "smtpPasswordAssignment", pattern: /^\s*SMTP_PASSWORD\s*=\s*\S+/im },
-    { name: "whatsappTokenAssignment", pattern: /^\s*WHATSAPP_(TOKEN|SECRET|ACCESS_TOKEN)\s*=\s*\S+/im },
-    { name: "smsTokenAssignment", pattern: /^\s*SMS_(TOKEN|SECRET|API_KEY)\s*=\s*\S+/im },
-    { name: "paymentSecretAssignment", pattern: /^\s*(PAYMENT_SECRET|PAYFAST_PASSPHRASE|YOCO_SECRET_KEY|STRIPE_SECRET_KEY)\s*=\s*\S+/im },
-    { name: "airtableTokenAssignment", pattern: /^\s*(AIRTABLE_TOKEN|AIRTABLE_API_KEY)\s*=\s*\S+/im },
-    { name: "privateKeyMaterial", pattern: /BEGIN (RSA|OPENSSH|EC|DSA)? ?PRIVATE KEY/i }
+    { name: "privateKeyMaterial", pattern: /BEGIN (RSA|OPENSSH|EC|DSA)? ?PRIVATE KEY/i },
+    { name: "todoMarker", pattern: /\bTODO\b/i },
+    { name: "fixmeMarker", pattern: /\bFIXME\b/i }
   ];
 
   for (const file of requiredFiles) {
     if (!exists(file)) continue;
     const content = read(file);
-    for (const item of forbidden) {
+    for (const item of forbiddenPatterns) {
       const passed = !item.pattern.test(content);
       addCheck(checks, `forbidden:${file}:${item.name}`, passed, passed ? "not found" : "forbidden content found", file);
     }
@@ -107,10 +151,12 @@ function checkForbiddenContent(checks) {
 
 function checkEnvTemplate(checks) {
   const file = "config/environment/.env.template";
-  if (!exists(file)) return;
+  if (!exists(file)) return null;
 
   const content = read(file);
-  for (const token of requiredEnvKeys) {
+  const env = parseEnv(content);
+
+  for (const token of requiredEnvTokens) {
     addCheck(
       checks,
       `env-template:contains:${token}`,
@@ -120,22 +166,23 @@ function checkEnvTemplate(checks) {
     );
   }
 
-  const placeholderOnlyChecks = [
-    { key: "SUPABASE_ANON_KEY", safePattern: /^SUPABASE_ANON_KEY=replace-/m },
-    { key: "SMTP_USER", safePattern: /^SMTP_USER=replace-/m },
-    { key: "EMAIL_FROM_ADDRESS", safePattern: /^EMAIL_FROM_ADDRESS=no-reply@example\.invalid/m },
-    { key: "EMAIL_REPLY_TO", safePattern: /^EMAIL_REPLY_TO=support@example\.invalid/m }
-  ];
-
-  for (const check of placeholderOnlyChecks) {
+  for (const key of blockedSecretAssignments) {
+    const value = env.get(key);
+    const safeEmpty = value === undefined || value === "";
     addCheck(
       checks,
-      `env-template:placeholder:${check.key}`,
-      check.safePattern.test(content),
-      check.safePattern.test(content) ? "safe placeholder" : "missing or unsafe placeholder",
+      `env-template:secret-empty:${key}`,
+      safeEmpty,
+      safeEmpty ? "empty or absent" : "secret-like value present",
       file
     );
   }
+
+  addCheck(checks, "env-template:email-provider-no-send", env.get("EMAIL_PROVIDER") === "no_send", String(env.get("EMAIL_PROVIDER") ?? ""), file);
+  addCheck(checks, "env-template:payment-provider-manual-proof", env.get("PAYMENT_PROVIDER") === "manual_eft_proof", String(env.get("PAYMENT_PROVIDER") ?? ""), file);
+  addCheck(checks, "env-template:oracle-lite-target", env.get("KINGSMEN_DEFAULT_DEPLOY_TARGET") === "oracle_lite", String(env.get("KINGSMEN_DEFAULT_DEPLOY_TARGET") ?? ""), file);
+
+  return env;
 }
 
 function checkProviderRegistry(checks) {
@@ -154,22 +201,45 @@ function checkProviderRegistry(checks) {
   addCheck(checks, "provider-registry:module", registry.module === "N01", String(registry.module), file);
   addCheck(checks, "provider-registry:submodule", registry.submodule === "N01.5.1", String(registry.submodule), file);
   addCheck(checks, "provider-registry:productionReadyFalse", registry.productionReady === false, String(registry.productionReady), file);
+  addCheck(checks, "provider-registry:report-path", registry.reportPath === "reports/validation/provider-health-report.json", String(registry.reportPath ?? ""), file);
 
   const doctrine = registry.doctrine ?? {};
   const doctrineChecks = [
     "oracleLiteFirst",
+    "dockerComposeFirst",
     "postgresqlTruth",
+    "redisPrivateQueue",
     "airtableMirrorOnly",
+    "n8nThinWrapperOnly",
     "emailPrimary",
     "whatsappUrgentOnly",
     "smsBackupOnly",
     "playwrightScoutOnly",
+    "manualMapFallbackRequired",
     "noHardcodedSecrets",
-    "missingOptionalProvidersDegradeGracefully"
+    "missingOptionalProvidersDegradeGracefully",
+    "productionReadyMustRemainFalse"
   ];
 
   for (const key of doctrineChecks) {
     addCheck(checks, `provider-registry:doctrine:${key}`, doctrine[key] === true, String(doctrine[key]), file);
+  }
+
+  const globalRules = registry.globalRules ?? {};
+  const globalRuleChecks = [
+    "secretsInGitAllowed:false",
+    "serviceRoleInBrowserAllowed:false",
+    "rawCardDataAllowed:false",
+    "rawDocumentsInApiResponsesAllowed:false",
+    "rawEvidenceInApiResponsesAllowed:false",
+    "providerCredentialsCanBeSwappedWithoutRebuild:true",
+    "candidateCoreMustRemainSafeWhenOptionalProvidersMissing:true"
+  ];
+
+  for (const rule of globalRuleChecks) {
+    const [key, expectedRaw] = rule.split(":");
+    const expected = expectedRaw === "true";
+    addCheck(checks, `provider-registry:global-rule:${key}`, globalRules[key] === expected, String(globalRules[key]), file);
   }
 
   const groups = registry.providerGroups ?? {};
@@ -186,20 +256,6 @@ function checkProviderRegistry(checks) {
     }
   }
 
-  const healthRules = registry.providerHealthRules ?? {};
-  const healthRuleChecks = [
-    "mustReportMissingRequiredProviders",
-    "optionalProviderMissingIsNotFatal",
-    "candidateCoreMustNotSilentlyFail",
-    "founderActionPacketOnProviderFailure",
-    "candidateSafeMessageOnProviderFailure",
-    "noRawProviderPayloadInCandidateResponse"
-  ];
-
-  for (const key of healthRuleChecks) {
-    addCheck(checks, `provider-registry:health-rule:${key}`, healthRules[key] === true, String(healthRules[key]), file);
-  }
-
   for (const [groupName, group] of Object.entries(groups)) {
     const providers = Array.isArray(group.providers) ? group.providers : [];
     for (const provider of providers) {
@@ -209,26 +265,43 @@ function checkProviderRegistry(checks) {
       addCheck(checks, `provider:${groupName}:${key}:has-failure-policy`, typeof provider.failurePolicy === "string" && provider.failurePolicy.length > 0, String(provider.failurePolicy ?? ""), file);
       addCheck(checks, `provider:${groupName}:${key}:has-safe-fallback`, typeof provider.safeFallback === "string" && provider.safeFallback.length > 0, String(provider.safeFallback ?? ""), file);
       addCheck(checks, `provider:${groupName}:${key}:env-required-array`, Array.isArray(provider.envRequired), Array.isArray(provider.envRequired) ? String(provider.envRequired.length) : "missing", file);
-      addCheck(checks, `provider:${groupName}:${key}:env-forbidden-array`, Array.isArray(provider.envForbiddenInRepo), Array.isArray(provider.envForbiddenInRepo) ? String(provider.envForbiddenInRepo.length) : "missing", file);
+      addCheck(checks, `provider:${groupName}:${key}:secret-env-array`, Array.isArray(provider.secretEnvNames), Array.isArray(provider.secretEnvNames) ? String(provider.secretEnvNames.length) : "missing", file);
+      addCheck(checks, `provider:${groupName}:${key}:candidate-risk`, typeof provider.candidateDataRisk === "string" && provider.candidateDataRisk.length > 0, String(provider.candidateDataRisk ?? ""), file);
     }
   }
 
-  addCheck(
-    checks,
-    "provider-registry:validator-path",
-    registry.validation?.validatorPath === "scripts/validators/validate-provider-health.mjs",
-    String(registry.validation?.validatorPath ?? ""),
-    file
-  );
-  addCheck(
-    checks,
-    "provider-registry:report-path",
-    registry.validation?.reportPath === "reports/validation/provider-health-report.json",
-    String(registry.validation?.reportPath ?? ""),
-    file
-  );
+  const healthValidation = registry.healthValidation ?? {};
+  addCheck(checks, "provider-registry:health-validator", healthValidation.validator === "scripts/validators/validate-provider-health.mjs", String(healthValidation.validator ?? ""), file);
+  addCheck(checks, "provider-registry:health-report-path", healthValidation.reportPath === "reports/validation/provider-health-report.json", String(healthValidation.reportPath ?? ""), file);
+  addCheck(checks, "provider-registry:must-pass-before-production", healthValidation.mustPassBeforeProduction === true, String(healthValidation.mustPassBeforeProduction), file);
+  addCheck(checks, "provider-registry:allowed-missing-array", Array.isArray(healthValidation.allowedMissingAtLaunch), Array.isArray(healthValidation.allowedMissingAtLaunch) ? String(healthValidation.allowedMissingAtLaunch.length) : "missing", file);
+  addCheck(checks, "provider-registry:required-local-array", Array.isArray(healthValidation.mustNotBeMissingForLocalRuntime), Array.isArray(healthValidation.mustNotBeMissingForLocalRuntime) ? String(healthValidation.mustNotBeMissingForLocalRuntime.length) : "missing", file);
+
+  addCheck(checks, "provider-registry:next-tracker-row", registry.nextTrackerRow === "N01.5.2 - scripts/validators/validate-provider-health.mjs", String(registry.nextTrackerRow ?? ""), file);
 
   return registry;
+}
+
+function checkRegistryEnvCompatibility(checks, registry, env) {
+  if (!registry || !env) return;
+  const file = "config/providers/provider-registry.json";
+  const groups = registry.providerGroups ?? {};
+  for (const [groupName, group] of Object.entries(groups)) {
+    const providers = Array.isArray(group.providers) ? group.providers : [];
+    for (const provider of providers) {
+      const key = provider.key ?? "unknown_provider";
+      const required = Array.isArray(provider.envRequired) ? provider.envRequired : [];
+      for (const envKey of required) {
+        addCheck(
+          checks,
+          `provider-env:${groupName}:${key}:${envKey}`,
+          env.has(envKey),
+          env.has(envKey) ? "present in env template" : "missing from env template",
+          file
+        );
+      }
+    }
+  }
 }
 
 function buildChecksums() {
@@ -247,8 +320,9 @@ function main() {
 
   checkRequiredFiles(checks);
   checkForbiddenContent(checks);
-  checkEnvTemplate(checks);
+  const env = checkEnvTemplate(checks);
   const registry = checkProviderRegistry(checks);
+  checkRegistryEnvCompatibility(checks, registry, env);
 
   const failed = checks.filter((check) => !check.passed);
   const report = {
