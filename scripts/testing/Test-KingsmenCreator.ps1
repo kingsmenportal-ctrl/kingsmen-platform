@@ -35,7 +35,8 @@ function Test-TextPresent {
         [string] $Token,
         [string] $File
     )
-    Add-Check -Name "contains:$File:$Token" -Passed ($Content.Contains($Token)) -Detail ($(if ($Content.Contains($Token)) { 'found' } else { 'missing' })) -File $File
+    $present = $Content.Contains($Token)
+    Add-Check -Name ('contains:' + $File + ':' + $Token) -Passed $present -Detail ($(if ($present) { 'found' } else { 'missing' })) -File $File
 }
 
 $CreatorPath = Join-Path $RepoRoot 'scripts/KINGSMEN_CREATOR.ps1'
