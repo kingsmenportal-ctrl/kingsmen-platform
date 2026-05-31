@@ -1,0 +1,218 @@
+# N01.7.1 - Kingsmen Oracle Lite Docker Compose
+# Local/Oracle Lite boot skeleton. productionReady remains false until runtime/security/interaction proof passes.
+# Do not commit real secrets. Provide PG_PASSWORD and any provider credentials from local environment or deployment secrets.
+
+services:
+  postgres:
+    image: postgres:16-alpine
+    container_name: kingsmen-postgres
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: ${PG_DB:-kingsmen}
+      POSTGRES_USER: ${PG_USER:-kingsmen_app}
+      POSTGRES_PASSWORD: ${PG_PASSWORD:?PG_PASSWORD must be set locally and never committed}
+      TZ: ${KINGSMEN_TIMEZONE:-Africa/Johannesburg}
+    volumes:
+      - kingsmen_postgres_data:/var/lib/postgresql/data
+      - ./supabase/migrations:/docker-entrypoint-initdb.d:ro
+    ports:
+      - "127.0.0.1:${PG_PORT:-5432}:5432"
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U $${POSTGRES_USER} -d $${POSTGRES_DB}"]
+      interval: 15s
+      timeout: 5s
+      retries: 10
+      start_period: 20s
+    networks:
+      - kingsmen_private
+    deploy:
+      resources:
+        limits:
+          cpus: "1.00"
+          memory: 1024M
+
+  redis:
+    image: redis:7-alpine
+    container_name: kingsmen-redis
+    restart: unless-stopped
+    command: ["redis-server", "--appendonly", "yes", "--save", "60", "1", "--loglevel", "warning"]
+    volumes:
+      - kingsmen_redis_data:/data
+    ports:
+      - "127.0.0.1:${REDIS_PORT:-6379}:6379"
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 15s
+      timeout: 5s
+      retries: 10
+      start_period: 10s
+    networks:
+      - kingsmen_private
+    deploy:
+      resources:
+        limits:
+          cpus: "0.50"
+          memory: 512M
+
+  api:
+    image: node:22-alpine
+    container_name: kingsmen-api
+    restart: unless-stopped
+    working_dir: /workspace
+    environment:
+      NODE_ENV: development
+      KINGSMEN_PRODUCTION_READY: "false"
+      KINGSMEN_DEFAULT_DEPLOY_TARGET: oracle_lite
+      KINGSMEN_ACTIVE_CANDIDATE_CAP: ${KINGSMEN_ACTIVE_CANDIDATE_CAP:-500}
+      PG_HOST: postgres
+      PG_PORT: 5432
+      PG_DB: ${PG_DB:-kingsmen}
+      PG_USER: ${PG_USER:-kingsmen_app}
+      REDIS_HOST: redis
+      REDIS_PORT: 6379
+      EMAIL_PROVIDER_MODE: ${EMAIL_PROVIDER_MODE:-disabled}
+      EMAIL_NO_SEND_MODE: "true"
+      WHATSAPP_URGENT_ONLY: "true"
+      SMS_BACKUP_ONLY: "true"
+      PLAYWRIGHT_BLOCK_ON_CAPTCHA: "true"
+      PLAYWRIGHT_BLOCK_ON_OTP: "true"
+    volumes:
+      - ./:/workspace:ro
+    command:
+      - node
+      - -e
+      - |
+        const http = require('http');
+        const payload = JSON.stringify({service:'api',status:'ok',productionReady:false,target:'oracle_lite'});
+        http.createServer((req,res)=>{
+          res.setHeader('content-type','application/json');
+          if(req.url === '/health' || req.url === '/api/health') return res.end(payload);
+          res.statusCode = 404;
+          res.end(JSON.stringify({error:'not_found',productionReady:false}));
+        }).listen(4000,'0.0.0.0');
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD", "node", "-e", "fetch('http://127.0.0.1:4000/health').then(r=>process.exit(r.ok?0:1)).catch(()=>process.exit(1))"]
+      interval: 15s
+      timeout: 5s
+      retries: 10
+      start_period: 15s
+    networks:
+      - kingsmen_private
+    deploy:
+      resources:
+        limits:
+          cpus: "1.00"
+          memory: 1024M
+
+  web:
+    image: node:22-alpine
+    container_name: kingsmen-web
+    restart: unless-stopped
+    working_dir: /workspace
+    environment:
+      NODE_ENV: development
+      KINGSMEN_PRODUCTION_READY: "false"
+      NEXT_PUBLIC_KINGSMEN_API_BASE_URL: /api
+      NEXT_PUBLIC_KINGSMEN_DEPLOY_TARGET: oracle_lite
+    volumes:
+      - ./:/workspace:ro
+    command:
+      - node
+      - -e
+      - |
+        const http = require('http');
+        const page = '<!doctype html><html><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Kingsmen Portal</title></head><body style="font-family:Arial;background:#05070d;color:#f5d37b;padding:32px"><h1>Kingsmen Portal</h1><p>Oracle Lite boot skeleton. productionReady=false.</p><p>Next UI layer will replace this placeholder with the real mobile-first public/candidate/founder surfaces.</p></body></html>';
+        http.createServer((req,res)=>{res.setHeader('content-type','text/html');res.end(page);}).listen(3000,'0.0.0.0');
+    healthcheck:
+      test: ["CMD", "node", "-e", "fetch('http://127.0.0.1:3000').then(r=>process.exit(r.ok?0:1)).catch(()=>process.exit(1))"]
+      interval: 15s
+      timeout: 5s
+      retries: 10
+      start_period: 10s
+    networks:
+      - kingsmen_private
+    deploy:
+      resources:
+        limits:
+          cpus: "1.00"
+          memory: 768M
+
+  worker:
+    image: node:22-alpine
+    container_name: kingsmen-worker
+    restart: unless-stopped
+    working_dir: /workspace
+    environment:
+      NODE_ENV: development
+      KINGSMEN_PRODUCTION_READY: "false"
+      KINGSMEN_WORKER_MODE: oracle_lite_low_concurrency
+      REDIS_HOST: redis
+      REDIS_PORT: 6379
+      WORKER_CONCURRENCY: ${REDIS_WORKER_CONCURRENCY:-2}
+      PLAYWRIGHT_MAX_CONCURRENCY: ${PLAYWRIGHT_MAX_CONCURRENCY:-1}
+    volumes:
+      - ./:/workspace:ro
+    command:
+      - node
+      - -e
+      - |
+        console.log(JSON.stringify({service:'worker',status:'idle',productionReady:false,target:'oracle_lite'}));
+        setInterval(()=>console.log(JSON.stringify({service:'worker',heartbeat:true,productionReady:false,ts:new Date().toISOString()})),60000);
+    depends_on:
+      redis:
+        condition: service_healthy
+      postgres:
+        condition: service_healthy
+    networks:
+      - kingsmen_private
+    deploy:
+      resources:
+        limits:
+          cpus: "0.50"
+          memory: 512M
+
+  nginx:
+    image: nginx:1.27-alpine
+    container_name: kingsmen-nginx
+    restart: unless-stopped
+    ports:
+      - "${KINGSMEN_HTTP_PORT:-8080}:80"
+    volumes:
+      - ./infrastructure/nginx/nginx.conf:/etc/nginx/nginx.conf:ro
+      - kingsmen_nginx_logs:/var/log/nginx
+    depends_on:
+      api:
+        condition: service_healthy
+      web:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD-SHELL", "wget -qO- http://127.0.0.1/health/nginx | grep -q 'ok'"]
+      interval: 15s
+      timeout: 5s
+      retries: 10
+      start_period: 10s
+    networks:
+      - kingsmen_private
+      - kingsmen_public
+    deploy:
+      resources:
+        limits:
+          cpus: "0.50"
+          memory: 256M
+
+volumes:
+  kingsmen_postgres_data:
+  kingsmen_redis_data:
+  kingsmen_nginx_logs:
+
+networks:
+  kingsmen_private:
+    driver: bridge
+    internal: true
+  kingsmen_public:
+    driver: bridge
