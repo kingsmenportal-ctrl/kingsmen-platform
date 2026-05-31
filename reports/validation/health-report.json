@@ -1,0 +1,672 @@
+{
+  "module": "N01",
+  "submodule": "N01.8.1",
+  "validator": "validate-health.mjs",
+  "productionReady": false,
+  "generatedAt": "2026-05-31T10:43:06.264Z",
+  "passed": false,
+  "totalChecks": 103,
+  "failedChecks": 1,
+  "healthScope": [
+    "nginx",
+    "docker-compose",
+    "maintenance-prune-report",
+    "oracle-lite-discipline"
+  ],
+  "checksums": [
+    {
+      "path": "infrastructure/nginx/nginx.conf",
+      "sha256": "4d4bead298e76c8ed5940cf646008f3850427e9aa9d28ad88a215337f2bbaa43",
+      "bytes": 6590
+    },
+    {
+      "path": "docker-compose.yml",
+      "sha256": "4eddf81d2239ddaecce348c0fa4392d8783214920a54c343cd6303643ff9ba56",
+      "bytes": 7020
+    },
+    {
+      "path": "scripts/maintenance/prune-logs.ps1",
+      "sha256": "bb62a1688020f5f9d7e773deb730d087366e96729892d2ccb62b91fff9ae3ef6",
+      "bytes": 8313
+    },
+    {
+      "path": "reports/maintenance/prune-logs-report.json",
+      "sha256": "ba8ad340a6b46b67cc4507c5036f83d43411bde833d513148e421607d81fbd5f",
+      "bytes": 8648
+    },
+    {
+      "path": "scripts/validators/validate-health.mjs",
+      "sha256": "e0d5ab247b81352cb40ea65908b5a59e01a059fba7fde33d8f7f682684cb6f42",
+      "bytes": 10155
+    }
+  ],
+  "failed": [
+    {
+      "name": "maintenance-report:json-parse",
+      "passed": false,
+      "detail": "Unexpected token '﻿', \"﻿{\r\n    \"m\"... is not valid JSON",
+      "file": "reports/maintenance/prune-logs-report.json"
+    }
+  ],
+  "checks": [
+    {
+      "name": "exists:infrastructure/nginx/nginx.conf",
+      "passed": true,
+      "detail": "found",
+      "file": "infrastructure/nginx/nginx.conf"
+    },
+    {
+      "name": "exists:docker-compose.yml",
+      "passed": true,
+      "detail": "found",
+      "file": "docker-compose.yml"
+    },
+    {
+      "name": "exists:scripts/maintenance/prune-logs.ps1",
+      "passed": true,
+      "detail": "found",
+      "file": "scripts/maintenance/prune-logs.ps1"
+    },
+    {
+      "name": "exists:reports/maintenance/prune-logs-report.json",
+      "passed": true,
+      "detail": "found",
+      "file": "reports/maintenance/prune-logs-report.json"
+    },
+    {
+      "name": "exists:scripts/validators/validate-health.mjs",
+      "passed": true,
+      "detail": "found",
+      "file": "scripts/validators/validate-health.mjs"
+    },
+    {
+      "name": "forbidden:infrastructure/nginx/nginx.conf:productionReadyTrue",
+      "passed": true,
+      "detail": "not found",
+      "file": "infrastructure/nginx/nginx.conf"
+    },
+    {
+      "name": "forbidden:infrastructure/nginx/nginx.conf:productionReadyJsonTrue",
+      "passed": true,
+      "detail": "not found",
+      "file": "infrastructure/nginx/nginx.conf"
+    },
+    {
+      "name": "forbidden:infrastructure/nginx/nginx.conf:productionReadyEnvTrue",
+      "passed": true,
+      "detail": "not found",
+      "file": "infrastructure/nginx/nginx.conf"
+    },
+    {
+      "name": "forbidden:infrastructure/nginx/nginx.conf:databaseUrlAssignment",
+      "passed": true,
+      "detail": "not found",
+      "file": "infrastructure/nginx/nginx.conf"
+    },
+    {
+      "name": "forbidden:infrastructure/nginx/nginx.conf:postgresPasswordValue",
+      "passed": true,
+      "detail": "not found",
+      "file": "infrastructure/nginx/nginx.conf"
+    },
+    {
+      "name": "forbidden:infrastructure/nginx/nginx.conf:supabaseServiceRole",
+      "passed": true,
+      "detail": "not found",
+      "file": "infrastructure/nginx/nginx.conf"
+    },
+    {
+      "name": "forbidden:infrastructure/nginx/nginx.conf:smtpPassword",
+      "passed": true,
+      "detail": "not found",
+      "file": "infrastructure/nginx/nginx.conf"
+    },
+    {
+      "name": "forbidden:infrastructure/nginx/nginx.conf:whatsappToken",
+      "passed": true,
+      "detail": "not found",
+      "file": "infrastructure/nginx/nginx.conf"
+    },
+    {
+      "name": "forbidden:infrastructure/nginx/nginx.conf:paymentSecret",
+      "passed": true,
+      "detail": "not found",
+      "file": "infrastructure/nginx/nginx.conf"
+    },
+    {
+      "name": "forbidden:infrastructure/nginx/nginx.conf:airtableToken",
+      "passed": true,
+      "detail": "not found",
+      "file": "infrastructure/nginx/nginx.conf"
+    },
+    {
+      "name": "forbidden:infrastructure/nginx/nginx.conf:privateKeyMaterial",
+      "passed": true,
+      "detail": "not found",
+      "file": "infrastructure/nginx/nginx.conf"
+    },
+    {
+      "name": "forbidden:infrastructure/nginx/nginx.conf:rawCandidateDocumentPath",
+      "passed": true,
+      "detail": "not found",
+      "file": "infrastructure/nginx/nginx.conf"
+    },
+    {
+      "name": "forbidden:docker-compose.yml:productionReadyTrue",
+      "passed": true,
+      "detail": "not found",
+      "file": "docker-compose.yml"
+    },
+    {
+      "name": "forbidden:docker-compose.yml:productionReadyJsonTrue",
+      "passed": true,
+      "detail": "not found",
+      "file": "docker-compose.yml"
+    },
+    {
+      "name": "forbidden:docker-compose.yml:productionReadyEnvTrue",
+      "passed": true,
+      "detail": "not found",
+      "file": "docker-compose.yml"
+    },
+    {
+      "name": "forbidden:docker-compose.yml:databaseUrlAssignment",
+      "passed": true,
+      "detail": "not found",
+      "file": "docker-compose.yml"
+    },
+    {
+      "name": "forbidden:docker-compose.yml:postgresPasswordValue",
+      "passed": true,
+      "detail": "not found",
+      "file": "docker-compose.yml"
+    },
+    {
+      "name": "forbidden:docker-compose.yml:supabaseServiceRole",
+      "passed": true,
+      "detail": "not found",
+      "file": "docker-compose.yml"
+    },
+    {
+      "name": "forbidden:docker-compose.yml:smtpPassword",
+      "passed": true,
+      "detail": "not found",
+      "file": "docker-compose.yml"
+    },
+    {
+      "name": "forbidden:docker-compose.yml:whatsappToken",
+      "passed": true,
+      "detail": "not found",
+      "file": "docker-compose.yml"
+    },
+    {
+      "name": "forbidden:docker-compose.yml:paymentSecret",
+      "passed": true,
+      "detail": "not found",
+      "file": "docker-compose.yml"
+    },
+    {
+      "name": "forbidden:docker-compose.yml:airtableToken",
+      "passed": true,
+      "detail": "not found",
+      "file": "docker-compose.yml"
+    },
+    {
+      "name": "forbidden:docker-compose.yml:privateKeyMaterial",
+      "passed": true,
+      "detail": "not found",
+      "file": "docker-compose.yml"
+    },
+    {
+      "name": "forbidden:docker-compose.yml:rawCandidateDocumentPath",
+      "passed": true,
+      "detail": "not found",
+      "file": "docker-compose.yml"
+    },
+    {
+      "name": "forbidden:scripts/maintenance/prune-logs.ps1:productionReadyTrue",
+      "passed": true,
+      "detail": "not found",
+      "file": "scripts/maintenance/prune-logs.ps1"
+    },
+    {
+      "name": "forbidden:scripts/maintenance/prune-logs.ps1:productionReadyJsonTrue",
+      "passed": true,
+      "detail": "not found",
+      "file": "scripts/maintenance/prune-logs.ps1"
+    },
+    {
+      "name": "forbidden:scripts/maintenance/prune-logs.ps1:productionReadyEnvTrue",
+      "passed": true,
+      "detail": "not found",
+      "file": "scripts/maintenance/prune-logs.ps1"
+    },
+    {
+      "name": "forbidden:scripts/maintenance/prune-logs.ps1:databaseUrlAssignment",
+      "passed": true,
+      "detail": "not found",
+      "file": "scripts/maintenance/prune-logs.ps1"
+    },
+    {
+      "name": "forbidden:scripts/maintenance/prune-logs.ps1:postgresPasswordValue",
+      "passed": true,
+      "detail": "not found",
+      "file": "scripts/maintenance/prune-logs.ps1"
+    },
+    {
+      "name": "forbidden:scripts/maintenance/prune-logs.ps1:supabaseServiceRole",
+      "passed": true,
+      "detail": "not found",
+      "file": "scripts/maintenance/prune-logs.ps1"
+    },
+    {
+      "name": "forbidden:scripts/maintenance/prune-logs.ps1:smtpPassword",
+      "passed": true,
+      "detail": "not found",
+      "file": "scripts/maintenance/prune-logs.ps1"
+    },
+    {
+      "name": "forbidden:scripts/maintenance/prune-logs.ps1:whatsappToken",
+      "passed": true,
+      "detail": "not found",
+      "file": "scripts/maintenance/prune-logs.ps1"
+    },
+    {
+      "name": "forbidden:scripts/maintenance/prune-logs.ps1:paymentSecret",
+      "passed": true,
+      "detail": "not found",
+      "file": "scripts/maintenance/prune-logs.ps1"
+    },
+    {
+      "name": "forbidden:scripts/maintenance/prune-logs.ps1:airtableToken",
+      "passed": true,
+      "detail": "not found",
+      "file": "scripts/maintenance/prune-logs.ps1"
+    },
+    {
+      "name": "forbidden:scripts/maintenance/prune-logs.ps1:privateKeyMaterial",
+      "passed": true,
+      "detail": "not found",
+      "file": "scripts/maintenance/prune-logs.ps1"
+    },
+    {
+      "name": "forbidden:scripts/maintenance/prune-logs.ps1:rawCandidateDocumentPath",
+      "passed": true,
+      "detail": "not found",
+      "file": "scripts/maintenance/prune-logs.ps1"
+    },
+    {
+      "name": "forbidden:reports/maintenance/prune-logs-report.json:productionReadyTrue",
+      "passed": true,
+      "detail": "not found",
+      "file": "reports/maintenance/prune-logs-report.json"
+    },
+    {
+      "name": "forbidden:reports/maintenance/prune-logs-report.json:productionReadyJsonTrue",
+      "passed": true,
+      "detail": "not found",
+      "file": "reports/maintenance/prune-logs-report.json"
+    },
+    {
+      "name": "forbidden:reports/maintenance/prune-logs-report.json:productionReadyEnvTrue",
+      "passed": true,
+      "detail": "not found",
+      "file": "reports/maintenance/prune-logs-report.json"
+    },
+    {
+      "name": "forbidden:reports/maintenance/prune-logs-report.json:databaseUrlAssignment",
+      "passed": true,
+      "detail": "not found",
+      "file": "reports/maintenance/prune-logs-report.json"
+    },
+    {
+      "name": "forbidden:reports/maintenance/prune-logs-report.json:postgresPasswordValue",
+      "passed": true,
+      "detail": "not found",
+      "file": "reports/maintenance/prune-logs-report.json"
+    },
+    {
+      "name": "forbidden:reports/maintenance/prune-logs-report.json:supabaseServiceRole",
+      "passed": true,
+      "detail": "not found",
+      "file": "reports/maintenance/prune-logs-report.json"
+    },
+    {
+      "name": "forbidden:reports/maintenance/prune-logs-report.json:smtpPassword",
+      "passed": true,
+      "detail": "not found",
+      "file": "reports/maintenance/prune-logs-report.json"
+    },
+    {
+      "name": "forbidden:reports/maintenance/prune-logs-report.json:whatsappToken",
+      "passed": true,
+      "detail": "not found",
+      "file": "reports/maintenance/prune-logs-report.json"
+    },
+    {
+      "name": "forbidden:reports/maintenance/prune-logs-report.json:paymentSecret",
+      "passed": true,
+      "detail": "not found",
+      "file": "reports/maintenance/prune-logs-report.json"
+    },
+    {
+      "name": "forbidden:reports/maintenance/prune-logs-report.json:airtableToken",
+      "passed": true,
+      "detail": "not found",
+      "file": "reports/maintenance/prune-logs-report.json"
+    },
+    {
+      "name": "forbidden:reports/maintenance/prune-logs-report.json:privateKeyMaterial",
+      "passed": true,
+      "detail": "not found",
+      "file": "reports/maintenance/prune-logs-report.json"
+    },
+    {
+      "name": "forbidden:reports/maintenance/prune-logs-report.json:rawCandidateDocumentPath",
+      "passed": true,
+      "detail": "not found",
+      "file": "reports/maintenance/prune-logs-report.json"
+    },
+    {
+      "name": "forbidden:scripts/validators/validate-health.mjs:productionReadyTrue",
+      "passed": true,
+      "detail": "not found",
+      "file": "scripts/validators/validate-health.mjs"
+    },
+    {
+      "name": "forbidden:scripts/validators/validate-health.mjs:productionReadyJsonTrue",
+      "passed": true,
+      "detail": "not found",
+      "file": "scripts/validators/validate-health.mjs"
+    },
+    {
+      "name": "forbidden:scripts/validators/validate-health.mjs:productionReadyEnvTrue",
+      "passed": true,
+      "detail": "not found",
+      "file": "scripts/validators/validate-health.mjs"
+    },
+    {
+      "name": "forbidden:scripts/validators/validate-health.mjs:databaseUrlAssignment",
+      "passed": true,
+      "detail": "not found",
+      "file": "scripts/validators/validate-health.mjs"
+    },
+    {
+      "name": "forbidden:scripts/validators/validate-health.mjs:postgresPasswordValue",
+      "passed": true,
+      "detail": "not found",
+      "file": "scripts/validators/validate-health.mjs"
+    },
+    {
+      "name": "forbidden:scripts/validators/validate-health.mjs:supabaseServiceRole",
+      "passed": true,
+      "detail": "not found",
+      "file": "scripts/validators/validate-health.mjs"
+    },
+    {
+      "name": "forbidden:scripts/validators/validate-health.mjs:smtpPassword",
+      "passed": true,
+      "detail": "not found",
+      "file": "scripts/validators/validate-health.mjs"
+    },
+    {
+      "name": "forbidden:scripts/validators/validate-health.mjs:whatsappToken",
+      "passed": true,
+      "detail": "not found",
+      "file": "scripts/validators/validate-health.mjs"
+    },
+    {
+      "name": "forbidden:scripts/validators/validate-health.mjs:paymentSecret",
+      "passed": true,
+      "detail": "not found",
+      "file": "scripts/validators/validate-health.mjs"
+    },
+    {
+      "name": "forbidden:scripts/validators/validate-health.mjs:airtableToken",
+      "passed": true,
+      "detail": "not found",
+      "file": "scripts/validators/validate-health.mjs"
+    },
+    {
+      "name": "forbidden:scripts/validators/validate-health.mjs:privateKeyMaterial",
+      "passed": true,
+      "detail": "not found",
+      "file": "scripts/validators/validate-health.mjs"
+    },
+    {
+      "name": "forbidden:scripts/validators/validate-health.mjs:rawCandidateDocumentPath",
+      "passed": true,
+      "detail": "not found",
+      "file": "scripts/validators/validate-health.mjs"
+    },
+    {
+      "name": "nginx:contains:server_tokens off;",
+      "passed": true,
+      "detail": "found",
+      "file": "infrastructure/nginx/nginx.conf"
+    },
+    {
+      "name": "nginx:contains:limit_req_zone $binary_remote_addr zone=kingsmen_public",
+      "passed": true,
+      "detail": "found",
+      "file": "infrastructure/nginx/nginx.conf"
+    },
+    {
+      "name": "nginx:contains:limit_req_zone $binary_remote_addr zone=kingsmen_api",
+      "passed": true,
+      "detail": "found",
+      "file": "infrastructure/nginx/nginx.conf"
+    },
+    {
+      "name": "nginx:contains:limit_req_zone $binary_remote_addr zone=kingsmen_auth",
+      "passed": true,
+      "detail": "found",
+      "file": "infrastructure/nginx/nginx.conf"
+    },
+    {
+      "name": "nginx:contains:limit_req_zone $binary_remote_addr zone=kingsmen_upload",
+      "passed": true,
+      "detail": "found",
+      "file": "infrastructure/nginx/nginx.conf"
+    },
+    {
+      "name": "nginx:contains:upstream kingsmen_web",
+      "passed": true,
+      "detail": "found",
+      "file": "infrastructure/nginx/nginx.conf"
+    },
+    {
+      "name": "nginx:contains:upstream kingsmen_api",
+      "passed": true,
+      "detail": "found",
+      "file": "infrastructure/nginx/nginx.conf"
+    },
+    {
+      "name": "nginx:contains:location = /health/nginx",
+      "passed": true,
+      "detail": "found",
+      "file": "infrastructure/nginx/nginx.conf"
+    },
+    {
+      "name": "nginx:contains:X-Kingsmen-Production-Ready",
+      "passed": true,
+      "detail": "found",
+      "file": "infrastructure/nginx/nginx.conf"
+    },
+    {
+      "name": "nginx:contains:oracle_lite",
+      "passed": true,
+      "detail": "found",
+      "file": "infrastructure/nginx/nginx.conf"
+    },
+    {
+      "name": "nginx:public-rate-limit",
+      "passed": true,
+      "detail": "found",
+      "file": "infrastructure/nginx/nginx.conf"
+    },
+    {
+      "name": "nginx:api-rate-limit",
+      "passed": true,
+      "detail": "found",
+      "file": "infrastructure/nginx/nginx.conf"
+    },
+    {
+      "name": "nginx:auth-rate-limit",
+      "passed": true,
+      "detail": "found",
+      "file": "infrastructure/nginx/nginx.conf"
+    },
+    {
+      "name": "nginx:upload-rate-limit",
+      "passed": true,
+      "detail": "found",
+      "file": "infrastructure/nginx/nginx.conf"
+    },
+    {
+      "name": "nginx:client-body-size-capped",
+      "passed": true,
+      "detail": "15m",
+      "file": "infrastructure/nginx/nginx.conf"
+    },
+    {
+      "name": "compose:service:postgres",
+      "passed": true,
+      "detail": "found",
+      "file": "docker-compose.yml"
+    },
+    {
+      "name": "compose:service:redis",
+      "passed": true,
+      "detail": "found",
+      "file": "docker-compose.yml"
+    },
+    {
+      "name": "compose:service:api",
+      "passed": true,
+      "detail": "found",
+      "file": "docker-compose.yml"
+    },
+    {
+      "name": "compose:service:web",
+      "passed": true,
+      "detail": "found",
+      "file": "docker-compose.yml"
+    },
+    {
+      "name": "compose:service:worker",
+      "passed": true,
+      "detail": "found",
+      "file": "docker-compose.yml"
+    },
+    {
+      "name": "compose:service:nginx",
+      "passed": true,
+      "detail": "found",
+      "file": "docker-compose.yml"
+    },
+    {
+      "name": "compose:contains:KINGSMEN_PRODUCTION_READY: \"false\"",
+      "passed": true,
+      "detail": "found",
+      "file": "docker-compose.yml"
+    },
+    {
+      "name": "compose:contains:KINGSMEN_DEFAULT_DEPLOY_TARGET: oracle_lite",
+      "passed": true,
+      "detail": "found",
+      "file": "docker-compose.yml"
+    },
+    {
+      "name": "compose:contains:KINGSMEN_ACTIVE_CANDIDATE_CAP",
+      "passed": true,
+      "detail": "found",
+      "file": "docker-compose.yml"
+    },
+    {
+      "name": "compose:contains:PG_PASSWORD must be set locally and never committed",
+      "passed": true,
+      "detail": "found",
+      "file": "docker-compose.yml"
+    },
+    {
+      "name": "compose:contains:postgres:16-alpine",
+      "passed": true,
+      "detail": "found",
+      "file": "docker-compose.yml"
+    },
+    {
+      "name": "compose:contains:redis:7-alpine",
+      "passed": true,
+      "detail": "found",
+      "file": "docker-compose.yml"
+    },
+    {
+      "name": "compose:contains:nginx:1.27-alpine",
+      "passed": true,
+      "detail": "found",
+      "file": "docker-compose.yml"
+    },
+    {
+      "name": "compose:contains:kingsmen_private:",
+      "passed": true,
+      "detail": "found",
+      "file": "docker-compose.yml"
+    },
+    {
+      "name": "compose:contains:internal: true",
+      "passed": true,
+      "detail": "found",
+      "file": "docker-compose.yml"
+    },
+    {
+      "name": "compose:contains:kingsmen_public:",
+      "passed": true,
+      "detail": "found",
+      "file": "docker-compose.yml"
+    },
+    {
+      "name": "compose:contains:PLAYWRIGHT_BLOCK_ON_CAPTCHA: \"true\"",
+      "passed": true,
+      "detail": "found",
+      "file": "docker-compose.yml"
+    },
+    {
+      "name": "compose:contains:PLAYWRIGHT_BLOCK_ON_OTP: \"true\"",
+      "passed": true,
+      "detail": "found",
+      "file": "docker-compose.yml"
+    },
+    {
+      "name": "compose:healthcheck-count",
+      "passed": true,
+      "detail": "5",
+      "file": "docker-compose.yml"
+    },
+    {
+      "name": "compose:postgres-local-only-port",
+      "passed": true,
+      "detail": "found",
+      "file": "docker-compose.yml"
+    },
+    {
+      "name": "compose:redis-local-only-port",
+      "passed": true,
+      "detail": "found",
+      "file": "docker-compose.yml"
+    },
+    {
+      "name": "compose:oracle-lite-resource-limits",
+      "passed": true,
+      "detail": "found",
+      "file": "docker-compose.yml"
+    },
+    {
+      "name": "maintenance-report:json-parse",
+      "passed": false,
+      "detail": "Unexpected token '﻿', \"﻿{\r\n    \"m\"... is not valid JSON",
+      "file": "reports/maintenance/prune-logs-report.json"
+    }
+  ],
+  "nextTrackerRow": "N01.8.1 repair - fix failed checks in reports/validation/health-report.json"
+}
