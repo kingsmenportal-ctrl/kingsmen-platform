@@ -1,0 +1,43 @@
+{
+  "module": "ORACLE",
+  "submodule": "ORACLE.5",
+  "script": "scripts/oracle/Test-OracleFreePrerequisites.ps1",
+  "productionReady": false,
+  "generatedAt": "2026-06-01T02:38:25.240Z",
+  "repoRoot": "C:\\Users\\dell\\Documents\\kingsmen-platform",
+  "dryRun": false,
+  "passed": true,
+  "totalChecks": 57,
+  "failedChecks": 0,
+  "warningChecks": 3,
+  "failed": [],
+  "warnings": [
+    { "name": "command:docker", "passed": false, "detail": "not found", "path": "docker", "severity": "warning" },
+    { "name": "command:oci", "passed": false, "detail": "not found", "path": "oci", "severity": "warning" },
+    { "name": "version:ssh", "passed": false, "detail": "OpenSSH_for_Windows_9.5p1, LibreSSL 3.8.2", "path": "ssh", "severity": "warning" }
+  ],
+  "proofSummary": {
+    "gitPullCompleted": true,
+    "gitAlreadyUpToDate": true,
+    "oracleWorkspaceReportRestored": true,
+    "oraclePrerequisitesPassed": true,
+    "oracleBootstrapReportPassed": true,
+    "oracleWorkspaceReportPassed": true,
+    "oracleWorkspaceValidationReportPassed": true,
+    "openClawSafetyReportPassed": true,
+    "envTemplateOracleLiteDefaultsPassed": true,
+    "gitAvailable": true,
+    "nodeAvailable": true,
+    "npmAvailableWarningOnly": true,
+    "dockerMissingWarningOnly": true,
+    "ociMissingWarningOnly": true,
+    "sshPresentVersionWarningOnly": true,
+    "powershellVersion": "5.1.19041.7291",
+    "noCloudResourcesCreated": true,
+    "noCredentialsStored": true,
+    "noProductionDeployed": true,
+    "noPaidResourceChange": true,
+    "gitHeadHash": "c238255"
+  },
+  "nextTrackerRow": "ORACLE.6 - scripts/validators/validate-oracle-prerequisites.mjs"
+}
