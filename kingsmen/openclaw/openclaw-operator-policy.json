@@ -1,0 +1,142 @@
+{
+  "module": "OPENCLAW",
+  "submodule": "OPENCLAW.1",
+  "name": "Kingsmen Governed OpenClaw Operator Policy",
+  "status": "built_pending_validation",
+  "productionReady": false,
+  "purpose": "Allow OpenClaw to assist Kingsmen from the build stage as a governed remote operator, scout, validator runner, and report reader without becoming the Kingsmen business brain or accessing secrets, raw candidate documents, payment truth, MFA, or production databases.",
+  "authorityHierarchy": [
+    "Founder",
+    "Founder Control Plane",
+    "Kingsmen Backend Policies",
+    "PostgreSQL Truth Store",
+    "PowerShell Creator",
+    "Validators and Reports",
+    "GitHub History",
+    "OpenClaw Governed Operator"
+  ],
+  "hardBoundaries": {
+    "openClawReplacesChatGPT": false,
+    "openClawReplacesPowerShellCreator": false,
+    "openClawReplacesBackend": false,
+    "openClawWritesProductionPostgres": false,
+    "openClawReadsRawCandidateDocuments": false,
+    "openClawReadsSecrets": false,
+    "openClawHandlesPaymentKeys": false,
+    "openClawBypassesCaptchaOrOtp": false,
+    "openClawAutoDeploysProduction": false,
+    "openClawSendsRealCandidateMessagesWithoutApproval": false,
+    "productionReady": false
+  },
+  "allowedAtBuildStage": {
+    "readReports": true,
+    "summarizeValidatorFailures": true,
+    "runSafeValidators": true,
+    "readGitStatus": true,
+    "draftPatches": true,
+    "draftGitHubIssues": true,
+    "monitorLocalOracleLiteHealth": true,
+    "monitorDiskCpuRam": true,
+    "scoutOfficialPublicSources": true,
+    "draftFounderActionPackets": true,
+    "draftStaffGuidance": true
+  },
+  "forbiddenAlways": [
+    "delete_production_data",
+    "modify_payment_truth_without_backend_policy",
+    "change_prices_without_founder_approval",
+    "send_real_bulk_whatsapp",
+    "send_routine_whatsapp",
+    "send_unverified_fee_or_deadline_instructions",
+    "bypass_captcha",
+    "bypass_otp",
+    "store_raw_credentials_in_repo",
+    "copy_candidate_documents_to_openclaw_workspace",
+    "expose_supabase_service_role_to_browser_or_agent",
+    "auto_raise_growth_cap_without_gate_report",
+    "claim_acceptance_funding_placement_or_job_guarantee"
+  ],
+  "permissionLevels": [
+    {
+      "level": 0,
+      "name": "No Access",
+      "examples": ["secrets", "MFA", "payment keys", "raw candidate documents", "production database passwords"]
+    },
+    {
+      "level": 1,
+      "name": "Read Masked Evidence",
+      "examples": ["reports", "validator summaries", "logs with candidate IDs masked", "provider health status"]
+    },
+    {
+      "level": 2,
+      "name": "Safe Commands",
+      "examples": ["git status", "node validators", "PowerShell validators", "disk and memory checks", "docker ps"]
+    },
+    {
+      "level": 3,
+      "name": "Draft Actions",
+      "examples": ["draft patch", "draft issue", "draft founder action packet", "draft staff instruction"]
+    },
+    {
+      "level": 4,
+      "name": "Controlled Non-Production Writes",
+      "examples": ["branch patch", "non-sensitive tracker draft", "docs patch"],
+      "requires": "founder_or_chatgpt_review"
+    },
+    {
+      "level": 5,
+      "name": "Founder Approval Required",
+      "examples": ["deploy", "real emails", "partner contact", "pricing change", "candidate escalation"]
+    },
+    {
+      "level": 6,
+      "name": "Forbidden",
+      "examples": ["bypass CAPTCHA", "bypass OTP", "delete production data", "impersonate institution", "fake proof"]
+    }
+  ],
+  "agents": [
+    {
+      "name": "Build Agent",
+      "allowed": ["inspect repo", "run validators", "summarize failed reports", "draft patches"],
+      "denied": ["commit directly to main without approval", "read secrets"]
+    },
+    {
+      "name": "Oracle Lite Agent",
+      "allowed": ["monitor CPU", "monitor RAM", "monitor disk", "check Docker", "check PostgreSQL", "check Redis", "check backups"],
+      "denied": ["increase paid resources automatically", "delete volumes"]
+    },
+    {
+      "name": "Source and Opportunity Scout",
+      "allowed": ["find public official opportunities", "summarize sources", "draft source verification packets"],
+      "denied": ["scrape aggressively", "treat social post as verified source", "send candidate instructions without source gate"]
+    },
+    {
+      "name": "Partner Growth Agent",
+      "allowed": ["find public school or employer contact pages", "draft outreach lists", "draft founder-reviewed partner packets"],
+      "denied": ["share candidate identity", "send bulk outreach without approval"]
+    },
+    {
+      "name": "Candidate Risk Agent",
+      "allowed": ["read masked candidate risk summaries", "flag stuck queues", "draft action packets"],
+      "denied": ["read raw documents", "decide refunds", "decide fraud", "change official status"]
+    },
+    {
+      "name": "Founder Strategy Agent",
+      "allowed": ["weekly reports", "growth readiness analysis", "capacity pressure summaries"],
+      "denied": ["raise caps", "change prices", "publish success claims without proof and consent"]
+    }
+  ],
+  "dailyRhythm": {
+    "morning": ["health", "candidate risk", "queue pressure", "build proof"],
+    "midday": ["urgent exceptions only"],
+    "afternoon": ["growth", "build", "source scouting", "staff support"],
+    "evening": ["closeout", "overnight jobs", "unresolved blockers"]
+  },
+  "oracleFreeStrategy": {
+    "phase1": "Run Kingsmen and OpenClaw on one Oracle Free account only if OpenClaw is low-concurrency and sandboxed.",
+    "phase2": "Split into two VMs when possible: Kingsmen Core gets priority resources, OpenClaw gets the smaller worker VM.",
+    "phase3": "Move OpenClaw to a separate Oracle Free account or paid small VPS only when Kingsmen candidate workload is protected and policy permits.",
+    "hardRule": "If OpenClaw competes with Kingsmen candidate runtime, OpenClaw pauses or moves out. Candidate safety wins."
+  },
+  "nextTrackerRow": "OPENCLAW.2 - scripts/openclaw/Prepare-KingsmenOpenClaw.ps1"
+}
