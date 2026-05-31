@@ -1,0 +1,267 @@
+{
+  "module": "N09",
+  "submodule": "N09.3",
+  "validator": "validate-n09-3",
+  "productionReady": false,
+  "generatedAt": "2026-05-31T09:42:34.680Z",
+  "passed": false,
+  "totalChecks": 36,
+  "failedChecks": 4,
+  "checksums": [
+    {
+      "path": "packages/db/src/n09-action-packet-bridge-policy.ts",
+      "sha256": "4481a61517ff792da8dc449bc85d19aaacf3bdafff9b0ebb1432d9a6071a41e0",
+      "bytes": 9100
+    },
+    {
+      "path": "scripts/validators/validate-n09-3.mjs",
+      "sha256": "5214a2ab8c0e734a5e4d5ce4c960de74f26c7052e04fd66ce86871534d8e632c",
+      "bytes": 7784
+    }
+  ],
+  "failed": [
+    {
+      "name": "exists:manifests/modules/N09.3-communications-contracts.json",
+      "passed": false,
+      "detail": "missing",
+      "file": "manifests/modules/N09.3-communications-contracts.json"
+    },
+    {
+      "name": "forbidden:scripts/validators/validate-n09-3.mjs:todo",
+      "passed": false,
+      "detail": "forbidden content found",
+      "file": "scripts/validators/validate-n09-3.mjs"
+    },
+    {
+      "name": "forbidden:scripts/validators/validate-n09-3.mjs:fixme",
+      "passed": false,
+      "detail": "forbidden content found",
+      "file": "scripts/validators/validate-n09-3.mjs"
+    },
+    {
+      "name": "typescript-parser-available",
+      "passed": false,
+      "detail": "typescript package is required for N09.3 validation",
+      "file": "packages/db/src/n09-action-packet-bridge-policy.ts"
+    }
+  ],
+  "checks": [
+    {
+      "name": "exists:packages/db/src/n09-action-packet-bridge-policy.ts",
+      "passed": true,
+      "detail": "found",
+      "file": "packages/db/src/n09-action-packet-bridge-policy.ts"
+    },
+    {
+      "name": "exists:scripts/validators/validate-n09-3.mjs",
+      "passed": true,
+      "detail": "found",
+      "file": "scripts/validators/validate-n09-3.mjs"
+    },
+    {
+      "name": "exists:manifests/modules/N09.3-communications-contracts.json",
+      "passed": false,
+      "detail": "missing",
+      "file": "manifests/modules/N09.3-communications-contracts.json"
+    },
+    {
+      "name": "contains:packages/db/src/n09-action-packet-bridge-policy.ts:export function n09AssertBridgeSafe",
+      "passed": true,
+      "detail": "found",
+      "file": "packages/db/src/n09-action-packet-bridge-policy.ts"
+    },
+    {
+      "name": "contains:packages/db/src/n09-action-packet-bridge-policy.ts:export function n09BuildActionPacketBridgePublic",
+      "passed": true,
+      "detail": "found",
+      "file": "packages/db/src/n09-action-packet-bridge-policy.ts"
+    },
+    {
+      "name": "contains:packages/db/src/n09-action-packet-bridge-policy.ts:N09_BRIDGE_SOURCE_VERIFICATION_REQUIRED",
+      "passed": true,
+      "detail": "found",
+      "file": "packages/db/src/n09-action-packet-bridge-policy.ts"
+    },
+    {
+      "name": "contains:packages/db/src/n09-action-packet-bridge-policy.ts:N09_BRIDGE_PROOF_REQUIRED",
+      "passed": true,
+      "detail": "found",
+      "file": "packages/db/src/n09-action-packet-bridge-policy.ts"
+    },
+    {
+      "name": "contains:packages/db/src/n09-action-packet-bridge-policy.ts:N09_BRIDGE_CONSENT_REQUIRED",
+      "passed": true,
+      "detail": "found",
+      "file": "packages/db/src/n09-action-packet-bridge-policy.ts"
+    },
+    {
+      "name": "contains:packages/db/src/n09-action-packet-bridge-policy.ts:N09_BRIDGE_SMS_BACKUP_ONLY",
+      "passed": true,
+      "detail": "found",
+      "file": "packages/db/src/n09-action-packet-bridge-policy.ts"
+    },
+    {
+      "name": "contains:packages/db/src/n09-action-packet-bridge-policy.ts:N09_BRIDGE_CANDIDATE_CHANNEL_FORBIDDEN",
+      "passed": true,
+      "detail": "found",
+      "file": "packages/db/src/n09-action-packet-bridge-policy.ts"
+    },
+    {
+      "name": "contains:packages/db/src/n09-action-packet-bridge-policy.ts:productionReady: false as const",
+      "passed": true,
+      "detail": "found",
+      "file": "packages/db/src/n09-action-packet-bridge-policy.ts"
+    },
+    {
+      "name": "contains:packages/db/src/n09-action-packet-bridge-policy.ts:n09AssertChannelAllowed",
+      "passed": true,
+      "detail": "found",
+      "file": "packages/db/src/n09-action-packet-bridge-policy.ts"
+    },
+    {
+      "name": "contains:packages/db/src/n09-action-packet-bridge-policy.ts:n09AssertProductionReadyFalse",
+      "passed": true,
+      "detail": "found",
+      "file": "packages/db/src/n09-action-packet-bridge-policy.ts"
+    },
+    {
+      "name": "contains:scripts/validators/validate-n09-3.mjs:validate-n09-3",
+      "passed": true,
+      "detail": "found",
+      "file": "scripts/validators/validate-n09-3.mjs"
+    },
+    {
+      "name": "contains:scripts/validators/validate-n09-3.mjs:reports/n09/n09-3-validation-report.json",
+      "passed": true,
+      "detail": "found",
+      "file": "scripts/validators/validate-n09-3.mjs"
+    },
+    {
+      "name": "contains:scripts/validators/validate-n09-3.mjs:sha256",
+      "passed": true,
+      "detail": "found",
+      "file": "scripts/validators/validate-n09-3.mjs"
+    },
+    {
+      "name": "contains:scripts/validators/validate-n09-3.mjs:typescript",
+      "passed": true,
+      "detail": "found",
+      "file": "scripts/validators/validate-n09-3.mjs"
+    },
+    {
+      "name": "forbidden:packages/db/src/n09-action-packet-bridge-policy.ts:productionReadyTrue",
+      "passed": true,
+      "detail": "not found",
+      "file": "packages/db/src/n09-action-packet-bridge-policy.ts"
+    },
+    {
+      "name": "forbidden:packages/db/src/n09-action-packet-bridge-policy.ts:productionReadyJsonTrue",
+      "passed": true,
+      "detail": "not found",
+      "file": "packages/db/src/n09-action-packet-bridge-policy.ts"
+    },
+    {
+      "name": "forbidden:packages/db/src/n09-action-packet-bridge-policy.ts:productionReadySqlTrue",
+      "passed": true,
+      "detail": "not found",
+      "file": "packages/db/src/n09-action-packet-bridge-policy.ts"
+    },
+    {
+      "name": "forbidden:packages/db/src/n09-action-packet-bridge-policy.ts:todo",
+      "passed": true,
+      "detail": "not found",
+      "file": "packages/db/src/n09-action-packet-bridge-policy.ts"
+    },
+    {
+      "name": "forbidden:packages/db/src/n09-action-packet-bridge-policy.ts:fixme",
+      "passed": true,
+      "detail": "not found",
+      "file": "packages/db/src/n09-action-packet-bridge-policy.ts"
+    },
+    {
+      "name": "forbidden:packages/db/src/n09-action-packet-bridge-policy.ts:hardcodedPasswordAssignment",
+      "passed": true,
+      "detail": "not found",
+      "file": "packages/db/src/n09-action-packet-bridge-policy.ts"
+    },
+    {
+      "name": "forbidden:packages/db/src/n09-action-packet-bridge-policy.ts:hardcodedTokenAssignment",
+      "passed": true,
+      "detail": "not found",
+      "file": "packages/db/src/n09-action-packet-bridge-policy.ts"
+    },
+    {
+      "name": "forbidden:packages/db/src/n09-action-packet-bridge-policy.ts:hardcodedApiKeyAssignment",
+      "passed": true,
+      "detail": "not found",
+      "file": "packages/db/src/n09-action-packet-bridge-policy.ts"
+    },
+    {
+      "name": "forbidden:packages/db/src/n09-action-packet-bridge-policy.ts:hardcodedSecretAssignment",
+      "passed": true,
+      "detail": "not found",
+      "file": "packages/db/src/n09-action-packet-bridge-policy.ts"
+    },
+    {
+      "name": "forbidden:scripts/validators/validate-n09-3.mjs:productionReadyTrue",
+      "passed": true,
+      "detail": "not found",
+      "file": "scripts/validators/validate-n09-3.mjs"
+    },
+    {
+      "name": "forbidden:scripts/validators/validate-n09-3.mjs:productionReadyJsonTrue",
+      "passed": true,
+      "detail": "not found",
+      "file": "scripts/validators/validate-n09-3.mjs"
+    },
+    {
+      "name": "forbidden:scripts/validators/validate-n09-3.mjs:productionReadySqlTrue",
+      "passed": true,
+      "detail": "not found",
+      "file": "scripts/validators/validate-n09-3.mjs"
+    },
+    {
+      "name": "forbidden:scripts/validators/validate-n09-3.mjs:todo",
+      "passed": false,
+      "detail": "forbidden content found",
+      "file": "scripts/validators/validate-n09-3.mjs"
+    },
+    {
+      "name": "forbidden:scripts/validators/validate-n09-3.mjs:fixme",
+      "passed": false,
+      "detail": "forbidden content found",
+      "file": "scripts/validators/validate-n09-3.mjs"
+    },
+    {
+      "name": "forbidden:scripts/validators/validate-n09-3.mjs:hardcodedPasswordAssignment",
+      "passed": true,
+      "detail": "not found",
+      "file": "scripts/validators/validate-n09-3.mjs"
+    },
+    {
+      "name": "forbidden:scripts/validators/validate-n09-3.mjs:hardcodedTokenAssignment",
+      "passed": true,
+      "detail": "not found",
+      "file": "scripts/validators/validate-n09-3.mjs"
+    },
+    {
+      "name": "forbidden:scripts/validators/validate-n09-3.mjs:hardcodedApiKeyAssignment",
+      "passed": true,
+      "detail": "not found",
+      "file": "scripts/validators/validate-n09-3.mjs"
+    },
+    {
+      "name": "forbidden:scripts/validators/validate-n09-3.mjs:hardcodedSecretAssignment",
+      "passed": true,
+      "detail": "not found",
+      "file": "scripts/validators/validate-n09-3.mjs"
+    },
+    {
+      "name": "typescript-parser-available",
+      "passed": false,
+      "detail": "typescript package is required for N09.3 validation",
+      "file": "packages/db/src/n09-action-packet-bridge-policy.ts"
+    }
+  ],
+  "nextTrackerRow": "N09.3 repair — fix failed checks in reports/n09/n09-3-validation-report.json"
+}
