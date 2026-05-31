@@ -1,213 +1,235 @@
 #requires -Version 5.1
 <#
 N01.6 - Invoke-KingsmenPhase.ps1
-Runs Kingsmen tracker phases in a Windows-first, proof-based way.
-
-Usage:
-  powershell -ExecutionPolicy Bypass -File .\scripts\phases\Invoke-KingsmenPhase.ps1 -Action List
-  powershell -ExecutionPolicy Bypass -File .\scripts\phases\Invoke-KingsmenPhase.ps1 -Action Status -PhaseName Build_Materializer
-  powershell -ExecutionPolicy Bypass -File .\scripts\phases\Invoke-KingsmenPhase.ps1 -Action Validate -PhaseName Infrastructure_Gate
-  powershell -ExecutionPolicy Bypass -File .\scripts\phases\Invoke-KingsmenPhase.ps1 -Action Run -PhaseName Scaffold
-
-This script does not replace KINGSMEN_CREATOR.ps1.
-It calls the Creator where appropriate and writes reports/phases/*.json evidence.
+Windows-first proof phase runner for Kingsmen repo materialization.
+Writes reports/phases/n01-6-phase-runner-report.json.
 #>
-
 [CmdletBinding()]
 param(
-    [Parameter(Mandatory = $true)]
-    [ValidateSet('List','Status','Validate','Run')]
-    [string] $Action,
-
-    [Parameter(Mandatory = $false)]
-    [string] $PhaseName = '',
-
-    [Parameter(Mandatory = $false)]
-    [string] $ModuleName = '',
-
-    [Parameter(Mandatory = $false)]
-    [string] $CommitMessage = ''
+  [ValidateSet('List','Status','Validate','Run','Report')]
+  [string]$Action = 'List',
+  [string]$PhaseName = '',
+  [string]$ModuleName = '',
+  [string]$Root = ''
 )
 
+Set-StrictMode -Version Latest
 $ErrorActionPreference = 'Stop'
 
-function Write-KmLine {
-    param(
-        [string] $Text,
-        [string] $Color = 'Gray'
-    )
-    Write-Host $Text -ForegroundColor $Color
+function Resolve-KingsmenRoot {
+  param([string]$ProvidedRoot)
+  if (-not [string]::IsNullOrWhiteSpace($ProvidedRoot)) {
+    $resolved = Resolve-Path -Path $ProvidedRoot -ErrorAction SilentlyContinue
+    if ($resolved) { return $resolved.Path }
+  }
+  $current = Get-Location
+  while ($null -ne $current) {
+    if (Test-Path (Join-Path $current.Path '.git') -PathType Container) { return $current.Path }
+    if (Test-Path (Join-Path $current.Path 'package.json')) { return $current.Path }
+    $parent = Split-Path -Parent $current.Path
+    if ([string]::IsNullOrWhiteSpace($parent) -or $parent -eq $current.Path) { break }
+    $current = Get-Item $parent
+  }
+  return (Split-Path -Parent (Split-Path -Parent (Split-Path -Parent $PSScriptRoot)))
 }
 
-function Get-KmRepoRoot {
-    $fromScript = Split-Path -Parent (Split-Path -Parent (Split-Path -Parent $PSScriptRoot))
-    if (Test-Path (Join-Path $fromScript '.git')) {
-        return $fromScript
-    }
-
-    $fromCurrent = (Get-Location).Path
-    if (Test-Path (Join-Path $fromCurrent '.git')) {
-        return $fromCurrent
-    }
-
-    throw 'Not inside a Git repository. Run from kingsmen-platform.'
-}
-
-function Add-KmCheck {
-    param(
-        [string] $Name,
-        $Passed,
-        [string] $Detail,
-        [string] $File = ''
-    )
-
-    $script:Checks += [pscustomobject]@{
-        name = $Name
-        passed = [bool]$Passed
-        detail = $Detail
-        file = $File
-    }
-}
-
-function Write-KmReport {
-    param(
-        [string] $ReportName,
-        [string] $Submodule,
-        [string] $NextTrackerRow
-    )
-
-    $failed = @($script:Checks | Where-Object { -not $_.passed })
-    $passed = ($failed.Count -eq 0)
-    $report = [ordered]@{
-        module = 'N01'
-        submodule = $Submodule
-        runner = 'scripts/phases/Invoke-KingsmenPhase.ps1'
-        productionReady = $false
-        generatedAt = (Get-Date).ToUniversalTime().ToString('o')
-        action = $Action
-        phaseName = $PhaseName
-        moduleName = $ModuleName
-        passed = $passed
-        totalChecks = @($script:Checks).Count
-        failedChecks = @($failed).Count
-        failed = @($failed)
-        checks = @($script:Checks)
-        nextTrackerRow = $(if ($passed) { $NextTrackerRow } else { 'N01.6 repair - fix failed checks in reports/phases/' + $ReportName })
-    }
-
-    $reportPath = Join-Path $script:ReportDir $ReportName
-    $report | ConvertTo-Json -Depth 10 | Set-Content -Path $reportPath -Encoding UTF8
-    $report | ConvertTo-Json -Depth 10
-
-    if ($passed) {
-        exit 0
-    }
-    exit 1
-}
-
-$script:RepoRoot = Get-KmRepoRoot
+$script:RepoRoot = Resolve-KingsmenRoot -ProvidedRoot $Root
 Set-Location $script:RepoRoot
-
 $script:Checks = @()
+$script:PhaseResults = @()
+$script:ProductionReady = $false
 $script:ReportDir = Join-Path $script:RepoRoot 'reports/phases'
+$script:ReportPath = Join-Path $script:ReportDir 'n01-6-phase-runner-report.json'
 New-Item -ItemType Directory -Force -Path $script:ReportDir | Out-Null
 
-$CreatorPath = Join-Path $script:RepoRoot 'scripts/KINGSMEN_CREATOR.ps1'
-$CreatorConfigPath = Join-Path $script:RepoRoot 'config/creator.config.json'
-$TrackerPath = Join-Path $script:RepoRoot 'Kingsmen_Build_Tracker.csv'
-$ProviderValidatorPath = Join-Path $script:RepoRoot 'scripts/validators/validate-provider-health.mjs'
-$N09ValidatorPath = Join-Path $script:RepoRoot 'scripts/validators/validate-n09-3.mjs'
+function Add-KmCheck {
+  param([string]$Name, [object]$Passed, [string]$Detail = '', [string]$File = '')
+  $safePassed = $false
+  try { $safePassed = [System.Convert]::ToBoolean($Passed) } catch { $safePassed = $false }
+  $script:Checks += [pscustomobject]@{ name = $Name; passed = $safePassed; detail = $Detail; file = $File }
+}
 
-$PhaseRegistry = @(
-    [ordered]@{ name = 'Close_Open_Wound'; phase = 1; validator = 'scripts/validators/validate-n09-3.mjs'; report = 'reports/n09/n09-3-validation-report.json'; status = 'validated' },
-    [ordered]@{ name = 'Build_Materializer'; phase = 2; validator = 'scripts/testing/Test-KingsmenCreator.ps1'; report = 'reports/creator/creator-validation-report.json'; status = 'validated' },
-    [ordered]@{ name = 'Infrastructure_Gate'; phase = 3; validator = 'scripts/validators/validate-provider-health.mjs'; report = 'reports/validation/provider-health-report.json'; status = 'in_progress' },
-    [ordered]@{ name = 'First_Clickable_Surface'; phase = 4; validator = 'scripts/testing/Test-FirstClickableSurface.ps1'; report = 'reports/ui/first-clickable-surface-report.json'; status = 'not_started' },
-    [ordered]@{ name = 'Scaffold'; phase = 0; validator = ''; report = 'reports/creator/creator-validation-report.json'; status = 'available_creator_action' }
+function Read-KmJson {
+  param([string]$RelativePath)
+  $full = Join-Path $script:RepoRoot $RelativePath
+  if (-not (Test-Path $full -PathType Leaf)) { return $null }
+  try { return (Get-Content -Path $full -Raw | ConvertFrom-Json) } catch { return $null }
+}
+
+function Test-KmPath {
+  param([string]$RelativePath, [string]$Label)
+  $full = Join-Path $script:RepoRoot $RelativePath
+  $ok = Test-Path $full
+  Add-KmCheck -Name ('exists:{0}' -f $Label) -Passed $ok -Detail $(if ($ok) { 'found' } else { 'missing' }) -File $RelativePath
+  return $ok
+}
+
+function Test-KmReportPassed {
+  param([string]$RelativePath, [string]$Label)
+  $json = Read-KmJson -RelativePath $RelativePath
+  $parsed = $null -ne $json
+  Add-KmCheck -Name ('report:{0}:json' -f $Label) -Passed $parsed -Detail $(if ($parsed) { 'parsed' } else { 'missing or invalid json' }) -File $RelativePath
+  if (-not $parsed) { return $false }
+
+  $hasPassed = $json.PSObject.Properties.Name -contains 'passed'
+  $passed = $hasPassed -and ($json.passed -eq $true)
+  Add-KmCheck -Name ('report:{0}:passed' -f $Label) -Passed $passed -Detail ('passed={0}' -f $json.passed) -File $RelativePath
+
+  $hasProd = $json.PSObject.Properties.Name -contains 'productionReady'
+  $prodSafe = $hasProd -and ($json.productionReady -eq $false)
+  Add-KmCheck -Name ('report:{0}:productionReadyFalse' -f $Label) -Passed $prodSafe -Detail ('productionReady={0}' -f $json.productionReady) -File $RelativePath
+
+  return ($passed -and $prodSafe)
+}
+
+function Invoke-KmCommand {
+  param([string]$Label, [string]$Executable, [string[]]$Arguments, [string]$File)
+  $raw = & $Executable @Arguments 2>&1
+  $exitCode = $LASTEXITCODE
+  $output = ($raw | Out-String).Trim()
+  $ok = ($exitCode -eq 0)
+  Add-KmCheck -Name ('command:{0}:exit-code' -f $Label) -Passed $ok -Detail ('exitCode={0}' -f $exitCode) -File $File
+  $script:PhaseResults += [pscustomobject]@{ label = $Label; executable = $Executable; exitCode = $exitCode; outputPreview = $output.Substring(0, [Math]::Min(1200, $output.Length)) }
+  return $ok
+}
+
+$script:PhaseRegistry = @(
+  [pscustomobject]@{ name = 'Close_Open_Wound'; phase = '1'; status = 'validated'; validatorKind = 'node'; validator = 'scripts/validators/validate-n09-3.mjs'; report = 'reports/n09/n09-3-validation-report.json'; runKind = 'creator'; creatorPhase = 'N09.3Complete' },
+  [pscustomobject]@{ name = 'Build_Materializer'; phase = '2'; status = 'validated'; validatorKind = 'powershell'; validator = 'scripts/testing/Test-KingsmenCreator.ps1'; report = 'reports/creator/creator-validation-report.json'; runKind = 'creator'; creatorPhase = 'Doctor' },
+  [pscustomobject]@{ name = 'Checkpoint_Guard'; phase = '2'; status = 'validated'; validatorKind = 'powershell'; validator = 'scripts/git/Assert-KingsmenGitCheckpoint.ps1'; report = 'reports/creator/git-checkpoint-guard-report.json'; runKind = 'script'; creatorPhase = '' },
+  [pscustomobject]@{ name = 'Proof_Tracker_Sync'; phase = '2'; status = 'validated'; validatorKind = 'powershell'; validator = 'scripts/tracker/Sync-KingsmenProofTracker.ps1'; report = 'reports/creator/proof-tracker-sync-report.json'; runKind = 'script'; creatorPhase = '' },
+  [pscustomobject]@{ name = 'Infrastructure_Gate'; phase = '3'; status = 'validated'; validatorKind = 'node'; validator = 'scripts/validators/validate-provider-health.mjs'; report = 'reports/validation/provider-health-report.json'; runKind = 'script'; creatorPhase = '' },
+  [pscustomobject]@{ name = 'N01_Phase_Runner'; phase = '3'; status = 'built_pending_validation'; validatorKind = 'self'; validator = 'scripts/phases/Invoke-KingsmenPhase.ps1'; report = 'reports/phases/n01-6-phase-runner-report.json'; runKind = 'self'; creatorPhase = '' },
+  [pscustomobject]@{ name = 'First_Clickable_Surface'; phase = '4'; status = 'not_started'; validatorKind = 'future'; validator = 'scripts/testing/Test-FirstClickableSurface.ps1'; report = 'reports/ui/first-clickable-surface-report.json'; runKind = 'future'; creatorPhase = '' }
 )
 
+function Get-KmPhase {
+  param([string]$Name)
+  $matches = @($script:PhaseRegistry | Where-Object { $_.name -eq $Name })
+  if ($matches.Count -eq 1) { return $matches[0] }
+  return $null
+}
+
+function Write-KmPhaseReport {
+  param([string]$NextTrackerRow)
+  $failed = @($script:Checks | Where-Object { $_.passed -ne $true })
+  $passed = ($failed.Count -eq 0)
+  $report = [ordered]@{
+    module = 'N01'
+    submodule = 'N01.6'
+    runner = 'scripts/phases/Invoke-KingsmenPhase.ps1'
+    productionReady = $script:ProductionReady
+    generatedAt = (Get-Date).ToUniversalTime().ToString('yyyy-MM-ddTHH:mm:ss.fffZ')
+    repoRoot = $script:RepoRoot
+    action = $Action
+    phaseName = $PhaseName
+    moduleName = $ModuleName
+    passed = $passed
+    totalChecks = @($script:Checks).Count
+    failedChecks = @($failed).Count
+    phaseRegistry = @($script:PhaseRegistry)
+    commandResults = @($script:PhaseResults)
+    failed = @($failed)
+    checks = @($script:Checks)
+    nextTrackerRow = $(if ($passed) { $NextTrackerRow } else { 'N01.6 repair - fix failed checks in reports/phases/n01-6-phase-runner-report.json' })
+  }
+  $report | ConvertTo-Json -Depth 18 | Set-Content -Path $script:ReportPath -Encoding UTF8
+  $report | ConvertTo-Json -Depth 18
+  if ($passed) { exit 0 }
+  exit 1
+}
+
 try {
-    Add-KmCheck -Name 'exists:scripts/KINGSMEN_CREATOR.ps1' -Passed (Test-Path $CreatorPath) -Detail $(if (Test-Path $CreatorPath) { 'found' } else { 'missing' }) -File 'scripts/KINGSMEN_CREATOR.ps1'
-    Add-KmCheck -Name 'exists:config/creator.config.json' -Passed (Test-Path $CreatorConfigPath) -Detail $(if (Test-Path $CreatorConfigPath) { 'found' } else { 'missing' }) -File 'config/creator.config.json'
-    Add-KmCheck -Name 'exists:Kingsmen_Build_Tracker.csv' -Passed (Test-Path $TrackerPath) -Detail $(if (Test-Path $TrackerPath) { 'found' } else { 'missing' }) -File 'Kingsmen_Build_Tracker.csv'
+  Test-KmPath -RelativePath 'scripts/KINGSMEN_CREATOR.ps1' -Label 'creator' | Out-Null
+  Test-KmPath -RelativePath 'kingsmen/config/creator.config.json' -Label 'creator-config' | Out-Null
+  Test-KmPath -RelativePath 'Kingsmen_Build_Tracker.csv' -Label 'tracker' | Out-Null
+  Test-KmPath -RelativePath 'config/environment/.env.template' -Label 'env-template' | Out-Null
+  Test-KmPath -RelativePath 'config/providers/provider-registry.json' -Label 'provider-registry' | Out-Null
 
-    if (Test-Path $CreatorConfigPath) {
-        $config = Get-Content -Path $CreatorConfigPath -Raw | ConvertFrom-Json
-        Add-KmCheck -Name 'creator-config:productionReadyFalse' -Passed ($config.productionReady -eq $false) -Detail ('productionReady=' + $config.productionReady) -File 'config/creator.config.json'
-        Add-KmCheck -Name 'creator-config:canonicalCreator' -Passed ($config.repo.canonicalCreator -eq 'scripts/KINGSMEN_CREATOR.ps1') -Detail ($config.repo.canonicalCreator) -File 'config/creator.config.json'
+  $config = Read-KmJson -RelativePath 'kingsmen/config/creator.config.json'
+  Add-KmCheck -Name 'creator-config:json' -Passed ($null -ne $config) -Detail $(if ($null -ne $config) { 'parsed' } else { 'missing or invalid json' }) -File 'kingsmen/config/creator.config.json'
+  if ($null -ne $config) {
+    Add-KmCheck -Name 'creator-config:productionReadyFalse' -Passed ($config.productionReady -eq $false) -Detail ('productionReady={0}' -f $config.productionReady) -File 'kingsmen/config/creator.config.json'
+    Add-KmCheck -Name 'creator-config:phaseRunnerScript' -Passed ($config.phaseRunner.script -eq 'scripts/KINGSMEN_CREATOR.ps1') -Detail ([string]$config.phaseRunner.script) -File 'kingsmen/config/creator.config.json'
+  }
+
+  if ($Action -eq 'List') {
+    Add-KmCheck -Name 'phase-registry:list' -Passed ($script:PhaseRegistry.Count -ge 7) -Detail ('phases={0}' -f $script:PhaseRegistry.Count) -File 'scripts/phases/Invoke-KingsmenPhase.ps1'
+    Write-KmPhaseReport -NextTrackerRow 'N01.6.1 - manifests/master-build-index.json'
+  }
+
+  if ($Action -eq 'Report') {
+    Test-KmReportPassed -RelativePath 'reports/n09/n09-3-validation-report.json' -Label 'n09-3' | Out-Null
+    Test-KmReportPassed -RelativePath 'reports/creator/creator-validation-report.json' -Label 'creator-validation' | Out-Null
+    Test-KmReportPassed -RelativePath 'reports/creator/git-checkpoint-guard-report.json' -Label 'git-checkpoint-guard' | Out-Null
+    Test-KmReportPassed -RelativePath 'reports/validation/provider-health-report.json' -Label 'provider-health' | Out-Null
+    Write-KmPhaseReport -NextTrackerRow 'N01.6.1 - manifests/master-build-index.json'
+  }
+
+  if ([string]::IsNullOrWhiteSpace($PhaseName)) {
+    Add-KmCheck -Name 'phase-name:required' -Passed $false -Detail 'PhaseName is required for Status, Validate, and Run.' -File 'scripts/phases/Invoke-KingsmenPhase.ps1'
+    Write-KmPhaseReport -NextTrackerRow 'N01.6 repair - provide PhaseName'
+  }
+
+  $phase = Get-KmPhase -Name $PhaseName
+  Add-KmCheck -Name ('phase-exists:{0}' -f $PhaseName) -Passed ($null -ne $phase) -Detail $(if ($null -ne $phase) { 'found' } else { 'missing' }) -File 'scripts/phases/Invoke-KingsmenPhase.ps1'
+  if ($null -eq $phase) { Write-KmPhaseReport -NextTrackerRow 'N01.6 repair - unknown phase' }
+
+  if ($Action -eq 'Status') {
+    Add-KmCheck -Name ('phase-status:{0}' -f $PhaseName) -Passed $true -Detail $phase.status -File 'scripts/phases/Invoke-KingsmenPhase.ps1'
+    Add-KmCheck -Name ('phase-validator:{0}' -f $PhaseName) -Passed (-not [string]::IsNullOrWhiteSpace($phase.validator)) -Detail $phase.validator -File 'scripts/phases/Invoke-KingsmenPhase.ps1'
+    Add-KmCheck -Name ('phase-report:{0}' -f $PhaseName) -Passed (-not [string]::IsNullOrWhiteSpace($phase.report)) -Detail $phase.report -File 'scripts/phases/Invoke-KingsmenPhase.ps1'
+    Test-KmReportPassed -RelativePath $phase.report -Label $PhaseName | Out-Null
+    Write-KmPhaseReport -NextTrackerRow 'N01.6.1 - manifests/master-build-index.json'
+  }
+
+  if ($Action -eq 'Validate') {
+    if ($phase.validatorKind -eq 'future') {
+      Add-KmCheck -Name ('phase-validator-supported:{0}' -f $PhaseName) -Passed $false -Detail 'Future phase validator not created yet.' -File $phase.validator
+      Write-KmPhaseReport -NextTrackerRow 'N01.6 repair - future phase cannot validate yet'
     }
 
-    if ($Action -eq 'List') {
-        foreach ($phase in $PhaseRegistry) {
-            Write-KmLine -Text ($phase.phase.ToString() + ' | ' + $phase.name + ' | ' + $phase.status) -Color 'Cyan'
-        }
-        Add-KmCheck -Name 'phase-registry:list' -Passed $true -Detail ('listed ' + $PhaseRegistry.Count + ' phases') -File 'scripts/phases/Invoke-KingsmenPhase.ps1'
-        Write-KmReport -ReportName 'n01-6-phase-runner-report.json' -Submodule 'N01.6' -NextTrackerRow 'N01.6.1 - manifests/master-build-index.json'
+    if ($phase.validatorKind -eq 'self') {
+      Add-KmCheck -Name 'self-validator:path' -Passed (Test-Path (Join-Path $script:RepoRoot $phase.validator) -PathType Leaf) -Detail $phase.validator -File $phase.validator
+    }
+    elseif ($phase.validatorKind -eq 'node') {
+      $validatorFull = Join-Path $script:RepoRoot $phase.validator
+      Add-KmCheck -Name ('validator-exists:{0}' -f $PhaseName) -Passed (Test-Path $validatorFull -PathType Leaf) -Detail $phase.validator -File $phase.validator
+      if (Test-Path $validatorFull -PathType Leaf) { Invoke-KmCommand -Label ('validate:{0}' -f $PhaseName) -Executable 'node' -Arguments @($phase.validator) -File $phase.validator | Out-Null }
+    }
+    elseif ($phase.validatorKind -eq 'powershell') {
+      $validatorFull = Join-Path $script:RepoRoot $phase.validator
+      Add-KmCheck -Name ('validator-exists:{0}' -f $PhaseName) -Passed (Test-Path $validatorFull -PathType Leaf) -Detail $phase.validator -File $phase.validator
+      if (Test-Path $validatorFull -PathType Leaf) { Invoke-KmCommand -Label ('validate:{0}' -f $PhaseName) -Executable 'powershell.exe' -Arguments @('-NoProfile','-ExecutionPolicy','Bypass','-File',$phase.validator) -File $phase.validator | Out-Null }
+    }
+    else {
+      Add-KmCheck -Name ('validator-kind-supported:{0}' -f $PhaseName) -Passed $false -Detail $phase.validatorKind -File 'scripts/phases/Invoke-KingsmenPhase.ps1'
     }
 
-    if ([string]::IsNullOrWhiteSpace($PhaseName)) {
-        throw 'PhaseName is required for Status, Validate, and Run.'
+    Test-KmReportPassed -RelativePath $phase.report -Label $PhaseName | Out-Null
+    Write-KmPhaseReport -NextTrackerRow 'N01.6.1 - manifests/master-build-index.json'
+  }
+
+  if ($Action -eq 'Run') {
+    if ($phase.runKind -eq 'creator') {
+      Invoke-KmCommand -Label ('run-creator:{0}' -f $PhaseName) -Executable 'powershell.exe' -Arguments @('-NoProfile','-ExecutionPolicy','Bypass','-File','scripts/KINGSMEN_CREATOR.ps1','-Phase',$phase.creatorPhase) -File 'scripts/KINGSMEN_CREATOR.ps1' | Out-Null
+    }
+    elseif ($phase.runKind -eq 'script') {
+      if ($phase.validatorKind -eq 'node') { Invoke-KmCommand -Label ('run-script:{0}' -f $PhaseName) -Executable 'node' -Arguments @($phase.validator) -File $phase.validator | Out-Null }
+      elseif ($phase.validatorKind -eq 'powershell') { Invoke-KmCommand -Label ('run-script:{0}' -f $PhaseName) -Executable 'powershell.exe' -Arguments @('-NoProfile','-ExecutionPolicy','Bypass','-File',$phase.validator) -File $phase.validator | Out-Null }
+      else { Add-KmCheck -Name ('run-script-supported:{0}' -f $PhaseName) -Passed $false -Detail $phase.validatorKind -File 'scripts/phases/Invoke-KingsmenPhase.ps1' }
+    }
+    elseif ($phase.runKind -eq 'self') {
+      Add-KmCheck -Name 'run-self:N01.6' -Passed $true -Detail 'Self phase runner is present. Use Action Report for proof rollup.' -File 'scripts/phases/Invoke-KingsmenPhase.ps1'
+    }
+    else {
+      Add-KmCheck -Name ('phase-run-supported:{0}' -f $PhaseName) -Passed $false -Detail 'This phase is not runnable yet.' -File 'scripts/phases/Invoke-KingsmenPhase.ps1'
     }
 
-    $phaseMatch = @($PhaseRegistry | Where-Object { $_.name -eq $PhaseName })
-    Add-KmCheck -Name ('phase-exists:' + $PhaseName) -Passed ($phaseMatch.Count -eq 1) -Detail ($(if ($phaseMatch.Count -eq 1) { 'found' } else { 'missing or duplicate' })) -File 'scripts/phases/Invoke-KingsmenPhase.ps1'
-
-    if ($phaseMatch.Count -ne 1) {
-        Write-KmReport -ReportName 'n01-6-phase-runner-report.json' -Submodule 'N01.6' -NextTrackerRow 'N01.6 repair - unknown phase'
-    }
-
-    $phase = $phaseMatch[0]
-
-    if ($Action -eq 'Status') {
-        $reportFile = Join-Path $script:RepoRoot $phase.report
-        Add-KmCheck -Name ('phase-status:' + $PhaseName) -Passed $true -Detail $phase.status -File 'scripts/phases/Invoke-KingsmenPhase.ps1'
-        Add-KmCheck -Name ('phase-report-path:' + $PhaseName) -Passed (-not [string]::IsNullOrWhiteSpace($phase.report)) -Detail $phase.report -File 'scripts/phases/Invoke-KingsmenPhase.ps1'
-        Add-KmCheck -Name ('phase-report-exists:' + $PhaseName) -Passed (Test-Path $reportFile) -Detail $(if (Test-Path $reportFile) { 'found' } else { 'not generated yet' }) -File $phase.report
-        Write-KmReport -ReportName 'n01-6-phase-runner-report.json' -Submodule 'N01.6' -NextTrackerRow 'N01.6.1 - manifests/master-build-index.json'
-    }
-
-    if ($Action -eq 'Validate') {
-        if ($PhaseName -eq 'Close_Open_Wound') {
-            Add-KmCheck -Name 'validator-exists:n09-3' -Passed (Test-Path $N09ValidatorPath) -Detail $(if (Test-Path $N09ValidatorPath) { 'found' } else { 'missing' }) -File 'scripts/validators/validate-n09-3.mjs'
-            if (Test-Path $N09ValidatorPath) {
-                $output = node $N09ValidatorPath 2>&1
-                Add-KmCheck -Name 'validator-run:n09-3' -Passed ($LASTEXITCODE -eq 0) -Detail (($output | Out-String).Trim()) -File 'scripts/validators/validate-n09-3.mjs'
-            }
-        }
-        elseif ($PhaseName -eq 'Infrastructure_Gate') {
-            Add-KmCheck -Name 'validator-exists:provider-health' -Passed (Test-Path $ProviderValidatorPath) -Detail $(if (Test-Path $ProviderValidatorPath) { 'found' } else { 'missing' }) -File 'scripts/validators/validate-provider-health.mjs'
-            if (Test-Path $ProviderValidatorPath) {
-                $output = node $ProviderValidatorPath 2>&1
-                Add-KmCheck -Name 'validator-run:provider-health' -Passed ($LASTEXITCODE -eq 0) -Detail (($output | Out-String).Trim()) -File 'scripts/validators/validate-provider-health.mjs'
-            }
-        }
-        elseif ($PhaseName -eq 'Build_Materializer') {
-            $testPath = Join-Path $script:RepoRoot 'scripts/testing/Test-KingsmenCreator.ps1'
-            Add-KmCheck -Name 'validator-exists:creator-self-test' -Passed (Test-Path $testPath) -Detail $(if (Test-Path $testPath) { 'found' } else { 'missing' }) -File 'scripts/testing/Test-KingsmenCreator.ps1'
-            if (Test-Path $testPath) {
-                $output = powershell -NoProfile -ExecutionPolicy Bypass -File $testPath 2>&1
-                Add-KmCheck -Name 'validator-run:creator-self-test' -Passed ($LASTEXITCODE -eq 0) -Detail (($output | Out-String).Trim()) -File 'scripts/testing/Test-KingsmenCreator.ps1'
-            }
-        }
-        else {
-            Add-KmCheck -Name ('validator-supported:' + $PhaseName) -Passed $false -Detail 'No validator implemented for this phase yet.' -File 'scripts/phases/Invoke-KingsmenPhase.ps1'
-        }
-
-        Write-KmReport -ReportName 'n01-6-phase-runner-report.json' -Submodule 'N01.6' -NextTrackerRow 'N01.6.1 - manifests/master-build-index.json'
-    }
-
-    if ($Action -eq 'Run') {
-        if ($PhaseName -eq 'Scaffold') {
-            $output = powershell -NoProfile -ExecutionPolicy Bypass -File $CreatorPath -Action Scaffold 2>&1
-            Add-KmCheck -Name 'phase-run:Scaffold' -Passed ($LASTEXITCODE -eq 0) -Detail (($output | Out-String).Trim()) -File 'scripts/KINGSMEN_CREATOR.ps1'
-        }
-        else {
-            Add-KmCheck -Name ('phase-run-supported:' + $PhaseName) -Passed $false -Detail 'Only Scaffold run is enabled in N01.6. Use Validate for proof checks.' -File 'scripts/phases/Invoke-KingsmenPhase.ps1'
-        }
-
-        Write-KmReport -ReportName 'n01-6-phase-runner-report.json' -Submodule 'N01.6' -NextTrackerRow 'N01.6.1 - manifests/master-build-index.json'
-    }
+    Test-KmReportPassed -RelativePath $phase.report -Label $PhaseName | Out-Null
+    Write-KmPhaseReport -NextTrackerRow 'N01.6.1 - manifests/master-build-index.json'
+  }
 } catch {
-    Add-KmCheck -Name 'phase-runner:unhandled-error' -Passed $false -Detail $_.Exception.Message -File 'scripts/phases/Invoke-KingsmenPhase.ps1'
-    Write-KmReport -ReportName 'n01-6-phase-runner-report.json' -Submodule 'N01.6' -NextTrackerRow 'N01.6 repair - runner crashed'
+  Add-KmCheck -Name 'phase-runner:unhandled-error' -Passed $false -Detail $_.Exception.Message -File 'scripts/phases/Invoke-KingsmenPhase.ps1'
+  Write-KmPhaseReport -NextTrackerRow 'N01.6 repair - runner crashed'
 }
