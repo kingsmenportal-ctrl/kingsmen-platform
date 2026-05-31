@@ -1,0 +1,1159 @@
+{
+  "module": "N01",
+  "submodule": "N01.5.2",
+  "validator": "validate-provider-health.mjs",
+  "productionReady": false,
+  "generatedAt": "2026-05-31T10:23:19.946Z",
+  "passed": true,
+  "totalChecks": 186,
+  "failedChecks": 0,
+  "providerGroupsChecked": [
+    "database",
+    "queue",
+    "storage",
+    "email",
+    "whatsapp",
+    "sms",
+    "payments",
+    "airtable",
+    "playwright"
+  ],
+  "registryStatus": "built_pending_provider_health_validation",
+  "checksums": [
+    {
+      "path": "config/environment/.env.template",
+      "sha256": "4b3f9a21d1719b115a2d1e052db88b934d53c9c2971709b76d1f35e8510b7f7d",
+      "bytes": 2997
+    },
+    {
+      "path": "config/providers/provider-registry.json",
+      "sha256": "23f350e86744fa14259e94d6bd4f4cf51eb33d94004f600d413b35373da2afd8",
+      "bytes": 10119
+    },
+    {
+      "path": "scripts/validators/validate-provider-health.mjs",
+      "sha256": "c09a8492d4d1298abc940eb50a6064a45b240002072d5a3afd65e232e1ab7227",
+      "bytes": 11343
+    }
+  ],
+  "failed": [],
+  "checks": [
+    {
+      "name": "exists:config/environment/.env.template",
+      "passed": true,
+      "detail": "found",
+      "file": "config/environment/.env.template"
+    },
+    {
+      "name": "exists:config/providers/provider-registry.json",
+      "passed": true,
+      "detail": "found",
+      "file": "config/providers/provider-registry.json"
+    },
+    {
+      "name": "exists:scripts/validators/validate-provider-health.mjs",
+      "passed": true,
+      "detail": "found",
+      "file": "scripts/validators/validate-provider-health.mjs"
+    },
+    {
+      "name": "forbidden:config/environment/.env.template:productionReadyTrue",
+      "passed": true,
+      "detail": "not found",
+      "file": "config/environment/.env.template"
+    },
+    {
+      "name": "forbidden:config/environment/.env.template:productionReadyJsonTrue",
+      "passed": true,
+      "detail": "not found",
+      "file": "config/environment/.env.template"
+    },
+    {
+      "name": "forbidden:config/environment/.env.template:productionReadyEnvTrue",
+      "passed": true,
+      "detail": "not found",
+      "file": "config/environment/.env.template"
+    },
+    {
+      "name": "forbidden:config/environment/.env.template:databaseUrlAssignment",
+      "passed": true,
+      "detail": "not found",
+      "file": "config/environment/.env.template"
+    },
+    {
+      "name": "forbidden:config/environment/.env.template:postgresPasswordAssignment",
+      "passed": true,
+      "detail": "not found",
+      "file": "config/environment/.env.template"
+    },
+    {
+      "name": "forbidden:config/environment/.env.template:supabaseServiceRoleAssignment",
+      "passed": true,
+      "detail": "not found",
+      "file": "config/environment/.env.template"
+    },
+    {
+      "name": "forbidden:config/environment/.env.template:smtpPasswordAssignment",
+      "passed": true,
+      "detail": "not found",
+      "file": "config/environment/.env.template"
+    },
+    {
+      "name": "forbidden:config/environment/.env.template:whatsappTokenAssignment",
+      "passed": true,
+      "detail": "not found",
+      "file": "config/environment/.env.template"
+    },
+    {
+      "name": "forbidden:config/environment/.env.template:smsTokenAssignment",
+      "passed": true,
+      "detail": "not found",
+      "file": "config/environment/.env.template"
+    },
+    {
+      "name": "forbidden:config/environment/.env.template:paymentSecretAssignment",
+      "passed": true,
+      "detail": "not found",
+      "file": "config/environment/.env.template"
+    },
+    {
+      "name": "forbidden:config/environment/.env.template:airtableTokenAssignment",
+      "passed": true,
+      "detail": "not found",
+      "file": "config/environment/.env.template"
+    },
+    {
+      "name": "forbidden:config/environment/.env.template:privateKeyMaterial",
+      "passed": true,
+      "detail": "not found",
+      "file": "config/environment/.env.template"
+    },
+    {
+      "name": "forbidden:config/providers/provider-registry.json:productionReadyTrue",
+      "passed": true,
+      "detail": "not found",
+      "file": "config/providers/provider-registry.json"
+    },
+    {
+      "name": "forbidden:config/providers/provider-registry.json:productionReadyJsonTrue",
+      "passed": true,
+      "detail": "not found",
+      "file": "config/providers/provider-registry.json"
+    },
+    {
+      "name": "forbidden:config/providers/provider-registry.json:productionReadyEnvTrue",
+      "passed": true,
+      "detail": "not found",
+      "file": "config/providers/provider-registry.json"
+    },
+    {
+      "name": "forbidden:config/providers/provider-registry.json:databaseUrlAssignment",
+      "passed": true,
+      "detail": "not found",
+      "file": "config/providers/provider-registry.json"
+    },
+    {
+      "name": "forbidden:config/providers/provider-registry.json:postgresPasswordAssignment",
+      "passed": true,
+      "detail": "not found",
+      "file": "config/providers/provider-registry.json"
+    },
+    {
+      "name": "forbidden:config/providers/provider-registry.json:supabaseServiceRoleAssignment",
+      "passed": true,
+      "detail": "not found",
+      "file": "config/providers/provider-registry.json"
+    },
+    {
+      "name": "forbidden:config/providers/provider-registry.json:smtpPasswordAssignment",
+      "passed": true,
+      "detail": "not found",
+      "file": "config/providers/provider-registry.json"
+    },
+    {
+      "name": "forbidden:config/providers/provider-registry.json:whatsappTokenAssignment",
+      "passed": true,
+      "detail": "not found",
+      "file": "config/providers/provider-registry.json"
+    },
+    {
+      "name": "forbidden:config/providers/provider-registry.json:smsTokenAssignment",
+      "passed": true,
+      "detail": "not found",
+      "file": "config/providers/provider-registry.json"
+    },
+    {
+      "name": "forbidden:config/providers/provider-registry.json:paymentSecretAssignment",
+      "passed": true,
+      "detail": "not found",
+      "file": "config/providers/provider-registry.json"
+    },
+    {
+      "name": "forbidden:config/providers/provider-registry.json:airtableTokenAssignment",
+      "passed": true,
+      "detail": "not found",
+      "file": "config/providers/provider-registry.json"
+    },
+    {
+      "name": "forbidden:config/providers/provider-registry.json:privateKeyMaterial",
+      "passed": true,
+      "detail": "not found",
+      "file": "config/providers/provider-registry.json"
+    },
+    {
+      "name": "forbidden:scripts/validators/validate-provider-health.mjs:productionReadyTrue",
+      "passed": true,
+      "detail": "not found",
+      "file": "scripts/validators/validate-provider-health.mjs"
+    },
+    {
+      "name": "forbidden:scripts/validators/validate-provider-health.mjs:productionReadyJsonTrue",
+      "passed": true,
+      "detail": "not found",
+      "file": "scripts/validators/validate-provider-health.mjs"
+    },
+    {
+      "name": "forbidden:scripts/validators/validate-provider-health.mjs:productionReadyEnvTrue",
+      "passed": true,
+      "detail": "not found",
+      "file": "scripts/validators/validate-provider-health.mjs"
+    },
+    {
+      "name": "forbidden:scripts/validators/validate-provider-health.mjs:databaseUrlAssignment",
+      "passed": true,
+      "detail": "not found",
+      "file": "scripts/validators/validate-provider-health.mjs"
+    },
+    {
+      "name": "forbidden:scripts/validators/validate-provider-health.mjs:postgresPasswordAssignment",
+      "passed": true,
+      "detail": "not found",
+      "file": "scripts/validators/validate-provider-health.mjs"
+    },
+    {
+      "name": "forbidden:scripts/validators/validate-provider-health.mjs:supabaseServiceRoleAssignment",
+      "passed": true,
+      "detail": "not found",
+      "file": "scripts/validators/validate-provider-health.mjs"
+    },
+    {
+      "name": "forbidden:scripts/validators/validate-provider-health.mjs:smtpPasswordAssignment",
+      "passed": true,
+      "detail": "not found",
+      "file": "scripts/validators/validate-provider-health.mjs"
+    },
+    {
+      "name": "forbidden:scripts/validators/validate-provider-health.mjs:whatsappTokenAssignment",
+      "passed": true,
+      "detail": "not found",
+      "file": "scripts/validators/validate-provider-health.mjs"
+    },
+    {
+      "name": "forbidden:scripts/validators/validate-provider-health.mjs:smsTokenAssignment",
+      "passed": true,
+      "detail": "not found",
+      "file": "scripts/validators/validate-provider-health.mjs"
+    },
+    {
+      "name": "forbidden:scripts/validators/validate-provider-health.mjs:paymentSecretAssignment",
+      "passed": true,
+      "detail": "not found",
+      "file": "scripts/validators/validate-provider-health.mjs"
+    },
+    {
+      "name": "forbidden:scripts/validators/validate-provider-health.mjs:airtableTokenAssignment",
+      "passed": true,
+      "detail": "not found",
+      "file": "scripts/validators/validate-provider-health.mjs"
+    },
+    {
+      "name": "forbidden:scripts/validators/validate-provider-health.mjs:privateKeyMaterial",
+      "passed": true,
+      "detail": "not found",
+      "file": "scripts/validators/validate-provider-health.mjs"
+    },
+    {
+      "name": "env-template:contains:KINGSMEN_PRODUCTION_READY=false",
+      "passed": true,
+      "detail": "found",
+      "file": "config/environment/.env.template"
+    },
+    {
+      "name": "env-template:contains:KINGSMEN_DEFAULT_DEPLOY_TARGET=oracle_lite",
+      "passed": true,
+      "detail": "found",
+      "file": "config/environment/.env.template"
+    },
+    {
+      "name": "env-template:contains:KINGSMEN_ACTIVE_CANDIDATE_CAP=500",
+      "passed": true,
+      "detail": "found",
+      "file": "config/environment/.env.template"
+    },
+    {
+      "name": "env-template:contains:KINGSMEN_EMAIL_PRIMARY=true",
+      "passed": true,
+      "detail": "found",
+      "file": "config/environment/.env.template"
+    },
+    {
+      "name": "env-template:contains:KINGSMEN_WHATSAPP_URGENT_ONLY=true",
+      "passed": true,
+      "detail": "found",
+      "file": "config/environment/.env.template"
+    },
+    {
+      "name": "env-template:contains:KINGSMEN_SMS_BACKUP_ONLY=true",
+      "passed": true,
+      "detail": "found",
+      "file": "config/environment/.env.template"
+    },
+    {
+      "name": "env-template:contains:KINGSMEN_AIRTABLE_MIRROR_ONLY=true",
+      "passed": true,
+      "detail": "found",
+      "file": "config/environment/.env.template"
+    },
+    {
+      "name": "env-template:contains:KINGSMEN_PLAYWRIGHT_SCOUT_ONLY=true",
+      "passed": true,
+      "detail": "found",
+      "file": "config/environment/.env.template"
+    },
+    {
+      "name": "env-template:contains:EMAIL_PROVIDER_MODE=disabled",
+      "passed": true,
+      "detail": "found",
+      "file": "config/environment/.env.template"
+    },
+    {
+      "name": "env-template:contains:EMAIL_NO_SEND_MODE=true",
+      "passed": true,
+      "detail": "found",
+      "file": "config/environment/.env.template"
+    },
+    {
+      "name": "env-template:contains:EMAIL_PREVIEW_MODE=true",
+      "passed": true,
+      "detail": "found",
+      "file": "config/environment/.env.template"
+    },
+    {
+      "name": "env-template:contains:WHATSAPP_URGENT_ONLY=true",
+      "passed": true,
+      "detail": "found",
+      "file": "config/environment/.env.template"
+    },
+    {
+      "name": "env-template:contains:WHATSAPP_BULK_BLOCKED=true",
+      "passed": true,
+      "detail": "found",
+      "file": "config/environment/.env.template"
+    },
+    {
+      "name": "env-template:contains:SMS_BACKUP_ONLY=true",
+      "passed": true,
+      "detail": "found",
+      "file": "config/environment/.env.template"
+    },
+    {
+      "name": "env-template:contains:SMS_BULK_BLOCKED=true",
+      "passed": true,
+      "detail": "found",
+      "file": "config/environment/.env.template"
+    },
+    {
+      "name": "env-template:contains:PAYMENT_PROVIDER_MODE=manual_proof",
+      "passed": true,
+      "detail": "found",
+      "file": "config/environment/.env.template"
+    },
+    {
+      "name": "env-template:contains:PAYMENT_MANUAL_PROOF_REVIEW_REQUIRED=true",
+      "passed": true,
+      "detail": "found",
+      "file": "config/environment/.env.template"
+    },
+    {
+      "name": "env-template:contains:AIRTABLE_MIRROR_MODE=disabled",
+      "passed": true,
+      "detail": "found",
+      "file": "config/environment/.env.template"
+    },
+    {
+      "name": "env-template:contains:PLAYWRIGHT_BLOCK_ON_CAPTCHA=true",
+      "passed": true,
+      "detail": "found",
+      "file": "config/environment/.env.template"
+    },
+    {
+      "name": "env-template:contains:PLAYWRIGHT_BLOCK_ON_OTP=true",
+      "passed": true,
+      "detail": "found",
+      "file": "config/environment/.env.template"
+    },
+    {
+      "name": "env-template:contains:PLAYWRIGHT_MAP_FALLBACK_ENABLED=true",
+      "passed": true,
+      "detail": "found",
+      "file": "config/environment/.env.template"
+    },
+    {
+      "name": "env-template:contains:FOUNDER_MFA_REQUIRED=true",
+      "passed": true,
+      "detail": "found",
+      "file": "config/environment/.env.template"
+    },
+    {
+      "name": "env-template:contains:OPERATOR_MFA_REQUIRED=true",
+      "passed": true,
+      "detail": "found",
+      "file": "config/environment/.env.template"
+    },
+    {
+      "name": "env-template:contains:APPEND_ONLY_AUDIT_ENABLED=true",
+      "passed": true,
+      "detail": "found",
+      "file": "config/environment/.env.template"
+    },
+    {
+      "name": "env-template:contains:POPIA_ACCESS_LOG_ENABLED=true",
+      "passed": true,
+      "detail": "found",
+      "file": "config/environment/.env.template"
+    },
+    {
+      "name": "env-template:contains:KINGSMEN_GIT_REQUIRED=true",
+      "passed": true,
+      "detail": "found",
+      "file": "config/environment/.env.template"
+    },
+    {
+      "name": "env-template:placeholder:SUPABASE_ANON_KEY",
+      "passed": true,
+      "detail": "safe placeholder",
+      "file": "config/environment/.env.template"
+    },
+    {
+      "name": "env-template:placeholder:SMTP_USER",
+      "passed": true,
+      "detail": "safe placeholder",
+      "file": "config/environment/.env.template"
+    },
+    {
+      "name": "env-template:placeholder:EMAIL_FROM_ADDRESS",
+      "passed": true,
+      "detail": "safe placeholder",
+      "file": "config/environment/.env.template"
+    },
+    {
+      "name": "env-template:placeholder:EMAIL_REPLY_TO",
+      "passed": true,
+      "detail": "safe placeholder",
+      "file": "config/environment/.env.template"
+    },
+    {
+      "name": "provider-registry:json-parse",
+      "passed": true,
+      "detail": "parsed",
+      "file": "config/providers/provider-registry.json"
+    },
+    {
+      "name": "provider-registry:module",
+      "passed": true,
+      "detail": "N01",
+      "file": "config/providers/provider-registry.json"
+    },
+    {
+      "name": "provider-registry:submodule",
+      "passed": true,
+      "detail": "N01.5.1",
+      "file": "config/providers/provider-registry.json"
+    },
+    {
+      "name": "provider-registry:productionReadyFalse",
+      "passed": true,
+      "detail": "false",
+      "file": "config/providers/provider-registry.json"
+    },
+    {
+      "name": "provider-registry:doctrine:oracleLiteFirst",
+      "passed": true,
+      "detail": "true",
+      "file": "config/providers/provider-registry.json"
+    },
+    {
+      "name": "provider-registry:doctrine:postgresqlTruth",
+      "passed": true,
+      "detail": "true",
+      "file": "config/providers/provider-registry.json"
+    },
+    {
+      "name": "provider-registry:doctrine:airtableMirrorOnly",
+      "passed": true,
+      "detail": "true",
+      "file": "config/providers/provider-registry.json"
+    },
+    {
+      "name": "provider-registry:doctrine:emailPrimary",
+      "passed": true,
+      "detail": "true",
+      "file": "config/providers/provider-registry.json"
+    },
+    {
+      "name": "provider-registry:doctrine:whatsappUrgentOnly",
+      "passed": true,
+      "detail": "true",
+      "file": "config/providers/provider-registry.json"
+    },
+    {
+      "name": "provider-registry:doctrine:smsBackupOnly",
+      "passed": true,
+      "detail": "true",
+      "file": "config/providers/provider-registry.json"
+    },
+    {
+      "name": "provider-registry:doctrine:playwrightScoutOnly",
+      "passed": true,
+      "detail": "true",
+      "file": "config/providers/provider-registry.json"
+    },
+    {
+      "name": "provider-registry:doctrine:noHardcodedSecrets",
+      "passed": true,
+      "detail": "true",
+      "file": "config/providers/provider-registry.json"
+    },
+    {
+      "name": "provider-registry:doctrine:missingOptionalProvidersDegradeGracefully",
+      "passed": true,
+      "detail": "true",
+      "file": "config/providers/provider-registry.json"
+    },
+    {
+      "name": "provider-registry:group:database",
+      "passed": true,
+      "detail": "found",
+      "file": "config/providers/provider-registry.json"
+    },
+    {
+      "name": "provider-registry:group-has-providers:database",
+      "passed": true,
+      "detail": "2",
+      "file": "config/providers/provider-registry.json"
+    },
+    {
+      "name": "provider-registry:group:queue",
+      "passed": true,
+      "detail": "found",
+      "file": "config/providers/provider-registry.json"
+    },
+    {
+      "name": "provider-registry:group-has-providers:queue",
+      "passed": true,
+      "detail": "1",
+      "file": "config/providers/provider-registry.json"
+    },
+    {
+      "name": "provider-registry:group:storage",
+      "passed": true,
+      "detail": "found",
+      "file": "config/providers/provider-registry.json"
+    },
+    {
+      "name": "provider-registry:group-has-providers:storage",
+      "passed": true,
+      "detail": "2",
+      "file": "config/providers/provider-registry.json"
+    },
+    {
+      "name": "provider-registry:group:email",
+      "passed": true,
+      "detail": "found",
+      "file": "config/providers/provider-registry.json"
+    },
+    {
+      "name": "provider-registry:group-has-providers:email",
+      "passed": true,
+      "detail": "2",
+      "file": "config/providers/provider-registry.json"
+    },
+    {
+      "name": "provider-registry:group:whatsapp",
+      "passed": true,
+      "detail": "found",
+      "file": "config/providers/provider-registry.json"
+    },
+    {
+      "name": "provider-registry:group-has-providers:whatsapp",
+      "passed": true,
+      "detail": "1",
+      "file": "config/providers/provider-registry.json"
+    },
+    {
+      "name": "provider-registry:group:sms",
+      "passed": true,
+      "detail": "found",
+      "file": "config/providers/provider-registry.json"
+    },
+    {
+      "name": "provider-registry:group-has-providers:sms",
+      "passed": true,
+      "detail": "1",
+      "file": "config/providers/provider-registry.json"
+    },
+    {
+      "name": "provider-registry:group:payments",
+      "passed": true,
+      "detail": "found",
+      "file": "config/providers/provider-registry.json"
+    },
+    {
+      "name": "provider-registry:group-has-providers:payments",
+      "passed": true,
+      "detail": "2",
+      "file": "config/providers/provider-registry.json"
+    },
+    {
+      "name": "provider-registry:group:airtable",
+      "passed": true,
+      "detail": "found",
+      "file": "config/providers/provider-registry.json"
+    },
+    {
+      "name": "provider-registry:group-has-providers:airtable",
+      "passed": true,
+      "detail": "1",
+      "file": "config/providers/provider-registry.json"
+    },
+    {
+      "name": "provider-registry:group:playwright",
+      "passed": true,
+      "detail": "found",
+      "file": "config/providers/provider-registry.json"
+    },
+    {
+      "name": "provider-registry:group-has-providers:playwright",
+      "passed": true,
+      "detail": "1",
+      "file": "config/providers/provider-registry.json"
+    },
+    {
+      "name": "provider-registry:health-rule:mustReportMissingRequiredProviders",
+      "passed": true,
+      "detail": "true",
+      "file": "config/providers/provider-registry.json"
+    },
+    {
+      "name": "provider-registry:health-rule:optionalProviderMissingIsNotFatal",
+      "passed": true,
+      "detail": "true",
+      "file": "config/providers/provider-registry.json"
+    },
+    {
+      "name": "provider-registry:health-rule:candidateCoreMustNotSilentlyFail",
+      "passed": true,
+      "detail": "true",
+      "file": "config/providers/provider-registry.json"
+    },
+    {
+      "name": "provider-registry:health-rule:founderActionPacketOnProviderFailure",
+      "passed": true,
+      "detail": "true",
+      "file": "config/providers/provider-registry.json"
+    },
+    {
+      "name": "provider-registry:health-rule:candidateSafeMessageOnProviderFailure",
+      "passed": true,
+      "detail": "true",
+      "file": "config/providers/provider-registry.json"
+    },
+    {
+      "name": "provider-registry:health-rule:noRawProviderPayloadInCandidateResponse",
+      "passed": true,
+      "detail": "true",
+      "file": "config/providers/provider-registry.json"
+    },
+    {
+      "name": "provider:database:postgres_local:has-kind",
+      "passed": true,
+      "detail": "postgresql",
+      "file": "config/providers/provider-registry.json"
+    },
+    {
+      "name": "provider:database:postgres_local:has-mode",
+      "passed": true,
+      "detail": "local_placeholder",
+      "file": "config/providers/provider-registry.json"
+    },
+    {
+      "name": "provider:database:postgres_local:has-failure-policy",
+      "passed": true,
+      "detail": "block_backend_boot",
+      "file": "config/providers/provider-registry.json"
+    },
+    {
+      "name": "provider:database:postgres_local:has-safe-fallback",
+      "passed": true,
+      "detail": "Do not start backend without PostgreSQL truth storage.",
+      "file": "config/providers/provider-registry.json"
+    },
+    {
+      "name": "provider:database:postgres_local:env-required-array",
+      "passed": true,
+      "detail": "4",
+      "file": "config/providers/provider-registry.json"
+    },
+    {
+      "name": "provider:database:postgres_local:env-forbidden-array",
+      "passed": true,
+      "detail": "2",
+      "file": "config/providers/provider-registry.json"
+    },
+    {
+      "name": "provider:database:supabase_managed_postgres:has-kind",
+      "passed": true,
+      "detail": "supabase_postgres",
+      "file": "config/providers/provider-registry.json"
+    },
+    {
+      "name": "provider:database:supabase_managed_postgres:has-mode",
+      "passed": true,
+      "detail": "optional_remote_truth_or_dev",
+      "file": "config/providers/provider-registry.json"
+    },
+    {
+      "name": "provider:database:supabase_managed_postgres:has-failure-policy",
+      "passed": true,
+      "detail": "degrade_to_local_postgres_when_available",
+      "file": "config/providers/provider-registry.json"
+    },
+    {
+      "name": "provider:database:supabase_managed_postgres:has-safe-fallback",
+      "passed": true,
+      "detail": "Use local PostgreSQL until Supabase runtime health is configured.",
+      "file": "config/providers/provider-registry.json"
+    },
+    {
+      "name": "provider:database:supabase_managed_postgres:env-required-array",
+      "passed": true,
+      "detail": "2",
+      "file": "config/providers/provider-registry.json"
+    },
+    {
+      "name": "provider:database:supabase_managed_postgres:env-forbidden-array",
+      "passed": true,
+      "detail": "2",
+      "file": "config/providers/provider-registry.json"
+    },
+    {
+      "name": "provider:queue:redis_local:has-kind",
+      "passed": true,
+      "detail": "redis",
+      "file": "config/providers/provider-registry.json"
+    },
+    {
+      "name": "provider:queue:redis_local:has-mode",
+      "passed": true,
+      "detail": "local_placeholder",
+      "file": "config/providers/provider-registry.json"
+    },
+    {
+      "name": "provider:queue:redis_local:has-failure-policy",
+      "passed": true,
+      "detail": "block_worker_dispatch_but_keep_read_models_safe",
+      "file": "config/providers/provider-registry.json"
+    },
+    {
+      "name": "provider:queue:redis_local:has-safe-fallback",
+      "passed": true,
+      "detail": "Show provider health alert and keep API read-only where possible.",
+      "file": "config/providers/provider-registry.json"
+    },
+    {
+      "name": "provider:queue:redis_local:env-required-array",
+      "passed": true,
+      "detail": "3",
+      "file": "config/providers/provider-registry.json"
+    },
+    {
+      "name": "provider:queue:redis_local:env-forbidden-array",
+      "passed": true,
+      "detail": "2",
+      "file": "config/providers/provider-registry.json"
+    },
+    {
+      "name": "provider:storage:supabase_storage_documents:has-kind",
+      "passed": true,
+      "detail": "object_storage",
+      "file": "config/providers/provider-registry.json"
+    },
+    {
+      "name": "provider:storage:supabase_storage_documents:has-mode",
+      "passed": true,
+      "detail": "disabled_until_configured",
+      "file": "config/providers/provider-registry.json"
+    },
+    {
+      "name": "provider:storage:supabase_storage_documents:has-failure-policy",
+      "passed": true,
+      "detail": "disable_uploads_generate_action_packet",
+      "file": "config/providers/provider-registry.json"
+    },
+    {
+      "name": "provider:storage:supabase_storage_documents:has-safe-fallback",
+      "passed": true,
+      "detail": "Candidate sees upload temporarily unavailable and founder receives storage health action packet.",
+      "file": "config/providers/provider-registry.json"
+    },
+    {
+      "name": "provider:storage:supabase_storage_documents:env-required-array",
+      "passed": true,
+      "detail": "3",
+      "file": "config/providers/provider-registry.json"
+    },
+    {
+      "name": "provider:storage:supabase_storage_documents:env-forbidden-array",
+      "passed": true,
+      "detail": "2",
+      "file": "config/providers/provider-registry.json"
+    },
+    {
+      "name": "provider:storage:oracle_object_storage_future:has-kind",
+      "passed": true,
+      "detail": "object_storage",
+      "file": "config/providers/provider-registry.json"
+    },
+    {
+      "name": "provider:storage:oracle_object_storage_future:has-mode",
+      "passed": true,
+      "detail": "future_optional",
+      "file": "config/providers/provider-registry.json"
+    },
+    {
+      "name": "provider:storage:oracle_object_storage_future:has-failure-policy",
+      "passed": true,
+      "detail": "not_required_for_initial_oracle_lite",
+      "file": "config/providers/provider-registry.json"
+    },
+    {
+      "name": "provider:storage:oracle_object_storage_future:has-safe-fallback",
+      "passed": true,
+      "detail": "Remain on configured signed-upload provider.",
+      "file": "config/providers/provider-registry.json"
+    },
+    {
+      "name": "provider:storage:oracle_object_storage_future:env-required-array",
+      "passed": true,
+      "detail": "0",
+      "file": "config/providers/provider-registry.json"
+    },
+    {
+      "name": "provider:storage:oracle_object_storage_future:env-forbidden-array",
+      "passed": true,
+      "detail": "4",
+      "file": "config/providers/provider-registry.json"
+    },
+    {
+      "name": "provider:email:no_send_email:has-kind",
+      "passed": true,
+      "detail": "email",
+      "file": "config/providers/provider-registry.json"
+    },
+    {
+      "name": "provider:email:no_send_email:has-mode",
+      "passed": true,
+      "detail": "preview_only",
+      "file": "config/providers/provider-registry.json"
+    },
+    {
+      "name": "provider:email:no_send_email:has-failure-policy",
+      "passed": true,
+      "detail": "safe_preview_only",
+      "file": "config/providers/provider-registry.json"
+    },
+    {
+      "name": "provider:email:no_send_email:has-safe-fallback",
+      "passed": true,
+      "detail": "Write message preview/evidence but do not send externally.",
+      "file": "config/providers/provider-registry.json"
+    },
+    {
+      "name": "provider:email:no_send_email:env-required-array",
+      "passed": true,
+      "detail": "2",
+      "file": "config/providers/provider-registry.json"
+    },
+    {
+      "name": "provider:email:no_send_email:env-forbidden-array",
+      "passed": true,
+      "detail": "0",
+      "file": "config/providers/provider-registry.json"
+    },
+    {
+      "name": "provider:email:smtp_provider:has-kind",
+      "passed": true,
+      "detail": "email",
+      "file": "config/providers/provider-registry.json"
+    },
+    {
+      "name": "provider:email:smtp_provider:has-mode",
+      "passed": true,
+      "detail": "disabled_until_credentials",
+      "file": "config/providers/provider-registry.json"
+    },
+    {
+      "name": "provider:email:smtp_provider:has-failure-policy",
+      "passed": true,
+      "detail": "switch_to_no_send_and_alert_founder",
+      "file": "config/providers/provider-registry.json"
+    },
+    {
+      "name": "provider:email:smtp_provider:has-safe-fallback",
+      "passed": true,
+      "detail": "Queue message, generate founder action packet, and keep candidate portal status visible.",
+      "file": "config/providers/provider-registry.json"
+    },
+    {
+      "name": "provider:email:smtp_provider:env-required-array",
+      "passed": true,
+      "detail": "3",
+      "file": "config/providers/provider-registry.json"
+    },
+    {
+      "name": "provider:email:smtp_provider:env-forbidden-array",
+      "passed": true,
+      "detail": "2",
+      "file": "config/providers/provider-registry.json"
+    },
+    {
+      "name": "provider:whatsapp:whatsapp_disabled:has-kind",
+      "passed": true,
+      "detail": "whatsapp",
+      "file": "config/providers/provider-registry.json"
+    },
+    {
+      "name": "provider:whatsapp:whatsapp_disabled:has-mode",
+      "passed": true,
+      "detail": "disabled_until_approved_templates",
+      "file": "config/providers/provider-registry.json"
+    },
+    {
+      "name": "provider:whatsapp:whatsapp_disabled:has-failure-policy",
+      "passed": true,
+      "detail": "use_email_primary_and_portal_status",
+      "file": "config/providers/provider-registry.json"
+    },
+    {
+      "name": "provider:whatsapp:whatsapp_disabled:has-safe-fallback",
+      "passed": true,
+      "detail": "Do not send WhatsApp. Use email and portal status unless emergency channel is configured.",
+      "file": "config/providers/provider-registry.json"
+    },
+    {
+      "name": "provider:whatsapp:whatsapp_disabled:env-required-array",
+      "passed": true,
+      "detail": "3",
+      "file": "config/providers/provider-registry.json"
+    },
+    {
+      "name": "provider:whatsapp:whatsapp_disabled:env-forbidden-array",
+      "passed": true,
+      "detail": "3",
+      "file": "config/providers/provider-registry.json"
+    },
+    {
+      "name": "provider:sms:sms_disabled:has-kind",
+      "passed": true,
+      "detail": "sms",
+      "file": "config/providers/provider-registry.json"
+    },
+    {
+      "name": "provider:sms:sms_disabled:has-mode",
+      "passed": true,
+      "detail": "disabled_until_configured",
+      "file": "config/providers/provider-registry.json"
+    },
+    {
+      "name": "provider:sms:sms_disabled:has-failure-policy",
+      "passed": true,
+      "detail": "use_email_primary_and_portal_status",
+      "file": "config/providers/provider-registry.json"
+    },
+    {
+      "name": "provider:sms:sms_disabled:has-safe-fallback",
+      "passed": true,
+      "detail": "Do not send SMS. Use email and portal status unless backup channel is configured.",
+      "file": "config/providers/provider-registry.json"
+    },
+    {
+      "name": "provider:sms:sms_disabled:env-required-array",
+      "passed": true,
+      "detail": "3",
+      "file": "config/providers/provider-registry.json"
+    },
+    {
+      "name": "provider:sms:sms_disabled:env-forbidden-array",
+      "passed": true,
+      "detail": "3",
+      "file": "config/providers/provider-registry.json"
+    },
+    {
+      "name": "provider:payments:manual_eft_proof:has-kind",
+      "passed": true,
+      "detail": "payment",
+      "file": "config/providers/provider-registry.json"
+    },
+    {
+      "name": "provider:payments:manual_eft_proof:has-mode",
+      "passed": true,
+      "detail": "manual_proof_review",
+      "file": "config/providers/provider-registry.json"
+    },
+    {
+      "name": "provider:payments:manual_eft_proof:has-failure-policy",
+      "passed": true,
+      "detail": "operator_or_founder_review_required",
+      "file": "config/providers/provider-registry.json"
+    },
+    {
+      "name": "provider:payments:manual_eft_proof:has-safe-fallback",
+      "passed": true,
+      "detail": "Candidate uploads proof, payment remains pending until reviewed.",
+      "file": "config/providers/provider-registry.json"
+    },
+    {
+      "name": "provider:payments:manual_eft_proof:env-required-array",
+      "passed": true,
+      "detail": "3",
+      "file": "config/providers/provider-registry.json"
+    },
+    {
+      "name": "provider:payments:manual_eft_proof:env-forbidden-array",
+      "passed": true,
+      "detail": "0",
+      "file": "config/providers/provider-registry.json"
+    },
+    {
+      "name": "provider:payments:hosted_checkout_future:has-kind",
+      "passed": true,
+      "detail": "payment",
+      "file": "config/providers/provider-registry.json"
+    },
+    {
+      "name": "provider:payments:hosted_checkout_future:has-mode",
+      "passed": true,
+      "detail": "future_disabled_until_provider_contract",
+      "file": "config/providers/provider-registry.json"
+    },
+    {
+      "name": "provider:payments:hosted_checkout_future:has-failure-policy",
+      "passed": true,
+      "detail": "disable_checkout_keep_manual_proof",
+      "file": "config/providers/provider-registry.json"
+    },
+    {
+      "name": "provider:payments:hosted_checkout_future:has-safe-fallback",
+      "passed": true,
+      "detail": "Manual proof review remains available. No raw card data is handled by Kingsmen.",
+      "file": "config/providers/provider-registry.json"
+    },
+    {
+      "name": "provider:payments:hosted_checkout_future:env-required-array",
+      "passed": true,
+      "detail": "1",
+      "file": "config/providers/provider-registry.json"
+    },
+    {
+      "name": "provider:payments:hosted_checkout_future:env-forbidden-array",
+      "passed": true,
+      "detail": "4",
+      "file": "config/providers/provider-registry.json"
+    },
+    {
+      "name": "provider:airtable:airtable_mirror_disabled:has-kind",
+      "passed": true,
+      "detail": "airtable",
+      "file": "config/providers/provider-registry.json"
+    },
+    {
+      "name": "provider:airtable:airtable_mirror_disabled:has-mode",
+      "passed": true,
+      "detail": "disabled_until_token",
+      "file": "config/providers/provider-registry.json"
+    },
+    {
+      "name": "provider:airtable:airtable_mirror_disabled:has-failure-policy",
+      "passed": true,
+      "detail": "skip_mirror_keep_postgresql_truth",
+      "file": "config/providers/provider-registry.json"
+    },
+    {
+      "name": "provider:airtable:airtable_mirror_disabled:has-safe-fallback",
+      "passed": true,
+      "detail": "PostgreSQL remains truth. Mirror jobs remain paused.",
+      "file": "config/providers/provider-registry.json"
+    },
+    {
+      "name": "provider:airtable:airtable_mirror_disabled:env-required-array",
+      "passed": true,
+      "detail": "3",
+      "file": "config/providers/provider-registry.json"
+    },
+    {
+      "name": "provider:airtable:airtable_mirror_disabled:env-forbidden-array",
+      "passed": true,
+      "detail": "2",
+      "file": "config/providers/provider-registry.json"
+    },
+    {
+      "name": "provider:playwright:playwright_disabled:has-kind",
+      "passed": true,
+      "detail": "browser_automation",
+      "file": "config/providers/provider-registry.json"
+    },
+    {
+      "name": "provider:playwright:playwright_disabled:has-mode",
+      "passed": true,
+      "detail": "disabled_until_route_adapter_ready",
+      "file": "config/providers/provider-registry.json"
+    },
+    {
+      "name": "provider:playwright:playwright_disabled:has-failure-policy",
+      "passed": true,
+      "detail": "generate_map_manual_application_package",
+      "file": "config/providers/provider-registry.json"
+    },
+    {
+      "name": "provider:playwright:playwright_disabled:has-safe-fallback",
+      "passed": true,
+      "detail": "Use verified official link, route checklist, proof-upload instruction, and MAP evidence ledger.",
+      "file": "config/providers/provider-registry.json"
+    },
+    {
+      "name": "provider:playwright:playwright_disabled:env-required-array",
+      "passed": true,
+      "detail": "5",
+      "file": "config/providers/provider-registry.json"
+    },
+    {
+      "name": "provider:playwright:playwright_disabled:env-forbidden-array",
+      "passed": true,
+      "detail": "3",
+      "file": "config/providers/provider-registry.json"
+    },
+    {
+      "name": "provider-registry:validator-path",
+      "passed": true,
+      "detail": "scripts/validators/validate-provider-health.mjs",
+      "file": "config/providers/provider-registry.json"
+    },
+    {
+      "name": "provider-registry:report-path",
+      "passed": true,
+      "detail": "reports/validation/provider-health-report.json",
+      "file": "config/providers/provider-registry.json"
+    }
+  ],
+  "nextTrackerRow": "N01.6 - scripts/phases/Invoke-KingsmenPhase.ps1"
+}
