@@ -36,7 +36,7 @@ const requiredTokens = {
     "\"submodule\": \"N09.3\"",
     "\"productionReady\": false",
     "\"packages/db/src/n09-action-packet-bridge-policy.ts\"",
-    "\"scripts/validators/validate-n09-3.mjs""
+    "\"scripts/validators/validate-n09-3.mjs\""
   ]
 };
 
@@ -71,13 +71,7 @@ function checkRequiredTokens(checks) {
     if (!exists(file)) continue;
     const content = read(file);
     for (const token of tokens) {
-      addCheck(
-        checks,
-        `contains:${file}:${token}`,
-        content.includes(token),
-        content.includes(token) ? "found" : "missing",
-        file
-      );
+      addCheck(checks, `contains:${file}:${token}`, content.includes(token), content.includes(token) ? "found" : "missing", file);
     }
   }
 }
@@ -102,13 +96,7 @@ function checkForbiddenContent(checks) {
     const content = read(file);
     for (const item of forbidden) {
       const passed = !item.pattern.test(content);
-      addCheck(
-        checks,
-        `forbidden:${file}:${item.name}`,
-        passed,
-        passed ? "not found" : "forbidden content found",
-        file
-      );
+      addCheck(checks, `forbidden:${file}:${item.name}`, passed, passed ? "not found" : "forbidden content found", file);
     }
   }
 }
@@ -121,13 +109,7 @@ async function checkTypeScriptParse(checks) {
   try {
     ts = await import("typescript");
   } catch (error) {
-    addCheck(
-      checks,
-      "typescript-parser-available",
-      false,
-      "typescript package is required for N09.3 validation. Run: npm install",
-      file
-    );
+    addCheck(checks, "typescript-parser-available", false, "typescript package is required for N09.3 validation. Run: npm install", file);
     return;
   }
 
@@ -148,9 +130,7 @@ async function checkTypeScriptParse(checks) {
     checks,
     "typescript-parse:n09-action-packet-bridge-policy.ts",
     diagnostics.length === 0,
-    diagnostics.length === 0
-      ? "parsed"
-      : diagnostics.map((d) => String(d.messageText)).join(" | "),
+    diagnostics.length === 0 ? "parsed" : diagnostics.map((d) => String(d.messageText)).join(" | "),
     file
   );
 }
@@ -168,13 +148,7 @@ function checkManifest(checks) {
 
     const manifestFiles = new Set((manifest.files ?? []).map((entry) => entry.path));
     for (const required of requiredFiles) {
-      addCheck(
-        checks,
-        `manifest:includes:${required}`,
-        manifestFiles.has(required),
-        manifestFiles.has(required) ? "included" : "missing",
-        file
-      );
+      addCheck(checks, `manifest:includes:${required}`, manifestFiles.has(required), manifestFiles.has(required) ? "included" : "missing", file);
     }
   } catch (error) {
     addCheck(checks, "manifest:json-parse", false, error instanceof Error ? error.message : "parse failed", file);
@@ -182,18 +156,15 @@ function checkManifest(checks) {
 }
 
 function buildChecksums() {
-  return requiredFiles
-    .filter((file) => exists(file))
-    .map((file) => ({
-      path: file,
-      sha256: sha256(read(file)),
-      bytes: Buffer.byteLength(read(file), "utf8")
-    }));
+  return requiredFiles.filter((file) => exists(file)).map((file) => ({
+    path: file,
+    sha256: sha256(read(file)),
+    bytes: Buffer.byteLength(read(file), "utf8")
+  }));
 }
 
 async function main() {
   const checks = [];
-
   checkRequiredFiles(checks);
   checkRequiredTokens(checks);
   checkForbiddenContent(checks);
@@ -213,14 +184,11 @@ async function main() {
     checksums: buildChecksums(),
     failed,
     checks,
-    nextTrackerRow: failed.length === 0
-      ? "CREATOR.1 - scripts/KINGSMEN_CREATOR.ps1"
-      : "N09.3 repair - fix failed checks in reports/n09/n09-3-validation-report.json"
+    nextTrackerRow: failed.length === 0 ? "CREATOR.1 - scripts/KINGSMEN_CREATOR.ps1" : "N09.3 repair - fix failed checks in reports/n09/n09-3-validation-report.json"
   };
 
   fs.mkdirSync(path.dirname(reportPath), { recursive: true });
   fs.writeFileSync(reportPath, JSON.stringify(report, null, 2));
-
   console.log(JSON.stringify(report, null, 2));
   process.exit(report.passed ? 0 : 1);
 }
@@ -236,11 +204,7 @@ main().catch((error) => {
     passed: false,
     totalChecks: 1,
     failedChecks: 1,
-    failed: [{
-      name: "validator:unhandled-error",
-      passed: false,
-      detail: error instanceof Error ? error.message : String(error)
-    }],
+    failed: [{ name: "validator:unhandled-error", passed: false, detail: error instanceof Error ? error.message : String(error) }],
     nextTrackerRow: "N09.3 repair - validator crashed"
   };
   fs.writeFileSync(reportPath, JSON.stringify(report, null, 2));
