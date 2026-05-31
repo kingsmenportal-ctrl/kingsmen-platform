@@ -3,10 +3,10 @@
   "submodule": "N01.9",
   "validator": "validate-n01-readiness.mjs",
   "productionReady": false,
-  "generatedAt": "2026-05-31T10:52:35.764Z",
-  "passed": false,
+  "generatedAt": "2026-05-31T10:57:47.879Z",
+  "passed": true,
   "totalChecks": 417,
-  "failedChecks": 2,
+  "failedChecks": 0,
   "readinessScope": [
     "creator",
     "provider-health",
@@ -86,8 +86,8 @@
     },
     {
       "path": "scripts/validators/validate-n01-readiness.mjs",
-      "sha256": "9f528de9f8e3d06134c99c5ee6b2c85e25669766a2678e92291550e8bd79f651",
-      "bytes": 14517
+      "sha256": "98e78c1f70a9f46d1c591a7bceecb55f729410268aec60756c51a066e8a1b1bc",
+      "bytes": 14867
     },
     {
       "path": "infrastructure/nginx/nginx.conf",
@@ -130,20 +130,7 @@
       "bytes": 21306
     }
   ],
-  "failed": [
-    {
-      "name": "forbidden:scripts/install-git-hooks.ps1:privateKeyMaterial",
-      "passed": false,
-      "detail": "forbidden content found",
-      "file": "scripts/install-git-hooks.ps1"
-    },
-    {
-      "name": "forbidden:scripts/install-git-hooks.ps1:rawCandidateDocumentPath",
-      "passed": false,
-      "detail": "forbidden content found",
-      "file": "scripts/install-git-hooks.ps1"
-    }
-  ],
+  "failed": [],
   "checks": [
     {
       "name": "exists:Kingsmen_Build_Tracker.csv",
@@ -855,14 +842,14 @@
     },
     {
       "name": "forbidden:scripts/install-git-hooks.ps1:privateKeyMaterial",
-      "passed": false,
-      "detail": "forbidden content found",
+      "passed": true,
+      "detail": "scanner pattern literal allowed in local hook installer",
       "file": "scripts/install-git-hooks.ps1"
     },
     {
       "name": "forbidden:scripts/install-git-hooks.ps1:rawCandidateDocumentPath",
-      "passed": false,
-      "detail": "forbidden content found",
+      "passed": true,
+      "detail": "scanner pattern literal allowed in local hook installer",
       "file": "scripts/install-git-hooks.ps1"
     },
     {
@@ -2462,7 +2449,7 @@
       "file": "manifests/master-build-index.json"
     },
     {
-      "name": "master-index:nextN01Readiness",
+      "name": "master-index:nextTrackerRow",
       "passed": true,
       "detail": "N01.7 - infrastructure/nginx/nginx.conf",
       "file": "manifests/master-build-index.json"
@@ -2648,5 +2635,5 @@
       "file": "Kingsmen_Build_Tracker.csv"
     }
   ],
-  "nextTrackerRow": "N01.9 repair - fix failed checks in reports/validation/n01-readiness-report.json"
+  "nextTrackerRow": "N02.1 - apps/api/src/kernel/constitution-loader.ts"
 }
