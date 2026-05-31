@@ -1,0 +1,41 @@
+{
+  "module": "OPENCLAW",
+  "submodule": "OPENCLAW.3",
+  "validator": "validate-openclaw-safety.mjs",
+  "productionReady": false,
+  "generatedAt": "2026-06-01T01:13:02.232Z",
+  "passed": true,
+  "totalChecks": 119,
+  "failedChecks": 0,
+  "checksums": [
+    { "path": "kingsmen/openclaw/openclaw-operator-policy.json", "sha256": "d48663bd739f0f0290554ed8159f380fda99bef78ae3ae7a4795e450a67e44ea", "bytes": 6099 },
+    { "path": "scripts/openclaw/Prepare-KingsmenOpenClaw.ps1", "sha256": "05254b0134cfd9fb84dbfbc2c23cba13c3495dfddc936782177908a41847013b", "bytes": 9297 },
+    { "path": "reports/openclaw/openclaw-prepare-report.json", "sha256": "3a5994c595b2a7f1241196c95451543b0ca4cee0a0861334c760325f022d8e3c", "bytes": 3943 },
+    { "path": "kingsmen/openclaw/runtime-config.json", "sha256": "3641d1cfc27801e88099d6acfaaefee82e1adce7a392bc33e9b741103be89279", "bytes": 1221 },
+    { "path": "kingsmen/openclaw/allowed-commands.json", "sha256": "091425810143892b648aaaab774494a6e4c428fe78cf07f1476ddb090310246f", "bytes": 993 },
+    { "path": "docs/openclaw/README.md", "sha256": "bcf186fb59d14c44b454fc215efadca62b6a5d8c138ea7237aa47a4280818b1e", "bytes": 465 }
+  ],
+  "failed": [],
+  "proofSummary": {
+    "gitPullCompleted": true,
+    "gitPullCommitRange": "bbb7233..920c8fe",
+    "bomRepairPulled": true,
+    "policyJsonParsed": true,
+    "runtimeConfigJsonParsed": true,
+    "allowedCommandsJsonParsed": true,
+    "prepareReportParsed": true,
+    "forbiddenContentScanPassed": true,
+    "productionReadyFalseVerified": true,
+    "openClawIsBusinessBrain": false,
+    "backendGovernsRuntime": true,
+    "postgresqlIsTruth": true,
+    "powershellCreatorMaterializes": true,
+    "validatorsProve": true,
+    "githubPreservesHistory": true,
+    "oracleLiteFirst": true,
+    "candidateSafetyWins": true,
+    "safeCommandsValidated": true,
+    "approvalBoundaryValidated": true
+  },
+  "nextTrackerRow": "ORACLE.1 - kingsmen/oracle/oracle-free-bootstrap-plan.json"
+}
