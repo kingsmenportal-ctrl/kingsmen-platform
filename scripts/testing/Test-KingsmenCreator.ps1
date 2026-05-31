@@ -70,8 +70,8 @@ try {
         }
     }
 
-    $parseErrors = $null
-    $tokens = $null
+    [System.Management.Automation.Language.Token[]] $tokens = @()
+    [System.Management.Automation.Language.ParseError[]] $parseErrors = @()
     [System.Management.Automation.Language.Parser]::ParseFile($CreatorPath, [ref]$tokens, [ref]$parseErrors) | Out-Null
     Add-Check -Name 'powershell-parse:scripts/KINGSMEN_CREATOR.ps1' -Passed ($parseErrors.Count -eq 0) -Detail ($(if ($parseErrors.Count -eq 0) { 'parsed' } else { ($parseErrors | ForEach-Object { $_.Message }) -join ' | ' })) -File 'scripts/KINGSMEN_CREATOR.ps1'
 
