@@ -1,0 +1,231 @@
+{
+  "module": "N01",
+  "submodule": "N01.6.1",
+  "name": "Kingsmen Master Build Index",
+  "version": "0.1.0",
+  "productionReady": false,
+  "status": "built_pending_manifest_validation",
+  "generatedBy": "ChatGPT + GitHub connector",
+  "repo": {
+    "owner": "kingsmenportal-ctrl",
+    "name": "kingsmen-platform",
+    "defaultBranch": "main",
+    "canonicalCreator": "scripts/KINGSMEN_CREATOR.ps1",
+    "phaseRunner": "scripts/phases/Invoke-KingsmenPhase.ps1",
+    "tracker": "Kingsmen_Build_Tracker.csv"
+  },
+  "proofDoctrine": {
+    "trackerIsBuildStatusAuthority": true,
+    "chatIsSpecificationNotProof": true,
+    "githubCommitIsProofMemory": true,
+    "noClaimWithoutFilePath": true,
+    "noFilePathWithoutContent": true,
+    "noContentWithoutValidator": true,
+    "noValidatorWithoutReport": true,
+    "noUiClaimWithoutClickableInteraction": true,
+    "noProductionClaimWithoutRuntimeProof": true
+  },
+  "globalLocks": {
+    "oracleLiteFirst": true,
+    "postgresqlTruth": true,
+    "airtableMirrorOnly": true,
+    "emailPrimary": true,
+    "whatsappUrgentOnly": true,
+    "smsBackupOnly": true,
+    "playwrightScoutOnly": true,
+    "allSixGatesVisibleToAllUsers": true,
+    "pricingControlsServiceIntensityNotCoreAccess": true,
+    "candidateDataNeverSharedWithoutSpecificConsent": true,
+    "productionReadyMustRemainFalseUntilFinalRuntimeProof": true
+  },
+  "validatedEvidence": [
+    {
+      "module": "N09.3",
+      "status": "validated",
+      "reportPath": "reports/n09/n09-3-validation-report.json",
+      "validator": "scripts/validators/validate-n09-3.mjs",
+      "proofSummary": "N09.3 communication bridge policy, validator, and manifest passed local validation with zero failed checks."
+    },
+    {
+      "module": "CREATOR.2",
+      "status": "validated",
+      "reportPath": "reports/creator/creator-validation-report.json",
+      "validator": "scripts/testing/Test-KingsmenCreator.ps1",
+      "proofSummary": "PowerShell Creator self-test passed and proved Scaffold, Materialize, Validate, GitCommit, and FullBuild exist."
+    },
+    {
+      "module": "N01.5.2",
+      "status": "validated",
+      "reportPath": "reports/validation/provider-health-report.json",
+      "validator": "scripts/validators/validate-provider-health.mjs",
+      "proofSummary": "Provider health validator passed with 186 checks, zero failed checks, and confirmed safe Oracle Lite defaults."
+    },
+    {
+      "module": "N01.6",
+      "status": "validated",
+      "reportPath": "reports/phases/n01-6-phase-runner-report.json",
+      "validator": "scripts/phases/Invoke-KingsmenPhase.ps1",
+      "proofSummary": "Phase runner listed phases and validated Infrastructure_Gate by rerunning provider-health successfully."
+    }
+  ],
+  "phaseIndex": [
+    {
+      "phase": 1,
+      "phaseName": "Close_Open_Wound",
+      "currentStatus": "validated",
+      "modules": ["N09.3.1", "N09.3.2", "N09.3.3"],
+      "requiredReports": ["reports/n09/n09-3-validation-report.json"],
+      "nextAction": "none"
+    },
+    {
+      "phase": 2,
+      "phaseName": "Build_Materializer",
+      "currentStatus": "validated_foundation",
+      "modules": ["CREATOR.1", "CREATOR.2", "CREATOR.3", "CREATOR.4", "CREATOR.5"],
+      "requiredReports": [
+        "reports/creator/creator-validation-report.json",
+        "reports/creator/git-hooks-install-report.json"
+      ],
+      "nextAction": "Ensure git-hooks install report exists after local installation."
+    },
+    {
+      "phase": 3,
+      "phaseName": "Infrastructure_Gate",
+      "currentStatus": "in_progress",
+      "modules": ["N01.5", "N01.5.1", "N01.5.2", "N01.6", "N01.6.1", "N01.7", "N01.7.1", "N01.8", "N01.8.1", "N01.9"],
+      "requiredReports": [
+        "reports/validation/provider-health-report.json",
+        "reports/phases/n01-6-phase-runner-report.json"
+      ],
+      "nextAction": "N01.7 - infrastructure/nginx/nginx.conf"
+    },
+    {
+      "phase": 4,
+      "phaseName": "First_Clickable_Surface",
+      "currentStatus": "not_started",
+      "modules": ["UI.1", "UI.1.1", "UI.1.2", "UI.1.3", "UI.2", "UI.2.1", "UI.2.2", "UI.2.3", "UI.3", "UI.3.1", "UI.3.2", "UI.3.3"],
+      "requiredReports": ["reports/ui/first-clickable-surface-report.json"],
+      "nextAction": "Wait until N01 infrastructure gate closes."
+    }
+  ],
+  "artifactIndex": {
+    "foundation": [
+      {
+        "path": "Kingsmen_Build_Tracker.csv",
+        "type": "csv",
+        "status": "built",
+        "validator": "scripts/validators/validate-tracker.mjs",
+        "reportPath": "reports/tracker/tracker-validation-report.json"
+      },
+      {
+        "path": "config/creator.config.json",
+        "type": "json",
+        "status": "built",
+        "validator": "scripts/phases/Invoke-KingsmenPhase.ps1",
+        "reportPath": "reports/phases/n01-6-phase-runner-report.json"
+      },
+      {
+        "path": "manifests/master-build-index.json",
+        "type": "json",
+        "status": "built_pending_manifest_validation",
+        "validator": "scripts/validators/validate-master-build-index.mjs",
+        "reportPath": "reports/validation/master-build-index-report.json"
+      }
+    ],
+    "creator": [
+      {
+        "path": "scripts/KINGSMEN_CREATOR.ps1",
+        "type": "powershell",
+        "status": "validated",
+        "validator": "scripts/testing/Test-KingsmenCreator.ps1",
+        "reportPath": "reports/creator/creator-validation-report.json"
+      },
+      {
+        "path": "scripts/testing/Test-KingsmenCreator.ps1",
+        "type": "powershell",
+        "status": "validated",
+        "validator": "scripts/testing/Test-KingsmenCreator.ps1",
+        "reportPath": "reports/creator/creator-validation-report.json"
+      },
+      {
+        "path": "scripts/install-git-hooks.ps1",
+        "type": "powershell",
+        "status": "built_pending_local_install_report",
+        "validator": "scripts/install-git-hooks.ps1",
+        "reportPath": "reports/creator/git-hooks-install-report.json"
+      }
+    ],
+    "n01_infrastructure": [
+      {
+        "path": "config/environment/.env.template",
+        "type": "env_template",
+        "status": "validated",
+        "validator": "scripts/validators/validate-provider-health.mjs",
+        "reportPath": "reports/validation/provider-health-report.json"
+      },
+      {
+        "path": "config/providers/provider-registry.json",
+        "type": "json",
+        "status": "validated",
+        "validator": "scripts/validators/validate-provider-health.mjs",
+        "reportPath": "reports/validation/provider-health-report.json"
+      },
+      {
+        "path": "scripts/validators/validate-provider-health.mjs",
+        "type": "javascript_validator",
+        "status": "validated",
+        "validator": "scripts/validators/validate-provider-health.mjs",
+        "reportPath": "reports/validation/provider-health-report.json"
+      },
+      {
+        "path": "scripts/phases/Invoke-KingsmenPhase.ps1",
+        "type": "powershell_runner",
+        "status": "validated",
+        "validator": "scripts/phases/Invoke-KingsmenPhase.ps1",
+        "reportPath": "reports/phases/n01-6-phase-runner-report.json"
+      }
+    ],
+    "n09_open_wound": [
+      {
+        "path": "packages/db/src/n09-action-packet-bridge-policy.ts",
+        "type": "typescript",
+        "status": "validated",
+        "validator": "scripts/validators/validate-n09-3.mjs",
+        "reportPath": "reports/n09/n09-3-validation-report.json"
+      },
+      {
+        "path": "scripts/validators/validate-n09-3.mjs",
+        "type": "javascript_validator",
+        "status": "validated",
+        "validator": "scripts/validators/validate-n09-3.mjs",
+        "reportPath": "reports/n09/n09-3-validation-report.json"
+      },
+      {
+        "path": "manifests/modules/N09.3-communications-contracts.json",
+        "type": "json_manifest",
+        "status": "validated",
+        "validator": "scripts/validators/validate-n09-3.mjs",
+        "reportPath": "reports/n09/n09-3-validation-report.json"
+      }
+    ]
+  },
+  "validationRules": {
+    "manifestMustRemainJsonParseable": true,
+    "allPathsMustBeRelativeRepoPaths": true,
+    "productionReadyMustBeFalse": true,
+    "validatorsMustWriteReports": true,
+    "reportsMustHavePassedBoolean": true,
+    "reportsMustHaveFailedChecks": true,
+    "newFilesMustMapToTrackerRows": true,
+    "phaseAdvancementRequiresReport": true
+  },
+  "blockedContent": {
+    "productionReadyTrue": true,
+    "hardcodedSecrets": true,
+    "candidateDocumentsInRepo": true,
+    "rawEvidenceInRepo": true,
+    "privateKeyMaterial": true,
+    "serviceRoleExposure": true
+  },
+  "nextTrackerRow": "N01.7 - infrastructure/nginx/nginx.conf"
+}
