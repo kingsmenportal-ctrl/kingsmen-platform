@@ -3,10 +3,10 @@
   "submodule": "N01.8.1",
   "validator": "validate-health.mjs",
   "productionReady": false,
-  "generatedAt": "2026-05-31T10:43:06.264Z",
-  "passed": false,
-  "totalChecks": 103,
-  "failedChecks": 1,
+  "generatedAt": "2026-05-31T10:48:23.889Z",
+  "passed": true,
+  "totalChecks": 112,
+  "failedChecks": 0,
   "healthScope": [
     "nginx",
     "docker-compose",
@@ -36,18 +36,11 @@
     },
     {
       "path": "scripts/validators/validate-health.mjs",
-      "sha256": "e0d5ab247b81352cb40ea65908b5a59e01a059fba7fde33d8f7f682684cb6f42",
-      "bytes": 10155
+      "sha256": "bc328a9edf38bf0e9dcbeebb0b222de805f99a7e6662e7597a3570357383efb9",
+      "bytes": 10280
     }
   ],
-  "failed": [
-    {
-      "name": "maintenance-report:json-parse",
-      "passed": false,
-      "detail": "Unexpected token '﻿', \"﻿{\r\n    \"m\"... is not valid JSON",
-      "file": "reports/maintenance/prune-logs-report.json"
-    }
-  ],
+  "failed": [],
   "checks": [
     {
       "name": "exists:infrastructure/nginx/nginx.conf",
@@ -663,10 +656,64 @@
     },
     {
       "name": "maintenance-report:json-parse",
-      "passed": false,
-      "detail": "Unexpected token '﻿', \"﻿{\r\n    \"m\"... is not valid JSON",
+      "passed": true,
+      "detail": "parsed",
+      "file": "reports/maintenance/prune-logs-report.json"
+    },
+    {
+      "name": "maintenance-report:module",
+      "passed": true,
+      "detail": "N01",
+      "file": "reports/maintenance/prune-logs-report.json"
+    },
+    {
+      "name": "maintenance-report:submodule",
+      "passed": true,
+      "detail": "N01.8",
+      "file": "reports/maintenance/prune-logs-report.json"
+    },
+    {
+      "name": "maintenance-report:passed",
+      "passed": true,
+      "detail": "true",
+      "file": "reports/maintenance/prune-logs-report.json"
+    },
+    {
+      "name": "maintenance-report:failedChecksZero",
+      "passed": true,
+      "detail": "0",
+      "file": "reports/maintenance/prune-logs-report.json"
+    },
+    {
+      "name": "maintenance-report:productionReadyFalse",
+      "passed": true,
+      "detail": "false",
+      "file": "reports/maintenance/prune-logs-report.json"
+    },
+    {
+      "name": "maintenance-report:protected-root-not-prunable:candidate_documents",
+      "passed": true,
+      "detail": "not prunable",
+      "file": "reports/maintenance/prune-logs-report.json"
+    },
+    {
+      "name": "maintenance-report:protected-root-not-prunable:raw_evidence",
+      "passed": true,
+      "detail": "not prunable",
+      "file": "reports/maintenance/prune-logs-report.json"
+    },
+    {
+      "name": "maintenance-report:protected-root-not-prunable:documents",
+      "passed": true,
+      "detail": "not prunable",
+      "file": "reports/maintenance/prune-logs-report.json"
+    },
+    {
+      "name": "maintenance-report:protected-root-not-prunable:evidence",
+      "passed": true,
+      "detail": "not prunable",
       "file": "reports/maintenance/prune-logs-report.json"
     }
   ],
-  "nextTrackerRow": "N01.8.1 repair - fix failed checks in reports/validation/health-report.json"
+  "nextTrackerRow": "N01.9 - scripts/validators/validate-n01-readiness.mjs"
 }
