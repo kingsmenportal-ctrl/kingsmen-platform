@@ -1,0 +1,33 @@
+{
+  "module": "N_PROVIDER.2",
+  "validator": "validate-provider-creator-integration.mjs",
+  "generated_at": "2026-06-02T02:35:00.591Z",
+  "passed": true,
+  "errors": [],
+  "warnings": [],
+  "required_files": [
+    "n-provider-1/provider-registry.json",
+    "n-provider-1/provider-states.schema.json",
+    "n-provider-1/validate-provider-registry.mjs",
+    "n-provider-1/validate-local-tools.mjs",
+    "n-provider-1/install-windows-tools.ps1",
+    "n-provider-2/Invoke-KingsmenProvider.ps1",
+    "n-provider-2/KINGSMEN_PROVIDER_CREATOR_INTEGRATION.md"
+  ],
+  "checksums": {
+    "n-provider-1/provider-registry.json": "6ed8ad5f0e529a54d9e521c0e070aeed3cbdd66866f90cf448d90ac40e175ad9",
+    "n-provider-1/provider-states.schema.json": "96d4e9b5d2d071a0af3cbbce317df4d68c0d8bb15c58a5dbc985241932a092e8",
+    "n-provider-1/validate-provider-registry.mjs": "2ccbde750a55950e7377127acc98b0c6f3fc291296d8e37a6611db8316336716",
+    "n-provider-1/validate-local-tools.mjs": "95a8ba1043b51186a33cbc75dbefaef250fd720fe891d740415a3625bf4b3cba",
+    "n-provider-1/install-windows-tools.ps1": "a8dfda4910a4986020d49f4b7551fc67671b0543e810c49fd374863b44092725",
+    "n-provider-2/Invoke-KingsmenProvider.ps1": "be14aa294b5c87387695ab7755839725bbf9c26afca15dbfffe5f6e250dca4e1",
+    "n-provider-2/KINGSMEN_PROVIDER_CREATOR_INTEGRATION.md": "5779ffe1b04d4972173fd0105fc72aeb51bf1fe80700a3f9afa91563a51f939b"
+  },
+  "safety": {
+    "no_raw_secret_values_checked_by_design": true,
+    "routes_to_n_provider_1_validators": true,
+    "optional_providers_disabled_until_gated": true,
+    "airtable_mirror_only": true,
+    "email_first": true
+  }
+}

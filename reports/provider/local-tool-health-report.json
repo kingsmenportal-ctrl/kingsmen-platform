@@ -1,7 +1,7 @@
 {
   "module": "N_PROVIDER.1",
   "validator": "validate-local-tools.mjs",
-  "generated_at": "2026-06-02T01:22:53.216Z",
+  "generated_at": "2026-06-02T02:34:50.924Z",
   "passed": true,
   "missing_required": [],
   "tools": [
