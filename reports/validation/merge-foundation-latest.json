@@ -1,0 +1,31 @@
+{
+  "schema": "kingsmen.validation-report.v1",
+  "module": "BATCH 01 — Merge Foundation",
+  "status": "BUILT_PENDING_VALIDATION",
+  "passed": false,
+  "generated_at": "2026-06-01T00:00:00+02:00",
+  "reason": "Initial report file created before validator execution. Run scripts/validators/validate-merge-foundation.mjs locally or in CI to update proof.",
+  "files_expected": [
+    "docs/constitution/reality-trained-kingsmen-constitution.md",
+    "manifests/proof/proof-standard.json",
+    "manifests/tools/tool-registry.json",
+    "manifests/credentials/credentials.registry.json",
+    "manifests/providers/provider-registry.json",
+    "manifests/reality/source-confidence-bands.json",
+    "manifests/business/package-catalogue.json",
+    "scripts/validators/validate-merge-foundation.mjs",
+    "reports/validation/merge-foundation-latest.json",
+    ".github/ISSUE_TEMPLATE/kingsmen-module.yml"
+  ],
+  "files_checked": 0,
+  "missing_files": [],
+  "failed_checks": [
+    "validator_not_yet_executed"
+  ],
+  "warnings": [
+    "This report is a seed report. It must be replaced by validator output after local or CI execution."
+  ],
+  "oracle_lite_impact": "none_runtime_yet",
+  "control_plane_impact": "Build Proof Centre later reads this report to show BATCH 01 proof status.",
+  "next_action": "Run node scripts/validators/validate-merge-foundation.mjs after dependencies/runtime are available."
+}
