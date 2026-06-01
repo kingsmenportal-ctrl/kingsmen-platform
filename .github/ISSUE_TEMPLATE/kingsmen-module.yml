@@ -1,0 +1,125 @@
+name: Kingsmen Module
+about: Track a Kingsmen module from doctrine to proof
+labels: ["kingsmen", "module", "proof-required"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Use this template for Kingsmen work that must become repo files, validators, reports, and Control Plane proof. Do not mark work complete from chat alone.
+  - type: input
+    id: module
+    attributes:
+      label: Module / Batch
+      description: Example: BATCH 02 — Creator Normalize, GROWTH.2 — Micro-Fact Content Engine, N21 — Mirror Intelligence
+    validations:
+      required: true
+  - type: dropdown
+    id: status
+    attributes:
+      label: Current proof status
+      options:
+        - NOT_STARTED
+        - DESIGNED
+        - BUILT_PENDING_VALIDATION
+        - VALIDATED
+        - RUNTIME_PROVEN
+        - STAGING_PROVEN
+        - PRODUCTION_READY
+        - PRODUCTION_ACTIVE
+        - PAUSED
+        - REPLACED
+        - ARCHIVED_FOR_FUTURE
+    validations:
+      required: true
+  - type: textarea
+    id: purpose
+    attributes:
+      label: Purpose
+      description: Why this module exists in Kingsmen.
+    validations:
+      required: true
+  - type: textarea
+    id: doctrine
+    attributes:
+      label: Doctrine / Reality Source
+      description: Which Kingsmen law, uploaded build history, public reality, or business rule requires this module?
+    validations:
+      required: true
+  - type: textarea
+    id: repo_paths
+    attributes:
+      label: Required repo paths
+      description: List exact files to create, update, validate, or archive.
+      placeholder: |
+        docs/...
+        manifests/...
+        packages/contracts/...
+        apps/api/...
+        apps/web/...
+        scripts/validators/...
+        reports/...
+    validations:
+      required: true
+  - type: textarea
+    id: validator
+    attributes:
+      label: Validator and report
+      description: Name the validator and report path required for proof.
+      placeholder: |
+        Validator: scripts/validators/validate-....mjs
+        Report: reports/.../latest.json
+    validations:
+      required: true
+  - type: textarea
+    id: control_plane
+    attributes:
+      label: Control Plane impact
+      description: Where will founder/operator see this module, proof, risk, or next action?
+    validations:
+      required: false
+  - type: textarea
+    id: oracle_lite
+    attributes:
+      label: Oracle Lite impact
+      description: CPU/RAM/storage/queue/provider impact and wake/sleep discipline.
+    validations:
+      required: false
+  - type: textarea
+    id: risks
+    attributes:
+      label: Risks / forbidden behavior
+      description: What must this module never do?
+      placeholder: |
+        No fake guarantees.
+        No raw secrets.
+        No unverified fees/deadlines.
+        No CAPTCHA/OTP bypass.
+    validations:
+      required: true
+  - type: textarea
+    id: acceptance
+    attributes:
+      label: Acceptance proof
+      description: What must exist before this issue can close?
+      placeholder: |
+        - Files exist
+        - Validator passes
+        - Report written
+        - Git checkpoint exists
+        - UI/API/runtime proof where relevant
+    validations:
+      required: true
+  - type: checkboxes
+    id: proof_checks
+    attributes:
+      label: Proof checklist
+      options:
+        - label: Exact repo paths identified
+        - label: Validator identified
+        - label: Report path identified
+        - label: Source-confidence impact checked
+        - label: Package/access law checked
+        - label: Tool/credential/provider impact checked
+        - label: Oracle Lite impact checked
+        - label: Founder approval requirement checked
+        - label: What remains unproven is stated
