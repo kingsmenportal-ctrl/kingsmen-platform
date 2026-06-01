@@ -1,0 +1,51 @@
+{
+  "module": "N_PROVIDER.4",
+  "name": "ChatGPT Connected Apps Reality Checker",
+  "version": "1.0.0",
+  "source_evidence": {
+    "chatgpt_apps_menu_visible_count": 24,
+    "google_drive_reference_document_id": "17kXGYrjHHY2tBdveCP6fzs9r64nbQwavlCUkw23jTQI",
+    "google_drive_reference_title": "N_PROVIDER.4 - ChatGPT Connected Apps Reality Checker"
+  },
+  "doctrine": {
+    "connected_in_chatgpt_ui_does_not_mean_production_safe": true,
+    "truth_source": "postgresql",
+    "airtable_mode": "mirror_only",
+    "communication_primary": "email",
+    "deployment_default": "oracle_lite",
+    "optional_provider_policy": "off_until_validated"
+  },
+  "status_values": [
+    "CALLABLE_NOW_CONFIRMED",
+    "TOOL_AVAILABLE_NOT_YET_N4_TESTED",
+    "VISIBLE_UNTESTED",
+    "OFF_UNTIL_GATED",
+    "UNKNOWN_OFF"
+  ],
+  "apps": [
+    {"id":"ai_wisebase","display_name":"AI Wisebase","category":"knowledge_reference","visible_in_chatgpt_apps":true,"chatgpt_access_status":"VISIBLE_UNTESTED","safe_default":"REFERENCE_ONLY"},
+    {"id":"airtable","display_name":"Airtable","category":"business_mirror_control","visible_in_chatgpt_apps":true,"chatgpt_access_status":"CALLABLE_NOW_CONFIRMED","safe_default":"MIRROR_ONLY"},
+    {"id":"b12_website_generator","display_name":"B12 Website Generator","category":"website_generation","visible_in_chatgpt_apps":true,"chatgpt_access_status":"VISIBLE_UNTESTED","safe_default":"PREVIEW_ONLY"},
+    {"id":"canva","display_name":"Canva","category":"brand_marketing_assets","visible_in_chatgpt_apps":true,"chatgpt_access_status":"VISIBLE_UNTESTED","safe_default":"DESIGN_ONLY"},
+    {"id":"catalyst_by_zoho","display_name":"Catalyst by Zoho","category":"optional_dev_deploy","visible_in_chatgpt_apps":true,"chatgpt_access_status":"VISIBLE_UNTESTED","safe_default":"OFF_UNTIL_GATED"},
+    {"id":"github","display_name":"GitHub","category":"repo_proof_build","visible_in_chatgpt_apps":true,"chatgpt_access_status":"CALLABLE_NOW_CONFIRMED","safe_default":"ON"},
+    {"id":"gmail","display_name":"Gmail","category":"communications","visible_in_chatgpt_apps":true,"chatgpt_access_status":"CALLABLE_NOW_CONFIRMED","safe_default":"TEST_OR_APPROVAL_REQUIRED"},
+    {"id":"google_calendar","display_name":"Google Calendar","category":"scheduling","visible_in_chatgpt_apps":true,"chatgpt_access_status":"TOOL_AVAILABLE_NOT_YET_N4_TESTED","safe_default":"ON_WITH_CONFIRMATION"},
+    {"id":"google_contacts","display_name":"Google Contacts","category":"contacts_outreach","visible_in_chatgpt_apps":true,"chatgpt_access_status":"TOOL_AVAILABLE_NOT_YET_N4_TESTED","safe_default":"LOOKUP_ONLY"},
+    {"id":"google_drive","display_name":"Google Drive","category":"documents_reports_storage","visible_in_chatgpt_apps":true,"chatgpt_access_status":"CALLABLE_NOW_CONFIRMED","safe_default":"ON_FOR_BUSINESS_DOCS"},
+    {"id":"indeed","display_name":"Indeed","category":"opportunity_research","visible_in_chatgpt_apps":true,"chatgpt_access_status":"VISIBLE_UNTESTED","safe_default":"RESEARCH_ONLY"},
+    {"id":"internshala","display_name":"Internshala","category":"opportunity_research","visible_in_chatgpt_apps":true,"chatgpt_access_status":"VISIBLE_UNTESTED","safe_default":"RESEARCH_ONLY"},
+    {"id":"jotform","display_name":"Jotform","category":"intake_forms","visible_in_chatgpt_apps":true,"chatgpt_access_status":"VISIBLE_UNTESTED","safe_default":"FALLBACK_TEST"},
+    {"id":"lovable","display_name":"Lovable","category":"ui_prototype","visible_in_chatgpt_apps":true,"chatgpt_access_status":"VISIBLE_UNTESTED","safe_default":"PROTOTYPE_ONLY"},
+    {"id":"midpage_legal_research","display_name":"Midpage Legal Research","category":"legal_compliance_research","visible_in_chatgpt_apps":true,"chatgpt_access_status":"VISIBLE_UNTESTED","safe_default":"RESEARCH_SUPPORT"},
+    {"id":"namecheap","display_name":"Namecheap","category":"domain_dns","visible_in_chatgpt_apps":true,"chatgpt_access_status":"VISIBLE_UNTESTED","safe_default":"CONFIRM_BEFORE_CHANGE"},
+    {"id":"neon_postgres","display_name":"Neon Postgres","category":"database_optional","visible_in_chatgpt_apps":true,"chatgpt_access_status":"VISIBLE_UNTESTED","safe_default":"OFF_UNTIL_GATED"},
+    {"id":"netlify","display_name":"Netlify","category":"frontend_deploy","visible_in_chatgpt_apps":true,"chatgpt_access_status":"CALLABLE_NOW_CONFIRMED","safe_default":"PREVIEW_ONLY"},
+    {"id":"norton","display_name":"Norton","category":"security_support","visible_in_chatgpt_apps":true,"chatgpt_access_status":"VISIBLE_UNTESTED","safe_default":"SUPPORT_ONLY"},
+    {"id":"openai_platform","display_name":"OpenAI Platform","category":"ai_provider","visible_in_chatgpt_apps":true,"chatgpt_access_status":"VISIBLE_UNTESTED","safe_default":"OFF_UNTIL_GATED"},
+    {"id":"paypal","display_name":"PayPal","category":"payments","visible_in_chatgpt_apps":true,"chatgpt_access_status":"VISIBLE_UNTESTED","safe_default":"LIVE_PAYMENTS_OFF"},
+    {"id":"replit","display_name":"Replit","category":"cloud_coding_sandbox","visible_in_chatgpt_apps":true,"chatgpt_access_status":"VISIBLE_UNTESTED","safe_default":"EXPERIMENT_ONLY"},
+    {"id":"softonic","display_name":"Softonic","category":"software_discovery","visible_in_chatgpt_apps":true,"chatgpt_access_status":"VISIBLE_UNTESTED","safe_default":"LOW_TRUST_RESEARCH"},
+    {"id":"vivin","display_name":"Vivin","category":"unknown","visible_in_chatgpt_apps":true,"chatgpt_access_status":"UNKNOWN_OFF","safe_default":"UNKNOWN_OFF"}
+  ]
+}
