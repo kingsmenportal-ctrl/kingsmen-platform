@@ -1,0 +1,100 @@
+{
+  "schema": "kingsmen.source-confidence.v1",
+  "batch": "BATCH 01 — Merge Foundation",
+  "status": "BUILT_PENDING_VALIDATION",
+  "authority_levels": [
+    {
+      "level": 1,
+      "name": "official_authority",
+      "description": "Official institution, government, provider, or verified domain source."
+    },
+    {
+      "level": 2,
+      "name": "direct_verified_provider_evidence",
+      "description": "Direct evidence from a verified partner, employer, accommodation owner, institution, or provider."
+    },
+    {
+      "level": 3,
+      "name": "public_aggregator",
+      "description": "Public directory, job board, bursary platform, accommodation platform, or non-official aggregator."
+    },
+    {
+      "level": 4,
+      "name": "social_or_community_lead",
+      "description": "Social media post, WhatsApp rumour, user-submitted name, community lead, or screenshot."
+    },
+    {
+      "level": 5,
+      "name": "unknown_or_unverified",
+      "description": "Source identity, owner, provider, or claim cannot yet be verified."
+    }
+  ],
+  "confidence_bands": [
+    "UNVERIFIED",
+    "LOW_CONFIDENCE",
+    "MEDIUM_CONFIDENCE",
+    "HIGH_CONFIDENCE",
+    "FROZEN_VERIFIED",
+    "STALE",
+    "CONFLICTED",
+    "REJECTED",
+    "SCAM_RISK"
+  ],
+  "claim_levels": [
+    {
+      "level": 0,
+      "name": "general_kingsmen_service_claim",
+      "risk": "low",
+      "examples": ["Kingsmen helps map routes, documents, accommodation needs, CV readiness, and source checks."],
+      "requires_verified_source": false,
+      "requires_approval": false
+    },
+    {
+      "level": 1,
+      "name": "stable_public_route_fact",
+      "risk": "medium_low",
+      "examples": ["TVET colleges are part of the public post-school system.", "NSFAS funding is separate from admission."],
+      "requires_verified_source": true,
+      "requires_approval": false
+    },
+    {
+      "level": 2,
+      "name": "named_route_anchor",
+      "risk": "medium_low",
+      "examples": ["UJ, DUT, UKZN, UNISA, TVET colleges, Services SETA, NSFAS."],
+      "requires_verified_source": true,
+      "requires_approval": false,
+      "restriction": "Must not imply partnership, current opening, acceptance, funding, job, or accommodation availability."
+    },
+    {
+      "level": 3,
+      "name": "specific_current_claim",
+      "risk": "high",
+      "examples": ["A bursary is open", "A learnership closes on a specific date", "An accommodation listing is available"],
+      "requires_verified_source": true,
+      "requires_approval": true
+    },
+    {
+      "level": 4,
+      "name": "money_deadline_payment_or_success_claim",
+      "risk": "very_high",
+      "examples": ["fee amount", "payment instruction", "deposit amount", "funding status", "candidate accepted", "candidate placed", "candidate found accommodation"],
+      "requires_verified_source": true,
+      "requires_approval": true,
+      "requires_proof_or_consent_when_about_outcomes": true
+    }
+  ],
+  "hard_blocks": [
+    "Do not publish unverified fees, deadlines, payment instructions, funding status, application status, accommodation deposits, or current openings.",
+    "Do not mark social/community leads as verified truth.",
+    "Do not use success stories without proof and candidate consent.",
+    "Do not imply official partnership without evidence.",
+    "Do not show unverified accommodation as verified.",
+    "Do not guarantee acceptance, funding, jobs, bursaries, accommodation, or success."
+  ],
+  "source_lead_default": {
+    "initial_authority_level": 4,
+    "initial_confidence_band": "UNVERIFIED",
+    "candidate_safe_warning": "Do not pay, travel, send documents, or apply blindly until this source is verified. Kingsmen will check source confidence and show safer next actions where possible."
+  }
+}
