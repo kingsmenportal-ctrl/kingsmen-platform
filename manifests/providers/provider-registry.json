@@ -1,0 +1,139 @@
+{
+  "schema": "kingsmen.provider-registry.v1",
+  "batch": "BATCH 01 — Merge Foundation",
+  "status": "BUILT_PENDING_VALIDATION",
+  "provider_statuses": [
+    "NOT_NEEDED_YET",
+    "NOT_CONFIGURED",
+    "CONFIGURED",
+    "HEALTHY",
+    "DEGRADED",
+    "FAILING",
+    "EXPIRED",
+    "REVOKED",
+    "REPLACED"
+  ],
+  "providers": [
+    {
+      "provider_id": "github",
+      "name": "GitHub",
+      "status": "CONFIGURED",
+      "purpose": "Source control, issues, pull requests, commits, proof memory, and Actions workflows.",
+      "runtime_effect": "Repo creation and proof can proceed.",
+      "candidate_visible_effect": "None directly.",
+      "fallback": "Local Git repository if GitHub unavailable.",
+      "health_check": "repository reachable and write permission available",
+      "risk_level": "medium"
+    },
+    {
+      "provider_id": "oracle_lite",
+      "name": "Oracle Free / Oracle Lite",
+      "status": "NOT_CONFIGURED",
+      "purpose": "First constrained runtime for production-like deployment.",
+      "runtime_effect": "Deployment disabled until VM/environment is configured.",
+      "candidate_visible_effect": "No public production service until deployed.",
+      "fallback": "Local Docker runtime and GitHub proof.",
+      "health_check": "VM reachable, Docker running, services healthy, backups configured",
+      "risk_level": "critical"
+    },
+    {
+      "provider_id": "postgresql",
+      "name": "PostgreSQL",
+      "status": "NOT_CONFIGURED",
+      "purpose": "Kingsmen truth database.",
+      "runtime_effect": "API runtime cannot store real candidate/source/payment/application truth until configured.",
+      "candidate_visible_effect": "Only static/demo pages until configured.",
+      "fallback": "Static proof, test fixtures, or local development database.",
+      "health_check": "database connection and migration readiness",
+      "risk_level": "critical"
+    },
+    {
+      "provider_id": "redis",
+      "name": "Redis",
+      "status": "NOT_CONFIGURED",
+      "purpose": "Queue, locks, rate limits, and lightweight worker coordination.",
+      "runtime_effect": "Worker queue and throttling disabled until configured.",
+      "candidate_visible_effect": "Long-running jobs may be disabled or manual.",
+      "fallback": "Database-backed queue if implemented later.",
+      "health_check": "Redis ping, auth, queue depth",
+      "risk_level": "high"
+    },
+    {
+      "provider_id": "email",
+      "name": "SMTP / Email Provider",
+      "status": "NOT_CONFIGURED",
+      "purpose": "Primary tracked candidate/founder communication.",
+      "runtime_effect": "Real outbound email disabled; Mailpit/local proof only.",
+      "candidate_visible_effect": "UI must show email pending, not sent.",
+      "fallback": "Mailpit/local capture or portal continuation instructions.",
+      "health_check": "SMTP connection and test outbox proof",
+      "risk_level": "high"
+    },
+    {
+      "provider_id": "payment",
+      "name": "Payment Provider",
+      "status": "NOT_CONFIGURED",
+      "purpose": "Hosted payment flow for packages and CV Revamp.",
+      "runtime_effect": "Real payment disabled; sandbox/manual proof only.",
+      "candidate_visible_effect": "No real payment claim may be shown.",
+      "fallback": "Manual proof or test/sandbox mode.",
+      "health_check": "sandbox payment verification and webhook proof",
+      "risk_level": "critical"
+    },
+    {
+      "provider_id": "object_storage",
+      "name": "Object Storage",
+      "status": "NOT_CONFIGURED",
+      "purpose": "Document Vault and evidence storage using signed upload URLs.",
+      "runtime_effect": "Real document upload disabled until configured.",
+      "candidate_visible_effect": "Document upload must be unavailable or marked test-only.",
+      "fallback": "Local development storage only.",
+      "health_check": "signed upload and read proof",
+      "risk_level": "critical"
+    },
+    {
+      "provider_id": "openclaw",
+      "name": "OpenClaw Gateway",
+      "status": "NOT_NEEDED_YET",
+      "purpose": "Governed remote operator gateway after reports, validators, and Control Plane exist.",
+      "runtime_effect": "No OpenClaw actions run while paused/not configured.",
+      "candidate_visible_effect": "None directly.",
+      "fallback": "ChatGPT, GitHub, and manual PowerShell operation.",
+      "health_check": "gateway reachable and permission policy enforced",
+      "risk_level": "high"
+    },
+    {
+      "provider_id": "whatsapp",
+      "name": "WhatsApp Provider",
+      "status": "NOT_NEEDED_YET",
+      "purpose": "Urgent-only/ceremonial templates later; not bulk routine reminders.",
+      "runtime_effect": "WhatsApp unavailable until configured and approved.",
+      "candidate_visible_effect": "Email remains primary.",
+      "fallback": "Email and portal notices.",
+      "health_check": "approved templates and urgent-only policy",
+      "risk_level": "high"
+    },
+    {
+      "provider_id": "sms",
+      "name": "SMS Provider",
+      "status": "NOT_NEEDED_YET",
+      "purpose": "Backup-only urgent fallback later.",
+      "runtime_effect": "SMS unavailable until configured and justified.",
+      "candidate_visible_effect": "Email remains primary.",
+      "fallback": "Email and portal notices.",
+      "health_check": "test backup SMS and cost guard",
+      "risk_level": "medium"
+    },
+    {
+      "provider_id": "mailpit",
+      "name": "Mailpit",
+      "status": "NOT_CONFIGURED",
+      "purpose": "Local/test email outbox proof.",
+      "runtime_effect": "Email templates can be tested locally once configured.",
+      "candidate_visible_effect": "No real delivery claim.",
+      "fallback": "Static template validation.",
+      "health_check": "Mailpit web/API reachable",
+      "risk_level": "low"
+    }
+  ]
+}
