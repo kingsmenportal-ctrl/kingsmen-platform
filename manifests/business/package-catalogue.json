@@ -1,0 +1,106 @@
+{
+  "schema": "kingsmen.package-catalogue.v1",
+  "batch": "BATCH 01 — Merge Foundation",
+  "status": "BUILT_PENDING_VALIDATION",
+  "currency": "ZAR",
+  "currency_symbol": "R",
+  "access_law": "Packages change active managed quantity, speed, monitoring intensity, human depth, SLA, escalation, manual fallback intensity, and reporting depth. Packages do not hide the core Kingsmen route brain or core safety capabilities.",
+  "core_gates_visible_to_all": [
+    "Higher Education",
+    "TVET",
+    "SETA / Learnership",
+    "Internship",
+    "Apprenticeship",
+    "Employment"
+  ],
+  "core_capabilities_visible_to_all": [
+    "NSFAS support where relevant",
+    "Bursary readiness",
+    "Accommodation support where relevant",
+    "CV readiness where relevant",
+    "Document readiness",
+    "Source verification",
+    "Proof tracking",
+    "MAP fallback",
+    "Human-Step Handoff",
+    "Phoenix fallback"
+  ],
+  "packages": [
+    {
+      "package_id": "foundational_accord",
+      "name": "Foundational Accord",
+      "price": 169.99,
+      "currency": "ZAR",
+      "status": "CANONICAL",
+      "controls": ["entry package", "lower active managed quantity", "standard queue", "standard monitoring"]
+    },
+    {
+      "package_id": "collegiate_ordinance",
+      "name": "Collegiate Ordinance",
+      "price": 299.99,
+      "currency": "ZAR",
+      "status": "CANONICAL",
+      "controls": ["higher active managed quantity", "stronger monitoring", "faster service intensity"]
+    },
+    {
+      "package_id": "chancellors_writ",
+      "name": "Chancellor's Writ",
+      "price": 399.99,
+      "currency": "ZAR",
+      "status": "CANONICAL",
+      "controls": ["priority intensity", "deeper human review", "stronger fallback support"]
+    },
+    {
+      "package_id": "regency_mandate",
+      "name": "Regency Mandate",
+      "price": 469.99,
+      "currency": "ZAR",
+      "status": "CANONICAL",
+      "controls": ["highest package intensity", "highest queue priority", "deepest monitoring and escalation"]
+    },
+    {
+      "package_id": "artisan_charter",
+      "name": "Artisan Charter",
+      "price": 149.99,
+      "currency": "ZAR",
+      "status": "CANONICAL",
+      "controls": ["work/skills route package", "standard active managed quantity", "CV/work readiness focus"]
+    },
+    {
+      "package_id": "guildmasters_charter",
+      "name": "Guildmaster's Charter",
+      "price": 199.99,
+      "currency": "ZAR",
+      "status": "CANONICAL",
+      "controls": ["stronger work/skills route intensity", "learnership/employment support", "higher monitoring"]
+    },
+    {
+      "package_id": "cv_revamp",
+      "name": "CV Revamp",
+      "price": 49.99,
+      "currency": "ZAR",
+      "status": "CANONICAL",
+      "controls": ["standalone low-cost entry product", "CV improvement", "work/learnership/internship/apprenticeship/employment funnel"]
+    }
+  ],
+  "cv_revamp_upgrade_rule": {
+    "applies_when": "A user first pays R49.99 for CV Revamp and later upgrades to any Kingsmen package.",
+    "benefit": "+2 active managed applications/routes on top of the selected package's normal active-managed quantity.",
+    "trust_reason": "The initial CV Revamp purchase is not wasted and becomes part of the user's Kingsmen growth path."
+  },
+  "accommodation_package_privilege": {
+    "current_policy": "Users who selected a Kingsmen package currently get accommodation support access at no extra accommodation-support charge where relevant.",
+    "candidate_language": "Accommodation support is a current package privilege, subject to verification, availability, consent, and no rent/payment handling by Kingsmen."
+  },
+  "forbidden_prices_or_labels": [
+    "Basic Guidance R500",
+    "Full Support R1500",
+    "Premium R3500",
+    "Any package price not listed in this manifest unless explicitly changed by founder and validated"
+  ],
+  "growth_cap": {
+    "starting_active_candidate_cap": 500,
+    "cap_limits": "active managed volume, not core capability access",
+    "growth_modes": ["500_active_start", "1000_ready_design", "5000_ready_architecture_not_automatic"]
+  }
+}
