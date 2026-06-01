@@ -1,0 +1,32 @@
+{
+  "module": "N_PROVIDER.1",
+  "name": "Kingsmen Tool and Provider Registry",
+  "version": "1.0.0",
+  "doctrine": {
+    "truth_source": "postgresql",
+    "airtable_mode": "mirror_only",
+    "communication_primary": "email",
+    "whatsapp_policy": "urgent_only",
+    "sms_policy": "backup_only",
+    "deployment_default": "oracle_lite",
+    "secrets_policy": "never_commit_raw_secrets",
+    "optional_provider_policy": "installable_but_disabled_until_validator_passes"
+  },
+  "provider_states": ["missing", "installed", "configured", "connected", "validated", "enabled", "disabled", "blocked", "deprecated"],
+  "providers": [
+    {"id":"github","category":"repo_proof","required_for_boot":true,"enabled_by_default":true,"mode":"repo_memory_proof_handover","safe_if_missing":false,"credentials":["GITHUB_TOKEN"],"local_tools":["git","gh"],"activation_gate":"repo_initialized_and_push_permission_confirmed"},
+    {"id":"postgres","category":"truth_vault","required_for_boot":true,"enabled_by_default":true,"mode":"source_of_truth","safe_if_missing":false,"credentials":["DATABASE_URL"],"local_tools":["docker"],"activation_gate":"docker_compose_postgres_healthy"},
+    {"id":"redis","category":"queue","required_for_boot":true,"enabled_by_default":true,"mode":"queue_cache_dlq","safe_if_missing":false,"credentials":["REDIS_URL"],"local_tools":["docker"],"activation_gate":"docker_compose_redis_healthy"},
+    {"id":"airtable","category":"mirror_control","required_for_boot":false,"enabled_by_default":false,"mode":"mirror_only","safe_if_missing":true,"credentials":["AIRTABLE_TOKEN"],"connected_bases_expected":12,"activation_gate":"twelve_bases_present_and_alignment_validator_passes"},
+    {"id":"gmail","category":"communications","required_for_boot":false,"enabled_by_default":false,"mode":"email_primary_test_mode","safe_if_missing":true,"credentials":["GMAIL_CLIENT_ID","GMAIL_CLIENT_SECRET","GMAIL_REFRESH_TOKEN"],"activation_gate":"email_templates_policy_and_test_send_validator_pass"},
+    {"id":"netlify","category":"frontend_deploy","required_for_boot":false,"enabled_by_default":false,"mode":"preview_only_until_ui_proof","safe_if_missing":true,"credentials":["NETLIFY_AUTH_TOKEN","NETLIFY_SITE_ID"],"local_tools":["netlify"],"activation_gate":"candidate_founder_partner_ui_interaction_proof_passes"},
+    {"id":"supabase","category":"storage_optional","required_for_boot":false,"enabled_by_default":false,"mode":"signed_upload_storage_optional","safe_if_missing":true,"credentials":["SUPABASE_URL","SUPABASE_ANON_KEY","SUPABASE_SERVICE_ROLE_KEY"],"local_tools":["supabase"],"activation_gate":"signed_upload_rls_and_service_role_boundary_pass"},
+    {"id":"n8n","category":"workflow_relay","required_for_boot":false,"enabled_by_default":false,"mode":"thin_wrapper_only","safe_if_missing":true,"credentials":["N8N_WEBHOOK_SECRET"],"local_tools":["docker"],"activation_gate":"backend_relay_and_single_result_post_contract_pass"},
+    {"id":"playwright","category":"scout_probe","required_for_boot":false,"enabled_by_default":false,"mode":"scout_probe_with_map_fallback","safe_if_missing":true,"credentials":[],"local_tools":["playwright"],"activation_gate":"captcha_otp_boundary_and_map_fallback_validator_pass"},
+    {"id":"whatsapp","category":"communications","required_for_boot":false,"enabled_by_default":false,"mode":"urgent_only","safe_if_missing":true,"credentials":["WHATSAPP_TOKEN","WHATSAPP_PHONE_NUMBER_ID"],"activation_gate":"urgent_template_policy_approved"},
+    {"id":"sms","category":"communications","required_for_boot":false,"enabled_by_default":false,"mode":"backup_only","safe_if_missing":true,"credentials":["SMS_PROVIDER_KEY"],"activation_gate":"backup_policy_and_cost_guard_pass"},
+    {"id":"payments","category":"finance","required_for_boot":false,"enabled_by_default":false,"mode":"hosted_checkout_only","safe_if_missing":true,"credentials":["PAYMENT_PROVIDER_SECRET","PAYMENT_WEBHOOK_SECRET"],"activation_gate":"official_pricing_refund_and_webhook_validator_pass"},
+    {"id":"oracle_cloud","category":"deployment","required_for_boot":false,"enabled_by_default":false,"mode":"oracle_lite_deploy_target","safe_if_missing":true,"credentials":["OCI_CONFIG_PROFILE"],"local_tools":["oci"],"activation_gate":"oracle_lite_capacity_security_backup_validator_pass"},
+    {"id":"monitoring","category":"observability","required_for_boot":false,"enabled_by_default":false,"mode":"prometheus_grafana_loki_optional","safe_if_missing":true,"credentials":[],"local_tools":["docker"],"activation_gate":"core_api_worker_health_endpoints_exist"}
+  ]
+}

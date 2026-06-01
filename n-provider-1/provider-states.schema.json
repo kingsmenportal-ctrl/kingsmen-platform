@@ -1,0 +1,48 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "Kingsmen Provider Registry Schema",
+  "type": "object",
+  "required": ["module", "version", "doctrine", "providers"],
+  "properties": {
+    "module": {"const": "N_PROVIDER.1"},
+    "name": {"type": "string"},
+    "version": {"type": "string"},
+    "doctrine": {
+      "type": "object",
+      "required": ["truth_source", "airtable_mode", "communication_primary", "deployment_default", "secrets_policy"],
+      "properties": {
+        "truth_source": {"const": "postgresql"},
+        "airtable_mode": {"const": "mirror_only"},
+        "communication_primary": {"const": "email"},
+        "whatsapp_policy": {"const": "urgent_only"},
+        "sms_policy": {"const": "backup_only"},
+        "deployment_default": {"const": "oracle_lite"},
+        "secrets_policy": {"const": "never_commit_raw_secrets"}
+      }
+    },
+    "provider_states": {
+      "type": "array",
+      "items": {"enum": ["missing", "installed", "configured", "connected", "validated", "enabled", "disabled", "blocked", "deprecated"]}
+    },
+    "providers": {
+      "type": "array",
+      "minItems": 10,
+      "items": {
+        "type": "object",
+        "required": ["id", "category", "required_for_boot", "enabled_by_default", "mode", "safe_if_missing", "credentials", "activation_gate"],
+        "properties": {
+          "id": {"type": "string", "pattern": "^[a-z0-9_]+$"},
+          "category": {"type": "string"},
+          "required_for_boot": {"type": "boolean"},
+          "enabled_by_default": {"type": "boolean"},
+          "mode": {"type": "string"},
+          "safe_if_missing": {"type": "boolean"},
+          "credentials": {"type": "array", "items": {"type": "string"}},
+          "local_tools": {"type": "array", "items": {"type": "string"}},
+          "connected_bases_expected": {"type": "number"},
+          "activation_gate": {"type": "string", "minLength": 3}
+        }
+      }
+    }
+  }
+}

@@ -1,0 +1,41 @@
+{
+  "module": "N_PROVIDER.1",
+  "generated_by": "ChatGPT connector audit + local validator",
+  "connected_tools": {
+    "github": {
+      "expected": true,
+      "status": "connected_checked_in_chatgpt",
+      "repo": "kingsmenportal-ctrl/kingsmen-platform",
+      "required_evidence": ["repo initialized", "admin/push permission", "issue or commit proof"]
+    },
+    "airtable": {
+      "expected": true,
+      "status": "connected_checked_in_chatgpt",
+      "expected_bases": 12,
+      "mode": "mirror_only",
+      "required_evidence": ["12 bases listed", "permissionLevel create", "alignment validator pending"]
+    },
+    "gmail": {
+      "expected": true,
+      "status": "connected_checked_in_chatgpt",
+      "mode": "email_primary_test_mode",
+      "required_evidence": ["search succeeds", "live sending disabled until template policy passes"]
+    },
+    "netlify": {
+      "expected": true,
+      "status": "available_not_production_enabled",
+      "mode": "preview_only_until_ui_proof",
+      "required_evidence": ["connector context available", "site/project deployment proof pending"]
+    }
+  },
+  "unsafe_defaults": {
+    "airtable_authority": false,
+    "gmail_live_send_without_policy": false,
+    "netlify_production_deploy": false,
+    "whatsapp_bulk": false,
+    "sms_primary": false,
+    "playwright_bypass": false,
+    "n8n_orchestration_authority": false,
+    "payment_live_mode": false
+  }
+}

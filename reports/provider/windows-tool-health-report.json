@@ -1,0 +1,136 @@
+﻿{
+    "module":  "N_PROVIDER.1",
+    "generated_at":  "2026-06-01T17:08:22.5478635-07:00",
+    "install_mode":  false,
+    "report_only":  true,
+    "passed":  false,
+    "missing_required":  [
+                             {
+                                 "version":  null,
+                                 "name":  "GitHub CLI",
+                                 "installed":  false,
+                                 "command":  "gh",
+                                 "path":  null,
+                                 "required":  true
+                             },
+                             {
+                                 "version":  null,
+                                 "name":  "PowerShell 7",
+                                 "installed":  false,
+                                 "command":  "pwsh",
+                                 "path":  null,
+                                 "required":  true
+                             },
+                             {
+                                 "version":  null,
+                                 "name":  "pnpm",
+                                 "installed":  false,
+                                 "command":  "pnpm",
+                                 "path":  null,
+                                 "required":  true
+                             },
+                             {
+                                 "version":  null,
+                                 "name":  "Docker",
+                                 "installed":  false,
+                                 "command":  "docker",
+                                 "path":  null,
+                                 "required":  true
+                             }
+                         ],
+    "tools":  [
+                  {
+                      "version":  "git version 2.54.0.windows.1",
+                      "name":  "Git",
+                      "installed":  true,
+                      "command":  "git",
+                      "path":  "C:\\Program Files\\Git\\cmd\\git.exe",
+                      "required":  true
+                  },
+                  {
+                      "version":  null,
+                      "name":  "GitHub CLI",
+                      "installed":  false,
+                      "command":  "gh",
+                      "path":  null,
+                      "required":  true
+                  },
+                  {
+                      "version":  null,
+                      "name":  "PowerShell 7",
+                      "installed":  false,
+                      "command":  "pwsh",
+                      "path":  null,
+                      "required":  true
+                  },
+                  {
+                      "version":  "v22.22.2",
+                      "name":  "Node.js LTS",
+                      "installed":  true,
+                      "command":  "node",
+                      "path":  "C:\\Program Files\\nodejs\\node.exe",
+                      "required":  true
+                  },
+                  {
+                      "version":  null,
+                      "name":  "pnpm",
+                      "installed":  false,
+                      "command":  "pnpm",
+                      "path":  null,
+                      "required":  true
+                  },
+                  {
+                      "version":  null,
+                      "name":  "Docker",
+                      "installed":  false,
+                      "command":  "docker",
+                      "path":  null,
+                      "required":  true
+                  },
+                  {
+                      "version":  "1.121.0",
+                      "name":  "VS Code",
+                      "installed":  true,
+                      "command":  "code",
+                      "path":  "C:\\Users\\dell\\AppData\\Local\\Programs\\Microsoft VS Code\\bin\\code.cmd",
+                      "required":  false
+                  },
+                  {
+                      "version":  "Python 3.14.4",
+                      "name":  "Python",
+                      "installed":  true,
+                      "command":  "python",
+                      "path":  "C:\\Python314\\python.exe",
+                      "required":  false
+                  },
+                  {
+                      "version":  null,
+                      "name":  "Netlify CLI",
+                      "installed":  false,
+                      "command":  "netlify",
+                      "path":  null,
+                      "required":  false
+                  },
+                  {
+                      "version":  null,
+                      "name":  "Supabase CLI",
+                      "installed":  false,
+                      "command":  "supabase",
+                      "path":  null,
+                      "required":  false
+                  },
+                  {
+                      "version":  null,
+                      "name":  "Oracle OCI CLI",
+                      "installed":  false,
+                      "command":  "oci",
+                      "path":  null,
+                      "required":  false
+                  }
+              ],
+    "safety":  {
+                   "secrets_printed":  false,
+                   "optional_tools_may_remain_missing":  true,
+                   "unsafe_providers_enabled":  false
+               }
+}
