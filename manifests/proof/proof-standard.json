@@ -1,0 +1,95 @@
+{
+  "schema": "kingsmen.proof-standard.v1",
+  "batch": "BATCH 01 — Merge Foundation",
+  "status": "BUILT_PENDING_VALIDATION",
+  "generated_for": "kingsmen-platform",
+  "proof_statuses": [
+    "NOT_STARTED",
+    "DESIGNED",
+    "BUILT_PENDING_VALIDATION",
+    "VALIDATED",
+    "RUNTIME_PROVEN",
+    "STAGING_PROVEN",
+    "PRODUCTION_READY",
+    "PRODUCTION_ACTIVE",
+    "PAUSED",
+    "REPLACED",
+    "ARCHIVED_FOR_FUTURE"
+  ],
+  "proof_layers": [
+    {
+      "layer": 1,
+      "name": "file_exists",
+      "description": "Required repo path exists."
+    },
+    {
+      "layer": 2,
+      "name": "content_exists",
+      "description": "File contains meaningful Kingsmen content, not an empty placeholder."
+    },
+    {
+      "layer": 3,
+      "name": "manifest_consistency",
+      "description": "Structured manifest records the doctrine, tool, provider, package, source-confidence, or module state."
+    },
+    {
+      "layer": 4,
+      "name": "validator_exists",
+      "description": "A validator script exists for the module or batch."
+    },
+    {
+      "layer": 5,
+      "name": "validator_passed",
+      "description": "Validator exits successfully and does not hide failures."
+    },
+    {
+      "layer": 6,
+      "name": "report_written",
+      "description": "Validator writes an honest JSON report with passed true/false, checked files, missing files, and next action."
+    },
+    {
+      "layer": 7,
+      "name": "git_checkpoint",
+      "description": "Changes are committed to Git/GitHub with traceable commit history."
+    },
+    {
+      "layer": 8,
+      "name": "ui_api_proof",
+      "description": "UI/API surfaces load or respond where applicable."
+    },
+    {
+      "layer": 9,
+      "name": "runtime_proof",
+      "description": "Local Docker or runtime command proves the module can run."
+    },
+    {
+      "layer": 10,
+      "name": "oracle_staging_proof",
+      "description": "Oracle Lite staging proves the module can operate under constrained deployment rules."
+    }
+  ],
+  "hard_rules": [
+    "No chat-only completion claim.",
+    "No production-ready claim without runtime and staging proof.",
+    "No UI claim without clickable or route proof.",
+    "No current source claim without source confidence evidence.",
+    "No package access gating of core Kingsmen gates.",
+    "No raw secrets in repository files.",
+    "No OpenClaw raw-secret or production-write access by default.",
+    "No fake guarantee of acceptance, funding, job, accommodation, or success.",
+    "No CAPTCHA or OTP bypass.",
+    "No mock/random analytics as production truth."
+  ],
+  "batch_01_required_files": [
+    "docs/constitution/reality-trained-kingsmen-constitution.md",
+    "manifests/proof/proof-standard.json",
+    "manifests/tools/tool-registry.json",
+    "manifests/credentials/credentials.registry.json",
+    "manifests/providers/provider-registry.json",
+    "manifests/reality/source-confidence-bands.json",
+    "manifests/business/package-catalogue.json",
+    "scripts/validators/validate-merge-foundation.mjs",
+    "reports/validation/merge-foundation-latest.json",
+    ".github/ISSUE_TEMPLATE/kingsmen-module.yml"
+  ]
+}
