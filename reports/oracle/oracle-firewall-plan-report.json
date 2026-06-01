@@ -1,0 +1,34 @@
+{
+  "module": "ORACLE",
+  "submodule": "ORACLE.17",
+  "script": "scripts/oracle/Prepare-OracleFirewallPlan.ps1",
+  "productionReady": false,
+  "generatedAt": "2026-06-01T08:57:52.843Z",
+  "repoRoot": "C:\\Users\\dell\\Documents\\kingsmen-platform",
+  "dryRun": false,
+  "passed": true,
+  "totalChecks": 24,
+  "failedChecks": 0,
+  "created": [
+    { "type": "directory", "path": "kingsmen/oracle/vm-bootstrap/network" },
+    { "type": "directory", "path": "kingsmen/oracle/vm-bootstrap/network/firewall" },
+    { "type": "directory", "path": "kingsmen/oracle/vm-bootstrap/security" },
+    { "type": "directory", "path": "kingsmen/oracle/vm-bootstrap/runtime/health" },
+    { "type": "directory", "path": "docs/oracle" },
+    { "type": "directory", "path": "reports/oracle" },
+    { "type": "file", "path": "kingsmen/oracle/vm-bootstrap/network/firewall/oracle-firewall-plan.json" },
+    { "type": "file", "path": "docs/oracle/oracle-firewall-plan.md" }
+  ],
+  "failed": [],
+  "proofSummary": {
+    "oracle17Passed": true,
+    "oracle16ReportPassed": true,
+    "oracle15ReportPassed": true,
+    "planJsonWritten": true,
+    "planMarkdownWritten": true,
+    "productionReadyFalseVerified": true,
+    "noFailedChecks": true,
+    "gitHeadHash": "fa69aba"
+  },
+  "nextTrackerRow": "ORACLE.18 - scripts/validators/validate-oracle-firewall-plan.mjs"
+}
