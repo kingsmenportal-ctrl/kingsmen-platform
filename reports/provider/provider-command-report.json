@@ -1,0 +1,19 @@
+﻿{
+    "module":  "N_PROVIDER.2",
+    "command":  "provider:doctor",
+    "generated_at":  "2026-06-01T19:34:38.6145029-07:00",
+    "passed":  true,
+    "actions":  [
+                    "provider_registry_validated",
+                    "local_tools_validated"
+                ],
+    "safety":  {
+                   "no_raw_secrets_printed":  true,
+                   "optional_providers_enabled":  false,
+                   "airtable_authority":  false,
+                   "whatsapp_bulk_enabled":  false,
+                   "sms_primary_enabled":  false,
+                   "payment_live_mode_enabled":  false
+               },
+    "completed_at":  "2026-06-01T19:34:50.9556562-07:00"
+}

@@ -1,7 +1,7 @@
 {
   "module": "N_PROVIDER.1",
   "validator": "validate-provider-registry.mjs",
-  "generated_at": "2026-06-02T01:30:53.190Z",
+  "generated_at": "2026-06-02T02:34:38.734Z",
   "passed": true,
   "errors": [],
   "warnings": [],
