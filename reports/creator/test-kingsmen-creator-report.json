@@ -1,0 +1,128 @@
+﻿{
+    "schema":  "kingsmen.creator-test.v1",
+    "module":  "CREATOR",
+    "submodule":  "CREATOR.2",
+    "generatedAt":  "2026-06-02T06:21:45.278Z",
+    "repoRoot":  "C:\\Users\\dell\\kingsmen-platform",
+    "passed":  true,
+    "totalChecks":  17,
+    "failedChecks":  0,
+    "failed":  [
+
+               ],
+    "checks":  [
+                   {
+                       "name":  "creator:file-exists",
+                       "passed":  true,
+                       "detail":  "C:\\Users\\dell\\kingsmen-platform\\scripts\\KINGSMEN_CREATOR.ps1"
+                   },
+                   {
+                       "name":  "creator:contains:$Phase",
+                       "passed":  true,
+                       "detail":  "static token check"
+                   },
+                   {
+                       "name":  "creator:contains:Invoke-Doctor",
+                       "passed":  true,
+                       "detail":  "static token check"
+                   },
+                   {
+                       "name":  "creator:contains:Invoke-AuditExisting",
+                       "passed":  true,
+                       "detail":  "static token check"
+                   },
+                   {
+                       "name":  "creator:contains:Invoke-Report",
+                       "passed":  true,
+                       "detail":  "static token check"
+                   },
+                   {
+                       "name":  "creator:contains:productionReady",
+                       "passed":  true,
+                       "detail":  "static token check"
+                   },
+                   {
+                       "name":  "creator:forbidden:productionReady = $true",
+                       "passed":  true,
+                       "detail":  "forbidden token check"
+                   },
+                   {
+                       "name":  "creator:forbidden:productionReady:true",
+                       "passed":  true,
+                       "detail":  "forbidden token check"
+                   },
+                   {
+                       "name":  "creator:forbidden:SUPABASE_SERVICE_ROLE",
+                       "passed":  true,
+                       "detail":  "forbidden token check"
+                   },
+                   {
+                       "name":  "creator:forbidden:SMTP_PASSWORD",
+                       "passed":  true,
+                       "detail":  "forbidden token check"
+                   },
+                   {
+                       "name":  "creator:forbidden:WHATSAPP_TOKEN",
+                       "passed":  true,
+                       "detail":  "forbidden token check"
+                   },
+                   {
+                       "name":  "creator:forbidden:PAYMENT_SECRET",
+                       "passed":  true,
+                       "detail":  "forbidden token check"
+                   },
+                   {
+                       "name":  "creator:forbidden:AIRTABLE_TOKEN",
+                       "passed":  true,
+                       "detail":  "forbidden token check"
+                   },
+                   {
+                       "name":  "run:phase-help",
+                       "passed":  true,
+                       "detail":  "exitCode=0"
+                   },
+                   {
+                       "name":  "run:phase-doctor",
+                       "passed":  true,
+                       "detail":  "exitCode=0"
+                   },
+                   {
+                       "name":  "run:phase-audit-existing",
+                       "passed":  true,
+                       "detail":  "exitCode=0"
+                   },
+                   {
+                       "name":  "run:phase-report",
+                       "passed":  true,
+                       "detail":  "exitCode=0"
+                   }
+               ],
+    "commandResults":  [
+                           {
+                               "name":  "phase-help",
+                               "exitCode":  0,
+                               "passed":  true,
+                               "outputPreview":  "{\r\n    \"module\":  \"CREATOR\",\r\n    \"submodule\":  \"CREATOR.1\",\r\n    \"path\":  \"scripts/KINGSMEN_CREATOR.ps1\",\r\n    \"creatorVersion\":  \"0.1.2\",\r\n    \"productionReady\":  false,\r\n    \"commands\":  [\r\n                     \".\\\\scripts\\\\KINGSMEN_CREATOR.ps1 -Phase Help\",\r\n                     \".\\\\scripts\\\\KINGSMEN_CREATOR.ps1 -Phase Doctor\",\r\n                     \".\\\\scripts\\\\KINGSMEN_CREATOR.ps1 -Phase AuditExisting\",\r\n                     \".\\\\scripts\\\\KINGSMEN_CREATOR.ps1 -Phase N09.3Complete\",\r\n                     \".\\\\scripts\\\\KINGSMEN_CREATOR.ps1 -Phase Validate\",\r\n                     \".\\\\scripts\\\\KINGSMEN_CREATOR.ps1 -Phase Report\"\r\n                 ],\r\n    \"reports\":  [\r\n                    \"reports/creator/creator-doctor-report.json\",\r\n                    \"reports/creator/creator-audit-existing-report.json\",\r\n                    \"reports/creator/creator-n09-3-validation-bridge-report.json\",\r\n                    \"reports/creator/creator-report-index.json\"\r\n                ],\r\n    \"nextTr"
+                           },
+                           {
+                               "name":  "phase-doctor",
+                               "exitCode":  0,
+                               "passed":  true,
+                               "outputPreview":  "{\r\n    \"module\":  \"CREATOR\",\r\n    \"submodule\":  \"CREATOR.1\",\r\n    \"path\":  \"scripts/KINGSMEN_CREATOR.ps1\",\r\n    \"creatorVersion\":  \"0.1.2\",\r\n    \"productionReady\":  false,\r\n    \"commands\":  [\r\n                     \".\\\\scripts\\\\KINGSMEN_CREATOR.ps1 -Phase Help\",\r\n                     \".\\\\scripts\\\\KINGSMEN_CREATOR.ps1 -Phase Doctor\",\r\n                     \".\\\\scripts\\\\KINGSMEN_CREATOR.ps1 -Phase AuditExisting\",\r\n                     \".\\\\scripts\\\\KINGSMEN_CREATOR.ps1 -Phase N09.3Complete\",\r\n                     \".\\\\scripts\\\\KINGSMEN_CREATOR.ps1 -Phase Validate\",\r\n                     \".\\\\scripts\\\\KINGSMEN_CREATOR.ps1 -Phase Report\"\r\n                 ],\r\n    \"reports\":  [\r\n                    \"reports/creator/creator-doctor-report.json\",\r\n                    \"reports/creator/creator-audit-existing-report.json\",\r\n                    \"reports/creator/creator-n09-3-validation-bridge-report.json\",\r\n                    \"reports/creator/creator-report-index.json\"\r\n                ],\r\n    \"nextTr"
+                           },
+                           {
+                               "name":  "phase-audit-existing",
+                               "exitCode":  0,
+                               "passed":  true,
+                               "outputPreview":  "{\r\n    \"module\":  \"CREATOR\",\r\n    \"submodule\":  \"CREATOR.1\",\r\n    \"path\":  \"scripts/KINGSMEN_CREATOR.ps1\",\r\n    \"creatorVersion\":  \"0.1.2\",\r\n    \"productionReady\":  false,\r\n    \"commands\":  [\r\n                     \".\\\\scripts\\\\KINGSMEN_CREATOR.ps1 -Phase Help\",\r\n                     \".\\\\scripts\\\\KINGSMEN_CREATOR.ps1 -Phase Doctor\",\r\n                     \".\\\\scripts\\\\KINGSMEN_CREATOR.ps1 -Phase AuditExisting\",\r\n                     \".\\\\scripts\\\\KINGSMEN_CREATOR.ps1 -Phase N09.3Complete\",\r\n                     \".\\\\scripts\\\\KINGSMEN_CREATOR.ps1 -Phase Validate\",\r\n                     \".\\\\scripts\\\\KINGSMEN_CREATOR.ps1 -Phase Report\"\r\n                 ],\r\n    \"reports\":  [\r\n                    \"reports/creator/creator-doctor-report.json\",\r\n                    \"reports/creator/creator-audit-existing-report.json\",\r\n                    \"reports/creator/creator-n09-3-validation-bridge-report.json\",\r\n                    \"reports/creator/creator-report-index.json\"\r\n                ],\r\n    \"nextTr"
+                           },
+                           {
+                               "name":  "phase-report",
+                               "exitCode":  0,
+                               "passed":  true,
+                               "outputPreview":  "{\r\n    \"module\":  \"CREATOR\",\r\n    \"submodule\":  \"CREATOR.1\",\r\n    \"path\":  \"scripts/KINGSMEN_CREATOR.ps1\",\r\n    \"creatorVersion\":  \"0.1.2\",\r\n    \"productionReady\":  false,\r\n    \"commands\":  [\r\n                     \".\\\\scripts\\\\KINGSMEN_CREATOR.ps1 -Phase Help\",\r\n                     \".\\\\scripts\\\\KINGSMEN_CREATOR.ps1 -Phase Doctor\",\r\n                     \".\\\\scripts\\\\KINGSMEN_CREATOR.ps1 -Phase AuditExisting\",\r\n                     \".\\\\scripts\\\\KINGSMEN_CREATOR.ps1 -Phase N09.3Complete\",\r\n                     \".\\\\scripts\\\\KINGSMEN_CREATOR.ps1 -Phase Validate\",\r\n                     \".\\\\scripts\\\\KINGSMEN_CREATOR.ps1 -Phase Report\"\r\n                 ],\r\n    \"reports\":  [\r\n                    \"reports/creator/creator-doctor-report.json\",\r\n                    \"reports/creator/creator-audit-existing-report.json\",\r\n                    \"reports/creator/creator-n09-3-validation-bridge-report.json\",\r\n                    \"reports/creator/creator-report-index.json\"\r\n                ],\r\n    \"nextTr"
+                           }
+                       ],
+    "note":  "BATCH 02 validates CREATOR.1 phase stability and report proof. Action mode remains CREATOR.2B.",
+    "nextAction":  "Run node scripts/validators/validate-creator-normalize.mjs"
+}

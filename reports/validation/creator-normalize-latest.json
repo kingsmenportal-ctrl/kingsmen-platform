@@ -3,7 +3,7 @@
   "module": "BATCH 02 — Creator Normalize",
   "status": "BUILT_PENDING_VALIDATION",
   "passed": false,
-  "generated_at": "2026-06-02T06:18:22.021Z",
+  "generated_at": "2026-06-02T06:21:45.610Z",
   "files_expected": [
     "scripts/KINGSMEN_CREATOR.ps1",
     "scripts/testing/Test-KingsmenCreator.ps1",
@@ -12,11 +12,9 @@
     "reports/validation/creator-normalize-latest.json"
   ],
   "files_checked": 5,
-  "missing_files": [
-    "reports/creator/test-kingsmen-creator-report.json"
-  ],
+  "missing_files": [],
   "failed_checks": [
-    "Missing required file: reports/creator/test-kingsmen-creator-report.json"
+    "Could not parse test-kingsmen-creator-report.json: Unexpected token '﻿', \"﻿{\r\n    \"s\"... is not valid JSON"
   ],
   "warnings": [
     "BATCH 02 currently validates CREATOR.1 phase stability and test harness proof. Action mode remains the next repair unless separately patched and proven."
