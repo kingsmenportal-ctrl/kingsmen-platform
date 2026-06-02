@@ -1,0 +1,173 @@
+{
+    "schema":  "kingsmen.creator-action-report.v1",
+    "module":  "CREATOR",
+    "submodule":  "CREATOR.2B",
+    "action":  "Scaffold",
+    "productionReady":  false,
+    "generatedAt":  "2026-06-02T07:11:17.319Z",
+    "repoRoot":  "C:\\Users\\dell\\kingsmen-platform",
+    "passed":  true,
+    "detail":  "Repository skeleton ensured.",
+    "totalChecks":  31,
+    "failedChecks":  0,
+    "failed":  [
+
+               ],
+    "checks":  [
+                   {
+                       "name":  "scaffold:docs",
+                       "passed":  true,
+                       "detail":  "directory ensured"
+                   },
+                   {
+                       "name":  "scaffold:docs\\constitution",
+                       "passed":  true,
+                       "detail":  "directory ensured"
+                   },
+                   {
+                       "name":  "scaffold:docs\\reality",
+                       "passed":  true,
+                       "detail":  "directory ensured"
+                   },
+                   {
+                       "name":  "scaffold:docs\\growth",
+                       "passed":  true,
+                       "detail":  "directory ensured"
+                   },
+                   {
+                       "name":  "scaffold:docs\\business",
+                       "passed":  true,
+                       "detail":  "directory ensured"
+                   },
+                   {
+                       "name":  "scaffold:docs\\tools",
+                       "passed":  true,
+                       "detail":  "directory ensured"
+                   },
+                   {
+                       "name":  "scaffold:manifests",
+                       "passed":  true,
+                       "detail":  "directory ensured"
+                   },
+                   {
+                       "name":  "scaffold:manifests\\modules",
+                       "passed":  true,
+                       "detail":  "directory ensured"
+                   },
+                   {
+                       "name":  "scaffold:manifests\\proof",
+                       "passed":  true,
+                       "detail":  "directory ensured"
+                   },
+                   {
+                       "name":  "scaffold:manifests\\tools",
+                       "passed":  true,
+                       "detail":  "directory ensured"
+                   },
+                   {
+                       "name":  "scaffold:manifests\\business",
+                       "passed":  true,
+                       "detail":  "directory ensured"
+                   },
+                   {
+                       "name":  "scaffold:apps",
+                       "passed":  true,
+                       "detail":  "directory ensured"
+                   },
+                   {
+                       "name":  "scaffold:apps\\api",
+                       "passed":  true,
+                       "detail":  "directory ensured"
+                   },
+                   {
+                       "name":  "scaffold:apps\\api\\src",
+                       "passed":  true,
+                       "detail":  "directory ensured"
+                   },
+                   {
+                       "name":  "scaffold:apps\\web",
+                       "passed":  true,
+                       "detail":  "directory ensured"
+                   },
+                   {
+                       "name":  "scaffold:apps\\web\\src",
+                       "passed":  true,
+                       "detail":  "directory ensured"
+                   },
+                   {
+                       "name":  "scaffold:packages",
+                       "passed":  true,
+                       "detail":  "directory ensured"
+                   },
+                   {
+                       "name":  "scaffold:packages\\contracts",
+                       "passed":  true,
+                       "detail":  "directory ensured"
+                   },
+                   {
+                       "name":  "scaffold:packages\\contracts\\src",
+                       "passed":  true,
+                       "detail":  "directory ensured"
+                   },
+                   {
+                       "name":  "scaffold:packages\\db",
+                       "passed":  true,
+                       "detail":  "directory ensured"
+                   },
+                   {
+                       "name":  "scaffold:packages\\db\\src",
+                       "passed":  true,
+                       "detail":  "directory ensured"
+                   },
+                   {
+                       "name":  "scaffold:scripts",
+                       "passed":  true,
+                       "detail":  "directory ensured"
+                   },
+                   {
+                       "name":  "scaffold:scripts\\validators",
+                       "passed":  true,
+                       "detail":  "directory ensured"
+                   },
+                   {
+                       "name":  "scaffold:scripts\\testing",
+                       "passed":  true,
+                       "detail":  "directory ensured"
+                   },
+                   {
+                       "name":  "scaffold:reports",
+                       "passed":  true,
+                       "detail":  "directory ensured"
+                   },
+                   {
+                       "name":  "scaffold:reports\\creator",
+                       "passed":  true,
+                       "detail":  "directory ensured"
+                   },
+                   {
+                       "name":  "scaffold:reports\\validation",
+                       "passed":  true,
+                       "detail":  "directory ensured"
+                   },
+                   {
+                       "name":  "scaffold:reports\\n09",
+                       "passed":  true,
+                       "detail":  "directory ensured"
+                   },
+                   {
+                       "name":  "scaffold:incoming",
+                       "passed":  true,
+                       "detail":  "directory ensured"
+                   },
+                   {
+                       "name":  "scaffold:.github",
+                       "passed":  true,
+                       "detail":  "directory ensured"
+                   },
+                   {
+                       "name":  "scaffold:.github\\workflows",
+                       "passed":  true,
+                       "detail":  "directory ensured"
+                   }
+               ]
+}

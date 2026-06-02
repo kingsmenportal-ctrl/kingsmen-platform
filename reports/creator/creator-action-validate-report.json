@@ -1,0 +1,28 @@
+{
+    "schema":  "kingsmen.creator-action-report.v1",
+    "module":  "CREATOR",
+    "submodule":  "CREATOR.2B",
+    "action":  "Validate",
+    "productionReady":  false,
+    "generatedAt":  "2026-06-02T07:11:17.504Z",
+    "repoRoot":  "C:\\Users\\dell\\kingsmen-platform",
+    "passed":  true,
+    "detail":  "Validator executed for merge-foundation.",
+    "totalChecks":  2,
+    "failedChecks":  0,
+    "failed":  [
+
+               ],
+    "checks":  [
+                   {
+                       "name":  "validate:validator-exists",
+                       "passed":  true,
+                       "detail":  "scripts\\validators\\validate-merge-foundation.mjs"
+                   },
+                   {
+                       "name":  "validate:exit-code",
+                       "passed":  true,
+                       "detail":  "exitCode=0"
+                   }
+               ]
+}
