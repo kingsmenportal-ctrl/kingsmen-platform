@@ -1,0 +1,39 @@
+{
+  "schema": "kingsmen.controlled-web-api-integration-proof.v1",
+  "module": "BATCH 15B - Controlled Local Web + Local API Integration Proof",
+  "status": "BUILT_PENDING_VALIDATION",
+  "productionReady": false,
+  "requiresBatches": [
+    "BATCH 14 - Controlled Local Next Web Boot Proof",
+    "BATCH 15A - Workspace Root / Lockfile Warning Repair"
+  ],
+  "webRoute": "/free-destiny-map",
+  "apiEndpoint": "/api/public/free-destiny-map/intake/local",
+  "nextRouteHandler": "apps/web/src/app/api/public/free-destiny-map/intake/local/route.ts",
+  "localExerciseDataDirectory": "data/local/free-destiny-map/next-api-integration",
+  "localWriteFlag": "KINGSMEN_ENABLE_LOCAL_INTAKE_WRITE",
+  "proofCommand": "powershell.exe -ExecutionPolicy Bypass -File scripts/runtime/Invoke-FreeDestinyMapControlledWebApiIntegration.ps1",
+  "proofScript": "scripts/proof/prove-free-destiny-map-controlled-web-api-integration.mjs",
+  "proofReport": "reports/runtime/free-destiny-map-controlled-web-api-integration-proof.json",
+  "validationReport": "reports/validation/free-destiny-map-controlled-web-api-integration-latest.json",
+  "storesProductionData": false,
+  "usesDemoPayloadOnly": true,
+  "takesPayment": false,
+  "sendsEmail": false,
+  "collectsDocuments": false,
+  "submitsOfficialApplications": false,
+  "oracleLiteImpact": "none_runtime_yet",
+  "controlPlaneImpact": "Adds first controlled same-origin local web plus local API intake proof.",
+  "requiredFiles": [
+    "docs/runtime/free-destiny-map-controlled-web-api-integration-proof.md",
+    "manifests/runtime/free-destiny-map-controlled-web-api-integration-proof.json",
+    "apps/web/src/app/api/public/free-destiny-map/intake/local/route.ts",
+    "packages/contracts/src/free-destiny-map-controlled-web-api-integration.ts",
+    "scripts/runtime/Invoke-FreeDestinyMapControlledWebApiIntegration.ps1",
+    "scripts/proof/prove-free-destiny-map-controlled-web-api-integration.mjs",
+    "reports/runtime/free-destiny-map-controlled-web-api-integration-proof.json",
+    "scripts/validators/validate-free-destiny-map-controlled-web-api-integration.mjs",
+    "reports/validation/free-destiny-map-controlled-web-api-integration-latest.json"
+  ],
+  "nextAction": "Run powershell.exe -ExecutionPolicy Bypass -File scripts/runtime/Invoke-FreeDestinyMapControlledWebApiIntegration.ps1 then node scripts/validators/validate-free-destiny-map-controlled-web-api-integration.mjs"
+}

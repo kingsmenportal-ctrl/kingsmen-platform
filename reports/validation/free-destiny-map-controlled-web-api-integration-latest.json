@@ -1,0 +1,36 @@
+{
+  "schema": "kingsmen.validation-report.v1",
+  "module": "BATCH 15B - Controlled Local Web + Local API Integration Proof",
+  "status": "BUILT_PENDING_VALIDATION",
+  "passed": false,
+  "generated_at": "2026-06-02T21:16:21.168Z",
+  "files_expected": [
+    "docs/runtime/free-destiny-map-controlled-web-api-integration-proof.md",
+    "manifests/runtime/free-destiny-map-controlled-web-api-integration-proof.json",
+    "apps/web/src/app/api/public/free-destiny-map/intake/local/route.ts",
+    "packages/contracts/src/free-destiny-map-controlled-web-api-integration.ts",
+    "scripts/runtime/Invoke-FreeDestinyMapControlledWebApiIntegration.ps1",
+    "scripts/proof/prove-free-destiny-map-controlled-web-api-integration.mjs",
+    "reports/runtime/free-destiny-map-controlled-web-api-integration-proof.json",
+    "scripts/validators/validate-free-destiny-map-controlled-web-api-integration.mjs",
+    "reports/validation/free-destiny-map-controlled-web-api-integration-latest.json"
+  ],
+  "upstream_files_checked": [
+    "reports/runtime/free-destiny-map-controlled-next-boot-proof.json",
+    "reports/runtime/free-destiny-map-workspace-root-warning-repair-proof.json",
+    "apps/web/package.json",
+    "apps/web/next.config.mjs",
+    "apps/web/src/app/free-destiny-map/page.tsx",
+    "apps/web/src/components/kingsmen/FreeDestinyMapApiForm.tsx"
+  ],
+  "files_checked": 15,
+  "missing_files": [],
+  "failed_checks": [
+    "scripts/runtime/Invoke-FreeDestinyMapControlledWebApiIntegration.ps1 missing token: ControlledWebApiIntegration"
+  ],
+  "warnings": [],
+  "oracle_lite_impact": "none_runtime_yet",
+  "control_plane_impact": "Adds controlled same-origin local web plus API intake proof.",
+  "runtime_proof": "reports/runtime/free-destiny-map-controlled-web-api-integration-proof.json",
+  "next_action": "Repair controlled local web plus API integration proof failures."
+}

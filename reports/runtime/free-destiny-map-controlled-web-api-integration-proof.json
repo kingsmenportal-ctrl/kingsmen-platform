@@ -1,0 +1,247 @@
+{
+  "schema": "kingsmen.controlled-web-api-integration-report.v1",
+  "module": "BATCH 15B - Controlled Local Web + Local API Integration Proof",
+  "status": "CONTROLLED_WEB_API_INTEGRATION_PROVEN",
+  "passed": true,
+  "productionReady": false,
+  "canClaimProduction": false,
+  "generated_at": "2026-06-02T21:16:20.981Z",
+  "serverStarted": true,
+  "serverStopped": true,
+  "webStatus": 200,
+  "apiStatus": 202,
+  "webRoute": "/free-destiny-map",
+  "apiEndpoint": "/api/public/free-destiny-map/intake/local",
+  "webUrl": "http://127.0.0.1:49747/free-destiny-map",
+  "apiUrl": "http://127.0.0.1:49747/api/public/free-destiny-map/intake/local",
+  "checks": [
+    {
+      "name": "pre-file-exists:reports/runtime/free-destiny-map-controlled-next-boot-proof.json",
+      "passed": true,
+      "detail": "reports/runtime/free-destiny-map-controlled-next-boot-proof.json"
+    },
+    {
+      "name": "pre-file-exists:reports/runtime/free-destiny-map-workspace-root-warning-repair-proof.json",
+      "passed": true,
+      "detail": "reports/runtime/free-destiny-map-workspace-root-warning-repair-proof.json"
+    },
+    {
+      "name": "pre-file-exists:apps/web/package.json",
+      "passed": true,
+      "detail": "apps/web/package.json"
+    },
+    {
+      "name": "pre-file-exists:apps/web/next.config.mjs",
+      "passed": true,
+      "detail": "apps/web/next.config.mjs"
+    },
+    {
+      "name": "pre-file-exists:apps/web/src/app/free-destiny-map/page.tsx",
+      "passed": true,
+      "detail": "apps/web/src/app/free-destiny-map/page.tsx"
+    },
+    {
+      "name": "pre-file-exists:apps/web/src/components/kingsmen/FreeDestinyMapApiForm.tsx",
+      "passed": true,
+      "detail": "apps/web/src/components/kingsmen/FreeDestinyMapApiForm.tsx"
+    },
+    {
+      "name": "pre-file-exists:apps/web/src/app/api/public/free-destiny-map/intake/local/route.ts",
+      "passed": true,
+      "detail": "apps/web/src/app/api/public/free-destiny-map/intake/local/route.ts"
+    },
+    {
+      "name": "pre-file-exists:apps/web/node_modules/next/package.json",
+      "passed": true,
+      "detail": "apps/web/node_modules/next/package.json"
+    },
+    {
+      "name": "pre-file-exists:apps/web/node_modules/react/package.json",
+      "passed": true,
+      "detail": "apps/web/node_modules/react/package.json"
+    },
+    {
+      "name": "pre-file-exists:apps/web/node_modules/react-dom/package.json",
+      "passed": true,
+      "detail": "apps/web/node_modules/react-dom/package.json"
+    },
+    {
+      "name": "pre-file-exists:data/local/.gitignore",
+      "passed": true,
+      "detail": "data/local/.gitignore"
+    },
+    {
+      "name": "batch-14-controlled-next-boot-proven",
+      "passed": true,
+      "detail": "status=CONTROLLED_NEXT_BOOT_PROVEN; passed=true"
+    },
+    {
+      "name": "batch-14-production-false",
+      "passed": true,
+      "detail": "production false"
+    },
+    {
+      "name": "batch-15a-workspace-root-repair-applied",
+      "passed": true,
+      "detail": "status=WORKSPACE_ROOT_WARNING_REPAIR_APPLIED; passed=true"
+    },
+    {
+      "name": "batch-15a-production-false",
+      "passed": true,
+      "detail": "production false"
+    },
+    {
+      "name": "next-api-route-exports-post",
+      "passed": true,
+      "detail": "POST handler present"
+    },
+    {
+      "name": "next-api-route-runtime-nodejs",
+      "passed": true,
+      "detail": "nodejs runtime"
+    },
+    {
+      "name": "next-api-route-writes-local-jsonl",
+      "passed": true,
+      "detail": "local JSONL write"
+    },
+    {
+      "name": "next-api-route-keeps-production-false",
+      "passed": true,
+      "detail": "production false"
+    },
+    {
+      "name": "next-api-route-blocks-official-submission",
+      "passed": true,
+      "detail": "official false"
+    },
+    {
+      "name": "next-api-route-blocks-payment",
+      "passed": true,
+      "detail": "payment false"
+    },
+    {
+      "name": "next-api-route-blocks-documents",
+      "passed": true,
+      "detail": "documents false"
+    },
+    {
+      "name": "next-api-route-blocks-email",
+      "passed": true,
+      "detail": "email false"
+    },
+    {
+      "name": "demo-payload-has-consent",
+      "passed": true,
+      "detail": "consent true"
+    },
+    {
+      "name": "demo-payload-has-route-intent",
+      "passed": true,
+      "detail": "route intent present"
+    },
+    {
+      "name": "demo-payload-no-sensitive-fields",
+      "passed": true,
+      "detail": "no sensitive field keys"
+    },
+    {
+      "name": "controlled-web-api-next-cli-exists",
+      "passed": true,
+      "detail": "C:\\Users\\dell\\kingsmen-platform\\apps\\web\\node_modules\\next\\dist\\bin\\next"
+    },
+    {
+      "name": "controlled-web-api-minimal-env",
+      "passed": true,
+      "detail": "keys=PATH,Path,PATHEXT,SystemRoot,WINDIR,TEMP,TMP,USERPROFILE,APPDATA,LOCALAPPDATA,COMSPEC,HOMEDRIVE,HOMEPATH,PROCESSOR_ARCHITECTURE,PROCESSOR_IDENTIFIER,NUMBER_OF_PROCESSORS,NEXT_TELEMETRY_DISABLED,CI,NODE_ENV,KINGSMEN_ENABLE_LOCAL_INTAKE_WRITE"
+    },
+    {
+      "name": "controlled-web-api-server-started",
+      "passed": true,
+      "detail": "url=http://127.0.0.1:49747/free-destiny-map"
+    },
+    {
+      "name": "controlled-web-api-web-status-200",
+      "passed": true,
+      "detail": "status=200"
+    },
+    {
+      "name": "controlled-web-api-page-has-free-destiny-map",
+      "passed": true,
+      "detail": "Free Destiny Map text"
+    },
+    {
+      "name": "controlled-web-api-page-has-local-intake-copy",
+      "passed": true,
+      "detail": "local intake wording"
+    },
+    {
+      "name": "controlled-web-api-post-status-202",
+      "passed": true,
+      "detail": "status=202"
+    },
+    {
+      "name": "controlled-web-api-response-accepted",
+      "passed": true,
+      "detail": "accepted true"
+    },
+    {
+      "name": "controlled-web-api-response-production-false",
+      "passed": true,
+      "detail": "productionReady false"
+    },
+    {
+      "name": "controlled-web-api-response-official-submission-false",
+      "passed": true,
+      "detail": "officialApplicationSubmitted false"
+    },
+    {
+      "name": "controlled-web-api-response-payment-false",
+      "passed": true,
+      "detail": "paymentInstructionSent false"
+    },
+    {
+      "name": "controlled-web-api-response-document-false",
+      "passed": true,
+      "detail": "documentUploadAccepted false"
+    },
+    {
+      "name": "controlled-web-api-response-email-false",
+      "passed": true,
+      "detail": "emailSent false"
+    },
+    {
+      "name": "controlled-web-api-local-write-succeeded",
+      "passed": true,
+      "detail": "data/local/free-destiny-map/next-api-integration/next-api-demo-intakes.jsonl"
+    },
+    {
+      "name": "controlled-web-api-server-stopped",
+      "passed": true,
+      "detail": "process tree stop attempted"
+    }
+  ],
+  "failed": [],
+  "api_response_reference": "KM-FDM-NEXT15B",
+  "api_local_write_succeeded": true,
+  "local_data_file": "data/local/free-destiny-map/next-api-integration/next-api-demo-intakes.jsonl",
+  "stdout_tail": [
+    "   ▲ Next.js 15.5.19",
+    "   - Local:        http://127.0.0.1:49747",
+    "   - Network:      http://127.0.0.1:49747",
+    "   - Experiments (use with caution):",
+    "     ✓ externalDir",
+    " ✓ Starting...",
+    " ✓ Ready in 5.6s",
+    " ○ Compiling /free-destiny-map ...",
+    " ✓ Compiled /free-destiny-map in 1596ms (532 modules)",
+    " GET /free-destiny-map 200 in 204ms",
+    " ○ Compiling /api/public/free-destiny-map/intake/local ...",
+    " ✓ Compiled /api/public/free-destiny-map/intake/local in 1209ms (551 modules)",
+    " POST /api/public/free-destiny-map/intake/local 202 in 1632ms"
+  ],
+  "stderr_tail": [],
+  "oracle_lite_impact": "none_runtime_yet",
+  "runtime_scope": "controlled local Next web plus local API integration proof only; no Oracle runtime; no production deployment",
+  "next_action": "Run validator and commit BATCH 15B. Next batch may add production build proof or backend runtime integration."
+}

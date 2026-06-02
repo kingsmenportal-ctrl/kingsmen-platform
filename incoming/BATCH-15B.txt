@@ -1,0 +1,847 @@
+FILE: docs/runtime/free-destiny-map-controlled-web-api-integration-proof.md
+---
+# BATCH 15B - Controlled Local Web + Local API Integration Proof
+
+## Purpose
+
+This batch proves the first controlled same-origin local web plus local API integration for the Free Destiny Map path.
+
+BATCH 14 proved the real Next web app can boot and serve `/free-destiny-map`.
+
+BATCH 15A repaired the Next workspace-root warning.
+
+BATCH 15B now adds a real Next route handler at `/api/public/free-destiny-map/intake/local`, starts the controlled local Next dev server, fetches the Free Destiny Map page, posts a safe demo intake payload to the local API route, verifies HTTP 202, writes local JSONL proof, and shuts the server down.
+
+## What this batch proves
+
+- the real Next app boots locally
+- `/free-destiny-map` responds with HTTP 200
+- `/api/public/free-destiny-map/intake/local` exists as a real Next route handler
+- a safe demo intake payload can be posted to the same-origin local API route
+- the local API route returns HTTP 202
+- the route keeps production claims blocked
+- the route blocks official submission, payment, document upload and email
+- local proof data stays under ignored `data/local`
+- the server process is stopped after proof
+
+## What this batch does not claim
+
+- no production deployment
+- no Oracle runtime
+- no Docker Compose boot
+- no PostgreSQL database
+- no Redis queue
+- no production API
+- no email sending
+- no payment processing
+- no document upload
+- no official application submission
+
+## Oracle Lite impact
+
+none_runtime_yet.
+
+This is a controlled local Next web plus local API proof only.
+
+## Next action
+
+After validation, BATCH 16 should either add a production build proof or connect this local API intake to the backend runtime shell with a controlled local API service boundary.
+---
+FILE: manifests/runtime/free-destiny-map-controlled-web-api-integration-proof.json
+---
+{
+  "schema": "kingsmen.controlled-web-api-integration-proof.v1",
+  "module": "BATCH 15B - Controlled Local Web + Local API Integration Proof",
+  "status": "BUILT_PENDING_VALIDATION",
+  "productionReady": false,
+  "requiresBatches": [
+    "BATCH 14 - Controlled Local Next Web Boot Proof",
+    "BATCH 15A - Workspace Root / Lockfile Warning Repair"
+  ],
+  "webRoute": "/free-destiny-map",
+  "apiEndpoint": "/api/public/free-destiny-map/intake/local",
+  "nextRouteHandler": "apps/web/src/app/api/public/free-destiny-map/intake/local/route.ts",
+  "localExerciseDataDirectory": "data/local/free-destiny-map/next-api-integration",
+  "localWriteFlag": "KINGSMEN_ENABLE_LOCAL_INTAKE_WRITE",
+  "proofCommand": "powershell.exe -ExecutionPolicy Bypass -File scripts/runtime/Invoke-FreeDestinyMapControlledWebApiIntegration.ps1",
+  "proofScript": "scripts/proof/prove-free-destiny-map-controlled-web-api-integration.mjs",
+  "proofReport": "reports/runtime/free-destiny-map-controlled-web-api-integration-proof.json",
+  "validationReport": "reports/validation/free-destiny-map-controlled-web-api-integration-latest.json",
+  "storesProductionData": false,
+  "usesDemoPayloadOnly": true,
+  "takesPayment": false,
+  "sendsEmail": false,
+  "collectsDocuments": false,
+  "submitsOfficialApplications": false,
+  "oracleLiteImpact": "none_runtime_yet",
+  "controlPlaneImpact": "Adds first controlled same-origin local web plus local API intake proof.",
+  "requiredFiles": [
+    "docs/runtime/free-destiny-map-controlled-web-api-integration-proof.md",
+    "manifests/runtime/free-destiny-map-controlled-web-api-integration-proof.json",
+    "apps/web/src/app/api/public/free-destiny-map/intake/local/route.ts",
+    "packages/contracts/src/free-destiny-map-controlled-web-api-integration.ts",
+    "scripts/runtime/Invoke-FreeDestinyMapControlledWebApiIntegration.ps1",
+    "scripts/proof/prove-free-destiny-map-controlled-web-api-integration.mjs",
+    "reports/runtime/free-destiny-map-controlled-web-api-integration-proof.json",
+    "scripts/validators/validate-free-destiny-map-controlled-web-api-integration.mjs",
+    "reports/validation/free-destiny-map-controlled-web-api-integration-latest.json"
+  ],
+  "nextAction": "Run powershell.exe -ExecutionPolicy Bypass -File scripts/runtime/Invoke-FreeDestinyMapControlledWebApiIntegration.ps1 then node scripts/validators/validate-free-destiny-map-controlled-web-api-integration.mjs"
+}
+---
+FILE: apps/web/src/app/api/public/free-destiny-map/intake/local/route.ts
+---
+import fs from "node:fs";
+import path from "node:path";
+import { NextRequest, NextResponse } from "next/server";
+
+export const runtime = "nodejs";
+export const dynamic = "force-dynamic";
+
+const endpoint = "/api/public/free-destiny-map/intake/local";
+const localWriteFlagName = "KINGSMEN_ENABLE_LOCAL_INTAKE_WRITE";
+
+type LocalIssue = {
+  field: string;
+  code: string;
+  message: string;
+};
+
+function hasSafeConsent(payload: Record<string, unknown>): boolean {
+  return payload.consentToBeContacted === true && payload.consentToProcessBasicInfo === true;
+}
+
+function hasRouteIntent(payload: Record<string, unknown>): boolean {
+  return (
+    (Array.isArray(payload.routeInterests) && payload.routeInterests.length > 0) ||
+    Boolean(payload.currentSituation) ||
+    Boolean(payload.knownRoute) ||
+    Boolean(payload.randomSourceName)
+  );
+}
+
+function sensitiveKeys(payload: Record<string, unknown>): string[] {
+  return Object.keys(payload).filter((key) =>
+    /identity|idNumber|passport|password|card|cvv|documentBase64/i.test(key)
+  );
+}
+
+export async function POST(request: NextRequest) {
+  let payload: Record<string, unknown> = {};
+
+  try {
+    payload = await request.json();
+  } catch {
+    payload = {};
+  }
+
+  const issues: LocalIssue[] = [];
+
+  if (!hasSafeConsent(payload)) {
+    issues.push({
+      field: "consent",
+      code: "CONSENT_REQUIRED",
+      message: "Contact and basic-info processing consent are required for the local Free Destiny Map intake shell."
+    });
+  }
+
+  if (!hasRouteIntent(payload)) {
+    issues.push({
+      field: "intent",
+      code: "INTENT_REQUIRED",
+      message: "At least one route interest, current situation, known route, or source-check item is required."
+    });
+  }
+
+  const blockedSensitiveKeys = sensitiveKeys(payload);
+
+  if (blockedSensitiveKeys.length > 0) {
+    issues.push({
+      field: "payload",
+      code: "SENSITIVE_FIELDS_BLOCKED",
+      message: "Sensitive fields are blocked in the local Free Destiny Map intake shell."
+    });
+  }
+
+  const accepted = issues.length === 0;
+  const localPersistenceEnabled = process.env[localWriteFlagName] === "true";
+
+  const responseBody = {
+    accepted,
+    reference: "KM-FDM-NEXT15B",
+    productionReady: false,
+    localPersistenceEnabled,
+    localWriteAttempted: localPersistenceEnabled,
+    localWriteSucceeded: false,
+    storageMode: "local_jsonl_shell",
+    officialApplicationSubmitted: false,
+    paymentInstructionSent: false,
+    documentUploadAccepted: false,
+    emailSent: false,
+    safeNotice:
+      "Controlled local Next API proof only. No production storage, no payment, no email, no documents, no official application submission.",
+    nextAction: accepted
+      ? "Controlled local Next API accepted the safe demo Free Destiny Map payload."
+      : "Fix local Free Destiny Map intake payload issues.",
+    issues
+  };
+
+  if (accepted && localPersistenceEnabled) {
+    const repoRoot = path.resolve(process.cwd(), "../..");
+    const localDataDir = path.join(repoRoot, "data/local/free-destiny-map/next-api-integration");
+    const localDataFile = path.join(localDataDir, "next-api-demo-intakes.jsonl");
+
+    fs.mkdirSync(localDataDir, { recursive: true });
+    fs.appendFileSync(
+      localDataFile,
+      `${JSON.stringify({
+        schema: "kingsmen.free-destiny-map.next-api-integration-record.v1",
+        module: "BATCH 15B - Controlled Local Web + Local API Integration Proof",
+        productionReady: false,
+        storesProductionData: false,
+        endpoint,
+        createdAt: new Date().toISOString(),
+        requestPayload: payload,
+        response: responseBody
+      })}\n`,
+      "utf8"
+    );
+
+    responseBody.localWriteSucceeded = fs.existsSync(localDataFile);
+  }
+
+  return NextResponse.json(responseBody, { status: accepted ? 202 : 400 });
+}
+
+export async function GET() {
+  return NextResponse.json(
+    {
+      accepted: false,
+      productionReady: false,
+      endpoint,
+      safeNotice: "Use POST with a safe Free Destiny Map local intake payload.",
+      officialApplicationSubmitted: false,
+      paymentInstructionSent: false,
+      documentUploadAccepted: false,
+      emailSent: false
+    },
+    { status: 405 }
+  );
+}
+---
+FILE: packages/contracts/src/free-destiny-map-controlled-web-api-integration.ts
+---
+export const FREE_DESTINY_MAP_CONTROLLED_WEB_API_INTEGRATION_MODULE =
+  "BATCH 15B - Controlled Local Web + Local API Integration Proof" as const;
+
+export const FREE_DESTINY_MAP_CONTROLLED_WEB_API_ROUTE =
+  "/free-destiny-map" as const;
+
+export const FREE_DESTINY_MAP_CONTROLLED_LOCAL_API_ENDPOINT =
+  "/api/public/free-destiny-map/intake/local" as const;
+
+export const FREE_DESTINY_MAP_CONTROLLED_NEXT_ROUTE_HANDLER =
+  "apps/web/src/app/api/public/free-destiny-map/intake/local/route.ts" as const;
+
+export type FreeDestinyMapControlledWebApiIntegrationStatus =
+  | "CONTROLLED_WEB_API_INTEGRATION_PROVEN"
+  | "CONTROLLED_WEB_API_INTEGRATION_FAILED";
+
+export interface FreeDestinyMapControlledWebApiIntegrationCheck {
+  name: string;
+  passed: boolean;
+  detail: string;
+}
+
+export interface FreeDestinyMapControlledWebApiIntegrationReport {
+  schema: "kingsmen.controlled-web-api-integration-report.v1";
+  module: typeof FREE_DESTINY_MAP_CONTROLLED_WEB_API_INTEGRATION_MODULE;
+  status: FreeDestinyMapControlledWebApiIntegrationStatus;
+  passed: boolean;
+  productionReady: false;
+  canClaimProduction: false;
+  serverStarted: boolean;
+  serverStopped: boolean;
+  webStatus: number;
+  apiStatus: number;
+  oracleLiteImpact: "none_runtime_yet";
+  checks: FreeDestinyMapControlledWebApiIntegrationCheck[];
+  failed: FreeDestinyMapControlledWebApiIntegrationCheck[];
+  nextAction: string;
+}
+---
+FILE: scripts/runtime/Invoke-FreeDestinyMapControlledWebApiIntegration.ps1
+---
+#requires -Version 5.1
+[CmdletBinding()]
+param(
+  [int]$TimeoutSeconds = 120,
+  [switch]$EnableLocalWrite
+)
+
+$ErrorActionPreference = "Stop"
+
+$repoRoot = Get-Location
+$scriptPath = Join-Path $repoRoot "scripts\proof\prove-free-destiny-map-controlled-web-api-integration.mjs"
+
+if (-not (Test-Path $scriptPath -PathType Leaf)) {
+  throw "Missing proof script: $scriptPath"
+}
+
+if ($EnableLocalWrite) {
+  $env:KINGSMEN_ENABLE_LOCAL_INTAKE_WRITE = "true"
+} elseif ([string]::IsNullOrWhiteSpace($env:KINGSMEN_ENABLE_LOCAL_INTAKE_WRITE)) {
+  $env:KINGSMEN_ENABLE_LOCAL_INTAKE_WRITE = "true"
+}
+
+Write-Host "Kingsmen Free Destiny Map controlled local web plus API integration proof"
+Write-Host "Timeout seconds: $TimeoutSeconds"
+Write-Host "Local write flag: $env:KINGSMEN_ENABLE_LOCAL_INTAKE_WRITE"
+Write-Host "This starts the local Next dev server, proves the page and same-origin API route, then stops it."
+Write-Host "This does not claim production, Oracle runtime, email, payment, documents, or official submissions."
+
+node $scriptPath "--timeoutSeconds=$TimeoutSeconds"
+
+if ($LASTEXITCODE -ne 0) {
+  throw "Free Destiny Map controlled web plus API integration proof failed."
+}
+---
+FILE: scripts/proof/prove-free-destiny-map-controlled-web-api-integration.mjs
+---
+#!/usr/bin/env node
+import fs from "node:fs";
+import net from "node:net";
+import path from "node:path";
+import { spawn } from "node:child_process";
+
+const root = process.cwd();
+const webDir = path.join(root, "apps/web");
+const proofReportPath = path.join(root, "reports/runtime/free-destiny-map-controlled-web-api-integration-proof.json");
+const localDataFile = path.join(root, "data/local/free-destiny-map/next-api-integration/next-api-demo-intakes.jsonl");
+
+const timeoutArg = process.argv.find((item) => item.startsWith("--timeoutSeconds="));
+const timeoutSeconds = timeoutArg ? Number(timeoutArg.split("=")[1]) : 120;
+const timeoutMs = Number.isFinite(timeoutSeconds) && timeoutSeconds > 0 ? timeoutSeconds * 1000 : 120000;
+
+const checks = [];
+const stdoutLines = [];
+const stderrLines = [];
+
+function exists(rel) {
+  return fs.existsSync(path.join(root, rel));
+}
+
+function read(rel) {
+  return fs.readFileSync(path.join(root, rel), "utf8").replace(/^\uFEFF/, "");
+}
+
+function parseJson(rel) {
+  return JSON.parse(read(rel));
+}
+
+function check(name, passed, detail = "") {
+  checks.push({ name, passed, detail });
+}
+
+function trimLog(lines) {
+  return lines.join("").split(/\r?\n/).filter(Boolean).slice(-100);
+}
+
+function getFreePort() {
+  return new Promise((resolve, reject) => {
+    const server = net.createServer();
+    server.once("error", reject);
+    server.listen(0, "127.0.0.1", () => {
+      const address = server.address();
+      const port = typeof address === "object" && address ? address.port : 0;
+      server.close(() => resolve(port));
+    });
+  });
+}
+
+function sleep(ms) {
+  return new Promise((resolve) => setTimeout(resolve, ms));
+}
+
+async function fetchWithTimeout(url, options = {}, ms = 7000) {
+  const controller = new AbortController();
+  const timer = setTimeout(() => controller.abort(), ms);
+  try {
+    return await fetch(url, { ...options, signal: controller.signal });
+  } finally {
+    clearTimeout(timer);
+  }
+}
+
+async function waitForHttpOk(url, maxMs) {
+  const started = Date.now();
+  let lastError = "";
+  while (Date.now() - started < maxMs) {
+    try {
+      const response = await fetchWithTimeout(url, {}, 7000);
+      const text = await response.text();
+      if (response.status === 200) {
+        return { ok: true, status: response.status, text, lastError };
+      }
+      lastError = `status=${response.status}`;
+    } catch (error) {
+      lastError = error instanceof Error ? error.message : String(error);
+    }
+    await sleep(1000);
+  }
+  return { ok: false, status: 0, text: "", lastError };
+}
+
+async function stopProcessTree(child) {
+  if (!child || !child.pid) return false;
+
+  if (process.platform === "win32") {
+    await new Promise((resolve) => {
+      const killer = spawn("taskkill", ["/pid", String(child.pid), "/t", "/f"], {
+        stdio: "ignore"
+      });
+      killer.once("close", () => resolve());
+      killer.once("error", () => resolve());
+    });
+  } else {
+    try {
+      child.kill("SIGTERM");
+    } catch {}
+    await sleep(1500);
+    if (child.exitCode === null) {
+      try {
+        child.kill("SIGKILL");
+      } catch {}
+    }
+  }
+
+  await sleep(1500);
+  return true;
+}
+
+const requiredPreFiles = [
+  "reports/runtime/free-destiny-map-controlled-next-boot-proof.json",
+  "reports/runtime/free-destiny-map-workspace-root-warning-repair-proof.json",
+  "apps/web/package.json",
+  "apps/web/next.config.mjs",
+  "apps/web/src/app/free-destiny-map/page.tsx",
+  "apps/web/src/components/kingsmen/FreeDestinyMapApiForm.tsx",
+  "apps/web/src/app/api/public/free-destiny-map/intake/local/route.ts",
+  "apps/web/node_modules/next/package.json",
+  "apps/web/node_modules/react/package.json",
+  "apps/web/node_modules/react-dom/package.json",
+  "data/local/.gitignore"
+];
+
+for (const file of requiredPreFiles) {
+  check(`pre-file-exists:${file}`, exists(file), file);
+}
+
+if (exists("reports/runtime/free-destiny-map-controlled-next-boot-proof.json")) {
+  const boot = parseJson("reports/runtime/free-destiny-map-controlled-next-boot-proof.json");
+  check("batch-14-controlled-next-boot-proven", boot.status === "CONTROLLED_NEXT_BOOT_PROVEN" && boot.passed === true, `status=${boot.status}; passed=${boot.passed}`);
+  check("batch-14-production-false", boot.productionReady === false && boot.canClaimProduction === false, "production false");
+}
+
+if (exists("reports/runtime/free-destiny-map-workspace-root-warning-repair-proof.json")) {
+  const repair = parseJson("reports/runtime/free-destiny-map-workspace-root-warning-repair-proof.json");
+  check("batch-15a-workspace-root-repair-applied", repair.status === "WORKSPACE_ROOT_WARNING_REPAIR_APPLIED" && repair.passed === true, `status=${repair.status}; passed=${repair.passed}`);
+  check("batch-15a-production-false", repair.productionReady === false && repair.canClaimProduction === false, "production false");
+}
+
+if (exists("apps/web/src/app/api/public/free-destiny-map/intake/local/route.ts")) {
+  const route = read("apps/web/src/app/api/public/free-destiny-map/intake/local/route.ts");
+  check("next-api-route-exports-post", route.includes("export async function POST"), "POST handler present");
+  check("next-api-route-runtime-nodejs", route.includes('runtime = "nodejs"'), "nodejs runtime");
+  check("next-api-route-writes-local-jsonl", route.includes("next-api-demo-intakes.jsonl"), "local JSONL write");
+  check("next-api-route-keeps-production-false", route.includes("productionReady: false"), "production false");
+  check("next-api-route-blocks-official-submission", route.includes("officialApplicationSubmitted: false"), "official false");
+  check("next-api-route-blocks-payment", route.includes("paymentInstructionSent: false"), "payment false");
+  check("next-api-route-blocks-documents", route.includes("documentUploadAccepted: false"), "documents false");
+  check("next-api-route-blocks-email", route.includes("emailSent: false"), "email false");
+}
+
+let child = null;
+let serverStarted = false;
+let serverStopped = false;
+let webStatus = 0;
+let apiStatus = 0;
+let webText = "";
+let apiResponse = null;
+let webUrl = "";
+let apiUrl = "";
+let port = 0;
+let spawnError = null;
+
+const demoPayload = {
+  fullName: "Kingsmen Integrated Demo Candidate",
+  province: "KwaZulu-Natal",
+  currentSituation: "Integrated local web plus API demo user wants study, funding, accommodation and CV route guidance.",
+  knownRoute: "Controlled local Next web plus API integration proof",
+  routeInterests: ["higher_education", "tvet", "nsfas_bursary", "accommodation", "cv_revamp", "source_check"],
+  needsAccommodation: true,
+  accommodationArea: "Durban / campus or training area",
+  needsFundingHelp: true,
+  needsCvHelp: true,
+  hasDocumentsReady: false,
+  randomSourceName: "Integrated demo bursary or learnership source to check later",
+  consentToBeContacted: true,
+  consentToProcessBasicInfo: true
+};
+
+check("demo-payload-has-consent", demoPayload.consentToBeContacted === true && demoPayload.consentToProcessBasicInfo === true, "consent true");
+check("demo-payload-has-route-intent", demoPayload.routeInterests.length > 0 && Boolean(demoPayload.currentSituation), "route intent present");
+check("demo-payload-no-sensitive-fields", !Object.keys(demoPayload).some((key) => /identity|idNumber|passport|password|card|cvv|documentBase64/i.test(key)), "no sensitive field keys");
+
+try {
+  const preFailures = checks.filter((item) => item.passed !== true);
+  if (preFailures.length > 0) {
+    throw new Error("Pre-integration checks failed. Controlled integration proof not attempted.");
+  }
+
+  port = await getFreePort();
+  webUrl = `http://127.0.0.1:${port}/free-destiny-map`;
+  apiUrl = `http://127.0.0.1:${port}/api/public/free-destiny-map/intake/local`;
+
+  const nextCliPath = path.join(webDir, "node_modules/next/dist/bin/next");
+
+  check("controlled-web-api-next-cli-exists", fs.existsSync(nextCliPath), nextCliPath);
+
+  const safeEnv = {};
+  const envKeysToKeep = [
+    "PATH",
+    "Path",
+    "PATHEXT",
+    "SystemRoot",
+    "WINDIR",
+    "TEMP",
+    "TMP",
+    "USERPROFILE",
+    "APPDATA",
+    "LOCALAPPDATA",
+    "COMSPEC",
+    "HOMEDRIVE",
+    "HOMEPATH",
+    "PROCESSOR_ARCHITECTURE",
+    "PROCESSOR_IDENTIFIER",
+    "NUMBER_OF_PROCESSORS"
+  ];
+
+  for (const key of envKeysToKeep) {
+    const value = process.env[key];
+    if (!key || key.includes("=") || key.includes("\u0000")) continue;
+    if (typeof value === "undefined" || String(value).includes("\u0000")) continue;
+    safeEnv[key] = String(value);
+  }
+
+  safeEnv.NEXT_TELEMETRY_DISABLED = "1";
+  safeEnv.CI = "1";
+  safeEnv.NODE_ENV = "development";
+  safeEnv.KINGSMEN_ENABLE_LOCAL_INTAKE_WRITE = "true";
+
+  check("controlled-web-api-minimal-env", true, `keys=${Object.keys(safeEnv).join(",")}`);
+
+  child = spawn(process.execPath, [nextCliPath, "dev", "--hostname", "127.0.0.1", "--port", String(port)], {
+    cwd: webDir,
+    env: safeEnv,
+    stdio: ["ignore", "pipe", "pipe"],
+    windowsHide: true
+  });
+
+  child.stdout.on("data", (chunk) => stdoutLines.push(chunk.toString()));
+  child.stderr.on("data", (chunk) => stderrLines.push(chunk.toString()));
+  child.once("error", (error) => {
+    spawnError = error;
+  });
+
+  const webResult = await waitForHttpOk(webUrl, timeoutMs);
+  webStatus = webResult.status;
+  webText = webResult.text;
+  serverStarted = webResult.ok;
+
+  check("controlled-web-api-server-started", serverStarted, serverStarted ? `url=${webUrl}` : `lastError=${webResult.lastError}`);
+  check("controlled-web-api-web-status-200", webStatus === 200, `status=${webStatus}`);
+  check("controlled-web-api-page-has-free-destiny-map", webText.includes("Free Destiny Map") || webText.includes("Start your Free Destiny Map"), "Free Destiny Map text");
+  check("controlled-web-api-page-has-local-intake-copy", webText.includes("local intake") || webText.includes("local shell"), "local intake wording");
+
+  const apiFetch = await fetchWithTimeout(
+    apiUrl,
+    {
+      method: "POST",
+      headers: {
+        "content-type": "application/json"
+      },
+      body: JSON.stringify(demoPayload)
+    },
+    15000
+  );
+
+  apiStatus = apiFetch.status;
+  apiResponse = await apiFetch.json();
+
+  check("controlled-web-api-post-status-202", apiStatus === 202, `status=${apiStatus}`);
+  check("controlled-web-api-response-accepted", apiResponse.accepted === true, "accepted true");
+  check("controlled-web-api-response-production-false", apiResponse.productionReady === false, "productionReady false");
+  check("controlled-web-api-response-official-submission-false", apiResponse.officialApplicationSubmitted === false, "officialApplicationSubmitted false");
+  check("controlled-web-api-response-payment-false", apiResponse.paymentInstructionSent === false, "paymentInstructionSent false");
+  check("controlled-web-api-response-document-false", apiResponse.documentUploadAccepted === false, "documentUploadAccepted false");
+  check("controlled-web-api-response-email-false", apiResponse.emailSent === false, "emailSent false");
+  check("controlled-web-api-local-write-succeeded", apiResponse.localWriteSucceeded === true && fs.existsSync(localDataFile), path.relative(root, localDataFile).replaceAll("\\", "/"));
+} catch (error) {
+  check("controlled-web-api-exception-absent", false, error instanceof Error ? error.message : String(error));
+} finally {
+  if (child) {
+    serverStopped = await stopProcessTree(child);
+  }
+}
+
+check("controlled-web-api-server-stopped", serverStopped, serverStopped ? "process tree stop attempted" : "server process was not started or could not be stopped");
+
+if (spawnError) {
+  check("controlled-web-api-spawn-error-absent", false, spawnError.message);
+}
+
+const failed = checks.filter((item) => item.passed !== true);
+const passed = failed.length === 0;
+
+const report = {
+  schema: "kingsmen.controlled-web-api-integration-report.v1",
+  module: "BATCH 15B - Controlled Local Web + Local API Integration Proof",
+  status: passed ? "CONTROLLED_WEB_API_INTEGRATION_PROVEN" : "CONTROLLED_WEB_API_INTEGRATION_FAILED",
+  passed,
+  productionReady: false,
+  canClaimProduction: false,
+  generated_at: new Date().toISOString(),
+  serverStarted,
+  serverStopped,
+  webStatus,
+  apiStatus,
+  webRoute: "/free-destiny-map",
+  apiEndpoint: "/api/public/free-destiny-map/intake/local",
+  webUrl,
+  apiUrl,
+  checks,
+  failed,
+  api_response_reference: apiResponse?.reference ?? null,
+  api_local_write_succeeded: apiResponse?.localWriteSucceeded ?? false,
+  local_data_file: fs.existsSync(localDataFile) ? path.relative(root, localDataFile).replaceAll("\\", "/") : null,
+  stdout_tail: trimLog(stdoutLines),
+  stderr_tail: trimLog(stderrLines),
+  oracle_lite_impact: "none_runtime_yet",
+  runtime_scope: "controlled local Next web plus local API integration proof only; no Oracle runtime; no production deployment",
+  next_action: passed
+    ? "Run validator and commit BATCH 15B. Next batch may add production build proof or backend runtime integration."
+    : "Repair controlled local web plus API integration failures before moving forward."
+};
+
+fs.mkdirSync(path.dirname(proofReportPath), { recursive: true });
+fs.writeFileSync(proofReportPath, `${JSON.stringify(report, null, 2)}\n`, "utf8");
+
+console.log(JSON.stringify(report, null, 2));
+if (!passed) process.exit(1);
+---
+FILE: reports/runtime/free-destiny-map-controlled-web-api-integration-proof.json
+---
+{
+  "schema": "kingsmen.controlled-web-api-integration-report.v1",
+  "module": "BATCH 15B - Controlled Local Web + Local API Integration Proof",
+  "status": "CONTROLLED_WEB_API_INTEGRATION_FAILED",
+  "passed": false,
+  "productionReady": false,
+  "canClaimProduction": false,
+  "generated_at": "2026-06-02T00:00:00.000Z",
+  "serverStarted": false,
+  "serverStopped": false,
+  "webStatus": 0,
+  "apiStatus": 0,
+  "webRoute": "/free-destiny-map",
+  "apiEndpoint": "/api/public/free-destiny-map/intake/local",
+  "checks": [],
+  "failed": [
+    {
+      "name": "controlled_web_api_integration_not_yet_executed",
+      "passed": false,
+      "detail": "Run scripts/runtime/Invoke-FreeDestinyMapControlledWebApiIntegration.ps1."
+    }
+  ],
+  "oracle_lite_impact": "none_runtime_yet",
+  "runtime_scope": "controlled local Next web plus local API integration proof only; no Oracle runtime; no production deployment",
+  "next_action": "Run BATCH 15B controlled local web plus API integration proof."
+}
+---
+FILE: scripts/validators/validate-free-destiny-map-controlled-web-api-integration.mjs
+---
+#!/usr/bin/env node
+import fs from "node:fs";
+import path from "node:path";
+
+const root = process.cwd();
+const reportPath = path.join(root, "reports/validation/free-destiny-map-controlled-web-api-integration-latest.json");
+
+const requiredFiles = [
+  "docs/runtime/free-destiny-map-controlled-web-api-integration-proof.md",
+  "manifests/runtime/free-destiny-map-controlled-web-api-integration-proof.json",
+  "apps/web/src/app/api/public/free-destiny-map/intake/local/route.ts",
+  "packages/contracts/src/free-destiny-map-controlled-web-api-integration.ts",
+  "scripts/runtime/Invoke-FreeDestinyMapControlledWebApiIntegration.ps1",
+  "scripts/proof/prove-free-destiny-map-controlled-web-api-integration.mjs",
+  "reports/runtime/free-destiny-map-controlled-web-api-integration-proof.json",
+  "scripts/validators/validate-free-destiny-map-controlled-web-api-integration.mjs",
+  "reports/validation/free-destiny-map-controlled-web-api-integration-latest.json"
+];
+
+const upstreamFiles = [
+  "reports/runtime/free-destiny-map-controlled-next-boot-proof.json",
+  "reports/runtime/free-destiny-map-workspace-root-warning-repair-proof.json",
+  "apps/web/package.json",
+  "apps/web/next.config.mjs",
+  "apps/web/src/app/free-destiny-map/page.tsx",
+  "apps/web/src/components/kingsmen/FreeDestinyMapApiForm.tsx"
+];
+
+function exists(rel) {
+  return fs.existsSync(path.join(root, rel));
+}
+
+function read(rel) {
+  return fs.readFileSync(path.join(root, rel), "utf8").replace(/^\uFEFF/, "");
+}
+
+function parseJson(rel) {
+  return JSON.parse(read(rel));
+}
+
+const failures = [];
+const warnings = [];
+const checked = [];
+
+for (const file of requiredFiles) {
+  checked.push(file);
+  if (!exists(file)) failures.push(`Missing required file: ${file}`);
+  else if (fs.statSync(path.join(root, file)).size === 0) failures.push(`Empty required file: ${file}`);
+}
+
+for (const file of upstreamFiles) {
+  checked.push(file);
+  if (!exists(file)) failures.push(`Missing upstream file: ${file}`);
+  else if (fs.statSync(path.join(root, file)).size === 0) failures.push(`Empty upstream file: ${file}`);
+}
+
+if (exists("manifests/runtime/free-destiny-map-controlled-web-api-integration-proof.json")) {
+  const manifest = parseJson("manifests/runtime/free-destiny-map-controlled-web-api-integration-proof.json");
+  if (manifest.productionReady !== false) failures.push("Manifest must keep productionReady false.");
+  if (manifest.storesProductionData !== false) failures.push("Manifest must declare storesProductionData false.");
+  if (manifest.usesDemoPayloadOnly !== true) failures.push("Manifest must declare usesDemoPayloadOnly true.");
+  if (manifest.takesPayment !== false) failures.push("Manifest must declare takesPayment false.");
+  if (manifest.sendsEmail !== false) failures.push("Manifest must declare sendsEmail false.");
+  if (manifest.collectsDocuments !== false) failures.push("Manifest must declare collectsDocuments false.");
+  if (manifest.submitsOfficialApplications !== false) failures.push("Manifest must declare submitsOfficialApplications false.");
+  if (manifest.webRoute !== "/free-destiny-map") failures.push("Manifest web route mismatch.");
+  if (manifest.apiEndpoint !== "/api/public/free-destiny-map/intake/local") failures.push("Manifest API endpoint mismatch.");
+  if (!String(manifest.oracleLiteImpact ?? "").includes("none_runtime_yet")) failures.push("Manifest must declare none_runtime_yet.");
+}
+
+const tokenChecks = [
+  ["apps/web/src/app/api/public/free-destiny-map/intake/local/route.ts", ["export async function POST", "runtime = \"nodejs\"", "next-api-demo-intakes.jsonl", "productionReady: false", "officialApplicationSubmitted: false", "paymentInstructionSent: false", "documentUploadAccepted: false", "emailSent: false"]],
+  ["packages/contracts/src/free-destiny-map-controlled-web-api-integration.ts", ["CONTROLLED_WEB_API_INTEGRATION_PROVEN", "FREE_DESTINY_MAP_CONTROLLED_LOCAL_API_ENDPOINT", "canClaimProduction: false"]],
+  ["scripts/runtime/Invoke-FreeDestinyMapControlledWebApiIntegration.ps1", ["KINGSMEN_ENABLE_LOCAL_INTAKE_WRITE", "ControlledWebApiIntegration", "does not claim production"]],
+  ["scripts/proof/prove-free-destiny-map-controlled-web-api-integration.mjs", ["CONTROLLED_WEB_API_INTEGRATION_PROVEN", "controlled-web-api-post-status-202", "controlled-web-api-local-write-succeeded", "KINGSMEN_ENABLE_LOCAL_INTAKE_WRITE"]],
+  ["reports/runtime/free-destiny-map-controlled-web-api-integration-proof.json", ["schema", "module", "status"]]
+];
+
+for (const [file, tokens] of tokenChecks) {
+  if (!exists(file)) continue;
+  const content = read(file);
+  for (const token of tokens) {
+    if (!content.includes(token)) failures.push(`${file} missing token: ${token}`);
+  }
+}
+
+if (exists("reports/runtime/free-destiny-map-controlled-web-api-integration-proof.json")) {
+  const proof = parseJson("reports/runtime/free-destiny-map-controlled-web-api-integration-proof.json");
+  if (proof.passed !== true) failures.push("Controlled web API integration proof must pass.");
+  if (proof.status !== "CONTROLLED_WEB_API_INTEGRATION_PROVEN") failures.push("Controlled web API integration proof status must be CONTROLLED_WEB_API_INTEGRATION_PROVEN.");
+  if (proof.productionReady !== false) failures.push("Controlled web API integration proof must keep productionReady false.");
+  if (proof.canClaimProduction !== false) failures.push("Controlled web API integration proof must keep canClaimProduction false.");
+  if (proof.serverStarted !== true) failures.push("Controlled web API integration proof must start server.");
+  if (proof.serverStopped !== true) failures.push("Controlled web API integration proof must stop server.");
+  if (proof.webStatus !== 200) failures.push("Controlled web API integration proof must record webStatus 200.");
+  if (proof.apiStatus !== 202) failures.push("Controlled web API integration proof must record apiStatus 202.");
+  if (proof.api_local_write_succeeded !== true) failures.push("Controlled web API integration proof must record local write success.");
+  if (!Array.isArray(proof.checks) || proof.checks.length < 15) failures.push("Controlled web API integration proof must include detailed checks.");
+}
+
+const forbiddenFiles = [
+  "docs/runtime/free-destiny-map-controlled-web-api-integration-proof.md",
+  "manifests/runtime/free-destiny-map-controlled-web-api-integration-proof.json",
+  "apps/web/src/app/api/public/free-destiny-map/intake/local/route.ts",
+  "packages/contracts/src/free-destiny-map-controlled-web-api-integration.ts",
+  "scripts/runtime/Invoke-FreeDestinyMapControlledWebApiIntegration.ps1"
+];
+
+const forbiddenPatterns = [
+  [/productionReady\s*[:=]\s*true/i, "productionReady true"],
+  [/canClaimProduction\s*[:=]\s*true/i, "canClaimProduction true"],
+  [/officialApplicationSubmitted:\s*true/i, "official application submitted true"],
+  [/paymentInstructionSent:\s*true/i, "payment instruction sent true"],
+  [/emailSent:\s*true/i, "email sent true"],
+  [/documentUploadAccepted:\s*true/i, "document upload accepted true"],
+  [/\bidentityNumber\s*[:=]/i, "identity number assignment"],
+  [/\bidNumber\s*[:=]/i, "id number assignment"],
+  [/\bpassportNumber\s*[:=]/i, "passport number assignment"],
+  [/\bcardNumber\s*[:=]/i, "card number assignment"],
+  [/\bcvv\s*[:=]/i, "cvv assignment"]
+];
+
+for (const file of forbiddenFiles) {
+  if (!exists(file)) continue;
+  const content = read(file);
+  for (const [pattern, label] of forbiddenPatterns) {
+    if (pattern.test(content)) failures.push(`${file} contains forbidden pattern: ${label}`);
+  }
+}
+
+const passed = failures.length === 0;
+
+const report = {
+  schema: "kingsmen.validation-report.v1",
+  module: "BATCH 15B - Controlled Local Web + Local API Integration Proof",
+  status: passed ? "VALIDATED" : "BUILT_PENDING_VALIDATION",
+  passed,
+  generated_at: new Date().toISOString(),
+  files_expected: requiredFiles,
+  upstream_files_checked: upstreamFiles,
+  files_checked: checked.length,
+  missing_files: requiredFiles.filter((file) => !exists(file)),
+  failed_checks: failures,
+  warnings,
+  oracle_lite_impact: "none_runtime_yet",
+  control_plane_impact: "Adds controlled same-origin local web plus API intake proof.",
+  runtime_proof: "reports/runtime/free-destiny-map-controlled-web-api-integration-proof.json",
+  next_action: passed ? "Proceed to BATCH 16 - Production build proof or backend runtime integration." : "Repair controlled local web plus API integration proof failures."
+};
+
+fs.mkdirSync(path.dirname(reportPath), { recursive: true });
+fs.writeFileSync(reportPath, `${JSON.stringify(report, null, 2)}\n`, "utf8");
+
+console.log(JSON.stringify(report, null, 2));
+if (!passed) process.exit(1);
+---
+FILE: reports/validation/free-destiny-map-controlled-web-api-integration-latest.json
+---
+{
+  "schema": "kingsmen.validation-report.v1",
+  "module": "BATCH 15B - Controlled Local Web + Local API Integration Proof",
+  "status": "BUILT_PENDING_VALIDATION",
+  "passed": false,
+  "generated_at": "2026-06-02T00:00:00.000Z",
+  "reason": "Seed report. Run BATCH 15B controlled local web plus API integration proof then validator.",
+  "files_checked": 0,
+  "failed_checks": [
+    "validator_not_yet_executed"
+  ],
+  "oracle_lite_impact": "none_runtime_yet",
+  "control_plane_impact": "Adds controlled same-origin local web plus API intake proof.",
+  "runtime_proof": "reports/runtime/free-destiny-map-controlled-web-api-integration-proof.json",
+  "next_action": "Run powershell.exe -ExecutionPolicy Bypass -File scripts/runtime/Invoke-FreeDestinyMapControlledWebApiIntegration.ps1 then node scripts/validators/validate-free-destiny-map-controlled-web-api-integration.mjs."
+}
