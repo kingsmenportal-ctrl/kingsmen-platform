@@ -1,0 +1,34 @@
+{
+  "schema": "kingsmen.validation-report.v1",
+  "module": "BATCH 18 - Controlled Next-to-Backend Bridge Proof",
+  "status": "VALIDATED",
+  "passed": true,
+  "generated_at": "2026-06-02T21:44:44.398Z",
+  "files_expected": [
+    "docs/runtime/free-destiny-map-next-backend-bridge-proof.md",
+    "manifests/runtime/free-destiny-map-next-backend-bridge-proof.json",
+    "apps/web/src/app/api/public/free-destiny-map/intake/local/route.ts",
+    "packages/contracts/src/free-destiny-map-next-backend-bridge.ts",
+    "scripts/runtime/Invoke-FreeDestinyMapNextBackendBridge.ps1",
+    "scripts/proof/prove-free-destiny-map-next-backend-bridge.mjs",
+    "reports/runtime/free-destiny-map-next-backend-bridge-proof.json",
+    "scripts/validators/validate-free-destiny-map-next-backend-bridge.mjs",
+    "reports/validation/free-destiny-map-next-backend-bridge-latest.json"
+  ],
+  "upstream_files_checked": [
+    "reports/runtime/free-destiny-map-backend-runtime-boundary-proof.json",
+    "reports/runtime/free-destiny-map-controlled-production-build-proof.json",
+    "apps/api/src/runtime/free-destiny-map-backend-local-runtime.mjs",
+    "apps/web/src/app/free-destiny-map/page.tsx",
+    "apps/web/package.json",
+    "data/local/.gitignore"
+  ],
+  "files_checked": 15,
+  "missing_files": [],
+  "failed_checks": [],
+  "warnings": [],
+  "oracle_lite_impact": "none_runtime_yet",
+  "control_plane_impact": "Adds controlled local Next API to backend runtime boundary bridge proof.",
+  "runtime_proof": "reports/runtime/free-destiny-map-next-backend-bridge-proof.json",
+  "next_action": "Proceed to BATCH 19 - Docker/Oracle Lite local runtime container preparation."
+}

@@ -4,7 +4,7 @@
     "submodule":  "CREATOR.2B",
     "action":  "Materialize",
     "productionReady":  false,
-    "generatedAt":  "2026-06-02T21:34:13.432Z",
+    "generatedAt":  "2026-06-02T21:44:26.844Z",
     "repoRoot":  "C:\\Users\\dell\\kingsmen-platform",
     "passed":  true,
     "detail":  "Materialize complete.",
@@ -20,47 +20,47 @@
                        "detail":  "blocks=9"
                    },
                    {
-                       "name":  "materialize:wrote:docs/runtime/free-destiny-map-backend-runtime-boundary.md",
+                       "name":  "materialize:wrote:docs/runtime/free-destiny-map-next-backend-bridge-proof.md",
                        "passed":  true,
                        "detail":  "written"
                    },
                    {
-                       "name":  "materialize:wrote:manifests/runtime/free-destiny-map-backend-runtime-boundary.json",
+                       "name":  "materialize:wrote:manifests/runtime/free-destiny-map-next-backend-bridge-proof.json",
                        "passed":  true,
                        "detail":  "written"
                    },
                    {
-                       "name":  "materialize:wrote:apps/api/src/runtime/free-destiny-map-backend-local-runtime.mjs",
+                       "name":  "materialize:wrote:apps/web/src/app/api/public/free-destiny-map/intake/local/route.ts",
                        "passed":  true,
                        "detail":  "written"
                    },
                    {
-                       "name":  "materialize:wrote:packages/contracts/src/free-destiny-map-backend-runtime-boundary.ts",
+                       "name":  "materialize:wrote:packages/contracts/src/free-destiny-map-next-backend-bridge.ts",
                        "passed":  true,
                        "detail":  "written"
                    },
                    {
-                       "name":  "materialize:wrote:scripts/runtime/Invoke-FreeDestinyMapBackendRuntimeBoundary.ps1",
+                       "name":  "materialize:wrote:scripts/runtime/Invoke-FreeDestinyMapNextBackendBridge.ps1",
                        "passed":  true,
                        "detail":  "written"
                    },
                    {
-                       "name":  "materialize:wrote:scripts/proof/prove-free-destiny-map-backend-runtime-boundary.mjs",
+                       "name":  "materialize:wrote:scripts/proof/prove-free-destiny-map-next-backend-bridge.mjs",
                        "passed":  true,
                        "detail":  "written"
                    },
                    {
-                       "name":  "materialize:wrote:reports/runtime/free-destiny-map-backend-runtime-boundary-proof.json",
+                       "name":  "materialize:wrote:reports/runtime/free-destiny-map-next-backend-bridge-proof.json",
                        "passed":  true,
                        "detail":  "written"
                    },
                    {
-                       "name":  "materialize:wrote:scripts/validators/validate-free-destiny-map-backend-runtime-boundary.mjs",
+                       "name":  "materialize:wrote:scripts/validators/validate-free-destiny-map-next-backend-bridge.mjs",
                        "passed":  true,
                        "detail":  "written"
                    },
                    {
-                       "name":  "materialize:wrote:reports/validation/free-destiny-map-backend-runtime-boundary-latest.json",
+                       "name":  "materialize:wrote:reports/validation/free-destiny-map-next-backend-bridge-latest.json",
                        "passed":  true,
                        "detail":  "written"
                    }

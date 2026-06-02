@@ -1,0 +1,1096 @@
+FILE: docs/runtime/free-destiny-map-next-backend-bridge-proof.md
+---
+# BATCH 18 - Controlled Next-to-Backend Bridge Proof
+
+## Purpose
+
+This batch proves the first controlled bridge from the real Next local API route into the separate backend runtime boundary.
+
+BATCH 15B proved the same-origin local Next web plus Next API route.
+
+BATCH 16 proved the controlled production build.
+
+BATCH 17 proved the separate backend local HTTP service boundary.
+
+BATCH 18 now connects the proven Next API route to the proven backend boundary using explicit local environment flags.
+
+## What this batch proves
+
+- BATCH 17 backend boundary proof exists and passed
+- BATCH 16 production build proof exists and passed
+- Next dev server can boot locally
+- backend boundary server can boot locally
+- `/free-destiny-map` returns HTTP 200 from Next
+- `/api/public/free-destiny-map/intake/local` returns HTTP 202 from Next
+- Next API route calls backend boundary
+- backend boundary returns HTTP 202
+- backend boundary writes local JSONL proof
+- bridge response confirms backend boundary was reached
+- production claims remain blocked
+- official submission, payment, document upload and email remain blocked
+- both servers shut down after proof
+
+## What this batch does not claim
+
+- no Oracle deployment
+- no Docker Compose boot
+- no PostgreSQL runtime
+- no Redis queue
+- no public production URL
+- no production backend URL
+- no email sending
+- no payment processing
+- no document upload
+- no official application submission
+
+## Oracle Lite impact
+
+none_runtime_yet.
+
+This is a controlled local bridge proof only.
+
+## Next action
+
+After validation, BATCH 19 should prepare Oracle Lite container/runtime boundaries or create a controlled Docker-local web plus backend compose proof.
+---
+FILE: manifests/runtime/free-destiny-map-next-backend-bridge-proof.json
+---
+{
+  "schema": "kingsmen.next-backend-bridge-proof.v1",
+  "module": "BATCH 18 - Controlled Next-to-Backend Bridge Proof",
+  "status": "BUILT_PENDING_VALIDATION",
+  "productionReady": false,
+  "requiresBatches": [
+    "BATCH 15B - Controlled Local Web + Local API Integration Proof",
+    "BATCH 16 - Controlled Production Build Proof",
+    "BATCH 17 - Backend Runtime Integration Shell / Local API Service Boundary"
+  ],
+  "webRoute": "/free-destiny-map",
+  "nextApiEndpoint": "/api/public/free-destiny-map/intake/local",
+  "backendHealthEndpoint": "/health",
+  "backendIntakeEndpoint": "/api/public/free-destiny-map/intake/local",
+  "nextRouteHandler": "apps/web/src/app/api/public/free-destiny-map/intake/local/route.ts",
+  "backendRuntimeModule": "apps/api/src/runtime/free-destiny-map-backend-local-runtime.mjs",
+  "bridgeFlag": "KINGSMEN_ENABLE_BACKEND_BRIDGE",
+  "backendBaseUrlEnv": "KINGSMEN_BACKEND_BASE_URL",
+  "localExerciseDataDirectory": "data/local/free-destiny-map/backend-runtime-boundary",
+  "proofCommand": "powershell.exe -ExecutionPolicy Bypass -File scripts/runtime/Invoke-FreeDestinyMapNextBackendBridge.ps1",
+  "proofScript": "scripts/proof/prove-free-destiny-map-next-backend-bridge.mjs",
+  "proofReport": "reports/runtime/free-destiny-map-next-backend-bridge-proof.json",
+  "validationReport": "reports/validation/free-destiny-map-next-backend-bridge-latest.json",
+  "storesProductionData": false,
+  "usesDemoPayloadOnly": true,
+  "takesPayment": false,
+  "sendsEmail": false,
+  "collectsDocuments": false,
+  "submitsOfficialApplications": false,
+  "deploysToOracle": false,
+  "oracleLiteImpact": "none_runtime_yet",
+  "controlPlaneImpact": "Proves the first controlled local Next API to backend boundary bridge.",
+  "requiredFiles": [
+    "docs/runtime/free-destiny-map-next-backend-bridge-proof.md",
+    "manifests/runtime/free-destiny-map-next-backend-bridge-proof.json",
+    "apps/web/src/app/api/public/free-destiny-map/intake/local/route.ts",
+    "packages/contracts/src/free-destiny-map-next-backend-bridge.ts",
+    "scripts/runtime/Invoke-FreeDestinyMapNextBackendBridge.ps1",
+    "scripts/proof/prove-free-destiny-map-next-backend-bridge.mjs",
+    "reports/runtime/free-destiny-map-next-backend-bridge-proof.json",
+    "scripts/validators/validate-free-destiny-map-next-backend-bridge.mjs",
+    "reports/validation/free-destiny-map-next-backend-bridge-latest.json"
+  ],
+  "nextAction": "Run powershell.exe -ExecutionPolicy Bypass -File scripts/runtime/Invoke-FreeDestinyMapNextBackendBridge.ps1 then node scripts/validators/validate-free-destiny-map-next-backend-bridge.mjs"
+}
+---
+FILE: apps/web/src/app/api/public/free-destiny-map/intake/local/route.ts
+---
+import fs from "node:fs";
+import path from "node:path";
+import { NextRequest, NextResponse } from "next/server";
+
+export const runtime = "nodejs";
+export const dynamic = "force-dynamic";
+
+const endpoint = "/api/public/free-destiny-map/intake/local";
+const localWriteFlagName = "KINGSMEN_ENABLE_LOCAL_INTAKE_WRITE";
+const backendBridgeFlagName = "KINGSMEN_ENABLE_BACKEND_BRIDGE";
+const backendBaseUrlEnvName = "KINGSMEN_BACKEND_BASE_URL";
+
+type LocalIssue = {
+  field: string;
+  code: string;
+  message: string;
+};
+
+type BackendBridgeResult = {
+  attempted: boolean;
+  succeeded: boolean;
+  status: number;
+  data: Record<string, unknown> | null;
+  error: string | null;
+};
+
+function hasSafeConsent(payload: Record<string, unknown>): boolean {
+  return payload.consentToBeContacted === true && payload.consentToProcessBasicInfo === true;
+}
+
+function hasRouteIntent(payload: Record<string, unknown>): boolean {
+  return (
+    (Array.isArray(payload.routeInterests) && payload.routeInterests.length > 0) ||
+    Boolean(payload.currentSituation) ||
+    Boolean(payload.knownRoute) ||
+    Boolean(payload.randomSourceName)
+  );
+}
+
+function sensitiveKeys(payload: Record<string, unknown>): string[] {
+  return Object.keys(payload).filter((key) =>
+    /identity|idNumber|passport|password|card|cvv|documentBase64/i.test(key)
+  );
+}
+
+function buildLocalValidationIssues(payload: Record<string, unknown>): LocalIssue[] {
+  const issues: LocalIssue[] = [];
+
+  if (!hasSafeConsent(payload)) {
+    issues.push({
+      field: "consent",
+      code: "CONSENT_REQUIRED",
+      message: "Contact and basic-info processing consent are required for the local Free Destiny Map intake shell."
+    });
+  }
+
+  if (!hasRouteIntent(payload)) {
+    issues.push({
+      field: "intent",
+      code: "INTENT_REQUIRED",
+      message: "At least one route interest, current situation, known route, or source-check item is required."
+    });
+  }
+
+  const blockedSensitiveKeys = sensitiveKeys(payload);
+
+  if (blockedSensitiveKeys.length > 0) {
+    issues.push({
+      field: "payload",
+      code: "SENSITIVE_FIELDS_BLOCKED",
+      message: "Sensitive fields are blocked in the local Free Destiny Map intake shell."
+    });
+  }
+
+  return issues;
+}
+
+function normalizedBackendBaseUrl(): string | null {
+  const value = process.env[backendBaseUrlEnvName];
+
+  if (!value) {
+    return null;
+  }
+
+  return value.replace(/\/+$/, "");
+}
+
+async function postToBackendBoundary(payload: Record<string, unknown>): Promise<BackendBridgeResult> {
+  const backendBaseUrl = normalizedBackendBaseUrl();
+
+  if (!backendBaseUrl) {
+    return {
+      attempted: false,
+      succeeded: false,
+      status: 0,
+      data: null,
+      error: "KINGSMEN_BACKEND_BASE_URL is missing."
+    };
+  }
+
+  const controller = new AbortController();
+  const timer = setTimeout(() => controller.abort(), 15000);
+
+  try {
+    const backendResponse = await fetch(`${backendBaseUrl}${endpoint}`, {
+      method: "POST",
+      headers: {
+        "content-type": "application/json"
+      },
+      body: JSON.stringify(payload),
+      signal: controller.signal
+    });
+
+    const data = (await backendResponse.json().catch(() => null)) as Record<string, unknown> | null;
+
+    return {
+      attempted: true,
+      succeeded: backendResponse.status === 202 && data?.accepted === true,
+      status: backendResponse.status,
+      data,
+      error: null
+    };
+  } catch (error) {
+    return {
+      attempted: true,
+      succeeded: false,
+      status: 0,
+      data: null,
+      error: error instanceof Error ? error.message : "Unknown backend bridge error."
+    };
+  } finally {
+    clearTimeout(timer);
+  }
+}
+
+function writeNextLocalProofRecord(payload: Record<string, unknown>, responseBody: Record<string, unknown>) {
+  const repoRoot = path.resolve(process.cwd(), "../..");
+  const localDataDir = path.join(repoRoot, "data/local/free-destiny-map/next-api-integration");
+  const localDataFile = path.join(localDataDir, "next-api-demo-intakes.jsonl");
+
+  fs.mkdirSync(localDataDir, { recursive: true });
+  fs.appendFileSync(
+    localDataFile,
+    `${JSON.stringify({
+      schema: "kingsmen.free-destiny-map.next-api-integration-record.v1",
+      module: "BATCH 18 - Controlled Next-to-Backend Bridge Proof",
+      productionReady: false,
+      storesProductionData: false,
+      endpoint,
+      createdAt: new Date().toISOString(),
+      requestPayload: payload,
+      response: responseBody
+    })}\n`,
+    "utf8"
+  );
+
+  return fs.existsSync(localDataFile);
+}
+
+export async function POST(request: NextRequest) {
+  let payload: Record<string, unknown> = {};
+
+  try {
+    payload = await request.json();
+  } catch {
+    payload = {};
+  }
+
+  const issues = buildLocalValidationIssues(payload);
+  const validLocalPayload = issues.length === 0;
+  const backendBridgeEnabled = process.env[backendBridgeFlagName] === "true";
+  const localPersistenceEnabled = process.env[localWriteFlagName] === "true";
+
+  if (!validLocalPayload) {
+    return NextResponse.json(
+      {
+        accepted: false,
+        reference: "KM-FDM-NEXT18-BLOCKED",
+        productionReady: false,
+        canClaimProduction: false,
+        deployedToOracle: false,
+        backendBridgeEnabled,
+        backendBridgeAttempted: false,
+        backendBridgeSucceeded: false,
+        backendBoundaryReached: false,
+        localPersistenceEnabled,
+        localWriteAttempted: false,
+        localWriteSucceeded: false,
+        storageMode: "validation_blocked_shell",
+        officialApplicationSubmitted: false,
+        paymentInstructionSent: false,
+        documentUploadAccepted: false,
+        emailSent: false,
+        safeNotice:
+          "Controlled local Next intake shell only. Payload validation failed before backend bridge.",
+        nextAction: "Fix local Free Destiny Map intake payload issues.",
+        issues
+      },
+      { status: 400 }
+    );
+  }
+
+  if (backendBridgeEnabled) {
+    const backendBridge = await postToBackendBoundary(payload);
+    const backendData = backendBridge.data ?? {};
+    const backendBoundaryReached = backendData.backendBoundaryReached === true;
+    const accepted = backendBridge.succeeded && backendBoundaryReached;
+
+    return NextResponse.json(
+      {
+        accepted,
+        reference: "KM-FDM-NEXT18-BRIDGE",
+        backendReference: backendData.reference ?? null,
+        productionReady: false,
+        canClaimProduction: false,
+        deployedToOracle: false,
+        backendBridgeEnabled: true,
+        backendBridgeAttempted: backendBridge.attempted,
+        backendBridgeSucceeded: accepted,
+        backendBridgeStatus: backendBridge.status,
+        backendBoundaryReached,
+        backendLocalWriteSucceeded: backendData.localWriteSucceeded === true,
+        backendStorageMode: backendData.storageMode ?? null,
+        localPersistenceEnabled: false,
+        localWriteAttempted: false,
+        localWriteSucceeded: false,
+        storageMode: "next_to_backend_bridge_shell",
+        officialApplicationSubmitted: false,
+        paymentInstructionSent: false,
+        documentUploadAccepted: false,
+        emailSent: false,
+        safeNotice:
+          "Controlled local Next-to-backend bridge proof only. No production storage, no Oracle runtime, no payment, no email, no documents, no official application submission.",
+        nextAction: accepted
+          ? "Next API route bridged the safe demo Free Destiny Map payload to the backend runtime boundary."
+          : "Repair backend bridge failure before moving forward.",
+        issues: accepted
+          ? []
+          : [
+              {
+                field: "backendBridge",
+                code: "BACKEND_BRIDGE_FAILED",
+                message: backendBridge.error ?? "Backend bridge did not return an accepted backend boundary response."
+              }
+            ]
+      },
+      { status: accepted ? 202 : 502 }
+    );
+  }
+
+  const responseBody = {
+    accepted: true,
+    reference: "KM-FDM-NEXT18-LOCAL",
+    productionReady: false,
+    canClaimProduction: false,
+    deployedToOracle: false,
+    backendBridgeEnabled: false,
+    backendBridgeAttempted: false,
+    backendBridgeSucceeded: false,
+    backendBoundaryReached: false,
+    localPersistenceEnabled,
+    localWriteAttempted: localPersistenceEnabled,
+    localWriteSucceeded: false,
+    storageMode: "local_jsonl_shell",
+    officialApplicationSubmitted: false,
+    paymentInstructionSent: false,
+    documentUploadAccepted: false,
+    emailSent: false,
+    safeNotice:
+      "Controlled local Next API proof only. Backend bridge is disabled. No production storage, no payment, no email, no documents, no official application submission.",
+    nextAction: "Controlled local Next API accepted the safe demo Free Destiny Map payload.",
+    issues: []
+  };
+
+  if (localPersistenceEnabled) {
+    responseBody.localWriteSucceeded = writeNextLocalProofRecord(payload, responseBody);
+  }
+
+  return NextResponse.json(responseBody, { status: 202 });
+}
+
+export async function GET() {
+  return NextResponse.json(
+    {
+      accepted: false,
+      productionReady: false,
+      canClaimProduction: false,
+      deployedToOracle: false,
+      endpoint,
+      backendBridgeEnabled: process.env[backendBridgeFlagName] === "true",
+      safeNotice: "Use POST with a safe Free Destiny Map local intake payload.",
+      officialApplicationSubmitted: false,
+      paymentInstructionSent: false,
+      documentUploadAccepted: false,
+      emailSent: false
+    },
+    { status: 405 }
+  );
+}
+---
+FILE: packages/contracts/src/free-destiny-map-next-backend-bridge.ts
+---
+export const FREE_DESTINY_MAP_NEXT_BACKEND_BRIDGE_MODULE =
+  "BATCH 18 - Controlled Next-to-Backend Bridge Proof" as const;
+
+export const FREE_DESTINY_MAP_NEXT_BACKEND_BRIDGE_NEXT_API_ENDPOINT =
+  "/api/public/free-destiny-map/intake/local" as const;
+
+export const FREE_DESTINY_MAP_NEXT_BACKEND_BRIDGE_BACKEND_HEALTH_ENDPOINT =
+  "/health" as const;
+
+export const FREE_DESTINY_MAP_NEXT_BACKEND_BRIDGE_BACKEND_INTAKE_ENDPOINT =
+  "/api/public/free-destiny-map/intake/local" as const;
+
+export type FreeDestinyMapNextBackendBridgeStatus =
+  | "NEXT_BACKEND_BRIDGE_PROVEN"
+  | "NEXT_BACKEND_BRIDGE_FAILED";
+
+export interface FreeDestinyMapNextBackendBridgeCheck {
+  name: string;
+  passed: boolean;
+  detail: string;
+}
+
+export interface FreeDestinyMapNextBackendBridgeReport {
+  schema: "kingsmen.next-backend-bridge-report.v1";
+  module: typeof FREE_DESTINY_MAP_NEXT_BACKEND_BRIDGE_MODULE;
+  status: FreeDestinyMapNextBackendBridgeStatus;
+  passed: boolean;
+  productionReady: false;
+  canClaimProduction: false;
+  deployedToOracle: false;
+  nextServerStarted: boolean;
+  nextServerStopped: boolean;
+  backendServerStarted: boolean;
+  backendServerStopped: boolean;
+  webStatus: number;
+  backendHealthStatus: number;
+  bridgeApiStatus: number;
+  oracleLiteImpact: "none_runtime_yet";
+  checks: FreeDestinyMapNextBackendBridgeCheck[];
+  failed: FreeDestinyMapNextBackendBridgeCheck[];
+  nextAction: string;
+}
+---
+FILE: scripts/runtime/Invoke-FreeDestinyMapNextBackendBridge.ps1
+---
+#requires -Version 5.1
+[CmdletBinding()]
+param(
+  [int]$TimeoutSeconds = 120
+)
+
+$ErrorActionPreference = "Stop"
+
+$repoRoot = Get-Location
+$scriptPath = Join-Path $repoRoot "scripts\proof\prove-free-destiny-map-next-backend-bridge.mjs"
+
+if (-not (Test-Path $scriptPath -PathType Leaf)) {
+  throw "Missing proof script: $scriptPath"
+}
+
+Write-Host "Kingsmen Free Destiny Map controlled Next-to-backend bridge proof - NextBackendBridge"
+Write-Host "Timeout seconds: $TimeoutSeconds"
+Write-Host "This starts a local backend boundary and a local Next server, proves the bridge, then stops both."
+Write-Host "This does not deploy to Oracle, does not send email, does not take payment, does not upload documents, and does not submit official applications."
+
+node $scriptPath "--timeoutSeconds=$TimeoutSeconds"
+
+if ($LASTEXITCODE -ne 0) {
+  throw "Free Destiny Map controlled Next-to-backend bridge proof failed."
+}
+---
+FILE: scripts/proof/prove-free-destiny-map-next-backend-bridge.mjs
+---
+#!/usr/bin/env node
+import fs from "node:fs";
+import net from "node:net";
+import path from "node:path";
+import { spawn } from "node:child_process";
+import { createFreeDestinyMapBackendLocalServer } from "../../apps/api/src/runtime/free-destiny-map-backend-local-runtime.mjs";
+
+const root = process.cwd();
+const webDir = path.join(root, "apps/web");
+const proofReportPath = path.join(root, "reports/runtime/free-destiny-map-next-backend-bridge-proof.json");
+const backendLocalDataFile = path.join(root, "data/local/free-destiny-map/backend-runtime-boundary/backend-runtime-demo-intakes.jsonl");
+
+const timeoutArg = process.argv.find((item) => item.startsWith("--timeoutSeconds="));
+const timeoutSeconds = timeoutArg ? Number(timeoutArg.split("=")[1]) : 120;
+const timeoutMs = Number.isFinite(timeoutSeconds) && timeoutSeconds > 0 ? timeoutSeconds * 1000 : 120000;
+
+const checks = [];
+const stdoutLines = [];
+const stderrLines = [];
+
+function exists(rel) {
+  return fs.existsSync(path.join(root, rel));
+}
+
+function read(rel) {
+  return fs.readFileSync(path.join(root, rel), "utf8").replace(/^\uFEFF/, "");
+}
+
+function parseJson(rel) {
+  return JSON.parse(read(rel));
+}
+
+function check(name, passed, detail = "") {
+  checks.push({ name, passed, detail });
+}
+
+function trimLog(lines) {
+  return lines.join("").split(/\r?\n/).filter(Boolean).slice(-120);
+}
+
+function getFreePort() {
+  return new Promise((resolve, reject) => {
+    const server = net.createServer();
+    server.once("error", reject);
+    server.listen(0, "127.0.0.1", () => {
+      const address = server.address();
+      const port = typeof address === "object" && address ? address.port : 0;
+      server.close(() => resolve(port));
+    });
+  });
+}
+
+function sleep(ms) {
+  return new Promise((resolve) => setTimeout(resolve, ms));
+}
+
+async function fetchWithTimeout(url, options = {}, ms = 7000) {
+  const controller = new AbortController();
+  const timer = setTimeout(() => controller.abort(), ms);
+  try {
+    return await fetch(url, { ...options, signal: controller.signal });
+  } finally {
+    clearTimeout(timer);
+  }
+}
+
+async function waitForHttpOk(url, maxMs) {
+  const started = Date.now();
+  let lastError = "";
+  while (Date.now() - started < maxMs) {
+    try {
+      const response = await fetchWithTimeout(url, {}, 7000);
+      const text = await response.text();
+      if (response.status === 200) {
+        return { ok: true, status: response.status, text, lastError };
+      }
+      lastError = `status=${response.status}`;
+    } catch (error) {
+      lastError = error instanceof Error ? error.message : String(error);
+    }
+    await sleep(1000);
+  }
+  return { ok: false, status: 0, text: "", lastError };
+}
+
+async function closeServer(server) {
+  return new Promise((resolve) => {
+    server.close(() => resolve(true));
+  });
+}
+
+async function stopProcessTree(child) {
+  if (!child || !child.pid) return false;
+
+  if (process.platform === "win32") {
+    await new Promise((resolve) => {
+      const killer = spawn("taskkill", ["/pid", String(child.pid), "/t", "/f"], {
+        stdio: "ignore"
+      });
+      killer.once("close", () => resolve());
+      killer.once("error", () => resolve());
+    });
+  } else {
+    try {
+      child.kill("SIGTERM");
+    } catch {}
+    await sleep(1500);
+    if (child.exitCode === null) {
+      try {
+        child.kill("SIGKILL");
+      } catch {}
+    }
+  }
+
+  await sleep(1500);
+  return true;
+}
+
+function safeEnvForNext(backendBaseUrl) {
+  const safeEnv = {};
+  const envKeysToKeep = [
+    "PATH",
+    "Path",
+    "PATHEXT",
+    "SystemRoot",
+    "WINDIR",
+    "TEMP",
+    "TMP",
+    "USERPROFILE",
+    "APPDATA",
+    "LOCALAPPDATA",
+    "COMSPEC",
+    "HOMEDRIVE",
+    "HOMEPATH",
+    "PROCESSOR_ARCHITECTURE",
+    "PROCESSOR_IDENTIFIER",
+    "NUMBER_OF_PROCESSORS"
+  ];
+
+  for (const key of envKeysToKeep) {
+    const value = process.env[key];
+    if (!key || key.includes("=") || key.includes("\u0000")) continue;
+    if (typeof value === "undefined" || String(value).includes("\u0000")) continue;
+    safeEnv[key] = String(value);
+  }
+
+  safeEnv.NEXT_TELEMETRY_DISABLED = "1";
+  safeEnv.CI = "1";
+  safeEnv.NODE_ENV = "development";
+  safeEnv.KINGSMEN_ENABLE_BACKEND_BRIDGE = "true";
+  safeEnv.KINGSMEN_BACKEND_BASE_URL = backendBaseUrl;
+  safeEnv.KINGSMEN_ENABLE_LOCAL_INTAKE_WRITE = "false";
+
+  return safeEnv;
+}
+
+const requiredPreFiles = [
+  "reports/runtime/free-destiny-map-backend-runtime-boundary-proof.json",
+  "reports/runtime/free-destiny-map-controlled-production-build-proof.json",
+  "reports/runtime/free-destiny-map-controlled-web-api-integration-proof.json",
+  "apps/api/src/runtime/free-destiny-map-backend-local-runtime.mjs",
+  "apps/web/src/app/api/public/free-destiny-map/intake/local/route.ts",
+  "apps/web/src/app/free-destiny-map/page.tsx",
+  "apps/web/node_modules/next/package.json",
+  "data/local/.gitignore"
+];
+
+for (const file of requiredPreFiles) {
+  check(`pre-file-exists:${file}`, exists(file), file);
+}
+
+if (exists("reports/runtime/free-destiny-map-backend-runtime-boundary-proof.json")) {
+  const backendProof = parseJson("reports/runtime/free-destiny-map-backend-runtime-boundary-proof.json");
+  check("batch-17-backend-boundary-proven", backendProof.status === "BACKEND_RUNTIME_BOUNDARY_PROVEN" && backendProof.passed === true, `status=${backendProof.status}; passed=${backendProof.passed}`);
+  check("batch-17-backend-statuses", backendProof.healthStatus === 200 && backendProof.intakeStatus === 202, `healthStatus=${backendProof.healthStatus}; intakeStatus=${backendProof.intakeStatus}`);
+  check("batch-17-production-oracle-false", backendProof.productionReady === false && backendProof.canClaimProduction === false && backendProof.deployedToOracle === false, "production/oracle false");
+}
+
+if (exists("reports/runtime/free-destiny-map-controlled-production-build-proof.json")) {
+  const buildProof = parseJson("reports/runtime/free-destiny-map-controlled-production-build-proof.json");
+  check("batch-16-production-build-proven", buildProof.status === "CONTROLLED_PRODUCTION_BUILD_PROVEN" && buildProof.passed === true, `status=${buildProof.status}; passed=${buildProof.passed}`);
+}
+
+if (exists("apps/web/src/app/api/public/free-destiny-map/intake/local/route.ts")) {
+  const route = read("apps/web/src/app/api/public/free-destiny-map/intake/local/route.ts");
+  check("next-route-has-backend-bridge-flag", route.includes("KINGSMEN_ENABLE_BACKEND_BRIDGE"), "bridge flag present");
+  check("next-route-has-backend-base-url-env", route.includes("KINGSMEN_BACKEND_BASE_URL"), "backend base URL env present");
+  check("next-route-posts-to-backend-boundary", route.includes("postToBackendBoundary"), "postToBackendBoundary present");
+  check("next-route-response-has-bridge-succeeded", route.includes("backendBridgeSucceeded"), "backendBridgeSucceeded present");
+  check("next-route-response-has-backend-boundary-reached", route.includes("backendBoundaryReached"), "backendBoundaryReached present");
+  check("next-route-keeps-production-false", route.includes("productionReady: false"), "production false");
+  check("next-route-keeps-oracle-false", route.includes("deployedToOracle: false"), "oracle false");
+  check("next-route-keeps-official-submission-false", route.includes("officialApplicationSubmitted: false"), "official false");
+  check("next-route-keeps-payment-false", route.includes("paymentInstructionSent: false"), "payment false");
+  check("next-route-keeps-documents-false", route.includes("documentUploadAccepted: false"), "documents false");
+  check("next-route-keeps-email-false", route.includes("emailSent: false"), "email false");
+}
+
+const demoPayload = {
+  fullName: "Kingsmen Next Backend Bridge Demo Candidate",
+  province: "KwaZulu-Natal",
+  currentSituation: "Next-to-backend bridge demo user wants study, funding, accommodation and CV route guidance.",
+  knownRoute: "Controlled local Next-to-backend bridge proof",
+  routeInterests: ["higher_education", "tvet", "nsfas_bursary", "accommodation", "cv_revamp", "source_check"],
+  needsAccommodation: true,
+  accommodationArea: "Durban / campus or training area",
+  needsFundingHelp: true,
+  needsCvHelp: true,
+  hasDocumentsReady: false,
+  randomSourceName: "Next bridge demo bursary or learnership source to check later",
+  consentToBeContacted: true,
+  consentToProcessBasicInfo: true
+};
+
+check("demo-payload-has-consent", demoPayload.consentToBeContacted === true && demoPayload.consentToProcessBasicInfo === true, "consent true");
+check("demo-payload-has-route-intent", demoPayload.routeInterests.length > 0 && Boolean(demoPayload.currentSituation), "route intent present");
+check("demo-payload-no-sensitive-fields", !Object.keys(demoPayload).some((key) => /identity|idNumber|passport|password|card|cvv|documentBase64/i.test(key)), "no sensitive field keys");
+
+let backendServer = null;
+let nextChild = null;
+let backendServerStarted = false;
+let backendServerStopped = false;
+let nextServerStarted = false;
+let nextServerStopped = false;
+let backendHealthStatus = 0;
+let webStatus = 0;
+let bridgeApiStatus = 0;
+let backendPort = 0;
+let nextPort = 0;
+let backendBaseUrl = "";
+let webUrl = "";
+let nextApiUrl = "";
+let backendHealthResponse = null;
+let bridgeResponse = null;
+let spawnError = null;
+
+try {
+  const preFailures = checks.filter((item) => item.passed !== true);
+  if (preFailures.length > 0) {
+    throw new Error("Pre-bridge checks failed. Next-to-backend bridge proof not attempted.");
+  }
+
+  backendPort = await getFreePort();
+  nextPort = await getFreePort();
+
+  backendBaseUrl = `http://127.0.0.1:${backendPort}`;
+  webUrl = `http://127.0.0.1:${nextPort}/free-destiny-map`;
+  nextApiUrl = `http://127.0.0.1:${nextPort}/api/public/free-destiny-map/intake/local`;
+
+  backendServer = createFreeDestinyMapBackendLocalServer({
+    repoRoot: root,
+    enableLocalWrite: true
+  });
+
+  await new Promise((resolve, reject) => {
+    backendServer.once("error", reject);
+    backendServer.listen(backendPort, "127.0.0.1", () => resolve());
+  });
+
+  backendServerStarted = true;
+
+  const backendHealthFetch = await fetchWithTimeout(`${backendBaseUrl}/health`);
+  backendHealthStatus = backendHealthFetch.status;
+  backendHealthResponse = await backendHealthFetch.json();
+
+  check("bridge-backend-server-started", backendServerStarted, `url=${backendBaseUrl}`);
+  check("bridge-backend-health-status-200", backendHealthStatus === 200, `status=${backendHealthStatus}`);
+  check("bridge-backend-health-production-false", backendHealthResponse.productionReady === false && backendHealthResponse.canClaimProduction === false, "production false");
+  check("bridge-backend-health-oracle-false", backendHealthResponse.deployedToOracle === false, "deployedToOracle false");
+
+  const nextCliPath = path.join(webDir, "node_modules/next/dist/bin/next");
+  check("bridge-next-cli-exists", fs.existsSync(nextCliPath), nextCliPath);
+
+  const safeEnv = safeEnvForNext(backendBaseUrl);
+  check("bridge-next-env-has-backend-url", safeEnv.KINGSMEN_BACKEND_BASE_URL === backendBaseUrl, backendBaseUrl);
+  check("bridge-next-env-enables-bridge", safeEnv.KINGSMEN_ENABLE_BACKEND_BRIDGE === "true", "bridge enabled");
+
+  nextChild = spawn(process.execPath, [nextCliPath, "dev", "--hostname", "127.0.0.1", "--port", String(nextPort)], {
+    cwd: webDir,
+    env: safeEnv,
+    stdio: ["ignore", "pipe", "pipe"],
+    windowsHide: true
+  });
+
+  nextChild.stdout.on("data", (chunk) => stdoutLines.push(chunk.toString()));
+  nextChild.stderr.on("data", (chunk) => stderrLines.push(chunk.toString()));
+  nextChild.once("error", (error) => {
+    spawnError = error;
+  });
+
+  const webResult = await waitForHttpOk(webUrl, timeoutMs);
+  webStatus = webResult.status;
+  nextServerStarted = webResult.ok;
+
+  check("bridge-next-server-started", nextServerStarted, nextServerStarted ? `url=${webUrl}` : `lastError=${webResult.lastError}`);
+  check("bridge-next-web-status-200", webStatus === 200, `status=${webStatus}`);
+  check("bridge-next-page-has-free-destiny-map", webResult.text.includes("Free Destiny Map") || webResult.text.includes("Start your Free Destiny Map"), "Free Destiny Map text");
+
+  const bridgeFetch = await fetchWithTimeout(
+    nextApiUrl,
+    {
+      method: "POST",
+      headers: {
+        "content-type": "application/json"
+      },
+      body: JSON.stringify(demoPayload)
+    },
+    20000
+  );
+
+  bridgeApiStatus = bridgeFetch.status;
+  bridgeResponse = await bridgeFetch.json();
+
+  check("bridge-next-api-status-202", bridgeApiStatus === 202, `status=${bridgeApiStatus}`);
+  check("bridge-response-accepted", bridgeResponse.accepted === true, "accepted true");
+  check("bridge-response-reference-next18", bridgeResponse.reference === "KM-FDM-NEXT18-BRIDGE", `reference=${bridgeResponse.reference}`);
+  check("bridge-response-backend-reference", bridgeResponse.backendReference === "KM-FDM-BACKEND17", `backendReference=${bridgeResponse.backendReference}`);
+  check("bridge-response-backend-attempted", bridgeResponse.backendBridgeAttempted === true, "backendBridgeAttempted true");
+  check("bridge-response-backend-succeeded", bridgeResponse.backendBridgeSucceeded === true, "backendBridgeSucceeded true");
+  check("bridge-response-backend-boundary-reached", bridgeResponse.backendBoundaryReached === true, "backendBoundaryReached true");
+  check("bridge-response-backend-local-write-succeeded", bridgeResponse.backendLocalWriteSucceeded === true && fs.existsSync(backendLocalDataFile), path.relative(root, backendLocalDataFile).replaceAll("\\", "/"));
+  check("bridge-response-production-false", bridgeResponse.productionReady === false && bridgeResponse.canClaimProduction === false, "production false");
+  check("bridge-response-oracle-false", bridgeResponse.deployedToOracle === false, "deployedToOracle false");
+  check("bridge-response-official-submission-false", bridgeResponse.officialApplicationSubmitted === false, "official false");
+  check("bridge-response-payment-false", bridgeResponse.paymentInstructionSent === false, "payment false");
+  check("bridge-response-document-false", bridgeResponse.documentUploadAccepted === false, "document false");
+  check("bridge-response-email-false", bridgeResponse.emailSent === false, "email false");
+} catch (error) {
+  check("bridge-exception-absent", false, error instanceof Error ? error.message : String(error));
+} finally {
+  if (nextChild) {
+    nextServerStopped = await stopProcessTree(nextChild);
+  }
+
+  if (backendServer) {
+    backendServerStopped = await closeServer(backendServer);
+  }
+}
+
+check("bridge-next-server-stopped", nextServerStopped, nextServerStopped ? "Next process tree stop attempted" : "Next server was not started or could not be stopped");
+check("bridge-backend-server-stopped", backendServerStopped, backendServerStopped ? "backend server close completed" : "backend server was not started or could not be stopped");
+
+if (spawnError) {
+  check("bridge-next-spawn-error-absent", false, spawnError.message);
+}
+
+const outputSafetyText = JSON.stringify({
+  backendHealthResponse,
+  bridgeResponse
+});
+
+check("bridge-no-deployment-command-output", !/docker\s+compose\s+up|kubectl|oci\s+deploy|oracle\s+deploy|deploy\s+to\s+oracle/i.test(outputSafetyText), "no deployment command output; deployedToOracle false is allowed as a safety flag");
+check("bridge-no-production-true", !/productionReady\s*[:=]\s*true/i.test(outputSafetyText), "productionReady true absent");
+check("bridge-no-official-submission-true", !/officialApplicationSubmitted\s*[:=]\s*true/i.test(outputSafetyText), "officialApplicationSubmitted true absent");
+check("bridge-no-payment-true", !/paymentInstructionSent\s*[:=]\s*true/i.test(outputSafetyText), "paymentInstructionSent true absent");
+check("bridge-no-email-true", !/emailSent\s*[:=]\s*true/i.test(outputSafetyText), "emailSent true absent");
+check("bridge-no-document-upload-true", !/documentUploadAccepted\s*[:=]\s*true/i.test(outputSafetyText), "documentUploadAccepted true absent");
+
+const failed = checks.filter((item) => item.passed !== true);
+const passed = failed.length === 0;
+
+const report = {
+  schema: "kingsmen.next-backend-bridge-report.v1",
+  module: "BATCH 18 - Controlled Next-to-Backend Bridge Proof",
+  status: passed ? "NEXT_BACKEND_BRIDGE_PROVEN" : "NEXT_BACKEND_BRIDGE_FAILED",
+  passed,
+  productionReady: false,
+  canClaimProduction: false,
+  deployedToOracle: false,
+  generated_at: new Date().toISOString(),
+  nextServerStarted,
+  nextServerStopped,
+  backendServerStarted,
+  backendServerStopped,
+  webStatus,
+  backendHealthStatus,
+  bridgeApiStatus,
+  backendBaseUrl,
+  webUrl,
+  nextApiUrl,
+  api_response_reference: bridgeResponse?.reference ?? null,
+  backend_reference: bridgeResponse?.backendReference ?? null,
+  backend_bridge_succeeded: bridgeResponse?.backendBridgeSucceeded ?? false,
+  backend_boundary_reached: bridgeResponse?.backendBoundaryReached ?? false,
+  backend_local_write_succeeded: bridgeResponse?.backendLocalWriteSucceeded ?? false,
+  local_data_file: fs.existsSync(backendLocalDataFile) ? path.relative(root, backendLocalDataFile).replaceAll("\\", "/") : null,
+  checks,
+  failed,
+  stdout_tail: trimLog(stdoutLines),
+  stderr_tail: trimLog(stderrLines),
+  oracle_lite_impact: "none_runtime_yet",
+  runtime_scope: "controlled local Next-to-backend bridge proof only; no Oracle runtime; no deployment",
+  next_action: passed
+    ? "Run validator and commit BATCH 18. Next batch may prepare Docker/Oracle Lite local container boundaries."
+    : "Repair Next-to-backend bridge failures before moving forward."
+};
+
+fs.mkdirSync(path.dirname(proofReportPath), { recursive: true });
+fs.writeFileSync(proofReportPath, `${JSON.stringify(report, null, 2)}\n`, "utf8");
+
+console.log(JSON.stringify(report, null, 2));
+if (!passed) process.exit(1);
+---
+FILE: reports/runtime/free-destiny-map-next-backend-bridge-proof.json
+---
+{
+  "schema": "kingsmen.next-backend-bridge-report.v1",
+  "module": "BATCH 18 - Controlled Next-to-Backend Bridge Proof",
+  "status": "NEXT_BACKEND_BRIDGE_FAILED",
+  "passed": false,
+  "productionReady": false,
+  "canClaimProduction": false,
+  "deployedToOracle": false,
+  "generated_at": "2026-06-02T00:00:00.000Z",
+  "nextServerStarted": false,
+  "nextServerStopped": false,
+  "backendServerStarted": false,
+  "backendServerStopped": false,
+  "webStatus": 0,
+  "backendHealthStatus": 0,
+  "bridgeApiStatus": 0,
+  "checks": [],
+  "failed": [
+    {
+      "name": "next_backend_bridge_not_yet_executed",
+      "passed": false,
+      "detail": "Run scripts/runtime/Invoke-FreeDestinyMapNextBackendBridge.ps1."
+    }
+  ],
+  "oracle_lite_impact": "none_runtime_yet",
+  "runtime_scope": "controlled local Next-to-backend bridge proof only; no Oracle runtime; no deployment",
+  "next_action": "Run BATCH 18 controlled Next-to-backend bridge proof."
+}
+---
+FILE: scripts/validators/validate-free-destiny-map-next-backend-bridge.mjs
+---
+#!/usr/bin/env node
+import fs from "node:fs";
+import path from "node:path";
+
+const root = process.cwd();
+const reportPath = path.join(root, "reports/validation/free-destiny-map-next-backend-bridge-latest.json");
+
+const requiredFiles = [
+  "docs/runtime/free-destiny-map-next-backend-bridge-proof.md",
+  "manifests/runtime/free-destiny-map-next-backend-bridge-proof.json",
+  "apps/web/src/app/api/public/free-destiny-map/intake/local/route.ts",
+  "packages/contracts/src/free-destiny-map-next-backend-bridge.ts",
+  "scripts/runtime/Invoke-FreeDestinyMapNextBackendBridge.ps1",
+  "scripts/proof/prove-free-destiny-map-next-backend-bridge.mjs",
+  "reports/runtime/free-destiny-map-next-backend-bridge-proof.json",
+  "scripts/validators/validate-free-destiny-map-next-backend-bridge.mjs",
+  "reports/validation/free-destiny-map-next-backend-bridge-latest.json"
+];
+
+const upstreamFiles = [
+  "reports/runtime/free-destiny-map-backend-runtime-boundary-proof.json",
+  "reports/runtime/free-destiny-map-controlled-production-build-proof.json",
+  "apps/api/src/runtime/free-destiny-map-backend-local-runtime.mjs",
+  "apps/web/src/app/free-destiny-map/page.tsx",
+  "apps/web/package.json",
+  "data/local/.gitignore"
+];
+
+function exists(rel) {
+  return fs.existsSync(path.join(root, rel));
+}
+
+function read(rel) {
+  return fs.readFileSync(path.join(root, rel), "utf8").replace(/^\uFEFF/, "");
+}
+
+function parseJson(rel) {
+  return JSON.parse(read(rel));
+}
+
+const failures = [];
+const warnings = [];
+const checked = [];
+
+for (const file of requiredFiles) {
+  checked.push(file);
+  if (!exists(file)) failures.push(`Missing required file: ${file}`);
+  else if (fs.statSync(path.join(root, file)).size === 0) failures.push(`Empty required file: ${file}`);
+}
+
+for (const file of upstreamFiles) {
+  checked.push(file);
+  if (!exists(file)) failures.push(`Missing upstream file: ${file}`);
+  else if (fs.statSync(path.join(root, file)).size === 0) failures.push(`Empty upstream file: ${file}`);
+}
+
+if (exists("manifests/runtime/free-destiny-map-next-backend-bridge-proof.json")) {
+  const manifest = parseJson("manifests/runtime/free-destiny-map-next-backend-bridge-proof.json");
+  if (manifest.productionReady !== false) failures.push("Manifest must keep productionReady false.");
+  if (manifest.storesProductionData !== false) failures.push("Manifest must declare storesProductionData false.");
+  if (manifest.usesDemoPayloadOnly !== true) failures.push("Manifest must declare usesDemoPayloadOnly true.");
+  if (manifest.takesPayment !== false) failures.push("Manifest must declare takesPayment false.");
+  if (manifest.sendsEmail !== false) failures.push("Manifest must declare sendsEmail false.");
+  if (manifest.collectsDocuments !== false) failures.push("Manifest must declare collectsDocuments false.");
+  if (manifest.submitsOfficialApplications !== false) failures.push("Manifest must declare submitsOfficialApplications false.");
+  if (manifest.deploysToOracle !== false) failures.push("Manifest must declare deploysToOracle false.");
+  if (!String(manifest.oracleLiteImpact ?? "").includes("none_runtime_yet")) failures.push("Manifest must declare none_runtime_yet.");
+}
+
+const tokenChecks = [
+  ["apps/web/src/app/api/public/free-destiny-map/intake/local/route.ts", ["KINGSMEN_ENABLE_BACKEND_BRIDGE", "KINGSMEN_BACKEND_BASE_URL", "postToBackendBoundary", "backendBridgeSucceeded", "backendBoundaryReached", "KM-FDM-NEXT18-BRIDGE", "productionReady: false", "deployedToOracle: false"]],
+  ["packages/contracts/src/free-destiny-map-next-backend-bridge.ts", ["NEXT_BACKEND_BRIDGE_PROVEN", "FREE_DESTINY_MAP_NEXT_BACKEND_BRIDGE_BACKEND_INTAKE_ENDPOINT", "deployedToOracle: false"]],
+  ["scripts/runtime/Invoke-FreeDestinyMapNextBackendBridge.ps1", ["NextBackendBridge", "does not deploy to Oracle", "does not submit official applications"]],
+  ["scripts/proof/prove-free-destiny-map-next-backend-bridge.mjs", ["NEXT_BACKEND_BRIDGE_PROVEN", "bridge-next-api-status-202", "bridge-response-backend-succeeded", "bridge-response-backend-boundary-reached", "KINGSMEN_ENABLE_BACKEND_BRIDGE"]],
+  ["reports/runtime/free-destiny-map-next-backend-bridge-proof.json", ["schema", "module", "status"]]
+];
+
+for (const [file, tokens] of tokenChecks) {
+  if (!exists(file)) continue;
+  const content = read(file);
+  for (const token of tokens) {
+    if (!content.includes(token)) failures.push(`${file} missing token: ${token}`);
+  }
+}
+
+if (exists("reports/runtime/free-destiny-map-next-backend-bridge-proof.json")) {
+  const proof = parseJson("reports/runtime/free-destiny-map-next-backend-bridge-proof.json");
+  if (proof.passed !== true) failures.push("Next-to-backend bridge proof must pass.");
+  if (proof.status !== "NEXT_BACKEND_BRIDGE_PROVEN") failures.push("Next-to-backend bridge proof status must be NEXT_BACKEND_BRIDGE_PROVEN.");
+  if (proof.productionReady !== false) failures.push("Next-to-backend bridge proof must keep productionReady false.");
+  if (proof.canClaimProduction !== false) failures.push("Next-to-backend bridge proof must keep canClaimProduction false.");
+  if (proof.deployedToOracle !== false) failures.push("Next-to-backend bridge proof must keep deployedToOracle false.");
+  if (proof.nextServerStarted !== true) failures.push("Next-to-backend bridge proof must start Next server.");
+  if (proof.nextServerStopped !== true) failures.push("Next-to-backend bridge proof must stop Next server.");
+  if (proof.backendServerStarted !== true) failures.push("Next-to-backend bridge proof must start backend server.");
+  if (proof.backendServerStopped !== true) failures.push("Next-to-backend bridge proof must stop backend server.");
+  if (proof.webStatus !== 200) failures.push("Next-to-backend bridge proof must record webStatus 200.");
+  if (proof.backendHealthStatus !== 200) failures.push("Next-to-backend bridge proof must record backendHealthStatus 200.");
+  if (proof.bridgeApiStatus !== 202) failures.push("Next-to-backend bridge proof must record bridgeApiStatus 202.");
+  if (proof.backend_bridge_succeeded !== true) failures.push("Next-to-backend bridge proof must record backend_bridge_succeeded true.");
+  if (proof.backend_boundary_reached !== true) failures.push("Next-to-backend bridge proof must record backend boundary reached.");
+  if (proof.backend_local_write_succeeded !== true) failures.push("Next-to-backend bridge proof must record backend local write success.");
+  if (!Array.isArray(proof.checks) || proof.checks.length < 30) failures.push("Next-to-backend bridge proof must include detailed checks.");
+}
+
+const forbiddenFiles = [
+  "docs/runtime/free-destiny-map-next-backend-bridge-proof.md",
+  "manifests/runtime/free-destiny-map-next-backend-bridge-proof.json",
+  "apps/web/src/app/api/public/free-destiny-map/intake/local/route.ts",
+  "packages/contracts/src/free-destiny-map-next-backend-bridge.ts",
+  "scripts/runtime/Invoke-FreeDestinyMapNextBackendBridge.ps1"
+];
+
+const forbiddenPatterns = [
+  [/productionReady\s*[:=]\s*true/i, "productionReady true"],
+  [/canClaimProduction\s*[:=]\s*true/i, "canClaimProduction true"],
+  [/deployedToOracle\s*[:=]\s*true/i, "deployedToOracle true"],
+  [/officialApplicationSubmitted:\s*true/i, "official application submitted true"],
+  [/paymentInstructionSent:\s*true/i, "payment instruction sent true"],
+  [/emailSent:\s*true/i, "email sent true"],
+  [/documentUploadAccepted:\s*true/i, "document upload accepted true"],
+  [/\bidentityNumber\s*[:=]/i, "identity number assignment"],
+  [/\bidNumber\s*[:=]/i, "id number assignment"],
+  [/\bpassportNumber\s*[:=]/i, "passport number assignment"],
+  [/\bcardNumber\s*[:=]/i, "card number assignment"],
+  [/\bcvv\s*[:=]/i, "cvv assignment"]
+];
+
+for (const file of forbiddenFiles) {
+  if (!exists(file)) continue;
+  const content = read(file);
+  for (const [pattern, label] of forbiddenPatterns) {
+    if (pattern.test(content)) failures.push(`${file} contains forbidden pattern: ${label}`);
+  }
+}
+
+const passed = failures.length === 0;
+
+const report = {
+  schema: "kingsmen.validation-report.v1",
+  module: "BATCH 18 - Controlled Next-to-Backend Bridge Proof",
+  status: passed ? "VALIDATED" : "BUILT_PENDING_VALIDATION",
+  passed,
+  generated_at: new Date().toISOString(),
+  files_expected: requiredFiles,
+  upstream_files_checked: upstreamFiles,
+  files_checked: checked.length,
+  missing_files: requiredFiles.filter((file) => !exists(file)),
+  failed_checks: failures,
+  warnings,
+  oracle_lite_impact: "none_runtime_yet",
+  control_plane_impact: "Adds controlled local Next API to backend runtime boundary bridge proof.",
+  runtime_proof: "reports/runtime/free-destiny-map-next-backend-bridge-proof.json",
+  next_action: passed ? "Proceed to BATCH 19 - Docker/Oracle Lite local runtime container preparation." : "Repair Next-to-backend bridge proof failures."
+};
+
+fs.mkdirSync(path.dirname(reportPath), { recursive: true });
+fs.writeFileSync(reportPath, `${JSON.stringify(report, null, 2)}\n`, "utf8");
+
+console.log(JSON.stringify(report, null, 2));
+if (!passed) process.exit(1);
+---
+FILE: reports/validation/free-destiny-map-next-backend-bridge-latest.json
+---
+{
+  "schema": "kingsmen.validation-report.v1",
+  "module": "BATCH 18 - Controlled Next-to-Backend Bridge Proof",
+  "status": "BUILT_PENDING_VALIDATION",
+  "passed": false,
+  "generated_at": "2026-06-02T00:00:00.000Z",
+  "reason": "Seed report. Run BATCH 18 Next-to-backend bridge proof then validator.",
+  "files_checked": 0,
+  "failed_checks": [
+    "validator_not_yet_executed"
+  ],
+  "oracle_lite_impact": "none_runtime_yet",
+  "control_plane_impact": "Adds controlled local Next API to backend runtime boundary bridge proof.",
+  "runtime_proof": "reports/runtime/free-destiny-map-next-backend-bridge-proof.json",
+  "next_action": "Run powershell.exe -ExecutionPolicy Bypass -File scripts/runtime/Invoke-FreeDestinyMapNextBackendBridge.ps1 then node scripts/validators/validate-free-destiny-map-next-backend-bridge.mjs."
+}

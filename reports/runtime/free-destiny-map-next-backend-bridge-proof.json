@@ -1,0 +1,339 @@
+{
+  "schema": "kingsmen.next-backend-bridge-report.v1",
+  "module": "BATCH 18 - Controlled Next-to-Backend Bridge Proof",
+  "status": "NEXT_BACKEND_BRIDGE_PROVEN",
+  "passed": true,
+  "productionReady": false,
+  "canClaimProduction": false,
+  "deployedToOracle": false,
+  "generated_at": "2026-06-02T21:44:42.692Z",
+  "nextServerStarted": true,
+  "nextServerStopped": true,
+  "backendServerStarted": true,
+  "backendServerStopped": true,
+  "webStatus": 200,
+  "backendHealthStatus": 200,
+  "bridgeApiStatus": 202,
+  "backendBaseUrl": "http://127.0.0.1:49888",
+  "webUrl": "http://127.0.0.1:49889/free-destiny-map",
+  "nextApiUrl": "http://127.0.0.1:49889/api/public/free-destiny-map/intake/local",
+  "api_response_reference": "KM-FDM-NEXT18-BRIDGE",
+  "backend_reference": "KM-FDM-BACKEND17",
+  "backend_bridge_succeeded": true,
+  "backend_boundary_reached": true,
+  "backend_local_write_succeeded": true,
+  "local_data_file": "data/local/free-destiny-map/backend-runtime-boundary/backend-runtime-demo-intakes.jsonl",
+  "checks": [
+    {
+      "name": "pre-file-exists:reports/runtime/free-destiny-map-backend-runtime-boundary-proof.json",
+      "passed": true,
+      "detail": "reports/runtime/free-destiny-map-backend-runtime-boundary-proof.json"
+    },
+    {
+      "name": "pre-file-exists:reports/runtime/free-destiny-map-controlled-production-build-proof.json",
+      "passed": true,
+      "detail": "reports/runtime/free-destiny-map-controlled-production-build-proof.json"
+    },
+    {
+      "name": "pre-file-exists:reports/runtime/free-destiny-map-controlled-web-api-integration-proof.json",
+      "passed": true,
+      "detail": "reports/runtime/free-destiny-map-controlled-web-api-integration-proof.json"
+    },
+    {
+      "name": "pre-file-exists:apps/api/src/runtime/free-destiny-map-backend-local-runtime.mjs",
+      "passed": true,
+      "detail": "apps/api/src/runtime/free-destiny-map-backend-local-runtime.mjs"
+    },
+    {
+      "name": "pre-file-exists:apps/web/src/app/api/public/free-destiny-map/intake/local/route.ts",
+      "passed": true,
+      "detail": "apps/web/src/app/api/public/free-destiny-map/intake/local/route.ts"
+    },
+    {
+      "name": "pre-file-exists:apps/web/src/app/free-destiny-map/page.tsx",
+      "passed": true,
+      "detail": "apps/web/src/app/free-destiny-map/page.tsx"
+    },
+    {
+      "name": "pre-file-exists:apps/web/node_modules/next/package.json",
+      "passed": true,
+      "detail": "apps/web/node_modules/next/package.json"
+    },
+    {
+      "name": "pre-file-exists:data/local/.gitignore",
+      "passed": true,
+      "detail": "data/local/.gitignore"
+    },
+    {
+      "name": "batch-17-backend-boundary-proven",
+      "passed": true,
+      "detail": "status=BACKEND_RUNTIME_BOUNDARY_PROVEN; passed=true"
+    },
+    {
+      "name": "batch-17-backend-statuses",
+      "passed": true,
+      "detail": "healthStatus=200; intakeStatus=202"
+    },
+    {
+      "name": "batch-17-production-oracle-false",
+      "passed": true,
+      "detail": "production/oracle false"
+    },
+    {
+      "name": "batch-16-production-build-proven",
+      "passed": true,
+      "detail": "status=CONTROLLED_PRODUCTION_BUILD_PROVEN; passed=true"
+    },
+    {
+      "name": "next-route-has-backend-bridge-flag",
+      "passed": true,
+      "detail": "bridge flag present"
+    },
+    {
+      "name": "next-route-has-backend-base-url-env",
+      "passed": true,
+      "detail": "backend base URL env present"
+    },
+    {
+      "name": "next-route-posts-to-backend-boundary",
+      "passed": true,
+      "detail": "postToBackendBoundary present"
+    },
+    {
+      "name": "next-route-response-has-bridge-succeeded",
+      "passed": true,
+      "detail": "backendBridgeSucceeded present"
+    },
+    {
+      "name": "next-route-response-has-backend-boundary-reached",
+      "passed": true,
+      "detail": "backendBoundaryReached present"
+    },
+    {
+      "name": "next-route-keeps-production-false",
+      "passed": true,
+      "detail": "production false"
+    },
+    {
+      "name": "next-route-keeps-oracle-false",
+      "passed": true,
+      "detail": "oracle false"
+    },
+    {
+      "name": "next-route-keeps-official-submission-false",
+      "passed": true,
+      "detail": "official false"
+    },
+    {
+      "name": "next-route-keeps-payment-false",
+      "passed": true,
+      "detail": "payment false"
+    },
+    {
+      "name": "next-route-keeps-documents-false",
+      "passed": true,
+      "detail": "documents false"
+    },
+    {
+      "name": "next-route-keeps-email-false",
+      "passed": true,
+      "detail": "email false"
+    },
+    {
+      "name": "demo-payload-has-consent",
+      "passed": true,
+      "detail": "consent true"
+    },
+    {
+      "name": "demo-payload-has-route-intent",
+      "passed": true,
+      "detail": "route intent present"
+    },
+    {
+      "name": "demo-payload-no-sensitive-fields",
+      "passed": true,
+      "detail": "no sensitive field keys"
+    },
+    {
+      "name": "bridge-backend-server-started",
+      "passed": true,
+      "detail": "url=http://127.0.0.1:49888"
+    },
+    {
+      "name": "bridge-backend-health-status-200",
+      "passed": true,
+      "detail": "status=200"
+    },
+    {
+      "name": "bridge-backend-health-production-false",
+      "passed": true,
+      "detail": "production false"
+    },
+    {
+      "name": "bridge-backend-health-oracle-false",
+      "passed": true,
+      "detail": "deployedToOracle false"
+    },
+    {
+      "name": "bridge-next-cli-exists",
+      "passed": true,
+      "detail": "C:\\Users\\dell\\kingsmen-platform\\apps\\web\\node_modules\\next\\dist\\bin\\next"
+    },
+    {
+      "name": "bridge-next-env-has-backend-url",
+      "passed": true,
+      "detail": "http://127.0.0.1:49888"
+    },
+    {
+      "name": "bridge-next-env-enables-bridge",
+      "passed": true,
+      "detail": "bridge enabled"
+    },
+    {
+      "name": "bridge-next-server-started",
+      "passed": true,
+      "detail": "url=http://127.0.0.1:49889/free-destiny-map"
+    },
+    {
+      "name": "bridge-next-web-status-200",
+      "passed": true,
+      "detail": "status=200"
+    },
+    {
+      "name": "bridge-next-page-has-free-destiny-map",
+      "passed": true,
+      "detail": "Free Destiny Map text"
+    },
+    {
+      "name": "bridge-next-api-status-202",
+      "passed": true,
+      "detail": "status=202"
+    },
+    {
+      "name": "bridge-response-accepted",
+      "passed": true,
+      "detail": "accepted true"
+    },
+    {
+      "name": "bridge-response-reference-next18",
+      "passed": true,
+      "detail": "reference=KM-FDM-NEXT18-BRIDGE"
+    },
+    {
+      "name": "bridge-response-backend-reference",
+      "passed": true,
+      "detail": "backendReference=KM-FDM-BACKEND17"
+    },
+    {
+      "name": "bridge-response-backend-attempted",
+      "passed": true,
+      "detail": "backendBridgeAttempted true"
+    },
+    {
+      "name": "bridge-response-backend-succeeded",
+      "passed": true,
+      "detail": "backendBridgeSucceeded true"
+    },
+    {
+      "name": "bridge-response-backend-boundary-reached",
+      "passed": true,
+      "detail": "backendBoundaryReached true"
+    },
+    {
+      "name": "bridge-response-backend-local-write-succeeded",
+      "passed": true,
+      "detail": "data/local/free-destiny-map/backend-runtime-boundary/backend-runtime-demo-intakes.jsonl"
+    },
+    {
+      "name": "bridge-response-production-false",
+      "passed": true,
+      "detail": "production false"
+    },
+    {
+      "name": "bridge-response-oracle-false",
+      "passed": true,
+      "detail": "deployedToOracle false"
+    },
+    {
+      "name": "bridge-response-official-submission-false",
+      "passed": true,
+      "detail": "official false"
+    },
+    {
+      "name": "bridge-response-payment-false",
+      "passed": true,
+      "detail": "payment false"
+    },
+    {
+      "name": "bridge-response-document-false",
+      "passed": true,
+      "detail": "document false"
+    },
+    {
+      "name": "bridge-response-email-false",
+      "passed": true,
+      "detail": "email false"
+    },
+    {
+      "name": "bridge-next-server-stopped",
+      "passed": true,
+      "detail": "Next process tree stop attempted"
+    },
+    {
+      "name": "bridge-backend-server-stopped",
+      "passed": true,
+      "detail": "backend server close completed"
+    },
+    {
+      "name": "bridge-no-deployment-command-output",
+      "passed": true,
+      "detail": "no deployment command output; deployedToOracle false is allowed as a safety flag"
+    },
+    {
+      "name": "bridge-no-production-true",
+      "passed": true,
+      "detail": "productionReady true absent"
+    },
+    {
+      "name": "bridge-no-official-submission-true",
+      "passed": true,
+      "detail": "officialApplicationSubmitted true absent"
+    },
+    {
+      "name": "bridge-no-payment-true",
+      "passed": true,
+      "detail": "paymentInstructionSent true absent"
+    },
+    {
+      "name": "bridge-no-email-true",
+      "passed": true,
+      "detail": "emailSent true absent"
+    },
+    {
+      "name": "bridge-no-document-upload-true",
+      "passed": true,
+      "detail": "documentUploadAccepted true absent"
+    }
+  ],
+  "failed": [],
+  "stdout_tail": [
+    "   ▲ Next.js 15.5.19",
+    "   - Local:        http://127.0.0.1:49889",
+    "   - Network:      http://127.0.0.1:49889",
+    "   - Experiments (use with caution):",
+    "     ✓ externalDir",
+    " ✓ Starting...",
+    " ✓ Ready in 5.2s",
+    " ○ Compiling /free-destiny-map ...",
+    " ✓ Compiled /free-destiny-map in 2.1s (532 modules)",
+    " GET /free-destiny-map 200 in 2850ms",
+    " GET /free-destiny-map 200 in 175ms",
+    " ○ Compiling /api/public/free-destiny-map/intake/local ...",
+    " ✓ Compiled /api/public/free-destiny-map/intake/local in 1088ms (551 modules)",
+    " POST /api/public/free-destiny-map/intake/local 202 in 1415ms"
+  ],
+  "stderr_tail": [],
+  "oracle_lite_impact": "none_runtime_yet",
+  "runtime_scope": "controlled local Next-to-backend bridge proof only; no Oracle runtime; no deployment",
+  "next_action": "Run validator and commit BATCH 18. Next batch may prepare Docker/Oracle Lite local container boundaries."
+}
