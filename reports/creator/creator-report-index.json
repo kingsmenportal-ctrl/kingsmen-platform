@@ -4,7 +4,7 @@
     "phase":  "Report",
     "creatorVersion":  "0.1.2",
     "productionReady":  false,
-    "generatedAt":  "2026-06-02T04:50:17.570Z",
+    "generatedAt":  "2026-06-02T05:58:40.218Z",
     "repoRoot":  "C:\\Users\\dell\\kingsmen-platform",
     "passed":  true,
     "reports":  [
@@ -23,14 +23,20 @@
                     {
                         "path":  "reports\\creator\\creator-audit-existing-report.json",
                         "bytes":  6167,
-                        "lastWriteTimeUtc":  "2026-06-02T04:50:07.930Z",
-                        "sha256":  "6e00332320928ec422402b162779b5e7ab4f105c7edf929d3bbba3fc86d698af"
+                        "lastWriteTimeUtc":  "2026-06-02T05:58:39.530Z",
+                        "sha256":  "98019cd0266778538120727c289104f3fae414d46332b3ee0b00542ade2dc4c0"
                     },
                     {
                         "path":  "reports\\creator\\creator-doctor-report.json",
                         "bytes":  3758,
-                        "lastWriteTimeUtc":  "2026-06-02T04:50:07.443Z",
-                        "sha256":  "9e1c2a00cf365ee530a4bc72fec53e04d1bd43984f52c98b896a97c614433756"
+                        "lastWriteTimeUtc":  "2026-06-02T05:58:39.067Z",
+                        "sha256":  "37595022f1a30197fd88f0f2bcde9b347e716178967fe459092b60b09fc780ff"
+                    },
+                    {
+                        "path":  "reports\\creator\\creator-report-index.json",
+                        "bytes":  16749,
+                        "lastWriteTimeUtc":  "2026-06-02T04:50:17.578Z",
+                        "sha256":  "6cb3079013e7c98e624ea5ad4f8b8f18a752686c18afe62d4a51507225e33ad9"
                     },
                     {
                         "path":  "reports\\creator\\creator-validation-report.json",
