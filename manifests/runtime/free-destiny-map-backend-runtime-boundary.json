@@ -1,0 +1,40 @@
+{
+  "schema": "kingsmen.backend-runtime-boundary.v1",
+  "module": "BATCH 17 - Backend Runtime Integration Shell / Local API Service Boundary",
+  "status": "BUILT_PENDING_VALIDATION",
+  "productionReady": false,
+  "requiresBatches": [
+    "BATCH 15B - Controlled Local Web + Local API Integration Proof",
+    "BATCH 16 - Controlled Production Build Proof"
+  ],
+  "backendRuntimeModule": "apps/api/src/runtime/free-destiny-map-backend-local-runtime.mjs",
+  "healthEndpoint": "/health",
+  "intakeEndpoint": "/api/public/free-destiny-map/intake/local",
+  "localExerciseDataDirectory": "data/local/free-destiny-map/backend-runtime-boundary",
+  "localWriteFlag": "KINGSMEN_ENABLE_LOCAL_BACKEND_WRITE",
+  "proofCommand": "powershell.exe -ExecutionPolicy Bypass -File scripts/runtime/Invoke-FreeDestinyMapBackendRuntimeBoundary.ps1",
+  "proofScript": "scripts/proof/prove-free-destiny-map-backend-runtime-boundary.mjs",
+  "proofReport": "reports/runtime/free-destiny-map-backend-runtime-boundary-proof.json",
+  "validationReport": "reports/validation/free-destiny-map-backend-runtime-boundary-latest.json",
+  "storesProductionData": false,
+  "usesDemoPayloadOnly": true,
+  "takesPayment": false,
+  "sendsEmail": false,
+  "collectsDocuments": false,
+  "submitsOfficialApplications": false,
+  "deploysToOracle": false,
+  "oracleLiteImpact": "none_runtime_yet",
+  "controlPlaneImpact": "Adds the first backend runtime service boundary before Next-to-backend bridge proof.",
+  "requiredFiles": [
+    "docs/runtime/free-destiny-map-backend-runtime-boundary.md",
+    "manifests/runtime/free-destiny-map-backend-runtime-boundary.json",
+    "apps/api/src/runtime/free-destiny-map-backend-local-runtime.mjs",
+    "packages/contracts/src/free-destiny-map-backend-runtime-boundary.ts",
+    "scripts/runtime/Invoke-FreeDestinyMapBackendRuntimeBoundary.ps1",
+    "scripts/proof/prove-free-destiny-map-backend-runtime-boundary.mjs",
+    "reports/runtime/free-destiny-map-backend-runtime-boundary-proof.json",
+    "scripts/validators/validate-free-destiny-map-backend-runtime-boundary.mjs",
+    "reports/validation/free-destiny-map-backend-runtime-boundary-latest.json"
+  ],
+  "nextAction": "Run powershell.exe -ExecutionPolicy Bypass -File scripts/runtime/Invoke-FreeDestinyMapBackendRuntimeBoundary.ps1 then node scripts/validators/validate-free-destiny-map-backend-runtime-boundary.mjs"
+}

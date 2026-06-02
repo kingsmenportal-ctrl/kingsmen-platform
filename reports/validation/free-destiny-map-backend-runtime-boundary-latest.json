@@ -1,0 +1,35 @@
+{
+  "schema": "kingsmen.validation-report.v1",
+  "module": "BATCH 17 - Backend Runtime Integration Shell / Local API Service Boundary",
+  "status": "BUILT_PENDING_VALIDATION",
+  "passed": false,
+  "generated_at": "2026-06-02T21:34:14.774Z",
+  "files_expected": [
+    "docs/runtime/free-destiny-map-backend-runtime-boundary.md",
+    "manifests/runtime/free-destiny-map-backend-runtime-boundary.json",
+    "apps/api/src/runtime/free-destiny-map-backend-local-runtime.mjs",
+    "packages/contracts/src/free-destiny-map-backend-runtime-boundary.ts",
+    "scripts/runtime/Invoke-FreeDestinyMapBackendRuntimeBoundary.ps1",
+    "scripts/proof/prove-free-destiny-map-backend-runtime-boundary.mjs",
+    "reports/runtime/free-destiny-map-backend-runtime-boundary-proof.json",
+    "scripts/validators/validate-free-destiny-map-backend-runtime-boundary.mjs",
+    "reports/validation/free-destiny-map-backend-runtime-boundary-latest.json"
+  ],
+  "upstream_files_checked": [
+    "reports/runtime/free-destiny-map-controlled-web-api-integration-proof.json",
+    "reports/runtime/free-destiny-map-controlled-production-build-proof.json",
+    "apps/web/src/app/api/public/free-destiny-map/intake/local/route.ts",
+    "data/local/.gitignore"
+  ],
+  "files_checked": 13,
+  "missing_files": [],
+  "failed_checks": [
+    "Backend runtime boundary proof must pass.",
+    "Backend runtime boundary proof status must be BACKEND_RUNTIME_BOUNDARY_PROVEN."
+  ],
+  "warnings": [],
+  "oracle_lite_impact": "none_runtime_yet",
+  "control_plane_impact": "Adds the first backend runtime service boundary before Next-to-backend bridge proof.",
+  "runtime_proof": "reports/runtime/free-destiny-map-backend-runtime-boundary-proof.json",
+  "next_action": "Repair backend runtime boundary proof failures."
+}
