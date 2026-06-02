@@ -1,0 +1,545 @@
+{
+  "schema": "kingsmen.docker-oracle-lite-container-preparation-report.v1",
+  "module": "BATCH 19 - Docker / Oracle Lite Local Runtime Container Preparation",
+  "status": "DOCKER_ORACLE_LITE_CONTAINER_PREPARATION_FAILED",
+  "passed": false,
+  "productionReady": false,
+  "canClaimProduction": false,
+  "deployedToOracle": false,
+  "dockerRunsInThisBatch": false,
+  "dockerBuildsInThisBatch": false,
+  "composeUpInThisBatch": false,
+  "generated_at": "2026-06-02T21:51:26.403Z",
+  "checks": [
+    {
+      "name": "required-file-exists:reports/runtime/free-destiny-map-next-backend-bridge-proof.json",
+      "passed": true,
+      "detail": "reports/runtime/free-destiny-map-next-backend-bridge-proof.json"
+    },
+    {
+      "name": "required-file-exists:reports/runtime/free-destiny-map-controlled-production-build-proof.json",
+      "passed": true,
+      "detail": "reports/runtime/free-destiny-map-controlled-production-build-proof.json"
+    },
+    {
+      "name": "required-file-exists:reports/runtime/free-destiny-map-backend-runtime-boundary-proof.json",
+      "passed": true,
+      "detail": "reports/runtime/free-destiny-map-backend-runtime-boundary-proof.json"
+    },
+    {
+      "name": "required-file-exists:apps/web/package.json",
+      "passed": true,
+      "detail": "apps/web/package.json"
+    },
+    {
+      "name": "required-file-exists:apps/web/package-lock.json",
+      "passed": true,
+      "detail": "apps/web/package-lock.json"
+    },
+    {
+      "name": "required-file-exists:apps/web/next.config.mjs",
+      "passed": true,
+      "detail": "apps/web/next.config.mjs"
+    },
+    {
+      "name": "required-file-exists:apps/web/Dockerfile.oracle-lite",
+      "passed": true,
+      "detail": "apps/web/Dockerfile.oracle-lite"
+    },
+    {
+      "name": "required-file-exists:apps/api/Dockerfile.oracle-lite",
+      "passed": true,
+      "detail": "apps/api/Dockerfile.oracle-lite"
+    },
+    {
+      "name": "required-file-exists:apps/api/src/runtime/free-destiny-map-backend-local-runtime.mjs",
+      "passed": true,
+      "detail": "apps/api/src/runtime/free-destiny-map-backend-local-runtime.mjs"
+    },
+    {
+      "name": "required-file-exists:apps/api/src/runtime/free-destiny-map-backend-local-server.mjs",
+      "passed": true,
+      "detail": "apps/api/src/runtime/free-destiny-map-backend-local-server.mjs"
+    },
+    {
+      "name": "required-file-exists:docker/oracle-lite/docker-compose.local.yml",
+      "passed": true,
+      "detail": "docker/oracle-lite/docker-compose.local.yml"
+    },
+    {
+      "name": "required-file-exists:.dockerignore",
+      "passed": true,
+      "detail": ".dockerignore"
+    },
+    {
+      "name": "batch-18-next-backend-bridge-proven",
+      "passed": true,
+      "detail": "status=NEXT_BACKEND_BRIDGE_PROVEN; passed=true"
+    },
+    {
+      "name": "batch-18-statuses-proven",
+      "passed": true,
+      "detail": "webStatus=200; backendHealthStatus=200; bridgeApiStatus=202"
+    },
+    {
+      "name": "batch-18-production-oracle-false",
+      "passed": true,
+      "detail": "production/oracle false"
+    },
+    {
+      "name": "batch-16-production-build-proven",
+      "passed": true,
+      "detail": "status=CONTROLLED_PRODUCTION_BUILD_PROVEN; exit=0"
+    },
+    {
+      "name": "web-dockerfile-uses-node-22-alpine",
+      "passed": true,
+      "detail": "node:22-alpine"
+    },
+    {
+      "name": "web-dockerfile-runs-npm-ci",
+      "passed": true,
+      "detail": "npm ci"
+    },
+    {
+      "name": "web-dockerfile-runs-next-build",
+      "passed": true,
+      "detail": "next build"
+    },
+    {
+      "name": "web-dockerfile-exposes-3000",
+      "passed": true,
+      "detail": "EXPOSE 3000"
+    },
+    {
+      "name": "web-dockerfile-sets-bridge-env",
+      "passed": true,
+      "detail": "bridge env"
+    },
+    {
+      "name": "web-dockerfile-keeps-local-write-false",
+      "passed": true,
+      "detail": "local write false"
+    },
+    {
+      "name": "api-dockerfile-uses-node-22-alpine",
+      "passed": true,
+      "detail": "node:22-alpine"
+    },
+    {
+      "name": "api-dockerfile-exposes-3001",
+      "passed": true,
+      "detail": "EXPOSE 3001"
+    },
+    {
+      "name": "api-dockerfile-runs-backend-server",
+      "passed": true,
+      "detail": "backend server entry"
+    },
+    {
+      "name": "api-dockerfile-local-backend-write-default-false",
+      "passed": true,
+      "detail": "local backend write false"
+    },
+    {
+      "name": "backend-server-imports-runtime-factory",
+      "passed": true,
+      "detail": "runtime factory"
+    },
+    {
+      "name": "backend-server-uses-host-env",
+      "passed": true,
+      "detail": "HOST env"
+    },
+    {
+      "name": "backend-server-uses-port-env",
+      "passed": true,
+      "detail": "PORT env"
+    },
+    {
+      "name": "backend-server-handles-sigterm",
+      "passed": true,
+      "detail": "SIGTERM"
+    },
+    {
+      "name": "backend-server-keeps-production-false",
+      "passed": true,
+      "detail": "production false"
+    },
+    {
+      "name": "backend-server-keeps-oracle-false",
+      "passed": true,
+      "detail": "oracle false"
+    },
+    {
+      "name": "compose-defines-api-service",
+      "passed": true,
+      "detail": "kingsmen-api"
+    },
+    {
+      "name": "compose-defines-web-service",
+      "passed": true,
+      "detail": "kingsmen-web"
+    },
+    {
+      "name": "compose-api-localhost-port",
+      "passed": true,
+      "detail": "api localhost port"
+    },
+    {
+      "name": "compose-web-localhost-port",
+      "passed": true,
+      "detail": "web localhost port"
+    },
+    {
+      "name": "compose-web-depends-on-api",
+      "passed": true,
+      "detail": "depends_on api"
+    },
+    {
+      "name": "compose-web-uses-backend-service-url",
+      "passed": true,
+      "detail": "backend service url"
+    },
+    {
+      "name": "compose-no-postgres-yet",
+      "passed": true,
+      "detail": "no postgres service in BATCH 19"
+    },
+    {
+      "name": "compose-no-redis-yet",
+      "passed": true,
+      "detail": "no redis service in BATCH 19"
+    },
+    {
+      "name": "compose-no-n8n-yet",
+      "passed": true,
+      "detail": "no n8n service in BATCH 19"
+    },
+    {
+      "name": "compose-no-playwright-yet",
+      "passed": true,
+      "detail": "no playwright service in BATCH 19"
+    },
+    {
+      "name": "compose-uses-low-memory-limits",
+      "passed": true,
+      "detail": "low memory limits"
+    },
+    {
+      "name": "compose-uses-low-cpu-limits",
+      "passed": true,
+      "detail": "low cpu limits"
+    },
+    {
+      "name": "dockerignore-ignores-node-modules",
+      "passed": true,
+      "detail": "node_modules ignored"
+    },
+    {
+      "name": "dockerignore-ignores-next",
+      "passed": true,
+      "detail": ".next ignored"
+    },
+    {
+      "name": "dockerignore-ignores-env",
+      "passed": true,
+      "detail": ".env ignored"
+    },
+    {
+      "name": "dockerignore-ignores-git",
+      "passed": true,
+      "detail": ".git ignored"
+    },
+    {
+      "name": "forbidden-pattern-absent:docs/runtime/docker-oracle-lite-container-preparation.md:productionReady true",
+      "passed": true,
+      "detail": "productionReady true"
+    },
+    {
+      "name": "forbidden-pattern-absent:docs/runtime/docker-oracle-lite-container-preparation.md:canClaimProduction true",
+      "passed": true,
+      "detail": "canClaimProduction true"
+    },
+    {
+      "name": "forbidden-pattern-absent:docs/runtime/docker-oracle-lite-container-preparation.md:deployedToOracle true",
+      "passed": true,
+      "detail": "deployedToOracle true"
+    },
+    {
+      "name": "forbidden-pattern-absent:docs/runtime/docker-oracle-lite-container-preparation.md:official application submitted true",
+      "passed": true,
+      "detail": "official application submitted true"
+    },
+    {
+      "name": "forbidden-pattern-absent:docs/runtime/docker-oracle-lite-container-preparation.md:payment instruction sent true",
+      "passed": true,
+      "detail": "payment instruction sent true"
+    },
+    {
+      "name": "forbidden-pattern-absent:docs/runtime/docker-oracle-lite-container-preparation.md:email sent true",
+      "passed": true,
+      "detail": "email sent true"
+    },
+    {
+      "name": "forbidden-pattern-absent:docs/runtime/docker-oracle-lite-container-preparation.md:document upload accepted true",
+      "passed": true,
+      "detail": "document upload accepted true"
+    },
+    {
+      "name": "forbidden-pattern-absent:manifests/runtime/docker-oracle-lite-container-preparation.json:productionReady true",
+      "passed": true,
+      "detail": "productionReady true"
+    },
+    {
+      "name": "forbidden-pattern-absent:manifests/runtime/docker-oracle-lite-container-preparation.json:canClaimProduction true",
+      "passed": true,
+      "detail": "canClaimProduction true"
+    },
+    {
+      "name": "forbidden-pattern-absent:manifests/runtime/docker-oracle-lite-container-preparation.json:deployedToOracle true",
+      "passed": true,
+      "detail": "deployedToOracle true"
+    },
+    {
+      "name": "forbidden-pattern-absent:manifests/runtime/docker-oracle-lite-container-preparation.json:official application submitted true",
+      "passed": true,
+      "detail": "official application submitted true"
+    },
+    {
+      "name": "forbidden-pattern-absent:manifests/runtime/docker-oracle-lite-container-preparation.json:payment instruction sent true",
+      "passed": true,
+      "detail": "payment instruction sent true"
+    },
+    {
+      "name": "forbidden-pattern-absent:manifests/runtime/docker-oracle-lite-container-preparation.json:email sent true",
+      "passed": true,
+      "detail": "email sent true"
+    },
+    {
+      "name": "forbidden-pattern-absent:manifests/runtime/docker-oracle-lite-container-preparation.json:document upload accepted true",
+      "passed": true,
+      "detail": "document upload accepted true"
+    },
+    {
+      "name": "forbidden-pattern-absent:apps/web/Dockerfile.oracle-lite:productionReady true",
+      "passed": true,
+      "detail": "productionReady true"
+    },
+    {
+      "name": "forbidden-pattern-absent:apps/web/Dockerfile.oracle-lite:canClaimProduction true",
+      "passed": true,
+      "detail": "canClaimProduction true"
+    },
+    {
+      "name": "forbidden-pattern-absent:apps/web/Dockerfile.oracle-lite:deployedToOracle true",
+      "passed": true,
+      "detail": "deployedToOracle true"
+    },
+    {
+      "name": "forbidden-pattern-absent:apps/web/Dockerfile.oracle-lite:official application submitted true",
+      "passed": true,
+      "detail": "official application submitted true"
+    },
+    {
+      "name": "forbidden-pattern-absent:apps/web/Dockerfile.oracle-lite:payment instruction sent true",
+      "passed": true,
+      "detail": "payment instruction sent true"
+    },
+    {
+      "name": "forbidden-pattern-absent:apps/web/Dockerfile.oracle-lite:email sent true",
+      "passed": true,
+      "detail": "email sent true"
+    },
+    {
+      "name": "forbidden-pattern-absent:apps/web/Dockerfile.oracle-lite:document upload accepted true",
+      "passed": true,
+      "detail": "document upload accepted true"
+    },
+    {
+      "name": "forbidden-pattern-absent:apps/api/Dockerfile.oracle-lite:productionReady true",
+      "passed": true,
+      "detail": "productionReady true"
+    },
+    {
+      "name": "forbidden-pattern-absent:apps/api/Dockerfile.oracle-lite:canClaimProduction true",
+      "passed": true,
+      "detail": "canClaimProduction true"
+    },
+    {
+      "name": "forbidden-pattern-absent:apps/api/Dockerfile.oracle-lite:deployedToOracle true",
+      "passed": true,
+      "detail": "deployedToOracle true"
+    },
+    {
+      "name": "forbidden-pattern-absent:apps/api/Dockerfile.oracle-lite:official application submitted true",
+      "passed": true,
+      "detail": "official application submitted true"
+    },
+    {
+      "name": "forbidden-pattern-absent:apps/api/Dockerfile.oracle-lite:payment instruction sent true",
+      "passed": true,
+      "detail": "payment instruction sent true"
+    },
+    {
+      "name": "forbidden-pattern-absent:apps/api/Dockerfile.oracle-lite:email sent true",
+      "passed": true,
+      "detail": "email sent true"
+    },
+    {
+      "name": "forbidden-pattern-absent:apps/api/Dockerfile.oracle-lite:document upload accepted true",
+      "passed": true,
+      "detail": "document upload accepted true"
+    },
+    {
+      "name": "forbidden-pattern-absent:apps/api/src/runtime/free-destiny-map-backend-local-server.mjs:productionReady true",
+      "passed": true,
+      "detail": "productionReady true"
+    },
+    {
+      "name": "forbidden-pattern-absent:apps/api/src/runtime/free-destiny-map-backend-local-server.mjs:canClaimProduction true",
+      "passed": true,
+      "detail": "canClaimProduction true"
+    },
+    {
+      "name": "forbidden-pattern-absent:apps/api/src/runtime/free-destiny-map-backend-local-server.mjs:deployedToOracle true",
+      "passed": true,
+      "detail": "deployedToOracle true"
+    },
+    {
+      "name": "forbidden-pattern-absent:apps/api/src/runtime/free-destiny-map-backend-local-server.mjs:official application submitted true",
+      "passed": true,
+      "detail": "official application submitted true"
+    },
+    {
+      "name": "forbidden-pattern-absent:apps/api/src/runtime/free-destiny-map-backend-local-server.mjs:payment instruction sent true",
+      "passed": true,
+      "detail": "payment instruction sent true"
+    },
+    {
+      "name": "forbidden-pattern-absent:apps/api/src/runtime/free-destiny-map-backend-local-server.mjs:email sent true",
+      "passed": true,
+      "detail": "email sent true"
+    },
+    {
+      "name": "forbidden-pattern-absent:apps/api/src/runtime/free-destiny-map-backend-local-server.mjs:document upload accepted true",
+      "passed": true,
+      "detail": "document upload accepted true"
+    },
+    {
+      "name": "forbidden-pattern-absent:docker/oracle-lite/docker-compose.local.yml:productionReady true",
+      "passed": true,
+      "detail": "productionReady true"
+    },
+    {
+      "name": "forbidden-pattern-absent:docker/oracle-lite/docker-compose.local.yml:canClaimProduction true",
+      "passed": true,
+      "detail": "canClaimProduction true"
+    },
+    {
+      "name": "forbidden-pattern-absent:docker/oracle-lite/docker-compose.local.yml:deployedToOracle true",
+      "passed": true,
+      "detail": "deployedToOracle true"
+    },
+    {
+      "name": "forbidden-pattern-absent:docker/oracle-lite/docker-compose.local.yml:official application submitted true",
+      "passed": true,
+      "detail": "official application submitted true"
+    },
+    {
+      "name": "forbidden-pattern-absent:docker/oracle-lite/docker-compose.local.yml:payment instruction sent true",
+      "passed": true,
+      "detail": "payment instruction sent true"
+    },
+    {
+      "name": "forbidden-pattern-absent:docker/oracle-lite/docker-compose.local.yml:email sent true",
+      "passed": true,
+      "detail": "email sent true"
+    },
+    {
+      "name": "forbidden-pattern-absent:docker/oracle-lite/docker-compose.local.yml:document upload accepted true",
+      "passed": true,
+      "detail": "document upload accepted true"
+    },
+    {
+      "name": "forbidden-pattern-absent:packages/contracts/src/docker-oracle-lite-container-preparation.ts:productionReady true",
+      "passed": true,
+      "detail": "productionReady true"
+    },
+    {
+      "name": "forbidden-pattern-absent:packages/contracts/src/docker-oracle-lite-container-preparation.ts:canClaimProduction true",
+      "passed": true,
+      "detail": "canClaimProduction true"
+    },
+    {
+      "name": "forbidden-pattern-absent:packages/contracts/src/docker-oracle-lite-container-preparation.ts:deployedToOracle true",
+      "passed": true,
+      "detail": "deployedToOracle true"
+    },
+    {
+      "name": "forbidden-pattern-absent:packages/contracts/src/docker-oracle-lite-container-preparation.ts:official application submitted true",
+      "passed": true,
+      "detail": "official application submitted true"
+    },
+    {
+      "name": "forbidden-pattern-absent:packages/contracts/src/docker-oracle-lite-container-preparation.ts:payment instruction sent true",
+      "passed": true,
+      "detail": "payment instruction sent true"
+    },
+    {
+      "name": "forbidden-pattern-absent:packages/contracts/src/docker-oracle-lite-container-preparation.ts:email sent true",
+      "passed": true,
+      "detail": "email sent true"
+    },
+    {
+      "name": "forbidden-pattern-absent:packages/contracts/src/docker-oracle-lite-container-preparation.ts:document upload accepted true",
+      "passed": true,
+      "detail": "document upload accepted true"
+    },
+    {
+      "name": "no-docker-run-command-in:docs/runtime/docker-oracle-lite-container-preparation.md",
+      "passed": true,
+      "detail": "docker run absent"
+    },
+    {
+      "name": "no-compose-up-command-in:docs/runtime/docker-oracle-lite-container-preparation.md",
+      "passed": false,
+      "detail": "compose up absent"
+    },
+    {
+      "name": "no-docker-run-command-in:scripts/proof/prove-docker-oracle-lite-container-preparation.mjs",
+      "passed": false,
+      "detail": "docker run absent"
+    },
+    {
+      "name": "no-compose-up-command-in:scripts/proof/prove-docker-oracle-lite-container-preparation.mjs",
+      "passed": true,
+      "detail": "compose up absent"
+    },
+    {
+      "name": "no-docker-run-command-in:scripts/validators/validate-docker-oracle-lite-container-preparation.mjs",
+      "passed": true,
+      "detail": "docker run absent"
+    },
+    {
+      "name": "no-compose-up-command-in:scripts/validators/validate-docker-oracle-lite-container-preparation.mjs",
+      "passed": true,
+      "detail": "compose up absent"
+    }
+  ],
+  "failed": [
+    {
+      "name": "no-compose-up-command-in:docs/runtime/docker-oracle-lite-container-preparation.md",
+      "passed": false,
+      "detail": "compose up absent"
+    },
+    {
+      "name": "no-docker-run-command-in:scripts/proof/prove-docker-oracle-lite-container-preparation.mjs",
+      "passed": false,
+      "detail": "docker run absent"
+    }
+  ],
+  "oracle_lite_impact": "container_preparation_only",
+  "runtime_scope": "Docker/Oracle Lite file preparation only; no docker build; no compose up; no Oracle deployment",
+  "next_action": "Repair Docker/Oracle Lite container preparation failures before moving forward."
+}

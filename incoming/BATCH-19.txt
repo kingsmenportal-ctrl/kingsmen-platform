@@ -1,0 +1,712 @@
+FILE: docs/runtime/docker-oracle-lite-container-preparation.md
+---
+# BATCH 19 - Docker / Oracle Lite Local Runtime Container Preparation
+
+## Purpose
+
+This batch prepares Docker and Oracle Lite local runtime container files for the proven Kingsmen Free Destiny Map path.
+
+BATCH 18 proved the full local chain:
+
+Next page -> Next API route -> backend runtime boundary -> backend local proof write.
+
+BATCH 19 now prepares container boundaries for the web and backend services without running Docker, without deploying to Oracle, and without claiming production readiness.
+
+## What this batch creates
+
+- Dockerfile for the Next web app
+- Dockerfile for the backend local runtime boundary
+- executable backend local server entrypoint
+- Oracle Lite local Docker Compose preparation file
+- Docker ignore file
+- container preparation proof script
+- validator
+- runtime proof report
+- validation report
+
+## What this batch proves
+
+- BATCH 18 bridge proof exists and passed
+- BATCH 16 production build proof exists and passed
+- web Dockerfile exists and has Oracle Lite-safe defaults
+- backend Dockerfile exists and has Oracle Lite-safe defaults
+- compose file defines web and api services
+- compose file uses low local ports and local-only bind intent
+- compose file sets backend bridge env vars
+- compose file avoids PostgreSQL, Redis, n8n, Playwright and Oracle deployment claims for this batch
+- production/action flags remain false
+
+## What this batch does not do
+
+- no Docker build
+- no Docker Compose up
+- no Oracle deployment
+- no public production URL
+- no PostgreSQL runtime
+- no Redis queue
+- no n8n runtime
+- no Playwright runtime
+- no email sending
+- no payment processing
+- no document upload
+- no official application submission
+
+## Oracle Lite impact
+
+Preparation only.
+
+No runtime is started in this batch.
+
+## Next action
+
+BATCH 20 should run a controlled Docker local build proof if Docker is installed, or produce a clear Docker unavailable report if Docker is not installed.
+---
+FILE: manifests/runtime/docker-oracle-lite-container-preparation.json
+---
+{
+  "schema": "kingsmen.docker-oracle-lite-container-preparation.v1",
+  "module": "BATCH 19 - Docker / Oracle Lite Local Runtime Container Preparation",
+  "status": "BUILT_PENDING_VALIDATION",
+  "productionReady": false,
+  "requiresBatches": [
+    "BATCH 16 - Controlled Production Build Proof",
+    "BATCH 17 - Backend Runtime Integration Shell / Local API Service Boundary",
+    "BATCH 18 - Controlled Next-to-Backend Bridge Proof"
+  ],
+  "dockerRunsInThisBatch": false,
+  "dockerBuildsInThisBatch": false,
+  "composeUpInThisBatch": false,
+  "deploysToOracle": false,
+  "webDockerfile": "apps/web/Dockerfile.oracle-lite",
+  "apiDockerfile": "apps/api/Dockerfile.oracle-lite",
+  "composeFile": "docker/oracle-lite/docker-compose.local.yml",
+  "dockerIgnoreFile": ".dockerignore",
+  "backendEntrypoint": "apps/api/src/runtime/free-destiny-map-backend-local-server.mjs",
+  "webService": "kingsmen-web",
+  "apiService": "kingsmen-api",
+  "webPort": 3000,
+  "apiPort": 3001,
+  "storesProductionData": false,
+  "usesDemoPayloadOnly": true,
+  "takesPayment": false,
+  "sendsEmail": false,
+  "collectsDocuments": false,
+  "submitsOfficialApplications": false,
+  "oracleLiteImpact": "container_preparation_only",
+  "controlPlaneImpact": "Prepares Docker/Oracle Lite local runtime boundaries for the already-proven Free Destiny Map web-to-backend chain.",
+  "requiredFiles": [
+    "docs/runtime/docker-oracle-lite-container-preparation.md",
+    "manifests/runtime/docker-oracle-lite-container-preparation.json",
+    ".dockerignore",
+    "apps/web/Dockerfile.oracle-lite",
+    "apps/api/Dockerfile.oracle-lite",
+    "apps/api/src/runtime/free-destiny-map-backend-local-server.mjs",
+    "docker/oracle-lite/docker-compose.local.yml",
+    "packages/contracts/src/docker-oracle-lite-container-preparation.ts",
+    "scripts/proof/prove-docker-oracle-lite-container-preparation.mjs",
+    "reports/runtime/docker-oracle-lite-container-preparation-proof.json",
+    "scripts/validators/validate-docker-oracle-lite-container-preparation.mjs",
+    "reports/validation/docker-oracle-lite-container-preparation-latest.json"
+  ],
+  "nextAction": "Run node scripts/proof/prove-docker-oracle-lite-container-preparation.mjs then node scripts/validators/validate-docker-oracle-lite-container-preparation.mjs"
+}
+---
+FILE: .dockerignore
+---
+.git
+.gitignore
+.github
+node_modules
+**/node_modules
+.next
+**/.next
+dist
+**/dist
+coverage
+**/coverage
+.env
+.env.*
+!.env.example
+reports
+incoming
+data/local/free-destiny-map
+.DS_Store
+Thumbs.db
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+---
+FILE: apps/web/Dockerfile.oracle-lite
+---
+# Kingsmen Oracle Lite web container preparation.
+# This Dockerfile is prepared for a later controlled Docker build proof.
+# It does not deploy, submit applications, send email, take payment, or upload documents.
+
+FROM node:22-alpine AS deps
+WORKDIR /repo/apps/web
+COPY apps/web/package.json apps/web/package-lock.json ./
+RUN npm ci --no-audit --no-fund
+
+FROM node:22-alpine AS builder
+WORKDIR /repo
+ENV NEXT_TELEMETRY_DISABLED=1
+ENV NODE_ENV=production
+COPY --from=deps /repo/apps/web/node_modules apps/web/node_modules
+COPY apps/web apps/web
+COPY packages packages
+RUN cd apps/web && npm run build
+
+FROM node:22-alpine AS runner
+WORKDIR /repo
+ENV NODE_ENV=production
+ENV NEXT_TELEMETRY_DISABLED=1
+ENV PORT=3000
+ENV HOSTNAME=0.0.0.0
+ENV KINGSMEN_ENABLE_BACKEND_BRIDGE=true
+ENV KINGSMEN_ENABLE_LOCAL_INTAKE_WRITE=false
+COPY --from=builder /repo/apps/web apps/web
+COPY --from=builder /repo/packages packages
+EXPOSE 3000
+CMD ["sh", "-lc", "cd apps/web && npm run start -- --hostname 0.0.0.0 --port ${PORT:-3000}"]
+---
+FILE: apps/api/Dockerfile.oracle-lite
+---
+# Kingsmen Oracle Lite backend runtime boundary container preparation.
+# This Dockerfile is prepared for a later controlled Docker build proof.
+# It does not deploy, submit applications, send email, take payment, or upload documents.
+
+FROM node:22-alpine
+WORKDIR /repo
+ENV NODE_ENV=production
+ENV HOST=0.0.0.0
+ENV PORT=3001
+ENV KINGSMEN_ENABLE_LOCAL_BACKEND_WRITE=false
+COPY apps/api/src/runtime apps/api/src/runtime
+COPY data/local/.gitignore data/local/.gitignore
+EXPOSE 3001
+CMD ["node", "apps/api/src/runtime/free-destiny-map-backend-local-server.mjs"]
+---
+FILE: apps/api/src/runtime/free-destiny-map-backend-local-server.mjs
+---
+#!/usr/bin/env node
+import { createFreeDestinyMapBackendLocalServer } from "./free-destiny-map-backend-local-runtime.mjs";
+
+const host = process.env.HOST || "0.0.0.0";
+const port = Number(process.env.PORT || 3001);
+const repoRoot = process.cwd();
+
+const server = createFreeDestinyMapBackendLocalServer({
+  repoRoot,
+  enableLocalWrite: process.env.KINGSMEN_ENABLE_LOCAL_BACKEND_WRITE === "true"
+});
+
+server.listen(port, host, () => {
+  console.log(
+    JSON.stringify({
+      schema: "kingsmen.backend-local-server-started.v1",
+      module: "BATCH 19 - Docker / Oracle Lite Local Runtime Container Preparation",
+      productionReady: false,
+      canClaimProduction: false,
+      deployedToOracle: false,
+      host,
+      port,
+      healthEndpoint: "/health",
+      intakeEndpoint: "/api/public/free-destiny-map/intake/local",
+      safeNotice:
+        "Backend local runtime boundary server. No Oracle deployment, no payment, no email, no document upload, no official application submission."
+    })
+  );
+});
+
+function shutdown(signal) {
+  console.log(
+    JSON.stringify({
+      schema: "kingsmen.backend-local-server-shutdown.v1",
+      signal,
+      productionReady: false,
+      deployedToOracle: false
+    })
+  );
+
+  server.close(() => {
+    process.exit(0);
+  });
+
+  setTimeout(() => process.exit(1), 10000).unref();
+}
+
+process.on("SIGTERM", () => shutdown("SIGTERM"));
+process.on("SIGINT", () => shutdown("SIGINT"));
+---
+FILE: docker/oracle-lite/docker-compose.local.yml
+---
+name: kingsmen-oracle-lite-local
+
+services:
+  kingsmen-api:
+    build:
+      context: ../..
+      dockerfile: apps/api/Dockerfile.oracle-lite
+    image: kingsmen/api:oracle-lite-local
+    container_name: kingsmen-api-local
+    environment:
+      NODE_ENV: production
+      HOST: 0.0.0.0
+      PORT: "3001"
+      KINGSMEN_ENABLE_LOCAL_BACKEND_WRITE: "true"
+    ports:
+      - "127.0.0.1:3001:3001"
+    volumes:
+      - ../../data/local:/repo/data/local
+    restart: "no"
+    mem_limit: 512m
+    cpus: "0.50"
+
+  kingsmen-web:
+    build:
+      context: ../..
+      dockerfile: apps/web/Dockerfile.oracle-lite
+    image: kingsmen/web:oracle-lite-local
+    container_name: kingsmen-web-local
+    depends_on:
+      - kingsmen-api
+    environment:
+      NODE_ENV: production
+      NEXT_TELEMETRY_DISABLED: "1"
+      PORT: "3000"
+      HOSTNAME: 0.0.0.0
+      KINGSMEN_ENABLE_BACKEND_BRIDGE: "true"
+      KINGSMEN_BACKEND_BASE_URL: "http://kingsmen-api:3001"
+      KINGSMEN_ENABLE_LOCAL_INTAKE_WRITE: "false"
+    ports:
+      - "127.0.0.1:3000:3000"
+    restart: "no"
+    mem_limit: 768m
+    cpus: "0.75"
+---
+FILE: packages/contracts/src/docker-oracle-lite-container-preparation.ts
+---
+export const DOCKER_ORACLE_LITE_CONTAINER_PREPARATION_MODULE =
+  "BATCH 19 - Docker / Oracle Lite Local Runtime Container Preparation" as const;
+
+export const DOCKER_ORACLE_LITE_WEB_DOCKERFILE =
+  "apps/web/Dockerfile.oracle-lite" as const;
+
+export const DOCKER_ORACLE_LITE_API_DOCKERFILE =
+  "apps/api/Dockerfile.oracle-lite" as const;
+
+export const DOCKER_ORACLE_LITE_COMPOSE_FILE =
+  "docker/oracle-lite/docker-compose.local.yml" as const;
+
+export type DockerOracleLiteContainerPreparationStatus =
+  | "DOCKER_ORACLE_LITE_CONTAINER_PREPARED"
+  | "DOCKER_ORACLE_LITE_CONTAINER_PREPARATION_FAILED";
+
+export interface DockerOracleLiteContainerPreparationCheck {
+  name: string;
+  passed: boolean;
+  detail: string;
+}
+
+export interface DockerOracleLiteContainerPreparationReport {
+  schema: "kingsmen.docker-oracle-lite-container-preparation-report.v1";
+  module: typeof DOCKER_ORACLE_LITE_CONTAINER_PREPARATION_MODULE;
+  status: DockerOracleLiteContainerPreparationStatus;
+  passed: boolean;
+  productionReady: false;
+  canClaimProduction: false;
+  deployedToOracle: false;
+  dockerRunsInThisBatch: false;
+  dockerBuildsInThisBatch: false;
+  composeUpInThisBatch: false;
+  oracleLiteImpact: "container_preparation_only";
+  checks: DockerOracleLiteContainerPreparationCheck[];
+  failed: DockerOracleLiteContainerPreparationCheck[];
+  nextAction: string;
+}
+---
+FILE: scripts/proof/prove-docker-oracle-lite-container-preparation.mjs
+---
+#!/usr/bin/env node
+import fs from "node:fs";
+import path from "node:path";
+
+const root = process.cwd();
+const proofReportPath = path.join(root, "reports/runtime/docker-oracle-lite-container-preparation-proof.json");
+const checks = [];
+
+function exists(rel) {
+  return fs.existsSync(path.join(root, rel));
+}
+
+function read(rel) {
+  return fs.readFileSync(path.join(root, rel), "utf8").replace(/^\uFEFF/, "");
+}
+
+function parseJson(rel) {
+  return JSON.parse(read(rel));
+}
+
+function check(name, passed, detail = "") {
+  checks.push({ name, passed, detail });
+}
+
+const requiredFiles = [
+  "reports/runtime/free-destiny-map-next-backend-bridge-proof.json",
+  "reports/runtime/free-destiny-map-controlled-production-build-proof.json",
+  "reports/runtime/free-destiny-map-backend-runtime-boundary-proof.json",
+  "apps/web/package.json",
+  "apps/web/package-lock.json",
+  "apps/web/next.config.mjs",
+  "apps/web/Dockerfile.oracle-lite",
+  "apps/api/Dockerfile.oracle-lite",
+  "apps/api/src/runtime/free-destiny-map-backend-local-runtime.mjs",
+  "apps/api/src/runtime/free-destiny-map-backend-local-server.mjs",
+  "docker/oracle-lite/docker-compose.local.yml",
+  ".dockerignore"
+];
+
+for (const file of requiredFiles) {
+  check(`required-file-exists:${file}`, exists(file), file);
+}
+
+if (exists("reports/runtime/free-destiny-map-next-backend-bridge-proof.json")) {
+  const bridge = parseJson("reports/runtime/free-destiny-map-next-backend-bridge-proof.json");
+  check("batch-18-next-backend-bridge-proven", bridge.status === "NEXT_BACKEND_BRIDGE_PROVEN" && bridge.passed === true, `status=${bridge.status}; passed=${bridge.passed}`);
+  check("batch-18-statuses-proven", bridge.webStatus === 200 && bridge.backendHealthStatus === 200 && bridge.bridgeApiStatus === 202, `webStatus=${bridge.webStatus}; backendHealthStatus=${bridge.backendHealthStatus}; bridgeApiStatus=${bridge.bridgeApiStatus}`);
+  check("batch-18-production-oracle-false", bridge.productionReady === false && bridge.canClaimProduction === false && bridge.deployedToOracle === false, "production/oracle false");
+}
+
+if (exists("reports/runtime/free-destiny-map-controlled-production-build-proof.json")) {
+  const build = parseJson("reports/runtime/free-destiny-map-controlled-production-build-proof.json");
+  check("batch-16-production-build-proven", build.status === "CONTROLLED_PRODUCTION_BUILD_PROVEN" && build.buildExitCode === 0, `status=${build.status}; exit=${build.buildExitCode}`);
+}
+
+if (exists("apps/web/Dockerfile.oracle-lite")) {
+  const webDockerfile = read("apps/web/Dockerfile.oracle-lite");
+  check("web-dockerfile-uses-node-22-alpine", webDockerfile.includes("node:22-alpine"), "node:22-alpine");
+  check("web-dockerfile-runs-npm-ci", webDockerfile.includes("npm ci --no-audit --no-fund"), "npm ci");
+  check("web-dockerfile-runs-next-build", webDockerfile.includes("npm run build"), "next build");
+  check("web-dockerfile-exposes-3000", webDockerfile.includes("EXPOSE 3000"), "EXPOSE 3000");
+  check("web-dockerfile-sets-bridge-env", webDockerfile.includes("KINGSMEN_ENABLE_BACKEND_BRIDGE=true"), "bridge env");
+  check("web-dockerfile-keeps-local-write-false", webDockerfile.includes("KINGSMEN_ENABLE_LOCAL_INTAKE_WRITE=false"), "local write false");
+}
+
+if (exists("apps/api/Dockerfile.oracle-lite")) {
+  const apiDockerfile = read("apps/api/Dockerfile.oracle-lite");
+  check("api-dockerfile-uses-node-22-alpine", apiDockerfile.includes("node:22-alpine"), "node:22-alpine");
+  check("api-dockerfile-exposes-3001", apiDockerfile.includes("EXPOSE 3001"), "EXPOSE 3001");
+  check("api-dockerfile-runs-backend-server", apiDockerfile.includes("free-destiny-map-backend-local-server.mjs"), "backend server entry");
+  check("api-dockerfile-local-backend-write-default-false", apiDockerfile.includes("KINGSMEN_ENABLE_LOCAL_BACKEND_WRITE=false"), "local backend write false");
+}
+
+if (exists("apps/api/src/runtime/free-destiny-map-backend-local-server.mjs")) {
+  const server = read("apps/api/src/runtime/free-destiny-map-backend-local-server.mjs");
+  check("backend-server-imports-runtime-factory", server.includes("createFreeDestinyMapBackendLocalServer"), "runtime factory");
+  check("backend-server-uses-host-env", server.includes("process.env.HOST"), "HOST env");
+  check("backend-server-uses-port-env", server.includes("process.env.PORT"), "PORT env");
+  check("backend-server-handles-sigterm", server.includes("SIGTERM"), "SIGTERM");
+  check("backend-server-keeps-production-false", server.includes("productionReady: false"), "production false");
+  check("backend-server-keeps-oracle-false", server.includes("deployedToOracle: false"), "oracle false");
+}
+
+if (exists("docker/oracle-lite/docker-compose.local.yml")) {
+  const compose = read("docker/oracle-lite/docker-compose.local.yml");
+  check("compose-defines-api-service", compose.includes("kingsmen-api:"), "kingsmen-api");
+  check("compose-defines-web-service", compose.includes("kingsmen-web:"), "kingsmen-web");
+  check("compose-api-localhost-port", compose.includes('"127.0.0.1:3001:3001"'), "api localhost port");
+  check("compose-web-localhost-port", compose.includes('"127.0.0.1:3000:3000"'), "web localhost port");
+  check("compose-web-depends-on-api", compose.includes("depends_on:") && compose.includes("kingsmen-api"), "depends_on api");
+  check("compose-web-uses-backend-service-url", compose.includes("http://kingsmen-api:3001"), "backend service url");
+  check("compose-no-postgres-yet", !/postgres/i.test(compose), "no postgres service in BATCH 19");
+  check("compose-no-redis-yet", !/redis/i.test(compose), "no redis service in BATCH 19");
+  check("compose-no-n8n-yet", !/n8n/i.test(compose), "no n8n service in BATCH 19");
+  check("compose-no-playwright-yet", !/playwright/i.test(compose), "no playwright service in BATCH 19");
+  check("compose-uses-low-memory-limits", compose.includes("mem_limit: 512m") && compose.includes("mem_limit: 768m"), "low memory limits");
+  check("compose-uses-low-cpu-limits", compose.includes('cpus: "0.50"') && compose.includes('cpus: "0.75"'), "low cpu limits");
+}
+
+if (exists(".dockerignore")) {
+  const dockerignore = read(".dockerignore");
+  check("dockerignore-ignores-node-modules", dockerignore.includes("node_modules"), "node_modules ignored");
+  check("dockerignore-ignores-next", dockerignore.includes(".next"), ".next ignored");
+  check("dockerignore-ignores-env", dockerignore.includes(".env"), ".env ignored");
+  check("dockerignore-ignores-git", dockerignore.includes(".git"), ".git ignored");
+}
+
+const safetyFiles = [
+  "docs/runtime/docker-oracle-lite-container-preparation.md",
+  "manifests/runtime/docker-oracle-lite-container-preparation.json",
+  "apps/web/Dockerfile.oracle-lite",
+  "apps/api/Dockerfile.oracle-lite",
+  "apps/api/src/runtime/free-destiny-map-backend-local-server.mjs",
+  "docker/oracle-lite/docker-compose.local.yml",
+  "packages/contracts/src/docker-oracle-lite-container-preparation.ts"
+];
+
+const forbiddenPatterns = [
+  [/productionReady\s*[:=]\s*true/i, "productionReady true"],
+  [/canClaimProduction\s*[:=]\s*true/i, "canClaimProduction true"],
+  [/deployedToOracle\s*[:=]\s*true/i, "deployedToOracle true"],
+  [/officialApplicationSubmitted:\s*true/i, "official application submitted true"],
+  [/paymentInstructionSent:\s*true/i, "payment instruction sent true"],
+  [/emailSent:\s*true/i, "email sent true"],
+  [/documentUploadAccepted:\s*true/i, "document upload accepted true"]
+];
+
+for (const file of safetyFiles) {
+  if (!exists(file)) continue;
+  const content = read(file);
+  for (const [pattern, label] of forbiddenPatterns) {
+    check(`forbidden-pattern-absent:${file}:${label}`, !pattern.test(content), label);
+  }
+}
+
+const commandFiles = [
+  "docs/runtime/docker-oracle-lite-container-preparation.md",
+  "scripts/proof/prove-docker-oracle-lite-container-preparation.mjs",
+  "scripts/validators/validate-docker-oracle-lite-container-preparation.mjs"
+];
+
+for (const file of commandFiles) {
+  if (!exists(file)) continue;
+  const content = read(file);
+  check(`no-docker-run-command-in:${file}`, !/docker\s+run/i.test(content), "docker run absent");
+  check(`no-compose-up-command-in:${file}`, !/docker\s+compose\s+up|docker-compose\s+up/i.test(content), "compose up absent");
+}
+
+const failed = checks.filter((item) => item.passed !== true);
+const passed = failed.length === 0;
+
+const report = {
+  schema: "kingsmen.docker-oracle-lite-container-preparation-report.v1",
+  module: "BATCH 19 - Docker / Oracle Lite Local Runtime Container Preparation",
+  status: passed ? "DOCKER_ORACLE_LITE_CONTAINER_PREPARED" : "DOCKER_ORACLE_LITE_CONTAINER_PREPARATION_FAILED",
+  passed,
+  productionReady: false,
+  canClaimProduction: false,
+  deployedToOracle: false,
+  dockerRunsInThisBatch: false,
+  dockerBuildsInThisBatch: false,
+  composeUpInThisBatch: false,
+  generated_at: new Date().toISOString(),
+  checks,
+  failed,
+  oracle_lite_impact: "container_preparation_only",
+  runtime_scope: "Docker/Oracle Lite file preparation only; no docker build; no compose up; no Oracle deployment",
+  next_action: passed
+    ? "Run validator and commit BATCH 19. BATCH 20 may attempt controlled Docker local build proof."
+    : "Repair Docker/Oracle Lite container preparation failures before moving forward."
+};
+
+fs.mkdirSync(path.dirname(proofReportPath), { recursive: true });
+fs.writeFileSync(proofReportPath, `${JSON.stringify(report, null, 2)}\n`, "utf8");
+
+console.log(JSON.stringify(report, null, 2));
+if (!passed) process.exit(1);
+---
+FILE: reports/runtime/docker-oracle-lite-container-preparation-proof.json
+---
+{
+  "schema": "kingsmen.docker-oracle-lite-container-preparation-report.v1",
+  "module": "BATCH 19 - Docker / Oracle Lite Local Runtime Container Preparation",
+  "status": "DOCKER_ORACLE_LITE_CONTAINER_PREPARATION_FAILED",
+  "passed": false,
+  "productionReady": false,
+  "canClaimProduction": false,
+  "deployedToOracle": false,
+  "dockerRunsInThisBatch": false,
+  "dockerBuildsInThisBatch": false,
+  "composeUpInThisBatch": false,
+  "generated_at": "2026-06-02T00:00:00.000Z",
+  "checks": [],
+  "failed": [
+    {
+      "name": "docker_oracle_lite_container_preparation_not_yet_executed",
+      "passed": false,
+      "detail": "Run scripts/proof/prove-docker-oracle-lite-container-preparation.mjs."
+    }
+  ],
+  "oracle_lite_impact": "container_preparation_only",
+  "runtime_scope": "Docker/Oracle Lite file preparation only; no docker build; no compose up; no Oracle deployment",
+  "next_action": "Run BATCH 19 Docker/Oracle Lite container preparation proof."
+}
+---
+FILE: scripts/validators/validate-docker-oracle-lite-container-preparation.mjs
+---
+#!/usr/bin/env node
+import fs from "node:fs";
+import path from "node:path";
+
+const root = process.cwd();
+const reportPath = path.join(root, "reports/validation/docker-oracle-lite-container-preparation-latest.json");
+
+const requiredFiles = [
+  "docs/runtime/docker-oracle-lite-container-preparation.md",
+  "manifests/runtime/docker-oracle-lite-container-preparation.json",
+  ".dockerignore",
+  "apps/web/Dockerfile.oracle-lite",
+  "apps/api/Dockerfile.oracle-lite",
+  "apps/api/src/runtime/free-destiny-map-backend-local-server.mjs",
+  "docker/oracle-lite/docker-compose.local.yml",
+  "packages/contracts/src/docker-oracle-lite-container-preparation.ts",
+  "scripts/proof/prove-docker-oracle-lite-container-preparation.mjs",
+  "reports/runtime/docker-oracle-lite-container-preparation-proof.json",
+  "scripts/validators/validate-docker-oracle-lite-container-preparation.mjs",
+  "reports/validation/docker-oracle-lite-container-preparation-latest.json"
+];
+
+const upstreamFiles = [
+  "reports/runtime/free-destiny-map-next-backend-bridge-proof.json",
+  "reports/runtime/free-destiny-map-controlled-production-build-proof.json",
+  "reports/runtime/free-destiny-map-backend-runtime-boundary-proof.json"
+];
+
+function exists(rel) {
+  return fs.existsSync(path.join(root, rel));
+}
+
+function read(rel) {
+  return fs.readFileSync(path.join(root, rel), "utf8").replace(/^\uFEFF/, "");
+}
+
+function parseJson(rel) {
+  return JSON.parse(read(rel));
+}
+
+const failures = [];
+const warnings = [];
+const checked = [];
+
+for (const file of requiredFiles) {
+  checked.push(file);
+  if (!exists(file)) failures.push(`Missing required file: ${file}`);
+  else if (fs.statSync(path.join(root, file)).size === 0) failures.push(`Empty required file: ${file}`);
+}
+
+for (const file of upstreamFiles) {
+  checked.push(file);
+  if (!exists(file)) failures.push(`Missing upstream file: ${file}`);
+  else if (fs.statSync(path.join(root, file)).size === 0) failures.push(`Empty upstream file: ${file}`);
+}
+
+if (exists("manifests/runtime/docker-oracle-lite-container-preparation.json")) {
+  const manifest = parseJson("manifests/runtime/docker-oracle-lite-container-preparation.json");
+  if (manifest.productionReady !== false) failures.push("Manifest must keep productionReady false.");
+  if (manifest.dockerRunsInThisBatch !== false) failures.push("Manifest must keep dockerRunsInThisBatch false.");
+  if (manifest.dockerBuildsInThisBatch !== false) failures.push("Manifest must keep dockerBuildsInThisBatch false.");
+  if (manifest.composeUpInThisBatch !== false) failures.push("Manifest must keep composeUpInThisBatch false.");
+  if (manifest.deploysToOracle !== false) failures.push("Manifest must keep deploysToOracle false.");
+  if (manifest.storesProductionData !== false) failures.push("Manifest must declare storesProductionData false.");
+  if (manifest.takesPayment !== false) failures.push("Manifest must declare takesPayment false.");
+  if (manifest.sendsEmail !== false) failures.push("Manifest must declare sendsEmail false.");
+  if (manifest.collectsDocuments !== false) failures.push("Manifest must declare collectsDocuments false.");
+  if (manifest.submitsOfficialApplications !== false) failures.push("Manifest must declare submitsOfficialApplications false.");
+  if (manifest.oracleLiteImpact !== "container_preparation_only") failures.push("Manifest must declare container_preparation_only.");
+}
+
+const tokenChecks = [
+  [".dockerignore", ["node_modules", ".next", ".env", ".git"]],
+  ["apps/web/Dockerfile.oracle-lite", ["node:22-alpine", "npm ci --no-audit --no-fund", "npm run build", "EXPOSE 3000", "KINGSMEN_ENABLE_BACKEND_BRIDGE=true"]],
+  ["apps/api/Dockerfile.oracle-lite", ["node:22-alpine", "EXPOSE 3001", "free-destiny-map-backend-local-server.mjs", "KINGSMEN_ENABLE_LOCAL_BACKEND_WRITE=false"]],
+  ["apps/api/src/runtime/free-destiny-map-backend-local-server.mjs", ["createFreeDestinyMapBackendLocalServer", "SIGTERM", "productionReady: false", "deployedToOracle: false"]],
+  ["docker/oracle-lite/docker-compose.local.yml", ["kingsmen-api", "kingsmen-web", "127.0.0.1:3000:3000", "127.0.0.1:3001:3001", "http://kingsmen-api:3001", "mem_limit", "cpus"]],
+  ["packages/contracts/src/docker-oracle-lite-container-preparation.ts", ["DOCKER_ORACLE_LITE_CONTAINER_PREPARED", "dockerRunsInThisBatch: false", "composeUpInThisBatch: false"]],
+  ["scripts/proof/prove-docker-oracle-lite-container-preparation.mjs", ["DOCKER_ORACLE_LITE_CONTAINER_PREPARED", "dockerBuildsInThisBatch: false", "composeUpInThisBatch: false", "container_preparation_only"]],
+  ["reports/runtime/docker-oracle-lite-container-preparation-proof.json", ["schema", "module", "status"]]
+];
+
+for (const [file, tokens] of tokenChecks) {
+  if (!exists(file)) continue;
+  const content = read(file);
+  for (const token of tokens) {
+    if (!content.includes(token)) failures.push(`${file} missing token: ${token}`);
+  }
+}
+
+if (exists("reports/runtime/docker-oracle-lite-container-preparation-proof.json")) {
+  const proof = parseJson("reports/runtime/docker-oracle-lite-container-preparation-proof.json");
+  if (proof.passed !== true) failures.push("Docker/Oracle Lite container preparation proof must pass.");
+  if (proof.status !== "DOCKER_ORACLE_LITE_CONTAINER_PREPARED") failures.push("Docker/Oracle Lite container preparation proof status must be DOCKER_ORACLE_LITE_CONTAINER_PREPARED.");
+  if (proof.productionReady !== false) failures.push("Proof must keep productionReady false.");
+  if (proof.canClaimProduction !== false) failures.push("Proof must keep canClaimProduction false.");
+  if (proof.deployedToOracle !== false) failures.push("Proof must keep deployedToOracle false.");
+  if (proof.dockerRunsInThisBatch !== false) failures.push("Proof must keep dockerRunsInThisBatch false.");
+  if (proof.dockerBuildsInThisBatch !== false) failures.push("Proof must keep dockerBuildsInThisBatch false.");
+  if (proof.composeUpInThisBatch !== false) failures.push("Proof must keep composeUpInThisBatch false.");
+  if (proof.oracle_lite_impact !== "container_preparation_only") failures.push("Proof must declare container_preparation_only.");
+  if (!Array.isArray(proof.checks) || proof.checks.length < 30) failures.push("Proof must include detailed checks.");
+}
+
+const forbiddenFiles = [
+  "docs/runtime/docker-oracle-lite-container-preparation.md",
+  "manifests/runtime/docker-oracle-lite-container-preparation.json",
+  "apps/web/Dockerfile.oracle-lite",
+  "apps/api/Dockerfile.oracle-lite",
+  "apps/api/src/runtime/free-destiny-map-backend-local-server.mjs",
+  "docker/oracle-lite/docker-compose.local.yml",
+  "packages/contracts/src/docker-oracle-lite-container-preparation.ts"
+];
+
+const forbiddenPatterns = [
+  [/productionReady\s*[:=]\s*true/i, "productionReady true"],
+  [/canClaimProduction\s*[:=]\s*true/i, "canClaimProduction true"],
+  [/deployedToOracle\s*[:=]\s*true/i, "deployedToOracle true"],
+  [/officialApplicationSubmitted:\s*true/i, "official application submitted true"],
+  [/paymentInstructionSent:\s*true/i, "payment instruction sent true"],
+  [/emailSent:\s*true/i, "email sent true"],
+  [/documentUploadAccepted:\s*true/i, "document upload accepted true"]
+];
+
+for (const file of forbiddenFiles) {
+  if (!exists(file)) continue;
+  const content = read(file);
+  for (const [pattern, label] of forbiddenPatterns) {
+    if (pattern.test(content)) failures.push(`${file} contains forbidden pattern: ${label}`);
+  }
+}
+
+const passed = failures.length === 0;
+
+const report = {
+  schema: "kingsmen.validation-report.v1",
+  module: "BATCH 19 - Docker / Oracle Lite Local Runtime Container Preparation",
+  status: passed ? "VALIDATED" : "BUILT_PENDING_VALIDATION",
+  passed,
+  generated_at: new Date().toISOString(),
+  files_expected: requiredFiles,
+  upstream_files_checked: upstreamFiles,
+  files_checked: checked.length,
+  missing_files: requiredFiles.filter((file) => !exists(file)),
+  failed_checks: failures,
+  warnings,
+  oracle_lite_impact: "container_preparation_only",
+  control_plane_impact: "Prepares Docker/Oracle Lite local runtime boundaries for controlled Docker proof.",
+  runtime_proof: "reports/runtime/docker-oracle-lite-container-preparation-proof.json",
+  next_action: passed ? "Proceed to BATCH 20 - Controlled Docker local build proof." : "Repair Docker/Oracle Lite container preparation failures."
+};
+
+fs.mkdirSync(path.dirname(reportPath), { recursive: true });
+fs.writeFileSync(reportPath, `${JSON.stringify(report, null, 2)}\n`, "utf8");
+
+console.log(JSON.stringify(report, null, 2));
+if (!passed) process.exit(1);
+---
+FILE: reports/validation/docker-oracle-lite-container-preparation-latest.json
+---
+{
+  "schema": "kingsmen.validation-report.v1",
+  "module": "BATCH 19 - Docker / Oracle Lite Local Runtime Container Preparation",
+  "status": "BUILT_PENDING_VALIDATION",
+  "passed": false,
+  "generated_at": "2026-06-02T00:00:00.000Z",
+  "reason": "Seed report. Run BATCH 19 Docker/Oracle Lite container preparation proof then validator.",
+  "files_checked": 0,
+  "failed_checks": [
+    "validator_not_yet_executed"
+  ],
+  "oracle_lite_impact": "container_preparation_only",
+  "control_plane_impact": "Prepares Docker/Oracle Lite local runtime boundaries for controlled Docker proof.",
+  "runtime_proof": "reports/runtime/docker-oracle-lite-container-preparation-proof.json",
+  "next_action": "Run node scripts/proof/prove-docker-oracle-lite-container-preparation.mjs then node scripts/validators/validate-docker-oracle-lite-container-preparation.mjs."
+}

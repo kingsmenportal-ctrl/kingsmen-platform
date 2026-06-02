@@ -1,0 +1,37 @@
+{
+  "schema": "kingsmen.validation-report.v1",
+  "module": "BATCH 19 - Docker / Oracle Lite Local Runtime Container Preparation",
+  "status": "BUILT_PENDING_VALIDATION",
+  "passed": false,
+  "generated_at": "2026-06-02T21:51:26.619Z",
+  "files_expected": [
+    "docs/runtime/docker-oracle-lite-container-preparation.md",
+    "manifests/runtime/docker-oracle-lite-container-preparation.json",
+    ".dockerignore",
+    "apps/web/Dockerfile.oracle-lite",
+    "apps/api/Dockerfile.oracle-lite",
+    "apps/api/src/runtime/free-destiny-map-backend-local-server.mjs",
+    "docker/oracle-lite/docker-compose.local.yml",
+    "packages/contracts/src/docker-oracle-lite-container-preparation.ts",
+    "scripts/proof/prove-docker-oracle-lite-container-preparation.mjs",
+    "reports/runtime/docker-oracle-lite-container-preparation-proof.json",
+    "scripts/validators/validate-docker-oracle-lite-container-preparation.mjs",
+    "reports/validation/docker-oracle-lite-container-preparation-latest.json"
+  ],
+  "upstream_files_checked": [
+    "reports/runtime/free-destiny-map-next-backend-bridge-proof.json",
+    "reports/runtime/free-destiny-map-controlled-production-build-proof.json",
+    "reports/runtime/free-destiny-map-backend-runtime-boundary-proof.json"
+  ],
+  "files_checked": 15,
+  "missing_files": [],
+  "failed_checks": [
+    "Docker/Oracle Lite container preparation proof must pass.",
+    "Docker/Oracle Lite container preparation proof status must be DOCKER_ORACLE_LITE_CONTAINER_PREPARED."
+  ],
+  "warnings": [],
+  "oracle_lite_impact": "container_preparation_only",
+  "control_plane_impact": "Prepares Docker/Oracle Lite local runtime boundaries for controlled Docker proof.",
+  "runtime_proof": "reports/runtime/docker-oracle-lite-container-preparation-proof.json",
+  "next_action": "Repair Docker/Oracle Lite container preparation failures."
+}

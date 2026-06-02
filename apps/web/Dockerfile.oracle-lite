@@ -1,0 +1,30 @@
+# Kingsmen Oracle Lite web container preparation.
+# This Dockerfile is prepared for a later controlled Docker build proof.
+# It does not deploy, submit applications, send email, take payment, or upload documents.
+
+FROM node:22-alpine AS deps
+WORKDIR /repo/apps/web
+COPY apps/web/package.json apps/web/package-lock.json ./
+RUN npm ci --no-audit --no-fund
+
+FROM node:22-alpine AS builder
+WORKDIR /repo
+ENV NEXT_TELEMETRY_DISABLED=1
+ENV NODE_ENV=production
+COPY --from=deps /repo/apps/web/node_modules apps/web/node_modules
+COPY apps/web apps/web
+COPY packages packages
+RUN cd apps/web && npm run build
+
+FROM node:22-alpine AS runner
+WORKDIR /repo
+ENV NODE_ENV=production
+ENV NEXT_TELEMETRY_DISABLED=1
+ENV PORT=3000
+ENV HOSTNAME=0.0.0.0
+ENV KINGSMEN_ENABLE_BACKEND_BRIDGE=true
+ENV KINGSMEN_ENABLE_LOCAL_INTAKE_WRITE=false
+COPY --from=builder /repo/apps/web apps/web
+COPY --from=builder /repo/packages packages
+EXPOSE 3000
+CMD ["sh", "-lc", "cd apps/web && npm run start -- --hostname 0.0.0.0 --port ${PORT:-3000}"]

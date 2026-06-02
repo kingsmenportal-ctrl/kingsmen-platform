@@ -1,0 +1,43 @@
+name: kingsmen-oracle-lite-local
+
+services:
+  kingsmen-api:
+    build:
+      context: ../..
+      dockerfile: apps/api/Dockerfile.oracle-lite
+    image: kingsmen/api:oracle-lite-local
+    container_name: kingsmen-api-local
+    environment:
+      NODE_ENV: production
+      HOST: 0.0.0.0
+      PORT: "3001"
+      KINGSMEN_ENABLE_LOCAL_BACKEND_WRITE: "true"
+    ports:
+      - "127.0.0.1:3001:3001"
+    volumes:
+      - ../../data/local:/repo/data/local
+    restart: "no"
+    mem_limit: 512m
+    cpus: "0.50"
+
+  kingsmen-web:
+    build:
+      context: ../..
+      dockerfile: apps/web/Dockerfile.oracle-lite
+    image: kingsmen/web:oracle-lite-local
+    container_name: kingsmen-web-local
+    depends_on:
+      - kingsmen-api
+    environment:
+      NODE_ENV: production
+      NEXT_TELEMETRY_DISABLED: "1"
+      PORT: "3000"
+      HOSTNAME: 0.0.0.0
+      KINGSMEN_ENABLE_BACKEND_BRIDGE: "true"
+      KINGSMEN_BACKEND_BASE_URL: "http://kingsmen-api:3001"
+      KINGSMEN_ENABLE_LOCAL_INTAKE_WRITE: "false"
+    ports:
+      - "127.0.0.1:3000:3000"
+    restart: "no"
+    mem_limit: 768m
+    cpus: "0.75"
