@@ -1,0 +1,35 @@
+{
+  "schema": "kingsmen.real-web-readiness-gate.v1",
+  "module": "BATCH 12 - Real Local Web Build / Dev-Server Readiness Gate",
+  "status": "BUILT_PENDING_VALIDATION",
+  "productionReady": false,
+  "sourceBatches": [
+    "BATCH 09 - Local HTTP API Boot Shell / First End-to-End Local HTTP Route Exercise",
+    "BATCH 10 - Local Web-to-HTTP Exercise / Minimal App Boot Proof",
+    "BATCH 11 - Real Local App Build Validator / Browser-Style Form Submit Proof"
+  ],
+  "webRoute": "/free-destiny-map",
+  "apiEndpoint": "/api/public/free-destiny-map/intake/local",
+  "proofCommand": "powershell.exe -ExecutionPolicy Bypass -File scripts/runtime/Invoke-FreeDestinyMapRealWebReadinessGate.ps1",
+  "proofScript": "scripts/proof/prove-free-destiny-map-real-web-readiness.mjs",
+  "proofReport": "reports/runtime/free-destiny-map-real-web-readiness-proof.json",
+  "validationReport": "reports/validation/free-destiny-map-real-web-readiness-latest.json",
+  "storesProductionData": false,
+  "takesPayment": false,
+  "sendsEmail": false,
+  "collectsDocuments": false,
+  "submitsOfficialApplications": false,
+  "oracleLiteImpact": "none_runtime_yet",
+  "controlPlaneImpact": "Adds honest real web build/dev-server readiness gate for Free Destiny Map.",
+  "requiredFiles": [
+    "docs/runtime/free-destiny-map-real-web-readiness-gate.md",
+    "manifests/runtime/free-destiny-map-real-web-readiness-gate.json",
+    "packages/contracts/src/free-destiny-map-real-web-readiness.ts",
+    "scripts/runtime/Invoke-FreeDestinyMapRealWebReadinessGate.ps1",
+    "scripts/proof/prove-free-destiny-map-real-web-readiness.mjs",
+    "reports/runtime/free-destiny-map-real-web-readiness-proof.json",
+    "scripts/validators/validate-free-destiny-map-real-web-readiness.mjs",
+    "reports/validation/free-destiny-map-real-web-readiness-latest.json"
+  ],
+  "nextAction": "Run powershell.exe -ExecutionPolicy Bypass -File scripts/runtime/Invoke-FreeDestinyMapRealWebReadinessGate.ps1 then node scripts/validators/validate-free-destiny-map-real-web-readiness.mjs"
+}

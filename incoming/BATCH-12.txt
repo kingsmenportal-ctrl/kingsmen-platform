@@ -1,0 +1,561 @@
+FILE: docs/runtime/free-destiny-map-real-web-readiness-gate.md
+---
+# BATCH 12 - Real Local Web Build / Dev-Server Readiness Gate
+
+## Purpose
+
+This batch creates a real local web build and dev-server readiness gate for the Free Destiny Map surface.
+
+BATCH 11 proved browser-style form submit behavior using a temporary local proof server. BATCH 12 now inspects the actual repo web structure and records whether Kingsmen can safely attempt a real local web build or dev-server boot.
+
+## What this batch checks
+
+- root package manifest exists
+- web app directory exists
+- Free Destiny Map app route exists
+- Free Destiny Map API form component exists
+- Free Destiny Map client adapter exists
+- public API endpoint contract exists
+- runtime proof chain from BATCH 09, BATCH 10, and BATCH 11 exists
+- data/local generated proof remains ignored
+- package manager evidence exists
+- build/dev scripts are discoverable if present
+- dangerous production claims remain blocked
+
+## Important proof rule
+
+This batch is a readiness gate, not a production build claim.
+
+If package scripts, dependencies, or app boot contracts are incomplete, the report must say so clearly. The validator passes when the readiness report is honest, safe, and complete.
+
+## What this batch does not do yet
+
+- no forced npm install
+- no production Next.js build claim
+- no long-running dev server
+- no Playwright automation
+- no Oracle deployment
+- no Docker Compose boot
+- no PostgreSQL database
+- no Redis queue
+- no email sending
+- no payment processing
+- no document upload
+- no official application submission
+
+## Oracle Lite impact
+
+none_runtime_yet.
+
+This is a source and local-readiness gate only.
+
+## Next action
+
+After validation, BATCH 13 should either repair the exact readiness blockers found by this report or create a controlled local web boot proof if the report says the repo is ready.
+---
+FILE: manifests/runtime/free-destiny-map-real-web-readiness-gate.json
+---
+{
+  "schema": "kingsmen.real-web-readiness-gate.v1",
+  "module": "BATCH 12 - Real Local Web Build / Dev-Server Readiness Gate",
+  "status": "BUILT_PENDING_VALIDATION",
+  "productionReady": false,
+  "sourceBatches": [
+    "BATCH 09 - Local HTTP API Boot Shell / First End-to-End Local HTTP Route Exercise",
+    "BATCH 10 - Local Web-to-HTTP Exercise / Minimal App Boot Proof",
+    "BATCH 11 - Real Local App Build Validator / Browser-Style Form Submit Proof"
+  ],
+  "webRoute": "/free-destiny-map",
+  "apiEndpoint": "/api/public/free-destiny-map/intake/local",
+  "proofCommand": "powershell.exe -ExecutionPolicy Bypass -File scripts/runtime/Invoke-FreeDestinyMapRealWebReadinessGate.ps1",
+  "proofScript": "scripts/proof/prove-free-destiny-map-real-web-readiness.mjs",
+  "proofReport": "reports/runtime/free-destiny-map-real-web-readiness-proof.json",
+  "validationReport": "reports/validation/free-destiny-map-real-web-readiness-latest.json",
+  "storesProductionData": false,
+  "takesPayment": false,
+  "sendsEmail": false,
+  "collectsDocuments": false,
+  "submitsOfficialApplications": false,
+  "oracleLiteImpact": "none_runtime_yet",
+  "controlPlaneImpact": "Adds honest real web build/dev-server readiness gate for Free Destiny Map.",
+  "requiredFiles": [
+    "docs/runtime/free-destiny-map-real-web-readiness-gate.md",
+    "manifests/runtime/free-destiny-map-real-web-readiness-gate.json",
+    "packages/contracts/src/free-destiny-map-real-web-readiness.ts",
+    "scripts/runtime/Invoke-FreeDestinyMapRealWebReadinessGate.ps1",
+    "scripts/proof/prove-free-destiny-map-real-web-readiness.mjs",
+    "reports/runtime/free-destiny-map-real-web-readiness-proof.json",
+    "scripts/validators/validate-free-destiny-map-real-web-readiness.mjs",
+    "reports/validation/free-destiny-map-real-web-readiness-latest.json"
+  ],
+  "nextAction": "Run powershell.exe -ExecutionPolicy Bypass -File scripts/runtime/Invoke-FreeDestinyMapRealWebReadinessGate.ps1 then node scripts/validators/validate-free-destiny-map-real-web-readiness.mjs"
+}
+---
+FILE: packages/contracts/src/free-destiny-map-real-web-readiness.ts
+---
+export const FREE_DESTINY_MAP_REAL_WEB_READINESS_MODULE =
+  "BATCH 12 - Real Local Web Build / Dev-Server Readiness Gate" as const;
+
+export const FREE_DESTINY_MAP_REAL_WEB_READINESS_WEB_ROUTE = "/free-destiny-map" as const;
+
+export const FREE_DESTINY_MAP_REAL_WEB_READINESS_API_ENDPOINT =
+  "/api/public/free-destiny-map/intake/local" as const;
+
+export type FreeDestinyMapReadinessStatus =
+  | "READY_FOR_CONTROLLED_LOCAL_BOOT"
+  | "BLOCKED_WITH_REPAIR_ACTIONS";
+
+export interface FreeDestinyMapRealWebReadinessCheck {
+  name: string;
+  passed: boolean;
+  detail: string;
+}
+
+export interface FreeDestinyMapRealWebReadinessReport {
+  schema: "kingsmen.real-web-readiness-report.v1";
+  module: typeof FREE_DESTINY_MAP_REAL_WEB_READINESS_MODULE;
+  status: FreeDestinyMapReadinessStatus;
+  passed: boolean;
+  productionReady: false;
+  canAttemptLocalWebBoot: boolean;
+  canClaimProduction: false;
+  oracleLiteImpact: "none_runtime_yet";
+  checks: FreeDestinyMapRealWebReadinessCheck[];
+  blockers: FreeDestinyMapRealWebReadinessCheck[];
+  nextAction: string;
+}
+---
+FILE: scripts/runtime/Invoke-FreeDestinyMapRealWebReadinessGate.ps1
+---
+#requires -Version 5.1
+[CmdletBinding()]
+param()
+
+$ErrorActionPreference = "Stop"
+
+$repoRoot = Get-Location
+$scriptPath = Join-Path $repoRoot "scripts\proof\prove-free-destiny-map-real-web-readiness.mjs"
+
+if (-not (Test-Path $scriptPath -PathType Leaf)) {
+  throw "Missing proof script: $scriptPath"
+}
+
+Write-Host "Kingsmen Free Destiny Map real local web readiness gate"
+Write-Host "This checks real repo readiness. It does not claim production, Oracle runtime, email, payment, documents, or official submissions."
+
+node $scriptPath
+
+if ($LASTEXITCODE -ne 0) {
+  throw "Free Destiny Map real web readiness gate failed."
+}
+---
+FILE: scripts/proof/prove-free-destiny-map-real-web-readiness.mjs
+---
+#!/usr/bin/env node
+import fs from "node:fs";
+import path from "node:path";
+
+const root = process.cwd();
+const proofReportPath = path.join(root, "reports/runtime/free-destiny-map-real-web-readiness-proof.json");
+
+const checks = [];
+
+function exists(rel) {
+  return fs.existsSync(path.join(root, rel));
+}
+
+function read(rel) {
+  return fs.readFileSync(path.join(root, rel), "utf8").replace(/^\uFEFF/, "");
+}
+
+function readJsonIfExists(rel) {
+  if (!exists(rel)) return null;
+  try {
+    return JSON.parse(read(rel));
+  } catch {
+    return null;
+  }
+}
+
+function check(name, passed, detail = "") {
+  checks.push({ name, passed, detail });
+}
+
+function listPackageScripts(pkg) {
+  if (!pkg || typeof pkg !== "object" || !pkg.scripts || typeof pkg.scripts !== "object") return [];
+  return Object.keys(pkg.scripts);
+}
+
+const rootPackage = readJsonIfExists("package.json");
+const webPackage = readJsonIfExists("apps/web/package.json");
+const packageLockExists = exists("package-lock.json");
+const pnpmLockExists = exists("pnpm-lock.yaml");
+const yarnLockExists = exists("yarn.lock");
+const nodeModulesExists = exists("node_modules");
+const webNodeModulesExists = exists("apps/web/node_modules");
+
+check("root-package-json-exists", exists("package.json"), "package.json");
+check("web-app-directory-exists", exists("apps/web"), "apps/web");
+check("api-app-directory-exists", exists("apps/api"), "apps/api");
+check("free-destiny-map-page-exists", exists("apps/web/src/app/free-destiny-map/page.tsx"), "apps/web/src/app/free-destiny-map/page.tsx");
+check("free-destiny-map-api-form-exists", exists("apps/web/src/components/kingsmen/FreeDestinyMapApiForm.tsx"), "apps/web/src/components/kingsmen/FreeDestinyMapApiForm.tsx");
+check("free-destiny-map-client-exists", exists("apps/web/src/lib/kingsmen/free-destiny-map-client.ts"), "apps/web/src/lib/kingsmen/free-destiny-map-client.ts");
+check("free-destiny-map-api-contract-exists", exists("packages/contracts/src/free-destiny-map-api-wiring.ts"), "packages/contracts/src/free-destiny-map-api-wiring.ts");
+check("free-destiny-map-persistence-route-exists", exists("apps/api/src/routes/free-destiny-map-persistence.routes.ts"), "apps/api/src/routes/free-destiny-map-persistence.routes.ts");
+check("data-local-gitignore-exists", exists("data/local/.gitignore"), "data/local/.gitignore");
+
+if (exists("data/local/.gitignore")) {
+  const ignore = read("data/local/.gitignore");
+  check("data-local-gitignore-blocks-generated-proof", ignore.includes("*") && ignore.includes("!.gitignore"), "data/local generated files ignored");
+}
+
+if (exists("apps/web/src/app/free-destiny-map/page.tsx")) {
+  const page = read("apps/web/src/app/free-destiny-map/page.tsx");
+  check("page-uses-free-destiny-map-api-form", page.includes("FreeDestinyMapApiForm"), "page uses FreeDestinyMapApiForm");
+}
+
+if (exists("apps/web/src/components/kingsmen/FreeDestinyMapApiForm.tsx")) {
+  const form = read("apps/web/src/components/kingsmen/FreeDestinyMapApiForm.tsx");
+  check("form-is-client-component", form.includes('"use client"'), "client component directive present");
+  check("form-submits-through-client-adapter", form.includes("submitFreeDestinyMapClientPayload"), "submit adapter present");
+  check("form-has-consent-fields", form.includes("consentToBeContacted") && form.includes("consentToProcessBasicInfo"), "consent fields present");
+  check("form-has-route-interests", form.includes("routeInterests"), "route interests present");
+  check("form-has-safety-copy", form.includes("Production storage") || form.includes("local intake API shell"), "safe local shell wording present");
+}
+
+if (exists("apps/web/src/lib/kingsmen/free-destiny-map-client.ts")) {
+  const client = read("apps/web/src/lib/kingsmen/free-destiny-map-client.ts");
+  check("client-builds-formdata-payload", client.includes("buildFreeDestinyMapClientPayload"), "FormData adapter present");
+  check("client-posts-json", client.includes("application/json"), "JSON submit present");
+  check("client-uses-local-endpoint-contract", client.includes("FREE_DESTINY_MAP_LOCAL_INTAKE_ENDPOINT"), "local endpoint contract present");
+}
+
+const rootScripts = listPackageScripts(rootPackage);
+const webScripts = listPackageScripts(webPackage);
+
+check("package-manager-lock-present", packageLockExists || pnpmLockExists || yarnLockExists, [
+  packageLockExists ? "package-lock.json" : null,
+  pnpmLockExists ? "pnpm-lock.yaml" : null,
+  yarnLockExists ? "yarn.lock" : null
+].filter(Boolean).join(", ") || "no lockfile found");
+
+check("root-or-web-build-script-discoverable", rootScripts.includes("build") || webScripts.includes("build"), `root scripts=${rootScripts.join(",")}; web scripts=${webScripts.join(",")}`);
+check("root-or-web-dev-script-discoverable", rootScripts.includes("dev") || webScripts.includes("dev"), `root scripts=${rootScripts.join(",")}; web scripts=${webScripts.join(",")}`);
+
+const nextConfigExists =
+  exists("apps/web/next.config.js") ||
+  exists("apps/web/next.config.mjs") ||
+  exists("apps/web/next.config.ts") ||
+  exists("next.config.js") ||
+  exists("next.config.mjs") ||
+  exists("next.config.ts");
+
+check("next-config-or-next-app-structure-present", nextConfigExists || exists("apps/web/src/app"), nextConfigExists ? "next config found" : "apps/web/src/app present");
+
+const rootDeps = {
+  ...(rootPackage?.dependencies ?? {}),
+  ...(rootPackage?.devDependencies ?? {})
+};
+const webDeps = {
+  ...(webPackage?.dependencies ?? {}),
+  ...(webPackage?.devDependencies ?? {})
+};
+
+const hasNextDependency = Boolean(rootDeps.next || webDeps.next);
+const hasReactDependency = Boolean(rootDeps.react || webDeps.react);
+const hasReactDomDependency = Boolean(rootDeps["react-dom"] || webDeps["react-dom"]);
+
+check("next-dependency-declared", hasNextDependency, "next dependency declared in root or web package");
+check("react-dependency-declared", hasReactDependency, "react dependency declared in root or web package");
+check("react-dom-dependency-declared", hasReactDomDependency, "react-dom dependency declared in root or web package");
+
+const dependencyInstallEvidence = nodeModulesExists || webNodeModulesExists;
+check("dependency-install-evidence-present", dependencyInstallEvidence, dependencyInstallEvidence ? "node_modules found" : "node_modules not found; install likely needed before real boot");
+
+const runtimeProofs = [
+  "reports/runtime/free-destiny-map-local-http-exercise-proof.json",
+  "reports/runtime/free-destiny-map-local-web-http-exercise-proof.json",
+  "reports/runtime/free-destiny-map-browser-style-submit-proof.json"
+];
+
+for (const proofFile of runtimeProofs) {
+  const proof = readJsonIfExists(proofFile);
+  check(`runtime-proof-passed:${proofFile}`, proof?.passed === true, proof ? `status=${proof.status}` : "missing or invalid");
+}
+
+const forbiddenFiles = [
+  "apps/web/src/app/free-destiny-map/page.tsx",
+  "apps/web/src/components/kingsmen/FreeDestinyMapApiForm.tsx",
+  "apps/web/src/lib/kingsmen/free-destiny-map-client.ts",
+  "packages/contracts/src/free-destiny-map-api-wiring.ts",
+  "apps/api/src/routes/free-destiny-map-persistence.routes.ts"
+];
+
+const forbiddenRuntimePatterns = [
+  [/\bidentityNumber\s*[:=]/i, "identity number field assignment"],
+  [/\bidNumber\s*[:=]/i, "id number field assignment"],
+  [/\bpassportNumber\s*[:=]/i, "passport number field assignment"],
+  [/\bpassword\s*[:=]/i, "password field assignment"],
+  [/\bcardNumber\s*[:=]/i, "card number field assignment"],
+  [/\bcvv\s*[:=]/i, "cvv field assignment"],
+  [/\bdocumentBase64\s*[:=]/i, "document payload assignment"],
+  [/officialApplicationSubmitted:\s*true/i, "official application submitted true"],
+  [/paymentInstructionSent:\s*true/i, "payment instruction sent true"],
+  [/emailSent:\s*true/i, "email sent true"],
+  [/productionReady\s*[:=]\s*true/i, "productionReady true"]
+];
+
+for (const file of forbiddenFiles) {
+  if (!exists(file)) continue;
+  const content = read(file);
+  for (const [pattern, label] of forbiddenRuntimePatterns) {
+    check(`forbidden-pattern-absent:${file}:${label}`, !pattern.test(content), label);
+  }
+}
+
+const bootCriticalNames = [
+  "root-package-json-exists",
+  "web-app-directory-exists",
+  "free-destiny-map-page-exists",
+  "free-destiny-map-api-form-exists",
+  "free-destiny-map-client-exists",
+  "package-manager-lock-present",
+  "root-or-web-build-script-discoverable",
+  "root-or-web-dev-script-discoverable",
+  "next-dependency-declared",
+  "react-dependency-declared",
+  "react-dom-dependency-declared",
+  "dependency-install-evidence-present"
+];
+
+const blockers = checks.filter((item) => item.passed !== true);
+const canAttemptLocalWebBoot = bootCriticalNames.every((name) => checks.find((item) => item.name === name)?.passed === true);
+const status = canAttemptLocalWebBoot ? "READY_FOR_CONTROLLED_LOCAL_BOOT" : "BLOCKED_WITH_REPAIR_ACTIONS";
+
+const report = {
+  schema: "kingsmen.real-web-readiness-report.v1",
+  module: "BATCH 12 - Real Local Web Build / Dev-Server Readiness Gate",
+  status,
+  passed: true,
+  productionReady: false,
+  canAttemptLocalWebBoot,
+  canClaimProduction: false,
+  generated_at: new Date().toISOString(),
+  checks,
+  blockers,
+  package_scripts: {
+    root: rootScripts,
+    web: webScripts
+  },
+  package_manager_evidence: {
+    packageLockExists,
+    pnpmLockExists,
+    yarnLockExists,
+    nodeModulesExists,
+    webNodeModulesExists
+  },
+  oracle_lite_impact: "none_runtime_yet",
+  runtime_scope: "real web build/dev-server readiness gate only; no long-running server; no production storage",
+  next_action: canAttemptLocalWebBoot
+    ? "Proceed to a controlled local web boot proof with explicit start/stop and timeout."
+    : "Repair the listed readiness blockers before attempting a real local web boot."
+};
+
+fs.mkdirSync(path.dirname(proofReportPath), { recursive: true });
+fs.writeFileSync(proofReportPath, `${JSON.stringify(report, null, 2)}\n`, "utf8");
+
+console.log(JSON.stringify(report, null, 2));
+---
+FILE: reports/runtime/free-destiny-map-real-web-readiness-proof.json
+---
+{
+  "schema": "kingsmen.real-web-readiness-report.v1",
+  "module": "BATCH 12 - Real Local Web Build / Dev-Server Readiness Gate",
+  "status": "BLOCKED_WITH_REPAIR_ACTIONS",
+  "passed": false,
+  "productionReady": false,
+  "canAttemptLocalWebBoot": false,
+  "canClaimProduction": false,
+  "generated_at": "2026-06-02T00:00:00.000Z",
+  "checks": [],
+  "blockers": [
+    {
+      "name": "readiness_gate_not_yet_executed",
+      "passed": false,
+      "detail": "Run scripts/proof/prove-free-destiny-map-real-web-readiness.mjs."
+    }
+  ],
+  "oracle_lite_impact": "none_runtime_yet",
+  "runtime_scope": "real web build/dev-server readiness gate only; no long-running server; no production storage",
+  "next_action": "Run BATCH 12 readiness gate."
+}
+---
+FILE: scripts/validators/validate-free-destiny-map-real-web-readiness.mjs
+---
+#!/usr/bin/env node
+import fs from "node:fs";
+import path from "node:path";
+
+const root = process.cwd();
+const reportPath = path.join(root, "reports/validation/free-destiny-map-real-web-readiness-latest.json");
+
+const requiredFiles = [
+  "docs/runtime/free-destiny-map-real-web-readiness-gate.md",
+  "manifests/runtime/free-destiny-map-real-web-readiness-gate.json",
+  "packages/contracts/src/free-destiny-map-real-web-readiness.ts",
+  "scripts/runtime/Invoke-FreeDestinyMapRealWebReadinessGate.ps1",
+  "scripts/proof/prove-free-destiny-map-real-web-readiness.mjs",
+  "reports/runtime/free-destiny-map-real-web-readiness-proof.json",
+  "scripts/validators/validate-free-destiny-map-real-web-readiness.mjs",
+  "reports/validation/free-destiny-map-real-web-readiness-latest.json"
+];
+
+const upstreamFiles = [
+  "apps/web/src/app/free-destiny-map/page.tsx",
+  "apps/web/src/components/kingsmen/FreeDestinyMapApiForm.tsx",
+  "apps/web/src/lib/kingsmen/free-destiny-map-client.ts",
+  "packages/contracts/src/free-destiny-map-api-wiring.ts",
+  "reports/runtime/free-destiny-map-browser-style-submit-proof.json"
+];
+
+function exists(rel) {
+  return fs.existsSync(path.join(root, rel));
+}
+
+function read(rel) {
+  return fs.readFileSync(path.join(root, rel), "utf8").replace(/^\uFEFF/, "");
+}
+
+function parseJson(rel) {
+  return JSON.parse(read(rel));
+}
+
+const failures = [];
+const warnings = [];
+const checked = [];
+
+for (const file of requiredFiles) {
+  checked.push(file);
+  if (!exists(file)) failures.push(`Missing required file: ${file}`);
+  else if (fs.statSync(path.join(root, file)).size === 0) failures.push(`Empty required file: ${file}`);
+}
+
+for (const file of upstreamFiles) {
+  checked.push(file);
+  if (!exists(file)) failures.push(`Missing upstream file: ${file}`);
+  else if (fs.statSync(path.join(root, file)).size === 0) failures.push(`Empty upstream file: ${file}`);
+}
+
+if (exists("manifests/runtime/free-destiny-map-real-web-readiness-gate.json")) {
+  const manifest = parseJson("manifests/runtime/free-destiny-map-real-web-readiness-gate.json");
+  if (manifest.productionReady !== false) failures.push("Manifest must keep productionReady false.");
+  if (manifest.storesProductionData !== false) failures.push("Manifest must declare storesProductionData false.");
+  if (manifest.takesPayment !== false) failures.push("Manifest must declare takesPayment false.");
+  if (manifest.sendsEmail !== false) failures.push("Manifest must declare sendsEmail false.");
+  if (manifest.collectsDocuments !== false) failures.push("Manifest must declare collectsDocuments false.");
+  if (manifest.submitsOfficialApplications !== false) failures.push("Manifest must declare submitsOfficialApplications false.");
+  if (manifest.webRoute !== "/free-destiny-map") failures.push("Manifest web route mismatch.");
+  if (manifest.apiEndpoint !== "/api/public/free-destiny-map/intake/local") failures.push("Manifest endpoint mismatch.");
+  if (!String(manifest.oracleLiteImpact ?? "").includes("none_runtime_yet")) failures.push("Manifest must declare none_runtime_yet.");
+}
+
+const tokenChecks = [
+  ["packages/contracts/src/free-destiny-map-real-web-readiness.ts", ["FREE_DESTINY_MAP_REAL_WEB_READINESS_WEB_ROUTE", "FreeDestinyMapRealWebReadinessReport", "canClaimProduction: false"]],
+  ["scripts/runtime/Invoke-FreeDestinyMapRealWebReadinessGate.ps1", ["prove-free-destiny-map-real-web-readiness.mjs", "does not claim production"]],
+  ["scripts/proof/prove-free-destiny-map-real-web-readiness.mjs", ["READY_FOR_CONTROLLED_LOCAL_BOOT", "BLOCKED_WITH_REPAIR_ACTIONS", "canAttemptLocalWebBoot", "dependency-install-evidence-present"]],
+  ["reports/runtime/free-destiny-map-real-web-readiness-proof.json", ["schema", "module", "status", "canClaimProduction"]],
+  ["apps/web/src/app/free-destiny-map/page.tsx", ["FreeDestinyMapApiForm"]],
+  ["apps/web/src/components/kingsmen/FreeDestinyMapApiForm.tsx", ['"use client"', "submitFreeDestinyMapClientPayload", "consentToBeContacted", "consentToProcessBasicInfo", "routeInterests"]],
+  ["apps/web/src/lib/kingsmen/free-destiny-map-client.ts", ["buildFreeDestinyMapClientPayload", "FREE_DESTINY_MAP_LOCAL_INTAKE_ENDPOINT", "application/json"]]
+];
+
+for (const [file, tokens] of tokenChecks) {
+  if (!exists(file)) continue;
+  const content = read(file);
+  for (const token of tokens) {
+    if (!content.includes(token)) failures.push(`${file} missing token: ${token}`);
+  }
+}
+
+if (exists("reports/runtime/free-destiny-map-real-web-readiness-proof.json")) {
+  const proof = parseJson("reports/runtime/free-destiny-map-real-web-readiness-proof.json");
+  if (proof.passed !== true) failures.push("Readiness proof report must set passed true after execution.");
+  if (proof.productionReady !== false) failures.push("Readiness proof must keep productionReady false.");
+  if (proof.canClaimProduction !== false) failures.push("Readiness proof must keep canClaimProduction false.");
+  if (!Array.isArray(proof.checks) || proof.checks.length < 10) failures.push("Readiness proof must include detailed checks.");
+  if (!["READY_FOR_CONTROLLED_LOCAL_BOOT", "BLOCKED_WITH_REPAIR_ACTIONS"].includes(proof.status)) failures.push("Readiness proof status is invalid.");
+  if (proof.status === "BLOCKED_WITH_REPAIR_ACTIONS" && (!Array.isArray(proof.blockers) || proof.blockers.length === 0)) {
+    failures.push("Blocked readiness proof must list blockers.");
+  }
+}
+
+const forbiddenRuntimePatterns = [
+  [/\bidentityNumber\s*[:=]/i, "identity number field assignment"],
+  [/\bidNumber\s*[:=]/i, "id number field assignment"],
+  [/\bpassportNumber\s*[:=]/i, "passport number field assignment"],
+  [/\bpassword\s*[:=]/i, "password field assignment"],
+  [/\bcardNumber\s*[:=]/i, "card number field assignment"],
+  [/\bcvv\s*[:=]/i, "cvv field assignment"],
+  [/\bdocumentBase64\s*[:=]/i, "document payload assignment"],
+  [/officialApplicationSubmitted:\s*true/i, "official application submitted true"],
+  [/paymentInstructionSent:\s*true/i, "payment instruction sent true"],
+  [/emailSent:\s*true/i, "email sent true"],
+  [/productionReady\s*[:=]\s*true/i, "productionReady true"]
+];
+
+const filesToScan = [...requiredFiles, ...upstreamFiles]
+  .filter((item) => exists(item))
+  .filter((item) => !item.includes("validate-free-destiny-map-real-web-readiness.mjs"))
+  .filter((item) => !item.includes("prove-free-destiny-map-real-web-readiness.mjs"));
+
+for (const file of filesToScan) {
+  const content = read(file);
+  for (const [pattern, label] of forbiddenRuntimePatterns) {
+    if (pattern.test(content)) failures.push(`${file} contains forbidden runtime pattern: ${label}`);
+  }
+}
+
+const passed = failures.length === 0;
+
+const report = {
+  schema: "kingsmen.validation-report.v1",
+  module: "BATCH 12 - Real Local Web Build / Dev-Server Readiness Gate",
+  status: passed ? "VALIDATED" : "BUILT_PENDING_VALIDATION",
+  passed,
+  generated_at: new Date().toISOString(),
+  files_expected: requiredFiles,
+  upstream_files_checked: upstreamFiles,
+  files_checked: checked.length,
+  missing_files: requiredFiles.filter((file) => !exists(file)),
+  failed_checks: failures,
+  warnings,
+  oracle_lite_impact: "none_runtime_yet",
+  control_plane_impact: "Adds honest real web build/dev-server readiness gate for Free Destiny Map.",
+  runtime_proof: "reports/runtime/free-destiny-map-real-web-readiness-proof.json",
+  next_action: passed ? "Proceed based on readiness proof: repair blockers or run controlled local web boot proof." : "Repair readiness gate failures and rerun proof plus validator."
+};
+
+fs.mkdirSync(path.dirname(reportPath), { recursive: true });
+fs.writeFileSync(reportPath, `${JSON.stringify(report, null, 2)}\n`, "utf8");
+
+console.log(JSON.stringify(report, null, 2));
+if (!passed) process.exit(1);
+---
+FILE: reports/validation/free-destiny-map-real-web-readiness-latest.json
+---
+{
+  "schema": "kingsmen.validation-report.v1",
+  "module": "BATCH 12 - Real Local Web Build / Dev-Server Readiness Gate",
+  "status": "BUILT_PENDING_VALIDATION",
+  "passed": false,
+  "generated_at": "2026-06-02T00:00:00.000Z",
+  "reason": "Seed report. Run BATCH 12 readiness gate then validator.",
+  "files_checked": 0,
+  "failed_checks": [
+    "validator_not_yet_executed"
+  ],
+  "oracle_lite_impact": "none_runtime_yet",
+  "control_plane_impact": "Adds honest real web build/dev-server readiness gate for Free Destiny Map.",
+  "runtime_proof": "reports/runtime/free-destiny-map-real-web-readiness-proof.json",
+  "next_action": "Run powershell.exe -ExecutionPolicy Bypass -File scripts/runtime/Invoke-FreeDestinyMapRealWebReadinessGate.ps1 then node scripts/validators/validate-free-destiny-map-real-web-readiness.mjs."
+}

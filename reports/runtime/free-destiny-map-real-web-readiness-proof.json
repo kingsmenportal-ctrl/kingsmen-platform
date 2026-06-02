@@ -1,0 +1,485 @@
+{
+  "schema": "kingsmen.real-web-readiness-report.v1",
+  "module": "BATCH 12 - Real Local Web Build / Dev-Server Readiness Gate",
+  "status": "BLOCKED_WITH_REPAIR_ACTIONS",
+  "passed": true,
+  "productionReady": false,
+  "canAttemptLocalWebBoot": false,
+  "canClaimProduction": false,
+  "generated_at": "2026-06-02T20:04:26.102Z",
+  "checks": [
+    {
+      "name": "root-package-json-exists",
+      "passed": true,
+      "detail": "package.json"
+    },
+    {
+      "name": "web-app-directory-exists",
+      "passed": true,
+      "detail": "apps/web"
+    },
+    {
+      "name": "api-app-directory-exists",
+      "passed": true,
+      "detail": "apps/api"
+    },
+    {
+      "name": "free-destiny-map-page-exists",
+      "passed": true,
+      "detail": "apps/web/src/app/free-destiny-map/page.tsx"
+    },
+    {
+      "name": "free-destiny-map-api-form-exists",
+      "passed": true,
+      "detail": "apps/web/src/components/kingsmen/FreeDestinyMapApiForm.tsx"
+    },
+    {
+      "name": "free-destiny-map-client-exists",
+      "passed": true,
+      "detail": "apps/web/src/lib/kingsmen/free-destiny-map-client.ts"
+    },
+    {
+      "name": "free-destiny-map-api-contract-exists",
+      "passed": true,
+      "detail": "packages/contracts/src/free-destiny-map-api-wiring.ts"
+    },
+    {
+      "name": "free-destiny-map-persistence-route-exists",
+      "passed": true,
+      "detail": "apps/api/src/routes/free-destiny-map-persistence.routes.ts"
+    },
+    {
+      "name": "data-local-gitignore-exists",
+      "passed": true,
+      "detail": "data/local/.gitignore"
+    },
+    {
+      "name": "data-local-gitignore-blocks-generated-proof",
+      "passed": true,
+      "detail": "data/local generated files ignored"
+    },
+    {
+      "name": "page-uses-free-destiny-map-api-form",
+      "passed": true,
+      "detail": "page uses FreeDestinyMapApiForm"
+    },
+    {
+      "name": "form-is-client-component",
+      "passed": true,
+      "detail": "client component directive present"
+    },
+    {
+      "name": "form-submits-through-client-adapter",
+      "passed": true,
+      "detail": "submit adapter present"
+    },
+    {
+      "name": "form-has-consent-fields",
+      "passed": true,
+      "detail": "consent fields present"
+    },
+    {
+      "name": "form-has-route-interests",
+      "passed": true,
+      "detail": "route interests present"
+    },
+    {
+      "name": "form-has-safety-copy",
+      "passed": true,
+      "detail": "safe local shell wording present"
+    },
+    {
+      "name": "client-builds-formdata-payload",
+      "passed": true,
+      "detail": "FormData adapter present"
+    },
+    {
+      "name": "client-posts-json",
+      "passed": true,
+      "detail": "JSON submit present"
+    },
+    {
+      "name": "client-uses-local-endpoint-contract",
+      "passed": true,
+      "detail": "local endpoint contract present"
+    },
+    {
+      "name": "package-manager-lock-present",
+      "passed": true,
+      "detail": "package-lock.json"
+    },
+    {
+      "name": "root-or-web-build-script-discoverable",
+      "passed": false,
+      "detail": "root scripts=test; web scripts="
+    },
+    {
+      "name": "root-or-web-dev-script-discoverable",
+      "passed": false,
+      "detail": "root scripts=test; web scripts="
+    },
+    {
+      "name": "next-config-or-next-app-structure-present",
+      "passed": true,
+      "detail": "apps/web/src/app present"
+    },
+    {
+      "name": "next-dependency-declared",
+      "passed": false,
+      "detail": "next dependency declared in root or web package"
+    },
+    {
+      "name": "react-dependency-declared",
+      "passed": false,
+      "detail": "react dependency declared in root or web package"
+    },
+    {
+      "name": "react-dom-dependency-declared",
+      "passed": false,
+      "detail": "react-dom dependency declared in root or web package"
+    },
+    {
+      "name": "dependency-install-evidence-present",
+      "passed": false,
+      "detail": "node_modules not found; install likely needed before real boot"
+    },
+    {
+      "name": "runtime-proof-passed:reports/runtime/free-destiny-map-local-http-exercise-proof.json",
+      "passed": true,
+      "detail": "status=LOCAL_HTTP_ROUTE_EXERCISE_PROVEN"
+    },
+    {
+      "name": "runtime-proof-passed:reports/runtime/free-destiny-map-local-web-http-exercise-proof.json",
+      "passed": true,
+      "detail": "status=LOCAL_WEB_HTTP_EXERCISE_PROVEN"
+    },
+    {
+      "name": "runtime-proof-passed:reports/runtime/free-destiny-map-browser-style-submit-proof.json",
+      "passed": true,
+      "detail": "status=BROWSER_STYLE_SUBMIT_PROVEN"
+    },
+    {
+      "name": "forbidden-pattern-absent:apps/web/src/app/free-destiny-map/page.tsx:identity number field assignment",
+      "passed": true,
+      "detail": "identity number field assignment"
+    },
+    {
+      "name": "forbidden-pattern-absent:apps/web/src/app/free-destiny-map/page.tsx:id number field assignment",
+      "passed": true,
+      "detail": "id number field assignment"
+    },
+    {
+      "name": "forbidden-pattern-absent:apps/web/src/app/free-destiny-map/page.tsx:passport number field assignment",
+      "passed": true,
+      "detail": "passport number field assignment"
+    },
+    {
+      "name": "forbidden-pattern-absent:apps/web/src/app/free-destiny-map/page.tsx:password field assignment",
+      "passed": true,
+      "detail": "password field assignment"
+    },
+    {
+      "name": "forbidden-pattern-absent:apps/web/src/app/free-destiny-map/page.tsx:card number field assignment",
+      "passed": true,
+      "detail": "card number field assignment"
+    },
+    {
+      "name": "forbidden-pattern-absent:apps/web/src/app/free-destiny-map/page.tsx:cvv field assignment",
+      "passed": true,
+      "detail": "cvv field assignment"
+    },
+    {
+      "name": "forbidden-pattern-absent:apps/web/src/app/free-destiny-map/page.tsx:document payload assignment",
+      "passed": true,
+      "detail": "document payload assignment"
+    },
+    {
+      "name": "forbidden-pattern-absent:apps/web/src/app/free-destiny-map/page.tsx:official application submitted true",
+      "passed": true,
+      "detail": "official application submitted true"
+    },
+    {
+      "name": "forbidden-pattern-absent:apps/web/src/app/free-destiny-map/page.tsx:payment instruction sent true",
+      "passed": true,
+      "detail": "payment instruction sent true"
+    },
+    {
+      "name": "forbidden-pattern-absent:apps/web/src/app/free-destiny-map/page.tsx:email sent true",
+      "passed": true,
+      "detail": "email sent true"
+    },
+    {
+      "name": "forbidden-pattern-absent:apps/web/src/app/free-destiny-map/page.tsx:productionReady true",
+      "passed": true,
+      "detail": "productionReady true"
+    },
+    {
+      "name": "forbidden-pattern-absent:apps/web/src/components/kingsmen/FreeDestinyMapApiForm.tsx:identity number field assignment",
+      "passed": true,
+      "detail": "identity number field assignment"
+    },
+    {
+      "name": "forbidden-pattern-absent:apps/web/src/components/kingsmen/FreeDestinyMapApiForm.tsx:id number field assignment",
+      "passed": true,
+      "detail": "id number field assignment"
+    },
+    {
+      "name": "forbidden-pattern-absent:apps/web/src/components/kingsmen/FreeDestinyMapApiForm.tsx:passport number field assignment",
+      "passed": true,
+      "detail": "passport number field assignment"
+    },
+    {
+      "name": "forbidden-pattern-absent:apps/web/src/components/kingsmen/FreeDestinyMapApiForm.tsx:password field assignment",
+      "passed": true,
+      "detail": "password field assignment"
+    },
+    {
+      "name": "forbidden-pattern-absent:apps/web/src/components/kingsmen/FreeDestinyMapApiForm.tsx:card number field assignment",
+      "passed": true,
+      "detail": "card number field assignment"
+    },
+    {
+      "name": "forbidden-pattern-absent:apps/web/src/components/kingsmen/FreeDestinyMapApiForm.tsx:cvv field assignment",
+      "passed": true,
+      "detail": "cvv field assignment"
+    },
+    {
+      "name": "forbidden-pattern-absent:apps/web/src/components/kingsmen/FreeDestinyMapApiForm.tsx:document payload assignment",
+      "passed": true,
+      "detail": "document payload assignment"
+    },
+    {
+      "name": "forbidden-pattern-absent:apps/web/src/components/kingsmen/FreeDestinyMapApiForm.tsx:official application submitted true",
+      "passed": true,
+      "detail": "official application submitted true"
+    },
+    {
+      "name": "forbidden-pattern-absent:apps/web/src/components/kingsmen/FreeDestinyMapApiForm.tsx:payment instruction sent true",
+      "passed": true,
+      "detail": "payment instruction sent true"
+    },
+    {
+      "name": "forbidden-pattern-absent:apps/web/src/components/kingsmen/FreeDestinyMapApiForm.tsx:email sent true",
+      "passed": true,
+      "detail": "email sent true"
+    },
+    {
+      "name": "forbidden-pattern-absent:apps/web/src/components/kingsmen/FreeDestinyMapApiForm.tsx:productionReady true",
+      "passed": true,
+      "detail": "productionReady true"
+    },
+    {
+      "name": "forbidden-pattern-absent:apps/web/src/lib/kingsmen/free-destiny-map-client.ts:identity number field assignment",
+      "passed": true,
+      "detail": "identity number field assignment"
+    },
+    {
+      "name": "forbidden-pattern-absent:apps/web/src/lib/kingsmen/free-destiny-map-client.ts:id number field assignment",
+      "passed": true,
+      "detail": "id number field assignment"
+    },
+    {
+      "name": "forbidden-pattern-absent:apps/web/src/lib/kingsmen/free-destiny-map-client.ts:passport number field assignment",
+      "passed": true,
+      "detail": "passport number field assignment"
+    },
+    {
+      "name": "forbidden-pattern-absent:apps/web/src/lib/kingsmen/free-destiny-map-client.ts:password field assignment",
+      "passed": true,
+      "detail": "password field assignment"
+    },
+    {
+      "name": "forbidden-pattern-absent:apps/web/src/lib/kingsmen/free-destiny-map-client.ts:card number field assignment",
+      "passed": true,
+      "detail": "card number field assignment"
+    },
+    {
+      "name": "forbidden-pattern-absent:apps/web/src/lib/kingsmen/free-destiny-map-client.ts:cvv field assignment",
+      "passed": true,
+      "detail": "cvv field assignment"
+    },
+    {
+      "name": "forbidden-pattern-absent:apps/web/src/lib/kingsmen/free-destiny-map-client.ts:document payload assignment",
+      "passed": true,
+      "detail": "document payload assignment"
+    },
+    {
+      "name": "forbidden-pattern-absent:apps/web/src/lib/kingsmen/free-destiny-map-client.ts:official application submitted true",
+      "passed": true,
+      "detail": "official application submitted true"
+    },
+    {
+      "name": "forbidden-pattern-absent:apps/web/src/lib/kingsmen/free-destiny-map-client.ts:payment instruction sent true",
+      "passed": true,
+      "detail": "payment instruction sent true"
+    },
+    {
+      "name": "forbidden-pattern-absent:apps/web/src/lib/kingsmen/free-destiny-map-client.ts:email sent true",
+      "passed": true,
+      "detail": "email sent true"
+    },
+    {
+      "name": "forbidden-pattern-absent:apps/web/src/lib/kingsmen/free-destiny-map-client.ts:productionReady true",
+      "passed": true,
+      "detail": "productionReady true"
+    },
+    {
+      "name": "forbidden-pattern-absent:packages/contracts/src/free-destiny-map-api-wiring.ts:identity number field assignment",
+      "passed": true,
+      "detail": "identity number field assignment"
+    },
+    {
+      "name": "forbidden-pattern-absent:packages/contracts/src/free-destiny-map-api-wiring.ts:id number field assignment",
+      "passed": true,
+      "detail": "id number field assignment"
+    },
+    {
+      "name": "forbidden-pattern-absent:packages/contracts/src/free-destiny-map-api-wiring.ts:passport number field assignment",
+      "passed": true,
+      "detail": "passport number field assignment"
+    },
+    {
+      "name": "forbidden-pattern-absent:packages/contracts/src/free-destiny-map-api-wiring.ts:password field assignment",
+      "passed": true,
+      "detail": "password field assignment"
+    },
+    {
+      "name": "forbidden-pattern-absent:packages/contracts/src/free-destiny-map-api-wiring.ts:card number field assignment",
+      "passed": true,
+      "detail": "card number field assignment"
+    },
+    {
+      "name": "forbidden-pattern-absent:packages/contracts/src/free-destiny-map-api-wiring.ts:cvv field assignment",
+      "passed": true,
+      "detail": "cvv field assignment"
+    },
+    {
+      "name": "forbidden-pattern-absent:packages/contracts/src/free-destiny-map-api-wiring.ts:document payload assignment",
+      "passed": true,
+      "detail": "document payload assignment"
+    },
+    {
+      "name": "forbidden-pattern-absent:packages/contracts/src/free-destiny-map-api-wiring.ts:official application submitted true",
+      "passed": true,
+      "detail": "official application submitted true"
+    },
+    {
+      "name": "forbidden-pattern-absent:packages/contracts/src/free-destiny-map-api-wiring.ts:payment instruction sent true",
+      "passed": true,
+      "detail": "payment instruction sent true"
+    },
+    {
+      "name": "forbidden-pattern-absent:packages/contracts/src/free-destiny-map-api-wiring.ts:email sent true",
+      "passed": true,
+      "detail": "email sent true"
+    },
+    {
+      "name": "forbidden-pattern-absent:packages/contracts/src/free-destiny-map-api-wiring.ts:productionReady true",
+      "passed": true,
+      "detail": "productionReady true"
+    },
+    {
+      "name": "forbidden-pattern-absent:apps/api/src/routes/free-destiny-map-persistence.routes.ts:identity number field assignment",
+      "passed": true,
+      "detail": "identity number field assignment"
+    },
+    {
+      "name": "forbidden-pattern-absent:apps/api/src/routes/free-destiny-map-persistence.routes.ts:id number field assignment",
+      "passed": true,
+      "detail": "id number field assignment"
+    },
+    {
+      "name": "forbidden-pattern-absent:apps/api/src/routes/free-destiny-map-persistence.routes.ts:passport number field assignment",
+      "passed": true,
+      "detail": "passport number field assignment"
+    },
+    {
+      "name": "forbidden-pattern-absent:apps/api/src/routes/free-destiny-map-persistence.routes.ts:password field assignment",
+      "passed": true,
+      "detail": "password field assignment"
+    },
+    {
+      "name": "forbidden-pattern-absent:apps/api/src/routes/free-destiny-map-persistence.routes.ts:card number field assignment",
+      "passed": true,
+      "detail": "card number field assignment"
+    },
+    {
+      "name": "forbidden-pattern-absent:apps/api/src/routes/free-destiny-map-persistence.routes.ts:cvv field assignment",
+      "passed": true,
+      "detail": "cvv field assignment"
+    },
+    {
+      "name": "forbidden-pattern-absent:apps/api/src/routes/free-destiny-map-persistence.routes.ts:document payload assignment",
+      "passed": true,
+      "detail": "document payload assignment"
+    },
+    {
+      "name": "forbidden-pattern-absent:apps/api/src/routes/free-destiny-map-persistence.routes.ts:official application submitted true",
+      "passed": true,
+      "detail": "official application submitted true"
+    },
+    {
+      "name": "forbidden-pattern-absent:apps/api/src/routes/free-destiny-map-persistence.routes.ts:payment instruction sent true",
+      "passed": true,
+      "detail": "payment instruction sent true"
+    },
+    {
+      "name": "forbidden-pattern-absent:apps/api/src/routes/free-destiny-map-persistence.routes.ts:email sent true",
+      "passed": true,
+      "detail": "email sent true"
+    },
+    {
+      "name": "forbidden-pattern-absent:apps/api/src/routes/free-destiny-map-persistence.routes.ts:productionReady true",
+      "passed": true,
+      "detail": "productionReady true"
+    }
+  ],
+  "blockers": [
+    {
+      "name": "root-or-web-build-script-discoverable",
+      "passed": false,
+      "detail": "root scripts=test; web scripts="
+    },
+    {
+      "name": "root-or-web-dev-script-discoverable",
+      "passed": false,
+      "detail": "root scripts=test; web scripts="
+    },
+    {
+      "name": "next-dependency-declared",
+      "passed": false,
+      "detail": "next dependency declared in root or web package"
+    },
+    {
+      "name": "react-dependency-declared",
+      "passed": false,
+      "detail": "react dependency declared in root or web package"
+    },
+    {
+      "name": "react-dom-dependency-declared",
+      "passed": false,
+      "detail": "react-dom dependency declared in root or web package"
+    },
+    {
+      "name": "dependency-install-evidence-present",
+      "passed": false,
+      "detail": "node_modules not found; install likely needed before real boot"
+    }
+  ],
+  "package_scripts": {
+    "root": [
+      "test"
+    ],
+    "web": []
+  },
+  "package_manager_evidence": {
+    "packageLockExists": true,
+    "pnpmLockExists": false,
+    "yarnLockExists": false,
+    "nodeModulesExists": false,
+    "webNodeModulesExists": false
+  },
+  "oracle_lite_impact": "none_runtime_yet",
+  "runtime_scope": "real web build/dev-server readiness gate only; no long-running server; no production storage",
+  "next_action": "Repair the listed readiness blockers before attempting a real local web boot."
+}

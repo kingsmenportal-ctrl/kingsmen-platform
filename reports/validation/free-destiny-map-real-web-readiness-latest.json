@@ -1,0 +1,32 @@
+{
+  "schema": "kingsmen.validation-report.v1",
+  "module": "BATCH 12 - Real Local Web Build / Dev-Server Readiness Gate",
+  "status": "VALIDATED",
+  "passed": true,
+  "generated_at": "2026-06-02T20:04:26.320Z",
+  "files_expected": [
+    "docs/runtime/free-destiny-map-real-web-readiness-gate.md",
+    "manifests/runtime/free-destiny-map-real-web-readiness-gate.json",
+    "packages/contracts/src/free-destiny-map-real-web-readiness.ts",
+    "scripts/runtime/Invoke-FreeDestinyMapRealWebReadinessGate.ps1",
+    "scripts/proof/prove-free-destiny-map-real-web-readiness.mjs",
+    "reports/runtime/free-destiny-map-real-web-readiness-proof.json",
+    "scripts/validators/validate-free-destiny-map-real-web-readiness.mjs",
+    "reports/validation/free-destiny-map-real-web-readiness-latest.json"
+  ],
+  "upstream_files_checked": [
+    "apps/web/src/app/free-destiny-map/page.tsx",
+    "apps/web/src/components/kingsmen/FreeDestinyMapApiForm.tsx",
+    "apps/web/src/lib/kingsmen/free-destiny-map-client.ts",
+    "packages/contracts/src/free-destiny-map-api-wiring.ts",
+    "reports/runtime/free-destiny-map-browser-style-submit-proof.json"
+  ],
+  "files_checked": 13,
+  "missing_files": [],
+  "failed_checks": [],
+  "warnings": [],
+  "oracle_lite_impact": "none_runtime_yet",
+  "control_plane_impact": "Adds honest real web build/dev-server readiness gate for Free Destiny Map.",
+  "runtime_proof": "reports/runtime/free-destiny-map-real-web-readiness-proof.json",
+  "next_action": "Proceed based on readiness proof: repair blockers or run controlled local web boot proof."
+}
