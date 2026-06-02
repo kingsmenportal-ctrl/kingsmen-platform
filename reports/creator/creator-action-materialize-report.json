@@ -1,0 +1,27 @@
+{
+    "schema":  "kingsmen.creator-action-report.v1",
+    "module":  "CREATOR",
+    "submodule":  "CREATOR.2B",
+    "action":  "Materialize",
+    "productionReady":  false,
+    "generatedAt":  "2026-06-02T07:15:24.066Z",
+    "repoRoot":  "C:\\Users\\dell\\kingsmen-platform",
+    "passed":  false,
+    "detail":  "Input file missing.",
+    "totalChecks":  1,
+    "failedChecks":  1,
+    "failed":  [
+                   {
+                       "name":  "materialize:input-exists",
+                       "passed":  false,
+                       "detail":  ".\\incoming\\BATCH-03.txt"
+                   }
+               ],
+    "checks":  [
+                   {
+                       "name":  "materialize:input-exists",
+                       "passed":  false,
+                       "detail":  ".\\incoming\\BATCH-03.txt"
+                   }
+               ]
+}
