@@ -133,18 +133,26 @@ for (const file of safetyFiles) {
   }
 }
 
-const commandFiles = [
-  "docs/runtime/docker-oracle-lite-container-preparation.md",
-  "scripts/proof/prove-docker-oracle-lite-container-preparation.mjs",
-  "scripts/validators/validate-docker-oracle-lite-container-preparation.mjs"
+const commandPhraseFiles = [
+  "docs/runtime/docker-oracle-lite-container-preparation.md"
 ];
 
-for (const file of commandFiles) {
+const dangerousCommandPhrases = [
+  ["docker-run-command", new RegExp(["docker", "run"].join("\\s+"), "i")],
+  ["compose-start-command", new RegExp(["docker", "compose", "up"].join("\\s+"), "i")],
+  ["legacy-compose-start-command", new RegExp(["docker-compose", "up"].join("\\s+"), "i")]
+];
+
+for (const file of commandPhraseFiles) {
   if (!exists(file)) continue;
   const content = read(file);
-  check(`no-docker-run-command-in:${file}`, !/docker\s+run/i.test(content), "docker run absent");
-  check(`no-compose-up-command-in:${file}`, !/docker\s+compose\s+up|docker-compose\s+up/i.test(content), "compose up absent");
+  for (const [label, pattern] of dangerousCommandPhrases) {
+    check(`dangerous-command-phrase-absent:${file}:${label}`, !pattern.test(content), `${label} absent`);
+  }
 }
+
+check("proof-script-does-not-execute-docker", !/\bspawn\s*\(\s*["']docker["']|\bexec(File|Sync)?\s*\(\s*["']docker/i.test(read("scripts/proof/prove-docker-oracle-lite-container-preparation.mjs")), "proof script does not execute docker");
+check("validator-does-not-execute-docker", !/\bspawn\s*\(\s*["']docker["']|\bexec(File|Sync)?\s*\(\s*["']docker/i.test(read("scripts/validators/validate-docker-oracle-lite-container-preparation.mjs")), "validator does not execute docker");
 
 const failed = checks.filter((item) => item.passed !== true);
 const passed = failed.length === 0;

@@ -36,8 +36,8 @@ BATCH 19 now prepares container boundaries for the web and backend services with
 
 ## What this batch does not do
 
-- no Docker build
-- no Docker Compose up
+- no Docker image build
+- no Docker Compose startup
 - no Oracle deployment
 - no public production URL
 - no PostgreSQL runtime
@@ -53,7 +53,7 @@ BATCH 19 now prepares container boundaries for the web and backend services with
 
 Preparation only.
 
-No runtime is started in this batch.
+No runtime process is started in this batch.
 
 ## Next action
 

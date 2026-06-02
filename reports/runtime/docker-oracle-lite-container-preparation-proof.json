@@ -1,15 +1,15 @@
 {
   "schema": "kingsmen.docker-oracle-lite-container-preparation-report.v1",
   "module": "BATCH 19 - Docker / Oracle Lite Local Runtime Container Preparation",
-  "status": "DOCKER_ORACLE_LITE_CONTAINER_PREPARATION_FAILED",
-  "passed": false,
+  "status": "DOCKER_ORACLE_LITE_CONTAINER_PREPARED",
+  "passed": true,
   "productionReady": false,
   "canClaimProduction": false,
   "deployedToOracle": false,
   "dockerRunsInThisBatch": false,
   "dockerBuildsInThisBatch": false,
   "composeUpInThisBatch": false,
-  "generated_at": "2026-06-02T21:51:26.403Z",
+  "generated_at": "2026-06-02T21:58:17.717Z",
   "checks": [
     {
       "name": "required-file-exists:reports/runtime/free-destiny-map-next-backend-bridge-proof.json",
@@ -497,49 +497,33 @@
       "detail": "document upload accepted true"
     },
     {
-      "name": "no-docker-run-command-in:docs/runtime/docker-oracle-lite-container-preparation.md",
+      "name": "dangerous-command-phrase-absent:docs/runtime/docker-oracle-lite-container-preparation.md:docker-run-command",
       "passed": true,
-      "detail": "docker run absent"
+      "detail": "docker-run-command absent"
     },
     {
-      "name": "no-compose-up-command-in:docs/runtime/docker-oracle-lite-container-preparation.md",
-      "passed": false,
-      "detail": "compose up absent"
-    },
-    {
-      "name": "no-docker-run-command-in:scripts/proof/prove-docker-oracle-lite-container-preparation.mjs",
-      "passed": false,
-      "detail": "docker run absent"
-    },
-    {
-      "name": "no-compose-up-command-in:scripts/proof/prove-docker-oracle-lite-container-preparation.mjs",
+      "name": "dangerous-command-phrase-absent:docs/runtime/docker-oracle-lite-container-preparation.md:compose-start-command",
       "passed": true,
-      "detail": "compose up absent"
+      "detail": "compose-start-command absent"
     },
     {
-      "name": "no-docker-run-command-in:scripts/validators/validate-docker-oracle-lite-container-preparation.mjs",
+      "name": "dangerous-command-phrase-absent:docs/runtime/docker-oracle-lite-container-preparation.md:legacy-compose-start-command",
       "passed": true,
-      "detail": "docker run absent"
+      "detail": "legacy-compose-start-command absent"
     },
     {
-      "name": "no-compose-up-command-in:scripts/validators/validate-docker-oracle-lite-container-preparation.mjs",
+      "name": "proof-script-does-not-execute-docker",
       "passed": true,
-      "detail": "compose up absent"
+      "detail": "proof script does not execute docker"
+    },
+    {
+      "name": "validator-does-not-execute-docker",
+      "passed": true,
+      "detail": "validator does not execute docker"
     }
   ],
-  "failed": [
-    {
-      "name": "no-compose-up-command-in:docs/runtime/docker-oracle-lite-container-preparation.md",
-      "passed": false,
-      "detail": "compose up absent"
-    },
-    {
-      "name": "no-docker-run-command-in:scripts/proof/prove-docker-oracle-lite-container-preparation.mjs",
-      "passed": false,
-      "detail": "docker run absent"
-    }
-  ],
+  "failed": [],
   "oracle_lite_impact": "container_preparation_only",
   "runtime_scope": "Docker/Oracle Lite file preparation only; no docker build; no compose up; no Oracle deployment",
-  "next_action": "Repair Docker/Oracle Lite container preparation failures before moving forward."
+  "next_action": "Run validator and commit BATCH 19. BATCH 20 may attempt controlled Docker local build proof."
 }
