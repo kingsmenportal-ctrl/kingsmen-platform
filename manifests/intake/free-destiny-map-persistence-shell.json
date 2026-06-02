@@ -1,0 +1,32 @@
+{
+  "schema": "kingsmen.intake-persistence-shell.v1",
+  "module": "BATCH 06 - Intake Persistence / Local Runtime Shell",
+  "status": "BUILT_PENDING_VALIDATION",
+  "productionReady": false,
+  "sourceBatch": "BATCH 05 - Free Destiny Map Intake Contract / Backend Shell",
+  "endpoint": "/api/public/free-destiny-map/intake/local",
+  "method": "POST",
+  "storesProductionData": false,
+  "storesLocalShellData": true,
+  "localWriteFlag": "KINGSMEN_ENABLE_LOCAL_INTAKE_WRITE",
+  "dataDirectory": "data/local/free-destiny-map",
+  "gitProtection": "data/local/.gitignore blocks generated local candidate data",
+  "takesPayment": false,
+  "sendsEmail": false,
+  "submitsOfficialApplications": false,
+  "collectsDocuments": false,
+  "oracleLiteImpact": "none_runtime_yet",
+  "controlPlaneImpact": "Creates local intake persistence boundary for future runtime proof.",
+  "requiredFiles": [
+    "docs/intake/free-destiny-map-local-runtime-shell.md",
+    "manifests/intake/free-destiny-map-persistence-shell.json",
+    "packages/contracts/src/free-destiny-map-persistence.ts",
+    "apps/api/src/repositories/free-destiny-map-local.repository.ts",
+    "apps/api/src/services/free-destiny-map-persistence.service.ts",
+    "apps/api/src/routes/free-destiny-map-persistence.routes.ts",
+    "data/local/.gitignore",
+    "scripts/validators/validate-free-destiny-map-persistence.mjs",
+    "reports/validation/free-destiny-map-persistence-latest.json"
+  ],
+  "nextAction": "Run node scripts/validators/validate-free-destiny-map-persistence.mjs"
+}

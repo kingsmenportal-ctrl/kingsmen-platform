@@ -4,11 +4,11 @@
     "submodule":  "CREATOR.2B",
     "action":  "Materialize",
     "productionReady":  false,
-    "generatedAt":  "2026-06-02T17:31:18.431Z",
+    "generatedAt":  "2026-06-02T18:48:21.971Z",
     "repoRoot":  "C:\\Users\\dell\\kingsmen-platform",
     "passed":  true,
     "detail":  "Materialize complete.",
-    "totalChecks":  8,
+    "totalChecks":  10,
     "failedChecks":  0,
     "failed":  [
 
@@ -17,40 +17,50 @@
                    {
                        "name":  "materialize:blocks",
                        "passed":  true,
-                       "detail":  "blocks=7"
+                       "detail":  "blocks=9"
                    },
                    {
-                       "name":  "materialize:wrote:docs/intake/free-destiny-map-intake-backend-shell.md",
+                       "name":  "materialize:wrote:docs/intake/free-destiny-map-local-runtime-shell.md",
                        "passed":  true,
                        "detail":  "written"
                    },
                    {
-                       "name":  "materialize:wrote:manifests/intake/free-destiny-map-intake-shell.json",
+                       "name":  "materialize:wrote:manifests/intake/free-destiny-map-persistence-shell.json",
                        "passed":  true,
                        "detail":  "written"
                    },
                    {
-                       "name":  "materialize:wrote:packages/contracts/src/free-destiny-map-intake.ts",
+                       "name":  "materialize:wrote:packages/contracts/src/free-destiny-map-persistence.ts",
                        "passed":  true,
                        "detail":  "written"
                    },
                    {
-                       "name":  "materialize:wrote:apps/api/src/services/free-destiny-map-intake.service.ts",
+                       "name":  "materialize:wrote:apps/api/src/repositories/free-destiny-map-local.repository.ts",
                        "passed":  true,
                        "detail":  "written"
                    },
                    {
-                       "name":  "materialize:wrote:apps/api/src/routes/free-destiny-map-intake.routes.ts",
+                       "name":  "materialize:wrote:apps/api/src/services/free-destiny-map-persistence.service.ts",
                        "passed":  true,
                        "detail":  "written"
                    },
                    {
-                       "name":  "materialize:wrote:scripts/validators/validate-free-destiny-map-intake.mjs",
+                       "name":  "materialize:wrote:apps/api/src/routes/free-destiny-map-persistence.routes.ts",
                        "passed":  true,
                        "detail":  "written"
                    },
                    {
-                       "name":  "materialize:wrote:reports/validation/free-destiny-map-intake-latest.json",
+                       "name":  "materialize:wrote:data/local/.gitignore",
+                       "passed":  true,
+                       "detail":  "written"
+                   },
+                   {
+                       "name":  "materialize:wrote:scripts/validators/validate-free-destiny-map-persistence.mjs",
+                       "passed":  true,
+                       "detail":  "written"
+                   },
+                   {
+                       "name":  "materialize:wrote:reports/validation/free-destiny-map-persistence-latest.json",
                        "passed":  true,
                        "detail":  "written"
                    }

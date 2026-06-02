@@ -1,0 +1,25 @@
+{
+  "schema": "kingsmen.validation-report.v1",
+  "module": "BATCH 06 - Intake Persistence / Local Runtime Shell",
+  "status": "VALIDATED",
+  "passed": true,
+  "generated_at": "2026-06-02T18:48:23.489Z",
+  "files_expected": [
+    "docs/intake/free-destiny-map-local-runtime-shell.md",
+    "manifests/intake/free-destiny-map-persistence-shell.json",
+    "packages/contracts/src/free-destiny-map-persistence.ts",
+    "apps/api/src/repositories/free-destiny-map-local.repository.ts",
+    "apps/api/src/services/free-destiny-map-persistence.service.ts",
+    "apps/api/src/routes/free-destiny-map-persistence.routes.ts",
+    "data/local/.gitignore",
+    "scripts/validators/validate-free-destiny-map-persistence.mjs",
+    "reports/validation/free-destiny-map-persistence-latest.json"
+  ],
+  "files_checked": 9,
+  "missing_files": [],
+  "failed_checks": [],
+  "warnings": [],
+  "oracle_lite_impact": "none_runtime_yet",
+  "control_plane_impact": "Adds local Free Destiny Map intake persistence boundary for runtime proof.",
+  "next_action": "Proceed to BATCH 07 - Public form to intake API wiring or local API boot proof."
+}
