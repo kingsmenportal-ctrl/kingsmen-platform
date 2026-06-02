@@ -1,0 +1,24 @@
+{
+  "schema": "kingsmen.validation-report.v1",
+  "module": "BATCH 03 - Build Proof Centre",
+  "status": "VALIDATED",
+  "passed": true,
+  "generated_at": "2026-06-02T17:12:19.317Z",
+  "files_expected": [
+    "docs/proof/build-proof-centre.md",
+    "manifests/proof/build-proof-centre.json",
+    "packages/contracts/src/build-proof-centre.ts",
+    "apps/web/src/components/kingsmen/BuildProofStatusCard.tsx",
+    "apps/web/src/components/kingsmen/BuildProofCentreShell.tsx",
+    "apps/web/src/app/founder/build-proof/page.tsx",
+    "scripts/validators/validate-build-proof-centre.mjs",
+    "reports/validation/build-proof-centre-latest.json"
+  ],
+  "files_checked": 14,
+  "missing_files": [],
+  "failed_checks": [],
+  "warnings": [],
+  "oracle_lite_impact": "none_runtime_yet",
+  "control_plane_impact": "Adds founder-facing Build Proof Centre UI shell and proof-report policy.",
+  "next_action": "Proceed to BATCH 04 - First Public Website + Free Destiny Map shell or next approved batch."
+}

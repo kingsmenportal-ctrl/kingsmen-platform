@@ -1,0 +1,323 @@
+FILE: docs/proof/build-proof-centre.md
+---
+# BATCH 03 - Build Proof Centre
+
+Build Proof Centre is the founder-facing proof surface for Kingsmen.
+
+It reads validator reports and explains what is built, what is validated, what failed, what is pending validation, what the next safe action is, and what the Oracle Lite impact is.
+
+Build Proof Centre must never claim production readiness just because files exist.
+
+A module is only VALIDATED when its report says passed true and failed_checks is empty.
+
+Oracle Lite impact: none_runtime_yet.
+---
+FILE: manifests/proof/build-proof-centre.json
+---
+{
+  "schema": "kingsmen.proof-centre.v1",
+  "module": "BATCH 03 - Build Proof Centre",
+  "status": "BUILT_PENDING_VALIDATION",
+  "productionReady": false,
+  "oracleLiteImpact": "none_runtime_yet",
+  "controlPlaneImpact": "Adds founder-facing proof centre shell.",
+  "proofReports": [
+    "reports/validation/merge-foundation-latest.json",
+    "reports/validation/creator-normalize-latest.json",
+    "reports/creator/creator-doctor-report.json",
+    "reports/creator/creator-audit-existing-report.json",
+    "reports/creator/creator-action-scaffold-report.json",
+    "reports/creator/creator-action-validate-report.json"
+  ],
+  "nextAction": "Run node scripts/validators/validate-build-proof-centre.mjs"
+}
+---
+FILE: packages/contracts/src/build-proof-centre.ts
+---
+export type KingsmenProofStatus =
+  | "NOT_STARTED"
+  | "BUILT_PENDING_VALIDATION"
+  | "VALIDATED"
+  | "RUNTIME_PROVEN"
+  | "STAGING_PROVEN"
+  | "PRODUCTION_READY"
+  | "PRODUCTION_ACTIVE"
+  | "PAUSED"
+  | "REPLACED"
+  | "ARCHIVED_FOR_FUTURE";
+
+export interface KingsmenProofReportSummary {
+  module: string;
+  status: KingsmenProofStatus | string;
+  passed: boolean;
+  reportPath: string;
+  failedChecks?: string[];
+  warnings?: string[];
+  oracleLiteImpact?: string;
+  controlPlaneImpact?: string;
+  nextAction?: string;
+}
+
+export const KINGSMEN_BUILD_PROOF_RULES = [
+  "No claim without file path.",
+  "No file path without content.",
+  "No content without validator.",
+  "No validator without report.",
+  "No production claim without runtime proof."
+];
+
+export const KINGSMEN_INITIAL_PROOF_REPORTS = [
+  "reports/validation/merge-foundation-latest.json",
+  "reports/validation/creator-normalize-latest.json",
+  "reports/creator/creator-doctor-report.json",
+  "reports/creator/creator-audit-existing-report.json",
+  "reports/creator/creator-action-scaffold-report.json",
+  "reports/creator/creator-action-validate-report.json"
+];
+
+export function isValidatedProof(report: KingsmenProofReportSummary): boolean {
+  return report.passed === true && (report.failedChecks ?? []).length === 0;
+}
+---
+FILE: apps/web/src/components/kingsmen/BuildProofStatusCard.tsx
+---
+type ProofReport = {
+  module: string;
+  status: string;
+  passed: boolean;
+  reportPath: string;
+  oracleLiteImpact?: string;
+  controlPlaneImpact?: string;
+  nextAction?: string;
+};
+
+export function BuildProofStatusCard({ report }: { report: ProofReport }) {
+  return (
+    <article style={{ border: "1px solid #d4af37", borderRadius: 16, padding: 16, background: "#07111f", color: "#f8fafc" }}>
+      <p style={{ margin: 0, color: "#d4af37", fontSize: 12 }}>{report.status}</p>
+      <h3>{report.module}</h3>
+      <p><strong>Status:</strong> {report.passed ? "PASSED" : "NEEDS WORK"}</p>
+      <p><strong>Report:</strong> {report.reportPath}</p>
+      {report.oracleLiteImpact ? <p><strong>Oracle Lite:</strong> {report.oracleLiteImpact}</p> : null}
+      {report.controlPlaneImpact ? <p><strong>Control Plane:</strong> {report.controlPlaneImpact}</p> : null}
+      {report.nextAction ? <p><strong>Next:</strong> {report.nextAction}</p> : null}
+    </article>
+  );
+}
+---
+FILE: apps/web/src/components/kingsmen/BuildProofCentreShell.tsx
+---
+import { BuildProofStatusCard } from "./BuildProofStatusCard";
+
+type ProofReport = {
+  module: string;
+  status: string;
+  passed: boolean;
+  reportPath: string;
+  oracleLiteImpact?: string;
+  controlPlaneImpact?: string;
+  nextAction?: string;
+};
+
+type Model = {
+  title: string;
+  productionReady: false;
+  reports: ProofReport[];
+  rules: string[];
+};
+
+export function BuildProofCentreShell({ model }: { model: Model }) {
+  const passed = model.reports.filter((report) => report.passed).length;
+
+  return (
+    <main style={{ minHeight: "100vh", padding: 28, background: "#050816", color: "#f8fafc" }}>
+      <section style={{ maxWidth: 1100, margin: "0 auto" }}>
+        <p style={{ color: "#d4af37", letterSpacing: "0.12em" }}>FOUNDER CONTROL PLANE</p>
+        <h1>Build Proof Centre</h1>
+        <p>Kingsmen does not trust chat claims. It reads proof reports, failed checks, warnings and next actions.</p>
+        <p><strong>{passed}</strong> of <strong>{model.reports.length}</strong> reports are passing. productionReady: false</p>
+
+        <section style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(260px, 1fr))", gap: 16 }}>
+          {model.reports.map((report) => (
+            <BuildProofStatusCard key={report.reportPath} report={report} />
+          ))}
+        </section>
+
+        <h2>Proof laws</h2>
+        <ul>
+          {model.rules.map((rule) => <li key={rule}>{rule}</li>)}
+        </ul>
+      </section>
+    </main>
+  );
+}
+---
+FILE: apps/web/src/app/founder/build-proof/page.tsx
+---
+import { BuildProofCentreShell } from "../../../components/kingsmen/BuildProofCentreShell";
+
+const model = {
+  title: "Build Proof Centre",
+  productionReady: false as const,
+  rules: [
+    "No claim without file path.",
+    "No file path without content.",
+    "No content without validator.",
+    "No validator without report.",
+    "No production claim without runtime proof."
+  ],
+  reports: [
+    {
+      module: "BATCH 01 - Merge Foundation",
+      status: "VALIDATED",
+      passed: true,
+      reportPath: "reports/validation/merge-foundation-latest.json",
+      oracleLiteImpact: "none_runtime_yet",
+      controlPlaneImpact: "Build Proof Centre reads this report."
+    },
+    {
+      module: "BATCH 02 - Creator Normalize",
+      status: "VALIDATED",
+      passed: true,
+      reportPath: "reports/validation/creator-normalize-latest.json",
+      oracleLiteImpact: "none_runtime_yet",
+      controlPlaneImpact: "Build Proof Centre reads this report."
+    },
+    {
+      module: "CREATOR.2B - Action Layer",
+      status: "BUILT_PENDING_VALIDATION",
+      passed: true,
+      reportPath: "reports/creator/creator-action-validate-report.json",
+      oracleLiteImpact: "none_runtime_yet",
+      controlPlaneImpact: "Shows Creator action proof."
+    }
+  ]
+};
+
+export default function BuildProofPage() {
+  return <BuildProofCentreShell model={model} />;
+}
+---
+FILE: scripts/validators/validate-build-proof-centre.mjs
+---
+#!/usr/bin/env node
+import fs from "node:fs";
+import path from "node:path";
+
+const root = process.cwd();
+const reportPath = path.join(root, "reports/validation/build-proof-centre-latest.json");
+
+const requiredFiles = [
+  "docs/proof/build-proof-centre.md",
+  "manifests/proof/build-proof-centre.json",
+  "packages/contracts/src/build-proof-centre.ts",
+  "apps/web/src/components/kingsmen/BuildProofStatusCard.tsx",
+  "apps/web/src/components/kingsmen/BuildProofCentreShell.tsx",
+  "apps/web/src/app/founder/build-proof/page.tsx",
+  "scripts/validators/validate-build-proof-centre.mjs",
+  "reports/validation/build-proof-centre-latest.json"
+];
+
+const proofReports = [
+  "reports/validation/merge-foundation-latest.json",
+  "reports/validation/creator-normalize-latest.json",
+  "reports/creator/creator-doctor-report.json",
+  "reports/creator/creator-audit-existing-report.json",
+  "reports/creator/creator-action-scaffold-report.json",
+  "reports/creator/creator-action-validate-report.json"
+];
+
+function exists(rel) {
+  return fs.existsSync(path.join(root, rel));
+}
+
+function read(rel) {
+  return fs.readFileSync(path.join(root, rel), "utf8").replace(/^\uFEFF/, "");
+}
+
+function parseJson(rel) {
+  return JSON.parse(read(rel));
+}
+
+const failures = [];
+const warnings = [];
+const checked = [];
+
+for (const file of requiredFiles) {
+  checked.push(file);
+  if (!exists(file)) failures.push(`Missing required file: ${file}`);
+  else if (fs.statSync(path.join(root, file)).size === 0) failures.push(`Empty required file: ${file}`);
+}
+
+for (const report of proofReports) {
+  checked.push(report);
+  if (!exists(report)) {
+    failures.push(`Missing indexed proof report: ${report}`);
+    continue;
+  }
+  try {
+    const parsed = parseJson(report);
+    if (parsed.passed !== true) warnings.push(`Indexed report is not passing: ${report}`);
+  } catch (error) {
+    failures.push(`Could not parse indexed report ${report}: ${error.message}`);
+  }
+}
+
+if (exists("manifests/proof/build-proof-centre.json")) {
+  const manifest = parseJson("manifests/proof/build-proof-centre.json");
+  if (manifest.productionReady !== false) failures.push("Manifest must keep productionReady false.");
+  if (!String(manifest.oracleLiteImpact ?? "").includes("none_runtime_yet")) failures.push("Manifest must declare Oracle Lite impact.");
+}
+
+for (const [file, tokens] of [
+  ["packages/contracts/src/build-proof-centre.ts", ["KingsmenProofStatus", "KingsmenProofReportSummary", "KINGSMEN_BUILD_PROOF_RULES", "KINGSMEN_INITIAL_PROOF_REPORTS", "isValidatedProof"]],
+  ["apps/web/src/app/founder/build-proof/page.tsx", ["BuildProofCentreShell", "productionReady: false", "BATCH 01", "BATCH 02", "CREATOR.2B"]]
+]) {
+  if (!exists(file)) continue;
+  const content = read(file);
+  for (const token of tokens) {
+    if (!content.includes(token)) failures.push(`${file} missing token: ${token}`);
+  }
+}
+
+const passed = failures.length === 0;
+
+const report = {
+  schema: "kingsmen.validation-report.v1",
+  module: "BATCH 03 - Build Proof Centre",
+  status: passed ? "VALIDATED" : "BUILT_PENDING_VALIDATION",
+  passed,
+  generated_at: new Date().toISOString(),
+  files_expected: requiredFiles,
+  files_checked: checked.length,
+  missing_files: requiredFiles.filter((file) => !exists(file)),
+  failed_checks: failures,
+  warnings,
+  oracle_lite_impact: "none_runtime_yet",
+  control_plane_impact: "Adds founder-facing Build Proof Centre UI shell and proof-report policy.",
+  next_action: passed ? "Proceed to BATCH 04 - First Public Website + Free Destiny Map shell or next approved batch." : "Repair Build Proof Centre failures and rerun validator."
+};
+
+fs.mkdirSync(path.dirname(reportPath), { recursive: true });
+fs.writeFileSync(reportPath, `${JSON.stringify(report, null, 2)}\n`, "utf8");
+
+console.log(JSON.stringify(report, null, 2));
+if (!passed) process.exit(1);
+---
+FILE: reports/validation/build-proof-centre-latest.json
+---
+{
+  "schema": "kingsmen.validation-report.v1",
+  "module": "BATCH 03 - Build Proof Centre",
+  "status": "BUILT_PENDING_VALIDATION",
+  "passed": false,
+  "generated_at": "2026-06-02T00:00:00.000Z",
+  "reason": "Seed report. Run scripts/validators/validate-build-proof-centre.mjs.",
+  "files_checked": 0,
+  "failed_checks": [
+    "validator_not_yet_executed"
+  ],
+  "oracle_lite_impact": "none_runtime_yet",
+  "control_plane_impact": "Adds founder-facing Build Proof Centre UI shell and proof-report policy.",
+  "next_action": "Run node scripts/validators/validate-build-proof-centre.mjs."
+}

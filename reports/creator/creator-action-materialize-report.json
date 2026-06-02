@@ -4,24 +4,60 @@
     "submodule":  "CREATOR.2B",
     "action":  "Materialize",
     "productionReady":  false,
-    "generatedAt":  "2026-06-02T07:15:24.066Z",
+    "generatedAt":  "2026-06-02T17:12:17.024Z",
     "repoRoot":  "C:\\Users\\dell\\kingsmen-platform",
-    "passed":  false,
-    "detail":  "Input file missing.",
-    "totalChecks":  1,
-    "failedChecks":  1,
+    "passed":  true,
+    "detail":  "Materialize complete.",
+    "totalChecks":  9,
+    "failedChecks":  0,
     "failed":  [
-                   {
-                       "name":  "materialize:input-exists",
-                       "passed":  false,
-                       "detail":  ".\\incoming\\BATCH-03.txt"
-                   }
+
                ],
     "checks":  [
                    {
-                       "name":  "materialize:input-exists",
-                       "passed":  false,
-                       "detail":  ".\\incoming\\BATCH-03.txt"
+                       "name":  "materialize:blocks",
+                       "passed":  true,
+                       "detail":  "blocks=8"
+                   },
+                   {
+                       "name":  "materialize:wrote:docs/proof/build-proof-centre.md",
+                       "passed":  true,
+                       "detail":  "written"
+                   },
+                   {
+                       "name":  "materialize:wrote:manifests/proof/build-proof-centre.json",
+                       "passed":  true,
+                       "detail":  "written"
+                   },
+                   {
+                       "name":  "materialize:wrote:packages/contracts/src/build-proof-centre.ts",
+                       "passed":  true,
+                       "detail":  "written"
+                   },
+                   {
+                       "name":  "materialize:wrote:apps/web/src/components/kingsmen/BuildProofStatusCard.tsx",
+                       "passed":  true,
+                       "detail":  "written"
+                   },
+                   {
+                       "name":  "materialize:wrote:apps/web/src/components/kingsmen/BuildProofCentreShell.tsx",
+                       "passed":  true,
+                       "detail":  "written"
+                   },
+                   {
+                       "name":  "materialize:wrote:apps/web/src/app/founder/build-proof/page.tsx",
+                       "passed":  true,
+                       "detail":  "written"
+                   },
+                   {
+                       "name":  "materialize:wrote:scripts/validators/validate-build-proof-centre.mjs",
+                       "passed":  true,
+                       "detail":  "written"
+                   },
+                   {
+                       "name":  "materialize:wrote:reports/validation/build-proof-centre-latest.json",
+                       "passed":  true,
+                       "detail":  "written"
                    }
                ]
 }

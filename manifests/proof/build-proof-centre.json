@@ -1,0 +1,17 @@
+{
+  "schema": "kingsmen.proof-centre.v1",
+  "module": "BATCH 03 - Build Proof Centre",
+  "status": "BUILT_PENDING_VALIDATION",
+  "productionReady": false,
+  "oracleLiteImpact": "none_runtime_yet",
+  "controlPlaneImpact": "Adds founder-facing proof centre shell.",
+  "proofReports": [
+    "reports/validation/merge-foundation-latest.json",
+    "reports/validation/creator-normalize-latest.json",
+    "reports/creator/creator-doctor-report.json",
+    "reports/creator/creator-audit-existing-report.json",
+    "reports/creator/creator-action-scaffold-report.json",
+    "reports/creator/creator-action-validate-report.json"
+  ],
+  "nextAction": "Run node scripts/validators/validate-build-proof-centre.mjs"
+}
