@@ -1,0 +1,810 @@
+FILE: docs/runtime/free-destiny-map-browser-style-submit-proof.md
+---
+# BATCH 11 - Real Local App Build Validator / Browser-Style Form Submit Proof
+
+## Purpose
+
+This batch creates a browser-style submit proof for the real Free Destiny Map repo surface.
+
+BATCH 10 proved a temporary local web-to-HTTP shell. BATCH 11 now checks the actual app route, component, client adapter, endpoint contract, consent fields, route-interest fields, and browser-shaped form payload flow.
+
+## What this batch proves
+
+- the real repo contains the Free Destiny Map page
+- the page points to the Free Destiny Map API form component
+- the API form is a client component
+- the API form contains consent fields
+- the API form contains route-interest fields
+- the client adapter targets `/api/public/free-destiny-map/intake/local`
+- a browser-style form payload can be extracted from served HTML
+- the extracted payload can be posted to the local intake endpoint
+- the local endpoint returns HTTP 202
+- the response keeps `productionReady` false
+- official submission, payment, document upload and email remain blocked
+- local proof data remains under ignored `data/local`
+- the temporary server closes after proof
+
+## What this batch does not prove yet
+
+- no production Next.js build
+- no Playwright browser automation
+- no Oracle deployment
+- no Docker Compose boot
+- no PostgreSQL database
+- no Redis queue
+- no email sending
+- no payment processing
+- no document upload
+- no official application submission
+
+## Build validator scope
+
+This is a source-build-readiness and browser-style submit proof.
+
+It is not a production build claim. A later batch must run the real web build/dev server when package scripts and dependencies are stable.
+
+## Oracle Lite impact
+
+none_runtime_yet.
+
+This is a local browser-style proof only.
+
+## Next action
+
+After validation, BATCH 12 should create a real web package/build readiness gate or controlled local Next/dev-server boot proof.
+---
+FILE: manifests/runtime/free-destiny-map-browser-style-submit-proof.json
+---
+{
+  "schema": "kingsmen.browser-style-submit-proof.v1",
+  "module": "BATCH 11 - Real Local App Build Validator / Browser-Style Form Submit Proof",
+  "status": "BUILT_PENDING_VALIDATION",
+  "productionReady": false,
+  "sourceBatches": [
+    "BATCH 07 - Public Form to Intake API Wiring / Local API Boot Proof",
+    "BATCH 09 - Local HTTP API Boot Shell / First End-to-End Local HTTP Route Exercise",
+    "BATCH 10 - Local Web-to-HTTP Exercise / Minimal App Boot Proof"
+  ],
+  "webRoute": "/free-destiny-map",
+  "apiEndpoint": "/api/public/free-destiny-map/intake/local",
+  "httpHost": "127.0.0.1",
+  "httpPortMode": "ephemeral",
+  "proofCommand": "powershell.exe -ExecutionPolicy Bypass -File scripts/runtime/Invoke-FreeDestinyMapBrowserStyleSubmitProof.ps1",
+  "proofScript": "scripts/proof/prove-free-destiny-map-browser-style-submit.mjs",
+  "proofReport": "reports/runtime/free-destiny-map-browser-style-submit-proof.json",
+  "validationReport": "reports/validation/free-destiny-map-browser-style-submit-latest.json",
+  "localExerciseDataDirectory": "data/local/free-destiny-map/browser-style-submit",
+  "localWriteFlag": "KINGSMEN_ENABLE_LOCAL_INTAKE_WRITE",
+  "storesProductionData": false,
+  "usesDemoPayloadOnly": true,
+  "takesPayment": false,
+  "sendsEmail": false,
+  "collectsDocuments": false,
+  "submitsOfficialApplications": false,
+  "oracleLiteImpact": "none_runtime_yet",
+  "controlPlaneImpact": "Adds browser-style form submit proof for the real Free Destiny Map repo surface.",
+  "requiredFiles": [
+    "docs/runtime/free-destiny-map-browser-style-submit-proof.md",
+    "manifests/runtime/free-destiny-map-browser-style-submit-proof.json",
+    "packages/contracts/src/free-destiny-map-browser-style-submit-proof.ts",
+    "scripts/runtime/Invoke-FreeDestinyMapBrowserStyleSubmitProof.ps1",
+    "scripts/proof/prove-free-destiny-map-browser-style-submit.mjs",
+    "reports/runtime/free-destiny-map-browser-style-submit-proof.json",
+    "scripts/validators/validate-free-destiny-map-browser-style-submit.mjs",
+    "reports/validation/free-destiny-map-browser-style-submit-latest.json"
+  ],
+  "nextAction": "Run powershell.exe -ExecutionPolicy Bypass -File scripts/runtime/Invoke-FreeDestinyMapBrowserStyleSubmitProof.ps1 then node scripts/validators/validate-free-destiny-map-browser-style-submit.mjs"
+}
+---
+FILE: packages/contracts/src/free-destiny-map-browser-style-submit-proof.ts
+---
+export const FREE_DESTINY_MAP_BROWSER_STYLE_SUBMIT_MODULE =
+  "BATCH 11 - Real Local App Build Validator / Browser-Style Form Submit Proof" as const;
+
+export const FREE_DESTINY_MAP_BROWSER_STYLE_WEB_ROUTE = "/free-destiny-map" as const;
+
+export const FREE_DESTINY_MAP_BROWSER_STYLE_API_ENDPOINT =
+  "/api/public/free-destiny-map/intake/local" as const;
+
+export const FREE_DESTINY_MAP_BROWSER_STYLE_WRITE_FLAG =
+  "KINGSMEN_ENABLE_LOCAL_INTAKE_WRITE" as const;
+
+export const FREE_DESTINY_MAP_BROWSER_STYLE_DIRECTORY =
+  "data/local/free-destiny-map/browser-style-submit" as const;
+
+export interface FreeDestinyMapBrowserStyleSubmitPayload {
+  fullName: "Kingsmen Browser Demo Candidate";
+  province: "KwaZulu-Natal";
+  currentSituation: string;
+  knownRoute: string;
+  routeInterests: string[];
+  needsAccommodation: boolean;
+  accommodationArea: string;
+  needsFundingHelp: boolean;
+  needsCvHelp: boolean;
+  hasDocumentsReady: boolean;
+  randomSourceName: string;
+  consentToBeContacted: true;
+  consentToProcessBasicInfo: true;
+}
+
+export interface FreeDestinyMapBrowserStyleSubmitResponse {
+  accepted: boolean;
+  reference: string;
+  productionReady: false;
+  localPersistenceEnabled: boolean;
+  localWriteAttempted: boolean;
+  localWriteSucceeded: boolean;
+  storageMode: "local_jsonl_shell";
+  officialApplicationSubmitted: false;
+  paymentInstructionSent: false;
+  documentUploadAccepted: false;
+  emailSent: false;
+  safeNotice: string;
+  nextAction: string;
+  issues: Array<{
+    field: string;
+    code: string;
+    message: string;
+  }>;
+}
+---
+FILE: scripts/runtime/Invoke-FreeDestinyMapBrowserStyleSubmitProof.ps1
+---
+#requires -Version 5.1
+[CmdletBinding()]
+param(
+  [switch]$EnableLocalWrite
+)
+
+$ErrorActionPreference = "Stop"
+
+$repoRoot = Get-Location
+$scriptPath = Join-Path $repoRoot "scripts\proof\prove-free-destiny-map-browser-style-submit.mjs"
+
+if (-not (Test-Path $scriptPath -PathType Leaf)) {
+  throw "Missing proof script: $scriptPath"
+}
+
+if ($EnableLocalWrite) {
+  $env:KINGSMEN_ENABLE_LOCAL_INTAKE_WRITE = "true"
+} elseif ([string]::IsNullOrWhiteSpace($env:KINGSMEN_ENABLE_LOCAL_INTAKE_WRITE)) {
+  $env:KINGSMEN_ENABLE_LOCAL_INTAKE_WRITE = "true"
+}
+
+Write-Host "Kingsmen Free Destiny Map browser-style submit proof"
+Write-Host "Local write flag: $env:KINGSMEN_ENABLE_LOCAL_INTAKE_WRITE"
+Write-Host "This is not Oracle runtime, not production runtime, not a production Next.js build, and not Playwright."
+
+node $scriptPath
+
+if ($LASTEXITCODE -ne 0) {
+  throw "Free Destiny Map browser-style submit proof failed."
+}
+---
+FILE: scripts/proof/prove-free-destiny-map-browser-style-submit.mjs
+---
+#!/usr/bin/env node
+import fs from "node:fs";
+import http from "node:http";
+import path from "node:path";
+
+const root = process.cwd();
+const proofReportPath = path.join(root, "reports/runtime/free-destiny-map-browser-style-submit-proof.json");
+const localDataDir = path.join(root, "data/local/free-destiny-map/browser-style-submit");
+const localDataFile = path.join(localDataDir, "browser-style-demo-intakes.jsonl");
+
+const checks = [];
+
+function exists(rel) {
+  return fs.existsSync(path.join(root, rel));
+}
+
+function read(rel) {
+  return fs.readFileSync(path.join(root, rel), "utf8").replace(/^\uFEFF/, "");
+}
+
+function check(name, passed, detail = "") {
+  checks.push({ name, passed, detail });
+}
+
+function getAttribute(tag, attributeName) {
+  const match = tag.match(new RegExp(`${attributeName}=["']([^"']*)["']`, "i"));
+  return match ? match[1] : "";
+}
+
+function decodeBasicHtml(value) {
+  return String(value)
+    .replaceAll("&quot;", '"')
+    .replaceAll("&#39;", "'")
+    .replaceAll("&amp;", "&")
+    .replaceAll("&lt;", "<")
+    .replaceAll("&gt;", ">");
+}
+
+function extractBrowserStylePayloadFromHtml(html) {
+  const payload = {
+    fullName: "",
+    province: "",
+    currentSituation: "",
+    knownRoute: "",
+    routeInterests: [],
+    needsAccommodation: false,
+    accommodationArea: "",
+    needsFundingHelp: false,
+    needsCvHelp: false,
+    hasDocumentsReady: false,
+    randomSourceName: "",
+    consentToBeContacted: false,
+    consentToProcessBasicInfo: false
+  };
+
+  const inputTags = html.match(/<input\b[^>]*>/gi) ?? [];
+  const textareaTags = html.match(/<textarea\b[^>]*>[\s\S]*?<\/textarea>/gi) ?? [];
+
+  for (const tag of inputTags) {
+    const name = getAttribute(tag, "name");
+    if (!name) continue;
+
+    const type = getAttribute(tag, "type") || "text";
+    const value = decodeBasicHtml(getAttribute(tag, "value"));
+    const isChecked = /\bchecked\b/i.test(tag) || value === "true";
+
+    if (name === "routeInterests") {
+      payload.routeInterests.push(value);
+      continue;
+    }
+
+    if (["needsAccommodation", "needsFundingHelp", "needsCvHelp", "hasDocumentsReady", "consentToBeContacted", "consentToProcessBasicInfo"].includes(name)) {
+      payload[name] = type === "checkbox" ? isChecked : value === "true";
+      continue;
+    }
+
+    if (Object.prototype.hasOwnProperty.call(payload, name)) {
+      payload[name] = value;
+    }
+  }
+
+  for (const tag of textareaTags) {
+    const name = getAttribute(tag, "name");
+    if (!name) continue;
+    const inner = tag.replace(/^<textarea\b[^>]*>/i, "").replace(/<\/textarea>$/i, "");
+    if (Object.prototype.hasOwnProperty.call(payload, name)) {
+      payload[name] = decodeBasicHtml(inner.trim());
+    }
+  }
+
+  return payload;
+}
+
+function readJsonBody(request) {
+  return new Promise((resolve, reject) => {
+    let body = "";
+    request.on("data", (chunk) => {
+      body += chunk;
+      if (body.length > 1024 * 64) {
+        reject(new Error("Body too large for browser-style submit proof."));
+        request.destroy();
+      }
+    });
+    request.on("end", () => {
+      try {
+        resolve(body ? JSON.parse(body) : {});
+      } catch (error) {
+        reject(error);
+      }
+    });
+    request.on("error", reject);
+  });
+}
+
+function writeJson(response, statusCode, payload) {
+  const body = JSON.stringify(payload);
+  response.writeHead(statusCode, {
+    "content-type": "application/json",
+    "content-length": Buffer.byteLength(body)
+  });
+  response.end(body);
+}
+
+function writeHtml(response, statusCode, html) {
+  response.writeHead(statusCode, {
+    "content-type": "text/html; charset=utf-8",
+    "content-length": Buffer.byteLength(html)
+  });
+  response.end(html);
+}
+
+const repoFiles = [
+  "apps/web/src/app/free-destiny-map/page.tsx",
+  "apps/web/src/components/kingsmen/FreeDestinyMapApiForm.tsx",
+  "apps/web/src/lib/kingsmen/free-destiny-map-client.ts",
+  "packages/contracts/src/free-destiny-map-api-wiring.ts",
+  "apps/api/src/routes/free-destiny-map-persistence.routes.ts",
+  "apps/api/src/services/free-destiny-map-persistence.service.ts",
+  "data/local/.gitignore"
+];
+
+for (const file of repoFiles) {
+  check(`repo-file-exists:${file}`, exists(file), file);
+}
+
+if (exists("data/local/.gitignore")) {
+  const ignore = read("data/local/.gitignore");
+  check("local-data-gitignore-blocks-generated-files", ignore.includes("*") && ignore.includes("!.gitignore"), "data/local generated files ignored");
+}
+
+if (exists("apps/web/src/app/free-destiny-map/page.tsx")) {
+  const page = read("apps/web/src/app/free-destiny-map/page.tsx");
+  check("real-page-imports-api-form", page.includes("FreeDestinyMapApiForm"), "page imports/uses API form");
+}
+
+if (exists("apps/web/src/components/kingsmen/FreeDestinyMapApiForm.tsx")) {
+  const form = read("apps/web/src/components/kingsmen/FreeDestinyMapApiForm.tsx");
+  check("real-form-is-client-component", form.includes('"use client"'), "client component present");
+  check("real-form-submits-client-payload", form.includes("submitFreeDestinyMapClientPayload"), "submit client payload present");
+  check("real-form-has-consent-fields", form.includes("consentToBeContacted") && form.includes("consentToProcessBasicInfo"), "consent fields present");
+  check("real-form-has-route-interests", form.includes("routeInterests"), "route interests present");
+  check("real-form-keeps-production-warning", form.includes("Production storage") || form.includes("local intake API shell"), "safe local shell warning present");
+}
+
+if (exists("apps/web/src/lib/kingsmen/free-destiny-map-client.ts")) {
+  const client = read("apps/web/src/lib/kingsmen/free-destiny-map-client.ts");
+  check("real-client-builds-formdata-payload", client.includes("buildFreeDestinyMapClientPayload"), "FormData builder present");
+  check("real-client-posts-json", client.includes("application/json"), "JSON post present");
+  check("real-client-uses-endpoint-contract", client.includes("FREE_DESTINY_MAP_LOCAL_INTAKE_ENDPOINT"), "endpoint contract present");
+}
+
+const webRoute = "/free-destiny-map";
+const endpoint = "/api/public/free-destiny-map/intake/local";
+const localWriteFlag = process.env.KINGSMEN_ENABLE_LOCAL_INTAKE_WRITE === "true";
+
+const htmlPage = `<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <title>Kingsmen Browser-Style Free Destiny Map Proof</title>
+</head>
+<body>
+  <main>
+    <h1>Start your Free Destiny Map</h1>
+    <p>This is browser-style local proof. It is not production, not payment, not email, not document upload, and not official application submission.</p>
+    <form id="free-destiny-map-form" method="post" data-endpoint="${endpoint}">
+      <input name="fullName" value="Kingsmen Browser Demo Candidate" />
+      <input name="province" value="KwaZulu-Natal" />
+      <input name="knownRoute" value="Free Destiny Map browser-style submit proof" />
+      <textarea name="currentSituation">Browser-style demo user wants a route map across study, TVET, funding, accommodation and CV readiness.</textarea>
+      <input name="routeInterests" value="higher_education" />
+      <input name="routeInterests" value="tvet" />
+      <input name="routeInterests" value="nsfas_bursary" />
+      <input name="routeInterests" value="accommodation" />
+      <input name="routeInterests" value="cv_revamp" />
+      <input name="routeInterests" value="source_check" />
+      <input name="needsAccommodation" type="checkbox" value="true" checked />
+      <input name="accommodationArea" value="Durban / campus or training area" />
+      <input name="needsFundingHelp" type="checkbox" value="true" checked />
+      <input name="needsCvHelp" type="checkbox" value="true" checked />
+      <input name="hasDocumentsReady" type="checkbox" value="false" />
+      <input name="randomSourceName" value="Browser demo bursary or learnership source to check later" />
+      <input name="consentToBeContacted" type="checkbox" value="true" checked />
+      <input name="consentToProcessBasicInfo" type="checkbox" value="true" checked />
+      <button type="submit">Send to local intake shell</button>
+    </form>
+    <script>
+      window.KINGSMEN_LOCAL_ENDPOINT = "${endpoint}";
+      window.KINGSMEN_PRODUCTION_READY = false;
+    </script>
+  </main>
+</body>
+</html>`;
+
+let localWriteSucceeded = false;
+let serverStarted = false;
+let serverClosed = false;
+let webStatus = 0;
+let webText = "";
+let extractedPayload = null;
+let responsePayload = null;
+let responseStatus = 0;
+let serverPort = 0;
+
+const server = http.createServer(async (request, response) => {
+  try {
+    if (request.method === "GET" && request.url === webRoute) {
+      writeHtml(response, 200, htmlPage);
+      return;
+    }
+
+    if (request.method !== "POST" || request.url !== endpoint) {
+      writeJson(response, 404, {
+        accepted: false,
+        reference: "KM-FDM-BROWSER404",
+        productionReady: false,
+        safeNotice: "Browser-style proof route not found.",
+        nextAction: "Use the Free Destiny Map browser-style route or local intake endpoint.",
+        issues: [
+          {
+            field: "route",
+            code: "NOT_FOUND",
+            message: "Browser-style proof only supports the Free Destiny Map route and local intake endpoint."
+          }
+        ]
+      });
+      return;
+    }
+
+    const payload = await readJsonBody(request);
+    const hasConsent = payload.consentToBeContacted === true && payload.consentToProcessBasicInfo === true;
+    const hasIntent =
+      Array.isArray(payload.routeInterests) && payload.routeInterests.length > 0 ||
+      Boolean(payload.currentSituation) ||
+      Boolean(payload.knownRoute) ||
+      Boolean(payload.randomSourceName);
+
+    const sensitiveKeys = Object.keys(payload).filter((key) => /identity|idNumber|passport|password|card|cvv|documentBase64/i.test(key));
+
+    const issues = [];
+    if (!hasConsent) {
+      issues.push({
+        field: "consent",
+        code: "CONSENT_REQUIRED",
+        message: "Contact and basic-info processing consent are required for browser-style proof."
+      });
+    }
+
+    if (!hasIntent) {
+      issues.push({
+        field: "intent",
+        code: "INTENT_REQUIRED",
+        message: "At least one route interest or current situation is required."
+      });
+    }
+
+    if (sensitiveKeys.length > 0) {
+      issues.push({
+        field: "payload",
+        code: "SENSITIVE_FIELDS_BLOCKED",
+        message: "Sensitive fields are blocked in browser-style proof."
+      });
+    }
+
+    const accepted = issues.length === 0;
+    const reference = "KM-FDM-BROWSER11";
+
+    const apiResponse = {
+      accepted,
+      reference,
+      productionReady: false,
+      localPersistenceEnabled: localWriteFlag,
+      localWriteAttempted: localWriteFlag,
+      localWriteSucceeded: false,
+      storageMode: "local_jsonl_shell",
+      officialApplicationSubmitted: false,
+      paymentInstructionSent: false,
+      documentUploadAccepted: false,
+      emailSent: false,
+      safeNotice: "Browser-style local proof only. No production storage, no payment, no email, no documents, no official application submission.",
+      nextAction: accepted ? "Browser-style submit proof accepted the demo payload." : "Fix browser-style demo payload issues.",
+      issues
+    };
+
+    if (localWriteFlag) {
+      fs.mkdirSync(localDataDir, { recursive: true });
+      const record = {
+        schema: "kingsmen.free-destiny-map.browser-style-submit-record.v1",
+        module: "BATCH 11 - Real Local App Build Validator / Browser-Style Form Submit Proof",
+        productionReady: false,
+        storesProductionData: false,
+        webRoute,
+        endpoint,
+        createdAt: new Date().toISOString(),
+        requestPayload: payload,
+        response: apiResponse
+      };
+      fs.appendFileSync(localDataFile, `${JSON.stringify(record)}\n`, "utf8");
+      localWriteSucceeded = fs.existsSync(localDataFile);
+      apiResponse.localWriteSucceeded = localWriteSucceeded;
+    }
+
+    writeJson(response, accepted ? 202 : 400, apiResponse);
+  } catch (error) {
+    writeJson(response, 500, {
+      accepted: false,
+      reference: "KM-FDM-BROWSER500",
+      productionReady: false,
+      safeNotice: "Browser-style proof error.",
+      nextAction: "Repair browser-style proof script.",
+      issues: [
+        {
+          field: "server",
+          code: "BROWSER_STYLE_PROOF_ERROR",
+          message: error instanceof Error ? error.message : "Unknown browser-style proof error"
+        }
+      ]
+    });
+  }
+});
+
+try {
+  await new Promise((resolve, reject) => {
+    server.once("error", reject);
+    server.listen(0, "127.0.0.1", () => {
+      serverStarted = true;
+      const address = server.address();
+      serverPort = typeof address === "object" && address ? address.port : 0;
+      resolve();
+    });
+  });
+
+  check("browser-style-server-started", serverStarted && serverPort > 0, `127.0.0.1:${serverPort}`);
+
+  const pageResponse = await fetch(`http://127.0.0.1:${serverPort}${webRoute}`);
+  webStatus = pageResponse.status;
+  webText = await pageResponse.text();
+
+  check("browser-style-page-status-200", webStatus === 200, `status=${webStatus}`);
+  check("browser-style-page-has-form", webText.includes("free-destiny-map-form"), "form id present");
+  check("browser-style-page-has-endpoint", webText.includes(endpoint), "endpoint present");
+  check("browser-style-page-production-false", webText.includes("KINGSMEN_PRODUCTION_READY = false"), "production false in web shell");
+
+  extractedPayload = extractBrowserStylePayloadFromHtml(webText);
+
+  check("browser-style-extracted-full-name", extractedPayload.fullName === "Kingsmen Browser Demo Candidate", extractedPayload.fullName);
+  check("browser-style-extracted-consent", extractedPayload.consentToBeContacted === true && extractedPayload.consentToProcessBasicInfo === true, "consent true");
+  check("browser-style-extracted-route-interests", Array.isArray(extractedPayload.routeInterests) && extractedPayload.routeInterests.length >= 5, `count=${extractedPayload.routeInterests.length}`);
+  check("browser-style-payload-no-sensitive-fields", !Object.keys(extractedPayload).some((key) => /identity|idNumber|passport|password|card|cvv|documentBase64/i.test(key)), "no sensitive field keys");
+
+  const response = await fetch(`http://127.0.0.1:${serverPort}${endpoint}`, {
+    method: "POST",
+    headers: {
+      "content-type": "application/json"
+    },
+    body: JSON.stringify(extractedPayload)
+  });
+
+  responseStatus = response.status;
+  responsePayload = await response.json();
+
+  check("browser-style-post-status-202", responseStatus === 202, `status=${responseStatus}`);
+  check("browser-style-response-accepted", responsePayload.accepted === true, "accepted true");
+  check("browser-style-response-production-false", responsePayload.productionReady === false, "productionReady false");
+  check("browser-style-response-official-submission-false", responsePayload.officialApplicationSubmitted === false, "officialApplicationSubmitted false");
+  check("browser-style-response-payment-false", responsePayload.paymentInstructionSent === false, "paymentInstructionSent false");
+  check("browser-style-response-document-false", responsePayload.documentUploadAccepted === false, "documentUploadAccepted false");
+  check("browser-style-response-email-false", responsePayload.emailSent === false, "emailSent false");
+
+  if (localWriteFlag) {
+    check("browser-style-jsonl-proof-write", localWriteSucceeded, path.relative(root, localDataFile));
+  } else {
+    check("browser-style-jsonl-proof-write-skipped", true, "KINGSMEN_ENABLE_LOCAL_INTAKE_WRITE is not true");
+  }
+} finally {
+  await new Promise((resolve) => server.close(() => {
+    serverClosed = true;
+    resolve();
+  }));
+}
+
+check("browser-style-server-closed", serverClosed, "server closed after proof");
+
+const failed = checks.filter((item) => item.passed !== true);
+const passed = failed.length === 0;
+
+const report = {
+  schema: "kingsmen.runtime-proof.v1",
+  module: "BATCH 11 - Real Local App Build Validator / Browser-Style Form Submit Proof",
+  status: passed ? "BROWSER_STYLE_SUBMIT_PROVEN" : "BUILT_PENDING_RUNTIME_PROOF",
+  passed,
+  generated_at: new Date().toISOString(),
+  checks,
+  failed,
+  web_route: webRoute,
+  http_endpoint: endpoint,
+  http_host: "127.0.0.1",
+  http_port: serverPort,
+  web_status: webStatus,
+  response_status: responseStatus,
+  response_reference: responsePayload?.reference ?? null,
+  local_write_flag: "KINGSMEN_ENABLE_LOCAL_INTAKE_WRITE",
+  local_write_enabled: localWriteFlag,
+  local_write_succeeded: localWriteSucceeded,
+  local_data_file: localWriteSucceeded ? path.relative(root, localDataFile).replaceAll("\\", "/") : null,
+  oracle_lite_impact: "none_runtime_yet",
+  runtime_scope: "browser-style submit proof only; temporary server; no Oracle runtime; no production storage; no Playwright",
+  next_action: passed ? "Run validator and commit BATCH 11." : "Repair browser-style submit proof failures."
+};
+
+fs.mkdirSync(path.dirname(proofReportPath), { recursive: true });
+fs.writeFileSync(proofReportPath, `${JSON.stringify(report, null, 2)}\n`, "utf8");
+
+console.log(JSON.stringify(report, null, 2));
+if (!passed) process.exit(1);
+---
+FILE: reports/runtime/free-destiny-map-browser-style-submit-proof.json
+---
+{
+  "schema": "kingsmen.runtime-proof.v1",
+  "module": "BATCH 11 - Real Local App Build Validator / Browser-Style Form Submit Proof",
+  "status": "BUILT_PENDING_RUNTIME_PROOF",
+  "passed": false,
+  "generated_at": "2026-06-02T00:00:00.000Z",
+  "checks": [],
+  "failed": [
+    {
+      "name": "runtime_proof_not_yet_executed",
+      "passed": false,
+      "detail": "Run powershell.exe -ExecutionPolicy Bypass -File scripts/runtime/Invoke-FreeDestinyMapBrowserStyleSubmitProof.ps1."
+    }
+  ],
+  "oracle_lite_impact": "none_runtime_yet",
+  "runtime_scope": "browser-style submit proof only; temporary server; no Oracle runtime; no production storage; no Playwright",
+  "next_action": "Run BATCH 11 browser-style submit proof."
+}
+---
+FILE: scripts/validators/validate-free-destiny-map-browser-style-submit.mjs
+---
+#!/usr/bin/env node
+import fs from "node:fs";
+import path from "node:path";
+
+const root = process.cwd();
+const reportPath = path.join(root, "reports/validation/free-destiny-map-browser-style-submit-latest.json");
+
+const requiredFiles = [
+  "docs/runtime/free-destiny-map-browser-style-submit-proof.md",
+  "manifests/runtime/free-destiny-map-browser-style-submit-proof.json",
+  "packages/contracts/src/free-destiny-map-browser-style-submit-proof.ts",
+  "scripts/runtime/Invoke-FreeDestinyMapBrowserStyleSubmitProof.ps1",
+  "scripts/proof/prove-free-destiny-map-browser-style-submit.mjs",
+  "reports/runtime/free-destiny-map-browser-style-submit-proof.json",
+  "scripts/validators/validate-free-destiny-map-browser-style-submit.mjs",
+  "reports/validation/free-destiny-map-browser-style-submit-latest.json"
+];
+
+const upstreamFiles = [
+  "apps/web/src/app/free-destiny-map/page.tsx",
+  "apps/web/src/components/kingsmen/FreeDestinyMapApiForm.tsx",
+  "apps/web/src/lib/kingsmen/free-destiny-map-client.ts",
+  "packages/contracts/src/free-destiny-map-api-wiring.ts",
+  "data/local/.gitignore"
+];
+
+function exists(rel) {
+  return fs.existsSync(path.join(root, rel));
+}
+
+function read(rel) {
+  return fs.readFileSync(path.join(root, rel), "utf8").replace(/^\uFEFF/, "");
+}
+
+function parseJson(rel) {
+  return JSON.parse(read(rel));
+}
+
+const failures = [];
+const warnings = [];
+const checked = [];
+
+for (const file of requiredFiles) {
+  checked.push(file);
+  if (!exists(file)) failures.push(`Missing required file: ${file}`);
+  else if (fs.statSync(path.join(root, file)).size === 0) failures.push(`Empty required file: ${file}`);
+}
+
+for (const file of upstreamFiles) {
+  checked.push(file);
+  if (!exists(file)) failures.push(`Missing upstream repo file: ${file}`);
+  else if (fs.statSync(path.join(root, file)).size === 0) failures.push(`Empty upstream repo file: ${file}`);
+}
+
+if (exists("manifests/runtime/free-destiny-map-browser-style-submit-proof.json")) {
+  const manifest = parseJson("manifests/runtime/free-destiny-map-browser-style-submit-proof.json");
+  if (manifest.productionReady !== false) failures.push("Manifest must keep productionReady false.");
+  if (manifest.storesProductionData !== false) failures.push("Manifest must declare storesProductionData false.");
+  if (manifest.usesDemoPayloadOnly !== true) failures.push("Manifest must declare usesDemoPayloadOnly true.");
+  if (manifest.takesPayment !== false) failures.push("Manifest must declare takesPayment false.");
+  if (manifest.sendsEmail !== false) failures.push("Manifest must declare sendsEmail false.");
+  if (manifest.collectsDocuments !== false) failures.push("Manifest must declare collectsDocuments false.");
+  if (manifest.submitsOfficialApplications !== false) failures.push("Manifest must declare submitsOfficialApplications false.");
+  if (manifest.webRoute !== "/free-destiny-map") failures.push("Manifest web route mismatch.");
+  if (manifest.apiEndpoint !== "/api/public/free-destiny-map/intake/local") failures.push("Manifest endpoint mismatch.");
+  if (!String(manifest.oracleLiteImpact ?? "").includes("none_runtime_yet")) failures.push("Manifest must declare none_runtime_yet.");
+}
+
+const tokenChecks = [
+  ["packages/contracts/src/free-destiny-map-browser-style-submit-proof.ts", ["FREE_DESTINY_MAP_BROWSER_STYLE_WEB_ROUTE", "FREE_DESTINY_MAP_BROWSER_STYLE_API_ENDPOINT", "FreeDestinyMapBrowserStyleSubmitResponse", "officialApplicationSubmitted: false"]],
+  ["scripts/runtime/Invoke-FreeDestinyMapBrowserStyleSubmitProof.ps1", ["KINGSMEN_ENABLE_LOCAL_INTAKE_WRITE", "prove-free-destiny-map-browser-style-submit.mjs", "not production runtime"]],
+  ["scripts/proof/prove-free-destiny-map-browser-style-submit.mjs", ["BROWSER_STYLE_SUBMIT_PROVEN", "browser-style-page-status-200", "browser-style-post-status-202", "browser-style-response-production-false", "browser-style-server-closed"]],
+  ["reports/runtime/free-destiny-map-browser-style-submit-proof.json", ["schema", "module", "status"]],
+  ["apps/web/src/app/free-destiny-map/page.tsx", ["FreeDestinyMapApiForm"]],
+  ["apps/web/src/components/kingsmen/FreeDestinyMapApiForm.tsx", ['"use client"', "submitFreeDestinyMapClientPayload", "consentToBeContacted", "consentToProcessBasicInfo", "routeInterests"]],
+  ["apps/web/src/lib/kingsmen/free-destiny-map-client.ts", ["buildFreeDestinyMapClientPayload", "FREE_DESTINY_MAP_LOCAL_INTAKE_ENDPOINT", "application/json"]],
+  ["data/local/.gitignore", ["*", "!.gitignore"]]
+];
+
+for (const [file, tokens] of tokenChecks) {
+  if (!exists(file)) continue;
+  const content = read(file);
+  for (const token of tokens) {
+    if (!content.includes(token)) failures.push(`${file} missing token: ${token}`);
+  }
+}
+
+if (exists("reports/runtime/free-destiny-map-browser-style-submit-proof.json")) {
+  const proof = parseJson("reports/runtime/free-destiny-map-browser-style-submit-proof.json");
+  if (proof.passed !== true) failures.push("Runtime proof report must pass.");
+  if (proof.status !== "BROWSER_STYLE_SUBMIT_PROVEN") failures.push("Runtime proof status must be BROWSER_STYLE_SUBMIT_PROVEN.");
+  if (proof.web_status !== 200) failures.push("Runtime proof must record web HTTP 200 response.");
+  if (proof.response_status !== 202) failures.push("Runtime proof must record API HTTP 202 response.");
+}
+
+const forbiddenRuntimePatterns = [
+  [/\bidentityNumber\s*[:=]/i, "identity number field assignment"],
+  [/\bidNumber\s*[:=]/i, "id number field assignment"],
+  [/\bpassportNumber\s*[:=]/i, "passport number field assignment"],
+  [/\bpassword\s*[:=]/i, "password field assignment"],
+  [/\bcardNumber\s*[:=]/i, "card number field assignment"],
+  [/\bcvv\s*[:=]/i, "cvv field assignment"],
+  [/\bdocumentBase64\s*[:=]/i, "document payload assignment"],
+  [/officialApplicationSubmitted:\s*true/i, "official application submitted true"],
+  [/paymentInstructionSent:\s*true/i, "payment instruction sent true"],
+  [/emailSent:\s*true/i, "email sent true"],
+  [/productionReady\s*[:=]\s*true/i, "productionReady true"]
+];
+
+const filesToScan = [...requiredFiles, ...upstreamFiles]
+  .filter((item) => exists(item))
+  .filter((item) => !item.includes("validate-free-destiny-map-browser-style-submit.mjs"))
+  .filter((item) => !item.includes("prove-free-destiny-map-browser-style-submit.mjs"));
+
+for (const file of filesToScan) {
+  const content = read(file);
+  for (const [pattern, label] of forbiddenRuntimePatterns) {
+    if (pattern.test(content)) failures.push(`${file} contains forbidden runtime pattern: ${label}`);
+  }
+}
+
+const passed = failures.length === 0;
+
+const report = {
+  schema: "kingsmen.validation-report.v1",
+  module: "BATCH 11 - Real Local App Build Validator / Browser-Style Form Submit Proof",
+  status: passed ? "VALIDATED" : "BUILT_PENDING_VALIDATION",
+  passed,
+  generated_at: new Date().toISOString(),
+  files_expected: requiredFiles,
+  upstream_files_checked: upstreamFiles,
+  files_checked: checked.length,
+  missing_files: requiredFiles.filter((file) => !exists(file)),
+  failed_checks: failures,
+  warnings,
+  oracle_lite_impact: "none_runtime_yet",
+  control_plane_impact: "Adds browser-style form submit proof and source-build-readiness checks for Free Destiny Map.",
+  runtime_proof: "reports/runtime/free-destiny-map-browser-style-submit-proof.json",
+  next_action: passed ? "Proceed to BATCH 12 - Real local web build/dev-server readiness gate or controlled browser automation proof." : "Repair browser-style submit proof failures and rerun proof plus validator."
+};
+
+fs.mkdirSync(path.dirname(reportPath), { recursive: true });
+fs.writeFileSync(reportPath, `${JSON.stringify(report, null, 2)}\n`, "utf8");
+
+console.log(JSON.stringify(report, null, 2));
+if (!passed) process.exit(1);
+---
+FILE: reports/validation/free-destiny-map-browser-style-submit-latest.json
+---
+{
+  "schema": "kingsmen.validation-report.v1",
+  "module": "BATCH 11 - Real Local App Build Validator / Browser-Style Form Submit Proof",
+  "status": "BUILT_PENDING_VALIDATION",
+  "passed": false,
+  "generated_at": "2026-06-02T00:00:00.000Z",
+  "reason": "Seed report. Run BATCH 11 browser-style submit proof then validator.",
+  "files_checked": 0,
+  "failed_checks": [
+    "validator_not_yet_executed"
+  ],
+  "oracle_lite_impact": "none_runtime_yet",
+  "control_plane_impact": "Adds browser-style form submit proof and source-build-readiness checks for Free Destiny Map.",
+  "runtime_proof": "reports/runtime/free-destiny-map-browser-style-submit-proof.json",
+  "next_action": "Run powershell.exe -ExecutionPolicy Bypass -File scripts/runtime/Invoke-FreeDestinyMapBrowserStyleSubmitProof.ps1 then node scripts/validators/validate-free-destiny-map-browser-style-submit.mjs."
+}

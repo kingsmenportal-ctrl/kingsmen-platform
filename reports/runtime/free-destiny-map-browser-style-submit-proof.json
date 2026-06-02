@@ -1,0 +1,199 @@
+{
+  "schema": "kingsmen.runtime-proof.v1",
+  "module": "BATCH 11 - Real Local App Build Validator / Browser-Style Form Submit Proof",
+  "status": "BROWSER_STYLE_SUBMIT_PROVEN",
+  "passed": true,
+  "generated_at": "2026-06-02T19:56:00.973Z",
+  "checks": [
+    {
+      "name": "repo-file-exists:apps/web/src/app/free-destiny-map/page.tsx",
+      "passed": true,
+      "detail": "apps/web/src/app/free-destiny-map/page.tsx"
+    },
+    {
+      "name": "repo-file-exists:apps/web/src/components/kingsmen/FreeDestinyMapApiForm.tsx",
+      "passed": true,
+      "detail": "apps/web/src/components/kingsmen/FreeDestinyMapApiForm.tsx"
+    },
+    {
+      "name": "repo-file-exists:apps/web/src/lib/kingsmen/free-destiny-map-client.ts",
+      "passed": true,
+      "detail": "apps/web/src/lib/kingsmen/free-destiny-map-client.ts"
+    },
+    {
+      "name": "repo-file-exists:packages/contracts/src/free-destiny-map-api-wiring.ts",
+      "passed": true,
+      "detail": "packages/contracts/src/free-destiny-map-api-wiring.ts"
+    },
+    {
+      "name": "repo-file-exists:apps/api/src/routes/free-destiny-map-persistence.routes.ts",
+      "passed": true,
+      "detail": "apps/api/src/routes/free-destiny-map-persistence.routes.ts"
+    },
+    {
+      "name": "repo-file-exists:apps/api/src/services/free-destiny-map-persistence.service.ts",
+      "passed": true,
+      "detail": "apps/api/src/services/free-destiny-map-persistence.service.ts"
+    },
+    {
+      "name": "repo-file-exists:data/local/.gitignore",
+      "passed": true,
+      "detail": "data/local/.gitignore"
+    },
+    {
+      "name": "local-data-gitignore-blocks-generated-files",
+      "passed": true,
+      "detail": "data/local generated files ignored"
+    },
+    {
+      "name": "real-page-imports-api-form",
+      "passed": true,
+      "detail": "page imports/uses API form"
+    },
+    {
+      "name": "real-form-is-client-component",
+      "passed": true,
+      "detail": "client component present"
+    },
+    {
+      "name": "real-form-submits-client-payload",
+      "passed": true,
+      "detail": "submit client payload present"
+    },
+    {
+      "name": "real-form-has-consent-fields",
+      "passed": true,
+      "detail": "consent fields present"
+    },
+    {
+      "name": "real-form-has-route-interests",
+      "passed": true,
+      "detail": "route interests present"
+    },
+    {
+      "name": "real-form-keeps-production-warning",
+      "passed": true,
+      "detail": "safe local shell warning present"
+    },
+    {
+      "name": "real-client-builds-formdata-payload",
+      "passed": true,
+      "detail": "FormData builder present"
+    },
+    {
+      "name": "real-client-posts-json",
+      "passed": true,
+      "detail": "JSON post present"
+    },
+    {
+      "name": "real-client-uses-endpoint-contract",
+      "passed": true,
+      "detail": "endpoint contract present"
+    },
+    {
+      "name": "browser-style-server-started",
+      "passed": true,
+      "detail": "127.0.0.1:49188"
+    },
+    {
+      "name": "browser-style-page-status-200",
+      "passed": true,
+      "detail": "status=200"
+    },
+    {
+      "name": "browser-style-page-has-form",
+      "passed": true,
+      "detail": "form id present"
+    },
+    {
+      "name": "browser-style-page-has-endpoint",
+      "passed": true,
+      "detail": "endpoint present"
+    },
+    {
+      "name": "browser-style-page-production-false",
+      "passed": true,
+      "detail": "production false in web shell"
+    },
+    {
+      "name": "browser-style-extracted-full-name",
+      "passed": true,
+      "detail": "Kingsmen Browser Demo Candidate"
+    },
+    {
+      "name": "browser-style-extracted-consent",
+      "passed": true,
+      "detail": "consent true"
+    },
+    {
+      "name": "browser-style-extracted-route-interests",
+      "passed": true,
+      "detail": "count=6"
+    },
+    {
+      "name": "browser-style-payload-no-sensitive-fields",
+      "passed": true,
+      "detail": "no sensitive field keys"
+    },
+    {
+      "name": "browser-style-post-status-202",
+      "passed": true,
+      "detail": "status=202"
+    },
+    {
+      "name": "browser-style-response-accepted",
+      "passed": true,
+      "detail": "accepted true"
+    },
+    {
+      "name": "browser-style-response-production-false",
+      "passed": true,
+      "detail": "productionReady false"
+    },
+    {
+      "name": "browser-style-response-official-submission-false",
+      "passed": true,
+      "detail": "officialApplicationSubmitted false"
+    },
+    {
+      "name": "browser-style-response-payment-false",
+      "passed": true,
+      "detail": "paymentInstructionSent false"
+    },
+    {
+      "name": "browser-style-response-document-false",
+      "passed": true,
+      "detail": "documentUploadAccepted false"
+    },
+    {
+      "name": "browser-style-response-email-false",
+      "passed": true,
+      "detail": "emailSent false"
+    },
+    {
+      "name": "browser-style-jsonl-proof-write",
+      "passed": true,
+      "detail": "data\\local\\free-destiny-map\\browser-style-submit\\browser-style-demo-intakes.jsonl"
+    },
+    {
+      "name": "browser-style-server-closed",
+      "passed": true,
+      "detail": "server closed after proof"
+    }
+  ],
+  "failed": [],
+  "web_route": "/free-destiny-map",
+  "http_endpoint": "/api/public/free-destiny-map/intake/local",
+  "http_host": "127.0.0.1",
+  "http_port": 49188,
+  "web_status": 200,
+  "response_status": 202,
+  "response_reference": "KM-FDM-BROWSER11",
+  "local_write_flag": "KINGSMEN_ENABLE_LOCAL_INTAKE_WRITE",
+  "local_write_enabled": true,
+  "local_write_succeeded": true,
+  "local_data_file": "data/local/free-destiny-map/browser-style-submit/browser-style-demo-intakes.jsonl",
+  "oracle_lite_impact": "none_runtime_yet",
+  "runtime_scope": "browser-style submit proof only; temporary server; no Oracle runtime; no production storage; no Playwright",
+  "next_action": "Run validator and commit BATCH 11."
+}

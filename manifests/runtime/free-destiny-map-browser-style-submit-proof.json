@@ -1,0 +1,40 @@
+{
+  "schema": "kingsmen.browser-style-submit-proof.v1",
+  "module": "BATCH 11 - Real Local App Build Validator / Browser-Style Form Submit Proof",
+  "status": "BUILT_PENDING_VALIDATION",
+  "productionReady": false,
+  "sourceBatches": [
+    "BATCH 07 - Public Form to Intake API Wiring / Local API Boot Proof",
+    "BATCH 09 - Local HTTP API Boot Shell / First End-to-End Local HTTP Route Exercise",
+    "BATCH 10 - Local Web-to-HTTP Exercise / Minimal App Boot Proof"
+  ],
+  "webRoute": "/free-destiny-map",
+  "apiEndpoint": "/api/public/free-destiny-map/intake/local",
+  "httpHost": "127.0.0.1",
+  "httpPortMode": "ephemeral",
+  "proofCommand": "powershell.exe -ExecutionPolicy Bypass -File scripts/runtime/Invoke-FreeDestinyMapBrowserStyleSubmitProof.ps1",
+  "proofScript": "scripts/proof/prove-free-destiny-map-browser-style-submit.mjs",
+  "proofReport": "reports/runtime/free-destiny-map-browser-style-submit-proof.json",
+  "validationReport": "reports/validation/free-destiny-map-browser-style-submit-latest.json",
+  "localExerciseDataDirectory": "data/local/free-destiny-map/browser-style-submit",
+  "localWriteFlag": "KINGSMEN_ENABLE_LOCAL_INTAKE_WRITE",
+  "storesProductionData": false,
+  "usesDemoPayloadOnly": true,
+  "takesPayment": false,
+  "sendsEmail": false,
+  "collectsDocuments": false,
+  "submitsOfficialApplications": false,
+  "oracleLiteImpact": "none_runtime_yet",
+  "controlPlaneImpact": "Adds browser-style form submit proof for the real Free Destiny Map repo surface.",
+  "requiredFiles": [
+    "docs/runtime/free-destiny-map-browser-style-submit-proof.md",
+    "manifests/runtime/free-destiny-map-browser-style-submit-proof.json",
+    "packages/contracts/src/free-destiny-map-browser-style-submit-proof.ts",
+    "scripts/runtime/Invoke-FreeDestinyMapBrowserStyleSubmitProof.ps1",
+    "scripts/proof/prove-free-destiny-map-browser-style-submit.mjs",
+    "reports/runtime/free-destiny-map-browser-style-submit-proof.json",
+    "scripts/validators/validate-free-destiny-map-browser-style-submit.mjs",
+    "reports/validation/free-destiny-map-browser-style-submit-latest.json"
+  ],
+  "nextAction": "Run powershell.exe -ExecutionPolicy Bypass -File scripts/runtime/Invoke-FreeDestinyMapBrowserStyleSubmitProof.ps1 then node scripts/validators/validate-free-destiny-map-browser-style-submit.mjs"
+}

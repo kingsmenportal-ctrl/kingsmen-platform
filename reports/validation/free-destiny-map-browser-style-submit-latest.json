@@ -1,0 +1,32 @@
+{
+  "schema": "kingsmen.validation-report.v1",
+  "module": "BATCH 11 - Real Local App Build Validator / Browser-Style Form Submit Proof",
+  "status": "VALIDATED",
+  "passed": true,
+  "generated_at": "2026-06-02T19:56:01.174Z",
+  "files_expected": [
+    "docs/runtime/free-destiny-map-browser-style-submit-proof.md",
+    "manifests/runtime/free-destiny-map-browser-style-submit-proof.json",
+    "packages/contracts/src/free-destiny-map-browser-style-submit-proof.ts",
+    "scripts/runtime/Invoke-FreeDestinyMapBrowserStyleSubmitProof.ps1",
+    "scripts/proof/prove-free-destiny-map-browser-style-submit.mjs",
+    "reports/runtime/free-destiny-map-browser-style-submit-proof.json",
+    "scripts/validators/validate-free-destiny-map-browser-style-submit.mjs",
+    "reports/validation/free-destiny-map-browser-style-submit-latest.json"
+  ],
+  "upstream_files_checked": [
+    "apps/web/src/app/free-destiny-map/page.tsx",
+    "apps/web/src/components/kingsmen/FreeDestinyMapApiForm.tsx",
+    "apps/web/src/lib/kingsmen/free-destiny-map-client.ts",
+    "packages/contracts/src/free-destiny-map-api-wiring.ts",
+    "data/local/.gitignore"
+  ],
+  "files_checked": 13,
+  "missing_files": [],
+  "failed_checks": [],
+  "warnings": [],
+  "oracle_lite_impact": "none_runtime_yet",
+  "control_plane_impact": "Adds browser-style form submit proof and source-build-readiness checks for Free Destiny Map.",
+  "runtime_proof": "reports/runtime/free-destiny-map-browser-style-submit-proof.json",
+  "next_action": "Proceed to BATCH 12 - Real local web build/dev-server readiness gate or controlled browser automation proof."
+}

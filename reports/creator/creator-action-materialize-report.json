@@ -4,7 +4,7 @@
     "submodule":  "CREATOR.2B",
     "action":  "Materialize",
     "productionReady":  false,
-    "generatedAt":  "2026-06-02T19:41:49.080Z",
+    "generatedAt":  "2026-06-02T19:55:59.761Z",
     "repoRoot":  "C:\\Users\\dell\\kingsmen-platform",
     "passed":  true,
     "detail":  "Materialize complete.",
@@ -20,42 +20,42 @@
                        "detail":  "blocks=8"
                    },
                    {
-                       "name":  "materialize:wrote:docs/runtime/free-destiny-map-local-web-http-exercise.md",
+                       "name":  "materialize:wrote:docs/runtime/free-destiny-map-browser-style-submit-proof.md",
                        "passed":  true,
                        "detail":  "written"
                    },
                    {
-                       "name":  "materialize:wrote:manifests/runtime/free-destiny-map-local-web-http-exercise.json",
+                       "name":  "materialize:wrote:manifests/runtime/free-destiny-map-browser-style-submit-proof.json",
                        "passed":  true,
                        "detail":  "written"
                    },
                    {
-                       "name":  "materialize:wrote:packages/contracts/src/free-destiny-map-local-web-http-exercise.ts",
+                       "name":  "materialize:wrote:packages/contracts/src/free-destiny-map-browser-style-submit-proof.ts",
                        "passed":  true,
                        "detail":  "written"
                    },
                    {
-                       "name":  "materialize:wrote:scripts/runtime/Invoke-FreeDestinyMapLocalWebHttpExercise.ps1",
+                       "name":  "materialize:wrote:scripts/runtime/Invoke-FreeDestinyMapBrowserStyleSubmitProof.ps1",
                        "passed":  true,
                        "detail":  "written"
                    },
                    {
-                       "name":  "materialize:wrote:scripts/proof/prove-free-destiny-map-local-web-http-exercise.mjs",
+                       "name":  "materialize:wrote:scripts/proof/prove-free-destiny-map-browser-style-submit.mjs",
                        "passed":  true,
                        "detail":  "written"
                    },
                    {
-                       "name":  "materialize:wrote:reports/runtime/free-destiny-map-local-web-http-exercise-proof.json",
+                       "name":  "materialize:wrote:reports/runtime/free-destiny-map-browser-style-submit-proof.json",
                        "passed":  true,
                        "detail":  "written"
                    },
                    {
-                       "name":  "materialize:wrote:scripts/validators/validate-free-destiny-map-local-web-http-exercise.mjs",
+                       "name":  "materialize:wrote:scripts/validators/validate-free-destiny-map-browser-style-submit.mjs",
                        "passed":  true,
                        "detail":  "written"
                    },
                    {
-                       "name":  "materialize:wrote:reports/validation/free-destiny-map-local-web-http-exercise-latest.json",
+                       "name":  "materialize:wrote:reports/validation/free-destiny-map-browser-style-submit-latest.json",
                        "passed":  true,
                        "detail":  "written"
                    }
