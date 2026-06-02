@@ -4,11 +4,11 @@ import { useState } from "react";
 import {
   buildFreeDestinyMapClientPayload,
   submitFreeDestinyMapClientPayload
-} from "../..//lib/kingsmen/free-destiny-map-client";
+} from "../../lib/kingsmen/free-destiny-map-client";
 import {
   FREE_DESTINY_MAP_API_WIRING_NOTICE,
   type FreeDestinyMapClientResponse
-} from "../../../../packages/contracts/src/free-destiny-map-api-wiring";
+} from "../../../../../packages/contracts/src/free-destiny-map-api-wiring";
 
 const routeOptions = [
   ["higher_education", "University"],

@@ -1,0 +1,356 @@
+{
+  "schema": "kingsmen.real-web-runtime-repair-report.v1",
+  "module": "BATCH 13 - Repair Real Web Build Blockers / Add Next App Package Runtime",
+  "status": "WEB_RUNTIME_REPAIR_APPLIED",
+  "passed": true,
+  "productionReady": false,
+  "canClaimProduction": false,
+  "canAttemptNextControlledBoot": true,
+  "generated_at": "2026-06-02T20:13:21.168Z",
+  "checks": [
+    {
+      "name": "apps-web-package-json-exists",
+      "passed": true,
+      "detail": "apps/web/package.json"
+    },
+    {
+      "name": "apps-web-gitignore-exists",
+      "passed": true,
+      "detail": "apps/web/.gitignore"
+    },
+    {
+      "name": "apps-web-next-config-exists",
+      "passed": true,
+      "detail": "apps/web/next.config.mjs"
+    },
+    {
+      "name": "apps-web-tsconfig-exists",
+      "passed": true,
+      "detail": "apps/web/tsconfig.json"
+    },
+    {
+      "name": "apps-web-next-env-exists",
+      "passed": true,
+      "detail": "apps/web/next-env.d.ts"
+    },
+    {
+      "name": "apps-web-root-layout-exists",
+      "passed": true,
+      "detail": "apps/web/src/app/layout.tsx"
+    },
+    {
+      "name": "web-dev-script-present",
+      "passed": true,
+      "detail": "next dev --hostname 127.0.0.1"
+    },
+    {
+      "name": "web-build-script-present",
+      "passed": true,
+      "detail": "next build"
+    },
+    {
+      "name": "web-start-script-present",
+      "passed": true,
+      "detail": "next start --hostname 127.0.0.1"
+    },
+    {
+      "name": "next-dependency-declared",
+      "passed": true,
+      "detail": "^15.5.0"
+    },
+    {
+      "name": "react-dependency-declared",
+      "passed": true,
+      "detail": "^19.1.0"
+    },
+    {
+      "name": "react-dom-dependency-declared",
+      "passed": true,
+      "detail": "^19.1.0"
+    },
+    {
+      "name": "typescript-dev-dependency-declared",
+      "passed": true,
+      "detail": "^5.8.0"
+    },
+    {
+      "name": "react-types-declared",
+      "passed": true,
+      "detail": "^19.0.0"
+    },
+    {
+      "name": "web-gitignore-blocks-node-modules",
+      "passed": true,
+      "detail": "node_modules ignored"
+    },
+    {
+      "name": "web-gitignore-blocks-next-output",
+      "passed": true,
+      "detail": ".next ignored"
+    },
+    {
+      "name": "layout-exports-root-layout",
+      "passed": true,
+      "detail": "RootLayout present"
+    },
+    {
+      "name": "layout-keeps-local-shell-branding",
+      "passed": true,
+      "detail": "Kingsmen metadata present"
+    },
+    {
+      "name": "form-client-import-path-repaired",
+      "passed": true,
+      "detail": "client import path"
+    },
+    {
+      "name": "form-contract-import-path-repaired",
+      "passed": true,
+      "detail": "contract import path"
+    },
+    {
+      "name": "form-still-client-component",
+      "passed": true,
+      "detail": "client directive present"
+    },
+    {
+      "name": "form-still-has-consent-fields",
+      "passed": true,
+      "detail": "consent fields present"
+    },
+    {
+      "name": "dependency-install-evidence-present",
+      "passed": true,
+      "detail": "apps/web/node_modules contains next/react/react-dom"
+    },
+    {
+      "name": "web-package-lock-created",
+      "passed": true,
+      "detail": "apps/web/package-lock.json"
+    },
+    {
+      "name": "forbidden-pattern-absent:apps/web/package.json:identity number field assignment",
+      "passed": true,
+      "detail": "identity number field assignment"
+    },
+    {
+      "name": "forbidden-pattern-absent:apps/web/package.json:id number field assignment",
+      "passed": true,
+      "detail": "id number field assignment"
+    },
+    {
+      "name": "forbidden-pattern-absent:apps/web/package.json:passport number field assignment",
+      "passed": true,
+      "detail": "passport number field assignment"
+    },
+    {
+      "name": "forbidden-pattern-absent:apps/web/package.json:password field assignment",
+      "passed": true,
+      "detail": "password field assignment"
+    },
+    {
+      "name": "forbidden-pattern-absent:apps/web/package.json:card number field assignment",
+      "passed": true,
+      "detail": "card number field assignment"
+    },
+    {
+      "name": "forbidden-pattern-absent:apps/web/package.json:cvv field assignment",
+      "passed": true,
+      "detail": "cvv field assignment"
+    },
+    {
+      "name": "forbidden-pattern-absent:apps/web/package.json:document payload assignment",
+      "passed": true,
+      "detail": "document payload assignment"
+    },
+    {
+      "name": "forbidden-pattern-absent:apps/web/package.json:official application submitted true",
+      "passed": true,
+      "detail": "official application submitted true"
+    },
+    {
+      "name": "forbidden-pattern-absent:apps/web/package.json:payment instruction sent true",
+      "passed": true,
+      "detail": "payment instruction sent true"
+    },
+    {
+      "name": "forbidden-pattern-absent:apps/web/package.json:email sent true",
+      "passed": true,
+      "detail": "email sent true"
+    },
+    {
+      "name": "forbidden-pattern-absent:apps/web/package.json:productionReady true",
+      "passed": true,
+      "detail": "productionReady true"
+    },
+    {
+      "name": "forbidden-pattern-absent:apps/web/src/app/layout.tsx:identity number field assignment",
+      "passed": true,
+      "detail": "identity number field assignment"
+    },
+    {
+      "name": "forbidden-pattern-absent:apps/web/src/app/layout.tsx:id number field assignment",
+      "passed": true,
+      "detail": "id number field assignment"
+    },
+    {
+      "name": "forbidden-pattern-absent:apps/web/src/app/layout.tsx:passport number field assignment",
+      "passed": true,
+      "detail": "passport number field assignment"
+    },
+    {
+      "name": "forbidden-pattern-absent:apps/web/src/app/layout.tsx:password field assignment",
+      "passed": true,
+      "detail": "password field assignment"
+    },
+    {
+      "name": "forbidden-pattern-absent:apps/web/src/app/layout.tsx:card number field assignment",
+      "passed": true,
+      "detail": "card number field assignment"
+    },
+    {
+      "name": "forbidden-pattern-absent:apps/web/src/app/layout.tsx:cvv field assignment",
+      "passed": true,
+      "detail": "cvv field assignment"
+    },
+    {
+      "name": "forbidden-pattern-absent:apps/web/src/app/layout.tsx:document payload assignment",
+      "passed": true,
+      "detail": "document payload assignment"
+    },
+    {
+      "name": "forbidden-pattern-absent:apps/web/src/app/layout.tsx:official application submitted true",
+      "passed": true,
+      "detail": "official application submitted true"
+    },
+    {
+      "name": "forbidden-pattern-absent:apps/web/src/app/layout.tsx:payment instruction sent true",
+      "passed": true,
+      "detail": "payment instruction sent true"
+    },
+    {
+      "name": "forbidden-pattern-absent:apps/web/src/app/layout.tsx:email sent true",
+      "passed": true,
+      "detail": "email sent true"
+    },
+    {
+      "name": "forbidden-pattern-absent:apps/web/src/app/layout.tsx:productionReady true",
+      "passed": true,
+      "detail": "productionReady true"
+    },
+    {
+      "name": "forbidden-pattern-absent:apps/web/src/components/kingsmen/FreeDestinyMapApiForm.tsx:identity number field assignment",
+      "passed": true,
+      "detail": "identity number field assignment"
+    },
+    {
+      "name": "forbidden-pattern-absent:apps/web/src/components/kingsmen/FreeDestinyMapApiForm.tsx:id number field assignment",
+      "passed": true,
+      "detail": "id number field assignment"
+    },
+    {
+      "name": "forbidden-pattern-absent:apps/web/src/components/kingsmen/FreeDestinyMapApiForm.tsx:passport number field assignment",
+      "passed": true,
+      "detail": "passport number field assignment"
+    },
+    {
+      "name": "forbidden-pattern-absent:apps/web/src/components/kingsmen/FreeDestinyMapApiForm.tsx:password field assignment",
+      "passed": true,
+      "detail": "password field assignment"
+    },
+    {
+      "name": "forbidden-pattern-absent:apps/web/src/components/kingsmen/FreeDestinyMapApiForm.tsx:card number field assignment",
+      "passed": true,
+      "detail": "card number field assignment"
+    },
+    {
+      "name": "forbidden-pattern-absent:apps/web/src/components/kingsmen/FreeDestinyMapApiForm.tsx:cvv field assignment",
+      "passed": true,
+      "detail": "cvv field assignment"
+    },
+    {
+      "name": "forbidden-pattern-absent:apps/web/src/components/kingsmen/FreeDestinyMapApiForm.tsx:document payload assignment",
+      "passed": true,
+      "detail": "document payload assignment"
+    },
+    {
+      "name": "forbidden-pattern-absent:apps/web/src/components/kingsmen/FreeDestinyMapApiForm.tsx:official application submitted true",
+      "passed": true,
+      "detail": "official application submitted true"
+    },
+    {
+      "name": "forbidden-pattern-absent:apps/web/src/components/kingsmen/FreeDestinyMapApiForm.tsx:payment instruction sent true",
+      "passed": true,
+      "detail": "payment instruction sent true"
+    },
+    {
+      "name": "forbidden-pattern-absent:apps/web/src/components/kingsmen/FreeDestinyMapApiForm.tsx:email sent true",
+      "passed": true,
+      "detail": "email sent true"
+    },
+    {
+      "name": "forbidden-pattern-absent:apps/web/src/components/kingsmen/FreeDestinyMapApiForm.tsx:productionReady true",
+      "passed": true,
+      "detail": "productionReady true"
+    },
+    {
+      "name": "forbidden-pattern-absent:apps/web/src/lib/kingsmen/free-destiny-map-client.ts:identity number field assignment",
+      "passed": true,
+      "detail": "identity number field assignment"
+    },
+    {
+      "name": "forbidden-pattern-absent:apps/web/src/lib/kingsmen/free-destiny-map-client.ts:id number field assignment",
+      "passed": true,
+      "detail": "id number field assignment"
+    },
+    {
+      "name": "forbidden-pattern-absent:apps/web/src/lib/kingsmen/free-destiny-map-client.ts:passport number field assignment",
+      "passed": true,
+      "detail": "passport number field assignment"
+    },
+    {
+      "name": "forbidden-pattern-absent:apps/web/src/lib/kingsmen/free-destiny-map-client.ts:password field assignment",
+      "passed": true,
+      "detail": "password field assignment"
+    },
+    {
+      "name": "forbidden-pattern-absent:apps/web/src/lib/kingsmen/free-destiny-map-client.ts:card number field assignment",
+      "passed": true,
+      "detail": "card number field assignment"
+    },
+    {
+      "name": "forbidden-pattern-absent:apps/web/src/lib/kingsmen/free-destiny-map-client.ts:cvv field assignment",
+      "passed": true,
+      "detail": "cvv field assignment"
+    },
+    {
+      "name": "forbidden-pattern-absent:apps/web/src/lib/kingsmen/free-destiny-map-client.ts:document payload assignment",
+      "passed": true,
+      "detail": "document payload assignment"
+    },
+    {
+      "name": "forbidden-pattern-absent:apps/web/src/lib/kingsmen/free-destiny-map-client.ts:official application submitted true",
+      "passed": true,
+      "detail": "official application submitted true"
+    },
+    {
+      "name": "forbidden-pattern-absent:apps/web/src/lib/kingsmen/free-destiny-map-client.ts:payment instruction sent true",
+      "passed": true,
+      "detail": "payment instruction sent true"
+    },
+    {
+      "name": "forbidden-pattern-absent:apps/web/src/lib/kingsmen/free-destiny-map-client.ts:email sent true",
+      "passed": true,
+      "detail": "email sent true"
+    },
+    {
+      "name": "forbidden-pattern-absent:apps/web/src/lib/kingsmen/free-destiny-map-client.ts:productionReady true",
+      "passed": true,
+      "detail": "productionReady true"
+    }
+  ],
+  "failed": [],
+  "oracle_lite_impact": "none_runtime_yet",
+  "runtime_scope": "local web runtime dependency and package repair only; no production build; no long-running server",
+  "next_action": "Rerun BATCH 12 readiness. If it becomes READY_FOR_CONTROLLED_LOCAL_BOOT, proceed to BATCH 14 controlled local web boot proof."
+}

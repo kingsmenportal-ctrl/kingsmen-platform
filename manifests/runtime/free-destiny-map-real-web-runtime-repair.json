@@ -1,0 +1,41 @@
+{
+  "schema": "kingsmen.real-web-runtime-repair.v1",
+  "module": "BATCH 13 - Repair Real Web Build Blockers / Add Next App Package Runtime",
+  "status": "BUILT_PENDING_VALIDATION",
+  "productionReady": false,
+  "repairsBatch": "BATCH 12 - Real Local Web Build / Dev-Server Readiness Gate",
+  "repairs": [
+    "root-or-web-build-script-discoverable",
+    "root-or-web-dev-script-discoverable",
+    "next-dependency-declared",
+    "react-dependency-declared",
+    "react-dom-dependency-declared",
+    "dependency-install-evidence-present"
+  ],
+  "webPackage": "apps/web/package.json",
+  "installCommand": "npm install --prefix apps/web --no-audit --no-fund",
+  "storesProductionData": false,
+  "takesPayment": false,
+  "sendsEmail": false,
+  "collectsDocuments": false,
+  "submitsOfficialApplications": false,
+  "oracleLiteImpact": "none_runtime_yet",
+  "controlPlaneImpact": "Repairs real web runtime readiness blockers so the next batch can attempt controlled local boot.",
+  "requiredFiles": [
+    "docs/runtime/free-destiny-map-real-web-runtime-repair.md",
+    "manifests/runtime/free-destiny-map-real-web-runtime-repair.json",
+    "apps/web/package.json",
+    "apps/web/.gitignore",
+    "apps/web/next.config.mjs",
+    "apps/web/tsconfig.json",
+    "apps/web/next-env.d.ts",
+    "apps/web/src/app/layout.tsx",
+    "packages/contracts/src/free-destiny-map-real-web-runtime-repair.ts",
+    "scripts/runtime/Invoke-FreeDestinyMapWebRuntimeRepair.ps1",
+    "scripts/proof/prove-free-destiny-map-real-web-runtime-repair.mjs",
+    "reports/runtime/free-destiny-map-real-web-runtime-repair-proof.json",
+    "scripts/validators/validate-free-destiny-map-real-web-runtime-repair.mjs",
+    "reports/validation/free-destiny-map-real-web-runtime-repair-latest.json"
+  ],
+  "nextAction": "Run powershell.exe -ExecutionPolicy Bypass -File scripts/runtime/Invoke-FreeDestinyMapWebRuntimeRepair.ps1 -RunInstall then rerun BATCH 12 readiness."
+}

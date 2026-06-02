@@ -1,0 +1,31 @@
+{
+  "schema": "kingsmen.validation-report.v1",
+  "module": "BATCH 13 - Repair Real Web Build Blockers / Add Next App Package Runtime",
+  "status": "VALIDATED",
+  "passed": true,
+  "generated_at": "2026-06-02T20:13:21.821Z",
+  "files_expected": [
+    "docs/runtime/free-destiny-map-real-web-runtime-repair.md",
+    "manifests/runtime/free-destiny-map-real-web-runtime-repair.json",
+    "apps/web/package.json",
+    "apps/web/.gitignore",
+    "apps/web/next.config.mjs",
+    "apps/web/tsconfig.json",
+    "apps/web/next-env.d.ts",
+    "apps/web/src/app/layout.tsx",
+    "packages/contracts/src/free-destiny-map-real-web-runtime-repair.ts",
+    "scripts/runtime/Invoke-FreeDestinyMapWebRuntimeRepair.ps1",
+    "scripts/proof/prove-free-destiny-map-real-web-runtime-repair.mjs",
+    "reports/runtime/free-destiny-map-real-web-runtime-repair-proof.json",
+    "scripts/validators/validate-free-destiny-map-real-web-runtime-repair.mjs",
+    "reports/validation/free-destiny-map-real-web-runtime-repair-latest.json"
+  ],
+  "files_checked": 14,
+  "missing_files": [],
+  "failed_checks": [],
+  "warnings": [],
+  "oracle_lite_impact": "none_runtime_yet",
+  "control_plane_impact": "Repairs real web build/dev-server blockers for Free Destiny Map.",
+  "runtime_proof": "reports/runtime/free-destiny-map-real-web-runtime-repair-proof.json",
+  "next_action": "Rerun BATCH 12 readiness. If ready, proceed to BATCH 14 controlled local web boot proof."
+}

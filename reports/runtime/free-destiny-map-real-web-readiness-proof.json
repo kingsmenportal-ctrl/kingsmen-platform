@@ -1,12 +1,12 @@
 {
   "schema": "kingsmen.real-web-readiness-report.v1",
   "module": "BATCH 12 - Real Local Web Build / Dev-Server Readiness Gate",
-  "status": "BLOCKED_WITH_REPAIR_ACTIONS",
+  "status": "READY_FOR_CONTROLLED_LOCAL_BOOT",
   "passed": true,
   "productionReady": false,
-  "canAttemptLocalWebBoot": false,
+  "canAttemptLocalWebBoot": true,
   "canClaimProduction": false,
-  "generated_at": "2026-06-02T20:04:26.102Z",
+  "generated_at": "2026-06-02T20:13:23.601Z",
   "checks": [
     {
       "name": "root-package-json-exists",
@@ -110,38 +110,38 @@
     },
     {
       "name": "root-or-web-build-script-discoverable",
-      "passed": false,
-      "detail": "root scripts=test; web scripts="
+      "passed": true,
+      "detail": "root scripts=test; web scripts=dev,build,start"
     },
     {
       "name": "root-or-web-dev-script-discoverable",
-      "passed": false,
-      "detail": "root scripts=test; web scripts="
+      "passed": true,
+      "detail": "root scripts=test; web scripts=dev,build,start"
     },
     {
       "name": "next-config-or-next-app-structure-present",
       "passed": true,
-      "detail": "apps/web/src/app present"
+      "detail": "next config found"
     },
     {
       "name": "next-dependency-declared",
-      "passed": false,
+      "passed": true,
       "detail": "next dependency declared in root or web package"
     },
     {
       "name": "react-dependency-declared",
-      "passed": false,
+      "passed": true,
       "detail": "react dependency declared in root or web package"
     },
     {
       "name": "react-dom-dependency-declared",
-      "passed": false,
+      "passed": true,
       "detail": "react-dom dependency declared in root or web package"
     },
     {
       "name": "dependency-install-evidence-present",
-      "passed": false,
-      "detail": "node_modules not found; install likely needed before real boot"
+      "passed": true,
+      "detail": "node_modules found"
     },
     {
       "name": "runtime-proof-passed:reports/runtime/free-destiny-map-local-http-exercise-proof.json",
@@ -434,52 +434,25 @@
       "detail": "productionReady true"
     }
   ],
-  "blockers": [
-    {
-      "name": "root-or-web-build-script-discoverable",
-      "passed": false,
-      "detail": "root scripts=test; web scripts="
-    },
-    {
-      "name": "root-or-web-dev-script-discoverable",
-      "passed": false,
-      "detail": "root scripts=test; web scripts="
-    },
-    {
-      "name": "next-dependency-declared",
-      "passed": false,
-      "detail": "next dependency declared in root or web package"
-    },
-    {
-      "name": "react-dependency-declared",
-      "passed": false,
-      "detail": "react dependency declared in root or web package"
-    },
-    {
-      "name": "react-dom-dependency-declared",
-      "passed": false,
-      "detail": "react-dom dependency declared in root or web package"
-    },
-    {
-      "name": "dependency-install-evidence-present",
-      "passed": false,
-      "detail": "node_modules not found; install likely needed before real boot"
-    }
-  ],
+  "blockers": [],
   "package_scripts": {
     "root": [
       "test"
     ],
-    "web": []
+    "web": [
+      "dev",
+      "build",
+      "start"
+    ]
   },
   "package_manager_evidence": {
     "packageLockExists": true,
     "pnpmLockExists": false,
     "yarnLockExists": false,
     "nodeModulesExists": false,
-    "webNodeModulesExists": false
+    "webNodeModulesExists": true
   },
   "oracle_lite_impact": "none_runtime_yet",
   "runtime_scope": "real web build/dev-server readiness gate only; no long-running server; no production storage",
-  "next_action": "Repair the listed readiness blockers before attempting a real local web boot."
+  "next_action": "Proceed to a controlled local web boot proof with explicit start/stop and timeout."
 }

@@ -1,0 +1,606 @@
+FILE: docs/runtime/free-destiny-map-real-web-runtime-repair.md
+---
+# BATCH 13 - Repair Real Web Build Blockers / Add Next App Package Runtime
+
+## Purpose
+
+This batch repairs the real web boot blockers found by BATCH 12.
+
+BATCH 12 did the correct thing: it refused to claim a real local web boot because the repo had no build script, no dev script, no Next dependency, no React dependency, no React DOM dependency, and no node_modules install evidence.
+
+BATCH 13 adds the missing web runtime foundation so the next batch can attempt a controlled local web boot proof.
+
+## What this batch creates or repairs
+
+- `apps/web/package.json`
+- web `dev`, `build`, and `start` scripts
+- Next, React, React DOM, TypeScript, and type dependencies
+- `apps/web/.gitignore`
+- `apps/web/next.config.mjs`
+- `apps/web/tsconfig.json`
+- `apps/web/next-env.d.ts`
+- `apps/web/src/app/layout.tsx`
+- import-path repair for the Free Destiny Map form component if needed
+- dependency install command
+- runtime repair proof report
+- validator report
+
+## What this batch does not claim
+
+- no production deployment
+- no Oracle runtime
+- no Docker Compose boot
+- no PostgreSQL database
+- no Redis queue
+- no production web build claim yet
+- no long-running dev server claim yet
+- no email sending
+- no payment
+- no document upload
+- no official application submission
+
+## Oracle Lite impact
+
+none_runtime_yet.
+
+This only repairs the local web runtime foundation.
+
+## Next action
+
+After validation, rerun BATCH 12 readiness. If BATCH 12 changes to `READY_FOR_CONTROLLED_LOCAL_BOOT`, BATCH 14 can attempt a controlled local Next/dev-server boot proof with explicit timeout and shutdown.
+---
+FILE: manifests/runtime/free-destiny-map-real-web-runtime-repair.json
+---
+{
+  "schema": "kingsmen.real-web-runtime-repair.v1",
+  "module": "BATCH 13 - Repair Real Web Build Blockers / Add Next App Package Runtime",
+  "status": "BUILT_PENDING_VALIDATION",
+  "productionReady": false,
+  "repairsBatch": "BATCH 12 - Real Local Web Build / Dev-Server Readiness Gate",
+  "repairs": [
+    "root-or-web-build-script-discoverable",
+    "root-or-web-dev-script-discoverable",
+    "next-dependency-declared",
+    "react-dependency-declared",
+    "react-dom-dependency-declared",
+    "dependency-install-evidence-present"
+  ],
+  "webPackage": "apps/web/package.json",
+  "installCommand": "npm install --prefix apps/web --no-audit --no-fund",
+  "storesProductionData": false,
+  "takesPayment": false,
+  "sendsEmail": false,
+  "collectsDocuments": false,
+  "submitsOfficialApplications": false,
+  "oracleLiteImpact": "none_runtime_yet",
+  "controlPlaneImpact": "Repairs real web runtime readiness blockers so the next batch can attempt controlled local boot.",
+  "requiredFiles": [
+    "docs/runtime/free-destiny-map-real-web-runtime-repair.md",
+    "manifests/runtime/free-destiny-map-real-web-runtime-repair.json",
+    "apps/web/package.json",
+    "apps/web/.gitignore",
+    "apps/web/next.config.mjs",
+    "apps/web/tsconfig.json",
+    "apps/web/next-env.d.ts",
+    "apps/web/src/app/layout.tsx",
+    "packages/contracts/src/free-destiny-map-real-web-runtime-repair.ts",
+    "scripts/runtime/Invoke-FreeDestinyMapWebRuntimeRepair.ps1",
+    "scripts/proof/prove-free-destiny-map-real-web-runtime-repair.mjs",
+    "reports/runtime/free-destiny-map-real-web-runtime-repair-proof.json",
+    "scripts/validators/validate-free-destiny-map-real-web-runtime-repair.mjs",
+    "reports/validation/free-destiny-map-real-web-runtime-repair-latest.json"
+  ],
+  "nextAction": "Run powershell.exe -ExecutionPolicy Bypass -File scripts/runtime/Invoke-FreeDestinyMapWebRuntimeRepair.ps1 -RunInstall then rerun BATCH 12 readiness."
+}
+---
+FILE: apps/web/package.json
+---
+{
+  "name": "@kingsmen/web",
+  "version": "0.0.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev": "next dev --hostname 127.0.0.1",
+    "build": "next build",
+    "start": "next start --hostname 127.0.0.1"
+  },
+  "dependencies": {
+    "next": "^15.5.0",
+    "react": "^19.1.0",
+    "react-dom": "^19.1.0"
+  },
+  "devDependencies": {
+    "@types/node": "^22.0.0",
+    "@types/react": "^19.0.0",
+    "@types/react-dom": "^19.0.0",
+    "typescript": "^5.8.0"
+  }
+}
+---
+FILE: apps/web/.gitignore
+---
+node_modules
+.next
+out
+dist
+coverage
+.env
+.env.*
+!.env.example
+---
+FILE: apps/web/next.config.mjs
+---
+/** @type {import('next').NextConfig} */
+const nextConfig = {
+  poweredByHeader: false,
+  reactStrictMode: true,
+  experimental: {
+    externalDir: true
+  }
+};
+
+export default nextConfig;
+---
+FILE: apps/web/tsconfig.json
+---
+{
+  "compilerOptions": {
+    "target": "ES2022",
+    "lib": ["dom", "dom.iterable", "es2022"],
+    "allowJs": false,
+    "skipLibCheck": true,
+    "strict": true,
+    "noEmit": true,
+    "esModuleInterop": true,
+    "module": "esnext",
+    "moduleResolution": "bundler",
+    "resolveJsonModule": true,
+    "isolatedModules": true,
+    "jsx": "preserve",
+    "incremental": true,
+    "plugins": [
+      {
+        "name": "next"
+      }
+    ],
+    "paths": {
+      "@/*": ["./src/*"],
+      "@kingsmen/contracts/*": ["../../packages/contracts/src/*"]
+    }
+  },
+  "include": ["next-env.d.ts", "src/**/*.ts", "src/**/*.tsx", ".next/types/**/*.ts"],
+  "exclude": ["node_modules"]
+}
+---
+FILE: apps/web/next-env.d.ts
+---
+/// <reference types="next" />
+/// <reference types="next/image-types/global" />
+
+// This file is generated/maintained for Kingsmen local web runtime readiness.
+// Do not manually add production secrets here.
+---
+FILE: apps/web/src/app/layout.tsx
+---
+import type { Metadata } from "next";
+
+export const metadata: Metadata = {
+  title: "Kingsmen Portal",
+  description: "Kingsmen Free Destiny Map local runtime shell"
+};
+
+export default function RootLayout({ children }: { children: React.ReactNode }) {
+  return (
+    <html lang="en-ZA">
+      <body style={{ margin: 0, background: "#050816" }}>{children}</body>
+    </html>
+  );
+}
+---
+FILE: packages/contracts/src/free-destiny-map-real-web-runtime-repair.ts
+---
+export const FREE_DESTINY_MAP_REAL_WEB_RUNTIME_REPAIR_MODULE =
+  "BATCH 13 - Repair Real Web Build Blockers / Add Next App Package Runtime" as const;
+
+export const FREE_DESTINY_MAP_REAL_WEB_RUNTIME_REPAIR_PACKAGE =
+  "apps/web/package.json" as const;
+
+export type FreeDestinyMapRuntimeRepairStatus =
+  | "WEB_RUNTIME_REPAIR_APPLIED"
+  | "WEB_RUNTIME_REPAIR_BLOCKED";
+
+export interface FreeDestinyMapRuntimeRepairCheck {
+  name: string;
+  passed: boolean;
+  detail: string;
+}
+
+export interface FreeDestinyMapRuntimeRepairReport {
+  schema: "kingsmen.real-web-runtime-repair-report.v1";
+  module: typeof FREE_DESTINY_MAP_REAL_WEB_RUNTIME_REPAIR_MODULE;
+  status: FreeDestinyMapRuntimeRepairStatus;
+  passed: boolean;
+  productionReady: false;
+  canClaimProduction: false;
+  canAttemptNextControlledBoot: boolean;
+  oracleLiteImpact: "none_runtime_yet";
+  checks: FreeDestinyMapRuntimeRepairCheck[];
+  failed: FreeDestinyMapRuntimeRepairCheck[];
+  nextAction: string;
+}
+---
+FILE: scripts/runtime/Invoke-FreeDestinyMapWebRuntimeRepair.ps1
+---
+#requires -Version 5.1
+[CmdletBinding()]
+param(
+  [switch]$RunInstall
+)
+
+$ErrorActionPreference = "Stop"
+
+$repoRoot = Get-Location
+$webDir = Join-Path $repoRoot "apps\web"
+$componentPath = Join-Path $repoRoot "apps\web\src\components\kingsmen\FreeDestinyMapApiForm.tsx"
+$proofScript = Join-Path $repoRoot "scripts\proof\prove-free-destiny-map-real-web-runtime-repair.mjs"
+
+if (-not (Test-Path $webDir -PathType Container)) {
+  throw "Missing web directory: $webDir"
+}
+
+if (-not (Test-Path $proofScript -PathType Leaf)) {
+  throw "Missing proof script: $proofScript"
+}
+
+if (Test-Path $componentPath -PathType Leaf) {
+  $content = Get-Content $componentPath -Raw
+  $updated = $content `
+    -replace '\.\./\.\.//lib/kingsmen/free-destiny-map-client', '../../lib/kingsmen/free-destiny-map-client' `
+    -replace '\.\./\.\./\.\./\.\./packages/contracts/src/free-destiny-map-api-wiring', '../../../../../packages/contracts/src/free-destiny-map-api-wiring'
+
+  if ($updated -ne $content) {
+    $utf8 = New-Object System.Text.UTF8Encoding($false)
+    [System.IO.File]::WriteAllText($componentPath, $updated, $utf8)
+    Write-Host "Repaired FreeDestinyMapApiForm import paths."
+  }
+}
+
+if ($RunInstall) {
+  Write-Host "Installing apps/web dependencies with npm."
+  Push-Location $webDir
+  try {
+    $npmCommand = Get-Command npm.cmd -ErrorAction SilentlyContinue
+    if ($null -eq $npmCommand) {
+      $npmCommand = Get-Command npm -ErrorAction Stop
+    }
+
+    & $npmCommand.Source install --no-audit --no-fund
+    if ($LASTEXITCODE -ne 0) {
+      throw "npm install failed with exit code $LASTEXITCODE"
+    }
+  } finally {
+    Pop-Location
+  }
+} else {
+  Write-Host "Skipping npm install. Use -RunInstall to repair dependency-install-evidence-present."
+}
+
+Write-Host "Kingsmen Free Destiny Map real web runtime repair proof"
+Write-Host "This repairs local web runtime readiness. It does not claim production, Oracle runtime, email, payment, documents, or official submissions."
+
+node $proofScript
+
+if ($LASTEXITCODE -ne 0) {
+  throw "Free Destiny Map web runtime repair proof failed."
+}
+---
+FILE: scripts/proof/prove-free-destiny-map-real-web-runtime-repair.mjs
+---
+#!/usr/bin/env node
+import fs from "node:fs";
+import path from "node:path";
+
+const root = process.cwd();
+const proofReportPath = path.join(root, "reports/runtime/free-destiny-map-real-web-runtime-repair-proof.json");
+const checks = [];
+
+function exists(rel) {
+  return fs.existsSync(path.join(root, rel));
+}
+
+function read(rel) {
+  return fs.readFileSync(path.join(root, rel), "utf8").replace(/^\uFEFF/, "");
+}
+
+function parseJson(rel) {
+  return JSON.parse(read(rel));
+}
+
+function check(name, passed, detail = "") {
+  checks.push({ name, passed, detail });
+}
+
+const webPackagePath = "apps/web/package.json";
+const webPackage = exists(webPackagePath) ? parseJson(webPackagePath) : null;
+
+check("apps-web-package-json-exists", exists(webPackagePath), webPackagePath);
+check("apps-web-gitignore-exists", exists("apps/web/.gitignore"), "apps/web/.gitignore");
+check("apps-web-next-config-exists", exists("apps/web/next.config.mjs"), "apps/web/next.config.mjs");
+check("apps-web-tsconfig-exists", exists("apps/web/tsconfig.json"), "apps/web/tsconfig.json");
+check("apps-web-next-env-exists", exists("apps/web/next-env.d.ts"), "apps/web/next-env.d.ts");
+check("apps-web-root-layout-exists", exists("apps/web/src/app/layout.tsx"), "apps/web/src/app/layout.tsx");
+
+if (webPackage) {
+  const scripts = webPackage.scripts ?? {};
+  const deps = webPackage.dependencies ?? {};
+  const devDeps = webPackage.devDependencies ?? {};
+
+  check("web-dev-script-present", typeof scripts.dev === "string" && scripts.dev.includes("next dev"), scripts.dev ?? "");
+  check("web-build-script-present", typeof scripts.build === "string" && scripts.build.includes("next build"), scripts.build ?? "");
+  check("web-start-script-present", typeof scripts.start === "string" && scripts.start.includes("next start"), scripts.start ?? "");
+  check("next-dependency-declared", Boolean(deps.next), deps.next ?? "missing");
+  check("react-dependency-declared", Boolean(deps.react), deps.react ?? "missing");
+  check("react-dom-dependency-declared", Boolean(deps["react-dom"]), deps["react-dom"] ?? "missing");
+  check("typescript-dev-dependency-declared", Boolean(devDeps.typescript), devDeps.typescript ?? "missing");
+  check("react-types-declared", Boolean(devDeps["@types/react"]), devDeps["@types/react"] ?? "missing");
+}
+
+if (exists("apps/web/.gitignore")) {
+  const ignore = read("apps/web/.gitignore");
+  check("web-gitignore-blocks-node-modules", ignore.includes("node_modules"), "node_modules ignored");
+  check("web-gitignore-blocks-next-output", ignore.includes(".next"), ".next ignored");
+}
+
+if (exists("apps/web/src/app/layout.tsx")) {
+  const layout = read("apps/web/src/app/layout.tsx");
+  check("layout-exports-root-layout", layout.includes("RootLayout"), "RootLayout present");
+  check("layout-keeps-local-shell-branding", layout.includes("Kingsmen"), "Kingsmen metadata present");
+}
+
+if (exists("apps/web/src/components/kingsmen/FreeDestinyMapApiForm.tsx")) {
+  const form = read("apps/web/src/components/kingsmen/FreeDestinyMapApiForm.tsx");
+  check("form-client-import-path-repaired", form.includes("../../lib/kingsmen/free-destiny-map-client"), "client import path");
+  check("form-contract-import-path-repaired", form.includes("../../../../../packages/contracts/src/free-destiny-map-api-wiring"), "contract import path");
+  check("form-still-client-component", form.includes('"use client"'), "client directive present");
+  check("form-still-has-consent-fields", form.includes("consentToBeContacted") && form.includes("consentToProcessBasicInfo"), "consent fields present");
+}
+
+const installEvidence = exists("apps/web/node_modules/next/package.json") &&
+  exists("apps/web/node_modules/react/package.json") &&
+  exists("apps/web/node_modules/react-dom/package.json");
+
+check("dependency-install-evidence-present", installEvidence, installEvidence ? "apps/web/node_modules contains next/react/react-dom" : "Run npm install --prefix apps/web --no-audit --no-fund");
+
+if (exists("apps/web/package-lock.json")) {
+  check("web-package-lock-created", true, "apps/web/package-lock.json");
+} else {
+  check("web-package-lock-created", false, "apps/web/package-lock.json missing");
+}
+
+const forbiddenFiles = [
+  "apps/web/package.json",
+  "apps/web/src/app/layout.tsx",
+  "apps/web/src/components/kingsmen/FreeDestinyMapApiForm.tsx",
+  "apps/web/src/lib/kingsmen/free-destiny-map-client.ts"
+];
+
+const forbiddenPatterns = [
+  [/\bidentityNumber\s*[:=]/i, "identity number field assignment"],
+  [/\bidNumber\s*[:=]/i, "id number field assignment"],
+  [/\bpassportNumber\s*[:=]/i, "passport number field assignment"],
+  [/\bpassword\s*[:=]/i, "password field assignment"],
+  [/\bcardNumber\s*[:=]/i, "card number field assignment"],
+  [/\bcvv\s*[:=]/i, "cvv field assignment"],
+  [/\bdocumentBase64\s*[:=]/i, "document payload assignment"],
+  [/officialApplicationSubmitted:\s*true/i, "official application submitted true"],
+  [/paymentInstructionSent:\s*true/i, "payment instruction sent true"],
+  [/emailSent:\s*true/i, "email sent true"],
+  [/productionReady\s*[:=]\s*true/i, "productionReady true"]
+];
+
+for (const file of forbiddenFiles) {
+  if (!exists(file)) continue;
+  const content = read(file);
+  for (const [pattern, label] of forbiddenPatterns) {
+    check(`forbidden-pattern-absent:${file}:${label}`, !pattern.test(content), label);
+  }
+}
+
+const failed = checks.filter((item) => item.passed !== true);
+const passed = failed.length === 0;
+
+const report = {
+  schema: "kingsmen.real-web-runtime-repair-report.v1",
+  module: "BATCH 13 - Repair Real Web Build Blockers / Add Next App Package Runtime",
+  status: passed ? "WEB_RUNTIME_REPAIR_APPLIED" : "WEB_RUNTIME_REPAIR_BLOCKED",
+  passed,
+  productionReady: false,
+  canClaimProduction: false,
+  canAttemptNextControlledBoot: passed,
+  generated_at: new Date().toISOString(),
+  checks,
+  failed,
+  oracle_lite_impact: "none_runtime_yet",
+  runtime_scope: "local web runtime dependency and package repair only; no production build; no long-running server",
+  next_action: passed
+    ? "Rerun BATCH 12 readiness. If it becomes READY_FOR_CONTROLLED_LOCAL_BOOT, proceed to BATCH 14 controlled local web boot proof."
+    : "Repair failed checks, especially npm install evidence, then rerun BATCH 13 proof."
+};
+
+fs.mkdirSync(path.dirname(proofReportPath), { recursive: true });
+fs.writeFileSync(proofReportPath, `${JSON.stringify(report, null, 2)}\n`, "utf8");
+
+console.log(JSON.stringify(report, null, 2));
+if (!passed) process.exit(1);
+---
+FILE: reports/runtime/free-destiny-map-real-web-runtime-repair-proof.json
+---
+{
+  "schema": "kingsmen.real-web-runtime-repair-report.v1",
+  "module": "BATCH 13 - Repair Real Web Build Blockers / Add Next App Package Runtime",
+  "status": "WEB_RUNTIME_REPAIR_BLOCKED",
+  "passed": false,
+  "productionReady": false,
+  "canClaimProduction": false,
+  "canAttemptNextControlledBoot": false,
+  "generated_at": "2026-06-02T00:00:00.000Z",
+  "checks": [],
+  "failed": [
+    {
+      "name": "runtime_repair_not_yet_executed",
+      "passed": false,
+      "detail": "Run scripts/runtime/Invoke-FreeDestinyMapWebRuntimeRepair.ps1 -RunInstall."
+    }
+  ],
+  "oracle_lite_impact": "none_runtime_yet",
+  "runtime_scope": "local web runtime dependency and package repair only; no production build; no long-running server",
+  "next_action": "Run BATCH 13 runtime repair."
+}
+---
+FILE: scripts/validators/validate-free-destiny-map-real-web-runtime-repair.mjs
+---
+#!/usr/bin/env node
+import fs from "node:fs";
+import path from "node:path";
+
+const root = process.cwd();
+const reportPath = path.join(root, "reports/validation/free-destiny-map-real-web-runtime-repair-latest.json");
+
+const requiredFiles = [
+  "docs/runtime/free-destiny-map-real-web-runtime-repair.md",
+  "manifests/runtime/free-destiny-map-real-web-runtime-repair.json",
+  "apps/web/package.json",
+  "apps/web/.gitignore",
+  "apps/web/next.config.mjs",
+  "apps/web/tsconfig.json",
+  "apps/web/next-env.d.ts",
+  "apps/web/src/app/layout.tsx",
+  "packages/contracts/src/free-destiny-map-real-web-runtime-repair.ts",
+  "scripts/runtime/Invoke-FreeDestinyMapWebRuntimeRepair.ps1",
+  "scripts/proof/prove-free-destiny-map-real-web-runtime-repair.mjs",
+  "reports/runtime/free-destiny-map-real-web-runtime-repair-proof.json",
+  "scripts/validators/validate-free-destiny-map-real-web-runtime-repair.mjs",
+  "reports/validation/free-destiny-map-real-web-runtime-repair-latest.json"
+];
+
+function exists(rel) {
+  return fs.existsSync(path.join(root, rel));
+}
+
+function read(rel) {
+  return fs.readFileSync(path.join(root, rel), "utf8").replace(/^\uFEFF/, "");
+}
+
+function parseJson(rel) {
+  return JSON.parse(read(rel));
+}
+
+const failures = [];
+const warnings = [];
+const checked = [];
+
+for (const file of requiredFiles) {
+  checked.push(file);
+  if (!exists(file)) failures.push(`Missing required file: ${file}`);
+  else if (fs.statSync(path.join(root, file)).size === 0) failures.push(`Empty required file: ${file}`);
+}
+
+if (exists("manifests/runtime/free-destiny-map-real-web-runtime-repair.json")) {
+  const manifest = parseJson("manifests/runtime/free-destiny-map-real-web-runtime-repair.json");
+  if (manifest.productionReady !== false) failures.push("Manifest must keep productionReady false.");
+  if (manifest.storesProductionData !== false) failures.push("Manifest must declare storesProductionData false.");
+  if (manifest.takesPayment !== false) failures.push("Manifest must declare takesPayment false.");
+  if (manifest.sendsEmail !== false) failures.push("Manifest must declare sendsEmail false.");
+  if (manifest.collectsDocuments !== false) failures.push("Manifest must declare collectsDocuments false.");
+  if (manifest.submitsOfficialApplications !== false) failures.push("Manifest must declare submitsOfficialApplications false.");
+  if (!String(manifest.oracleLiteImpact ?? "").includes("none_runtime_yet")) failures.push("Manifest must declare none_runtime_yet.");
+}
+
+if (exists("apps/web/package.json")) {
+  const pkg = parseJson("apps/web/package.json");
+  if (!pkg.scripts?.dev || !String(pkg.scripts.dev).includes("next dev")) failures.push("apps/web package must have next dev script.");
+  if (!pkg.scripts?.build || !String(pkg.scripts.build).includes("next build")) failures.push("apps/web package must have next build script.");
+  if (!pkg.scripts?.start || !String(pkg.scripts.start).includes("next start")) failures.push("apps/web package must have next start script.");
+  if (!pkg.dependencies?.next) failures.push("apps/web package must declare next dependency.");
+  if (!pkg.dependencies?.react) failures.push("apps/web package must declare react dependency.");
+  if (!pkg.dependencies?.["react-dom"]) failures.push("apps/web package must declare react-dom dependency.");
+  if (!pkg.devDependencies?.typescript) failures.push("apps/web package must declare typescript devDependency.");
+}
+
+const tokenChecks = [
+  ["apps/web/.gitignore", ["node_modules", ".next"]],
+  ["apps/web/next.config.mjs", ["reactStrictMode", "externalDir"]],
+  ["apps/web/tsconfig.json", ["@kingsmen/contracts", "jsx"]],
+  ["apps/web/src/app/layout.tsx", ["RootLayout", "Kingsmen"]],
+  ["packages/contracts/src/free-destiny-map-real-web-runtime-repair.ts", ["WEB_RUNTIME_REPAIR_APPLIED", "canAttemptNextControlledBoot"]],
+  ["scripts/runtime/Invoke-FreeDestinyMapWebRuntimeRepair.ps1", ["-RunInstall", "npm", "FreeDestinyMapApiForm"]],
+  ["scripts/proof/prove-free-destiny-map-real-web-runtime-repair.mjs", ["WEB_RUNTIME_REPAIR_APPLIED", "dependency-install-evidence-present", "web-build-script-present"]],
+  ["reports/runtime/free-destiny-map-real-web-runtime-repair-proof.json", ["schema", "module", "status"]]
+];
+
+for (const [file, tokens] of tokenChecks) {
+  if (!exists(file)) continue;
+  const content = read(file);
+  for (const token of tokens) {
+    if (!content.includes(token)) failures.push(`${file} missing token: ${token}`);
+  }
+}
+
+if (exists("reports/runtime/free-destiny-map-real-web-runtime-repair-proof.json")) {
+  const proof = parseJson("reports/runtime/free-destiny-map-real-web-runtime-repair-proof.json");
+  if (proof.passed !== true) failures.push("Runtime repair proof must pass.");
+  if (proof.status !== "WEB_RUNTIME_REPAIR_APPLIED") failures.push("Runtime repair proof status must be WEB_RUNTIME_REPAIR_APPLIED.");
+  if (proof.productionReady !== false) failures.push("Runtime repair proof must keep productionReady false.");
+  if (proof.canClaimProduction !== false) failures.push("Runtime repair proof must keep canClaimProduction false.");
+  if (proof.canAttemptNextControlledBoot !== true) failures.push("Runtime repair proof must set canAttemptNextControlledBoot true.");
+}
+
+if (!exists("apps/web/package-lock.json")) failures.push("apps/web/package-lock.json must exist after npm install.");
+if (!exists("apps/web/node_modules/next/package.json")) failures.push("apps/web/node_modules/next/package.json must exist after npm install.");
+if (!exists("apps/web/node_modules/react/package.json")) failures.push("apps/web/node_modules/react/package.json must exist after npm install.");
+if (!exists("apps/web/node_modules/react-dom/package.json")) failures.push("apps/web/node_modules/react-dom/package.json must exist after npm install.");
+
+const passed = failures.length === 0;
+
+const report = {
+  schema: "kingsmen.validation-report.v1",
+  module: "BATCH 13 - Repair Real Web Build Blockers / Add Next App Package Runtime",
+  status: passed ? "VALIDATED" : "BUILT_PENDING_VALIDATION",
+  passed,
+  generated_at: new Date().toISOString(),
+  files_expected: requiredFiles,
+  files_checked: checked.length,
+  missing_files: requiredFiles.filter((file) => !exists(file)),
+  failed_checks: failures,
+  warnings,
+  oracle_lite_impact: "none_runtime_yet",
+  control_plane_impact: "Repairs real web build/dev-server blockers for Free Destiny Map.",
+  runtime_proof: "reports/runtime/free-destiny-map-real-web-runtime-repair-proof.json",
+  next_action: passed ? "Rerun BATCH 12 readiness. If ready, proceed to BATCH 14 controlled local web boot proof." : "Repair runtime package blockers and rerun proof plus validator."
+};
+
+fs.mkdirSync(path.dirname(reportPath), { recursive: true });
+fs.writeFileSync(reportPath, `${JSON.stringify(report, null, 2)}\n`, "utf8");
+
+console.log(JSON.stringify(report, null, 2));
+if (!passed) process.exit(1);
+---
+FILE: reports/validation/free-destiny-map-real-web-runtime-repair-latest.json
+---
+{
+  "schema": "kingsmen.validation-report.v1",
+  "module": "BATCH 13 - Repair Real Web Build Blockers / Add Next App Package Runtime",
+  "status": "BUILT_PENDING_VALIDATION",
+  "passed": false,
+  "generated_at": "2026-06-02T00:00:00.000Z",
+  "reason": "Seed report. Run BATCH 13 runtime repair with -RunInstall, then validator.",
+  "files_checked": 0,
+  "failed_checks": [
+    "validator_not_yet_executed"
+  ],
+  "oracle_lite_impact": "none_runtime_yet",
+  "control_plane_impact": "Repairs real web build/dev-server blockers for Free Destiny Map.",
+  "runtime_proof": "reports/runtime/free-destiny-map-real-web-runtime-repair-proof.json",
+  "next_action": "Run powershell.exe -ExecutionPolicy Bypass -File scripts/runtime/Invoke-FreeDestinyMapWebRuntimeRepair.ps1 -RunInstall then node scripts/validators/validate-free-destiny-map-real-web-runtime-repair.mjs."
+}

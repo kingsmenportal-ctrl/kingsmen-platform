@@ -4,11 +4,11 @@
     "submodule":  "CREATOR.2B",
     "action":  "Materialize",
     "productionReady":  false,
-    "generatedAt":  "2026-06-02T20:04:25.047Z",
+    "generatedAt":  "2026-06-02T20:10:55.188Z",
     "repoRoot":  "C:\\Users\\dell\\kingsmen-platform",
     "passed":  true,
     "detail":  "Materialize complete.",
-    "totalChecks":  9,
+    "totalChecks":  15,
     "failedChecks":  0,
     "failed":  [
 
@@ -17,45 +17,75 @@
                    {
                        "name":  "materialize:blocks",
                        "passed":  true,
-                       "detail":  "blocks=8"
+                       "detail":  "blocks=14"
                    },
                    {
-                       "name":  "materialize:wrote:docs/runtime/free-destiny-map-real-web-readiness-gate.md",
+                       "name":  "materialize:wrote:docs/runtime/free-destiny-map-real-web-runtime-repair.md",
                        "passed":  true,
                        "detail":  "written"
                    },
                    {
-                       "name":  "materialize:wrote:manifests/runtime/free-destiny-map-real-web-readiness-gate.json",
+                       "name":  "materialize:wrote:manifests/runtime/free-destiny-map-real-web-runtime-repair.json",
                        "passed":  true,
                        "detail":  "written"
                    },
                    {
-                       "name":  "materialize:wrote:packages/contracts/src/free-destiny-map-real-web-readiness.ts",
+                       "name":  "materialize:wrote:apps/web/package.json",
                        "passed":  true,
                        "detail":  "written"
                    },
                    {
-                       "name":  "materialize:wrote:scripts/runtime/Invoke-FreeDestinyMapRealWebReadinessGate.ps1",
+                       "name":  "materialize:wrote:apps/web/.gitignore",
                        "passed":  true,
                        "detail":  "written"
                    },
                    {
-                       "name":  "materialize:wrote:scripts/proof/prove-free-destiny-map-real-web-readiness.mjs",
+                       "name":  "materialize:wrote:apps/web/next.config.mjs",
                        "passed":  true,
                        "detail":  "written"
                    },
                    {
-                       "name":  "materialize:wrote:reports/runtime/free-destiny-map-real-web-readiness-proof.json",
+                       "name":  "materialize:wrote:apps/web/tsconfig.json",
                        "passed":  true,
                        "detail":  "written"
                    },
                    {
-                       "name":  "materialize:wrote:scripts/validators/validate-free-destiny-map-real-web-readiness.mjs",
+                       "name":  "materialize:wrote:apps/web/next-env.d.ts",
                        "passed":  true,
                        "detail":  "written"
                    },
                    {
-                       "name":  "materialize:wrote:reports/validation/free-destiny-map-real-web-readiness-latest.json",
+                       "name":  "materialize:wrote:apps/web/src/app/layout.tsx",
+                       "passed":  true,
+                       "detail":  "written"
+                   },
+                   {
+                       "name":  "materialize:wrote:packages/contracts/src/free-destiny-map-real-web-runtime-repair.ts",
+                       "passed":  true,
+                       "detail":  "written"
+                   },
+                   {
+                       "name":  "materialize:wrote:scripts/runtime/Invoke-FreeDestinyMapWebRuntimeRepair.ps1",
+                       "passed":  true,
+                       "detail":  "written"
+                   },
+                   {
+                       "name":  "materialize:wrote:scripts/proof/prove-free-destiny-map-real-web-runtime-repair.mjs",
+                       "passed":  true,
+                       "detail":  "written"
+                   },
+                   {
+                       "name":  "materialize:wrote:reports/runtime/free-destiny-map-real-web-runtime-repair-proof.json",
+                       "passed":  true,
+                       "detail":  "written"
+                   },
+                   {
+                       "name":  "materialize:wrote:scripts/validators/validate-free-destiny-map-real-web-runtime-repair.mjs",
+                       "passed":  true,
+                       "detail":  "written"
+                   },
+                   {
+                       "name":  "materialize:wrote:reports/validation/free-destiny-map-real-web-runtime-repair-latest.json",
                        "passed":  true,
                        "detail":  "written"
                    }
