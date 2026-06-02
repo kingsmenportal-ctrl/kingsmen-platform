@@ -1,9 +1,9 @@
 {
   "schema": "kingsmen.validation-report.v1",
   "module": "BATCH 04 - First Public Website + Free Destiny Map Shell",
-  "status": "BUILT_PENDING_VALIDATION",
-  "passed": false,
-  "generated_at": "2026-06-02T17:23:51.777Z",
+  "status": "VALIDATED",
+  "passed": true,
+  "generated_at": "2026-06-02T17:26:33.060Z",
   "files_expected": [
     "docs/public/first-public-website-free-destiny-map.md",
     "manifests/public/free-destiny-map-shell.json",
@@ -18,21 +18,9 @@
   ],
   "files_checked": 10,
   "missing_files": [],
-  "failed_checks": [
-    "docs/public/first-public-website-free-destiny-map.md contains forbidden claim: guaranteed acceptance",
-    "docs/public/first-public-website-free-destiny-map.md contains forbidden claim: guaranteed job",
-    "docs/public/first-public-website-free-destiny-map.md contains forbidden claim: guaranteed accommodation",
-    "manifests/public/free-destiny-map-shell.json contains forbidden claim: guaranteed acceptance",
-    "manifests/public/free-destiny-map-shell.json contains forbidden claim: guaranteed funding",
-    "manifests/public/free-destiny-map-shell.json contains forbidden claim: guaranteed job",
-    "manifests/public/free-destiny-map-shell.json contains forbidden claim: guaranteed accommodation",
-    "scripts/validators/validate-public-website-free-destiny-map.mjs contains forbidden claim: guaranteed acceptance",
-    "scripts/validators/validate-public-website-free-destiny-map.mjs contains forbidden claim: guaranteed funding",
-    "scripts/validators/validate-public-website-free-destiny-map.mjs contains forbidden claim: guaranteed job",
-    "scripts/validators/validate-public-website-free-destiny-map.mjs contains forbidden claim: guaranteed accommodation"
-  ],
+  "failed_checks": [],
   "warnings": [],
   "oracle_lite_impact": "none_runtime_yet",
   "control_plane_impact": "Adds first public user-facing Kingsmen shell and Free Destiny Map route.",
-  "next_action": "Repair public website shell failures and rerun validator."
+  "next_action": "Proceed to BATCH 05 - Free Destiny Map intake contract/backend shell or next approved batch."
 }

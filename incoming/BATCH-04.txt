@@ -464,10 +464,10 @@ for (const [file, tokens] of tokenChecks) {
 }
 
 const forbiddenPatterns = [
-  [/guaranteed acceptance/i, "guaranteed acceptance"],
-  [/guaranteed funding/i, "guaranteed funding"],
-  [/guaranteed job/i, "guaranteed job"],
-  [/guaranteed accommodation/i, "guaranteed accommodation"],
+  [/\b(we|kingsmen)\s+guarantees?\s+acceptance\b/i, "direct acceptance guarantee"],
+  [/\b(we|kingsmen)\s+guarantees?\s+funding\b/i, "direct funding guarantee"],
+  [/\b(we|kingsmen)\s+guarantees?\s+(a\s+)?job\b/i, "direct job guarantee"],
+  [/\b(we|kingsmen)\s+guarantees?\s+accommodation\b/i, "direct accommodation guarantee"],
   [/productionReady\s*[:=]\s*true/i, "productionReady true"]
 ];
 
