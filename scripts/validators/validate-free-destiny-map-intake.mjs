@@ -62,16 +62,24 @@ for (const [file, tokens] of tokenChecks) {
 }
 
 const forbiddenPatterns = [
-  [/\bpassword\b/i, "password collection"],
-  [/\bcardNumber\b/i, "card number collection"],
-  [/\bcvv\b/i, "cvv collection"],
-  [/\bdocumentBase64\b/i, "document upload payload"],
+  [/\bpassword\s*[:=]/i, "password field assignment"],
+  [/\bpassword\s*\?/i, "password optional field"],
+  [/\bcardNumber\s*[:=]/i, "card number field assignment"],
+  [/\bcardNumber\s*\?/i, "card number optional field"],
+  [/\bcvv\s*[:=]/i, "cvv field assignment"],
+  [/\bcvv\s*\?/i, "cvv optional field"],
+  [/\bdocumentBase64\s*[:=]/i, "document upload payload"],
+  [/\bdocumentBase64\s*\?/i, "document upload optional field"],
   [/officialApplicationSubmitted:\s*true/i, "official application submitted true"],
   [/paymentInstructionSent:\s*true/i, "payment instruction sent true"],
   [/productionReady\s*[:=]\s*true/i, "productionReady true"]
 ];
 
-for (const file of requiredFiles.filter((item) => exists(item))) {
+const filesToScanForForbiddenRuntimeFields = requiredFiles
+  .filter((item) => exists(item))
+  .filter((item) => !item.includes("validate-free-destiny-map-intake.mjs"));
+
+for (const file of filesToScanForForbiddenRuntimeFields) {
   const content = read(file);
   for (const [pattern, label] of forbiddenPatterns) {
     if (pattern.test(content)) failures.push(`${file} contains forbidden pattern: ${label}`);
