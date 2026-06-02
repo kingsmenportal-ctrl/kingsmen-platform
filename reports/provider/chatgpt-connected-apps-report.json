@@ -1,0 +1,23 @@
+{
+  "module": "N_PROVIDER.4",
+  "validator": "validate-chatgpt-connected-apps.mjs",
+  "generated_at": "2026-06-02T03:55:33.171Z",
+  "passed": true,
+  "errors": [],
+  "expected_app_count": 24,
+  "actual_app_count": 24,
+  "status_counts": {
+    "VISIBLE_UNTESTED": 16,
+    "CALLABLE_NOW_CONFIRMED": 5,
+    "TOOL_AVAILABLE_NOT_YET_N4_TESTED": 2,
+    "UNKNOWN_OFF": 1
+  },
+  "google_drive_reference_document_id": "17kXGYrjHHY2tBdveCP6fzs9r64nbQwavlCUkw23jTQI",
+  "safety": {
+    "distinguishes_visible_from_callable": true,
+    "airtable_mirror_only": true,
+    "email_first": true,
+    "payments_live_gated": true,
+    "unknown_apps_off": true
+  }
+}
