@@ -3,7 +3,7 @@
   "module": "BATCH 07 - Public Form to Intake API Wiring / Local API Boot Proof",
   "status": "VALIDATED",
   "passed": true,
-  "generated_at": "2026-06-02T19:08:41.808Z",
+  "generated_at": "2026-06-02T19:22:16.278Z",
   "files_expected": [
     "docs/runtime/free-destiny-map-public-api-wiring.md",
     "manifests/runtime/free-destiny-map-api-wiring-shell.json",

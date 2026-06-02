@@ -3,7 +3,7 @@
   "module": "BATCH 06 - Intake Persistence / Local Runtime Shell",
   "status": "VALIDATED",
   "passed": true,
-  "generated_at": "2026-06-02T18:50:58.716Z",
+  "generated_at": "2026-06-02T19:22:16.418Z",
   "files_expected": [
     "docs/intake/free-destiny-map-local-runtime-shell.md",
     "manifests/intake/free-destiny-map-persistence-shell.json",
