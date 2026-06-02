@@ -1,18 +1,18 @@
 {
   "schema": "kingsmen.controlled-next-boot-report.v1",
   "module": "BATCH 14 - Controlled Local Next Web Boot Proof",
-  "status": "CONTROLLED_NEXT_BOOT_FAILED",
-  "passed": false,
+  "status": "CONTROLLED_NEXT_BOOT_PROVEN",
+  "passed": true,
   "productionReady": false,
   "canClaimProduction": false,
-  "generated_at": "2026-06-02T20:36:07.961Z",
-  "serverStarted": false,
-  "serverStopped": false,
-  "webStatus": 0,
+  "generated_at": "2026-06-02T20:39:15.577Z",
+  "serverStarted": true,
+  "serverStopped": true,
+  "webStatus": 200,
   "webRoute": "/free-destiny-map",
-  "webUrl": "http://127.0.0.1:49405/free-destiny-map",
+  "webUrl": "http://127.0.0.1:49420/free-destiny-map",
   "httpHost": "127.0.0.1",
-  "httpPort": 49405,
+  "httpPort": 49420,
   "checks": [
     {
       "name": "batch-12-readiness-proof-exists",
@@ -100,31 +100,84 @@
       "detail": "^19.1.0"
     },
     {
-      "name": "controlled-next-boot-exception-absent",
-      "passed": false,
-      "detail": "spawn EINVAL"
+      "name": "controlled-next-launcher-next-cli-exists",
+      "passed": true,
+      "detail": "C:\\Users\\dell\\kingsmen-platform\\apps\\web\\node_modules\\next\\dist\\bin\\next"
+    },
+    {
+      "name": "controlled-next-launcher-mode",
+      "passed": true,
+      "detail": "direct node next launcher; bypass npm.cmd for Windows spawn EINVAL repair"
+    },
+    {
+      "name": "controlled-next-server-started",
+      "passed": true,
+      "detail": "url=http://127.0.0.1:49420/free-destiny-map"
+    },
+    {
+      "name": "controlled-next-route-status-200",
+      "passed": true,
+      "detail": "status=200"
+    },
+    {
+      "name": "controlled-next-page-has-free-destiny-map",
+      "passed": true,
+      "detail": "Free Destiny Map text"
+    },
+    {
+      "name": "controlled-next-page-has-local-intake-copy",
+      "passed": true,
+      "detail": "local intake wording"
+    },
+    {
+      "name": "controlled-next-page-no-production-true",
+      "passed": true,
+      "detail": "productionReady true absent"
+    },
+    {
+      "name": "controlled-next-page-no-official-submission-true",
+      "passed": true,
+      "detail": "officialApplicationSubmitted true absent"
+    },
+    {
+      "name": "controlled-next-page-no-payment-true",
+      "passed": true,
+      "detail": "paymentInstructionSent true absent"
+    },
+    {
+      "name": "controlled-next-page-no-email-true",
+      "passed": true,
+      "detail": "emailSent true absent"
     },
     {
       "name": "controlled-next-server-stopped",
-      "passed": false,
-      "detail": "server process was not started or could not be stopped"
+      "passed": true,
+      "detail": "process tree stop attempted"
     }
   ],
-  "failed": [
-    {
-      "name": "controlled-next-boot-exception-absent",
-      "passed": false,
-      "detail": "spawn EINVAL"
-    },
-    {
-      "name": "controlled-next-server-stopped",
-      "passed": false,
-      "detail": "server process was not started or could not be stopped"
-    }
+  "failed": [],
+  "stdout_tail": [
+    "   ▲ Next.js 15.5.19",
+    "   - Local:        http://127.0.0.1:49420",
+    "   - Network:      http://127.0.0.1:49420",
+    "   - Experiments (use with caution):",
+    "     ✓ externalDir",
+    " ✓ Starting...",
+    " ✓ Ready in 3.9s",
+    " ○ Compiling /free-destiny-map ...",
+    " ✓ Compiled /free-destiny-map in 6.5s (532 modules)",
+    " GET /free-destiny-map 200 in 2438ms"
   ],
-  "stdout_tail": [],
-  "stderr_tail": [],
+  "stderr_tail": [
+    " ⚠ Warning: Next.js inferred your workspace root, but it may not be correct.",
+    " We detected multiple lockfiles and selected the directory of C:\\Users\\dell\\package-lock.json as the root directory.",
+    " To silence this warning, set `outputFileTracingRoot` in your Next.js config, or consider removing one of the lockfiles if it's not needed.",
+    "   See https://nextjs.org/docs/app/api-reference/config/next-config-js/output#caveats for more information.",
+    " Detected additional lockfiles: ",
+    "   * C:\\Users\\dell\\kingsmen-platform\\apps\\web\\package-lock.json",
+    "   * C:\\Users\\dell\\kingsmen-platform\\package-lock.json"
+  ],
   "oracle_lite_impact": "none_runtime_yet",
   "runtime_scope": "controlled local Next dev boot proof only; no Oracle runtime; no production deployment",
-  "next_action": "Repair controlled Next boot failures before moving forward."
+  "next_action": "Run validator and commit BATCH 14. Next batch may add controlled local API integration or production build proof."
 }

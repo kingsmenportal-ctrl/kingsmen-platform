@@ -1,9 +1,9 @@
 {
   "schema": "kingsmen.validation-report.v1",
   "module": "BATCH 14 - Controlled Local Next Web Boot Proof",
-  "status": "BUILT_PENDING_VALIDATION",
-  "passed": false,
-  "generated_at": "2026-06-02T20:36:08.227Z",
+  "status": "VALIDATED",
+  "passed": true,
+  "generated_at": "2026-06-02T20:39:16.303Z",
   "files_expected": [
     "docs/runtime/free-destiny-map-controlled-next-boot-proof.md",
     "manifests/runtime/free-destiny-map-controlled-next-boot-proof.json",
@@ -26,16 +26,10 @@
   ],
   "files_checked": 16,
   "missing_files": [],
-  "failed_checks": [
-    "Controlled Next boot proof must pass.",
-    "Controlled Next boot proof status must be CONTROLLED_NEXT_BOOT_PROVEN.",
-    "Controlled Next boot proof must start server.",
-    "Controlled Next boot proof must stop server.",
-    "Controlled Next boot proof must record webStatus 200."
-  ],
+  "failed_checks": [],
   "warnings": [],
   "oracle_lite_impact": "none_runtime_yet",
   "control_plane_impact": "Adds controlled real Next local web boot proof for Free Destiny Map.",
   "runtime_proof": "reports/runtime/free-destiny-map-controlled-next-boot-proof.json",
-  "next_action": "Repair controlled Next boot failures and rerun proof plus validator."
+  "next_action": "Proceed to BATCH 15 - Controlled local API integration or production build proof."
 }

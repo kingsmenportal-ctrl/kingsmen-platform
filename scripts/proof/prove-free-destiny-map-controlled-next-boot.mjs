@@ -156,16 +156,29 @@ try {
   port = await getFreePort();
   webUrl = `http://127.0.0.1:${port}/free-destiny-map`;
 
-  const npmCommand = process.platform === "win32" ? "npm.cmd" : "npm";
-  child = spawn(npmCommand, ["run", "dev", "--", "--port", String(port)], {
+  const nextCliPath = path.join(webDir, "node_modules/next/dist/bin/next");
+  const launchMode = "direct node next launcher; bypass npm.cmd for Windows spawn EINVAL repair";
+
+  check("controlled-next-launcher-next-cli-exists", fs.existsSync(nextCliPath), nextCliPath);
+  check("controlled-next-launcher-mode", true, launchMode);
+
+  const safeEnv = {};
+  for (const [key, value] of Object.entries(process.env)) {
+    if (!key || key.includes("=") || key.includes("\u0000")) continue;
+    if (typeof value === "undefined" || String(value).includes("\u0000")) continue;
+    safeEnv[key] = String(value);
+  }
+
+  safeEnv.NEXT_TELEMETRY_DISABLED = "1";
+  safeEnv.CI = "1";
+
+  child = spawn(process.execPath, [nextCliPath, "dev", "--hostname", "127.0.0.1", "--port", String(port)], {
     cwd: webDir,
-    env: {
-      ...process.env,
-      NEXT_TELEMETRY_DISABLED: "1",
-      CI: "1"
-    },
-    stdio: ["ignore", "pipe", "pipe"]
+    env: safeEnv,
+    stdio: ["ignore", "pipe", "pipe"],
+    windowsHide: true
   });
+
 
   child.stdout.on("data", (chunk) => stdoutLines.push(chunk.toString()));
   child.stderr.on("data", (chunk) => stderrLines.push(chunk.toString()));
