@@ -1,0 +1,19 @@
+{
+  "module": "N_PROVIDER.1",
+  "validator": "validate-provider-registry.mjs",
+  "generated_at": "2026-06-02T01:30:53.190Z",
+  "passed": true,
+  "errors": [],
+  "warnings": [],
+  "provider_count": 14,
+  "checksums": {
+    "n-provider-1\\provider-registry.json": "6ed8ad5f0e529a54d9e521c0e070aeed3cbdd66866f90cf448d90ac40e175ad9",
+    "n-provider-1\\provider-states.schema.json": "96d4e9b5d2d071a0af3cbbce317df4d68c0d8bb15c58a5dbc985241932a092e8"
+  },
+  "safety": {
+    "no_raw_secret_values_checked_by_design": true,
+    "optional_providers_disabled_until_gated": true,
+    "airtable_mirror_only": true,
+    "email_first": true
+  }
+}

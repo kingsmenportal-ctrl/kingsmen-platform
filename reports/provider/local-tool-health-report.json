@@ -1,0 +1,94 @@
+{
+  "module": "N_PROVIDER.1",
+  "validator": "validate-local-tools.mjs",
+  "generated_at": "2026-06-02T01:22:53.216Z",
+  "passed": true,
+  "missing_required": [],
+  "tools": [
+    {
+      "id": "git",
+      "required": true,
+      "installed": true,
+      "command": "git --version",
+      "version": "git version 2.54.0.windows.1",
+      "error": null
+    },
+    {
+      "id": "gh",
+      "required": true,
+      "installed": true,
+      "command": "gh --version",
+      "version": "gh version 2.93.0 (2026-05-27)",
+      "error": null
+    },
+    {
+      "id": "pwsh",
+      "required": true,
+      "installed": true,
+      "command": "pwsh --version",
+      "version": "PowerShell 7.6.2",
+      "error": null
+    },
+    {
+      "id": "node",
+      "required": true,
+      "installed": true,
+      "command": "node --version",
+      "version": "v22.22.2",
+      "error": null
+    },
+    {
+      "id": "pnpm",
+      "required": true,
+      "installed": true,
+      "command": "pnpm --version",
+      "version": "11.5.0",
+      "error": null
+    },
+    {
+      "id": "docker",
+      "required": true,
+      "installed": true,
+      "command": "docker --version",
+      "version": "Docker version 29.4.3, build 055a478",
+      "error": null
+    },
+    {
+      "id": "netlify",
+      "required": false,
+      "installed": false,
+      "command": "netlify --version",
+      "version": null,
+      "error": "'netlify' is not recognized as an internal or external command,"
+    },
+    {
+      "id": "supabase",
+      "required": false,
+      "installed": false,
+      "command": "supabase --version",
+      "version": null,
+      "error": "'supabase' is not recognized as an internal or external command,"
+    },
+    {
+      "id": "oci",
+      "required": false,
+      "installed": false,
+      "command": "oci --version",
+      "version": null,
+      "error": "'oci' is not recognized as an internal or external command,"
+    },
+    {
+      "id": "playwright",
+      "required": false,
+      "installed": true,
+      "command": "npx playwright --version",
+      "version": "Version 1.60.0",
+      "error": null
+    }
+  ],
+  "safety": {
+    "optional_tools_may_remain_missing": true,
+    "no_secrets_read_or_printed": true,
+    "install_not_performed_by_validator": true
+  }
+}
