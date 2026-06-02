@@ -1,0 +1,93 @@
+{
+  "schema": "kingsmen.runtime-proof.v1",
+  "module": "BATCH 07 - Public Form to Intake API Wiring / Local API Boot Proof",
+  "status": "RUNTIME_SHELL_PROVEN",
+  "passed": true,
+  "generated_at": "2026-06-02T19:08:41.649Z",
+  "checks": [
+    {
+      "name": "file-exists:apps/api/src/routes/free-destiny-map-intake.routes.ts",
+      "passed": true,
+      "detail": "apps/api/src/routes/free-destiny-map-intake.routes.ts"
+    },
+    {
+      "name": "file-exists:apps/api/src/routes/free-destiny-map-persistence.routes.ts",
+      "passed": true,
+      "detail": "apps/api/src/routes/free-destiny-map-persistence.routes.ts"
+    },
+    {
+      "name": "file-exists:apps/api/src/services/free-destiny-map-intake.service.ts",
+      "passed": true,
+      "detail": "apps/api/src/services/free-destiny-map-intake.service.ts"
+    },
+    {
+      "name": "file-exists:apps/api/src/services/free-destiny-map-persistence.service.ts",
+      "passed": true,
+      "detail": "apps/api/src/services/free-destiny-map-persistence.service.ts"
+    },
+    {
+      "name": "file-exists:apps/web/src/components/kingsmen/FreeDestinyMapApiForm.tsx",
+      "passed": true,
+      "detail": "apps/web/src/components/kingsmen/FreeDestinyMapApiForm.tsx"
+    },
+    {
+      "name": "file-exists:apps/web/src/lib/kingsmen/free-destiny-map-client.ts",
+      "passed": true,
+      "detail": "apps/web/src/lib/kingsmen/free-destiny-map-client.ts"
+    },
+    {
+      "name": "client-posts-local-endpoint",
+      "passed": true,
+      "detail": "client uses endpoint contract"
+    },
+    {
+      "name": "client-builds-formdata-payload",
+      "passed": true,
+      "detail": "client builds payload from FormData"
+    },
+    {
+      "name": "client-uses-json",
+      "passed": true,
+      "detail": "client posts json"
+    },
+    {
+      "name": "form-is-client-component",
+      "passed": true,
+      "detail": "Next client component"
+    },
+    {
+      "name": "form-has-consent",
+      "passed": true,
+      "detail": "consent fields present"
+    },
+    {
+      "name": "form-has-route-interests",
+      "passed": true,
+      "detail": "route interest fields present"
+    },
+    {
+      "name": "form-has-local-shell-warning",
+      "passed": true,
+      "detail": "safe local shell warning present"
+    },
+    {
+      "name": "route-local-endpoint-exists",
+      "passed": true,
+      "detail": "local endpoint present"
+    },
+    {
+      "name": "route-keeps-production-false",
+      "passed": true,
+      "detail": "production false"
+    },
+    {
+      "name": "route-blocks-official-submission",
+      "passed": true,
+      "detail": "official submission false"
+    }
+  ],
+  "failed": [],
+  "oracle_lite_impact": "none_runtime_yet",
+  "runtime_scope": "static local boot proof only; no server started; no production storage",
+  "next_action": "Run validator and commit BATCH 07."
+}

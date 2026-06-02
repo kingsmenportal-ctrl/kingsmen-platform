@@ -1,0 +1,27 @@
+{
+  "schema": "kingsmen.validation-report.v1",
+  "module": "BATCH 07 - Public Form to Intake API Wiring / Local API Boot Proof",
+  "status": "VALIDATED",
+  "passed": true,
+  "generated_at": "2026-06-02T19:08:41.808Z",
+  "files_expected": [
+    "docs/runtime/free-destiny-map-public-api-wiring.md",
+    "manifests/runtime/free-destiny-map-api-wiring-shell.json",
+    "packages/contracts/src/free-destiny-map-api-wiring.ts",
+    "apps/web/src/lib/kingsmen/free-destiny-map-client.ts",
+    "apps/web/src/components/kingsmen/FreeDestinyMapApiForm.tsx",
+    "apps/web/src/app/free-destiny-map/page.tsx",
+    "scripts/proof/prove-free-destiny-map-api-wiring.mjs",
+    "reports/runtime/free-destiny-map-api-wiring-proof.json",
+    "scripts/validators/validate-free-destiny-map-api-wiring.mjs",
+    "reports/validation/free-destiny-map-api-wiring-latest.json"
+  ],
+  "files_checked": 10,
+  "missing_files": [],
+  "failed_checks": [],
+  "warnings": [],
+  "oracle_lite_impact": "none_runtime_yet",
+  "control_plane_impact": "Adds public form wiring to local Free Destiny Map intake API shell.",
+  "runtime_proof": "reports/runtime/free-destiny-map-api-wiring-proof.json",
+  "next_action": "Proceed to BATCH 08 - Local API boot command/proof or first end-to-end local route exercise."
+}

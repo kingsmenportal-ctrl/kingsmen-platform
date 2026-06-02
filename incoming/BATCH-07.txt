@@ -1,0 +1,630 @@
+FILE: docs/runtime/free-destiny-map-public-api-wiring.md
+---
+# BATCH 07 - Public Form to Intake API Wiring / Local API Boot Proof
+
+## Purpose
+
+This batch connects the public Free Destiny Map form shell toward the safe intake API boundary created in BATCH 05 and the local persistence shell created in BATCH 06.
+
+It does not claim production readiness.
+
+## What this batch creates
+
+- public form client adapter
+- connected Free Destiny Map form component
+- updated Free Destiny Map page
+- public API wiring contract
+- local API boot proof script
+- runtime proof report
+- validator and validation report
+
+## Runtime boundary
+
+The connected form posts to:
+
+`/api/public/free-destiny-map/intake/local`
+
+That endpoint remains a local runtime shell.
+
+The backend decides whether local JSONL writing is enabled through:
+
+`KINGSMEN_ENABLE_LOCAL_INTAKE_WRITE`
+
+If the flag is not enabled, the API still returns safe shell feedback without writing data.
+
+## What this batch does not do yet
+
+- no production database storage
+- no Supabase service role usage
+- no email sending
+- no payment processing
+- no document upload
+- no official application submission
+- no Oracle runtime claim
+- no production readiness claim
+
+## Safety
+
+The public form must only capture basic route-mapping information and consent.
+
+It must not capture raw ID numbers, passwords, portal logins, card details, CVV, document files, base64 documents, or official application credentials.
+
+## Oracle Lite impact
+
+none_runtime_yet.
+
+This batch creates UI wiring, client adapter, local boot proof, validator, and reports only.
+
+## Next action
+
+After validation, BATCH 08 should create local API boot/server wiring or the first developer runtime command that proves the route can be exercised locally.
+---
+FILE: manifests/runtime/free-destiny-map-api-wiring-shell.json
+---
+{
+  "schema": "kingsmen.runtime-wiring-shell.v1",
+  "module": "BATCH 07 - Public Form to Intake API Wiring / Local API Boot Proof",
+  "status": "BUILT_PENDING_VALIDATION",
+  "productionReady": false,
+  "sourceBatches": [
+    "BATCH 04 - First Public Website + Free Destiny Map Shell",
+    "BATCH 05 - Free Destiny Map Intake Contract / Backend Shell",
+    "BATCH 06 - Intake Persistence / Local Runtime Shell"
+  ],
+  "publicRoute": "/free-destiny-map",
+  "apiEndpoint": "/api/public/free-destiny-map/intake/local",
+  "localWriteFlag": "KINGSMEN_ENABLE_LOCAL_INTAKE_WRITE",
+  "storesProductionData": false,
+  "takesPayment": false,
+  "sendsEmail": false,
+  "submitsOfficialApplications": false,
+  "collectsDocuments": false,
+  "oracleLiteImpact": "none_runtime_yet",
+  "controlPlaneImpact": "Adds public form wiring toward the safe local intake API shell.",
+  "requiredFiles": [
+    "docs/runtime/free-destiny-map-public-api-wiring.md",
+    "manifests/runtime/free-destiny-map-api-wiring-shell.json",
+    "packages/contracts/src/free-destiny-map-api-wiring.ts",
+    "apps/web/src/lib/kingsmen/free-destiny-map-client.ts",
+    "apps/web/src/components/kingsmen/FreeDestinyMapApiForm.tsx",
+    "apps/web/src/app/free-destiny-map/page.tsx",
+    "scripts/proof/prove-free-destiny-map-api-wiring.mjs",
+    "reports/runtime/free-destiny-map-api-wiring-proof.json",
+    "scripts/validators/validate-free-destiny-map-api-wiring.mjs",
+    "reports/validation/free-destiny-map-api-wiring-latest.json"
+  ],
+  "nextAction": "Run node scripts/proof/prove-free-destiny-map-api-wiring.mjs then node scripts/validators/validate-free-destiny-map-api-wiring.mjs"
+}
+---
+FILE: packages/contracts/src/free-destiny-map-api-wiring.ts
+---
+export const FREE_DESTINY_MAP_PUBLIC_ROUTE = "/free-destiny-map" as const;
+
+export const FREE_DESTINY_MAP_LOCAL_INTAKE_ENDPOINT = "/api/public/free-destiny-map/intake/local" as const;
+
+export const FREE_DESTINY_MAP_LOCAL_WRITE_FLAG = "KINGSMEN_ENABLE_LOCAL_INTAKE_WRITE" as const;
+
+export const FREE_DESTINY_MAP_API_WIRING_NOTICE =
+  "This public form wiring targets a local intake shell. It is not production storage, not payment, not email delivery, not document upload, and not official application submission.";
+
+export interface FreeDestinyMapClientSubmission {
+  fullName?: string;
+  province?: string;
+  currentSituation?: string;
+  knownRoute?: string;
+  routeInterests?: string[];
+  needsAccommodation?: boolean;
+  accommodationArea?: string;
+  needsFundingHelp?: boolean;
+  needsCvHelp?: boolean;
+  hasDocumentsReady?: boolean;
+  randomSourceName?: string;
+  consentToBeContacted?: boolean;
+  consentToProcessBasicInfo?: boolean;
+}
+
+export interface FreeDestinyMapClientResponse {
+  accepted: boolean;
+  reference: string;
+  productionReady: false;
+  localPersistenceEnabled?: boolean;
+  localWriteAttempted?: boolean;
+  localWriteSucceeded?: boolean;
+  storageMode?: "disabled" | "local_jsonl_shell";
+  safeNotice: string;
+  nextAction: string;
+  issues: Array<{
+    field: string;
+    code: string;
+    message: string;
+  }>;
+}
+---
+FILE: apps/web/src/lib/kingsmen/free-destiny-map-client.ts
+---
+import {
+  FREE_DESTINY_MAP_LOCAL_INTAKE_ENDPOINT,
+  type FreeDestinyMapClientResponse,
+  type FreeDestinyMapClientSubmission
+} from "../../../../../packages/contracts/src/free-destiny-map-api-wiring";
+
+export function buildFreeDestinyMapClientPayload(formData: FormData): FreeDestinyMapClientSubmission {
+  const routeInterests = formData
+    .getAll("routeInterests")
+    .map((item) => String(item))
+    .filter(Boolean);
+
+  return {
+    fullName: String(formData.get("fullName") ?? "").trim(),
+    province: String(formData.get("province") ?? "").trim(),
+    currentSituation: String(formData.get("currentSituation") ?? "").trim(),
+    knownRoute: String(formData.get("knownRoute") ?? "").trim(),
+    routeInterests,
+    needsAccommodation: formData.get("needsAccommodation") === "on",
+    accommodationArea: String(formData.get("accommodationArea") ?? "").trim(),
+    needsFundingHelp: formData.get("needsFundingHelp") === "on",
+    needsCvHelp: formData.get("needsCvHelp") === "on",
+    hasDocumentsReady: formData.get("hasDocumentsReady") === "on",
+    randomSourceName: String(formData.get("randomSourceName") ?? "").trim(),
+    consentToBeContacted: formData.get("consentToBeContacted") === "on",
+    consentToProcessBasicInfo: formData.get("consentToProcessBasicInfo") === "on"
+  };
+}
+
+export async function submitFreeDestinyMapClientPayload(
+  payload: FreeDestinyMapClientSubmission
+): Promise<FreeDestinyMapClientResponse> {
+  const response = await fetch(FREE_DESTINY_MAP_LOCAL_INTAKE_ENDPOINT, {
+    method: "POST",
+    headers: {
+      "content-type": "application/json"
+    },
+    body: JSON.stringify(payload)
+  });
+
+  const data = (await response.json()) as FreeDestinyMapClientResponse;
+
+  return data;
+}
+---
+FILE: apps/web/src/components/kingsmen/FreeDestinyMapApiForm.tsx
+---
+"use client";
+
+import { useState } from "react";
+import {
+  buildFreeDestinyMapClientPayload,
+  submitFreeDestinyMapClientPayload
+} from "../..//lib/kingsmen/free-destiny-map-client";
+import {
+  FREE_DESTINY_MAP_API_WIRING_NOTICE,
+  type FreeDestinyMapClientResponse
+} from "../../../../packages/contracts/src/free-destiny-map-api-wiring";
+
+const routeOptions = [
+  ["higher_education", "University"],
+  ["tvet", "TVET"],
+  ["seta_learnership", "SETA / learnership"],
+  ["internship", "Internship"],
+  ["apprenticeship", "Apprenticeship"],
+  ["employment", "Employment"],
+  ["nsfas_bursary", "NSFAS / bursary"],
+  ["accommodation", "Accommodation"],
+  ["cv_revamp", "CV Revamp"],
+  ["documents", "Documents"],
+  ["source_check", "Source check"],
+  ["phoenix_fallback", "Phoenix fallback"],
+  ["confused_full_map", "I need the full map"]
+];
+
+export function FreeDestinyMapApiForm() {
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [result, setResult] = useState<FreeDestinyMapClientResponse | null>(null);
+  const [error, setError] = useState<string | null>(null);
+
+  async function onSubmit(event: React.FormEvent<HTMLFormElement>) {
+    event.preventDefault();
+    setIsSubmitting(true);
+    setError(null);
+    setResult(null);
+
+    try {
+      const payload = buildFreeDestinyMapClientPayload(new FormData(event.currentTarget));
+      const response = await submitFreeDestinyMapClientPayload(payload);
+      setResult(response);
+    } catch {
+      setError("The local intake shell could not be reached. This is still a runtime wiring stage, not production.");
+    } finally {
+      setIsSubmitting(false);
+    }
+  }
+
+  const fieldStyle = {
+    width: "100%",
+    padding: "12px 14px",
+    borderRadius: 12,
+    border: "1px solid rgba(212,175,55,0.35)",
+    background: "#020617",
+    color: "#f8fafc"
+  };
+
+  const labelStyle = {
+    display: "block",
+    marginBottom: 6,
+    color: "#f8fafc",
+    fontSize: 13
+  };
+
+  return (
+    <section style={{ border: "1px solid rgba(212,175,55,0.35)", borderRadius: 22, padding: 22, background: "rgba(2,6,23,0.92)", color: "#f8fafc" }}>
+      <p style={{ margin: 0, color: "#d4af37", letterSpacing: "0.12em", textTransform: "uppercase", fontSize: 12 }}>Free first map</p>
+      <h2 style={{ marginTop: 8 }}>Start your Free Destiny Map</h2>
+      <p style={{ color: "#cbd5e1", lineHeight: 1.7 }}>
+        This form is wired toward the local intake API shell. Production storage, email, payment, documents and official submissions are still blocked.
+      </p>
+      <p style={{ color: "#fde68a", lineHeight: 1.7 }}>{FREE_DESTINY_MAP_API_WIRING_NOTICE}</p>
+
+      <form onSubmit={onSubmit} style={{ display: "grid", gap: 14 }}>
+        <label>
+          <span style={labelStyle}>Your name</span>
+          <input name="fullName" style={fieldStyle} placeholder="Full name" />
+        </label>
+
+        <label>
+          <span style={labelStyle}>Province / area</span>
+          <input name="province" style={fieldStyle} placeholder="Example: KwaZulu-Natal, Gauteng, Eastern Cape" />
+        </label>
+
+        <label>
+          <span style={labelStyle}>Known route</span>
+          <input name="knownRoute" style={fieldStyle} placeholder="Example: UJ, TVET, NSFAS, CV, accommodation, learnership..." />
+        </label>
+
+        <label>
+          <span style={labelStyle}>Current situation</span>
+          <textarea name="currentSituation" style={{ ...fieldStyle, minHeight: 96 }} placeholder="Tell Kingsmen what you are trying to do." />
+        </label>
+
+        <fieldset style={{ border: "1px solid rgba(212,175,55,0.25)", borderRadius: 14, padding: 14 }}>
+          <legend style={{ color: "#d4af37" }}>Route interests</legend>
+          <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(160px, 1fr))", gap: 10 }}>
+            {routeOptions.map(([value, label]) => (
+              <label key={value} style={{ display: "flex", gap: 8, alignItems: "center", color: "#e2e8f0" }}>
+                <input name="routeInterests" value={value} type="checkbox" />
+                {label}
+              </label>
+            ))}
+          </div>
+        </fieldset>
+
+        <label style={{ display: "flex", gap: 8, alignItems: "center" }}>
+          <input name="needsAccommodation" type="checkbox" />
+          I may need accommodation near study, work, training, learnership, internship or apprenticeship.
+        </label>
+
+        <label>
+          <span style={labelStyle}>Accommodation area, campus, workplace or training location</span>
+          <input name="accommodationArea" style={fieldStyle} placeholder="Example: Durban, Johannesburg, Cape Town, campus/workplace area..." />
+        </label>
+
+        <label style={{ display: "flex", gap: 8, alignItems: "center" }}>
+          <input name="needsFundingHelp" type="checkbox" />
+          I may need NSFAS, bursary or funding readiness support.
+        </label>
+
+        <label style={{ display: "flex", gap: 8, alignItems: "center" }}>
+          <input name="needsCvHelp" type="checkbox" />
+          I may need CV help.
+        </label>
+
+        <label style={{ display: "flex", gap: 8, alignItems: "center" }}>
+          <input name="hasDocumentsReady" type="checkbox" />
+          I already have some documents ready.
+        </label>
+
+        <label>
+          <span style={labelStyle}>Random opportunity, college, bursary, job, landlord, learnership or training provider to check</span>
+          <input name="randomSourceName" style={fieldStyle} placeholder="Name or link to check later" />
+        </label>
+
+        <label style={{ display: "flex", gap: 8, alignItems: "center" }}>
+          <input name="consentToBeContacted" type="checkbox" />
+          I agree Kingsmen may contact me about this Free Destiny Map.
+        </label>
+
+        <label style={{ display: "flex", gap: 8, alignItems: "center" }}>
+          <input name="consentToProcessBasicInfo" type="checkbox" />
+          I agree Kingsmen may process this basic route-mapping information.
+        </label>
+
+        <button type="submit" disabled={isSubmitting} style={{ border: 0, borderRadius: 999, padding: "13px 18px", background: "#d4af37", color: "#020617", fontWeight: 800 }}>
+          {isSubmitting ? "Sending to local shell..." : "Send to local intake shell"}
+        </button>
+      </form>
+
+      {error ? (
+        <div style={{ marginTop: 16, padding: 14, borderRadius: 14, background: "rgba(239,68,68,0.12)", color: "#fecaca" }}>
+          {error}
+        </div>
+      ) : null}
+
+      {result ? (
+        <div style={{ marginTop: 16, padding: 14, borderRadius: 14, background: "rgba(34,197,94,0.12)", color: "#bbf7d0" }}>
+          <p><strong>Reference:</strong> {result.reference}</p>
+          <p><strong>Accepted:</strong> {String(result.accepted)}</p>
+          <p><strong>Production ready:</strong> {String(result.productionReady)}</p>
+          <p><strong>Next:</strong> {result.nextAction}</p>
+          {result.issues.length > 0 ? (
+            <ul>
+              {result.issues.map((issue) => (
+                <li key={`${issue.field}-${issue.code}`}>{issue.message}</li>
+              ))}
+            </ul>
+          ) : null}
+        </div>
+      ) : null}
+    </section>
+  );
+}
+---
+FILE: apps/web/src/app/free-destiny-map/page.tsx
+---
+import { FreeDestinyMapApiForm } from "../../components/kingsmen/FreeDestinyMapApiForm";
+
+export default function FreeDestinyMapPage() {
+  return (
+    <main style={{ minHeight: "100vh", padding: 28, background: "#050816" }}>
+      <section style={{ maxWidth: 920, margin: "0 auto" }}>
+        <FreeDestinyMapApiForm />
+      </section>
+    </main>
+  );
+}
+---
+FILE: scripts/proof/prove-free-destiny-map-api-wiring.mjs
+---
+#!/usr/bin/env node
+import fs from "node:fs";
+import path from "node:path";
+
+const root = process.cwd();
+const reportPath = path.join(root, "reports/runtime/free-destiny-map-api-wiring-proof.json");
+
+function exists(rel) {
+  return fs.existsSync(path.join(root, rel));
+}
+
+function read(rel) {
+  return fs.readFileSync(path.join(root, rel), "utf8").replace(/^\uFEFF/, "");
+}
+
+const checks = [];
+
+function check(name, passed, detail = "") {
+  checks.push({ name, passed, detail });
+}
+
+const requiredRuntimeFiles = [
+  "apps/api/src/routes/free-destiny-map-intake.routes.ts",
+  "apps/api/src/routes/free-destiny-map-persistence.routes.ts",
+  "apps/api/src/services/free-destiny-map-intake.service.ts",
+  "apps/api/src/services/free-destiny-map-persistence.service.ts",
+  "apps/web/src/components/kingsmen/FreeDestinyMapApiForm.tsx",
+  "apps/web/src/lib/kingsmen/free-destiny-map-client.ts"
+];
+
+for (const file of requiredRuntimeFiles) {
+  check(`file-exists:${file}`, exists(file), file);
+}
+
+if (exists("apps/web/src/lib/kingsmen/free-destiny-map-client.ts")) {
+  const client = read("apps/web/src/lib/kingsmen/free-destiny-map-client.ts");
+  check("client-posts-local-endpoint", client.includes("FREE_DESTINY_MAP_LOCAL_INTAKE_ENDPOINT"), "client uses endpoint contract");
+  check("client-builds-formdata-payload", client.includes("buildFreeDestinyMapClientPayload"), "client builds payload from FormData");
+  check("client-uses-json", client.includes("application/json"), "client posts json");
+}
+
+if (exists("apps/web/src/components/kingsmen/FreeDestinyMapApiForm.tsx")) {
+  const form = read("apps/web/src/components/kingsmen/FreeDestinyMapApiForm.tsx");
+  check("form-is-client-component", form.includes('"use client"'), "Next client component");
+  check("form-has-consent", form.includes("consentToBeContacted") && form.includes("consentToProcessBasicInfo"), "consent fields present");
+  check("form-has-route-interests", form.includes("routeInterests"), "route interest fields present");
+  check("form-has-local-shell-warning", form.includes("Production storage") || form.includes("local intake API shell"), "safe local shell warning present");
+}
+
+if (exists("apps/api/src/routes/free-destiny-map-persistence.routes.ts")) {
+  const route = read("apps/api/src/routes/free-destiny-map-persistence.routes.ts");
+  check("route-local-endpoint-exists", route.includes("/api/public/free-destiny-map/intake/local"), "local endpoint present");
+  check("route-keeps-production-false", route.includes("productionReady: false"), "production false");
+  check("route-blocks-official-submission", route.includes("officialApplicationSubmitted: false"), "official submission false");
+}
+
+const failed = checks.filter((item) => item.passed !== true);
+const passed = failed.length === 0;
+
+const report = {
+  schema: "kingsmen.runtime-proof.v1",
+  module: "BATCH 07 - Public Form to Intake API Wiring / Local API Boot Proof",
+  status: passed ? "RUNTIME_SHELL_PROVEN" : "BUILT_PENDING_RUNTIME_PROOF",
+  passed,
+  generated_at: new Date().toISOString(),
+  checks,
+  failed,
+  oracle_lite_impact: "none_runtime_yet",
+  runtime_scope: "static local boot proof only; no server started; no production storage",
+  next_action: passed ? "Run validator and commit BATCH 07." : "Repair wiring proof failures."
+};
+
+fs.mkdirSync(path.dirname(reportPath), { recursive: true });
+fs.writeFileSync(reportPath, `${JSON.stringify(report, null, 2)}\n`, "utf8");
+
+console.log(JSON.stringify(report, null, 2));
+if (!passed) process.exit(1);
+---
+FILE: reports/runtime/free-destiny-map-api-wiring-proof.json
+---
+{
+  "schema": "kingsmen.runtime-proof.v1",
+  "module": "BATCH 07 - Public Form to Intake API Wiring / Local API Boot Proof",
+  "status": "BUILT_PENDING_RUNTIME_PROOF",
+  "passed": false,
+  "generated_at": "2026-06-02T00:00:00.000Z",
+  "checks": [],
+  "failed": [
+    {
+      "name": "runtime_proof_not_yet_executed",
+      "passed": false,
+      "detail": "Run node scripts/proof/prove-free-destiny-map-api-wiring.mjs."
+    }
+  ],
+  "oracle_lite_impact": "none_runtime_yet",
+  "runtime_scope": "static local boot proof only; no server started; no production storage",
+  "next_action": "Run node scripts/proof/prove-free-destiny-map-api-wiring.mjs."
+}
+---
+FILE: scripts/validators/validate-free-destiny-map-api-wiring.mjs
+---
+#!/usr/bin/env node
+import fs from "node:fs";
+import path from "node:path";
+
+const root = process.cwd();
+const reportPath = path.join(root, "reports/validation/free-destiny-map-api-wiring-latest.json");
+
+const requiredFiles = [
+  "docs/runtime/free-destiny-map-public-api-wiring.md",
+  "manifests/runtime/free-destiny-map-api-wiring-shell.json",
+  "packages/contracts/src/free-destiny-map-api-wiring.ts",
+  "apps/web/src/lib/kingsmen/free-destiny-map-client.ts",
+  "apps/web/src/components/kingsmen/FreeDestinyMapApiForm.tsx",
+  "apps/web/src/app/free-destiny-map/page.tsx",
+  "scripts/proof/prove-free-destiny-map-api-wiring.mjs",
+  "reports/runtime/free-destiny-map-api-wiring-proof.json",
+  "scripts/validators/validate-free-destiny-map-api-wiring.mjs",
+  "reports/validation/free-destiny-map-api-wiring-latest.json"
+];
+
+function exists(rel) {
+  return fs.existsSync(path.join(root, rel));
+}
+
+function read(rel) {
+  return fs.readFileSync(path.join(root, rel), "utf8").replace(/^\uFEFF/, "");
+}
+
+function parseJson(rel) {
+  return JSON.parse(read(rel));
+}
+
+const failures = [];
+const warnings = [];
+const checked = [];
+
+for (const file of requiredFiles) {
+  checked.push(file);
+  if (!exists(file)) failures.push(`Missing required file: ${file}`);
+  else if (fs.statSync(path.join(root, file)).size === 0) failures.push(`Empty required file: ${file}`);
+}
+
+if (exists("manifests/runtime/free-destiny-map-api-wiring-shell.json")) {
+  const manifest = parseJson("manifests/runtime/free-destiny-map-api-wiring-shell.json");
+  if (manifest.productionReady !== false) failures.push("Manifest must keep productionReady false.");
+  if (manifest.apiEndpoint !== "/api/public/free-destiny-map/intake/local") failures.push("Manifest endpoint mismatch.");
+  if (manifest.storesProductionData !== false) failures.push("Manifest must declare storesProductionData false.");
+  if (manifest.takesPayment !== false) failures.push("Manifest must declare takesPayment false.");
+  if (manifest.sendsEmail !== false) failures.push("Manifest must declare sendsEmail false.");
+  if (manifest.collectsDocuments !== false) failures.push("Manifest must declare collectsDocuments false.");
+  if (!String(manifest.oracleLiteImpact ?? "").includes("none_runtime_yet")) failures.push("Manifest must declare none_runtime_yet.");
+}
+
+const tokenChecks = [
+  ["packages/contracts/src/free-destiny-map-api-wiring.ts", ["FREE_DESTINY_MAP_LOCAL_INTAKE_ENDPOINT", "FREE_DESTINY_MAP_API_WIRING_NOTICE", "FreeDestinyMapClientSubmission", "FreeDestinyMapClientResponse"]],
+  ["apps/web/src/lib/kingsmen/free-destiny-map-client.ts", ["buildFreeDestinyMapClientPayload", "submitFreeDestinyMapClientPayload", "FREE_DESTINY_MAP_LOCAL_INTAKE_ENDPOINT", "application/json"]],
+  ["apps/web/src/components/kingsmen/FreeDestinyMapApiForm.tsx", ['"use client"', "submitFreeDestinyMapClientPayload", "consentToBeContacted", "consentToProcessBasicInfo", "Production storage"]],
+  ["apps/web/src/app/free-destiny-map/page.tsx", ["FreeDestinyMapApiForm"]],
+  ["scripts/proof/prove-free-destiny-map-api-wiring.mjs", ["RUNTIME_SHELL_PROVEN", "client-posts-local-endpoint", "route-local-endpoint-exists"]]
+];
+
+for (const [file, tokens] of tokenChecks) {
+  if (!exists(file)) continue;
+  const content = read(file);
+  for (const token of tokens) {
+    if (!content.includes(token)) failures.push(`${file} missing token: ${token}`);
+  }
+}
+
+if (exists("reports/runtime/free-destiny-map-api-wiring-proof.json")) {
+  const proof = parseJson("reports/runtime/free-destiny-map-api-wiring-proof.json");
+  if (proof.passed !== true) failures.push("Runtime proof report must pass.");
+  if (proof.status !== "RUNTIME_SHELL_PROVEN") failures.push("Runtime proof status must be RUNTIME_SHELL_PROVEN.");
+}
+
+const forbiddenRuntimePatterns = [
+  [/\bidentityNumber\s*[:=]/i, "identity number field assignment"],
+  [/\bidNumber\s*[:=]/i, "id number field assignment"],
+  [/\bpassportNumber\s*[:=]/i, "passport number field assignment"],
+  [/\bpassword\s*[:=]/i, "password field assignment"],
+  [/\bcardNumber\s*[:=]/i, "card number field assignment"],
+  [/\bcvv\s*[:=]/i, "cvv field assignment"],
+  [/\bdocumentBase64\s*[:=]/i, "document payload assignment"],
+  [/officialApplicationSubmitted:\s*true/i, "official application submitted true"],
+  [/paymentInstructionSent:\s*true/i, "payment instruction sent true"],
+  [/emailSent:\s*true/i, "email sent true"],
+  [/productionReady\s*[:=]\s*true/i, "productionReady true"]
+];
+
+const filesToScan = requiredFiles
+  .filter((item) => exists(item))
+  .filter((item) => !item.includes("validate-free-destiny-map-api-wiring.mjs"))
+  .filter((item) => !item.includes("prove-free-destiny-map-api-wiring.mjs"));
+
+for (const file of filesToScan) {
+  const content = read(file);
+  for (const [pattern, label] of forbiddenRuntimePatterns) {
+    if (pattern.test(content)) failures.push(`${file} contains forbidden runtime pattern: ${label}`);
+  }
+}
+
+const passed = failures.length === 0;
+
+const report = {
+  schema: "kingsmen.validation-report.v1",
+  module: "BATCH 07 - Public Form to Intake API Wiring / Local API Boot Proof",
+  status: passed ? "VALIDATED" : "BUILT_PENDING_VALIDATION",
+  passed,
+  generated_at: new Date().toISOString(),
+  files_expected: requiredFiles,
+  files_checked: checked.length,
+  missing_files: requiredFiles.filter((file) => !exists(file)),
+  failed_checks: failures,
+  warnings,
+  oracle_lite_impact: "none_runtime_yet",
+  control_plane_impact: "Adds public form wiring to local Free Destiny Map intake API shell.",
+  runtime_proof: "reports/runtime/free-destiny-map-api-wiring-proof.json",
+  next_action: passed ? "Proceed to BATCH 08 - Local API boot command/proof or first end-to-end local route exercise." : "Repair public form API wiring failures and rerun proof plus validator."
+};
+
+fs.mkdirSync(path.dirname(reportPath), { recursive: true });
+fs.writeFileSync(reportPath, `${JSON.stringify(report, null, 2)}\n`, "utf8");
+
+console.log(JSON.stringify(report, null, 2));
+if (!passed) process.exit(1);
+---
+FILE: reports/validation/free-destiny-map-api-wiring-latest.json
+---
+{
+  "schema": "kingsmen.validation-report.v1",
+  "module": "BATCH 07 - Public Form to Intake API Wiring / Local API Boot Proof",
+  "status": "BUILT_PENDING_VALIDATION",
+  "passed": false,
+  "generated_at": "2026-06-02T00:00:00.000Z",
+  "reason": "Seed report. Run node scripts/proof/prove-free-destiny-map-api-wiring.mjs then node scripts/validators/validate-free-destiny-map-api-wiring.mjs.",
+  "files_checked": 0,
+  "failed_checks": [
+    "validator_not_yet_executed"
+  ],
+  "oracle_lite_impact": "none_runtime_yet",
+  "control_plane_impact": "Adds public form wiring to local Free Destiny Map intake API shell.",
+  "runtime_proof": "reports/runtime/free-destiny-map-api-wiring-proof.json",
+  "next_action": "Run BATCH 07 proof and validator."
+}

@@ -1,0 +1,34 @@
+{
+  "schema": "kingsmen.runtime-wiring-shell.v1",
+  "module": "BATCH 07 - Public Form to Intake API Wiring / Local API Boot Proof",
+  "status": "BUILT_PENDING_VALIDATION",
+  "productionReady": false,
+  "sourceBatches": [
+    "BATCH 04 - First Public Website + Free Destiny Map Shell",
+    "BATCH 05 - Free Destiny Map Intake Contract / Backend Shell",
+    "BATCH 06 - Intake Persistence / Local Runtime Shell"
+  ],
+  "publicRoute": "/free-destiny-map",
+  "apiEndpoint": "/api/public/free-destiny-map/intake/local",
+  "localWriteFlag": "KINGSMEN_ENABLE_LOCAL_INTAKE_WRITE",
+  "storesProductionData": false,
+  "takesPayment": false,
+  "sendsEmail": false,
+  "submitsOfficialApplications": false,
+  "collectsDocuments": false,
+  "oracleLiteImpact": "none_runtime_yet",
+  "controlPlaneImpact": "Adds public form wiring toward the safe local intake API shell.",
+  "requiredFiles": [
+    "docs/runtime/free-destiny-map-public-api-wiring.md",
+    "manifests/runtime/free-destiny-map-api-wiring-shell.json",
+    "packages/contracts/src/free-destiny-map-api-wiring.ts",
+    "apps/web/src/lib/kingsmen/free-destiny-map-client.ts",
+    "apps/web/src/components/kingsmen/FreeDestinyMapApiForm.tsx",
+    "apps/web/src/app/free-destiny-map/page.tsx",
+    "scripts/proof/prove-free-destiny-map-api-wiring.mjs",
+    "reports/runtime/free-destiny-map-api-wiring-proof.json",
+    "scripts/validators/validate-free-destiny-map-api-wiring.mjs",
+    "reports/validation/free-destiny-map-api-wiring-latest.json"
+  ],
+  "nextAction": "Run node scripts/proof/prove-free-destiny-map-api-wiring.mjs then node scripts/validators/validate-free-destiny-map-api-wiring.mjs"
+}
