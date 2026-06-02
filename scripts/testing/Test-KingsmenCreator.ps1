@@ -1,4 +1,4 @@
-#requires -Version 5.1
+﻿#requires -Version 5.1
 <#
 CREATOR.2 - Test-KingsmenCreator.ps1
 PowerShell 5.1-safe self-test for scripts/KINGSMEN_CREATOR.ps1.
@@ -179,3 +179,4 @@ $Report | ConvertTo-Json -Depth 12
 
 if ($Passed) { exit 0 }
 exit 1
+

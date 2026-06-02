@@ -1,0 +1,208 @@
+﻿{
+    "module":  "CREATOR",
+    "submodule":  "CREATOR.1",
+    "phase":  "N09.3Complete",
+    "creatorVersion":  "0.1.2",
+    "productionReady":  false,
+    "generatedAt":  "2026-06-02T06:18:20.068Z",
+    "repoRoot":  "C:\\Users\\dell\\kingsmen-platform",
+    "passed":  false,
+    "validatorExitCode":  1,
+    "validatorOutputPreview":  "{\r\n  \"module\": \"N09\",\r\n  \"submodule\": \"N09.3\",\r\n  \"validator\": \"validate-n09-3\",\r\n  \"productionReady\": false,\r\n  \"generatedAt\": \"2026-06-02T06:18:19.861Z\",\r\n  \"passed\": false,\r\n  \"totalChecks\": 57,\r\n  \"failedChecks\": 1,\r\n  \"checksums\": [\r\n    {\r\n      \"path\": \"packages/db/src/n09-action-packet-bridge-policy.ts\",\r\n      \"sha256\": \"4481a61517ff792da8dc449bc85d19aaacf3bdafff9b0ebb1432d9a6071a41e0\",\r\n      \"bytes\": 9100\r\n    },\r\n    {\r\n      \"path\": \"scripts/validators/validate-n09-3.mjs\",\r\n      \"sha256\": \"4e13fd91392e31b34b9937d25649f2e10417bd50dd049964cfb093361c784e17\",\r\n      \"bytes\": 7649\r\n    },\r\n    {\r\n      \"path\": \"manifests/modules/N09.3-communications-contracts.json\",\r\n      \"sha256\": \"9d25bdb789f38d0439cb35d2a089662872b4ae259bfe21d38a79635ba48798e4\",\r\n      \"bytes\": 2042\r\n    }\r\n  ],\r\n  \"failed\": [\r\n    {\r\n      \"name\": \"typescript-parser-available\",\r\n      \"passed\": false,\r\n      \"detail\": \"typescript package is required for N09.3 validation. Run: npm install\",\r\n      \"file\": \"packages/db/src/n09-action-packet-bridge-policy.ts\"\r\n    }\r\n  ],\r\n  \"checks\": [\r\n    {\r\n      \"name\": \"exists:packages/db/src/n09-action-packet-bridge-policy.ts\",\r\n      \"passed\": true,\r\n      \"detail\": \"found\",\r\n      \"file\": \"packages/db/src/n09-action-packet-bridge-policy.ts\"\r\n    },\r\n    {\r\n      \"name\": \"exists:scripts/validators/validate-n09-3.mjs\",\r\n      \"passed\": true,\r\n      \"detail\": \"found\",\r\n      \"file\": \"scripts/validators/validate-n09-3.mjs\"\r\n    },\r\n    {\r\n      \"name\": \"exists:manifests/modules/N09.3-communications-contracts.json\",\r\n      \"passed\": true,\r\n      \"detail\": \"found\",\r\n      \"file\": \"manifests/modules/N09.3-communications-contracts.json\"\r\n    },\r\n    {\r\n      \"name\": \"contains:packages/db/src/n09-action-packet-bridge-policy.ts:export function n09AssertBridgeSafe\",\r\n      \"passed\": true,\r\n      \"detail\": \"found\",\r\n      \"file\": \"packages/db/src/n09-action-packet-bridge-policy.ts\"\r\n    },\r\n    {\r\n      \"name\": \"contains:packages/db/src/n09-action-packet-bri",
+    "totalChecks":  25,
+    "failedChecks":  2,
+    "failed":  [
+                   {
+                       "name":  "validator:n09.3:exit-code",
+                       "passed":  false,
+                       "detail":  "exitCode=1",
+                       "path":  "",
+                       "severity":  "required"
+                   },
+                   {
+                       "name":  "report:n09.3:passed-true",
+                       "passed":  false,
+                       "detail":  "passed=False",
+                       "path":  "reports/n09/n09-3-validation-report.json",
+                       "severity":  "required"
+                   }
+               ],
+    "checks":  [
+                   {
+                       "name":  "exists:packages/db/src/n09-action-packet-bridge-policy.ts",
+                       "passed":  true,
+                       "detail":  "found",
+                       "path":  "packages/db/src/n09-action-packet-bridge-policy.ts",
+                       "severity":  "required"
+                   },
+                   {
+                       "name":  "forbidden:packages/db/src/n09-action-packet-bridge-policy.ts:productionReadyTrue",
+                       "passed":  true,
+                       "detail":  "not found",
+                       "path":  "packages/db/src/n09-action-packet-bridge-policy.ts",
+                       "severity":  "required"
+                   },
+                   {
+                       "name":  "forbidden:packages/db/src/n09-action-packet-bridge-policy.ts:productionReadyJsonTrue",
+                       "passed":  true,
+                       "detail":  "not found",
+                       "path":  "packages/db/src/n09-action-packet-bridge-policy.ts",
+                       "severity":  "required"
+                   },
+                   {
+                       "name":  "forbidden:packages/db/src/n09-action-packet-bridge-policy.ts:productionReadySqlTrue",
+                       "passed":  true,
+                       "detail":  "not found",
+                       "path":  "packages/db/src/n09-action-packet-bridge-policy.ts",
+                       "severity":  "required"
+                   },
+                   {
+                       "name":  "forbidden:packages/db/src/n09-action-packet-bridge-policy.ts:todoMarker",
+                       "passed":  true,
+                       "detail":  "not found",
+                       "path":  "packages/db/src/n09-action-packet-bridge-policy.ts",
+                       "severity":  "required"
+                   },
+                   {
+                       "name":  "forbidden:packages/db/src/n09-action-packet-bridge-policy.ts:fixmeMarker",
+                       "passed":  true,
+                       "detail":  "not found",
+                       "path":  "packages/db/src/n09-action-packet-bridge-policy.ts",
+                       "severity":  "required"
+                   },
+                   {
+                       "name":  "exists:scripts/validators/validate-n09-3.mjs",
+                       "passed":  true,
+                       "detail":  "found",
+                       "path":  "scripts/validators/validate-n09-3.mjs",
+                       "severity":  "required"
+                   },
+                   {
+                       "name":  "forbidden:scripts/validators/validate-n09-3.mjs:productionReadyTrue",
+                       "passed":  true,
+                       "detail":  "not found",
+                       "path":  "scripts/validators/validate-n09-3.mjs",
+                       "severity":  "required"
+                   },
+                   {
+                       "name":  "forbidden:scripts/validators/validate-n09-3.mjs:productionReadyJsonTrue",
+                       "passed":  true,
+                       "detail":  "not found",
+                       "path":  "scripts/validators/validate-n09-3.mjs",
+                       "severity":  "required"
+                   },
+                   {
+                       "name":  "forbidden:scripts/validators/validate-n09-3.mjs:productionReadySqlTrue",
+                       "passed":  true,
+                       "detail":  "not found",
+                       "path":  "scripts/validators/validate-n09-3.mjs",
+                       "severity":  "required"
+                   },
+                   {
+                       "name":  "forbidden:scripts/validators/validate-n09-3.mjs:todoMarker",
+                       "passed":  true,
+                       "detail":  "not found",
+                       "path":  "scripts/validators/validate-n09-3.mjs",
+                       "severity":  "required"
+                   },
+                   {
+                       "name":  "forbidden:scripts/validators/validate-n09-3.mjs:fixmeMarker",
+                       "passed":  true,
+                       "detail":  "not found",
+                       "path":  "scripts/validators/validate-n09-3.mjs",
+                       "severity":  "required"
+                   },
+                   {
+                       "name":  "exists:manifests/modules/N09.3-communications-contracts.json",
+                       "passed":  true,
+                       "detail":  "found",
+                       "path":  "manifests/modules/N09.3-communications-contracts.json",
+                       "severity":  "required"
+                   },
+                   {
+                       "name":  "forbidden:manifests/modules/N09.3-communications-contracts.json:productionReadyTrue",
+                       "passed":  true,
+                       "detail":  "not found",
+                       "path":  "manifests/modules/N09.3-communications-contracts.json",
+                       "severity":  "required"
+                   },
+                   {
+                       "name":  "forbidden:manifests/modules/N09.3-communications-contracts.json:productionReadyJsonTrue",
+                       "passed":  true,
+                       "detail":  "not found",
+                       "path":  "manifests/modules/N09.3-communications-contracts.json",
+                       "severity":  "required"
+                   },
+                   {
+                       "name":  "forbidden:manifests/modules/N09.3-communications-contracts.json:productionReadySqlTrue",
+                       "passed":  true,
+                       "detail":  "not found",
+                       "path":  "manifests/modules/N09.3-communications-contracts.json",
+                       "severity":  "required"
+                   },
+                   {
+                       "name":  "forbidden:manifests/modules/N09.3-communications-contracts.json:todoMarker",
+                       "passed":  true,
+                       "detail":  "not found",
+                       "path":  "manifests/modules/N09.3-communications-contracts.json",
+                       "severity":  "required"
+                   },
+                   {
+                       "name":  "forbidden:manifests/modules/N09.3-communications-contracts.json:fixmeMarker",
+                       "passed":  true,
+                       "detail":  "not found",
+                       "path":  "manifests/modules/N09.3-communications-contracts.json",
+                       "severity":  "required"
+                   },
+                   {
+                       "name":  "exists:packages/contracts/src/n09-index.ts",
+                       "passed":  true,
+                       "detail":  "found",
+                       "path":  "packages/contracts/src/n09-index.ts",
+                       "severity":  "required"
+                   },
+                   {
+                       "name":  "exists:packages/db/src/n09-channel-policy.ts",
+                       "passed":  true,
+                       "detail":  "found",
+                       "path":  "packages/db/src/n09-channel-policy.ts",
+                       "severity":  "required"
+                   },
+                   {
+                       "name":  "exists:packages/db/src/n09-message-safety-policy.ts",
+                       "passed":  true,
+                       "detail":  "found",
+                       "path":  "packages/db/src/n09-message-safety-policy.ts",
+                       "severity":  "required"
+                   },
+                   {
+                       "name":  "node:available",
+                       "passed":  true,
+                       "detail":  "v22.22.2",
+                       "path":  "",
+                       "severity":  "required"
+                   },
+                   {
+                       "name":  "validator:n09.3:exit-code",
+                       "passed":  false,
+                       "detail":  "exitCode=1",
+                       "path":  "",
+                       "severity":  "required"
+                   },
+                   {
+                       "name":  "report:n09.3:exists",
+                       "passed":  true,
+                       "detail":  "found",
+                       "path":  "reports/n09/n09-3-validation-report.json",
+                       "severity":  "required"
+                   },
+                   {
+                       "name":  "report:n09.3:passed-true",
+                       "passed":  false,
+                       "detail":  "passed=False",
+                       "path":  "reports/n09/n09-3-validation-report.json",
+                       "severity":  "required"
+                   }
+               ],
+    "nextTrackerRow":  "N09.3 repair - resolve failed report checks"
+}

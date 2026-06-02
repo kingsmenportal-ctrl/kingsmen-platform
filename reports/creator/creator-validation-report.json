@@ -1,183 +1,190 @@
-{
-  "module": "CREATOR",
-  "submodule": "CREATOR.2",
-  "validator": "Test-KingsmenCreator.ps1",
-  "productionReady": false,
-  "generatedAt": "2026-05-31T20:37:23.405Z",
-  "repoRoot": "C:\\Users\\dell\\Documents\\kingsmen-platform",
-  "passed": true,
-  "totalChecks": 28,
-  "failedChecks": 0,
-  "failed": [],
-  "checks": [
-    {
-      "name": "exists:scripts/KINGSMEN_CREATOR.ps1",
-      "passed": true,
-      "detail": "found",
-      "file": "scripts/KINGSMEN_CREATOR.ps1"
-    },
-    {
-      "name": "contains:scripts/KINGSMEN_CREATOR.ps1:ValidateSet('AuditExisting','Validate','N09.3Complete','Report','Doctor','Help')",
-      "passed": true,
-      "detail": "found",
-      "file": "scripts/KINGSMEN_CREATOR.ps1"
-    },
-    {
-      "name": "contains:scripts/KINGSMEN_CREATOR.ps1:function Invoke-Doctor",
-      "passed": true,
-      "detail": "found",
-      "file": "scripts/KINGSMEN_CREATOR.ps1"
-    },
-    {
-      "name": "contains:scripts/KINGSMEN_CREATOR.ps1:function Invoke-AuditExisting",
-      "passed": true,
-      "detail": "found",
-      "file": "scripts/KINGSMEN_CREATOR.ps1"
-    },
-    {
-      "name": "contains:scripts/KINGSMEN_CREATOR.ps1:function Invoke-N09_3Validation",
-      "passed": true,
-      "detail": "found",
-      "file": "scripts/KINGSMEN_CREATOR.ps1"
-    },
-    {
-      "name": "contains:scripts/KINGSMEN_CREATOR.ps1:function Invoke-Report",
-      "passed": true,
-      "detail": "found",
-      "file": "scripts/KINGSMEN_CREATOR.ps1"
-    },
-    {
-      "name": "contains:scripts/KINGSMEN_CREATOR.ps1:productionReady",
-      "passed": true,
-      "detail": "found",
-      "file": "scripts/KINGSMEN_CREATOR.ps1"
-    },
-    {
-      "name": "forbidden:scripts/KINGSMEN_CREATOR.ps1:productionReadyTrue",
-      "passed": true,
-      "detail": "not found",
-      "file": "scripts/KINGSMEN_CREATOR.ps1"
-    },
-    {
-      "name": "forbidden:scripts/KINGSMEN_CREATOR.ps1:SUPABASE_SERVICE_ROLE",
-      "passed": true,
-      "detail": "not found",
-      "file": "scripts/KINGSMEN_CREATOR.ps1"
-    },
-    {
-      "name": "forbidden:scripts/KINGSMEN_CREATOR.ps1:SMTP_PASSWORD",
-      "passed": true,
-      "detail": "not found",
-      "file": "scripts/KINGSMEN_CREATOR.ps1"
-    },
-    {
-      "name": "forbidden:scripts/KINGSMEN_CREATOR.ps1:WHATSAPP_TOKEN",
-      "passed": true,
-      "detail": "not found",
-      "file": "scripts/KINGSMEN_CREATOR.ps1"
-    },
-    {
-      "name": "forbidden:scripts/KINGSMEN_CREATOR.ps1:PAYMENT_SECRET",
-      "passed": true,
-      "detail": "not found",
-      "file": "scripts/KINGSMEN_CREATOR.ps1"
-    },
-    {
-      "name": "forbidden:scripts/KINGSMEN_CREATOR.ps1:AIRTABLE_TOKEN",
-      "passed": true,
-      "detail": "not found",
-      "file": "scripts/KINGSMEN_CREATOR.ps1"
-    },
-    {
-      "name": "creator-phase:Help:exit-code",
-      "passed": true,
-      "detail": "exitCode=0",
-      "file": "scripts/KINGSMEN_CREATOR.ps1"
-    },
-    {
-      "name": "creator-phase:Help:productionReadyFalse",
-      "passed": true,
-      "detail": "productionReady=False",
-      "file": "scripts/KINGSMEN_CREATOR.ps1"
-    },
-    {
-      "name": "creator-phase:Help:nextTrackerRow",
-      "passed": true,
-      "detail": "CREATOR.2 - scripts/testing/Test-KingsmenCreator.ps1",
-      "file": "scripts/KINGSMEN_CREATOR.ps1"
-    },
-    {
-      "name": "creator-phase:Doctor:exit-code",
-      "passed": true,
-      "detail": "exitCode=0",
-      "file": "scripts/KINGSMEN_CREATOR.ps1"
-    },
-    {
-      "name": "creator-phase:Doctor:productionReadyFalse",
-      "passed": true,
-      "detail": "productionReady=False",
-      "file": "scripts/KINGSMEN_CREATOR.ps1"
-    },
-    {
-      "name": "creator-phase:Doctor:nextTrackerRow",
-      "passed": true,
-      "detail": "CREATOR.2 - scripts/testing/Test-KingsmenCreator.ps1",
-      "file": "scripts/KINGSMEN_CREATOR.ps1"
-    },
-    {
-      "name": "creator-phase:AuditExisting:exit-code",
-      "passed": true,
-      "detail": "exitCode=0",
-      "file": "scripts/KINGSMEN_CREATOR.ps1"
-    },
-    {
-      "name": "creator-phase:AuditExisting:productionReadyFalse",
-      "passed": true,
-      "detail": "productionReady=False",
-      "file": "scripts/KINGSMEN_CREATOR.ps1"
-    },
-    {
-      "name": "creator-phase:AuditExisting:nextTrackerRow",
-      "passed": true,
-      "detail": "CREATOR.2 - scripts/testing/Test-KingsmenCreator.ps1",
-      "file": "scripts/KINGSMEN_CREATOR.ps1"
-    },
-    {
-      "name": "creator-phase:N09.3Complete:exit-code",
-      "passed": true,
-      "detail": "exitCode=0",
-      "file": "scripts/KINGSMEN_CREATOR.ps1"
-    },
-    {
-      "name": "creator-phase:N09.3Complete:productionReadyFalse",
-      "passed": true,
-      "detail": "productionReady=False",
-      "file": "scripts/KINGSMEN_CREATOR.ps1"
-    },
-    {
-      "name": "creator-phase:N09.3Complete:nextTrackerRow",
-      "passed": true,
-      "detail": "CREATOR.2 - scripts/testing/Test-KingsmenCreator.ps1",
-      "file": "scripts/KINGSMEN_CREATOR.ps1"
-    },
-    {
-      "name": "creator-phase:Report:exit-code",
-      "passed": true,
-      "detail": "exitCode=0",
-      "file": "scripts/KINGSMEN_CREATOR.ps1"
-    },
-    {
-      "name": "creator-phase:Report:productionReadyFalse",
-      "passed": true,
-      "detail": "productionReady=False",
-      "file": "scripts/KINGSMEN_CREATOR.ps1"
-    },
-    {
-      "name": "creator-phase:Report:nextTrackerRow",
-      "passed": true,
-      "detail": "CREATOR.2 - scripts/testing/Test-KingsmenCreator.ps1",
-      "file": "scripts/KINGSMEN_CREATOR.ps1"
-    }
-  ],
-  "nextTrackerRow": "CREATOR.3 - reports/creator/creator-validation-report.json"
+﻿{
+    "module":  "CREATOR",
+    "submodule":  "CREATOR.2",
+    "validator":  "Test-KingsmenCreator.ps1",
+    "productionReady":  false,
+    "generatedAt":  "2026-06-02T06:18:21.857Z",
+    "repoRoot":  "C:\\Users\\dell\\kingsmen-platform",
+    "passed":  false,
+    "totalChecks":  28,
+    "failedChecks":  1,
+    "failed":  [
+                   {
+                       "name":  "creator-phase:N09.3Complete:exit-code",
+                       "passed":  false,
+                       "detail":  "exitCode=1",
+                       "file":  "scripts/KINGSMEN_CREATOR.ps1"
+                   }
+               ],
+    "checks":  [
+                   {
+                       "name":  "exists:scripts/KINGSMEN_CREATOR.ps1",
+                       "passed":  true,
+                       "detail":  "found",
+                       "file":  "scripts/KINGSMEN_CREATOR.ps1"
+                   },
+                   {
+                       "name":  "contains:scripts/KINGSMEN_CREATOR.ps1:ValidateSet(\u0027AuditExisting\u0027,\u0027Validate\u0027,\u0027N09.3Complete\u0027,\u0027Report\u0027,\u0027Doctor\u0027,\u0027Help\u0027)",
+                       "passed":  true,
+                       "detail":  "found",
+                       "file":  "scripts/KINGSMEN_CREATOR.ps1"
+                   },
+                   {
+                       "name":  "contains:scripts/KINGSMEN_CREATOR.ps1:function Invoke-Doctor",
+                       "passed":  true,
+                       "detail":  "found",
+                       "file":  "scripts/KINGSMEN_CREATOR.ps1"
+                   },
+                   {
+                       "name":  "contains:scripts/KINGSMEN_CREATOR.ps1:function Invoke-AuditExisting",
+                       "passed":  true,
+                       "detail":  "found",
+                       "file":  "scripts/KINGSMEN_CREATOR.ps1"
+                   },
+                   {
+                       "name":  "contains:scripts/KINGSMEN_CREATOR.ps1:function Invoke-N09_3Validation",
+                       "passed":  true,
+                       "detail":  "found",
+                       "file":  "scripts/KINGSMEN_CREATOR.ps1"
+                   },
+                   {
+                       "name":  "contains:scripts/KINGSMEN_CREATOR.ps1:function Invoke-Report",
+                       "passed":  true,
+                       "detail":  "found",
+                       "file":  "scripts/KINGSMEN_CREATOR.ps1"
+                   },
+                   {
+                       "name":  "contains:scripts/KINGSMEN_CREATOR.ps1:productionReady",
+                       "passed":  true,
+                       "detail":  "found",
+                       "file":  "scripts/KINGSMEN_CREATOR.ps1"
+                   },
+                   {
+                       "name":  "forbidden:scripts/KINGSMEN_CREATOR.ps1:productionReadyTrue",
+                       "passed":  true,
+                       "detail":  "not found",
+                       "file":  "scripts/KINGSMEN_CREATOR.ps1"
+                   },
+                   {
+                       "name":  "forbidden:scripts/KINGSMEN_CREATOR.ps1:SUPABASE_SERVICE_ROLE",
+                       "passed":  true,
+                       "detail":  "not found",
+                       "file":  "scripts/KINGSMEN_CREATOR.ps1"
+                   },
+                   {
+                       "name":  "forbidden:scripts/KINGSMEN_CREATOR.ps1:SMTP_PASSWORD",
+                       "passed":  true,
+                       "detail":  "not found",
+                       "file":  "scripts/KINGSMEN_CREATOR.ps1"
+                   },
+                   {
+                       "name":  "forbidden:scripts/KINGSMEN_CREATOR.ps1:WHATSAPP_TOKEN",
+                       "passed":  true,
+                       "detail":  "not found",
+                       "file":  "scripts/KINGSMEN_CREATOR.ps1"
+                   },
+                   {
+                       "name":  "forbidden:scripts/KINGSMEN_CREATOR.ps1:PAYMENT_SECRET",
+                       "passed":  true,
+                       "detail":  "not found",
+                       "file":  "scripts/KINGSMEN_CREATOR.ps1"
+                   },
+                   {
+                       "name":  "forbidden:scripts/KINGSMEN_CREATOR.ps1:AIRTABLE_TOKEN",
+                       "passed":  true,
+                       "detail":  "not found",
+                       "file":  "scripts/KINGSMEN_CREATOR.ps1"
+                   },
+                   {
+                       "name":  "creator-phase:Help:exit-code",
+                       "passed":  true,
+                       "detail":  "exitCode=0",
+                       "file":  "scripts/KINGSMEN_CREATOR.ps1"
+                   },
+                   {
+                       "name":  "creator-phase:Help:productionReadyFalse",
+                       "passed":  true,
+                       "detail":  "productionReady=False",
+                       "file":  "scripts/KINGSMEN_CREATOR.ps1"
+                   },
+                   {
+                       "name":  "creator-phase:Help:nextTrackerRow",
+                       "passed":  true,
+                       "detail":  "CREATOR.2 - scripts/testing/Test-KingsmenCreator.ps1",
+                       "file":  "scripts/KINGSMEN_CREATOR.ps1"
+                   },
+                   {
+                       "name":  "creator-phase:Doctor:exit-code",
+                       "passed":  true,
+                       "detail":  "exitCode=0",
+                       "file":  "scripts/KINGSMEN_CREATOR.ps1"
+                   },
+                   {
+                       "name":  "creator-phase:Doctor:productionReadyFalse",
+                       "passed":  true,
+                       "detail":  "productionReady=False",
+                       "file":  "scripts/KINGSMEN_CREATOR.ps1"
+                   },
+                   {
+                       "name":  "creator-phase:Doctor:nextTrackerRow",
+                       "passed":  true,
+                       "detail":  "CREATOR.2 - scripts/testing/Test-KingsmenCreator.ps1",
+                       "file":  "scripts/KINGSMEN_CREATOR.ps1"
+                   },
+                   {
+                       "name":  "creator-phase:AuditExisting:exit-code",
+                       "passed":  true,
+                       "detail":  "exitCode=0",
+                       "file":  "scripts/KINGSMEN_CREATOR.ps1"
+                   },
+                   {
+                       "name":  "creator-phase:AuditExisting:productionReadyFalse",
+                       "passed":  true,
+                       "detail":  "productionReady=False",
+                       "file":  "scripts/KINGSMEN_CREATOR.ps1"
+                   },
+                   {
+                       "name":  "creator-phase:AuditExisting:nextTrackerRow",
+                       "passed":  true,
+                       "detail":  "CREATOR.2 - scripts/testing/Test-KingsmenCreator.ps1",
+                       "file":  "scripts/KINGSMEN_CREATOR.ps1"
+                   },
+                   {
+                       "name":  "creator-phase:N09.3Complete:exit-code",
+                       "passed":  false,
+                       "detail":  "exitCode=1",
+                       "file":  "scripts/KINGSMEN_CREATOR.ps1"
+                   },
+                   {
+                       "name":  "creator-phase:N09.3Complete:productionReadyFalse",
+                       "passed":  true,
+                       "detail":  "productionReady=False",
+                       "file":  "scripts/KINGSMEN_CREATOR.ps1"
+                   },
+                   {
+                       "name":  "creator-phase:N09.3Complete:nextTrackerRow",
+                       "passed":  true,
+                       "detail":  "N09.3 repair - resolve failed report checks",
+                       "file":  "scripts/KINGSMEN_CREATOR.ps1"
+                   },
+                   {
+                       "name":  "creator-phase:Report:exit-code",
+                       "passed":  true,
+                       "detail":  "exitCode=0",
+                       "file":  "scripts/KINGSMEN_CREATOR.ps1"
+                   },
+                   {
+                       "name":  "creator-phase:Report:productionReadyFalse",
+                       "passed":  true,
+                       "detail":  "productionReady=False",
+                       "file":  "scripts/KINGSMEN_CREATOR.ps1"
+                   },
+                   {
+                       "name":  "creator-phase:Report:nextTrackerRow",
+                       "passed":  true,
+                       "detail":  "CREATOR.2 - scripts/testing/Test-KingsmenCreator.ps1",
+                       "file":  "scripts/KINGSMEN_CREATOR.ps1"
+                   }
+               ],
+    "nextTrackerRow":  "CREATOR.2 repair - fix failed checks in reports/creator/creator-validation-report.json"
 }

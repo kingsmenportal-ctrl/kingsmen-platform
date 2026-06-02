@@ -4,7 +4,7 @@
     "phase":  "Report",
     "creatorVersion":  "0.1.2",
     "productionReady":  false,
-    "generatedAt":  "2026-06-02T05:58:40.218Z",
+    "generatedAt":  "2026-06-02T06:18:21.475Z",
     "repoRoot":  "C:\\Users\\dell\\kingsmen-platform",
     "passed":  true,
     "reports":  [
@@ -23,25 +23,31 @@
                     {
                         "path":  "reports\\creator\\creator-audit-existing-report.json",
                         "bytes":  6167,
-                        "lastWriteTimeUtc":  "2026-06-02T05:58:39.530Z",
-                        "sha256":  "98019cd0266778538120727c289104f3fae414d46332b3ee0b00542ade2dc4c0"
+                        "lastWriteTimeUtc":  "2026-06-02T06:18:18.886Z",
+                        "sha256":  "7eef331812f2cfe36cb0920c41171095f66149afd4b6f391d737c24e23a69785"
                     },
                     {
                         "path":  "reports\\creator\\creator-doctor-report.json",
                         "bytes":  3758,
-                        "lastWriteTimeUtc":  "2026-06-02T05:58:39.067Z",
-                        "sha256":  "37595022f1a30197fd88f0f2bcde9b347e716178967fe459092b60b09fc780ff"
+                        "lastWriteTimeUtc":  "2026-06-02T06:18:18.070Z",
+                        "sha256":  "1b1c3cd3e2ab11b8a8a2a63b9f063720403bba6d2b27ce3017ab7cd65c5603fa"
+                    },
+                    {
+                        "path":  "reports\\creator\\creator-n09-3-validation-bridge-report.json",
+                        "bytes":  12322,
+                        "lastWriteTimeUtc":  "2026-06-02T06:18:20.142Z",
+                        "sha256":  "f13d697bea4c6ca4760241c4fdb32a73a7fc74e8f48194eb9b25f6adb94ba55d"
                     },
                     {
                         "path":  "reports\\creator\\creator-report-index.json",
-                        "bytes":  16749,
-                        "lastWriteTimeUtc":  "2026-06-02T04:50:17.578Z",
-                        "sha256":  "6cb3079013e7c98e624ea5ad4f8b8f18a752686c18afe62d4a51507225e33ad9"
+                        "bytes":  17096,
+                        "lastWriteTimeUtc":  "2026-06-02T06:16:36.175Z",
+                        "sha256":  "f90f06879bd33add8298b77108d6d46688d7f665b1c17cbf1cdb9752c57be7fe"
                     },
                     {
                         "path":  "reports\\creator\\creator-validation-report.json",
                         "bytes":  5757,
-                        "lastWriteTimeUtc":  "2026-06-01T22:59:32.924Z",
+                        "lastWriteTimeUtc":  "2026-06-02T06:16:36.176Z",
                         "sha256":  "fe91e5b65bbf0f0b2d2e7a40d55bca8785e7ad0585c19c1031af21c914e19c61"
                     },
                     {
@@ -82,9 +88,9 @@
                     },
                     {
                         "path":  "reports\\n09\\n09-3-validation-report.json",
-                        "bytes":  13776,
-                        "lastWriteTimeUtc":  "2026-06-01T22:59:33.014Z",
-                        "sha256":  "9d6f717d64450de0f88e5ac27e98305281c91eb13cdd925db487e0754cde4899"
+                        "bytes":  13720,
+                        "lastWriteTimeUtc":  "2026-06-02T06:18:19.867Z",
+                        "sha256":  "c77a266410a1d0de5cec60140a6e0f11c7717d7ecfb3bb59a8004d92748d7ec0"
                     },
                     {
                         "path":  "reports\\n20\\.gitkeep",
@@ -273,6 +279,12 @@
                         "sha256":  "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
                     },
                     {
+                        "path":  "reports\\validation\\creator-normalize-latest.json",
+                        "bytes":  452,
+                        "lastWriteTimeUtc":  "2026-06-02T06:16:49.657Z",
+                        "sha256":  "1cec63506afbb8a6e6d3df7efad7c7c2743596285a53bb0feefac6a0c5c28c3b"
+                    },
+                    {
                         "path":  "reports\\validation\\health-report.json",
                         "bytes":  22024,
                         "lastWriteTimeUtc":  "2026-06-01T22:59:33.354Z",
@@ -281,8 +293,8 @@
                     {
                         "path":  "reports\\validation\\merge-foundation-latest.json",
                         "bytes":  1025,
-                        "lastWriteTimeUtc":  "2026-06-02T04:36:36.201Z",
-                        "sha256":  "85c9017471a04a2c2281902b3b0944ebe76bde31902d8e18998b3deba54b928a"
+                        "lastWriteTimeUtc":  "2026-06-02T05:58:40.467Z",
+                        "sha256":  "77ec37b70bfb455dda75106af21b98155678da4413b7e2507c5530db46b10293"
                     },
                     {
                         "path":  "reports\\validation\\n01-readiness-report.json",

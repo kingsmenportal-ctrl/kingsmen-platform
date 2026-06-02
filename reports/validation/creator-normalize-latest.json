@@ -1,0 +1,27 @@
+{
+  "schema": "kingsmen.validation-report.v1",
+  "module": "BATCH 02 — Creator Normalize",
+  "status": "BUILT_PENDING_VALIDATION",
+  "passed": false,
+  "generated_at": "2026-06-02T06:18:22.021Z",
+  "files_expected": [
+    "scripts/KINGSMEN_CREATOR.ps1",
+    "scripts/testing/Test-KingsmenCreator.ps1",
+    "scripts/validators/validate-creator-normalize.mjs",
+    "reports/creator/test-kingsmen-creator-report.json",
+    "reports/validation/creator-normalize-latest.json"
+  ],
+  "files_checked": 5,
+  "missing_files": [
+    "reports/creator/test-kingsmen-creator-report.json"
+  ],
+  "failed_checks": [
+    "Missing required file: reports/creator/test-kingsmen-creator-report.json"
+  ],
+  "warnings": [
+    "BATCH 02 currently validates CREATOR.1 phase stability and test harness proof. Action mode remains the next repair unless separately patched and proven."
+  ],
+  "oracle_lite_impact": "none_runtime_yet",
+  "control_plane_impact": "Build Proof Centre later reads Creator normalize status.",
+  "next_action": "Repair Creator normalize failures and rerun test plus validator."
+}
