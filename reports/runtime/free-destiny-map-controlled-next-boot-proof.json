@@ -5,14 +5,14 @@
   "passed": false,
   "productionReady": false,
   "canClaimProduction": false,
-  "generated_at": "2026-06-02T20:24:00.551Z",
+  "generated_at": "2026-06-02T20:36:07.961Z",
   "serverStarted": false,
   "serverStopped": false,
   "webStatus": 0,
   "webRoute": "/free-destiny-map",
-  "webUrl": "http://127.0.0.1:49357/free-destiny-map",
+  "webUrl": "http://127.0.0.1:49405/free-destiny-map",
   "httpHost": "127.0.0.1",
-  "httpPort": 49357,
+  "httpPort": 49405,
   "checks": [
     {
       "name": "batch-12-readiness-proof-exists",
