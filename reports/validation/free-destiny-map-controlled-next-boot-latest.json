@@ -3,7 +3,7 @@
   "module": "BATCH 14 - Controlled Local Next Web Boot Proof",
   "status": "VALIDATED",
   "passed": true,
-  "generated_at": "2026-06-02T20:39:16.303Z",
+  "generated_at": "2026-06-02T21:02:42.555Z",
   "files_expected": [
     "docs/runtime/free-destiny-map-controlled-next-boot-proof.md",
     "manifests/runtime/free-destiny-map-controlled-next-boot-proof.json",

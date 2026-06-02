@@ -163,7 +163,27 @@ try {
   check("controlled-next-launcher-mode", true, launchMode);
 
   const safeEnv = {};
-  for (const [key, value] of Object.entries(process.env)) {
+  const envKeysToKeep = [
+    "PATH",
+    "Path",
+    "PATHEXT",
+    "SystemRoot",
+    "WINDIR",
+    "TEMP",
+    "TMP",
+    "USERPROFILE",
+    "APPDATA",
+    "LOCALAPPDATA",
+    "COMSPEC",
+    "HOMEDRIVE",
+    "HOMEPATH",
+    "PROCESSOR_ARCHITECTURE",
+    "PROCESSOR_IDENTIFIER",
+    "NUMBER_OF_PROCESSORS"
+  ];
+
+  for (const key of envKeysToKeep) {
+    const value = process.env[key];
     if (!key || key.includes("=") || key.includes("\u0000")) continue;
     if (typeof value === "undefined" || String(value).includes("\u0000")) continue;
     safeEnv[key] = String(value);
@@ -171,6 +191,10 @@ try {
 
   safeEnv.NEXT_TELEMETRY_DISABLED = "1";
   safeEnv.CI = "1";
+  safeEnv.NODE_ENV = "development";
+
+  check("controlled-next-launcher-node-exec-exists", fs.existsSync(process.execPath), process.execPath);
+  check("controlled-next-launcher-minimal-env", true, `keys=${Object.keys(safeEnv).join(",")}`);
 
   child = spawn(process.execPath, [nextCliPath, "dev", "--hostname", "127.0.0.1", "--port", String(port)], {
     cwd: webDir,

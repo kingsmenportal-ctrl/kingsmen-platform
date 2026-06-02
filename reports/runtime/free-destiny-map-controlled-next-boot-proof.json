@@ -5,14 +5,14 @@
   "passed": true,
   "productionReady": false,
   "canClaimProduction": false,
-  "generated_at": "2026-06-02T20:39:15.577Z",
+  "generated_at": "2026-06-02T21:02:11.416Z",
   "serverStarted": true,
   "serverStopped": true,
   "webStatus": 200,
   "webRoute": "/free-destiny-map",
-  "webUrl": "http://127.0.0.1:49420/free-destiny-map",
+  "webUrl": "http://127.0.0.1:49648/free-destiny-map",
   "httpHost": "127.0.0.1",
-  "httpPort": 49420,
+  "httpPort": 49648,
   "checks": [
     {
       "name": "batch-12-readiness-proof-exists",
@@ -110,9 +110,19 @@
       "detail": "direct node next launcher; bypass npm.cmd for Windows spawn EINVAL repair"
     },
     {
+      "name": "controlled-next-launcher-node-exec-exists",
+      "passed": true,
+      "detail": "C:\\Program Files\\nodejs\\node.exe"
+    },
+    {
+      "name": "controlled-next-launcher-minimal-env",
+      "passed": true,
+      "detail": "keys=PATH,Path,PATHEXT,SystemRoot,WINDIR,TEMP,TMP,USERPROFILE,APPDATA,LOCALAPPDATA,COMSPEC,HOMEDRIVE,HOMEPATH,PROCESSOR_ARCHITECTURE,PROCESSOR_IDENTIFIER,NUMBER_OF_PROCESSORS,NEXT_TELEMETRY_DISABLED,CI,NODE_ENV"
+    },
+    {
       "name": "controlled-next-server-started",
       "passed": true,
-      "detail": "url=http://127.0.0.1:49420/free-destiny-map"
+      "detail": "url=http://127.0.0.1:49648/free-destiny-map"
     },
     {
       "name": "controlled-next-route-status-200",
@@ -158,15 +168,15 @@
   "failed": [],
   "stdout_tail": [
     "   ▲ Next.js 15.5.19",
-    "   - Local:        http://127.0.0.1:49420",
-    "   - Network:      http://127.0.0.1:49420",
+    "   - Local:        http://127.0.0.1:49648",
+    "   - Network:      http://127.0.0.1:49648",
     "   - Experiments (use with caution):",
     "     ✓ externalDir",
     " ✓ Starting...",
-    " ✓ Ready in 3.9s",
+    " ✓ Ready in 5.8s",
     " ○ Compiling /free-destiny-map ...",
-    " ✓ Compiled /free-destiny-map in 6.5s (532 modules)",
-    " GET /free-destiny-map 200 in 2438ms"
+    " ✓ Compiled /free-destiny-map in 6.9s (532 modules)",
+    " GET /free-destiny-map 200 in 6673ms"
   ],
   "stderr_tail": [
     " ⚠ Warning: Next.js inferred your workspace root, but it may not be correct.",
