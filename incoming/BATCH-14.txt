@@ -1,0 +1,585 @@
+FILE: docs/runtime/free-destiny-map-controlled-next-boot-proof.md
+---
+# BATCH 14 - Controlled Local Next Web Boot Proof
+
+## Purpose
+
+This batch performs the first controlled local Next.js web boot proof for the Free Destiny Map surface.
+
+BATCH 13 repaired the web runtime blockers and BATCH 12 readiness changed to `READY_FOR_CONTROLLED_LOCAL_BOOT`. BATCH 14 now starts the real `apps/web` Next dev server on `127.0.0.1`, requests `/free-destiny-map`, checks the response, records proof, and shuts the server down.
+
+## What this batch proves
+
+- BATCH 12 readiness says controlled local boot is allowed
+- BATCH 13 runtime repair proof passed
+- `apps/web/package.json` has a `dev` script
+- `apps/web/node_modules` contains Next, React, and React DOM
+- a real Next dev server can start locally
+- `/free-destiny-map` responds with HTTP 200
+- the page contains Kingsmen Free Destiny Map content
+- the page keeps production claims blocked
+- the server process is stopped after proof
+
+## What this batch does not claim
+
+- no production deployment
+- no Oracle runtime
+- no Docker Compose boot
+- no PostgreSQL database
+- no Redis queue
+- no production build claim
+- no payment
+- no email sending
+- no document upload
+- no official application submission
+
+## Oracle Lite impact
+
+none_runtime_yet.
+
+This is a controlled local web boot proof only.
+
+## Next action
+
+After validation, BATCH 15 should connect the local Next web surface to a controlled local API runtime or create a real local web build proof with explicit build command, timeout, report, and no production claim.
+---
+FILE: manifests/runtime/free-destiny-map-controlled-next-boot-proof.json
+---
+{
+  "schema": "kingsmen.controlled-next-boot-proof.v1",
+  "module": "BATCH 14 - Controlled Local Next Web Boot Proof",
+  "status": "BUILT_PENDING_VALIDATION",
+  "productionReady": false,
+  "requiresBatches": [
+    "BATCH 12 - Real Local Web Build / Dev-Server Readiness Gate",
+    "BATCH 13 - Repair Real Web Build Blockers / Add Next App Package Runtime"
+  ],
+  "webPackage": "apps/web/package.json",
+  "webRoute": "/free-destiny-map",
+  "httpHost": "127.0.0.1",
+  "httpPortMode": "ephemeral",
+  "proofCommand": "powershell.exe -ExecutionPolicy Bypass -File scripts/runtime/Invoke-FreeDestinyMapControlledNextBoot.ps1",
+  "proofScript": "scripts/proof/prove-free-destiny-map-controlled-next-boot.mjs",
+  "proofReport": "reports/runtime/free-destiny-map-controlled-next-boot-proof.json",
+  "validationReport": "reports/validation/free-destiny-map-controlled-next-boot-latest.json",
+  "storesProductionData": false,
+  "takesPayment": false,
+  "sendsEmail": false,
+  "collectsDocuments": false,
+  "submitsOfficialApplications": false,
+  "oracleLiteImpact": "none_runtime_yet",
+  "controlPlaneImpact": "Adds first controlled real Next local boot proof for Free Destiny Map.",
+  "requiredFiles": [
+    "docs/runtime/free-destiny-map-controlled-next-boot-proof.md",
+    "manifests/runtime/free-destiny-map-controlled-next-boot-proof.json",
+    "packages/contracts/src/free-destiny-map-controlled-next-boot.ts",
+    "scripts/runtime/Invoke-FreeDestinyMapControlledNextBoot.ps1",
+    "scripts/proof/prove-free-destiny-map-controlled-next-boot.mjs",
+    "reports/runtime/free-destiny-map-controlled-next-boot-proof.json",
+    "scripts/validators/validate-free-destiny-map-controlled-next-boot.mjs",
+    "reports/validation/free-destiny-map-controlled-next-boot-latest.json"
+  ],
+  "nextAction": "Run powershell.exe -ExecutionPolicy Bypass -File scripts/runtime/Invoke-FreeDestinyMapControlledNextBoot.ps1 then node scripts/validators/validate-free-destiny-map-controlled-next-boot.mjs"
+}
+---
+FILE: packages/contracts/src/free-destiny-map-controlled-next-boot.ts
+---
+export const FREE_DESTINY_MAP_CONTROLLED_NEXT_BOOT_MODULE =
+  "BATCH 14 - Controlled Local Next Web Boot Proof" as const;
+
+export const FREE_DESTINY_MAP_CONTROLLED_NEXT_BOOT_WEB_PACKAGE =
+  "apps/web/package.json" as const;
+
+export const FREE_DESTINY_MAP_CONTROLLED_NEXT_BOOT_ROUTE =
+  "/free-destiny-map" as const;
+
+export type FreeDestinyMapControlledNextBootStatus =
+  | "CONTROLLED_NEXT_BOOT_PROVEN"
+  | "CONTROLLED_NEXT_BOOT_FAILED";
+
+export interface FreeDestinyMapControlledNextBootCheck {
+  name: string;
+  passed: boolean;
+  detail: string;
+}
+
+export interface FreeDestinyMapControlledNextBootReport {
+  schema: "kingsmen.controlled-next-boot-report.v1";
+  module: typeof FREE_DESTINY_MAP_CONTROLLED_NEXT_BOOT_MODULE;
+  status: FreeDestinyMapControlledNextBootStatus;
+  passed: boolean;
+  productionReady: false;
+  canClaimProduction: false;
+  serverStarted: boolean;
+  serverStopped: boolean;
+  webStatus: number;
+  oracleLiteImpact: "none_runtime_yet";
+  checks: FreeDestinyMapControlledNextBootCheck[];
+  failed: FreeDestinyMapControlledNextBootCheck[];
+  nextAction: string;
+}
+---
+FILE: scripts/runtime/Invoke-FreeDestinyMapControlledNextBoot.ps1
+---
+#requires -Version 5.1
+[CmdletBinding()]
+param(
+  [int]$TimeoutSeconds = 120
+)
+
+$ErrorActionPreference = "Stop"
+
+$repoRoot = Get-Location
+$scriptPath = Join-Path $repoRoot "scripts\proof\prove-free-destiny-map-controlled-next-boot.mjs"
+
+if (-not (Test-Path $scriptPath -PathType Leaf)) {
+  throw "Missing proof script: $scriptPath"
+}
+
+Write-Host "Kingsmen Free Destiny Map controlled Next web boot proof"
+Write-Host "Timeout seconds: $TimeoutSeconds"
+Write-Host "This starts a local Next dev server, proves /free-destiny-map, then stops it."
+Write-Host "This does not claim production, Oracle runtime, email, payment, documents, or official submissions."
+
+node $scriptPath "--timeoutSeconds=$TimeoutSeconds"
+
+if ($LASTEXITCODE -ne 0) {
+  throw "Free Destiny Map controlled Next boot proof failed."
+}
+---
+FILE: scripts/proof/prove-free-destiny-map-controlled-next-boot.mjs
+---
+#!/usr/bin/env node
+import fs from "node:fs";
+import net from "node:net";
+import path from "node:path";
+import { spawn } from "node:child_process";
+
+const root = process.cwd();
+const webDir = path.join(root, "apps/web");
+const proofReportPath = path.join(root, "reports/runtime/free-destiny-map-controlled-next-boot-proof.json");
+
+const timeoutArg = process.argv.find((item) => item.startsWith("--timeoutSeconds="));
+const timeoutSeconds = timeoutArg ? Number(timeoutArg.split("=")[1]) : 120;
+const timeoutMs = Number.isFinite(timeoutSeconds) && timeoutSeconds > 0 ? timeoutSeconds * 1000 : 120000;
+
+const checks = [];
+const stdoutLines = [];
+const stderrLines = [];
+
+function exists(rel) {
+  return fs.existsSync(path.join(root, rel));
+}
+
+function read(rel) {
+  return fs.readFileSync(path.join(root, rel), "utf8").replace(/^\uFEFF/, "");
+}
+
+function parseJson(rel) {
+  return JSON.parse(read(rel));
+}
+
+function check(name, passed, detail = "") {
+  checks.push({ name, passed, detail });
+}
+
+function trimLog(lines) {
+  return lines.join("").split(/\r?\n/).filter(Boolean).slice(-80);
+}
+
+function getFreePort() {
+  return new Promise((resolve, reject) => {
+    const server = net.createServer();
+    server.once("error", reject);
+    server.listen(0, "127.0.0.1", () => {
+      const address = server.address();
+      const port = typeof address === "object" && address ? address.port : 0;
+      server.close(() => resolve(port));
+    });
+  });
+}
+
+function sleep(ms) {
+  return new Promise((resolve) => setTimeout(resolve, ms));
+}
+
+async function fetchWithTimeout(url, ms = 5000) {
+  const controller = new AbortController();
+  const timer = setTimeout(() => controller.abort(), ms);
+  try {
+    return await fetch(url, { signal: controller.signal });
+  } finally {
+    clearTimeout(timer);
+  }
+}
+
+async function waitForHttpOk(url, maxMs) {
+  const started = Date.now();
+  let lastError = "";
+  while (Date.now() - started < maxMs) {
+    try {
+      const response = await fetchWithTimeout(url, 7000);
+      const text = await response.text();
+      if (response.status === 200) {
+        return { ok: true, status: response.status, text, lastError };
+      }
+      lastError = `status=${response.status}`;
+    } catch (error) {
+      lastError = error instanceof Error ? error.message : String(error);
+    }
+    await sleep(1000);
+  }
+  return { ok: false, status: 0, text: "", lastError };
+}
+
+async function stopProcessTree(child) {
+  if (!child || !child.pid) return false;
+
+  if (process.platform === "win32") {
+    await new Promise((resolve) => {
+      const killer = spawn("taskkill", ["/pid", String(child.pid), "/t", "/f"], {
+        stdio: "ignore"
+      });
+      killer.once("close", () => resolve());
+      killer.once("error", () => resolve());
+    });
+  } else {
+    try {
+      child.kill("SIGTERM");
+    } catch {}
+    await sleep(1500);
+    if (child.exitCode === null) {
+      try {
+        child.kill("SIGKILL");
+      } catch {}
+    }
+  }
+
+  await sleep(1500);
+  return true;
+}
+
+check("batch-12-readiness-proof-exists", exists("reports/runtime/free-destiny-map-real-web-readiness-proof.json"), "reports/runtime/free-destiny-map-real-web-readiness-proof.json");
+check("batch-13-runtime-repair-proof-exists", exists("reports/runtime/free-destiny-map-real-web-runtime-repair-proof.json"), "reports/runtime/free-destiny-map-real-web-runtime-repair-proof.json");
+check("apps-web-package-json-exists", exists("apps/web/package.json"), "apps/web/package.json");
+check("apps-web-node-modules-next-exists", exists("apps/web/node_modules/next/package.json"), "apps/web/node_modules/next/package.json");
+check("apps-web-node-modules-react-exists", exists("apps/web/node_modules/react/package.json"), "apps/web/node_modules/react/package.json");
+check("apps-web-node-modules-react-dom-exists", exists("apps/web/node_modules/react-dom/package.json"), "apps/web/node_modules/react-dom/package.json");
+check("free-destiny-map-page-exists", exists("apps/web/src/app/free-destiny-map/page.tsx"), "apps/web/src/app/free-destiny-map/page.tsx");
+check("free-destiny-map-form-exists", exists("apps/web/src/components/kingsmen/FreeDestinyMapApiForm.tsx"), "apps/web/src/components/kingsmen/FreeDestinyMapApiForm.tsx");
+
+if (exists("reports/runtime/free-destiny-map-real-web-readiness-proof.json")) {
+  const readiness = parseJson("reports/runtime/free-destiny-map-real-web-readiness-proof.json");
+  check("batch-12-ready-for-controlled-boot", readiness.status === "READY_FOR_CONTROLLED_LOCAL_BOOT" && readiness.canAttemptLocalWebBoot === true, `status=${readiness.status}; canAttemptLocalWebBoot=${readiness.canAttemptLocalWebBoot}`);
+  check("batch-12-keeps-production-false", readiness.productionReady === false && readiness.canClaimProduction === false, "production false");
+}
+
+if (exists("reports/runtime/free-destiny-map-real-web-runtime-repair-proof.json")) {
+  const repair = parseJson("reports/runtime/free-destiny-map-real-web-runtime-repair-proof.json");
+  check("batch-13-runtime-repair-applied", repair.status === "WEB_RUNTIME_REPAIR_APPLIED" && repair.passed === true, `status=${repair.status}; passed=${repair.passed}`);
+  check("batch-13-keeps-production-false", repair.productionReady === false && repair.canClaimProduction === false, "production false");
+}
+
+if (exists("apps/web/package.json")) {
+  const webPackage = parseJson("apps/web/package.json");
+  check("web-dev-script-present", String(webPackage.scripts?.dev ?? "").includes("next dev"), String(webPackage.scripts?.dev ?? ""));
+  check("web-build-script-present", String(webPackage.scripts?.build ?? "").includes("next build"), String(webPackage.scripts?.build ?? ""));
+  check("web-next-dependency-present", Boolean(webPackage.dependencies?.next), webPackage.dependencies?.next ?? "missing");
+  check("web-react-dependency-present", Boolean(webPackage.dependencies?.react), webPackage.dependencies?.react ?? "missing");
+  check("web-react-dom-dependency-present", Boolean(webPackage.dependencies?.["react-dom"]), webPackage.dependencies?.["react-dom"] ?? "missing");
+}
+
+let child = null;
+let serverStarted = false;
+let serverStopped = false;
+let webStatus = 0;
+let webText = "";
+let webUrl = "";
+let port = 0;
+let spawnError = null;
+
+try {
+  const preFailures = checks.filter((item) => item.passed !== true);
+  if (preFailures.length > 0) {
+    throw new Error("Pre-boot checks failed. Controlled boot not attempted.");
+  }
+
+  port = await getFreePort();
+  webUrl = `http://127.0.0.1:${port}/free-destiny-map`;
+
+  const npmCommand = process.platform === "win32" ? "npm.cmd" : "npm";
+  child = spawn(npmCommand, ["run", "dev", "--", "--port", String(port)], {
+    cwd: webDir,
+    env: {
+      ...process.env,
+      NEXT_TELEMETRY_DISABLED: "1",
+      CI: "1"
+    },
+    stdio: ["ignore", "pipe", "pipe"]
+  });
+
+  child.stdout.on("data", (chunk) => stdoutLines.push(chunk.toString()));
+  child.stderr.on("data", (chunk) => stderrLines.push(chunk.toString()));
+  child.once("error", (error) => {
+    spawnError = error;
+  });
+
+  const result = await waitForHttpOk(webUrl, timeoutMs);
+  webStatus = result.status;
+  webText = result.text;
+
+  serverStarted = result.ok;
+
+  check("controlled-next-server-started", serverStarted, serverStarted ? `url=${webUrl}` : `lastError=${result.lastError}`);
+  check("controlled-next-route-status-200", webStatus === 200, `status=${webStatus}`);
+  check("controlled-next-page-has-free-destiny-map", webText.includes("Free Destiny Map") || webText.includes("Start your Free Destiny Map"), "Free Destiny Map text");
+  check("controlled-next-page-has-local-intake-copy", webText.includes("local intake") || webText.includes("local shell"), "local intake wording");
+  check("controlled-next-page-no-production-true", !/productionReady\s*[:=]\s*true/i.test(webText), "productionReady true absent");
+  check("controlled-next-page-no-official-submission-true", !/officialApplicationSubmitted\s*[:=]\s*true/i.test(webText), "officialApplicationSubmitted true absent");
+  check("controlled-next-page-no-payment-true", !/paymentInstructionSent\s*[:=]\s*true/i.test(webText), "paymentInstructionSent true absent");
+  check("controlled-next-page-no-email-true", !/emailSent\s*[:=]\s*true/i.test(webText), "emailSent true absent");
+} catch (error) {
+  check("controlled-next-boot-exception-absent", false, error instanceof Error ? error.message : String(error));
+} finally {
+  if (child) {
+    serverStopped = await stopProcessTree(child);
+  }
+}
+
+check("controlled-next-server-stopped", serverStopped, serverStopped ? "process tree stop attempted" : "server process was not started or could not be stopped");
+
+if (spawnError) {
+  check("controlled-next-spawn-error-absent", false, spawnError.message);
+}
+
+const failed = checks.filter((item) => item.passed !== true);
+const passed = failed.length === 0;
+
+const report = {
+  schema: "kingsmen.controlled-next-boot-report.v1",
+  module: "BATCH 14 - Controlled Local Next Web Boot Proof",
+  status: passed ? "CONTROLLED_NEXT_BOOT_PROVEN" : "CONTROLLED_NEXT_BOOT_FAILED",
+  passed,
+  productionReady: false,
+  canClaimProduction: false,
+  generated_at: new Date().toISOString(),
+  serverStarted,
+  serverStopped,
+  webStatus,
+  webRoute: "/free-destiny-map",
+  webUrl,
+  httpHost: "127.0.0.1",
+  httpPort: port,
+  checks,
+  failed,
+  stdout_tail: trimLog(stdoutLines),
+  stderr_tail: trimLog(stderrLines),
+  oracle_lite_impact: "none_runtime_yet",
+  runtime_scope: "controlled local Next dev boot proof only; no Oracle runtime; no production deployment",
+  next_action: passed
+    ? "Run validator and commit BATCH 14. Next batch may add controlled local API integration or production build proof."
+    : "Repair controlled Next boot failures before moving forward."
+};
+
+fs.mkdirSync(path.dirname(proofReportPath), { recursive: true });
+fs.writeFileSync(proofReportPath, `${JSON.stringify(report, null, 2)}\n`, "utf8");
+
+console.log(JSON.stringify(report, null, 2));
+if (!passed) process.exit(1);
+---
+FILE: reports/runtime/free-destiny-map-controlled-next-boot-proof.json
+---
+{
+  "schema": "kingsmen.controlled-next-boot-report.v1",
+  "module": "BATCH 14 - Controlled Local Next Web Boot Proof",
+  "status": "CONTROLLED_NEXT_BOOT_FAILED",
+  "passed": false,
+  "productionReady": false,
+  "canClaimProduction": false,
+  "generated_at": "2026-06-02T00:00:00.000Z",
+  "serverStarted": false,
+  "serverStopped": false,
+  "webStatus": 0,
+  "webRoute": "/free-destiny-map",
+  "checks": [],
+  "failed": [
+    {
+      "name": "controlled_next_boot_not_yet_executed",
+      "passed": false,
+      "detail": "Run scripts/runtime/Invoke-FreeDestinyMapControlledNextBoot.ps1."
+    }
+  ],
+  "oracle_lite_impact": "none_runtime_yet",
+  "runtime_scope": "controlled local Next dev boot proof only; no Oracle runtime; no production deployment",
+  "next_action": "Run BATCH 14 controlled Next boot proof."
+}
+---
+FILE: scripts/validators/validate-free-destiny-map-controlled-next-boot.mjs
+---
+#!/usr/bin/env node
+import fs from "node:fs";
+import path from "node:path";
+
+const root = process.cwd();
+const reportPath = path.join(root, "reports/validation/free-destiny-map-controlled-next-boot-latest.json");
+
+const requiredFiles = [
+  "docs/runtime/free-destiny-map-controlled-next-boot-proof.md",
+  "manifests/runtime/free-destiny-map-controlled-next-boot-proof.json",
+  "packages/contracts/src/free-destiny-map-controlled-next-boot.ts",
+  "scripts/runtime/Invoke-FreeDestinyMapControlledNextBoot.ps1",
+  "scripts/proof/prove-free-destiny-map-controlled-next-boot.mjs",
+  "reports/runtime/free-destiny-map-controlled-next-boot-proof.json",
+  "scripts/validators/validate-free-destiny-map-controlled-next-boot.mjs",
+  "reports/validation/free-destiny-map-controlled-next-boot-latest.json"
+];
+
+const upstreamFiles = [
+  "apps/web/package.json",
+  "apps/web/package-lock.json",
+  "apps/web/next.config.mjs",
+  "apps/web/src/app/layout.tsx",
+  "apps/web/src/app/free-destiny-map/page.tsx",
+  "apps/web/src/components/kingsmen/FreeDestinyMapApiForm.tsx",
+  "reports/runtime/free-destiny-map-real-web-readiness-proof.json",
+  "reports/runtime/free-destiny-map-real-web-runtime-repair-proof.json"
+];
+
+function exists(rel) {
+  return fs.existsSync(path.join(root, rel));
+}
+
+function read(rel) {
+  return fs.readFileSync(path.join(root, rel), "utf8").replace(/^\uFEFF/, "");
+}
+
+function parseJson(rel) {
+  return JSON.parse(read(rel));
+}
+
+const failures = [];
+const warnings = [];
+const checked = [];
+
+for (const file of requiredFiles) {
+  checked.push(file);
+  if (!exists(file)) failures.push(`Missing required file: ${file}`);
+  else if (fs.statSync(path.join(root, file)).size === 0) failures.push(`Empty required file: ${file}`);
+}
+
+for (const file of upstreamFiles) {
+  checked.push(file);
+  if (!exists(file)) failures.push(`Missing upstream file: ${file}`);
+  else if (fs.statSync(path.join(root, file)).size === 0) failures.push(`Empty upstream file: ${file}`);
+}
+
+if (exists("manifests/runtime/free-destiny-map-controlled-next-boot-proof.json")) {
+  const manifest = parseJson("manifests/runtime/free-destiny-map-controlled-next-boot-proof.json");
+  if (manifest.productionReady !== false) failures.push("Manifest must keep productionReady false.");
+  if (manifest.storesProductionData !== false) failures.push("Manifest must declare storesProductionData false.");
+  if (manifest.takesPayment !== false) failures.push("Manifest must declare takesPayment false.");
+  if (manifest.sendsEmail !== false) failures.push("Manifest must declare sendsEmail false.");
+  if (manifest.collectsDocuments !== false) failures.push("Manifest must declare collectsDocuments false.");
+  if (manifest.submitsOfficialApplications !== false) failures.push("Manifest must declare submitsOfficialApplications false.");
+  if (manifest.webRoute !== "/free-destiny-map") failures.push("Manifest web route mismatch.");
+  if (!String(manifest.oracleLiteImpact ?? "").includes("none_runtime_yet")) failures.push("Manifest must declare none_runtime_yet.");
+}
+
+const tokenChecks = [
+  ["packages/contracts/src/free-destiny-map-controlled-next-boot.ts", ["CONTROLLED_NEXT_BOOT_PROVEN", "serverStarted", "serverStopped", "canClaimProduction: false"]],
+  ["scripts/runtime/Invoke-FreeDestinyMapControlledNextBoot.ps1", ["TimeoutSeconds", "controlled Next web boot proof", "does not claim production"]],
+  ["scripts/proof/prove-free-destiny-map-controlled-next-boot.mjs", ["CONTROLLED_NEXT_BOOT_PROVEN", "npm", "next dev", "controlled-next-route-status-200", "controlled-next-server-stopped"]],
+  ["reports/runtime/free-destiny-map-controlled-next-boot-proof.json", ["schema", "module", "status"]],
+  ["apps/web/package.json", ["next dev", "next build", "next start"]]
+];
+
+for (const [file, tokens] of tokenChecks) {
+  if (!exists(file)) continue;
+  const content = read(file);
+  for (const token of tokens) {
+    if (!content.includes(token)) failures.push(`${file} missing token: ${token}`);
+  }
+}
+
+if (exists("reports/runtime/free-destiny-map-controlled-next-boot-proof.json")) {
+  const proof = parseJson("reports/runtime/free-destiny-map-controlled-next-boot-proof.json");
+  if (proof.passed !== true) failures.push("Controlled Next boot proof must pass.");
+  if (proof.status !== "CONTROLLED_NEXT_BOOT_PROVEN") failures.push("Controlled Next boot proof status must be CONTROLLED_NEXT_BOOT_PROVEN.");
+  if (proof.productionReady !== false) failures.push("Controlled Next boot proof must keep productionReady false.");
+  if (proof.canClaimProduction !== false) failures.push("Controlled Next boot proof must keep canClaimProduction false.");
+  if (proof.serverStarted !== true) failures.push("Controlled Next boot proof must start server.");
+  if (proof.serverStopped !== true) failures.push("Controlled Next boot proof must stop server.");
+  if (proof.webStatus !== 200) failures.push("Controlled Next boot proof must record webStatus 200.");
+  if (!Array.isArray(proof.checks) || proof.checks.length < 10) failures.push("Controlled Next boot proof must include detailed checks.");
+}
+
+const forbiddenFiles = [
+  "docs/runtime/free-destiny-map-controlled-next-boot-proof.md",
+  "manifests/runtime/free-destiny-map-controlled-next-boot-proof.json",
+  "packages/contracts/src/free-destiny-map-controlled-next-boot.ts",
+  "scripts/runtime/Invoke-FreeDestinyMapControlledNextBoot.ps1",
+  "apps/web/src/app/free-destiny-map/page.tsx",
+  "apps/web/src/components/kingsmen/FreeDestinyMapApiForm.tsx"
+];
+
+const forbiddenPatterns = [
+  [/productionReady\s*[:=]\s*true/i, "productionReady true"],
+  [/canClaimProduction\s*[:=]\s*true/i, "canClaimProduction true"],
+  [/officialApplicationSubmitted:\s*true/i, "official application submitted true"],
+  [/paymentInstructionSent:\s*true/i, "payment instruction sent true"],
+  [/emailSent:\s*true/i, "email sent true"],
+  [/documentUploadAccepted:\s*true/i, "document upload accepted true"]
+];
+
+for (const file of forbiddenFiles) {
+  if (!exists(file)) continue;
+  const content = read(file);
+  for (const [pattern, label] of forbiddenPatterns) {
+    if (pattern.test(content)) failures.push(`${file} contains forbidden pattern: ${label}`);
+  }
+}
+
+const passed = failures.length === 0;
+
+const report = {
+  schema: "kingsmen.validation-report.v1",
+  module: "BATCH 14 - Controlled Local Next Web Boot Proof",
+  status: passed ? "VALIDATED" : "BUILT_PENDING_VALIDATION",
+  passed,
+  generated_at: new Date().toISOString(),
+  files_expected: requiredFiles,
+  upstream_files_checked: upstreamFiles,
+  files_checked: checked.length,
+  missing_files: requiredFiles.filter((file) => !exists(file)),
+  failed_checks: failures,
+  warnings,
+  oracle_lite_impact: "none_runtime_yet",
+  control_plane_impact: "Adds controlled real Next local web boot proof for Free Destiny Map.",
+  runtime_proof: "reports/runtime/free-destiny-map-controlled-next-boot-proof.json",
+  next_action: passed ? "Proceed to BATCH 15 - Controlled local API integration or production build proof." : "Repair controlled Next boot failures and rerun proof plus validator."
+};
+
+fs.mkdirSync(path.dirname(reportPath), { recursive: true });
+fs.writeFileSync(reportPath, `${JSON.stringify(report, null, 2)}\n`, "utf8");
+
+console.log(JSON.stringify(report, null, 2));
+if (!passed) process.exit(1);
+---
+FILE: reports/validation/free-destiny-map-controlled-next-boot-latest.json
+---
+{
+  "schema": "kingsmen.validation-report.v1",
+  "module": "BATCH 14 - Controlled Local Next Web Boot Proof",
+  "status": "BUILT_PENDING_VALIDATION",
+  "passed": false,
+  "generated_at": "2026-06-02T00:00:00.000Z",
+  "reason": "Seed report. Run BATCH 14 controlled Next boot proof, then validator.",
+  "files_checked": 0,
+  "failed_checks": [
+    "validator_not_yet_executed"
+  ],
+  "oracle_lite_impact": "none_runtime_yet",
+  "control_plane_impact": "Adds controlled real Next local web boot proof for Free Destiny Map.",
+  "runtime_proof": "reports/runtime/free-destiny-map-controlled-next-boot-proof.json",
+  "next_action": "Run powershell.exe -ExecutionPolicy Bypass -File scripts/runtime/Invoke-FreeDestinyMapControlledNextBoot.ps1 then node scripts/validators/validate-free-destiny-map-controlled-next-boot.mjs."
+}

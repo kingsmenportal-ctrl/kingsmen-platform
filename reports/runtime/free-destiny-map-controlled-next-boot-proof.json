@@ -1,0 +1,130 @@
+{
+  "schema": "kingsmen.controlled-next-boot-report.v1",
+  "module": "BATCH 14 - Controlled Local Next Web Boot Proof",
+  "status": "CONTROLLED_NEXT_BOOT_FAILED",
+  "passed": false,
+  "productionReady": false,
+  "canClaimProduction": false,
+  "generated_at": "2026-06-02T20:24:00.551Z",
+  "serverStarted": false,
+  "serverStopped": false,
+  "webStatus": 0,
+  "webRoute": "/free-destiny-map",
+  "webUrl": "http://127.0.0.1:49357/free-destiny-map",
+  "httpHost": "127.0.0.1",
+  "httpPort": 49357,
+  "checks": [
+    {
+      "name": "batch-12-readiness-proof-exists",
+      "passed": true,
+      "detail": "reports/runtime/free-destiny-map-real-web-readiness-proof.json"
+    },
+    {
+      "name": "batch-13-runtime-repair-proof-exists",
+      "passed": true,
+      "detail": "reports/runtime/free-destiny-map-real-web-runtime-repair-proof.json"
+    },
+    {
+      "name": "apps-web-package-json-exists",
+      "passed": true,
+      "detail": "apps/web/package.json"
+    },
+    {
+      "name": "apps-web-node-modules-next-exists",
+      "passed": true,
+      "detail": "apps/web/node_modules/next/package.json"
+    },
+    {
+      "name": "apps-web-node-modules-react-exists",
+      "passed": true,
+      "detail": "apps/web/node_modules/react/package.json"
+    },
+    {
+      "name": "apps-web-node-modules-react-dom-exists",
+      "passed": true,
+      "detail": "apps/web/node_modules/react-dom/package.json"
+    },
+    {
+      "name": "free-destiny-map-page-exists",
+      "passed": true,
+      "detail": "apps/web/src/app/free-destiny-map/page.tsx"
+    },
+    {
+      "name": "free-destiny-map-form-exists",
+      "passed": true,
+      "detail": "apps/web/src/components/kingsmen/FreeDestinyMapApiForm.tsx"
+    },
+    {
+      "name": "batch-12-ready-for-controlled-boot",
+      "passed": true,
+      "detail": "status=READY_FOR_CONTROLLED_LOCAL_BOOT; canAttemptLocalWebBoot=true"
+    },
+    {
+      "name": "batch-12-keeps-production-false",
+      "passed": true,
+      "detail": "production false"
+    },
+    {
+      "name": "batch-13-runtime-repair-applied",
+      "passed": true,
+      "detail": "status=WEB_RUNTIME_REPAIR_APPLIED; passed=true"
+    },
+    {
+      "name": "batch-13-keeps-production-false",
+      "passed": true,
+      "detail": "production false"
+    },
+    {
+      "name": "web-dev-script-present",
+      "passed": true,
+      "detail": "next dev --hostname 127.0.0.1"
+    },
+    {
+      "name": "web-build-script-present",
+      "passed": true,
+      "detail": "next build"
+    },
+    {
+      "name": "web-next-dependency-present",
+      "passed": true,
+      "detail": "^15.5.0"
+    },
+    {
+      "name": "web-react-dependency-present",
+      "passed": true,
+      "detail": "^19.1.0"
+    },
+    {
+      "name": "web-react-dom-dependency-present",
+      "passed": true,
+      "detail": "^19.1.0"
+    },
+    {
+      "name": "controlled-next-boot-exception-absent",
+      "passed": false,
+      "detail": "spawn EINVAL"
+    },
+    {
+      "name": "controlled-next-server-stopped",
+      "passed": false,
+      "detail": "server process was not started or could not be stopped"
+    }
+  ],
+  "failed": [
+    {
+      "name": "controlled-next-boot-exception-absent",
+      "passed": false,
+      "detail": "spawn EINVAL"
+    },
+    {
+      "name": "controlled-next-server-stopped",
+      "passed": false,
+      "detail": "server process was not started or could not be stopped"
+    }
+  ],
+  "stdout_tail": [],
+  "stderr_tail": [],
+  "oracle_lite_impact": "none_runtime_yet",
+  "runtime_scope": "controlled local Next dev boot proof only; no Oracle runtime; no production deployment",
+  "next_action": "Repair controlled Next boot failures before moving forward."
+}

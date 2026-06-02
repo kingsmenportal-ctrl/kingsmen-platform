@@ -1,0 +1,41 @@
+{
+  "schema": "kingsmen.validation-report.v1",
+  "module": "BATCH 14 - Controlled Local Next Web Boot Proof",
+  "status": "BUILT_PENDING_VALIDATION",
+  "passed": false,
+  "generated_at": "2026-06-02T20:24:01.746Z",
+  "files_expected": [
+    "docs/runtime/free-destiny-map-controlled-next-boot-proof.md",
+    "manifests/runtime/free-destiny-map-controlled-next-boot-proof.json",
+    "packages/contracts/src/free-destiny-map-controlled-next-boot.ts",
+    "scripts/runtime/Invoke-FreeDestinyMapControlledNextBoot.ps1",
+    "scripts/proof/prove-free-destiny-map-controlled-next-boot.mjs",
+    "reports/runtime/free-destiny-map-controlled-next-boot-proof.json",
+    "scripts/validators/validate-free-destiny-map-controlled-next-boot.mjs",
+    "reports/validation/free-destiny-map-controlled-next-boot-latest.json"
+  ],
+  "upstream_files_checked": [
+    "apps/web/package.json",
+    "apps/web/package-lock.json",
+    "apps/web/next.config.mjs",
+    "apps/web/src/app/layout.tsx",
+    "apps/web/src/app/free-destiny-map/page.tsx",
+    "apps/web/src/components/kingsmen/FreeDestinyMapApiForm.tsx",
+    "reports/runtime/free-destiny-map-real-web-readiness-proof.json",
+    "reports/runtime/free-destiny-map-real-web-runtime-repair-proof.json"
+  ],
+  "files_checked": 16,
+  "missing_files": [],
+  "failed_checks": [
+    "Controlled Next boot proof must pass.",
+    "Controlled Next boot proof status must be CONTROLLED_NEXT_BOOT_PROVEN.",
+    "Controlled Next boot proof must start server.",
+    "Controlled Next boot proof must stop server.",
+    "Controlled Next boot proof must record webStatus 200."
+  ],
+  "warnings": [],
+  "oracle_lite_impact": "none_runtime_yet",
+  "control_plane_impact": "Adds controlled real Next local web boot proof for Free Destiny Map.",
+  "runtime_proof": "reports/runtime/free-destiny-map-controlled-next-boot-proof.json",
+  "next_action": "Repair controlled Next boot failures and rerun proof plus validator."
+}

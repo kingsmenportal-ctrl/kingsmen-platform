@@ -4,11 +4,11 @@
     "submodule":  "CREATOR.2B",
     "action":  "Materialize",
     "productionReady":  false,
-    "generatedAt":  "2026-06-02T20:10:55.188Z",
+    "generatedAt":  "2026-06-02T20:23:59.696Z",
     "repoRoot":  "C:\\Users\\dell\\kingsmen-platform",
     "passed":  true,
     "detail":  "Materialize complete.",
-    "totalChecks":  15,
+    "totalChecks":  9,
     "failedChecks":  0,
     "failed":  [
 
@@ -17,75 +17,45 @@
                    {
                        "name":  "materialize:blocks",
                        "passed":  true,
-                       "detail":  "blocks=14"
+                       "detail":  "blocks=8"
                    },
                    {
-                       "name":  "materialize:wrote:docs/runtime/free-destiny-map-real-web-runtime-repair.md",
+                       "name":  "materialize:wrote:docs/runtime/free-destiny-map-controlled-next-boot-proof.md",
                        "passed":  true,
                        "detail":  "written"
                    },
                    {
-                       "name":  "materialize:wrote:manifests/runtime/free-destiny-map-real-web-runtime-repair.json",
+                       "name":  "materialize:wrote:manifests/runtime/free-destiny-map-controlled-next-boot-proof.json",
                        "passed":  true,
                        "detail":  "written"
                    },
                    {
-                       "name":  "materialize:wrote:apps/web/package.json",
+                       "name":  "materialize:wrote:packages/contracts/src/free-destiny-map-controlled-next-boot.ts",
                        "passed":  true,
                        "detail":  "written"
                    },
                    {
-                       "name":  "materialize:wrote:apps/web/.gitignore",
+                       "name":  "materialize:wrote:scripts/runtime/Invoke-FreeDestinyMapControlledNextBoot.ps1",
                        "passed":  true,
                        "detail":  "written"
                    },
                    {
-                       "name":  "materialize:wrote:apps/web/next.config.mjs",
+                       "name":  "materialize:wrote:scripts/proof/prove-free-destiny-map-controlled-next-boot.mjs",
                        "passed":  true,
                        "detail":  "written"
                    },
                    {
-                       "name":  "materialize:wrote:apps/web/tsconfig.json",
+                       "name":  "materialize:wrote:reports/runtime/free-destiny-map-controlled-next-boot-proof.json",
                        "passed":  true,
                        "detail":  "written"
                    },
                    {
-                       "name":  "materialize:wrote:apps/web/next-env.d.ts",
+                       "name":  "materialize:wrote:scripts/validators/validate-free-destiny-map-controlled-next-boot.mjs",
                        "passed":  true,
                        "detail":  "written"
                    },
                    {
-                       "name":  "materialize:wrote:apps/web/src/app/layout.tsx",
-                       "passed":  true,
-                       "detail":  "written"
-                   },
-                   {
-                       "name":  "materialize:wrote:packages/contracts/src/free-destiny-map-real-web-runtime-repair.ts",
-                       "passed":  true,
-                       "detail":  "written"
-                   },
-                   {
-                       "name":  "materialize:wrote:scripts/runtime/Invoke-FreeDestinyMapWebRuntimeRepair.ps1",
-                       "passed":  true,
-                       "detail":  "written"
-                   },
-                   {
-                       "name":  "materialize:wrote:scripts/proof/prove-free-destiny-map-real-web-runtime-repair.mjs",
-                       "passed":  true,
-                       "detail":  "written"
-                   },
-                   {
-                       "name":  "materialize:wrote:reports/runtime/free-destiny-map-real-web-runtime-repair-proof.json",
-                       "passed":  true,
-                       "detail":  "written"
-                   },
-                   {
-                       "name":  "materialize:wrote:scripts/validators/validate-free-destiny-map-real-web-runtime-repair.mjs",
-                       "passed":  true,
-                       "detail":  "written"
-                   },
-                   {
-                       "name":  "materialize:wrote:reports/validation/free-destiny-map-real-web-runtime-repair-latest.json",
+                       "name":  "materialize:wrote:reports/validation/free-destiny-map-controlled-next-boot-latest.json",
                        "passed":  true,
                        "detail":  "written"
                    }
