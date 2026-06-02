@@ -1,0 +1,40 @@
+{
+  "schema": "kingsmen.local-web-http-exercise.v1",
+  "module": "BATCH 10 - Local Web-to-HTTP Exercise / Minimal App Boot Proof",
+  "status": "BUILT_PENDING_VALIDATION",
+  "productionReady": false,
+  "sourceBatches": [
+    "BATCH 07 - Public Form to Intake API Wiring / Local API Boot Proof",
+    "BATCH 08 - Local API Boot Command / First End-to-End Local Route Exercise",
+    "BATCH 09 - Local HTTP API Boot Shell / First End-to-End Local HTTP Route Exercise"
+  ],
+  "webRoute": "/free-destiny-map",
+  "apiEndpoint": "/api/public/free-destiny-map/intake/local",
+  "httpHost": "127.0.0.1",
+  "httpPortMode": "ephemeral",
+  "proofCommand": "powershell.exe -ExecutionPolicy Bypass -File scripts/runtime/Invoke-FreeDestinyMapLocalWebHttpExercise.ps1",
+  "proofScript": "scripts/proof/prove-free-destiny-map-local-web-http-exercise.mjs",
+  "proofReport": "reports/runtime/free-destiny-map-local-web-http-exercise-proof.json",
+  "validationReport": "reports/validation/free-destiny-map-local-web-http-exercise-latest.json",
+  "localExerciseDataDirectory": "data/local/free-destiny-map/web-http-exercise",
+  "localWriteFlag": "KINGSMEN_ENABLE_LOCAL_INTAKE_WRITE",
+  "storesProductionData": false,
+  "usesDemoPayloadOnly": true,
+  "takesPayment": false,
+  "sendsEmail": false,
+  "collectsDocuments": false,
+  "submitsOfficialApplications": false,
+  "oracleLiteImpact": "none_runtime_yet",
+  "controlPlaneImpact": "Adds first local web-to-HTTP proof for Free Destiny Map.",
+  "requiredFiles": [
+    "docs/runtime/free-destiny-map-local-web-http-exercise.md",
+    "manifests/runtime/free-destiny-map-local-web-http-exercise.json",
+    "packages/contracts/src/free-destiny-map-local-web-http-exercise.ts",
+    "scripts/runtime/Invoke-FreeDestinyMapLocalWebHttpExercise.ps1",
+    "scripts/proof/prove-free-destiny-map-local-web-http-exercise.mjs",
+    "reports/runtime/free-destiny-map-local-web-http-exercise-proof.json",
+    "scripts/validators/validate-free-destiny-map-local-web-http-exercise.mjs",
+    "reports/validation/free-destiny-map-local-web-http-exercise-latest.json"
+  ],
+  "nextAction": "Run powershell.exe -ExecutionPolicy Bypass -File scripts/runtime/Invoke-FreeDestinyMapLocalWebHttpExercise.ps1 then node scripts/validators/validate-free-destiny-map-local-web-http-exercise.mjs"
+}
