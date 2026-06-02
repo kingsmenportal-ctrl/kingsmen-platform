@@ -1,0 +1,33 @@
+{
+  "schema": "kingsmen.docker-oracle-lite-controlled-build-report.v1",
+  "module": "BATCH 20 - Controlled Docker Local Build Proof",
+  "status": "DOCKER_LOCAL_BUILD_FAILED",
+  "passed": false,
+  "productionReady": false,
+  "canClaimProduction": false,
+  "deployedToOracle": false,
+  "generated_at": "2026-06-02T00:00:00.000Z",
+  "dockerAvailable": false,
+  "dockerVersion": null,
+  "dockerInfoOk": false,
+  "unavailableReason": "Proof not yet executed.",
+  "dockerBuildsAttempted": false,
+  "dockerBuildsSucceeded": false,
+  "dockerRunsInThisBatch": false,
+  "composeUpInThisBatch": false,
+  "apiImage": "kingsmen/api:oracle-lite-local",
+  "webImage": "kingsmen/web:oracle-lite-local",
+  "apiBuildExitCode": null,
+  "webBuildExitCode": null,
+  "checks": [],
+  "failed": [
+    {
+      "name": "docker_oracle_lite_controlled_build_not_yet_executed",
+      "passed": false,
+      "detail": "Run scripts/runtime/Invoke-DockerOracleLiteControlledBuild.ps1."
+    }
+  ],
+  "oracle_lite_impact": "controlled_local_docker_build_only",
+  "runtime_scope": "controlled Docker local image build proof only; no container runtime; no Compose startup; no Oracle deployment",
+  "next_action": "Run BATCH 20 controlled Docker local build proof."
+}

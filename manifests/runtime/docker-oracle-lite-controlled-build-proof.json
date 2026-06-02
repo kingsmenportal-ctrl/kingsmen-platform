@@ -1,0 +1,41 @@
+{
+  "schema": "kingsmen.docker-oracle-lite-controlled-build-proof.v1",
+  "module": "BATCH 20 - Controlled Docker Local Build Proof",
+  "status": "BUILT_PENDING_VALIDATION",
+  "productionReady": false,
+  "requiresBatches": [
+    "BATCH 19 - Docker / Oracle Lite Local Runtime Container Preparation"
+  ],
+  "dockerRunsInThisBatch": false,
+  "dockerBuildsInThisBatch": true,
+  "composeUpInThisBatch": false,
+  "deploysToOracle": false,
+  "webImage": "kingsmen/web:oracle-lite-local",
+  "apiImage": "kingsmen/api:oracle-lite-local",
+  "webDockerfile": "apps/web/Dockerfile.oracle-lite",
+  "apiDockerfile": "apps/api/Dockerfile.oracle-lite",
+  "composeFile": "docker/oracle-lite/docker-compose.local.yml",
+  "proofCommand": "powershell.exe -ExecutionPolicy Bypass -File scripts/runtime/Invoke-DockerOracleLiteControlledBuild.ps1",
+  "proofScript": "scripts/proof/prove-docker-oracle-lite-controlled-build.mjs",
+  "proofReport": "reports/runtime/docker-oracle-lite-controlled-build-proof.json",
+  "validationReport": "reports/validation/docker-oracle-lite-controlled-build-latest.json",
+  "storesProductionData": false,
+  "usesDemoPayloadOnly": true,
+  "takesPayment": false,
+  "sendsEmail": false,
+  "collectsDocuments": false,
+  "submitsOfficialApplications": false,
+  "oracleLiteImpact": "controlled_local_docker_build_only",
+  "controlPlaneImpact": "Proves or honestly blocks local Docker image build for Oracle Lite runtime boundary.",
+  "requiredFiles": [
+    "docs/runtime/docker-oracle-lite-controlled-build-proof.md",
+    "manifests/runtime/docker-oracle-lite-controlled-build-proof.json",
+    "packages/contracts/src/docker-oracle-lite-controlled-build.ts",
+    "scripts/runtime/Invoke-DockerOracleLiteControlledBuild.ps1",
+    "scripts/proof/prove-docker-oracle-lite-controlled-build.mjs",
+    "reports/runtime/docker-oracle-lite-controlled-build-proof.json",
+    "scripts/validators/validate-docker-oracle-lite-controlled-build.mjs",
+    "reports/validation/docker-oracle-lite-controlled-build-latest.json"
+  ],
+  "nextAction": "Run powershell.exe -ExecutionPolicy Bypass -File scripts/runtime/Invoke-DockerOracleLiteControlledBuild.ps1 then node scripts/validators/validate-docker-oracle-lite-controlled-build.mjs"
+}

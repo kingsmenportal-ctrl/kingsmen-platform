@@ -4,11 +4,11 @@
     "submodule":  "CREATOR.2B",
     "action":  "Materialize",
     "productionReady":  false,
-    "generatedAt":  "2026-06-02T21:51:26.150Z",
+    "generatedAt":  "2026-06-02T22:16:02.070Z",
     "repoRoot":  "C:\\Users\\dell\\kingsmen-platform",
     "passed":  true,
     "detail":  "Materialize complete.",
-    "totalChecks":  13,
+    "totalChecks":  9,
     "failedChecks":  0,
     "failed":  [
 
@@ -17,65 +17,45 @@
                    {
                        "name":  "materialize:blocks",
                        "passed":  true,
-                       "detail":  "blocks=12"
+                       "detail":  "blocks=8"
                    },
                    {
-                       "name":  "materialize:wrote:docs/runtime/docker-oracle-lite-container-preparation.md",
+                       "name":  "materialize:wrote:docs/runtime/docker-oracle-lite-controlled-build-proof.md",
                        "passed":  true,
                        "detail":  "written"
                    },
                    {
-                       "name":  "materialize:wrote:manifests/runtime/docker-oracle-lite-container-preparation.json",
+                       "name":  "materialize:wrote:manifests/runtime/docker-oracle-lite-controlled-build-proof.json",
                        "passed":  true,
                        "detail":  "written"
                    },
                    {
-                       "name":  "materialize:wrote:.dockerignore",
+                       "name":  "materialize:wrote:packages/contracts/src/docker-oracle-lite-controlled-build.ts",
                        "passed":  true,
                        "detail":  "written"
                    },
                    {
-                       "name":  "materialize:wrote:apps/web/Dockerfile.oracle-lite",
+                       "name":  "materialize:wrote:scripts/runtime/Invoke-DockerOracleLiteControlledBuild.ps1",
                        "passed":  true,
                        "detail":  "written"
                    },
                    {
-                       "name":  "materialize:wrote:apps/api/Dockerfile.oracle-lite",
+                       "name":  "materialize:wrote:scripts/proof/prove-docker-oracle-lite-controlled-build.mjs",
                        "passed":  true,
                        "detail":  "written"
                    },
                    {
-                       "name":  "materialize:wrote:apps/api/src/runtime/free-destiny-map-backend-local-server.mjs",
+                       "name":  "materialize:wrote:reports/runtime/docker-oracle-lite-controlled-build-proof.json",
                        "passed":  true,
                        "detail":  "written"
                    },
                    {
-                       "name":  "materialize:wrote:docker/oracle-lite/docker-compose.local.yml",
+                       "name":  "materialize:wrote:scripts/validators/validate-docker-oracle-lite-controlled-build.mjs",
                        "passed":  true,
                        "detail":  "written"
                    },
                    {
-                       "name":  "materialize:wrote:packages/contracts/src/docker-oracle-lite-container-preparation.ts",
-                       "passed":  true,
-                       "detail":  "written"
-                   },
-                   {
-                       "name":  "materialize:wrote:scripts/proof/prove-docker-oracle-lite-container-preparation.mjs",
-                       "passed":  true,
-                       "detail":  "written"
-                   },
-                   {
-                       "name":  "materialize:wrote:reports/runtime/docker-oracle-lite-container-preparation-proof.json",
-                       "passed":  true,
-                       "detail":  "written"
-                   },
-                   {
-                       "name":  "materialize:wrote:scripts/validators/validate-docker-oracle-lite-container-preparation.mjs",
-                       "passed":  true,
-                       "detail":  "written"
-                   },
-                   {
-                       "name":  "materialize:wrote:reports/validation/docker-oracle-lite-container-preparation-latest.json",
+                       "name":  "materialize:wrote:reports/validation/docker-oracle-lite-controlled-build-latest.json",
                        "passed":  true,
                        "detail":  "written"
                    }
