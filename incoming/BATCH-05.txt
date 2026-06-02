@@ -1,0 +1,446 @@
+FILE: docs/intake/free-destiny-map-intake-backend-shell.md
+---
+# BATCH 05 - Free Destiny Map Intake Contract / Backend Shell
+
+## Purpose
+
+This batch creates the backend-ready shell for Free Destiny Map intake.
+
+It connects the public idea from BATCH 04 to a safe contract and API boundary without pretending that the intake is fully live, stored, emailed, paid, submitted, or production-ready.
+
+## What this batch creates
+
+- Free Destiny Map intake payload contract
+- safe validation rules
+- consent fields
+- route-interest fields
+- accommodation need fields
+- CV need fields
+- funding readiness fields
+- document readiness summary fields
+- random source / opportunity check field
+- backend service shell
+- API route shell
+- validator and validation report
+
+## What this batch does not do yet
+
+- no database write
+- no email sending
+- no payment processing
+- no official application submission
+- no document upload
+- no raw secret handling
+- no raw sensitive identity collection
+- no production runtime claim
+
+## Safety rules
+
+Free Destiny Map intake must not ask for sensitive documents, card details, passwords, portal logins, or raw official submission credentials.
+
+It may capture high-level readiness and consent so Kingsmen can later route the user safely.
+
+## Oracle Lite impact
+
+none_runtime_yet.
+
+This batch is contracts, service shell, route shell, validator, and proof report only.
+
+## Next action
+
+After validation, connect this shell to local runtime wiring or continue with the candidate intake persistence batch.
+---
+FILE: manifests/intake/free-destiny-map-intake-shell.json
+---
+{
+  "schema": "kingsmen.intake-shell.v1",
+  "module": "BATCH 05 - Free Destiny Map Intake Contract / Backend Shell",
+  "status": "BUILT_PENDING_VALIDATION",
+  "productionReady": false,
+  "endpoint": "/api/public/free-destiny-map/intake",
+  "method": "POST",
+  "storesData": false,
+  "sendsEmail": false,
+  "takesPayment": false,
+  "submitsOfficialApplications": false,
+  "collectsDocuments": false,
+  "oracleLiteImpact": "none_runtime_yet",
+  "controlPlaneImpact": "Creates backend-ready Free Destiny Map intake boundary for later wiring.",
+  "requiredFiles": [
+    "docs/intake/free-destiny-map-intake-backend-shell.md",
+    "manifests/intake/free-destiny-map-intake-shell.json",
+    "packages/contracts/src/free-destiny-map-intake.ts",
+    "apps/api/src/services/free-destiny-map-intake.service.ts",
+    "apps/api/src/routes/free-destiny-map-intake.routes.ts",
+    "scripts/validators/validate-free-destiny-map-intake.mjs",
+    "reports/validation/free-destiny-map-intake-latest.json"
+  ],
+  "allowedFields": [
+    "fullName",
+    "province",
+    "currentSituation",
+    "knownRoute",
+    "routeInterests",
+    "needsAccommodation",
+    "accommodationArea",
+    "needsFundingHelp",
+    "needsCvHelp",
+    "hasDocumentsReady",
+    "randomSourceName",
+    "consentToBeContacted",
+    "consentToProcessBasicInfo"
+  ],
+  "forbiddenCollection": [
+    "passwords",
+    "bank card details",
+    "portal login credentials",
+    "raw documents",
+    "official application submission credentials",
+    "payment instructions"
+  ],
+  "nextAction": "Run node scripts/validators/validate-free-destiny-map-intake.mjs"
+}
+---
+FILE: packages/contracts/src/free-destiny-map-intake.ts
+---
+export type FreeDestinyRouteInterest =
+  | "higher_education"
+  | "tvet"
+  | "seta_learnership"
+  | "internship"
+  | "apprenticeship"
+  | "employment"
+  | "nsfas_bursary"
+  | "accommodation"
+  | "cv_revamp"
+  | "documents"
+  | "source_check"
+  | "phoenix_fallback"
+  | "confused_full_map";
+
+export type FreeDestinyUrgency = "normal" | "soon" | "urgent_deadline_risk";
+
+export interface FreeDestinyMapIntakePayload {
+  fullName?: string;
+  province?: string;
+  currentSituation?: string;
+  knownRoute?: string;
+  routeInterests?: FreeDestinyRouteInterest[];
+  urgency?: FreeDestinyUrgency;
+  needsAccommodation?: boolean;
+  accommodationArea?: string;
+  needsFundingHelp?: boolean;
+  needsCvHelp?: boolean;
+  hasDocumentsReady?: boolean;
+  randomSourceName?: string;
+  consentToBeContacted?: boolean;
+  consentToProcessBasicInfo?: boolean;
+}
+
+export interface FreeDestinyMapIntakeValidationIssue {
+  field: string;
+  code: string;
+  message: string;
+}
+
+export interface FreeDestinyMapIntakeResult {
+  accepted: boolean;
+  productionReady: false;
+  reference: string;
+  issues: FreeDestinyMapIntakeValidationIssue[];
+  nextAction: string;
+  safeNotice: string;
+}
+
+export const FREE_DESTINY_MAP_SAFE_NOTICE =
+  "This Free Destiny Map intake shell does not submit official applications, take payments, upload documents, guarantee outcomes, or store production data yet.";
+
+export const FREE_DESTINY_MAP_ALLOWED_ROUTE_INTERESTS: FreeDestinyRouteInterest[] = [
+  "higher_education",
+  "tvet",
+  "seta_learnership",
+  "internship",
+  "apprenticeship",
+  "employment",
+  "nsfas_bursary",
+  "accommodation",
+  "cv_revamp",
+  "documents",
+  "source_check",
+  "phoenix_fallback",
+  "confused_full_map"
+];
+
+export function createFreeDestinyReference(seed: string): string {
+  const cleanSeed = seed.replace(/[^a-zA-Z0-9]/g, "").slice(0, 8).toUpperCase() || "GUEST";
+  return `KM-FDM-${cleanSeed}`;
+}
+
+export function hasMinimumFreeDestinyConsent(payload: FreeDestinyMapIntakePayload): boolean {
+  return payload.consentToBeContacted === true && payload.consentToProcessBasicInfo === true;
+}
+---
+FILE: apps/api/src/services/free-destiny-map-intake.service.ts
+---
+import {
+  FREE_DESTINY_MAP_ALLOWED_ROUTE_INTERESTS,
+  FREE_DESTINY_MAP_SAFE_NOTICE,
+  createFreeDestinyReference,
+  hasMinimumFreeDestinyConsent,
+  type FreeDestinyMapIntakePayload,
+  type FreeDestinyMapIntakeResult,
+  type FreeDestinyMapIntakeValidationIssue,
+  type FreeDestinyRouteInterest
+} from "../../../../packages/contracts/src/free-destiny-map-intake";
+
+function isNonEmptyText(value: unknown): value is string {
+  return typeof value === "string" && value.trim().length > 0;
+}
+
+function normalizeText(value: unknown): string | undefined {
+  if (!isNonEmptyText(value)) return undefined;
+  return value.trim().slice(0, 280);
+}
+
+function normalizeRouteInterests(value: unknown): FreeDestinyRouteInterest[] {
+  if (!Array.isArray(value)) return [];
+
+  const allowed = new Set<string>(FREE_DESTINY_MAP_ALLOWED_ROUTE_INTERESTS);
+
+  return value
+    .filter((item): item is string => typeof item === "string")
+    .filter((item) => allowed.has(item))
+    .slice(0, 8) as FreeDestinyRouteInterest[];
+}
+
+export function normalizeFreeDestinyMapIntakePayload(input: unknown): FreeDestinyMapIntakePayload {
+  const source = typeof input === "object" && input !== null ? (input as Record<string, unknown>) : {};
+
+  return {
+    fullName: normalizeText(source.fullName),
+    province: normalizeText(source.province),
+    currentSituation: normalizeText(source.currentSituation),
+    knownRoute: normalizeText(source.knownRoute),
+    routeInterests: normalizeRouteInterests(source.routeInterests),
+    urgency:
+      source.urgency === "soon" || source.urgency === "urgent_deadline_risk"
+        ? source.urgency
+        : "normal",
+    needsAccommodation: source.needsAccommodation === true,
+    accommodationArea: normalizeText(source.accommodationArea),
+    needsFundingHelp: source.needsFundingHelp === true,
+    needsCvHelp: source.needsCvHelp === true,
+    hasDocumentsReady: source.hasDocumentsReady === true,
+    randomSourceName: normalizeText(source.randomSourceName),
+    consentToBeContacted: source.consentToBeContacted === true,
+    consentToProcessBasicInfo: source.consentToProcessBasicInfo === true
+  };
+}
+
+export function validateFreeDestinyMapIntakePayload(payload: FreeDestinyMapIntakePayload): FreeDestinyMapIntakeValidationIssue[] {
+  const issues: FreeDestinyMapIntakeValidationIssue[] = [];
+
+  if (!hasMinimumFreeDestinyConsent(payload)) {
+    issues.push({
+      field: "consent",
+      code: "CONSENT_REQUIRED",
+      message: "Kingsmen needs contact and basic-info processing consent before continuing."
+    });
+  }
+
+  const hasIntent =
+    Boolean(payload.knownRoute) ||
+    Boolean(payload.currentSituation) ||
+    Boolean(payload.randomSourceName) ||
+    Boolean(payload.needsAccommodation) ||
+    Boolean(payload.needsFundingHelp) ||
+    Boolean(payload.needsCvHelp) ||
+    Boolean(payload.hasDocumentsReady) ||
+    (payload.routeInterests ?? []).length > 0;
+
+  if (!hasIntent) {
+    issues.push({
+      field: "intent",
+      code: "INTENT_REQUIRED",
+      message: "Free Destiny Map needs at least one route, need, question, or current situation."
+    });
+  }
+
+  if (payload.needsAccommodation === true && !payload.accommodationArea) {
+    issues.push({
+      field: "accommodationArea",
+      code: "ACCOMMODATION_AREA_RECOMMENDED",
+      message: "Accommodation needs should include a preferred area, campus, workplace, or training location when known."
+    });
+  }
+
+  return issues;
+}
+
+export function buildFreeDestinyMapIntakeResult(payload: FreeDestinyMapIntakePayload): FreeDestinyMapIntakeResult {
+  const issues = validateFreeDestinyMapIntakePayload(payload);
+  const reference = createFreeDestinyReference(payload.fullName ?? payload.province ?? "guest");
+
+  return {
+    accepted: issues.length === 0,
+    productionReady: false,
+    reference,
+    issues,
+    safeNotice: FREE_DESTINY_MAP_SAFE_NOTICE,
+    nextAction:
+      issues.length === 0
+        ? "Shell accepted. Later batches will persist, email, score, and route this intake safely."
+        : "Fix the listed intake issues before continuing."
+  };
+}
+
+export function processFreeDestinyMapIntakeShell(input: unknown): FreeDestinyMapIntakeResult {
+  const payload = normalizeFreeDestinyMapIntakePayload(input);
+  return buildFreeDestinyMapIntakeResult(payload);
+}
+---
+FILE: apps/api/src/routes/free-destiny-map-intake.routes.ts
+---
+import { processFreeDestinyMapIntakeShell } from "../services/free-destiny-map-intake.service";
+
+type RouteLikeApp = {
+  post: (path: string, handler: (request: { body?: unknown }, reply: { code: (status: number) => { send: (payload: unknown) => unknown } }) => unknown) => unknown;
+};
+
+export async function registerFreeDestinyMapIntakeRoutes(app: RouteLikeApp) {
+  app.post("/api/public/free-destiny-map/intake", (request, reply) => {
+    const result = processFreeDestinyMapIntakeShell(request.body);
+
+    return reply.code(result.accepted ? 202 : 400).send({
+      ...result,
+      officialApplicationSubmitted: false,
+      paymentInstructionSent: false,
+      documentUploadAccepted: false,
+      productionReady: false
+    });
+  });
+}
+---
+FILE: scripts/validators/validate-free-destiny-map-intake.mjs
+---
+#!/usr/bin/env node
+import fs from "node:fs";
+import path from "node:path";
+
+const root = process.cwd();
+const reportPath = path.join(root, "reports/validation/free-destiny-map-intake-latest.json");
+
+const requiredFiles = [
+  "docs/intake/free-destiny-map-intake-backend-shell.md",
+  "manifests/intake/free-destiny-map-intake-shell.json",
+  "packages/contracts/src/free-destiny-map-intake.ts",
+  "apps/api/src/services/free-destiny-map-intake.service.ts",
+  "apps/api/src/routes/free-destiny-map-intake.routes.ts",
+  "scripts/validators/validate-free-destiny-map-intake.mjs",
+  "reports/validation/free-destiny-map-intake-latest.json"
+];
+
+function exists(rel) {
+  return fs.existsSync(path.join(root, rel));
+}
+
+function read(rel) {
+  return fs.readFileSync(path.join(root, rel), "utf8").replace(/^\uFEFF/, "");
+}
+
+function parseJson(rel) {
+  return JSON.parse(read(rel));
+}
+
+const failures = [];
+const warnings = [];
+const checked = [];
+
+for (const file of requiredFiles) {
+  checked.push(file);
+  if (!exists(file)) failures.push(`Missing required file: ${file}`);
+  else if (fs.statSync(path.join(root, file)).size === 0) failures.push(`Empty required file: ${file}`);
+}
+
+if (exists("manifests/intake/free-destiny-map-intake-shell.json")) {
+  const manifest = parseJson("manifests/intake/free-destiny-map-intake-shell.json");
+  if (manifest.productionReady !== false) failures.push("Manifest must keep productionReady false.");
+  if (manifest.storesData !== false) failures.push("Manifest must declare storesData false.");
+  if (manifest.takesPayment !== false) failures.push("Manifest must declare takesPayment false.");
+  if (manifest.collectsDocuments !== false) failures.push("Manifest must declare collectsDocuments false.");
+  if (!String(manifest.oracleLiteImpact ?? "").includes("none_runtime_yet")) failures.push("Manifest must declare none_runtime_yet.");
+  if (manifest.endpoint !== "/api/public/free-destiny-map/intake") failures.push("Manifest endpoint mismatch.");
+}
+
+const tokenChecks = [
+  ["packages/contracts/src/free-destiny-map-intake.ts", ["FreeDestinyMapIntakePayload", "FreeDestinyMapIntakeResult", "FREE_DESTINY_MAP_SAFE_NOTICE", "accommodation", "cv_revamp", "source_check"]],
+  ["apps/api/src/services/free-destiny-map-intake.service.ts", ["normalizeFreeDestinyMapIntakePayload", "validateFreeDestinyMapIntakePayload", "processFreeDestinyMapIntakeShell", "CONSENT_REQUIRED", "INTENT_REQUIRED"]],
+  ["apps/api/src/routes/free-destiny-map-intake.routes.ts", ["/api/public/free-destiny-map/intake", "officialApplicationSubmitted: false", "paymentInstructionSent: false", "documentUploadAccepted: false", "productionReady: false"]]
+];
+
+for (const [file, tokens] of tokenChecks) {
+  if (!exists(file)) continue;
+  const content = read(file);
+  for (const token of tokens) {
+    if (!content.includes(token)) failures.push(`${file} missing token: ${token}`);
+  }
+}
+
+const forbiddenPatterns = [
+  [/\bpassword\b/i, "password collection"],
+  [/\bcardNumber\b/i, "card number collection"],
+  [/\bcvv\b/i, "cvv collection"],
+  [/\bdocumentBase64\b/i, "document upload payload"],
+  [/officialApplicationSubmitted:\s*true/i, "official application submitted true"],
+  [/paymentInstructionSent:\s*true/i, "payment instruction sent true"],
+  [/productionReady\s*[:=]\s*true/i, "productionReady true"]
+];
+
+for (const file of requiredFiles.filter((item) => exists(item))) {
+  const content = read(file);
+  for (const [pattern, label] of forbiddenPatterns) {
+    if (pattern.test(content)) failures.push(`${file} contains forbidden pattern: ${label}`);
+  }
+}
+
+const passed = failures.length === 0;
+
+const report = {
+  schema: "kingsmen.validation-report.v1",
+  module: "BATCH 05 - Free Destiny Map Intake Contract / Backend Shell",
+  status: passed ? "VALIDATED" : "BUILT_PENDING_VALIDATION",
+  passed,
+  generated_at: new Date().toISOString(),
+  files_expected: requiredFiles,
+  files_checked: checked.length,
+  missing_files: requiredFiles.filter((file) => !exists(file)),
+  failed_checks: failures,
+  warnings,
+  oracle_lite_impact: "none_runtime_yet",
+  control_plane_impact: "Adds backend-ready Free Destiny Map intake boundary.",
+  next_action: passed ? "Proceed to BATCH 06 - Intake persistence/local runtime shell or next approved batch." : "Repair Free Destiny Map intake failures and rerun validator."
+};
+
+fs.mkdirSync(path.dirname(reportPath), { recursive: true });
+fs.writeFileSync(reportPath, `${JSON.stringify(report, null, 2)}\n`, "utf8");
+
+console.log(JSON.stringify(report, null, 2));
+if (!passed) process.exit(1);
+---
+FILE: reports/validation/free-destiny-map-intake-latest.json
+---
+{
+  "schema": "kingsmen.validation-report.v1",
+  "module": "BATCH 05 - Free Destiny Map Intake Contract / Backend Shell",
+  "status": "BUILT_PENDING_VALIDATION",
+  "passed": false,
+  "generated_at": "2026-06-02T00:00:00.000Z",
+  "reason": "Seed report. Run scripts/validators/validate-free-destiny-map-intake.mjs.",
+  "files_checked": 0,
+  "failed_checks": [
+    "validator_not_yet_executed"
+  ],
+  "oracle_lite_impact": "none_runtime_yet",
+  "control_plane_impact": "Adds backend-ready Free Destiny Map intake boundary.",
+  "next_action": "Run node scripts/validators/validate-free-destiny-map-intake.mjs."
+}

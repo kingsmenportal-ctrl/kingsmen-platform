@@ -1,0 +1,48 @@
+{
+  "schema": "kingsmen.intake-shell.v1",
+  "module": "BATCH 05 - Free Destiny Map Intake Contract / Backend Shell",
+  "status": "BUILT_PENDING_VALIDATION",
+  "productionReady": false,
+  "endpoint": "/api/public/free-destiny-map/intake",
+  "method": "POST",
+  "storesData": false,
+  "sendsEmail": false,
+  "takesPayment": false,
+  "submitsOfficialApplications": false,
+  "collectsDocuments": false,
+  "oracleLiteImpact": "none_runtime_yet",
+  "controlPlaneImpact": "Creates backend-ready Free Destiny Map intake boundary for later wiring.",
+  "requiredFiles": [
+    "docs/intake/free-destiny-map-intake-backend-shell.md",
+    "manifests/intake/free-destiny-map-intake-shell.json",
+    "packages/contracts/src/free-destiny-map-intake.ts",
+    "apps/api/src/services/free-destiny-map-intake.service.ts",
+    "apps/api/src/routes/free-destiny-map-intake.routes.ts",
+    "scripts/validators/validate-free-destiny-map-intake.mjs",
+    "reports/validation/free-destiny-map-intake-latest.json"
+  ],
+  "allowedFields": [
+    "fullName",
+    "province",
+    "currentSituation",
+    "knownRoute",
+    "routeInterests",
+    "needsAccommodation",
+    "accommodationArea",
+    "needsFundingHelp",
+    "needsCvHelp",
+    "hasDocumentsReady",
+    "randomSourceName",
+    "consentToBeContacted",
+    "consentToProcessBasicInfo"
+  ],
+  "forbiddenCollection": [
+    "passwords",
+    "bank card details",
+    "portal login credentials",
+    "raw documents",
+    "official application submission credentials",
+    "payment instructions"
+  ],
+  "nextAction": "Run node scripts/validators/validate-free-destiny-map-intake.mjs"
+}
