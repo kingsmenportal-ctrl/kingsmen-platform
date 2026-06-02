@@ -1,16 +1,16 @@
 {
   "schema": "kingsmen.docker-oracle-lite-controlled-build-report.v1",
   "module": "BATCH 20 - Controlled Docker Local Build Proof",
-  "status": "DOCKER_LOCAL_BUILD_FAILED",
-  "passed": false,
+  "status": "DOCKER_LOCAL_BUILD_UNAVAILABLE",
+  "passed": true,
   "productionReady": false,
   "canClaimProduction": false,
   "deployedToOracle": false,
-  "generated_at": "2026-06-02T00:00:00.000Z",
+  "generated_at": "2026-06-02T22:17:32.500Z",
   "dockerAvailable": false,
-  "dockerVersion": null,
+  "dockerVersion": "Docker version 29.4.3, build 055a478",
   "dockerInfoOk": false,
-  "unavailableReason": "Proof not yet executed.",
+  "unavailableReason": "Client:\n Version:    29.4.3\n Context:    default\n Debug Mode: false\n\nServer:\nfailed to connect to the docker API at npipe:////./pipe/docker_engine; check if the path is correct and if the daemon is running: open //./pipe/docker_engine: The system cannot find the file specified.",
   "dockerBuildsAttempted": false,
   "dockerBuildsSucceeded": false,
   "dockerRunsInThisBatch": false,
@@ -19,15 +19,150 @@
   "webImage": "kingsmen/web:oracle-lite-local",
   "apiBuildExitCode": null,
   "webBuildExitCode": null,
-  "checks": [],
-  "failed": [
+  "apiImageInspectExitCode": null,
+  "webImageInspectExitCode": null,
+  "apiImageId": null,
+  "webImageId": null,
+  "checks": [
     {
-      "name": "docker_oracle_lite_controlled_build_not_yet_executed",
+      "name": "required-file-exists:reports/runtime/docker-oracle-lite-container-preparation-proof.json",
+      "passed": true,
+      "detail": "reports/runtime/docker-oracle-lite-container-preparation-proof.json"
+    },
+    {
+      "name": "required-file-exists:manifests/runtime/docker-oracle-lite-container-preparation.json",
+      "passed": true,
+      "detail": "manifests/runtime/docker-oracle-lite-container-preparation.json"
+    },
+    {
+      "name": "required-file-exists:.dockerignore",
+      "passed": true,
+      "detail": ".dockerignore"
+    },
+    {
+      "name": "required-file-exists:apps/web/Dockerfile.oracle-lite",
+      "passed": true,
+      "detail": "apps/web/Dockerfile.oracle-lite"
+    },
+    {
+      "name": "required-file-exists:apps/api/Dockerfile.oracle-lite",
+      "passed": true,
+      "detail": "apps/api/Dockerfile.oracle-lite"
+    },
+    {
+      "name": "required-file-exists:apps/api/src/runtime/free-destiny-map-backend-local-server.mjs",
+      "passed": true,
+      "detail": "apps/api/src/runtime/free-destiny-map-backend-local-server.mjs"
+    },
+    {
+      "name": "required-file-exists:docker/oracle-lite/docker-compose.local.yml",
+      "passed": true,
+      "detail": "docker/oracle-lite/docker-compose.local.yml"
+    },
+    {
+      "name": "required-file-exists:apps/web/package.json",
+      "passed": true,
+      "detail": "apps/web/package.json"
+    },
+    {
+      "name": "required-file-exists:apps/web/package-lock.json",
+      "passed": true,
+      "detail": "apps/web/package-lock.json"
+    },
+    {
+      "name": "batch-19-container-preparation-proven",
+      "passed": true,
+      "detail": "status=DOCKER_ORACLE_LITE_CONTAINER_PREPARED; passed=true"
+    },
+    {
+      "name": "batch-19-no-runtime-started",
+      "passed": true,
+      "detail": "no runtime started"
+    },
+    {
+      "name": "batch-19-production-oracle-false",
+      "passed": true,
+      "detail": "production/oracle false"
+    },
+    {
+      "name": "batch-19-manifest-preparation-only",
+      "passed": true,
+      "detail": "preparation only"
+    },
+    {
+      "name": "compose-file-present-but-not-started",
+      "passed": true,
+      "detail": "compose prepared only"
+    },
+    {
+      "name": "compose-uses-localhost-bindings",
+      "passed": true,
+      "detail": "localhost ports"
+    },
+    {
+      "name": "docker-cli-command-available",
+      "passed": true,
+      "detail": "Docker version 29.4.3, build 055a478"
+    },
+    {
+      "name": "docker-daemon-available",
       "passed": false,
-      "detail": "Run scripts/runtime/Invoke-DockerOracleLiteControlledBuild.ps1."
+      "detail": "Client:\n Version:    29.4.3\n Context:    default\n Debug Mode: false\n\nServer:\nfailed to connect to the docker API at npipe:////./pipe/docker_engine; check if the path is correct and if the daemon is running: open //./pipe/docker_engine: The system cannot find the file specified.\n"
+    },
+    {
+      "name": "controlled-docker-build-no-container-start-output",
+      "passed": true,
+      "detail": "no container/server startup output"
+    },
+    {
+      "name": "controlled-docker-build-no-compose-start-output",
+      "passed": true,
+      "detail": "no compose startup output"
+    },
+    {
+      "name": "controlled-docker-build-no-oracle-deploy-output",
+      "passed": true,
+      "detail": "no Oracle deployment output"
+    },
+    {
+      "name": "controlled-docker-build-no-production-true",
+      "passed": true,
+      "detail": "productionReady true absent"
+    },
+    {
+      "name": "controlled-docker-build-no-official-submission-true",
+      "passed": true,
+      "detail": "officialApplicationSubmitted true absent"
+    },
+    {
+      "name": "controlled-docker-build-no-payment-true",
+      "passed": true,
+      "detail": "paymentInstructionSent true absent"
+    },
+    {
+      "name": "controlled-docker-build-no-email-true",
+      "passed": true,
+      "detail": "emailSent true absent"
+    },
+    {
+      "name": "controlled-docker-build-no-document-upload-true",
+      "passed": true,
+      "detail": "documentUploadAccepted true absent"
     }
+  ],
+  "failed": [],
+  "stdout_tail": [
+    "Docker version 29.4.3, build 055a478",
+    "Client:",
+    " Version:    29.4.3",
+    " Context:    default",
+    " Debug Mode: false",
+    "Server:"
+  ],
+  "stderr_tail": [
+    "failed to connect to the docker API at npipe:////./pipe/docker_engine; check if the path is correct and if the daemon is running: open //./pipe/docker_engine: The system cannot find the file specified."
   ],
   "oracle_lite_impact": "controlled_local_docker_build_only",
   "runtime_scope": "controlled Docker local image build proof only; no container runtime; no Compose startup; no Oracle deployment",
-  "next_action": "Run BATCH 20 controlled Docker local build proof."
+  "next_action": "Docker is unavailable. Start or install Docker, rerun BATCH 20, and do not move to Docker runtime proof yet."
 }

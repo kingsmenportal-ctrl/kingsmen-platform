@@ -189,14 +189,14 @@ if (preFailures.length === 0) {
   check("docker-cli-command-available", versionResult.code === 0, versionResult.error ?? dockerVersion);
 
   if (versionResult.code !== 0) {
-    unavailableReason = versionResult.error ?? dockerVersion || "Docker CLI unavailable.";
+    unavailableReason = versionResult.error ?? (dockerVersion || "Docker CLI unavailable.");
   } else {
     const infoResult = await runDocker(["info"], { timeoutMs: 30000, collectOutput: true });
     dockerInfoOk = infoResult.code === 0;
     check("docker-daemon-available", dockerInfoOk, infoResult.error ?? `${infoResult.stdout}${infoResult.stderr}`.slice(-500));
 
     if (!dockerInfoOk) {
-      unavailableReason = infoResult.error ?? `${infoResult.stdout}${infoResult.stderr}`.trim() || "Docker daemon unavailable.";
+      unavailableReason = infoResult.error ?? (`${infoResult.stdout}${infoResult.stderr}`.trim() || "Docker daemon unavailable.");
     } else {
       dockerAvailable = true;
     }
