@@ -3,7 +3,7 @@
   "module": "BATCH 08 - Local API Boot Command / First End-to-End Local Route Exercise",
   "status": "VALIDATED",
   "passed": true,
-  "generated_at": "2026-06-02T19:25:35.141Z",
+  "generated_at": "2026-06-02T19:44:22.403Z",
   "files_expected": [
     "docs/runtime/free-destiny-map-local-route-exercise.md",
     "manifests/runtime/free-destiny-map-local-route-exercise.json",
