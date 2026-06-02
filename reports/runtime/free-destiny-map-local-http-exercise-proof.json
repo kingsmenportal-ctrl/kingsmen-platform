@@ -1,0 +1,142 @@
+{
+  "schema": "kingsmen.runtime-proof.v1",
+  "module": "BATCH 09 - Local HTTP API Boot Shell / First End-to-End Local HTTP Route Exercise",
+  "status": "LOCAL_HTTP_ROUTE_EXERCISE_PROVEN",
+  "passed": true,
+  "generated_at": "2026-06-02T19:36:20.942Z",
+  "checks": [
+    {
+      "name": "upstream-file-exists:apps/api/src/routes/free-destiny-map-intake.routes.ts",
+      "passed": true,
+      "detail": "apps/api/src/routes/free-destiny-map-intake.routes.ts"
+    },
+    {
+      "name": "upstream-file-exists:apps/api/src/routes/free-destiny-map-persistence.routes.ts",
+      "passed": true,
+      "detail": "apps/api/src/routes/free-destiny-map-persistence.routes.ts"
+    },
+    {
+      "name": "upstream-file-exists:apps/api/src/services/free-destiny-map-intake.service.ts",
+      "passed": true,
+      "detail": "apps/api/src/services/free-destiny-map-intake.service.ts"
+    },
+    {
+      "name": "upstream-file-exists:apps/api/src/services/free-destiny-map-persistence.service.ts",
+      "passed": true,
+      "detail": "apps/api/src/services/free-destiny-map-persistence.service.ts"
+    },
+    {
+      "name": "upstream-file-exists:apps/web/src/components/kingsmen/FreeDestinyMapApiForm.tsx",
+      "passed": true,
+      "detail": "apps/web/src/components/kingsmen/FreeDestinyMapApiForm.tsx"
+    },
+    {
+      "name": "upstream-file-exists:apps/web/src/lib/kingsmen/free-destiny-map-client.ts",
+      "passed": true,
+      "detail": "apps/web/src/lib/kingsmen/free-destiny-map-client.ts"
+    },
+    {
+      "name": "upstream-file-exists:scripts/runtime/Invoke-FreeDestinyMapLocalExercise.ps1",
+      "passed": true,
+      "detail": "scripts/runtime/Invoke-FreeDestinyMapLocalExercise.ps1"
+    },
+    {
+      "name": "upstream-file-exists:data/local/.gitignore",
+      "passed": true,
+      "detail": "data/local/.gitignore"
+    },
+    {
+      "name": "local-data-gitignore-blocks-generated-files",
+      "passed": true,
+      "detail": "data/local generated files ignored"
+    },
+    {
+      "name": "client-uses-local-endpoint-contract",
+      "passed": true,
+      "detail": "client endpoint contract present"
+    },
+    {
+      "name": "client-posts-json",
+      "passed": true,
+      "detail": "client posts json"
+    },
+    {
+      "name": "demo-payload-has-consent",
+      "passed": true,
+      "detail": "consent true"
+    },
+    {
+      "name": "demo-payload-has-route-intent",
+      "passed": true,
+      "detail": "route intent present"
+    },
+    {
+      "name": "demo-payload-no-sensitive-fields",
+      "passed": true,
+      "detail": "no sensitive field keys"
+    },
+    {
+      "name": "local-http-server-started",
+      "passed": true,
+      "detail": "127.0.0.1:65447"
+    },
+    {
+      "name": "local-http-post-status-202",
+      "passed": true,
+      "detail": "status=202"
+    },
+    {
+      "name": "local-http-response-accepted",
+      "passed": true,
+      "detail": "accepted true"
+    },
+    {
+      "name": "local-http-response-production-false",
+      "passed": true,
+      "detail": "productionReady false"
+    },
+    {
+      "name": "local-http-response-official-submission-false",
+      "passed": true,
+      "detail": "officialApplicationSubmitted false"
+    },
+    {
+      "name": "local-http-response-payment-false",
+      "passed": true,
+      "detail": "paymentInstructionSent false"
+    },
+    {
+      "name": "local-http-response-document-false",
+      "passed": true,
+      "detail": "documentUploadAccepted false"
+    },
+    {
+      "name": "local-http-response-email-false",
+      "passed": true,
+      "detail": "emailSent false"
+    },
+    {
+      "name": "local-http-jsonl-proof-write",
+      "passed": true,
+      "detail": "data\\local\\free-destiny-map\\http-exercise\\http-demo-intakes.jsonl"
+    },
+    {
+      "name": "local-http-server-closed",
+      "passed": true,
+      "detail": "server closed after exercise"
+    }
+  ],
+  "failed": [],
+  "http_endpoint": "/api/public/free-destiny-map/intake/local",
+  "http_host": "127.0.0.1",
+  "http_port": 65447,
+  "response_status": 202,
+  "response_reference": "KM-FDM-HTTP09",
+  "local_write_flag": "KINGSMEN_ENABLE_LOCAL_INTAKE_WRITE",
+  "local_write_enabled": true,
+  "local_write_succeeded": true,
+  "local_data_file": "data/local/free-destiny-map/http-exercise/http-demo-intakes.jsonl",
+  "oracle_lite_impact": "none_runtime_yet",
+  "runtime_scope": "local HTTP route exercise proof only; temporary server; no Oracle runtime; no production storage",
+  "next_action": "Run validator and commit BATCH 09."
+}

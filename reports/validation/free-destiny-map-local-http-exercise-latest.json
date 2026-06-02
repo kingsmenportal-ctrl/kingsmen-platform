@@ -1,0 +1,25 @@
+{
+  "schema": "kingsmen.validation-report.v1",
+  "module": "BATCH 09 - Local HTTP API Boot Shell / First End-to-End Local HTTP Route Exercise",
+  "status": "VALIDATED",
+  "passed": true,
+  "generated_at": "2026-06-02T19:36:21.177Z",
+  "files_expected": [
+    "docs/runtime/free-destiny-map-local-http-exercise.md",
+    "manifests/runtime/free-destiny-map-local-http-exercise.json",
+    "packages/contracts/src/free-destiny-map-local-http-exercise.ts",
+    "scripts/runtime/Invoke-FreeDestinyMapLocalHttpExercise.ps1",
+    "scripts/proof/prove-free-destiny-map-local-http-exercise.mjs",
+    "reports/runtime/free-destiny-map-local-http-exercise-proof.json",
+    "scripts/validators/validate-free-destiny-map-local-http-exercise.mjs",
+    "reports/validation/free-destiny-map-local-http-exercise-latest.json"
+  ],
+  "files_checked": 8,
+  "missing_files": [],
+  "failed_checks": [],
+  "warnings": [],
+  "oracle_lite_impact": "none_runtime_yet",
+  "control_plane_impact": "Adds local HTTP route exercise proof for Free Destiny Map intake path.",
+  "runtime_proof": "reports/runtime/free-destiny-map-local-http-exercise-proof.json",
+  "next_action": "Proceed to BATCH 10 - Local web-to-HTTP exercise or minimal app boot proof."
+}
