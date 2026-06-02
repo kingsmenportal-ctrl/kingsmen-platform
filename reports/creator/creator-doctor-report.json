@@ -1,0 +1,95 @@
+﻿{
+    "module":  "CREATOR",
+    "submodule":  "CREATOR.1",
+    "phase":  "Doctor",
+    "creatorVersion":  "0.1.2",
+    "productionReady":  false,
+    "generatedAt":  "2026-06-02T04:44:28.620Z",
+    "repoRoot":  "C:\\Users\\dell\\kingsmen-platform",
+    "passed":  true,
+    "totalChecks":  11,
+    "failedChecks":  0,
+    "failed":  [
+
+               ],
+    "checks":  [
+                   {
+                       "name":  "doctor:dir:scripts",
+                       "passed":  true,
+                       "detail":  "directory exists",
+                       "path":  "scripts",
+                       "severity":  "required"
+                   },
+                   {
+                       "name":  "doctor:dir:scripts/validators",
+                       "passed":  true,
+                       "detail":  "directory exists",
+                       "path":  "scripts/validators",
+                       "severity":  "required"
+                   },
+                   {
+                       "name":  "doctor:dir:scripts/testing",
+                       "passed":  true,
+                       "detail":  "directory exists",
+                       "path":  "scripts/testing",
+                       "severity":  "required"
+                   },
+                   {
+                       "name":  "doctor:dir:reports",
+                       "passed":  true,
+                       "detail":  "directory exists",
+                       "path":  "reports",
+                       "severity":  "required"
+                   },
+                   {
+                       "name":  "doctor:dir:reports/creator",
+                       "passed":  true,
+                       "detail":  "directory exists",
+                       "path":  "reports/creator",
+                       "severity":  "required"
+                   },
+                   {
+                       "name":  "doctor:dir:reports/n09",
+                       "passed":  true,
+                       "detail":  "directory exists",
+                       "path":  "reports/n09",
+                       "severity":  "required"
+                   },
+                   {
+                       "name":  "doctor:dir:manifests/modules",
+                       "passed":  true,
+                       "detail":  "directory exists",
+                       "path":  "manifests/modules",
+                       "severity":  "required"
+                   },
+                   {
+                       "name":  "doctor:dir:packages/contracts/src",
+                       "passed":  true,
+                       "detail":  "directory exists",
+                       "path":  "packages/contracts/src",
+                       "severity":  "required"
+                   },
+                   {
+                       "name":  "doctor:dir:packages/db/src",
+                       "passed":  true,
+                       "detail":  "directory exists",
+                       "path":  "packages/db/src",
+                       "severity":  "required"
+                   },
+                   {
+                       "name":  "doctor:node",
+                       "passed":  true,
+                       "detail":  "v22.22.2",
+                       "path":  "",
+                       "severity":  "required"
+                   },
+                   {
+                       "name":  "doctor:git",
+                       "passed":  true,
+                       "detail":  "git version 2.54.0.windows.1",
+                       "path":  "",
+                       "severity":  "required"
+                   }
+               ],
+    "nextTrackerRow":  "CREATOR.2 - scripts/testing/Test-KingsmenCreator.ps1"
+}

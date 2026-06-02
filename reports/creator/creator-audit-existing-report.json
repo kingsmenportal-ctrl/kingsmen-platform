@@ -1,0 +1,149 @@
+﻿{
+    "module":  "CREATOR",
+    "submodule":  "CREATOR.1",
+    "phase":  "AuditExisting",
+    "creatorVersion":  "0.1.2",
+    "productionReady":  false,
+    "generatedAt":  "2026-06-02T04:44:29.842Z",
+    "repoRoot":  "C:\\Users\\dell\\kingsmen-platform",
+    "gitHash":  "c0969f4",
+    "passed":  true,
+    "totalChecks":  18,
+    "failedChecks":  0,
+    "blockingFailedChecks":  0,
+    "failed":  [
+
+               ],
+    "blockingFailed":  [
+
+                       ],
+    "checks":  [
+                   {
+                       "name":  "exists:scripts/KINGSMEN_CREATOR.ps1",
+                       "passed":  true,
+                       "detail":  "found",
+                       "path":  "scripts/KINGSMEN_CREATOR.ps1",
+                       "severity":  "required"
+                   },
+                   {
+                       "name":  "exists:package.json",
+                       "passed":  true,
+                       "detail":  "found",
+                       "path":  "package.json",
+                       "severity":  "required"
+                   },
+                   {
+                       "name":  "exists:supabase/migrations",
+                       "passed":  true,
+                       "detail":  "found",
+                       "path":  "supabase/migrations",
+                       "severity":  "required"
+                   },
+                   {
+                       "name":  "exists:packages/contracts/src",
+                       "passed":  true,
+                       "detail":  "found",
+                       "path":  "packages/contracts/src",
+                       "severity":  "required"
+                   },
+                   {
+                       "name":  "exists:packages/db/src",
+                       "passed":  true,
+                       "detail":  "found",
+                       "path":  "packages/db/src",
+                       "severity":  "required"
+                   },
+                   {
+                       "name":  "exists:apps/api/src",
+                       "passed":  true,
+                       "detail":  "found",
+                       "path":  "apps/api/src",
+                       "severity":  "required"
+                   },
+                   {
+                       "name":  "exists:apps/web/src",
+                       "passed":  true,
+                       "detail":  "found",
+                       "path":  "apps/web/src",
+                       "severity":  "required"
+                   },
+                   {
+                       "name":  "exists:scripts/validators",
+                       "passed":  true,
+                       "detail":  "found",
+                       "path":  "scripts/validators",
+                       "severity":  "required"
+                   },
+                   {
+                       "name":  "exists:scripts/testing",
+                       "passed":  true,
+                       "detail":  "found",
+                       "path":  "scripts/testing",
+                       "severity":  "required"
+                   },
+                   {
+                       "name":  "exists:manifests/modules",
+                       "passed":  true,
+                       "detail":  "found",
+                       "path":  "manifests/modules",
+                       "severity":  "required"
+                   },
+                   {
+                       "name":  "exists:reports",
+                       "passed":  true,
+                       "detail":  "found",
+                       "path":  "reports",
+                       "severity":  "required"
+                   },
+                   {
+                       "name":  "exists:packages/db/src/n09-action-packet-bridge-policy.ts",
+                       "passed":  true,
+                       "detail":  "found",
+                       "path":  "packages/db/src/n09-action-packet-bridge-policy.ts",
+                       "severity":  "required"
+                   },
+                   {
+                       "name":  "exists:scripts/validators/validate-n09-3.mjs",
+                       "passed":  true,
+                       "detail":  "found",
+                       "path":  "scripts/validators/validate-n09-3.mjs",
+                       "severity":  "required"
+                   },
+                   {
+                       "name":  "exists:manifests/modules/N09.3-communications-contracts.json",
+                       "passed":  true,
+                       "detail":  "found",
+                       "path":  "manifests/modules/N09.3-communications-contracts.json",
+                       "severity":  "required"
+                   },
+                   {
+                       "name":  "exists:packages/contracts/src/n09-index.ts",
+                       "passed":  true,
+                       "detail":  "found",
+                       "path":  "packages/contracts/src/n09-index.ts",
+                       "severity":  "required"
+                   },
+                   {
+                       "name":  "exists:packages/db/src/n09-channel-policy.ts",
+                       "passed":  true,
+                       "detail":  "found",
+                       "path":  "packages/db/src/n09-channel-policy.ts",
+                       "severity":  "required"
+                   },
+                   {
+                       "name":  "exists:packages/db/src/n09-message-safety-policy.ts",
+                       "passed":  true,
+                       "detail":  "found",
+                       "path":  "packages/db/src/n09-message-safety-policy.ts",
+                       "severity":  "required"
+                   },
+                   {
+                       "name":  "git:available",
+                       "passed":  true,
+                       "detail":  "git version 2.54.0.windows.1",
+                       "path":  "",
+                       "severity":  "required"
+                   }
+               ],
+    "nextTrackerRow":  "CREATOR.2 - scripts/testing/Test-KingsmenCreator.ps1"
+}
