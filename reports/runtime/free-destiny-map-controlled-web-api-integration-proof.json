@@ -5,15 +5,15 @@
   "passed": true,
   "productionReady": false,
   "canClaimProduction": false,
-  "generated_at": "2026-06-02T21:16:20.981Z",
+  "generated_at": "2026-06-02T21:18:14.588Z",
   "serverStarted": true,
   "serverStopped": true,
   "webStatus": 200,
   "apiStatus": 202,
   "webRoute": "/free-destiny-map",
   "apiEndpoint": "/api/public/free-destiny-map/intake/local",
-  "webUrl": "http://127.0.0.1:49747/free-destiny-map",
-  "apiUrl": "http://127.0.0.1:49747/api/public/free-destiny-map/intake/local",
+  "webUrl": "http://127.0.0.1:49766/free-destiny-map",
+  "apiUrl": "http://127.0.0.1:49766/api/public/free-destiny-map/intake/local",
   "checks": [
     {
       "name": "pre-file-exists:reports/runtime/free-destiny-map-controlled-next-boot-proof.json",
@@ -158,7 +158,7 @@
     {
       "name": "controlled-web-api-server-started",
       "passed": true,
-      "detail": "url=http://127.0.0.1:49747/free-destiny-map"
+      "detail": "url=http://127.0.0.1:49766/free-destiny-map"
     },
     {
       "name": "controlled-web-api-web-status-200",
@@ -227,18 +227,18 @@
   "local_data_file": "data/local/free-destiny-map/next-api-integration/next-api-demo-intakes.jsonl",
   "stdout_tail": [
     "   ▲ Next.js 15.5.19",
-    "   - Local:        http://127.0.0.1:49747",
-    "   - Network:      http://127.0.0.1:49747",
+    "   - Local:        http://127.0.0.1:49766",
+    "   - Network:      http://127.0.0.1:49766",
     "   - Experiments (use with caution):",
     "     ✓ externalDir",
     " ✓ Starting...",
-    " ✓ Ready in 5.6s",
+    " ✓ Ready in 4.1s",
     " ○ Compiling /free-destiny-map ...",
-    " ✓ Compiled /free-destiny-map in 1596ms (532 modules)",
-    " GET /free-destiny-map 200 in 204ms",
+    " ✓ Compiled /free-destiny-map in 1649ms (532 modules)",
+    " GET /free-destiny-map 200 in 2548ms",
     " ○ Compiling /api/public/free-destiny-map/intake/local ...",
-    " ✓ Compiled /api/public/free-destiny-map/intake/local in 1209ms (551 modules)",
-    " POST /api/public/free-destiny-map/intake/local 202 in 1632ms"
+    " ✓ Compiled /api/public/free-destiny-map/intake/local in 1279ms (551 modules)",
+    " POST /api/public/free-destiny-map/intake/local 202 in 1901ms"
   ],
   "stderr_tail": [],
   "oracle_lite_impact": "none_runtime_yet",

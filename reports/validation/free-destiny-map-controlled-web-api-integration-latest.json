@@ -1,9 +1,9 @@
 {
   "schema": "kingsmen.validation-report.v1",
   "module": "BATCH 15B - Controlled Local Web + Local API Integration Proof",
-  "status": "BUILT_PENDING_VALIDATION",
-  "passed": false,
-  "generated_at": "2026-06-02T21:16:21.168Z",
+  "status": "VALIDATED",
+  "passed": true,
+  "generated_at": "2026-06-02T21:19:13.617Z",
   "files_expected": [
     "docs/runtime/free-destiny-map-controlled-web-api-integration-proof.md",
     "manifests/runtime/free-destiny-map-controlled-web-api-integration-proof.json",
@@ -25,12 +25,10 @@
   ],
   "files_checked": 15,
   "missing_files": [],
-  "failed_checks": [
-    "scripts/runtime/Invoke-FreeDestinyMapControlledWebApiIntegration.ps1 missing token: ControlledWebApiIntegration"
-  ],
+  "failed_checks": [],
   "warnings": [],
   "oracle_lite_impact": "none_runtime_yet",
   "control_plane_impact": "Adds controlled same-origin local web plus API intake proof.",
   "runtime_proof": "reports/runtime/free-destiny-map-controlled-web-api-integration-proof.json",
-  "next_action": "Repair controlled local web plus API integration proof failures."
+  "next_action": "Proceed to BATCH 16 - Production build proof or backend runtime integration."
 }
