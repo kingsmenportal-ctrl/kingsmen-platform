@@ -1,0 +1,476 @@
+FILE: docs/runtime/free-destiny-map-local-route-exercise.md
+---
+# BATCH 08 - Local API Boot Command / First End-to-End Local Route Exercise
+
+## Purpose
+
+This batch creates the first controlled local route exercise for Free Destiny Map intake.
+
+It proves the local pathway from a safe demo payload into a local JSONL proof record, while keeping production runtime claims blocked.
+
+## What this batch creates
+
+- local route exercise contract
+- PowerShell runtime command
+- Node proof exercise
+- local JSONL proof write under ignored data/local
+- runtime proof report
+- validator and validation report
+
+## What this batch proves
+
+The local exercise proves:
+
+- upstream BATCH 05 intake files exist
+- upstream BATCH 06 local persistence files exist
+- upstream BATCH 07 form wiring files exist
+- the public local intake endpoint contract is still `/api/public/free-destiny-map/intake/local`
+- the local write flag remains `KINGSMEN_ENABLE_LOCAL_INTAKE_WRITE`
+- a safe demo payload can be shaped into a local intake exercise
+- a local JSONL proof record can be written under `data/local/free-destiny-map/exercise`
+- generated local data remains protected by `data/local/.gitignore`
+
+## What this batch does not prove yet
+
+- no real HTTP server boot
+- no real browser interaction
+- no production database
+- no Oracle deploy
+- no payment
+- no email
+- no document upload
+- no official application submission
+
+## Oracle Lite impact
+
+none_runtime_yet.
+
+This is a local developer/runtime proof only.
+
+## Next action
+
+After validation, BATCH 09 should create either a real local API server boot shell or a minimal local HTTP route exercise.
+---
+FILE: manifests/runtime/free-destiny-map-local-route-exercise.json
+---
+{
+  "schema": "kingsmen.local-route-exercise.v1",
+  "module": "BATCH 08 - Local API Boot Command / First End-to-End Local Route Exercise",
+  "status": "BUILT_PENDING_VALIDATION",
+  "productionReady": false,
+  "sourceBatches": [
+    "BATCH 05 - Free Destiny Map Intake Contract / Backend Shell",
+    "BATCH 06 - Intake Persistence / Local Runtime Shell",
+    "BATCH 07 - Public Form to Intake API Wiring / Local API Boot Proof"
+  ],
+  "exerciseCommand": "powershell.exe -ExecutionPolicy Bypass -File scripts/runtime/Invoke-FreeDestinyMapLocalExercise.ps1",
+  "proofScript": "scripts/proof/prove-free-destiny-map-local-route-exercise.mjs",
+  "proofReport": "reports/runtime/free-destiny-map-local-route-exercise-proof.json",
+  "validationReport": "reports/validation/free-destiny-map-local-route-exercise-latest.json",
+  "localExerciseDataDirectory": "data/local/free-destiny-map/exercise",
+  "localWriteFlag": "KINGSMEN_ENABLE_LOCAL_INTAKE_WRITE",
+  "apiEndpoint": "/api/public/free-destiny-map/intake/local",
+  "storesProductionData": false,
+  "usesDemoPayloadOnly": true,
+  "takesPayment": false,
+  "sendsEmail": false,
+  "collectsDocuments": false,
+  "submitsOfficialApplications": false,
+  "oracleLiteImpact": "none_runtime_yet",
+  "controlPlaneImpact": "Adds first local route exercise proof for Free Destiny Map.",
+  "requiredFiles": [
+    "docs/runtime/free-destiny-map-local-route-exercise.md",
+    "manifests/runtime/free-destiny-map-local-route-exercise.json",
+    "packages/contracts/src/free-destiny-map-local-exercise.ts",
+    "scripts/runtime/Invoke-FreeDestinyMapLocalExercise.ps1",
+    "scripts/proof/prove-free-destiny-map-local-route-exercise.mjs",
+    "reports/runtime/free-destiny-map-local-route-exercise-proof.json",
+    "scripts/validators/validate-free-destiny-map-local-route-exercise.mjs",
+    "reports/validation/free-destiny-map-local-route-exercise-latest.json"
+  ],
+  "nextAction": "Run powershell.exe -ExecutionPolicy Bypass -File scripts/runtime/Invoke-FreeDestinyMapLocalExercise.ps1 then node scripts/validators/validate-free-destiny-map-local-route-exercise.mjs"
+}
+---
+FILE: packages/contracts/src/free-destiny-map-local-exercise.ts
+---
+export const FREE_DESTINY_MAP_LOCAL_EXERCISE_MODULE =
+  "BATCH 08 - Local API Boot Command / First End-to-End Local Route Exercise" as const;
+
+export const FREE_DESTINY_MAP_LOCAL_EXERCISE_ENDPOINT =
+  "/api/public/free-destiny-map/intake/local" as const;
+
+export const FREE_DESTINY_MAP_LOCAL_EXERCISE_WRITE_FLAG =
+  "KINGSMEN_ENABLE_LOCAL_INTAKE_WRITE" as const;
+
+export const FREE_DESTINY_MAP_LOCAL_EXERCISE_DIRECTORY =
+  "data/local/free-destiny-map/exercise" as const;
+
+export interface FreeDestinyMapLocalExercisePayload {
+  fullName: "Kingsmen Demo Candidate";
+  province: "KwaZulu-Natal";
+  currentSituation: string;
+  knownRoute: string;
+  routeInterests: string[];
+  needsAccommodation: boolean;
+  accommodationArea: string;
+  needsFundingHelp: boolean;
+  needsCvHelp: boolean;
+  hasDocumentsReady: boolean;
+  randomSourceName: string;
+  consentToBeContacted: true;
+  consentToProcessBasicInfo: true;
+}
+
+export interface FreeDestinyMapLocalExerciseRecord {
+  schema: "kingsmen.free-destiny-map.local-exercise-record.v1";
+  module: typeof FREE_DESTINY_MAP_LOCAL_EXERCISE_MODULE;
+  productionReady: false;
+  storesProductionData: false;
+  endpoint: typeof FREE_DESTINY_MAP_LOCAL_EXERCISE_ENDPOINT;
+  createdAt: string;
+  reference: string;
+  accepted: boolean;
+  payload: FreeDestinyMapLocalExercisePayload;
+  safeNotice: string;
+}
+---
+FILE: scripts/runtime/Invoke-FreeDestinyMapLocalExercise.ps1
+---
+#requires -Version 5.1
+[CmdletBinding()]
+param(
+  [switch]$EnableLocalWrite
+)
+
+$ErrorActionPreference = "Stop"
+
+$repoRoot = Get-Location
+$scriptPath = Join-Path $repoRoot "scripts\proof\prove-free-destiny-map-local-route-exercise.mjs"
+
+if (-not (Test-Path $scriptPath -PathType Leaf)) {
+  throw "Missing proof script: $scriptPath"
+}
+
+if ($EnableLocalWrite) {
+  $env:KINGSMEN_ENABLE_LOCAL_INTAKE_WRITE = "true"
+} elseif ([string]::IsNullOrWhiteSpace($env:KINGSMEN_ENABLE_LOCAL_INTAKE_WRITE)) {
+  $env:KINGSMEN_ENABLE_LOCAL_INTAKE_WRITE = "false"
+}
+
+Write-Host "Kingsmen Free Destiny Map local route exercise"
+Write-Host "Local write flag: $env:KINGSMEN_ENABLE_LOCAL_INTAKE_WRITE"
+Write-Host "This is not production runtime."
+
+node $scriptPath
+
+if ($LASTEXITCODE -ne 0) {
+  throw "Free Destiny Map local route exercise failed."
+}
+---
+FILE: scripts/proof/prove-free-destiny-map-local-route-exercise.mjs
+---
+#!/usr/bin/env node
+import fs from "node:fs";
+import path from "node:path";
+
+const root = process.cwd();
+const proofReportPath = path.join(root, "reports/runtime/free-destiny-map-local-route-exercise-proof.json");
+const localDataDir = path.join(root, "data/local/free-destiny-map/exercise");
+const localDataFile = path.join(localDataDir, "demo-intakes.jsonl");
+
+const checks = [];
+
+function exists(rel) {
+  return fs.existsSync(path.join(root, rel));
+}
+
+function read(rel) {
+  return fs.readFileSync(path.join(root, rel), "utf8").replace(/^\uFEFF/, "");
+}
+
+function check(name, passed, detail = "") {
+  checks.push({ name, passed, detail });
+}
+
+const upstreamFiles = [
+  "apps/api/src/services/free-destiny-map-intake.service.ts",
+  "apps/api/src/routes/free-destiny-map-intake.routes.ts",
+  "apps/api/src/services/free-destiny-map-persistence.service.ts",
+  "apps/api/src/routes/free-destiny-map-persistence.routes.ts",
+  "apps/web/src/components/kingsmen/FreeDestinyMapApiForm.tsx",
+  "apps/web/src/lib/kingsmen/free-destiny-map-client.ts",
+  "data/local/.gitignore"
+];
+
+for (const file of upstreamFiles) {
+  check(`upstream-file-exists:${file}`, exists(file), file);
+}
+
+if (exists("data/local/.gitignore")) {
+  const ignore = read("data/local/.gitignore");
+  check("local-data-gitignore-blocks-generated-files", ignore.includes("*") && ignore.includes("!.gitignore"), "data/local generated files ignored");
+}
+
+if (exists("apps/web/src/lib/kingsmen/free-destiny-map-client.ts")) {
+  const client = read("apps/web/src/lib/kingsmen/free-destiny-map-client.ts");
+  check("client-uses-local-endpoint-contract", client.includes("FREE_DESTINY_MAP_LOCAL_INTAKE_ENDPOINT"), "client endpoint contract present");
+  check("client-posts-json", client.includes("application/json"), "client posts json");
+}
+
+if (exists("apps/api/src/routes/free-destiny-map-persistence.routes.ts")) {
+  const route = read("apps/api/src/routes/free-destiny-map-persistence.routes.ts");
+  check("route-local-endpoint-present", route.includes("/api/public/free-destiny-map/intake/local"), "local endpoint present");
+  check("route-production-ready-false", route.includes("productionReady: false"), "productionReady false");
+  check("route-email-false", route.includes("emailSent: false"), "email false");
+  check("route-document-upload-false", route.includes("documentUploadAccepted: false"), "document upload false");
+}
+
+const demoPayload = {
+  fullName: "Kingsmen Demo Candidate",
+  province: "KwaZulu-Natal",
+  currentSituation: "Demo user wants a full route map across study, TVET, funding, accommodation and CV readiness.",
+  knownRoute: "Free Destiny Map local route exercise",
+  routeInterests: ["higher_education", "tvet", "nsfas_bursary", "accommodation", "cv_revamp", "source_check"],
+  needsAccommodation: true,
+  accommodationArea: "Durban / campus or training area",
+  needsFundingHelp: true,
+  needsCvHelp: true,
+  hasDocumentsReady: false,
+  randomSourceName: "Demo bursary or learnership source to check later",
+  consentToBeContacted: true,
+  consentToProcessBasicInfo: true
+};
+
+const hasConsent = demoPayload.consentToBeContacted === true && demoPayload.consentToProcessBasicInfo === true;
+const hasIntent =
+  demoPayload.routeInterests.length > 0 ||
+  Boolean(demoPayload.currentSituation) ||
+  Boolean(demoPayload.knownRoute) ||
+  Boolean(demoPayload.randomSourceName);
+
+check("demo-payload-has-consent", hasConsent, "contact and basic-info processing consent true");
+check("demo-payload-has-route-intent", hasIntent, "route interest or situation present");
+check("demo-payload-no-sensitive-fields", !Object.keys(demoPayload).some((key) => /identity|idNumber|passport|password|card|cvv|documentBase64/i.test(key)), "no sensitive field keys");
+
+const reference = "KM-FDM-LOCAL08";
+const accepted = hasConsent && hasIntent;
+const localWriteFlag = process.env.KINGSMEN_ENABLE_LOCAL_INTAKE_WRITE === "true";
+
+const exerciseRecord = {
+  schema: "kingsmen.free-destiny-map.local-exercise-record.v1",
+  module: "BATCH 08 - Local API Boot Command / First End-to-End Local Route Exercise",
+  productionReady: false,
+  storesProductionData: false,
+  endpoint: "/api/public/free-destiny-map/intake/local",
+  createdAt: new Date().toISOString(),
+  reference,
+  accepted,
+  localWriteFlag,
+  payload: demoPayload,
+  safeNotice: "Local route exercise only. No production storage, no payment, no email, no documents, no official application submission."
+};
+
+let localWriteSucceeded = false;
+
+if (localWriteFlag) {
+  fs.mkdirSync(localDataDir, { recursive: true });
+  fs.appendFileSync(localDataFile, `${JSON.stringify(exerciseRecord)}\n`, "utf8");
+  localWriteSucceeded = fs.existsSync(localDataFile);
+  check("local-jsonl-proof-write", localWriteSucceeded, path.relative(root, localDataFile));
+} else {
+  check("local-jsonl-proof-write-skipped", true, "KINGSMEN_ENABLE_LOCAL_INTAKE_WRITE is not true");
+}
+
+const failed = checks.filter((item) => item.passed !== true);
+const passed = failed.length === 0;
+
+const report = {
+  schema: "kingsmen.runtime-proof.v1",
+  module: "BATCH 08 - Local API Boot Command / First End-to-End Local Route Exercise",
+  status: passed ? "LOCAL_ROUTE_EXERCISE_PROVEN" : "BUILT_PENDING_RUNTIME_PROOF",
+  passed,
+  generated_at: new Date().toISOString(),
+  checks,
+  failed,
+  local_write_flag: "KINGSMEN_ENABLE_LOCAL_INTAKE_WRITE",
+  local_write_enabled: localWriteFlag,
+  local_write_succeeded: localWriteSucceeded,
+  local_data_file: localWriteSucceeded ? path.relative(root, localDataFile).replaceAll("\\", "/") : null,
+  demo_reference: reference,
+  oracle_lite_impact: "none_runtime_yet",
+  runtime_scope: "local route exercise proof only; no server started; no production storage",
+  next_action: passed ? "Run validator and commit BATCH 08." : "Repair local route exercise failures."
+};
+
+fs.mkdirSync(path.dirname(proofReportPath), { recursive: true });
+fs.writeFileSync(proofReportPath, `${JSON.stringify(report, null, 2)}\n`, "utf8");
+
+console.log(JSON.stringify(report, null, 2));
+if (!passed) process.exit(1);
+---
+FILE: reports/runtime/free-destiny-map-local-route-exercise-proof.json
+---
+{
+  "schema": "kingsmen.runtime-proof.v1",
+  "module": "BATCH 08 - Local API Boot Command / First End-to-End Local Route Exercise",
+  "status": "BUILT_PENDING_RUNTIME_PROOF",
+  "passed": false,
+  "generated_at": "2026-06-02T00:00:00.000Z",
+  "checks": [],
+  "failed": [
+    {
+      "name": "runtime_proof_not_yet_executed",
+      "passed": false,
+      "detail": "Run powershell.exe -ExecutionPolicy Bypass -File scripts/runtime/Invoke-FreeDestinyMapLocalExercise.ps1."
+    }
+  ],
+  "oracle_lite_impact": "none_runtime_yet",
+  "runtime_scope": "local route exercise proof only; no server started; no production storage",
+  "next_action": "Run BATCH 08 local exercise proof."
+}
+---
+FILE: scripts/validators/validate-free-destiny-map-local-route-exercise.mjs
+---
+#!/usr/bin/env node
+import fs from "node:fs";
+import path from "node:path";
+
+const root = process.cwd();
+const reportPath = path.join(root, "reports/validation/free-destiny-map-local-route-exercise-latest.json");
+
+const requiredFiles = [
+  "docs/runtime/free-destiny-map-local-route-exercise.md",
+  "manifests/runtime/free-destiny-map-local-route-exercise.json",
+  "packages/contracts/src/free-destiny-map-local-exercise.ts",
+  "scripts/runtime/Invoke-FreeDestinyMapLocalExercise.ps1",
+  "scripts/proof/prove-free-destiny-map-local-route-exercise.mjs",
+  "reports/runtime/free-destiny-map-local-route-exercise-proof.json",
+  "scripts/validators/validate-free-destiny-map-local-route-exercise.mjs",
+  "reports/validation/free-destiny-map-local-route-exercise-latest.json"
+];
+
+function exists(rel) {
+  return fs.existsSync(path.join(root, rel));
+}
+
+function read(rel) {
+  return fs.readFileSync(path.join(root, rel), "utf8").replace(/^\uFEFF/, "");
+}
+
+function parseJson(rel) {
+  return JSON.parse(read(rel));
+}
+
+const failures = [];
+const warnings = [];
+const checked = [];
+
+for (const file of requiredFiles) {
+  checked.push(file);
+  if (!exists(file)) failures.push(`Missing required file: ${file}`);
+  else if (fs.statSync(path.join(root, file)).size === 0) failures.push(`Empty required file: ${file}`);
+}
+
+if (exists("manifests/runtime/free-destiny-map-local-route-exercise.json")) {
+  const manifest = parseJson("manifests/runtime/free-destiny-map-local-route-exercise.json");
+  if (manifest.productionReady !== false) failures.push("Manifest must keep productionReady false.");
+  if (manifest.storesProductionData !== false) failures.push("Manifest must declare storesProductionData false.");
+  if (manifest.usesDemoPayloadOnly !== true) failures.push("Manifest must declare usesDemoPayloadOnly true.");
+  if (manifest.takesPayment !== false) failures.push("Manifest must declare takesPayment false.");
+  if (manifest.sendsEmail !== false) failures.push("Manifest must declare sendsEmail false.");
+  if (manifest.collectsDocuments !== false) failures.push("Manifest must declare collectsDocuments false.");
+  if (manifest.apiEndpoint !== "/api/public/free-destiny-map/intake/local") failures.push("Manifest endpoint mismatch.");
+  if (!String(manifest.oracleLiteImpact ?? "").includes("none_runtime_yet")) failures.push("Manifest must declare none_runtime_yet.");
+}
+
+const tokenChecks = [
+  ["packages/contracts/src/free-destiny-map-local-exercise.ts", ["FREE_DESTINY_MAP_LOCAL_EXERCISE_ENDPOINT", "FREE_DESTINY_MAP_LOCAL_EXERCISE_WRITE_FLAG", "FreeDestinyMapLocalExerciseRecord", "storesProductionData: false"]],
+  ["scripts/runtime/Invoke-FreeDestinyMapLocalExercise.ps1", ["KINGSMEN_ENABLE_LOCAL_INTAKE_WRITE", "prove-free-destiny-map-local-route-exercise.mjs", "not production runtime"]],
+  ["scripts/proof/prove-free-destiny-map-local-route-exercise.mjs", ["LOCAL_ROUTE_EXERCISE_PROVEN", "demo-payload-has-consent", "local-jsonl-proof-write", "storesProductionData: false"]],
+  ["reports/runtime/free-destiny-map-local-route-exercise-proof.json", ["schema", "module", "status"]],
+  ["data/local/.gitignore", ["*", "!.gitignore"]]
+];
+
+for (const [file, tokens] of tokenChecks) {
+  if (!exists(file)) continue;
+  const content = read(file);
+  for (const token of tokens) {
+    if (!content.includes(token)) failures.push(`${file} missing token: ${token}`);
+  }
+}
+
+if (exists("reports/runtime/free-destiny-map-local-route-exercise-proof.json")) {
+  const proof = parseJson("reports/runtime/free-destiny-map-local-route-exercise-proof.json");
+  if (proof.passed !== true) failures.push("Runtime proof report must pass.");
+  if (proof.status !== "LOCAL_ROUTE_EXERCISE_PROVEN") failures.push("Runtime proof status must be LOCAL_ROUTE_EXERCISE_PROVEN.");
+}
+
+const forbiddenRuntimePatterns = [
+  [/\bidentityNumber\s*[:=]/i, "identity number field assignment"],
+  [/\bidNumber\s*[:=]/i, "id number field assignment"],
+  [/\bpassportNumber\s*[:=]/i, "passport number field assignment"],
+  [/\bpassword\s*[:=]/i, "password field assignment"],
+  [/\bcardNumber\s*[:=]/i, "card number field assignment"],
+  [/\bcvv\s*[:=]/i, "cvv field assignment"],
+  [/\bdocumentBase64\s*[:=]/i, "document payload assignment"],
+  [/officialApplicationSubmitted:\s*true/i, "official application submitted true"],
+  [/paymentInstructionSent:\s*true/i, "payment instruction sent true"],
+  [/emailSent:\s*true/i, "email sent true"],
+  [/productionReady\s*[:=]\s*true/i, "productionReady true"]
+];
+
+const filesToScan = requiredFiles
+  .filter((item) => exists(item))
+  .filter((item) => !item.includes("validate-free-destiny-map-local-route-exercise.mjs"))
+  .filter((item) => !item.includes("prove-free-destiny-map-local-route-exercise.mjs"));
+
+for (const file of filesToScan) {
+  const content = read(file);
+  for (const [pattern, label] of forbiddenRuntimePatterns) {
+    if (pattern.test(content)) failures.push(`${file} contains forbidden runtime pattern: ${label}`);
+  }
+}
+
+const passed = failures.length === 0;
+
+const report = {
+  schema: "kingsmen.validation-report.v1",
+  module: "BATCH 08 - Local API Boot Command / First End-to-End Local Route Exercise",
+  status: passed ? "VALIDATED" : "BUILT_PENDING_VALIDATION",
+  passed,
+  generated_at: new Date().toISOString(),
+  files_expected: requiredFiles,
+  files_checked: checked.length,
+  missing_files: requiredFiles.filter((file) => !exists(file)),
+  failed_checks: failures,
+  warnings,
+  oracle_lite_impact: "none_runtime_yet",
+  control_plane_impact: "Adds local route exercise proof for Free Destiny Map intake path.",
+  runtime_proof: "reports/runtime/free-destiny-map-local-route-exercise-proof.json",
+  next_action: passed ? "Proceed to BATCH 09 - Local HTTP API boot shell or first end-to-end local HTTP route exercise." : "Repair local route exercise failures and rerun proof plus validator."
+};
+
+fs.mkdirSync(path.dirname(reportPath), { recursive: true });
+fs.writeFileSync(reportPath, `${JSON.stringify(report, null, 2)}\n`, "utf8");
+
+console.log(JSON.stringify(report, null, 2));
+if (!passed) process.exit(1);
+---
+FILE: reports/validation/free-destiny-map-local-route-exercise-latest.json
+---
+{
+  "schema": "kingsmen.validation-report.v1",
+  "module": "BATCH 08 - Local API Boot Command / First End-to-End Local Route Exercise",
+  "status": "BUILT_PENDING_VALIDATION",
+  "passed": false,
+  "generated_at": "2026-06-02T00:00:00.000Z",
+  "reason": "Seed report. Run BATCH 08 local exercise proof then validator.",
+  "files_checked": 0,
+  "failed_checks": [
+    "validator_not_yet_executed"
+  ],
+  "oracle_lite_impact": "none_runtime_yet",
+  "control_plane_impact": "Adds local route exercise proof for Free Destiny Map intake path.",
+  "runtime_proof": "reports/runtime/free-destiny-map-local-route-exercise-proof.json",
+  "next_action": "Run powershell.exe -ExecutionPolicy Bypass -File scripts/runtime/Invoke-FreeDestinyMapLocalExercise.ps1 then node scripts/validators/validate-free-destiny-map-local-route-exercise.mjs."
+}

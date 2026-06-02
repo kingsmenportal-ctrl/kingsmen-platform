@@ -1,0 +1,37 @@
+{
+  "schema": "kingsmen.local-route-exercise.v1",
+  "module": "BATCH 08 - Local API Boot Command / First End-to-End Local Route Exercise",
+  "status": "BUILT_PENDING_VALIDATION",
+  "productionReady": false,
+  "sourceBatches": [
+    "BATCH 05 - Free Destiny Map Intake Contract / Backend Shell",
+    "BATCH 06 - Intake Persistence / Local Runtime Shell",
+    "BATCH 07 - Public Form to Intake API Wiring / Local API Boot Proof"
+  ],
+  "exerciseCommand": "powershell.exe -ExecutionPolicy Bypass -File scripts/runtime/Invoke-FreeDestinyMapLocalExercise.ps1",
+  "proofScript": "scripts/proof/prove-free-destiny-map-local-route-exercise.mjs",
+  "proofReport": "reports/runtime/free-destiny-map-local-route-exercise-proof.json",
+  "validationReport": "reports/validation/free-destiny-map-local-route-exercise-latest.json",
+  "localExerciseDataDirectory": "data/local/free-destiny-map/exercise",
+  "localWriteFlag": "KINGSMEN_ENABLE_LOCAL_INTAKE_WRITE",
+  "apiEndpoint": "/api/public/free-destiny-map/intake/local",
+  "storesProductionData": false,
+  "usesDemoPayloadOnly": true,
+  "takesPayment": false,
+  "sendsEmail": false,
+  "collectsDocuments": false,
+  "submitsOfficialApplications": false,
+  "oracleLiteImpact": "none_runtime_yet",
+  "controlPlaneImpact": "Adds first local route exercise proof for Free Destiny Map.",
+  "requiredFiles": [
+    "docs/runtime/free-destiny-map-local-route-exercise.md",
+    "manifests/runtime/free-destiny-map-local-route-exercise.json",
+    "packages/contracts/src/free-destiny-map-local-exercise.ts",
+    "scripts/runtime/Invoke-FreeDestinyMapLocalExercise.ps1",
+    "scripts/proof/prove-free-destiny-map-local-route-exercise.mjs",
+    "reports/runtime/free-destiny-map-local-route-exercise-proof.json",
+    "scripts/validators/validate-free-destiny-map-local-route-exercise.mjs",
+    "reports/validation/free-destiny-map-local-route-exercise-latest.json"
+  ],
+  "nextAction": "Run powershell.exe -ExecutionPolicy Bypass -File scripts/runtime/Invoke-FreeDestinyMapLocalExercise.ps1 then node scripts/validators/validate-free-destiny-map-local-route-exercise.mjs"
+}

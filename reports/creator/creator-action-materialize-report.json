@@ -4,11 +4,11 @@
     "submodule":  "CREATOR.2B",
     "action":  "Materialize",
     "productionReady":  false,
-    "generatedAt":  "2026-06-02T19:08:41.385Z",
+    "generatedAt":  "2026-06-02T19:18:35.809Z",
     "repoRoot":  "C:\\Users\\dell\\kingsmen-platform",
     "passed":  true,
     "detail":  "Materialize complete.",
-    "totalChecks":  11,
+    "totalChecks":  9,
     "failedChecks":  0,
     "failed":  [
 
@@ -17,55 +17,45 @@
                    {
                        "name":  "materialize:blocks",
                        "passed":  true,
-                       "detail":  "blocks=10"
+                       "detail":  "blocks=8"
                    },
                    {
-                       "name":  "materialize:wrote:docs/runtime/free-destiny-map-public-api-wiring.md",
+                       "name":  "materialize:wrote:docs/runtime/free-destiny-map-local-route-exercise.md",
                        "passed":  true,
                        "detail":  "written"
                    },
                    {
-                       "name":  "materialize:wrote:manifests/runtime/free-destiny-map-api-wiring-shell.json",
+                       "name":  "materialize:wrote:manifests/runtime/free-destiny-map-local-route-exercise.json",
                        "passed":  true,
                        "detail":  "written"
                    },
                    {
-                       "name":  "materialize:wrote:packages/contracts/src/free-destiny-map-api-wiring.ts",
+                       "name":  "materialize:wrote:packages/contracts/src/free-destiny-map-local-exercise.ts",
                        "passed":  true,
                        "detail":  "written"
                    },
                    {
-                       "name":  "materialize:wrote:apps/web/src/lib/kingsmen/free-destiny-map-client.ts",
+                       "name":  "materialize:wrote:scripts/runtime/Invoke-FreeDestinyMapLocalExercise.ps1",
                        "passed":  true,
                        "detail":  "written"
                    },
                    {
-                       "name":  "materialize:wrote:apps/web/src/components/kingsmen/FreeDestinyMapApiForm.tsx",
+                       "name":  "materialize:wrote:scripts/proof/prove-free-destiny-map-local-route-exercise.mjs",
                        "passed":  true,
                        "detail":  "written"
                    },
                    {
-                       "name":  "materialize:wrote:apps/web/src/app/free-destiny-map/page.tsx",
+                       "name":  "materialize:wrote:reports/runtime/free-destiny-map-local-route-exercise-proof.json",
                        "passed":  true,
                        "detail":  "written"
                    },
                    {
-                       "name":  "materialize:wrote:scripts/proof/prove-free-destiny-map-api-wiring.mjs",
+                       "name":  "materialize:wrote:scripts/validators/validate-free-destiny-map-local-route-exercise.mjs",
                        "passed":  true,
                        "detail":  "written"
                    },
                    {
-                       "name":  "materialize:wrote:reports/runtime/free-destiny-map-api-wiring-proof.json",
-                       "passed":  true,
-                       "detail":  "written"
-                   },
-                   {
-                       "name":  "materialize:wrote:scripts/validators/validate-free-destiny-map-api-wiring.mjs",
-                       "passed":  true,
-                       "detail":  "written"
-                   },
-                   {
-                       "name":  "materialize:wrote:reports/validation/free-destiny-map-api-wiring-latest.json",
+                       "name":  "materialize:wrote:reports/validation/free-destiny-map-local-route-exercise-latest.json",
                        "passed":  true,
                        "detail":  "written"
                    }
