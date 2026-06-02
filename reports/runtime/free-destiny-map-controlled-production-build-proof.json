@@ -1,0 +1,270 @@
+{
+  "schema": "kingsmen.controlled-production-build-report.v1",
+  "module": "BATCH 16 - Controlled Production Build Proof",
+  "status": "CONTROLLED_PRODUCTION_BUILD_PROVEN",
+  "passed": true,
+  "productionReady": false,
+  "canClaimProduction": false,
+  "deployedToOracle": false,
+  "generated_at": "2026-06-02T21:26:34.197Z",
+  "buildStarted": true,
+  "buildExited": true,
+  "buildExitCode": 0,
+  "buildTimedOut": false,
+  "buildOutputDirectory": "apps/web/.next",
+  "checks": [
+    {
+      "name": "pre-file-exists:reports/runtime/free-destiny-map-controlled-next-boot-proof.json",
+      "passed": true,
+      "detail": "reports/runtime/free-destiny-map-controlled-next-boot-proof.json"
+    },
+    {
+      "name": "pre-file-exists:reports/runtime/free-destiny-map-workspace-root-warning-repair-proof.json",
+      "passed": true,
+      "detail": "reports/runtime/free-destiny-map-workspace-root-warning-repair-proof.json"
+    },
+    {
+      "name": "pre-file-exists:reports/runtime/free-destiny-map-controlled-web-api-integration-proof.json",
+      "passed": true,
+      "detail": "reports/runtime/free-destiny-map-controlled-web-api-integration-proof.json"
+    },
+    {
+      "name": "pre-file-exists:apps/web/package.json",
+      "passed": true,
+      "detail": "apps/web/package.json"
+    },
+    {
+      "name": "pre-file-exists:apps/web/package-lock.json",
+      "passed": true,
+      "detail": "apps/web/package-lock.json"
+    },
+    {
+      "name": "pre-file-exists:apps/web/next.config.mjs",
+      "passed": true,
+      "detail": "apps/web/next.config.mjs"
+    },
+    {
+      "name": "pre-file-exists:apps/web/src/app/layout.tsx",
+      "passed": true,
+      "detail": "apps/web/src/app/layout.tsx"
+    },
+    {
+      "name": "pre-file-exists:apps/web/src/app/free-destiny-map/page.tsx",
+      "passed": true,
+      "detail": "apps/web/src/app/free-destiny-map/page.tsx"
+    },
+    {
+      "name": "pre-file-exists:apps/web/src/components/kingsmen/FreeDestinyMapApiForm.tsx",
+      "passed": true,
+      "detail": "apps/web/src/components/kingsmen/FreeDestinyMapApiForm.tsx"
+    },
+    {
+      "name": "pre-file-exists:apps/web/src/app/api/public/free-destiny-map/intake/local/route.ts",
+      "passed": true,
+      "detail": "apps/web/src/app/api/public/free-destiny-map/intake/local/route.ts"
+    },
+    {
+      "name": "pre-file-exists:apps/web/node_modules/next/package.json",
+      "passed": true,
+      "detail": "apps/web/node_modules/next/package.json"
+    },
+    {
+      "name": "pre-file-exists:apps/web/node_modules/react/package.json",
+      "passed": true,
+      "detail": "apps/web/node_modules/react/package.json"
+    },
+    {
+      "name": "pre-file-exists:apps/web/node_modules/react-dom/package.json",
+      "passed": true,
+      "detail": "apps/web/node_modules/react-dom/package.json"
+    },
+    {
+      "name": "pre-file-exists:apps/web/.gitignore",
+      "passed": true,
+      "detail": "apps/web/.gitignore"
+    },
+    {
+      "name": "batch-15b-integration-proven",
+      "passed": true,
+      "detail": "status=CONTROLLED_WEB_API_INTEGRATION_PROVEN; passed=true"
+    },
+    {
+      "name": "batch-15b-production-false",
+      "passed": true,
+      "detail": "production false"
+    },
+    {
+      "name": "batch-15b-web-and-api-statuses",
+      "passed": true,
+      "detail": "webStatus=200; apiStatus=202"
+    },
+    {
+      "name": "web-build-script-present",
+      "passed": true,
+      "detail": "next build"
+    },
+    {
+      "name": "web-next-dependency-present",
+      "passed": true,
+      "detail": "^15.5.0"
+    },
+    {
+      "name": "web-react-dependency-present",
+      "passed": true,
+      "detail": "^19.1.0"
+    },
+    {
+      "name": "web-react-dom-dependency-present",
+      "passed": true,
+      "detail": "^19.1.0"
+    },
+    {
+      "name": "web-build-output-ignored",
+      "passed": true,
+      "detail": ".next ignored"
+    },
+    {
+      "name": "web-node-modules-ignored",
+      "passed": true,
+      "detail": "node_modules ignored"
+    },
+    {
+      "name": "next-config-output-file-tracing-root-present",
+      "passed": true,
+      "detail": "outputFileTracingRoot present"
+    },
+    {
+      "name": "next-config-powered-header-disabled",
+      "passed": true,
+      "detail": "poweredByHeader false"
+    },
+    {
+      "name": "api-route-keeps-production-false",
+      "passed": true,
+      "detail": "production false"
+    },
+    {
+      "name": "api-route-keeps-payment-false",
+      "passed": true,
+      "detail": "payment false"
+    },
+    {
+      "name": "api-route-keeps-email-false",
+      "passed": true,
+      "detail": "email false"
+    },
+    {
+      "name": "api-route-keeps-document-false",
+      "passed": true,
+      "detail": "document false"
+    },
+    {
+      "name": "api-route-keeps-official-submission-false",
+      "passed": true,
+      "detail": "official false"
+    },
+    {
+      "name": "controlled-build-next-cli-exists",
+      "passed": true,
+      "detail": "C:\\Users\\dell\\kingsmen-platform\\apps\\web\\node_modules\\next\\dist\\bin\\next"
+    },
+    {
+      "name": "controlled-build-minimal-env",
+      "passed": true,
+      "detail": "keys=PATH,Path,PATHEXT,SystemRoot,WINDIR,TEMP,TMP,USERPROFILE,APPDATA,LOCALAPPDATA,COMSPEC,HOMEDRIVE,HOMEPATH,PROCESSOR_ARCHITECTURE,PROCESSOR_IDENTIFIER,NUMBER_OF_PROCESSORS,NEXT_TELEMETRY_DISABLED,CI,NODE_ENV"
+    },
+    {
+      "name": "controlled-production-build-started",
+      "passed": true,
+      "detail": "next build process started"
+    },
+    {
+      "name": "controlled-production-build-exited",
+      "passed": true,
+      "detail": "exitCode=0"
+    },
+    {
+      "name": "controlled-production-build-exit-code-zero",
+      "passed": true,
+      "detail": "exitCode=0"
+    },
+    {
+      "name": "controlled-production-build-not-timed-out",
+      "passed": true,
+      "detail": "timedOut=false"
+    },
+    {
+      "name": "controlled-production-build-output-directory-exists",
+      "passed": true,
+      "detail": "apps/web/.next"
+    },
+    {
+      "name": "controlled-production-build-build-id-or-manifest-exists",
+      "passed": true,
+      "detail": "build output markers"
+    },
+    {
+      "name": "controlled-production-build-no-oracle-deploy",
+      "passed": true,
+      "detail": "no deployment command output"
+    },
+    {
+      "name": "controlled-production-build-no-production-true",
+      "passed": true,
+      "detail": "productionReady true absent"
+    },
+    {
+      "name": "controlled-production-build-no-official-submission-true",
+      "passed": true,
+      "detail": "officialApplicationSubmitted true absent"
+    },
+    {
+      "name": "controlled-production-build-no-payment-true",
+      "passed": true,
+      "detail": "paymentInstructionSent true absent"
+    },
+    {
+      "name": "controlled-production-build-no-email-true",
+      "passed": true,
+      "detail": "emailSent true absent"
+    },
+    {
+      "name": "controlled-production-build-no-document-upload-true",
+      "passed": true,
+      "detail": "documentUploadAccepted true absent"
+    }
+  ],
+  "failed": [],
+  "stdout_tail": [
+    "   ▲ Next.js 15.5.19",
+    "   - Experiments (use with caution):",
+    "     ✓ externalDir",
+    "   Creating an optimized production build ...",
+    " ✓ Compiled successfully in 4.6s",
+    "   Linting and checking validity of types ...",
+    "   Collecting page data ...",
+    "   Generating static pages (0/6) ...",
+    "   Generating static pages (1/6) ",
+    "   Generating static pages (2/6) ",
+    "   Generating static pages (4/6) ",
+    " ✓ Generating static pages (6/6)",
+    "   Finalizing page optimization ...",
+    "   Collecting build traces ...",
+    "Route (app)                                       Size  First Load JS",
+    "┌ ○ /_not-found                                  995 B         103 kB",
+    "├ ƒ /api/public/free-destiny-map/intake/local    133 B         103 kB",
+    "├ ○ /founder/build-proof                         133 B         103 kB",
+    "├ ○ /free-destiny-map                           2.5 kB         105 kB",
+    "└ ○ /kingsmen                                    133 B         103 kB",
+    "+ First Load JS shared by all                   102 kB",
+    "  ├ chunks/255-98a0bdaa30757bda.js             46.2 kB",
+    "  ├ chunks/4bd1b696-c023c6e3521b1417.js        54.2 kB",
+    "  └ other shared chunks (total)                1.95 kB",
+    "○  (Static)   prerendered as static content",
+    "ƒ  (Dynamic)  server-rendered on demand"
+  ],
+  "stderr_tail": [],
+  "oracle_lite_impact": "none_runtime_yet",
+  "runtime_scope": "controlled local Next production build proof only; no Oracle runtime; no deployment",
+  "next_action": "Run validator and commit BATCH 16. Next batch may add backend runtime integration or Oracle Lite container preparation."
+}

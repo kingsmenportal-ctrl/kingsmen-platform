@@ -4,11 +4,11 @@
     "submodule":  "CREATOR.2B",
     "action":  "Materialize",
     "productionReady":  false,
-    "generatedAt":  "2026-06-02T21:16:05.492Z",
+    "generatedAt":  "2026-06-02T21:25:56.727Z",
     "repoRoot":  "C:\\Users\\dell\\kingsmen-platform",
     "passed":  true,
     "detail":  "Materialize complete.",
-    "totalChecks":  10,
+    "totalChecks":  9,
     "failedChecks":  0,
     "failed":  [
 
@@ -17,50 +17,45 @@
                    {
                        "name":  "materialize:blocks",
                        "passed":  true,
-                       "detail":  "blocks=9"
+                       "detail":  "blocks=8"
                    },
                    {
-                       "name":  "materialize:wrote:docs/runtime/free-destiny-map-controlled-web-api-integration-proof.md",
+                       "name":  "materialize:wrote:docs/runtime/free-destiny-map-controlled-production-build-proof.md",
                        "passed":  true,
                        "detail":  "written"
                    },
                    {
-                       "name":  "materialize:wrote:manifests/runtime/free-destiny-map-controlled-web-api-integration-proof.json",
+                       "name":  "materialize:wrote:manifests/runtime/free-destiny-map-controlled-production-build-proof.json",
                        "passed":  true,
                        "detail":  "written"
                    },
                    {
-                       "name":  "materialize:wrote:apps/web/src/app/api/public/free-destiny-map/intake/local/route.ts",
+                       "name":  "materialize:wrote:packages/contracts/src/free-destiny-map-controlled-production-build.ts",
                        "passed":  true,
                        "detail":  "written"
                    },
                    {
-                       "name":  "materialize:wrote:packages/contracts/src/free-destiny-map-controlled-web-api-integration.ts",
+                       "name":  "materialize:wrote:scripts/runtime/Invoke-FreeDestinyMapControlledProductionBuild.ps1",
                        "passed":  true,
                        "detail":  "written"
                    },
                    {
-                       "name":  "materialize:wrote:scripts/runtime/Invoke-FreeDestinyMapControlledWebApiIntegration.ps1",
+                       "name":  "materialize:wrote:scripts/proof/prove-free-destiny-map-controlled-production-build.mjs",
                        "passed":  true,
                        "detail":  "written"
                    },
                    {
-                       "name":  "materialize:wrote:scripts/proof/prove-free-destiny-map-controlled-web-api-integration.mjs",
+                       "name":  "materialize:wrote:reports/runtime/free-destiny-map-controlled-production-build-proof.json",
                        "passed":  true,
                        "detail":  "written"
                    },
                    {
-                       "name":  "materialize:wrote:reports/runtime/free-destiny-map-controlled-web-api-integration-proof.json",
+                       "name":  "materialize:wrote:scripts/validators/validate-free-destiny-map-controlled-production-build.mjs",
                        "passed":  true,
                        "detail":  "written"
                    },
                    {
-                       "name":  "materialize:wrote:scripts/validators/validate-free-destiny-map-controlled-web-api-integration.mjs",
-                       "passed":  true,
-                       "detail":  "written"
-                   },
-                   {
-                       "name":  "materialize:wrote:reports/validation/free-destiny-map-controlled-web-api-integration-latest.json",
+                       "name":  "materialize:wrote:reports/validation/free-destiny-map-controlled-production-build-latest.json",
                        "passed":  true,
                        "detail":  "written"
                    }

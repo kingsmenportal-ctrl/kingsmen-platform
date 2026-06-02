@@ -1,0 +1,34 @@
+{
+  "schema": "kingsmen.validation-report.v1",
+  "module": "BATCH 16 - Controlled Production Build Proof",
+  "status": "VALIDATED",
+  "passed": true,
+  "generated_at": "2026-06-02T21:27:06.076Z",
+  "files_expected": [
+    "docs/runtime/free-destiny-map-controlled-production-build-proof.md",
+    "manifests/runtime/free-destiny-map-controlled-production-build-proof.json",
+    "packages/contracts/src/free-destiny-map-controlled-production-build.ts",
+    "scripts/runtime/Invoke-FreeDestinyMapControlledProductionBuild.ps1",
+    "scripts/proof/prove-free-destiny-map-controlled-production-build.mjs",
+    "reports/runtime/free-destiny-map-controlled-production-build-proof.json",
+    "scripts/validators/validate-free-destiny-map-controlled-production-build.mjs",
+    "reports/validation/free-destiny-map-controlled-production-build-latest.json"
+  ],
+  "upstream_files_checked": [
+    "reports/runtime/free-destiny-map-controlled-web-api-integration-proof.json",
+    "apps/web/package.json",
+    "apps/web/package-lock.json",
+    "apps/web/next.config.mjs",
+    "apps/web/src/app/layout.tsx",
+    "apps/web/src/app/free-destiny-map/page.tsx",
+    "apps/web/src/app/api/public/free-destiny-map/intake/local/route.ts"
+  ],
+  "files_checked": 15,
+  "missing_files": [],
+  "failed_checks": [],
+  "warnings": [],
+  "oracle_lite_impact": "none_runtime_yet",
+  "control_plane_impact": "Adds controlled local production build proof for apps/web.",
+  "runtime_proof": "reports/runtime/free-destiny-map-controlled-production-build-proof.json",
+  "next_action": "Proceed to BATCH 17 - Backend runtime integration or Oracle Lite container preparation."
+}

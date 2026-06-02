@@ -1,0 +1,627 @@
+FILE: docs/runtime/free-destiny-map-controlled-production-build-proof.md
+---
+# BATCH 16 - Controlled Production Build Proof
+
+## Purpose
+
+This batch proves the first controlled production build for the Kingsmen `apps/web` Next.js surface.
+
+BATCH 14 proved the real local Next dev server can boot.
+
+BATCH 15A repaired the workspace-root warning.
+
+BATCH 15B proved the same-origin local web plus API intake route.
+
+BATCH 16 now runs a controlled `next build` for `apps/web`, captures stdout and stderr, verifies the build output, writes a proof report, and validates that no production deployment or real-world action was claimed.
+
+## What this batch proves
+
+- BATCH 15B integration proof exists and passed
+- `apps/web` has Next, React, React DOM and package scripts
+- `apps/web` production build can be attempted with a controlled timeout
+- `next build` exits successfully
+- `.next` build output exists
+- Free Destiny Map page and local API route compile
+- production claims remain blocked
+- Oracle runtime is still not claimed
+- no email, payment, document upload or official application submission is performed
+
+## What this batch does not claim
+
+- no Oracle deployment
+- no Docker Compose boot
+- no PostgreSQL runtime
+- no Redis queue
+- no public production URL
+- no email sending
+- no payment processing
+- no document upload
+- no official application submission
+
+## Oracle Lite impact
+
+none_runtime_yet.
+
+This is a controlled local production build proof only.
+
+## Next action
+
+After validation, BATCH 17 should add either backend runtime integration proof or Oracle Lite web container build/runtime preparation.
+---
+FILE: manifests/runtime/free-destiny-map-controlled-production-build-proof.json
+---
+{
+  "schema": "kingsmen.controlled-production-build-proof.v1",
+  "module": "BATCH 16 - Controlled Production Build Proof",
+  "status": "BUILT_PENDING_VALIDATION",
+  "productionReady": false,
+  "requiresBatches": [
+    "BATCH 14 - Controlled Local Next Web Boot Proof",
+    "BATCH 15A - Workspace Root / Lockfile Warning Repair",
+    "BATCH 15B - Controlled Local Web + Local API Integration Proof"
+  ],
+  "webPackage": "apps/web/package.json",
+  "buildCommand": "node apps/web/node_modules/next/dist/bin/next build",
+  "buildWorkingDirectory": "apps/web",
+  "proofCommand": "powershell.exe -ExecutionPolicy Bypass -File scripts/runtime/Invoke-FreeDestinyMapControlledProductionBuild.ps1",
+  "proofScript": "scripts/proof/prove-free-destiny-map-controlled-production-build.mjs",
+  "proofReport": "reports/runtime/free-destiny-map-controlled-production-build-proof.json",
+  "validationReport": "reports/validation/free-destiny-map-controlled-production-build-latest.json",
+  "buildOutputDirectory": "apps/web/.next",
+  "storesProductionData": false,
+  "takesPayment": false,
+  "sendsEmail": false,
+  "collectsDocuments": false,
+  "submitsOfficialApplications": false,
+  "deploysToOracle": false,
+  "oracleLiteImpact": "none_runtime_yet",
+  "controlPlaneImpact": "Adds controlled production build proof for the web surface before deployment/container work.",
+  "requiredFiles": [
+    "docs/runtime/free-destiny-map-controlled-production-build-proof.md",
+    "manifests/runtime/free-destiny-map-controlled-production-build-proof.json",
+    "packages/contracts/src/free-destiny-map-controlled-production-build.ts",
+    "scripts/runtime/Invoke-FreeDestinyMapControlledProductionBuild.ps1",
+    "scripts/proof/prove-free-destiny-map-controlled-production-build.mjs",
+    "reports/runtime/free-destiny-map-controlled-production-build-proof.json",
+    "scripts/validators/validate-free-destiny-map-controlled-production-build.mjs",
+    "reports/validation/free-destiny-map-controlled-production-build-latest.json"
+  ],
+  "nextAction": "Run powershell.exe -ExecutionPolicy Bypass -File scripts/runtime/Invoke-FreeDestinyMapControlledProductionBuild.ps1 then node scripts/validators/validate-free-destiny-map-controlled-production-build.mjs"
+}
+---
+FILE: packages/contracts/src/free-destiny-map-controlled-production-build.ts
+---
+export const FREE_DESTINY_MAP_CONTROLLED_PRODUCTION_BUILD_MODULE =
+  "BATCH 16 - Controlled Production Build Proof" as const;
+
+export const FREE_DESTINY_MAP_CONTROLLED_PRODUCTION_BUILD_WEB_PACKAGE =
+  "apps/web/package.json" as const;
+
+export const FREE_DESTINY_MAP_CONTROLLED_PRODUCTION_BUILD_OUTPUT =
+  "apps/web/.next" as const;
+
+export type FreeDestinyMapControlledProductionBuildStatus =
+  | "CONTROLLED_PRODUCTION_BUILD_PROVEN"
+  | "CONTROLLED_PRODUCTION_BUILD_FAILED";
+
+export interface FreeDestinyMapControlledProductionBuildCheck {
+  name: string;
+  passed: boolean;
+  detail: string;
+}
+
+export interface FreeDestinyMapControlledProductionBuildReport {
+  schema: "kingsmen.controlled-production-build-report.v1";
+  module: typeof FREE_DESTINY_MAP_CONTROLLED_PRODUCTION_BUILD_MODULE;
+  status: FreeDestinyMapControlledProductionBuildStatus;
+  passed: boolean;
+  productionReady: false;
+  canClaimProduction: false;
+  deployedToOracle: false;
+  buildStarted: boolean;
+  buildExited: boolean;
+  buildExitCode: number | null;
+  oracleLiteImpact: "none_runtime_yet";
+  checks: FreeDestinyMapControlledProductionBuildCheck[];
+  failed: FreeDestinyMapControlledProductionBuildCheck[];
+  nextAction: string;
+}
+---
+FILE: scripts/runtime/Invoke-FreeDestinyMapControlledProductionBuild.ps1
+---
+#requires -Version 5.1
+[CmdletBinding()]
+param(
+  [int]$TimeoutSeconds = 300
+)
+
+$ErrorActionPreference = "Stop"
+
+$repoRoot = Get-Location
+$scriptPath = Join-Path $repoRoot "scripts\proof\prove-free-destiny-map-controlled-production-build.mjs"
+
+if (-not (Test-Path $scriptPath -PathType Leaf)) {
+  throw "Missing proof script: $scriptPath"
+}
+
+Write-Host "Kingsmen Free Destiny Map controlled production build proof - ControlledProductionBuild"
+Write-Host "Timeout seconds: $TimeoutSeconds"
+Write-Host "This runs a local Next production build for apps/web and records proof."
+Write-Host "This does not deploy to Oracle, does not send email, does not take payment, does not upload documents, and does not submit official applications."
+
+node $scriptPath "--timeoutSeconds=$TimeoutSeconds"
+
+if ($LASTEXITCODE -ne 0) {
+  throw "Free Destiny Map controlled production build proof failed."
+}
+---
+FILE: scripts/proof/prove-free-destiny-map-controlled-production-build.mjs
+---
+#!/usr/bin/env node
+import fs from "node:fs";
+import path from "node:path";
+import { spawn } from "node:child_process";
+
+const root = process.cwd();
+const webDir = path.join(root, "apps/web");
+const proofReportPath = path.join(root, "reports/runtime/free-destiny-map-controlled-production-build-proof.json");
+
+const timeoutArg = process.argv.find((item) => item.startsWith("--timeoutSeconds="));
+const timeoutSeconds = timeoutArg ? Number(timeoutArg.split("=")[1]) : 300;
+const timeoutMs = Number.isFinite(timeoutSeconds) && timeoutSeconds > 0 ? timeoutSeconds * 1000 : 300000;
+
+const checks = [];
+const stdoutLines = [];
+const stderrLines = [];
+
+function exists(rel) {
+  return fs.existsSync(path.join(root, rel));
+}
+
+function read(rel) {
+  return fs.readFileSync(path.join(root, rel), "utf8").replace(/^\uFEFF/, "");
+}
+
+function parseJson(rel) {
+  return JSON.parse(read(rel));
+}
+
+function check(name, passed, detail = "") {
+  checks.push({ name, passed, detail });
+}
+
+function trimLog(lines) {
+  return lines.join("").split(/\r?\n/).filter(Boolean).slice(-160);
+}
+
+function sleep(ms) {
+  return new Promise((resolve) => setTimeout(resolve, ms));
+}
+
+async function stopProcessTree(child) {
+  if (!child || !child.pid) return false;
+
+  if (process.platform === "win32") {
+    await new Promise((resolve) => {
+      const killer = spawn("taskkill", ["/pid", String(child.pid), "/t", "/f"], {
+        stdio: "ignore"
+      });
+      killer.once("close", () => resolve());
+      killer.once("error", () => resolve());
+    });
+  } else {
+    try {
+      child.kill("SIGTERM");
+    } catch {}
+    await sleep(1500);
+    if (child.exitCode === null) {
+      try {
+        child.kill("SIGKILL");
+      } catch {}
+    }
+  }
+
+  await sleep(1000);
+  return true;
+}
+
+function safeEnvForBuild() {
+  const safeEnv = {};
+  const envKeysToKeep = [
+    "PATH",
+    "Path",
+    "PATHEXT",
+    "SystemRoot",
+    "WINDIR",
+    "TEMP",
+    "TMP",
+    "USERPROFILE",
+    "APPDATA",
+    "LOCALAPPDATA",
+    "COMSPEC",
+    "HOMEDRIVE",
+    "HOMEPATH",
+    "PROCESSOR_ARCHITECTURE",
+    "PROCESSOR_IDENTIFIER",
+    "NUMBER_OF_PROCESSORS"
+  ];
+
+  for (const key of envKeysToKeep) {
+    const value = process.env[key];
+    if (!key || key.includes("=") || key.includes("\u0000")) continue;
+    if (typeof value === "undefined" || String(value).includes("\u0000")) continue;
+    safeEnv[key] = String(value);
+  }
+
+  safeEnv.NEXT_TELEMETRY_DISABLED = "1";
+  safeEnv.CI = "1";
+  safeEnv.NODE_ENV = "production";
+
+  return safeEnv;
+}
+
+const requiredPreFiles = [
+  "reports/runtime/free-destiny-map-controlled-next-boot-proof.json",
+  "reports/runtime/free-destiny-map-workspace-root-warning-repair-proof.json",
+  "reports/runtime/free-destiny-map-controlled-web-api-integration-proof.json",
+  "apps/web/package.json",
+  "apps/web/package-lock.json",
+  "apps/web/next.config.mjs",
+  "apps/web/src/app/layout.tsx",
+  "apps/web/src/app/free-destiny-map/page.tsx",
+  "apps/web/src/components/kingsmen/FreeDestinyMapApiForm.tsx",
+  "apps/web/src/app/api/public/free-destiny-map/intake/local/route.ts",
+  "apps/web/node_modules/next/package.json",
+  "apps/web/node_modules/react/package.json",
+  "apps/web/node_modules/react-dom/package.json",
+  "apps/web/.gitignore"
+];
+
+for (const file of requiredPreFiles) {
+  check(`pre-file-exists:${file}`, exists(file), file);
+}
+
+if (exists("reports/runtime/free-destiny-map-controlled-web-api-integration-proof.json")) {
+  const integration = parseJson("reports/runtime/free-destiny-map-controlled-web-api-integration-proof.json");
+  check("batch-15b-integration-proven", integration.status === "CONTROLLED_WEB_API_INTEGRATION_PROVEN" && integration.passed === true, `status=${integration.status}; passed=${integration.passed}`);
+  check("batch-15b-production-false", integration.productionReady === false && integration.canClaimProduction === false, "production false");
+  check("batch-15b-web-and-api-statuses", integration.webStatus === 200 && integration.apiStatus === 202, `webStatus=${integration.webStatus}; apiStatus=${integration.apiStatus}`);
+}
+
+if (exists("apps/web/package.json")) {
+  const pkg = parseJson("apps/web/package.json");
+  check("web-build-script-present", String(pkg.scripts?.build ?? "").includes("next build"), String(pkg.scripts?.build ?? ""));
+  check("web-next-dependency-present", Boolean(pkg.dependencies?.next), pkg.dependencies?.next ?? "missing");
+  check("web-react-dependency-present", Boolean(pkg.dependencies?.react), pkg.dependencies?.react ?? "missing");
+  check("web-react-dom-dependency-present", Boolean(pkg.dependencies?.["react-dom"]), pkg.dependencies?.["react-dom"] ?? "missing");
+}
+
+if (exists("apps/web/.gitignore")) {
+  const ignore = read("apps/web/.gitignore");
+  check("web-build-output-ignored", ignore.includes(".next"), ".next ignored");
+  check("web-node-modules-ignored", ignore.includes("node_modules"), "node_modules ignored");
+}
+
+if (exists("apps/web/next.config.mjs")) {
+  const config = read("apps/web/next.config.mjs");
+  check("next-config-output-file-tracing-root-present", config.includes("outputFileTracingRoot"), "outputFileTracingRoot present");
+  check("next-config-powered-header-disabled", config.includes("poweredByHeader: false"), "poweredByHeader false");
+}
+
+if (exists("apps/web/src/app/api/public/free-destiny-map/intake/local/route.ts")) {
+  const route = read("apps/web/src/app/api/public/free-destiny-map/intake/local/route.ts");
+  check("api-route-keeps-production-false", route.includes("productionReady: false"), "production false");
+  check("api-route-keeps-payment-false", route.includes("paymentInstructionSent: false"), "payment false");
+  check("api-route-keeps-email-false", route.includes("emailSent: false"), "email false");
+  check("api-route-keeps-document-false", route.includes("documentUploadAccepted: false"), "document false");
+  check("api-route-keeps-official-submission-false", route.includes("officialApplicationSubmitted: false"), "official false");
+}
+
+let child = null;
+let buildStarted = false;
+let buildExited = false;
+let buildExitCode = null;
+let buildTimedOut = false;
+let spawnError = null;
+
+try {
+  const preFailures = checks.filter((item) => item.passed !== true);
+  if (preFailures.length > 0) {
+    throw new Error("Pre-build checks failed. Controlled production build not attempted.");
+  }
+
+  const nextCliPath = path.join(webDir, "node_modules/next/dist/bin/next");
+  check("controlled-build-next-cli-exists", fs.existsSync(nextCliPath), nextCliPath);
+
+  const safeEnv = safeEnvForBuild();
+  check("controlled-build-minimal-env", true, `keys=${Object.keys(safeEnv).join(",")}`);
+
+  child = spawn(process.execPath, [nextCliPath, "build"], {
+    cwd: webDir,
+    env: safeEnv,
+    stdio: ["ignore", "pipe", "pipe"],
+    windowsHide: true
+  });
+
+  buildStarted = true;
+
+  child.stdout.on("data", (chunk) => stdoutLines.push(chunk.toString()));
+  child.stderr.on("data", (chunk) => stderrLines.push(chunk.toString()));
+  child.once("error", (error) => {
+    spawnError = error;
+  });
+
+  const result = await new Promise((resolve) => {
+    const timer = setTimeout(async () => {
+      buildTimedOut = true;
+      await stopProcessTree(child);
+      resolve({ code: null, timedOut: true });
+    }, timeoutMs);
+
+    child.once("close", (code) => {
+      clearTimeout(timer);
+      resolve({ code, timedOut: false });
+    });
+  });
+
+  buildExited = !result.timedOut;
+  buildExitCode = result.code;
+
+  check("controlled-production-build-started", buildStarted, "next build process started");
+  check("controlled-production-build-exited", buildExited, buildExited ? `exitCode=${buildExitCode}` : "build timeout");
+  check("controlled-production-build-exit-code-zero", buildExitCode === 0, `exitCode=${buildExitCode}`);
+  check("controlled-production-build-not-timed-out", buildTimedOut === false, `timedOut=${buildTimedOut}`);
+  check("controlled-production-build-output-directory-exists", exists("apps/web/.next"), "apps/web/.next");
+  check("controlled-production-build-build-id-or-manifest-exists", exists("apps/web/.next/BUILD_ID") || exists("apps/web/.next/routes-manifest.json") || exists("apps/web/.next/server"), "build output markers");
+} catch (error) {
+  check("controlled-production-build-exception-absent", false, error instanceof Error ? error.message : String(error));
+} finally {
+  if (child && buildTimedOut) {
+    await stopProcessTree(child);
+  }
+}
+
+if (spawnError) {
+  check("controlled-production-build-spawn-error-absent", false, spawnError.message);
+}
+
+const outputText = `${stdoutLines.join("")}\n${stderrLines.join("")}`;
+
+check("controlled-production-build-no-oracle-deploy", !/oracle|oci|docker\s+compose\s+up|kubectl|deploy/i.test(outputText), "no deployment command output");
+check("controlled-production-build-no-production-true", !/productionReady\s*[:=]\s*true/i.test(outputText), "productionReady true absent");
+check("controlled-production-build-no-official-submission-true", !/officialApplicationSubmitted\s*[:=]\s*true/i.test(outputText), "officialApplicationSubmitted true absent");
+check("controlled-production-build-no-payment-true", !/paymentInstructionSent\s*[:=]\s*true/i.test(outputText), "paymentInstructionSent true absent");
+check("controlled-production-build-no-email-true", !/emailSent\s*[:=]\s*true/i.test(outputText), "emailSent true absent");
+check("controlled-production-build-no-document-upload-true", !/documentUploadAccepted\s*[:=]\s*true/i.test(outputText), "documentUploadAccepted true absent");
+
+const failed = checks.filter((item) => item.passed !== true);
+const passed = failed.length === 0;
+
+const report = {
+  schema: "kingsmen.controlled-production-build-report.v1",
+  module: "BATCH 16 - Controlled Production Build Proof",
+  status: passed ? "CONTROLLED_PRODUCTION_BUILD_PROVEN" : "CONTROLLED_PRODUCTION_BUILD_FAILED",
+  passed,
+  productionReady: false,
+  canClaimProduction: false,
+  deployedToOracle: false,
+  generated_at: new Date().toISOString(),
+  buildStarted,
+  buildExited,
+  buildExitCode,
+  buildTimedOut,
+  buildOutputDirectory: "apps/web/.next",
+  checks,
+  failed,
+  stdout_tail: trimLog(stdoutLines),
+  stderr_tail: trimLog(stderrLines),
+  oracle_lite_impact: "none_runtime_yet",
+  runtime_scope: "controlled local Next production build proof only; no Oracle runtime; no deployment",
+  next_action: passed
+    ? "Run validator and commit BATCH 16. Next batch may add backend runtime integration or Oracle Lite container preparation."
+    : "Repair controlled production build failures before moving forward."
+};
+
+fs.mkdirSync(path.dirname(proofReportPath), { recursive: true });
+fs.writeFileSync(proofReportPath, `${JSON.stringify(report, null, 2)}\n`, "utf8");
+
+console.log(JSON.stringify(report, null, 2));
+if (!passed) process.exit(1);
+---
+FILE: reports/runtime/free-destiny-map-controlled-production-build-proof.json
+---
+{
+  "schema": "kingsmen.controlled-production-build-report.v1",
+  "module": "BATCH 16 - Controlled Production Build Proof",
+  "status": "CONTROLLED_PRODUCTION_BUILD_FAILED",
+  "passed": false,
+  "productionReady": false,
+  "canClaimProduction": false,
+  "deployedToOracle": false,
+  "generated_at": "2026-06-02T00:00:00.000Z",
+  "buildStarted": false,
+  "buildExited": false,
+  "buildExitCode": null,
+  "checks": [],
+  "failed": [
+    {
+      "name": "controlled_production_build_not_yet_executed",
+      "passed": false,
+      "detail": "Run scripts/runtime/Invoke-FreeDestinyMapControlledProductionBuild.ps1."
+    }
+  ],
+  "oracle_lite_impact": "none_runtime_yet",
+  "runtime_scope": "controlled local Next production build proof only; no Oracle runtime; no deployment",
+  "next_action": "Run BATCH 16 controlled production build proof."
+}
+---
+FILE: scripts/validators/validate-free-destiny-map-controlled-production-build.mjs
+---
+#!/usr/bin/env node
+import fs from "node:fs";
+import path from "node:path";
+
+const root = process.cwd();
+const reportPath = path.join(root, "reports/validation/free-destiny-map-controlled-production-build-latest.json");
+
+const requiredFiles = [
+  "docs/runtime/free-destiny-map-controlled-production-build-proof.md",
+  "manifests/runtime/free-destiny-map-controlled-production-build-proof.json",
+  "packages/contracts/src/free-destiny-map-controlled-production-build.ts",
+  "scripts/runtime/Invoke-FreeDestinyMapControlledProductionBuild.ps1",
+  "scripts/proof/prove-free-destiny-map-controlled-production-build.mjs",
+  "reports/runtime/free-destiny-map-controlled-production-build-proof.json",
+  "scripts/validators/validate-free-destiny-map-controlled-production-build.mjs",
+  "reports/validation/free-destiny-map-controlled-production-build-latest.json"
+];
+
+const upstreamFiles = [
+  "reports/runtime/free-destiny-map-controlled-web-api-integration-proof.json",
+  "apps/web/package.json",
+  "apps/web/package-lock.json",
+  "apps/web/next.config.mjs",
+  "apps/web/src/app/layout.tsx",
+  "apps/web/src/app/free-destiny-map/page.tsx",
+  "apps/web/src/app/api/public/free-destiny-map/intake/local/route.ts"
+];
+
+function exists(rel) {
+  return fs.existsSync(path.join(root, rel));
+}
+
+function read(rel) {
+  return fs.readFileSync(path.join(root, rel), "utf8").replace(/^\uFEFF/, "");
+}
+
+function parseJson(rel) {
+  return JSON.parse(read(rel));
+}
+
+const failures = [];
+const warnings = [];
+const checked = [];
+
+for (const file of requiredFiles) {
+  checked.push(file);
+  if (!exists(file)) failures.push(`Missing required file: ${file}`);
+  else if (fs.statSync(path.join(root, file)).size === 0) failures.push(`Empty required file: ${file}`);
+}
+
+for (const file of upstreamFiles) {
+  checked.push(file);
+  if (!exists(file)) failures.push(`Missing upstream file: ${file}`);
+  else if (fs.statSync(path.join(root, file)).size === 0) failures.push(`Empty upstream file: ${file}`);
+}
+
+if (exists("manifests/runtime/free-destiny-map-controlled-production-build-proof.json")) {
+  const manifest = parseJson("manifests/runtime/free-destiny-map-controlled-production-build-proof.json");
+  if (manifest.productionReady !== false) failures.push("Manifest must keep productionReady false.");
+  if (manifest.storesProductionData !== false) failures.push("Manifest must declare storesProductionData false.");
+  if (manifest.takesPayment !== false) failures.push("Manifest must declare takesPayment false.");
+  if (manifest.sendsEmail !== false) failures.push("Manifest must declare sendsEmail false.");
+  if (manifest.collectsDocuments !== false) failures.push("Manifest must declare collectsDocuments false.");
+  if (manifest.submitsOfficialApplications !== false) failures.push("Manifest must declare submitsOfficialApplications false.");
+  if (manifest.deploysToOracle !== false) failures.push("Manifest must declare deploysToOracle false.");
+  if (!String(manifest.oracleLiteImpact ?? "").includes("none_runtime_yet")) failures.push("Manifest must declare none_runtime_yet.");
+}
+
+const tokenChecks = [
+  ["packages/contracts/src/free-destiny-map-controlled-production-build.ts", ["CONTROLLED_PRODUCTION_BUILD_PROVEN", "deployedToOracle: false", "canClaimProduction: false"]],
+  ["scripts/runtime/Invoke-FreeDestinyMapControlledProductionBuild.ps1", ["ControlledProductionBuild", "does not deploy to Oracle", "does not submit official applications"]],
+  ["scripts/proof/prove-free-destiny-map-controlled-production-build.mjs", ["CONTROLLED_PRODUCTION_BUILD_PROVEN", "controlled-production-build-exit-code-zero", "controlled-production-build-output-directory-exists", "deployedToOracle: false"]],
+  ["reports/runtime/free-destiny-map-controlled-production-build-proof.json", ["schema", "module", "status"]]
+];
+
+for (const [file, tokens] of tokenChecks) {
+  if (!exists(file)) continue;
+  const content = read(file);
+  for (const token of tokens) {
+    if (!content.includes(token)) failures.push(`${file} missing token: ${token}`);
+  }
+}
+
+if (exists("reports/runtime/free-destiny-map-controlled-production-build-proof.json")) {
+  const proof = parseJson("reports/runtime/free-destiny-map-controlled-production-build-proof.json");
+  if (proof.passed !== true) failures.push("Controlled production build proof must pass.");
+  if (proof.status !== "CONTROLLED_PRODUCTION_BUILD_PROVEN") failures.push("Controlled production build proof status must be CONTROLLED_PRODUCTION_BUILD_PROVEN.");
+  if (proof.productionReady !== false) failures.push("Controlled production build proof must keep productionReady false.");
+  if (proof.canClaimProduction !== false) failures.push("Controlled production build proof must keep canClaimProduction false.");
+  if (proof.deployedToOracle !== false) failures.push("Controlled production build proof must keep deployedToOracle false.");
+  if (proof.buildStarted !== true) failures.push("Controlled production build proof must start build.");
+  if (proof.buildExited !== true) failures.push("Controlled production build proof must exit build.");
+  if (proof.buildExitCode !== 0) failures.push("Controlled production build proof must record buildExitCode 0.");
+  if (!Array.isArray(proof.checks) || proof.checks.length < 20) failures.push("Controlled production build proof must include detailed checks.");
+}
+
+if (!exists("apps/web/.next")) failures.push("apps/web/.next must exist after controlled production build.");
+
+const forbiddenFiles = [
+  "docs/runtime/free-destiny-map-controlled-production-build-proof.md",
+  "manifests/runtime/free-destiny-map-controlled-production-build-proof.json",
+  "packages/contracts/src/free-destiny-map-controlled-production-build.ts",
+  "scripts/runtime/Invoke-FreeDestinyMapControlledProductionBuild.ps1",
+  "apps/web/src/app/api/public/free-destiny-map/intake/local/route.ts"
+];
+
+const forbiddenPatterns = [
+  [/productionReady\s*[:=]\s*true/i, "productionReady true"],
+  [/canClaimProduction\s*[:=]\s*true/i, "canClaimProduction true"],
+  [/deployedToOracle\s*[:=]\s*true/i, "deployedToOracle true"],
+  [/officialApplicationSubmitted:\s*true/i, "official application submitted true"],
+  [/paymentInstructionSent:\s*true/i, "payment instruction sent true"],
+  [/emailSent:\s*true/i, "email sent true"],
+  [/documentUploadAccepted:\s*true/i, "document upload accepted true"]
+];
+
+for (const file of forbiddenFiles) {
+  if (!exists(file)) continue;
+  const content = read(file);
+  for (const [pattern, label] of forbiddenPatterns) {
+    if (pattern.test(content)) failures.push(`${file} contains forbidden pattern: ${label}`);
+  }
+}
+
+const passed = failures.length === 0;
+
+const report = {
+  schema: "kingsmen.validation-report.v1",
+  module: "BATCH 16 - Controlled Production Build Proof",
+  status: passed ? "VALIDATED" : "BUILT_PENDING_VALIDATION",
+  passed,
+  generated_at: new Date().toISOString(),
+  files_expected: requiredFiles,
+  upstream_files_checked: upstreamFiles,
+  files_checked: checked.length,
+  missing_files: requiredFiles.filter((file) => !exists(file)),
+  failed_checks: failures,
+  warnings,
+  oracle_lite_impact: "none_runtime_yet",
+  control_plane_impact: "Adds controlled local production build proof for apps/web.",
+  runtime_proof: "reports/runtime/free-destiny-map-controlled-production-build-proof.json",
+  next_action: passed ? "Proceed to BATCH 17 - Backend runtime integration or Oracle Lite container preparation." : "Repair controlled production build proof failures."
+};
+
+fs.mkdirSync(path.dirname(reportPath), { recursive: true });
+fs.writeFileSync(reportPath, `${JSON.stringify(report, null, 2)}\n`, "utf8");
+
+console.log(JSON.stringify(report, null, 2));
+if (!passed) process.exit(1);
+---
+FILE: reports/validation/free-destiny-map-controlled-production-build-latest.json
+---
+{
+  "schema": "kingsmen.validation-report.v1",
+  "module": "BATCH 16 - Controlled Production Build Proof",
+  "status": "BUILT_PENDING_VALIDATION",
+  "passed": false,
+  "generated_at": "2026-06-02T00:00:00.000Z",
+  "reason": "Seed report. Run BATCH 16 controlled production build proof then validator.",
+  "files_checked": 0,
+  "failed_checks": [
+    "validator_not_yet_executed"
+  ],
+  "oracle_lite_impact": "none_runtime_yet",
+  "control_plane_impact": "Adds controlled local production build proof for apps/web.",
+  "runtime_proof": "reports/runtime/free-destiny-map-controlled-production-build-proof.json",
+  "next_action": "Run powershell.exe -ExecutionPolicy Bypass -File scripts/runtime/Invoke-FreeDestinyMapControlledProductionBuild.ps1 then node scripts/validators/validate-free-destiny-map-controlled-production-build.mjs."
+}

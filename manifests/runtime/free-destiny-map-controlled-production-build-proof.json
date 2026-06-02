@@ -1,0 +1,38 @@
+{
+  "schema": "kingsmen.controlled-production-build-proof.v1",
+  "module": "BATCH 16 - Controlled Production Build Proof",
+  "status": "BUILT_PENDING_VALIDATION",
+  "productionReady": false,
+  "requiresBatches": [
+    "BATCH 14 - Controlled Local Next Web Boot Proof",
+    "BATCH 15A - Workspace Root / Lockfile Warning Repair",
+    "BATCH 15B - Controlled Local Web + Local API Integration Proof"
+  ],
+  "webPackage": "apps/web/package.json",
+  "buildCommand": "node apps/web/node_modules/next/dist/bin/next build",
+  "buildWorkingDirectory": "apps/web",
+  "proofCommand": "powershell.exe -ExecutionPolicy Bypass -File scripts/runtime/Invoke-FreeDestinyMapControlledProductionBuild.ps1",
+  "proofScript": "scripts/proof/prove-free-destiny-map-controlled-production-build.mjs",
+  "proofReport": "reports/runtime/free-destiny-map-controlled-production-build-proof.json",
+  "validationReport": "reports/validation/free-destiny-map-controlled-production-build-latest.json",
+  "buildOutputDirectory": "apps/web/.next",
+  "storesProductionData": false,
+  "takesPayment": false,
+  "sendsEmail": false,
+  "collectsDocuments": false,
+  "submitsOfficialApplications": false,
+  "deploysToOracle": false,
+  "oracleLiteImpact": "none_runtime_yet",
+  "controlPlaneImpact": "Adds controlled production build proof for the web surface before deployment/container work.",
+  "requiredFiles": [
+    "docs/runtime/free-destiny-map-controlled-production-build-proof.md",
+    "manifests/runtime/free-destiny-map-controlled-production-build-proof.json",
+    "packages/contracts/src/free-destiny-map-controlled-production-build.ts",
+    "scripts/runtime/Invoke-FreeDestinyMapControlledProductionBuild.ps1",
+    "scripts/proof/prove-free-destiny-map-controlled-production-build.mjs",
+    "reports/runtime/free-destiny-map-controlled-production-build-proof.json",
+    "scripts/validators/validate-free-destiny-map-controlled-production-build.mjs",
+    "reports/validation/free-destiny-map-controlled-production-build-latest.json"
+  ],
+  "nextAction": "Run powershell.exe -ExecutionPolicy Bypass -File scripts/runtime/Invoke-FreeDestinyMapControlledProductionBuild.ps1 then node scripts/validators/validate-free-destiny-map-controlled-production-build.mjs"
+}
