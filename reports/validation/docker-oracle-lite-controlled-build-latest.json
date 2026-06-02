@@ -4,7 +4,7 @@
   "status": "VALIDATED",
   "passed": true,
   "proof_status": "DOCKER_LOCAL_BUILD_UNAVAILABLE",
-  "generated_at": "2026-06-02T22:17:32.717Z",
+  "generated_at": "2026-06-02T22:19:21.743Z",
   "files_expected": [
     "docs/runtime/docker-oracle-lite-controlled-build-proof.md",
     "manifests/runtime/docker-oracle-lite-controlled-build-proof.json",
