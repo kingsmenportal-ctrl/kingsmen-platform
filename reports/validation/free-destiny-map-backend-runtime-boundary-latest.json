@@ -1,9 +1,9 @@
 {
   "schema": "kingsmen.validation-report.v1",
   "module": "BATCH 17 - Backend Runtime Integration Shell / Local API Service Boundary",
-  "status": "BUILT_PENDING_VALIDATION",
-  "passed": false,
-  "generated_at": "2026-06-02T21:34:14.774Z",
+  "status": "VALIDATED",
+  "passed": true,
+  "generated_at": "2026-06-02T21:36:03.624Z",
   "files_expected": [
     "docs/runtime/free-destiny-map-backend-runtime-boundary.md",
     "manifests/runtime/free-destiny-map-backend-runtime-boundary.json",
@@ -23,13 +23,10 @@
   ],
   "files_checked": 13,
   "missing_files": [],
-  "failed_checks": [
-    "Backend runtime boundary proof must pass.",
-    "Backend runtime boundary proof status must be BACKEND_RUNTIME_BOUNDARY_PROVEN."
-  ],
+  "failed_checks": [],
   "warnings": [],
   "oracle_lite_impact": "none_runtime_yet",
   "control_plane_impact": "Adds the first backend runtime service boundary before Next-to-backend bridge proof.",
   "runtime_proof": "reports/runtime/free-destiny-map-backend-runtime-boundary-proof.json",
-  "next_action": "Repair backend runtime boundary proof failures."
+  "next_action": "Proceed to BATCH 18 - Controlled Next-to-backend bridge proof."
 }

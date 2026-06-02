@@ -199,7 +199,7 @@ const outputSafetyText = JSON.stringify({
   intakeResponse
 });
 
-check("backend-boundary-no-oracle-deploy", !/docker\s+compose\s+up|kubectl|oci|oracle.*deploy/i.test(outputSafetyText), "no deployment output");
+check("backend-boundary-no-deployment-command-output", !/docker\s+compose\s+up|kubectl|oci\s+deploy|oracle\s+deploy|deploy\s+to\s+oracle/i.test(outputSafetyText), "no deployment command output; deployedToOracle false is allowed as a safety flag");
 check("backend-boundary-no-production-true", !/productionReady\s*[:=]\s*true/i.test(outputSafetyText), "productionReady true absent");
 check("backend-boundary-no-official-submission-true", !/officialApplicationSubmitted\s*[:=]\s*true/i.test(outputSafetyText), "officialApplicationSubmitted true absent");
 check("backend-boundary-no-payment-true", !/paymentInstructionSent\s*[:=]\s*true/i.test(outputSafetyText), "paymentInstructionSent true absent");

@@ -1,18 +1,18 @@
 {
   "schema": "kingsmen.backend-runtime-boundary-report.v1",
   "module": "BATCH 17 - Backend Runtime Integration Shell / Local API Service Boundary",
-  "status": "BACKEND_RUNTIME_BOUNDARY_FAILED",
-  "passed": false,
+  "status": "BACKEND_RUNTIME_BOUNDARY_PROVEN",
+  "passed": true,
   "productionReady": false,
   "canClaimProduction": false,
   "deployedToOracle": false,
-  "generated_at": "2026-06-02T21:34:14.389Z",
+  "generated_at": "2026-06-02T21:36:03.415Z",
   "serverStarted": true,
   "serverStopped": true,
   "healthStatus": 200,
   "intakeStatus": 202,
-  "healthUrl": "http://127.0.0.1:49841/health",
-  "intakeUrl": "http://127.0.0.1:49841/api/public/free-destiny-map/intake/local",
+  "healthUrl": "http://127.0.0.1:49849/health",
+  "intakeUrl": "http://127.0.0.1:49849/api/public/free-destiny-map/intake/local",
   "api_response_reference": "KM-FDM-BACKEND17",
   "backend_boundary_reached": true,
   "backend_local_write_succeeded": true,
@@ -131,7 +131,7 @@
     {
       "name": "backend-boundary-server-started",
       "passed": true,
-      "detail": "url=http://127.0.0.1:49841"
+      "detail": "url=http://127.0.0.1:49849"
     },
     {
       "name": "backend-boundary-health-status-200",
@@ -204,9 +204,9 @@
       "detail": "server close completed"
     },
     {
-      "name": "backend-boundary-no-oracle-deploy",
-      "passed": false,
-      "detail": "no deployment output"
+      "name": "backend-boundary-no-deployment-command-output",
+      "passed": true,
+      "detail": "no deployment command output; deployedToOracle false is allowed as a safety flag"
     },
     {
       "name": "backend-boundary-no-production-true",
@@ -234,14 +234,8 @@
       "detail": "documentUploadAccepted true absent"
     }
   ],
-  "failed": [
-    {
-      "name": "backend-boundary-no-oracle-deploy",
-      "passed": false,
-      "detail": "no deployment output"
-    }
-  ],
+  "failed": [],
   "oracle_lite_impact": "none_runtime_yet",
   "runtime_scope": "controlled local backend service boundary proof only; no Oracle runtime; no deployment",
-  "next_action": "Repair backend runtime boundary failures before moving forward."
+  "next_action": "Run validator and commit BATCH 17. Next batch should connect Next local API route to backend runtime boundary."
 }
