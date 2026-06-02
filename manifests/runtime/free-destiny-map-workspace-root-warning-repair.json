@@ -1,0 +1,28 @@
+{
+  "schema": "kingsmen.workspace-root-warning-repair.v1",
+  "module": "BATCH 15A - Workspace Root / Lockfile Warning Repair",
+  "status": "BUILT_PENDING_VALIDATION",
+  "productionReady": false,
+  "repairsBatch": "BATCH 14 - Controlled Local Next Web Boot Proof",
+  "configFile": "apps/web/next.config.mjs",
+  "repair": "Set outputFileTracingRoot to the Kingsmen repository root from apps/web.",
+  "deletesExternalFiles": false,
+  "storesProductionData": false,
+  "takesPayment": false,
+  "sendsEmail": false,
+  "collectsDocuments": false,
+  "submitsOfficialApplications": false,
+  "oracleLiteImpact": "none_runtime_yet",
+  "controlPlaneImpact": "Removes Next workspace-root ambiguity before deeper local integration proof.",
+  "requiredFiles": [
+    "docs/runtime/free-destiny-map-workspace-root-warning-repair.md",
+    "manifests/runtime/free-destiny-map-workspace-root-warning-repair.json",
+    "apps/web/next.config.mjs",
+    "packages/contracts/src/free-destiny-map-workspace-root-warning-repair.ts",
+    "scripts/proof/prove-free-destiny-map-workspace-root-warning-repair.mjs",
+    "reports/runtime/free-destiny-map-workspace-root-warning-repair-proof.json",
+    "scripts/validators/validate-free-destiny-map-workspace-root-warning-repair.mjs",
+    "reports/validation/free-destiny-map-workspace-root-warning-repair-latest.json"
+  ],
+  "nextAction": "Run node scripts/proof/prove-free-destiny-map-workspace-root-warning-repair.mjs then node scripts/validators/validate-free-destiny-map-workspace-root-warning-repair.mjs"
+}

@@ -5,14 +5,14 @@
   "passed": true,
   "productionReady": false,
   "canClaimProduction": false,
-  "generated_at": "2026-06-02T21:02:11.416Z",
+  "generated_at": "2026-06-02T21:08:59.989Z",
   "serverStarted": true,
   "serverStopped": true,
   "webStatus": 200,
   "webRoute": "/free-destiny-map",
-  "webUrl": "http://127.0.0.1:49648/free-destiny-map",
+  "webUrl": "http://127.0.0.1:49705/free-destiny-map",
   "httpHost": "127.0.0.1",
-  "httpPort": 49648,
+  "httpPort": 49705,
   "checks": [
     {
       "name": "batch-12-readiness-proof-exists",
@@ -122,7 +122,7 @@
     {
       "name": "controlled-next-server-started",
       "passed": true,
-      "detail": "url=http://127.0.0.1:49648/free-destiny-map"
+      "detail": "url=http://127.0.0.1:49705/free-destiny-map"
     },
     {
       "name": "controlled-next-route-status-200",
@@ -168,25 +168,18 @@
   "failed": [],
   "stdout_tail": [
     "   ▲ Next.js 15.5.19",
-    "   - Local:        http://127.0.0.1:49648",
-    "   - Network:      http://127.0.0.1:49648",
+    "   - Local:        http://127.0.0.1:49705",
+    "   - Network:      http://127.0.0.1:49705",
     "   - Experiments (use with caution):",
     "     ✓ externalDir",
     " ✓ Starting...",
-    " ✓ Ready in 5.8s",
+    " ✓ Ready in 4.9s",
     " ○ Compiling /free-destiny-map ...",
-    " ✓ Compiled /free-destiny-map in 6.9s (532 modules)",
-    " GET /free-destiny-map 200 in 6673ms"
+    " ✓ Compiled /free-destiny-map in 2s (532 modules)",
+    " GET /free-destiny-map 200 in 2931ms",
+    " GET /free-destiny-map 200 in 153ms"
   ],
-  "stderr_tail": [
-    " ⚠ Warning: Next.js inferred your workspace root, but it may not be correct.",
-    " We detected multiple lockfiles and selected the directory of C:\\Users\\dell\\package-lock.json as the root directory.",
-    " To silence this warning, set `outputFileTracingRoot` in your Next.js config, or consider removing one of the lockfiles if it's not needed.",
-    "   See https://nextjs.org/docs/app/api-reference/config/next-config-js/output#caveats for more information.",
-    " Detected additional lockfiles: ",
-    "   * C:\\Users\\dell\\kingsmen-platform\\apps\\web\\package-lock.json",
-    "   * C:\\Users\\dell\\kingsmen-platform\\package-lock.json"
-  ],
+  "stderr_tail": [],
   "oracle_lite_impact": "none_runtime_yet",
   "runtime_scope": "controlled local Next dev boot proof only; no Oracle runtime; no production deployment",
   "next_action": "Run validator and commit BATCH 14. Next batch may add controlled local API integration or production build proof."

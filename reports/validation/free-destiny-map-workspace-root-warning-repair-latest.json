@@ -1,0 +1,25 @@
+{
+  "schema": "kingsmen.validation-report.v1",
+  "module": "BATCH 15A - Workspace Root / Lockfile Warning Repair",
+  "status": "VALIDATED",
+  "passed": true,
+  "generated_at": "2026-06-02T21:08:45.577Z",
+  "files_expected": [
+    "docs/runtime/free-destiny-map-workspace-root-warning-repair.md",
+    "manifests/runtime/free-destiny-map-workspace-root-warning-repair.json",
+    "apps/web/next.config.mjs",
+    "packages/contracts/src/free-destiny-map-workspace-root-warning-repair.ts",
+    "scripts/proof/prove-free-destiny-map-workspace-root-warning-repair.mjs",
+    "reports/runtime/free-destiny-map-workspace-root-warning-repair-proof.json",
+    "scripts/validators/validate-free-destiny-map-workspace-root-warning-repair.mjs",
+    "reports/validation/free-destiny-map-workspace-root-warning-repair-latest.json"
+  ],
+  "files_checked": 8,
+  "missing_files": [],
+  "failed_checks": [],
+  "warnings": [],
+  "oracle_lite_impact": "none_runtime_yet",
+  "control_plane_impact": "Repairs Next workspace-root ambiguity before controlled local API integration.",
+  "runtime_proof": "reports/runtime/free-destiny-map-workspace-root-warning-repair-proof.json",
+  "next_action": "Rerun BATCH 14 controlled Next boot proof, then proceed to BATCH 15B if still proven."
+}

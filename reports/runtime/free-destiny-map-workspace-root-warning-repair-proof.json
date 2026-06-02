@@ -1,0 +1,145 @@
+{
+  "schema": "kingsmen.workspace-root-warning-repair-report.v1",
+  "module": "BATCH 15A - Workspace Root / Lockfile Warning Repair",
+  "status": "WORKSPACE_ROOT_WARNING_REPAIR_APPLIED",
+  "passed": true,
+  "productionReady": false,
+  "canClaimProduction": false,
+  "generated_at": "2026-06-02T21:08:45.360Z",
+  "checks": [
+    {
+      "name": "next-config-exists",
+      "passed": true,
+      "detail": "apps/web/next.config.mjs"
+    },
+    {
+      "name": "batch-14-proof-exists",
+      "passed": true,
+      "detail": "reports/runtime/free-destiny-map-controlled-next-boot-proof.json"
+    },
+    {
+      "name": "web-package-lock-exists",
+      "passed": true,
+      "detail": "apps/web/package-lock.json"
+    },
+    {
+      "name": "repo-package-lock-preserved",
+      "passed": true,
+      "detail": "package-lock.json"
+    },
+    {
+      "name": "no-external-delete-claim",
+      "passed": true,
+      "detail": "BATCH 15A does not delete C:\\Users\\dell\\package-lock.json or any external file."
+    },
+    {
+      "name": "next-config-imports-path",
+      "passed": true,
+      "detail": "node:path import present"
+    },
+    {
+      "name": "next-config-imports-file-url",
+      "passed": true,
+      "detail": "fileURLToPath import present"
+    },
+    {
+      "name": "next-config-defines-repo-root",
+      "passed": true,
+      "detail": "repo root from apps/web"
+    },
+    {
+      "name": "next-config-sets-output-file-tracing-root",
+      "passed": true,
+      "detail": "explicit outputFileTracingRoot present"
+    },
+    {
+      "name": "next-config-keeps-external-dir",
+      "passed": true,
+      "detail": "externalDir still enabled"
+    },
+    {
+      "name": "next-config-keeps-powered-header-off",
+      "passed": true,
+      "detail": "poweredByHeader false"
+    },
+    {
+      "name": "batch-14-controlled-next-boot-proven",
+      "passed": true,
+      "detail": "status=CONTROLLED_NEXT_BOOT_PROVEN; passed=true"
+    },
+    {
+      "name": "batch-14-production-still-false",
+      "passed": true,
+      "detail": "production false"
+    },
+    {
+      "name": "batch-14-web-status-200",
+      "passed": true,
+      "detail": "webStatus=200"
+    },
+    {
+      "name": "forbidden-pattern-absent:apps/web/next.config.mjs:productionReady true",
+      "passed": true,
+      "detail": "productionReady true"
+    },
+    {
+      "name": "forbidden-pattern-absent:apps/web/next.config.mjs:canClaimProduction true",
+      "passed": true,
+      "detail": "canClaimProduction true"
+    },
+    {
+      "name": "forbidden-pattern-absent:apps/web/next.config.mjs:official application submitted true",
+      "passed": true,
+      "detail": "official application submitted true"
+    },
+    {
+      "name": "forbidden-pattern-absent:apps/web/next.config.mjs:payment instruction sent true",
+      "passed": true,
+      "detail": "payment instruction sent true"
+    },
+    {
+      "name": "forbidden-pattern-absent:apps/web/next.config.mjs:email sent true",
+      "passed": true,
+      "detail": "email sent true"
+    },
+    {
+      "name": "forbidden-pattern-absent:apps/web/next.config.mjs:document upload accepted true",
+      "passed": true,
+      "detail": "document upload accepted true"
+    },
+    {
+      "name": "forbidden-pattern-absent:packages/contracts/src/free-destiny-map-workspace-root-warning-repair.ts:productionReady true",
+      "passed": true,
+      "detail": "productionReady true"
+    },
+    {
+      "name": "forbidden-pattern-absent:packages/contracts/src/free-destiny-map-workspace-root-warning-repair.ts:canClaimProduction true",
+      "passed": true,
+      "detail": "canClaimProduction true"
+    },
+    {
+      "name": "forbidden-pattern-absent:packages/contracts/src/free-destiny-map-workspace-root-warning-repair.ts:official application submitted true",
+      "passed": true,
+      "detail": "official application submitted true"
+    },
+    {
+      "name": "forbidden-pattern-absent:packages/contracts/src/free-destiny-map-workspace-root-warning-repair.ts:payment instruction sent true",
+      "passed": true,
+      "detail": "payment instruction sent true"
+    },
+    {
+      "name": "forbidden-pattern-absent:packages/contracts/src/free-destiny-map-workspace-root-warning-repair.ts:email sent true",
+      "passed": true,
+      "detail": "email sent true"
+    },
+    {
+      "name": "forbidden-pattern-absent:packages/contracts/src/free-destiny-map-workspace-root-warning-repair.ts:document upload accepted true",
+      "passed": true,
+      "detail": "document upload accepted true"
+    }
+  ],
+  "failed": [],
+  "oracle_lite_impact": "none_runtime_yet",
+  "runtime_scope": "Next workspace-root warning repair only; no server boot; no production deployment",
+  "next_action": "Rerun BATCH 14 controlled Next boot proof to confirm warning repair, then commit."
+}

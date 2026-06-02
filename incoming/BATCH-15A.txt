@@ -1,0 +1,365 @@
+FILE: docs/runtime/free-destiny-map-workspace-root-warning-repair.md
+---
+# BATCH 15A - Workspace Root / Lockfile Warning Repair
+
+## Purpose
+
+This batch repairs the controlled Next boot warning found in BATCH 14.
+
+BATCH 14 proved the real Next dev server can boot and serve `/free-destiny-map`, but Next warned that multiple lockfiles exist and that it inferred a workspace root outside the intended Kingsmen web app boundary.
+
+This batch fixes the warning safely by explicitly setting the Next output tracing root to the Kingsmen repository root.
+
+## What this batch repairs
+
+- prevents Next from guessing the workspace root incorrectly
+- keeps the web app inside the Kingsmen repo boundary
+- avoids deleting lockfiles outside the repo
+- preserves the successful BATCH 14 boot proof
+- keeps production claims blocked
+
+## What this batch does not claim
+
+- no Oracle runtime
+- no production deployment
+- no Docker Compose boot
+- no PostgreSQL
+- no Redis
+- no email sending
+- no payment
+- no document upload
+- no official application submission
+
+## Oracle Lite impact
+
+none_runtime_yet.
+
+This is a local Next configuration repair only.
+
+## Next action
+
+After validation, rerun the controlled Next boot proof. If the warning is gone and BATCH 14 still passes, proceed to BATCH 15B controlled local web plus local API integration proof.
+---
+FILE: manifests/runtime/free-destiny-map-workspace-root-warning-repair.json
+---
+{
+  "schema": "kingsmen.workspace-root-warning-repair.v1",
+  "module": "BATCH 15A - Workspace Root / Lockfile Warning Repair",
+  "status": "BUILT_PENDING_VALIDATION",
+  "productionReady": false,
+  "repairsBatch": "BATCH 14 - Controlled Local Next Web Boot Proof",
+  "configFile": "apps/web/next.config.mjs",
+  "repair": "Set outputFileTracingRoot to the Kingsmen repository root from apps/web.",
+  "deletesExternalFiles": false,
+  "storesProductionData": false,
+  "takesPayment": false,
+  "sendsEmail": false,
+  "collectsDocuments": false,
+  "submitsOfficialApplications": false,
+  "oracleLiteImpact": "none_runtime_yet",
+  "controlPlaneImpact": "Removes Next workspace-root ambiguity before deeper local integration proof.",
+  "requiredFiles": [
+    "docs/runtime/free-destiny-map-workspace-root-warning-repair.md",
+    "manifests/runtime/free-destiny-map-workspace-root-warning-repair.json",
+    "apps/web/next.config.mjs",
+    "packages/contracts/src/free-destiny-map-workspace-root-warning-repair.ts",
+    "scripts/proof/prove-free-destiny-map-workspace-root-warning-repair.mjs",
+    "reports/runtime/free-destiny-map-workspace-root-warning-repair-proof.json",
+    "scripts/validators/validate-free-destiny-map-workspace-root-warning-repair.mjs",
+    "reports/validation/free-destiny-map-workspace-root-warning-repair-latest.json"
+  ],
+  "nextAction": "Run node scripts/proof/prove-free-destiny-map-workspace-root-warning-repair.mjs then node scripts/validators/validate-free-destiny-map-workspace-root-warning-repair.mjs"
+}
+---
+FILE: apps/web/next.config.mjs
+---
+import path from "node:path";
+import { fileURLToPath } from "node:url";
+
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
+const kingsmenRepoRoot = path.resolve(__dirname, "../..");
+
+/** @type {import('next').NextConfig} */
+const nextConfig = {
+  poweredByHeader: false,
+  reactStrictMode: true,
+  outputFileTracingRoot: kingsmenRepoRoot,
+  experimental: {
+    externalDir: true
+  }
+};
+
+export default nextConfig;
+---
+FILE: packages/contracts/src/free-destiny-map-workspace-root-warning-repair.ts
+---
+export const FREE_DESTINY_MAP_WORKSPACE_ROOT_WARNING_REPAIR_MODULE =
+  "BATCH 15A - Workspace Root / Lockfile Warning Repair" as const;
+
+export const FREE_DESTINY_MAP_WORKSPACE_ROOT_WARNING_REPAIR_CONFIG =
+  "apps/web/next.config.mjs" as const;
+
+export type FreeDestinyMapWorkspaceRootWarningRepairStatus =
+  | "WORKSPACE_ROOT_WARNING_REPAIR_APPLIED"
+  | "WORKSPACE_ROOT_WARNING_REPAIR_BLOCKED";
+
+export interface FreeDestinyMapWorkspaceRootWarningRepairCheck {
+  name: string;
+  passed: boolean;
+  detail: string;
+}
+
+export interface FreeDestinyMapWorkspaceRootWarningRepairReport {
+  schema: "kingsmen.workspace-root-warning-repair-report.v1";
+  module: typeof FREE_DESTINY_MAP_WORKSPACE_ROOT_WARNING_REPAIR_MODULE;
+  status: FreeDestinyMapWorkspaceRootWarningRepairStatus;
+  passed: boolean;
+  productionReady: false;
+  canClaimProduction: false;
+  oracleLiteImpact: "none_runtime_yet";
+  checks: FreeDestinyMapWorkspaceRootWarningRepairCheck[];
+  failed: FreeDestinyMapWorkspaceRootWarningRepairCheck[];
+  nextAction: string;
+}
+---
+FILE: scripts/proof/prove-free-destiny-map-workspace-root-warning-repair.mjs
+---
+#!/usr/bin/env node
+import fs from "node:fs";
+import path from "node:path";
+
+const root = process.cwd();
+const proofReportPath = path.join(root, "reports/runtime/free-destiny-map-workspace-root-warning-repair-proof.json");
+const checks = [];
+
+function exists(rel) {
+  return fs.existsSync(path.join(root, rel));
+}
+
+function read(rel) {
+  return fs.readFileSync(path.join(root, rel), "utf8").replace(/^\uFEFF/, "");
+}
+
+function parseJson(rel) {
+  return JSON.parse(read(rel));
+}
+
+function check(name, passed, detail = "") {
+  checks.push({ name, passed, detail });
+}
+
+check("next-config-exists", exists("apps/web/next.config.mjs"), "apps/web/next.config.mjs");
+check("batch-14-proof-exists", exists("reports/runtime/free-destiny-map-controlled-next-boot-proof.json"), "reports/runtime/free-destiny-map-controlled-next-boot-proof.json");
+check("web-package-lock-exists", exists("apps/web/package-lock.json"), "apps/web/package-lock.json");
+check("repo-package-lock-preserved", exists("package-lock.json"), "package-lock.json");
+check("no-external-delete-claim", true, "BATCH 15A does not delete C:\\Users\\dell\\package-lock.json or any external file.");
+
+if (exists("apps/web/next.config.mjs")) {
+  const config = read("apps/web/next.config.mjs");
+  check("next-config-imports-path", config.includes('import path from "node:path"'), "node:path import present");
+  check("next-config-imports-file-url", config.includes('fileURLToPath'), "fileURLToPath import present");
+  check("next-config-defines-repo-root", config.includes("kingsmenRepoRoot") && config.includes("../.."), "repo root from apps/web");
+  check("next-config-sets-output-file-tracing-root", config.includes("outputFileTracingRoot: kingsmenRepoRoot"), "explicit outputFileTracingRoot present");
+  check("next-config-keeps-external-dir", config.includes("externalDir: true"), "externalDir still enabled");
+  check("next-config-keeps-powered-header-off", config.includes("poweredByHeader: false"), "poweredByHeader false");
+}
+
+if (exists("reports/runtime/free-destiny-map-controlled-next-boot-proof.json")) {
+  const proof = parseJson("reports/runtime/free-destiny-map-controlled-next-boot-proof.json");
+  check("batch-14-controlled-next-boot-proven", proof.status === "CONTROLLED_NEXT_BOOT_PROVEN" && proof.passed === true, `status=${proof.status}; passed=${proof.passed}`);
+  check("batch-14-production-still-false", proof.productionReady === false && proof.canClaimProduction === false, "production false");
+  check("batch-14-web-status-200", proof.webStatus === 200, `webStatus=${proof.webStatus}`);
+}
+
+const forbiddenFiles = [
+  "apps/web/next.config.mjs",
+  "packages/contracts/src/free-destiny-map-workspace-root-warning-repair.ts"
+];
+
+const forbiddenPatterns = [
+  [/productionReady\s*[:=]\s*true/i, "productionReady true"],
+  [/canClaimProduction\s*[:=]\s*true/i, "canClaimProduction true"],
+  [/officialApplicationSubmitted:\s*true/i, "official application submitted true"],
+  [/paymentInstructionSent:\s*true/i, "payment instruction sent true"],
+  [/emailSent:\s*true/i, "email sent true"],
+  [/documentUploadAccepted:\s*true/i, "document upload accepted true"]
+];
+
+for (const file of forbiddenFiles) {
+  if (!exists(file)) continue;
+  const content = read(file);
+  for (const [pattern, label] of forbiddenPatterns) {
+    check(`forbidden-pattern-absent:${file}:${label}`, !pattern.test(content), label);
+  }
+}
+
+const failed = checks.filter((item) => item.passed !== true);
+const passed = failed.length === 0;
+
+const report = {
+  schema: "kingsmen.workspace-root-warning-repair-report.v1",
+  module: "BATCH 15A - Workspace Root / Lockfile Warning Repair",
+  status: passed ? "WORKSPACE_ROOT_WARNING_REPAIR_APPLIED" : "WORKSPACE_ROOT_WARNING_REPAIR_BLOCKED",
+  passed,
+  productionReady: false,
+  canClaimProduction: false,
+  generated_at: new Date().toISOString(),
+  checks,
+  failed,
+  oracle_lite_impact: "none_runtime_yet",
+  runtime_scope: "Next workspace-root warning repair only; no server boot; no production deployment",
+  next_action: passed
+    ? "Rerun BATCH 14 controlled Next boot proof to confirm warning repair, then commit."
+    : "Repair failed workspace-root warning checks."
+};
+
+fs.mkdirSync(path.dirname(proofReportPath), { recursive: true });
+fs.writeFileSync(proofReportPath, `${JSON.stringify(report, null, 2)}\n`, "utf8");
+
+console.log(JSON.stringify(report, null, 2));
+if (!passed) process.exit(1);
+---
+FILE: reports/runtime/free-destiny-map-workspace-root-warning-repair-proof.json
+---
+{
+  "schema": "kingsmen.workspace-root-warning-repair-report.v1",
+  "module": "BATCH 15A - Workspace Root / Lockfile Warning Repair",
+  "status": "WORKSPACE_ROOT_WARNING_REPAIR_BLOCKED",
+  "passed": false,
+  "productionReady": false,
+  "canClaimProduction": false,
+  "generated_at": "2026-06-02T00:00:00.000Z",
+  "checks": [],
+  "failed": [
+    {
+      "name": "workspace_root_warning_repair_not_yet_executed",
+      "passed": false,
+      "detail": "Run scripts/proof/prove-free-destiny-map-workspace-root-warning-repair.mjs."
+    }
+  ],
+  "oracle_lite_impact": "none_runtime_yet",
+  "runtime_scope": "Next workspace-root warning repair only; no server boot; no production deployment",
+  "next_action": "Run BATCH 15A workspace-root warning repair proof."
+}
+---
+FILE: scripts/validators/validate-free-destiny-map-workspace-root-warning-repair.mjs
+---
+#!/usr/bin/env node
+import fs from "node:fs";
+import path from "node:path";
+
+const root = process.cwd();
+const reportPath = path.join(root, "reports/validation/free-destiny-map-workspace-root-warning-repair-latest.json");
+
+const requiredFiles = [
+  "docs/runtime/free-destiny-map-workspace-root-warning-repair.md",
+  "manifests/runtime/free-destiny-map-workspace-root-warning-repair.json",
+  "apps/web/next.config.mjs",
+  "packages/contracts/src/free-destiny-map-workspace-root-warning-repair.ts",
+  "scripts/proof/prove-free-destiny-map-workspace-root-warning-repair.mjs",
+  "reports/runtime/free-destiny-map-workspace-root-warning-repair-proof.json",
+  "scripts/validators/validate-free-destiny-map-workspace-root-warning-repair.mjs",
+  "reports/validation/free-destiny-map-workspace-root-warning-repair-latest.json"
+];
+
+function exists(rel) {
+  return fs.existsSync(path.join(root, rel));
+}
+
+function read(rel) {
+  return fs.readFileSync(path.join(root, rel), "utf8").replace(/^\uFEFF/, "");
+}
+
+function parseJson(rel) {
+  return JSON.parse(read(rel));
+}
+
+const failures = [];
+const warnings = [];
+const checked = [];
+
+for (const file of requiredFiles) {
+  checked.push(file);
+  if (!exists(file)) failures.push(`Missing required file: ${file}`);
+  else if (fs.statSync(path.join(root, file)).size === 0) failures.push(`Empty required file: ${file}`);
+}
+
+if (exists("manifests/runtime/free-destiny-map-workspace-root-warning-repair.json")) {
+  const manifest = parseJson("manifests/runtime/free-destiny-map-workspace-root-warning-repair.json");
+  if (manifest.productionReady !== false) failures.push("Manifest must keep productionReady false.");
+  if (manifest.deletesExternalFiles !== false) failures.push("Manifest must declare deletesExternalFiles false.");
+  if (manifest.storesProductionData !== false) failures.push("Manifest must declare storesProductionData false.");
+  if (manifest.takesPayment !== false) failures.push("Manifest must declare takesPayment false.");
+  if (manifest.sendsEmail !== false) failures.push("Manifest must declare sendsEmail false.");
+  if (manifest.collectsDocuments !== false) failures.push("Manifest must declare collectsDocuments false.");
+  if (manifest.submitsOfficialApplications !== false) failures.push("Manifest must declare submitsOfficialApplications false.");
+  if (!String(manifest.oracleLiteImpact ?? "").includes("none_runtime_yet")) failures.push("Manifest must declare none_runtime_yet.");
+}
+
+const tokenChecks = [
+  ["apps/web/next.config.mjs", ["outputFileTracingRoot", "kingsmenRepoRoot", "../..", "externalDir"]],
+  ["packages/contracts/src/free-destiny-map-workspace-root-warning-repair.ts", ["WORKSPACE_ROOT_WARNING_REPAIR_APPLIED", "canClaimProduction: false"]],
+  ["scripts/proof/prove-free-destiny-map-workspace-root-warning-repair.mjs", ["WORKSPACE_ROOT_WARNING_REPAIR_APPLIED", "outputFileTracingRoot", "no-external-delete-claim"]],
+  ["reports/runtime/free-destiny-map-workspace-root-warning-repair-proof.json", ["schema", "module", "status"]]
+];
+
+for (const [file, tokens] of tokenChecks) {
+  if (!exists(file)) continue;
+  const content = read(file);
+  for (const token of tokens) {
+    if (!content.includes(token)) failures.push(`${file} missing token: ${token}`);
+  }
+}
+
+if (exists("reports/runtime/free-destiny-map-workspace-root-warning-repair-proof.json")) {
+  const proof = parseJson("reports/runtime/free-destiny-map-workspace-root-warning-repair-proof.json");
+  if (proof.passed !== true) failures.push("Workspace root warning repair proof must pass.");
+  if (proof.status !== "WORKSPACE_ROOT_WARNING_REPAIR_APPLIED") failures.push("Workspace root warning repair proof status must be WORKSPACE_ROOT_WARNING_REPAIR_APPLIED.");
+  if (proof.productionReady !== false) failures.push("Workspace root warning repair proof must keep productionReady false.");
+  if (proof.canClaimProduction !== false) failures.push("Workspace root warning repair proof must keep canClaimProduction false.");
+}
+
+const passed = failures.length === 0;
+
+const report = {
+  schema: "kingsmen.validation-report.v1",
+  module: "BATCH 15A - Workspace Root / Lockfile Warning Repair",
+  status: passed ? "VALIDATED" : "BUILT_PENDING_VALIDATION",
+  passed,
+  generated_at: new Date().toISOString(),
+  files_expected: requiredFiles,
+  files_checked: checked.length,
+  missing_files: requiredFiles.filter((file) => !exists(file)),
+  failed_checks: failures,
+  warnings,
+  oracle_lite_impact: "none_runtime_yet",
+  control_plane_impact: "Repairs Next workspace-root ambiguity before controlled local API integration.",
+  runtime_proof: "reports/runtime/free-destiny-map-workspace-root-warning-repair-proof.json",
+  next_action: passed ? "Rerun BATCH 14 controlled Next boot proof, then proceed to BATCH 15B if still proven." : "Repair workspace-root warning repair failures."
+};
+
+fs.mkdirSync(path.dirname(reportPath), { recursive: true });
+fs.writeFileSync(reportPath, `${JSON.stringify(report, null, 2)}\n`, "utf8");
+
+console.log(JSON.stringify(report, null, 2));
+if (!passed) process.exit(1);
+---
+FILE: reports/validation/free-destiny-map-workspace-root-warning-repair-latest.json
+---
+{
+  "schema": "kingsmen.validation-report.v1",
+  "module": "BATCH 15A - Workspace Root / Lockfile Warning Repair",
+  "status": "BUILT_PENDING_VALIDATION",
+  "passed": false,
+  "generated_at": "2026-06-02T00:00:00.000Z",
+  "reason": "Seed report. Run BATCH 15A workspace root warning repair proof then validator.",
+  "files_checked": 0,
+  "failed_checks": [
+    "validator_not_yet_executed"
+  ],
+  "oracle_lite_impact": "none_runtime_yet",
+  "control_plane_impact": "Repairs Next workspace-root ambiguity before controlled local API integration.",
+  "runtime_proof": "reports/runtime/free-destiny-map-workspace-root-warning-repair-proof.json",
+  "next_action": "Run node scripts/proof/prove-free-destiny-map-workspace-root-warning-repair.mjs then node scripts/validators/validate-free-destiny-map-workspace-root-warning-repair.mjs."
+}
