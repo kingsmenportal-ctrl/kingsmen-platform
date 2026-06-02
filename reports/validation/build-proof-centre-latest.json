@@ -3,7 +3,7 @@
   "module": "BATCH 03 - Build Proof Centre",
   "status": "VALIDATED",
   "passed": true,
-  "generated_at": "2026-06-02T17:12:19.317Z",
+  "generated_at": "2026-06-02T17:17:05.700Z",
   "files_expected": [
     "docs/proof/build-proof-centre.md",
     "manifests/proof/build-proof-centre.json",
