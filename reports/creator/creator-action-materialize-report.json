@@ -4,11 +4,11 @@
     "submodule":  "CREATOR.2B",
     "action":  "Materialize",
     "productionReady":  false,
-    "generatedAt":  "2026-06-02T17:12:17.024Z",
+    "generatedAt":  "2026-06-02T17:23:51.426Z",
     "repoRoot":  "C:\\Users\\dell\\kingsmen-platform",
     "passed":  true,
     "detail":  "Materialize complete.",
-    "totalChecks":  9,
+    "totalChecks":  11,
     "failedChecks":  0,
     "failed":  [
 
@@ -17,45 +17,55 @@
                    {
                        "name":  "materialize:blocks",
                        "passed":  true,
-                       "detail":  "blocks=8"
+                       "detail":  "blocks=10"
                    },
                    {
-                       "name":  "materialize:wrote:docs/proof/build-proof-centre.md",
+                       "name":  "materialize:wrote:docs/public/first-public-website-free-destiny-map.md",
                        "passed":  true,
                        "detail":  "written"
                    },
                    {
-                       "name":  "materialize:wrote:manifests/proof/build-proof-centre.json",
+                       "name":  "materialize:wrote:manifests/public/free-destiny-map-shell.json",
                        "passed":  true,
                        "detail":  "written"
                    },
                    {
-                       "name":  "materialize:wrote:packages/contracts/src/build-proof-centre.ts",
+                       "name":  "materialize:wrote:packages/contracts/src/free-destiny-map.ts",
                        "passed":  true,
                        "detail":  "written"
                    },
                    {
-                       "name":  "materialize:wrote:apps/web/src/components/kingsmen/BuildProofStatusCard.tsx",
+                       "name":  "materialize:wrote:apps/web/src/components/kingsmen/PublicRouteCard.tsx",
                        "passed":  true,
                        "detail":  "written"
                    },
                    {
-                       "name":  "materialize:wrote:apps/web/src/components/kingsmen/BuildProofCentreShell.tsx",
+                       "name":  "materialize:wrote:apps/web/src/components/kingsmen/FreeDestinyMapFormShell.tsx",
                        "passed":  true,
                        "detail":  "written"
                    },
                    {
-                       "name":  "materialize:wrote:apps/web/src/app/founder/build-proof/page.tsx",
+                       "name":  "materialize:wrote:apps/web/src/components/kingsmen/PublicWebsiteShell.tsx",
                        "passed":  true,
                        "detail":  "written"
                    },
                    {
-                       "name":  "materialize:wrote:scripts/validators/validate-build-proof-centre.mjs",
+                       "name":  "materialize:wrote:apps/web/src/app/kingsmen/page.tsx",
                        "passed":  true,
                        "detail":  "written"
                    },
                    {
-                       "name":  "materialize:wrote:reports/validation/build-proof-centre-latest.json",
+                       "name":  "materialize:wrote:apps/web/src/app/free-destiny-map/page.tsx",
+                       "passed":  true,
+                       "detail":  "written"
+                   },
+                   {
+                       "name":  "materialize:wrote:scripts/validators/validate-public-website-free-destiny-map.mjs",
+                       "passed":  true,
+                       "detail":  "written"
+                   },
+                   {
+                       "name":  "materialize:wrote:reports/validation/public-website-free-destiny-map-latest.json",
                        "passed":  true,
                        "detail":  "written"
                    }

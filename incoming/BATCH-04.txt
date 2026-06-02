@@ -1,0 +1,521 @@
+FILE: docs/public/first-public-website-free-destiny-map.md
+---
+# BATCH 04 - First Public Website + Free Destiny Map Shell
+
+## Purpose
+
+This batch creates the first public Kingsmen website shell and Free Destiny Map entry surface.
+
+It is not yet a live production website, payment system, real submission engine, or connected backend intake. It is a validated public-facing shell that explains Kingsmen safely and gives the user a first route-aware entry point.
+
+## Public promise
+
+Kingsmen helps users map their movement across:
+
+- higher education
+- TVET
+- SETA / learnership routes
+- internships
+- apprenticeships
+- employment
+- NSFAS and bursary readiness
+- accommodation needs
+- CV readiness
+- document readiness
+- source confidence
+- fallback / Phoenix direction
+
+## Hard safety rules
+
+Kingsmen must not claim:
+
+- guaranteed acceptance
+- guaranteed NSFAS/funding
+- guaranteed job placement
+- guaranteed accommodation
+- official partnership with an institution unless verified
+- current opening/deadline/fee without source verification
+- production readiness before runtime proof
+
+## Free Destiny Map purpose
+
+The Free Destiny Map is a fast first-intake route map.
+
+It helps the user tell Kingsmen:
+
+- who they are
+- what they want
+- whether they are confused or know the route
+- what province/location matters
+- whether they need accommodation
+- whether they need CV help
+- whether they need funding/NSFAS/bursary support
+- whether they heard about a random bursary, job, college, learnership, accommodation, or training provider
+- what documents they already have
+
+At this shell stage, the form is not yet connected to backend storage.
+
+## Oracle Lite impact
+
+none_runtime_yet.
+
+This batch creates static route/page/components/contracts/validator only.
+
+## Next action
+
+After validation, the next batch should connect the shell to a safe local intake contract or continue the public website UI.
+---
+FILE: manifests/public/free-destiny-map-shell.json
+---
+{
+  "schema": "kingsmen.public-surface.v1",
+  "module": "BATCH 04 - First Public Website + Free Destiny Map Shell",
+  "status": "BUILT_PENDING_VALIDATION",
+  "productionReady": false,
+  "routes": [
+    "/kingsmen",
+    "/free-destiny-map"
+  ],
+  "coverage": [
+    "higher_education",
+    "tvet",
+    "seta_learnerships",
+    "internships",
+    "apprenticeships",
+    "employment",
+    "nsfas_bursaries",
+    "accommodation",
+    "cv_readiness",
+    "documents",
+    "source_confidence",
+    "phoenix_fallback"
+  ],
+  "requiredFiles": [
+    "docs/public/first-public-website-free-destiny-map.md",
+    "manifests/public/free-destiny-map-shell.json",
+    "packages/contracts/src/free-destiny-map.ts",
+    "apps/web/src/components/kingsmen/PublicRouteCard.tsx",
+    "apps/web/src/components/kingsmen/FreeDestinyMapFormShell.tsx",
+    "apps/web/src/components/kingsmen/PublicWebsiteShell.tsx",
+    "apps/web/src/app/kingsmen/page.tsx",
+    "apps/web/src/app/free-destiny-map/page.tsx",
+    "scripts/validators/validate-public-website-free-destiny-map.mjs",
+    "reports/validation/public-website-free-destiny-map-latest.json"
+  ],
+  "forbiddenClaims": [
+    "guaranteed acceptance",
+    "guaranteed funding",
+    "guaranteed job",
+    "guaranteed accommodation",
+    "official partner",
+    "productionReady true"
+  ],
+  "oracleLiteImpact": "none_runtime_yet",
+  "controlPlaneImpact": "Adds first public user-facing website and Free Destiny Map shell.",
+  "nextAction": "Run node scripts/validators/validate-public-website-free-destiny-map.mjs"
+}
+---
+FILE: packages/contracts/src/free-destiny-map.ts
+---
+export type KingsmenPublicRouteKey =
+  | "higher_education"
+  | "tvet"
+  | "seta_learnerships"
+  | "internships"
+  | "apprenticeships"
+  | "employment"
+  | "nsfas_bursaries"
+  | "accommodation"
+  | "cv_readiness"
+  | "documents"
+  | "source_confidence"
+  | "phoenix_fallback";
+
+export interface KingsmenPublicRouteCard {
+  key: KingsmenPublicRouteKey;
+  title: string;
+  shortFact: string;
+  userNeed: string;
+  kingsmenHelp: string;
+}
+
+export interface FreeDestinyMapDraft {
+  fullName?: string;
+  province?: string;
+  currentSituation?: string;
+  knownRoute?: string;
+  needsAccommodation?: boolean;
+  needsFundingHelp?: boolean;
+  needsCvHelp?: boolean;
+  hasDocumentsReady?: boolean;
+  randomSourceName?: string;
+  consentToBeContacted?: boolean;
+}
+
+export interface FreeDestinyMapShellModel {
+  productionReady: false;
+  title: "Free Destiny Map";
+  disclaimer: string;
+  routeCards: KingsmenPublicRouteCard[];
+}
+
+export const FREE_DESTINY_MAP_DISCLAIMER =
+  "Kingsmen does not guarantee acceptance, funding, jobs, accommodation, or official outcomes. Kingsmen helps you map routes, documents, source confidence, next steps, and fallback options.";
+
+export const KINGSMEN_PUBLIC_ROUTE_CARDS: KingsmenPublicRouteCard[] = [
+  {
+    key: "higher_education",
+    title: "University routes",
+    shortFact: "University planning is not only choosing a name. It includes documents, funding, location, proof and backup routes.",
+    userNeed: "For users applying to or exploring public/private university routes.",
+    kingsmenHelp: "Kingsmen helps map readiness, requirements, funding needs, accommodation needs and fallback routes."
+  },
+  {
+    key: "tvet",
+    title: "TVET routes",
+    shortFact: "TVET is part of South Africa's post-school movement and can connect to practical, vocational and work-facing routes.",
+    userNeed: "For users who want college, skills, campus and practical route options.",
+    kingsmenHelp: "Kingsmen helps compare TVET, funding, documents, location and next-step readiness."
+  },
+  {
+    key: "seta_learnerships",
+    title: "SETA and learnership routes",
+    shortFact: "Learnership routes often involve source checks, CV readiness, documents, location and training/work attendance.",
+    userNeed: "For users who heard about or are searching for learnerships and skills programmes.",
+    kingsmenHelp: "Kingsmen helps check source confidence and prepare CV, documents and route fit."
+  },
+  {
+    key: "employment",
+    title: "Work and CV routes",
+    shortFact: "A CV is not separate from the route. It connects to qualification, location, documents and opportunity source confidence.",
+    userNeed: "For job seekers, internship seekers and apprenticeship candidates.",
+    kingsmenHelp: "Kingsmen helps prepare the CV path and connect it to route planning."
+  },
+  {
+    key: "nsfas_bursaries",
+    title: "Funding and bursary readiness",
+    shortFact: "Admission and funding are separate problems. Users may need documents, proof and backup funding routes.",
+    userNeed: "For users who need NSFAS, bursary or funding guidance.",
+    kingsmenHelp: "Kingsmen helps map documents, official-source confidence and next actions."
+  },
+  {
+    key: "accommodation",
+    title: "Accommodation route",
+    shortFact: "Accommodation is not just a room. It depends on campus, workplace, training site, budget, documents, proof and source safety.",
+    userNeed: "For users who may need a place near study, work, learnership, internship, apprenticeship or training.",
+    kingsmenHelp: "Kingsmen helps capture the need and connect it to the full route. Package users can see this as part of their current Kingsmen support where relevant."
+  }
+];
+---
+FILE: apps/web/src/components/kingsmen/PublicRouteCard.tsx
+---
+type PublicRouteCardProps = {
+  title: string;
+  shortFact: string;
+  userNeed: string;
+  kingsmenHelp: string;
+};
+
+export function PublicRouteCard({ title, shortFact, userNeed, kingsmenHelp }: PublicRouteCardProps) {
+  return (
+    <article style={{ border: "1px solid rgba(212,175,55,0.35)", borderRadius: 18, padding: 18, background: "#08111f", color: "#f8fafc" }}>
+      <p style={{ margin: 0, color: "#d4af37", fontSize: 12, letterSpacing: "0.12em", textTransform: "uppercase" }}>Route</p>
+      <h3 style={{ margin: "8px 0", fontSize: 20 }}>{title}</h3>
+      <p style={{ color: "#e2e8f0", lineHeight: 1.6 }}>{shortFact}</p>
+      <p style={{ color: "#cbd5e1", lineHeight: 1.6 }}><strong>User need:</strong> {userNeed}</p>
+      <p style={{ color: "#cbd5e1", lineHeight: 1.6 }}><strong>Kingsmen helps:</strong> {kingsmenHelp}</p>
+    </article>
+  );
+}
+---
+FILE: apps/web/src/components/kingsmen/FreeDestinyMapFormShell.tsx
+---
+export function FreeDestinyMapFormShell() {
+  const fieldStyle = {
+    width: "100%",
+    padding: "12px 14px",
+    borderRadius: 12,
+    border: "1px solid rgba(212,175,55,0.35)",
+    background: "#020617",
+    color: "#f8fafc"
+  };
+
+  const labelStyle = {
+    display: "block",
+    marginBottom: 6,
+    color: "#f8fafc",
+    fontSize: 13
+  };
+
+  return (
+    <section style={{ border: "1px solid rgba(212,175,55,0.35)", borderRadius: 22, padding: 22, background: "rgba(2,6,23,0.92)", color: "#f8fafc" }}>
+      <p style={{ margin: 0, color: "#d4af37", letterSpacing: "0.12em", textTransform: "uppercase", fontSize: 12 }}>Free first map</p>
+      <h2 style={{ marginTop: 8 }}>Start your Free Destiny Map</h2>
+      <p style={{ color: "#cbd5e1", lineHeight: 1.7 }}>
+        This shell captures the first user intent. Backend saving, email delivery, source checks and proof tracking come in later batches.
+      </p>
+
+      <form style={{ display: "grid", gap: 14 }}>
+        <label>
+          <span style={labelStyle}>Your name</span>
+          <input style={fieldStyle} placeholder="Full name" />
+        </label>
+
+        <label>
+          <span style={labelStyle}>Province / area</span>
+          <input style={fieldStyle} placeholder="Example: KwaZulu-Natal, Gauteng, Eastern Cape" />
+        </label>
+
+        <label>
+          <span style={labelStyle}>What are you trying to do?</span>
+          <select style={fieldStyle} defaultValue="">
+            <option value="" disabled>Select one</option>
+            <option>Apply to university</option>
+            <option>Explore TVET</option>
+            <option>Find learnership / SETA route</option>
+            <option>Find job / internship / apprenticeship</option>
+            <option>Need NSFAS or bursary readiness</option>
+            <option>Need accommodation</option>
+            <option>Improve CV</option>
+            <option>I am confused and need a full map</option>
+          </select>
+        </label>
+
+        <label>
+          <span style={labelStyle}>Heard about a random opportunity or place?</span>
+          <input style={fieldStyle} placeholder="Bursary, job, college, landlord, learnership, accommodation, training provider..." />
+        </label>
+
+        <label>
+          <span style={labelStyle}>What do you already have?</span>
+          <textarea style={{ ...fieldStyle, minHeight: 110 }} placeholder="Documents, CV, marks, ID, proof, known route, accommodation need..." />
+        </label>
+
+        <button type="button" style={{ border: 0, borderRadius: 999, padding: "13px 18px", background: "#d4af37", color: "#020617", fontWeight: 800 }}>
+          Shell only - backend connection comes next
+        </button>
+      </form>
+    </section>
+  );
+}
+---
+FILE: apps/web/src/components/kingsmen/PublicWebsiteShell.tsx
+---
+import { PublicRouteCard } from "./PublicRouteCard";
+import { FreeDestinyMapFormShell } from "./FreeDestinyMapFormShell";
+
+const routeCards = [
+  {
+    title: "University routes",
+    shortFact: "A study route includes documents, funding, accommodation, proof and backup options.",
+    userNeed: "For users applying or exploring higher education.",
+    kingsmenHelp: "Kingsmen maps route readiness, documents, source confidence and next actions."
+  },
+  {
+    title: "TVET routes",
+    shortFact: "TVET can be a practical post-school route, not an insult or last resort.",
+    userNeed: "For users looking at colleges, campuses and work-facing study routes.",
+    kingsmenHelp: "Kingsmen maps TVET, funding, accommodation, documents and fallback routes."
+  },
+  {
+    title: "SETA / learnership routes",
+    shortFact: "Learnership routes often depend on CV, documents, source confidence, location and attendance.",
+    userNeed: "For users searching for learnerships, skills programmes and training routes.",
+    kingsmenHelp: "Kingsmen checks the route and prepares the user before they move blindly."
+  },
+  {
+    title: "Work / internship / apprenticeship",
+    shortFact: "A job route is stronger when the CV, documents, location and opportunity source are ready.",
+    userNeed: "For users who want employment, internships or apprenticeships.",
+    kingsmenHelp: "Kingsmen links CV readiness to real movement planning."
+  },
+  {
+    title: "NSFAS / bursary readiness",
+    shortFact: "Funding and admission are separate problems. Both need documents and proof.",
+    userNeed: "For users needing funding direction or bursary source checks.",
+    kingsmenHelp: "Kingsmen maps documents, source confidence and backup funding routes."
+  },
+  {
+    title: "Accommodation",
+    shortFact: "A room only helps when it matches campus, workplace, training site, budget and source safety.",
+    userNeed: "For users who may need a credible place near study, work, learnership, internship, apprenticeship or training.",
+    kingsmenHelp: "Kingsmen captures accommodation need as part of the full route."
+  }
+];
+
+export function PublicWebsiteShell() {
+  return (
+    <main style={{ minHeight: "100vh", background: "#050816", color: "#f8fafc" }}>
+      <section style={{ padding: "44px 24px", maxWidth: 1180, margin: "0 auto" }}>
+        <p style={{ color: "#d4af37", letterSpacing: "0.16em", textTransform: "uppercase" }}>Kingsmen Portal</p>
+        <h1 style={{ fontSize: 44, lineHeight: 1.08, margin: "10px 0" }}>Map your study, work, funding, accommodation and fallback route.</h1>
+        <p style={{ maxWidth: 820, color: "#cbd5e1", lineHeight: 1.8 }}>
+          Kingsmen helps South African users move with a map, not panic. Start with a Free Destiny Map across university, TVET,
+          SETA, learnerships, internships, apprenticeships, employment, NSFAS, bursaries, accommodation, CV and documents.
+        </p>
+        <p style={{ maxWidth: 820, color: "#fde68a", lineHeight: 1.7 }}>
+          Kingsmen does not guarantee acceptance, funding, jobs, accommodation or official outcomes. It helps you check readiness,
+          source confidence, documents, proof and next actions.
+        </p>
+
+        <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(260px, 1fr))", gap: 16, marginTop: 28 }}>
+          {routeCards.map((card) => (
+            <PublicRouteCard key={card.title} {...card} />
+          ))}
+        </div>
+
+        <div style={{ marginTop: 28 }}>
+          <FreeDestinyMapFormShell />
+        </div>
+      </section>
+    </main>
+  );
+}
+---
+FILE: apps/web/src/app/kingsmen/page.tsx
+---
+import { PublicWebsiteShell } from "../../components/kingsmen/PublicWebsiteShell";
+
+export default function KingsmenPublicPage() {
+  return <PublicWebsiteShell />;
+}
+---
+FILE: apps/web/src/app/free-destiny-map/page.tsx
+---
+import { FreeDestinyMapFormShell } from "../../components/kingsmen/FreeDestinyMapFormShell";
+
+export default function FreeDestinyMapPage() {
+  return (
+    <main style={{ minHeight: "100vh", padding: 28, background: "#050816" }}>
+      <section style={{ maxWidth: 880, margin: "0 auto" }}>
+        <FreeDestinyMapFormShell />
+      </section>
+    </main>
+  );
+}
+---
+FILE: scripts/validators/validate-public-website-free-destiny-map.mjs
+---
+#!/usr/bin/env node
+import fs from "node:fs";
+import path from "node:path";
+
+const root = process.cwd();
+const reportPath = path.join(root, "reports/validation/public-website-free-destiny-map-latest.json");
+
+const requiredFiles = [
+  "docs/public/first-public-website-free-destiny-map.md",
+  "manifests/public/free-destiny-map-shell.json",
+  "packages/contracts/src/free-destiny-map.ts",
+  "apps/web/src/components/kingsmen/PublicRouteCard.tsx",
+  "apps/web/src/components/kingsmen/FreeDestinyMapFormShell.tsx",
+  "apps/web/src/components/kingsmen/PublicWebsiteShell.tsx",
+  "apps/web/src/app/kingsmen/page.tsx",
+  "apps/web/src/app/free-destiny-map/page.tsx",
+  "scripts/validators/validate-public-website-free-destiny-map.mjs",
+  "reports/validation/public-website-free-destiny-map-latest.json"
+];
+
+function exists(rel) {
+  return fs.existsSync(path.join(root, rel));
+}
+
+function read(rel) {
+  return fs.readFileSync(path.join(root, rel), "utf8").replace(/^\uFEFF/, "");
+}
+
+function parseJson(rel) {
+  return JSON.parse(read(rel));
+}
+
+const failures = [];
+const warnings = [];
+const checked = [];
+
+for (const file of requiredFiles) {
+  checked.push(file);
+  if (!exists(file)) failures.push(`Missing required file: ${file}`);
+  else if (fs.statSync(path.join(root, file)).size === 0) failures.push(`Empty required file: ${file}`);
+}
+
+if (exists("manifests/public/free-destiny-map-shell.json")) {
+  const manifest = parseJson("manifests/public/free-destiny-map-shell.json");
+  if (manifest.productionReady !== false) failures.push("Manifest must keep productionReady false.");
+  if (!String(manifest.oracleLiteImpact ?? "").includes("none_runtime_yet")) failures.push("Manifest must declare none_runtime_yet.");
+  for (const route of ["/kingsmen", "/free-destiny-map"]) {
+    if (!manifest.routes?.includes(route)) failures.push(`Manifest missing route ${route}`);
+  }
+}
+
+const tokenChecks = [
+  ["packages/contracts/src/free-destiny-map.ts", ["FreeDestinyMapDraft", "KINGSMEN_PUBLIC_ROUTE_CARDS", "FREE_DESTINY_MAP_DISCLAIMER", "accommodation", "cv_readiness"]],
+  ["apps/web/src/components/kingsmen/PublicWebsiteShell.tsx", ["University routes", "TVET routes", "SETA", "NSFAS", "Accommodation", "does not guarantee"]],
+  ["apps/web/src/components/kingsmen/FreeDestinyMapFormShell.tsx", ["Free Destiny Map", "Need accommodation", "Improve CV", "backend connection comes next"]],
+  ["apps/web/src/app/kingsmen/page.tsx", ["PublicWebsiteShell"]],
+  ["apps/web/src/app/free-destiny-map/page.tsx", ["FreeDestinyMapFormShell"]]
+];
+
+for (const [file, tokens] of tokenChecks) {
+  if (!exists(file)) continue;
+  const content = read(file);
+  for (const token of tokens) {
+    if (!content.includes(token)) failures.push(`${file} missing token: ${token}`);
+  }
+}
+
+const forbiddenPatterns = [
+  [/guaranteed acceptance/i, "guaranteed acceptance"],
+  [/guaranteed funding/i, "guaranteed funding"],
+  [/guaranteed job/i, "guaranteed job"],
+  [/guaranteed accommodation/i, "guaranteed accommodation"],
+  [/productionReady\s*[:=]\s*true/i, "productionReady true"]
+];
+
+for (const file of requiredFiles.filter((item) => exists(item))) {
+  const content = read(file);
+  for (const [pattern, label] of forbiddenPatterns) {
+    if (pattern.test(content)) failures.push(`${file} contains forbidden claim: ${label}`);
+  }
+}
+
+const passed = failures.length === 0;
+
+const report = {
+  schema: "kingsmen.validation-report.v1",
+  module: "BATCH 04 - First Public Website + Free Destiny Map Shell",
+  status: passed ? "VALIDATED" : "BUILT_PENDING_VALIDATION",
+  passed,
+  generated_at: new Date().toISOString(),
+  files_expected: requiredFiles,
+  files_checked: checked.length,
+  missing_files: requiredFiles.filter((file) => !exists(file)),
+  failed_checks: failures,
+  warnings,
+  oracle_lite_impact: "none_runtime_yet",
+  control_plane_impact: "Adds first public user-facing Kingsmen shell and Free Destiny Map route.",
+  next_action: passed ? "Proceed to BATCH 05 - Free Destiny Map intake contract/backend shell or next approved batch." : "Repair public website shell failures and rerun validator."
+};
+
+fs.mkdirSync(path.dirname(reportPath), { recursive: true });
+fs.writeFileSync(reportPath, `${JSON.stringify(report, null, 2)}\n`, "utf8");
+
+console.log(JSON.stringify(report, null, 2));
+if (!passed) process.exit(1);
+---
+FILE: reports/validation/public-website-free-destiny-map-latest.json
+---
+{
+  "schema": "kingsmen.validation-report.v1",
+  "module": "BATCH 04 - First Public Website + Free Destiny Map Shell",
+  "status": "BUILT_PENDING_VALIDATION",
+  "passed": false,
+  "generated_at": "2026-06-02T00:00:00.000Z",
+  "reason": "Seed report. Run scripts/validators/validate-public-website-free-destiny-map.mjs.",
+  "files_checked": 0,
+  "failed_checks": [
+    "validator_not_yet_executed"
+  ],
+  "oracle_lite_impact": "none_runtime_yet",
+  "control_plane_impact": "Adds first public user-facing Kingsmen shell and Free Destiny Map route.",
+  "next_action": "Run node scripts/validators/validate-public-website-free-destiny-map.mjs."
+}

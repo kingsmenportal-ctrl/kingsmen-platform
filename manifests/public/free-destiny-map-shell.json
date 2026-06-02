@@ -1,0 +1,47 @@
+{
+  "schema": "kingsmen.public-surface.v1",
+  "module": "BATCH 04 - First Public Website + Free Destiny Map Shell",
+  "status": "BUILT_PENDING_VALIDATION",
+  "productionReady": false,
+  "routes": [
+    "/kingsmen",
+    "/free-destiny-map"
+  ],
+  "coverage": [
+    "higher_education",
+    "tvet",
+    "seta_learnerships",
+    "internships",
+    "apprenticeships",
+    "employment",
+    "nsfas_bursaries",
+    "accommodation",
+    "cv_readiness",
+    "documents",
+    "source_confidence",
+    "phoenix_fallback"
+  ],
+  "requiredFiles": [
+    "docs/public/first-public-website-free-destiny-map.md",
+    "manifests/public/free-destiny-map-shell.json",
+    "packages/contracts/src/free-destiny-map.ts",
+    "apps/web/src/components/kingsmen/PublicRouteCard.tsx",
+    "apps/web/src/components/kingsmen/FreeDestinyMapFormShell.tsx",
+    "apps/web/src/components/kingsmen/PublicWebsiteShell.tsx",
+    "apps/web/src/app/kingsmen/page.tsx",
+    "apps/web/src/app/free-destiny-map/page.tsx",
+    "scripts/validators/validate-public-website-free-destiny-map.mjs",
+    "reports/validation/public-website-free-destiny-map-latest.json"
+  ],
+  "forbiddenClaims": [
+    "guaranteed acceptance",
+    "guaranteed funding",
+    "guaranteed job",
+    "guaranteed accommodation",
+    "official partner",
+    "productionReady true"
+  ],
+  "oracleLiteImpact": "none_runtime_yet",
+  "controlPlaneImpact": "Adds first public user-facing website and Free Destiny Map shell.",
+  "nextAction": "Run node scripts/validators/validate-public-website-free-destiny-map.mjs"
+}
