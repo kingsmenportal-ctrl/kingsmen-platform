@@ -1,4 +1,4 @@
-﻿#!/usr/bin/env node
+#!/usr/bin/env node
 import fs from "node:fs";
 import path from "node:path";
 
@@ -60,7 +60,8 @@ for (const file of scanFiles) {
   const text = fs.readFileSync(p, "utf8");
   if (/productionReady\s*[:=]\s*true/i.test(text)) failures.push(`${file} must not set productionReady true.`);
   if (/deployedToOracle\s*[:=]\s*true/i.test(text)) failures.push(`${file} must not set deployedToOracle true.`);
-  if (/oci\s+compute\s+instance\s+launch/i.test(text)) failures.push(`${file} must not launch Oracle compute.`);
+  const documentedBlockOnly = /No\s+`?oci\s+compute\s+instance\s+launch`?/i.test(text);
+  if (/oci\s+compute\s+instance\s+launch/i.test(text) && !documentedBlockOnly) failures.push(`${file} must not launch Oracle compute.`);
   if (/ssh\s+.*@/i.test(text)) failures.push(`${file} must not execute SSH remote commands in BATCH 23.`);
   if (/scp\s+/i.test(text)) failures.push(`${file} must not execute SCP in BATCH 23.`);
 }

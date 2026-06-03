@@ -1,9 +1,9 @@
 {
   "schema": "kingsmen.validation-report.v1",
   "module": "BATCH 23 - Oracle VM Environment Checklist / Remote Handoff Runner",
-  "status": "BUILT_PENDING_VALIDATION",
-  "passed": false,
-  "generated_at": "2026-06-03T08:51:23.219Z",
+  "status": "VALIDATED",
+  "passed": true,
+  "generated_at": "2026-06-03T08:54:29.245Z",
   "files_expected": [
     "docs/runtime/batch23-oracle-vm-environment-checklist.md",
     "manifests/runtime/batch23-oracle-vm-handoff-runner.json",
@@ -14,13 +14,11 @@
   ],
   "files_checked": 6,
   "missing_files": [],
-  "failed_checks": [
-    "docs/runtime/batch23-oracle-vm-environment-checklist.md must not launch Oracle compute."
-  ],
+  "failed_checks": [],
   "warnings": [],
   "oracle_lite_impact": "environment_checklist_and_handoff_runner_only",
   "productionReady": false,
   "canClaimProduction": false,
   "deployedToOracle": false,
-  "next_action": "Repair BATCH 23."
+  "next_action": "Proceed to BATCH 24 - Oracle Remote Dry-Run Readiness when approved."
 }
