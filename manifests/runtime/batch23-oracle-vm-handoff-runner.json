@@ -1,0 +1,33 @@
+﻿{
+  "schema": "kingsmen.batch23.oracle-vm-handoff-runner.v1",
+  "module": "BATCH 23 - Oracle VM Environment Checklist / Remote Handoff Runner",
+  "status": "BUILT_PENDING_VALIDATION",
+  "productionReady": false,
+  "canClaimProduction": false,
+  "deployedToOracle": false,
+  "runsOracleCommands": false,
+  "runsRemoteCommands": false,
+  "requiresPaidOracle": false,
+  "usesSecrets": false,
+  "oracle_lite_impact": "environment_checklist_and_handoff_runner_only",
+  "depends_on": [
+    "BATCH 22 - Docker Runtime Health Hardening / Oracle Lite VM Handoff Preparation"
+  ],
+  "required_environment_names": [
+    "ORACLE_VM_HOST",
+    "ORACLE_VM_USER",
+    "ORACLE_SSH_KEY_PATH",
+    "KINGSMEN_REMOTE_PATH"
+  ],
+  "blocked_actions": [
+    "oci_compute_instance_launch",
+    "paid_oracle_resource_creation",
+    "production_claim",
+    "live_payment",
+    "live_email",
+    "document_upload_runtime",
+    "official_application_submission",
+    "secret_commit"
+  ],
+  "next_action": "Run BATCH 23 validator, commit proof, then proceed to BATCH 24 remote dry-run readiness when approved."
+}
