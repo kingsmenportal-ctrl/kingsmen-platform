@@ -1,0 +1,23 @@
+{
+  "schema": "kingsmen.validation-report.v1",
+  "module": "N_PROVIDER.5 - 25 Connected Apps + Supabase Reality Map",
+  "status": "BUILT_PENDING_VALIDATION",
+  "passed": false,
+  "generated_at": "2026-06-03T06:50:25.120Z",
+  "files_expected": [
+    "docs/providers/N_PROVIDER_5_CONNECTED_APPS_REALITY_MAP.md",
+    "manifests/providers/connected-apps-provider-map.json",
+    "scripts/validators/validate-connected-apps-provider-map.mjs",
+    "reports/providers/connected-apps-provider-map-latest.json"
+  ],
+  "files_checked": 4,
+  "provider_count": 0,
+  "missing_files": [],
+  "failed_checks": [
+    "Provider manifest cannot be parsed."
+  ],
+  "warnings": [],
+  "oracle_lite_impact": "none_provider_map_only",
+  "control_plane_impact": "Creates provider reality map and gates visible apps before production use.",
+  "next_action": "Repair provider map."
+}
