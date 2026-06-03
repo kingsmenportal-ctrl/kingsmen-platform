@@ -1,0 +1,30 @@
+{
+  "schema": "kingsmen.docker-oracle-lite-controlled-runtime-report.v1",
+  "module": "BATCH 21 - Controlled Docker Local Runtime Proof",
+  "status": "DOCKER_LOCAL_RUNTIME_FAILED",
+  "passed": false,
+  "productionReady": false,
+  "canClaimProduction": false,
+  "deployedToOracle": false,
+  "generated_at": "2026-06-02T00:00:00.000Z",
+  "dockerRunsInThisBatch": true,
+  "dockerBuildsInThisBatch": false,
+  "composeUpInThisBatch": true,
+  "composeDownInThisBatch": true,
+  "composeUpSucceeded": false,
+  "composeDownSucceeded": false,
+  "apiHealthStatus": 0,
+  "webStatus": 0,
+  "bridgeApiStatus": 0,
+  "checks": [],
+  "failed": [
+    {
+      "name": "docker_oracle_lite_controlled_runtime_not_yet_executed",
+      "passed": false,
+      "detail": "Run scripts/runtime/Invoke-DockerOracleLiteControlledRuntime.ps1."
+    }
+  ],
+  "oracle_lite_impact": "controlled_local_docker_runtime_only",
+  "runtime_scope": "controlled Docker local runtime proof only; no Oracle deployment; no public production URL",
+  "next_action": "Run BATCH 21 controlled Docker local runtime proof."
+}
