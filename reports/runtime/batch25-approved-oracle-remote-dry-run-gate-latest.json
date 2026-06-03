@@ -1,0 +1,25 @@
+{
+  "schema": "kingsmen.validation-report.v1",
+  "module": "BATCH 25 - Approved Oracle Remote Dry-Run Execution Gate",
+  "status": "VALIDATED",
+  "passed": true,
+  "generated_at": "2026-06-03T09:11:35.632Z",
+  "files_expected": [
+    "docs/runtime/batch25-approved-oracle-remote-dry-run-gate.md",
+    "manifests/runtime/batch25-approved-oracle-remote-dry-run-gate.json",
+    "scripts/runtime/Invoke-Batch25ApprovedOracleRemoteDryRunGate.ps1",
+    "scripts/validators/validate-batch25-approved-oracle-remote-dry-run-gate.mjs",
+    "reports/runtime/batch25-approved-oracle-remote-dry-run-gate-latest.json",
+    "reports/runtime/batch24-oracle-remote-dry-run-readiness-latest.json"
+  ],
+  "files_checked": 6,
+  "missing_files": [],
+  "failed_checks": [],
+  "warnings": [],
+  "oracle_lite_impact": "approved_remote_dry_run_gate_only",
+  "productionReady": false,
+  "canClaimProduction": false,
+  "deployedToOracle": false,
+  "runsRemoteCommands": false,
+  "next_action": "Proceed to BATCH 26 approved remote read-only checks when explicitly approved."
+}

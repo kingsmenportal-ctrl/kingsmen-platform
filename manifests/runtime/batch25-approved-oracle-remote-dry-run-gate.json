@@ -1,0 +1,44 @@
+﻿{
+  "schema": "kingsmen.batch25.approved-oracle-remote-dry-run-gate.v1",
+  "module": "BATCH 25 - Approved Oracle Remote Dry-Run Execution Gate",
+  "status": "BUILT_PENDING_VALIDATION",
+  "productionReady": false,
+  "canClaimProduction": false,
+  "deployedToOracle": false,
+  "requiresApprovedDryRunFlag": true,
+  "runsOracleCommands": false,
+  "runsRemoteCommandsByDefault": false,
+  "copiesFilesToOracle": false,
+  "requiresPaidOracle": false,
+  "usesSecrets": false,
+  "oracle_lite_impact": "approved_remote_dry_run_gate_only",
+  "depends_on": [
+    "BATCH 24 - Oracle Remote Dry-Run Readiness"
+  ],
+  "required_environment_names": [
+    "ORACLE_VM_HOST",
+    "ORACLE_VM_USER",
+    "ORACLE_SSH_KEY_PATH",
+    "KINGSMEN_REMOTE_PATH"
+  ],
+  "allowed_when_approved": [
+    "ssh_read_only_hostname_check",
+    "ssh_read_only_docker_version_check",
+    "ssh_read_only_git_version_check",
+    "ssh_read_only_disk_check",
+    "ssh_read_only_memory_check"
+  ],
+  "blocked_actions": [
+    "oci_compute_instance_launch",
+    "paid_oracle_resource_creation",
+    "production_deployment",
+    "public_url_claim",
+    "live_database_migration",
+    "live_payment",
+    "live_email",
+    "document_upload_runtime",
+    "official_application_submission",
+    "secret_commit"
+  ],
+  "next_action": "Run BATCH 25 validator, commit proof, then proceed to BATCH 26 approved remote read-only checks."
+}
