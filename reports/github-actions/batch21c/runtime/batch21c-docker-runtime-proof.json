@@ -1,0 +1,89 @@
+{
+  "schema": "kingsmen.batch21c.github-actions-docker-runtime-report.v1",
+  "module": "BATCH 21C - GitHub Actions Docker Runtime Proof",
+  "status": "GITHUB_ACTIONS_DOCKER_RUNTIME_PROVEN",
+  "passed": true,
+  "productionReady": false,
+  "canClaimProduction": false,
+  "deployedToOracle": false,
+  "generated_at": "2026-06-02T21:12:30.960Z",
+  "runsInGitHubActions": true,
+  "composeUpSucceeded": true,
+  "composeDownSucceeded": true,
+  "apiHealthStatus": 200,
+  "webStatus": 200,
+  "bridgeApiStatus": 202,
+  "backend_bridge_succeeded": true,
+  "backend_boundary_reached": true,
+  "backend_local_write_succeeded": true,
+  "checks": [
+    {
+      "name": "ci-compose-down-before",
+      "passed": true,
+      "detail": "exit=0; "
+    },
+    {
+      "name": "ci-compose-up-no-build",
+      "passed": true,
+      "detail": "exit=0;  Network kingsmen-oracle-lite-local_default  Creating\n Network kingsmen-oracle-lite-local_default  Created\n Container kingsmen-api-local  Creating\n Container kingsmen-api-local  Created\n Container kingsmen-web-local  Creating\n Container kingsmen-web-local  Created\n Container kingsmen-api-local  Starting\n Container kingsmen-api-local  Started\n Container kingsmen-web-local  Starting\n Container kingsmen-web-local  Started\n"
+    },
+    {
+      "name": "ci-compose-ps-has-services",
+      "passed": true,
+      "detail": "NAME                 IMAGE                            COMMAND                  SERVICE        CREATED        STATUS                  PORTS\nkingsmen-api-local   kingsmen/api:oracle-lite-local   \"docker-entrypoint.s…\"   kingsmen-api   1 second ago   Up Less than a second   127.0.0.1:3001->3001/tcp\nkingsmen-web-local   kingsmen/web:oracle-lite-local   \"docker-entrypoint.s…\"   kingsmen-web   1 second ago   Up Less than a second   127.0.0.1:3000->3000/tcp\n"
+    },
+    {
+      "name": "ci-api-health-200",
+      "passed": true,
+      "detail": "HTTP 200"
+    },
+    {
+      "name": "ci-web-page-200",
+      "passed": true,
+      "detail": "HTTP 200"
+    },
+    {
+      "name": "ci-web-page-has-free-destiny-map",
+      "passed": true,
+      "detail": "page text"
+    },
+    {
+      "name": "ci-bridge-api-202",
+      "passed": true,
+      "detail": "status=202"
+    },
+    {
+      "name": "ci-bridge-backend-succeeded",
+      "passed": true,
+      "detail": "backendBridgeSucceeded true"
+    },
+    {
+      "name": "ci-bridge-backend-boundary-reached",
+      "passed": true,
+      "detail": "backendBoundaryReached true"
+    },
+    {
+      "name": "ci-backend-local-write-succeeded",
+      "passed": true,
+      "detail": "backend local write"
+    },
+    {
+      "name": "ci-production-false",
+      "passed": true,
+      "detail": "production/oracle false"
+    },
+    {
+      "name": "ci-no-payment-email-document-official",
+      "passed": true,
+      "detail": "blocked high-risk outputs false"
+    },
+    {
+      "name": "ci-compose-down-after",
+      "passed": true,
+      "detail": "exit=0;  Container kingsmen-web-local  Stopping\n Container kingsmen-web-local  Stopped\n Container kingsmen-web-local  Removing\n Container kingsmen-web-local  Removed\n Container kingsmen-api-local  Stopping\n Container kingsmen-api-local  Stopped\n Container kingsmen-api-local  Removing\n Container kingsmen-api-local  Removed\n Network kingsmen-oracle-lite-local_default  Removing\n Network kingsmen-oracle-lite-local_default  Removed\n"
+    }
+  ],
+  "failed": [],
+  "oracle_lite_impact": "ci_docker_runtime_proof_only",
+  "next_action": "Run validator and proceed to N_PROVIDER.5."
+}
