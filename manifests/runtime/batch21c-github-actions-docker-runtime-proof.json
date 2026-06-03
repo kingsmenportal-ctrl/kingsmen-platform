@@ -1,0 +1,18 @@
+﻿{
+  "schema": "kingsmen.batch21c.github-actions-docker-runtime-proof.v1",
+  "module": "BATCH 21C - GitHub Actions Docker Runtime Proof",
+  "status": "BUILT_PENDING_CI_VALIDATION",
+  "productionReady": false,
+  "canClaimProduction": false,
+  "deployedToOracle": false,
+  "runsInGitHubActions": true,
+  "dockerBuildsInThisBatch": true,
+  "dockerRunsInThisBatch": true,
+  "composeUpInThisBatch": true,
+  "composeDownInThisBatch": true,
+  "apiHealthUrl": "http://127.0.0.1:3001/health",
+  "webUrl": "http://127.0.0.1:3000/free-destiny-map",
+  "bridgeApiUrl": "http://127.0.0.1:3000/api/public/free-destiny-map/intake/local",
+  "oracleLiteImpact": "ci_docker_runtime_proof_only",
+  "nextAction": "Push to GitHub and confirm the BATCH 21C workflow passes."
+}

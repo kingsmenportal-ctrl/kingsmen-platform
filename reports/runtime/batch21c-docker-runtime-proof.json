@@ -1,0 +1,26 @@
+﻿{
+  "schema": "kingsmen.batch21c.github-actions-docker-runtime-report.v1",
+  "module": "BATCH 21C - GitHub Actions Docker Runtime Proof",
+  "status": "GITHUB_ACTIONS_DOCKER_RUNTIME_FAILED",
+  "passed": false,
+  "productionReady": false,
+  "canClaimProduction": false,
+  "deployedToOracle": false,
+  "generated_at": "2026-06-02T00:00:00.000Z",
+  "runsInGitHubActions": true,
+  "composeUpSucceeded": false,
+  "composeDownSucceeded": false,
+  "apiHealthStatus": 0,
+  "webStatus": 0,
+  "bridgeApiStatus": 0,
+  "checks": [],
+  "failed": [
+    {
+      "name": "batch21c_ci_proof_not_yet_executed",
+      "passed": false,
+      "detail": "GitHub Actions workflow must run and produce proof."
+    }
+  ],
+  "oracle_lite_impact": "ci_docker_runtime_proof_only",
+  "next_action": "Push workflow and run GitHub Actions BATCH 21C proof."
+}

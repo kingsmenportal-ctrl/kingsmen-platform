@@ -1,0 +1,42 @@
+﻿name: BATCH 21C - Docker Runtime Proof
+
+on:
+  workflow_dispatch:
+  push:
+    branches: [ main ]
+
+permissions:
+  contents: read
+
+jobs:
+  prove-docker-runtime:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Show Docker versions
+        run: |
+          docker --version
+          docker compose version
+          node --version
+
+      - name: Build API image
+        run: docker build -f apps/api/Dockerfile.oracle-lite -t kingsmen/api:oracle-lite-local .
+
+      - name: Build Web image
+        run: docker build -f apps/web/Dockerfile.oracle-lite -t kingsmen/web:oracle-lite-local .
+
+      - name: Prove Docker runtime
+        run: node scripts/proof/prove-docker-oracle-lite-controlled-runtime-ci.mjs
+
+      - name: Validate CI proof
+        run: node scripts/validators/validate-docker-oracle-lite-controlled-runtime-ci.mjs
+
+      - name: Upload proof reports
+        uses: actions/upload-artifact@v4
+        with:
+          name: batch21c-docker-runtime-proof
+          path: |
+            reports/runtime/batch21c-docker-runtime-proof.json
+            reports/validation/batch21c-docker-runtime-proof-latest.json
