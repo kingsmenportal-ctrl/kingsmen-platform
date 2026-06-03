@@ -1,0 +1,25 @@
+{
+  "schema": "kingsmen.validation-report.v1",
+  "module": "AGENTS-01 - Kingsmen Agent System",
+  "status": "VALIDATED",
+  "passed": true,
+  "generated_at": "2026-06-03T07:04:31.194Z",
+  "files_expected": [
+    "docs/agents/KINGSMEN_AGENT_SYSTEM.md",
+    "docs/agents/AGENT_AUTHORITY_BOUNDARY.md",
+    "docs/agents/AGENT_HANDOFF_RULES.md",
+    "docs/agents/AGENT_RISK_REGISTER.md",
+    "manifests/agents/kingsmen-agent-system.json",
+    "scripts/validators/validate-kingsmen-agent-system.mjs",
+    "reports/agents/kingsmen-agent-system-latest.json",
+    "reports/tools/connected-tool-activation-gates-latest.json"
+  ],
+  "files_checked": 8,
+  "agent_count": 30,
+  "missing_files": [],
+  "failed_checks": [],
+  "warnings": [],
+  "oracle_lite_impact": "none_agent_map_only",
+  "control_plane_impact": "Creates Kingsmen agent authority and handoff system before Oracle Lite handoff.",
+  "next_action": "Proceed to BATCH 22 - Docker Runtime Health Hardening / Oracle Lite VM Handoff Preparation."
+}
