@@ -3,7 +3,7 @@
   "module": "BATCH 21 - Controlled Docker Local Runtime Proof",
   "status": "BUILT_PENDING_VALIDATION",
   "passed": false,
-  "generated_at": "2026-06-03T02:13:46.054Z",
+  "generated_at": "2026-06-03T04:32:16.608Z",
   "files_expected": [
     "docs/runtime/docker-oracle-lite-controlled-runtime-proof.md",
     "manifests/runtime/docker-oracle-lite-controlled-runtime-proof.json",
@@ -32,8 +32,7 @@
     "Runtime proof must record bridgeApiStatus 202.",
     "Runtime proof must record backend_bridge_succeeded true.",
     "Runtime proof must record backend_boundary_reached true.",
-    "Runtime proof must record backend_local_write_succeeded true.",
-    "Runtime proof must include detailed checks."
+    "Runtime proof must record backend_local_write_succeeded true."
   ],
   "warnings": [],
   "oracle_lite_impact": "controlled_local_docker_runtime_only",

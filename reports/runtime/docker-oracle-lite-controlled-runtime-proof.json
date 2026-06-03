@@ -6,7 +6,7 @@
   "productionReady": false,
   "canClaimProduction": false,
   "deployedToOracle": false,
-  "generated_at": "2026-06-02T00:00:00.000Z",
+  "generated_at": "2026-06-03T02:49:22.743Z",
   "dockerRunsInThisBatch": true,
   "dockerBuildsInThisBatch": false,
   "composeUpInThisBatch": true,
@@ -16,15 +16,340 @@
   "apiHealthStatus": 0,
   "webStatus": 0,
   "bridgeApiStatus": 0,
-  "checks": [],
+  "apiImage": "kingsmen/api:oracle-lite-local",
+  "webImage": "kingsmen/web:oracle-lite-local",
+  "apiImageId": "sha256:9174b163a838703f8cba51bb7ce2d8764d33f6aef4e2514b97689a12173f0378",
+  "webImageId": "sha256:c52fc95761f13261f00cfa814fb1692faf9363e0cad37768a8c4d36badc25541",
+  "apiHealthUrl": "http://127.0.0.1:3001/health",
+  "webUrl": "http://127.0.0.1:3000/free-destiny-map",
+  "bridgeApiUrl": "http://127.0.0.1:3000/api/public/free-destiny-map/intake/local",
+  "api_response_reference": null,
+  "backend_reference": null,
+  "backend_bridge_succeeded": false,
+  "backend_boundary_reached": false,
+  "backend_local_write_succeeded": false,
+  "local_data_file": "data/local/free-destiny-map/backend-runtime-boundary/backend-runtime-demo-intakes.jsonl",
+  "checks": [
+    {
+      "name": "required-file-exists:reports/runtime/docker-oracle-lite-controlled-build-proof.json",
+      "passed": true,
+      "detail": "reports/runtime/docker-oracle-lite-controlled-build-proof.json"
+    },
+    {
+      "name": "required-file-exists:reports/runtime/docker-oracle-lite-container-preparation-proof.json",
+      "passed": true,
+      "detail": "reports/runtime/docker-oracle-lite-container-preparation-proof.json"
+    },
+    {
+      "name": "required-file-exists:docker/oracle-lite/docker-compose.local.yml",
+      "passed": true,
+      "detail": "docker/oracle-lite/docker-compose.local.yml"
+    },
+    {
+      "name": "required-file-exists:apps/web/Dockerfile.oracle-lite",
+      "passed": true,
+      "detail": "apps/web/Dockerfile.oracle-lite"
+    },
+    {
+      "name": "required-file-exists:apps/api/Dockerfile.oracle-lite",
+      "passed": true,
+      "detail": "apps/api/Dockerfile.oracle-lite"
+    },
+    {
+      "name": "required-file-exists:data/local/.gitignore",
+      "passed": true,
+      "detail": "data/local/.gitignore"
+    },
+    {
+      "name": "batch-20-docker-build-proven",
+      "passed": true,
+      "detail": "status=DOCKER_LOCAL_BUILD_PROVEN; passed=true"
+    },
+    {
+      "name": "batch-20-docker-builds-succeeded",
+      "passed": true,
+      "detail": "api=0; web=0"
+    },
+    {
+      "name": "batch-20-no-runtime-started",
+      "passed": true,
+      "detail": "BATCH 20 build only"
+    },
+    {
+      "name": "batch-20-production-oracle-false",
+      "passed": true,
+      "detail": "production/oracle false"
+    },
+    {
+      "name": "compose-defines-api-and-web",
+      "passed": true,
+      "detail": "api/web services"
+    },
+    {
+      "name": "compose-uses-localhost-ports",
+      "passed": true,
+      "detail": "localhost ports"
+    },
+    {
+      "name": "compose-bridge-env-present",
+      "passed": true,
+      "detail": "bridge env"
+    },
+    {
+      "name": "compose-backend-write-enabled",
+      "passed": true,
+      "detail": "backend local write enabled"
+    },
+    {
+      "name": "compose-no-postgres-yet",
+      "passed": true,
+      "detail": "no postgres service in BATCH 21"
+    },
+    {
+      "name": "compose-no-redis-yet",
+      "passed": true,
+      "detail": "no redis service in BATCH 21"
+    },
+    {
+      "name": "demo-payload-has-consent",
+      "passed": true,
+      "detail": "consent true"
+    },
+    {
+      "name": "demo-payload-has-route-intent",
+      "passed": true,
+      "detail": "route intent present"
+    },
+    {
+      "name": "demo-payload-no-sensitive-fields",
+      "passed": true,
+      "detail": "no sensitive field keys"
+    },
+    {
+      "name": "docker-daemon-available",
+      "passed": true,
+      "detail": "ure: x86_64\n CPUs: 4\n Total Memory: 3.778GiB\n Name: docker-desktop\n ID: 44ba6ebc-c937-4dd0-93ea-00f3af8bab9e\n Docker Root Dir: /var/lib/docker\n Debug Mode: false\n HTTP Proxy: http.docker.internal:3128\n HTTPS Proxy: http.docker.internal:3128\n No Proxy: hubproxy.docker.internal\n Labels:\n  com.docker.desktop.address=npipe://\\\\.\\pipe\\docker_cli\n Experimental: false\n Insecure Registries:\n  hubproxy.docker.internal:5555\n  ::1/128\n  127.0.0.0/8\n Live Restore Enabled: false\n Firewall Backend: iptables\n\n"
+    },
+    {
+      "name": "docker-runtime-api-image-exists",
+      "passed": true,
+      "detail": "sha256:9174b163a838703f8cba51bb7ce2d8764d33f6aef4e2514b97689a12173f0378"
+    },
+    {
+      "name": "docker-runtime-web-image-exists",
+      "passed": true,
+      "detail": "sha256:c52fc95761f13261f00cfa814fb1692faf9363e0cad37768a8c4d36badc25541"
+    },
+    {
+      "name": "docker-runtime-compose-down-before",
+      "passed": false,
+      "detail": "exit=1; timedOut=false"
+    },
+    {
+      "name": "docker-runtime-compose-up-no-build",
+      "passed": false,
+      "detail": "exit=1; timedOut=false; error=none"
+    },
+    {
+      "name": "docker-runtime-compose-ps-runs",
+      "passed": false,
+      "detail": "compose ps includes web/api"
+    },
+    {
+      "name": "docker-runtime-api-health-200",
+      "passed": false,
+      "detail": "fetch failed"
+    },
+    {
+      "name": "docker-runtime-api-health-production-false",
+      "passed": false,
+      "detail": "production false"
+    },
+    {
+      "name": "docker-runtime-api-health-oracle-false",
+      "passed": false,
+      "detail": "deployedToOracle false"
+    },
+    {
+      "name": "docker-runtime-web-page-200",
+      "passed": false,
+      "detail": "fetch failed"
+    },
+    {
+      "name": "docker-runtime-web-page-has-free-destiny-map",
+      "passed": false,
+      "detail": "Free Destiny Map text"
+    },
+    {
+      "name": "docker-runtime-exception-absent",
+      "passed": false,
+      "detail": "fetch failed"
+    },
+    {
+      "name": "docker-runtime-compose-down-after",
+      "passed": false,
+      "detail": "exit=1; timedOut=false"
+    },
+    {
+      "name": "docker-runtime-no-oracle-deploy-output",
+      "passed": true,
+      "detail": "no Oracle deployment output"
+    },
+    {
+      "name": "docker-runtime-no-production-true",
+      "passed": true,
+      "detail": "productionReady true absent"
+    },
+    {
+      "name": "docker-runtime-no-official-submission-true",
+      "passed": true,
+      "detail": "officialApplicationSubmitted true absent"
+    },
+    {
+      "name": "docker-runtime-no-payment-true",
+      "passed": true,
+      "detail": "paymentInstructionSent true absent"
+    },
+    {
+      "name": "docker-runtime-no-email-true",
+      "passed": true,
+      "detail": "emailSent true absent"
+    },
+    {
+      "name": "docker-runtime-no-document-upload-true",
+      "passed": true,
+      "detail": "documentUploadAccepted true absent"
+    }
+  ],
   "failed": [
     {
-      "name": "docker_oracle_lite_controlled_runtime_not_yet_executed",
+      "name": "docker-runtime-compose-down-before",
       "passed": false,
-      "detail": "Run scripts/runtime/Invoke-DockerOracleLiteControlledRuntime.ps1."
+      "detail": "exit=1; timedOut=false"
+    },
+    {
+      "name": "docker-runtime-compose-up-no-build",
+      "passed": false,
+      "detail": "exit=1; timedOut=false; error=none"
+    },
+    {
+      "name": "docker-runtime-compose-ps-runs",
+      "passed": false,
+      "detail": "compose ps includes web/api"
+    },
+    {
+      "name": "docker-runtime-api-health-200",
+      "passed": false,
+      "detail": "fetch failed"
+    },
+    {
+      "name": "docker-runtime-api-health-production-false",
+      "passed": false,
+      "detail": "production false"
+    },
+    {
+      "name": "docker-runtime-api-health-oracle-false",
+      "passed": false,
+      "detail": "deployedToOracle false"
+    },
+    {
+      "name": "docker-runtime-web-page-200",
+      "passed": false,
+      "detail": "fetch failed"
+    },
+    {
+      "name": "docker-runtime-web-page-has-free-destiny-map",
+      "passed": false,
+      "detail": "Free Destiny Map text"
+    },
+    {
+      "name": "docker-runtime-exception-absent",
+      "passed": false,
+      "detail": "fetch failed"
+    },
+    {
+      "name": "docker-runtime-compose-down-after",
+      "passed": false,
+      "detail": "exit=1; timedOut=false"
     }
+  ],
+  "stdout_tail": [
+    "Client:",
+    " Version:    29.4.3",
+    " Context:    desktop-linux",
+    " Debug Mode: false",
+    "Server:",
+    " Containers: 1",
+    "  Running: 0",
+    "  Paused: 0",
+    "  Stopped: 1",
+    " Images: 28",
+    " Server Version: 29.4.3",
+    " Storage Driver: overlay2",
+    "  Backing Filesystem: extfs",
+    "  Supports d_type: true",
+    "  Using metacopy: false",
+    "  Native Overlay Diff: true",
+    "  userxattr: false",
+    " Logging Driver: json-file",
+    " Cgroup Driver: cgroupfs",
+    " Cgroup Version: 2",
+    " Plugins:",
+    "  Volume: local",
+    "  Network: bridge host ipvlan macvlan null overlay",
+    "  Log: awslogs fluentd gcplogs gelf journald json-file local splunk syslog",
+    " CDI spec directories:",
+    "  /etc/cdi",
+    "  /var/run/cdi",
+    " Discovered Devices:",
+    "  cdi: docker.com/gpu=webgpu",
+    " Swarm: inactive",
+    " Runtimes: io.containerd.runc.v2 nvidia runc",
+    " Default Runtime: runc",
+    " Init Binary: docker-init",
+    " containerd version: 77c84241c7cbdd9b4eca2591793e3d4f4317c590",
+    " runc version: v1.3.5-0-g488fc13e",
+    " init version: de40ad0",
+    " Security Options:",
+    "  seccomp",
+    "   Profile: builtin",
+    "  cgroupns",
+    " Kernel Version: 6.6.114.1-microsoft-standard-WSL2",
+    " Operating System: Docker Desktop",
+    " OSType: linux",
+    " Architecture: x86_64",
+    " CPUs: 4",
+    " Total Memory: 3.778GiB",
+    " Name: docker-desktop",
+    " ID: 44ba6ebc-c937-4dd0-93ea-00f3af8bab9e",
+    " Docker Root Dir: /var/lib/docker",
+    " Debug Mode: false",
+    " HTTP Proxy: http.docker.internal:3128",
+    " HTTPS Proxy: http.docker.internal:3128",
+    " No Proxy: hubproxy.docker.internal",
+    " Labels:",
+    "  com.docker.desktop.address=npipe://\\\\.\\pipe\\docker_cli",
+    " Experimental: false",
+    " Insecure Registries:",
+    "  hubproxy.docker.internal:5555",
+    "  ::1/128",
+    "  127.0.0.0/8",
+    " Live Restore Enabled: false",
+    " Firewall Backend: iptables",
+    "sha256:9174b163a838703f8cba51bb7ce2d8764d33f6aef4e2514b97689a12173f0378",
+    "sha256:c52fc95761f13261f00cfa814fb1692faf9363e0cad37768a8c4d36badc25541"
+  ],
+  "stderr_tail": [
+    "'\\\"docker\\\"' is not recognized as an internal or external command,",
+    "operable program or batch file.",
+    "'\\\"docker\\\"' is not recognized as an internal or external command,",
+    "operable program or batch file.",
+    "'\\\"docker\\\"' is not recognized as an internal or external command,",
+    "operable program or batch file.",
+    "'\\\"docker\\\"' is not recognized as an internal or external command,",
+    "operable program or batch file."
   ],
   "oracle_lite_impact": "controlled_local_docker_runtime_only",
   "runtime_scope": "controlled Docker local runtime proof only; no Oracle deployment; no public production URL",
-  "next_action": "Run BATCH 21 controlled Docker local runtime proof."
+  "next_action": "Repair Docker local runtime failures before moving forward."
 }
