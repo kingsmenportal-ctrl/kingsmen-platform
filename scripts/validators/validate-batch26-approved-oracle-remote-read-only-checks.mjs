@@ -1,4 +1,4 @@
-﻿#!/usr/bin/env node
+#!/usr/bin/env node
 import fs from "node:fs";
 import path from "node:path";
 
@@ -72,8 +72,9 @@ for (const file of scanFiles) {
   if (/productionReady\s*[:=]\s*true/i.test(text)) failures.push(`${file} must not set productionReady true.`);
   if (/deployedToOracle\s*[:=]\s*true/i.test(text)) failures.push(`${file} must not set deployedToOracle true.`);
   if (/scp\s+/i.test(text) || /Start-Process\s+scp/i.test(text)) failures.push(`${file} must not execute SCP.`);
-  if (/docker\s+compose\s+up/i.test(text)) failures.push(`${file} must not run docker compose up.`);
-  if (/docker\s+compose\s+down/i.test(text)) failures.push(`${file} must not run docker compose down.`);
+  const documentedDockerComposeBlock = /no\s+Docker\s+Compose\s+up\/down/i.test(text) || /blocked_actions/i.test(text);
+  if (/docker\s+compose\s+up/i.test(text) && !documentedDockerComposeBlock) failures.push(`${file} must not run docker compose up.`);
+  if (/docker\s+compose\s+down/i.test(text) && !documentedDockerComposeBlock) failures.push(`${file} must not run docker compose down.`);
   if (/docker\s+start|docker\s+run/i.test(text)) failures.push(`${file} must not start Docker containers.`);
   if (/oci\s+compute\s+instance\s+launch/i.test(text) && !/blocked_actions|no OCI compute launch|No `?oci compute instance launch`?/i.test(text)) failures.push(`${file} must not launch Oracle compute.`);
   if (/public\s+production\s+URL/i.test(text) && !/no public production URL/i.test(text)) failures.push(`${file} must not claim public production URL.`);

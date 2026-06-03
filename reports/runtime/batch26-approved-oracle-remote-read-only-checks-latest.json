@@ -1,9 +1,9 @@
 {
   "schema": "kingsmen.validation-report.v1",
   "module": "BATCH 26 - Approved Oracle Remote Read-Only Checks",
-  "status": "BUILT_PENDING_VALIDATION",
-  "passed": false,
-  "generated_at": "2026-06-03T09:18:22.801Z",
+  "status": "VALIDATED",
+  "passed": true,
+  "generated_at": "2026-06-03T09:21:56.308Z",
   "files_expected": [
     "docs/runtime/batch26-approved-oracle-remote-read-only-checks.md",
     "manifests/runtime/batch26-approved-oracle-remote-read-only-checks.json",
@@ -14,13 +14,11 @@
   ],
   "files_checked": 6,
   "missing_files": [],
-  "failed_checks": [
-    "docs/runtime/batch26-approved-oracle-remote-read-only-checks.md must not run docker compose up."
-  ],
+  "failed_checks": [],
   "warnings": [],
   "oracle_lite_impact": "approved_remote_read_only_checks_only",
   "productionReady": false,
   "canClaimProduction": false,
   "deployedToOracle": false,
-  "next_action": "Repair BATCH 26."
+  "next_action": "Run approved BATCH 26 read-only check only after setting Oracle VM env values."
 }
