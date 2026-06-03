@@ -3,7 +3,7 @@
   "module": "BATCH 21 - Controlled Docker Local Runtime Proof",
   "status": "BUILT_PENDING_VALIDATION",
   "passed": false,
-  "generated_at": "2026-06-03T01:12:04.282Z",
+  "generated_at": "2026-06-03T01:25:23.660Z",
   "files_expected": [
     "docs/runtime/docker-oracle-lite-controlled-runtime-proof.md",
     "manifests/runtime/docker-oracle-lite-controlled-runtime-proof.json",
