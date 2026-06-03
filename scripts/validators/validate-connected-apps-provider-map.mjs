@@ -1,4 +1,4 @@
-﻿#!/usr/bin/env node
+#!/usr/bin/env node
 import fs from "node:fs";
 import path from "node:path";
 
@@ -22,7 +22,7 @@ for (const file of requiredFiles) {
 
 let manifest = null;
 try {
-  manifest = JSON.parse(fs.readFileSync(manifestPath, "utf8"));
+  manifest = JSON.parse(fs.readFileSync(manifestPath, "utf8").replace(/^\uFEFF/, ""));
 } catch {
   failures.push("Provider manifest cannot be parsed.");
 }
