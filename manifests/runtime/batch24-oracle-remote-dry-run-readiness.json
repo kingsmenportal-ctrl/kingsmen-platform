@@ -1,0 +1,47 @@
+﻿{
+  "schema": "kingsmen.batch24.oracle-remote-dry-run-readiness.v1",
+  "module": "BATCH 24 - Oracle Remote Dry-Run Readiness",
+  "status": "BUILT_PENDING_VALIDATION",
+  "productionReady": false,
+  "canClaimProduction": false,
+  "deployedToOracle": false,
+  "runsOracleCommands": false,
+  "runsRemoteCommands": false,
+  "copiesFilesToOracle": false,
+  "requiresPaidOracle": false,
+  "usesSecrets": false,
+  "oracle_lite_impact": "remote_dry_run_readiness_only",
+  "depends_on": [
+    "BATCH 23 - Oracle VM Environment Checklist / Remote Handoff Runner"
+  ],
+  "required_environment_names": [
+    "ORACLE_VM_HOST",
+    "ORACLE_VM_USER",
+    "ORACLE_SSH_KEY_PATH",
+    "KINGSMEN_REMOTE_PATH"
+  ],
+  "future_remote_checks_not_executed_here": [
+    "remote_hostname",
+    "docker_version",
+    "docker_compose_version",
+    "remote_target_path",
+    "disk_space",
+    "memory",
+    "git_available",
+    "firewall_readiness"
+  ],
+  "blocked_actions": [
+    "ssh_execution",
+    "scp_execution",
+    "oci_compute_instance_launch",
+    "paid_oracle_resource_creation",
+    "production_claim",
+    "public_url_claim",
+    "live_payment",
+    "live_email",
+    "document_upload_runtime",
+    "official_application_submission",
+    "secret_commit"
+  ],
+  "next_action": "Run BATCH 24 validator, commit proof, then proceed to BATCH 25 only when remote dry-run execution is approved."
+}
