@@ -136,6 +136,89 @@ function runDocker(args, options = {}) {
   });
 }
 
+
+function quoteShellArg(value) {
+  const text = String(value);
+  if (process.platform === "win32") {
+    return `"${text.replace(/"/g, '\\"')}"`;
+  }
+  return `'${text.replace(/'/g, `'\\''`)}'`;
+}
+
+function runDockerCompose(args, options = {}) {
+  const timeout = options.timeoutMs ?? 60000;
+  const collectOutput = options.collectOutput !== false;
+  const normalizedArgs = Array.isArray(args) && args[0] === "compose" ? args.slice(1) : args;
+
+  return new Promise((resolve) => {
+    const out = [];
+    const err = [];
+    let timedOut = false;
+
+    const commandText = ["docker", "compose", ...normalizedArgs].map(quoteShellArg).join(" ");
+
+    const child =
+      process.platform === "win32"
+        ? spawn("cmd.exe", ["/d", "/s", "/c", commandText], {
+            cwd: root,
+            env: safeEnv(),
+            stdio: ["ignore", "pipe", "pipe"],
+            windowsHide: true
+          })
+        : spawn("sh", ["-lc", commandText], {
+            cwd: root,
+            env: safeEnv(),
+            stdio: ["ignore", "pipe", "pipe"]
+          });
+
+    const timer = setTimeout(() => {
+      timedOut = true;
+      try {
+        child.kill("SIGTERM");
+      } catch {}
+      if (process.platform === "win32" && child.pid) {
+        const killer = spawn("taskkill", ["/pid", String(child.pid), "/t", "/f"], { stdio: "ignore" });
+        killer.once("close", () => {});
+        killer.once("error", () => {});
+      }
+    }, timeout);
+
+    child.stdout.on("data", (chunk) => {
+      const text = chunk.toString();
+      out.push(text);
+      if (collectOutput) stdoutLines.push(text);
+    });
+
+    child.stderr.on("data", (chunk) => {
+      const text = chunk.toString();
+      err.push(text);
+      if (collectOutput) stderrLines.push(text);
+    });
+
+    child.once("error", (error) => {
+      clearTimeout(timer);
+      resolve({
+        code: null,
+        timedOut,
+        stdout: out.join(""),
+        stderr: err.join(""),
+        error: error instanceof Error ? error.message : String(error)
+      });
+    });
+
+    child.once("close", (code) => {
+      clearTimeout(timer);
+      resolve({
+        code,
+        timedOut,
+        stdout: out.join(""),
+        stderr: err.join(""),
+        error: null
+      });
+    });
+  });
+}
+
 async function fetchWithTimeout(url, options = {}, ms = 7000) {
   const controller = new AbortController();
   const timer = setTimeout(() => controller.abort(), ms);
@@ -255,14 +338,14 @@ try {
   webImageId = webInspect.stdout.trim() || null;
   check("docker-runtime-web-image-exists", webInspect.code === 0 && Boolean(webImageId), webImageId ?? `exit=${webInspect.code}`);
 
-  const downBefore = await runDocker(["compose", "-f", composeFile, "down", "--remove-orphans"], { timeoutMs: 120000 });
+  const downBefore = await runDockerCompose(["-f", composeFile, "down", "--remove-orphans"], { timeoutMs: 120000 });
   check("docker-runtime-compose-down-before", [0].includes(downBefore.code), `exit=${downBefore.code}; timedOut=${downBefore.timedOut}`);
 
-  const up = await runDocker(["compose", "-f", composeFile, "up", "-d", "--no-build"], { timeoutMs });
+  const up = await runDockerCompose(["-f", composeFile, "up", "-d", "--no-build"], { timeoutMs });
   composeUpSucceeded = up.code === 0;
   check("docker-runtime-compose-up-no-build", composeUpSucceeded, `exit=${up.code}; timedOut=${up.timedOut}; error=${up.error ?? "none"}`);
 
-  const ps = await runDocker(["compose", "-f", composeFile, "ps"], { timeoutMs: 30000 });
+  const ps = await runDockerCompose(["-f", composeFile, "ps"], { timeoutMs: 30000 });
   check("docker-runtime-compose-ps-runs", ps.code === 0 && ps.stdout.includes("kingsmen-api") && ps.stdout.includes("kingsmen-web"), "compose ps includes web/api");
 
   const apiHealth = await waitForStatus("http://127.0.0.1:3001/health", 200, timeoutMs);
@@ -309,7 +392,7 @@ try {
 } catch (error) {
   check("docker-runtime-exception-absent", false, error instanceof Error ? error.message : String(error));
 } finally {
-  const down = await runDocker(["compose", "-f", composeFile, "down", "--remove-orphans"], { timeoutMs: 120000 });
+  const down = await runDockerCompose(["-f", composeFile, "down", "--remove-orphans"], { timeoutMs: 120000 });
   composeDownSucceeded = down.code === 0;
   check("docker-runtime-compose-down-after", composeDownSucceeded, `exit=${down.code}; timedOut=${down.timedOut}`);
 }
