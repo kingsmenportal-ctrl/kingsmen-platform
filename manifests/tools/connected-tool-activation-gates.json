@@ -1,0 +1,748 @@
+﻿{
+    "schema":  "kingsmen.connected-tool-activation-gates.v1",
+    "module":  "TOOLS-01 - Connected Tool Activation Gates",
+    "status":  "BUILT_PENDING_VALIDATION",
+    "source_provider_map":  "manifests/providers/connected-apps-provider-map.json",
+    "provider_count":  25,
+    "tool_gate_count":  25,
+    "production_enabled":  false,
+    "runtime_use_enabled":  false,
+    "law":  [
+                "Visible app does not automatically mean callable.",
+                "Callable app does not automatically mean production-safe.",
+                "AI may recommend.",
+                "Scripts must validate.",
+                "Backend must enforce.",
+                "PowerShell / GitHub Actions must prove.",
+                "GitHub must preserve.",
+                "Founder must approve high-risk actions."
+            ],
+    "gates":  [
+                  {
+                      "tool_name":  "Google Drive",
+                      "provider_class":  "CALLABLE_NOW",
+                      "activation_status":  "CALLABLE_NOW_PRODUCTION_GATED",
+                      "high_risk":  false,
+                      "production_enabled":  false,
+                      "runtime_use_enabled":  false,
+                      "founder_approval_required":  false,
+                      "secrets_boundary_required":  true,
+                      "candidate_data_boundary_required":  true,
+                      "validator_required":  true,
+                      "proof_report_required":  true,
+                      "allowed_now":  [
+                                          "record_visibility",
+                                          "document_boundary",
+                                          "run_connector_test_when_available",
+                                          "write_report"
+                                      ],
+                      "blocked_until_gated":  [
+                                                  "production_use",
+                                                  "candidate_data_write",
+                                                  "secret_storage",
+                                                  "payment_action",
+                                                  "public_deployment",
+                                                  "bulk_outreach",
+                                                  "official_application_action",
+                                                  "live_ai_automation"
+                                              ]
+                  },
+                  {
+                      "tool_name":  "Gmail",
+                      "provider_class":  "CALLABLE_NOW",
+                      "activation_status":  "CALLABLE_NOW_PRODUCTION_GATED",
+                      "high_risk":  true,
+                      "production_enabled":  false,
+                      "runtime_use_enabled":  false,
+                      "founder_approval_required":  true,
+                      "secrets_boundary_required":  true,
+                      "candidate_data_boundary_required":  true,
+                      "validator_required":  true,
+                      "proof_report_required":  true,
+                      "allowed_now":  [
+                                          "record_visibility",
+                                          "document_boundary",
+                                          "run_connector_test_when_available",
+                                          "write_report"
+                                      ],
+                      "blocked_until_gated":  [
+                                                  "production_use",
+                                                  "candidate_data_write",
+                                                  "secret_storage",
+                                                  "payment_action",
+                                                  "public_deployment",
+                                                  "bulk_outreach",
+                                                  "official_application_action",
+                                                  "live_ai_automation"
+                                              ]
+                  },
+                  {
+                      "tool_name":  "Google Calendar",
+                      "provider_class":  "CALLABLE_NOW",
+                      "activation_status":  "CALLABLE_NOW_PRODUCTION_GATED",
+                      "high_risk":  false,
+                      "production_enabled":  false,
+                      "runtime_use_enabled":  false,
+                      "founder_approval_required":  false,
+                      "secrets_boundary_required":  true,
+                      "candidate_data_boundary_required":  true,
+                      "validator_required":  true,
+                      "proof_report_required":  true,
+                      "allowed_now":  [
+                                          "record_visibility",
+                                          "document_boundary",
+                                          "run_connector_test_when_available",
+                                          "write_report"
+                                      ],
+                      "blocked_until_gated":  [
+                                                  "production_use",
+                                                  "candidate_data_write",
+                                                  "secret_storage",
+                                                  "payment_action",
+                                                  "public_deployment",
+                                                  "bulk_outreach",
+                                                  "official_application_action",
+                                                  "live_ai_automation"
+                                              ]
+                  },
+                  {
+                      "tool_name":  "Google Contacts",
+                      "provider_class":  "CALLABLE_NOW",
+                      "activation_status":  "CALLABLE_NOW_PRODUCTION_GATED",
+                      "high_risk":  true,
+                      "production_enabled":  false,
+                      "runtime_use_enabled":  false,
+                      "founder_approval_required":  true,
+                      "secrets_boundary_required":  true,
+                      "candidate_data_boundary_required":  true,
+                      "validator_required":  true,
+                      "proof_report_required":  true,
+                      "allowed_now":  [
+                                          "record_visibility",
+                                          "document_boundary",
+                                          "run_connector_test_when_available",
+                                          "write_report"
+                                      ],
+                      "blocked_until_gated":  [
+                                                  "production_use",
+                                                  "candidate_data_write",
+                                                  "secret_storage",
+                                                  "payment_action",
+                                                  "public_deployment",
+                                                  "bulk_outreach",
+                                                  "official_application_action",
+                                                  "live_ai_automation"
+                                              ]
+                  },
+                  {
+                      "tool_name":  "GitHub",
+                      "provider_class":  "CALLABLE_NOW",
+                      "activation_status":  "CALLABLE_NOW_PRODUCTION_GATED",
+                      "high_risk":  true,
+                      "production_enabled":  false,
+                      "runtime_use_enabled":  false,
+                      "founder_approval_required":  true,
+                      "secrets_boundary_required":  true,
+                      "candidate_data_boundary_required":  true,
+                      "validator_required":  true,
+                      "proof_report_required":  true,
+                      "allowed_now":  [
+                                          "record_visibility",
+                                          "document_boundary",
+                                          "run_connector_test_when_available",
+                                          "write_report"
+                                      ],
+                      "blocked_until_gated":  [
+                                                  "production_use",
+                                                  "candidate_data_write",
+                                                  "secret_storage",
+                                                  "payment_action",
+                                                  "public_deployment",
+                                                  "bulk_outreach",
+                                                  "official_application_action",
+                                                  "live_ai_automation"
+                                              ]
+                  },
+                  {
+                      "tool_name":  "Airtable",
+                      "provider_class":  "CALLABLE_NOW",
+                      "activation_status":  "CALLABLE_NOW_PRODUCTION_GATED",
+                      "high_risk":  true,
+                      "production_enabled":  false,
+                      "runtime_use_enabled":  false,
+                      "founder_approval_required":  true,
+                      "secrets_boundary_required":  true,
+                      "candidate_data_boundary_required":  true,
+                      "validator_required":  true,
+                      "proof_report_required":  true,
+                      "allowed_now":  [
+                                          "record_visibility",
+                                          "document_boundary",
+                                          "run_connector_test_when_available",
+                                          "write_report"
+                                      ],
+                      "blocked_until_gated":  [
+                                                  "production_use",
+                                                  "candidate_data_write",
+                                                  "secret_storage",
+                                                  "payment_action",
+                                                  "public_deployment",
+                                                  "bulk_outreach",
+                                                  "official_application_action",
+                                                  "live_ai_automation"
+                                              ]
+                  },
+                  {
+                      "tool_name":  "Supabase",
+                      "provider_class":  "VISIBLE_UNTESTED",
+                      "activation_status":  "VISIBLE_UNTESTED",
+                      "high_risk":  true,
+                      "production_enabled":  false,
+                      "runtime_use_enabled":  false,
+                      "founder_approval_required":  true,
+                      "secrets_boundary_required":  true,
+                      "candidate_data_boundary_required":  true,
+                      "validator_required":  true,
+                      "proof_report_required":  true,
+                      "allowed_now":  [
+                                          "record_visibility",
+                                          "document_boundary",
+                                          "run_connector_test_when_available",
+                                          "write_report"
+                                      ],
+                      "blocked_until_gated":  [
+                                                  "production_use",
+                                                  "candidate_data_write",
+                                                  "secret_storage",
+                                                  "payment_action",
+                                                  "public_deployment",
+                                                  "bulk_outreach",
+                                                  "official_application_action",
+                                                  "live_ai_automation"
+                                              ]
+                  },
+                  {
+                      "tool_name":  "PayPal",
+                      "provider_class":  "VISIBLE_UNTESTED",
+                      "activation_status":  "VISIBLE_UNTESTED",
+                      "high_risk":  true,
+                      "production_enabled":  false,
+                      "runtime_use_enabled":  false,
+                      "founder_approval_required":  true,
+                      "secrets_boundary_required":  true,
+                      "candidate_data_boundary_required":  true,
+                      "validator_required":  true,
+                      "proof_report_required":  true,
+                      "allowed_now":  [
+                                          "record_visibility",
+                                          "document_boundary",
+                                          "run_connector_test_when_available",
+                                          "write_report"
+                                      ],
+                      "blocked_until_gated":  [
+                                                  "production_use",
+                                                  "candidate_data_write",
+                                                  "secret_storage",
+                                                  "payment_action",
+                                                  "public_deployment",
+                                                  "bulk_outreach",
+                                                  "official_application_action",
+                                                  "live_ai_automation"
+                                              ]
+                  },
+                  {
+                      "tool_name":  "OpenAI Platform",
+                      "provider_class":  "VISIBLE_UNTESTED",
+                      "activation_status":  "VISIBLE_UNTESTED",
+                      "high_risk":  true,
+                      "production_enabled":  false,
+                      "runtime_use_enabled":  false,
+                      "founder_approval_required":  true,
+                      "secrets_boundary_required":  true,
+                      "candidate_data_boundary_required":  true,
+                      "validator_required":  true,
+                      "proof_report_required":  true,
+                      "allowed_now":  [
+                                          "record_visibility",
+                                          "document_boundary",
+                                          "run_connector_test_when_available",
+                                          "write_report"
+                                      ],
+                      "blocked_until_gated":  [
+                                                  "production_use",
+                                                  "candidate_data_write",
+                                                  "secret_storage",
+                                                  "payment_action",
+                                                  "public_deployment",
+                                                  "bulk_outreach",
+                                                  "official_application_action",
+                                                  "live_ai_automation"
+                                              ]
+                  },
+                  {
+                      "tool_name":  "AI Wisebase",
+                      "provider_class":  "VISIBLE_UNTESTED",
+                      "activation_status":  "VISIBLE_UNTESTED",
+                      "high_risk":  true,
+                      "production_enabled":  false,
+                      "runtime_use_enabled":  false,
+                      "founder_approval_required":  true,
+                      "secrets_boundary_required":  true,
+                      "candidate_data_boundary_required":  true,
+                      "validator_required":  true,
+                      "proof_report_required":  true,
+                      "allowed_now":  [
+                                          "record_visibility",
+                                          "document_boundary",
+                                          "run_connector_test_when_available",
+                                          "write_report"
+                                      ],
+                      "blocked_until_gated":  [
+                                                  "production_use",
+                                                  "candidate_data_write",
+                                                  "secret_storage",
+                                                  "payment_action",
+                                                  "public_deployment",
+                                                  "bulk_outreach",
+                                                  "official_application_action",
+                                                  "live_ai_automation"
+                                              ]
+                  },
+                  {
+                      "tool_name":  "B12 Website Generator",
+                      "provider_class":  "VISIBLE_UNTESTED",
+                      "activation_status":  "VISIBLE_UNTESTED",
+                      "high_risk":  false,
+                      "production_enabled":  false,
+                      "runtime_use_enabled":  false,
+                      "founder_approval_required":  false,
+                      "secrets_boundary_required":  true,
+                      "candidate_data_boundary_required":  true,
+                      "validator_required":  true,
+                      "proof_report_required":  true,
+                      "allowed_now":  [
+                                          "record_visibility",
+                                          "document_boundary",
+                                          "run_connector_test_when_available",
+                                          "write_report"
+                                      ],
+                      "blocked_until_gated":  [
+                                                  "production_use",
+                                                  "candidate_data_write",
+                                                  "secret_storage",
+                                                  "payment_action",
+                                                  "public_deployment",
+                                                  "bulk_outreach",
+                                                  "official_application_action",
+                                                  "live_ai_automation"
+                                              ]
+                  },
+                  {
+                      "tool_name":  "Canva",
+                      "provider_class":  "VISIBLE_UNTESTED",
+                      "activation_status":  "VISIBLE_UNTESTED",
+                      "high_risk":  false,
+                      "production_enabled":  false,
+                      "runtime_use_enabled":  false,
+                      "founder_approval_required":  false,
+                      "secrets_boundary_required":  true,
+                      "candidate_data_boundary_required":  true,
+                      "validator_required":  true,
+                      "proof_report_required":  true,
+                      "allowed_now":  [
+                                          "record_visibility",
+                                          "document_boundary",
+                                          "run_connector_test_when_available",
+                                          "write_report"
+                                      ],
+                      "blocked_until_gated":  [
+                                                  "production_use",
+                                                  "candidate_data_write",
+                                                  "secret_storage",
+                                                  "payment_action",
+                                                  "public_deployment",
+                                                  "bulk_outreach",
+                                                  "official_application_action",
+                                                  "live_ai_automation"
+                                              ]
+                  },
+                  {
+                      "tool_name":  "Catalyst by Zoho",
+                      "provider_class":  "VISIBLE_UNTESTED",
+                      "activation_status":  "VISIBLE_UNTESTED",
+                      "high_risk":  true,
+                      "production_enabled":  false,
+                      "runtime_use_enabled":  false,
+                      "founder_approval_required":  true,
+                      "secrets_boundary_required":  true,
+                      "candidate_data_boundary_required":  true,
+                      "validator_required":  true,
+                      "proof_report_required":  true,
+                      "allowed_now":  [
+                                          "record_visibility",
+                                          "document_boundary",
+                                          "run_connector_test_when_available",
+                                          "write_report"
+                                      ],
+                      "blocked_until_gated":  [
+                                                  "production_use",
+                                                  "candidate_data_write",
+                                                  "secret_storage",
+                                                  "payment_action",
+                                                  "public_deployment",
+                                                  "bulk_outreach",
+                                                  "official_application_action",
+                                                  "live_ai_automation"
+                                              ]
+                  },
+                  {
+                      "tool_name":  "Indeed",
+                      "provider_class":  "VISIBLE_UNTESTED",
+                      "activation_status":  "VISIBLE_UNTESTED",
+                      "high_risk":  true,
+                      "production_enabled":  false,
+                      "runtime_use_enabled":  false,
+                      "founder_approval_required":  true,
+                      "secrets_boundary_required":  true,
+                      "candidate_data_boundary_required":  true,
+                      "validator_required":  true,
+                      "proof_report_required":  true,
+                      "allowed_now":  [
+                                          "record_visibility",
+                                          "document_boundary",
+                                          "run_connector_test_when_available",
+                                          "write_report"
+                                      ],
+                      "blocked_until_gated":  [
+                                                  "production_use",
+                                                  "candidate_data_write",
+                                                  "secret_storage",
+                                                  "payment_action",
+                                                  "public_deployment",
+                                                  "bulk_outreach",
+                                                  "official_application_action",
+                                                  "live_ai_automation"
+                                              ]
+                  },
+                  {
+                      "tool_name":  "Internshala",
+                      "provider_class":  "VISIBLE_UNTESTED",
+                      "activation_status":  "VISIBLE_UNTESTED",
+                      "high_risk":  true,
+                      "production_enabled":  false,
+                      "runtime_use_enabled":  false,
+                      "founder_approval_required":  true,
+                      "secrets_boundary_required":  true,
+                      "candidate_data_boundary_required":  true,
+                      "validator_required":  true,
+                      "proof_report_required":  true,
+                      "allowed_now":  [
+                                          "record_visibility",
+                                          "document_boundary",
+                                          "run_connector_test_when_available",
+                                          "write_report"
+                                      ],
+                      "blocked_until_gated":  [
+                                                  "production_use",
+                                                  "candidate_data_write",
+                                                  "secret_storage",
+                                                  "payment_action",
+                                                  "public_deployment",
+                                                  "bulk_outreach",
+                                                  "official_application_action",
+                                                  "live_ai_automation"
+                                              ]
+                  },
+                  {
+                      "tool_name":  "Jotform",
+                      "provider_class":  "VISIBLE_UNTESTED",
+                      "activation_status":  "VISIBLE_UNTESTED",
+                      "high_risk":  true,
+                      "production_enabled":  false,
+                      "runtime_use_enabled":  false,
+                      "founder_approval_required":  true,
+                      "secrets_boundary_required":  true,
+                      "candidate_data_boundary_required":  true,
+                      "validator_required":  true,
+                      "proof_report_required":  true,
+                      "allowed_now":  [
+                                          "record_visibility",
+                                          "document_boundary",
+                                          "run_connector_test_when_available",
+                                          "write_report"
+                                      ],
+                      "blocked_until_gated":  [
+                                                  "production_use",
+                                                  "candidate_data_write",
+                                                  "secret_storage",
+                                                  "payment_action",
+                                                  "public_deployment",
+                                                  "bulk_outreach",
+                                                  "official_application_action",
+                                                  "live_ai_automation"
+                                              ]
+                  },
+                  {
+                      "tool_name":  "Lovable",
+                      "provider_class":  "VISIBLE_UNTESTED",
+                      "activation_status":  "VISIBLE_UNTESTED",
+                      "high_risk":  false,
+                      "production_enabled":  false,
+                      "runtime_use_enabled":  false,
+                      "founder_approval_required":  false,
+                      "secrets_boundary_required":  true,
+                      "candidate_data_boundary_required":  true,
+                      "validator_required":  true,
+                      "proof_report_required":  true,
+                      "allowed_now":  [
+                                          "record_visibility",
+                                          "document_boundary",
+                                          "run_connector_test_when_available",
+                                          "write_report"
+                                      ],
+                      "blocked_until_gated":  [
+                                                  "production_use",
+                                                  "candidate_data_write",
+                                                  "secret_storage",
+                                                  "payment_action",
+                                                  "public_deployment",
+                                                  "bulk_outreach",
+                                                  "official_application_action",
+                                                  "live_ai_automation"
+                                              ]
+                  },
+                  {
+                      "tool_name":  "Midpage Legal Research",
+                      "provider_class":  "VISIBLE_UNTESTED",
+                      "activation_status":  "VISIBLE_UNTESTED",
+                      "high_risk":  true,
+                      "production_enabled":  false,
+                      "runtime_use_enabled":  false,
+                      "founder_approval_required":  true,
+                      "secrets_boundary_required":  true,
+                      "candidate_data_boundary_required":  true,
+                      "validator_required":  true,
+                      "proof_report_required":  true,
+                      "allowed_now":  [
+                                          "record_visibility",
+                                          "document_boundary",
+                                          "run_connector_test_when_available",
+                                          "write_report"
+                                      ],
+                      "blocked_until_gated":  [
+                                                  "production_use",
+                                                  "candidate_data_write",
+                                                  "secret_storage",
+                                                  "payment_action",
+                                                  "public_deployment",
+                                                  "bulk_outreach",
+                                                  "official_application_action",
+                                                  "live_ai_automation"
+                                              ]
+                  },
+                  {
+                      "tool_name":  "Namecheap",
+                      "provider_class":  "VISIBLE_UNTESTED",
+                      "activation_status":  "VISIBLE_UNTESTED",
+                      "high_risk":  true,
+                      "production_enabled":  false,
+                      "runtime_use_enabled":  false,
+                      "founder_approval_required":  true,
+                      "secrets_boundary_required":  true,
+                      "candidate_data_boundary_required":  true,
+                      "validator_required":  true,
+                      "proof_report_required":  true,
+                      "allowed_now":  [
+                                          "record_visibility",
+                                          "document_boundary",
+                                          "run_connector_test_when_available",
+                                          "write_report"
+                                      ],
+                      "blocked_until_gated":  [
+                                                  "production_use",
+                                                  "candidate_data_write",
+                                                  "secret_storage",
+                                                  "payment_action",
+                                                  "public_deployment",
+                                                  "bulk_outreach",
+                                                  "official_application_action",
+                                                  "live_ai_automation"
+                                              ]
+                  },
+                  {
+                      "tool_name":  "Neon Postgres",
+                      "provider_class":  "VISIBLE_UNTESTED",
+                      "activation_status":  "VISIBLE_UNTESTED",
+                      "high_risk":  true,
+                      "production_enabled":  false,
+                      "runtime_use_enabled":  false,
+                      "founder_approval_required":  true,
+                      "secrets_boundary_required":  true,
+                      "candidate_data_boundary_required":  true,
+                      "validator_required":  true,
+                      "proof_report_required":  true,
+                      "allowed_now":  [
+                                          "record_visibility",
+                                          "document_boundary",
+                                          "run_connector_test_when_available",
+                                          "write_report"
+                                      ],
+                      "blocked_until_gated":  [
+                                                  "production_use",
+                                                  "candidate_data_write",
+                                                  "secret_storage",
+                                                  "payment_action",
+                                                  "public_deployment",
+                                                  "bulk_outreach",
+                                                  "official_application_action",
+                                                  "live_ai_automation"
+                                              ]
+                  },
+                  {
+                      "tool_name":  "Netlify",
+                      "provider_class":  "VISIBLE_UNTESTED",
+                      "activation_status":  "VISIBLE_UNTESTED",
+                      "high_risk":  true,
+                      "production_enabled":  false,
+                      "runtime_use_enabled":  false,
+                      "founder_approval_required":  true,
+                      "secrets_boundary_required":  true,
+                      "candidate_data_boundary_required":  true,
+                      "validator_required":  true,
+                      "proof_report_required":  true,
+                      "allowed_now":  [
+                                          "record_visibility",
+                                          "document_boundary",
+                                          "run_connector_test_when_available",
+                                          "write_report"
+                                      ],
+                      "blocked_until_gated":  [
+                                                  "production_use",
+                                                  "candidate_data_write",
+                                                  "secret_storage",
+                                                  "payment_action",
+                                                  "public_deployment",
+                                                  "bulk_outreach",
+                                                  "official_application_action",
+                                                  "live_ai_automation"
+                                              ]
+                  },
+                  {
+                      "tool_name":  "Norton",
+                      "provider_class":  "VISIBLE_UNTESTED",
+                      "activation_status":  "VISIBLE_UNTESTED",
+                      "high_risk":  false,
+                      "production_enabled":  false,
+                      "runtime_use_enabled":  false,
+                      "founder_approval_required":  false,
+                      "secrets_boundary_required":  true,
+                      "candidate_data_boundary_required":  true,
+                      "validator_required":  true,
+                      "proof_report_required":  true,
+                      "allowed_now":  [
+                                          "record_visibility",
+                                          "document_boundary",
+                                          "run_connector_test_when_available",
+                                          "write_report"
+                                      ],
+                      "blocked_until_gated":  [
+                                                  "production_use",
+                                                  "candidate_data_write",
+                                                  "secret_storage",
+                                                  "payment_action",
+                                                  "public_deployment",
+                                                  "bulk_outreach",
+                                                  "official_application_action",
+                                                  "live_ai_automation"
+                                              ]
+                  },
+                  {
+                      "tool_name":  "Replit",
+                      "provider_class":  "VISIBLE_UNTESTED",
+                      "activation_status":  "VISIBLE_UNTESTED",
+                      "high_risk":  false,
+                      "production_enabled":  false,
+                      "runtime_use_enabled":  false,
+                      "founder_approval_required":  false,
+                      "secrets_boundary_required":  true,
+                      "candidate_data_boundary_required":  true,
+                      "validator_required":  true,
+                      "proof_report_required":  true,
+                      "allowed_now":  [
+                                          "record_visibility",
+                                          "document_boundary",
+                                          "run_connector_test_when_available",
+                                          "write_report"
+                                      ],
+                      "blocked_until_gated":  [
+                                                  "production_use",
+                                                  "candidate_data_write",
+                                                  "secret_storage",
+                                                  "payment_action",
+                                                  "public_deployment",
+                                                  "bulk_outreach",
+                                                  "official_application_action",
+                                                  "live_ai_automation"
+                                              ]
+                  },
+                  {
+                      "tool_name":  "Softonic",
+                      "provider_class":  "OFF_UNTIL_GATED",
+                      "activation_status":  "OFF_UNTIL_GATED",
+                      "high_risk":  true,
+                      "production_enabled":  false,
+                      "runtime_use_enabled":  false,
+                      "founder_approval_required":  true,
+                      "secrets_boundary_required":  true,
+                      "candidate_data_boundary_required":  true,
+                      "validator_required":  true,
+                      "proof_report_required":  true,
+                      "allowed_now":  [
+                                          "record_visibility",
+                                          "document_boundary",
+                                          "run_connector_test_when_available",
+                                          "write_report"
+                                      ],
+                      "blocked_until_gated":  [
+                                                  "production_use",
+                                                  "candidate_data_write",
+                                                  "secret_storage",
+                                                  "payment_action",
+                                                  "public_deployment",
+                                                  "bulk_outreach",
+                                                  "official_application_action",
+                                                  "live_ai_automation"
+                                              ]
+                  },
+                  {
+                      "tool_name":  "Vivin",
+                      "provider_class":  "OFF_UNTIL_GATED",
+                      "activation_status":  "OFF_UNTIL_GATED",
+                      "high_risk":  true,
+                      "production_enabled":  false,
+                      "runtime_use_enabled":  false,
+                      "founder_approval_required":  true,
+                      "secrets_boundary_required":  true,
+                      "candidate_data_boundary_required":  true,
+                      "validator_required":  true,
+                      "proof_report_required":  true,
+                      "allowed_now":  [
+                                          "record_visibility",
+                                          "document_boundary",
+                                          "run_connector_test_when_available",
+                                          "write_report"
+                                      ],
+                      "blocked_until_gated":  [
+                                                  "production_use",
+                                                  "candidate_data_write",
+                                                  "secret_storage",
+                                                  "payment_action",
+                                                  "public_deployment",
+                                                  "bulk_outreach",
+                                                  "official_application_action",
+                                                  "live_ai_automation"
+                                              ]
+                  }
+              ],
+    "next_action":  "Create AGENTS-01 - Kingsmen Agent System."
+}

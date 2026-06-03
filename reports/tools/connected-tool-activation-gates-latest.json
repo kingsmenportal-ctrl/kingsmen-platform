@@ -1,0 +1,24 @@
+{
+  "schema": "kingsmen.validation-report.v1",
+  "module": "TOOLS-01 - Connected Tool Activation Gates",
+  "status": "VALIDATED",
+  "passed": true,
+  "generated_at": "2026-06-03T06:57:35.033Z",
+  "files_expected": [
+    "docs/tools/TOOLS_01_CONNECTED_TOOL_ACTIVATION_GATES.md",
+    "manifests/tools/connected-tool-activation-gates.json",
+    "scripts/validators/validate-connected-tool-activation-gates.mjs",
+    "reports/tools/connected-tool-activation-gates-latest.json",
+    "manifests/providers/connected-apps-provider-map.json",
+    "reports/providers/connected-apps-provider-map-latest.json"
+  ],
+  "files_checked": 6,
+  "provider_count": 25,
+  "tool_gate_count": 25,
+  "missing_files": [],
+  "failed_checks": [],
+  "warnings": [],
+  "oracle_lite_impact": "none_tool_gate_map_only",
+  "control_plane_impact": "Creates activation gates for connected tools before production use.",
+  "next_action": "Proceed to AGENTS-01 - Kingsmen Agent System."
+}
