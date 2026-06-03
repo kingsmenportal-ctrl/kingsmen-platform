@@ -1,0 +1,28 @@
+{
+  "schema": "kingsmen.validation-report.v1",
+  "module": "BATCH 22 - Docker Runtime Health Hardening / Oracle Lite VM Handoff Preparation",
+  "status": "VALIDATED",
+  "passed": true,
+  "generated_at": "2026-06-03T07:37:35.419Z",
+  "files_expected": [
+    "docs/runtime/batch22-oracle-lite-handoff-prep.md",
+    "manifests/runtime/batch22-oracle-lite-handoff-prep.json",
+    "scripts/validators/validate-batch22-oracle-lite-handoff-prep.mjs",
+    "reports/runtime/batch22-oracle-lite-handoff-prep-latest.json",
+    "reports/github-actions/batch21c/runtime/batch21c-docker-runtime-proof.json",
+    "reports/github-actions/batch21c/validation/batch21c-docker-runtime-proof-latest.json",
+    "reports/agents/kingsmen-agent-system-latest.json",
+    "reports/tools/connected-tool-activation-gates-latest.json",
+    "reports/providers/connected-apps-provider-map-latest.json"
+  ],
+  "files_checked": 9,
+  "missing_files": [],
+  "failed_checks": [],
+  "warnings": [],
+  "oracle_lite_impact": "handoff_preparation_only",
+  "control_plane_impact": "Prepares Docker runtime health expectations for Oracle Lite VM handoff.",
+  "productionReady": false,
+  "canClaimProduction": false,
+  "deployedToOracle": false,
+  "next_action": "Proceed to BATCH 23 - Oracle VM Environment Checklist / Remote Handoff Runner."
+}

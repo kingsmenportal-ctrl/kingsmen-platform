@@ -1,0 +1,36 @@
+﻿{
+  "schema": "kingsmen.batch22.oracle-lite-handoff-prep.v1",
+  "module": "BATCH 22 - Docker Runtime Health Hardening / Oracle Lite VM Handoff Preparation",
+  "status": "BUILT_PENDING_VALIDATION",
+  "productionReady": false,
+  "canClaimProduction": false,
+  "deployedToOracle": false,
+  "runsOracleCommands": false,
+  "requiresPaidOracle": false,
+  "usesSecrets": false,
+  "oracle_lite_impact": "handoff_preparation_only",
+  "depends_on": [
+    "BATCH 21C - GitHub Actions Docker Runtime Proof",
+    "N_PROVIDER.5 - 25 Connected Apps + Supabase Reality Map",
+    "TOOLS-01 - Connected Tool Activation Gates",
+    "AGENTS-01 - Kingsmen Agent System"
+  ],
+  "health_expectations": {
+    "api_health_status": 200,
+    "web_status": 200,
+    "bridge_api_status": 202,
+    "compose_up_required": true,
+    "compose_down_required": true,
+    "backend_bridge_required": true,
+    "backend_local_write_required": true
+  },
+  "oracle_lite_rules": [
+    "Oracle Free / Oracle Lite first.",
+    "Docker Compose first.",
+    "Low concurrency.",
+    "No secrets in repo.",
+    "No paid Oracle resources without founder approval.",
+    "No production claim before Oracle proof."
+  ],
+  "next_action": "Run BATCH 22 validator, commit proof, then proceed to BATCH 23 Oracle VM environment checklist."
+}
