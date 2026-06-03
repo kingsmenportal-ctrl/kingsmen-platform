@@ -1,0 +1,26 @@
+{
+    "schema":  "kingsmen.oracle-access-boundary.v1",
+    "module":  "ORACLE-01 - Oracle Free Access Boundary",
+    "status":  "VALIDATED",
+    "oracleRegion":  "af-johannesburg-1",
+    "oracleRegionName":  "South Africa Central Johannesburg",
+    "storesSecretsInRepo":  false,
+    "productionReady":  false,
+    "deployedToOracle":  false,
+    "oracleLiteImpact":  "access_boundary_only_no_deployment",
+    "localOnlyPaths":  {
+                           "ociConfig":  "C:\\Users\\dell\\.oci\\config",
+                           "ociApiPrivateKey":  "C:\\Users\\dell\\.oci\\oci_api_key.pem",
+                           "oracleSshPrivateKey":  "C:\\Users\\dell\\.ssh\\oracle_kingsmen.key",
+                           "oracleSshPublicKey":  "C:\\Users\\dell\\.ssh\\oracle_kingsmen.pub"
+                       },
+    "blockedFromRepo":  [
+                            "OCI API private key",
+                            "SSH private key",
+                            "Oracle password",
+                            "GitHub token",
+                            "Supabase service_role",
+                            "payment secret",
+                            "SMTP password"
+                        ]
+}

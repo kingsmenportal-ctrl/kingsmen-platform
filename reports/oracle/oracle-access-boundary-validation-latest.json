@@ -1,0 +1,11 @@
+{
+    "schema":  "kingsmen.validation-report.v1",
+    "module":  "ORACLE-01 - Oracle Free Access Boundary",
+    "status":  "VALIDATED",
+    "passed":  true,
+    "generated_at":  "2026-06-03T10:11:32.5675475Z",
+    "productionReady":  false,
+    "deployedToOracle":  false,
+    "oracle_lite_impact":  "access_boundary_only_no_deployment",
+    "next_action":  "Run Oracle local access checks after OCI config/private key are ready."
+}
