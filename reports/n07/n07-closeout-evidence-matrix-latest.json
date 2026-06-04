@@ -1,0 +1,35 @@
+{
+  "schema": "kingsmen.n07-closeout-evidence-matrix.v1",
+  "productionReady": false,
+  "rows": [
+    {
+      "moduleCode": "N07-AIRTABLE-01",
+      "proofReportPath": "reports/n07/n07-airtable-01-proof-latest.json",
+      "validationReportPath": "reports/validation/n07-airtable-01-validation-latest.json",
+      "passed": true,
+      "productionReady": false
+    },
+    {
+      "moduleCode": "N07-AIRTABLE-02",
+      "proofReportPath": "reports/n07/n07-airtable-02-proof-latest.json",
+      "validationReportPath": "reports/validation/n07-airtable-02-validation-latest.json",
+      "passed": true,
+      "productionReady": false
+    },
+    {
+      "moduleCode": "N07-AIRTABLE-03",
+      "proofReportPath": "reports/n07/n07-airtable-03-proof-latest.json",
+      "validationReportPath": "reports/validation/n07-airtable-03-validation-latest.json",
+      "passed": true,
+      "productionReady": false
+    }
+  ],
+  "allPassed": true,
+  "postgresTruthPreserved": true,
+  "airtableMirrorOnly": true,
+  "airtableTruthAuthorityBlocked": true,
+  "missingCredentialsDegradeGracefully": true,
+  "oracleLiteSyncLimitsConfirmed": true,
+  "handoverTo": "N08-FOUNDER-CONTROL",
+  "checkedAt": "2026-06-04T22:11:28.020Z"
+}
