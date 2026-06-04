@@ -1,0 +1,17 @@
+{
+  "schema": "kingsmen.n03-truth-01-proof.v1",
+  "module": "N03-TRUTH-01 - PostgreSQL Truth Vault / Core Tables / RLS Boundary / Proof",
+  "status": "N03_POSTGRES_TRUTH_VAULT_CORE_TABLES_RLS_PROVEN",
+  "passed": true,
+  "productionReady": false,
+  "postgresIsTruth": true,
+  "candidateOwnDataBoundary": true,
+  "candidateCannotMarkPaid": true,
+  "candidateCannotMarkSubmitted": true,
+  "candidateCannotVerifyOutcome": true,
+  "evidenceAppendFirst": true,
+  "auditAppendFirst": true,
+  "failures": [],
+  "nextAction": "Continue to N03-TRUTH-02 - payment/application/evidence status transition guards.",
+  "checkedAt": "2026-06-04T06:03:46.931Z"
+}
