@@ -1,0 +1,16 @@
+{
+  "schema": "kingsmen.n04-candidate-08.v1",
+  "module": "N04-CANDIDATE-08 - Support Centre / Help Requests / Manual Assistance / Tribunal Intake",
+  "status": "N04_SUPPORT_TRIBUNAL_INTAKE_PROVEN",
+  "productionReady": false,
+  "requiresN04Candidate07": true,
+  "supportCentreBuilt": true,
+  "helpRequestBuilt": true,
+  "manualAssistanceBuilt": true,
+  "tribunalIntakeBuilt": true,
+  "emailFirstSupport": true,
+  "evidenceRequiredForSupport": true,
+  "candidateHarmPriorityBuilt": true,
+  "tribunalRequiresReview": true,
+  "founderOperatorReviewRequired": true
+}

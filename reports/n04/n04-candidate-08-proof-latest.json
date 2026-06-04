@@ -1,0 +1,19 @@
+{
+  "schema": "kingsmen.n04-candidate-08-proof.v1",
+  "module": "N04-CANDIDATE-08 - Support Centre / Help Requests / Manual Assistance / Tribunal Intake",
+  "status": "N04_SUPPORT_TRIBUNAL_INTAKE_PROVEN",
+  "passed": true,
+  "productionReady": false,
+  "supportCentreBuilt": true,
+  "helpRequestBuilt": true,
+  "manualAssistanceBuilt": true,
+  "tribunalIntakeBuilt": true,
+  "emailFirstSupport": true,
+  "evidenceRequiredForSupport": true,
+  "candidateHarmPriorityBuilt": true,
+  "tribunalRequiresReview": true,
+  "founderOperatorReviewRequired": true,
+  "failures": [],
+  "nextAction": "Continue to N04-CANDIDATE-09 - financial view, service orders, payment status, and refund visibility.",
+  "checkedAt": "2026-06-04T10:31:01.180Z"
+}
