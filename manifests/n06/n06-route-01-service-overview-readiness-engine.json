@@ -1,0 +1,16 @@
+{
+  "schema": "kingsmen.n06-route-01.v1",
+  "module": "N06-ROUTE-01 - Route Universe / Application Workbench Service Overview / Readiness Engine",
+  "status": "N06_ROUTE_UNIVERSE_READINESS_ENGINE_PROVEN",
+  "productionReady": false,
+  "requiresN05Document05": true,
+  "routeUniverseOverviewBuilt": true,
+  "sixGateRouteUniverseBuilt": true,
+  "readinessEngineBuilt": true,
+  "knownRouteFastLaneSupported": true,
+  "caoParentChildRulePreserved": true,
+  "packageControlsIntensityNotGateAccess": true,
+  "capLimitsVolumeNotCapability": true,
+  "sourceConfidenceRequired": true,
+  "documentReadinessConnectsToN05": true
+}
