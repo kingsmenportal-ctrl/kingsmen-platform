@@ -1,0 +1,16 @@
+{
+  "schema": "kingsmen.n04-candidate-10.v1",
+  "module": "N04-CANDIDATE-10 - Success Loop / Feedback / Outcomes / Learning Signals",
+  "status": "N04_SUCCESS_LOOP_FEEDBACK_OUTCOMES_LEARNING_PROVEN",
+  "productionReady": false,
+  "requiresN04Candidate09": true,
+  "outcomeCaptureBuilt": true,
+  "feedbackCaptureBuilt": true,
+  "successTransitionBuilt": true,
+  "learningSignalsBuilt": true,
+  "outcomeRequiresProof": true,
+  "successStoryRequiresProofAndConsent": true,
+  "aiMaySuggestNotGovern": true,
+  "noGuaranteeLanguageRequired": true,
+  "candidateNotExperiment": true
+}
