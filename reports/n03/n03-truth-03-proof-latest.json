@@ -1,0 +1,17 @@
+{
+  "schema": "kingsmen.n03-truth-03-proof.v1",
+  "module": "N03-TRUTH-03 - CAO Parent-Child Application Model / Six-Gate Visibility Constraints",
+  "status": "N03_CAO_PARENT_CHILD_SIX_GATE_VISIBILITY_PROVEN",
+  "passed": true,
+  "productionReady": false,
+  "caoIsOneParentApplication": true,
+  "caoProgrammeChoicesAreChildren": true,
+  "packageCountsParentApplicationsNotCaoChoices": true,
+  "allSixGatesVisibleToAllUsers": true,
+  "packageControlsIntensityNotGateAccess": true,
+  "capLimitsVolumeNotCapability": true,
+  "activeCandidateStartingCap": 500,
+  "failures": [],
+  "nextAction": "Continue to N03-TRUTH-04 - POPIA access log, evidence immutability, and source authority registry.",
+  "checkedAt": "2026-06-04T06:23:14.278Z"
+}

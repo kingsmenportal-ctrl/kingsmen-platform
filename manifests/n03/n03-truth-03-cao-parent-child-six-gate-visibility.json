@@ -1,0 +1,14 @@
+{
+  "schema": "kingsmen.n03-truth-03.v1",
+  "module": "N03-TRUTH-03 - CAO Parent-Child Application Model / Six-Gate Visibility Constraints",
+  "status": "N03_CAO_PARENT_CHILD_SIX_GATE_VISIBILITY_PROVEN",
+  "productionReady": false,
+  "requiresN03Truth02": true,
+  "caoIsOneParentApplication": true,
+  "caoProgrammeChoicesAreChildren": true,
+  "packageCountsParentApplicationsNotCaoChoices": true,
+  "allSixGatesVisibleToAllUsers": true,
+  "packageControlsIntensityNotGateAccess": true,
+  "capLimitsVolumeNotCapability": true,
+  "activeCandidateStartingCap": 500
+}
