@@ -1,0 +1,15 @@
+{
+  "schema": "kingsmen.n05-document-04b.v1",
+  "module": "N05-DOCUMENT-04B - Review Methods / Server Wiring / Document Status Integration",
+  "status": "N05_DOCUMENT_REVIEW_METHODS_SERVER_WIRING_STATUS_INTEGRATION_PROVEN",
+  "productionReady": false,
+  "requiresN05Document04": true,
+  "reviewMethodsBuilt": true,
+  "ocrFraudReviewMethodsBuilt": true,
+  "statusIntegrationBuilt": true,
+  "serverWiringRegistryBuilt": true,
+  "candidateSafeStatusMappingBuilt": true,
+  "reviewRequiresProofEvidenceAudit": true,
+  "candidateReviewAuthorityBlocked": true,
+  "fraudClearRequiresHumanReview": true
+}
