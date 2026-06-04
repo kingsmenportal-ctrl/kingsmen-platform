@@ -1,0 +1,15 @@
+{
+  "schema": "kingsmen.n04-candidate-01.v1",
+  "module": "N04-CANDIDATE-01 - Candidate Identity / Intake Truth / Lifecycle Foundation",
+  "status": "N04_CANDIDATE_IDENTITY_INTAKE_LIFECYCLE_PROVEN",
+  "productionReady": false,
+  "requiresN03Truth05": true,
+  "candidateIdentityBuilt": true,
+  "candidateIntakeTruthBuilt": true,
+  "candidateLifecycleBuilt": true,
+  "sixGatePreferenceCaptureBuilt": true,
+  "allSixGatesVisibleToAllUsers": true,
+  "knownRouteFastLaneSupported": true,
+  "candidateCannotSelfVerifyPaidSubmittedOutcome": true,
+  "popiaSafeCandidateBoundary": true
+}

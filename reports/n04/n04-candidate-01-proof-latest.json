@@ -1,0 +1,18 @@
+{
+  "schema": "kingsmen.n04-candidate-01-proof.v1",
+  "module": "N04-CANDIDATE-01 - Candidate Identity / Intake Truth / Lifecycle Foundation",
+  "status": "N04_CANDIDATE_IDENTITY_INTAKE_LIFECYCLE_PROVEN",
+  "passed": true,
+  "productionReady": false,
+  "candidateIdentityBuilt": true,
+  "candidateIntakeTruthBuilt": true,
+  "candidateLifecycleBuilt": true,
+  "sixGatePreferenceCaptureBuilt": true,
+  "allSixGatesVisibleToAllUsers": true,
+  "knownRouteFastLaneSupported": true,
+  "candidateCannotSelfVerifyPaidSubmittedOutcome": true,
+  "popiaSafeCandidateBoundary": true,
+  "failures": [],
+  "nextAction": "Continue to N04-CANDIDATE-02 - Candidate auth/session/account recovery boundary.",
+  "checkedAt": "2026-06-04T08:30:55.711Z"
+}
