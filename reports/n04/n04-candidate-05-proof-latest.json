@@ -1,0 +1,17 @@
+{
+  "schema": "kingsmen.n04-candidate-05-proof.v1",
+  "module": "N04-CANDIDATE-05 - Mobile Portal Journey / Email-First Experience / Urgent WhatsApp Boundary",
+  "status": "N04_MOBILE_EMAIL_FIRST_URGENT_WHATSAPP_PROVEN",
+  "passed": true,
+  "productionReady": false,
+  "mobilePortalJourneyBuilt": true,
+  "emailFirstExperienceBuilt": true,
+  "urgentWhatsAppBoundaryBuilt": true,
+  "smsBackupOnly": true,
+  "bulkWhatsAppBlocked": true,
+  "routineCommsEmailOnly": true,
+  "candidateSafeJourneyGuidanceBuilt": true,
+  "failures": [],
+  "nextAction": "Continue to N04-CANDIDATE-06 - communication centre, email templates, notification rules, and message evidence ledger.",
+  "checkedAt": "2026-06-04T09:24:40.379Z"
+}

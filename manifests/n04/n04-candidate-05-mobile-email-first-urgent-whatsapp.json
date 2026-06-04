@@ -1,0 +1,14 @@
+{
+  "schema": "kingsmen.n04-candidate-05.v1",
+  "module": "N04-CANDIDATE-05 - Mobile Portal Journey / Email-First Experience / Urgent WhatsApp Boundary",
+  "status": "N04_MOBILE_EMAIL_FIRST_URGENT_WHATSAPP_PROVEN",
+  "productionReady": false,
+  "requiresN04Candidate04": true,
+  "mobilePortalJourneyBuilt": true,
+  "emailFirstExperienceBuilt": true,
+  "urgentWhatsAppBoundaryBuilt": true,
+  "smsBackupOnly": true,
+  "bulkWhatsAppBlocked": true,
+  "routineCommsEmailOnly": true,
+  "candidateSafeJourneyGuidanceBuilt": true
+}
