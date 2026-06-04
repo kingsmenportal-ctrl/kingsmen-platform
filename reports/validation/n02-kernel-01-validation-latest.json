@@ -1,0 +1,8 @@
+{
+  "schema": "kingsmen.n02-kernel-01-validation.v1",
+  "module": "N02-KERNEL-01",
+  "passed": true,
+  "productionReady": false,
+  "failures": [],
+  "checkedAt": "2026-06-04T05:15:29.833Z"
+}

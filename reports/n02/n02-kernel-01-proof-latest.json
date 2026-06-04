@@ -1,0 +1,18 @@
+{
+  "schema": "kingsmen.n02-kernel-01-proof.v1",
+  "module": "N02-KERNEL-01 - Backend Constitution Loader / Command Envelope / Policy Guard / Command Bus Proof",
+  "status": "N02_KERNEL_CONSTITUTION_COMMAND_POLICY_BUS_PROVEN",
+  "passed": true,
+  "productionReady": false,
+  "requiresN00": true,
+  "loadsConstitution": true,
+  "commandEnvelopeBuilt": true,
+  "commandBusBuilt": true,
+  "policyGuardBuilt": true,
+  "providerLiveClaimsBlockedWithoutProof": true,
+  "rawShellBlocked": true,
+  "founderApprovalRequiredForHighRiskActions": true,
+  "failures": [],
+  "nextAction": "Continue to N02-KERNEL-02 - idempotency, audit context, and queue dispatch boundary.",
+  "checkedAt": "2026-06-04T05:13:06.855Z"
+}
