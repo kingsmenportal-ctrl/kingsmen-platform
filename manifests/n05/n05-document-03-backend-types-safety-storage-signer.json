@@ -1,0 +1,15 @@
+{
+  "schema": "kingsmen.n05-document-03.v1",
+  "module": "N05-DOCUMENT-03 - Backend Types / Safety Policies / Storage Signer Boundary",
+  "status": "N05_DOCUMENT_BACKEND_TYPES_SAFETY_STORAGE_SIGNER_PROVEN",
+  "productionReady": false,
+  "requiresN05Document02": true,
+  "signedUploadTypesBuilt": true,
+  "signedReadTypesBuilt": true,
+  "storageSignerBoundaryBuilt": true,
+  "documentSafetyPolicyBuilt": true,
+  "mimeSizeExtensionGuardBuilt": true,
+  "candidateOwnDocumentBoundaryBuilt": true,
+  "serviceRoleBackendOnly": true,
+  "rawPublicUrlBlocked": true
+}

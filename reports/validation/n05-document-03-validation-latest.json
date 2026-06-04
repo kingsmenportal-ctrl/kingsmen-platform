@@ -1,0 +1,8 @@
+{
+  "schema": "kingsmen.n05-document-03-validation.v1",
+  "module": "N05-DOCUMENT-03",
+  "passed": true,
+  "productionReady": false,
+  "failures": [],
+  "checkedAt": "2026-06-04T12:14:17.598Z"
+}
