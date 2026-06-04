@@ -1,0 +1,15 @@
+{
+  "schema": "kingsmen.n05-document-02.v1",
+  "module": "N05-DOCUMENT-02 - PostgreSQL Schema / RLS / Document Status Views / Seeds",
+  "status": "N05_DOCUMENT_POSTGRES_RLS_STATUS_VIEWS_SEEDS_PROVEN",
+  "productionReady": false,
+  "requiresN05Document01": true,
+  "postgresSchemaBuilt": true,
+  "rlsBoundaryBuilt": true,
+  "documentStatusViewsBuilt": true,
+  "documentTypeSeedsBuilt": true,
+  "candidateOwnDocumentReadBuilt": true,
+  "candidateDocumentVerificationBlocked": true,
+  "evidenceLinksBuilt": true,
+  "ocrFraudReviewTablesBuilt": true
+}

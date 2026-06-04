@@ -1,0 +1,18 @@
+{
+  "schema": "kingsmen.n05-document-02-proof.v1",
+  "module": "N05-DOCUMENT-02 - PostgreSQL Schema / RLS / Document Status Views / Seeds",
+  "status": "N05_DOCUMENT_POSTGRES_RLS_STATUS_VIEWS_SEEDS_PROVEN",
+  "passed": true,
+  "productionReady": false,
+  "postgresSchemaBuilt": true,
+  "rlsBoundaryBuilt": true,
+  "documentStatusViewsBuilt": true,
+  "documentTypeSeedsBuilt": true,
+  "candidateOwnDocumentReadBuilt": true,
+  "candidateDocumentVerificationBlocked": true,
+  "evidenceLinksBuilt": true,
+  "ocrFraudReviewTablesBuilt": true,
+  "failures": [],
+  "nextAction": "Continue to N05-DOCUMENT-03 - backend types, safety policies, and storage signer boundary.",
+  "checkedAt": "2026-06-04T11:34:49.779Z"
+}
