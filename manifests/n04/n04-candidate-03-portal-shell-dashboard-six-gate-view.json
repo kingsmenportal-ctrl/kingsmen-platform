@@ -1,0 +1,15 @@
+{
+  "schema": "kingsmen.n04-candidate-03.v1",
+  "module": "N04-CANDIDATE-03 - Candidate Portal Shell / Dashboard Read Model / Six-Gate View",
+  "status": "N04_CANDIDATE_PORTAL_SHELL_DASHBOARD_SIX_GATE_VIEW_PROVEN",
+  "productionReady": false,
+  "requiresN04Candidate02": true,
+  "candidatePortalShellBuilt": true,
+  "dashboardReadModelBuilt": true,
+  "sixGateViewBuilt": true,
+  "allSixGatesVisibleToAllUsers": true,
+  "packageControlsIntensityNotGateAccess": true,
+  "candidateSafeReadModelOnly": true,
+  "serviceRoleNeverInBrowser": true,
+  "noTruthAuthorityActionsInBrowser": true
+}
