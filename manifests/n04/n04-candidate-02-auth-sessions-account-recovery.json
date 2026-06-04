@@ -1,0 +1,15 @@
+{
+  "schema": "kingsmen.n04-candidate-02.v1",
+  "module": "N04-CANDIDATE-02 - Candidate Auth / Sessions / Account Recovery Boundary",
+  "status": "N04_CANDIDATE_AUTH_SESSIONS_ACCOUNT_RECOVERY_PROVEN",
+  "productionReady": false,
+  "requiresN04Candidate01": true,
+  "candidateAuthBoundaryBuilt": true,
+  "sessionBoundaryBuilt": true,
+  "accountRecoveryBoundaryBuilt": true,
+  "sessionAuditRequired": true,
+  "serviceRoleBackendOnly": true,
+  "anonBrowserOwnDataOnly": true,
+  "candidateCannotBypassTruthAuthority": true,
+  "popiaSafeAccountRecovery": true
+}
