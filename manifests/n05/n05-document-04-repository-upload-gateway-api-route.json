@@ -1,0 +1,15 @@
+{
+  "schema": "kingsmen.n05-document-04.v1",
+  "module": "N05-DOCUMENT-04 - Repository / Upload Gateway / API Route Boundary",
+  "status": "N05_DOCUMENT_REPOSITORY_UPLOAD_GATEWAY_API_ROUTE_PROVEN",
+  "productionReady": false,
+  "requiresN05Document03": true,
+  "documentRepositoryBuilt": true,
+  "signedUploadGatewayBuilt": true,
+  "signedReadGatewayBuilt": true,
+  "candidateDocumentApiBuilt": true,
+  "serviceRoleNotExposed": true,
+  "candidateOwnDocumentOnly": true,
+  "candidateCannotVerifyRejectDelete": true,
+  "rawPublicUrlBlocked": true
+}
