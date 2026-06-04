@@ -1,0 +1,8 @@
+{
+  "schema": "kingsmen.n07-airtable-01-validation.v1",
+  "module": "N07-AIRTABLE-01",
+  "passed": true,
+  "productionReady": false,
+  "failures": [],
+  "checkedAt": "2026-06-04T20:45:51.107Z"
+}

@@ -1,0 +1,16 @@
+{
+  "schema": "kingsmen.n07-airtable-01.v1",
+  "module": "N07-AIRTABLE-01 - Airtable Mirror Boundary / Async Sync Doctrine / Provider Proof Gate",
+  "status": "N07_AIRTABLE_MIRROR_BOUNDARY_ASYNC_SYNC_PROVIDER_GATE_PROVEN",
+  "productionReady": false,
+  "requiresN06Route05": true,
+  "postgresTruthPreserved": true,
+  "airtableMirrorOnly": true,
+  "airtableCannotGovernTruth": true,
+  "asyncQueueSyncBuilt": true,
+  "batchSyncDisciplineBuilt": true,
+  "missingCredentialsDegradeGracefully": true,
+  "providerProofGateBuilt": true,
+  "oracleLiteSyncLimitsEnforced": true,
+  "twelveBaseMapBuilt": true
+}
