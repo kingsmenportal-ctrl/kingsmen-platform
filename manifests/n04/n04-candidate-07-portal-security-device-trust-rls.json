@@ -1,0 +1,15 @@
+{
+  "schema": "kingsmen.n04-candidate-07.v1",
+  "module": "N04-CANDIDATE-07 - Portal Security / Device Trust / Account Recovery / RLS Enforcement",
+  "status": "N04_PORTAL_SECURITY_DEVICE_TRUST_RLS_PROVEN",
+  "productionReady": false,
+  "requiresN04Candidate06": true,
+  "deviceTrustBuilt": true,
+  "sessionRiskBuilt": true,
+  "accountRecoverySecurityBuilt": true,
+  "candidateOwnDataRlsBuilt": true,
+  "serviceRoleBackendOnly": true,
+  "browserCannotAccessOtherCandidateData": true,
+  "suspiciousSessionRequiresReview": true,
+  "popiaAccessLogRequired": true
+}
