@@ -1,0 +1,22 @@
+{
+  "schema": "kingsmen.n00-constitution-proof.v1",
+  "module": "N00 - Constitution / Doctrine Lock",
+  "status": "N00_CONSTITUTION_DOCTRINE_LOCK_PROVEN",
+  "passed": true,
+  "productionReady": false,
+  "oracleLiteDefault": true,
+  "allSixGatesVisibleToAllUsers": true,
+  "packageControlsIntensityNotGateAccess": true,
+  "caoParentChildRule": true,
+  "noProofNoSubmitted": true,
+  "emailFirst": true,
+  "whatsappUrgentOnly": true,
+  "playwrightProbeOnly": true,
+  "captchaOtpBypassAllowed": false,
+  "sourceConfidenceRequired": true,
+  "aiMaySuggestNotGovern": true,
+  "activeCandidateStartingCap": 500,
+  "failures": [],
+  "nextAction": "Continue to the next missing foundational layer after N00.",
+  "checkedAt": "2026-06-04T04:47:50.956Z"
+}

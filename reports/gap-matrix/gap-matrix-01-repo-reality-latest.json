@@ -1,0 +1,100 @@
+{
+  "schema": "kingsmen.gap-matrix.repo-reality.v1",
+  "module": "GAP-MATRIX-01 - Repo Gap Matrix from MASTER-INDEX-01 against actual files",
+  "passed": true,
+  "productionReady": false,
+  "gitRealityOnly": true,
+  "earliestMissingOrPartialLayer": "N00",
+  "rows": [
+    {
+      "layer": "MASTER-INDEX-01",
+      "expectedCount": 5,
+      "presentCount": 5,
+      "missingCount": 0,
+      "status": "validated_or_present_pending_report_review",
+      "present": [
+        "docs/master/KINGSMEN_MASTER_LAYER_INDEX.md",
+        "manifests/master/kingsmen-master-layer-index.json",
+        "manifests/providers/kingsmen-25-connected-apps-tools-provider-map.json",
+        "scripts/proof/prove-master-layer-index-and-provider-gates.mjs",
+        "reports/master/master-layer-index-proof-latest.json"
+      ],
+      "missing": []
+    },
+    {
+      "layer": "N00",
+      "expectedCount": 8,
+      "presentCount": 0,
+      "missingCount": 8,
+      "status": "missing",
+      "present": [],
+      "missing": [
+        "docs/constitution/KINGSMEN_CONSTITUTION.md",
+        "manifests/constitution/n00-constitution-doctrine-lock.json",
+        "packages/contracts/src/constitution-contract.ts",
+        "packages/backend/src/constitution/constitution-loader.ts",
+        "scripts/proof/prove-n00-constitution-doctrine-lock.mjs",
+        "scripts/validators/validate-n00-constitution-doctrine-lock.mjs",
+        "reports/constitution/n00-constitution-proof-latest.json",
+        "reports/validation/n00-constitution-validation-latest.json"
+      ]
+    },
+    {
+      "layer": "N01",
+      "expectedCount": 2,
+      "presentCount": 2,
+      "missingCount": 0,
+      "status": "validated_or_present_pending_report_review",
+      "present": [
+        "reports/validation/n01-readiness-report.json",
+        "scripts/validators/validate-n01-readiness.mjs"
+      ],
+      "missing": []
+    },
+    {
+      "layer": "N09.3",
+      "expectedCount": 3,
+      "presentCount": 3,
+      "missingCount": 0,
+      "status": "validated_or_present_pending_report_review",
+      "present": [
+        "manifests/modules/N09.3-communications-contracts.json",
+        "scripts/validators/validate-n09-3.mjs",
+        "reports/n09/n09-3-validation-report.json"
+      ],
+      "missing": []
+    },
+    {
+      "layer": "ORACLE-RUNTIME-BATCHES",
+      "expectedCount": 6,
+      "presentCount": 6,
+      "missingCount": 0,
+      "status": "validated_or_present_pending_report_review",
+      "present": [
+        "manifests/runtime/batch21c-github-actions-docker-runtime-proof.json",
+        "manifests/runtime/batch22-oracle-lite-handoff-prep.json",
+        "manifests/runtime/docker-oracle-lite-controlled-runtime-proof.json",
+        "reports/runtime/docker-oracle-lite-controlled-runtime-proof.json",
+        "scripts/proof/prove-docker-oracle-lite-controlled-runtime.mjs",
+        "scripts/validators/validate-docker-oracle-lite-controlled-runtime.mjs"
+      ],
+      "missing": []
+    },
+    {
+      "layer": "FREE-DESTINY-MAP-RUNTIME",
+      "expectedCount": 4,
+      "presentCount": 4,
+      "missingCount": 0,
+      "status": "validated_or_present_pending_report_review",
+      "present": [
+        "manifests/runtime/free-destiny-map-real-web-readiness-gate.json",
+        "reports/runtime/free-destiny-map-real-web-readiness-proof.json",
+        "scripts/proof/prove-free-destiny-map-real-web-readiness.mjs",
+        "scripts/validators/validate-free-destiny-map-real-web-readiness.mjs"
+      ],
+      "missing": []
+    }
+  ],
+  "nextAction": "Build N00 - Constitution / Doctrine Lock.",
+  "checkedAt": "2026-06-04T04:37:50.708Z"
+}
