@@ -1,0 +1,15 @@
+{
+  "schema": "kingsmen.n03-truth-02.v1",
+  "module": "N03-TRUTH-02 - Payment / Application / Evidence Status Transition Guards",
+  "status": "N03_PAYMENT_APPLICATION_EVIDENCE_STATUS_GUARDS_PROVEN",
+  "productionReady": false,
+  "requiresN03Truth01": true,
+  "paymentRequiresWebhookOrManualFinanceProof": true,
+  "returnUrlCannotMarkPaid": true,
+  "applicationSubmittedRequiresProof": true,
+  "outcomeVerifiedRequiresProof": true,
+  "successStoryRequiresProofConsent": true,
+  "partnerSharingRequiresConsent": true,
+  "sourceConfidenceCandidateBlocked": true,
+  "auditRequiredForStatusTransition": true
+}

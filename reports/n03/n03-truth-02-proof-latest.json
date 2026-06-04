@@ -1,0 +1,17 @@
+{
+  "schema": "kingsmen.n03-truth-02-proof.v1",
+  "module": "N03-TRUTH-02 - Payment / Application / Evidence Status Transition Guards",
+  "status": "N03_PAYMENT_APPLICATION_EVIDENCE_STATUS_GUARDS_PROVEN",
+  "passed": true,
+  "productionReady": false,
+  "paymentRequiresWebhookOrManualFinanceProof": true,
+  "returnUrlCannotMarkPaid": true,
+  "applicationSubmittedRequiresProof": true,
+  "outcomeVerifiedRequiresProof": true,
+  "successStoryRequiresProofConsent": true,
+  "partnerSharingRequiresConsent": true,
+  "auditRequiredForStatusTransition": true,
+  "failures": [],
+  "nextAction": "Continue to N03-TRUTH-03 - CAO parent-child application model and six-gate visibility constraints.",
+  "checkedAt": "2026-06-04T06:12:26.413Z"
+}

@@ -1,0 +1,8 @@
+{
+  "schema": "kingsmen.n03-truth-02-validation.v1",
+  "module": "N03-TRUTH-02",
+  "passed": true,
+  "productionReady": false,
+  "failures": [],
+  "checkedAt": "2026-06-04T06:12:26.532Z"
+}
