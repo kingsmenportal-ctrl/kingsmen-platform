@@ -1,0 +1,13 @@
+{
+  "schema": "kingsmen.n02-kernel-02.v1",
+  "module": "N02-KERNEL-02 - Idempotency / Audit Context / Queue Dispatch Boundary",
+  "status": "N02_KERNEL_IDEMPOTENCY_AUDIT_QUEUE_BOUNDARY_PROVEN",
+  "productionReady": false,
+  "requiresN02Kernel01": true,
+  "idempotencyBuilt": true,
+  "auditContextBuilt": true,
+  "queueDispatchBoundaryBuilt": true,
+  "duplicateCommandProtectionBuilt": true,
+  "auditRequiredForDispatch": true,
+  "oracleLiteQueueDiscipline": true
+}
