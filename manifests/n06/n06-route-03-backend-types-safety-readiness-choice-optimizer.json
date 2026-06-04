@@ -1,0 +1,15 @@
+{
+  "schema": "kingsmen.n06-route-03.v1",
+  "module": "N06-ROUTE-03 - Backend Types / Safety Policies / Readiness Scoring / Choice Optimizer Boundary",
+  "status": "N06_ROUTE_BACKEND_TYPES_SAFETY_READINESS_CHOICE_OPTIMIZER_PROVEN",
+  "productionReady": false,
+  "requiresN06Route02": true,
+  "readinessScoringBuilt": true,
+  "choiceOptimizerBuilt": true,
+  "caoChoiceOptimizerBuilt": true,
+  "knownRouteFastSubmissionReadinessBuilt": true,
+  "sourceConfidenceSafetyBuilt": true,
+  "feeDeadlinePaymentInstructionGateBuilt": true,
+  "noGuaranteeBoundaryBuilt": true,
+  "candidateDocumentReadinessConnected": true
+}
