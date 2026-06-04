@@ -1,0 +1,15 @@
+{
+  "schema": "kingsmen.n03-truth-04.v1",
+  "module": "N03-TRUTH-04 - POPIA Access Log / Evidence Immutability / Source Authority Registry",
+  "status": "N03_POPIA_EVIDENCE_SOURCE_AUTHORITY_PROVEN",
+  "productionReady": false,
+  "requiresN03Truth03": true,
+  "popiaAccessLogBuilt": true,
+  "evidenceImmutableAppendFirst": true,
+  "sourceAuthorityRegistryBuilt": true,
+  "sourceConfidenceBandsRequired": true,
+  "officialInstructionsRequireVerifiedSource": true,
+  "candidateDataAccessMustBeLogged": true,
+  "evidenceDeleteBlocked": true,
+  "silentOverwriteBlocked": true
+}
