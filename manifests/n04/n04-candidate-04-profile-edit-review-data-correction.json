@@ -1,0 +1,15 @@
+{
+  "schema": "kingsmen.n04-candidate-04.v1",
+  "module": "N04-CANDIDATE-04 - Profile Edit Review / Candidate Data Correction Boundary",
+  "status": "N04_PROFILE_EDIT_REVIEW_DATA_CORRECTION_PROVEN",
+  "productionReady": false,
+  "requiresN04Candidate03": true,
+  "profileCorrectionRequestBuilt": true,
+  "sensitiveChangeReviewRequired": true,
+  "auditRequiredForCorrection": true,
+  "popiaLogRequiredForCorrection": true,
+  "oldValuePreserved": true,
+  "silentOverwriteBlocked": true,
+  "candidateCannotBypassTruthAuthority": true,
+  "candidateCannotChangePaymentSubmissionOutcomeSource": true
+}
