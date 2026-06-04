@@ -1,0 +1,21 @@
+{
+  "schema": "kingsmen.n05-document-05.v1",
+  "module": "N05-DOCUMENT-05 - Validator / Manifest / Evidence Matrix / Closeout",
+  "status": "N05_DOCUMENT_CLOSEOUT_EVIDENCE_MATRIX_PROVEN",
+  "productionReady": false,
+  "requiresN05Document01": true,
+  "requiresN05Document02": true,
+  "requiresN05Document03": true,
+  "requiresN05Document04": true,
+  "requiresN05Document04B": true,
+  "evidenceMatrixBuilt": true,
+  "allN05ProofReportsRequired": true,
+  "allN05ValidationReportsRequired": true,
+  "signedUploadReadBoundaryConfirmed": true,
+  "privateStorageConfirmed": true,
+  "rawPublicUrlBlocked": true,
+  "ocrAiAssistiveOnly": true,
+  "candidateCannotVerifyRejectDelete": true,
+  "documentStatusIntegrationConfirmed": true,
+  "handoverToN06RouteUniverse": true
+}

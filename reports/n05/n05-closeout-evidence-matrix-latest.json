@@ -1,0 +1,50 @@
+{
+  "schema": "kingsmen.n05-closeout-evidence-matrix.v1",
+  "productionReady": false,
+  "rows": [
+    {
+      "moduleCode": "N05-DOCUMENT-01",
+      "proofReportPath": "reports/n05/n05-document-01-proof-latest.json",
+      "validationReportPath": "reports/validation/n05-document-01-validation-latest.json",
+      "passed": true,
+      "productionReady": false
+    },
+    {
+      "moduleCode": "N05-DOCUMENT-02",
+      "proofReportPath": "reports/n05/n05-document-02-proof-latest.json",
+      "validationReportPath": "reports/validation/n05-document-02-validation-latest.json",
+      "passed": true,
+      "productionReady": false
+    },
+    {
+      "moduleCode": "N05-DOCUMENT-03",
+      "proofReportPath": "reports/n05/n05-document-03-proof-latest.json",
+      "validationReportPath": "reports/validation/n05-document-03-validation-latest.json",
+      "passed": true,
+      "productionReady": false
+    },
+    {
+      "moduleCode": "N05-DOCUMENT-04",
+      "proofReportPath": "reports/n05/n05-document-04-proof-latest.json",
+      "validationReportPath": "reports/validation/n05-document-04-validation-latest.json",
+      "passed": true,
+      "productionReady": false
+    },
+    {
+      "moduleCode": "N05-DOCUMENT-04B",
+      "proofReportPath": "reports/n05/n05-document-04b-proof-latest.json",
+      "validationReportPath": "reports/validation/n05-document-04b-validation-latest.json",
+      "passed": true,
+      "productionReady": false
+    }
+  ],
+  "allPassed": true,
+  "signedUploadReadBoundaryConfirmed": true,
+  "privateStorageConfirmed": true,
+  "rawPublicUrlBlocked": true,
+  "ocrAiAssistiveOnly": true,
+  "candidateCannotVerifyRejectDelete": true,
+  "documentStatusIntegrationConfirmed": true,
+  "handoverTo": "N06-ROUTE-UNIVERSE",
+  "checkedAt": "2026-06-04T12:45:58.207Z"
+}
