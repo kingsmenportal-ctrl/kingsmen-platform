@@ -1,0 +1,17 @@
+{
+  "schema": "kingsmen.n05-document-01.v1",
+  "module": "N05-DOCUMENT-01 - Document Vault Service Overview / Storage Boundary / OCR-Fraud-Review Doctrine",
+  "status": "N05_DOCUMENT_SERVICE_OVERVIEW_STORAGE_OCR_FRAUD_REVIEW_PROVEN",
+  "productionReady": false,
+  "requiresN04Candidate11": true,
+  "documentVaultServiceBuilt": true,
+  "signedUploadBoundaryBuilt": true,
+  "privateStorageRequired": true,
+  "rawPublicFileAccessBlocked": true,
+  "candidateCanViewOwnDocuments": true,
+  "candidateCannotVerifyDocuments": true,
+  "ocrAssistiveOnly": true,
+  "fraudReviewRequiresEvidence": true,
+  "riskyDocumentRequiresHumanReview": true,
+  "documentStatusRequiresProof": true
+}
