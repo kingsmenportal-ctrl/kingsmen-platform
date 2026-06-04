@@ -1,0 +1,20 @@
+{
+  "schema": "kingsmen.n04-candidate-09-proof.v1",
+  "module": "N04-CANDIDATE-09 - Financial View / Service Orders / Payment Status / Refund Visibility",
+  "status": "N04_FINANCIAL_VIEW_SERVICE_ORDERS_REFUNDS_PROVEN",
+  "passed": true,
+  "productionReady": false,
+  "financialViewBuilt": true,
+  "serviceOrdersBuilt": true,
+  "paymentStatusVisibilityBuilt": true,
+  "refundVisibilityBuilt": true,
+  "candidateCannotMarkPaid": true,
+  "returnUrlCannotMarkPaid": true,
+  "paymentRequiresWebhookOrManualFinanceReview": true,
+  "refundRequiresManualFinanceReview": true,
+  "officialPricingPreserved": true,
+  "cvRevampUpgradeBonusPreserved": true,
+  "failures": [],
+  "nextAction": "Continue to N04-CANDIDATE-10 - success loop, feedback, outcomes, and learning signals.",
+  "checkedAt": "2026-06-04T10:37:27.647Z"
+}
