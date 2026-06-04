@@ -1,0 +1,50 @@
+{
+  "schema": "kingsmen.n06-closeout-evidence-matrix.v1",
+  "productionReady": false,
+  "rows": [
+    {
+      "moduleCode": "N06-ROUTE-01",
+      "proofReportPath": "reports/n06/n06-route-01-proof-latest.json",
+      "validationReportPath": "reports/validation/n06-route-01-validation-latest.json",
+      "passed": true,
+      "productionReady": false
+    },
+    {
+      "moduleCode": "N06-ROUTE-02",
+      "proofReportPath": "reports/n06/n06-route-02-proof-latest.json",
+      "validationReportPath": "reports/validation/n06-route-02-validation-latest.json",
+      "passed": true,
+      "productionReady": false
+    },
+    {
+      "moduleCode": "N06-ROUTE-03",
+      "proofReportPath": "reports/n06/n06-route-03-proof-latest.json",
+      "validationReportPath": "reports/validation/n06-route-03-validation-latest.json",
+      "passed": true,
+      "productionReady": false
+    },
+    {
+      "moduleCode": "N06-ROUTE-04",
+      "proofReportPath": "reports/n06/n06-route-04-proof-latest.json",
+      "validationReportPath": "reports/validation/n06-route-04-validation-latest.json",
+      "passed": true,
+      "productionReady": false
+    },
+    {
+      "moduleCode": "N06-ROUTE-04B",
+      "proofReportPath": "reports/n06/n06-route-04b-proof-latest.json",
+      "validationReportPath": "reports/validation/n06-route-04b-validation-latest.json",
+      "passed": true,
+      "productionReady": false
+    }
+  ],
+  "allPassed": true,
+  "sixGateWorkbenchConfirmed": true,
+  "caoParentChildRuleConfirmed": true,
+  "sourceConfidenceGateConfirmed": true,
+  "readinessScoringConfirmed": true,
+  "choiceOptimizerConfirmed": true,
+  "candidateSafeWorkbenchPortalConfirmed": true,
+  "handoverTo": "N07-AIRTABLE-SYNC",
+  "checkedAt": "2026-06-04T20:36:25.565Z"
+}

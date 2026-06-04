@@ -1,0 +1,21 @@
+{
+  "schema": "kingsmen.n06-route-05.v1",
+  "module": "N06-ROUTE-05 - Validator / Docs / Manifest / Evidence Matrix / Closeout",
+  "status": "N06_ROUTE_CLOSEOUT_EVIDENCE_MATRIX_PROVEN",
+  "productionReady": false,
+  "requiresN06Route01": true,
+  "requiresN06Route02": true,
+  "requiresN06Route03": true,
+  "requiresN06Route04": true,
+  "requiresN06Route04B": true,
+  "evidenceMatrixBuilt": true,
+  "allN06ProofReportsRequired": true,
+  "allN06ValidationReportsRequired": true,
+  "sixGateWorkbenchConfirmed": true,
+  "caoParentChildRuleConfirmed": true,
+  "sourceConfidenceGateConfirmed": true,
+  "readinessScoringConfirmed": true,
+  "choiceOptimizerConfirmed": true,
+  "candidateSafeWorkbenchPortalConfirmed": true,
+  "handoverToN07AirtableSync": true
+}
