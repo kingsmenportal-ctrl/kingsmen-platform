@@ -1,0 +1,15 @@
+{
+  "schema": "kingsmen.n06-route-04b.v1",
+  "module": "N06-ROUTE-04B - API Routes / Server Wiring / Candidate Portal Workbench Integration",
+  "status": "N06_ROUTE_API_ROUTES_SERVER_WIRING_PORTAL_INTEGRATION_PROVEN",
+  "productionReady": false,
+  "requiresN06Route04": true,
+  "workbenchRouteRegistryBuilt": true,
+  "candidatePortalWorkbenchPageBuilt": true,
+  "sixGateWorkbenchViewBuilt": true,
+  "caoParentChildPortalViewBuilt": true,
+  "serverWiringSafetyBuilt": true,
+  "candidateSafeReadModelOnly": true,
+  "candidateTruthAuthorityBlocked": true,
+  "serviceRoleNotExposed": true
+}
