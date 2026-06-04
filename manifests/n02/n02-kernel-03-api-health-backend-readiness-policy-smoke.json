@@ -1,0 +1,15 @@
+{
+  "schema": "kingsmen.n02-kernel-03.v1",
+  "module": "N02-KERNEL-03 - API Health / Backend Readiness / Policy Smoke Test",
+  "status": "N02_KERNEL_API_HEALTH_BACKEND_READINESS_POLICY_SMOKE_PROVEN",
+  "productionReady": false,
+  "requiresN02Kernel01": true,
+  "requiresN02Kernel02": true,
+  "apiHealthBuilt": true,
+  "backendReadinessBuilt": true,
+  "policySmokeTestBuilt": true,
+  "publicHealthDoesNotLeakSecrets": true,
+  "founderReadinessRequiresFounderSurface": true,
+  "liveClaimsBlockedWithoutProof": true,
+  "rawShellBlocked": true
+}
