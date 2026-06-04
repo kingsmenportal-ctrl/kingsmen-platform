@@ -1,0 +1,17 @@
+{
+  "schema": "kingsmen.n08-founder-03.v1",
+  "module": "N08-FOUNDER-03 - Daily Digest / Mobile Alerts / Stop-Selling Operations",
+  "status": "N08_FOUNDER_DAILY_DIGEST_MOBILE_ALERTS_STOP_SELLING_PROVEN",
+  "productionReady": false,
+  "requiresN08Founder02": true,
+  "dailyDigestContractBuilt": true,
+  "mobileAlertContractBuilt": true,
+  "stopSellingOperationsBuilt": true,
+  "founderRhythmBuilt": true,
+  "urgentOnlyAlertBoundaryBuilt": true,
+  "candidateHarmAlertBuilt": true,
+  "providerFailureAlertBuilt": true,
+  "queueDangerAlertBuilt": true,
+  "privacyRiskAlertBuilt": true,
+  "stopSellingLimitsVolumeNotCapability": true
+}
