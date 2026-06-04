@@ -1,0 +1,9 @@
+{
+  "schema": "kingsmen.provider-gates-validation.v1",
+  "module": "MASTER-INDEX-01",
+  "passed": true,
+  "providerCount": 25,
+  "productionReady": false,
+  "failures": [],
+  "checkedAt": "2026-06-04T03:47:38.205Z"
+}

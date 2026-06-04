@@ -1,0 +1,9 @@
+{
+  "schema": "kingsmen.no-provider-live-claims-validation.v1",
+  "module": "MASTER-INDEX-01",
+  "passed": true,
+  "noProviderClaimsLiveWithoutProof": true,
+  "productionReady": false,
+  "failures": [],
+  "checkedAt": "2026-06-04T03:47:38.346Z"
+}

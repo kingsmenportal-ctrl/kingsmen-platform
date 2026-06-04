@@ -1,0 +1,202 @@
+{
+    "liveClaims":  {
+                       "emailRuntimeLive":  false,
+                       "officialSubmissionsLive":  false,
+                       "paymentsLive":  false,
+                       "deployedToOracle":  false,
+                       "publicHttpsReady":  false,
+                       "productionReady":  false
+                   },
+    "providerCount":  25,
+    "schema":  "kingsmen.provider-gates.v1",
+    "providerGateStatuses":  [
+                                 "not_required_for_current_phase",
+                                 "not_configured",
+                                 "configured_pending_proof",
+                                 "sandbox_proven",
+                                 "controlled_live",
+                                 "live_blocked",
+                                 "degraded",
+                                 "incident",
+                                 "disabled_by_policy"
+                             ],
+    "module":  "MASTER-INDEX-01",
+    "providers":  [
+                      {
+                          "status":  "configured_pending_proof",
+                          "code":  "chatgpt",
+                          "name":  "ChatGPT",
+                          "boundary":  "Does not prove repo files exist",
+                          "role":  "Architect, doctrine keeper, planner, reviewer, prompt/module generator"
+                      },
+                      {
+                          "status":  "configured_pending_proof",
+                          "code":  "github",
+                          "name":  "GitHub",
+                          "boundary":  "GitHub presence is not production readiness",
+                          "role":  "Repo source control, proof history, Git checkpoints"
+                      },
+                      {
+                          "status":  "not_configured",
+                          "code":  "github_actions",
+                          "name":  "GitHub Actions",
+                          "boundary":  "CI passing does not mean live providers are configured",
+                          "role":  "CI proof runner"
+                      },
+                      {
+                          "status":  "configured_pending_proof",
+                          "code":  "powershell_creator",
+                          "name":  "PowerShell Creator / KINGSMEN_CREATOR.ps1",
+                          "boundary":  "Not the business brain",
+                          "role":  "Windows-first materializer, builder, validator, deploy runner"
+                      },
+                      {
+                          "status":  "configured_pending_proof",
+                          "code":  "docker",
+                          "name":  "Docker / Docker Compose",
+                          "boundary":  "Local Docker is not public production proof",
+                          "role":  "Oracle Lite runtime packaging"
+                      },
+                      {
+                          "status":  "not_configured",
+                          "code":  "oracle_free",
+                          "name":  "Oracle Cloud Free / Oracle Lite",
+                          "boundary":  "Low concurrency, no AWS-style assumptions",
+                          "role":  "First controlled deployment host"
+                      },
+                      {
+                          "status":  "not_configured",
+                          "code":  "nginx_https",
+                          "name":  "Nginx / Public HTTPS Gate",
+                          "boundary":  "HTTPS does not mean payments/email/submissions live",
+                          "role":  "Reverse proxy and HTTPS readiness"
+                      },
+                      {
+                          "status":  "not_configured",
+                          "code":  "supabase",
+                          "name":  "Supabase",
+                          "boundary":  "service_role backend-only",
+                          "role":  "Auth, RLS, signed storage, own-data boundary"
+                      },
+                      {
+                          "status":  "configured_pending_proof",
+                          "code":  "postgres",
+                          "name":  "PostgreSQL Truth Vault",
+                          "boundary":  "Airtable/n8n/AI cannot override truth",
+                          "role":  "Primary system truth"
+                      },
+                      {
+                          "status":  "not_configured",
+                          "code":  "redis",
+                          "name":  "Redis / Queue Layer",
+                          "boundary":  "No infinite retry",
+                          "role":  "Low-cost queue and retry discipline"
+                      },
+                      {
+                          "status":  "not_configured",
+                          "code":  "gmail",
+                          "name":  "Gmail",
+                          "boundary":  "Live only after COMMS-01",
+                          "role":  "Email-first runtime"
+                      },
+                      {
+                          "status":  "configured_pending_proof",
+                          "code":  "google_drive",
+                          "name":  "Google Drive",
+                          "boundary":  "No raw secrets",
+                          "role":  "Non-secret planning and report workspace"
+                      },
+                      {
+                          "status":  "not_required_for_current_phase",
+                          "code":  "google_calendar",
+                          "name":  "Google Calendar",
+                          "boundary":  "Calendar is not source truth",
+                          "role":  "Scheduling support"
+                      },
+                      {
+                          "status":  "not_required_for_current_phase",
+                          "code":  "google_contacts",
+                          "name":  "Google Contacts",
+                          "boundary":  "Cannot bypass verification/consent",
+                          "role":  "Contact reference"
+                      },
+                      {
+                          "status":  "not_required_for_current_phase",
+                          "code":  "canva",
+                          "name":  "Canva",
+                          "boundary":  "Does not replace policy/legal proof",
+                          "role":  "Public/outreach creative production"
+                      },
+                      {
+                          "status":  "not_configured",
+                          "code":  "payfast",
+                          "name":  "PayFast",
+                          "boundary":  "Live only after PAYMENTS-04",
+                          "role":  "South African payment provider"
+                      },
+                      {
+                          "status":  "not_configured",
+                          "code":  "paypal",
+                          "name":  "PayPal",
+                          "boundary":  "Optional; must not weaken PayFast policy",
+                          "role":  "Optional secondary payment provider"
+                      },
+                      {
+                          "status":  "not_configured",
+                          "code":  "airtable",
+                          "name":  "Airtable",
+                          "boundary":  "Never truth",
+                          "role":  "Async mirror / operations visibility"
+                      },
+                      {
+                          "status":  "not_configured",
+                          "code":  "n8n",
+                          "name":  "n8n",
+                          "boundary":  "No orchestration authority",
+                          "role":  "Thin workflow wrapper"
+                      },
+                      {
+                          "status":  "configured_pending_proof",
+                          "code":  "playwright",
+                          "name":  "Playwright",
+                          "boundary":  "No CAPTCHA/OTP bypass",
+                          "role":  "Scout/probe"
+                      },
+                      {
+                          "status":  "not_required_for_current_phase",
+                          "code":  "neon_postgres",
+                          "name":  "Neon Postgres",
+                          "boundary":  "Not default production unless approved",
+                          "role":  "Optional managed Postgres/dev/staging"
+                      },
+                      {
+                          "status":  "not_configured",
+                          "code":  "namecheap_dns",
+                          "name":  "Namecheap / Domain / DNS",
+                          "boundary":  "Domain does not equal production",
+                          "role":  "Domain and DNS readiness"
+                      },
+                      {
+                          "status":  "not_required_for_current_phase",
+                          "code":  "codex_aider",
+                          "name":  "OpenAI Codex CLI / Aider",
+                          "boundary":  "No uncontrolled production writes",
+                          "role":  "Repo coding acceleration"
+                      },
+                      {
+                          "status":  "not_required_for_current_phase",
+                          "code":  "ui_code_helpers",
+                          "name":  "Cursor / Windsurf / Cline / Continue / Copilot / Gemini CLI",
+                          "boundary":  "Cannot replace validators or PowerShell Creator",
+                          "role":  "Optional UI/code helpers"
+                      },
+                      {
+                          "status":  "not_required_for_current_phase",
+                          "code":  "founder_command_layer",
+                          "name":  "OpenJarvis / OpenClaw / Founder Command Layer",
+                          "boundary":  "No raw shell from browser",
+                          "role":  "Controlled founder command gateway"
+                      }
+                  ],
+    "productionReady":  false
+}

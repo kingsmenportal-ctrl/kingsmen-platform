@@ -1,0 +1,60 @@
+# KINGSMEN_MASTER_LAYER_INDEX
+
+MASTER-INDEX-01 is the canonical build-order and proof matrix for Kingsmen.
+
+## Truth boundary
+
+No layer is complete because it appears in chat or Drive.
+No provider is live because it is listed.
+No tool can claim production without proof.
+
+## Oracle Lite default
+
+Oracle Free / Oracle Lite remains the default deployment constraint.
+
+## Layer families
+
+- Foundation and Proof Discipline
+- Candidate Core and Portal
+- Document Payment Communication and Candidate Surfaces
+- Route Workbench
+- Founder Control
+- External Surfaces
+- Oracle Public Runtime
+- Reality Security Backup Observability
+- Launch Gates
+- Growth Era After Proof
+
+
+## Layers
+
+- N00 — Constitution / Doctrine Lock
+- N01 — Monorepo / Oracle Lite Runtime
+- N02 — Backend API Kernel / State Machine / Command Bus
+- N03 — PostgreSQL Truth Vault
+- CREATOR.1 — KINGSMEN_CREATOR.ps1
+- N_PROVIDER.5 — 25 Connected Apps + Supabase Reality Map
+- TOOLS-01 — Connected Tool Activation Gates
+- N04 — Candidate Core & Portal
+- N05 — Document Vault
+- PAYMENTS-01 — Payment Provider Sandbox / Webhook Verification Gate
+- PAYMENTS-04 — Live Payment Activation / Public Callback / First Transaction Monitoring Gate
+- COMMS-01 — Gmail Email-First Runtime Gate
+- ROUTE-WORKBENCH-01 — Route Universe / Application Workbench API / Choice Optimizer
+- ROUTE-WORKBENCH-08 — Workbench Closeout / Route Evidence Matrix / Candidate Portal Integration Proof
+- FOUNDER-CONTROL-01 — Founder Mobile Control Plane / Action Packets / Queue Health
+- FOUNDER-CONTROL-03 — Founder Daily Digest / Mobile Alerts / Stop-Selling Operations
+- PUBLIC-WEBSITE-01 — Public Site / Package Pages / Free Destiny Map Funnel
+- PARTNER-PORTAL-01 — Verified Partner / Consent-Safe Demand Intake
+- ORACLE-06 — Controlled Oracle Docker Runtime Deployment
+- PUBLIC-GATE-01 — Nginx / HTTPS / Public URL / Domain Readiness
+- N20.5 — End-to-End Interaction Proof / Demo Seed / Luxury UI / Mobile Test
+- SECURITY-01 — Public Runtime Security Audit / Secrets / RLS / Provider Boundary Proof
+- BACKUP-01 — Backup / Restore / Evidence Retention / Disaster Recovery Proof
+- OBSERVABILITY-01 — Runtime Logs / Metrics / Alerts / Founder Incident Packets
+- LIVE-GATE-01 — Final Go/No-Go / Provider Health / Production Claim Boundary
+- GO-LIVE-01 — Controlled Pilot Activation / Founder Approval / First Real User Monitoring
+- PILOT-OPS-01 — First 7 Days Pilot Operations
+- PILOT-OPS-02 — 30-Day Pilot Metrics
+- PILOT-OPS-03 — 90-Day Growth Decision
+- SCALE-01 — Controlled Expansion / Next-Cap Approval / Human Guide Activation / Province Growth Plan
