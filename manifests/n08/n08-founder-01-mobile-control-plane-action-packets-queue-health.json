@@ -1,0 +1,15 @@
+{
+  "schema": "kingsmen.n08-founder-01.v1",
+  "module": "N08-FOUNDER-01 - Founder Mobile Control Plane / Action Packets / Queue Health",
+  "status": "N08_FOUNDER_MOBILE_CONTROL_PLANE_ACTION_PACKETS_QUEUE_HEALTH_PROVEN",
+  "productionReady": false,
+  "requiresN07Airtable04": true,
+  "founderMobileControlPlaneBuilt": true,
+  "actionPacketContractBuilt": true,
+  "queueHealthReadModelBuilt": true,
+  "providerHealthSummaryBuilt": true,
+  "stopSellingSignalSurfaceBuilt": true,
+  "exceptionOnlyFounderModeBuilt": true,
+  "proofAuditRequiredForTruthChange": true,
+  "oracleLiteCapacityVisible": true
+}
