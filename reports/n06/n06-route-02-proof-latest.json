@@ -1,0 +1,19 @@
+{
+  "schema": "kingsmen.n06-route-02-proof.v1",
+  "module": "N06-ROUTE-02 - PostgreSQL Schema / RLS / Views / Seeds for Route Universe",
+  "status": "N06_ROUTE_POSTGRES_RLS_VIEWS_SEEDS_PROVEN",
+  "passed": true,
+  "productionReady": false,
+  "postgresSchemaBuilt": true,
+  "rlsBoundaryBuilt": true,
+  "routeGateSeedsBuilt": true,
+  "routeSystemsBuilt": true,
+  "routeUniverseTableBuilt": true,
+  "sourceAuthorityTableBuilt": true,
+  "candidateReadinessTableBuilt": true,
+  "caoParentChildTablesBuilt": true,
+  "candidateSafeViewsBuilt": true,
+  "failures": [],
+  "nextAction": "Continue to N06-ROUTE-03 - backend types, safety policies, readiness scoring, and choice optimizer boundary.",
+  "checkedAt": "2026-06-04T13:05:11.574Z"
+}

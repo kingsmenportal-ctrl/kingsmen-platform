@@ -1,0 +1,16 @@
+{
+  "schema": "kingsmen.n06-route-02.v1",
+  "module": "N06-ROUTE-02 - PostgreSQL Schema / RLS / Views / Seeds for Route Universe",
+  "status": "N06_ROUTE_POSTGRES_RLS_VIEWS_SEEDS_PROVEN",
+  "productionReady": false,
+  "requiresN06Route01": true,
+  "postgresSchemaBuilt": true,
+  "rlsBoundaryBuilt": true,
+  "routeGateSeedsBuilt": true,
+  "routeSystemsBuilt": true,
+  "routeUniverseTableBuilt": true,
+  "sourceAuthorityTableBuilt": true,
+  "candidateReadinessTableBuilt": true,
+  "caoParentChildTablesBuilt": true,
+  "candidateSafeViewsBuilt": true
+}
