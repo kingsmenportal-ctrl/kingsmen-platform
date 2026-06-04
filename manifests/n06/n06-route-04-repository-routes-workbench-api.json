@@ -1,0 +1,16 @@
+{
+  "schema": "kingsmen.n06-route-04.v1",
+  "module": "N06-ROUTE-04 - Repository / Routes / Workbench API",
+  "status": "N06_ROUTE_REPOSITORY_ROUTES_WORKBENCH_API_PROVEN",
+  "productionReady": false,
+  "requiresN06Route03": true,
+  "routeRepositoryBuilt": true,
+  "readinessRepositoryBuilt": true,
+  "caoChoiceRepositoryBuilt": true,
+  "workbenchApiRoutesBuilt": true,
+  "knownRouteReadinessRouteBuilt": true,
+  "choiceOptimizerRouteBuilt": true,
+  "caoChoiceOptimizerRouteBuilt": true,
+  "candidateTruthAuthorityBlocked": true,
+  "candidateSafeReadModelOnly": true
+}
