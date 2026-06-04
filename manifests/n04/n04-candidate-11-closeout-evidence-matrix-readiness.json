@@ -1,0 +1,16 @@
+{
+  "schema": "kingsmen.n04-candidate-11.v1",
+  "module": "N04-CANDIDATE-11 - N04 Closeout / Evidence Matrix / Readiness Gate",
+  "status": "N04_CLOSEOUT_EVIDENCE_MATRIX_READINESS_PROVEN",
+  "productionReady": false,
+  "requiresN04Candidate01To10": true,
+  "evidenceMatrixBuilt": true,
+  "candidatePortalPagesPresent": true,
+  "allSixGatesVisibleToAllUsers": true,
+  "emailFirst": true,
+  "whatsappUrgentOnly": true,
+  "smsBackupOnly": true,
+  "candidateCannotSelfVerifyPaidSubmittedOutcome": true,
+  "candidateCannotChangeSourceAuthority": true,
+  "handoverToN05DocumentVault": true
+}

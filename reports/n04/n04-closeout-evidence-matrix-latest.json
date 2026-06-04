@@ -1,0 +1,79 @@
+{
+  "schema": "kingsmen.n04-closeout-evidence-matrix.v1",
+  "productionReady": false,
+  "rows": [
+    {
+      "moduleCode": "N04-CANDIDATE-01",
+      "proofReportPath": "reports/n04/n04-candidate-01-proof-latest.json",
+      "validationReportPath": "reports/validation/n04-candidate-01-validation-latest.json",
+      "passed": true,
+      "productionReady": false
+    },
+    {
+      "moduleCode": "N04-CANDIDATE-02",
+      "proofReportPath": "reports/n04/n04-candidate-02-proof-latest.json",
+      "validationReportPath": "reports/validation/n04-candidate-02-validation-latest.json",
+      "passed": true,
+      "productionReady": false
+    },
+    {
+      "moduleCode": "N04-CANDIDATE-03",
+      "proofReportPath": "reports/n04/n04-candidate-03-proof-latest.json",
+      "validationReportPath": "reports/validation/n04-candidate-03-validation-latest.json",
+      "passed": true,
+      "productionReady": false
+    },
+    {
+      "moduleCode": "N04-CANDIDATE-04",
+      "proofReportPath": "reports/n04/n04-candidate-04-proof-latest.json",
+      "validationReportPath": "reports/validation/n04-candidate-04-validation-latest.json",
+      "passed": true,
+      "productionReady": false
+    },
+    {
+      "moduleCode": "N04-CANDIDATE-05",
+      "proofReportPath": "reports/n04/n04-candidate-05-proof-latest.json",
+      "validationReportPath": "reports/validation/n04-candidate-05-validation-latest.json",
+      "passed": true,
+      "productionReady": false
+    },
+    {
+      "moduleCode": "N04-CANDIDATE-06",
+      "proofReportPath": "reports/n04/n04-candidate-06-proof-latest.json",
+      "validationReportPath": "reports/validation/n04-candidate-06-validation-latest.json",
+      "passed": true,
+      "productionReady": false
+    },
+    {
+      "moduleCode": "N04-CANDIDATE-07",
+      "proofReportPath": "reports/n04/n04-candidate-07-proof-latest.json",
+      "validationReportPath": "reports/validation/n04-candidate-07-validation-latest.json",
+      "passed": true,
+      "productionReady": false
+    },
+    {
+      "moduleCode": "N04-CANDIDATE-08",
+      "proofReportPath": "reports/n04/n04-candidate-08-proof-latest.json",
+      "validationReportPath": "reports/validation/n04-candidate-08-validation-latest.json",
+      "passed": true,
+      "productionReady": false
+    },
+    {
+      "moduleCode": "N04-CANDIDATE-09",
+      "proofReportPath": "reports/n04/n04-candidate-09-proof-latest.json",
+      "validationReportPath": "reports/validation/n04-candidate-09-validation-latest.json",
+      "passed": true,
+      "productionReady": false
+    },
+    {
+      "moduleCode": "N04-CANDIDATE-10",
+      "proofReportPath": "reports/n04/n04-candidate-10-proof-latest.json",
+      "validationReportPath": "reports/validation/n04-candidate-10-validation-latest.json",
+      "passed": true,
+      "productionReady": false
+    }
+  ],
+  "allPassed": true,
+  "handoverTo": "N05-DOCUMENT-VAULT",
+  "checkedAt": "2026-06-04T11:03:48.229Z"
+}
