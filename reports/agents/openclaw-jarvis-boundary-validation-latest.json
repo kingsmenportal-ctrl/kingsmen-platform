@@ -4,15 +4,20 @@
   "status": "BUILT_PENDING_VALIDATION",
   "passed": false,
   "productionReady": false,
-  "failed_checks": [
-    "docs/agents/OPENCLAW_KINGSMEN_BOUNDARY.md contains forbidden secret-like token: /service_role/i"
-  ],
+  "connectedToKingsmenSecrets": false,
+  "candidateDataAccess": false,
+  "oracleAccess": false,
+  "paymentAccess": false,
   "files_expected": [
     "docs/agents/OPENCLAW_KINGSMEN_BOUNDARY.md",
     "docs/agents/JARVIS_KINGSMEN_BOUNDARY.md",
     "manifests/agents/openclaw-jarvis-boundary.json",
-    "scripts/agents/Install-OpenClawSandbox.ps1"
+    "scripts/agents/Install-OpenClawSandbox.ps1",
+    ".gitignore"
   ],
-  "generated_at": "2026-06-05T03:14:56.724Z",
-  "next_action": "Repair boundary files."
+  "failed_checks": [
+    "Jarvis blockedUse must include payments."
+  ],
+  "generated_at": "2026-06-05T03:56:23.985Z",
+  "next_action": "Repair OpenClaw/Jarvis sandbox boundary files."
 }
