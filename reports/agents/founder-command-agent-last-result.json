@@ -1,0 +1,15 @@
+﻿{
+    "schema":  "kingsmen.founder-command-agent-result.v1",
+    "module":  "AGENTS-01 - Founder Command Agent",
+    "command":  "raw-shell",
+    "commandClass":  "BLOCKED",
+    "allowedToExecute":  false,
+    "requiresFounderApproval":  false,
+    "blockedByPolicy":  true,
+    "productionReady":  false,
+    "executedHighRiskAction":  false,
+    "touchedSecrets":  false,
+    "touchedCandidateData":  false,
+    "generated_at":  "2026-06-05T04:04:12.2347156Z",
+    "next_action":  "Command blocked by AGENTS-01 policy."
+}
