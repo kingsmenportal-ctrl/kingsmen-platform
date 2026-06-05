@@ -1,0 +1,26 @@
+{
+  "module": "TOOLS-OPENCLAW-01",
+  "status": "INSTALLED_NOT_TRUSTED",
+  "openclaw_installed": true,
+  "gateway_started": true,
+  "gateway_action": "STOP_GATEWAY_BEFORE_KINGSMEN_USE",
+  "whatsapp_setup_attempted": true,
+  "decision": "Do not use WhatsApp channel for Kingsmen yet. Keep OpenClaw local sandbox only.",
+  "model_observed": "minimax-m3:cloud",
+  "required_model_boundary": "Prefer local Ollama model qwen3.5:2b before Kingsmen use.",
+  "allowed_now": [
+    "read safe docs only after approval",
+    "summarize reports only after approval",
+    "suggest safe commands only"
+  ],
+  "blocked_now": [
+    "WhatsApp automation",
+    "shell execution",
+    "Oracle deployment",
+    "Supabase service_role",
+    "payment actions",
+    "candidate data",
+    "repo modifications"
+  ],
+  "next_batch": "TOOLS-OPENCLAW-02 or REALITY-AUDIT-01"
+}
