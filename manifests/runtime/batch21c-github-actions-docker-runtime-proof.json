@@ -1,18 +1,29 @@
 ﻿{
-  "schema": "kingsmen.batch21c.github-actions-docker-runtime-proof.v1",
+  "schema": "kingsmen.batch21c-docker-runtime-proof-manifest.v1",
   "module": "BATCH 21C - GitHub Actions Docker Runtime Proof",
-  "status": "BUILT_PENDING_CI_VALIDATION",
+  "status": "BUILT_PENDING_GITHUB_ACTIONS_RUN",
   "productionReady": false,
-  "canClaimProduction": false,
   "deployedToOracle": false,
-  "runsInGitHubActions": true,
-  "dockerBuildsInThisBatch": true,
-  "dockerRunsInThisBatch": true,
-  "composeUpInThisBatch": true,
-  "composeDownInThisBatch": true,
-  "apiHealthUrl": "http://127.0.0.1:3001/health",
-  "webUrl": "http://127.0.0.1:3000/free-destiny-map",
-  "bridgeApiUrl": "http://127.0.0.1:3000/api/public/free-destiny-map/intake/local",
-  "oracleLiteImpact": "ci_docker_runtime_proof_only",
-  "nextAction": "Push to GitHub and confirm the BATCH 21C workflow passes."
+  "publicHttpsReady": false,
+  "paymentsLive": false,
+  "emailRuntimeLive": false,
+  "officialSubmissionsLive": false,
+  "runtimeScope": "github_actions_ci_docker_runtime_only",
+  "requiredEndpoints": {
+    "apiHealth": "http://127.0.0.1:3001/health",
+    "webPage": "http://127.0.0.1:3000/free-destiny-map",
+    "bridgePost": "http://127.0.0.1:3000/api/public/free-destiny-map/intake/local"
+  },
+  "requiredProof": {
+    "proofEnvironment": "github_actions",
+    "composeUpSucceeded": true,
+    "composeDownSucceeded": true,
+    "apiHealthStatus": 200,
+    "webStatus": 200,
+    "bridgeApiStatus": 202,
+    "backend_bridge_succeeded": true,
+    "backend_boundary_reached": true,
+    "backend_local_write_succeeded": true
+  },
+  "nextAction": "Push workflow, let GitHub Actions run, then preserve passing proof before BATCH 22."
 }

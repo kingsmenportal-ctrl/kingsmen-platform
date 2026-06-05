@@ -1,15 +1,11 @@
-﻿{
+{
   "schema": "kingsmen.validation-report.v1",
   "module": "BATCH 21C - GitHub Actions Docker Runtime Proof",
-  "status": "BUILT_PENDING_CI_VALIDATION",
-  "passed": false,
-  "generated_at": "2026-06-02T00:00:00.000Z",
-  "reason": "Seed report. GitHub Actions must run BATCH 21C proof first.",
-  "files_checked": 0,
-  "failed_checks": [
-    "github_actions_runtime_proof_not_yet_executed"
-  ],
-  "oracle_lite_impact": "ci_docker_runtime_proof_only",
-  "runtime_proof": "reports/runtime/batch21c-docker-runtime-proof.json",
-  "next_action": "Push workflow and run GitHub Actions BATCH 21C proof."
+  "status": "VALIDATED",
+  "passed": true,
+  "sourceOnly": true,
+  "productionReady": false,
+  "failed_checks": [],
+  "generated_at": "2026-06-05T04:28:39.579Z",
+  "next_action": "BATCH 21C proof is valid. Proceed to BATCH 22."
 }

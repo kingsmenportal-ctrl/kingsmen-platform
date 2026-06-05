@@ -1,26 +1,22 @@
 ﻿{
-  "schema": "kingsmen.batch21c.github-actions-docker-runtime-report.v1",
+  "schema": "kingsmen.batch21c-docker-runtime-proof.v1",
   "module": "BATCH 21C - GitHub Actions Docker Runtime Proof",
-  "status": "GITHUB_ACTIONS_DOCKER_RUNTIME_FAILED",
+  "status": "BUILT_PENDING_GITHUB_ACTIONS_RUN",
   "passed": false,
   "productionReady": false,
-  "canClaimProduction": false,
+  "proofEnvironment": "pending",
   "deployedToOracle": false,
-  "generated_at": "2026-06-02T00:00:00.000Z",
-  "runsInGitHubActions": true,
+  "publicHttpsReady": false,
+  "paymentsLive": false,
+  "emailRuntimeLive": false,
+  "officialSubmissionsLive": false,
   "composeUpSucceeded": false,
   "composeDownSucceeded": false,
   "apiHealthStatus": 0,
   "webStatus": 0,
   "bridgeApiStatus": 0,
-  "checks": [],
-  "failed": [
-    {
-      "name": "batch21c_ci_proof_not_yet_executed",
-      "passed": false,
-      "detail": "GitHub Actions workflow must run and produce proof."
-    }
-  ],
-  "oracle_lite_impact": "ci_docker_runtime_proof_only",
-  "next_action": "Push workflow and run GitHub Actions BATCH 21C proof."
+  "backend_bridge_succeeded": false,
+  "backend_boundary_reached": false,
+  "backend_local_write_succeeded": false,
+  "next_action": "GitHub Actions must run prove-docker-oracle-lite-controlled-runtime-ci.mjs."
 }

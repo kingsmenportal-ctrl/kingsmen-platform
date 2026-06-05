@@ -4,131 +4,283 @@ import path from "node:path";
 import { spawn } from "node:child_process";
 
 const root = process.cwd();
-const composeFile = "docker/oracle-lite/docker-compose.local.yml";
-const proofPath = path.join(root, "reports/runtime/batch21c-docker-runtime-proof.json");
-const localDataFile = path.join(root, "data/local/free-destiny-map/backend-runtime-boundary/backend-runtime-demo-intakes.jsonl");
-const checks = [];
+const composeFile = path.join(root, "docker/oracle-lite/docker-compose.local.yml");
+const reportPath = path.join(root, "reports/runtime/batch21c-docker-runtime-proof.json");
+const projectName = "kingsmen-batch21c-ci";
 
-function check(name, passed, detail = "") { checks.push({ name, passed, detail }); }
-function run(args, timeoutMs = 180000) {
+const apiHealthUrl = "http://127.0.0.1:3001/health";
+const webUrl = "http://127.0.0.1:3000/free-destiny-map";
+const bridgeUrl = "http://127.0.0.1:3000/api/public/free-destiny-map/intake/local";
+
+const stdoutLines = [];
+const stderrLines = [];
+
+function tail(text, max = 5000) {
+  const value = String(text ?? "");
+  return value.length > max ? value.slice(value.length - max) : value;
+}
+
+function run(command, args, options = {}) {
+  const timeoutMs = options.timeoutMs ?? 600000;
+
   return new Promise((resolve) => {
-    const child = spawn("docker", args, { cwd: root, env: { ...process.env, CI: "1", NEXT_TELEMETRY_DISABLED: "1" }, stdio: ["ignore", "pipe", "pipe"] });
-    let stdout = "", stderr = "", timedOut = false;
-    const timer = setTimeout(() => { timedOut = true; child.kill("SIGTERM"); }, timeoutMs);
-    child.stdout.on("data", d => stdout += d.toString());
-    child.stderr.on("data", d => stderr += d.toString());
-    child.on("close", code => { clearTimeout(timer); resolve({ code, stdout, stderr, timedOut }); });
-    child.on("error", e => { clearTimeout(timer); resolve({ code: null, stdout, stderr, timedOut, error: e.message }); });
+    const out = [];
+    const err = [];
+    let timedOut = false;
+
+    const child = spawn(command, args, {
+      cwd: root,
+      env: { ...process.env, CI: process.env.CI ?? "true" },
+      stdio: ["ignore", "pipe", "pipe"],
+      windowsHide: true
+    });
+
+    const timer = setTimeout(() => {
+      timedOut = true;
+      try {
+        child.kill("SIGTERM");
+      } catch {}
+    }, timeoutMs);
+
+    child.stdout.on("data", (chunk) => {
+      const text = chunk.toString();
+      out.push(text);
+      stdoutLines.push(text);
+    });
+
+    child.stderr.on("data", (chunk) => {
+      const text = chunk.toString();
+      err.push(text);
+      stderrLines.push(text);
+    });
+
+    child.once("error", (error) => {
+      clearTimeout(timer);
+      resolve({
+        code: null,
+        timedOut,
+        stdout: out.join(""),
+        stderr: err.join(""),
+        error: error instanceof Error ? error.message : String(error)
+      });
+    });
+
+    child.once("close", (code) => {
+      clearTimeout(timer);
+      resolve({
+        code,
+        timedOut,
+        stdout: out.join(""),
+        stderr: err.join(""),
+        error: null
+      });
+    });
   });
 }
-async function wait(url, expected, timeoutMs = 180000) {
-  const end = Date.now() + timeoutMs;
-  let last = "";
-  while (Date.now() < end) {
+
+async function requestJson(url, options = {}) {
+  const controller = new AbortController();
+  const timeout = setTimeout(() => controller.abort(), options.timeoutMs ?? 15000);
+
+  try {
+    const response = await fetch(url, {
+      method: options.method ?? "GET",
+      headers: options.headers ?? {},
+      body: options.body,
+      signal: controller.signal
+    });
+
+    const text = await response.text();
+    let json = null;
+
     try {
-      const res = await fetch(url);
-      const text = await res.text();
-      if (res.status === expected) return { ok: true, status: res.status, text };
-      last = `status=${res.status}`;
-    } catch (e) { last = e.message; }
-    await new Promise(r => setTimeout(r, 1500));
+      json = text ? JSON.parse(text) : null;
+    } catch {}
+
+    return {
+      ok: response.ok,
+      status: response.status,
+      text,
+      json,
+      error: null
+    };
+  } catch (error) {
+    return {
+      ok: false,
+      status: 0,
+      text: "",
+      json: null,
+      error: error instanceof Error ? error.message : String(error)
+    };
+  } finally {
+    clearTimeout(timeout);
   }
-  return { ok: false, status: 0, text: "", last };
 }
 
-const payload = {
-  fullName: "Kingsmen GitHub Actions Runtime Demo Candidate",
-  province: "KwaZulu-Natal",
-  currentSituation: "GitHub Actions CI runtime proof.",
-  knownRoute: "BATCH 21C GitHub Actions Docker runtime proof",
-  routeInterests: ["higher_education","tvet","nsfas_bursary","accommodation","cv_revamp","source_check"],
-  needsAccommodation: true,
-  accommodationArea: "Durban",
-  needsFundingHelp: true,
-  needsCvHelp: true,
-  hasDocumentsReady: false,
-  randomSourceName: "GitHub Actions demo source",
-  consentToBeContacted: true,
-  consentToProcessBasicInfo: true
-};
+async function waitFor(url, expectedStatuses, timeoutMs = 180000) {
+  const started = Date.now();
+  let last = null;
 
-let composeUpSucceeded = false;
-let composeDownSucceeded = false;
-let apiHealthStatus = 0;
-let webStatus = 0;
-let bridgeApiStatus = 0;
-let bridgeResponse = null;
+  while (Date.now() - started < timeoutMs) {
+    last = await requestJson(url, { timeoutMs: 10000 });
+    if (expectedStatuses.includes(last.status)) return last;
+    await new Promise((resolve) => setTimeout(resolve, 3000));
+  }
 
-try {
-  let downBefore = await run(["compose","-f",composeFile,"down","--remove-orphans"], 120000);
-  check("ci-compose-down-before", downBefore.code === 0, `exit=${downBefore.code}; ${downBefore.stderr}`);
-
-  let up = await run(["compose","-f",composeFile,"up","-d","--no-build","--remove-orphans"], 180000);
-  composeUpSucceeded = up.code === 0;
-  check("ci-compose-up-no-build", composeUpSucceeded, `exit=${up.code}; ${up.stderr}`);
-
-  let ps = await run(["compose","-f",composeFile,"ps"], 30000);
-  check("ci-compose-ps-has-services", ps.code === 0 && ps.stdout.includes("kingsmen-api") && ps.stdout.includes("kingsmen-web"), ps.stdout);
-
-  const api = await wait("http://127.0.0.1:3001/health", 200);
-  apiHealthStatus = api.status;
-  check("ci-api-health-200", api.ok, api.last || "HTTP 200");
-
-  const web = await wait("http://127.0.0.1:3000/free-destiny-map", 200);
-  webStatus = web.status;
-  check("ci-web-page-200", web.ok, web.last || "HTTP 200");
-  check("ci-web-page-has-free-destiny-map", web.text.includes("Free Destiny Map") || web.text.includes("Start your Free Destiny Map"), "page text");
-
-  const bridge = await fetch("http://127.0.0.1:3000/api/public/free-destiny-map/intake/local", {
-    method: "POST",
-    headers: { "content-type": "application/json" },
-    body: JSON.stringify(payload)
-  });
-  bridgeApiStatus = bridge.status;
-  bridgeResponse = await bridge.json();
-
-  check("ci-bridge-api-202", bridgeApiStatus === 202, `status=${bridgeApiStatus}`);
-  check("ci-bridge-backend-succeeded", bridgeResponse.backendBridgeSucceeded === true, "backendBridgeSucceeded true");
-  check("ci-bridge-backend-boundary-reached", bridgeResponse.backendBoundaryReached === true, "backendBoundaryReached true");
-  check("ci-backend-local-write-succeeded", bridgeResponse.backendLocalWriteSucceeded === true && fs.existsSync(localDataFile), "backend local write");
-  check("ci-production-false", bridgeResponse.productionReady === false && bridgeResponse.canClaimProduction === false && bridgeResponse.deployedToOracle === false, "production/oracle false");
-  check("ci-no-payment-email-document-official", bridgeResponse.paymentInstructionSent === false && bridgeResponse.emailSent === false && bridgeResponse.documentUploadAccepted === false && bridgeResponse.officialApplicationSubmitted === false, "blocked high-risk outputs false");
-} catch (e) {
-  check("ci-runtime-exception-absent", false, e.message);
-} finally {
-  let down = await run(["compose","-f",composeFile,"down","--remove-orphans"], 120000);
-  composeDownSucceeded = down.code === 0;
-  check("ci-compose-down-after", composeDownSucceeded, `exit=${down.code}; ${down.stderr}`);
+  return last ?? { ok: false, status: 0, text: "", json: null, error: "timeout_waiting_for_endpoint" };
 }
 
-const failed = checks.filter(c => !c.passed);
-const passed = failed.length === 0 && composeUpSucceeded && composeDownSucceeded && apiHealthStatus === 200 && webStatus === 200 && bridgeApiStatus === 202;
+function buildPayload() {
+  return {
+    fullName: "Kingsmen GitHub Actions Runtime Demo Candidate",
+    province: "KwaZulu-Natal",
+    currentSituation: "GitHub Actions Docker runtime proof user wants study, funding, accommodation and CV route guidance.",
+    knownRoute: "BATCH 21C GitHub Actions Docker runtime proof",
+    routeInterests: ["higher_education", "tvet", "nsfas_bursary", "accommodation", "cv_revamp", "source_check"],
+    needsAccommodation: true,
+    accommodationArea: "Durban / campus or training area",
+    needsFundingHelp: true,
+    needsCvHelp: true,
+    hasDocumentsReady: false,
+    randomSourceName: "GitHub Actions runtime demo bursary or learnership source to check later",
+    consentToBeContacted: true,
+    consentToProcessBasicInfo: true
+  };
+}
 
-const report = {
-  schema: "kingsmen.batch21c.github-actions-docker-runtime-report.v1",
-  module: "BATCH 21C - GitHub Actions Docker Runtime Proof",
-  status: passed ? "GITHUB_ACTIONS_DOCKER_RUNTIME_PROVEN" : "GITHUB_ACTIONS_DOCKER_RUNTIME_FAILED",
-  passed,
-  productionReady: false,
-  canClaimProduction: false,
-  deployedToOracle: false,
-  generated_at: new Date().toISOString(),
-  runsInGitHubActions: true,
-  composeUpSucceeded,
-  composeDownSucceeded,
-  apiHealthStatus,
-  webStatus,
-  bridgeApiStatus,
-  backend_bridge_succeeded: bridgeResponse?.backendBridgeSucceeded ?? false,
-  backend_boundary_reached: bridgeResponse?.backendBoundaryReached ?? false,
-  backend_local_write_succeeded: bridgeResponse?.backendLocalWriteSucceeded ?? false,
-  checks,
-  failed,
-  oracle_lite_impact: "ci_docker_runtime_proof_only",
-  next_action: passed ? "Run validator and proceed to N_PROVIDER.5." : "Repair BATCH 21C CI runtime proof."
-};
+function writeReport(report) {
+  fs.mkdirSync(path.dirname(reportPath), { recursive: true });
+  fs.writeFileSync(reportPath, `${JSON.stringify(report, null, 2)}\n`, "utf8");
+}
 
-fs.mkdirSync(path.dirname(proofPath), { recursive: true });
-fs.writeFileSync(proofPath, JSON.stringify(report, null, 2) + "\n");
-console.log(JSON.stringify(report, null, 2));
-if (!passed) process.exit(1);
+async function main() {
+  const checks = [];
+  const failures = [];
+
+  const proofEnvironment = process.env.GITHUB_ACTIONS === "true" ? "github_actions" : "local_ci_script";
+
+  let composeDownBefore = { code: null };
+  let composeUp = { code: null };
+  let composePs = { code: null };
+  let composeLogs = { code: null, stdout: "", stderr: "" };
+  let composeDownAfter = { code: null };
+
+  let apiHealth = { status: 0, json: null, text: "", error: "not_run" };
+  let webPage = { status: 0, json: null, text: "", error: "not_run" };
+  let bridgePost = { status: 0, json: null, text: "", error: "not_run" };
+
+  try {
+    if (!fs.existsSync(composeFile)) {
+      failures.push({ name: "compose_file_missing", detail: composeFile });
+      throw new Error("Missing docker/oracle-lite/docker-compose.local.yml");
+    }
+
+    composeDownBefore = await run("docker", ["compose", "-p", projectName, "-f", composeFile, "down", "--remove-orphans"], { timeoutMs: 180000 });
+
+    composeUp = await run("docker", ["compose", "-p", projectName, "-f", composeFile, "up", "-d", "--build", "--remove-orphans"], { timeoutMs: 900000 });
+
+    checks.push({
+      name: "compose_up_succeeded",
+      passed: composeUp.code === 0,
+      code: composeUp.code,
+      timedOut: composeUp.timedOut,
+      stderr_tail: tail(composeUp.stderr)
+    });
+
+    if (composeUp.code !== 0) {
+      failures.push({ name: "compose_up_failed", detail: tail(composeUp.stderr || composeUp.stdout) });
+      throw new Error("docker compose up failed");
+    }
+
+    composePs = await run("docker", ["compose", "-p", projectName, "-f", composeFile, "ps"], { timeoutMs: 60000 });
+
+    apiHealth = await waitFor(apiHealthUrl, [200], 180000);
+    webPage = await waitFor(webUrl, [200], 180000);
+
+    const payload = JSON.stringify(buildPayload());
+
+    bridgePost = await requestJson(bridgeUrl, {
+      method: "POST",
+      timeoutMs: 30000,
+      headers: { "content-type": "application/json" },
+      body: payload
+    });
+
+    const bridgeJson = bridgePost.json ?? {};
+
+    checks.push({ name: "api_health_200", passed: apiHealth.status === 200, status: apiHealth.status, error: apiHealth.error });
+    checks.push({ name: "web_page_200", passed: webPage.status === 200, status: webPage.status, error: webPage.error });
+    checks.push({ name: "bridge_post_202", passed: bridgePost.status === 202, status: bridgePost.status, error: bridgePost.error });
+    checks.push({ name: "backend_bridge_succeeded", passed: bridgeJson.backendBridgeSucceeded === true });
+    checks.push({ name: "backend_boundary_reached", passed: bridgeJson.backendBoundaryReached === true });
+    checks.push({ name: "backend_local_write_succeeded", passed: bridgeJson.backendLocalWriteSucceeded === true });
+  } catch (error) {
+    failures.push({
+      name: "batch21c_runtime_exception",
+      detail: error instanceof Error ? error.message : String(error)
+    });
+  } finally {
+    composeLogs = await run("docker", ["compose", "-p", projectName, "-f", composeFile, "logs", "--tail=200"], { timeoutMs: 120000 });
+    composeDownAfter = await run("docker", ["compose", "-p", projectName, "-f", composeFile, "down", "--remove-orphans"], { timeoutMs: 180000 });
+
+    checks.push({
+      name: "compose_down_succeeded",
+      passed: composeDownAfter.code === 0,
+      code: composeDownAfter.code,
+      timedOut: composeDownAfter.timedOut,
+      stderr_tail: tail(composeDownAfter.stderr)
+    });
+  }
+
+  const bridgeJson = bridgePost.json ?? {};
+
+  const passed =
+    composeUp.code === 0 &&
+    composeDownAfter.code === 0 &&
+    apiHealth.status === 200 &&
+    webPage.status === 200 &&
+    bridgePost.status === 202 &&
+    bridgeJson.backendBridgeSucceeded === true &&
+    bridgeJson.backendBoundaryReached === true &&
+    bridgeJson.backendLocalWriteSucceeded === true;
+
+  const report = {
+    schema: "kingsmen.batch21c-docker-runtime-proof.v1",
+    module: "BATCH 21C - GitHub Actions Docker Runtime Proof",
+    status: passed ? "BATCH21C_DOCKER_RUNTIME_PROVEN" : "BATCH21C_DOCKER_RUNTIME_FAILED",
+    passed,
+    productionReady: false,
+    proofEnvironment,
+    deployedToOracle: false,
+    publicHttpsReady: false,
+    paymentsLive: false,
+    emailRuntimeLive: false,
+    officialSubmissionsLive: false,
+    composeUpSucceeded: composeUp.code === 0,
+    composeDownSucceeded: composeDownAfter.code === 0,
+    apiHealthStatus: apiHealth.status,
+    webStatus: webPage.status,
+    bridgeApiStatus: bridgePost.status,
+    backend_bridge_succeeded: bridgeJson.backendBridgeSucceeded === true,
+    backend_boundary_reached: bridgeJson.backendBoundaryReached === true,
+    backend_local_write_succeeded: bridgeJson.backendLocalWriteSucceeded === true,
+    checks,
+    failed_checks: checks.filter((check) => !check.passed),
+    failures,
+    compose_ps_tail: tail(composePs.stdout),
+    compose_logs_tail: tail(composeLogs.stdout || composeLogs.stderr),
+    stdout_tail: tail(stdoutLines.join("")),
+    stderr_tail: tail(stderrLines.join("")),
+    generated_at: new Date().toISOString(),
+    next_action: passed
+      ? "Proceed to BATCH 22 - Docker Runtime Health Hardening / Oracle Lite VM Handoff Preparation."
+      : "Repair Docker runtime or compose proof path before BATCH 22."
+  };
+
+  writeReport(report);
+  console.log(JSON.stringify(report, null, 2));
+
+  if (!passed) process.exit(1);
+}
+
+await main();

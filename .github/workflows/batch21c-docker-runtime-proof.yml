@@ -1,19 +1,36 @@
-﻿name: BATCH 21C - Docker Runtime Proof
+﻿name: BATCH 21C Docker Runtime Proof
 
 on:
   workflow_dispatch:
   push:
-    branches: [ main ]
+    branches:
+      - main
+    paths:
+      - ".github/workflows/batch21c-docker-runtime-proof.yml"
+      - "docker/oracle-lite/**"
+      - "apps/web/**"
+      - "packages/**"
+      - "scripts/proof/prove-docker-oracle-lite-controlled-runtime-ci.mjs"
+      - "scripts/validators/validate-docker-oracle-lite-controlled-runtime-ci.mjs"
+      - "manifests/runtime/batch21c-github-actions-docker-runtime-proof.json"
 
 permissions:
   contents: read
 
 jobs:
-  prove-docker-runtime:
+  docker-runtime-proof:
+    name: Prove Docker runtime
     runs-on: ubuntu-latest
-    timeout-minutes: 30
+    timeout-minutes: 25
+
     steps:
-      - uses: actions/checkout@v4
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: "22"
 
       - name: Show Docker versions
         run: |
@@ -21,22 +38,18 @@ jobs:
           docker compose version
           node --version
 
-      - name: Build API image
-        run: docker build -f apps/api/Dockerfile.oracle-lite -t kingsmen/api:oracle-lite-local .
-
-      - name: Build Web image
-        run: docker build -f apps/web/Dockerfile.oracle-lite -t kingsmen/web:oracle-lite-local .
-
-      - name: Prove Docker runtime
+      - name: Prove BATCH 21C Docker runtime
         run: node scripts/proof/prove-docker-oracle-lite-controlled-runtime-ci.mjs
 
-      - name: Validate CI proof
+      - name: Validate BATCH 21C proof
         run: node scripts/validators/validate-docker-oracle-lite-controlled-runtime-ci.mjs
 
-      - name: Upload proof reports
+      - name: Upload BATCH 21C reports
         uses: actions/upload-artifact@v4
+        if: always()
         with:
           name: batch21c-docker-runtime-proof
           path: |
             reports/runtime/batch21c-docker-runtime-proof.json
             reports/validation/batch21c-docker-runtime-proof-latest.json
+          if-no-files-found: warn
