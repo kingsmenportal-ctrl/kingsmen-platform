@@ -1,0 +1,57 @@
+{
+    "module":  "REALITY-AUDIT-01",
+    "status":  "GENERATED_LOCAL_REPORT_PENDING_REVIEW",
+    "generated_at":  "2026-06-05T04:31:07",
+    "git":  {
+                "branch":  "main",
+                "commit":  "e4f5f1dfce7c413016a63fcf9e4ded24fc074163",
+                "working_tree_clean_before_audit":  true
+            },
+    "counts":  {
+                   "total_tracked_files":  969,
+                   "docs":  84,
+                   "manifests":  81,
+                   "reports":  198,
+                   "apps":  112,
+                   "packages":  239,
+                   "scripts":  194,
+                   "github_workflows":  2,
+                   "validators":  98,
+                   "ui_related_files":  94,
+                   "source_runtime_related_files":  549,
+                   "safe_proof_files":  362
+               },
+    "key_files":  {
+                      "package_json":  true,
+                      "powershell_creator":  true,
+                      "docker_compose_yml":  true,
+                      "compose_yml":  false,
+                      "github_workflows":  true,
+                      "apps_folder":  true,
+                      "packages_folder":  true,
+                      "manifests_folder":  true,
+                      "reports_folder":  true,
+                      "docs_folder":  true,
+                      "validators_folder":  true
+                  },
+    "classification":  {
+                           "docs_and_manifests_exist":  true,
+                           "reports_exist":  true,
+                           "source_code_exists":  true,
+                           "ui_files_exist":  true,
+                           "validators_exist":  true,
+                           "github_workflows_exist":  true,
+                           "runtime_proof_not_confirmed_by_this_audit":  true,
+                           "ui_click_proof_not_confirmed_by_this_audit":  true,
+                           "production_ready":  false
+                       },
+    "honest_result":  "This audit counts and classifies tracked repo artifacts only. It does not prove local runtime, Oracle deployment, Supabase live status, PayFast runtime, email runtime, or clickable UI.",
+    "next_required_proofs":  [
+                                 "Run validators and capture reports",
+                                 "Run local app/runtime and capture health proof",
+                                 "Run clickable UI proof for public site, candidate portal, founder control, and partner portal",
+                                 "Verify Supabase project status before using it as live backend",
+                                 "Verify Oracle Lite deployment separately",
+                                 "Keep Jarvis and OpenClaw experimental until validator-proven"
+                             ]
+}
