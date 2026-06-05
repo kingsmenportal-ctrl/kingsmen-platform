@@ -3,9 +3,9 @@
   "module": "BATCH 21C - GitHub Actions Docker Runtime Proof",
   "status": "VALIDATED",
   "passed": true,
-  "sourceOnly": true,
+  "sourceOnly": false,
   "productionReady": false,
   "failed_checks": [],
-  "generated_at": "2026-06-05T04:28:39.579Z",
+  "generated_at": "2026-06-05T04:46:40.342Z",
   "next_action": "BATCH 21C proof is valid. Proceed to BATCH 22."
 }

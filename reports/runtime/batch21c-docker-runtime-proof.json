@@ -1,22 +1,75 @@
-﻿{
+{
   "schema": "kingsmen.batch21c-docker-runtime-proof.v1",
   "module": "BATCH 21C - GitHub Actions Docker Runtime Proof",
-  "status": "BUILT_PENDING_GITHUB_ACTIONS_RUN",
-  "passed": false,
+  "status": "BATCH21C_DOCKER_RUNTIME_PROVEN",
+  "passed": true,
   "productionReady": false,
-  "proofEnvironment": "pending",
+  "proofEnvironment": "github_actions",
   "deployedToOracle": false,
   "publicHttpsReady": false,
   "paymentsLive": false,
   "emailRuntimeLive": false,
   "officialSubmissionsLive": false,
-  "composeUpSucceeded": false,
-  "composeDownSucceeded": false,
-  "apiHealthStatus": 0,
-  "webStatus": 0,
-  "bridgeApiStatus": 0,
-  "backend_bridge_succeeded": false,
-  "backend_boundary_reached": false,
-  "backend_local_write_succeeded": false,
-  "next_action": "GitHub Actions must run prove-docker-oracle-lite-controlled-runtime-ci.mjs."
+  "composeUpSucceeded": true,
+  "composeDownSucceeded": true,
+  "apiHealthStatus": 200,
+  "webStatus": 200,
+  "bridgeApiStatus": 202,
+  "backend_bridge_succeeded": true,
+  "backend_boundary_reached": true,
+  "backend_local_write_succeeded": true,
+  "checks": [
+    {
+      "name": "compose_up_succeeded",
+      "passed": true,
+      "code": 0,
+      "timedOut": false,
+      "stderr_tail": " kingsmen-api  Built\n kingsmen-web  Built\n Network kingsmen-batch21c-ci_default  Creating\n Network kingsmen-batch21c-ci_default  Created\n Container kingsmen-api-local  Creating\n Container kingsmen-api-local  Created\n Container kingsmen-web-local  Creating\n Container kingsmen-web-local  Created\n Container kingsmen-api-local  Starting\n Container kingsmen-api-local  Started\n Container kingsmen-web-local  Starting\n Container kingsmen-web-local  Started\n"
+    },
+    {
+      "name": "api_health_200",
+      "passed": true,
+      "status": 200,
+      "error": null
+    },
+    {
+      "name": "web_page_200",
+      "passed": true,
+      "status": 200,
+      "error": null
+    },
+    {
+      "name": "bridge_post_202",
+      "passed": true,
+      "status": 202,
+      "error": null
+    },
+    {
+      "name": "backend_bridge_succeeded",
+      "passed": true
+    },
+    {
+      "name": "backend_boundary_reached",
+      "passed": true
+    },
+    {
+      "name": "backend_local_write_succeeded",
+      "passed": true
+    },
+    {
+      "name": "compose_down_succeeded",
+      "passed": true,
+      "code": 0,
+      "timedOut": false,
+      "stderr_tail": " Container kingsmen-web-local  Stopping\n Container kingsmen-web-local  Stopped\n Container kingsmen-web-local  Removing\n Container kingsmen-web-local  Removed\n Container kingsmen-api-local  Stopping\n Container kingsmen-api-local  Stopped\n Container kingsmen-api-local  Removing\n Container kingsmen-api-local  Removed\n Network kingsmen-batch21c-ci_default  Removing\n Network kingsmen-batch21c-ci_default  Removed\n"
+    }
+  ],
+  "failed_checks": [],
+  "failures": [],
+  "compose_ps_tail": "NAME                 IMAGE                            COMMAND                  SERVICE        CREATED                  STATUS                  PORTS\nkingsmen-api-local   kingsmen/api:oracle-lite-local   \"docker-entrypoint.s…\"   kingsmen-api   Less than a second ago   Up Less than a second   127.0.0.1:3001->3001/tcp\nkingsmen-web-local   kingsmen/web:oracle-lite-local   \"docker-entrypoint.s…\"   kingsmen-web   Less than a second ago   Up Less than a second   127.0.0.1:3000->3000/tcp\n",
+  "compose_logs_tail": "kingsmen-web-local  | \nkingsmen-web-local  | > @kingsmen/web@0.0.0 start\nkingsmen-web-local  | > next start --hostname 127.0.0.1 --hostname 0.0.0.0 --port 3000\nkingsmen-web-local  | \nkingsmen-web-local  |    ▲ Next.js 15.5.19\nkingsmen-web-local  |    - Local:        http://localhost:3000\nkingsmen-web-local  |    - Network:      http://0.0.0.0:3000\nkingsmen-web-local  | \nkingsmen-web-local  |  ✓ Starting...\nkingsmen-api-local  | {\"schema\":\"kingsmen.backend-local-server-started.v1\",\"module\":\"BATCH 19 - Docker / Oracle Lite Local Runtime Container Preparation\",\"productionReady\":false,\"canClaimProduction\":false,\"deployedToOracle\":false,\"host\":\"0.0.0.0\",\"port\":3001,\"healthEndpoint\":\"/health\",\"intakeEndpoint\":\"/api/public/free-destiny-map/intake/local\",\"safeNotice\":\"Backend local runtime boundary server. No Oracle deployment, no payment, no email, no document upload, no official application submission.\"}\nkingsmen-web-local  |  ✓ Ready in 684ms\n",
+  "stdout_tail": "ndidate/workbench/readiness           200 B         103 kB\n#21 29.95 ├ ƒ /api/founder/airtable/health                 200 B         103 kB\n#21 29.95 ├ ƒ /api/founder/airtable/sync/enqueue           200 B         103 kB\n#21 29.95 ├ ƒ /api/founder/alerts/mobile                   200 B         103 kB\n#21 29.95 ├ ƒ /api/founder/backend-readiness               200 B         103 kB\n#21 29.95 ├ ƒ /api/founder/commands/approve                200 B         103 kB\n#21 29.95 ├ ƒ /api/founder/commands/execute                200 B         103 kB\n#21 29.95 ├ ƒ /api/founder/control-plane/health            200 B         103 kB\n#21 29.95 ├ ƒ /api/founder/digest                          200 B         103 kB\n#21 29.95 ├ ƒ /api/founder/documents/review                200 B         103 kB\n#21 29.95 ├ ƒ /api/founder/stop-selling                    200 B         103 kB\n#21 29.95 ├ ƒ /api/health/kingsmen-kernel                  200 B         103 kB\n#21 29.95 ├ ƒ /api/public/free-destiny-map/intake/local    200 B         103 kB\n#21 29.95 ├ ○ /candidate/dashboard                         200 B         103 kB\n#21 29.95 ├ ○ /candidate/documents                         200 B         103 kB\n#21 29.95 ├ ○ /candidate/finance                           200 B         103 kB\n#21 29.95 ├ ○ /candidate/messages                          200 B         103 kB\n#21 29.95 ├ ○ /candidate/mobile                            200 B         103 kB\n#21 29.95 ├ ○ /candidate/outcomes                          200 B         103 kB\n#21 29.95 ├ ○ /candidate/support                           200 B         103 kB\n#21 29.95 ├ ○ /candidate/workbench                         200 B         103 kB\n#21 29.95 ├ ○ /founder/build-proof                         200 B         103 kB\n#21 29.95 ├ ○ /founder/control-plane                       200 B         103 kB\n#21 29.95 ├ ○ /founder/control-plane/commands              200 B         103 kB\n#21 29.95 ├ ○ /founder/control-plane/digest                200 B         103 kB\n#21 29.95 ├ ○ /founder/master-index                        200 B         103 kB\n#21 29.95 ├ ○ /founder/providers                           200 B         103 kB\n#21 29.95 ├ ○ /founder/providers/airtable                  200 B         103 kB\n#21 29.95 ├ ○ /free-destiny-map                           2.5 kB         105 kB\n#21 29.95 └ ○ /kingsmen                                    200 B         103 kB\n#21 29.95 + First Load JS shared by all                   102 kB\n#21 29.95   ├ chunks/255-98a0bdaa30757bda.js             46.2 kB\n#21 29.95   ├ chunks/4bd1b696-c023c6e3521b1417.js        54.2 kB\n#21 29.95   └ other shared chunks (total)                1.88 kB\n#21 29.95 \n#21 29.95 \n#21 29.95 ○  (Static)   prerendered as static content\n#21 29.95 ƒ  (Dynamic)  server-rendered on demand\n#21 29.95 \n#21 30.00 npm notice\n#21 30.00 npm notice New major version of npm available! 10.9.8 -> 11.16.0\n#21 30.00 npm notice Changelog: https://github.com/npm/cli/releases/tag/v11.16.0\n#21 30.00 npm notice To update run: npm install -g npm@11.16.0\n#21 30.00 npm notice\n#21 DONE 30.2s\n\n#22 [kingsmen-web runner 3/4] COPY --from=builder /repo/apps/web apps/web\n#22 DONE 4.0s\n\n#23 [kingsmen-web runner 4/4] COPY --from=builder /repo/packages packages\n#23 DONE 0.1s\n\n#24 [kingsmen-web] exporting to image\n#24 exporting layers\n#24 exporting layers 2.4s done\n#24 writing image sha256:bcdcd755e65833fcf8a798a11e6a53b2695810137449ad0cc52d41dc84315c72 done\n#24 naming to docker.io/kingsmen/web:oracle-lite-local done\n#24 DONE 2.4s\n\n#25 [kingsmen-web] resolving provenance for metadata file\n#25 DONE 0.0s\nNAME                 IMAGE                            COMMAND                  SERVICE        CREATED                  STATUS                  PORTS\nkingsmen-api-local   kingsmen/api:oracle-lite-local   \"docker-entrypoint.s…\"   kingsmen-api   Less than a second ago   Up Less than a second   127.0.0.1:3001->3001/tcp\nkingsmen-web-local   kingsmen/web:oracle-lite-local   \"docker-entrypoint.s…\"   kingsmen-web   Less than a second ago   Up Less than a second   127.0.0.1:3000->3000/tcp\nkingsmen-web-local  | \nkingsmen-web-local  | > @kingsmen/web@0.0.0 start\nkingsmen-web-local  | > next start --hostname 127.0.0.1 --hostname 0.0.0.0 --port 3000\nkingsmen-web-local  | \nkingsmen-web-local  |    ▲ Next.js 15.5.19\nkingsmen-web-local  |    - Local:        http://localhost:3000\nkingsmen-web-local  |    - Network:      http://0.0.0.0:3000\nkingsmen-web-local  | \nkingsmen-web-local  |  ✓ Starting...\nkingsmen-api-local  | {\"schema\":\"kingsmen.backend-local-server-started.v1\",\"module\":\"BATCH 19 - Docker / Oracle Lite Local Runtime Container Preparation\",\"productionReady\":false,\"canClaimProduction\":false,\"deployedToOracle\":false,\"host\":\"0.0.0.0\",\"port\":3001,\"healthEndpoint\":\"/health\",\"intakeEndpoint\":\"/api/public/free-destiny-map/intake/local\",\"safeNotice\":\"Backend local runtime boundary server. No Oracle deployment, no payment, no email, no document upload, no official application submission.\"}\nkingsmen-web-local  |  ✓ Ready in 684ms\n",
+  "stderr_tail": " kingsmen-api  Built\n kingsmen-web  Built\n Network kingsmen-batch21c-ci_default  Creating\n Network kingsmen-batch21c-ci_default  Created\n Container kingsmen-api-local  Creating\n Container kingsmen-api-local  Created\n Container kingsmen-web-local  Creating\n Container kingsmen-web-local  Created\n Container kingsmen-api-local  Starting\n Container kingsmen-api-local  Started\n Container kingsmen-web-local  Starting\n Container kingsmen-web-local  Started\n Container kingsmen-web-local  Stopping\n Container kingsmen-web-local  Stopped\n Container kingsmen-web-local  Removing\n Container kingsmen-web-local  Removed\n Container kingsmen-api-local  Stopping\n Container kingsmen-api-local  Stopped\n Container kingsmen-api-local  Removing\n Container kingsmen-api-local  Removed\n Network kingsmen-batch21c-ci_default  Removing\n Network kingsmen-batch21c-ci_default  Removed\n",
+  "generated_at": "2026-06-04T19:33:47.671Z",
+  "next_action": "Proceed to BATCH 22 - Docker Runtime Health Hardening / Oracle Lite VM Handoff Preparation."
 }
