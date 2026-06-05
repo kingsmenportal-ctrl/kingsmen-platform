@@ -1,0 +1,13 @@
+﻿{
+    "schema":  "kingsmen.openclaw-sandbox-install-report.v1",
+    "module":  "TOOLS-AGENT-01 - OpenClaw Sandbox Install",
+    "status":  "OPENCLAW_SANDBOX_REPO_PRESENT",
+    "productionReady":  false,
+    "connectedToKingsmenSecrets":  false,
+    "candidateDataAccess":  false,
+    "oracleAccess":  false,
+    "paymentAccess":  false,
+    "installedPath":  "C:\\Users\\dell\\kingsmen-platform\\tools\\agents\\openclaw\\repo",
+    "generated_at":  "2026-06-05T03:25:33.8962386Z",
+    "next_action":  "Review OpenClaw docs locally. Do not configure secrets. Build Kingsmen Founder Command Agent boundary first."
+}
