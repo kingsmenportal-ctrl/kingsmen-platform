@@ -8,6 +8,6 @@
     "oracleAccess":  false,
     "paymentAccess":  false,
     "installedPath":  "C:\\Users\\dell\\kingsmen-platform\\tools\\agents\\openclaw\\repo",
-    "generated_at":  "2026-06-05T03:25:33.8962386Z",
+    "generated_at":  "2026-06-05T03:27:34.1050981Z",
     "next_action":  "Review OpenClaw docs locally. Do not configure secrets. Build Kingsmen Founder Command Agent boundary first."
 }
