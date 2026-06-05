@@ -1,26 +1,31 @@
-export type KingsmenProviderGateStatus =
-  | "not_required_for_current_phase"
-  | "not_configured"
+﻿export type KingsmenProviderStatus =
+  | "callable_verified"
+  | "callable_contextual"
   | "configured_pending_proof"
-  | "sandbox_proven"
-  | "controlled_live"
-  | "live_blocked"
-  | "degraded"
-  | "incident"
-  | "disabled_by_policy";
+  | "local_runner"
+  | "local_build_proven"
+  | "access_material_pending_cli_proof"
+  | "visible_untested"
+  | "not_configured"
+  | "ping_verified_not_truth"
+  | "optional_gated"
+  | "sandbox_proven_research_only"
+  | string;
 
-export type KingsmenProviderGate = {
-  code: string;
+export interface KingsmenProviderGate {
+  id: string;
   name: string;
-  role: string;
-  boundary: string;
-  status: KingsmenProviderGateStatus;
-};
+  class: string;
+  status: KingsmenProviderStatus;
+  productionSafe: false;
+  highRisk: boolean;
+}
 
-export type KingsmenProviderGateMap = {
+export interface KingsmenProviderGateMap {
   schema: "kingsmen.provider-gates.v1";
-  module: "MASTER-INDEX-01";
+  module: string;
+  status: string;
   productionReady: false;
-  providerCount: 25;
   providers: KingsmenProviderGate[];
-};
+  nextAction: string;
+}

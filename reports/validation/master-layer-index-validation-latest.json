@@ -1,8 +1,10 @@
 {
-  "schema": "kingsmen.master-layer-index-validation.v1",
-  "module": "MASTER-INDEX-01",
+  "schema": "kingsmen.validation-report.v1",
+  "module": "MASTER-INDEX-01 - Master Layer Index",
+  "status": "VALIDATED",
   "passed": true,
   "productionReady": false,
-  "failures": [],
-  "checkedAt": "2026-06-04T04:06:19.518Z"
+  "failed_checks": [],
+  "generated_at": "2026-06-05T04:16:53.955Z",
+  "next_action": "Validate provider gates and no-production-claims boundary."
 }

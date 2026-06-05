@@ -4,14 +4,29 @@
   "status": "MASTER_INDEX_PROVIDER_GATES_BUILD_ORDER_PROOF_MATRIX_PROVEN",
   "passed": true,
   "productionReady": false,
-  "masterLayerIndexBuilt": true,
-  "providerGatesMapped": true,
-  "providerCount": 25,
-  "oracleLiteDefaultEnforced": true,
-  "noProviderClaimsLiveWithoutProof": true,
-  "allLayerFamiliesIndexed": true,
-  "proofMatrixRequired": true,
-  "failures": [],
-  "nextAction": "Continue with repo materialization in the validated build order.",
-  "checkedAt": "2026-06-04T04:06:19.403Z"
+  "checks": [
+    {
+      "name": "master_manifest_present",
+      "passed": true
+    },
+    {
+      "name": "provider_manifest_present",
+      "passed": true
+    },
+    {
+      "name": "provider_count_25",
+      "passed": true
+    },
+    {
+      "name": "production_claims_false",
+      "passed": true
+    },
+    {
+      "name": "next_runtime_gate_batch21c",
+      "passed": true
+    }
+  ],
+  "failed_checks": [],
+  "generated_at": "2026-06-05T04:16:53.820Z",
+  "next_action": "Run validators, commit and push MASTER-INDEX-01."
 }

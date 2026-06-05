@@ -1,202 +1,34 @@
-{
-    "liveClaims":  {
-                       "emailRuntimeLive":  false,
-                       "officialSubmissionsLive":  false,
-                       "paymentsLive":  false,
-                       "deployedToOracle":  false,
-                       "publicHttpsReady":  false,
-                       "productionReady":  false
-                   },
-    "providerCount":  25,
-    "schema":  "kingsmen.provider-gates.v1",
-    "providerGateStatuses":  [
-                                 "not_required_for_current_phase",
-                                 "not_configured",
-                                 "configured_pending_proof",
-                                 "sandbox_proven",
-                                 "controlled_live",
-                                 "live_blocked",
-                                 "degraded",
-                                 "incident",
-                                 "disabled_by_policy"
-                             ],
-    "module":  "MASTER-INDEX-01",
-    "providers":  [
-                      {
-                          "status":  "configured_pending_proof",
-                          "code":  "chatgpt",
-                          "name":  "ChatGPT",
-                          "boundary":  "Does not prove repo files exist",
-                          "role":  "Architect, doctrine keeper, planner, reviewer, prompt/module generator"
-                      },
-                      {
-                          "status":  "configured_pending_proof",
-                          "code":  "github",
-                          "name":  "GitHub",
-                          "boundary":  "GitHub presence is not production readiness",
-                          "role":  "Repo source control, proof history, Git checkpoints"
-                      },
-                      {
-                          "status":  "not_configured",
-                          "code":  "github_actions",
-                          "name":  "GitHub Actions",
-                          "boundary":  "CI passing does not mean live providers are configured",
-                          "role":  "CI proof runner"
-                      },
-                      {
-                          "status":  "configured_pending_proof",
-                          "code":  "powershell_creator",
-                          "name":  "PowerShell Creator / KINGSMEN_CREATOR.ps1",
-                          "boundary":  "Not the business brain",
-                          "role":  "Windows-first materializer, builder, validator, deploy runner"
-                      },
-                      {
-                          "status":  "configured_pending_proof",
-                          "code":  "docker",
-                          "name":  "Docker / Docker Compose",
-                          "boundary":  "Local Docker is not public production proof",
-                          "role":  "Oracle Lite runtime packaging"
-                      },
-                      {
-                          "status":  "not_configured",
-                          "code":  "oracle_free",
-                          "name":  "Oracle Cloud Free / Oracle Lite",
-                          "boundary":  "Low concurrency, no AWS-style assumptions",
-                          "role":  "First controlled deployment host"
-                      },
-                      {
-                          "status":  "not_configured",
-                          "code":  "nginx_https",
-                          "name":  "Nginx / Public HTTPS Gate",
-                          "boundary":  "HTTPS does not mean payments/email/submissions live",
-                          "role":  "Reverse proxy and HTTPS readiness"
-                      },
-                      {
-                          "status":  "not_configured",
-                          "code":  "supabase",
-                          "name":  "Supabase",
-                          "boundary":  "service_role backend-only",
-                          "role":  "Auth, RLS, signed storage, own-data boundary"
-                      },
-                      {
-                          "status":  "configured_pending_proof",
-                          "code":  "postgres",
-                          "name":  "PostgreSQL Truth Vault",
-                          "boundary":  "Airtable/n8n/AI cannot override truth",
-                          "role":  "Primary system truth"
-                      },
-                      {
-                          "status":  "not_configured",
-                          "code":  "redis",
-                          "name":  "Redis / Queue Layer",
-                          "boundary":  "No infinite retry",
-                          "role":  "Low-cost queue and retry discipline"
-                      },
-                      {
-                          "status":  "not_configured",
-                          "code":  "gmail",
-                          "name":  "Gmail",
-                          "boundary":  "Live only after COMMS-01",
-                          "role":  "Email-first runtime"
-                      },
-                      {
-                          "status":  "configured_pending_proof",
-                          "code":  "google_drive",
-                          "name":  "Google Drive",
-                          "boundary":  "No raw secrets",
-                          "role":  "Non-secret planning and report workspace"
-                      },
-                      {
-                          "status":  "not_required_for_current_phase",
-                          "code":  "google_calendar",
-                          "name":  "Google Calendar",
-                          "boundary":  "Calendar is not source truth",
-                          "role":  "Scheduling support"
-                      },
-                      {
-                          "status":  "not_required_for_current_phase",
-                          "code":  "google_contacts",
-                          "name":  "Google Contacts",
-                          "boundary":  "Cannot bypass verification/consent",
-                          "role":  "Contact reference"
-                      },
-                      {
-                          "status":  "not_required_for_current_phase",
-                          "code":  "canva",
-                          "name":  "Canva",
-                          "boundary":  "Does not replace policy/legal proof",
-                          "role":  "Public/outreach creative production"
-                      },
-                      {
-                          "status":  "not_configured",
-                          "code":  "payfast",
-                          "name":  "PayFast",
-                          "boundary":  "Live only after PAYMENTS-04",
-                          "role":  "South African payment provider"
-                      },
-                      {
-                          "status":  "not_configured",
-                          "code":  "paypal",
-                          "name":  "PayPal",
-                          "boundary":  "Optional; must not weaken PayFast policy",
-                          "role":  "Optional secondary payment provider"
-                      },
-                      {
-                          "status":  "not_configured",
-                          "code":  "airtable",
-                          "name":  "Airtable",
-                          "boundary":  "Never truth",
-                          "role":  "Async mirror / operations visibility"
-                      },
-                      {
-                          "status":  "not_configured",
-                          "code":  "n8n",
-                          "name":  "n8n",
-                          "boundary":  "No orchestration authority",
-                          "role":  "Thin workflow wrapper"
-                      },
-                      {
-                          "status":  "configured_pending_proof",
-                          "code":  "playwright",
-                          "name":  "Playwright",
-                          "boundary":  "No CAPTCHA/OTP bypass",
-                          "role":  "Scout/probe"
-                      },
-                      {
-                          "status":  "not_required_for_current_phase",
-                          "code":  "neon_postgres",
-                          "name":  "Neon Postgres",
-                          "boundary":  "Not default production unless approved",
-                          "role":  "Optional managed Postgres/dev/staging"
-                      },
-                      {
-                          "status":  "not_configured",
-                          "code":  "namecheap_dns",
-                          "name":  "Namecheap / Domain / DNS",
-                          "boundary":  "Domain does not equal production",
-                          "role":  "Domain and DNS readiness"
-                      },
-                      {
-                          "status":  "not_required_for_current_phase",
-                          "code":  "codex_aider",
-                          "name":  "OpenAI Codex CLI / Aider",
-                          "boundary":  "No uncontrolled production writes",
-                          "role":  "Repo coding acceleration"
-                      },
-                      {
-                          "status":  "not_required_for_current_phase",
-                          "code":  "ui_code_helpers",
-                          "name":  "Cursor / Windsurf / Cline / Continue / Copilot / Gemini CLI",
-                          "boundary":  "Cannot replace validators or PowerShell Creator",
-                          "role":  "Optional UI/code helpers"
-                      },
-                      {
-                          "status":  "not_required_for_current_phase",
-                          "code":  "founder_command_layer",
-                          "name":  "OpenJarvis / OpenClaw / Founder Command Layer",
-                          "boundary":  "No raw shell from browser",
-                          "role":  "Controlled founder command gateway"
-                      }
-                  ],
-    "productionReady":  false
+﻿{
+  "schema": "kingsmen.provider-gates.v1",
+  "module": "MASTER-INDEX-01 - 25 Connected Apps / Tools Provider Gate",
+  "status": "BUILT_PENDING_VALIDATION",
+  "productionReady": false,
+  "providers": [
+    { "id": "chatgpt", "name": "ChatGPT", "class": "ai_architect", "status": "callable_contextual", "productionSafe": false, "highRisk": false },
+    { "id": "github", "name": "GitHub", "class": "repo_proof", "status": "callable_verified", "productionSafe": false, "highRisk": true },
+    { "id": "github_actions", "name": "GitHub Actions", "class": "ci_proof", "status": "configured_pending_proof", "productionSafe": false, "highRisk": true },
+    { "id": "powershell_creator", "name": "PowerShell Creator", "class": "local_builder", "status": "local_runner", "productionSafe": false, "highRisk": true },
+    { "id": "docker_compose", "name": "Docker / Docker Compose", "class": "runtime_packaging", "status": "local_build_proven", "productionSafe": false, "highRisk": true },
+    { "id": "oracle_lite", "name": "Oracle Cloud Free / Oracle Lite", "class": "deployment_host", "status": "access_material_pending_cli_proof", "productionSafe": false, "highRisk": true },
+    { "id": "nginx_https", "name": "Nginx / Public HTTPS Gate", "class": "public_gate", "status": "not_configured", "productionSafe": false, "highRisk": true },
+    { "id": "supabase", "name": "Supabase", "class": "auth_rls_storage", "status": "visible_untested", "productionSafe": false, "highRisk": true },
+    { "id": "postgresql_truth_vault", "name": "PostgreSQL Truth Vault", "class": "truth_database", "status": "doctrine_locked_needs_runtime_proof", "productionSafe": false, "highRisk": true },
+    { "id": "redis_queue", "name": "Redis / Queue Layer", "class": "queue", "status": "not_configured", "productionSafe": false, "highRisk": false },
+    { "id": "gmail", "name": "Gmail", "class": "email_runtime", "status": "callable_verified_not_runtime_live", "productionSafe": false, "highRisk": true },
+    { "id": "google_drive", "name": "Google Drive", "class": "document_report_store", "status": "callable_verified", "productionSafe": false, "highRisk": false },
+    { "id": "google_calendar", "name": "Google Calendar", "class": "schedule_support", "status": "callable_verified", "productionSafe": false, "highRisk": false },
+    { "id": "google_contacts", "name": "Google Contacts", "class": "contact_support", "status": "callable_verified", "productionSafe": false, "highRisk": true },
+    { "id": "canva", "name": "Canva", "class": "design_assets", "status": "visible_untested", "productionSafe": false, "highRisk": false },
+    { "id": "payfast", "name": "PayFast", "class": "payments", "status": "not_configured", "productionSafe": false, "highRisk": true },
+    { "id": "paypal", "name": "PayPal", "class": "payments", "status": "visible_untested_live_blocked", "productionSafe": false, "highRisk": true },
+    { "id": "airtable", "name": "Airtable", "class": "async_mirror", "status": "ping_verified_not_truth", "productionSafe": false, "highRisk": false },
+    { "id": "n8n", "name": "n8n", "class": "workflow_relay", "status": "not_configured", "productionSafe": false, "highRisk": true },
+    { "id": "playwright", "name": "Playwright", "class": "browser_scout", "status": "not_configured", "productionSafe": false, "highRisk": true },
+    { "id": "neon_postgres", "name": "Neon Postgres", "class": "database_optional", "status": "visible_untested", "productionSafe": false, "highRisk": true },
+    { "id": "namecheap_dns", "name": "Namecheap / Domain / DNS", "class": "domain_dns", "status": "visible_untested", "productionSafe": false, "highRisk": true },
+    { "id": "codex_aider_workers", "name": "OpenAI Codex CLI / Aider / Coding Workers", "class": "coding_acceleration", "status": "optional_gated", "productionSafe": false, "highRisk": false },
+    { "id": "ui_code_helpers", "name": "Cursor / Windsurf / Cline / Continue / Copilot / Gemini CLI Helper Lane", "class": "coding_helpers", "status": "optional_gated", "productionSafe": false, "highRisk": false },
+    { "id": "openjarvis_openclaw", "name": "OpenJarvis / OpenClaw / Founder Command Layer", "class": "founder_command_gateway", "status": "sandbox_proven_research_only", "productionSafe": false, "highRisk": true }
+  ],
+  "nextAction": "Validate provider gate map and keep all high-risk providers blocked until proof and founder approval."
 }

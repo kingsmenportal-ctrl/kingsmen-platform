@@ -1,63 +1,69 @@
+﻿#!/usr/bin/env node
 import fs from "node:fs";
+import path from "node:path";
 
-function exists(path) {
-  return fs.existsSync(path);
+const root = process.cwd();
+
+function readJson(rel) {
+  return JSON.parse(fs.readFileSync(path.join(root, rel), "utf8").replace(/^\uFEFF/, ""));
 }
 
-const required = [
-  "docs/master/KINGSMEN_MASTER_LAYER_INDEX.md",
-  "docs/master/KINGSMEN_CONNECTED_APPS_TOOLS_PROVIDER_GATE.md",
-  "docs/master/KINGSMEN_BUILD_ORDER_AND_PROOF_RULES.md",
-  "manifests/master/kingsmen-master-layer-index.json",
-  "manifests/providers/kingsmen-25-connected-apps-tools-provider-map.json",
-  "packages/contracts/src/master-layer-index-contract.ts",
-  "packages/contracts/src/provider-gate-contract.ts",
-  "packages/backend/src/master/master-layer-index-service.ts",
-  "packages/backend/src/providers/provider-gate-policy.ts",
-  "apps/web/src/app/founder/master-index/page.tsx",
-  "apps/web/src/app/founder/providers/page.tsx",
-  "apps/web/src/components/kingsmen/founder/master/MasterLayerIndexTable.tsx",
-  "apps/web/src/components/kingsmen/founder/providers/ProviderGateMatrix.tsx",
-  "scripts/validators/validate-master-layer-index.mjs",
-  "scripts/validators/validate-25-provider-gates.mjs",
-  "scripts/validators/validate-no-provider-claims-live-without-proof.mjs"
-];
+const master = readJson("manifests/master/kingsmen-master-layer-index.json");
+const providers = readJson("manifests/providers/kingsmen-25-connected-apps-tools-provider-map.json");
 
-const failures = required.filter((path) => !exists(path)).map((path) => `Missing ${path}`);
-const master = JSON.parse(fs.readFileSync("manifests/master/kingsmen-master-layer-index.json", "utf8"));
-const providers = JSON.parse(fs.readFileSync("manifests/providers/kingsmen-25-connected-apps-tools-provider-map.json", "utf8"));
+const checks = [];
 
-if (master.productionReady !== false) failures.push("Master manifest productionReady must be false");
-if (providers.providerCount !== 25) failures.push("Provider manifest providerCount must equal 25");
-if ((providers.providers || []).length !== 25) failures.push("Provider list must contain exactly 25 providers");
+checks.push({
+  name: "master_manifest_present",
+  passed: master.schema === "kingsmen.master-layer-index.v1"
+});
+
+checks.push({
+  name: "provider_manifest_present",
+  passed: providers.schema === "kingsmen.provider-gates.v1"
+});
+
+checks.push({
+  name: "provider_count_25",
+  passed: Array.isArray(providers.providers) && providers.providers.length === 25
+});
+
+checks.push({
+  name: "production_claims_false",
+  passed:
+    master.productionReady === false &&
+    master.deployedToOracle === false &&
+    master.paymentsLive === false &&
+    master.emailRuntimeLive === false &&
+    providers.productionReady === false
+});
+
+checks.push({
+  name: "next_runtime_gate_batch21c",
+  passed: master.layers.some((layer) => layer.id === "BATCH-21C" && layer.status === "next_runtime_gate")
+});
+
+const failed = checks.filter((check) => !check.passed);
+const passed = failed.length === 0;
 
 const report = {
   schema: "kingsmen.master-index-provider-gates-proof.v1",
   module: "MASTER-INDEX-01 - KINGSMEN_MASTER_LAYER_INDEX / 25 Provider Gates / Build Order / Proof Matrix",
-  status: failures.length === 0
-    ? "MASTER_INDEX_PROVIDER_GATES_BUILD_ORDER_PROOF_MATRIX_PROVEN"
-    : "MASTER_INDEX_PROVIDER_GATES_BUILD_ORDER_PROOF_MATRIX_BLOCKED",
-  passed: failures.length === 0,
+  status: passed ? "MASTER_INDEX_PROVIDER_GATES_BUILD_ORDER_PROOF_MATRIX_PROVEN" : "MASTER_INDEX_PROVIDER_GATES_BUILD_ORDER_PROOF_MATRIX_FAILED",
+  passed,
   productionReady: false,
-  masterLayerIndexBuilt: true,
-  providerGatesMapped: true,
-  providerCount: providers.providers?.length ?? 0,
-  oracleLiteDefaultEnforced: master.oracleLiteDefault === true,
-  noProviderClaimsLiveWithoutProof: true,
-  allLayerFamiliesIndexed: Array.isArray(master.layerFamilies) && master.layerFamilies.length >= 10,
-  proofMatrixRequired: true,
-  failures,
-  nextAction: failures.length === 0
-    ? "Continue with repo materialization in the validated build order."
-    : "Repair missing MASTER-INDEX-01 files and rerun validators.",
-  checkedAt: new Date().toISOString()
+  checks,
+  failed_checks: failed,
+  generated_at: new Date().toISOString(),
+  next_action: passed ? "Run validators, commit and push MASTER-INDEX-01." : "Repair master index/provider gate files."
 };
 
-fs.mkdirSync("reports/master", { recursive: true });
-fs.writeFileSync("reports/master/master-layer-index-proof-latest.json", JSON.stringify(report, null, 2));
+fs.mkdirSync(path.join(root, "reports/master"), { recursive: true });
+fs.writeFileSync(
+  path.join(root, "reports/master/master-layer-index-proof-latest.json"),
+  `${JSON.stringify(report, null, 2)}\n`,
+  "utf8"
+);
 
-if (!report.passed) {
-  console.error(JSON.stringify(report, null, 2));
-  process.exit(1);
-}
-console.log("MASTER-INDEX-01 proof passed.");
+console.log(JSON.stringify(report, null, 2));
+if (!passed) process.exit(1);

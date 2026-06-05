@@ -1,3 +1,8 @@
-export function ProviderGateMatrix() {
-  return <section data-kingsmen-component=\"provider-gate-matrix\">25 provider gates mapped. Live claims require proof.</section>;
+﻿export function ProviderGateMatrix() {
+  return (
+    <section>
+      <h2>Provider Gate Matrix</h2>
+      <p>Shows connected apps, roles, risks, and production boundaries.</p>
+    </section>
+  );
 }

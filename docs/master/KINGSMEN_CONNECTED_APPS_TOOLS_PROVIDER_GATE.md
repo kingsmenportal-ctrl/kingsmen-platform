@@ -1,31 +1,53 @@
-# KINGSMEN CONNECTED APPS / TOOLS PROVIDER GATE
+﻿# KINGSMEN CONNECTED APPS / TOOLS PROVIDER GATE
 
-This file maps the 25 connected apps/tools into Kingsmen as provider gates.
+Module: MASTER-INDEX-01  
+Production Ready: false
 
-Connected means mapped. It does not mean live.
+## Provider Law
 
-- ChatGPT: Architect, doctrine keeper, planner, reviewer, prompt/module generator. Boundary: Does not prove repo files exist. Status: configured_pending_proof
-- GitHub: Repo source control, proof history, Git checkpoints. Boundary: GitHub presence is not production readiness. Status: configured_pending_proof
-- GitHub Actions: CI proof runner. Boundary: CI passing does not mean live providers are configured. Status: not_configured
-- PowerShell Creator / KINGSMEN_CREATOR.ps1: Windows-first materializer, builder, validator, deploy runner. Boundary: Not the business brain. Status: configured_pending_proof
-- Docker / Docker Compose: Oracle Lite runtime packaging. Boundary: Local Docker is not public production proof. Status: configured_pending_proof
-- Oracle Cloud Free / Oracle Lite: First controlled deployment host. Boundary: Low concurrency, no AWS-style assumptions. Status: not_configured
-- Nginx / Public HTTPS Gate: Reverse proxy and HTTPS readiness. Boundary: HTTPS does not mean payments/email/submissions live. Status: not_configured
-- Supabase: Auth, RLS, signed storage, own-data boundary. Boundary: service_role backend-only. Status: not_configured
-- PostgreSQL Truth Vault: Primary system truth. Boundary: Airtable/n8n/AI cannot override truth. Status: configured_pending_proof
-- Redis / Queue Layer: Low-cost queue and retry discipline. Boundary: No infinite retry. Status: not_configured
-- Gmail: Email-first runtime. Boundary: Live only after COMMS-01. Status: not_configured
-- Google Drive: Non-secret planning and report workspace. Boundary: No raw secrets. Status: configured_pending_proof
-- Google Calendar: Scheduling support. Boundary: Calendar is not source truth. Status: not_required_for_current_phase
-- Google Contacts: Contact reference. Boundary: Cannot bypass verification/consent. Status: not_required_for_current_phase
-- Canva: Public/outreach creative production. Boundary: Does not replace policy/legal proof. Status: not_required_for_current_phase
-- PayFast: South African payment provider. Boundary: Live only after PAYMENTS-04. Status: not_configured
-- PayPal: Optional secondary payment provider. Boundary: Optional; must not weaken PayFast policy. Status: not_configured
-- Airtable: Async mirror / operations visibility. Boundary: Never truth. Status: not_configured
-- n8n: Thin workflow wrapper. Boundary: No orchestration authority. Status: not_configured
-- Playwright: Scout/probe. Boundary: No CAPTCHA/OTP bypass. Status: configured_pending_proof
-- Neon Postgres: Optional managed Postgres/dev/staging. Boundary: Not default production unless approved. Status: not_required_for_current_phase
-- Namecheap / Domain / DNS: Domain and DNS readiness. Boundary: Domain does not equal production. Status: not_configured
-- OpenAI Codex CLI / Aider: Repo coding acceleration. Boundary: No uncontrolled production writes. Status: not_required_for_current_phase
-- Cursor / Windsurf / Cline / Continue / Copilot / Gemini CLI: Optional UI/code helpers. Boundary: Cannot replace validators or PowerShell Creator. Status: not_required_for_current_phase
-- OpenJarvis / OpenClaw / Founder Command Layer: Controlled founder command gateway. Boundary: No raw shell from browser. Status: not_required_for_current_phase
+Visible does not mean callable.  
+Callable does not mean production-safe.  
+Production-safe requires boundary, validator, proof report, and founder approval for high-risk use.
+
+## 25 Provider / Tool Map
+
+1. ChatGPT — Architect, doctrine keeper, planner, reviewer, prompt/module generator. Does not prove repo files exist.
+2. GitHub — Repo source control, history, backup, Git checkpoints.
+3. GitHub Actions — CI proof runner for validators, Docker proof, security scans, reports.
+4. PowerShell Creator / KINGSMEN_CREATOR.ps1 — Windows-first materializer, builder, validator, deploy runner.
+5. Docker / Docker Compose — Oracle Lite packaging for local and server runtime.
+6. Oracle Cloud Free / Oracle Lite — first controlled deployment host with low-concurrency discipline.
+7. Nginx / Public HTTPS Gate — reverse proxy, HTTPS, public callback boundary.
+8. Supabase — Auth, RLS, signed storage, browser own-data boundary. Service role is backend-only.
+9. PostgreSQL Truth Vault — primary system truth for candidates, applications, documents, payments, evidence, audits, sources, outcomes.
+10. Redis / Queue Layer — low-cost queues, worker throttling, DLQ, retry discipline.
+11. Gmail — email-first runtime after COMMS-01.
+12. Google Drive — connected document/report workspace for non-secret planning, indexes, handover docs.
+13. Google Calendar — founder reviews, school meetings, partner meetings, safe candidate appointments.
+14. Google Contacts — contact reference for schools/partners/operators when explicitly used.
+15. Canva — public/outreach creative production for school assets, pitch visuals, social/funnel graphics.
+16. PayFast — South African payment provider. Live only after PAYMENTS-04.
+17. PayPal — secondary/international payment provider with sandbox/live gates.
+18. Airtable — async mirror/operations visibility only. Never truth.
+19. n8n — thin workflow wrapper. Stateless relay back to backend. No orchestration authority.
+20. Playwright — scout/probe for portal health/source-change detection. No CAPTCHA/OTP bypass.
+21. Neon Postgres — optional managed Postgres/dev/staging/migration support if approved.
+22. Namecheap / Domain / DNS — domain, DNS, public URL, branded email routing later.
+23. OpenAI Codex CLI / Aider / Coding Workers — repo coding acceleration under proof discipline.
+24. Cursor / Windsurf / Cline / Continue / Copilot / Gemini CLI Helper Lane — optional UI/code helpers.
+25. OpenJarvis / OpenClaw / Founder Command Layer — controlled founder command gateway; allowlisted, audited, report-backed commands only.
+
+## High-Risk Provider Uses
+
+High-risk uses require founder approval and proof:
+- payments
+- refunds
+- production database
+- public deployment
+- DNS / HTTPS
+- candidate data sharing
+- partner identity sharing
+- bulk outreach
+- official application actions
+- live AI automation
+- Oracle resource creation

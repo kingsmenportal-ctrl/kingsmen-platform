@@ -1,9 +1,10 @@
 {
-  "schema": "kingsmen.no-provider-live-claims-validation.v1",
-  "module": "MASTER-INDEX-01",
+  "schema": "kingsmen.validation-report.v1",
+  "module": "MASTER-INDEX-01 - No Provider Claims Live Without Proof",
+  "status": "VALIDATED",
   "passed": true,
-  "noProviderClaimsLiveWithoutProof": true,
   "productionReady": false,
-  "failures": [],
-  "checkedAt": "2026-06-04T04:06:19.709Z"
+  "failed_checks": [],
+  "generated_at": "2026-06-05T04:16:54.204Z",
+  "next_action": "MASTER-INDEX-01 may be committed as non-production index authority."
 }

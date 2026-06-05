@@ -1,36 +1,66 @@
+﻿#!/usr/bin/env node
 import fs from "node:fs";
+import path from "node:path";
 
-const manifest = JSON.parse(fs.readFileSync("manifests/providers/kingsmen-25-connected-apps-tools-provider-map.json", "utf8"));
-const claims = manifest.liveClaims || {};
-const forbiddenTrueClaims = [
-  "paymentsLive",
-  "emailRuntimeLive",
-  "officialSubmissionsLive",
-  "deployedToOracle",
-  "publicHttpsReady",
-  "productionReady"
+const root = process.cwd();
+const failures = [];
+
+const files = [
+  "manifests/master/kingsmen-master-layer-index.json",
+  "manifests/providers/kingsmen-25-connected-apps-tools-provider-map.json"
 ];
 
-const failures = [];
-for (const claim of forbiddenTrueClaims) {
-  if (claims[claim] === true) failures.push(`${claim} cannot be true in MASTER-INDEX-01 without matching provider proof gate`);
+function readJson(rel) {
+  return JSON.parse(fs.readFileSync(path.join(root, rel), "utf8").replace(/^\uFEFF/, ""));
 }
+
+for (const file of files) {
+  if (!fs.existsSync(path.join(root, file))) {
+    failures.push(`Missing ${file}`);
+  }
+}
+
+if (failures.length === 0) {
+  const master = readJson(files[0]);
+  const providers = readJson(files[1]);
+
+  const blockedClaimFields = [
+    "productionReady",
+    "deployedToOracle",
+    "publicHttpsReady",
+    "paymentsLive",
+    "emailRuntimeLive",
+    "officialSubmissionsLive",
+    "candidateOwnDataProof",
+    "partnerConsentSharing",
+    "oraclePaidResourcesEnabled"
+  ];
+
+  for (const field of blockedClaimFields) {
+    if (master[field] === true) failures.push(`Master manifest illegally claims ${field}=true without proof.`);
+  }
+
+  if (providers.productionReady === true) failures.push("Provider manifest illegally claims productionReady=true.");
+
+  for (const provider of providers.providers ?? []) {
+    if (provider.productionSafe === true) failures.push(`Provider ${provider.id} illegally claims productionSafe=true.`);
+  }
+}
+
+const passed = failures.length === 0;
 
 const report = {
-  schema: "kingsmen.no-provider-live-claims-validation.v1",
-  module: "MASTER-INDEX-01",
-  passed: failures.length === 0,
-  noProviderClaimsLiveWithoutProof: failures.length === 0,
+  schema: "kingsmen.validation-report.v1",
+  module: "MASTER-INDEX-01 - No Provider Claims Live Without Proof",
+  status: passed ? "VALIDATED" : "PRODUCTION_CLAIM_BLOCKED",
+  passed,
   productionReady: false,
-  failures,
-  checkedAt: new Date().toISOString()
+  failed_checks: failures,
+  generated_at: new Date().toISOString(),
+  next_action: passed ? "MASTER-INDEX-01 may be committed as non-production index authority." : "Remove false production claims."
 };
 
-fs.mkdirSync("reports/validation", { recursive: true });
-fs.writeFileSync("reports/validation/no-provider-claims-live-without-proof-latest.json", JSON.stringify(report, null, 2));
-
-if (!report.passed) {
-  console.error(JSON.stringify(report, null, 2));
-  process.exit(1);
-}
-console.log("No provider live claims without proof validation passed.");
+fs.mkdirSync(path.join(root, "reports/validation"), { recursive: true });
+fs.writeFileSync(path.join(root, "reports/validation/no-provider-claims-live-without-proof-latest.json"), `${JSON.stringify(report, null, 2)}\n`, "utf8");
+console.log(JSON.stringify(report, null, 2));
+if (!passed) process.exit(1);

@@ -1,9 +1,10 @@
 {
-  "schema": "kingsmen.provider-gates-validation.v1",
-  "module": "MASTER-INDEX-01",
+  "schema": "kingsmen.validation-report.v1",
+  "module": "MASTER-INDEX-01 - 25 Provider Gates",
+  "status": "VALIDATED",
   "passed": true,
-  "providerCount": 25,
   "productionReady": false,
-  "failures": [],
-  "checkedAt": "2026-06-04T04:06:19.614Z"
+  "failed_checks": [],
+  "generated_at": "2026-06-05T04:16:54.078Z",
+  "next_action": "Validate no provider production claims without proof."
 }
