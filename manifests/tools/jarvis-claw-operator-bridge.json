@@ -1,0 +1,36 @@
+{
+  "module": "TOOLS-JARVIS-CLAW-02",
+  "name": "Active Kingsmen AI Operator Bridge",
+  "status": "BOUNDARY_CONTRACT_CREATED_PENDING_TESTS",
+  "purpose": "Make Jarvis and OpenClaw useful for Kingsmen without giving them uncontrolled authority.",
+  "roles": {
+    "jarvis": "local command brain and safe planner",
+    "openclaw": "local operator assistant",
+    "powershell": "approved executor",
+    "github": "proof ledger",
+    "validators": "truth judge",
+    "founder": "approval authority"
+  },
+  "blocked": [
+    "secrets",
+    ".env",
+    ".oci",
+    ".ssh",
+    "logs",
+    "candidate_data",
+    "payment_data",
+    "whatsapp_automation",
+    "browser_control",
+    "unapproved_shell_execution",
+    "unapproved_repo_modification",
+    "oracle_deployment",
+    "supabase_service_role",
+    "payfast_actions"
+  ],
+  "next_tests": [
+    "OpenClaw exact boundary reply",
+    "OpenClaw safety lock reply",
+    "OpenClaw three-line Kingsmen role explanation",
+    "Jarvis short boundary reply"
+  ]
+}
