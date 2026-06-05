@@ -1,4 +1,4 @@
-﻿#!/usr/bin/env node
+#!/usr/bin/env node
 import fs from "node:fs";
 import path from "node:path";
 
@@ -38,6 +38,9 @@ const secretPatterns = [
 ];
 
 for (const file of requiredFiles.filter((file) => fs.existsSync(full(file)))) {
+  // Do not treat the validator file itself as a secret leak just because it contains regex definitions.
+  if (file === "scripts/agents/validate-kingsmen-agent-system.mjs") continue;
+
   const text = read(file);
   for (const pattern of secretPatterns) {
     if (pattern.test(text)) {

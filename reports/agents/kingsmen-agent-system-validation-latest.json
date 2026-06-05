@@ -1,8 +1,8 @@
 {
   "schema": "kingsmen.validation-report.v1",
   "module": "AGENTS-01 - Founder Command Agent / Agent Registry / Tool Permission Boundary",
-  "status": "BUILT_PENDING_VALIDATION",
-  "passed": false,
+  "status": "VALIDATED",
+  "passed": true,
   "productionReady": false,
   "files_expected": [
     "docs/agents/KINGSMEN_AGENT_SYSTEM.md",
@@ -11,9 +11,7 @@
     "scripts/agents/Invoke-KingsmenFounderCommand.ps1",
     "scripts/agents/validate-kingsmen-agent-system.mjs"
   ],
-  "failed_checks": [
-    "scripts/agents/validate-kingsmen-agent-system.mjs contains forbidden secret pattern: /-----BEGIN .*PRIVATE KEY-----/i"
-  ],
-  "generated_at": "2026-06-05T04:04:10.109Z",
-  "next_action": "Repair AGENTS-01 files."
+  "failed_checks": [],
+  "generated_at": "2026-06-05T04:07:47.563Z",
+  "next_action": "Proceed to MASTER-INDEX-01 or BATCH 21C depending on active build order."
 }
