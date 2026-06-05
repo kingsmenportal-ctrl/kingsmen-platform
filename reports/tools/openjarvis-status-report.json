@@ -1,0 +1,12 @@
+{
+  "module": "TOOLS-OPENJARVIS-01",
+  "status": "BUILT_SANDBOXED_NOT_TRUSTED_FOR_REPO_REASONING",
+  "jarvis_installed": true,
+  "local_model": "qwen3.5:2b",
+  "security_profile": "personal",
+  "guard_file": "docs/KINGSMEN_JARVIS_GUARD.md",
+  "safe_file_list": "reports/tools/jarvis-safe-files-list.txt",
+  "result": "Jarvis can run locally but failed safe Kingsmen file-list reasoning tests.",
+  "decision": "Keep Jarvis read-only and experimental. Do not use it as proof authority or build executor.",
+  "next_batch": "REALITY-AUDIT-01 or TOOLS-OPENJARVIS-02"
+}
