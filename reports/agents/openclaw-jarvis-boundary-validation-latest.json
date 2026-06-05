@@ -1,8 +1,8 @@
 {
   "schema": "kingsmen.validation-report.v1",
   "module": "TOOLS-AGENT-01 - OpenClaw and Jarvis Sandbox Boundary",
-  "status": "BUILT_PENDING_VALIDATION",
-  "passed": false,
+  "status": "VALIDATED",
+  "passed": true,
   "productionReady": false,
   "connectedToKingsmenSecrets": false,
   "candidateDataAccess": false,
@@ -15,9 +15,7 @@
     "scripts/agents/Install-OpenClawSandbox.ps1",
     ".gitignore"
   ],
-  "failed_checks": [
-    "Jarvis blockedUse must include payments."
-  ],
-  "generated_at": "2026-06-05T03:56:23.985Z",
-  "next_action": "Repair OpenClaw/Jarvis sandbox boundary files."
+  "failed_checks": [],
+  "generated_at": "2026-06-05T03:59:01.997Z",
+  "next_action": "Proceed to AGENTS-01 Founder Command Agent boundary."
 }

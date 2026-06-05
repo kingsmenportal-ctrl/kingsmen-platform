@@ -1,22 +1,40 @@
-﻿{
-  "schema": "kingsmen.agent-tool-boundary.v1",
-  "module": "TOOLS-AGENT-01 - OpenClaw and Jarvis Sandbox Boundary",
-  "productionReady": false,
-  "tools": [
-    {
-      "name": "OpenClaw",
-      "source": "https://github.com/openclaw/openclaw",
-      "status": "RESEARCH_SANDBOX_ONLY",
-      "allowedUse": ["founder command inspiration", "sandbox install", "agent routing study"],
-      "blockedUse": ["secrets", "candidate data", "payments", "Oracle deploy", "official submissions"]
-    },
-    {
-      "name": "Jarvis",
-      "source": "user-provided videos/screenshots",
-      "status": "RESEARCH_ONLY_NOT_CONNECTED",
-      "allowedUse": ["command UI inspiration", "voice/chat command idea"],
-      "blockedUse": ["secrets", "candidate data", "production automation"]
-    }
-  ],
-  "nextAction": "Install OpenClaw only in sandbox folder and validate no secrets/candidate data are exposed."
+{
+    "schema":  "kingsmen.agent-tool-boundary.v1",
+    "module":  "TOOLS-AGENT-01 - OpenClaw and Jarvis Sandbox Boundary",
+    "productionReady":  false,
+    "tools":  [
+                  {
+                      "name":  "OpenClaw",
+                      "source":  "https://github.com/openclaw/openclaw",
+                      "status":  "RESEARCH_SANDBOX_ONLY",
+                      "allowedUse":  [
+                                         "founder command inspiration",
+                                         "sandbox install",
+                                         "agent routing study"
+                                     ],
+                      "blockedUse":  [
+                                         "secrets",
+                                         "candidate data",
+                                         "payments",
+                                         "Oracle deploy",
+                                         "official submissions"
+                                     ]
+                  },
+                  {
+                      "name":  "Jarvis",
+                      "source":  "user-provided videos/screenshots",
+                      "status":  "RESEARCH_ONLY_NOT_CONNECTED",
+                      "allowedUse":  [
+                                         "command UI inspiration",
+                                         "voice/chat command idea"
+                                     ],
+                      "blockedUse":  [
+                                         "secrets",
+                                         "candidate data",
+                                         "production automation",
+                                         "payments"
+                                     ]
+                  }
+              ],
+    "nextAction":  "Install OpenClaw only in sandbox folder and validate no secrets/candidate data are exposed."
 }
