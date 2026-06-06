@@ -1,0 +1,154 @@
+{
+  "schema": "kingsmen.founder-control-plane-entry-link-runtime-proof.v1",
+  "module": "BATCH 28 - Founder Control Plane Entry Link Runtime Proof",
+  "status": "FOUNDER_CONTROL_PLANE_ENTRY_LINK_RUNTIME_PROVEN",
+  "passed": true,
+  "productionReady": false,
+  "canClaimProduction": false,
+  "deployedToOracle": false,
+  "generated_at": "2026-06-06T17:40:42.094Z",
+  "runtimeScope": "controlled_local_docker_runtime_ui_navigation_proof",
+  "composeFile": "docker/oracle-lite/docker-compose.local.yml",
+  "webBuildSucceeded": true,
+  "composeUpSucceeded": true,
+  "composeDownSucceeded": true,
+  "apiHealthStatus": 200,
+  "controlPlaneStatus": 200,
+  "proofCentreStatus": 200,
+  "entryLinkRendered": true,
+  "targetRouteReached": true,
+  "portsReleasedAfterDown": true,
+  "checks": [
+    {
+      "name": "required-file:docker/oracle-lite/docker-compose.local.yml",
+      "passed": true,
+      "detail": "docker/oracle-lite/docker-compose.local.yml"
+    },
+    {
+      "name": "required-file:apps/web/src/app/founder/control-plane/page.tsx",
+      "passed": true,
+      "detail": "apps/web/src/app/founder/control-plane/page.tsx"
+    },
+    {
+      "name": "required-file:apps/web/src/app/founder/proof-centre/page.tsx",
+      "passed": true,
+      "detail": "apps/web/src/app/founder/proof-centre/page.tsx"
+    },
+    {
+      "name": "required-file:reports/control-plane/founder-proof-centre-entry-link-proof.json",
+      "passed": true,
+      "detail": "reports/control-plane/founder-proof-centre-entry-link-proof.json"
+    },
+    {
+      "name": "required-file:reports/validation/founder-proof-centre-entry-link-latest.json",
+      "passed": true,
+      "detail": "reports/validation/founder-proof-centre-entry-link-latest.json"
+    },
+    {
+      "name": "batch27-entry-link-proven",
+      "passed": true,
+      "detail": "FOUNDER_PROOF_CENTRE_ENTRY_LINK_PROVEN"
+    },
+    {
+      "name": "batch27-validation-passed",
+      "passed": true,
+      "detail": "VALIDATED"
+    },
+    {
+      "name": "batch27-no-production-claim",
+      "passed": true,
+      "detail": "BATCH 27 production false"
+    },
+    {
+      "name": "batch27-no-oracle-claim",
+      "passed": true,
+      "detail": "BATCH 27 oracle false"
+    },
+    {
+      "name": "compose-down-before",
+      "passed": true,
+      "detail": "exit=0; timedOut=false"
+    },
+    {
+      "name": "web-build-succeeded",
+      "passed": true,
+      "detail": "exit=0; timedOut=false"
+    },
+    {
+      "name": "compose-up-succeeded",
+      "passed": true,
+      "detail": "exit=0; timedOut=false"
+    },
+    {
+      "name": "api-health-200",
+      "passed": true,
+      "detail": "status=200; error="
+    },
+    {
+      "name": "control-plane-page-200",
+      "passed": true,
+      "detail": "status=200; error="
+    },
+    {
+      "name": "control-plane-entry-marker-rendered",
+      "passed": true,
+      "detail": "entry marker"
+    },
+    {
+      "name": "control-plane-entry-href-rendered",
+      "passed": true,
+      "detail": "href"
+    },
+    {
+      "name": "control-plane-entry-label-rendered",
+      "passed": true,
+      "detail": "label"
+    },
+    {
+      "name": "proof-centre-page-200",
+      "passed": true,
+      "detail": "status=200; error="
+    },
+    {
+      "name": "proof-centre-page-rendered",
+      "passed": true,
+      "detail": "Build Proof Centre text"
+    },
+    {
+      "name": "compose-down-after",
+      "passed": true,
+      "detail": "exit=0; timedOut=false"
+    },
+    {
+      "name": "docker-containers-released-after-down",
+      "passed": true,
+      "detail": ""
+    }
+  ],
+  "failed": [],
+  "commandSummary": {
+    "composeDownBefore": {
+      "exitCode": 0,
+      "timedOut": false,
+      "seconds": 0.37
+    },
+    "webBuild": {
+      "exitCode": 0,
+      "timedOut": false,
+      "seconds": 143.35,
+      "stderrTail": " Image kingsmen/api:oracle-lite-local Building \n Image kingsmen/web:oracle-lite-local Building \n Image kingsmen/web:oracle-lite-local Built \n"
+    },
+    "composeUp": {
+      "exitCode": 0,
+      "timedOut": false,
+      "seconds": 11.9,
+      "stderrTail": " Network kingsmen-oracle-lite-local_default Creating \n Network kingsmen-oracle-lite-local_default Created \n Container kingsmen-api-local Creating \n Container kingsmen-api-local Created \n Container kingsmen-web-local Creating \n Container kingsmen-web-local Created \n Container kingsmen-api-local Starting \n Container kingsmen-api-local Started \n Container kingsmen-web-local Starting \n Container kingsmen-web-local Started \n"
+    },
+    "composeDownAfter": {
+      "exitCode": 0,
+      "timedOut": false,
+      "seconds": 6.34
+    }
+  },
+  "next_action": "Run validator and commit BATCH 28."
+}

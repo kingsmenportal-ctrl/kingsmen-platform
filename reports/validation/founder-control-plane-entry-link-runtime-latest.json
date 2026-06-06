@@ -1,0 +1,25 @@
+{
+  "schema": "kingsmen.validation-report.v1",
+  "module": "BATCH 28 - Founder Control Plane Entry Link Runtime Proof",
+  "status": "VALIDATED",
+  "passed": true,
+  "generated_at": "2026-06-06T17:40:42.214Z",
+  "files_expected": [
+    "docs/control-plane/founder-control-plane-entry-link-runtime-proof.md",
+    "manifests/control-plane/founder-control-plane-entry-link-runtime-proof.json",
+    "packages/contracts/src/founder-control-plane-entry-link-runtime-proof.ts",
+    "scripts/proof/prove-founder-control-plane-entry-link-runtime.mjs",
+    "scripts/validators/validate-founder-control-plane-entry-link-runtime.mjs",
+    "reports/control-plane/founder-control-plane-entry-link-runtime-proof.json",
+    "reports/control-plane/founder-proof-centre-entry-link-proof.json",
+    "reports/validation/founder-proof-centre-entry-link-latest.json"
+  ],
+  "files_checked": 8,
+  "missing_files": [],
+  "failed_checks": [],
+  "warnings": [],
+  "oracle_lite_impact": "controlled_local_docker_runtime_only_no_oracle_claim",
+  "control_plane_impact": "Founder Control Plane entry link to the Proof Centre is proven in the controlled local Docker web runtime.",
+  "proof": "reports/control-plane/founder-control-plane-entry-link-runtime-proof.json",
+  "next_action": "Commit BATCH 28."
+}

@@ -1,0 +1,21 @@
+﻿{
+  "schema": "kingsmen.control-plane-manifest.v1",
+  "module": "BATCH 28 - Founder Control Plane Entry Link Runtime Proof",
+  "status": "BUILT_PENDING_VALIDATION",
+  "scope": "controlled_local_docker_runtime_ui_navigation_proof",
+  "productionReady": false,
+  "canClaimProduction": false,
+  "deployedToOracle": false,
+  "startsDocker": true,
+  "touchesSecrets": false,
+  "touchesCandidateData": false,
+  "sourcePage": "apps/web/src/app/founder/control-plane/page.tsx",
+  "targetRoute": "/founder/proof-centre/",
+  "composeFile": "docker/oracle-lite/docker-compose.local.yml",
+  "requiredPriorProof": "reports/control-plane/founder-proof-centre-entry-link-proof.json",
+  "outputs": [
+    "reports/control-plane/founder-control-plane-entry-link-runtime-proof.json",
+    "reports/validation/founder-control-plane-entry-link-runtime-latest.json"
+  ],
+  "nextAction": "Run BATCH 28 proof and validator."
+}
