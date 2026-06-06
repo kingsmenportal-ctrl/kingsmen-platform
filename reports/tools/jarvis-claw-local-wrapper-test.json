@@ -1,0 +1,21 @@
+{
+    "module":  "TOOLS-JARVIS-CLAW-04",
+    "status":  "TIMEOUT_SAFE_TEST_COMPLETED",
+    "generated_at":  "2026-06-05T19:53:57",
+    "timeout_seconds":  45,
+    "jarvis_direct_safe_mode":  {
+                                    "name":  "jarvis-wrapper",
+                                    "status":  "TIMEOUT",
+                                    "passed":  false,
+                                    "output":  "Timed out after 45 seconds"
+                                },
+    "ollama_direct_wrapper":  {
+                                  "name":  "ollama-wrapper",
+                                  "status":  "TIMEOUT",
+                                  "passed":  false,
+                                  "output":  "Timed out after 45 seconds"
+                              },
+    "all_passed":  false,
+    "production_authority":  false,
+    "decision":  "Jarvis and Ollama may only be used through controlled wrappers. Timeouts prevent local AI tests from trapping the founder."
+}
