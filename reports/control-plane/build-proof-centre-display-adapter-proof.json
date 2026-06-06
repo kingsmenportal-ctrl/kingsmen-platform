@@ -1,0 +1,106 @@
+{
+  "schema": "kingsmen.control-plane-proof-display-adapter-proof.v1",
+  "module": "BATCH 24 - Smallest Useful Control-Plane Proof Display Adapter",
+  "status": "CONTROL_PLANE_PROOF_DISPLAY_ADAPTER_PROVEN",
+  "passed": true,
+  "productionReady": false,
+  "canClaimProduction": false,
+  "deployedToOracle": false,
+  "generated_at": "2026-06-06T16:29:34.569Z",
+  "adapterPath": "reports/control-plane/build-proof-centre-display-adapter.json",
+  "previewPath": "reports/control-plane/build-proof-centre-display-adapter-preview.html",
+  "checks": [
+    {
+      "name": "input-exists:reports/runtime/build-proof-centre-read-model.json",
+      "passed": true,
+      "detail": "reports/runtime/build-proof-centre-read-model.json"
+    },
+    {
+      "name": "input-exists:reports/runtime/build-proof-centre-proof.json",
+      "passed": true,
+      "detail": "reports/runtime/build-proof-centre-proof.json"
+    },
+    {
+      "name": "input-exists:reports/validation/build-proof-centre-latest.json",
+      "passed": true,
+      "detail": "reports/validation/build-proof-centre-latest.json"
+    },
+    {
+      "name": "source-read-model-valid",
+      "passed": true,
+      "detail": "kingsmen.build-proof-centre-read-model.v1"
+    },
+    {
+      "name": "source-proof-proven",
+      "passed": true,
+      "detail": "BUILD_PROOF_CENTRE_READ_MODEL_PROVEN"
+    },
+    {
+      "name": "source-validation-passed",
+      "passed": true,
+      "detail": "VALIDATED"
+    },
+    {
+      "name": "source-all-proof-items-passed",
+      "passed": true,
+      "detail": "true"
+    },
+    {
+      "name": "source-no-production-claim",
+      "passed": true,
+      "detail": "production false"
+    },
+    {
+      "name": "source-no-oracle-claim",
+      "passed": true,
+      "detail": "oracle false"
+    },
+    {
+      "name": "adapter-has-two-cards",
+      "passed": true,
+      "detail": "cards=2"
+    },
+    {
+      "name": "adapter-all-cards-passed",
+      "passed": true,
+      "detail": "all cards proven"
+    },
+    {
+      "name": "adapter-no-production-claim",
+      "passed": true,
+      "detail": "no production claim"
+    },
+    {
+      "name": "adapter-no-oracle-claim",
+      "passed": true,
+      "detail": "no oracle claim"
+    },
+    {
+      "name": "adapter-json-written",
+      "passed": true,
+      "detail": "reports/control-plane/build-proof-centre-display-adapter.json"
+    },
+    {
+      "name": "adapter-html-written",
+      "passed": true,
+      "detail": "reports/control-plane/build-proof-centre-display-adapter-preview.html"
+    },
+    {
+      "name": "adapter-local-only",
+      "passed": true,
+      "detail": "local_control_plane_display_adapter_only"
+    },
+    {
+      "name": "adapter-no-docker-start",
+      "passed": true,
+      "detail": "This script does not invoke Docker."
+    },
+    {
+      "name": "adapter-no-secret-access",
+      "passed": true,
+      "detail": "This script reads only reports/runtime and reports/validation inputs."
+    }
+  ],
+  "failed": [],
+  "next_action": "Run validator and commit BATCH 24."
+}

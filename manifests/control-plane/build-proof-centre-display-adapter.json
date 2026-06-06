@@ -1,0 +1,24 @@
+﻿{
+  "schema": "kingsmen.control-plane-manifest.v1",
+  "module": "BATCH 24 - Smallest Useful Control-Plane Proof Display Adapter",
+  "status": "BUILT_PENDING_VALIDATION",
+  "scope": "local_control_plane_display_adapter_only",
+  "productionReady": false,
+  "canClaimProduction": false,
+  "deployedToOracle": false,
+  "startsDocker": false,
+  "touchesSecrets": false,
+  "touchesCandidateData": false,
+  "inputs": [
+    "reports/runtime/build-proof-centre-read-model.json",
+    "reports/runtime/build-proof-centre-proof.json",
+    "reports/validation/build-proof-centre-latest.json"
+  ],
+  "outputs": [
+    "reports/control-plane/build-proof-centre-display-adapter.json",
+    "reports/control-plane/build-proof-centre-display-adapter-preview.html",
+    "reports/control-plane/build-proof-centre-display-adapter-proof.json",
+    "reports/validation/control-plane-proof-display-adapter-latest.json"
+  ],
+  "nextAction": "Run BATCH 24 proof and validator."
+}

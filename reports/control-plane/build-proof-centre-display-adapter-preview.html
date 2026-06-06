@@ -1,0 +1,48 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <title>Kingsmen Build Proof Centre</title>
+  <style>
+    body { margin: 0; font-family: Arial, sans-serif; background: #07111f; color: #e8f3ff; }
+    main { max-width: 980px; margin: 0 auto; padding: 32px; }
+    header { border-bottom: 1px solid #16324f; margin-bottom: 24px; padding-bottom: 18px; }
+    h1 { margin: 0; color: #d6b25e; }
+    .warning { background: #10243b; border: 1px solid #2c5e8c; padding: 14px; border-radius: 12px; margin: 18px 0; }
+    .grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 18px; }
+    .card { border: 1px solid #1e4566; border-radius: 18px; padding: 18px; background: #0b1b2d; box-shadow: 0 10px 28px rgba(0,0,0,.25); }
+    .card.safe { border-color: #22c55e; }
+    .badge { display: inline-block; padding: 6px 10px; border-radius: 999px; background: #123d2a; color: #86efac; font-weight: bold; font-size: 12px; }
+    ul { padding: 0; list-style: none; }
+    li { display: flex; justify-content: space-between; border-bottom: 1px solid #16324f; padding: 7px 0; gap: 12px; }
+    small { color: #91a7bf; word-break: break-all; }
+  </style>
+</head>
+<body>
+  <main>
+    <header>
+      <h1>Kingsmen Build Proof Centre</h1>
+      <p>Smallest useful Control Plane proof display adapter.</p>
+    </header>
+    <div class="warning">Local proof display only. This is not production readiness and not Oracle deployment proof.</div>
+    <div class="grid">
+    <section class="card safe">
+      <div class="badge">PROVEN</div>
+      <h2>Docker Oracle Lite Controlled Runtime</h2>
+      <p>DOCKER_LOCAL_RUNTIME_PROVEN / VALIDATED</p>
+      <ul><li><span>apiHealthStatus</span><strong>200</strong></li><li><span>webStatus</span><strong>200</strong></li><li><span>bridgeApiStatus</span><strong>202</strong></li><li><span>composeUpSucceeded</span><strong>true</strong></li><li><span>composeDownSucceeded</span><strong>true</strong></li></ul>
+      <small>reports/runtime/docker-oracle-lite-controlled-runtime-proof.json</small>
+    </section>
+  
+
+    <section class="card safe">
+      <div class="badge">PROVEN</div>
+      <h2>Docker Oracle Lite Runtime Health Hardening</h2>
+      <p>DOCKER_RUNTIME_HEALTH_HARDENED_LOCAL / VALIDATED</p>
+      <ul><li><span>composeCyclesExpected</span><strong>2</strong></li><li><span>composeCyclesCompleted</span><strong>2</strong></li><li><span>failedChecks</span><strong>0</strong></li></ul>
+      <small>reports/runtime/docker-oracle-lite-runtime-health-hardening-proof.json</small>
+    </section>
+  </div>
+  </main>
+</body>
+</html>

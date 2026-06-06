@@ -1,0 +1,47 @@
+{
+  "schema": "kingsmen.control-plane-proof-display-adapter.v1",
+  "module": "BATCH 24 - Smallest Useful Control-Plane Proof Display Adapter",
+  "generated_at": "2026-06-06T16:29:34.462Z",
+  "productionReady": false,
+  "canClaimProduction": false,
+  "deployedToOracle": false,
+  "runtimeScope": "local_control_plane_display_adapter_only",
+  "sourceReadModel": "reports/runtime/build-proof-centre-read-model.json",
+  "allCardsPassed": true,
+  "noProductionClaim": true,
+  "noOracleClaim": true,
+  "cards": [
+    {
+      "id": "docker-oracle-lite-controlled-runtime",
+      "title": "Docker Oracle Lite Controlled Runtime",
+      "badge": "PROVEN",
+      "tone": "safe",
+      "subtitle": "DOCKER_LOCAL_RUNTIME_PROVEN / VALIDATED",
+      "reportPath": "reports/runtime/docker-oracle-lite-controlled-runtime-proof.json",
+      "validationPath": "reports/validation/docker-oracle-lite-controlled-runtime-latest.json",
+      "metrics": {
+        "apiHealthStatus": 200,
+        "webStatus": 200,
+        "bridgeApiStatus": 202,
+        "composeUpSucceeded": true,
+        "composeDownSucceeded": true
+      }
+    },
+    {
+      "id": "docker-oracle-lite-runtime-health-hardening",
+      "title": "Docker Oracle Lite Runtime Health Hardening",
+      "badge": "PROVEN",
+      "tone": "safe",
+      "subtitle": "DOCKER_RUNTIME_HEALTH_HARDENED_LOCAL / VALIDATED",
+      "reportPath": "reports/runtime/docker-oracle-lite-runtime-health-hardening-proof.json",
+      "validationPath": "reports/validation/docker-oracle-lite-runtime-health-hardening-latest.json",
+      "metrics": {
+        "composeCyclesExpected": 2,
+        "composeCyclesCompleted": 2,
+        "failedChecks": 0
+      }
+    }
+  ],
+  "founderWarning": "Local proof display only. This is not production readiness and not Oracle deployment proof.",
+  "nextAction": "Commit BATCH 24, then wire this adapter into the smallest future Founder Control Plane surface."
+}

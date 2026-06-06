@@ -1,0 +1,27 @@
+{
+  "schema": "kingsmen.validation-report.v1",
+  "module": "BATCH 24 - Smallest Useful Control-Plane Proof Display Adapter",
+  "status": "VALIDATED",
+  "passed": true,
+  "generated_at": "2026-06-06T16:29:34.795Z",
+  "files_expected": [
+    "docs/control-plane/build-proof-centre-display-adapter.md",
+    "manifests/control-plane/build-proof-centre-display-adapter.json",
+    "packages/contracts/src/control-plane-proof-display-adapter.ts",
+    "scripts/proof/prove-control-plane-proof-display-adapter.mjs",
+    "scripts/validators/validate-control-plane-proof-display-adapter.mjs",
+    "reports/control-plane/build-proof-centre-display-adapter.json",
+    "reports/control-plane/build-proof-centre-display-adapter-preview.html",
+    "reports/control-plane/build-proof-centre-display-adapter-proof.json"
+  ],
+  "files_checked": 8,
+  "missing_files": [],
+  "failed_checks": [],
+  "warnings": [],
+  "oracle_lite_impact": "none_local_display_adapter_only",
+  "control_plane_impact": "Future Founder Control Plane can display BATCH 21 and BATCH 22 proof cards using this adapter.",
+  "adapter": "reports/control-plane/build-proof-centre-display-adapter.json",
+  "preview": "reports/control-plane/build-proof-centre-display-adapter-preview.html",
+  "proof": "reports/control-plane/build-proof-centre-display-adapter-proof.json",
+  "next_action": "Commit BATCH 24."
+}
