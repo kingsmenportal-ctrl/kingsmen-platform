@@ -1,0 +1,32 @@
+{
+    "module":  "TOOLS-JARVIS-CLAW-04D",
+    "status":  "LOCAL_AI_HEALTH_CHECK_COMPLETED",
+    "generated_at":  "2026-06-05T20:01:22",
+    "jarvis":  {
+                   "path":  "C:\\Users\\dell\\AppData\\Local\\OpenJarvis\\src\\.venv\\Scripts\\jarvis.exe",
+                   "exists":  true
+               },
+    "ollama":  {
+                   "command_exists":  true,
+                   "qwen35_2b_installed":  true,
+                   "list_result":  {
+                                       "name":  "ollama-list",
+                                       "exit":  0,
+                                       "passed":  true,
+                                       "output":  "NAME          ID              SIZE      MODIFIED     \r\nqwen3.5:2b    324d162be6ca    2.7 GB    18 hours ago"
+                                   }
+               },
+    "openclaw":  {
+                     "command_exists":  true,
+                     "config_validate_result":  {
+                                                    "name":  "openclaw-config-validate",
+                                                    "exit":  0,
+                                                    "passed":  true,
+                                                    "output":  "Config valid: ~\\.openclaw\\openclaw.json"
+                                                }
+                 },
+    "ai_generation_tested":  false,
+    "production_authority":  false,
+    "decision":  "This confirms local AI tool availability only. It does not prove Jarvis/OpenClaw reasoning quality or production authority.",
+    "all_health_passed":  true
+}
