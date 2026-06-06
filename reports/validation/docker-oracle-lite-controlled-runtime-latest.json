@@ -1,9 +1,9 @@
 {
   "schema": "kingsmen.validation-report.v1",
   "module": "BATCH 21 - Controlled Docker Local Runtime Proof",
-  "status": "BUILT_PENDING_VALIDATION",
-  "passed": false,
-  "generated_at": "2026-06-03T04:32:16.608Z",
+  "status": "VALIDATED",
+  "passed": true,
+  "generated_at": "2026-06-06T15:24:55.564Z",
   "files_expected": [
     "docs/runtime/docker-oracle-lite-controlled-runtime-proof.md",
     "manifests/runtime/docker-oracle-lite-controlled-runtime-proof.json",
@@ -22,21 +22,10 @@
   ],
   "files_checked": 12,
   "missing_files": [],
-  "failed_checks": [
-    "Runtime proof status must be DOCKER_LOCAL_RUNTIME_PROVEN.",
-    "Runtime proof must pass.",
-    "Runtime proof must record composeUpSucceeded true.",
-    "Runtime proof must record composeDownSucceeded true.",
-    "Runtime proof must record apiHealthStatus 200.",
-    "Runtime proof must record webStatus 200.",
-    "Runtime proof must record bridgeApiStatus 202.",
-    "Runtime proof must record backend_bridge_succeeded true.",
-    "Runtime proof must record backend_boundary_reached true.",
-    "Runtime proof must record backend_local_write_succeeded true."
-  ],
+  "failed_checks": [],
   "warnings": [],
   "oracle_lite_impact": "controlled_local_docker_runtime_only",
   "control_plane_impact": "Build Proof Centre can show the first controlled local Docker runtime proof.",
   "runtime_proof": "reports/runtime/docker-oracle-lite-controlled-runtime-proof.json",
-  "next_action": "Repair Docker local runtime proof failures."
+  "next_action": "Proceed to BATCH 22 - Docker runtime health hardening or Oracle VM handoff preparation."
 }

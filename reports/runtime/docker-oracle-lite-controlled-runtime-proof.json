@@ -1,21 +1,21 @@
 {
   "schema": "kingsmen.docker-oracle-lite-controlled-runtime-report.v1",
   "module": "BATCH 21 - Controlled Docker Local Runtime Proof",
-  "status": "DOCKER_LOCAL_RUNTIME_FAILED",
-  "passed": false,
+  "status": "DOCKER_LOCAL_RUNTIME_PROVEN",
+  "passed": true,
   "productionReady": false,
   "canClaimProduction": false,
   "deployedToOracle": false,
-  "generated_at": "2026-06-03T02:49:22.743Z",
+  "generated_at": "2026-06-06T15:24:55.258Z",
   "dockerRunsInThisBatch": true,
   "dockerBuildsInThisBatch": false,
   "composeUpInThisBatch": true,
   "composeDownInThisBatch": true,
-  "composeUpSucceeded": false,
-  "composeDownSucceeded": false,
-  "apiHealthStatus": 0,
-  "webStatus": 0,
-  "bridgeApiStatus": 0,
+  "composeUpSucceeded": true,
+  "composeDownSucceeded": true,
+  "apiHealthStatus": 200,
+  "webStatus": 200,
+  "bridgeApiStatus": 202,
   "apiImage": "kingsmen/api:oracle-lite-local",
   "webImage": "kingsmen/web:oracle-lite-local",
   "apiImageId": "sha256:9174b163a838703f8cba51bb7ce2d8764d33f6aef4e2514b97689a12173f0378",
@@ -23,11 +23,11 @@
   "apiHealthUrl": "http://127.0.0.1:3001/health",
   "webUrl": "http://127.0.0.1:3000/free-destiny-map",
   "bridgeApiUrl": "http://127.0.0.1:3000/api/public/free-destiny-map/intake/local",
-  "api_response_reference": null,
-  "backend_reference": null,
-  "backend_bridge_succeeded": false,
-  "backend_boundary_reached": false,
-  "backend_local_write_succeeded": false,
+  "api_response_reference": "KM-FDM-NEXT18-BRIDGE",
+  "backend_reference": "KM-FDM-BACKEND17",
+  "backend_bridge_succeeded": true,
+  "backend_boundary_reached": true,
+  "backend_local_write_succeeded": true,
   "local_data_file": "data/local/free-destiny-map/backend-runtime-boundary/backend-runtime-demo-intakes.jsonl",
   "checks": [
     {
@@ -142,53 +142,108 @@
     },
     {
       "name": "docker-runtime-compose-down-before",
-      "passed": false,
-      "detail": "exit=1; timedOut=false"
+      "passed": true,
+      "detail": "exit=0; timedOut=false"
     },
     {
       "name": "docker-runtime-compose-up-no-build",
-      "passed": false,
-      "detail": "exit=1; timedOut=false; error=none"
+      "passed": true,
+      "detail": "exit=0; timedOut=false; error=Network kingsmen-oracle-lite-local_default Creating \n Network kingsmen-oracle-lite-local_default Created \n Container kingsmen-api-local Creating \n Container kingsmen-api-local Created \n Container kingsmen-web-local Creating \n Container kingsmen-web-local Created \n Container kingsmen-api-local Starting \n Container kingsmen-api-local Started \n Container kingsmen-web-local Starting \n Container kingsmen-web-local Started"
     },
     {
       "name": "docker-runtime-compose-ps-runs",
-      "passed": false,
+      "passed": true,
       "detail": "compose ps includes web/api"
     },
     {
       "name": "docker-runtime-api-health-200",
-      "passed": false,
-      "detail": "fetch failed"
+      "passed": true,
+      "detail": "HTTP 200"
     },
     {
       "name": "docker-runtime-api-health-production-false",
-      "passed": false,
+      "passed": true,
       "detail": "production false"
     },
     {
       "name": "docker-runtime-api-health-oracle-false",
-      "passed": false,
+      "passed": true,
       "detail": "deployedToOracle false"
     },
     {
       "name": "docker-runtime-web-page-200",
-      "passed": false,
-      "detail": "fetch failed"
+      "passed": true,
+      "detail": "HTTP 200"
     },
     {
       "name": "docker-runtime-web-page-has-free-destiny-map",
-      "passed": false,
+      "passed": true,
       "detail": "Free Destiny Map text"
     },
     {
-      "name": "docker-runtime-exception-absent",
-      "passed": false,
-      "detail": "fetch failed"
+      "name": "docker-runtime-bridge-api-202",
+      "passed": true,
+      "detail": "status=202"
+    },
+    {
+      "name": "docker-runtime-bridge-response-accepted",
+      "passed": true,
+      "detail": "accepted true"
+    },
+    {
+      "name": "docker-runtime-bridge-backend-succeeded",
+      "passed": true,
+      "detail": "backendBridgeSucceeded true"
+    },
+    {
+      "name": "docker-runtime-bridge-backend-boundary-reached",
+      "passed": true,
+      "detail": "backendBoundaryReached true"
+    },
+    {
+      "name": "docker-runtime-bridge-backend-reference",
+      "passed": true,
+      "detail": "backendReference=KM-FDM-BACKEND17"
+    },
+    {
+      "name": "docker-runtime-backend-local-write-succeeded",
+      "passed": true,
+      "detail": "data/local/free-destiny-map/backend-runtime-boundary/backend-runtime-demo-intakes.jsonl"
+    },
+    {
+      "name": "docker-runtime-bridge-production-false",
+      "passed": true,
+      "detail": "production false"
+    },
+    {
+      "name": "docker-runtime-bridge-oracle-false",
+      "passed": true,
+      "detail": "deployedToOracle false"
+    },
+    {
+      "name": "docker-runtime-bridge-official-submission-false",
+      "passed": true,
+      "detail": "official false"
+    },
+    {
+      "name": "docker-runtime-bridge-payment-false",
+      "passed": true,
+      "detail": "payment false"
+    },
+    {
+      "name": "docker-runtime-bridge-document-false",
+      "passed": true,
+      "detail": "document false"
+    },
+    {
+      "name": "docker-runtime-bridge-email-false",
+      "passed": true,
+      "detail": "email false"
     },
     {
       "name": "docker-runtime-compose-down-after",
-      "passed": false,
-      "detail": "exit=1; timedOut=false"
+      "passed": true,
+      "detail": "exit=0; timedOut=false"
     },
     {
       "name": "docker-runtime-no-oracle-deploy-output",
@@ -221,68 +276,17 @@
       "detail": "documentUploadAccepted true absent"
     }
   ],
-  "failed": [
-    {
-      "name": "docker-runtime-compose-down-before",
-      "passed": false,
-      "detail": "exit=1; timedOut=false"
-    },
-    {
-      "name": "docker-runtime-compose-up-no-build",
-      "passed": false,
-      "detail": "exit=1; timedOut=false; error=none"
-    },
-    {
-      "name": "docker-runtime-compose-ps-runs",
-      "passed": false,
-      "detail": "compose ps includes web/api"
-    },
-    {
-      "name": "docker-runtime-api-health-200",
-      "passed": false,
-      "detail": "fetch failed"
-    },
-    {
-      "name": "docker-runtime-api-health-production-false",
-      "passed": false,
-      "detail": "production false"
-    },
-    {
-      "name": "docker-runtime-api-health-oracle-false",
-      "passed": false,
-      "detail": "deployedToOracle false"
-    },
-    {
-      "name": "docker-runtime-web-page-200",
-      "passed": false,
-      "detail": "fetch failed"
-    },
-    {
-      "name": "docker-runtime-web-page-has-free-destiny-map",
-      "passed": false,
-      "detail": "Free Destiny Map text"
-    },
-    {
-      "name": "docker-runtime-exception-absent",
-      "passed": false,
-      "detail": "fetch failed"
-    },
-    {
-      "name": "docker-runtime-compose-down-after",
-      "passed": false,
-      "detail": "exit=1; timedOut=false"
-    }
-  ],
+  "failed": [],
   "stdout_tail": [
     "Client:",
     " Version:    29.4.3",
     " Context:    desktop-linux",
     " Debug Mode: false",
     "Server:",
-    " Containers: 1",
+    " Containers: 6",
     "  Running: 0",
     "  Paused: 0",
-    "  Stopped: 1",
+    "  Stopped: 6",
     " Images: 28",
     " Server Version: 29.4.3",
     " Storage Driver: overlay2",
@@ -337,19 +341,34 @@
     " Live Restore Enabled: false",
     " Firewall Backend: iptables",
     "sha256:9174b163a838703f8cba51bb7ce2d8764d33f6aef4e2514b97689a12173f0378",
-    "sha256:c52fc95761f13261f00cfa814fb1692faf9363e0cad37768a8c4d36badc25541"
+    "sha256:c52fc95761f13261f00cfa814fb1692faf9363e0cad37768a8c4d36badc25541",
+    "NAME                 IMAGE                            COMMAND                  SERVICE        CREATED         STATUS         PORTS",
+    "kingsmen-api-local   kingsmen/api:oracle-lite-local   \"docker-entrypoint.s…\"   kingsmen-api   7 seconds ago   Up 3 seconds   127.0.0.1:3001->3001/tcp",
+    "kingsmen-web-local   kingsmen/web:oracle-lite-local   \"docker-entrypoint.s…\"   kingsmen-web   6 seconds ago   Up 2 seconds   127.0.0.1:3000->3000/tcp"
   ],
   "stderr_tail": [
-    "'\\\"docker\\\"' is not recognized as an internal or external command,",
-    "operable program or batch file.",
-    "'\\\"docker\\\"' is not recognized as an internal or external command,",
-    "operable program or batch file.",
-    "'\\\"docker\\\"' is not recognized as an internal or external command,",
-    "operable program or batch file.",
-    "'\\\"docker\\\"' is not recognized as an internal or external command,",
-    "operable program or batch file."
+    " Network kingsmen-oracle-lite-local_default Creating ",
+    " Network kingsmen-oracle-lite-local_default Created ",
+    " Container kingsmen-api-local Creating ",
+    " Container kingsmen-api-local Created ",
+    " Container kingsmen-web-local Creating ",
+    " Container kingsmen-web-local Created ",
+    " Container kingsmen-api-local Starting ",
+    " Container kingsmen-api-local Started ",
+    " Container kingsmen-web-local Starting ",
+    " Container kingsmen-web-local Started ",
+    " Container kingsmen-web-local Stopping ",
+    " Container kingsmen-web-local Stopped ",
+    " Container kingsmen-web-local Removing ",
+    " Container kingsmen-web-local Removed ",
+    " Container kingsmen-api-local Stopping ",
+    " Container kingsmen-api-local Stopped ",
+    " Container kingsmen-api-local Removing ",
+    " Container kingsmen-api-local Removed ",
+    " Network kingsmen-oracle-lite-local_default Removing ",
+    " Network kingsmen-oracle-lite-local_default Removed "
   ],
   "oracle_lite_impact": "controlled_local_docker_runtime_only",
   "runtime_scope": "controlled Docker local runtime proof only; no Oracle deployment; no public production URL",
-  "next_action": "Repair Docker local runtime failures before moving forward."
+  "next_action": "Run validator and commit BATCH 21. Next batch may harden Docker runtime health or prepare Oracle VM handoff."
 }

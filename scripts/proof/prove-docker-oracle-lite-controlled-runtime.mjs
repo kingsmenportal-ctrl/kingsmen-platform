@@ -146,64 +146,60 @@ function quoteShellArg(value) {
 }
 
 function runDockerCompose(args, options = {}) {
-  const timeout = options.timeoutMs ?? 60000;
+  const timeoutMs = Number(options.timeoutMs || 120000);
   const collectOutput = options.collectOutput !== false;
-  const normalizedArgs = Array.isArray(args) && args[0] === "compose" ? args.slice(1) : args;
 
   return new Promise((resolve) => {
+    const normalizedArgs = Array.isArray(args) ? [...args] : [];
+
+    if (normalizedArgs[0] === "docker") {
+      normalizedArgs.shift();
+    }
+
+    if (normalizedArgs[0] === "compose") {
+      normalizedArgs.shift();
+    }
+
+    const finalArgs = ["compose", ...normalizedArgs];
     const out = [];
     const err = [];
     let timedOut = false;
 
-    const commandText = ["docker", "compose", ...normalizedArgs].map(quoteShellArg).join(" ");
+    const composeEnv = {
+      ...process.env,
+      COMPOSE_PROJECT_NAME: process.env.COMPOSE_PROJECT_NAME || "kingsmen-oracle-lite-local"
+    };
 
-    const child =
-      process.platform === "win32"
-        ? spawn("cmd.exe", ["/d", "/s", "/c", commandText], {
-            cwd: root,
-            env: safeEnv(),
-            stdio: ["ignore", "pipe", "pipe"],
-            windowsHide: true
-          })
-        : spawn("sh", ["-lc", commandText], {
-            cwd: root,
-            env: safeEnv(),
-            stdio: ["ignore", "pipe", "pipe"]
-          });
+    const child = spawn("docker", finalArgs, {
+      cwd: root,
+      env: composeEnv,
+      stdio: ["ignore", "pipe", "pipe"],
+      windowsHide: process.platform === "win32"
+    });
 
     const timer = setTimeout(() => {
       timedOut = true;
       try {
         child.kill("SIGTERM");
       } catch {}
+
       if (process.platform === "win32" && child.pid) {
         const killer = spawn("taskkill", ["/pid", String(child.pid), "/t", "/f"], { stdio: "ignore" });
         killer.once("close", () => {});
         killer.once("error", () => {});
       }
-    }, timeout);
+    }, timeoutMs);
 
     child.stdout.on("data", (chunk) => {
-      const text = chunk.toString();
+      const text = String(chunk);
       out.push(text);
       if (collectOutput) stdoutLines.push(text);
     });
 
     child.stderr.on("data", (chunk) => {
-      const text = chunk.toString();
+      const text = String(chunk);
       err.push(text);
       if (collectOutput) stderrLines.push(text);
-    });
-
-    child.once("error", (error) => {
-      clearTimeout(timer);
-      resolve({
-        code: null,
-        timedOut,
-        stdout: out.join(""),
-        stderr: err.join(""),
-        error: error instanceof Error ? error.message : String(error)
-      });
     });
 
     child.once("close", (code) => {
@@ -213,7 +209,22 @@ function runDockerCompose(args, options = {}) {
         timedOut,
         stdout: out.join(""),
         stderr: err.join(""),
-        error: null
+        error: err.join("").trim() || null,
+        command: ["docker", ...finalArgs].join(" ")
+      });
+    });
+
+    child.once("error", (error) => {
+      clearTimeout(timer);
+      const message = String(error && error.message ? error.message : error);
+      if (collectOutput) stderrLines.push(message);
+      resolve({
+        code: 127,
+        timedOut,
+        stdout: out.join(""),
+        stderr: err.join(""),
+        error: message,
+        command: ["docker", ...finalArgs].join(" ")
       });
     });
   });
