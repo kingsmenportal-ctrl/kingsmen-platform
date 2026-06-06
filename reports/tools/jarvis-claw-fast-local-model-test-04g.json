@@ -1,0 +1,33 @@
+{
+    "module":  "TOOLS-JARVIS-CLAW-04G",
+    "status":  "FAST_LOCAL_MODEL_TEST_COMPLETED_WITH_FIXED_PROCESS_RUNNER",
+    "generated_at":  "2026-06-05T22:17:25",
+    "timeout_seconds":  90,
+    "selected_model":  "qwen2.5:0.5b",
+    "previous_04f_result":  "FAILED_SCRIPT_BUG_NOT_MODEL_PROOF",
+    "ollama_fast_reply":  {
+                              "name":  "ollama-fast-reply",
+                              "command":  "ollama",
+                              "resolved_path":  "C:\\Users\\dell\\AppData\\Local\\Programs\\Ollama\\ollama.exe",
+                              "status":  "TIMEOUT",
+                              "passed":  false,
+                              "seconds":  90.06,
+                              "output":  "Timed out after 90 seconds",
+                              "error":  ""
+                          },
+    "jarvis_fast_reply":  {
+                              "name":  "jarvis-fast-reply",
+                              "command":  "jarvis",
+                              "resolved_path":  "C:\\Users\\dell\\bin\\jarvis.cmd",
+                              "status":  "EXITED",
+                              "exit_code":  0,
+                              "passed":  true,
+                              "seconds":  65.93,
+                              "output":  "___                       _                  _     \r\n / _ \\ _ __   ___ _ __     | | __ _ _ ____   _(_)___ \r\n| | | | \u0027_ \\ / _ \\ \u0027_ \\ _  | |/ _` | \u0027__\\ \\ / / / __|\r\n| |_| | |_) |  __/ | | | |_| | (_| | |   \\ V /| \\__ \\\r\n \\___/| .__/ \\___|_| |_|\\___/ \\__,_|_|    \\_/ |_|___/\r\n      |_|                                            \r\n      Personal AI, On Personal Devices\r\n\r\nREADY",
+                              "error":  "\u001b[33mA new version of OpenJarvis is available (v0.1.1 GÂ∆ v1.0.2)\r\nUpdate: cd C:\\Users\\dell\\AppData\\Local\\OpenJarvis\\src \u0026\u0026 git pull \u0026\u0026 uv sync\r\nOr run: jarvis self-update\u001b[0m"
+                          },
+    "usable_fast_local_route":  "jarvis_direct_safe_mode",
+    "all_passed":  false,
+    "production_authority":  false,
+    "decision":  "Fast local route is still not proven. Keep Jarvis/OpenClaw experimental."
+}
