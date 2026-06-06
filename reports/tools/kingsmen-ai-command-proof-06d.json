@@ -1,0 +1,10 @@
+{
+    "production_authority":  false,
+    "module":  "TOOLS-JARVIS-CLAW-06D",
+    "generated_at":  "2026-06-06T06:43:27",
+    "status":  "KINGSMEN_AI_BOUNDARY_FAILED",
+    "command":  "kingsmen-ai",
+    "output":  "\u001b[33mA new version of OpenJarvis is available (v0.1.1 â+\u0027 v1.0.2)\r\nUpdate: cd C:\\Users\\dell\\AppData\\Local\\OpenJarvis\\src \u0026\u0026 git pull \u0026\u0026 uv sync\r\nOr run: jarvis self-update\u001b[0m\r\n___                       _                  _     \r\n / _ \\ _ __   ___ _ __     | | __ _ _ ____   _(_)___ \r\n| | | | \u0027_ \\ / _ \\ \u0027_ \\ _  | |/ _` | \u0027__\\ \\ / / / __|\r\n| |_| | |_) |  __/ | | | |_| | (_| | |   \\ V /| \\__ \\\r\n \\___/| .__/ \\___|_| |_|\\___/ \\__,_|_|    \\_/ |_|___/\r\n      |_|                                            \r\n      Personal AI, On Personal Devices\r\n\r\nHello! I\u0027m Qwen3.5, the latest large language model developed by Tongyi Lab. How can I assist you today? Whether it\u0027s answering questions, creating content, coding, or just having a conversationâ?\"I\u0027d be happy to help! dY~S",
+    "decision":  "Do not use kingsmen-ai as a Kingsmen helper yet. OpenJarvis local model still fails boundary.",
+    "passed":  false
+}

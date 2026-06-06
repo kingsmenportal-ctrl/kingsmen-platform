@@ -3,7 +3,7 @@ param(
   [string]$Prompt,
 
   [int]$TimeoutSeconds = 300,
-  [int]$MaxTokens = 250,
+  [int]$MaxTokens = 180,
   [string]$Model = "qwen3.5:2b"
 )
 
@@ -11,62 +11,57 @@ $ErrorActionPreference = "Continue"
 
 function Quote-Arg {
   param([string]$Arg)
-
   if ($null -eq $Arg) { return '""' }
-
   $s = [string]$Arg
   if ($s.Length -eq 0) { return '""' }
-
   $s = $s -replace '"', '\"'
   return '"' + $s + '"'
 }
 
 $task = @"
-You are Kingsmen Local Helper.
+SYSTEM:
+You are not Kingsman.
+You are not The King's Man.
+You are not a local guide.
+You are not a roleplay assistant.
+You are not a fiction assistant.
 
-IMPORTANT:
-Kingsmen means the real Kingsmen platform in C:\Kingsmen\kingsmen-platform.
-Kingsmen is NOT a movie, NOT fiction, NOT a kingdom, NOT a roleplay setting.
+You are Kingsmen Portal helper for the real repository:
+C:\Kingsmen\kingsmen-platform
 
-Kingsmen is a South African opportunity, education, application, employment, SETA, TVET, university, bursary, partner, document, proof, founder-control, Jarvis, OpenClaw, GitHub, PowerShell, Oracle Lite project.
+Kingsmen Portal is a South African education, opportunity, application, employment, SETA, TVET, university, bursary, partner, document, proof, founder-control, Jarvis, OpenClaw, GitHub, PowerShell, and Oracle Lite project.
 
-Your allowed work:
-- summarize proof reports
-- explain current tool status
-- suggest the next safe command
-- review docs, manifests, and reports
+Allowed:
+- summarize safe reports
+- explain tool status
+- suggest the next safe proof command
+- review docs, manifests, reports
 - help with Jarvis/OpenClaw/PowerShell/Git proof discipline
 
-Your blocked work:
-- no secrets
-- no .env
-- no .oci
-- no .ssh
-- no candidate data
-- no payment data
-- no WhatsApp automation
-- no browser control
-- no shell execution
-- no repo edits
-- no Oracle deployment
-- no Supabase service_role
-- no PayFast actions
-- no production actions
+Blocked:
+- secrets
+- logs
+- .env
+- .oci
+- .ssh
+- candidate data
+- payment data
+- WhatsApp automation
+- browser control
+- shell execution
+- repo edits
+- Oracle deployment
+- Supabase service_role
+- PayFast actions
+- production actions
 
-Answer rules:
-- no roleplay
-- no jokes
-- no fiction
-- no generic assistant greeting
-- answer the founder task directly
-- if blocked, say exactly: Blocked by Kingsmen boundary. Founder approval and validator proof required.
+Answer directly. No greeting. No jokes. No fiction.
 
-Founder task:
+FOUNDER TASK:
 $Prompt
 "@
 
 $jarvisCmd = Get-Command jarvis -ErrorAction SilentlyContinue
-
 if ($null -eq $jarvisCmd) {
   Write-Host "ERROR: jarvis command not found." -ForegroundColor Red
   exit 127
@@ -81,11 +76,15 @@ $argsList = @(
   "ask",
   "--no-stream",
   "--no-context",
+  "--persona",
+  "none",
   "--agent=",
   "--engine",
   "ollama",
   "--model",
   $Model,
+  "--temperature",
+  "0",
   "--max-tokens",
   [string]$MaxTokens,
   $task
@@ -93,7 +92,6 @@ $argsList = @(
 
 $tempOut = [System.IO.Path]::GetTempFileName()
 $tempErr = [System.IO.Path]::GetTempFileName()
-
 $argString = (($argsList | ForEach-Object { Quote-Arg ([string]$_) }) -join " ")
 
 $p = Start-Process `

@@ -3,7 +3,6 @@ function kingsmen-ai {
     [Parameter(ValueFromRemainingArguments=$true)]
     [string[]]$PromptParts
   )
-
   $repo = "C:\Kingsmen\kingsmen-platform"
   powershell -NoProfile -ExecutionPolicy Bypass -File "$repo\scripts\tools\kingsmen-ai.ps1" @PromptParts
 }
@@ -13,7 +12,6 @@ function kingsmen-ai-fast {
     [Parameter(ValueFromRemainingArguments=$true)]
     [string[]]$PromptParts
   )
-
   $repo = "C:\Kingsmen\kingsmen-platform"
   powershell -NoProfile -ExecutionPolicy Bypass -File "$repo\scripts\tools\kingsmen-ai-fast.ps1" @PromptParts
 }
@@ -23,7 +21,6 @@ function kingsmen-ai-smart {
     [Parameter(ValueFromRemainingArguments=$true)]
     [string[]]$PromptParts
   )
-
   $repo = "C:\Kingsmen\kingsmen-platform"
   powershell -NoProfile -ExecutionPolicy Bypass -File "$repo\scripts\tools\kingsmen-ai-smart.ps1" @PromptParts
 }
