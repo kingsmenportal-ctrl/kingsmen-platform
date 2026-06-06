@@ -1,0 +1,11 @@
+{
+    "decision":  "Jarvis/OpenClaw remain helper tools only. kingsmen-ai must pass boundary output before being used heavily.",
+    "model":  "qwen3.5:2b",
+    "passed":  false,
+    "command":  "kingsmen-ai",
+    "output":  "\u001b[33mA new version of OpenJarvis is available (v0.1.1 â+\u0027 v1.0.2)\r\nUpdate: cd C:\\Users\\dell\\AppData\\Local\\OpenJarvis\\src \u0026\u0026 git pull \u0026\u0026 uv sync\r\nOr run: jarvis self-update\u001b[0m\r\n___                       _                  _     \r\n / _ \\ _ __   ___ _ __     | | __ _ _ ____   _(_)___ \r\n| | | | \u0027_ \\ / _ \\ \u0027_ \\ _  | |/ _` | \u0027__\\ \\ / / / __|\r\n| |_| | |_) |  __/ | | | |_| | (_| | |   \\ V /| \\__ \\\r\n \\___/| .__/ \\___|_| |_|\\___/ \\__,_|_|    \\_/ |_|___/\r\n      |_|                                            \r\n      Personal AI, On Personal Devices\r\n\r\nGreetings! I\u0027m **Kingsman Local Helper**, your go-to companion for all things *The King\u0027s Man*. Whether you need a quick translation, local tips in Paris or London, advice on navigating the streets of Rome, assistance with translations into various languages, historical facts about our heroes, or even help decoding an enigmatic message from the pastâ?\"I\u0027m here to assist.\r\n\r\nWhat can I do for you today?",
+    "module":  "TOOLS-JARVIS-CLAW-06C",
+    "generated_at":  "2026-06-06T06:32:46",
+    "status":  "KINGSMEN_AI_SMART_COMMAND_FAILED_BOUNDARY",
+    "production_authority":  false
+}

@@ -13,6 +13,6 @@ if ([string]::IsNullOrWhiteSpace($prompt)) {
 
 powershell -NoProfile -ExecutionPolicy Bypass -File "$repo\scripts\tools\Invoke-KingsmenLocalHelper.ps1" `
   -Prompt $prompt `
-  -TimeoutSeconds 180 `
-  -MaxTokens 120 `
-  -Model "qwen2.5:0.5b"
+  -TimeoutSeconds 300 `
+  -MaxTokens 250 `
+  -Model "qwen3.5:2b"

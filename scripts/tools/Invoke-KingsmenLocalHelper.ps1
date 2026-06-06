@@ -2,9 +2,9 @@ param(
   [Parameter(Mandatory=$true)]
   [string]$Prompt,
 
-  [int]$TimeoutSeconds = 180,
-  [int]$MaxTokens = 180,
-  [string]$Model = "qwen2.5:0.5b"
+  [int]$TimeoutSeconds = 300,
+  [int]$MaxTokens = 250,
+  [string]$Model = "qwen3.5:2b"
 )
 
 $ErrorActionPreference = "Continue"
@@ -12,31 +12,33 @@ $ErrorActionPreference = "Continue"
 function Quote-Arg {
   param([string]$Arg)
 
-  if ($null -eq $Arg) {
-    return '""'
-  }
+  if ($null -eq $Arg) { return '""' }
 
   $s = [string]$Arg
-
-  if ($s.Length -eq 0) {
-    return '""'
-  }
+  if ($s.Length -eq 0) { return '""' }
 
   $s = $s -replace '"', '\"'
   return '"' + $s + '"'
 }
 
-$boundary = @"
-You are Kingsmen local helper.
+$task = @"
+You are Kingsmen Local Helper.
 
-Kingsmen is a South African opportunity, education, application, employment, SETA, TVET, university, bursary, partner, and founder-control platform.
+IMPORTANT:
+Kingsmen means the real Kingsmen platform in C:\Kingsmen\kingsmen-platform.
+Kingsmen is NOT a movie, NOT fiction, NOT a kingdom, NOT a roleplay setting.
 
-Rules:
-- no roleplay
-- no jokes
-- no movie/franchise interpretation
+Kingsmen is a South African opportunity, education, application, employment, SETA, TVET, university, bursary, partner, document, proof, founder-control, Jarvis, OpenClaw, GitHub, PowerShell, Oracle Lite project.
+
+Your allowed work:
+- summarize proof reports
+- explain current tool status
+- suggest the next safe command
+- review docs, manifests, and reports
+- help with Jarvis/OpenClaw/PowerShell/Git proof discipline
+
+Your blocked work:
 - no secrets
-- no logs
 - no .env
 - no .oci
 - no .ssh
@@ -49,15 +51,19 @@ Rules:
 - no Oracle deployment
 - no Supabase service_role
 - no PayFast actions
-- safe docs, reports, manifests, planning, summaries, and command suggestions only
-- PowerShell executes only after founder approval
-- GitHub proof and validators decide what is real
+- no production actions
 
-When blocked, say exactly:
-Blocked by Kingsmen boundary. Founder approval and validator proof required.
+Answer rules:
+- no roleplay
+- no jokes
+- no fiction
+- no generic assistant greeting
+- answer the founder task directly
+- if blocked, say exactly: Blocked by Kingsmen boundary. Founder approval and validator proof required.
+
+Founder task:
+$Prompt
 "@
-
-$task = "$boundary`r`n`r`nFounder task:`r`n$Prompt"
 
 $jarvisCmd = Get-Command jarvis -ErrorAction SilentlyContinue
 
@@ -85,32 +91,19 @@ $argsList = @(
   $task
 )
 
-$psi = New-Object System.Diagnostics.ProcessStartInfo
-$psi.FileName = $jarvisPath
-$psi.Arguments = (($argsList | ForEach-Object { Quote-Arg ([string]$_) }) -join " ")
-$psi.RedirectStandardOutput = $true
-$psi.RedirectStandardError = $true
-$psi.UseShellExecute = $false
-$psi.CreateNoWindow = $true
-$psi.WorkingDirectory = (Resolve-Path ".").Path
+$tempOut = [System.IO.Path]::GetTempFileName()
+$tempErr = [System.IO.Path]::GetTempFileName()
 
-$p = New-Object System.Diagnostics.Process
-$p.StartInfo = $psi
+$argString = (($argsList | ForEach-Object { Quote-Arg ([string]$_) }) -join " ")
 
-$startedOk = $false
-
-try {
-  $startedOk = $p.Start()
-} catch {
-  Write-Host "ERROR: failed to start Jarvis." -ForegroundColor Red
-  Write-Host $_.Exception.Message
-  exit 1
-}
-
-if (-not $startedOk) {
-  Write-Host "ERROR: Jarvis did not start." -ForegroundColor Red
-  exit 1
-}
+$p = Start-Process `
+  -FilePath $jarvisPath `
+  -ArgumentList $argString `
+  -NoNewWindow `
+  -PassThru `
+  -RedirectStandardOutput $tempOut `
+  -RedirectStandardError $tempErr `
+  -WorkingDirectory (Resolve-Path ".").Path
 
 $exited = $p.WaitForExit($TimeoutSeconds * 1000)
 
@@ -120,8 +113,10 @@ if (-not $exited) {
   exit 124
 }
 
-$stdout = $p.StandardOutput.ReadToEnd()
-$stderr = $p.StandardError.ReadToEnd()
+$stdout = Get-Content $tempOut -Raw -ErrorAction SilentlyContinue
+$stderr = Get-Content $tempErr -Raw -ErrorAction SilentlyContinue
+
+Remove-Item $tempOut, $tempErr -Force -ErrorAction SilentlyContinue
 
 if (-not [string]::IsNullOrWhiteSpace($stderr)) {
   Write-Host $stderr.Trim() -ForegroundColor DarkYellow
