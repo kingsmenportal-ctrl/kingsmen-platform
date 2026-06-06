@@ -1,0 +1,27 @@
+{
+  "schema": "kingsmen.validation-report.v1",
+  "module": "BATCH 29 - Proof Centre Registry Refresh",
+  "status": "VALIDATED",
+  "passed": true,
+  "generated_at": "2026-06-06T17:48:40.215Z",
+  "files_expected": [
+    "docs/control-plane/proof-centre-registry-refresh.md",
+    "manifests/control-plane/proof-centre-registry-refresh.json",
+    "packages/contracts/src/proof-centre-registry.ts",
+    "scripts/proof/prove-proof-centre-registry-refresh.mjs",
+    "scripts/validators/validate-proof-centre-registry-refresh.mjs",
+    "apps/web/src/app/founder/proof-centre/page.tsx",
+    "reports/control-plane/proof-centre-registry.json",
+    "reports/control-plane/proof-centre-registry-refresh-proof.json"
+  ],
+  "files_checked": 8,
+  "missing_files": [],
+  "failed_checks": [],
+  "warnings": [],
+  "oracle_lite_impact": "none_local_registry_refresh_only",
+  "control_plane_impact": "Founder Proof Centre now lists BATCH 21 through BATCH 28 proof gates.",
+  "registry": "reports/control-plane/proof-centre-registry.json",
+  "proof": "reports/control-plane/proof-centre-registry-refresh-proof.json",
+  "page": "apps/web/src/app/founder/proof-centre/page.tsx",
+  "next_action": "Commit BATCH 29."
+}

@@ -1,0 +1,414 @@
+{
+  "schema": "kingsmen.proof-centre-registry-refresh-proof.v1",
+  "module": "BATCH 29 - Proof Centre Registry Refresh",
+  "status": "PROOF_CENTRE_REGISTRY_REFRESH_PROVEN",
+  "passed": true,
+  "productionReady": false,
+  "canClaimProduction": false,
+  "deployedToOracle": false,
+  "generated_at": "2026-06-06T17:48:39.814Z",
+  "runtimeScope": "local_proof_registry_refresh_only",
+  "registryPath": "reports/control-plane/proof-centre-registry.json",
+  "pagePath": "apps/web/src/app/founder/proof-centre/page.tsx",
+  "entryCount": 8,
+  "allEntriesProven": true,
+  "checks": [
+    {
+      "name": "required-file:apps/web/src/app/founder/proof-centre/page.tsx",
+      "passed": true,
+      "detail": "apps/web/src/app/founder/proof-centre/page.tsx"
+    },
+    {
+      "name": "proof-exists:batch-21",
+      "passed": true,
+      "detail": "reports/runtime/docker-oracle-lite-controlled-runtime-proof.json"
+    },
+    {
+      "name": "validation-exists:batch-21",
+      "passed": true,
+      "detail": "reports/validation/docker-oracle-lite-controlled-runtime-latest.json"
+    },
+    {
+      "name": "proof-status:batch-21",
+      "passed": true,
+      "detail": "DOCKER_LOCAL_RUNTIME_PROVEN"
+    },
+    {
+      "name": "validation-passed:batch-21",
+      "passed": true,
+      "detail": "VALIDATED"
+    },
+    {
+      "name": "proof-no-production:batch-21",
+      "passed": true,
+      "detail": "production false"
+    },
+    {
+      "name": "proof-no-oracle:batch-21",
+      "passed": true,
+      "detail": "oracle false"
+    },
+    {
+      "name": "proof-no-failed-checks:batch-21",
+      "passed": true,
+      "detail": "failed=0"
+    },
+    {
+      "name": "proof-exists:batch-22",
+      "passed": true,
+      "detail": "reports/runtime/docker-oracle-lite-runtime-health-hardening-proof.json"
+    },
+    {
+      "name": "validation-exists:batch-22",
+      "passed": true,
+      "detail": "reports/validation/docker-oracle-lite-runtime-health-hardening-latest.json"
+    },
+    {
+      "name": "proof-status:batch-22",
+      "passed": true,
+      "detail": "DOCKER_RUNTIME_HEALTH_HARDENED_LOCAL"
+    },
+    {
+      "name": "validation-passed:batch-22",
+      "passed": true,
+      "detail": "VALIDATED"
+    },
+    {
+      "name": "proof-no-production:batch-22",
+      "passed": true,
+      "detail": "production false"
+    },
+    {
+      "name": "proof-no-oracle:batch-22",
+      "passed": true,
+      "detail": "oracle false"
+    },
+    {
+      "name": "proof-no-failed-checks:batch-22",
+      "passed": true,
+      "detail": "failed=0"
+    },
+    {
+      "name": "proof-exists:batch-23",
+      "passed": true,
+      "detail": "reports/runtime/build-proof-centre-proof.json"
+    },
+    {
+      "name": "validation-exists:batch-23",
+      "passed": true,
+      "detail": "reports/validation/build-proof-centre-latest.json"
+    },
+    {
+      "name": "proof-status:batch-23",
+      "passed": true,
+      "detail": "BUILD_PROOF_CENTRE_READ_MODEL_PROVEN"
+    },
+    {
+      "name": "validation-passed:batch-23",
+      "passed": true,
+      "detail": "VALIDATED"
+    },
+    {
+      "name": "proof-no-production:batch-23",
+      "passed": true,
+      "detail": "production false"
+    },
+    {
+      "name": "proof-no-oracle:batch-23",
+      "passed": true,
+      "detail": "oracle false"
+    },
+    {
+      "name": "proof-no-failed-checks:batch-23",
+      "passed": true,
+      "detail": "failed=0"
+    },
+    {
+      "name": "proof-exists:batch-24",
+      "passed": true,
+      "detail": "reports/control-plane/build-proof-centre-display-adapter-proof.json"
+    },
+    {
+      "name": "validation-exists:batch-24",
+      "passed": true,
+      "detail": "reports/validation/control-plane-proof-display-adapter-latest.json"
+    },
+    {
+      "name": "proof-status:batch-24",
+      "passed": true,
+      "detail": "CONTROL_PLANE_PROOF_DISPLAY_ADAPTER_PROVEN"
+    },
+    {
+      "name": "validation-passed:batch-24",
+      "passed": true,
+      "detail": "VALIDATED"
+    },
+    {
+      "name": "proof-no-production:batch-24",
+      "passed": true,
+      "detail": "production false"
+    },
+    {
+      "name": "proof-no-oracle:batch-24",
+      "passed": true,
+      "detail": "oracle false"
+    },
+    {
+      "name": "proof-no-failed-checks:batch-24",
+      "passed": true,
+      "detail": "failed=0"
+    },
+    {
+      "name": "proof-exists:batch-25",
+      "passed": true,
+      "detail": "reports/control-plane/founder-proof-centre-page-wiring-proof.json"
+    },
+    {
+      "name": "validation-exists:batch-25",
+      "passed": true,
+      "detail": "reports/validation/founder-proof-centre-page-wiring-latest.json"
+    },
+    {
+      "name": "proof-status:batch-25",
+      "passed": true,
+      "detail": "FOUNDER_PROOF_CENTRE_PAGE_WIRING_PROVEN"
+    },
+    {
+      "name": "validation-passed:batch-25",
+      "passed": true,
+      "detail": "VALIDATED"
+    },
+    {
+      "name": "proof-no-production:batch-25",
+      "passed": true,
+      "detail": "production false"
+    },
+    {
+      "name": "proof-no-oracle:batch-25",
+      "passed": true,
+      "detail": "oracle false"
+    },
+    {
+      "name": "proof-no-failed-checks:batch-25",
+      "passed": true,
+      "detail": "failed=0"
+    },
+    {
+      "name": "proof-exists:batch-26b",
+      "passed": true,
+      "detail": "reports/control-plane/founder-proof-centre-runtime-reachability-proof.json"
+    },
+    {
+      "name": "validation-exists:batch-26b",
+      "passed": true,
+      "detail": "reports/validation/founder-proof-centre-runtime-reachability-latest.json"
+    },
+    {
+      "name": "proof-status:batch-26b",
+      "passed": true,
+      "detail": "FOUNDER_PROOF_CENTRE_RUNTIME_REACHABLE_LOCAL"
+    },
+    {
+      "name": "validation-passed:batch-26b",
+      "passed": true,
+      "detail": "VALIDATED"
+    },
+    {
+      "name": "proof-no-production:batch-26b",
+      "passed": true,
+      "detail": "production false"
+    },
+    {
+      "name": "proof-no-oracle:batch-26b",
+      "passed": true,
+      "detail": "oracle false"
+    },
+    {
+      "name": "proof-no-failed-checks:batch-26b",
+      "passed": true,
+      "detail": "failed=0"
+    },
+    {
+      "name": "proof-exists:batch-27",
+      "passed": true,
+      "detail": "reports/control-plane/founder-proof-centre-entry-link-proof.json"
+    },
+    {
+      "name": "validation-exists:batch-27",
+      "passed": true,
+      "detail": "reports/validation/founder-proof-centre-entry-link-latest.json"
+    },
+    {
+      "name": "proof-status:batch-27",
+      "passed": true,
+      "detail": "FOUNDER_PROOF_CENTRE_ENTRY_LINK_PROVEN"
+    },
+    {
+      "name": "validation-passed:batch-27",
+      "passed": true,
+      "detail": "VALIDATED"
+    },
+    {
+      "name": "proof-no-production:batch-27",
+      "passed": true,
+      "detail": "production false"
+    },
+    {
+      "name": "proof-no-oracle:batch-27",
+      "passed": true,
+      "detail": "oracle false"
+    },
+    {
+      "name": "proof-no-failed-checks:batch-27",
+      "passed": true,
+      "detail": "failed=0"
+    },
+    {
+      "name": "proof-exists:batch-28",
+      "passed": true,
+      "detail": "reports/control-plane/founder-control-plane-entry-link-runtime-proof.json"
+    },
+    {
+      "name": "validation-exists:batch-28",
+      "passed": true,
+      "detail": "reports/validation/founder-control-plane-entry-link-runtime-latest.json"
+    },
+    {
+      "name": "proof-status:batch-28",
+      "passed": true,
+      "detail": "FOUNDER_CONTROL_PLANE_ENTRY_LINK_RUNTIME_PROVEN"
+    },
+    {
+      "name": "validation-passed:batch-28",
+      "passed": true,
+      "detail": "VALIDATED"
+    },
+    {
+      "name": "proof-no-production:batch-28",
+      "passed": true,
+      "detail": "production false"
+    },
+    {
+      "name": "proof-no-oracle:batch-28",
+      "passed": true,
+      "detail": "oracle false"
+    },
+    {
+      "name": "proof-no-failed-checks:batch-28",
+      "passed": true,
+      "detail": "failed=0"
+    },
+    {
+      "name": "registry-has-eight-entries",
+      "passed": true,
+      "detail": "entries=8"
+    },
+    {
+      "name": "registry-all-entries-proven",
+      "passed": true,
+      "detail": "all entries proven"
+    },
+    {
+      "name": "registry-no-production-claim",
+      "passed": true,
+      "detail": "production false"
+    },
+    {
+      "name": "registry-no-oracle-claim",
+      "passed": true,
+      "detail": "oracle false"
+    },
+    {
+      "name": "page-includes:BATCH 21",
+      "passed": true,
+      "detail": "BATCH 21 / Controlled Docker Oracle Lite Runtime"
+    },
+    {
+      "name": "page-includes:BATCH 22",
+      "passed": true,
+      "detail": "BATCH 22 / Runtime Health Hardening"
+    },
+    {
+      "name": "page-includes:BATCH 23",
+      "passed": true,
+      "detail": "BATCH 23 / Build Proof Centre Read Model"
+    },
+    {
+      "name": "page-includes:BATCH 24",
+      "passed": true,
+      "detail": "BATCH 24 / Control Plane Proof Display Adapter"
+    },
+    {
+      "name": "page-includes:BATCH 25",
+      "passed": true,
+      "detail": "BATCH 25 / Founder Proof Centre Page Wiring"
+    },
+    {
+      "name": "page-includes:BATCH 26B",
+      "passed": true,
+      "detail": "BATCH 26B / Founder Proof Centre Runtime Reachability"
+    },
+    {
+      "name": "page-includes:BATCH 27",
+      "passed": true,
+      "detail": "BATCH 27 / Founder Control Plane Proof Centre Entry Link"
+    },
+    {
+      "name": "page-includes:BATCH 28",
+      "passed": true,
+      "detail": "BATCH 28 / Founder Control Plane Entry Link Runtime Proof"
+    },
+    {
+      "name": "page-still-has-founder-title",
+      "passed": true,
+      "detail": "founder title"
+    },
+    {
+      "name": "page-still-has-build-proof-centre",
+      "passed": true,
+      "detail": "Build Proof Centre"
+    },
+    {
+      "name": "page-still-has-local-warning",
+      "passed": true,
+      "detail": "local warning"
+    },
+    {
+      "name": "page-no-production-claim",
+      "passed": true,
+      "detail": "no production/oracle true"
+    },
+    {
+      "name": "page-no-forbidden:service_role",
+      "passed": true,
+      "detail": "service_role"
+    },
+    {
+      "name": "page-no-forbidden:PAYFAST_PASSPHRASE",
+      "passed": true,
+      "detail": "PAYFAST_PASSPHRASE"
+    },
+    {
+      "name": "page-no-forbidden:PRIVATE KEY",
+      "passed": true,
+      "detail": "PRIVATE KEY"
+    },
+    {
+      "name": "page-no-forbidden:.env",
+      "passed": true,
+      "detail": ".env"
+    },
+    {
+      "name": "page-no-forbidden:.oci",
+      "passed": true,
+      "detail": ".oci"
+    },
+    {
+      "name": "page-no-forbidden:.ssh",
+      "passed": true,
+      "detail": ".ssh"
+    }
+  ],
+  "failed": [],
+  "next_action": "Run validator and commit BATCH 29."
+}

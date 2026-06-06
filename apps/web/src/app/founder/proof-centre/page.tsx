@@ -1,27 +1,55 @@
-﻿export const dynamic = "force-static";
+export const dynamic = "force-static";
 
 const proofCards = [
   {
-    title: "BATCH 21",
-    label: "Controlled Docker Oracle Lite Runtime",
-    status: "PROVEN"
+    "id": "batch-21",
+    "title": "BATCH 21",
+    "label": "Controlled Docker Oracle Lite Runtime",
+    "status": "PROVEN"
   },
   {
-    title: "BATCH 22",
-    label: "Runtime Health Hardening",
-    status: "PROVEN"
+    "id": "batch-22",
+    "title": "BATCH 22",
+    "label": "Runtime Health Hardening",
+    "status": "PROVEN"
   },
   {
-    title: "BATCH 24",
-    label: "Build Proof Centre Display Adapter",
-    status: "PROVEN"
+    "id": "batch-23",
+    "title": "BATCH 23",
+    "label": "Build Proof Centre Read Model",
+    "status": "PROVEN"
   },
   {
-    title: "BATCH 25",
-    label: "Founder Proof Centre Page Wiring",
-    status: "PROVEN"
+    "id": "batch-24",
+    "title": "BATCH 24",
+    "label": "Control Plane Proof Display Adapter",
+    "status": "PROVEN"
+  },
+  {
+    "id": "batch-25",
+    "title": "BATCH 25",
+    "label": "Founder Proof Centre Page Wiring",
+    "status": "PROVEN"
+  },
+  {
+    "id": "batch-26b",
+    "title": "BATCH 26B",
+    "label": "Founder Proof Centre Runtime Reachability",
+    "status": "PROVEN"
+  },
+  {
+    "id": "batch-27",
+    "title": "BATCH 27",
+    "label": "Founder Control Plane Proof Centre Entry Link",
+    "status": "PROVEN"
+  },
+  {
+    "id": "batch-28",
+    "title": "BATCH 28",
+    "label": "Founder Control Plane Entry Link Runtime Proof",
+    "status": "PROVEN"
   }
-];
+] as const;
 
 export default function FounderProofCentrePage() {
   return (

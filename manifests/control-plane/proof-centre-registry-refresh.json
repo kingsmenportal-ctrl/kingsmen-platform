@@ -1,0 +1,30 @@
+﻿{
+  "schema": "kingsmen.control-plane-manifest.v1",
+  "module": "BATCH 29 - Proof Centre Registry Refresh",
+  "status": "BUILT_PENDING_VALIDATION",
+  "scope": "local_proof_registry_refresh_only",
+  "productionReady": false,
+  "canClaimProduction": false,
+  "deployedToOracle": false,
+  "startsDocker": false,
+  "touchesSecrets": false,
+  "touchesCandidateData": false,
+  "targetPage": "apps/web/src/app/founder/proof-centre/page.tsx",
+  "registryOutput": "reports/control-plane/proof-centre-registry.json",
+  "requiredBatches": [
+    "BATCH 21",
+    "BATCH 22",
+    "BATCH 23",
+    "BATCH 24",
+    "BATCH 25",
+    "BATCH 26B",
+    "BATCH 27",
+    "BATCH 28"
+  ],
+  "outputs": [
+    "reports/control-plane/proof-centre-registry.json",
+    "reports/control-plane/proof-centre-registry-refresh-proof.json",
+    "reports/validation/proof-centre-registry-refresh-latest.json"
+  ],
+  "nextAction": "Run BATCH 29 proof and validator."
+}
