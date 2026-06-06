@@ -1,0 +1,542 @@
+{
+  "schema": "kingsmen.proof-centre-registry-final-checkpoint-through-batch-30-proof.v1",
+  "module": "BATCH 31 - Proof Centre Registry Final Checkpoint Through BATCH 30",
+  "status": "PROOF_CENTRE_REGISTRY_FINAL_CHECKPOINT_THROUGH_BATCH_30_FAILED",
+  "passed": false,
+  "productionReady": false,
+  "canClaimProduction": false,
+  "deployedToOracle": false,
+  "startsDocker": false,
+  "generated_at": "2026-06-06T18:17:06.747Z",
+  "expectedEntryCount": 10,
+  "entryCount": 8,
+  "expectedEntries": [
+    "BATCH 21",
+    "BATCH 22",
+    "BATCH 23",
+    "BATCH 24",
+    "BATCH 25",
+    "BATCH 26B",
+    "BATCH 27",
+    "BATCH 28",
+    "BATCH 29",
+    "BATCH 30"
+  ],
+  "allEntriesPresentInRegistry": false,
+  "allEntriesPresentInPage": false,
+  "allEntriesProven": true,
+  "registryPath": "reports/control-plane/proof-centre-registry.json",
+  "pagePath": "apps/web/src/app/founder/proof-centre/page.tsx",
+  "proofEvidence": [
+    {
+      "title": "BATCH 21",
+      "matchingReports": [
+        "reports/agents/kingsmen-agent-system-validation-latest.json",
+        "reports/control-plane/proof-centre-registry-refresh-proof.json",
+        "reports/control-plane/proof-centre-registry-runtime-refresh-proof.json",
+        "reports/control-plane/proof-centre-registry.json",
+        "reports/github-actions/batch21c/runtime/batch21c-docker-runtime-proof.json",
+        "reports/github-actions/batch21c/validation/batch21c-docker-runtime-proof-latest.json",
+        "reports/runtime/batch21c-docker-runtime-proof.json",
+        "reports/runtime/build-proof-centre-proof.json",
+        "reports/runtime/build-proof-centre-read-model.json",
+        "reports/runtime/docker-oracle-lite-controlled-build-proof.json",
+        "reports/runtime/docker-oracle-lite-controlled-runtime-proof.json",
+        "reports/runtime/docker-oracle-lite-runtime-health-hardening-proof.json",
+        "reports/validation/batch21c-docker-runtime-proof-latest.json",
+        "reports/validation/build-proof-centre-latest.json",
+        "reports/validation/control-plane-proof-display-adapter-latest.json",
+        "reports/validation/docker-oracle-lite-controlled-build-latest.json",
+        "reports/validation/docker-oracle-lite-controlled-runtime-latest.json",
+        "reports/validation/proof-centre-registry-refresh-latest.json"
+      ],
+      "passed": true
+    },
+    {
+      "title": "BATCH 22",
+      "matchingReports": [
+        "reports/agents/kingsmen-agent-system-latest.json",
+        "reports/control-plane/proof-centre-registry-refresh-proof.json",
+        "reports/control-plane/proof-centre-registry-runtime-refresh-proof.json",
+        "reports/control-plane/proof-centre-registry.json",
+        "reports/runtime/batch21c-docker-runtime-proof.json",
+        "reports/runtime/batch22-oracle-lite-handoff-prep-latest.json",
+        "reports/runtime/build-proof-centre-proof.json",
+        "reports/runtime/build-proof-centre-read-model.json",
+        "reports/runtime/docker-oracle-lite-runtime-health-hardening-proof.json",
+        "reports/validation/batch21c-docker-runtime-proof-latest.json",
+        "reports/validation/build-proof-centre-latest.json",
+        "reports/validation/control-plane-proof-display-adapter-latest.json",
+        "reports/validation/docker-oracle-lite-controlled-runtime-latest.json",
+        "reports/validation/docker-oracle-lite-runtime-health-hardening-latest.json"
+      ],
+      "passed": true
+    },
+    {
+      "title": "BATCH 23",
+      "matchingReports": [
+        "reports/control-plane/proof-centre-registry-refresh-proof.json",
+        "reports/control-plane/proof-centre-registry-runtime-refresh-proof.json",
+        "reports/control-plane/proof-centre-registry.json",
+        "reports/runtime/batch22-oracle-lite-handoff-prep-latest.json",
+        "reports/runtime/batch23-oracle-vm-handoff-runner-latest.json",
+        "reports/runtime/build-proof-centre-proof.json",
+        "reports/runtime/build-proof-centre-read-model.json",
+        "reports/validation/build-proof-centre-latest.json"
+      ],
+      "passed": true
+    },
+    {
+      "title": "BATCH 24",
+      "matchingReports": [
+        "reports/control-plane/build-proof-centre-display-adapter-proof.json",
+        "reports/control-plane/build-proof-centre-display-adapter.json",
+        "reports/control-plane/founder-proof-centre-page-wiring-proof.json",
+        "reports/control-plane/proof-centre-registry-refresh-proof.json",
+        "reports/control-plane/proof-centre-registry-runtime-refresh-proof.json",
+        "reports/control-plane/proof-centre-registry.json",
+        "reports/runtime/batch23-oracle-vm-handoff-runner-latest.json",
+        "reports/runtime/batch24-oracle-remote-dry-run-readiness-latest.json",
+        "reports/validation/control-plane-proof-display-adapter-latest.json",
+        "reports/validation/founder-proof-centre-page-wiring-latest.json"
+      ],
+      "passed": true
+    },
+    {
+      "title": "BATCH 25",
+      "matchingReports": [
+        "reports/control-plane/founder-proof-centre-page-wiring-proof.json",
+        "reports/control-plane/founder-proof-centre-runtime-adapter-capture.json",
+        "reports/control-plane/founder-proof-centre-runtime-reachability-proof.json",
+        "reports/control-plane/proof-centre-registry-refresh-proof.json",
+        "reports/control-plane/proof-centre-registry-runtime-refresh-proof.json",
+        "reports/control-plane/proof-centre-registry.json",
+        "reports/runtime/batch24-oracle-remote-dry-run-readiness-latest.json",
+        "reports/runtime/batch25-approved-oracle-remote-dry-run-gate-latest.json",
+        "reports/validation/founder-proof-centre-page-wiring-latest.json"
+      ],
+      "passed": true
+    },
+    {
+      "title": "BATCH 26B",
+      "matchingReports": [
+        "reports/control-plane/founder-proof-centre-entry-link-proof.json",
+        "reports/control-plane/proof-centre-registry-refresh-proof.json",
+        "reports/control-plane/proof-centre-registry-runtime-refresh-proof.json",
+        "reports/control-plane/proof-centre-registry.json"
+      ],
+      "passed": true
+    },
+    {
+      "title": "BATCH 27",
+      "matchingReports": [
+        "reports/control-plane/founder-control-plane-entry-link-runtime-proof.json",
+        "reports/control-plane/founder-proof-centre-entry-link-proof.json",
+        "reports/control-plane/proof-centre-registry-refresh-proof.json",
+        "reports/control-plane/proof-centre-registry-runtime-refresh-proof.json",
+        "reports/control-plane/proof-centre-registry.json",
+        "reports/validation/founder-proof-centre-entry-link-latest.json"
+      ],
+      "passed": true
+    },
+    {
+      "title": "BATCH 28",
+      "matchingReports": [
+        "reports/control-plane/founder-control-plane-entry-link-runtime-proof.json",
+        "reports/control-plane/proof-centre-registry-refresh-proof.json",
+        "reports/control-plane/proof-centre-registry-runtime-refresh-proof.json",
+        "reports/control-plane/proof-centre-registry.json",
+        "reports/validation/founder-control-plane-entry-link-runtime-latest.json",
+        "reports/validation/proof-centre-registry-refresh-latest.json"
+      ],
+      "passed": true
+    },
+    {
+      "title": "BATCH 29",
+      "matchingReports": [
+        "reports/control-plane/proof-centre-registry-refresh-proof.json",
+        "reports/control-plane/proof-centre-registry.json",
+        "reports/validation/proof-centre-registry-refresh-latest.json"
+      ],
+      "passed": true
+    },
+    {
+      "title": "BATCH 30",
+      "matchingReports": [
+        "reports/control-plane/proof-centre-registry-runtime-refresh-proof.json",
+        "reports/validation/proof-centre-registry-runtime-refresh-latest.json"
+      ],
+      "passed": true
+    }
+  ],
+  "checks": [
+    {
+      "name": "required-file:reports/control-plane/proof-centre-registry.json",
+      "passed": true,
+      "detail": "reports/control-plane/proof-centre-registry.json"
+    },
+    {
+      "name": "required-file:apps/web/src/app/founder/proof-centre/page.tsx",
+      "passed": true,
+      "detail": "apps/web/src/app/founder/proof-centre/page.tsx"
+    },
+    {
+      "name": "batch29-registry-refresh-proof-exists",
+      "passed": true,
+      "detail": "BATCH 29 proof"
+    },
+    {
+      "name": "batch29-registry-refresh-validation-exists",
+      "passed": true,
+      "detail": "BATCH 29 validation"
+    },
+    {
+      "name": "registry-includes:BATCH 21",
+      "passed": true,
+      "detail": "BATCH 21"
+    },
+    {
+      "name": "registry-includes:BATCH 22",
+      "passed": true,
+      "detail": "BATCH 22"
+    },
+    {
+      "name": "registry-includes:BATCH 23",
+      "passed": true,
+      "detail": "BATCH 23"
+    },
+    {
+      "name": "registry-includes:BATCH 24",
+      "passed": true,
+      "detail": "BATCH 24"
+    },
+    {
+      "name": "registry-includes:BATCH 25",
+      "passed": true,
+      "detail": "BATCH 25"
+    },
+    {
+      "name": "registry-includes:BATCH 26B",
+      "passed": true,
+      "detail": "BATCH 26B"
+    },
+    {
+      "name": "registry-includes:BATCH 27",
+      "passed": true,
+      "detail": "BATCH 27"
+    },
+    {
+      "name": "registry-includes:BATCH 28",
+      "passed": true,
+      "detail": "BATCH 28"
+    },
+    {
+      "name": "registry-includes:BATCH 29",
+      "passed": true,
+      "detail": "BATCH 29"
+    },
+    {
+      "name": "registry-includes:BATCH 30",
+      "passed": false,
+      "detail": "BATCH 30"
+    },
+    {
+      "name": "page-includes:BATCH 21",
+      "passed": true,
+      "detail": "BATCH 21"
+    },
+    {
+      "name": "page-includes:BATCH 22",
+      "passed": true,
+      "detail": "BATCH 22"
+    },
+    {
+      "name": "page-includes:BATCH 23",
+      "passed": true,
+      "detail": "BATCH 23"
+    },
+    {
+      "name": "page-includes:BATCH 24",
+      "passed": true,
+      "detail": "BATCH 24"
+    },
+    {
+      "name": "page-includes:BATCH 25",
+      "passed": true,
+      "detail": "BATCH 25"
+    },
+    {
+      "name": "page-includes:BATCH 26B",
+      "passed": true,
+      "detail": "BATCH 26B"
+    },
+    {
+      "name": "page-includes:BATCH 27",
+      "passed": true,
+      "detail": "BATCH 27"
+    },
+    {
+      "name": "page-includes:BATCH 28",
+      "passed": true,
+      "detail": "BATCH 28"
+    },
+    {
+      "name": "page-includes:BATCH 29",
+      "passed": false,
+      "detail": "BATCH 29"
+    },
+    {
+      "name": "page-includes:BATCH 30",
+      "passed": false,
+      "detail": "BATCH 30"
+    },
+    {
+      "name": "registry-entry-count-is-10",
+      "passed": false,
+      "detail": "entryCount=8"
+    },
+    {
+      "name": "expected-entry-count-is-10",
+      "passed": true,
+      "detail": "expected=10"
+    },
+    {
+      "name": "proof-report-exists:BATCH 21",
+      "passed": true,
+      "detail": "reports/agents/kingsmen-agent-system-validation-latest.json, reports/control-plane/proof-centre-registry-refresh-proof.json, reports/control-plane/proof-centre-registry-runtime-refresh-proof.json, reports/control-plane/proof-centre-registry.json, reports/github-actions/batch21c/runtime/batch21c-docker-runtime-proof.json, reports/github-actions/batch21c/validation/batch21c-docker-runtime-proof-latest.json, reports/runtime/batch21c-docker-runtime-proof.json, reports/runtime/build-proof-centre-proof.json, reports/runtime/build-proof-centre-read-model.json, reports/runtime/docker-oracle-lite-controlled-build-proof.json, reports/runtime/docker-oracle-lite-controlled-runtime-proof.json, reports/runtime/docker-oracle-lite-runtime-health-hardening-proof.json, reports/validation/batch21c-docker-runtime-proof-latest.json, reports/validation/build-proof-centre-latest.json, reports/validation/control-plane-proof-display-adapter-latest.json, reports/validation/docker-oracle-lite-controlled-build-latest.json, reports/validation/docker-oracle-lite-controlled-runtime-latest.json, reports/validation/proof-centre-registry-refresh-latest.json"
+    },
+    {
+      "name": "proof-report-passed:BATCH 21",
+      "passed": true,
+      "detail": "reports/agents/kingsmen-agent-system-validation-latest.json, reports/control-plane/proof-centre-registry-refresh-proof.json, reports/control-plane/proof-centre-registry-runtime-refresh-proof.json, reports/control-plane/proof-centre-registry.json, reports/github-actions/batch21c/runtime/batch21c-docker-runtime-proof.json, reports/github-actions/batch21c/validation/batch21c-docker-runtime-proof-latest.json, reports/runtime/batch21c-docker-runtime-proof.json, reports/runtime/build-proof-centre-proof.json, reports/runtime/build-proof-centre-read-model.json, reports/runtime/docker-oracle-lite-controlled-build-proof.json, reports/runtime/docker-oracle-lite-controlled-runtime-proof.json, reports/runtime/docker-oracle-lite-runtime-health-hardening-proof.json, reports/validation/batch21c-docker-runtime-proof-latest.json, reports/validation/build-proof-centre-latest.json, reports/validation/control-plane-proof-display-adapter-latest.json, reports/validation/docker-oracle-lite-controlled-build-latest.json, reports/validation/docker-oracle-lite-controlled-runtime-latest.json, reports/validation/proof-centre-registry-refresh-latest.json"
+    },
+    {
+      "name": "proof-report-exists:BATCH 22",
+      "passed": true,
+      "detail": "reports/agents/kingsmen-agent-system-latest.json, reports/control-plane/proof-centre-registry-refresh-proof.json, reports/control-plane/proof-centre-registry-runtime-refresh-proof.json, reports/control-plane/proof-centre-registry.json, reports/runtime/batch21c-docker-runtime-proof.json, reports/runtime/batch22-oracle-lite-handoff-prep-latest.json, reports/runtime/build-proof-centre-proof.json, reports/runtime/build-proof-centre-read-model.json, reports/runtime/docker-oracle-lite-runtime-health-hardening-proof.json, reports/validation/batch21c-docker-runtime-proof-latest.json, reports/validation/build-proof-centre-latest.json, reports/validation/control-plane-proof-display-adapter-latest.json, reports/validation/docker-oracle-lite-controlled-runtime-latest.json, reports/validation/docker-oracle-lite-runtime-health-hardening-latest.json"
+    },
+    {
+      "name": "proof-report-passed:BATCH 22",
+      "passed": true,
+      "detail": "reports/agents/kingsmen-agent-system-latest.json, reports/control-plane/proof-centre-registry-refresh-proof.json, reports/control-plane/proof-centre-registry-runtime-refresh-proof.json, reports/control-plane/proof-centre-registry.json, reports/runtime/batch21c-docker-runtime-proof.json, reports/runtime/batch22-oracle-lite-handoff-prep-latest.json, reports/runtime/build-proof-centre-proof.json, reports/runtime/build-proof-centre-read-model.json, reports/runtime/docker-oracle-lite-runtime-health-hardening-proof.json, reports/validation/batch21c-docker-runtime-proof-latest.json, reports/validation/build-proof-centre-latest.json, reports/validation/control-plane-proof-display-adapter-latest.json, reports/validation/docker-oracle-lite-controlled-runtime-latest.json, reports/validation/docker-oracle-lite-runtime-health-hardening-latest.json"
+    },
+    {
+      "name": "proof-report-exists:BATCH 23",
+      "passed": true,
+      "detail": "reports/control-plane/proof-centre-registry-refresh-proof.json, reports/control-plane/proof-centre-registry-runtime-refresh-proof.json, reports/control-plane/proof-centre-registry.json, reports/runtime/batch22-oracle-lite-handoff-prep-latest.json, reports/runtime/batch23-oracle-vm-handoff-runner-latest.json, reports/runtime/build-proof-centre-proof.json, reports/runtime/build-proof-centre-read-model.json, reports/validation/build-proof-centre-latest.json"
+    },
+    {
+      "name": "proof-report-passed:BATCH 23",
+      "passed": true,
+      "detail": "reports/control-plane/proof-centre-registry-refresh-proof.json, reports/control-plane/proof-centre-registry-runtime-refresh-proof.json, reports/control-plane/proof-centre-registry.json, reports/runtime/batch22-oracle-lite-handoff-prep-latest.json, reports/runtime/batch23-oracle-vm-handoff-runner-latest.json, reports/runtime/build-proof-centre-proof.json, reports/runtime/build-proof-centre-read-model.json, reports/validation/build-proof-centre-latest.json"
+    },
+    {
+      "name": "proof-report-exists:BATCH 24",
+      "passed": true,
+      "detail": "reports/control-plane/build-proof-centre-display-adapter-proof.json, reports/control-plane/build-proof-centre-display-adapter.json, reports/control-plane/founder-proof-centre-page-wiring-proof.json, reports/control-plane/proof-centre-registry-refresh-proof.json, reports/control-plane/proof-centre-registry-runtime-refresh-proof.json, reports/control-plane/proof-centre-registry.json, reports/runtime/batch23-oracle-vm-handoff-runner-latest.json, reports/runtime/batch24-oracle-remote-dry-run-readiness-latest.json, reports/validation/control-plane-proof-display-adapter-latest.json, reports/validation/founder-proof-centre-page-wiring-latest.json"
+    },
+    {
+      "name": "proof-report-passed:BATCH 24",
+      "passed": true,
+      "detail": "reports/control-plane/build-proof-centre-display-adapter-proof.json, reports/control-plane/build-proof-centre-display-adapter.json, reports/control-plane/founder-proof-centre-page-wiring-proof.json, reports/control-plane/proof-centre-registry-refresh-proof.json, reports/control-plane/proof-centre-registry-runtime-refresh-proof.json, reports/control-plane/proof-centre-registry.json, reports/runtime/batch23-oracle-vm-handoff-runner-latest.json, reports/runtime/batch24-oracle-remote-dry-run-readiness-latest.json, reports/validation/control-plane-proof-display-adapter-latest.json, reports/validation/founder-proof-centre-page-wiring-latest.json"
+    },
+    {
+      "name": "proof-report-exists:BATCH 25",
+      "passed": true,
+      "detail": "reports/control-plane/founder-proof-centre-page-wiring-proof.json, reports/control-plane/founder-proof-centre-runtime-adapter-capture.json, reports/control-plane/founder-proof-centre-runtime-reachability-proof.json, reports/control-plane/proof-centre-registry-refresh-proof.json, reports/control-plane/proof-centre-registry-runtime-refresh-proof.json, reports/control-plane/proof-centre-registry.json, reports/runtime/batch24-oracle-remote-dry-run-readiness-latest.json, reports/runtime/batch25-approved-oracle-remote-dry-run-gate-latest.json, reports/validation/founder-proof-centre-page-wiring-latest.json"
+    },
+    {
+      "name": "proof-report-passed:BATCH 25",
+      "passed": true,
+      "detail": "reports/control-plane/founder-proof-centre-page-wiring-proof.json, reports/control-plane/founder-proof-centre-runtime-adapter-capture.json, reports/control-plane/founder-proof-centre-runtime-reachability-proof.json, reports/control-plane/proof-centre-registry-refresh-proof.json, reports/control-plane/proof-centre-registry-runtime-refresh-proof.json, reports/control-plane/proof-centre-registry.json, reports/runtime/batch24-oracle-remote-dry-run-readiness-latest.json, reports/runtime/batch25-approved-oracle-remote-dry-run-gate-latest.json, reports/validation/founder-proof-centre-page-wiring-latest.json"
+    },
+    {
+      "name": "proof-report-exists:BATCH 26B",
+      "passed": true,
+      "detail": "reports/control-plane/founder-proof-centre-entry-link-proof.json, reports/control-plane/proof-centre-registry-refresh-proof.json, reports/control-plane/proof-centre-registry-runtime-refresh-proof.json, reports/control-plane/proof-centre-registry.json"
+    },
+    {
+      "name": "proof-report-passed:BATCH 26B",
+      "passed": true,
+      "detail": "reports/control-plane/founder-proof-centre-entry-link-proof.json, reports/control-plane/proof-centre-registry-refresh-proof.json, reports/control-plane/proof-centre-registry-runtime-refresh-proof.json, reports/control-plane/proof-centre-registry.json"
+    },
+    {
+      "name": "proof-report-exists:BATCH 27",
+      "passed": true,
+      "detail": "reports/control-plane/founder-control-plane-entry-link-runtime-proof.json, reports/control-plane/founder-proof-centre-entry-link-proof.json, reports/control-plane/proof-centre-registry-refresh-proof.json, reports/control-plane/proof-centre-registry-runtime-refresh-proof.json, reports/control-plane/proof-centre-registry.json, reports/validation/founder-proof-centre-entry-link-latest.json"
+    },
+    {
+      "name": "proof-report-passed:BATCH 27",
+      "passed": true,
+      "detail": "reports/control-plane/founder-control-plane-entry-link-runtime-proof.json, reports/control-plane/founder-proof-centre-entry-link-proof.json, reports/control-plane/proof-centre-registry-refresh-proof.json, reports/control-plane/proof-centre-registry-runtime-refresh-proof.json, reports/control-plane/proof-centre-registry.json, reports/validation/founder-proof-centre-entry-link-latest.json"
+    },
+    {
+      "name": "proof-report-exists:BATCH 28",
+      "passed": true,
+      "detail": "reports/control-plane/founder-control-plane-entry-link-runtime-proof.json, reports/control-plane/proof-centre-registry-refresh-proof.json, reports/control-plane/proof-centre-registry-runtime-refresh-proof.json, reports/control-plane/proof-centre-registry.json, reports/validation/founder-control-plane-entry-link-runtime-latest.json, reports/validation/proof-centre-registry-refresh-latest.json"
+    },
+    {
+      "name": "proof-report-passed:BATCH 28",
+      "passed": true,
+      "detail": "reports/control-plane/founder-control-plane-entry-link-runtime-proof.json, reports/control-plane/proof-centre-registry-refresh-proof.json, reports/control-plane/proof-centre-registry-runtime-refresh-proof.json, reports/control-plane/proof-centre-registry.json, reports/validation/founder-control-plane-entry-link-runtime-latest.json, reports/validation/proof-centre-registry-refresh-latest.json"
+    },
+    {
+      "name": "proof-report-exists:BATCH 29",
+      "passed": true,
+      "detail": "reports/control-plane/proof-centre-registry-refresh-proof.json, reports/control-plane/proof-centre-registry.json, reports/validation/proof-centre-registry-refresh-latest.json"
+    },
+    {
+      "name": "proof-report-passed:BATCH 29",
+      "passed": true,
+      "detail": "reports/control-plane/proof-centre-registry-refresh-proof.json, reports/control-plane/proof-centre-registry.json, reports/validation/proof-centre-registry-refresh-latest.json"
+    },
+    {
+      "name": "proof-report-exists:BATCH 30",
+      "passed": true,
+      "detail": "reports/control-plane/proof-centre-registry-runtime-refresh-proof.json, reports/validation/proof-centre-registry-runtime-refresh-latest.json"
+    },
+    {
+      "name": "proof-report-passed:BATCH 30",
+      "passed": true,
+      "detail": "reports/control-plane/proof-centre-registry-runtime-refresh-proof.json, reports/validation/proof-centre-registry-runtime-refresh-latest.json"
+    },
+    {
+      "name": "batch29-proof-passed",
+      "passed": true,
+      "detail": "PROOF_CENTRE_REGISTRY_REFRESH_PROVEN"
+    },
+    {
+      "name": "batch29-validation-passed",
+      "passed": true,
+      "detail": "VALIDATED"
+    },
+    {
+      "name": "registry-no-production-claim",
+      "passed": true,
+      "detail": "production false"
+    },
+    {
+      "name": "registry-no-oracle-claim",
+      "passed": true,
+      "detail": "oracle false"
+    },
+    {
+      "name": "page-no-production-claim",
+      "passed": true,
+      "detail": "page production false"
+    },
+    {
+      "name": "page-no-oracle-claim",
+      "passed": true,
+      "detail": "page oracle false"
+    },
+    {
+      "name": "registry-no-forbidden:service_role",
+      "passed": true,
+      "detail": "service_role"
+    },
+    {
+      "name": "page-no-forbidden:service_role",
+      "passed": true,
+      "detail": "service_role"
+    },
+    {
+      "name": "registry-no-forbidden:PAYFAST_PASSPHRASE",
+      "passed": true,
+      "detail": "PAYFAST_PASSPHRASE"
+    },
+    {
+      "name": "page-no-forbidden:PAYFAST_PASSPHRASE",
+      "passed": true,
+      "detail": "PAYFAST_PASSPHRASE"
+    },
+    {
+      "name": "registry-no-forbidden:PRIVATE KEY",
+      "passed": true,
+      "detail": "PRIVATE KEY"
+    },
+    {
+      "name": "page-no-forbidden:PRIVATE KEY",
+      "passed": true,
+      "detail": "PRIVATE KEY"
+    },
+    {
+      "name": "registry-no-forbidden:.env",
+      "passed": true,
+      "detail": ".env"
+    },
+    {
+      "name": "page-no-forbidden:.env",
+      "passed": true,
+      "detail": ".env"
+    },
+    {
+      "name": "registry-no-forbidden:.oci",
+      "passed": true,
+      "detail": ".oci"
+    },
+    {
+      "name": "page-no-forbidden:.oci",
+      "passed": true,
+      "detail": ".oci"
+    },
+    {
+      "name": "registry-no-forbidden:.ssh",
+      "passed": true,
+      "detail": ".ssh"
+    },
+    {
+      "name": "page-no-forbidden:.ssh",
+      "passed": true,
+      "detail": ".ssh"
+    },
+    {
+      "name": "all-entries-present-in-registry",
+      "passed": false,
+      "detail": "registry includes BATCH 21 through BATCH 30"
+    },
+    {
+      "name": "all-entries-present-in-page",
+      "passed": false,
+      "detail": "page includes BATCH 21 through BATCH 30"
+    },
+    {
+      "name": "all-entries-proven",
+      "passed": true,
+      "detail": "report proof exists and passed for every expected entry"
+    }
+  ],
+  "failed": [
+    {
+      "name": "registry-includes:BATCH 30",
+      "passed": false,
+      "detail": "BATCH 30"
+    },
+    {
+      "name": "page-includes:BATCH 29",
+      "passed": false,
+      "detail": "BATCH 29"
+    },
+    {
+      "name": "page-includes:BATCH 30",
+      "passed": false,
+      "detail": "BATCH 30"
+    },
+    {
+      "name": "registry-entry-count-is-10",
+      "passed": false,
+      "detail": "entryCount=8"
+    },
+    {
+      "name": "all-entries-present-in-registry",
+      "passed": false,
+      "detail": "registry includes BATCH 21 through BATCH 30"
+    },
+    {
+      "name": "all-entries-present-in-page",
+      "passed": false,
+      "detail": "page includes BATCH 21 through BATCH 30"
+    }
+  ],
+  "next_action": "Repair Proof Centre registry checkpoint before moving forward."
+}

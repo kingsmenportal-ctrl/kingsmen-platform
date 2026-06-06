@@ -1,0 +1,71 @@
+{
+  "schema": "kingsmen.validation-report.v1",
+  "module": "BATCH 31 - Proof Centre Registry Final Checkpoint Through BATCH 30",
+  "status": "FAILED",
+  "passed": false,
+  "generated_at": "2026-06-06T18:17:06.887Z",
+  "files_expected": [
+    "docs/control-plane/proof-centre-registry-final-checkpoint-through-batch-30.md",
+    "manifests/control-plane/proof-centre-registry-final-checkpoint-through-batch-30.json",
+    "packages/contracts/src/proof-centre-registry-final-checkpoint-through-batch-30.ts",
+    "scripts/proof/prove-proof-centre-registry-final-checkpoint-through-batch-30.mjs",
+    "scripts/validators/validate-proof-centre-registry-final-checkpoint-through-batch-30.mjs",
+    "reports/control-plane/proof-centre-registry.json",
+    "apps/web/src/app/founder/proof-centre/page.tsx",
+    "reports/control-plane/proof-centre-registry-final-checkpoint-through-batch-30-proof.json"
+  ],
+  "files_checked": 8,
+  "missing_files": [],
+  "failed_checks": [
+    {
+      "name": "proof-status",
+      "passed": false,
+      "detail": "PROOF_CENTRE_REGISTRY_FINAL_CHECKPOINT_THROUGH_BATCH_30_FAILED"
+    },
+    {
+      "name": "proof-passed",
+      "passed": false,
+      "detail": "false"
+    },
+    {
+      "name": "proof-entry-count-10",
+      "passed": false,
+      "detail": "entryCount=8"
+    },
+    {
+      "name": "proof-all-registry-entries-present",
+      "passed": false,
+      "detail": "registry"
+    },
+    {
+      "name": "proof-all-page-entries-present",
+      "passed": false,
+      "detail": "page"
+    },
+    {
+      "name": "proof-no-failed-checks",
+      "passed": false,
+      "detail": "failed=6"
+    },
+    {
+      "name": "page-still-includes:BATCH 29",
+      "passed": false,
+      "detail": "BATCH 29"
+    },
+    {
+      "name": "registry-still-includes:BATCH 30",
+      "passed": false,
+      "detail": "BATCH 30"
+    },
+    {
+      "name": "page-still-includes:BATCH 30",
+      "passed": false,
+      "detail": "BATCH 30"
+    }
+  ],
+  "warnings": [],
+  "oracle_lite_impact": "none_local_checkpoint_only",
+  "control_plane_impact": "Founder Proof Centre registry and page have a checkpoint through BATCH 30.",
+  "proof": "reports/control-plane/proof-centre-registry-final-checkpoint-through-batch-30-proof.json",
+  "next_action": "Repair BATCH 31 checkpoint before moving forward."
+}

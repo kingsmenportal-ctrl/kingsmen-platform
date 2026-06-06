@@ -1,0 +1,36 @@
+﻿{
+  "schema": "kingsmen.control-plane-manifest.v1",
+  "module": "BATCH 31 - Proof Centre Registry Final Checkpoint Through BATCH 30",
+  "status": "BUILT_PENDING_VALIDATION",
+  "scope": "local_control_plane_checkpoint_only",
+  "productionReady": false,
+  "canClaimProduction": false,
+  "deployedToOracle": false,
+  "startsDocker": false,
+  "touchesSecrets": false,
+  "touchesCandidateData": false,
+  "expectedEntryCount": 10,
+  "expectedEntries": [
+    "BATCH 21",
+    "BATCH 22",
+    "BATCH 23",
+    "BATCH 24",
+    "BATCH 25",
+    "BATCH 26B",
+    "BATCH 27",
+    "BATCH 28",
+    "BATCH 29",
+    "BATCH 30"
+  ],
+  "inputs": [
+    "reports/control-plane/proof-centre-registry.json",
+    "apps/web/src/app/founder/proof-centre/page.tsx",
+    "reports/control-plane/proof-centre-registry-refresh-proof.json",
+    "reports/validation/proof-centre-registry-refresh-latest.json"
+  ],
+  "outputs": [
+    "reports/control-plane/proof-centre-registry-final-checkpoint-through-batch-30-proof.json",
+    "reports/validation/proof-centre-registry-final-checkpoint-through-batch-30-latest.json"
+  ],
+  "nextAction": "Run BATCH 31 proof and validator."
+}
