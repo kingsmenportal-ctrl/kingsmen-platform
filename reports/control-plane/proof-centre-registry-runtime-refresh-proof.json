@@ -1,0 +1,292 @@
+{
+  "schema": "kingsmen.proof-centre-registry-runtime-refresh-proof.v1",
+  "module": "BATCH 30 - Proof Centre Registry Runtime Refresh Proof",
+  "status": "PROOF_CENTRE_REGISTRY_RUNTIME_REFRESH_PROVEN",
+  "passed": true,
+  "productionReady": false,
+  "canClaimProduction": false,
+  "deployedToOracle": false,
+  "generated_at": "2026-06-06T18:00:06.327Z",
+  "runtimeScope": "controlled_local_docker_runtime_proof_centre_registry_render_proof",
+  "composeFile": "docker/oracle-lite/docker-compose.local.yml",
+  "targetUrl": "http://127.0.0.1:3000/founder/proof-centre",
+  "pageCapturePath": "reports/control-plane/proof-centre-registry-runtime-page-capture.html",
+  "webBuildSucceeded": true,
+  "composeUpSucceeded": true,
+  "composeDownSucceeded": true,
+  "apiHealthStatus": 200,
+  "proofCentreStatus": 200,
+  "renderedBatchCount": 8,
+  "renderedLabelCount": 8,
+  "allEightBatchesRendered": true,
+  "allEightLabelsRendered": true,
+  "portsReleasedAfterDown": true,
+  "checks": [
+    {
+      "name": "required-file:docker/oracle-lite/docker-compose.local.yml",
+      "passed": true,
+      "detail": "docker/oracle-lite/docker-compose.local.yml"
+    },
+    {
+      "name": "required-file:apps/web/src/app/founder/proof-centre/page.tsx",
+      "passed": true,
+      "detail": "apps/web/src/app/founder/proof-centre/page.tsx"
+    },
+    {
+      "name": "required-file:reports/control-plane/proof-centre-registry.json",
+      "passed": true,
+      "detail": "reports/control-plane/proof-centre-registry.json"
+    },
+    {
+      "name": "required-file:reports/control-plane/proof-centre-registry-refresh-proof.json",
+      "passed": true,
+      "detail": "reports/control-plane/proof-centre-registry-refresh-proof.json"
+    },
+    {
+      "name": "required-file:reports/validation/proof-centre-registry-refresh-latest.json",
+      "passed": true,
+      "detail": "reports/validation/proof-centre-registry-refresh-latest.json"
+    },
+    {
+      "name": "batch29-proof-proven",
+      "passed": true,
+      "detail": "PROOF_CENTRE_REGISTRY_REFRESH_PROVEN"
+    },
+    {
+      "name": "batch29-validation-passed",
+      "passed": true,
+      "detail": "VALIDATED"
+    },
+    {
+      "name": "batch29-entry-count-eight",
+      "passed": true,
+      "detail": "8"
+    },
+    {
+      "name": "batch29-all-entries-proven",
+      "passed": true,
+      "detail": "true"
+    },
+    {
+      "name": "batch29-no-production",
+      "passed": true,
+      "detail": "production false"
+    },
+    {
+      "name": "batch29-no-oracle",
+      "passed": true,
+      "detail": "oracle false"
+    },
+    {
+      "name": "registry-eight-entries",
+      "passed": true,
+      "detail": "entries=8"
+    },
+    {
+      "name": "registry-all-proven",
+      "passed": true,
+      "detail": "true"
+    },
+    {
+      "name": "compose-down-before",
+      "passed": true,
+      "detail": "exit=0; timedOut=false"
+    },
+    {
+      "name": "web-build-succeeded",
+      "passed": true,
+      "detail": "exit=0; timedOut=false"
+    },
+    {
+      "name": "compose-up-succeeded",
+      "passed": true,
+      "detail": "exit=0; timedOut=false"
+    },
+    {
+      "name": "api-health-200",
+      "passed": true,
+      "detail": "status=200; error="
+    },
+    {
+      "name": "proof-centre-page-200",
+      "passed": true,
+      "detail": "status=200; error="
+    },
+    {
+      "name": "proof-centre-has-founder-title",
+      "passed": true,
+      "detail": "founder title"
+    },
+    {
+      "name": "proof-centre-has-build-proof-centre",
+      "passed": true,
+      "detail": "Build Proof Centre"
+    },
+    {
+      "name": "proof-centre-has-local-warning",
+      "passed": true,
+      "detail": "local warning"
+    },
+    {
+      "name": "runtime-page-has:BATCH 21",
+      "passed": true,
+      "detail": "BATCH 21"
+    },
+    {
+      "name": "runtime-page-has:BATCH 22",
+      "passed": true,
+      "detail": "BATCH 22"
+    },
+    {
+      "name": "runtime-page-has:BATCH 23",
+      "passed": true,
+      "detail": "BATCH 23"
+    },
+    {
+      "name": "runtime-page-has:BATCH 24",
+      "passed": true,
+      "detail": "BATCH 24"
+    },
+    {
+      "name": "runtime-page-has:BATCH 25",
+      "passed": true,
+      "detail": "BATCH 25"
+    },
+    {
+      "name": "runtime-page-has:BATCH 26B",
+      "passed": true,
+      "detail": "BATCH 26B"
+    },
+    {
+      "name": "runtime-page-has:BATCH 27",
+      "passed": true,
+      "detail": "BATCH 27"
+    },
+    {
+      "name": "runtime-page-has:BATCH 28",
+      "passed": true,
+      "detail": "BATCH 28"
+    },
+    {
+      "name": "runtime-page-has-label:Controlled Docker Oracle Lite Runtime",
+      "passed": true,
+      "detail": "Controlled Docker Oracle Lite Runtime"
+    },
+    {
+      "name": "runtime-page-has-label:Runtime Health Hardening",
+      "passed": true,
+      "detail": "Runtime Health Hardening"
+    },
+    {
+      "name": "runtime-page-has-label:Build Proof Centre Read Model",
+      "passed": true,
+      "detail": "Build Proof Centre Read Model"
+    },
+    {
+      "name": "runtime-page-has-label:Control Plane Proof Display Adapter",
+      "passed": true,
+      "detail": "Control Plane Proof Display Adapter"
+    },
+    {
+      "name": "runtime-page-has-label:Founder Proof Centre Page Wiring",
+      "passed": true,
+      "detail": "Founder Proof Centre Page Wiring"
+    },
+    {
+      "name": "runtime-page-has-label:Founder Proof Centre Runtime Reachability",
+      "passed": true,
+      "detail": "Founder Proof Centre Runtime Reachability"
+    },
+    {
+      "name": "runtime-page-has-label:Founder Control Plane Proof Centre Entry Link",
+      "passed": true,
+      "detail": "Founder Control Plane Proof Centre Entry Link"
+    },
+    {
+      "name": "runtime-page-has-label:Founder Control Plane Entry Link Runtime Proof",
+      "passed": true,
+      "detail": "Founder Control Plane Entry Link Runtime Proof"
+    },
+    {
+      "name": "runtime-page-renders-eight-batches",
+      "passed": true,
+      "detail": "rendered=8"
+    },
+    {
+      "name": "runtime-page-renders-eight-labels",
+      "passed": true,
+      "detail": "rendered=8"
+    },
+    {
+      "name": "runtime-page-no-production-claim",
+      "passed": true,
+      "detail": "no production boundary language"
+    },
+    {
+      "name": "compose-down-after",
+      "passed": true,
+      "detail": "exit=0; timedOut=false"
+    },
+    {
+      "name": "docker-containers-released-after-down",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "name": "runtime-page-no-forbidden:service_role",
+      "passed": true,
+      "detail": "service_role"
+    },
+    {
+      "name": "runtime-page-no-forbidden:PAYFAST_PASSPHRASE",
+      "passed": true,
+      "detail": "PAYFAST_PASSPHRASE"
+    },
+    {
+      "name": "runtime-page-no-forbidden:PRIVATE KEY",
+      "passed": true,
+      "detail": "PRIVATE KEY"
+    },
+    {
+      "name": "runtime-page-no-forbidden:.env",
+      "passed": true,
+      "detail": ".env"
+    },
+    {
+      "name": "runtime-page-no-forbidden:.oci",
+      "passed": true,
+      "detail": ".oci"
+    },
+    {
+      "name": "runtime-page-no-forbidden:.ssh",
+      "passed": true,
+      "detail": ".ssh"
+    }
+  ],
+  "failed": [],
+  "commandSummary": {
+    "composeDownBefore": {
+      "exitCode": 0,
+      "timedOut": false,
+      "seconds": 2.85
+    },
+    "webBuild": {
+      "exitCode": 0,
+      "timedOut": false,
+      "seconds": 144.86,
+      "stderrTail": " Image kingsmen/web:oracle-lite-local Building \n Image kingsmen/api:oracle-lite-local Building \n Image kingsmen/web:oracle-lite-local Built \n"
+    },
+    "composeUp": {
+      "exitCode": 0,
+      "timedOut": false,
+      "seconds": 14.31,
+      "stderrTail": " Network kingsmen-oracle-lite-local_default Creating \n Network kingsmen-oracle-lite-local_default Created \n Container kingsmen-api-local Creating \n Container kingsmen-api-local Created \n Container kingsmen-web-local Creating \n Container kingsmen-web-local Created \n Container kingsmen-api-local Starting \n Container kingsmen-api-local Started \n Container kingsmen-web-local Starting \n Container kingsmen-web-local Started \n"
+    },
+    "composeDownAfter": {
+      "exitCode": 0,
+      "timedOut": false,
+      "seconds": 7.01
+    }
+  },
+  "next_action": "Run validator and commit BATCH 30."
+}

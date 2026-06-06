@@ -1,0 +1,22 @@
+﻿{
+  "schema": "kingsmen.control-plane-manifest.v1",
+  "module": "BATCH 30 - Proof Centre Registry Runtime Refresh Proof",
+  "status": "BUILT_PENDING_VALIDATION",
+  "scope": "controlled_local_docker_runtime_proof_centre_registry_render_proof",
+  "productionReady": false,
+  "canClaimProduction": false,
+  "deployedToOracle": false,
+  "startsDocker": true,
+  "touchesSecrets": false,
+  "touchesCandidateData": false,
+  "composeFile": "docker/oracle-lite/docker-compose.local.yml",
+  "targetRoute": "/founder/proof-centre/",
+  "targetUrl": "http://127.0.0.1:3000/founder/proof-centre",
+  "requiredPriorProof": "reports/control-plane/proof-centre-registry-refresh-proof.json",
+  "outputs": [
+    "reports/control-plane/proof-centre-registry-runtime-refresh-proof.json",
+    "reports/control-plane/proof-centre-registry-runtime-page-capture.html",
+    "reports/validation/proof-centre-registry-runtime-refresh-latest.json"
+  ],
+  "nextAction": "Run BATCH 30 proof and validator."
+}
