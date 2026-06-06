@@ -1,24 +1,25 @@
 {
   "schema": "kingsmen.validation-report.v1",
-  "module": "BATCH 03 - Build Proof Centre",
+  "module": "BATCH 23 - Build Proof Centre Read Model",
   "status": "VALIDATED",
   "passed": true,
-  "generated_at": "2026-06-02T17:17:05.700Z",
+  "generated_at": "2026-06-06T16:16:06.440Z",
   "files_expected": [
-    "docs/proof/build-proof-centre.md",
-    "manifests/proof/build-proof-centre.json",
+    "docs/runtime/build-proof-centre.md",
+    "manifests/runtime/build-proof-centre.json",
     "packages/contracts/src/build-proof-centre.ts",
-    "apps/web/src/components/kingsmen/BuildProofStatusCard.tsx",
-    "apps/web/src/components/kingsmen/BuildProofCentreShell.tsx",
-    "apps/web/src/app/founder/build-proof/page.tsx",
+    "scripts/proof/prove-build-proof-centre.mjs",
     "scripts/validators/validate-build-proof-centre.mjs",
-    "reports/validation/build-proof-centre-latest.json"
+    "reports/runtime/build-proof-centre-read-model.json",
+    "reports/runtime/build-proof-centre-proof.json"
   ],
-  "files_checked": 14,
+  "files_checked": 7,
   "missing_files": [],
   "failed_checks": [],
   "warnings": [],
-  "oracle_lite_impact": "none_runtime_yet",
-  "control_plane_impact": "Adds founder-facing Build Proof Centre UI shell and proof-report policy.",
-  "next_action": "Proceed to BATCH 04 - First Public Website + Free Destiny Map shell or next approved batch."
+  "oracle_lite_impact": "none_local_file_read_model_only",
+  "control_plane_impact": "Future Build Proof Centre can display BATCH 21 and BATCH 22 proof status without starting runtime services.",
+  "read_model": "reports/runtime/build-proof-centre-read-model.json",
+  "runtime_proof": "reports/runtime/build-proof-centre-proof.json",
+  "next_action": "Commit BATCH 23."
 }

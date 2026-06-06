@@ -1,44 +1,62 @@
-export type KingsmenProofStatus =
-  | "NOT_STARTED"
-  | "BUILT_PENDING_VALIDATION"
+﻿export type KingsmenProofGateStatus =
+  | "PROVEN"
   | "VALIDATED"
-  | "RUNTIME_PROVEN"
-  | "STAGING_PROVEN"
-  | "PRODUCTION_READY"
-  | "PRODUCTION_ACTIVE"
-  | "PAUSED"
-  | "REPLACED"
-  | "ARCHIVED_FOR_FUTURE";
+  | "FAILED"
+  | "MISSING"
+  | "UNKNOWN";
 
-export interface KingsmenProofReportSummary {
+export type KingsmenBuildProofItem = {
+  id: string;
+  label: string;
   module: string;
-  status: KingsmenProofStatus | string;
+  status: string;
+  validationStatus: string;
   passed: boolean;
+  productionReady: false;
+  canClaimProduction: false;
+  deployedToOracle: false;
   reportPath: string;
-  failedChecks?: string[];
-  warnings?: string[];
-  oracleLiteImpact?: string;
-  controlPlaneImpact?: string;
-  nextAction?: string;
-}
+  validationPath: string;
+  keyMetrics: Record<string, string | number | boolean | null>;
+};
 
-export const KINGSMEN_BUILD_PROOF_RULES = [
-  "No claim without file path.",
-  "No file path without content.",
-  "No content without validator.",
-  "No validator without report.",
-  "No production claim without runtime proof."
-];
+export type KingsmenBuildProofCentreReadModel = {
+  schema: "kingsmen.build-proof-centre-read-model.v1";
+  module: "BATCH 23 - Build Proof Centre Read Model";
+  generated_at: string;
+  productionReady: false;
+  canClaimProduction: false;
+  deployedToOracle: false;
+  runtimeScope: "local_file_read_model_only";
+  allProofItemsPassed: boolean;
+  noProductionClaim: boolean;
+  noOracleClaim: boolean;
+  proofItems: KingsmenBuildProofItem[];
+  founderSummary: string;
+  nextAction: string;
+};
 
-export const KINGSMEN_INITIAL_PROOF_REPORTS = [
-  "reports/validation/merge-foundation-latest.json",
-  "reports/validation/creator-normalize-latest.json",
-  "reports/creator/creator-doctor-report.json",
-  "reports/creator/creator-audit-existing-report.json",
-  "reports/creator/creator-action-scaffold-report.json",
-  "reports/creator/creator-action-validate-report.json"
-];
-
-export function isValidatedProof(report: KingsmenProofReportSummary): boolean {
-  return report.passed === true && (report.failedChecks ?? []).length === 0;
-}
+export type KingsmenBuildProofCentreProofReport = {
+  schema: "kingsmen.build-proof-centre-proof.v1";
+  module: "BATCH 23 - Build Proof Centre Read Model";
+  status:
+    | "BUILD_PROOF_CENTRE_READ_MODEL_PROVEN"
+    | "BUILD_PROOF_CENTRE_READ_MODEL_FAILED";
+  passed: boolean;
+  productionReady: false;
+  canClaimProduction: false;
+  deployedToOracle: false;
+  generated_at: string;
+  readModelPath: string;
+  checks: Array<{
+    name: string;
+    passed: boolean;
+    detail: string;
+  }>;
+  failed: Array<{
+    name: string;
+    passed: boolean;
+    detail: string;
+  }>;
+  next_action: string;
+};

@@ -1,0 +1,105 @@
+{
+  "schema": "kingsmen.build-proof-centre-proof.v1",
+  "module": "BATCH 23 - Build Proof Centre Read Model",
+  "status": "BUILD_PROOF_CENTRE_READ_MODEL_PROVEN",
+  "passed": true,
+  "productionReady": false,
+  "canClaimProduction": false,
+  "deployedToOracle": false,
+  "generated_at": "2026-06-06T16:16:06.311Z",
+  "readModelPath": "reports/runtime/build-proof-centre-read-model.json",
+  "checks": [
+    {
+      "name": "input-exists:reports/runtime/docker-oracle-lite-controlled-runtime-proof.json",
+      "passed": true,
+      "detail": "reports/runtime/docker-oracle-lite-controlled-runtime-proof.json"
+    },
+    {
+      "name": "input-exists:reports/validation/docker-oracle-lite-controlled-runtime-latest.json",
+      "passed": true,
+      "detail": "reports/validation/docker-oracle-lite-controlled-runtime-latest.json"
+    },
+    {
+      "name": "input-exists:reports/runtime/docker-oracle-lite-runtime-health-hardening-proof.json",
+      "passed": true,
+      "detail": "reports/runtime/docker-oracle-lite-runtime-health-hardening-proof.json"
+    },
+    {
+      "name": "input-exists:reports/validation/docker-oracle-lite-runtime-health-hardening-latest.json",
+      "passed": true,
+      "detail": "reports/validation/docker-oracle-lite-runtime-health-hardening-latest.json"
+    },
+    {
+      "name": "batch21-proof-passed",
+      "passed": true,
+      "detail": "DOCKER_LOCAL_RUNTIME_PROVEN"
+    },
+    {
+      "name": "batch21-validation-passed",
+      "passed": true,
+      "detail": "VALIDATED"
+    },
+    {
+      "name": "batch21-no-production-claim",
+      "passed": true,
+      "detail": "BATCH 21 production flags"
+    },
+    {
+      "name": "batch21-no-oracle-claim",
+      "passed": true,
+      "detail": "BATCH 21 oracle flag"
+    },
+    {
+      "name": "batch22-proof-passed",
+      "passed": true,
+      "detail": "DOCKER_RUNTIME_HEALTH_HARDENED_LOCAL"
+    },
+    {
+      "name": "batch22-validation-passed",
+      "passed": true,
+      "detail": "VALIDATED"
+    },
+    {
+      "name": "batch22-no-production-claim",
+      "passed": true,
+      "detail": "BATCH 22 production flags"
+    },
+    {
+      "name": "batch22-no-oracle-claim",
+      "passed": true,
+      "detail": "BATCH 22 oracle flag"
+    },
+    {
+      "name": "batch22-two-cycles",
+      "passed": true,
+      "detail": "expected=2; completed=2"
+    },
+    {
+      "name": "batch22-no-failed-checks",
+      "passed": true,
+      "detail": "failed=0"
+    },
+    {
+      "name": "read-model-two-proof-items",
+      "passed": true,
+      "detail": "items=2"
+    },
+    {
+      "name": "read-model-all-proof-items-passed",
+      "passed": true,
+      "detail": "all proof items passed"
+    },
+    {
+      "name": "read-model-no-production-claim",
+      "passed": true,
+      "detail": "no production claim"
+    },
+    {
+      "name": "read-model-no-oracle-claim",
+      "passed": true,
+      "detail": "no oracle claim"
+    }
+  ],
+  "failed": [],
+  "next_action": "Run validator and commit BATCH 23."
+}

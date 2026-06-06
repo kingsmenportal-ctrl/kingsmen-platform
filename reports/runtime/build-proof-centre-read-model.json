@@ -1,0 +1,54 @@
+{
+  "schema": "kingsmen.build-proof-centre-read-model.v1",
+  "module": "BATCH 23 - Build Proof Centre Read Model",
+  "generated_at": "2026-06-06T16:16:06.309Z",
+  "productionReady": false,
+  "canClaimProduction": false,
+  "deployedToOracle": false,
+  "runtimeScope": "local_file_read_model_only",
+  "allProofItemsPassed": true,
+  "noProductionClaim": true,
+  "noOracleClaim": true,
+  "proofItems": [
+    {
+      "id": "docker-oracle-lite-controlled-runtime",
+      "label": "Docker Oracle Lite Controlled Runtime",
+      "module": "BATCH 21 - Controlled Docker Local Runtime Proof",
+      "status": "DOCKER_LOCAL_RUNTIME_PROVEN",
+      "validationStatus": "VALIDATED",
+      "passed": true,
+      "productionReady": false,
+      "canClaimProduction": false,
+      "deployedToOracle": false,
+      "reportPath": "reports/runtime/docker-oracle-lite-controlled-runtime-proof.json",
+      "validationPath": "reports/validation/docker-oracle-lite-controlled-runtime-latest.json",
+      "keyMetrics": {
+        "apiHealthStatus": 200,
+        "webStatus": 200,
+        "bridgeApiStatus": 202,
+        "composeUpSucceeded": true,
+        "composeDownSucceeded": true
+      }
+    },
+    {
+      "id": "docker-oracle-lite-runtime-health-hardening",
+      "label": "Docker Oracle Lite Runtime Health Hardening",
+      "module": "BATCH 22 - Docker Oracle Lite Runtime Health Hardening",
+      "status": "DOCKER_RUNTIME_HEALTH_HARDENED_LOCAL",
+      "validationStatus": "VALIDATED",
+      "passed": true,
+      "productionReady": false,
+      "canClaimProduction": false,
+      "deployedToOracle": false,
+      "reportPath": "reports/runtime/docker-oracle-lite-runtime-health-hardening-proof.json",
+      "validationPath": "reports/validation/docker-oracle-lite-runtime-health-hardening-latest.json",
+      "keyMetrics": {
+        "composeCyclesExpected": 2,
+        "composeCyclesCompleted": 2,
+        "failedChecks": 0
+      }
+    }
+  ],
+  "founderSummary": "BATCH 21 and BATCH 22 are locally proven and validated. This is local proof only, not production or Oracle deployment proof.",
+  "nextAction": "Commit BATCH 23, then proceed to the smallest useful control-plane display adapter."
+}

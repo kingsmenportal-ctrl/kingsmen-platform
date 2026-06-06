@@ -1,0 +1,39 @@
+﻿{
+  "schema": "kingsmen.manifest.v1",
+  "module": "BATCH 23 - Build Proof Centre Read Model",
+  "status": "BUILT_PENDING_VALIDATION",
+  "purpose": "Create a safe local read model from existing runtime proof reports for future founder/control-plane display.",
+  "productionReady": false,
+  "canClaimProduction": false,
+  "deployedToOracle": false,
+  "runtimeScope": "local_file_read_model_only",
+  "inputs": [
+    "reports/runtime/docker-oracle-lite-controlled-runtime-proof.json",
+    "reports/validation/docker-oracle-lite-controlled-runtime-latest.json",
+    "reports/runtime/docker-oracle-lite-runtime-health-hardening-proof.json",
+    "reports/validation/docker-oracle-lite-runtime-health-hardening-latest.json"
+  ],
+  "outputs": [
+    "reports/runtime/build-proof-centre-read-model.json",
+    "reports/runtime/build-proof-centre-proof.json",
+    "reports/validation/build-proof-centre-latest.json"
+  ],
+  "files": [
+    "docs/runtime/build-proof-centre.md",
+    "manifests/runtime/build-proof-centre.json",
+    "packages/contracts/src/build-proof-centre.ts",
+    "scripts/proof/prove-build-proof-centre.mjs",
+    "scripts/validators/validate-build-proof-centre.mjs"
+  ],
+  "blockedActions": [
+    "oracle_deployment",
+    "production_claim",
+    "payment_action",
+    "email_send",
+    "whatsapp_send",
+    "candidate_data_access",
+    "secret_access",
+    "docker_start"
+  ],
+  "nextAction": "Run BATCH 23 proof and validator."
+}
