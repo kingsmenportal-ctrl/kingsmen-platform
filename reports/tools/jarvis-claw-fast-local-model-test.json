@@ -1,0 +1,27 @@
+{
+    "module":  "TOOLS-JARVIS-CLAW-04F",
+    "status":  "FAST_LOCAL_MODEL_TEST_COMPLETED",
+    "generated_at":  "2026-06-05T22:02:07",
+    "timeout_seconds":  45,
+    "selected_model":  "qwen2.5:0.5b",
+    "ollama_fast_reply":  {
+                              "name":  "ollama-fast-reply",
+                              "status":  "TIMEOUT",
+                              "passed":  false,
+                              "seconds":  45.06,
+                              "output":  "Timed out after 45 seconds",
+                              "error":  ""
+                          },
+    "jarvis_fast_reply":  {
+                              "name":  "jarvis-fast-reply",
+                              "status":  "FAILED_TO_START",
+                              "passed":  false,
+                              "seconds":  0,
+                              "output":  "",
+                              "error":  "Process did not start."
+                          },
+    "usable_fast_local_route":  "none",
+    "all_passed":  false,
+    "production_authority":  false,
+    "decision":  "Local fast model is still not proven. Do not rely on Jarvis or OpenClaw for Kingsmen reasoning yet."
+}
