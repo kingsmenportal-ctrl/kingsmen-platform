@@ -3,7 +3,7 @@
   "module": "BATCH 34 - Free Destiny Map Intake Local Runtime Reachability Proof",
   "status": "FAILED",
   "passed": false,
-  "generated_at": "2026-06-06T18:59:09.869Z",
+  "generated_at": "2026-06-06T22:48:26.387Z",
   "files_expected": [
     "docs/candidate/free-destiny-map-intake-runtime-reachability.md",
     "manifests/candidate/free-destiny-map-intake-runtime-reachability.json",
@@ -30,9 +30,24 @@
       "detail": "false"
     },
     {
+      "name": "proof-compose-up",
+      "passed": false,
+      "detail": "compose up true"
+    },
+    {
+      "name": "proof-compose-down",
+      "passed": false,
+      "detail": "compose down true"
+    },
+    {
+      "name": "proof-page-status-200",
+      "passed": false,
+      "detail": "pageStatus=0"
+    },
+    {
       "name": "proof-no-failed-checks",
       "passed": false,
-      "detail": "failed=9"
+      "detail": "failed=3"
     }
   ],
   "warnings": [],

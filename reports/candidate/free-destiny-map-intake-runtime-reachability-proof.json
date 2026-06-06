@@ -14,11 +14,11 @@
   "touchesContactData": false,
   "touchesPayments": false,
   "touchesMessaging": false,
-  "generated_at": "2026-06-06T18:59:09.565Z",
+  "generated_at": "2026-06-06T21:12:27.323Z",
   "composeFile": "docker/oracle-lite/docker-compose.local.yml",
-  "composeUpSucceeded": true,
-  "composeDownSucceeded": true,
-  "pageStatus": 200,
+  "composeUpSucceeded": false,
+  "composeDownSucceeded": false,
+  "pageStatus": 0,
   "sourceRoute": "/free-destiny-map/",
   "sourcePage": "apps/web/src/app/free-destiny-map/page.tsx",
   "checks": [
@@ -64,83 +64,18 @@
     },
     {
       "name": "compose-down-before-exit-ok",
-      "passed": true,
-      "detail": "exit=0; error=none"
+      "passed": false,
+      "detail": "exit=1; error=none"
     },
     {
       "name": "compose-up-no-build",
-      "passed": true,
-      "detail": "exit=0; error=none"
-    },
-    {
-      "name": "runtime-page-status-200",
-      "passed": true,
-      "detail": "status=200; error=none"
-    },
-    {
-      "name": "runtime-page-identifies-free-destiny-map",
-      "passed": true,
-      "detail": "Free Destiny Map text"
-    },
-    {
-      "name": "runtime-page-has-intake-form-marker",
       "passed": false,
-      "detail": "rendered intake marker"
-    },
-    {
-      "name": "runtime-page-has-current-stage-field",
-      "passed": false,
-      "detail": "current-stage marker"
-    },
-    {
-      "name": "runtime-page-has-province-field",
-      "passed": false,
-      "detail": "province marker"
-    },
-    {
-      "name": "runtime-page-has-route-interest-field",
-      "passed": false,
-      "detail": "route-interest marker"
-    },
-    {
-      "name": "runtime-page-has-biggest-blocker-field",
-      "passed": false,
-      "detail": "biggest-blocker marker"
-    },
-    {
-      "name": "runtime-page-has-readiness-goal-field",
-      "passed": false,
-      "detail": "readiness-goal marker"
-    },
-    {
-      "name": "runtime-page-has-boundary-confirmation",
-      "passed": false,
-      "detail": "boundary marker"
-    },
-    {
-      "name": "runtime-page-has-preview-button",
-      "passed": false,
-      "detail": "preview button"
-    },
-    {
-      "name": "runtime-page-does-not-submit",
-      "passed": false,
-      "detail": "no submit"
-    },
-    {
-      "name": "runtime-page-no-production-claim",
-      "passed": true,
-      "detail": "no production claim"
-    },
-    {
-      "name": "runtime-page-no-oracle-deployed-claim",
-      "passed": true,
-      "detail": "no Oracle deployment claim"
+      "detail": "exit=1; error=none"
     },
     {
       "name": "compose-down-after-exit-ok",
-      "passed": true,
-      "detail": "exit=0; error=none"
+      "passed": false,
+      "detail": "exit=1; error=none"
     },
     {
       "name": "runtime-html-no-forbidden:service_role",
@@ -185,49 +120,19 @@
   ],
   "failed": [
     {
-      "name": "runtime-page-has-intake-form-marker",
+      "name": "compose-down-before-exit-ok",
       "passed": false,
-      "detail": "rendered intake marker"
+      "detail": "exit=1; error=none"
     },
     {
-      "name": "runtime-page-has-current-stage-field",
+      "name": "compose-up-no-build",
       "passed": false,
-      "detail": "current-stage marker"
+      "detail": "exit=1; error=none"
     },
     {
-      "name": "runtime-page-has-province-field",
+      "name": "compose-down-after-exit-ok",
       "passed": false,
-      "detail": "province marker"
-    },
-    {
-      "name": "runtime-page-has-route-interest-field",
-      "passed": false,
-      "detail": "route-interest marker"
-    },
-    {
-      "name": "runtime-page-has-biggest-blocker-field",
-      "passed": false,
-      "detail": "biggest-blocker marker"
-    },
-    {
-      "name": "runtime-page-has-readiness-goal-field",
-      "passed": false,
-      "detail": "readiness-goal marker"
-    },
-    {
-      "name": "runtime-page-has-boundary-confirmation",
-      "passed": false,
-      "detail": "boundary marker"
-    },
-    {
-      "name": "runtime-page-has-preview-button",
-      "passed": false,
-      "detail": "preview button"
-    },
-    {
-      "name": "runtime-page-does-not-submit",
-      "passed": false,
-      "detail": "no submit"
+      "detail": "exit=1; error=none"
     }
   ],
   "commandLog": [
@@ -240,11 +145,11 @@
         "down",
         "--remove-orphans"
       ],
-      "status": 0,
+      "status": 1,
       "signal": null,
       "timedOut": false,
       "stdout_tail": "",
-      "stderr_tail": "",
+      "stderr_tail": "failed to connect to the docker API at npipe:////./pipe/dockerDesktopLinuxEngine; check if the path is correct and if the daemon is running: open //./pipe/dockerDesktopLinuxEngine: The system cannot find the file specified.\n",
       "error": null
     },
     {
@@ -257,11 +162,11 @@
         "-d",
         "--no-build"
       ],
-      "status": 0,
+      "status": 1,
       "signal": null,
       "timedOut": false,
       "stdout_tail": "",
-      "stderr_tail": " Network kingsmen-oracle-lite-local_default Creating \n Network kingsmen-oracle-lite-local_default Created \n Container kingsmen-api-local Creating \n Container kingsmen-api-local Created \n Container kingsmen-web-local Creating \n Container kingsmen-web-local Created \n Container kingsmen-api-local Starting \n Container kingsmen-api-local Started \n Container kingsmen-web-local Starting \n Container kingsmen-web-local Started \n",
+      "stderr_tail": "unable to get image 'kingsmen/api:oracle-lite-local': failed to connect to the docker API at npipe:////./pipe/dockerDesktopLinuxEngine; check if the path is correct and if the daemon is running: open //./pipe/dockerDesktopLinuxEngine: The system cannot find the file specified.\n",
       "error": null
     },
     {
@@ -273,11 +178,11 @@
         "down",
         "--remove-orphans"
       ],
-      "status": 0,
+      "status": 1,
       "signal": null,
       "timedOut": false,
       "stdout_tail": "",
-      "stderr_tail": " Container kingsmen-web-local Stopping \n Container kingsmen-web-local Stopped \n Container kingsmen-web-local Removing \n Container kingsmen-web-local Removed \n Container kingsmen-api-local Stopping \n Container kingsmen-api-local Stopped \n Container kingsmen-api-local Removing \n Container kingsmen-api-local Removed \n Network kingsmen-oracle-lite-local_default Removing \n Network kingsmen-oracle-lite-local_default Removed \n",
+      "stderr_tail": "failed to connect to the docker API at npipe:////./pipe/dockerDesktopLinuxEngine; check if the path is correct and if the daemon is running: open //./pipe/dockerDesktopLinuxEngine: The system cannot find the file specified.\n",
       "error": null
     }
   ],
