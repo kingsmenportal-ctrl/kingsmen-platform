@@ -1,0 +1,26 @@
+{
+  "module": "TOOLS-JARVIS-CLAW-06E",
+  "status": "LOCAL_AI_HELPER_QUARANTINED",
+  "decision": "Do not trust kingsmen-ai for Kingsmen reasoning. Jarvis/OpenClaw remain experimental helper tools only.",
+  "reason": "Boundary tests failed even after disabling persona and strengthening the prompt.",
+  "production_authority": false,
+  "allowed_use": [
+    "availability checks",
+    "experimental tests",
+    "safe pasted-text summaries only when manually reviewed"
+  ],
+  "blocked_use": [
+    "architecture decisions",
+    "repo modification",
+    "validator truth",
+    "deployment decisions",
+    "security decisions",
+    "candidate data",
+    "payment data",
+    "secrets",
+    "Oracle deployment",
+    "Supabase service_role",
+    "PayFast actions"
+  ],
+  "next_action": "Return to REALITY-RUNTIME-01 / core Kingsmen proof work."
+}
