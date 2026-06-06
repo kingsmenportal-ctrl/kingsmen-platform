@@ -1,0 +1,31 @@
+﻿{
+  "schema": "kingsmen.control-plane-manifest.v1",
+  "module": "BATCH 26 - Founder Proof Centre Local Web Runtime Reachability Proof",
+  "status": "BUILT_PENDING_VALIDATION",
+  "scope": "local_web_runtime_reachability_only",
+  "productionReady": false,
+  "canClaimProduction": false,
+  "deployedToOracle": false,
+  "startsDocker": true,
+  "touchesSecrets": false,
+  "touchesCandidateData": false,
+  "composeFile": "docker/oracle-lite/docker-compose.local.yml",
+  "pageUrl": "http://127.0.0.1:3000/founder/proof-centre/",
+  "adapterUrl": "http://127.0.0.1:3000/founder/proof-centre/adapter.json",
+  "apiHealthUrl": "http://127.0.0.1:3001/health",
+  "inputs": [
+    "apps/web/public/founder/proof-centre/index.html",
+    "apps/web/src/app/founder/proof-centre/page.tsx",
+    "apps/web/public/founder/proof-centre/adapter.json",
+    "reports/control-plane/founder-proof-centre-page-wiring-proof.json",
+    "reports/validation/founder-proof-centre-page-wiring-latest.json",
+    "docker/oracle-lite/docker-compose.local.yml"
+  ],
+  "outputs": [
+    "reports/control-plane/founder-proof-centre-runtime-reachability-proof.json",
+    "reports/control-plane/founder-proof-centre-runtime-page-capture.html",
+    "reports/control-plane/founder-proof-centre-runtime-adapter-capture.json",
+    "reports/validation/founder-proof-centre-runtime-reachability-latest.json"
+  ],
+  "nextAction": "Run BATCH 26 proof and validator."
+}

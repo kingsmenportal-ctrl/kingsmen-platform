@@ -1,0 +1,361 @@
+{
+  "schema": "kingsmen.founder-proof-centre-runtime-reachability-proof.v1",
+  "module": "BATCH 26 - Founder Proof Centre Local Web Runtime Reachability Proof",
+  "status": "FOUNDER_PROOF_CENTRE_RUNTIME_REACHABILITY_FAILED",
+  "passed": false,
+  "productionReady": false,
+  "canClaimProduction": false,
+  "deployedToOracle": false,
+  "generated_at": "2026-06-06T17:16:58.176Z",
+  "runtimeScope": "local_web_runtime_reachability_only",
+  "composeFile": "docker/oracle-lite/docker-compose.local.yml",
+  "webBuildSucceeded": true,
+  "apiHealthUrl": "http://127.0.0.1:3001/health",
+  "pageUrl": "http://127.0.0.1:3000/founder/proof-centre/",
+  "adapterUrl": "http://127.0.0.1:3000/founder/proof-centre/adapter.json",
+  "apiHealthStatus": 200,
+  "pageStatus": 200,
+  "adapterStatus": 200,
+  "composeUpSucceeded": true,
+  "composeDownSucceeded": true,
+  "portsReleasedAfterDown": true,
+  "pageCapture": "reports/control-plane/founder-proof-centre-runtime-page-capture.html",
+  "adapterCapture": "reports/control-plane/founder-proof-centre-runtime-adapter-capture.json",
+  "checks": [
+    {
+      "name": "required-file:apps/web/public/founder/proof-centre/index.html",
+      "passed": true,
+      "detail": "apps/web/public/founder/proof-centre/index.html"
+    },
+    {
+      "name": "required-file:apps/web/src/app/founder/proof-centre/page.tsx",
+      "passed": true,
+      "detail": "apps/web/src/app/founder/proof-centre/page.tsx"
+    },
+    {
+      "name": "required-file:apps/web/public/founder/proof-centre/adapter.json",
+      "passed": true,
+      "detail": "apps/web/public/founder/proof-centre/adapter.json"
+    },
+    {
+      "name": "required-file:reports/control-plane/founder-proof-centre-page-wiring-proof.json",
+      "passed": true,
+      "detail": "reports/control-plane/founder-proof-centre-page-wiring-proof.json"
+    },
+    {
+      "name": "required-file:reports/validation/founder-proof-centre-page-wiring-latest.json",
+      "passed": true,
+      "detail": "reports/validation/founder-proof-centre-page-wiring-latest.json"
+    },
+    {
+      "name": "required-file:docker/oracle-lite/docker-compose.local.yml",
+      "passed": true,
+      "detail": "docker/oracle-lite/docker-compose.local.yml"
+    },
+    {
+      "name": "batch25-proof-proven",
+      "passed": true,
+      "detail": "FOUNDER_PROOF_CENTRE_PAGE_WIRING_PROVEN"
+    },
+    {
+      "name": "batch25-validation-passed",
+      "passed": true,
+      "detail": "VALIDATED"
+    },
+    {
+      "name": "batch25-no-production-claim",
+      "passed": true,
+      "detail": "BATCH 25 production false"
+    },
+    {
+      "name": "batch25-no-oracle-claim",
+      "passed": true,
+      "detail": "BATCH 25 oracle false"
+    },
+    {
+      "name": "docker-info",
+      "passed": false,
+      "detail": ""
+    },
+    {
+      "name": "clean-down-before",
+      "passed": true,
+      "detail": "exit=0; "
+    },
+    {
+      "name": "port-3000-free-before",
+      "passed": true,
+      "detail": "3000 free before up"
+    },
+    {
+      "name": "port-3001-free-before",
+      "passed": true,
+      "detail": "3001 free before up"
+    },
+    {
+      "name": "web-image-build",
+      "passed": true,
+      "detail": "exit=0; Image kingsmen/api:oracle-lite-local Building \n Image kingsmen/web:oracle-lite-local Building \n Image kingsmen/web:oracle-lite-local Built"
+    },
+    {
+      "name": "compose-up",
+      "passed": true,
+      "detail": "exit=0; Network kingsmen-oracle-lite-local_default Creating \n Network kingsmen-oracle-lite-local_default Created \n Container kingsmen-api-local Creating \n Container kingsmen-api-local Created \n Container kingsmen-web-local Creating \n Container kingsmen-web-local Created \n Container kingsmen-api-local Starting \n Container kingsmen-api-local Started \n Container kingsmen-web-local Starting \n Container kingsmen-web-local Started"
+    },
+    {
+      "name": "compose-ps-services",
+      "passed": true,
+      "detail": "NAME                 IMAGE                            COMMAND                  SERVICE        CREATED          STATUS         PORTS\nkingsmen-api-local   kingsmen/api:oracle-lite-local   \"docker-entrypoint.s…\"   kingsmen-api   16 seconds ago   Up 8 seconds   127.0.0.1:3001->3001/tcp\nkingsmen-web-local   kingsmen/web:oracle-lite-local   \"docker-entrypoint.s…\"   kingsmen-web   12 seconds ago   Up 3 seconds   127.0.0.1:3000->3000/tcp\n"
+    },
+    {
+      "name": "api-health-200",
+      "passed": true,
+      "detail": "status=200"
+    },
+    {
+      "name": "api-health-not-production",
+      "passed": true,
+      "detail": "{\"ok\":true,\"module\":\"BATCH 17 - Backend Runtime Integration Shell / Local API Service Boundary\",\"productionReady\":false,\"canClaimProduction\":false,\"deployedToOracle\":false,\"oracleLiteImpact\":\"none_runtime_yet\",\"endpoints\":{\"health\":\"/health\",\"intake\":\"/api/public/free-destiny-map/intake/local\"}}"
+    },
+    {
+      "name": "api-health-not-oracle",
+      "passed": true,
+      "detail": "{\"ok\":true,\"module\":\"BATCH 17 - Backend Runtime Integration Shell / Local API Service Boundary\",\"productionReady\":false,\"canClaimProduction\":false,\"deployedToOracle\":false,\"oracleLiteImpact\":\"none_runtime_yet\",\"endpoints\":{\"health\":\"/health\",\"intake\":\"/api/public/free-destiny-map/intake/local\"}}"
+    },
+    {
+      "name": "founder-page-http-200",
+      "passed": true,
+      "detail": "status=200"
+    },
+    {
+      "name": "founder-page-has-founder-title",
+      "passed": true,
+      "detail": "founder title"
+    },
+    {
+      "name": "founder-page-has-build-proof-centre",
+      "passed": true,
+      "detail": "Build Proof Centre text"
+    },
+    {
+      "name": "founder-page-has-local-warning",
+      "passed": true,
+      "detail": "local warning"
+    },
+    {
+      "name": "founder-page-has-proven-badge",
+      "passed": true,
+      "detail": "PROVEN badge"
+    },
+    {
+      "name": "founder-page-has-no-production-language",
+      "passed": true,
+      "detail": "no production claim language"
+    },
+    {
+      "name": "public-adapter-http-200",
+      "passed": true,
+      "detail": "status=200"
+    },
+    {
+      "name": "public-adapter-schema",
+      "passed": true,
+      "detail": "kingsmen.founder-proof-centre-page.v1"
+    },
+    {
+      "name": "public-adapter-route-hint",
+      "passed": true,
+      "detail": "/founder/proof-centre/"
+    },
+    {
+      "name": "public-adapter-all-cards-passed",
+      "passed": true,
+      "detail": "true"
+    },
+    {
+      "name": "public-adapter-no-production",
+      "passed": true,
+      "detail": "production false"
+    },
+    {
+      "name": "public-adapter-no-oracle",
+      "passed": true,
+      "detail": "oracle false"
+    },
+    {
+      "name": "compose-down-after",
+      "passed": true,
+      "detail": "exit=0; Container kingsmen-web-local Stopping \n Container kingsmen-web-local Stopped \n Container kingsmen-web-local Removing \n Container kingsmen-web-local Removed \n Container kingsmen-api-local Stopping \n Container kingsmen-api-local Stopped \n Container kingsmen-api-local Removing \n Container kingsmen-api-local Removed \n Network kingsmen-oracle-lite-local_default Removing \n Network kingsmen-oracle-lite-local_default Removed"
+    },
+    {
+      "name": "ports-released-after-down",
+      "passed": true,
+      "detail": "3000=true; 3001=true"
+    },
+    {
+      "name": "no-production-claim",
+      "passed": true,
+      "detail": "Report hard-codes productionReady=false and canClaimProduction=false."
+    },
+    {
+      "name": "no-oracle-claim",
+      "passed": true,
+      "detail": "Report hard-codes deployedToOracle=false."
+    }
+  ],
+  "failed": [
+    {
+      "name": "docker-info",
+      "passed": false,
+      "detail": ""
+    }
+  ],
+  "stdout_tail": [
+    "#2 transferring dockerfile: 1.09kB 0.9s done",
+    "#2 DONE 2.2s",
+    "#3 [internal] load metadata for docker.io/library/node:22-alpine",
+    "#3 DONE 0.0s",
+    "#4 [internal] load .dockerignore",
+    "#4 transferring context:",
+    "#4 transferring context: 304B 0.1s done",
+    "#4 DONE 0.7s",
+    "#5 [deps 1/4] FROM docker.io/library/node:22-alpine",
+    "#5 DONE 0.0s",
+    "#6 [internal] load build context",
+    "#6 transferring context: 34.91kB 2.4s done",
+    "#6 DONE 3.7s",
+    "#7 [builder 2/6] WORKDIR /repo",
+    "#7 CACHED",
+    "#8 [deps 2/4] WORKDIR /repo/apps/web",
+    "#8 CACHED",
+    "#9 [deps 3/4] COPY apps/web/package.json apps/web/package-lock.json ./",
+    "#9 CACHED",
+    "#10 [deps 4/4] RUN npm ci --no-audit --no-fund",
+    "#10 CACHED",
+    "#11 [builder 3/6] COPY --from=deps /repo/apps/web/node_modules apps/web/node_modules",
+    "#11 CACHED",
+    "#12 [builder 4/6] COPY apps/web apps/web",
+    "#12 DONE 3.2s",
+    "#13 [builder 5/6] COPY packages packages",
+    "#13 DONE 3.5s",
+    "#14 [builder 6/6] RUN cd apps/web && npm run build",
+    "#14 10.24 ",
+    "#14 10.24 > @kingsmen/web@0.0.0 build",
+    "#14 10.24 > next build",
+    "#14 10.24 ",
+    "#14 12.11    ▲ Next.js 15.5.19",
+    "#14 12.11    - Experiments (use with caution):",
+    "#14 12.11      ✓ externalDir",
+    "#14 12.11 ",
+    "#14 12.29    Creating an optimized production build ...",
+    "#14 38.62  ✓ Compiled successfully in 20.0s",
+    "#14 38.63    Linting and checking validity of types ...",
+    "#14 46.37    Collecting page data ...",
+    "#14 50.05    Generating static pages (0/38) ...",
+    "#14 51.72    Generating static pages (9/38) ",
+    "#14 51.72    Generating static pages (18/38) ",
+    "#14 52.24    Generating static pages (28/38) ",
+    "#14 52.50  ✓ Generating static pages (38/38)",
+    "#14 54.22    Finalizing page optimization ...",
+    "#14 54.22    Collecting build traces ...",
+    "#14 68.70 ",
+    "#14 68.72 Route (app)                                       Size  First Load JS",
+    "#14 68.72 ┌ ○ /_not-found                                  990 B         103 kB",
+    "#14 68.72 ├ ƒ /api/candidate/documents/read-url            203 B         103 kB",
+    "#14 68.72 ├ ƒ /api/candidate/documents/status              203 B         103 kB",
+    "#14 68.72 ├ ƒ /api/candidate/documents/upload-url          203 B         103 kB",
+    "#14 68.72 ├ ƒ /api/candidate/workbench/cao-optimizer       203 B         103 kB",
+    "#14 68.72 ├ ƒ /api/candidate/workbench/choice-optimizer    203 B         103 kB",
+    "#14 68.72 ├ ƒ /api/candidate/workbench/readiness           203 B         103 kB",
+    "#14 68.72 ├ ƒ /api/founder/airtable/health                 203 B         103 kB",
+    "#14 68.72 ├ ƒ /api/founder/airtable/sync/enqueue           203 B         103 kB",
+    "#14 68.72 ├ ƒ /api/founder/alerts/mobile                   203 B         103 kB",
+    "#14 68.72 ├ ƒ /api/founder/backend-readiness               203 B         103 kB",
+    "#14 68.72 ├ ƒ /api/founder/commands/approve                203 B         103 kB",
+    "#14 68.72 ├ ƒ /api/founder/commands/execute                203 B         103 kB",
+    "#14 68.72 ├ ƒ /api/founder/control-plane/health            203 B         103 kB",
+    "#14 68.72 ├ ƒ /api/founder/digest                          203 B         103 kB",
+    "#14 68.72 ├ ƒ /api/founder/documents/review                203 B         103 kB",
+    "#14 68.72 ├ ƒ /api/founder/stop-selling                    203 B         103 kB",
+    "#14 68.72 ├ ƒ /api/health/kingsmen-kernel                  203 B         103 kB",
+    "#14 68.72 ├ ƒ /api/public/free-destiny-map/intake/local    203 B         103 kB",
+    "#14 68.72 ├ ○ /candidate/dashboard                         203 B         103 kB",
+    "#14 68.72 ├ ○ /candidate/documents                         203 B         103 kB",
+    "#14 68.72 ├ ○ /candidate/finance                           203 B         103 kB",
+    "#14 68.72 ├ ○ /candidate/messages                          203 B         103 kB",
+    "#14 68.72 ├ ○ /candidate/mobile                            203 B         103 kB",
+    "#14 68.72 ├ ○ /candidate/outcomes                          203 B         103 kB",
+    "#14 68.72 ├ ○ /candidate/support                           203 B         103 kB",
+    "#14 68.72 ├ ○ /candidate/workbench                         203 B         103 kB",
+    "#14 68.72 ├ ○ /founder/build-proof                         203 B         103 kB",
+    "#14 68.72 ├ ○ /founder/control-plane                       203 B         103 kB",
+    "#14 68.72 ├ ○ /founder/control-plane/commands              203 B         103 kB",
+    "#14 68.72 ├ ○ /founder/control-plane/digest                203 B         103 kB",
+    "#14 68.72 ├ ○ /founder/master-index                        203 B         103 kB",
+    "#14 68.72 ├ ○ /founder/proof-centre                        203 B         103 kB",
+    "#14 68.72 ├ ○ /founder/providers                           203 B         103 kB",
+    "#14 68.72 ├ ○ /founder/providers/airtable                  203 B         103 kB",
+    "#14 68.72 ├ ○ /free-destiny-map                           2.5 kB         105 kB",
+    "#14 68.72 └ ○ /kingsmen                                    203 B         103 kB",
+    "#14 68.72 + First Load JS shared by all                   102 kB",
+    "#14 68.72   ├ chunks/255-98a0bdaa30757bda.js             46.2 kB",
+    "#14 68.72   ├ chunks/4bd1b696-c023c6e3521b1417.js        54.2 kB",
+    "#14 68.72   └ other shared chunks (total)                1.88 kB",
+    "#14 68.72 ",
+    "#14 68.72 ",
+    "#14 68.72 ○  (Static)   prerendered as static content",
+    "#14 68.72 ƒ  (Dynamic)  server-rendered on demand",
+    "#14 68.72 ",
+    "#14 68.79 npm notice",
+    "#14 68.79 npm notice New major version of npm available! 10.9.8 -> 11.16.0",
+    "#14 68.79 npm notice Changelog: https://github.com/npm/cli/releases/tag/v11.16.0",
+    "#14 68.79 npm notice To update run: npm install -g npm@11.16.0",
+    "#14 68.79 npm notice",
+    "#14 DONE 70.3s",
+    "#7 [builder 2/6] WORKDIR /repo",
+    "#7 CACHED",
+    "#15 [runner 3/4] COPY --from=builder /repo/apps/web apps/web",
+    "#15 DONE 18.2s",
+    "#16 [runner 4/4] COPY --from=builder /repo/packages packages",
+    "#16 DONE 3.6s",
+    "#17 exporting to image",
+    "#17 exporting layers",
+    "#17 exporting layers 9.9s done",
+    "#17 writing image sha256:ffa2d4ff50bf6ee4ce1719c198484065d43cd8aef5bf8f87b7464f4d3b55c729",
+    "#17 writing image sha256:ffa2d4ff50bf6ee4ce1719c198484065d43cd8aef5bf8f87b7464f4d3b55c729 0.3s done",
+    "#17 naming to docker.io/kingsmen/web:oracle-lite-local",
+    "#17 naming to docker.io/kingsmen/web:oracle-lite-local 0.5s done",
+    "#17 DONE 12.4s",
+    "#18 resolving provenance for metadata file",
+    "#18 DONE 2.3s",
+    "NAME                 IMAGE                            COMMAND                  SERVICE        CREATED          STATUS         PORTS",
+    "kingsmen-api-local   kingsmen/api:oracle-lite-local   \"docker-entrypoint.s…\"   kingsmen-api   16 seconds ago   Up 8 seconds   127.0.0.1:3001->3001/tcp",
+    "kingsmen-web-local   kingsmen/web:oracle-lite-local   \"docker-entrypoint.s…\"   kingsmen-web   12 seconds ago   Up 3 seconds   127.0.0.1:3000->3000/tcp"
+  ],
+  "stderr_tail": [
+    " Image kingsmen/api:oracle-lite-local Building ",
+    " Image kingsmen/web:oracle-lite-local Building ",
+    " Image kingsmen/web:oracle-lite-local Built ",
+    " Network kingsmen-oracle-lite-local_default Creating ",
+    " Network kingsmen-oracle-lite-local_default Created ",
+    " Container kingsmen-api-local Creating ",
+    " Container kingsmen-api-local Created ",
+    " Container kingsmen-web-local Creating ",
+    " Container kingsmen-web-local Created ",
+    " Container kingsmen-api-local Starting ",
+    " Container kingsmen-api-local Started ",
+    " Container kingsmen-web-local Starting ",
+    " Container kingsmen-web-local Started ",
+    " Container kingsmen-web-local Stopping ",
+    " Container kingsmen-web-local Stopped ",
+    " Container kingsmen-web-local Removing ",
+    " Container kingsmen-web-local Removed ",
+    " Container kingsmen-api-local Stopping ",
+    " Container kingsmen-api-local Stopped ",
+    " Container kingsmen-api-local Removing ",
+    " Container kingsmen-api-local Removed ",
+    " Network kingsmen-oracle-lite-local_default Removing ",
+    " Network kingsmen-oracle-lite-local_default Removed "
+  ],
+  "next_action": "Repair BATCH 26 reachability proof before moving forward."
+}
