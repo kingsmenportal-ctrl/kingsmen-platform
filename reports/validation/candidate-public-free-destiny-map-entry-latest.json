@@ -1,0 +1,29 @@
+{
+  "schema": "kingsmen.validation-report.v1",
+  "module": "BATCH 32 - Candidate Public Entry to Free Destiny Map",
+  "status": "VALIDATED",
+  "passed": true,
+  "generated_at": "2026-06-06T18:44:18.560Z",
+  "files_expected": [
+    "docs/candidate/candidate-public-free-destiny-map-entry.md",
+    "manifests/candidate/candidate-public-free-destiny-map-entry.json",
+    "packages/contracts/src/candidate-public-free-destiny-map-entry.ts",
+    "scripts/proof/prove-candidate-public-free-destiny-map-entry.mjs",
+    "scripts/validators/validate-candidate-public-free-destiny-map-entry.mjs",
+    "apps/web/src/app/kingsmen/page.tsx",
+    "apps/web/src/app/free-destiny-map/page.tsx",
+    "reports/candidate/candidate-public-free-destiny-map-entry-proof.json"
+  ],
+  "files_checked": 8,
+  "missing_files": [],
+  "failed_checks": [],
+  "warnings": [],
+  "oracle_lite_impact": "none_local_candidate_ui_link_only",
+  "candidate_impact": "Public Kingsmen page now links candidates to the Free Destiny Map entry route.",
+  "source_page": "apps/web/src/app/kingsmen/page.tsx",
+  "source_route": "/kingsmen",
+  "target_page": "apps/web/src/app/free-destiny-map/page.tsx",
+  "target_route": "/free-destiny-map/",
+  "proof": "reports/candidate/candidate-public-free-destiny-map-entry-proof.json",
+  "next_action": "Commit BATCH 32, then move to real Free Destiny Map intake capture proof."
+}

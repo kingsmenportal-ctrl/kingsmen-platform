@@ -1,0 +1,23 @@
+﻿{
+  "schema": "kingsmen.candidate-manifest.v1",
+  "module": "BATCH 32 - Candidate Public Entry to Free Destiny Map",
+  "status": "BUILT_PENDING_VALIDATION",
+  "scope": "candidate_public_entry_link_only",
+  "productionReady": false,
+  "canClaimProduction": false,
+  "deployedToOracle": false,
+  "startsDocker": false,
+  "touchesSecrets": false,
+  "touchesCandidateData": false,
+  "touchesPayments": false,
+  "touchesMessaging": false,
+  "sourcePage": "apps/web/src/app/kingsmen/page.tsx",
+  "sourceRoute": "/kingsmen",
+  "targetPage": "apps/web/src/app/free-destiny-map/page.tsx",
+  "targetRoute": "/free-destiny-map/",
+  "outputs": [
+    "reports/candidate/candidate-public-free-destiny-map-entry-proof.json",
+    "reports/validation/candidate-public-free-destiny-map-entry-latest.json"
+  ],
+  "nextAction": "Run BATCH 32 proof and validator."
+}

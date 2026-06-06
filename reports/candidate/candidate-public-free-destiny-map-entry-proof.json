@@ -1,0 +1,143 @@
+{
+  "schema": "kingsmen.candidate-public-free-destiny-map-entry-proof.v1",
+  "module": "BATCH 32 - Candidate Public Entry to Free Destiny Map",
+  "status": "CANDIDATE_PUBLIC_FREE_DESTINY_MAP_ENTRY_PROVEN",
+  "passed": true,
+  "productionReady": false,
+  "canClaimProduction": false,
+  "deployedToOracle": false,
+  "startsDocker": false,
+  "touchesSecrets": false,
+  "touchesCandidateData": false,
+  "touchesPayments": false,
+  "touchesMessaging": false,
+  "generated_at": "2026-06-06T18:44:18.433Z",
+  "sourcePage": "apps/web/src/app/kingsmen/page.tsx",
+  "sourceRoute": "/kingsmen",
+  "targetPage": "apps/web/src/app/free-destiny-map/page.tsx",
+  "targetRoute": "/free-destiny-map/",
+  "checks": [
+    {
+      "name": "required-file:apps/web/src/app/kingsmen/page.tsx",
+      "passed": true,
+      "detail": "apps/web/src/app/kingsmen/page.tsx"
+    },
+    {
+      "name": "required-file:apps/web/src/app/free-destiny-map/page.tsx",
+      "passed": true,
+      "detail": "apps/web/src/app/free-destiny-map/page.tsx"
+    },
+    {
+      "name": "source-page-has-entry-marker",
+      "passed": true,
+      "detail": "entry marker"
+    },
+    {
+      "name": "source-page-links-to-free-destiny-map",
+      "passed": true,
+      "detail": "/free-destiny-map/"
+    },
+    {
+      "name": "source-page-has-candidate-label",
+      "passed": true,
+      "detail": "candidate CTA label"
+    },
+    {
+      "name": "target-page-exists",
+      "passed": true,
+      "detail": "apps/web/src/app/free-destiny-map/page.tsx"
+    },
+    {
+      "name": "target-page-is-free-destiny-map",
+      "passed": true,
+      "detail": "target page must identify Free Destiny Map"
+    },
+    {
+      "name": "candidate-entry-not-founder-only",
+      "passed": true,
+      "detail": "candidate entry must not depend on founder proof centre"
+    },
+    {
+      "name": "no-production-ready-claim",
+      "passed": true,
+      "detail": "no production claim"
+    },
+    {
+      "name": "no-oracle-deployed-claim",
+      "passed": true,
+      "detail": "no Oracle claim"
+    },
+    {
+      "name": "source-no-forbidden:service_role",
+      "passed": true,
+      "detail": "service_role"
+    },
+    {
+      "name": "target-no-forbidden:service_role",
+      "passed": true,
+      "detail": "service_role"
+    },
+    {
+      "name": "source-no-forbidden:PAYFAST_PASSPHRASE",
+      "passed": true,
+      "detail": "PAYFAST_PASSPHRASE"
+    },
+    {
+      "name": "target-no-forbidden:PAYFAST_PASSPHRASE",
+      "passed": true,
+      "detail": "PAYFAST_PASSPHRASE"
+    },
+    {
+      "name": "source-no-forbidden:PRIVATE KEY",
+      "passed": true,
+      "detail": "PRIVATE KEY"
+    },
+    {
+      "name": "target-no-forbidden:PRIVATE KEY",
+      "passed": true,
+      "detail": "PRIVATE KEY"
+    },
+    {
+      "name": "source-no-forbidden:.env",
+      "passed": true,
+      "detail": ".env"
+    },
+    {
+      "name": "target-no-forbidden:.env",
+      "passed": true,
+      "detail": ".env"
+    },
+    {
+      "name": "source-no-forbidden:.oci",
+      "passed": true,
+      "detail": ".oci"
+    },
+    {
+      "name": "target-no-forbidden:.oci",
+      "passed": true,
+      "detail": ".oci"
+    },
+    {
+      "name": "source-no-forbidden:.ssh",
+      "passed": true,
+      "detail": ".ssh"
+    },
+    {
+      "name": "target-no-forbidden:.ssh",
+      "passed": true,
+      "detail": ".ssh"
+    },
+    {
+      "name": "source-no-forbidden:WHATSAPP_TOKEN",
+      "passed": true,
+      "detail": "WHATSAPP_TOKEN"
+    },
+    {
+      "name": "target-no-forbidden:WHATSAPP_TOKEN",
+      "passed": true,
+      "detail": "WHATSAPP_TOKEN"
+    }
+  ],
+  "failed": [],
+  "next_action": "Run validator and commit BATCH 32."
+}
