@@ -1,0 +1,24 @@
+{
+  "schema": "kingsmen.validation-report.v1",
+  "module": "BATCH 22 - Docker Oracle Lite Runtime Health Hardening",
+  "status": "VALIDATED",
+  "passed": true,
+  "generated_at": "2026-06-06T16:03:05.504Z",
+  "files_expected": [
+    "docs/runtime/docker-oracle-lite-runtime-health-hardening.md",
+    "manifests/runtime/docker-oracle-lite-runtime-health-hardening.json",
+    "packages/contracts/src/docker-oracle-lite-runtime-health.ts",
+    "scripts/runtime/Invoke-DockerOracleLiteRuntimeHealthHardening.ps1",
+    "scripts/proof/prove-docker-oracle-lite-runtime-health-hardening.mjs",
+    "scripts/validators/validate-docker-oracle-lite-runtime-health-hardening.mjs",
+    "reports/runtime/docker-oracle-lite-runtime-health-hardening-proof.json"
+  ],
+  "files_checked": 7,
+  "missing_files": [],
+  "failed_checks": [],
+  "warnings": [],
+  "oracle_lite_impact": "local_runtime_health_hardened_without_expanding_services",
+  "control_plane_impact": "Build Proof Centre can show repeated local runtime health proof.",
+  "runtime_proof": "reports/runtime/docker-oracle-lite-runtime-health-hardening-proof.json",
+  "next_action": "Commit BATCH 22."
+}

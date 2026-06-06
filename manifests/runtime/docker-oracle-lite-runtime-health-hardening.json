@@ -1,0 +1,14 @@
+{
+  "schema": "kingsmen.runtime-health-hardening-manifest.v1",
+  "module": "BATCH 22 - Docker Oracle Lite Runtime Health Hardening",
+  "depends_on": ["BATCH 21 - Controlled Docker Local Runtime Proof"],
+  "scope": "controlled_local_docker_runtime_health_only",
+  "production_ready": false,
+  "can_claim_production": false,
+  "deployed_to_oracle": false,
+  "expected_cycles": 2,
+  "required_services": ["kingsmen-api", "kingsmen-web"],
+  "required_ports": [3000, 3001],
+  "proof_report": "reports/runtime/docker-oracle-lite-runtime-health-hardening-proof.json",
+  "validation_report": "reports/validation/docker-oracle-lite-runtime-health-hardening-latest.json"
+}
