@@ -2,12 +2,29 @@ param(
   [Parameter(Mandatory=$true)]
   [string]$Prompt,
 
-  [int]$TimeoutSeconds = 120,
-  [int]$MaxTokens = 250,
+  [int]$TimeoutSeconds = 180,
+  [int]$MaxTokens = 180,
   [string]$Model = "qwen2.5:0.5b"
 )
 
 $ErrorActionPreference = "Continue"
+
+function Quote-Arg {
+  param([string]$Arg)
+
+  if ($null -eq $Arg) {
+    return '""'
+  }
+
+  $s = [string]$Arg
+
+  if ($s.Length -eq 0) {
+    return '""'
+  }
+
+  $s = $s -replace '"', '\"'
+  return '"' + $s + '"'
+}
 
 $boundary = @"
 You are Kingsmen local helper.
@@ -40,24 +57,75 @@ When blocked, say exactly:
 Blocked by Kingsmen boundary. Founder approval and validator proof required.
 "@
 
-$task = "$boundary`n`nFounder task:`n$Prompt"
+$task = "$boundary`r`n`r`nFounder task:`r`n$Prompt"
 
-$job = Start-Job -ScriptBlock {
-  param($task, $model, $maxTokens)
+$jarvisCmd = Get-Command jarvis -ErrorAction SilentlyContinue
 
-  jarvis ask --no-stream --no-context --agent= --engine ollama --model $model --max-tokens $maxTokens $task
-} -ArgumentList $task, $Model, $MaxTokens
+if ($null -eq $jarvisCmd) {
+  Write-Host "ERROR: jarvis command not found." -ForegroundColor Red
+  exit 127
+}
 
-$done = Wait-Job $job -Timeout $TimeoutSeconds
+$jarvisPath = $jarvisCmd.Source
+if ([string]::IsNullOrWhiteSpace($jarvisPath)) {
+  $jarvisPath = $jarvisCmd.Path
+}
 
-if ($null -eq $done) {
-  Stop-Job $job -ErrorAction SilentlyContinue
-  Remove-Job $job -Force -ErrorAction SilentlyContinue
+$argsList = @(
+  "ask",
+  "--no-stream",
+  "--no-context",
+  "--agent=",
+  "--engine",
+  "ollama",
+  "--model",
+  $Model,
+  "--max-tokens",
+  [string]$MaxTokens,
+  $task
+)
+
+$psi = New-Object System.Diagnostics.ProcessStartInfo
+$psi.FileName = $jarvisPath
+$psi.Arguments = (($argsList | ForEach-Object { Quote-Arg ([string]$_) }) -join " ")
+$psi.RedirectStandardOutput = $true
+$psi.RedirectStandardError = $true
+$psi.UseShellExecute = $false
+$psi.CreateNoWindow = $true
+$psi.WorkingDirectory = (Resolve-Path ".").Path
+
+$p = New-Object System.Diagnostics.Process
+$p.StartInfo = $psi
+
+$startedOk = $false
+
+try {
+  $startedOk = $p.Start()
+} catch {
+  Write-Host "ERROR: failed to start Jarvis." -ForegroundColor Red
+  Write-Host $_.Exception.Message
+  exit 1
+}
+
+if (-not $startedOk) {
+  Write-Host "ERROR: Jarvis did not start." -ForegroundColor Red
+  exit 1
+}
+
+$exited = $p.WaitForExit($TimeoutSeconds * 1000)
+
+if (-not $exited) {
+  try { $p.Kill() } catch {}
   Write-Host "TIMEOUT: Kingsmen local helper did not respond inside $TimeoutSeconds seconds." -ForegroundColor Red
   exit 124
 }
 
-$output = Receive-Job $job -ErrorAction SilentlyContinue | Out-String
-Remove-Job $job -Force -ErrorAction SilentlyContinue
+$stdout = $p.StandardOutput.ReadToEnd()
+$stderr = $p.StandardError.ReadToEnd()
 
-Write-Output $output.Trim()
+if (-not [string]::IsNullOrWhiteSpace($stderr)) {
+  Write-Host $stderr.Trim() -ForegroundColor DarkYellow
+}
+
+Write-Output $stdout.Trim()
+exit $p.ExitCode
