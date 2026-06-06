@@ -1,0 +1,11 @@
+{
+    "module":  "TOOLS-JARVIS-CLAW-05",
+    "status":  "KINGSMEN_LOCAL_HELPER_NOT_READY",
+    "generated_at":  "2026-06-05T22:28:14",
+    "proven_route":  "jarvis_direct_safe_mode",
+    "model":  "qwen2.5:0.5b",
+    "passed":  false,
+    "output":  "___                       _                  _     \r\n / _ \\ _ __   ___ _ __     | | __ _ _ ____   _(_)___ \r\n| | | | \u0027_ \\ / _ \\ \u0027_ \\ _  | |/ _` | \u0027__\\ \\ / / / __|\r\n| |_| | |_) |  __/ | | | |_| | (_| | |   \\ V /| \\__ \\\r\n \\___/| .__/ \\___|_| |_|\\___/ \\__,_|_|    \\_/ |_|___/\r\n      |_|                                            \r\n      Personal AI, On Personal Devices\r\n\r\nHello! I\u0027m Qwen, an artificial intelligence language model created by Alibaba Cloud. I can answer questions and provide information on various topics to the best",
+    "production_authority":  false,
+    "decision":  "Use Invoke-KingsmenLocalHelper.ps1 for small safe Kingsmen helper tasks only. It may suggest, summarize, and plan, but must not execute or modify production."
+}
