@@ -1,0 +1,201 @@
+{
+  "schema": "kingsmen.free-destiny-map-intake-capture-proof.v1",
+  "module": "BATCH 33 - Free Destiny Map Intake Capture Proof",
+  "status": "FREE_DESTINY_MAP_INTAKE_CAPTURE_PROVEN",
+  "passed": true,
+  "productionReady": false,
+  "canClaimProduction": false,
+  "deployedToOracle": false,
+  "startsDocker": false,
+  "touchesSecrets": false,
+  "touchesCandidateData": true,
+  "candidateDataScope": "non_sensitive_static_ui_only_no_submit_no_storage",
+  "touchesSensitiveCandidateData": false,
+  "storesCandidateData": false,
+  "sendsCandidateData": false,
+  "touchesContactData": false,
+  "touchesPayments": false,
+  "touchesMessaging": false,
+  "generated_at": "2026-06-06T18:51:58.308Z",
+  "sourceRoute": "/free-destiny-map/",
+  "sourcePage": "apps/web/src/app/free-destiny-map/page.tsx",
+  "checks": [
+    {
+      "name": "required-file:apps/web/src/app/free-destiny-map/page.tsx",
+      "passed": true,
+      "detail": "apps/web/src/app/free-destiny-map/page.tsx"
+    },
+    {
+      "name": "required-file:reports/candidate/candidate-public-free-destiny-map-entry-proof.json",
+      "passed": true,
+      "detail": "reports/candidate/candidate-public-free-destiny-map-entry-proof.json"
+    },
+    {
+      "name": "required-file:reports/validation/candidate-public-free-destiny-map-entry-latest.json",
+      "passed": true,
+      "detail": "reports/validation/candidate-public-free-destiny-map-entry-latest.json"
+    },
+    {
+      "name": "batch32-entry-proof-passed",
+      "passed": true,
+      "detail": "CANDIDATE_PUBLIC_FREE_DESTINY_MAP_ENTRY_PROVEN"
+    },
+    {
+      "name": "batch32-entry-validation-passed",
+      "passed": true,
+      "detail": "VALIDATED"
+    },
+    {
+      "name": "page-identifies-free-destiny-map",
+      "passed": true,
+      "detail": "Free Destiny Map text"
+    },
+    {
+      "name": "page-has-intake-form-marker",
+      "passed": true,
+      "detail": "form marker"
+    },
+    {
+      "name": "page-has-form-tag",
+      "passed": true,
+      "detail": "form tag"
+    },
+    {
+      "name": "page-has-current-stage-field",
+      "passed": true,
+      "detail": "current stage"
+    },
+    {
+      "name": "page-has-province-field",
+      "passed": true,
+      "detail": "province"
+    },
+    {
+      "name": "page-has-route-interest-field",
+      "passed": true,
+      "detail": "route interest"
+    },
+    {
+      "name": "page-has-biggest-blocker-field",
+      "passed": true,
+      "detail": "biggest blocker"
+    },
+    {
+      "name": "page-has-readiness-goal-field",
+      "passed": true,
+      "detail": "readiness goal"
+    },
+    {
+      "name": "page-has-boundary-confirmation",
+      "passed": true,
+      "detail": "boundary confirmation"
+    },
+    {
+      "name": "page-has-preview-button",
+      "passed": true,
+      "detail": "preview path button"
+    },
+    {
+      "name": "button-is-not-submit",
+      "passed": true,
+      "detail": "type button only"
+    },
+    {
+      "name": "form-has-no-action",
+      "passed": true,
+      "detail": "no form action"
+    },
+    {
+      "name": "form-has-no-post-method",
+      "passed": true,
+      "detail": "no form method"
+    },
+    {
+      "name": "page-has-no-field-name-submit-values",
+      "passed": true,
+      "detail": "no HTML name attributes"
+    },
+    {
+      "name": "page-has-no-client-js-handler",
+      "passed": true,
+      "detail": "no handlers"
+    },
+    {
+      "name": "page-is-static-server-page",
+      "passed": true,
+      "detail": "no client component"
+    },
+    {
+      "name": "page-has-no-backend-fetch",
+      "passed": true,
+      "detail": "no API calls"
+    },
+    {
+      "name": "page-has-no-storage",
+      "passed": true,
+      "detail": "no browser storage"
+    },
+    {
+      "name": "page-has-no-contact-fields",
+      "passed": true,
+      "detail": "no contact or ID fields"
+    },
+    {
+      "name": "no-production-ready-claim",
+      "passed": true,
+      "detail": "no production claim"
+    },
+    {
+      "name": "no-oracle-deployed-claim",
+      "passed": true,
+      "detail": "no Oracle claim"
+    },
+    {
+      "name": "page-no-forbidden:service_role",
+      "passed": true,
+      "detail": "service_role"
+    },
+    {
+      "name": "page-no-forbidden:PAYFAST_PASSPHRASE",
+      "passed": true,
+      "detail": "PAYFAST_PASSPHRASE"
+    },
+    {
+      "name": "page-no-forbidden:PRIVATE KEY",
+      "passed": true,
+      "detail": "PRIVATE KEY"
+    },
+    {
+      "name": "page-no-forbidden:.env",
+      "passed": true,
+      "detail": ".env"
+    },
+    {
+      "name": "page-no-forbidden:.oci",
+      "passed": true,
+      "detail": ".oci"
+    },
+    {
+      "name": "page-no-forbidden:.ssh",
+      "passed": true,
+      "detail": ".ssh"
+    },
+    {
+      "name": "page-no-forbidden:WHATSAPP_TOKEN",
+      "passed": true,
+      "detail": "WHATSAPP_TOKEN"
+    },
+    {
+      "name": "page-no-forbidden:SUPABASE_SERVICE_ROLE",
+      "passed": true,
+      "detail": "SUPABASE_SERVICE_ROLE"
+    },
+    {
+      "name": "page-no-forbidden:PAYFAST_MERCHANT_KEY",
+      "passed": true,
+      "detail": "PAYFAST_MERCHANT_KEY"
+    }
+  ],
+  "failed": [],
+  "next_action": "Run validator and commit BATCH 33."
+}

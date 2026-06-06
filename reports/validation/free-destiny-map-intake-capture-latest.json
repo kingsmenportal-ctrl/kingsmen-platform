@@ -1,0 +1,26 @@
+{
+  "schema": "kingsmen.validation-report.v1",
+  "module": "BATCH 33 - Free Destiny Map Intake Capture Proof",
+  "status": "VALIDATED",
+  "passed": true,
+  "generated_at": "2026-06-06T18:51:58.424Z",
+  "files_expected": [
+    "docs/candidate/free-destiny-map-intake-capture.md",
+    "manifests/candidate/free-destiny-map-intake-capture.json",
+    "packages/contracts/src/free-destiny-map-intake-capture.ts",
+    "scripts/proof/prove-free-destiny-map-intake-capture.mjs",
+    "scripts/validators/validate-free-destiny-map-intake-capture.mjs",
+    "apps/web/src/app/free-destiny-map/page.tsx",
+    "reports/candidate/free-destiny-map-intake-capture-proof.json"
+  ],
+  "files_checked": 7,
+  "missing_files": [],
+  "failed_checks": [],
+  "warnings": [],
+  "oracle_lite_impact": "none_local_candidate_ui_intake_surface_only",
+  "candidate_impact": "Free Destiny Map now has a safe non-sensitive intake capture surface.",
+  "source_page": "apps/web/src/app/free-destiny-map/page.tsx",
+  "source_route": "/free-destiny-map/",
+  "proof": "reports/candidate/free-destiny-map-intake-capture-proof.json",
+  "next_action": "Commit BATCH 33, then move to BATCH 34 - Free Destiny Map intake local runtime reachability proof."
+}

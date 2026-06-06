@@ -1,0 +1,34 @@
+﻿{
+  "schema": "kingsmen.candidate-manifest.v1",
+  "module": "BATCH 33 - Free Destiny Map Intake Capture Proof",
+  "status": "BUILT_PENDING_VALIDATION",
+  "scope": "local_candidate_ui_intake_surface_only",
+  "dependsOn": [
+    "BATCH 32 - Candidate Public Entry to Free Destiny Map"
+  ],
+  "sourceRoute": "/free-destiny-map/",
+  "sourcePage": "apps/web/src/app/free-destiny-map/page.tsx",
+  "productionReady": false,
+  "canClaimProduction": false,
+  "deployedToOracle": false,
+  "startsDocker": false,
+  "touchesSecrets": false,
+  "touchesCandidateData": true,
+  "candidateDataScope": "non_sensitive_static_ui_only_no_submit_no_storage",
+  "touchesSensitiveCandidateData": false,
+  "storesCandidateData": false,
+  "sendsCandidateData": false,
+  "touchesContactData": false,
+  "touchesPayments": false,
+  "touchesMessaging": false,
+  "inputs": [
+    "reports/candidate/candidate-public-free-destiny-map-entry-proof.json",
+    "reports/validation/candidate-public-free-destiny-map-entry-latest.json",
+    "apps/web/src/app/free-destiny-map/page.tsx"
+  ],
+  "outputs": [
+    "reports/candidate/free-destiny-map-intake-capture-proof.json",
+    "reports/validation/free-destiny-map-intake-capture-latest.json"
+  ],
+  "nextAction": "Run BATCH 33 proof and validator."
+}
