@@ -1,0 +1,44 @@
+{
+  "schema": "kingsmen.validation-report.v1",
+  "module": "BATCH 34 - Free Destiny Map Intake Local Runtime Reachability Proof",
+  "status": "FAILED",
+  "passed": false,
+  "generated_at": "2026-06-06T18:59:09.869Z",
+  "files_expected": [
+    "docs/candidate/free-destiny-map-intake-runtime-reachability.md",
+    "manifests/candidate/free-destiny-map-intake-runtime-reachability.json",
+    "packages/contracts/src/free-destiny-map-intake-runtime-reachability.ts",
+    "scripts/proof/prove-free-destiny-map-intake-runtime-reachability.mjs",
+    "scripts/validators/validate-free-destiny-map-intake-runtime-reachability.mjs",
+    "apps/web/src/app/free-destiny-map/page.tsx",
+    "docker/oracle-lite/docker-compose.local.yml",
+    "reports/candidate/free-destiny-map-intake-capture-proof.json",
+    "reports/validation/free-destiny-map-intake-capture-latest.json",
+    "reports/candidate/free-destiny-map-intake-runtime-reachability-proof.json"
+  ],
+  "files_checked": 10,
+  "missing_files": [],
+  "failed_checks": [
+    {
+      "name": "proof-status",
+      "passed": false,
+      "detail": "FREE_DESTINY_MAP_INTAKE_RUNTIME_REACHABILITY_FAILED"
+    },
+    {
+      "name": "proof-passed",
+      "passed": false,
+      "detail": "false"
+    },
+    {
+      "name": "proof-no-failed-checks",
+      "passed": false,
+      "detail": "failed=9"
+    }
+  ],
+  "warnings": [],
+  "oracle_lite_impact": "controlled_local_docker_candidate_route_reachability_only",
+  "candidate_impact": "Free Destiny Map intake page is reachable through the local Oracle Lite web runtime.",
+  "source_route": "/free-destiny-map/",
+  "proof": "reports/candidate/free-destiny-map-intake-runtime-reachability-proof.json",
+  "next_action": "Repair BATCH 34 runtime reachability before moving forward."
+}

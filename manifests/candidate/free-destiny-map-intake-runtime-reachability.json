@@ -1,0 +1,28 @@
+﻿{
+  "schema": "kingsmen.candidate-manifest.v1",
+  "module": "BATCH 34 - Free Destiny Map Intake Local Runtime Reachability Proof",
+  "status": "BUILT_PENDING_VALIDATION",
+  "scope": "controlled_local_docker_candidate_route_reachability_only",
+  "dependsOn": [
+    "BATCH 33 - Free Destiny Map Intake Capture Proof"
+  ],
+  "sourceRoute": "/free-destiny-map/",
+  "sourcePage": "apps/web/src/app/free-destiny-map/page.tsx",
+  "composeFile": "docker/oracle-lite/docker-compose.local.yml",
+  "productionReady": false,
+  "canClaimProduction": false,
+  "deployedToOracle": false,
+  "startsDocker": true,
+  "touchesSecrets": false,
+  "touchesCandidateData": false,
+  "storesCandidateData": false,
+  "sendsCandidateData": false,
+  "touchesContactData": false,
+  "touchesPayments": false,
+  "touchesMessaging": false,
+  "outputs": [
+    "reports/candidate/free-destiny-map-intake-runtime-reachability-proof.json",
+    "reports/validation/free-destiny-map-intake-runtime-reachability-latest.json"
+  ],
+  "nextAction": "Run BATCH 34 proof and validator."
+}

@@ -1,0 +1,285 @@
+{
+  "schema": "kingsmen.free-destiny-map-intake-runtime-reachability-proof.v1",
+  "module": "BATCH 34 - Free Destiny Map Intake Local Runtime Reachability Proof",
+  "status": "FREE_DESTINY_MAP_INTAKE_RUNTIME_REACHABILITY_FAILED",
+  "passed": false,
+  "productionReady": false,
+  "canClaimProduction": false,
+  "deployedToOracle": false,
+  "startsDocker": true,
+  "touchesSecrets": false,
+  "touchesCandidateData": false,
+  "storesCandidateData": false,
+  "sendsCandidateData": false,
+  "touchesContactData": false,
+  "touchesPayments": false,
+  "touchesMessaging": false,
+  "generated_at": "2026-06-06T18:59:09.565Z",
+  "composeFile": "docker/oracle-lite/docker-compose.local.yml",
+  "composeUpSucceeded": true,
+  "composeDownSucceeded": true,
+  "pageStatus": 200,
+  "sourceRoute": "/free-destiny-map/",
+  "sourcePage": "apps/web/src/app/free-destiny-map/page.tsx",
+  "checks": [
+    {
+      "name": "required-file:docker/oracle-lite/docker-compose.local.yml",
+      "passed": true,
+      "detail": "docker/oracle-lite/docker-compose.local.yml"
+    },
+    {
+      "name": "required-file:apps/web/src/app/free-destiny-map/page.tsx",
+      "passed": true,
+      "detail": "apps/web/src/app/free-destiny-map/page.tsx"
+    },
+    {
+      "name": "required-file:reports/candidate/free-destiny-map-intake-capture-proof.json",
+      "passed": true,
+      "detail": "reports/candidate/free-destiny-map-intake-capture-proof.json"
+    },
+    {
+      "name": "required-file:reports/validation/free-destiny-map-intake-capture-latest.json",
+      "passed": true,
+      "detail": "reports/validation/free-destiny-map-intake-capture-latest.json"
+    },
+    {
+      "name": "batch33-proof-passed",
+      "passed": true,
+      "detail": "FREE_DESTINY_MAP_INTAKE_CAPTURE_PROVEN"
+    },
+    {
+      "name": "batch33-validation-passed",
+      "passed": true,
+      "detail": "VALIDATED"
+    },
+    {
+      "name": "source-page-has-intake-marker",
+      "passed": true,
+      "detail": "source intake marker"
+    },
+    {
+      "name": "source-page-no-submit-handler",
+      "passed": true,
+      "detail": "no submit/fetch in source"
+    },
+    {
+      "name": "compose-down-before-exit-ok",
+      "passed": true,
+      "detail": "exit=0; error=none"
+    },
+    {
+      "name": "compose-up-no-build",
+      "passed": true,
+      "detail": "exit=0; error=none"
+    },
+    {
+      "name": "runtime-page-status-200",
+      "passed": true,
+      "detail": "status=200; error=none"
+    },
+    {
+      "name": "runtime-page-identifies-free-destiny-map",
+      "passed": true,
+      "detail": "Free Destiny Map text"
+    },
+    {
+      "name": "runtime-page-has-intake-form-marker",
+      "passed": false,
+      "detail": "rendered intake marker"
+    },
+    {
+      "name": "runtime-page-has-current-stage-field",
+      "passed": false,
+      "detail": "current-stage marker"
+    },
+    {
+      "name": "runtime-page-has-province-field",
+      "passed": false,
+      "detail": "province marker"
+    },
+    {
+      "name": "runtime-page-has-route-interest-field",
+      "passed": false,
+      "detail": "route-interest marker"
+    },
+    {
+      "name": "runtime-page-has-biggest-blocker-field",
+      "passed": false,
+      "detail": "biggest-blocker marker"
+    },
+    {
+      "name": "runtime-page-has-readiness-goal-field",
+      "passed": false,
+      "detail": "readiness-goal marker"
+    },
+    {
+      "name": "runtime-page-has-boundary-confirmation",
+      "passed": false,
+      "detail": "boundary marker"
+    },
+    {
+      "name": "runtime-page-has-preview-button",
+      "passed": false,
+      "detail": "preview button"
+    },
+    {
+      "name": "runtime-page-does-not-submit",
+      "passed": false,
+      "detail": "no submit"
+    },
+    {
+      "name": "runtime-page-no-production-claim",
+      "passed": true,
+      "detail": "no production claim"
+    },
+    {
+      "name": "runtime-page-no-oracle-deployed-claim",
+      "passed": true,
+      "detail": "no Oracle deployment claim"
+    },
+    {
+      "name": "compose-down-after-exit-ok",
+      "passed": true,
+      "detail": "exit=0; error=none"
+    },
+    {
+      "name": "runtime-html-no-forbidden:service_role",
+      "passed": true,
+      "detail": "service_role"
+    },
+    {
+      "name": "runtime-html-no-forbidden:PAYFAST_PASSPHRASE",
+      "passed": true,
+      "detail": "PAYFAST_PASSPHRASE"
+    },
+    {
+      "name": "runtime-html-no-forbidden:PRIVATE KEY",
+      "passed": true,
+      "detail": "PRIVATE KEY"
+    },
+    {
+      "name": "runtime-html-no-forbidden:.env",
+      "passed": true,
+      "detail": ".env"
+    },
+    {
+      "name": "runtime-html-no-forbidden:.oci",
+      "passed": true,
+      "detail": ".oci"
+    },
+    {
+      "name": "runtime-html-no-forbidden:.ssh",
+      "passed": true,
+      "detail": ".ssh"
+    },
+    {
+      "name": "runtime-html-no-forbidden:SUPABASE_SERVICE_ROLE",
+      "passed": true,
+      "detail": "SUPABASE_SERVICE_ROLE"
+    },
+    {
+      "name": "runtime-html-no-forbidden:PAYFAST_MERCHANT_KEY",
+      "passed": true,
+      "detail": "PAYFAST_MERCHANT_KEY"
+    }
+  ],
+  "failed": [
+    {
+      "name": "runtime-page-has-intake-form-marker",
+      "passed": false,
+      "detail": "rendered intake marker"
+    },
+    {
+      "name": "runtime-page-has-current-stage-field",
+      "passed": false,
+      "detail": "current-stage marker"
+    },
+    {
+      "name": "runtime-page-has-province-field",
+      "passed": false,
+      "detail": "province marker"
+    },
+    {
+      "name": "runtime-page-has-route-interest-field",
+      "passed": false,
+      "detail": "route-interest marker"
+    },
+    {
+      "name": "runtime-page-has-biggest-blocker-field",
+      "passed": false,
+      "detail": "biggest-blocker marker"
+    },
+    {
+      "name": "runtime-page-has-readiness-goal-field",
+      "passed": false,
+      "detail": "readiness-goal marker"
+    },
+    {
+      "name": "runtime-page-has-boundary-confirmation",
+      "passed": false,
+      "detail": "boundary marker"
+    },
+    {
+      "name": "runtime-page-has-preview-button",
+      "passed": false,
+      "detail": "preview button"
+    },
+    {
+      "name": "runtime-page-does-not-submit",
+      "passed": false,
+      "detail": "no submit"
+    }
+  ],
+  "commandLog": [
+    {
+      "cmd": "docker",
+      "args": [
+        "compose",
+        "-f",
+        "docker/oracle-lite/docker-compose.local.yml",
+        "down",
+        "--remove-orphans"
+      ],
+      "status": 0,
+      "signal": null,
+      "timedOut": false,
+      "stdout_tail": "",
+      "stderr_tail": "",
+      "error": null
+    },
+    {
+      "cmd": "docker",
+      "args": [
+        "compose",
+        "-f",
+        "docker/oracle-lite/docker-compose.local.yml",
+        "up",
+        "-d",
+        "--no-build"
+      ],
+      "status": 0,
+      "signal": null,
+      "timedOut": false,
+      "stdout_tail": "",
+      "stderr_tail": " Network kingsmen-oracle-lite-local_default Creating \n Network kingsmen-oracle-lite-local_default Created \n Container kingsmen-api-local Creating \n Container kingsmen-api-local Created \n Container kingsmen-web-local Creating \n Container kingsmen-web-local Created \n Container kingsmen-api-local Starting \n Container kingsmen-api-local Started \n Container kingsmen-web-local Starting \n Container kingsmen-web-local Started \n",
+      "error": null
+    },
+    {
+      "cmd": "docker",
+      "args": [
+        "compose",
+        "-f",
+        "docker/oracle-lite/docker-compose.local.yml",
+        "down",
+        "--remove-orphans"
+      ],
+      "status": 0,
+      "signal": null,
+      "timedOut": false,
+      "stdout_tail": "",
+      "stderr_tail": " Container kingsmen-web-local Stopping \n Container kingsmen-web-local Stopped \n Container kingsmen-web-local Removing \n Container kingsmen-web-local Removed \n Container kingsmen-api-local Stopping \n Container kingsmen-api-local Stopped \n Container kingsmen-api-local Removing \n Container kingsmen-api-local Removed \n Network kingsmen-oracle-lite-local_default Removing \n Network kingsmen-oracle-lite-local_default Removed \n",
+      "error": null
+    }
+  ],
+  "next_action": "Repair Free Destiny Map runtime reachability before moving forward."
+}
