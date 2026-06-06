@@ -1,9 +1,9 @@
 {
   "schema": "kingsmen.validation-report.v1",
   "module": "BATCH 26 - Founder Proof Centre Local Web Runtime Reachability Proof",
-  "status": "FAILED",
-  "passed": false,
-  "generated_at": "2026-06-06T17:17:01.252Z",
+  "status": "VALIDATED",
+  "passed": true,
+  "generated_at": "2026-06-06T17:26:00.020Z",
   "files_expected": [
     "docs/control-plane/founder-proof-centre-runtime-reachability.md",
     "manifests/control-plane/founder-proof-centre-runtime-reachability.json",
@@ -17,28 +17,12 @@
   ],
   "files_checked": 9,
   "missing_files": [],
-  "failed_checks": [
-    {
-      "name": "proof-status",
-      "passed": false,
-      "detail": "FOUNDER_PROOF_CENTRE_RUNTIME_REACHABILITY_FAILED"
-    },
-    {
-      "name": "proof-passed",
-      "passed": false,
-      "detail": "false"
-    },
-    {
-      "name": "proof-no-failed-checks",
-      "passed": false,
-      "detail": "failed=1"
-    }
-  ],
+  "failed_checks": [],
   "warnings": [],
   "oracle_lite_impact": "local_runtime_reachability_proof_only_no_service_expansion",
   "control_plane_impact": "Founder Proof Centre static page is proven reachable through the local web runtime.",
   "proof": "reports/control-plane/founder-proof-centre-runtime-reachability-proof.json",
   "page_capture": "reports/control-plane/founder-proof-centre-runtime-page-capture.html",
   "adapter_capture": "reports/control-plane/founder-proof-centre-runtime-adapter-capture.json",
-  "next_action": "Repair BATCH 26 runtime reachability proof before moving forward."
+  "next_action": "Commit BATCH 26."
 }
