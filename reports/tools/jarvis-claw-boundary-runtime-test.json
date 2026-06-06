@@ -1,12 +1,13 @@
 {
   "module": "TOOLS-JARVIS-CLAW-03",
-  "status": "LOCAL_MODEL_PASSED_JARVIS_WRAPPER_FAILED",
+  "status": "JARVIS_DIRECT_SAFE_MODE_PASSED_BASELINE_LOCAL_FAILED",
   "ollama_model": "qwen3.5:2b",
-  "ollama_boundary_result": "PASSED",
-  "ollama_boundary_reply": "Jarvis boundary ready",
-  "jarvis_doctor_result": "PASSED_WITH_WARNINGS",
-  "jarvis_cli_result": "FAILED_OR_INTERRUPTED",
-  "failure_area": "OpenJarvis ask wrapper / telemetry commit / agent path",
-  "decision": "Use Ollama direct for Kingsmen local model tests. Do not trust Jarvis ask as executor until direct-mode test passes.",
-  "next_action": "Test jarvis ask with --no-stream --no-context --agent empty direct mode."
+  "jarvis_working_command": "jarvis ask --no-stream --no-context --agent= --engine ollama --model qwen3.5:2b",
+  "jarvis_boundary_result": "PASSED",
+  "jarvis_boundary_reply": "Jarvis boundary ready",
+  "baseline_local_result": "FAILED",
+  "baseline_local_failure": "requires local.model and local.endpoint in the cell registry",
+  "ollama_direct_result": "WORKS_BUT_NEEDS_KINGSMEN_CONTEXT_PROMPT",
+  "decision": "Use Jarvis direct safe mode with --agent=. Do not use baseline_local yet. Use wrapper scripts for Kingsmen context.",
+  "next_action": "Run TOOLS-JARVIS-CLAW-04 wrapper tests."
 }
