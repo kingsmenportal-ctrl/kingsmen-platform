@@ -1,0 +1,26 @@
+﻿{
+  "schema": "kingsmen.control-plane-manifest.v1",
+  "module": "BATCH 27 - Founder Control Plane Proof Centre Entry Link",
+  "status": "BUILT_PENDING_VALIDATION",
+  "scope": "local_founder_control_plane_link_only",
+  "productionReady": false,
+  "canClaimProduction": false,
+  "deployedToOracle": false,
+  "startsDocker": false,
+  "touchesSecrets": false,
+  "touchesCandidateData": false,
+  "sourcePage": "apps/web/src/app/founder/control-plane/page.tsx",
+  "targetRoute": "/founder/proof-centre/",
+  "targetPage": "apps/web/src/app/founder/proof-centre/page.tsx",
+  "inputs": [
+    "apps/web/src/app/founder/control-plane/page.tsx",
+    "apps/web/src/app/founder/proof-centre/page.tsx",
+    "reports/control-plane/founder-proof-centre-runtime-reachability-proof.json",
+    "reports/validation/founder-proof-centre-runtime-reachability-latest.json"
+  ],
+  "outputs": [
+    "reports/control-plane/founder-proof-centre-entry-link-proof.json",
+    "reports/validation/founder-proof-centre-entry-link-latest.json"
+  ],
+  "nextAction": "Run BATCH 27 proof and validator."
+}

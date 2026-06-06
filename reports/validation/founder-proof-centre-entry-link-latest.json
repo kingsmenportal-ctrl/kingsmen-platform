@@ -1,0 +1,27 @@
+{
+  "schema": "kingsmen.validation-report.v1",
+  "module": "BATCH 27 - Founder Control Plane Proof Centre Entry Link",
+  "status": "VALIDATED",
+  "passed": true,
+  "generated_at": "2026-06-06T17:33:33.301Z",
+  "files_expected": [
+    "docs/control-plane/founder-proof-centre-entry-link.md",
+    "manifests/control-plane/founder-proof-centre-entry-link.json",
+    "packages/contracts/src/founder-proof-centre-entry-link.ts",
+    "scripts/proof/prove-founder-proof-centre-entry-link.mjs",
+    "scripts/validators/validate-founder-proof-centre-entry-link.mjs",
+    "apps/web/src/app/founder/control-plane/page.tsx",
+    "apps/web/src/app/founder/proof-centre/page.tsx",
+    "reports/control-plane/founder-proof-centre-entry-link-proof.json"
+  ],
+  "files_checked": 8,
+  "missing_files": [],
+  "failed_checks": [],
+  "warnings": [],
+  "oracle_lite_impact": "none_local_ui_link_only",
+  "control_plane_impact": "Existing Founder Control Plane page links to the proven Founder Proof Centre route.",
+  "source_page": "apps/web/src/app/founder/control-plane/page.tsx",
+  "target_route": "/founder/proof-centre/",
+  "proof": "reports/control-plane/founder-proof-centre-entry-link-proof.json",
+  "next_action": "Commit BATCH 27."
+}

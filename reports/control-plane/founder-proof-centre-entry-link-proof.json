@@ -1,0 +1,128 @@
+{
+  "schema": "kingsmen.founder-proof-centre-entry-link-proof.v1",
+  "module": "BATCH 27 - Founder Control Plane Proof Centre Entry Link",
+  "status": "FOUNDER_PROOF_CENTRE_ENTRY_LINK_PROVEN",
+  "passed": true,
+  "productionReady": false,
+  "canClaimProduction": false,
+  "deployedToOracle": false,
+  "generated_at": "2026-06-06T17:33:33.172Z",
+  "runtimeScope": "local_founder_control_plane_link_only",
+  "sourcePage": "apps/web/src/app/founder/control-plane/page.tsx",
+  "targetRoute": "/founder/proof-centre/",
+  "targetPage": "apps/web/src/app/founder/proof-centre/page.tsx",
+  "checks": [
+    {
+      "name": "required-file:apps/web/src/app/founder/control-plane/page.tsx",
+      "passed": true,
+      "detail": "apps/web/src/app/founder/control-plane/page.tsx"
+    },
+    {
+      "name": "required-file:apps/web/src/app/founder/proof-centre/page.tsx",
+      "passed": true,
+      "detail": "apps/web/src/app/founder/proof-centre/page.tsx"
+    },
+    {
+      "name": "required-file:reports/control-plane/founder-proof-centre-runtime-reachability-proof.json",
+      "passed": true,
+      "detail": "reports/control-plane/founder-proof-centre-runtime-reachability-proof.json"
+    },
+    {
+      "name": "required-file:reports/validation/founder-proof-centre-runtime-reachability-latest.json",
+      "passed": true,
+      "detail": "reports/validation/founder-proof-centre-runtime-reachability-latest.json"
+    },
+    {
+      "name": "batch26b-runtime-reachable",
+      "passed": true,
+      "detail": "FOUNDER_PROOF_CENTRE_RUNTIME_REACHABLE_LOCAL"
+    },
+    {
+      "name": "batch26b-validation-passed",
+      "passed": true,
+      "detail": "VALIDATED"
+    },
+    {
+      "name": "batch26b-no-production-claim",
+      "passed": true,
+      "detail": "BATCH 26B production false"
+    },
+    {
+      "name": "batch26b-no-oracle-claim",
+      "passed": true,
+      "detail": "BATCH 26B oracle false"
+    },
+    {
+      "name": "entry-link-present",
+      "passed": true,
+      "detail": "data marker"
+    },
+    {
+      "name": "entry-link-target-route",
+      "passed": true,
+      "detail": "/founder/proof-centre/"
+    },
+    {
+      "name": "entry-link-label",
+      "passed": true,
+      "detail": "label"
+    },
+    {
+      "name": "target-page-exists",
+      "passed": true,
+      "detail": "apps/web/src/app/founder/proof-centre/page.tsx"
+    },
+    {
+      "name": "target-page-has-founder-control-plane",
+      "passed": true,
+      "detail": "target title"
+    },
+    {
+      "name": "target-page-has-build-proof-centre",
+      "passed": true,
+      "detail": "target proof centre text"
+    },
+    {
+      "name": "entry-link-no-production-claim",
+      "passed": true,
+      "detail": "no production claim"
+    },
+    {
+      "name": "entry-link-no-oracle-claim",
+      "passed": true,
+      "detail": "no Oracle claim"
+    },
+    {
+      "name": "source-no-forbidden:service_role",
+      "passed": true,
+      "detail": "service_role"
+    },
+    {
+      "name": "source-no-forbidden:PAYFAST_PASSPHRASE",
+      "passed": true,
+      "detail": "PAYFAST_PASSPHRASE"
+    },
+    {
+      "name": "source-no-forbidden:PRIVATE KEY",
+      "passed": true,
+      "detail": "PRIVATE KEY"
+    },
+    {
+      "name": "source-no-forbidden:.env",
+      "passed": true,
+      "detail": ".env"
+    },
+    {
+      "name": "source-no-forbidden:.oci",
+      "passed": true,
+      "detail": ".oci"
+    },
+    {
+      "name": "source-no-forbidden:.ssh",
+      "passed": true,
+      "detail": ".ssh"
+    }
+  ],
+  "failed": [],
+  "next_action": "Run validator and commit BATCH 27."
+}

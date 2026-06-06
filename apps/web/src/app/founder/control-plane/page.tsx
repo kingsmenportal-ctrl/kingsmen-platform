@@ -23,6 +23,27 @@ export default function FounderControlPlanePage() {
         <h2>Truth boundary</h2>
         <p>Founder actions that change candidate truth require proof, evidence, and audit records.</p>
       </section>
+    
+        <a
+          data-kingsmen-proof-centre-entry="true"
+          href="/founder/proof-centre/"
+          style={{
+            display: "inline-flex",
+            alignItems: "center",
+            justifyContent: "center",
+            marginTop: "18px",
+            padding: "12px 16px",
+            borderRadius: "999px",
+            border: "1px solid rgba(214, 178, 94, 0.55)",
+            background: "rgba(214, 178, 94, 0.12)",
+            color: "#f8d77a",
+            fontWeight: 900,
+            textDecoration: "none"
+          }}
+        >
+          Open Build Proof Centre
+        </a>
+
     </main>
   );
 }
