@@ -1,0 +1,26 @@
+﻿{
+  "schema": "kingsmen.control-plane-manifest.v1",
+  "module": "BATCH 25 - Smallest Founder Control Plane Page Wiring",
+  "status": "BUILT_PENDING_VALIDATION",
+  "scope": "local_static_founder_page_wiring_only",
+  "productionReady": false,
+  "canClaimProduction": false,
+  "deployedToOracle": false,
+  "startsDocker": false,
+  "touchesSecrets": false,
+  "touchesCandidateData": false,
+  "webPath": "apps/web/public/founder/proof-centre/index.html",
+  "publicAdapterPath": "apps/web/public/founder/proof-centre/adapter.json",
+  "inputs": [
+    "reports/control-plane/build-proof-centre-display-adapter.json",
+    "reports/control-plane/build-proof-centre-display-adapter-proof.json",
+    "reports/validation/control-plane-proof-display-adapter-latest.json"
+  ],
+  "outputs": [
+    "apps/web/public/founder/proof-centre/index.html",
+    "apps/web/public/founder/proof-centre/adapter.json",
+    "reports/control-plane/founder-proof-centre-page-wiring-proof.json",
+    "reports/validation/founder-proof-centre-page-wiring-latest.json"
+  ],
+  "nextAction": "Run BATCH 25 proof and validator."
+}

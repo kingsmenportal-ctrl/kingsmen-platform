@@ -1,0 +1,28 @@
+{
+  "schema": "kingsmen.validation-report.v1",
+  "module": "BATCH 25 - Smallest Founder Control Plane Page Wiring",
+  "status": "VALIDATED",
+  "passed": true,
+  "generated_at": "2026-06-06T16:38:20.563Z",
+  "files_expected": [
+    "docs/control-plane/founder-proof-centre-page-wiring.md",
+    "manifests/control-plane/founder-proof-centre-page-wiring.json",
+    "packages/contracts/src/founder-proof-centre-page.ts",
+    "scripts/proof/prove-founder-proof-centre-page-wiring.mjs",
+    "scripts/validators/validate-founder-proof-centre-page-wiring.mjs",
+    "apps/web/public/founder/proof-centre/index.html",
+    "apps/web/public/founder/proof-centre/adapter.json",
+    "reports/control-plane/founder-proof-centre-page-wiring-proof.json"
+  ],
+  "files_checked": 8,
+  "missing_files": [],
+  "failed_checks": [],
+  "warnings": [],
+  "oracle_lite_impact": "none_local_static_web_page_only",
+  "control_plane_impact": "Founder can view BATCH 24 proof cards through a tiny static web page once the local web app is running.",
+  "route_hint": "/founder/proof-centre/",
+  "html": "apps/web/public/founder/proof-centre/index.html",
+  "public_adapter": "apps/web/public/founder/proof-centre/adapter.json",
+  "proof": "reports/control-plane/founder-proof-centre-page-wiring-proof.json",
+  "next_action": "Commit BATCH 25."
+}

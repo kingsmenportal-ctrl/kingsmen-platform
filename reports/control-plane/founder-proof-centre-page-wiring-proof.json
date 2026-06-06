@@ -1,0 +1,138 @@
+{
+  "schema": "kingsmen.founder-proof-centre-page-wiring-proof.v1",
+  "module": "BATCH 25 - Smallest Founder Control Plane Page Wiring",
+  "status": "FOUNDER_PROOF_CENTRE_PAGE_WIRING_PROVEN",
+  "passed": true,
+  "productionReady": false,
+  "canClaimProduction": false,
+  "deployedToOracle": false,
+  "generated_at": "2026-06-06T16:38:20.424Z",
+  "routeHint": "/founder/proof-centre/",
+  "htmlPath": "apps/web/public/founder/proof-centre/index.html",
+  "publicAdapterPath": "apps/web/public/founder/proof-centre/adapter.json",
+  "sourceAdapter": "reports/control-plane/build-proof-centre-display-adapter.json",
+  "checks": [
+    {
+      "name": "input-exists:reports/control-plane/build-proof-centre-display-adapter.json",
+      "passed": true,
+      "detail": "reports/control-plane/build-proof-centre-display-adapter.json"
+    },
+    {
+      "name": "input-exists:reports/control-plane/build-proof-centre-display-adapter-proof.json",
+      "passed": true,
+      "detail": "reports/control-plane/build-proof-centre-display-adapter-proof.json"
+    },
+    {
+      "name": "input-exists:reports/validation/control-plane-proof-display-adapter-latest.json",
+      "passed": true,
+      "detail": "reports/validation/control-plane-proof-display-adapter-latest.json"
+    },
+    {
+      "name": "apps-web-exists",
+      "passed": true,
+      "detail": "apps/web"
+    },
+    {
+      "name": "apps-web-package-exists",
+      "passed": true,
+      "detail": "apps/web/package.json"
+    },
+    {
+      "name": "apps-web-src-exists",
+      "passed": true,
+      "detail": "apps/web/src"
+    },
+    {
+      "name": "uses-public-static-wiring",
+      "passed": true,
+      "detail": "No App Router path is guessed."
+    },
+    {
+      "name": "batch24-adapter-schema",
+      "passed": true,
+      "detail": "kingsmen.control-plane-proof-display-adapter.v1"
+    },
+    {
+      "name": "batch24-proof-proven",
+      "passed": true,
+      "detail": "CONTROL_PLANE_PROOF_DISPLAY_ADAPTER_PROVEN"
+    },
+    {
+      "name": "batch24-validation-passed",
+      "passed": true,
+      "detail": "VALIDATED"
+    },
+    {
+      "name": "batch24-all-cards-passed",
+      "passed": true,
+      "detail": "true"
+    },
+    {
+      "name": "batch24-no-production-claim",
+      "passed": true,
+      "detail": "production false"
+    },
+    {
+      "name": "batch24-no-oracle-claim",
+      "passed": true,
+      "detail": "oracle false"
+    },
+    {
+      "name": "page-source-has-cards",
+      "passed": true,
+      "detail": "cards=2"
+    },
+    {
+      "name": "page-all-cards-passed",
+      "passed": true,
+      "detail": "all cards proven"
+    },
+    {
+      "name": "page-no-production-claim",
+      "passed": true,
+      "detail": "no production claim"
+    },
+    {
+      "name": "page-no-oracle-claim",
+      "passed": true,
+      "detail": "no oracle claim"
+    },
+    {
+      "name": "public-adapter-written",
+      "passed": true,
+      "detail": "apps/web/public/founder/proof-centre/adapter.json"
+    },
+    {
+      "name": "founder-page-written",
+      "passed": true,
+      "detail": "apps/web/public/founder/proof-centre/index.html"
+    },
+    {
+      "name": "founder-page-local-only",
+      "passed": true,
+      "detail": "local_static_founder_page_wiring_only"
+    },
+    {
+      "name": "founder-page-no-production",
+      "passed": true,
+      "detail": "production false"
+    },
+    {
+      "name": "founder-page-no-oracle",
+      "passed": true,
+      "detail": "oracle false"
+    },
+    {
+      "name": "founder-page-no-docker-start",
+      "passed": true,
+      "detail": "This script does not invoke Docker."
+    },
+    {
+      "name": "founder-page-no-secret-access",
+      "passed": true,
+      "detail": "This script reads only BATCH 24 proof outputs."
+    }
+  ],
+  "failed": [],
+  "next_action": "Run validator and commit BATCH 25."
+}
