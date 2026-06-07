@@ -1,0 +1,29 @@
+﻿{
+  "schema": "kingsmen.personal-jobs-manifest.v1",
+  "module": "PERSONAL-JOBS-01 - Local Personal Job Desk",
+  "status": "BUILT_PENDING_VALIDATION",
+  "scope": "local_personal_job_campaign_surface",
+  "route": "/personal-job-desk",
+  "productionReady": false,
+  "canClaimProduction": false,
+  "deployedToOracle": false,
+  "startsDocker": false,
+  "touchesSecrets": false,
+  "touchesPayments": false,
+  "touchesMessaging": false,
+  "storesCandidateDataInGit": false,
+  "localPrivateProfile": "data/personal-job-desk/personal-candidate.local.json",
+  "gitIgnoredPrivateProfile": true,
+  "outputs": [
+    "apps/web/src/app/personal-job-desk/page.tsx",
+    "apps/web/src/app/personal-job-desk/PersonalJobDeskClient.tsx",
+    "docs/personal-jobs/personal-jobs-01-local-job-desk.md",
+    "manifests/personal-jobs/personal-jobs-01-local-job-desk.json",
+    "packages/contracts/src/personal-jobs-01-local-job-desk.ts",
+    "scripts/proof/prove-personal-jobs-01-local-job-desk.mjs",
+    "scripts/validators/validate-personal-jobs-01-local-job-desk.mjs",
+    "reports/personal-jobs/personal-jobs-01-local-job-desk-proof.json",
+    "reports/validation/personal-jobs-01-local-job-desk-latest.json"
+  ],
+  "nextAction": "Run PERSONAL-JOBS-01 proof and validator, then commit tracked files only."
+}

@@ -1,0 +1,28 @@
+{
+  "schema": "kingsmen.validation-report.v1",
+  "module": "PERSONAL-JOBS-01 - Local Personal Job Desk",
+  "status": "VALIDATED",
+  "passed": true,
+  "generated_at": "2026-06-07T20:34:56.416Z",
+  "files_expected": [
+    ".gitignore",
+    "apps/web/src/app/personal-job-desk/page.tsx",
+    "apps/web/src/app/personal-job-desk/PersonalJobDeskClient.tsx",
+    "docs/personal-jobs/personal-jobs-01-local-job-desk.md",
+    "manifests/personal-jobs/personal-jobs-01-local-job-desk.json",
+    "packages/contracts/src/personal-jobs-01-local-job-desk.ts",
+    "scripts/proof/prove-personal-jobs-01-local-job-desk.mjs",
+    "scripts/validators/validate-personal-jobs-01-local-job-desk.mjs",
+    "reports/personal-jobs/personal-jobs-01-local-job-desk-proof.json"
+  ],
+  "files_checked": 9,
+  "missing_files": [],
+  "failed_checks": [],
+  "warnings": [
+    "Local private profile exists for this workstation only and is intentionally not committed."
+  ],
+  "oracle_lite_impact": "none_local_ui_only",
+  "route": "/personal-job-desk",
+  "local_private_profile": "data/personal-job-desk/personal-candidate.local.json",
+  "next_action": "Commit PERSONAL-JOBS-01 tracked files only. Do not add the local private profile."
+}

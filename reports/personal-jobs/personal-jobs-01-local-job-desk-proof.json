@@ -1,0 +1,174 @@
+{
+  "schema": "kingsmen.personal-jobs-01-proof.v1",
+  "module": "PERSONAL-JOBS-01 - Local Personal Job Desk",
+  "status": "PERSONAL_JOBS_01_LOCAL_JOB_DESK_PROVEN",
+  "passed": true,
+  "productionReady": false,
+  "canClaimProduction": false,
+  "deployedToOracle": false,
+  "startsDocker": false,
+  "generated_at": "2026-06-07T20:34:55.228Z",
+  "route": "/personal-job-desk",
+  "localPrivateProfilePath": "data/personal-job-desk/personal-candidate.local.json",
+  "localPrivateProfileIgnoredByGit": true,
+  "committedFilesContainPersonalContact": false,
+  "checks": [
+    {
+      "name": "expected-file:.gitignore",
+      "passed": true,
+      "detail": ".gitignore"
+    },
+    {
+      "name": "expected-file:apps/web/src/app/personal-job-desk/page.tsx",
+      "passed": true,
+      "detail": "apps/web/src/app/personal-job-desk/page.tsx"
+    },
+    {
+      "name": "expected-file:apps/web/src/app/personal-job-desk/PersonalJobDeskClient.tsx",
+      "passed": true,
+      "detail": "apps/web/src/app/personal-job-desk/PersonalJobDeskClient.tsx"
+    },
+    {
+      "name": "expected-file:docs/personal-jobs/personal-jobs-01-local-job-desk.md",
+      "passed": true,
+      "detail": "docs/personal-jobs/personal-jobs-01-local-job-desk.md"
+    },
+    {
+      "name": "expected-file:manifests/personal-jobs/personal-jobs-01-local-job-desk.json",
+      "passed": true,
+      "detail": "manifests/personal-jobs/personal-jobs-01-local-job-desk.json"
+    },
+    {
+      "name": "expected-file:packages/contracts/src/personal-jobs-01-local-job-desk.ts",
+      "passed": true,
+      "detail": "packages/contracts/src/personal-jobs-01-local-job-desk.ts"
+    },
+    {
+      "name": "expected-file:scripts/proof/prove-personal-jobs-01-local-job-desk.mjs",
+      "passed": true,
+      "detail": "scripts/proof/prove-personal-jobs-01-local-job-desk.mjs"
+    },
+    {
+      "name": "expected-file:scripts/validators/validate-personal-jobs-01-local-job-desk.mjs",
+      "passed": true,
+      "detail": "scripts/validators/validate-personal-jobs-01-local-job-desk.mjs"
+    },
+    {
+      "name": "local-private-profile-exists",
+      "passed": true,
+      "detail": "local private profile must exist for founder local use"
+    },
+    {
+      "name": "local-private-profile-valid",
+      "passed": true,
+      "detail": "profile shape and campaign data"
+    },
+    {
+      "name": "local-private-profile-ignored-by-git",
+      "passed": true,
+      "detail": "data/personal-job-desk/personal-candidate.local.json"
+    },
+    {
+      "name": "local-private-profile-not-tracked",
+      "passed": true,
+      "detail": "private profile must not be tracked"
+    },
+    {
+      "name": "page-reads-local-private-profile",
+      "passed": true,
+      "detail": "server page reads ignored local profile"
+    },
+    {
+      "name": "page-force-dynamic",
+      "passed": true,
+      "detail": "local profile should be read at runtime"
+    },
+    {
+      "name": "client-has-personal-job-desk-marker",
+      "passed": true,
+      "detail": "desk marker"
+    },
+    {
+      "name": "client-has-opportunity-capture",
+      "passed": true,
+      "detail": "opportunity capture marker"
+    },
+    {
+      "name": "client-uses-local-storage",
+      "passed": true,
+      "detail": "browser localStorage tracker"
+    },
+    {
+      "name": "client-has-15-cv-slots",
+      "passed": true,
+      "detail": "15 CV and motivation-letter slots"
+    },
+    {
+      "name": "client-has-no-email-send",
+      "passed": true,
+      "detail": "no outbound email runtime"
+    },
+    {
+      "name": "client-has-no-payment-runtime",
+      "passed": true,
+      "detail": "no payment runtime"
+    },
+    {
+      "name": "client-has-no-whatsapp-runtime",
+      "passed": true,
+      "detail": "no WhatsApp runtime"
+    },
+    {
+      "name": "committed-files-no-personal-contact:/ndabenhlemvel@gmail\\.com/i",
+      "passed": true,
+      "detail": "personal contact must remain local-only"
+    },
+    {
+      "name": "committed-files-no-personal-contact:/072\\s*064\\s*6072/i",
+      "passed": true,
+      "detail": "personal contact must remain local-only"
+    },
+    {
+      "name": "runtime-no-forbidden:service_role",
+      "passed": true,
+      "detail": "service_role"
+    },
+    {
+      "name": "runtime-no-forbidden:PAYFAST_PASSPHRASE",
+      "passed": true,
+      "detail": "PAYFAST_PASSPHRASE"
+    },
+    {
+      "name": "runtime-no-forbidden:private-key-material",
+      "passed": true,
+      "detail": "private-key-material"
+    },
+    {
+      "name": "runtime-no-forbidden:oci-private-path",
+      "passed": true,
+      "detail": "oci-private-path"
+    },
+    {
+      "name": "runtime-no-forbidden:ssh-private-path",
+      "passed": true,
+      "detail": "ssh-private-path"
+    },
+    {
+      "name": "runtime-no-forbidden:docker-compose-up-runtime",
+      "passed": true,
+      "detail": "docker-compose-up-runtime"
+    },
+    {
+      "name": "runtime-no-forbidden:positive-oracle-claim",
+      "passed": true,
+      "detail": "positive-oracle-claim"
+    },
+    {
+      "name": "runtime-no-forbidden:positive-production-claim",
+      "passed": true,
+      "detail": "positive-production-claim"
+    }
+  ],
+  "failed": [],
+  "next_action": "Run validator and commit PERSONAL-JOBS-01 tracked files only."
+}

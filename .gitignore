@@ -144,3 +144,6 @@ vite.config.ts.timestamp-*
 # Local sandbox tool repositories
 tools/agents/openclaw/repo/
 tools/agents/jarvis/repo/
+# Kingsmen PERSONAL-JOBS local private profile
+data/personal-job-desk/*.local.json
+data/personal-job-desk/*.local.md
