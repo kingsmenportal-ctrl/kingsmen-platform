@@ -1,0 +1,32 @@
+﻿{
+  "schema": "kingsmen.personal-jobs-manifest.v1",
+  "module": "PERSONAL-JOBS-02 - Local Job Opportunity Intake / Track External Job Leads",
+  "status": "BUILT_PENDING_VALIDATION",
+  "scope": "local_personal_job_campaign_opportunity_intake",
+  "productionReady": false,
+  "canClaimProduction": false,
+  "deployedToOracle": false,
+  "startsDocker": false,
+  "touchesSecrets": false,
+  "touchesPayments": false,
+  "touchesMessaging": false,
+  "touchesCandidateData": false,
+  "storesCandidateDataInGit": false,
+  "route": "/personal-job-desk/opportunities",
+  "localStorageKey": "kingsmen.personalJobs02.externalLeads.v1",
+  "dependsOn": [
+    "PERSONAL-JOBS-01 - Local Personal Job Desk"
+  ],
+  "inputs": [
+    "data/personal-job-desk/personal-candidate.local.json",
+    "reports/personal-jobs/personal-jobs-01-local-job-desk-proof.json",
+    "reports/validation/personal-jobs-01-local-job-desk-latest.json"
+  ],
+  "outputs": [
+    "apps/web/src/app/personal-job-desk/opportunities/page.tsx",
+    "apps/web/src/app/personal-job-desk/opportunities/OpportunityIntakeClient.tsx",
+    "reports/personal-jobs/personal-jobs-02-local-opportunity-intake-proof.json",
+    "reports/validation/personal-jobs-02-local-opportunity-intake-latest.json"
+  ],
+  "nextAction": "Run PERSONAL-JOBS-02 proof and validator."
+}

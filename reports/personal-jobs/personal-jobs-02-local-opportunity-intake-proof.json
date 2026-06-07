@@ -1,0 +1,255 @@
+{
+  "schema": "kingsmen.personal-jobs-02-proof.v1",
+  "module": "PERSONAL-JOBS-02 - Local Job Opportunity Intake / Track External Job Leads",
+  "status": "PERSONAL_JOBS_02_LOCAL_OPPORTUNITY_INTAKE_PROVEN",
+  "passed": true,
+  "productionReady": false,
+  "canClaimProduction": false,
+  "deployedToOracle": false,
+  "startsDocker": false,
+  "generated_at": "2026-06-07T20:48:21.643Z",
+  "route": "/personal-job-desk/opportunities",
+  "localStorageKey": "kingsmen.personalJobs02.externalLeads.v1",
+  "localPrivateProfilePath": "data/personal-job-desk/personal-candidate.local.json",
+  "localPrivateProfileIgnoredByGit": true,
+  "committedFilesContainPersonalContact": false,
+  "checks": [
+    {
+      "name": "expected-file:.gitignore",
+      "passed": true,
+      "detail": ".gitignore"
+    },
+    {
+      "name": "expected-file:apps/web/src/app/personal-job-desk/opportunities/page.tsx",
+      "passed": true,
+      "detail": "apps/web/src/app/personal-job-desk/opportunities/page.tsx"
+    },
+    {
+      "name": "expected-file:apps/web/src/app/personal-job-desk/opportunities/OpportunityIntakeClient.tsx",
+      "passed": true,
+      "detail": "apps/web/src/app/personal-job-desk/opportunities/OpportunityIntakeClient.tsx"
+    },
+    {
+      "name": "expected-file:docs/personal-jobs/personal-jobs-02-local-opportunity-intake.md",
+      "passed": true,
+      "detail": "docs/personal-jobs/personal-jobs-02-local-opportunity-intake.md"
+    },
+    {
+      "name": "expected-file:manifests/personal-jobs/personal-jobs-02-local-opportunity-intake.json",
+      "passed": true,
+      "detail": "manifests/personal-jobs/personal-jobs-02-local-opportunity-intake.json"
+    },
+    {
+      "name": "expected-file:packages/contracts/src/personal-jobs-02-local-opportunity-intake.ts",
+      "passed": true,
+      "detail": "packages/contracts/src/personal-jobs-02-local-opportunity-intake.ts"
+    },
+    {
+      "name": "expected-file:scripts/proof/prove-personal-jobs-02-local-opportunity-intake.mjs",
+      "passed": true,
+      "detail": "scripts/proof/prove-personal-jobs-02-local-opportunity-intake.mjs"
+    },
+    {
+      "name": "expected-file:scripts/validators/validate-personal-jobs-02-local-opportunity-intake.mjs",
+      "passed": true,
+      "detail": "scripts/validators/validate-personal-jobs-02-local-opportunity-intake.mjs"
+    },
+    {
+      "name": "dependency-file:reports/personal-jobs/personal-jobs-01-local-job-desk-proof.json",
+      "passed": true,
+      "detail": "reports/personal-jobs/personal-jobs-01-local-job-desk-proof.json"
+    },
+    {
+      "name": "dependency-file:reports/validation/personal-jobs-01-local-job-desk-latest.json",
+      "passed": true,
+      "detail": "reports/validation/personal-jobs-01-local-job-desk-latest.json"
+    },
+    {
+      "name": "dependency-file:data/personal-job-desk/personal-candidate.local.json",
+      "passed": true,
+      "detail": "data/personal-job-desk/personal-candidate.local.json"
+    },
+    {
+      "name": "personal-jobs-01-proven",
+      "passed": true,
+      "detail": "PERSONAL_JOBS_01_LOCAL_JOB_DESK_PROVEN"
+    },
+    {
+      "name": "personal-jobs-01-validated",
+      "passed": true,
+      "detail": "VALIDATED"
+    },
+    {
+      "name": "personal-jobs-01-no-production-claim",
+      "passed": true,
+      "detail": "PERSONAL-JOBS-01 production false"
+    },
+    {
+      "name": "gitignore-keeps-local-profile-private",
+      "passed": true,
+      "detail": "local json ignore pattern"
+    },
+    {
+      "name": "page-route-marker",
+      "passed": true,
+      "detail": "page marker"
+    },
+    {
+      "name": "page-force-dynamic",
+      "passed": true,
+      "detail": "runtime local read"
+    },
+    {
+      "name": "page-reads-local-private-profile",
+      "passed": true,
+      "detail": "local private profile path"
+    },
+    {
+      "name": "client-marker",
+      "passed": true,
+      "detail": "local tracker marker"
+    },
+    {
+      "name": "client-capture-marker",
+      "passed": true,
+      "detail": "external lead capture marker"
+    },
+    {
+      "name": "client-uses-local-storage",
+      "passed": true,
+      "detail": "kingsmen.personalJobs02.externalLeads.v1"
+    },
+    {
+      "name": "client-has-duplicate-warning",
+      "passed": true,
+      "detail": "duplicate detection"
+    },
+    {
+      "name": "client-has-json-export",
+      "passed": true,
+      "detail": "manual export"
+    },
+    {
+      "name": "client-has-status-flow",
+      "passed": true,
+      "detail": "lead statuses"
+    },
+    {
+      "name": "client-has-source-types",
+      "passed": true,
+      "detail": "external sources"
+    },
+    {
+      "name": "client-has-15-cv-slots",
+      "passed": true,
+      "detail": "15 CV slots"
+    },
+    {
+      "name": "client-has-15-motivation-slots",
+      "passed": true,
+      "detail": "15 motivation slots"
+    },
+    {
+      "name": "client-has-proof-field",
+      "passed": true,
+      "detail": "proof note field"
+    },
+    {
+      "name": "client-has-no-send-boundary",
+      "passed": true,
+      "detail": "no-send boundary"
+    },
+    {
+      "name": "manifest-status-built-pending-validation",
+      "passed": true,
+      "detail": "BUILT_PENDING_VALIDATION"
+    },
+    {
+      "name": "manifest-local-route",
+      "passed": true,
+      "detail": "/personal-job-desk/opportunities"
+    },
+    {
+      "name": "manifest-local-storage-key",
+      "passed": true,
+      "detail": "kingsmen.personalJobs02.externalLeads.v1"
+    },
+    {
+      "name": "manifest-no-production-claim",
+      "passed": true,
+      "detail": "manifest production false"
+    },
+    {
+      "name": "manifest-no-oracle-claim",
+      "passed": true,
+      "detail": "manifest oracle false"
+    },
+    {
+      "name": "manifest-no-docker",
+      "passed": true,
+      "detail": "manifest docker false"
+    },
+    {
+      "name": "runtime-no-forbidden:email-send-runtime",
+      "passed": true,
+      "detail": "email-send-runtime"
+    },
+    {
+      "name": "runtime-no-forbidden:payment-runtime",
+      "passed": true,
+      "detail": "payment-runtime"
+    },
+    {
+      "name": "runtime-no-forbidden:whatsapp-runtime",
+      "passed": true,
+      "detail": "whatsapp-runtime"
+    },
+    {
+      "name": "runtime-no-forbidden:service-role-secret",
+      "passed": true,
+      "detail": "service-role-secret"
+    },
+    {
+      "name": "runtime-no-forbidden:payfast-passphrase",
+      "passed": true,
+      "detail": "payfast-passphrase"
+    },
+    {
+      "name": "runtime-no-forbidden:private-key-material",
+      "passed": true,
+      "detail": "private-key-material"
+    },
+    {
+      "name": "runtime-no-forbidden:oci-private-path",
+      "passed": true,
+      "detail": "oci-private-path"
+    },
+    {
+      "name": "runtime-no-forbidden:ssh-private-path",
+      "passed": true,
+      "detail": "ssh-private-path"
+    },
+    {
+      "name": "runtime-no-forbidden:docker-compose-up-runtime",
+      "passed": true,
+      "detail": "docker-compose-up-runtime"
+    },
+    {
+      "name": "runtime-no-forbidden:positive-oracle-claim",
+      "passed": true,
+      "detail": "positive-oracle-claim"
+    },
+    {
+      "name": "runtime-no-forbidden:positive-production-claim",
+      "passed": true,
+      "detail": "positive-production-claim"
+    },
+    {
+      "name": "committed-files-no-local-profile-contact",
+      "passed": true,
+      "detail": "local profile contact must stay untracked"
+    }
+  ],
+  "failed": [],
+  "next_action": "Run validator and commit PERSONAL-JOBS-02 tracked files only."
+}

@@ -1,0 +1,30 @@
+{
+  "schema": "kingsmen.validation-report.v1",
+  "module": "PERSONAL-JOBS-02 - Local Job Opportunity Intake / Track External Job Leads",
+  "status": "VALIDATED",
+  "passed": true,
+  "generated_at": "2026-06-07T20:48:21.780Z",
+  "files_expected": [
+    ".gitignore",
+    "apps/web/src/app/personal-job-desk/opportunities/page.tsx",
+    "apps/web/src/app/personal-job-desk/opportunities/OpportunityIntakeClient.tsx",
+    "docs/personal-jobs/personal-jobs-02-local-opportunity-intake.md",
+    "manifests/personal-jobs/personal-jobs-02-local-opportunity-intake.json",
+    "packages/contracts/src/personal-jobs-02-local-opportunity-intake.ts",
+    "scripts/proof/prove-personal-jobs-02-local-opportunity-intake.mjs",
+    "scripts/validators/validate-personal-jobs-02-local-opportunity-intake.mjs",
+    "reports/personal-jobs/personal-jobs-02-local-opportunity-intake-proof.json"
+  ],
+  "files_checked": 9,
+  "missing_files": [],
+  "failed_checks": [],
+  "warnings": [
+    "Opportunity leads are stored in browser localStorage for local founder use.",
+    "This does not send applications or messages; proof notes remain manually entered."
+  ],
+  "oracle_lite_impact": "none_local_ui_only",
+  "route": "/personal-job-desk/opportunities",
+  "local_storage_key": "kingsmen.personalJobs02.externalLeads.v1",
+  "proof": "reports/personal-jobs/personal-jobs-02-local-opportunity-intake-proof.json",
+  "next_action": "Commit PERSONAL-JOBS-02 tracked files only."
+}
