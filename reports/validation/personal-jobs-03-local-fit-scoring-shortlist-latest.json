@@ -1,0 +1,20 @@
+{
+  "schema": "kingsmen.validation-report.v1",
+  "module": "PERSONAL-JOBS-03 - Local Fit Scoring / Shortlist Decision Desk",
+  "status": "VALIDATED",
+  "passed": true,
+  "generated_at": "2026-06-07T21:10:56.709Z",
+  "files_checked": 8,
+  "missing_files": [],
+  "failed_checks": [],
+  "warnings": [
+    "Shortlist scoring is local and heuristic; final application decisions still require human review.",
+    "This does not send applications or messages; it only ranks locally captured leads."
+  ],
+  "oracle_lite_impact": "none_local_ui_only",
+  "route": "/personal-job-desk/shortlist",
+  "reads_local_storage_key": "kingsmen.personalJobs02.externalLeads.v1",
+  "writes_local_storage_key": "kingsmen.personalJobs03.shortlist.v1",
+  "proof": "reports/personal-jobs/personal-jobs-03-local-fit-scoring-shortlist-proof.json",
+  "next_action": "Commit PERSONAL-JOBS-03 tracked files only."
+}

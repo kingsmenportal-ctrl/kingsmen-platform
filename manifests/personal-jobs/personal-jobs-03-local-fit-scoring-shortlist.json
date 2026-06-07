@@ -1,0 +1,30 @@
+{
+  "schema": "kingsmen.module-manifest.v1",
+  "module": "PERSONAL-JOBS-03 - Local Fit Scoring / Shortlist Decision Desk",
+  "status": "BUILT_PENDING_VALIDATION",
+  "route": "/personal-job-desk/shortlist",
+  "depends_on": [
+    "PERSONAL-JOBS-01 - Local Job Desk",
+    "PERSONAL-JOBS-02 - Local Job Opportunity Intake / Track External Job Leads"
+  ],
+  "local_storage": {
+    "reads": ["kingsmen.personalJobs02.externalLeads.v1"],
+    "writes": [
+      "kingsmen.personalJobs02.externalLeads.v1",
+      "kingsmen.personalJobs03.shortlist.v1"
+    ]
+  },
+  "local_private_profile_path": "data/personal-job-desk/personal-candidate.local.json",
+  "cv_slots": 15,
+  "motivation_letter_slots": 15,
+  "productionReady": false,
+  "canClaimProduction": false,
+  "deployedToOracle": false,
+  "startsDocker": false,
+  "touchesCandidateData": true,
+  "storesCandidateData": false,
+  "sendsCandidateData": false,
+  "touchesPayments": false,
+  "touchesMessaging": false,
+  "boundary": "Local-only decision surface. No sending, no applying, no payment, no production claim."
+}
