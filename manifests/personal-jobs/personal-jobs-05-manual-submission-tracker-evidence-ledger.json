@@ -1,0 +1,39 @@
+{
+  "schema": "kingsmen.module-manifest.v1",
+  "module": "PERSONAL-JOBS-05 - Manual Application Submission Tracker / Evidence Ledger",
+  "status": "BUILT_PENDING_VALIDATION",
+  "route": "/personal-job-desk/submissions",
+  "readsLocalStorageKey": "kingsmen.personalJobs04.applyPacks.v1",
+  "writesLocalStorageKey": "kingsmen.personalJobs05.submissions.v1",
+  "dependsOn": [
+    "PERSONAL-JOBS-01",
+    "PERSONAL-JOBS-02",
+    "PERSONAL-JOBS-03",
+    "PERSONAL-JOBS-04"
+  ],
+  "localPrivateProfilePath": "data/personal-job-desk/personal-candidate.local.json",
+  "localPrivateProfileMustRemainIgnoredByGit": true,
+  "touchesCandidateData": true,
+  "storesCandidateData": "localStorage_only",
+  "sendsApplications": false,
+  "sendsEmail": false,
+  "sendsWhatsApp": false,
+  "touchesPayments": false,
+  "productionReady": false,
+  "canClaimProduction": false,
+  "deployedToOracle": false,
+  "startsDocker": false,
+  "oracleLiteImpact": "none_local_ui_only",
+  "evidenceStatuses": [
+    "DRAFT_PACK_READY",
+    "MANUALLY_SUBMITTED",
+    "PROOF_CAPTURED",
+    "FOLLOW_UP_DUE",
+    "RESPONSE_RECEIVED",
+    "INTERVIEW_STAGE",
+    "UNSUCCESSFUL",
+    "OFFER_RECEIVED",
+    "CLOSED"
+  ],
+  "nextAction": "Run proof and validator, then commit tracked files only."
+}

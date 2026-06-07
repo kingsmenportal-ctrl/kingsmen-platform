@@ -1,0 +1,380 @@
+{
+  "schema": "kingsmen.personal-jobs-05-proof.v1",
+  "module": "PERSONAL-JOBS-05 - Manual Application Submission Tracker / Evidence Ledger",
+  "status": "PERSONAL_JOBS_05_MANUAL_SUBMISSION_TRACKER_EVIDENCE_LEDGER_PROVEN",
+  "passed": true,
+  "productionReady": false,
+  "canClaimProduction": false,
+  "deployedToOracle": false,
+  "startsDocker": false,
+  "generated_at": "2026-06-07T21:54:55.420Z",
+  "route": "/personal-job-desk/submissions",
+  "readsLocalStorageKey": "kingsmen.personalJobs04.applyPacks.v1",
+  "writesLocalStorageKey": "kingsmen.personalJobs05.submissions.v1",
+  "localPrivateProfilePath": "data/personal-job-desk/personal-candidate.local.json",
+  "localPrivateProfileIgnoredByGit": true,
+  "committedFilesContainPersonalContact": false,
+  "sendsApplications": false,
+  "sendsEmail": false,
+  "sendsWhatsApp": false,
+  "touchesPayments": false,
+  "checks": [
+    {
+      "name": "expected-file:.gitignore",
+      "passed": true,
+      "detail": ".gitignore"
+    },
+    {
+      "name": "expected-file:apps/web/src/app/personal-job-desk/submissions/page.tsx",
+      "passed": true,
+      "detail": "apps/web/src/app/personal-job-desk/submissions/page.tsx"
+    },
+    {
+      "name": "expected-file:apps/web/src/app/personal-job-desk/submissions/SubmissionTrackerClient.tsx",
+      "passed": true,
+      "detail": "apps/web/src/app/personal-job-desk/submissions/SubmissionTrackerClient.tsx"
+    },
+    {
+      "name": "expected-file:docs/personal-jobs/personal-jobs-05-manual-submission-tracker-evidence-ledger.md",
+      "passed": true,
+      "detail": "docs/personal-jobs/personal-jobs-05-manual-submission-tracker-evidence-ledger.md"
+    },
+    {
+      "name": "expected-file:manifests/personal-jobs/personal-jobs-05-manual-submission-tracker-evidence-ledger.json",
+      "passed": true,
+      "detail": "manifests/personal-jobs/personal-jobs-05-manual-submission-tracker-evidence-ledger.json"
+    },
+    {
+      "name": "expected-file:packages/contracts/src/personal-jobs-05-manual-submission-tracker-evidence-ledger.ts",
+      "passed": true,
+      "detail": "packages/contracts/src/personal-jobs-05-manual-submission-tracker-evidence-ledger.ts"
+    },
+    {
+      "name": "expected-file:scripts/proof/prove-personal-jobs-05-manual-submission-tracker-evidence-ledger.mjs",
+      "passed": true,
+      "detail": "scripts/proof/prove-personal-jobs-05-manual-submission-tracker-evidence-ledger.mjs"
+    },
+    {
+      "name": "expected-file:scripts/validators/validate-personal-jobs-05-manual-submission-tracker-evidence-ledger.mjs",
+      "passed": true,
+      "detail": "scripts/validators/validate-personal-jobs-05-manual-submission-tracker-evidence-ledger.mjs"
+    },
+    {
+      "name": "dependency-file:reports/personal-jobs/personal-jobs-01-local-job-desk-proof.json",
+      "passed": true,
+      "detail": "reports/personal-jobs/personal-jobs-01-local-job-desk-proof.json"
+    },
+    {
+      "name": "dependency-file:reports/validation/personal-jobs-01-local-job-desk-latest.json",
+      "passed": true,
+      "detail": "reports/validation/personal-jobs-01-local-job-desk-latest.json"
+    },
+    {
+      "name": "dependency-file:reports/personal-jobs/personal-jobs-02-local-opportunity-intake-proof.json",
+      "passed": true,
+      "detail": "reports/personal-jobs/personal-jobs-02-local-opportunity-intake-proof.json"
+    },
+    {
+      "name": "dependency-file:reports/validation/personal-jobs-02-local-opportunity-intake-latest.json",
+      "passed": true,
+      "detail": "reports/validation/personal-jobs-02-local-opportunity-intake-latest.json"
+    },
+    {
+      "name": "dependency-file:reports/personal-jobs/personal-jobs-03-local-fit-scoring-shortlist-proof.json",
+      "passed": true,
+      "detail": "reports/personal-jobs/personal-jobs-03-local-fit-scoring-shortlist-proof.json"
+    },
+    {
+      "name": "dependency-file:reports/validation/personal-jobs-03-local-fit-scoring-shortlist-latest.json",
+      "passed": true,
+      "detail": "reports/validation/personal-jobs-03-local-fit-scoring-shortlist-latest.json"
+    },
+    {
+      "name": "dependency-file:reports/personal-jobs/personal-jobs-04-cv-motivation-apply-pack-builder-proof.json",
+      "passed": true,
+      "detail": "reports/personal-jobs/personal-jobs-04-cv-motivation-apply-pack-builder-proof.json"
+    },
+    {
+      "name": "dependency-file:reports/validation/personal-jobs-04-cv-motivation-apply-pack-builder-latest.json",
+      "passed": true,
+      "detail": "reports/validation/personal-jobs-04-cv-motivation-apply-pack-builder-latest.json"
+    },
+    {
+      "name": "dependency-file:data/personal-job-desk/personal-candidate.local.json",
+      "passed": true,
+      "detail": "data/personal-job-desk/personal-candidate.local.json"
+    },
+    {
+      "name": "personal-jobs-01-proof-passed",
+      "passed": true,
+      "detail": "true"
+    },
+    {
+      "name": "personal-jobs-01-validation-passed",
+      "passed": true,
+      "detail": "true"
+    },
+    {
+      "name": "personal-jobs-02-proof-passed",
+      "passed": true,
+      "detail": "true"
+    },
+    {
+      "name": "personal-jobs-02-validation-passed",
+      "passed": true,
+      "detail": "true"
+    },
+    {
+      "name": "personal-jobs-03-proof-passed",
+      "passed": true,
+      "detail": "true"
+    },
+    {
+      "name": "personal-jobs-03-validation-passed",
+      "passed": true,
+      "detail": "true"
+    },
+    {
+      "name": "personal-jobs-04-proof-passed",
+      "passed": true,
+      "detail": "true"
+    },
+    {
+      "name": "personal-jobs-04-validation-passed",
+      "passed": true,
+      "detail": "true"
+    },
+    {
+      "name": "gitignore-keeps-local-profile-private",
+      "passed": true,
+      "detail": "local json ignore pattern"
+    },
+    {
+      "name": "page-route-marker",
+      "passed": true,
+      "detail": "page marker"
+    },
+    {
+      "name": "page-force-dynamic",
+      "passed": true,
+      "detail": "runtime local read"
+    },
+    {
+      "name": "page-reads-local-private-profile",
+      "passed": true,
+      "detail": "local private profile path"
+    },
+    {
+      "name": "client-no-send-marker",
+      "passed": true,
+      "detail": "local no-send marker"
+    },
+    {
+      "name": "client-reads-personal-jobs-04-apply-packs",
+      "passed": true,
+      "detail": "PERSONAL-JOBS-04 localStorage key"
+    },
+    {
+      "name": "client-writes-submission-ledger",
+      "passed": true,
+      "detail": "PERSONAL-JOBS-05 localStorage key"
+    },
+    {
+      "name": "client-record-manual-submission-function",
+      "passed": true,
+      "detail": "recordManualSubmission"
+    },
+    {
+      "name": "client-export-evidence-ledger",
+      "passed": true,
+      "detail": "exportEvidenceLedger"
+    },
+    {
+      "name": "client-draft-pack-ready-status",
+      "passed": true,
+      "detail": "DRAFT_PACK_READY"
+    },
+    {
+      "name": "client-manually-submitted-status",
+      "passed": true,
+      "detail": "MANUALLY_SUBMITTED"
+    },
+    {
+      "name": "client-proof-captured-status",
+      "passed": true,
+      "detail": "PROOF_CAPTURED"
+    },
+    {
+      "name": "client-follow-up-due-status",
+      "passed": true,
+      "detail": "FOLLOW_UP_DUE"
+    },
+    {
+      "name": "client-offer-received-status",
+      "passed": true,
+      "detail": "OFFER_RECEIVED"
+    },
+    {
+      "name": "client-no-send-boundary",
+      "passed": true,
+      "detail": "no-send boundary"
+    },
+    {
+      "name": "contract-export",
+      "passed": true,
+      "detail": "contract export"
+    },
+    {
+      "name": "contract-route",
+      "passed": true,
+      "detail": "contract route"
+    },
+    {
+      "name": "contract-no-send",
+      "passed": true,
+      "detail": "contract no-send"
+    },
+    {
+      "name": "contract-status-type",
+      "passed": true,
+      "detail": "status type"
+    },
+    {
+      "name": "doc-boundary",
+      "passed": true,
+      "detail": "doc boundary"
+    },
+    {
+      "name": "doc-evidence-doctrine",
+      "passed": true,
+      "detail": "doc evidence doctrine"
+    },
+    {
+      "name": "manifest-status-built-pending-validation",
+      "passed": true,
+      "detail": "BUILT_PENDING_VALIDATION"
+    },
+    {
+      "name": "manifest-local-route",
+      "passed": true,
+      "detail": "/personal-job-desk/submissions"
+    },
+    {
+      "name": "manifest-no-production-claim",
+      "passed": true,
+      "detail": "manifest production false"
+    },
+    {
+      "name": "manifest-no-oracle-claim",
+      "passed": true,
+      "detail": "manifest oracle false"
+    },
+    {
+      "name": "manifest-no-docker",
+      "passed": true,
+      "detail": "manifest docker false"
+    },
+    {
+      "name": "manifest-no-send",
+      "passed": true,
+      "detail": "manifest send false"
+    },
+    {
+      "name": "manifest-no-payment",
+      "passed": true,
+      "detail": "manifest payments false"
+    },
+    {
+      "name": "runtime-no-forbidden:email-send-runtime",
+      "passed": true,
+      "detail": "email-send-runtime"
+    },
+    {
+      "name": "runtime-no-forbidden:payment-runtime",
+      "passed": true,
+      "detail": "payment-runtime"
+    },
+    {
+      "name": "runtime-no-forbidden:whatsapp-runtime",
+      "passed": true,
+      "detail": "whatsapp-runtime"
+    },
+    {
+      "name": "runtime-no-forbidden:service-role-secret",
+      "passed": true,
+      "detail": "service-role-secret"
+    },
+    {
+      "name": "runtime-no-forbidden:payfast-passphrase",
+      "passed": true,
+      "detail": "payfast-passphrase"
+    },
+    {
+      "name": "runtime-no-forbidden:private-key-material",
+      "passed": true,
+      "detail": "private-key-material"
+    },
+    {
+      "name": "runtime-no-forbidden:oci-private-path",
+      "passed": true,
+      "detail": "oci-private-path"
+    },
+    {
+      "name": "runtime-no-forbidden:ssh-private-path",
+      "passed": true,
+      "detail": "ssh-private-path"
+    },
+    {
+      "name": "runtime-no-forbidden:docker-compose-up-runtime",
+      "passed": true,
+      "detail": "docker-compose-up-runtime"
+    },
+    {
+      "name": "runtime-no-forbidden:PRODUCTION_READY_TRUE",
+      "passed": true,
+      "detail": "PRODUCTION_READY_TRUE"
+    },
+    {
+      "name": "runtime-no-forbidden:DEPLOYED_TO_ORACLE_TRUE",
+      "passed": true,
+      "detail": "DEPLOYED_TO_ORACLE_TRUE"
+    },
+    {
+      "name": "runtime-no-forbidden:smtp.send",
+      "passed": true,
+      "detail": "smtp.send"
+    },
+    {
+      "name": "runtime-no-forbidden:fetch('/api/send",
+      "passed": true,
+      "detail": "fetch('/api/send"
+    },
+    {
+      "name": "runtime-no-forbidden:sendEmail(",
+      "passed": true,
+      "detail": "sendEmail("
+    },
+    {
+      "name": "runtime-no-forbidden:sendWhatsApp(",
+      "passed": true,
+      "detail": "sendWhatsApp("
+    },
+    {
+      "name": "runtime-no-forbidden:submitApplication(",
+      "passed": true,
+      "detail": "submitApplication("
+    },
+    {
+      "name": "runtime-no-forbidden:payfast",
+      "passed": true,
+      "detail": "payfast"
+    },
+    {
+      "name": "committed-files-no-local-profile-contact",
+      "passed": true,
+      "detail": "local profile contact must stay untracked"
+    }
+  ],
+  "failed": [],
+  "next_action": "Run validator and commit PERSONAL-JOBS-05 tracked files only."
+}

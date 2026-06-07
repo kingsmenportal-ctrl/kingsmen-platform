@@ -1,0 +1,21 @@
+{
+  "schema": "kingsmen.validation-report.v1",
+  "module": "PERSONAL-JOBS-05 - Manual Application Submission Tracker / Evidence Ledger",
+  "status": "VALIDATED",
+  "passed": true,
+  "generated_at": "2026-06-07T21:54:55.562Z",
+  "files_checked": 8,
+  "missing_files": [],
+  "failed_checks": [],
+  "warnings": [
+    "Submission records are local evidence rows only; actual applications require human action.",
+    "This module does not send applications, emails, WhatsApps, payments, or portal submissions.",
+    "Proof references must be truthful and should point to real screenshots, confirmation numbers, or records."
+  ],
+  "oracle_lite_impact": "none_local_ui_only",
+  "route": "/personal-job-desk/submissions",
+  "reads_local_storage_key": "kingsmen.personalJobs04.applyPacks.v1",
+  "writes_local_storage_key": "kingsmen.personalJobs05.submissions.v1",
+  "proof": "reports/personal-jobs/personal-jobs-05-manual-submission-tracker-evidence-ledger-proof.json",
+  "next_action": "Commit PERSONAL-JOBS-05 tracked files only."
+}
