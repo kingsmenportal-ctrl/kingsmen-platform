@@ -1,0 +1,21 @@
+{
+  "schema": "kingsmen.validation-report.v1",
+  "module": "PERSONAL-JOBS-04 - CV & Motivation Letter Apply Pack Builder",
+  "status": "VALIDATED",
+  "passed": true,
+  "generated_at": "2026-06-07T21:33:05.433Z",
+  "files_checked": 8,
+  "missing_files": [],
+  "failed_checks": [],
+  "warnings": [
+    "Apply packs are local drafts only; final applications require manual human review.",
+    "This module does not send applications, emails, WhatsApps, payments, or portal submissions.",
+    "Generated CV and motivation wording must remain truthful and must not invent candidate facts."
+  ],
+  "oracle_lite_impact": "none_local_ui_only",
+  "route": "/personal-job-desk/apply-pack",
+  "reads_local_storage_key": "kingsmen.personalJobs03.shortlist.v1",
+  "writes_local_storage_key": "kingsmen.personalJobs04.applyPacks.v1",
+  "proof": "reports/personal-jobs/personal-jobs-04-cv-motivation-apply-pack-builder-proof.json",
+  "next_action": "Commit PERSONAL-JOBS-04 tracked files only."
+}

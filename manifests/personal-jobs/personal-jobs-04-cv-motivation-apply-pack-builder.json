@@ -1,0 +1,39 @@
+{
+  "schema": "kingsmen.module-manifest.v1",
+  "module": "PERSONAL-JOBS-04 - CV & Motivation Letter Apply Pack Builder",
+  "status": "BUILT_PENDING_VALIDATION",
+  "route": "/personal-job-desk/apply-pack",
+  "depends_on": [
+    "PERSONAL-JOBS-01 - Local Job Desk",
+    "PERSONAL-JOBS-02 - Local Job Opportunity Intake / Track External Job Leads",
+    "PERSONAL-JOBS-03 - Local Fit Scoring / Shortlist Decision Desk"
+  ],
+  "local_storage": {
+    "reads": ["kingsmen.personalJobs03.shortlist.v1"],
+    "writes": ["kingsmen.personalJobs04.applyPacks.v1"]
+  },
+  "local_private_profile_path": "data/personal-job-desk/personal-candidate.local.json",
+  "cv_slots": 15,
+  "motivation_letter_slots": 15,
+  "templates": [
+    "Executive Classic",
+    "ATS Plain",
+    "Retail & Service",
+    "Administrative Precision",
+    "Learnership Entry",
+    "General Worker",
+    "Digital Support",
+    "Hospitality & Care"
+  ],
+  "productionReady": false,
+  "canClaimProduction": false,
+  "deployedToOracle": false,
+  "startsDocker": false,
+  "touchesCandidateData": true,
+  "storesCandidateData": false,
+  "sendsCandidateData": false,
+  "touchesPayments": false,
+  "touchesMessaging": false,
+  "sendsApplications": false,
+  "boundary": "Local draft-only apply pack builder. No sending, no applying, no payment, no production claim."
+}
