@@ -1,0 +1,21 @@
+{
+  "schema": "kingsmen.validation-report.v1",
+  "module": "PERSONAL-JOBS-18 - South African Job Source Expansion / Real Local Lead Adapters",
+  "status": "VALIDATED",
+  "passed": true,
+  "generated_at": "2026-06-08T23:15:45.949Z",
+  "files_checked": 11,
+  "missing_files": [],
+  "failed_checks": [],
+  "warnings": [
+    "PJ18 expands South African local source discovery, but it does not submit applications.",
+    "Some public careers pages may be JavaScript-rendered and may require Playwright/manual review.",
+    "Source URLs in sa-job-sources.local.json must be kept editable because employer portals change.",
+    "Human approval remains required before applying or contacting an employer."
+  ],
+  "oracle_lite_impact": "low_local_agent_run_only",
+  "route": "/personal-job-desk/sa-sources",
+  "api_route": "/api/personal-jobs/sa-sources/run",
+  "proof": "reports/personal-jobs/personal-jobs-18-sa-source-expansion-proof.json",
+  "next_action": "Commit PJ18 tracked files only, then run local dev server and test /personal-job-desk/sa-sources."
+}

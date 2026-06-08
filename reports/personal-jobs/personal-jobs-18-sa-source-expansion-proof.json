@@ -1,0 +1,336 @@
+{
+  "schema": "kingsmen.personal-jobs-18-proof.v1",
+  "module": "PERSONAL-JOBS-18 - South African Job Source Expansion / Real Local Lead Adapters",
+  "status": "PERSONAL_JOBS_18_SA_SOURCE_EXPANSION_PROVEN",
+  "passed": true,
+  "productionReady": false,
+  "canClaimProduction": false,
+  "deployedToOracle": false,
+  "startsDocker": false,
+  "route": "/personal-job-desk/sa-sources",
+  "apiRoute": "/api/personal-jobs/sa-sources/run",
+  "countryFocus": "South Africa",
+  "searchesRealSources": true,
+  "manualJobEntryRequired": false,
+  "manualJobEntryFallbackOnly": true,
+  "supportsDpsaLandingAdapter": true,
+  "supportsPublicCareersPageAdapter": true,
+  "supportsSearchLandingAdapter": true,
+  "exportsToPj02Shape": true,
+  "combinesWithPj17Leads": true,
+  "sendsApplications": false,
+  "sendsEmail": false,
+  "sendsWhatsApp": false,
+  "touchesPayments": false,
+  "contactsEmployers": false,
+  "generated_at": "2026-06-08T23:15:45.933Z",
+  "checks": [
+    {
+      "name": "expected-file:.gitignore",
+      "passed": true,
+      "detail": ".gitignore"
+    },
+    {
+      "name": "expected-file:data/personal-job-desk/sa-job-sources.local.example.json",
+      "passed": true,
+      "detail": "data/personal-job-desk/sa-job-sources.local.example.json"
+    },
+    {
+      "name": "expected-file:scripts/agents/personal-job-sa-source-runner.mjs",
+      "passed": true,
+      "detail": "scripts/agents/personal-job-sa-source-runner.mjs"
+    },
+    {
+      "name": "expected-file:apps/web/src/app/api/personal-jobs/sa-sources/run/route.ts",
+      "passed": true,
+      "detail": "apps/web/src/app/api/personal-jobs/sa-sources/run/route.ts"
+    },
+    {
+      "name": "expected-file:apps/web/src/app/personal-job-desk/sa-sources/page.tsx",
+      "passed": true,
+      "detail": "apps/web/src/app/personal-job-desk/sa-sources/page.tsx"
+    },
+    {
+      "name": "expected-file:apps/web/src/app/personal-job-desk/sa-sources/SaSourcesClient.tsx",
+      "passed": true,
+      "detail": "apps/web/src/app/personal-job-desk/sa-sources/SaSourcesClient.tsx"
+    },
+    {
+      "name": "expected-file:packages/contracts/src/personal-jobs-18-sa-source-expansion.ts",
+      "passed": true,
+      "detail": "packages/contracts/src/personal-jobs-18-sa-source-expansion.ts"
+    },
+    {
+      "name": "expected-file:docs/personal-jobs/personal-jobs-18-sa-source-expansion.md",
+      "passed": true,
+      "detail": "docs/personal-jobs/personal-jobs-18-sa-source-expansion.md"
+    },
+    {
+      "name": "expected-file:manifests/personal-jobs/personal-jobs-18-sa-source-expansion.json",
+      "passed": true,
+      "detail": "manifests/personal-jobs/personal-jobs-18-sa-source-expansion.json"
+    },
+    {
+      "name": "expected-file:scripts/proof/prove-personal-jobs-18-sa-source-expansion.mjs",
+      "passed": true,
+      "detail": "scripts/proof/prove-personal-jobs-18-sa-source-expansion.mjs"
+    },
+    {
+      "name": "expected-file:scripts/validators/validate-personal-jobs-18-sa-source-expansion.mjs",
+      "passed": true,
+      "detail": "scripts/validators/validate-personal-jobs-18-sa-source-expansion.mjs"
+    },
+    {
+      "name": "gitignore-sa-local-config",
+      "passed": true,
+      "detail": "SA local config ignored"
+    },
+    {
+      "name": "gitignore-sa-discovered",
+      "passed": true,
+      "detail": "SA discovered jobs ignored"
+    },
+    {
+      "name": "source-example-valid-json",
+      "passed": true,
+      "detail": "valid json"
+    },
+    {
+      "name": "source-example-sa-country",
+      "passed": true,
+      "detail": "kingsmen.personal-jobs-18.sa-sources.v1"
+    },
+    {
+      "name": "source-example-dpsa",
+      "passed": true,
+      "detail": "dpsaLanding"
+    },
+    {
+      "name": "source-example-public-careers",
+      "passed": true,
+      "detail": "publicCareersPage"
+    },
+    {
+      "name": "source-example-search-landings",
+      "passed": true,
+      "detail": "searchLanding"
+    },
+    {
+      "name": "agent-reads-one-profile",
+      "passed": true,
+      "detail": "one profile"
+    },
+    {
+      "name": "agent-sa-source-config",
+      "passed": true,
+      "detail": "SA source config"
+    },
+    {
+      "name": "agent-dpsa-adapter",
+      "passed": true,
+      "detail": "DPSA adapter"
+    },
+    {
+      "name": "agent-public-careers-adapter",
+      "passed": true,
+      "detail": "public careers adapter"
+    },
+    {
+      "name": "agent-search-landing-adapter",
+      "passed": true,
+      "detail": "search landing adapter"
+    },
+    {
+      "name": "agent-sa-query-builder",
+      "passed": true,
+      "detail": "SA query builder"
+    },
+    {
+      "name": "agent-sa-scoring",
+      "passed": true,
+      "detail": "SA lead score"
+    },
+    {
+      "name": "agent-pj02-shape",
+      "passed": true,
+      "detail": "PJ02 export"
+    },
+    {
+      "name": "agent-combines-pj17",
+      "passed": true,
+      "detail": "combines PJ17 leads"
+    },
+    {
+      "name": "agent-no-auto-apply",
+      "passed": true,
+      "detail": "no auto apply"
+    },
+    {
+      "name": "api-runs-agent",
+      "passed": true,
+      "detail": "API runs agent"
+    },
+    {
+      "name": "api-node-runtime",
+      "passed": true,
+      "detail": "nodejs runtime"
+    },
+    {
+      "name": "page-client",
+      "passed": true,
+      "detail": "SaSourcesClient"
+    },
+    {
+      "name": "client-run-button",
+      "passed": true,
+      "detail": "run button"
+    },
+    {
+      "name": "client-api-call",
+      "passed": true,
+      "detail": "API route call"
+    },
+    {
+      "name": "client-pj02-export",
+      "passed": true,
+      "detail": "PJ02 key"
+    },
+    {
+      "name": "client-manual-fallback",
+      "passed": true,
+      "detail": "manual fallback only"
+    },
+    {
+      "name": "contract-capabilities",
+      "passed": true,
+      "detail": "contract capabilities"
+    },
+    {
+      "name": "contract-boundaries",
+      "passed": true,
+      "detail": "contract boundaries"
+    },
+    {
+      "name": "doc-purpose",
+      "passed": true,
+      "detail": "SA purpose"
+    },
+    {
+      "name": "doc-local-private-files",
+      "passed": true,
+      "detail": "local privacy"
+    },
+    {
+      "name": "manifest-valid-json",
+      "passed": true,
+      "detail": "manifest json"
+    },
+    {
+      "name": "manifest-route",
+      "passed": true,
+      "detail": "/personal-job-desk/sa-sources"
+    },
+    {
+      "name": "manifest-country-focus",
+      "passed": true,
+      "detail": "South Africa"
+    },
+    {
+      "name": "manifest-real-sources",
+      "passed": true,
+      "detail": "real sources true"
+    },
+    {
+      "name": "manifest-manual-entry-fallback",
+      "passed": true,
+      "detail": "manual fallback"
+    },
+    {
+      "name": "manifest-no-production",
+      "passed": true,
+      "detail": "no production claim"
+    },
+    {
+      "name": "manifest-no-send",
+      "passed": true,
+      "detail": "no send/apply"
+    },
+    {
+      "name": "manifest-human-approval",
+      "passed": true,
+      "detail": "approval required"
+    },
+    {
+      "name": "node-syntax:scripts/agents/personal-job-sa-source-runner.mjs",
+      "passed": true,
+      "detail": "syntax ok"
+    },
+    {
+      "name": "node-syntax:scripts/proof/prove-personal-jobs-18-sa-source-expansion.mjs",
+      "passed": true,
+      "detail": "syntax ok"
+    },
+    {
+      "name": "agent-dry-run-exit-zero",
+      "passed": true,
+      "detail": "dry run ok"
+    },
+    {
+      "name": "agent-dry-run-sa-country",
+      "passed": true,
+      "detail": "South Africa"
+    },
+    {
+      "name": "agent-dry-run-generates-queries",
+      "passed": true,
+      "detail": "29 queries"
+    },
+    {
+      "name": "agent-dry-run-uses-one-profile",
+      "passed": true,
+      "detail": "usedOneProfile true"
+    },
+    {
+      "name": "forbidden-not-present:smtp.send",
+      "passed": true,
+      "detail": "smtp.send"
+    },
+    {
+      "name": "forbidden-not-present:sendEmail(",
+      "passed": true,
+      "detail": "sendEmail("
+    },
+    {
+      "name": "forbidden-not-present:sendWhatsApp(",
+      "passed": true,
+      "detail": "sendWhatsApp("
+    },
+    {
+      "name": "forbidden-not-present:submitApplication(",
+      "passed": true,
+      "detail": "submitApplication("
+    },
+    {
+      "name": "forbidden-not-present:payfast-passphrase",
+      "passed": true,
+      "detail": "payfast-passphrase"
+    },
+    {
+      "name": "forbidden-not-present:service_role",
+      "passed": true,
+      "detail": "service_role"
+    },
+    {
+      "name": "forbidden-not-present:PRODUCTION_READY_TRUE",
+      "passed": true,
+      "detail": "PRODUCTION_READY_TRUE"
+    },
+    {
+      "name": "forbidden-not-present:DEPLOYED_TO_ORACLE_TRUE",
+      "passed": true,
+      "detail": "DEPLOYED_TO_ORACLE_TRUE"
+    }
+  ],
+  "failed": [],
+  "next_action": "Run validator, commit PJ18 files, then open /personal-job-desk/sa-sources and press Run SA source runner."
+}

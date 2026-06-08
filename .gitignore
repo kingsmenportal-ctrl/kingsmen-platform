@@ -151,3 +151,7 @@ data/personal-job-desk/discovered-jobs.local.json
 data/personal-job-desk/job-discovery-runs.local.json
 data/personal-job-desk/documents/
 reports/personal-jobs/personal-jobs-17-job-discovery-agent-latest.json
+data/personal-job-desk/sa-job-sources.local.json
+data/personal-job-desk/sa-discovered-jobs.local.json
+data/personal-job-desk/sa-source-runs.local.json
+reports/personal-jobs/personal-jobs-18-sa-source-runner-latest.json

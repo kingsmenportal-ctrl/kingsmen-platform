@@ -1,0 +1,131 @@
+{
+  "schema": "kingsmen.personal-jobs-18.sa-sources.v1",
+  "purpose": "South African local source registry for Kingsmen Personal Job Desk. Copy to sa-job-sources.local.json for private local edits.",
+  "safety": {
+    "noCredentialUse": true,
+    "noLoginBypass": true,
+    "noCaptchaBypass": true,
+    "noAggressiveScraping": true,
+    "noAutoApply": true,
+    "noEmployerContact": true,
+    "humanApprovalBeforeApply": true
+  },
+  "sourceGroups": [
+    "PUBLIC_SECTOR",
+    "RETAIL",
+    "WHOLESALE",
+    "LEARNERSHIP",
+    "INTERNSHIP",
+    "COMPANY_CAREERS",
+    "JOB_BOARD_LANDING",
+    "MANUAL_SAFE_REVIEW"
+  ],
+  "sources": [
+    {
+      "id": "dpsa-public-service-vacancy-circular",
+      "label": "DPSA Public Service Vacancy Circular",
+      "group": "PUBLIC_SECTOR",
+      "enabled": true,
+      "adapter": "dpsaLanding",
+      "url": "https://www.dpsa.gov.za/newsroom/psvc/",
+      "sourceConfidence": 0.86,
+      "defaultLocation": "South Africa"
+    },
+    {
+      "id": "shoprite-careers",
+      "label": "Shoprite Group Careers",
+      "group": "RETAIL",
+      "enabled": true,
+      "adapter": "publicCareersPage",
+      "url": "https://www.shoprite.jobs/",
+      "company": "Shoprite Group",
+      "sourceConfidence": 0.78,
+      "defaultLocation": "South Africa"
+    },
+    {
+      "id": "pick-n-pay-careers",
+      "label": "Pick n Pay Careers",
+      "group": "RETAIL",
+      "enabled": true,
+      "adapter": "publicCareersPage",
+      "url": "https://www.pnp.co.za/careers",
+      "company": "Pick n Pay",
+      "sourceConfidence": 0.72,
+      "defaultLocation": "South Africa"
+    },
+    {
+      "id": "boxer-careers",
+      "label": "Boxer Careers",
+      "group": "RETAIL",
+      "enabled": true,
+      "adapter": "publicCareersPage",
+      "url": "https://www.boxer.co.za/careers",
+      "company": "Boxer",
+      "sourceConfidence": 0.72,
+      "defaultLocation": "South Africa"
+    },
+    {
+      "id": "clicks-careers",
+      "label": "Clicks Group Careers",
+      "group": "RETAIL",
+      "enabled": true,
+      "adapter": "publicCareersPage",
+      "url": "https://clicksgroup.simplify.hr/",
+      "company": "Clicks Group",
+      "sourceConfidence": 0.72,
+      "defaultLocation": "South Africa"
+    },
+    {
+      "id": "dischem-careers",
+      "label": "Dis-Chem Careers",
+      "group": "RETAIL",
+      "enabled": true,
+      "adapter": "publicCareersPage",
+      "url": "https://dischem.simplify.hr/",
+      "company": "Dis-Chem",
+      "sourceConfidence": 0.72,
+      "defaultLocation": "South Africa"
+    },
+    {
+      "id": "mr-price-careers",
+      "label": "Mr Price Careers",
+      "group": "RETAIL",
+      "enabled": true,
+      "adapter": "publicCareersPage",
+      "url": "https://www.mrp.com/en_za/careers",
+      "company": "Mr Price Group",
+      "sourceConfidence": 0.7,
+      "defaultLocation": "South Africa"
+    },
+    {
+      "id": "pnet-search-landing",
+      "label": "PNet Search Landing",
+      "group": "JOB_BOARD_LANDING",
+      "enabled": true,
+      "adapter": "searchLanding",
+      "urlTemplate": "https://www.pnet.co.za/jobs/{query}/in-south-africa",
+      "sourceConfidence": 0.58,
+      "defaultLocation": "South Africa"
+    },
+    {
+      "id": "careers24-search-landing",
+      "label": "Careers24 Search Landing",
+      "group": "JOB_BOARD_LANDING",
+      "enabled": true,
+      "adapter": "searchLanding",
+      "urlTemplate": "https://www.careers24.com/jobs/lc-south-africa/?q={query}",
+      "sourceConfidence": 0.58,
+      "defaultLocation": "South Africa"
+    },
+    {
+      "id": "indeed-sa-search-landing",
+      "label": "Indeed South Africa Search Landing",
+      "group": "JOB_BOARD_LANDING",
+      "enabled": true,
+      "adapter": "searchLanding",
+      "urlTemplate": "https://za.indeed.com/jobs?q={query}&l=South+Africa",
+      "sourceConfidence": 0.58,
+      "defaultLocation": "South Africa"
+    }
+  ]
+}
