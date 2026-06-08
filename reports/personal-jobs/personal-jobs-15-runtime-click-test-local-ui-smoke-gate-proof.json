@@ -1,0 +1,112 @@
+{
+  "schema": "kingsmen.personal-jobs-15-proof.v1",
+  "module": "PERSONAL-JOBS-15 - Personal Job Desk Runtime Click Test / Local UI Smoke Gate",
+  "status": "PERSONAL_JOBS_15_RUNTIME_CLICK_TEST_LOCAL_UI_SMOKE_GATE_PROVEN",
+  "passed": true,
+  "productionReady": false,
+  "canClaimProduction": false,
+  "deployedToOracle": false,
+  "startsDocker": false,
+  "generated_at": "2026-06-08T08:52:33.835Z",
+  "route": "/personal-job-desk/runtime-click-test",
+  "localBaseUrl": "http://127.0.0.1:3002",
+  "runtimeTargetCount": 2,
+  "runtimeTargets": [
+    "/personal-job-desk",
+    "/personal-job-desk/runtime-click-test"
+  ],
+  "runtimeResults": [
+    {
+      "target": "/personal-job-desk",
+      "ok": true,
+      "status": 200,
+      "bytes": 23547,
+      "hasNotFoundText": true,
+      "passed": true,
+      "source": "powershell-status-preflight"
+    },
+    {
+      "target": "/personal-job-desk/runtime-click-test",
+      "ok": true,
+      "status": 200,
+      "bytes": 39197,
+      "hasNotFoundText": true,
+      "passed": true,
+      "source": "powershell-status-preflight"
+    }
+  ],
+  "checks": [
+    {
+      "name": "expected-file:apps/web/src/app/personal-job-desk/runtime-click-test/page.tsx",
+      "passed": true,
+      "detail": "apps/web/src/app/personal-job-desk/runtime-click-test/page.tsx"
+    },
+    {
+      "name": "expected-file:apps/web/src/app/personal-job-desk/runtime-click-test/RuntimeClickTestClient.tsx",
+      "passed": true,
+      "detail": "apps/web/src/app/personal-job-desk/runtime-click-test/RuntimeClickTestClient.tsx"
+    },
+    {
+      "name": "expected-file:apps/web/src/app/personal-job-desk/navigation/NavigationHubClient.tsx",
+      "passed": true,
+      "detail": "apps/web/src/app/personal-job-desk/navigation/NavigationHubClient.tsx"
+    },
+    {
+      "name": "expected-file:docs/personal-jobs/personal-jobs-15-runtime-click-test-local-ui-smoke-gate.md",
+      "passed": true,
+      "detail": "docs/personal-jobs/personal-jobs-15-runtime-click-test-local-ui-smoke-gate.md"
+    },
+    {
+      "name": "expected-file:manifests/personal-jobs/personal-jobs-15-runtime-click-test-local-ui-smoke-gate.json",
+      "passed": true,
+      "detail": "manifests/personal-jobs/personal-jobs-15-runtime-click-test-local-ui-smoke-gate.json"
+    },
+    {
+      "name": "expected-file:packages/contracts/src/personal-jobs-15-runtime-click-test-local-ui-smoke-gate.ts",
+      "passed": true,
+      "detail": "packages/contracts/src/personal-jobs-15-runtime-click-test-local-ui-smoke-gate.ts"
+    },
+    {
+      "name": "expected-file:scripts/proof/prove-personal-jobs-15-runtime-click-test-local-ui-smoke-gate.mjs",
+      "passed": true,
+      "detail": "scripts/proof/prove-personal-jobs-15-runtime-click-test-local-ui-smoke-gate.mjs"
+    },
+    {
+      "name": "expected-file:scripts/validators/validate-personal-jobs-15-runtime-click-test-local-ui-smoke-gate.mjs",
+      "passed": true,
+      "detail": "scripts/validators/validate-personal-jobs-15-runtime-click-test-local-ui-smoke-gate.mjs"
+    },
+    {
+      "name": "page-route-marker",
+      "passed": true,
+      "detail": "/personal-job-desk/runtime-click-test"
+    },
+    {
+      "name": "client-runtime-click-test-marker",
+      "passed": true,
+      "detail": "runtime click smoke UI marker"
+    },
+    {
+      "name": "client-no-send-boundary",
+      "passed": true,
+      "detail": "local UI only"
+    },
+    {
+      "name": "runtime-local-server-found",
+      "passed": true,
+      "detail": "http://127.0.0.1:3002 via powershell status preflight"
+    },
+    {
+      "name": "runtime-route:/personal-job-desk",
+      "passed": true,
+      "detail": "200 23547 bytes via powershell-status-preflight"
+    },
+    {
+      "name": "runtime-route:/personal-job-desk/runtime-click-test",
+      "passed": true,
+      "detail": "200 39197 bytes via powershell-status-preflight"
+    }
+  ],
+  "failed": [],
+  "next_action": "Run validator and commit PERSONAL-JOBS-15 tracked files only."
+}

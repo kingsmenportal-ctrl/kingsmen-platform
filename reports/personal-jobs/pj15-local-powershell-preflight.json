@@ -1,0 +1,27 @@
+{
+    "schema":  "kingsmen.personal-jobs-15-powershell-preflight.v1",
+    "generated_at":  "2026-06-08T08:52:33.1006085Z",
+    "baseUrl":  "http://127.0.0.1:3002",
+    "route":  "/personal-job-desk/runtime-click-test",
+    "results":  [
+                    {
+                        "target":  "/personal-job-desk",
+                        "url":  "http://127.0.0.1:3002/personal-job-desk",
+                        "ok":  true,
+                        "status":  200,
+                        "bytes":  23547,
+                        "hasNotFoundText":  true,
+                        "passed":  true
+                    },
+                    {
+                        "target":  "/personal-job-desk/runtime-click-test",
+                        "url":  "http://127.0.0.1:3002/personal-job-desk/runtime-click-test",
+                        "ok":  true,
+                        "status":  200,
+                        "bytes":  39197,
+                        "hasNotFoundText":  true,
+                        "passed":  true
+                    }
+                ],
+    "passed":  true
+}

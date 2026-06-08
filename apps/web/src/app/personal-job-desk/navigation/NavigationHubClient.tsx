@@ -72,11 +72,11 @@ const ROUTES: RouteItem[] = [
   {
     id: "PJ07",
     title: "Outcome Ledger / Offer Decision",
-    href: "/personal-job-desk/outcome-ledger",
+    href: "/personal-job-desk/outcomes",
     stage: "Outcome",
     purpose: "Records outcomes, offers, rejections, silence, next-route decisions, and campaign command status.",
     primaryAction: "Record job-search outcome",
-    localKeys: ["kingsmen.personalJobs07.outcomes.v1"],
+    localKeys: ["kingsmen.personalJobs07.outcomeLedger.v1"],
     boundary: "Local proof ledger only; no production analytics claim."
   },
   {
@@ -96,7 +96,7 @@ const ROUTES: RouteItem[] = [
     stage: "Daily rhythm",
     purpose: "Turns the job search into a daily campaign: find leads, normalize, shortlist, build packs, apply manually, follow up, and record outcomes.",
     primaryAction: "Run today's campaign loop",
-    localKeys: ["kingsmen.personalJobs10.dailyLoop.v1"],
+    localKeys: ["kingsmen.personalJobs10.dailyOperatingLoop.v1"],
     boundary: "Founder-only local operating rhythm."
   },
   {
@@ -106,7 +106,7 @@ const ROUTES: RouteItem[] = [
     stage: "Import",
     purpose: "Lets you paste or import job search results you found elsewhere, then turn them into local candidate leads.",
     primaryAction: "Import job-search results",
-    localKeys: ["kingsmen.personalJobs11.importedSearches.v1"],
+    localKeys: ["kingsmen.personalJobs11.searchImportBatches.v1"],
     boundary: "Import desk only; does not scrape or apply."
   },
   {
@@ -116,7 +116,7 @@ const ROUTES: RouteItem[] = [
     stage: "Verified lead finding",
     purpose: "Guides verified lead finding from real job sources while keeping the local proof boundary clear.",
     primaryAction: "Run verified lead search workflow",
-    localKeys: ["kingsmen.personalJobs12.verifiedLeads.v1"],
+    localKeys: ["kingsmen.personalJobs12.sourceRunnerSessions.v1"],
     boundary: "Verification workflow only; no automatic employer contact."
   },
   {

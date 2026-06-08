@@ -1,0 +1,21 @@
+{
+  "schema": "kingsmen.validation-report.v1",
+  "module": "PERSONAL-JOBS-15 - Personal Job Desk Runtime Click Test / Local UI Smoke Gate",
+  "status": "VALIDATED",
+  "passed": true,
+  "generated_at": "2026-06-08T08:52:33.868Z",
+  "files_checked": 8,
+  "missing_files": [],
+  "failed_checks": [],
+  "warnings": [
+    "This proof requires a running local Next.js server.",
+    "Use KINGSMEN_WEB_BASE_URL if the server is not on ports 3000-3010.",
+    "This does not prove production readiness or Oracle deployment.",
+    "This does not send messages, contact employers, scrape websites, or touch payments."
+  ],
+  "oracle_lite_impact": "none_local_ui_only",
+  "route": "/personal-job-desk/runtime-click-test",
+  "local_base_url": "http://127.0.0.1:3002",
+  "proof": "reports/personal-jobs/personal-jobs-15-runtime-click-test-local-ui-smoke-gate-proof.json",
+  "next_action": "Commit PERSONAL-JOBS-15 tracked files only."
+}
