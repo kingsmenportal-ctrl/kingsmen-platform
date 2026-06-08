@@ -1,0 +1,21 @@
+{
+  "schema": "kingsmen.validation-report.v1",
+  "module": "PERSONAL-JOBS-12 - Real Job Search Source Runner / Verified Lead Finder",
+  "status": "VALIDATED",
+  "passed": true,
+  "generated_at": "2026-06-08T05:39:19.546Z",
+  "files_checked": 8,
+  "missing_files": [],
+  "failed_checks": [],
+  "warnings": [
+    "This is local UI and browser localStorage only.",
+    "This opens source pages under user control only.",
+    "Captured leads still require human review before applications.",
+    "This does not prove production readiness.",
+    "This does not send applications, email, WhatsApp, payments, employer contact, background bots, or external calendar events."
+  ],
+  "oracle_lite_impact": "none_local_ui_only",
+  "route": "/personal-job-desk/source-runner",
+  "proof": "reports/personal-jobs/personal-jobs-12-real-job-search-source-runner-verified-lead-finder-proof.json",
+  "next_action": "Commit PERSONAL-JOBS-12 tracked files only."
+}
