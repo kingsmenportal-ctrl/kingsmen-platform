@@ -1,0 +1,51 @@
+export const PERSONAL_JOBS_14_MODULE = {
+  id: "PERSONAL-JOBS-14",
+  name: "Personal Job Desk Navigation / Real Use Gate Expansion",
+  route: "/personal-job-desk/navigation",
+  expandedRealUseGateRoute: "/personal-job-desk/real-use-gate",
+  status: "BUILT_PENDING_VALIDATION",
+  localOnly: true,
+  productionReady: false,
+  canClaimProduction: false,
+  deployedToOracle: false,
+  startsDocker: false,
+  noSendBoundary: true,
+  sendsApplications: false,
+  sendsEmail: false,
+  sendsWhatsApp: false,
+  touchesPayments: false,
+  touchesExternalCalendar: false,
+  searchesInternet: false,
+  opensExternalPages: false,
+  scrapesWebsites: false,
+  contactsEmployers: false,
+  routesConnected: [
+    "/personal-job-desk",
+    "/personal-job-desk/opportunities",
+    "/personal-job-desk/shortlist",
+    "/personal-job-desk/apply-pack",
+    "/personal-job-desk/follow-up",
+    "/personal-job-desk/outcome-ledger",
+    "/personal-job-desk/real-use-gate",
+    "/personal-job-desk/daily-loop",
+    "/personal-job-desk/import-search",
+    "/personal-job-desk/source-runner",
+    "/personal-job-desk/normalizer",
+    "/personal-job-desk/navigation"
+  ],
+  readsLocalStorageKeys: [
+    "kingsmen.personalJobs02.externalLeads.v1",
+    "kingsmen.personalJobs03.shortlist.v1",
+    "kingsmen.personalJobs04.applyPacks.v1",
+    "kingsmen.personalJobs06.followUps.v1",
+    "kingsmen.personalJobs07.outcomes.v1",
+    "kingsmen.personalJobs10.dailyLoop.v1",
+    "kingsmen.personalJobs11.importedSearches.v1",
+    "kingsmen.personalJobs12.verifiedLeads.v1",
+    "kingsmen.personalJobs13.normalizerReports.v1",
+    "kingsmen.personalJobs13.normalizerBackups.v1"
+  ],
+  writesLocalStorageKeys: ["kingsmen.personalJobs14.navigationVisits.v1"]
+} as const;
+
+export type PersonalJobs14Module = typeof PERSONAL_JOBS_14_MODULE;

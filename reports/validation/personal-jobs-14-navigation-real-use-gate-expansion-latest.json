@@ -1,0 +1,21 @@
+{
+  "schema": "kingsmen.validation-report.v1",
+  "module": "PERSONAL-JOBS-14 - Personal Job Desk Navigation / Real Use Gate Expansion",
+  "status": "VALIDATED",
+  "passed": true,
+  "generated_at": "2026-06-08T06:17:49.157Z",
+  "files_checked": 8,
+  "missing_files": [],
+  "failed_checks": [],
+  "warnings": [
+    "This is local UI navigation only.",
+    "This does not prove production readiness.",
+    "This does not deploy to Oracle.",
+    "This does not send messages, contact employers, scrape websites, or touch payments."
+  ],
+  "oracle_lite_impact": "none_local_ui_only",
+  "route": "/personal-job-desk/navigation",
+  "expanded_route": "/personal-job-desk/real-use-gate",
+  "proof": "reports/personal-jobs/personal-jobs-14-navigation-real-use-gate-expansion-proof.json",
+  "next_action": "Commit PERSONAL-JOBS-14 tracked files only."
+}
