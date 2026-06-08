@@ -19,7 +19,7 @@
   "sendsWhatsApp": false,
   "touchesPayments": false,
   "contactsEmployers": false,
-  "generated_at": "2026-06-08T19:24:34.936Z",
+  "generated_at": "2026-06-08T19:29:52.025Z",
   "checks": [
     {
       "name": "expected-file:.gitignore",
