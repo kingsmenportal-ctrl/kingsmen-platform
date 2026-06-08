@@ -1,0 +1,30 @@
+{
+  "schema": "kingsmen.module-manifest.v1",
+  "module": "PERSONAL-JOBS-06 - Follow-Up Calendar / Interview Prep / Response Tracker",
+  "status": "BUILT_PENDING_VALIDATION",
+  "route": "/personal-job-desk/follow-up",
+  "localOnly": true,
+  "productionReady": false,
+  "canClaimProduction": false,
+  "deployedToOracle": false,
+  "startsDocker": false,
+  "touchesCandidateData": true,
+  "storesCandidateData": "browser_local_storage_only",
+  "readsLocalStorageKey": "kingsmen.personalJobs05.submissions.v1",
+  "writesLocalStorageKey": "kingsmen.personalJobs06.followUps.v1",
+  "localPrivateProfilePath": "data/personal-job-desk/personal-candidate.local.json",
+  "sendsApplications": false,
+  "sendsEmail": false,
+  "sendsWhatsApp": false,
+  "touchesPayments": false,
+  "touchesExternalCalendar": false,
+  "dependencies": [
+    "PERSONAL-JOBS-01",
+    "PERSONAL-JOBS-02",
+    "PERSONAL-JOBS-03",
+    "PERSONAL-JOBS-04",
+    "PERSONAL-JOBS-05"
+  ],
+  "oracleLiteImpact": "none_local_ui_only",
+  "nextAction": "Run proof and validator before commit."
+}

@@ -1,0 +1,21 @@
+{
+  "schema": "kingsmen.validation-report.v1",
+  "module": "PERSONAL-JOBS-06 - Follow-Up Calendar / Interview Prep / Response Tracker",
+  "status": "VALIDATED",
+  "passed": true,
+  "generated_at": "2026-06-08T02:04:38.733Z",
+  "files_checked": 8,
+  "missing_files": [],
+  "failed_checks": [],
+  "warnings": [
+    "Follow-up records are local planning rows only; actual follow-up remains manual.",
+    "Interview preparation notes must remain truthful and must not invent experience, qualifications, certificates, references, or recruiter replies.",
+    "This module does not send applications, messages, payments, or external calendar events."
+  ],
+  "oracle_lite_impact": "none_local_ui_only",
+  "route": "/personal-job-desk/follow-up",
+  "reads_local_storage_key": "kingsmen.personalJobs05.submissions.v1",
+  "writes_local_storage_key": "kingsmen.personalJobs06.followUps.v1",
+  "proof": "reports/personal-jobs/personal-jobs-06-follow-up-calendar-interview-response-tracker-proof.json",
+  "next_action": "Commit PERSONAL-JOBS-06 tracked files only."
+}
