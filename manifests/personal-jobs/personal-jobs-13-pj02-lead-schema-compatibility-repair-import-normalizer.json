@@ -1,0 +1,47 @@
+{
+  "schema": "kingsmen.module-manifest.v1",
+  "module": "PERSONAL-JOBS-13 - PJ02 Lead Schema Compatibility Repair / Import Normalizer",
+  "status": "BUILT_PENDING_VALIDATION",
+  "route": "/personal-job-desk/normalizer",
+  "localOnly": true,
+  "productionReady": false,
+  "canClaimProduction": false,
+  "deployedToOracle": false,
+  "startsDocker": false,
+  "touchesCandidateData": true,
+  "storesCandidateData": "browser_local_storage_only",
+  "readsLocalStorageKeys": [
+    "kingsmen.personalJobs02.externalLeads.v1"
+  ],
+  "writesLocalStorageKeys": [
+    "kingsmen.personalJobs02.externalLeads.v1",
+    "kingsmen.personalJobs13.normalizerBackups.v1",
+    "kingsmen.personalJobs13.normalizerReports.v1"
+  ],
+  "normalizesToExactPersonalJobs02LeadShape": true,
+  "createsBackupBeforeRewrite": true,
+  "repairsImportedPersonalJobs11And12Leads": true,
+  "linkedRoutes": [
+    "/personal-job-desk/opportunities",
+    "/personal-job-desk/shortlist",
+    "/personal-job-desk/import-search",
+    "/personal-job-desk/source-runner",
+    "/personal-job-desk/daily-loop"
+  ],
+  "searchesInternet": false,
+  "opensExternalPages": false,
+  "scrapesWebsites": false,
+  "sendsApplications": false,
+  "sendsEmail": false,
+  "sendsWhatsApp": false,
+  "touchesPayments": false,
+  "touchesExternalCalendar": false,
+  "contactsEmployers": false,
+  "dependencies": [
+    "PERSONAL-JOBS-02",
+    "PERSONAL-JOBS-11",
+    "PERSONAL-JOBS-12"
+  ],
+  "oracleLiteImpact": "none_local_ui_only",
+  "nextAction": "Run proof and validator before commit."
+}

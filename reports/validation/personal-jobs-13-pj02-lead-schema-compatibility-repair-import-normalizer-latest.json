@@ -1,0 +1,20 @@
+{
+  "schema": "kingsmen.validation-report.v1",
+  "module": "PERSONAL-JOBS-13 - PJ02 Lead Schema Compatibility Repair / Import Normalizer",
+  "status": "VALIDATED",
+  "passed": true,
+  "generated_at": "2026-06-08T06:01:28.936Z",
+  "files_checked": 8,
+  "missing_files": [],
+  "failed_checks": [],
+  "warnings": [
+    "This is local UI and browser localStorage only.",
+    "This rewrites PJ02 localStorage only after creating a local backup.",
+    "This does not prove production readiness.",
+    "This does not search, scrape, open external pages, send messages, contact employers, or touch payments."
+  ],
+  "oracle_lite_impact": "none_local_ui_only",
+  "route": "/personal-job-desk/normalizer",
+  "proof": "reports/personal-jobs/personal-jobs-13-pj02-lead-schema-compatibility-repair-import-normalizer-proof.json",
+  "next_action": "Commit PERSONAL-JOBS-13 tracked files only."
+}

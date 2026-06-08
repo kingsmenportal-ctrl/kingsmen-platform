@@ -1,0 +1,596 @@
+{
+  "schema": "kingsmen.personal-jobs-13-proof.v1",
+  "module": "PERSONAL-JOBS-13 - PJ02 Lead Schema Compatibility Repair / Import Normalizer",
+  "status": "PERSONAL_JOBS_13_PJ02_LEAD_SCHEMA_COMPATIBILITY_REPAIR_IMPORT_NORMALIZER_PROVEN",
+  "passed": true,
+  "productionReady": false,
+  "canClaimProduction": false,
+  "deployedToOracle": false,
+  "startsDocker": false,
+  "generated_at": "2026-06-08T06:01:28.805Z",
+  "route": "/personal-job-desk/normalizer",
+  "normalizesToExactPersonalJobs02LeadShape": true,
+  "createsBackupBeforeRewrite": true,
+  "repairsImportedPersonalJobs11And12Leads": true,
+  "readsLocalStorageKeys": [
+    "kingsmen.personalJobs02.externalLeads.v1"
+  ],
+  "writesLocalStorageKeys": [
+    "kingsmen.personalJobs02.externalLeads.v1",
+    "kingsmen.personalJobs13.normalizerBackups.v1",
+    "kingsmen.personalJobs13.normalizerReports.v1"
+  ],
+  "searchesInternet": false,
+  "opensExternalPages": false,
+  "scrapesWebsites": false,
+  "sendsApplications": false,
+  "sendsEmail": false,
+  "sendsWhatsApp": false,
+  "touchesPayments": false,
+  "touchesExternalCalendar": false,
+  "contactsEmployers": false,
+  "checks": [
+    {
+      "name": "expected-file:.gitignore",
+      "passed": true,
+      "detail": ".gitignore"
+    },
+    {
+      "name": "expected-file:apps/web/src/app/personal-job-desk/normalizer/page.tsx",
+      "passed": true,
+      "detail": "apps/web/src/app/personal-job-desk/normalizer/page.tsx"
+    },
+    {
+      "name": "expected-file:apps/web/src/app/personal-job-desk/normalizer/ImportNormalizerClient.tsx",
+      "passed": true,
+      "detail": "apps/web/src/app/personal-job-desk/normalizer/ImportNormalizerClient.tsx"
+    },
+    {
+      "name": "expected-file:docs/personal-jobs/personal-jobs-13-pj02-lead-schema-compatibility-repair-import-normalizer.md",
+      "passed": true,
+      "detail": "docs/personal-jobs/personal-jobs-13-pj02-lead-schema-compatibility-repair-import-normalizer.md"
+    },
+    {
+      "name": "expected-file:manifests/personal-jobs/personal-jobs-13-pj02-lead-schema-compatibility-repair-import-normalizer.json",
+      "passed": true,
+      "detail": "manifests/personal-jobs/personal-jobs-13-pj02-lead-schema-compatibility-repair-import-normalizer.json"
+    },
+    {
+      "name": "expected-file:packages/contracts/src/personal-jobs-13-pj02-lead-schema-compatibility-repair-import-normalizer.ts",
+      "passed": true,
+      "detail": "packages/contracts/src/personal-jobs-13-pj02-lead-schema-compatibility-repair-import-normalizer.ts"
+    },
+    {
+      "name": "expected-file:scripts/proof/prove-personal-jobs-13-pj02-lead-schema-compatibility-repair-import-normalizer.mjs",
+      "passed": true,
+      "detail": "scripts/proof/prove-personal-jobs-13-pj02-lead-schema-compatibility-repair-import-normalizer.mjs"
+    },
+    {
+      "name": "expected-file:scripts/validators/validate-personal-jobs-13-pj02-lead-schema-compatibility-repair-import-normalizer.mjs",
+      "passed": true,
+      "detail": "scripts/validators/validate-personal-jobs-13-pj02-lead-schema-compatibility-repair-import-normalizer.mjs"
+    },
+    {
+      "name": "route-file:apps/web/src/app/personal-job-desk/opportunities/OpportunityIntakeClient.tsx",
+      "passed": true,
+      "detail": "apps/web/src/app/personal-job-desk/opportunities/OpportunityIntakeClient.tsx"
+    },
+    {
+      "name": "route-file:apps/web/src/app/personal-job-desk/import-search/page.tsx",
+      "passed": true,
+      "detail": "apps/web/src/app/personal-job-desk/import-search/page.tsx"
+    },
+    {
+      "name": "route-file:apps/web/src/app/personal-job-desk/source-runner/page.tsx",
+      "passed": true,
+      "detail": "apps/web/src/app/personal-job-desk/source-runner/page.tsx"
+    },
+    {
+      "name": "route-file:apps/web/src/app/personal-job-desk/normalizer/page.tsx",
+      "passed": true,
+      "detail": "apps/web/src/app/personal-job-desk/normalizer/page.tsx"
+    },
+    {
+      "name": "dependency-personal-jobs-02-proof-exists",
+      "passed": true,
+      "detail": "personal-jobs-02-local-opportunity-intake-proof.json"
+    },
+    {
+      "name": "dependency-personal-jobs-02-validation-exists",
+      "passed": true,
+      "detail": "personal-jobs-02-local-opportunity-intake-latest.json"
+    },
+    {
+      "name": "dependency-personal-jobs-02-proof-passed",
+      "passed": true,
+      "detail": "true"
+    },
+    {
+      "name": "dependency-personal-jobs-02-validation-passed",
+      "passed": true,
+      "detail": "true"
+    },
+    {
+      "name": "dependency-personal-jobs-11-proof-exists",
+      "passed": true,
+      "detail": "personal-jobs-11-local-job-search-import-desk-proof.json"
+    },
+    {
+      "name": "dependency-personal-jobs-11-validation-exists",
+      "passed": true,
+      "detail": "personal-jobs-11-local-job-search-import-desk-latest.json"
+    },
+    {
+      "name": "dependency-personal-jobs-11-proof-passed",
+      "passed": true,
+      "detail": "true"
+    },
+    {
+      "name": "dependency-personal-jobs-11-validation-passed",
+      "passed": true,
+      "detail": "true"
+    },
+    {
+      "name": "dependency-personal-jobs-12-proof-exists",
+      "passed": true,
+      "detail": "personal-jobs-12-real-job-search-source-runner-verified-lead-finder-proof.json"
+    },
+    {
+      "name": "dependency-personal-jobs-12-validation-exists",
+      "passed": true,
+      "detail": "personal-jobs-12-real-job-search-source-runner-verified-lead-finder-latest.json"
+    },
+    {
+      "name": "dependency-personal-jobs-12-proof-passed",
+      "passed": true,
+      "detail": "true"
+    },
+    {
+      "name": "dependency-personal-jobs-12-validation-passed",
+      "passed": true,
+      "detail": "true"
+    },
+    {
+      "name": "pj02-schema-source-field:company",
+      "passed": true,
+      "detail": "company"
+    },
+    {
+      "name": "client-normalizes-field:company",
+      "passed": true,
+      "detail": "company"
+    },
+    {
+      "name": "pj02-schema-source-field:roleTitle",
+      "passed": true,
+      "detail": "roleTitle"
+    },
+    {
+      "name": "client-normalizes-field:roleTitle",
+      "passed": true,
+      "detail": "roleTitle"
+    },
+    {
+      "name": "pj02-schema-source-field:opportunityLink",
+      "passed": true,
+      "detail": "opportunityLink"
+    },
+    {
+      "name": "client-normalizes-field:opportunityLink",
+      "passed": true,
+      "detail": "opportunityLink"
+    },
+    {
+      "name": "pj02-schema-source-field:sourceType",
+      "passed": true,
+      "detail": "sourceType"
+    },
+    {
+      "name": "client-normalizes-field:sourceType",
+      "passed": true,
+      "detail": "sourceType"
+    },
+    {
+      "name": "pj02-schema-source-field:location",
+      "passed": true,
+      "detail": "location"
+    },
+    {
+      "name": "client-normalizes-field:location",
+      "passed": true,
+      "detail": "location"
+    },
+    {
+      "name": "pj02-schema-source-field:workMode",
+      "passed": true,
+      "detail": "workMode"
+    },
+    {
+      "name": "client-normalizes-field:workMode",
+      "passed": true,
+      "detail": "workMode"
+    },
+    {
+      "name": "pj02-schema-source-field:deadline",
+      "passed": true,
+      "detail": "deadline"
+    },
+    {
+      "name": "client-normalizes-field:deadline",
+      "passed": true,
+      "detail": "deadline"
+    },
+    {
+      "name": "pj02-schema-source-field:salaryText",
+      "passed": true,
+      "detail": "salaryText"
+    },
+    {
+      "name": "client-normalizes-field:salaryText",
+      "passed": true,
+      "detail": "salaryText"
+    },
+    {
+      "name": "pj02-schema-source-field:requirementsText",
+      "passed": true,
+      "detail": "requirementsText"
+    },
+    {
+      "name": "client-normalizes-field:requirementsText",
+      "passed": true,
+      "detail": "requirementsText"
+    },
+    {
+      "name": "pj02-schema-source-field:fitReason",
+      "passed": true,
+      "detail": "fitReason"
+    },
+    {
+      "name": "client-normalizes-field:fitReason",
+      "passed": true,
+      "detail": "fitReason"
+    },
+    {
+      "name": "pj02-schema-source-field:riskNotes",
+      "passed": true,
+      "detail": "riskNotes"
+    },
+    {
+      "name": "client-normalizes-field:riskNotes",
+      "passed": true,
+      "detail": "riskNotes"
+    },
+    {
+      "name": "pj02-schema-source-field:confidence",
+      "passed": true,
+      "detail": "confidence"
+    },
+    {
+      "name": "client-normalizes-field:confidence",
+      "passed": true,
+      "detail": "confidence"
+    },
+    {
+      "name": "pj02-schema-source-field:status",
+      "passed": true,
+      "detail": "status"
+    },
+    {
+      "name": "client-normalizes-field:status",
+      "passed": true,
+      "detail": "status"
+    },
+    {
+      "name": "pj02-schema-source-field:nextAction",
+      "passed": true,
+      "detail": "nextAction"
+    },
+    {
+      "name": "client-normalizes-field:nextAction",
+      "passed": true,
+      "detail": "nextAction"
+    },
+    {
+      "name": "pj02-schema-source-field:cvSlot",
+      "passed": true,
+      "detail": "cvSlot"
+    },
+    {
+      "name": "client-normalizes-field:cvSlot",
+      "passed": true,
+      "detail": "cvSlot"
+    },
+    {
+      "name": "pj02-schema-source-field:motivationLetterSlot",
+      "passed": true,
+      "detail": "motivationLetterSlot"
+    },
+    {
+      "name": "client-normalizes-field:motivationLetterSlot",
+      "passed": true,
+      "detail": "motivationLetterSlot"
+    },
+    {
+      "name": "pj02-schema-source-field:proofNote",
+      "passed": true,
+      "detail": "proofNote"
+    },
+    {
+      "name": "client-normalizes-field:proofNote",
+      "passed": true,
+      "detail": "proofNote"
+    },
+    {
+      "name": "page-route-marker",
+      "passed": true,
+      "detail": "route marker"
+    },
+    {
+      "name": "client-normalizer-marker",
+      "passed": true,
+      "detail": "client marker"
+    },
+    {
+      "name": "client-no-send-marker",
+      "passed": true,
+      "detail": "no-send marker"
+    },
+    {
+      "name": "client-pj02-key",
+      "passed": true,
+      "detail": "PJ02 key"
+    },
+    {
+      "name": "client-backup-key",
+      "passed": true,
+      "detail": "backup key"
+    },
+    {
+      "name": "client-report-key",
+      "passed": true,
+      "detail": "report key"
+    },
+    {
+      "name": "client-normalize-function",
+      "passed": true,
+      "detail": "normalizeLead"
+    },
+    {
+      "name": "client-exact-shape-function",
+      "passed": true,
+      "detail": "isExactPJ02Lead"
+    },
+    {
+      "name": "client-backup-before-rewrite",
+      "passed": true,
+      "detail": "backup before rewrite"
+    },
+    {
+      "name": "client-slot-15",
+      "passed": true,
+      "detail": "15 slots"
+    },
+    {
+      "name": "client-status-values",
+      "passed": true,
+      "detail": "PJ02 statuses"
+    },
+    {
+      "name": "client-source-values",
+      "passed": true,
+      "detail": "PJ02 sources"
+    },
+    {
+      "name": "client-work-modes",
+      "passed": true,
+      "detail": "work modes"
+    },
+    {
+      "name": "client-confidence-values",
+      "passed": true,
+      "detail": "confidence values"
+    },
+    {
+      "name": "doc-boundary",
+      "passed": true,
+      "detail": "doc boundary"
+    },
+    {
+      "name": "manifest-status",
+      "passed": true,
+      "detail": "BUILT_PENDING_VALIDATION"
+    },
+    {
+      "name": "manifest-route",
+      "passed": true,
+      "detail": "/personal-job-desk/normalizer"
+    },
+    {
+      "name": "manifest-exact-shape",
+      "passed": true,
+      "detail": "exact shape true"
+    },
+    {
+      "name": "manifest-backup",
+      "passed": true,
+      "detail": "backup true"
+    },
+    {
+      "name": "manifest-repairs-imported",
+      "passed": true,
+      "detail": "repairs true"
+    },
+    {
+      "name": "manifest-pj02-write",
+      "passed": true,
+      "detail": "PJ02 write key"
+    },
+    {
+      "name": "manifest-backup-write",
+      "passed": true,
+      "detail": "backup write key"
+    },
+    {
+      "name": "manifest-report-write",
+      "passed": true,
+      "detail": "report write key"
+    },
+    {
+      "name": "manifest-no-production",
+      "passed": true,
+      "detail": "production false"
+    },
+    {
+      "name": "manifest-no-oracle",
+      "passed": true,
+      "detail": "oracle false"
+    },
+    {
+      "name": "manifest-no-docker",
+      "passed": true,
+      "detail": "docker false"
+    },
+    {
+      "name": "manifest-no-external",
+      "passed": true,
+      "detail": "external false"
+    },
+    {
+      "name": "manifest-no-send",
+      "passed": true,
+      "detail": "send false"
+    },
+    {
+      "name": "manifest-no-employer-contact",
+      "passed": true,
+      "detail": "employer false"
+    },
+    {
+      "name": "contract-route",
+      "passed": true,
+      "detail": "contract route"
+    },
+    {
+      "name": "contract-fields",
+      "passed": true,
+      "detail": "contract fields"
+    },
+    {
+      "name": "contract-boundary",
+      "passed": true,
+      "detail": "contract boundary"
+    },
+    {
+      "name": "runtime-no-forbidden:email-send-runtime",
+      "passed": true,
+      "detail": "email-send-runtime"
+    },
+    {
+      "name": "runtime-no-forbidden:payment-runtime",
+      "passed": true,
+      "detail": "payment-runtime"
+    },
+    {
+      "name": "runtime-no-forbidden:whatsapp-runtime",
+      "passed": true,
+      "detail": "whatsapp-runtime"
+    },
+    {
+      "name": "runtime-no-forbidden:service-role-secret",
+      "passed": true,
+      "detail": "service-role-secret"
+    },
+    {
+      "name": "runtime-no-forbidden:payfast-passphrase",
+      "passed": true,
+      "detail": "payfast-passphrase"
+    },
+    {
+      "name": "runtime-no-forbidden:private-key-material",
+      "passed": true,
+      "detail": "private-key-material"
+    },
+    {
+      "name": "runtime-no-forbidden:oci-private-path",
+      "passed": true,
+      "detail": "oci-private-path"
+    },
+    {
+      "name": "runtime-no-forbidden:ssh-private-path",
+      "passed": true,
+      "detail": "ssh-private-path"
+    },
+    {
+      "name": "runtime-no-forbidden:docker-compose-up-runtime",
+      "passed": true,
+      "detail": "docker-compose-up-runtime"
+    },
+    {
+      "name": "runtime-no-forbidden:PRODUCTION_READY_TRUE",
+      "passed": true,
+      "detail": "PRODUCTION_READY_TRUE"
+    },
+    {
+      "name": "runtime-no-forbidden:DEPLOYED_TO_ORACLE_TRUE",
+      "passed": true,
+      "detail": "DEPLOYED_TO_ORACLE_TRUE"
+    },
+    {
+      "name": "runtime-no-forbidden:smtp.send",
+      "passed": true,
+      "detail": "smtp.send"
+    },
+    {
+      "name": "runtime-no-forbidden:sendEmail(",
+      "passed": true,
+      "detail": "sendEmail("
+    },
+    {
+      "name": "runtime-no-forbidden:sendWhatsApp(",
+      "passed": true,
+      "detail": "sendWhatsApp("
+    },
+    {
+      "name": "runtime-no-forbidden:submitApplication(",
+      "passed": true,
+      "detail": "submitApplication("
+    },
+    {
+      "name": "runtime-no-forbidden:window.open(",
+      "passed": true,
+      "detail": "window.open("
+    },
+    {
+      "name": "runtime-no-forbidden:fetch(",
+      "passed": true,
+      "detail": "fetch("
+    },
+    {
+      "name": "runtime-no-forbidden:axios.",
+      "passed": true,
+      "detail": "axios."
+    },
+    {
+      "name": "runtime-no-forbidden:puppeteer",
+      "passed": true,
+      "detail": "puppeteer"
+    },
+    {
+      "name": "runtime-no-forbidden:playwright",
+      "passed": true,
+      "detail": "playwright"
+    },
+    {
+      "name": "runtime-no-forbidden:cheerio",
+      "passed": true,
+      "detail": "cheerio"
+    },
+    {
+      "name": "committed-files-no-local-profile-contact",
+      "passed": true,
+      "detail": "local profile contact must stay untracked"
+    }
+  ],
+  "failed": [],
+  "next_action": "Run validator and commit PERSONAL-JOBS-13 tracked files only."
+}
