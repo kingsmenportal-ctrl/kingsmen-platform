@@ -1,0 +1,21 @@
+{
+  "schema": "kingsmen.validation-report.v1",
+  "module": "PERSONAL-JOBS-11 - Local Job Search Import Desk",
+  "status": "VALIDATED",
+  "passed": true,
+  "generated_at": "2026-06-08T05:21:29.919Z",
+  "files_checked": 8,
+  "missing_files": [],
+  "failed_checks": [],
+  "warnings": [
+    "This is local UI and browser localStorage only.",
+    "This does not search the internet automatically.",
+    "Imported leads are unverified until source review.",
+    "This does not prove production readiness.",
+    "This does not send applications, email, WhatsApp, payments, employer contact, scraping, or external calendar events."
+  ],
+  "oracle_lite_impact": "none_local_ui_only",
+  "route": "/personal-job-desk/import-search",
+  "proof": "reports/personal-jobs/personal-jobs-11-local-job-search-import-desk-proof.json",
+  "next_action": "Commit PERSONAL-JOBS-11 tracked files only."
+}
