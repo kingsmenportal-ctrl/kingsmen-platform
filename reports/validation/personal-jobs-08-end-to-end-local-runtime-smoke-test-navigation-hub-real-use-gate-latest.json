@@ -1,0 +1,37 @@
+{
+  "schema": "kingsmen.validation-report.v1",
+  "module": "PERSONAL-JOBS-08 - End-to-End Local Runtime Smoke Test / Navigation Hub / Real Use Gate",
+  "status": "VALIDATED",
+  "passed": true,
+  "generated_at": "2026-06-08T02:23:30.225Z",
+  "files_checked": 8,
+  "missing_files": [],
+  "failed_checks": [],
+  "warnings": [
+    "This is a local real-use gate only; it does not prove production readiness.",
+    "Browser localStorage smoke data depends on the user's local browser session.",
+    "The route hub helps real use but does not send applications, messages, payments, employer contact, or external calendar events."
+  ],
+  "oracle_lite_impact": "none_local_ui_only",
+  "route": "/personal-job-desk/real-use-gate",
+  "navigation_routes": [
+    "/personal-job-desk",
+    "/personal-job-desk/opportunities",
+    "/personal-job-desk/shortlist",
+    "/personal-job-desk/apply-pack",
+    "/personal-job-desk/submissions",
+    "/personal-job-desk/follow-up",
+    "/personal-job-desk/outcomes"
+  ],
+  "reads_local_storage_keys": [
+    "kingsmen.personalJobs02.externalLeads.v1",
+    "kingsmen.personalJobs03.shortlist.v1",
+    "kingsmen.personalJobs04.applyPacks.v1",
+    "kingsmen.personalJobs05.submissions.v1",
+    "kingsmen.personalJobs06.followUps.v1",
+    "kingsmen.personalJobs07.outcomeLedger.v1"
+  ],
+  "writes_local_storage_key": "kingsmen.personalJobs08.realUseGate.v1",
+  "proof": "reports/personal-jobs/personal-jobs-08-end-to-end-local-runtime-smoke-test-navigation-hub-real-use-gate-proof.json",
+  "next_action": "Commit PERSONAL-JOBS-08 tracked files only."
+}
