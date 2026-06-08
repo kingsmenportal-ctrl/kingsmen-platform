@@ -1,0 +1,27 @@
+{
+  "schema": "kingsmen.validation-report.v1",
+  "module": "PERSONAL-JOBS-07 - Outcome Ledger / Offer Decision / Job Search Command Dashboard",
+  "status": "VALIDATED",
+  "passed": true,
+  "generated_at": "2026-06-08T02:16:09.832Z",
+  "files_checked": 8,
+  "missing_files": [],
+  "failed_checks": [],
+  "warnings": [
+    "Outcome records are local planning rows only; real employment decisions require human review.",
+    "Offer decisions must verify written proof, employer legitimacy, salary, location, transport, contract, and safety.",
+    "This module does not send applications, messages, payments, employer contact, or external calendar events."
+  ],
+  "oracle_lite_impact": "none_local_ui_only",
+  "route": "/personal-job-desk/outcomes",
+  "reads_local_storage_keys": [
+    "kingsmen.personalJobs02.externalLeads.v1",
+    "kingsmen.personalJobs03.shortlist.v1",
+    "kingsmen.personalJobs04.applyPacks.v1",
+    "kingsmen.personalJobs05.submissions.v1",
+    "kingsmen.personalJobs06.followUps.v1"
+  ],
+  "writes_local_storage_key": "kingsmen.personalJobs07.outcomeLedger.v1",
+  "proof": "reports/personal-jobs/personal-jobs-07-outcome-ledger-offer-decision-command-dashboard-proof.json",
+  "next_action": "Commit PERSONAL-JOBS-07 tracked files only."
+}
