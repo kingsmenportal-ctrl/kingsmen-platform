@@ -1,0 +1,636 @@
+{
+  "schema": "kingsmen.personal-jobs-16-proof.v1",
+  "module": "PERSONAL-JOBS-16 - GitHub Proof Index / Build Ledger / Founder Handover",
+  "status": "PERSONAL_JOBS_16_GITHUB_PROOF_INDEX_BUILD_LEDGER_FOUNDER_HANDOVER_PROVEN",
+  "passed": true,
+  "productionReady": false,
+  "canClaimProduction": false,
+  "deployedToOracle": false,
+  "startsDocker": false,
+  "generated_at": "2026-06-08T18:54:15.278Z",
+  "route": "/personal-job-desk/proof-index",
+  "writesLocalStorageKeys": [
+    "kingsmen.personalJobs16.githubProofIndex.v1",
+    "kingsmen.personalJobs16.founderHandover.v1"
+  ],
+  "dependencyModuleCount": 13,
+  "dependencyIndex": [
+    {
+      "module": "PERSONAL-JOBS-01",
+      "proof": "reports/personal-jobs/personal-jobs-01-local-job-desk-proof.json",
+      "proofPassed": true,
+      "validation": "reports/validation/personal-jobs-01-local-job-desk-latest.json",
+      "validationPassed": true
+    },
+    {
+      "module": "PERSONAL-JOBS-02",
+      "proof": "reports/personal-jobs/personal-jobs-02-local-opportunity-intake-proof.json",
+      "proofPassed": true,
+      "validation": "reports/validation/personal-jobs-02-local-opportunity-intake-latest.json",
+      "validationPassed": true
+    },
+    {
+      "module": "PERSONAL-JOBS-03",
+      "proof": "reports/personal-jobs/personal-jobs-03-local-fit-scoring-shortlist-proof.json",
+      "proofPassed": true,
+      "validation": "reports/validation/personal-jobs-03-local-fit-scoring-shortlist-latest.json",
+      "validationPassed": true
+    },
+    {
+      "module": "PERSONAL-JOBS-04",
+      "proof": "reports/personal-jobs/personal-jobs-04-cv-motivation-apply-pack-builder-proof.json",
+      "proofPassed": true,
+      "validation": "reports/validation/personal-jobs-04-cv-motivation-apply-pack-builder-latest.json",
+      "validationPassed": true
+    },
+    {
+      "module": "PERSONAL-JOBS-06",
+      "proof": "reports/personal-jobs/personal-jobs-06-follow-up-calendar-interview-response-tracker-proof.json",
+      "proofPassed": true,
+      "validation": "reports/validation/personal-jobs-06-follow-up-calendar-interview-response-tracker-latest.json",
+      "validationPassed": true
+    },
+    {
+      "module": "PERSONAL-JOBS-07",
+      "proof": "reports/personal-jobs/personal-jobs-07-outcome-ledger-offer-decision-command-dashboard-proof.json",
+      "proofPassed": true,
+      "validation": "reports/validation/personal-jobs-07-outcome-ledger-offer-decision-command-dashboard-latest.json",
+      "validationPassed": true
+    },
+    {
+      "module": "PERSONAL-JOBS-08",
+      "proof": "reports/personal-jobs/personal-jobs-08-end-to-end-local-runtime-smoke-test-navigation-hub-real-use-gate-proof.json",
+      "proofPassed": true,
+      "validation": "reports/validation/personal-jobs-08-end-to-end-local-runtime-smoke-test-navigation-hub-real-use-gate-latest.json",
+      "validationPassed": true
+    },
+    {
+      "module": "PERSONAL-JOBS-10",
+      "proof": "reports/personal-jobs/personal-jobs-10-personal-job-campaign-daily-operating-loop-proof.json",
+      "proofPassed": true,
+      "validation": "reports/validation/personal-jobs-10-personal-job-campaign-daily-operating-loop-latest.json",
+      "validationPassed": true
+    },
+    {
+      "module": "PERSONAL-JOBS-11",
+      "proof": "reports/personal-jobs/personal-jobs-11-local-job-search-import-desk-proof.json",
+      "proofPassed": true,
+      "validation": "reports/validation/personal-jobs-11-local-job-search-import-desk-latest.json",
+      "validationPassed": true
+    },
+    {
+      "module": "PERSONAL-JOBS-12",
+      "proof": "reports/personal-jobs/personal-jobs-12-real-job-search-source-runner-verified-lead-finder-proof.json",
+      "proofPassed": true,
+      "validation": "reports/validation/personal-jobs-12-real-job-search-source-runner-verified-lead-finder-latest.json",
+      "validationPassed": true
+    },
+    {
+      "module": "PERSONAL-JOBS-13",
+      "proof": "reports/personal-jobs/personal-jobs-13-pj02-lead-schema-compatibility-repair-import-normalizer-proof.json",
+      "proofPassed": true,
+      "validation": "reports/validation/personal-jobs-13-pj02-lead-schema-compatibility-repair-import-normalizer-latest.json",
+      "validationPassed": true
+    },
+    {
+      "module": "PERSONAL-JOBS-14",
+      "proof": "reports/personal-jobs/personal-jobs-14-navigation-real-use-gate-expansion-proof.json",
+      "proofPassed": true,
+      "validation": "reports/validation/personal-jobs-14-navigation-real-use-gate-expansion-latest.json",
+      "validationPassed": true
+    },
+    {
+      "module": "PERSONAL-JOBS-15",
+      "proof": "reports/personal-jobs/personal-jobs-15-runtime-click-test-local-ui-smoke-gate-proof.json",
+      "proofPassed": true,
+      "validation": "reports/validation/personal-jobs-15-runtime-click-test-local-ui-smoke-gate-latest.json",
+      "validationPassed": true
+    }
+  ],
+  "git": {
+    "insideWorktree": true,
+    "branch": "main",
+    "head": "66e000a",
+    "originConfigured": true,
+    "workingTreeCleanBeforeCommit": false,
+    "statusShort": "?? apps/web/src/app/personal-job-desk/proof-index/\n?? docs/personal-jobs/personal-jobs-16-github-proof-index-build-ledger-founder-handover.md\n?? manifests/personal-jobs/personal-jobs-16-github-proof-index-build-ledger-founder-handover.json\n?? packages/contracts/src/personal-jobs-16-github-proof-index-build-ledger-founder-handover.ts\n?? reports/personal-jobs/personal-jobs-16-github-proof-index-build-ledger-founder-handover-proof.json\n?? scripts/proof/prove-personal-jobs-16-github-proof-index-build-ledger-founder-handover.mjs\n?? scripts/validators/validate-personal-jobs-16-github-proof-index-build-ledger-founder-handover.mjs"
+  },
+  "searchesInternet": false,
+  "opensExternalPages": false,
+  "scrapesWebsites": false,
+  "sendsApplications": false,
+  "sendsEmail": false,
+  "sendsWhatsApp": false,
+  "touchesPayments": false,
+  "touchesExternalCalendar": false,
+  "contactsEmployers": false,
+  "checks": [
+    {
+      "name": "expected-file:apps/web/src/app/personal-job-desk/proof-index/page.tsx",
+      "passed": true,
+      "detail": "apps/web/src/app/personal-job-desk/proof-index/page.tsx"
+    },
+    {
+      "name": "expected-file:apps/web/src/app/personal-job-desk/proof-index/ProofIndexClient.tsx",
+      "passed": true,
+      "detail": "apps/web/src/app/personal-job-desk/proof-index/ProofIndexClient.tsx"
+    },
+    {
+      "name": "expected-file:docs/personal-jobs/personal-jobs-16-github-proof-index-build-ledger-founder-handover.md",
+      "passed": true,
+      "detail": "docs/personal-jobs/personal-jobs-16-github-proof-index-build-ledger-founder-handover.md"
+    },
+    {
+      "name": "expected-file:manifests/personal-jobs/personal-jobs-16-github-proof-index-build-ledger-founder-handover.json",
+      "passed": true,
+      "detail": "manifests/personal-jobs/personal-jobs-16-github-proof-index-build-ledger-founder-handover.json"
+    },
+    {
+      "name": "expected-file:packages/contracts/src/personal-jobs-16-github-proof-index-build-ledger-founder-handover.ts",
+      "passed": true,
+      "detail": "packages/contracts/src/personal-jobs-16-github-proof-index-build-ledger-founder-handover.ts"
+    },
+    {
+      "name": "expected-file:scripts/proof/prove-personal-jobs-16-github-proof-index-build-ledger-founder-handover.mjs",
+      "passed": true,
+      "detail": "scripts/proof/prove-personal-jobs-16-github-proof-index-build-ledger-founder-handover.mjs"
+    },
+    {
+      "name": "expected-file:scripts/validators/validate-personal-jobs-16-github-proof-index-build-ledger-founder-handover.mjs",
+      "passed": true,
+      "detail": "scripts/validators/validate-personal-jobs-16-github-proof-index-build-ledger-founder-handover.mjs"
+    },
+    {
+      "name": "page-uses-proof-index-client",
+      "passed": true,
+      "detail": "ProofIndexClient"
+    },
+    {
+      "name": "page-force-dynamic",
+      "passed": true,
+      "detail": "force dynamic local route"
+    },
+    {
+      "name": "client-marker",
+      "passed": true,
+      "detail": "PJ16 marker"
+    },
+    {
+      "name": "client-build-ledger",
+      "passed": true,
+      "detail": "Build ledger"
+    },
+    {
+      "name": "client-founder-handover",
+      "passed": true,
+      "detail": "Founder handover"
+    },
+    {
+      "name": "client-local-storage-visit",
+      "passed": true,
+      "detail": "visit key"
+    },
+    {
+      "name": "client-local-storage-handover",
+      "passed": true,
+      "detail": "handover key"
+    },
+    {
+      "name": "client-runtime-click-test-link",
+      "passed": true,
+      "detail": "runtime click test route"
+    },
+    {
+      "name": "client-navigation-link",
+      "passed": true,
+      "detail": "navigation route"
+    },
+    {
+      "name": "client-no-send-boundary",
+      "passed": true,
+      "detail": "no-send boundary"
+    },
+    {
+      "name": "doc-proof-authority",
+      "passed": true,
+      "detail": "proof authority"
+    },
+    {
+      "name": "doc-locked-boundary",
+      "passed": true,
+      "detail": "locked boundary"
+    },
+    {
+      "name": "contract-export",
+      "passed": true,
+      "detail": "contract export"
+    },
+    {
+      "name": "contract-route",
+      "passed": true,
+      "detail": "/personal-job-desk/proof-index"
+    },
+    {
+      "name": "contract-production-false",
+      "passed": true,
+      "detail": "production false"
+    },
+    {
+      "name": "manifest-json-valid",
+      "passed": true,
+      "detail": "valid json"
+    },
+    {
+      "name": "manifest-status-built-pending-validation",
+      "passed": true,
+      "detail": "BUILT_PENDING_VALIDATION"
+    },
+    {
+      "name": "manifest-route",
+      "passed": true,
+      "detail": "/personal-job-desk/proof-index"
+    },
+    {
+      "name": "manifest-no-production",
+      "passed": true,
+      "detail": "production false"
+    },
+    {
+      "name": "manifest-no-oracle",
+      "passed": true,
+      "detail": "oracle false"
+    },
+    {
+      "name": "manifest-no-docker",
+      "passed": true,
+      "detail": "docker false"
+    },
+    {
+      "name": "manifest-no-send-email",
+      "passed": true,
+      "detail": "email false"
+    },
+    {
+      "name": "manifest-no-whatsapp",
+      "passed": true,
+      "detail": "whatsapp false"
+    },
+    {
+      "name": "manifest-no-payment",
+      "passed": true,
+      "detail": "payments false"
+    },
+    {
+      "name": "manifest-required-dependency-count",
+      "passed": true,
+      "detail": "13 dependency modules"
+    },
+    {
+      "name": "dependency-proof-exists:PJ01",
+      "passed": true,
+      "detail": "reports/personal-jobs/personal-jobs-01-local-job-desk-proof.json"
+    },
+    {
+      "name": "dependency-validation-exists:PJ01",
+      "passed": true,
+      "detail": "reports/validation/personal-jobs-01-local-job-desk-latest.json"
+    },
+    {
+      "name": "dependency-proof-passed:PJ01",
+      "passed": true,
+      "detail": "PERSONAL_JOBS_01_LOCAL_JOB_DESK_PROVEN"
+    },
+    {
+      "name": "dependency-validation-passed:PJ01",
+      "passed": true,
+      "detail": "VALIDATED"
+    },
+    {
+      "name": "dependency-proof-exists:PJ02",
+      "passed": true,
+      "detail": "reports/personal-jobs/personal-jobs-02-local-opportunity-intake-proof.json"
+    },
+    {
+      "name": "dependency-validation-exists:PJ02",
+      "passed": true,
+      "detail": "reports/validation/personal-jobs-02-local-opportunity-intake-latest.json"
+    },
+    {
+      "name": "dependency-proof-passed:PJ02",
+      "passed": true,
+      "detail": "PERSONAL_JOBS_02_LOCAL_OPPORTUNITY_INTAKE_PROVEN"
+    },
+    {
+      "name": "dependency-validation-passed:PJ02",
+      "passed": true,
+      "detail": "VALIDATED"
+    },
+    {
+      "name": "dependency-proof-exists:PJ03",
+      "passed": true,
+      "detail": "reports/personal-jobs/personal-jobs-03-local-fit-scoring-shortlist-proof.json"
+    },
+    {
+      "name": "dependency-validation-exists:PJ03",
+      "passed": true,
+      "detail": "reports/validation/personal-jobs-03-local-fit-scoring-shortlist-latest.json"
+    },
+    {
+      "name": "dependency-proof-passed:PJ03",
+      "passed": true,
+      "detail": "PERSONAL_JOBS_03_LOCAL_FIT_SCORING_SHORTLIST_PROVEN"
+    },
+    {
+      "name": "dependency-validation-passed:PJ03",
+      "passed": true,
+      "detail": "VALIDATED"
+    },
+    {
+      "name": "dependency-proof-exists:PJ04",
+      "passed": true,
+      "detail": "reports/personal-jobs/personal-jobs-04-cv-motivation-apply-pack-builder-proof.json"
+    },
+    {
+      "name": "dependency-validation-exists:PJ04",
+      "passed": true,
+      "detail": "reports/validation/personal-jobs-04-cv-motivation-apply-pack-builder-latest.json"
+    },
+    {
+      "name": "dependency-proof-passed:PJ04",
+      "passed": true,
+      "detail": "PERSONAL_JOBS_04_CV_MOTIVATION_APPLY_PACK_BUILDER_PROVEN"
+    },
+    {
+      "name": "dependency-validation-passed:PJ04",
+      "passed": true,
+      "detail": "VALIDATED"
+    },
+    {
+      "name": "dependency-proof-exists:PJ06",
+      "passed": true,
+      "detail": "reports/personal-jobs/personal-jobs-06-follow-up-calendar-interview-response-tracker-proof.json"
+    },
+    {
+      "name": "dependency-validation-exists:PJ06",
+      "passed": true,
+      "detail": "reports/validation/personal-jobs-06-follow-up-calendar-interview-response-tracker-latest.json"
+    },
+    {
+      "name": "dependency-proof-passed:PJ06",
+      "passed": true,
+      "detail": "PERSONAL_JOBS_06_FOLLOW_UP_CALENDAR_INTERVIEW_RESPONSE_TRACKER_PROVEN"
+    },
+    {
+      "name": "dependency-validation-passed:PJ06",
+      "passed": true,
+      "detail": "VALIDATED"
+    },
+    {
+      "name": "dependency-proof-exists:PJ07",
+      "passed": true,
+      "detail": "reports/personal-jobs/personal-jobs-07-outcome-ledger-offer-decision-command-dashboard-proof.json"
+    },
+    {
+      "name": "dependency-validation-exists:PJ07",
+      "passed": true,
+      "detail": "reports/validation/personal-jobs-07-outcome-ledger-offer-decision-command-dashboard-latest.json"
+    },
+    {
+      "name": "dependency-proof-passed:PJ07",
+      "passed": true,
+      "detail": "PERSONAL_JOBS_07_OUTCOME_LEDGER_OFFER_DECISION_COMMAND_DASHBOARD_PROVEN"
+    },
+    {
+      "name": "dependency-validation-passed:PJ07",
+      "passed": true,
+      "detail": "VALIDATED"
+    },
+    {
+      "name": "dependency-proof-exists:PJ08",
+      "passed": true,
+      "detail": "reports/personal-jobs/personal-jobs-08-end-to-end-local-runtime-smoke-test-navigation-hub-real-use-gate-proof.json"
+    },
+    {
+      "name": "dependency-validation-exists:PJ08",
+      "passed": true,
+      "detail": "reports/validation/personal-jobs-08-end-to-end-local-runtime-smoke-test-navigation-hub-real-use-gate-latest.json"
+    },
+    {
+      "name": "dependency-proof-passed:PJ08",
+      "passed": true,
+      "detail": "PERSONAL_JOBS_08_END_TO_END_LOCAL_RUNTIME_SMOKE_TEST_NAVIGATION_HUB_REAL_USE_GATE_PROVEN"
+    },
+    {
+      "name": "dependency-validation-passed:PJ08",
+      "passed": true,
+      "detail": "VALIDATED"
+    },
+    {
+      "name": "dependency-proof-exists:PJ10",
+      "passed": true,
+      "detail": "reports/personal-jobs/personal-jobs-10-personal-job-campaign-daily-operating-loop-proof.json"
+    },
+    {
+      "name": "dependency-validation-exists:PJ10",
+      "passed": true,
+      "detail": "reports/validation/personal-jobs-10-personal-job-campaign-daily-operating-loop-latest.json"
+    },
+    {
+      "name": "dependency-proof-passed:PJ10",
+      "passed": true,
+      "detail": "PERSONAL_JOBS_10_PERSONAL_JOB_CAMPAIGN_DAILY_OPERATING_LOOP_PROVEN"
+    },
+    {
+      "name": "dependency-validation-passed:PJ10",
+      "passed": true,
+      "detail": "VALIDATED"
+    },
+    {
+      "name": "dependency-proof-exists:PJ11",
+      "passed": true,
+      "detail": "reports/personal-jobs/personal-jobs-11-local-job-search-import-desk-proof.json"
+    },
+    {
+      "name": "dependency-validation-exists:PJ11",
+      "passed": true,
+      "detail": "reports/validation/personal-jobs-11-local-job-search-import-desk-latest.json"
+    },
+    {
+      "name": "dependency-proof-passed:PJ11",
+      "passed": true,
+      "detail": "PERSONAL_JOBS_11_LOCAL_JOB_SEARCH_IMPORT_DESK_PROVEN"
+    },
+    {
+      "name": "dependency-validation-passed:PJ11",
+      "passed": true,
+      "detail": "VALIDATED"
+    },
+    {
+      "name": "dependency-proof-exists:PJ12",
+      "passed": true,
+      "detail": "reports/personal-jobs/personal-jobs-12-real-job-search-source-runner-verified-lead-finder-proof.json"
+    },
+    {
+      "name": "dependency-validation-exists:PJ12",
+      "passed": true,
+      "detail": "reports/validation/personal-jobs-12-real-job-search-source-runner-verified-lead-finder-latest.json"
+    },
+    {
+      "name": "dependency-proof-passed:PJ12",
+      "passed": true,
+      "detail": "PERSONAL_JOBS_12_REAL_JOB_SEARCH_SOURCE_RUNNER_VERIFIED_LEAD_FINDER_PROVEN"
+    },
+    {
+      "name": "dependency-validation-passed:PJ12",
+      "passed": true,
+      "detail": "VALIDATED"
+    },
+    {
+      "name": "dependency-proof-exists:PJ13",
+      "passed": true,
+      "detail": "reports/personal-jobs/personal-jobs-13-pj02-lead-schema-compatibility-repair-import-normalizer-proof.json"
+    },
+    {
+      "name": "dependency-validation-exists:PJ13",
+      "passed": true,
+      "detail": "reports/validation/personal-jobs-13-pj02-lead-schema-compatibility-repair-import-normalizer-latest.json"
+    },
+    {
+      "name": "dependency-proof-passed:PJ13",
+      "passed": true,
+      "detail": "PERSONAL_JOBS_13_PJ02_LEAD_SCHEMA_COMPATIBILITY_REPAIR_IMPORT_NORMALIZER_PROVEN"
+    },
+    {
+      "name": "dependency-validation-passed:PJ13",
+      "passed": true,
+      "detail": "VALIDATED"
+    },
+    {
+      "name": "dependency-proof-exists:PJ14",
+      "passed": true,
+      "detail": "reports/personal-jobs/personal-jobs-14-navigation-real-use-gate-expansion-proof.json"
+    },
+    {
+      "name": "dependency-validation-exists:PJ14",
+      "passed": true,
+      "detail": "reports/validation/personal-jobs-14-navigation-real-use-gate-expansion-latest.json"
+    },
+    {
+      "name": "dependency-proof-passed:PJ14",
+      "passed": true,
+      "detail": "PERSONAL_JOBS_14_NAVIGATION_REAL_USE_GATE_EXPANSION_PROVEN"
+    },
+    {
+      "name": "dependency-validation-passed:PJ14",
+      "passed": true,
+      "detail": "VALIDATED"
+    },
+    {
+      "name": "dependency-proof-exists:PJ15",
+      "passed": true,
+      "detail": "reports/personal-jobs/personal-jobs-15-runtime-click-test-local-ui-smoke-gate-proof.json"
+    },
+    {
+      "name": "dependency-validation-exists:PJ15",
+      "passed": true,
+      "detail": "reports/validation/personal-jobs-15-runtime-click-test-local-ui-smoke-gate-latest.json"
+    },
+    {
+      "name": "dependency-proof-passed:PJ15",
+      "passed": true,
+      "detail": "PERSONAL_JOBS_15_RUNTIME_CLICK_TEST_LOCAL_UI_SMOKE_GATE_PROVEN"
+    },
+    {
+      "name": "dependency-validation-passed:PJ15",
+      "passed": true,
+      "detail": "VALIDATED"
+    },
+    {
+      "name": "runtime-no-forbidden:fetch(",
+      "passed": true,
+      "detail": "fetch("
+    },
+    {
+      "name": "runtime-no-forbidden:axios.",
+      "passed": true,
+      "detail": "axios."
+    },
+    {
+      "name": "runtime-no-forbidden:puppeteer",
+      "passed": true,
+      "detail": "puppeteer"
+    },
+    {
+      "name": "runtime-no-forbidden:playwright",
+      "passed": true,
+      "detail": "playwright"
+    },
+    {
+      "name": "runtime-no-forbidden:sendEmail(",
+      "passed": true,
+      "detail": "sendEmail("
+    },
+    {
+      "name": "runtime-no-forbidden:sendWhatsApp(",
+      "passed": true,
+      "detail": "sendWhatsApp("
+    },
+    {
+      "name": "runtime-no-forbidden:submitApplication(",
+      "passed": true,
+      "detail": "submitApplication("
+    },
+    {
+      "name": "runtime-no-forbidden:smtp.send",
+      "passed": true,
+      "detail": "smtp.send"
+    },
+    {
+      "name": "runtime-no-forbidden:service_role",
+      "passed": true,
+      "detail": "service_role"
+    },
+    {
+      "name": "runtime-no-forbidden:payfast-passphrase",
+      "passed": true,
+      "detail": "payfast-passphrase"
+    },
+    {
+      "name": "runtime-no-forbidden:PRODUCTION_READY_TRUE",
+      "passed": true,
+      "detail": "PRODUCTION_READY_TRUE"
+    },
+    {
+      "name": "runtime-no-forbidden:DEPLOYED_TO_ORACLE_TRUE",
+      "passed": true,
+      "detail": "DEPLOYED_TO_ORACLE_TRUE"
+    },
+    {
+      "name": "committed-files-no-personal-contact",
+      "passed": true,
+      "detail": "no email or phone in committed PJ16 files"
+    },
+    {
+      "name": "git-worktree",
+      "passed": true,
+      "detail": "true"
+    },
+    {
+      "name": "git-head-readable",
+      "passed": true,
+      "detail": "66e000a"
+    },
+    {
+      "name": "git-branch-readable",
+      "passed": true,
+      "detail": "main"
+    },
+    {
+      "name": "git-origin-readable",
+      "passed": true,
+      "detail": "origin configured"
+    }
+  ],
+  "failed": [],
+  "next_action": "Run validator and commit PERSONAL-JOBS-16 tracked files only."
+}

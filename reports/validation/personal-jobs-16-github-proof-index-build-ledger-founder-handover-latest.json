@@ -1,0 +1,21 @@
+{
+  "schema": "kingsmen.validation-report.v1",
+  "module": "PERSONAL-JOBS-16 - GitHub Proof Index / Build Ledger / Founder Handover",
+  "status": "VALIDATED",
+  "passed": true,
+  "generated_at": "2026-06-08T18:54:15.314Z",
+  "files_checked": 7,
+  "missing_files": [],
+  "failed_checks": [],
+  "warnings": [
+    "This is a local UI proof index and founder handover surface only.",
+    "This does not prove production readiness.",
+    "This does not deploy to Oracle.",
+    "This does not send messages, contact employers, scrape websites, or touch payments.",
+    "Runtime route clickability should still be checked separately through the local dev server."
+  ],
+  "oracle_lite_impact": "none_local_ui_only",
+  "route": "/personal-job-desk/proof-index",
+  "proof": "reports/personal-jobs/personal-jobs-16-github-proof-index-build-ledger-founder-handover-proof.json",
+  "next_action": "Commit PERSONAL-JOBS-16 tracked files only."
+}
