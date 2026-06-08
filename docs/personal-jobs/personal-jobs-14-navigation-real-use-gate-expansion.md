@@ -1,4 +1,4 @@
-# PERSONAL-JOBS-14 — Personal Job Desk Navigation / Real Use Gate Expansion
+# PERSONAL-JOBS-14 - Personal Job Desk Navigation / Real Use Gate Expansion
 
 ## Purpose
 
@@ -13,7 +13,7 @@ It is a navigation repair and real-use gate expansion. It does not add hidden au
 - PJ03: `/personal-job-desk/shortlist`
 - PJ04: `/personal-job-desk/apply-pack`
 - PJ06: `/personal-job-desk/follow-up`
-- PJ07: `/personal-job-desk/outcome-ledger`
+- PJ07: `/personal-job-desk/outcomes`
 - PJ08: `/personal-job-desk/real-use-gate`
 - PJ10: `/personal-job-desk/daily-loop`
 - PJ11: `/personal-job-desk/import-search`
