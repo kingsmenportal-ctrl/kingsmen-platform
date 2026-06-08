@@ -1,0 +1,585 @@
+{
+  "schema": "kingsmen.personal-jobs-10-proof.v1",
+  "module": "PERSONAL-JOBS-10 - Personal Job Campaign Daily Operating Loop",
+  "status": "PERSONAL_JOBS_10_PERSONAL_JOB_CAMPAIGN_DAILY_OPERATING_LOOP_PROVEN",
+  "passed": true,
+  "productionReady": false,
+  "canClaimProduction": false,
+  "deployedToOracle": false,
+  "startsDocker": false,
+  "generated_at": "2026-06-08T04:25:43.584Z",
+  "route": "/personal-job-desk/daily-loop",
+  "readsLocalStorageKeys": [
+    "kingsmen.personalJobs02.externalLeads.v1",
+    "kingsmen.personalJobs03.shortlist.v1",
+    "kingsmen.personalJobs04.applyPacks.v1",
+    "kingsmen.personalJobs05.submissions.v1",
+    "kingsmen.personalJobs06.followUps.v1",
+    "kingsmen.personalJobs07.outcomeLedger.v1",
+    "kingsmen.personalJobs08.realUseGate.v1"
+  ],
+  "writesLocalStorageKey": "kingsmen.personalJobs10.dailyOperatingLoop.v1",
+  "localPrivateProfilePath": "data/personal-job-desk/personal-candidate.local.json",
+  "localPrivateProfileIgnoredByGit": true,
+  "committedFilesContainPersonalContact": false,
+  "sendsApplications": false,
+  "sendsEmail": false,
+  "sendsWhatsApp": false,
+  "touchesPayments": false,
+  "touchesExternalCalendar": false,
+  "contactsEmployers": false,
+  "checks": [
+    {
+      "name": "expected-file:.gitignore",
+      "passed": true,
+      "detail": ".gitignore"
+    },
+    {
+      "name": "expected-file:apps/web/src/app/personal-job-desk/daily-loop/page.tsx",
+      "passed": true,
+      "detail": "apps/web/src/app/personal-job-desk/daily-loop/page.tsx"
+    },
+    {
+      "name": "expected-file:apps/web/src/app/personal-job-desk/daily-loop/DailyLoopClient.tsx",
+      "passed": true,
+      "detail": "apps/web/src/app/personal-job-desk/daily-loop/DailyLoopClient.tsx"
+    },
+    {
+      "name": "expected-file:docs/personal-jobs/personal-jobs-10-personal-job-campaign-daily-operating-loop.md",
+      "passed": true,
+      "detail": "docs/personal-jobs/personal-jobs-10-personal-job-campaign-daily-operating-loop.md"
+    },
+    {
+      "name": "expected-file:manifests/personal-jobs/personal-jobs-10-personal-job-campaign-daily-operating-loop.json",
+      "passed": true,
+      "detail": "manifests/personal-jobs/personal-jobs-10-personal-job-campaign-daily-operating-loop.json"
+    },
+    {
+      "name": "expected-file:packages/contracts/src/personal-jobs-10-personal-job-campaign-daily-operating-loop.ts",
+      "passed": true,
+      "detail": "packages/contracts/src/personal-jobs-10-personal-job-campaign-daily-operating-loop.ts"
+    },
+    {
+      "name": "expected-file:scripts/proof/prove-personal-jobs-10-personal-job-campaign-daily-operating-loop.mjs",
+      "passed": true,
+      "detail": "scripts/proof/prove-personal-jobs-10-personal-job-campaign-daily-operating-loop.mjs"
+    },
+    {
+      "name": "expected-file:scripts/validators/validate-personal-jobs-10-personal-job-campaign-daily-operating-loop.mjs",
+      "passed": true,
+      "detail": "scripts/validators/validate-personal-jobs-10-personal-job-campaign-daily-operating-loop.mjs"
+    },
+    {
+      "name": "route-file:apps/web/src/app/personal-job-desk/page.tsx",
+      "passed": true,
+      "detail": "apps/web/src/app/personal-job-desk/page.tsx"
+    },
+    {
+      "name": "route-file:apps/web/src/app/personal-job-desk/opportunities/page.tsx",
+      "passed": true,
+      "detail": "apps/web/src/app/personal-job-desk/opportunities/page.tsx"
+    },
+    {
+      "name": "route-file:apps/web/src/app/personal-job-desk/shortlist/page.tsx",
+      "passed": true,
+      "detail": "apps/web/src/app/personal-job-desk/shortlist/page.tsx"
+    },
+    {
+      "name": "route-file:apps/web/src/app/personal-job-desk/apply-pack/page.tsx",
+      "passed": true,
+      "detail": "apps/web/src/app/personal-job-desk/apply-pack/page.tsx"
+    },
+    {
+      "name": "route-file:apps/web/src/app/personal-job-desk/submissions/page.tsx",
+      "passed": true,
+      "detail": "apps/web/src/app/personal-job-desk/submissions/page.tsx"
+    },
+    {
+      "name": "route-file:apps/web/src/app/personal-job-desk/follow-up/page.tsx",
+      "passed": true,
+      "detail": "apps/web/src/app/personal-job-desk/follow-up/page.tsx"
+    },
+    {
+      "name": "route-file:apps/web/src/app/personal-job-desk/outcomes/page.tsx",
+      "passed": true,
+      "detail": "apps/web/src/app/personal-job-desk/outcomes/page.tsx"
+    },
+    {
+      "name": "route-file:apps/web/src/app/personal-job-desk/real-use-gate/page.tsx",
+      "passed": true,
+      "detail": "apps/web/src/app/personal-job-desk/real-use-gate/page.tsx"
+    },
+    {
+      "name": "route-file:apps/web/src/app/personal-job-desk/daily-loop/page.tsx",
+      "passed": true,
+      "detail": "apps/web/src/app/personal-job-desk/daily-loop/page.tsx"
+    },
+    {
+      "name": "dependency-personal-jobs-01-proof-exists",
+      "passed": true,
+      "detail": "personal-jobs-01-local-job-desk-proof.json"
+    },
+    {
+      "name": "dependency-personal-jobs-01-validation-exists",
+      "passed": true,
+      "detail": "personal-jobs-01-local-job-desk-latest.json"
+    },
+    {
+      "name": "dependency-personal-jobs-01-proof-passed",
+      "passed": true,
+      "detail": "true"
+    },
+    {
+      "name": "dependency-personal-jobs-01-validation-passed",
+      "passed": true,
+      "detail": "true"
+    },
+    {
+      "name": "dependency-personal-jobs-02-proof-exists",
+      "passed": true,
+      "detail": "personal-jobs-02-local-opportunity-intake-proof.json"
+    },
+    {
+      "name": "dependency-personal-jobs-02-validation-exists",
+      "passed": true,
+      "detail": "personal-jobs-02-local-opportunity-intake-latest.json"
+    },
+    {
+      "name": "dependency-personal-jobs-02-proof-passed",
+      "passed": true,
+      "detail": "true"
+    },
+    {
+      "name": "dependency-personal-jobs-02-validation-passed",
+      "passed": true,
+      "detail": "true"
+    },
+    {
+      "name": "dependency-personal-jobs-03-proof-exists",
+      "passed": true,
+      "detail": "personal-jobs-03-local-fit-scoring-shortlist-proof.json"
+    },
+    {
+      "name": "dependency-personal-jobs-03-validation-exists",
+      "passed": true,
+      "detail": "personal-jobs-03-local-fit-scoring-shortlist-latest.json"
+    },
+    {
+      "name": "dependency-personal-jobs-03-proof-passed",
+      "passed": true,
+      "detail": "true"
+    },
+    {
+      "name": "dependency-personal-jobs-03-validation-passed",
+      "passed": true,
+      "detail": "true"
+    },
+    {
+      "name": "dependency-personal-jobs-04-proof-exists",
+      "passed": true,
+      "detail": "personal-jobs-04-cv-motivation-apply-pack-builder-proof.json"
+    },
+    {
+      "name": "dependency-personal-jobs-04-validation-exists",
+      "passed": true,
+      "detail": "personal-jobs-04-cv-motivation-apply-pack-builder-latest.json"
+    },
+    {
+      "name": "dependency-personal-jobs-04-proof-passed",
+      "passed": true,
+      "detail": "true"
+    },
+    {
+      "name": "dependency-personal-jobs-04-validation-passed",
+      "passed": true,
+      "detail": "true"
+    },
+    {
+      "name": "dependency-personal-jobs-05-proof-exists",
+      "passed": true,
+      "detail": "personal-jobs-05-manual-submission-tracker-evidence-ledger-proof.json"
+    },
+    {
+      "name": "dependency-personal-jobs-05-validation-exists",
+      "passed": true,
+      "detail": "personal-jobs-05-manual-submission-tracker-evidence-ledger-latest.json"
+    },
+    {
+      "name": "dependency-personal-jobs-05-proof-passed",
+      "passed": true,
+      "detail": "true"
+    },
+    {
+      "name": "dependency-personal-jobs-05-validation-passed",
+      "passed": true,
+      "detail": "true"
+    },
+    {
+      "name": "dependency-personal-jobs-06-proof-exists",
+      "passed": true,
+      "detail": "personal-jobs-06-follow-up-calendar-interview-response-tracker-proof.json"
+    },
+    {
+      "name": "dependency-personal-jobs-06-validation-exists",
+      "passed": true,
+      "detail": "personal-jobs-06-follow-up-calendar-interview-response-tracker-latest.json"
+    },
+    {
+      "name": "dependency-personal-jobs-06-proof-passed",
+      "passed": true,
+      "detail": "true"
+    },
+    {
+      "name": "dependency-personal-jobs-06-validation-passed",
+      "passed": true,
+      "detail": "true"
+    },
+    {
+      "name": "dependency-personal-jobs-07-proof-exists",
+      "passed": true,
+      "detail": "personal-jobs-07-outcome-ledger-offer-decision-command-dashboard-proof.json"
+    },
+    {
+      "name": "dependency-personal-jobs-07-validation-exists",
+      "passed": true,
+      "detail": "personal-jobs-07-outcome-ledger-offer-decision-command-dashboard-latest.json"
+    },
+    {
+      "name": "dependency-personal-jobs-07-proof-passed",
+      "passed": true,
+      "detail": "true"
+    },
+    {
+      "name": "dependency-personal-jobs-07-validation-passed",
+      "passed": true,
+      "detail": "true"
+    },
+    {
+      "name": "dependency-personal-jobs-08-proof-exists",
+      "passed": true,
+      "detail": "personal-jobs-08-end-to-end-local-runtime-smoke-test-navigation-hub-real-use-gate-proof.json"
+    },
+    {
+      "name": "dependency-personal-jobs-08-validation-exists",
+      "passed": true,
+      "detail": "personal-jobs-08-end-to-end-local-runtime-smoke-test-navigation-hub-real-use-gate-latest.json"
+    },
+    {
+      "name": "dependency-personal-jobs-08-proof-passed",
+      "passed": true,
+      "detail": "true"
+    },
+    {
+      "name": "dependency-personal-jobs-08-validation-passed",
+      "passed": true,
+      "detail": "true"
+    },
+    {
+      "name": "gitignore-keeps-local-profile-private",
+      "passed": true,
+      "detail": "local profile ignore pattern"
+    },
+    {
+      "name": "page-route-marker",
+      "passed": true,
+      "detail": "route marker"
+    },
+    {
+      "name": "page-force-dynamic",
+      "passed": true,
+      "detail": "force dynamic"
+    },
+    {
+      "name": "page-local-profile-read",
+      "passed": true,
+      "detail": "local private profile"
+    },
+    {
+      "name": "client-daily-loop-marker",
+      "passed": true,
+      "detail": "client marker"
+    },
+    {
+      "name": "client-no-send-marker",
+      "passed": true,
+      "detail": "no-send marker"
+    },
+    {
+      "name": "client-build-snapshot",
+      "passed": true,
+      "detail": "buildSnapshot"
+    },
+    {
+      "name": "client-build-commands",
+      "passed": true,
+      "detail": "buildCommands"
+    },
+    {
+      "name": "client-run-daily-loop",
+      "passed": true,
+      "detail": "runDailyLoop"
+    },
+    {
+      "name": "client-export-json",
+      "passed": true,
+      "detail": "exportJson"
+    },
+    {
+      "name": "client-crown-urgency",
+      "passed": true,
+      "detail": "CROWN urgency"
+    },
+    {
+      "name": "client-proof-required",
+      "passed": true,
+      "detail": "proofRequired"
+    },
+    {
+      "name": "client-write-key",
+      "passed": true,
+      "detail": "daily loop write key"
+    },
+    {
+      "name": "client-reads-key:kingsmen.personalJobs02.externalLeads.v1",
+      "passed": true,
+      "detail": "kingsmen.personalJobs02.externalLeads.v1"
+    },
+    {
+      "name": "client-reads-key:kingsmen.personalJobs03.shortlist.v1",
+      "passed": true,
+      "detail": "kingsmen.personalJobs03.shortlist.v1"
+    },
+    {
+      "name": "client-reads-key:kingsmen.personalJobs04.applyPacks.v1",
+      "passed": true,
+      "detail": "kingsmen.personalJobs04.applyPacks.v1"
+    },
+    {
+      "name": "client-reads-key:kingsmen.personalJobs05.submissions.v1",
+      "passed": true,
+      "detail": "kingsmen.personalJobs05.submissions.v1"
+    },
+    {
+      "name": "client-reads-key:kingsmen.personalJobs06.followUps.v1",
+      "passed": true,
+      "detail": "kingsmen.personalJobs06.followUps.v1"
+    },
+    {
+      "name": "client-reads-key:kingsmen.personalJobs07.outcomeLedger.v1",
+      "passed": true,
+      "detail": "kingsmen.personalJobs07.outcomeLedger.v1"
+    },
+    {
+      "name": "client-reads-key:kingsmen.personalJobs08.realUseGate.v1",
+      "passed": true,
+      "detail": "kingsmen.personalJobs08.realUseGate.v1"
+    },
+    {
+      "name": "client-links-route:/personal-job-desk",
+      "passed": true,
+      "detail": "/personal-job-desk"
+    },
+    {
+      "name": "client-links-route:/personal-job-desk/opportunities",
+      "passed": true,
+      "detail": "/personal-job-desk/opportunities"
+    },
+    {
+      "name": "client-links-route:/personal-job-desk/shortlist",
+      "passed": true,
+      "detail": "/personal-job-desk/shortlist"
+    },
+    {
+      "name": "client-links-route:/personal-job-desk/apply-pack",
+      "passed": true,
+      "detail": "/personal-job-desk/apply-pack"
+    },
+    {
+      "name": "client-links-route:/personal-job-desk/submissions",
+      "passed": true,
+      "detail": "/personal-job-desk/submissions"
+    },
+    {
+      "name": "client-links-route:/personal-job-desk/follow-up",
+      "passed": true,
+      "detail": "/personal-job-desk/follow-up"
+    },
+    {
+      "name": "client-links-route:/personal-job-desk/outcomes",
+      "passed": true,
+      "detail": "/personal-job-desk/outcomes"
+    },
+    {
+      "name": "client-links-route:/personal-job-desk/real-use-gate",
+      "passed": true,
+      "detail": "/personal-job-desk/real-use-gate"
+    },
+    {
+      "name": "doc-local-boundary",
+      "passed": true,
+      "detail": "doc boundary"
+    },
+    {
+      "name": "manifest-status",
+      "passed": true,
+      "detail": "BUILT_PENDING_VALIDATION"
+    },
+    {
+      "name": "manifest-route",
+      "passed": true,
+      "detail": "/personal-job-desk/daily-loop"
+    },
+    {
+      "name": "manifest-read-key-count",
+      "passed": true,
+      "detail": "7 read keys"
+    },
+    {
+      "name": "manifest-linked-route-count",
+      "passed": true,
+      "detail": "8 linked routes"
+    },
+    {
+      "name": "manifest-write-key",
+      "passed": true,
+      "detail": "kingsmen.personalJobs10.dailyOperatingLoop.v1"
+    },
+    {
+      "name": "manifest-no-production",
+      "passed": true,
+      "detail": "production false"
+    },
+    {
+      "name": "manifest-no-oracle",
+      "passed": true,
+      "detail": "oracle false"
+    },
+    {
+      "name": "manifest-no-docker",
+      "passed": true,
+      "detail": "docker false"
+    },
+    {
+      "name": "manifest-no-send",
+      "passed": true,
+      "detail": "send false"
+    },
+    {
+      "name": "manifest-no-payment",
+      "passed": true,
+      "detail": "payment false"
+    },
+    {
+      "name": "manifest-no-calendar",
+      "passed": true,
+      "detail": "calendar false"
+    },
+    {
+      "name": "manifest-no-employer-contact",
+      "passed": true,
+      "detail": "employer false"
+    },
+    {
+      "name": "contract-route",
+      "passed": true,
+      "detail": "contract route"
+    },
+    {
+      "name": "contract-boundary",
+      "passed": true,
+      "detail": "contract boundary"
+    },
+    {
+      "name": "runtime-no-forbidden:email-send-runtime",
+      "passed": true,
+      "detail": "email-send-runtime"
+    },
+    {
+      "name": "runtime-no-forbidden:payment-runtime",
+      "passed": true,
+      "detail": "payment-runtime"
+    },
+    {
+      "name": "runtime-no-forbidden:whatsapp-runtime",
+      "passed": true,
+      "detail": "whatsapp-runtime"
+    },
+    {
+      "name": "runtime-no-forbidden:service-role-secret",
+      "passed": true,
+      "detail": "service-role-secret"
+    },
+    {
+      "name": "runtime-no-forbidden:payfast-passphrase",
+      "passed": true,
+      "detail": "payfast-passphrase"
+    },
+    {
+      "name": "runtime-no-forbidden:private-key-material",
+      "passed": true,
+      "detail": "private-key-material"
+    },
+    {
+      "name": "runtime-no-forbidden:oci-private-path",
+      "passed": true,
+      "detail": "oci-private-path"
+    },
+    {
+      "name": "runtime-no-forbidden:ssh-private-path",
+      "passed": true,
+      "detail": "ssh-private-path"
+    },
+    {
+      "name": "runtime-no-forbidden:docker-compose-up-runtime",
+      "passed": true,
+      "detail": "docker-compose-up-runtime"
+    },
+    {
+      "name": "runtime-no-forbidden:PRODUCTION_READY_TRUE",
+      "passed": true,
+      "detail": "PRODUCTION_READY_TRUE"
+    },
+    {
+      "name": "runtime-no-forbidden:DEPLOYED_TO_ORACLE_TRUE",
+      "passed": true,
+      "detail": "DEPLOYED_TO_ORACLE_TRUE"
+    },
+    {
+      "name": "runtime-no-forbidden:smtp.send",
+      "passed": true,
+      "detail": "smtp.send"
+    },
+    {
+      "name": "runtime-no-forbidden:sendEmail(",
+      "passed": true,
+      "detail": "sendEmail("
+    },
+    {
+      "name": "runtime-no-forbidden:sendWhatsApp(",
+      "passed": true,
+      "detail": "sendWhatsApp("
+    },
+    {
+      "name": "runtime-no-forbidden:submitApplication(",
+      "passed": true,
+      "detail": "submitApplication("
+    },
+    {
+      "name": "runtime-no-forbidden:google.calendar",
+      "passed": true,
+      "detail": "google.calendar"
+    },
+    {
+      "name": "runtime-no-forbidden:gapi.client",
+      "passed": true,
+      "detail": "gapi.client"
+    },
+    {
+      "name": "committed-files-no-local-profile-contact",
+      "passed": true,
+      "detail": "local profile contact must stay untracked"
+    }
+  ],
+  "failed": [],
+  "next_action": "Run validator and commit PERSONAL-JOBS-10 tracked files only."
+}

@@ -1,0 +1,19 @@
+{
+  "schema": "kingsmen.validation-report.v1",
+  "module": "PERSONAL-JOBS-10 - Personal Job Campaign Daily Operating Loop",
+  "status": "VALIDATED",
+  "passed": true,
+  "generated_at": "2026-06-08T04:25:43.727Z",
+  "files_checked": 8,
+  "missing_files": [],
+  "failed_checks": [],
+  "warnings": [
+    "This is local UI and browser localStorage only.",
+    "This does not prove production readiness.",
+    "This does not send applications, email, WhatsApp, payments, employer contact, or external calendar events."
+  ],
+  "oracle_lite_impact": "none_local_ui_only",
+  "route": "/personal-job-desk/daily-loop",
+  "proof": "reports/personal-jobs/personal-jobs-10-personal-job-campaign-daily-operating-loop-proof.json",
+  "next_action": "Commit PERSONAL-JOBS-10 tracked files only."
+}
