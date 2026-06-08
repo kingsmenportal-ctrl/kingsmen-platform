@@ -1,0 +1,21 @@
+{
+  "schema": "kingsmen.validation-report.v1",
+  "module": "PERSONAL-JOBS-17 - Real Job Discovery Agent / One-Profile Job Finder / Playwright Source Scout",
+  "status": "VALIDATED",
+  "passed": true,
+  "generated_at": "2026-06-08T19:24:34.978Z",
+  "files_checked": 12,
+  "missing_files": [],
+  "failed_checks": [],
+  "warnings": [
+    "PJ17 finds and scores leads from real source adapters, but it does not submit applications.",
+    "Source availability depends on public source uptime and local internet access.",
+    "Playwright scout is optional and must only be used on authorised careers pages.",
+    "Human approval remains required before applying or contacting an employer."
+  ],
+  "oracle_lite_impact": "low_local_agent_run_only",
+  "route": "/personal-job-desk/job-finder",
+  "api_route": "/api/personal-jobs/job-finder/run",
+  "proof": "reports/personal-jobs/personal-jobs-17-real-job-discovery-agent-proof.json",
+  "next_action": "Commit PJ17 tracked files only, then run local dev server and test /personal-job-desk/job-finder."
+}

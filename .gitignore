@@ -147,3 +147,6 @@ tools/agents/jarvis/repo/
 # Kingsmen PERSONAL-JOBS local private profile
 data/personal-job-desk/*.local.json
 data/personal-job-desk/*.local.md
+data/personal-job-desk/discovered-jobs.local.json
+data/personal-job-desk/job-discovery-runs.local.json
+data/personal-job-desk/documents/

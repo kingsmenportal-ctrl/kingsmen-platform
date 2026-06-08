@@ -1,0 +1,337 @@
+{
+  "schema": "kingsmen.personal-jobs-17-proof.v1",
+  "module": "PERSONAL-JOBS-17 - Real Job Discovery Agent / One-Profile Job Finder / Playwright Source Scout",
+  "status": "PERSONAL_JOBS_17_REAL_JOB_DISCOVERY_AGENT_PROVEN",
+  "passed": true,
+  "productionReady": false,
+  "canClaimProduction": false,
+  "deployedToOracle": false,
+  "startsDocker": false,
+  "route": "/personal-job-desk/job-finder",
+  "apiRoute": "/api/personal-jobs/job-finder/run",
+  "searchesRealSources": true,
+  "manualJobEntryRequired": false,
+  "manualJobEntryFallbackOnly": true,
+  "supportsPlaywrightScout": true,
+  "exportsToPj02Shape": true,
+  "sendsApplications": false,
+  "sendsEmail": false,
+  "sendsWhatsApp": false,
+  "touchesPayments": false,
+  "contactsEmployers": false,
+  "generated_at": "2026-06-08T19:24:34.936Z",
+  "checks": [
+    {
+      "name": "expected-file:.gitignore",
+      "passed": true,
+      "detail": ".gitignore"
+    },
+    {
+      "name": "expected-file:data/personal-job-desk/job-search-sources.local.example.json",
+      "passed": true,
+      "detail": "data/personal-job-desk/job-search-sources.local.example.json"
+    },
+    {
+      "name": "expected-file:scripts/agents/personal-job-discovery-agent.mjs",
+      "passed": true,
+      "detail": "scripts/agents/personal-job-discovery-agent.mjs"
+    },
+    {
+      "name": "expected-file:scripts/agents/playwright-job-source-scout.mjs",
+      "passed": true,
+      "detail": "scripts/agents/playwright-job-source-scout.mjs"
+    },
+    {
+      "name": "expected-file:apps/web/src/app/api/personal-jobs/job-finder/run/route.ts",
+      "passed": true,
+      "detail": "apps/web/src/app/api/personal-jobs/job-finder/run/route.ts"
+    },
+    {
+      "name": "expected-file:apps/web/src/app/personal-job-desk/job-finder/page.tsx",
+      "passed": true,
+      "detail": "apps/web/src/app/personal-job-desk/job-finder/page.tsx"
+    },
+    {
+      "name": "expected-file:apps/web/src/app/personal-job-desk/job-finder/JobFinderClient.tsx",
+      "passed": true,
+      "detail": "apps/web/src/app/personal-job-desk/job-finder/JobFinderClient.tsx"
+    },
+    {
+      "name": "expected-file:packages/contracts/src/personal-jobs-17-real-job-discovery-agent.ts",
+      "passed": true,
+      "detail": "packages/contracts/src/personal-jobs-17-real-job-discovery-agent.ts"
+    },
+    {
+      "name": "expected-file:docs/personal-jobs/personal-jobs-17-real-job-discovery-agent.md",
+      "passed": true,
+      "detail": "docs/personal-jobs/personal-jobs-17-real-job-discovery-agent.md"
+    },
+    {
+      "name": "expected-file:manifests/personal-jobs/personal-jobs-17-real-job-discovery-agent.json",
+      "passed": true,
+      "detail": "manifests/personal-jobs/personal-jobs-17-real-job-discovery-agent.json"
+    },
+    {
+      "name": "expected-file:scripts/proof/prove-personal-jobs-17-real-job-discovery-agent.mjs",
+      "passed": true,
+      "detail": "scripts/proof/prove-personal-jobs-17-real-job-discovery-agent.mjs"
+    },
+    {
+      "name": "expected-file:scripts/validators/validate-personal-jobs-17-real-job-discovery-agent.mjs",
+      "passed": true,
+      "detail": "scripts/validators/validate-personal-jobs-17-real-job-discovery-agent.mjs"
+    },
+    {
+      "name": "gitignore-local-profile",
+      "passed": true,
+      "detail": "local json ignored"
+    },
+    {
+      "name": "source-example-valid-json",
+      "passed": true,
+      "detail": "source example json"
+    },
+    {
+      "name": "source-example-has-real-adapters",
+      "passed": true,
+      "detail": "remoteok + arbeitnow"
+    },
+    {
+      "name": "source-example-has-playwright-adapter",
+      "passed": true,
+      "detail": "playwrightPage"
+    },
+    {
+      "name": "agent-reads-one-profile",
+      "passed": true,
+      "detail": "one profile path"
+    },
+    {
+      "name": "agent-generates-search-queries",
+      "passed": true,
+      "detail": "buildSearchQueries"
+    },
+    {
+      "name": "agent-remoteok-adapter",
+      "passed": true,
+      "detail": "RemoteOK adapter"
+    },
+    {
+      "name": "agent-arbeitnow-adapter",
+      "passed": true,
+      "detail": "Arbeitnow adapter"
+    },
+    {
+      "name": "agent-greenhouse-adapter",
+      "passed": true,
+      "detail": "Greenhouse adapter"
+    },
+    {
+      "name": "agent-lever-adapter",
+      "passed": true,
+      "detail": "Lever adapter"
+    },
+    {
+      "name": "agent-rss-adapter",
+      "passed": true,
+      "detail": "RSS adapter"
+    },
+    {
+      "name": "agent-dedupe-leads",
+      "passed": true,
+      "detail": "dedupeLeads"
+    },
+    {
+      "name": "agent-score-leads",
+      "passed": true,
+      "detail": "scoreLead"
+    },
+    {
+      "name": "agent-pj02-shape",
+      "passed": true,
+      "detail": "PJ02 compatible export"
+    },
+    {
+      "name": "agent-writes-discovered-jobs",
+      "passed": true,
+      "detail": "discovered jobs local"
+    },
+    {
+      "name": "agent-no-auto-apply-boundary",
+      "passed": true,
+      "detail": "human approval"
+    },
+    {
+      "name": "playwright-scout-optional",
+      "passed": true,
+      "detail": "optional dynamic Playwright"
+    },
+    {
+      "name": "playwright-scout-no-bypass",
+      "passed": true,
+      "detail": "no bypass"
+    },
+    {
+      "name": "api-runs-agent",
+      "passed": true,
+      "detail": "API runs local agent"
+    },
+    {
+      "name": "api-node-runtime",
+      "passed": true,
+      "detail": "nodejs runtime"
+    },
+    {
+      "name": "page-client",
+      "passed": true,
+      "detail": "JobFinderClient"
+    },
+    {
+      "name": "client-run-button",
+      "passed": true,
+      "detail": "run button"
+    },
+    {
+      "name": "client-api-call",
+      "passed": true,
+      "detail": "API route call"
+    },
+    {
+      "name": "client-exports-pj02",
+      "passed": true,
+      "detail": "PJ02 localStorage key"
+    },
+    {
+      "name": "client-no-manual-job-core",
+      "passed": true,
+      "detail": "manual entry fallback"
+    },
+    {
+      "name": "contract-capabilities",
+      "passed": true,
+      "detail": "contract capabilities"
+    },
+    {
+      "name": "contract-boundaries",
+      "passed": true,
+      "detail": "contract boundaries"
+    },
+    {
+      "name": "doc-purpose-corrected",
+      "passed": true,
+      "detail": "direction corrected"
+    },
+    {
+      "name": "manifest-valid-json",
+      "passed": true,
+      "detail": "manifest json"
+    },
+    {
+      "name": "manifest-route",
+      "passed": true,
+      "detail": "/personal-job-desk/job-finder"
+    },
+    {
+      "name": "manifest-real-search",
+      "passed": true,
+      "detail": "real sources true"
+    },
+    {
+      "name": "manifest-manual-entry-fallback",
+      "passed": true,
+      "detail": "manual fallback only"
+    },
+    {
+      "name": "manifest-no-production",
+      "passed": true,
+      "detail": "no production claim"
+    },
+    {
+      "name": "manifest-no-send",
+      "passed": true,
+      "detail": "no send/apply"
+    },
+    {
+      "name": "manifest-no-payment",
+      "passed": true,
+      "detail": "no payment"
+    },
+    {
+      "name": "manifest-human-approval",
+      "passed": true,
+      "detail": "human approval"
+    },
+    {
+      "name": "node-syntax:scripts/agents/personal-job-discovery-agent.mjs",
+      "passed": true,
+      "detail": "syntax ok"
+    },
+    {
+      "name": "node-syntax:scripts/agents/playwright-job-source-scout.mjs",
+      "passed": true,
+      "detail": "syntax ok"
+    },
+    {
+      "name": "node-syntax:scripts/proof/prove-personal-jobs-17-real-job-discovery-agent.mjs",
+      "passed": true,
+      "detail": "syntax ok"
+    },
+    {
+      "name": "agent-dry-run-exit-zero",
+      "passed": true,
+      "detail": "dry run ok"
+    },
+    {
+      "name": "agent-dry-run-generates-queries",
+      "passed": true,
+      "detail": "23 queries"
+    },
+    {
+      "name": "agent-dry-run-uses-one-profile",
+      "passed": true,
+      "detail": "usedOneProfile true"
+    },
+    {
+      "name": "forbidden-not-present:smtp.send",
+      "passed": true,
+      "detail": "smtp.send"
+    },
+    {
+      "name": "forbidden-not-present:sendEmail(",
+      "passed": true,
+      "detail": "sendEmail("
+    },
+    {
+      "name": "forbidden-not-present:sendWhatsApp(",
+      "passed": true,
+      "detail": "sendWhatsApp("
+    },
+    {
+      "name": "forbidden-not-present:submitApplication(",
+      "passed": true,
+      "detail": "submitApplication("
+    },
+    {
+      "name": "forbidden-not-present:payfast-passphrase",
+      "passed": true,
+      "detail": "payfast-passphrase"
+    },
+    {
+      "name": "forbidden-not-present:service_role",
+      "passed": true,
+      "detail": "service_role"
+    },
+    {
+      "name": "forbidden-not-present:PRODUCTION_READY_TRUE",
+      "passed": true,
+      "detail": "PRODUCTION_READY_TRUE"
+    },
+    {
+      "name": "forbidden-not-present:DEPLOYED_TO_ORACLE_TRUE",
+      "passed": true,
+      "detail": "DEPLOYED_TO_ORACLE_TRUE"
+    }
+  ],
+  "failed": [],
+  "next_action": "Run validator, commit PJ17 files, then open /personal-job-desk/job-finder and press Run job finder."
+}

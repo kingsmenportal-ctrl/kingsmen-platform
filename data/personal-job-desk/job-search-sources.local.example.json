@@ -1,0 +1,54 @@
+{
+  "schema": "kingsmen.personal-jobs-17.sources.v1",
+  "purpose": "Local source registry for the Personal Job Discovery Agent. Copy to job-search-sources.local.json for private local changes.",
+  "safety": {
+    "noCredentialUse": true,
+    "noLoginBypass": true,
+    "noCaptchaBypass": true,
+    "noAggressiveScraping": true,
+    "noAutoApply": true,
+    "noEmployerContact": true
+  },
+  "sources": [
+    {
+      "id": "remoteok",
+      "label": "RemoteOK public API",
+      "enabled": true,
+      "adapter": "remoteok",
+      "endpoint": "https://remoteok.com/api",
+      "sourceConfidence": 0.72
+    },
+    {
+      "id": "arbeitnow",
+      "label": "Arbeitnow public job board API",
+      "enabled": true,
+      "adapter": "arbeitnow",
+      "endpoint": "https://www.arbeitnow.com/api/job-board-api",
+      "sourceConfidence": 0.7
+    },
+    {
+      "id": "example-greenhouse",
+      "label": "Example Greenhouse board adapter",
+      "enabled": false,
+      "adapter": "greenhouse",
+      "boardToken": "replace-with-company-board-token",
+      "sourceConfidence": 0.82
+    },
+    {
+      "id": "example-lever",
+      "label": "Example Lever board adapter",
+      "enabled": false,
+      "adapter": "lever",
+      "companySlug": "replace-with-company-slug",
+      "sourceConfidence": 0.82
+    },
+    {
+      "id": "example-playwright-careers-page",
+      "label": "Example Playwright careers page scout",
+      "enabled": false,
+      "adapter": "playwrightPage",
+      "url": "https://example.com/careers",
+      "sourceConfidence": 0.55
+    }
+  ]
+}
