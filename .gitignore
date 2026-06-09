@@ -159,3 +159,6 @@ data/personal-job-desk/playwright-source-scout-results.local.json
 data/personal-job-desk/sa-source-health.local.json
 data/personal-job-desk/source-scout-queue.local.json
 reports/personal-jobs/personal-jobs-19-source-scout-latest.json
+data/personal-job-desk/opportunity-command-queue.local.json
+data/personal-job-desk/apply-readiness-selections.local.json
+reports/personal-jobs/personal-jobs-20-opportunity-command-queue-latest.json

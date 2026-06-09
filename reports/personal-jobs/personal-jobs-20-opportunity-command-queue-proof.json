@@ -1,0 +1,311 @@
+{
+  "schema": "kingsmen.personal-jobs-20-proof.v1",
+  "module": "PERSONAL-JOBS-20 - Unified Opportunity Command Queue / Apply Readiness Selector",
+  "status": "PERSONAL_JOBS_20_OPPORTUNITY_COMMAND_QUEUE_PROVEN",
+  "passed": true,
+  "productionReady": false,
+  "canClaimProduction": false,
+  "deployedToOracle": false,
+  "startsDocker": false,
+  "route": "/personal-job-desk/opportunity-queue",
+  "apiRoute": "/api/personal-jobs/opportunity-queue/build",
+  "combinesPj17Pj18Pj19Leads": true,
+  "deduplicatesOpportunities": true,
+  "ranksReadiness": true,
+  "classifiesApplyReadiness": true,
+  "usesSourceHealth": true,
+  "exportsToApplyPackCandidateKey": true,
+  "manualJobEntryRequired": false,
+  "manualJobEntryFallbackOnly": true,
+  "sendsApplications": false,
+  "sendsEmail": false,
+  "sendsWhatsApp": false,
+  "touchesPayments": false,
+  "contactsEmployers": false,
+  "bypassesLoginOrCaptcha": false,
+  "generated_at": "2026-06-09T01:31:31.083Z",
+  "checks": [
+    {
+      "name": "expected-file:.gitignore",
+      "passed": true,
+      "detail": ".gitignore"
+    },
+    {
+      "name": "expected-file:scripts/agents/personal-job-opportunity-command-queue.mjs",
+      "passed": true,
+      "detail": "scripts/agents/personal-job-opportunity-command-queue.mjs"
+    },
+    {
+      "name": "expected-file:apps/web/src/app/api/personal-jobs/opportunity-queue/build/route.ts",
+      "passed": true,
+      "detail": "apps/web/src/app/api/personal-jobs/opportunity-queue/build/route.ts"
+    },
+    {
+      "name": "expected-file:apps/web/src/app/personal-job-desk/opportunity-queue/page.tsx",
+      "passed": true,
+      "detail": "apps/web/src/app/personal-job-desk/opportunity-queue/page.tsx"
+    },
+    {
+      "name": "expected-file:apps/web/src/app/personal-job-desk/opportunity-queue/OpportunityQueueClient.tsx",
+      "passed": true,
+      "detail": "apps/web/src/app/personal-job-desk/opportunity-queue/OpportunityQueueClient.tsx"
+    },
+    {
+      "name": "expected-file:packages/contracts/src/personal-jobs-20-opportunity-command-queue.ts",
+      "passed": true,
+      "detail": "packages/contracts/src/personal-jobs-20-opportunity-command-queue.ts"
+    },
+    {
+      "name": "expected-file:docs/personal-jobs/personal-jobs-20-opportunity-command-queue.md",
+      "passed": true,
+      "detail": "docs/personal-jobs/personal-jobs-20-opportunity-command-queue.md"
+    },
+    {
+      "name": "expected-file:manifests/personal-jobs/personal-jobs-20-opportunity-command-queue.json",
+      "passed": true,
+      "detail": "manifests/personal-jobs/personal-jobs-20-opportunity-command-queue.json"
+    },
+    {
+      "name": "expected-file:scripts/proof/prove-personal-jobs-20-opportunity-command-queue.mjs",
+      "passed": true,
+      "detail": "scripts/proof/prove-personal-jobs-20-opportunity-command-queue.mjs"
+    },
+    {
+      "name": "expected-file:scripts/validators/validate-personal-jobs-20-opportunity-command-queue.mjs",
+      "passed": true,
+      "detail": "scripts/validators/validate-personal-jobs-20-opportunity-command-queue.mjs"
+    },
+    {
+      "name": "gitignore-queue-local",
+      "passed": true,
+      "detail": "local queue ignored"
+    },
+    {
+      "name": "gitignore-latest-report",
+      "passed": true,
+      "detail": "latest report ignored"
+    },
+    {
+      "name": "agent-reads-pj17",
+      "passed": true,
+      "detail": "PJ17 input"
+    },
+    {
+      "name": "agent-reads-pj18",
+      "passed": true,
+      "detail": "PJ18 input"
+    },
+    {
+      "name": "agent-reads-pj19",
+      "passed": true,
+      "detail": "PJ19 input"
+    },
+    {
+      "name": "agent-reads-health",
+      "passed": true,
+      "detail": "source health input"
+    },
+    {
+      "name": "agent-readiness-states",
+      "passed": true,
+      "detail": "readiness states"
+    },
+    {
+      "name": "agent-dedupe",
+      "passed": true,
+      "detail": "dedupeQueue"
+    },
+    {
+      "name": "agent-readiness-score",
+      "passed": true,
+      "detail": "readinessScore"
+    },
+    {
+      "name": "agent-apply-pack-candidates",
+      "passed": true,
+      "detail": "apply-pack candidates"
+    },
+    {
+      "name": "agent-no-auto-apply",
+      "passed": true,
+      "detail": "no auto-apply"
+    },
+    {
+      "name": "api-runs-agent",
+      "passed": true,
+      "detail": "API runs queue agent"
+    },
+    {
+      "name": "api-node-runtime",
+      "passed": true,
+      "detail": "nodejs runtime"
+    },
+    {
+      "name": "page-client",
+      "passed": true,
+      "detail": "OpportunityQueueClient route"
+    },
+    {
+      "name": "client-build-button",
+      "passed": true,
+      "detail": "build button"
+    },
+    {
+      "name": "client-select-button",
+      "passed": true,
+      "detail": "select button"
+    },
+    {
+      "name": "client-api-call",
+      "passed": true,
+      "detail": "API route call"
+    },
+    {
+      "name": "client-export-key",
+      "passed": true,
+      "detail": "apply pack key"
+    },
+    {
+      "name": "contract-combines",
+      "passed": true,
+      "detail": "contract combines"
+    },
+    {
+      "name": "contract-boundaries",
+      "passed": true,
+      "detail": "contract boundaries"
+    },
+    {
+      "name": "doc-purpose",
+      "passed": true,
+      "detail": "doc purpose"
+    },
+    {
+      "name": "manifest-valid-json",
+      "passed": true,
+      "detail": "manifest json"
+    },
+    {
+      "name": "manifest-route",
+      "passed": true,
+      "detail": "/personal-job-desk/opportunity-queue"
+    },
+    {
+      "name": "manifest-api-route",
+      "passed": true,
+      "detail": "/api/personal-jobs/opportunity-queue/build"
+    },
+    {
+      "name": "manifest-combines",
+      "passed": true,
+      "detail": "combines leads"
+    },
+    {
+      "name": "manifest-dedupes",
+      "passed": true,
+      "detail": "dedupes"
+    },
+    {
+      "name": "manifest-readiness",
+      "passed": true,
+      "detail": "readiness classification"
+    },
+    {
+      "name": "manifest-no-production",
+      "passed": true,
+      "detail": "no production claim"
+    },
+    {
+      "name": "manifest-no-send",
+      "passed": true,
+      "detail": "no send/apply"
+    },
+    {
+      "name": "manifest-human-approval",
+      "passed": true,
+      "detail": "approval required"
+    },
+    {
+      "name": "node-syntax:scripts/agents/personal-job-opportunity-command-queue.mjs",
+      "passed": true,
+      "detail": "syntax ok"
+    },
+    {
+      "name": "node-syntax:scripts/proof/prove-personal-jobs-20-opportunity-command-queue.mjs",
+      "passed": true,
+      "detail": "syntax ok"
+    },
+    {
+      "name": "agent-dry-run-exit-zero",
+      "passed": true,
+      "detail": "dry run ok"
+    },
+    {
+      "name": "agent-dry-run-status",
+      "passed": true,
+      "detail": "COMPLETED"
+    },
+    {
+      "name": "agent-dry-run-state-counts",
+      "passed": true,
+      "detail": "state counts returned"
+    },
+    {
+      "name": "agent-dry-run-boundaries",
+      "passed": true,
+      "detail": "no send/contact"
+    },
+    {
+      "name": "forbidden-not-present:smtp.send",
+      "passed": true,
+      "detail": "smtp.send"
+    },
+    {
+      "name": "forbidden-not-present:sendEmail(",
+      "passed": true,
+      "detail": "sendEmail("
+    },
+    {
+      "name": "forbidden-not-present:sendWhatsApp(",
+      "passed": true,
+      "detail": "sendWhatsApp("
+    },
+    {
+      "name": "forbidden-not-present:submitApplication(",
+      "passed": true,
+      "detail": "submitApplication("
+    },
+    {
+      "name": "forbidden-not-present:payfast-passphrase",
+      "passed": true,
+      "detail": "payfast-passphrase"
+    },
+    {
+      "name": "forbidden-not-present:service_role",
+      "passed": true,
+      "detail": "service_role"
+    },
+    {
+      "name": "forbidden-not-present:captcha.solve",
+      "passed": true,
+      "detail": "captcha.solve"
+    },
+    {
+      "name": "forbidden-not-present:bypassCaptcha",
+      "passed": true,
+      "detail": "bypassCaptcha"
+    },
+    {
+      "name": "forbidden-not-present:PRODUCTION_READY_TRUE",
+      "passed": true,
+      "detail": "PRODUCTION_READY_TRUE"
+    },
+    {
+      "name": "forbidden-not-present:DEPLOYED_TO_ORACLE_TRUE",
+      "passed": true,
+      "detail": "DEPLOYED_TO_ORACLE_TRUE"
+    }
+  ],
+  "failed": [],
+  "next_action": "Run validator, commit PJ20 files, then test /personal-job-desk/opportunity-queue."
+}

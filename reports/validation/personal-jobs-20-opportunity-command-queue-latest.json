@@ -1,0 +1,21 @@
+{
+  "schema": "kingsmen.validation-report.v1",
+  "module": "PERSONAL-JOBS-20 - Unified Opportunity Command Queue / Apply Readiness Selector",
+  "status": "VALIDATED",
+  "passed": true,
+  "generated_at": "2026-06-09T01:31:31.104Z",
+  "files_checked": 10,
+  "missing_files": [],
+  "failed_checks": [],
+  "warnings": [
+    "PJ20 selects opportunities for apply-pack preparation only.",
+    "PJ20 does not submit applications or contact employers.",
+    "Queue outputs are local/private and ignored by Git.",
+    "Human approval remains required before any application action."
+  ],
+  "oracle_lite_impact": "low_local_queue_build_only",
+  "route": "/personal-job-desk/opportunity-queue",
+  "api_route": "/api/personal-jobs/opportunity-queue/build",
+  "proof": "reports/personal-jobs/personal-jobs-20-opportunity-command-queue-proof.json",
+  "next_action": "Commit PJ20 tracked files, then test /personal-job-desk/opportunity-queue."
+}
