@@ -1,0 +1,44 @@
+{
+  "schema": "kingsmen.personal-jobs-19.source-scout-queue.v1",
+  "purpose": "Optional local override queue for PJ19 Playwright source scouting. If source-scout-queue.local.json is absent, PJ19 builds a queue from PJ18 SA sources.",
+  "safety": {
+    "lowConcurrency": true,
+    "maxConcurrency": 1,
+    "noCredentialUse": true,
+    "noLoginBypass": true,
+    "noCaptchaBypass": true,
+    "noAggressiveScraping": true,
+    "noAutoApply": true,
+    "noEmployerContact": true,
+    "humanApprovalBeforeApply": true
+  },
+  "targets": [
+    {
+      "id": "shoprite-careers",
+      "label": "Shoprite Group Careers",
+      "url": "https://www.shoprite.jobs/",
+      "company": "Shoprite Group",
+      "group": "RETAIL",
+      "enabled": true,
+      "sourceConfidence": 0.78
+    },
+    {
+      "id": "clicks-careers",
+      "label": "Clicks Group Careers",
+      "url": "https://clicksgroup.simplify.hr/",
+      "company": "Clicks Group",
+      "group": "RETAIL",
+      "enabled": true,
+      "sourceConfidence": 0.72
+    },
+    {
+      "id": "dischem-careers",
+      "label": "Dis-Chem Careers",
+      "url": "https://dischem.simplify.hr/",
+      "company": "Dis-Chem",
+      "group": "RETAIL",
+      "enabled": true,
+      "sourceConfidence": 0.72
+    }
+  ]
+}

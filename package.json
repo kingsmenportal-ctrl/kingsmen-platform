@@ -21,6 +21,7 @@
   },
   "homepage": "https://github.com/kingsmenportal-ctrl/kingsmen-platform#readme",
   "devDependencies": {
+    "playwright": "^1.60.0",
     "typescript": "^6.0.3"
   }
 }

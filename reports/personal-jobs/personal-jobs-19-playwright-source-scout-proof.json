@@ -1,0 +1,367 @@
+{
+  "schema": "kingsmen.personal-jobs-19-proof.v1",
+  "module": "PERSONAL-JOBS-19 - Playwright Source Queue / Employer Career Page Scout / SA Source Health Report",
+  "status": "PERSONAL_JOBS_19_PLAYWRIGHT_SOURCE_SCOUT_PROVEN",
+  "passed": true,
+  "productionReady": false,
+  "canClaimProduction": false,
+  "deployedToOracle": false,
+  "startsDocker": false,
+  "route": "/personal-job-desk/source-scout",
+  "apiRoute": "/api/personal-jobs/source-scout/run",
+  "countryFocus": "South Africa",
+  "usesPlaywrightScout": true,
+  "maxConcurrency": 1,
+  "reportsSourceHealth": true,
+  "extractsVisibleJobLinks": true,
+  "exportsToPj02Shape": true,
+  "combinesWithPj17AndPj18Leads": true,
+  "manualJobEntryRequired": false,
+  "manualJobEntryFallbackOnly": true,
+  "sendsApplications": false,
+  "sendsEmail": false,
+  "sendsWhatsApp": false,
+  "touchesPayments": false,
+  "contactsEmployers": false,
+  "bypassesLoginOrCaptcha": false,
+  "generated_at": "2026-06-09T00:20:03.809Z",
+  "checks": [
+    {
+      "name": "expected-file:.gitignore",
+      "passed": true,
+      "detail": ".gitignore"
+    },
+    {
+      "name": "expected-file:data/personal-job-desk/source-scout-queue.local.example.json",
+      "passed": true,
+      "detail": "data/personal-job-desk/source-scout-queue.local.example.json"
+    },
+    {
+      "name": "expected-file:scripts/agents/personal-job-playwright-source-scout.mjs",
+      "passed": true,
+      "detail": "scripts/agents/personal-job-playwright-source-scout.mjs"
+    },
+    {
+      "name": "expected-file:apps/web/src/app/api/personal-jobs/source-scout/run/route.ts",
+      "passed": true,
+      "detail": "apps/web/src/app/api/personal-jobs/source-scout/run/route.ts"
+    },
+    {
+      "name": "expected-file:apps/web/src/app/personal-job-desk/source-scout/page.tsx",
+      "passed": true,
+      "detail": "apps/web/src/app/personal-job-desk/source-scout/page.tsx"
+    },
+    {
+      "name": "expected-file:apps/web/src/app/personal-job-desk/source-scout/SourceScoutClient.tsx",
+      "passed": true,
+      "detail": "apps/web/src/app/personal-job-desk/source-scout/SourceScoutClient.tsx"
+    },
+    {
+      "name": "expected-file:packages/contracts/src/personal-jobs-19-playwright-source-scout.ts",
+      "passed": true,
+      "detail": "packages/contracts/src/personal-jobs-19-playwright-source-scout.ts"
+    },
+    {
+      "name": "expected-file:docs/personal-jobs/personal-jobs-19-playwright-source-scout.md",
+      "passed": true,
+      "detail": "docs/personal-jobs/personal-jobs-19-playwright-source-scout.md"
+    },
+    {
+      "name": "expected-file:manifests/personal-jobs/personal-jobs-19-playwright-source-scout.json",
+      "passed": true,
+      "detail": "manifests/personal-jobs/personal-jobs-19-playwright-source-scout.json"
+    },
+    {
+      "name": "expected-file:scripts/proof/prove-personal-jobs-19-playwright-source-scout.mjs",
+      "passed": true,
+      "detail": "scripts/proof/prove-personal-jobs-19-playwright-source-scout.mjs"
+    },
+    {
+      "name": "expected-file:scripts/validators/validate-personal-jobs-19-playwright-source-scout.mjs",
+      "passed": true,
+      "detail": "scripts/validators/validate-personal-jobs-19-playwright-source-scout.mjs"
+    },
+    {
+      "name": "gitignore-scout-results",
+      "passed": true,
+      "detail": "scout results ignored"
+    },
+    {
+      "name": "gitignore-source-health",
+      "passed": true,
+      "detail": "source health ignored"
+    },
+    {
+      "name": "gitignore-latest-report",
+      "passed": true,
+      "detail": "latest run report ignored"
+    },
+    {
+      "name": "queue-example-valid-json",
+      "passed": true,
+      "detail": "valid queue example json"
+    },
+    {
+      "name": "queue-example-schema",
+      "passed": true,
+      "detail": "kingsmen.personal-jobs-19.source-scout-queue.v1"
+    },
+    {
+      "name": "queue-example-safety",
+      "passed": true,
+      "detail": "queue safety"
+    },
+    {
+      "name": "agent-dynamic-playwright-import",
+      "passed": true,
+      "detail": "dynamic playwright import"
+    },
+    {
+      "name": "agent-reads-one-profile",
+      "passed": true,
+      "detail": "one profile"
+    },
+    {
+      "name": "agent-reads-pj18-sources",
+      "passed": true,
+      "detail": "PJ18 source registry"
+    },
+    {
+      "name": "agent-queue-override",
+      "passed": true,
+      "detail": "local queue override"
+    },
+    {
+      "name": "agent-health-statuses",
+      "passed": true,
+      "detail": "health statuses"
+    },
+    {
+      "name": "agent-max-concurrency-one",
+      "passed": true,
+      "detail": "max concurrency 1"
+    },
+    {
+      "name": "agent-extracts-links",
+      "passed": true,
+      "detail": "visible link extraction"
+    },
+    {
+      "name": "agent-blocker-detection",
+      "passed": true,
+      "detail": "blocker detection"
+    },
+    {
+      "name": "agent-pj02-shape",
+      "passed": true,
+      "detail": "PJ02 export"
+    },
+    {
+      "name": "agent-combines-pj17-pj18",
+      "passed": true,
+      "detail": "combines prior leads"
+    },
+    {
+      "name": "agent-no-auto-apply",
+      "passed": true,
+      "detail": "no auto-apply"
+    },
+    {
+      "name": "api-runs-agent",
+      "passed": true,
+      "detail": "API runs scout agent"
+    },
+    {
+      "name": "api-node-runtime",
+      "passed": true,
+      "detail": "node runtime"
+    },
+    {
+      "name": "page-client",
+      "passed": true,
+      "detail": "SourceScoutClient route"
+    },
+    {
+      "name": "client-run-button",
+      "passed": true,
+      "detail": "run button"
+    },
+    {
+      "name": "client-api-call",
+      "passed": true,
+      "detail": "API route call"
+    },
+    {
+      "name": "client-pj02-export",
+      "passed": true,
+      "detail": "PJ02 local storage export"
+    },
+    {
+      "name": "client-health-key",
+      "passed": true,
+      "detail": "source health local storage"
+    },
+    {
+      "name": "contract-playwright",
+      "passed": true,
+      "detail": "contract capabilities"
+    },
+    {
+      "name": "contract-boundaries",
+      "passed": true,
+      "detail": "contract boundaries"
+    },
+    {
+      "name": "doc-purpose",
+      "passed": true,
+      "detail": "doc purpose"
+    },
+    {
+      "name": "doc-health-statuses",
+      "passed": true,
+      "detail": "doc health statuses"
+    },
+    {
+      "name": "manifest-valid-json",
+      "passed": true,
+      "detail": "manifest json"
+    },
+    {
+      "name": "manifest-route",
+      "passed": true,
+      "detail": "/personal-job-desk/source-scout"
+    },
+    {
+      "name": "manifest-api-route",
+      "passed": true,
+      "detail": "/api/personal-jobs/source-scout/run"
+    },
+    {
+      "name": "manifest-country-focus",
+      "passed": true,
+      "detail": "South Africa"
+    },
+    {
+      "name": "manifest-playwright-true",
+      "passed": true,
+      "detail": "uses playwright"
+    },
+    {
+      "name": "manifest-max-concurrency-one",
+      "passed": true,
+      "detail": "max concurrency 1"
+    },
+    {
+      "name": "manifest-source-health",
+      "passed": true,
+      "detail": "source health"
+    },
+    {
+      "name": "manifest-no-production",
+      "passed": true,
+      "detail": "no production claim"
+    },
+    {
+      "name": "manifest-no-send",
+      "passed": true,
+      "detail": "no send/apply"
+    },
+    {
+      "name": "manifest-no-bypass",
+      "passed": true,
+      "detail": "no bypass"
+    },
+    {
+      "name": "manifest-human-approval",
+      "passed": true,
+      "detail": "approval required"
+    },
+    {
+      "name": "node-syntax:scripts/agents/personal-job-playwright-source-scout.mjs",
+      "passed": true,
+      "detail": "syntax ok"
+    },
+    {
+      "name": "node-syntax:scripts/proof/prove-personal-jobs-19-playwright-source-scout.mjs",
+      "passed": true,
+      "detail": "syntax ok"
+    },
+    {
+      "name": "agent-dry-run-exit-zero",
+      "passed": true,
+      "detail": "dry run ok"
+    },
+    {
+      "name": "agent-dry-run-status",
+      "passed": true,
+      "detail": "DRY_RUN_READY"
+    },
+    {
+      "name": "agent-dry-run-queue",
+      "passed": true,
+      "detail": "3 queued"
+    },
+    {
+      "name": "agent-dry-run-health-statuses",
+      "passed": true,
+      "detail": "health statuses returned"
+    },
+    {
+      "name": "agent-dry-run-boundaries",
+      "passed": true,
+      "detail": "no send/contact"
+    },
+    {
+      "name": "forbidden-not-present:smtp.send",
+      "passed": true,
+      "detail": "smtp.send"
+    },
+    {
+      "name": "forbidden-not-present:sendEmail(",
+      "passed": true,
+      "detail": "sendEmail("
+    },
+    {
+      "name": "forbidden-not-present:sendWhatsApp(",
+      "passed": true,
+      "detail": "sendWhatsApp("
+    },
+    {
+      "name": "forbidden-not-present:submitApplication(",
+      "passed": true,
+      "detail": "submitApplication("
+    },
+    {
+      "name": "forbidden-not-present:payfast-passphrase",
+      "passed": true,
+      "detail": "payfast-passphrase"
+    },
+    {
+      "name": "forbidden-not-present:service_role",
+      "passed": true,
+      "detail": "service_role"
+    },
+    {
+      "name": "forbidden-not-present:captcha.solve",
+      "passed": true,
+      "detail": "captcha.solve"
+    },
+    {
+      "name": "forbidden-not-present:bypassCaptcha",
+      "passed": true,
+      "detail": "bypassCaptcha"
+    },
+    {
+      "name": "forbidden-not-present:PRODUCTION_READY_TRUE",
+      "passed": true,
+      "detail": "PRODUCTION_READY_TRUE"
+    },
+    {
+      "name": "forbidden-not-present:DEPLOYED_TO_ORACLE_TRUE",
+      "passed": true,
+      "detail": "DEPLOYED_TO_ORACLE_TRUE"
+    }
+  ],
+  "failed": [],
+  "next_action": "Run validator, commit PJ19 files, install Playwright if needed, then test /personal-job-desk/source-scout."
+}

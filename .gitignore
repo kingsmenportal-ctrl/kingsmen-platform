@@ -155,3 +155,7 @@ data/personal-job-desk/sa-job-sources.local.json
 data/personal-job-desk/sa-discovered-jobs.local.json
 data/personal-job-desk/sa-source-runs.local.json
 reports/personal-jobs/personal-jobs-18-sa-source-runner-latest.json
+data/personal-job-desk/playwright-source-scout-results.local.json
+data/personal-job-desk/sa-source-health.local.json
+data/personal-job-desk/source-scout-queue.local.json
+reports/personal-jobs/personal-jobs-19-source-scout-latest.json
