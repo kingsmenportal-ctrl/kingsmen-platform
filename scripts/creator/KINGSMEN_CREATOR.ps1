@@ -38,6 +38,11 @@ if ($Mode -eq "Validate" -and $Phase -eq "N05") {
   exit $LASTEXITCODE
 }
 
+if ($Mode -eq "Validate" -and $Phase -eq "N06") {
+  powershell -ExecutionPolicy Bypass -File "$Base\scripts\validators\Validate-N06.ps1"
+  exit $LASTEXITCODE
+}
+
 if ($Mode -eq "Migrate" -and $Phase -eq "N03") {
   powershell -ExecutionPolicy Bypass -File "$Base\scripts\db\Run-N03Migration.ps1"
   exit $LASTEXITCODE
@@ -53,5 +58,10 @@ if ($Mode -eq "Migrate" -and $Phase -eq "N05") {
   exit $LASTEXITCODE
 }
 
-Write-Host "Available validate phases: N00, N01, N02, N03, N04, N05" -ForegroundColor Green
-Write-Host "N05 local DB migration: powershell -ExecutionPolicy Bypass -File .\KINGSMEN_CREATOR.ps1 -Phase N05 -Mode Migrate" -ForegroundColor Yellow
+if ($Mode -eq "Migrate" -and $Phase -eq "N06") {
+  powershell -ExecutionPolicy Bypass -File "$Base\scripts\db\Run-N06Migration.ps1"
+  exit $LASTEXITCODE
+}
+
+Write-Host "Available validate phases: N00, N01, N02, N03, N04, N05, N06" -ForegroundColor Green
+Write-Host "N06 local DB migration: powershell -ExecutionPolicy Bypass -File .\KINGSMEN_CREATOR.ps1 -Phase N06 -Mode Migrate" -ForegroundColor Yellow

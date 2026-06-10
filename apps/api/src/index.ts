@@ -15,3 +15,4 @@ export * from "./idempotency/idempotency";
 export * from "./heartbeat/worker-heartbeat";
 export * from "./candidate";
 export * from "./documents";
+export * from "./routes";

@@ -1,0 +1,28 @@
+﻿{
+    "module":  "N06",
+    "name":  "Route Universe / Application Workbench",
+    "checked_at":  "2026-06-10T11:48:20",
+    "status":  "FAIL",
+    "failures":  [
+                     "MAP fallback module missing manual package marker."
+                 ],
+    "required_files":  [
+                           "manifests\\n06\\route-universe-workbench.json",
+                           "db\\migrations\\0004_n06_route_universe.sql",
+                           "db\\seeds\\n06_route_universe_seed.sql",
+                           "apps\\api\\src\\routes\\route-types.ts",
+                           "apps\\api\\src\\routes\\source-confidence.ts",
+                           "apps\\api\\src\\routes\\portal-health.ts",
+                           "apps\\api\\src\\routes\\route-readiness.ts",
+                           "apps\\api\\src\\routes\\application-workbench.ts",
+                           "apps\\api\\src\\routes\\cao-boundary.ts",
+                           "apps\\api\\src\\routes\\nsfas-support.ts",
+                           "apps\\api\\src\\routes\\map-fallback.ts",
+                           "apps\\api\\src\\routes\\route-universe-repository.ts",
+                           "apps\\api\\src\\routes\\index.ts",
+                           "apps\\web\\src\\application-workbench\\ApplicationWorkbenchPanel.tsx",
+                           "apps\\web\\src\\application-workbench\\RouteReadinessPanel.tsx",
+                           "scripts\\db\\Run-N06Migration.ps1",
+                           "reports\\n06\\N06_ROUTE_UNIVERSE_WORKBENCH_REPORT.md"
+                       ]
+}

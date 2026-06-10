@@ -1,0 +1,31 @@
+{
+  "module": "N06",
+  "name": "Route Universe / Application Workbench",
+  "status": "prepared",
+  "depends_on": ["N00", "N01", "N02", "N03", "N04", "N05"],
+  "purpose": "Create the national route universe and application workbench foundation for universities, TVET, SETA/learnerships, bursaries, accommodation, employers, NSFAS, CAO, private colleges, MAP fallback, portal health, fees, deadlines, and readiness.",
+  "route_laws": [
+    "All national sectors remain available from day one.",
+    "Packages control campaign weight, route count, monitoring, and priority, not dignity or sector access.",
+    "Source confidence is required for route-facing links, deadlines, fees, and instructions.",
+    "Official sources receive Band A only when sourced from official government, institution, authority, or portal pages.",
+    "CAO is one Kingsmen application with internal choices as child items.",
+    "CAO fees and limits must be treated as portal rules, not Kingsmen guarantees.",
+    "NSFAS support is route support and document support, not a no-fee bypass or approval guarantee.",
+    "Playwright is scout/probe only.",
+    "CAPTCHA, OTP, downtime, or manual-only portals must route to MAP fallback.",
+    "Private colleges must require CHE/DHET/SAQA/QCTO verification before being treated as safe.",
+    "No fake deadlines, fake links, fake requirements, fake programme availability, or fake acceptance claims.",
+    "Route universe data can be incomplete but must never be falsely presented as complete."
+  ],
+  "sections": [
+    "N06.1 Route Universe Overview / National Mapping",
+    "N06.2 Schema / RLS / Views / Seeds",
+    "N06.3 Backend Types / Readiness Engine / Portal Health",
+    "N06.4 Application Workbench Repository / CAO Boundary / NSFAS Support",
+    "N06.5 MAP Manual Fallback / Source Confidence / Route Safety",
+    "N06.6 Candidate Portal and Control Plane Workbench UI",
+    "N06.7 Validator / Migration Runner / Closeout"
+  ],
+  "next": "N07 - Airtable Sync"
+}
