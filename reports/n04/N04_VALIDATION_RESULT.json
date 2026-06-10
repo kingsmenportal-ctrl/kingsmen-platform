@@ -1,0 +1,26 @@
+﻿{
+    "module":  "N04",
+    "name":  "Candidate Core \u0026 Portal",
+    "checked_at":  "2026-06-10T11:32:07",
+    "status":  "PASS",
+    "failures":  [
+
+                 ],
+    "required_files":  [
+                           "manifests\\n04\\candidate-core-portal.json",
+                           "db\\migrations\\0002_n04_candidate_core.sql",
+                           "db\\seeds\\n04_runtime_config_seed.sql",
+                           "apps\\api\\src\\candidate\\candidate-types.ts",
+                           "apps\\api\\src\\candidate\\smart-intake.ts",
+                           "apps\\api\\src\\candidate\\candidate-auth.ts",
+                           "apps\\api\\src\\candidate\\profile-review.ts",
+                           "apps\\api\\src\\candidate\\candidate-portal-read-model.ts",
+                           "apps\\api\\src\\candidate\\candidate-messages.ts",
+                           "apps\\api\\src\\candidate\\candidate-success-loop.ts",
+                           "apps\\api\\src\\candidate\\index.ts",
+                           "apps\\web\\src\\candidate-portal\\CandidatePortalShell.tsx",
+                           "apps\\web\\src\\candidate-portal\\SmartIntakeReview.tsx",
+                           "scripts\\db\\Run-N04Migration.ps1",
+                           "reports\\n04\\N04_CANDIDATE_CORE_PORTAL_REPORT.md"
+                       ]
+}

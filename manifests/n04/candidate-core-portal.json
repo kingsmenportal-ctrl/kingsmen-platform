@@ -1,0 +1,33 @@
+{
+  "module": "N04",
+  "name": "Candidate Core & Portal",
+  "status": "prepared",
+  "depends_on": ["N00", "N01", "N02", "N03"],
+  "purpose": "Create the candidate identity, smart intake, profile review, portal read model, communication centre, support, finance view, and success-loop foundation.",
+  "candidate_laws": [
+    "The candidate must not retype details already available in CVs and documents.",
+    "Smart forms must prefill from document-backed field sources.",
+    "Unknown or low-confidence fields must be asked clearly.",
+    "Candidate confirms extracted data before it becomes trusted profile data.",
+    "Sensitive profile corrections require operator approval.",
+    "Email is primary communication.",
+    "WhatsApp is urgent-only.",
+    "SMS is backup-only.",
+    "No fake qualifications, references, certificates, skills, results, or experience.",
+    "Every profile field must be source-traceable when extracted from documents.",
+    "Candidate status must be visible without exposing internal worker complexity.",
+    "AI may suggest; it must not govern official status, payments, refunds, fraud, privacy, or hard blockers."
+  ],
+  "sections": [
+    "N04.1 Candidate Intake Form",
+    "N04.2 Candidate Auth / Sessions / Portal Access / Account Recovery Foundation",
+    "N04.2B API Routes / Web Login Pages / Server Wiring / Boot Test",
+    "N04.3 Runtime Re-Attachment / Candidate Portal Shell / Route Workbench Read Model",
+    "N04.4 Candidate Profile Edit Review / Operator Approval Boundary",
+    "N04.5 Candidate Portal UI / Mobile Journey / Email-First Experience",
+    "N04.6 Candidate Communication Centre / Email Templates / Notification Rules / Message Evidence Ledger",
+    "N04.7 Candidate Portal Security / Sessions / Device Trust / Account Recovery / RLS Enforcement",
+    "N04.10 Candidate Success Loop / Feedback / Outcomes / Learning Signals"
+  ],
+  "next": "N05 - Document Vault"
+}
