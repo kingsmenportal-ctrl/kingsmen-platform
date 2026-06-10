@@ -1,0 +1,28 @@
+{
+  "schema": "kingsmen.validation-report.v1",
+  "module": "PERSONAL-JOBS-24 - Candidate Application Tracker / Proof-Backed Progress View",
+  "status": "VALIDATED",
+  "passed": true,
+  "generated_at": "2026-06-10T03:03:20.553Z",
+  "proof": "reports/personal-jobs/personal-jobs-24-application-tracker-proof.json",
+  "output": "data/personal-job-desk/application-tracker.local.json",
+  "summary": {
+    "totalItems": 80,
+    "reviewRequired": 80,
+    "readyForManualSubmission": 0,
+    "submittedProofCaptured": 0,
+    "followUpScheduled": 0,
+    "outcomesVisible": 0,
+    "byCandidateStatus": {
+      "REVIEW_REQUIRED": 80
+    }
+  },
+  "failed_checks": [],
+  "warnings": [
+    "PJ24 does not apply to jobs automatically.",
+    "PJ24 does not contact employers.",
+    "PJ24 only creates candidate-safe progress visibility.",
+    "Candidate-visible progress must not guarantee employment, interview, offer, or response."
+  ],
+  "next_action": "Commit PJ24 tracked files and test the local UI."
+}

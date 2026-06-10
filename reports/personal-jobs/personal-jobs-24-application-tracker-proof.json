@@ -1,0 +1,134 @@
+{
+  "schema": "kingsmen.personal-jobs-24-proof.v1",
+  "module": "PERSONAL-JOBS-24 - Candidate Application Tracker / Proof-Backed Progress View",
+  "status": "PROVEN",
+  "passed": true,
+  "generated_at": "2026-06-10T03:03:20.520Z",
+  "input": "data/personal-job-desk/manual-submission-workbench.local.json",
+  "output": "data/personal-job-desk/application-tracker.local.json",
+  "summary": {
+    "totalItems": 80,
+    "reviewRequired": 80,
+    "readyForManualSubmission": 0,
+    "submittedProofCaptured": 0,
+    "followUpScheduled": 0,
+    "outcomesVisible": 0,
+    "byCandidateStatus": {
+      "REVIEW_REQUIRED": 80
+    }
+  },
+  "boundaries": {
+    "sendsApplications": false,
+    "sendsEmail": false,
+    "sendsWhatsApp": false,
+    "touchesPayments": false,
+    "contactsEmployers": false,
+    "bypassesLoginOtpCaptcha": false,
+    "productionReady": false,
+    "deployedToOracle": false
+  },
+  "checks": [
+    {
+      "name": "file:scripts/agents/personal-job-application-tracker.mjs",
+      "passed": true,
+      "detail": "scripts/agents/personal-job-application-tracker.mjs"
+    },
+    {
+      "name": "file:apps/web/src/app/api/personal-jobs/application-tracker/route.ts",
+      "passed": true,
+      "detail": "apps/web/src/app/api/personal-jobs/application-tracker/route.ts"
+    },
+    {
+      "name": "file:apps/web/src/app/personal-job-desk/application-tracker/page.tsx",
+      "passed": true,
+      "detail": "apps/web/src/app/personal-job-desk/application-tracker/page.tsx"
+    },
+    {
+      "name": "file:apps/web/src/app/personal-job-desk/application-tracker/ApplicationTrackerClient.tsx",
+      "passed": true,
+      "detail": "apps/web/src/app/personal-job-desk/application-tracker/ApplicationTrackerClient.tsx"
+    },
+    {
+      "name": "file:packages/contracts/src/personal-jobs-24-application-tracker.ts",
+      "passed": true,
+      "detail": "packages/contracts/src/personal-jobs-24-application-tracker.ts"
+    },
+    {
+      "name": "file:docs/personal-jobs/personal-jobs-24-application-tracker.md",
+      "passed": true,
+      "detail": "docs/personal-jobs/personal-jobs-24-application-tracker.md"
+    },
+    {
+      "name": "file:manifests/personal-jobs/personal-jobs-24-application-tracker.json",
+      "passed": true,
+      "detail": "manifests/personal-jobs/personal-jobs-24-application-tracker.json"
+    },
+    {
+      "name": "file:scripts/proof/prove-personal-jobs-24-application-tracker.mjs",
+      "passed": true,
+      "detail": "scripts/proof/prove-personal-jobs-24-application-tracker.mjs"
+    },
+    {
+      "name": "file:scripts/validators/validate-personal-jobs-24-application-tracker.mjs",
+      "passed": true,
+      "detail": "scripts/validators/validate-personal-jobs-24-application-tracker.mjs"
+    },
+    {
+      "name": "pj23_input_exists",
+      "passed": true,
+      "detail": "PJ23 manual-submission-workbench.local.json must exist before PJ24."
+    },
+    {
+      "name": "agent_exit_zero",
+      "passed": true,
+      "detail": "{\n  \"status\": \"COMPLETED\",\n  \"pj23RecordCount\": 80,\n  \"trackerItemCount\": 80,\n  \"summary\": {\n    \"totalItems\": 80,\n    \"reviewRequired\": 80,\n    \"readyForManualSubmission\": 0,\n    \"submittedProofCaptured\": 0,\n    \"followUpScheduled\": 0,\n    \"outcomesVisible\": 0,\n    \"byCandidateStatus\": {\n      \"REVIEW_REQUIRED\": 80\n    }\n  }\n}\n"
+    },
+    {
+      "name": "output_written",
+      "passed": true,
+      "detail": "C:\\Kingsmen\\kingsmen-platform\\data\\personal-job-desk\\application-tracker.local.json"
+    },
+    {
+      "name": "input_completed",
+      "passed": true,
+      "detail": "COMPLETED"
+    },
+    {
+      "name": "output_completed",
+      "passed": true,
+      "detail": "COMPLETED"
+    },
+    {
+      "name": "items_created",
+      "passed": true,
+      "detail": "80"
+    },
+    {
+      "name": "items_match_pj23_records",
+      "passed": true,
+      "detail": "80 vs 80"
+    },
+    {
+      "name": "all_items_have_required_sections",
+      "passed": true,
+      "detail": "0 items missing required sections"
+    },
+    {
+      "name": "no_unsafe_actions",
+      "passed": true,
+      "detail": "0 unsafe items"
+    },
+    {
+      "name": "no_success_guarantees",
+      "passed": true,
+      "detail": "0 guarantee-like items"
+    },
+    {
+      "name": "global_safety_boundary_no_send",
+      "passed": true,
+      "detail": "{\"sendsApplications\":false,\"sendsEmail\":false,\"sendsWhatsApp\":false,\"contactsEmployers\":false,\"touchesPayments\":false,\"bypassesLoginOtpCaptcha\":false,\"productionClaim\":false,\"deployedToOracle\":false}"
+    }
+  ],
+  "failed": [],
+  "next_action": "Commit PJ24, then test /personal-job-desk/application-tracker."
+}

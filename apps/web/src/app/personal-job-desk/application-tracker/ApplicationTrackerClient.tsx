@@ -1,0 +1,429 @@
+"use client";
+
+import { useEffect, useMemo, useState } from "react";
+
+type TrackerItem = {
+  trackerId: string;
+  workbenchId: string;
+  packId: string;
+  candidateStatus: string;
+  candidateMessage: string;
+  opportunity: {
+    title: string;
+    company: string;
+    location: string;
+    sourceUrl: string;
+    applyUrl: string;
+  };
+  timeline: {
+    createdAt: string;
+    updatedAt: string;
+    startedAt: string;
+    submittedAt: string;
+    followUpDate: string;
+  };
+  progress: Array<{
+    key: string;
+    label: string;
+    state: string;
+    proofBacked: boolean;
+  }>;
+  proof: {
+    proofCaptured: boolean;
+    proofType: string;
+    proofReference: string;
+    submittedAt: string;
+    proofNotes: string;
+    candidateVisibleRule: string;
+  };
+  outcome: {
+    outcomeStatus: string;
+    outcomeNotesVisible: boolean;
+    outcomeMessage: string;
+  };
+  candidateControls: {
+    candidateAcknowledged: boolean;
+    candidateQuestion: string;
+    lastCandidateNoteAt: string;
+  };
+  disclaimers: string[];
+};
+
+type TrackerOutput = {
+  status?: string;
+  generatedAt?: string;
+  trackerItemCount?: number;
+  summary?: any;
+  items?: TrackerItem[];
+};
+
+const statuses = [
+  "ALL",
+  "REVIEW_REQUIRED",
+  "READY_FOR_MANUAL_SUBMISSION",
+  "MANUAL_SUBMISSION_IN_PROGRESS",
+  "SUBMITTED_PROOF_CAPTURED",
+  "FOLLOW_UP_SCHEDULED",
+  "INTERVIEW_STAGE",
+  "REJECTED",
+  "OFFER_RECEIVED",
+  "NO_RESPONSE_FOLLOWUP",
+  "CLOSED_NOT_APPLYING"
+];
+
+export default function ApplicationTrackerClient() {
+  const [tracker, setTracker] = useState<TrackerOutput | null>(null);
+  const [selectedId, setSelectedId] = useState("");
+  const [filter, setFilter] = useState("ALL");
+  const [message, setMessage] = useState("");
+  const [loading, setLoading] = useState(false);
+
+  const items = useMemo(() => tracker?.items ?? [], [tracker]);
+
+  const filtered = useMemo(() => {
+    if (filter === "ALL") return items;
+    return items.filter((item) => item.candidateStatus === filter);
+  }, [items, filter]);
+
+  const selected = useMemo(() => {
+    return items.find((item) => item.trackerId === selectedId) ?? filtered[0] ?? null;
+  }, [items, filtered, selectedId]);
+
+  useEffect(() => {
+    loadTracker();
+  }, []);
+
+  async function loadTracker() {
+    setLoading(true);
+    setMessage("");
+
+    try {
+      const response = await fetch("/api/personal-jobs/application-tracker", { method: "GET" });
+      const json = await response.json();
+      if (!response.ok) throw new Error(json.error || "PJ24 load failed.");
+      setTracker(json);
+      setSelectedId(json.items?.[0]?.trackerId ?? "");
+      setMessage(`PJ24 loaded ${json.trackerItemCount} tracker items.`);
+    } catch (error) {
+      setMessage(error instanceof Error ? error.message : "PJ24 load failed.");
+    } finally {
+      setLoading(false);
+    }
+  }
+
+  function patchControls(key: keyof TrackerItem["candidateControls"], value: string | boolean) {
+    if (!selected || !tracker?.items) return;
+
+    const updatedItems = tracker.items.map((item) => {
+      if (item.trackerId !== selected.trackerId) return item;
+      return {
+        ...item,
+        candidateControls: {
+          ...item.candidateControls,
+          [key]: value
+        }
+      };
+    });
+
+    setTracker({ ...tracker, items: updatedItems });
+  }
+
+  async function saveSelected(item: TrackerItem) {
+    setLoading(true);
+    setMessage("");
+
+    try {
+      const response = await fetch("/api/personal-jobs/application-tracker", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          trackerId: item.trackerId,
+          candidateControls: item.candidateControls
+        })
+      });
+
+      const json = await response.json();
+      if (!response.ok) throw new Error(json.error || "PJ24 save failed.");
+
+      setTracker(json.tracker);
+      setSelectedId(json.item.trackerId);
+      setMessage("Saved candidate tracker note.");
+    } catch (error) {
+      setMessage(error instanceof Error ? error.message : "PJ24 save failed.");
+    } finally {
+      setLoading(false);
+    }
+  }
+
+  return (
+    <main style={main}>
+      <section style={panel}>
+        <p style={eyebrow}>PERSONAL-JOBS-24</p>
+        <h1 style={{ fontSize: 40, margin: "8px 0" }}>Application Tracker</h1>
+        <p style={muted}>
+          Candidate-safe progress view for PJ23 application records. Progress is shown with proof boundaries.
+        </p>
+        <button onClick={loadTracker} disabled={loading} style={button}>
+          {loading ? "Working..." : "Refresh tracker"}
+        </button>
+        {message ? <p style={{ color: "#ffd77a" }}>{message}</p> : null}
+      </section>
+
+      <section style={statsGrid}>
+        <Stat label="Total" value={tracker?.summary?.totalItems ?? 0} />
+        <Stat label="Review required" value={tracker?.summary?.reviewRequired ?? 0} />
+        <Stat label="Ready manual" value={tracker?.summary?.readyForManualSubmission ?? 0} />
+        <Stat label="Proof captured" value={tracker?.summary?.submittedProofCaptured ?? 0} />
+        <Stat label="Follow-up" value={tracker?.summary?.followUpScheduled ?? 0} />
+        <Stat label="Outcomes" value={tracker?.summary?.outcomesVisible ?? 0} />
+      </section>
+
+      <section style={layout}>
+        <aside style={panel}>
+          <h2>Applications</h2>
+          <select value={filter} onChange={(e) => setFilter(e.target.value)} style={input}>
+            {statuses.map((status) => <option key={status} value={status}>{status}</option>)}
+          </select>
+
+          <div style={{ display: "grid", gap: 10, marginTop: 14 }}>
+            {filtered.slice(0, 120).map((item) => (
+              <button
+                key={item.trackerId}
+                onClick={() => setSelectedId(item.trackerId)}
+                style={{
+                  ...queueCard,
+                  outline: selected?.trackerId === item.trackerId ? "2px solid #ffd77a" : "none"
+                }}
+              >
+                <strong>{item.opportunity.title || "Untitled opportunity"}</strong>
+                <span>{item.opportunity.company || "Unknown company"} - {item.opportunity.location || "Unknown location"}</span>
+                <small>{item.candidateStatus}</small>
+              </button>
+            ))}
+          </div>
+        </aside>
+
+        <section style={panel}>
+          {!selected ? (
+            <p style={muted}>No tracker item selected.</p>
+          ) : (
+            <>
+              <p style={eyebrow}>{selected.candidateStatus}</p>
+              <h2>{selected.opportunity.title || "Untitled opportunity"}</h2>
+              <p style={muted}>{selected.opportunity.company || "Unknown company"} - {selected.opportunity.location || "Unknown location"}</p>
+              <p style={messageBox}>{selected.candidateMessage}</p>
+
+              <div style={{ display: "flex", gap: 10, flexWrap: "wrap", marginBottom: 18 }}>
+                {selected.opportunity.sourceUrl ? <a href={selected.opportunity.sourceUrl} target="_blank" rel="noreferrer" style={linkButton}>Open source</a> : null}
+                {selected.opportunity.applyUrl ? <a href={selected.opportunity.applyUrl} target="_blank" rel="noreferrer" style={linkButton}>Open apply URL</a> : null}
+              </div>
+
+              <section style={subPanel}>
+                <h3>Progress</h3>
+                <div style={{ display: "grid", gap: 10 }}>
+                  {selected.progress.map((step) => (
+                    <div key={step.key} style={progressCard}>
+                      <strong>{step.label}</strong>
+                      <span>{step.state}</span>
+                      <small>{step.proofBacked ? "Proof-backed" : "Waiting for proof"}</small>
+                    </div>
+                  ))}
+                </div>
+              </section>
+
+              <section style={subPanel}>
+                <h3>Proof</h3>
+                <p style={muted}>Captured: {selected.proof.proofCaptured ? "Yes" : "No"}</p>
+                <p style={muted}>Type: {selected.proof.proofType || "None yet"}</p>
+                <p style={muted}>Reference: {selected.proof.proofReference || "None yet"}</p>
+                <p style={muted}>Submitted at: {selected.proof.submittedAt || "Not submitted yet"}</p>
+              </section>
+
+              <section style={subPanel}>
+                <h3>Timeline</h3>
+                <p style={muted}>Started: {selected.timeline.startedAt || "Not started"}</p>
+                <p style={muted}>Submitted: {selected.timeline.submittedAt || "Not submitted"}</p>
+                <p style={muted}>Follow-up: {selected.timeline.followUpDate || "No follow-up date"}</p>
+              </section>
+
+              <section style={subPanel}>
+                <h3>Candidate note</h3>
+                <label style={checkLabel}>
+                  <input
+                    type="checkbox"
+                    checked={selected.candidateControls.candidateAcknowledged}
+                    onChange={(e) => patchControls("candidateAcknowledged", e.target.checked)}
+                  />
+                  I have seen this status
+                </label>
+                <textarea
+                  value={selected.candidateControls.candidateQuestion}
+                  onChange={(e) => patchControls("candidateQuestion", e.target.value)}
+                  placeholder="Ask a question or add a note..."
+                  style={textarea}
+                />
+                <button style={button} disabled={loading} onClick={() => saveSelected(selected)}>
+                  Save note
+                </button>
+              </section>
+
+              <section style={subPanel}>
+                <h3>Important</h3>
+                <ul style={listStyle}>{selected.disclaimers.map((item) => <li key={item}>{item}</li>)}</ul>
+              </section>
+            </>
+          )}
+        </section>
+      </section>
+    </main>
+  );
+}
+
+function Stat({ label, value }: { label: string; value: number }) {
+  return (
+    <article style={card}>
+      <strong style={{ fontSize: 28, color: "#ffd77a" }}>{value}</strong>
+      <span style={{ display: "block", color: "#b9ad92" }}>{label}</span>
+    </article>
+  );
+}
+
+const main = {
+  minHeight: "100vh",
+  background: "linear-gradient(135deg,#050505,#151108,#241907)",
+  color: "#f8f0db",
+  padding: 28,
+  fontFamily: "Arial, sans-serif"
+};
+
+const panel = {
+  border: "1px solid rgba(255,215,122,.25)",
+  borderRadius: 24,
+  background: "rgba(255,255,255,.055)",
+  padding: 22,
+  marginBottom: 20
+};
+
+const subPanel = {
+  border: "1px solid rgba(255,215,122,.14)",
+  borderRadius: 18,
+  background: "rgba(0,0,0,.18)",
+  padding: 16,
+  marginTop: 14
+};
+
+const card = {
+  border: "1px solid rgba(255,215,122,.2)",
+  borderRadius: 18,
+  background: "rgba(0,0,0,.22)",
+  padding: 16
+};
+
+const layout = {
+  display: "grid",
+  gridTemplateColumns: "minmax(300px, 420px) 1fr",
+  gap: 18,
+  alignItems: "start"
+};
+
+const statsGrid = {
+  display: "grid",
+  gridTemplateColumns: "repeat(auto-fit,minmax(160px,1fr))",
+  gap: 14,
+  marginBottom: 20
+};
+
+const queueCard = {
+  textAlign: "left" as const,
+  border: "1px solid rgba(255,215,122,.18)",
+  borderRadius: 14,
+  padding: 12,
+  background: "rgba(0,0,0,.28)",
+  color: "#f8f0db",
+  cursor: "pointer",
+  display: "grid",
+  gap: 5
+};
+
+const progressCard = {
+  border: "1px solid rgba(255,215,122,.18)",
+  borderRadius: 14,
+  padding: 12,
+  background: "rgba(0,0,0,.22)",
+  color: "#f8f0db",
+  display: "grid",
+  gap: 5
+};
+
+const eyebrow = {
+  color: "#d7ad49",
+  textTransform: "uppercase" as const,
+  letterSpacing: ".18em",
+  fontSize: 12
+};
+
+const muted = {
+  color: "#d8caa8",
+  lineHeight: 1.6
+};
+
+const input = {
+  width: "100%",
+  border: "1px solid rgba(255,215,122,.28)",
+  borderRadius: 12,
+  padding: 11,
+  background: "rgba(0,0,0,.28)",
+  color: "#f8f0db"
+};
+
+const textarea = {
+  width: "100%",
+  minHeight: 90,
+  border: "1px solid rgba(255,215,122,.28)",
+  borderRadius: 12,
+  padding: 11,
+  marginTop: 12,
+  background: "rgba(0,0,0,.28)",
+  color: "#f8f0db"
+};
+
+const button = {
+  border: 0,
+  borderRadius: 999,
+  background: "#d7ad49",
+  color: "#111",
+  padding: "12px 16px",
+  fontWeight: 800,
+  cursor: "pointer",
+  marginTop: 14
+};
+
+const linkButton = {
+  borderRadius: 999,
+  border: "1px solid rgba(255,215,122,.45)",
+  color: "#ffd77a",
+  padding: "9px 12px",
+  textDecoration: "none"
+};
+
+const checkLabel = {
+  display: "flex",
+  gap: 10,
+  alignItems: "center",
+  color: "#d8caa8"
+};
+
+const listStyle = {
+  color: "#d8caa8",
+  lineHeight: 1.55,
+  paddingLeft: 22
+};
+
+const messageBox = {
+  color: "#f8f0db",
+  lineHeight: 1.6,
+  background: "rgba(215,173,73,.12)",
+  border: "1px solid rgba(215,173,73,.28)",
+  borderRadius: 16,
+  padding: 14
+};
