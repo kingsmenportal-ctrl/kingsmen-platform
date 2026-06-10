@@ -1,0 +1,257 @@
+﻿{
+    "schema":  "kingsmen.personal-jobs-40-route-menu.validation.v1",
+    "module":  "PJ40",
+    "status":  "BUILT",
+    "generatedAt":  "2026-06-10T07:19:29.3891766Z",
+    "shell":  "apps\\web\\src\\app\\personal-job-desk\\PersonalJobDeskShell.tsx",
+    "backup":  "apps\\web\\src\\app\\personal-job-desk\\PersonalJobDeskShell.tsx.backup-20260610-001923",
+    "routeCount":  35,
+    "routes":  [
+                   {
+                       "slug":  "",
+                       "label":  "Dashboard",
+                       "href":  "/personal-job-desk",
+                       "icon":  "⌂",
+                       "source":  "root"
+                   },
+                   {
+                       "slug":  "application-tracker",
+                       "label":  "Tracker",
+                       "href":  "/personal-job-desk/application-tracker",
+                       "icon":  "◷",
+                       "source":  "page.tsx"
+                   },
+                   {
+                       "slug":  "apply-now",
+                       "label":  "Apply",
+                       "href":  "/personal-job-desk/apply-now",
+                       "icon":  "✦",
+                       "source":  "page.tsx"
+                   },
+                   {
+                       "slug":  "apply-pack",
+                       "label":  "Apply Pack",
+                       "href":  "/personal-job-desk/apply-pack",
+                       "icon":  "▤",
+                       "source":  "page.tsx"
+                   },
+                   {
+                       "slug":  "apply-pack-builder",
+                       "label":  "Apply Pack Builder",
+                       "href":  "/personal-job-desk/apply-pack-builder",
+                       "icon":  "•",
+                       "source":  "page.tsx"
+                   },
+                   {
+                       "slug":  "daily-loop",
+                       "label":  "Daily Loop",
+                       "href":  "/personal-job-desk/daily-loop",
+                       "icon":  "↻",
+                       "source":  "page.tsx"
+                   },
+                   {
+                       "slug":  "daily-worklist",
+                       "label":  "Daily Worklist",
+                       "href":  "/personal-job-desk/daily-worklist",
+                       "icon":  "•",
+                       "source":  "page.tsx"
+                   },
+                   {
+                       "slug":  "document-pack-index",
+                       "label":  "Documents",
+                       "href":  "/personal-job-desk/document-pack-index",
+                       "icon":  "▣",
+                       "source":  "page.tsx"
+                   },
+                   {
+                       "slug":  "follow-up",
+                       "label":  "Follow Up",
+                       "href":  "/personal-job-desk/follow-up",
+                       "icon":  "✉",
+                       "source":  "page.tsx"
+                   },
+                   {
+                       "slug":  "follow-up-inbox",
+                       "label":  "Follow Up Inbox",
+                       "href":  "/personal-job-desk/follow-up-inbox",
+                       "icon":  "•",
+                       "source":  "page.tsx"
+                   },
+                   {
+                       "slug":  "import-search",
+                       "label":  "Import Search",
+                       "href":  "/personal-job-desk/import-search",
+                       "icon":  "•",
+                       "source":  "page.tsx"
+                   },
+                   {
+                       "slug":  "job-finder",
+                       "label":  "Job Finder",
+                       "href":  "/personal-job-desk/job-finder",
+                       "icon":  "⌕",
+                       "source":  "page.tsx"
+                   },
+                   {
+                       "slug":  "manual-submission-workbench",
+                       "label":  "Manual Submission Workbench",
+                       "href":  "/personal-job-desk/manual-submission-workbench",
+                       "icon":  "•",
+                       "source":  "page.tsx"
+                   },
+                   {
+                       "slug":  "navigation",
+                       "label":  "Navigation",
+                       "href":  "/personal-job-desk/navigation",
+                       "icon":  "•",
+                       "source":  "page.tsx"
+                   },
+                   {
+                       "slug":  "normalizer",
+                       "label":  "Normalizer",
+                       "href":  "/personal-job-desk/normalizer",
+                       "icon":  "•",
+                       "source":  "page.tsx"
+                   },
+                   {
+                       "slug":  "opportunities",
+                       "label":  "Opportunities",
+                       "href":  "/personal-job-desk/opportunities",
+                       "icon":  "•",
+                       "source":  "page.tsx"
+                   },
+                   {
+                       "slug":  "opportunity-quality-gate",
+                       "label":  "Opportunity Quality Gate",
+                       "href":  "/personal-job-desk/opportunity-quality-gate",
+                       "icon":  "•",
+                       "source":  "page.tsx"
+                   },
+                   {
+                       "slug":  "opportunity-queue",
+                       "label":  "Opportunity Queue",
+                       "href":  "/personal-job-desk/opportunity-queue",
+                       "icon":  "•",
+                       "source":  "page.tsx"
+                   },
+                   {
+                       "slug":  "opportunity-scout",
+                       "label":  "Scout",
+                       "href":  "/personal-job-desk/opportunity-scout",
+                       "icon":  "◎",
+                       "source":  "page.tsx"
+                   },
+                   {
+                       "slug":  "outcomes",
+                       "label":  "Outcomes",
+                       "href":  "/personal-job-desk/outcomes",
+                       "icon":  "✓",
+                       "source":  "page.tsx"
+                   },
+                   {
+                       "slug":  "proof-index",
+                       "label":  "Proof Index",
+                       "href":  "/personal-job-desk/proof-index",
+                       "icon":  "•",
+                       "source":  "page.tsx"
+                   },
+                   {
+                       "slug":  "proof-review-board",
+                       "label":  "Proof Review Board",
+                       "href":  "/personal-job-desk/proof-review-board",
+                       "icon":  "•",
+                       "source":  "page.tsx"
+                   },
+                   {
+                       "slug":  "public-snapshot",
+                       "label":  "Public Snapshot",
+                       "href":  "/personal-job-desk/public-snapshot",
+                       "icon":  "•",
+                       "source":  "page.tsx"
+                   },
+                   {
+                       "slug":  "readiness-queue",
+                       "label":  "Readiness Queue",
+                       "href":  "/personal-job-desk/readiness-queue",
+                       "icon":  "•",
+                       "source":  "page.tsx"
+                   },
+                   {
+                       "slug":  "real-use-gate",
+                       "label":  "Real Use Gate",
+                       "href":  "/personal-job-desk/real-use-gate",
+                       "icon":  "•",
+                       "source":  "page.tsx"
+                   },
+                   {
+                       "slug":  "response-library",
+                       "label":  "Response Library",
+                       "href":  "/personal-job-desk/response-library",
+                       "icon":  "•",
+                       "source":  "page.tsx"
+                   },
+                   {
+                       "slug":  "review-ledger",
+                       "label":  "Review Ledger",
+                       "href":  "/personal-job-desk/review-ledger",
+                       "icon":  "•",
+                       "source":  "page.tsx"
+                   },
+                   {
+                       "slug":  "runtime-click-test",
+                       "label":  "Runtime Click Test",
+                       "href":  "/personal-job-desk/runtime-click-test",
+                       "icon":  "•",
+                       "source":  "page.tsx"
+                   },
+                   {
+                       "slug":  "sa-sources",
+                       "label":  "SA Sources",
+                       "href":  "/personal-job-desk/sa-sources",
+                       "icon":  "⚑",
+                       "source":  "page.tsx"
+                   },
+                   {
+                       "slug":  "shortlist",
+                       "label":  "Shortlist",
+                       "href":  "/personal-job-desk/shortlist",
+                       "icon":  "•",
+                       "source":  "page.tsx"
+                   },
+                   {
+                       "slug":  "source-runner",
+                       "label":  "Source Runner",
+                       "href":  "/personal-job-desk/source-runner",
+                       "icon":  "•",
+                       "source":  "page.tsx"
+                   },
+                   {
+                       "slug":  "source-scout",
+                       "label":  "Source Scout",
+                       "href":  "/personal-job-desk/source-scout",
+                       "icon":  "◇",
+                       "source":  "page.tsx"
+                   },
+                   {
+                       "slug":  "status-advancement",
+                       "label":  "Status Advancement",
+                       "href":  "/personal-job-desk/status-advancement",
+                       "icon":  "•",
+                       "source":  "page.tsx"
+                   },
+                   {
+                       "slug":  "status-timeline",
+                       "label":  "Status Timeline",
+                       "href":  "/personal-job-desk/status-timeline",
+                       "icon":  "•",
+                       "source":  "page.tsx"
+                   },
+                   {
+                       "slug":  "submissions",
+                       "label":  "Submissions",
+                       "href":  "/personal-job-desk/submissions",
+                       "icon":  "•",
+                       "source":  "page.tsx"
+                   }
+               ],
+    "rule":  "Menu is generated from real route folders with page.tsx. Do not add fake menu items."
+}

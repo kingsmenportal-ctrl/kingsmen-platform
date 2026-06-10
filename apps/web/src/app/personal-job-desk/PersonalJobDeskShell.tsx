@@ -6,9 +6,40 @@ import { useMemo, useState } from "react";
 
 const navItems = [
   { label: "Dashboard", href: "/personal-job-desk", icon: "⌂" },
+  { label: "Tracker", href: "/personal-job-desk/application-tracker", icon: "◷" },
   { label: "Apply", href: "/personal-job-desk/apply-now", icon: "✦" },
+  { label: "Apply Pack", href: "/personal-job-desk/apply-pack", icon: "▤" },
+  { label: "Apply Pack Builder", href: "/personal-job-desk/apply-pack-builder", icon: "•" },
+  { label: "Daily Loop", href: "/personal-job-desk/daily-loop", icon: "↻" },
+  { label: "Daily Worklist", href: "/personal-job-desk/daily-worklist", icon: "•" },
+  { label: "Documents", href: "/personal-job-desk/document-pack-index", icon: "▣" },
+  { label: "Follow Up", href: "/personal-job-desk/follow-up", icon: "✉" },
+  { label: "Follow Up Inbox", href: "/personal-job-desk/follow-up-inbox", icon: "•" },
+  { label: "Import Search", href: "/personal-job-desk/import-search", icon: "•" },
+  { label: "Job Finder", href: "/personal-job-desk/job-finder", icon: "⌕" },
+  { label: "Manual Submission Workbench", href: "/personal-job-desk/manual-submission-workbench", icon: "•" },
+  { label: "Navigation", href: "/personal-job-desk/navigation", icon: "•" },
+  { label: "Normalizer", href: "/personal-job-desk/normalizer", icon: "•" },
+  { label: "Opportunities", href: "/personal-job-desk/opportunities", icon: "•" },
+  { label: "Opportunity Quality Gate", href: "/personal-job-desk/opportunity-quality-gate", icon: "•" },
+  { label: "Opportunity Queue", href: "/personal-job-desk/opportunity-queue", icon: "•" },
   { label: "Scout", href: "/personal-job-desk/opportunity-scout", icon: "◎" },
-  { label: "Documents", href: "/personal-job-desk/document-pack-index", icon: "▣" }
+  { label: "Outcomes", href: "/personal-job-desk/outcomes", icon: "✓" },
+  { label: "Proof Index", href: "/personal-job-desk/proof-index", icon: "•" },
+  { label: "Proof Review Board", href: "/personal-job-desk/proof-review-board", icon: "•" },
+  { label: "Public Snapshot", href: "/personal-job-desk/public-snapshot", icon: "•" },
+  { label: "Readiness Queue", href: "/personal-job-desk/readiness-queue", icon: "•" },
+  { label: "Real Use Gate", href: "/personal-job-desk/real-use-gate", icon: "•" },
+  { label: "Response Library", href: "/personal-job-desk/response-library", icon: "•" },
+  { label: "Review Ledger", href: "/personal-job-desk/review-ledger", icon: "•" },
+  { label: "Runtime Click Test", href: "/personal-job-desk/runtime-click-test", icon: "•" },
+  { label: "SA Sources", href: "/personal-job-desk/sa-sources", icon: "⚑" },
+  { label: "Shortlist", href: "/personal-job-desk/shortlist", icon: "•" },
+  { label: "Source Runner", href: "/personal-job-desk/source-runner", icon: "•" },
+  { label: "Source Scout", href: "/personal-job-desk/source-scout", icon: "◇" },
+  { label: "Status Advancement", href: "/personal-job-desk/status-advancement", icon: "•" },
+  { label: "Status Timeline", href: "/personal-job-desk/status-timeline", icon: "•" },
+  { label: "Submissions", href: "/personal-job-desk/submissions", icon: "•" }
 ];
 
 export default function PersonalJobDeskShell({ children }: { children: ReactNode }) {
@@ -54,7 +85,7 @@ export default function PersonalJobDeskShell({ children }: { children: ReactNode
       <section style={body}>
         <header style={top}>
           <div style={topLeft}>
-            <button onClick={() => router.back()} style={ghost}>← Back</button>
+            <button onClick={() => router.back()} style={ghost}>â† Back</button>
             <a href="/personal-job-desk" style={ghostLink}>Home</a>
             <button onClick={() => location.reload()} style={ghost}>Refresh</button>
           </div>
