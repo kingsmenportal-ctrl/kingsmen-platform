@@ -1,0 +1,39 @@
+{
+  "schema": "kingsmen.validation-report.v1",
+  "module": "PERSONAL-JOBS-32 - Candidate-Safe Public Job Desk Snapshot / Exportable Progress Report",
+  "status": "VALIDATED",
+  "passed": true,
+  "generated_at": "2026-06-10T03:53:45.493Z",
+  "proof": "reports/personal-jobs/personal-jobs-32-public-snapshot-proof.json",
+  "output": "data/personal-job-desk/public-snapshot.local.json",
+  "summary": {
+    "totalItems": 80,
+    "awaitingProof": 80,
+    "awaitingApproval": 0,
+    "readyForAuditRecord": 0,
+    "auditRecorded": 0,
+    "rejected": 0,
+    "blocked": 0,
+    "closed": 0,
+    "proofBacked": 0,
+    "candidateVisibleMessages": 0,
+    "redactedProofItems": 0,
+    "byPublicStatus": {
+      "AWAITING_PROOF": 80
+    },
+    "byEvidenceLevel": {
+      "NO_EVIDENCE": 80
+    },
+    "byVisibility": {
+      "NO_PROOF_AVAILABLE": 80
+    }
+  },
+  "failed_checks": [],
+  "warnings": [
+    "PJ32 is read-only.",
+    "PJ32 does not expose sensitive proof.",
+    "PJ32 does not submit applications or contact employers.",
+    "PJ32 does not guarantee employment, interview, offer, funding, or response."
+  ],
+  "next_action": "Commit PJ32 tracked files and test the local UI."
+}

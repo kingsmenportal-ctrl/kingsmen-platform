@@ -187,3 +187,5 @@ data/personal-job-desk/status-advancement-audit.local.json
 reports/personal-jobs/personal-jobs-30-status-advancement-latest.json
 data/personal-job-desk/status-timeline.local.json
 reports/personal-jobs/personal-jobs-31-status-timeline-latest.json
+data/personal-job-desk/public-snapshot.local.json
+reports/personal-jobs/personal-jobs-32-public-snapshot-latest.json

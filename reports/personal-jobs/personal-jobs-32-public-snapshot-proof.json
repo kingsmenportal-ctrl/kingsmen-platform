@@ -1,0 +1,159 @@
+{
+  "schema": "kingsmen.personal-jobs-32-proof.v1",
+  "module": "PERSONAL-JOBS-32 - Candidate-Safe Public Job Desk Snapshot / Exportable Progress Report",
+  "status": "PROVEN",
+  "passed": true,
+  "generated_at": "2026-06-10T03:53:45.453Z",
+  "input": "data/personal-job-desk/status-timeline.local.json",
+  "output": "data/personal-job-desk/public-snapshot.local.json",
+  "summary": {
+    "totalItems": 80,
+    "awaitingProof": 80,
+    "awaitingApproval": 0,
+    "readyForAuditRecord": 0,
+    "auditRecorded": 0,
+    "rejected": 0,
+    "blocked": 0,
+    "closed": 0,
+    "proofBacked": 0,
+    "candidateVisibleMessages": 0,
+    "redactedProofItems": 0,
+    "byPublicStatus": {
+      "AWAITING_PROOF": 80
+    },
+    "byEvidenceLevel": {
+      "NO_EVIDENCE": 80
+    },
+    "byVisibility": {
+      "NO_PROOF_AVAILABLE": 80
+    }
+  },
+  "boundaries": {
+    "sendsApplications": false,
+    "sendsEmail": false,
+    "sendsWhatsApp": false,
+    "sendsSms": false,
+    "touchesPayments": false,
+    "contactsEmployers": false,
+    "bypassesLoginOtpCaptcha": false,
+    "autoMutatesApplicationTracker": false,
+    "autoMutatesProofBoard": false,
+    "exposesSensitiveProof": false,
+    "productionReady": false,
+    "deployedToOracle": false
+  },
+  "checks": [
+    {
+      "name": "file:scripts/agents/personal-job-public-snapshot.mjs",
+      "passed": true,
+      "detail": "scripts/agents/personal-job-public-snapshot.mjs"
+    },
+    {
+      "name": "file:apps/web/src/app/api/personal-jobs/public-snapshot/route.ts",
+      "passed": true,
+      "detail": "apps/web/src/app/api/personal-jobs/public-snapshot/route.ts"
+    },
+    {
+      "name": "file:apps/web/src/app/personal-job-desk/public-snapshot/page.tsx",
+      "passed": true,
+      "detail": "apps/web/src/app/personal-job-desk/public-snapshot/page.tsx"
+    },
+    {
+      "name": "file:apps/web/src/app/personal-job-desk/public-snapshot/PublicSnapshotClient.tsx",
+      "passed": true,
+      "detail": "apps/web/src/app/personal-job-desk/public-snapshot/PublicSnapshotClient.tsx"
+    },
+    {
+      "name": "file:packages/contracts/src/personal-jobs-32-public-snapshot.ts",
+      "passed": true,
+      "detail": "packages/contracts/src/personal-jobs-32-public-snapshot.ts"
+    },
+    {
+      "name": "file:docs/personal-jobs/personal-jobs-32-public-snapshot.md",
+      "passed": true,
+      "detail": "docs/personal-jobs/personal-jobs-32-public-snapshot.md"
+    },
+    {
+      "name": "file:manifests/personal-jobs/personal-jobs-32-public-snapshot.json",
+      "passed": true,
+      "detail": "manifests/personal-jobs/personal-jobs-32-public-snapshot.json"
+    },
+    {
+      "name": "file:scripts/proof/prove-personal-jobs-32-public-snapshot.mjs",
+      "passed": true,
+      "detail": "scripts/proof/prove-personal-jobs-32-public-snapshot.mjs"
+    },
+    {
+      "name": "file:scripts/validators/validate-personal-jobs-32-public-snapshot.mjs",
+      "passed": true,
+      "detail": "scripts/validators/validate-personal-jobs-32-public-snapshot.mjs"
+    },
+    {
+      "name": "pj31_input_exists",
+      "passed": true,
+      "detail": "PJ31 status-timeline.local.json must exist before PJ32."
+    },
+    {
+      "name": "agent_exit_zero",
+      "passed": true,
+      "detail": "{\n  \"status\": \"COMPLETED\",\n  \"pj31TimelineItemCount\": 80,\n  \"snapshotItemCount\": 80,\n  \"summary\": {\n    \"totalItems\": 80,\n    \"awaitingProof\": 80,\n    \"awaitingApproval\": 0,\n    \"readyForAuditRecord\": 0,\n    \"auditRecorded\": 0,\n    \"rejected\": 0,\n    \"blocked\": 0,\n    \"closed\": 0,\n    \"proofBacked\": 0,\n    \"candidateVisibleMessages\": 0,\n    \"redactedProofItems\": 0,\n    \"byPublicStatus\": {\n      \"AWAITING_PROOF\": 80\n    },\n    \"byEvidenceLevel\": {\n      \"NO_EVIDENCE\": 80\n    },\n    \"byVisibility\": {\n      \"NO_PROOF_AVAILABLE\": 80\n    }\n  }\n}\n"
+    },
+    {
+      "name": "output_written",
+      "passed": true,
+      "detail": "C:\\Kingsmen\\kingsmen-platform\\data\\personal-job-desk\\public-snapshot.local.json"
+    },
+    {
+      "name": "input_completed",
+      "passed": true,
+      "detail": "COMPLETED"
+    },
+    {
+      "name": "output_completed",
+      "passed": true,
+      "detail": "COMPLETED"
+    },
+    {
+      "name": "snapshot_items_created",
+      "passed": true,
+      "detail": "80"
+    },
+    {
+      "name": "items_match_pj31_timeline",
+      "passed": true,
+      "detail": "80 vs 80"
+    },
+    {
+      "name": "export_report_created",
+      "passed": true,
+      "detail": "kingsmen-personal-job-desk-progress-snapshot.md"
+    },
+    {
+      "name": "all_items_have_required_sections",
+      "passed": true,
+      "detail": "0 snapshot items missing required sections"
+    },
+    {
+      "name": "no_unsafe_snapshot_actions",
+      "passed": true,
+      "detail": "0 unsafe snapshot items"
+    },
+    {
+      "name": "sensitive_proof_redacted",
+      "passed": true,
+      "detail": "0 sensitive proof leaks"
+    },
+    {
+      "name": "no_success_guarantees",
+      "passed": true,
+      "detail": "0 guarantee-like snapshot items"
+    },
+    {
+      "name": "global_safety_boundary_no_send_no_leak",
+      "passed": true,
+      "detail": "{\"sendsApplications\":false,\"sendsEmail\":false,\"sendsWhatsApp\":false,\"sendsSms\":false,\"contactsEmployers\":false,\"touchesPayments\":false,\"bypassesLoginOtpCaptcha\":false,\"autoMutatesApplicationTracker\":false,\"autoMutatesProofBoard\":false,\"exposesSensitiveProof\":false,\"productionClaim\":false,\"deployedToOracle\":false}"
+    }
+  ],
+  "failed": [],
+  "next_action": "Commit PJ32, then test /personal-job-desk/public-snapshot."
+}
