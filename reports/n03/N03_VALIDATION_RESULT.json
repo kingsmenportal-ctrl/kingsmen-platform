@@ -1,0 +1,23 @@
+﻿{
+    "module":  "N03",
+    "name":  "PostgreSQL Truth Vault",
+    "checked_at":  "2026-06-10T11:28:38",
+    "status":  "PASS",
+    "failures":  [
+
+                 ],
+    "required_files":  [
+                           "manifests\\n03\\postgres-truth-vault.json",
+                           "db\\migrations\\0001_n03_truth_vault.sql",
+                           "db\\seeds\\n03_source_authorities_seed.sql",
+                           "apps\\api\\src\\db\\truth-vault-schema.ts",
+                           "apps\\api\\src\\db\\database-url.ts",
+                           "apps\\api\\src\\db\\truth-vault-repository.ts",
+                           "apps\\api\\src\\evidence\\evidence-ledger.ts",
+                           "apps\\api\\src\\idempotency\\idempotency.ts",
+                           "apps\\api\\src\\heartbeat\\worker-heartbeat.ts",
+                           "apps\\api\\src\\index.ts",
+                           "scripts\\db\\Run-N03Migration.ps1",
+                           "reports\\n03\\N03_POSTGRES_TRUTH_VAULT_REPORT.md"
+                       ]
+}

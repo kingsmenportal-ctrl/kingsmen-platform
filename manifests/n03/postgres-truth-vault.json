@@ -1,0 +1,37 @@
+{
+  "module": "N03",
+  "name": "PostgreSQL Truth Vault",
+  "status": "prepared",
+  "depends_on": ["N00", "N01", "N02"],
+  "purpose": "Create the canonical PostgreSQL truth layer for candidates, applications, commands, workflow runs, evidence, source authority, heartbeat, DLQ, and RLS discipline.",
+  "truth_laws": [
+    "PostgreSQL is the source of truth.",
+    "Airtable is mirror only.",
+    "n8n is a thin worker only.",
+    "Every command must have idempotency protection.",
+    "Every important action must create evidence.",
+    "Workflow results must be recorded exactly once.",
+    "Manual fallback must be evidence-backed.",
+    "Source authority must track confidence bands.",
+    "Sensitive candidate data must be protected.",
+    "RLS is required before production exposure."
+  ],
+  "schemas": ["public"],
+  "core_tables": [
+    "candidates",
+    "candidate_profiles",
+    "applications",
+    "command_log",
+    "idempotency_keys",
+    "workflow_runs",
+    "evidence_ledger",
+    "audit_events",
+    "source_authorities",
+    "route_sources",
+    "worker_heartbeats",
+    "dead_letter_queue",
+    "approval_requests",
+    "system_runtime_config"
+  ],
+  "next": "N04 - Candidate Core & Portal"
+}
