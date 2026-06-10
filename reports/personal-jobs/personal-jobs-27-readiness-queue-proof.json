@@ -1,0 +1,145 @@
+{
+  "schema": "kingsmen.personal-jobs-27-proof.v1",
+  "module": "PERSONAL-JOBS-27 - Application Readiness Governor / Priority Queue for Manual Execution",
+  "status": "PROVEN",
+  "passed": true,
+  "generated_at": "2026-06-10T03:21:54.549Z",
+  "input": "data/personal-job-desk/response-library.local.json",
+  "output": "data/personal-job-desk/readiness-priority-queue.local.json",
+  "summary": {
+    "totalItems": 80,
+    "urgent": 0,
+    "high": 0,
+    "normal": 0,
+    "low": 80,
+    "wait": 0,
+    "blockedReviewRequired": 80,
+    "readyForManualSubmission": 0,
+    "proofCaptureRequired": 0,
+    "followUpDue": 0,
+    "outcomeReviewRequired": 0,
+    "candidateResponseRequired": 0,
+    "closed": 0,
+    "byQueueStatus": {
+      "BLOCKED_REVIEW_REQUIRED": 80
+    },
+    "byPriorityBand": {
+      "P3_LOW": 80
+    }
+  },
+  "boundaries": {
+    "sendsApplications": false,
+    "sendsEmail": false,
+    "sendsWhatsApp": false,
+    "sendsSms": false,
+    "touchesPayments": false,
+    "contactsEmployers": false,
+    "bypassesLoginOtpCaptcha": false,
+    "productionReady": false,
+    "deployedToOracle": false
+  },
+  "checks": [
+    {
+      "name": "file:scripts/agents/personal-job-readiness-queue.mjs",
+      "passed": true,
+      "detail": "scripts/agents/personal-job-readiness-queue.mjs"
+    },
+    {
+      "name": "file:apps/web/src/app/api/personal-jobs/readiness-queue/route.ts",
+      "passed": true,
+      "detail": "apps/web/src/app/api/personal-jobs/readiness-queue/route.ts"
+    },
+    {
+      "name": "file:apps/web/src/app/personal-job-desk/readiness-queue/page.tsx",
+      "passed": true,
+      "detail": "apps/web/src/app/personal-job-desk/readiness-queue/page.tsx"
+    },
+    {
+      "name": "file:apps/web/src/app/personal-job-desk/readiness-queue/ReadinessQueueClient.tsx",
+      "passed": true,
+      "detail": "apps/web/src/app/personal-job-desk/readiness-queue/ReadinessQueueClient.tsx"
+    },
+    {
+      "name": "file:packages/contracts/src/personal-jobs-27-readiness-queue.ts",
+      "passed": true,
+      "detail": "packages/contracts/src/personal-jobs-27-readiness-queue.ts"
+    },
+    {
+      "name": "file:docs/personal-jobs/personal-jobs-27-readiness-queue.md",
+      "passed": true,
+      "detail": "docs/personal-jobs/personal-jobs-27-readiness-queue.md"
+    },
+    {
+      "name": "file:manifests/personal-jobs/personal-jobs-27-readiness-queue.json",
+      "passed": true,
+      "detail": "manifests/personal-jobs/personal-jobs-27-readiness-queue.json"
+    },
+    {
+      "name": "file:scripts/proof/prove-personal-jobs-27-readiness-queue.mjs",
+      "passed": true,
+      "detail": "scripts/proof/prove-personal-jobs-27-readiness-queue.mjs"
+    },
+    {
+      "name": "file:scripts/validators/validate-personal-jobs-27-readiness-queue.mjs",
+      "passed": true,
+      "detail": "scripts/validators/validate-personal-jobs-27-readiness-queue.mjs"
+    },
+    {
+      "name": "pj26_input_exists",
+      "passed": true,
+      "detail": "PJ26 response-library.local.json must exist before PJ27."
+    },
+    {
+      "name": "agent_exit_zero",
+      "passed": true,
+      "detail": "{\n  \"status\": \"COMPLETED\",\n  \"pj26WorkflowCount\": 80,\n  \"queueItemCount\": 80,\n  \"summary\": {\n    \"totalItems\": 80,\n    \"urgent\": 0,\n    \"high\": 0,\n    \"normal\": 0,\n    \"low\": 80,\n    \"wait\": 0,\n    \"blockedReviewRequired\": 80,\n    \"readyForManualSubmission\": 0,\n    \"proofCaptureRequired\": 0,\n    \"followUpDue\": 0,\n    \"outcomeReviewRequired\": 0,\n    \"candidateResponseRequired\": 0,\n    \"closed\": 0,\n    \"byQueueStatus\": {\n      \"BLOCKED_REVIEW_REQUIRED\": 80\n    },\n    \"byPriorityBand\": {\n      \"P3_LOW\": 80\n    }\n  }\n}\n"
+    },
+    {
+      "name": "output_written",
+      "passed": true,
+      "detail": "C:\\Kingsmen\\kingsmen-platform\\data\\personal-job-desk\\readiness-priority-queue.local.json"
+    },
+    {
+      "name": "input_completed",
+      "passed": true,
+      "detail": "COMPLETED"
+    },
+    {
+      "name": "output_completed",
+      "passed": true,
+      "detail": "COMPLETED"
+    },
+    {
+      "name": "queue_items_created",
+      "passed": true,
+      "detail": "80"
+    },
+    {
+      "name": "queue_items_match_pj26_workflows",
+      "passed": true,
+      "detail": "80 vs 80"
+    },
+    {
+      "name": "all_items_have_required_sections",
+      "passed": true,
+      "detail": "0 queue items missing required sections"
+    },
+    {
+      "name": "readiness_gate_blocks_auto_actions",
+      "passed": true,
+      "detail": "0 unsafe readiness gates"
+    },
+    {
+      "name": "global_safety_boundary_no_send",
+      "passed": true,
+      "detail": "{\"sendsApplications\":false,\"sendsEmail\":false,\"sendsWhatsApp\":false,\"sendsSms\":false,\"contactsEmployers\":false,\"touchesPayments\":false,\"bypassesLoginOtpCaptcha\":false,\"productionClaim\":false,\"deployedToOracle\":false}"
+    },
+    {
+      "name": "priority_score_range_valid",
+      "passed": true,
+      "detail": "0 bad priority scores"
+    }
+  ],
+  "failed": [],
+  "next_action": "Commit PJ27, then test /personal-job-desk/readiness-queue."
+}

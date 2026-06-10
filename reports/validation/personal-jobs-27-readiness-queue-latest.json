@@ -1,0 +1,38 @@
+{
+  "schema": "kingsmen.validation-report.v1",
+  "module": "PERSONAL-JOBS-27 - Application Readiness Governor / Priority Queue for Manual Execution",
+  "status": "VALIDATED",
+  "passed": true,
+  "generated_at": "2026-06-10T03:21:54.579Z",
+  "proof": "reports/personal-jobs/personal-jobs-27-readiness-queue-proof.json",
+  "output": "data/personal-job-desk/readiness-priority-queue.local.json",
+  "summary": {
+    "totalItems": 80,
+    "urgent": 0,
+    "high": 0,
+    "normal": 0,
+    "low": 80,
+    "wait": 0,
+    "blockedReviewRequired": 80,
+    "readyForManualSubmission": 0,
+    "proofCaptureRequired": 0,
+    "followUpDue": 0,
+    "outcomeReviewRequired": 0,
+    "candidateResponseRequired": 0,
+    "closed": 0,
+    "byQueueStatus": {
+      "BLOCKED_REVIEW_REQUIRED": 80
+    },
+    "byPriorityBand": {
+      "P3_LOW": 80
+    }
+  },
+  "failed_checks": [],
+  "warnings": [
+    "PJ27 does not execute applications automatically.",
+    "PJ27 does not contact employers or candidates automatically.",
+    "PJ27 only ranks and packages manual operator actions.",
+    "Proof and human approval are required before status advancement."
+  ],
+  "next_action": "Commit PJ27 tracked files and test the local UI."
+}
