@@ -1,0 +1,39 @@
+{
+  "phase": "N13",
+  "name": "Observability / Reports / Incident Runtime",
+  "status": "foundation",
+  "purpose": "Give Kingsmen founder-grade visibility into system health, workflow progress, candidate pipeline load, incidents, capacity pressure, reports, delivery logs, and evidence-backed recovery actions.",
+  "dependencies": ["N00", "N01", "N02", "N03", "N04", "N05", "N06", "N07", "N08", "N09", "N10", "N11", "N12"],
+  "locked_doctrine": [
+    "Founder must see cause, reason, fix path, and evidence for incidents.",
+    "Reports inform the founder; reports do not bypass policy gates.",
+    "Email remains primary report delivery.",
+    "WhatsApp is urgent-only for critical incident escalation.",
+    "Oracle Lite monitoring must focus on cap, queue, memory, storage, workflow failure rate, and DB pressure.",
+    "No proofless success claims.",
+    "No false green health status.",
+    "Every incident must have severity, status, owner, evidence, timeline, and resolution notes.",
+    "Growth-cap readiness is measured by outcome quality, system health, and operational evidence.",
+    "Candidate privacy must be protected in reports."
+  ],
+  "report_types": [
+    "MORNING_FOUNDER",
+    "MIDDAY_FOUNDER",
+    "EVENING_FOUNDER",
+    "INCIDENT",
+    "FINANCE",
+    "DOCUMENT_PIPELINE",
+    "MATCHING",
+    "DISPATCH",
+    "PLAYWRIGHT",
+    "MANUAL_FALLBACK",
+    "PORTAL_HEALTH",
+    "RISK",
+    "SYSTEM_HEALTH",
+    "BACKUP",
+    "CAPACITY",
+    "WEEKLY",
+    "MONTHLY"
+  ],
+  "next": "N14 - Integrations / Workflow Connector Runtime"
+}

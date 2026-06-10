@@ -1,0 +1,16 @@
+{
+  "purpose": "Non-secret observability runtime example for Kingsmen N13.",
+  "timezone": "Africa/Johannesburg",
+  "reportCadence": {
+    "morningFounder": "08:00",
+    "middayFounder": "13:00",
+    "eveningFounder": "18:00",
+    "weekly": "Monday 08:30",
+    "monthly": "1st day 09:00"
+  },
+  "healthStatusRule": "Never show GREEN if a SEV1 is open, critical capacity pressure exists, or payment/document/workflow evidence is missing.",
+  "urgentEscalationRule": "WhatsApp may be used only for SEV1/SEV2 urgent incident escalation. Email remains primary.",
+  "privacyRule": "Founder reports aggregate candidate data by default and redact sensitive personal details unless operationally necessary.",
+  "oracleLiteWatch": ["active_candidate_cap", "queue_pressure", "db_pressure", "memory_pressure", "storage_pressure", "workflow_failure_rate"],
+  "secretsRule": "No secrets are committed. Runtime reads secrets only from deployment secret store later."
+}
