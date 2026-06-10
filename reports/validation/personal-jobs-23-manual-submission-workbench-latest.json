@@ -1,0 +1,32 @@
+{
+  "schema": "kingsmen.validation-report.v1",
+  "module": "PERSONAL-JOBS-23 - Manual Submission Execution Checklist / Follow-Up Calendar / Outcome Reporting",
+  "status": "VALIDATED",
+  "passed": true,
+  "generated_at": "2026-06-10T02:58:48.713Z",
+  "proof": "reports/personal-jobs/personal-jobs-23-manual-submission-workbench-proof.json",
+  "output": "data/personal-job-desk/manual-submission-workbench.local.json",
+  "summary": {
+    "totalRecords": 80,
+    "notReadyReviewRequired": 80,
+    "readyToExecuteManually": 0,
+    "manualSubmissionStarted": 0,
+    "submittedProofCaptured": 0,
+    "followUpScheduled": 0,
+    "outcomesRecorded": 0,
+    "byExecutionStatus": {
+      "NOT_READY_REVIEW_REQUIRED": 80
+    },
+    "byOutcomeStatus": {
+      "NONE": 80
+    }
+  },
+  "failed_checks": [],
+  "warnings": [
+    "PJ23 does not apply to jobs automatically.",
+    "PJ23 does not contact employers.",
+    "PJ23 only creates a manual execution, proof, follow-up, and outcome workbench.",
+    "Manual execution still requires human action outside the app."
+  ],
+  "next_action": "Commit PJ23 tracked files and test the local UI."
+}

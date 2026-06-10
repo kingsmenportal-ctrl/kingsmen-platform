@@ -169,3 +169,5 @@ data/personal-job-desk/application-packs.local.json
 reports/personal-jobs/personal-jobs-21-apply-pack-builder-latest.json
 data/personal-job-desk/application-review-ledger.local.json
 reports/personal-jobs/personal-jobs-22-review-ledger-latest.json
+data/personal-job-desk/manual-submission-workbench.local.json
+reports/personal-jobs/personal-jobs-23-manual-submission-workbench-latest.json
