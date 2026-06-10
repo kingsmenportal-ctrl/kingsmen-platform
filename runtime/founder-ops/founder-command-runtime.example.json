@@ -1,0 +1,39 @@
+{
+  "purpose": "Non-secret runtime example for the founder/operator command cockpit.",
+  "founderControlIsCommandCockpit": true,
+  "notSecondBackend": true,
+  "commandsRouteThrough": ["N12 governance", "N16 orchestrator"],
+  "readOnlyRoute": "N08 control plane read models",
+  "reportsRoute": "N13 observability",
+  "phoneCockpitEnabled": true,
+  "dailyBriefs": ["MORNING", "MIDDAY", "EVENING", "INCIDENT", "WEEKLY", "MONTHLY"],
+  "dangerousBoundaries": [
+    "official submissions",
+    "refund finality",
+    "fraud finality",
+    "privacy finality",
+    "official status claims",
+    "hard blockers"
+  ],
+  "allowedFounderActions": [
+    "inspect",
+    "prioritize",
+    "pause",
+    "resume",
+    "approve",
+    "reject",
+    "escalate",
+    "request MAP",
+    "request Phoenix fallback",
+    "request review",
+    "build brief"
+  ],
+  "blockedFounderActions": [
+    "bypass state machine",
+    "direct official submission",
+    "direct refund payout",
+    "final fraud decision without governance",
+    "fake official status",
+    "silent override"
+  ]
+}

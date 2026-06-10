@@ -32,3 +32,5 @@ export * as Governance from "./governance";
 export * as Opportunity from "./opportunity";
 
 export * as Orchestrator from "./orchestrator";
+
+export * as FounderOps from "./founder-ops";

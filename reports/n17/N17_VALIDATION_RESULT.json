@@ -1,0 +1,9 @@
+﻿{
+    "phase":  "N17",
+    "name":  "Founder Control Plane / Command Ops Runtime",
+    "passed":  true,
+    "checkedAt":  "2026-06-10T14:57:20",
+    "failures":  [
+
+                 ]
+}

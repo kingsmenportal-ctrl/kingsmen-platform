@@ -1,0 +1,25 @@
+{
+  "phase": "N17",
+  "name": "Founder Control Plane / Command Ops Runtime",
+  "status": "foundation",
+  "purpose": "Create the founder/operator command cockpit for Kingsmen: mobile-first oversight, command intake, command approval, escalation handling, daily briefs, watchlists, and command audit while preserving N12 governance and N16 orchestrator state control.",
+  "side": "founder_operator_side",
+  "not_candidate_side": true,
+  "locked_laws": [
+    "Founder Control Plane is a command cockpit, not a second backend.",
+    "Founder commands must route through N12 governance and N16 orchestrator.",
+    "Founder commands may not bypass the state machine.",
+    "Founder commands may not directly submit applications, approve refunds, decide fraud, alter privacy status, or fake official status.",
+    "Founder can inspect, prioritize, pause, resume, approve, reject, escalate, request MAP, request Phoenix fallback, and request human review.",
+    "Dangerous commands require approval boundary and evidence.",
+    "All founder decisions must write audit and evidence references.",
+    "Phone-friendly founder cockpit must show cause, reason, current risk, next action, and fix path.",
+    "Daily briefs must include system health, queue, finance, documents, matching, Playwright/MAP, incidents, cap, and urgent candidates.",
+    "Priority lane changes affect order and intensity only, not user dignity or national route access.",
+    "No silent override. No invisible command. No command without trace.",
+    "Candidate communication remains email-first; WhatsApp is urgent-only.",
+    "Founder control must respect Oracle Lite capacity and 500 active-candidate operating cap."
+  ],
+  "depends_on": ["N08","N12","N13","N16"],
+  "next": "N18 - Public Website / Route House Front Door"
+}
