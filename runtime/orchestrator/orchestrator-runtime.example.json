@@ -1,0 +1,23 @@
+{
+  "purpose": "Non-secret runtime example for backend-controlled execution.",
+  "backendControlsState": true,
+  "n8nWorkersAreThin": true,
+  "workflowResultRequired": true,
+  "sameStateWorkersCannotAdvanceState": true,
+  "w24RoutesThroughW17": true,
+  "playwrightRole": "Scout/probe only. Blocked, CAPTCHA, OTP, down, or manual-only portals create MAP handoff.",
+  "priorityLanes": ["LOW", "NORMAL", "HIGH", "URGENT", "FOUNDER_OVERRIDE"],
+  "oracleLite": {
+    "activeCandidateCap": 500,
+    "capLimitsThroughputOnly": true,
+    "nationalCapabilityRemainsEnabled": true
+  },
+  "humanApprovalBoundaries": [
+    "official submissions",
+    "refunds",
+    "fraud decisions",
+    "privacy decisions",
+    "official status claims",
+    "hard blockers"
+  ]
+}

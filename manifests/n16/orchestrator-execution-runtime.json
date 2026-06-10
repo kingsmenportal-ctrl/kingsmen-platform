@@ -1,0 +1,24 @@
+{
+  "phase": "N16",
+  "name": "Orchestrator / Execution Runtime",
+  "status": "foundation",
+  "purpose": "Bind N00-N15 into one controlled execution runtime where the backend owns command routing, state transitions, dispatch, retries, manual fallback, workflow result ingestion, priority lanes, and execution traces.",
+  "locked_laws": [
+    "Backend orchestrator controls all application state transitions.",
+    "n8n workers remain stateless thin workers.",
+    "A worker may execute a domain task but may not govern final state by itself.",
+    "Every worker result must return through /workflow/result or equivalent backend result ingestion.",
+    "Every orchestration run needs idempotency, evidence, trace, and final state guard.",
+    "Same-state workers must never advance candidate/application state.",
+    "W24 command routes through W17 before worker dispatch.",
+    "Playwright is scout/probe only; blocked/CAPTCHA/OTP/down/manual-only creates MAP handoff.",
+    "Priority lanes change order and intensity, not user dignity or sector access.",
+    "Human approval is required for submission, refund, fraud, privacy, official-status, and hard-blocker decisions.",
+    "Oracle Lite cap controls throughput only; capability remains national.",
+    "No silent retry storms; retries are capped and visible in evidence.",
+    "Failed execution must produce reason, fix path, and manual/Phoenix fallback where appropriate."
+  ],
+  "connected_phases": ["N00","N01","N02","N03","N04","N05","N06","N07","N08","N09","N10","N11","N12","N13","N14","N15"],
+  "worker_count": 19,
+  "next": "N17 - Founder Control Plane / Command Ops Runtime"
+}

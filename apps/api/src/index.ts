@@ -30,3 +30,5 @@ export * as AiDecision from "./ai-decision";
 export * as Governance from "./governance";
 
 export * as Opportunity from "./opportunity";
+
+export * as Orchestrator from "./orchestrator";
