@@ -1,0 +1,51 @@
+{
+  "schema": "kingsmen.personal-jobs-37-professional-workbench.validation.v1",
+  "status": "FAILED",
+  "passed": false,
+  "generatedAt": "2026-06-10T06:07:16.175Z",
+  "checks": [
+    {
+      "name": "exists:apps/web/src/app/personal-job-desk/PersonalJobDeskShell.tsx",
+      "passed": true,
+      "detail": "apps/web/src/app/personal-job-desk/PersonalJobDeskShell.tsx"
+    },
+    {
+      "name": "exists:apps/web/src/app/personal-job-desk/page.tsx",
+      "passed": true,
+      "detail": "apps/web/src/app/personal-job-desk/page.tsx"
+    },
+    {
+      "name": "uses_professional_dashboard_language",
+      "passed": true,
+      "detail": "Dashboard uses product language instead of build-report language"
+    },
+    {
+      "name": "has_search_first_experience",
+      "passed": true,
+      "detail": "Dashboard has search-first job platform structure"
+    },
+    {
+      "name": "has_profile_document_application_sections",
+      "passed": false,
+      "detail": "Dashboard includes real job-platform sections"
+    },
+    {
+      "name": "removes_internal_missing-controls_language",
+      "passed": true,
+      "detail": "No internal build explanation on user home"
+    },
+    {
+      "name": "shell_has_clean_navigation",
+      "passed": true,
+      "detail": "Shell has clean professional navigation"
+    }
+  ],
+  "failed": [
+    {
+      "name": "has_profile_document_application_sections",
+      "passed": false,
+      "detail": "Dashboard includes real job-platform sections"
+    }
+  ],
+  "nextAction": "Repair failed checks."
+}

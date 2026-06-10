@@ -1,0 +1,22 @@
+{
+  "module": "PERSONAL-JOBS-37",
+  "name": "Professional Personal Job Workbench UI",
+  "status": "Built/Pending Local Review",
+  "paths": [
+    "apps/web/src/app/personal-job-desk/PersonalJobDeskShell.tsx",
+    "apps/web/src/app/personal-job-desk/page.tsx",
+    "scripts/validators/validate-personal-jobs-37-professional-workbench.mjs",
+    "docs/personal-jobs/personal-jobs-37-professional-workbench.md"
+  ],
+  "capabilities": [
+    "professional shell",
+    "search-first dashboard",
+    "profile readiness",
+    "document readiness",
+    "application pipeline",
+    "route cards",
+    "task list",
+    "quick actions"
+  ],
+  "truth_boundary": "Improves UI structure and user experience. It does not claim final production readiness."
+}

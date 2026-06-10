@@ -1,261 +1,488 @@
 import type { CSSProperties } from "react";
 
-const modules = [
-  {
-    title: "Apply Now",
-    href: "/personal-job-desk/apply-now",
-    badge: "APPLY",
-    description: "Smart CV intake, profile, documents, application packs and proof tracking.",
-    action: "Continue applying"
-  },
-  {
-    title: "Opportunity Scout",
-    href: "/personal-job-desk/opportunity-scout",
-    badge: "SCOUT",
-    description: "Run connected search/scout tools and import real opportunities into the queue.",
-    action: "Find opportunities"
-  },
-  {
-    title: "Document Pack",
-    href: "/personal-job-desk/document-pack-index",
-    badge: "DOCS",
-    description: "Check CV, ID, certificates, proof and route-specific document readiness.",
-    action: "Review documents"
-  }
+const tasks = [
+  { title: "Upload or refresh your CV", meta: "Smart profile uses your document first", href: "/personal-job-desk/apply-now" },
+  { title: "Run opportunity scout", meta: "Find jobs, learnerships and funding sources", href: "/personal-job-desk/opportunity-scout" },
+  { title: "Prepare application pack", meta: "Reuse profile and documents", href: "/personal-job-desk/apply-now" },
+  { title: "Capture proof", meta: "Reference, screenshot, email proof or portal confirmation", href: "/personal-job-desk/apply-now" }
 ];
 
-const workflow = [
-  "Upload CV/documents",
-  "Smart profile fills itself",
-  "Scout real opportunities",
-  "Import selected lead",
-  "Build application pack",
-  "Open official source",
-  "Apply safely",
-  "Capture proof"
+const categories = [
+  { name: "Jobs", count: "Scout", text: "Retail, admin, general worker, call centre, security, office support" },
+  { name: "Learnerships", count: "Scout", text: "SETA, employer and youth programme routes" },
+  { name: "Internships", count: "Scout", text: "Graduate, TVET and workplace experience routes" },
+  { name: "Funding", count: "Scout", text: "Bursaries, youth support, training and grant routes" }
+];
+
+const pipeline = [
+  ["Profile", "Smart CV intake"],
+  ["Documents", "CV / ID / certificates"],
+  ["Scout", "Find verified source"],
+  ["Pack", "Prepare application"],
+  ["Apply", "Official source"],
+  ["Proof", "Track outcome"]
 ];
 
 export default function PersonalJobDeskHome() {
   return (
-    <main style={main}>
+    <main style={page}>
       <section style={hero}>
-        <div>
-          <p style={eyebrow}>KINGSMEN PERSONAL JOB DESK</p>
-          <h1 style={title}>Real application command centre</h1>
-          <p style={lead}>
-            This is the connected home for your job side: smart CV intake, opportunity scout,
-            document readiness, application packs, source opening and proof tracking.
+        <div style={heroCopy}>
+          <p style={eyebrow}>KINGSMEN WORKBENCH</p>
+          <h1 style={title}>Find. Prepare. Apply. Track.</h1>
+          <p style={subtitle}>
+            A smart application desk for jobs, learnerships, internships and funding. Upload your CV once,
+            scout real opportunities, prepare clean application packs and keep proof of every move.
           </p>
 
-          <div style={heroActions}>
-            <a href="/personal-job-desk/apply-now" style={primaryButton}>Start / continue application</a>
-            <a href="/personal-job-desk/opportunity-scout" style={secondaryButton}>Run opportunity scout</a>
-            <a href="/personal-job-desk/document-pack-index" style={secondaryButton}>Open document pack</a>
+          <div style={searchBar}>
+            <input style={searchInput} placeholder="Search role, company, learnership, bursary..." />
+            <input style={whereInput} placeholder="Johannesburg" />
+            <a href="/personal-job-desk/opportunity-scout" style={searchButton}>Find opportunities</a>
           </div>
         </div>
 
-        <div style={statusCard}>
-          <span style={statusNumber}>8</span>
-          <strong>Core steps</strong>
-          <small>Find → Prepare → Apply → Track proof</small>
-        </div>
+        <aside style={profileCard}>
+          <div style={profileTop}>
+            <span style={avatar}>K</span>
+            <div>
+              <strong>Your application profile</strong>
+              <small>CV-powered smart intake</small>
+            </div>
+          </div>
+
+          <div style={meterTrack}>
+            <span style={meterFill} />
+          </div>
+
+          <div style={profileStats}>
+            <span><strong>0</strong><small>Applications</small></span>
+            <span><strong>0</strong><small>Proofs</small></span>
+            <span><strong>0</strong><small>Packs</small></span>
+          </div>
+
+          <a href="/personal-job-desk/apply-now" style={primaryFull}>Complete profile</a>
+        </aside>
       </section>
 
-      <section style={grid}>
-        {modules.map((module) => (
-          <a key={module.href} href={module.href} style={moduleCard}>
-            <span style={badge}>{module.badge}</span>
-            <h2>{module.title}</h2>
-            <p>{module.description}</p>
-            <strong style={cardAction}>{module.action} →</strong>
-          </a>
-        ))}
+      <section style={quickGrid}>
+        <a href="/personal-job-desk/apply-now" style={quickCard}>
+          <span style={quickIcon}>✦</span>
+          <strong>Smart apply desk</strong>
+          <small>CV autofill, documents, packs and proof.</small>
+        </a>
+
+        <a href="/personal-job-desk/opportunity-scout" style={quickCard}>
+          <span style={quickIcon}>◎</span>
+          <strong>Opportunity scout</strong>
+          <small>Search and import real leads.</small>
+        </a>
+
+        <a href="/personal-job-desk/document-pack-index" style={quickCard}>
+          <span style={quickIcon}>▣</span>
+          <strong>Document vault</strong>
+          <small>Check what is ready or missing.</small>
+        </a>
+      </section>
+
+      <section style={mainGrid}>
+        <section style={panel}>
+          <div style={sectionHead}>
+            <div>
+              <p style={eyebrow}>TODAY</p>
+              <h2 style={sectionTitle}>Next actions</h2>
+            </div>
+            <a href="/personal-job-desk/apply-now" style={textButton}>Open apply desk</a>
+          </div>
+
+          <div style={taskList}>
+            {tasks.map((task, index) => (
+              <a key={task.title} href={task.href} style={taskRow}>
+                <span style={taskNumber}>{index + 1}</span>
+                <span>
+                  <strong>{task.title}</strong>
+                  <small>{task.meta}</small>
+                </span>
+                <b>→</b>
+              </a>
+            ))}
+          </div>
+        </section>
+
+        <section style={panel}>
+          <div style={sectionHead}>
+            <div>
+              <p style={eyebrow}>PIPELINE</p>
+              <h2 style={sectionTitle}>Application status</h2>
+            </div>
+          </div>
+
+          <div style={pipelineGrid}>
+            {pipeline.map(([name, desc]) => (
+              <div key={name} style={pipelineCard}>
+                <strong>{name}</strong>
+                <small>{desc}</small>
+              </div>
+            ))}
+          </div>
+        </section>
       </section>
 
       <section style={panel}>
-        <p style={eyebrow}>CONNECTED WORKFLOW</p>
-        <h2 style={{ marginTop: 0 }}>How the user journey should work</h2>
+        <div style={sectionHead}>
+          <div>
+            <p style={eyebrow}>ROUTES</p>
+            <h2 style={sectionTitle}>What Kingsmen can help you chase</h2>
+          </div>
+          <a href="/personal-job-desk/opportunity-scout" style={textButton}>Scout now</a>
+        </div>
 
-        <div style={steps}>
-          {workflow.map((step, index) => (
-            <div key={step} style={stepCard}>
-              <span style={stepNumber}>{String(index + 1).padStart(2, "0")}</span>
-              <strong>{step}</strong>
-            </div>
+        <div style={categoryGrid}>
+          {categories.map((item) => (
+            <article key={item.name} style={categoryCard}>
+              <span style={routeBadge}>{item.count}</span>
+              <h3>{item.name}</h3>
+              <p>{item.text}</p>
+            </article>
           ))}
         </div>
       </section>
 
-      <section style={panel}>
-        <p style={eyebrow}>PLATFORM CONTROLS</p>
-        <h2 style={{ marginTop: 0 }}>What was missing and is now added</h2>
-        <div style={controlGrid}>
-          <div style={controlCard}>Back button</div>
-          <div style={controlCard}>Forward button</div>
-          <div style={controlCard}>Home button</div>
-          <div style={controlCard}>Refresh button</div>
-          <div style={controlCard}>Persistent side menu</div>
-          <div style={controlCard}>Top current-page bar</div>
-          <div style={controlCard}>Module menu drawer</div>
-          <div style={controlCard}>Quick action buttons</div>
-        </div>
+      <section style={bottomGrid}>
+        <section style={panel}>
+          <p style={eyebrow}>DOCUMENT READINESS</p>
+          <h2 style={sectionTitle}>Your document pack</h2>
+          <div style={docRows}>
+            <div style={docRow}><span>CV</span><b>Upload / refresh</b></div>
+            <div style={docRow}><span>ID copy</span><b>Required for many routes</b></div>
+            <div style={docRow}><span>Certificates</span><b>Add when available</b></div>
+            <div style={docRow}><span>Proof files</span><b>Attach after applying</b></div>
+          </div>
+          <a href="/personal-job-desk/document-pack-index" style={secondaryFull}>Review documents</a>
+        </section>
+
+        <section style={panel}>
+          <p style={eyebrow}>ASSISTED APPLICATION</p>
+          <h2 style={sectionTitle}>How Kingsmen should reduce your work</h2>
+          <div style={assistantList}>
+            <span>Read CV and fill profile</span>
+            <span>Scout sources and import leads</span>
+            <span>Reuse details across applications</span>
+            <span>Prepare pack before official apply</span>
+            <span>Stop at login, OTP, CAPTCHA or unsafe pages</span>
+            <span>Capture proof after submission</span>
+          </div>
+        </section>
       </section>
     </main>
   );
 }
 
-const main: CSSProperties = {
+const page: CSSProperties = {
   padding: 24,
   display: "grid",
-  gap: 18
+  gap: 18,
+  background: "radial-gradient(circle at 12% 0%,rgba(229,184,87,.18),transparent 32%),#070705"
 };
 
 const hero: CSSProperties = {
   display: "grid",
-  gridTemplateColumns: "1fr minmax(220px,320px)",
-  gap: 18,
-  border: "1px solid rgba(255,215,122,.28)",
+  gridTemplateColumns: "minmax(0,1fr) 340px",
+  gap: 18
+};
+
+const heroCopy: CSSProperties = {
+  minHeight: 330,
   borderRadius: 32,
-  background: "linear-gradient(135deg,rgba(215,173,73,.18),rgba(0,0,0,.32))",
-  padding: 28
+  padding: 32,
+  background: "linear-gradient(135deg,rgba(229,184,87,.16),rgba(255,255,255,.045))",
+  border: "1px solid rgba(229,184,87,.18)",
+  display: "grid",
+  alignContent: "center"
 };
 
 const eyebrow: CSSProperties = {
-  color: "#d7ad49",
-  textTransform: "uppercase",
-  letterSpacing: ".16em",
+  margin: 0,
+  color: "#d8a83e",
   fontSize: 12,
-  fontWeight: 900
+  letterSpacing: ".16em",
+  fontWeight: 1000,
+  textTransform: "uppercase"
 };
 
 const title: CSSProperties = {
-  fontSize: 52,
-  lineHeight: 1,
-  margin: "8px 0 14px"
+  margin: "10px 0 12px",
+  fontSize: 64,
+  lineHeight: .92,
+  letterSpacing: "-.06em"
 };
 
-const lead: CSSProperties = {
-  color: "#d8caa8",
-  lineHeight: 1.7,
+const subtitle: CSSProperties = {
+  color: "#cfc2a4",
   maxWidth: 760,
-  fontSize: 17
+  fontSize: 17,
+  lineHeight: 1.65
 };
 
-const heroActions: CSSProperties = {
-  display: "flex",
-  flexWrap: "wrap",
+const searchBar: CSSProperties = {
+  marginTop: 22,
+  display: "grid",
+  gridTemplateColumns: "minmax(0,1.4fr) minmax(180px,.6fr) auto",
   gap: 10,
-  marginTop: 20
+  padding: 8,
+  borderRadius: 999,
+  background: "rgba(0,0,0,.32)",
+  border: "1px solid rgba(229,184,87,.20)"
 };
 
-const primaryButton: CSSProperties = {
+const searchInput: CSSProperties = {
   border: 0,
+  outline: 0,
+  background: "transparent",
+  color: "#f6efe0",
+  padding: "14px 16px",
+  fontSize: 15
+};
+
+const whereInput: CSSProperties = {
+  ...searchInput,
+  borderLeft: "1px solid rgba(229,184,87,.16)"
+};
+
+const searchButton: CSSProperties = {
   borderRadius: 999,
-  padding: "13px 18px",
-  background: "#d7ad49",
+  background: "#e5b857",
   color: "#111",
+  textDecoration: "none",
+  padding: "14px 18px",
   fontWeight: 1000,
-  textDecoration: "none"
+  whiteSpace: "nowrap"
 };
 
-const secondaryButton: CSSProperties = {
-  border: "1px solid rgba(255,215,122,.38)",
-  borderRadius: 999,
-  padding: "13px 18px",
-  color: "#ffd77a",
-  fontWeight: 900,
-  textDecoration: "none",
-  background: "rgba(0,0,0,.18)"
-};
-
-const statusCard: CSSProperties = {
-  border: "1px solid rgba(255,215,122,.24)",
-  borderRadius: 28,
-  background: "rgba(0,0,0,.26)",
+const profileCard: CSSProperties = {
+  borderRadius: 32,
+  padding: 24,
+  background: "linear-gradient(180deg,#181209,#0b0905)",
+  border: "1px solid rgba(229,184,87,.20)",
   display: "grid",
-  placeContent: "center",
-  gap: 8,
-  textAlign: "center",
-  color: "#ffd77a"
+  alignContent: "space-between",
+  gap: 18
 };
 
-const statusNumber: CSSProperties = {
-  fontSize: 66,
-  fontWeight: 1000
-};
-
-const grid: CSSProperties = {
-  display: "grid",
-  gridTemplateColumns: "repeat(auto-fit,minmax(260px,1fr))",
-  gap: 16
-};
-
-const moduleCard: CSSProperties = {
-  border: "1px solid rgba(255,215,122,.20)",
-  borderRadius: 26,
-  padding: 22,
-  background: "rgba(255,255,255,.055)",
-  color: "#f8f0db",
-  textDecoration: "none",
-  display: "grid",
-  gap: 10,
-  minHeight: 210
-};
-
-const badge: CSSProperties = {
-  width: "fit-content",
-  borderRadius: 999,
-  padding: "8px 10px",
-  border: "1px solid rgba(255,215,122,.24)",
-  background: "rgba(215,173,73,.14)",
-  color: "#ffd77a",
-  fontSize: 12,
-  fontWeight: 900
-};
-
-const cardAction: CSSProperties = {
-  color: "#ffd77a",
-  marginTop: "auto"
-};
-
-const panel: CSSProperties = {
-  border: "1px solid rgba(255,215,122,.20)",
-  borderRadius: 26,
-  padding: 22,
-  background: "rgba(0,0,0,.22)"
-};
-
-const steps: CSSProperties = {
-  display: "grid",
-  gridTemplateColumns: "repeat(auto-fit,minmax(180px,1fr))",
+const profileTop: CSSProperties = {
+  display: "flex",
+  alignItems: "center",
   gap: 12
 };
 
-const stepCard: CSSProperties = {
-  border: "1px solid rgba(255,215,122,.16)",
-  borderRadius: 18,
-  padding: 15,
+const avatar: CSSProperties = {
+  width: 56,
+  height: 56,
+  borderRadius: 20,
+  display: "grid",
+  placeItems: "center",
+  background: "linear-gradient(135deg,#f4c968,#8f6826)",
+  color: "#111",
+  fontWeight: 1000,
+  fontSize: 28
+};
+
+const meterTrack: CSSProperties = {
+  height: 10,
+  borderRadius: 999,
+  background: "rgba(255,255,255,.10)",
+  overflow: "hidden"
+};
+
+const meterFill: CSSProperties = {
+  display: "block",
+  width: "18%",
+  height: "100%",
+  background: "#e5b857",
+  borderRadius: 999
+};
+
+const profileStats: CSSProperties = {
+  display: "grid",
+  gridTemplateColumns: "repeat(3,1fr)",
+  gap: 10
+};
+
+const primaryFull: CSSProperties = {
+  display: "block",
+  textAlign: "center",
+  borderRadius: 999,
+  padding: "13px 16px",
+  background: "#e5b857",
+  color: "#111",
+  textDecoration: "none",
+  fontWeight: 1000
+};
+
+const secondaryFull: CSSProperties = {
+  display: "block",
+  textAlign: "center",
+  borderRadius: 999,
+  padding: "13px 16px",
+  border: "1px solid rgba(229,184,87,.32)",
+  color: "#f4c968",
+  textDecoration: "none",
+  fontWeight: 1000,
+  marginTop: 16
+};
+
+const quickGrid: CSSProperties = {
+  display: "grid",
+  gridTemplateColumns: "repeat(3,minmax(0,1fr))",
+  gap: 14
+};
+
+const quickCard: CSSProperties = {
+  padding: 18,
+  borderRadius: 24,
   background: "rgba(255,255,255,.045)",
+  border: "1px solid rgba(229,184,87,.14)",
+  color: "#f6efe0",
+  textDecoration: "none",
   display: "grid",
   gap: 8
 };
 
-const stepNumber: CSSProperties = {
-  color: "#d7ad49",
-  fontWeight: 1000
+const quickIcon: CSSProperties = {
+  width: 38,
+  height: 38,
+  borderRadius: 14,
+  display: "grid",
+  placeItems: "center",
+  color: "#f4c968",
+  background: "rgba(229,184,87,.12)"
 };
 
-const controlGrid: CSSProperties = {
+const mainGrid: CSSProperties = {
   display: "grid",
-  gridTemplateColumns: "repeat(auto-fit,minmax(180px,1fr))",
+  gridTemplateColumns: "minmax(0,1fr) minmax(340px,.9fr)",
+  gap: 18
+};
+
+const bottomGrid: CSSProperties = {
+  display: "grid",
+  gridTemplateColumns: "minmax(320px,.8fr) minmax(0,1fr)",
+  gap: 18
+};
+
+const panel: CSSProperties = {
+  borderRadius: 28,
+  padding: 22,
+  background: "rgba(255,255,255,.045)",
+  border: "1px solid rgba(229,184,87,.14)"
+};
+
+const sectionHead: CSSProperties = {
+  display: "flex",
+  justifyContent: "space-between",
+  alignItems: "start",
+  gap: 12,
+  marginBottom: 16
+};
+
+const sectionTitle: CSSProperties = {
+  margin: "6px 0 0",
+  fontSize: 26,
+  letterSpacing: "-.03em"
+};
+
+const textButton: CSSProperties = {
+  color: "#f4c968",
+  textDecoration: "none",
+  fontWeight: 1000,
+  whiteSpace: "nowrap"
+};
+
+const taskList: CSSProperties = {
+  display: "grid",
   gap: 10
 };
 
-const controlCard: CSSProperties = {
-  border: "1px solid rgba(255,215,122,.16)",
-  borderRadius: 16,
+const taskRow: CSSProperties = {
+  display: "grid",
+  gridTemplateColumns: "42px 1fr auto",
+  gap: 12,
+  alignItems: "center",
   padding: 14,
-  background: "rgba(215,173,73,.08)",
-  color: "#ffd77a",
-  fontWeight: 900
+  borderRadius: 18,
+  background: "rgba(0,0,0,.22)",
+  border: "1px solid rgba(229,184,87,.10)",
+  color: "#f6efe0",
+  textDecoration: "none"
+};
+
+const taskNumber: CSSProperties = {
+  width: 34,
+  height: 34,
+  borderRadius: 12,
+  display: "grid",
+  placeItems: "center",
+  background: "rgba(229,184,87,.12)",
+  color: "#f4c968",
+  fontWeight: 1000
+};
+
+const pipelineGrid: CSSProperties = {
+  display: "grid",
+  gridTemplateColumns: "repeat(2,minmax(0,1fr))",
+  gap: 10
+};
+
+const pipelineCard: CSSProperties = {
+  padding: 14,
+  borderRadius: 18,
+  background: "rgba(0,0,0,.22)",
+  border: "1px solid rgba(229,184,87,.10)",
+  display: "grid",
+  gap: 5
+};
+
+const categoryGrid: CSSProperties = {
+  display: "grid",
+  gridTemplateColumns: "repeat(4,minmax(0,1fr))",
+  gap: 14
+};
+
+const categoryCard: CSSProperties = {
+  padding: 18,
+  minHeight: 170,
+  borderRadius: 24,
+  background: "linear-gradient(180deg,rgba(229,184,87,.10),rgba(0,0,0,.18))",
+  border: "1px solid rgba(229,184,87,.14)"
+};
+
+const routeBadge: CSSProperties = {
+  display: "inline-block",
+  borderRadius: 999,
+  padding: "7px 10px",
+  background: "rgba(229,184,87,.12)",
+  color: "#f4c968",
+  fontSize: 12,
+  fontWeight: 1000
+};
+
+const docRows: CSSProperties = {
+  display: "grid",
+  gap: 10
+};
+
+const docRow: CSSProperties = {
+  display: "flex",
+  justifyContent: "space-between",
+  gap: 10,
+  padding: 13,
+  borderRadius: 16,
+  background: "rgba(0,0,0,.22)",
+  border: "1px solid rgba(229,184,87,.10)"
+};
+
+const assistantList: CSSProperties = {
+  display: "grid",
+  gridTemplateColumns: "repeat(2,minmax(0,1fr))",
+  gap: 10
 };

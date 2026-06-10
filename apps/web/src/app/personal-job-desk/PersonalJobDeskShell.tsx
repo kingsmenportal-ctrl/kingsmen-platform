@@ -4,298 +4,188 @@ import type { CSSProperties, ReactNode } from "react";
 import { usePathname, useRouter } from "next/navigation";
 import { useMemo, useState } from "react";
 
-type NavItem = {
-  label: string;
-  href: string;
-  description: string;
-  badge: string;
-};
-
-const navItems: NavItem[] = [
-  {
-    label: "Command Home",
-    href: "/personal-job-desk",
-    description: "Personal job platform overview",
-    badge: "HOME"
-  },
-  {
-    label: "Apply Now",
-    href: "/personal-job-desk/apply-now",
-    description: "Profile, CV, documents, packs and proof",
-    badge: "APPLY"
-  },
-  {
-    label: "Opportunity Scout",
-    href: "/personal-job-desk/opportunity-scout",
-    description: "Find and import real leads",
-    badge: "SCOUT"
-  },
-  {
-    label: "Document Pack",
-    href: "/personal-job-desk/document-pack-index",
-    description: "Document readiness and pack index",
-    badge: "DOCS"
-  }
+const navItems = [
+  { label: "Dashboard", href: "/personal-job-desk", icon: "⌂" },
+  { label: "Apply", href: "/personal-job-desk/apply-now", icon: "✦" },
+  { label: "Scout", href: "/personal-job-desk/opportunity-scout", icon: "◎" },
+  { label: "Documents", href: "/personal-job-desk/document-pack-index", icon: "▣" }
 ];
 
 export default function PersonalJobDeskShell({ children }: { children: ReactNode }) {
   const pathname = usePathname();
   const router = useRouter();
-  const [menuOpen, setMenuOpen] = useState(false);
+  const [open, setOpen] = useState(false);
 
   const active = useMemo(() => {
-    return navItems.find((item) => pathname === item.href) || navItems.find((item) => pathname.startsWith(item.href) && item.href !== "/personal-job-desk") || navItems[0];
+    return navItems.find((item) => pathname === item.href) ||
+      navItems.find((item) => item.href !== "/personal-job-desk" && pathname.startsWith(item.href)) ||
+      navItems[0];
   }, [pathname]);
 
-  function goBack() {
-    if (typeof window !== "undefined" && window.history.length > 1) {
-      router.back();
-    } else {
-      router.push("/personal-job-desk");
-    }
-  }
-
-  function goForward() {
-    if (typeof window !== "undefined") {
-      window.history.forward();
-    }
-  }
-
-  function refresh() {
-    router.refresh();
-    if (typeof window !== "undefined") {
-      window.location.reload();
-    }
-  }
-
   return (
-    <div style={shell}>
-      <aside style={sidebar}>
-        <div style={brandBlock}>
-          <div style={crest}>K</div>
-          <div>
-            <p style={eyebrow}>KINGSMEN</p>
-            <h1 style={brandTitle}>Personal Job Desk</h1>
-          </div>
-        </div>
+    <div style={app}>
+      <aside style={side}>
+        <a href="/personal-job-desk" style={brand}>
+          <span style={mark}>K</span>
+          <span>
+            <strong>Kingsmen</strong>
+            <small>Personal Workbench</small>
+          </span>
+        </a>
 
-        <nav style={navStack}>
+        <nav style={nav}>
           {navItems.map((item) => {
-            const isActive = pathname === item.href || (item.href !== "/personal-job-desk" && pathname.startsWith(item.href));
-
+            const selected = pathname === item.href || (item.href !== "/personal-job-desk" && pathname.startsWith(item.href));
             return (
-              <a key={item.href} href={item.href} style={isActive ? navActive : navLink}>
-                <span style={navBadge}>{item.badge}</span>
-                <span style={navText}>
-                  <strong>{item.label}</strong>
-                  <small>{item.description}</small>
-                </span>
+              <a key={item.href} href={item.href} style={selected ? navSelected : navItem}>
+                <span style={navIcon}>{item.icon}</span>
+                <span>{item.label}</span>
               </a>
             );
           })}
         </nav>
 
-        <div style={sideFooter}>
-          <strong>Reality boundary</strong>
-          <span>
-            Kingsmen helps you find, prepare and track real applications. It must not invent jobs,
-            fake details, bypass OTP/CAPTCHA, or pretend a portal was submitted when it was not.
-          </span>
+        <div style={sideCard}>
+          <strong>Today</strong>
+          <span>Prepare profile, scout real opportunities, build packs, and capture proof.</span>
         </div>
       </aside>
 
-      <section style={mainArea}>
-        <header style={topbar}>
+      <section style={body}>
+        <header style={top}>
           <div style={topLeft}>
-            <button onClick={goBack} style={iconButton} title="Back">← Back</button>
-            <button onClick={goForward} style={iconButton} title="Forward">Forward →</button>
-            <a href="/personal-job-desk" style={iconLink}>⌂ Home</a>
-            <button onClick={refresh} style={iconButton}>Refresh</button>
+            <button onClick={() => router.back()} style={ghost}>← Back</button>
+            <a href="/personal-job-desk" style={ghostLink}>Home</a>
+            <button onClick={() => location.reload()} style={ghost}>Refresh</button>
           </div>
 
-          <div style={currentPage}>
-            <span style={currentBadge}>{active?.badge}</span>
-            <div>
-              <strong>{active?.label}</strong>
-              <small>{active?.description}</small>
-            </div>
+          <div style={pageTitle}>
+            <span style={pageIcon}>{active.icon}</span>
+            <strong>{active.label}</strong>
           </div>
 
-          <button onClick={() => setMenuOpen((value) => !value)} style={menuButton}>
-            ☰ Menu
-          </button>
+          <button onClick={() => setOpen(!open)} style={menu}>Menu</button>
         </header>
 
-        {menuOpen ? (
+        {open ? (
           <section style={drawer}>
-            <div style={drawerHeader}>
-              <strong>Kingsmen Menu</strong>
-              <button onClick={() => setMenuOpen(false)} style={closeButton}>Close</button>
-            </div>
-
-            <div style={drawerGrid}>
-              {navItems.map((item) => (
-                <a key={item.href} href={item.href} style={drawerCard}>
-                  <span style={navBadge}>{item.badge}</span>
-                  <strong>{item.label}</strong>
-                  <small>{item.description}</small>
-                </a>
-              ))}
-            </div>
-
-            <div style={quickActionRow}>
-              <a href="/personal-job-desk/apply-now" style={primaryAction}>Continue application</a>
-              <a href="/personal-job-desk/opportunity-scout" style={secondaryAction}>Find opportunities</a>
-              <a href="/personal-job-desk/document-pack-index" style={secondaryAction}>Check documents</a>
-            </div>
+            {navItems.map((item) => (
+              <a key={item.href} href={item.href} style={drawerLink}>
+                <span style={navIcon}>{item.icon}</span>
+                <span>{item.label}</span>
+              </a>
+            ))}
           </section>
         ) : null}
 
-        <section style={contentWrap}>
-          {children}
-        </section>
-
-        <nav style={mobileNav}>
-          {navItems.map((item) => {
-            const isActive = pathname === item.href || (item.href !== "/personal-job-desk" && pathname.startsWith(item.href));
-
-            return (
-              <a key={item.href} href={item.href} style={isActive ? mobileNavActive : mobileNavLink}>
-                <span>{item.badge}</span>
-                <small>{item.label}</small>
-              </a>
-            );
-          })}
-        </nav>
+        <main style={content}>{children}</main>
       </section>
     </div>
   );
 }
 
-const shell: CSSProperties = {
+const app: CSSProperties = {
   minHeight: "100vh",
   display: "grid",
-  gridTemplateColumns: "320px minmax(0, 1fr)",
-  background: "radial-gradient(circle at top left,rgba(215,173,73,.22),transparent 30%),linear-gradient(135deg,#020202,#100b05,#261807)",
-  color: "#f8f0db",
-  fontFamily: "Arial, sans-serif"
+  gridTemplateColumns: "280px minmax(0,1fr)",
+  background: "#070705",
+  color: "#f6efe0",
+  fontFamily: "Inter, Arial, sans-serif"
 };
 
-const sidebar: CSSProperties = {
+const side: CSSProperties = {
   position: "sticky",
   top: 0,
   height: "100vh",
-  borderRight: "1px solid rgba(255,215,122,.22)",
-  background: "linear-gradient(180deg,rgba(0,0,0,.72),rgba(0,0,0,.38))",
   padding: 22,
+  background: "linear-gradient(180deg,#0f0c07,#070705)",
+  borderRight: "1px solid rgba(229,184,87,.18)",
   display: "grid",
   gridTemplateRows: "auto 1fr auto",
-  gap: 22
+  gap: 24
 };
 
-const brandBlock: CSSProperties = {
+const brand: CSSProperties = {
   display: "flex",
   alignItems: "center",
-  gap: 14
-};
-
-const crest: CSSProperties = {
-  width: 54,
-  height: 54,
-  borderRadius: 18,
-  background: "linear-gradient(135deg,#ffd77a,#8a641b)",
-  color: "#111",
-  display: "grid",
-  placeItems: "center",
-  fontSize: 28,
-  fontWeight: 1000,
-  boxShadow: "0 20px 50px rgba(215,173,73,.24)"
-};
-
-const eyebrow: CSSProperties = {
-  margin: 0,
-  color: "#d7ad49",
-  fontSize: 11,
-  fontWeight: 900,
-  letterSpacing: ".18em"
-};
-
-const brandTitle: CSSProperties = {
-  margin: "4px 0 0",
-  fontSize: 18
-};
-
-const navStack: CSSProperties = {
-  display: "grid",
-  gap: 10,
-  alignContent: "start"
-};
-
-const navLink: CSSProperties = {
-  display: "flex",
   gap: 12,
-  alignItems: "center",
-  padding: 14,
-  borderRadius: 18,
-  border: "1px solid rgba(255,215,122,.12)",
-  background: "rgba(255,255,255,.04)",
-  color: "#f8f0db",
+  color: "#f6efe0",
   textDecoration: "none"
 };
 
-const navActive: CSSProperties = {
-  ...navLink,
-  border: "1px solid rgba(255,215,122,.45)",
-  background: "linear-gradient(135deg,rgba(215,173,73,.26),rgba(0,0,0,.25))",
-  boxShadow: "0 18px 45px rgba(0,0,0,.26)"
-};
-
-const navBadge: CSSProperties = {
-  minWidth: 54,
-  borderRadius: 999,
-  padding: "7px 8px",
-  background: "rgba(215,173,73,.16)",
-  color: "#ffd77a",
-  border: "1px solid rgba(255,215,122,.22)",
-  fontSize: 11,
-  fontWeight: 900,
-  textAlign: "center"
-};
-
-const navText: CSSProperties = {
+const mark: CSSProperties = {
+  width: 44,
+  height: 44,
+  borderRadius: 14,
   display: "grid",
-  gap: 3
+  placeItems: "center",
+  background: "linear-gradient(135deg,#f4c968,#8f6826)",
+  color: "#111",
+  fontWeight: 1000,
+  fontSize: 23
 };
 
-const sideFooter: CSSProperties = {
+const nav: CSSProperties = {
+  display: "grid",
+  alignContent: "start",
+  gap: 8
+};
+
+const navItem: CSSProperties = {
+  display: "flex",
+  alignItems: "center",
+  gap: 12,
+  padding: "13px 14px",
+  borderRadius: 16,
+  color: "#cfc2a4",
+  textDecoration: "none",
+  border: "1px solid transparent"
+};
+
+const navSelected: CSSProperties = {
+  ...navItem,
+  color: "#ffe1a1",
+  background: "rgba(229,184,87,.13)",
+  border: "1px solid rgba(229,184,87,.28)"
+};
+
+const navIcon: CSSProperties = {
+  width: 28,
+  height: 28,
+  borderRadius: 10,
+  display: "grid",
+  placeItems: "center",
+  background: "rgba(229,184,87,.12)",
+  color: "#f4c968"
+};
+
+const sideCard: CSSProperties = {
   display: "grid",
   gap: 8,
-  padding: 14,
+  padding: 16,
   borderRadius: 18,
-  border: "1px solid rgba(255,215,122,.16)",
-  background: "rgba(0,0,0,.24)",
-  color: "#d8caa8",
-  lineHeight: 1.45,
-  fontSize: 13
+  background: "rgba(255,255,255,.045)",
+  border: "1px solid rgba(229,184,87,.15)",
+  color: "#cfc2a4",
+  lineHeight: 1.45
 };
 
-const mainArea: CSSProperties = {
-  minWidth: 0,
-  display: "grid",
-  gridTemplateRows: "auto auto 1fr auto"
+const body: CSSProperties = {
+  minWidth: 0
 };
 
-const topbar: CSSProperties = {
-  position: "sticky",
-  top: 0,
-  zIndex: 20,
+const top: CSSProperties = {
+  height: 68,
   display: "grid",
   gridTemplateColumns: "1fr auto auto",
-  gap: 14,
   alignItems: "center",
-  padding: "14px 18px",
-  borderBottom: "1px solid rgba(255,215,122,.18)",
-  background: "rgba(10,7,3,.88)",
+  gap: 14,
+  padding: "0 22px",
+  background: "rgba(7,7,5,.92)",
+  borderBottom: "1px solid rgba(229,184,87,.14)",
+  position: "sticky",
+  top: 0,
+  zIndex: 10,
   backdropFilter: "blur(14px)"
 };
 
@@ -305,127 +195,60 @@ const topLeft: CSSProperties = {
   flexWrap: "wrap"
 };
 
-const iconButton: CSSProperties = {
-  border: "1px solid rgba(255,215,122,.24)",
-  background: "rgba(0,0,0,.22)",
-  color: "#ffd77a",
+const ghost: CSSProperties = {
+  border: "1px solid rgba(229,184,87,.22)",
+  background: "rgba(255,255,255,.035)",
+  color: "#f4c968",
   borderRadius: 999,
-  padding: "10px 12px",
-  fontWeight: 900,
+  padding: "9px 12px",
+  fontWeight: 800,
   cursor: "pointer"
 };
 
-const iconLink: CSSProperties = {
-  ...iconButton,
+const ghostLink: CSSProperties = {
+  ...ghost,
   textDecoration: "none"
 };
 
-const currentPage: CSSProperties = {
+const pageTitle: CSSProperties = {
   display: "flex",
   alignItems: "center",
-  gap: 10,
-  minWidth: 220
+  gap: 10
 };
 
-const currentBadge: CSSProperties = {
-  ...navBadge,
-  minWidth: 68
+const pageIcon: CSSProperties = {
+  ...navIcon,
+  width: 32,
+  height: 32
 };
 
-const menuButton: CSSProperties = {
+const menu: CSSProperties = {
   border: 0,
-  background: "#d7ad49",
+  background: "#e5b857",
   color: "#111",
   borderRadius: 999,
-  padding: "11px 16px",
+  padding: "10px 15px",
   fontWeight: 1000,
   cursor: "pointer"
 };
 
 const drawer: CSSProperties = {
   margin: 18,
-  padding: 18,
-  border: "1px solid rgba(255,215,122,.24)",
-  borderRadius: 24,
-  background: "rgba(0,0,0,.46)",
-  boxShadow: "0 28px 80px rgba(0,0,0,.36)"
-};
-
-const drawerHeader: CSSProperties = {
-  display: "flex",
-  justifyContent: "space-between",
-  alignItems: "center",
-  marginBottom: 14
-};
-
-const closeButton: CSSProperties = {
-  ...iconButton,
-  padding: "8px 12px"
-};
-
-const drawerGrid: CSSProperties = {
-  display: "grid",
-  gridTemplateColumns: "repeat(auto-fit,minmax(220px,1fr))",
-  gap: 12
-};
-
-const drawerCard: CSSProperties = {
-  display: "grid",
-  gap: 9,
-  padding: 16,
+  padding: 14,
   borderRadius: 18,
-  border: "1px solid rgba(255,215,122,.18)",
-  background: "rgba(255,255,255,.055)",
-  color: "#f8f0db",
-  textDecoration: "none"
-};
-
-const quickActionRow: CSSProperties = {
-  display: "flex",
-  flexWrap: "wrap",
-  gap: 10,
-  marginTop: 16
-};
-
-const primaryAction: CSSProperties = {
-  border: 0,
-  borderRadius: 999,
-  padding: "12px 16px",
-  background: "#d7ad49",
-  color: "#111",
-  fontWeight: 1000,
-  textDecoration: "none"
-};
-
-const secondaryAction: CSSProperties = {
-  border: "1px solid rgba(255,215,122,.36)",
-  borderRadius: 999,
-  padding: "12px 16px",
-  color: "#ffd77a",
-  fontWeight: 900,
-  textDecoration: "none",
-  background: "rgba(0,0,0,.18)"
-};
-
-const contentWrap: CSSProperties = {
-  minWidth: 0
-};
-
-const mobileNav: CSSProperties = {
-  display: "none"
-};
-
-const mobileNavLink: CSSProperties = {
-  color: "#d8caa8",
-  textDecoration: "none",
+  background: "rgba(20,16,9,.96)",
+  border: "1px solid rgba(229,184,87,.18)",
   display: "grid",
-  placeItems: "center",
-  gap: 3,
-  fontSize: 11
+  gridTemplateColumns: "repeat(auto-fit,minmax(180px,1fr))",
+  gap: 10
 };
 
-const mobileNavActive: CSSProperties = {
-  ...mobileNavLink,
-  color: "#ffd77a",
-  fontWeight: 900
+const drawerLink: CSSProperties = {
+  ...navItem,
+  background: "rgba(255,255,255,.045)",
+  color: "#f6efe0"
+};
+
+const content: CSSProperties = {
+  minWidth: 0
 };
