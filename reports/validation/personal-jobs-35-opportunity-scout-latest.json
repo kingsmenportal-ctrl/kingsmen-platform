@@ -2,7 +2,7 @@
   "schema": "kingsmen.personal-jobs-35-opportunity-scout.validation.v1",
   "status": "VALIDATED",
   "passed": true,
-  "generatedAt": "2026-06-10T05:10:29.515Z",
+  "generatedAt": "2026-06-10T05:13:40.220Z",
   "checks": [
     {
       "name": "exists:scripts/agents/personal-job-opportunity-scout.mjs",

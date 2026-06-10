@@ -50,7 +50,15 @@ export default function OpportunityScoutClient() {
     });
 
     const json = await response.json();
-    if (!response.ok) throw new Error(json.error || "Request failed.");
+    if (!response.ok) {
+      return {
+        status: "ERROR_VISIBLE",
+        leads: [],
+        sourceResults: [],
+        diagnostics: [json.error || "Request failed."],
+        nextAction: "Check terminal output and repair the failing route."
+      };
+    }
     return json;
   }
 

@@ -13,8 +13,9 @@ function repoRoot() {
 }
 
 const ROOT = repoRoot();
-const OUT = path.join(ROOT, "data/personal-job-desk/scouted-opportunities.local.json");
-const APPLY_STORE = path.join(ROOT, "data/personal-job-desk/apply-now.local.json");
+const DATA_DIR = path.join(ROOT, "data", "personal-job-desk");
+const OUT = path.join(DATA_DIR, "scouted-opportunities.local.json");
+const APPLY_STORE = path.join(DATA_DIR, "apply-now.local.json");
 
 function readJson(file: string, fallback: any) {
   try {
@@ -29,6 +30,23 @@ function writeJson(file: string, data: any) {
   fs.writeFileSync(file, `${JSON.stringify(data, null, 2)}\n`, "utf8");
 }
 
+function defaultScout() {
+  return {
+    schema: "kingsmen.personal-jobs-35.opportunity-scout.v1",
+    module: "PERSONAL-JOBS-35",
+    status: "READY",
+    generatedAt: new Date().toISOString(),
+    query: "",
+    location: "Johannesburg",
+    category: "JOB",
+    leadCount: 0,
+    sourceResults: [],
+    leads: [],
+    diagnostics: [],
+    nextAction: "Run scout. If a website blocks automation, open the source manually from this page."
+  };
+}
+
 function defaultApplyStore() {
   return {
     updatedAt: new Date().toISOString(),
@@ -41,93 +59,248 @@ function defaultApplyStore() {
   };
 }
 
-export async function GET() {
-  const output = readJson(OUT, {
-    schema: "kingsmen.personal-jobs-35.opportunity-scout.v1",
-    module: "PERSONAL-JOBS-35",
-    status: "EMPTY",
-    generatedAt: new Date().toISOString(),
-    leadCount: 0,
-    sourceResults: [],
-    leads: []
-  });
+function sourceLinks(query: string, location: string, category: string) {
+  const q = encodeURIComponent(query || "entry level jobs learnership internship");
+  const l = encodeURIComponent(location || "Johannesburg");
 
-  return NextResponse.json(output);
+  return [
+    {
+      leadId: `lead-${Date.now()}-indeed`,
+      source: "Indeed",
+      category,
+      title: `${query || "Entry level jobs"} - Indeed live search`,
+      organisation: "Indeed",
+      location,
+      sourceUrl: `https://za.indeed.com/jobs?q=${q}&l=${l}`,
+      applicationMethod: "PORTAL",
+      confidence: "LIVE_SOURCE_SEARCH",
+      scoutStatus: "OPEN_AND_REVIEW",
+      imported: false,
+      createdAt: new Date().toISOString()
+    },
+    {
+      leadId: `lead-${Date.now()}-careers24`,
+      source: "Careers24",
+      category,
+      title: `${query || "Entry level jobs"} - Careers24 live search`,
+      organisation: "Careers24",
+      location,
+      sourceUrl: `https://www.careers24.com/jobs/lc-${l}/?q=${q}`,
+      applicationMethod: "PORTAL",
+      confidence: "LIVE_SOURCE_SEARCH",
+      scoutStatus: "OPEN_AND_REVIEW",
+      imported: false,
+      createdAt: new Date().toISOString()
+    },
+    {
+      leadId: `lead-${Date.now()}-pnet`,
+      source: "PNet",
+      category,
+      title: `${query || "Entry level jobs"} - PNet live search`,
+      organisation: "PNet",
+      location,
+      sourceUrl: `https://www.pnet.co.za/jobs/${q}/in-${l}`,
+      applicationMethod: "PORTAL",
+      confidence: "LIVE_SOURCE_SEARCH",
+      scoutStatus: "OPEN_AND_REVIEW",
+      imported: false,
+      createdAt: new Date().toISOString()
+    },
+    {
+      leadId: `lead-${Date.now()}-sayouth`,
+      source: "SA Youth",
+      category: "LEARNERSHIP",
+      title: "SA Youth opportunities",
+      organisation: "SA Youth",
+      location,
+      sourceUrl: "https://sayouth.mobi/",
+      applicationMethod: "PORTAL",
+      confidence: "OFFICIAL_SOURCE_ENTRY",
+      scoutStatus: "LOGIN_OR_MANUAL_REVIEW_REQUIRED",
+      imported: false,
+      createdAt: new Date().toISOString()
+    },
+    {
+      leadId: `lead-${Date.now()}-essa`,
+      source: "ESSA Labour",
+      category: "JOB",
+      title: "ESSA Labour opportunities",
+      organisation: "Department of Employment and Labour",
+      location,
+      sourceUrl: "https://essa.labour.gov.za/EssaOnline/WebBeans/",
+      applicationMethod: "PORTAL",
+      confidence: "OFFICIAL_SOURCE_ENTRY",
+      scoutStatus: "LOGIN_OR_MANUAL_REVIEW_REQUIRED",
+      imported: false,
+      createdAt: new Date().toISOString()
+    },
+    {
+      leadId: `lead-${Date.now()}-nyda`,
+      source: "NYDA",
+      category: "FUNDING",
+      title: "NYDA youth opportunities",
+      organisation: "NYDA",
+      location,
+      sourceUrl: "https://www.nyda.gov.za/",
+      applicationMethod: "PORTAL",
+      confidence: "OFFICIAL_SOURCE_ENTRY",
+      scoutStatus: "OPEN_AND_REVIEW",
+      imported: false,
+      createdAt: new Date().toISOString()
+    }
+  ];
+}
+
+export async function GET() {
+  try {
+    fs.mkdirSync(DATA_DIR, { recursive: true });
+    return NextResponse.json(readJson(OUT, defaultScout()));
+  } catch (error) {
+    return NextResponse.json({
+      ...defaultScout(),
+      status: "ERROR_VISIBLE",
+      diagnostics: [error instanceof Error ? error.message : "GET failed"]
+    });
+  }
 }
 
 export async function POST(request: Request) {
-  const body = await request.json().catch(() => ({}));
-  const action = String(body.action || "").trim();
+  try {
+    const body = await request.json().catch(() => ({}));
+    const action = String(body.action || "").trim();
 
-  if (action === "runScout") {
-    const script = path.join(ROOT, "scripts/agents/personal-job-opportunity-scout.mjs");
-    const args = [
-      script,
-      `--query=${String(body.query || "")}`,
-      `--location=${String(body.location || "Johannesburg")}`,
-      `--category=${String(body.category || "JOB")}`
-    ];
+    if (action === "runScout") {
+      const query = String(body.query || "entry level general worker admin learnership internship").trim();
+      const location = String(body.location || "Johannesburg").trim();
+      const category = String(body.category || "JOB").trim();
 
-    const result = spawnSync(process.execPath, args, {
-      cwd: ROOT,
-      encoding: "utf8",
-      timeout: 120000,
-      maxBuffer: 1024 * 1024 * 30
-    });
+      const script = path.join(ROOT, "scripts", "agents", "personal-job-opportunity-scout.mjs");
+      const fallbackLeads = sourceLinks(query, location, category);
 
-    if (result.status !== 0) {
-      return NextResponse.json({
-        status: "FAILED",
-        error: result.stderr || result.stdout || "Scout failed."
-      }, { status: 500 });
-    }
+      let diagnostics: string[] = [];
+      let leads = fallbackLeads;
+      let sourceResults: any[] = fallbackLeads.map((lead) => ({
+        source: lead.source,
+        status: lead.scoutStatus,
+        note: "Safe live-source card available. Open and review before applying.",
+        openUrl: lead.sourceUrl
+      }));
 
-    return NextResponse.json(readJson(OUT, {}));
-  }
+      if (fs.existsSync(script)) {
+        const result = spawnSync(process.execPath, [
+          script,
+          `--query=${query}`,
+          `--location=${location}`,
+          `--category=${category}`
+        ], {
+          cwd: ROOT,
+          encoding: "utf8",
+          timeout: 120000,
+          maxBuffer: 1024 * 1024 * 30
+        });
 
-  if (action === "importLead") {
-    const leadId = String(body.leadId || "");
-    const scout = readJson(OUT, { leads: [] });
-    const lead = (scout.leads || []).find((x: any) => x.leadId === leadId);
+        diagnostics.push(`agent_exit=${result.status}`);
+        if (result.stderr) diagnostics.push(result.stderr.slice(0, 5000));
+        if (result.stdout) diagnostics.push(result.stdout.slice(0, 5000));
 
-    if (!lead) {
-      return NextResponse.json({ status: "FAILED", error: "Lead not found." }, { status: 404 });
-    }
+        const agentOut = readJson(OUT, null);
+        if (result.status === 0 && agentOut && Array.isArray(agentOut.leads) && agentOut.leads.length) {
+          leads = agentOut.leads;
+          sourceResults = agentOut.sourceResults || sourceResults;
+        }
+      } else {
+        diagnostics.push("Scout agent file missing. Used safe live-source cards.");
+      }
 
-    const store = readJson(APPLY_STORE, defaultApplyStore());
-    const exists = (store.opportunities || []).some((opp: any) => opp.sourceUrl === lead.sourceUrl);
-
-    if (!exists) {
-      store.opportunities = [
-        {
-          opportunityId: `opp-${Date.now()}-${Math.random().toString(16).slice(2)}`,
-          title: lead.title,
-          organisation: lead.organisation || lead.source,
-          category: lead.category || "JOB",
-          location: lead.location || "",
-          sourceUrl: lead.sourceUrl,
-          applicationMethod: lead.applicationMethod || "PORTAL",
-          emailTo: "",
-          closingDate: "",
-          notes: `Imported from ${lead.source}. Review official page before applying.`,
-          status: "IMPORTED_BY_SCOUT",
-          createdAt: new Date().toISOString(),
-          updatedAt: new Date().toISOString()
+      const output = {
+        schema: "kingsmen.personal-jobs-35.opportunity-scout.v1",
+        module: "PERSONAL-JOBS-35",
+        status: "SCOUT_READY",
+        generatedAt: new Date().toISOString(),
+        query,
+        location,
+        category,
+        leadCount: leads.length,
+        sourceResults,
+        leads,
+        diagnostics,
+        safetyBoundary: {
+          autoApplies: false,
+          bypassesLogin: false,
+          bypassesOtp: false,
+          bypassesCaptcha: false,
+          contactsEmployers: false,
+          inventsJobs: false,
+          requiresCandidateReview: true
         },
-        ...(store.opportunities || [])
-      ];
+        nextAction: "Review leads, open official pages, import useful leads into Apply Now, then build packs."
+      };
+
+      writeJson(OUT, output);
+      return NextResponse.json(output);
     }
 
-    store.updatedAt = new Date().toISOString();
-    writeJson(APPLY_STORE, store);
+    if (action === "importLead") {
+      const leadId = String(body.leadId || "");
+      const scout = readJson(OUT, defaultScout());
+      const lead = (scout.leads || []).find((x: any) => x.leadId === leadId);
 
-    scout.leads = (scout.leads || []).map((x: any) =>
-      x.leadId === leadId ? { ...x, imported: true, importedAt: new Date().toISOString() } : x
-    );
-    writeJson(OUT, scout);
+      if (!lead) {
+        return NextResponse.json({
+          status: "FAILED",
+          error: "Lead not found. Run scout again."
+        });
+      }
 
-    return NextResponse.json({ status: "IMPORTED", lead, store, scout });
+      const store = readJson(APPLY_STORE, defaultApplyStore());
+      const exists = (store.opportunities || []).some((opp: any) => opp.sourceUrl === lead.sourceUrl);
+
+      if (!exists) {
+        store.opportunities = [
+          {
+            opportunityId: `opp-${Date.now()}-${Math.random().toString(16).slice(2)}`,
+            title: lead.title,
+            organisation: lead.organisation || lead.source,
+            category: lead.category || "JOB",
+            location: lead.location || "",
+            sourceUrl: lead.sourceUrl,
+            applicationMethod: lead.applicationMethod || "PORTAL",
+            emailTo: "",
+            closingDate: "",
+            notes: `Imported from ${lead.source}. Review the official page before applying.`,
+            status: "IMPORTED_BY_SCOUT",
+            createdAt: new Date().toISOString(),
+            updatedAt: new Date().toISOString()
+          },
+          ...(store.opportunities || [])
+        ];
+      }
+
+      store.updatedAt = new Date().toISOString();
+      writeJson(APPLY_STORE, store);
+
+      scout.leads = (scout.leads || []).map((x: any) =>
+        x.leadId === leadId ? { ...x, imported: true, importedAt: new Date().toISOString() } : x
+      );
+      writeJson(OUT, scout);
+
+      return NextResponse.json({
+        status: "IMPORTED",
+        lead,
+        store,
+        scout
+      });
+    }
+
+    return NextResponse.json({
+      status: "FAILED",
+      error: "Unknown action."
+    });
+  } catch (error) {
+    return NextResponse.json({
+      status: "ERROR_VISIBLE",
+      error: error instanceof Error ? error.message : "POST failed.",
+      stack: error instanceof Error ? error.stack : ""
+    });
   }
-
-  return NextResponse.json({ status: "FAILED", error: "Unknown action." }, { status: 400 });
 }
