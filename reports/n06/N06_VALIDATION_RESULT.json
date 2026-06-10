@@ -1,10 +1,10 @@
 ﻿{
     "module":  "N06",
     "name":  "Route Universe / Application Workbench",
-    "checked_at":  "2026-06-10T11:48:20",
-    "status":  "FAIL",
+    "checked_at":  "2026-06-10T11:52:57",
+    "status":  "PASS",
     "failures":  [
-                     "MAP fallback module missing manual package marker."
+
                  ],
     "required_files":  [
                            "manifests\\n06\\route-universe-workbench.json",

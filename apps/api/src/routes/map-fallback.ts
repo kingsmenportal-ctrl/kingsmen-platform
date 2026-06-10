@@ -6,6 +6,8 @@ export type MapFallbackReasonCode =
   | "SOURCE_REVIEW_REQUIRED"
   | "OTHER";
 
+export const MAP_FALLBACK_LABEL = "Manual Application Package";
+
 export interface ManualApplicationPackageInput {
   applicationId: string;
   candidateId: string;
@@ -25,6 +27,7 @@ export interface ManualApplicationPackage {
   requiredDocuments: string[];
   sourceLinks: string[];
   packageStatus: "DRAFT" | "READY" | "SENT" | "IN_PROGRESS" | "COMPLETED" | "CANCELLED";
+  packageLabel: typeof MAP_FALLBACK_LABEL;
 }
 
 export function buildManualApplicationPackage(input: ManualApplicationPackageInput): ManualApplicationPackage {
@@ -47,6 +50,11 @@ export function buildManualApplicationPackage(input: ManualApplicationPackageInp
     ],
     requiredDocuments: input.requiredDocuments,
     sourceLinks: input.sourceLinks,
-    packageStatus: "DRAFT"
+    packageStatus: "DRAFT",
+    packageLabel: MAP_FALLBACK_LABEL
   };
+}
+
+export function mapFallbackIsManualApplicationPackage(): true {
+  return true;
 }
