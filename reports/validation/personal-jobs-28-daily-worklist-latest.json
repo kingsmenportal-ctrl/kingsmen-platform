@@ -1,0 +1,49 @@
+{
+  "schema": "kingsmen.validation-report.v1",
+  "module": "PERSONAL-JOBS-28 - Operator Daily Worklist / Founder Action Packet Digest",
+  "status": "VALIDATED",
+  "passed": true,
+  "generated_at": "2026-06-10T03:27:45.228Z",
+  "proof": "reports/personal-jobs/personal-jobs-28-daily-worklist-proof.json",
+  "output": "data/personal-job-desk/daily-worklist.local.json",
+  "summary": {
+    "totalItems": 80,
+    "today": 0,
+    "inProgress": 0,
+    "waitingProof": 0,
+    "waitingCandidate": 0,
+    "waitingFounder": 80,
+    "done": 0,
+    "closed": 0,
+    "founderAttentionRequired": 80,
+    "candidateHarmRisk": 0,
+    "estimatedMinutes": 480,
+    "byWorklistStatus": {
+      "WAITING_FOUNDER": 80
+    },
+    "byWorkSlot": {
+      "MORNING_REVIEW": 80
+    },
+    "byPriorityBand": {
+      "P3_LOW": 80
+    }
+  },
+  "founderDigest": {
+    "dailyLoad": {
+      "activeItems": 80,
+      "todayItems": 80,
+      "founderAttentionItems": 80,
+      "candidateHarmRiskItems": 0,
+      "estimatedMinutes": 480
+    },
+    "actionPacketCount": 12
+  },
+  "failed_checks": [],
+  "warnings": [
+    "PJ28 does not execute applications automatically.",
+    "PJ28 does not send email, WhatsApp, SMS, or employer messages automatically.",
+    "PJ28 only packages daily work and founder action packets.",
+    "Manual proof and founder/operator decisions are still required."
+  ],
+  "next_action": "Commit PJ28 tracked files and test the local UI."
+}

@@ -1,0 +1,161 @@
+{
+  "schema": "kingsmen.personal-jobs-28-proof.v1",
+  "module": "PERSONAL-JOBS-28 - Operator Daily Worklist / Founder Action Packet Digest",
+  "status": "PROVEN",
+  "passed": true,
+  "generated_at": "2026-06-10T03:27:45.196Z",
+  "input": "data/personal-job-desk/readiness-priority-queue.local.json",
+  "output": "data/personal-job-desk/daily-worklist.local.json",
+  "summary": {
+    "totalItems": 80,
+    "today": 0,
+    "inProgress": 0,
+    "waitingProof": 0,
+    "waitingCandidate": 0,
+    "waitingFounder": 80,
+    "done": 0,
+    "closed": 0,
+    "founderAttentionRequired": 80,
+    "candidateHarmRisk": 0,
+    "estimatedMinutes": 480,
+    "byWorklistStatus": {
+      "WAITING_FOUNDER": 80
+    },
+    "byWorkSlot": {
+      "MORNING_REVIEW": 80
+    },
+    "byPriorityBand": {
+      "P3_LOW": 80
+    }
+  },
+  "founderDigest": {
+    "dailyLoad": {
+      "activeItems": 80,
+      "todayItems": 80,
+      "founderAttentionItems": 80,
+      "candidateHarmRiskItems": 0,
+      "estimatedMinutes": 480
+    },
+    "actionPacketCount": 12
+  },
+  "boundaries": {
+    "sendsApplications": false,
+    "sendsEmail": false,
+    "sendsWhatsApp": false,
+    "sendsSms": false,
+    "touchesPayments": false,
+    "contactsEmployers": false,
+    "bypassesLoginOtpCaptcha": false,
+    "productionReady": false,
+    "deployedToOracle": false
+  },
+  "checks": [
+    {
+      "name": "file:scripts/agents/personal-job-daily-worklist.mjs",
+      "passed": true,
+      "detail": "scripts/agents/personal-job-daily-worklist.mjs"
+    },
+    {
+      "name": "file:apps/web/src/app/api/personal-jobs/daily-worklist/route.ts",
+      "passed": true,
+      "detail": "apps/web/src/app/api/personal-jobs/daily-worklist/route.ts"
+    },
+    {
+      "name": "file:apps/web/src/app/personal-job-desk/daily-worklist/page.tsx",
+      "passed": true,
+      "detail": "apps/web/src/app/personal-job-desk/daily-worklist/page.tsx"
+    },
+    {
+      "name": "file:apps/web/src/app/personal-job-desk/daily-worklist/DailyWorklistClient.tsx",
+      "passed": true,
+      "detail": "apps/web/src/app/personal-job-desk/daily-worklist/DailyWorklistClient.tsx"
+    },
+    {
+      "name": "file:packages/contracts/src/personal-jobs-28-daily-worklist.ts",
+      "passed": true,
+      "detail": "packages/contracts/src/personal-jobs-28-daily-worklist.ts"
+    },
+    {
+      "name": "file:docs/personal-jobs/personal-jobs-28-daily-worklist.md",
+      "passed": true,
+      "detail": "docs/personal-jobs/personal-jobs-28-daily-worklist.md"
+    },
+    {
+      "name": "file:manifests/personal-jobs/personal-jobs-28-daily-worklist.json",
+      "passed": true,
+      "detail": "manifests/personal-jobs/personal-jobs-28-daily-worklist.json"
+    },
+    {
+      "name": "file:scripts/proof/prove-personal-jobs-28-daily-worklist.mjs",
+      "passed": true,
+      "detail": "scripts/proof/prove-personal-jobs-28-daily-worklist.mjs"
+    },
+    {
+      "name": "file:scripts/validators/validate-personal-jobs-28-daily-worklist.mjs",
+      "passed": true,
+      "detail": "scripts/validators/validate-personal-jobs-28-daily-worklist.mjs"
+    },
+    {
+      "name": "pj27_input_exists",
+      "passed": true,
+      "detail": "PJ27 readiness-priority-queue.local.json must exist before PJ28."
+    },
+    {
+      "name": "agent_exit_zero",
+      "passed": true,
+      "detail": "{\n  \"status\": \"COMPLETED\",\n  \"pj27QueueItemCount\": 80,\n  \"worklistItemCount\": 80,\n  \"summary\": {\n    \"totalItems\": 80,\n    \"today\": 0,\n    \"inProgress\": 0,\n    \"waitingProof\": 0,\n    \"waitingCandidate\": 0,\n    \"waitingFounder\": 80,\n    \"done\": 0,\n    \"closed\": 0,\n    \"founderAttentionRequired\": 80,\n    \"candidateHarmRisk\": 0,\n    \"estimatedMinutes\": 480,\n    \"byWorklistStatus\": {\n      \"WAITING_FOUNDER\": 80\n    },\n    \"byWorkSlot\": {\n      \"MORNING_REVIEW\": 80\n    },\n    \"byPriorityBand\": {\n      \"P3_LOW\": 80\n    }\n  },\n  \"founderDigest\": {\n    \"dailyLoad\": {\n      \"activeItems\": 80,\n      \"todayItems\": 80,\n      \"founderAttentionItems\": 80,\n      \"candidateHarmRiskItems\": 0,\n      \"estimatedMinutes\": 480\n    },\n    \"actionPacketCount\": 12\n  }\n}\n"
+    },
+    {
+      "name": "output_written",
+      "passed": true,
+      "detail": "C:\\Kingsmen\\kingsmen-platform\\data\\personal-job-desk\\daily-worklist.local.json"
+    },
+    {
+      "name": "input_completed",
+      "passed": true,
+      "detail": "COMPLETED"
+    },
+    {
+      "name": "output_completed",
+      "passed": true,
+      "detail": "COMPLETED"
+    },
+    {
+      "name": "worklist_items_created",
+      "passed": true,
+      "detail": "80"
+    },
+    {
+      "name": "worklist_items_match_pj27_queue",
+      "passed": true,
+      "detail": "80 vs 80"
+    },
+    {
+      "name": "founder_digest_created",
+      "passed": true,
+      "detail": "pj28-digest-2026-06-10"
+    },
+    {
+      "name": "action_packets_created",
+      "passed": true,
+      "detail": "12"
+    },
+    {
+      "name": "all_items_have_required_sections",
+      "passed": true,
+      "detail": "0 worklist items missing required sections"
+    },
+    {
+      "name": "no_unsafe_item_actions",
+      "passed": true,
+      "detail": "0 unsafe worklist items"
+    },
+    {
+      "name": "global_safety_boundary_no_send",
+      "passed": true,
+      "detail": "{\"sendsApplications\":false,\"sendsEmail\":false,\"sendsWhatsApp\":false,\"sendsSms\":false,\"contactsEmployers\":false,\"touchesPayments\":false,\"bypassesLoginOtpCaptcha\":false,\"productionClaim\":false,\"deployedToOracle\":false}"
+    }
+  ],
+  "failed": [],
+  "next_action": "Commit PJ28, then test /personal-job-desk/daily-worklist."
+}
