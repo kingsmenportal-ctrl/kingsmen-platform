@@ -4,10 +4,7 @@ param(
 )
 
 $ErrorActionPreference = "Stop"
-
 $Base = "C:\Kingsmen\kingsmen-platform"
-if (!(Test-Path $Base)) { throw "Missing Kingsmen repo at $Base" }
-
 Set-Location $Base
 
 $NormalizedPhase = $Phase.ToUpperInvariant()

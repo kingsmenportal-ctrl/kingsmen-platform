@@ -1,0 +1,32 @@
+{
+  "phase": "N08",
+  "name": "Control Plane Foundation",
+  "status": "foundation",
+  "laws": [
+    "Control Plane is not Data Plane.",
+    "Control Plane issues audited backend commands only.",
+    "No direct candidate state mutation from UI.",
+    "Dangerous actions require human approval.",
+    "Kill switches require audit trail.",
+    "Capacity guard protects Oracle Lite.",
+    "PostgreSQL remains truth.",
+    "Airtable remains mirror only.",
+    "Email is primary.",
+    "WhatsApp is urgent-only."
+  ],
+  "surfaces": [
+    "Command Center",
+    "Candidate Queue",
+    "Application Queue",
+    "Document Queue",
+    "Route Queue",
+    "Approval Queue",
+    "Kill Switches",
+    "Capacity Guard",
+    "Worker Health",
+    "Manual Fallback Center",
+    "Phoenix Recovery Center",
+    "Reports Center"
+  ],
+  "next": "N09 - Notifications / Communications Runtime"
+}
