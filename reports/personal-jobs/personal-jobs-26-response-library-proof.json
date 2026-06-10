@@ -1,0 +1,155 @@
+{
+  "schema": "kingsmen.personal-jobs-26-proof.v1",
+  "module": "PERSONAL-JOBS-26 - Operator Response Library / Reusable Templates / Manual-Send Proof Workflow",
+  "status": "PROVEN",
+  "passed": true,
+  "generated_at": "2026-06-10T03:11:22.822Z",
+  "input": "data/personal-job-desk/follow-up-inbox.local.json",
+  "output": "data/personal-job-desk/response-library.local.json",
+  "summary": {
+    "totalWorkflows": 80,
+    "templateCount": 6,
+    "noResponseNeeded": 80,
+    "draftAvailable": 0,
+    "finalReadyForApproval": 0,
+    "approvedForManualSend": 0,
+    "manualSendProofCaptured": 0,
+    "closed": 0,
+    "byResponseStatus": {
+      "NO_RESPONSE_NEEDED": 80
+    },
+    "byQuestionCategory": {
+      "GENERAL": 80
+    }
+  },
+  "boundaries": {
+    "sendsApplications": false,
+    "sendsEmail": false,
+    "sendsWhatsApp": false,
+    "sendsSms": false,
+    "touchesPayments": false,
+    "contactsEmployers": false,
+    "bypassesLoginOtpCaptcha": false,
+    "productionReady": false,
+    "deployedToOracle": false
+  },
+  "checks": [
+    {
+      "name": "file:scripts/agents/personal-job-response-library.mjs",
+      "passed": true,
+      "detail": "scripts/agents/personal-job-response-library.mjs"
+    },
+    {
+      "name": "file:apps/web/src/app/api/personal-jobs/response-library/route.ts",
+      "passed": true,
+      "detail": "apps/web/src/app/api/personal-jobs/response-library/route.ts"
+    },
+    {
+      "name": "file:apps/web/src/app/personal-job-desk/response-library/page.tsx",
+      "passed": true,
+      "detail": "apps/web/src/app/personal-job-desk/response-library/page.tsx"
+    },
+    {
+      "name": "file:apps/web/src/app/personal-job-desk/response-library/ResponseLibraryClient.tsx",
+      "passed": true,
+      "detail": "apps/web/src/app/personal-job-desk/response-library/ResponseLibraryClient.tsx"
+    },
+    {
+      "name": "file:packages/contracts/src/personal-jobs-26-response-library.ts",
+      "passed": true,
+      "detail": "packages/contracts/src/personal-jobs-26-response-library.ts"
+    },
+    {
+      "name": "file:docs/personal-jobs/personal-jobs-26-response-library.md",
+      "passed": true,
+      "detail": "docs/personal-jobs/personal-jobs-26-response-library.md"
+    },
+    {
+      "name": "file:manifests/personal-jobs/personal-jobs-26-response-library.json",
+      "passed": true,
+      "detail": "manifests/personal-jobs/personal-jobs-26-response-library.json"
+    },
+    {
+      "name": "file:scripts/proof/prove-personal-jobs-26-response-library.mjs",
+      "passed": true,
+      "detail": "scripts/proof/prove-personal-jobs-26-response-library.mjs"
+    },
+    {
+      "name": "file:scripts/validators/validate-personal-jobs-26-response-library.mjs",
+      "passed": true,
+      "detail": "scripts/validators/validate-personal-jobs-26-response-library.mjs"
+    },
+    {
+      "name": "pj25_input_exists",
+      "passed": true,
+      "detail": "PJ25 follow-up-inbox.local.json must exist before PJ26."
+    },
+    {
+      "name": "agent_exit_zero",
+      "passed": true,
+      "detail": "{\n  \"status\": \"COMPLETED\",\n  \"pj25ThreadCount\": 80,\n  \"responseWorkflowCount\": 80,\n  \"summary\": {\n    \"totalWorkflows\": 80,\n    \"templateCount\": 6,\n    \"noResponseNeeded\": 80,\n    \"draftAvailable\": 0,\n    \"finalReadyForApproval\": 0,\n    \"approvedForManualSend\": 0,\n    \"manualSendProofCaptured\": 0,\n    \"closed\": 0,\n    \"byResponseStatus\": {\n      \"NO_RESPONSE_NEEDED\": 80\n    },\n    \"byQuestionCategory\": {\n      \"GENERAL\": 80\n    }\n  }\n}\n"
+    },
+    {
+      "name": "output_written",
+      "passed": true,
+      "detail": "C:\\Kingsmen\\kingsmen-platform\\data\\personal-job-desk\\response-library.local.json"
+    },
+    {
+      "name": "input_completed",
+      "passed": true,
+      "detail": "COMPLETED"
+    },
+    {
+      "name": "output_completed",
+      "passed": true,
+      "detail": "COMPLETED"
+    },
+    {
+      "name": "templates_created",
+      "passed": true,
+      "detail": "6"
+    },
+    {
+      "name": "workflows_created",
+      "passed": true,
+      "detail": "80"
+    },
+    {
+      "name": "workflows_match_pj25_threads",
+      "passed": true,
+      "detail": "80 vs 80"
+    },
+    {
+      "name": "all_templates_have_required_sections",
+      "passed": true,
+      "detail": "0 templates missing required sections"
+    },
+    {
+      "name": "all_workflows_have_required_sections",
+      "passed": true,
+      "detail": "0 workflows missing required sections"
+    },
+    {
+      "name": "no_unsafe_actions",
+      "passed": true,
+      "detail": "0 unsafe workflows"
+    },
+    {
+      "name": "manual_sent_requires_proof",
+      "passed": true,
+      "detail": "0 sent workflows without proof"
+    },
+    {
+      "name": "no_success_guarantees",
+      "passed": true,
+      "detail": "0 guarantee-like workflows"
+    },
+    {
+      "name": "global_safety_boundary_no_send",
+      "passed": true,
+      "detail": "{\"sendsApplications\":false,\"sendsEmail\":false,\"sendsWhatsApp\":false,\"sendsSms\":false,\"contactsEmployers\":false,\"touchesPayments\":false,\"bypassesLoginOtpCaptcha\":false,\"productionClaim\":false,\"deployedToOracle\":false}"
+    }
+  ],
+  "failed": [],
+  "next_action": "Commit PJ26, then test /personal-job-desk/response-library."
+}

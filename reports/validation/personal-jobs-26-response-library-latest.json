@@ -1,0 +1,33 @@
+{
+  "schema": "kingsmen.validation-report.v1",
+  "module": "PERSONAL-JOBS-26 - Operator Response Library / Reusable Templates / Manual-Send Proof Workflow",
+  "status": "VALIDATED",
+  "passed": true,
+  "generated_at": "2026-06-10T03:11:22.892Z",
+  "proof": "reports/personal-jobs/personal-jobs-26-response-library-proof.json",
+  "output": "data/personal-job-desk/response-library.local.json",
+  "summary": {
+    "totalWorkflows": 80,
+    "templateCount": 6,
+    "noResponseNeeded": 80,
+    "draftAvailable": 0,
+    "finalReadyForApproval": 0,
+    "approvedForManualSend": 0,
+    "manualSendProofCaptured": 0,
+    "closed": 0,
+    "byResponseStatus": {
+      "NO_RESPONSE_NEEDED": 80
+    },
+    "byQuestionCategory": {
+      "GENERAL": 80
+    }
+  },
+  "failed_checks": [],
+  "warnings": [
+    "PJ26 does not send email, WhatsApp, SMS, or employer messages automatically.",
+    "PJ26 only creates response templates and manual-send proof workflow.",
+    "Operator responses must not guarantee employment, interview, offer, funding, or response.",
+    "Manual-send proof is required when response is marked sent."
+  ],
+  "next_action": "Commit PJ26 tracked files and test the local UI."
+}
