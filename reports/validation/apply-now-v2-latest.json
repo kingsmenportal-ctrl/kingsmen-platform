@@ -1,0 +1,57 @@
+{
+  "schema": "kingsmen.apply-now-v2.validation.v1",
+  "status": "FAILED",
+  "passed": false,
+  "generatedAt": "2026-06-10T04:42:25.738Z",
+  "route": "/personal-job-desk/apply-now",
+  "checks": [
+    {
+      "name": "has_command_centre_title",
+      "passed": true,
+      "detail": "has_command_centre_title"
+    },
+    {
+      "name": "has_route_cards",
+      "passed": true,
+      "detail": "has_route_cards"
+    },
+    {
+      "name": "has_source_hunter",
+      "passed": true,
+      "detail": "has_source_hunter"
+    },
+    {
+      "name": "has_document_vault",
+      "passed": true,
+      "detail": "has_document_vault"
+    },
+    {
+      "name": "has_application_queue",
+      "passed": true,
+      "detail": "has_application_queue"
+    },
+    {
+      "name": "has_application_pack",
+      "passed": true,
+      "detail": "has_application_pack"
+    },
+    {
+      "name": "has_real_sources",
+      "passed": true,
+      "detail": "has_real_sources"
+    },
+    {
+      "name": "does_not_claim_auto_submit",
+      "passed": false,
+      "detail": "does_not_claim_auto_submit"
+    }
+  ],
+  "failed": [
+    {
+      "name": "does_not_claim_auto_submit",
+      "passed": false,
+      "detail": "does_not_claim_auto_submit"
+    }
+  ],
+  "nextAction": "Repair failed checks."
+}

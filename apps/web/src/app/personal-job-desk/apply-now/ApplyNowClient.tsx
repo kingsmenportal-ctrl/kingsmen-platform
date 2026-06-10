@@ -11,16 +11,6 @@ type Store = {
   proofLog?: any[];
 };
 
-const sourceLinks = [
-  ["SA Youth", "https://sayouth.mobi/"],
-  ["ESSA Labour", "https://essa.labour.gov.za/EssaOnline/WebBeans/"],
-  ["NYDA", "https://www.nyda.gov.za/"],
-  ["Indeed Johannesburg", "https://za.indeed.com/jobs?q=learnership+internship+entry+level&l=Johannesburg"],
-  ["LinkedIn Jobs", "https://www.linkedin.com/jobs/search/?keywords=learnership%20internship%20entry%20level&location=Johannesburg%2C%20Gauteng%2C%20South%20Africa"],
-  ["PNet", "https://www.pnet.co.za/jobs/learnership/in-johannesburg"],
-  ["Careers24", "https://www.careers24.com/jobs/lc-johannesburg/"]
-];
-
 const blankProfile = {
   fullName: "",
   idOrPassport: "",
@@ -46,6 +36,98 @@ const blankOpportunity = {
   notes: ""
 };
 
+const realSources = [
+  {
+    name: "SA Youth",
+    type: "Jobs / Programmes / Skills",
+    url: "https://sayouth.mobi/",
+    note: "Free youth opportunity network. Use for job, youth programme and skilling routes."
+  },
+  {
+    name: "ESSA Labour",
+    type: "Government work seeker database",
+    url: "https://essa.labour.gov.za/EssaOnline/WebBeans/",
+    note: "Register, capture CV and search work or learning opportunities."
+  },
+  {
+    name: "NYDA",
+    type: "Youth grants / skills / scholarships",
+    url: "https://www.nyda.gov.za/",
+    note: "Use for youth services, grants, vouchers, education and skills routes."
+  },
+  {
+    name: "Indeed",
+    type: "Jobs / internships / learnerships",
+    url: "https://za.indeed.com/",
+    note: "Use search terms, then import only real listings."
+  },
+  {
+    name: "LinkedIn Jobs",
+    type: "Internships / entry jobs",
+    url: "https://www.linkedin.com/jobs/",
+    note: "Use for formal listings and company pages."
+  },
+  {
+    name: "Careers24",
+    type: "Jobs",
+    url: "https://www.careers24.com/",
+    note: "Use for SA job listings."
+  },
+  {
+    name: "PNet",
+    type: "Jobs / learnerships",
+    url: "https://www.pnet.co.za/",
+    note: "Use for formal SA job listings."
+  }
+];
+
+const routeCards = [
+  {
+    key: "JOB",
+    title: "Jobs",
+    subtitle: "General worker, admin, retail, call centre, driver, office support",
+    search: "entry level general worker admin retail call centre"
+  },
+  {
+    key: "LEARNERSHIP",
+    title: "Learnerships",
+    subtitle: "SETAs, companies, youth programmes, work-integrated learning",
+    search: "learnership matric no experience"
+  },
+  {
+    key: "INTERNSHIP",
+    title: "Internships",
+    subtitle: "Graduate, TVET, workplace exposure, entry internships",
+    search: "internship entry level graduate TVET"
+  },
+  {
+    key: "FUNDING",
+    title: "Funding",
+    subtitle: "Bursaries, youth grants, training support, scholarships",
+    search: "bursary youth grant scholarship training funding"
+  }
+];
+
+function encode(value: string) {
+  return encodeURIComponent(value.trim());
+}
+
+function searchLinks(query: string, location: string) {
+  const q = encode(query || "entry level jobs learnership internships");
+  const l = encode(location || "Johannesburg");
+
+  return [
+    ["Indeed", `https://za.indeed.com/jobs?q=${q}&l=${l}`],
+    ["LinkedIn", `https://www.linkedin.com/jobs/search/?keywords=${q}&location=${l}%2C%20South%20Africa`],
+    ["Google Jobs Search", `https://www.google.com/search?q=${q}+${l}+South+Africa+apply`],
+    ["Careers24", `https://www.careers24.com/jobs/lc-${l}/?q=${q}`],
+    ["PNet", `https://www.pnet.co.za/jobs/${q}/in-${l}`],
+    ["SA Youth", "https://sayouth.mobi/"],
+    ["ESSA", "https://essa.labour.gov.za/EssaOnline/WebBeans/"],
+    ["NYDA", "https://www.nyda.gov.za/"]
+  ];
+}
+
 export default function ApplyNowClient() {
   const [store, setStore] = useState<Store>({});
   const [profile, setProfile] = useState<Record<string, string>>(blankProfile);
@@ -55,10 +137,36 @@ export default function ApplyNowClient() {
   const [selectedPack, setSelectedPack] = useState<any | null>(null);
   const [proofDraft, setProofDraft] = useState<Record<string, string>>({});
   const [loading, setLoading] = useState(false);
+  const [activeRoute, setActiveRoute] = useState("JOB");
+  const [searchText, setSearchText] = useState("entry level general worker admin learnership internship");
 
   const documents = useMemo(() => store.documents ?? [], [store]);
   const opportunities = useMemo(() => store.opportunities ?? [], [store]);
   const packs = useMemo(() => store.applicationPacks ?? [], [store]);
+  const proofLog = useMemo(() => store.proofLog ?? [], [store]);
+
+  const readiness = useMemo(() => {
+    const required = [
+      profile.fullName,
+      profile.phone,
+      profile.email,
+      profile.location,
+      profile.highestEducation,
+      profile.skills
+    ].filter(Boolean).length;
+
+    const hasCv = documents.some((doc) => doc.documentType === "CV");
+    const hasId = documents.some((doc) => doc.documentType === "ID_COPY");
+    const score = Math.round(((required / 6) * 70) + (hasCv ? 15 : 0) + (hasId ? 15 : 0));
+
+    return {
+      score,
+      hasCv,
+      hasId,
+      profileFields: required,
+      ready: score >= 80
+    };
+  }, [profile, documents]);
 
   useEffect(() => {
     load();
@@ -82,7 +190,7 @@ export default function ApplyNowClient() {
       const json = await api();
       setStore(json);
       setProfile({ ...blankProfile, ...(json.profile ?? {}) });
-      setMessage("Apply Desk loaded.");
+      setMessage("Kingsmen Apply Desk loaded.");
     } catch (error) {
       setMessage(error instanceof Error ? error.message : "Load failed.");
     } finally {
@@ -95,7 +203,7 @@ export default function ApplyNowClient() {
     try {
       const json = await api({ action: "saveProfile", profile });
       setStore(json.store);
-      setMessage("Profile saved. This one profile can be reused for multiple applications.");
+      setMessage("Candidate profile saved.");
     } catch (error) {
       setMessage(error instanceof Error ? error.message : "Save failed.");
     } finally {
@@ -129,8 +237,8 @@ export default function ApplyNowClient() {
     try {
       const json = await api({ action: "addOpportunity", opportunity });
       setStore(json.store);
-      setOpportunity(blankOpportunity);
-      setMessage("Real opportunity saved. Generate a pack when ready.");
+      setOpportunity({ ...blankOpportunity, category: activeRoute, location: profile.location || "Johannesburg" });
+      setMessage("Real opportunity saved to the application queue.");
     } catch (error) {
       setMessage(error instanceof Error ? error.message : "Add opportunity failed.");
     } finally {
@@ -144,7 +252,7 @@ export default function ApplyNowClient() {
       const json = await api({ action: "generatePack", opportunityId });
       setStore(json.store);
       setSelectedPack(json.pack);
-      setMessage("Application pack generated. Apply manually through the real source, then capture proof.");
+      setMessage("Application pack generated. Apply through the real source, then capture proof.");
     } catch (error) {
       setMessage(error instanceof Error ? error.message : "Pack generation failed.");
     } finally {
@@ -158,7 +266,7 @@ export default function ApplyNowClient() {
       const proof = proofDraft[opportunityId] || "";
       const json = await api({ action: "markApplied", opportunityId, proof });
       setStore(json.store);
-      setMessage("Applied status saved with proof.");
+      setMessage("Application marked as applied with proof.");
     } catch (error) {
       setMessage(error instanceof Error ? error.message : "Proof capture failed.");
     } finally {
@@ -184,41 +292,82 @@ export default function ApplyNowClient() {
     setMessage("Copied.");
   }
 
+  function selectRoute(route: any) {
+    setActiveRoute(route.key);
+    setSearchText(route.search);
+    setOpportunity({ ...opportunity, category: route.key, location: profile.location || opportunity.location || "Johannesburg" });
+  }
+
   return (
     <main style={main}>
-      <section style={hero}>
-        <p style={eyebrow}>KINGSMEN APPLY DESK — TODAY MODE</p>
-        <h1 style={{ fontSize: 44, margin: "8px 0" }}>Find. Prepare. Apply. Track proof.</h1>
-        <p style={muted}>
-          One real profile, real documents, real opportunity links, multiple application packs. No fake data, no fake jobs, no automatic portal bypass.
-        </p>
-        <button onClick={load} disabled={loading} style={button}>{loading ? "Working..." : "Refresh"}</button>
-        {message ? <p style={{ color: "#ffd77a", fontWeight: 700 }}>{message}</p> : null}
+      <section style={topBar}>
+        <div>
+          <p style={eyebrow}>KINGSMEN PERSONAL JOB DESK</p>
+          <h1 style={{ fontSize: 46, margin: "6px 0" }}>Apply Command Centre</h1>
+          <p style={muted}>Built for real applications today: profile, documents, source search, opportunity import, application pack, proof tracking.</p>
+        </div>
+
+        <div style={readinessBox}>
+          <strong style={{ fontSize: 42 }}>{readiness.score}%</strong>
+          <span>Readiness</span>
+          <small>{readiness.ready ? "Ready to apply faster" : "Complete profile + CV + ID"}</small>
+        </div>
       </section>
 
       <section style={statsGrid}>
         <Stat label="Documents" value={documents.length} />
         <Stat label="Opportunities" value={opportunities.length} />
-        <Stat label="Packs" value={packs.length} />
-        <Stat label="Proof logs" value={(store.proofLog ?? []).length} />
+        <Stat label="Application packs" value={packs.length} />
+        <Stat label="Proof captured" value={proofLog.length} />
+      </section>
+
+      {message ? <section style={alertBox}>{message}</section> : null}
+
+      <section style={routeGrid}>
+        {routeCards.map((route) => (
+          <button
+            key={route.key}
+            onClick={() => selectRoute(route)}
+            style={{ ...routeCard, outline: activeRoute === route.key ? "2px solid #ffd77a" : "none" }}
+          >
+            <strong>{route.title}</strong>
+            <span>{route.subtitle}</span>
+          </button>
+        ))}
       </section>
 
       <section style={panel}>
-        <h2>1. Real opportunity sources</h2>
-        <p style={muted}>Open real sources, choose a real opportunity, then paste the official link below. Kingsmen does not invent opportunities.</p>
+        <div style={sectionHead}>
+          <div>
+            <p style={eyebrow}>REAL SOURCE HUNTER</p>
+            <h2>Search real opportunities</h2>
+          </div>
+          <button onClick={load} disabled={loading} style={button}>{loading ? "Working..." : "Refresh"}</button>
+        </div>
+
+        <div style={searchRow}>
+          <input value={searchText} onChange={(e) => setSearchText(e.target.value)} style={input} />
+          <input value={profile.location || "Johannesburg"} onChange={(e) => setProfile({ ...profile, location: e.target.value })} style={input} />
+        </div>
+
         <div style={sourceGrid}>
-          {sourceLinks.map(([label, url]) => (
-            <a key={label} href={url} target="_blank" rel="noreferrer" style={sourceCard}>
+          {searchLinks(searchText, profile.location).map(([label, url]) => (
+            <a key={`${label}-${url}`} href={url} target="_blank" rel="noreferrer" style={sourceCard}>
               <strong>{label}</strong>
-              <span>Open source</span>
+              <span>Open live search</span>
             </a>
           ))}
+        </div>
+
+        <div style={miniNote}>
+          Kingsmen does not pretend to have a live employer API yet. Use these live sources, open real listings, then import the link below.
         </div>
       </section>
 
       <section style={layout}>
         <section style={panel}>
-          <h2>2. Candidate profile</h2>
+          <p style={eyebrow}>CANDIDATE CORE</p>
+          <h2>One profile for many applications</h2>
           <div style={formGrid}>
             <Input label="Full name" value={profile.fullName} onChange={(v) => setProfile({ ...profile, fullName: v })} />
             <Input label="ID / Passport" value={profile.idOrPassport} onChange={(v) => setProfile({ ...profile, idOrPassport: v })} />
@@ -229,95 +378,109 @@ export default function ApplyNowClient() {
           </div>
           <TextArea label="Work experience" value={profile.workExperience} onChange={(v) => setProfile({ ...profile, workExperience: v })} />
           <TextArea label="Skills" value={profile.skills} onChange={(v) => setProfile({ ...profile, skills: v })} />
-          <TextArea label="Notes / restrictions / preferred jobs" value={profile.notes} onChange={(v) => setProfile({ ...profile, notes: v })} />
+          <TextArea label="Preferred jobs / restrictions / notes" value={profile.notes} onChange={(v) => setProfile({ ...profile, notes: v })} />
           <button onClick={saveProfile} style={button}>Save profile</button>
         </section>
 
         <section style={panel}>
-          <h2>3. Upload documents</h2>
-          <p style={muted}>Upload real documents only. This stores files locally inside the repo under data/personal-job-desk/uploads.</p>
-          <select value={documentType} onChange={(e) => setDocumentType(e.target.value)} style={input}>
-            <option value="CV">CV</option>
-            <option value="ID_COPY">ID copy</option>
-            <option value="CERTIFICATE">Certificate / qualification</option>
-            <option value="COVER_LETTER">Cover letter</option>
-            <option value="REFERENCE">Reference</option>
-            <option value="OTHER">Other</option>
-          </select>
-          <input type="file" onChange={(e) => uploadDocument(e.target.files?.[0] ?? null)} style={{ ...input, marginTop: 12 }} />
+          <p style={eyebrow}>DOCUMENT VAULT</p>
+          <h2>Upload real documents</h2>
+          <div style={dropZone}>
+            <select value={documentType} onChange={(e) => setDocumentType(e.target.value)} style={input}>
+              <option value="CV">CV</option>
+              <option value="ID_COPY">ID copy</option>
+              <option value="CERTIFICATE">Certificate / qualification</option>
+              <option value="COVER_LETTER">Cover letter</option>
+              <option value="REFERENCE">Reference</option>
+              <option value="OTHER">Other</option>
+            </select>
+            <input type="file" onChange={(e) => uploadDocument(e.target.files?.[0] ?? null)} style={input} />
+          </div>
 
-          <div style={{ marginTop: 18, display: "grid", gap: 10 }}>
+          <div style={docGrid}>
+            {documents.length === 0 ? <p style={muted}>No documents uploaded yet. Upload CV and ID first.</p> : null}
             {documents.map((doc) => (
-              <div key={doc.documentId} style={miniCard}>
+              <article key={doc.documentId} style={miniCard}>
                 <strong>{doc.documentType}</strong>
                 <span>{doc.originalName}</span>
                 <small>{doc.localPath}</small>
-              </div>
+              </article>
             ))}
           </div>
         </section>
       </section>
 
       <section style={panel}>
-        <h2>4. Add real opportunity</h2>
+        <p style={eyebrow}>IMPORT REAL OPPORTUNITY</p>
+        <h2>Add job / learnership / internship / funding route</h2>
         <div style={formGrid}>
           <Input label="Title" value={opportunity.title} onChange={(v) => setOpportunity({ ...opportunity, title: v })} placeholder="e.g. Admin Learnership / General Worker / Internship" />
           <Input label="Organisation" value={opportunity.organisation} onChange={(v) => setOpportunity({ ...opportunity, organisation: v })} />
-          <Select label="Category" value={opportunity.category} onChange={(v) => setOpportunity({ ...opportunity, category: v })} options={["JOB", "LEARNERSHIP", "INTERNSHIP", "FUNDING", "BURSARY", "OTHER"]} />
+          <Select label="Category" value={opportunity.category || activeRoute} onChange={(v) => setOpportunity({ ...opportunity, category: v })} options={["JOB", "LEARNERSHIP", "INTERNSHIP", "FUNDING", "BURSARY", "OTHER"]} />
           <Select label="Application method" value={opportunity.applicationMethod} onChange={(v) => setOpportunity({ ...opportunity, applicationMethod: v })} options={["PORTAL", "EMAIL", "UPLOAD_FORM", "WALK_IN", "OTHER"]} />
-          <Input label="Email to apply, if given" value={opportunity.emailTo} onChange={(v) => setOpportunity({ ...opportunity, emailTo: v })} />
+          <Input label="Email to apply, if listed" value={opportunity.emailTo} onChange={(v) => setOpportunity({ ...opportunity, emailTo: v })} />
           <Input label="Closing date" value={opportunity.closingDate} onChange={(v) => setOpportunity({ ...opportunity, closingDate: v })} />
         </div>
-        <Input label="Official/source link" value={opportunity.sourceUrl} onChange={(v) => setOpportunity({ ...opportunity, sourceUrl: v })} placeholder="Paste real job / learnership / funding link here" />
-        <TextArea label="Notes / requirements copied from source" value={opportunity.notes} onChange={(v) => setOpportunity({ ...opportunity, notes: v })} />
-        <button onClick={addOpportunity} style={button}>Save opportunity</button>
+        <Input label="Official/source link" value={opportunity.sourceUrl} onChange={(v) => setOpportunity({ ...opportunity, sourceUrl: v })} placeholder="Paste real opportunity link here" />
+        <TextArea label="Requirements copied from the source" value={opportunity.notes} onChange={(v) => setOpportunity({ ...opportunity, notes: v })} />
+        <button onClick={addOpportunity} style={button}>Add to application queue</button>
       </section>
 
-      <section style={panel}>
-        <h2>5. Applications</h2>
-        <div style={{ display: "grid", gap: 14 }}>
-          {opportunities.map((opp) => (
-            <article key={opp.opportunityId} style={appCard}>
-              <div>
-                <p style={eyebrow}>{opp.category} / {opp.status}</p>
-                <h3>{opp.title}</h3>
-                <p style={muted}>{opp.organisation} — {opp.location}</p>
-                <a href={opp.sourceUrl} target="_blank" rel="noreferrer" style={link}>Open official/source link</a>
-              </div>
+      <section style={columns}>
+        <section style={panel}>
+          <p style={eyebrow}>APPLICATION QUEUE</p>
+          <h2>Apply list</h2>
+          <div style={{ display: "grid", gap: 14 }}>
+            {opportunities.length === 0 ? <p style={muted}>No opportunities imported yet. Search real sources above, then paste a real link.</p> : null}
 
-              <div style={{ display: "flex", gap: 10, flexWrap: "wrap" }}>
-                <button onClick={() => generatePack(opp.opportunityId)} style={button}>Generate pack</button>
-                <button onClick={() => deleteOpportunity(opp.opportunityId)} style={buttonDanger}>Remove</button>
-              </div>
+            {opportunities.map((opp) => (
+              <article key={opp.opportunityId} style={appCard}>
+                <div>
+                  <p style={eyebrow}>{opp.category} / {opp.status}</p>
+                  <h3>{opp.title}</h3>
+                  <p style={muted}>{opp.organisation} — {opp.location}</p>
+                  <a href={opp.sourceUrl} target="_blank" rel="noreferrer" style={link}>Open official/source link</a>
+                </div>
 
-              <div>
+                <div style={buttonRow}>
+                  <button onClick={() => generatePack(opp.opportunityId)} style={button}>Build pack</button>
+                  <button onClick={() => deleteOpportunity(opp.opportunityId)} style={buttonDanger}>Remove</button>
+                </div>
+
                 <Input
-                  label="Paste proof after applying"
+                  label="Proof after applying"
                   value={proofDraft[opp.opportunityId] || ""}
                   onChange={(v) => setProofDraft({ ...proofDraft, [opp.opportunityId]: v })}
                   placeholder="Reference number, email sent proof, screenshot note, portal confirmation"
                 />
                 <button onClick={() => markApplied(opp.opportunityId)} style={buttonSecondary}>Mark applied with proof</button>
-              </div>
-            </article>
-          ))}
-        </div>
-      </section>
+              </article>
+            ))}
+          </div>
+        </section>
 
-      <section style={panel}>
-        <h2>6. Latest application pack</h2>
-        {selectedPack ? (
-          <>
-            <p style={muted}>Use this to apply manually through the official portal/email. Then capture proof above.</p>
-            <pre style={pre}>{selectedPack.body}</pre>
-            <div style={{ display: "flex", gap: 10, flexWrap: "wrap" }}>
-              <button onClick={() => copyText(selectedPack.body)} style={button}>Copy pack</button>
-              {selectedPack.mailto ? <a href={selectedPack.mailto} style={buttonLink}>Open email draft</a> : null}
-            </div>
-          </>
-        ) : (
-          <p style={muted}>Generate a pack from an opportunity.</p>
-        )}
+        <section style={panel}>
+          <p style={eyebrow}>APPLICATION PACK</p>
+          <h2>Ready-to-use pack</h2>
+
+          {selectedPack ? (
+            <>
+              <p style={muted}>Use this to apply manually through the official portal or email. Then capture proof in the queue.</p>
+              <pre style={pre}>{selectedPack.body}</pre>
+              <div style={buttonRow}>
+                <button onClick={() => copyText(selectedPack.body)} style={button}>Copy pack</button>
+                {selectedPack.mailto ? <a href={selectedPack.mailto} style={buttonLink}>Open email draft</a> : null}
+              </div>
+            </>
+          ) : (
+            <p style={muted}>Select an opportunity and click Build pack.</p>
+          )}
+
+          <div style={truthBox}>
+            <strong>Reality boundary</strong>
+            <span>One form cannot legally and reliably auto-submit everywhere today. Kingsmen must package your profile and documents, route you to real sources, and capture proof.</span>
+          </div>
+        </section>
       </section>
     </main>
   );
@@ -364,23 +527,35 @@ function TextArea({ label, value, onChange }: { label: string; value: string; on
 function Stat({ label, value }: { label: string; value: number }) {
   return (
     <article style={statCard}>
-      <strong style={{ fontSize: 30, color: "#ffd77a" }}>{value}</strong>
+      <strong>{value}</strong>
       <span>{label}</span>
     </article>
   );
 }
 
-const main = { minHeight: "100vh", background: "linear-gradient(135deg,#030303,#151008,#241907)", color: "#f8f0db", padding: 26, fontFamily: "Arial, sans-serif" };
-const hero = { border: "1px solid rgba(255,215,122,.28)", borderRadius: 28, background: "linear-gradient(135deg,rgba(215,173,73,.18),rgba(0,0,0,.35))", padding: 24, marginBottom: 18 };
+const main = { minHeight: "100vh", background: "radial-gradient(circle at top left,rgba(215,173,73,.2),transparent 28%),linear-gradient(135deg,#020202,#120d06,#261a07)", color: "#f8f0db", padding: 26, fontFamily: "Arial, sans-serif" };
+const topBar = { display: "grid", gridTemplateColumns: "1fr minmax(180px,260px)", gap: 18, alignItems: "stretch", border: "1px solid rgba(255,215,122,.28)", borderRadius: 30, background: "linear-gradient(135deg,rgba(215,173,73,.18),rgba(0,0,0,.38))", padding: 24, marginBottom: 18 };
+const readinessBox = { border: "1px solid rgba(255,215,122,.32)", borderRadius: 24, background: "rgba(0,0,0,.28)", padding: 18, display: "grid", placeContent: "center", textAlign: "center" as const, color: "#ffd77a" };
 const panel = { border: "1px solid rgba(255,215,122,.22)", borderRadius: 24, background: "rgba(255,255,255,.055)", padding: 22, marginBottom: 18 };
-const layout = { display: "grid", gridTemplateColumns: "repeat(auto-fit,minmax(330px,1fr))", gap: 18 };
+const layout = { display: "grid", gridTemplateColumns: "repeat(auto-fit,minmax(360px,1fr))", gap: 18 };
+const columns = { display: "grid", gridTemplateColumns: "minmax(360px,1fr) minmax(360px,1fr)", gap: 18 };
 const statsGrid = { display: "grid", gridTemplateColumns: "repeat(auto-fit,minmax(160px,1fr))", gap: 12, marginBottom: 18 };
+const routeGrid = { display: "grid", gridTemplateColumns: "repeat(auto-fit,minmax(220px,1fr))", gap: 12, marginBottom: 18 };
 const formGrid = { display: "grid", gridTemplateColumns: "repeat(auto-fit,minmax(220px,1fr))", gap: 12 };
+const searchRow = { display: "grid", gridTemplateColumns: "2fr 1fr", gap: 12, marginBottom: 14 };
 const sourceGrid = { display: "grid", gridTemplateColumns: "repeat(auto-fit,minmax(170px,1fr))", gap: 12 };
+const sectionHead = { display: "flex", justifyContent: "space-between", gap: 12, alignItems: "start", flexWrap: "wrap" as const };
+const routeCard = { textAlign: "left" as const, border: "1px solid rgba(255,215,122,.20)", borderRadius: 20, padding: 16, background: "rgba(0,0,0,.26)", color: "#f8f0db", display: "grid", gap: 8, cursor: "pointer" };
 const sourceCard = { border: "1px solid rgba(255,215,122,.22)", borderRadius: 18, padding: 14, background: "rgba(0,0,0,.28)", color: "#ffd77a", textDecoration: "none", display: "grid", gap: 5 };
 const appCard = { border: "1px solid rgba(255,215,122,.18)", borderRadius: 20, padding: 16, background: "rgba(0,0,0,.22)", display: "grid", gap: 14 };
 const miniCard = { border: "1px solid rgba(255,215,122,.16)", borderRadius: 14, padding: 12, background: "rgba(0,0,0,.22)", display: "grid", gap: 4 };
 const statCard = { border: "1px solid rgba(255,215,122,.18)", borderRadius: 18, padding: 16, background: "rgba(0,0,0,.24)", display: "grid", gap: 5 };
+const docGrid = { display: "grid", gap: 10, marginTop: 16 };
+const dropZone = { display: "grid", gap: 12, border: "1px dashed rgba(255,215,122,.32)", borderRadius: 18, padding: 16, background: "rgba(0,0,0,.18)" };
+const buttonRow = { display: "flex", gap: 10, flexWrap: "wrap" as const };
+const alertBox = { border: "1px solid rgba(255,215,122,.24)", borderRadius: 18, background: "rgba(215,173,73,.12)", color: "#ffd77a", padding: 14, marginBottom: 18, fontWeight: 800 };
+const truthBox = { border: "1px solid rgba(255,215,122,.18)", borderRadius: 18, padding: 14, marginTop: 16, background: "rgba(0,0,0,.25)", display: "grid", gap: 6, color: "#d8caa8" };
+const miniNote = { color: "#d8caa8", marginTop: 14, lineHeight: 1.5, borderLeft: "3px solid #d7ad49", paddingLeft: 12 };
 const eyebrow = { color: "#d7ad49", textTransform: "uppercase" as const, letterSpacing: ".16em", fontSize: 12 };
 const muted = { color: "#d8caa8", lineHeight: 1.6 };
 const labelStyle = { display: "block", color: "#d8caa8", marginBottom: 6, fontSize: 13 };
@@ -391,4 +566,4 @@ const buttonSecondary = { border: "1px solid rgba(255,215,122,.45)", borderRadiu
 const buttonDanger = { border: "1px solid rgba(255,120,120,.45)", borderRadius: 999, background: "transparent", color: "#ffb3b3", padding: "12px 16px", fontWeight: 800, cursor: "pointer", marginTop: 14 };
 const buttonLink = { ...button, display: "inline-block", textDecoration: "none" };
 const link = { color: "#ffd77a", fontWeight: 800 };
-const pre = { whiteSpace: "pre-wrap" as const, color: "#d8caa8", background: "rgba(0,0,0,.35)", padding: 14, borderRadius: 16, maxHeight: 420, overflow: "auto", border: "1px solid rgba(255,215,122,.16)" };
+const pre = { whiteSpace: "pre-wrap" as const, color: "#d8caa8", background: "rgba(0,0,0,.35)", padding: 14, borderRadius: 16, maxHeight: 500, overflow: "auto", border: "1px solid rgba(255,215,122,.16)" };
