@@ -20,3 +20,5 @@ export * from "./routes";
 export * as AirtableSync from "./airtable";
 
 export * as ControlPlane from "./control-plane";
+
+export * as Communications from "./communications";

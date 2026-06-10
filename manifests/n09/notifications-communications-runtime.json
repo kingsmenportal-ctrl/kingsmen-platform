@@ -1,0 +1,36 @@
+{
+  "phase": "N09",
+  "name": "Notifications / Communications Runtime",
+  "status": "foundation",
+  "laws": [
+    "Email is primary.",
+    "WhatsApp is urgent-only.",
+    "SMS is backup-only.",
+    "No bulk WhatsApp reminders.",
+    "Every message must have evidence.",
+    "Candidate-facing communication must be clear, truthful, and status-backed.",
+    "Notifications may inform but must not silently change application state.",
+    "Official submissions, refunds, fraud, privacy, and final decisions need human-approved backend boundaries.",
+    "Quiet hours and rate limits protect candidates and Oracle Lite capacity.",
+    "PostgreSQL remains truth; Airtable mirrors only."
+  ],
+  "channels": [
+    "EMAIL_PRIMARY",
+    "WHATSAPP_URGENT_ONLY",
+    "SMS_BACKUP_ONLY",
+    "PORTAL_INBOX"
+  ],
+  "runtime_surfaces": [
+    "Notification Outbox",
+    "Delivery Attempts",
+    "Inbound Message Intake",
+    "Candidate Portal Inbox",
+    "Template Registry",
+    "Communication Threads",
+    "Urgent Escalation Queue",
+    "Quiet Hours",
+    "Rate Limits",
+    "Message Evidence Ledger"
+  ],
+  "next": "N10 - Finance / PayFast Runtime"
+}
