@@ -1,0 +1,47 @@
+{
+  "purpose": "Non-secret runtime example for N18 public website front door.",
+  "identity": "private route command house",
+  "notCheapApplicationHelp": true,
+  "staticFirst": true,
+  "oracleLiteDeployable": true,
+  "freeDestinyMap": {
+    "priceLabel": "R0",
+    "managedApplications": 0,
+    "visibility": "all-sector preview only",
+    "sealed": [
+      "exact institution targets",
+      "exact company targets",
+      "application links",
+      "manual route plans",
+      "programme targets",
+      "bursary targets",
+      "accommodation targets"
+    ]
+  },
+  "pricing": {
+    "cvRevamp": "R49.99",
+    "cvVersions": 15,
+    "motivationLetters": 15,
+    "accommodationSupport": "R179.00",
+    "accommodationRoutes": 8,
+    "paidPackageAcc01Routes": 8
+  },
+  "leadHandoff": {
+    "to": ["N04 candidate core", "N05 document vault"],
+    "requiresConsent": true,
+    "smartFormDocumentAware": true
+  },
+  "communication": {
+    "primary": "email",
+    "whatsapp": "urgent-only"
+  },
+  "hardBoundaries": [
+    "not official portal",
+    "no guarantee",
+    "no fake claims",
+    "no fake testimonials",
+    "no sealed route leak",
+    "no fake CV details",
+    "no POPIA bypass"
+  ]
+}

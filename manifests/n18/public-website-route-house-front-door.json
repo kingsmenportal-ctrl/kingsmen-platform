@@ -1,0 +1,30 @@
+{
+  "phase": "N18",
+  "name": "Public Website / Route House Front Door",
+  "status": "foundation",
+  "purpose": "Create the public-facing Kingsmen front door: route-house positioning, sector universe preview, free Destiny Map lead capture, pricing boundaries, trust language, proof-safe claims, and candidate portal handoff.",
+  "side": "public_front_door",
+  "depends_on": ["N04", "N05", "N06", "N10", "N12", "N17"],
+  "locked_laws": [
+    "Kingsmen must be publicly presented as a private route house / private route command house.",
+    "Kingsmen must not be presented as a cheap application-help service.",
+    "The public site sells direction, protection, positioning, evidence, speed, route intelligence, document readiness, opportunity confidence, accommodation stability, CV/motivation strength, fallback, and managed execution.",
+    "All sectors remain visible to every user from the public website.",
+    "Packages control campaign weight, intensity, managed count, monitoring, priority, and execution support; packages must not control dignity or sector access.",
+    "Free Destiny Map is R0 with 0 managed applications and all-sector preview only.",
+    "Exact institution/company/portal/programme/bursary/accommodation targets, application links, and manual route plans remain sealed until package activation.",
+    "CV Revamp is R49.99 and includes 15 personalised CV versions plus 15 matching motivation letters.",
+    "Accommodation Support Package is R179.00 for 8 accommodation applications/routes standalone.",
+    "Every paid Kingsmen package includes up to 8 ACC-01 accommodation routes.",
+    "Never invent fake experience, qualifications, references, certificates, skills, testimonials, acceptance claims, deadlines, fees, official status, or official relationships.",
+    "Kingsmen is not an official university, TVET, SETA, NSFAS, CAO, employer, bursary provider, accommodation provider, payment provider, or government portal.",
+    "No guarantee of admission, funding, employment, accommodation, approval, or official response speed.",
+    "Public forms must be smart and document-aware: do not force users to type details already extracted from CVs and uploaded documents.",
+    "Candidate communication remains email-first; WhatsApp is urgent-only.",
+    "Public lead intake must hand off to N04 candidate core and N05 document vault without bypassing consent, POPIA, or profile confirmation.",
+    "Public website content must route through content guardrails before publishing.",
+    "No public page may expose sealed route intelligence reserved for activated packages.",
+    "The public website must be Oracle Lite deployable and static-first where possible."
+  ],
+  "next": "N19 - Candidate Mobile / Public-to-Portal Experience"
+}
