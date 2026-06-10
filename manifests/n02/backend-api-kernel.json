@@ -1,0 +1,39 @@
+{
+  "module": "N02",
+  "name": "Backend API Kernel / State Machine",
+  "status": "prepared",
+  "depends_on": ["N00", "N01"],
+  "purpose": "Create the backend command, state, policy, workflow result, adapter, read model, and observability foundation.",
+  "laws": [
+    "Backend controls all state transitions.",
+    "n8n workers may only return normalized results.",
+    "Each workflow result must be idempotent.",
+    "Every command must carry a correlation ID and idempotency key.",
+    "Dangerous actions require founder approval.",
+    "AI may suggest but must not govern hard blockers, payments, refunds, official status, fraud, privacy, or submissions.",
+    "Playwright is scout/probe only and must route blocked portals to MAP fallback.",
+    "No completion claim without validator and report."
+  ],
+  "states": [
+    "NEW",
+    "INTAKE_PENDING",
+    "EVALUATION_PENDING",
+    "DOCUMENT_PENDING",
+    "EXECUTION_PENDING",
+    "COMPLETED",
+    "FAILED"
+  ],
+  "same_state_workers": [
+    "W04",
+    "W05",
+    "W08",
+    "W09",
+    "W13",
+    "W14",
+    "W15",
+    "W16",
+    "W17",
+    "W24"
+  ],
+  "next": "N03 - PostgreSQL Truth Vault"
+}

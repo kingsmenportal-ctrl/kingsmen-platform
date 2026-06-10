@@ -4,6 +4,7 @@ param(
 )
 
 $ErrorActionPreference = "Stop"
+
 $Base = "C:\Kingsmen\kingsmen-platform"
 Set-Location $Base
 
@@ -17,4 +18,9 @@ if ($Mode -eq "Validate" -and $Phase -eq "N01") {
   exit $LASTEXITCODE
 }
 
-Write-Host "Available: -Phase N00 -Mode Validate | -Phase N01 -Mode Validate" -ForegroundColor Green
+if ($Mode -eq "Validate" -and $Phase -eq "N02") {
+  powershell -ExecutionPolicy Bypass -File "$Base\scripts\validators\Validate-N02.ps1"
+  exit $LASTEXITCODE
+}
+
+Write-Host "Available: -Phase N00 -Mode Validate | -Phase N01 -Mode Validate | -Phase N02 -Mode Validate" -ForegroundColor Green
