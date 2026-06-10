@@ -37,3 +37,4 @@ export * as FounderOps from "./founder-ops";
 
 export * as PublicWebsite from "./public-website";
 export * as CandidateMobile from "./candidate-mobile";
+export * as FinalAssembly from "./final-assembly";
