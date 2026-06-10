@@ -224,7 +224,13 @@ export default function ApplyNowClient() {
         dataUrl
       });
       setStore(json.store);
-      setMessage(`${documentType} uploaded: ${file.name}`);
+      setProfile({ ...blankProfile, ...(json.store?.profile ?? profile) });
+
+      if (json.smartProfile?.filledFields?.length) {
+        setMessage(`${documentType} uploaded. Kingsmen read the document and autofilled: ${json.smartProfile.filledFields.join(", ")}. Review before applying.`);
+      } else {
+        setMessage(`${documentType} uploaded. ${json.document?.extractionMessage ?? "No fields extracted."}`);
+      }
     } catch (error) {
       setMessage(error instanceof Error ? error.message : "Upload failed.");
     } finally {
@@ -397,6 +403,32 @@ export default function ApplyNowClient() {
             <input type="file" onChange={(e) => uploadDocument(e.target.files?.[0] ?? null)} style={input} />
           </div>
 
+          <button
+            onClick={async () => {
+              setLoading(true);
+              try {
+                const json = await api({ action: "smartProfileFromDocuments" });
+                setStore(json.store);
+                setProfile({ ...blankProfile, ...(json.store?.profile ?? profile) });
+                setMessage(json.smartProfile?.filledFields?.length
+                  ? `Smart autofill refreshed: ${json.smartProfile.filledFields.join(", ")}.`
+                  : "No extra profile fields found in uploaded documents.");
+              } catch (error) {
+                setMessage(error instanceof Error ? error.message : "Smart autofill failed.");
+              } finally {
+                setLoading(false);
+              }
+            }}
+            style={buttonSecondary}
+          >
+            Smart autofill from uploaded documents
+          </button>
+
+          <div style={truthBox}>
+            <strong>Smart form rule</strong>
+            <span>Upload CV/documents first. Kingsmen reads what it can and fills the form. You only review, correct missing fields, then apply.</span>
+          </div>
+
           <div style={docGrid}>
             {documents.length === 0 ? <p style={muted}>No documents uploaded yet. Upload CV and ID first.</p> : null}
             {documents.map((doc) => (
@@ -438,7 +470,7 @@ export default function ApplyNowClient() {
                 <div>
                   <p style={eyebrow}>{opp.category} / {opp.status}</p>
                   <h3>{opp.title}</h3>
-                  <p style={muted}>{opp.organisation} â€” {opp.location}</p>
+                  <p style={muted}>{opp.organisation} Ã¢â‚¬â€ {opp.location}</p>
                   <a href={opp.sourceUrl} target="_blank" rel="noreferrer" style={link}>Open official/source link</a>
                 </div>
 

@@ -1,0 +1,45 @@
+{
+  "schema": "kingsmen.personal-jobs-34-smart-cv-intake.validation.v1",
+  "status": "VALIDATED",
+  "passed": true,
+  "generatedAt": "2026-06-10T05:01:22.889Z",
+  "checks": [
+    {
+      "name": "exists:apps/web/src/app/api/personal-jobs/apply-now/route.ts",
+      "passed": true,
+      "detail": "apps/web/src/app/api/personal-jobs/apply-now/route.ts"
+    },
+    {
+      "name": "exists:apps/web/src/app/personal-job-desk/apply-now/ApplyNowClient.tsx",
+      "passed": true,
+      "detail": "apps/web/src/app/personal-job-desk/apply-now/ApplyNowClient.tsx"
+    },
+    {
+      "name": "server_extracts_docx_pdf_text",
+      "passed": true,
+      "detail": "API supports DOCX/PDF/text extraction"
+    },
+    {
+      "name": "server_extracts_profile_fields",
+      "passed": true,
+      "detail": "API extracts profile fields"
+    },
+    {
+      "name": "server_does_not_overwrite_existing_profile_values",
+      "passed": true,
+      "detail": "Smart extraction fills blanks without overwriting"
+    },
+    {
+      "name": "client_has_smart_autofill_button",
+      "passed": true,
+      "detail": "Client exposes smart autofill action"
+    },
+    {
+      "name": "client_refreshes_profile_after_upload",
+      "passed": true,
+      "detail": "Client updates visible form after extraction"
+    }
+  ],
+  "failed": [],
+  "nextAction": "Upload a CV/DOCX/PDF/TXT and review autofilled fields."
+}

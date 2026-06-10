@@ -1,0 +1,20 @@
+{
+  "module": "PERSONAL-JOBS-34",
+  "name": "Smart CV Intake / Autofill",
+  "status": "Built/Pending Local Use",
+  "paths": [
+    "apps/web/src/app/api/personal-jobs/apply-now/route.ts",
+    "apps/web/src/app/personal-job-desk/apply-now/ApplyNowClient.tsx",
+    "scripts/validators/validate-personal-jobs-34-smart-cv-intake.mjs",
+    "docs/personal-jobs/personal-jobs-34-smart-cv-intake.md"
+  ],
+  "capabilities": [
+    "document upload",
+    "docx text extraction",
+    "pdf text extraction",
+    "profile autofill",
+    "candidate review before application",
+    "no invented experience or qualifications"
+  ],
+  "truth_boundary": "Smart extraction suggests and fills blank fields only. Candidate review is required."
+}
