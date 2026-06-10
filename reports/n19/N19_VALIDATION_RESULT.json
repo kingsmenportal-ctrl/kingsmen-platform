@@ -1,0 +1,20 @@
+﻿{
+    "phase":  "N19",
+    "name":  "Candidate Mobile / Public-to-Portal Experience",
+    "validated_at":  "2026-06-10T15:08:47.7229563-07:00",
+    "passed":  true,
+    "failures":  [
+
+                 ],
+    "laws":  [
+                 "MOBILE_WEB_FIRST",
+                 "PUBLIC_TO_PORTAL_HANDOFF",
+                 "EMAIL_PRIMARY",
+                 "WHATSAPP_URGENT_ONLY",
+                 "SMS_BACKUP_ONLY",
+                 "NO_FAKE_STATUS",
+                 "SMART_FORM_DOES_NOT_RETYPE_DOCUMENT_DATA",
+                 "DEVICE_TRUST_REQUIRED",
+                 "POPIA_MINIMIZATION"
+             ]
+}

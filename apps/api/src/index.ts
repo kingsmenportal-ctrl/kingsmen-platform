@@ -34,3 +34,6 @@ export * as Opportunity from "./opportunity";
 export * as Orchestrator from "./orchestrator";
 
 export * as FounderOps from "./founder-ops";
+
+export * as PublicWebsite from "./public-website";
+export * as CandidateMobile from "./candidate-mobile";

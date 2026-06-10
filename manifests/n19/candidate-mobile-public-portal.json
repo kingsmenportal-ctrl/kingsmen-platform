@@ -1,0 +1,31 @@
+{
+  "phase": "N19",
+  "name": "Candidate Mobile / Public-to-Portal Experience",
+  "status": "repo-materialized",
+  "oracle_lite_realistic": true,
+  "laws": [
+    "MOBILE_WEB_FIRST",
+    "PUBLIC_TO_PORTAL_HANDOFF",
+    "EMAIL_PRIMARY",
+    "WHATSAPP_URGENT_ONLY",
+    "SMS_BACKUP_ONLY",
+    "NO_FAKE_STATUS",
+    "NO_FAKE_DEADLINES",
+    "NO_FAKE_ACCEPTANCE_CLAIMS",
+    "SMART_FORM_DOES_NOT_RETYPE_DOCUMENT_DATA",
+    "DEVICE_TRUST_REQUIRED",
+    "POPIA_MINIMIZATION",
+    "CANDIDATE_CAN_SEE_STATUS_BUT_NOT_OVERRIDE_STATE",
+    "FOUNDER_CONTROL_PLANE_REMAINS_OPERATOR_SIDE"
+  ],
+  "purpose": "Give candidates a mobile-first experience from the public website into the secure portal without creating a separate native app layer or weakening backend governance.",
+  "created_files": {
+    "db_migration": "db/migrations/0017_n19_candidate_mobile_public_portal.sql",
+    "db_seed": "db/seeds/n19_candidate_mobile_seed.sql",
+    "runtime_example": "runtime/candidate-mobile/candidate-mobile-runtime.example.json",
+    "api": "apps/api/src/candidate-mobile",
+    "web": "apps/web/src/candidate-mobile",
+    "validator": "scripts/validators/Validate-N19.ps1",
+    "report": "reports/n19/N19_CANDIDATE_MOBILE_PUBLIC_PORTAL_REPORT.md"
+  }
+}

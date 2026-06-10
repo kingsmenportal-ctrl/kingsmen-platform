@@ -1,17 +1,20 @@
 param(
-  [Parameter(Mandatory=$true)][string]$Phase,
-  [Parameter(Mandatory=$false)][ValidateSet("Validate")][string]$Mode = "Validate"
+  [string]$Phase = "N19",
+  [string]$Mode = "Validate"
 )
 
 $ErrorActionPreference = "Stop"
 $Base = "C:\Kingsmen\kingsmen-platform"
+if (!(Test-Path $Base)) { throw "Missing repo folder: $Base" }
 Set-Location $Base
 
-$NormalizedPhase = $Phase.ToUpperInvariant()
-$Validator = Join-Path $Base "scripts\validators\Validate-$NormalizedPhase.ps1"
+if ($Mode -ne "Validate") {
+  throw "KINGSMEN_CREATOR currently supports Validate mode for repo-materialized N-series phases."
+}
 
+$Validator = Join-Path $Base ("scripts\validators\Validate-" + $Phase + ".ps1")
 if (!(Test-Path $Validator)) {
-  throw "No validator found for phase $NormalizedPhase at $Validator"
+  throw "Missing validator for phase $Phase at $Validator"
 }
 
 powershell -ExecutionPolicy Bypass -File $Validator
