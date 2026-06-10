@@ -14,3 +14,4 @@ export * from "./evidence/evidence-ledger";
 export * from "./idempotency/idempotency";
 export * from "./heartbeat/worker-heartbeat";
 export * from "./candidate";
+export * from "./documents";

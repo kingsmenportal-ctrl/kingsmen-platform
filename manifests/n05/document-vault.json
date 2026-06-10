@@ -1,0 +1,30 @@
+{
+  "module": "N05",
+  "name": "Document Vault",
+  "status": "prepared",
+  "depends_on": ["N00", "N01", "N02", "N03", "N04"],
+  "purpose": "Create the document upload, request, analysis, verification, fraud-signal, storage monitoring, and candidate smart-intake extraction bridge foundation.",
+  "document_laws": [
+    "Candidate documents must never be treated as public files.",
+    "Every document must belong to a candidate.",
+    "Every document must have type, status, storage reference, and evidence reference.",
+    "Document extraction may prefill smart forms but may not silently become trusted profile data.",
+    "Candidate confirmation is required for extracted personal fields.",
+    "Operator approval is required for sensitive document or identity conflicts.",
+    "Fraud signals are alerts, not final guilt decisions.",
+    "AI may assist analysis but must not make final fraud, privacy, payment, refund, or official-submission decisions.",
+    "Storage must be monitored for size, checksum, lifecycle, and protection status.",
+    "Document requests must explain why each document is needed.",
+    "Manual fallback must include document readiness status."
+  ],
+  "sections": [
+    "N05.1 Document Vault Service Overview",
+    "N05.2 Document Vault Schema / RLS / Views / Seeds",
+    "N05.3 Backend Types / Signer Boundary / Storage Contract",
+    "N05.4 Upload Gateway / Document Requests / Candidate Smart Intake Bridge",
+    "N05.5 Verification / Fraud Signals / Operator Approval Boundary",
+    "N05.6 Candidate Portal Document UI / Checklist / Status",
+    "N05.7 Validator / Migration Runner / Closeout"
+  ],
+  "next": "N06 - Route Universe / Application Workbench"
+}

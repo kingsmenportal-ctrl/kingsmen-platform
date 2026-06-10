@@ -1,0 +1,28 @@
+﻿{
+    "module":  "N05",
+    "name":  "Document Vault",
+    "checked_at":  "2026-06-10T11:41:18",
+    "status":  "PASS",
+    "failures":  [
+
+                 ],
+    "required_files":  [
+                           "manifests\\n05\\document-vault.json",
+                           "db\\migrations\\0003_n05_document_vault.sql",
+                           "db\\seeds\\n05_runtime_config_seed.sql",
+                           "apps\\api\\src\\documents\\document-types.ts",
+                           "apps\\api\\src\\documents\\document-policy.ts",
+                           "apps\\api\\src\\documents\\document-readiness.ts",
+                           "apps\\api\\src\\documents\\document-request-engine.ts",
+                           "apps\\api\\src\\documents\\document-verification.ts",
+                           "apps\\api\\src\\documents\\document-fraud.ts",
+                           "apps\\api\\src\\documents\\document-extraction-bridge.ts",
+                           "apps\\api\\src\\documents\\document-storage.ts",
+                           "apps\\api\\src\\documents\\document-vault-repository.ts",
+                           "apps\\api\\src\\documents\\index.ts",
+                           "apps\\web\\src\\document-vault\\DocumentVaultPanel.tsx",
+                           "apps\\web\\src\\document-vault\\DocumentUploadChecklist.tsx",
+                           "scripts\\db\\Run-N05Migration.ps1",
+                           "reports\\n05\\N05_DOCUMENT_VAULT_REPORT.md"
+                       ]
+}
