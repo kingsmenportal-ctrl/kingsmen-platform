@@ -172,7 +172,7 @@ export default function JobFinderClient() {
           <span>Discovered leads</span>
         </article>
         <article>
-          <strong>{runResult?.searchQueries?.length ?? "â€”"}</strong>
+          <strong>{runResult?.searchQueries?.length ?? "Ã¢â‚¬â€"}</strong>
           <span>Auto-generated searches</span>
         </article>
         <article>
@@ -205,7 +205,7 @@ export default function JobFinderClient() {
         <h2>Discovered opportunities</h2>
         {topLeads.length === 0 ? (
           <p className="muted">
-            No leads loaded yet. Press â€œRun job finderâ€. The agent will use your one local profile
+            No leads loaded yet. Press Ã¢â‚¬Å“Run job finderÃ¢â‚¬Â. The agent will use your one local profile
             and the local source registry to search automatically.
           </p>
         ) : (
