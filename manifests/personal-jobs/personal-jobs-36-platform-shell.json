@@ -1,0 +1,23 @@
+{
+  "module": "PERSONAL-JOBS-36",
+  "name": "Personal Job Desk Platform Shell",
+  "status": "Built/Pending Local Use",
+  "paths": [
+    "apps/web/src/app/personal-job-desk/layout.tsx",
+    "apps/web/src/app/personal-job-desk/PersonalJobDeskShell.tsx",
+    "apps/web/src/app/personal-job-desk/page.tsx",
+    "scripts/validators/validate-personal-jobs-36-platform-shell.mjs",
+    "docs/personal-jobs/personal-jobs-36-platform-shell.md"
+  ],
+  "capabilities": [
+    "persistent menu",
+    "back button",
+    "home button",
+    "forward button",
+    "refresh button",
+    "menu drawer",
+    "connected module hub",
+    "quick actions"
+  ],
+  "truth_boundary": "This adds platform navigation and UX shell. It does not claim full production runtime."
+}

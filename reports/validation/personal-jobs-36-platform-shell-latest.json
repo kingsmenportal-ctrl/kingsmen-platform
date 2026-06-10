@@ -1,0 +1,50 @@
+{
+  "schema": "kingsmen.personal-jobs-36-platform-shell.validation.v1",
+  "status": "VALIDATED",
+  "passed": true,
+  "generatedAt": "2026-06-10T05:41:55.440Z",
+  "checks": [
+    {
+      "name": "exists:apps/web/src/app/personal-job-desk/layout.tsx",
+      "passed": true,
+      "detail": "apps/web/src/app/personal-job-desk/layout.tsx"
+    },
+    {
+      "name": "exists:apps/web/src/app/personal-job-desk/PersonalJobDeskShell.tsx",
+      "passed": true,
+      "detail": "apps/web/src/app/personal-job-desk/PersonalJobDeskShell.tsx"
+    },
+    {
+      "name": "exists:apps/web/src/app/personal-job-desk/page.tsx",
+      "passed": true,
+      "detail": "apps/web/src/app/personal-job-desk/page.tsx"
+    },
+    {
+      "name": "has_back_button",
+      "passed": true,
+      "detail": "Platform shell includes real back action"
+    },
+    {
+      "name": "has_home_button",
+      "passed": true,
+      "detail": "Platform shell includes home navigation"
+    },
+    {
+      "name": "has_menu_drawer",
+      "passed": true,
+      "detail": "Platform shell includes menu drawer"
+    },
+    {
+      "name": "has_module_links",
+      "passed": true,
+      "detail": "Shell links to Apply, Scout and Document Pack"
+    },
+    {
+      "name": "home_has_workflow",
+      "passed": true,
+      "detail": "Home explains the connected user workflow"
+    }
+  ],
+  "failed": [],
+  "nextAction": "Open /personal-job-desk and use the persistent menu/back/home controls."
+}
