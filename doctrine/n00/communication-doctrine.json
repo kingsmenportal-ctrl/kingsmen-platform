@@ -1,0 +1,12 @@
+{
+  "module": "N00",
+  "primary_channel": "email",
+  "rules": [
+    "Email is the primary communication nervous system.",
+    "WhatsApp is urgent-only, emergency-only, or ceremonial.",
+    "SMS is backup-only.",
+    "Candidate portal status must reduce unnecessary messages.",
+    "All important messages must be evidence-ledgered.",
+    "No bulk WhatsApp routine reminders."
+  ]
+}

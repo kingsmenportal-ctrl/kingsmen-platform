@@ -1,0 +1,22 @@
+{
+  "module": "N00",
+  "name": "Kingsmen Constitution / Doctrine Lock",
+  "status": "locked",
+  "laws": [
+    "Backend controls all flow through state machine.",
+    "n8n remains a stateless thin worker only.",
+    "PostgreSQL is truth.",
+    "Airtable is mirror only.",
+    "PowerShell Creator materializes files and validates proof.",
+    "Email is primary communication.",
+    "WhatsApp is urgent-only.",
+    "SMS is backup-only.",
+    "Playwright is scout/probe only; blocked portals move to MAP manual fallback.",
+    "All national sectors remain open from day one.",
+    "Packages control campaign weight, not dignity or sector access.",
+    "Oracle Lite discipline applies from the start.",
+    "No fake guarantees.",
+    "No proofless completion claims.",
+    "No destructive action without explicit founder confirmation."
+  ]
+}

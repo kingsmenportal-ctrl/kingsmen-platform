@@ -1,0 +1,45 @@
+{
+  "module": "N00",
+  "boot_blockers": [
+    {
+      "code": "NO_BACKEND_STATE_MACHINE",
+      "severity": "critical",
+      "rule": "Kingsmen may not boot without backend-controlled state transitions."
+    },
+    {
+      "code": "N8N_ORCHESTRATION_DETECTED",
+      "severity": "critical",
+      "rule": "n8n may not contain orchestration brain logic."
+    },
+    {
+      "code": "NO_POSTGRES_TRUTH_LAYER",
+      "severity": "critical",
+      "rule": "Kingsmen may not claim production truth without PostgreSQL truth vault."
+    },
+    {
+      "code": "NO_EVIDENCE_LEDGER",
+      "severity": "critical",
+      "rule": "Important actions must produce evidence."
+    },
+    {
+      "code": "NO_MANUAL_FALLBACK",
+      "severity": "critical",
+      "rule": "Blocked portals must generate MAP manual fallback."
+    },
+    {
+      "code": "UNVERIFIED_SOURCE_LINK",
+      "severity": "high",
+      "rule": "Kingsmen may not present route intelligence as verified without source confidence."
+    },
+    {
+      "code": "WHATSAPP_BULK_ROUTINE_USE",
+      "severity": "high",
+      "rule": "WhatsApp must remain urgent-only, not primary routine communication."
+    },
+    {
+      "code": "PROOFLESS_COMPLETION_CLAIM",
+      "severity": "critical",
+      "rule": "No module may be called complete without files, validator, report, and next action."
+    }
+  ]
+}

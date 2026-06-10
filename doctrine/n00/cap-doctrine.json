@@ -1,0 +1,13 @@
+{
+  "module": "N00",
+  "starting_cap": 500,
+  "meaning": "500 active candidates at the starting operational cap.",
+  "rules": [
+    "Cap limits volume only.",
+    "Cap does not remove sectors.",
+    "Cap does not reduce candidate dignity.",
+    "All national routes remain available from day one.",
+    "Priority queue controls execution pressure.",
+    "Manual fallback protects blocked routes."
+  ]
+}

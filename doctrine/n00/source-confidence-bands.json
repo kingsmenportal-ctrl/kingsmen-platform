@@ -1,0 +1,26 @@
+{
+  "module": "N00",
+  "bands": [
+    {
+      "band": "A",
+      "name": "Official source",
+      "meaning": "Institution, government, provider, or official portal source."
+    },
+    {
+      "band": "B",
+      "name": "Trusted secondary source",
+      "meaning": "Known job board, recognised listing platform, or reputable public reference."
+    },
+    {
+      "band": "C",
+      "name": "Unverified lead",
+      "meaning": "Requires manual verification before candidate-facing use."
+    },
+    {
+      "band": "D",
+      "name": "Risk source",
+      "meaning": "Possible scam, stale, misleading, or unverifiable."
+    }
+  ],
+  "law": "Candidate-facing links, deadlines, fees, routes, and application instructions require source confidence."
+}

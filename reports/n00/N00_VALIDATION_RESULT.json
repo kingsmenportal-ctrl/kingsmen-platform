@@ -1,0 +1,19 @@
+﻿{
+    "module":  "N00",
+    "name":  "Kingsmen Constitution / Doctrine Lock",
+    "checked_at":  "2026-06-10T10:55:17",
+    "required_files":  [
+                           "doctrine\\n00\\kingsmen-laws.json",
+                           "doctrine\\n00\\boot-blockers.json",
+                           "doctrine\\n00\\source-confidence-bands.json",
+                           "doctrine\\n00\\privacy-popia-law.json",
+                           "doctrine\\n00\\pricing-lock.json",
+                           "doctrine\\n00\\oracle-lite-rules.json",
+                           "doctrine\\n00\\communication-doctrine.json",
+                           "doctrine\\n00\\cap-doctrine.json"
+                       ],
+    "status":  "PASS",
+    "failures":  [
+
+                 ]
+}

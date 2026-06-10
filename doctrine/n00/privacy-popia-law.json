@@ -1,0 +1,13 @@
+{
+  "module": "N00",
+  "law": "Kingsmen must respect POPIA-style privacy discipline from day one.",
+  "rules": [
+    "Collect only necessary candidate data.",
+    "Protect ID numbers, documents, addresses, banking details, academic records, and application evidence.",
+    "Never expose candidate data in logs unnecessarily.",
+    "Never send sensitive candidate data through unsafe channels.",
+    "Human approval required for sensitive outbound communications.",
+    "Evidence ledgers must record actions without leaking unnecessary private data.",
+    "Candidate documents must be handled as protected records."
+  ]
+}

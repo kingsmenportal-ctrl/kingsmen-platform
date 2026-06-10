@@ -1,0 +1,16 @@
+{
+  "module": "N00",
+  "target": "Oracle Cloud Free Tier / Oracle Lite discipline",
+  "rules": [
+    "Start with 500 active candidates cap.",
+    "Prepare architecture for 1000-ready without pretending unlimited scale.",
+    "Use caps to limit volume, not capability.",
+    "Do not remove national routes because of free-tier limits.",
+    "Avoid useless layers.",
+    "Prefer repo-materializable, validator-provable modules.",
+    "Keep n8n thin.",
+    "Keep PostgreSQL as truth.",
+    "Keep Airtable as mirror.",
+    "Keep Playwright low-concurrency and fallback-aware."
+  ]
+}
