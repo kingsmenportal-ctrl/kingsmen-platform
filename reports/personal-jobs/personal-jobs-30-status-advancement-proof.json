@@ -1,0 +1,147 @@
+{
+  "schema": "kingsmen.personal-jobs-30-proof.v1",
+  "module": "PERSONAL-JOBS-30 - Status Advancement Writer / Audit Mirror",
+  "status": "PROVEN",
+  "passed": true,
+  "generated_at": "2026-06-10T03:40:02.962Z",
+  "input": "data/personal-job-desk/proof-review-board.local.json",
+  "output": "data/personal-job-desk/status-advancement-audit.local.json",
+  "summary": {
+    "totalRecords": 80,
+    "notReady": 80,
+    "readyToRecord": 0,
+    "recordedInAuditMirror": 0,
+    "rejected": 0,
+    "blocked": 0,
+    "closed": 0,
+    "canRecordAuditMirror": 0,
+    "proofBacked": 0,
+    "approved": 0,
+    "byRecordStatus": {
+      "NOT_READY": 80
+    },
+    "byTargetStatus": {
+      "REVIEW_REQUIRED": 80
+    },
+    "byPriorityBand": {
+      "P3_LOW": 80
+    }
+  },
+  "boundaries": {
+    "sendsApplications": false,
+    "sendsEmail": false,
+    "sendsWhatsApp": false,
+    "sendsSms": false,
+    "touchesPayments": false,
+    "contactsEmployers": false,
+    "bypassesLoginOtpCaptcha": false,
+    "autoMutatesApplicationTracker": false,
+    "autoMutatesProofBoard": false,
+    "productionReady": false,
+    "deployedToOracle": false
+  },
+  "checks": [
+    {
+      "name": "file:scripts/agents/personal-job-status-advancement.mjs",
+      "passed": true,
+      "detail": "scripts/agents/personal-job-status-advancement.mjs"
+    },
+    {
+      "name": "file:apps/web/src/app/api/personal-jobs/status-advancement/route.ts",
+      "passed": true,
+      "detail": "apps/web/src/app/api/personal-jobs/status-advancement/route.ts"
+    },
+    {
+      "name": "file:apps/web/src/app/personal-job-desk/status-advancement/page.tsx",
+      "passed": true,
+      "detail": "apps/web/src/app/personal-job-desk/status-advancement/page.tsx"
+    },
+    {
+      "name": "file:apps/web/src/app/personal-job-desk/status-advancement/StatusAdvancementClient.tsx",
+      "passed": true,
+      "detail": "apps/web/src/app/personal-job-desk/status-advancement/StatusAdvancementClient.tsx"
+    },
+    {
+      "name": "file:packages/contracts/src/personal-jobs-30-status-advancement.ts",
+      "passed": true,
+      "detail": "packages/contracts/src/personal-jobs-30-status-advancement.ts"
+    },
+    {
+      "name": "file:docs/personal-jobs/personal-jobs-30-status-advancement.md",
+      "passed": true,
+      "detail": "docs/personal-jobs/personal-jobs-30-status-advancement.md"
+    },
+    {
+      "name": "file:manifests/personal-jobs/personal-jobs-30-status-advancement.json",
+      "passed": true,
+      "detail": "manifests/personal-jobs/personal-jobs-30-status-advancement.json"
+    },
+    {
+      "name": "file:scripts/proof/prove-personal-jobs-30-status-advancement.mjs",
+      "passed": true,
+      "detail": "scripts/proof/prove-personal-jobs-30-status-advancement.mjs"
+    },
+    {
+      "name": "file:scripts/validators/validate-personal-jobs-30-status-advancement.mjs",
+      "passed": true,
+      "detail": "scripts/validators/validate-personal-jobs-30-status-advancement.mjs"
+    },
+    {
+      "name": "pj29_input_exists",
+      "passed": true,
+      "detail": "PJ29 proof-review-board.local.json must exist before PJ30."
+    },
+    {
+      "name": "agent_exit_zero",
+      "passed": true,
+      "detail": "{\n  \"status\": \"COMPLETED\",\n  \"pj29ReviewItemCount\": 80,\n  \"advancementRecordCount\": 80,\n  \"summary\": {\n    \"totalRecords\": 80,\n    \"notReady\": 80,\n    \"readyToRecord\": 0,\n    \"recordedInAuditMirror\": 0,\n    \"rejected\": 0,\n    \"blocked\": 0,\n    \"closed\": 0,\n    \"canRecordAuditMirror\": 0,\n    \"proofBacked\": 0,\n    \"approved\": 0,\n    \"byRecordStatus\": {\n      \"NOT_READY\": 80\n    },\n    \"byTargetStatus\": {\n      \"REVIEW_REQUIRED\": 80\n    },\n    \"byPriorityBand\": {\n      \"P3_LOW\": 80\n    }\n  }\n}\n"
+    },
+    {
+      "name": "output_written",
+      "passed": true,
+      "detail": "C:\\Kingsmen\\kingsmen-platform\\data\\personal-job-desk\\status-advancement-audit.local.json"
+    },
+    {
+      "name": "input_completed",
+      "passed": true,
+      "detail": "COMPLETED"
+    },
+    {
+      "name": "output_completed",
+      "passed": true,
+      "detail": "COMPLETED"
+    },
+    {
+      "name": "advancement_records_created",
+      "passed": true,
+      "detail": "80"
+    },
+    {
+      "name": "records_match_pj29_reviews",
+      "passed": true,
+      "detail": "80 vs 80"
+    },
+    {
+      "name": "all_records_have_required_sections",
+      "passed": true,
+      "detail": "0 records missing required sections"
+    },
+    {
+      "name": "no_unsafe_record_actions",
+      "passed": true,
+      "detail": "0 unsafe advancement records"
+    },
+    {
+      "name": "recording_requires_proof_approval_target",
+      "passed": true,
+      "detail": "0 bad recordable records"
+    },
+    {
+      "name": "global_safety_boundary_no_send_no_mutation",
+      "passed": true,
+      "detail": "{\"sendsApplications\":false,\"sendsEmail\":false,\"sendsWhatsApp\":false,\"sendsSms\":false,\"contactsEmployers\":false,\"touchesPayments\":false,\"bypassesLoginOtpCaptcha\":false,\"autoMutatesApplicationTracker\":false,\"autoMutatesProofBoard\":false,\"productionClaim\":false,\"deployedToOracle\":false}"
+    }
+  ],
+  "failed": [],
+  "next_action": "Commit PJ30, then test /personal-job-desk/status-advancement."
+}
