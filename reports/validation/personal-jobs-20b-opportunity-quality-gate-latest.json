@@ -1,0 +1,36 @@
+{
+  "schema": "kingsmen.validation-report.v1",
+  "module": "PERSONAL-JOBS-20B - Opportunity Quality Gate / Specific Vacancy Filter / Search Landing Demotion",
+  "status": "VALIDATED",
+  "passed": true,
+  "generated_at": "2026-06-10T01:21:15.821Z",
+  "proof": "reports/personal-jobs/personal-jobs-20b-opportunity-quality-gate-proof.json",
+  "output": "data/personal-job-desk/opportunity-quality-gate.local.json",
+  "summary": {
+    "total": 249,
+    "readyForApplyPackCount": 80,
+    "blockedFromApplyPackCount": 169,
+    "stateCounts": {
+      "LOW_PRIORITY_REJECT_CANDIDATE": 98,
+      "REVIEWABLE_SOURCE_PAGE": 44,
+      "MANUAL_SOURCE_REVIEW": 2,
+      "GOV_SOURCE_DOCUMENT": 25,
+      "READY_FOR_APPLY_PACK": 80
+    },
+    "gateTypeCounts": {
+      "FOREIGN_LOW_FIT": 98,
+      "SEARCH_LANDING_PAGE": 30,
+      "BLOCKED_OR_LOGIN_WALL": 2,
+      "GOV_SOURCE_DOCUMENT": 25,
+      "INSUFFICIENT_SPECIFICITY": 14,
+      "SPECIFIC_VACANCY": 80
+    }
+  },
+  "failed_checks": [],
+  "warnings": [
+    "PJ20B does not apply to jobs.",
+    "PJ20B does not contact employers.",
+    "PJ20B only filters the PJ20 queue before apply-pack generation."
+  ],
+  "next_action": "Commit PJ20B tracked files and test the local UI."
+}

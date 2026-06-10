@@ -1,0 +1,22 @@
+{
+  "schema": "kingsmen.personal-jobs-module-manifest.v1",
+  "module": "PERSONAL-JOBS-20B - Opportunity Quality Gate / Specific Vacancy Filter / Search Landing Demotion",
+  "status": "BUILT_PENDING_VALIDATION",
+  "route": "/personal-job-desk/opportunity-quality-gate",
+  "api_route": "/api/personal-jobs/opportunity-quality-gate/build",
+  "agent_script": "scripts/agents/personal-job-opportunity-quality-gate.mjs",
+  "input": "data/personal-job-desk/opportunity-command-queue.local.json",
+  "output": "data/personal-job-desk/opportunity-quality-gate.local.json",
+  "search_landing_pages_demoted": true,
+  "government_documents_demoted": true,
+  "login_register_pages_demoted": true,
+  "specific_vacancy_required_for_apply_pack": true,
+  "sends_applications": false,
+  "sends_email": false,
+  "sends_whatsapp": false,
+  "touches_payments": false,
+  "contacts_employers": false,
+  "bypasses_login_or_captcha": false,
+  "production_ready": false,
+  "deployed_to_oracle": false
+}

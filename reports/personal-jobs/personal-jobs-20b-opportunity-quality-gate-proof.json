@@ -1,0 +1,147 @@
+{
+  "schema": "kingsmen.personal-jobs-20b-proof.v1",
+  "module": "PERSONAL-JOBS-20B - Opportunity Quality Gate / Specific Vacancy Filter / Search Landing Demotion",
+  "status": "PROVEN",
+  "passed": true,
+  "generated_at": "2026-06-10T01:21:15.728Z",
+  "output": "data/personal-job-desk/opportunity-quality-gate.local.json",
+  "summary": {
+    "total": 249,
+    "readyForApplyPackCount": 80,
+    "blockedFromApplyPackCount": 169,
+    "stateCounts": {
+      "LOW_PRIORITY_REJECT_CANDIDATE": 98,
+      "REVIEWABLE_SOURCE_PAGE": 44,
+      "MANUAL_SOURCE_REVIEW": 2,
+      "GOV_SOURCE_DOCUMENT": 25,
+      "READY_FOR_APPLY_PACK": 80
+    },
+    "gateTypeCounts": {
+      "FOREIGN_LOW_FIT": 98,
+      "SEARCH_LANDING_PAGE": 30,
+      "BLOCKED_OR_LOGIN_WALL": 2,
+      "GOV_SOURCE_DOCUMENT": 25,
+      "INSUFFICIENT_SPECIFICITY": 14,
+      "SPECIFIC_VACANCY": 80
+    }
+  },
+  "boundaries": {
+    "sendsApplications": false,
+    "sendsEmail": false,
+    "sendsWhatsApp": false,
+    "touchesPayments": false,
+    "contactsEmployers": false,
+    "bypassesLoginOrCaptcha": false,
+    "productionReady": false,
+    "deployedToOracle": false
+  },
+  "checks": [
+    {
+      "name": "file:scripts/agents/personal-job-opportunity-quality-gate.mjs",
+      "passed": true,
+      "detail": "scripts/agents/personal-job-opportunity-quality-gate.mjs"
+    },
+    {
+      "name": "file:apps/web/src/app/api/personal-jobs/opportunity-quality-gate/build/route.ts",
+      "passed": true,
+      "detail": "apps/web/src/app/api/personal-jobs/opportunity-quality-gate/build/route.ts"
+    },
+    {
+      "name": "file:apps/web/src/app/personal-job-desk/opportunity-quality-gate/page.tsx",
+      "passed": true,
+      "detail": "apps/web/src/app/personal-job-desk/opportunity-quality-gate/page.tsx"
+    },
+    {
+      "name": "file:apps/web/src/app/personal-job-desk/opportunity-quality-gate/OpportunityQualityGateClient.tsx",
+      "passed": true,
+      "detail": "apps/web/src/app/personal-job-desk/opportunity-quality-gate/OpportunityQualityGateClient.tsx"
+    },
+    {
+      "name": "file:packages/contracts/src/personal-jobs-20b-opportunity-quality-gate.ts",
+      "passed": true,
+      "detail": "packages/contracts/src/personal-jobs-20b-opportunity-quality-gate.ts"
+    },
+    {
+      "name": "file:docs/personal-jobs/personal-jobs-20b-opportunity-quality-gate.md",
+      "passed": true,
+      "detail": "docs/personal-jobs/personal-jobs-20b-opportunity-quality-gate.md"
+    },
+    {
+      "name": "file:manifests/personal-jobs/personal-jobs-20b-opportunity-quality-gate.json",
+      "passed": true,
+      "detail": "manifests/personal-jobs/personal-jobs-20b-opportunity-quality-gate.json"
+    },
+    {
+      "name": "file:scripts/proof/prove-personal-jobs-20b-opportunity-quality-gate.mjs",
+      "passed": true,
+      "detail": "scripts/proof/prove-personal-jobs-20b-opportunity-quality-gate.mjs"
+    },
+    {
+      "name": "file:scripts/validators/validate-personal-jobs-20b-opportunity-quality-gate.mjs",
+      "passed": true,
+      "detail": "scripts/validators/validate-personal-jobs-20b-opportunity-quality-gate.mjs"
+    },
+    {
+      "name": "case:pnet_search_landing",
+      "passed": true,
+      "detail": "expected REVIEWABLE_SOURCE_PAGE, got REVIEWABLE_SOURCE_PAGE"
+    },
+    {
+      "name": "case:careers24_search_landing",
+      "passed": true,
+      "detail": "expected REVIEWABLE_SOURCE_PAGE, got REVIEWABLE_SOURCE_PAGE"
+    },
+    {
+      "name": "case:indeed_search_landing",
+      "passed": true,
+      "detail": "expected REVIEWABLE_SOURCE_PAGE, got REVIEWABLE_SOURCE_PAGE"
+    },
+    {
+      "name": "case:dpsa_z83",
+      "passed": true,
+      "detail": "expected GOV_SOURCE_DOCUMENT, got GOV_SOURCE_DOCUMENT"
+    },
+    {
+      "name": "case:login_wall",
+      "passed": true,
+      "detail": "expected MANUAL_SOURCE_REVIEW, got MANUAL_SOURCE_REVIEW"
+    },
+    {
+      "name": "case:foreign_low_fit",
+      "passed": true,
+      "detail": "expected LOW_PRIORITY_REJECT_CANDIDATE, got LOW_PRIORITY_REJECT_CANDIDATE"
+    },
+    {
+      "name": "case:specific_sa_vacancy",
+      "passed": true,
+      "detail": "expected READY_FOR_APPLY_PACK, got READY_FOR_APPLY_PACK"
+    },
+    {
+      "name": "agent_exit_zero",
+      "passed": true,
+      "detail": "{\n  \"status\": \"COMPLETED\",\n  \"total\": 249,\n  \"readyForApplyPackCount\": 80,\n  \"blockedFromApplyPackCount\": 169,\n  \"stateCounts\": {\n    \"LOW_PRIORITY_REJECT_CANDIDATE\": 98,\n    \"REVIEWABLE_SOURCE_PAGE\": 44,\n    \"MANUAL_SOURCE_REVIEW\": 2,\n    \"GOV_SOURCE_DOCUMENT\": 25,\n    \"READY_FOR_APPLY_PACK\": 80\n  },\n  \"gateTypeCounts\": {\n    \"FOREIGN_LOW_FIT\": 98,\n    \"SEARCH_LANDING_PAGE\": 30,\n    \"BLOCKED_OR_LOGIN_WALL\": 2,\n    \"GOV_SOURCE_DOCUMENT\": 25,\n    \"INSUFFICIENT_SPECIFICITY\": 14,\n    \"SPECIFIC_VACANCY\": 80\n  }\n}\n"
+    },
+    {
+      "name": "output_written",
+      "passed": true,
+      "detail": "C:\\Kingsmen\\kingsmen-platform\\data\\personal-job-desk\\opportunity-quality-gate.local.json"
+    },
+    {
+      "name": "output_completed",
+      "passed": true,
+      "detail": "COMPLETED"
+    },
+    {
+      "name": "output_has_leads",
+      "passed": true,
+      "detail": "249"
+    },
+    {
+      "name": "no_invalid_ready_for_apply_pack",
+      "passed": true,
+      "detail": "0 invalid ready leads"
+    }
+  ],
+  "failed": [],
+  "next_action": "Commit PJ20B, then test /personal-job-desk/opportunity-quality-gate."
+}
