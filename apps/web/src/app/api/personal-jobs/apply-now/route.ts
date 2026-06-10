@@ -1,25 +1,36 @@
-import { NextRequest, NextResponse } from "next/server";
 import fs from "node:fs";
 import path from "node:path";
-import crypto from "node:crypto";
+import { NextResponse } from "next/server";
 
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
 
+type CandidateProfile = {
+  fullName?: string;
+  idNumber?: string;
+  phone?: string;
+  email?: string;
+  location?: string;
+  highestEducation?: string;
+  workExperience?: string;
+  skills?: string;
+  notes?: string;
+};
+
 type Store = {
-  updatedAt?: string;
-  profile?: Record<string, string>;
-  documents?: any[];
-  opportunities?: any[];
-  applicationPacks?: any[];
-  proofLog?: any[];
-  smartExtraction?: any[];
+  schema: string;
+  updatedAt: string;
+  profile: CandidateProfile;
+  documents: any[];
+  opportunities: any[];
+  applicationPacks: any[];
+  proofLog: any[];
+  smartExtraction: any[];
 };
 
 function repoRoot() {
   const cwd = process.cwd();
-  if (fs.existsSync(path.join(cwd, "apps", "web"))) return cwd;
-  if (cwd.endsWith(path.join("apps", "web"))) return path.resolve(cwd, "../..");
+  if (cwd.replace(/\\/g, "/").endsWith("apps/web")) return path.resolve(cwd, "../..");
   return cwd;
 }
 
@@ -28,148 +39,100 @@ const DATA_DIR = path.join(ROOT, "data", "personal-job-desk");
 const UPLOAD_DIR = path.join(DATA_DIR, "uploads");
 const STORE_PATH = path.join(DATA_DIR, "apply-now.local.json");
 
-const blankProfile = {
-  fullName: "",
-  idOrPassport: "",
-  phone: "",
-  email: "",
-  location: "Johannesburg",
-  highestEducation: "",
-  workExperience: "",
-  skills: "",
-  targetRoutes: "Jobs, Learnerships, Internships, Funding",
-  notes: ""
-};
-
-function ensureDirs() {
-  fs.mkdirSync(DATA_DIR, { recursive: true });
-  fs.mkdirSync(UPLOAD_DIR, { recursive: true });
-}
-
-function readStore(): Store {
-  ensureDirs();
-
-  if (!fs.existsSync(STORE_PATH)) {
-    return {
-      updatedAt: new Date().toISOString(),
-      profile: { ...blankProfile },
-      documents: [],
-      opportunities: [],
-      applicationPacks: [],
-      proofLog: [],
-      smartExtraction: []
-    };
-  }
-
-  const store = JSON.parse(fs.readFileSync(STORE_PATH, "utf8"));
+function defaultStore(): Store {
   return {
-    updatedAt: store.updatedAt || new Date().toISOString(),
-    profile: { ...blankProfile, ...(store.profile || {}) },
-    documents: Array.isArray(store.documents) ? store.documents : [],
-    opportunities: Array.isArray(store.opportunities) ? store.opportunities : [],
-    applicationPacks: Array.isArray(store.applicationPacks) ? store.applicationPacks : [],
-    proofLog: Array.isArray(store.proofLog) ? store.proofLog : [],
-    smartExtraction: Array.isArray(store.smartExtraction) ? store.smartExtraction : []
+    schema: "kingsmen.personal-job-desk.smart-apply.v2",
+    updatedAt: new Date().toISOString(),
+    profile: {
+      location: "Johannesburg"
+    },
+    documents: [],
+    opportunities: [],
+    applicationPacks: [],
+    proofLog: [],
+    smartExtraction: []
   };
 }
 
+function readStore(): Store {
+  try {
+    const parsed = JSON.parse(fs.readFileSync(STORE_PATH, "utf8").replace(/^\uFEFF/, ""));
+    return {
+      ...defaultStore(),
+      ...parsed,
+      profile: parsed.profile || {},
+      documents: Array.isArray(parsed.documents) ? parsed.documents : [],
+      opportunities: Array.isArray(parsed.opportunities) ? parsed.opportunities : [],
+      applicationPacks: Array.isArray(parsed.applicationPacks) ? parsed.applicationPacks : [],
+      proofLog: Array.isArray(parsed.proofLog) ? parsed.proofLog : [],
+      smartExtraction: Array.isArray(parsed.smartExtraction) ? parsed.smartExtraction : []
+    };
+  } catch {
+    return defaultStore();
+  }
+}
+
 function writeStore(store: Store) {
-  ensureDirs();
-  const next = { ...store, updatedAt: new Date().toISOString() };
-  fs.writeFileSync(STORE_PATH, JSON.stringify(next, null, 2) + "\n", "utf8");
-  return next;
+  fs.mkdirSync(DATA_DIR, { recursive: true });
+  store.updatedAt = new Date().toISOString();
+  fs.writeFileSync(STORE_PATH, `${JSON.stringify(store, null, 2)}\n`, "utf8");
 }
 
-function id(prefix: string) {
-  return `${prefix}_${crypto.randomBytes(8).toString("hex")}`;
-}
-
-function safeName(name: string) {
-  return String(name || "document")
-    .replace(/[^\w.\-]+/g, "_")
-    .replace(/_+/g, "_")
-    .slice(0, 120);
-}
-
-function dataUrlToBuffer(dataUrl: string) {
-  const match = String(dataUrl || "").match(/^data:([^;]+);base64,(.+)$/);
-  if (!match) throw new Error("Invalid upload payload.");
+function decodeDataUrl(dataUrl: string) {
+  const match = dataUrl.match(/^data:([^;]+);base64,(.+)$/);
+  if (!match) throw new Error("Invalid file upload format.");
   return {
     mimeType: match[1],
     buffer: Buffer.from(match[2], "base64")
   };
 }
 
-function cleanText(text: string) {
-  return String(text || "")
-    .replace(/\r/g, "\n")
-    .replace(/[ \t]+/g, " ")
-    .replace(/\n{3,}/g, "\n\n")
-    .trim();
-}
+async function extractDocumentText(fileName: string, mimeType: string, buffer: Buffer) {
+  const lower = fileName.toLowerCase();
 
-async function extractText(buffer: Buffer, fileName: string, mimeType: string) {
-  const ext = path.extname(fileName).toLowerCase();
-
-  if ([".txt", ".md", ".csv", ".json"].includes(ext) || mimeType.startsWith("text/")) {
-    return cleanText(buffer.toString("utf8"));
+  if (mimeType.includes("text") || lower.endsWith(".txt")) {
+    return buffer.toString("utf8");
   }
 
-  if (ext === ".docx" || mimeType.includes("wordprocessingml")) {
-    const mammoth = await import("mammoth");
-    const result = await mammoth.extractRawText({ buffer });
-    return cleanText(result.value || "");
+  if (lower.endsWith(".docx") || mimeType.includes("wordprocessingml")) {
+    try {
+      const mammoth = await import("mammoth");
+      const result = await mammoth.extractRawText({ buffer });
+      return result.value || "";
+    } catch (error) {
+      return `DOCX extraction failed: ${error instanceof Error ? error.message : "unknown error"}`;
+    }
   }
 
-  if (ext === ".pdf" || mimeType === "application/pdf") {
-    const imported = await import("pdf-parse");
-    const pdfParse = (imported as any).default || imported;
-    const result = await pdfParse(buffer);
-    return cleanText(result.text || "");
+  if (lower.endsWith(".pdf") || mimeType.includes("pdf")) {
+    try {
+      const pdfParse = await import("pdf-parse");
+      const parser = (pdfParse as any).default || pdfParse;
+      const result = await parser(buffer);
+      return result.text || "";
+    } catch (error) {
+      return `PDF extraction failed: ${error instanceof Error ? error.message : "unknown error"}`;
+    }
   }
 
   return "";
 }
 
-function pickSection(lines: string[], starts: string[], stops: string[]) {
-  const startIndex = lines.findIndex((line) => starts.some((s) => line.toLowerCase().includes(s)));
-  if (startIndex < 0) return "";
-
-  const collected: string[] = [];
-
-  for (let i = startIndex + 1; i < lines.length; i++) {
-    const line = lines[i].trim();
-    const lower = line.toLowerCase();
-
-    if (stops.some((s) => lower.includes(s)) && collected.length > 0) break;
-    if (line) collected.push(line);
-    if (collected.length >= 10) break;
-  }
-
-  return collected.join("; ");
+function cleanLine(line: string) {
+  return line.replace(/\s+/g, " ").trim();
 }
 
-function extractProfile(text: string, existingProfile: Record<string, string> = {}) {
-  const cleaned = cleanText(text);
-  const lines = cleaned
-    .split("\n")
-    .map((x) => x.trim())
-    .filter(Boolean)
-    .slice(0, 220);
+function findFirst(text: string, patterns: RegExp[]) {
+  for (const pattern of patterns) {
+    const match = text.match(pattern);
+    if (match?.[1]) return cleanLine(match[1]);
+    if (match?.[0]) return cleanLine(match[0]);
+  }
+  return "";
+}
 
-  const joined = lines.join("\n");
-
-  const email = joined.match(/[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}/i)?.[0] || "";
-
-  const phone =
-    joined.match(/(?:\+27|27|0)[\s\-]?(?:\d[\s\-]?){8,10}/)?.[0]?.replace(/\s+/g, " ").trim() || "";
-
-  const idNumber =
-    joined.match(/\b\d{13}\b/)?.[0] ||
-    joined.match(/\b[A-Z0-9]{6,12}\b(?=.*passport)/i)?.[0] ||
-    "";
-
-  const badNameWords = [
+function extractName(lines: string[]) {
+  const banned = [
     "curriculum vitae",
     "resume",
     "cv",
@@ -178,332 +141,446 @@ function extractProfile(text: string, existingProfile: Record<string, string> = 
     "contact",
     "email",
     "phone",
-    "address"
+    "address",
+    "experience",
+    "education",
+    "skills"
   ];
 
-  let fullName = "";
-  const explicitName = joined.match(/(?:full name|name)\s*[:\-]\s*([A-Z][A-Za-z .'-]{3,80})/i)?.[1]?.trim() || "";
-
-  if (explicitName) {
-    fullName = explicitName;
-  } else {
-    for (const line of lines.slice(0, 20)) {
+  const candidate = lines
+    .map(cleanLine)
+    .filter(Boolean)
+    .find((line) => {
       const lower = line.toLowerCase();
-      const wordCount = line.split(/\s+/).length;
-      const looksName =
-        wordCount >= 2 &&
-        wordCount <= 5 &&
-        /^[A-Za-z .'-]+$/.test(line) &&
-        !badNameWords.some((bad) => lower.includes(bad)) &&
-        !line.includes("@");
+      if (line.length < 5 || line.length > 70) return false;
+      if (/\d/.test(line)) return false;
+      if (banned.some((word) => lower.includes(word))) return false;
+      const parts = line.split(" ").filter(Boolean);
+      return parts.length >= 2 && parts.length <= 5;
+    });
 
-      if (looksName) {
-        fullName = line;
-        break;
-      }
-    }
-  }
+  return candidate || "";
+}
 
-  const locationCandidates = [
-    "Johannesburg", "Soweto", "Pretoria", "Midrand", "Sandton", "Roodepoort",
-    "Germiston", "Boksburg", "Kempton Park", "Tembisa", "Centurion",
-    "Durban", "Cape Town", "Polokwane", "Bloemfontein", "Nelspruit",
-    "Mbombela", "Rustenburg", "Vereeniging", "Benoni"
+function extractSkills(text: string) {
+  const known = [
+    "customer service",
+    "communication",
+    "computer literacy",
+    "microsoft word",
+    "microsoft excel",
+    "excel",
+    "word",
+    "powerpoint",
+    "data entry",
+    "admin",
+    "administration",
+    "retail",
+    "cashier",
+    "sales",
+    "call centre",
+    "teamwork",
+    "problem solving",
+    "time management",
+    "driver",
+    "stock taking",
+    "warehouse",
+    "cleaning",
+    "security",
+    "hospitality",
+    "typing",
+    "filing",
+    "reception",
+    "telephone etiquette"
   ];
 
-  let location = "";
-  for (const candidate of locationCandidates) {
-    if (new RegExp(`\\b${candidate}\\b`, "i").test(joined)) {
-      location = candidate;
-      break;
-    }
+  const lower = text.toLowerCase();
+  const found = known.filter((skill) => lower.includes(skill));
+  return Array.from(new Set(found)).slice(0, 18).join(", ");
+}
+
+function extractEducation(text: string) {
+  const lower = text.toLowerCase();
+
+  if (lower.includes("degree") || lower.includes("bachelor")) return "Degree / Bachelor level mentioned in CV";
+  if (lower.includes("diploma")) return "Diploma mentioned in CV";
+  if (lower.includes("higher certificate")) return "Higher Certificate mentioned in CV";
+  if (lower.includes("certificate")) return "Certificate mentioned in CV";
+  if (lower.includes("grade 12") || lower.includes("matric") || lower.includes("national senior certificate")) return "Grade 12 / Matric mentioned in CV";
+  if (lower.includes("grade 11")) return "Grade 11 mentioned in CV";
+  if (lower.includes("grade 10")) return "Grade 10 mentioned in CV";
+
+  return "";
+}
+
+function extractLocation(text: string) {
+  const places = [
+    "Johannesburg",
+    "Soweto",
+    "Pretoria",
+    "Tshwane",
+    "Ekurhuleni",
+    "Midrand",
+    "Sandton",
+    "Randburg",
+    "Roodepoort",
+    "Germiston",
+    "Boksburg",
+    "Kempton Park",
+    "Durban",
+    "Cape Town",
+    "Polokwane",
+    "Mbombela",
+    "Bloemfontein",
+    "Gqeberha",
+    "East London",
+    "Rustenburg",
+    "Mafikeng",
+    "Kimberley",
+    "Pietermaritzburg"
+  ];
+
+  const lower = text.toLowerCase();
+  const place = places.find((item) => lower.includes(item.toLowerCase()));
+  return place || "";
+}
+
+function extractExperience(text: string) {
+  const lines = text.split(/\r?\n/).map(cleanLine).filter(Boolean);
+  const startIndex = lines.findIndex((line) => {
+    const lower = line.toLowerCase();
+    return lower.includes("experience") || lower.includes("employment") || lower.includes("work history");
+  });
+
+  if (startIndex >= 0) {
+    return lines.slice(startIndex, startIndex + 8).join("\n");
   }
 
-  const educationLine =
-    lines.find((line) =>
-      /(matric|grade 12|nqf|certificate|diploma|degree|bachelor|national senior certificate|higher certificate)/i.test(line)
-    ) || "";
+  const jobWords = ["cashier", "general worker", "admin", "assistant", "sales", "retail", "driver", "cleaner", "security", "call centre"];
+  const matched = lines.filter((line) => jobWords.some((word) => line.toLowerCase().includes(word))).slice(0, 8);
 
-  const skills = pickSection(
-    lines,
-    ["skills", "key skills", "competencies", "abilities"],
-    ["experience", "employment", "education", "qualification", "reference"]
-  );
+  return matched.join("\n");
+}
 
-  const workExperience = pickSection(
-    lines,
-    ["work experience", "employment history", "experience", "previous employment"],
-    ["education", "qualification", "skills", "reference"]
-  );
+function extractProfileFromText(text: string): CandidateProfile {
+  const lines = text.split(/\r?\n/).map(cleanLine).filter(Boolean);
 
-  const highestEducation = pickSection(
-    lines,
-    ["education", "qualification", "academic"],
-    ["experience", "employment", "skills", "reference"]
-  ) || educationLine;
+  const email = findFirst(text, [
+    /[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}/i
+  ]);
 
-  const suggestions: Record<string, string> = {
-    fullName,
-    idOrPassport: idNumber,
+  const phone = findFirst(text, [
+    /(?:\+27|0)[\s-]?[6-8][0-9][\s-]?[0-9]{3}[\s-]?[0-9]{4}/,
+    /(?:\+27|0)[0-9\s-]{8,14}/
+  ]);
+
+  const idNumber = findFirst(text, [
+    /\b[0-9]{13}\b/
+  ]);
+
+  return {
+    fullName: extractName(lines),
+    idNumber,
     phone,
     email,
-    location,
-    highestEducation,
-    workExperience,
-    skills
-  };
-
-  const merged: Record<string, string> = { ...blankProfile, ...existingProfile };
-
-  for (const [key, value] of Object.entries(suggestions)) {
-    if (value && !String(merged[key] || "").trim()) merged[key] = value;
-  }
-
-  if (!merged.targetRoutes) merged.targetRoutes = "Jobs, Learnerships, Internships, Funding";
-
-  const filled = Object.entries(suggestions).filter(([, value]) => Boolean(value)).map(([key]) => key);
-
-  return {
-    profile: merged,
-    suggestions,
-    confidence: Math.min(95, 25 + filled.length * 10),
-    filledFields: filled,
-    extractedTextPreview: cleaned.slice(0, 2500)
+    location: extractLocation(text),
+    highestEducation: extractEducation(text),
+    workExperience: extractExperience(text),
+    skills: extractSkills(text)
   };
 }
 
-function opportunityStatus(opp: any) {
-  if (opp.status) return opp.status;
-  return "READY_TO_PREPARE";
-}
+function mergeSmartProfile(existing: CandidateProfile, extracted: CandidateProfile) {
+  const merged: CandidateProfile = { ...existing };
 
-function buildPack(profile: any, opportunity: any, documents: any[]) {
-  const cv = documents.find((doc) => doc.documentType === "CV");
-  const idDoc = documents.find((doc) => doc.documentType === "ID_COPY");
-
-  const lines = [
-    `APPLICATION PACK`,
-    ``,
-    `Candidate: ${profile.fullName || "[review name]"}`,
-    `Phone: ${profile.phone || "[review phone]"}`,
-    `Email: ${profile.email || "[review email]"}`,
-    `Location: ${profile.location || "[review location]"}`,
-    ``,
-    `Opportunity: ${opportunity.title || "[opportunity title]"}`,
-    `Organisation: ${opportunity.organisation || "[organisation]"}`,
-    `Category: ${opportunity.category || "JOB"}`,
-    `Application method: ${opportunity.applicationMethod || "PORTAL"}`,
-    `Official/source link: ${opportunity.sourceUrl || "[source link]"}`,
-    `Closing date: ${opportunity.closingDate || "[not captured]"}`,
-    ``,
-    `Profile summary:`,
-    `${profile.highestEducation ? `Education: ${profile.highestEducation}` : "Education: [review education]"}`,
-    `${profile.skills ? `Skills: ${profile.skills}` : "Skills: [review skills]"}`,
-    `${profile.workExperience ? `Experience: ${profile.workExperience}` : "Experience: [review experience]"}`,
-    ``,
-    `Documents ready:`,
-    `CV: ${cv ? cv.originalName : "Missing"}`,
-    `ID copy: ${idDoc ? idDoc.originalName : "Missing / upload if required"}`,
-    ``,
-    `Source requirements copied by candidate:`,
-    `${opportunity.notes || "[copy requirements from official source]"}`,
-    ``,
-    `Reality rule: apply only through the official source or official email. Do not invent qualifications, experience, references, certificates or outcomes.`
-  ];
-
-  const body = lines.join("\n");
-
-  let mailto = "";
-  if (opportunity.emailTo) {
-    const subject = encodeURIComponent(`Application: ${opportunity.title || "Opportunity"}`);
-    const text = encodeURIComponent(body);
-    mailto = `mailto:${opportunity.emailTo}?subject=${subject}&body=${text}`;
+  for (const key of Object.keys(extracted) as Array<keyof CandidateProfile>) {
+    const value = extracted[key];
+    if (value && (!merged[key] || String(merged[key]).trim().length < 2)) {
+      merged[key] = value;
+    }
   }
 
-  return {
-    packId: id("pack"),
-    opportunityId: opportunity.opportunityId,
-    createdAt: new Date().toISOString(),
-    title: opportunity.title,
-    body,
-    mailto
-  };
+  return merged;
+}
+
+function scoreReadiness(store: Store) {
+  const profile = store.profile || {};
+  const hasProfile = Boolean(profile.fullName && profile.phone && profile.email);
+  const hasCv = store.documents.some((doc) => String(doc.type).toUpperCase() === "CV");
+  const hasId = store.documents.some((doc) => String(doc.type).toUpperCase() === "ID");
+  const hasOpportunity = store.opportunities.length > 0;
+  const hasPack = store.applicationPacks.length > 0;
+  const hasProof = store.proofLog.length > 0;
+
+  const checks = [hasProfile, hasCv, hasId, hasOpportunity, hasPack, hasProof];
+  return Math.round((checks.filter(Boolean).length / checks.length) * 100);
+}
+
+function buildPack(profile: CandidateProfile, opportunity: any) {
+  const name = profile.fullName || "[Candidate name]";
+  const phone = profile.phone || "[Phone]";
+  const email = profile.email || "[Email]";
+  const location = profile.location || "[Location]";
+  const education = profile.highestEducation || "[Highest education]";
+  const skills = profile.skills || "[Skills]";
+  const experience = profile.workExperience || "[Work experience]";
+
+  return [
+    `Application Pack: ${opportunity.title}`,
+    ``,
+    `Candidate: ${name}`,
+    `Phone: ${phone}`,
+    `Email: ${email}`,
+    `Location: ${location}`,
+    `Education: ${education}`,
+    ``,
+    `Target opportunity`,
+    `- Title: ${opportunity.title}`,
+    `- Organisation: ${opportunity.organisation}`,
+    `- Category: ${opportunity.category}`,
+    `- Method: ${opportunity.applicationMethod}`,
+    `- Source: ${opportunity.sourceUrl}`,
+    ``,
+    `Candidate strengths`,
+    skills,
+    ``,
+    `Experience summary`,
+    experience,
+    ``,
+    `Truth and safety`,
+    `This pack reuses candidate-provided information and uploaded documents. It does not invent experience, qualifications, references, certificates, identity details, or submission proof.`,
+    ``,
+    `Suggested short message`,
+    `Good day,`,
+    ``,
+    `I would like to apply for the ${opportunity.title} opportunity at ${opportunity.organisation}. I have attached my CV and supporting documents where required. I am available to provide any additional information needed.`,
+    ``,
+    `Kind regards,`,
+    `${name}`,
+    `${phone}`,
+    `${email}`
+  ].join("\n");
 }
 
 export async function GET() {
-  return NextResponse.json(readStore());
+  const store = readStore();
+  return NextResponse.json({
+    ...store,
+    readiness: scoreReadiness(store)
+  });
 }
 
-export async function POST(req: NextRequest) {
+export async function POST(request: Request) {
   try {
-    const body = await req.json();
-    const action = body.action;
+    const body = await request.json().catch(() => ({}));
+    const action = String(body.action || "");
     const store = readStore();
 
     if (action === "saveProfile") {
-      store.profile = { ...blankProfile, ...(body.profile || {}) };
-      return NextResponse.json({ ok: true, store: writeStore(store) });
-    }
-
-    if (action === "uploadDocument") {
-      const { mimeType, buffer } = dataUrlToBuffer(body.dataUrl);
-      const documentId = id("doc");
-      const originalName = safeName(body.fileName || "document");
-      const documentType = body.documentType || "OTHER";
-      const fileName = `${documentId}_${originalName}`;
-      const localPath = path.join(UPLOAD_DIR, fileName);
-
-      fs.writeFileSync(localPath, buffer);
-
-      let extractedText = "";
-      let extractionStatus = "not_extracted";
-      let extractionMessage = "Document stored. Text extraction was not available for this file type.";
-      let smartProfile = null;
-
-      try {
-        extractedText = await extractText(buffer, originalName, mimeType);
-
-        if (extractedText) {
-          extractionStatus = "extracted";
-          extractionMessage = "Document text extracted.";
-          smartProfile = extractProfile(extractedText, store.profile || {});
-          store.profile = smartProfile.profile;
-          store.smartExtraction = [
-            ...(store.smartExtraction || []),
-            {
-              extractionId: id("extract"),
-              documentId,
-              documentType,
-              originalName,
-              createdAt: new Date().toISOString(),
-              confidence: smartProfile.confidence,
-              filledFields: smartProfile.filledFields,
-              suggestions: smartProfile.suggestions,
-              textPreview: smartProfile.extractedTextPreview
-            }
-          ];
-        }
-      } catch (error) {
-        extractionStatus = "failed";
-        extractionMessage = error instanceof Error ? error.message : "Extraction failed.";
-      }
-
-      const document = {
-        documentId,
-        documentType,
-        originalName,
-        mimeType,
-        bytes: buffer.length,
-        localPath: path.relative(ROOT, localPath).replace(/\\/g, "/"),
-        uploadedAt: new Date().toISOString(),
-        extractionStatus,
-        extractionMessage,
-        extractedFields: smartProfile?.filledFields || []
+      store.profile = {
+        ...store.profile,
+        ...(body.profile || {})
       };
 
-      store.documents = [document, ...(store.documents || [])];
-
+      writeStore(store);
       return NextResponse.json({
-        ok: true,
-        document,
-        smartProfile,
-        store: writeStore(store)
+        status: "SAVED",
+        store,
+        readiness: scoreReadiness(store)
       });
     }
 
-    if (action === "smartProfileFromDocuments") {
-      const documents = store.documents || [];
-      let combined = "";
+    if (action === "uploadDocument") {
+      const fileName = String(body.fileName || "").trim();
+      const type = String(body.documentType || "CV").trim().toUpperCase();
+      const dataUrl = String(body.dataUrl || "");
 
-      for (const doc of documents) {
-        const filePath = path.join(ROOT, doc.localPath || "");
-        if (fs.existsSync(filePath)) {
-          try {
-            const buffer = fs.readFileSync(filePath);
-            combined += "\n\n" + await extractText(buffer, doc.originalName || "", doc.mimeType || "");
-          } catch {
-            // keep going
-          }
-        }
+      if (!fileName || !dataUrl) {
+        return NextResponse.json({ status: "FAILED", error: "Missing file." }, { status: 400 });
       }
 
-      const smartProfile = extractProfile(combined, store.profile || {});
-      store.profile = smartProfile.profile;
-      store.smartExtraction = [
-        ...(store.smartExtraction || []),
-        {
-          extractionId: id("extract"),
-          documentId: "ALL_DOCUMENTS",
-          documentType: "SMART_PROFILE_REFRESH",
-          originalName: "All uploaded documents",
-          createdAt: new Date().toISOString(),
-          confidence: smartProfile.confidence,
-          filledFields: smartProfile.filledFields,
-          suggestions: smartProfile.suggestions,
-          textPreview: smartProfile.extractedTextPreview
-        }
-      ];
+      fs.mkdirSync(UPLOAD_DIR, { recursive: true });
 
-      return NextResponse.json({ ok: true, smartProfile, store: writeStore(store) });
-    }
+      const decoded = decodeDataUrl(dataUrl);
+      const safeName = fileName.replace(/[^a-zA-Z0-9._-]/g, "_");
+      const storedName = `${Date.now()}-${safeName}`;
+      const filePath = path.join(UPLOAD_DIR, storedName);
 
-    if (action === "addOpportunity") {
-      const opportunity = {
-        opportunityId: id("opp"),
-        createdAt: new Date().toISOString(),
-        status: "READY_TO_PREPARE",
-        ...(body.opportunity || {})
-      };
+      fs.writeFileSync(filePath, decoded.buffer);
 
-      if (!opportunity.title) throw new Error("Opportunity title is required.");
-      if (!opportunity.sourceUrl) throw new Error("Official/source link is required.");
+      const text = await extractDocumentText(fileName, decoded.mimeType, decoded.buffer);
+      const extracted = extractProfileFromText(text || "");
 
-      store.opportunities = [opportunity, ...(store.opportunities || [])];
-      return NextResponse.json({ ok: true, opportunity, store: writeStore(store) });
-    }
-
-    if (action === "deleteOpportunity") {
-      store.opportunities = (store.opportunities || []).filter((opp) => opp.opportunityId !== body.opportunityId);
-      return NextResponse.json({ ok: true, store: writeStore(store) });
-    }
-
-    if (action === "generatePack") {
-      const opportunity = (store.opportunities || []).find((opp) => opp.opportunityId === body.opportunityId);
-      if (!opportunity) throw new Error("Opportunity not found.");
-
-      const pack = buildPack(store.profile || {}, opportunity, store.documents || []);
-      store.applicationPacks = [pack, ...(store.applicationPacks || [])];
-
-      store.opportunities = (store.opportunities || []).map((opp) =>
-        opp.opportunityId === body.opportunityId
-          ? { ...opp, status: opportunityStatus({ ...opp, status: "PACK_READY" }) }
-          : opp
-      );
-
-      return NextResponse.json({ ok: true, pack, store: writeStore(store) });
-    }
-
-    if (action === "markApplied") {
-      const proof = {
-        proofId: id("proof"),
-        opportunityId: body.opportunityId,
-        proof: body.proof || "",
+      const documentRecord = {
+        documentId: `doc-${Date.now()}-${Math.random().toString(16).slice(2)}`,
+        type,
+        fileName,
+        storedName,
+        localPath: filePath,
+        mimeType: decoded.mimeType,
+        sizeBytes: decoded.buffer.length,
+        extractedTextPreview: text ? text.slice(0, 1800) : "",
+        smartFields: extracted,
         createdAt: new Date().toISOString()
       };
 
-      store.proofLog = [proof, ...(store.proofLog || [])];
-      store.opportunities = (store.opportunities || []).map((opp) =>
-        opp.opportunityId === body.opportunityId ? { ...opp, status: "APPLIED_PROOF_CAPTURED" } : opp
-      );
+      store.documents = [documentRecord, ...store.documents];
+      store.profile = mergeSmartProfile(store.profile || {}, extracted);
 
-      return NextResponse.json({ ok: true, proof, store: writeStore(store) });
+      store.smartExtraction = [
+        {
+          extractionId: `extract-${Date.now()}`,
+          documentId: documentRecord.documentId,
+          fileName,
+          type,
+          extracted,
+          textLength: text.length,
+          status: text.includes("extraction failed") ? "PARTIAL" : "EXTRACTED",
+          createdAt: new Date().toISOString()
+        },
+        ...store.smartExtraction
+      ];
+
+      writeStore(store);
+
+      return NextResponse.json({
+        status: "DOCUMENT_UPLOADED",
+        document: documentRecord,
+        extracted,
+        store,
+        readiness: scoreReadiness(store)
+      });
     }
 
-    throw new Error(`Unknown action: ${action}`);
+    if (action === "addOpportunity") {
+      const opportunity = body.opportunity || {};
+
+      if (!opportunity.title || !opportunity.organisation || !opportunity.sourceUrl) {
+        return NextResponse.json({
+          status: "FAILED",
+          error: "Title, organisation and official/source link are required."
+        }, { status: 400 });
+      }
+
+      const record = {
+        opportunityId: `opp-${Date.now()}-${Math.random().toString(16).slice(2)}`,
+        title: String(opportunity.title),
+        organisation: String(opportunity.organisation),
+        category: String(opportunity.category || "JOB"),
+        applicationMethod: String(opportunity.applicationMethod || "PORTAL"),
+        emailTo: String(opportunity.emailTo || ""),
+        closingDate: String(opportunity.closingDate || ""),
+        sourceUrl: String(opportunity.sourceUrl),
+        notes: String(opportunity.notes || ""),
+        status: "READY_TO_PREPARE",
+        createdAt: new Date().toISOString(),
+        updatedAt: new Date().toISOString()
+      };
+
+      store.opportunities = [record, ...store.opportunities];
+      writeStore(store);
+
+      return NextResponse.json({
+        status: "OPPORTUNITY_ADDED",
+        opportunity: record,
+        store,
+        readiness: scoreReadiness(store)
+      });
+    }
+
+    if (action === "generatePack") {
+      const opportunityId = String(body.opportunityId || "");
+      const opportunity = store.opportunities.find((item) => item.opportunityId === opportunityId);
+
+      if (!opportunity) {
+        return NextResponse.json({ status: "FAILED", error: "Opportunity not found." }, { status: 404 });
+      }
+
+      const packText = buildPack(store.profile || {}, opportunity);
+
+      const pack = {
+        packId: `pack-${Date.now()}-${Math.random().toString(16).slice(2)}`,
+        opportunityId,
+        title: `Application Pack — ${opportunity.title}`,
+        body: packText,
+        createdAt: new Date().toISOString()
+      };
+
+      store.applicationPacks = [pack, ...store.applicationPacks];
+      store.opportunities = store.opportunities.map((item) =>
+        item.opportunityId === opportunityId
+          ? { ...item, status: "PACK_READY", updatedAt: new Date().toISOString() }
+          : item
+      );
+
+      writeStore(store);
+
+      return NextResponse.json({
+        status: "PACK_READY",
+        pack,
+        store,
+        readiness: scoreReadiness(store)
+      });
+    }
+
+    if (action === "markApplied") {
+      const opportunityId = String(body.opportunityId || "");
+      const proof = String(body.proof || "").trim();
+
+      if (!opportunityId || !proof) {
+        return NextResponse.json({
+          status: "FAILED",
+          error: "Proof or reference is required."
+        }, { status: 400 });
+      }
+
+      const proofRecord = {
+        proofId: `proof-${Date.now()}-${Math.random().toString(16).slice(2)}`,
+        opportunityId,
+        proof,
+        createdAt: new Date().toISOString()
+      };
+
+      store.proofLog = [proofRecord, ...store.proofLog];
+      store.opportunities = store.opportunities.map((item) =>
+        item.opportunityId === opportunityId
+          ? { ...item, status: "APPLIED_PROOF_CAPTURED", updatedAt: new Date().toISOString() }
+          : item
+      );
+
+      writeStore(store);
+
+      return NextResponse.json({
+        status: "PROOF_CAPTURED",
+        proof: proofRecord,
+        store,
+        readiness: scoreReadiness(store)
+      });
+    }
+
+    if (action === "deleteOpportunity") {
+      const opportunityId = String(body.opportunityId || "");
+      store.opportunities = store.opportunities.filter((item) => item.opportunityId !== opportunityId);
+      store.applicationPacks = store.applicationPacks.filter((item) => item.opportunityId !== opportunityId);
+      store.proofLog = store.proofLog.filter((item) => item.opportunityId !== opportunityId);
+      writeStore(store);
+
+      return NextResponse.json({
+        status: "DELETED",
+        store,
+        readiness: scoreReadiness(store)
+      });
+    }
+
+    return NextResponse.json({
+      status: "FAILED",
+      error: "Unknown action."
+    }, { status: 400 });
   } catch (error) {
-    return NextResponse.json(
-      { ok: false, error: error instanceof Error ? error.message : "Request failed." },
-      { status: 400 }
-    );
+    return NextResponse.json({
+      status: "ERROR_VISIBLE",
+      error: error instanceof Error ? error.message : "Unknown Apply Desk error",
+      stack: error instanceof Error ? error.stack : ""
+    }, { status: 500 });
   }
 }

@@ -1,0 +1,45 @@
+{
+  "schema": "kingsmen.personal-jobs-38-smart-apply.validation.v1",
+  "status": "VALIDATED",
+  "passed": true,
+  "generatedAt": "2026-06-10T06:19:19.046Z",
+  "checks": [
+    {
+      "name": "exists:apps/web/src/app/api/personal-jobs/apply-now/route.ts",
+      "passed": true,
+      "detail": "apps/web/src/app/api/personal-jobs/apply-now/route.ts"
+    },
+    {
+      "name": "exists:apps/web/src/app/personal-job-desk/apply-now/page.tsx",
+      "passed": true,
+      "detail": "apps/web/src/app/personal-job-desk/apply-now/page.tsx"
+    },
+    {
+      "name": "exists:apps/web/src/app/personal-job-desk/apply-now/ApplyNowClient.tsx",
+      "passed": true,
+      "detail": "apps/web/src/app/personal-job-desk/apply-now/ApplyNowClient.tsx"
+    },
+    {
+      "name": "api_supports_smart_document_extraction",
+      "passed": true,
+      "detail": "Apply API reads uploaded documents and extracts profile fields"
+    },
+    {
+      "name": "api_preserves_application_pack_and_proof",
+      "passed": true,
+      "detail": "Apply API keeps pack generation and proof capture"
+    },
+    {
+      "name": "client_has_smart_intake_language",
+      "passed": true,
+      "detail": "Apply client behaves like smart intake instead of dumb manual form"
+    },
+    {
+      "name": "client_has_queue_pack_proof",
+      "passed": true,
+      "detail": "Apply client has queue, pack and proof workflow"
+    }
+  ],
+  "failed": [],
+  "nextAction": "Open /personal-job-desk/apply-now and test CV upload, autofill, opportunity queue, pack and proof."
+}

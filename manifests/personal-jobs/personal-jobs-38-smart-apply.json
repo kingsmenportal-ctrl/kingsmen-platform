@@ -1,0 +1,23 @@
+{
+  "module": "PERSONAL-JOBS-38",
+  "name": "Smart Apply Workbench",
+  "status": "Built/Pending Local Review",
+  "paths": [
+    "apps/web/src/app/api/personal-jobs/apply-now/route.ts",
+    "apps/web/src/app/personal-job-desk/apply-now/page.tsx",
+    "apps/web/src/app/personal-job-desk/apply-now/ApplyNowClient.tsx",
+    "scripts/validators/validate-personal-jobs-38-smart-apply.mjs",
+    "docs/personal-jobs/personal-jobs-38-smart-apply.md"
+  ],
+  "capabilities": [
+    "CV upload",
+    "DOCX extraction",
+    "PDF extraction attempt",
+    "smart profile autofill",
+    "document vault list",
+    "opportunity queue",
+    "application pack generation",
+    "proof capture"
+  ],
+  "truth_boundary": "Smart extraction uses candidate-provided documents only. It does not invent or alter facts."
+}
