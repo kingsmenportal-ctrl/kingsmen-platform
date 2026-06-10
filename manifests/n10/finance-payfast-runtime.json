@@ -1,0 +1,36 @@
+{
+  "phase": "N10",
+  "name": "Finance / PayFast Runtime",
+  "status": "foundation",
+  "laws": [
+    "PostgreSQL finance ledger is truth.",
+    "PayFast is the payment processor, not Kingsmen truth.",
+    "No payment secrets are committed.",
+    "No AI refund approval.",
+    "No Airtable payment truth.",
+    "Paid status requires verified payment evidence.",
+    "PayFast ITN receipts must be idempotent.",
+    "PayFast signatures must be verified before payment status changes.",
+    "Refunds require human approval.",
+    "Finance messages follow email-primary doctrine.",
+    "CV Revamp must never invent fake experience, certificates, references, skills, or qualifications."
+  ],
+  "pricing_locked": [
+    "FREE_DESTINY_MAP_R0",
+    "CV_REVAMP_R49_99",
+    "ACCOMMODATION_SUPPORT_R179"
+  ],
+  "runtime_surfaces": [
+    "Plan Catalog",
+    "Orders",
+    "Invoices",
+    "Payments",
+    "PayFast Payment Intents",
+    "PayFast ITN Receipts",
+    "Finance Ledger",
+    "Refund Review Queue",
+    "Payment Evidence Ledger",
+    "Candidate Finance View"
+  ],
+  "next": "N11 - AI Decision / Matching Engine"
+}

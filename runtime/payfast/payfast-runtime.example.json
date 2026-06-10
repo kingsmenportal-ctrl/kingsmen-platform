@@ -1,0 +1,16 @@
+{
+  "purpose": "Non-secret PayFast runtime example. Real credentials are never committed.",
+  "requiredEnvironmentVariables": [
+    "PAYFAST_ENVIRONMENT",
+    "PAYFAST_MERCHANT_ID",
+    "PAYFAST_MERCHANT_KEY",
+    "PAYFAST_PASSPHRASE",
+    "PAYFAST_RETURN_URL",
+    "PAYFAST_CANCEL_URL",
+    "PAYFAST_NOTIFY_URL"
+  ],
+  "sandboxProcessUrl": "https://sandbox.payfast.co.za/eng/process",
+  "liveProcessUrl": "https://www.payfast.co.za/eng/process",
+  "secretRule": "Use local environment variables, Oracle secrets, or deployment secret store later. Never commit real PayFast credentials.",
+  "truthRule": "PayFast confirms payment; PostgreSQL finance ledger remains truth."
+}

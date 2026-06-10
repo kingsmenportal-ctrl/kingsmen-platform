@@ -22,3 +22,5 @@ export * as AirtableSync from "./airtable";
 export * as ControlPlane from "./control-plane";
 
 export * as Communications from "./communications";
+
+export * as Finance from "./finance";
