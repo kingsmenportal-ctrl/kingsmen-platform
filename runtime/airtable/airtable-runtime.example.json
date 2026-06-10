@@ -1,0 +1,24 @@
+{
+  "purpose": "Non-secret Airtable runtime example. Secrets are never committed.",
+  "requiredEnvironmentVariables": [
+    "AIRTABLE_API_KEY",
+    "AIRTABLE_BASE_NEXUS_7",
+    "AIRTABLE_BASE_NEXUS_MSB",
+    "AIRTABLE_BASE_APPLICATIONS_HUB",
+    "AIRTABLE_BASE_AI_ENGINE",
+    "AIRTABLE_BASE_AI_DECISION_ORCHESTRATION",
+    "AIRTABLE_BASE_SYSTEM_OPERATIONS",
+    "AIRTABLE_BASE_AUTOMATION_CONTROL",
+    "AIRTABLE_BASE_COMMUNICATIONS_CENTER",
+    "AIRTABLE_BASE_PROGRAMS_INTELLIGENCE",
+    "AIRTABLE_BASE_FINANCIAL_OPERATIONS",
+    "AIRTABLE_BASE_PARTNER_ECOSYSTEM",
+    "AIRTABLE_BASE_DOCUMENT_VAULT"
+  ],
+  "secretRule": "Use local environment variables, Oracle secrets, or Supabase secret store later. Never commit real Airtable API keys or base IDs.",
+  "rateLimitPolicy": {
+    "maxRequestsPerSecondPerBase": 4,
+    "retryBaseDelayMs": 750,
+    "maxAttempts": 5
+  }
+}

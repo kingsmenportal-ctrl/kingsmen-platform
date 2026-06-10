@@ -1,0 +1,55 @@
+{
+  "phase": "N07",
+  "name": "Airtable Sync",
+  "status": "foundation",
+  "createdBy": "KINGSMEN_CREATOR",
+  "doctrine": {
+    "postgresTruth": true,
+    "airtableMirrorOnly": true,
+    "noOrchestrationInAirtable": true,
+    "noSecretsInRepo": true,
+    "n8nThinWorkerCompatible": true,
+    "evidenceLedgerRequired": true,
+    "idempotencyRequired": true,
+    "oracleLiteRealistic": true
+  },
+  "bases": [
+    "Kingsman Nexus-7",
+    "Kingsman Nexus (MSB)",
+    "Applications Hub",
+    "AI Engine",
+    "AI Decision & Orchestration Engine",
+    "System Operations",
+    "Automation Control",
+    "Communications Center",
+    "Programs & Intelligence",
+    "Kingsmen Financial Operations",
+    "Partner Ecosystem Directory",
+    "Document Vault"
+  ],
+  "syncDirections": [
+    "postgres_to_airtable_mirror",
+    "airtable_to_postgres_intake_only",
+    "airtable_to_postgres_operator_notes_only"
+  ],
+  "blockedBehaviours": [
+    "airtable_as_truth_source",
+    "airtable_orchestrates_workflows",
+    "airtable_overrides_backend_state",
+    "airtable_sends_candidate_messages_directly",
+    "airtable_stores_secrets",
+    "silent_sync_conflict_resolution",
+    "automatic_submission_from_airtable"
+  ],
+  "outputs": [
+    "airtable base registry",
+    "sync target registry",
+    "field mapping registry",
+    "sync outbox",
+    "sync run ledger",
+    "webhook receipt ledger",
+    "sync policy engine",
+    "Airtable client adapter",
+    "operator mirror panel"
+  ]
+}

@@ -1,67 +1,21 @@
 param(
-  [string]$Phase = "",
-  [string]$Mode = "Report"
+  [Parameter(Mandatory=$true)][string]$Phase,
+  [Parameter(Mandatory=$false)][ValidateSet("Validate")][string]$Mode = "Validate"
 )
 
 $ErrorActionPreference = "Stop"
 
 $Base = "C:\Kingsmen\kingsmen-platform"
+if (!(Test-Path $Base)) { throw "Missing Kingsmen repo at $Base" }
+
 Set-Location $Base
 
-if ($Mode -eq "Validate" -and $Phase -eq "N00") {
-  powershell -ExecutionPolicy Bypass -File "$Base\scripts\validators\Validate-N00.ps1"
-  exit $LASTEXITCODE
+$NormalizedPhase = $Phase.ToUpperInvariant()
+$Validator = Join-Path $Base "scripts\validators\Validate-$NormalizedPhase.ps1"
+
+if (!(Test-Path $Validator)) {
+  throw "No validator found for phase $NormalizedPhase at $Validator"
 }
 
-if ($Mode -eq "Validate" -and $Phase -eq "N01") {
-  powershell -ExecutionPolicy Bypass -File "$Base\scripts\validators\Validate-N01.ps1"
-  exit $LASTEXITCODE
-}
-
-if ($Mode -eq "Validate" -and $Phase -eq "N02") {
-  powershell -ExecutionPolicy Bypass -File "$Base\scripts\validators\Validate-N02.ps1"
-  exit $LASTEXITCODE
-}
-
-if ($Mode -eq "Validate" -and $Phase -eq "N03") {
-  powershell -ExecutionPolicy Bypass -File "$Base\scripts\validators\Validate-N03.ps1"
-  exit $LASTEXITCODE
-}
-
-if ($Mode -eq "Validate" -and $Phase -eq "N04") {
-  powershell -ExecutionPolicy Bypass -File "$Base\scripts\validators\Validate-N04.ps1"
-  exit $LASTEXITCODE
-}
-
-if ($Mode -eq "Validate" -and $Phase -eq "N05") {
-  powershell -ExecutionPolicy Bypass -File "$Base\scripts\validators\Validate-N05.ps1"
-  exit $LASTEXITCODE
-}
-
-if ($Mode -eq "Validate" -and $Phase -eq "N06") {
-  powershell -ExecutionPolicy Bypass -File "$Base\scripts\validators\Validate-N06.ps1"
-  exit $LASTEXITCODE
-}
-
-if ($Mode -eq "Migrate" -and $Phase -eq "N03") {
-  powershell -ExecutionPolicy Bypass -File "$Base\scripts\db\Run-N03Migration.ps1"
-  exit $LASTEXITCODE
-}
-
-if ($Mode -eq "Migrate" -and $Phase -eq "N04") {
-  powershell -ExecutionPolicy Bypass -File "$Base\scripts\db\Run-N04Migration.ps1"
-  exit $LASTEXITCODE
-}
-
-if ($Mode -eq "Migrate" -and $Phase -eq "N05") {
-  powershell -ExecutionPolicy Bypass -File "$Base\scripts\db\Run-N05Migration.ps1"
-  exit $LASTEXITCODE
-}
-
-if ($Mode -eq "Migrate" -and $Phase -eq "N06") {
-  powershell -ExecutionPolicy Bypass -File "$Base\scripts\db\Run-N06Migration.ps1"
-  exit $LASTEXITCODE
-}
-
-Write-Host "Available validate phases: N00, N01, N02, N03, N04, N05, N06" -ForegroundColor Green
-Write-Host "N06 local DB migration: powershell -ExecutionPolicy Bypass -File .\KINGSMEN_CREATOR.ps1 -Phase N06 -Mode Migrate" -ForegroundColor Yellow
+powershell -ExecutionPolicy Bypass -File $Validator
+exit $LASTEXITCODE

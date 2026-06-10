@@ -1,11 +1,21 @@
 param(
-  [string]$Phase = "",
-  [string]$Mode = "Report"
+  [Parameter(Mandatory=$true)][string]$Phase,
+  [Parameter(Mandatory=$false)][ValidateSet("Validate")][string]$Mode = "Validate"
 )
 
 $ErrorActionPreference = "Stop"
+
 $Base = "C:\Kingsmen\kingsmen-platform"
+if (!(Test-Path $Base)) { throw "Missing Kingsmen repo at $Base" }
+
 Set-Location $Base
 
-powershell -ExecutionPolicy Bypass -File "$Base\scripts\creator\KINGSMEN_CREATOR.ps1" -Phase $Phase -Mode $Mode
+$NormalizedPhase = $Phase.ToUpperInvariant()
+$Validator = Join-Path $Base "scripts\validators\Validate-$NormalizedPhase.ps1"
+
+if (!(Test-Path $Validator)) {
+  throw "No validator found for phase $NormalizedPhase at $Validator"
+}
+
+powershell -ExecutionPolicy Bypass -File $Validator
 exit $LASTEXITCODE

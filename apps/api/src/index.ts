@@ -16,3 +16,5 @@ export * from "./heartbeat/worker-heartbeat";
 export * from "./candidate";
 export * from "./documents";
 export * from "./routes";
+
+export * as AirtableSync from "./airtable";
