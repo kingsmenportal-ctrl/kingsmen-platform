@@ -1,0 +1,141 @@
+{
+  "schema": "kingsmen.personal-jobs-22-proof.v1",
+  "module": "PERSONAL-JOBS-22 - Human Review Selector / Proof Capture / Outcome Ledger Handoff",
+  "status": "PROVEN",
+  "passed": true,
+  "generated_at": "2026-06-10T02:50:06.338Z",
+  "input": "data/personal-job-desk/application-packs.local.json",
+  "output": "data/personal-job-desk/application-review-ledger.local.json",
+  "summary": {
+    "totalRecords": 80,
+    "waitingHumanReview": 80,
+    "readyForManualSubmission": 0,
+    "proofCaptured": 0,
+    "outcomesRecorded": 0,
+    "blockedProfileFix": 0,
+    "closedNotApplying": 0,
+    "byReviewStatus": {
+      "PENDING_REVIEW": 80
+    },
+    "byActionState": {
+      "WAITING_HUMAN_REVIEW": 80
+    },
+    "byOutcomeStatus": {
+      "NONE": 80
+    }
+  },
+  "boundaries": {
+    "sendsApplications": false,
+    "sendsEmail": false,
+    "sendsWhatsApp": false,
+    "touchesPayments": false,
+    "contactsEmployers": false,
+    "bypassesLoginOtpCaptcha": false,
+    "productionReady": false,
+    "deployedToOracle": false
+  },
+  "checks": [
+    {
+      "name": "file:scripts/agents/personal-job-review-ledger.mjs",
+      "passed": true,
+      "detail": "scripts/agents/personal-job-review-ledger.mjs"
+    },
+    {
+      "name": "file:apps/web/src/app/api/personal-jobs/review-ledger/route.ts",
+      "passed": true,
+      "detail": "apps/web/src/app/api/personal-jobs/review-ledger/route.ts"
+    },
+    {
+      "name": "file:apps/web/src/app/personal-job-desk/review-ledger/page.tsx",
+      "passed": true,
+      "detail": "apps/web/src/app/personal-job-desk/review-ledger/page.tsx"
+    },
+    {
+      "name": "file:apps/web/src/app/personal-job-desk/review-ledger/ReviewLedgerClient.tsx",
+      "passed": true,
+      "detail": "apps/web/src/app/personal-job-desk/review-ledger/ReviewLedgerClient.tsx"
+    },
+    {
+      "name": "file:packages/contracts/src/personal-jobs-22-review-ledger.ts",
+      "passed": true,
+      "detail": "packages/contracts/src/personal-jobs-22-review-ledger.ts"
+    },
+    {
+      "name": "file:docs/personal-jobs/personal-jobs-22-review-ledger.md",
+      "passed": true,
+      "detail": "docs/personal-jobs/personal-jobs-22-review-ledger.md"
+    },
+    {
+      "name": "file:manifests/personal-jobs/personal-jobs-22-review-ledger.json",
+      "passed": true,
+      "detail": "manifests/personal-jobs/personal-jobs-22-review-ledger.json"
+    },
+    {
+      "name": "file:scripts/proof/prove-personal-jobs-22-review-ledger.mjs",
+      "passed": true,
+      "detail": "scripts/proof/prove-personal-jobs-22-review-ledger.mjs"
+    },
+    {
+      "name": "file:scripts/validators/validate-personal-jobs-22-review-ledger.mjs",
+      "passed": true,
+      "detail": "scripts/validators/validate-personal-jobs-22-review-ledger.mjs"
+    },
+    {
+      "name": "pj21_input_exists",
+      "passed": true,
+      "detail": "PJ21 application-packs.local.json must exist before PJ22."
+    },
+    {
+      "name": "agent_exit_zero",
+      "passed": true,
+      "detail": "{\n  \"status\": \"COMPLETED\",\n  \"pj21PackCount\": 80,\n  \"reviewRecordCount\": 80,\n  \"summary\": {\n    \"totalRecords\": 80,\n    \"waitingHumanReview\": 80,\n    \"readyForManualSubmission\": 0,\n    \"proofCaptured\": 0,\n    \"outcomesRecorded\": 0,\n    \"blockedProfileFix\": 0,\n    \"closedNotApplying\": 0,\n    \"byReviewStatus\": {\n      \"PENDING_REVIEW\": 80\n    },\n    \"byActionState\": {\n      \"WAITING_HUMAN_REVIEW\": 80\n    },\n    \"byOutcomeStatus\": {\n      \"NONE\": 80\n    }\n  }\n}\n"
+    },
+    {
+      "name": "output_written",
+      "passed": true,
+      "detail": "C:\\Kingsmen\\kingsmen-platform\\data\\personal-job-desk\\application-review-ledger.local.json"
+    },
+    {
+      "name": "input_completed",
+      "passed": true,
+      "detail": "COMPLETED"
+    },
+    {
+      "name": "output_completed",
+      "passed": true,
+      "detail": "COMPLETED"
+    },
+    {
+      "name": "records_created",
+      "passed": true,
+      "detail": "80"
+    },
+    {
+      "name": "records_match_pj21_packs",
+      "passed": true,
+      "detail": "80 vs 80"
+    },
+    {
+      "name": "all_records_have_required_sections",
+      "passed": true,
+      "detail": "0 records missing required sections"
+    },
+    {
+      "name": "no_unsafe_submission_boundary",
+      "passed": true,
+      "detail": "0 unsafe records"
+    },
+    {
+      "name": "manual_ready_requires_candidate_and_founder_approval",
+      "passed": true,
+      "detail": "0 bad ready records"
+    },
+    {
+      "name": "global_safety_boundary_no_send",
+      "passed": true,
+      "detail": "{\"sendsApplications\":false,\"sendsEmail\":false,\"sendsWhatsApp\":false,\"contactsEmployers\":false,\"touchesPayments\":false,\"bypassesLoginOtpCaptcha\":false,\"productionClaim\":false,\"deployedToOracle\":false}"
+    }
+  ],
+  "failed": [],
+  "next_action": "Commit PJ22, then test /personal-job-desk/review-ledger."
+}

@@ -1,0 +1,35 @@
+{
+  "schema": "kingsmen.validation-report.v1",
+  "module": "PERSONAL-JOBS-22 - Human Review Selector / Proof Capture / Outcome Ledger Handoff",
+  "status": "VALIDATED",
+  "passed": true,
+  "generated_at": "2026-06-10T02:50:06.369Z",
+  "proof": "reports/personal-jobs/personal-jobs-22-review-ledger-proof.json",
+  "output": "data/personal-job-desk/application-review-ledger.local.json",
+  "summary": {
+    "totalRecords": 80,
+    "waitingHumanReview": 80,
+    "readyForManualSubmission": 0,
+    "proofCaptured": 0,
+    "outcomesRecorded": 0,
+    "blockedProfileFix": 0,
+    "closedNotApplying": 0,
+    "byReviewStatus": {
+      "PENDING_REVIEW": 80
+    },
+    "byActionState": {
+      "WAITING_HUMAN_REVIEW": 80
+    },
+    "byOutcomeStatus": {
+      "NONE": 80
+    }
+  },
+  "failed_checks": [],
+  "warnings": [
+    "PJ22 does not apply to jobs.",
+    "PJ22 does not contact employers.",
+    "PJ22 only records review, approval, proof, and outcomes.",
+    "Manual submission readiness requires both candidate approval and founder/operator review."
+  ],
+  "next_action": "Commit PJ22 tracked files and test the local UI."
+}
