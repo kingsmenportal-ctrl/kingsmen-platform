@@ -1,0 +1,139 @@
+{
+  "schema": "kingsmen.personal-jobs-25-proof.v1",
+  "module": "PERSONAL-JOBS-25 - Candidate Follow-Up Inbox / Questions / Operator Response Queue",
+  "status": "PROVEN",
+  "passed": true,
+  "generated_at": "2026-06-10T03:06:56.883Z",
+  "input": "data/personal-job-desk/application-tracker.local.json",
+  "output": "data/personal-job-desk/follow-up-inbox.local.json",
+  "summary": {
+    "totalThreads": 80,
+    "candidateQuestionsPending": 0,
+    "operatorDrafted": 0,
+    "approvedForManualSend": 0,
+    "markedSentWithProof": 0,
+    "noQuestion": 80,
+    "closed": 0,
+    "byThreadStatus": {
+      "NO_QUESTION": 80
+    },
+    "byQuestionCategory": {
+      "GENERAL": 80
+    }
+  },
+  "boundaries": {
+    "sendsApplications": false,
+    "sendsEmail": false,
+    "sendsWhatsApp": false,
+    "sendsSms": false,
+    "touchesPayments": false,
+    "contactsEmployers": false,
+    "bypassesLoginOtpCaptcha": false,
+    "productionReady": false,
+    "deployedToOracle": false
+  },
+  "checks": [
+    {
+      "name": "file:scripts/agents/personal-job-follow-up-inbox.mjs",
+      "passed": true,
+      "detail": "scripts/agents/personal-job-follow-up-inbox.mjs"
+    },
+    {
+      "name": "file:apps/web/src/app/api/personal-jobs/follow-up-inbox/route.ts",
+      "passed": true,
+      "detail": "apps/web/src/app/api/personal-jobs/follow-up-inbox/route.ts"
+    },
+    {
+      "name": "file:apps/web/src/app/personal-job-desk/follow-up-inbox/page.tsx",
+      "passed": true,
+      "detail": "apps/web/src/app/personal-job-desk/follow-up-inbox/page.tsx"
+    },
+    {
+      "name": "file:apps/web/src/app/personal-job-desk/follow-up-inbox/FollowUpInboxClient.tsx",
+      "passed": true,
+      "detail": "apps/web/src/app/personal-job-desk/follow-up-inbox/FollowUpInboxClient.tsx"
+    },
+    {
+      "name": "file:packages/contracts/src/personal-jobs-25-follow-up-inbox.ts",
+      "passed": true,
+      "detail": "packages/contracts/src/personal-jobs-25-follow-up-inbox.ts"
+    },
+    {
+      "name": "file:docs/personal-jobs/personal-jobs-25-follow-up-inbox.md",
+      "passed": true,
+      "detail": "docs/personal-jobs/personal-jobs-25-follow-up-inbox.md"
+    },
+    {
+      "name": "file:manifests/personal-jobs/personal-jobs-25-follow-up-inbox.json",
+      "passed": true,
+      "detail": "manifests/personal-jobs/personal-jobs-25-follow-up-inbox.json"
+    },
+    {
+      "name": "file:scripts/proof/prove-personal-jobs-25-follow-up-inbox.mjs",
+      "passed": true,
+      "detail": "scripts/proof/prove-personal-jobs-25-follow-up-inbox.mjs"
+    },
+    {
+      "name": "file:scripts/validators/validate-personal-jobs-25-follow-up-inbox.mjs",
+      "passed": true,
+      "detail": "scripts/validators/validate-personal-jobs-25-follow-up-inbox.mjs"
+    },
+    {
+      "name": "pj24_input_exists",
+      "passed": true,
+      "detail": "PJ24 application-tracker.local.json must exist before PJ25."
+    },
+    {
+      "name": "agent_exit_zero",
+      "passed": true,
+      "detail": "{\n  \"status\": \"COMPLETED\",\n  \"pj24ItemCount\": 80,\n  \"threadCount\": 80,\n  \"summary\": {\n    \"totalThreads\": 80,\n    \"candidateQuestionsPending\": 0,\n    \"operatorDrafted\": 0,\n    \"approvedForManualSend\": 0,\n    \"markedSentWithProof\": 0,\n    \"noQuestion\": 80,\n    \"closed\": 0,\n    \"byThreadStatus\": {\n      \"NO_QUESTION\": 80\n    },\n    \"byQuestionCategory\": {\n      \"GENERAL\": 80\n    }\n  }\n}\n"
+    },
+    {
+      "name": "output_written",
+      "passed": true,
+      "detail": "C:\\Kingsmen\\kingsmen-platform\\data\\personal-job-desk\\follow-up-inbox.local.json"
+    },
+    {
+      "name": "input_completed",
+      "passed": true,
+      "detail": "COMPLETED"
+    },
+    {
+      "name": "output_completed",
+      "passed": true,
+      "detail": "COMPLETED"
+    },
+    {
+      "name": "threads_created",
+      "passed": true,
+      "detail": "80"
+    },
+    {
+      "name": "threads_match_pj24_items",
+      "passed": true,
+      "detail": "80 vs 80"
+    },
+    {
+      "name": "all_threads_have_required_sections",
+      "passed": true,
+      "detail": "0 threads missing required sections"
+    },
+    {
+      "name": "no_unsafe_actions",
+      "passed": true,
+      "detail": "0 unsafe threads"
+    },
+    {
+      "name": "no_success_guarantees",
+      "passed": true,
+      "detail": "0 guarantee-like threads"
+    },
+    {
+      "name": "global_safety_boundary_no_send",
+      "passed": true,
+      "detail": "{\"sendsApplications\":false,\"sendsEmail\":false,\"sendsWhatsApp\":false,\"sendsSms\":false,\"contactsEmployers\":false,\"touchesPayments\":false,\"bypassesLoginOtpCaptcha\":false,\"productionClaim\":false,\"deployedToOracle\":false}"
+    }
+  ],
+  "failed": [],
+  "next_action": "Commit PJ25, then test /personal-job-desk/follow-up-inbox."
+}
