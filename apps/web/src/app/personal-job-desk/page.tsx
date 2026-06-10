@@ -1,5 +1,12 @@
 const modules = [
   {
+    title: "Opportunity Scout",
+    href: "/personal-job-desk/opportunity-scout",
+    type: "Playwright Agent",
+    description: "Searches public sources and imports real leads into Apply Now.",
+    status: "Connected scout"
+  },
+  {
     title: "Apply Now",
     href: "/personal-job-desk/apply-now",
     type: "Candidate Action",

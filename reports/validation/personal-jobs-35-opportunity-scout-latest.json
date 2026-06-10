@@ -1,0 +1,50 @@
+{
+  "schema": "kingsmen.personal-jobs-35-opportunity-scout.validation.v1",
+  "status": "VALIDATED",
+  "passed": true,
+  "generatedAt": "2026-06-10T05:08:49.433Z",
+  "checks": [
+    {
+      "name": "exists:scripts/agents/personal-job-opportunity-scout.mjs",
+      "passed": true,
+      "detail": "scripts/agents/personal-job-opportunity-scout.mjs"
+    },
+    {
+      "name": "exists:apps/web/src/app/api/personal-jobs/opportunity-scout/route.ts",
+      "passed": true,
+      "detail": "apps/web/src/app/api/personal-jobs/opportunity-scout/route.ts"
+    },
+    {
+      "name": "exists:apps/web/src/app/personal-job-desk/opportunity-scout/page.tsx",
+      "passed": true,
+      "detail": "apps/web/src/app/personal-job-desk/opportunity-scout/page.tsx"
+    },
+    {
+      "name": "exists:apps/web/src/app/personal-job-desk/opportunity-scout/OpportunityScoutClient.tsx",
+      "passed": true,
+      "detail": "apps/web/src/app/personal-job-desk/opportunity-scout/OpportunityScoutClient.tsx"
+    },
+    {
+      "name": "uses_playwright",
+      "passed": true,
+      "detail": "Scout agent must use Playwright"
+    },
+    {
+      "name": "has_safe_boundaries",
+      "passed": true,
+      "detail": "Scout must declare automation boundaries"
+    },
+    {
+      "name": "can_import_lead_to_apply_now",
+      "passed": true,
+      "detail": "API imports lead into Apply Now store"
+    },
+    {
+      "name": "ui_has_run_scout",
+      "passed": true,
+      "detail": "UI can run scout and import leads"
+    }
+  ],
+  "failed": [],
+  "nextAction": "Open /personal-job-desk/opportunity-scout and run scout."
+}
