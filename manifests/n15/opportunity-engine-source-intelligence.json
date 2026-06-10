@@ -1,0 +1,36 @@
+{
+  "phase": "N15",
+  "name": "Opportunity Engine / External Source Intelligence",
+  "status": "foundation",
+  "purpose": "Create verified external source intelligence for universities, TVETs, SETA/QCTO routes, learnerships, bursaries, accommodation, employers, internships, NSFAS, CAO, and private colleges.",
+  "locked_doctrine": [
+    "No fake deadlines.",
+    "No fake links.",
+    "No fake programme availability.",
+    "No fake eligibility claims.",
+    "No fake acceptance or placement guarantees.",
+    "Every opportunity claim needs source confidence and evidence references.",
+    "Official claims require official or authority source confidence.",
+    "Stale observations must be marked for review before candidate-facing use.",
+    "Private colleges require CHE, DHET, SAQA, or QCTO verification before safe recommendation.",
+    "SETA, QCTO, learnership, and employer routes require provider evidence before promotion.",
+    "Opportunity intelligence may recommend and route; it must not submit official applications by itself.",
+    "Playwright/source scouts observe only and route blocked or uncertain findings to manual review.",
+    "All sectors remain open from day one; packages control campaign weight and managed execution count."
+  ],
+  "opportunity_sectors": [
+    "UNIVERSITY",
+    "TVET",
+    "SETA",
+    "QCTO",
+    "LEARNERSHIP",
+    "BURSARY",
+    "ACCOMMODATION",
+    "EMPLOYER",
+    "INTERNSHIP",
+    "NSFAS",
+    "CAO",
+    "PRIVATE_COLLEGE"
+  ],
+  "next": "N16 - Orchestrator / Execution Runtime"
+}

@@ -1,0 +1,17 @@
+{
+  "purpose": "Non-secret opportunity source intelligence runtime example.",
+  "sourceDoctrine": {
+    "noFakeDeadlines": true,
+    "noFakeLinks": true,
+    "noFakeProgrammeAvailability": true,
+    "noFakeEligibilityClaims": true,
+    "noFakeGuarantees": true,
+    "evidenceRequired": true,
+    "staleSourcesRequireReview": true
+  },
+  "officialClaimMinimumConfidence": "OFFICIAL_VERIFIED",
+  "routeRecommendationMinimumConfidence": "MEDIUM",
+  "privateCollegeSafety": "Require CHE, DHET, SAQA, or QCTO verification before safe recommendation.",
+  "playwrightRole": "Scout/probe only. Blocked or uncertain sources go to manual review.",
+  "candidateFacingRule": "Do not expose exact targets on Free Destiny Map; sealed exact target rules remain active."
+}
