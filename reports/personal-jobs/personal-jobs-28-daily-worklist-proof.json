@@ -3,7 +3,7 @@
   "module": "PERSONAL-JOBS-28 - Operator Daily Worklist / Founder Action Packet Digest",
   "status": "PROVEN",
   "passed": true,
-  "generated_at": "2026-06-10T03:27:45.196Z",
+  "generated_at": "2026-06-10T03:28:57.707Z",
   "input": "data/personal-job-desk/readiness-priority-queue.local.json",
   "output": "data/personal-job-desk/daily-worklist.local.json",
   "summary": {
