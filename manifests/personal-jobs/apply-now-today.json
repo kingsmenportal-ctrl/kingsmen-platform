@@ -1,0 +1,17 @@
+{
+  "schema": "kingsmen.today.apply-now.manifest.v1",
+  "module": "KINGSMEN-TODAY-APPLY-NOW",
+  "route": "/personal-job-desk/apply-now",
+  "api_route": "/api/personal-jobs/apply-now",
+  "creates_profile_form": true,
+  "creates_document_upload": true,
+  "creates_real_source_buttons": true,
+  "creates_opportunity_intake": true,
+  "creates_application_pack_generator": true,
+  "creates_proof_capture": true,
+  "uses_fake_jobs": false,
+  "auto_submits_applications": false,
+  "bypasses_portals": false,
+  "bypasses_otp_captcha": false,
+  "guarantees_job": false
+}

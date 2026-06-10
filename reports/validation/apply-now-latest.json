@@ -1,0 +1,56 @@
+{
+  "schema": "kingsmen.today.apply-now.validation.v1",
+  "status": "VALIDATED",
+  "passed": true,
+  "generatedAt": "2026-06-10T04:26:56.994Z",
+  "route": "/personal-job-desk/apply-now",
+  "checks": [
+    {
+      "name": "file:apps/web/src/app/personal-job-desk/apply-now/page.tsx",
+      "passed": true,
+      "detail": "apps/web/src/app/personal-job-desk/apply-now/page.tsx"
+    },
+    {
+      "name": "file:apps/web/src/app/personal-job-desk/apply-now/ApplyNowClient.tsx",
+      "passed": true,
+      "detail": "apps/web/src/app/personal-job-desk/apply-now/ApplyNowClient.tsx"
+    },
+    {
+      "name": "file:apps/web/src/app/api/personal-jobs/apply-now/route.ts",
+      "passed": true,
+      "detail": "apps/web/src/app/api/personal-jobs/apply-now/route.ts"
+    },
+    {
+      "name": "has_upload_document_action",
+      "passed": true,
+      "detail": "Upload document action must exist."
+    },
+    {
+      "name": "has_add_opportunity_action",
+      "passed": true,
+      "detail": "Opportunity action must exist."
+    },
+    {
+      "name": "has_generate_pack_action",
+      "passed": true,
+      "detail": "Pack generation action must exist."
+    },
+    {
+      "name": "has_mark_applied_proof_action",
+      "passed": true,
+      "detail": "Proof capture action must exist."
+    },
+    {
+      "name": "has_real_source_links",
+      "passed": true,
+      "detail": "Real source links must exist."
+    },
+    {
+      "name": "no_fake_submission_claim",
+      "passed": true,
+      "detail": "Interface must not claim unsafe auto-submit."
+    }
+  ],
+  "failed": [],
+  "nextAction": "Run npm/dev server and open /personal-job-desk/apply-now."
+}

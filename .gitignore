@@ -189,3 +189,7 @@ data/personal-job-desk/status-timeline.local.json
 reports/personal-jobs/personal-jobs-31-status-timeline-latest.json
 data/personal-job-desk/public-snapshot.local.json
 reports/personal-jobs/personal-jobs-32-public-snapshot-latest.json
+data/personal-job-desk/document-pack-index.local.json
+reports/personal-jobs/personal-jobs-33-document-pack-index-latest.json
+data/personal-job-desk/apply-now.local.json
+data/personal-job-desk/uploads/
