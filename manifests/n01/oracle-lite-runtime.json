@@ -1,0 +1,22 @@
+{
+  "module": "N01",
+  "name": "Monorepo / Oracle Lite Runtime",
+  "status": "prepared",
+  "runtime_target": "Oracle Cloud Free Tier / local Windows development",
+  "starting_cap": 500,
+  "services": ["web", "api", "postgres", "nginx"],
+  "laws": [
+    "PostgreSQL remains truth.",
+    "Airtable remains mirror only.",
+    "n8n remains thin worker only.",
+    "PowerShell Creator remains materializer and validator.",
+    "Local development must work before cloud deployment.",
+    "No module may claim completion without validation report."
+  ],
+  "ports": {
+    "web": 3000,
+    "api": 4000,
+    "postgres": 5432,
+    "nginx": 8080
+  }
+}

@@ -1,0 +1,32 @@
+services:
+  kingsmen-postgres:
+    image: postgres:16-alpine
+    container_name: kingsmen-postgres
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: kingsmen
+      POSTGRES_USER: kingsmen
+      POSTGRES_PASSWORD: kingsmen_dev_password
+    ports:
+      - "5432:5432"
+    volumes:
+      - kingsmen_postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U kingsmen -d kingsmen"]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+
+  kingsmen-nginx:
+    image: nginx:1.27-alpine
+    container_name: kingsmen-nginx
+    restart: unless-stopped
+    ports:
+      - "8080:80"
+    volumes:
+      - ./nginx.conf:/etc/nginx/conf.d/default.conf:ro
+    depends_on:
+      - kingsmen-postgres
+
+volumes:
+  kingsmen_postgres_data:
