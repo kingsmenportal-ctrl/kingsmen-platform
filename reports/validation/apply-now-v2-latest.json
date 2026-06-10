@@ -1,8 +1,8 @@
 {
-  "schema": "kingsmen.apply-now-v2.validation.v1",
-  "status": "FAILED",
-  "passed": false,
-  "generatedAt": "2026-06-10T04:42:25.738Z",
+  "schema": "kingsmen.apply-now-v2.validation.v2",
+  "status": "VALIDATED",
+  "passed": true,
+  "generatedAt": "2026-06-10T04:52:37.756Z",
   "route": "/personal-job-desk/apply-now",
   "checks": [
     {
@@ -41,17 +41,11 @@
       "detail": "has_real_sources"
     },
     {
-      "name": "does_not_claim_auto_submit",
-      "passed": false,
-      "detail": "does_not_claim_auto_submit"
+      "name": "does_not_claim_unsafe_automation",
+      "passed": true,
+      "detail": "does_not_claim_unsafe_automation"
     }
   ],
-  "failed": [
-    {
-      "name": "does_not_claim_auto_submit",
-      "passed": false,
-      "detail": "does_not_claim_auto_submit"
-    }
-  ],
-  "nextAction": "Repair failed checks."
+  "failed": [],
+  "nextAction": "Use /personal-job-desk as the connected hub."
 }

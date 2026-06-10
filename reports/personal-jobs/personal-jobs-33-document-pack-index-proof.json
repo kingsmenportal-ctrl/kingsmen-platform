@@ -1,0 +1,161 @@
+{
+  "schema": "kingsmen.personal-jobs-33-proof.v1",
+  "module": "PERSONAL-JOBS-33 - Candidate Document Pack Index / Application Evidence Attachment Map",
+  "status": "FAILED",
+  "passed": false,
+  "generated_at": "2026-06-10T04:52:38.334Z",
+  "input": "data/personal-job-desk/public-snapshot.local.json",
+  "output": "data/personal-job-desk/document-pack-index.local.json",
+  "summary": {
+    "totalPacks": 80,
+    "needsCandidateDocuments": 80,
+    "evidenceOnly": 0,
+    "packReadyForReview": 0,
+    "readyForManualExport": 0,
+    "blockedNoEvidence": 0,
+    "closed": 0,
+    "totalRequiredMissing": 160,
+    "evidenceAvailable": 0,
+    "exportableNow": 0,
+    "byPackStatus": {
+      "NEEDS_CANDIDATE_DOCUMENTS": 80
+    },
+    "byPublicStatus": {
+      "AWAITING_PROOF": 80
+    }
+  },
+  "boundaries": {
+    "createsDocuments": false,
+    "fabricatesDocuments": false,
+    "exposesSensitiveProof": false,
+    "sendsApplications": false,
+    "sendsEmail": false,
+    "sendsWhatsApp": false,
+    "sendsSms": false,
+    "touchesPayments": false,
+    "contactsEmployers": false,
+    "bypassesLoginOtpCaptcha": false,
+    "productionReady": false,
+    "deployedToOracle": false
+  },
+  "checks": [
+    {
+      "name": "file:scripts/agents/personal-job-document-pack-index.mjs",
+      "passed": true,
+      "detail": "scripts/agents/personal-job-document-pack-index.mjs"
+    },
+    {
+      "name": "file:apps/web/src/app/api/personal-jobs/document-pack-index/route.ts",
+      "passed": true,
+      "detail": "apps/web/src/app/api/personal-jobs/document-pack-index/route.ts"
+    },
+    {
+      "name": "file:apps/web/src/app/personal-job-desk/document-pack-index/page.tsx",
+      "passed": true,
+      "detail": "apps/web/src/app/personal-job-desk/document-pack-index/page.tsx"
+    },
+    {
+      "name": "file:apps/web/src/app/personal-job-desk/document-pack-index/DocumentPackIndexClient.tsx",
+      "passed": true,
+      "detail": "apps/web/src/app/personal-job-desk/document-pack-index/DocumentPackIndexClient.tsx"
+    },
+    {
+      "name": "file:packages/contracts/src/personal-jobs-33-document-pack-index.ts",
+      "passed": true,
+      "detail": "packages/contracts/src/personal-jobs-33-document-pack-index.ts"
+    },
+    {
+      "name": "file:docs/personal-jobs/personal-jobs-33-document-pack-index.md",
+      "passed": true,
+      "detail": "docs/personal-jobs/personal-jobs-33-document-pack-index.md"
+    },
+    {
+      "name": "file:manifests/personal-jobs/personal-jobs-33-document-pack-index.json",
+      "passed": true,
+      "detail": "manifests/personal-jobs/personal-jobs-33-document-pack-index.json"
+    },
+    {
+      "name": "file:scripts/proof/prove-personal-jobs-33-document-pack-index.mjs",
+      "passed": true,
+      "detail": "scripts/proof/prove-personal-jobs-33-document-pack-index.mjs"
+    },
+    {
+      "name": "file:scripts/validators/validate-personal-jobs-33-document-pack-index.mjs",
+      "passed": true,
+      "detail": "scripts/validators/validate-personal-jobs-33-document-pack-index.mjs"
+    },
+    {
+      "name": "pj32_input_exists",
+      "passed": true,
+      "detail": "PJ32 public-snapshot.local.json must exist before PJ33."
+    },
+    {
+      "name": "agent_exit_zero",
+      "passed": true,
+      "detail": "{\n  \"status\": \"COMPLETED\",\n  \"pj32SnapshotItemCount\": 80,\n  \"documentPackCount\": 80,\n  \"summary\": {\n    \"totalPacks\": 80,\n    \"needsCandidateDocuments\": 80,\n    \"evidenceOnly\": 0,\n    \"packReadyForReview\": 0,\n    \"readyForManualExport\": 0,\n    \"blockedNoEvidence\": 0,\n    \"closed\": 0,\n    \"totalRequiredMissing\": 160,\n    \"evidenceAvailable\": 0,\n    \"exportableNow\": 0,\n    \"byPackStatus\": {\n      \"NEEDS_CANDIDATE_DOCUMENTS\": 80\n    },\n    \"byPublicStatus\": {\n      \"AWAITING_PROOF\": 80\n    }\n  }\n}\n"
+    },
+    {
+      "name": "output_written",
+      "passed": true,
+      "detail": "C:\\Kingsmen\\kingsmen-platform\\data\\personal-job-desk\\document-pack-index.local.json"
+    },
+    {
+      "name": "input_completed",
+      "passed": true,
+      "detail": "COMPLETED"
+    },
+    {
+      "name": "output_completed",
+      "passed": true,
+      "detail": "COMPLETED"
+    },
+    {
+      "name": "document_packs_created",
+      "passed": true,
+      "detail": "80"
+    },
+    {
+      "name": "packs_match_pj32_snapshot",
+      "passed": true,
+      "detail": "80 vs 80"
+    },
+    {
+      "name": "export_index_created",
+      "passed": true,
+      "detail": "kingsmen-personal-job-document-pack-index.md"
+    },
+    {
+      "name": "all_packs_have_required_sections",
+      "passed": true,
+      "detail": "0 packs missing required sections"
+    },
+    {
+      "name": "required_cv_and_id_slots_exist",
+      "passed": true,
+      "detail": "0 packs without required base docs"
+    },
+    {
+      "name": "no_unsafe_pack_actions",
+      "passed": true,
+      "detail": "0 unsafe document packs"
+    },
+    {
+      "name": "no_invalid_document_language",
+      "passed": false,
+      "detail": "80 invalid-document-language packs"
+    },
+    {
+      "name": "global_safety_boundary_no_send_no_fabrication",
+      "passed": true,
+      "detail": "{\"createsDocuments\":false,\"fabricatesDocuments\":false,\"exposesSensitiveProof\":false,\"sendsApplications\":false,\"sendsEmail\":false,\"sendsWhatsApp\":false,\"sendsSms\":false,\"contactsEmployers\":false,\"touchesPayments\":false,\"bypassesLoginOtpCaptcha\":false,\"productionClaim\":false,\"deployedToOracle\":false}"
+    }
+  ],
+  "failed": [
+    {
+      "name": "no_invalid_document_language",
+      "passed": false,
+      "detail": "80 invalid-document-language packs"
+    }
+  ],
+  "next_action": "Repair failed checks."
+}

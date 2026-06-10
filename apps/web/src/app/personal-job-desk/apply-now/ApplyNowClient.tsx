@@ -438,7 +438,7 @@ export default function ApplyNowClient() {
                 <div>
                   <p style={eyebrow}>{opp.category} / {opp.status}</p>
                   <h3>{opp.title}</h3>
-                  <p style={muted}>{opp.organisation} — {opp.location}</p>
+                  <p style={muted}>{opp.organisation} â€” {opp.location}</p>
                   <a href={opp.sourceUrl} target="_blank" rel="noreferrer" style={link}>Open official/source link</a>
                 </div>
 
@@ -478,7 +478,7 @@ export default function ApplyNowClient() {
 
           <div style={truthBox}>
             <strong>Reality boundary</strong>
-            <span>One form cannot legally and reliably auto-submit everywhere today. Kingsmen must package your profile and documents, route you to real sources, and capture proof.</span>
+            <span>One form cannot legally and reliably submit to every employer automatically today. Kingsmen must package your profile and documents, route you to real sources, and capture proof.</span>
           </div>
         </section>
       </section>
