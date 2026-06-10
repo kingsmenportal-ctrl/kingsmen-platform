@@ -1,0 +1,31 @@
+{
+  "phase": "N11",
+  "name": "AI Decision / Matching Engine",
+  "status": "foundation",
+  "doctrine": [
+    "AI may suggest but must not govern money, refunds, official status, submissions, fraud, privacy, or hard blockers.",
+    "AI recommendations require source confidence and evidence references.",
+    "No fake guarantees.",
+    "No silent learning.",
+    "No uncontrolled reinforcement learning.",
+    "No Phoenix false rescue.",
+    "No route recommendation without explanation.",
+    "No official application submission is triggered by AI alone.",
+    "Human/operator override is required for sensitive or high-risk decisions.",
+    "Candidate success signals are used for quality improvement, not experimentation on candidates."
+  ],
+  "runtime_surfaces": [
+    "Candidate Signal Builder",
+    "Eligibility Screening",
+    "Route Matching",
+    "Placement Scoring",
+    "Destiny Map Builder",
+    "Recommendation Explainer",
+    "Phoenix Fallback Planner",
+    "Learning Signal Ledger",
+    "AI Budget Guard",
+    "Human Override Queue"
+  ],
+  "capacity_rule": "Cap limits volume, not route capability.",
+  "next": "N12 - Governance / Policy Runtime"
+}

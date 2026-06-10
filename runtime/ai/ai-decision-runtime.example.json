@@ -1,0 +1,30 @@
+{
+  "purpose": "Non-secret AI decision runtime example for Kingsmen N11.",
+  "mode": "recommendation_only",
+  "blockedDecisions": [
+    "money",
+    "refunds",
+    "official_status",
+    "submissions",
+    "fraud",
+    "privacy",
+    "hard_blockers"
+  ],
+  "sourceConfidenceRequired": true,
+  "evidenceRequired": true,
+  "humanReviewRequiredFor": [
+    "high_risk_recommendation",
+    "phoenix_fallback",
+    "manual_submission_package",
+    "official_portal_status",
+    "document_fraud",
+    "refund_or_payment",
+    "privacy_sensitive_change"
+  ],
+  "oracleLiteBudgetGuard": {
+    "maxExpensiveCallsPerCandidatePerDay": 3,
+    "preferRulesFirst": true,
+    "useAiForExplanationAndRanking": true
+  },
+  "secretsRule": "No model provider secrets are committed. Use environment variables or deployment secret store later."
+}

@@ -24,3 +24,5 @@ export * as ControlPlane from "./control-plane";
 export * as Communications from "./communications";
 
 export * as Finance from "./finance";
+
+export * as AiDecision from "./ai-decision";
