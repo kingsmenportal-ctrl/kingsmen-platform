@@ -1,0 +1,38 @@
+{
+  "schema": "kingsmen.validation-report.v1",
+  "module": "PERSONAL-JOBS-29 - Proof Review Board / Status Advancement Control",
+  "status": "VALIDATED",
+  "passed": true,
+  "generated_at": "2026-06-10T03:32:21.885Z",
+  "proof": "reports/personal-jobs/personal-jobs-29-proof-review-board-proof.json",
+  "output": "data/personal-job-desk/proof-review-board.local.json",
+  "summary": {
+    "totalItems": 80,
+    "waitingFounderDecision": 80,
+    "needsProof": 0,
+    "readyForReview": 0,
+    "approvedForStatusAdvance": 0,
+    "rejectedProof": 0,
+    "statusAdvanceRecorded": 0,
+    "closed": 0,
+    "canAdvanceStatus": 0,
+    "proofCaptured": 0,
+    "byReviewStatus": {
+      "WAITING_FOUNDER_DECISION": 80
+    },
+    "byTargetStatus": {
+      "REVIEW_REQUIRED": 80
+    },
+    "byPriorityBand": {
+      "P3_LOW": 80
+    }
+  },
+  "failed_checks": [],
+  "warnings": [
+    "PJ29 does not execute applications automatically.",
+    "PJ29 does not send email, WhatsApp, SMS, or employer messages automatically.",
+    "PJ29 does not mutate PJ24/PJ28 tracker/worklist records automatically.",
+    "Proof and founder/operator decision are required before status advancement."
+  ],
+  "next_action": "Commit PJ29 tracked files and test the local UI."
+}
