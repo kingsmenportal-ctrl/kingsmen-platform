@@ -164,3 +164,6 @@ data/personal-job-desk/apply-readiness-selections.local.json
 reports/personal-jobs/personal-jobs-20-opportunity-command-queue-latest.json
 data/personal-job-desk/opportunity-quality-gate.local.json
 reports/personal-jobs/personal-jobs-20b-opportunity-quality-gate-latest.json
+data/personal-job-desk/one-profile.local.json
+data/personal-job-desk/application-packs.local.json
+reports/personal-jobs/personal-jobs-21-apply-pack-builder-latest.json

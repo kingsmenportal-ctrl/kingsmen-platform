@@ -1,0 +1,118 @@
+{
+  "schema": "kingsmen.personal-jobs-21-proof.v1",
+  "module": "PERSONAL-JOBS-21 - One Profile Apply Pack Builder / CV + Motivation Drafts / Manual Submission Packet",
+  "status": "PROVEN",
+  "passed": true,
+  "generated_at": "2026-06-10T01:58:12.922Z",
+  "output": "data/personal-job-desk/application-packs.local.json",
+  "summary": {
+    "totalReadyLeadsFromPJ20B": 80,
+    "applicationPackCount": 80,
+    "readyForHumanReviewCount": 0,
+    "needsProfileCompletionCount": 80
+  },
+  "boundaries": {
+    "sendsApplications": false,
+    "sendsEmail": false,
+    "sendsWhatsApp": false,
+    "touchesPayments": false,
+    "contactsEmployers": false,
+    "bypassesLoginOrCaptcha": false,
+    "productionReady": false,
+    "deployedToOracle": false
+  },
+  "checks": [
+    {
+      "name": "file:scripts/agents/personal-job-apply-pack-builder.mjs",
+      "passed": true,
+      "detail": "scripts/agents/personal-job-apply-pack-builder.mjs"
+    },
+    {
+      "name": "file:apps/web/src/app/api/personal-jobs/apply-pack-builder/build/route.ts",
+      "passed": true,
+      "detail": "apps/web/src/app/api/personal-jobs/apply-pack-builder/build/route.ts"
+    },
+    {
+      "name": "file:apps/web/src/app/personal-job-desk/apply-pack-builder/page.tsx",
+      "passed": true,
+      "detail": "apps/web/src/app/personal-job-desk/apply-pack-builder/page.tsx"
+    },
+    {
+      "name": "file:apps/web/src/app/personal-job-desk/apply-pack-builder/ApplyPackBuilderClient.tsx",
+      "passed": true,
+      "detail": "apps/web/src/app/personal-job-desk/apply-pack-builder/ApplyPackBuilderClient.tsx"
+    },
+    {
+      "name": "file:packages/contracts/src/personal-jobs-21-apply-pack-builder.ts",
+      "passed": true,
+      "detail": "packages/contracts/src/personal-jobs-21-apply-pack-builder.ts"
+    },
+    {
+      "name": "file:docs/personal-jobs/personal-jobs-21-apply-pack-builder.md",
+      "passed": true,
+      "detail": "docs/personal-jobs/personal-jobs-21-apply-pack-builder.md"
+    },
+    {
+      "name": "file:manifests/personal-jobs/personal-jobs-21-apply-pack-builder.json",
+      "passed": true,
+      "detail": "manifests/personal-jobs/personal-jobs-21-apply-pack-builder.json"
+    },
+    {
+      "name": "file:scripts/proof/prove-personal-jobs-21-apply-pack-builder.mjs",
+      "passed": true,
+      "detail": "scripts/proof/prove-personal-jobs-21-apply-pack-builder.mjs"
+    },
+    {
+      "name": "file:scripts/validators/validate-personal-jobs-21-apply-pack-builder.mjs",
+      "passed": true,
+      "detail": "scripts/validators/validate-personal-jobs-21-apply-pack-builder.mjs"
+    },
+    {
+      "name": "pj20b_input_exists",
+      "passed": true,
+      "detail": "PJ20B output must exist before PJ21."
+    },
+    {
+      "name": "agent_exit_zero",
+      "passed": true,
+      "detail": "{\n  \"status\": \"COMPLETED\",\n  \"totalReadyLeadsFromPJ20B\": 80,\n  \"applicationPackCount\": 80,\n  \"readyForHumanReviewCount\": 0,\n  \"needsProfileCompletionCount\": 80\n}\n"
+    },
+    {
+      "name": "output_written",
+      "passed": true,
+      "detail": "C:\\Kingsmen\\kingsmen-platform\\data\\personal-job-desk\\application-packs.local.json"
+    },
+    {
+      "name": "output_completed",
+      "passed": true,
+      "detail": "COMPLETED"
+    },
+    {
+      "name": "packs_created",
+      "passed": true,
+      "detail": "80"
+    },
+    {
+      "name": "packs_match_ready_leads",
+      "passed": true,
+      "detail": "80 vs 80"
+    },
+    {
+      "name": "no_unsafe_pack_actions",
+      "passed": true,
+      "detail": "0 unsafe packs"
+    },
+    {
+      "name": "all_packs_have_required_sections",
+      "passed": true,
+      "detail": "0 incomplete packs"
+    },
+    {
+      "name": "only_specific_vacancy_ready_packs",
+      "passed": true,
+      "detail": "0 non-specific vacancy packs"
+    }
+  ],
+  "failed": [],
+  "next_action": "Commit PJ21, then test /personal-job-desk/apply-pack-builder."
+}
