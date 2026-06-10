@@ -26,3 +26,5 @@ export * as Communications from "./communications";
 export * as Finance from "./finance";
 
 export * as AiDecision from "./ai-decision";
+
+export * as Governance from "./governance";

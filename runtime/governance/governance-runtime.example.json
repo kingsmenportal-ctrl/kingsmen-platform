@@ -1,0 +1,28 @@
+{
+  "purpose": "Non-secret governance runtime example for Kingsmen N12.",
+  "mode": "policy_gate_runtime",
+  "stateMachineAuthority": "backend",
+  "humanReviewRequiredFor": [
+    "official_submission",
+    "refund_approval",
+    "fraud_confirmation",
+    "privacy_sensitive_change",
+    "hard_blocker_override",
+    "low_confidence_source",
+    "phoenix_fallback",
+    "growth_cap_increase",
+    "WhatsApp non-urgent exception"
+  ],
+  "hardBlocks": [
+    "AI governing money",
+    "AI approving refunds",
+    "AI confirming fraud",
+    "AI deciding official status",
+    "AI submitting official applications",
+    "privacy-sensitive action without lawful basis",
+    "growth cap increase without outcome-quality evidence",
+    "silent override"
+  ],
+  "auditRule": "Every policy gate, override, consent, source-confidence review, and cap decision must create evidence/audit records.",
+  "secretsRule": "No secrets are committed. Governance runtime reads secrets only from deployment secret store later."
+}

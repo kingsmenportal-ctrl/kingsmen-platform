@@ -1,0 +1,46 @@
+{
+  "phase": "N12",
+  "name": "Governance / Policy Runtime",
+  "status": "foundation",
+  "purpose": "Central Kingsmen governance runtime for policy gates, human override, compliance evidence, POPIA discipline, source confidence, refund/submission boundaries, and growth-cap control.",
+  "locked_doctrine": [
+    "Backend state machine controls flow.",
+    "AI may suggest but must not govern money, refunds, official status, submissions, fraud, privacy, or hard blockers.",
+    "No silent override.",
+    "No proofless success claims.",
+    "No fake guarantees.",
+    "No Phoenix false rescue.",
+    "No growth cap increase without outcome-quality evidence.",
+    "No official submission without permitted state, evidence, and human/operator approval when required.",
+    "No refund decision without finance boundary and human/operator approval.",
+    "No privacy-sensitive action without POPIA lawful basis, consent or operator approval.",
+    "Source confidence must be attached to official claims and route recommendations.",
+    "All policy decisions must create audit/evidence records."
+  ],
+  "policy_domains": [
+    "STATE_MACHINE",
+    "AI_BOUNDARY",
+    "SUBMISSION",
+    "FINANCE_REFUND",
+    "POPIA_PRIVACY",
+    "SOURCE_CONFIDENCE",
+    "DOCUMENT_FRAUD",
+    "HUMAN_OVERRIDE",
+    "PHOENIX_FALLBACK",
+    "COMMUNICATION",
+    "GROWTH_CAP",
+    "ORACLE_LITE"
+  ],
+  "human_review_required_for": [
+    "official_submission",
+    "refund_approval",
+    "fraud_confirmation",
+    "privacy_sensitive_change",
+    "hard_blocker_override",
+    "low_confidence_source",
+    "phoenix_fallback",
+    "growth_cap_increase",
+    "WhatsApp non-urgent exception"
+  ],
+  "next": "N13 - Observability / Reports / Incident Runtime"
+}
