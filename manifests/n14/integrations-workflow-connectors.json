@@ -1,0 +1,24 @@
+{
+  "phase": "N14",
+  "name": "Integrations / Workflow Connector Runtime",
+  "status": "foundation",
+  "purpose": "Connect backend commands to external workers and providers without allowing integrations to become the business brain.",
+  "locked_doctrine": [
+    "Backend remains the controller and source of truth.",
+    "n8n workflows are stateless thin workers.",
+    "Each workflow may perform one Airtable mirror write and one backend result POST.",
+    "No orchestration logic is allowed inside n8n, Airtable, Playwright, PayFast, email, or other connectors.",
+    "Every inbound webhook must be authenticated or blocked.",
+    "Every workflow result must pass idempotency, state transition, policy gate, and evidence checks.",
+    "Playwright is scout/probe only and must route CAPTCHA, OTP, down portal, or blocked portal to MAP/manual fallback.",
+    "Airtable is mirror only and may not override PostgreSQL truth.",
+    "PayFast events update payment evidence but do not decide refunds without governance.",
+    "Email is the primary communications connector.",
+    "WhatsApp remains urgent-only.",
+    "Connector failures must go to retry or DLQ with cause, reason, fix path, and evidence.",
+    "No secret values may be committed."
+  ],
+  "workflow_codes": ["W00","W01","W02","W03","W04","W05","W06","W07","W08","W09","W10","W11","W12","W13","W14","W15","W16","W17","W24"],
+  "standard_worker_contract": ["Webhook_Trigger","Normalize_Input","Validate_Input","Process_Domain_Logic","Final_State_Write","Build_Result","POST /workflow/result","Respond_to_Webhook"],
+  "next": "N15 - Opportunity Engine / External Source Intelligence"
+}

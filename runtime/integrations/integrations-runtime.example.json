@@ -1,0 +1,9 @@
+{
+  "purpose": "Non-secret runtime example for N14 integrations and workflow connectors.",
+  "backendTruth": true,
+  "secretRule": "Never commit secret values. Use secret refs only.",
+  "n8nContract": { "statelessThinWorker": true, "maxAirtableWrites": 1, "maxBackendResultPosts": 1, "standardNodeCount": 8, "resultEndpoint": "/workflow/result" },
+  "airtableBoundary": "MIRROR_ONLY_POSTGRES_WINS",
+  "playwrightBoundary": "SCOUT_PROBE_ONLY_MAP_ON_CAPTCHA_OTP_PORTAL_DOWN",
+  "communicationsBoundary": "EMAIL_PRIMARY_WHATSAPP_URGENT_ONLY_SMS_BACKUP_ONLY"
+}

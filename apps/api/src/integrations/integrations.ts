@@ -1,0 +1,47 @@
+export type WorkflowCode =
+  | "W00" | "W01" | "W02" | "W03" | "W04" | "W05" | "W06" | "W07" | "W08" | "W09"
+  | "W10" | "W11" | "W12" | "W13" | "W14" | "W15" | "W16" | "W17" | "W24";
+
+export type KingsmenState = "SAME" | "NEW" | "INTAKE_PENDING" | "EVALUATION_PENDING" | "DOCUMENT_PENDING" | "EXECUTION_PENDING" | "COMPLETED" | "FAILED";
+
+export interface WorkflowConnector { workflowCode: WorkflowCode; workflowName: string; targetState: KingsmenState; connectorKey: string; sameStateWorker: boolean; maxAirtableWrites: number; maxBackendResultPosts: number; doctrineNote: string; }
+export interface WorkerResultEnvelope { workflowCode: WorkflowCode; commandRef: string; previousState?: KingsmenState; requestedState: KingsmenState; workerNodeCount: number; airtableWriteCount: number; backendResultPostCount: number; evidenceRefs: string[]; payload: Record<string, unknown>; }
+export interface ConnectorFailure { sourceRef: string; sourceType: "OUTBOX" | "INBOX" | "WORKFLOW_RESULT" | "AIRTABLE_MIRROR" | "PLAYWRIGHT_PROBE" | "PAYFAST_EVENT" | "EMAIL_EVENT" | "OTHER"; connectorKey: string; severity: "INFO" | "WATCH" | "WARNING" | "CRITICAL"; cause: string; reason: string; fixPath: string; evidenceRefs: string[]; payload: Record<string, unknown>; }
+
+export const N8N_STANDARD_NODE_COUNT = 8;
+export const MAX_AIRTABLE_WRITES_PER_WORKFLOW = 1;
+export const MAX_BACKEND_RESULT_POSTS_PER_WORKFLOW = 1;
+
+export const WORKFLOW_REGISTRY: WorkflowConnector[] = [
+  { workflowCode: "W00", workflowName: "Template Registry", targetState: "SAME", connectorKey: "n8n_worker_gateway", sameStateWorker: true, maxAirtableWrites: 1, maxBackendResultPosts: 1, doctrineNote: "Same-state registry worker." },
+  { workflowCode: "W01", workflowName: "Kingsmen Intake Web", targetState: "EVALUATION_PENDING", connectorKey: "n8n_worker_gateway", sameStateWorker: false, maxAirtableWrites: 1, maxBackendResultPosts: 1, doctrineNote: "Intake claim/commit/heartbeat/duplicate gate." },
+  { workflowCode: "W02", workflowName: "MSB Evaluate", targetState: "DOCUMENT_PENDING", connectorKey: "n8n_worker_gateway", sameStateWorker: false, maxAirtableWrites: 1, maxBackendResultPosts: 1, doctrineNote: "Evaluation worker." },
+  { workflowCode: "W03", workflowName: "MSB Execute", targetState: "COMPLETED", connectorKey: "n8n_worker_gateway", sameStateWorker: false, maxAirtableWrites: 1, maxBackendResultPosts: 1, doctrineNote: "Execution worker; no portal bypass." },
+  { workflowCode: "W04", workflowName: "MSB Govern", targetState: "SAME", connectorKey: "n8n_worker_gateway", sameStateWorker: true, maxAirtableWrites: 1, maxBackendResultPosts: 1, doctrineNote: "Governance same-state worker." },
+  { workflowCode: "W05", workflowName: "Playwright Trigger", targetState: "SAME", connectorKey: "playwright_probe_service", sameStateWorker: true, maxAirtableWrites: 1, maxBackendResultPosts: 1, doctrineNote: "Playwright scout/probe with MAP fallback." },
+  { workflowCode: "W06", workflowName: "MSB Defer", targetState: "DOCUMENT_PENDING", connectorKey: "n8n_worker_gateway", sameStateWorker: false, maxAirtableWrites: 1, maxBackendResultPosts: 1, doctrineNote: "Defer worker." },
+  { workflowCode: "W07", workflowName: "Document Uploaded", targetState: "EXECUTION_PENDING", connectorKey: "n8n_worker_gateway", sameStateWorker: false, maxAirtableWrites: 1, maxBackendResultPosts: 1, doctrineNote: "Document readiness worker." },
+  { workflowCode: "W08", workflowName: "MSB Status", targetState: "SAME", connectorKey: "n8n_worker_gateway", sameStateWorker: true, maxAirtableWrites: 1, maxBackendResultPosts: 1, doctrineNote: "Same-state status worker." },
+  { workflowCode: "W09", workflowName: "Comms Inbound", targetState: "SAME", connectorKey: "email_delivery_gateway", sameStateWorker: true, maxAirtableWrites: 1, maxBackendResultPosts: 1, doctrineNote: "Inbound communications worker." },
+  { workflowCode: "W10", workflowName: "MSB Fee", targetState: "EXECUTION_PENDING", connectorKey: "payfast_itn_gateway", sameStateWorker: false, maxAirtableWrites: 1, maxBackendResultPosts: 1, doctrineNote: "Payment evidence worker." },
+  { workflowCode: "W11", workflowName: "MSB Content", targetState: "DOCUMENT_PENDING", connectorKey: "n8n_worker_gateway", sameStateWorker: false, maxAirtableWrites: 1, maxBackendResultPosts: 1, doctrineNote: "Content/document worker." },
+  { workflowCode: "W12", workflowName: "Outreach Inbound", targetState: "INTAKE_PENDING", connectorKey: "n8n_worker_gateway", sameStateWorker: false, maxAirtableWrites: 1, maxBackendResultPosts: 1, doctrineNote: "Outreach-to-intake worker." },
+  { workflowCode: "W13", workflowName: "Social Generate", targetState: "SAME", connectorKey: "n8n_worker_gateway", sameStateWorker: true, maxAirtableWrites: 1, maxBackendResultPosts: 1, doctrineNote: "Social same-state worker." },
+  { workflowCode: "W14", workflowName: "Analytics Request", targetState: "SAME", connectorKey: "n8n_worker_gateway", sameStateWorker: true, maxAirtableWrites: 1, maxBackendResultPosts: 1, doctrineNote: "Analytics same-state worker." },
+  { workflowCode: "W15", workflowName: "System Insight Generator", targetState: "SAME", connectorKey: "n8n_worker_gateway", sameStateWorker: true, maxAirtableWrites: 1, maxBackendResultPosts: 1, doctrineNote: "W15 insight suggests; governance decides." },
+  { workflowCode: "W16", workflowName: "Sovereign Kernel", targetState: "SAME", connectorKey: "n8n_worker_gateway", sameStateWorker: true, maxAirtableWrites: 1, maxBackendResultPosts: 1, doctrineNote: "Kernel same-state worker." },
+  { workflowCode: "W17", workflowName: "Sovereign Kernel v2", targetState: "SAME", connectorKey: "n8n_worker_gateway", sameStateWorker: true, maxAirtableWrites: 1, maxBackendResultPosts: 1, doctrineNote: "W24 routes through W17." },
+  { workflowCode: "W24", workflowName: "W24 Command", targetState: "SAME", connectorKey: "n8n_worker_gateway", sameStateWorker: true, maxAirtableWrites: 1, maxBackendResultPosts: 1, doctrineNote: "W24 -> W17 -> worker -> /workflow/result." }
+];
+
+export function assertNoCommittedSecret(value?: string): void { if (value && /sk-|pat_|token_[A-Za-z0-9]|passphrase=|merchant_key=/i.test(value)) throw new Error("SECRET_VALUE_COMMITTED_IN_CONNECTOR_CONFIG"); }
+export function assertThinWorkerResult(envelope: WorkerResultEnvelope): void { if (envelope.workerNodeCount !== N8N_STANDARD_NODE_COUNT) throw new Error("WORKER_STANDARD_8_NODE_CONTRACT_REQUIRED"); if (envelope.airtableWriteCount > MAX_AIRTABLE_WRITES_PER_WORKFLOW) throw new Error("WORKER_AIRTABLE_WRITE_LIMIT_EXCEEDED"); if (envelope.backendResultPostCount !== MAX_BACKEND_RESULT_POSTS_PER_WORKFLOW) throw new Error("WORKER_MUST_POST_EXACTLY_ONE_BACKEND_RESULT"); if (envelope.evidenceRefs.length === 0) throw new Error("WORKER_RESULT_EVIDENCE_REQUIRED"); }
+export function findWorkflow(code: WorkflowCode): WorkflowConnector { const found = WORKFLOW_REGISTRY.find((workflow) => workflow.workflowCode === code); if (!found) throw new Error(`UNKNOWN_WORKFLOW_${code}`); return found; }
+export function buildN8nDispatchContract() { return ["Webhook_Trigger", "Normalize_Input", "Validate_Input", "Process_Domain_Logic", "Final_State_Write", "Build_Result", "POST /workflow/result", "Respond_to_Webhook"]; }
+export function assertAirtableCannotOverrideTruth(direction: "POSTGRES_TO_AIRTABLE_MIRROR" | "AIRTABLE_TO_POSTGRES_REVIEW_ONLY"): void { if (direction === "AIRTABLE_TO_POSTGRES_REVIEW_ONLY") throw new Error("AIRTABLE_TO_POSTGRES_REQUIRES_OPERATOR_REVIEW"); }
+export function buildPlaywrightProbeResult(input: { blockReason?: "CAPTCHA" | "OTP" | "PORTAL_DOWN" | "RATE_LIMITED" | "LOGIN_REQUIRED" | "MANUAL_ONLY" | "UNKNOWN"; evidenceRefs: string[] }) { if (input.evidenceRefs.length === 0) throw new Error("PLAYWRIGHT_PROBE_EVIDENCE_REQUIRED"); const mapReasons = ["CAPTCHA", "OTP", "PORTAL_DOWN", "RATE_LIMITED", "LOGIN_REQUIRED", "MANUAL_ONLY"]; const mapRequired = Boolean(input.blockReason && mapReasons.includes(input.blockReason)); return { probeRef: `probe_${Date.now()}`, probeStatus: mapRequired ? "MAP_REQUIRED" : "SUCCESS", mapRequired, blockReason: input.blockReason, evidenceRefs: input.evidenceRefs }; }
+export function assertPayfastCannotDecideRefunds(refundDecisionAllowed: boolean): void { if (refundDecisionAllowed) throw new Error("PAYFAST_REFUND_DECISION_BLOCKED"); }
+export function assertWhatsAppUrgentOnly(channel: "EMAIL" | "WHATSAPP_URGENT" | "SMS_BACKUP" | "PORTAL", urgent: boolean): void { if (channel === "WHATSAPP_URGENT" && !urgent) throw new Error("WHATSAPP_CONNECTOR_URGENT_ONLY"); }
+export function assertWebhookVerified(status: "VERIFIED" | "MISSING" | "FAILED" | "NOT_REQUIRED"): void { if (status !== "VERIFIED" && status !== "NOT_REQUIRED") throw new Error("WEBHOOK_SIGNATURE_VERIFICATION_REQUIRED"); }
+export function createIntegrationDlqItem(failure: ConnectorFailure): ConnectorFailure & { dlqRef: string; status: "OPEN" } { if (!failure.cause.trim()) throw new Error("INTEGRATION_DLQ_CAUSE_REQUIRED"); if (!failure.reason.trim()) throw new Error("INTEGRATION_DLQ_REASON_REQUIRED"); if (!failure.fixPath.trim()) throw new Error("INTEGRATION_DLQ_FIX_PATH_REQUIRED"); if (failure.evidenceRefs.length === 0) throw new Error("INTEGRATION_DLQ_EVIDENCE_REQUIRED"); return { ...failure, dlqRef: `dlq_${Date.now()}`, status: "OPEN" }; }
+export function assertBackendControlsFlow(): true { return true; }

@@ -1,0 +1,9 @@
+﻿{
+    "phase":  "N14",
+    "name":  "Integrations / Workflow Connector Runtime",
+    "passed":  true,
+    "checkedAt":  "2026-06-10T14:43:35",
+    "failures":  [
+
+                 ]
+}
