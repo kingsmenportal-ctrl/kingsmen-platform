@@ -1,0 +1,147 @@
+{
+  "schema": "kingsmen.personal-jobs-31-proof.v1",
+  "module": "PERSONAL-JOBS-31 - Candidate Status Timeline / Evidence-Readable Dashboard",
+  "status": "PROVEN",
+  "passed": true,
+  "generated_at": "2026-06-10T03:48:05.849Z",
+  "input": "data/personal-job-desk/status-advancement-audit.local.json",
+  "output": "data/personal-job-desk/status-timeline.local.json",
+  "summary": {
+    "totalItems": 80,
+    "awaitingProof": 80,
+    "awaitingApproval": 0,
+    "readyForAuditRecord": 0,
+    "auditRecorded": 0,
+    "rejected": 0,
+    "blocked": 0,
+    "closed": 0,
+    "candidateVisibleMessages": 0,
+    "proofBacked": 0,
+    "byTimelineStatus": {
+      "AWAITING_PROOF": 80
+    },
+    "byEvidenceLevel": {
+      "NO_EVIDENCE": 80
+    },
+    "byTargetStatus": {
+      "REVIEW_REQUIRED": 80
+    }
+  },
+  "boundaries": {
+    "sendsApplications": false,
+    "sendsEmail": false,
+    "sendsWhatsApp": false,
+    "sendsSms": false,
+    "touchesPayments": false,
+    "contactsEmployers": false,
+    "bypassesLoginOtpCaptcha": false,
+    "autoMutatesApplicationTracker": false,
+    "autoMutatesProofBoard": false,
+    "productionReady": false,
+    "deployedToOracle": false
+  },
+  "checks": [
+    {
+      "name": "file:scripts/agents/personal-job-status-timeline.mjs",
+      "passed": true,
+      "detail": "scripts/agents/personal-job-status-timeline.mjs"
+    },
+    {
+      "name": "file:apps/web/src/app/api/personal-jobs/status-timeline/route.ts",
+      "passed": true,
+      "detail": "apps/web/src/app/api/personal-jobs/status-timeline/route.ts"
+    },
+    {
+      "name": "file:apps/web/src/app/personal-job-desk/status-timeline/page.tsx",
+      "passed": true,
+      "detail": "apps/web/src/app/personal-job-desk/status-timeline/page.tsx"
+    },
+    {
+      "name": "file:apps/web/src/app/personal-job-desk/status-timeline/StatusTimelineClient.tsx",
+      "passed": true,
+      "detail": "apps/web/src/app/personal-job-desk/status-timeline/StatusTimelineClient.tsx"
+    },
+    {
+      "name": "file:packages/contracts/src/personal-jobs-31-status-timeline.ts",
+      "passed": true,
+      "detail": "packages/contracts/src/personal-jobs-31-status-timeline.ts"
+    },
+    {
+      "name": "file:docs/personal-jobs/personal-jobs-31-status-timeline.md",
+      "passed": true,
+      "detail": "docs/personal-jobs/personal-jobs-31-status-timeline.md"
+    },
+    {
+      "name": "file:manifests/personal-jobs/personal-jobs-31-status-timeline.json",
+      "passed": true,
+      "detail": "manifests/personal-jobs/personal-jobs-31-status-timeline.json"
+    },
+    {
+      "name": "file:scripts/proof/prove-personal-jobs-31-status-timeline.mjs",
+      "passed": true,
+      "detail": "scripts/proof/prove-personal-jobs-31-status-timeline.mjs"
+    },
+    {
+      "name": "file:scripts/validators/validate-personal-jobs-31-status-timeline.mjs",
+      "passed": true,
+      "detail": "scripts/validators/validate-personal-jobs-31-status-timeline.mjs"
+    },
+    {
+      "name": "pj30_input_exists",
+      "passed": true,
+      "detail": "PJ30 status-advancement-audit.local.json must exist before PJ31."
+    },
+    {
+      "name": "agent_exit_zero",
+      "passed": true,
+      "detail": "{\n  \"status\": \"COMPLETED\",\n  \"pj30AdvancementRecordCount\": 80,\n  \"timelineItemCount\": 80,\n  \"summary\": {\n    \"totalItems\": 80,\n    \"awaitingProof\": 80,\n    \"awaitingApproval\": 0,\n    \"readyForAuditRecord\": 0,\n    \"auditRecorded\": 0,\n    \"rejected\": 0,\n    \"blocked\": 0,\n    \"closed\": 0,\n    \"candidateVisibleMessages\": 0,\n    \"proofBacked\": 0,\n    \"byTimelineStatus\": {\n      \"AWAITING_PROOF\": 80\n    },\n    \"byEvidenceLevel\": {\n      \"NO_EVIDENCE\": 80\n    },\n    \"byTargetStatus\": {\n      \"REVIEW_REQUIRED\": 80\n    }\n  }\n}\n"
+    },
+    {
+      "name": "output_written",
+      "passed": true,
+      "detail": "C:\\Kingsmen\\kingsmen-platform\\data\\personal-job-desk\\status-timeline.local.json"
+    },
+    {
+      "name": "input_completed",
+      "passed": true,
+      "detail": "COMPLETED"
+    },
+    {
+      "name": "output_completed",
+      "passed": true,
+      "detail": "COMPLETED"
+    },
+    {
+      "name": "timeline_items_created",
+      "passed": true,
+      "detail": "80"
+    },
+    {
+      "name": "items_match_pj30_records",
+      "passed": true,
+      "detail": "80 vs 80"
+    },
+    {
+      "name": "all_items_have_required_sections",
+      "passed": true,
+      "detail": "0 timeline items missing required sections"
+    },
+    {
+      "name": "no_unsafe_timeline_actions",
+      "passed": true,
+      "detail": "0 unsafe timeline items"
+    },
+    {
+      "name": "no_success_guarantees",
+      "passed": true,
+      "detail": "0 guarantee-like timeline items"
+    },
+    {
+      "name": "global_safety_boundary_no_send_no_mutation",
+      "passed": true,
+      "detail": "{\"sendsApplications\":false,\"sendsEmail\":false,\"sendsWhatsApp\":false,\"sendsSms\":false,\"contactsEmployers\":false,\"touchesPayments\":false,\"bypassesLoginOtpCaptcha\":false,\"autoMutatesApplicationTracker\":false,\"autoMutatesProofBoard\":false,\"productionClaim\":false,\"deployedToOracle\":false}"
+    }
+  ],
+  "failed": [],
+  "next_action": "Commit PJ31, then test /personal-job-desk/status-timeline."
+}

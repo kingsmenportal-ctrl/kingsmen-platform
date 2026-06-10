@@ -1,0 +1,38 @@
+{
+  "schema": "kingsmen.validation-report.v1",
+  "module": "PERSONAL-JOBS-31 - Candidate Status Timeline / Evidence-Readable Dashboard",
+  "status": "VALIDATED",
+  "passed": true,
+  "generated_at": "2026-06-10T03:48:05.868Z",
+  "proof": "reports/personal-jobs/personal-jobs-31-status-timeline-proof.json",
+  "output": "data/personal-job-desk/status-timeline.local.json",
+  "summary": {
+    "totalItems": 80,
+    "awaitingProof": 80,
+    "awaitingApproval": 0,
+    "readyForAuditRecord": 0,
+    "auditRecorded": 0,
+    "rejected": 0,
+    "blocked": 0,
+    "closed": 0,
+    "candidateVisibleMessages": 0,
+    "proofBacked": 0,
+    "byTimelineStatus": {
+      "AWAITING_PROOF": 80
+    },
+    "byEvidenceLevel": {
+      "NO_EVIDENCE": 80
+    },
+    "byTargetStatus": {
+      "REVIEW_REQUIRED": 80
+    }
+  },
+  "failed_checks": [],
+  "warnings": [
+    "PJ31 is read-only.",
+    "PJ31 does not mutate application tracker, proof board, or audit records.",
+    "PJ31 does not send email, WhatsApp, SMS, or employer messages automatically.",
+    "Candidate-visible timeline must not guarantee employment, interview, offer, or response."
+  ],
+  "next_action": "Commit PJ31 tracked files and test the local UI."
+}
