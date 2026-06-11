@@ -1,7 +1,7 @@
-import JarvisHudClient from "./JarvisHudClient";
+import JarvisAgentClient from "./JarvisAgentClient";
 
 export const dynamic = "force-dynamic";
 
 export default function JarvisPage() {
-  return <JarvisHudClient surface="JARVIS" />;
+  return <JarvisAgentClient />;
 }
