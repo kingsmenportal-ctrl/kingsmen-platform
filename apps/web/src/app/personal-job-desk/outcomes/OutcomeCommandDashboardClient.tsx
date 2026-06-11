@@ -331,7 +331,7 @@ export default function OutcomeCommandDashboardClient({
       interviews: outcomes.filter((record) => record.status === "INTERVIEW_ACTIVE").length,
       offers: outcomes.filter((record) => record.status === "OFFER_RECEIVED").length,
       hired: outcomes.filter((record) => record.status === "HIRED" || record.status === "OFFER_ACCEPTED").length,
-      rejected: outcomes.filter((record) => record.status === "UNSUCCESSFUL" || record.status === "REJECTED").length
+      rejected: outcomes.filter((record) => record.status === "CLOSED_NO_RESPONSE" || record.status === "OFFER_DECLINED").length
     };
   }, [data, outcomes]);
 

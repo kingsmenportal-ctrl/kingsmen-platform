@@ -1,5 +1,6 @@
 /// <reference types="next" />
 /// <reference types="next/image-types/global" />
+/// <reference path="./.next/types/routes.d.ts" />
 
-// This file is generated/maintained for Kingsmen local web runtime readiness.
-// Do not manually add production secrets here.
+// NOTE: This file should not be edited
+// see https://nextjs.org/docs/app/api-reference/config/typescript for more information.
