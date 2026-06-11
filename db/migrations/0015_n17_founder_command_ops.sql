@@ -113,7 +113,7 @@ create table if not exists public.founder_watchlist_items (
   risk_level text not null default 'WATCH',
   next_action text not null,
   due_at timestamptz,
-  evidence_refs text[] not null default array[]::text,
+  evidence_refs text[] not null default ARRAY[]::text[],
   created_at timestamptz not null default now(),
   resolved_at timestamptz,
   constraint founder_watch_type_chk check (watch_type in ('CANDIDATE','APPLICATION','DOCUMENT','ROUTE','SOURCE','FINANCE','COMMS','INCIDENT','CAPACITY','PLAYWRIGHT','MAP','PHOENIX')),
