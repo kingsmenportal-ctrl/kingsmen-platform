@@ -1,0 +1,54 @@
+{
+  "id": "PJ_PUBLIC_JARVIS_20_CONTINUE_DEV",
+  "sequence": 20,
+  "project_name": "Continue",
+  "repository": "continuedev/continue",
+  "public_url": "https://github.com/continuedev/continue",
+  "study_file": "docs/jarvis/public-reference-studies/PJ_PUBLIC_JARVIS_20_CONTINUE_DEV.md",
+  "recorded_branch": "main",
+  "study_date": "2026-06-15",
+  "status": "recorded_reference_only",
+  "maintenance_note": "The public README at study time states that the repository is no longer actively maintained and read-only for all users. Kingsmen records this for pattern extraction only, not as a runtime dependency.",
+  "primary_lesson": "Context-managed coding-assistant pattern for repo-aware AI development.",
+  "kingsmen_adaptations": [
+    "JarvisRepoContextSelector",
+    "JarvisContextBudgetGuard",
+    "JarvisIgnorePolicy",
+    "JarvisRelevantFilePicker",
+    "JarvisConversationCompactor",
+    "JarvisRepoRulesLoader",
+    "JarvisCli",
+    "JarvisIdeBridge",
+    "JarvisModelRoutingConfig",
+    "JarvisSourceControlledAiChecks",
+    "JarvisValidatorManifest",
+    "JarvisPreCommitReviewGate",
+    "JarvisCiCheckPack"
+  ],
+  "kingsmen_rejections": [
+    "unbounded repo context dumping",
+    "assistant rules overriding locked doctrine",
+    "IDE plugin acting outside backend policy",
+    "CLI command bypassing approval gates",
+    "model selection without budget or risk policy",
+    "using stale or unmaintained public repos as runtime authority",
+    "candidate data in coding context",
+    "secret files entering prompts or logs",
+    "source-controlled AI checks with no human accountability"
+  ],
+  "architecture_fit": [
+    "Jarvis Builder Core",
+    "Jarvis Context Engine",
+    "Jarvis IDE/CLI Bridge",
+    "Jarvis Model Router",
+    "Jarvis Validator Layer",
+    "Jarvis Evidence Layer"
+  ],
+  "authority_boundary": [
+    "Does not replace backend state machine",
+    "Does not replace PostgreSQL Truth Vault",
+    "Does not override N00 doctrine",
+    "Does not bypass validators",
+    "Does not bypass founder approval"
+  ]
+}
