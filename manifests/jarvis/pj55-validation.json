@@ -1,0 +1,24 @@
+{
+  "id": "pj55-validation",
+  "pj": "PJ55",
+  "version": "1.0.0",
+  "required_files": [
+    "docs/agents/PJ55_JARVIS_FINAL_RUNTIME_CLOSEOUT.md",
+    "manifests/jarvis/pj55-final-runtime-closeout.json",
+    "manifests/jarvis/pj55-acceptance-record.json",
+    "manifests/jarvis/pj55-runtime-status-map.json",
+    "manifests/jarvis/pj55-deferred-repair-carryover.json",
+    "manifests/jarvis/pj55-next-pj56-plan.json",
+    "manifests/jarvis/pj55-validation.json",
+    "scripts/jarvis/validate-pj55-final-runtime-closeout.mjs"
+  ],
+  "required_checks": [
+    "files_exist",
+    "json_loads",
+    "preview_not_production",
+    "runtime_path_present",
+    "deferred_repairs_present",
+    "pj56_plan_present"
+  ],
+  "next_phase": "PJ56 Jarvis Repair Sprint and Build Proof"
+}
