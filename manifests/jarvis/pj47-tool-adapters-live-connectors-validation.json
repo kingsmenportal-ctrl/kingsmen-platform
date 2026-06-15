@@ -1,0 +1,30 @@
+{
+  "id": "pj47-tool-adapters-live-connectors-validation",
+  "pj": "PJ47",
+  "version": "1.0.0",
+  "required_files": [
+    "docs/agents/PJ47_JARVIS_TOOL_ADAPTERS_LIVE_CONNECTORS.md",
+    "manifests/jarvis/pj47-tool-adapters-live-connectors.json",
+    "manifests/jarvis/jarvis-live-connector-catalog.json",
+    "manifests/jarvis/jarvis-adapter-contracts.json",
+    "manifests/jarvis/jarvis-connector-routing-policy.json",
+    "manifests/jarvis/jarvis-connector-evidence-policy.json",
+    "manifests/jarvis/pj47-tool-adapters-live-connectors-validation.json",
+    "apps/web/src/lib/jarvis/runtime/connectors/types.ts",
+    "apps/web/src/lib/jarvis/runtime/connectors/registry.ts",
+    "apps/web/src/lib/jarvis/runtime/connectors/index.ts",
+    "scripts/jarvis/validate-pj47-tool-adapters-live-connectors.mjs"
+  ],
+  "required_checks": [
+    "files_exist",
+    "json_loads",
+    "connector_ids_unique",
+    "connectors_have_adapters",
+    "contracts_reference_connectors_indirectly",
+    "routing_default_is_manual_review",
+    "evidence_required_for_all_connectors",
+    "runtime_types_exist",
+    "runtime_registry_exists"
+  ],
+  "next_phase": "PJ48 Jarvis Memory Vault"
+}
