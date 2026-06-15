@@ -1,0 +1,39 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://kingsmen.local/schemas/jarvis-voice-interface.schema.json",
+  "title": "Jarvis Voice Interface Schema",
+  "type": "object",
+  "required": ["id", "pj", "version", "voice_states", "wake_greetings", "safety_rules"],
+  "properties": {
+    "id": { "type": "string" },
+    "pj": { "type": "string" },
+    "version": { "type": "string" },
+    "voice_states": {
+      "type": "array",
+      "items": { "type": "string" },
+      "minItems": 1
+    },
+    "wake_greetings": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["greeting_id", "trigger", "text", "commander_only", "kingsmen_branded"],
+        "properties": {
+          "greeting_id": { "type": "string" },
+          "trigger": { "type": "string" },
+          "text": { "type": "string" },
+          "commander_only": { "type": "boolean" },
+          "kingsmen_branded": { "type": "boolean" }
+        },
+        "additionalProperties": false
+      },
+      "minItems": 1
+    },
+    "safety_rules": {
+      "type": "array",
+      "items": { "type": "string" },
+      "minItems": 1
+    }
+  },
+  "additionalProperties": false
+}
