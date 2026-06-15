@@ -1,0 +1,41 @@
+{
+  "id": "PJ_PUBLIC_JARVIS_18_OPEN_INTERPRETER",
+  "status": "recorded",
+  "branch": "main",
+  "project": {
+    "name": "Open Interpreter",
+    "repository": "openinterpreter/openinterpreter",
+    "type": "public coding agent / computer-use assistant reference"
+  },
+  "kingsmen_lessons": [
+    "safe local command execution",
+    "sandbox discipline",
+    "permission prompts",
+    "model/harness routing",
+    "skills/hooks/MCP bridge",
+    "computer-use QA testing",
+    "local session state",
+    "validator command running"
+  ],
+  "kingsmen_modules_influenced": [
+    "JarvisTerminalRuntime",
+    "JarvisSandboxExecutor",
+    "JarvisCommandHarness",
+    "JarvisModelHarnessSelector",
+    "JarvisPermissionPrompt",
+    "JarvisSkillsRuntime",
+    "JarvisHooksRuntime",
+    "JarvisMcpBridge",
+    "JarvisValidatorCommandRunner",
+    "JarvisExecutionTranscript"
+  ],
+  "forbidden_patterns": [
+    "unrestricted shell execution",
+    "silent command execution",
+    "production app control from terminal mode",
+    "secrets printed into logs",
+    "repo-wide changes without scope",
+    "browser/native automation bypassing login/CAPTCHA/OTP rules"
+  ],
+  "record_path": "docs/jarvis/public-reference-studies/PJ_PUBLIC_JARVIS_18_OPEN_INTERPRETER.md"
+}
