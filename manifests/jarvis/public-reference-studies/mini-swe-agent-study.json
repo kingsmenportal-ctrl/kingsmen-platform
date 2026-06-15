@@ -1,0 +1,75 @@
+{
+  "projectNumber": 23,
+  "status": "RECORDED",
+  "branch": "main",
+  "publicReference": {
+    "name": "mini-SWE-agent",
+    "repository": "SWE-agent/mini-swe-agent",
+    "url": "https://github.com/SWE-agent/mini-swe-agent",
+    "category": "minimal software-engineering agent / command-line repair loop / sandbox-friendly builder baseline"
+  },
+  "kingsmenDecision": "Accepted as a reference for the minimal auditable Kingsmen Jarvis Builder Core. Not accepted as uncontrolled shell authority or production authority.",
+  "primaryLessons": [
+    "A serious repo builder can begin as a small auditable command loop.",
+    "Linear trajectories are easier to debug, store, and validate.",
+    "Independent command execution is safer and easier to sandbox than a long-lived uncontrolled shell.",
+    "Validators and evidence should prove the result, not the model's confidence.",
+    "Kingsmen should start with a minimal Builder Core before adding IDE, voice, channel, and multi-agent layers."
+  ],
+  "adaptIntoKingsmen": [
+    "JarvisMiniBuilderCore",
+    "JarvisLinearTrajectoryLedger",
+    "JarvisIndependentCommandRunner",
+    "JarvisSandboxCommandAdapter",
+    "JarvisLocalRepoTaskRunner",
+    "JarvisValidatorFirstLoop",
+    "JarvisSimpleControlFlow",
+    "JarvisBaselineAgentHarness",
+    "JarvisCommandTranscriptStore",
+    "JarvisRepairResultContract",
+    "JarvisNoUselessLayerCheck"
+  ],
+  "rejectFromKingsmen": [
+    "unrestricted bash as universal authority",
+    "commands outside approved project folders",
+    "production commands from mini builder mode",
+    "blind model trust because the scaffold is simple",
+    "unbounded loops",
+    "terminal output containing secrets",
+    "candidate data in command transcripts",
+    "repo-wide edits without module scope",
+    "validator bypass because the agent says it is correct"
+  ],
+  "requiredKingsmenGuards": [
+    "DoctrinePolicyGate",
+    "RiskClassifier",
+    "ApprovalGate",
+    "SecretsRedactionGuard",
+    "RepoScopeGuard",
+    "ValidatorRunner",
+    "EvidenceLedger"
+  ],
+  "recommendedBuildOrder": [
+    "JarvisMiniBuilderCore interface",
+    "Linear trajectory ledger schema",
+    "Safe PowerShell/Bash command runner",
+    "Repo scope guard",
+    "Validator runner",
+    "Changed-files reporter",
+    "Repair loop with max attempts",
+    "Founder approval boundary",
+    "Commit/PR suggestion only",
+    "Later IDE/voice/channel bridges"
+  ],
+  "relatedStudies": [
+    "PJ_PUBLIC_JARVIS_16_OPENHANDS",
+    "PJ_PUBLIC_JARVIS_17_AIDER",
+    "PJ_PUBLIC_JARVIS_18_OPEN_INTERPRETER",
+    "PJ_PUBLIC_JARVIS_19_CLINE",
+    "PJ_PUBLIC_JARVIS_22_SWE_AGENT"
+  ],
+  "files": {
+    "study": "docs/jarvis/public-reference-studies/PJ_PUBLIC_JARVIS_23_MINI_SWE_AGENT.md",
+    "manifest": "manifests/jarvis/public-reference-studies/mini-swe-agent-study.json"
+  }
+}
