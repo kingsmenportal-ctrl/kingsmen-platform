@@ -1,0 +1,46 @@
+{
+  "id": "PJ_PUBLIC_JARVIS_14_LEON_AI",
+  "status": "RECORDED",
+  "recordedFor": "Kingsmen Jarvis",
+  "repositoryBranch": "main",
+  "studyDate": "2026-06-15",
+  "publicReference": {
+    "name": "Leon AI",
+    "repository": "leon-ai/leon",
+    "url": "https://github.com/leon-ai/leon",
+    "type": "open-source-personal-ai-assistant"
+  },
+  "kingsmenLessons": [
+    "mode-manager",
+    "controlled-vs-agent-execution",
+    "skill-action-tool-function-chain",
+    "context-router",
+    "layered-memory-boundary",
+    "local-remote-model-provider-routing",
+    "recovery-planner"
+  ],
+  "kingsmenAdopt": [
+    "JarvisModeManager",
+    "JarvisControlledMode",
+    "JarvisBuilderMode",
+    "JarvisResearchMode",
+    "JarvisConnectorDryRunMode",
+    "JarvisProductionApprovalMode",
+    "JarvisSkillActionToolFunctionChain",
+    "JarvisContextRouter",
+    "JarvisLayeredMemoryBoundary",
+    "JarvisModelProviderRouter",
+    "JarvisRecoveryPlanner"
+  ],
+  "kingsmenReject": [
+    "free-form-agent-execution-as-default",
+    "assistant-generated-doctrine-changes",
+    "unbounded-memory",
+    "unreviewed-community-skills",
+    "production-connector-actions-from-smart-mode",
+    "secrets-in-context-or-logs",
+    "agent-mode-bypassing-deterministic-validators"
+  ],
+  "recordPath": "docs/jarvis/public-reference-studies/PJ_PUBLIC_JARVIS_14_LEON_AI.md",
+  "finalDecision": "Leon AI is a reference for Kingsmen Jarvis Mode Manager, Skill Execution Chain, Context Router, Memory Boundary, Model Provider Router, and Recovery Planner. Kingsmen Jarvis remains controlled by doctrine, policy gates, validators, evidence ledger, backend state machine, PostgreSQL truth, and founder approval."
+}
