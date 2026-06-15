@@ -1,0 +1,35 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://kingsmen.local/schemas/jarvis-approval-evidence.schema.json",
+  "title": "Jarvis Approval and Evidence Schema",
+  "type": "object",
+  "required": ["id", "pj", "version", "approval_rules", "evidence_fields"],
+  "properties": {
+    "id": { "type": "string" },
+    "pj": { "type": "string" },
+    "version": { "type": "string" },
+    "approval_rules": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "type": "object",
+        "required": ["rule_id", "label", "risk_levels", "approval_required", "reason", "hud_surface"],
+        "properties": {
+          "rule_id": { "type": "string", "pattern": "^[a-z0-9_]+$" },
+          "label": { "type": "string" },
+          "risk_levels": { "type": "array", "items": { "type": "string" }, "minItems": 1 },
+          "approval_required": { "type": "boolean" },
+          "reason": { "type": "string" },
+          "hud_surface": { "type": "string" }
+        },
+        "additionalProperties": false
+      }
+    },
+    "evidence_fields": {
+      "type": "array",
+      "items": { "type": "string" },
+      "minItems": 1
+    }
+  },
+  "additionalProperties": false
+}
