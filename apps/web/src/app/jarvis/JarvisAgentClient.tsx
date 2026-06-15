@@ -1,6 +1,7 @@
 "use client";
 
 import { FormEvent, useEffect, useMemo, useRef, useState } from "react";
+import { jarvisRealBuildLock } from "@/lib/jarvis/real-build-lock";
 import styles from "./JarvisAgent.module.css";
 
 type Message = {
@@ -41,15 +42,15 @@ const commandCards: CommandCard[] = [
   { label: "Database scan", tool: "DATABASE_SCAN", message: "database scan", risk: "review", surface: "Read Model" },
   { label: "Probe routes", tool: "ROUTE_PROBE", message: "probe routes", risk: "approval", surface: "Route Scout" },
   { label: "Git status", tool: "GIT_STATUS", message: "git status", risk: "safe", surface: "Repo" },
-  { label: "Create file", tool: "CREATE_FILE", message: "create a file saying Jarvis is connected and writing real files", risk: "approval", surface: "Safe File" },
+  { label: "Real build lock", tool: "HELP", message: "show Jarvis real build lock", risk: "safe", surface: "Commander Lock" },
   { label: "Help", tool: "HELP", message: "what can you do", risk: "safe", surface: "Dialogue" }
 ];
 
 const missionPanels = [
-  { title: "Runtime", value: "PJ43 linked", note: "Kernel modules created" },
-  { title: "HUD", value: "PJ44 active", note: "Commander visual layer" },
-  { title: "Evidence", value: "Required", note: "No success claim without proof" },
-  { title: "Approval", value: "Gated", note: "Risky commands require review" }
+  { title: "Real Build", value: "LOCKED", note: "Issue #36 active" },
+  { title: "Visual Law", value: "SYSTEM", note: "Not wallpaper" },
+  { title: "Local Runtime", value: "CMD-SAFE", note: "No wrong shell syntax" },
+  { title: "Proof", value: "REQUIRED", note: "Repo and build evidence" }
 ];
 
 function speak(text: string) {
@@ -85,7 +86,7 @@ export default function JarvisAgentClient() {
   const [messages, setMessages] = useState<Message[]>([
     {
       role: "jarvis",
-      text: wakeGreeting,
+      text: `${wakeGreeting} ${jarvisRealBuildLock.decision}`,
       ok: true
     }
   ]);
@@ -108,6 +109,23 @@ export default function JarvisAgentClient() {
   async function runAgent(message: string, tool?: string) {
     const clean = message.trim();
     if (!clean || running) return;
+
+    if (clean.toLowerCase().includes("real build lock")) {
+      const lockText = [
+        jarvisRealBuildLock.decision,
+        jarvisRealBuildLock.visualLaw,
+        jarvisRealBuildLock.localLaw,
+        jarvisRealBuildLock.proofLaw,
+        `Next build: ${jarvisRealBuildLock.nextBuild.join(" | ")}`
+      ].join("\n");
+      setMessages((items) => [
+        ...items,
+        { role: "founder", text: clean },
+        { role: "jarvis", text: lockText, ok: true, tool: "REAL_BUILD_LOCK" }
+      ]);
+      speak("Commander, the real build lock is active. Jarvis will not treat the visual system as wallpaper or continue planning instead of building.");
+      return;
+    }
 
     setRunning(true);
     setMessages((items) => [...items, { role: "founder", text: clean }]);
@@ -230,14 +248,15 @@ export default function JarvisAgentClient() {
       <section className={styles.frame}>
         <header className={styles.header}>
           <div>
-            <p className={styles.kicker}>KINGSMEN COMMAND HOUSE · REAL JARVIS HUD</p>
+            <p className={styles.kicker}>KINGSMEN COMMAND HOUSE · REAL JARVIS BUILD LOCK ACTIVE</p>
             <h1>JARVIS</h1>
             <p className={styles.subtitle}>{wakeGreeting}</p>
+            <p className={styles.subtitle}>{jarvisRealBuildLock.visualLaw}</p>
           </div>
           <div className={styles.statusStack}>
             <div className={styles.status}>
               <span className={running ? styles.pulseWarn : styles.pulseOk} />
-              <strong>{running ? "EXECUTING" : "ONLINE"}</strong>
+              <strong>{running ? "EXECUTING" : "REAL BUILD"}</strong>
               <small>{voiceState}</small>
             </div>
             <div className={styles.confidenceChip}>{confidenceFor(lastJarvis)}</div>
@@ -275,8 +294,8 @@ export default function JarvisAgentClient() {
             </div>
 
             <section className={styles.approvalBox}>
-              <strong>Approval Gate</strong>
-              <p>Risky commands stay review-bound until PJ45 wiring connects runtime approval checks.</p>
+              <strong>Commander Lock</strong>
+              <p>{jarvisRealBuildLock.localLaw}</p>
             </section>
           </aside>
 
@@ -284,7 +303,7 @@ export default function JarvisAgentClient() {
             <div className={styles.commandDeck}>
               {commandCards.map((item) => (
                 <button
-                  key={item.tool}
+                  key={item.tool + item.label}
                   className={styles.commandCard}
                   onClick={() => {
                     setInput(item.message);
@@ -326,6 +345,16 @@ export default function JarvisAgentClient() {
 
           <aside className={styles.right}>
             <section className={styles.panel}>
+              <h2>Real build lock</h2>
+              <p>{jarvisRealBuildLock.decision}</p>
+              <ul>
+                {jarvisRealBuildLock.nextBuild.map((item) => (
+                  <li key={item}>{item}</li>
+                ))}
+              </ul>
+            </section>
+
+            <section className={styles.panel}>
               <h2>Live output</h2>
               {lastOutput?.output ? <pre>{lastOutput.output}</pre> : <p>No command output yet.</p>}
             </section>
@@ -349,10 +378,11 @@ export default function JarvisAgentClient() {
             <section className={styles.panel}>
               <h2>HUD surfaces</h2>
               <ul>
+                <li>Real build lock</li>
                 <li>Mission board</li>
                 <li>Command deck</li>
                 <li>Voice orb</li>
-                <li>Approval gate</li>
+                <li>Commander lock</li>
                 <li>Evidence drawer</li>
                 <li>Source confidence chip</li>
               </ul>
