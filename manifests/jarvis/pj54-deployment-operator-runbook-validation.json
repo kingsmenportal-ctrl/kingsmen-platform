@@ -1,0 +1,26 @@
+{
+  "id": "pj54-deployment-operator-runbook-validation",
+  "pj": "PJ54",
+  "version": "1.0.0",
+  "required_files": [
+    "docs/agents/PJ54_JARVIS_DEPLOYMENT_OPERATOR_RUNBOOK.md",
+    "manifests/jarvis/pj54-deployment-checklist.json",
+    "manifests/jarvis/pj54-operator-daily-routine.json",
+    "manifests/jarvis/pj54-runtime-health-checklist.json",
+    "manifests/jarvis/pj54-incident-repair-playbook.json",
+    "manifests/jarvis/pj54-release-evidence-checklist.json",
+    "manifests/jarvis/pj54-deployment-operator-runbook-validation.json",
+    "scripts/jarvis/validate-pj54-deployment-operator-runbook.mjs"
+  ],
+  "required_checks": [
+    "files_exist",
+    "json_loads",
+    "deployment_modes_defined",
+    "operator_routine_defined",
+    "health_surfaces_defined",
+    "incident_classes_defined",
+    "release_evidence_defined",
+    "next_phase_defined"
+  ],
+  "next_phase": "PJ55 Jarvis Final Runtime Closeout"
+}
