@@ -1,0 +1,56 @@
+{
+  "id": "jarvis-live-data-law",
+  "pj": "PJ42.1",
+  "version": "1.0.0",
+  "purpose": "Define when Jarvis must use live data and which live routes are allowed.",
+  "must_use_live_data_when_question_mentions": [
+    "today",
+    "latest",
+    "current",
+    "now",
+    "deadline",
+    "fee",
+    "price",
+    "weather",
+    "news",
+    "job",
+    "learnership",
+    "opening",
+    "closing date",
+    "portal status",
+    "build status",
+    "repo status"
+  ],
+  "must_use_live_data_for_categories": [
+    "current_deadlines",
+    "current_fees_or_prices",
+    "current_rules_or_laws",
+    "current_jobs_or_learnerships",
+    "current_portal_status",
+    "current_weather_time_finance_or_news",
+    "current_repo_or_build_status",
+    "current_public_source_changes"
+  ],
+  "approved_live_routes": [
+    "web_research",
+    "github_inspection",
+    "postgres_read_model_summary",
+    "kingsmen_knowledge_search",
+    "playwright_scout",
+    "approved_utility_api",
+    "safe_command_registry"
+  ],
+  "source_confidence_bands": [
+    "verified_official",
+    "high_trusted_recent",
+    "medium_needs_review",
+    "low_unverified_or_stale",
+    "blocked_or_unsafe"
+  ],
+  "answer_rules": {
+    "cite_live_sources_when_used": true,
+    "state_uncertainty_when_not_verified": true,
+    "do_not_claim_official_status_without_evidence": true,
+    "prefer_official_sources_for_deadlines_fees_rules_and_applications": true
+  }
+}
