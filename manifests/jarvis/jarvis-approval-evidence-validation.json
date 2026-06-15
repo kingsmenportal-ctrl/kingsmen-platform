@@ -1,0 +1,30 @@
+{
+  "id": "jarvis-approval-evidence-validation",
+  "pj": "PJ42.9",
+  "version": "1.0.0",
+  "required_files": [
+    "docs/agents/PJ42_9_JARVIS_APPROVAL_EVIDENCE_LAYER.md",
+    "manifests/jarvis/jarvis-approval-evidence.schema.json",
+    "manifests/jarvis/jarvis-approval-policy.json",
+    "manifests/jarvis/jarvis-evidence-ledger-contract.json",
+    "manifests/jarvis/jarvis-approval-workflows.json",
+    "manifests/jarvis/jarvis-evidence-event-types.json",
+    "manifests/jarvis/jarvis-approval-evidence-validation.json",
+    "scripts/jarvis/validate-pj42-9-approval-evidence.mjs"
+  ],
+  "required_checks": [
+    "files_exist",
+    "json_loads",
+    "approval_rules_exist",
+    "approval_statuses_exist",
+    "evidence_fields_exist",
+    "required_event_types_exist",
+    "blocked_action_event_exists",
+    "tool_failure_event_exists",
+    "success_claim_requires_evidence",
+    "approval_required_risk_has_modal",
+    "blocked_actions_record_reason",
+    "workflows_exist"
+  ],
+  "next_phase": "PJ42.10 Voice-ready Commander Interface"
+}
