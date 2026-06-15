@@ -1,0 +1,133 @@
+import type { JarvisCommandDefinition, JarvisCommandId, JarvisIntentId } from './types';
+
+const blockedCommand = (reason: string): JarvisCommandDefinition => ({
+  commandId: 'BLOCKED_UNKNOWN_COMMAND',
+  label: 'Blocked Unknown Command',
+  category: 'blocked',
+  riskLevel: 'blocked',
+  approvalRequired: true,
+  evidenceRequired: true,
+  adapterId: 'blocked_adapter',
+  blockedReason: reason,
+});
+
+const commandByIntent: Record<JarvisIntentId, JarvisCommandDefinition> = {
+  general_dialogue: {
+    commandId: 'ASK_GENERAL',
+    label: 'Ask General Question',
+    category: 'dialogue',
+    riskLevel: 'safe_read',
+    approvalRequired: false,
+    evidenceRequired: true,
+    adapterId: 'dialogue_brain',
+  },
+  live_research: {
+    commandId: 'LIVE_RESEARCH',
+    label: 'Live Public Research',
+    category: 'live_research',
+    riskLevel: 'safe_read',
+    approvalRequired: false,
+    evidenceRequired: true,
+    adapterId: 'web_research_adapter',
+  },
+  kingsmen_knowledge: {
+    commandId: 'SEARCH_KINGSMEN_KNOWLEDGE',
+    label: 'Search Kingsmen Knowledge',
+    category: 'kingsmen_knowledge',
+    riskLevel: 'safe_read',
+    approvalRequired: false,
+    evidenceRequired: true,
+    adapterId: 'kingsmen_knowledge_adapter',
+  },
+  repo_inspection: {
+    commandId: 'GITHUB_REPO_INSPECT',
+    label: 'Inspect Kingsmen GitHub Repo',
+    category: 'repo_inspection',
+    riskLevel: 'safe_read',
+    approvalRequired: false,
+    evidenceRequired: true,
+    adapterId: 'github_adapter',
+  },
+  system_health: {
+    commandId: 'SYSTEM_STATUS',
+    label: 'System Status',
+    category: 'system_health',
+    riskLevel: 'safe_read',
+    approvalRequired: false,
+    evidenceRequired: true,
+    adapterId: 'system_health_adapter',
+  },
+  validation_build: {
+    commandId: 'VALIDATE_PHASE',
+    label: 'Validate Build Phase',
+    category: 'validation_build',
+    riskLevel: 'approval_required',
+    approvalRequired: true,
+    evidenceRequired: true,
+    adapterId: 'validation_adapter',
+  },
+  database_read_model: {
+    commandId: 'POSTGRES_READ_MODEL_SCAN',
+    label: 'PostgreSQL Read Model Scan',
+    category: 'database_read_model',
+    riskLevel: 'safe_read',
+    approvalRequired: false,
+    evidenceRequired: true,
+    adapterId: 'postgres_read_model_adapter',
+  },
+  playwright_scout: {
+    commandId: 'PLAYWRIGHT_PORTAL_HEALTH',
+    label: 'Playwright Portal Health Scout',
+    category: 'playwright_scout',
+    riskLevel: 'approval_required',
+    approvalRequired: true,
+    evidenceRequired: true,
+    adapterId: 'playwright_scout_adapter',
+  },
+  report_generation: {
+    commandId: 'GENERATE_FOUNDER_DIGEST',
+    label: 'Generate Founder Digest',
+    category: 'report_generation',
+    riskLevel: 'safe_generate',
+    approvalRequired: false,
+    evidenceRequired: true,
+    adapterId: 'report_generation_adapter',
+  },
+  approval_flow: {
+    commandId: 'REQUEST_APPROVAL',
+    label: 'Request Commander Approval',
+    category: 'approval_flow',
+    riskLevel: 'review_required',
+    approvalRequired: true,
+    evidenceRequired: true,
+    adapterId: 'approval_adapter',
+  },
+  visual_hud_request: {
+    commandId: 'GENERATE_FOUNDER_DIGEST',
+    label: 'Generate Visual HUD Plan',
+    category: 'report_generation',
+    riskLevel: 'safe_generate',
+    approvalRequired: false,
+    evidenceRequired: true,
+    adapterId: 'report_generation_adapter',
+  },
+  blocked_unsafe_action: {
+    commandId: 'SUBMIT_OFFICIAL_APPLICATION_SILENTLY',
+    label: 'Blocked Unsafe Action',
+    category: 'blocked',
+    riskLevel: 'blocked',
+    approvalRequired: true,
+    evidenceRequired: true,
+    adapterId: 'blocked_adapter',
+    blockedReason: 'Input matched blocked unsafe action intent.',
+  },
+};
+
+export function getCommandForIntent(intentId: JarvisIntentId): JarvisCommandDefinition {
+  return commandByIntent[intentId] ?? blockedCommand(`No registered command for intent ${intentId}`);
+}
+
+export function getCommandById(commandId: JarvisCommandId): JarvisCommandDefinition {
+  const found = Object.values(commandByIntent).find((command) => command.commandId === commandId);
+  return found ?? blockedCommand(`Unknown command id ${commandId}`);
+}
