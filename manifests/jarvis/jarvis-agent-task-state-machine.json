@@ -1,0 +1,42 @@
+{
+  "id": "jarvis-agent-task-state-machine",
+  "pj": "PJ49",
+  "version": "1.0.0",
+  "states": [
+    "queued",
+    "normalizing",
+    "classifying",
+    "resolving_command",
+    "checking_policy",
+    "selecting_adapter",
+    "retrieving_context",
+    "checking_live_data",
+    "scoring_confidence",
+    "recording_evidence",
+    "composing_answer",
+    "presenting",
+    "completed",
+    "blocked",
+    "failed"
+  ],
+  "transitions": [
+    { "from": "queued", "to": "normalizing" },
+    { "from": "normalizing", "to": "classifying" },
+    { "from": "classifying", "to": "resolving_command" },
+    { "from": "resolving_command", "to": "checking_policy" },
+    { "from": "checking_policy", "to": "selecting_adapter" },
+    { "from": "selecting_adapter", "to": "retrieving_context" },
+    { "from": "retrieving_context", "to": "checking_live_data" },
+    { "from": "checking_live_data", "to": "scoring_confidence" },
+    { "from": "scoring_confidence", "to": "recording_evidence" },
+    { "from": "recording_evidence", "to": "composing_answer" },
+    { "from": "composing_answer", "to": "presenting" },
+    { "from": "presenting", "to": "completed" },
+    { "from": "checking_policy", "to": "blocked" },
+    { "from": "selecting_adapter", "to": "blocked" },
+    { "from": "retrieving_context", "to": "failed" },
+    { "from": "checking_live_data", "to": "failed" }
+  ],
+  "terminal_states": ["completed", "blocked", "failed"],
+  "evidence_required_states": ["blocked", "failed", "completed"]
+}
