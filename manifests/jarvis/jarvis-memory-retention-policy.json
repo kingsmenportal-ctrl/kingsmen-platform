@@ -1,0 +1,37 @@
+{
+  "id": "jarvis-memory-retention-policy",
+  "pj": "PJ48",
+  "version": "1.0.0",
+  "retention_classes": [
+    {
+      "class_id": "retain_until_superseded",
+      "description": "Keep summary until a newer approved summary replaces it.",
+      "requires_supersede_reference": true
+    },
+    {
+      "class_id": "retain_until_resolved_or_superseded",
+      "description": "Keep summary until issue is resolved or a newer summary replaces it.",
+      "requires_supersede_reference": true
+    },
+    {
+      "class_id": "retain_with_timestamp",
+      "description": "Keep summary with timestamp and require freshness review before reuse.",
+      "requires_supersede_reference": false
+    },
+    {
+      "class_id": "retain_until_resolved_then_archive",
+      "description": "Keep active until resolved, then archive as historical summary.",
+      "requires_supersede_reference": false
+    },
+    {
+      "class_id": "retain_until_changed_by_commander",
+      "description": "Keep approved Commander preference until Commander changes it.",
+      "requires_supersede_reference": true
+    }
+  ],
+  "archive_rules": {
+    "archived_memory_is_context_only": true,
+    "archived_memory_never_overrides_current_source": true,
+    "archived_memory_must_keep_original_status_label": true
+  }
+}
