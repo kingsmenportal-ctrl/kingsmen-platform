@@ -1,0 +1,67 @@
+{
+  "id": "pj42-runtime-module-map",
+  "pj": "PJ42_CLOSEOUT",
+  "version": "1.0.0",
+  "runtime_modules": [
+    {
+      "module_id": "jarvis_manifest_loader",
+      "maps_to": ["PJ42.1", "PJ42.2", "PJ42.3", "PJ42.4", "PJ42.5", "PJ42.6", "PJ42.7", "PJ42.8", "PJ42.9", "PJ42.10"],
+      "purpose": "Load and validate all Jarvis manifests at startup."
+    },
+    {
+      "module_id": "jarvis_intent_router",
+      "maps_to": ["PJ42.3"],
+      "purpose": "Classify Commander intent and freshness/risk needs."
+    },
+    {
+      "module_id": "jarvis_command_registry",
+      "maps_to": ["PJ42.2"],
+      "purpose": "Resolve allowed commands and block unknown commands."
+    },
+    {
+      "module_id": "jarvis_policy_gate",
+      "maps_to": ["PJ42.1", "PJ42.2", "PJ42.9"],
+      "purpose": "Enforce Commander-only, approval, evidence, memory, and safety laws."
+    },
+    {
+      "module_id": "jarvis_tool_router",
+      "maps_to": ["PJ42.4"],
+      "purpose": "Route commands to approved adapters and block unknown tools."
+    },
+    {
+      "module_id": "jarvis_source_confidence_engine",
+      "maps_to": ["PJ42.5"],
+      "purpose": "Assign source authority, freshness, confidence band, and conflict state."
+    },
+    {
+      "module_id": "jarvis_knowledge_brain",
+      "maps_to": ["PJ42.6"],
+      "purpose": "Retrieve approved Kingsmen knowledge before claims."
+    },
+    {
+      "module_id": "jarvis_live_data_router",
+      "maps_to": ["PJ42.7"],
+      "purpose": "Route current facts to approved live data sources."
+    },
+    {
+      "module_id": "jarvis_evidence_ledger",
+      "maps_to": ["PJ42.9"],
+      "purpose": "Write evidence for tool-backed answers, approvals, failures, and blocked actions."
+    },
+    {
+      "module_id": "jarvis_answer_composer",
+      "maps_to": ["PJ42.5", "PJ42.6", "PJ42.9"],
+      "purpose": "Compose answers with status labels, confidence, evidence, and next safe action."
+    },
+    {
+      "module_id": "jarvis_visual_hud",
+      "maps_to": ["PJ42.8"],
+      "purpose": "Render Jarvis through cards, panels, drawers, modals, badges, and mission board."
+    },
+    {
+      "module_id": "jarvis_voice_interface",
+      "maps_to": ["PJ42.10"],
+      "purpose": "Provide voice-ready Commander interface while enforcing all laws."
+    }
+  ]
+}
