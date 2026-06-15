@@ -1,0 +1,53 @@
+{
+  "pass": "09",
+  "status": "built",
+  "branch": "main",
+  "purpose": "Mount the read-only founder console shell with deterministic smoke data, a pass-08 export index, style contract, and accessibility check.",
+  "builtFiles": [
+    "packages/jarvis-core/src/jarvis-founder-console-route-mount.ts",
+    "packages/jarvis-core/src/jarvis-console-fixture-composer.ts",
+    "packages/jarvis-core/src/jarvis-console-static-smoke-page.ts",
+    "packages/jarvis-core/src/live-pass-08-index.ts",
+    "packages/contracts/src/jarvis/console-style-contract.ts",
+    "packages/jarvis-core/src/jarvis-console-accessibility-check.ts",
+    "scripts/validators/validate-jarvis-live-pass-09.mjs",
+    "manifests/jarvis/live-build-passes/pass-09.json"
+  ],
+  "capabilities": [
+    "JarvisFounderConsoleRouteMount",
+    "JarvisConsoleFixtureComposer",
+    "JarvisConsoleStaticSmokePage",
+    "JarvisPass08ExportIndex",
+    "JarvisConsoleStyleContract",
+    "JarvisConsoleAccessibilityCheck",
+    "JarvisLivePass09Validator"
+  ],
+  "commits": [
+    { "sha": "b16425a4676e75ff7de934498ca24f0dfd644ca9", "summary": "Add Jarvis founder console route mount" },
+    { "sha": "6c38d5b1f6a98d2dfe814d4c2a22c4c15b1ddda1", "summary": "Add Jarvis console fixture composer" },
+    { "sha": "b3f07f0bef2f1de46511cbc04c2c64627fecdade", "summary": "Add Jarvis console static smoke page" },
+    { "sha": "3b7b5ab4bcc31c104406e1474022842b1fd7d6bc", "summary": "Add Jarvis console style contract" },
+    { "sha": "fa99d376a3a63c4cc113fb165bebd4825e556ac7", "summary": "Add Jarvis console accessibility check" },
+    { "sha": "6cab9ac8cccd3f9f6ac37e0199e3f2307650eb7a", "summary": "Add Jarvis pass 08 export index" },
+    { "sha": "c011a35d9cb6e6ae732854698b51902901ffe87d", "summary": "Add Jarvis live pass 09 validator" }
+  ],
+  "validator": {
+    "script": "node scripts/validators/validate-jarvis-live-pass-09.mjs",
+    "reportPath": "reports/jarvis/validate-jarvis-live-pass-09.json"
+  },
+  "authorityBoundary": [
+    "Founder console route mount is read-only.",
+    "Static smoke page uses deterministic fixture data only.",
+    "Style and accessibility checks do not replace product validation.",
+    "HUD output remains informational and does not replace backend authority.",
+    "PostgreSQL Truth Vault, backend state machine, validators, evidence, and founder approval remain authoritative."
+  ],
+  "nextTargets": [
+    "JarvisFounderConsoleRealRouteFile",
+    "JarvisConsoleServerReadAdapter",
+    "JarvisConsoleDataProviderInterface",
+    "JarvisConsoleViewModelAssembler",
+    "JarvisConsoleUiSnapshotValidator",
+    "JarvisPass09ExportIndex"
+  ]
+}
