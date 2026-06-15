@@ -1,0 +1,27 @@
+{
+  "id": "pj51-runtime-repair-build-validation-validation",
+  "pj": "PJ51",
+  "version": "1.0.0",
+  "required_files": [
+    "docs/agents/PJ51_JARVIS_RUNTIME_REPAIR_BUILD_VALIDATION.md",
+    "manifests/jarvis/pj51-runtime-repair-build-validation.json",
+    "manifests/jarvis/pj51-build-validation.json",
+    "manifests/jarvis/pj51-deferred-repair-tracker.json",
+    "manifests/jarvis/pj51-runtime-file-audit.json",
+    "manifests/jarvis/pj51-runtime-repair-build-validation-validation.json",
+    "scripts/jarvis/validate-pj51-runtime-repair-build-validation.mjs"
+  ],
+  "required_checks": [
+    "files_exist",
+    "json_loads",
+    "runtime_audit_required_files_exist",
+    "runtime_index_exports_required_modules",
+    "web_package_has_build_script",
+    "web_tsconfig_strict_enabled",
+    "kernel_route_exists",
+    "smoke_route_exists",
+    "deferred_items_are_tracked",
+    "readiness_labels_exist"
+  ],
+  "next_phase": "PJ52 Jarvis Integration Hardening"
+}
