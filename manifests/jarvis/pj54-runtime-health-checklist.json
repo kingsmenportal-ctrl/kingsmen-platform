@@ -1,0 +1,57 @@
+{
+  "id": "pj54-runtime-health-checklist",
+  "pj": "PJ54",
+  "version": "1.0.0",
+  "health_surfaces": [
+    {
+      "surface_id": "web_build",
+      "label": "Web Build",
+      "check": "apps_web_build_command_available",
+      "expected": "build_script_present_and_runnable"
+    },
+    {
+      "surface_id": "kernel_route",
+      "label": "Jarvis Kernel Route",
+      "check": "kernel_api_route_exists",
+      "expected": "route_file_present"
+    },
+    {
+      "surface_id": "smoke_route",
+      "label": "Kernel Smoke Route",
+      "check": "smoke_api_route_exists",
+      "expected": "route_file_present"
+    },
+    {
+      "surface_id": "runtime_index",
+      "label": "Runtime Index",
+      "check": "runtime_exports_present",
+      "expected": "kernel_and_smoke_exports_present"
+    },
+    {
+      "surface_id": "hud_client",
+      "label": "Jarvis HUD Client",
+      "check": "jarvis_client_exists",
+      "expected": "client_file_present"
+    },
+    {
+      "surface_id": "evidence_contract",
+      "label": "Evidence Contract",
+      "check": "evidence_manifest_or_runtime_present",
+      "expected": "evidence_surface_present"
+    }
+  ],
+  "health_result_labels": [
+    "pass",
+    "fail",
+    "warning",
+    "deferred",
+    "not_checked"
+  ],
+  "failure_output_required": [
+    "surface_id",
+    "failure_reason",
+    "risk_level",
+    "safe_fallback",
+    "next_repair_step"
+  ]
+}
