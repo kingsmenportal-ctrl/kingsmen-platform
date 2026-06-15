@@ -1,0 +1,52 @@
+{
+  "id": "PJ_PUBLIC_JARVIS_26_SEMANTIC_KERNEL_AGENT_FRAMEWORK",
+  "project_number": 26,
+  "status": "recorded",
+  "branch_recorded": "main",
+  "source": {
+    "name": "Microsoft Semantic Kernel / Microsoft Agent Framework transition",
+    "repository": "microsoft/semantic-kernel",
+    "url": "https://github.com/microsoft/semantic-kernel",
+    "type": "public_open_source_agent_orchestration_framework"
+  },
+  "kingsmen_lesson": "plugin-orchestrated agent runtime with typed functions, model-provider routing, MCP/OpenAPI bridge discipline, structured outputs, process framework thinking, and migration awareness",
+  "adapt": [
+    "JarvisKernel",
+    "JarvisPluginRegistry",
+    "JarvisFunctionContract",
+    "JarvisToolInvocationPolicy",
+    "JarvisModelProviderRouter",
+    "JarvisMultiAgentOrchestrator",
+    "JarvisProcessFramework",
+    "JarvisMcpGateway",
+    "JarvisOpenApiToolBridge",
+    "JarvisVectorMemoryAdapter",
+    "JarvisMultimodalInputRouter",
+    "JarvisStructuredOutputContract",
+    "JarvisAgentMigrationWatch"
+  ],
+  "reject": [
+    "framework as final authority",
+    "agent framework replacing backend state machine",
+    "plugins bypassing doctrine policy gate",
+    "MCP/OpenAPI tools without trust classification",
+    "secrets in plugin configuration or logs",
+    "production connector actions from a normal chat agent",
+    "multi-agent orchestration before the mini builder core is proven",
+    "model routing without cost/risk policy",
+    "candidate data sent into vector memory without POPIA boundary",
+    "adopting a changing runtime without migration plan"
+  ],
+  "kingsmen_authority_remains": [
+    "PostgreSQL Truth Vault",
+    "Backend API state machine",
+    "GitHub repository",
+    "Kingsmen doctrine files",
+    "validators and boot-blockers",
+    "founder approval"
+  ],
+  "recorded_files": {
+    "study": "docs/jarvis/public-reference-studies/PJ_PUBLIC_JARVIS_26_SEMANTIC_KERNEL_AGENT_FRAMEWORK.md",
+    "manifest": "manifests/jarvis/public-reference-studies/semantic-kernel-agent-framework-study.json"
+  }
+}
