@@ -1,0 +1,41 @@
+{
+  "id": "jarvis-orchestration-policy",
+  "pj": "PJ49",
+  "version": "1.0.0",
+  "global_rules": {
+    "unknown_role_default": "blocked",
+    "unknown_step_default": "blocked",
+    "one_request_one_plan": true,
+    "approved_roles_only": true,
+    "approved_steps_only": true,
+    "evidence_required": true,
+    "confidence_required_for_source_claims": true,
+    "memory_is_context_not_current_truth": true
+  },
+  "step_rules": {
+    "intent_before_command": true,
+    "command_before_adapter": true,
+    "review_before_sensitive_route": true,
+    "confidence_before_verified_claim": true,
+    "evidence_before_completion_claim": true,
+    "answer_before_presentation": true
+  },
+  "blocked_patterns": [
+    "unknown_role_chain",
+    "unknown_step_chain",
+    "unregistered_command_path",
+    "unmapped_adapter_path",
+    "completion_without_evidence",
+    "current_fact_from_memory_only",
+    "public_facing_jarvis_mode"
+  ],
+  "safe_outputs": [
+    "answer",
+    "safe_plan",
+    "review_request",
+    "blocked_notice",
+    "failure_report",
+    "evidence_summary",
+    "hud_metadata"
+  ]
+}
