@@ -1,0 +1,62 @@
+{
+  "id": "jarvis-source-confidence-bands",
+  "pj": "PJ42.5",
+  "version": "1.0.0",
+  "confidence_bands": [
+    {
+      "band_id": "verified_official",
+      "label": "Verified Official",
+      "description": "Official or primary authority source directly supports the claim, freshness requirement is satisfied, and no unresolved conflict exists.",
+      "may_answer_confidently": true,
+      "may_trigger_action": true,
+      "requires_review": false,
+      "minimum_authority_level": "official_primary",
+      "freshness_required_when_current_fact": true,
+      "ui_badge": "Verified"
+    },
+    {
+      "band_id": "high_trusted_recent",
+      "label": "High Trusted Recent",
+      "description": "Trusted source supports the claim and is recent enough, but source is not the primary official authority.",
+      "may_answer_confidently": true,
+      "may_trigger_action": false,
+      "requires_review": false,
+      "minimum_authority_level": "trusted_secondary",
+      "freshness_required_when_current_fact": true,
+      "ui_badge": "High"
+    },
+    {
+      "band_id": "medium_needs_review",
+      "label": "Medium Needs Review",
+      "description": "Source is useful but incomplete, indirect, unsupported by primary evidence, or operationally sensitive enough to need Commander/operator review.",
+      "may_answer_confidently": false,
+      "may_trigger_action": false,
+      "requires_review": true,
+      "minimum_authority_level": "supporting_secondary",
+      "freshness_required_when_current_fact": true,
+      "ui_badge": "Review"
+    },
+    {
+      "band_id": "low_unverified_or_stale",
+      "label": "Low Unverified or Stale",
+      "description": "Source is old, unclear, weak, unattributed, only a lead, or not current enough for the claim.",
+      "may_answer_confidently": false,
+      "may_trigger_action": false,
+      "requires_review": true,
+      "minimum_authority_level": "lead_only",
+      "freshness_required_when_current_fact": true,
+      "ui_badge": "Low"
+    },
+    {
+      "band_id": "blocked_or_unsafe",
+      "label": "Blocked or Unsafe",
+      "description": "Source or claim is unsafe, privacy-invasive, manipulative, unlawful, conflicts with Kingsmen law, or lacks evidence for official action.",
+      "may_answer_confidently": false,
+      "may_trigger_action": false,
+      "requires_review": true,
+      "minimum_authority_level": "blocked",
+      "freshness_required_when_current_fact": true,
+      "ui_badge": "Blocked"
+    }
+  ]
+}
