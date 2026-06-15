@@ -1,0 +1,59 @@
+{
+  "project_number": 24,
+  "status": "recorded",
+  "branch": "main",
+  "reference_project": "langchain-ai/langgraph",
+  "reference_url": "https://github.com/langchain-ai/langgraph",
+  "reference_type": "public_open_source_stateful_agent_orchestration_framework",
+  "recorded_file": "docs/jarvis/public-reference-studies/PJ_PUBLIC_JARVIS_24_LANGGRAPH.md",
+  "kingsmen_lesson": "Stateful agent loops require explicit state, checkpoints, human-in-the-loop review, durable execution, recovery, and evidence traces.",
+  "dependency_decision": "pattern_study_only_not_runtime_authority",
+  "adapt": [
+    "JarvisStatefulAgentLoop",
+    "JarvisCheckpointStore",
+    "JarvisHumanInLoopCheckpoint",
+    "JarvisDurableExecutionLedger",
+    "JarvisAgentResumeController",
+    "JarvisRetryPolicy",
+    "JarvisBranchingDecisionGraph",
+    "JarvisSubgraphPattern",
+    "JarvisStreamingStateReporter",
+    "JarvisToolCallReviewNode",
+    "JarvisMemoryBoundaryNode",
+    "JarvisExecutionTraceViewer",
+    "JarvisRecoveryNode"
+  ],
+  "reject": [
+    "agent_graph_replacing_backend_state_machine",
+    "llm_final_state_authority",
+    "unbounded_autonomous_loops",
+    "stateful_memory_without_popia_retention_boundaries",
+    "production_deployment_from_agent_graph_directly",
+    "risky_actions_without_human_in_loop",
+    "tool_calls_without_review_nodes",
+    "external_observability_as_truth_source",
+    "complex_graph_layers_before_simple_validator_loop"
+  ],
+  "kingsmen_fit": [
+    "JarvisCommandIntake",
+    "JarvisModeManager",
+    "JarvisBuilderCore",
+    "JarvisResearchAgent",
+    "JarvisToolPolicyGate",
+    "JarvisApprovalGate",
+    "JarvisEvidenceLedger",
+    "JarvisRecoveryPlanner",
+    "JarvisValidatorRunner",
+    "JarvisStatefulAgentLoop",
+    "JarvisRunTraceViewer"
+  ],
+  "authority_boundary": [
+    "PostgreSQL Truth Vault",
+    "Backend API state machine",
+    "Kingsmen doctrine files",
+    "validators and boot-blockers",
+    "founder approval",
+    "GitHub evidence"
+  ],
+  "oracle_lite_rule": "Start with a small Kingsmen-owned state/checkpoint/event schema before considering any external graph runtime. No useless layers."
+}
