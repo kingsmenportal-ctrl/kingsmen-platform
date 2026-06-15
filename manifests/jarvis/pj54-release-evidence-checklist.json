@@ -1,0 +1,43 @@
+{
+  "id": "pj54-release-evidence-checklist",
+  "pj": "PJ54",
+  "version": "1.0.0",
+  "release_evidence_required": [
+    "phase_issue_reference",
+    "created_file_list",
+    "runtime_health_result",
+    "smoke_result",
+    "hud_result",
+    "api_result",
+    "evidence_result",
+    "source_confidence_result",
+    "deferred_repair_status",
+    "release_status_label"
+  ],
+  "release_status_labels": [
+    "not_released",
+    "preview_release",
+    "repair_required",
+    "operator_release_candidate",
+    "operational_release"
+  ],
+  "minimum_for_preview_release": [
+    "phase_issue_reference",
+    "created_file_list",
+    "api_result",
+    "smoke_result",
+    "deferred_repair_status"
+  ],
+  "minimum_for_operational_release": [
+    "web_build_result",
+    "kernel_smoke_result",
+    "api_result",
+    "hud_result",
+    "evidence_result",
+    "source_confidence_result",
+    "memory_boundary_result",
+    "connector_boundary_result",
+    "operator_signoff"
+  ],
+  "release_rule": "Release labels must match evidence, not optimism."
+}
