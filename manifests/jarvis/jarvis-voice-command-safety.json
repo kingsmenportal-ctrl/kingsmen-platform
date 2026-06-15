@@ -1,0 +1,37 @@
+{
+  "id": "jarvis-voice-command-safety",
+  "pj": "PJ42.10",
+  "version": "1.0.0",
+  "safety_rules": [
+    "voice_is_not_a_shortcut_around_policy_gate",
+    "voice_is_not_a_shortcut_around_approval",
+    "voice_is_not_a_shortcut_around_evidence",
+    "unclear_transcript_must_not_execute_command",
+    "risky_voice_command_must_show_approval_modal",
+    "blocked_command_remains_blocked_by_voice",
+    "private_raw_data_must_not_be_spoken_by_default",
+    "candidate_facing_jarvis_voice_is_forbidden"
+  ],
+  "voice_approval_requirements": [
+    "command_id_visible",
+    "target_visible",
+    "risk_level_visible",
+    "expected_effect_visible",
+    "evidence_preview_visible",
+    "rollback_note_visible",
+    "explicit_commander_confirmation_required"
+  ],
+  "ambiguous_transcript_policy": {
+    "execute_on_ambiguity": false,
+    "allowed_response": "Ask Commander to confirm or restate the command.",
+    "must_show_transcript_for_confirmation": true
+  },
+  "blocked_voice_actions": [
+    "send_external_message_as_jarvis",
+    "make_payment_decision",
+    "submit_official_application_silently",
+    "bypass_captcha_or_otp",
+    "read_private_raw_data_aloud_by_default",
+    "speak_to_candidate_as_jarvis"
+  ]
+}
