@@ -1,0 +1,18 @@
+{
+  "endpoint": "/api/jarvis/security/scan",
+  "method": "POST",
+  "body": {
+    "source": "local-validator",
+    "actor": "commander",
+    "scope": "repo_text",
+    "tools": ["gitleaks", "trivy", "semgrep"],
+    "changedFiles": ["apps/web/src/example.ts"],
+    "scanText": "Review this redacted summary for unsafe code pattern and dependency risk language only."
+  },
+  "expectedSafety": {
+    "detectionOnly": true,
+    "destructiveFixesAllowed": false,
+    "rawSensitiveValuesStored": false,
+    "deploymentBlockRequiresPolicy": true
+  }
+}
