@@ -25,6 +25,16 @@ export function routeJarvisIntent(request: JarvisRuntimeRequest): JarvisIntentRe
     };
   }
 
+  if (includesAny(text, ['trace gateway', 'trace evidence', 'langfuse', 'trace ledger', 'redacted trace', 'observability evidence'])) {
+    return {
+      intentId: 'jarvis_trace_evidence',
+      confidence: 'high',
+      freshnessRequired: false,
+      policyGateRequired: true,
+      reason: 'Input asks for Jarvis trace/evidence gateway work with redaction and observability boundaries.',
+    };
+  }
+
   if (includesAny(text, ['voice gateway', 'voice session', 'wake word', 'wakeword', 'openwakeword', 'whisper.cpp', 'speech to text', 'stt', 'text to speech', 'tts', 'piper'])) {
     return {
       intentId: 'jarvis_voice_gateway',
