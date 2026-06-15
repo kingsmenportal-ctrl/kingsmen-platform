@@ -1,0 +1,107 @@
+{
+  "id": "pj42-to-pj43-build-order",
+  "pj": "PJ42_CLOSEOUT",
+  "version": "1.0.0",
+  "purpose": "Define the build order for turning PJ42 laws and manifests into PJ43 runtime implementation.",
+  "build_order": [
+    {
+      "step": 1,
+      "id": "load_manifests",
+      "title": "Jarvis Manifest Loader",
+      "description": "Load PJ42 manifests and validate JSON at startup.",
+      "depends_on": []
+    },
+    {
+      "step": 2,
+      "id": "runtime_types",
+      "title": "Jarvis Runtime Types",
+      "description": "Create TypeScript types for intents, commands, adapters, confidence bands, evidence, approvals, HUD states, and voice states.",
+      "depends_on": ["load_manifests"]
+    },
+    {
+      "step": 3,
+      "id": "intent_router_runtime",
+      "title": "Intent Router Runtime",
+      "description": "Implement classifier rules, confidence labels, freshness detection, blocked intent detection, and fallback behavior.",
+      "depends_on": ["runtime_types"]
+    },
+    {
+      "step": 4,
+      "id": "command_registry_runtime",
+      "title": "Command Registry Runtime",
+      "description": "Resolve registered commands and block unknown commands.",
+      "depends_on": ["runtime_types"]
+    },
+    {
+      "step": 5,
+      "id": "policy_gate_runtime",
+      "title": "Policy Gate Runtime",
+      "description": "Enforce Commander-only, approval, memory, evidence, and blocked-action laws.",
+      "depends_on": ["intent_router_runtime", "command_registry_runtime"]
+    },
+    {
+      "step": 6,
+      "id": "tool_router_runtime",
+      "title": "Tool Router Runtime",
+      "description": "Map commands to approved adapters and block unknown tools.",
+      "depends_on": ["policy_gate_runtime"]
+    },
+    {
+      "step": 7,
+      "id": "source_confidence_runtime",
+      "title": "Source Confidence Runtime",
+      "description": "Evaluate authority, freshness, evidence, directness, conflicts, and confidence bands.",
+      "depends_on": ["tool_router_runtime"]
+    },
+    {
+      "step": 8,
+      "id": "knowledge_brain_runtime",
+      "title": "Knowledge Brain Runtime",
+      "description": "Retrieve approved Kingsmen knowledge, exclude forbidden memory, and attach status labels.",
+      "depends_on": ["source_confidence_runtime"]
+    },
+    {
+      "step": 9,
+      "id": "live_data_router_runtime",
+      "title": "Live Data Router Runtime",
+      "description": "Route current facts to live web, GitHub, system health, read models, Playwright scout, utilities, or review fallback.",
+      "depends_on": ["source_confidence_runtime"]
+    },
+    {
+      "step": 10,
+      "id": "evidence_ledger_runtime",
+      "title": "Evidence Ledger Runtime",
+      "description": "Record evidence events for answers, tools, approvals, failures, and blocked actions.",
+      "depends_on": ["tool_router_runtime", "source_confidence_runtime"]
+    },
+    {
+      "step": 11,
+      "id": "answer_composer_runtime",
+      "title": "Answer Composer Runtime",
+      "description": "Compose answers with confidence, evidence, status labels, and next safe action.",
+      "depends_on": ["knowledge_brain_runtime", "live_data_router_runtime", "evidence_ledger_runtime"]
+    },
+    {
+      "step": 12,
+      "id": "visual_hud_runtime",
+      "title": "Visual HUD Runtime",
+      "description": "Render Commander HUD surfaces, cards, drawers, modals, badges, panels, mission board, and mobile view.",
+      "depends_on": ["answer_composer_runtime"]
+    },
+    {
+      "step": 13,
+      "id": "voice_interface_runtime",
+      "title": "Voice-ready Commander Interface Runtime",
+      "description": "Implement wake greeting, voice states, speech boundaries, TTS output, and approval-safe voice interaction.",
+      "depends_on": ["visual_hud_runtime", "policy_gate_runtime"]
+    },
+    {
+      "step": 14,
+      "id": "kernel_smoke_test",
+      "title": "Real Jarvis Kernel Smoke Test",
+      "description": "Prove the full flow from Commander message to visual/voice answer with evidence and blocked unsafe paths.",
+      "depends_on": ["voice_interface_runtime"]
+    }
+  ],
+  "next_phase": "PJ43 Jarvis Runtime Implementation"
+}
