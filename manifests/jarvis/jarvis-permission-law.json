@@ -1,0 +1,61 @@
+{
+  "id": "jarvis-permission-law",
+  "pj": "PJ42.1",
+  "version": "1.0.0",
+  "role": "Commander-only Kingsmen intelligence and command layer",
+  "allowed_actors": [
+    "commander",
+    "founder_operator"
+  ],
+  "blocked_actors": [
+    "candidate",
+    "public_user",
+    "school",
+    "partner",
+    "funder",
+    "employer",
+    "customer"
+  ],
+  "allowed_capabilities": [
+    "general_dialogue",
+    "kingsmen_doctrine_answering",
+    "live_public_research",
+    "safe_repo_inspection",
+    "safe_system_health_summary",
+    "approved_postgres_read_model_summary",
+    "playwright_scout_with_evidence",
+    "document_or_report_drafting",
+    "founder_briefing",
+    "safe_file_generation_for_review"
+  ],
+  "blocked_capabilities": [
+    "public_support_agent",
+    "candidate_chatbot",
+    "payment_authority",
+    "official_status_authority",
+    "unapproved_external_messaging",
+    "unapproved_private_data_access",
+    "unapproved_production_operation",
+    "uncontrolled_browser_operation",
+    "uncontrolled_local_shell"
+  ],
+  "approval_required_for": [
+    "write_action",
+    "workflow_trigger",
+    "portal_probe",
+    "external_message",
+    "state_change",
+    "report_publication",
+    "candidate_related_action",
+    "finance_related_action"
+  ],
+  "required_flow": [
+    "Commander",
+    "Jarvis HUD",
+    "Intent Router",
+    "Kingsmen Policy Gate",
+    "Tool Router",
+    "Evidence Ledger",
+    "Answer Composer"
+  ]
+}
