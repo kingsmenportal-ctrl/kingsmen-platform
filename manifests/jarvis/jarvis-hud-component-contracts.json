@@ -1,0 +1,77 @@
+{
+  "id": "jarvis-hud-component-contracts",
+  "pj": "PJ42.8",
+  "version": "1.0.0",
+  "component_contracts": [
+    {
+      "component_id": "JarvisWakeScreen",
+      "surface_id": "commander_wake_screen",
+      "required_props": ["greeting", "systemStatus", "quickCommands", "timestamp"],
+      "must_never_show": ["candidate_chat_prompt", "public_support_copy"],
+      "commander_only": true
+    },
+    {
+      "component_id": "JarvisVoiceOrb",
+      "surface_id": "jarvis_voice_orb",
+      "required_props": ["state", "caption", "isListening", "isSpeaking", "isUsingTool"],
+      "must_never_show": ["candidate_voice_mode"],
+      "commander_only": true
+    },
+    {
+      "component_id": "JarvisCommandCard",
+      "surface_id": "command_card",
+      "required_props": ["commandId", "label", "riskLevel", "adapterId", "status", "nextAction"],
+      "must_never_show": ["raw_secret", "private_raw_record"],
+      "commander_only": true
+    },
+    {
+      "component_id": "JarvisEvidenceDrawer",
+      "surface_id": "evidence_drawer",
+      "required_props": ["evidenceId", "sourceRefs", "timestamp", "toolName", "resultSummary", "failureReason"],
+      "must_never_show": ["raw_secret", "auth_token", "browser_cookie", "private_payment_detail"],
+      "commander_only": true
+    },
+    {
+      "component_id": "JarvisApprovalModal",
+      "surface_id": "approval_modal",
+      "required_props": ["approvalId", "commandId", "riskLevel", "expectedEffect", "rollbackNote", "approveLabel", "rejectLabel"],
+      "must_never_show": ["auto_approve_hidden_button"],
+      "commander_only": true
+    },
+    {
+      "component_id": "JarvisSourceConfidenceChip",
+      "surface_id": "source_confidence_chip",
+      "required_props": ["confidenceBand", "authorityLevel", "freshnessStatus", "label"],
+      "must_never_show": ["verified_without_source"],
+      "commander_only": true
+    },
+    {
+      "component_id": "JarvisMissionBoard",
+      "surface_id": "mission_board",
+      "required_props": ["missions", "filters", "prioritySummary", "blockedCount", "approvalCount"],
+      "must_never_show": ["public_candidate_queue"],
+      "commander_only": true
+    },
+    {
+      "component_id": "JarvisSystemHealthPanel",
+      "surface_id": "system_health_panel",
+      "required_props": ["overallStatus", "services", "incidents", "lastChecked", "nextAction"],
+      "must_never_show": ["raw_secret_log"],
+      "commander_only": true
+    },
+    {
+      "component_id": "JarvisPortalScoutCard",
+      "surface_id": "portal_scout_screenshot_card",
+      "required_props": ["portalUrl", "screenshotRef", "blockerStatus", "retrievedAt", "fallback"],
+      "must_never_show": ["private_login_secret", "captcha_bypass_prompt"],
+      "commander_only": true
+    },
+    {
+      "component_id": "JarvisMobileFounderView",
+      "surface_id": "mobile_founder_view",
+      "required_props": ["priorityCards", "approvalQueue", "dailyDigest", "systemPulse"],
+      "must_never_show": ["candidate_public_chat"],
+      "commander_only": true
+    }
+  ]
+}
