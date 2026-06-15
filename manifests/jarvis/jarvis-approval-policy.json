@@ -1,0 +1,74 @@
+{
+  "id": "jarvis-approval-policy",
+  "pj": "PJ42.9",
+  "version": "1.0.0",
+  "approval_rules": [
+    {
+      "rule_id": "safe_read_no_approval",
+      "label": "Safe Read Without Approval",
+      "risk_levels": ["safe_read"],
+      "approval_required": false,
+      "reason": "Read-only answers and inspections may proceed when policy allows and evidence is recorded.",
+      "hud_surface": "command_card"
+    },
+    {
+      "rule_id": "safe_generate_reviewable",
+      "label": "Safe Generate Reviewable",
+      "risk_levels": ["safe_generate"],
+      "approval_required": false,
+      "reason": "Drafts and reports may be generated for Commander review but external use may require review.",
+      "hud_surface": "command_card"
+    },
+    {
+      "rule_id": "review_required_modal",
+      "label": "Review Required",
+      "risk_levels": ["review_required"],
+      "approval_required": true,
+      "reason": "Output may affect operations or external use and needs Commander review before use.",
+      "hud_surface": "approval_modal"
+    },
+    {
+      "rule_id": "approval_required_modal",
+      "label": "Approval Required",
+      "risk_levels": ["approval_required"],
+      "approval_required": true,
+      "reason": "Action may run tools, probe portals, trigger workflow, write files, or affect operations.",
+      "hud_surface": "approval_modal"
+    },
+    {
+      "rule_id": "blocked_card",
+      "label": "Blocked Action",
+      "risk_levels": ["blocked"],
+      "approval_required": false,
+      "reason": "Action is outside Jarvis authority and must be refused with safe redirect.",
+      "hud_surface": "blocked_card"
+    }
+  ],
+  "approval_required_for": [
+    "write_action",
+    "build_or_validator_run",
+    "playwright_scout",
+    "workflow_trigger",
+    "candidate_state_effect",
+    "finance_effect",
+    "external_use_of_generated_output",
+    "evidence_pack_for_external_use",
+    "system_repair_action"
+  ],
+  "approval_record_fields": [
+    "approval_id",
+    "command_id",
+    "intent_id",
+    "adapter_id",
+    "risk_level",
+    "request_summary",
+    "expected_effect",
+    "evidence_preview",
+    "rollback_note",
+    "status",
+    "approved_by",
+    "created_at",
+    "decided_at"
+  ],
+  "approval_statuses": ["not_required", "pending", "approved", "denied", "expired", "blocked"]
+}
