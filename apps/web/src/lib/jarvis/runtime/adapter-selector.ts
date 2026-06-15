@@ -7,6 +7,7 @@ const known = new Set<string>([
   'github_adapter',
   'public_repo_registry_adapter',
   'jarvis_voice_gateway_adapter',
+  'langfuse_trace_gateway_adapter',
   'system_health_adapter',
   'validation_adapter',
   'build_adapter',
