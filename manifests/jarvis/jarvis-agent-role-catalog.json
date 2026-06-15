@@ -1,0 +1,84 @@
+{
+  "id": "jarvis-agent-role-catalog",
+  "pj": "PJ49",
+  "version": "1.0.0",
+  "roles": [
+    {
+      "role_id": "commander_interface",
+      "label": "Commander Interface",
+      "purpose": "Accept Commander input and return HUD or voice-ready output.",
+      "may_call_tools": false,
+      "required_output": "normalized_request"
+    },
+    {
+      "role_id": "intent_classifier",
+      "label": "Intent Classifier",
+      "purpose": "Classify request intent and freshness need.",
+      "may_call_tools": false,
+      "required_output": "intent_result"
+    },
+    {
+      "role_id": "command_resolver",
+      "label": "Command Resolver",
+      "purpose": "Resolve classified intent to registered command candidate.",
+      "may_call_tools": false,
+      "required_output": "command_result"
+    },
+    {
+      "role_id": "policy_guard",
+      "label": "Policy Guard",
+      "purpose": "Apply Kingsmen policy before adapter or action route.",
+      "may_call_tools": false,
+      "required_output": "policy_result"
+    },
+    {
+      "role_id": "tool_dispatcher",
+      "label": "Tool Dispatcher",
+      "purpose": "Select approved adapter or connector route.",
+      "may_call_tools": true,
+      "required_output": "adapter_result"
+    },
+    {
+      "role_id": "knowledge_retriever",
+      "label": "Knowledge Retriever",
+      "purpose": "Plan or perform approved Kingsmen knowledge lookup.",
+      "may_call_tools": true,
+      "required_output": "knowledge_result"
+    },
+    {
+      "role_id": "live_data_researcher",
+      "label": "Live Data Researcher",
+      "purpose": "Route current facts to approved live data path.",
+      "may_call_tools": true,
+      "required_output": "live_data_result"
+    },
+    {
+      "role_id": "source_confidence_judge",
+      "label": "Source Confidence Judge",
+      "purpose": "Assign confidence band to source-backed claims.",
+      "may_call_tools": false,
+      "required_output": "confidence_result"
+    },
+    {
+      "role_id": "evidence_recorder",
+      "label": "Evidence Recorder",
+      "purpose": "Create evidence entry for answer, action, failure, or blocked result.",
+      "may_call_tools": false,
+      "required_output": "evidence_result"
+    },
+    {
+      "role_id": "answer_composer",
+      "label": "Answer Composer",
+      "purpose": "Compose final Commander-facing response from governed results.",
+      "may_call_tools": false,
+      "required_output": "answer_result"
+    },
+    {
+      "role_id": "hud_presenter",
+      "label": "HUD Presenter",
+      "purpose": "Map answer metadata to visual HUD and voice surfaces.",
+      "may_call_tools": false,
+      "required_output": "presentation_result"
+    }
+  ]
+}
