@@ -1,0 +1,53 @@
+{
+  "pass": 11,
+  "name": "Jarvis Founder Console API Read Layer",
+  "status": "built",
+  "branch": "main",
+  "purpose": "Adds the read-only console API/read handler layer, backend read contract, fixture adapter, route smoke test, view-model fixture, and Pass 10 export index.",
+  "files": [
+    "packages/jarvis-core/src/live-pass-10-index.ts",
+    "packages/contracts/src/jarvis/console-backend-read-contract.ts",
+    "packages/jarvis-core/src/jarvis-console-api-read-handler.ts",
+    "packages/jarvis-core/src/jarvis-console-data-provider-fixture-adapter.ts",
+    "packages/jarvis-core/src/jarvis-console-route-smoke-test.ts",
+    "packages/jarvis-core/src/jarvis-console-view-model-fixture.ts",
+    "scripts/validators/validate-jarvis-live-pass-11.mjs"
+  ],
+  "capabilities": [
+    "JarvisConsoleApiReadHandler",
+    "JarvisConsoleDataProviderFixtureAdapter",
+    "JarvisConsoleBackendReadContract",
+    "JarvisConsoleRouteSmokeTest",
+    "JarvisConsoleViewModelFixture",
+    "JarvisPass10ExportIndex",
+    "JarvisLivePass11Validator"
+  ],
+  "validator": {
+    "script": "node scripts/validators/validate-jarvis-live-pass-11.mjs",
+    "report": "reports/jarvis/validate-jarvis-live-pass-11.json"
+  },
+  "authorityBoundary": [
+    "Console API handler is read-only.",
+    "Backend read contract is a read model contract only, not the truth source.",
+    "Fixture adapter is deterministic smoke data, not production data.",
+    "Route smoke test checks display readiness only.",
+    "Backend state machine, PostgreSQL Truth Vault, validators, evidence, and founder approval remain authoritative."
+  ],
+  "commits": [
+    "0ccbc1aa0fa6ac41ae1722f38aa3bd5f78e582a9",
+    "b1a69308164c40f97398f225545c87988a675380",
+    "2aab504da4f2c307199d8097c9d77fb89d44d07e",
+    "0c6546667788c298a513cedbaab97add3593bf03",
+    "2ba8b8d30522f631254f9d06d56386d5bc3ee847",
+    "e83c799d1787c18641526e7f3c400775763d1ab8",
+    "f73c91225d11396049770fb452261e9590b4eb5a"
+  ],
+  "nextTargets": [
+    "JarvisConsoleBackendReadAdapterReal",
+    "JarvisConsoleApiRouteIntegration",
+    "JarvisConsoleDataProviderPort",
+    "JarvisConsoleResponseContract",
+    "JarvisConsoleReadModelCache",
+    "JarvisPass11ExportIndex"
+  ]
+}
