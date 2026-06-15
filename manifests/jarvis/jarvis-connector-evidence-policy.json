@@ -1,0 +1,36 @@
+{
+  "id": "jarvis-connector-evidence-policy",
+  "pj": "PJ47",
+  "version": "1.0.0",
+  "evidence_required_for_all_connectors": true,
+  "evidence_fields": [
+    "connector_id",
+    "adapter_id",
+    "command_id",
+    "intent_id",
+    "status",
+    "summary",
+    "source_refs",
+    "confidence_band",
+    "checked_at",
+    "failure_reason",
+    "next_safe_action"
+  ],
+  "success_claim_rules": {
+    "success_requires_status_success": true,
+    "success_requires_evidence": true,
+    "success_requires_source_confidence_when_live": true,
+    "success_requires_no_unresolved_blocker": true
+  },
+  "failure_claim_rules": {
+    "must_state_connector_attempted": true,
+    "must_state_failure_reason": true,
+    "must_state_next_safe_action": true,
+    "must_not_claim_success": true
+  },
+  "blocked_claim_rules": {
+    "must_state_block_reason": true,
+    "must_state_safe_redirect": true,
+    "must_not_execute_connector": true
+  }
+}
