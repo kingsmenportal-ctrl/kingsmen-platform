@@ -1,0 +1,23 @@
+{
+  "id": "JB-003",
+  "title": "CMD Jarvis Startup Proof Checklist",
+  "status": "created",
+  "local_path_expected": "C:/Kingsmen/kingsmen-platform/apps/web/package.json",
+  "launcher": "scripts/windows/START_JARVIS_CMD.cmd",
+  "route": "http://127.0.0.1:3000/jarvis",
+  "required_local_proof": [
+    "CMD command used",
+    "npm run dev output",
+    "browser route result",
+    "git status after pull"
+  ],
+  "success_evidence": [
+    "Next server shows Ready or Local URL",
+    "Jarvis route loads without connection refused",
+    "no duplicate host and port flags are used"
+  ],
+  "blocked_claims": [
+    "Do not claim local success without Commander output",
+    "Do not call Jarvis production ready from GitHub files alone"
+  ]
+}
