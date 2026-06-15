@@ -25,7 +25,17 @@ export function routeJarvisIntent(request: JarvisRuntimeRequest): JarvisIntentRe
     };
   }
 
-  if (includesAny(text, ['public repo', 'public repos', 'github stack', 'open source stack', 'docling', 'openwakeword', 'whisper.cpp', 'langfuse', 'gitleaks', 'trivy'])) {
+  if (includesAny(text, ['voice gateway', 'voice session', 'wake word', 'wakeword', 'openwakeword', 'whisper.cpp', 'speech to text', 'stt', 'text to speech', 'tts', 'piper'])) {
+    return {
+      intentId: 'jarvis_voice_gateway',
+      confidence: 'high',
+      freshnessRequired: false,
+      policyGateRequired: true,
+      reason: 'Input asks for Jarvis voice session, wake-word, STT, or TTS gateway work.',
+    };
+  }
+
+  if (includesAny(text, ['public repo', 'public repos', 'github stack', 'open source stack', 'docling', 'langfuse', 'gitleaks', 'trivy'])) {
     return {
       intentId: 'public_repo_integration',
       confidence: 'high',
