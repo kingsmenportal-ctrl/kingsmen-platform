@@ -7,6 +7,7 @@ echo ===============================================================
 
 set "ROOT=%~dp0"
 set "WEB=%ROOT%apps\web"
+set "URL=http://127.0.0.1:3000/jarvis"
 
 if not exist "%WEB%\package.json" (
   echo ERROR: Could not find apps\web\package.json.
@@ -17,11 +18,19 @@ if not exist "%WEB%\package.json" (
 
 echo Repo: %ROOT%
 echo Web : %WEB%
-echo URL : http://127.0.0.1:3000/jarvis
-echo.
-echo If port 3000 is already busy, close the old server first.
+echo URL : %URL%
 echo.
 
-start "" "http://127.0.0.1:3000/jarvis"
+for /f "tokens=5" %%P in ('netstat -ano ^| findstr /R /C:"127\.0\.0\.1:3000 .*LISTENING"') do (
+  echo Port 3000 is already in use by PID %%P.
+  echo Opening existing Jarvis session instead of starting a second server.
+  echo To stop it manually, run: taskkill /F /PID %%P
+  start "" "%URL%"
+  exit /b 0
+)
+
+echo Starting Jarvis dev server...
+echo.
+start "" "%URL%"
 cd /d "%WEB%"
 npm run dev
