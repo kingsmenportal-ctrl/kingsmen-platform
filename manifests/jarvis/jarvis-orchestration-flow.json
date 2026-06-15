@@ -1,0 +1,26 @@
+{
+  "id": "jarvis-orchestration-flow",
+  "pj": "PJ49",
+  "version": "1.0.0",
+  "steps": [
+    { "step_id": "normalize", "role_id": "commander_interface", "required": true, "next": "classify_intent" },
+    { "step_id": "classify_intent", "role_id": "intent_classifier", "required": true, "next": "resolve_command" },
+    { "step_id": "resolve_command", "role_id": "command_resolver", "required": true, "next": "apply_policy" },
+    { "step_id": "apply_policy", "role_id": "policy_guard", "required": true, "next": "select_adapter" },
+    { "step_id": "select_adapter", "role_id": "tool_dispatcher", "required": true, "next": "retrieve_context" },
+    { "step_id": "retrieve_context", "role_id": "knowledge_retriever", "required": false, "next": "live_data_if_required" },
+    { "step_id": "live_data_if_required", "role_id": "live_data_researcher", "required": false, "next": "score_confidence" },
+    { "step_id": "score_confidence", "role_id": "source_confidence_judge", "required": true, "next": "record_evidence" },
+    { "step_id": "record_evidence", "role_id": "evidence_recorder", "required": true, "next": "compose_answer" },
+    { "step_id": "compose_answer", "role_id": "answer_composer", "required": true, "next": "present" },
+    { "step_id": "present", "role_id": "hud_presenter", "required": true, "next": "complete" }
+  ],
+  "fallbacks": {
+    "unknown_intent": "record_blocked_and_answer_safe",
+    "unknown_command": "record_blocked_and_answer_safe",
+    "policy_block": "record_blocked_and_answer_safe",
+    "tool_failure": "record_failure_and_answer_safe",
+    "low_confidence": "answer_with_uncertainty_or_review",
+    "missing_evidence": "do_not_claim_success"
+  }
+}
