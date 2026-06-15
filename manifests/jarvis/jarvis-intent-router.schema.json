@@ -1,0 +1,52 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://kingsmen.local/schemas/jarvis-intent-router.schema.json",
+  "title": "Jarvis Intent Router Schema",
+  "type": "object",
+  "required": ["id", "pj", "version", "intents"],
+  "properties": {
+    "id": { "type": "string" },
+    "pj": { "type": "string" },
+    "version": { "type": "string" },
+    "intents": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "type": "object",
+        "required": [
+          "intent_id",
+          "label",
+          "description",
+          "default_command_family",
+          "default_risk_level",
+          "freshness_required",
+          "policy_gate_required",
+          "allowed_confidence",
+          "fallback_when_low_confidence"
+        ],
+        "properties": {
+          "intent_id": { "type": "string", "pattern": "^[a-z0-9_]+$" },
+          "label": { "type": "string" },
+          "description": { "type": "string" },
+          "default_command_family": { "type": "string" },
+          "default_risk_level": {
+            "type": "string",
+            "enum": ["safe_read", "safe_generate", "review_required", "approval_required", "blocked"]
+          },
+          "freshness_required": { "type": "boolean" },
+          "policy_gate_required": { "type": "boolean" },
+          "allowed_confidence": {
+            "type": "array",
+            "items": { "type": "string", "enum": ["high", "medium", "low", "blocked"] },
+            "minItems": 1
+          },
+          "fallback_when_low_confidence": { "type": "string" },
+          "keywords": { "type": "array", "items": { "type": "string" } },
+          "blocked_when": { "type": "array", "items": { "type": "string" } }
+        },
+        "additionalProperties": false
+      }
+    }
+  },
+  "additionalProperties": false
+}
