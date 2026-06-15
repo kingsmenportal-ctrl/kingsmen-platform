@@ -1,0 +1,34 @@
+{
+  "id": "jarvis-memory-write-policy",
+  "pj": "PJ48",
+  "version": "1.0.0",
+  "core_rules": {
+    "summary_only": true,
+    "source_reference_required": true,
+    "domain_required": true,
+    "status_label_required": true,
+    "timestamp_required": true,
+    "review_required_for_sensitive_summaries": true,
+    "live_facts_need_refresh_before_reuse": true
+  },
+  "allowed_write_categories": [
+    "doctrine_summary",
+    "build_decision_summary",
+    "command_outcome_summary",
+    "source_intelligence_summary",
+    "incident_summary",
+    "visual_product_summary",
+    "commander_preference_summary"
+  ],
+  "write_decision_flow": [
+    "normalize_candidate_memory",
+    "classify_memory_domain",
+    "check_allowed_category",
+    "check_summary_only",
+    "check_source_reference",
+    "apply_redaction",
+    "assign_retention_class",
+    "record_memory_entry"
+  ],
+  "write_result_statuses": ["accepted", "needs_review", "blocked", "superseded"]
+}
