@@ -1,0 +1,28 @@
+{
+  "id": "pj50-api-smoke-contract",
+  "pj": "PJ50",
+  "version": "1.0.0",
+  "purpose": "Define the expected API-facing shape for Jarvis kernel smoke-test output.",
+  "suite_response_fields": [
+    "suiteId",
+    "passed",
+    "total",
+    "failed",
+    "results"
+  ],
+  "result_fields": [
+    "scenarioId",
+    "passed",
+    "expectedIntent",
+    "actualIntent",
+    "expectedCommand",
+    "actualCommand",
+    "expectedOk",
+    "actualOk",
+    "evidenceId",
+    "sourceConfidenceBand",
+    "answer"
+  ],
+  "pass_rule": "All scenarios must pass before the kernel is called smoke-ready.",
+  "failure_rule": "Failed scenarios must expose expected and actual values for repair."
+}
