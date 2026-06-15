@@ -1,0 +1,33 @@
+{
+  "id": "PJ_PUBLIC_JARVIS_04_POCKETPAW",
+  "status": "RECORDED",
+  "recordedBranch": "main",
+  "project": {
+    "name": "PocketPaw",
+    "repository": "pocketpaw/pocketpaw",
+    "url": "https://github.com/pocketpaw/pocketpaw",
+    "type": "self-hosted personal AI agent / desktop and web dashboard reference"
+  },
+  "kingsmenFit": {
+    "primaryContribution": "command center architecture with desktop/web dashboard, channels, agent backends, tools, memory, security, and audit patterns",
+    "adapt": [
+      "event-driven command flow",
+      "agent backend abstraction",
+      "web HUD and later optional desktop helper",
+      "connector registry with dry-run",
+      "tool policy and approval gate",
+      "audit/evidence ledger",
+      "memory with redaction and retention"
+    ],
+    "reject": [
+      "silent production actions",
+      "unreviewed tool execution",
+      "unsafe secret handling",
+      "unbounded candidate memory",
+      "channels overriding Kingsmen email-first doctrine",
+      "connectors bypassing PostgreSQL truth or backend state machine"
+    ]
+  },
+  "repoRecord": "docs/jarvis/public-reference-studies/PJ_PUBLIC_JARVIS_04_POCKETPAW.md",
+  "nextStudySuggested": "kishanrajput23/Jarvis-Desktop-Voice-Assistant or ganeshnikhil/J.A.R.V.I.S.2.0"
+}
