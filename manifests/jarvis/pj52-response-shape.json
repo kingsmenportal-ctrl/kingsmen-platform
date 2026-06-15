@@ -1,0 +1,24 @@
+{
+  "id": "pj52-response-shape",
+  "pj": "PJ52",
+  "version": "1.0.0",
+  "required_keys": [
+    "ok",
+    "answer",
+    "metadata",
+    "evidence"
+  ],
+  "metadata_keys": [
+    "intent",
+    "command",
+    "route",
+    "confidence",
+    "status"
+  ],
+  "hud_needs": [
+    "message",
+    "status_chip",
+    "evidence_summary",
+    "next_step"
+  ]
+}
