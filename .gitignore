@@ -193,3 +193,9 @@ data/personal-job-desk/document-pack-index.local.json
 reports/personal-jobs/personal-jobs-33-document-pack-index-latest.json
 data/personal-job-desk/apply-now.local.json
 data/personal-job-desk/uploads/
+
+# N21 external GitHub stack research clones and local reports
+external/github-stack/
+reports/github-stack/*.local.json
+reports/github-stack/*.local.csv
+reports/github-stack/*.local.md
