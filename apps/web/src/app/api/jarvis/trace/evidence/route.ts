@@ -25,7 +25,8 @@ export async function POST(request: NextRequest) {
     ...result,
     doctrine: {
       traceBoundary: 'Metadata and redacted summaries only.',
-      noRawSensitiveData: 'Do not send raw candidate documents, raw identity values, raw payment values, or raw audio.',
+      noRawAudio: 'No raw audio.',
+      noRawSensitiveData: 'No raw private records may be placed into trace payloads.',
       exportBoundary: 'External Langfuse export remains disabled until production approval.',
       evidenceAuthority: 'PostgreSQL evidence ledger remains Kingsmen authority.',
     },
@@ -41,6 +42,6 @@ export async function GET() {
     method: 'POST',
     required: ['source', 'actor', 'eventName'],
     optional: ['evidenceId', 'candidateId', 'commandId', 'intentId', 'adapterId', 'input', 'output', 'metadata'],
-    safety: 'Redacted metadata only. External trace export disabled. PostgreSQL evidence remains authority.',
+    safety: 'Redacted metadata only. No raw audio. External trace export disabled. PostgreSQL evidence remains authority.',
   });
 }
