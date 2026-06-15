@@ -1,0 +1,90 @@
+{
+  "id": "jarvis-intent-classifier-rules",
+  "pj": "PJ42.3",
+  "version": "1.0.0",
+  "rules": [
+    {
+      "rule_id": "freshness_terms_route_live",
+      "priority": 10,
+      "if_any_terms": ["latest", "current", "today", "now", "this week", "deadline", "closing date", "fee", "price", "weather", "news", "job", "learnership"],
+      "then_intent": "live_research",
+      "freshness_required": true
+    },
+    {
+      "rule_id": "github_terms_route_repo",
+      "priority": 20,
+      "if_any_terms": ["github", "repo", "commit", "issue", "branch", "pull request", "file in repo", "registered in github"],
+      "then_intent": "repo_inspection",
+      "freshness_required": true
+    },
+    {
+      "rule_id": "kingsmen_terms_route_knowledge",
+      "priority": 30,
+      "if_any_terms": ["kingsmen", "jarvis", "n-series", "workflow", "business pack", "pricing", "route universe", "candidate portal", "control plane"],
+      "then_intent": "kingsmen_knowledge",
+      "freshness_required": false
+    },
+    {
+      "rule_id": "system_health_terms_route_health",
+      "priority": 40,
+      "if_any_terms": ["system status", "health", "online", "broken", "failing", "build error", "deployment", "is it working"],
+      "then_intent": "system_health",
+      "freshness_required": true
+    },
+    {
+      "rule_id": "validation_terms_route_build",
+      "priority": 50,
+      "if_any_terms": ["validate", "validator", "run build", "test", "prove", "check phase", "boot test"],
+      "then_intent": "validation_build",
+      "policy_gate_required": true
+    },
+    {
+      "rule_id": "database_terms_route_read_model",
+      "priority": 60,
+      "if_any_terms": ["database", "postgres", "postgresql", "supabase", "table", "read model", "queue count"],
+      "then_intent": "database_read_model",
+      "policy_gate_required": true
+    },
+    {
+      "rule_id": "playwright_terms_route_scout",
+      "priority": 70,
+      "if_any_terms": ["playwright", "portal", "screenshot", "check page", "login page", "captcha", "otp", "blocker"],
+      "then_intent": "playwright_scout",
+      "policy_gate_required": true
+    },
+    {
+      "rule_id": "report_terms_route_report",
+      "priority": 80,
+      "if_any_terms": ["report", "digest", "summary", "briefing", "roadmap", "evidence pack", "plan"],
+      "then_intent": "report_generation",
+      "freshness_required": false
+    },
+    {
+      "rule_id": "visual_terms_route_hud",
+      "priority": 90,
+      "if_any_terms": ["visual", "dashboard", "hud", "cards", "panel", "ui", "mobile view", "not black and white"],
+      "then_intent": "visual_hud_request",
+      "freshness_required": false
+    },
+    {
+      "rule_id": "blocked_external_action",
+      "priority": 1,
+      "if_any_terms": ["send as jarvis to candidate", "make payment decision", "submit silently", "bypass approval", "ignore evidence", "act as public chatbot"],
+      "then_intent": "blocked_unsafe_action",
+      "policy_gate_required": true
+    }
+  ],
+  "tie_breakers": [
+    "blocked_unsafe_action wins over all other intents",
+    "explicit GitHub/repo request wins over general Kingsmen knowledge",
+    "freshness terms require live data unless the user asks not to browse",
+    "build or action verbs require policy gate",
+    "low confidence never executes a command"
+  ],
+  "confidence_rules": {
+    "high": "explicit terms match one intent and no safety conflict exists",
+    "medium": "intent is likely but domain overlap exists",
+    "low": "request is ambiguous or lacks execution target",
+    "blocked": "request matches blocked unsafe action"
+  }
+}
