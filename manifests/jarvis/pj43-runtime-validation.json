@@ -1,0 +1,33 @@
+{
+  "id": "pj43-runtime-validation",
+  "pj": "PJ43",
+  "version": "1.0.0",
+  "required_files": [
+    "docs/agents/PJ43_JARVIS_RUNTIME_IMPLEMENTATION.md",
+    "manifests/jarvis/pj43-runtime-implementation.json",
+    "manifests/jarvis/pj43-runtime-validation.json",
+    "apps/web/src/lib/jarvis/runtime/types.ts",
+    "apps/web/src/lib/jarvis/runtime/intent-router.ts",
+    "apps/web/src/lib/jarvis/runtime/command-registry.ts",
+    "apps/web/src/lib/jarvis/runtime/policy-gate.ts",
+    "apps/web/src/lib/jarvis/runtime/adapter-selector.ts",
+    "apps/web/src/lib/jarvis/runtime/source-confidence.ts",
+    "apps/web/src/lib/jarvis/runtime/knowledge-brain.ts",
+    "apps/web/src/lib/jarvis/runtime/live-data-router.ts",
+    "apps/web/src/lib/jarvis/runtime/evidence-ledger.ts",
+    "apps/web/src/lib/jarvis/runtime/answer-composer.ts",
+    "apps/web/src/lib/jarvis/runtime/kernel.ts",
+    "apps/web/src/lib/jarvis/runtime/index.ts",
+    "scripts/jarvis/validate-pj43-runtime-implementation.mjs"
+  ],
+  "required_checks": [
+    "files_exist",
+    "runtime_flow_present",
+    "command_guard_present",
+    "adapter_guard_present",
+    "evidence_entry_created",
+    "kernel_smoke_test_exported",
+    "runtime_index_exports_modules"
+  ],
+  "next_phase": "PJ44 Jarvis UI HUD Implementation"
+}
