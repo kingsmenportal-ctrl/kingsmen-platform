@@ -1,0 +1,31 @@
+{
+  "id": "pj48-memory-vault-validation",
+  "pj": "PJ48",
+  "version": "1.0.0",
+  "required_files": [
+    "docs/agents/PJ48_JARVIS_MEMORY_VAULT.md",
+    "manifests/jarvis/jarvis-memory-vault.schema.json",
+    "manifests/jarvis/jarvis-memory-domains.json",
+    "manifests/jarvis/jarvis-memory-write-policy.json",
+    "manifests/jarvis/jarvis-memory-read-policy.json",
+    "manifests/jarvis/jarvis-memory-retention-policy.json",
+    "manifests/jarvis/jarvis-memory-redaction-policy.json",
+    "apps/web/src/lib/jarvis/runtime/memory/types.ts",
+    "apps/web/src/lib/jarvis/runtime/memory/vault.ts",
+    "apps/web/src/lib/jarvis/runtime/memory/index.ts",
+    "manifests/jarvis/pj48-memory-vault-validation.json",
+    "scripts/jarvis/validate-pj48-memory-vault.mjs"
+  ],
+  "required_checks": [
+    "files_exist",
+    "json_loads",
+    "memory_domains_exist",
+    "domain_ids_unique",
+    "write_policy_summary_only",
+    "read_policy_current_facts_live",
+    "retention_classes_exist",
+    "redaction_rules_exist",
+    "runtime_helper_exists"
+  ],
+  "next_phase": "PJ49 Jarvis Agent Orchestrator"
+}
