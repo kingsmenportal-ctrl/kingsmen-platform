@@ -1,0 +1,28 @@
+{
+  "id": "jarvis-memory-read-policy",
+  "pj": "PJ48",
+  "version": "1.0.0",
+  "core_rules": {
+    "route_through_intent_router": true,
+    "route_through_knowledge_brain": true,
+    "apply_source_confidence": true,
+    "state_when_memory_is_old": true,
+    "memory_is_context_not_current_proof": true,
+    "current_facts_require_live_data_router": true
+  },
+  "read_flow": [
+    "classify_intent",
+    "select_memory_domains",
+    "retrieve_summary_entries",
+    "check_staleness",
+    "check_source_reference",
+    "apply_source_confidence",
+    "compose_answer_with_status_label"
+  ],
+  "memory_use_statuses": [
+    "usable_context",
+    "needs_live_refresh",
+    "needs_review",
+    "blocked"
+  ]
+}
