@@ -1,0 +1,50 @@
+{
+  "id": "jarvis-knowledge-answer-composition",
+  "pj": "PJ42.6",
+  "version": "1.0.0",
+  "purpose": "Define how Jarvis must compose answers from retrieved Kingsmen knowledge.",
+  "answer_requirements": [
+    "answer_the_commander_directly",
+    "state_source_basis_when_available",
+    "state_status_label_for_kingsmen_facts",
+    "state_uncertainty_when_source_missing",
+    "separate_locked_fact_from_plan",
+    "separate_built_from_planned",
+    "separate_public_live_fact_from_memory",
+    "provide_next_safe_action_when_relevant"
+  ],
+  "status_language": {
+    "locked": "This is locked doctrine.",
+    "validated": "This has validator or proof support.",
+    "registered": "This has been registered in GitHub or manifests.",
+    "created": "This file or artifact has been created.",
+    "planned": "This is planned but not yet built.",
+    "draft": "This is a draft and needs review.",
+    "missing_proof": "This claim needs proof before it can be treated as complete.",
+    "stale": "This may be outdated and needs live verification.",
+    "conflicting": "Sources conflict and require review.",
+    "blocked": "This is blocked by Kingsmen law."
+  },
+  "prohibited_answer_patterns": [
+    "claiming_unbuilt_features_as_built",
+    "claiming_unverified_sources_as_official",
+    "using_memory_as_current_deadline_or_fee_source",
+    "exposing_private_raw_data",
+    "inventing_missing_repo_files",
+    "hiding_uncertainty",
+    "turning_candidate_facing_messages_into_jarvis_speech"
+  ],
+  "preferred_answer_structure": [
+    "direct_answer",
+    "what_is_locked_or_verified",
+    "what_is_planned_or_missing",
+    "source_confidence_or_evidence_note",
+    "next_safe_action"
+  ],
+  "visual_output_rules": {
+    "knowledge_card_required_for_kingsmen_architecture_answers": true,
+    "source_confidence_chip_required_for_live_or_source_backed_answers": true,
+    "evidence_drawer_required_for_tool_backed_answers": true,
+    "blocked_card_required_for_blocked_actions": true
+  }
+}
