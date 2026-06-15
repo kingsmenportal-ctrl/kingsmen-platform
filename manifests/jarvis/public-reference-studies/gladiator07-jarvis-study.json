@@ -1,0 +1,47 @@
+{
+  "id": "pj-public-jarvis-12-gladiator07-jarvis",
+  "status": "recorded",
+  "recordedToBranch": "main",
+  "projectNumber": 12,
+  "projectName": "Gladiator07 / JARVIS",
+  "repository": "Gladiator07/JARVIS",
+  "publicUrl": "https://github.com/Gladiator07/JARVIS",
+  "sourceType": "public-github-repository",
+  "kingsmenUse": "reference-study-only",
+  "studyDocument": "docs/jarvis/public-reference-studies/PJ_PUBLIC_JARVIS_12_GLADIATOR07_JARVIS.md",
+  "primaryLessons": [
+    "GUI command surface",
+    "voice command vocabulary",
+    "modular feature adapter pattern",
+    "local system-status reporting",
+    "screenshot proof helper",
+    "safe local utility adapter"
+  ],
+  "adaptIntoKingsmen": [
+    "JarvisHud",
+    "JarvisVoiceInputShell",
+    "JarvisCommandRegistry",
+    "JarvisFeatureAdapterPattern",
+    "JarvisLocalUtilityAdapter",
+    "JarvisScreenshotProofHelper",
+    "JarvisSystemStatusReporter",
+    "JarvisDraftEmailHelper"
+  ],
+  "rejectFromKingsmen": [
+    "secrets in normal config files",
+    "email sending without approval",
+    "voice-triggered risky actions",
+    "unlogged file/system control",
+    "production app actions from GUI or voice alone",
+    "candidate data in local assistant folders"
+  ],
+  "authorityBoundary": [
+    "PostgreSQL Truth Vault",
+    "Backend state machine",
+    "GitHub repository",
+    "Doctrine and policy gates",
+    "Validators",
+    "Evidence ledger",
+    "Founder approval"
+  ]
+}
