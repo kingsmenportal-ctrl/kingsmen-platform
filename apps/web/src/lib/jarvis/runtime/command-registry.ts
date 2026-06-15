@@ -66,6 +66,15 @@ const commandByIntent: Record<JarvisIntentId, JarvisCommandDefinition> = {
     evidenceRequired: true,
     adapterId: 'jarvis_voice_gateway_adapter',
   },
+  jarvis_trace_evidence: {
+    commandId: 'JARVIS_TRACE_EVIDENCE',
+    label: 'Jarvis Trace Evidence Gateway',
+    category: 'jarvis_trace_evidence',
+    riskLevel: 'review_required',
+    approvalRequired: true,
+    evidenceRequired: true,
+    adapterId: 'langfuse_trace_gateway_adapter',
+  },
   system_health: {
     commandId: 'SYSTEM_STATUS',
     label: 'System Status',
