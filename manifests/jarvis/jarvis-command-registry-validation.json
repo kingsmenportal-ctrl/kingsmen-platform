@@ -1,0 +1,27 @@
+{
+  "id": "jarvis-command-registry-validation",
+  "pj": "PJ42.2",
+  "version": "1.0.0",
+  "required_files": [
+    "docs/agents/PJ42_2_JARVIS_COMMAND_REGISTRY.md",
+    "manifests/jarvis/jarvis-command-registry.schema.json",
+    "manifests/jarvis/jarvis-command-categories.json",
+    "manifests/jarvis/jarvis-command-registry.json",
+    "manifests/jarvis/jarvis-command-registry-validation.json",
+    "scripts/jarvis/validate-pj42-2-command-registry.mjs"
+  ],
+  "required_checks": [
+    "registry_exists",
+    "schema_exists",
+    "categories_exist",
+    "commands_array_present",
+    "unknown_command_defaults_to_blocked",
+    "all_command_ids_unique",
+    "all_required_fields_present",
+    "all_risk_levels_known",
+    "blocked_commands_have_blocked_reason",
+    "approval_required_matches_risk_level",
+    "evidence_required_for_all_commands"
+  ],
+  "next_phase": "PJ42.3 Intent Router"
+}
