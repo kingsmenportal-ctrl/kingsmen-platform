@@ -1,0 +1,56 @@
+{
+  "id": "jarvis-knowledge-memory-boundary",
+  "pj": "PJ42.6",
+  "version": "1.0.0",
+  "purpose": "Define the boundary between Knowledge Brain retrieval, safe memory, and forbidden private data.",
+  "allowed_memory_types": [
+    "doctrine_summary",
+    "build_decision_summary",
+    "phase_completion_summary",
+    "command_outcome_summary",
+    "source_confidence_summary",
+    "public_opportunity_intelligence_summary",
+    "incident_summary",
+    "visual_product_decision_summary",
+    "founder_preference_approved_summary"
+  ],
+  "forbidden_memory_types": [
+    "raw_candidate_profile",
+    "raw_payment_record",
+    "private_document_content",
+    "authentication_or_token_material",
+    "browser_cookie_or_session_material",
+    "private_bank_or_card_information",
+    "raw_secret_log",
+    "unapproved_personal_data",
+    "fake_or_unsupported_status_claim"
+  ],
+  "memory_write_requirements": [
+    "must_be_summary_not_raw_private_record",
+    "must_have_domain_id",
+    "must_have_source_reference",
+    "must_have_status_label",
+    "must_have_timestamp",
+    "must_have_delete_or_supersede_path",
+    "must_not_override_current_live_data"
+  ],
+  "memory_read_requirements": [
+    "route_through_intent_router",
+    "route_through_policy_gate_when_sensitive",
+    "apply_source_confidence",
+    "state_when_memory_is_old_or_superseded",
+    "never_treat_memory_as_current_source_for_unstable_facts"
+  ],
+  "safe_status_labels": [
+    "locked",
+    "validated",
+    "registered",
+    "created",
+    "planned",
+    "draft",
+    "missing_proof",
+    "stale",
+    "conflicting",
+    "blocked"
+  ]
+}
