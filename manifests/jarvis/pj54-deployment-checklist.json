@@ -1,0 +1,38 @@
+{
+  "id": "pj54-deployment-checklist",
+  "pj": "PJ54",
+  "version": "1.0.0",
+  "mode_order": [
+    "build_mode",
+    "validation_mode",
+    "commander_preview_mode",
+    "operational_mode"
+  ],
+  "required_before_preview": [
+    "runtime_files_present",
+    "api_kernel_route_present",
+    "smoke_route_present",
+    "hud_client_present",
+    "evidence_contract_present",
+    "source_confidence_manifest_present",
+    "memory_boundary_manifest_present",
+    "connector_catalog_present"
+  ],
+  "required_before_operational": [
+    "web_build_checked",
+    "kernel_smoke_checked",
+    "api_response_shape_checked",
+    "hud_output_checked",
+    "blocked_command_checked",
+    "evidence_output_checked",
+    "deferred_repairs_reviewed",
+    "release_evidence_recorded"
+  ],
+  "deployment_result_labels": [
+    "not_ready",
+    "preview_ready",
+    "needs_repair",
+    "operator_approved",
+    "operational_ready"
+  ]
+}
