@@ -1,0 +1,55 @@
+{
+  "id": "JARVIS_STARTUP_REALITY_RECORD",
+  "status": "recorded",
+  "repo": "kingsmenportal-ctrl/kingsmen-platform",
+  "local_path": "C:\\Kingsmen\\kingsmen-platform",
+  "observed_failures": [
+    {
+      "command": "scripts\\windows\\START_JARVIS_CMD.cmd",
+      "result": "The system cannot find the path specified."
+    },
+    {
+      "command": "dir scripts\\windows",
+      "result": "Directory shown as C:\\Kingsmen\\kingsmen-platform\\scripts with File Not Found"
+    },
+    {
+      "command": "npm run dev",
+      "result": "EADDRINUSE 127.0.0.1:3000"
+    },
+    {
+      "command": "netstat -ano | findstr :3000",
+      "result": "127.0.0.1:3000 LISTENING PID 8768"
+    }
+  ],
+  "current_authority_launchers": [
+    "START_JARVIS.cmd",
+    "CLONE_AND_START_JARVIS.cmd",
+    "scripts/windows/START_JARVIS_CMD.cmd"
+  ],
+  "launcher_authority": "START_JARVIS.cmd",
+  "compatibility_rule": "scripts/windows/START_JARVIS_CMD.cmd delegates to START_JARVIS.cmd",
+  "port_3000_rule": "If port 3000 is already listening, open /jarvis instead of starting a second server.",
+  "tool_stack": {
+    "GitHub": "core source control",
+    "OpenJarvis": "reference only",
+    "OpenClaw": "locked behind policy gates only",
+    "Playwright": "controlled scout only",
+    "Hermes": "clarify before core adoption"
+  },
+  "safe_chain": [
+    "Commander",
+    "Jarvis Command Layer",
+    "Kingsmen Backend State Machine",
+    "Approved Tools"
+  ],
+  "blocked_chain": [
+    "Commander",
+    "OpenClaw/Hermes directly controlling everything"
+  ],
+  "next_local_commands": [
+    "cd /d C:\\Kingsmen\\kingsmen-platform",
+    "git pull",
+    "dir START_JARVIS.cmd",
+    "START_JARVIS.cmd"
+  ]
+}
