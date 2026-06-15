@@ -1,0 +1,16 @@
+{
+  "id": "pj52-surface-ids",
+  "pj": "PJ52",
+  "version": "1.0.0",
+  "surfaces": [
+    "hud",
+    "kernel_endpoint",
+    "smoke_endpoint",
+    "runtime_exports",
+    "kernel_runner",
+    "memory_vault",
+    "connector_registry",
+    "evidence_entry",
+    "answer_output"
+  ]
+}
