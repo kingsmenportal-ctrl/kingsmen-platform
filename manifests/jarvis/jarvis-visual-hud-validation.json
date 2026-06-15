@@ -1,0 +1,30 @@
+{
+  "id": "jarvis-visual-hud-validation",
+  "pj": "PJ42.8",
+  "version": "1.0.0",
+  "required_files": [
+    "docs/agents/PJ42_8_JARVIS_VISUAL_HUD.md",
+    "manifests/jarvis/jarvis-visual-hud.schema.json",
+    "manifests/jarvis/jarvis-visual-surface-catalog.json",
+    "manifests/jarvis/jarvis-hud-layout-system.json",
+    "manifests/jarvis/jarvis-hud-component-contracts.json",
+    "manifests/jarvis/jarvis-hud-state-machine.json",
+    "manifests/jarvis/jarvis-hud-accessibility-mobile.json",
+    "manifests/jarvis/jarvis-visual-hud-validation.json",
+    "scripts/jarvis/validate-pj42-8-visual-hud.mjs"
+  ],
+  "required_checks": [
+    "files_exist",
+    "json_loads",
+    "required_surfaces_present",
+    "surface_ids_unique",
+    "layouts_reference_known_surfaces",
+    "components_reference_known_surfaces",
+    "commander_only_components_defined",
+    "hud_states_defined",
+    "mobile_rules_defined",
+    "accessibility_rules_defined",
+    "plain_chat_only_blocked"
+  ],
+  "next_phase": "PJ42.9 Approval and Evidence Layer"
+}
