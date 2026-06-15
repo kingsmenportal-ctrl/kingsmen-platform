@@ -1,0 +1,12 @@
+{
+  "id": "pj53-repair-closure",
+  "pj": "PJ53",
+  "items": [
+    { "id": "pj44_css", "phase": "PJ44", "close_in": "PJ54" },
+    { "id": "pj44_validator", "phase": "PJ44", "close_in": "PJ54" },
+    { "id": "pj45_validator", "phase": "PJ45", "close_in": "PJ54" },
+    { "id": "pj46_prompt_runtime", "phase": "PJ46", "close_in": "PJ54" },
+    { "id": "pj46_validator", "phase": "PJ46", "close_in": "PJ54" },
+    { "id": "pj52_validator_body", "phase": "PJ52", "close_in": "PJ54" }
+  ]
+}
