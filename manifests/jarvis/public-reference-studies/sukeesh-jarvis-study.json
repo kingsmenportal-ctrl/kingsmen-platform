@@ -1,0 +1,37 @@
+{
+  "id": "PJ_PUBLIC_JARVIS_06_SUKEESH_JARVIS",
+  "status": "recorded",
+  "target_branch": "main",
+  "source_project": "sukeesh/Jarvis",
+  "source_type": "public_github_repository",
+  "study_file": "docs/jarvis/public-reference-studies/PJ_PUBLIC_JARVIS_06_SUKEESH_JARVIS.md",
+  "kingsmen_decision": "adapt_selectively_do_not_copy_wholesale",
+  "primary_lessons": [
+    "command_registry",
+    "help_system",
+    "small_plugin_command_model",
+    "local_utility_adapter",
+    "voice_as_surface_only"
+  ],
+  "reject": [
+    "untyped_commands",
+    "unreviewed_plugins",
+    "production_actions_without_approval",
+    "weak_candidate_data_protection",
+    "utility_mixing_without_policy_gate"
+  ],
+  "kingsmen_layer_fit": [
+    "jarvis_command_registry",
+    "jarvis_help_generator",
+    "safe_plugin_loader",
+    "local_founder_utility_adapter",
+    "evidence_logged_command_execution"
+  ],
+  "required_boundaries": [
+    "Jarvis commands must resolve through approved command manifests",
+    "Voice must not bypass policy gate",
+    "Plugins/connectors require approved manifest entries",
+    "Production-risk actions require founder approval",
+    "Every command execution must produce evidence"
+  ]
+}
