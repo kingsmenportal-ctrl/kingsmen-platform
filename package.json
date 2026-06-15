@@ -1,21 +1,28 @@
 {
   "name": "kingsmen-platform",
   "version": "1.0.0",
-  "description": "",
+  "description": "Kingsmen Platform live build repository",
   "main": "index.js",
   "directories": {
     "doc": "docs"
   },
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "node scripts/validators/validate-jarvis-core.mjs",
+    "jarvis:validate": "node scripts/validators/validate-jarvis-core.mjs"
   },
   "repository": {
     "type": "git",
     "url": "git+https://github.com/kingsmenportal-ctrl/kingsmen-platform.git"
   },
-  "keywords": [],
-  "author": "",
-  "license": "ISC",
+  "keywords": [
+    "kingsmen",
+    "jarvis",
+    "south-africa",
+    "admissions",
+    "opportunities"
+  ],
+  "author": "Kingsmen Portal",
+  "license": "UNLICENSED",
   "bugs": {
     "url": "https://github.com/kingsmenportal-ctrl/kingsmen-platform/issues"
   },
