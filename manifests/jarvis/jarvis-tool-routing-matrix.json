@@ -1,0 +1,30 @@
+{
+  "id": "jarvis-tool-routing-matrix",
+  "pj": "PJ42.4",
+  "version": "1.0.0",
+  "routes": [
+    { "command_id": "ASK_GENERAL", "adapter_id": "dialogue_brain", "requires_policy_gate": false, "requires_approval_token": false },
+    { "command_id": "LIVE_RESEARCH", "adapter_id": "web_research_adapter", "requires_policy_gate": false, "requires_approval_token": false },
+    { "command_id": "SEARCH_KINGSMEN_KNOWLEDGE", "adapter_id": "kingsmen_knowledge_adapter", "requires_policy_gate": false, "requires_approval_token": false },
+    { "command_id": "GITHUB_REPO_INSPECT", "adapter_id": "github_adapter", "requires_policy_gate": false, "requires_approval_token": false },
+    { "command_id": "SYSTEM_STATUS", "adapter_id": "system_health_adapter", "requires_policy_gate": false, "requires_approval_token": false },
+    { "command_id": "VALIDATE_PHASE", "adapter_id": "validation_adapter", "requires_policy_gate": true, "requires_approval_token": true },
+    { "command_id": "RUN_WEB_BUILD", "adapter_id": "build_adapter", "requires_policy_gate": true, "requires_approval_token": true },
+    { "command_id": "POSTGRES_READ_MODEL_SCAN", "adapter_id": "postgres_read_model_adapter", "requires_policy_gate": true, "requires_approval_token": false },
+    { "command_id": "PLAYWRIGHT_PORTAL_HEALTH", "adapter_id": "playwright_scout_adapter", "requires_policy_gate": true, "requires_approval_token": true },
+    { "command_id": "GENERATE_FOUNDER_DIGEST", "adapter_id": "report_generation_adapter", "requires_policy_gate": false, "requires_approval_token": false },
+    { "command_id": "GENERATE_EVIDENCE_PACK", "adapter_id": "evidence_pack_adapter", "requires_policy_gate": true, "requires_approval_token": true },
+    { "command_id": "REQUEST_APPROVAL", "adapter_id": "approval_adapter", "requires_policy_gate": true, "requires_approval_token": false },
+    { "command_id": "SEND_EXTERNAL_MESSAGE", "adapter_id": "blocked_adapter", "requires_policy_gate": true, "requires_approval_token": false },
+    { "command_id": "MAKE_PAYMENT_DECISION", "adapter_id": "blocked_adapter", "requires_policy_gate": true, "requires_approval_token": false },
+    { "command_id": "SUBMIT_OFFICIAL_APPLICATION_SILENTLY", "adapter_id": "blocked_adapter", "requires_policy_gate": true, "requires_approval_token": false }
+  ],
+  "fallbacks": {
+    "unknown_command": "blocked_adapter",
+    "unknown_adapter": "blocked_adapter",
+    "missing_policy_gate": "blocked_adapter",
+    "missing_evidence_rule": "blocked_adapter",
+    "adapter_timeout": "return_failure_with_next_safe_action",
+    "adapter_error": "return_failure_with_evidence_and_no_success_claim"
+  }
+}
