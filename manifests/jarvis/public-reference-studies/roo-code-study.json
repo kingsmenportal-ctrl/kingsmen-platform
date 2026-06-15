@@ -1,0 +1,109 @@
+{
+  "id": "PJ_PUBLIC_JARVIS_21_ROO_CODE",
+  "projectNumber": 21,
+  "status": "RECORDED_PUBLIC_REFERENCE_STUDY",
+  "recordedBranch": "main",
+  "referenceProject": {
+    "name": "Roo Code",
+    "repository": "RooCodeInc/Roo-Code",
+    "url": "https://github.com/RooCodeInc/Roo-Code",
+    "type": "archived_public_open_source_ide_coding_agent",
+    "runtimeDependencyApproved": false,
+    "dependencyDecision": "PATTERN_STUDY_ONLY_BECAUSE_PROJECT_IS_ARCHIVED_AND_EXTENSION_WAS_SHUT_DOWN"
+  },
+  "publicSnapshot": {
+    "archived": true,
+    "archiveDateObserved": "2026-05-15",
+    "extensionShutdownObserved": true,
+    "visibleStarsApprox": "24.2k",
+    "visibleForksApprox": "3.3k",
+    "visibleCommitsApprox": "7073",
+    "license": "Apache-2.0",
+    "dominantLanguage": "TypeScript",
+    "visibleImportantFiles": [
+      ".roo",
+      ".roomodes",
+      ".rooignore",
+      "AGENTS.md",
+      "apps",
+      "packages",
+      "schemas",
+      "src",
+      "webview-ui"
+    ],
+    "visibleModes": [
+      "Code Mode",
+      "Architect Mode",
+      "Ask Mode",
+      "Debug Mode",
+      "Custom Modes"
+    ]
+  },
+  "kingsmenLesson": "Mode-separated IDE coding agents with scoped tool access, repo rules, MCP gateway concepts, and founder-visible review flow.",
+  "kingsmenModulesInformed": [
+    "JarvisModeManager",
+    "JarvisCodeMode",
+    "JarvisArchitectMode",
+    "JarvisAskMode",
+    "JarvisDebugMode",
+    "JarvisCustomModeRegistry",
+    "JarvisModePolicyMatrix",
+    "JarvisRooIgnoreEquivalent",
+    "JarvisAgentInstructionsLoader",
+    "JarvisMcpGateway",
+    "JarvisIdeWebviewBridge",
+    "JarvisModeScopedToolAccess",
+    "JarvisModeScopedEvidenceLedger"
+  ],
+  "recommendedKingsmenModes": [
+    "builder_mode",
+    "architecture_plan_mode",
+    "safe_chat_or_explain_mode",
+    "diagnostic_repair_mode",
+    "module_scoped_modes",
+    "source_research_mode",
+    "deployment_dry_run_mode"
+  ],
+  "adapt": [
+    "Mode-separated assistant behavior",
+    "Source-controlled Jarvis mode rules",
+    "Mode-specific tool permission matrices",
+    "Repo ignore rules for secrets and candidate-sensitive data",
+    "Agent instruction files subordinate to Kingsmen doctrine",
+    "MCP/server gateway through policy gates",
+    "IDE/HUD webview pattern for founder review",
+    "N-series module-scoped custom modes"
+  ],
+  "reject": [
+    "Depending on an archived or shut-down project as a live foundation",
+    "Any mode overriding Kingsmen doctrine",
+    "Any custom mode granting itself production authority",
+    "Unregistered MCP servers or tools",
+    "IDE actions bypassing backend policy and validators",
+    "Repo-wide edits without module scope",
+    "Secrets entering prompts logs diffs or commits",
+    "Candidate data used as free-form coding context"
+  ],
+  "requiredModeDeclarationFields": [
+    "mode_id",
+    "purpose",
+    "allowed_commands",
+    "allowed_files_and_folders",
+    "forbidden_files_and_folders",
+    "allowed_tools",
+    "forbidden_tools",
+    "approval_requirements",
+    "evidence_requirements",
+    "validator_requirements",
+    "rollback_or_failure_path"
+  ],
+  "proposedRepoPaths": [
+    ".jarvis/modes/",
+    ".jarvis/ignore/jarvis-ignore.rules",
+    ".jarvis/instructions/AGENTS.md",
+    ".jarvis/instructions/KINGSMEN_AGENT_RULES.md",
+    ".jarvis/policies/mode-policy-matrix.json",
+    ".jarvis/policies/mcp-tool-policy.json"
+  ],
+  "finalDecision": "Adopt the mode separation concept. Do not adopt Roo Code as a live dependency. Implement Kingsmen-owned mode manager, mode policy matrix, and module-scoped custom modes."
+}
