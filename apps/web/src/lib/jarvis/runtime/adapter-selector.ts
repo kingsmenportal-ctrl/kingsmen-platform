@@ -5,6 +5,7 @@ const known = new Set<string>([
   'web_research_adapter',
   'kingsmen_knowledge_adapter',
   'github_adapter',
+  'public_repo_registry_adapter',
   'system_health_adapter',
   'validation_adapter',
   'build_adapter',
