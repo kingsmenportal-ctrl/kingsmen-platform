@@ -1,0 +1,67 @@
+{
+  "id": "jarvis-live-failure-fallback",
+  "pj": "PJ42.7",
+  "version": "1.0.0",
+  "failure_types": [
+    {
+      "failure_id": "route_unavailable",
+      "description": "The chosen live route is not available or adapter cannot run.",
+      "answer_rule": "State route unavailable and offer next safe route or manual review.",
+      "success_claim_allowed": false
+    },
+    {
+      "failure_id": "source_not_found",
+      "description": "No source was found for the current claim.",
+      "answer_rule": "State that no verified source was found and do not claim verified answer.",
+      "success_claim_allowed": false
+    },
+    {
+      "failure_id": "source_conflict",
+      "description": "Multiple sources conflict on a current-sensitive claim.",
+      "answer_rule": "State conflict, prefer official authority if available, and route to review.",
+      "success_claim_allowed": false
+    },
+    {
+      "failure_id": "source_stale",
+      "description": "Available source or cache is too old for the claim.",
+      "answer_rule": "Mark as stale and require live refresh.",
+      "success_claim_allowed": false
+    },
+    {
+      "failure_id": "policy_blocked",
+      "description": "Live route exists but policy gate blocks the request.",
+      "answer_rule": "Explain the safe boundary and redirect to approved workflow.",
+      "success_claim_allowed": false
+    },
+    {
+      "failure_id": "portal_blocker_detected",
+      "description": "Portal scout found CAPTCHA, OTP, login wall, outage, or manual blocker.",
+      "answer_rule": "Do not bypass. Capture blocker evidence and recommend Manual Application Package or review.",
+      "success_claim_allowed": false
+    }
+  ],
+  "manual_fallback_routes": [
+    "manual_source_review",
+    "commander_review",
+    "operator_review",
+    "manual_application_package",
+    "official_contact_check",
+    "retry_later_with_evidence"
+  ],
+  "failure_evidence_required": [
+    "route_id",
+    "adapter_id",
+    "failure_id",
+    "timestamp",
+    "query_summary",
+    "evidence_reference",
+    "next_safe_action"
+  ],
+  "forbidden_failure_behavior": [
+    "invent_current_fact_after_live_failure",
+    "claim_portal_success_after_blocker",
+    "hide_source_conflict",
+    "use_stale_cache_as_verified_current_fact",
+    "bypass_policy_gate"
+  ]
+}
