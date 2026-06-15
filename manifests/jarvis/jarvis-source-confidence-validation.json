@@ -1,0 +1,29 @@
+{
+  "id": "jarvis-source-confidence-validation",
+  "pj": "PJ42.5",
+  "version": "1.0.0",
+  "required_files": [
+    "docs/agents/PJ42_5_JARVIS_SOURCE_CONFIDENCE_ENGINE.md",
+    "manifests/jarvis/jarvis-source-confidence.schema.json",
+    "manifests/jarvis/jarvis-source-confidence-bands.json",
+    "manifests/jarvis/jarvis-source-authority.json",
+    "manifests/jarvis/jarvis-source-confidence-rules.json",
+    "manifests/jarvis/jarvis-source-conflict-handling.json",
+    "manifests/jarvis/jarvis-source-confidence-validation.json",
+    "scripts/jarvis/validate-pj42-5-source-confidence.mjs"
+  ],
+  "required_checks": [
+    "files_exist",
+    "json_loads",
+    "all_required_bands_exist",
+    "authority_levels_exist",
+    "authority_ceilings_reference_known_bands",
+    "band_rules_reference_known_bands",
+    "freshness_windows_defined",
+    "conflict_types_reference_known_bands",
+    "blocked_conflict_triggers_defined",
+    "manual_review_triggers_defined",
+    "verified_official_requires_official_primary"
+  ],
+  "next_phase": "PJ42.6 Knowledge Brain"
+}
