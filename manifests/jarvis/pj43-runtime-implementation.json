@@ -1,0 +1,40 @@
+{
+  "id": "pj43-runtime-implementation",
+  "pj": "PJ43",
+  "version": "1.0.0",
+  "status": "created",
+  "parent": "PJ42 Closeout Real Jarvis Kernel Assembly Plan",
+  "runtime_root": "apps/web/src/lib/jarvis/runtime",
+  "core_flow": [
+    "intent_router",
+    "command_registry",
+    "policy_gate",
+    "tool_router",
+    "source_confidence",
+    "evidence_ledger",
+    "answer_composer"
+  ],
+  "created_modules": [
+    "types.ts",
+    "intent-router.ts",
+    "command-registry.ts",
+    "policy-gate.ts",
+    "tool-router.ts",
+    "source-confidence.ts",
+    "knowledge-brain.ts",
+    "live-data-router.ts",
+    "evidence-ledger.ts",
+    "answer-composer.ts",
+    "kernel.ts",
+    "index.ts"
+  ],
+  "runtime_laws": {
+    "unknown_intent": "safe_answer_or_block_if_executable",
+    "unknown_command": "blocked",
+    "unknown_tool": "blocked",
+    "missing_evidence": "no_success_claim",
+    "risky_action_without_approval": "blocked",
+    "private_raw_data_access": "blocked"
+  },
+  "next_phase": "PJ44 Jarvis UI/HUD Implementation"
+}
