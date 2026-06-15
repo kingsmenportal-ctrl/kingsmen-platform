@@ -1,0 +1,38 @@
+{
+  "id": "pj45-api-response-contract",
+  "pj": "PJ45",
+  "version": "1.0.0",
+  "route": "/api/jarvis/agent",
+  "legacy_fields": [
+    "ok",
+    "tool",
+    "reply",
+    "stdout",
+    "stderr",
+    "evidencePath",
+    "startedAt",
+    "finishedAt",
+    "durationMs",
+    "selectedTool",
+    "message"
+  ],
+  "kernel_required": true,
+  "kernel_fields": [
+    "ok",
+    "answer",
+    "intent",
+    "command",
+    "policy",
+    "toolRoute",
+    "sourceConfidence",
+    "evidence"
+  ],
+  "hud_targets": [
+    "mission_board",
+    "command_card",
+    "tool_indicator",
+    "confidence_chip",
+    "evidence_drawer",
+    "answer_stream"
+  ]
+}
