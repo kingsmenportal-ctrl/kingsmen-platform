@@ -1,0 +1,84 @@
+{
+  "id": "jarvis-memory-domains",
+  "pj": "PJ48",
+  "version": "1.0.0",
+  "memory_domains": [
+    {
+      "domain_id": "doctrine_summary",
+      "label": "Doctrine Summary",
+      "description": "Summaries of locked Kingsmen and Jarvis doctrine.",
+      "allowed_write_types": ["locked_doctrine_summary", "law_summary", "phase_law_summary"],
+      "blocked_write_types": ["raw_record", "full_document_body"],
+      "requires_source_reference": true,
+      "requires_summary_only": true,
+      "retention_class": "retain_until_superseded",
+      "review_required": false
+    },
+    {
+      "domain_id": "build_decision_summary",
+      "label": "Build Decision Summary",
+      "description": "Commander-approved build direction, phase choices, and architecture decisions.",
+      "allowed_write_types": ["commander_decision", "phase_decision", "architecture_decision"],
+      "blocked_write_types": ["unapproved_guess", "full_record_body"],
+      "requires_source_reference": true,
+      "requires_summary_only": true,
+      "retention_class": "retain_until_superseded",
+      "review_required": false
+    },
+    {
+      "domain_id": "command_outcome_summary",
+      "label": "Command Outcome Summary",
+      "description": "Safe summaries of commands run, results, failures, blockers, and next actions.",
+      "allowed_write_types": ["command_result", "blocked_command", "tool_failure", "validator_result"],
+      "blocked_write_types": ["full_log_body", "full_payload_body"],
+      "requires_source_reference": true,
+      "requires_summary_only": true,
+      "retention_class": "retain_until_resolved_or_superseded",
+      "review_required": false
+    },
+    {
+      "domain_id": "source_intelligence_summary",
+      "label": "Source Intelligence Summary",
+      "description": "Safe summaries of public source checks, authority, freshness, confidence band, and conflicts.",
+      "allowed_write_types": ["public_source_summary", "confidence_summary", "conflict_summary"],
+      "blocked_write_types": ["unverified_lead_as_fact", "unsafe_instruction_body"],
+      "requires_source_reference": true,
+      "requires_summary_only": true,
+      "retention_class": "retain_with_timestamp",
+      "review_required": true
+    },
+    {
+      "domain_id": "incident_summary",
+      "label": "Incident Summary",
+      "description": "Safe incident summaries for failures, repair paths, portal blockers, and build issues.",
+      "allowed_write_types": ["incident_summary", "repair_summary", "fallback_summary"],
+      "blocked_write_types": ["full_runtime_log", "full_error_payload"],
+      "requires_source_reference": true,
+      "requires_summary_only": true,
+      "retention_class": "retain_until_resolved_then_archive",
+      "review_required": true
+    },
+    {
+      "domain_id": "visual_product_summary",
+      "label": "Visual Product Summary",
+      "description": "Safe summaries of HUD, mobile, Commander interface, cards, panels, modals, and design decisions.",
+      "allowed_write_types": ["product_decision", "hud_decision", "ui_summary"],
+      "blocked_write_types": ["unapproved_ui_override", "generic_chat_only_override"],
+      "requires_source_reference": true,
+      "requires_summary_only": true,
+      "retention_class": "retain_until_superseded",
+      "review_required": false
+    },
+    {
+      "domain_id": "commander_preference_summary",
+      "label": "Commander Preference Summary",
+      "description": "Commander-approved preferences that affect Jarvis behavior, style, and Kingsmen build direction.",
+      "allowed_write_types": ["approved_preference", "style_preference", "operating_preference"],
+      "blocked_write_types": ["unapproved_profile", "unapproved_guess"],
+      "requires_source_reference": true,
+      "requires_summary_only": true,
+      "retention_class": "retain_until_changed_by_commander",
+      "review_required": true
+    }
+  ]
+}
