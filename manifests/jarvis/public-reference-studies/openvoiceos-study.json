@@ -1,0 +1,39 @@
+{
+  "id": "PJ_PUBLIC_JARVIS_09_OPENVOICEOS",
+  "status": "RECORDED",
+  "recordedBranch": "main",
+  "publicReference": {
+    "name": "OpenVoiceOS / ovos-core",
+    "repository": "OpenVoiceOS/ovos-core",
+    "url": "https://github.com/OpenVoiceOS/ovos-core",
+    "category": "open-source voice assistant core"
+  },
+  "kingsmenContribution": [
+    "voice pipeline separation",
+    "skills as isolated action modules",
+    "persona fallback as controlled conversation mode",
+    "headless and local assistant operation",
+    "wake/listen/speak assistant architecture",
+    "voice-command safety boundaries"
+  ],
+  "adaptIntoKingsmen": [
+    "JarvisVoiceSession",
+    "SpeechCapture",
+    "TranscriptFinalizer",
+    "IntentClassifier",
+    "CommandRegistry",
+    "DoctrinePolicyGate",
+    "SkillToolRouter",
+    "EvidenceLedger",
+    "ResponseComposer"
+  ],
+  "rejectForKingsmen": [
+    "unreviewed community skills",
+    "always-on microphone by default",
+    "voice commands bypassing policy gate",
+    "production app control by voice only",
+    "candidate data in loose skill memory",
+    "secrets inside persona files"
+  ],
+  "repoRecord": "docs/jarvis/public-reference-studies/PJ_PUBLIC_JARVIS_09_OPENVOICEOS.md"
+}
