@@ -1,0 +1,45 @@
+{
+  "id": "PJ_PUBLIC_JARVIS_13_OPENCLAW",
+  "status": "RECORDED",
+  "branch": "main",
+  "public_reference": {
+    "repository": "openclaw/openclaw",
+    "type": "public_personal_ai_assistant",
+    "focus": [
+      "multi_channel_gateway",
+      "pairing_allowlist_security",
+      "session_routing",
+      "sandboxed_tool_execution",
+      "live_canvas",
+      "skills_registry",
+      "operator_commands"
+    ]
+  },
+  "kingsmen_adaptation": [
+    "JarvisGateway",
+    "JarvisChannelRouter",
+    "JarvisSessionManager",
+    "JarvisAllowedSenderPolicy",
+    "JarvisFounderPairingGate",
+    "JarvisToolSandboxPolicy",
+    "JarvisLiveCanvasHud",
+    "JarvisDoctorCommand",
+    "JarvisSkillRegistry"
+  ],
+  "kingsmen_rejections": [
+    "public_channel_production_control",
+    "unknown_sender_control",
+    "whatsapp_as_primary_comms",
+    "unrestricted_non_main_tool_execution",
+    "unreviewed_skills",
+    "agent_autonomy_bypassing_backend_state_machine"
+  ],
+  "doctrine_alignment": [
+    "postgres_truth",
+    "backend_state_machine_authority",
+    "github_change_history",
+    "validators_before_risk",
+    "evidence_ledger",
+    "founder_approval_for_production_risk"
+  ]
+}
