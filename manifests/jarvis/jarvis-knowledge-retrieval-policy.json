@@ -1,0 +1,54 @@
+{
+  "id": "jarvis-knowledge-retrieval-policy",
+  "pj": "PJ42.6",
+  "version": "1.0.0",
+  "core_rules": {
+    "retrieve_before_claiming_kingsmen_fact": true,
+    "prefer_current_repo_files": true,
+    "prefer_locked_doctrine": true,
+    "do_not_use_raw_private_records_as_memory": true,
+    "state_uncertainty_when_source_missing": true,
+    "route_current_public_facts_to_live_data_router": true
+  },
+  "retrieval_order": [
+    "current_repo_law_and_manifests",
+    "locked_doctrine_files",
+    "validated_build_records",
+    "github_issues_and_commit_evidence",
+    "public_source_intelligence_with_confidence_band",
+    "safe_summarized_memory",
+    "visible_conversation_context"
+  ],
+  "query_expansion_rules": [
+    {
+      "trigger": "jarvis",
+      "expand_to": ["PJ42", "Real Jarvis Constitution", "Jarvis law", "command registry", "intent router", "tool router"]
+    },
+    {
+      "trigger": "n-series",
+      "expand_to": ["N00", "N01", "N02", "N03", "N04", "N05", "N06", "N07", "N20"]
+    },
+    {
+      "trigger": "route",
+      "expand_to": ["route universe", "source confidence", "CAO", "NSFAS", "TVET", "SETA", "bursary", "learnership", "accommodation"]
+    },
+    {
+      "trigger": "visual",
+      "expand_to": ["HUD", "Founder Control Plane", "mission board", "evidence drawer", "approval modal", "status cards"]
+    }
+  ],
+  "freshness_handling": {
+    "repo_state": "use_github_live_lookup",
+    "current_deadlines_or_fees": "use_live_data_router_and_source_confidence",
+    "locked_doctrine": "use_latest_committed_file_or_issue",
+    "build_status": "use_latest_validator_or_build_evidence",
+    "old_memory": "treat_as_context_not_truth"
+  },
+  "minimum_evidence_for_answer": {
+    "locked_fact": ["repo_file_or_issue_reference"],
+    "created_file_claim": ["github_file_reference_or_commit"],
+    "current_public_fact": ["source_url", "retrieved_at", "confidence_band"],
+    "planned_feature": ["issue_or_doctrine_reference"],
+    "system_status": ["health_source_or_latest_evidence"]
+  }
+}
