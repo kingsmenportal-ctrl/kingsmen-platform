@@ -1,0 +1,30 @@
+{
+  "id": "jarvis-knowledge-brain-validation",
+  "pj": "PJ42.6",
+  "version": "1.0.0",
+  "required_files": [
+    "docs/agents/PJ42_6_JARVIS_KNOWLEDGE_BRAIN.md",
+    "manifests/jarvis/jarvis-knowledge-brain.schema.json",
+    "manifests/jarvis/jarvis-knowledge-domains.json",
+    "manifests/jarvis/jarvis-knowledge-retrieval-policy.json",
+    "manifests/jarvis/jarvis-knowledge-indexing-storage.json",
+    "manifests/jarvis/jarvis-knowledge-memory-boundary.json",
+    "manifests/jarvis/jarvis-knowledge-answer-composition.json",
+    "manifests/jarvis/jarvis-knowledge-brain-validation.json",
+    "scripts/jarvis/validate-pj42-6-knowledge-brain.mjs"
+  ],
+  "required_checks": [
+    "files_exist",
+    "json_loads",
+    "knowledge_domain_ids_unique",
+    "required_domains_present",
+    "retrieval_order_present",
+    "query_expansion_rules_present",
+    "indexable_content_defined",
+    "not_indexable_content_defined",
+    "forbidden_memory_types_defined",
+    "answer_status_language_defined",
+    "prohibited_answer_patterns_defined"
+  ],
+  "next_phase": "PJ42.7 Live Data Router"
+}
