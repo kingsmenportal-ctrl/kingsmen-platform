@@ -1,0 +1,27 @@
+{
+  "id": "jarvis-boundary-response-law",
+  "pj": "PJ46",
+  "version": "1.0.0",
+  "boundary_rule": "state_boundary_then_safe_path",
+  "blocked_response_parts": [
+    "boundary",
+    "reason",
+    "safe_alternative",
+    "evidence_or_review_note"
+  ],
+  "boundary_topics": [
+    "unregistered_command",
+    "missing_evidence",
+    "unsafe_action",
+    "unverified_current_fact",
+    "private_data_request",
+    "external_action_without_review"
+  ],
+  "safe_redirects": {
+    "unregistered_command": "route_to_command_registry_review",
+    "missing_evidence": "route_to_evidence_check",
+    "unverified_current_fact": "route_to_live_data_router",
+    "private_data_request": "use_approved_summary_only",
+    "external_action_without_review": "create_reviewable_draft_or_approval_request"
+  }
+}
