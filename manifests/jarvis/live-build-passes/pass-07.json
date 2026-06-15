@@ -1,0 +1,50 @@
+{
+  "manifestRef": "jarvis-live-pass-07",
+  "project": "Kingsmen Jarvis",
+  "branch": "main",
+  "status": "built",
+  "purpose": "Pass 07 adds founder-console page composition, HUD panel composition, build-session list view, review queue read route, validation report list view, and pass-validator registry.",
+  "builtFiles": [
+    "packages/jarvis-core/src/jarvis-founder-console-page-shell.ts",
+    "packages/jarvis-core/src/jarvis-hud-panel-composer.ts",
+    "packages/jarvis-core/src/jarvis-build-session-list-view.ts",
+    "packages/jarvis-core/src/jarvis-review-queue-read-route.ts",
+    "packages/jarvis-core/src/jarvis-validation-report-list-view.ts",
+    "packages/jarvis-core/src/jarvis-pass-validator-registry.ts",
+    "scripts/validators/validate-jarvis-live-pass-07.mjs"
+  ],
+  "capabilities": [
+    "JarvisFounderConsolePageShell",
+    "JarvisHudPanelComposer",
+    "JarvisBuildSessionListView",
+    "JarvisReviewQueueReadRoute",
+    "JarvisValidationReportListView",
+    "JarvisPassValidatorRegistry",
+    "JarvisLivePass07Validator"
+  ],
+  "authorityBoundaries": [
+    "Founder console page is read-only and informational.",
+    "HUD panel composer only orders display panels and does not execute actions.",
+    "Build-session list view exposes safe summaries only.",
+    "Review queue read route does not approve, return, or block items.",
+    "Validation report list view displays report metadata only.",
+    "Pass-validator registry records validator paths and does not run them by itself.",
+    "Jarvis remains under Kingsmen doctrine, backend state machine, validators, evidence, and founder approval."
+  ],
+  "validator": {
+    "script": "node scripts/validators/validate-jarvis-live-pass-07.mjs",
+    "reportPath": "reports/jarvis/validate-jarvis-live-pass-07.json"
+  },
+  "knownGaps": [
+    "package.json aggregate validator wiring remains deferred because previous broad package rewrites were blocked.",
+    "Pass 07 modules are directly importable by path until a safe export index is added."
+  ],
+  "nextLiveTargets": [
+    "JarvisFounderConsoleStaticHtml",
+    "JarvisFounderConsoleClientState",
+    "JarvisHudPanelDataFixture",
+    "JarvisReviewQueueFixture",
+    "JarvisValidationReportFixture",
+    "JarvisConsoleSmokeValidator"
+  ]
+}
