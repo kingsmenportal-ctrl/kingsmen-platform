@@ -1,0 +1,28 @@
+{
+  "name": "N21.2 document smart intake sample",
+  "request": {
+    "documentId": "doc_cv_sample_001",
+    "candidateId": "candidate_sample_001",
+    "filename": "sample-cv.txt",
+    "mimeType": "text/plain",
+    "engine": "plain_text_fallback",
+    "extractedText": "Full Name: Example Candidate\nEmail: example.candidate@email.com\nPhone: 071 234 5678\nAddress: 123 Main Road, Johannesburg\nSchool: Example Secondary School\nHighest Qualification: National Senior Certificate\nSkills: communication, computer literacy, teamwork\nCertificates: Security training certificate\nWork Experience: General worker at Example Company\nDrivers License: Code 10"
+  },
+  "expected": {
+    "mode": "candidate_draft_review",
+    "mayWriteCandidateTruth": false,
+    "reviewRequired": true,
+    "fieldsExpectedAtLeast": [
+      "full_name",
+      "email",
+      "phone",
+      "address",
+      "highest_qualification",
+      "school_name",
+      "skills",
+      "certificates",
+      "work_experience",
+      "drivers_license"
+    ]
+  }
+}
