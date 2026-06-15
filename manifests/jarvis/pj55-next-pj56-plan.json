@@ -1,0 +1,21 @@
+{
+  "id": "pj55-next-pj56-plan",
+  "pj": "PJ55",
+  "version": "1.0.0",
+  "next_phase": "PJ56 Jarvis Repair Sprint and Build Proof",
+  "objective": "Close deferred repair items and capture build, smoke, validator, API, and HUD proof.",
+  "planned_work": [
+    "repair deferred PJ44 HUD hardening",
+    "repair deferred PJ44 validator",
+    "repair deferred PJ45 validator",
+    "repair deferred PJ46 runtime bridge",
+    "repair deferred PJ46 validator",
+    "repair deferred PJ52 validator hardening",
+    "repair deferred PJ53 validator",
+    "run web build check",
+    "run kernel smoke suite",
+    "record proof summary",
+    "update production readiness status"
+  ],
+  "success_condition": "Jarvis has proof-backed preview build status and a clear production readiness decision."
+}
