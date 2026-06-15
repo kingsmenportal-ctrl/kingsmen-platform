@@ -1,0 +1,31 @@
+{
+  "endpoint": "/api/jarvis/voice/session",
+  "method": "POST",
+  "safePrepareBody": {
+    "inputMode": "transcript_only",
+    "transcript": "Jarvis, show me the public repo integration board",
+    "engine": "browser_speech_api",
+    "actor": "commander",
+    "routeToKernel": false
+  },
+  "kernelRouteBody": {
+    "inputMode": "transcript_only",
+    "transcript": "Jarvis, show me the public repo integration board",
+    "engine": "browser_speech_api",
+    "actor": "commander",
+    "routeToKernel": true
+  },
+  "sensitiveBody": {
+    "inputMode": "transcript_only",
+    "transcript": "Jarvis, submit this application now",
+    "engine": "browser_speech_api",
+    "actor": "commander",
+    "routeToKernel": true
+  },
+  "expectedSafety": {
+    "rawAudioStored": false,
+    "alwaysOnMicrophone": false,
+    "bypassedPolicyGate": false,
+    "requiresKernelPolicy": true
+  }
+}
