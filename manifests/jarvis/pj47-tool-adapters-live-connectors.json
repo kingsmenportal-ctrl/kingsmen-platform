@@ -1,0 +1,31 @@
+{
+  "id": "pj47-tool-adapters-live-connectors",
+  "pj": "PJ47",
+  "version": "1.0.0",
+  "status": "registered",
+  "parent": "PJ46",
+  "purpose": "Register approved Jarvis connector families and governed adapter rules.",
+  "core_law": [
+    "Jarvis may only use approved connectors through governed adapters.",
+    "Unknown connector defaults to blocked.",
+    "Unmapped adapter defaults to blocked.",
+    "Missing evidence means no success claim.",
+    "Current facts require live route and source confidence."
+  ],
+  "runtime_flow": [
+    "intent_router",
+    "command_registry",
+    "policy_gate",
+    "adapter_selector",
+    "live_connector",
+    "source_confidence",
+    "evidence_ledger",
+    "answer_composer"
+  ],
+  "required_runtime_files": [
+    "apps/web/src/lib/jarvis/runtime/connectors/types.ts",
+    "apps/web/src/lib/jarvis/runtime/connectors/registry.ts",
+    "apps/web/src/lib/jarvis/runtime/connectors/index.ts"
+  ],
+  "next_phase": "PJ48 Jarvis Memory Vault"
+}
