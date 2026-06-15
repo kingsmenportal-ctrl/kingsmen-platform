@@ -1,0 +1,40 @@
+{
+  "id": "jarvis-evidence-ledger-contract",
+  "pj": "PJ42.9",
+  "version": "1.0.0",
+  "evidence_fields": [
+    "evidence_id",
+    "created_at",
+    "actor",
+    "command_id",
+    "intent_id",
+    "adapter_id",
+    "risk_level",
+    "approval_id",
+    "approval_status",
+    "source_confidence_band",
+    "tool_name",
+    "input_summary",
+    "result_summary",
+    "claim_allowed",
+    "failure_reason",
+    "blocked_reason",
+    "next_safe_action"
+  ],
+  "required_for_event_types": {
+    "tool_answer": ["evidence_id", "command_id", "adapter_id", "result_summary", "source_confidence_band"],
+    "approval_request": ["evidence_id", "approval_id", "command_id", "risk_level", "input_summary"],
+    "approval_decision": ["evidence_id", "approval_id", "approval_status", "actor"],
+    "blocked_action": ["evidence_id", "command_id", "blocked_reason", "next_safe_action"],
+    "tool_failure": ["evidence_id", "command_id", "adapter_id", "failure_reason", "next_safe_action"],
+    "success_claim": ["evidence_id", "command_id", "result_summary", "claim_allowed"]
+  },
+  "claim_rules": {
+    "success_claim_requires_evidence": true,
+    "official_status_claim_requires_source_proof": true,
+    "missing_evidence_blocks_success_claim": true,
+    "blocked_action_must_record_blocked_reason": true,
+    "failure_must_not_be_reported_as_success": true
+  },
+  "storage_note": "This contract defines required fields. Physical storage may be PostgreSQL, file artifact, or future evidence service, but required fields must remain available."
+}
