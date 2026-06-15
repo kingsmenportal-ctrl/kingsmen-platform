@@ -1,0 +1,36 @@
+{
+  "id": "PJ_PUBLIC_JARVIS_07_KISHANRAJPUT23_DESKTOP_VOICE_ASSISTANT",
+  "status": "RECORDED",
+  "recordedBranch": "main",
+  "studyFile": "docs/jarvis/public-reference-studies/PJ_PUBLIC_JARVIS_07_KISHANRAJPUT23_DESKTOP_VOICE_ASSISTANT.md",
+  "publicProject": {
+    "owner": "kishanrajput23",
+    "repo": "Jarvis-Desktop-Voice-Assistant",
+    "sourceType": "GitHub public topic/repository",
+    "topic": "jarvis-assistant"
+  },
+  "kingsmenUse": [
+    "voice command loop",
+    "desktop responsiveness",
+    "asynchronous interaction",
+    "safe local utility adapter",
+    "spoken status feedback"
+  ],
+  "kingsmenReject": [
+    "uncontrolled shell execution",
+    "voice-only production actions",
+    "unreviewed desktop automation",
+    "hardcoded secrets",
+    "loose candidate data memory"
+  ],
+  "implementationPriority": [
+    "P1 voice command safety manifest",
+    "P1 voice command finalizer",
+    "P1 cancel/stop command handling",
+    "P1 async progress events",
+    "P2 native PowerShell voice bridge",
+    "P2 spoken status summaries",
+    "P3 optional desktop helper after web HUD stability"
+  ],
+  "doctrineBoundary": "docs/N00-doctrine/jarvis-app-connector-law.md"
+}
