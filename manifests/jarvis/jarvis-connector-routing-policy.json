@@ -1,0 +1,75 @@
+{
+  "id": "jarvis-connector-routing-policy",
+  "pj": "PJ47",
+  "version": "1.0.0",
+  "routing_rules": [
+    {
+      "need": "current_public_fact",
+      "preferred_connector": "web_research",
+      "fallback_connector": "blocked_manual_review",
+      "confidence_required": true
+    },
+    {
+      "need": "repo_or_issue_fact",
+      "preferred_connector": "github_repo",
+      "fallback_connector": "blocked_manual_review",
+      "confidence_required": true
+    },
+    {
+      "need": "health_status",
+      "preferred_connector": "system_health",
+      "fallback_connector": "blocked_manual_review",
+      "confidence_required": false
+    },
+    {
+      "need": "build_or_validator_proof",
+      "preferred_connector": "build_validation",
+      "fallback_connector": "blocked_manual_review",
+      "confidence_required": false
+    },
+    {
+      "need": "operational_summary",
+      "preferred_connector": "postgres_read_model",
+      "fallback_connector": "blocked_manual_review",
+      "confidence_required": false
+    },
+    {
+      "need": "portal_reachability_or_blocker",
+      "preferred_connector": "playwright_scout",
+      "fallback_connector": "blocked_manual_review",
+      "confidence_required": true
+    },
+    {
+      "need": "utility_fact",
+      "preferred_connector": "utility_api",
+      "fallback_connector": "blocked_manual_review",
+      "confidence_required": true
+    },
+    {
+      "need": "kingsmen_doctrine_or_build_memory",
+      "preferred_connector": "knowledge_search",
+      "fallback_connector": "blocked_manual_review",
+      "confidence_required": true
+    },
+    {
+      "need": "evidence_summary",
+      "preferred_connector": "evidence_ledger",
+      "fallback_connector": "blocked_manual_review",
+      "confidence_required": false
+    },
+    {
+      "need": "unknown_or_unsafe",
+      "preferred_connector": "blocked_manual_review",
+      "fallback_connector": "blocked_manual_review",
+      "confidence_required": false
+    }
+  ],
+  "default_route": "blocked_manual_review",
+  "rules": {
+    "unknown_need": "blocked_manual_review",
+    "unmapped_connector": "blocked_manual_review",
+    "missing_evidence": "no_success_claim",
+    "stale_current_fact": "reroute_live_or_review",
+    "tool_failure": "return_failure_and_next_safe_action"
+  }
+}
