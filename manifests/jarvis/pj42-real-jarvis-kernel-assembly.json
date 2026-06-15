@@ -1,0 +1,89 @@
+{
+  "id": "pj42-real-jarvis-kernel-assembly",
+  "pj": "PJ42_CLOSEOUT",
+  "version": "1.0.0",
+  "status": "founder_locked",
+  "purpose": "Define the governed assembly order for the Real Jarvis kernel before runtime implementation.",
+  "kernel_flow": [
+    "commander_interface",
+    "intent_router",
+    "command_registry",
+    "policy_gate",
+    "tool_router",
+    "approved_adapter",
+    "source_confidence_engine",
+    "evidence_ledger",
+    "answer_composer",
+    "visual_hud_voice_output"
+  ],
+  "required_layers": [
+    {
+      "layer_id": "constitution",
+      "phase": "PJ42.0",
+      "purpose": "Define what Real Jarvis is and is not."
+    },
+    {
+      "layer_id": "law_files",
+      "phase": "PJ42.1",
+      "purpose": "Load machine-readable Jarvis laws."
+    },
+    {
+      "layer_id": "command_registry",
+      "phase": "PJ42.2",
+      "purpose": "Only registered commands may execute."
+    },
+    {
+      "layer_id": "intent_router",
+      "phase": "PJ42.3",
+      "purpose": "Classify Commander request before command selection."
+    },
+    {
+      "layer_id": "tool_router",
+      "phase": "PJ42.4",
+      "purpose": "Map approved commands to approved adapters."
+    },
+    {
+      "layer_id": "source_confidence",
+      "phase": "PJ42.5",
+      "purpose": "Score evidence, authority, freshness, and conflicts."
+    },
+    {
+      "layer_id": "knowledge_brain",
+      "phase": "PJ42.6",
+      "purpose": "Retrieve approved Kingsmen knowledge before claims."
+    },
+    {
+      "layer_id": "live_data_router",
+      "phase": "PJ42.7",
+      "purpose": "Route unstable facts to approved live data sources."
+    },
+    {
+      "layer_id": "visual_hud",
+      "phase": "PJ42.8",
+      "purpose": "Render Jarvis through Commander visual surfaces."
+    },
+    {
+      "layer_id": "approval_evidence",
+      "phase": "PJ42.9",
+      "purpose": "Require approval for risky actions and evidence for claims."
+    },
+    {
+      "layer_id": "voice_interface",
+      "phase": "PJ42.10",
+      "purpose": "Provide voice-ready Commander input/output without bypassing law."
+    }
+  ],
+  "runtime_non_negotiables": [
+    "unknown_command_blocked",
+    "unknown_tool_blocked",
+    "free_text_tool_calling_forbidden",
+    "source_confidence_required_for_live_claims",
+    "evidence_required_for_tool_backed_answers",
+    "approval_required_for_risky_actions",
+    "voice_must_not_bypass_policy",
+    "visual_hud_required_for_meaningful_actions",
+    "candidate_facing_jarvis_forbidden",
+    "raw_private_records_excluded_from_memory"
+  ],
+  "next_phase": "PJ43 Jarvis Runtime Implementation"
+}
