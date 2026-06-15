@@ -1,0 +1,52 @@
+{
+  "id": "pj51-runtime-file-audit",
+  "pj": "PJ51",
+  "version": "1.0.0",
+  "required_files": [
+    "docs/agents/PJ51_JARVIS_RUNTIME_REPAIR_BUILD_VALIDATION.md",
+    "manifests/jarvis/pj51-runtime-repair-build-validation.json",
+    "manifests/jarvis/pj51-build-validation.json",
+    "manifests/jarvis/pj51-deferred-repair-tracker.json",
+    "manifests/jarvis/pj51-runtime-file-audit.json",
+    "apps/web/package.json",
+    "apps/web/tsconfig.json",
+    "apps/web/src/lib/jarvis/runtime/index.ts",
+    "apps/web/src/lib/jarvis/runtime/types.ts",
+    "apps/web/src/lib/jarvis/runtime/intent-router.ts",
+    "apps/web/src/lib/jarvis/runtime/command-registry.ts",
+    "apps/web/src/lib/jarvis/runtime/policy-gate.ts",
+    "apps/web/src/lib/jarvis/runtime/adapter-selector.ts",
+    "apps/web/src/lib/jarvis/runtime/source-confidence.ts",
+    "apps/web/src/lib/jarvis/runtime/knowledge-brain.ts",
+    "apps/web/src/lib/jarvis/runtime/live-data-router.ts",
+    "apps/web/src/lib/jarvis/runtime/evidence-ledger.ts",
+    "apps/web/src/lib/jarvis/runtime/answer-composer.ts",
+    "apps/web/src/lib/jarvis/runtime/kernel.ts",
+    "apps/web/src/lib/jarvis/runtime/smoke-tests.ts",
+    "apps/web/src/lib/jarvis/runtime/connectors/index.ts",
+    "apps/web/src/lib/jarvis/runtime/memory/index.ts",
+    "apps/web/src/lib/jarvis/runtime/orchestrator/index.ts",
+    "apps/web/src/lib/jarvis/api/api-runtime-bridge.ts",
+    "apps/web/src/app/api/jarvis/kernel/route.ts",
+    "apps/web/src/app/api/jarvis/kernel/smoke/route.ts",
+    "scripts/jarvis/validate-pj51-runtime-repair-build-validation.mjs"
+  ],
+  "required_runtime_exports": [
+    "./types",
+    "./intent-router",
+    "./command-registry",
+    "./policy-gate",
+    "./adapter-selector",
+    "./source-confidence",
+    "./knowledge-brain",
+    "./live-data-router",
+    "./evidence-ledger",
+    "./answer-composer",
+    "./kernel",
+    "./smoke-tests"
+  ],
+  "required_api_routes": [
+    "apps/web/src/app/api/jarvis/kernel/route.ts",
+    "apps/web/src/app/api/jarvis/kernel/smoke/route.ts"
+  ]
+}
