@@ -1,0 +1,37 @@
+{
+  "id": "PJ_PUBLIC_JARVIS_10_UNI_CREATOR_DESKTOP_ASSISTANCE",
+  "status": "RECORDED",
+  "branch": "main",
+  "public_project": {
+    "name": "Uni-Creator/Jarvis-Desktop-Assistance",
+    "url": "https://github.com/Uni-Creator/Jarvis-Desktop-Assistance",
+    "type": "desktop voice and GUI assistant",
+    "language": "Python"
+  },
+  "kingsmen_fit": {
+    "primary_lesson": "Jarvis HUD responsiveness and chat-style GUI flow",
+    "adapt": [
+      "chat-style GUI surface",
+      "voice and text input",
+      "background task handling",
+      "modular GUI/helper separation",
+      "safe local utility adapter"
+    ],
+    "reject": [
+      "direct risky system control",
+      "voice bypassing policy gate",
+      "unsafe local sensitive storage",
+      "desktop assistant as authority",
+      "production app actions without approval"
+    ],
+    "target_modules": [
+      "JarvisHud",
+      "JarvisChatPanel",
+      "JarvisVoiceInputShell",
+      "JarvisBackgroundTaskRunner",
+      "JarvisLocalUtilityAdapter"
+    ]
+  },
+  "authority": "reference_only",
+  "doctrine": "docs/N00-doctrine/jarvis-app-connector-law.md"
+}
