@@ -1,0 +1,37 @@
+{
+  "id": "pj52-risk-register",
+  "pj": "PJ52",
+  "version": "1.0.0",
+  "risks": [
+    {
+      "id": "ui_api_drift",
+      "label": "Interface and API response drift",
+      "level": "medium",
+      "control": "stable_response_shape"
+    },
+    {
+      "id": "runtime_export_gap",
+      "label": "Runtime export gap",
+      "level": "medium",
+      "control": "index_audit"
+    },
+    {
+      "id": "old_repair_items",
+      "label": "Open repair items remain unresolved",
+      "level": "medium",
+      "control": "repair_plan"
+    },
+    {
+      "id": "missing_evidence_surface",
+      "label": "Result lacks evidence summary",
+      "level": "high",
+      "control": "response_shape"
+    },
+    {
+      "id": "build_not_checked",
+      "label": "Build not checked after wiring",
+      "level": "high",
+      "control": "pj53_gate"
+    }
+  ]
+}
