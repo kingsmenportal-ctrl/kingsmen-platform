@@ -1,0 +1,40 @@
+{
+  "id": "pj-public-jarvis-05-ganeshnikhil-jarvis-2",
+  "status": "recorded",
+  "recordedToBranch": "main",
+  "studyPath": "docs/jarvis/public-reference-studies/PJ_PUBLIC_JARVIS_05_GANESHNIKHIL_JARVIS_2.md",
+  "publicProject": {
+    "name": "J.A.R.V.I.S.2.0",
+    "repository": "ganeshnikhil/J.A.R.V.I.S.2.0",
+    "url": "https://github.com/ganeshnikhil/J.A.R.V.I.S.2.0"
+  },
+  "primaryLessons": [
+    "hybrid local/cloud model routing",
+    "RAG-backed knowledge interaction",
+    "function-call routing",
+    "multimodal readiness",
+    "voice session timeout/finalization",
+    "low-spec system awareness",
+    "device automation as future gated local helper"
+  ],
+  "kingsmenDecision": "adapt_selectively",
+  "mustReject": [
+    "direct production email sending",
+    "ungated phone/device control",
+    "unsafe secret handling",
+    "uncontrolled website/application automation",
+    "candidate data memory without policy",
+    "AI function calling as authority"
+  ],
+  "recommendedKingsmenModules": [
+    "model-router.ts",
+    "function-call-router.ts",
+    "rag/knowledge-retriever.ts",
+    "rag/source-bound-answer.ts",
+    "voice/voice-session-state.ts",
+    "multimodal/screenshot-reader.ts",
+    "device/local-device-adapter.ts",
+    "policy-gate.ts",
+    "evidence-ledger.ts"
+  ]
+}
