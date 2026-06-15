@@ -1,0 +1,43 @@
+{
+  "id": "PJ_PUBLIC_JARVIS_15_HOME_ASSISTANT_ASSIST",
+  "status": "RECORDED",
+  "recordedToBranch": "main",
+  "sourceType": "public-assistant-architecture-reference",
+  "sourceName": "Home Assistant Assist",
+  "sourceRepository": "home-assistant/core and Home Assistant voice ecosystem",
+  "primaryLesson": "intent-first assistant execution with custom sentences, slot filling, local-first voice, cancel/respond-only safety, and controlled integrations",
+  "kingsmenAdapt": [
+    "JarvisIntentCatalog",
+    "JarvisCommandSentenceRegistry",
+    "JarvisSlotFiller",
+    "JarvisEntityResolver",
+    "JarvisNevermindCancelIntent",
+    "JarvisRespondOnlyIntent",
+    "JarvisLocalFirstVoiceMode",
+    "JarvisDashboardAssistButton",
+    "JarvisCustomSentenceCompiler",
+    "JarvisIntentValidationHarness"
+  ],
+  "kingsmenReject": [
+    "voice command directly causing production action",
+    "unknown intent execution",
+    "custom sentences bypassing policy",
+    "always-on microphone by default",
+    "candidate-sensitive data in assistant memory",
+    "connector actions without evidence logging",
+    "production app changes without approval",
+    "external LLM deciding final authority"
+  ],
+  "targetKingsmenFiles": [
+    "apps/web/src/lib/jarvis/runtime/intent-router.ts",
+    "apps/web/src/lib/jarvis/runtime/command-registry.ts",
+    "apps/web/src/lib/jarvis/runtime/policy-gate.ts",
+    "apps/web/src/lib/jarvis/runtime/evidence-ledger.ts",
+    "apps/web/src/app/api/jarvis/voice/route.ts",
+    "manifests/jarvis/jarvis-intent-taxonomy.json",
+    "manifests/jarvis/jarvis-command-registry.json",
+    "manifests/jarvis/jarvis-voice-command-safety.json",
+    "manifests/jarvis/jarvis-tool-routing-matrix.json"
+  ],
+  "decision": "ADAPT intent pipeline, slot filling, custom command grammar, local-first voice, cancel/respond-only safety; reject voice-to-production action without gate."
+}
