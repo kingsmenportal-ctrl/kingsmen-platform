@@ -1,0 +1,30 @@
+{
+  "id": "jarvis-voice-interface-validation",
+  "pj": "PJ42.10",
+  "version": "1.0.0",
+  "required_files": [
+    "docs/agents/PJ42_10_JARVIS_VOICE_READY_COMMANDER_INTERFACE.md",
+    "manifests/jarvis/jarvis-voice-interface.schema.json",
+    "manifests/jarvis/jarvis-wake-greeting.json",
+    "manifests/jarvis/jarvis-voice-state-machine.json",
+    "manifests/jarvis/jarvis-voice-command-safety.json",
+    "manifests/jarvis/jarvis-speech-tts-boundary.json",
+    "manifests/jarvis/jarvis-voice-interface-validation.json",
+    "scripts/jarvis/validate-pj42-10-voice-interface.mjs"
+  ],
+  "required_checks": [
+    "files_exist",
+    "json_loads",
+    "standard_wake_greeting_exists",
+    "wake_greeting_is_commander_only",
+    "wake_greeting_is_kingsmen_branded",
+    "voice_states_exist",
+    "required_voice_states_present",
+    "voice_safety_rules_present",
+    "voice_does_not_bypass_policy_gate",
+    "ambiguous_transcript_does_not_execute",
+    "speech_tts_boundary_present",
+    "candidate_voice_mode_forbidden"
+  ],
+  "next_phase": "PJ42 Closeout — Real Jarvis Kernel Assembly Plan"
+}
