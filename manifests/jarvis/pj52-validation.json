@@ -1,0 +1,26 @@
+{
+  "id": "pj52-validation",
+  "pj": "PJ52",
+  "version": "1.0.0",
+  "required_files": [
+    "docs/agents/PJ52_JARVIS_INTEGRATION_HARDENING.md",
+    "manifests/jarvis/pj52-runtime-chain-lite.json",
+    "manifests/jarvis/pj52-surface-ids.json",
+    "manifests/jarvis/pj52-response-shape.json",
+    "manifests/jarvis/pj52-checks-lite.json",
+    "manifests/jarvis/pj52-repair-plan.json",
+    "manifests/jarvis/pj52-risk-register.json",
+    "manifests/jarvis/pj52-validation.json",
+    "scripts/jarvis/validate-pj52-integration-hardening.mjs"
+  ],
+  "checks": [
+    "files_exist",
+    "json_loads",
+    "chain_has_input_and_output",
+    "surfaces_listed",
+    "response_keys_listed",
+    "repair_items_listed",
+    "risks_listed"
+  ],
+  "next_phase": "PJ53 Production Readiness Gate"
+}
