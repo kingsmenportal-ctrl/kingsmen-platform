@@ -1,0 +1,71 @@
+{
+  "schema": "kingsmen.jarvis.public_reference_study.v1",
+  "project_number": 22,
+  "status": "RECORDED",
+  "recorded_branch": "main",
+  "public_reference": {
+    "name": "SWE-agent",
+    "repository": "SWE-agent/SWE-agent",
+    "url": "https://github.com/SWE-agent/SWE-agent",
+    "reference_type": "public software-engineering agent / issue-to-patch repair system",
+    "dependency_policy": "pattern_study_only_not_runtime_authority",
+    "current_warning": "The public README says most current development effort is on mini-SWE-agent, which superseded SWE-agent, so Kingsmen studies the design pattern rather than depending on this repo directly."
+  },
+  "kingsmen_lessons": [
+    "issue-to-patch repair loop",
+    "agent-computer interface for software engineering",
+    "targeted repo navigation",
+    "targeted edits",
+    "test and validator execution",
+    "trajectory recording",
+    "patch output contract",
+    "repair attempt evidence ledger"
+  ],
+  "adapt_into_kingsmen": [
+    "JarvisIssueToPatchRunner",
+    "JarvisAgentComputerInterface",
+    "JarvisRepoNavigationTools",
+    "JarvisTargetedEditTool",
+    "JarvisTestExecutionTool",
+    "JarvisTrajectoryRecorder",
+    "JarvisPatchOutputContract",
+    "JarvisRepairAttemptLedger",
+    "JarvisIssueContextLoader",
+    "JarvisNoUnrelatedFileGuard",
+    "JarvisMiniRepairMode",
+    "JarvisBenchmarkHarness"
+  ],
+  "reject_from_kingsmen": [
+    "maximal autonomous agency as default",
+    "repo-wide edits without module scope",
+    "issue fixes that ignore Kingsmen doctrine",
+    "cybersecurity/offensive modes inside default Jarvis build",
+    "silent terminal or test execution",
+    "unbounded repair loops",
+    "patches without evidence trail",
+    "candidate data in issue context",
+    "secrets in logs, prompts, trajectories, diffs, or commits"
+  ],
+  "authority_boundary": [
+    "PostgreSQL Truth Vault",
+    "Backend state machine",
+    "GitHub repository",
+    "Locked doctrine files",
+    "Validators and boot-blockers",
+    "Evidence ledger",
+    "Founder approval"
+  ],
+  "future_modules": [
+    "packages/jarvis-builder/src/issue-to-patch-runner.ts",
+    "packages/jarvis-builder/src/agent-computer-interface.ts",
+    "packages/jarvis-builder/src/repo-navigation-tools.ts",
+    "packages/jarvis-builder/src/targeted-edit-tool.ts",
+    "packages/jarvis-builder/src/test-execution-tool.ts",
+    "packages/jarvis-builder/src/trajectory-recorder.ts",
+    "packages/jarvis-builder/src/patch-output-contract.ts",
+    "packages/jarvis-builder/src/no-unrelated-file-guard.ts",
+    "packages/jarvis-builder/src/repair-attempt-ledger.ts",
+    "packages/jarvis-builder/src/mini-repair-mode.ts"
+  ],
+  "final_kingsmen_rule": "Jarvis must not just answer coding questions. Jarvis must produce scoped patches with test evidence and a replayable repair trail."
+}
