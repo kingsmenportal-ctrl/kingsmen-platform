@@ -1,0 +1,24 @@
+{
+  "endpoint": "/api/jarvis/trace/evidence",
+  "method": "POST",
+  "body": {
+    "source": "jarvis_kernel",
+    "actor": "commander",
+    "eventName": "jarvis_command_routed",
+    "evidenceId": "evidence_demo_001",
+    "commandId": "PUBLIC_REPO_INTEGRATION_BOARD",
+    "intentId": "public_repo_integration",
+    "adapterId": "public_repo_registry_adapter",
+    "input": "Show me the public repo integration board.",
+    "output": "Public repo integration board prepared.",
+    "metadata": {
+      "riskLevel": "safe_read",
+      "sourceConfidenceBand": "medium_needs_review"
+    }
+  },
+  "expectedSafety": {
+    "redacted": true,
+    "exportedToLangfuse": false,
+    "postgresEvidenceAuthority": true
+  }
+}
