@@ -1,0 +1,29 @@
+{
+  "id": "pj49-agent-orchestrator-validation",
+  "pj": "PJ49",
+  "version": "1.0.0",
+  "required_files": [
+    "docs/agents/PJ49_JARVIS_AGENT_ORCHESTRATOR.md",
+    "manifests/jarvis/pj49-agent-orchestrator.json",
+    "manifests/jarvis/jarvis-agent-role-catalog.json",
+    "manifests/jarvis/jarvis-orchestration-flow.json",
+    "manifests/jarvis/jarvis-orchestration-policy.json",
+    "manifests/jarvis/jarvis-agent-task-state-machine.json",
+    "manifests/jarvis/pj49-agent-orchestrator-validation.json",
+    "apps/web/src/lib/jarvis/runtime/orchestrator/types.ts",
+    "apps/web/src/lib/jarvis/runtime/orchestrator/agent-orchestrator.ts",
+    "apps/web/src/lib/jarvis/runtime/orchestrator/index.ts",
+    "scripts/jarvis/validate-pj49-agent-orchestrator.mjs"
+  ],
+  "required_checks": [
+    "files_exist",
+    "json_loads",
+    "roles_exist",
+    "flow_references_known_roles",
+    "states_exist",
+    "terminal_states_exist",
+    "policy_blocks_unknown_roles",
+    "runtime_exports_exist"
+  ],
+  "next_phase": "PJ50 Jarvis Kernel Smoke Tests"
+}
