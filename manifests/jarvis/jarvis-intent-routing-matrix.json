@@ -1,0 +1,121 @@
+{
+  "id": "jarvis-intent-routing-matrix",
+  "pj": "PJ42.3",
+  "version": "1.0.0",
+  "routing_rules": [
+    {
+      "intent_id": "general_dialogue",
+      "command_candidates": ["ASK_GENERAL"],
+      "requires_command_registry_lookup": true,
+      "requires_policy_gate": false,
+      "requires_live_data_router": false,
+      "requires_tool_router": false,
+      "output_surface": ["jarvis_hud", "dialogue_card"]
+    },
+    {
+      "intent_id": "live_research",
+      "command_candidates": ["LIVE_RESEARCH"],
+      "requires_command_registry_lookup": true,
+      "requires_policy_gate": false,
+      "requires_live_data_router": true,
+      "requires_tool_router": true,
+      "output_surface": ["jarvis_hud", "source_confidence_card", "evidence_drawer"]
+    },
+    {
+      "intent_id": "kingsmen_knowledge",
+      "command_candidates": ["SEARCH_KINGSMEN_KNOWLEDGE", "ASK_GENERAL"],
+      "requires_command_registry_lookup": true,
+      "requires_policy_gate": false,
+      "requires_live_data_router": false,
+      "requires_tool_router": true,
+      "output_surface": ["jarvis_hud", "knowledge_card", "evidence_drawer"]
+    },
+    {
+      "intent_id": "repo_inspection",
+      "command_candidates": ["GITHUB_REPO_INSPECT"],
+      "requires_command_registry_lookup": true,
+      "requires_policy_gate": false,
+      "requires_live_data_router": true,
+      "requires_tool_router": true,
+      "output_surface": ["jarvis_hud", "repo_card", "evidence_drawer"]
+    },
+    {
+      "intent_id": "system_health",
+      "command_candidates": ["SYSTEM_STATUS"],
+      "requires_command_registry_lookup": true,
+      "requires_policy_gate": false,
+      "requires_live_data_router": true,
+      "requires_tool_router": true,
+      "output_surface": ["jarvis_hud", "system_health_panel"]
+    },
+    {
+      "intent_id": "validation_build",
+      "command_candidates": ["VALIDATE_PHASE", "RUN_WEB_BUILD"],
+      "requires_command_registry_lookup": true,
+      "requires_policy_gate": true,
+      "requires_live_data_router": false,
+      "requires_tool_router": true,
+      "output_surface": ["jarvis_hud", "validation_card", "approval_modal", "evidence_drawer"]
+    },
+    {
+      "intent_id": "database_read_model",
+      "command_candidates": ["POSTGRES_READ_MODEL_SCAN"],
+      "requires_command_registry_lookup": true,
+      "requires_policy_gate": true,
+      "requires_live_data_router": true,
+      "requires_tool_router": true,
+      "output_surface": ["jarvis_hud", "database_summary_card", "evidence_drawer"]
+    },
+    {
+      "intent_id": "playwright_scout",
+      "command_candidates": ["PLAYWRIGHT_PORTAL_HEALTH"],
+      "requires_command_registry_lookup": true,
+      "requires_policy_gate": true,
+      "requires_live_data_router": true,
+      "requires_tool_router": true,
+      "output_surface": ["jarvis_hud", "portal_scout_card", "approval_modal", "evidence_drawer"]
+    },
+    {
+      "intent_id": "report_generation",
+      "command_candidates": ["GENERATE_FOUNDER_DIGEST", "GENERATE_EVIDENCE_PACK"],
+      "requires_command_registry_lookup": true,
+      "requires_policy_gate": false,
+      "requires_live_data_router": false,
+      "requires_tool_router": true,
+      "output_surface": ["jarvis_hud", "digest_card", "evidence_drawer"]
+    },
+    {
+      "intent_id": "approval_flow",
+      "command_candidates": ["REQUEST_APPROVAL"],
+      "requires_command_registry_lookup": true,
+      "requires_policy_gate": true,
+      "requires_live_data_router": false,
+      "requires_tool_router": true,
+      "output_surface": ["jarvis_hud", "approval_modal"]
+    },
+    {
+      "intent_id": "visual_hud_request",
+      "command_candidates": ["GENERATE_FOUNDER_DIGEST", "ASK_GENERAL"],
+      "requires_command_registry_lookup": true,
+      "requires_policy_gate": false,
+      "requires_live_data_router": false,
+      "requires_tool_router": false,
+      "output_surface": ["jarvis_hud", "visual_blueprint_card"]
+    },
+    {
+      "intent_id": "blocked_unsafe_action",
+      "command_candidates": ["SEND_EXTERNAL_MESSAGE", "MAKE_PAYMENT_DECISION", "SUBMIT_OFFICIAL_APPLICATION_SILENTLY"],
+      "requires_command_registry_lookup": true,
+      "requires_policy_gate": true,
+      "requires_live_data_router": false,
+      "requires_tool_router": false,
+      "output_surface": ["jarvis_hud", "blocked_card", "safe_redirect_card"]
+    }
+  ],
+  "fallbacks": {
+    "low_confidence": "clarify_or_safe_answer_no_tool",
+    "unknown_intent": "blocked_if_executable_else_safe_answer",
+    "unknown_command_candidate": "blocked",
+    "live_fact_without_live_route": "state_verification_required"
+  }
+}
