@@ -1,0 +1,43 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://kingsmen.local/schemas/jarvis-knowledge-brain.schema.json",
+  "title": "Jarvis Knowledge Brain Schema",
+  "type": "object",
+  "required": ["id", "pj", "version", "knowledge_domains"],
+  "properties": {
+    "id": { "type": "string" },
+    "pj": { "type": "string" },
+    "version": { "type": "string" },
+    "knowledge_domains": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "type": "object",
+        "required": [
+          "domain_id",
+          "label",
+          "description",
+          "allowed_sources",
+          "blocked_sources",
+          "retrieval_priority",
+          "may_cache_summary",
+          "requires_source_confidence",
+          "answer_status_labels"
+        ],
+        "properties": {
+          "domain_id": { "type": "string", "pattern": "^[a-z0-9_]+$" },
+          "label": { "type": "string" },
+          "description": { "type": "string" },
+          "allowed_sources": { "type": "array", "items": { "type": "string" }, "minItems": 1 },
+          "blocked_sources": { "type": "array", "items": { "type": "string" } },
+          "retrieval_priority": { "type": "integer", "minimum": 1, "maximum": 100 },
+          "may_cache_summary": { "type": "boolean" },
+          "requires_source_confidence": { "type": "boolean" },
+          "answer_status_labels": { "type": "array", "items": { "type": "string" }, "minItems": 1 }
+        },
+        "additionalProperties": false
+      }
+    }
+  },
+  "additionalProperties": false
+}
