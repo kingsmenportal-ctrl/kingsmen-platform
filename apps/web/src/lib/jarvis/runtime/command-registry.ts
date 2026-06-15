@@ -75,6 +75,15 @@ const commandByIntent: Record<JarvisIntentId, JarvisCommandDefinition> = {
     evidenceRequired: true,
     adapterId: 'langfuse_trace_gateway_adapter',
   },
+  jarvis_security_scan: {
+    commandId: 'JARVIS_SECURITY_SCAN',
+    label: 'Jarvis Security Scan Gate',
+    category: 'jarvis_security_scan',
+    riskLevel: 'review_required',
+    approvalRequired: true,
+    evidenceRequired: true,
+    adapterId: 'security_scan_gate_adapter',
+  },
   system_health: {
     commandId: 'SYSTEM_STATUS',
     label: 'System Status',
