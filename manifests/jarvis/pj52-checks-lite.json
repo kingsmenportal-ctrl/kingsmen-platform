@@ -1,0 +1,16 @@
+{
+  "id": "pj52-checks-lite",
+  "pj": "PJ52",
+  "version": "1.0.0",
+  "checks": [
+    "hud_metadata",
+    "api_shape",
+    "runtime_exports",
+    "kernel_runner",
+    "smoke_runner",
+    "memory_summary",
+    "record_entry",
+    "confidence_label",
+    "repair_list"
+  ]
+}
