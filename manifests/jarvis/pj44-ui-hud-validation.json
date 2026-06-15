@@ -1,0 +1,29 @@
+{
+  "id": "pj44-ui-hud-validation",
+  "pj": "PJ44",
+  "version": "1.0.0",
+  "status": "partial_created_css_deferred",
+  "required_files": [
+    "docs/agents/PJ44_JARVIS_UI_HUD_IMPLEMENTATION.md",
+    "manifests/jarvis/pj44-ui-hud-implementation.json",
+    "manifests/jarvis/pj44-ui-hud-validation.json",
+    "apps/web/src/app/jarvis/JarvisAgentClient.tsx",
+    "apps/web/src/app/jarvis/JarvisAgent.module.css",
+    "scripts/jarvis/validate-pj44-ui-hud.mjs"
+  ],
+  "required_markers": [
+    "KINGSMEN COMMAND HOUSE",
+    "wakeGreeting",
+    "missionPanels",
+    "commandCards",
+    "Evidence drawer",
+    "Approval Gate",
+    "VOICE COMMAND"
+  ],
+  "deferred_items": [
+    "Dedicated PJ44 CSS replacement was blocked by connector safety filter.",
+    "Existing CSS remains active.",
+    "A smaller style repair can be performed in PJ44.1 or PJ45 before final build validation."
+  ],
+  "next_phase": "PJ45 Jarvis API Runtime Wiring"
+}
