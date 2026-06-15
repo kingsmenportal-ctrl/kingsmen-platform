@@ -1,0 +1,110 @@
+{
+  "id": "jarvis-source-confidence-rules",
+  "pj": "PJ42.5",
+  "version": "1.0.0",
+  "scoring_inputs": [
+    "authority_level",
+    "freshness_status",
+    "directness",
+    "evidence_presence",
+    "conflict_status",
+    "domain_sensitivity",
+    "tool_reliability"
+  ],
+  "freshness_windows": {
+    "portal_health": "same_day",
+    "deadlines": "live_or_same_week",
+    "fees": "live_or_same_month",
+    "jobs": "live_or_same_week",
+    "learnerships": "live_or_same_week",
+    "bursaries": "live_or_same_month",
+    "legal_or_policy": "current_official_version_required",
+    "weather": "live_required",
+    "finance_or_price": "live_required",
+    "repo_or_build_status": "live_required",
+    "static_doctrine": "latest_repo_version_required"
+  },
+  "band_rules": [
+    {
+      "rule_id": "official_current_direct_no_conflict",
+      "if": {
+        "authority_level": "official_primary",
+        "freshness_ok": true,
+        "directly_supports_claim": true,
+        "conflict_detected": false,
+        "evidence_present": true
+      },
+      "then_band": "verified_official"
+    },
+    {
+      "rule_id": "trusted_recent_direct_no_conflict",
+      "if": {
+        "authority_level": "trusted_secondary",
+        "freshness_ok": true,
+        "directly_supports_claim": true,
+        "conflict_detected": false,
+        "evidence_present": true
+      },
+      "then_band": "high_trusted_recent"
+    },
+    {
+      "rule_id": "official_secondary_recent",
+      "if": {
+        "authority_level": "official_secondary",
+        "freshness_ok": true,
+        "evidence_present": true
+      },
+      "then_band": "high_trusted_recent"
+    },
+    {
+      "rule_id": "supporting_or_indirect_source",
+      "if": {
+        "authority_level": "supporting_secondary"
+      },
+      "then_band": "medium_needs_review"
+    },
+    {
+      "rule_id": "lead_only_source",
+      "if": {
+        "authority_level": "lead_only"
+      },
+      "then_band": "low_unverified_or_stale"
+    },
+    {
+      "rule_id": "stale_current_fact",
+      "if": {
+        "freshness_required": true,
+        "freshness_ok": false
+      },
+      "then_band": "low_unverified_or_stale"
+    },
+    {
+      "rule_id": "conflict_detected",
+      "if": {
+        "conflict_detected": true
+      },
+      "then_band": "medium_needs_review"
+    },
+    {
+      "rule_id": "unsafe_or_blocked_source",
+      "if": {
+        "source_is_unsafe": true
+      },
+      "then_band": "blocked_or_unsafe"
+    },
+    {
+      "rule_id": "missing_evidence",
+      "if": {
+        "evidence_present": false
+      },
+      "then_band": "low_unverified_or_stale"
+    }
+  ],
+  "action_rules": {
+    "verified_official": "May support confident answer and approved downstream action when command policy allows.",
+    "high_trusted_recent": "May support answer but not official action without official verification.",
+    "medium_needs_review": "May support draft, warning, or lead. Requires review before operational use.",
+    "low_unverified_or_stale": "May only be treated as lead or uncertainty. No operational action.",
+    "blocked_or_unsafe": "Must refuse or redirect to safe workflow."
+  }
+}
