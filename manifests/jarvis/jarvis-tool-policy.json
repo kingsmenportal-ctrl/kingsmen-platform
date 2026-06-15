@@ -1,0 +1,53 @@
+{
+  "id": "jarvis-tool-policy",
+  "pj": "PJ42.4",
+  "version": "1.0.0",
+  "global_rules": {
+    "free_text_tool_calling_allowed": false,
+    "unknown_tool_default": "blocked",
+    "unregistered_adapter_default": "blocked",
+    "evidence_required_for_all_adapters": true,
+    "no_success_claim_without_tool_evidence": true,
+    "risky_adapter_requires_policy_gate": true,
+    "risky_adapter_requires_approval_token": true
+  },
+  "risk_handling": {
+    "safe_read": {
+      "policy_gate_required": false,
+      "approval_token_required": false
+    },
+    "safe_generate": {
+      "policy_gate_required": false,
+      "approval_token_required": false,
+      "external_use_requires_review": true
+    },
+    "review_required": {
+      "policy_gate_required": true,
+      "approval_token_required": true
+    },
+    "approval_required": {
+      "policy_gate_required": true,
+      "approval_token_required": true
+    },
+    "blocked": {
+      "route_to": "blocked_adapter",
+      "tool_execution_allowed": false
+    }
+  },
+  "adapter_boundaries": {
+    "web_research_adapter": "read public sources only and cite source trail",
+    "github_adapter": "inspect approved repository surfaces only",
+    "postgres_read_model_adapter": "read approved summaries only",
+    "playwright_scout_adapter": "scout pages and gather evidence only; no silent submissions or blocker bypass",
+    "report_generation_adapter": "generate reviewable reports only",
+    "evidence_pack_adapter": "generate reviewable evidence packs only",
+    "approval_adapter": "request and record approval state only",
+    "blocked_adapter": "refuse unsafe action and provide safe redirect"
+  },
+  "failure_policy": {
+    "tool_timeout": "state timeout and next safe action",
+    "tool_error": "state failure and do not claim success",
+    "missing_evidence": "block success claim",
+    "missing_source_confidence": "mark answer as unverified or route to source-confidence engine"
+  }
+}
