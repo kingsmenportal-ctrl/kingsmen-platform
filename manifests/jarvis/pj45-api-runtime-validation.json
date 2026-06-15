@@ -1,0 +1,22 @@
+{
+  "id": "pj45-api-runtime-validation",
+  "pj": "PJ45",
+  "version": "1.0.0",
+  "required_files": [
+    "docs/agents/PJ45_JARVIS_API_RUNTIME_WIRING.md",
+    "manifests/jarvis/pj45-api-runtime-wiring.json",
+    "manifests/jarvis/pj45-api-response-contract.json",
+    "apps/web/src/lib/jarvis/api/api-runtime-bridge.ts",
+    "apps/web/src/app/api/jarvis/kernel/route.ts",
+    "apps/web/src/lib/jarvis/runtime/kernel.ts",
+    "scripts/jarvis/validate-pj45-api-runtime-wiring.mjs"
+  ],
+  "required_markers": [
+    "runJarvisKernel",
+    "runJarvisApiKernelBridge",
+    "kernel",
+    "GET",
+    "POST"
+  ],
+  "next_phase": "PJ46"
+}
