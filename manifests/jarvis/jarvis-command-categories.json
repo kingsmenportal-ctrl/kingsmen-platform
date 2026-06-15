@@ -1,0 +1,73 @@
+{
+  "id": "jarvis-command-categories",
+  "pj": "PJ42.2",
+  "version": "1.0.0",
+  "categories": [
+    {
+      "id": "dialogue",
+      "label": "Dialogue",
+      "purpose": "Normal smart conversation, explanations, and reasoning.",
+      "default_risk": "safe_read"
+    },
+    {
+      "id": "live_research",
+      "label": "Live Research",
+      "purpose": "Current public information, source checks, deadlines, fees, jobs, rules, and news.",
+      "default_risk": "safe_read"
+    },
+    {
+      "id": "kingsmen_knowledge",
+      "label": "Kingsmen Knowledge",
+      "purpose": "Search Kingsmen doctrine, architecture, pricing, workflows, and safe project knowledge.",
+      "default_risk": "safe_read"
+    },
+    {
+      "id": "repo_inspection",
+      "label": "Repo Inspection",
+      "purpose": "Inspect GitHub files, issues, commits, and build evidence.",
+      "default_risk": "safe_read"
+    },
+    {
+      "id": "system_health",
+      "label": "System Health",
+      "purpose": "Check approved system health surfaces.",
+      "default_risk": "safe_read"
+    },
+    {
+      "id": "validation_build",
+      "label": "Validation and Build",
+      "purpose": "Run or plan validators and build checks.",
+      "default_risk": "approval_required"
+    },
+    {
+      "id": "database_read_model",
+      "label": "Database Read Model",
+      "purpose": "Read approved operational summaries only.",
+      "default_risk": "safe_read"
+    },
+    {
+      "id": "playwright_scout",
+      "label": "Playwright Scout",
+      "purpose": "Scout public or approved portal pages with evidence and fallback detection.",
+      "default_risk": "approval_required"
+    },
+    {
+      "id": "report_generation",
+      "label": "Report Generation",
+      "purpose": "Generate Founder reports, digests, route maps, and evidence packs.",
+      "default_risk": "safe_generate"
+    },
+    {
+      "id": "approval_flow",
+      "label": "Approval Flow",
+      "purpose": "Request and record Commander approval for risky actions.",
+      "default_risk": "review_required"
+    },
+    {
+      "id": "blocked",
+      "label": "Blocked",
+      "purpose": "Explicitly classify actions that Jarvis must not perform.",
+      "default_risk": "blocked"
+    }
+  ]
+}
