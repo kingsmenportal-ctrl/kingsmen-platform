@@ -1,0 +1,38 @@
+{
+  "id": "jarvis-memory-law",
+  "pj": "PJ42.1",
+  "version": "1.0.0",
+  "purpose": "Define what Jarvis may and may not remember.",
+  "allowed_memory": [
+    "kingsmen_doctrine_summaries",
+    "approved_founder_preferences",
+    "build_decisions",
+    "command_outcomes",
+    "public_source_intelligence",
+    "source_confidence_history",
+    "system_incident_summaries",
+    "validated_module_status",
+    "non_private_operational_patterns"
+  ],
+  "blocked_memory": [
+    "raw_private_operational_records",
+    "private_payment_details",
+    "authentication_material",
+    "browser_session_material",
+    "unapproved_personal_data",
+    "private_document_contents_without_approved_workflow",
+    "production_access_material"
+  ],
+  "memory_write_rules": {
+    "must_be_summarized": true,
+    "must_have_source_context": true,
+    "must_have_timestamp": true,
+    "must_not_store_full_private_records": true,
+    "must_be_deletable": true
+  },
+  "memory_read_rules": {
+    "must_route_through_policy_gate": true,
+    "must_not_override_live_data_when_current_facts_are_required": true,
+    "must_disclose_uncertainty_when_memory_is_old": true
+  }
+}
