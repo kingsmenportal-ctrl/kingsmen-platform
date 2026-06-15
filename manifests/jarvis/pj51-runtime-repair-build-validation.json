@@ -1,0 +1,29 @@
+{
+  "id": "pj51-runtime-repair-build-validation",
+  "pj": "PJ51",
+  "version": "1.0.0",
+  "parent_issue": 30,
+  "issue": 31,
+  "status": "created",
+  "purpose": "Validate the Jarvis runtime package after PJ43 through PJ50 and track repair items before deeper integration.",
+  "core_flow_checked": [
+    "runtime_index",
+    "kernel_runtime",
+    "api_kernel_route",
+    "api_smoke_route",
+    "smoke_tests",
+    "connector_registry",
+    "memory_vault",
+    "orchestrator",
+    "build_script"
+  ],
+  "readiness_labels": [
+    "ready_for_local_build_check",
+    "repair_required_before_build",
+    "validator_missing",
+    "route_missing",
+    "export_missing",
+    "deferred_item_open"
+  ],
+  "next_phase": "PJ52 Jarvis Integration Hardening"
+}
