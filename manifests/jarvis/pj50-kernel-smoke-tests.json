@@ -1,0 +1,30 @@
+{
+  "id": "pj50-kernel-smoke-tests",
+  "pj": "PJ50",
+  "version": "1.0.0",
+  "parent": "PJ49 Agent Orchestrator",
+  "purpose": "Register the first governed Jarvis kernel smoke-test package.",
+  "core_rule": "Smoke tests prove safe kernel paths before advanced automation.",
+  "required_paths": [
+    "general_dialogue",
+    "kingsmen_knowledge",
+    "live_data_route_decision",
+    "blocked_action",
+    "source_confidence_label",
+    "evidence_entry",
+    "hud_metadata",
+    "orchestrator_plan"
+  ],
+  "required_outputs": [
+    "scenario_id",
+    "input",
+    "expected_intent",
+    "expected_command",
+    "expected_route_family",
+    "expected_safety_outcome",
+    "expected_source_confidence",
+    "expected_evidence",
+    "expected_hud_metadata"
+  ],
+  "next_phase": "PJ51 Jarvis Runtime Repair and Build Validation"
+}
