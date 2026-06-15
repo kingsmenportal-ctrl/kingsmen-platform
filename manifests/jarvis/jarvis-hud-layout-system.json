@@ -1,0 +1,71 @@
+{
+  "id": "jarvis-hud-layout-system",
+  "pj": "PJ42.8",
+  "version": "1.0.0",
+  "layouts": [
+    {
+      "layout_id": "desktop_command_house",
+      "label": "Desktop Command House",
+      "target": "desktop",
+      "regions": [
+        "top_command_bar",
+        "left_mission_rail",
+        "center_conversation_and_cards",
+        "right_evidence_drawer",
+        "bottom_status_timeline"
+      ],
+      "required_surfaces": [
+        "commander_wake_screen",
+        "jarvis_voice_orb",
+        "live_response_stream",
+        "mission_board",
+        "evidence_drawer",
+        "system_health_panel"
+      ]
+    },
+    {
+      "layout_id": "mobile_founder_command",
+      "label": "Mobile Founder Command",
+      "target": "mobile",
+      "regions": [
+        "top_status_strip",
+        "voice_orb_and_input",
+        "priority_card_stack",
+        "approval_sheet",
+        "evidence_sheet"
+      ],
+      "required_surfaces": [
+        "mobile_founder_view",
+        "jarvis_voice_orb",
+        "command_card",
+        "approval_modal",
+        "evidence_drawer",
+        "system_health_panel"
+      ]
+    },
+    {
+      "layout_id": "mission_control_focus",
+      "label": "Mission Control Focus",
+      "target": "desktop_tablet",
+      "regions": [
+        "mission_board_main",
+        "tool_activity_side_panel",
+        "evidence_drawer",
+        "approval_modal_layer"
+      ],
+      "required_surfaces": [
+        "mission_board",
+        "tool_use_indicator",
+        "command_card",
+        "evidence_drawer",
+        "approval_modal"
+      ]
+    }
+  ],
+  "visual_density_rules": {
+    "mobile": "show_priority_cards_first",
+    "desktop": "show_mission_board_and_evidence_side_by_side",
+    "critical_incident": "promote_blocked_failed_and_approval_required_cards",
+    "routine": "compress_low_risk_safe_read_cards"
+  }
+}
