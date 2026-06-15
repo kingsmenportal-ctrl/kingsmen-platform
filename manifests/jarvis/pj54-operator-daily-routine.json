@@ -1,0 +1,49 @@
+{
+  "id": "pj54-operator-daily-routine",
+  "pj": "PJ54",
+  "version": "1.0.0",
+  "routine_blocks": [
+    {
+      "block_id": "morning_open",
+      "label": "Morning Open",
+      "checks": [
+        "review_latest_repo_state",
+        "review_open_jarvis_issues",
+        "review_deferred_repairs",
+        "check_kernel_smoke_route",
+        "check_hud_loads"
+      ],
+      "output": "morning_commander_status"
+    },
+    {
+      "block_id": "midday_control",
+      "label": "Midday Control",
+      "checks": [
+        "check_api_health",
+        "check_evidence_entries",
+        "check_blocked_action_response",
+        "check_live_route_behavior",
+        "record_new_incidents"
+      ],
+      "output": "midday_operator_note"
+    },
+    {
+      "block_id": "evening_close",
+      "label": "Evening Close",
+      "checks": [
+        "summarize_completed_work",
+        "summarize_failed_checks",
+        "summarize_repair_next_steps",
+        "confirm_no_unverified_success_claims",
+        "prepare_next_phase"
+      ],
+      "output": "evening_commander_report"
+    }
+  ],
+  "operator_notes": [
+    "Do not claim operational readiness without proof.",
+    "Do not ignore deferred repair items.",
+    "Do not use live facts from memory only.",
+    "Always separate built, planned, failed, and deferred."
+  ]
+}
