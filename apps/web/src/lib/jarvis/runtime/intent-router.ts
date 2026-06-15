@@ -25,6 +25,16 @@ export function routeJarvisIntent(request: JarvisRuntimeRequest): JarvisIntentRe
     };
   }
 
+  if (includesAny(text, ['security scan', 'scan gate', 'gitleaks', 'trivy', 'semgrep', 'dependency risk', 'code risk'])) {
+    return {
+      intentId: 'jarvis_security_scan',
+      confidence: 'high',
+      freshnessRequired: false,
+      policyGateRequired: true,
+      reason: 'Input asks for Jarvis security scan gate work with detection and review boundaries.',
+    };
+  }
+
   if (includesAny(text, ['trace gateway', 'trace evidence', 'langfuse', 'trace ledger', 'redacted trace', 'observability evidence'])) {
     return {
       intentId: 'jarvis_trace_evidence',
