@@ -1,0 +1,17 @@
+{
+  "endpoint": "/api/documents/extract",
+  "method": "POST",
+  "body": {
+    "documentId": "doc_cv_001",
+    "candidateId": "candidate_001",
+    "filename": "cv.txt",
+    "mimeType": "text/plain",
+    "engine": "plain_text_fallback",
+    "extractedText": "Full Name: Example Candidate\nEmail: example@email.com\nPhone: 071 234 5678\nSkills: communication, computer literacy"
+  },
+  "expectedSafety": {
+    "mode": "candidate_draft_review",
+    "reviewRequired": true,
+    "mayWriteCandidateTruth": false
+  }
+}
