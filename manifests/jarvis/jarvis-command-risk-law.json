@@ -1,0 +1,55 @@
+{
+  "id": "jarvis-command-risk-law",
+  "pj": "PJ42.1",
+  "version": "1.0.0",
+  "default_unknown_command": "blocked",
+  "risk_levels": {
+    "safe_read": {
+      "description": "Read-only inspection of approved non-sensitive surfaces.",
+      "approval_required": false,
+      "evidence_required": true
+    },
+    "safe_generate": {
+      "description": "Generate drafts, summaries, plans, reports, or safe files for Commander review.",
+      "approval_required": false,
+      "evidence_required": true
+    },
+    "review_required": {
+      "description": "Output must be reviewed by Commander before use outside Kingsmen.",
+      "approval_required": true,
+      "evidence_required": true
+    },
+    "approval_required": {
+      "description": "Action changes state, writes files, triggers workflow, sends message, probes portal, or affects operations.",
+      "approval_required": true,
+      "evidence_required": true
+    },
+    "blocked": {
+      "description": "Action is outside Jarvis authority or not safe for automation.",
+      "approval_required": false,
+      "evidence_required": true
+    }
+  },
+  "blocked_categories": [
+    "candidate_facing_jarvis_speech",
+    "unapproved_external_message",
+    "official_status_claim_without_evidence",
+    "payment_decision_by_ai",
+    "silent_application_submission",
+    "unapproved_private_data_access",
+    "unapproved_local_machine_control",
+    "unknown_public_agent_execution"
+  ],
+  "required_command_fields": [
+    "command_id",
+    "label",
+    "description",
+    "risk_level",
+    "allowed_actor",
+    "required_approval",
+    "tool_adapter",
+    "evidence_required",
+    "timeout_ms",
+    "rollback_note"
+  ]
+}
