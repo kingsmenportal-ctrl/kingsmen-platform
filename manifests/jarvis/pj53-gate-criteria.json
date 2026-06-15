@@ -1,0 +1,17 @@
+{
+  "id": "pj53-gate-criteria",
+  "pj": "PJ53",
+  "criteria": [
+    { "id": "runtime_files", "required": true },
+    { "id": "runtime_exports", "required": true },
+    { "id": "api_kernel_route", "required": true },
+    { "id": "api_smoke_route", "required": true },
+    { "id": "hud_page", "required": true },
+    { "id": "evidence_module", "required": true },
+    { "id": "confidence_module", "required": true },
+    { "id": "memory_module", "required": true },
+    { "id": "connector_registry", "required": true },
+    { "id": "build_script", "required": true },
+    { "id": "repair_tracker", "required": true }
+  ]
+}
