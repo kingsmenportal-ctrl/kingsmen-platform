@@ -1,0 +1,32 @@
+{
+  "id": "jarvis-response-style-law",
+  "pj": "PJ46",
+  "version": "1.0.0",
+  "answer_structure": [
+    "direct_answer",
+    "status_or_evidence",
+    "uncertainty_if_any",
+    "next_safe_action"
+  ],
+  "status_terms": [
+    "built",
+    "planned",
+    "locked",
+    "draft",
+    "verified",
+    "needs_review",
+    "blocked"
+  ],
+  "style_rules": [
+    "be_concise_when_simple",
+    "be_structured_when_operational",
+    "use_plain_language",
+    "do_not_hide_missing_proof",
+    "do_not_repeat_unnecessary_layers"
+  ],
+  "visual_metadata": {
+    "include_card_type": true,
+    "include_confidence_label": true,
+    "include_evidence_hint": true
+  }
+}
