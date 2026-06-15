@@ -1,0 +1,112 @@
+{
+  "id": "jarvis-live-route-catalog",
+  "pj": "PJ42.7",
+  "version": "1.0.0",
+  "live_routes": [
+    {
+      "route_id": "web_research_live",
+      "label": "Web Research Live Route",
+      "description": "Use current public web research for changing public facts such as deadlines, fees, policies, jobs, learnerships, bursaries, news, and public route updates.",
+      "adapter_id": "web_research_adapter",
+      "allowed_domains": ["public_web"],
+      "freshness_domains": ["deadlines", "fees", "rules", "jobs", "learnerships", "bursaries", "news", "public_source_changes"],
+      "requires_source_confidence": true,
+      "requires_evidence": true,
+      "requires_policy_gate": false,
+      "cache_ttl_seconds": 86400,
+      "failure_fallback": "State live web verification failed and provide next safe verification step."
+    },
+    {
+      "route_id": "github_live",
+      "label": "GitHub Live Route",
+      "description": "Use live GitHub inspection for repo files, issues, commits, PRs, and phase registration evidence.",
+      "adapter_id": "github_adapter",
+      "allowed_domains": ["github_repo"],
+      "freshness_domains": ["repo_status", "build_evidence", "created_files", "issues", "commits"],
+      "requires_source_confidence": true,
+      "requires_evidence": true,
+      "requires_policy_gate": false,
+      "cache_ttl_seconds": 300,
+      "failure_fallback": "State GitHub verification failed and do not claim repo state."
+    },
+    {
+      "route_id": "system_health_live",
+      "label": "System Health Live Route",
+      "description": "Use approved health endpoints or health summaries for current system state.",
+      "adapter_id": "system_health_adapter",
+      "allowed_domains": ["system_health"],
+      "freshness_domains": ["system_status", "deployment_status", "service_health"],
+      "requires_source_confidence": false,
+      "requires_evidence": true,
+      "requires_policy_gate": false,
+      "cache_ttl_seconds": 60,
+      "failure_fallback": "State health check failed and recommend safe diagnostic route."
+    },
+    {
+      "route_id": "postgres_read_model_live",
+      "label": "PostgreSQL Read Model Live Route",
+      "description": "Use approved read-only operational summaries for current queues, counts, and non-private operations state.",
+      "adapter_id": "postgres_read_model_adapter",
+      "allowed_domains": ["approved_read_models"],
+      "freshness_domains": ["queue_counts", "capacity", "workflow_status", "non_private_operational_summary"],
+      "requires_source_confidence": false,
+      "requires_evidence": true,
+      "requires_policy_gate": true,
+      "cache_ttl_seconds": 120,
+      "failure_fallback": "State read model lookup failed and do not expose raw data."
+    },
+    {
+      "route_id": "playwright_scout_live",
+      "label": "Playwright Scout Live Route",
+      "description": "Use approved Playwright scout to check pages, portal reachability, blockers, screenshots, and manual fallback evidence.",
+      "adapter_id": "playwright_scout_adapter",
+      "allowed_domains": ["approved_public_or_scoped_portal_pages"],
+      "freshness_domains": ["portal_health", "login_page", "deadline_page", "fee_page", "blocker_detection", "screenshot_evidence"],
+      "requires_source_confidence": true,
+      "requires_evidence": true,
+      "requires_policy_gate": true,
+      "cache_ttl_seconds": 3600,
+      "failure_fallback": "Return blocker or failure evidence and recommend manual fallback."
+    },
+    {
+      "route_id": "utility_api_live",
+      "label": "Utility API Live Route",
+      "description": "Use approved utility APIs for weather, time, finance, calculators, and similar tool-backed facts.",
+      "adapter_id": "utility_api_adapter",
+      "allowed_domains": ["approved_utility_api"],
+      "freshness_domains": ["weather", "time", "finance", "calculator", "unit_conversion"],
+      "requires_source_confidence": false,
+      "requires_evidence": true,
+      "requires_policy_gate": false,
+      "cache_ttl_seconds": 300,
+      "failure_fallback": "State utility lookup failed and do not invent current utility facts."
+    },
+    {
+      "route_id": "source_registry_snapshot_live",
+      "label": "Source Registry Snapshot Route",
+      "description": "Use Kingsmen source registry snapshots and confidence history as supporting evidence, never as final current truth when facts can change.",
+      "adapter_id": "source_registry_adapter",
+      "allowed_domains": ["source_registry"],
+      "freshness_domains": ["source_history", "known_route_sources", "previous_confidence_records"],
+      "requires_source_confidence": true,
+      "requires_evidence": true,
+      "requires_policy_gate": false,
+      "cache_ttl_seconds": 604800,
+      "failure_fallback": "State snapshot lookup failed and route to live verification."
+    },
+    {
+      "route_id": "blocked_manual_review_live",
+      "label": "Blocked or Manual Review Route",
+      "description": "Use when no safe live route exists, source confidence is too low, sources conflict, or the request requires human/operator review.",
+      "adapter_id": "blocked_adapter",
+      "allowed_domains": ["blocked_or_manual_review"],
+      "freshness_domains": ["unsafe", "conflicting", "unverified", "requires_manual_review"],
+      "requires_source_confidence": true,
+      "requires_evidence": true,
+      "requires_policy_gate": true,
+      "cache_ttl_seconds": 0,
+      "failure_fallback": "Keep action blocked and provide safe review path.",
+      "blocked_reason": "No approved live route or source confidence is insufficient."
+    }
+  ]
+}
