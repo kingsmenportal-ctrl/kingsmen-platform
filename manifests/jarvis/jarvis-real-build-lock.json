@@ -1,0 +1,29 @@
+{
+  "id": "jarvis-real-build-lock",
+  "issue": 36,
+  "date": "2026-06-15",
+  "authority": "Commander pasted directives",
+  "status": "locked",
+  "core_decision": "Stop treating Jarvis as planning-only or wallpaper-only. Preserve the Commander requirements and build the real Kingsmen Jarvis system.",
+  "non_minimization": true,
+  "rules": [
+    "Jarvis is Commander-only.",
+    "Jarvis must be live, visual, clickable, listening, speaking, intelligent, organized, professional, respectful, disciplined, and connected to Kingsmen.",
+    "The locked visual reference is the system identity, not decoration.",
+    "Do not change the locked visual direction without Commander instruction.",
+    "Do not give PowerShell syntax as CMD syntax.",
+    "Local runtime proof is required before claiming Jarvis works locally.",
+    "GitHub proof is required before claiming local Builder Core work is preserved.",
+    "Public Jarvis or OpenClaw tools are research-only until vetted.",
+    "OpenClaw is guarded operator support, not the brain.",
+    "Playwright is probe and scout only.",
+    "No chat claim replaces repo proof."
+  ],
+  "next_build_focus": [
+    "repair local startup path",
+    "preserve Builder Core in GitHub",
+    "convert Jarvis HUD into a unified live system shell",
+    "add Commander real-build status into runtime",
+    "prove with build and smoke evidence"
+  ]
+}
