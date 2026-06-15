@@ -1,0 +1,48 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://kingsmen.local/schemas/jarvis-live-data-router.schema.json",
+  "title": "Jarvis Live Data Router Schema",
+  "type": "object",
+  "required": ["id", "pj", "version", "live_routes"],
+  "properties": {
+    "id": { "type": "string" },
+    "pj": { "type": "string" },
+    "version": { "type": "string" },
+    "live_routes": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "type": "object",
+        "required": [
+          "route_id",
+          "label",
+          "description",
+          "adapter_id",
+          "allowed_domains",
+          "freshness_domains",
+          "requires_source_confidence",
+          "requires_evidence",
+          "requires_policy_gate",
+          "cache_ttl_seconds",
+          "failure_fallback"
+        ],
+        "properties": {
+          "route_id": { "type": "string", "pattern": "^[a-z0-9_]+$" },
+          "label": { "type": "string" },
+          "description": { "type": "string" },
+          "adapter_id": { "type": "string" },
+          "allowed_domains": { "type": "array", "items": { "type": "string" }, "minItems": 1 },
+          "freshness_domains": { "type": "array", "items": { "type": "string" }, "minItems": 1 },
+          "requires_source_confidence": { "type": "boolean" },
+          "requires_evidence": { "type": "boolean" },
+          "requires_policy_gate": { "type": "boolean" },
+          "cache_ttl_seconds": { "type": "integer", "minimum": 0, "maximum": 2592000 },
+          "failure_fallback": { "type": "string" },
+          "blocked_reason": { "type": "string" }
+        },
+        "additionalProperties": false
+      }
+    }
+  },
+  "additionalProperties": false
+}
