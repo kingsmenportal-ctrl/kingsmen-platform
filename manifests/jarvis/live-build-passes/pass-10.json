@@ -1,0 +1,57 @@
+{
+  "pass": "10",
+  "status": "built",
+  "branch": "main",
+  "purpose": "Founder console real route/data layer: pass-09 export index, read-only route descriptor, data provider interface, server read descriptor, view-model assembler, and UI snapshot validator.",
+  "builtFiles": [
+    "packages/jarvis-core/src/live-pass-09-index.ts",
+    "packages/contracts/src/jarvis/console-data-provider.ts",
+    "packages/jarvis-core/src/jarvis-founder-console-real-route-file.ts",
+    "packages/jarvis-core/src/jarvis-console-server-read-adapter.ts",
+    "packages/jarvis-core/src/jarvis-console-view-model-assembler.ts",
+    "packages/jarvis-core/src/jarvis-console-ui-snapshot-validator.ts",
+    "scripts/validators/validate-jarvis-live-pass-10.mjs"
+  ],
+  "capabilities": [
+    "JarvisPass09ExportIndex",
+    "JarvisConsoleDataProviderInterface",
+    "JarvisFounderConsoleRealRouteFile",
+    "JarvisConsoleServerReadAdapter",
+    "JarvisConsoleViewModelAssembler",
+    "JarvisConsoleUiSnapshotValidator",
+    "JarvisLivePass10Validator"
+  ],
+  "authorityBoundary": [
+    "Founder console route descriptor is read-only.",
+    "Console data provider interface is display-data only.",
+    "Server read adapter descriptor does not mutate state.",
+    "View model assembler only prepares safe founder display data.",
+    "UI snapshot validator checks display shape only.",
+    "Backend state machine, PostgreSQL Truth Vault, validators, evidence, and founder approval remain authoritative."
+  ],
+  "validator": {
+    "script": "node scripts/validators/validate-jarvis-live-pass-10.mjs",
+    "report": "reports/jarvis/validate-jarvis-live-pass-10.json"
+  },
+  "commits": [
+    "6d1ea06746e81caedf40aa7dd84770e2df053cbf",
+    "f5e2b4fa888763a16755a081cf3758cbe50e6703",
+    "4090d849a8dfbc0fa7572fd4207717a2f349d03f",
+    "4dbb56684da941ad376803501172db397bbadc82",
+    "9b6fdc4038c2c1a4ed580b30d9daeb6d207c01c1",
+    "7a829ba5ad3450d9f1c8ec23bcfbab93c43d3733",
+    "17286ea6bbec1127f2b02794d88845e4c9dc9247"
+  ],
+  "blockedOrReduced": [
+    "Full provider-backed server read implementation was filtered; committed a safe read adapter descriptor instead.",
+    "Typed provider import in the view-model assembler was filtered; committed a self-contained assembler with safe counts."
+  ],
+  "nextTargets": [
+    "JarvisConsoleApiReadHandler",
+    "JarvisConsoleDataProviderFixtureAdapter",
+    "JarvisConsoleBackendReadContract",
+    "JarvisConsoleRouteSmokeTest",
+    "JarvisConsoleViewModelFixture",
+    "JarvisPass10ExportIndex"
+  ]
+}
