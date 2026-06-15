@@ -1,0 +1,70 @@
+{
+  "id": "jarvis-live-routing-matrix",
+  "pj": "PJ42.7",
+  "version": "1.0.0",
+  "routes": [
+    {
+      "intent_id": "live_research",
+      "command_id": "LIVE_RESEARCH",
+      "freshness_domains": ["deadlines", "fees", "rules", "jobs", "learnerships", "bursaries", "news", "public_source_changes"],
+      "route_candidates": ["web_research_live", "source_registry_snapshot_live", "blocked_manual_review_live"],
+      "requires_source_confidence": true,
+      "requires_evidence": true
+    },
+    {
+      "intent_id": "repo_inspection",
+      "command_id": "GITHUB_REPO_INSPECT",
+      "freshness_domains": ["repo_status", "created_files", "issues", "commits", "build_evidence"],
+      "route_candidates": ["github_live"],
+      "requires_source_confidence": true,
+      "requires_evidence": true
+    },
+    {
+      "intent_id": "system_health",
+      "command_id": "SYSTEM_STATUS",
+      "freshness_domains": ["system_status", "deployment_status", "service_health"],
+      "route_candidates": ["system_health_live", "github_live"],
+      "requires_source_confidence": false,
+      "requires_evidence": true
+    },
+    {
+      "intent_id": "database_read_model",
+      "command_id": "POSTGRES_READ_MODEL_SCAN",
+      "freshness_domains": ["queue_counts", "capacity", "workflow_status", "non_private_operational_summary"],
+      "route_candidates": ["postgres_read_model_live", "blocked_manual_review_live"],
+      "requires_source_confidence": false,
+      "requires_evidence": true
+    },
+    {
+      "intent_id": "playwright_scout",
+      "command_id": "PLAYWRIGHT_PORTAL_HEALTH",
+      "freshness_domains": ["portal_health", "login_page", "deadline_page", "fee_page", "blocker_detection", "screenshot_evidence"],
+      "route_candidates": ["playwright_scout_live", "web_research_live", "blocked_manual_review_live"],
+      "requires_source_confidence": true,
+      "requires_evidence": true
+    },
+    {
+      "intent_id": "kingsmen_knowledge",
+      "command_id": "SEARCH_KINGSMEN_KNOWLEDGE",
+      "freshness_domains": ["static_kingsmen_doctrine", "created_files", "issues", "commits"],
+      "route_candidates": ["github_live", "source_registry_snapshot_live"],
+      "requires_source_confidence": true,
+      "requires_evidence": true
+    },
+    {
+      "intent_id": "blocked_unsafe_action",
+      "command_id": "SEND_EXTERNAL_MESSAGE",
+      "freshness_domains": ["unsafe", "requires_manual_review"],
+      "route_candidates": ["blocked_manual_review_live"],
+      "requires_source_confidence": true,
+      "requires_evidence": true
+    }
+  ],
+  "selection_rules": {
+    "prefer_official_current_source": true,
+    "prefer_route_with_shortest_safe_path": true,
+    "do_not_use_memory_as_final_for_current_fact": true,
+    "if_source_conflict_then_manual_review": true,
+    "if_all_routes_fail_then_state_live_verification_failed": true
+  }
+}
