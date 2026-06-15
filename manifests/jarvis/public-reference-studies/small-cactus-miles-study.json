@@ -1,0 +1,45 @@
+{
+  "id": "PJ_PUBLIC_JARVIS_11_SMALL_CACTUS_MILES",
+  "status": "recorded",
+  "public_project": {
+    "repository": "small-cactus/M.I.L.E.S",
+    "category": "voice-assistant-natural-conversation-memory-plugins-model-switching",
+    "source_type": "public_github_repository"
+  },
+  "kingsmen_fit": {
+    "primary_lessons": [
+      "natural voice command surface",
+      "follow-up context without repeated wake word",
+      "explicit persistent memory",
+      "plugin/tool adapter contract",
+      "model/cost mode switching",
+      "setup wizard for configuration",
+      "projection HUD concept",
+      "privacy boundary for local processing"
+    ],
+    "components_to_influence": [
+      "JarvisConversationEngine",
+      "JarvisFollowUpContextResolver",
+      "JarvisExplicitMemoryWriter",
+      "JarvisCostModeSelector",
+      "JarvisModelRouter",
+      "JarvisPluginContract",
+      "JarvisSetupWizard",
+      "JarvisProjectionHudMode",
+      "JarvisPrivacyBoundary"
+    ],
+    "reject_or_harden": [
+      "self-changing doctrine",
+      "unreviewed user-created plugins",
+      "always-listening by default",
+      "device control without approval gate",
+      "persistent memory without retention policy",
+      "camera/image capture without explicit permission",
+      "production actions from natural voice alone"
+    ]
+  },
+  "record": {
+    "doc_path": "docs/jarvis/public-reference-studies/PJ_PUBLIC_JARVIS_11_SMALL_CACTUS_MILES.md",
+    "branch": "main"
+  }
+}
