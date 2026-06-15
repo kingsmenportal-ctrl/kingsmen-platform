@@ -1,0 +1,59 @@
+{
+  "id": "jarvis-knowledge-indexing-storage",
+  "pj": "PJ42.6",
+  "version": "1.0.0",
+  "storage_strategy": {
+    "primary_truth": "git_repository_and_postgres_truth_vault",
+    "search_index": "derived_index_only",
+    "vector_index": "derived_optional_pgvector_index",
+    "cache": "ephemeral_or_versioned_summary_cache",
+    "memory": "safe_summarized_memory_only"
+  },
+  "indexable_content": [
+    "approved_docs",
+    "approved_manifests",
+    "approved_scripts_metadata",
+    "github_issue_summaries",
+    "validated_build_summaries",
+    "public_source_snapshots",
+    "source_confidence_records",
+    "safe_founder_decision_summaries",
+    "safe_incident_summaries"
+  ],
+  "not_indexable_content": [
+    "raw_candidate_records",
+    "raw_payment_records",
+    "private_documents",
+    "authentication_material",
+    "browser_session_material",
+    "production_access_material",
+    "unapproved_personal_data",
+    "raw_secret_logs"
+  ],
+  "index_metadata_required": [
+    "knowledge_id",
+    "domain_id",
+    "source_type",
+    "source_reference",
+    "source_confidence_band",
+    "created_at",
+    "updated_at",
+    "version_or_commit",
+    "status_label",
+    "summary_allowed"
+  ],
+  "summary_rules": {
+    "summaries_must_preserve_status": true,
+    "summaries_must_not_create_new_claims": true,
+    "summaries_must_link_back_to_source": true,
+    "summaries_must_exclude_private_raw_data": true,
+    "summaries_must_be_refreshable": true
+  },
+  "retention_rules": {
+    "doctrine_summaries": "retain_until_superseded",
+    "source_snapshots": "retain_with_timestamp_and_confidence",
+    "incident_summaries": "retain_until_resolved_then_archive",
+    "ephemeral_tool_context": "expire_after_session_or_configured_ttl",
+    "unsafe_or_blocked_content": "store_only_block_reason_and_safe_redirect"
+  }
+}
