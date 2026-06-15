@@ -1,0 +1,117 @@
+{
+  "id": "jarvis-live-connector-catalog",
+  "pj": "PJ47",
+  "version": "1.0.0",
+  "connectors": [
+    {
+      "connector_id": "web_research",
+      "label": "Web Research",
+      "purpose": "Current public facts, deadlines, fees, jobs, rules, and news.",
+      "adapter_id": "web_research_adapter",
+      "read_only": true,
+      "live_data": true,
+      "requires_source_confidence": true,
+      "requires_evidence": true,
+      "default_failure": "Return unverified status and next verification step."
+    },
+    {
+      "connector_id": "github_repo",
+      "label": "GitHub Repo and Issue Inspection",
+      "purpose": "Inspect repo files, issues, commits, and phase evidence.",
+      "adapter_id": "github_adapter",
+      "read_only": true,
+      "live_data": true,
+      "requires_source_confidence": true,
+      "requires_evidence": true,
+      "default_failure": "Do not guess repo state. State repo lookup failed."
+    },
+    {
+      "connector_id": "system_health",
+      "label": "System Health",
+      "purpose": "Read approved health surfaces and summarize status.",
+      "adapter_id": "system_health_adapter",
+      "read_only": true,
+      "live_data": true,
+      "requires_source_confidence": false,
+      "requires_evidence": true,
+      "default_failure": "Return health check failure and next diagnostic step."
+    },
+    {
+      "connector_id": "build_validation",
+      "label": "Build and Validator Evidence",
+      "purpose": "Run or inspect approved validation and build proof.",
+      "adapter_id": "validation_adapter",
+      "read_only": false,
+      "live_data": false,
+      "requires_source_confidence": false,
+      "requires_evidence": true,
+      "default_failure": "Return validation failure without claiming completion."
+    },
+    {
+      "connector_id": "postgres_read_model",
+      "label": "PostgreSQL Read Model",
+      "purpose": "Read approved operational summaries only.",
+      "adapter_id": "postgres_read_model_adapter",
+      "read_only": true,
+      "live_data": true,
+      "requires_source_confidence": false,
+      "requires_evidence": true,
+      "default_failure": "Return read-model failure and safe repair path."
+    },
+    {
+      "connector_id": "playwright_scout",
+      "label": "Playwright Scout",
+      "purpose": "Scout approved pages for reachability, blockers, screenshots, and manual fallback signals.",
+      "adapter_id": "playwright_scout_adapter",
+      "read_only": false,
+      "live_data": true,
+      "requires_source_confidence": true,
+      "requires_evidence": true,
+      "default_failure": "Return scout failure and manual fallback recommendation."
+    },
+    {
+      "connector_id": "utility_api",
+      "label": "Utility APIs",
+      "purpose": "Weather, time, calculator, currency, and other utility facts.",
+      "adapter_id": "utility_api_adapter",
+      "read_only": true,
+      "live_data": true,
+      "requires_source_confidence": true,
+      "requires_evidence": true,
+      "default_failure": "State utility lookup failed and avoid stale values."
+    },
+    {
+      "connector_id": "knowledge_search",
+      "label": "Knowledge Search",
+      "purpose": "Retrieve approved Kingsmen knowledge domains and summaries.",
+      "adapter_id": "kingsmen_knowledge_adapter",
+      "read_only": true,
+      "live_data": false,
+      "requires_source_confidence": true,
+      "requires_evidence": true,
+      "default_failure": "Answer from visible context only and state missing knowledge lookup."
+    },
+    {
+      "connector_id": "evidence_ledger",
+      "label": "Evidence Ledger",
+      "purpose": "Create or read governed evidence summaries for Jarvis actions.",
+      "adapter_id": "evidence_pack_adapter",
+      "read_only": false,
+      "live_data": false,
+      "requires_source_confidence": false,
+      "requires_evidence": true,
+      "default_failure": "Do not claim evidence was stored. Return failure."
+    },
+    {
+      "connector_id": "blocked_manual_review",
+      "label": "Blocked or Manual Review",
+      "purpose": "Route unknown or unsafe connector requests to blocked/manual review path.",
+      "adapter_id": "blocked_adapter",
+      "read_only": true,
+      "live_data": false,
+      "requires_source_confidence": false,
+      "requires_evidence": true,
+      "default_failure": "Keep action blocked and explain safe route."
+    }
+  ]
+}
