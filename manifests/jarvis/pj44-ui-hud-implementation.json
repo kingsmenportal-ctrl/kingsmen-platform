@@ -1,0 +1,32 @@
+{
+  "id": "pj44-ui-hud-implementation",
+  "pj": "PJ44",
+  "version": "1.0.0",
+  "status": "created",
+  "parent": "PJ43 Jarvis Runtime Implementation",
+  "issue": 24,
+  "purpose": "Upgrade the existing Jarvis page into a structured Commander HUD.",
+  "upgraded_files": [
+    "apps/web/src/app/jarvis/JarvisAgentClient.tsx",
+    "apps/web/src/app/jarvis/JarvisAgent.module.css"
+  ],
+  "required_surfaces": [
+    "commander_wake_header",
+    "voice_orb",
+    "command_deck",
+    "mission_board",
+    "live_command_stream",
+    "evidence_drawer",
+    "approval_modal_placeholder",
+    "source_confidence_chips",
+    "system_status_panels",
+    "mobile_founder_layout"
+  ],
+  "runtime_boundary": {
+    "ui_only": true,
+    "must_not_bypass_pj42_law": true,
+    "must_not_bypass_pj43_runtime": true,
+    "api_wiring_phase": "PJ45"
+  },
+  "next_phase": "PJ45 Jarvis API Runtime Wiring"
+}
