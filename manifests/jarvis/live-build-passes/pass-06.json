@@ -1,0 +1,48 @@
+{
+  "manifestRef": "jarvis-live-pass-06",
+  "project": "Kingsmen Jarvis",
+  "branch": "main",
+  "status": "built",
+  "purpose": "Pass 06 adds safe import surface, validation aggregation, read-only founder console route, build-session persistence snapshot, and HUD panels for patch review and validator reports.",
+  "builtFiles": [
+    "packages/jarvis-core/src/live-pass-06-index.ts",
+    "packages/jarvis-core/src/jarvis-validator-aggregator-safe.ts",
+    "packages/jarvis-core/src/jarvis-founder-console-route-readonly.ts",
+    "packages/jarvis-core/src/jarvis-build-session-persistence-adapter.ts",
+    "packages/jarvis-core/src/jarvis-patch-review-hud-panel.ts",
+    "packages/jarvis-core/src/jarvis-validator-report-hud-panel.ts",
+    "scripts/validators/validate-jarvis-live-pass-06.mjs"
+  ],
+  "capabilities": [
+    "JarvisLivePassExportIndex",
+    "JarvisValidatorAggregatorSafe",
+    "JarvisFounderConsoleRouteReadOnly",
+    "JarvisBuildSessionPersistenceAdapter",
+    "JarvisPatchReviewHudPanel",
+    "JarvisValidatorReportHudPanel",
+    "JarvisLivePass06Validator"
+  ],
+  "authorityBoundaries": [
+    "Founder console route is read-only.",
+    "Build-session persistence stores snapshots only.",
+    "HUD panels are informational and do not execute actions.",
+    "Validator aggregation summarizes proof and does not replace validators.",
+    "Jarvis remains under Kingsmen doctrine, backend state machine, validators, evidence, and founder approval."
+  ],
+  "validator": {
+    "script": "node scripts/validators/validate-jarvis-live-pass-06.mjs",
+    "reportPath": "reports/jarvis/validate-jarvis-live-pass-06.json"
+  },
+  "knownGaps": [
+    "package.json aggregate validator wiring remains deferred because previous broad package rewrites were blocked.",
+    "Pass 06 modules are importable through live-pass-06-index.ts and direct paths."
+  ],
+  "nextLiveTargets": [
+    "JarvisFounderConsolePageShell",
+    "JarvisHudPanelComposer",
+    "JarvisBuildSessionListView",
+    "JarvisReviewQueueReadRoute",
+    "JarvisValidationReportListView",
+    "JarvisPassValidatorRegistry"
+  ]
+}
