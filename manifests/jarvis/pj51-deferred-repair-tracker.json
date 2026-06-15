@@ -1,0 +1,43 @@
+{
+  "id": "pj51-deferred-repair-tracker",
+  "pj": "PJ51",
+  "version": "1.0.0",
+  "policy": "Deferred items must stay visible until repaired or replaced by a validated equivalent.",
+  "items": [
+    {
+      "item_id": "pj44_dedicated_hud_css",
+      "origin_phase": "PJ44",
+      "status": "deferred",
+      "impact": "HUD can use existing styling, but dedicated visual hardening remains open.",
+      "repair_path": "Create or restore dedicated Jarvis HUD stylesheet and run web build."
+    },
+    {
+      "item_id": "pj44_validator_script",
+      "origin_phase": "PJ44",
+      "status": "deferred",
+      "impact": "HUD file markers are not covered by a phase-specific validator yet.",
+      "repair_path": "Add PJ44 validator or include HUD checks in PJ51/PJ52 validation."
+    },
+    {
+      "item_id": "pj45_validator_script",
+      "origin_phase": "PJ45",
+      "status": "deferred",
+      "impact": "API bridge files exist, but PJ45 has no dedicated validator script yet.",
+      "repair_path": "Add API bridge validator or cover route checks in PJ51 validation."
+    },
+    {
+      "item_id": "pj46_prompt_runtime_module",
+      "origin_phase": "PJ46",
+      "status": "deferred",
+      "impact": "Prompt source of truth is JSON manifest; runtime module remains open.",
+      "repair_path": "Create prompt runtime loader that reads or mirrors PJ46 manifest safely."
+    },
+    {
+      "item_id": "pj46_validator_script",
+      "origin_phase": "PJ46",
+      "status": "deferred",
+      "impact": "Personality package has manifests and runtime personality helper, but no dedicated validator script yet.",
+      "repair_path": "Add validator or include PJ46 manifest checks in PJ51/PJ52."
+    }
+  ]
+}
