@@ -1,0 +1,50 @@
+{
+  "id": "jarvis-real-build-backlog",
+  "issue": 36,
+  "status": "active",
+  "priority": "implementation",
+  "items": [
+    {
+      "id": "JB-001",
+      "title": "Prove local Jarvis startup",
+      "goal": "Make http://127.0.0.1:3000/jarvis reachable from the Commander machine.",
+      "proof": ["CMD output", "server running", "browser loads Jarvis"]
+    },
+    {
+      "id": "JB-002",
+      "title": "Preserve Builder Core in GitHub",
+      "goal": "Complete local Builder Core chain and prove the files are committed to main.",
+      "proof": ["git status", "git log", "remote file check"]
+    },
+    {
+      "id": "JB-003",
+      "title": "Expose Commander real-build lock in runtime",
+      "goal": "Add runtime constants/API so Jarvis can display the active real-build lock and not drift.",
+      "proof": ["source file", "API response", "UI display"]
+    },
+    {
+      "id": "JB-004",
+      "title": "Rebuild Jarvis visual shell",
+      "goal": "Turn the locked visual identity into the real operating surface, not a background with generic cards.",
+      "proof": ["Jarvis client update", "CSS update", "screenshot review"]
+    },
+    {
+      "id": "JB-005",
+      "title": "Improve voice and response quality",
+      "goal": "Jarvis must greet, listen, speak, and answer with Commander-grade language and structure.",
+      "proof": ["wake greeting", "voice state", "response tests"]
+    },
+    {
+      "id": "JB-006",
+      "title": "Wire evidence and command state visibly",
+      "goal": "Jarvis must show what it did, what proof exists, and what is blocked.",
+      "proof": ["evidence drawer", "status panel", "blocked state"]
+    },
+    {
+      "id": "JB-007",
+      "title": "Build and smoke proof",
+      "goal": "Run build and smoke tests after implementation changes.",
+      "proof": ["npm run build", "smoke endpoint", "proof report"]
+    }
+  ]
+}
