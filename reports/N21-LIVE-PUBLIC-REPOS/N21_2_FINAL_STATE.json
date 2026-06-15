@@ -1,0 +1,19 @@
+{
+  "id": "N21_2_FINAL_STATE",
+  "branch": "n21-live-public-repo-adapters",
+  "public_repo": "DS4SD/docling",
+  "adapter": "DoclingAdapter",
+  "state": "review_safe_live_foundation_committed",
+  "created_routes": [
+    "/api/documents/extract",
+    "/api/jarvis/public-repos/docling-smart-intake"
+  ],
+  "created_services": [
+    "DocumentFieldMapper",
+    "DocumentExtractionService",
+    "DoclingSmartIntakeAdapter"
+  ],
+  "truth_write": "blocked",
+  "review_required": true,
+  "next": "N21.3_PLAYWRIGHT_SCOUT_GATEWAY"
+}
