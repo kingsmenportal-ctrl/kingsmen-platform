@@ -1,0 +1,31 @@
+{
+  "id": "jarvis-validation-law",
+  "pj": "PJ42.1",
+  "version": "1.0.0",
+  "purpose": "Validate that PJ42.1 law files exist and can be loaded by Kingsmen.",
+  "required_files": [
+    "docs/agents/PJ42_1_JARVIS_LAW_FILES.md",
+    "manifests/jarvis/pj42-1-jarvis-law-master.json",
+    "manifests/jarvis/jarvis-permission-law.json",
+    "manifests/jarvis/jarvis-memory-law.json",
+    "manifests/jarvis/jarvis-live-data-law.json",
+    "manifests/jarvis/jarvis-command-risk-law.json",
+    "manifests/jarvis/jarvis-visual-hud-law.json",
+    "manifests/jarvis/jarvis-evidence-law.json",
+    "manifests/jarvis/jarvis-validation-law.json"
+  ],
+  "required_checks": [
+    "files_exist",
+    "json_loads",
+    "commander_only_rule_present",
+    "risk_levels_present",
+    "memory_rules_present",
+    "live_data_rules_present",
+    "visual_hud_rules_present",
+    "evidence_rules_present",
+    "unknown_command_rule_present"
+  ],
+  "pass_message": "PJ42.1 law files are present and readable.",
+  "fail_message": "PJ42.1 is incomplete until missing law files are repaired.",
+  "next_phase": "PJ42.2 Jarvis Command Registry"
+}
