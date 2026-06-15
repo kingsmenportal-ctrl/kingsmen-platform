@@ -1,0 +1,16 @@
+{
+  "endpoint": "/api/routes/scout",
+  "method": "POST",
+  "body": {
+    "routeId": "route_cao_home",
+    "url": "https://www.cao.ac.za/",
+    "mode": "metadata_fetch",
+    "expectedKeywords": ["cao", "applications"]
+  },
+  "expectedSafety": {
+    "maySubmit": false,
+    "mayBypassCaptcha": false,
+    "mayHandleOtp": false,
+    "mayHandlePayment": false
+  }
+}
