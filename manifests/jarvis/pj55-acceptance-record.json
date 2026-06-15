@@ -1,0 +1,41 @@
+{
+  "id": "pj55-acceptance-record",
+  "pj": "PJ55",
+  "version": "1.0.0",
+  "acceptance_status": "accepted_for_preview_repair_track",
+  "accepted_as": [
+    "governed_runtime_foundation",
+    "commander_only_jarvis_path",
+    "law_manifest_package",
+    "runtime_kernel_start",
+    "api_bridge_start",
+    "hud_direction_start",
+    "memory_boundary_start",
+    "smoke_test_start",
+    "operator_runbook_start"
+  ],
+  "not_accepted_as": [
+    "final_production_release",
+    "fully_hardened_visual_ui",
+    "fully_closed_validator_suite",
+    "fully_proven_web_build",
+    "fully_proven_runtime_deployment"
+  ],
+  "minimum_preview_conditions": [
+    "commander_only_use",
+    "no_candidate_facing_jarvis",
+    "no direct public automation",
+    "no production claim",
+    "use evidence notes",
+    "run smoke checks when available"
+  ],
+  "minimum_production_conditions": [
+    "all deferred repair items closed",
+    "web build proof captured",
+    "runtime smoke proof captured",
+    "validator suite proof captured",
+    "hud proof captured",
+    "api proof captured",
+    "operator runbook proof captured"
+  ]
+}
