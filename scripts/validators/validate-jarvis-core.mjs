@@ -11,6 +11,7 @@ const requiredFiles = [
   'packages/jarvis-core/src/jarvis-evidence-ledger.ts',
   'packages/jarvis-core/src/jarvis-command-runner.ts',
   'packages/jarvis-core/src/jarvis-mini-builder-core.ts',
+  'packages/jarvis-core/src/jarvis-repo-map.ts',
   'packages/jarvis-core/src/index.ts'
 ];
 
@@ -60,6 +61,15 @@ const requiredTokens = new Map([
     'blockedPaths',
     'readyForPatchWriter',
     'JARVIS_BUILD_VALIDATOR_REQUIRED'
+  ]],
+  ['packages/jarvis-core/src/jarvis-repo-map.ts', [
+    'JarvisRepoMapInput',
+    'JarvisRepoMapResult',
+    'jarvisSelectRepoContext',
+    'selectedFiles',
+    'blockedFiles',
+    'ignoredFiles',
+    'DEFAULT_BLOCKED_PATTERNS'
   ]]
 ]);
 
@@ -89,6 +99,7 @@ const contract = read('packages/contracts/src/jarvis/index.ts');
 const policy = read('packages/jarvis-core/src/jarvis-policy-gate.ts');
 const registry = read('packages/jarvis-core/src/jarvis-tool-registry.ts');
 const miniBuilder = read('packages/jarvis-core/src/jarvis-mini-builder-core.ts');
+const repoMap = read('packages/jarvis-core/src/jarvis-repo-map.ts');
 
 if (!contract.includes("'whatsapp_urgent'")) {
   fail('Jarvis WhatsApp boundary missing: only whatsapp_urgent may be a Jarvis channel.');
@@ -110,6 +121,10 @@ if (!miniBuilder.includes('isPathInsideScope') || !miniBuilder.includes('isBlock
   fail('Jarvis mini builder must enforce scoped paths and blocked path patterns.');
 }
 
+if (!repoMap.includes('scoreFile') || !repoMap.includes('insideScope')) {
+  fail('Jarvis repo map must score files and enforce module scope.');
+}
+
 const report = {
   validator: 'validate-jarvis-core',
   status: 'passed',
@@ -121,7 +136,8 @@ const report = {
     emailPrimaryWhatsappUrgentOnly: true,
     evidenceLedgerRequired: true,
     connectorTrustRegistryRequired: true,
-    scopedBuilderRequired: true
+    scopedBuilderRequired: true,
+    repoContextSelectorRequired: true
   },
   files: evidence
 };
