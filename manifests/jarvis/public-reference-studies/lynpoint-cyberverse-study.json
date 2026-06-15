@@ -1,0 +1,43 @@
+{
+  "id": "PJ_PUBLIC_JARVIS_08_LYNPOINT_CYBERVERSE",
+  "status": "RECORDED",
+  "recordedBranch": "main",
+  "publicProject": "Lynpoint/CyberVerse",
+  "sourceUrl": "https://github.com/topics/jarvis-assistant",
+  "sourceType": "github-topic-listing",
+  "studyPath": "docs/jarvis/public-reference-studies/PJ_PUBLIC_JARVIS_08_LYNPOINT_CYBERVERSE.md",
+  "kingsmenDecision": "ADAPT_CAREFULLY_DO_NOT_CLONE_AS_AUTHORITY",
+  "usefulFor": [
+    "real_time_voice_presence",
+    "streaming_response_composer",
+    "webrtc_live_voice_gateway",
+    "turn_taking_controller",
+    "interrupt_cancel_handler",
+    "persona_memory_boundary",
+    "rag_context_router",
+    "future_avatar_surface"
+  ],
+  "mustReject": [
+    "ai_avatar_as_authority",
+    "always_on_camera_or_microphone_by_default",
+    "unbounded_persona_memory",
+    "production_tool_calls_without_approval",
+    "voice_layer_bypassing_backend_state_machine",
+    "unverified_rag_as_truth",
+    "candidate_data_in_personality_memory",
+    "visual_polish_before_functional_builder"
+  ],
+  "kingsmenBuildPriority": [
+    "text_command_engine",
+    "doctrine_policy_gate",
+    "command_registry",
+    "builder_core",
+    "evidence_ledger",
+    "validator_runner",
+    "app_connector_router",
+    "voice_input_speech_output",
+    "streaming_response_composer",
+    "webrtc_live_voice_gateway",
+    "optional_avatar_surface"
+  ]
+}
