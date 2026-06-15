@@ -10,6 +10,7 @@ type Message = {
   error?: string;
   tool?: string;
   ok?: boolean;
+  evidencePath?: string;
 };
 
 type AgentResponse = {
@@ -22,15 +23,33 @@ type AgentResponse = {
   createdPath?: string;
 };
 
-const quickTools = [
-  { label: "System status", tool: "SYSTEM_STATUS", message: "system status" },
-  { label: "Validate N20", tool: "VALIDATE_N20", message: "validate N20" },
-  { label: "Run build", tool: "RUN_WEB_BUILD", message: "run web build" },
-  { label: "Database scan", tool: "DATABASE_SCAN", message: "database scan" },
-  { label: "Probe routes", tool: "ROUTE_PROBE", message: "probe routes" },
-  { label: "Git status", tool: "GIT_STATUS", message: "git status" },
-  { label: "Create file", tool: "CREATE_FILE", message: "create a file saying Jarvis is connected and writing real files" },
-  { label: "Help", tool: "HELP", message: "what can you do" }
+type CommandCard = {
+  label: string;
+  tool: string;
+  message: string;
+  risk: "safe" | "review" | "approval";
+  surface: string;
+};
+
+const wakeGreeting =
+  "Welcome to Kingsmen Command, Commander. Jarvis is online. The command house is awake, your desk is prepared, and I stand ready.";
+
+const commandCards: CommandCard[] = [
+  { label: "System status", tool: "SYSTEM_STATUS", message: "system status", risk: "safe", surface: "System Health" },
+  { label: "Validate N20", tool: "VALIDATE_N20", message: "validate N20", risk: "approval", surface: "Validation" },
+  { label: "Run build", tool: "RUN_WEB_BUILD", message: "run web build", risk: "approval", surface: "Build" },
+  { label: "Database scan", tool: "DATABASE_SCAN", message: "database scan", risk: "review", surface: "Read Model" },
+  { label: "Probe routes", tool: "ROUTE_PROBE", message: "probe routes", risk: "approval", surface: "Route Scout" },
+  { label: "Git status", tool: "GIT_STATUS", message: "git status", risk: "safe", surface: "Repo" },
+  { label: "Create file", tool: "CREATE_FILE", message: "create a file saying Jarvis is connected and writing real files", risk: "approval", surface: "Safe File" },
+  { label: "Help", tool: "HELP", message: "what can you do", risk: "safe", surface: "Dialogue" }
+];
+
+const missionPanels = [
+  { title: "Runtime", value: "PJ43 linked", note: "Kernel modules created" },
+  { title: "HUD", value: "PJ44 active", note: "Commander visual layer" },
+  { title: "Evidence", value: "Required", note: "No success claim without proof" },
+  { title: "Approval", value: "Gated", note: "Risky commands require review" }
 ];
 
 function speak(text: string) {
@@ -51,6 +70,14 @@ function getSpeechRecognition() {
   return api.SpeechRecognition || api.webkitSpeechRecognition;
 }
 
+function confidenceFor(message?: Message) {
+  if (!message) return "standby";
+  if (message.ok === false) return "needs review";
+  if (message.evidencePath) return "evidence linked";
+  if (message.output) return "tool output";
+  return "dialogue";
+}
+
 export default function JarvisAgentClient() {
   const [input, setInput] = useState("system status");
   const [running, setRunning] = useState(false);
@@ -58,15 +85,24 @@ export default function JarvisAgentClient() {
   const [messages, setMessages] = useState<Message[]>([
     {
       role: "jarvis",
-      text: "Real Jarvis agent runtime online. I can run Kingsmen checks, scan PostgreSQL, probe routes, create safe files, run build, validate N20, and speak responses."
+      text: wakeGreeting,
+      ok: true
     }
   ]);
   const [visualActive, setVisualActive] = useState(false);
   const videoRef = useRef<HTMLVideoElement | null>(null);
   const streamRef = useRef<MediaStream | null>(null);
 
+  const lastJarvis = useMemo(() => {
+    return [...messages].reverse().find((message) => message.role === "jarvis");
+  }, [messages]);
+
   const lastOutput = useMemo(() => {
     return [...messages].reverse().find((message) => message.role === "jarvis" && message.output);
+  }, [messages]);
+
+  const evidenceItems = useMemo(() => {
+    return messages.filter((message) => message.role === "jarvis" && (message.evidencePath || message.tool || message.error));
   }, [messages]);
 
   async function runAgent(message: string, tool?: string) {
@@ -96,7 +132,8 @@ export default function JarvisAgentClient() {
           output: payload.stdout,
           error: payload.stderr,
           tool: payload.tool,
-          ok: payload.ok
+          ok: payload.ok,
+          evidencePath: payload.evidencePath
         }
       ]);
 
@@ -140,7 +177,7 @@ export default function JarvisAgentClient() {
 
     recognition.onstart = () => {
       setVoiceState("listening");
-      speak("Listening.");
+      speak("Listening, Commander.");
     };
 
     recognition.onresult = (event: any) => {
@@ -155,7 +192,7 @@ export default function JarvisAgentClient() {
     };
 
     recognition.onend = () => {
-      setVoiceState((current) => current === "listening" ? "voice ready" : current);
+      setVoiceState((current) => (current === "listening" ? "voice ready" : current));
     };
 
     recognition.start();
@@ -193,22 +230,33 @@ export default function JarvisAgentClient() {
       <section className={styles.frame}>
         <header className={styles.header}>
           <div>
-            <p className={styles.kicker}>KINGSMEN REAL JARVIS AGENT RUNTIME</p>
+            <p className={styles.kicker}>KINGSMEN COMMAND HOUSE · REAL JARVIS HUD</p>
             <h1>JARVIS</h1>
-            <p className={styles.subtitle}>
-              Connected local operator with tools, voice, speech response, route probes, DB scans, build, N20 validation, file creation, and evidence logging.
-            </p>
+            <p className={styles.subtitle}>{wakeGreeting}</p>
           </div>
-          <div className={styles.status}>
-            <span className={running ? styles.pulseWarn : styles.pulseOk} />
-            <strong>{running ? "EXECUTING" : "ONLINE"}</strong>
-            <small>{voiceState}</small>
+          <div className={styles.statusStack}>
+            <div className={styles.status}>
+              <span className={running ? styles.pulseWarn : styles.pulseOk} />
+              <strong>{running ? "EXECUTING" : "ONLINE"}</strong>
+              <small>{voiceState}</small>
+            </div>
+            <div className={styles.confidenceChip}>{confidenceFor(lastJarvis)}</div>
           </div>
         </header>
 
+        <section className={styles.missionBoard}>
+          {missionPanels.map((panel) => (
+            <article key={panel.title} className={styles.missionCard}>
+              <span>{panel.title}</span>
+              <strong>{panel.value}</strong>
+              <small>{panel.note}</small>
+            </article>
+          ))}
+        </section>
+
         <section className={styles.layout}>
           <aside className={styles.left}>
-            <div className={styles.orb}>
+            <div className={running ? styles.orbActive : styles.orb} aria-label="Jarvis voice orb">
               <div className={styles.r1} />
               <div className={styles.r2} />
               <div className={styles.core}>J</div>
@@ -217,7 +265,6 @@ export default function JarvisAgentClient() {
             <button className={styles.voiceButton} onClick={startVoice} disabled={running}>
               VOICE COMMAND
             </button>
-
             <button className={styles.voiceButton} onClick={toggleVisual}>
               {visualActive ? "STOP VISUAL FEED" : "START VISUAL FEED"}
             </button>
@@ -227,28 +274,40 @@ export default function JarvisAgentClient() {
               {!visualActive ? <span>visual feed standby</span> : null}
             </div>
 
-            <div className={styles.tools}>
-              {quickTools.map((item) => (
+            <section className={styles.approvalBox}>
+              <strong>Approval Gate</strong>
+              <p>Risky commands stay review-bound until PJ45 wiring connects runtime approval checks.</p>
+            </section>
+          </aside>
+
+          <section className={styles.chat}>
+            <div className={styles.commandDeck}>
+              {commandCards.map((item) => (
                 <button
                   key={item.tool}
+                  className={styles.commandCard}
                   onClick={() => {
                     setInput(item.message);
                     runAgent(item.message, item.tool);
                   }}
                   disabled={running}
                 >
-                  {item.label}
+                  <span>{item.surface}</span>
+                  <strong>{item.label}</strong>
+                  <small>{item.risk}</small>
                 </button>
               ))}
             </div>
-          </aside>
 
-          <section className={styles.chat}>
             <div className={styles.messages}>
               {messages.map((message, index) => (
                 <article key={index} className={message.role === "founder" ? styles.founderMsg : styles.jarvisMsg}>
-                  <strong>{message.role === "founder" ? "FOUNDER" : `JARVIS${message.tool ? ` · ${message.tool}` : ""}`}</strong>
+                  <div className={styles.messageMeta}>
+                    <strong>{message.role === "founder" ? "COMMANDER" : `JARVIS${message.tool ? ` · ${message.tool}` : ""}`}</strong>
+                    <span>{message.ok === false ? "needs review" : message.evidencePath ? "evidence" : "live"}</span>
+                  </div>
                   <p>{message.text}</p>
+                  {message.evidencePath ? <code className={styles.evidenceLine}>Evidence: {message.evidencePath}</code> : null}
                   {message.output ? <pre>{message.output}</pre> : null}
                   {message.error ? <pre className={styles.error}>{message.error}</pre> : null}
                 </article>
@@ -259,26 +318,45 @@ export default function JarvisAgentClient() {
               <input
                 value={input}
                 onChange={(event) => setInput(event.target.value)}
-                placeholder="Tell Jarvis what to do..."
+                placeholder="Command Jarvis from Kingsmen Command..."
               />
               <button disabled={running}>{running ? "RUNNING" : "SEND"}</button>
             </form>
           </section>
 
           <aside className={styles.right}>
-            <h2>Live output</h2>
-            {lastOutput?.output ? <pre>{lastOutput.output}</pre> : <p>No command output yet.</p>}
-            <h2>Real tools</h2>
-            <ul>
-              <li>System status</li>
-              <li>N20 validation</li>
-              <li>Web build</li>
-              <li>PostgreSQL DB scan</li>
-              <li>Route/API probe</li>
-              <li>Git status</li>
-              <li>Safe file creation</li>
-              <li>Evidence logging</li>
-            </ul>
+            <section className={styles.panel}>
+              <h2>Live output</h2>
+              {lastOutput?.output ? <pre>{lastOutput.output}</pre> : <p>No command output yet.</p>}
+            </section>
+
+            <section className={styles.panel}>
+              <h2>Evidence drawer</h2>
+              {evidenceItems.length ? (
+                <ul className={styles.evidenceList}>
+                  {evidenceItems.slice(-8).reverse().map((item, index) => (
+                    <li key={`${item.tool ?? "dialogue"}-${index}`}>
+                      <strong>{item.tool ?? "JARVIS"}</strong>
+                      <span>{item.evidencePath ?? item.error ?? "tool output captured"}</span>
+                    </li>
+                  ))}
+                </ul>
+              ) : (
+                <p>No evidence captured yet.</p>
+              )}
+            </section>
+
+            <section className={styles.panel}>
+              <h2>HUD surfaces</h2>
+              <ul>
+                <li>Mission board</li>
+                <li>Command deck</li>
+                <li>Voice orb</li>
+                <li>Approval gate</li>
+                <li>Evidence drawer</li>
+                <li>Source confidence chip</li>
+              </ul>
+            </section>
           </aside>
         </section>
       </section>
