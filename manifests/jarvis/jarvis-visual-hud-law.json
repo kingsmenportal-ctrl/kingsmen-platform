@@ -1,0 +1,48 @@
+{
+  "id": "jarvis-visual-hud-law",
+  "pj": "PJ42.1",
+  "version": "1.0.0",
+  "purpose": "Ensure Real Jarvis is built as a visual command HUD, not a plain chat screen.",
+  "plain_chat_only_allowed": false,
+  "required_surfaces": [
+    "commander_wake_screen",
+    "jarvis_voice_orb",
+    "live_response_stream",
+    "command_cards",
+    "mission_board",
+    "tool_use_indicator",
+    "source_confidence_chips",
+    "evidence_drawer",
+    "approval_modal",
+    "system_health_panel",
+    "portal_scout_screenshot_cards",
+    "route_intelligence_panel",
+    "finance_health_panel",
+    "document_pipeline_panel",
+    "mobile_founder_view"
+  ],
+  "required_card_fields": [
+    "title",
+    "status",
+    "risk_level",
+    "source_confidence",
+    "last_updated",
+    "next_action",
+    "evidence_link_or_reference"
+  ],
+  "visual_statuses": [
+    "online",
+    "thinking",
+    "using_tool",
+    "awaiting_approval",
+    "completed",
+    "blocked",
+    "failed",
+    "needs_review"
+  ],
+  "branding_law": {
+    "must_use_kingsmen_language": true,
+    "must_keep_commander_only_tone": true,
+    "must_not_sound_like_public_support_bot": true
+  }
+}
