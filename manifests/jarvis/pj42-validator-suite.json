@@ -1,0 +1,28 @@
+{
+  "id": "pj42-validator-suite",
+  "pj": "PJ42_CLOSEOUT",
+  "version": "1.0.0",
+  "validators": [
+    "scripts/jarvis/validate-pj42-2-command-registry.mjs",
+    "scripts/jarvis/validate-pj42-3-intent-router.mjs",
+    "scripts/jarvis/validate-pj42-4-tool-router.mjs",
+    "scripts/jarvis/validate-pj42-5-source-confidence.mjs",
+    "scripts/jarvis/validate-pj42-6-knowledge-brain.mjs",
+    "scripts/jarvis/validate-pj42-7-live-data-router.mjs",
+    "scripts/jarvis/validate-pj42-8-visual-hud.mjs",
+    "scripts/jarvis/validate-pj42-9-approval-evidence.mjs",
+    "scripts/jarvis/validate-pj42-10-voice-interface.mjs",
+    "scripts/jarvis/validate-pj42-closeout-kernel-assembly.mjs"
+  ],
+  "required_validator_behavior": [
+    "fail_when_required_file_missing",
+    "fail_when_json_invalid",
+    "fail_when_unknown_command_not_blocked",
+    "fail_when_unknown_tool_not_blocked",
+    "fail_when_evidence_rule_missing",
+    "fail_when_voice_bypasses_policy",
+    "fail_when_visual_hud_missing",
+    "fail_when_raw_private_records_are_indexable"
+  ],
+  "recommended_script": "node scripts/jarvis/validate-pj42-closeout-kernel-assembly.mjs"
+}
