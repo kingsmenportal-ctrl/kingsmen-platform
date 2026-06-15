@@ -1,0 +1,29 @@
+{
+  "title": "Jarvis Visual HUD Schema",
+  "type": "object",
+  "required": ["id", "pj", "version", "surfaces"],
+  "properties": {
+    "id": { "type": "string" },
+    "pj": { "type": "string" },
+    "version": { "type": "string" },
+    "surfaces": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["surface_id", "label", "surface_type", "description", "required_states", "required_fields", "mobile_required", "evidence_visible", "approval_visible", "source_confidence_visible"],
+        "properties": {
+          "surface_id": { "type": "string" },
+          "label": { "type": "string" },
+          "surface_type": { "type": "string" },
+          "description": { "type": "string" },
+          "required_states": { "type": "array", "items": { "type": "string" } },
+          "required_fields": { "type": "array", "items": { "type": "string" } },
+          "mobile_required": { "type": "boolean" },
+          "evidence_visible": { "type": "boolean" },
+          "approval_visible": { "type": "boolean" },
+          "source_confidence_visible": { "type": "boolean" }
+        }
+      }
+    }
+  }
+}
