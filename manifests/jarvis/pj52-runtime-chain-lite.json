@@ -1,0 +1,19 @@
+{
+  "id": "pj52-runtime-chain-lite",
+  "pj": "PJ52",
+  "version": "1.0.0",
+  "steps": [
+    "input",
+    "api",
+    "kernel",
+    "intent",
+    "command",
+    "check",
+    "route",
+    "context",
+    "confidence",
+    "record",
+    "answer",
+    "output"
+  ]
+}
