@@ -1,0 +1,43 @@
+{
+  "id": "jarvis-evidence-law",
+  "pj": "PJ42.1",
+  "version": "1.0.0",
+  "purpose": "Define what proof Jarvis must capture for answers, actions, tools, and failures.",
+  "evidence_required_for": [
+    "tool_backed_answer",
+    "live_research_answer",
+    "system_status_answer",
+    "repo_inspection_answer",
+    "playwright_scout_result",
+    "generated_report",
+    "write_action",
+    "workflow_trigger",
+    "approval_request",
+    "blocked_command",
+    "failed_command"
+  ],
+  "minimum_evidence_fields": [
+    "evidence_id",
+    "timestamp",
+    "actor",
+    "command_id",
+    "tool_name",
+    "risk_level",
+    "source_confidence",
+    "input_summary",
+    "result_summary",
+    "next_safe_action"
+  ],
+  "conditional_fields": {
+    "live_source_used": ["source_url", "source_title", "retrieved_at"],
+    "portal_scout_used": ["portal_url", "screenshot_reference", "blocker_detected", "manual_fallback_required"],
+    "failure_occurred": ["failure_reason", "retry_allowed", "manual_review_required"],
+    "approval_required": ["approval_id", "approval_status", "approved_by", "approval_timestamp"]
+  },
+  "claim_rules": {
+    "no_success_claim_without_evidence": true,
+    "no_official_status_claim_without_source": true,
+    "no_deadline_or_fee_claim_without_recent_source": true,
+    "state_uncertainty_when_evidence_is_incomplete": true
+  }
+}
