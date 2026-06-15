@@ -1,0 +1,42 @@
+{
+  "pass": "08",
+  "status": "built",
+  "branch": "main",
+  "purpose": "Founder-console static shell, safe client state, UI data fixtures, and smoke validator for Jarvis HUD/read surfaces.",
+  "builtFiles": [
+    "packages/jarvis-core/src/jarvis-founder-console-static-html.ts",
+    "packages/jarvis-core/src/jarvis-founder-console-client-state.ts",
+    "packages/jarvis-core/src/jarvis-hud-panel-data-fixture.ts",
+    "packages/jarvis-core/src/jarvis-review-queue-fixture.ts",
+    "packages/jarvis-core/src/jarvis-validation-report-fixture.ts",
+    "scripts/validators/validate-jarvis-live-pass-08.mjs",
+    "manifests/jarvis/live-build-passes/pass-08.json"
+  ],
+  "capabilities": [
+    "JarvisFounderConsoleStaticHtml",
+    "JarvisFounderConsoleClientState",
+    "JarvisHudPanelDataFixture",
+    "JarvisReviewQueueFixture",
+    "JarvisValidationReportFixture",
+    "JarvisConsoleSmokeValidator"
+  ],
+  "validator": {
+    "script": "node scripts/validators/validate-jarvis-live-pass-08.mjs",
+    "reportPath": "reports/jarvis/validate-jarvis-live-pass-08.json"
+  },
+  "authorityBoundary": [
+    "Static HTML is a founder console shell only.",
+    "Client state stores safe display state only.",
+    "Fixtures are deterministic smoke data and not production truth.",
+    "HUD and console output remain informational, not final system authority.",
+    "Backend state machine, PostgreSQL truth, validators, evidence, and founder approval remain authoritative."
+  ],
+  "nextTargets": [
+    "JarvisFounderConsoleRouteMount",
+    "JarvisConsoleFixtureComposer",
+    "JarvisConsoleStaticSmokePage",
+    "JarvisPass08ExportIndex",
+    "JarvisConsoleStyleContract",
+    "JarvisConsoleAccessibilityCheck"
+  ]
+}
