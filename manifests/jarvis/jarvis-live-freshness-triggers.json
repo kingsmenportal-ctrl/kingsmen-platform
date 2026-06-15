@@ -1,0 +1,82 @@
+{
+  "id": "jarvis-live-freshness-triggers",
+  "pj": "PJ42.7",
+  "version": "1.0.0",
+  "must_route_live_when_terms_present": [
+    "today",
+    "now",
+    "latest",
+    "current",
+    "this week",
+    "this month",
+    "deadline",
+    "closing date",
+    "opening date",
+    "fee",
+    "price",
+    "cost",
+    "weather",
+    "time",
+    "news",
+    "job",
+    "vacancy",
+    "learnership",
+    "bursary",
+    "status",
+    "portal",
+    "online",
+    "down",
+    "repo",
+    "build",
+    "commit",
+    "issue"
+  ],
+  "freshness_domains": [
+    {
+      "domain": "deadlines",
+      "route_preference": ["web_research_live", "source_registry_snapshot_live", "blocked_manual_review_live"],
+      "memory_allowed_as_final_answer": false
+    },
+    {
+      "domain": "fees",
+      "route_preference": ["web_research_live", "playwright_scout_live", "blocked_manual_review_live"],
+      "memory_allowed_as_final_answer": false
+    },
+    {
+      "domain": "jobs_learnerships_bursaries",
+      "route_preference": ["web_research_live", "source_registry_snapshot_live", "blocked_manual_review_live"],
+      "memory_allowed_as_final_answer": false
+    },
+    {
+      "domain": "portal_health",
+      "route_preference": ["playwright_scout_live", "web_research_live", "blocked_manual_review_live"],
+      "memory_allowed_as_final_answer": false
+    },
+    {
+      "domain": "repo_build_status",
+      "route_preference": ["github_live", "system_health_live"],
+      "memory_allowed_as_final_answer": false
+    },
+    {
+      "domain": "system_status",
+      "route_preference": ["system_health_live", "github_live"],
+      "memory_allowed_as_final_answer": false
+    },
+    {
+      "domain": "weather_time_finance_utility",
+      "route_preference": ["utility_api_live"],
+      "memory_allowed_as_final_answer": false
+    },
+    {
+      "domain": "static_kingsmen_doctrine",
+      "route_preference": ["github_live", "source_registry_snapshot_live"],
+      "memory_allowed_as_final_answer": true
+    }
+  ],
+  "fallback_rules": {
+    "memory_only_for_current_fact": "state_live_verification_required",
+    "live_route_unavailable": "state_live_verification_failed_and_offer_manual_check",
+    "source_conflict_detected": "route_to_blocked_manual_review_live",
+    "source_confidence_below_medium": "route_to_blocked_manual_review_live"
+  }
+}
