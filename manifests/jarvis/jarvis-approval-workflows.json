@@ -1,0 +1,39 @@
+{
+  "id": "jarvis-approval-workflows",
+  "pj": "PJ42.9",
+  "version": "1.0.0",
+  "workflows": [
+    {
+      "workflow_id": "approval_not_required",
+      "description": "Safe read or safe generate command proceeds without approval but still records evidence.",
+      "steps": ["classify_risk", "confirm_no_approval_required", "run_adapter", "write_evidence", "answer_commander"]
+    },
+    {
+      "workflow_id": "approval_required_before_tool",
+      "description": "Risky command must show approval modal before adapter execution.",
+      "steps": ["classify_risk", "build_approval_request", "show_approval_modal", "await_decision", "run_adapter_if_approved", "write_evidence", "answer_commander"]
+    },
+    {
+      "workflow_id": "review_required_before_external_use",
+      "description": "Generated output may be created, but external/public use requires Commander review.",
+      "steps": ["generate_reviewable_output", "write_evidence", "mark_external_use_pending_review", "answer_commander"]
+    },
+    {
+      "workflow_id": "blocked_action_refusal",
+      "description": "Blocked command never executes active adapter; blocked evidence and safe redirect are returned.",
+      "steps": ["identify_blocked_rule", "write_blocked_evidence", "show_blocked_card", "provide_safe_redirect"]
+    },
+    {
+      "workflow_id": "tool_failure_path",
+      "description": "Tool failure returns failure evidence and next safe action, not a success claim.",
+      "steps": ["capture_failure", "write_failure_evidence", "show_failure_card", "recommend_retry_or_manual_path"]
+    }
+  ],
+  "approval_expiry_policy": {
+    "approval_expires_when_command_changes": true,
+    "approval_expires_when_target_changes": true,
+    "approval_expires_when_risk_level_changes": true,
+    "default_expiry_minutes": 30
+  },
+  "commander_decision_values": ["approve", "deny", "revise", "defer"]
+}
