@@ -1,0 +1,49 @@
+{
+  "id": "jarvis-live-cache-policy",
+  "pj": "PJ42.7",
+  "version": "1.0.0",
+  "core_rules": {
+    "cache_is_supporting_evidence_not_truth_for_current_facts": true,
+    "cache_must_include_retrieved_at": true,
+    "cache_must_include_route_id": true,
+    "cache_must_include_source_confidence_band": true,
+    "expired_cache_requires_live_refresh": true,
+    "conflicting_cache_requires_review": true
+  },
+  "ttl_seconds_by_domain": {
+    "weather": 900,
+    "time": 60,
+    "finance": 300,
+    "news": 1800,
+    "portal_health": 3600,
+    "deadline_page": 86400,
+    "fee_page": 259200,
+    "jobs": 86400,
+    "learnerships": 86400,
+    "bursaries": 259200,
+    "repo_status": 300,
+    "build_evidence": 300,
+    "system_status": 60,
+    "static_kingsmen_doctrine": 604800,
+    "source_registry_snapshot": 604800
+  },
+  "cache_entry_required_fields": [
+    "cache_id",
+    "route_id",
+    "domain",
+    "query_summary",
+    "retrieved_at",
+    "expires_at",
+    "source_reference",
+    "source_confidence_band",
+    "evidence_reference",
+    "stale_after_seconds"
+  ],
+  "cache_use_rules": {
+    "may_use_cache_without_refresh_for_static_doctrine": true,
+    "may_use_cache_without_refresh_for_current_deadlines": false,
+    "may_use_cache_without_refresh_for_fees": false,
+    "may_use_cache_without_refresh_for_portal_health": false,
+    "may_use_cache_without_refresh_for_repo_status": false
+  }
+}
