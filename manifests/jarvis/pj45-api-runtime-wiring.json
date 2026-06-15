@@ -1,0 +1,35 @@
+{
+  "id": "pj45-api-runtime-wiring",
+  "pj": "PJ45",
+  "version": "1.0.0",
+  "issue": 25,
+  "purpose": "Connect PJ43 Jarvis runtime metadata to existing Jarvis API responses.",
+  "existing_routes": [
+    "apps/web/src/app/api/jarvis/agent/route.ts",
+    "apps/web/src/app/api/jarvis/command/route.ts"
+  ],
+  "runtime_import": "apps/web/src/lib/jarvis/runtime/kernel.ts",
+  "bridge_file": "apps/web/src/lib/jarvis/api/api-runtime-bridge.ts",
+  "response_contract": "manifests/jarvis/pj45-api-response-contract.json",
+  "required_response_fields": [
+    "ok",
+    "reply",
+    "selectedTool",
+    "kernel",
+    "evidencePath",
+    "startedAt",
+    "finishedAt",
+    "durationMs"
+  ],
+  "kernel_fields": [
+    "ok",
+    "answer",
+    "intent",
+    "command",
+    "policy",
+    "toolRoute",
+    "sourceConfidence",
+    "evidence"
+  ],
+  "next_phase": "PJ46 — Jarvis System Prompt and Personality Kernel"
+}
