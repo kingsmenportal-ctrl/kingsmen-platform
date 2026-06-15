@@ -1,0 +1,29 @@
+{
+  "id": "jarvis-memory-redaction-policy",
+  "pj": "PJ48",
+  "version": "1.0.0",
+  "purpose": "Keep Jarvis memory entries as safe summaries before storage.",
+  "redaction_rules": [
+    {
+      "rule_id": "summary_not_body",
+      "description": "Store summary, status, source reference, and decision only. Do not store full bodies."
+    },
+    {
+      "rule_id": "mask_identifiers",
+      "description": "Mask direct identifiers unless a Commander-approved summary requires a non-sensitive label."
+    },
+    {
+      "rule_id": "mask_access_material",
+      "description": "Never store access strings, session strings, or credential-like content in memory."
+    },
+    {
+      "rule_id": "preserve_source_reference",
+      "description": "Keep enough source reference to retrieve the original approved evidence trail."
+    },
+    {
+      "rule_id": "preserve_status_label",
+      "description": "Keep locked, validated, planned, stale, conflicting, blocked, or needs-review status."
+    }
+  ],
+  "redaction_result_statuses": ["safe_summary", "needs_review", "blocked"]
+}
