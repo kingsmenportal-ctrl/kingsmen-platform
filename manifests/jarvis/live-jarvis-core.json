@@ -1,0 +1,48 @@
+{
+  "manifestRef": "jarvis-live-core-v0",
+  "status": "built",
+  "branch": "main",
+  "purpose": "Live Kingsmen Jarvis foundation: typed commands, tool trust registry, policy gate, evidence ledger, command runner, and validator wiring.",
+  "notReferenceOnly": true,
+  "authorityDoctrine": {
+    "backendRemainsAuthority": true,
+    "postgresTruthVaultRemainsAuthority": true,
+    "githubRepoIsBuildEvidence": true,
+    "founderApprovalRequiredForProductionRisk": true,
+    "whatsappUrgentOnly": true,
+    "noUselessLayers": true
+  },
+  "builtFiles": [
+    "packages/contracts/src/jarvis/index.ts",
+    "packages/jarvis-core/src/jarvis-policy-gate.ts",
+    "packages/jarvis-core/src/jarvis-tool-registry.ts",
+    "packages/jarvis-core/src/jarvis-evidence-ledger.ts",
+    "packages/jarvis-core/src/jarvis-command-runner.ts",
+    "packages/jarvis-core/src/index.ts",
+    "scripts/validators/validate-jarvis-core.mjs"
+  ],
+  "npmScripts": {
+    "test": "node scripts/validators/validate-jarvis-core.mjs",
+    "jarvis:validate": "node scripts/validators/validate-jarvis-core.mjs"
+  },
+  "liveCapabilities": [
+    "JarvisCommandEnvelope",
+    "JarvisToolCapabilityCard",
+    "JarvisPolicyDecision",
+    "JarvisEvidenceEvent",
+    "JarvisPolicyGate",
+    "JarvisToolRegistry",
+    "JarvisEvidenceLedger",
+    "JarvisCommandRunner",
+    "JarvisCoreValidator"
+  ],
+  "nextBuildTargets": [
+    "JarvisMiniBuilderCore",
+    "JarvisRepoMap",
+    "JarvisPatchPlanContract",
+    "JarvisChangedFilesReporter",
+    "JarvisValidatorResultLedger",
+    "JarvisHudReadModel"
+  ],
+  "createdAtIso": "2026-06-15T00:00:00.000+02:00"
+}
