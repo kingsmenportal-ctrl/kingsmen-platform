@@ -4,3 +4,4 @@ export * from './jarvis-tool-registry';
 export * from './jarvis-evidence-ledger';
 export * from './jarvis-command-runner';
 export * from './jarvis-mini-builder-core';
+export * from './jarvis-repo-map';
