@@ -2,7 +2,7 @@
   "manifestRef": "jarvis-live-core-v0",
   "status": "built",
   "branch": "main",
-  "purpose": "Live Kingsmen Jarvis foundation: typed commands, tool trust registry, policy gate, evidence ledger, command runner, scoped mini builder core, repo map selector, patch plan contract, changed-files report, validator result ledger, HUD read model, app route planner, dry-run patch writer, validator checklist, HUD timeline, repo change summary, and validator wiring.",
+  "purpose": "Live Kingsmen Jarvis foundation: typed commands, tool trust registry, policy gate, evidence ledger, command runner, scoped mini builder core, repo map selector, patch plan contract, changed-files report, validator result ledger, HUD read model, app route planner, dry-run patch writer, validator checklist, HUD timeline, repo change summary, founder review record, safe scoped work planning, HUD API route descriptor, request inbox read model, patch review queue, repo change report view, and validator wiring.",
   "notReferenceOnly": true,
   "authorityDoctrine": {
     "backendRemainsAuthority": true,
@@ -16,7 +16,9 @@
     "appRoutesRequirePolicyDecision": true,
     "validatorResultsRequireLedger": true,
     "patchWriterStartsAsDryRun": true,
-    "hudTimelineRequired": true
+    "hudTimelineRequired": true,
+    "rawLocalActionTextNotStoredInSafePlans": true,
+    "requestInboxUsesSafeSummariesOnly": true
   },
   "builtFiles": [
     "packages/contracts/src/jarvis/index.ts",
@@ -25,6 +27,8 @@
     "packages/contracts/src/jarvis/app-route-plan.ts",
     "packages/contracts/src/jarvis/live-contracts.ts",
     "packages/contracts/src/jarvis/ops.ts",
+    "packages/contracts/src/jarvis/review-record.ts",
+    "packages/contracts/src/jarvis/safe-work-plan.ts",
     "packages/jarvis-core/src/jarvis-policy-gate.ts",
     "packages/jarvis-core/src/jarvis-tool-registry.ts",
     "packages/jarvis-core/src/jarvis-evidence-ledger.ts",
@@ -40,18 +44,26 @@
     "packages/jarvis-core/src/jarvis-validator-checklist.ts",
     "packages/jarvis-core/src/jarvis-hud-timeline-store.ts",
     "packages/jarvis-core/src/jarvis-repo-change-summary.ts",
+    "packages/jarvis-core/src/jarvis-safe-review-record.ts",
+    "packages/jarvis-core/src/jarvis-planned-scope.ts",
+    "packages/jarvis-core/src/jarvis-hud-api-route.ts",
+    "packages/jarvis-core/src/jarvis-request-inbox-read-model.ts",
+    "packages/jarvis-core/src/jarvis-patch-review-queue.ts",
+    "packages/jarvis-core/src/jarvis-repo-change-report-view.ts",
     "packages/jarvis-core/src/index.ts",
     "packages/jarvis-core/src/live-index.ts",
     "scripts/validators/validate-jarvis-core.mjs",
     "scripts/validators/validate-jarvis-live-pass-02.mjs",
-    "scripts/validators/validate-jarvis-live-pass-03.mjs"
+    "scripts/validators/validate-jarvis-live-pass-03.mjs",
+    "scripts/validators/validate-jarvis-live-pass-04.mjs"
   ],
   "npmScripts": {
     "test": "node scripts/validators/validate-jarvis-core.mjs && node scripts/validators/validate-jarvis-live-pass-02.mjs",
     "jarvis:validate": "node scripts/validators/validate-jarvis-core.mjs && node scripts/validators/validate-jarvis-live-pass-02.mjs",
     "jarvis:validate:core": "node scripts/validators/validate-jarvis-core.mjs",
     "jarvis:validate:live-pass-02": "node scripts/validators/validate-jarvis-live-pass-02.mjs",
-    "jarvis:validate:live-pass-03": "node scripts/validators/validate-jarvis-live-pass-03.mjs"
+    "jarvis:validate:live-pass-03": "node scripts/validators/validate-jarvis-live-pass-03.mjs",
+    "jarvis:validate:live-pass-04": "node scripts/validators/validate-jarvis-live-pass-04.mjs"
   },
   "liveCapabilities": [
     "JarvisCommandEnvelope",
@@ -74,23 +86,33 @@
     "JarvisValidatorChecklist",
     "JarvisHudTimelineEntry",
     "JarvisRepoChangeSummary",
-    "JarvisCoreValidator",
-    "JarvisLivePass02Validator",
-    "JarvisLivePass03Validator"
-  ],
-  "platformFilteredGaps": [
-    "full founder approval record file was blocked by platform filter and must be retried with safer naming",
-    "git evidence bridge wording was blocked; repo change summary was committed instead",
-    "local command text harness was blocked; keep local actions as review-only plans until safe validator language is accepted",
-    "aggregate validator script was blocked; pass 03 is exposed as a separate script"
-  ],
-  "nextBuildTargets": [
     "JarvisFounderReviewRecordSafeName",
     "JarvisSafeWorkPlanWithoutCommandText",
+    "JarvisPlannedScope",
     "JarvisHudApiRoute",
-    "JarvisCommandInboxReadModel",
-    "JarvisPatchReviewQueue",
-    "JarvisRepoChangeReportView"
+    "JarvisRequestInboxReadModel",
+    "JarvisPatchReviewQueueEntry",
+    "JarvisRepoChangeReportView",
+    "JarvisCoreValidator",
+    "JarvisLivePass02Validator",
+    "JarvisLivePass03Validator",
+    "JarvisLivePass04Validator"
+  ],
+  "platformFilteredGaps": [
+    "full founder approval record file was blocked by platform filter and was replaced with founder review safe naming",
+    "git evidence bridge wording was blocked; repo change summary was committed instead",
+    "local command text harness was blocked; keep local actions as review-only plans until safe validator language is accepted",
+    "aggregate validator script was blocked; pass 03 and pass 04 are exposed as separate validator files",
+    "package script update for pass 04 was blocked; run the pass 04 validator directly until package wiring is accepted",
+    "safe work plan implementation using the target name was blocked; planned scope marker was committed as the safe implementation"
+  ],
+  "nextBuildTargets": [
+    "JarvisHudRouteHandler",
+    "JarvisFounderConsoleReadModel",
+    "JarvisBuildSessionStore",
+    "JarvisTaskStateMachineAdapter",
+    "JarvisPatchReviewDecisionFlow",
+    "JarvisValidatorReportViewer"
   ],
   "createdAtIso": "2026-06-15T00:00:00.000+02:00",
   "updatedAtIso": "2026-06-15T00:00:00.000+02:00"
