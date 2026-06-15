@@ -1,0 +1,27 @@
+{
+  "id": "jarvis-intent-router-validation",
+  "pj": "PJ42.3",
+  "version": "1.0.0",
+  "required_files": [
+    "docs/agents/PJ42_3_JARVIS_INTENT_ROUTER.md",
+    "manifests/jarvis/jarvis-intent-router.schema.json",
+    "manifests/jarvis/jarvis-intent-taxonomy.json",
+    "manifests/jarvis/jarvis-intent-routing-matrix.json",
+    "manifests/jarvis/jarvis-intent-classifier-rules.json",
+    "manifests/jarvis/jarvis-intent-router-validation.json",
+    "scripts/jarvis/validate-pj42-3-intent-router.mjs"
+  ],
+  "required_checks": [
+    "files_exist",
+    "json_loads",
+    "intent_ids_unique",
+    "routing_matrix_references_known_intents",
+    "classifier_rules_reference_known_intents",
+    "intent_command_families_defined",
+    "blocked_intent_present",
+    "low_confidence_fallback_present",
+    "freshness_rules_present",
+    "policy_gate_rules_present"
+  ],
+  "next_phase": "PJ42.4 Tool Router"
+}
