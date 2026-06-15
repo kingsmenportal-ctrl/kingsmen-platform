@@ -48,6 +48,15 @@ const commandByIntent: Record<JarvisIntentId, JarvisCommandDefinition> = {
     evidenceRequired: true,
     adapterId: 'github_adapter',
   },
+  public_repo_integration: {
+    commandId: 'PUBLIC_REPO_INTEGRATION_BOARD',
+    label: 'Public Repo Integration Board',
+    category: 'public_repo_integration',
+    riskLevel: 'safe_read',
+    approvalRequired: false,
+    evidenceRequired: true,
+    adapterId: 'public_repo_registry_adapter',
+  },
   system_health: {
     commandId: 'SYSTEM_STATUS',
     label: 'System Status',
