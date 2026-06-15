@@ -1,0 +1,37 @@
+{
+  "id": "pj51-build-validation",
+  "pj": "PJ51",
+  "version": "1.0.0",
+  "build_surfaces": [
+    {
+      "surface_id": "root_package",
+      "path": "package.json",
+      "required_script": null,
+      "note": "Root package currently holds repository metadata and base dependencies."
+    },
+    {
+      "surface_id": "web_package",
+      "path": "apps/web/package.json",
+      "required_script": "build",
+      "expected_command": "npm run build --workspace apps/web or cd apps/web && npm run build"
+    },
+    {
+      "surface_id": "web_tsconfig",
+      "path": "apps/web/tsconfig.json",
+      "required_options": ["strict", "noEmit", "moduleResolution", "paths"]
+    }
+  ],
+  "runtime_build_checks": [
+    "runtime index exports required modules",
+    "kernel route imports runtime bridge",
+    "smoke route imports smoke suite",
+    "runtime files are TypeScript modules",
+    "validators are JavaScript modules"
+  ],
+  "build_readiness_output": {
+    "must_report_missing_files": true,
+    "must_report_missing_exports": true,
+    "must_report_deferred_repairs": true,
+    "must_report_build_script_status": true
+  }
+}
