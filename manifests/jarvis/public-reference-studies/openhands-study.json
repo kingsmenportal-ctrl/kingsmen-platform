@@ -1,0 +1,43 @@
+{
+  "id": "PJ_PUBLIC_JARVIS_16_OPENHANDS",
+  "status": "RECORDED",
+  "recorded_branch": "main",
+  "project_name": "OpenHands",
+  "former_name": "OpenDevin",
+  "category": "software-development-agent-platform",
+  "primary_lessons": [
+    "repo-aware software builder",
+    "sandboxed execution",
+    "shell and browser operation",
+    "file editing and patch writing",
+    "iterative repair loop",
+    "validator-first workflow",
+    "lifecycle control",
+    "security boundaries"
+  ],
+  "kingsmen_components_informed": [
+    "JarvisBuilderCore",
+    "JarvisWorkspace",
+    "JarvisSandboxExecutor",
+    "JarvisRepoExplorer",
+    "JarvisPatchWriter",
+    "JarvisShellRunner",
+    "JarvisBrowserScout",
+    "JarvisValidatorRunner",
+    "JarvisRepairLoop",
+    "JarvisLifecycleController",
+    "JarvisChangedFilesReporter",
+    "JarvisSecurityAnalyzer"
+  ],
+  "must_reject": [
+    "unrestricted shell access",
+    "silent file edits with no evidence",
+    "production environment execution by default",
+    "repo-wide rewrites without module scope",
+    "automatic deployment without approval",
+    "secret exposure through logs",
+    "long autonomous loops without progress checkpoints"
+  ],
+  "doctrine_anchor": "docs/N00-doctrine/jarvis-app-connector-law.md",
+  "study_file": "docs/jarvis/public-reference-studies/PJ_PUBLIC_JARVIS_16_OPENHANDS.md"
+}
