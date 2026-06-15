@@ -1,0 +1,32 @@
+{
+  "id": "PJ_PUBLIC_JARVIS_02_NEKO",
+  "status": "RECORDED",
+  "branch": "kimi-kingsmen-setup",
+  "source_project": "Project-N-E-K-O/N.E.K.O",
+  "category": "public_jarvis_reference_study",
+  "source_summary": "AI companion pattern: watches, reads, listens, plays alongside user; memory and embodied emotional engine.",
+  "kingsmen_fit": [
+    "conversation continuity",
+    "session memory",
+    "context awareness",
+    "voice and HUD presence",
+    "personality kernel"
+  ],
+  "kingsmen_rejections": [
+    "uncontrolled always-watching behavior",
+    "emotion engine as decision authority",
+    "waifu or entertainment-first dependency",
+    "storing sensitive candidate data in memory",
+    "bypassing doctrine or approval gates"
+  ],
+  "repo_record": "docs/jarvis/public-reference-studies/PJ_PUBLIC_JARVIS_02_NEKO.md",
+  "implementation_boundary": "Reference only. Do not import external code without separate review.",
+  "production_boundary": "No production app access or candidate data access is granted by this study.",
+  "next_recommended_build_modules": [
+    "conversation-engine",
+    "session-memory",
+    "context-snapshot-boundary",
+    "personality-kernel",
+    "voice-session"
+  ]
+}
