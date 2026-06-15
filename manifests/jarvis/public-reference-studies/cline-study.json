@@ -1,0 +1,39 @@
+{
+  "study_id": "PJ_PUBLIC_JARVIS_19",
+  "name": "Cline",
+  "public_repository": "cline/cline",
+  "category": "repo-native coding agent / IDE and CLI builder reference",
+  "recorded_path": "docs/jarvis/public-reference-studies/PJ_PUBLIC_JARVIS_19_CLINE.md",
+  "recorded_branch": "main",
+  "kingsmen_lessons": [
+    "JarvisBuildPlanMode",
+    "JarvisApprovedActionMode",
+    "JarvisRepoRulesLoader",
+    "JarvisDiffCheckpointLedger",
+    "JarvisValidatorCommandRunner",
+    "JarvisTerminalOutputWatcher",
+    "JarvisToolAdapterBridge",
+    "JarvisMcpBridge",
+    "JarvisBuilderSquad",
+    "JarvisScheduledRepoHealthAgent",
+    "JarvisChannelAccessControl"
+  ],
+  "kingsmen_rejects": [
+    "auto_approval_by_default",
+    "repo_wide_edits_without_scope",
+    "terminal_commands_without_risk_classification",
+    "production_deployment_from_builder_mode",
+    "secrets_in_prompts_logs_or_commits",
+    "unreviewed_community_tools_or_mcp_servers",
+    "unpaired_messaging_channel_control",
+    "scheduled_production_risk_actions_without_founder_approval"
+  ],
+  "doctrine_alignment": [
+    "repo_first_build_rule",
+    "human_in_the_loop_approval",
+    "validators_before_commit_or_push",
+    "evidence_ledger_required",
+    "production_actions_require_founder_approval"
+  ],
+  "status": "recorded"
+}
