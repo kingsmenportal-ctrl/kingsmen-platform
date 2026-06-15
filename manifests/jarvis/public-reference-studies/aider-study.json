@@ -1,0 +1,27 @@
+{
+  "id": "PJ_PUBLIC_JARVIS_17_AIDER",
+  "status": "RECORDED",
+  "branch": "main",
+  "source_project": "Aider-AI/aider",
+  "source_url": "https://github.com/Aider-AI/aider",
+  "classification": "repo-native-ai-pair-programming-reference",
+  "kingsmen_lessons": [
+    "JarvisRepoMap",
+    "JarvisPatchWriter",
+    "JarvisChangedFilesReporter",
+    "JarvisValidatorLoop",
+    "JarvisRepairLoop",
+    "JarvisCommitMessageDraft",
+    "JarvisVoiceToBuildCommand",
+    "JarvisDiffReviewFlow"
+  ],
+  "fit": "Kingsmen Jarvis Builder Core",
+  "do_not_copy": [
+    "unreviewed repo-wide edits",
+    "unchecked changes",
+    "production changes from builder mode",
+    "candidate data in build context",
+    "missing evidence reports"
+  ],
+  "record_path": "docs/jarvis/public-reference-studies/PJ_PUBLIC_JARVIS_17_AIDER.md"
+}
