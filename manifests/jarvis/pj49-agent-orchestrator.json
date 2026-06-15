@@ -1,0 +1,36 @@
+{
+  "id": "pj49-agent-orchestrator",
+  "pj": "PJ49",
+  "version": "1.0.0",
+  "status": "created",
+  "parent": "PJ48 Memory Vault",
+  "purpose": "Coordinate Jarvis internal roles through governed runtime layers for one Commander request.",
+  "core_rule": "One Commander request equals one governed orchestration plan.",
+  "runtime_flow": [
+    "commander_request",
+    "normalize",
+    "classify_intent",
+    "resolve_command",
+    "apply_policy",
+    "select_adapter",
+    "retrieve_knowledge_or_live_data",
+    "score_source_confidence",
+    "write_evidence",
+    "compose_answer",
+    "render_hud_or_voice"
+  ],
+  "created_surfaces": [
+    "human_doctrine",
+    "package_manifest",
+    "role_catalog",
+    "flow_manifest",
+    "policy_manifest",
+    "task_state_machine",
+    "runtime_types",
+    "runtime_orchestrator",
+    "runtime_index",
+    "validation_manifest",
+    "validator_script"
+  ],
+  "next_phase": "PJ50 Jarvis Kernel Smoke Tests"
+}
