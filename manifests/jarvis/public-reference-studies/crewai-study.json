@@ -1,0 +1,73 @@
+{
+  "status": "RECORDED",
+  "branch_recorded": "main",
+  "project_number": 27,
+  "project_key": "crewai",
+  "public_reference": {
+    "name": "CrewAI",
+    "repository": "crewAIInc/crewAI",
+    "url": "https://github.com/crewAIInc/crewAI",
+    "license_observed": "MIT",
+    "study_type": "pattern_study_only",
+    "observed_on": "2026-06-15"
+  },
+  "kingsmen_decision": {
+    "use_as_runtime_foundation": false,
+    "adapt_selected_patterns": true,
+    "reason": "CrewAI is useful for role cards, task contracts, expected outputs, human review tasks, and controlled flows, but Kingsmen authority must remain in doctrine, backend policy, validators, evidence, and founder approval."
+  },
+  "patterns_to_adapt": [
+    "JarvisCrewContract",
+    "JarvisSpecialistRoleCard",
+    "JarvisTaskContract",
+    "JarvisExpectedOutputSchema",
+    "JarvisFlowStep",
+    "JarvisFlowState",
+    "JarvisFlowRouter",
+    "JarvisCrewStepWrapper",
+    "JarvisDelegationPolicy",
+    "JarvisHumanReviewTask",
+    "JarvisAgentGuardrailConfig",
+    "JarvisStructuredTaskOutput",
+    "JarvisCrewTelemetryBoundary",
+    "JarvisEnterpriseControlPlaneLater"
+  ],
+  "specialist_roles_considered": [
+    "DoctrineGuardianAgent",
+    "RepoBuilderAgent",
+    "ValidatorAgent",
+    "ResearchVerifierAgent",
+    "ConnectorPlannerAgent",
+    "CommsDraftAgent",
+    "SecurityReviewAgent",
+    "FinancePolicyAgent"
+  ],
+  "reject": [
+    "agent crews as the default brain",
+    "agents delegating production authority to each other",
+    "auto-generated specialist roles without founder approval",
+    "unbounded crew memory",
+    "crew conversations becoming truth",
+    "tasks without expected output schemas",
+    "external tools without trust classification",
+    "MCP or docs tools bypassing source-confidence rules",
+    "telemetry or share settings that expose sensitive context",
+    "candidate data in agent backstories, prompts, memory, or traces",
+    "crew flows replacing the Kingsmen backend state machine",
+    "enterprise control plane becoming the source of truth"
+  ],
+  "safe_build_order": [
+    "Mini Builder Core",
+    "Mode Manager",
+    "Task Contract",
+    "Validator Runner",
+    "Evidence Ledger",
+    "Controlled Flow",
+    "Specialist role registry",
+    "Crew wrapper only when necessary"
+  ],
+  "repo_records": {
+    "study_markdown": "docs/jarvis/public-reference-studies/PJ_PUBLIC_JARVIS_27_CREWAI.md",
+    "manifest": "manifests/jarvis/public-reference-studies/crewai-study.json"
+  }
+}
