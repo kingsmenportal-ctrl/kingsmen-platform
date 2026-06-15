@@ -1,0 +1,51 @@
+{
+  "id": "pj54-incident-repair-playbook",
+  "pj": "PJ54",
+  "version": "1.0.0",
+  "incident_classes": [
+    {
+      "class_id": "build_failure",
+      "label": "Build Failure",
+      "required_report": ["command_run", "error_summary", "affected_files", "repair_step", "recheck_step"],
+      "safe_fallback": "keep Jarvis in build mode"
+    },
+    {
+      "class_id": "api_failure",
+      "label": "API Failure",
+      "required_report": ["route", "request_shape", "response_shape", "error_summary", "repair_step"],
+      "safe_fallback": "use existing stable route or return safe failure"
+    },
+    {
+      "class_id": "hud_failure",
+      "label": "HUD Failure",
+      "required_report": ["surface", "render_status", "error_summary", "repair_step"],
+      "safe_fallback": "use simple command panel until fixed"
+    },
+    {
+      "class_id": "smoke_failure",
+      "label": "Smoke Failure",
+      "required_report": ["scenario", "expected", "actual", "repair_step"],
+      "safe_fallback": "do not advance readiness status"
+    },
+    {
+      "class_id": "evidence_failure",
+      "label": "Evidence Failure",
+      "required_report": ["action", "missing_evidence", "risk", "repair_step"],
+      "safe_fallback": "do not claim success"
+    },
+    {
+      "class_id": "confidence_failure",
+      "label": "Confidence Failure",
+      "required_report": ["claim", "source_status", "confidence_gap", "repair_step"],
+      "safe_fallback": "mark unverified and avoid action"
+    },
+    {
+      "class_id": "connector_failure",
+      "label": "Connector Failure",
+      "required_report": ["connector", "expected_result", "failure_summary", "safe_alternative"],
+      "safe_fallback": "manual review or alternate approved route"
+    }
+  ],
+  "incident_statuses": ["new", "triaged", "repairing", "recheck_needed", "resolved", "deferred"],
+  "incident_rule": "If Jarvis cannot prove success, it must report the failure and safe fallback."
+}
