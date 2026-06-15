@@ -1,0 +1,117 @@
+{
+  "id": "jarvis-knowledge-domains",
+  "pj": "PJ42.6",
+  "version": "1.0.0",
+  "knowledge_domains": [
+    {
+      "domain_id": "kingsmen_doctrine_laws",
+      "label": "Kingsmen Doctrine and Laws",
+      "description": "Locked Kingsmen constitutional doctrine, operating rules, privacy rules, boot blockers, and source confidence laws.",
+      "allowed_sources": ["docs", "manifests", "github_issues"],
+      "blocked_sources": ["raw_private_records", "unapproved_chat_memory"],
+      "retrieval_priority": 1,
+      "may_cache_summary": true,
+      "requires_source_confidence": true,
+      "answer_status_labels": ["locked", "validated", "planned", "missing_proof"]
+    },
+    {
+      "domain_id": "pj42_jarvis_law_package",
+      "label": "PJ42 Jarvis Law Package",
+      "description": "Real Jarvis constitution, law files, command registry, intent router, tool router, source confidence engine, and later Jarvis phases.",
+      "allowed_sources": ["docs/agents", "manifests/jarvis", "scripts/jarvis", "github_issues"],
+      "blocked_sources": ["public_agent_defaults", "unregistered_tools"],
+      "retrieval_priority": 2,
+      "may_cache_summary": true,
+      "requires_source_confidence": true,
+      "answer_status_labels": ["registered", "created", "validated", "planned"]
+    },
+    {
+      "domain_id": "n_series_architecture",
+      "label": "N-Series Architecture",
+      "description": "N00 to N20 Kingsmen build sequence, backend kernel, portal, route universe, document vault, control plane, integrations, and final assembly.",
+      "allowed_sources": ["docs", "manifests", "github_issues", "safe_memory_summary"],
+      "blocked_sources": ["unverified_public_summaries"],
+      "retrieval_priority": 3,
+      "may_cache_summary": true,
+      "requires_source_confidence": true,
+      "answer_status_labels": ["locked", "planned", "created", "missing_proof"]
+    },
+    {
+      "domain_id": "workflow_registry",
+      "label": "Workflow Registry",
+      "description": "W00-W24 worker registry, thin-worker rules, state transitions, idempotency, backend result posting, and evidence requirements.",
+      "allowed_sources": ["docs", "manifests", "workflow_exports", "github_issues"],
+      "blocked_sources": ["unverified_n8n_logic", "workflow_secrets"],
+      "retrieval_priority": 4,
+      "may_cache_summary": true,
+      "requires_source_confidence": true,
+      "answer_status_labels": ["registered", "validated", "draft", "missing_proof"]
+    },
+    {
+      "domain_id": "pricing_business_pack",
+      "label": "Pricing and Business Pack",
+      "description": "Kingsmen pricing codex, packages, business pack, policies, refund rules, sales documents, and founder operating documents.",
+      "allowed_sources": ["docs", "manifests", "github_issues", "safe_memory_summary"],
+      "blocked_sources": ["invented_prices", "unapproved_package_changes"],
+      "retrieval_priority": 5,
+      "may_cache_summary": true,
+      "requires_source_confidence": true,
+      "answer_status_labels": ["locked", "current", "draft", "requires_commander_change"]
+    },
+    {
+      "domain_id": "route_universe_public_sources",
+      "label": "Route Universe and Public Source Intelligence",
+      "description": "Universities, TVETs, CAO, NSFAS, bursaries, SETA routes, learnerships, jobs, accommodation, and public source snapshots.",
+      "allowed_sources": ["official_public_sources", "source_registry", "source_snapshots", "playwright_evidence", "trusted_secondary_sources"],
+      "blocked_sources": ["unverified_social_leads_as_truth", "stale_deadline_claims"],
+      "retrieval_priority": 6,
+      "may_cache_summary": true,
+      "requires_source_confidence": true,
+      "answer_status_labels": ["verified", "high", "needs_review", "stale", "blocked"]
+    },
+    {
+      "domain_id": "github_build_evidence",
+      "label": "GitHub and Build Evidence",
+      "description": "Repo files, commits, issues, validator scripts, build records, and phase registration evidence.",
+      "allowed_sources": ["github_repo", "github_issues", "commits", "validator_output"],
+      "blocked_sources": ["uncommitted_claims", "missing_file_claims"],
+      "retrieval_priority": 7,
+      "may_cache_summary": true,
+      "requires_source_confidence": true,
+      "answer_status_labels": ["created", "registered", "validated", "failed", "missing"]
+    },
+    {
+      "domain_id": "founder_decisions_command_outcomes",
+      "label": "Founder Decisions and Command Outcomes",
+      "description": "Approved Commander decisions, phase choices, command outcomes, blocked attempts, and build-direction decisions.",
+      "allowed_sources": ["github_issues", "safe_memory_summary", "evidence_ledger"],
+      "blocked_sources": ["raw_private_records", "unapproved_inference"],
+      "retrieval_priority": 8,
+      "may_cache_summary": true,
+      "requires_source_confidence": true,
+      "answer_status_labels": ["approved", "registered", "blocked", "pending_review"]
+    },
+    {
+      "domain_id": "system_incident_summaries",
+      "label": "System Incident Summaries",
+      "description": "Build failures, validator failures, tool failures, portal blockers, deployment issues, and repair paths summarized safely.",
+      "allowed_sources": ["evidence_ledger", "validator_output", "build_logs_summary", "github_issues"],
+      "blocked_sources": ["raw_secret_logs", "private_error_payloads"],
+      "retrieval_priority": 9,
+      "may_cache_summary": true,
+      "requires_source_confidence": true,
+      "answer_status_labels": ["incident", "repair_path", "resolved", "needs_review"]
+    },
+    {
+      "domain_id": "visual_hud_product_decisions",
+      "label": "Visual HUD and Product Decisions",
+      "description": "Jarvis HUD, Founder Control Plane, mobile view, dashboard cards, visual rules, mission board, and product UX decisions.",
+      "allowed_sources": ["docs", "manifests/jarvis", "design_notes", "github_issues"],
+      "blocked_sources": ["generic_black_white_chat_only", "unapproved_public_agent_ui"],
+      "retrieval_priority": 10,
+      "may_cache_summary": true,
+      "requires_source_confidence": true,
+      "answer_status_labels": ["planned", "designed", "created", "needs_visual_build"]
+    }
+  ]
+}
