@@ -9,3 +9,4 @@ export * from './live-data-router';
 export * from './evidence-ledger';
 export * from './answer-composer';
 export * from './kernel';
+export * from './smoke-tests';
