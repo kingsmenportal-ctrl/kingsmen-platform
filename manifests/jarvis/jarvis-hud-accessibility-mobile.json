@@ -1,0 +1,47 @@
+{
+  "id": "jarvis-hud-accessibility-mobile",
+  "pj": "PJ42.8",
+  "version": "1.0.0",
+  "mobile_rules": {
+    "mobile_founder_view_required": true,
+    "priority_cards_first": true,
+    "approval_queue_visible_without_desktop": true,
+    "system_pulse_visible_without_scroll": true,
+    "voice_orb_accessible_from_top": true,
+    "evidence_drawer_may_be_bottom_sheet": true,
+    "mission_board_may_be_card_stack": true
+  },
+  "accessibility_rules": {
+    "status_must_not_rely_on_color_only": true,
+    "all_badges_need_text_labels": true,
+    "approval_buttons_need_clear_labels": true,
+    "blocked_actions_need_reason_text": true,
+    "tool_use_indicator_needs_plain_language": true,
+    "source_confidence_chip_needs_label": true,
+    "keyboard_navigation_required": true,
+    "screen_reader_labels_required": true
+  },
+  "responsive_breakpoints": {
+    "mobile": "0-767",
+    "tablet": "768-1199",
+    "desktop": "1200+"
+  },
+  "mobile_priority_order": [
+    "critical_alerts",
+    "approval_queue",
+    "system_pulse",
+    "jarvis_voice_orb",
+    "live_response_stream",
+    "mission_board",
+    "evidence_drawer",
+    "route_intelligence_panel",
+    "finance_health_panel",
+    "document_pipeline_panel"
+  ],
+  "performance_rules": {
+    "defer_heavy_panels_on_mobile": true,
+    "lazy_load_screenshots": true,
+    "compress_old_mission_cards": true,
+    "keep_input_responsive_during_tool_use": true
+  }
+}
