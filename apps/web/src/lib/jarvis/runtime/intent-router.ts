@@ -25,6 +25,16 @@ export function routeJarvisIntent(request: JarvisRuntimeRequest): JarvisIntentRe
     };
   }
 
+  if (includesAny(text, ['public repo', 'public repos', 'github stack', 'open source stack', 'docling', 'openwakeword', 'whisper.cpp', 'langfuse', 'gitleaks', 'trivy'])) {
+    return {
+      intentId: 'public_repo_integration',
+      confidence: 'high',
+      freshnessRequired: true,
+      policyGateRequired: false,
+      reason: 'Input asks about live public repository integrations or adapter readiness.',
+    };
+  }
+
   if (includesAny(text, ['latest', 'current', 'today', 'now', 'deadline', 'closing date', 'fee', 'price', 'job', 'learnership', 'weather', 'news'])) {
     return {
       intentId: 'live_research',
