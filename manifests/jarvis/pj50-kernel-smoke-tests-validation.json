@@ -1,0 +1,27 @@
+{
+  "id": "pj50-kernel-smoke-tests-validation",
+  "pj": "PJ50",
+  "version": "1.0.0",
+  "required_files": [
+    "docs/agents/PJ50_JARVIS_KERNEL_SMOKE_TESTS.md",
+    "manifests/jarvis/pj50-kernel-smoke-tests.json",
+    "manifests/jarvis/jarvis-kernel-smoke-scenarios.json",
+    "manifests/jarvis/pj50-api-smoke-contract.json",
+    "manifests/jarvis/pj50-kernel-smoke-tests-validation.json",
+    "apps/web/src/lib/jarvis/runtime/smoke-tests.ts",
+    "apps/web/src/lib/jarvis/runtime/index.ts",
+    "apps/web/src/app/api/jarvis/kernel/smoke/route.ts",
+    "scripts/jarvis/validate-pj50-kernel-smoke-tests.mjs"
+  ],
+  "required_checks": [
+    "files_exist",
+    "json_loads",
+    "scenario_ids_unique",
+    "required_scenarios_present",
+    "runtime_helper_exports_suite",
+    "runtime_index_exports_smoke_tests",
+    "api_smoke_route_exists",
+    "contract_fields_defined"
+  ],
+  "next_phase": "PJ51 Jarvis Runtime Repair and Build Validation"
+}
