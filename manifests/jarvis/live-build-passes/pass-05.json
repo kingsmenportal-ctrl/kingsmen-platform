@@ -1,0 +1,42 @@
+{
+  "manifestRef": "jarvis-live-pass-05",
+  "status": "built",
+  "branch": "main",
+  "purpose": "Continue live Kingsmen Jarvis build with runtime read models, session state, state adapter, review decision flow, and validator report view.",
+  "builtFiles": [
+    "packages/jarvis-core/src/jarvis-hud-route-handler.ts",
+    "packages/jarvis-core/src/jarvis-founder-console-read-model.ts",
+    "packages/jarvis-core/src/jarvis-build-session-store.ts",
+    "packages/jarvis-core/src/jarvis-task-state-machine-adapter.ts",
+    "packages/jarvis-core/src/jarvis-patch-review-decision-flow.ts",
+    "packages/jarvis-core/src/jarvis-validator-report-viewer.ts",
+    "scripts/validators/validate-jarvis-live-pass-05.mjs"
+  ],
+  "capabilities": [
+    "JarvisHudRouteHandler",
+    "JarvisFounderConsoleReadModel",
+    "JarvisBuildSessionStore",
+    "JarvisTaskStateMachineAdapter",
+    "JarvisPatchReviewDecisionFlow",
+    "JarvisValidatorReportViewer",
+    "JarvisLivePass05Validator"
+  ],
+  "validator": {
+    "script": "node scripts/validators/validate-jarvis-live-pass-05.mjs",
+    "report": "reports/jarvis/validate-jarvis-live-pass-05.json"
+  },
+  "authorityBoundary": [
+    "Jarvis read models do not replace PostgreSQL Truth Vault.",
+    "Jarvis task adapter does not replace backend API state machine.",
+    "Founder review remains required for production-risk paths.",
+    "HUD output is informational and not final system authority."
+  ],
+  "nextLiveTargets": [
+    "JarvisLivePassExportIndex",
+    "JarvisValidatorAggregatorSafe",
+    "JarvisFounderConsoleRouteReadOnly",
+    "JarvisBuildSessionPersistenceAdapter",
+    "JarvisPatchReviewHudPanel",
+    "JarvisValidatorReportHudPanel"
+  ]
+}
