@@ -10,6 +10,7 @@ const requiredFiles = [
   'packages/jarvis-core/src/jarvis-tool-registry.ts',
   'packages/jarvis-core/src/jarvis-evidence-ledger.ts',
   'packages/jarvis-core/src/jarvis-command-runner.ts',
+  'packages/jarvis-core/src/jarvis-mini-builder-core.ts',
   'packages/jarvis-core/src/index.ts'
 ];
 
@@ -50,6 +51,15 @@ const requiredTokens = new Map([
     'dry_run_tool_plan',
     'execute_allowed_tool',
     'blocked'
+  ]],
+  ['packages/jarvis-core/src/jarvis-mini-builder-core.ts', [
+    'JarvisBuildTask',
+    'JarvisMiniBuildPlan',
+    'jarvisCreateMiniBuildPlan',
+    'scopeRoot',
+    'blockedPaths',
+    'readyForPatchWriter',
+    'JARVIS_BUILD_VALIDATOR_REQUIRED'
   ]]
 ]);
 
@@ -78,6 +88,7 @@ for (const file of requiredFiles) {
 const contract = read('packages/contracts/src/jarvis/index.ts');
 const policy = read('packages/jarvis-core/src/jarvis-policy-gate.ts');
 const registry = read('packages/jarvis-core/src/jarvis-tool-registry.ts');
+const miniBuilder = read('packages/jarvis-core/src/jarvis-mini-builder-core.ts');
 
 if (!contract.includes("'whatsapp_urgent'")) {
   fail('Jarvis WhatsApp boundary missing: only whatsapp_urgent may be a Jarvis channel.');
@@ -95,6 +106,10 @@ if (registry.includes("'whatsapp'")) {
   fail('Jarvis registry must not allow normal WhatsApp as a primary channel. Use whatsapp_urgent only.');
 }
 
+if (!miniBuilder.includes('isPathInsideScope') || !miniBuilder.includes('isBlockedPath')) {
+  fail('Jarvis mini builder must enforce scoped paths and blocked path patterns.');
+}
+
 const report = {
   validator: 'validate-jarvis-core',
   status: 'passed',
@@ -105,7 +120,8 @@ const report = {
     founderApprovalForProductionRisk: true,
     emailPrimaryWhatsappUrgentOnly: true,
     evidenceLedgerRequired: true,
-    connectorTrustRegistryRequired: true
+    connectorTrustRegistryRequired: true,
+    scopedBuilderRequired: true
   },
   files: evidence
 };
