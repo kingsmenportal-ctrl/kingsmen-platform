@@ -1,0 +1,58 @@
+{
+  "id": "jarvis-evidence-event-types",
+  "pj": "PJ42.9",
+  "version": "1.0.0",
+  "event_types": [
+    {
+      "event_type": "tool_answer",
+      "description": "Jarvis used an approved adapter to answer the Commander.",
+      "requires_source_confidence": true,
+      "requires_approval_status": false
+    },
+    {
+      "event_type": "approval_request",
+      "description": "Jarvis requested Commander approval before a risky action.",
+      "requires_source_confidence": false,
+      "requires_approval_status": true
+    },
+    {
+      "event_type": "approval_decision",
+      "description": "Commander approved, denied, revised, or deferred an approval request.",
+      "requires_source_confidence": false,
+      "requires_approval_status": true
+    },
+    {
+      "event_type": "blocked_action",
+      "description": "Jarvis blocked an unsafe or unauthorized action and provided a safe redirect.",
+      "requires_source_confidence": false,
+      "requires_approval_status": true
+    },
+    {
+      "event_type": "tool_failure",
+      "description": "An approved adapter failed, timed out, or returned insufficient evidence.",
+      "requires_source_confidence": false,
+      "requires_approval_status": false
+    },
+    {
+      "event_type": "success_claim",
+      "description": "Jarvis is allowed to report a completed result only when evidence supports it.",
+      "requires_source_confidence": true,
+      "requires_approval_status": false
+    },
+    {
+      "event_type": "manual_fallback",
+      "description": "Jarvis routed work to manual fallback because automation was blocked or evidence was incomplete.",
+      "requires_source_confidence": true,
+      "requires_approval_status": false
+    }
+  ],
+  "event_display_surfaces": {
+    "tool_answer": ["dialogue_card", "evidence_drawer"],
+    "approval_request": ["approval_modal", "evidence_drawer"],
+    "approval_decision": ["approval_modal", "timeline"],
+    "blocked_action": ["blocked_card", "safe_redirect_card", "evidence_drawer"],
+    "tool_failure": ["failure_card", "evidence_drawer"],
+    "success_claim": ["success_card", "evidence_drawer"],
+    "manual_fallback": ["manual_fallback_card", "evidence_drawer"]
+  }
+}
