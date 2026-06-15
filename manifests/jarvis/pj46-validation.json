@@ -1,0 +1,27 @@
+{
+  "id": "pj46-validation",
+  "pj": "PJ46",
+  "version": "1.0.0",
+  "required_files": [
+    "docs/agents/PJ46_JARVIS_SYSTEM_PROMPT_PERSONALITY_KERNEL.md",
+    "manifests/jarvis/pj46-system-prompt-kernel.json",
+    "manifests/jarvis/jarvis-personality-law.json",
+    "manifests/jarvis/jarvis-response-style-law.json",
+    "manifests/jarvis/jarvis-boundary-response-law.json",
+    "apps/web/src/lib/jarvis/runtime/personality-kernel.ts",
+    "manifests/jarvis/pj46-validation.json"
+  ],
+  "deferred_files": [
+    "apps/web/src/lib/jarvis/runtime/prompt-kernel.ts",
+    "scripts/jarvis/validate-pj46-personality-kernel.mjs"
+  ],
+  "required_checks": [
+    "doctrine_exists",
+    "prompt_manifest_exists",
+    "personality_law_exists",
+    "response_style_exists",
+    "boundary_manifest_exists",
+    "runtime_personality_module_exists"
+  ],
+  "next_phase": "PJ47 Tool Adapters and Live Connectors"
+}
