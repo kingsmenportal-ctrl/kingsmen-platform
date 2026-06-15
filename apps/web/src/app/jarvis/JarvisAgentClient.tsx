@@ -32,11 +32,36 @@ type CommandCard = {
   surface: string;
 };
 
+type PublicIntegrationHudItem = {
+  id: string;
+  name: string;
+  nStep: string;
+  adapterId: string;
+  repository: string;
+  liveRoute: string;
+  validator: string;
+  readiness: string;
+  safetyBoundary: string;
+  localRuntimeNote: string;
+};
+
+type PublicIntegrationHud = {
+  ok: boolean;
+  summary: {
+    total: number;
+    liveRoutes: number;
+    contractReady: number;
+    localRuntimeRequired: number;
+  };
+  items: PublicIntegrationHudItem[];
+};
+
 const wakeGreeting =
   "Welcome to Kingsmen Command, Commander. Jarvis is online. The command house is awake, your desk is prepared, and I stand ready.";
 
 const commandCards: CommandCard[] = [
   { label: "System status", tool: "SYSTEM_STATUS", message: "system status", risk: "safe", surface: "System Health" },
+  { label: "Integration HUD", tool: "PUBLIC_INTEGRATION_HUD", message: "show public integration HUD", risk: "safe", surface: "N21 Gates" },
   { label: "Validate N20", tool: "VALIDATE_N20", message: "validate N20", risk: "approval", surface: "Validation" },
   { label: "Run build", tool: "RUN_WEB_BUILD", message: "run web build", risk: "approval", surface: "Build" },
   { label: "Database scan", tool: "DATABASE_SCAN", message: "database scan", risk: "review", surface: "Read Model" },
@@ -50,6 +75,7 @@ const missionPanels = [
   { title: "Real Build", value: "LOCKED", note: "Issue #36 active" },
   { title: "Visual Law", value: "SYSTEM", note: "Not wallpaper" },
   { title: "Local Runtime", value: "CMD-SAFE", note: "No wrong shell syntax" },
+  { title: "N21 Gates", value: "HUD", note: "Public integration board" },
   { title: "Proof", value: "REQUIRED", note: "Repo and build evidence" }
 ];
 
@@ -83,6 +109,8 @@ export default function JarvisAgentClient() {
   const [input, setInput] = useState("system status");
   const [running, setRunning] = useState(false);
   const [voiceState, setVoiceState] = useState("voice ready");
+  const [integrationHud, setIntegrationHud] = useState<PublicIntegrationHud | null>(null);
+  const [integrationHudError, setIntegrationHudError] = useState<string | null>(null);
   const [messages, setMessages] = useState<Message[]>([
     {
       role: "jarvis",
@@ -106,9 +134,40 @@ export default function JarvisAgentClient() {
     return messages.filter((message) => message.role === "jarvis" && (message.evidencePath || message.tool || message.error));
   }, [messages]);
 
+  async function refreshIntegrationHud() {
+    try {
+      const response = await fetch("/api/jarvis/public-repos/hud", { cache: "no-store" });
+      const payload = (await response.json()) as PublicIntegrationHud;
+      if (!response.ok || !payload.ok) {
+        setIntegrationHudError("public integration HUD unavailable");
+        return;
+      }
+      setIntegrationHud(payload);
+      setIntegrationHudError(null);
+    } catch (error) {
+      setIntegrationHudError(error instanceof Error ? error.message : "public integration HUD request failed");
+    }
+  }
+
   async function runAgent(message: string, tool?: string) {
     const clean = message.trim();
     if (!clean || running) return;
+
+    if (clean.toLowerCase().includes("public integration hud")) {
+      await refreshIntegrationHud();
+      setMessages((items) => [
+        ...items,
+        { role: "founder", text: clean },
+        {
+          role: "jarvis",
+          text: "Commander, the public integration HUD is refreshed. It shows Docling, Playwright, Voice, Trace Evidence, and Security Scan gates with their live routes and safety boundaries.",
+          ok: true,
+          tool: "PUBLIC_INTEGRATION_HUD"
+        }
+      ]);
+      speak("Commander, the public integration HUD is refreshed.");
+      return;
+    }
 
     if (clean.toLowerCase().includes("real build lock")) {
       const lockText = [
@@ -236,6 +295,7 @@ export default function JarvisAgentClient() {
   }
 
   useEffect(() => {
+    refreshIntegrationHud();
     return () => {
       streamRef.current?.getTracks().forEach((track) => track.stop());
       if ("speechSynthesis" in window) window.speechSynthesis.cancel();
@@ -271,6 +331,30 @@ export default function JarvisAgentClient() {
               <small>{panel.note}</small>
             </article>
           ))}
+        </section>
+
+        <section className={styles.integrationHud}>
+          <div className={styles.integrationHudHeader}>
+            <div>
+              <span>N21 PUBLIC INTEGRATION HUD</span>
+              <strong>{integrationHud ? `${integrationHud.summary.liveRoutes}/${integrationHud.summary.total} live routes` : "loading"}</strong>
+            </div>
+            <button type="button" onClick={refreshIntegrationHud}>Refresh HUD</button>
+          </div>
+          {integrationHudError ? <p className={styles.integrationError}>{integrationHudError}</p> : null}
+          <div className={styles.integrationGrid}>
+            {(integrationHud?.items ?? []).map((item) => (
+              <article key={item.id} className={styles.integrationCard}>
+                <div className={styles.integrationMeta}>
+                  <span>{item.nStep}</span>
+                  <strong>{item.name}</strong>
+                </div>
+                <p>{item.safetyBoundary}</p>
+                <code>{item.liveRoute}</code>
+                <small>{item.readiness} · {item.adapterId}</small>
+              </article>
+            ))}
+          </div>
         </section>
 
         <section className={styles.layout}>
@@ -355,6 +439,22 @@ export default function JarvisAgentClient() {
             </section>
 
             <section className={styles.panel}>
+              <h2>Public integration status</h2>
+              {integrationHud ? (
+                <ul className={styles.evidenceList}>
+                  {integrationHud.items.map((item) => (
+                    <li key={item.id}>
+                      <strong>{item.nStep} · {item.name}</strong>
+                      <span>{item.readiness} · {item.liveRoute}</span>
+                    </li>
+                  ))}
+                </ul>
+              ) : (
+                <p>Public integration HUD loading.</p>
+              )}
+            </section>
+
+            <section className={styles.panel}>
               <h2>Live output</h2>
               {lastOutput?.output ? <pre>{lastOutput.output}</pre> : <p>No command output yet.</p>}
             </section>
@@ -380,6 +480,7 @@ export default function JarvisAgentClient() {
               <ul>
                 <li>Real build lock</li>
                 <li>Mission board</li>
+                <li>N21 public integration HUD</li>
                 <li>Command deck</li>
                 <li>Voice orb</li>
                 <li>Commander lock</li>
