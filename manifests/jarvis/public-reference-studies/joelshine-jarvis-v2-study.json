@@ -1,0 +1,35 @@
+{
+  "id": "PJ_PUBLIC_JARVIS_03_JOELSHINE_JARVIS_V2",
+  "status": "recorded",
+  "recorded_to": "main",
+  "source_repository": "JoelShine/Jarvis-v2.0",
+  "source_url": "https://github.com/JoelShine/Jarvis-v2.0",
+  "project_type": "python_windows_voice_assistant",
+  "kingsmen_use": "ux_and_local_assistant_inspiration_only",
+  "adapt": [
+    "voice_command_vocabulary",
+    "jarvis_launchpad_ui",
+    "local_utility_adapter",
+    "screenshot_proof_helper",
+    "ocr_helper_boundary",
+    "simple_assistant_wake_phrases"
+  ],
+  "reject": [
+    "uncontrolled_system_commands",
+    "production_actions_from_voice_only",
+    "direct_email_without_approval",
+    "desktop_automation_as_production_orchestration",
+    "random_local_candidate_data_storage",
+    "bypassing_kingsmen_validators"
+  ],
+  "kingsmen_modules_suggested": [
+    "apps/web/src/lib/jarvis/voice-command-vocabulary.ts",
+    "apps/web/src/lib/jarvis/local-utility-adapter.ts",
+    "apps/web/src/lib/jarvis/screenshot-proof-adapter.ts",
+    "apps/web/src/lib/jarvis/ocr-helper-boundary.ts",
+    "apps/web/src/app/jarvis/JarvisLaunchpad.tsx",
+    "manifests/jarvis/jarvis-local-utility-commands.json",
+    "manifests/jarvis/jarvis-launchpad-command-catalog.json"
+  ],
+  "doctrine_dependency": "docs/N00-doctrine/jarvis-app-connector-law.md"
+}
