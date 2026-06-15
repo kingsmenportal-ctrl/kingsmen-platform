@@ -1,0 +1,18 @@
+{
+  "id": "N21_2_DOCLING_SMART_INTAKE_FOUNDATION",
+  "branch": "n21-live-public-repo-adapters",
+  "status": "committed",
+  "live_level": "review_safe_api_and_adapter_wrapper",
+  "public_repo": "DS4SD/docling",
+  "adapter": "DoclingAdapter",
+  "routes": [
+    "/api/documents/extract",
+    "/api/jarvis/public-repos/docling-smart-intake"
+  ],
+  "safety": {
+    "mayWriteCandidateTruth": false,
+    "reviewRequired": true,
+    "rawExternalParserNotAssumedInstalled": true
+  },
+  "next": "N21.3 Playwright Scout Gateway"
+}
