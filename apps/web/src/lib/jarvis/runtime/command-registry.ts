@@ -57,6 +57,15 @@ const commandByIntent: Record<JarvisIntentId, JarvisCommandDefinition> = {
     evidenceRequired: true,
     adapterId: 'public_repo_registry_adapter',
   },
+  jarvis_voice_gateway: {
+    commandId: 'JARVIS_VOICE_SESSION',
+    label: 'Jarvis Voice Session Gateway',
+    category: 'jarvis_voice_gateway',
+    riskLevel: 'approval_required',
+    approvalRequired: true,
+    evidenceRequired: true,
+    adapterId: 'jarvis_voice_gateway_adapter',
+  },
   system_health: {
     commandId: 'SYSTEM_STATUS',
     label: 'System Status',
