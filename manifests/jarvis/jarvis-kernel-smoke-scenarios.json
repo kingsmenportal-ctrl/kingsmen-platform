@@ -1,12 +1,12 @@
 {
   "id": "jarvis-kernel-smoke-scenarios",
   "pj": "PJ50",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "scenarios": [
     {
       "scenario_id": "SMOKE_GENERAL_DIALOGUE",
       "label": "General dialogue",
-      "input": "Explain what Jarvis is in Kingsmen.",
+      "input": "Explain the meaning of payment day.",
       "expected_intent": "general_dialogue",
       "expected_command": "ASK_GENERAL",
       "expected_route_family": "dialogue",
@@ -66,7 +66,7 @@
     {
       "scenario_id": "SMOKE_ORCHESTRATOR_PLAN",
       "label": "Orchestrator plan",
-      "input": "Check Kingsmen status and show evidence.",
+      "input": "Show system health and evidence.",
       "expected_intent": "system_health",
       "expected_command": "SYSTEM_STATUS",
       "expected_route_family": "system_health",
