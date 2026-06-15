@@ -1,0 +1,31 @@
+{
+  "id": "jarvis-live-data-router-validation",
+  "pj": "PJ42.7",
+  "version": "1.0.0",
+  "required_files": [
+    "docs/agents/PJ42_7_JARVIS_LIVE_DATA_ROUTER.md",
+    "manifests/jarvis/jarvis-live-data-router.schema.json",
+    "manifests/jarvis/jarvis-live-route-catalog.json",
+    "manifests/jarvis/jarvis-live-freshness-triggers.json",
+    "manifests/jarvis/jarvis-live-routing-matrix.json",
+    "manifests/jarvis/jarvis-live-cache-policy.json",
+    "manifests/jarvis/jarvis-live-failure-fallback.json",
+    "manifests/jarvis/jarvis-live-data-router-validation.json",
+    "scripts/jarvis/validate-pj42-7-live-data-router.mjs"
+  ],
+  "required_checks": [
+    "files_exist",
+    "json_loads",
+    "route_ids_unique",
+    "required_live_routes_present",
+    "routes_reference_known_adapters",
+    "routes_require_evidence",
+    "routes_with_current_facts_require_source_confidence",
+    "freshness_triggers_present",
+    "routing_matrix_references_known_routes",
+    "cache_ttl_defined",
+    "failure_types_defined",
+    "manual_fallback_routes_defined"
+  ],
+  "next_phase": "PJ42.8 Visual HUD"
+}
