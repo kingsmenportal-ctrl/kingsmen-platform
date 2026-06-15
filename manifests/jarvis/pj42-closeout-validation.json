@@ -1,0 +1,39 @@
+{
+  "id": "pj42-closeout-validation",
+  "pj": "PJ42_CLOSEOUT",
+  "version": "1.0.0",
+  "required_files": [
+    "docs/agents/PJ42_CLOSEOUT_REAL_JARVIS_KERNEL_ASSEMBLY_PLAN.md",
+    "manifests/jarvis/pj42-real-jarvis-kernel-assembly.json",
+    "manifests/jarvis/pj42-runtime-module-map.json",
+    "manifests/jarvis/pj42-validator-suite.json",
+    "manifests/jarvis/pj42-to-pj43-build-order.json",
+    "manifests/jarvis/pj42-closeout-validation.json",
+    "scripts/jarvis/validate-pj42-closeout-kernel-assembly.mjs"
+  ],
+  "required_checks": [
+    "files_exist",
+    "json_loads",
+    "kernel_flow_present",
+    "required_layers_present",
+    "runtime_modules_present",
+    "validator_suite_present",
+    "build_order_present",
+    "non_negotiables_present",
+    "next_phase_is_pj43"
+  ],
+  "required_phases": [
+    "PJ42.0",
+    "PJ42.1",
+    "PJ42.2",
+    "PJ42.3",
+    "PJ42.4",
+    "PJ42.5",
+    "PJ42.6",
+    "PJ42.7",
+    "PJ42.8",
+    "PJ42.9",
+    "PJ42.10"
+  ],
+  "next_phase": "PJ43 Jarvis Runtime Implementation"
+}
