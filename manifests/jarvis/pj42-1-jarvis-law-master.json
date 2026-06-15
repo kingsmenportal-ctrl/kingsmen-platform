@@ -1,0 +1,138 @@
+{
+  "id": "PJ42.1",
+  "title": "Jarvis Law Files",
+  "status": "founder_locked",
+  "parent": "PJ42.0 Real Jarvis Constitution",
+  "version": "1.0.0",
+  "locked_date": "2026-06-15",
+  "doctrine": {
+    "jarvis_role": "Commander-only Kingsmen intelligence and command layer",
+    "jarvis_must_be": [
+      "live",
+      "fast",
+      "visual",
+      "intelligent",
+      "evidence_backed",
+      "policy_gated",
+      "kingsmen_branded"
+    ],
+    "jarvis_must_not_be": [
+      "public_chatbot",
+      "uncontrolled_shell",
+      "uncontrolled_browser_operator",
+      "payment_authority",
+      "official_status_authority",
+      "candidate_facing_agent"
+    ]
+  },
+  "required_flow": [
+    "Commander",
+    "Jarvis HUD",
+    "Dialogue Brain",
+    "Intent Router",
+    "Kingsmen Policy Gate",
+    "Tool Router",
+    "Evidence Ledger",
+    "Answer Composer"
+  ],
+  "permission_law": {
+    "allowed_actors": ["commander", "founder_operator"],
+    "blocked_actors": ["candidate", "school", "partner", "funder", "employer", "public_user"],
+    "approval_required_for": [
+      "write_actions",
+      "external_messages",
+      "portal_actions",
+      "file_generation_for_public_use",
+      "workflow_retry",
+      "payment_related_actions",
+      "status_claims"
+    ]
+  },
+  "memory_law": {
+    "allowed_memory": [
+      "doctrine_summaries",
+      "approved_founder_preferences",
+      "build_decisions",
+      "command_outcomes",
+      "public_source_intelligence",
+      "system_incident_summaries",
+      "validated_module_status"
+    ],
+    "blocked_memory": [
+      "raw_private_operational_records",
+      "payment_private_details",
+      "authentication_material",
+      "browser_session_material",
+      "unapproved_personal_data"
+    ]
+  },
+  "live_data_law": {
+    "must_use_live_data_when": [
+      "current_deadlines",
+      "current_prices_or_fees",
+      "current_rules_or_laws",
+      "current_jobs_or_learnerships",
+      "current_portal_status",
+      "current_weather_time_finance_or_news",
+      "current_repo_or_build_status"
+    ],
+    "approved_routes": [
+      "web_research",
+      "github_inspection",
+      "postgres_read_models",
+      "kingsmen_knowledge_search",
+      "playwright_scout",
+      "approved_utility_api",
+      "safe_command_registry"
+    ]
+  },
+  "command_risk_law": {
+    "levels": ["safe_read", "safe_generate", "review_required", "approval_required", "blocked"],
+    "default_for_unknown_command": "blocked",
+    "requires_evidence_for_all_commands": true,
+    "requires_human_approval_for_risky_actions": true
+  },
+  "visual_law": {
+    "jarvis_must_not_remain_plain_chat_only": true,
+    "required_surfaces": [
+      "commander_wake_screen",
+      "jarvis_hud",
+      "voice_orb",
+      "mission_board",
+      "command_cards",
+      "tool_use_indicators",
+      "evidence_drawer",
+      "approval_modal",
+      "source_confidence_chips",
+      "portal_scout_screenshot_cards",
+      "system_health_panels",
+      "mobile_founder_view"
+    ]
+  },
+  "evidence_law": {
+    "every_answer_should_state_confidence_when_using_tools": true,
+    "every_action_must_write_evidence": true,
+    "evidence_types": [
+      "source_url",
+      "timestamp",
+      "tool_name",
+      "command_id",
+      "risk_level",
+      "result_summary",
+      "failure_reason",
+      "next_safe_action"
+    ]
+  },
+  "validator_law": {
+    "pj42_1_complete_when": [
+      "master_law_manifest_exists",
+      "human_doctrine_exists",
+      "command_registry_schema_defined",
+      "risk_levels_defined",
+      "memory_boundaries_defined",
+      "live_data_routes_defined",
+      "visual_surfaces_defined",
+      "evidence_requirements_defined"
+    ]
+  }
+}
