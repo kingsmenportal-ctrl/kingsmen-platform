@@ -1,0 +1,77 @@
+{
+  "id": "jarvis-adapter-contracts",
+  "pj": "PJ47",
+  "version": "1.0.0",
+  "contracts": [
+    {
+      "adapter_id": "web_research_adapter",
+      "input_required": ["query", "freshness_reason"],
+      "output_required": ["summary", "sources", "confidence_band", "retrieved_at"],
+      "may_write": false,
+      "must_not": ["claim_current_fact_without_source", "use_stale_cache_as_truth"]
+    },
+    {
+      "adapter_id": "github_adapter",
+      "input_required": ["repo", "lookup_scope"],
+      "output_required": ["result", "reference", "retrieved_at"],
+      "may_write": false,
+      "must_not": ["guess_file_state", "claim_missing_commit_as_created"]
+    },
+    {
+      "adapter_id": "system_health_adapter",
+      "input_required": ["health_scope"],
+      "output_required": ["status", "evidence", "checked_at"],
+      "may_write": false,
+      "must_not": ["hide_failure", "claim_online_without_check"]
+    },
+    {
+      "adapter_id": "validation_adapter",
+      "input_required": ["validator_id", "phase"],
+      "output_required": ["status", "proof", "repair_path"],
+      "may_write": false,
+      "must_not": ["claim_pass_without_output", "change_code_inside_validation"]
+    },
+    {
+      "adapter_id": "postgres_read_model_adapter",
+      "input_required": ["read_model", "scope"],
+      "output_required": ["summary", "checked_at", "evidence"],
+      "may_write": false,
+      "must_not": ["return_raw_private_rows", "return_unapproved_fields"]
+    },
+    {
+      "adapter_id": "playwright_scout_adapter",
+      "input_required": ["url", "scout_goal"],
+      "output_required": ["status", "blockers", "evidence", "manual_fallback"],
+      "may_write": false,
+      "must_not": ["submit_forms_silently", "bypass_blockers", "claim_success_without_screenshot_or_log"]
+    },
+    {
+      "adapter_id": "utility_api_adapter",
+      "input_required": ["utility_type", "parameters"],
+      "output_required": ["result", "checked_at", "source_or_tool"],
+      "may_write": false,
+      "must_not": ["return_stale_utility_value"]
+    },
+    {
+      "adapter_id": "kingsmen_knowledge_adapter",
+      "input_required": ["domain", "query"],
+      "output_required": ["summary", "status_label", "source_reference"],
+      "may_write": false,
+      "must_not": ["invent_doctrine", "expose_private_raw_data"]
+    },
+    {
+      "adapter_id": "evidence_pack_adapter",
+      "input_required": ["evidence_type", "source_refs"],
+      "output_required": ["evidence_id", "status", "created_at"],
+      "may_write": true,
+      "must_not": ["store_private_raw_data", "create_fake_proof"]
+    },
+    {
+      "adapter_id": "blocked_adapter",
+      "input_required": ["reason", "safe_redirect"],
+      "output_required": ["blocked", "reason", "safe_redirect"],
+      "may_write": false,
+      "must_not": ["execute_blocked_action"]
+    }
+  ]
+}
