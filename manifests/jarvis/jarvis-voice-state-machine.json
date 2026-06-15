@@ -1,0 +1,41 @@
+{
+  "id": "jarvis-voice-state-machine",
+  "pj": "PJ42.10",
+  "version": "1.0.0",
+  "voice_states": [
+    "sleeping",
+    "wake_detected",
+    "listening",
+    "transcribing",
+    "normalizing",
+    "thinking",
+    "using_tool",
+    "awaiting_approval",
+    "speaking",
+    "completed",
+    "blocked",
+    "failed"
+  ],
+  "transitions": [
+    { "from": "sleeping", "to": "wake_detected", "on": "wake_word_detected" },
+    { "from": "wake_detected", "to": "listening", "on": "greeting_completed" },
+    { "from": "listening", "to": "transcribing", "on": "speech_captured" },
+    { "from": "transcribing", "to": "normalizing", "on": "transcript_ready" },
+    { "from": "normalizing", "to": "thinking", "on": "request_normalized" },
+    { "from": "thinking", "to": "using_tool", "on": "approved_tool_needed" },
+    { "from": "thinking", "to": "awaiting_approval", "on": "risky_action_detected" },
+    { "from": "using_tool", "to": "speaking", "on": "answer_ready" },
+    { "from": "awaiting_approval", "to": "using_tool", "on": "approval_granted" },
+    { "from": "awaiting_approval", "to": "blocked", "on": "approval_denied_or_expired" },
+    { "from": "speaking", "to": "completed", "on": "speech_output_complete" },
+    { "from": "thinking", "to": "blocked", "on": "blocked_command_detected" },
+    { "from": "using_tool", "to": "failed", "on": "tool_failure" }
+  ],
+  "hud_visibility_rules": {
+    "state_must_be_visible": true,
+    "tool_use_must_be_visible": true,
+    "approval_state_must_be_visible": true,
+    "blocked_state_must_show_reason": true,
+    "failure_state_must_show_next_safe_action": true
+  }
+}
