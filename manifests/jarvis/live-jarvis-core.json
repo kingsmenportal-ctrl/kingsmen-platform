@@ -2,7 +2,7 @@
   "manifestRef": "jarvis-live-core-v0",
   "status": "built",
   "branch": "main",
-  "purpose": "Live Kingsmen Jarvis foundation: typed commands, tool trust registry, policy gate, evidence ledger, command runner, scoped mini builder core, and validator wiring.",
+  "purpose": "Live Kingsmen Jarvis foundation: typed commands, tool trust registry, policy gate, evidence ledger, command runner, scoped mini builder core, repo map selector, and validator wiring.",
   "notReferenceOnly": true,
   "authorityDoctrine": {
     "backendRemainsAuthority": true,
@@ -11,7 +11,8 @@
     "founderApprovalRequiredForProductionRisk": true,
     "whatsappUrgentOnly": true,
     "noUselessLayers": true,
-    "scopedBuilderOnly": true
+    "scopedBuilderOnly": true,
+    "repoContextSelectorRequired": true
   },
   "builtFiles": [
     "packages/contracts/src/jarvis/index.ts",
@@ -20,6 +21,7 @@
     "packages/jarvis-core/src/jarvis-evidence-ledger.ts",
     "packages/jarvis-core/src/jarvis-command-runner.ts",
     "packages/jarvis-core/src/jarvis-mini-builder-core.ts",
+    "packages/jarvis-core/src/jarvis-repo-map.ts",
     "packages/jarvis-core/src/index.ts",
     "scripts/validators/validate-jarvis-core.mjs"
   ],
@@ -37,10 +39,10 @@
     "JarvisEvidenceLedger",
     "JarvisCommandRunner",
     "JarvisMiniBuilderCore",
+    "JarvisRepoMap",
     "JarvisCoreValidator"
   ],
   "nextBuildTargets": [
-    "JarvisRepoMap",
     "JarvisPatchPlanContract",
     "JarvisChangedFilesReporter",
     "JarvisValidatorResultLedger",
