@@ -1,0 +1,29 @@
+{
+  "id": "jarvis-tool-router-validation",
+  "pj": "PJ42.4",
+  "version": "1.0.0",
+  "required_files": [
+    "docs/agents/PJ42_4_JARVIS_TOOL_ROUTER.md",
+    "manifests/jarvis/jarvis-tool-adapter.schema.json",
+    "manifests/jarvis/jarvis-approved-tool-adapters.json",
+    "manifests/jarvis/jarvis-tool-routing-matrix.json",
+    "manifests/jarvis/jarvis-tool-policy.json",
+    "manifests/jarvis/jarvis-tool-router-validation.json",
+    "scripts/jarvis/validate-pj42-4-tool-router.mjs"
+  ],
+  "required_checks": [
+    "files_exist",
+    "json_loads",
+    "adapter_ids_unique",
+    "routes_reference_known_adapters",
+    "routes_reference_known_commands",
+    "adapters_reference_known_commands",
+    "evidence_required_for_all_adapters",
+    "blocked_adapter_present",
+    "unknown_tool_default_blocked",
+    "risky_routes_require_policy_gate",
+    "approval_routes_require_approval_token",
+    "failure_policy_present"
+  ],
+  "next_phase": "PJ42.5 Source Confidence Engine"
+}
