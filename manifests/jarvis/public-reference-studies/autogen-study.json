@@ -1,0 +1,75 @@
+{
+  "id": "PJ_PUBLIC_JARVIS_25_AUTOGEN",
+  "sequence": 25,
+  "status": "RECORDED_REFERENCE_STUDY",
+  "branch": "main",
+  "project_name": "AutoGen",
+  "repository": "microsoft/autogen",
+  "repository_url": "https://github.com/microsoft/autogen",
+  "checked_date": "2026-06-15",
+  "source_type": "public_github_repository",
+  "runtime_dependency_decision": "DO_NOT_DEPEND_AS_FOUNDATION",
+  "dependency_reason": "The public README marks AutoGen as maintenance mode and points new users to Microsoft Agent Framework. Kingsmen should study AutoGen as a pattern, not build core runtime on it.",
+  "kingsmen_learning_category": [
+    "multi_agent_role_registry",
+    "message_passing",
+    "agent_tool_wrapping",
+    "prototype_studio",
+    "mcp_trust_policy",
+    "agent_benchmarking",
+    "human_sidecar_mode"
+  ],
+  "adapt_into_kingsmen": [
+    "JarvisAgentRoleRegistry",
+    "JarvisMessageBus",
+    "JarvisSpecialistAgentContract",
+    "JarvisAgentToolWrapper",
+    "JarvisAgentChatPattern",
+    "JarvisMultiAgentPrototypeStudio",
+    "JarvisAgentBenchHarness",
+    "JarvisMcpTrustPolicy",
+    "JarvisTeamRunTranscript",
+    "JarvisAgentDelegationBoundary",
+    "JarvisAgentCapabilityCard",
+    "JarvisHumanSidecarMode"
+  ],
+  "reject_from_kingsmen": [
+    "AutoGen as runtime foundation while in maintenance mode",
+    "unbounded multi-agent autonomy",
+    "agents selecting their own production tools",
+    "untrusted MCP servers",
+    "local command execution through MCP without approval",
+    "agent group chats overriding backend state machine",
+    "AutoGen Studio as production control panel",
+    "specialist agents writing doctrine",
+    "candidate data in free-form agent conversations",
+    "secrets in prompts/logs/transcripts/config",
+    "benchmark scores replacing Kingsmen validators"
+  ],
+  "authority_boundary": [
+    "PostgreSQL Truth Vault",
+    "Backend API state machine",
+    "locked doctrine files",
+    "GitHub evidence",
+    "validators and boot-blockers",
+    "founder approval"
+  ],
+  "implementation_order": [
+    "JarvisMiniBuilderCore",
+    "JarvisModeManager",
+    "JarvisAgentRoleRegistry",
+    "necessary specialist agents only",
+    "message/evidence transcript",
+    "validator-first repair loop",
+    "multi-agent delegation only after proof"
+  ],
+  "related_previous_studies": [
+    "PJ_PUBLIC_JARVIS_16_OPENHANDS",
+    "PJ_PUBLIC_JARVIS_17_AIDER",
+    "PJ_PUBLIC_JARVIS_19_CLINE",
+    "PJ_PUBLIC_JARVIS_22_SWE_AGENT",
+    "PJ_PUBLIC_JARVIS_23_MINI_SWE_AGENT",
+    "PJ_PUBLIC_JARVIS_24_LANGGRAPH"
+  ],
+  "study_file": "docs/jarvis/public-reference-studies/PJ_PUBLIC_JARVIS_25_AUTOGEN.md"
+}
