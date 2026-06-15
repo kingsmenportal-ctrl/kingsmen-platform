@@ -1,0 +1,93 @@
+{
+  "id": "jarvis-source-authority",
+  "pj": "PJ42.5",
+  "version": "1.0.0",
+  "authority_levels": [
+    {
+      "level_id": "official_primary",
+      "rank": 1,
+      "label": "Official Primary",
+      "examples": [
+        "official institution website",
+        "official government website",
+        "official SETA website",
+        "official bursary provider website",
+        "official employer career page",
+        "official application portal",
+        "official published PDF or notice"
+      ],
+      "allowed_confidence_ceiling": "verified_official"
+    },
+    {
+      "level_id": "official_secondary",
+      "rank": 2,
+      "label": "Official Secondary",
+      "examples": [
+        "official social page",
+        "official newsletter",
+        "official press release mirrored outside main site"
+      ],
+      "allowed_confidence_ceiling": "high_trusted_recent"
+    },
+    {
+      "level_id": "trusted_secondary",
+      "rank": 3,
+      "label": "Trusted Secondary",
+      "examples": [
+        "reputable news source",
+        "trusted scholarship/job aggregator",
+        "recognized education information site",
+        "verified partner source"
+      ],
+      "allowed_confidence_ceiling": "high_trusted_recent"
+    },
+    {
+      "level_id": "supporting_secondary",
+      "rank": 4,
+      "label": "Supporting Secondary",
+      "examples": [
+        "blog post",
+        "general aggregator",
+        "third-party summary",
+        "non-official guide"
+      ],
+      "allowed_confidence_ceiling": "medium_needs_review"
+    },
+    {
+      "level_id": "lead_only",
+      "rank": 5,
+      "label": "Lead Only",
+      "examples": [
+        "community post",
+        "forum thread",
+        "unverified screenshot",
+        "word-of-mouth lead",
+        "unattributed social post"
+      ],
+      "allowed_confidence_ceiling": "low_unverified_or_stale"
+    },
+    {
+      "level_id": "blocked",
+      "rank": 99,
+      "label": "Blocked",
+      "examples": [
+        "privacy-invasive source",
+        "unsafe instruction",
+        "source requiring bypass",
+        "fake proof",
+        "unsupported official-status claim"
+      ],
+      "allowed_confidence_ceiling": "blocked_or_unsafe"
+    }
+  ],
+  "domain_rules": {
+    "deadlines": "prefer official_primary only for verified claims",
+    "fees": "prefer official_primary only for verified claims",
+    "official_status": "official_primary required",
+    "jobs": "official_primary or trusted_secondary may answer; official_primary required for action",
+    "learnerships": "official_primary or trusted_secondary may answer; official_primary required for action",
+    "bursaries": "official_primary preferred; trusted_secondary may be lead only unless provider confirms",
+    "portal_health": "live scout evidence required",
+    "legal_or_policy": "official_primary required for strong claim"
+  }
+}
