@@ -1,0 +1,58 @@
+{
+  "id": "pj55-deferred-repair-carryover",
+  "pj": "PJ55",
+  "version": "1.0.0",
+  "carry_to": "PJ56",
+  "repair_items": [
+    {
+      "id": "pj44_css_hardening",
+      "source_phase": "PJ44",
+      "status": "deferred",
+      "required_for_production": true,
+      "target": "visual HUD styling proof"
+    },
+    {
+      "id": "pj44_validator",
+      "source_phase": "PJ44",
+      "status": "deferred",
+      "required_for_production": true,
+      "target": "visual HUD validation proof"
+    },
+    {
+      "id": "pj45_validator",
+      "source_phase": "PJ45",
+      "status": "deferred",
+      "required_for_production": true,
+      "target": "API wiring validation proof"
+    },
+    {
+      "id": "pj46_prompt_runtime",
+      "source_phase": "PJ46",
+      "status": "deferred",
+      "required_for_production": true,
+      "target": "runtime prompt/personality bridge"
+    },
+    {
+      "id": "pj46_validator",
+      "source_phase": "PJ46",
+      "status": "deferred",
+      "required_for_production": true,
+      "target": "personality validation proof"
+    },
+    {
+      "id": "pj52_validator_hardening",
+      "source_phase": "PJ52",
+      "status": "deferred",
+      "required_for_production": true,
+      "target": "integration validation proof"
+    },
+    {
+      "id": "pj53_validator",
+      "source_phase": "PJ53",
+      "status": "deferred",
+      "required_for_production": true,
+      "target": "readiness gate validation proof"
+    }
+  ],
+  "rule": "No deferred repair item may be silently forgotten or treated as production-ready."
+}
