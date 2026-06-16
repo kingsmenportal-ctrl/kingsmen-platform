@@ -1,0 +1,25 @@
+{
+  "schema": "kingsmen.local-truth-vault-postgres.v1",
+  "module": "Local Truth Vault PostgreSQL",
+  "status": "foundation_built_local_only_pending_runtime_start",
+  "productionReady": false,
+  "publicLaunchAllowed": false,
+  "localOnly": true,
+  "rawSecretsInGitAllowed": false,
+  "databaseUrlPrintedToLogsAllowed": false,
+  "requiredFiles": [
+    "scripts/staging/Start-KingsmenLocalTruthVault.ps1",
+    "docs/ops/KINGSMEN_LOCAL_TRUTH_VAULT_POSTGRES.md",
+    "manifests/ops/local-truth-vault-postgres-v1.json"
+  ],
+  "localRuntimeOutputsIgnoredByGit": [
+    ".local/kingsmen.local-postgres.env",
+    "reports/staging/local-truth-vault-postgres-latest.json",
+    "reports/staging/truth-vault-persistence-staging-latest.json"
+  ],
+  "expectedRuntimeResult": {
+    "truthVaultReportStatus": "TRUTH_VAULT_STAGING_PROBE_PASSED",
+    "webReportStatus": "WEB_BACKEND_STAGING_PROBE_PASSED",
+    "minimumPassedReportsAfterLocalDbAndWeb": 2
+  }
+}
