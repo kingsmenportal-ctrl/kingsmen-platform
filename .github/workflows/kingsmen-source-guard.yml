@@ -1,0 +1,54 @@
+name: Kingsmen Source Guard
+
+on:
+  pull_request:
+    branches: [main]
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+jobs:
+  source-guard:
+    name: source-guard
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: API Truth Vault persistence validator
+        run: npm run api:validate:truth-vault
+
+      - name: Safe web/backend boundary validator
+        run: npm run web:validate:backend-boundary
+
+      - name: PayFast sandbox source proof
+        run: npm run payments:prove:sandbox
+
+      - name: PayFast sandbox validator
+        run: npm run payments:validate:sandbox
+
+      - name: RLS/security source proof
+        run: npm run security:prove:rls
+
+      - name: RLS/security validator
+        run: npm run security:validate:rls
+
+      - name: Backup/restore source proof
+        run: npm run backup:prove:restore
+
+      - name: Backup/restore validator
+        run: npm run backup:validate:restore
+
+      - name: Launch audit report
+        run: npm run kingsmen:launch:audit
