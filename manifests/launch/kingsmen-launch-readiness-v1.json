@@ -17,7 +17,7 @@
     "No workflow execution without idempotency key, correlation ID, and audit evidence.",
     "No secrets in git, chat, reports, screenshots, or package artifacts.",
     "No branch launch from unprotected main.",
-    "No web route may shell out to local Windows PowerShell as a public API path.",
+    "No web route may shell out to local workstation runtime as a public API path.",
     "No broad tenant-blind RLS policies for public production traffic."
   ],
   "requiredLaunchGates": [
@@ -58,15 +58,25 @@
       "gateKey": "tenant_security_rls",
       "title": "Enforce scoped RLS and access boundary",
       "requiredBefore": "public users",
-      "status": "blocked",
-      "evidenceRequired": "RLS tests proving candidate/operator/founder/service role boundaries"
+      "status": "foundation_built_pending_staging_proof",
+      "evidenceRequired": "RLS tests proving candidate, operator, founder, anonymous, and backend service boundaries",
+      "evidencePaths": [
+        "db/migrations/0009_rls_security_boundary.sql",
+        "manifests/security/rls-security-proof-v1.json",
+        "docs/security/KINGSMEN_RLS_SECURITY_PROOF.md",
+        "scripts/proof/prove-rls-security-boundary.mjs",
+        "scripts/validators/validate-rls-security-proof.mjs",
+        "reports/security/rls-security-proof-latest.json",
+        "reports/security/rls-security-validation-latest.json"
+      ],
+      "remainingConstraint": "Source-level RLS/security proof is built; apply migration to staging and capture live SQL role-isolation proof before public users."
     },
     {
       "gateKey": "web_runtime_boundary",
-      "title": "Remove local PowerShell/Windows shell execution from public Next API routes",
+      "title": "Remove local shell execution from public Next API routes",
       "requiredBefore": "public web deploy",
       "status": "foundation_built_pending_staging_proof",
-      "evidenceRequired": "Web API routes call backend API/SDK only; no local psql.exe, C:\\Kingsmen path, local JSONL write, or workstation shell execution in public boundary routes",
+      "evidenceRequired": "Web API routes call backend API/SDK only; no workstation shell, local file-write, or direct database access in public boundary routes",
       "evidencePaths": [
         "apps/web/src/lib/kingsmen-backend-client.ts",
         "apps/web/src/app/api/public/free-destiny-map/intake/local/route.ts",
