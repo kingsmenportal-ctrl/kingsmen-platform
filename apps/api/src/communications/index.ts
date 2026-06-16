@@ -7,3 +7,4 @@ export * from "./communication-throttle";
 export * from "./urgent-escalation";
 export * from "./portal-inbox";
 export * from "./communications-read-model";
+export * from "./communications-proof-boundary";
