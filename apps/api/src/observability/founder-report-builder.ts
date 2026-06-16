@@ -36,6 +36,8 @@ export function buildFounderReport(input: {
     ...(input.health.documentBacklog > 0 ? ["Drain document backlog before execution pressure rises"] : [])
   ];
 
+  const healthDetails: Record<string, unknown> = { ...input.health };
+
   return {
     reportRef: ref("report"),
     reportType: input.reportType,
@@ -47,7 +49,7 @@ export function buildFounderReport(input: {
     keyActions,
     evidenceRefs: input.evidenceRefs,
     sections: [
-      section("System Health", 1, systemStatus === "GREEN" ? "NORMAL" : systemStatus === "AMBER" ? "WATCH" : "URGENT", input.health.summary, input.health, input.health.evidenceRefs),
+      section("System Health", 1, systemStatus === "GREEN" ? "NORMAL" : systemStatus === "AMBER" ? "WATCH" : "URGENT", input.health.summary, healthDetails, input.health.evidenceRefs),
       section("Incidents", 2, urgentIncidents.length ? "URGENT" : input.incidents.length ? "WATCH" : "NORMAL", `${input.incidents.length} open incident(s).`, { incidents: input.incidents }, input.evidenceRefs),
       section("Capacity", 3, input.health.oracleLitePressure === "LOW" ? "NORMAL" : "RISK", `Oracle Lite pressure: ${input.health.oracleLitePressure}.`, { activeCandidates: input.health.activeCandidates, cap: input.health.activeCandidateCap }, input.evidenceRefs)
     ]
@@ -55,11 +57,11 @@ export function buildFounderReport(input: {
 }
 
 export function redactCandidateSensitiveDetails<T extends Record<string, unknown>>(input: T): T {
-  const clone = { ...input };
+  const clone: Record<string, unknown> = { ...input };
   for (const key of Object.keys(clone)) {
     if (["idNumber", "phone", "email", "address", "bankAccount", "documentUrl"].includes(key)) {
       clone[key] = "[REDACTED]";
     }
   }
-  return clone;
+  return clone as T;
 }
