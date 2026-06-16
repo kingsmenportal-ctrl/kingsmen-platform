@@ -8,4 +8,5 @@ export * from "./payfast-itn";
 export * from "./finance-ledger";
 export * from "./refund-boundary";
 export * from "./payment-evidence";
+export * from "./payfast-sandbox-proof";
 export * from "./finance-read-model";
