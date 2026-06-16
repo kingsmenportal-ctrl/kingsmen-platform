@@ -24,208 +24,99 @@
     "No candidate notification provider may send live messages until communications staging proof passes.",
     "No public launch until observability and incident staging proof passes.",
     "No personal data collection or payment flow until legal, privacy, consent, terms, and refund policy proof passes.",
-    "No final assembly readiness may open until the staging runtime proof pack is captured and reviewed."
+    "No final assembly readiness may open until the staging runtime proof pack is captured and reviewed.",
+    "No public launch until the final assembly evidence bundle exists, is redacted, and is founder-reviewed."
   ],
   "requiredLaunchGates": [
     {
       "gateKey": "repo_protection",
       "title": "Protect main branch and require validators",
-      "requiredBefore": "merge/release",
       "status": "foundation_built_pending_github_apply",
-      "evidenceRequired": "GitHub branch protection rule with source-guard required status check, force-push/deletion disabled, pull-request review required, and admins included",
-      "evidencePaths": [
-        "manifests/repo/main-branch-protection-v1.json",
-        "docs/repo/KINGSMEN_BRANCH_PROTECTION.md",
-        ".github/workflows/kingsmen-source-guard.yml",
-        "scripts/github/Set-KingsmenMainBranchProtection.ps1",
-        "scripts/proof/prove-main-branch-protection-boundary.mjs",
-        "scripts/validators/validate-main-branch-protection.mjs",
-        "reports/repo/main-branch-protection-proof-latest.json",
-        "reports/repo/main-branch-protection-validation-latest.json"
-      ],
-      "remainingConstraint": "Run the branch protection apply script with GitHub admin permissions, then verify source-guard is required before merge/release."
+      "evidencePaths": ["manifests/repo/main-branch-protection-v1.json", "scripts/github/Set-KingsmenMainBranchProtection.ps1", "reports/repo/main-branch-protection-apply-latest.json"],
+      "remainingConstraint": "Apply and verify GitHub branch protection with source-guard required."
     },
     {
       "gateKey": "api_runtime",
       "title": "Materialize backend API as deployable runtime",
-      "requiredBefore": "staging deploy",
       "status": "foundation_built",
-      "evidenceRequired": "apps/api package/runtime entrypoint, health route, command route, workflow result route, read-model routes, and deploy command",
-      "evidencePaths": [
-        "apps/api/package.json",
-        "apps/api/tsconfig.json",
-        "apps/api/src/server.ts",
-        "docs/api/KINGSMEN_DEPLOYABLE_API.md"
-      ]
+      "evidencePaths": ["apps/api/package.json", "apps/api/src/server.ts", "docs/api/KINGSMEN_DEPLOYABLE_API.md"]
     },
     {
       "gateKey": "truth_vault_persistence",
-      "title": "Replace repository stubs with real PostgreSQL/Supabase persistence",
-      "requiredBefore": "staging data writes",
+      "title": "Real PostgreSQL/Supabase persistence",
       "status": "foundation_built_pending_staging_proof",
-      "evidenceRequired": "DB integration tests proving evidence, idempotency, heartbeat, command log, workflow result, and audit writes",
-      "evidencePaths": [
-        "apps/api/src/db/truth-vault-repository.ts",
-        "docs/api/KINGSMEN_TRUTH_VAULT_PERSISTENCE.md",
-        "scripts/validators/validate-api-truth-vault-persistence.mjs"
-      ],
-      "remainingConstraint": "Run API against staging PostgreSQL/Supabase with KINGSMEN_TRUTH_VAULT_MODE=postgres and capture integration proof before public users."
+      "evidencePaths": ["apps/api/src/db/truth-vault-repository.ts", "scripts/validators/validate-api-truth-vault-persistence.mjs", "reports/staging/truth-vault-persistence-staging-latest.json"],
+      "remainingConstraint": "Run staging PostgreSQL/Supabase integration proof."
     },
     {
       "gateKey": "tenant_security_rls",
-      "title": "Enforce scoped RLS and access boundary",
-      "requiredBefore": "public users",
+      "title": "Scoped RLS and access boundary",
       "status": "foundation_built_pending_staging_proof",
-      "evidenceRequired": "RLS tests proving candidate, operator, founder, anonymous, and backend service boundaries",
-      "evidencePaths": [
-        "db/migrations/0009_rls_security_boundary.sql",
-        "manifests/security/rls-security-proof-v1.json",
-        "docs/security/KINGSMEN_RLS_SECURITY_PROOF.md",
-        "scripts/proof/prove-rls-security-boundary.mjs",
-        "scripts/validators/validate-rls-security-proof.mjs",
-        "reports/security/rls-security-proof-latest.json",
-        "reports/security/rls-security-validation-latest.json"
-      ],
-      "remainingConstraint": "Apply migration to staging and capture live SQL role-isolation proof before public users."
+      "evidencePaths": ["db/migrations/0009_rls_security_boundary.sql", "manifests/security/rls-security-proof-v1.json", "reports/staging/rls-sql-isolation-staging-latest.json"],
+      "remainingConstraint": "Capture live SQL role-isolation proof."
     },
     {
       "gateKey": "web_runtime_boundary",
-      "title": "Remove local shell execution from public Next API routes",
-      "requiredBefore": "public web deploy",
+      "title": "Safe web-to-backend boundary",
       "status": "foundation_built_pending_staging_proof",
-      "evidenceRequired": "Web API routes call backend API/SDK only; no workstation shell, local file-write, or direct database access in public boundary routes",
-      "evidencePaths": [
-        "apps/web/src/lib/kingsmen-backend-client.ts",
-        "apps/web/src/app/api/public/free-destiny-map/intake/local/route.ts",
-        "apps/web/src/app/api/jarvis/status/route.ts",
-        "apps/web/src/app/api/jarvis/command/route.ts",
-        "docs/web/KINGSMEN_SAFE_WEB_BACKEND_BOUNDARY.md",
-        "scripts/validators/validate-safe-web-backend-boundary.mjs"
-      ],
-      "remainingConstraint": "Run staging web/API smoke proof with KINGSMEN_BACKEND_BASE_URL configured before public launch."
+      "evidencePaths": ["apps/web/src/lib/kingsmen-backend-client.ts", "docs/web/KINGSMEN_SAFE_WEB_BACKEND_BOUNDARY.md", "reports/staging/web-backend-boundary-staging-latest.json"],
+      "remainingConstraint": "Run staging web/API smoke proof."
     },
     {
       "gateKey": "payments",
-      "title": "PayFast sandbox and ITN verification evidence",
-      "requiredBefore": "taking money",
+      "title": "PayFast sandbox and ITN evidence",
       "status": "foundation_built_pending_real_sandbox_evidence",
-      "evidenceRequired": "sandbox success, cancel, return, failed payment, duplicate ITN, invalid signature, replay, amount mismatch, refund human-review, and secret-redaction tests",
-      "evidencePaths": [
-        "manifests/payment/payfast-sandbox-proof-v1.json",
-        "docs/finance/KINGSMEN_PAYMENT_PROOF.md",
-        "apps/api/src/finance/payfast-sandbox-proof.ts",
-        "scripts/proof/prove-payfast-sandbox-boundary.mjs",
-        "scripts/validators/validate-payfast-sandbox-proof.mjs",
-        "reports/finance/payfast-sandbox-proof-run-latest.json",
-        "reports/finance/payfast-sandbox-proof-latest.json"
-      ],
-      "remainingConstraint": "Capture real PayFast sandbox checkout against staging notify URL before paid pilot or live payments."
-    },
-    {
-      "gateKey": "secrets_wiring",
-      "title": "Wire secrets outside Git with masked runtime health proof",
-      "requiredBefore": "staging deploy",
-      "status": "foundation_built_pending_runtime_secret_health_proof",
-      "evidenceRequired": "credential registry, empty env example, no raw secret values in repo, masked runtime secret health report, and no browser/OpenClaw raw secret access",
-      "evidencePaths": [
-        "manifests/credentials/credentials.registry.json",
-        "manifests/credentials/secrets-wiring-proof-v1.json",
-        ".env.example",
-        "docs/security/KINGSMEN_SECRETS_WIRING_PROOF.md",
-        "scripts/security/Test-KingsmenSecretWiring.ps1",
-        "scripts/proof/prove-secrets-wiring-boundary.mjs",
-        "scripts/validators/validate-secrets-wiring-proof.mjs",
-        "reports/security/secrets-wiring-proof-latest.json",
-        "reports/security/secrets-wiring-validation-latest.json",
-        "reports/security/secrets-wiring-runtime-health-latest.json"
-      ],
-      "remainingConstraint": "Run masked runtime secret health proof after real env vars are configured outside Git."
-    },
-    {
-      "gateKey": "communications",
-      "title": "Email provider and urgent WhatsApp-only boundary",
-      "requiredBefore": "candidate notifications",
-      "status": "foundation_built_pending_provider_staging_proof",
-      "evidenceRequired": "email send/receive, bounce handling, opt-out policy, WhatsApp urgent-only approval evidence, SMS fallback proof, and redacted evidence report",
-      "evidencePaths": [
-        "apps/api/src/communications/communications-proof-boundary.ts",
-        "manifests/communications/communications-proof-v1.json",
-        "docs/communications/KINGSMEN_COMMUNICATIONS_PROOF.md",
-        "scripts/proof/prove-communications-boundary.mjs",
-        "scripts/validators/validate-communications-proof.mjs",
-        "reports/communications/communications-proof-latest.json",
-        "reports/communications/communications-validation-latest.json"
-      ],
-      "remainingConstraint": "Run provider staging send/receive, bounce, opt-out, WhatsApp urgent-only, SMS fallback, and redacted evidence proof before real candidate notifications."
+      "evidencePaths": ["manifests/payment/payfast-sandbox-proof-v1.json", "docs/finance/KINGSMEN_PAYMENT_PROOF.md", "reports/staging/payfast-provider-sandbox-staging-latest.json"],
+      "remainingConstraint": "Capture real PayFast sandbox checkout against staging notify URL."
     },
     {
       "gateKey": "backup_restore",
       "title": "Backup and restore drill",
-      "requiredBefore": "production data",
       "status": "foundation_built_pending_staging_drill",
-      "evidenceRequired": "restore drill report with RPO/RTO, backup SHA-256, target/source separation, counts-only sample verification, and no secrets/raw candidate rows",
-      "evidencePaths": [
-        "manifests/ops/backup-restore-proof-v1.json",
-        "docs/ops/KINGSMEN_BACKUP_RESTORE_PROOF.md",
-        "scripts/backup/New-KingsmenTruthVaultBackup.ps1",
-        "scripts/backup/Test-KingsmenTruthVaultRestore.ps1",
-        "scripts/proof/prove-backup-restore-boundary.mjs",
-        "scripts/validators/validate-backup-restore-proof.mjs",
-        "reports/ops/backup-restore-proof-latest.json",
-        "reports/ops/backup-restore-validation-latest.json"
-      ],
-      "remainingConstraint": "Run a real staging backup and restore drill before production personal data."
+      "evidencePaths": ["manifests/ops/backup-restore-proof-v1.json", "scripts/backup/New-KingsmenTruthVaultBackup.ps1", "scripts/backup/Test-KingsmenTruthVaultRestore.ps1", "reports/staging/backup-restore-drill-staging-latest.json"],
+      "remainingConstraint": "Run real staging backup and restore drill."
+    },
+    {
+      "gateKey": "secrets_wiring",
+      "title": "Secrets outside Git with masked runtime health proof",
+      "status": "foundation_built_pending_runtime_secret_health_proof",
+      "evidencePaths": ["manifests/credentials/secrets-wiring-proof-v1.json", "scripts/security/Test-KingsmenSecretWiring.ps1", "reports/security/secrets-wiring-runtime-health-latest.json"],
+      "remainingConstraint": "Run masked runtime secret health proof."
+    },
+    {
+      "gateKey": "communications",
+      "title": "Email primary and urgent WhatsApp-only boundary",
+      "status": "foundation_built_pending_provider_staging_proof",
+      "evidencePaths": ["manifests/communications/communications-proof-v1.json", "docs/communications/KINGSMEN_COMMUNICATIONS_PROOF.md", "reports/staging/communications-provider-staging-latest.json"],
+      "remainingConstraint": "Run communications provider staging proof."
     },
     {
       "gateKey": "observability_incident",
-      "title": "Operational monitoring and incident SOP",
-      "requiredBefore": "public users",
+      "title": "Observability and incident proof",
       "status": "foundation_built_pending_staging_monitoring_proof",
-      "evidenceRequired": "health checks, structured logs, correlation IDs, queue/DLQ review, alert definitions, incident runbook, founder escalation path, and redaction proof",
-      "evidencePaths": [
-        "apps/api/src/ops/observability-incident-proof-boundary.ts",
-        "manifests/ops/observability-incident-proof-v1.json",
-        "docs/ops/KINGSMEN_OBSERVABILITY_INCIDENT_PROOF.md",
-        "scripts/proof/prove-observability-incident-boundary.mjs",
-        "scripts/validators/validate-observability-incident-proof.mjs",
-        "reports/ops/observability-incident-proof-latest.json",
-        "reports/ops/observability-incident-validation-latest.json"
-      ],
-      "remainingConstraint": "Run staging monitoring, DLQ, alert, redaction, and incident drill proof before public users."
+      "evidencePaths": ["manifests/ops/observability-incident-proof-v1.json", "docs/ops/KINGSMEN_OBSERVABILITY_INCIDENT_PROOF.md", "reports/staging/observability-incident-staging-latest.json"],
+      "remainingConstraint": "Run staging monitoring, DLQ, alert, redaction, and incident drill proof."
     },
     {
       "gateKey": "legal_privacy",
-      "title": "Privacy, consent, refund, and candidate terms",
-      "requiredBefore": "collecting personal data or payments",
+      "title": "Legal, privacy, consent, terms, and refund proof",
       "status": "foundation_built_pending_legal_review_and_publication_proof",
-      "evidenceRequired": "published terms, privacy notice, consent notice, refund/payment terms, data-subject request path, versioned legal review, consent capture proof, and refund display proof",
-      "evidencePaths": [
-        "apps/api/src/legal/legal-privacy-proof-boundary.ts",
-        "manifests/legal/legal-privacy-proof-v1.json",
-        "docs/legal/KINGSMEN_LEGAL_PRIVACY_CONSENT_REFUND_PROOF.md",
-        "scripts/proof/prove-legal-privacy-boundary.mjs",
-        "scripts/validators/validate-legal-privacy-proof.mjs",
-        "reports/legal/legal-privacy-proof-latest.json",
-        "reports/legal/legal-privacy-validation-latest.json"
-      ],
-      "remainingConstraint": "Publish/version policy surfaces and capture founder/legal review, consent smoke proof, refund/payment display proof, and data-subject request proof before collecting personal data or payments."
+      "evidencePaths": ["manifests/legal/legal-privacy-proof-v1.json", "docs/legal/KINGSMEN_LEGAL_PRIVACY_CONSENT_REFUND_PROOF.md", "reports/staging/legal-privacy-publication-staging-latest.json"],
+      "remainingConstraint": "Publish/version policy surfaces and capture founder/legal review plus consent/refund smoke proof."
     },
     {
       "gateKey": "staging_runtime_proof_pack",
       "title": "Capture complete staging runtime evidence pack",
-      "requiredBefore": "final assembly",
       "status": "foundation_built_pending_staging_evidence_capture",
-      "evidenceRequired": "one reviewed redacted staging pack containing DB persistence, web/API smoke, RLS isolation, PayFast sandbox, backup/restore, secrets runtime, communications provider, observability incident, legal publication, and branch protection evidence",
-      "evidencePaths": [
-        "apps/api/src/ops/staging-runtime-proof-pack-boundary.ts",
-        "manifests/launch/staging-runtime-proof-pack-v1.json",
-        "docs/launch/KINGSMEN_STAGING_RUNTIME_PROOF_PACK.md",
-        "scripts/proof/prove-staging-runtime-proof-pack.mjs",
-        "scripts/validators/validate-staging-runtime-proof-pack.mjs",
-        "reports/staging/staging-runtime-proof-pack-latest.json",
-        "reports/staging/staging-runtime-proof-pack-validation-latest.json"
-      ],
-      "remainingConstraint": "Run and review all redacted staging runtime evidence reports before changing final assembly checks from pending to passed."
+      "evidencePaths": ["apps/api/src/ops/staging-runtime-proof-pack-boundary.ts", "manifests/launch/staging-runtime-proof-pack-v1.json", "docs/launch/KINGSMEN_STAGING_RUNTIME_PROOF_PACK.md", "reports/staging/staging-runtime-proof-pack-latest.json"],
+      "remainingConstraint": "Run and review all redacted staging runtime evidence reports."
+    },
+    {
+      "gateKey": "final_assembly_evidence_capture",
+      "title": "Capture final assembly evidence bundle",
+      "status": "foundation_built_pending_final_evidence_capture_review",
+      "evidencePaths": ["apps/api/src/final-assembly/final-assembly-evidence-capture-boundary.ts", "manifests/launch/final-assembly-evidence-capture-v1.json", "docs/launch/KINGSMEN_FINAL_ASSEMBLY_EVIDENCE_CAPTURE.md", "scripts/staging/Collect-KingsmenFinalAssemblyEvidence.ps1", "scripts/proof/prove-final-assembly-evidence-capture.mjs", "scripts/validators/validate-final-assembly-evidence-capture.mjs", "reports/final-assembly/final-assembly-evidence-bundle-latest.json", "reports/final-assembly/final-assembly-evidence-validation-latest.json"],
+      "remainingConstraint": "Run final assembly evidence collector and founder-review the redacted evidence bundle before public launch."
     }
   ],
   "launchPhases": [
@@ -240,17 +131,22 @@
       "definitionOfDone": "API health, command intake, workflow result intake, DB writes, web reads, and staging runtime proof pack pass."
     },
     {
-      "phase": "2_founder_private_beta",
+      "phase": "2_final_assembly",
+      "goal": "Collect reviewed redacted evidence into one final assembly bundle.",
+      "definitionOfDone": "Final assembly evidence bundle exists, hashes all required reports, and founder review is recorded."
+    },
+    {
+      "phase": "3_founder_private_beta",
       "goal": "Founder/operator can process real test candidates manually with evidence.",
       "definitionOfDone": "10 end-to-end candidate journeys completed without unsafe writes or missing evidence."
     },
     {
-      "phase": "3_paid_pilot",
+      "phase": "4_paid_pilot",
       "goal": "Limited paid pilot under active founder supervision.",
-      "definitionOfDone": "PayFast proof, communications proof, support process, refund process, secrets runtime proof, backup/restore proof, observability proof, legal/privacy proof, staging runtime proof pack, and incident response are complete."
+      "definitionOfDone": "PayFast proof, communications proof, support process, refund process, secrets runtime proof, backup/restore proof, observability proof, legal/privacy proof, staging runtime proof pack, final assembly evidence bundle, and incident response are complete."
     },
     {
-      "phase": "4_public_launch",
+      "phase": "5_public_launch",
       "goal": "Open public acquisition with capped load.",
       "definitionOfDone": "All required launch gates pass and candidate cap is enforced."
     }
