@@ -7,7 +7,7 @@ import {
   type FreeDestinyMapIntakeResult,
   type FreeDestinyMapIntakeValidationIssue,
   type FreeDestinyRouteInterest
-} from "../../../../packages/contracts/src/free-destiny-map-intake";
+} from "./free-destiny-map-contracts";
 
 function isNonEmptyText(value: unknown): value is string {
   return typeof value === "string" && value.trim().length > 0;
