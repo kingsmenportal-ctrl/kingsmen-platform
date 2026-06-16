@@ -75,7 +75,7 @@ PostgreSQL Truth Vault mode:
 
 ```bash
 KINGSMEN_TRUTH_VAULT_MODE=postgres
-KINGSMEN_DATABASE_URL=postgres://...
+KINGSMEN_DATABASE_URL=[set-outside-git]
 KINGSMEN_DATABASE_SSL=true
 npm run api:start
 ```
@@ -144,12 +144,12 @@ npm run backup:validate:restore
 Real staging drill:
 
 ```powershell
-$env:KINGSMEN_DATABASE_URL = "postgres://...source..."
-$env:KINGSMEN_BACKUP_ROOT = "D:\\KingsmenBackups"
+$env:KINGSMEN_DATABASE_URL = "[source-database-url-set-outside-git]"
+$env:KINGSMEN_BACKUP_ROOT = "D:\KingsmenBackups"
 .\scripts\backup\New-KingsmenTruthVaultBackup.ps1
 
-$env:KINGSMEN_RESTORE_DRILL_DATABASE_URL = "postgres://...restore-drill..."
-.\scripts\backup\Test-KingsmenTruthVaultRestore.ps1 -BackupFile "D:\\KingsmenBackups\\...\\kingsmen-truth-vault-....dump"
+$env:KINGSMEN_RESTORE_DRILL_DATABASE_URL = "[restore-drill-database-url-set-outside-git]"
+.\scripts\backup\Test-KingsmenTruthVaultRestore.ps1 -BackupFile "D:\KingsmenBackups\...\kingsmen-truth-vault-....dump"
 ```
 
 This still does not authorize production personal data. It only proves the backup/restore source boundary. Before production data, run a real staging restore drill and store counts-only evidence with RPO/RTO.
