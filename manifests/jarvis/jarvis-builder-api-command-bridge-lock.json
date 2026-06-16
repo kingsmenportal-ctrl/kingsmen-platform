@@ -1,0 +1,21 @@
+{
+    "lock_name":  "jarvis-builder-api-command-bridge",
+    "status":  "LOCKED",
+    "locked_at":  "2026-06-15T07:43:41.0806688Z",
+    "commander_only":  true,
+    "cockpit_commands":  [
+                             "Jarvis, create Kingsmen module N21 Founder Command Digest",
+                             "approve KJB-yyyyMMdd-HHmmss",
+                             "builder status"
+                         ],
+    "api_routes":  [
+                       "/api/jarvis/command",
+                       "/api/jarvis/builder"
+                   ],
+    "allowed_write_boundaries":  [
+                                     "docs\\kingsmen\\modules\\",
+                                     "manifests\\kingsmen\\modules\\",
+                                     "reports\\jarvis\\builder\\module-proofs\\"
+                                 ],
+    "visual_css_changed":  false
+}

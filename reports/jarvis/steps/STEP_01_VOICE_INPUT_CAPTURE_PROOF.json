@@ -1,0 +1,20 @@
+﻿{
+    "step":  "STEP_01_VOICE_INPUT_CAPTURE",
+    "status":  "INSTALLED",
+    "created_at":  "2026-06-14T08:27:06.4791720Z",
+    "repo":  "C:\\Kingsmen\\kingsmen-platform",
+    "layout_preserved":  true,
+    "primary_layout_file":  "apps\\web\\src\\app\\jarvis\\JarvisHudClient.tsx",
+    "primary_layout_sha256":  "5c007dc20468366f9f65f2e347bafd8d2731e0a14ff2991b0fcf345f29ef6b9b",
+    "installed_files":  [
+                            "tools\\jarvis\\KINGSMEN_JARVIS_STEP_01_VOICE_CAPTURE.ps1",
+                            "docs\\jarvis\\JARVIS_STEP_01_VOICE_INPUT_CAPTURE.md",
+                            "reports\\jarvis\\steps\\STEP_01_VOICE_INPUT_CAPTURE_PROOF.json",
+                            "C:\\Kingsmen\\JARVIS_STEP_01_VOICE_CAPTURE.cmd",
+                            "C:\\Kingsmen\\JARVIS_STEP_01_VOICE_LOGS.cmd"
+                        ],
+    "test_command":  "C:\\Kingsmen\\JARVIS_STEP_01_VOICE_CAPTURE.cmd",
+    "logs_command":  "C:\\Kingsmen\\JARVIS_STEP_01_VOICE_LOGS.cmd",
+    "expected_spoken_test":  "Say Jarvis",
+    "next_step":  "STEP_02_MANDATORY_KINGSMEN_WELCOME"
+}

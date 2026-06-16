@@ -1,0 +1,13 @@
+﻿{
+    "step":  "STEP_01D_SERVER_SCRIPT_DISCOVERY_REPAIR",
+    "status":  "server-online",
+    "detail":  "Already online.",
+    "updated_at":  "2026-06-14T09:48:23.6854972Z",
+    "repo":  "C:\\Kingsmen\\kingsmen-platform",
+    "target_dir":  "",
+    "command":  "",
+    "url":  "http://127.0.0.1:3000/jarvis",
+    "status_url":  "http://127.0.0.1:3000/api/jarvis/status",
+    "log":  "C:\\Kingsmen\\kingsmen-platform\\reports\\jarvis\\runtime\\STEP_01D_SERVER_SCRIPT_DISCOVERY_REPAIR.log",
+    "scan_report":  "C:\\Kingsmen\\kingsmen-platform\\reports\\jarvis\\runtime\\STEP_01D_PACKAGE_SCRIPT_SCAN.json"
+}

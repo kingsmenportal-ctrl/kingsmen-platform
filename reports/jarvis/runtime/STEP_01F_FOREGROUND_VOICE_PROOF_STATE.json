@@ -1,0 +1,21 @@
+{
+    "step":  "STEP_01F_FOREGROUND_VOICE_PROOF",
+    "status":  "listening",
+    "updated_at":  "2026-06-14T10:04:12.6748375Z",
+    "recognizer_started":  true,
+    "recognizer_culture":  "en-US",
+    "total_speech_detected":  0,
+    "total_hypothesized":  0,
+    "total_recognized":  0,
+    "total_rejected":  0,
+    "total_wake":  0,
+    "total_api_posts":  0,
+    "last_text":  "",
+    "last_confidence":  null,
+    "last_event":  "STILL LISTENING - say Jarvis, or press Q to stop.",
+    "api":  "http://127.0.0.1:3000/api/jarvis/voice",
+    "log":  "C:\\Kingsmen\\kingsmen-platform\\reports\\jarvis\\runtime\\STEP_01F_FOREGROUND_VOICE_PROOF.log",
+    "events":  "C:\\Kingsmen\\kingsmen-platform\\reports\\jarvis\\runtime\\STEP_01F_FOREGROUND_VOICE_PROOF_EVENTS.jsonl",
+    "foreground_loop_alive":  true,
+    "layout_files_changed":  false
+}

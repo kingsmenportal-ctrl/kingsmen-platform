@@ -1,0 +1,28 @@
+{
+  "proof_id": "PROOF-KJB-20260615-140132",
+  "plan_id": "KJB-20260615-140132",
+  "completed_at": "2026-06-15T21:12:46.578Z",
+  "command": "Jarvis, create Kingsmen module N21 Builder API Smoke Test",
+  "module_id": "N21",
+  "title": "Builder API Smoke Test",
+  "changed_files": [
+    "docs/kingsmen/modules/n21-builder-api-smoke-test.md",
+    "manifests/kingsmen/modules/n21-builder-api-smoke-test.json",
+    "reports/jarvis/builder/module-proofs/n21-builder-api-smoke-test-proof-seed.json"
+  ],
+  "backups": [],
+  "validation_passed": false,
+  "validation_results": [
+    {
+      "command": "npm run build",
+      "cwd": "C:\\Kingsmen\\kingsmen-platform\\apps\\web",
+      "exit_code": 1,
+      "stdout": "\n> @kingsmen/web@0.0.0 build\n> next build\n\n   ▲ Next.js 15.5.19\n   - Experiments (use with caution):\n     ✓ externalDir\n\n   Creating an optimized production build ...\n ✓ Compiled successfully in 41s\n   Linting and checking validity of types ...\n",
+      "stderr": " ⚠ You are using a non-standard \"NODE_ENV\" value in your environment. This creates inconsistencies in the project and is strongly advised against. Read more: https://nextjs.org/docs/messages/non-standard-node-env\nFailed to compile.\n\n./src/app/command/page.tsx:6:27\nType error: Type '{ surface: string; }' is not assignable to type 'IntrinsicAttributes'.\n  Property 'surface' does not exist on type 'IntrinsicAttributes'.\n\n\u001b[0m \u001b[90m 4 |\u001b[39m\n \u001b[90m 5 |\u001b[39m \u001b[36mexport\u001b[39m \u001b[36mdefault\u001b[39m \u001b[36mfunction\u001b[39m \u001b[33mCommandPage\u001b[39m() {\n\u001b[31m\u001b[1m>\u001b[22m\u001b[39m\u001b[90m 6 |\u001b[39m   \u001b[36mreturn\u001b[39m \u001b[33m<\u001b[39m\u001b[33mJarvisHudClient\u001b[39m surface\u001b[33m=\u001b[39m\u001b[32m\"COMMAND\"\u001b[39m \u001b[33m/\u001b[39m\u001b[33m>\u001b[39m\u001b[33m;\u001b[39m\n \u001b[90m   |\u001b[39m                           \u001b[31m\u001b[1m^\u001b[22m\u001b[39m\n \u001b[90m 7 |\u001b[39m }\n \u001b[90m 8 |\u001b[39m\u001b[0m\nNext.js build worker exited with code: 1 and signal: null\n"
+    }
+  ],
+  "git_commit_attempted": false,
+  "git_commit_ok": false,
+  "git_results": [],
+  "final_status": "BUILT_VALIDATION_FAILED_NO_COMMIT"
+}

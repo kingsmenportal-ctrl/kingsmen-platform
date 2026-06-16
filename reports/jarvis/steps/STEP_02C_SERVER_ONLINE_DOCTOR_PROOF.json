@@ -1,0 +1,34 @@
+{
+    "step":  "STEP_02C_SERVER_ONLINE_DOCTOR",
+    "status":  "COMPLETE",
+    "created_at":  "2026-06-15T08:50:16.3563589Z",
+    "purpose":  "Start and prove Jarvis Next server on 127.0.0.1:3000",
+    "changed_files":  [
+                          {
+                              "path":  "tools\\jarvis\\START_JARVIS_SERVER_ONLINE.ps1",
+                              "sha256":  "bc17b1f78e4bfeeeb509d528fc8c1ebe07a057ae736d7240e50da50c7f2a1b4b"
+                          },
+                          {
+                              "path":  "tools\\jarvis\\PROBE_JARVIS_SERVER.ps1",
+                              "sha256":  "9fdc242a87e103a90497cbe323e65d2e8ccf231d0ffd83a53431e922fe4c0f23"
+                          },
+                          {
+                              "path":  "C:\\Kingsmen\\START_JARVIS_SERVER_ONLINE.cmd",
+                              "sha256":  "db46707c92b00fa0f4726a280e9fcd679f92fd8d0e2ecf53967b0a4c780453a3"
+                          },
+                          {
+                              "path":  "C:\\Kingsmen\\PROBE_JARVIS_SERVER.cmd",
+                              "sha256":  "e2dd66d9b02fc7f4a1e5c9aa09d002c9f0e624b90e349f59f24c5f13d9bf0b8e"
+                          },
+                          {
+                              "path":  "C:\\Kingsmen\\OPEN_JARVIS_LOCKED.cmd",
+                              "sha256":  "ec47256acd3de1ac5e4371b3c239238dbb810bf74c58beb8d69746c03486c429"
+                          }
+                      ],
+    "visual_files_changed":  [
+
+                             ],
+    "run_first":  "C:\\Kingsmen\\START_JARVIS_SERVER_ONLINE.cmd",
+    "probe_second_window":  "C:\\Kingsmen\\PROBE_JARVIS_SERVER.cmd",
+    "smoke_after_online":  "C:\\Kingsmen\\JARVIS_BUILDER_API_SMOKE_TEST.cmd"
+}

@@ -1,345 +1,503 @@
 "use client";
 
-import { FormEvent, useEffect, useMemo, useRef, useState } from "react";
+import { useEffect, useMemo, useRef, useState, type CSSProperties } from "react";
 import styles from "./JarvisHud.module.css";
 
-type JarvisCard = {
-  key: string;
-  title: string;
-  state: string;
-  detail: string;
-  ok: boolean;
+type EvidenceLevel = "ok" | "info" | "warn" | "critical";
+type EvidenceRow = { id: string; time: string; event: string; source: string; level: EvidenceLevel };
+type AgentState = { name: string; status: "ACTIVE" | "READY" | "LOCKED" | "IDLE" | "WAITING"; detail: string };
+type ActionItem = { id: string; title: string; detail: string; severity: "Critical" | "Review" | "Info"; status: "Open" | "Queued" | "Done" };
+type WorkflowItem = { id: string; label: string; status: "Ready" | "Running" | "Queued" | "Done" };
+type ViewBox = { scale: number; left: number; top: number };
+
+type SpeechRecognitionConstructor = new () => SpeechRecognitionInstance;
+type SpeechRecognitionInstance = {
+  lang: string;
+  continuous: boolean;
+  interimResults: boolean;
+  maxAlternatives: number;
+  start: () => void;
+  stop: () => void;
+  onstart: (() => void) | null;
+  onend: (() => void) | null;
+  onerror: ((event: { error?: string }) => void) | null;
+  onresult: ((event: SpeechRecognitionEventLike) => void) | null;
+};
+type SpeechRecognitionEventLike = {
+  resultIndex: number;
+  results: ArrayLike<{ isFinal: boolean; 0: { transcript: string; confidence?: number } }>;
 };
 
-type JarvisCommand = {
-  id: string;
-  title: string;
-  description: string;
-  category: string;
-  risk: "SAFE_READ" | "POLICY_REVIEW" | "BLOCKED";
-};
+declare global {
+  interface Window {
+    SpeechRecognition?: SpeechRecognitionConstructor;
+    webkitSpeechRecognition?: SpeechRecognitionConstructor;
+  }
+}
 
-type JarvisStatus = {
-  ok: boolean;
-  generatedAt: string;
-  cards: JarvisCard[];
-  commands: JarvisCommand[];
-  doctrine: string[];
-};
+const WAKE_GREETING =
+  "Welcome to Kingsmen Command, Commander. Jarvis is online. The command house is awake, your desk is prepared, and I stand ready to brief, inspect, report, search, repair, research, organise, or execute under Kingsmen doctrine.";
 
-type JarvisResult = {
-  ok: boolean;
-  commandId: string;
-  title: string;
-  category: string;
-  risk: string;
-  startedAt: string;
-  finishedAt: string;
-  durationMs: number;
-  stdout: string;
-  stderr: string;
-  evidencePath: string;
-  message: string;
-};
-
-const quickCommands = [
-  "SYSTEM_VALIDATE_N20",
-  "DB_LEDGER_CHECK",
-  "OPENCLAW_GRIP_CHECK",
-  "QUEUE_HEALTH_CHECK",
-  "INCIDENT_REVIEW",
-  "MANUAL_FALLBACK_REVIEW",
-  "FOUNDER_OVERRIDE_REVIEW",
-  "PUBLIC_ROUTE_HOUSE_CHECK",
-  "CANDIDATE_PORTAL_CHECK"
+const COMMANDS = [
+  "Jarvis, give me Kingsmen system status.",
+  "Jarvis, inspect voice readiness.",
+  "Jarvis, prepare founder morning report.",
+  "Jarvis, check pending risks.",
+  "Jarvis, summarize the command queue.",
 ];
 
-function normalizeCommand(value: string) {
-  return value.trim().replace(/\s+/g, "_").replace(/-/g, "_").toUpperCase();
+function clock(): string {
+  return new Date().toLocaleTimeString("en-GB", { hour: "2-digit", minute: "2-digit", second: "2-digit" });
 }
 
-function safeOutput(value: string) {
-  const trimmed = value.trim();
-  return trimmed.length > 0 ? trimmed : "No output returned.";
+function makeId(prefix: string): string {
+  return `${prefix}-${Date.now()}-${Math.random().toString(16).slice(2)}`;
 }
 
-export default function JarvisHudClient({ surface }: { surface: string }) {
-  const [status, setStatus] = useState<JarvisStatus | null>(null);
-  const [statusError, setStatusError] = useState<string | null>(null);
-  const [commandInput, setCommandInput] = useState("SYSTEM_VALIDATE_N20");
-  const [running, setRunning] = useState<string | null>(null);
-  const [result, setResult] = useState<JarvisResult | null>(null);
-  const [cameraActive, setCameraActive] = useState(false);
-  const [voiceState, setVoiceState] = useState<"idle" | "listening" | "unsupported">("idle");
-  const videoRef = useRef<HTMLVideoElement | null>(null);
-  const streamRef = useRef<MediaStream | null>(null);
+function computeViewBox(): ViewBox {
+  if (typeof window === "undefined") return { scale: 1, left: 0, top: 0 };
+  const baseW = 1920;
+  const baseH = 1080;
+  const scale = Math.min(window.innerWidth / baseW, window.innerHeight / baseH);
+  const safeScale = Math.max(0.42, Math.min(1, scale));
+  return {
+    scale: safeScale,
+    left: Math.max(0, (window.innerWidth - baseW * safeScale) / 2),
+    top: Math.max(0, (window.innerHeight - baseH * safeScale) / 2),
+  };
+}
 
-  async function loadStatus() {
-    try {
-      setStatusError(null);
-      const response = await fetch("/api/jarvis/status", { cache: "no-store" });
-      const payload = (await response.json()) as JarvisStatus;
-      setStatus(payload);
-    } catch (error) {
-      setStatusError(error instanceof Error ? error.message : "Jarvis status failed.");
-    }
+export default function JarvisHudClient() {
+  const [viewBox, setViewBox] = useState<ViewBox>({ scale: 1, left: 0, top: 0 });
+  const [serverOnline, setServerOnline] = useState(false);
+  const [listening, setListening] = useState(false);
+  const [speaking, setSpeaking] = useState(false);
+  const [autoSpeak, setAutoSpeak] = useState(true);
+  const [command, setCommand] = useState("Jarvis, why are you not speaking?");
+  const [lastHeard, setLastHeard] = useState("No confirmed live voice command yet.");
+  const [reply, setReply] = useState("Awaiting command, Commander.");
+  const [focus, setFocus] = useState("High priority candidate screening and payment risk review");
+
+  const [evidence, setEvidence] = useState<EvidenceRow[]>([
+    { id: makeId("ev"), time: clock(), event: "Live fixed viewport cockpit loaded", source: "hud", level: "ok" },
+    { id: makeId("ev"), time: clock(), event: "No wallpaper interface active", source: "layout", level: "ok" },
+    { id: makeId("ev"), time: clock(), event: "Commander-only doctrine locked", source: "doctrine", level: "ok" },
+  ]);
+
+  const [agents, setAgents] = useState<AgentState[]>([
+    { name: "Vision Agent", status: "READY", detail: "Visual workspace available" },
+    { name: "Brain Agent", status: "ACTIVE", detail: "Command reasoning online" },
+    { name: "Memory Agent", status: "LOCKED", detail: "Founder doctrine protected" },
+    { name: "Voice Bridge", status: "WAITING", detail: "Listening channel prepared" },
+    { name: "OpenClaw Guard", status: "ACTIVE", detail: "Tool execution guarded" },
+  ]);
+
+  const [actions, setActions] = useState<ActionItem[]>([
+    { id: "act-1", title: "High Risk Payment Detected", detail: "Payment review required before route release.", severity: "Critical", status: "Open" },
+    { id: "act-2", title: "Route Deviation Alert", detail: "Unusual node behaviour in candidate route graph.", severity: "Review", status: "Queued" },
+  ]);
+
+  const [workflow, setWorkflow] = useState<WorkflowItem[]>([
+    { id: "wf-1", label: "Ingest", status: "Done" },
+    { id: "wf-2", label: "Verify", status: "Done" },
+    { id: "wf-3", label: "Assess", status: "Running" },
+    { id: "wf-4", label: "Cross-check", status: "Queued" },
+    { id: "wf-5", label: "Rank", status: "Queued" },
+    { id: "wf-6", label: "Report", status: "Ready" },
+  ]);
+
+  const recognitionRef = useRef<SpeechRecognitionInstance | null>(null);
+  const timerRef = useRef<number | null>(null);
+
+  const shellStyle = {
+    transform: `translate3d(${viewBox.left}px, ${viewBox.top}px, 0) scale(${viewBox.scale})`,
+  } as CSSProperties;
+
+  const readiness = useMemo(() => {
+    let score = 76;
+    if (serverOnline) score += 10;
+    if (listening) score += 7;
+    if (autoSpeak) score += 4;
+    if (agents.every((agent) => agent.status !== "IDLE")) score += 3;
+    return Math.min(score, 100);
+  }, [serverOnline, listening, autoSpeak, agents]);
+
+  function pushEvidence(event: string, source: string, level: EvidenceLevel = "info") {
+    setEvidence((rows) => [{ id: makeId("ev"), time: clock(), event, source, level }, ...rows].slice(0, 16));
   }
 
-  async function runCommand(commandId: string) {
-    const normalized = normalizeCommand(commandId);
-    if (!normalized) return;
+  function speak(text: string) {
+    if (!autoSpeak || typeof window === "undefined" || !("speechSynthesis" in window)) return;
+    window.speechSynthesis.cancel();
+    const utterance = new SpeechSynthesisUtterance(text);
+    utterance.lang = "en-ZA";
+    utterance.rate = 0.92;
+    utterance.pitch = 0.86;
+    utterance.volume = 1;
+    utterance.onstart = () => setSpeaking(true);
+    utterance.onend = () => setSpeaking(false);
+    utterance.onerror = () => {
+      setSpeaking(false);
+      pushEvidence("speech output failed", "voice", "warn");
+    };
+    window.speechSynthesis.speak(utterance);
+  }
 
-    setRunning(normalized);
-    setResult(null);
+  async function sendToJarvis(rawCommand: string, source: string) {
+    const clean = rawCommand.trim();
+    if (!clean) return;
+    setCommand(clean);
+    setLastHeard(clean);
+    pushEvidence(`command captured: ${clean}`, source, "ok");
+
+    if (clean.toLowerCase() === "jarvis" || clean.toLowerCase().startsWith("jarvis wake")) {
+      setReply(WAKE_GREETING);
+      pushEvidence("wake greeting delivered", "voice", "ok");
+      speak(WAKE_GREETING);
+      return;
+    }
 
     try {
-      const response = await fetch("/api/jarvis/command", {
+      const res = await fetch("/api/jarvis/command", {
         method: "POST",
         headers: { "content-type": "application/json" },
-        body: JSON.stringify({ commandId: normalized })
+        body: JSON.stringify({ command: clean, text: clean, source, commander_only: true, ui_mode: "fixed-live-system" }),
       });
-
-      const payload = (await response.json()) as JarvisResult;
-      setResult(payload);
-      await loadStatus();
-    } catch (error) {
-      setResult({
-        ok: false,
-        commandId: normalized,
-        title: "Jarvis command failed",
-        category: "Runtime",
-        risk: "SAFE_READ",
-        startedAt: new Date().toISOString(),
-        finishedAt: new Date().toISOString(),
-        durationMs: 0,
-        stdout: "",
-        stderr: error instanceof Error ? error.message : "Unknown command failure.",
-        evidencePath: "reports/jarvis/jarvis-command-evidence.jsonl",
-        message: "Jarvis could not complete the command request."
-      });
-    } finally {
-      setRunning(null);
-    }
-  }
-
-  function submitCommand(event: FormEvent<HTMLFormElement>) {
-    event.preventDefault();
-    runCommand(commandInput);
-  }
-
-  async function toggleCamera() {
-    if (cameraActive) {
-      streamRef.current?.getTracks().forEach((track) => track.stop());
-      streamRef.current = null;
-      if (videoRef.current) videoRef.current.srcObject = null;
-      setCameraActive(false);
-      return;
-    }
-
-    try {
-      const stream = await navigator.mediaDevices.getUserMedia({ video: true, audio: false });
-      streamRef.current = stream;
-      if (videoRef.current) videoRef.current.srcObject = stream;
-      setCameraActive(true);
+      const data = await res.json().catch(() => ({}));
+      const apiReply =
+        typeof data.reply === "string"
+          ? data.reply
+          : typeof data.message === "string"
+          ? data.message
+          : typeof data.output === "string"
+          ? data.output
+          : `Certainly, Commander. I heard the command: ${clean}`;
+      setReply(apiReply);
+      pushEvidence("reply received", "api", "ok");
+      speak(apiReply);
     } catch {
-      setCameraActive(false);
+      const fallback = `Certainly, Commander. I heard the command: ${clean}. The local cockpit is active, but the API response route needs inspection.`;
+      setReply(fallback);
+      pushEvidence("api command fallback used", "api", "warn");
+      speak(fallback);
     }
   }
 
-  function startVoice() {
-    const SpeechRecognition =
-      (window as unknown as { SpeechRecognition?: any; webkitSpeechRecognition?: any }).SpeechRecognition ||
-      (window as unknown as { SpeechRecognition?: any; webkitSpeechRecognition?: any }).webkitSpeechRecognition;
-
-    if (!SpeechRecognition) {
-      setVoiceState("unsupported");
+  function startListening() {
+    const Recognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+    if (!Recognition) {
+      const message = "Commander, browser speech recognition is not exposed here. Use Microsoft Edge or the native voice bridge.";
+      setReply(message);
+      pushEvidence("browser speech recognition unavailable", "voice", "warn");
+      speak(message);
       return;
     }
 
-    const recognition = new SpeechRecognition();
-    recognition.lang = "en-ZA";
-    recognition.interimResults = false;
-    recognition.maxAlternatives = 1;
-    setVoiceState("listening");
+    if (recognitionRef.current) {
+      try { recognitionRef.current.stop(); } catch {}
+      recognitionRef.current = null;
+    }
 
-    recognition.onresult = (event: any) => {
-      const transcript = event.results?.[0]?.[0]?.transcript ?? "";
-      const normalized = normalizeCommand(transcript);
-      setCommandInput(normalized);
-      setVoiceState("idle");
-      if (normalized) runCommand(normalized);
+    const recognition = new Recognition();
+    recognition.lang = "en-ZA";
+    recognition.continuous = true;
+    recognition.interimResults = true;
+    recognition.maxAlternatives = 1;
+
+    recognition.onstart = () => {
+      setListening(true);
+      setAgents((items) => items.map((agent) => agent.name === "Voice Bridge" ? { ...agent, status: "ACTIVE", detail: "Browser microphone listening" } : agent));
+      pushEvidence("microphone listening started", "voice", "ok");
     };
 
-    recognition.onerror = () => setVoiceState("idle");
-    recognition.onend = () => setVoiceState("idle");
-    recognition.start();
+    recognition.onend = () => {
+      setListening(false);
+      setAgents((items) => items.map((agent) => agent.name === "Voice Bridge" ? { ...agent, status: "WAITING", detail: "Listening stopped" } : agent));
+      pushEvidence("microphone listening stopped", "voice", "info");
+    };
+
+    recognition.onerror = (event) => {
+      setListening(false);
+      pushEvidence(`voice error: ${event.error || "unknown"}`, "voice", "warn");
+    };
+
+    recognition.onresult = (event) => {
+      let interim = "";
+      for (let index = event.resultIndex; index < event.results.length; index += 1) {
+        const result = event.results[index];
+        const transcript = result[0]?.transcript?.trim() || "";
+        if (!transcript) continue;
+        if (result.isFinal) {
+          sendToJarvis(transcript, "browser-voice");
+        } else {
+          interim = transcript;
+        }
+      }
+      if (interim) setLastHeard(interim);
+    };
+
+    recognitionRef.current = recognition;
+    try {
+      recognition.start();
+    } catch {
+      pushEvidence("voice recognition already running", "voice", "warn");
+    }
+  }
+
+  function stopListening() {
+    if (recognitionRef.current) {
+      try { recognitionRef.current.stop(); } catch {}
+      recognitionRef.current = null;
+    }
+    setListening(false);
+  }
+
+  async function checkServer() {
+    try {
+      const res = await fetch("/api/jarvis/status", { cache: "no-store" });
+      setServerOnline(res.ok);
+      pushEvidence(res.ok ? "status-check ok" : "status-check failed", "api", res.ok ? "ok" : "warn");
+    } catch {
+      setServerOnline(false);
+      pushEvidence("status-check offline", "api", "warn");
+    }
   }
 
   useEffect(() => {
-    loadStatus();
-    const timer = window.setInterval(loadStatus, 15000);
+    const resize = () => setViewBox(computeViewBox());
+    resize();
+    window.addEventListener("resize", resize);
+    checkServer();
+    timerRef.current = window.setInterval(checkServer, 20000);
     return () => {
-      window.clearInterval(timer);
-      streamRef.current?.getTracks().forEach((track) => track.stop());
+      window.removeEventListener("resize", resize);
+      if (timerRef.current) window.clearInterval(timerRef.current);
+      if (recognitionRef.current) {
+        try { recognitionRef.current.stop(); } catch {}
+      }
     };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  const grouped = useMemo(() => {
-    const list = status?.commands ?? [];
-    return list.reduce<Record<string, JarvisCommand[]>>((acc, command) => {
-      acc[command.category] = acc[command.category] ?? [];
-      acc[command.category].push(command);
-      return acc;
-    }, {});
-  }, [status]);
-
-  const okCount = status?.cards.filter((card) => card.ok).length ?? 0;
-  const totalCount = status?.cards.length ?? 0;
+  const statusText = serverOnline ? "SYSTEM ONLINE" : "SERVER WAITING";
+  const voiceText = listening ? "LISTENING" : "VOICE READY";
 
   return (
-    <main className={styles.shell}>
-      <div className={styles.gridGlow} />
-      <section className={styles.hud}>
+    <main className={styles.stage}>
+      <div className={styles.shell} style={shellStyle}>
         <header className={styles.header}>
-          <div>
-            <div className={styles.kicker}>KINGSMEN {surface} INTERFACE</div>
-            <h1>JARVIS</h1>
-            <p>
-              Founder command cockpit. Live system truth, safe command execution, OpenClaw grip checks,
-              evidence output, and policy boundaries. This is not a fake chatbot and it does not replace
-              the backend state machine.
-            </p>
-          </div>
-          <div className={styles.topStatus}>
-            <span className={status?.ok ? styles.dotOk : styles.dotWarn} />
-            <strong>{status?.ok ? "SYSTEM GRIP STABLE" : "SYSTEM NEEDS REVIEW"}</strong>
-            <small>{status ? `${okCount}/${totalCount} surfaces confirmed` : "loading truth..."}</small>
-          </div>
+          <section className={styles.brandBlock}>
+            <div className={styles.crest}>â™”</div>
+            <div>
+              <div className={styles.brand}>KINGSMEN</div>
+              <div className={styles.subtitle}>PRIVATE ROUTE COMMAND HOUSE</div>
+            </div>
+          </section>
+
+          <section className={styles.titleBlock}>
+            <div className={styles.jarvisTitle}>JARVIS</div>
+            <div className={styles.jarvisSubtitle}>FOUNDER AI OPERATING ASSISTANT</div>
+          </section>
+
+          <section className={styles.statusStrip}>
+            <button className={styles.statusPill} onClick={checkServer}>{statusText}</button>
+            <button className={styles.statusPill} onClick={() => setAutoSpeak((value) => !value)}>{autoSpeak ? "SPEECH ON" : "SPEECH OFF"}</button>
+            <button className={styles.iconButton} onClick={() => speak("Jarvis voice output is active, Commander.")}>VOICE</button>
+            <button className={styles.iconButton} onClick={() => sendToJarvis("Jarvis, inspect command readiness.", "header")}>SCAN</button>
+          </section>
         </header>
 
-        <section className={styles.coreLayout}>
+        <section className={styles.grid}>
           <aside className={styles.leftRail}>
-            <div className={styles.panelTitle}>System Truth</div>
-            <div className={styles.cardStack}>
-              {(status?.cards ?? []).map((card) => (
-                <article key={card.key} className={card.ok ? styles.truthCardOk : styles.truthCardWarn}>
-                  <div className={styles.cardState}>{card.state}</div>
-                  <h3>{card.title}</h3>
-                  <p>{card.detail}</p>
-                </article>
-              ))}
-              {statusError ? (
-                <article className={styles.truthCardWarn}>
-                  <div className={styles.cardState}>ERROR</div>
-                  <h3>Status API</h3>
-                  <p>{statusError}</p>
-                </article>
-              ) : null}
-            </div>
+            <section className={styles.card}>
+              <div className={styles.cardTitle}>SYSTEM READINESS</div>
+              <div className={styles.readinessWrap}>
+                <div className={styles.readinessRing}><span>{readiness}%</span></div>
+                <div className={styles.readinessList}>
+                  <p>Core AI <strong>Operational</strong></p>
+                  <p>Agents <strong>Operational</strong></p>
+                  <p>OpenClaw <strong>Guarded</strong></p>
+                  <p>Voice Link <strong>{voiceText}</strong></p>
+                  <p>Data Fabric <strong>Live</strong></p>
+                </div>
+              </div>
+              <button className={styles.fullButton} onClick={checkServer}>Full Diagnostics</button>
+            </section>
+
+            <section className={styles.card}>
+              <div className={styles.cardTitle}>MISSION OVERVIEW</div>
+              <div className={styles.metricGrid}>
+                <div><span>Active Routes</span><strong>07</strong></div>
+                <div><span>Open Actions</span><strong>{actions.length}</strong></div>
+                <div><span>Priority Alerts</span><strong>02</strong></div>
+              </div>
+              <p className={styles.focusLine}>{focus}</p>
+            </section>
+
+            <section className={styles.card}>
+              <div className={styles.cardTitle}>ROUTE INTELLIGENCE</div>
+              <div className={styles.signalMap}><div className={styles.mapPulse}></div></div>
+              <div className={styles.scoreRows}>
+                <p>Route Active <strong>7 / 12</strong></p>
+                <p>Risk Level <strong>Low</strong></p>
+                <p>Coverage <strong>92%</strong></p>
+                <p>Integrity <strong>98%</strong></p>
+              </div>
+            </section>
+
+            <section className={styles.card}>
+              <div className={styles.cardTitle}>APPLICATION QUEUE</div>
+              <div className={styles.donut}><span>47</span></div>
+              <div className={styles.queueRows}>
+                <p>New <strong>12</strong></p>
+                <p>In Review <strong>18</strong></p>
+                <p>On Hold <strong>6</strong></p>
+                <p>Escalated <strong>2</strong></p>
+              </div>
+            </section>
           </aside>
 
-          <section className={styles.centerCore}>
-            <div className={styles.orbWrap}>
-              <div className={styles.ringOne} />
-              <div className={styles.ringTwo} />
-              <div className={styles.ringThree} />
-              <div className={styles.orb}>
-                <span>J</span>
-              </div>
-              <div className={styles.orbCaption}>
-                <strong>{running ? `EXECUTING ${running}` : "AWAITING FOUNDER COMMAND"}</strong>
-                <small>{status?.generatedAt ? `Truth refreshed ${new Date(status.generatedAt).toLocaleTimeString()}` : "loading..."}</small>
-              </div>
+          <section className={styles.core}>
+            <div className={styles.thoughtStream}>
+              <div className={styles.cardTitle}>THOUGHT STREAM</div>
+              <p>Analyzing 7 live sources</p>
+              <p>Cross-checking identity graph</p>
+              <p>Scanning route health</p>
+              <p>Evaluating payment risk</p>
+              <p>Ranking candidate matches</p>
             </div>
 
-            <form className={styles.commandForm} onSubmit={submitCommand}>
-              <input
-                value={commandInput}
-                onChange={(event) => setCommandInput(event.target.value)}
-                placeholder="Type command e.g. DB_LEDGER_CHECK"
-                aria-label="Jarvis command input"
-              />
-              <button type="submit" disabled={running !== null}>
-                {running ? "RUNNING" : "EXECUTE"}
-              </button>
-              <button type="button" onClick={startVoice} disabled={running !== null} className={styles.secondaryButton}>
-                {voiceState === "listening" ? "LISTENING" : voiceState === "unsupported" ? "NO VOICE" : "VOICE"}
-              </button>
+            <section className={styles.orbPanel}>
+              <div className={styles.wave}></div>
+              <div className={`${styles.orb} ${listening ? styles.orbListening : ""} ${speaking ? styles.orbSpeaking : ""}`}>
+                <div className={styles.orbRingOne}></div>
+                <div className={styles.orbRingTwo}></div>
+                <div className={styles.orbCore}>
+                  <span>JARVIS</span>
+                  <small>{listening ? "Listening" : speaking ? "Speaking" : "Ready"}</small>
+                </div>
+              </div>
+              <div className={styles.workspaceInfo}>
+                <div><span>ACTIVE WORKSPACE</span><strong>Founder Intake & Verification</strong></div>
+                <div><span>CONTEXT WINDOW</span><strong>Memory Active</strong></div>
+                <div><span>REASONING ENGINE</span><strong>Confidence 94%</strong></div>
+              </div>
+            </section>
+
+            <form className={styles.commandBar} onSubmit={(event) => { event.preventDefault(); sendToJarvis(command, "typing"); }}>
+              <input value={command} onChange={(event) => setCommand(event.target.value)} placeholder="Speak or type command to JARVIS..." aria-label="Jarvis command" />
+              <button type="submit">Send</button>
             </form>
 
-            <div className={styles.quickDeck}>
-              {quickCommands.map((command) => (
-                <button key={command} type="button" onClick={() => { setCommandInput(command); runCommand(command); }} disabled={running !== null}>
-                  {command}
+            <nav className={styles.modeNav}>
+              {["VOICE", "VISION", "DATA", "BRAIN", "AGENTS", "TOOLS"].map((item) => <button key={item} onClick={() => pushEvidence(`${item} mode selected`, "mode", "info")}>{item}</button>)}
+            </nav>
+
+            <section className={styles.workflow}>
+              {workflow.map((step) => (
+                <button
+                  key={step.id}
+                  className={styles.workflowStep}
+                  onClick={() => {
+                    setWorkflow((items) => items.map((candidate) => candidate.id === step.id ? { ...candidate, status: candidate.status === "Done" ? "Ready" : "Running" } : candidate));
+                    pushEvidence(`workflow selected: ${step.label}`, "workflow", "info");
+                  }}
+                >
+                  <span></span><strong>{step.label}</strong><small>{step.status}</small>
                 </button>
               ))}
-            </div>
+            </section>
 
-            <section className={styles.resultPanel}>
-              <div className={styles.panelTitle}>Live Command Result</div>
-              {result ? (
-                <>
-                  <div className={result.ok ? styles.resultOk : styles.resultFail}>
-                    {result.ok ? "SUCCESS" : "FAILED"} · {result.commandId} · {result.durationMs}ms
-                  </div>
-                  <p>{result.message}</p>
-                  <small>Evidence: {result.evidencePath}</small>
-                  <pre>{safeOutput(result.stdout + (result.stderr ? `\n\nSTDERR:\n${result.stderr}` : ""))}</pre>
-                </>
-              ) : (
-                <p className={styles.muted}>
-                  Execute a command. Jarvis will return live output here and record an evidence line.
-                </p>
-              )}
+            <section className={styles.replyPanel}>
+              <div className={styles.cardTitle}>JARVIS STATUS</div>
+              <p><strong>Jarvis:</strong> {reply}</p>
+              <p><strong>I heard:</strong> {lastHeard}</p>
             </section>
           </section>
 
           <aside className={styles.rightRail}>
-            <div className={styles.panelTitle}>OpenClaw / Visual Feed</div>
-            <div className={styles.cameraPanel}>
-              <video ref={videoRef} autoPlay muted playsInline className={styles.video} />
-              {!cameraActive ? (
-                <div className={styles.cameraPlaceholder}>
-                  <strong>VISUAL FEED STANDBY</strong>
-                  <span>Enable camera when founder visual mode is needed.</span>
-                </div>
-              ) : null}
-            </div>
-            <button className={styles.fullButton} type="button" onClick={toggleCamera}>
-              {cameraActive ? "STOP VISUAL FEED" : "START VISUAL FEED"}
-            </button>
-            <button className={styles.fullButton} type="button" onClick={() => runCommand("OPENCLAW_GRIP_CHECK")} disabled={running !== null}>
-              RUN OPENCLAW GRIP CHECK
-            </button>
-
-            <div className={styles.doctrine}>
-              <div className={styles.panelTitle}>Jarvis Doctrine</div>
-              {(status?.doctrine ?? [
-                "Backend state machine remains authority.",
-                "Jarvis surfaces truth and safe actions.",
-                "Risky actions require policy and evidence gates."
-              ]).map((line) => (
-                <p key={line}>{line}</p>
+            <section className={styles.card}>
+              <div className={styles.cardTitle}>AGENT STACK</div>
+              {agents.map((agent) => (
+                <button key={agent.name} className={styles.agentRow} onClick={() => {
+                  setAgents((items) => items.map((item) => item.name === agent.name ? { ...item, status: item.status === "ACTIVE" ? "READY" : "ACTIVE" } : item));
+                  pushEvidence(`${agent.name} inspected`, "agent", "info");
+                }}>
+                  <span>{agent.name}</span><strong>{agent.status}</strong><small>{agent.detail}</small>
+                </button>
               ))}
-            </div>
+            </section>
 
-            <div className={styles.commandGroups}>
-              <div className={styles.panelTitle}>Command Registry</div>
-              {Object.entries(grouped).map(([category, commands]) => (
-                <details key={category} open={category === "System" || category === "OpenClaw"}>
-                  <summary>{category}</summary>
-                  {commands.map((command) => (
-                    <button key={command.id} type="button" onClick={() => { setCommandInput(command.id); runCommand(command.id); }} disabled={running !== null}>
-                      <strong>{command.id}</strong>
-                      <span>{command.description}</span>
-                    </button>
-                  ))}
-                </details>
+            <section className={styles.card}>
+              <div className={styles.cardTitle}>COMMAND QUEUE</div>
+              {COMMANDS.map((preset, index) => <button key={preset} className={styles.commandPreset} onClick={() => sendToJarvis(preset, "preset")}><span>0{index + 1}</span>{preset}</button>)}
+            </section>
+
+            <section className={styles.card}>
+              <div className={styles.cardTitle}>PRIORITY ACTIONS</div>
+              {actions.map((action) => (
+                <button key={action.id} className={`${styles.actionRow} ${action.severity === "Critical" ? styles.actionCritical : ""}`} onClick={() => {
+                  setFocus(action.detail);
+                  pushEvidence(`priority opened: ${action.title}`, "priority", action.severity === "Critical" ? "critical" : "warn");
+                }}>
+                  <strong>{action.title}</strong><span>{action.detail}</span><small>{action.status}</small>
+                </button>
               ))}
-            </div>
+            </section>
+
+            <section className={styles.card}>
+              <div className={styles.cardTitle}>OPENCLAW TOOLS</div>
+              <button className={styles.toolButton} onClick={() => sendToJarvis("Jarvis, verify command readiness.", "tool")}>Verify Command</button>
+              <button className={styles.toolButton} onClick={() => sendToJarvis("Jarvis, prepare evidence report.", "tool")}>Evidence Report</button>
+              <button className={styles.toolButton} onClick={() => sendToJarvis("Jarvis, launch guarded OpenClaw plan.", "tool")}>Launch OpenClaw</button>
+            </section>
           </aside>
+
+          <section className={styles.bottomRail}>
+            <section className={styles.card}>
+              <div className={styles.cardTitle}>VOICE INPUT</div>
+              <div className={styles.voiceWave}></div>
+              <p>{lastHeard}</p>
+              <div className={styles.buttonRow}>
+                <button onClick={startListening}>{listening ? "Listening..." : "Start Voice"}</button>
+                <button onClick={stopListening}>Stop</button>
+                <button onClick={() => sendToJarvis("Jarvis", "wake-button")}>Wake Jarvis</button>
+              </div>
+            </section>
+
+            <section className={styles.card}>
+              <div className={styles.cardTitle}>LIVE EXECUTION TIMELINE</div>
+              <div className={styles.scrollList}>{evidence.map((row) => <p key={row.id} className={styles[row.level]}><span>{row.time}</span> {row.event}</p>)}</div>
+            </section>
+
+            <section className={styles.card}>
+              <div className={styles.cardTitle}>EVIDENCE FEED</div>
+              <div className={styles.evidenceGrid}>
+                {evidence.slice(0, 6).map((row) => (
+                  <button key={row.id} onClick={() => setReply(`${row.source}: ${row.event}`)}>
+                    <strong>{row.source}</strong><span>{row.event}</span><small>{row.time}</small>
+                  </button>
+                ))}
+              </div>
+            </section>
+
+            <section className={styles.card}>
+              <div className={styles.cardTitle}>FOUNDER ACTIONS</div>
+              <button className={styles.founderButton} onClick={() => sendToJarvis("Jarvis, generate founder report.", "founder")}>Generate Founder Report</button>
+              <button className={styles.founderButton} onClick={() => sendToJarvis("Jarvis, initiate deep investigation.", "founder")}>Initiate Deep Investigation</button>
+              <button className={styles.founderButton} onClick={() => sendToJarvis("Jarvis, escalate to operator.", "founder")}>Escalate To Operator</button>
+            </section>
+          </section>
         </section>
-      </section>
+
+        <footer className={styles.footer}>
+          <span>KINGSMEN PROTOCOL</span>
+          <span>Discretion is our highest standard</span>
+          <span>All operations encrypted end-to-end</span>
+          <span>Zero trust architecture</span>
+          <strong>JARVIS v2.7.1</strong>
+        </footer>
+      </div>
     </main>
   );
 }

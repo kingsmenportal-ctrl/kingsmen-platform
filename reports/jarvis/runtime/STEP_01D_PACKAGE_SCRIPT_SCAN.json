@@ -1,0 +1,54 @@
+﻿[
+    {
+        "path":  ".",
+        "full_path":  "C:\\Kingsmen\\kingsmen-platform",
+        "name":  "kingsmen-platform",
+        "dev":  null,
+        "start":  null,
+        "build":  null,
+        "has_jarvis_route":  false,
+        "has_next":  false,
+        "has_vite":  false,
+        "mode":  "",
+        "score":  0
+    },
+    {
+        "path":  "apps\\web",
+        "full_path":  "C:\\Kingsmen\\kingsmen-platform\\apps\\web",
+        "name":  "@kingsmen/web",
+        "dev":  "next dev -H 127.0.0.1 -p 3000",
+        "start":  "next start -H 127.0.0.1 -p 3000",
+        "build":  "next build",
+        "has_jarvis_route":  true,
+        "has_next":  true,
+        "has_vite":  false,
+        "mode":  "npm-dev",
+        "score":  345
+    },
+    {
+        "path":  "apps\\web\\.next",
+        "full_path":  "C:\\Kingsmen\\kingsmen-platform\\apps\\web\\.next",
+        "name":  "",
+        "dev":  null,
+        "start":  null,
+        "build":  null,
+        "has_jarvis_route":  false,
+        "has_next":  false,
+        "has_vite":  false,
+        "mode":  "",
+        "score":  80
+    },
+    {
+        "path":  "apps\\web\\.next\\types",
+        "full_path":  "C:\\Kingsmen\\kingsmen-platform\\apps\\web\\.next\\types",
+        "name":  "",
+        "dev":  null,
+        "start":  null,
+        "build":  null,
+        "has_jarvis_route":  true,
+        "has_next":  false,
+        "has_vite":  false,
+        "mode":  "",
+        "score":  150
+    }
+]

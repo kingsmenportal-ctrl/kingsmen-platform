@@ -1,0 +1,11 @@
+{
+  "turns": 35,
+  "lastCommand": "connect to kingsmen",
+  "lastIntent": "general",
+  "lastReply": "Certainly, Commander.\n\nI heard the command:\nconnect to kingsmen\n\nOperational meaning:\nJarvis is holding the conversation context and will not reduce your instruction into a stock phrase.\n\nRecommended command:\nClassify the next instruction as a brief, repair, research task, tool route, strategy decision, document review, finance check, or personal assistance request.\n\nStanding by, Sir.",
+  "lastReplyHash": "c5f8de6eaa8da83071a08ccfc04bd52c20c2c94362cb93c8104a8e17ac1b374e",
+  "conversationUntil": 1781508198810,
+  "lastVoiceAt": 0,
+  "bridgeStatus": "waiting",
+  "updatedAt": "2026-06-15T07:21:48.816Z"
+}

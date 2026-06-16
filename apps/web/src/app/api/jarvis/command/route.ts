@@ -1,185 +1,126 @@
-import { execFile } from "node:child_process";
-import { mkdir, appendFile } from "node:fs/promises";
-import path from "node:path";
-import { promisify } from "node:util";
 import { NextRequest, NextResponse } from "next/server";
+import { approveBuilderPlan, createBuilderPlan, listBuilderPlans } from "../../../../lib/jarvis/builderCore";
 
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
 
-const execFileAsync = promisify(execFile);
+const WAKE_GREETING =
+  "Welcome to Kingsmen Command, Commander. Jarvis is online. The command house is awake, your desk is prepared, and I stand ready to brief, inspect, report, search, repair, research, organise, or execute under Kingsmen doctrine.";
 
-const ROOT = "C:\\Kingsmen\\kingsmen-platform";
-const ENV_FILE = "C:\\Kingsmen\\KINGSMEN_LOCAL_DATABASE_ENV.ps1";
-const PSQL = "C:\\Program Files\\PostgreSQL\\16\\bin\\psql.exe";
-const EVIDENCE_DIR = path.join(ROOT, "reports", "jarvis");
-const EVIDENCE_FILE = path.join(EVIDENCE_DIR, "jarvis-command-evidence.jsonl");
+function extractText(body: any): string {
+  return String(body?.command || body?.text || body?.message || body?.prompt || "").trim();
+}
 
-type RunnerResult = { ok: boolean; stdout: string; stderr: string };
+function isBuilderPlanCommand(text: string): boolean {
+  return /\b(create|build|plan|draft|generate)\b/i.test(text) && /\bN\d{2}[A-Z0-9.\-]*\b/i.test(text);
+}
 
-async function ps(script: string, timeout = 30000): Promise<RunnerResult> {
+function formatPlanReply(plan: any): string {
+  const files = plan.proposed_files
+    .map((file: any) => `- ${file.path}`)
+    .join("\n");
+
+  return [
+    "Builder plan created, Commander.",
+    "",
+    `Plan ID: ${plan.plan_id}`,
+    `Module: ${plan.module_id}`,
+    `Title: ${plan.title}`,
+    "",
+    "No files have been written yet.",
+    "",
+    "Proposed files:",
+    files,
+    "",
+    "Approval command:",
+    plan.approval_phrase,
+  ].join("\n");
+}
+
+function formatStatusReply(plans: any[]): string {
+  if (!plans.length) return "Builder Core has no plans yet, Commander.";
+
+  return [
+    "Recent Builder Core plans, Commander:",
+    "",
+    ...plans.slice(0, 8).map((plan) => `${plan.plan_id} | ${plan.status} | ${plan.module_id} | ${plan.title}`),
+  ].join("\n");
+}
+
+export async function POST(req: NextRequest) {
+  const body = await req.json().catch(() => ({}));
+  const text = extractText(body);
+  const lower = text.toLowerCase();
+
   try {
-    const { stdout, stderr } = await execFileAsync("powershell", ["-NoProfile", "-ExecutionPolicy", "Bypass", "-Command", script], {
-      cwd: ROOT,
-      timeout,
-      windowsHide: true,
-      maxBuffer: 1024 * 1024 * 2
-    });
-    return { ok: true, stdout: String(stdout ?? "").trim(), stderr: String(stderr ?? "").trim() };
-  } catch (error) {
-    const err = error as { stdout?: unknown; stderr?: unknown; message?: string };
-    return { ok: false, stdout: String(err.stdout ?? "").trim(), stderr: String(err.stderr ?? err.message ?? "Command failed.").trim() };
-  }
-}
-
-function db(sql: string, timeout = 30000) {
-  const escaped = sql.replace(/'/g, "''");
-  return ps(`. '${ENV_FILE}'; & '${PSQL}' -d $env:DATABASE_URL -P pager=off -c '${escaped}'`, timeout);
-}
-
-function url(urlValue: string) {
-  return ps(`$ProgressPreference='SilentlyContinue'; $r=Invoke-WebRequest -Uri '${urlValue}' -UseBasicParsing -TimeoutSec 10; "HTTP $($r.StatusCode) $($r.StatusDescription)"`, 15000);
-}
-
-async function openClaw(): Promise<RunnerResult> {
-  const jarvis = await url("http://127.0.0.1:3000/jarvis");
-  const ledger = await db("select count(*) as applied_migrations from public.kingsmen_schema_migrations;", 15000);
-  const git = await ps("git status --short", 15000);
-  return {
-    ok: jarvis.ok && ledger.ok && git.ok,
-    stdout: [
-      "OPENCLAW GRIP CHECK",
-      "",
-      "JARVIS ROUTE:",
-      jarvis.stdout || jarvis.stderr,
-      "",
-      "DATABASE LEDGER:",
-      ledger.stdout || ledger.stderr,
-      "",
-      "GIT STATE:",
-      git.stdout || "working tree clean",
-      "",
-      "OPENCLAW RESULT:",
-      "Route, database truth, and repository state inspected."
-    ].join("\\n"),
-    stderr: [jarvis.stderr, ledger.stderr, git.stderr].filter(Boolean).join("\\n")
-  };
-}
-
-const registry = {
-  SYSTEM_VALIDATE_N20: {
-    title: "Validate N20 system lock",
-    category: "System",
-    risk: "SAFE_READ",
-    run: () => ps("& '.\\KINGSMEN_CREATOR.ps1' -Phase N20 -Mode Validate", 45000)
-  },
-  DB_LEDGER_CHECK: {
-    title: "Check migration ledger",
-    category: "Database",
-    risk: "SAFE_READ",
-    run: () => db("select version(); select count(*) as applied_migrations from public.kingsmen_schema_migrations; select migration_name, applied_at from public.kingsmen_schema_migrations order by migration_name;")
-  },
-  QUEUE_HEALTH_CHECK: {
-    title: "Check queue health",
-    category: "Operations",
-    risk: "SAFE_READ",
-    run: () => db("select table_name from information_schema.tables where table_schema='public' and (table_name ilike '%queue%' or table_name ilike '%workflow%' or table_name ilike '%heartbeat%' or table_name ilike '%dead%' or table_name ilike '%dlq%') order by table_name;")
-  },
-  INCIDENT_REVIEW: {
-    title: "Review incidents",
-    category: "Operations",
-    risk: "SAFE_READ",
-    run: () => db("select table_name from information_schema.tables where table_schema='public' and (table_name ilike '%incident%' or table_name ilike '%error%' or table_name ilike '%observability%' or table_name ilike '%report%') order by table_name;")
-  },
-  MANUAL_FALLBACK_REVIEW: {
-    title: "Manual fallback review",
-    category: "Operations",
-    risk: "SAFE_READ",
-    run: () => db("select table_name from information_schema.tables where table_schema='public' and (table_name ilike '%manual%' or table_name ilike '%fallback%' or table_name ilike '%map%' or table_name ilike '%phoenix%') order by table_name;")
-  },
-  FOUNDER_OVERRIDE_REVIEW: {
-    title: "Founder override review",
-    category: "Governance",
-    risk: "SAFE_READ",
-    run: () => db("select table_name from information_schema.tables where table_schema='public' and (table_name ilike '%override%' or table_name ilike '%governance%' or table_name ilike '%policy%' or table_name ilike '%approval%') order by table_name;")
-  },
-  PUBLIC_ROUTE_HOUSE_CHECK: {
-    title: "Public route house check",
-    category: "Web",
-    risk: "SAFE_READ",
-    run: async () => {
-      const home = await url("http://127.0.0.1:3000");
-      const finalAssembly = await url("http://127.0.0.1:3000/final-assembly");
-      return {
-        ok: home.ok && finalAssembly.ok,
-        stdout: ["PUBLIC ROUTE HOUSE CHECK", "", "/", home.stdout || home.stderr, "", "/final-assembly", finalAssembly.stdout || finalAssembly.stderr].join("\\n"),
-        stderr: [home.stderr, finalAssembly.stderr].filter(Boolean).join("\\n")
-      };
+    if (!text || lower === "jarvis" || lower === "wake jarvis") {
+      return NextResponse.json({
+        ok: true,
+        mode: "wake",
+        reply: WAKE_GREETING,
+      });
     }
-  },
-  CANDIDATE_PORTAL_CHECK: {
-    title: "Candidate portal check",
-    category: "Web",
-    risk: "SAFE_READ",
-    run: () => url("http://127.0.0.1:3000/candidate")
-  },
-  OPENCLAW_GRIP_CHECK: {
-    title: "OpenClaw grip check",
-    category: "OpenClaw",
-    risk: "SAFE_READ",
-    run: openClaw
-  }
-} as const;
 
-async function evidence(entry: unknown) {
-  await mkdir(EVIDENCE_DIR, { recursive: true });
-  await appendFile(EVIDENCE_FILE, JSON.stringify(entry) + "\\n", "utf8");
-}
+    const approval = text.match(/^(?:jarvis[\s,]+)?approve\s+(KJB-\d{8}-\d{6})$/i);
+    if (approval) {
+      const proof = approveBuilderPlan(approval[1].toUpperCase());
+      return NextResponse.json({
+        ok: true,
+        mode: "builder-approve",
+        reply: [
+          "Builder plan approved and executed, Commander.",
+          "",
+          `Final status: ${proof.final_status}`,
+          `Validation passed: ${proof.validation_passed ? "YES" : "NO"}`,
+          `Git commit: ${proof.git_commit_ok ? "YES" : "NO"}`,
+          `Proof: ${proof.plan_id}-proof.json`,
+        ].join("\n"),
+        proof,
+      });
+    }
 
-export async function POST(request: NextRequest) {
-  const startedAt = new Date();
-  const body = await request.json().catch(() => ({}));
-  const raw = typeof body.commandId === "string" ? body.commandId : "";
-  const commandId = raw.trim().replace(/\\s+/g, "_").replace(/-/g, "_").toUpperCase();
-  const command = registry[commandId as keyof typeof registry];
+    if (/builder\s+status|build\s+status|plans/i.test(text)) {
+      const plans = listBuilderPlans();
+      return NextResponse.json({
+        ok: true,
+        mode: "builder-status",
+        reply: formatStatusReply(plans),
+        plans,
+      });
+    }
 
-  if (!command) {
-    const blocked = {
+    if (isBuilderPlanCommand(text)) {
+      const plan = createBuilderPlan(text);
+      return NextResponse.json({
+        ok: true,
+        mode: "builder-plan",
+        reply: formatPlanReply(plan),
+        plan: {
+          plan_id: plan.plan_id,
+          status: plan.status,
+          module_id: plan.module_id,
+          title: plan.title,
+          approval_phrase: plan.approval_phrase,
+          proposed_files: plan.proposed_files.map((file) => ({
+            path: file.path,
+            action: file.action,
+            purpose: file.purpose,
+          })),
+        },
+      });
+    }
+
+    return NextResponse.json({
+      ok: true,
+      mode: "commander-reply",
+      reply: `Standing by, Commander. I heard: ${text}`,
+    });
+  } catch (error: any) {
+    return NextResponse.json({
       ok: false,
-      commandId,
-      title: "Blocked command",
-      category: "Policy",
-      risk: "BLOCKED",
-      startedAt: startedAt.toISOString(),
-      finishedAt: new Date().toISOString(),
-      durationMs: 0,
-      stdout: "",
-      stderr: "Jarvis blocked an unknown or unsafe command. Only whitelisted SAFE_READ commands are allowed in PJ38.",
-      evidencePath: EVIDENCE_FILE,
-      message: "Command blocked by Jarvis policy boundary."
-    };
-    await evidence(blocked);
-    return NextResponse.json(blocked, { status: 400 });
+      mode: "builder-error",
+      reply: `Commander, Builder Core blocked this command: ${error?.message || "unknown error"}`,
+      error: error?.message || "unknown error",
+    }, { status: 200 });
   }
-
-  const output = await command.run();
-  const finishedAt = new Date();
-
-  const result = {
-    ok: output.ok,
-    commandId,
-    title: command.title,
-    category: command.category,
-    risk: command.risk,
-    startedAt: startedAt.toISOString(),
-    finishedAt: finishedAt.toISOString(),
-    durationMs: finishedAt.getTime() - startedAt.getTime(),
-    stdout: output.stdout,
-    stderr: output.stderr,
-    evidencePath: EVIDENCE_FILE,
-    message: output.ok ? "Jarvis command completed and evidence was recorded." : "Jarvis command returned a failure result. Evidence was recorded."
-  };
-
-  await evidence(result);
-  return NextResponse.json(result, { status: output.ok ? 200 : 500 });
 }

@@ -1,0 +1,29 @@
+{
+    "step":  "STEP_02A_BUILDER_CORE",
+    "status":  "COMPLETE",
+    "created_at":  "2026-06-15T07:19:06.8192204Z",
+    "visual_files_changed":  [
+
+                             ],
+    "safety_backup":  "C:\\Kingsmen\\kingsmen-platform\\backups\\jarvis-step-02a-builder-core-before-20260615_001906",
+    "changed_files":  [
+                          {
+                              "path":  "tools\\jarvis\\JARVIS_BUILDER_CORE.ps1",
+                              "sha256":  "7530a6dc0cf28edd8a9cf44e872204e3f28ae0edc5bc963c9070336c7656630b"
+                          },
+                          {
+                              "path":  "docs\\jarvis\\JARVIS_BUILDER_CORE.md",
+                              "sha256":  "1b556b13b6347d8ffeb7fc2889b83c3d08877e3338dc05810893ad66e8e8263f"
+                          },
+                          {
+                              "path":  "manifests\\jarvis\\jarvis-builder-core-lock.json",
+                              "sha256":  "e9948fe1e2d9f9a53fca78ca86b0f2578441f4a5fd66c6d5d02a90bf874d3cd0"
+                          },
+                          {
+                              "path":  "C:\\Kingsmen\\START_JARVIS_BUILDER_CORE.cmd",
+                              "sha256":  "dfb099dc90bea49988ac240c4a2e1f2b20ad9bc9c10fe179ed3d964226d5d87d"
+                          }
+                      ],
+    "installed_flow":  "typed command -\u003e plan -\u003e approval -\u003e file write -\u003e build/test -\u003e proof -\u003e git commit",
+    "run_command":  "C:\\Kingsmen\\START_JARVIS_BUILDER_CORE.cmd"
+}

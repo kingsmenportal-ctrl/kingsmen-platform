@@ -1,0 +1,13 @@
+﻿{
+    "step":  "STEP_01_VOICE_INPUT_CAPTURE",
+    "status":  "listening",
+    "updated_at":  "2026-06-14T09:58:13.3058306Z",
+    "recognizer_started":  true,
+    "total_recognized":  0,
+    "total_wake":  0,
+    "total_speech_detected":  0,
+    "last_text":  "",
+    "api":  "http://127.0.0.1:3000/api/jarvis/voice",
+    "log":  "C:\\Kingsmen\\kingsmen-platform\\reports\\jarvis\\runtime\\STEP_01_NATIVE_VOICE_CAPTURE.log",
+    "events":  "C:\\Kingsmen\\kingsmen-platform\\reports\\jarvis\\runtime\\STEP_01_NATIVE_VOICE_CAPTURE_EVENTS.jsonl"
+}

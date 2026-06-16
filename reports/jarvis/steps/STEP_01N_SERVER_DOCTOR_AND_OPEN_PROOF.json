@@ -1,0 +1,17 @@
+{
+    "step":  "STEP_01N_SERVER_DOCTOR_AND_OPEN",
+    "status":  "COMPLETE",
+    "created_at":  "2026-06-15T06:51:22.8814863Z",
+    "visual_files_changed":  [
+
+                             ],
+    "server_started_new":  true,
+    "jarvis_status_url":  "http://127.0.0.1:3000/api/jarvis/status",
+    "jarvis_url":  "http://127.0.0.1:3000/jarvis",
+    "port_owner_after":  {
+                             "pid":  14768,
+                             "process":  "node",
+                             "path":  "C:\\Program Files\\nodejs\\node.exe"
+                         },
+    "server_cmd":  "C:\\Kingsmen\\kingsmen-platform\\reports\\jarvis\\runtime\\START_NEXT_JARVIS_SERVER_20260614_235031.cmd"
+}

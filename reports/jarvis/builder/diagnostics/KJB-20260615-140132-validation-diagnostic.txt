@@ -1,0 +1,60 @@
+KINGSMEN JARVIS BUILDER VALIDATION DIAGNOSTIC
+===============================================================
+Plan ID: KJB-20260615-140132
+Proof: C:\Kingsmen\kingsmen-platform\reports\jarvis\builder\proofs\KJB-20260615-140132-proof.json
+Plan status: BUILT_VALIDATION_FAILED_NO_COMMIT
+Module: N21 - Builder API Smoke Test
+Final status: BUILT_VALIDATION_FAILED_NO_COMMIT
+Validation passed: False
+Git commit attempted: False
+Git commit ok: False
+
+Changed files:
+- docs/kingsmen/modules/n21-builder-api-smoke-test.md
+- manifests/kingsmen/modules/n21-builder-api-smoke-test.json
+- reports/jarvis/builder/module-proofs/n21-builder-api-smoke-test-proof-seed.json
+
+VALIDATION RESULTS
+===============================================================
+
+STEP: npm run build
+EXIT: 1
+
+STDOUT:
+
+> @kingsmen/web@0.0.0 build
+> next build
+
+   â–² Next.js 15.5.19
+   - Experiments (use with caution):
+     âœ“ externalDir
+
+   Creating an optimized production build ...
+ âœ“ Compiled successfully in 41s
+   Linting and checking validity of types ...
+
+
+STDERR:
+ âš  You are using a non-standard "NODE_ENV" value in your environment. This creates inconsistencies in the project and is strongly advised against. Read more: https://nextjs.org/docs/messages/non-standard-node-env
+Failed to compile.
+
+./src/app/command/page.tsx:6:27
+Type error: Type '{ surface: string; }' is not assignable to type 'IntrinsicAttributes'.
+  Property 'surface' does not exist on type 'IntrinsicAttributes'.
+
+[0m [90m 4 |[39m
+ [90m 5 |[39m [36mexport[39m [36mdefault[39m [36mfunction[39m [33mCommandPage[39m() {
+[31m[1m>[22m[39m[90m 6 |[39m   [36mreturn[39m [33m<[39m[33mJarvisHudClient[39m surface[33m=[39m[32m"COMMAND"[39m [33m/[39m[33m>[39m[33m;[39m
+ [90m   |[39m                           [31m[1m^[22m[39m
+ [90m 7 |[39m }
+ [90m 8 |[39m[0m
+Next.js build worker exited with code: 1 and signal: null
+
+
+GIT RESULTS
+===============================================================
+
+DIAGNOSIS
+===============================================================
+Builder already wrote the safe module files, but validation failed. Commit was correctly blocked.
+Do not approve the same plan again. Repair the validation failure, then create a fresh plan or run a resume/finalize step.

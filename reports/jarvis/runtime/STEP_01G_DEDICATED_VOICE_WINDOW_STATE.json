@@ -1,0 +1,23 @@
+{
+    "step":  "STEP_01G_DEDICATED_VOICE_WINDOW",
+    "status":  "listening",
+    "updated_at":  "2026-06-14T10:08:26.4057807Z",
+    "recognizer_started":  true,
+    "recognizer_culture":  "en-US",
+    "total_speech_detected":  0,
+    "total_hypothesized":  0,
+    "total_recognized":  0,
+    "total_rejected":  0,
+    "total_wake":  0,
+    "total_api_posts":  0,
+    "total_spoken":  0,
+    "last_text":  "",
+    "last_confidence":  null,
+    "last_event":  "This window will not return to a PowerShell prompt. Close the window to stop.",
+    "api":  "http://127.0.0.1:3000/api/jarvis/voice",
+    "jarvis_url":  "http://127.0.0.1:3000/jarvis",
+    "log":  "C:\\Kingsmen\\kingsmen-platform\\reports\\jarvis\\runtime\\STEP_01G_DEDICATED_VOICE_WINDOW.log",
+    "events":  "C:\\Kingsmen\\kingsmen-platform\\reports\\jarvis\\runtime\\STEP_01G_DEDICATED_VOICE_WINDOW_EVENTS.jsonl",
+    "dedicated_window_alive":  true,
+    "layout_files_changed":  false
+}

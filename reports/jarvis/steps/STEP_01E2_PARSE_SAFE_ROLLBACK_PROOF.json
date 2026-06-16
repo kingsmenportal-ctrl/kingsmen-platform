@@ -1,0 +1,24 @@
+{
+    "step":  "STEP_01E2_PARSE_SAFE_ROLLBACK",
+    "status":  "COMPLETE",
+    "created_at":  "2026-06-14T09:55:50.5101904Z",
+    "repo":  "C:\\Kingsmen\\kingsmen-platform",
+    "rollback_source":  "C:\\Kingsmen\\kingsmen-platform\\backups\\jarvis-step-01e-visual-styles-20260614_024629",
+    "safety_backup":  "C:\\Kingsmen\\kingsmen-platform\\backups\\jarvis-step-01e2-parse-safe-before-rollback-20260614_025551",
+    "reason":  "Restore previous layout from Step 01E automatic backup. Do not create another visual design.",
+    "previous_rollback_error_fixed":  "Removed nested script generation and broken here-string pattern.",
+    "results":  {
+                    "hud":  "restored",
+                    "css":  "restored"
+                },
+    "before":  {
+                   "hud_sha256":  "e21f448e9d7fa11f3a65389401169bf369b7ab0fd4e944cf3ed49ef0eeef0e5a",
+                   "css_sha256":  "11119b3901f36bb4c9675a1b9ccefcf9e3504ca9c83a20f04d1f7cd9c755d17c"
+               },
+    "after":  {
+                  "hud_sha256":  "5c007dc20468366f9f65f2e347bafd8d2731e0a14ff2991b0fcf345f29ef6b9b",
+                  "css_sha256":  "832520df00c5f29324d581e590b3395c8fb71df3aa94e36777ae9f5896d8d59b"
+              },
+    "layout_relocked":  true,
+    "next_command":  "Ctrl+F5 browser refresh, then C:\\Kingsmen\\START_JARVIS_FULL_COMMAND_VOICE.cmd only if Next needs restart."
+}

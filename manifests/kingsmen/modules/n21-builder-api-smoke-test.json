@@ -1,0 +1,26 @@
+{
+  "module_id": "N21",
+  "title": "Builder API Smoke Test",
+  "slug": "n21-builder-api-smoke-test",
+  "status": "BUILDER_DRAFT",
+  "created_by": "Kingsmen Jarvis Builder API Command Bridge",
+  "plan_id": "KJB-20260615-140132",
+  "original_command": "Jarvis, create Kingsmen module N21 Builder API Smoke Test",
+  "commander_only": true,
+  "safety": {
+    "requires_plan": true,
+    "requires_approval": true,
+    "requires_validation": true,
+    "requires_proof": true,
+    "commit_after_validation": true,
+    "public_candidate_access": "blocked"
+  },
+  "doctrine": [
+    "Commander-only Jarvis",
+    "Backend state authority",
+    "PostgreSQL truth",
+    "Airtable mirror only",
+    "n8n thin worker only",
+    "No silent automation"
+  ]
+}

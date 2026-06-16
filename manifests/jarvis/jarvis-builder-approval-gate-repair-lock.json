@@ -1,0 +1,14 @@
+{
+    "lock_name":  "jarvis-builder-approval-gate-repair",
+    "status":  "LOCKED",
+    "locked_at":  "2026-06-15T21:19:04.4277916Z",
+    "repairs":  [
+                    "fixed Builder Core repo root",
+                    "approval parser accepts approve and Jarvis approve",
+                    "Builder API errors return visible JSON instead of browser Internal Server Error",
+                    "direct approval command added"
+                ],
+    "visual_files_changed":  [
+
+                             ]
+}

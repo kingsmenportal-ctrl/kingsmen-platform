@@ -1,0 +1,22 @@
+{
+    "step":  "STEP_01K3_CSS_MODULE_PURITY_REPAIR",
+    "status":  "COMPLETE",
+    "created_at":  "2026-06-15T01:07:53.9763496Z",
+    "changed_files":  [
+                          "apps\\web\\src\\app\\jarvis\\JarvisHud.module.css"
+                      ],
+    "untouched_files":  [
+                            "apps\\web\\src\\app\\jarvis\\JarvisHudClient.tsx",
+                            "apps\\web\\public\\jarvis\\locked-reference.png"
+                        ],
+    "safety_backup":  "C:\\Kingsmen\\kingsmen-platform\\backups\\jarvis-step-01k3-before-css-module-purity-repair-20260614_180753",
+    "css_sha256_before":  "4395a4a21f601cd5a0d31c3f9d4e6849922cc3d1d1a93a6addbcc711a1613c9d",
+    "css_sha256_after":  "d2e5f0024369f977879fe426732a7cdb79fe971062df877a1b7a4f3f054c8af9",
+    "removed_invalid_selectors":  [
+                                      ":global(html)",
+                                      ":global(body)"
+                                  ],
+    "next_command_1":  "Stop the Next server with Ctrl+C",
+    "next_command_2":  "cd /d C:\\Kingsmen\\kingsmen-platform\\apps\\web \u0026\u0026 npm run dev -- -H 127.0.0.1 -p 3000",
+    "next_command_3":  "C:\\Kingsmen\\OPEN_JARVIS_LOCKED.cmd"
+}

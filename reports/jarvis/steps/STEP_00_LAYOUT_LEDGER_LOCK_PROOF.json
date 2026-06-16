@@ -1,0 +1,67 @@
+{
+    "step":  "STEP_00_LAYOUT_LEDGER_LOCK",
+    "status":  "COMPLETE",
+    "created_at":  "2026-06-14T08:19:39.4073096Z",
+    "repo":  "C:\\Kingsmen\\kingsmen-platform",
+    "primary_layout_file":  "apps\\web\\src\\app\\jarvis\\JarvisHudClient.tsx",
+    "locked_files":  [
+                         {
+                             "path":  "apps\\web\\src\\app\\jarvis\\JarvisHudClient.tsx",
+                             "exists":  true,
+                             "locked":  true,
+                             "sha256":  "5c007dc20468366f9f65f2e347bafd8d2731e0a14ff2991b0fcf345f29ef6b9b",
+                             "bytes":  8385,
+                             "lines":  10
+                         },
+                         {
+                             "path":  "apps\\web\\src\\app\\jarvis\\page.tsx",
+                             "exists":  true,
+                             "locked":  true,
+                             "sha256":  "d79b6fce97a4f4426f505db2825d2edacb8c41aa39c5ee77d289d079247a0397",
+                             "bytes":  113,
+                             "lines":  3
+                         },
+                         {
+                             "path":  "apps\\web\\src\\app\\api\\jarvis\\status\\route.ts",
+                             "exists":  true,
+                             "locked":  true,
+                             "sha256":  "cea14d7f3adc9652ca3a1a1c5ad42afa769bf8220a8ae90ddef09cf5abf85fe7",
+                             "bytes":  268,
+                             "lines":  5
+                         },
+                         {
+                             "path":  "apps\\web\\src\\app\\api\\jarvis\\command\\route.ts",
+                             "exists":  true,
+                             "locked":  true,
+                             "sha256":  "d85afc848de1903e019da5a881534a0a61e90a8e49f080a5c0218b957a6ffef8",
+                             "bytes":  370,
+                             "lines":  5
+                         },
+                         {
+                             "path":  "apps\\web\\src\\app\\api\\jarvis\\voice\\route.ts",
+                             "exists":  true,
+                             "locked":  true,
+                             "sha256":  "5de146e4f02befd97f42bbfb7d5a0acae2233cc63de03a99082031ca8eb60b1b",
+                             "bytes":  538,
+                             "lines":  5
+                         },
+                         {
+                             "path":  "apps\\web\\src\\lib\\jarvis\\doctrine.ts",
+                             "exists":  true,
+                             "locked":  true,
+                             "sha256":  "2be91e5bc6ea88e16b3cea82f09826966b894e0b41a3ed341acd75eaa000e5f6",
+                             "bytes":  10303,
+                             "lines":  27
+                         },
+                         {
+                             "path":  "docs\\jarvis\\KINGSMEN_JARVIS_V5_MASTER_COMMAND_SCRIPT_LOCK.md",
+                             "exists":  true,
+                             "locked":  true,
+                             "sha256":  "5322b7c6015795288f605ad90066d09fdc01131917ea7d5f7eda1e9098c13ce6",
+                             "bytes":  31657,
+                             "lines":  1228
+                         }
+                     ],
+    "next_step":  "STEP_01_VOICE_INPUT_CAPTURE",
+    "guard_command":  "C:\\Kingsmen\\JARVIS_STEP_GUARD.cmd"
+}

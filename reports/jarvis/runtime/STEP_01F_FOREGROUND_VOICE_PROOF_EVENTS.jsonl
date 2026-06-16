@@ -1,0 +1,4 @@
+﻿{"ts":"2026-06-14T10:03:55.8608206Z","type":"step-start","text":"STEP 01F starting","extra":{}}
+{"ts":"2026-06-14T10:03:56.3997379Z","type":"api-status-ok","text":"Jarvis API detected","extra":{}}
+{"ts":"2026-06-14T10:03:57.3199069Z","type":"listening","text":"Foreground recognition loop alive. Say Jarvis.","extra":{}}
+{"ts":"2026-06-14T10:04:12.6376812Z","type":"foreground-heartbeat","text":"Still listening.","extra":{}}

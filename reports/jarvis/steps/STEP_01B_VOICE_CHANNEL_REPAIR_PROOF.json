@@ -1,0 +1,22 @@
+{
+    "step":  "STEP_01B_VOICE_CHANNEL_REPAIR",
+    "status":  "INSTALLED",
+    "created_at":  "2026-06-14T08:45:20.9060949Z",
+    "repo":  "C:\\Kingsmen\\kingsmen-platform",
+    "layout_preserved":  true,
+    "primary_layout_file":  "apps\\web\\src\\app\\jarvis\\JarvisHudClient.tsx",
+    "primary_layout_sha256":  "5c007dc20468366f9f65f2e347bafd8d2731e0a14ff2991b0fcf345f29ef6b9b",
+    "installed_files":  [
+                            "tools\\jarvis\\KINGSMEN_JARVIS_STEP_01B_VOICE_CHANNEL_REPAIR.ps1",
+                            "docs\\jarvis\\JARVIS_STEP_01B_VOICE_CHANNEL_REPAIR.md",
+                            "reports\\jarvis\\steps\\STEP_01B_VOICE_CHANNEL_REPAIR_PROOF.json",
+                            "C:\\Kingsmen\\JARVIS_STEP_01B_VOICE_CHANNEL_REPAIR.cmd",
+                            "C:\\Kingsmen\\JARVIS_STEP_01B_VOICE_LOGS.cmd",
+                            "C:\\Kingsmen\\JARVIS_STEP_01B_START_SERVER_AND_VOICE.cmd"
+                        ],
+    "primary_test_command":  "C:\\Kingsmen\\JARVIS_STEP_01B_START_SERVER_AND_VOICE.cmd",
+    "voice_only_command":  "C:\\Kingsmen\\JARVIS_STEP_01B_VOICE_CHANNEL_REPAIR.cmd",
+    "logs_command":  "C:\\Kingsmen\\JARVIS_STEP_01B_VOICE_LOGS.cmd",
+    "expected_spoken_test":  "Say Jarvis",
+    "next_step":  "STEP_02_MANDATORY_KINGSMEN_WELCOME"
+}

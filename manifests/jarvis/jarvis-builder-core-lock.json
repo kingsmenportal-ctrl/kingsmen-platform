@@ -1,0 +1,27 @@
+{
+    "lock_name":  "jarvis-builder-core",
+    "status":  "LOCKED",
+    "locked_at":  "2026-06-15T07:19:06.8192204Z",
+    "commander_only":  true,
+    "flow":  [
+                 "typed command",
+                 "plan",
+                 "approved file write",
+                 "build/test",
+                 "proof report",
+                 "git commit"
+             ],
+    "allowed_write_boundaries":  [
+                                     "docs\\kingsmen\\modules\\",
+                                     "manifests\\kingsmen\\modules\\",
+                                     "reports\\jarvis\\builder\\module-proofs\\"
+                                 ],
+    "blocked":  [
+                    "silent writes",
+                    "candidate/public access",
+                    "visual changes",
+                    "arbitrary filesystem writes",
+                    "commit after failed validation"
+                ],
+    "launcher":  "C:\\Kingsmen\\START_JARVIS_BUILDER_CORE.cmd"
+}

@@ -1,0 +1,10 @@
+﻿{
+    "step":  "STEP_01C_SERVER_BOOT_AND_VOICE_PROOF",
+    "status":  "server-offline",
+    "detail":  "Server did not respond on port 3000.",
+    "updated_at":  "2026-06-14T09:25:11.4171219Z",
+    "repo":  "C:\\Kingsmen\\kingsmen-platform",
+    "url":  "http://127.0.0.1:3000/jarvis",
+    "status_url":  "http://127.0.0.1:3000/api/jarvis/status",
+    "log":  "C:\\Kingsmen\\kingsmen-platform\\reports\\jarvis\\runtime\\STEP_01C_SERVER_BOOT_AND_VOICE_PROOF.log"
+}

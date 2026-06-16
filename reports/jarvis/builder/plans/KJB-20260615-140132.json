@@ -1,0 +1,41 @@
+{
+  "plan_id": "KJB-20260615-140132",
+  "created_at": "2026-06-15T21:01:32.064Z",
+  "status": "BUILT_VALIDATION_FAILED_NO_COMMIT",
+  "command": "Jarvis, create Kingsmen module N21 Builder API Smoke Test",
+  "module_id": "N21",
+  "title": "Builder API Smoke Test",
+  "slug": "n21-builder-api-smoke-test",
+  "approval_phrase": "approve KJB-20260615-140132",
+  "proposed_files": [
+    {
+      "path": "docs/kingsmen/modules/n21-builder-api-smoke-test.md",
+      "action": "create_or_replace",
+      "purpose": "Human-readable Kingsmen module draft and doctrine gate.",
+      "content": "# N21 - Builder API Smoke Test\r\n\r\nStatus: BUILDER_DRAFT\r\nCreated by: Kingsmen Jarvis Builder API Command Bridge\r\nCreated at: 2026-06-15T21:01:32.063Z\r\n\r\n## Commander Command\r\n\r\nJarvis, create Kingsmen module N21 Builder API Smoke Test\r\n\r\n## Purpose\r\n\r\nThis is a controlled Builder Core output created through the Jarvis command route. It proves that Jarvis can receive a typed Commander command, create a plan, wait for approval, write safe files, validate, create proof, and attempt a Git commit.\r\n\r\n## Kingsmen Doctrine Boundary\r\n\r\n- Jarvis is Commander-only.\r\n- No candidate-facing exposure.\r\n- No silent write.\r\n- Backend and PostgreSQL remain the authority for operational state.\r\n- Airtable remains a mirror only.\r\n- n8n remains a thin worker only.\r\n- Every build action must leave proof.\r\n\r\n## Next Gate\r\n\r\nProduction code may only be added after a new approved plan lists exact files, rollback path, validation, and proof output.\r\n"
+    },
+    {
+      "path": "manifests/kingsmen/modules/n21-builder-api-smoke-test.json",
+      "action": "create_or_replace",
+      "purpose": "Machine-readable module manifest for Control Plane/Jarvis indexing.",
+      "content": "{\n  \"module_id\": \"N21\",\n  \"title\": \"Builder API Smoke Test\",\n  \"slug\": \"n21-builder-api-smoke-test\",\n  \"status\": \"BUILDER_DRAFT\",\n  \"created_by\": \"Kingsmen Jarvis Builder API Command Bridge\",\n  \"plan_id\": \"KJB-20260615-140132\",\n  \"original_command\": \"Jarvis, create Kingsmen module N21 Builder API Smoke Test\",\n  \"commander_only\": true,\n  \"safety\": {\n    \"requires_plan\": true,\n    \"requires_approval\": true,\n    \"requires_validation\": true,\n    \"requires_proof\": true,\n    \"commit_after_validation\": true,\n    \"public_candidate_access\": \"blocked\"\n  },\n  \"doctrine\": [\n    \"Commander-only Jarvis\",\n    \"Backend state authority\",\n    \"PostgreSQL truth\",\n    \"Airtable mirror only\",\n    \"n8n thin worker only\",\n    \"No silent automation\"\n  ]\n}"
+    },
+    {
+      "path": "reports/jarvis/builder/module-proofs/n21-builder-api-smoke-test-proof-seed.json",
+      "action": "create_or_replace",
+      "purpose": "Proof seed showing this module was generated through Builder Core approval.",
+      "content": "{\n  \"module_id\": \"N21\",\n  \"title\": \"Builder API Smoke Test\",\n  \"plan_id\": \"KJB-20260615-140132\",\n  \"proof_status\": \"seed_created_before_validation\",\n  \"created_at\": \"2026-06-15T21:01:32.063Z\"\n}"
+    }
+  ],
+  "validation": {
+    "run_typecheck_if_available": true,
+    "run_lint_if_available": true,
+    "run_build_if_available": true
+  },
+  "git": {
+    "commit_after_validation": true,
+    "commit_message": "jarvis-builder: N21 Builder API Smoke Test",
+    "staged_paths_only": true
+  },
+  "proof_path": "C:\\Kingsmen\\kingsmen-platform\\reports\\jarvis\\builder\\proofs\\KJB-20260615-140132-proof.json"
+}

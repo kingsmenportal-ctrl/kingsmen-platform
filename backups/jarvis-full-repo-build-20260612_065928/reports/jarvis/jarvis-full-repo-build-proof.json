@@ -1,0 +1,21 @@
+{
+  "version": "KINGSMEN_RESTART_JARVIS_EXACT_REPO_BUILD",
+  "created_at": "2026-06-12T04:50:16.841368+00:00",
+  "source_v5_sha256": "5322b7c6015795288f605ad90066d09fdc01131917ea7d5f7eda1e9098c13ce6",
+  "build_type": "repo_patch_not_standalone_shell",
+  "writes": [
+    "docs/jarvis/KINGSMEN_JARVIS_V5_MASTER_COMMAND_SCRIPT_LOCK.md",
+    "manifests/jarvis/jarvis-v5-doctrine-lock.json",
+    "apps/web/src/lib/jarvis/doctrine.ts",
+    "apps/web/src/app/jarvis/page.tsx",
+    "apps/web/src/app/jarvis/JarvisHudClient.tsx",
+    "apps/web/src/app/api/jarvis/status/route.ts",
+    "apps/web/src/app/api/jarvis/command/route.ts",
+    "apps/web/src/app/api/jarvis/voice/route.ts",
+    "apps/web/src/app/api/jarvis/voice/events/route.ts",
+    "tools/jarvis/KINGSMEN_NATIVE_VOICE_BRIDGE.ps1",
+    "tools/jarvis/START_JARVIS_FULL_COMMAND_VOICE.ps1",
+    "tools/jarvis/JARVIS_FULL_COMMAND_VOICE_DIAGNOSTIC.ps1"
+  ],
+  "standard_wake": "Welcome to Kingsmen Command, Commander. Jarvis is online. The command house is awake, your desk is prepared, and I stand ready to brief, inspect, report, search, repair, research, organise, or execute under Kingsmen doctrine."
+}

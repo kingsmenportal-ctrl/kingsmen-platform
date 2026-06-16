@@ -1,0 +1,40 @@
+{
+    "step":  "STEP_02D_APPROVAL_GATE_REPAIR",
+    "status":  "COMPLETE",
+    "created_at":  "2026-06-15T21:19:04.4277916Z",
+    "backup_root":  "C:\\Kingsmen\\kingsmen-platform\\backups\\jarvis-step-02d-approval-gate-before-20260615_141901",
+    "changed_files":  [
+                          {
+                              "path":  "apps\\web\\src\\lib\\jarvis\\builderCore.ts",
+                              "sha256":  "3da5f2252edb0115f2c7392f3c87b4c4c57388bf84a4e112d584b9ab27a53e59"
+                          },
+                          {
+                              "path":  "apps\\web\\src\\app\\api\\jarvis\\command\\route.ts",
+                              "sha256":  "9a9e6561da2e0871e15b78b0f7ba4d2928625f06e778be66c31023f3507576c0"
+                          },
+                          {
+                              "path":  "apps\\web\\src\\app\\api\\jarvis\\builder\\route.ts",
+                              "sha256":  "d334b3c303d32c23dc42be442dc241828122185a391be1c7beeb640a31dbb736"
+                          },
+                          {
+                              "path":  "tools\\jarvis\\JARVIS_APPROVE_BUILDER_PLAN.ps1",
+                              "sha256":  "f79f8bd0b246521fe4ce04b7e9775e6c49b421740ae7c426c282d9a0465453cb"
+                          },
+                          {
+                              "path":  "tools\\jarvis\\RESTART_JARVIS_SERVER_AFTER_02D.ps1",
+                              "sha256":  "b4664d748fc2483fb8675d41d5643decdb3bca52771d3a76fed5a8550ba4ac58"
+                          },
+                          {
+                              "path":  "C:\\Kingsmen\\JARVIS_APPROVE_BUILDER_PLAN.cmd",
+                              "sha256":  "f12fe006a94e4031598546212b7e15009a5c162fc0c6cb15cab3b037969a4bef"
+                          },
+                          {
+                              "path":  "C:\\Kingsmen\\RESTART_JARVIS_SERVER_AFTER_02D.cmd",
+                              "sha256":  "426643ff7107a60d2b6917d03638e6508587d8d24d6c11d667ec3058a4d17fea"
+                          }
+                      ],
+    "visual_files_changed":  [
+
+                             ],
+    "restart_required":  true
+}

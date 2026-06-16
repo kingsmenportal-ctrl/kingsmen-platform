@@ -1,0 +1,29 @@
+{
+    "step":  "STEP_01I_EXACT_LAYOUT_RESTORE_FROM_VERIFIED_SOURCE",
+    "status":  "COMPLETE",
+    "created_at":  "2026-06-14T10:20:27.7165806Z",
+    "verified_source":  "C:\\Kingsmen\\kingsmen-platform\\backups\\jarvis-step-01e2-parse-safe-before-rollback-20260614_025551",
+    "safety_backup":  "C:\\Kingsmen\\kingsmen-platform\\backups\\jarvis-step-01i-before-exact-restore-20260614_032027",
+    "restored":  true,
+    "no_new_design":  true,
+    "voice_runtime_touched":  false,
+    "api_logic_touched":  false,
+    "live_hud":  {
+                     "exists":  true,
+                     "bytes":  10784,
+                     "sha256":  "e21f448e9d7fa11f3a65389401169bf369b7ab0fd4e944cf3ed49ef0eeef0e5a",
+                     "styles_usage_count":  30,
+                     "className_count":  29,
+                     "css_module_import":  true
+                 },
+    "live_css":  {
+                     "exists":  true,
+                     "bytes":  8601,
+                     "sha256":  "11119b3901f36bb4c9675a1b9ccefcf9e3504ca9c83a20f04d1f7cd9c755d17c",
+                     "styles_usage_count":  0,
+                     "className_count":  0,
+                     "css_module_import":  false
+                 },
+    "layout_lock":  "C:\\Kingsmen\\kingsmen-platform\\manifests\\jarvis\\jarvis-layout-lock.json",
+    "next":  "Refresh http://127.0.0.1:3000/jarvis with Ctrl+F5. If still plain, restart the Next server window."
+}

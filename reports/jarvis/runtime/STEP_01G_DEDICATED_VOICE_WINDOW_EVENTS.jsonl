@@ -1,0 +1,3 @@
+﻿{"ts":"2026-06-14T10:08:25.3808281Z","type":"worker-start","text":"Dedicated Jarvis voice window started.","extra":{}}
+{"ts":"2026-06-14T10:08:25.8578616Z","type":"api-status-ok","text":"Jarvis API detected on port 3000.","extra":{}}
+{"ts":"2026-06-14T10:08:26.3387779Z","type":"listening","text":"Dedicated voice window is listening.","extra":{}}

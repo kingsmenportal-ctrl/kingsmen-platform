@@ -1,0 +1,30 @@
+{
+    "step":  "STEP_01M_FIXED_VIEWPORT_AND_SAFE_LAUNCH",
+    "status":  "COMPLETE",
+    "created_at":  "2026-06-15T06:38:19.6812196Z",
+    "fixed":  [
+                  "Collapsed responsive layout removed",
+                  "Fixed 1920x1080 live cockpit scales into any browser window",
+                  "Port 3000 duplicate launch guarded by START_JARVIS_SAFE.cmd"
+              ],
+    "safety_backup":  "C:\\Kingsmen\\kingsmen-platform\\backups\\jarvis-step-01m-before-fixed-viewport-20260614_233819",
+    "changed_files":  [
+                          {
+                              "path":  "apps\\web\\src\\app\\jarvis\\JarvisHudClient.tsx",
+                              "sha256":  "6a8156648fa05319985ede66c926b65f5a7332a727bf9cc5d0a704c26644aa61"
+                          },
+                          {
+                              "path":  "apps\\web\\src\\app\\jarvis\\JarvisHud.module.css",
+                              "sha256":  "8ced00e1fd4ca51c5efdb1ba4f9e2bc554b79778f969c5aeef04828c4b034a45"
+                          },
+                          {
+                              "path":  "tools\\jarvis\\START_JARVIS_SAFE.ps1",
+                              "sha256":  "b9dd8d7452e54d1dd11cbdb7c3385e5ed36b96ddcc6b8a3512801cb2a3ee6870"
+                          },
+                          {
+                              "path":  "C:\\Kingsmen\\START_JARVIS_SAFE.cmd",
+                              "sha256":  "982082c03a2619ce30dbd8e03658bd2ab8a83c7753eade6d41840bc866def5f4"
+                          }
+                      ],
+    "next_command":  "C:\\Kingsmen\\START_JARVIS_SAFE.cmd"
+}

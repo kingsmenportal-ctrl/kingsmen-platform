@@ -1,0 +1,22 @@
+{
+    "step":  "STEP_01D_SERVER_SCRIPT_DISCOVERY_REPAIR",
+    "status":  "INSTALLED",
+    "created_at":  "2026-06-14T09:25:26.2476258Z",
+    "repo":  "C:\\Kingsmen\\kingsmen-platform",
+    "layout_preserved":  true,
+    "primary_layout_file":  "apps\\web\\src\\app\\jarvis\\JarvisHudClient.tsx",
+    "primary_layout_sha256":  "5c007dc20468366f9f65f2e347bafd8d2731e0a14ff2991b0fcf345f29ef6b9b",
+    "installed_files":  [
+                            "tools\\jarvis\\KINGSMEN_JARVIS_STEP_01D_SERVER_SCRIPT_DISCOVERY_REPAIR.ps1",
+                            "docs\\jarvis\\JARVIS_STEP_01D_SERVER_SCRIPT_DISCOVERY_REPAIR.md",
+                            "reports\\jarvis\\steps\\STEP_01D_SERVER_SCRIPT_DISCOVERY_REPAIR.json",
+                            "C:\\Kingsmen\\JARVIS_STEP_01D_SERVER_SCRIPT_DISCOVERY_REPAIR.cmd",
+                            "C:\\Kingsmen\\JARVIS_STEP_01D_LOGS.cmd",
+                            "C:\\Kingsmen\\START_JARVIS_FULL_COMMAND_VOICE.cmd"
+                        ],
+    "primary_test_command":  "C:\\Kingsmen\\JARVIS_STEP_01D_SERVER_SCRIPT_DISCOVERY_REPAIR.cmd",
+    "main_start_command":  "C:\\Kingsmen\\START_JARVIS_FULL_COMMAND_VOICE.cmd",
+    "logs_command":  "C:\\Kingsmen\\JARVIS_STEP_01D_LOGS.cmd",
+    "expected_url":  "http://127.0.0.1:3000/jarvis",
+    "next_step":  "STEP_02_MANDATORY_KINGSMEN_WELCOME"
+}

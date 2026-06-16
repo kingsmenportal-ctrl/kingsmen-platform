@@ -1,0 +1,15 @@
+﻿{
+    "step":  "STEP_01B_VOICE_CHANNEL_REPAIR",
+    "status":  "listening",
+    "updated_at":  "2026-06-14T09:28:16.6196056Z",
+    "recognizer_started":  true,
+    "api_online":  true,
+    "total_speech_detected":  0,
+    "total_hypothesis":  0,
+    "total_recognized":  0,
+    "total_wake":  0,
+    "last_text":  "",
+    "api":  "http://127.0.0.1:3000/api/jarvis/voice",
+    "log":  "C:\\Kingsmen\\kingsmen-platform\\reports\\jarvis\\runtime\\STEP_01B_VOICE_CHANNEL_REPAIR.log",
+    "events":  "C:\\Kingsmen\\kingsmen-platform\\reports\\jarvis\\runtime\\STEP_01B_VOICE_CHANNEL_REPAIR_EVENTS.jsonl"
+}

@@ -1,0 +1,11 @@
+{
+    "lock_name":  "jarvis-fixed-live-cockpit-layout-lock",
+    "status":  "LOCKED",
+    "locked_at":  "2026-06-15T06:38:19.6812196Z",
+    "rule":  "Approved visual language remains; live DOM cockpit must stay fixed 1920x1080 and scale into viewport; no responsive collapse; no wallpaper interface.",
+    "changed_files":  [
+                          "apps\\web\\src\\app\\jarvis\\JarvisHudClient.tsx",
+                          "apps\\web\\src\\app\\jarvis\\JarvisHud.module.css"
+                      ],
+    "proof":  "C:\\Kingsmen\\kingsmen-platform\\reports\\jarvis\\steps\\STEP_01M_FIXED_VIEWPORT_AND_SAFE_LAUNCH_PROOF.json"
+}
