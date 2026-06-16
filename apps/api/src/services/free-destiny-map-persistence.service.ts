@@ -8,7 +8,7 @@ import {
   buildFreeDestinyMapAuditEvent,
   type FreeDestinyMapPersistenceResult,
   type StoredFreeDestinyMapIntakeSummary
-} from "../../../../packages/contracts/src/free-destiny-map-persistence";
+} from "./free-destiny-map-contracts";
 
 export interface FreeDestinyMapPersistenceOptions {
   enableLocalWrite?: boolean;
