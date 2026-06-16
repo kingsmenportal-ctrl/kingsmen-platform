@@ -24,6 +24,38 @@ npm test
 npm run jarvis:validate
 ```
 
+## Deployable backend API runtime
+
+`apps/api` now contains a deployable backend API package, TypeScript build config, and HTTP server runtime.
+
+It exposes:
+
+- `GET /health`
+- `GET /api/system/health`
+- `POST /api/commands`
+- `POST /api/workflow/result`
+- `POST /api/workflow-results`
+- `GET /api/candidates/:candidateId/status`
+- `GET /api/applications/:applicationId/workbench`
+
+Run from the root after installing the API package dependencies:
+
+```powershell
+npm run api:build
+npm run api:start
+```
+
+Or directly:
+
+```powershell
+cd apps/api
+npm install
+npm run build
+npm start
+```
+
+Current API storage mode is `memory_development_only`. The next launch build must replace this with real PostgreSQL/Supabase Truth Vault persistence.
+
 ## Kingsmen launch readiness gate
 
 The repo now has a strict launch-readiness gate. It does not fake production readiness; it reports the exact blockers that must be repaired before public candidates, payments, or production data.
