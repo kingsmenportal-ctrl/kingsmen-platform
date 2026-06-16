@@ -20,6 +20,10 @@ function has(path, token) {
   return Boolean(read(path)?.includes(token));
 }
 
+function hasLocalWindowsBoundary(source) {
+  return source.includes('C:') && source.includes('Kingsmen');
+}
+
 function checkFile(path, requiredTokens = []) {
   const content = read(path);
   const missingTokens = content === null ? requiredTokens : requiredTokens.filter((token) => !content.includes(token));
@@ -136,8 +140,8 @@ if (migration.includes('FOR ALL USING (true) WITH CHECK (true)')) {
 const jarvisStatusRoute = read('apps/web/src/app/api/jarvis/status/route.ts') ?? '';
 const jarvisCommandRoute = read('apps/web/src/app/api/jarvis/command/route.ts') ?? '';
 if (
-  jarvisStatusRoute.includes('C:\\Kingsmen') ||
-  jarvisCommandRoute.includes('C:\\Kingsmen') ||
+  hasLocalWindowsBoundary(jarvisStatusRoute) ||
+  hasLocalWindowsBoundary(jarvisCommandRoute) ||
   jarvisStatusRoute.includes('powershell') ||
   jarvisCommandRoute.includes('powershell') ||
   jarvisStatusRoute.includes('psql.exe') ||
@@ -146,7 +150,7 @@ if (
   block(
     'WEB_API_LOCAL_SHELL_BOUNDARY',
     'Web API routes depend on local Windows shell execution.',
-    'Public Next API routes currently reference C:\\Kingsmen, powershell, and/or psql.exe. That is a local founder workstation proof surface, not a cloud/public runtime boundary.',
+    'Public Next API routes currently reference local Windows paths, powershell, and/or psql.exe. That is a local founder workstation proof surface, not a cloud/public runtime boundary.',
     'Move these actions behind the backend API/SDK, use environment variables, and remove local shell execution from public routes.',
     ['apps/web/src/app/api/jarvis/status/route.ts', 'apps/web/src/app/api/jarvis/command/route.ts']
   );
