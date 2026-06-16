@@ -53,13 +53,15 @@ const requiredFileChecks = [
     'secrets:prove:wiring',
     'secrets:validate:wiring',
     'communications:prove',
-    'communications:validate'
+    'communications:validate',
+    'observability:prove',
+    'observability:validate'
   ]),
   checkFile('.gitignore', ['.env', '.env.*', '!.env.example', '.local/backups', 'backups/', '*.dump', '*.backup']),
   checkFile('.env.example', ['DATABASE_URL=', 'REDIS_URL=', 'SMTP_PASSWORD=', 'PAYMENT_PROVIDER_SECRET=', 'STORAGE_ACCESS_KEY=']),
-  checkFile('manifests/launch/kingsmen-launch-readiness-v1.json', ['requiredLaunchGates', 'publicLaunchStatus', 'main-branch-protection-v1', 'web_runtime_boundary', 'payfast-sandbox-proof-v1', 'rls-security-proof-v1', 'backup-restore-proof-v1', 'secrets_wiring', 'secrets-wiring-proof-v1', 'communications-proof-v1', 'foundation_built_pending_provider_staging_proof']),
-  checkFile('docs/launch/KINGSMEN_LAUNCH_READINESS.md', ['Exact blockers', 'npm run kingsmen:launch:gate', 'npm run web:validate:backend-boundary', 'npm run payments:validate:sandbox', 'npm run security:validate:rls', 'npm run backup:validate:restore', 'npm run secrets:validate:wiring', 'npm run communications:validate']),
-  checkFile('.github/workflows/kingsmen-source-guard.yml', ['name: Kingsmen Source Guard', 'source-guard', 'npm run backup:validate:restore', 'npm run secrets:validate:wiring', 'npm run communications:validate', 'npm run repo:validate:branch-protection', 'npm run kingsmen:launch:audit']),
+  checkFile('manifests/launch/kingsmen-launch-readiness-v1.json', ['requiredLaunchGates', 'publicLaunchStatus', 'main-branch-protection-v1', 'web_runtime_boundary', 'payfast-sandbox-proof-v1', 'rls-security-proof-v1', 'backup-restore-proof-v1', 'secrets_wiring', 'secrets-wiring-proof-v1', 'communications-proof-v1', 'observability-incident-proof-v1', 'foundation_built_pending_staging_monitoring_proof']),
+  checkFile('docs/launch/KINGSMEN_LAUNCH_READINESS.md', ['Exact blockers', 'npm run kingsmen:launch:gate', 'npm run web:validate:backend-boundary', 'npm run payments:validate:sandbox', 'npm run security:validate:rls', 'npm run backup:validate:restore', 'npm run secrets:validate:wiring', 'npm run communications:validate', 'npm run observability:validate']),
+  checkFile('.github/workflows/kingsmen-source-guard.yml', ['name: Kingsmen Source Guard', 'source-guard', 'npm run backup:validate:restore', 'npm run secrets:validate:wiring', 'npm run communications:validate', 'npm run observability:validate', 'npm run repo:validate:branch-protection', 'npm run kingsmen:launch:audit']),
 
   checkFile('apps/api/package.json', ['build', 'start']),
   checkFile('apps/api/src/server.ts', ['/health', '/api/commands', '/api/workflow-results']),
@@ -113,6 +115,12 @@ const requiredFileChecks = [
   checkFile('docs/communications/KINGSMEN_COMMUNICATIONS_PROOF.md', ['Email is primary', 'WhatsApp is urgent-only', 'SMS is backup-only', 'npm run communications:validate']),
   checkFile('scripts/proof/prove-communications-boundary.mjs', ['COMMUNICATIONS_SOURCE_PROOF_PASSED', 'providerStagingProofPending: true']),
   checkFile('scripts/validators/validate-communications-proof.mjs', ['COMMUNICATIONS_PROOF_VALIDATED', 'communications:validate', 'COMMUNICATIONS_PROVIDER_STAGING_PROOF_REQUIRED']),
+
+  checkFile('apps/api/src/ops/observability-incident-proof-boundary.ts', ['OBSERVABILITY_INCIDENT_BOUNDARY_SOURCE_ONLY', 'apiHealthCheckRequired', 'databaseHealthCheckRequired', 'queueHealthCheckRequired', 'correlationIdRequired', 'dlqReviewRequired', 'founderEscalationRequired', 'incidentRunbookRequired']),
+  checkFile('manifests/ops/observability-incident-proof-v1.json', ['kingsmen.observability-incident-proof.v1', 'foundation_built_pending_staging_monitoring_proof', 'api_health_check_defined', 'dlq_review_required', 'founder_escalation_defined']),
+  checkFile('docs/ops/KINGSMEN_OBSERVABILITY_INCIDENT_PROOF.md', ['Production ready: **false**', 'SEV1', 'SEV2', 'SEV3', 'founder escalation', 'npm run observability:validate']),
+  checkFile('scripts/proof/prove-observability-incident-boundary.mjs', ['OBSERVABILITY_INCIDENT_SOURCE_PROOF_PASSED', 'stagingRuntimeProofPending: true']),
+  checkFile('scripts/validators/validate-observability-incident-proof.mjs', ['OBSERVABILITY_INCIDENT_PROOF_VALIDATED', 'observability:validate', 'OBSERVABILITY_STAGING_PROOF_REQUIRED']),
 
   checkFile('packages/contracts/src/jarvis/index.ts', ['JarvisCommandEnvelope', 'tenantRef', 'correlationId', 'requestId']),
   checkFile('packages/jarvis-core/src/jarvis-policy-gate.ts', ['JARVIS_APPROVAL_REQUIRED', 'founderApprovalRef', 'JARVIS_BLOCKED_UNSAFE_ACTION']),
@@ -172,7 +180,8 @@ for (const [path, unsafeFields] of [
   ['manifests/ops/backup-restore-proof-v1.json', ['productionReady', 'publicLaunchAllowed', 'productionDataAllowed']],
   ['manifests/repo/main-branch-protection-v1.json', ['productionReady', 'publicLaunchAllowed']],
   ['manifests/credentials/secrets-wiring-proof-v1.json', ['productionReady', 'publicLaunchAllowed', 'liveSecretsCommitted', 'rawSecretsInReportsAllowed']],
-  ['manifests/communications/communications-proof-v1.json', ['productionReady', 'publicLaunchAllowed', 'liveMessagesSent', 'bulkSendingAllowed']]
+  ['manifests/communications/communications-proof-v1.json', ['productionReady', 'publicLaunchAllowed', 'liveMessagesSent', 'bulkSendingAllowed']],
+  ['manifests/ops/observability-incident-proof-v1.json', ['productionReady', 'publicLaunchAllowed', 'liveMonitoringConnected', 'livePagerConfigured']]
 ]) {
   try {
     const parsed = json(path);
@@ -212,6 +221,11 @@ if (communicationsManifest?.includes('foundation_built_pending_provider_staging_
   warn('COMMUNICATIONS_PROVIDER_STAGING_PROOF_REQUIRED', 'Communications source-level boundary is built but provider staging proof is still required.', 'Candidate notifications require provider send/receive, bounce, opt-out, WhatsApp urgent-only, SMS fallback, and redacted evidence proof.', 'Run communications staging proof before enabling real candidate notifications.', ['manifests/communications/communications-proof-v1.json', 'docs/communications/KINGSMEN_COMMUNICATIONS_PROOF.md']);
 }
 
+const observabilityManifest = read('manifests/ops/observability-incident-proof-v1.json');
+if (observabilityManifest?.includes('foundation_built_pending_staging_monitoring_proof')) {
+  warn('OBSERVABILITY_STAGING_PROOF_REQUIRED', 'Observability and incident source-level boundary is built but staging proof is still required.', 'Public users require live health, structured log, queue/DLQ, alert, redaction, and incident drill evidence.', 'Run observability staging proof before public users.', ['manifests/ops/observability-incident-proof-v1.json', 'docs/ops/KINGSMEN_OBSERVABILITY_INCIDENT_PROOF.md']);
+}
+
 const readinessEngine = read('apps/api/src/final-assembly/readiness-engine.ts') ?? '';
 for (const token of ['secrets_not_committed', 'database_backup_restore_test', 'payfast_sandbox_evidence']) {
   if (readinessEngine.includes(token) && readinessEngine.includes('status: "pending"')) {
@@ -244,6 +258,7 @@ const report = {
     livePaymentsRemainBlockedUntilSandboxProviderProof: true,
     emailPrimary: true,
     whatsappUrgentOnly: true,
+    observabilityRequiredBeforePublicUsers: true,
     founderApprovalForProductionRisk: true,
     noSecretsInRepo: true,
     publicLaunchRequiresAllP0Gates: true
@@ -252,7 +267,7 @@ const report = {
   blockers,
   warnings,
   nextActions: blockers.length === 0
-    ? ['Apply GitHub branch protection, complete masked secrets runtime proof, communications provider proof, staging smoke tests, and live evidence before public traffic.']
+    ? ['Apply GitHub branch protection, complete masked secrets runtime proof, communications provider proof, observability staging proof, staging smoke tests, and live evidence before public traffic.']
     : [
         'Run API Truth Vault persistence validation and staging DB integration proof.',
         'Run web backend-boundary validation and staging smoke proof with KINGSMEN_BACKEND_BASE_URL configured.',
@@ -262,7 +277,8 @@ const report = {
         'Run repo branch-protection proof, then apply GitHub main protection with source-guard required.',
         'Run secrets wiring proof, then perform masked runtime secret health proof in staging/Oracle.',
         'Run communications proof, then perform provider staging send/receive, bounce, opt-out, WhatsApp urgent-only, SMS fallback, and redacted evidence proof.',
-        'Prove observability, incident handling, legal, privacy, consent, terms, and refund policy.'
+        'Run observability proof, then perform staging health, queue/DLQ, alert, redaction, and incident drill proof.',
+        'Prove legal, privacy, consent, terms, and refund policy.'
       ]
 };
 
