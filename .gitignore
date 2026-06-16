@@ -34,7 +34,7 @@ bower_components
 # node-waf configuration
 .lock-wscript
 
-# Compiled binary addons (https://nodejs.org/api/addons.html)
+# Compiled binary addons (https://nodejs.org/api/addons)
 build/Release
 
 # Dependency directories
@@ -85,7 +85,7 @@ dist
 
 # Gatsby files
 .cache/
-# Comment in the public line in if your project uses Gatsby and not Next.js
+# Comment in the public line in if your project uses Gatsby but not Next.js
 # https://nextjs.org/blog/next-9-1#public-directory-support
 # public
 
@@ -193,3 +193,11 @@ data/personal-job-desk/document-pack-index.local.json
 reports/personal-jobs/personal-jobs-33-document-pack-index-latest.json
 data/personal-job-desk/apply-now.local.json
 data/personal-job-desk/uploads/
+
+# Kingsmen backup archives and local restore drill artifacts
+.local/backups/
+backups/
+*.dump
+*.backup
+*.sql.gz
+*.restore.local.json
