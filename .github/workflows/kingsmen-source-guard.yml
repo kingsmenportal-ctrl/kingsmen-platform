@@ -50,5 +50,17 @@ jobs:
       - name: Backup/restore validator
         run: npm run backup:validate:restore
 
+      - name: Secrets wiring source proof
+        run: npm run secrets:prove:wiring
+
+      - name: Secrets wiring validator
+        run: npm run secrets:validate:wiring
+
+      - name: Branch protection source proof
+        run: npm run repo:prove:branch-protection
+
+      - name: Branch protection validator
+        run: npm run repo:validate:branch-protection
+
       - name: Launch audit report
         run: npm run kingsmen:launch:audit
