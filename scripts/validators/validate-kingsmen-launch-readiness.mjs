@@ -39,7 +39,7 @@ function checkFile(path, requiredTokens = []) {
 
 const requiredFileChecks = [
   checkFile('README.md', ['PostgreSQL Truth Vault', 'n8n', 'email primary']),
-  checkFile('package.json', ['kingsmen:launch:audit', 'kingsmen:launch:gate']),
+  checkFile('package.json', ['kingsmen:launch:audit', 'kingsmen:launch:gate', 'api:validate:truth-vault']),
   checkFile('manifests/launch/kingsmen-launch-readiness-v1.json', ['requiredLaunchGates', 'publicLaunchStatus']),
   checkFile('docs/launch/KINGSMEN_LAUNCH_READINESS.md', ['Exact blockers', 'npm run kingsmen:launch:gate']),
   checkFile('packages/contracts/src/jarvis/index.ts', ['JarvisCommandEnvelope', 'tenantRef', 'correlationId', 'requestId']),
@@ -49,6 +49,8 @@ const requiredFileChecks = [
   checkFile('apps/api/src/kernel/command-bus.ts', ['KingsmenCommandBus', 'assertPolicyAllows']),
   checkFile('apps/api/src/state/state-machine.ts', ['WORKFLOW_TARGET_STATE', 'assertTransition']),
   checkFile('apps/api/src/db/truth-vault-schema.ts', ['N03_TRUTH_TABLES', 'N03_RLS_REQUIRED']),
+  checkFile('apps/api/src/db/truth-vault-repository.ts', ['KINGSMEN_TRUTH_VAULT_MODE', 'postgres_truth_vault', 'recordCommand', 'recordWorkflowResult']),
+  checkFile('scripts/validators/validate-api-truth-vault-persistence.mjs', ['API Truth Vault Persistence', 'postgres_truth_vault']),
   checkFile('db/migrations/0001_n03_truth_vault.sql', ['CREATE TABLE IF NOT EXISTS candidates', 'ENABLE ROW LEVEL SECURITY']),
   checkFile('apps/api/src/final-assembly/final-read-model.ts', ['buildDefaultLaunchGates', 'gate_public_launch']),
   checkFile('apps/api/src/final-assembly/readiness-engine.ts', ['secrets_not_committed', 'database_backup_restore_test', 'payfast_sandbox_evidence'])
@@ -208,10 +210,10 @@ const report = {
   nextActions: blockers.length === 0
     ? ['Open the final founder launch approval gate and run staging smoke tests before public traffic.']
     : [
-        'Fix API runtime packaging and live backend entrypoints.',
-        'Replace Truth Vault persistence stubs with real PostgreSQL/Supabase writes.',
+        'Run API Truth Vault persistence validation and staging DB integration proof.',
         'Remove local PowerShell/Windows shell execution from public web API routes.',
-        'Prove PayFast sandbox/ITN, secrets wiring, backup/restore, and RLS isolation.',
+        'Add scoped RLS policies and prove candidate/operator/founder/service-role isolation.',
+        'Prove PayFast sandbox/ITN, secrets wiring, backup/restore, and incident handling.',
         'Protect main and require this launch gate before release.'
       ]
 };
