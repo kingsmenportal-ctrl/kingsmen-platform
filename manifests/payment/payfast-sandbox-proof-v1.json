@@ -1,0 +1,41 @@
+{
+  "manifestKey": "payfast-sandbox-proof-v1",
+  "module": "PAYMENTS - PayFast Sandbox Proof",
+  "status": "foundation_built_pending_sandbox_run",
+  "productionReady": false,
+  "payfastEnvironment": "sandbox",
+  "livePaymentsEnabled": false,
+  "candidateCharged": false,
+  "refundsAutoApproved": false,
+  "paymentStatusChangesRequireAcceptedItn": true,
+  "truthAuthority": "PostgreSQL/Supabase finance tables",
+  "providerBoundary": "PayFast is processor evidence, not Kingsmen truth",
+  "requiredScenarioKeys": [
+    "sandbox_success_complete_itn",
+    "sandbox_cancel_return_no_status_change",
+    "sandbox_return_pending_until_itn",
+    "sandbox_failed_payment_rejected",
+    "sandbox_duplicate_itn_rejected",
+    "sandbox_invalid_signature_rejected",
+    "sandbox_amount_mismatch_rejected",
+    "sandbox_replay_idempotency_rejected",
+    "refund_requires_human_review",
+    "secrets_redacted_from_evidence"
+  ],
+  "evidencePaths": [
+    "apps/api/src/finance/payfast-signature.ts",
+    "apps/api/src/finance/payfast-itn.ts",
+    "apps/api/src/finance/payfast-sandbox-proof.ts",
+    "db/migrations/0008_n10_finance_payfast.sql",
+    "docs/finance/KINGSMEN_PAYMENT_PROOF.md",
+    "scripts/proof/prove-payfast-sandbox-boundary.mjs",
+    "scripts/validators/validate-payfast-sandbox-proof.mjs"
+  ],
+  "liveLaunchBlockers": [
+    "Real PayFast sandbox checkout must be performed with merchant credentials outside git.",
+    "ITN callback must be tested against staging backend notify URL.",
+    "Duplicate/replay receipts must be captured in reports/finance before taking money.",
+    "Refund procedure must remain human-review only.",
+    "Payment, refund, privacy, and candidate terms must be published before paid pilot."
+  ]
+}
