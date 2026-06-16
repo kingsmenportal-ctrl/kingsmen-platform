@@ -32,22 +32,27 @@
       "gateKey": "api_runtime",
       "title": "Materialize backend API as deployable runtime",
       "requiredBefore": "staging deploy",
-      "status": "foundation_built_memory_only",
+      "status": "foundation_built",
       "evidenceRequired": "apps/api package/runtime entrypoint, health route, command route, workflow result route, read-model routes, and deploy command",
       "evidencePaths": [
         "apps/api/package.json",
         "apps/api/tsconfig.json",
         "apps/api/src/server.ts",
         "docs/api/KINGSMEN_DEPLOYABLE_API.md"
-      ],
-      "remainingConstraint": "Durable Truth Vault persistence is still required before staging data writes."
+      ]
     },
     {
       "gateKey": "truth_vault_persistence",
       "title": "Replace repository stubs with real PostgreSQL/Supabase persistence",
       "requiredBefore": "staging data writes",
-      "status": "blocked",
-      "evidenceRequired": "DB integration tests proving evidence, idempotency, heartbeat, command log, workflow result, and audit writes"
+      "status": "foundation_built_pending_staging_proof",
+      "evidenceRequired": "DB integration tests proving evidence, idempotency, heartbeat, command log, workflow result, and audit writes",
+      "evidencePaths": [
+        "apps/api/src/db/truth-vault-repository.ts",
+        "docs/api/KINGSMEN_TRUTH_VAULT_PERSISTENCE.md",
+        "scripts/validators/validate-api-truth-vault-persistence.mjs"
+      ],
+      "remainingConstraint": "Run API against staging PostgreSQL/Supabase with KINGSMEN_TRUTH_VAULT_MODE=postgres and capture integration proof before public users."
     },
     {
       "gateKey": "tenant_security_rls",
