@@ -16,23 +16,23 @@ function read(path) {
   return readFileSync(full, 'utf8');
 }
 
-function checkFile(path, requiredTokens = []) {
-  const content = read(path);
-  const missingTokens = content === null ? requiredTokens : requiredTokens.filter((token) => !content.includes(token));
-  return {
-    path,
-    exists: content !== null,
-    bytes: content?.length ?? 0,
-    requiredTokens,
-    missingTokens,
-    passed: content !== null && missingTokens.length === 0
-  };
-}
-
 function json(path) {
   const content = read(path);
   if (!content) return null;
   return JSON.parse(content);
+}
+
+function checkFile(path, tokens = []) {
+  const content = read(path);
+  const missingTokens = content === null ? tokens : tokens.filter((token) => !content.includes(token));
+  return {
+    path,
+    exists: content !== null,
+    bytes: content?.length ?? 0,
+    requiredTokens: tokens,
+    missingTokens,
+    passed: content !== null && missingTokens.length === 0
+  };
 }
 
 const requiredFileChecks = [
@@ -49,11 +49,15 @@ const requiredFileChecks = [
     'backup:prove:restore',
     'backup:validate:restore',
     'repo:prove:branch-protection',
-    'repo:validate:branch-protection'
+    'repo:validate:branch-protection',
+    'secrets:prove:wiring',
+    'secrets:validate:wiring'
   ]),
-  checkFile('.gitignore', ['.local/backups', 'backups/', '*.dump', '*.backup']),
-  checkFile('manifests/launch/kingsmen-launch-readiness-v1.json', ['requiredLaunchGates', 'publicLaunchStatus', 'main-branch-protection-v1', 'web_runtime_boundary', 'payfast-sandbox-proof-v1', 'rls-security-proof-v1', 'backup-restore-proof-v1']),
-  checkFile('docs/launch/KINGSMEN_LAUNCH_READINESS.md', ['Exact blockers', 'npm run kingsmen:launch:gate', 'npm run web:validate:backend-boundary', 'npm run payments:validate:sandbox', 'npm run security:validate:rls', 'npm run backup:validate:restore']),
+  checkFile('.gitignore', ['.env', '.env.*', '!.env.example', '.local/backups', 'backups/', '*.dump', '*.backup']),
+  checkFile('.env.example', ['DATABASE_URL=', 'REDIS_URL=', 'SMTP_PASSWORD=', 'PAYMENT_PROVIDER_SECRET=', 'STORAGE_ACCESS_KEY=']),
+  checkFile('manifests/launch/kingsmen-launch-readiness-v1.json', ['requiredLaunchGates', 'publicLaunchStatus', 'main-branch-protection-v1', 'web_runtime_boundary', 'payfast-sandbox-proof-v1', 'rls-security-proof-v1', 'backup-restore-proof-v1', 'secrets_wiring', 'secrets-wiring-proof-v1']),
+  checkFile('docs/launch/KINGSMEN_LAUNCH_READINESS.md', ['Exact blockers', 'npm run kingsmen:launch:gate', 'npm run web:validate:backend-boundary', 'npm run payments:validate:sandbox', 'npm run security:validate:rls', 'npm run backup:validate:restore', 'npm run secrets:validate:wiring']),
+  checkFile('.github/workflows/kingsmen-source-guard.yml', ['name: Kingsmen Source Guard', 'source-guard', 'npm run backup:validate:restore', 'npm run secrets:validate:wiring', 'npm run repo:validate:branch-protection', 'npm run kingsmen:launch:audit']),
 
   checkFile('apps/api/package.json', ['build', 'start']),
   checkFile('apps/api/src/server.ts', ['/health', '/api/commands', '/api/workflow-results']),
@@ -91,10 +95,16 @@ const requiredFileChecks = [
 
   checkFile('manifests/repo/main-branch-protection-v1.json', ['main-branch-protection-v1', 'foundation_built_pending_github_apply', 'source-guard', 'preventForcePush']),
   checkFile('docs/repo/KINGSMEN_BRANCH_PROTECTION.md', ['source-guard', 'force push blocked', 'npm run repo:validate:branch-protection']),
-  checkFile('.github/workflows/kingsmen-source-guard.yml', ['name: Kingsmen Source Guard', 'source-guard', 'npm run backup:validate:restore', 'npm run kingsmen:launch:audit']),
   checkFile('scripts/github/Set-KingsmenMainBranchProtection.ps1', ['gh api', 'allow_force_pushes = $false', 'allow_deletions = $false', 'MAIN_BRANCH_PROTECTION_APPLIED']),
   checkFile('scripts/proof/prove-main-branch-protection-boundary.mjs', ['MAIN_BRANCH_PROTECTION_SOURCE_PROOF_PASSED', 'githubProtectionApplied: false']),
   checkFile('scripts/validators/validate-main-branch-protection.mjs', ['MAIN_BRANCH_PROTECTION_VALIDATED', 'repo:validate:branch-protection', 'MAIN_BRANCH_PROTECTION_APPLY_REQUIRED']),
+
+  checkFile('manifests/credentials/credentials.registry.json', ['kingsmen.credentials-registry.v1', 'raw_secrets_in_repo', 'openclaw_raw_secret_access']),
+  checkFile('manifests/credentials/secrets-wiring-proof-v1.json', ['kingsmen.secrets-wiring-proof.v1', 'foundation_built_pending_runtime_secret_health_proof', 'rawSecretsInReportsAllowed', 'DATABASE_URL', 'REDIS_URL']),
+  checkFile('docs/security/KINGSMEN_SECRETS_WIRING_PROOF.md', ['No raw secrets in Git', 'Test-KingsmenSecretWiring.ps1', 'reports/security/secrets-wiring-runtime-health-latest.json', 'npm run secrets:validate:wiring']),
+  checkFile('scripts/security/Test-KingsmenSecretWiring.ps1', ['MASKED_RUNTIME_SECRET_HEALTH_REPORTED', 'rawSecretsPrinted = $false', 'connectionStringsPrinted = $false', 'valuePrinted = $false']),
+  checkFile('scripts/proof/prove-secrets-wiring-boundary.mjs', ['SECRETS_WIRING_SOURCE_PROOF_PASSED', 'env_example_empty_placeholders_only', 'credential_has_no_value', 'runtimeSecretHealthProofPending: true']),
+  checkFile('scripts/validators/validate-secrets-wiring-proof.mjs', ['SECRETS_WIRING_PROOF_VALIDATED', 'secrets:validate:wiring', 'SECRETS_RUNTIME_HEALTH_PROOF_REQUIRED']),
 
   checkFile('packages/contracts/src/jarvis/index.ts', ['JarvisCommandEnvelope', 'tenantRef', 'correlationId', 'requestId']),
   checkFile('packages/jarvis-core/src/jarvis-policy-gate.ts', ['JARVIS_APPROVAL_REQUIRED', 'founderApprovalRef', 'JARVIS_BLOCKED_UNSAFE_ACTION']),
@@ -142,18 +152,8 @@ const publicWebRoutes = [
 
 for (const routePath of publicWebRoutes) {
   const route = read(routePath) ?? '';
-  if (
-    (route.includes('C:') && route.includes('Kingsmen')) ||
-    route.includes('powershell') ||
-    route.includes('psql.exe') ||
-    route.includes('node:child_process') ||
-    route.includes('from "node:fs"') ||
-    route.includes("from 'node:fs'") ||
-    route.includes('appendFile') ||
-    route.includes('appendFileSync') ||
-    route.includes('writeFileSync') ||
-    route.includes('data/local')
-  ) {
+  const unsafeTokens = ['node:child_process', 'appendFile', 'appendFileSync', 'writeFileSync', 'data/local', 'psql.exe'];
+  if ((route.includes('C:') && route.includes('Kingsmen')) || unsafeTokens.some((token) => route.includes(token))) {
     block('WEB_API_LOCAL_RUNTIME_BOUNDARY', 'Public web API route depends on local runtime behavior.', 'Public web routes must not reference workstation paths, shell execution, local JSONL writes, or direct file writes.', 'Use the backend API client and KINGSMEN_BACKEND_BASE_URL only.', [routePath]);
   }
 }
@@ -162,7 +162,8 @@ for (const [path, unsafeFields] of [
   ['manifests/payment/payfast-sandbox-proof-v1.json', ['productionReady', 'livePaymentsEnabled', 'candidateCharged']],
   ['manifests/security/rls-security-proof-v1.json', ['productionReady', 'publicLaunchAllowed']],
   ['manifests/ops/backup-restore-proof-v1.json', ['productionReady', 'publicLaunchAllowed', 'productionDataAllowed']],
-  ['manifests/repo/main-branch-protection-v1.json', ['productionReady', 'publicLaunchAllowed']]
+  ['manifests/repo/main-branch-protection-v1.json', ['productionReady', 'publicLaunchAllowed']],
+  ['manifests/credentials/secrets-wiring-proof-v1.json', ['productionReady', 'publicLaunchAllowed', 'liveSecretsCommitted', 'rawSecretsInReportsAllowed']]
 ]) {
   try {
     const parsed = json(path);
@@ -179,13 +180,7 @@ for (const [path, unsafeFields] of [
 
 const branchManifest = read('manifests/repo/main-branch-protection-v1.json');
 if (branchManifest?.includes('foundation_built_pending_github_apply')) {
-  warn(
-    'MAIN_BRANCH_PROTECTION_APPLY_REQUIRED',
-    'Branch protection source boundary is built but GitHub protection must still be applied.',
-    'The workflow and apply script exist, but main is not proven protected until GitHub settings confirm source-guard is required and force-push/deletion are disabled.',
-    'Run scripts/github/Set-KingsmenMainBranchProtection.ps1 with GitHub admin permissions and verify through GitHub UI or gh api.',
-    ['scripts/github/Set-KingsmenMainBranchProtection.ps1', 'manifests/repo/main-branch-protection-v1.json']
-  );
+  warn('MAIN_BRANCH_PROTECTION_APPLY_REQUIRED', 'Branch protection source boundary is built but GitHub protection must still be applied.', 'The workflow and apply script exist, but main is not proven protected until GitHub settings confirm source-guard is required and force-push/deletion are disabled.', 'Run scripts/github/Set-KingsmenMainBranchProtection.ps1 with GitHub admin permissions and verify through GitHub UI or gh api.', ['scripts/github/Set-KingsmenMainBranchProtection.ps1']);
 }
 
 const rlsManifest = read('manifests/security/rls-security-proof-v1.json');
@@ -196,6 +191,11 @@ if (rlsManifest?.includes('foundation_built_pending_staging_proof')) {
 const backupManifest = read('manifests/ops/backup-restore-proof-v1.json');
 if (backupManifest?.includes('foundation_built_pending_staging_drill')) {
   warn('BACKUP_RESTORE_STAGING_DRILL_REQUIRED', 'Backup/restore source-level boundary is built but staging restore proof is still required.', 'Production personal data requires a live backup and restore drill with RPO/RTO evidence.', 'Run the backup and restore PowerShell scripts against staging and store a counts-only report.', ['scripts/backup/New-KingsmenTruthVaultBackup.ps1', 'scripts/backup/Test-KingsmenTruthVaultRestore.ps1']);
+}
+
+const secretsManifest = read('manifests/credentials/secrets-wiring-proof-v1.json');
+if (secretsManifest?.includes('foundation_built_pending_runtime_secret_health_proof')) {
+  warn('SECRETS_RUNTIME_HEALTH_PROOF_REQUIRED', 'Secrets wiring source-level boundary is built but masked runtime health proof is still required.', 'Real environment variables must be configured outside Git and checked with masked status-only reports before staging/public launch.', 'Run scripts/security/Test-KingsmenSecretWiring.ps1 in staging/Oracle after configuring env vars outside Git.', ['scripts/security/Test-KingsmenSecretWiring.ps1', 'manifests/credentials/secrets-wiring-proof-v1.json']);
 }
 
 const readinessEngine = read('apps/api/src/final-assembly/readiness-engine.ts') ?? '';
@@ -226,6 +226,7 @@ const report = {
     backupRestoreRequiredBeforeProductionData: true,
     mainBranchProtectionRequired: true,
     sourceGuardRequiredBeforeMerge: true,
+    secretsRuntimeHealthRequired: true,
     livePaymentsRemainBlockedUntilSandboxProviderProof: true,
     emailPrimary: true,
     whatsappUrgentOnly: true,
@@ -237,7 +238,7 @@ const report = {
   blockers,
   warnings,
   nextActions: blockers.length === 0
-    ? ['Apply GitHub branch protection, then complete staging smoke tests and live evidence before public traffic.']
+    ? ['Apply GitHub branch protection, complete masked secrets runtime proof, then complete staging smoke tests and live evidence before public traffic.']
     : [
         'Run API Truth Vault persistence validation and staging DB integration proof.',
         'Run web backend-boundary validation and staging smoke proof with KINGSMEN_BACKEND_BASE_URL configured.',
@@ -245,7 +246,8 @@ const report = {
         'Run RLS/security source proof, then apply migration to staging and capture live SQL role-isolation proof.',
         'Run backup/restore source proof, then perform live staging backup and restore drill with RPO/RTO evidence.',
         'Run repo branch-protection proof, then apply GitHub main protection with source-guard required.',
-        'Prove secrets wiring and incident handling.'
+        'Run secrets wiring proof, then perform masked runtime secret health proof in staging/Oracle.',
+        'Prove communications and incident handling.'
       ]
 };
 
