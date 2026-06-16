@@ -37,20 +37,27 @@ const wakeGreeting =
 
 const commandCards: CommandCard[] = [
   { label: "System status", tool: "SYSTEM_STATUS", message: "system status", risk: "safe", surface: "System Health" },
-  { label: "Validate N20", tool: "VALIDATE_N20", message: "validate N20", risk: "approval", surface: "Validation" },
-  { label: "Run build", tool: "RUN_WEB_BUILD", message: "run web build", risk: "approval", surface: "Build" },
+  { label: "Git status", tool: "GIT_STATUS", message: "git status", risk: "safe", surface: "Repo" },
   { label: "Database scan", tool: "DATABASE_SCAN", message: "database scan", risk: "review", surface: "Read Model" },
   { label: "Probe routes", tool: "ROUTE_PROBE", message: "probe routes", risk: "approval", surface: "Route Scout" },
-  { label: "Git status", tool: "GIT_STATUS", message: "git status", risk: "safe", surface: "Repo" },
+  { label: "Run build", tool: "RUN_WEB_BUILD", message: "run web build", risk: "approval", surface: "Build" },
+  { label: "Validate N20", tool: "VALIDATE_N20", message: "validate N20", risk: "approval", surface: "Validation" },
   { label: "Real build lock", tool: "HELP", message: "show Jarvis real build lock", risk: "safe", surface: "Commander Lock" },
   { label: "Help", tool: "HELP", message: "what can you do", risk: "safe", surface: "Dialogue" }
 ];
 
 const missionPanels = [
-  { title: "Real Build", value: "LOCKED", note: "Issue #36 active" },
-  { title: "Visual Law", value: "SYSTEM", note: "Not wallpaper" },
-  { title: "Local Runtime", value: "CMD-SAFE", note: "No wrong shell syntax" },
-  { title: "Proof", value: "REQUIRED", note: "Repo and build evidence" }
+  { title: "Real Build", value: "LOCKED", note: "Issue #36 and JB-004 active" },
+  { title: "Visual Law", value: "SYSTEM", note: "Visual layer is the operating shell" },
+  { title: "Local Runtime", value: "CMD-FIRST", note: "No wrong shell syntax" },
+  { title: "Proof", value: "REQUIRED", note: "Local CMD output still needed" }
+];
+
+const operatingDoctrine = [
+  "Jarvis is Commander-only.",
+  "The visual shell is the system surface.",
+  "Commands must be clear, governed, and evidence-backed.",
+  "No production claim is allowed without local proof."
 ];
 
 function speak(text: string) {
@@ -76,7 +83,14 @@ function confidenceFor(message?: Message) {
   if (message.ok === false) return "needs review";
   if (message.evidencePath) return "evidence linked";
   if (message.output) return "tool output";
+  if (message.tool) return "tool routed";
   return "dialogue";
+}
+
+function riskLabel(risk: CommandCard["risk"]) {
+  if (risk === "approval") return "Approval gate";
+  if (risk === "review") return "Review route";
+  return "Safe read";
 }
 
 export default function JarvisAgentClient() {
@@ -87,7 +101,8 @@ export default function JarvisAgentClient() {
     {
       role: "jarvis",
       text: `${wakeGreeting} ${jarvisRealBuildLock.decision}`,
-      ok: true
+      ok: true,
+      tool: "WAKE"
     }
   ]);
   const [visualActive, setVisualActive] = useState(false);
@@ -105,6 +120,17 @@ export default function JarvisAgentClient() {
   const evidenceItems = useMemo(() => {
     return messages.filter((message) => message.role === "jarvis" && (message.evidencePath || message.tool || message.error));
   }, [messages]);
+
+  const systemLedger = useMemo(
+    () => [
+      { label: "Voice", value: voiceState },
+      { label: "Visual feed", value: visualActive ? "active" : "standby" },
+      { label: "Kernel", value: running ? "executing" : "ready" },
+      { label: "Evidence", value: `${evidenceItems.length} item${evidenceItems.length === 1 ? "" : "s"}` },
+      { label: "Confidence", value: confidenceFor(lastJarvis) }
+    ],
+    [evidenceItems.length, lastJarvis, running, visualActive, voiceState]
+  );
 
   async function runAgent(message: string, tool?: string) {
     const clean = message.trim();
@@ -158,7 +184,7 @@ export default function JarvisAgentClient() {
       speak(payload.ok ? finalText : `Command failed. ${payload.reply}`);
     } catch (error) {
       const text = error instanceof Error ? error.message : "Jarvis agent failed.";
-      setMessages((items) => [...items, { role: "jarvis", text: "Agent request failed.", error: text, ok: false }]);
+      setMessages((items) => [...items, { role: "jarvis", text: "Agent request failed.", error: text, ok: false, tool: "AGENT" }]);
       speak("Agent request failed.");
     } finally {
       setRunning(false);
@@ -245,10 +271,11 @@ export default function JarvisAgentClient() {
   return (
     <main className={styles.shell}>
       <div className={styles.grid} />
+      <div className={styles.aura} />
       <section className={styles.frame}>
         <header className={styles.header}>
           <div>
-            <p className={styles.kicker}>KINGSMEN COMMAND HOUSE · REAL JARVIS BUILD LOCK ACTIVE</p>
+            <p className={styles.kicker}>KINGSMEN COMMAND HOUSE · JB-004 LIVE OPERATING SHELL</p>
             <h1>JARVIS</h1>
             <p className={styles.subtitle}>{wakeGreeting}</p>
             <p className={styles.subtitle}>{jarvisRealBuildLock.visualLaw}</p>
@@ -256,7 +283,7 @@ export default function JarvisAgentClient() {
           <div className={styles.statusStack}>
             <div className={styles.status}>
               <span className={running ? styles.pulseWarn : styles.pulseOk} />
-              <strong>{running ? "EXECUTING" : "REAL BUILD"}</strong>
+              <strong>{running ? "EXECUTING" : "COMMAND READY"}</strong>
               <small>{voiceState}</small>
             </div>
             <div className={styles.confidenceChip}>{confidenceFor(lastJarvis)}</div>
@@ -275,18 +302,27 @@ export default function JarvisAgentClient() {
 
         <section className={styles.layout}>
           <aside className={styles.left}>
-            <div className={running ? styles.orbActive : styles.orb} aria-label="Jarvis voice orb">
-              <div className={styles.r1} />
-              <div className={styles.r2} />
-              <div className={styles.core}>J</div>
-            </div>
+            <section className={styles.orbConsole}>
+              <div className={running ? styles.orbActive : styles.orb} aria-label="Jarvis voice orb">
+                <div className={styles.r1} />
+                <div className={styles.r2} />
+                <div className={styles.r3} />
+                <div className={styles.core}>J</div>
+              </div>
+              <p className={styles.orbCaption}>Commander voice and visual command core</p>
+            </section>
 
-            <button className={styles.voiceButton} onClick={startVoice} disabled={running}>
-              VOICE COMMAND
-            </button>
-            <button className={styles.voiceButton} onClick={toggleVisual}>
-              {visualActive ? "STOP VISUAL FEED" : "START VISUAL FEED"}
-            </button>
+            <div className={styles.actionStack}>
+              <button className={styles.voiceButton} onClick={startVoice} disabled={running}>
+                VOICE COMMAND
+              </button>
+              <button className={styles.voiceButton} onClick={() => speak(wakeGreeting)}>
+                SPEAK WAKE GREETING
+              </button>
+              <button className={styles.voiceButton} onClick={toggleVisual}>
+                {visualActive ? "STOP VISUAL FEED" : "START VISUAL FEED"}
+              </button>
+            </div>
 
             <div className={styles.camera}>
               <video ref={videoRef} autoPlay muted playsInline />
@@ -300,6 +336,24 @@ export default function JarvisAgentClient() {
           </aside>
 
           <section className={styles.chat}>
+            <section className={styles.commandCentre}>
+              <div>
+                <p className={styles.kicker}>Live command centre</p>
+                <h2>Speak, type, inspect, and prove.</h2>
+                <p>
+                  Jarvis will route safe commands, show evidence, and keep the build lock visible. Local proof is still required before any production claim.
+                </p>
+              </div>
+              <form className={styles.topForm} onSubmit={submit}>
+                <input
+                  value={input}
+                  onChange={(event) => setInput(event.target.value)}
+                  placeholder="Command Jarvis from Kingsmen Command..."
+                />
+                <button disabled={running}>{running ? "RUNNING" : "EXECUTE"}</button>
+              </form>
+            </section>
+
             <div className={styles.commandDeck}>
               {commandCards.map((item) => (
                 <button
@@ -313,7 +367,7 @@ export default function JarvisAgentClient() {
                 >
                   <span>{item.surface}</span>
                   <strong>{item.label}</strong>
-                  <small>{item.risk}</small>
+                  <small>{riskLabel(item.risk)}</small>
                 </button>
               ))}
             </div>
@@ -332,23 +386,35 @@ export default function JarvisAgentClient() {
                 </article>
               ))}
             </div>
-
-            <form className={styles.form} onSubmit={submit}>
-              <input
-                value={input}
-                onChange={(event) => setInput(event.target.value)}
-                placeholder="Command Jarvis from Kingsmen Command..."
-              />
-              <button disabled={running}>{running ? "RUNNING" : "SEND"}</button>
-            </form>
           </section>
 
           <aside className={styles.right}>
+            <section className={styles.panel}>
+              <h2>Live status ledger</h2>
+              <ul className={styles.ledgerList}>
+                {systemLedger.map((item) => (
+                  <li key={item.label}>
+                    <span>{item.label}</span>
+                    <strong>{item.value}</strong>
+                  </li>
+                ))}
+              </ul>
+            </section>
+
             <section className={styles.panel}>
               <h2>Real build lock</h2>
               <p>{jarvisRealBuildLock.decision}</p>
               <ul>
                 {jarvisRealBuildLock.nextBuild.map((item) => (
+                  <li key={item}>{item}</li>
+                ))}
+              </ul>
+            </section>
+
+            <section className={styles.panel}>
+              <h2>Operating doctrine</h2>
+              <ul>
+                {operatingDoctrine.map((item) => (
                   <li key={item}>{item}</li>
                 ))}
               </ul>
@@ -373,19 +439,6 @@ export default function JarvisAgentClient() {
               ) : (
                 <p>No evidence captured yet.</p>
               )}
-            </section>
-
-            <section className={styles.panel}>
-              <h2>HUD surfaces</h2>
-              <ul>
-                <li>Real build lock</li>
-                <li>Mission board</li>
-                <li>Command deck</li>
-                <li>Voice orb</li>
-                <li>Commander lock</li>
-                <li>Evidence drawer</li>
-                <li>Source confidence chip</li>
-              </ul>
             </section>
           </aside>
         </section>
