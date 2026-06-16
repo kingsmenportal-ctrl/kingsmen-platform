@@ -81,8 +81,18 @@
       "gateKey": "payments",
       "title": "PayFast sandbox and ITN verification evidence",
       "requiredBefore": "taking money",
-      "status": "blocked",
-      "evidenceRequired": "sandbox success, cancel, return, failed payment, duplicate ITN, invalid signature, and replay tests"
+      "status": "foundation_built_pending_real_sandbox_evidence",
+      "evidenceRequired": "sandbox success, cancel, return, failed payment, duplicate ITN, invalid signature, replay, amount mismatch, refund human-review, and secret-redaction tests",
+      "evidencePaths": [
+        "manifests/payment/payfast-sandbox-proof-v1.json",
+        "docs/finance/KINGSMEN_PAYMENT_PROOF.md",
+        "apps/api/src/finance/payfast-sandbox-proof.ts",
+        "scripts/proof/prove-payfast-sandbox-boundary.mjs",
+        "scripts/validators/validate-payfast-sandbox-proof.mjs",
+        "reports/finance/payfast-sandbox-proof-run-latest.json",
+        "reports/finance/payfast-sandbox-proof-latest.json"
+      ],
+      "remainingConstraint": "Source-level sandbox proof is built; real PayFast sandbox checkout against staging notify URL must be captured before paid pilot or live payments."
     },
     {
       "gateKey": "communications",
