@@ -68,6 +68,12 @@ jobs:
       - name: Observability validator
         run: npm run observability:validate
 
+      - name: Legal/privacy source proof
+        run: npm run legal:prove
+
+      - name: Legal/privacy validator
+        run: npm run legal:validate
+
       - name: Branch protection source proof
         run: npm run repo:prove:branch-protection
 
