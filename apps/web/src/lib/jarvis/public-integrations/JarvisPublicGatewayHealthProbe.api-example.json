@@ -1,0 +1,26 @@
+{
+  "method": "GET",
+  "route": "/api/jarvis/public-repos/health",
+  "description": "Safe local health probe for N21 public gateway GET/status routes.",
+  "expectedDoctrine": {
+    "method": "GET only",
+    "noPost": true,
+    "noToolExecution": true,
+    "noMutation": true,
+    "noSecretOutput": true
+  },
+  "expectedSummaryShape": {
+    "total": 5,
+    "green": "number",
+    "yellow": "number",
+    "red": "number",
+    "checkedAt": "ISO timestamp"
+  },
+  "expectedItemShape": {
+    "id": "docling-smart-intake",
+    "status": "green | yellow | red",
+    "httpStatus": 200,
+    "latencyMs": 123,
+    "reason": "Local GET status route responded successfully."
+  }
+}
