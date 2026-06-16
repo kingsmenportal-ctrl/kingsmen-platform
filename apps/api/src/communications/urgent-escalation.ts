@@ -13,10 +13,10 @@ export interface UrgentWhatsAppEscalationRequest {
 export function createUrgentWhatsAppEscalation(input: UrgentWhatsAppEscalationRequest) {
   if (!input.approvalRef || !input.approvedByOperatorRef) {
     return {
+      ...input,
       escalationRef: `wa_urgent_${Date.now()}_${Math.random().toString(36).slice(2, 10)}`,
       status: "PENDING_APPROVAL",
-      reason: input.reason,
-      ...input
+      reason: input.reason
     };
   }
 
