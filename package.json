@@ -30,6 +30,8 @@
     "secrets:validate:wiring": "node scripts/validators/validate-secrets-wiring-proof.mjs",
     "communications:prove": "node scripts/proof/prove-communications-boundary.mjs",
     "communications:validate": "node scripts/validators/validate-communications-proof.mjs",
+    "observability:prove": "node scripts/proof/prove-observability-incident-boundary.mjs",
+    "observability:validate": "node scripts/validators/validate-observability-incident-proof.mjs",
     "kingsmen:launch:audit": "node scripts/validators/validate-kingsmen-launch-readiness.mjs --audit",
     "kingsmen:launch:gate": "node scripts/validators/validate-kingsmen-launch-readiness.mjs --gate"
   },
