@@ -39,7 +39,7 @@ const checks = [
       '/api/jarvis/public-repos/health',
       'Health Probe',
       'green ·',
-      'No POST'
+      'without executing POST actions'
     ]
   }
 ];
