@@ -6,7 +6,7 @@ This document is the real finish-line map for launching Kingsmen. It is intentio
 
 **Public launch is blocked.**
 
-The repo has strong doctrine, contracts, migrations, module manifests, validators, local proof surfaces, a deployable backend API runtime, PostgreSQL/Supabase Truth Vault persistence foundation, a source-level safe web-to-backend boundary, a PayFast sandbox proof boundary, an RLS/security source-level boundary, a backup/restore source-level boundary, a branch-protection source boundary, and a secrets wiring source boundary. It is still not safe to open to public candidates or take money because real staging proof, real PayFast sandbox provider evidence, real backup/restore drill evidence, masked runtime secret health evidence, GitHub branch-protection application, legal/privacy, and staging runtime gates remain closed.
+The repo has strong doctrine, contracts, migrations, module manifests, validators, local proof surfaces, a deployable backend API runtime, PostgreSQL/Supabase Truth Vault persistence foundation, a source-level safe web-to-backend boundary, a PayFast sandbox proof boundary, an RLS/security source-level boundary, a backup/restore source-level boundary, a branch-protection source boundary, a secrets wiring source boundary, and a communications proof source boundary. It is still not safe to open to public candidates or take money because real staging proof, real PayFast sandbox provider evidence, real backup/restore drill evidence, masked runtime secret health evidence, communications provider staging evidence, GitHub branch-protection application, legal/privacy, and staging runtime gates remain closed.
 
 ## How far from launch
 
@@ -20,10 +20,10 @@ The repo has strong doctrine, contracts, migrations, module manifests, validator
 | Backup / restore | Source-level boundary built, real staging drill pending | Backup and restore scripts, manifest, proof runner, validator, and archive gitignore rules exist. A real staging restore drill with RPO/RTO evidence is still required before production personal data. |
 | Branch protection | Source boundary built, GitHub apply pending | Source guard workflow, protection manifest, apply script, proof runner, and validator exist. GitHub `main` protection must still be applied with admin permissions. |
 | Secrets wiring | Source boundary built, runtime health pending | Credential registry, empty `.env.example`, masked health script, source proof, and validator exist. Real env vars must still be configured outside Git and checked with masked runtime reports. |
-| Communications | Manual required | Email primary and WhatsApp urgent-only doctrine exists; provider proof is still needed. |
+| Communications | Source boundary built, provider proof pending | Email-primary, WhatsApp-urgent-only, SMS-backup-only, consent, opt-out, bounce handling, and no-live-send proof exist. Provider staging send/receive proof is still required before candidate notifications. |
 | Workflow execution | Partial | Workflow codes and state machine exist; deployed n8n/worker callback proof is still required. |
 | Observability | Partial | Audit/evidence patterns exist; live monitoring, DLQ review, and incident SOP need proof. |
-| Production operations | Blocked | Branch protection, secrets runtime proof, backup/restore staging drill, and launch runbook are required. |
+| Production operations | Blocked | Branch protection, secrets runtime proof, backup/restore staging drill, communications provider proof, and launch runbook are required. |
 
 ## Exact blockers
 
@@ -36,7 +36,8 @@ The repo has strong doctrine, contracts, migrations, module manifests, validator
 5. **Prove PayFast sandbox + ITN against provider sandbox.** Source-level proof exists, but no real payments until sandbox success/cancel/return/failure/duplicate/invalid-signature/replay/amount-mismatch/refund-review evidence exists from staging.
 6. **Prove backup and restore.** Source-level scripts exist, but no production personal data until a real staging restore drill proves backup archive checksum, target/source separation, counts-only verification, RPO/RTO, and secret/raw-data redaction.
 7. **Wire secrets outside git.** Source-level secrets wiring proof exists, but launch still requires masked runtime health evidence proving required environment variables are configured outside Git without printing values.
-8. **Publish privacy, consent, terms, and refund policy.** This is required before collecting personal data and money.
+8. **Prove communications provider boundary.** Source-level communications proof exists, but candidate notifications require provider staging send/receive, bounce, opt-out, WhatsApp urgent-only, SMS fallback-only, and redacted-evidence proof.
+9. **Publish privacy, consent, terms, and refund policy.** This is required before collecting personal data and money.
 
 ### P1 — Must be fixed before paid pilot
 
@@ -204,6 +205,33 @@ Masked runtime health check:
 
 This still does not authorize public launch. Real secrets must live only in local `.env`, GitHub Secrets, Oracle environment variables, or future vault/KMS. Reports may show only configured/not-configured/masked status and must never print values, URLs, token prefixes, private keys, service-role keys, or provider secrets.
 
+## Communications proof command
+
+Source-level proof:
+
+```bash
+npm run communications:prove
+```
+
+Validator:
+
+```bash
+npm run communications:validate
+```
+
+Provider staging proof still required:
+
+```txt
+SMTP or email-provider sandbox send/receive
+bounce handling
+unsubscribe/opt-out path
+WhatsApp urgent-only approval evidence
+SMS fallback-only evidence
+redacted evidence report with no recipient address or raw message body
+```
+
+This still does not authorize real candidate notifications. It only proves the source-level communications boundary.
+
 ## Launch command
 
 Run this for a report without failing the shell:
@@ -225,5 +253,5 @@ The gate must remain blocked until the P0 launch blockers are fixed and evidence
 1. **Repo lock:** protect main, require validators, stop accidental package/release mistakes.
 2. **Staging runtime:** run API + web + PostgreSQL/Supabase + internal command flow.
 3. **Founder private beta:** process a small number of real test candidates manually with evidence.
-4. **Paid pilot:** only after PayFast, refunds, support, backup/restore, and incident response pass.
+4. **Paid pilot:** only after PayFast, refunds, support, backup/restore, communications proof, and incident response pass.
 5. **Public launch:** only after every required launch gate opens.
