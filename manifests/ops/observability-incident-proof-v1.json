@@ -1,0 +1,53 @@
+{
+  "schema": "kingsmen.observability-incident-proof.v1",
+  "module": "Observability + Incident Proof",
+  "status": "foundation_built_pending_staging_monitoring_proof",
+  "productionReady": false,
+  "publicLaunchAllowed": false,
+  "liveMonitoringConnected": false,
+  "livePagerConfigured": false,
+  "rawCandidateDataInLogsAllowed": false,
+  "providerSecretsInLogsAllowed": false,
+  "requiredControls": {
+    "apiHealthCheckRequired": true,
+    "databaseHealthCheckRequired": true,
+    "queueHealthCheckRequired": true,
+    "structuredLogsRequired": true,
+    "correlationIdRequired": true,
+    "auditEvidenceRequired": true,
+    "deadLetterQueueReviewRequired": true,
+    "founderEscalationRequired": true,
+    "incidentRunbookRequired": true,
+    "piiRedactionRequired": true
+  },
+  "requiredScenarios": [
+    "api_health_check_defined",
+    "database_health_check_defined",
+    "queue_health_check_defined",
+    "structured_logs_require_correlation_id",
+    "idempotency_key_logged_safely",
+    "dlq_review_required",
+    "payment_failure_alert_defined",
+    "rls_denial_alert_defined",
+    "backup_restore_failure_alert_defined",
+    "communications_failure_alert_defined",
+    "incident_severity_triage_defined",
+    "founder_escalation_defined",
+    "pii_and_secret_redaction_required",
+    "live_monitoring_pending"
+  ],
+  "evidenceReports": [
+    "reports/ops/observability-incident-proof-latest.json",
+    "reports/ops/observability-incident-validation-latest.json"
+  ],
+  "remainingProofRequired": [
+    "staging API health check proof",
+    "staging database health proof",
+    "staging worker queue/DLQ proof",
+    "redacted structured log sample",
+    "alert-rule screenshot or config proof",
+    "SEV1/SEV2/SEV3 incident runbook drill",
+    "founder escalation test",
+    "no PII or secrets in logs proof"
+  ]
+}
