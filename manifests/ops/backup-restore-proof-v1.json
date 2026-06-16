@@ -1,0 +1,47 @@
+{
+  "manifestKey": "backup-restore-proof-v1",
+  "module": "Kingsmen Backup and Restore Proof",
+  "status": "foundation_built_pending_staging_drill",
+  "productionReady": false,
+  "publicLaunchAllowed": false,
+  "productionDataAllowed": false,
+  "backupStorageAllowedInGit": false,
+  "rawCandidateRowsAllowedInReports": false,
+  "databaseUrlAllowedInReports": false,
+  "backupStrategy": {
+    "authority": "PostgreSQL/Supabase Truth Vault",
+    "tooling": ["pg_dump", "pg_restore", "psql"],
+    "format": "custom",
+    "ownerPrivilegesRestored": false,
+    "restoreTargetMustDifferFromSource": true,
+    "reportsMayContainCountsOnly": true,
+    "reportsMayContainSha256Only": true
+  },
+  "requiredEnvironment": {
+    "sourceDatabaseUrl": "KINGSMEN_DATABASE_URL or DATABASE_URL",
+    "restoreDrillDatabaseUrl": "KINGSMEN_RESTORE_DRILL_DATABASE_URL",
+    "backupRoot": "KINGSMEN_BACKUP_ROOT optional local/offsite path"
+  },
+  "proofScenarios": [
+    "backup_script_exists_and_uses_pg_dump",
+    "restore_script_exists_and_uses_pg_restore",
+    "restore_script_blocks_same_source_and_target",
+    "backup_manifest_redacts_database_url",
+    "backup_files_are_gitignored",
+    "restore_report_counts_only_no_raw_candidate_rows",
+    "sha256_checksum_required",
+    "rpo_rto_fields_required",
+    "production_ready_false",
+    "staging_drill_still_required"
+  ],
+  "evidencePaths": [
+    "scripts/backup/New-KingsmenTruthVaultBackup.ps1",
+    "scripts/backup/Test-KingsmenTruthVaultRestore.ps1",
+    "scripts/proof/prove-backup-restore-boundary.mjs",
+    "scripts/validators/validate-backup-restore-proof.mjs",
+    "docs/ops/KINGSMEN_BACKUP_RESTORE_PROOF.md",
+    "reports/ops/backup-restore-proof-latest.json",
+    "reports/ops/backup-restore-validation-latest.json"
+  ],
+  "remainingConstraint": "Run a real staging backup and restore drill, store counts-only evidence, verify RPO/RTO, and keep backup archives outside Git before production data."
+}
