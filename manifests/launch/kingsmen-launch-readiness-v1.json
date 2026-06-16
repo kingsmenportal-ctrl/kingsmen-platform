@@ -21,7 +21,8 @@
     "No broad tenant-blind RLS policies for public production traffic.",
     "No production personal data until backup and restore drill evidence passes.",
     "No provider credentials may be printed in logs, reports, screenshots, or frontend code.",
-    "No candidate notification provider may send live messages until communications staging proof passes."
+    "No candidate notification provider may send live messages until communications staging proof passes.",
+    "No public launch until observability and incident staging proof passes."
   ],
   "requiredLaunchGates": [
     {
@@ -177,8 +178,18 @@
       "gateKey": "observability_incident",
       "title": "Operational monitoring and incident SOP",
       "requiredBefore": "public users",
-      "status": "manual_required",
-      "evidenceRequired": "health checks, logs, DLQ view, incident runbook, founder escalation path"
+      "status": "foundation_built_pending_staging_monitoring_proof",
+      "evidenceRequired": "health checks, structured logs, correlation IDs, queue/DLQ review, alert definitions, incident runbook, founder escalation path, and redaction proof",
+      "evidencePaths": [
+        "apps/api/src/ops/observability-incident-proof-boundary.ts",
+        "manifests/ops/observability-incident-proof-v1.json",
+        "docs/ops/KINGSMEN_OBSERVABILITY_INCIDENT_PROOF.md",
+        "scripts/proof/prove-observability-incident-boundary.mjs",
+        "scripts/validators/validate-observability-incident-proof.mjs",
+        "reports/ops/observability-incident-proof-latest.json",
+        "reports/ops/observability-incident-validation-latest.json"
+      ],
+      "remainingConstraint": "Run staging monitoring, DLQ, alert, redaction, and incident drill proof before public users."
     },
     {
       "gateKey": "legal_privacy",
@@ -207,7 +218,7 @@
     {
       "phase": "3_paid_pilot",
       "goal": "Limited paid pilot under active founder supervision.",
-      "definitionOfDone": "PayFast proof, communications proof, support process, refund process, secrets runtime proof, and backup/restore proof are complete."
+      "definitionOfDone": "PayFast proof, communications proof, support process, refund process, secrets runtime proof, backup/restore proof, observability proof, and incident response are complete."
     },
     {
       "phase": "4_public_launch",
