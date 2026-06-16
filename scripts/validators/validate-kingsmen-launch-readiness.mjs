@@ -39,9 +39,9 @@ function checkFile(path, requiredTokens = []) {
 
 const requiredFileChecks = [
   checkFile('README.md', ['PostgreSQL Truth Vault', 'n8n', 'email primary']),
-  checkFile('package.json', ['kingsmen:launch:audit', 'kingsmen:launch:gate', 'api:validate:truth-vault', 'web:validate:backend-boundary']),
-  checkFile('manifests/launch/kingsmen-launch-readiness-v1.json', ['requiredLaunchGates', 'publicLaunchStatus', 'web_runtime_boundary']),
-  checkFile('docs/launch/KINGSMEN_LAUNCH_READINESS.md', ['Exact blockers', 'npm run kingsmen:launch:gate', 'npm run web:validate:backend-boundary']),
+  checkFile('package.json', ['kingsmen:launch:audit', 'kingsmen:launch:gate', 'api:validate:truth-vault', 'web:validate:backend-boundary', 'payments:prove:sandbox', 'payments:validate:sandbox']),
+  checkFile('manifests/launch/kingsmen-launch-readiness-v1.json', ['requiredLaunchGates', 'publicLaunchStatus', 'web_runtime_boundary', 'payfast-sandbox-proof-v1']),
+  checkFile('docs/launch/KINGSMEN_LAUNCH_READINESS.md', ['Exact blockers', 'npm run kingsmen:launch:gate', 'npm run web:validate:backend-boundary', 'npm run payments:validate:sandbox']),
   checkFile('packages/contracts/src/jarvis/index.ts', ['JarvisCommandEnvelope', 'tenantRef', 'correlationId', 'requestId']),
   checkFile('packages/jarvis-core/src/jarvis-policy-gate.ts', ['JARVIS_APPROVAL_REQUIRED', 'founderApprovalRef', 'JARVIS_BLOCKED_UNSAFE_ACTION']),
   checkFile('packages/jarvis-core/src/jarvis-evidence-ledger.ts', ['validator_result', 'jarvisAssertEvidenceLedgerSafe']),
@@ -58,6 +58,13 @@ const requiredFileChecks = [
   checkFile('apps/web/src/app/api/jarvis/command/route.ts', ['postKingsmenCommand', 'localShellExecuted: false']),
   checkFile('docs/web/KINGSMEN_SAFE_WEB_BACKEND_BOUNDARY.md', ['KINGSMEN_BACKEND_BASE_URL', 'proxy surface']),
   checkFile('db/migrations/0001_n03_truth_vault.sql', ['CREATE TABLE IF NOT EXISTS candidates', 'ENABLE ROW LEVEL SECURITY']),
+  checkFile('db/migrations/0008_n10_finance_payfast.sql', ['payfast_payment_intents', 'payfast_itn_receipts', 'payment_evidence_ledger']),
+  checkFile('apps/api/src/finance/payfast-itn.ts', ['verifyPayFastSignature', 'expectedAmountCents', 'duplicate', 'ipValid']),
+  checkFile('apps/api/src/finance/payfast-sandbox-proof.ts', ['sandbox_success_complete_itn', 'sandbox_replay_idempotency_rejected', 'refund_requires_human_review', 'secrets_redacted_from_evidence']),
+  checkFile('manifests/payment/payfast-sandbox-proof-v1.json', ['foundation_built_pending_sandbox_run', 'paymentStatusChangesRequireAcceptedItn', 'livePaymentsEnabled']),
+  checkFile('docs/finance/KINGSMEN_PAYMENT_PROOF.md', ['Paid status requires accepted ITN evidence', 'real PayFast sandbox checkout']),
+  checkFile('scripts/proof/prove-payfast-sandbox-boundary.mjs', ['PAYFAST_SANDBOX_SOURCE_PROOF_PASSED', 'reports/finance/payfast-sandbox-proof-run-latest.json']),
+  checkFile('scripts/validators/validate-payfast-sandbox-proof.mjs', ['PAYFAST_SANDBOX_PROOF_VALIDATED', 'payments:prove:sandbox']),
   checkFile('apps/api/src/final-assembly/final-read-model.ts', ['buildDefaultLaunchGates', 'gate_public_launch']),
   checkFile('apps/api/src/final-assembly/readiness-engine.ts', ['secrets_not_committed', 'database_backup_restore_test', 'payfast_sandbox_evidence'])
 ];
@@ -114,6 +121,15 @@ if (packageJson) {
         'Safe web/backend boundary validator script is missing.',
         'The repo cannot prove that public web routes avoid local shell and direct DB access.',
         'Add web:validate:backend-boundary to package.json.',
+        ['package.json']
+      );
+    }
+    if (!parsed.scripts?.['payments:validate:sandbox'] || !parsed.scripts?.['payments:prove:sandbox']) {
+      block(
+        'PAYMENT_PROOF_SCRIPT_MISSING',
+        'PayFast sandbox proof scripts are missing.',
+        'The repo cannot prove payment boundaries before paid pilot.',
+        'Add payments:prove:sandbox and payments:validate:sandbox scripts to package.json.',
         ['package.json']
       );
     }
@@ -184,6 +200,24 @@ for (const routePath of publicWebRoutes) {
   }
 }
 
+const paymentManifest = read('manifests/payment/payfast-sandbox-proof-v1.json');
+if (paymentManifest) {
+  try {
+    const parsed = JSON.parse(paymentManifest);
+    if (parsed.productionReady !== false || parsed.livePaymentsEnabled !== false || parsed.candidateCharged !== false) {
+      block(
+        'PAYMENT_PROOF_UNSAFE_FLAG',
+        'Payment proof manifest has unsafe runtime flags.',
+        'Payment proof must not claim production readiness, live payments, or candidate charging.',
+        'Set productionReady=false, livePaymentsEnabled=false, candidateCharged=false.',
+        ['manifests/payment/payfast-sandbox-proof-v1.json']
+      );
+    }
+  } catch (error) {
+    block('PAYMENT_MANIFEST_INVALID', 'Payment manifest is invalid JSON.', String(error), 'Repair payment manifest JSON.', ['manifests/payment/payfast-sandbox-proof-v1.json']);
+  }
+}
+
 const readinessEngine = read('apps/api/src/final-assembly/readiness-engine.ts') ?? '';
 for (const token of ['secrets_not_committed', 'database_backup_restore_test', 'payfast_sandbox_evidence']) {
   if (readinessEngine.includes(token) && readinessEngine.includes('status: "pending"')) {
@@ -225,6 +259,8 @@ const report = {
     backendControlsState: true,
     n8nThinWorkersOnly: true,
     webCallsBackendApiOnly: true,
+    payfastItnEvidenceRequired: true,
+    livePaymentsRemainBlockedUntilSandboxProviderProof: true,
     emailPrimary: true,
     whatsappUrgentOnly: true,
     founderApprovalForProductionRisk: true,
@@ -239,8 +275,9 @@ const report = {
     : [
         'Run API Truth Vault persistence validation and staging DB integration proof.',
         'Run web backend-boundary validation and staging smoke proof with KINGSMEN_BACKEND_BASE_URL configured.',
+        'Run PayFast sandbox proof validator and real provider sandbox checkout against staging notify URL.',
         'Add scoped RLS policies and prove candidate/operator/founder/service-role isolation.',
-        'Prove PayFast sandbox/ITN, secrets wiring, backup/restore, and incident handling.',
+        'Prove secrets wiring, backup/restore, and incident handling.',
         'Protect main and require this launch gate before release.'
       ]
 };
