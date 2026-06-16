@@ -1,6 +1,7 @@
 {
   "name": "kingsmen-platform",
   "version": "1.0.0",
+  "private": true,
   "description": "Kingsmen Platform live build repository",
   "main": "index.js",
   "directories": {
@@ -11,7 +12,9 @@
     "jarvis:validate": "node scripts/validators/validate-jarvis-core.mjs && node scripts/validators/validate-jarvis-live-pass-02.mjs",
     "jarvis:validate:core": "node scripts/validators/validate-jarvis-core.mjs",
     "jarvis:validate:live-pass-02": "node scripts/validators/validate-jarvis-live-pass-02.mjs",
-    "jarvis:validate:live-pass-03": "node scripts/validators/validate-jarvis-live-pass-03.mjs"
+    "jarvis:validate:live-pass-03": "node scripts/validators/validate-jarvis-live-pass-03.mjs",
+    "kingsmen:launch:audit": "node scripts/validators/validate-kingsmen-launch-readiness.mjs --audit",
+    "kingsmen:launch:gate": "node scripts/validators/validate-kingsmen-launch-readiness.mjs --gate"
   },
   "repository": {
     "type": "git",
