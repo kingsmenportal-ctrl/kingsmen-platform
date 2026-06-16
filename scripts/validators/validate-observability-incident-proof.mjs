@@ -5,6 +5,7 @@ import { fileURLToPath } from 'node:url';
 const repoRoot = dirname(dirname(dirname(fileURLToPath(import.meta.url))));
 const reportPath = join(repoRoot, 'reports/ops/observability-incident-validation-latest.json');
 const proofPath = 'reports/ops/observability-incident-proof-latest.json';
+const OBSERVABILITY_STAGING_PROOF_REQUIRED = true;
 
 function read(path) {
   const full = join(repoRoot, path);
@@ -74,6 +75,7 @@ checks.push(check('manifest_production_false', manifest?.productionReady === fal
 checks.push(check('manifest_public_launch_false', manifest?.publicLaunchAllowed === false, String(manifest?.publicLaunchAllowed)));
 checks.push(check('manifest_live_monitoring_false', manifest?.liveMonitoringConnected === false, String(manifest?.liveMonitoringConnected)));
 checks.push(check('manifest_live_pager_false', manifest?.livePagerConfigured === false, String(manifest?.livePagerConfigured)));
+checks.push(check('OBSERVABILITY_STAGING_PROOF_REQUIRED', OBSERVABILITY_STAGING_PROOF_REQUIRED, 'staging observability proof remains required'));
 
 const passed = checks.every((item) => item.passed);
 const report = {
@@ -85,6 +87,7 @@ const report = {
   publicLaunchAllowed: false,
   liveMonitoringConnected: false,
   livePagerConfigured: false,
+  OBSERVABILITY_STAGING_PROOF_REQUIRED,
   failed_checks: checks.filter((item) => !item.passed).map(({ name, detail }) => ({ name, detail })),
   checks,
   generated_at: new Date().toISOString(),
