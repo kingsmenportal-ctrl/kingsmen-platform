@@ -22,8 +22,8 @@ Kingsmen may not collect production personal data until a restore drill proves t
 PowerShell:
 
 ```powershell
-$env:KINGSMEN_DATABASE_URL = "postgres://..."
-$env:KINGSMEN_BACKUP_ROOT = "D:\\KingsmenBackups"
+$env:KINGSMEN_DATABASE_URL = "[source-database-url-set-outside-git]"
+$env:KINGSMEN_BACKUP_ROOT = "D:\KingsmenBackups"
 .\scripts\backup\New-KingsmenTruthVaultBackup.ps1
 ```
 
@@ -34,11 +34,11 @@ The backup script writes a local backup archive and a redacted local manifest. I
 PowerShell:
 
 ```powershell
-$env:KINGSMEN_RESTORE_DRILL_DATABASE_URL = "postgres://...restore-drill..."
-.\scripts\backup\Test-KingsmenTruthVaultRestore.ps1 -BackupFile "D:\\KingsmenBackups\\kingsmen-truth-vault-....dump"
+$env:KINGSMEN_RESTORE_DRILL_DATABASE_URL = "[restore-drill-database-url-set-outside-git]"
+.\scripts\backup\Test-KingsmenTruthVaultRestore.ps1 -BackupFile "D:\KingsmenBackups\kingsmen-truth-vault-....dump"
 ```
 
-The restore script refuses to run if the restore target equals the source database URL. It writes a counts-only restore drill report.
+The restore script uses `pg_restore` for the staging restore drill and refuses to run if the restore target equals the source database URL. It writes a counts-only restore drill report.
 
 ## Source-level proof commands
 
