@@ -32,6 +32,8 @@
     "communications:validate": "node scripts/validators/validate-communications-proof.mjs",
     "observability:prove": "node scripts/proof/prove-observability-incident-boundary.mjs",
     "observability:validate": "node scripts/validators/validate-observability-incident-proof.mjs",
+    "legal:prove": "node scripts/proof/prove-legal-privacy-boundary.mjs",
+    "legal:validate": "node scripts/validators/validate-legal-privacy-proof.mjs",
     "kingsmen:launch:audit": "node scripts/validators/validate-kingsmen-launch-readiness.mjs --audit",
     "kingsmen:launch:gate": "node scripts/validators/validate-kingsmen-launch-readiness.mjs --gate"
   },
