@@ -6,7 +6,7 @@ This document is the real finish-line map for launching Kingsmen. It is intentio
 
 **Public launch is blocked.**
 
-The repo has strong doctrine, contracts, migrations, module manifests, validators, and local proof surfaces. It is not yet safe to open to public candidates because several runtime gates still need evidence.
+The repo has strong doctrine, contracts, migrations, module manifests, validators, local proof surfaces, and now a deployable backend API runtime. It is not yet safe to open to public candidates because several runtime gates still need evidence.
 
 ## How far from launch
 
@@ -14,7 +14,7 @@ The repo has strong doctrine, contracts, migrations, module manifests, validator
 |---|---|---|
 | Architecture / doctrine | Mostly complete | N00-N20 concepts and rules are represented in repo files. |
 | Database schema | Partially complete | Truth Vault migration exists, but production RLS/security tests are still required. |
-| Backend API | Partially complete | API contracts and boundaries exist, but the backend is not yet a complete deployable runtime. |
+| Backend API | Runtime foundation built | `apps/api` now has a package, TypeScript build config, server entrypoint, health route, command intake, workflow-result intake, and read-model routes. Durable DB persistence is still pending. |
 | Web / control plane | Partially complete | Next app exists, but some API routes still depend on local Windows shell commands. |
 | Payments | Blocked | PayFast sandbox and ITN evidence are required before taking money. |
 | Communications | Manual required | Email primary and WhatsApp urgent-only doctrine exists; provider proof is still needed. |
@@ -27,19 +27,18 @@ The repo has strong doctrine, contracts, migrations, module manifests, validator
 ### P0 — Must be fixed before any public users
 
 1. **Protect `main`.** The repository currently warns that the main branch is not protected. Public launch needs branch protection with required validators.
-2. **Materialize deployable backend runtime.** `apps/api/src/index.ts` exports modules, but `apps/api/package.json` is not present yet. Add a real API runtime entrypoint and deploy command.
-3. **Replace Truth Vault repository stubs with real persistence.** `TruthVaultRepository` currently prepares write results; it does not persist records to PostgreSQL/Supabase.
-4. **Lock RLS/security boundaries.** The current migration enables RLS but uses broad service-role `FOR ALL USING (true)` policies. Production needs scoped tests and public/user policies.
-5. **Remove public web dependency on local PowerShell and Windows paths.** Web API routes must not shell out to `powershell`, `psql.exe`, or `C:\Kingsmen` in public deployment.
-6. **Prove PayFast sandbox + ITN.** No real payments until sandbox success/cancel/return/failure/duplicate/invalid-signature/replay evidence exists.
-7. **Prove backup and restore.** No production personal data until a restore drill is completed.
-8. **Wire secrets outside git.** No live keys in repo, chat, logs, screenshots, reports, or package artifacts.
-9. **Publish privacy, consent, terms, and refund policy.** This is required before collecting personal data and money.
+2. **Replace Truth Vault repository stubs with real persistence.** `TruthVaultRepository` currently prepares write results; it does not persist records to PostgreSQL/Supabase.
+3. **Lock RLS/security boundaries.** The current migration enables RLS but uses broad service-role `FOR ALL USING (true)` policies. Production needs scoped tests and public/user policies.
+4. **Remove public web dependency on local PowerShell and Windows paths.** Web API routes must not shell out to `powershell`, `psql.exe`, or `C:\Kingsmen` in public deployment.
+5. **Prove PayFast sandbox + ITN.** No real payments until sandbox success/cancel/return/failure/duplicate/invalid-signature/replay evidence exists.
+6. **Prove backup and restore.** No production personal data until a restore drill is completed.
+7. **Wire secrets outside git.** No live keys in repo, chat, logs, screenshots, reports, or package artifacts.
+8. **Publish privacy, consent, terms, and refund policy.** This is required before collecting personal data and money.
 
 ### P1 — Must be fixed before paid pilot
 
-1. Add backend API health route and command intake route backed by PostgreSQL writes.
-2. Add workflow result endpoint with idempotency, correlation ID, state transition check, and evidence ledger write.
+1. Replace API `memory_development_only` storage with PostgreSQL/Supabase writes.
+2. Add workflow result endpoint persistence with idempotency, correlation ID, state transition check, and evidence ledger write.
 3. Add real email provider send proof and bounce/failure handling.
 4. Add founder/operator dashboard that reads from backend read models, not local shell commands.
 5. Add DLQ review and incident workflow.
@@ -52,6 +51,22 @@ The repo has strong doctrine, contracts, migrations, module manifests, validator
 3. Add load tests under the 500 active-candidate cap.
 4. Add tenant-scoped founder console views.
 5. Add automated regression tests for N00-N20 invariants.
+
+## API runtime command
+
+```bash
+cd apps/api
+npm install
+npm run build
+npm start
+```
+
+Root helpers:
+
+```bash
+npm run api:build
+npm run api:start
+```
 
 ## Launch command
 
