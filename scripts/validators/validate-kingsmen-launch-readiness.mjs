@@ -39,9 +39,18 @@ function checkFile(path, requiredTokens = []) {
 
 const requiredFileChecks = [
   checkFile('README.md', ['PostgreSQL Truth Vault', 'n8n', 'email primary']),
-  checkFile('package.json', ['kingsmen:launch:audit', 'kingsmen:launch:gate', 'api:validate:truth-vault', 'web:validate:backend-boundary', 'payments:prove:sandbox', 'payments:validate:sandbox']),
-  checkFile('manifests/launch/kingsmen-launch-readiness-v1.json', ['requiredLaunchGates', 'publicLaunchStatus', 'web_runtime_boundary', 'payfast-sandbox-proof-v1']),
-  checkFile('docs/launch/KINGSMEN_LAUNCH_READINESS.md', ['Exact blockers', 'npm run kingsmen:launch:gate', 'npm run web:validate:backend-boundary', 'npm run payments:validate:sandbox']),
+  checkFile('package.json', [
+    'kingsmen:launch:audit',
+    'kingsmen:launch:gate',
+    'api:validate:truth-vault',
+    'web:validate:backend-boundary',
+    'payments:prove:sandbox',
+    'payments:validate:sandbox',
+    'security:prove:rls',
+    'security:validate:rls'
+  ]),
+  checkFile('manifests/launch/kingsmen-launch-readiness-v1.json', ['requiredLaunchGates', 'publicLaunchStatus', 'web_runtime_boundary', 'payfast-sandbox-proof-v1', 'rls-security-proof-v1']),
+  checkFile('docs/launch/KINGSMEN_LAUNCH_READINESS.md', ['Exact blockers', 'npm run kingsmen:launch:gate', 'npm run web:validate:backend-boundary', 'npm run payments:validate:sandbox', 'npm run security:validate:rls']),
   checkFile('packages/contracts/src/jarvis/index.ts', ['JarvisCommandEnvelope', 'tenantRef', 'correlationId', 'requestId']),
   checkFile('packages/jarvis-core/src/jarvis-policy-gate.ts', ['JARVIS_APPROVAL_REQUIRED', 'founderApprovalRef', 'JARVIS_BLOCKED_UNSAFE_ACTION']),
   checkFile('packages/jarvis-core/src/jarvis-evidence-ledger.ts', ['validator_result', 'jarvisAssertEvidenceLedgerSafe']),
@@ -58,6 +67,11 @@ const requiredFileChecks = [
   checkFile('apps/web/src/app/api/jarvis/command/route.ts', ['postKingsmenCommand', 'localShellExecuted: false']),
   checkFile('docs/web/KINGSMEN_SAFE_WEB_BACKEND_BOUNDARY.md', ['KINGSMEN_BACKEND_BASE_URL', 'proxy surface']),
   checkFile('db/migrations/0001_n03_truth_vault.sql', ['CREATE TABLE IF NOT EXISTS candidates', 'ENABLE ROW LEVEL SECURITY']),
+  checkFile('db/migrations/0009_rls_security_boundary.sql', ['current_runtime_role', 'is_backend_service_role', 'candidates_candidate_read_own', 'applications_candidate_read_own', 'evidence_ledger_candidate_read_own_safe', 'route_sources_public_verified_read']),
+  checkFile('manifests/security/rls-security-proof-v1.json', ['rls-security-proof-v1', 'foundation_built_pending_staging_proof', 'serviceRoleRequiresBackendContext', 'candidateReadsOwnRowsOnly']),
+  checkFile('docs/security/KINGSMEN_RLS_SECURITY_PROOF.md', ['app.kingsmen_role', 'app.service_context', 'staging proof']),
+  checkFile('scripts/proof/prove-rls-security-boundary.mjs', ['RLS_SECURITY_SOURCE_PROOF_PASSED', 'candidate_cannot_read_other_candidate_row', 'service_role_without_backend_context_denied']),
+  checkFile('scripts/validators/validate-rls-security-proof.mjs', ['RLS_SECURITY_PROOF_VALIDATED', 'security:validate:rls']),
   checkFile('db/migrations/0008_n10_finance_payfast.sql', ['payfast_payment_intents', 'payfast_itn_receipts', 'payment_evidence_ledger']),
   checkFile('apps/api/src/finance/payfast-itn.ts', ['verifyPayFastSignature', 'expectedAmountCents', 'duplicate', 'ipValid']),
   checkFile('apps/api/src/finance/payfast-sandbox-proof.ts', ['sandbox_success_complete_itn', 'sandbox_replay_idempotency_rejected', 'refund_requires_human_review', 'secrets_redacted_from_evidence']),
@@ -133,6 +147,15 @@ if (packageJson) {
         ['package.json']
       );
     }
+    if (!parsed.scripts?.['security:prove:rls'] || !parsed.scripts?.['security:validate:rls']) {
+      block(
+        'RLS_SECURITY_SCRIPT_MISSING',
+        'RLS/security proof scripts are missing.',
+        'The repo cannot prove scoped RLS boundary before public users.',
+        'Add security:prove:rls and security:validate:rls scripts to package.json.',
+        ['package.json']
+      );
+    }
   } catch (error) {
     block('PACKAGE_JSON_INVALID', 'package.json is invalid JSON.', String(error), 'Repair package.json.', ['package.json']);
   }
@@ -159,14 +182,33 @@ if (repository.includes('prepared for PostgreSQL persistence') && !repository.in
   );
 }
 
-const migration = read('db/migrations/0001_n03_truth_vault.sql') ?? '';
-if (migration.includes('FOR ALL USING (true) WITH CHECK (true)')) {
+const bootstrapMigration = read('db/migrations/0001_n03_truth_vault.sql') ?? '';
+const hardeningMigration = read('db/migrations/0009_rls_security_boundary.sql') ?? '';
+const rlsManifest = read('manifests/security/rls-security-proof-v1.json') ?? '';
+const hasBootstrapBroadPolicies = bootstrapMigration.includes('FOR ALL USING (true) WITH CHECK (true)');
+const hasRlsHardening = hardeningMigration.includes('DROP POLICY IF EXISTS service_role_all_candidates')
+  && hardeningMigration.includes('candidates_candidate_read_own')
+  && hardeningMigration.includes('applications_candidate_read_own')
+  && hardeningMigration.includes('route_sources_public_verified_read')
+  && rlsManifest.includes('foundation_built_pending_staging_proof');
+
+if (hasBootstrapBroadPolicies && !hasRlsHardening) {
   block(
     'RLS_POLICIES_TOO_BROAD_FOR_PUBLIC_LAUNCH',
-    'RLS is enabled but policies are broad service-role policies.',
-    'The migration creates many FOR ALL USING (true) policies. That can be acceptable for bootstrap/service-role access, but it is not enough evidence for public multi-user production access.',
+    'RLS is enabled but only broad bootstrap policies are present.',
+    'The N03 migration creates FOR ALL USING true policies. That can be acceptable for bootstrap/service-role access, but it is not enough for public multi-user production access.',
     'Add scoped candidate/operator/founder/service policies and tests proving row isolation before public users.',
     ['db/migrations/0001_n03_truth_vault.sql']
+  );
+}
+
+if (hasRlsHardening) {
+  warn(
+    'RLS_STAGING_PROOF_REQUIRED',
+    'RLS/security source-level boundary is built but staging proof is still required.',
+    'The migration and validators exist, but public users need live SQL role-isolation proof against staging PostgreSQL/Supabase.',
+    'Apply db/migrations/0009_rls_security_boundary.sql to staging and store a passing live proof report.',
+    ['db/migrations/0009_rls_security_boundary.sql', 'manifests/security/rls-security-proof-v1.json']
   );
 }
 
@@ -193,7 +235,7 @@ for (const routePath of publicWebRoutes) {
     block(
       'WEB_API_LOCAL_RUNTIME_BOUNDARY',
       'Public web API route depends on local runtime behavior.',
-      'Public Next API routes must not reference local Windows paths, powershell, psql.exe, child_process, local JSONL writes, or direct local file writes.',
+      'Public Next API routes must not reference local workstation paths, shell execution, local JSONL writes, or direct local file writes.',
       'Use the backend API client and KINGSMEN_BACKEND_BASE_URL only.',
       [routePath]
     );
@@ -215,6 +257,23 @@ if (paymentManifest) {
     }
   } catch (error) {
     block('PAYMENT_MANIFEST_INVALID', 'Payment manifest is invalid JSON.', String(error), 'Repair payment manifest JSON.', ['manifests/payment/payfast-sandbox-proof-v1.json']);
+  }
+}
+
+if (rlsManifest) {
+  try {
+    const parsed = JSON.parse(rlsManifest);
+    if (parsed.productionReady !== false || parsed.publicLaunchAllowed !== false) {
+      block(
+        'RLS_MANIFEST_UNSAFE_FLAG',
+        'RLS/security manifest has unsafe launch flags.',
+        'RLS proof must not claim production readiness or public launch approval.',
+        'Set productionReady=false and publicLaunchAllowed=false until staging SQL isolation proof passes.',
+        ['manifests/security/rls-security-proof-v1.json']
+      );
+    }
+  } catch (error) {
+    block('RLS_MANIFEST_INVALID', 'RLS/security manifest is invalid JSON.', String(error), 'Repair RLS manifest JSON.', ['manifests/security/rls-security-proof-v1.json']);
   }
 }
 
@@ -260,6 +319,7 @@ const report = {
     n8nThinWorkersOnly: true,
     webCallsBackendApiOnly: true,
     payfastItnEvidenceRequired: true,
+    rlsRoleIsolationRequired: true,
     livePaymentsRemainBlockedUntilSandboxProviderProof: true,
     emailPrimary: true,
     whatsappUrgentOnly: true,
@@ -276,7 +336,7 @@ const report = {
         'Run API Truth Vault persistence validation and staging DB integration proof.',
         'Run web backend-boundary validation and staging smoke proof with KINGSMEN_BACKEND_BASE_URL configured.',
         'Run PayFast sandbox proof validator and real provider sandbox checkout against staging notify URL.',
-        'Add scoped RLS policies and prove candidate/operator/founder/service-role isolation.',
+        'Run RLS/security source proof, then apply migration to staging and capture live SQL role-isolation proof.',
         'Prove secrets wiring, backup/restore, and incident handling.',
         'Protect main and require this launch gate before release.'
       ]
