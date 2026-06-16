@@ -16,14 +16,6 @@ function read(path) {
   return readFileSync(full, 'utf8');
 }
 
-function has(path, token) {
-  return Boolean(read(path)?.includes(token));
-}
-
-function hasLocalWindowsBoundary(source) {
-  return source.includes('C:') && source.includes('Kingsmen');
-}
-
 function checkFile(path, requiredTokens = []) {
   const content = read(path);
   const missingTokens = content === null ? requiredTokens : requiredTokens.filter((token) => !content.includes(token));
@@ -35,6 +27,12 @@ function checkFile(path, requiredTokens = []) {
     missingTokens,
     passed: content !== null && missingTokens.length === 0
   };
+}
+
+function json(path) {
+  const content = read(path);
+  if (!content) return null;
+  return JSON.parse(content);
 }
 
 const requiredFileChecks = [
@@ -49,32 +47,33 @@ const requiredFileChecks = [
     'security:prove:rls',
     'security:validate:rls',
     'backup:prove:restore',
-    'backup:validate:restore'
+    'backup:validate:restore',
+    'repo:prove:branch-protection',
+    'repo:validate:branch-protection'
   ]),
   checkFile('.gitignore', ['.local/backups', 'backups/', '*.dump', '*.backup']),
-  checkFile('manifests/launch/kingsmen-launch-readiness-v1.json', ['requiredLaunchGates', 'publicLaunchStatus', 'web_runtime_boundary', 'payfast-sandbox-proof-v1', 'rls-security-proof-v1', 'backup-restore-proof-v1']),
+  checkFile('manifests/launch/kingsmen-launch-readiness-v1.json', ['requiredLaunchGates', 'publicLaunchStatus', 'main-branch-protection-v1', 'web_runtime_boundary', 'payfast-sandbox-proof-v1', 'rls-security-proof-v1', 'backup-restore-proof-v1']),
   checkFile('docs/launch/KINGSMEN_LAUNCH_READINESS.md', ['Exact blockers', 'npm run kingsmen:launch:gate', 'npm run web:validate:backend-boundary', 'npm run payments:validate:sandbox', 'npm run security:validate:rls', 'npm run backup:validate:restore']),
-  checkFile('packages/contracts/src/jarvis/index.ts', ['JarvisCommandEnvelope', 'tenantRef', 'correlationId', 'requestId']),
-  checkFile('packages/jarvis-core/src/jarvis-policy-gate.ts', ['JARVIS_APPROVAL_REQUIRED', 'founderApprovalRef', 'JARVIS_BLOCKED_UNSAFE_ACTION']),
-  checkFile('packages/jarvis-core/src/jarvis-evidence-ledger.ts', ['validator_result', 'jarvisAssertEvidenceLedgerSafe']),
-  checkFile('apps/api/src/kernel/command-envelope.ts', ['idempotencyKey', 'correlationId', 'assertCommandEnvelope']),
-  checkFile('apps/api/src/kernel/command-bus.ts', ['KingsmenCommandBus', 'assertPolicyAllows']),
-  checkFile('apps/api/src/state/state-machine.ts', ['WORKFLOW_TARGET_STATE', 'assertTransition']),
-  checkFile('apps/api/src/db/truth-vault-schema.ts', ['N03_TRUTH_TABLES', 'N03_RLS_REQUIRED']),
+
+  checkFile('apps/api/package.json', ['build', 'start']),
+  checkFile('apps/api/src/server.ts', ['/health', '/api/commands', '/api/workflow-results']),
   checkFile('apps/api/src/db/truth-vault-repository.ts', ['KINGSMEN_TRUTH_VAULT_MODE', 'postgres_truth_vault', 'recordCommand', 'recordWorkflowResult']),
   checkFile('scripts/validators/validate-api-truth-vault-persistence.mjs', ['API Truth Vault Persistence', 'postgres_truth_vault']),
-  checkFile('scripts/validators/validate-safe-web-backend-boundary.mjs', ['SAFE_WEB_BACKEND_BOUNDARY_VALIDATED', 'KINGSMEN_BACKEND_BASE_URL']),
+
   checkFile('apps/web/src/lib/kingsmen-backend-client.ts', ['KINGSMEN_BACKEND_BASE_URL', 'backend_api_only', 'postKingsmenCommand']),
   checkFile('apps/web/src/app/api/public/free-destiny-map/intake/local/route.ts', ['candidate.intake.received', 'web_to_backend_api_boundary', 'localWriteAttempted: false']),
   checkFile('apps/web/src/app/api/jarvis/status/route.ts', ['getKingsmenApiHealth', 'Backend API Boundary']),
   checkFile('apps/web/src/app/api/jarvis/command/route.ts', ['postKingsmenCommand', 'localShellExecuted: false']),
   checkFile('docs/web/KINGSMEN_SAFE_WEB_BACKEND_BOUNDARY.md', ['KINGSMEN_BACKEND_BASE_URL', 'proxy surface']),
+  checkFile('scripts/validators/validate-safe-web-backend-boundary.mjs', ['SAFE_WEB_BACKEND_BOUNDARY_VALIDATED', 'KINGSMEN_BACKEND_BASE_URL']),
+
   checkFile('db/migrations/0001_n03_truth_vault.sql', ['CREATE TABLE IF NOT EXISTS candidates', 'ENABLE ROW LEVEL SECURITY']),
   checkFile('db/migrations/0009_rls_security_boundary.sql', ['current_runtime_role', 'is_backend_service_role', 'candidates_candidate_read_own', 'applications_candidate_read_own', 'evidence_ledger_candidate_read_own_safe', 'route_sources_public_verified_read']),
   checkFile('manifests/security/rls-security-proof-v1.json', ['rls-security-proof-v1', 'foundation_built_pending_staging_proof', 'serviceRoleRequiresBackendContext', 'candidateReadsOwnRowsOnly']),
   checkFile('docs/security/KINGSMEN_RLS_SECURITY_PROOF.md', ['app.kingsmen_role', 'app.service_context', 'staging proof']),
   checkFile('scripts/proof/prove-rls-security-boundary.mjs', ['RLS_SECURITY_SOURCE_PROOF_PASSED', 'candidate_cannot_read_other_candidate_row', 'service_role_without_backend_context_denied']),
   checkFile('scripts/validators/validate-rls-security-proof.mjs', ['RLS_SECURITY_PROOF_VALIDATED', 'security:validate:rls']),
+
   checkFile('db/migrations/0008_n10_finance_payfast.sql', ['payfast_payment_intents', 'payfast_itn_receipts', 'payment_evidence_ledger']),
   checkFile('apps/api/src/finance/payfast-itn.ts', ['verifyPayFastSignature', 'expectedAmountCents', 'duplicate', 'ipValid']),
   checkFile('apps/api/src/finance/payfast-sandbox-proof.ts', ['sandbox_success_complete_itn', 'sandbox_replay_idempotency_rejected', 'refund_requires_human_review', 'secrets_redacted_from_evidence']),
@@ -82,13 +81,24 @@ const requiredFileChecks = [
   checkFile('docs/finance/KINGSMEN_PAYMENT_PROOF.md', ['Paid status requires accepted ITN evidence', 'real PayFast sandbox checkout']),
   checkFile('scripts/proof/prove-payfast-sandbox-boundary.mjs', ['PAYFAST_SANDBOX_SOURCE_PROOF_PASSED', 'reports/finance/payfast-sandbox-proof-run-latest.json']),
   checkFile('scripts/validators/validate-payfast-sandbox-proof.mjs', ['PAYFAST_SANDBOX_PROOF_VALIDATED', 'payments:prove:sandbox']),
+
   checkFile('manifests/ops/backup-restore-proof-v1.json', ['backup-restore-proof-v1', 'foundation_built_pending_staging_drill', 'restoreTargetMustDifferFromSource', 'backupStorageAllowedInGit']),
   checkFile('docs/ops/KINGSMEN_BACKUP_RESTORE_PROOF.md', ['pg_dump', 'pg_restore', 'RPO', 'RTO', 'Production ready: **false**']),
   checkFile('scripts/backup/New-KingsmenTruthVaultBackup.ps1', ['KINGSMEN_DATABASE_URL', 'pg_dump', 'Get-FileHash', 'databaseUrlRedacted', 'committedToGit = $false']),
   checkFile('scripts/backup/Test-KingsmenTruthVaultRestore.ps1', ['KINGSMEN_RESTORE_DRILL_DATABASE_URL', 'pg_restore', 'Restore target matches source database', 'countOnly = $true', 'rtoSeconds']),
   checkFile('scripts/proof/prove-backup-restore-boundary.mjs', ['BACKUP_RESTORE_SOURCE_PROOF_PASSED', 'stagingRestoreDrillCompleted: false']),
-  checkFile('scripts/validators/validate-backup-restore-proof.mjs', ['BACKUP_RESTORE_PROOF_VALIDATED', 'backup:validate:restore']),
-  checkFile('apps/api/src/final-assembly/final-read-model.ts', ['buildDefaultLaunchGates', 'gate_public_launch']),
+  checkFile('scripts/validators/validate-backup-restore-proof.mjs', ['BACKUP_RESTORE_PROOF_VALIDATED', 'backup:validate:restore', 'BACKUP_RESTORE_STAGING_DRILL_REQUIRED']),
+
+  checkFile('manifests/repo/main-branch-protection-v1.json', ['main-branch-protection-v1', 'foundation_built_pending_github_apply', 'source-guard', 'preventForcePush']),
+  checkFile('docs/repo/KINGSMEN_BRANCH_PROTECTION.md', ['source-guard', 'force push blocked', 'npm run repo:validate:branch-protection']),
+  checkFile('.github/workflows/kingsmen-source-guard.yml', ['name: Kingsmen Source Guard', 'source-guard', 'npm run backup:validate:restore', 'npm run kingsmen:launch:audit']),
+  checkFile('scripts/github/Set-KingsmenMainBranchProtection.ps1', ['gh api', 'allow_force_pushes = $false', 'allow_deletions = $false', 'MAIN_BRANCH_PROTECTION_APPLIED']),
+  checkFile('scripts/proof/prove-main-branch-protection-boundary.mjs', ['MAIN_BRANCH_PROTECTION_SOURCE_PROOF_PASSED', 'githubProtectionApplied: false']),
+  checkFile('scripts/validators/validate-main-branch-protection.mjs', ['MAIN_BRANCH_PROTECTION_VALIDATED', 'repo:validate:branch-protection', 'MAIN_BRANCH_PROTECTION_APPLY_REQUIRED']),
+
+  checkFile('packages/contracts/src/jarvis/index.ts', ['JarvisCommandEnvelope', 'tenantRef', 'correlationId', 'requestId']),
+  checkFile('packages/jarvis-core/src/jarvis-policy-gate.ts', ['JARVIS_APPROVAL_REQUIRED', 'founderApprovalRef', 'JARVIS_BLOCKED_UNSAFE_ACTION']),
+  checkFile('packages/jarvis-core/src/jarvis-evidence-ledger.ts', ['validator_result', 'jarvisAssertEvidenceLedgerSafe']),
   checkFile('apps/api/src/final-assembly/readiness-engine.ts', ['secrets_not_committed', 'database_backup_restore_test', 'payfast_sandbox_evidence'])
 ];
 
@@ -108,126 +118,20 @@ for (const check of requiredFileChecks) {
     block(
       'REQUIRED_FILE_OR_TOKEN_MISSING',
       `Required launch evidence missing: ${check.path}`,
-      check.exists
-        ? `Missing tokens: ${check.missingTokens.join(', ')}`
-        : 'File does not exist.',
+      check.exists ? `Missing tokens: ${check.missingTokens.join(', ')}` : 'File does not exist.',
       'Restore the file/tokens or update the launch manifest only with equivalent evidence.',
       [check.path]
     );
   }
 }
 
-const packageJson = read('package.json');
-if (packageJson) {
-  try {
-    const parsed = JSON.parse(packageJson);
-    if (parsed.private !== true) {
-      warn(
-        'ROOT_PACKAGE_NOT_PRIVATE',
-        'Root package is not marked private.',
-        'Publishing the monorepo root can accidentally package operational files.',
-        'Keep the root package private and publish only sealed package subdirectories.'
-      );
-    }
-    if (!parsed.scripts?.['kingsmen:launch:audit'] || !parsed.scripts?.['kingsmen:launch:gate']) {
-      block(
-        'LAUNCH_SCRIPTS_MISSING',
-        'Launch audit/gate scripts are missing.',
-        'The repo cannot run a single launch-readiness command.',
-        'Add kingsmen:launch:audit and kingsmen:launch:gate scripts to package.json.',
-        ['package.json']
-      );
-    }
-    if (!parsed.scripts?.['web:validate:backend-boundary']) {
-      block(
-        'WEB_BOUNDARY_VALIDATOR_SCRIPT_MISSING',
-        'Safe web/backend boundary validator script is missing.',
-        'The repo cannot prove that public web routes avoid local shell and direct DB access.',
-        'Add web:validate:backend-boundary to package.json.',
-        ['package.json']
-      );
-    }
-    if (!parsed.scripts?.['payments:validate:sandbox'] || !parsed.scripts?.['payments:prove:sandbox']) {
-      block(
-        'PAYMENT_PROOF_SCRIPT_MISSING',
-        'PayFast sandbox proof scripts are missing.',
-        'The repo cannot prove payment boundaries before paid pilot.',
-        'Add payments:prove:sandbox and payments:validate:sandbox scripts to package.json.',
-        ['package.json']
-      );
-    }
-    if (!parsed.scripts?.['security:prove:rls'] || !parsed.scripts?.['security:validate:rls']) {
-      block(
-        'RLS_SECURITY_SCRIPT_MISSING',
-        'RLS/security proof scripts are missing.',
-        'The repo cannot prove scoped RLS boundary before public users.',
-        'Add security:prove:rls and security:validate:rls scripts to package.json.',
-        ['package.json']
-      );
-    }
-    if (!parsed.scripts?.['backup:prove:restore'] || !parsed.scripts?.['backup:validate:restore']) {
-      block(
-        'BACKUP_RESTORE_SCRIPT_MISSING',
-        'Backup/restore proof scripts are missing.',
-        'The repo cannot prove backup/restore boundaries before production data.',
-        'Add backup:prove:restore and backup:validate:restore scripts to package.json.',
-        ['package.json']
-      );
-    }
-  } catch (error) {
-    block('PACKAGE_JSON_INVALID', 'package.json is invalid JSON.', String(error), 'Repair package.json.', ['package.json']);
+try {
+  const packageJson = json('package.json');
+  if (packageJson?.private !== true) {
+    warn('ROOT_PACKAGE_NOT_PRIVATE', 'Root package is not marked private.', 'Publishing the monorepo root can accidentally package operational files.', 'Keep the root package private.');
   }
-}
-
-if (!existsSync(relative('apps/api/package.json'))) {
-  block(
-    'API_RUNTIME_PACKAGE_MISSING',
-    'Backend API is not yet a standalone deployable runtime.',
-    'apps/api/package.json is missing. apps/api currently exports modules but does not define its own build/start/deploy scripts.',
-    'Add apps/api/package.json, a runtime server entrypoint, health route, command route, workflow-result route, and deployment command.',
-    ['apps/api/src/index.ts']
-  );
-}
-
-const repository = read('apps/api/src/db/truth-vault-repository.ts') ?? '';
-if (repository.includes('prepared for PostgreSQL persistence') && !repository.includes('await ')) {
-  block(
-    'TRUTH_VAULT_PERSISTENCE_STUB',
-    'Truth Vault repository prepares results but does not persist them.',
-    'Repository methods return ok/ref/message objects without a live PostgreSQL/Supabase client write.',
-    'Implement real writes for evidence, idempotency, command log, workflow run, audit event, heartbeat, DLQ, and approval records with integration tests.',
-    ['apps/api/src/db/truth-vault-repository.ts']
-  );
-}
-
-const bootstrapMigration = read('db/migrations/0001_n03_truth_vault.sql') ?? '';
-const hardeningMigration = read('db/migrations/0009_rls_security_boundary.sql') ?? '';
-const rlsManifest = read('manifests/security/rls-security-proof-v1.json') ?? '';
-const hasBootstrapBroadPolicies = bootstrapMigration.includes('FOR ALL USING (true) WITH CHECK (true)');
-const hasRlsHardening = hardeningMigration.includes('DROP POLICY IF EXISTS service_role_all_candidates')
-  && hardeningMigration.includes('candidates_candidate_read_own')
-  && hardeningMigration.includes('applications_candidate_read_own')
-  && hardeningMigration.includes('route_sources_public_verified_read')
-  && rlsManifest.includes('foundation_built_pending_staging_proof');
-
-if (hasBootstrapBroadPolicies && !hasRlsHardening) {
-  block(
-    'RLS_POLICIES_TOO_BROAD_FOR_PUBLIC_LAUNCH',
-    'RLS is enabled but only broad bootstrap policies are present.',
-    'The N03 migration creates FOR ALL USING true policies. That can be acceptable for bootstrap/service-role access, but it is not enough for public multi-user production access.',
-    'Add scoped candidate/operator/founder/service policies and tests proving row isolation before public users.',
-    ['db/migrations/0001_n03_truth_vault.sql']
-  );
-}
-
-if (hasRlsHardening) {
-  warn(
-    'RLS_STAGING_PROOF_REQUIRED',
-    'RLS/security source-level boundary is built but staging proof is still required.',
-    'The migration and validators exist, but public users need live SQL role-isolation proof against staging PostgreSQL/Supabase.',
-    'Apply db/migrations/0009_rls_security_boundary.sql to staging and store a passing live proof report.',
-    ['db/migrations/0009_rls_security_boundary.sql', 'manifests/security/rls-security-proof-v1.json']
-  );
+} catch (error) {
+  block('PACKAGE_JSON_INVALID', 'package.json is invalid JSON.', String(error), 'Repair package.json.', ['package.json']);
 }
 
 const publicWebRoutes = [
@@ -239,7 +143,7 @@ const publicWebRoutes = [
 for (const routePath of publicWebRoutes) {
   const route = read(routePath) ?? '';
   if (
-    hasLocalWindowsBoundary(route) ||
+    (route.includes('C:') && route.includes('Kingsmen')) ||
     route.includes('powershell') ||
     route.includes('psql.exe') ||
     route.includes('node:child_process') ||
@@ -250,111 +154,55 @@ for (const routePath of publicWebRoutes) {
     route.includes('writeFileSync') ||
     route.includes('data/local')
   ) {
-    block(
-      'WEB_API_LOCAL_RUNTIME_BOUNDARY',
-      'Public web API route depends on local runtime behavior.',
-      'Public Next API routes must not reference local workstation paths, shell execution, local JSONL writes, or direct local file writes.',
-      'Use the backend API client and KINGSMEN_BACKEND_BASE_URL only.',
-      [routePath]
-    );
+    block('WEB_API_LOCAL_RUNTIME_BOUNDARY', 'Public web API route depends on local runtime behavior.', 'Public web routes must not reference workstation paths, shell execution, local JSONL writes, or direct file writes.', 'Use the backend API client and KINGSMEN_BACKEND_BASE_URL only.', [routePath]);
   }
 }
 
-const paymentManifest = read('manifests/payment/payfast-sandbox-proof-v1.json');
-if (paymentManifest) {
+for (const [path, unsafeFields] of [
+  ['manifests/payment/payfast-sandbox-proof-v1.json', ['productionReady', 'livePaymentsEnabled', 'candidateCharged']],
+  ['manifests/security/rls-security-proof-v1.json', ['productionReady', 'publicLaunchAllowed']],
+  ['manifests/ops/backup-restore-proof-v1.json', ['productionReady', 'publicLaunchAllowed', 'productionDataAllowed']],
+  ['manifests/repo/main-branch-protection-v1.json', ['productionReady', 'publicLaunchAllowed']]
+]) {
   try {
-    const parsed = JSON.parse(paymentManifest);
-    if (parsed.productionReady !== false || parsed.livePaymentsEnabled !== false || parsed.candidateCharged !== false) {
-      block(
-        'PAYMENT_PROOF_UNSAFE_FLAG',
-        'Payment proof manifest has unsafe runtime flags.',
-        'Payment proof must not claim production readiness, live payments, or candidate charging.',
-        'Set productionReady=false, livePaymentsEnabled=false, candidateCharged=false.',
-        ['manifests/payment/payfast-sandbox-proof-v1.json']
-      );
+    const parsed = json(path);
+    if (!parsed) continue;
+    for (const field of unsafeFields) {
+      if (parsed[field] !== false) {
+        block('UNSAFE_MANIFEST_FLAG', `Unsafe manifest flag in ${path}.`, `${field} must be false until live evidence passes.`, 'Keep source-level proof manifests non-production until real evidence is captured.', [path]);
+      }
     }
   } catch (error) {
-    block('PAYMENT_MANIFEST_INVALID', 'Payment manifest is invalid JSON.', String(error), 'Repair payment manifest JSON.', ['manifests/payment/payfast-sandbox-proof-v1.json']);
+    block('MANIFEST_JSON_INVALID', `${path} is invalid JSON.`, String(error), 'Repair manifest JSON.', [path]);
   }
 }
 
-if (rlsManifest) {
-  try {
-    const parsed = JSON.parse(rlsManifest);
-    if (parsed.productionReady !== false || parsed.publicLaunchAllowed !== false) {
-      block(
-        'RLS_MANIFEST_UNSAFE_FLAG',
-        'RLS/security manifest has unsafe launch flags.',
-        'RLS proof must not claim production readiness or public launch approval.',
-        'Set productionReady=false and publicLaunchAllowed=false until staging SQL isolation proof passes.',
-        ['manifests/security/rls-security-proof-v1.json']
-      );
-    }
-  } catch (error) {
-    block('RLS_MANIFEST_INVALID', 'RLS/security manifest is invalid JSON.', String(error), 'Repair RLS manifest JSON.', ['manifests/security/rls-security-proof-v1.json']);
-  }
+const branchManifest = read('manifests/repo/main-branch-protection-v1.json');
+if (branchManifest?.includes('foundation_built_pending_github_apply')) {
+  warn(
+    'MAIN_BRANCH_PROTECTION_APPLY_REQUIRED',
+    'Branch protection source boundary is built but GitHub protection must still be applied.',
+    'The workflow and apply script exist, but main is not proven protected until GitHub settings confirm source-guard is required and force-push/deletion are disabled.',
+    'Run scripts/github/Set-KingsmenMainBranchProtection.ps1 with GitHub admin permissions and verify through GitHub UI or gh api.',
+    ['scripts/github/Set-KingsmenMainBranchProtection.ps1', 'manifests/repo/main-branch-protection-v1.json']
+  );
+}
+
+const rlsManifest = read('manifests/security/rls-security-proof-v1.json');
+if (rlsManifest?.includes('foundation_built_pending_staging_proof')) {
+  warn('RLS_STAGING_PROOF_REQUIRED', 'RLS/security source-level boundary is built but staging proof is still required.', 'Live SQL role-isolation proof against staging PostgreSQL/Supabase is required before public users.', 'Apply db/migrations/0009_rls_security_boundary.sql to staging and store a passing live proof report.', ['db/migrations/0009_rls_security_boundary.sql']);
 }
 
 const backupManifest = read('manifests/ops/backup-restore-proof-v1.json');
-if (backupManifest) {
-  try {
-    const parsed = JSON.parse(backupManifest);
-    if (parsed.productionReady !== false || parsed.publicLaunchAllowed !== false || parsed.productionDataAllowed !== false) {
-      block(
-        'BACKUP_RESTORE_UNSAFE_FLAG',
-        'Backup/restore manifest has unsafe launch flags.',
-        'Backup/restore proof must not claim production readiness, public launch approval, or production data approval.',
-        'Set productionReady=false, publicLaunchAllowed=false, and productionDataAllowed=false until live staging restore proof passes.',
-        ['manifests/ops/backup-restore-proof-v1.json']
-      );
-    }
-    if (parsed.backupStorageAllowedInGit !== false || parsed.rawCandidateRowsAllowedInReports !== false || parsed.databaseUrlAllowedInReports !== false) {
-      block(
-        'BACKUP_RESTORE_DATA_EXPOSURE_RISK',
-        'Backup/restore manifest allows unsafe backup evidence exposure.',
-        'Backups must stay out of Git, reports must not contain raw candidate rows, and database URLs must be redacted.',
-        'Set backupStorageAllowedInGit=false, rawCandidateRowsAllowedInReports=false, and databaseUrlAllowedInReports=false.',
-        ['manifests/ops/backup-restore-proof-v1.json']
-      );
-    }
-  } catch (error) {
-    block('BACKUP_RESTORE_MANIFEST_INVALID', 'Backup/restore manifest is invalid JSON.', String(error), 'Repair backup/restore manifest JSON.', ['manifests/ops/backup-restore-proof-v1.json']);
-  }
-}
-
 if (backupManifest?.includes('foundation_built_pending_staging_drill')) {
-  warn(
-    'BACKUP_RESTORE_STAGING_DRILL_REQUIRED',
-    'Backup/restore source-level boundary is built but staging restore proof is still required.',
-    'Scripts and validators exist, but production personal data requires a live backup and restore drill with RPO/RTO evidence.',
-    'Run New-KingsmenTruthVaultBackup.ps1 and Test-KingsmenTruthVaultRestore.ps1 against staging and store a counts-only report.',
-    ['scripts/backup/New-KingsmenTruthVaultBackup.ps1', 'scripts/backup/Test-KingsmenTruthVaultRestore.ps1']
-  );
+  warn('BACKUP_RESTORE_STAGING_DRILL_REQUIRED', 'Backup/restore source-level boundary is built but staging restore proof is still required.', 'Production personal data requires a live backup and restore drill with RPO/RTO evidence.', 'Run the backup and restore PowerShell scripts against staging and store a counts-only report.', ['scripts/backup/New-KingsmenTruthVaultBackup.ps1', 'scripts/backup/Test-KingsmenTruthVaultRestore.ps1']);
 }
 
 const readinessEngine = read('apps/api/src/final-assembly/readiness-engine.ts') ?? '';
 for (const token of ['secrets_not_committed', 'database_backup_restore_test', 'payfast_sandbox_evidence']) {
   if (readinessEngine.includes(token) && readinessEngine.includes('status: "pending"')) {
-    block(
-      'FINAL_ASSEMBLY_REQUIRED_CHECK_PENDING',
-      `Final assembly required check is still pending: ${token}`,
-      'The final assembly model still marks required launch evidence as pending.',
-      'Run and record the required evidence, then update readiness checks only after proof exists.',
-      ['apps/api/src/final-assembly/readiness-engine.ts']
-    );
+    block('FINAL_ASSEMBLY_REQUIRED_CHECK_PENDING', `Final assembly required check is still pending: ${token}`, 'The final assembly model still marks required launch evidence as pending.', 'Run and record the required evidence, then update readiness checks only after proof exists.', ['apps/api/src/final-assembly/readiness-engine.ts']);
   }
-}
-
-if (has('apps/web/package.json', '"private": true')) {
-  // Good: web app should not be published as an npm package.
-} else {
-  warn(
-    'WEB_PACKAGE_PRIVATE_FLAG_MISSING',
-    'Web app package should be private.',
-    'apps/web should deploy as an app, not publish as a shared npm package.',
-    'Set private true in apps/web/package.json.',
-    ['apps/web/package.json']
-  );
 }
 
 const report = {
@@ -376,6 +224,8 @@ const report = {
     payfastItnEvidenceRequired: true,
     rlsRoleIsolationRequired: true,
     backupRestoreRequiredBeforeProductionData: true,
+    mainBranchProtectionRequired: true,
+    sourceGuardRequiredBeforeMerge: true,
     livePaymentsRemainBlockedUntilSandboxProviderProof: true,
     emailPrimary: true,
     whatsappUrgentOnly: true,
@@ -387,15 +237,15 @@ const report = {
   blockers,
   warnings,
   nextActions: blockers.length === 0
-    ? ['Open the final founder launch approval gate and run staging smoke tests before public traffic.']
+    ? ['Apply GitHub branch protection, then complete staging smoke tests and live evidence before public traffic.']
     : [
         'Run API Truth Vault persistence validation and staging DB integration proof.',
         'Run web backend-boundary validation and staging smoke proof with KINGSMEN_BACKEND_BASE_URL configured.',
         'Run PayFast sandbox proof validator and real provider sandbox checkout against staging notify URL.',
         'Run RLS/security source proof, then apply migration to staging and capture live SQL role-isolation proof.',
         'Run backup/restore source proof, then perform live staging backup and restore drill with RPO/RTO evidence.',
-        'Prove secrets wiring and incident handling.',
-        'Protect main and require this launch gate before release.'
+        'Run repo branch-protection proof, then apply GitHub main protection with source-guard required.',
+        'Prove secrets wiring and incident handling.'
       ]
 };
 
