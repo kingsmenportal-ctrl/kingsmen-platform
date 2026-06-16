@@ -1,0 +1,31 @@
+{
+  "manifestKey": "main-branch-protection-v1",
+  "module": "Kingsmen Main Branch Protection",
+  "status": "foundation_built_pending_github_apply",
+  "productionReady": false,
+  "publicLaunchAllowed": false,
+  "branch": "main",
+  "repository": "kingsmenportal-ctrl/kingsmen-platform",
+  "requiredProtections": {
+    "preventDeletion": true,
+    "preventForcePush": true,
+    "requiresPullRequestBeforeMerging": true,
+    "requiredApprovingReviewCount": 1,
+    "dismissStaleReviews": true,
+    "requiresCodeOwnerReviews": false,
+    "requiresConversationResolution": true,
+    "requiresStatusChecks": true,
+    "strictStatusChecks": true,
+    "requiredStatusCheckContexts": [
+      "source-guard"
+    ],
+    "enforceAdmins": true,
+    "requiredLinearHistory": true
+  },
+  "sourceGuardWorkflow": ".github/workflows/kingsmen-source-guard.yml",
+  "applyScript": "scripts/github/Set-KingsmenMainBranchProtection.ps1",
+  "proofScript": "scripts/proof/prove-main-branch-protection-boundary.mjs",
+  "validator": "scripts/validators/validate-main-branch-protection.mjs",
+  "reportPath": "reports/repo/main-branch-protection-validation-latest.json",
+  "remainingConstraint": "Run the PowerShell apply script with GitHub admin permissions, verify protection through GitHub UI or gh api, and keep required source-guard checks passing before merge/release."
+}
