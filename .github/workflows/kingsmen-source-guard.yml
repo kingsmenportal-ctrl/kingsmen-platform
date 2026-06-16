@@ -80,6 +80,12 @@ jobs:
       - name: Staging pack validator
         run: npm run staging:validate:pack
 
+      - name: Final assembly evidence source proof
+        run: npm run final:prove:evidence
+
+      - name: Final assembly evidence validator
+        run: npm run final:validate:evidence
+
       - name: Branch protection source proof
         run: npm run repo:prove:branch-protection
 
