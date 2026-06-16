@@ -6,14 +6,14 @@ This document is the real finish-line map for launching Kingsmen. It is intentio
 
 **Public launch is blocked.**
 
-The repo has strong doctrine, contracts, migrations, module manifests, validators, local proof surfaces, a deployable backend API runtime, PostgreSQL/Supabase Truth Vault persistence foundation, a source-level safe web-to-backend boundary, and a PayFast sandbox proof boundary. It is still not safe to open to public candidates or take money because RLS/security, real PayFast sandbox provider evidence, backup, branch-protection, legal/privacy, and staging-proof gates remain closed.
+The repo has strong doctrine, contracts, migrations, module manifests, validators, local proof surfaces, a deployable backend API runtime, PostgreSQL/Supabase Truth Vault persistence foundation, a source-level safe web-to-backend boundary, a PayFast sandbox proof boundary, and an RLS/security source-level boundary. It is still not safe to open to public candidates or take money because real staging proof, real PayFast sandbox provider evidence, backup, branch-protection, legal/privacy, and staging runtime gates remain closed.
 
 ## How far from launch
 
 | Launch stage | Status | Meaning |
 |---|---|---|
 | Architecture / doctrine | Mostly complete | N00-N20 concepts and rules are represented in repo files. |
-| Database schema | Partially complete | Truth Vault migration exists, but production RLS/security tests are still required. |
+| Database schema | RLS source boundary built | Truth Vault migration exists and RLS hardening migration exists. Staging SQL role-isolation proof is still required. |
 | Backend API | Runtime + persistence foundation built | `apps/api` has a package, TypeScript build config, server entrypoint, health route, command intake, workflow-result intake, read-model routes, and optional PostgreSQL Truth Vault mode. Staging DB integration proof is still required. |
 | Web / control plane | Boundary foundation built | Public Free Destiny Map and Jarvis API routes now use backend API command/health boundaries instead of local shell/JSONL writes. Staging web/API smoke proof is still required. |
 | Payments | Source-level sandbox proof built, real provider proof pending | PayFast signature/ITN/cancel/return/duplicate/replay/amount/refund/redaction proof is represented in code and validators. Real PayFast sandbox checkout against staging notify URL is still required before taking money. |
@@ -28,7 +28,7 @@ The repo has strong doctrine, contracts, migrations, module manifests, validator
 
 1. **Protect `main`.** The repository currently warns that the main branch is not protected. Public launch needs branch protection with required validators.
 2. **Prove Truth Vault persistence on staging.** The repository stub has been replaced with PostgreSQL-mode writes, but a live staging run must still prove command log, idempotency, workflow run, evidence ledger, audit, approval, heartbeat, and DLQ paths.
-3. **Lock RLS/security boundaries.** The current migration enables RLS but uses broad service-role `FOR ALL USING (true)` policies. Production needs scoped tests and public/user policies.
+3. **Prove RLS/security in staging.** RLS/security source-level boundary is built, but the hardening migration must be applied to staging and tested for candidate, operator, founder, anonymous, and backend service isolation.
 4. **Prove safe web-to-backend boundary in staging.** Source-level hardening is built, but the deployed web app must prove `KINGSMEN_BACKEND_BASE_URL` calls API health and command intake without local shell, local file writes, or direct database access.
 5. **Prove PayFast sandbox + ITN against provider sandbox.** Source-level proof exists, but no real payments until sandbox success/cancel/return/failure/duplicate/invalid-signature/replay/amount-mismatch/refund-review evidence exists from staging.
 6. **Prove backup and restore.** No production personal data until a restore drill is completed.
@@ -107,6 +107,22 @@ npm run payments:validate:sandbox
 ```
 
 This still does not authorize live payments. It only proves the source-level boundary. Before paid pilot, run real PayFast sandbox checkout against a staging notify URL and keep the generated proof reports.
+
+## RLS/security proof command
+
+Source-level proof:
+
+```bash
+npm run security:prove:rls
+```
+
+Validator:
+
+```bash
+npm run security:validate:rls
+```
+
+This still does not authorize public candidate traffic. Before public users, apply the RLS hardening migration to staging and capture live SQL role-isolation proof.
 
 ## Launch command
 
