@@ -1,0 +1,29 @@
+{
+  "route": "/api/jarvis/public-repos/evidence-summary",
+  "method": "GET",
+  "purpose": "Read-only N21 public gateway evidence summary for Commander HUD and local verification.",
+  "query": {
+    "timeoutMs": 2500
+  },
+  "expectedSafety": {
+    "readOnly": true,
+    "noPostActions": true,
+    "noToolExecution": true,
+    "noInstalls": true,
+    "noFixes": true,
+    "noCommits": true,
+    "noDeploymentBlocks": true,
+    "postgresEvidenceAuthority": true
+  },
+  "expectedSummaryFields": [
+    "total",
+    "ready",
+    "review",
+    "blocked",
+    "greenRoutes",
+    "installedLocalRuntimes",
+    "missingLocalRuntimes",
+    "unknownLocalRuntimes",
+    "checkedAt"
+  ]
+}
