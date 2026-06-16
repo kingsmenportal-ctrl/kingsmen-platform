@@ -19,7 +19,8 @@
     "No branch launch from unprotected main.",
     "No web route may shell out to local workstation runtime as a public API path.",
     "No broad tenant-blind RLS policies for public production traffic.",
-    "No production personal data until backup and restore drill evidence passes."
+    "No production personal data until backup and restore drill evidence passes.",
+    "No provider credentials may be printed in logs, reports, screenshots, or frontend code."
   ],
   "requiredLaunchGates": [
     {
@@ -117,6 +118,26 @@
       "remainingConstraint": "Source-level sandbox proof is built; real PayFast sandbox checkout against staging notify URL must be captured before paid pilot or live payments."
     },
     {
+      "gateKey": "secrets_wiring",
+      "title": "Wire secrets outside Git with masked runtime health proof",
+      "requiredBefore": "staging deploy",
+      "status": "foundation_built_pending_runtime_secret_health_proof",
+      "evidenceRequired": "credential registry, empty env example, no raw secret values in repo, masked runtime secret health report, and no browser/OpenClaw raw secret access",
+      "evidencePaths": [
+        "manifests/credentials/credentials.registry.json",
+        "manifests/credentials/secrets-wiring-proof-v1.json",
+        ".env.example",
+        "docs/security/KINGSMEN_SECRETS_WIRING_PROOF.md",
+        "scripts/security/Test-KingsmenSecretWiring.ps1",
+        "scripts/proof/prove-secrets-wiring-boundary.mjs",
+        "scripts/validators/validate-secrets-wiring-proof.mjs",
+        "reports/security/secrets-wiring-proof-latest.json",
+        "reports/security/secrets-wiring-validation-latest.json",
+        "reports/security/secrets-wiring-runtime-health-latest.json"
+      ],
+      "remainingConstraint": "Run masked runtime secret health proof in staging/Oracle after real env vars are configured outside Git; reports must show status only and never secret values."
+    },
+    {
       "gateKey": "communications",
       "title": "Email provider and urgent WhatsApp-only boundary",
       "requiredBefore": "candidate notifications",
@@ -175,7 +196,7 @@
     {
       "phase": "3_paid_pilot",
       "goal": "Limited paid pilot under active founder supervision.",
-      "definitionOfDone": "PayFast proof, support process, refund process, and backup/restore proof are complete."
+      "definitionOfDone": "PayFast proof, support process, refund process, secrets runtime proof, and backup/restore proof are complete."
     },
     {
       "phase": "4_public_launch",
