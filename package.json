@@ -24,6 +24,8 @@
     "security:validate:rls": "node scripts/validators/validate-rls-security-proof.mjs",
     "backup:prove:restore": "node scripts/proof/prove-backup-restore-boundary.mjs",
     "backup:validate:restore": "node scripts/validators/validate-backup-restore-proof.mjs",
+    "repo:prove:branch-protection": "node scripts/proof/prove-main-branch-protection-boundary.mjs",
+    "repo:validate:branch-protection": "node scripts/validators/validate-main-branch-protection.mjs",
     "kingsmen:launch:audit": "node scripts/validators/validate-kingsmen-launch-readiness.mjs --audit",
     "kingsmen:launch:gate": "node scripts/validators/validate-kingsmen-launch-readiness.mjs --gate"
   },
