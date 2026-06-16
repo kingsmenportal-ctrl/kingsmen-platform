@@ -12,10 +12,58 @@ param(
 
 $ErrorActionPreference = "Stop"
 
+function Write-FailureReport {
+  param(
+    [string]$Status,
+    [string]$Reason,
+    [string]$NextAction
+  )
+
+  $localReportPath = Join-Path $RepoRoot "reports/staging/local-truth-vault-postgres-latest.json"
+  $localReportDir = Split-Path -Parent $localReportPath
+  if (-not (Test-Path $localReportDir)) { New-Item -ItemType Directory -Force -Path $localReportDir | Out-Null }
+
+  $failure = [ordered]@{
+    schema = "kingsmen.local-truth-vault-postgres.v1"
+    module = "Local Truth Vault PostgreSQL"
+    status = $Status
+    passed = $false
+    productionReady = $false
+    publicLaunchAllowed = $false
+    localOnly = $true
+    rawSecretsPrinted = $false
+    databaseUrlPrinted = $false
+    envFile = ".local/kingsmen.local-postgres.env"
+    reason = $Reason
+    generatedAt = (Get-Date).ToUniversalTime().ToString("o")
+    nextAction = $NextAction
+  }
+
+  $failure | ConvertTo-Json -Depth 8 | Set-Content -Encoding UTF8 -Path $localReportPath
+  Write-Output ($failure | ConvertTo-Json -Depth 8)
+}
+
 function Assert-CommandAvailable {
   param([string]$Name)
   if (-not (Get-Command $Name -ErrorAction SilentlyContinue)) {
-    throw "$Name is required but was not found in PATH. Install/start Docker Desktop, then rerun this script."
+    Write-FailureReport `
+      -Status "DOCKER_CLI_NOT_FOUND" `
+      -Reason "$Name is required but was not found in PATH." `
+      -NextAction "Install Docker Desktop, reopen PowerShell, then rerun scripts/staging/Start-KingsmenLocalTruthVault.ps1."
+    throw "$Name is required but was not found in PATH. Install Docker Desktop, reopen PowerShell, then rerun this script."
+  }
+}
+
+function Assert-DockerDaemonRunning {
+  try {
+    & docker info --format "{{.ServerVersion}}" | Out-Null
+    if ($LASTEXITCODE -ne 0) { throw "docker info exited with code $LASTEXITCODE" }
+  } catch {
+    Write-FailureReport `
+      -Status "DOCKER_DAEMON_NOT_RUNNING" `
+      -Reason "Docker CLI exists, but Docker Desktop daemon is not reachable. This usually means Docker Desktop is closed or still starting." `
+      -NextAction "Start Docker Desktop. Wait until it says Docker is running. Then rerun scripts/staging/Start-KingsmenLocalTruthVault.ps1."
+    throw "Docker Desktop daemon is not running. Start Docker Desktop, wait until it says Docker is running, then rerun this script."
   }
 }
 
@@ -51,6 +99,7 @@ function Invoke-ContainerPsqlFile {
 }
 
 Assert-CommandAvailable -Name "docker"
+Assert-DockerDaemonRunning
 
 $localDir = Join-Path $RepoRoot ".local"
 if (-not (Test-Path $localDir)) { New-Item -ItemType Directory -Force -Path $localDir | Out-Null }
