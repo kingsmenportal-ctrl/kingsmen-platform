@@ -1,0 +1,42 @@
+{
+  "manifestKey": "staging-runtime-proof-pack-v1",
+  "schema": "kingsmen.staging-runtime-proof-pack.v1",
+  "status": "foundation_built_pending_staging_evidence_capture",
+  "productionReady": false,
+  "publicLaunchAllowed": false,
+  "stagingRuntimeEvidencePending": true,
+  "rawSecretsAllowedInEvidence": false,
+  "rawCandidateDataAllowedInEvidence": false,
+  "requiredEvidenceReports": [
+    "reports/staging/truth-vault-persistence-staging-latest.json",
+    "reports/staging/web-backend-boundary-staging-latest.json",
+    "reports/staging/rls-sql-isolation-staging-latest.json",
+    "reports/staging/payfast-provider-sandbox-staging-latest.json",
+    "reports/staging/backup-restore-drill-staging-latest.json",
+    "reports/security/secrets-wiring-runtime-health-latest.json",
+    "reports/staging/communications-provider-staging-latest.json",
+    "reports/staging/observability-incident-staging-latest.json",
+    "reports/staging/legal-privacy-publication-staging-latest.json",
+    "reports/repo/main-branch-protection-apply-latest.json"
+  ],
+  "runtimeEvidenceRules": [
+    "Reports may show pass/fail, timestamps, environment labels, hashes, counts, correlation IDs, and redacted ids only.",
+    "Reports must not show database URLs, provider tokens, secret prefixes, private keys, raw candidate names, raw candidate contacts, or document contents.",
+    "Any failed staging proof keeps public launch blocked.",
+    "Final assembly may only be marked complete after runtime evidence files exist and are reviewed."
+  ],
+  "sourceProofCommands": [
+    "npm run api:validate:truth-vault",
+    "npm run web:validate:backend-boundary",
+    "npm run payments:validate:sandbox",
+    "npm run security:validate:rls",
+    "npm run backup:validate:restore",
+    "npm run secrets:validate:wiring",
+    "npm run communications:validate",
+    "npm run observability:validate",
+    "npm run legal:validate",
+    "npm run repo:validate:branch-protection",
+    "npm run staging:validate:pack",
+    "npm run kingsmen:launch:audit"
+  ]
+}
