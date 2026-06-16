@@ -1,0 +1,22 @@
+{
+  "name": "@kingsmen/api",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Deployable Kingsmen backend API runtime for command intake, workflow results, and read-model access.",
+  "type": "commonjs",
+  "main": "dist/server.js",
+  "scripts": {
+    "build": "tsc -p tsconfig.json",
+    "start": "node dist/server.js",
+    "dev": "tsc -p tsconfig.json --watch",
+    "validate": "npm run build"
+  },
+  "engines": {
+    "node": ">=20.0.0"
+  },
+  "dependencies": {},
+  "devDependencies": {
+    "@types/node": "^24.0.0",
+    "typescript": "^6.0.3"
+  }
+}
