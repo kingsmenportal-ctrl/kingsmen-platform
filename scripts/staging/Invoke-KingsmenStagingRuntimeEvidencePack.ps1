@@ -9,6 +9,19 @@ param(
 
 $ErrorActionPreference = "Stop"
 
+function Test-PlaceholderValue {
+  param([string]$Value)
+  if (-not $Value) { return $false }
+  $trimmed = $Value.Trim()
+  return (
+    $trimmed -match '^<.*>$' -or
+    $trimmed -match 'your .*connection string' -or
+    $trimmed -match 'your .*url' -or
+    $trimmed -match 'example' -or
+    $trimmed -match 'placeholder'
+  )
+}
+
 function New-Report {
   param(
     [string]$Module,
@@ -57,15 +70,16 @@ function Invoke-HealthProbe {
   param([string]$Url)
   try {
     $response = Invoke-WebRequest -Uri $Url -UseBasicParsing -TimeoutSec 10
-    return [ordered]@{ attempted = $true; passed = ($response.StatusCode -ge 200 -and $response.StatusCode -lt 300); statusCode = $response.StatusCode }
+    return [ordered]@{ attempted = $true; passed = ($response.StatusCode -ge 200 -and $response.StatusCode -lt 300); statusCode = $response.StatusCode; reason = "HTTP_$($response.StatusCode)" }
   } catch {
-    return [ordered]@{ attempted = $true; passed = $false; statusCode = $null; error = "HEALTH_PROBE_FAILED" }
+    return [ordered]@{ attempted = $true; passed = $false; statusCode = $null; reason = "HEALTH_PROBE_FAILED" }
   }
 }
 
 function Invoke-DatabaseProbe {
   if (-not $RunDatabaseProbe) { return [ordered]@{ attempted = $false; passed = $false; reason = "RUN_DATABASE_PROBE_NOT_SET" } }
   if (-not $env:KINGSMEN_DATABASE_URL) { return [ordered]@{ attempted = $true; passed = $false; reason = "KINGSMEN_DATABASE_URL_NOT_CONFIGURED" } }
+  if (Test-PlaceholderValue -Value $env:KINGSMEN_DATABASE_URL) { return [ordered]@{ attempted = $true; passed = $false; reason = "PLACEHOLDER_DATABASE_URL_CONFIGURED" } }
   $psql = Get-Command psql -ErrorAction SilentlyContinue
   if (-not $psql) { return [ordered]@{ attempted = $true; passed = $false; reason = "PSQL_NOT_AVAILABLE" } }
 
@@ -83,22 +97,22 @@ function Invoke-DatabaseProbe {
 }
 
 $databaseProbe = Invoke-DatabaseProbe
-Write-Report -Path "reports/staging/truth-vault-persistence-staging-latest.json" -Report (New-Report -Module "Truth Vault Persistence Staging Evidence" -Status ($(if ($databaseProbe.passed) { "TRUTH_VAULT_STAGING_PROBE_PASSED" } else { "PENDING_STAGING_CAPTURE" })) -Passed ([bool]$databaseProbe.passed) -Checks @(@{ name = "database_probe"; passed = [bool]$databaseProbe.passed; detail = $databaseProbe.reason }) -NextAction "Run with -RunDatabaseProbe after KINGSMEN_DATABASE_URL is configured outside Git.")
+Write-Report -Path "reports/staging/truth-vault-persistence-staging-latest.json" -Report (New-Report -Module "Truth Vault Persistence Staging Evidence" -Status ($(if ($databaseProbe.passed) { "TRUTH_VAULT_STAGING_PROBE_PASSED" } else { "PENDING_STAGING_CAPTURE" })) -Passed ([bool]$databaseProbe.passed) -Checks @(@{ name = "database_probe"; passed = [bool]$databaseProbe.passed; detail = $databaseProbe.reason }) -NextAction "Run with -RunDatabaseProbe after KINGSMEN_DATABASE_URL is configured outside Git with a real staging PostgreSQL connection string.")
 
 $webChecks = @()
 $webPassed = $false
-if ($RunWebProbe -and $BackendBaseUrl) {
+if ($RunWebProbe -and $BackendBaseUrl -and -not (Test-PlaceholderValue -Value $BackendBaseUrl)) {
   $health = Invoke-HealthProbe -Url (($BackendBaseUrl.TrimEnd('/')) + "/health")
   $system = Invoke-HealthProbe -Url (($BackendBaseUrl.TrimEnd('/')) + "/api/system/health")
   $webChecks = @(
-    @{ name = "backend_health"; passed = [bool]$health.passed; detail = if ($health.statusCode) { "HTTP_$($health.statusCode)" } else { "NO_STATUS" } },
-    @{ name = "backend_system_health"; passed = [bool]$system.passed; detail = if ($system.statusCode) { "HTTP_$($system.statusCode)" } else { "NO_STATUS" } }
+    @{ name = "backend_health"; passed = [bool]$health.passed; detail = $health.reason },
+    @{ name = "backend_system_health"; passed = [bool]$system.passed; detail = $system.reason }
   )
   $webPassed = [bool]$health.passed -and [bool]$system.passed
 } else {
-  $webChecks = @(@{ name = "web_probe"; passed = $false; detail = "RUN_WEB_PROBE_OR_BACKEND_BASE_URL_NOT_SET" })
+  $webChecks = @(@{ name = "web_probe"; passed = $false; detail = "RUN_WEB_PROBE_OR_BACKEND_BASE_URL_NOT_SET_OR_PLACEHOLDER" })
 }
-Write-Report -Path "reports/staging/web-backend-boundary-staging-latest.json" -Report (New-Report -Module "Web Backend Boundary Staging Evidence" -Status ($(if ($webPassed) { "WEB_BACKEND_STAGING_PROBE_PASSED" } else { "PENDING_STAGING_CAPTURE" })) -Passed $webPassed -Checks $webChecks -NextAction "Run with -RunWebProbe and KINGSMEN_BACKEND_BASE_URL configured outside Git.")
+Write-Report -Path "reports/staging/web-backend-boundary-staging-latest.json" -Report (New-Report -Module "Web Backend Boundary Staging Evidence" -Status ($(if ($webPassed) { "WEB_BACKEND_STAGING_PROBE_PASSED" } else { "PENDING_STAGING_CAPTURE" })) -Passed $webPassed -Checks $webChecks -NextAction "Run with -RunWebProbe and KINGSMEN_BACKEND_BASE_URL pointing to a running staging backend API.")
 
 $pendingReports = @(
   @{ path = "reports/staging/rls-sql-isolation-staging-latest.json"; module = "RLS SQL Isolation Staging Evidence"; action = "Apply RLS migration to staging and capture role-isolation report." },
