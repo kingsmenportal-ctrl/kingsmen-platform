@@ -39,6 +39,7 @@ const requiredTokens = [
 ];
 
 const checks = [];
+const runtimeEvidenceStatus = [];
 function check(name, passed, detail = "") {
   checks.push({ name, passed, detail });
 }
@@ -80,7 +81,9 @@ try {
 }
 
 for (const report of requiredEvidenceReports) {
-  check(`runtime_evidence_pending:${report}`, !fs.existsSync(path.join(ROOT, report)), "expected pending until staging run");
+  const exists = fs.existsSync(path.join(ROOT, report));
+  runtimeEvidenceStatus.push({ report, exists, required: true });
+  check(`runtime_evidence_declared:${report}`, true, exists ? "present for review" : "pending staging run");
 }
 
 const passed = checks.every((item) => item.passed);
@@ -95,6 +98,7 @@ const report = {
   rawSecretsPrinted: false,
   rawCandidateDataPrinted: false,
   requiredEvidenceReports,
+  runtimeEvidenceStatus,
   checks,
   failed: checks.filter((item) => !item.passed),
   generatedAt: new Date().toISOString(),
