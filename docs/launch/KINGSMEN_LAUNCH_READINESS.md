@@ -6,7 +6,7 @@ This document is the real finish-line map for launching Kingsmen. It is intentio
 
 **Public launch is blocked.**
 
-The repo has strong doctrine, contracts, migrations, module manifests, validators, local proof surfaces, a deployable backend API runtime, PostgreSQL/Supabase Truth Vault persistence foundation, and a source-level safe web-to-backend boundary. It is still not safe to open to public candidates because RLS/security, payment, backup, branch-protection, legal/privacy, and staging-proof gates remain closed.
+The repo has strong doctrine, contracts, migrations, module manifests, validators, local proof surfaces, a deployable backend API runtime, PostgreSQL/Supabase Truth Vault persistence foundation, a source-level safe web-to-backend boundary, and a PayFast sandbox proof boundary. It is still not safe to open to public candidates or take money because RLS/security, real PayFast sandbox provider evidence, backup, branch-protection, legal/privacy, and staging-proof gates remain closed.
 
 ## How far from launch
 
@@ -16,7 +16,7 @@ The repo has strong doctrine, contracts, migrations, module manifests, validator
 | Database schema | Partially complete | Truth Vault migration exists, but production RLS/security tests are still required. |
 | Backend API | Runtime + persistence foundation built | `apps/api` has a package, TypeScript build config, server entrypoint, health route, command intake, workflow-result intake, read-model routes, and optional PostgreSQL Truth Vault mode. Staging DB integration proof is still required. |
 | Web / control plane | Boundary foundation built | Public Free Destiny Map and Jarvis API routes now use backend API command/health boundaries instead of local shell/JSONL writes. Staging web/API smoke proof is still required. |
-| Payments | Blocked | PayFast sandbox and ITN evidence are required before taking money. |
+| Payments | Source-level sandbox proof built, real provider proof pending | PayFast signature/ITN/cancel/return/duplicate/replay/amount/refund/redaction proof is represented in code and validators. Real PayFast sandbox checkout against staging notify URL is still required before taking money. |
 | Communications | Manual required | Email primary and WhatsApp urgent-only doctrine exists; provider proof is still needed. |
 | Workflow execution | Partial | Workflow codes and state machine exist; deployed n8n/worker callback proof is still required. |
 | Observability | Partial | Audit/evidence patterns exist; live monitoring, DLQ review, and incident SOP need proof. |
@@ -30,7 +30,7 @@ The repo has strong doctrine, contracts, migrations, module manifests, validator
 2. **Prove Truth Vault persistence on staging.** The repository stub has been replaced with PostgreSQL-mode writes, but a live staging run must still prove command log, idempotency, workflow run, evidence ledger, audit, approval, heartbeat, and DLQ paths.
 3. **Lock RLS/security boundaries.** The current migration enables RLS but uses broad service-role `FOR ALL USING (true)` policies. Production needs scoped tests and public/user policies.
 4. **Prove safe web-to-backend boundary in staging.** Source-level hardening is built, but the deployed web app must prove `KINGSMEN_BACKEND_BASE_URL` calls API health and command intake without local shell, local file writes, or direct database access.
-5. **Prove PayFast sandbox + ITN.** No real payments until sandbox success/cancel/return/failure/duplicate/invalid-signature/replay evidence exists.
+5. **Prove PayFast sandbox + ITN against provider sandbox.** Source-level proof exists, but no real payments until sandbox success/cancel/return/failure/duplicate/invalid-signature/replay/amount-mismatch/refund-review evidence exists from staging.
 6. **Prove backup and restore.** No production personal data until a restore drill is completed.
 7. **Wire secrets outside git.** No live keys in repo, chat, logs, screenshots, reports, or package artifacts.
 8. **Publish privacy, consent, terms, and refund policy.** This is required before collecting personal data and money.
@@ -91,6 +91,22 @@ Validation:
 ```bash
 npm run web:validate:backend-boundary
 ```
+
+## Payment proof command
+
+Source-level proof:
+
+```bash
+npm run payments:prove:sandbox
+```
+
+Validator:
+
+```bash
+npm run payments:validate:sandbox
+```
+
+This still does not authorize live payments. It only proves the source-level boundary. Before paid pilot, run real PayFast sandbox checkout against a staging notify URL and keep the generated proof reports.
 
 ## Launch command
 
