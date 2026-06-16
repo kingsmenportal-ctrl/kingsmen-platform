@@ -6,7 +6,7 @@ This document is the real finish-line map for launching Kingsmen. It is intentio
 
 **Public launch is blocked.**
 
-The repo has strong doctrine, contracts, migrations, module manifests, validators, local proof surfaces, a deployable backend API runtime, PostgreSQL/Supabase Truth Vault persistence foundation, a source-level safe web-to-backend boundary, a PayFast sandbox proof boundary, and an RLS/security source-level boundary. It is still not safe to open to public candidates or take money because real staging proof, real PayFast sandbox provider evidence, backup, branch-protection, legal/privacy, and staging runtime gates remain closed.
+The repo has strong doctrine, contracts, migrations, module manifests, validators, local proof surfaces, a deployable backend API runtime, PostgreSQL/Supabase Truth Vault persistence foundation, a source-level safe web-to-backend boundary, a PayFast sandbox proof boundary, an RLS/security source-level boundary, and a backup/restore source-level boundary. It is still not safe to open to public candidates or take money because real staging proof, real PayFast sandbox provider evidence, real backup/restore drill evidence, branch-protection, legal/privacy, and staging runtime gates remain closed.
 
 ## How far from launch
 
@@ -17,10 +17,11 @@ The repo has strong doctrine, contracts, migrations, module manifests, validator
 | Backend API | Runtime + persistence foundation built | `apps/api` has a package, TypeScript build config, server entrypoint, health route, command intake, workflow-result intake, read-model routes, and optional PostgreSQL Truth Vault mode. Staging DB integration proof is still required. |
 | Web / control plane | Boundary foundation built | Public Free Destiny Map and Jarvis API routes now use backend API command/health boundaries instead of local shell/JSONL writes. Staging web/API smoke proof is still required. |
 | Payments | Source-level sandbox proof built, real provider proof pending | PayFast signature/ITN/cancel/return/duplicate/replay/amount/refund/redaction proof is represented in code and validators. Real PayFast sandbox checkout against staging notify URL is still required before taking money. |
+| Backup / restore | Source-level boundary built, real staging drill pending | Backup and restore scripts, manifest, proof runner, validator, and archive gitignore rules exist. A real staging restore drill with RPO/RTO evidence is still required before production personal data. |
 | Communications | Manual required | Email primary and WhatsApp urgent-only doctrine exists; provider proof is still needed. |
 | Workflow execution | Partial | Workflow codes and state machine exist; deployed n8n/worker callback proof is still required. |
 | Observability | Partial | Audit/evidence patterns exist; live monitoring, DLQ review, and incident SOP need proof. |
-| Production operations | Blocked | Branch protection, secrets, backup/restore, and launch runbook are required. |
+| Production operations | Blocked | Branch protection, secrets, backup/restore staging drill, and launch runbook are required. |
 
 ## Exact blockers
 
@@ -31,7 +32,7 @@ The repo has strong doctrine, contracts, migrations, module manifests, validator
 3. **Prove RLS/security in staging.** RLS/security source-level boundary is built, but the hardening migration must be applied to staging and tested for candidate, operator, founder, anonymous, and backend service isolation.
 4. **Prove safe web-to-backend boundary in staging.** Source-level hardening is built, but the deployed web app must prove `KINGSMEN_BACKEND_BASE_URL` calls API health and command intake without local shell, local file writes, or direct database access.
 5. **Prove PayFast sandbox + ITN against provider sandbox.** Source-level proof exists, but no real payments until sandbox success/cancel/return/failure/duplicate/invalid-signature/replay/amount-mismatch/refund-review evidence exists from staging.
-6. **Prove backup and restore.** No production personal data until a restore drill is completed.
+6. **Prove backup and restore.** Source-level scripts exist, but no production personal data until a real staging restore drill proves backup archive checksum, target/source separation, counts-only verification, RPO/RTO, and secret/raw-data redaction.
 7. **Wire secrets outside git.** No live keys in repo, chat, logs, screenshots, reports, or package artifacts.
 8. **Publish privacy, consent, terms, and refund policy.** This is required before collecting personal data and money.
 
@@ -123,6 +124,33 @@ npm run security:validate:rls
 ```
 
 This still does not authorize public candidate traffic. Before public users, apply the RLS hardening migration to staging and capture live SQL role-isolation proof.
+
+## Backup/restore proof command
+
+Source-level proof:
+
+```bash
+npm run backup:prove:restore
+```
+
+Validator:
+
+```bash
+npm run backup:validate:restore
+```
+
+Real staging drill:
+
+```powershell
+$env:KINGSMEN_DATABASE_URL = "postgres://...source..."
+$env:KINGSMEN_BACKUP_ROOT = "D:\\KingsmenBackups"
+.\scripts\backup\New-KingsmenTruthVaultBackup.ps1
+
+$env:KINGSMEN_RESTORE_DRILL_DATABASE_URL = "postgres://...restore-drill..."
+.\scripts\backup\Test-KingsmenTruthVaultRestore.ps1 -BackupFile "D:\\KingsmenBackups\\...\\kingsmen-truth-vault-....dump"
+```
+
+This still does not authorize production personal data. It only proves the backup/restore source boundary. Before production data, run a real staging restore drill and store counts-only evidence with RPO/RTO.
 
 ## Launch command
 
