@@ -1,0 +1,30 @@
+{
+  "id": "JB-004",
+  "name": "Jarvis Commander Operating Shell",
+  "status": "repo-built-local-proof-required",
+  "issue": 39,
+  "locked_intent": "Jarvis must present as the live Kingsmen Commander operating system surface.",
+  "not_allowed": [
+    "wallpaper-only",
+    "generic-cards-only",
+    "planning-only-page",
+    "production-claim-without-proof"
+  ],
+  "surfaces": [
+    "commander_header",
+    "voice_orb",
+    "visual_feed",
+    "command_centre",
+    "live_status_ledger",
+    "evidence_drawer",
+    "live_output",
+    "real_build_lock"
+  ],
+  "proof_required_next": [
+    "git_pull_on_local_machine",
+    "start_jarvis_cmd_present",
+    "port_3000_free_or_known",
+    "npm_run_dev_output",
+    "browser_loads_jarvis_route"
+  ]
+}
