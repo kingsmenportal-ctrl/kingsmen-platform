@@ -39,9 +39,9 @@ function checkFile(path, requiredTokens = []) {
 
 const requiredFileChecks = [
   checkFile('README.md', ['PostgreSQL Truth Vault', 'n8n', 'email primary']),
-  checkFile('package.json', ['kingsmen:launch:audit', 'kingsmen:launch:gate', 'api:validate:truth-vault']),
-  checkFile('manifests/launch/kingsmen-launch-readiness-v1.json', ['requiredLaunchGates', 'publicLaunchStatus']),
-  checkFile('docs/launch/KINGSMEN_LAUNCH_READINESS.md', ['Exact blockers', 'npm run kingsmen:launch:gate']),
+  checkFile('package.json', ['kingsmen:launch:audit', 'kingsmen:launch:gate', 'api:validate:truth-vault', 'web:validate:backend-boundary']),
+  checkFile('manifests/launch/kingsmen-launch-readiness-v1.json', ['requiredLaunchGates', 'publicLaunchStatus', 'web_runtime_boundary']),
+  checkFile('docs/launch/KINGSMEN_LAUNCH_READINESS.md', ['Exact blockers', 'npm run kingsmen:launch:gate', 'npm run web:validate:backend-boundary']),
   checkFile('packages/contracts/src/jarvis/index.ts', ['JarvisCommandEnvelope', 'tenantRef', 'correlationId', 'requestId']),
   checkFile('packages/jarvis-core/src/jarvis-policy-gate.ts', ['JARVIS_APPROVAL_REQUIRED', 'founderApprovalRef', 'JARVIS_BLOCKED_UNSAFE_ACTION']),
   checkFile('packages/jarvis-core/src/jarvis-evidence-ledger.ts', ['validator_result', 'jarvisAssertEvidenceLedgerSafe']),
@@ -51,6 +51,12 @@ const requiredFileChecks = [
   checkFile('apps/api/src/db/truth-vault-schema.ts', ['N03_TRUTH_TABLES', 'N03_RLS_REQUIRED']),
   checkFile('apps/api/src/db/truth-vault-repository.ts', ['KINGSMEN_TRUTH_VAULT_MODE', 'postgres_truth_vault', 'recordCommand', 'recordWorkflowResult']),
   checkFile('scripts/validators/validate-api-truth-vault-persistence.mjs', ['API Truth Vault Persistence', 'postgres_truth_vault']),
+  checkFile('scripts/validators/validate-safe-web-backend-boundary.mjs', ['SAFE_WEB_BACKEND_BOUNDARY_VALIDATED', 'KINGSMEN_BACKEND_BASE_URL']),
+  checkFile('apps/web/src/lib/kingsmen-backend-client.ts', ['KINGSMEN_BACKEND_BASE_URL', 'backend_api_only', 'postKingsmenCommand']),
+  checkFile('apps/web/src/app/api/public/free-destiny-map/intake/local/route.ts', ['candidate.intake.received', 'web_to_backend_api_boundary', 'localWriteAttempted: false']),
+  checkFile('apps/web/src/app/api/jarvis/status/route.ts', ['getKingsmenApiHealth', 'Backend API Boundary']),
+  checkFile('apps/web/src/app/api/jarvis/command/route.ts', ['postKingsmenCommand', 'localShellExecuted: false']),
+  checkFile('docs/web/KINGSMEN_SAFE_WEB_BACKEND_BOUNDARY.md', ['KINGSMEN_BACKEND_BASE_URL', 'proxy surface']),
   checkFile('db/migrations/0001_n03_truth_vault.sql', ['CREATE TABLE IF NOT EXISTS candidates', 'ENABLE ROW LEVEL SECURITY']),
   checkFile('apps/api/src/final-assembly/final-read-model.ts', ['buildDefaultLaunchGates', 'gate_public_launch']),
   checkFile('apps/api/src/final-assembly/readiness-engine.ts', ['secrets_not_committed', 'database_backup_restore_test', 'payfast_sandbox_evidence'])
@@ -102,6 +108,15 @@ if (packageJson) {
         ['package.json']
       );
     }
+    if (!parsed.scripts?.['web:validate:backend-boundary']) {
+      block(
+        'WEB_BOUNDARY_VALIDATOR_SCRIPT_MISSING',
+        'Safe web/backend boundary validator script is missing.',
+        'The repo cannot prove that public web routes avoid local shell and direct DB access.',
+        'Add web:validate:backend-boundary to package.json.',
+        ['package.json']
+      );
+    }
   } catch (error) {
     block('PACKAGE_JSON_INVALID', 'package.json is invalid JSON.', String(error), 'Repair package.json.', ['package.json']);
   }
@@ -139,23 +154,34 @@ if (migration.includes('FOR ALL USING (true) WITH CHECK (true)')) {
   );
 }
 
-const jarvisStatusRoute = read('apps/web/src/app/api/jarvis/status/route.ts') ?? '';
-const jarvisCommandRoute = read('apps/web/src/app/api/jarvis/command/route.ts') ?? '';
-if (
-  hasLocalWindowsBoundary(jarvisStatusRoute) ||
-  hasLocalWindowsBoundary(jarvisCommandRoute) ||
-  jarvisStatusRoute.includes('powershell') ||
-  jarvisCommandRoute.includes('powershell') ||
-  jarvisStatusRoute.includes('psql.exe') ||
-  jarvisCommandRoute.includes('psql.exe')
-) {
-  block(
-    'WEB_API_LOCAL_SHELL_BOUNDARY',
-    'Web API routes depend on local Windows shell execution.',
-    'Public Next API routes currently reference local Windows paths, powershell, and/or psql.exe. That is a local founder workstation proof surface, not a cloud/public runtime boundary.',
-    'Move these actions behind the backend API/SDK, use environment variables, and remove local shell execution from public routes.',
-    ['apps/web/src/app/api/jarvis/status/route.ts', 'apps/web/src/app/api/jarvis/command/route.ts']
-  );
+const publicWebRoutes = [
+  'apps/web/src/app/api/jarvis/status/route.ts',
+  'apps/web/src/app/api/jarvis/command/route.ts',
+  'apps/web/src/app/api/public/free-destiny-map/intake/local/route.ts'
+];
+
+for (const routePath of publicWebRoutes) {
+  const route = read(routePath) ?? '';
+  if (
+    hasLocalWindowsBoundary(route) ||
+    route.includes('powershell') ||
+    route.includes('psql.exe') ||
+    route.includes('node:child_process') ||
+    route.includes('from "node:fs"') ||
+    route.includes("from 'node:fs'") ||
+    route.includes('appendFile') ||
+    route.includes('appendFileSync') ||
+    route.includes('writeFileSync') ||
+    route.includes('data/local')
+  ) {
+    block(
+      'WEB_API_LOCAL_RUNTIME_BOUNDARY',
+      'Public web API route depends on local runtime behavior.',
+      'Public Next API routes must not reference local Windows paths, powershell, psql.exe, child_process, local JSONL writes, or direct local file writes.',
+      'Use the backend API client and KINGSMEN_BACKEND_BASE_URL only.',
+      [routePath]
+    );
+  }
 }
 
 const readinessEngine = read('apps/api/src/final-assembly/readiness-engine.ts') ?? '';
@@ -198,6 +224,7 @@ const report = {
     postgresTruthVault: true,
     backendControlsState: true,
     n8nThinWorkersOnly: true,
+    webCallsBackendApiOnly: true,
     emailPrimary: true,
     whatsappUrgentOnly: true,
     founderApprovalForProductionRisk: true,
@@ -211,7 +238,7 @@ const report = {
     ? ['Open the final founder launch approval gate and run staging smoke tests before public traffic.']
     : [
         'Run API Truth Vault persistence validation and staging DB integration proof.',
-        'Remove local PowerShell/Windows shell execution from public web API routes.',
+        'Run web backend-boundary validation and staging smoke proof with KINGSMEN_BACKEND_BASE_URL configured.',
         'Add scoped RLS policies and prove candidate/operator/founder/service-role isolation.',
         'Prove PayFast sandbox/ITN, secrets wiring, backup/restore, and incident handling.',
         'Protect main and require this launch gate before release.'
