@@ -25,6 +25,13 @@ function check(name, passed, detail = '') {
   if (!passed) failed.push(row);
 }
 
+function isAllowedEnvExampleValue(rawValue) {
+  const value = rawValue.trim();
+  if (!value) return true;
+  if (value === '""' || value === "''") return true;
+  return ['development', 'local', 'memory', 'false', '8080', '15000', 'payfast_sandbox'].includes(value);
+}
+
 const requiredFiles = [
   'manifests/credentials/credentials.registry.json',
   'manifests/credentials/secrets-wiring-proof-v1.json',
@@ -70,9 +77,7 @@ if (fs.existsSync(full('.env.example'))) {
   const assignedRealValues = nonCommentAssignments.filter((line) => {
     const index = line.indexOf('=');
     if (index < 0) return false;
-    const value = line.slice(index + 1).trim();
-    if (!value) return false;
-    return !['development', 'local', 'memory', 'false', '8080', '15000', 'payfast_sandbox'].includes(value);
+    return !isAllowedEnvExampleValue(line.slice(index + 1));
   });
   check('env_example_empty_placeholders_only', assignedRealValues.length === 0, assignedRealValues.join(', '));
 }
