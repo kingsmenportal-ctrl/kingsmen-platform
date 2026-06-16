@@ -74,6 +74,12 @@ jobs:
       - name: Legal/privacy validator
         run: npm run legal:validate
 
+      - name: Staging pack source proof
+        run: npm run staging:prove:pack
+
+      - name: Staging pack validator
+        run: npm run staging:validate:pack
+
       - name: Branch protection source proof
         run: npm run repo:prove:branch-protection
 
