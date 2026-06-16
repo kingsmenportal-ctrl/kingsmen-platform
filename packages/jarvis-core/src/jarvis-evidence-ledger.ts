@@ -76,6 +76,29 @@ export function jarvisAppendToolPlan(
   };
 }
 
+export function jarvisAppendValidatorResult(
+  ledger: JarvisEvidenceLedger,
+  command: JarvisCommandEnvelope,
+  input: {
+    readonly validatorRef: string;
+    readonly passed: boolean;
+    readonly safeSummary: string;
+  }
+): JarvisEvidenceLedger {
+  const status = input.passed ? 'passed' : 'failed';
+  return {
+    events: [
+      ...ledger.events,
+      jarvisCreateEvidenceEvent({
+        command,
+        eventType: 'validator_result',
+        safeSummary: `Validator ${input.validatorRef} ${status}: ${input.safeSummary}`,
+        sequence: ledger.events.length + 1
+      })
+    ]
+  };
+}
+
 export function jarvisAssertEvidenceLedgerSafe(ledger: JarvisEvidenceLedger): void {
   if (ledger.events.length === 0) {
     throw new Error('JARVIS_EVIDENCE_LEDGER_EMPTY');
