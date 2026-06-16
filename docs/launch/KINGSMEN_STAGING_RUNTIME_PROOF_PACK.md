@@ -2,7 +2,8 @@
 
 Production ready: **false**  
 Public launch allowed: **false**  
-Status: `foundation_built_pending_staging_evidence_capture`
+Status: `foundation_built_pending_staging_evidence_capture`  
+Validator token: Staging runtime proof pack
 
 This pack collects the remaining staging evidence required before Kingsmen can move from source-ready to runtime-proven.
 
@@ -94,7 +95,7 @@ provider passphrases
    Published Terms, Privacy Notice, Consent Notice, Refund and Payment Policy, Data Subject Request Path, founder/legal review, consent timestamp/policy version, and refund display proof.
 
 10. **Branch protection applied proof**  
-    GitHub `main` protection active with `source-guard` required, deletion/force-push disabled, PR review required, and admins included.
+     GitHub `main` protection active with `source-guard` required, deletion/force-push disabled, PR review required, and admins included.
 
 ## Final assembly rule
 
