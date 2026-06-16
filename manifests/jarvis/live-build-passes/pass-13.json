@@ -1,0 +1,53 @@
+{
+  "pass": "Jarvis Live Build Pass 13",
+  "status": "built",
+  "branch": "main",
+  "purpose": "Add the read-only founder-console provider bridge, fixture-backed route handler, response fixture, cache hydrator, read-only API smoke validator, and Pass 12 export index.",
+  "builtFiles": [
+    "packages/jarvis-core/src/live-pass-12-index.ts",
+    "packages/jarvis-core/src/jarvis-console-backend-provider-bridge.ts",
+    "packages/jarvis-core/src/jarvis-console-route-handler-with-fixture-provider.ts",
+    "packages/jarvis-core/src/jarvis-console-response-fixture.ts",
+    "packages/jarvis-core/src/jarvis-console-cache-hydrator.ts",
+    "packages/jarvis-core/src/jarvis-console-readonly-api-smoke-validator.ts",
+    "scripts/validators/validate-jarvis-live-pass-13.mjs"
+  ],
+  "capabilities": [
+    "JarvisConsoleBackendProviderBridge",
+    "JarvisConsoleRouteHandlerWithFixtureProvider",
+    "JarvisConsoleResponseFixture",
+    "JarvisConsoleCacheHydrator",
+    "JarvisConsoleReadOnlyApiSmokeValidator",
+    "JarvisPass12ExportIndex",
+    "JarvisLivePass13Validator"
+  ],
+  "commits": [
+    "4e4f9b988d9d939bff7562f12aab2e6b5078b530",
+    "bb423b0fd787a879ddb62350f1d9c745a8b06b7f",
+    "8ae5bbed4483b078d2633584a5418c1c4d0e35d2",
+    "712bffb6fbb72efa7137c542e0dc8461b43a263d",
+    "0cc84cfbf2a9c4c70c383003276c530fa3e64292",
+    "68f7197c0c2f50f39ffcc865f83a29e9db83dfb4",
+    "f6bea43c02408d2d1fe70785794e195f7e7fc475"
+  ],
+  "validator": {
+    "script": "scripts/validators/validate-jarvis-live-pass-13.mjs",
+    "reportPath": "reports/jarvis/validate-jarvis-live-pass-13.json"
+  },
+  "authorityBoundary": [
+    "Provider bridge is read-only.",
+    "Fixture-backed route handler is deterministic smoke data only.",
+    "Response fixture does not replace backend read models.",
+    "Cache hydrator stores display snapshots only.",
+    "Read-only API smoke validator checks shape only.",
+    "Backend state machine, PostgreSQL Truth Vault, validators, evidence, and founder approval remain authoritative."
+  ],
+  "nextLiveTargets": [
+    "JarvisConsoleBackendProviderAdapterFromFixture",
+    "JarvisConsoleResponseHydrationFlow",
+    "JarvisConsoleCacheReadRoute",
+    "JarvisConsoleHealthReadModel",
+    "JarvisConsoleSmokeReportFixture",
+    "JarvisPass13ExportIndex"
+  ]
+}
