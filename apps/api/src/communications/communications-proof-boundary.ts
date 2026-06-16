@@ -1,9 +1,9 @@
-export type CommunicationChannel = "email" | "whatsapp" | "sms";
-export type CommunicationPurpose = "transactional" | "urgent" | "support" | "marketing" | "bulk";
+export type ProofCommunicationChannel = "email" | "whatsapp" | "sms";
+export type ProofCommunicationPurpose = "transactional" | "urgent" | "support" | "marketing" | "bulk";
 
 export interface CommunicationBoundaryRequest {
-  channel: CommunicationChannel;
-  purpose: CommunicationPurpose;
+  channel: ProofCommunicationChannel;
+  purpose: ProofCommunicationPurpose;
   candidateRef?: string;
   templateRef: string;
   recipientCount: number;
@@ -16,7 +16,7 @@ export interface CommunicationBoundaryDecision {
   allowed: boolean;
   queuedOnly: boolean;
   reason: string;
-  channel: CommunicationChannel;
+  channel: ProofCommunicationChannel;
   evidence: {
     policyRef: "COMMUNICATIONS_BOUNDARY_SOURCE_ONLY";
     emailPrimary: true;
