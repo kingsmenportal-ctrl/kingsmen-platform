@@ -6,7 +6,7 @@ This document is the real finish-line map for launching Kingsmen. It is intentio
 
 **Public launch is blocked.**
 
-The repo has strong doctrine, contracts, migrations, module manifests, validators, local proof surfaces, and now a deployable backend API runtime. It is not yet safe to open to public candidates because several runtime gates still need evidence.
+The repo has strong doctrine, contracts, migrations, module manifests, validators, local proof surfaces, a deployable backend API runtime, and now a PostgreSQL/Supabase Truth Vault persistence foundation. It is still not safe to open to public candidates because security, web-boundary, payment, backup, branch-protection, and staging-proof gates remain closed.
 
 ## How far from launch
 
@@ -14,7 +14,7 @@ The repo has strong doctrine, contracts, migrations, module manifests, validator
 |---|---|---|
 | Architecture / doctrine | Mostly complete | N00-N20 concepts and rules are represented in repo files. |
 | Database schema | Partially complete | Truth Vault migration exists, but production RLS/security tests are still required. |
-| Backend API | Runtime foundation built | `apps/api` now has a package, TypeScript build config, server entrypoint, health route, command intake, workflow-result intake, and read-model routes. Durable DB persistence is still pending. |
+| Backend API | Runtime + persistence foundation built | `apps/api` has a package, TypeScript build config, server entrypoint, health route, command intake, workflow-result intake, read-model routes, and optional PostgreSQL Truth Vault mode. Staging DB integration proof is still required. |
 | Web / control plane | Partially complete | Next app exists, but some API routes still depend on local Windows shell commands. |
 | Payments | Blocked | PayFast sandbox and ITN evidence are required before taking money. |
 | Communications | Manual required | Email primary and WhatsApp urgent-only doctrine exists; provider proof is still needed. |
@@ -27,7 +27,7 @@ The repo has strong doctrine, contracts, migrations, module manifests, validator
 ### P0 — Must be fixed before any public users
 
 1. **Protect `main`.** The repository currently warns that the main branch is not protected. Public launch needs branch protection with required validators.
-2. **Replace Truth Vault repository stubs with real persistence.** `TruthVaultRepository` currently prepares write results; it does not persist records to PostgreSQL/Supabase.
+2. **Prove Truth Vault persistence on staging.** The repository stub has been replaced with PostgreSQL-mode writes, but a live staging run must still prove command log, idempotency, workflow run, evidence ledger, audit, approval, heartbeat, and DLQ paths.
 3. **Lock RLS/security boundaries.** The current migration enables RLS but uses broad service-role `FOR ALL USING (true)` policies. Production needs scoped tests and public/user policies.
 4. **Remove public web dependency on local PowerShell and Windows paths.** Web API routes must not shell out to `powershell`, `psql.exe`, or `C:\Kingsmen` in public deployment.
 5. **Prove PayFast sandbox + ITN.** No real payments until sandbox success/cancel/return/failure/duplicate/invalid-signature/replay evidence exists.
@@ -37,20 +37,20 @@ The repo has strong doctrine, contracts, migrations, module manifests, validator
 
 ### P1 — Must be fixed before paid pilot
 
-1. Replace API `memory_development_only` storage with PostgreSQL/Supabase writes.
-2. Add workflow result endpoint persistence with idempotency, correlation ID, state transition check, and evidence ledger write.
-3. Add real email provider send proof and bounce/failure handling.
-4. Add founder/operator dashboard that reads from backend read models, not local shell commands.
-5. Add DLQ review and incident workflow.
-6. Add staging deploy proof for web + API + database.
+1. Replace public web local shell routes with backend API/SDK calls.
+2. Add real email provider send proof and bounce/failure handling.
+3. Add founder/operator dashboard that reads from backend read models, not local shell commands.
+4. Add DLQ review and incident workflow.
+5. Add staging deploy proof for web + API + database.
+6. Add tenant-scoped founder console views.
 
 ### P2 — Must be fixed before scaling
 
 1. Publish internal packages only after strict `files` whitelists and package dry runs.
 2. Add SDK package for web/control-plane/workers.
 3. Add load tests under the 500 active-candidate cap.
-4. Add tenant-scoped founder console views.
-5. Add automated regression tests for N00-N20 invariants.
+4. Add automated regression tests for N00-N20 invariants.
+5. Add N21-N23 Mirror/Adapt/Copy reality-intelligence modules after the immediate launch blockers.
 
 ## API runtime command
 
@@ -65,6 +65,16 @@ Root helpers:
 
 ```bash
 npm run api:build
+npm run api:start
+npm run api:validate:truth-vault
+```
+
+PostgreSQL Truth Vault mode:
+
+```bash
+KINGSMEN_TRUTH_VAULT_MODE=postgres
+KINGSMEN_DATABASE_URL=postgres://...
+KINGSMEN_DATABASE_SSL=true
 npm run api:start
 ```
 
