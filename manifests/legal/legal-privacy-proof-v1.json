@@ -1,0 +1,50 @@
+{
+  "schema": "kingsmen.legal-privacy-proof.v1",
+  "module": "Legal + Privacy + Consent + Refund Proof",
+  "status": "foundation_built_pending_legal_review_and_publication_proof",
+  "productionReady": false,
+  "publicLaunchAllowed": false,
+  "finalLegalAdviceProvidedByCode": false,
+  "attorneyOrFounderReviewRequired": true,
+  "publishedPoliciesRequired": true,
+  "popiaPrivacyNoticeRequired": true,
+  "cpaRefundTermsRequired": true,
+  "termsOfServiceRequired": true,
+  "consentCaptureRequired": true,
+  "marketingConsentSeparateRequired": true,
+  "dataSubjectRequestPathRequired": true,
+  "childDataGuardianConsentRequired": true,
+  "refundHumanReviewRequired": true,
+  "policyVersioningRequired": true,
+  "personalDataCollectionBeforePrivacyNoticeAllowed": false,
+  "paymentBeforeRefundNoticeAllowed": false,
+  "requiredPublicSurfaces": [
+    "Terms of Service",
+    "Privacy Notice",
+    "Consent Notice",
+    "Refund and Payment Policy",
+    "Data Subject Request Path",
+    "Support and Complaint Path"
+  ],
+  "sourceProofScenarios": [
+    "privacy_notice_required_before_personal_data_collection",
+    "terms_required_before_account_or_paid_service",
+    "refund_policy_required_before_payment",
+    "consent_timestamp_and_policy_version_required",
+    "marketing_consent_separate_from_service_consent",
+    "data_subject_access_correction_deletion_path_defined",
+    "refund_claim_requires_order_evidence_and_human_review",
+    "minor_or_child_data_requires_guardian_boundary",
+    "policy_versioning_and_change_log_required",
+    "legal_review_required_before_public_launch"
+  ],
+  "remainingStagingEvidence": [
+    "Published draft URLs or route paths for terms, privacy, consent, refund, and support policies",
+    "Founder/legal review record with version numbers",
+    "Consent capture smoke proof with timestamp, policy version, actor, surface, and correlationId",
+    "Refund policy display proof before checkout",
+    "Data subject request intake proof",
+    "No personal data intake before privacy notice proof",
+    "No payment flow before refund/payment terms proof"
+  ]
+}
