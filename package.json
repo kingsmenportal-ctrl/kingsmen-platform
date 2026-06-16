@@ -18,6 +18,8 @@
     "api:validate": "npm --prefix apps/api run validate",
     "api:validate:truth-vault": "node scripts/validators/validate-api-truth-vault-persistence.mjs",
     "web:validate:backend-boundary": "node scripts/validators/validate-safe-web-backend-boundary.mjs",
+    "payments:prove:sandbox": "node scripts/proof/prove-payfast-sandbox-boundary.mjs",
+    "payments:validate:sandbox": "node scripts/validators/validate-payfast-sandbox-proof.mjs",
     "kingsmen:launch:audit": "node scripts/validators/validate-kingsmen-launch-readiness.mjs --audit",
     "kingsmen:launch:gate": "node scripts/validators/validate-kingsmen-launch-readiness.mjs --gate"
   },
