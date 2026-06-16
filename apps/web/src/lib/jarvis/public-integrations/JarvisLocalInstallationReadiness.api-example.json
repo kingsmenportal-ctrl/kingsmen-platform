@@ -1,0 +1,27 @@
+{
+  "method": "GET",
+  "route": "/api/jarvis/public-repos/local-readiness",
+  "purpose": "Report whether optional local runtimes are installed without installing or changing anything.",
+  "expectedSummary": {
+    "total": 8,
+    "installed": "number",
+    "missing": "number",
+    "unknown": "number"
+  },
+  "coveredTools": [
+    "Docling Runtime",
+    "Playwright Browser Runtime",
+    "openWakeWord Runtime",
+    "whisper.cpp Runtime",
+    "Piper Runtime",
+    "gitleaks Runtime",
+    "Trivy Runtime",
+    "Semgrep Runtime"
+  ],
+  "safety": {
+    "noInstall": true,
+    "noMutation": true,
+    "noSecretOutput": true,
+    "allowlistedCheckOnly": true
+  }
+}
