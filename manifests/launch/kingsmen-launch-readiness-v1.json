@@ -18,7 +18,8 @@
     "No secrets in git, chat, reports, screenshots, or package artifacts.",
     "No branch launch from unprotected main.",
     "No web route may shell out to local workstation runtime as a public API path.",
-    "No broad tenant-blind RLS policies for public production traffic."
+    "No broad tenant-blind RLS policies for public production traffic.",
+    "No production personal data until backup and restore drill evidence passes."
   ],
   "requiredLaunchGates": [
     {
@@ -115,8 +116,19 @@
       "gateKey": "backup_restore",
       "title": "Backup and restore drill",
       "requiredBefore": "production data",
-      "status": "blocked",
-      "evidenceRequired": "restore drill report with RPO/RTO and verified sample records"
+      "status": "foundation_built_pending_staging_drill",
+      "evidenceRequired": "restore drill report with RPO/RTO, backup SHA-256, target/source separation, counts-only sample verification, and no secrets/raw candidate rows",
+      "evidencePaths": [
+        "manifests/ops/backup-restore-proof-v1.json",
+        "docs/ops/KINGSMEN_BACKUP_RESTORE_PROOF.md",
+        "scripts/backup/New-KingsmenTruthVaultBackup.ps1",
+        "scripts/backup/Test-KingsmenTruthVaultRestore.ps1",
+        "scripts/proof/prove-backup-restore-boundary.mjs",
+        "scripts/validators/validate-backup-restore-proof.mjs",
+        "reports/ops/backup-restore-proof-latest.json",
+        "reports/ops/backup-restore-validation-latest.json"
+      ],
+      "remainingConstraint": "Source-level backup/restore boundary is built; run a real staging backup and restore drill before production personal data."
     },
     {
       "gateKey": "observability_incident",
