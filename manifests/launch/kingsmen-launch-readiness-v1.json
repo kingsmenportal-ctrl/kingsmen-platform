@@ -23,7 +23,8 @@
     "No provider credentials may be printed in logs, reports, screenshots, or frontend code.",
     "No candidate notification provider may send live messages until communications staging proof passes.",
     "No public launch until observability and incident staging proof passes.",
-    "No personal data collection or payment flow until legal, privacy, consent, terms, and refund policy proof passes."
+    "No personal data collection or payment flow until legal, privacy, consent, terms, and refund policy proof passes.",
+    "No final assembly readiness may open until the staging runtime proof pack is captured and reviewed."
   ],
   "requiredLaunchGates": [
     {
@@ -208,6 +209,23 @@
         "reports/legal/legal-privacy-validation-latest.json"
       ],
       "remainingConstraint": "Publish/version policy surfaces and capture founder/legal review, consent smoke proof, refund/payment display proof, and data-subject request proof before collecting personal data or payments."
+    },
+    {
+      "gateKey": "staging_runtime_proof_pack",
+      "title": "Capture complete staging runtime evidence pack",
+      "requiredBefore": "final assembly",
+      "status": "foundation_built_pending_staging_evidence_capture",
+      "evidenceRequired": "one reviewed redacted staging pack containing DB persistence, web/API smoke, RLS isolation, PayFast sandbox, backup/restore, secrets runtime, communications provider, observability incident, legal publication, and branch protection evidence",
+      "evidencePaths": [
+        "apps/api/src/ops/staging-runtime-proof-pack-boundary.ts",
+        "manifests/launch/staging-runtime-proof-pack-v1.json",
+        "docs/launch/KINGSMEN_STAGING_RUNTIME_PROOF_PACK.md",
+        "scripts/proof/prove-staging-runtime-proof-pack.mjs",
+        "scripts/validators/validate-staging-runtime-proof-pack.mjs",
+        "reports/staging/staging-runtime-proof-pack-latest.json",
+        "reports/staging/staging-runtime-proof-pack-validation-latest.json"
+      ],
+      "remainingConstraint": "Run and review all redacted staging runtime evidence reports before changing final assembly checks from pending to passed."
     }
   ],
   "launchPhases": [
@@ -219,7 +237,7 @@
     {
       "phase": "1_staging_runtime",
       "goal": "Backend, web, DB, and internal control plane run against staging.",
-      "definitionOfDone": "API health, command intake, workflow result intake, DB writes, and web reads pass."
+      "definitionOfDone": "API health, command intake, workflow result intake, DB writes, web reads, and staging runtime proof pack pass."
     },
     {
       "phase": "2_founder_private_beta",
@@ -229,7 +247,7 @@
     {
       "phase": "3_paid_pilot",
       "goal": "Limited paid pilot under active founder supervision.",
-      "definitionOfDone": "PayFast proof, communications proof, support process, refund process, secrets runtime proof, backup/restore proof, observability proof, legal/privacy proof, and incident response are complete."
+      "definitionOfDone": "PayFast proof, communications proof, support process, refund process, secrets runtime proof, backup/restore proof, observability proof, legal/privacy proof, staging runtime proof pack, and incident response are complete."
     },
     {
       "phase": "4_public_launch",
