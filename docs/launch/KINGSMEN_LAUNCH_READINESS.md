@@ -6,7 +6,7 @@ This document is the real finish-line map for launching Kingsmen. It is intentio
 
 **Public launch is blocked.**
 
-The repo has strong doctrine, contracts, migrations, module manifests, validators, local proof surfaces, a deployable backend API runtime, PostgreSQL/Supabase Truth Vault persistence foundation, a source-level safe web-to-backend boundary, a PayFast sandbox proof boundary, an RLS/security source-level boundary, a backup/restore source-level boundary, a branch-protection source boundary, a secrets wiring source boundary, a communications proof source boundary, and an observability + incident proof source boundary. It is still not safe to open to public candidates or take money because real staging proof, real PayFast sandbox provider evidence, real backup/restore drill evidence, masked runtime secret health evidence, communications provider staging evidence, observability staging monitoring evidence, GitHub branch-protection application, legal/privacy, and staging runtime gates remain closed.
+The repo has strong doctrine, contracts, migrations, module manifests, validators, local proof surfaces, a deployable backend API runtime, PostgreSQL/Supabase Truth Vault persistence foundation, a source-level safe web-to-backend boundary, a PayFast sandbox proof boundary, an RLS/security source-level boundary, a backup/restore source-level boundary, a branch-protection source boundary, a secrets wiring source boundary, a communications proof source boundary, an observability + incident proof source boundary, and a legal + privacy + consent + refund proof source boundary. It is still not safe to open to public candidates or take money because real staging proof, real PayFast sandbox provider evidence, real backup/restore drill evidence, masked runtime secret health evidence, communications provider staging evidence, observability staging monitoring evidence, legal/privacy publication proof, GitHub branch-protection application, and staging runtime gates remain closed.
 
 ## How far from launch
 
@@ -22,8 +22,9 @@ The repo has strong doctrine, contracts, migrations, module manifests, validator
 | Secrets wiring | Source boundary built, runtime health pending | Credential registry, empty `.env.example`, masked health script, source proof, and validator exist. Real env vars must still be configured outside Git and checked with masked runtime reports. |
 | Communications | Source boundary built, provider proof pending | Email-primary, WhatsApp-urgent-only, SMS-backup-only, consent, opt-out, bounce handling, and no-live-send proof exist. Provider staging send/receive proof is still required before candidate notifications. |
 | Observability | Source boundary built, staging monitoring proof pending | Health checks, structured logs, correlation ID rules, DLQ review, alert categories, redaction, SEV runbook, and founder escalation proof exist. Live monitoring, alert, and incident drill proof is still required. |
+| Legal/privacy | Source boundary built, publication proof pending | Terms, Privacy Notice, Consent Notice, Refund and Payment Policy, Data Subject Request Path, and review-gate proof exist. Published/versioned policy surfaces and consent/refund smoke proof are still required. |
 | Workflow execution | Partial | Workflow codes and state machine exist; deployed n8n/worker callback proof is still required. |
-| Production operations | Blocked | Branch protection, secrets runtime proof, backup/restore staging drill, communications provider proof, observability staging proof, and launch runbook are required. |
+| Production operations | Blocked | Branch protection, secrets runtime proof, backup/restore staging drill, communications provider proof, observability staging proof, legal/privacy publication proof, and launch runbook are required. |
 
 ## Exact blockers
 
@@ -38,7 +39,7 @@ The repo has strong doctrine, contracts, migrations, module manifests, validator
 7. **Wire secrets outside git.** Source-level secrets wiring proof exists, but launch still requires masked runtime health evidence proving required environment variables are configured outside Git without printing values.
 8. **Prove communications provider boundary.** Source-level communications proof exists, but candidate notifications require provider staging send/receive, bounce, opt-out, WhatsApp urgent-only, SMS fallback-only, and redacted-evidence proof.
 9. **Prove observability and incident handling.** Source-level observability + incident proof exists, but public users require staging health, logs, queue/DLQ, alert, redaction, and SEV runbook evidence.
-10. **Publish privacy, consent, terms, and refund policy.** This is required before collecting personal data and money.
+10. **Publish privacy, consent, terms, and refund policy.** Source-level legal/privacy proof exists, but launch still requires published/versioned surfaces, founder/legal review, consent capture proof, refund/payment display proof, and data-subject request proof.
 
 ### P1 — Must be fixed before paid pilot
 
@@ -265,6 +266,37 @@ no PII or secrets in logs proof
 
 This still does not authorize public users. It only proves the source-level observability and incident boundary.
 
+## Legal + privacy + consent + refund proof command
+
+Source-level proof:
+
+```bash
+npm run legal:prove
+```
+
+Validator:
+
+```bash
+npm run legal:validate
+```
+
+Publication and review proof still required:
+
+```txt
+published Terms of Service
+published Privacy Notice
+published Consent Notice
+published Refund and Payment Policy
+published Data Subject Request Path
+founder/legal review record with policy versions
+consent capture smoke proof with timestamp and policy version
+refund/payment policy display proof before checkout
+no personal data collection before privacy notice proof
+no payment flow before refund/payment terms proof
+```
+
+This still does not authorize collecting personal data or taking payments. It only proves the source-level legal/privacy boundary.
+
 ## Launch command
 
 Run this for a report without failing the shell:
@@ -286,5 +318,5 @@ The gate must remain blocked until the P0 launch blockers are fixed and evidence
 1. **Repo lock:** protect main, require validators, stop accidental package/release mistakes.
 2. **Staging runtime:** run API + web + PostgreSQL/Supabase + internal command flow.
 3. **Founder private beta:** process a small number of real test candidates manually with evidence.
-4. **Paid pilot:** only after PayFast, refunds, support, backup/restore, communications proof, incident response, and observability proof pass.
+4. **Paid pilot:** only after PayFast, refunds, support, backup/restore, communications proof, legal/privacy proof, incident response, and observability proof pass.
 5. **Public launch:** only after every required launch gate opens.
