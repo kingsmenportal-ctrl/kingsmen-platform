@@ -65,8 +65,17 @@
       "gateKey": "web_runtime_boundary",
       "title": "Remove local PowerShell/Windows shell execution from public Next API routes",
       "requiredBefore": "public web deploy",
-      "status": "blocked",
-      "evidenceRequired": "Web API routes call backend API/SDK only; no local psql.exe or C:\\Kingsmen paths"
+      "status": "foundation_built_pending_staging_proof",
+      "evidenceRequired": "Web API routes call backend API/SDK only; no local psql.exe, C:\\Kingsmen path, local JSONL write, or workstation shell execution in public boundary routes",
+      "evidencePaths": [
+        "apps/web/src/lib/kingsmen-backend-client.ts",
+        "apps/web/src/app/api/public/free-destiny-map/intake/local/route.ts",
+        "apps/web/src/app/api/jarvis/status/route.ts",
+        "apps/web/src/app/api/jarvis/command/route.ts",
+        "docs/web/KINGSMEN_SAFE_WEB_BACKEND_BOUNDARY.md",
+        "scripts/validators/validate-safe-web-backend-boundary.mjs"
+      ],
+      "remainingConstraint": "Run staging web/API smoke proof with KINGSMEN_BACKEND_BASE_URL configured before public launch."
     },
     {
       "gateKey": "payments",
