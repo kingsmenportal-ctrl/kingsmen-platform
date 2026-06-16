@@ -1,14 +1,15 @@
-import fs from "node:fs";
-import path from "node:path";
 import { NextRequest, NextResponse } from "next/server";
+
+import {
+  createKingsmenWebCommandEnvelope,
+  getKingsmenBackendBoundary,
+  postKingsmenCommand
+} from "@/lib/kingsmen-backend-client";
 
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
 
 const endpoint = "/api/public/free-destiny-map/intake/local";
-const localWriteFlagName = "KINGSMEN_ENABLE_LOCAL_INTAKE_WRITE";
-const backendBridgeFlagName = "KINGSMEN_ENABLE_BACKEND_BRIDGE";
-const backendBaseUrlEnvName = "KINGSMEN_BACKEND_BASE_URL";
 
 type LocalIssue = {
   field: string;
@@ -16,12 +17,14 @@ type LocalIssue = {
   message: string;
 };
 
-type BackendBridgeResult = {
-  attempted: boolean;
-  succeeded: boolean;
-  status: number;
-  data: Record<string, unknown> | null;
-  error: string | null;
+type BackendCommandResponse = {
+  ok?: boolean;
+  status?: string;
+  commandId?: string;
+  correlationId?: string;
+  idempotencyKey?: string;
+  storageMode?: string;
+  generatedAtIso?: string;
 };
 
 function hasSafeConsent(payload: Record<string, unknown>): boolean {
@@ -50,7 +53,7 @@ function buildLocalValidationIssues(payload: Record<string, unknown>): LocalIssu
     issues.push({
       field: "consent",
       code: "CONSENT_REQUIRED",
-      message: "Contact and basic-info processing consent are required for the local Free Destiny Map intake shell."
+      message: "Contact and basic-info processing consent are required for the Free Destiny Map intake boundary."
     });
   }
 
@@ -68,93 +71,15 @@ function buildLocalValidationIssues(payload: Record<string, unknown>): LocalIssu
     issues.push({
       field: "payload",
       code: "SENSITIVE_FIELDS_BLOCKED",
-      message: "Sensitive fields are blocked in the local Free Destiny Map intake shell."
+      message: "Sensitive fields are blocked in the Free Destiny Map intake boundary."
     });
   }
 
   return issues;
 }
 
-function normalizedBackendBaseUrl(): string | null {
-  const value = process.env[backendBaseUrlEnvName];
-
-  if (!value) {
-    return null;
-  }
-
-  return value.replace(/\/+$/, "");
-}
-
-async function postToBackendBoundary(payload: Record<string, unknown>): Promise<BackendBridgeResult> {
-  const backendBaseUrl = normalizedBackendBaseUrl();
-
-  if (!backendBaseUrl) {
-    return {
-      attempted: false,
-      succeeded: false,
-      status: 0,
-      data: null,
-      error: "KINGSMEN_BACKEND_BASE_URL is missing."
-    };
-  }
-
-  const controller = new AbortController();
-  const timer = setTimeout(() => controller.abort(), 15000);
-
-  try {
-    const backendResponse = await fetch(`${backendBaseUrl}${endpoint}`, {
-      method: "POST",
-      headers: {
-        "content-type": "application/json"
-      },
-      body: JSON.stringify(payload),
-      signal: controller.signal
-    });
-
-    const data = (await backendResponse.json().catch(() => null)) as Record<string, unknown> | null;
-
-    return {
-      attempted: true,
-      succeeded: backendResponse.status === 202 && data?.accepted === true,
-      status: backendResponse.status,
-      data,
-      error: null
-    };
-  } catch (error) {
-    return {
-      attempted: true,
-      succeeded: false,
-      status: 0,
-      data: null,
-      error: error instanceof Error ? error.message : "Unknown backend bridge error."
-    };
-  } finally {
-    clearTimeout(timer);
-  }
-}
-
-function writeNextLocalProofRecord(payload: Record<string, unknown>, responseBody: Record<string, unknown>) {
-  const repoRoot = path.resolve(process.cwd(), "../..");
-  const localDataDir = path.join(repoRoot, "data/local/free-destiny-map/next-api-integration");
-  const localDataFile = path.join(localDataDir, "next-api-demo-intakes.jsonl");
-
-  fs.mkdirSync(localDataDir, { recursive: true });
-  fs.appendFileSync(
-    localDataFile,
-    `${JSON.stringify({
-      schema: "kingsmen.free-destiny-map.next-api-integration-record.v1",
-      module: "BATCH 18 - Controlled Next-to-Backend Bridge Proof",
-      productionReady: false,
-      storesProductionData: false,
-      endpoint,
-      createdAt: new Date().toISOString(),
-      requestPayload: payload,
-      response: responseBody
-    })}\n`,
-    "utf8"
-  );
-
-  return fs.existsSync(localDataFile);
+function optionalString(value: unknown): string | undefined {
+  return typeof value === "string" && value.trim().length > 0 ? value.trim() : undefined;
 }
 
 export async function POST(request: NextRequest) {
@@ -167,119 +92,109 @@ export async function POST(request: NextRequest) {
   }
 
   const issues = buildLocalValidationIssues(payload);
-  const validLocalPayload = issues.length === 0;
-  const backendBridgeEnabled = process.env[backendBridgeFlagName] === "true";
-  const localPersistenceEnabled = process.env[localWriteFlagName] === "true";
+  const backendBoundary = getKingsmenBackendBoundary();
 
-  if (!validLocalPayload) {
+  if (issues.length > 0) {
     return NextResponse.json(
       {
         accepted: false,
-        reference: "KM-FDM-NEXT18-BLOCKED",
+        reference: "KM-FDM-WEB-BLOCKED",
         productionReady: false,
         canClaimProduction: false,
         deployedToOracle: false,
-        backendBridgeEnabled,
-        backendBridgeAttempted: false,
-        backendBridgeSucceeded: false,
+        backendBoundaryMode: backendBoundary.mode,
+        backendConfigured: backendBoundary.configured,
         backendBoundaryReached: false,
-        localPersistenceEnabled,
         localWriteAttempted: false,
         localWriteSucceeded: false,
-        storageMode: "validation_blocked_shell",
+        storageMode: "validation_blocked_backend_boundary",
         officialApplicationSubmitted: false,
         paymentInstructionSent: false,
         documentUploadAccepted: false,
         emailSent: false,
-        safeNotice:
-          "Controlled local Next intake shell only. Payload validation failed before backend bridge.",
-        nextAction: "Fix local Free Destiny Map intake payload issues.",
+        safeNotice: "Payload validation failed before the backend API boundary. No local file write, shell command, payment, email, document upload, or official application submission occurred.",
+        nextAction: "Fix Free Destiny Map intake payload issues.",
         issues
       },
       { status: 400 }
     );
   }
 
-  if (backendBridgeEnabled) {
-    const backendBridge = await postToBackendBoundary(payload);
-    const backendData = backendBridge.data ?? {};
-    const backendBoundaryReached = backendData.backendBoundaryReached === true;
-    const accepted = backendBridge.succeeded && backendBoundaryReached;
+  const command = createKingsmenWebCommandEnvelope({
+    commandType: "candidate.intake.received",
+    commandIdPrefix: "web_fdm_intake",
+    idempotencyKeyPrefix: "web_fdm_intake",
+    idempotencyInput: {
+      clientRequestId: payload.clientRequestId,
+      email: payload.email,
+      currentSituation: payload.currentSituation,
+      routeInterests: payload.routeInterests
+    },
+    correlationId: request.headers.get("x-correlation-id") ?? undefined,
+    actor: {
+      type: "candidate",
+      id: optionalString(payload.candidatePublicRef) ?? "free_destiny_map_public_candidate",
+      displayName: optionalString(payload.fullName) ?? optionalString(payload.name)
+    },
+    candidateId: optionalString(payload.candidatePublicRef),
+    source: "portal",
+    payload: {
+      ...payload,
+      webBoundaryEndpoint: endpoint,
+      submittedThrough: "free_destiny_map_web_boundary",
+      localFileWriteDisabled: true,
+      localShellDisabled: true
+    }
+  });
 
-    return NextResponse.json(
-      {
-        accepted,
-        reference: "KM-FDM-NEXT18-BRIDGE",
-        backendReference: backendData.reference ?? null,
-        productionReady: false,
-        canClaimProduction: false,
-        deployedToOracle: false,
-        backendBridgeEnabled: true,
-        backendBridgeAttempted: backendBridge.attempted,
-        backendBridgeSucceeded: accepted,
-        backendBridgeStatus: backendBridge.status,
-        backendBoundaryReached,
-        backendLocalWriteSucceeded: backendData.localWriteSucceeded === true,
-        backendStorageMode: backendData.storageMode ?? null,
-        localPersistenceEnabled: false,
-        localWriteAttempted: false,
-        localWriteSucceeded: false,
-        storageMode: "next_to_backend_bridge_shell",
-        officialApplicationSubmitted: false,
-        paymentInstructionSent: false,
-        documentUploadAccepted: false,
-        emailSent: false,
-        safeNotice:
-          "Controlled local Next-to-backend bridge proof only. No production storage, no Oracle runtime, no payment, no email, no documents, no official application submission.",
-        nextAction: accepted
-          ? "Next API route bridged the safe demo Free Destiny Map payload to the backend runtime boundary."
-          : "Repair backend bridge failure before moving forward.",
-        issues: accepted
-          ? []
-          : [
-              {
-                field: "backendBridge",
-                code: "BACKEND_BRIDGE_FAILED",
-                message: backendBridge.error ?? "Backend bridge did not return an accepted backend boundary response."
-              }
-            ]
-      },
-      { status: accepted ? 202 : 502 }
-    );
-  }
+  const backend = await postKingsmenCommand<typeof command.payload, BackendCommandResponse>(command);
+  const accepted = backend.ok && (backend.status === 202 || backend.status === 200) && backend.data?.ok !== false;
 
-  const responseBody = {
-    accepted: true,
-    reference: "KM-FDM-NEXT18-LOCAL",
-    productionReady: false,
-    canClaimProduction: false,
-    deployedToOracle: false,
-    backendBridgeEnabled: false,
-    backendBridgeAttempted: false,
-    backendBridgeSucceeded: false,
-    backendBoundaryReached: false,
-    localPersistenceEnabled,
-    localWriteAttempted: localPersistenceEnabled,
-    localWriteSucceeded: false,
-    storageMode: "local_jsonl_shell",
-    officialApplicationSubmitted: false,
-    paymentInstructionSent: false,
-    documentUploadAccepted: false,
-    emailSent: false,
-    safeNotice:
-      "Controlled local Next API proof only. Backend bridge is disabled. No production storage, no payment, no email, no documents, no official application submission.",
-    nextAction: "Controlled local Next API accepted the safe demo Free Destiny Map payload.",
-    issues: []
-  };
-
-  if (localPersistenceEnabled) {
-    responseBody.localWriteSucceeded = writeNextLocalProofRecord(payload, responseBody);
-  }
-
-  return NextResponse.json(responseBody, { status: 202 });
+  return NextResponse.json(
+    {
+      accepted,
+      reference: accepted ? "KM-FDM-WEB-BACKEND" : "KM-FDM-WEB-BACKEND-FAILED",
+      backendReference: backend.data?.commandId ?? null,
+      correlationId: backend.data?.correlationId ?? command.correlationId,
+      idempotencyKey: backend.data?.idempotencyKey ?? command.idempotencyKey,
+      productionReady: false,
+      canClaimProduction: false,
+      deployedToOracle: false,
+      backendBoundaryMode: backend.boundary.mode,
+      backendConfigured: backend.boundary.configured,
+      backendBridgeAttempted: backend.boundary.configured,
+      backendBridgeSucceeded: accepted,
+      backendBridgeStatus: backend.status,
+      backendBoundaryReached: accepted,
+      backendStorageMode: backend.data?.storageMode ?? null,
+      localWriteAttempted: false,
+      localWriteSucceeded: false,
+      storageMode: "web_to_backend_api_boundary",
+      officialApplicationSubmitted: false,
+      paymentInstructionSent: false,
+      documentUploadAccepted: false,
+      emailSent: false,
+      safeNotice: "Free Destiny Map intake is routed through the backend API command boundary only. The web route performs no local file writes, shell execution, direct database access, payment, email, document upload, or official application submission.",
+      nextAction: accepted
+        ? "Backend command boundary accepted the Free Destiny Map intake."
+        : "Configure or repair KINGSMEN_BACKEND_BASE_URL before public deployment.",
+      issues: accepted
+        ? []
+        : [
+            {
+              field: "backendBoundary",
+              code: "BACKEND_BOUNDARY_FAILED",
+              message: backend.error ?? "Backend API boundary did not accept the command."
+            }
+          ]
+    },
+    { status: accepted ? 202 : 502 }
+  );
 }
 
 export async function GET() {
+  const backendBoundary = getKingsmenBackendBoundary();
+
   return NextResponse.json(
     {
       accepted: false,
@@ -287,8 +202,9 @@ export async function GET() {
       canClaimProduction: false,
       deployedToOracle: false,
       endpoint,
-      backendBridgeEnabled: process.env[backendBridgeFlagName] === "true",
-      safeNotice: "Use POST with a safe Free Destiny Map local intake payload.",
+      backendBoundaryMode: backendBoundary.mode,
+      backendConfigured: backendBoundary.configured,
+      safeNotice: "Use POST with a safe Free Destiny Map intake payload. This route proxies to the backend API only.",
       officialApplicationSubmitted: false,
       paymentInstructionSent: false,
       documentUploadAccepted: false,
