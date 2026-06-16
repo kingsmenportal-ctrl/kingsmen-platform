@@ -6,7 +6,7 @@ This document is the real finish-line map for launching Kingsmen. It is intentio
 
 **Public launch is blocked.**
 
-The repo has strong doctrine, contracts, migrations, module manifests, validators, local proof surfaces, a deployable backend API runtime, PostgreSQL/Supabase Truth Vault persistence foundation, a source-level safe web-to-backend boundary, a PayFast sandbox proof boundary, an RLS/security source-level boundary, a backup/restore source-level boundary, and a branch-protection source boundary. It is still not safe to open to public candidates or take money because real staging proof, real PayFast sandbox provider evidence, real backup/restore drill evidence, GitHub branch-protection application, legal/privacy, and staging runtime gates remain closed.
+The repo has strong doctrine, contracts, migrations, module manifests, validators, local proof surfaces, a deployable backend API runtime, PostgreSQL/Supabase Truth Vault persistence foundation, a source-level safe web-to-backend boundary, a PayFast sandbox proof boundary, an RLS/security source-level boundary, a backup/restore source-level boundary, a branch-protection source boundary, and a secrets wiring source boundary. It is still not safe to open to public candidates or take money because real staging proof, real PayFast sandbox provider evidence, real backup/restore drill evidence, masked runtime secret health evidence, GitHub branch-protection application, legal/privacy, and staging runtime gates remain closed.
 
 ## How far from launch
 
@@ -19,10 +19,11 @@ The repo has strong doctrine, contracts, migrations, module manifests, validator
 | Payments | Source-level sandbox proof built, real provider proof pending | PayFast signature/ITN/cancel/return/duplicate/replay/amount/refund/redaction proof is represented in code and validators. Real PayFast sandbox checkout against staging notify URL is still required before taking money. |
 | Backup / restore | Source-level boundary built, real staging drill pending | Backup and restore scripts, manifest, proof runner, validator, and archive gitignore rules exist. A real staging restore drill with RPO/RTO evidence is still required before production personal data. |
 | Branch protection | Source boundary built, GitHub apply pending | Source guard workflow, protection manifest, apply script, proof runner, and validator exist. GitHub `main` protection must still be applied with admin permissions. |
+| Secrets wiring | Source boundary built, runtime health pending | Credential registry, empty `.env.example`, masked health script, source proof, and validator exist. Real env vars must still be configured outside Git and checked with masked runtime reports. |
 | Communications | Manual required | Email primary and WhatsApp urgent-only doctrine exists; provider proof is still needed. |
 | Workflow execution | Partial | Workflow codes and state machine exist; deployed n8n/worker callback proof is still required. |
 | Observability | Partial | Audit/evidence patterns exist; live monitoring, DLQ review, and incident SOP need proof. |
-| Production operations | Blocked | Branch protection, secrets, backup/restore staging drill, and launch runbook are required. |
+| Production operations | Blocked | Branch protection, secrets runtime proof, backup/restore staging drill, and launch runbook are required. |
 
 ## Exact blockers
 
@@ -34,7 +35,7 @@ The repo has strong doctrine, contracts, migrations, module manifests, validator
 4. **Prove safe web-to-backend boundary in staging.** Source-level hardening is built, but the deployed web app must prove `KINGSMEN_BACKEND_BASE_URL` calls API health and command intake without local shell, local file writes, or direct database access.
 5. **Prove PayFast sandbox + ITN against provider sandbox.** Source-level proof exists, but no real payments until sandbox success/cancel/return/failure/duplicate/invalid-signature/replay/amount-mismatch/refund-review evidence exists from staging.
 6. **Prove backup and restore.** Source-level scripts exist, but no production personal data until a real staging restore drill proves backup archive checksum, target/source separation, counts-only verification, RPO/RTO, and secret/raw-data redaction.
-7. **Wire secrets outside git.** No live keys in repo, chat, logs, screenshots, reports, or package artifacts.
+7. **Wire secrets outside git.** Source-level secrets wiring proof exists, but launch still requires masked runtime health evidence proving required environment variables are configured outside Git without printing values.
 8. **Publish privacy, consent, terms, and refund policy.** This is required before collecting personal data and money.
 
 ### P1 — Must be fixed before paid pilot
@@ -180,6 +181,28 @@ Dry run:
 ```
 
 This still does not prove GitHub settings are active until the apply script passes and GitHub confirms `main` requires `source-guard`, blocks force push/deletion, and requires pull-request review.
+
+## Secrets wiring proof command
+
+Source-level proof:
+
+```bash
+npm run secrets:prove:wiring
+```
+
+Validator:
+
+```bash
+npm run secrets:validate:wiring
+```
+
+Masked runtime health check:
+
+```powershell
+.\scripts\security\Test-KingsmenSecretWiring.ps1
+```
+
+This still does not authorize public launch. Real secrets must live only in local `.env`, GitHub Secrets, Oracle environment variables, or future vault/KMS. Reports may show only configured/not-configured/masked status and must never print values, URLs, token prefixes, private keys, service-role keys, or provider secrets.
 
 ## Launch command
 
