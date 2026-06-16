@@ -77,6 +77,30 @@ type PublicGatewayHealth = {
   items: PublicGatewayHealthItem[];
 };
 
+type LocalInstallationItem = {
+  id: string;
+  name: string;
+  nStep: string;
+  repository: string;
+  category: string;
+  status: "installed" | "missing" | "unknown";
+  command: string;
+  version: string | null;
+  reason: string;
+};
+
+type LocalInstallationReadiness = {
+  ok: boolean;
+  summary: {
+    total: number;
+    installed: number;
+    missing: number;
+    unknown: number;
+    checkedAt: string;
+  };
+  items: LocalInstallationItem[];
+};
+
 const wakeGreeting =
   "Welcome to Kingsmen Command, Commander. Jarvis is online. The command house is awake, your desk is prepared, and I stand ready.";
 
@@ -84,6 +108,7 @@ const commandCards: CommandCard[] = [
   { label: "System status", tool: "SYSTEM_STATUS", message: "system status", risk: "safe", surface: "System Health" },
   { label: "Integration HUD", tool: "PUBLIC_INTEGRATION_HUD", message: "show public integration HUD", risk: "safe", surface: "N21 Gates" },
   { label: "Health Probe", tool: "PUBLIC_GATEWAY_HEALTH", message: "run public gateway health probe", risk: "safe", surface: "N21 Gates" },
+  { label: "Install Readiness", tool: "LOCAL_INSTALL_READINESS", message: "check local installation readiness", risk: "safe", surface: "N21 Runtime" },
   { label: "Validate N20", tool: "VALIDATE_N20", message: "validate N20", risk: "approval", surface: "Validation" },
   { label: "Run build", tool: "RUN_WEB_BUILD", message: "run web build", risk: "approval", surface: "Build" },
   { label: "Database scan", tool: "DATABASE_SCAN", message: "database scan", risk: "review", surface: "Read Model" },
@@ -96,7 +121,7 @@ const commandCards: CommandCard[] = [
 const missionPanels = [
   { title: "Real Build", value: "LOCKED", note: "Issue #36 active" },
   { title: "Visual Law", value: "SYSTEM", note: "Not wallpaper" },
-  { title: "Local Runtime", value: "CMD-SAFE", note: "No wrong shell syntax" },
+  { title: "Local Runtime", value: "CHECKED", note: "N21.9 install readiness" },
   { title: "N21 Gates", value: "HUD", note: "Public integration board" },
   { title: "Proof", value: "REQUIRED", note: "Repo and build evidence" }
 ];
@@ -133,6 +158,12 @@ function healthClass(status: PublicGatewayHealthItem["status"]) {
   return styles.healthRed;
 }
 
+function installClass(status: LocalInstallationItem["status"]) {
+  if (status === "installed") return styles.installInstalled;
+  if (status === "missing") return styles.installMissing;
+  return styles.installUnknown;
+}
+
 export default function JarvisAgentClient() {
   const [input, setInput] = useState("system status");
   const [running, setRunning] = useState(false);
@@ -141,6 +172,8 @@ export default function JarvisAgentClient() {
   const [integrationHudError, setIntegrationHudError] = useState<string | null>(null);
   const [gatewayHealth, setGatewayHealth] = useState<PublicGatewayHealth | null>(null);
   const [gatewayHealthError, setGatewayHealthError] = useState<string | null>(null);
+  const [localReadiness, setLocalReadiness] = useState<LocalInstallationReadiness | null>(null);
+  const [localReadinessError, setLocalReadinessError] = useState<string | null>(null);
   const [messages, setMessages] = useState<Message[]>([
     {
       role: "jarvis",
@@ -166,6 +199,17 @@ export default function JarvisAgentClient() {
 
   function healthFor(id: string) {
     return gatewayHealth?.items.find((item) => item.id === id) ?? null;
+  }
+
+  function installFor(id: string) {
+    const aliases: Record<string, string[]> = {
+      "docling-smart-intake": ["docling-runtime"],
+      "playwright-scout-gateway": ["playwright-browser-runtime"],
+      "jarvis-voice-gateway": ["openwakeword-runtime", "whisper-cpp-runtime", "piper-runtime"],
+      "jarvis-security-scan-gate": ["gitleaks-runtime", "trivy-runtime", "semgrep-runtime"]
+    };
+    const ids = aliases[id] ?? [];
+    return localReadiness?.items.filter((item) => ids.includes(item.id)) ?? [];
   }
 
   async function refreshIntegrationHud() {
@@ -198,9 +242,40 @@ export default function JarvisAgentClient() {
     }
   }
 
+  async function refreshLocalReadiness() {
+    try {
+      const response = await fetch("/api/jarvis/public-repos/local-readiness", { cache: "no-store" });
+      const payload = (await response.json()) as LocalInstallationReadiness;
+      if (!response.ok || !payload.ok) {
+        setLocalReadinessError("local installation readiness unavailable");
+        return;
+      }
+      setLocalReadiness(payload);
+      setLocalReadinessError(null);
+    } catch (error) {
+      setLocalReadinessError(error instanceof Error ? error.message : "local installation readiness request failed");
+    }
+  }
+
   async function runAgent(message: string, tool?: string) {
     const clean = message.trim();
     if (!clean || running) return;
+
+    if (tool === "LOCAL_INSTALL_READINESS" || clean.toLowerCase().includes("local installation") || clean.toLowerCase().includes("install readiness")) {
+      await refreshLocalReadiness();
+      setMessages((items) => [
+        ...items,
+        { role: "founder", text: clean },
+        {
+          role: "jarvis",
+          text: "Commander, local installation readiness is refreshed. It checks allowlisted local packages and binaries only, with no install, mutation, secret output, or deployment block.",
+          ok: true,
+          tool: "LOCAL_INSTALL_READINESS"
+        }
+      ]);
+      speak("Commander, local installation readiness is refreshed.");
+      return;
+    }
 
     if (tool === "PUBLIC_GATEWAY_HEALTH" || clean.toLowerCase().includes("gateway health") || clean.toLowerCase().includes("health probe")) {
       await refreshGatewayHealth();
@@ -221,12 +296,13 @@ export default function JarvisAgentClient() {
     if (clean.toLowerCase().includes("public integration hud")) {
       await refreshIntegrationHud();
       await refreshGatewayHealth();
+      await refreshLocalReadiness();
       setMessages((items) => [
         ...items,
         { role: "founder", text: clean },
         {
           role: "jarvis",
-          text: "Commander, the public integration HUD is refreshed. It shows Docling, Playwright, Voice, Trace Evidence, and Security Scan gates with their live routes, safety boundaries, and local route health.",
+          text: "Commander, the public integration HUD is refreshed. It shows Docling, Playwright, Voice, Trace Evidence, and Security Scan gates with their live routes, safety boundaries, local route health, and installation readiness.",
           ok: true,
           tool: "PUBLIC_INTEGRATION_HUD"
         }
@@ -363,6 +439,7 @@ export default function JarvisAgentClient() {
   useEffect(() => {
     refreshIntegrationHud();
     refreshGatewayHealth();
+    refreshLocalReadiness();
     return () => {
       streamRef.current?.getTracks().forEach((track) => track.stop());
       if ("speechSynthesis" in window) window.speechSynthesis.cancel();
@@ -406,17 +483,21 @@ export default function JarvisAgentClient() {
               <span>N21 PUBLIC INTEGRATION HUD</span>
               <strong>{integrationHud ? `${integrationHud.summary.liveRoutes}/${integrationHud.summary.total} live routes` : "loading"}</strong>
               <small>{gatewayHealth ? `${gatewayHealth.summary.green} green · ${gatewayHealth.summary.yellow} yellow · ${gatewayHealth.summary.red} red` : "health probe loading"}</small>
+              <small>{localReadiness ? `${localReadiness.summary.installed} installed · ${localReadiness.summary.missing} missing · ${localReadiness.summary.unknown} unknown` : "install readiness loading"}</small>
             </div>
             <div className={styles.integrationActions}>
               <button type="button" onClick={refreshIntegrationHud}>Refresh HUD</button>
               <button type="button" onClick={refreshGatewayHealth}>Probe Health</button>
+              <button type="button" onClick={refreshLocalReadiness}>Check Installs</button>
             </div>
           </div>
           {integrationHudError ? <p className={styles.integrationError}>{integrationHudError}</p> : null}
           {gatewayHealthError ? <p className={styles.integrationError}>{gatewayHealthError}</p> : null}
+          {localReadinessError ? <p className={styles.integrationError}>{localReadinessError}</p> : null}
           <div className={styles.integrationGrid}>
             {(integrationHud?.items ?? []).map((item) => {
               const health = healthFor(item.id);
+              const installs = installFor(item.id);
               return (
                 <article key={item.id} className={styles.integrationCard}>
                   <div className={styles.integrationMeta}>
@@ -429,6 +510,15 @@ export default function JarvisAgentClient() {
                     <span className={`${styles.healthPill} ${healthClass(health.status)}`}>
                       {health.status} · {health.httpStatus ?? "no status"} · {health.latencyMs ?? "?"}ms
                     </span>
+                  ) : null}
+                  {installs.length ? (
+                    <div className={styles.installStack}>
+                      {installs.map((install) => (
+                        <span key={install.id} className={`${styles.installPill} ${installClass(install.status)}`} title={install.reason}>
+                          {install.name}: {install.status}
+                        </span>
+                      ))}
+                    </div>
                   ) : null}
                   <small>{item.readiness} · {item.adapterId}</small>
                 </article>
@@ -539,6 +629,23 @@ export default function JarvisAgentClient() {
             </section>
 
             <section className={styles.panel}>
+              <h2>Local installation readiness</h2>
+              {localReadiness ? (
+                <ul className={styles.evidenceList}>
+                  {localReadiness.items.map((item) => (
+                    <li key={item.id}>
+                      <strong>{item.nStep} · {item.name}</strong>
+                      <span>{item.status} · {item.version ?? "no version"}</span>
+                      <span>{item.reason}</span>
+                    </li>
+                  ))}
+                </ul>
+              ) : (
+                <p>Local installation readiness loading.</p>
+              )}
+            </section>
+
+            <section className={styles.panel}>
               <h2>Live output</h2>
               {lastOutput?.output ? <pre>{lastOutput.output}</pre> : <p>No command output yet.</p>}
             </section>
@@ -566,6 +673,7 @@ export default function JarvisAgentClient() {
                 <li>Mission board</li>
                 <li>N21 public integration HUD</li>
                 <li>N21 public gateway health probe</li>
+                <li>N21 local installation readiness</li>
                 <li>Command deck</li>
                 <li>Voice orb</li>
                 <li>Commander lock</li>
