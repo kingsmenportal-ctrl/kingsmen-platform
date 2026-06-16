@@ -1,6 +1,6 @@
 import fs from "node:fs/promises";
 import path from "node:path";
-import type { StoredFreeDestinyMapIntakeSummary } from "../../../../packages/contracts/src/free-destiny-map-persistence";
+import type { StoredFreeDestinyMapIntakeSummary } from "../services/free-destiny-map-contracts";
 
 export interface FreeDestinyMapLocalRepositoryOptions {
   baseDirectory?: string;
