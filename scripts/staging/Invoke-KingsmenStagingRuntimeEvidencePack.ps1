@@ -9,6 +9,21 @@ param(
 
 $ErrorActionPreference = "Stop"
 
+function Import-LocalRuntimeEnv {
+  $envPath = Join-Path $RepoRoot ".local/kingsmen.local-postgres.env"
+  if (-not (Test-Path $envPath)) { return }
+  foreach ($line in Get-Content -Path $envPath) {
+    if ($line -match '^[A-Z0-9_]+=') {
+      $parts = $line -split '=', 2
+      $name = $parts[0]
+      $value = $parts[1]
+      if (-not [Environment]::GetEnvironmentVariable($name, 'Process')) {
+        Set-Item -Path "Env:$name" -Value $value
+      }
+    }
+  }
+}
+
 function Test-PlaceholderValue {
   param([string]$Value)
   if (-not $Value) { return $false }
@@ -17,6 +32,10 @@ function Test-PlaceholderValue {
     $trimmed -match '^<.*>$' -or
     $trimmed -match 'your .*connection string' -or
     $trimmed -match 'your .*url' -or
+    $trimmed -match 'postgresql://REAL_' -or
+    $trimmed -match 'REAL_USER' -or
+    $trimmed -match 'REAL_PASSWORD' -or
+    $trimmed -match 'REAL_HOST' -or
     $trimmed -match 'example' -or
     $trimmed -match 'placeholder'
   )
@@ -76,12 +95,27 @@ function Invoke-HealthProbe {
   }
 }
 
+function Invoke-DockerDatabaseProbe {
+  $docker = Get-Command docker -ErrorAction SilentlyContinue
+  if (-not $docker) { return [ordered]@{ attempted = $true; passed = $false; reason = "DOCKER_NOT_AVAILABLE_FOR_DB_PROBE" } }
+  if (-not $env:KINGSMEN_POSTGRES_CONTAINER) { return [ordered]@{ attempted = $true; passed = $false; reason = "KINGSMEN_POSTGRES_CONTAINER_NOT_CONFIGURED" } }
+  $dbUser = $(if ($env:KINGSMEN_POSTGRES_USER) { $env:KINGSMEN_POSTGRES_USER } else { "kingsmen" })
+  $dbName = $(if ($env:KINGSMEN_POSTGRES_DATABASE) { $env:KINGSMEN_POSTGRES_DATABASE } else { "kingsmen_truth_vault" })
+  try {
+    & $docker.Source exec $env:KINGSMEN_POSTGRES_CONTAINER psql -U $dbUser -d $dbName -v ON_ERROR_STOP=1 -q -t -c "select 1" | Out-Null
+    if ($LASTEXITCODE -eq 0) { return [ordered]@{ attempted = $true; passed = $true; reason = "DOCKER_POSTGRES_SELECT_1_OK" } }
+    return [ordered]@{ attempted = $true; passed = $false; reason = "DOCKER_POSTGRES_SELECT_1_FAILED" }
+  } catch {
+    return [ordered]@{ attempted = $true; passed = $false; reason = "DOCKER_POSTGRES_PROBE_EXCEPTION" }
+  }
+}
+
 function Invoke-DatabaseProbe {
   if (-not $RunDatabaseProbe) { return [ordered]@{ attempted = $false; passed = $false; reason = "RUN_DATABASE_PROBE_NOT_SET" } }
   if (-not $env:KINGSMEN_DATABASE_URL) { return [ordered]@{ attempted = $true; passed = $false; reason = "KINGSMEN_DATABASE_URL_NOT_CONFIGURED" } }
   if (Test-PlaceholderValue -Value $env:KINGSMEN_DATABASE_URL) { return [ordered]@{ attempted = $true; passed = $false; reason = "PLACEHOLDER_DATABASE_URL_CONFIGURED" } }
   $psql = Get-Command psql -ErrorAction SilentlyContinue
-  if (-not $psql) { return [ordered]@{ attempted = $true; passed = $false; reason = "PSQL_NOT_AVAILABLE" } }
+  if (-not $psql) { return Invoke-DockerDatabaseProbe }
 
   $oldUrl = $env:DATABASE_URL
   try {
@@ -95,6 +129,9 @@ function Invoke-DatabaseProbe {
     $env:DATABASE_URL = $oldUrl
   }
 }
+
+Import-LocalRuntimeEnv
+if (-not $BackendBaseUrl -and $env:KINGSMEN_BACKEND_BASE_URL) { $BackendBaseUrl = $env:KINGSMEN_BACKEND_BASE_URL }
 
 $databaseProbe = Invoke-DatabaseProbe
 Write-Report -Path "reports/staging/truth-vault-persistence-staging-latest.json" -Report (New-Report -Module "Truth Vault Persistence Staging Evidence" -Status ($(if ($databaseProbe.passed) { "TRUTH_VAULT_STAGING_PROBE_PASSED" } else { "PENDING_STAGING_CAPTURE" })) -Passed ([bool]$databaseProbe.passed) -Checks @(@{ name = "database_probe"; passed = [bool]$databaseProbe.passed; detail = $databaseProbe.reason }) -NextAction "Run with -RunDatabaseProbe after KINGSMEN_DATABASE_URL is configured outside Git with a real staging PostgreSQL connection string.")
