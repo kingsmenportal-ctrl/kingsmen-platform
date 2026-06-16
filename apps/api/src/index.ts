@@ -1,3 +1,4 @@
+export * from "./server";
 export * from "./kernel/command-envelope";
 export * from "./kernel/command-bus";
 export * from "./kernel/api-boundary";
