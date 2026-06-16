@@ -59,13 +59,16 @@ const requiredFileChecks = [
     'legal:prove',
     'legal:validate',
     'staging:prove:pack',
-    'staging:validate:pack'
+    'staging:validate:pack',
+    'final:prove:evidence',
+    'final:validate:evidence',
+    'final:collect:evidence'
   ]),
   checkFile('.gitignore', ['.env', '.env.*', '!.env.example', '.local/backups', 'backups/', '*.dump', '*.backup']),
   checkFile('.env.example', ['DATABASE_URL=', 'REDIS_URL=', 'SMTP_PASSWORD=', 'PAYMENT_PROVIDER_SECRET=', 'STORAGE_ACCESS_KEY=']),
-  checkFile('manifests/launch/kingsmen-launch-readiness-v1.json', ['requiredLaunchGates', 'publicLaunchStatus', 'main-branch-protection-v1', 'web_runtime_boundary', 'payfast-sandbox-proof-v1', 'rls-security-proof-v1', 'backup-restore-proof-v1', 'secrets_wiring', 'secrets-wiring-proof-v1', 'communications-proof-v1', 'observability-incident-proof-v1', 'legal-privacy-proof-v1', 'staging-runtime-proof-pack-v1', 'foundation_built_pending_staging_evidence_capture']),
-  checkFile('docs/launch/KINGSMEN_LAUNCH_READINESS.md', ['Exact blockers', 'npm run kingsmen:launch:gate', 'npm run web:validate:backend-boundary', 'npm run payments:validate:sandbox', 'npm run security:validate:rls', 'npm run backup:validate:restore', 'npm run secrets:validate:wiring', 'npm run communications:validate', 'npm run observability:validate', 'npm run legal:validate', 'npm run staging:validate:pack']),
-  checkFile('.github/workflows/kingsmen-source-guard.yml', ['name: Kingsmen Source Guard', 'source-guard', 'npm run backup:validate:restore', 'npm run secrets:validate:wiring', 'npm run communications:validate', 'npm run observability:validate', 'npm run legal:validate', 'npm run staging:validate:pack', 'npm run repo:validate:branch-protection', 'npm run kingsmen:launch:audit']),
+  checkFile('manifests/launch/kingsmen-launch-readiness-v1.json', ['requiredLaunchGates', 'publicLaunchStatus', 'main-branch-protection-v1', 'web_runtime_boundary', 'payfast-sandbox-proof-v1', 'rls-security-proof-v1', 'backup-restore-proof-v1', 'secrets_wiring', 'secrets-wiring-proof-v1', 'communications-proof-v1', 'observability-incident-proof-v1', 'legal-privacy-proof-v1', 'staging-runtime-proof-pack-v1', 'final-assembly-evidence-capture-v1', 'foundation_built_pending_final_evidence_capture_review']),
+  checkFile('docs/launch/KINGSMEN_LAUNCH_READINESS.md', ['Exact blockers', 'npm run kingsmen:launch:gate', 'npm run web:validate:backend-boundary', 'npm run payments:validate:sandbox', 'npm run security:validate:rls', 'npm run backup:validate:restore', 'npm run secrets:validate:wiring', 'npm run communications:validate', 'npm run observability:validate', 'npm run legal:validate', 'npm run staging:validate:pack', 'npm run final:validate:evidence']),
+  checkFile('.github/workflows/kingsmen-source-guard.yml', ['name: Kingsmen Source Guard', 'source-guard', 'npm run backup:validate:restore', 'npm run secrets:validate:wiring', 'npm run communications:validate', 'npm run observability:validate', 'npm run legal:validate', 'npm run staging:validate:pack', 'npm run final:validate:evidence', 'npm run repo:validate:branch-protection', 'npm run kingsmen:launch:audit']),
 
   checkFile('apps/api/package.json', ['build', 'start']),
   checkFile('apps/api/src/server.ts', ['/health', '/api/commands', '/api/workflow-results']),
@@ -138,6 +141,13 @@ const requiredFileChecks = [
   checkFile('scripts/proof/prove-staging-runtime-proof-pack.mjs', ['STAGING_RUNTIME_PROOF_PACK_SOURCE_PROOF_PASSED', 'stagingRuntimeEvidencePending: true']),
   checkFile('scripts/validators/validate-staging-runtime-proof-pack.mjs', ['STAGING_RUNTIME_PROOF_PACK_VALIDATED', 'staging:validate:pack', 'STAGING_RUNTIME_EVIDENCE_PACK_REQUIRED']),
 
+  checkFile('apps/api/src/final-assembly/final-assembly-evidence-capture-boundary.ts', ['FINAL_ASSEMBLY_EVIDENCE_CAPTURE_BOUNDARY_SOURCE_ONLY', 'requiredFinalAssemblyEvidenceReports', 'finalAssemblyEvidencePending', 'finalAssemblyFounderReviewRequired']),
+  checkFile('manifests/launch/final-assembly-evidence-capture-v1.json', ['kingsmen.final-assembly-evidence-capture.v1', 'foundation_built_pending_final_evidence_capture_review', 'reports/final-assembly/final-assembly-evidence-bundle-latest.json']),
+  checkFile('docs/launch/KINGSMEN_FINAL_ASSEMBLY_EVIDENCE_CAPTURE.md', ['Final Assembly Evidence Capture Proof', 'Production ready: **false**', 'npm run final:validate:evidence', 'Collect-KingsmenFinalAssemblyEvidence.ps1']),
+  checkFile('scripts/staging/Collect-KingsmenFinalAssemblyEvidence.ps1', ['FINAL_ASSEMBLY_EVIDENCE_BUNDLE_INCOMPLETE', 'FINAL_ASSEMBLY_EVIDENCE_BUNDLE_READY_FOR_FOUNDER_REVIEW', 'rawReportBodiesCopied = $false', 'Get-FileHash']),
+  checkFile('scripts/proof/prove-final-assembly-evidence-capture.mjs', ['FINAL_ASSEMBLY_EVIDENCE_CAPTURE_SOURCE_PROOF_PASSED', 'finalAssemblyEvidencePending: true', 'runtimeReportInventory']),
+  checkFile('scripts/validators/validate-final-assembly-evidence-capture.mjs', ['FINAL_ASSEMBLY_EVIDENCE_CAPTURE_VALIDATED', 'final:validate:evidence', 'FINAL_ASSEMBLY_EVIDENCE_CAPTURE_REQUIRED']),
+
   checkFile('packages/contracts/src/jarvis/index.ts', ['JarvisCommandEnvelope', 'tenantRef', 'correlationId', 'requestId']),
   checkFile('packages/jarvis-core/src/jarvis-policy-gate.ts', ['JARVIS_APPROVAL_REQUIRED', 'founderApprovalRef', 'JARVIS_BLOCKED_UNSAFE_ACTION']),
   checkFile('packages/jarvis-core/src/jarvis-evidence-ledger.ts', ['validator_result', 'jarvisAssertEvidenceLedgerSafe']),
@@ -191,7 +201,8 @@ for (const [path, unsafeFields] of [
   ['manifests/communications/communications-proof-v1.json', ['productionReady', 'publicLaunchAllowed', 'liveMessagesSent', 'bulkSendingAllowed']],
   ['manifests/ops/observability-incident-proof-v1.json', ['productionReady', 'publicLaunchAllowed', 'liveMonitoringConnected', 'livePagerConfigured']],
   ['manifests/legal/legal-privacy-proof-v1.json', ['productionReady', 'publicLaunchAllowed', 'finalLegalAdviceProvidedByCode']],
-  ['manifests/launch/staging-runtime-proof-pack-v1.json', ['productionReady', 'publicLaunchAllowed', 'rawSecretsAllowedInEvidence', 'rawCandidateDataAllowedInEvidence']]
+  ['manifests/launch/staging-runtime-proof-pack-v1.json', ['productionReady', 'publicLaunchAllowed', 'rawSecretsAllowedInEvidence', 'rawCandidateDataAllowedInEvidence']],
+  ['manifests/launch/final-assembly-evidence-capture-v1.json', ['productionReady', 'publicLaunchAllowed', 'finalAssemblyCanOpen', 'rawReportBodiesMayBeCopiedIntoBundle', 'rawCandidateDataAllowedInBundle', 'providerCredentialsAllowedInBundle']]
 ]) {
   try {
     const parsed = json(path);
@@ -214,7 +225,8 @@ const warningRules = [
   ['manifests/communications/communications-proof-v1.json', 'foundation_built_pending_provider_staging_proof', 'COMMUNICATIONS_PROVIDER_STAGING_PROOF_REQUIRED', 'Communications source-level boundary is built but provider staging proof is still required.', 'Candidate notifications require provider send/receive, bounce, opt-out, WhatsApp urgent-only, SMS fallback, and redacted evidence proof.', 'Run communications staging proof before enabling real candidate notifications.', ['manifests/communications/communications-proof-v1.json', 'docs/communications/KINGSMEN_COMMUNICATIONS_PROOF.md']],
   ['manifests/ops/observability-incident-proof-v1.json', 'foundation_built_pending_staging_monitoring_proof', 'OBSERVABILITY_STAGING_PROOF_REQUIRED', 'Observability and incident source-level boundary is built but staging proof is still required.', 'Public users require live health, structured log, queue/DLQ, alert, redaction, and incident drill evidence.', 'Run observability staging proof before public users.', ['manifests/ops/observability-incident-proof-v1.json', 'docs/ops/KINGSMEN_OBSERVABILITY_INCIDENT_PROOF.md']],
   ['manifests/legal/legal-privacy-proof-v1.json', 'foundation_built_pending_legal_review_and_publication_proof', 'LEGAL_PRIVACY_PUBLICATION_PROOF_REQUIRED', 'Legal/privacy source-level boundary is built but publication and review proof is still required.', 'Collecting personal data or payments requires published/versioned legal surfaces, founder/legal review, consent capture proof, refund display proof, and data-subject request proof.', 'Publish policy surfaces and capture legal/founder review plus consent/refund smoke proof before launch.', ['manifests/legal/legal-privacy-proof-v1.json', 'docs/legal/KINGSMEN_LEGAL_PRIVACY_CONSENT_REFUND_PROOF.md']],
-  ['manifests/launch/staging-runtime-proof-pack-v1.json', 'foundation_built_pending_staging_evidence_capture', 'STAGING_RUNTIME_EVIDENCE_PACK_REQUIRED', 'Staging runtime proof pack is source-built but runtime evidence is still required.', 'Final assembly requires redacted staging evidence for DB, web/API, RLS, PayFast, backup/restore, secrets, communications, observability, legal/privacy, and branch protection.', 'Run and review the staging runtime evidence pack before changing final assembly checks from pending to passed.', ['manifests/launch/staging-runtime-proof-pack-v1.json', 'docs/launch/KINGSMEN_STAGING_RUNTIME_PROOF_PACK.md']]
+  ['manifests/launch/staging-runtime-proof-pack-v1.json', 'foundation_built_pending_staging_evidence_capture', 'STAGING_RUNTIME_EVIDENCE_PACK_REQUIRED', 'Staging runtime proof pack is source-built but runtime evidence is still required.', 'Final assembly requires redacted staging evidence for DB, web/API, RLS, PayFast, backup/restore, secrets, communications, observability, legal/privacy, and branch protection.', 'Run and review the staging runtime evidence pack before changing final assembly checks from pending to passed.', ['manifests/launch/staging-runtime-proof-pack-v1.json', 'docs/launch/KINGSMEN_STAGING_RUNTIME_PROOF_PACK.md']],
+  ['manifests/launch/final-assembly-evidence-capture-v1.json', 'foundation_built_pending_final_evidence_capture_review', 'FINAL_ASSEMBLY_EVIDENCE_CAPTURE_REQUIRED', 'Final assembly evidence capture is source-built but reviewed runtime bundle is still required.', 'Public launch requires one redacted final assembly evidence bundle with every required staging report present, passed, reviewed, and hashed.', 'Run scripts/staging/Collect-KingsmenFinalAssemblyEvidence.ps1 and founder-review the bundle before opening the launch gate.', ['manifests/launch/final-assembly-evidence-capture-v1.json', 'docs/launch/KINGSMEN_FINAL_ASSEMBLY_EVIDENCE_CAPTURE.md']]
 ];
 
 for (const [path, token, code, title, detail, remediation, evidencePaths] of warningRules) {
@@ -258,6 +270,7 @@ const report = {
     observabilityRequiredBeforePublicUsers: true,
     legalPrivacyRequiredBeforeDataOrPayments: true,
     stagingRuntimeProofPackRequiredBeforeFinalAssembly: true,
+    finalAssemblyEvidenceCaptureRequiredBeforeLaunch: true,
     founderApprovalForProductionRisk: true,
     noSecretsInRepo: true,
     publicLaunchRequiresAllP0Gates: true
@@ -266,7 +279,7 @@ const report = {
   blockers,
   warnings,
   nextActions: blockers.length === 0
-    ? ['Apply GitHub branch protection, complete masked secrets runtime proof, staging runtime evidence pack, and live evidence before public traffic.']
+    ? ['Apply GitHub branch protection, complete masked secrets runtime proof, staging runtime evidence pack, final assembly evidence bundle, and live evidence before public traffic.']
     : [
         'Run API Truth Vault persistence validation and staging DB integration proof.',
         'Run web backend-boundary validation and staging smoke proof with KINGSMEN_BACKEND_BASE_URL configured.',
@@ -278,7 +291,8 @@ const report = {
         'Run communications proof, then perform provider staging send/receive, bounce, opt-out, WhatsApp urgent-only, SMS fallback, and redacted evidence proof.',
         'Run observability proof, then perform staging health, queue/DLQ, alert, redaction, and incident drill proof.',
         'Run legal/privacy proof, then publish/version policy surfaces and capture legal/founder review, consent capture proof, refund display proof, and data-subject request proof.',
-        'Run staging runtime proof pack and review all redacted evidence before final assembly.'
+        'Run staging runtime proof pack and review all redacted evidence before final assembly.',
+        'Run final assembly evidence capture and founder-review the bundle before launch.'
       ]
 };
 
