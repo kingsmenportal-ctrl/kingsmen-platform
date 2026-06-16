@@ -1,0 +1,48 @@
+{
+  "manifestKey": "rls-security-proof-v1",
+  "module": "Kingsmen RLS Security Boundary Proof",
+  "status": "foundation_built_pending_staging_proof",
+  "productionReady": false,
+  "publicLaunchAllowed": false,
+  "schemaAuthority": "PostgreSQL/Supabase Truth Vault",
+  "migrationPath": "db/migrations/0009_rls_security_boundary.sql",
+  "runtimeClaims": {
+    "roleSetting": "app.kingsmen_role",
+    "serviceContextSetting": "app.service_context",
+    "candidatePublicRefSetting": "app.candidate_public_ref",
+    "allowedRoles": [
+      "anonymous",
+      "candidate",
+      "operator",
+      "founder",
+      "service_role"
+    ]
+  },
+  "securityBoundaries": {
+    "backendServiceWritesOnly": true,
+    "serviceRoleRequiresBackendContext": true,
+    "candidateReadsOwnRowsOnly": true,
+    "candidateCannotReadProtectedEvidence": true,
+    "operatorFounderReadOnlyPolicies": true,
+    "publicRouteSourcesLimitedToVerified": true,
+    "noBroadTenantBlindPolicyInHardeningMigration": true,
+    "stagingExecutionRequired": true
+  },
+  "proofScenarios": [
+    "candidate_can_read_own_candidate_row",
+    "candidate_cannot_read_other_candidate_row",
+    "candidate_can_read_own_applications",
+    "candidate_cannot_read_protected_evidence",
+    "operator_can_read_candidate_workbench",
+    "founder_can_read_audit_events",
+    "service_role_without_backend_context_denied",
+    "service_role_with_backend_context_can_write",
+    "anonymous_cannot_read_candidate_data",
+    "public_can_read_verified_route_sources_only"
+  ],
+  "proofRunner": "scripts/proof/prove-rls-security-boundary.mjs",
+  "validator": "scripts/validators/validate-rls-security-proof.mjs",
+  "proofReport": "reports/security/rls-security-proof-latest.json",
+  "validationReport": "reports/security/rls-security-validation-latest.json",
+  "remainingConstraint": "Apply the migration to staging PostgreSQL/Supabase and run live SQL role-isolation tests before public users."
+}
