@@ -14,7 +14,7 @@ export interface SmartMobileQuestion {
 }
 
 export function buildMobileSmartQuestions(fields: ExtractedCandidateField[]): SmartMobileQuestion[] {
-  const required = [
+  const required: Array<readonly [key: string, label: string]> = [
     ["full_name", "Full names"],
     ["id_number", "ID number"],
     ["phone", "Phone number"],
@@ -25,12 +25,12 @@ export function buildMobileSmartQuestions(fields: ExtractedCandidateField[]): Sm
 
   const byKey = new Map(fields.map((f) => [f.key, f]));
 
-  return required.flatMap(([key, label]) => {
+  return required.flatMap<SmartMobileQuestion>(([key, label]) => {
     const field = byKey.get(key);
-    if (!field || !field.value) return [{ key, label, reason: "missing" as const }];
-    if (field.confidence < 0.78) return [{ key, label, reason: "low_confidence" as const, prefill: field.value }];
+    if (!field || !field.value) return [{ key, label, reason: "missing" }];
+    if (field.confidence < 0.78) return [{ key, label, reason: "low_confidence", prefill: field.value }];
     if (!field.candidateConfirmed && field.source !== "candidate") {
-      return [{ key, label, reason: "candidate_confirmation" as const, prefill: field.value }];
+      return [{ key, label, reason: "candidate_confirmation", prefill: field.value }];
     }
     return [];
   });
