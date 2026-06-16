@@ -1,61 +1,56 @@
 # Kingsmen Launch Readiness
 
-This document is the real finish-line map for launching Kingsmen. It is intentionally strict: a module can be architecturally present in the repo and still be blocked from public launch until its runtime evidence exists.
+This document is the real finish-line map for launching Kingsmen. A module can be present in the repo and still be blocked from public launch until runtime evidence exists.
 
 ## Current verdict
 
 **Public launch is blocked.**
 
-The repo has strong doctrine, contracts, migrations, module manifests, validators, local proof surfaces, a deployable backend API runtime, PostgreSQL/Supabase Truth Vault persistence foundation, a source-level safe web-to-backend boundary, a PayFast sandbox proof boundary, an RLS/security source-level boundary, a backup/restore source-level boundary, a branch-protection source boundary, a secrets wiring source boundary, a communications proof source boundary, an observability + incident proof source boundary, and a legal + privacy + consent + refund proof source boundary. It is still not safe to open to public candidates or take money because real staging proof, real PayFast sandbox provider evidence, real backup/restore drill evidence, masked runtime secret health evidence, communications provider staging evidence, observability staging monitoring evidence, legal/privacy publication proof, GitHub branch-protection application, and staging runtime gates remain closed.
-
-## How far from launch
-
-| Launch stage | Status | Meaning |
-|---|---|---|
-| Architecture / doctrine | Mostly complete | N00-N20 concepts and rules are represented in repo files. |
-| Database schema | RLS source boundary built | Truth Vault migration exists and RLS hardening migration exists. Staging SQL role-isolation proof is still required. |
-| Backend API | Runtime + persistence foundation built | `apps/api` has a package, TypeScript build config, server entrypoint, health route, command intake, workflow-result intake, read-model routes, and optional PostgreSQL Truth Vault mode. Staging DB integration proof is still required. |
-| Web / control plane | Boundary foundation built | Public Free Destiny Map and Jarvis API routes now use backend API command/health boundaries instead of local shell/JSONL writes. Staging web/API smoke proof is still required. |
-| Payments | Source-level sandbox proof built, real provider proof pending | PayFast signature/ITN/cancel/return/duplicate/replay/amount/refund/redaction proof is represented in code and validators. Real PayFast sandbox checkout against staging notify URL is still required before taking money. |
-| Backup / restore | Source-level boundary built, real staging drill pending | Backup and restore scripts, manifest, proof runner, validator, and archive gitignore rules exist. A real staging restore drill with RPO/RTO evidence is still required before production personal data. |
-| Branch protection | Source boundary built, GitHub apply pending | Source guard workflow, protection manifest, apply script, proof runner, and validator exist. GitHub `main` protection must still be applied with admin permissions. |
-| Secrets wiring | Source boundary built, runtime health pending | Credential registry, empty `.env.example`, masked health script, source proof, and validator exist. Real env vars must still be configured outside Git and checked with masked runtime reports. |
-| Communications | Source boundary built, provider proof pending | Email-primary, WhatsApp-urgent-only, SMS-backup-only, consent, opt-out, bounce handling, and no-live-send proof exist. Provider staging send/receive proof is still required before candidate notifications. |
-| Observability | Source boundary built, staging monitoring proof pending | Health checks, structured logs, correlation ID rules, DLQ review, alert categories, redaction, SEV runbook, and founder escalation proof exist. Live monitoring, alert, and incident drill proof is still required. |
-| Legal/privacy | Source boundary built, publication proof pending | Terms, Privacy Notice, Consent Notice, Refund and Payment Policy, Data Subject Request Path, and review-gate proof exist. Published/versioned policy surfaces and consent/refund smoke proof are still required. |
-| Workflow execution | Partial | Workflow codes and state machine exist; deployed n8n/worker callback proof is still required. |
-| Production operations | Blocked | Branch protection, secrets runtime proof, backup/restore staging drill, communications provider proof, observability staging proof, legal/privacy publication proof, and launch runbook are required. |
+The repo has source-level proof for backend API, PostgreSQL/Supabase Truth Vault persistence, safe web-to-backend boundary, PayFast sandbox boundary, RLS/security, backup/restore, branch protection, secrets wiring, communications, observability + incident handling, legal + privacy + consent + refund policy, and the staging runtime proof pack. It is still not safe to open to public candidates or take money because real staging evidence and final assembly runtime proof are still pending.
 
 ## Exact blockers
 
 ### P0 — Must be fixed before any public users
 
 1. **Protect `main`.** Source guard and apply script exist, but GitHub protection must still be applied and verified.
-2. **Prove Truth Vault persistence on staging.** The repository stub has been replaced with PostgreSQL-mode writes, but a live staging run must still prove command log, idempotency, workflow run, evidence ledger, audit, approval, heartbeat, and DLQ paths.
-3. **Prove RLS/security in staging.** RLS/security source-level boundary is built, but the hardening migration must be applied to staging and tested for candidate, operator, founder, anonymous, and backend service isolation.
-4. **Prove safe web-to-backend boundary in staging.** Source-level hardening is built, but the deployed web app must prove `KINGSMEN_BACKEND_BASE_URL` calls API health and command intake without local shell, local file writes, or direct database access.
-5. **Prove PayFast sandbox + ITN against provider sandbox.** Source-level proof exists, but no real payments until sandbox success/cancel/return/failure/duplicate/invalid-signature/replay/amount-mismatch/refund-review evidence exists from staging.
-6. **Prove backup and restore.** Source-level scripts exist, but no production personal data until a real staging restore drill proves backup archive checksum, target/source separation, counts-only verification, RPO/RTO, and secret/raw-data redaction.
-7. **Wire secrets outside git.** Source-level secrets wiring proof exists, but launch still requires masked runtime health evidence proving required environment variables are configured outside Git without printing values.
-8. **Prove communications provider boundary.** Source-level communications proof exists, but candidate notifications require provider staging send/receive, bounce, opt-out, WhatsApp urgent-only, SMS fallback-only, and redacted-evidence proof.
-9. **Prove observability and incident handling.** Source-level observability + incident proof exists, but public users require staging health, logs, queue/DLQ, alert, redaction, and SEV runbook evidence.
-10. **Publish privacy, consent, terms, and refund policy.** Source-level legal/privacy proof exists, but launch still requires published/versioned surfaces, founder/legal review, consent capture proof, refund/payment display proof, and data-subject request proof.
+2. **Prove Truth Vault persistence on staging.** A live staging run must prove command log, idempotency, workflow run, evidence ledger, audit, approval, heartbeat, and DLQ paths.
+3. **Prove RLS/security in staging.** Apply the hardening migration to staging and test candidate, operator, founder, anonymous, and backend service isolation.
+4. **Prove safe web-to-backend boundary in staging.** The deployed web app must prove `KINGSMEN_BACKEND_BASE_URL` calls API health and command intake without local shell, local file writes, or direct database access.
+5. **Prove PayFast sandbox + ITN against provider sandbox.** No real payments until sandbox success/cancel/return/failure/duplicate/invalid-signature/replay/amount-mismatch/refund-review evidence exists from staging.
+6. **Prove backup and restore.** No production personal data until a real staging restore drill proves backup archive checksum, target/source separation, counts-only verification, RPO/RTO, and redaction.
+7. **Wire secrets outside git.** Launch requires masked runtime health evidence proving required environment variables are configured outside Git without printing values.
+8. **Prove communications provider boundary.** Candidate notifications require provider staging send/receive, bounce, opt-out, WhatsApp urgent-only, SMS fallback-only, and redacted evidence proof.
+9. **Prove observability and incident handling.** Public users require staging health, logs, queue/DLQ, alerts, redaction, and SEV runbook evidence.
+10. **Publish privacy, consent, terms, and refund policy.** Launch requires published/versioned surfaces, founder/legal review, consent capture proof, refund/payment display proof, and data-subject request proof.
+11. **Capture the staging runtime proof pack.** Final assembly must not open until the staging runtime proof pack contains reviewed redacted runtime evidence for all P0 gates.
 
-### P1 — Must be fixed before paid pilot
+## Source proof command stack
 
-1. Add real email provider send proof and bounce/failure handling.
-2. Add founder/operator dashboard that reads from backend read models, not local shell commands.
-3. Add live DLQ review and incident workflow drill.
-4. Add staging deploy proof for web + API + database.
-5. Add tenant-scoped founder console views.
+Run these commands for source-level proof only:
 
-### P2 — Must be fixed before scaling
-
-1. Publish internal packages only after strict `files` whitelists and package dry runs.
-2. Add SDK package for web/control-plane/workers.
-3. Add load tests under the 500 active-candidate cap.
-4. Add automated regression tests for N00-N20 invariants.
-5. Add N21-N23 Mirror/Adapt/Copy reality-intelligence modules after the immediate launch blockers.
+```bash
+npm run api:validate:truth-vault
+npm run web:validate:backend-boundary
+npm run payments:prove:sandbox
+npm run payments:validate:sandbox
+npm run security:prove:rls
+npm run security:validate:rls
+npm run backup:prove:restore
+npm run backup:validate:restore
+npm run secrets:prove:wiring
+npm run secrets:validate:wiring
+npm run communications:prove
+npm run communications:validate
+npm run observability:prove
+npm run observability:validate
+npm run legal:prove
+npm run legal:validate
+npm run staging:prove:pack
+npm run staging:validate:pack
+npm run repo:prove:branch-protection
+npm run repo:validate:branch-protection
+npm run kingsmen:launch:audit
+```
 
 ## API runtime command
 
@@ -100,47 +95,26 @@ npm run web:validate:backend-boundary
 
 ## Payment proof command
 
-Source-level proof:
-
 ```bash
 npm run payments:prove:sandbox
-```
-
-Validator:
-
-```bash
 npm run payments:validate:sandbox
 ```
 
-This still does not authorize live payments. It only proves the source-level boundary. Before paid pilot, run real PayFast sandbox checkout against a staging notify URL and keep the generated proof reports.
+This does not authorize live payments. Run real PayFast sandbox checkout against a staging notify URL before paid pilot.
 
 ## RLS/security proof command
 
-Source-level proof:
-
 ```bash
 npm run security:prove:rls
-```
-
-Validator:
-
-```bash
 npm run security:validate:rls
 ```
 
-This still does not authorize public candidate traffic. Before public users, apply the RLS hardening migration to staging and capture live SQL role-isolation proof.
+This does not authorize public candidate traffic. Apply the RLS hardening migration to staging and capture live SQL role-isolation proof.
 
 ## Backup/restore proof command
 
-Source-level proof:
-
 ```bash
 npm run backup:prove:restore
-```
-
-Validator:
-
-```bash
 npm run backup:validate:restore
 ```
 
@@ -155,19 +129,10 @@ $env:KINGSMEN_RESTORE_DRILL_DATABASE_URL = "[restore-drill-database-url-set-outs
 .\scripts\backup\Test-KingsmenTruthVaultRestore.ps1 -BackupFile "D:\KingsmenBackups\...\kingsmen-truth-vault-....dump"
 ```
 
-This still does not authorize production personal data. It only proves the backup/restore source boundary. Before production data, run a real staging restore drill and store counts-only evidence with RPO/RTO.
-
 ## Branch protection command
-
-Source-level proof:
 
 ```bash
 npm run repo:prove:branch-protection
-```
-
-Validator:
-
-```bash
 npm run repo:validate:branch-protection
 ```
 
@@ -177,25 +142,10 @@ Apply GitHub branch protection with admin permissions:
 .\scripts\github\Set-KingsmenMainBranchProtection.ps1
 ```
 
-Dry run:
-
-```powershell
-.\scripts\github\Set-KingsmenMainBranchProtection.ps1 -DryRun
-```
-
-This still does not prove GitHub settings are active until the apply script passes and GitHub confirms `main` requires `source-guard`, blocks force push/deletion, and requires pull-request review.
-
 ## Secrets wiring proof command
-
-Source-level proof:
 
 ```bash
 npm run secrets:prove:wiring
-```
-
-Validator:
-
-```bash
 npm run secrets:validate:wiring
 ```
 
@@ -205,97 +155,60 @@ Masked runtime health check:
 .\scripts\security\Test-KingsmenSecretWiring.ps1
 ```
 
-This still does not authorize public launch. Real secrets must live only in local `.env`, GitHub Secrets, Oracle environment variables, or future vault/KMS. Reports may show only configured/not-configured/masked status and must never print values, URLs, token prefixes, private keys, service-role keys, or provider secrets.
+Reports may show only configured/not-configured/masked status and must never print values, URLs, token prefixes, private keys, service-role keys, or provider secrets.
 
 ## Communications proof command
 
-Source-level proof:
-
 ```bash
 npm run communications:prove
-```
-
-Validator:
-
-```bash
 npm run communications:validate
 ```
 
-Provider staging proof still required:
-
-```txt
-SMTP or email-provider sandbox send/receive
-bounce handling
-unsubscribe/opt-out path
-WhatsApp urgent-only approval evidence
-SMS fallback-only evidence
-redacted evidence report with no recipient address or raw message body
-```
-
-This still does not authorize real candidate notifications. It only proves the source-level communications boundary.
+Provider staging proof still required: email send/receive, bounce handling, opt-out path, WhatsApp urgent-only approval evidence, SMS fallback-only evidence, and redacted evidence report.
 
 ## Observability + incident proof command
 
-Source-level proof:
-
 ```bash
 npm run observability:prove
-```
-
-Validator:
-
-```bash
 npm run observability:validate
 ```
 
-Staging observability proof still required:
-
-```txt
-API health proof
-database health proof
-queue and DLQ proof
-structured log sample with correlationId
-payment failure alert proof
-RLS/security alert proof
-backup/restore alert proof
-communications failure alert proof
-SEV1/SEV2/SEV3 incident drill
-founder escalation path
-no PII or secrets in logs proof
-```
-
-This still does not authorize public users. It only proves the source-level observability and incident boundary.
+Staging observability proof still required: API health proof, database health proof, queue/DLQ proof, structured log sample with correlationId, alert proof, SEV1/SEV2/SEV3 incident drill, founder escalation, and no PII or secrets in logs proof.
 
 ## Legal + privacy + consent + refund proof command
 
-Source-level proof:
-
 ```bash
 npm run legal:prove
-```
-
-Validator:
-
-```bash
 npm run legal:validate
 ```
 
-Publication and review proof still required:
+Publication and review proof still required: published Terms of Service, Privacy Notice, Consent Notice, Refund and Payment Policy, Data Subject Request Path, founder/legal review record with policy versions, consent capture smoke proof, refund/payment display proof, and no personal data collection before privacy notice proof.
 
-```txt
-published Terms of Service
-published Privacy Notice
-published Consent Notice
-published Refund and Payment Policy
-published Data Subject Request Path
-founder/legal review record with policy versions
-consent capture smoke proof with timestamp and policy version
-refund/payment policy display proof before checkout
-no personal data collection before privacy notice proof
-no payment flow before refund/payment terms proof
+## Staging runtime proof pack command
+
+```bash
+npm run staging:prove:pack
+npm run staging:validate:pack
 ```
 
-This still does not authorize collecting personal data or taking payments. It only proves the source-level legal/privacy boundary.
+See `docs/launch/KINGSMEN_STAGING_RUNTIME_PROOF_PACK.md`.
+
+The staging runtime proof pack requires these redacted runtime reports:
+
+```txt
+reports/staging/truth-vault-persistence-staging-latest.json
+reports/staging/web-backend-boundary-staging-latest.json
+reports/staging/rls-sql-isolation-staging-latest.json
+reports/staging/payfast-provider-sandbox-staging-latest.json
+reports/staging/backup-restore-drill-staging-latest.json
+reports/security/secrets-wiring-runtime-health-latest.json
+reports/staging/communications-provider-staging-latest.json
+reports/staging/observability-incident-staging-latest.json
+reports/staging/legal-privacy-publication-staging-latest.json
+reports/repo/main-branch-protection-apply-latest.json
+```
+
+The staging pack is source-built, but runtime evidence remains pending until those files exist and are reviewed.
 
 ## Launch command
 
@@ -316,7 +229,7 @@ The gate must remain blocked until the P0 launch blockers are fixed and evidence
 ## Launch phases
 
 1. **Repo lock:** protect main, require validators, stop accidental package/release mistakes.
-2. **Staging runtime:** run API + web + PostgreSQL/Supabase + internal command flow.
+2. **Staging runtime:** run API + web + PostgreSQL/Supabase + internal command flow + staging runtime proof pack.
 3. **Founder private beta:** process a small number of real test candidates manually with evidence.
-4. **Paid pilot:** only after PayFast, refunds, support, backup/restore, communications proof, legal/privacy proof, incident response, and observability proof pass.
+4. **Paid pilot:** only after PayFast, refunds, support, backup/restore, communications proof, legal/privacy proof, incident response, observability proof, and staging pack pass.
 5. **Public launch:** only after every required launch gate opens.
