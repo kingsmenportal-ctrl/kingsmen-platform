@@ -56,6 +56,12 @@ jobs:
       - name: Secrets wiring validator
         run: npm run secrets:validate:wiring
 
+      - name: Communications source proof
+        run: npm run communications:prove
+
+      - name: Communications validator
+        run: npm run communications:validate
+
       - name: Branch protection source proof
         run: npm run repo:prove:branch-protection
 
