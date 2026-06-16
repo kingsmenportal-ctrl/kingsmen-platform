@@ -56,12 +56,34 @@ type PublicIntegrationHud = {
   items: PublicIntegrationHudItem[];
 };
 
+type PublicGatewayHealthItem = {
+  id: string;
+  name: string;
+  status: "green" | "yellow" | "red";
+  httpStatus: number | null;
+  latencyMs: number | null;
+  reason: string;
+};
+
+type PublicGatewayHealth = {
+  ok: boolean;
+  summary: {
+    total: number;
+    green: number;
+    yellow: number;
+    red: number;
+    checkedAt: string;
+  };
+  items: PublicGatewayHealthItem[];
+};
+
 const wakeGreeting =
   "Welcome to Kingsmen Command, Commander. Jarvis is online. The command house is awake, your desk is prepared, and I stand ready.";
 
 const commandCards: CommandCard[] = [
   { label: "System status", tool: "SYSTEM_STATUS", message: "system status", risk: "safe", surface: "System Health" },
   { label: "Integration HUD", tool: "PUBLIC_INTEGRATION_HUD", message: "show public integration HUD", risk: "safe", surface: "N21 Gates" },
+  { label: "Health Probe", tool: "PUBLIC_GATEWAY_HEALTH", message: "run public gateway health probe", risk: "safe", surface: "N21 Gates" },
   { label: "Validate N20", tool: "VALIDATE_N20", message: "validate N20", risk: "approval", surface: "Validation" },
   { label: "Run build", tool: "RUN_WEB_BUILD", message: "run web build", risk: "approval", surface: "Build" },
   { label: "Database scan", tool: "DATABASE_SCAN", message: "database scan", risk: "review", surface: "Read Model" },
@@ -105,12 +127,20 @@ function confidenceFor(message?: Message) {
   return "dialogue";
 }
 
+function healthClass(status: PublicGatewayHealthItem["status"]) {
+  if (status === "green") return styles.healthGreen;
+  if (status === "yellow") return styles.healthYellow;
+  return styles.healthRed;
+}
+
 export default function JarvisAgentClient() {
   const [input, setInput] = useState("system status");
   const [running, setRunning] = useState(false);
   const [voiceState, setVoiceState] = useState("voice ready");
   const [integrationHud, setIntegrationHud] = useState<PublicIntegrationHud | null>(null);
   const [integrationHudError, setIntegrationHudError] = useState<string | null>(null);
+  const [gatewayHealth, setGatewayHealth] = useState<PublicGatewayHealth | null>(null);
+  const [gatewayHealthError, setGatewayHealthError] = useState<string | null>(null);
   const [messages, setMessages] = useState<Message[]>([
     {
       role: "jarvis",
@@ -134,6 +164,10 @@ export default function JarvisAgentClient() {
     return messages.filter((message) => message.role === "jarvis" && (message.evidencePath || message.tool || message.error));
   }, [messages]);
 
+  function healthFor(id: string) {
+    return gatewayHealth?.items.find((item) => item.id === id) ?? null;
+  }
+
   async function refreshIntegrationHud() {
     try {
       const response = await fetch("/api/jarvis/public-repos/hud", { cache: "no-store" });
@@ -149,18 +183,50 @@ export default function JarvisAgentClient() {
     }
   }
 
+  async function refreshGatewayHealth() {
+    try {
+      const response = await fetch("/api/jarvis/public-repos/health", { cache: "no-store" });
+      const payload = (await response.json()) as PublicGatewayHealth;
+      if (!response.ok || !payload.ok) {
+        setGatewayHealthError("public gateway health unavailable");
+        return;
+      }
+      setGatewayHealth(payload);
+      setGatewayHealthError(null);
+    } catch (error) {
+      setGatewayHealthError(error instanceof Error ? error.message : "public gateway health request failed");
+    }
+  }
+
   async function runAgent(message: string, tool?: string) {
     const clean = message.trim();
     if (!clean || running) return;
 
-    if (clean.toLowerCase().includes("public integration hud")) {
-      await refreshIntegrationHud();
+    if (tool === "PUBLIC_GATEWAY_HEALTH" || clean.toLowerCase().includes("gateway health") || clean.toLowerCase().includes("health probe")) {
+      await refreshGatewayHealth();
       setMessages((items) => [
         ...items,
         { role: "founder", text: clean },
         {
           role: "jarvis",
-          text: "Commander, the public integration HUD is refreshed. It shows Docling, Playwright, Voice, Trace Evidence, and Security Scan gates with their live routes and safety boundaries.",
+          text: "Commander, the public gateway health probe is refreshed. It checks local GET routes only and reports green, yellow, or red without executing POST actions or tools.",
+          ok: true,
+          tool: "PUBLIC_GATEWAY_HEALTH"
+        }
+      ]);
+      speak("Commander, the public gateway health probe is refreshed.");
+      return;
+    }
+
+    if (clean.toLowerCase().includes("public integration hud")) {
+      await refreshIntegrationHud();
+      await refreshGatewayHealth();
+      setMessages((items) => [
+        ...items,
+        { role: "founder", text: clean },
+        {
+          role: "jarvis",
+          text: "Commander, the public integration HUD is refreshed. It shows Docling, Playwright, Voice, Trace Evidence, and Security Scan gates with their live routes, safety boundaries, and local route health.",
           ok: true,
           tool: "PUBLIC_INTEGRATION_HUD"
         }
@@ -296,6 +362,7 @@ export default function JarvisAgentClient() {
 
   useEffect(() => {
     refreshIntegrationHud();
+    refreshGatewayHealth();
     return () => {
       streamRef.current?.getTracks().forEach((track) => track.stop());
       if ("speechSynthesis" in window) window.speechSynthesis.cancel();
@@ -338,22 +405,35 @@ export default function JarvisAgentClient() {
             <div>
               <span>N21 PUBLIC INTEGRATION HUD</span>
               <strong>{integrationHud ? `${integrationHud.summary.liveRoutes}/${integrationHud.summary.total} live routes` : "loading"}</strong>
+              <small>{gatewayHealth ? `${gatewayHealth.summary.green} green · ${gatewayHealth.summary.yellow} yellow · ${gatewayHealth.summary.red} red` : "health probe loading"}</small>
             </div>
-            <button type="button" onClick={refreshIntegrationHud}>Refresh HUD</button>
+            <div className={styles.integrationActions}>
+              <button type="button" onClick={refreshIntegrationHud}>Refresh HUD</button>
+              <button type="button" onClick={refreshGatewayHealth}>Probe Health</button>
+            </div>
           </div>
           {integrationHudError ? <p className={styles.integrationError}>{integrationHudError}</p> : null}
+          {gatewayHealthError ? <p className={styles.integrationError}>{gatewayHealthError}</p> : null}
           <div className={styles.integrationGrid}>
-            {(integrationHud?.items ?? []).map((item) => (
-              <article key={item.id} className={styles.integrationCard}>
-                <div className={styles.integrationMeta}>
-                  <span>{item.nStep}</span>
-                  <strong>{item.name}</strong>
-                </div>
-                <p>{item.safetyBoundary}</p>
-                <code>{item.liveRoute}</code>
-                <small>{item.readiness} · {item.adapterId}</small>
-              </article>
-            ))}
+            {(integrationHud?.items ?? []).map((item) => {
+              const health = healthFor(item.id);
+              return (
+                <article key={item.id} className={styles.integrationCard}>
+                  <div className={styles.integrationMeta}>
+                    <span>{item.nStep}</span>
+                    <strong>{item.name}</strong>
+                  </div>
+                  <p>{item.safetyBoundary}</p>
+                  <code>{item.liveRoute}</code>
+                  {health ? (
+                    <span className={`${styles.healthPill} ${healthClass(health.status)}`}>
+                      {health.status} · {health.httpStatus ?? "no status"} · {health.latencyMs ?? "?"}ms
+                    </span>
+                  ) : null}
+                  <small>{item.readiness} · {item.adapterId}</small>
+                </article>
+              );
+            })}
           </div>
         </section>
 
@@ -442,12 +522,16 @@ export default function JarvisAgentClient() {
               <h2>Public integration status</h2>
               {integrationHud ? (
                 <ul className={styles.evidenceList}>
-                  {integrationHud.items.map((item) => (
-                    <li key={item.id}>
-                      <strong>{item.nStep} · {item.name}</strong>
-                      <span>{item.readiness} · {item.liveRoute}</span>
-                    </li>
-                  ))}
+                  {integrationHud.items.map((item) => {
+                    const health = healthFor(item.id);
+                    return (
+                      <li key={item.id}>
+                        <strong>{item.nStep} · {item.name}</strong>
+                        <span>{item.readiness} · {item.liveRoute}</span>
+                        {health ? <span>{health.status} · HTTP {health.httpStatus ?? "none"} · {health.reason}</span> : null}
+                      </li>
+                    );
+                  })}
                 </ul>
               ) : (
                 <p>Public integration HUD loading.</p>
@@ -481,6 +565,7 @@ export default function JarvisAgentClient() {
                 <li>Real build lock</li>
                 <li>Mission board</li>
                 <li>N21 public integration HUD</li>
+                <li>N21 public gateway health probe</li>
                 <li>Command deck</li>
                 <li>Voice orb</li>
                 <li>Commander lock</li>
