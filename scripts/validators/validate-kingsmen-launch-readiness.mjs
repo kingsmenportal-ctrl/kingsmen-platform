@@ -55,13 +55,15 @@ const requiredFileChecks = [
     'communications:prove',
     'communications:validate',
     'observability:prove',
-    'observability:validate'
+    'observability:validate',
+    'legal:prove',
+    'legal:validate'
   ]),
   checkFile('.gitignore', ['.env', '.env.*', '!.env.example', '.local/backups', 'backups/', '*.dump', '*.backup']),
   checkFile('.env.example', ['DATABASE_URL=', 'REDIS_URL=', 'SMTP_PASSWORD=', 'PAYMENT_PROVIDER_SECRET=', 'STORAGE_ACCESS_KEY=']),
-  checkFile('manifests/launch/kingsmen-launch-readiness-v1.json', ['requiredLaunchGates', 'publicLaunchStatus', 'main-branch-protection-v1', 'web_runtime_boundary', 'payfast-sandbox-proof-v1', 'rls-security-proof-v1', 'backup-restore-proof-v1', 'secrets_wiring', 'secrets-wiring-proof-v1', 'communications-proof-v1', 'observability-incident-proof-v1', 'foundation_built_pending_staging_monitoring_proof']),
-  checkFile('docs/launch/KINGSMEN_LAUNCH_READINESS.md', ['Exact blockers', 'npm run kingsmen:launch:gate', 'npm run web:validate:backend-boundary', 'npm run payments:validate:sandbox', 'npm run security:validate:rls', 'npm run backup:validate:restore', 'npm run secrets:validate:wiring', 'npm run communications:validate', 'npm run observability:validate']),
-  checkFile('.github/workflows/kingsmen-source-guard.yml', ['name: Kingsmen Source Guard', 'source-guard', 'npm run backup:validate:restore', 'npm run secrets:validate:wiring', 'npm run communications:validate', 'npm run observability:validate', 'npm run repo:validate:branch-protection', 'npm run kingsmen:launch:audit']),
+  checkFile('manifests/launch/kingsmen-launch-readiness-v1.json', ['requiredLaunchGates', 'publicLaunchStatus', 'main-branch-protection-v1', 'web_runtime_boundary', 'payfast-sandbox-proof-v1', 'rls-security-proof-v1', 'backup-restore-proof-v1', 'secrets_wiring', 'secrets-wiring-proof-v1', 'communications-proof-v1', 'observability-incident-proof-v1', 'legal-privacy-proof-v1', 'foundation_built_pending_legal_review_and_publication_proof']),
+  checkFile('docs/launch/KINGSMEN_LAUNCH_READINESS.md', ['Exact blockers', 'npm run kingsmen:launch:gate', 'npm run web:validate:backend-boundary', 'npm run payments:validate:sandbox', 'npm run security:validate:rls', 'npm run backup:validate:restore', 'npm run secrets:validate:wiring', 'npm run communications:validate', 'npm run observability:validate', 'npm run legal:validate']),
+  checkFile('.github/workflows/kingsmen-source-guard.yml', ['name: Kingsmen Source Guard', 'source-guard', 'npm run backup:validate:restore', 'npm run secrets:validate:wiring', 'npm run communications:validate', 'npm run observability:validate', 'npm run legal:validate', 'npm run repo:validate:branch-protection', 'npm run kingsmen:launch:audit']),
 
   checkFile('apps/api/package.json', ['build', 'start']),
   checkFile('apps/api/src/server.ts', ['/health', '/api/commands', '/api/workflow-results']),
@@ -122,6 +124,12 @@ const requiredFileChecks = [
   checkFile('scripts/proof/prove-observability-incident-boundary.mjs', ['OBSERVABILITY_INCIDENT_SOURCE_PROOF_PASSED', 'stagingRuntimeProofPending: true']),
   checkFile('scripts/validators/validate-observability-incident-proof.mjs', ['OBSERVABILITY_INCIDENT_PROOF_VALIDATED', 'observability:validate', 'OBSERVABILITY_STAGING_PROOF_REQUIRED']),
 
+  checkFile('apps/api/src/legal/legal-privacy-proof-boundary.ts', ['LEGAL_PRIVACY_BOUNDARY_SOURCE_ONLY', 'popiaPrivacyNoticeRequired', 'cpaRefundTermsRequired', 'consentCaptureRequired', 'refundHumanReviewRequired']),
+  checkFile('manifests/legal/legal-privacy-proof-v1.json', ['kingsmen.legal-privacy-proof.v1', 'foundation_built_pending_legal_review_and_publication_proof', 'Terms of Service', 'Privacy Notice', 'Refund and Payment Policy']),
+  checkFile('docs/legal/KINGSMEN_LEGAL_PRIVACY_CONSENT_REFUND_PROOF.md', ['Production ready: **false**', 'Public launch allowed: **false**', 'Terms of Service', 'Privacy Notice', 'Refund and Payment Policy', 'npm run legal:validate']),
+  checkFile('scripts/proof/prove-legal-privacy-boundary.mjs', ['LEGAL_PRIVACY_SOURCE_PROOF_PASSED', 'providerRuntimeProofPending: true']),
+  checkFile('scripts/validators/validate-legal-privacy-proof.mjs', ['LEGAL_PRIVACY_PROOF_VALIDATED', 'legal:validate', 'LEGAL_PRIVACY_PUBLICATION_PROOF_REQUIRED']),
+
   checkFile('packages/contracts/src/jarvis/index.ts', ['JarvisCommandEnvelope', 'tenantRef', 'correlationId', 'requestId']),
   checkFile('packages/jarvis-core/src/jarvis-policy-gate.ts', ['JARVIS_APPROVAL_REQUIRED', 'founderApprovalRef', 'JARVIS_BLOCKED_UNSAFE_ACTION']),
   checkFile('packages/jarvis-core/src/jarvis-evidence-ledger.ts', ['validator_result', 'jarvisAssertEvidenceLedgerSafe']),
@@ -141,13 +149,7 @@ function warn(code, title, detail, remediation, evidencePaths = []) {
 
 for (const check of requiredFileChecks) {
   if (!check.passed) {
-    block(
-      'REQUIRED_FILE_OR_TOKEN_MISSING',
-      `Required launch evidence missing: ${check.path}`,
-      check.exists ? `Missing tokens: ${check.missingTokens.join(', ')}` : 'File does not exist.',
-      'Restore the file/tokens or update the launch manifest only with equivalent evidence.',
-      [check.path]
-    );
+    block('REQUIRED_FILE_OR_TOKEN_MISSING', `Required launch evidence missing: ${check.path}`, check.exists ? `Missing tokens: ${check.missingTokens.join(', ')}` : 'File does not exist.', 'Restore the file/tokens or update the launch manifest only with equivalent evidence.', [check.path]);
   }
 }
 
@@ -160,13 +162,11 @@ try {
   block('PACKAGE_JSON_INVALID', 'package.json is invalid JSON.', String(error), 'Repair package.json.', ['package.json']);
 }
 
-const publicWebRoutes = [
+for (const routePath of [
   'apps/web/src/app/api/jarvis/status/route.ts',
   'apps/web/src/app/api/jarvis/command/route.ts',
   'apps/web/src/app/api/public/free-destiny-map/intake/local/route.ts'
-];
-
-for (const routePath of publicWebRoutes) {
+]) {
   const route = read(routePath) ?? '';
   const unsafeTokens = ['node:child_process', 'appendFile', 'appendFileSync', 'writeFileSync', 'data/local', 'psql.exe'];
   if ((route.includes('C:') && route.includes('Kingsmen')) || unsafeTokens.some((token) => route.includes(token))) {
@@ -181,7 +181,8 @@ for (const [path, unsafeFields] of [
   ['manifests/repo/main-branch-protection-v1.json', ['productionReady', 'publicLaunchAllowed']],
   ['manifests/credentials/secrets-wiring-proof-v1.json', ['productionReady', 'publicLaunchAllowed', 'liveSecretsCommitted', 'rawSecretsInReportsAllowed']],
   ['manifests/communications/communications-proof-v1.json', ['productionReady', 'publicLaunchAllowed', 'liveMessagesSent', 'bulkSendingAllowed']],
-  ['manifests/ops/observability-incident-proof-v1.json', ['productionReady', 'publicLaunchAllowed', 'liveMonitoringConnected', 'livePagerConfigured']]
+  ['manifests/ops/observability-incident-proof-v1.json', ['productionReady', 'publicLaunchAllowed', 'liveMonitoringConnected', 'livePagerConfigured']],
+  ['manifests/legal/legal-privacy-proof-v1.json', ['productionReady', 'publicLaunchAllowed', 'finalLegalAdviceProvidedByCode']]
 ]) {
   try {
     const parsed = json(path);
@@ -196,34 +197,20 @@ for (const [path, unsafeFields] of [
   }
 }
 
-const branchManifest = read('manifests/repo/main-branch-protection-v1.json');
-if (branchManifest?.includes('foundation_built_pending_github_apply')) {
-  warn('MAIN_BRANCH_PROTECTION_APPLY_REQUIRED', 'Branch protection source boundary is built but GitHub protection must still be applied.', 'The workflow and apply script exist, but main is not proven protected until GitHub settings confirm source-guard is required and force-push/deletion are disabled.', 'Run scripts/github/Set-KingsmenMainBranchProtection.ps1 with GitHub admin permissions and verify through GitHub UI or gh api.', ['scripts/github/Set-KingsmenMainBranchProtection.ps1']);
-}
+const warningRules = [
+  ['manifests/repo/main-branch-protection-v1.json', 'foundation_built_pending_github_apply', 'MAIN_BRANCH_PROTECTION_APPLY_REQUIRED', 'Branch protection source boundary is built but GitHub protection must still be applied.', 'The workflow and apply script exist, but main is not proven protected until GitHub settings confirm source-guard is required and force-push/deletion are disabled.', 'Run scripts/github/Set-KingsmenMainBranchProtection.ps1 with GitHub admin permissions and verify through GitHub UI or gh api.', ['scripts/github/Set-KingsmenMainBranchProtection.ps1']],
+  ['manifests/security/rls-security-proof-v1.json', 'foundation_built_pending_staging_proof', 'RLS_STAGING_PROOF_REQUIRED', 'RLS/security source-level boundary is built but staging proof is still required.', 'Live SQL role-isolation proof against staging PostgreSQL/Supabase is required before public users.', 'Apply db/migrations/0009_rls_security_boundary.sql to staging and store a passing live proof report.', ['db/migrations/0009_rls_security_boundary.sql']],
+  ['manifests/ops/backup-restore-proof-v1.json', 'foundation_built_pending_staging_drill', 'BACKUP_RESTORE_STAGING_DRILL_REQUIRED', 'Backup/restore source-level boundary is built but staging restore proof is still required.', 'Production personal data requires a live backup and restore drill with RPO/RTO evidence.', 'Run the backup and restore PowerShell scripts against staging and store a counts-only report.', ['scripts/backup/New-KingsmenTruthVaultBackup.ps1', 'scripts/backup/Test-KingsmenTruthVaultRestore.ps1']],
+  ['manifests/credentials/secrets-wiring-proof-v1.json', 'foundation_built_pending_runtime_secret_health_proof', 'SECRETS_RUNTIME_HEALTH_PROOF_REQUIRED', 'Secrets wiring source-level boundary is built but masked runtime health proof is still required.', 'Real environment variables must be configured outside Git and checked with masked status-only reports before staging/public launch.', 'Run scripts/security/Test-KingsmenSecretWiring.ps1 in staging/Oracle after configuring env vars outside Git.', ['scripts/security/Test-KingsmenSecretWiring.ps1', 'manifests/credentials/secrets-wiring-proof-v1.json']],
+  ['manifests/communications/communications-proof-v1.json', 'foundation_built_pending_provider_staging_proof', 'COMMUNICATIONS_PROVIDER_STAGING_PROOF_REQUIRED', 'Communications source-level boundary is built but provider staging proof is still required.', 'Candidate notifications require provider send/receive, bounce, opt-out, WhatsApp urgent-only, SMS fallback, and redacted evidence proof.', 'Run communications staging proof before enabling real candidate notifications.', ['manifests/communications/communications-proof-v1.json', 'docs/communications/KINGSMEN_COMMUNICATIONS_PROOF.md']],
+  ['manifests/ops/observability-incident-proof-v1.json', 'foundation_built_pending_staging_monitoring_proof', 'OBSERVABILITY_STAGING_PROOF_REQUIRED', 'Observability and incident source-level boundary is built but staging proof is still required.', 'Public users require live health, structured log, queue/DLQ, alert, redaction, and incident drill evidence.', 'Run observability staging proof before public users.', ['manifests/ops/observability-incident-proof-v1.json', 'docs/ops/KINGSMEN_OBSERVABILITY_INCIDENT_PROOF.md']],
+  ['manifests/legal/legal-privacy-proof-v1.json', 'foundation_built_pending_legal_review_and_publication_proof', 'LEGAL_PRIVACY_PUBLICATION_PROOF_REQUIRED', 'Legal/privacy source-level boundary is built but publication and review proof is still required.', 'Collecting personal data or payments requires published/versioned legal surfaces, founder/legal review, consent capture proof, refund display proof, and data-subject request proof.', 'Publish policy surfaces and capture legal/founder review plus consent/refund smoke proof before launch.', ['manifests/legal/legal-privacy-proof-v1.json', 'docs/legal/KINGSMEN_LEGAL_PRIVACY_CONSENT_REFUND_PROOF.md']]
+];
 
-const rlsManifest = read('manifests/security/rls-security-proof-v1.json');
-if (rlsManifest?.includes('foundation_built_pending_staging_proof')) {
-  warn('RLS_STAGING_PROOF_REQUIRED', 'RLS/security source-level boundary is built but staging proof is still required.', 'Live SQL role-isolation proof against staging PostgreSQL/Supabase is required before public users.', 'Apply db/migrations/0009_rls_security_boundary.sql to staging and store a passing live proof report.', ['db/migrations/0009_rls_security_boundary.sql']);
-}
-
-const backupManifest = read('manifests/ops/backup-restore-proof-v1.json');
-if (backupManifest?.includes('foundation_built_pending_staging_drill')) {
-  warn('BACKUP_RESTORE_STAGING_DRILL_REQUIRED', 'Backup/restore source-level boundary is built but staging restore proof is still required.', 'Production personal data requires a live backup and restore drill with RPO/RTO evidence.', 'Run the backup and restore PowerShell scripts against staging and store a counts-only report.', ['scripts/backup/New-KingsmenTruthVaultBackup.ps1', 'scripts/backup/Test-KingsmenTruthVaultRestore.ps1']);
-}
-
-const secretsManifest = read('manifests/credentials/secrets-wiring-proof-v1.json');
-if (secretsManifest?.includes('foundation_built_pending_runtime_secret_health_proof')) {
-  warn('SECRETS_RUNTIME_HEALTH_PROOF_REQUIRED', 'Secrets wiring source-level boundary is built but masked runtime health proof is still required.', 'Real environment variables must be configured outside Git and checked with masked status-only reports before staging/public launch.', 'Run scripts/security/Test-KingsmenSecretWiring.ps1 in staging/Oracle after configuring env vars outside Git.', ['scripts/security/Test-KingsmenSecretWiring.ps1', 'manifests/credentials/secrets-wiring-proof-v1.json']);
-}
-
-const communicationsManifest = read('manifests/communications/communications-proof-v1.json');
-if (communicationsManifest?.includes('foundation_built_pending_provider_staging_proof')) {
-  warn('COMMUNICATIONS_PROVIDER_STAGING_PROOF_REQUIRED', 'Communications source-level boundary is built but provider staging proof is still required.', 'Candidate notifications require provider send/receive, bounce, opt-out, WhatsApp urgent-only, SMS fallback, and redacted evidence proof.', 'Run communications staging proof before enabling real candidate notifications.', ['manifests/communications/communications-proof-v1.json', 'docs/communications/KINGSMEN_COMMUNICATIONS_PROOF.md']);
-}
-
-const observabilityManifest = read('manifests/ops/observability-incident-proof-v1.json');
-if (observabilityManifest?.includes('foundation_built_pending_staging_monitoring_proof')) {
-  warn('OBSERVABILITY_STAGING_PROOF_REQUIRED', 'Observability and incident source-level boundary is built but staging proof is still required.', 'Public users require live health, structured log, queue/DLQ, alert, redaction, and incident drill evidence.', 'Run observability staging proof before public users.', ['manifests/ops/observability-incident-proof-v1.json', 'docs/ops/KINGSMEN_OBSERVABILITY_INCIDENT_PROOF.md']);
+for (const [path, token, code, title, detail, remediation, evidencePaths] of warningRules) {
+  if ((read(path) ?? '').includes(token)) {
+    warn(code, title, detail, remediation, evidencePaths);
+  }
 }
 
 const readinessEngine = read('apps/api/src/final-assembly/readiness-engine.ts') ?? '';
@@ -259,6 +246,7 @@ const report = {
     emailPrimary: true,
     whatsappUrgentOnly: true,
     observabilityRequiredBeforePublicUsers: true,
+    legalPrivacyRequiredBeforeDataOrPayments: true,
     founderApprovalForProductionRisk: true,
     noSecretsInRepo: true,
     publicLaunchRequiresAllP0Gates: true
@@ -267,7 +255,7 @@ const report = {
   blockers,
   warnings,
   nextActions: blockers.length === 0
-    ? ['Apply GitHub branch protection, complete masked secrets runtime proof, communications provider proof, observability staging proof, staging smoke tests, and live evidence before public traffic.']
+    ? ['Apply GitHub branch protection, complete masked secrets runtime proof, legal/privacy publication proof, communications provider proof, observability staging proof, staging smoke tests, and live evidence before public traffic.']
     : [
         'Run API Truth Vault persistence validation and staging DB integration proof.',
         'Run web backend-boundary validation and staging smoke proof with KINGSMEN_BACKEND_BASE_URL configured.',
@@ -278,7 +266,7 @@ const report = {
         'Run secrets wiring proof, then perform masked runtime secret health proof in staging/Oracle.',
         'Run communications proof, then perform provider staging send/receive, bounce, opt-out, WhatsApp urgent-only, SMS fallback, and redacted evidence proof.',
         'Run observability proof, then perform staging health, queue/DLQ, alert, redaction, and incident drill proof.',
-        'Prove legal, privacy, consent, terms, and refund policy.'
+        'Run legal/privacy proof, then publish/version policy surfaces and capture legal/founder review, consent capture proof, refund display proof, and data-subject request proof.'
       ]
 };
 
