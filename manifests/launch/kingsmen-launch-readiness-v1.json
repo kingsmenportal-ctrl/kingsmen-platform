@@ -20,7 +20,8 @@
     "No web route may shell out to local workstation runtime as a public API path.",
     "No broad tenant-blind RLS policies for public production traffic.",
     "No production personal data until backup and restore drill evidence passes.",
-    "No provider credentials may be printed in logs, reports, screenshots, or frontend code."
+    "No provider credentials may be printed in logs, reports, screenshots, or frontend code.",
+    "No candidate notification provider may send live messages until communications staging proof passes."
   ],
   "requiredLaunchGates": [
     {
@@ -39,7 +40,7 @@
         "reports/repo/main-branch-protection-proof-latest.json",
         "reports/repo/main-branch-protection-validation-latest.json"
       ],
-      "remainingConstraint": "Run the branch protection apply script with GitHub admin permissions, then verify the source-guard status check is required before merge/release."
+      "remainingConstraint": "Run the branch protection apply script with GitHub admin permissions, then verify source-guard is required before merge/release."
     },
     {
       "gateKey": "api_runtime",
@@ -82,7 +83,7 @@
         "reports/security/rls-security-proof-latest.json",
         "reports/security/rls-security-validation-latest.json"
       ],
-      "remainingConstraint": "Source-level RLS/security proof is built; apply migration to staging and capture live SQL role-isolation proof before public users."
+      "remainingConstraint": "Apply migration to staging and capture live SQL role-isolation proof before public users."
     },
     {
       "gateKey": "web_runtime_boundary",
@@ -115,7 +116,7 @@
         "reports/finance/payfast-sandbox-proof-run-latest.json",
         "reports/finance/payfast-sandbox-proof-latest.json"
       ],
-      "remainingConstraint": "Source-level sandbox proof is built; real PayFast sandbox checkout against staging notify URL must be captured before paid pilot or live payments."
+      "remainingConstraint": "Capture real PayFast sandbox checkout against staging notify URL before paid pilot or live payments."
     },
     {
       "gateKey": "secrets_wiring",
@@ -135,14 +136,24 @@
         "reports/security/secrets-wiring-validation-latest.json",
         "reports/security/secrets-wiring-runtime-health-latest.json"
       ],
-      "remainingConstraint": "Run masked runtime secret health proof in staging/Oracle after real env vars are configured outside Git; reports must show status only and never secret values."
+      "remainingConstraint": "Run masked runtime secret health proof after real env vars are configured outside Git."
     },
     {
       "gateKey": "communications",
       "title": "Email provider and urgent WhatsApp-only boundary",
       "requiredBefore": "candidate notifications",
-      "status": "manual_required",
-      "evidenceRequired": "email send/receive logs, bounce handling, opt-out policy, WhatsApp urgent-only approval evidence"
+      "status": "foundation_built_pending_provider_staging_proof",
+      "evidenceRequired": "email send/receive, bounce handling, opt-out policy, WhatsApp urgent-only approval evidence, SMS fallback proof, and redacted evidence report",
+      "evidencePaths": [
+        "apps/api/src/communications/communications-proof-boundary.ts",
+        "manifests/communications/communications-proof-v1.json",
+        "docs/communications/KINGSMEN_COMMUNICATIONS_PROOF.md",
+        "scripts/proof/prove-communications-boundary.mjs",
+        "scripts/validators/validate-communications-proof.mjs",
+        "reports/communications/communications-proof-latest.json",
+        "reports/communications/communications-validation-latest.json"
+      ],
+      "remainingConstraint": "Run provider staging send/receive, bounce, opt-out, WhatsApp urgent-only, SMS fallback, and redacted evidence proof before real candidate notifications."
     },
     {
       "gateKey": "backup_restore",
@@ -160,7 +171,7 @@
         "reports/ops/backup-restore-proof-latest.json",
         "reports/ops/backup-restore-validation-latest.json"
       ],
-      "remainingConstraint": "Source-level backup/restore boundary is built; run a real staging backup and restore drill before production personal data."
+      "remainingConstraint": "Run a real staging backup and restore drill before production personal data."
     },
     {
       "gateKey": "observability_incident",
@@ -196,7 +207,7 @@
     {
       "phase": "3_paid_pilot",
       "goal": "Limited paid pilot under active founder supervision.",
-      "definitionOfDone": "PayFast proof, support process, refund process, secrets runtime proof, and backup/restore proof are complete."
+      "definitionOfDone": "PayFast proof, communications proof, support process, refund process, secrets runtime proof, and backup/restore proof are complete."
     },
     {
       "phase": "4_public_launch",
