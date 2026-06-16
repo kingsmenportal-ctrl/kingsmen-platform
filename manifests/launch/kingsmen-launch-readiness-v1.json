@@ -26,8 +26,19 @@
       "gateKey": "repo_protection",
       "title": "Protect main branch and require validators",
       "requiredBefore": "merge/release",
-      "status": "manual_required",
-      "evidenceRequired": "GitHub branch protection rule with required launch gate status check"
+      "status": "foundation_built_pending_github_apply",
+      "evidenceRequired": "GitHub branch protection rule with source-guard required status check, force-push/deletion disabled, pull-request review required, and admins included",
+      "evidencePaths": [
+        "manifests/repo/main-branch-protection-v1.json",
+        "docs/repo/KINGSMEN_BRANCH_PROTECTION.md",
+        ".github/workflows/kingsmen-source-guard.yml",
+        "scripts/github/Set-KingsmenMainBranchProtection.ps1",
+        "scripts/proof/prove-main-branch-protection-boundary.mjs",
+        "scripts/validators/validate-main-branch-protection.mjs",
+        "reports/repo/main-branch-protection-proof-latest.json",
+        "reports/repo/main-branch-protection-validation-latest.json"
+      ],
+      "remainingConstraint": "Run the branch protection apply script with GitHub admin permissions, then verify the source-guard status check is required before merge/release."
     },
     {
       "gateKey": "api_runtime",
@@ -149,7 +160,7 @@
     {
       "phase": "0_repo_lock",
       "goal": "Repo cannot regress silently.",
-      "definitionOfDone": "Protected main, launch gate script present, required status checks configured."
+      "definitionOfDone": "Protected main, launch gate script present, required source-guard status check configured."
     },
     {
       "phase": "1_staging_runtime",
