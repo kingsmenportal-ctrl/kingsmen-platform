@@ -62,6 +62,12 @@ jobs:
       - name: Communications validator
         run: npm run communications:validate
 
+      - name: Observability source proof
+        run: npm run observability:prove
+
+      - name: Observability validator
+        run: npm run observability:validate
+
       - name: Branch protection source proof
         run: npm run repo:prove:branch-protection
 
