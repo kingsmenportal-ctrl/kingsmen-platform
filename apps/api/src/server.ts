@@ -15,10 +15,11 @@ import type {
   CandidateReadModel
 } from "./read-models/candidate-read-model";
 import type { KingsmenState } from "./state/state-machine";
+import { TruthVaultRepository } from "./db/truth-vault-repository";
 
 const MAX_BODY_BYTES = 1_000_000;
 const SERVICE_NAME = "kingsmen-api";
-const STORAGE_MODE = "memory_development_only";
+const truthVault = TruthVaultRepository.fromEnvironment();
 
 type JsonObject = Record<string, unknown>;
 
@@ -231,6 +232,39 @@ async function handleCommand(request: IncomingMessage, response: ServerResponse)
     return;
   }
 
+  const status: StoredCommand["status"] = policy.requiresApproval ? "PENDING_APPROVAL" : "ACCEPTED";
+  const responseBody = {
+    ok: true,
+    status,
+    commandId: command.commandId,
+    correlationId: command.correlationId,
+    idempotencyKey: command.idempotencyKey,
+    policy,
+    storageMode: truthVault.storageMode,
+    warning: truthVault.enabled ? undefined : "Runtime is deployable, but durable PostgreSQL/Supabase persistence is disabled for this process.",
+    generatedAtIso: nowIso()
+  };
+
+  if (truthVault.enabled) {
+    const stored = await truthVault.recordCommand({ command, policy, status, responseBody });
+    if (stored.replay) {
+      sendJson(response, 200, {
+        ...(stored.responseBody as JsonObject),
+        ok: true,
+        status: "IDEMPOTENT_REPLAY",
+        commandId: stored.commandId,
+        correlationId: command.correlationId,
+        idempotencyKey: command.idempotencyKey,
+        storageMode: truthVault.storageMode,
+        generatedAtIso: nowIso()
+      }, command.correlationId);
+      return;
+    }
+
+    sendJson(response, 202, responseBody, command.correlationId);
+    return;
+  }
+
   const duplicateCommandId = store.idempotencyKeys.get(command.idempotencyKey);
   if (duplicateCommandId) {
     sendJson(response, 200, {
@@ -239,13 +273,12 @@ async function handleCommand(request: IncomingMessage, response: ServerResponse)
       commandId: duplicateCommandId,
       correlationId: command.correlationId,
       idempotencyKey: command.idempotencyKey,
-      storageMode: STORAGE_MODE,
+      storageMode: truthVault.storageMode,
       generatedAtIso: nowIso()
     }, command.correlationId);
     return;
   }
 
-  const status: StoredCommand["status"] = policy.requiresApproval ? "PENDING_APPROVAL" : "ACCEPTED";
   store.commands.set(command.commandId, {
     command,
     policy,
@@ -255,22 +288,44 @@ async function handleCommand(request: IncomingMessage, response: ServerResponse)
   store.idempotencyKeys.set(command.idempotencyKey, command.commandId);
   upsertReadModelsForCommand(command);
 
-  sendJson(response, 202, {
-    ok: true,
-    status,
-    commandId: command.commandId,
-    correlationId: command.correlationId,
-    idempotencyKey: command.idempotencyKey,
-    policy,
-    storageMode: STORAGE_MODE,
-    warning: "Runtime is deployable, but durable PostgreSQL/Supabase persistence is the next required launch gate.",
-    generatedAtIso: nowIso()
-  }, command.correlationId);
+  sendJson(response, 202, responseBody, command.correlationId);
 }
 
 async function handleWorkflowResult(request: IncomingMessage, response: ServerResponse): Promise<void> {
   const body = await readJson(request);
   const result = assertWorkflowResult(body as WorkflowResultEnvelope);
+
+  const responseBody = {
+    ok: true,
+    status: "WORKFLOW_RESULT_ACCEPTED",
+    workflowRunId: result.workflowRunId,
+    workflow: result.workflow,
+    correlationId: result.correlationId,
+    previousState: result.previousState,
+    finalState: result.finalState,
+    storageMode: truthVault.storageMode,
+    warning: truthVault.enabled ? undefined : "Runtime is deployable, but durable PostgreSQL/Supabase persistence is disabled for this process.",
+    generatedAtIso: nowIso()
+  };
+
+  if (truthVault.enabled) {
+    const stored = await truthVault.recordWorkflowResult({ result, responseBody });
+    if (stored.replay) {
+      sendJson(response, 200, {
+        ...(stored.responseBody as JsonObject),
+        ok: true,
+        status: "IDEMPOTENT_WORKFLOW_REPLAY",
+        workflowRunId: stored.workflowRunId,
+        correlationId: result.correlationId,
+        storageMode: truthVault.storageMode,
+        generatedAtIso: nowIso()
+      }, result.correlationId);
+      return;
+    }
+
+    sendJson(response, 202, responseBody, result.correlationId);
+    return;
+  }
 
   const duplicateWorkflowRunId = store.workflowResults.get(result.workflowRunId);
   if (duplicateWorkflowRunId) {
@@ -279,7 +334,7 @@ async function handleWorkflowResult(request: IncomingMessage, response: ServerRe
       status: "IDEMPOTENT_WORKFLOW_REPLAY",
       workflowRunId: result.workflowRunId,
       correlationId: result.correlationId,
-      storageMode: STORAGE_MODE,
+      storageMode: truthVault.storageMode,
       generatedAtIso: nowIso()
     }, result.correlationId);
     return;
@@ -291,26 +346,17 @@ async function handleWorkflowResult(request: IncomingMessage, response: ServerRe
   });
   upsertReadModelsForWorkflowResult(result);
 
-  sendJson(response, 202, {
-    ok: true,
-    status: "WORKFLOW_RESULT_ACCEPTED",
-    workflowRunId: result.workflowRunId,
-    workflow: result.workflow,
-    correlationId: result.correlationId,
-    previousState: result.previousState,
-    finalState: result.finalState,
-    storageMode: STORAGE_MODE,
-    warning: "Runtime is deployable, but durable PostgreSQL/Supabase persistence is the next required launch gate.",
-    generatedAtIso: nowIso()
-  }, result.correlationId);
+  sendJson(response, 202, responseBody, result.correlationId);
 }
 
-function handleHealth(response: ServerResponse): void {
+async function handleHealth(response: ServerResponse): Promise<void> {
+  const truthVaultHealth = await truthVault.healthCheck();
   sendJson(response, 200, {
     ok: true,
     service: SERVICE_NAME,
     status: "healthy",
-    storageMode: STORAGE_MODE,
+    storageMode: truthVault.storageMode,
+    truthVault: truthVaultHealth,
     startedAtIso: store.startedAtIso,
     generatedAtIso: nowIso(),
     routes: [
@@ -325,7 +371,18 @@ function handleHealth(response: ServerResponse): void {
   });
 }
 
-function handleCandidateStatus(response: ServerResponse, candidateId: string): void {
+async function handleCandidateStatus(response: ServerResponse, candidateId: string): Promise<void> {
+  if (truthVault.enabled) {
+    const candidate = await truthVault.readCandidateStatus(candidateId);
+    if (!candidate) {
+      sendError(response, 404, "CANDIDATE_READ_MODEL_NOT_FOUND", `No candidate read model found for ${candidateId}.`);
+      return;
+    }
+
+    sendJson(response, 200, { ok: true, candidate, storageMode: truthVault.storageMode, generatedAtIso: nowIso() });
+    return;
+  }
+
   const candidate = store.candidates.get(candidateId);
   if (!candidate) {
     sendError(response, 404, "CANDIDATE_READ_MODEL_NOT_FOUND", `No candidate read model found for ${candidateId}.`);
@@ -335,12 +392,23 @@ function handleCandidateStatus(response: ServerResponse, candidateId: string): v
   sendJson(response, 200, {
     ok: true,
     candidate,
-    storageMode: STORAGE_MODE,
+    storageMode: truthVault.storageMode,
     generatedAtIso: nowIso()
   });
 }
 
-function handleApplicationWorkbench(response: ServerResponse, applicationId: string): void {
+async function handleApplicationWorkbench(response: ServerResponse, applicationId: string): Promise<void> {
+  if (truthVault.enabled) {
+    const application = await truthVault.readApplicationWorkbench(applicationId);
+    if (!application) {
+      sendError(response, 404, "APPLICATION_WORKBENCH_NOT_FOUND", `No application workbench found for ${applicationId}.`);
+      return;
+    }
+
+    sendJson(response, 200, { ok: true, application, storageMode: truthVault.storageMode, generatedAtIso: nowIso() });
+    return;
+  }
+
   const application = store.applications.get(applicationId);
   if (!application) {
     sendError(response, 404, "APPLICATION_WORKBENCH_NOT_FOUND", `No application workbench found for ${applicationId}.`);
@@ -350,7 +418,7 @@ function handleApplicationWorkbench(response: ServerResponse, applicationId: str
   sendJson(response, 200, {
     ok: true,
     application,
-    storageMode: STORAGE_MODE,
+    storageMode: truthVault.storageMode,
     generatedAtIso: nowIso()
   });
 }
@@ -374,7 +442,7 @@ export function createKingsmenApiServer() {
       }
 
       if (method === "GET" && (pathname === "/" || pathname === "/health" || pathname === "/api/system/health")) {
-        handleHealth(response);
+        await handleHealth(response);
         return;
       }
 
@@ -390,13 +458,13 @@ export function createKingsmenApiServer() {
 
       const candidateId = getPathParam(/^\/api\/candidates\/([^/]+)\/status$/, pathname);
       if (method === "GET" && candidateId) {
-        handleCandidateStatus(response, candidateId);
+        await handleCandidateStatus(response, candidateId);
         return;
       }
 
       const applicationId = getPathParam(/^\/api\/applications\/([^/]+)\/workbench$/, pathname);
       if (method === "GET" && applicationId) {
-        handleApplicationWorkbench(response, applicationId);
+        await handleApplicationWorkbench(response, applicationId);
         return;
       }
 
@@ -420,7 +488,7 @@ export function startKingsmenApiServer(options: KingsmenApiServerOptions = {}) {
       event: "server_started",
       host,
       port,
-      storageMode: STORAGE_MODE,
+      storageMode: truthVault.storageMode,
       generatedAtIso: nowIso()
     }));
   });
@@ -432,7 +500,9 @@ export function startKingsmenApiServer(options: KingsmenApiServerOptions = {}) {
       signal,
       generatedAtIso: nowIso()
     }));
-    server.close(() => process.exit(0));
+    server.close(() => {
+      truthVault.close().finally(() => process.exit(0));
+    });
   };
 
   process.once("SIGINT", shutdown);
