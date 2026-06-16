@@ -36,6 +36,9 @@
     "legal:validate": "node scripts/validators/validate-legal-privacy-proof.mjs",
     "staging:prove:pack": "node scripts/proof/prove-staging-runtime-proof-pack.mjs",
     "staging:validate:pack": "node scripts/validators/validate-staging-runtime-proof-pack.mjs",
+    "final:prove:evidence": "node scripts/proof/prove-final-assembly-evidence-capture.mjs",
+    "final:validate:evidence": "node scripts/validators/validate-final-assembly-evidence-capture.mjs",
+    "final:collect:evidence": "powershell -ExecutionPolicy Bypass -File scripts/staging/Collect-KingsmenFinalAssemblyEvidence.ps1",
     "kingsmen:launch:audit": "node scripts/validators/validate-kingsmen-launch-readiness.mjs --audit",
     "kingsmen:launch:gate": "node scripts/validators/validate-kingsmen-launch-readiness.mjs --gate"
   },
