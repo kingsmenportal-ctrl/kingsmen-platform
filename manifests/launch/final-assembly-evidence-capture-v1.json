@@ -1,0 +1,40 @@
+{
+  "manifestKey": "final-assembly-evidence-capture-v1",
+  "schema": "kingsmen.final-assembly-evidence-capture.v1",
+  "status": "foundation_built_pending_final_evidence_capture_review",
+  "productionReady": false,
+  "publicLaunchAllowed": false,
+  "finalAssemblyCanOpen": false,
+  "finalAssemblyEvidencePending": true,
+  "finalAssemblyFounderReviewRequired": true,
+  "rawReportBodiesMayBeCopiedIntoBundle": false,
+  "rawCandidateDataAllowedInBundle": false,
+  "providerCredentialsAllowedInBundle": false,
+  "bundleOutputPath": "reports/final-assembly/final-assembly-evidence-bundle-latest.json",
+  "validationOutputPath": "reports/final-assembly/final-assembly-evidence-validation-latest.json",
+  "requiredEvidenceReports": [
+    "reports/staging/truth-vault-persistence-staging-latest.json",
+    "reports/staging/web-backend-boundary-staging-latest.json",
+    "reports/staging/rls-sql-isolation-staging-latest.json",
+    "reports/staging/payfast-provider-sandbox-staging-latest.json",
+    "reports/staging/backup-restore-drill-staging-latest.json",
+    "reports/security/secrets-wiring-runtime-health-latest.json",
+    "reports/staging/communications-provider-staging-latest.json",
+    "reports/staging/observability-incident-staging-latest.json",
+    "reports/staging/legal-privacy-publication-staging-latest.json",
+    "reports/repo/main-branch-protection-apply-latest.json"
+  ],
+  "bundleRules": [
+    "Bundle may include report path, exists flag, passed flag, review flag, redaction flag, status, timestamps, counts, and sha256 only.",
+    "Bundle must not copy raw staging report bodies.",
+    "Bundle must not contain database URLs, provider credentials, raw candidate names, raw candidate contact details, document contents, payment card data, or provider passphrases.",
+    "Any missing, failed, unreviewed, or unredacted report keeps final assembly closed.",
+    "Founder review remains required before any public launch status may change."
+  ],
+  "sourceProofCommands": [
+    "npm run staging:validate:pack",
+    "npm run final:prove:evidence",
+    "npm run final:validate:evidence",
+    "npm run kingsmen:launch:audit"
+  ]
+}
