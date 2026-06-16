@@ -6,7 +6,7 @@ This document is the real finish-line map for launching Kingsmen. A module can b
 
 **Public launch is blocked.**
 
-The repo has source-level proof for backend API, PostgreSQL/Supabase Truth Vault persistence, safe web-to-backend boundary, PayFast sandbox boundary, RLS/security, backup/restore, branch protection, secrets wiring, communications, observability + incident handling, legal + privacy + consent + refund policy, and the staging runtime proof pack. It is still not safe to open to public candidates or take money because real staging evidence and final assembly runtime proof are still pending.
+The repo has source-level proof for backend API, PostgreSQL/Supabase Truth Vault persistence, safe web-to-backend boundary, PayFast sandbox boundary, RLS/security, backup/restore, branch protection, secrets wiring, communications, observability + incident handling, legal + privacy + consent + refund policy, the staging runtime proof pack, and final assembly evidence capture. It is still not safe to open to public candidates or take money because real staging evidence and final founder review are still pending.
 
 ## Exact blockers
 
@@ -23,6 +23,7 @@ The repo has source-level proof for backend API, PostgreSQL/Supabase Truth Vault
 9. **Prove observability and incident handling.** Public users require staging health, logs, queue/DLQ, alerts, redaction, and SEV runbook evidence.
 10. **Publish privacy, consent, terms, and refund policy.** Launch requires published/versioned surfaces, founder/legal review, consent capture proof, refund/payment display proof, and data-subject request proof.
 11. **Capture the staging runtime proof pack.** Final assembly must not open until the staging runtime proof pack contains reviewed redacted runtime evidence for all P0 gates.
+12. **Capture final assembly evidence bundle.** The final assembly collector must summarize every required staging report with SHA-256/status/review/redaction fields and founder review must remain required.
 
 ## Source proof command stack
 
@@ -47,6 +48,8 @@ npm run legal:prove
 npm run legal:validate
 npm run staging:prove:pack
 npm run staging:validate:pack
+npm run final:prove:evidence
+npm run final:validate:evidence
 npm run repo:prove:branch-protection
 npm run repo:validate:branch-protection
 npm run kingsmen:launch:audit
@@ -210,6 +213,35 @@ reports/repo/main-branch-protection-apply-latest.json
 
 The staging pack is source-built, but runtime evidence remains pending until those files exist and are reviewed.
 
+## Final assembly evidence capture command
+
+```bash
+npm run final:prove:evidence
+npm run final:validate:evidence
+```
+
+Collector for Windows/Oracle staging:
+
+```powershell
+.\scripts\staging\Collect-KingsmenFinalAssemblyEvidence.ps1
+```
+
+Strict collector that exits non-zero if any required staging report is missing, failed, unreviewed, or unredacted:
+
+```powershell
+.\scripts\staging\Collect-KingsmenFinalAssemblyEvidence.ps1 -RequireAll
+```
+
+See `docs/launch/KINGSMEN_FINAL_ASSEMBLY_EVIDENCE_CAPTURE.md`.
+
+The output is:
+
+```txt
+reports/final-assembly/final-assembly-evidence-bundle-latest.json
+```
+
+The bundle must contain only report paths, status flags, review flags, redaction flags, timestamps, counts, and SHA-256 hashes. It must not copy raw staging report bodies.
+
 ## Launch command
 
 Run this for a report without failing the shell:
@@ -230,6 +262,7 @@ The gate must remain blocked until the P0 launch blockers are fixed and evidence
 
 1. **Repo lock:** protect main, require validators, stop accidental package/release mistakes.
 2. **Staging runtime:** run API + web + PostgreSQL/Supabase + internal command flow + staging runtime proof pack.
-3. **Founder private beta:** process a small number of real test candidates manually with evidence.
-4. **Paid pilot:** only after PayFast, refunds, support, backup/restore, communications proof, legal/privacy proof, incident response, observability proof, and staging pack pass.
-5. **Public launch:** only after every required launch gate opens.
+3. **Final assembly:** collect final assembly evidence bundle, founder-review every report, and keep public launch blocked until all P0 evidence passes.
+4. **Founder private beta:** process a small number of real test candidates manually with evidence.
+5. **Paid pilot:** only after PayFast, refunds, support, backup/restore, communications proof, legal/privacy proof, incident response, observability proof, staging pack, and final assembly evidence bundle pass.
+6. **Public launch:** only after every required launch gate opens.
