@@ -16,6 +16,7 @@
     "api:build": "npm --prefix apps/api run build",
     "api:start": "npm --prefix apps/api start",
     "api:validate": "npm --prefix apps/api run validate",
+    "api:validate:truth-vault": "node scripts/validators/validate-api-truth-vault-persistence.mjs",
     "kingsmen:launch:audit": "node scripts/validators/validate-kingsmen-launch-readiness.mjs --audit",
     "kingsmen:launch:gate": "node scripts/validators/validate-kingsmen-launch-readiness.mjs --gate"
   },
