@@ -51,13 +51,15 @@ const requiredFileChecks = [
     'repo:prove:branch-protection',
     'repo:validate:branch-protection',
     'secrets:prove:wiring',
-    'secrets:validate:wiring'
+    'secrets:validate:wiring',
+    'communications:prove',
+    'communications:validate'
   ]),
   checkFile('.gitignore', ['.env', '.env.*', '!.env.example', '.local/backups', 'backups/', '*.dump', '*.backup']),
   checkFile('.env.example', ['DATABASE_URL=', 'REDIS_URL=', 'SMTP_PASSWORD=', 'PAYMENT_PROVIDER_SECRET=', 'STORAGE_ACCESS_KEY=']),
-  checkFile('manifests/launch/kingsmen-launch-readiness-v1.json', ['requiredLaunchGates', 'publicLaunchStatus', 'main-branch-protection-v1', 'web_runtime_boundary', 'payfast-sandbox-proof-v1', 'rls-security-proof-v1', 'backup-restore-proof-v1', 'secrets_wiring', 'secrets-wiring-proof-v1']),
-  checkFile('docs/launch/KINGSMEN_LAUNCH_READINESS.md', ['Exact blockers', 'npm run kingsmen:launch:gate', 'npm run web:validate:backend-boundary', 'npm run payments:validate:sandbox', 'npm run security:validate:rls', 'npm run backup:validate:restore', 'npm run secrets:validate:wiring']),
-  checkFile('.github/workflows/kingsmen-source-guard.yml', ['name: Kingsmen Source Guard', 'source-guard', 'npm run backup:validate:restore', 'npm run secrets:validate:wiring', 'npm run repo:validate:branch-protection', 'npm run kingsmen:launch:audit']),
+  checkFile('manifests/launch/kingsmen-launch-readiness-v1.json', ['requiredLaunchGates', 'publicLaunchStatus', 'main-branch-protection-v1', 'web_runtime_boundary', 'payfast-sandbox-proof-v1', 'rls-security-proof-v1', 'backup-restore-proof-v1', 'secrets_wiring', 'secrets-wiring-proof-v1', 'communications-proof-v1', 'foundation_built_pending_provider_staging_proof']),
+  checkFile('docs/launch/KINGSMEN_LAUNCH_READINESS.md', ['Exact blockers', 'npm run kingsmen:launch:gate', 'npm run web:validate:backend-boundary', 'npm run payments:validate:sandbox', 'npm run security:validate:rls', 'npm run backup:validate:restore', 'npm run secrets:validate:wiring', 'npm run communications:validate']),
+  checkFile('.github/workflows/kingsmen-source-guard.yml', ['name: Kingsmen Source Guard', 'source-guard', 'npm run backup:validate:restore', 'npm run secrets:validate:wiring', 'npm run communications:validate', 'npm run repo:validate:branch-protection', 'npm run kingsmen:launch:audit']),
 
   checkFile('apps/api/package.json', ['build', 'start']),
   checkFile('apps/api/src/server.ts', ['/health', '/api/commands', '/api/workflow-results']),
@@ -105,6 +107,12 @@ const requiredFileChecks = [
   checkFile('scripts/security/Test-KingsmenSecretWiring.ps1', ['MASKED_RUNTIME_SECRET_HEALTH_REPORTED', 'rawSecretsPrinted = $false', 'connectionStringsPrinted = $false', 'valuePrinted = $false']),
   checkFile('scripts/proof/prove-secrets-wiring-boundary.mjs', ['SECRETS_WIRING_SOURCE_PROOF_PASSED', 'env_example_empty_placeholders_only', 'credential_has_no_value', 'runtimeSecretHealthProofPending: true']),
   checkFile('scripts/validators/validate-secrets-wiring-proof.mjs', ['SECRETS_WIRING_PROOF_VALIDATED', 'secrets:validate:wiring', 'SECRETS_RUNTIME_HEALTH_PROOF_REQUIRED']),
+
+  checkFile('apps/api/src/communications/communications-proof-boundary.ts', ['COMMUNICATIONS_BOUNDARY_SOURCE_ONLY', 'emailPrimary', 'whatsappUrgentOnly', 'smsBackupOnly', 'bulkMarketingDenied', 'providerSendRequiresStagingProof', 'liveSendExecuted: false']),
+  checkFile('manifests/communications/communications-proof-v1.json', ['kingsmen.communications-proof.v1', 'foundation_built_pending_provider_staging_proof', 'emailPrimary', 'whatsappUrgentOnly', 'smsBackupOnly']),
+  checkFile('docs/communications/KINGSMEN_COMMUNICATIONS_PROOF.md', ['Email is primary', 'WhatsApp is urgent-only', 'SMS is backup-only', 'npm run communications:validate']),
+  checkFile('scripts/proof/prove-communications-boundary.mjs', ['COMMUNICATIONS_SOURCE_PROOF_PASSED', 'providerStagingProofPending: true']),
+  checkFile('scripts/validators/validate-communications-proof.mjs', ['COMMUNICATIONS_PROOF_VALIDATED', 'communications:validate', 'COMMUNICATIONS_PROVIDER_STAGING_PROOF_REQUIRED']),
 
   checkFile('packages/contracts/src/jarvis/index.ts', ['JarvisCommandEnvelope', 'tenantRef', 'correlationId', 'requestId']),
   checkFile('packages/jarvis-core/src/jarvis-policy-gate.ts', ['JARVIS_APPROVAL_REQUIRED', 'founderApprovalRef', 'JARVIS_BLOCKED_UNSAFE_ACTION']),
@@ -163,7 +171,8 @@ for (const [path, unsafeFields] of [
   ['manifests/security/rls-security-proof-v1.json', ['productionReady', 'publicLaunchAllowed']],
   ['manifests/ops/backup-restore-proof-v1.json', ['productionReady', 'publicLaunchAllowed', 'productionDataAllowed']],
   ['manifests/repo/main-branch-protection-v1.json', ['productionReady', 'publicLaunchAllowed']],
-  ['manifests/credentials/secrets-wiring-proof-v1.json', ['productionReady', 'publicLaunchAllowed', 'liveSecretsCommitted', 'rawSecretsInReportsAllowed']]
+  ['manifests/credentials/secrets-wiring-proof-v1.json', ['productionReady', 'publicLaunchAllowed', 'liveSecretsCommitted', 'rawSecretsInReportsAllowed']],
+  ['manifests/communications/communications-proof-v1.json', ['productionReady', 'publicLaunchAllowed', 'liveMessagesSent', 'bulkSendingAllowed']]
 ]) {
   try {
     const parsed = json(path);
@@ -196,6 +205,11 @@ if (backupManifest?.includes('foundation_built_pending_staging_drill')) {
 const secretsManifest = read('manifests/credentials/secrets-wiring-proof-v1.json');
 if (secretsManifest?.includes('foundation_built_pending_runtime_secret_health_proof')) {
   warn('SECRETS_RUNTIME_HEALTH_PROOF_REQUIRED', 'Secrets wiring source-level boundary is built but masked runtime health proof is still required.', 'Real environment variables must be configured outside Git and checked with masked status-only reports before staging/public launch.', 'Run scripts/security/Test-KingsmenSecretWiring.ps1 in staging/Oracle after configuring env vars outside Git.', ['scripts/security/Test-KingsmenSecretWiring.ps1', 'manifests/credentials/secrets-wiring-proof-v1.json']);
+}
+
+const communicationsManifest = read('manifests/communications/communications-proof-v1.json');
+if (communicationsManifest?.includes('foundation_built_pending_provider_staging_proof')) {
+  warn('COMMUNICATIONS_PROVIDER_STAGING_PROOF_REQUIRED', 'Communications source-level boundary is built but provider staging proof is still required.', 'Candidate notifications require provider send/receive, bounce, opt-out, WhatsApp urgent-only, SMS fallback, and redacted evidence proof.', 'Run communications staging proof before enabling real candidate notifications.', ['manifests/communications/communications-proof-v1.json', 'docs/communications/KINGSMEN_COMMUNICATIONS_PROOF.md']);
 }
 
 const readinessEngine = read('apps/api/src/final-assembly/readiness-engine.ts') ?? '';
@@ -238,7 +252,7 @@ const report = {
   blockers,
   warnings,
   nextActions: blockers.length === 0
-    ? ['Apply GitHub branch protection, complete masked secrets runtime proof, then complete staging smoke tests and live evidence before public traffic.']
+    ? ['Apply GitHub branch protection, complete masked secrets runtime proof, communications provider proof, staging smoke tests, and live evidence before public traffic.']
     : [
         'Run API Truth Vault persistence validation and staging DB integration proof.',
         'Run web backend-boundary validation and staging smoke proof with KINGSMEN_BACKEND_BASE_URL configured.',
@@ -247,7 +261,8 @@ const report = {
         'Run backup/restore source proof, then perform live staging backup and restore drill with RPO/RTO evidence.',
         'Run repo branch-protection proof, then apply GitHub main protection with source-guard required.',
         'Run secrets wiring proof, then perform masked runtime secret health proof in staging/Oracle.',
-        'Prove communications and incident handling.'
+        'Run communications proof, then perform provider staging send/receive, bounce, opt-out, WhatsApp urgent-only, SMS fallback, and redacted evidence proof.',
+        'Prove observability, incident handling, legal, privacy, consent, terms, and refund policy.'
       ]
 };
 
