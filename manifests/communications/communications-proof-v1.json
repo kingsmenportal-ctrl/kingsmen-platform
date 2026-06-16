@@ -1,0 +1,44 @@
+{
+  "schema": "kingsmen.communications-proof.v1",
+  "manifestKey": "communications-proof-v1",
+  "status": "foundation_built_pending_provider_staging_proof",
+  "productionReady": false,
+  "publicLaunchAllowed": false,
+  "liveMessagesSent": false,
+  "bulkSendingAllowed": false,
+  "emailPrimary": true,
+  "whatsappUrgentOnly": true,
+  "smsBackupOnly": true,
+  "marketingRequiresExplicitConsent": true,
+  "providerSecretsMayBeLogged": false,
+  "rawRecipientDataInReportsAllowed": false,
+  "requiredProviderProof": [
+    "SMTP or email-provider sandbox send/receive proof",
+    "bounce handling proof",
+    "unsubscribe/opt-out proof for marketing messages",
+    "WhatsApp urgent-only approval evidence",
+    "SMS fallback-only evidence",
+    "redacted evidence report with no recipient addresses or message bodies"
+  ],
+  "sourceProofScenarios": [
+    "transactional_email_queued_primary",
+    "marketing_email_without_consent_denied",
+    "bulk_message_denied",
+    "whatsapp_non_urgent_denied",
+    "whatsapp_urgent_queued_only",
+    "sms_non_urgent_denied",
+    "sms_urgent_backup_only",
+    "provider_send_requires_staging_proof",
+    "recipient_data_redacted",
+    "live_send_never_executed_by_source_proof"
+  ],
+  "evidencePaths": [
+    "apps/api/src/communications/communications-proof-boundary.ts",
+    "manifests/communications/communications-proof-v1.json",
+    "docs/communications/KINGSMEN_COMMUNICATIONS_PROOF.md",
+    "scripts/proof/prove-communications-boundary.mjs",
+    "scripts/validators/validate-communications-proof.mjs",
+    "reports/communications/communications-proof-latest.json",
+    "reports/communications/communications-validation-latest.json"
+  ]
+}
