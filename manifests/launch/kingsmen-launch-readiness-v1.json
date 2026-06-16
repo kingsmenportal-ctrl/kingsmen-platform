@@ -22,7 +22,8 @@
     "No production personal data until backup and restore drill evidence passes.",
     "No provider credentials may be printed in logs, reports, screenshots, or frontend code.",
     "No candidate notification provider may send live messages until communications staging proof passes.",
-    "No public launch until observability and incident staging proof passes."
+    "No public launch until observability and incident staging proof passes.",
+    "No personal data collection or payment flow until legal, privacy, consent, terms, and refund policy proof passes."
   ],
   "requiredLaunchGates": [
     {
@@ -195,8 +196,18 @@
       "gateKey": "legal_privacy",
       "title": "Privacy, consent, refund, and candidate terms",
       "requiredBefore": "collecting personal data or payments",
-      "status": "manual_required",
-      "evidenceRequired": "published terms, privacy notice, POPIA consent, refund/payment terms"
+      "status": "foundation_built_pending_legal_review_and_publication_proof",
+      "evidenceRequired": "published terms, privacy notice, consent notice, refund/payment terms, data-subject request path, versioned legal review, consent capture proof, and refund display proof",
+      "evidencePaths": [
+        "apps/api/src/legal/legal-privacy-proof-boundary.ts",
+        "manifests/legal/legal-privacy-proof-v1.json",
+        "docs/legal/KINGSMEN_LEGAL_PRIVACY_CONSENT_REFUND_PROOF.md",
+        "scripts/proof/prove-legal-privacy-boundary.mjs",
+        "scripts/validators/validate-legal-privacy-proof.mjs",
+        "reports/legal/legal-privacy-proof-latest.json",
+        "reports/legal/legal-privacy-validation-latest.json"
+      ],
+      "remainingConstraint": "Publish/version policy surfaces and capture founder/legal review, consent smoke proof, refund/payment display proof, and data-subject request proof before collecting personal data or payments."
     }
   ],
   "launchPhases": [
@@ -218,7 +229,7 @@
     {
       "phase": "3_paid_pilot",
       "goal": "Limited paid pilot under active founder supervision.",
-      "definitionOfDone": "PayFast proof, communications proof, support process, refund process, secrets runtime proof, backup/restore proof, observability proof, and incident response are complete."
+      "definitionOfDone": "PayFast proof, communications proof, support process, refund process, secrets runtime proof, backup/restore proof, observability proof, legal/privacy proof, and incident response are complete."
     },
     {
       "phase": "4_public_launch",
