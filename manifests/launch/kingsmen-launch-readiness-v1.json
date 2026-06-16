@@ -1,0 +1,122 @@
+{
+  "manifestKey": "kingsmen-launch-readiness-v1",
+  "releaseName": "Kingsmen Oracle Lite Founder Release",
+  "publicLaunchStatus": "blocked_until_required_gates_pass",
+  "candidateCap": 500,
+  "truthAuthority": "PostgreSQL/Supabase Truth Vault",
+  "workerAuthority": "n8n thin workers only",
+  "communicationDoctrine": {
+    "emailPrimary": true,
+    "whatsappUrgentOnly": true,
+    "smsBackupOnly": true
+  },
+  "nonNegotiableLaunchRules": [
+    "No public users until launch gate is open.",
+    "No production payment flow until PayFast sandbox and ITN evidence pass.",
+    "No candidate data writes outside PostgreSQL/Supabase Truth Vault.",
+    "No workflow execution without idempotency key, correlation ID, and audit evidence.",
+    "No secrets in git, chat, reports, screenshots, or package artifacts.",
+    "No branch launch from unprotected main.",
+    "No web route may shell out to local Windows PowerShell as a public API path.",
+    "No broad tenant-blind RLS policies for public production traffic."
+  ],
+  "requiredLaunchGates": [
+    {
+      "gateKey": "repo_protection",
+      "title": "Protect main branch and require validators",
+      "requiredBefore": "merge/release",
+      "status": "manual_required",
+      "evidenceRequired": "GitHub branch protection rule with required launch gate status check"
+    },
+    {
+      "gateKey": "api_runtime",
+      "title": "Materialize backend API as deployable runtime",
+      "requiredBefore": "staging deploy",
+      "status": "blocked",
+      "evidenceRequired": "apps/api package/runtime entrypoint, health route, command route, workflow result route, and deploy command"
+    },
+    {
+      "gateKey": "truth_vault_persistence",
+      "title": "Replace repository stubs with real PostgreSQL/Supabase persistence",
+      "requiredBefore": "staging data writes",
+      "status": "blocked",
+      "evidenceRequired": "DB integration tests proving evidence, idempotency, heartbeat, command log, workflow result, and audit writes"
+    },
+    {
+      "gateKey": "tenant_security_rls",
+      "title": "Enforce scoped RLS and access boundary",
+      "requiredBefore": "public users",
+      "status": "blocked",
+      "evidenceRequired": "RLS tests proving candidate/operator/founder/service role boundaries"
+    },
+    {
+      "gateKey": "web_runtime_boundary",
+      "title": "Remove local PowerShell/Windows shell execution from public Next API routes",
+      "requiredBefore": "public web deploy",
+      "status": "blocked",
+      "evidenceRequired": "Web API routes call backend API/SDK only; no local psql.exe or C:\\Kingsmen paths"
+    },
+    {
+      "gateKey": "payments",
+      "title": "PayFast sandbox and ITN verification evidence",
+      "requiredBefore": "taking money",
+      "status": "blocked",
+      "evidenceRequired": "sandbox success, cancel, return, failed payment, duplicate ITN, invalid signature, and replay tests"
+    },
+    {
+      "gateKey": "communications",
+      "title": "Email provider and urgent WhatsApp-only boundary",
+      "requiredBefore": "candidate notifications",
+      "status": "manual_required",
+      "evidenceRequired": "email send/receive logs, bounce handling, opt-out policy, WhatsApp urgent-only approval evidence"
+    },
+    {
+      "gateKey": "backup_restore",
+      "title": "Backup and restore drill",
+      "requiredBefore": "production data",
+      "status": "blocked",
+      "evidenceRequired": "restore drill report with RPO/RTO and verified sample records"
+    },
+    {
+      "gateKey": "observability_incident",
+      "title": "Operational monitoring and incident SOP",
+      "requiredBefore": "public users",
+      "status": "manual_required",
+      "evidenceRequired": "health checks, logs, DLQ view, incident runbook, founder escalation path"
+    },
+    {
+      "gateKey": "legal_privacy",
+      "title": "Privacy, consent, refund, and candidate terms",
+      "requiredBefore": "collecting personal data or payments",
+      "status": "manual_required",
+      "evidenceRequired": "published terms, privacy notice, POPIA consent, refund/payment terms"
+    }
+  ],
+  "launchPhases": [
+    {
+      "phase": "0_repo_lock",
+      "goal": "Repo cannot regress silently.",
+      "definitionOfDone": "Protected main, launch gate script present, required status checks configured."
+    },
+    {
+      "phase": "1_staging_runtime",
+      "goal": "Backend, web, DB, and internal control plane run against staging.",
+      "definitionOfDone": "API health, command intake, workflow result intake, DB writes, and web reads pass."
+    },
+    {
+      "phase": "2_founder_private_beta",
+      "goal": "Founder/operator can process real test candidates manually with evidence.",
+      "definitionOfDone": "10 end-to-end candidate journeys completed without unsafe writes or missing evidence."
+    },
+    {
+      "phase": "3_paid_pilot",
+      "goal": "Limited paid pilot under active founder supervision.",
+      "definitionOfDone": "PayFast proof, support process, refund process, and backup/restore proof are complete."
+    },
+    {
+      "phase": "4_public_launch",
+      "goal": "Open public acquisition with capped load.",
+      "definitionOfDone": "All required launch gates pass and candidate cap is enforced."
+    }
+  ]
+}
