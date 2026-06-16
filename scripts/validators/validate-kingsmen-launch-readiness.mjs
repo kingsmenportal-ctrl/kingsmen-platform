@@ -47,10 +47,13 @@ const requiredFileChecks = [
     'payments:prove:sandbox',
     'payments:validate:sandbox',
     'security:prove:rls',
-    'security:validate:rls'
+    'security:validate:rls',
+    'backup:prove:restore',
+    'backup:validate:restore'
   ]),
-  checkFile('manifests/launch/kingsmen-launch-readiness-v1.json', ['requiredLaunchGates', 'publicLaunchStatus', 'web_runtime_boundary', 'payfast-sandbox-proof-v1', 'rls-security-proof-v1']),
-  checkFile('docs/launch/KINGSMEN_LAUNCH_READINESS.md', ['Exact blockers', 'npm run kingsmen:launch:gate', 'npm run web:validate:backend-boundary', 'npm run payments:validate:sandbox', 'npm run security:validate:rls']),
+  checkFile('.gitignore', ['.local/backups', 'backups/', '*.dump', '*.backup']),
+  checkFile('manifests/launch/kingsmen-launch-readiness-v1.json', ['requiredLaunchGates', 'publicLaunchStatus', 'web_runtime_boundary', 'payfast-sandbox-proof-v1', 'rls-security-proof-v1', 'backup-restore-proof-v1']),
+  checkFile('docs/launch/KINGSMEN_LAUNCH_READINESS.md', ['Exact blockers', 'npm run kingsmen:launch:gate', 'npm run web:validate:backend-boundary', 'npm run payments:validate:sandbox', 'npm run security:validate:rls', 'npm run backup:validate:restore']),
   checkFile('packages/contracts/src/jarvis/index.ts', ['JarvisCommandEnvelope', 'tenantRef', 'correlationId', 'requestId']),
   checkFile('packages/jarvis-core/src/jarvis-policy-gate.ts', ['JARVIS_APPROVAL_REQUIRED', 'founderApprovalRef', 'JARVIS_BLOCKED_UNSAFE_ACTION']),
   checkFile('packages/jarvis-core/src/jarvis-evidence-ledger.ts', ['validator_result', 'jarvisAssertEvidenceLedgerSafe']),
@@ -79,6 +82,12 @@ const requiredFileChecks = [
   checkFile('docs/finance/KINGSMEN_PAYMENT_PROOF.md', ['Paid status requires accepted ITN evidence', 'real PayFast sandbox checkout']),
   checkFile('scripts/proof/prove-payfast-sandbox-boundary.mjs', ['PAYFAST_SANDBOX_SOURCE_PROOF_PASSED', 'reports/finance/payfast-sandbox-proof-run-latest.json']),
   checkFile('scripts/validators/validate-payfast-sandbox-proof.mjs', ['PAYFAST_SANDBOX_PROOF_VALIDATED', 'payments:prove:sandbox']),
+  checkFile('manifests/ops/backup-restore-proof-v1.json', ['backup-restore-proof-v1', 'foundation_built_pending_staging_drill', 'restoreTargetMustDifferFromSource', 'backupStorageAllowedInGit']),
+  checkFile('docs/ops/KINGSMEN_BACKUP_RESTORE_PROOF.md', ['pg_dump', 'pg_restore', 'RPO', 'RTO', 'Production ready: **false**']),
+  checkFile('scripts/backup/New-KingsmenTruthVaultBackup.ps1', ['KINGSMEN_DATABASE_URL', 'pg_dump', 'Get-FileHash', 'databaseUrlRedacted', 'committedToGit = $false']),
+  checkFile('scripts/backup/Test-KingsmenTruthVaultRestore.ps1', ['KINGSMEN_RESTORE_DRILL_DATABASE_URL', 'pg_restore', 'Restore target matches source database', 'countOnly = $true', 'rtoSeconds']),
+  checkFile('scripts/proof/prove-backup-restore-boundary.mjs', ['BACKUP_RESTORE_SOURCE_PROOF_PASSED', 'stagingRestoreDrillCompleted: false']),
+  checkFile('scripts/validators/validate-backup-restore-proof.mjs', ['BACKUP_RESTORE_PROOF_VALIDATED', 'backup:validate:restore']),
   checkFile('apps/api/src/final-assembly/final-read-model.ts', ['buildDefaultLaunchGates', 'gate_public_launch']),
   checkFile('apps/api/src/final-assembly/readiness-engine.ts', ['secrets_not_committed', 'database_backup_restore_test', 'payfast_sandbox_evidence'])
 ];
@@ -153,6 +162,15 @@ if (packageJson) {
         'RLS/security proof scripts are missing.',
         'The repo cannot prove scoped RLS boundary before public users.',
         'Add security:prove:rls and security:validate:rls scripts to package.json.',
+        ['package.json']
+      );
+    }
+    if (!parsed.scripts?.['backup:prove:restore'] || !parsed.scripts?.['backup:validate:restore']) {
+      block(
+        'BACKUP_RESTORE_SCRIPT_MISSING',
+        'Backup/restore proof scripts are missing.',
+        'The repo cannot prove backup/restore boundaries before production data.',
+        'Add backup:prove:restore and backup:validate:restore scripts to package.json.',
         ['package.json']
       );
     }
@@ -277,6 +295,43 @@ if (rlsManifest) {
   }
 }
 
+const backupManifest = read('manifests/ops/backup-restore-proof-v1.json');
+if (backupManifest) {
+  try {
+    const parsed = JSON.parse(backupManifest);
+    if (parsed.productionReady !== false || parsed.publicLaunchAllowed !== false || parsed.productionDataAllowed !== false) {
+      block(
+        'BACKUP_RESTORE_UNSAFE_FLAG',
+        'Backup/restore manifest has unsafe launch flags.',
+        'Backup/restore proof must not claim production readiness, public launch approval, or production data approval.',
+        'Set productionReady=false, publicLaunchAllowed=false, and productionDataAllowed=false until live staging restore proof passes.',
+        ['manifests/ops/backup-restore-proof-v1.json']
+      );
+    }
+    if (parsed.backupStorageAllowedInGit !== false || parsed.rawCandidateRowsAllowedInReports !== false || parsed.databaseUrlAllowedInReports !== false) {
+      block(
+        'BACKUP_RESTORE_DATA_EXPOSURE_RISK',
+        'Backup/restore manifest allows unsafe backup evidence exposure.',
+        'Backups must stay out of Git, reports must not contain raw candidate rows, and database URLs must be redacted.',
+        'Set backupStorageAllowedInGit=false, rawCandidateRowsAllowedInReports=false, and databaseUrlAllowedInReports=false.',
+        ['manifests/ops/backup-restore-proof-v1.json']
+      );
+    }
+  } catch (error) {
+    block('BACKUP_RESTORE_MANIFEST_INVALID', 'Backup/restore manifest is invalid JSON.', String(error), 'Repair backup/restore manifest JSON.', ['manifests/ops/backup-restore-proof-v1.json']);
+  }
+}
+
+if (backupManifest?.includes('foundation_built_pending_staging_drill')) {
+  warn(
+    'BACKUP_RESTORE_STAGING_DRILL_REQUIRED',
+    'Backup/restore source-level boundary is built but staging restore proof is still required.',
+    'Scripts and validators exist, but production personal data requires a live backup and restore drill with RPO/RTO evidence.',
+    'Run New-KingsmenTruthVaultBackup.ps1 and Test-KingsmenTruthVaultRestore.ps1 against staging and store a counts-only report.',
+    ['scripts/backup/New-KingsmenTruthVaultBackup.ps1', 'scripts/backup/Test-KingsmenTruthVaultRestore.ps1']
+  );
+}
+
 const readinessEngine = read('apps/api/src/final-assembly/readiness-engine.ts') ?? '';
 for (const token of ['secrets_not_committed', 'database_backup_restore_test', 'payfast_sandbox_evidence']) {
   if (readinessEngine.includes(token) && readinessEngine.includes('status: "pending"')) {
@@ -320,6 +375,7 @@ const report = {
     webCallsBackendApiOnly: true,
     payfastItnEvidenceRequired: true,
     rlsRoleIsolationRequired: true,
+    backupRestoreRequiredBeforeProductionData: true,
     livePaymentsRemainBlockedUntilSandboxProviderProof: true,
     emailPrimary: true,
     whatsappUrgentOnly: true,
@@ -337,7 +393,8 @@ const report = {
         'Run web backend-boundary validation and staging smoke proof with KINGSMEN_BACKEND_BASE_URL configured.',
         'Run PayFast sandbox proof validator and real provider sandbox checkout against staging notify URL.',
         'Run RLS/security source proof, then apply migration to staging and capture live SQL role-isolation proof.',
-        'Prove secrets wiring, backup/restore, and incident handling.',
+        'Run backup/restore source proof, then perform live staging backup and restore drill with RPO/RTO evidence.',
+        'Prove secrets wiring and incident handling.',
         'Protect main and require this launch gate before release.'
       ]
 };
