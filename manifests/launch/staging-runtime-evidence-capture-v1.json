@@ -1,0 +1,30 @@
+{
+  "schema": "kingsmen.staging-runtime-evidence-capture.v1",
+  "module": "Staging Runtime Evidence Capture",
+  "status": "foundation_built_pending_runtime_execution",
+  "productionReady": false,
+  "publicLaunchAllowed": false,
+  "runsLiveExternalProviders": false,
+  "rawSecretsAllowedInReports": false,
+  "rawCandidateDataAllowedInReports": false,
+  "providerCredentialsAllowedInReports": false,
+  "generatedReports": [
+    "reports/staging/truth-vault-persistence-staging-latest.json",
+    "reports/staging/web-backend-boundary-staging-latest.json",
+    "reports/staging/rls-sql-isolation-staging-latest.json",
+    "reports/staging/payfast-provider-sandbox-staging-latest.json",
+    "reports/staging/backup-restore-drill-staging-latest.json",
+    "reports/security/secrets-wiring-runtime-health-latest.json",
+    "reports/staging/communications-provider-staging-latest.json",
+    "reports/staging/observability-incident-staging-latest.json",
+    "reports/staging/legal-privacy-publication-staging-latest.json",
+    "reports/repo/main-branch-protection-apply-latest.json"
+  ],
+  "rules": {
+    "truthVaultReportMayPassOnlyAfterDatabaseProbe": true,
+    "webBoundaryReportMayPassOnlyAfterBackendHealthProbe": true,
+    "externalProviderReportsStayPendingUntilRealEvidenceImported": true,
+    "reviewedDefaultsToFalse": true,
+    "finalAssemblyCollectorConsumesOnlyRedactedSummaries": true
+  }
+}
