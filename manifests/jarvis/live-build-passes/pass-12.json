@@ -1,0 +1,53 @@
+{
+  "pass": "Jarvis Live Build Pass 12",
+  "status": "built",
+  "branch": "main",
+  "purpose": "Add the read-only founder-console backend read adapter, API route integration, provider port, response contract, read-model cache, and Pass 11 export index.",
+  "builtFiles": [
+    "packages/jarvis-core/src/live-pass-11-index.ts",
+    "packages/contracts/src/jarvis/console-response-contract.ts",
+    "packages/contracts/src/jarvis/console-data-provider-port.ts",
+    "packages/jarvis-core/src/jarvis-console-backend-read-adapter-real.ts",
+    "packages/jarvis-core/src/jarvis-console-api-route-integration.ts",
+    "packages/jarvis-core/src/jarvis-console-read-model-cache.ts",
+    "scripts/validators/validate-jarvis-live-pass-12.mjs"
+  ],
+  "capabilities": [
+    "JarvisConsoleBackendReadAdapterReal",
+    "JarvisConsoleApiRouteIntegration",
+    "JarvisConsoleDataProviderPort",
+    "JarvisConsoleResponseContract",
+    "JarvisConsoleReadModelCache",
+    "JarvisPass11ExportIndex",
+    "JarvisLivePass12Validator"
+  ],
+  "commits": [
+    "6c5a001c3319534f4a5481c15babc4cbedcaf774",
+    "bc26230ef32d5f823832c21efb2343c6a87bfae7",
+    "cda1881fb4db1732fb3f5dc1098d48be97713fa3",
+    "2f32892beb6bba82b8dd81ca74031643ce446420",
+    "310f46a1830a9be3938ec8cda76f536b3003bd98",
+    "dd659dfcdd14a35e1a240f5f96d1725a5964f163",
+    "47d02d68c892e4299607608419892e0bd4ac863b"
+  ],
+  "validator": {
+    "script": "scripts/validators/validate-jarvis-live-pass-12.mjs",
+    "reportPath": "reports/jarvis/validate-jarvis-live-pass-12.json"
+  },
+  "authorityBoundary": [
+    "Console backend read adapter is read-only.",
+    "Console API route integration is GET/read-only only.",
+    "Data-provider port exposes read-model building only.",
+    "Response contract carries display data and authority-boundary text only.",
+    "Read-model cache stores display snapshots only.",
+    "Backend state machine, PostgreSQL Truth Vault, validators, evidence, and founder approval remain authoritative."
+  ],
+  "nextLiveTargets": [
+    "JarvisConsoleBackendProviderBridge",
+    "JarvisConsoleRouteHandlerWithFixtureProvider",
+    "JarvisConsoleResponseFixture",
+    "JarvisConsoleCacheHydrator",
+    "JarvisConsoleReadOnlyApiSmokeValidator",
+    "JarvisPass12ExportIndex"
+  ]
+}
