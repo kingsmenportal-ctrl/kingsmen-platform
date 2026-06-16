@@ -32,8 +32,15 @@
       "gateKey": "api_runtime",
       "title": "Materialize backend API as deployable runtime",
       "requiredBefore": "staging deploy",
-      "status": "blocked",
-      "evidenceRequired": "apps/api package/runtime entrypoint, health route, command route, workflow result route, and deploy command"
+      "status": "foundation_built_memory_only",
+      "evidenceRequired": "apps/api package/runtime entrypoint, health route, command route, workflow result route, read-model routes, and deploy command",
+      "evidencePaths": [
+        "apps/api/package.json",
+        "apps/api/tsconfig.json",
+        "apps/api/src/server.ts",
+        "docs/api/KINGSMEN_DEPLOYABLE_API.md"
+      ],
+      "remainingConstraint": "Durable Truth Vault persistence is still required before staging data writes."
     },
     {
       "gateKey": "truth_vault_persistence",
