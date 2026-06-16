@@ -13,6 +13,9 @@
     "jarvis:validate:core": "node scripts/validators/validate-jarvis-core.mjs",
     "jarvis:validate:live-pass-02": "node scripts/validators/validate-jarvis-live-pass-02.mjs",
     "jarvis:validate:live-pass-03": "node scripts/validators/validate-jarvis-live-pass-03.mjs",
+    "api:build": "npm --prefix apps/api run build",
+    "api:start": "npm --prefix apps/api start",
+    "api:validate": "npm --prefix apps/api run validate",
     "kingsmen:launch:audit": "node scripts/validators/validate-kingsmen-launch-readiness.mjs --audit",
     "kingsmen:launch:gate": "node scripts/validators/validate-kingsmen-launch-readiness.mjs --gate"
   },
