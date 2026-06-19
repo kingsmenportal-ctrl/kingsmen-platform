@@ -17,6 +17,7 @@
     "jarvis:credentials:scan:local": "powershell -ExecutionPolicy Bypass -File scripts/jarvis/Invoke-JarvisCredentialReadiness.ps1 -EnvFile .local/kingsmen.local-postgres.env -BackendBaseUrl http://127.0.0.1:3001",
     "jarvis:credentials:scan:local:queue": "powershell -ExecutionPolicy Bypass -File scripts/jarvis/Invoke-JarvisCredentialReadiness.ps1 -EnvFile .local/kingsmen.local-postgres.env -BackendBaseUrl http://127.0.0.1:3001 -RedisUrl redis://127.0.0.1:6379",
     "jarvis:activation:local:queue": "powershell -ExecutionPolicy Bypass -File scripts/jarvis/Invoke-JarvisLocalQueueActivationMatrix.ps1",
+    "jarvis:activation:local:observability": "powershell -ExecutionPolicy Bypass -File scripts/jarvis/Invoke-JarvisLocalObservabilityActivationMatrix.ps1",
     "jarvis:activation:matrix": "powershell -ExecutionPolicy Bypass -File scripts/jarvis/Build-JarvisModuleActivationMatrix.ps1",
     "api:build": "npm --prefix apps/api run build",
     "api:start": "npm --prefix apps/api start",
@@ -72,7 +73,7 @@
   },
   "homepage": "https://github.com/kingsmenportal-ctrl/kingsmen-platform#readme",
   "devDependencies": {
-    "playwright": "^1.60.0",
+    "playwright": "^1.60.3",
     "typescript": "^6.0.3"
   }
 }
