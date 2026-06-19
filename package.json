@@ -15,7 +15,7 @@
     "jarvis:validate:live-pass-03": "node scripts/validators/validate-jarvis-live-pass-03.mjs",
     "jarvis:credentials:scan": "powershell -ExecutionPolicy Bypass -File scripts/jarvis/Invoke-JarvisCredentialReadiness.ps1",
     "jarvis:credentials:scan:local": "powershell -ExecutionPolicy Bypass -File scripts/jarvis/Invoke-JarvisCredentialReadiness.ps1 -EnvFile .local/kingsmen.local-postgres.env -BackendBaseUrl http://127.0.0.1:3001",
-    "jarvis:credentials:scan:local:queue": "powershell -ExecutionPolicy Bypass -File scripts/jarvis/Invoke-JarvisCredentialReadiness.ps1 -EnvFile .local/kingsmen.local-postgres.env -BackendBaseUrl http://127.0.0.1:3001 -RedisUrl redis://127.0.0.1:6379",
+    "jarvis:credentials:scan:local:queue": "powershell -ExecutionPolicy Bypass -File scripts/jarvis/Invoke-JarvisCredentialReadiness.ps1 -EnvFile .local/kingsmen.local-postgres.env -BackendBaseUrl http://127.0.0.1:3001 -RedisUrl $env:KINGSMEN_LOCAL_REDIS_URL",
     "jarvis:activation:local:queue": "powershell -ExecutionPolicy Bypass -File scripts/jarvis/Invoke-JarvisLocalQueueActivationMatrix.ps1",
     "jarvis:activation:local:observability": "powershell -ExecutionPolicy Bypass -File scripts/jarvis/Invoke-JarvisLocalObservabilityActivationMatrix.ps1",
     "jarvis:activation:matrix": "powershell -ExecutionPolicy Bypass -File scripts/jarvis/Build-JarvisModuleActivationMatrix.ps1",
