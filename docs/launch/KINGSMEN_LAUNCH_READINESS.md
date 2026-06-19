@@ -179,7 +179,7 @@ npm run observability:staging
 
 Staging observability proof still required: API health proof, database health proof, queue/DLQ proof, structured log sample with correlationId, alert proof, SEV1/SEV2/SEV3 incident drill, founder escalation, and no PII or secrets in logs proof.
 
-## Legal + privacy + consent + refund proof command
+## legal + privacy + consent + refund proof command
 
 ```bash
 npm run legal:prove
