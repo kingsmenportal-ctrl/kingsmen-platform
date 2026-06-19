@@ -108,7 +108,7 @@ function Invoke-DockerText {
       throw "DOCKER_COMMAND_FAILED:${Stage}:$safeErr"
     }
 
-    return $stdout
+    return [string]$stdout
   } finally {
     try { Remove-Item -Force -ErrorAction SilentlyContinue $stdoutPath, $stderrPath } catch { }
   }
@@ -124,7 +124,7 @@ function Resolve-PostgresContainer {
   $lastError = ""
   foreach ($name in $candidates) {
     try {
-      $status = (Invoke-DockerText -Arguments @("inspect", "-f", "{{.State.Status}}", $name) -Stage "inspect_postgres_container_$name").Trim()
+      $status = ([string](Invoke-DockerText -Arguments @("inspect", "-f", "{{.State.Status}}", $name) -Stage "inspect_postgres_container_$name")).Trim()
       if ($status -eq "running") {
         $env:KINGSMEN_POSTGRES_CONTAINER = $name
         return @{ found = $true; name = $name; status = $status; error = "" }
@@ -137,10 +137,11 @@ function Resolve-PostgresContainer {
   }
 
   try {
-    $names = (Invoke-DockerText -Arguments @("ps", "-a", "--format", "{{.Names}}") -Stage "list_docker_containers").Split("`n") | ForEach-Object { $_.Trim() } | Where-Object { $_ }
+    $containerList = [string](Invoke-DockerText -Arguments @("ps", "-a", "--format", "{{.Names}}") -Stage "list_docker_containers")
+    $names = $containerList -split "`n" | ForEach-Object { ([string]$_).Trim() } | Where-Object { $_ }
     foreach ($name in $names) {
       if ($name -match 'kingsmen.*(truth|postgres)|postgres.*kingsmen') {
-        $status = (Invoke-DockerText -Arguments @("inspect", "-f", "{{.State.Status}}", $name) -Stage "inspect_discovered_postgres_container_$name").Trim()
+        $status = ([string](Invoke-DockerText -Arguments @("inspect", "-f", "{{.State.Status}}", $name) -Stage "inspect_discovered_postgres_container_$name")).Trim()
         if ($status -eq "running") {
           $env:KINGSMEN_POSTGRES_CONTAINER = $name
           return @{ found = $true; name = $name; status = $status; error = "" }
@@ -153,6 +154,7 @@ function Resolve-PostgresContainer {
     if ($lastError.Length -gt 300) { $lastError = $lastError.Substring(0, 300) }
   }
 
+  if (-not $lastError) { $lastError = "NO_KINGSMEN_POSTGRES_CONTAINER_FOUND" }
   return @{ found = $false; name = ""; status = ""; error = $lastError }
 }
 
@@ -269,8 +271,12 @@ try {
   Write-Output ($report | ConvertTo-Json -Depth 12)
   if (-not $allPassed) { exit 1 }
 } catch {
-  try { Invoke-DockerText -Arguments @("exec", $env:KINGSMEN_POSTGRES_CONTAINER, "rm", "-f", $dumpPath) -Stage "cleanup_after_exception_remove_dump" | Out-Null } catch { }
-  if (-not $PreserveRestoreDatabase -and $RestoreDatabaseName -and $RestoreDatabaseName -ne $env:KINGSMEN_POSTGRES_DATABASE) {
+  try {
+    if ($env:KINGSMEN_POSTGRES_CONTAINER) {
+      Invoke-DockerText -Arguments @("exec", $env:KINGSMEN_POSTGRES_CONTAINER, "rm", "-f", $dumpPath) -Stage "cleanup_after_exception_remove_dump" | Out-Null
+    }
+  } catch { }
+  if (-not $PreserveRestoreDatabase -and $RestoreDatabaseName -and $RestoreDatabaseName -ne $env:KINGSMEN_POSTGRES_DATABASE -and $env:KINGSMEN_POSTGRES_CONTAINER) {
     try { Invoke-DockerText -Arguments @("exec", $env:KINGSMEN_POSTGRES_CONTAINER, "dropdb", "-U", $env:KINGSMEN_POSTGRES_USER, "--if-exists", $RestoreDatabaseName) -Stage "cleanup_after_exception_drop_restore_database" | Out-Null } catch { }
   }
   $safeReason = ([string]$_.Exception.Message)
