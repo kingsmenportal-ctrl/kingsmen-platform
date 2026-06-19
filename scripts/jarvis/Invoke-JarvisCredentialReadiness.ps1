@@ -1,6 +1,9 @@
 param(
   [string]$ReportPath = "reports/jarvis/jarvis-credential-readiness-latest.json",
-  [switch]$RequireProductionCredentials
+  [string[]]$EnvFile = @(),
+  [string]$BackendBaseUrl = "",
+  [switch]$RequireProductionCredentials,
+  [switch]$NoAliasDatabaseUrl
 )
 
 $ErrorActionPreference = "Stop"
@@ -48,6 +51,56 @@ function Get-KingsmenRedactedPreview {
   if (Test-KingsmenPlaceholder $Value) { return "missing_or_placeholder" }
   if ($Value.Length -le 8) { return "present_redacted" }
   return ($Value.Substring(0, 2) + "***" + $Value.Substring($Value.Length - 2))
+}
+
+function Import-KingsmenEnvFile {
+  param([string]$Path)
+
+  if ([string]::IsNullOrWhiteSpace($Path)) { return [ordered]@{ path = $Path; loaded = $false; reason = "empty_path"; importedCount = 0 } }
+
+  $resolved = Join-Path (Get-Location) $Path
+  if (-not (Test-Path $resolved)) {
+    return [ordered]@{ path = $Path; loaded = $false; reason = "file_missing"; importedCount = 0 }
+  }
+
+  $imported = 0
+  Get-Content $resolved | ForEach-Object {
+    $line = $_.Trim()
+    if ($line.Length -eq 0) { return }
+    if ($line.StartsWith("#")) { return }
+    if ($line -match '^\s*([A-Za-z_][A-Za-z0-9_]*)\s*=\s*(.*)\s*$') {
+      $name = $Matches[1].Trim()
+      $value = $Matches[2].Trim()
+      if (($value.StartsWith('"') -and $value.EndsWith('"')) -or ($value.StartsWith("'") -and $value.EndsWith("'"))) {
+        $value = $value.Substring(1, $value.Length - 2)
+      }
+      [Environment]::SetEnvironmentVariable($name, $value, "Process")
+      $script:imported = $script:imported + 1
+    }
+  }
+
+  return [ordered]@{ path = $Path; loaded = $true; reason = "loaded_redacted"; importedCount = $script:imported }
+}
+
+$envFileReports = @()
+foreach ($file in $EnvFile) {
+  $script:imported = 0
+  $envFileReports += Import-KingsmenEnvFile -Path $file
+}
+
+if (-not [string]::IsNullOrWhiteSpace($BackendBaseUrl)) {
+  [Environment]::SetEnvironmentVariable("KINGSMEN_BACKEND_BASE_URL", $BackendBaseUrl, "Process")
+}
+
+if (-not $NoAliasDatabaseUrl) {
+  $kingsmenDb = [Environment]::GetEnvironmentVariable("KINGSMEN_DATABASE_URL", "Process")
+  $databaseUrl = [Environment]::GetEnvironmentVariable("DATABASE_URL", "Process")
+  if ((-not (Test-KingsmenPlaceholder $kingsmenDb)) -and (Test-KingsmenPlaceholder $databaseUrl)) {
+    [Environment]::SetEnvironmentVariable("DATABASE_URL", $kingsmenDb, "Process")
+  }
+  if ((-not (Test-KingsmenPlaceholder $databaseUrl)) -and (Test-KingsmenPlaceholder $kingsmenDb)) {
+    [Environment]::SetEnvironmentVariable("KINGSMEN_DATABASE_URL", $databaseUrl, "Process")
+  }
 }
 
 $requirements = @(
@@ -122,6 +175,9 @@ $report = [ordered]@{
   jarvisMayStoreSecrets = $false
   credentialsAddedToGit = $false
   placeholderValuesAccepted = $false
+  envFilesLoaded = $envFileReports
+  databaseUrlAliasedInProcess = (-not $NoAliasDatabaseUrl)
+  backendBaseUrlInjectedInProcess = (-not [string]::IsNullOrWhiteSpace($BackendBaseUrl))
   checks = $checks
   modules = $modules
   generatedAt = (Get-Date).ToUniversalTime().ToString("o")
