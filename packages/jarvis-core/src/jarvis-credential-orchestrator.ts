@@ -242,19 +242,41 @@ export const JARVIS_CREDENTIAL_REQUIREMENTS: readonly JarvisCredentialRequiremen
   }
 ];
 
+const JARVIS_PLACEHOLDER_VALUES = new Set([
+  '...',
+  'changeme',
+  'change_me',
+  'todo',
+  'tbd',
+  'placeholder',
+  'your_value_here',
+  'replace_me',
+  'real',
+  'real_value',
+  'real_bucket',
+  'real_secret',
+  'real_key',
+  'real_token',
+  'real_password',
+  'real_host',
+  'real_user',
+  'dummy',
+  'dummy_value',
+  'fake',
+  'fake_value'
+]);
+
 export function jarvisIsCredentialPlaceholder(value: string | undefined | null): boolean {
   if (value == null) return true;
   const normalized = value.trim().toLowerCase();
   return (
     normalized.length === 0 ||
-    normalized === '...' ||
-    normalized === 'changeme' ||
-    normalized === 'change_me' ||
-    normalized === 'todo' ||
-    normalized === 'placeholder' ||
-    normalized === 'your_value_here' ||
+    JARVIS_PLACEHOLDER_VALUES.has(normalized) ||
     normalized.startsWith('your_') ||
     normalized.startsWith('replace_') ||
+    normalized.startsWith('real_') ||
+    normalized.startsWith('dummy_') ||
+    normalized.startsWith('fake_') ||
     normalized.includes('example.com')
   );
 }
