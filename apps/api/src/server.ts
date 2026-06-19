@@ -16,10 +16,19 @@ import type {
 } from "./read-models/candidate-read-model";
 import type { KingsmenState } from "./state/state-machine";
 import { TruthVaultRepository } from "./db/truth-vault-repository";
+import {
+  buildPayFastCancelResponse,
+  buildPayFastItnHttpResponse,
+  buildPayFastReturnPendingResponse,
+  buildPayFastStatusPendingResponse,
+  parsePayFastFormBody
+} from "./finance/payfast-http-routes";
+import { PayFastFinanceRepository } from "./finance/payfast-finance-repository";
 
 const MAX_BODY_BYTES = 1_000_000;
 const SERVICE_NAME = "kingsmen-api";
 const truthVault = TruthVaultRepository.fromEnvironment();
+const payfastFinance = PayFastFinanceRepository.fromEnvironment();
 
 type JsonObject = Record<string, unknown>;
 
@@ -214,6 +223,33 @@ function getPathParam(pattern: RegExp, pathname: string): string | null {
   return match?.[1] ? decodeURIComponent(match[1]) : null;
 }
 
+function remoteAddress(request: IncomingMessage): string {
+  const forwardedFor = request.headers["x-forwarded-for"];
+  const raw = Array.isArray(forwardedFor) ? forwardedFor[0] : forwardedFor;
+  const first = raw?.split(",")[0]?.trim() || request.socket.remoteAddress || "";
+  return first.replace(/^::ffff:/, "");
+}
+
+function queryMerchantReference(url: URL): string | undefined {
+  return url.searchParams.get("m_payment_id") ?? url.searchParams.get("merchantReference") ?? undefined;
+}
+
+function isPayFastItnSourceVerified(request: IncomingMessage): boolean {
+  if (process.env.PAYFAST_ITN_SOURCE_VERIFIED === "true") return true;
+
+  const address = remoteAddress(request);
+  const allowlist = (process.env.PAYFAST_ITN_ALLOWED_IPS ?? "")
+    .split(",")
+    .map((value) => value.trim())
+    .filter(Boolean);
+
+  if (allowlist.includes(address)) return true;
+
+  const mode = process.env.PAYFAST_ITN_SOURCE_MODE ?? "strict";
+  const localAddresses = new Set(["127.0.0.1", "::1", "localhost"]);
+  return mode === "local_sandbox_only" && localAddresses.has(address);
+}
+
 async function handleCommand(request: IncomingMessage, response: ServerResponse): Promise<void> {
   const body = await readJson(request);
   const command = assertCommandEnvelope(body as CommandEnvelope);
@@ -349,14 +385,97 @@ async function handleWorkflowResult(request: IncomingMessage, response: ServerRe
   sendJson(response, 202, responseBody, result.correlationId);
 }
 
+async function handlePayFastItn(request: IncomingMessage, response: ServerResponse): Promise<void> {
+  const rawBody = await readBody(request);
+  const payload = parsePayFastFormBody(rawBody);
+  const merchantReference = typeof payload.m_payment_id === "string" ? payload.m_payment_id : "";
+
+  if (!merchantReference) {
+    sendError(response, 422, "PAYFAST_ITN_MISSING_MERCHANT_REFERENCE", "PayFast ITN missing m_payment_id.");
+    return;
+  }
+
+  const expectation = await payfastFinance.findIntentExpectation(merchantReference);
+  if (!expectation) {
+    sendError(response, 404, "PAYFAST_INTENT_NOT_FOUND", `No PayFast payment intent found for ${merchantReference}.`);
+    return;
+  }
+
+  const firstPass = buildPayFastItnHttpResponse({
+    env: process.env,
+    rawBody,
+    expectedMerchantReference: expectation.merchantReference,
+    expectedAmountCents: expectation.amountCents,
+    duplicate: false,
+    ipValid: isPayFastItnSourceVerified(request)
+  });
+
+  const duplicate = firstPass.validation ? await payfastFinance.hasItnReceipt(firstPass.validation.idempotencyKey) : false;
+  const responseBody = duplicate
+    ? buildPayFastItnHttpResponse({
+        env: process.env,
+        rawBody,
+        expectedMerchantReference: expectation.merchantReference,
+        expectedAmountCents: expectation.amountCents,
+        duplicate: true,
+        ipValid: isPayFastItnSourceVerified(request)
+      })
+    : firstPass;
+
+  const persistence = responseBody.validation
+    ? await payfastFinance.recordItnResult({ validation: responseBody.validation, payload, expectation })
+    : null;
+
+  sendJson(response, responseBody.ok ? 200 : 422, {
+    ...responseBody,
+    persistence,
+    financeStorageMode: payfastFinance.storageMode
+  });
+}
+
+async function handlePayFastReturn(response: ServerResponse, url: URL): Promise<void> {
+  sendJson(response, 200, buildPayFastReturnPendingResponse({
+    env: process.env,
+    merchantReference: queryMerchantReference(url)
+  }));
+}
+
+async function handlePayFastCancel(response: ServerResponse, url: URL): Promise<void> {
+  sendJson(response, 200, buildPayFastCancelResponse({
+    env: process.env,
+    merchantReference: queryMerchantReference(url)
+  }));
+}
+
+async function handlePayFastStatus(response: ServerResponse, merchantReference: string): Promise<void> {
+  const status = await payfastFinance.readPaymentStatus(merchantReference);
+  if (status) {
+    sendJson(response, 200, {
+      ok: true,
+      status: "PAYFAST_STATUS_READ",
+      payment: status,
+      financeStorageMode: payfastFinance.storageMode,
+      generatedAtIso: nowIso()
+    });
+    return;
+  }
+
+  sendJson(response, 200, {
+    ...buildPayFastStatusPendingResponse({ env: process.env, merchantReference }),
+    financeStorageMode: payfastFinance.storageMode
+  });
+}
+
 async function handleHealth(response: ServerResponse): Promise<void> {
   const truthVaultHealth = await truthVault.healthCheck();
+  const payfastFinanceHealth = await payfastFinance.healthCheck();
   sendJson(response, 200, {
     ok: true,
     service: SERVICE_NAME,
     status: "healthy",
     storageMode: truthVault.storageMode,
     truthVault: truthVaultHealth,
+    payfastFinance: payfastFinanceHealth,
     startedAtIso: store.startedAtIso,
     generatedAtIso: nowIso(),
     routes: [
@@ -365,6 +484,10 @@ async function handleHealth(response: ServerResponse): Promise<void> {
       "POST /api/commands",
       "POST /api/workflow/result",
       "POST /api/workflow-results",
+      "POST /api/payments/payfast/itn",
+      "GET /api/payments/payfast/return",
+      "GET /api/payments/payfast/cancel",
+      "GET /api/payments/payfast/status/:merchantReference",
       "GET /api/candidates/:candidateId/status",
       "GET /api/applications/:applicationId/workbench"
     ]
@@ -456,6 +579,27 @@ export function createKingsmenApiServer() {
         return;
       }
 
+      if (method === "POST" && pathname === "/api/payments/payfast/itn") {
+        await handlePayFastItn(request, response);
+        return;
+      }
+
+      if (method === "GET" && pathname === "/api/payments/payfast/return") {
+        await handlePayFastReturn(response, url);
+        return;
+      }
+
+      if (method === "GET" && pathname === "/api/payments/payfast/cancel") {
+        await handlePayFastCancel(response, url);
+        return;
+      }
+
+      const payfastStatusRef = getPathParam(/^\/api\/payments\/payfast\/status\/([^/]+)$/, pathname);
+      if (method === "GET" && payfastStatusRef) {
+        await handlePayFastStatus(response, payfastStatusRef);
+        return;
+      }
+
       const candidateId = getPathParam(/^\/api\/candidates\/([^/]+)\/status$/, pathname);
       if (method === "GET" && candidateId) {
         await handleCandidateStatus(response, candidateId);
@@ -489,6 +633,7 @@ export function startKingsmenApiServer(options: KingsmenApiServerOptions = {}) {
       host,
       port,
       storageMode: truthVault.storageMode,
+      financeStorageMode: payfastFinance.storageMode,
       generatedAtIso: nowIso()
     }));
   });
@@ -501,7 +646,7 @@ export function startKingsmenApiServer(options: KingsmenApiServerOptions = {}) {
       generatedAtIso: nowIso()
     }));
     server.close(() => {
-      truthVault.close().finally(() => process.exit(0));
+      Promise.all([truthVault.close(), payfastFinance.close()]).finally(() => process.exit(0));
     });
   };
 
