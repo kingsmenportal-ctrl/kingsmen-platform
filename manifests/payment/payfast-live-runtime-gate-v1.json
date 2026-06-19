@@ -1,0 +1,45 @@
+{
+  "id": "kingsmen.payfast-live-runtime-gate.v1",
+  "name": "PayFast Live Runtime Gate",
+  "status": "foundation_built_pending_provider_verification_and_runtime_proof",
+  "productionReady": false,
+  "livePaymentsEnabled": false,
+  "purpose": "Prevent real payment activation until PayFast account verification, sandbox ITN proof, runtime configuration, and founder approval are complete.",
+  "requiredEnvironmentNames": [
+    "PAYFAST_ENVIRONMENT",
+    "PAYFAST_MERCHANT_ID",
+    "PAYFAST_MERCHANT_KEY",
+    "PAYFAST_NOTIFY_URL",
+    "PAYFAST_RETURN_URL",
+    "PAYFAST_CANCEL_URL",
+    "PAYMENT_PROVIDER_SECRET"
+  ],
+  "requiredLiveFlags": [
+    "PAYFAST_ACCOUNT_VERIFIED",
+    "PAYFAST_SANDBOX_ITN_PROOF_REVIEWED",
+    "PAYFAST_FOUNDER_PAYMENT_APPROVAL"
+  ],
+  "rules": {
+    "returnUrlMarksPaid": false,
+    "cancelUrlMarksPaid": false,
+    "acceptedItnRequiredForPaidStatus": true,
+    "signatureAmountSourceStatusIdempotencyRequired": true,
+    "duplicateOrReplayItnRejected": true,
+    "payfastAccountVerificationRequiredForLive": true,
+    "sandboxItnProofRequiredForLive": true,
+    "founderApprovalRequiredForLive": true,
+    "notifyUrlHttpsRequiredForLive": true
+  },
+  "runtimeGateModule": "apps/api/src/finance/payfast-runtime-gate.ts",
+  "validator": "scripts/validators/validate-payfast-runtime-gate.mjs",
+  "evidenceOutputs": [
+    "reports/finance/payfast-runtime-gate-source-latest.json"
+  ],
+  "blockingReality": [
+    "PayFast account must be approved by PayFast.",
+    "Provider credentials must be configured outside source control.",
+    "Notify, return, and cancel URLs must point to the correct staging or live Kingsmen endpoints.",
+    "A real PayFast sandbox checkout and ITN proof must pass before live activation.",
+    "Founder approval is required before production-risk payment activation."
+  ]
+}
