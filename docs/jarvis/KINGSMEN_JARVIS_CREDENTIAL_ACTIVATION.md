@@ -70,7 +70,13 @@ Module activation matrix:
 reports/jarvis/jarvis-module-activation-matrix-latest.json
 ```
 
-Both reports must remain redacted.
+Document Vault storage proof:
+
+```text
+reports/staging/document-vault-storage-staging-latest.json
+```
+
+All reports must remain redacted.
 
 ## Activation matrix statuses
 
@@ -91,5 +97,37 @@ Both reports must remain redacted.
 5. Run `npm run final:collect:evidence`.
 6. Run `npm run jarvis:activation:matrix`.
 7. Founder approves production-risk activation.
+
+## Document Vault storage staging proof
+
+Do not enable real candidate document upload just because storage credentials exist. Document Vault also needs a redacted staging proof that confirms:
+
+1. storage credentials are configured outside Git;
+2. bucket access was tested;
+3. upload, download, and delete smoke test was completed;
+4. access-control rules were reviewed;
+5. file type, file size, retention, and deletion policy were reviewed;
+6. malware-scan boundary was reviewed;
+7. founder review was marked.
+
+Run only after setting real storage values in the current process environment:
+
+```powershell
+npm run document-vault:staging -- `
+  -MarkProviderConfigured `
+  -MarkBucketAccessTested `
+  -MarkUploadDownloadDeleteTested `
+  -MarkAccessControlReviewed `
+  -MarkFilePolicyReviewed `
+  -MarkMalwareScanBoundaryReviewed `
+  -MarkFounderReviewed
+```
+
+Then rebuild the Jarvis activation matrix:
+
+```powershell
+npm run jarvis:credentials:scan
+npm run jarvis:activation:matrix
+```
 
 Jarvis can coordinate the above sequence, but Kingsmen launch gates remain the authority.
