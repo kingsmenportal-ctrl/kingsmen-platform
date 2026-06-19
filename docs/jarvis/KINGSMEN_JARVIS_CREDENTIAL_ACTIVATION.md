@@ -11,9 +11,10 @@ Jarvis may only:
 1. inventory which credentials are required;
 2. reject placeholders such as `...`, `changeme`, `your_value_here`, `example.com`, `REAL_VALUE`, `REAL_BUCKET`, `dummy_*`, or `fake_*`;
 3. confirm whether a credential is present in the current process environment;
-4. write redacted readiness evidence;
-5. tell the operator which staging proof can run next;
-6. build a module activation matrix that combines credential readiness with Kingsmen evidence reports.
+4. load approved local `.env`-style files into the current PowerShell process only;
+5. write redacted readiness evidence;
+6. tell the operator which staging proof can run next;
+7. build a module activation matrix that combines credential readiness with Kingsmen evidence reports.
 
 Jarvis may not:
 
@@ -43,6 +44,22 @@ Scan current process credentials without printing raw values:
 ```powershell
 npm run jarvis:credentials:scan
 ```
+
+Scan local Kingsmen `.local` PostgreSQL env and inject the local backend URL into the current process only:
+
+```powershell
+npm run jarvis:credentials:scan:local
+```
+
+Equivalent direct command:
+
+```powershell
+.\scripts\jarvis\Invoke-JarvisCredentialReadiness.ps1 `
+  -EnvFile ".local\kingsmen.local-postgres.env" `
+  -BackendBaseUrl "http://127.0.0.1:3001"
+```
+
+The local scan writes only redacted evidence and records `envFilesLoaded` status. It also mirrors `KINGSMEN_DATABASE_URL` to `DATABASE_URL` in-process when one is present and the other is missing. It does not modify the env file and does not commit secrets.
 
 Build the Jarvis module activation matrix:
 
@@ -91,7 +108,7 @@ All reports must remain redacted.
 ## Activation sequence
 
 1. Operator adds credentials outside Git: local process environment, Oracle environment, GitHub secrets where appropriate, or vault/KMS later.
-2. Run `npm run jarvis:credentials:scan`.
+2. Run `npm run jarvis:credentials:scan` or `npm run jarvis:credentials:scan:local`.
 3. Replace any `PLACEHOLDER_REJECTED` or missing values.
 4. Run the module-specific staging proof.
 5. Run `npm run final:collect:evidence`.
