@@ -14,12 +14,15 @@ param(
 
 $ErrorActionPreference = "Stop"
 
-function Test-ConfiguredSecret {
-  param([string]$Name)
-  $value = [Environment]::GetEnvironmentVariable($Name, 'Process')
-  if ([string]::IsNullOrWhiteSpace($value)) { return $false }
-  $normalized = $value.Trim().ToLowerInvariant()
-  $bad = @(
+function Test-PlaceholderValue {
+  param([string]$Value)
+
+  if ([string]::IsNullOrWhiteSpace($Value)) { return $true }
+
+  $normalized = $Value.Trim().ToLowerInvariant()
+  $compact = ($normalized -replace '[\s_\-]+', '')
+
+  $badExact = @(
     "...",
     "todo",
     "tbd",
@@ -40,13 +43,49 @@ function Test-ConfiguredSecret {
     "fake",
     "fake_value"
   )
-  if ($bad -contains $normalized) { return $false }
-  if ($normalized.StartsWith("your_")) { return $false }
-  if ($normalized.StartsWith("replace_")) { return $false }
-  if ($normalized.StartsWith("real_")) { return $false }
-  if ($normalized.StartsWith("dummy_")) { return $false }
-  if ($normalized.StartsWith("fake_")) { return $false }
-  if ($normalized.Contains("example.com")) { return $false }
+
+  if ($badExact -contains $normalized) { return $true }
+
+  $badFragments = @(
+    "placeholder",
+    "changeme",
+    "replaceme",
+    "yourvaluehere",
+    "youractual",
+    "yourreal",
+    "actualsmtp",
+    "realsandboxvalue",
+    "realinternal",
+    "realprovider",
+    "dummyvalue",
+    "fakevalue",
+    "examplecom"
+  )
+
+  foreach ($fragment in $badFragments) {
+    if ($compact.Contains($fragment)) { return $true }
+  }
+
+  foreach ($prefix in @("your_", "your-", "your ", "replace_", "replace-", "replace ", "real_", "real-", "dummy_", "dummy-", "fake_", "fake-")) {
+    if ($normalized.StartsWith($prefix)) { return $true }
+  }
+
+  if ($normalized.Contains("example.com")) { return $true }
+  return $false
+}
+
+function Test-ConfiguredSecret {
+  param([string]$Name)
+
+  $value = [Environment]::GetEnvironmentVariable($Name, 'Process')
+  if (Test-PlaceholderValue -Value $value) { return $false }
+
+  if ($Name -eq "SMTP_HOST") {
+    $trimmed = $value.Trim()
+    if ($trimmed -match '\s') { return $false }
+    if ($trimmed -notmatch '^[a-zA-Z0-9][a-zA-Z0-9.-]*(:[0-9]{2,5})?$') { return $false }
+  }
+
   return $true
 }
 
@@ -75,6 +114,7 @@ $checks = @()
 $checks = Add-Check $checks "smtp_host_configured" (Test-ConfiguredSecret "SMTP_HOST") "masked_presence_only"
 $checks = Add-Check $checks "smtp_user_configured" (Test-ConfiguredSecret "SMTP_USER") "masked_presence_only"
 $checks = Add-Check $checks "smtp_password_configured" (Test-ConfiguredSecret "SMTP_PASSWORD") "masked_presence_only"
+$checks = Add-Check $checks "placeholder_values_rejected" $true "known_placeholder_patterns_rejected"
 $checks = Add-Check $checks "provider_marked_configured" ([bool]$MarkProviderConfigured) "operator_attested"
 $checks = Add-Check $checks "email_send_receive_tested" ([bool]$MarkEmailSendReceiveTested) "operator_attested"
 $checks = Add-Check $checks "bounce_handling_tested" ([bool]$MarkBounceHandlingTested) "operator_attested"
@@ -106,9 +146,11 @@ $report = [ordered]@{
   rawProviderCredentialsCopied = $false
   rawCandidateDataIncluded = $false
   providerCredentialsIncluded = $false
+  placeholderValuesAccepted = $false
+  credentialPlaceholderScan = "known_placeholder_patterns_rejected"
   checks = $checks
   generatedAt = (Get-Date).ToUniversalTime().ToString("o")
-  nextAction = $(if ($allPassed) { "Communications provider staging proof passed. Continue to PayFast, observability, or branch protection evidence." } else { "Configure real SMTP env values outside Git and mark provider staging tests only after evidence exists." })
+  nextAction = $(if ($allPassed) { "Communications provider staging proof passed. Continue to PayFast or branch protection evidence." } else { "Configure real SMTP env values outside Git and mark provider staging tests only after evidence exists." })
 }
 
 Write-Report -Report $report
