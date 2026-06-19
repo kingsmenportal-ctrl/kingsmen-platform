@@ -74,6 +74,14 @@ Equivalent direct command:
   -RedisUrl "redis://127.0.0.1:6379"
 ```
 
+Run the local queue scan and rebuild the activation matrix in one command, even when other provider credentials are still missing:
+
+```powershell
+npm run jarvis:activation:local:queue
+```
+
+This wrapper is useful because the credential scan exits non-zero while PayFast, communications, or storage credentials remain absent, but the activation matrix still needs to rebuild from the redacted report.
+
 The local scan writes only redacted evidence and records `envFilesLoaded` status. It also mirrors `KINGSMEN_DATABASE_URL` to `DATABASE_URL` in-process when one is present and the other is missing. It does not modify the env file and does not commit secrets.
 
 The local queue scan only makes `REDIS_URL` visible to Jarvis credential readiness. It does **not** prove Redis is running and does **not** mark queue fabric live. Queue fabric still requires the observability/incident staging proof.
@@ -125,11 +133,11 @@ All reports must remain redacted.
 ## Activation sequence
 
 1. Operator adds credentials outside Git: local process environment, Oracle environment, GitHub secrets where appropriate, or vault/KMS later.
-2. Run `npm run jarvis:credentials:scan`, `npm run jarvis:credentials:scan:local`, or `npm run jarvis:credentials:scan:local:queue`.
+2. Run `npm run jarvis:credentials:scan`, `npm run jarvis:credentials:scan:local`, `npm run jarvis:credentials:scan:local:queue`, or `npm run jarvis:activation:local:queue`.
 3. Replace any `PLACEHOLDER_REJECTED` or missing values.
 4. Run the module-specific staging proof.
 5. Run `npm run final:collect:evidence`.
-6. Run `npm run jarvis:activation:matrix`.
+6. Run `npm run jarvis:activation:matrix` or the wrapper command.
 7. Founder approves production-risk activation.
 
 ## Dummy value rejection
