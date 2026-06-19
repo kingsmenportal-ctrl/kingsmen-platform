@@ -2,7 +2,8 @@
 [CmdletBinding()]
 param(
   [string]$RegistryPath = "manifests/credentials/credentials.registry.json",
-  [string]$ReportPath = "reports/security/secrets-wiring-runtime-health-latest.json"
+  [string]$ReportPath = "reports/security/secrets-wiring-runtime-health-latest.json",
+  [switch]$MarkOperatorReviewed
 )
 
 $ErrorActionPreference = "Stop"
@@ -48,6 +49,9 @@ $report = [ordered]@{
   module = "Secrets Wiring Runtime Health"
   status = "MASKED_RUNTIME_SECRET_HEALTH_REPORTED"
   passed = ($betaMissing.Count -eq 0 -and $openClawVisible.Count -eq 0)
+  reviewed = [bool]$MarkOperatorReviewed
+  stagingReviewed = [bool]$MarkOperatorReviewed
+  redacted = $true
   productionReady = $false
   publicLaunchAllowed = $false
   rawSecretsPrinted = $false
