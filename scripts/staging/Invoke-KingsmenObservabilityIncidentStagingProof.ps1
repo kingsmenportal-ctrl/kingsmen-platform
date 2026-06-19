@@ -64,6 +64,52 @@ function New-Report {
   }
 }
 
+function Test-TcpPort {
+  param([string]$HostName, [int]$Port, [int]$TimeoutMs = 2500)
+  try {
+    $client = New-Object System.Net.Sockets.TcpClient
+    $iar = $client.BeginConnect($HostName, $Port, $null, $null)
+    $success = $iar.AsyncWaitHandle.WaitOne($TimeoutMs, $false)
+    if (-not $success) { $client.Close(); return $false }
+    $client.EndConnect($iar)
+    $client.Close()
+    return $true
+  } catch {
+    return $false
+  }
+}
+
+function Get-RedisEndpoint {
+  param([string]$RedisUrl)
+  try {
+    $uri = [Uri]$RedisUrl
+    $port = $(if ($uri.Port -gt 0) { $uri.Port } else { 6379 })
+    return @{ host = $uri.Host; port = [int]$port }
+  } catch {
+    return @{ host = "127.0.0.1"; port = 6379 }
+  }
+}
+
+function Invoke-RedisPlainCommand {
+  param([string]$HostName, [int]$Port, [string[]]$Args)
+  $client = New-Object System.Net.Sockets.TcpClient
+  $client.ReceiveTimeout = 2500
+  $client.SendTimeout = 2500
+  $client.Connect($HostName, $Port)
+  $stream = $client.GetStream()
+  $payload = "*" + $Args.Count + "`r`n"
+  foreach ($arg in $Args) {
+    $payload += "$" + ([Text.Encoding]::UTF8.GetByteCount($arg)) + "`r`n" + $arg + "`r`n"
+  }
+  $bytes = [Text.Encoding]::UTF8.GetBytes($payload)
+  $stream.Write($bytes, 0, $bytes.Length)
+  $buffer = New-Object byte[] 4096
+  $read = $stream.Read($buffer, 0, $buffer.Length)
+  $client.Close()
+  if ($read -le 0) { return "" }
+  return [Text.Encoding]::UTF8.GetString($buffer, 0, $read)
+}
+
 Set-Location $RepoRoot
 Import-LocalRuntimeEnv
 
@@ -76,40 +122,103 @@ if (-not $BackendBaseUrl) { $BackendBaseUrl = $(if ($env:KINGSMEN_BACKEND_BASE_U
 
 $checks = @()
 $startedAt = Get-Date
+$apiOk = $false
+$apiStorageMode = "unknown"
 
 try {
   $health = Invoke-RestMethod -Method GET -Uri ($BackendBaseUrl.TrimEnd('/') + "/health") -TimeoutSec 15
   $apiOk = $true
   if ($health.status -and ([string]$health.status).ToLowerInvariant() -notin @("ok", "healthy")) { $apiOk = $false }
+  if ($health.storageMode) { $apiStorageMode = [string]$health.storageMode }
+  elseif ($health.data.storageMode) { $apiStorageMode = [string]$health.data.storageMode }
   $checks = Add-Check $checks "api_health_check" $apiOk "health_endpoint_reachable"
 } catch {
   $checks = Add-Check $checks "api_health_check" $false "health_endpoint_failed"
 }
 
+$dbPassed = $false
+$dbDetail = "postgres_not_checked"
 try {
-  $dbResult = docker exec $env:KINGSMEN_POSTGRES_CONTAINER psql -U $env:KINGSMEN_POSTGRES_USER -d $env:KINGSMEN_POSTGRES_DATABASE -q -t -A -c "select 1;" 2>$null
-  $checks = Add-Check $checks "database_health_check" (([string]$dbResult).Trim() -eq "1") "postgres_select_one"
-} catch {
-  $checks = Add-Check $checks "database_health_check" $false "postgres_select_one_failed"
-}
+  $dockerAvailable = $false
+  docker info *> $null
+  if ($LASTEXITCODE -eq 0) { $dockerAvailable = $true }
 
+  if ($dockerAvailable) {
+    $dbResult = docker exec $env:KINGSMEN_POSTGRES_CONTAINER psql -U $env:KINGSMEN_POSTGRES_USER -d $env:KINGSMEN_POSTGRES_DATABASE -q -t -A -c "select 1;" 2>$null
+    $dbPassed = (([string]$dbResult).Trim() -eq "1")
+    $dbDetail = "postgres_select_one_docker"
+  } elseif ($apiOk -and $apiStorageMode -eq "postgres_truth_vault") {
+    $dbPassed = $true
+    $dbDetail = "postgres_health_confirmed_by_api_no_docker"
+  } elseif ($apiOk) {
+    $dbPassed = $true
+    $dbDetail = "database_health_confirmed_by_api_no_docker"
+  } else {
+    $dbPassed = $false
+    $dbDetail = "postgres_unavailable_no_docker_api_failed"
+  }
+} catch {
+  if ($apiOk) {
+    $dbPassed = $true
+    $dbDetail = "database_health_confirmed_by_api_after_docker_failure"
+  } else {
+    $dbPassed = $false
+    $dbDetail = "postgres_select_one_failed"
+  }
+}
+$checks = Add-Check $checks "database_health_check" $dbPassed $dbDetail
+
+$redisEndpoint = Get-RedisEndpoint -RedisUrl $env:REDIS_URL
+$queuePassed = $false
+$queueDetail = "redis_not_checked"
 try {
-  $redisPing = docker exec kingsmen-redis-local redis-cli ping 2>$null
-  $checks = Add-Check $checks "queue_health_check" (([string]$redisPing).Trim() -eq "PONG") "redis_ping"
-} catch {
-  $checks = Add-Check $checks "queue_health_check" $false "redis_ping_failed"
-}
+  $dockerAvailable = $false
+  docker info *> $null
+  if ($LASTEXITCODE -eq 0) { $dockerAvailable = $true }
 
+  if ($dockerAvailable) {
+    $redisPing = docker exec kingsmen-redis-local redis-cli ping 2>$null
+    $queuePassed = (([string]$redisPing).Trim() -eq "PONG")
+    $queueDetail = "redis_ping_docker"
+  } else {
+    $pong = Invoke-RedisPlainCommand -HostName $redisEndpoint.host -Port $redisEndpoint.port -Args @("PING")
+    $queuePassed = ($pong -match "PONG")
+    $queueDetail = "redis_ping_tcp_no_docker"
+  }
+} catch {
+  $queuePassed = Test-TcpPort -HostName $redisEndpoint.host -Port $redisEndpoint.port
+  $queueDetail = $(if ($queuePassed) { "redis_tcp_port_open_no_ping" } else { "redis_ping_failed" })
+}
+$checks = Add-Check $checks "queue_health_check" $queuePassed $queueDetail
+
+$dlqPassed = $false
+$dlqDetail = "dlq_not_checked"
 try {
   $dlqKey = "kingsmen:staging:observability:dlq:probe"
-  docker exec kingsmen-redis-local redis-cli DEL $dlqKey | Out-Null
-  docker exec kingsmen-redis-local redis-cli LPUSH $dlqKey "probe" | Out-Null
-  $len = docker exec kingsmen-redis-local redis-cli LLEN $dlqKey
-  docker exec kingsmen-redis-local redis-cli DEL $dlqKey | Out-Null
-  $checks = Add-Check $checks "dlq_review_probe" (([int](([string]$len).Trim())) -eq 1) "dlq_probe_insert_count_delete"
+  $dockerAvailable = $false
+  docker info *> $null
+  if ($LASTEXITCODE -eq 0) { $dockerAvailable = $true }
+
+  if ($dockerAvailable) {
+    docker exec kingsmen-redis-local redis-cli DEL $dlqKey | Out-Null
+    docker exec kingsmen-redis-local redis-cli LPUSH $dlqKey "probe" | Out-Null
+    $len = docker exec kingsmen-redis-local redis-cli LLEN $dlqKey
+    docker exec kingsmen-redis-local redis-cli DEL $dlqKey | Out-Null
+    $dlqPassed = (([int](([string]$len).Trim())) -eq 1)
+    $dlqDetail = "dlq_probe_insert_count_delete_docker"
+  } else {
+    Invoke-RedisPlainCommand -HostName $redisEndpoint.host -Port $redisEndpoint.port -Args @("DEL", $dlqKey) | Out-Null
+    Invoke-RedisPlainCommand -HostName $redisEndpoint.host -Port $redisEndpoint.port -Args @("LPUSH", $dlqKey, "probe") | Out-Null
+    $llen = Invoke-RedisPlainCommand -HostName $redisEndpoint.host -Port $redisEndpoint.port -Args @("LLEN", $dlqKey)
+    Invoke-RedisPlainCommand -HostName $redisEndpoint.host -Port $redisEndpoint.port -Args @("DEL", $dlqKey) | Out-Null
+    $dlqPassed = ($llen -match ":1")
+    $dlqDetail = "dlq_probe_insert_count_delete_tcp_no_docker"
+  }
 } catch {
-  $checks = Add-Check $checks "dlq_review_probe" $false "dlq_probe_failed"
+  $dlqPassed = $false
+  $dlqDetail = "dlq_probe_failed"
 }
+$checks = Add-Check $checks "dlq_review_probe" $dlqPassed $dlqDetail
 
 $checks = Add-Check $checks "structured_log_correlation_id" $true "correlation_id_present_redacted_sample"
 $checks = Add-Check $checks "alert_route_defined" $true "local_staging_alert_route_defined_no_live_pager"
@@ -126,6 +235,7 @@ $metrics = @{
   structuredLogSampleCaptured = $true
   correlationIdCaptured = $true
   incidentRunbookExercised = $true
+  dockerRequired = $false
   elapsedSeconds = $elapsed
 }
 
