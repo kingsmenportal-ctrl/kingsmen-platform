@@ -93,8 +93,14 @@ function Invoke-DockerText {
 
   Write-Stage $Stage
 
-  $output = & $docker.Source @Arguments 2>&1
-  $exitCode = $LASTEXITCODE
+  $previousErrorActionPreference = $ErrorActionPreference
+  $ErrorActionPreference = "Continue"
+  try {
+    $output = & $docker.Source @Arguments 2>&1
+    $exitCode = $LASTEXITCODE
+  } finally {
+    $ErrorActionPreference = $previousErrorActionPreference
+  }
   $text = Convert-OutputToText -Output $output
 
   if ($exitCode -ne 0) {
@@ -155,8 +161,14 @@ function Invoke-PsqlText {
   $docker = Get-Command docker -ErrorAction SilentlyContinue
   if (-not $docker) { throw "DOCKER_NOT_AVAILABLE" }
   Write-Stage $Stage
-  $output = $Sql | & $docker.Source exec -i $env:KINGSMEN_POSTGRES_CONTAINER psql -U $env:KINGSMEN_POSTGRES_USER -d $DatabaseName -v ON_ERROR_STOP=1 -q -t -A 2>&1
-  $exitCode = $LASTEXITCODE
+  $previousErrorActionPreference = $ErrorActionPreference
+  $ErrorActionPreference = "Continue"
+  try {
+    $output = $Sql | & $docker.Source exec -i $env:KINGSMEN_POSTGRES_CONTAINER psql -U $env:KINGSMEN_POSTGRES_USER -d $DatabaseName -v ON_ERROR_STOP=1 -q -t -A 2>&1
+    $exitCode = $LASTEXITCODE
+  } finally {
+    $ErrorActionPreference = $previousErrorActionPreference
+  }
   if ($exitCode -ne 0) {
     $safeErr = (Convert-OutputToText -Output $output).Trim()
     if ($safeErr.Length -gt 500) { $safeErr = $safeErr.Substring(0, 500) }
