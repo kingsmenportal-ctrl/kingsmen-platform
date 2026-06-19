@@ -102,6 +102,21 @@ function Set-KingsmenEnvFileValue {
   $updated | Set-Content -Encoding UTF8 -Path $Path
 }
 
+function New-PostgresConnectionString {
+  param(
+    [string]$User,
+    [string]$Password,
+    [string]$HostName,
+    [int]$Port,
+    [string]$Database
+  )
+
+  $encodedUser = [System.Uri]::EscapeDataString($User)
+  $encodedPassword = [System.Uri]::EscapeDataString($Password)
+  $encodedDatabase = [System.Uri]::EscapeDataString($Database)
+  return "postgresql://${encodedUser}:${encodedPassword}@${HostName}:${Port}/${encodedDatabase}"
+}
+
 if ($KillExistingPort) {
   $listeners = Get-NetTCPConnection -LocalPort $Port -State Listen -ErrorAction SilentlyContinue
   foreach ($listener in $listeners) {
@@ -126,11 +141,13 @@ $envImportCount = Import-KingsmenEnvFile -Path $EnvFile
 
 $containerPasswordSynced = $false
 $containerPasswordAvailable = $false
+$databaseUrlCredentialsUrlEncoded = $false
 if (-not $NoSyncPostgresPasswordFromContainer) {
   $containerPassword = Read-DockerContainerEnvValue -ContainerName $PostgresContainerName -EnvName "POSTGRES_PASSWORD"
   if (-not [string]::IsNullOrWhiteSpace($containerPassword)) {
     $containerPasswordAvailable = $true
-    $databaseUrl = "postgresql://$PostgresUser`:$containerPassword@127.0.0.1:$PostgresPort/$PostgresDatabase"
+    $databaseUrl = New-PostgresConnectionString -User $PostgresUser -Password $containerPassword -HostName "127.0.0.1" -Port $PostgresPort -Database $PostgresDatabase
+    $databaseUrlCredentialsUrlEncoded = $true
     [Environment]::SetEnvironmentVariable("KINGSMEN_POSTGRES_PASSWORD", $containerPassword, 'Process')
     [Environment]::SetEnvironmentVariable("KINGSMEN_DATABASE_URL", $databaseUrl, 'Process')
     [Environment]::SetEnvironmentVariable("DATABASE_URL", $databaseUrl, 'Process')
@@ -162,6 +179,7 @@ Write-Host (@{
   redisContainerStartAttempted = $redisContainerStartAttempted
   postgresContainerPasswordAvailable = $containerPasswordAvailable
   databaseUrlSyncedFromPostgresContainer = $containerPasswordSynced
+  databaseUrlCredentialsUrlEncoded = $databaseUrlCredentialsUrlEncoded
   databaseUrlLoaded = -not [string]::IsNullOrWhiteSpace($env:DATABASE_URL)
   redisUrlLoaded = -not [string]::IsNullOrWhiteSpace($env:REDIS_URL)
   rawSecretsPrinted = $false
