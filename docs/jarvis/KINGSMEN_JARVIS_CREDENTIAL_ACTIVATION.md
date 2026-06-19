@@ -59,7 +59,24 @@ Equivalent direct command:
   -BackendBaseUrl "http://127.0.0.1:3001"
 ```
 
+Scan local Kingsmen `.local` PostgreSQL env, inject the local backend URL, and inject the local Redis queue URL into the current process only:
+
+```powershell
+npm run jarvis:credentials:scan:local:queue
+```
+
+Equivalent direct command:
+
+```powershell
+.\scripts\jarvis\Invoke-JarvisCredentialReadiness.ps1 `
+  -EnvFile ".local\kingsmen.local-postgres.env" `
+  -BackendBaseUrl "http://127.0.0.1:3001" `
+  -RedisUrl "redis://127.0.0.1:6379"
+```
+
 The local scan writes only redacted evidence and records `envFilesLoaded` status. It also mirrors `KINGSMEN_DATABASE_URL` to `DATABASE_URL` in-process when one is present and the other is missing. It does not modify the env file and does not commit secrets.
+
+The local queue scan only makes `REDIS_URL` visible to Jarvis credential readiness. It does **not** prove Redis is running and does **not** mark queue fabric live. Queue fabric still requires the observability/incident staging proof.
 
 Build the Jarvis module activation matrix:
 
@@ -108,7 +125,7 @@ All reports must remain redacted.
 ## Activation sequence
 
 1. Operator adds credentials outside Git: local process environment, Oracle environment, GitHub secrets where appropriate, or vault/KMS later.
-2. Run `npm run jarvis:credentials:scan` or `npm run jarvis:credentials:scan:local`.
+2. Run `npm run jarvis:credentials:scan`, `npm run jarvis:credentials:scan:local`, or `npm run jarvis:credentials:scan:local:queue`.
 3. Replace any `PLACEHOLDER_REJECTED` or missing values.
 4. Run the module-specific staging proof.
 5. Run `npm run final:collect:evidence`.
