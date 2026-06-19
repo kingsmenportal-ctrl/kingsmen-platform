@@ -24,8 +24,27 @@ function Get-ModuleCredentialReady {
 
 function Get-EvidenceReport {
   param($FinalEvidenceBundle, [string]$Path)
-  if ($null -eq $FinalEvidenceBundle -or $null -eq $FinalEvidenceBundle.reports) { return $null }
-  return $FinalEvidenceBundle.reports | Where-Object { $_.path -eq $Path } | Select-Object -First 1
+  if ($null -ne $FinalEvidenceBundle -and $null -ne $FinalEvidenceBundle.reports) {
+    $fromBundle = $FinalEvidenceBundle.reports | Where-Object { $_.path -eq $Path } | Select-Object -First 1
+    if ($null -ne $fromBundle) { return $fromBundle }
+  }
+
+  if (Test-Path $Path) {
+    $direct = Read-JsonFileOrNull -Path $Path
+    if ($null -ne $direct) {
+      return [ordered]@{
+        path = $Path
+        exists = $true
+        passed = [bool]$direct.passed
+        reviewed = [bool]$direct.reviewed
+        redacted = [bool]$direct.redacted
+        status = [string]$direct.status
+        generatedAt = $direct.generatedAt
+      }
+    }
+  }
+
+  return $null
 }
 
 function New-ActivationModule {
@@ -97,7 +116,7 @@ $modules = @(
   New-ActivationModule -ModuleRef "queue_fabric" -DisplayName "Redis Queue Fabric" -CredentialModuleRef "queue_fabric" -EvidencePath "reports/staging/observability-incident-staging-latest.json"
   New-ActivationModule -ModuleRef "payments" -DisplayName "PayFast Payments" -CredentialModuleRef "payments" -EvidencePath "reports/staging/payfast-provider-sandbox-staging-latest.json"
   New-ActivationModule -ModuleRef "communications" -DisplayName "Email / WhatsApp / SMS Communications" -CredentialModuleRef "communications" -EvidencePath "reports/staging/communications-provider-staging-latest.json"
-  New-ActivationModule -ModuleRef "document_vault" -DisplayName "Document Vault Storage" -CredentialModuleRef "document_vault" -EvidencePath "NOT_REQUIRED" -EvidenceRequired $false
+  New-ActivationModule -ModuleRef "document_vault" -DisplayName "Document Vault Storage" -CredentialModuleRef "document_vault" -EvidencePath "reports/staging/document-vault-storage-staging-latest.json"
   New-ActivationModule -ModuleRef "legal_privacy" -DisplayName "Legal Privacy Publication" -CredentialModuleRef "NOT_REQUIRED" -CredentialRequired $false -EvidencePath "reports/staging/legal-privacy-publication-staging-latest.json"
   New-ActivationModule -ModuleRef "branch_protection" -DisplayName "GitHub Main Branch Protection" -CredentialModuleRef "NOT_REQUIRED" -CredentialRequired $false -EvidencePath "reports/repo/main-branch-protection-apply-latest.json"
 )
