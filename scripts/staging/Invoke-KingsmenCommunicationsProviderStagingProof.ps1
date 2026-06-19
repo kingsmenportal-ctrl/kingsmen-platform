@@ -18,8 +18,35 @@ function Test-ConfiguredSecret {
   param([string]$Name)
   $value = [Environment]::GetEnvironmentVariable($Name, 'Process')
   if ([string]::IsNullOrWhiteSpace($value)) { return $false }
-  if ($value.Trim() -eq "...") { return $false }
-  if ($value.Trim().ToUpperInvariant() -in @("TODO", "TBD", "PLACEHOLDER", "CHANGE_ME", "REPLACE_ME")) { return $false }
+  $normalized = $value.Trim().ToLowerInvariant()
+  $bad = @(
+    "...",
+    "todo",
+    "tbd",
+    "placeholder",
+    "changeme",
+    "change_me",
+    "replace_me",
+    "your_value_here",
+    "real",
+    "real_value",
+    "real_host",
+    "real_user",
+    "real_password",
+    "real_secret",
+    "real_key",
+    "dummy",
+    "dummy_value",
+    "fake",
+    "fake_value"
+  )
+  if ($bad -contains $normalized) { return $false }
+  if ($normalized.StartsWith("your_")) { return $false }
+  if ($normalized.StartsWith("replace_")) { return $false }
+  if ($normalized.StartsWith("real_")) { return $false }
+  if ($normalized.StartsWith("dummy_")) { return $false }
+  if ($normalized.StartsWith("fake_")) { return $false }
+  if ($normalized.Contains("example.com")) { return $false }
   return $true
 }
 
