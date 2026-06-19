@@ -40,32 +40,53 @@ requireFile('apps/web/src/finance/CandidatePaymentStatusPanel.tsx', [
   'accepted PayFast ITN evidence'
 ]);
 
+requireFile('apps/web/src/finance/payment-status-api.ts', [
+  'fetchCandidatePaymentStatus',
+  'mapPayFastBackendStatus',
+  'GET',
+  '/api/payments/payfast/status/',
+  'KINGSMEN_API_BASE_URL',
+  'NEXT_PUBLIC_KINGSMEN_API_BASE_URL',
+  'activeRequiresEntitlementStatusActive',
+  'noPaymentStateMutationFromWeb'
+]);
+
 requireFile('apps/web/src/app/candidate/payment-status/page.tsx', [
-  'CandidatePaymentStatusPanel',
+  'fetchCandidatePaymentStatus',
+  'merchantReference',
+  'm_payment_id',
   'Payment and package access',
   'backend finance ledger'
 ]);
 
 requireFile('docs/candidate/KINGSMEN_CANDIDATE_PAYMENT_STATUS.md', [
   'Production ready: **false**',
-  '/candidate/payment-status',
+  '/candidate/payment-status?merchantReference=',
+  'GET /api/payments/payfast/status/:merchantReference',
   'pending',
   'paid',
   'active',
   'blocked',
-  'Browser return cannot activate a Kingsmen package',
-  'Fetch `/api/payments/payfast/status/:merchantReference` from the backend'
+  'Browser return cannot open a Kingsmen package',
+  'KINGSMEN_API_BASE_URL'
 ]);
 
 const panel = read('apps/web/src/finance/CandidatePaymentStatusPanel.tsx') ?? '';
-if (panel.includes('PAYFAST_MERCHANT_KEY') || panel.includes('PAYFAST_PASSPHRASE')) {
-  failures.push('Candidate payment status UI must not expose PayFast credential names.');
+const api = read('apps/web/src/finance/payment-status-api.ts') ?? '';
+if (panel.includes('PAYFAST_MERCHANT_KEY') || panel.includes('PAYFAST_PASSPHRASE') || api.includes('PAYFAST_MERCHANT_KEY') || api.includes('PAYFAST_PASSPHRASE')) {
+  failures.push('Candidate payment status UI and API mapper must not expose PayFast credential names.');
 }
 if (!panel.includes('status?: PaymentStatus')) {
   failures.push('Candidate payment status panel must accept a status prop for backend mapping.');
 }
 if (!panel.includes('evidenceRef?: string')) {
   failures.push('Candidate payment status panel must support showing evidence reference when available.');
+}
+if (!api.includes('entitlementStatus === "ACTIVE"')) {
+  failures.push('Candidate payment status mapper must require ACTIVE entitlement for active UI status.');
+}
+if (!api.includes('cache: "no-store"')) {
+  failures.push('Candidate payment status fetch must not cache live finance status.');
 }
 
 const report = {
@@ -75,16 +96,18 @@ const report = {
   failures,
   checkedFiles: [
     'apps/web/src/finance/CandidatePaymentStatusPanel.tsx',
+    'apps/web/src/finance/payment-status-api.ts',
     'apps/web/src/app/candidate/payment-status/page.tsx',
     'docs/candidate/KINGSMEN_CANDIDATE_PAYMENT_STATUS.md'
   ],
   doctrine: {
     candidateCanSeePaymentAndPackageStatus: true,
-    returnPageCannotActivatePackage: true,
-    cancelPageCannotActivatePackage: true,
+    returnPageCannotOpenPackage: true,
+    cancelPageCannotOpenPackage: true,
     activeStatusRequiresEvidenceEntitlement: true,
     noProviderSecretsInUi: true,
-    backendStatusFetchStillRequiredForProduction: true
+    backendStatusFetchBuilt: true,
+    noWebMutationOfPaymentState: true
   }
 };
 
