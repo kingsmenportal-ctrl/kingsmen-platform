@@ -86,14 +86,26 @@ function Invoke-ContainerSqlScalar {
   return ($LASTEXITCODE -eq 0)
 }
 
+function Get-ContainerRuntimeStatus {
+  param([string]$Name)
+  $status = (& docker inspect -f "{{.State.Status}} restart={{.RestartCount}}" $Name 2>$null)
+  if ($LASTEXITCODE -ne 0 -or -not $status) { return "not_inspectable" }
+  return [string]$status
+}
+
 function Wait-PostgresReady {
   param([string]$Name, [string]$User, [string]$Database)
   $stableReadyCount = 0
   $lastFailure = "not_checked"
 
-  for ($i = 0; $i -lt 90; $i++) {
-    $inspectStatus = (& docker inspect -f "{{.State.Status}} {{.State.Health.Status}} {{.RestartCount}}" $Name 2>$null)
-    if ($LASTEXITCODE -ne 0) { $lastFailure = "container_not_inspectable"; Start-Sleep -Seconds 2; continue }
+  for ($i = 0; $i -lt 120; $i++) {
+    $containerStatus = Get-ContainerRuntimeStatus -Name $Name
+    if ($containerStatus -notmatch "^running") {
+      $stableReadyCount = 0
+      $lastFailure = "container_status=$containerStatus"
+      Start-Sleep -Seconds 2
+      continue
+    }
 
     & docker exec $Name pg_isready -U $User -d $Database | Out-Null
     $pgReady = ($LASTEXITCODE -eq 0)
@@ -108,7 +120,7 @@ function Wait-PostgresReady {
       if ($stableReadyCount -ge 3) { return }
     } else {
       $stableReadyCount = 0
-      $lastFailure = "pg_isready=$pgReady select_1=$selectReady inspect=$inspectStatus"
+      $lastFailure = "pg_isready=$pgReady select_1=$selectReady container=$containerStatus"
     }
 
     Start-Sleep -Seconds 2
