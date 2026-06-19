@@ -30,6 +30,7 @@
     "secrets:validate:wiring": "node scripts/validators/validate-secrets-wiring-proof.mjs",
     "communications:prove": "node scripts/proof/prove-communications-boundary.mjs",
     "communications:validate": "node scripts/validators/validate-communications-proof.mjs",
+    "communications:staging": "powershell -ExecutionPolicy Bypass -File scripts/staging/Invoke-KingsmenCommunicationsProviderStagingProof.ps1",
     "observability:prove": "node scripts/proof/prove-observability-incident-boundary.mjs",
     "observability:validate": "node scripts/validators/validate-observability-incident-proof.mjs",
     "observability:staging": "powershell -ExecutionPolicy Bypass -File scripts/staging/Invoke-KingsmenObservabilityIncidentStagingProof.ps1",
