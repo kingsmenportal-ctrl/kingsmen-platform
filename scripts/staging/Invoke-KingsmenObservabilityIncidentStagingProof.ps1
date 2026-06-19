@@ -1,13 +1,29 @@
 #requires -Version 5.1
 [CmdletBinding()]
 param(
-  [string]$RepoRoot = (Resolve-Path (Join-Path $PSScriptRoot "..\..")).Path,
+  [string]$RepoRoot = "",
   [string]$ReportPath = "reports/staging/observability-incident-staging-latest.json",
   [string]$BackendBaseUrl = "",
   [switch]$MarkOperatorReviewed
 )
 
 $ErrorActionPreference = "Stop"
+
+function Resolve-KingsmenRepoRoot {
+  param([string]$Candidate)
+
+  if (-not [string]::IsNullOrWhiteSpace($Candidate)) {
+    return (Resolve-Path $Candidate).Path
+  }
+
+  if (-not [string]::IsNullOrWhiteSpace($PSScriptRoot)) {
+    return (Resolve-Path (Join-Path $PSScriptRoot "..\..")).Path
+  }
+
+  return (Get-Location).Path
+}
+
+$RepoRoot = Resolve-KingsmenRepoRoot -Candidate $RepoRoot
 
 function Import-LocalRuntimeEnv {
   $envPath = Join-Path $RepoRoot ".local/kingsmen.local-postgres.env"
@@ -79,6 +95,34 @@ function Test-TcpPort {
   }
 }
 
+function Test-DockerAvailable {
+  try {
+    docker info *> $null
+    return ($LASTEXITCODE -eq 0)
+  } catch {
+    return $false
+  }
+}
+
+function Ensure-DockerContainerRunning {
+  param([string]$Name)
+
+  if (-not (Test-DockerAvailable)) { return $false }
+
+  try {
+    $running = docker inspect -f "{{.State.Running}}" $Name 2>$null
+    if (([string]$running).Trim().ToLowerInvariant() -eq "true") { return $true }
+
+    docker start $Name *> $null
+    Start-Sleep -Seconds 2
+
+    $runningAfterStart = docker inspect -f "{{.State.Running}}" $Name 2>$null
+    return (([string]$runningAfterStart).Trim().ToLowerInvariant() -eq "true")
+  } catch {
+    return $false
+  }
+}
+
 function Get-RedisEndpoint {
   param([string]$RedisUrl)
   try {
@@ -117,6 +161,7 @@ if (-not $env:DATABASE_URL -and $env:KINGSMEN_DATABASE_URL) { $env:DATABASE_URL 
 if (-not $env:KINGSMEN_POSTGRES_CONTAINER) { $env:KINGSMEN_POSTGRES_CONTAINER = "kingsmen-truth-vault-local" }
 if (-not $env:KINGSMEN_POSTGRES_DATABASE) { $env:KINGSMEN_POSTGRES_DATABASE = "kingsmen_truth_vault" }
 if (-not $env:KINGSMEN_POSTGRES_USER) { $env:KINGSMEN_POSTGRES_USER = "kingsmen" }
+if (-not $env:KINGSMEN_REDIS_CONTAINER) { $env:KINGSMEN_REDIS_CONTAINER = "kingsmen-redis-local" }
 if (-not $env:REDIS_URL) { $env:REDIS_URL = "redis://127.0.0.1:6379" }
 if (-not $BackendBaseUrl) { $BackendBaseUrl = $(if ($env:KINGSMEN_BACKEND_BASE_URL) { $env:KINGSMEN_BACKEND_BASE_URL } else { "http://127.0.0.1:3001" }) }
 
@@ -124,6 +169,8 @@ $checks = @()
 $startedAt = Get-Date
 $apiOk = $false
 $apiStorageMode = "unknown"
+$postgresContainerRunning = Ensure-DockerContainerRunning -Name $env:KINGSMEN_POSTGRES_CONTAINER
+$redisContainerRunning = Ensure-DockerContainerRunning -Name $env:KINGSMEN_REDIS_CONTAINER
 
 try {
   $health = Invoke-RestMethod -Method GET -Uri ($BackendBaseUrl.TrimEnd('/') + "/health") -TimeoutSec 15
@@ -139,14 +186,10 @@ try {
 $dbPassed = $false
 $dbDetail = "postgres_not_checked"
 try {
-  $dockerAvailable = $false
-  docker info *> $null
-  if ($LASTEXITCODE -eq 0) { $dockerAvailable = $true }
-
-  if ($dockerAvailable) {
+  if ($postgresContainerRunning) {
     $dbResult = docker exec $env:KINGSMEN_POSTGRES_CONTAINER psql -U $env:KINGSMEN_POSTGRES_USER -d $env:KINGSMEN_POSTGRES_DATABASE -q -t -A -c "select 1;" 2>$null
     $dbPassed = (([string]$dbResult).Trim() -eq "1")
-    $dbDetail = "postgres_select_one_docker"
+    $dbDetail = $(if ($dbPassed) { "postgres_select_one_docker" } else { "postgres_select_one_docker_failed" })
   } elseif ($apiOk -and $apiStorageMode -eq "postgres_truth_vault") {
     $dbPassed = $true
     $dbDetail = "postgres_health_confirmed_by_api_no_docker"
@@ -172,18 +215,16 @@ $redisEndpoint = Get-RedisEndpoint -RedisUrl $env:REDIS_URL
 $queuePassed = $false
 $queueDetail = "redis_not_checked"
 try {
-  $dockerAvailable = $false
-  docker info *> $null
-  if ($LASTEXITCODE -eq 0) { $dockerAvailable = $true }
-
-  if ($dockerAvailable) {
-    $redisPing = docker exec kingsmen-redis-local redis-cli ping 2>$null
+  if ($redisContainerRunning) {
+    $redisPing = docker exec $env:KINGSMEN_REDIS_CONTAINER redis-cli ping 2>$null
     $queuePassed = (([string]$redisPing).Trim() -eq "PONG")
-    $queueDetail = "redis_ping_docker"
-  } else {
+    $queueDetail = $(if ($queuePassed) { "redis_ping_docker" } else { "redis_ping_docker_failed" })
+  }
+
+  if (-not $queuePassed) {
     $pong = Invoke-RedisPlainCommand -HostName $redisEndpoint.host -Port $redisEndpoint.port -Args @("PING")
     $queuePassed = ($pong -match "PONG")
-    $queueDetail = "redis_ping_tcp_no_docker"
+    $queueDetail = $(if ($queuePassed) { "redis_ping_tcp_fallback" } else { "redis_ping_failed" })
   }
 } catch {
   $queuePassed = Test-TcpPort -HostName $redisEndpoint.host -Port $redisEndpoint.port
@@ -195,24 +236,22 @@ $dlqPassed = $false
 $dlqDetail = "dlq_not_checked"
 try {
   $dlqKey = "kingsmen:staging:observability:dlq:probe"
-  $dockerAvailable = $false
-  docker info *> $null
-  if ($LASTEXITCODE -eq 0) { $dockerAvailable = $true }
-
-  if ($dockerAvailable) {
-    docker exec kingsmen-redis-local redis-cli DEL $dlqKey | Out-Null
-    docker exec kingsmen-redis-local redis-cli LPUSH $dlqKey "probe" | Out-Null
-    $len = docker exec kingsmen-redis-local redis-cli LLEN $dlqKey
-    docker exec kingsmen-redis-local redis-cli DEL $dlqKey | Out-Null
+  if ($redisContainerRunning) {
+    docker exec $env:KINGSMEN_REDIS_CONTAINER redis-cli DEL $dlqKey | Out-Null
+    docker exec $env:KINGSMEN_REDIS_CONTAINER redis-cli LPUSH $dlqKey "probe" | Out-Null
+    $len = docker exec $env:KINGSMEN_REDIS_CONTAINER redis-cli LLEN $dlqKey
+    docker exec $env:KINGSMEN_REDIS_CONTAINER redis-cli DEL $dlqKey | Out-Null
     $dlqPassed = (([int](([string]$len).Trim())) -eq 1)
-    $dlqDetail = "dlq_probe_insert_count_delete_docker"
-  } else {
+    $dlqDetail = $(if ($dlqPassed) { "dlq_probe_insert_count_delete_docker" } else { "dlq_probe_docker_failed" })
+  }
+
+  if (-not $dlqPassed) {
     Invoke-RedisPlainCommand -HostName $redisEndpoint.host -Port $redisEndpoint.port -Args @("DEL", $dlqKey) | Out-Null
     Invoke-RedisPlainCommand -HostName $redisEndpoint.host -Port $redisEndpoint.port -Args @("LPUSH", $dlqKey, "probe") | Out-Null
     $llen = Invoke-RedisPlainCommand -HostName $redisEndpoint.host -Port $redisEndpoint.port -Args @("LLEN", $dlqKey)
     Invoke-RedisPlainCommand -HostName $redisEndpoint.host -Port $redisEndpoint.port -Args @("DEL", $dlqKey) | Out-Null
     $dlqPassed = ($llen -match ":1")
-    $dlqDetail = "dlq_probe_insert_count_delete_tcp_no_docker"
+    $dlqDetail = $(if ($dlqPassed) { "dlq_probe_insert_count_delete_tcp_fallback" } else { "dlq_probe_failed" })
   }
 } catch {
   $dlqPassed = $false
@@ -236,10 +275,12 @@ $metrics = @{
   correlationIdCaptured = $true
   incidentRunbookExercised = $true
   dockerRequired = $false
+  postgresContainerRunning = $postgresContainerRunning
+  redisContainerRunning = $redisContainerRunning
   elapsedSeconds = $elapsed
 }
 
-$nextAction = $(if ($allPassed) { "Observability incident staging proof passed. Continue to legal/privacy publication proof or communications provider proof." } else { "Fix failed observability staging checks, then rerun this proof." })
+$nextAction = $(if ($allPassed) { "Observability incident staging proof passed. Continue to legal/privacy publication proof or communications provider proof." } else { "Fix failed observability staging checks, then rerun this proof. For local proof, start Docker containers and the API on port 3001." })
 $report = New-Report -Passed ([bool]$allPassed) -Checks $checks -Metrics $metrics -NextAction $nextAction
 Write-Report -Report $report
 if (-not $allPassed) { exit 1 }
