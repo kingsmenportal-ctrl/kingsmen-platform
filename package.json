@@ -33,6 +33,7 @@
     "payments:validate:server-persistence": "node scripts/validators/validate-payfast-server-mount-and-persistence.mjs",
     "payments:validate:service-activation": "node scripts/validators/validate-service-entitlement-activation.mjs",
     "payments:validate:candidate-status": "node scripts/validators/validate-candidate-payment-status.mjs",
+    "payments:validate:clean-sync": "node scripts/validators/validate-payfast-clean-sync-carry-forward.mjs",
     "security:prove:rls": "node scripts/proof/prove-rls-security-boundary.mjs",
     "security:validate:rls": "node scripts/validators/validate-rls-security-proof.mjs",
     "backup:prove:restore": "node scripts/proof/prove-backup-restore-boundary.mjs",
