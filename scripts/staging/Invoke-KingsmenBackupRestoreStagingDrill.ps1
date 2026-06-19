@@ -96,7 +96,7 @@ function Invoke-DockerText {
     $completed = $process.WaitForExit($CommandTimeoutSeconds * 1000)
     if (-not $completed) {
       try { $process.Kill() } catch { }
-      throw "DOCKER_COMMAND_TIMEOUT:$Stage"
+      throw "DOCKER_COMMAND_TIMEOUT:${Stage}"
     }
 
     $stdout = if (Test-Path $stdoutPath) { Get-Content -Raw -Path $stdoutPath } else { "" }
@@ -114,13 +114,55 @@ function Invoke-DockerText {
   }
 }
 
+function Resolve-PostgresContainer {
+  $candidates = @()
+  if ($env:KINGSMEN_POSTGRES_CONTAINER) { $candidates += ([string]$env:KINGSMEN_POSTGRES_CONTAINER).Trim() }
+  $candidates += "kingsmen-truth-vault-local"
+  $candidates += "kingsmen-postgres-local"
+  $candidates = $candidates | Where-Object { $_ } | Select-Object -Unique
+
+  $lastError = ""
+  foreach ($name in $candidates) {
+    try {
+      $status = (Invoke-DockerText -Arguments @("inspect", "-f", "{{.State.Status}}", $name) -Stage "inspect_postgres_container_$name").Trim()
+      if ($status -eq "running") {
+        $env:KINGSMEN_POSTGRES_CONTAINER = $name
+        return @{ found = $true; name = $name; status = $status; error = "" }
+      }
+      $lastError = "CONTAINER_NOT_RUNNING:$name:$status"
+    } catch {
+      $lastError = ([string]$_.Exception.Message)
+      if ($lastError.Length -gt 300) { $lastError = $lastError.Substring(0, 300) }
+    }
+  }
+
+  try {
+    $names = (Invoke-DockerText -Arguments @("ps", "-a", "--format", "{{.Names}}") -Stage "list_docker_containers").Split("`n") | ForEach-Object { $_.Trim() } | Where-Object { $_ }
+    foreach ($name in $names) {
+      if ($name -match 'kingsmen.*(truth|postgres)|postgres.*kingsmen') {
+        $status = (Invoke-DockerText -Arguments @("inspect", "-f", "{{.State.Status}}", $name) -Stage "inspect_discovered_postgres_container_$name").Trim()
+        if ($status -eq "running") {
+          $env:KINGSMEN_POSTGRES_CONTAINER = $name
+          return @{ found = $true; name = $name; status = $status; error = "" }
+        }
+        $lastError = "DISCOVERED_CONTAINER_NOT_RUNNING:$name:$status"
+      }
+    }
+  } catch {
+    $lastError = ([string]$_.Exception.Message)
+    if ($lastError.Length -gt 300) { $lastError = $lastError.Substring(0, 300) }
+  }
+
+  return @{ found = $false; name = ""; status = ""; error = $lastError }
+}
+
 function Invoke-PsqlText {
   param([string]$DatabaseName, [string]$Sql, [string]$Stage = "psql_sql")
   $docker = Get-Command docker -ErrorAction SilentlyContinue
   if (-not $docker) { throw "DOCKER_NOT_AVAILABLE" }
   Write-Stage $Stage
   $Sql | & $docker.Source exec -i $env:KINGSMEN_POSTGRES_CONTAINER psql -U $env:KINGSMEN_POSTGRES_USER -d $DatabaseName -v ON_ERROR_STOP=1 -q -t -A
-  if ($LASTEXITCODE -ne 0) { throw "PSQL_SQL_FAILED:$Stage" }
+  if ($LASTEXITCODE -ne 0) { throw "PSQL_SQL_FAILED:${Stage}" }
 }
 
 function Get-TableCounts {
@@ -157,17 +199,15 @@ function Compare-Counts {
 
 Import-LocalRuntimeEnv
 
-if (-not $env:KINGSMEN_POSTGRES_CONTAINER) { Fail-Drill "KINGSMEN_POSTGRES_CONTAINER_NOT_CONFIGURED" }
-if (-not $env:KINGSMEN_POSTGRES_DATABASE) { Fail-Drill "KINGSMEN_POSTGRES_DATABASE_NOT_CONFIGURED" }
-if (-not $env:KINGSMEN_POSTGRES_USER) { Fail-Drill "KINGSMEN_POSTGRES_USER_NOT_CONFIGURED" }
+if (-not $env:KINGSMEN_POSTGRES_DATABASE) { $env:KINGSMEN_POSTGRES_DATABASE = "kingsmen_truth_vault" }
+if (-not $env:KINGSMEN_POSTGRES_USER) { $env:KINGSMEN_POSTGRES_USER = "kingsmen" }
 
 $docker = Get-Command docker -ErrorAction SilentlyContinue
 if (-not $docker) { Fail-Drill "DOCKER_NOT_AVAILABLE" }
 
-try {
-  Invoke-DockerText -Arguments @("inspect", $env:KINGSMEN_POSTGRES_CONTAINER) -Stage "inspect_postgres_container" | Out-Null
-} catch {
-  Fail-Drill "POSTGRES_CONTAINER_NOT_AVAILABLE"
+$containerResolution = Resolve-PostgresContainer
+if (-not $containerResolution.found) {
+  Fail-Drill "POSTGRES_CONTAINER_NOT_AVAILABLE:$($containerResolution.error)"
 }
 
 if (-not $RestoreDatabaseName) {
@@ -185,6 +225,7 @@ $restoreCounts = @{}
 $checks = @()
 
 try {
+  $checks += @{ name = "postgres_container_resolved"; passed = $true; detail = "container_running" }
   $sourceCounts = Get-TableCounts -DatabaseName $env:KINGSMEN_POSTGRES_DATABASE
   $checks += @{ name = "source_counts_captured"; passed = $true; detail = "count_only" }
 
@@ -203,7 +244,6 @@ try {
   $checks += Compare-Counts -SourceCounts $sourceCounts -RestoreCounts $restoreCounts
 
   $elapsed = [Math]::Round(((Get-Date) - $startedAt).TotalSeconds, 3)
-  $allPassed = -not ($checks | Where-Object { $_.passed -ne $true })
 
   if (-not $PreserveRestoreDatabase) {
     Invoke-DockerText -Arguments @("exec", $env:KINGSMEN_POSTGRES_CONTAINER, "dropdb", "-U", $env:KINGSMEN_POSTGRES_USER, "--if-exists", $RestoreDatabaseName) -Stage "cleanup_restore_database" | Out-Null
@@ -212,6 +252,8 @@ try {
 
   Invoke-DockerText -Arguments @("exec", $env:KINGSMEN_POSTGRES_CONTAINER, "rm", "-f", $dumpPath) -Stage "remove_container_dump_file" | Out-Null
   $checks += @{ name = "container_dump_removed"; passed = $true; detail = "dump_not_left_in_container" }
+
+  $allPassed = -not ($checks | Where-Object { $_.passed -ne $true })
 
   $metrics = @{
     rtoSeconds = $elapsed
