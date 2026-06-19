@@ -1,0 +1,87 @@
+{
+  "id": "kingsmen.connected-operating-system.v1",
+  "status": "source_built_pending_runtime_proofs",
+  "productionReady": false,
+  "publicLaunchAllowed": false,
+  "purpose": "Connect Kingsmen and Jarvis across N00-N20 so the platform is finished through evidence-backed modules rather than isolated PayFast work.",
+  "authorityDoctrine": {
+    "backendIsAuthority": true,
+    "postgresIsTruth": true,
+    "jarvisIsBrainRouter": true,
+    "openclawIsOperatorWorker": true,
+    "powershellIsCreatorScribe": true,
+    "githubIsEvidenceWarehouse": true,
+    "airtableIsMirrorOnly": true,
+    "n8nIsThinRelayOnly": true,
+    "playwrightIsScoutOnly": true,
+    "manualMapFallbackRequired": true,
+    "founderApprovalRequiredForRisk": true,
+    "noUselessLayers": true
+  },
+  "moduleCoverage": [
+    "N00 constitution doctrine lock",
+    "N01 repo foundation runtime proof",
+    "N02 backend kernel command bus",
+    "N03 PostgreSQL truth vault RLS",
+    "N04 candidate portal support payment status",
+    "N05 document vault",
+    "N06 route universe application workbench",
+    "N07 Airtable mirror source authority",
+    "N08 founder control plane",
+    "N09 communications email primary WhatsApp urgent SMS backup",
+    "N10 finance PayFast entitlement activation",
+    "N11 AI decision engine Destiny Map",
+    "N12 governance tribunal audit POPIA",
+    "N13 observability incidents backups",
+    "N14 integrations registry secrets wiring",
+    "N15 opportunity engine SETA QCTO employer skills",
+    "N16 execution orchestrator MAP Phoenix fallback",
+    "N17 founder caps growth finance control",
+    "N18 public website legal sales funnel",
+    "N19 mobile PWA accessibility",
+    "N20 final assembly launch gate"
+  ],
+  "jarvisBridge": {
+    "source": "packages/jarvis-core/src/jarvis-kingsmen-system-bridge.ts",
+    "safeCommands": [
+      "SYSTEM_STATUS",
+      "VALIDATE_MODULE",
+      "BUILD_SAFE_BATCH",
+      "CANDIDATE_READ",
+      "DOCUMENT_REVIEW_QUEUE",
+      "ROUTE_RECOMMENDATION",
+      "SEND_EMAIL_NOTICE",
+      "PAYMENT_STATUS_READ",
+      "OPPORTUNITY_MATCH",
+      "MAP_FALLBACK"
+    ],
+    "founderReviewCommands": [
+      "SEND_URGENT_WHATSAPP",
+      "REFUND_REVIEW_PACK",
+      "INCIDENT_ESCALATE",
+      "PUBLIC_LAUNCH_APPROVAL"
+    ],
+    "blockedActions": [
+      "store raw secrets",
+      "mark paid from return URL",
+      "bulk WhatsApp marketing",
+      "force portal submit through CAPTCHA or OTP",
+      "public launch without gate"
+    ]
+  },
+  "systemSpine": "apps/api/src/system/kingsmen-operating-system-spine.ts",
+  "validator": "scripts/validators/validate-kingsmen-connected-operating-system.mjs",
+  "validatorCommand": "npm run kingsmen:validate:connected-system",
+  "finalGateCommand": "npm run kingsmen:launch:gate",
+  "remainingExternalProofs": [
+    "branch sync/mergeability",
+    "runtime secrets configured outside Git",
+    "PostgreSQL/Supabase staging proof",
+    "PayFast provider sandbox proof",
+    "communications provider staging proof",
+    "document vault storage proof",
+    "legal/privacy publication review",
+    "backup restore drill",
+    "founder launch approval"
+  ]
+}
