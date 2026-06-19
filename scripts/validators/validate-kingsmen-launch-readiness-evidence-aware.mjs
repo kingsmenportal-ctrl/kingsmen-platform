@@ -28,8 +28,7 @@ function writeJson(path, value) {
   writeFileSync(full, `${JSON.stringify(value, null, 2)}\n`, 'utf8');
 }
 
-function evidencePassed(path) {
-  const report = readJson(path);
+function reportEntryPassed(report) {
   return Boolean(
     report &&
     report.exists !== false &&
@@ -39,15 +38,30 @@ function evidencePassed(path) {
   );
 }
 
-function finalBundleReady() {
-  const bundle = readJson('reports/final-assembly/final-assembly-evidence-bundle-latest.json');
+function readFinalBundle() {
+  return readJson('reports/final-assembly/final-assembly-evidence-bundle-latest.json');
+}
+
+function evidencePassed(path, finalBundle) {
+  const bundleReport = Array.isArray(finalBundle?.reports)
+    ? finalBundle.reports.find((entry) => entry.path === path)
+    : null;
+
+  if (bundleReport) {
+    return reportEntryPassed(bundleReport);
+  }
+
+  return reportEntryPassed(readJson(path));
+}
+
+function finalBundleReady(finalBundle) {
   return Boolean(
-    bundle &&
-    bundle.totalReports > 0 &&
-    bundle.presentReports === bundle.totalReports &&
-    bundle.passedReports === bundle.totalReports &&
-    bundle.reviewedReports === bundle.totalReports &&
-    bundle.redactedReports === bundle.totalReports
+    finalBundle &&
+    finalBundle.totalReports > 0 &&
+    finalBundle.presentReports === finalBundle.totalReports &&
+    finalBundle.passedReports === finalBundle.totalReports &&
+    finalBundle.reviewedReports === finalBundle.totalReports &&
+    finalBundle.redactedReports === finalBundle.totalReports
   );
 }
 
@@ -62,6 +76,7 @@ if (!report) {
   if (original.stderr) process.stderr.write(original.stderr);
   process.exitCode = original.status ?? 1;
 } else {
+  const finalBundle = readFinalBundle();
   const evidenceByWarningCode = {
     MAIN_BRANCH_PROTECTION_APPLY_REQUIRED: 'reports/repo/main-branch-protection-apply-latest.json',
     RLS_STAGING_PROOF_REQUIRED: 'reports/staging/rls-sql-isolation-staging-latest.json',
@@ -76,10 +91,10 @@ if (!report) {
   const evidenceAwareWarnings = originalWarnings.filter((warning) => {
     const evidencePath = evidenceByWarningCode[warning.code];
     if (!evidencePath) return true;
-    return !evidencePassed(evidencePath);
+    return !evidencePassed(evidencePath, finalBundle);
   });
 
-  const bundleIsReady = finalBundleReady();
+  const bundleIsReady = finalBundleReady(finalBundle);
   const finalWarningCodes = new Set([
     'STAGING_RUNTIME_EVIDENCE_PACK_REQUIRED',
     'FINAL_ASSEMBLY_EVIDENCE_CAPTURE_REQUIRED'
@@ -98,6 +113,7 @@ if (!report) {
   report.warningFilter = {
     sourceValidator: 'validate-kingsmen-launch-readiness',
     suppressedWarnings: originalWarnings.length - report.warnings.length,
+    evidenceSource: finalBundle ? 'final-assembly-bundle' : 'individual-runtime-reports',
     rule: 'Suppress source-boundary warnings only when matching runtime evidence is passed, reviewed, and redacted.'
   };
 
