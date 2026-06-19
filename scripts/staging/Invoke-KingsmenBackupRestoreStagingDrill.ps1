@@ -11,7 +11,7 @@ $ErrorActionPreference = "Stop"
 
 function Write-Stage {
   param([string]$Name)
-  Write-Output "KINGSMEN_BACKUP_RESTORE_STAGE=$Name"
+  $script:KingsmenBackupRestoreStage = $Name
 }
 
 function Import-LocalRuntimeEnv {
