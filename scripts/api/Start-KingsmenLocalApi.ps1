@@ -9,7 +9,8 @@ param(
   [int]$PostgresPort = 55432,
   [switch]$SkipBuild,
   [switch]$KillExistingPort,
-  [switch]$NoSyncPostgresPasswordFromContainer
+  [switch]$NoSyncPostgresPasswordFromContainer,
+  [switch]$NoRepairPostgresRolePassword
 )
 
 $ErrorActionPreference = "Stop"
@@ -117,6 +118,38 @@ function New-PostgresConnectionString {
   return "postgresql://${encodedUser}:${encodedPassword}@${HostName}:${Port}/${encodedDatabase}"
 }
 
+function ConvertTo-PostgresSqlIdentifier {
+  param([string]$Value)
+  return '"' + ($Value -replace '"', '""') + '"'
+}
+
+function ConvertTo-PostgresSqlLiteral {
+  param([string]$Value)
+  return "'" + ($Value -replace "'", "''") + "'"
+}
+
+function Repair-PostgresRolePassword {
+  param(
+    [string]$ContainerName,
+    [string]$Database,
+    [string]$User,
+    [string]$Password
+  )
+
+  if (-not (Test-CommandAvailable "docker")) { return $false }
+  if ([string]::IsNullOrWhiteSpace($ContainerName) -or [string]::IsNullOrWhiteSpace($Database) -or [string]::IsNullOrWhiteSpace($User) -or [string]::IsNullOrEmpty($Password)) { return $false }
+
+  $roleIdentifier = ConvertTo-PostgresSqlIdentifier -Value $User
+  $passwordLiteral = ConvertTo-PostgresSqlLiteral -Value $Password
+  $sql = "ALTER ROLE $roleIdentifier WITH PASSWORD $passwordLiteral;"
+
+  $sql | & docker exec -i $ContainerName psql -U $User -d $Database -v ON_ERROR_STOP=1 *> $null
+  if ($LASTEXITCODE -eq 0) { return $true }
+
+  $sql | & docker exec -i $ContainerName psql -U postgres -d $Database -v ON_ERROR_STOP=1 *> $null
+  return $LASTEXITCODE -eq 0
+}
+
 if ($KillExistingPort) {
   $listeners = Get-NetTCPConnection -LocalPort $Port -State Listen -ErrorAction SilentlyContinue
   foreach ($listener in $listeners) {
@@ -142,10 +175,18 @@ $envImportCount = Import-KingsmenEnvFile -Path $EnvFile
 $containerPasswordSynced = $false
 $containerPasswordAvailable = $false
 $databaseUrlCredentialsUrlEncoded = $false
+$postgresRolePasswordRepairAttempted = $false
+$postgresRolePasswordRepairSucceeded = $false
 if (-not $NoSyncPostgresPasswordFromContainer) {
   $containerPassword = Read-DockerContainerEnvValue -ContainerName $PostgresContainerName -EnvName "POSTGRES_PASSWORD"
   if (-not [string]::IsNullOrWhiteSpace($containerPassword)) {
     $containerPasswordAvailable = $true
+
+    if (-not $NoRepairPostgresRolePassword) {
+      $postgresRolePasswordRepairAttempted = $true
+      $postgresRolePasswordRepairSucceeded = Repair-PostgresRolePassword -ContainerName $PostgresContainerName -Database $PostgresDatabase -User $PostgresUser -Password $containerPassword
+    }
+
     $databaseUrl = New-PostgresConnectionString -User $PostgresUser -Password $containerPassword -HostName "127.0.0.1" -Port $PostgresPort -Database $PostgresDatabase
     $databaseUrlCredentialsUrlEncoded = $true
     [Environment]::SetEnvironmentVariable("KINGSMEN_POSTGRES_PASSWORD", $containerPassword, 'Process')
@@ -178,6 +219,8 @@ Write-Host (@{
   postgresContainerStartAttempted = $postgresContainerStartAttempted
   redisContainerStartAttempted = $redisContainerStartAttempted
   postgresContainerPasswordAvailable = $containerPasswordAvailable
+  postgresRolePasswordRepairAttempted = $postgresRolePasswordRepairAttempted
+  postgresRolePasswordRepairSucceeded = $postgresRolePasswordRepairSucceeded
   databaseUrlSyncedFromPostgresContainer = $containerPasswordSynced
   databaseUrlCredentialsUrlEncoded = $databaseUrlCredentialsUrlEncoded
   databaseUrlLoaded = -not [string]::IsNullOrWhiteSpace($env:DATABASE_URL)
