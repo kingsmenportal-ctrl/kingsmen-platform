@@ -3,27 +3,39 @@ import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { spawnSync } from 'node:child_process';
 
-const repoRoot = dirname(dirname(dirname(fileURLToPath(import.meta.url))));
+const scriptRepoRoot = dirname(dirname(dirname(fileURLToPath(import.meta.url))));
+const cwdRoot = process.cwd();
+const repoRoots = [...new Set([scriptRepoRoot, cwdRoot])];
 const args = new Set(process.argv.slice(2));
 const gateMode = args.has('--gate');
 const modeArg = gateMode ? '--gate' : '--audit';
 
-function relative(path) {
-  return join(repoRoot, path);
+function relative(path, root = scriptRepoRoot) {
+  return join(root, path);
 }
 
 function readJson(path) {
-  const full = relative(path);
-  if (!existsSync(full)) return null;
-  try {
-    return JSON.parse(readFileSync(full, 'utf8'));
-  } catch {
-    return null;
+  for (const root of repoRoots) {
+    const full = relative(path, root);
+    if (!existsSync(full)) continue;
+    try {
+      return {
+        json: JSON.parse(readFileSync(full, 'utf8')),
+        foundAt: full
+      };
+    } catch {
+      return {
+        json: null,
+        foundAt: full,
+        parseFailed: true
+      };
+    }
   }
+  return { json: null, foundAt: null, parseFailed: false };
 }
 
 function writeJson(path, value) {
-  const full = relative(path);
+  const full = relative(path, cwdRoot);
   mkdirSync(dirname(full), { recursive: true });
   writeFileSync(full, `${JSON.stringify(value, null, 2)}\n`, 'utf8');
 }
@@ -42,41 +54,54 @@ function readFinalBundle() {
   return readJson('reports/final-assembly/final-assembly-evidence-bundle-latest.json');
 }
 
-function evidencePassed(path, finalBundle) {
-  const bundleReport = Array.isArray(finalBundle?.reports)
-    ? finalBundle.reports.find((entry) => entry.path === path)
+function evidencePassed(path, finalBundleJson) {
+  const bundleReport = Array.isArray(finalBundleJson?.reports)
+    ? finalBundleJson.reports.find((entry) => entry.path === path)
     : null;
 
   if (bundleReport) {
-    return reportEntryPassed(bundleReport);
+    return {
+      passed: reportEntryPassed(bundleReport),
+      source: 'final-assembly-bundle',
+      found: true,
+      status: bundleReport.status ?? 'unknown'
+    };
   }
 
-  return reportEntryPassed(readJson(path));
+  const direct = readJson(path);
+  return {
+    passed: reportEntryPassed(direct.json),
+    source: 'individual-runtime-report',
+    found: Boolean(direct.foundAt),
+    status: direct.json?.status ?? (direct.parseFailed ? 'parse_failed' : 'missing')
+  };
 }
 
-function finalBundleReady(finalBundle) {
+function finalBundleReady(finalBundleJson) {
   return Boolean(
-    finalBundle &&
-    finalBundle.totalReports > 0 &&
-    finalBundle.presentReports === finalBundle.totalReports &&
-    finalBundle.passedReports === finalBundle.totalReports &&
-    finalBundle.reviewedReports === finalBundle.totalReports &&
-    finalBundle.redactedReports === finalBundle.totalReports
+    finalBundleJson &&
+    finalBundleJson.totalReports > 0 &&
+    finalBundleJson.presentReports === finalBundleJson.totalReports &&
+    finalBundleJson.passedReports === finalBundleJson.totalReports &&
+    finalBundleJson.reviewedReports === finalBundleJson.totalReports &&
+    finalBundleJson.redactedReports === finalBundleJson.totalReports
   );
 }
 
 const original = spawnSync(process.execPath, ['scripts/validators/validate-kingsmen-launch-readiness.mjs', modeArg], {
-  cwd: repoRoot,
+  cwd: cwdRoot,
   encoding: 'utf8'
 });
 
-const report = readJson('reports/launch/kingsmen-launch-readiness-latest.json');
+const launchReport = readJson('reports/launch/kingsmen-launch-readiness-latest.json');
+const report = launchReport.json;
 if (!report) {
   if (original.stdout) process.stdout.write(original.stdout);
   if (original.stderr) process.stderr.write(original.stderr);
   process.exitCode = original.status ?? 1;
 } else {
-  const finalBundle = readFinalBundle();
+  const finalBundleRead = readFinalBundle();
+  const finalBundle = finalBundleRead.json;
   const evidenceByWarningCode = {
     MAIN_BRANCH_PROTECTION_APPLY_REQUIRED: 'reports/repo/main-branch-protection-apply-latest.json',
     RLS_STAGING_PROOF_REQUIRED: 'reports/staging/rls-sql-isolation-staging-latest.json',
@@ -88,10 +113,16 @@ if (!report) {
   };
 
   const originalWarnings = Array.isArray(report.warnings) ? report.warnings : [];
+  const warningEvidence = {};
   const evidenceAwareWarnings = originalWarnings.filter((warning) => {
     const evidencePath = evidenceByWarningCode[warning.code];
     if (!evidencePath) return true;
-    return !evidencePassed(evidencePath, finalBundle);
+    const result = evidencePassed(evidencePath, finalBundle);
+    warningEvidence[warning.code] = {
+      evidencePath,
+      ...result
+    };
+    return !result.passed;
   });
 
   const bundleIsReady = finalBundleReady(finalBundle);
@@ -114,7 +145,11 @@ if (!report) {
     sourceValidator: 'validate-kingsmen-launch-readiness',
     suppressedWarnings: originalWarnings.length - report.warnings.length,
     evidenceSource: finalBundle ? 'final-assembly-bundle' : 'individual-runtime-reports',
-    rule: 'Suppress source-boundary warnings only when matching runtime evidence is passed, reviewed, and redacted.'
+    finalBundleFound: Boolean(finalBundleRead.foundAt),
+    launchReportFound: Boolean(launchReport.foundAt),
+    rootCandidatesChecked: repoRoots.length,
+    rule: 'Suppress source-boundary warnings only when matching runtime evidence is passed, reviewed, and redacted.',
+    evidenceByWarningCode: warningEvidence
   };
 
   writeJson('reports/launch/kingsmen-launch-readiness-latest.json', report);
