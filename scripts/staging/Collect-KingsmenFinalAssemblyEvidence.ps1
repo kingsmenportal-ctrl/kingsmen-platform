@@ -43,6 +43,21 @@ function Read-JsonSummary {
   $passed = $false
   if ($null -ne $json.passed) { $passed = [bool]$json.passed }
 
+  $status = if ($json.status) { [string]$json.status } else { "STATUS_NOT_REPORTED" }
+
+  if ($Path -eq "reports/staging/communications-provider-staging-latest.json" -and $passed) {
+    $placeholderScanOk = $false
+    if ($null -ne $json.placeholderValuesAccepted -and [bool]$json.placeholderValuesAccepted -eq $false -and $null -ne $json.credentialPlaceholderScan) {
+      $scanText = [string]$json.credentialPlaceholderScan
+      if ($scanText.ToLowerInvariant().Contains("rejected")) { $placeholderScanOk = $true }
+    }
+
+    if (-not $placeholderScanOk) {
+      $passed = $false
+      $status = "COMMUNICATIONS_PLACEHOLDER_SCAN_REQUIRED"
+    }
+  }
+
   $reviewed = $false
   foreach ($field in @("reviewed", "founderReviewed", "operatorReviewed", "legalReviewed", "stagingReviewed")) {
     if ($null -ne $json.$field -and [bool]$json.$field) { $reviewed = $true }
@@ -59,7 +74,7 @@ function Read-JsonSummary {
     passed = $passed
     reviewed = $reviewed
     redacted = $redacted
-    status = if ($json.status) { [string]$json.status } else { "STATUS_NOT_REPORTED" }
+    status = $status
     sha256 = $hash
     generatedAt = if ($json.generatedAt) { [string]$json.generatedAt } elseif ($json.generated_at) { [string]$json.generated_at } else { $null }
     rawBodyCopied = $false
