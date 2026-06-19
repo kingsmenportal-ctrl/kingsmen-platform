@@ -12,15 +12,37 @@ param(
 $ErrorActionPreference = "Stop"
 
 function Test-PlaceholderValue {
-  param([string]$Value)
+  param([AllowNull()][string]$Value)
   if ([string]::IsNullOrWhiteSpace($Value)) { return $true }
   $trimmed = $Value.Trim()
   $lower = $trimmed.ToLowerInvariant()
-  if ($trimmed -eq "...") { return $true }
-  if ($lower -eq "changeme") { return $true }
-  if ($lower -eq "your_value_here") { return $true }
-  if ($lower -eq "replace_me") { return $true }
+  $bad = @(
+    "...",
+    "changeme",
+    "change_me",
+    "todo",
+    "tbd",
+    "placeholder",
+    "your_value_here",
+    "replace_me",
+    "real",
+    "real_value",
+    "real_bucket",
+    "real_secret",
+    "real_key",
+    "real_token",
+    "real_password",
+    "dummy",
+    "dummy_value",
+    "fake",
+    "fake_value"
+  )
+  if ($bad -contains $lower) { return $true }
+  if ($lower -like "your_*") { return $true }
   if ($lower -like "replace_*") { return $true }
+  if ($lower -like "real_*") { return $true }
+  if ($lower -like "dummy_*") { return $true }
+  if ($lower -like "fake_*") { return $true }
   if ($lower -like "*.example.com*") { return $true }
   if ($lower -like "example-*") { return $true }
   return $false
@@ -86,3 +108,4 @@ $dir = Split-Path -Parent $OutputPath
 if (-not (Test-Path $dir)) { New-Item -ItemType Directory -Path $dir -Force | Out-Null }
 $report | ConvertTo-Json -Depth 12 | Set-Content -Path $OutputPath -Encoding UTF8
 $report | ConvertTo-Json -Depth 12
+if (-not $passed) { exit 1 }
