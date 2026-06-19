@@ -129,7 +129,7 @@ function Resolve-PostgresContainer {
         $env:KINGSMEN_POSTGRES_CONTAINER = $name
         return @{ found = $true; name = $name; status = $status; error = "" }
       }
-      $lastError = "CONTAINER_NOT_RUNNING:$name:$status"
+      $lastError = "CONTAINER_NOT_RUNNING:${name}:${status}"
     } catch {
       $lastError = ([string]$_.Exception.Message)
       if ($lastError.Length -gt 300) { $lastError = $lastError.Substring(0, 300) }
@@ -145,7 +145,7 @@ function Resolve-PostgresContainer {
           $env:KINGSMEN_POSTGRES_CONTAINER = $name
           return @{ found = $true; name = $name; status = $status; error = "" }
         }
-        $lastError = "DISCOVERED_CONTAINER_NOT_RUNNING:$name:$status"
+        $lastError = "DISCOVERED_CONTAINER_NOT_RUNNING:${name}:${status}"
       }
     }
   } catch {
