@@ -167,6 +167,8 @@ npm run communications:prove
 npm run communications:validate
 ```
 
+This communications proof is source-level only and does not authorize live candidate messages.
+
 Provider staging proof still required: email send/receive, bounce handling, opt-out path, WhatsApp urgent-only approval evidence, SMS fallback-only evidence, and redacted evidence report.
 
 ## observability + incident proof command
