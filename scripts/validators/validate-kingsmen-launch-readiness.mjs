@@ -236,9 +236,18 @@ for (const [path, token, code, title, detail, remediation, evidencePaths] of war
 }
 
 const readinessEngine = read('apps/api/src/final-assembly/readiness-engine.ts') ?? '';
+function readinessStatusFor(checkKey) {
+  const escaped = checkKey.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+  const pattern = new RegExp(`checkKey:\\s*["']${escaped}["'][\\s\\S]*?status:\\s*["'](passed|pending|failed)["']`);
+  return readinessEngine.match(pattern)?.[1] ?? 'missing';
+}
+
 for (const token of ['secrets_not_committed', 'database_backup_restore_test', 'payfast_sandbox_evidence']) {
-  if (readinessEngine.includes(token) && readinessEngine.includes('status: "pending"')) {
-    block('FINAL_ASSEMBLY_REQUIRED_CHECK_PENDING', `Final assembly required check is still pending: ${token}`, 'The final assembly model still marks required launch evidence as pending.', 'Run and record the required evidence, then update readiness checks only after proof exists.', ['apps/api/src/final-assembly/readiness-engine.ts']);
+  const status = readinessStatusFor(token);
+  if (status === 'pending' || status === 'failed') {
+    block('FINAL_ASSEMBLY_REQUIRED_CHECK_PENDING', `Final assembly required check is still pending: ${token}`, `The final assembly model marks this evidence as ${status}.`, 'Run and record the required evidence, then update readiness checks only after proof exists.', ['apps/api/src/final-assembly/readiness-engine.ts']);
+  } else if (status === 'missing') {
+    block('FINAL_ASSEMBLY_REQUIRED_CHECK_MISSING', `Final assembly required check is missing: ${token}`, 'The final assembly model does not contain this required check.', 'Restore the required readiness check before launch.', ['apps/api/src/final-assembly/readiness-engine.ts']);
   }
 }
 
