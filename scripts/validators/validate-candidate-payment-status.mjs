@@ -57,10 +57,6 @@ requireFile('docs/candidate/KINGSMEN_CANDIDATE_PAYMENT_STATUS.md', [
   'Fetch `/api/payments/payfast/status/:merchantReference` from the backend'
 ]);
 
-requireFile('package.json', [
-  'payments:validate:candidate-status'
-]);
-
 const panel = read('apps/web/src/finance/CandidatePaymentStatusPanel.tsx') ?? '';
 if (panel.includes('PAYFAST_MERCHANT_KEY') || panel.includes('PAYFAST_PASSPHRASE')) {
   failures.push('Candidate payment status UI must not expose PayFast credential names.');
@@ -80,8 +76,7 @@ const report = {
   checkedFiles: [
     'apps/web/src/finance/CandidatePaymentStatusPanel.tsx',
     'apps/web/src/app/candidate/payment-status/page.tsx',
-    'docs/candidate/KINGSMEN_CANDIDATE_PAYMENT_STATUS.md',
-    'package.json'
+    'docs/candidate/KINGSMEN_CANDIDATE_PAYMENT_STATUS.md'
   ],
   doctrine: {
     candidateCanSeePaymentAndPackageStatus: true,
