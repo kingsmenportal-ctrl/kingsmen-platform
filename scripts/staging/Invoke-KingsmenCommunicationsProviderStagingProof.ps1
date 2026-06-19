@@ -1,7 +1,7 @@
 #requires -Version 5.1
 [CmdletBinding()]
 param(
-  [string]$RepoRoot = (Resolve-Path (Join-Path $PSScriptRoot "..\..")).Path,
+  [string]$RepoRoot = "",
   [string]$ReportPath = "reports/staging/communications-provider-staging-latest.json",
   [switch]$MarkProviderConfigured,
   [switch]$MarkEmailSendReceiveTested,
@@ -13,6 +13,26 @@ param(
 )
 
 $ErrorActionPreference = "Stop"
+
+function Resolve-KingsmenRepoRoot {
+  param([string]$RequestedRepoRoot)
+
+  if (-not [string]::IsNullOrWhiteSpace($RequestedRepoRoot)) {
+    return (Resolve-Path $RequestedRepoRoot).Path
+  }
+
+  $scriptPath = $MyInvocation.MyCommand.Path
+  if (-not [string]::IsNullOrWhiteSpace($scriptPath)) {
+    $scriptDir = Split-Path -Parent $scriptPath
+    if (-not [string]::IsNullOrWhiteSpace($scriptDir)) {
+      return (Resolve-Path (Join-Path $scriptDir "..\..")).Path
+    }
+  }
+
+  return (Resolve-Path (Get-Location)).Path
+}
+
+$RepoRoot = Resolve-KingsmenRepoRoot -RequestedRepoRoot $RepoRoot
 
 function Test-PlaceholderValue {
   param([string]$Value)
