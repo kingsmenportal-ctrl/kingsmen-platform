@@ -2,6 +2,7 @@ param(
   [string]$ReportPath = "reports/jarvis/jarvis-credential-readiness-latest.json",
   [string[]]$EnvFile = @(),
   [string]$BackendBaseUrl = "",
+  [string]$RedisUrl = "",
   [switch]$RequireProductionCredentials,
   [switch]$NoAliasDatabaseUrl
 )
@@ -92,6 +93,10 @@ if (-not [string]::IsNullOrWhiteSpace($BackendBaseUrl)) {
   [Environment]::SetEnvironmentVariable("KINGSMEN_BACKEND_BASE_URL", $BackendBaseUrl, "Process")
 }
 
+if (-not [string]::IsNullOrWhiteSpace($RedisUrl)) {
+  [Environment]::SetEnvironmentVariable("REDIS_URL", $RedisUrl, "Process")
+}
+
 if (-not $NoAliasDatabaseUrl) {
   $kingsmenDb = [Environment]::GetEnvironmentVariable("KINGSMEN_DATABASE_URL", "Process")
   $databaseUrl = [Environment]::GetEnvironmentVariable("DATABASE_URL", "Process")
@@ -178,6 +183,7 @@ $report = [ordered]@{
   envFilesLoaded = $envFileReports
   databaseUrlAliasedInProcess = (-not $NoAliasDatabaseUrl)
   backendBaseUrlInjectedInProcess = (-not [string]::IsNullOrWhiteSpace($BackendBaseUrl))
+  redisUrlInjectedInProcess = (-not [string]::IsNullOrWhiteSpace($RedisUrl))
   checks = $checks
   modules = $modules
   generatedAt = (Get-Date).ToUniversalTime().ToString("o")
