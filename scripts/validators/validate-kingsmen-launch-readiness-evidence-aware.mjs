@@ -14,24 +14,78 @@ function relative(path, root = scriptRepoRoot) {
   return join(root, path);
 }
 
+function decodeJsonBuffer(buffer) {
+  if (!Buffer.isBuffer(buffer) || buffer.length === 0) return '';
+
+  const hasUtf16LeBom = buffer.length >= 2 && buffer[0] === 0xff && buffer[1] === 0xfe;
+  const hasUtf16BeBom = buffer.length >= 2 && buffer[0] === 0xfe && buffer[1] === 0xff;
+  const hasUtf8Bom = buffer.length >= 3 && buffer[0] === 0xef && buffer[1] === 0xbb && buffer[2] === 0xbf;
+
+  if (hasUtf16LeBom) return buffer.subarray(2).toString('utf16le');
+  if (hasUtf16BeBom) {
+    const swapped = Buffer.alloc(buffer.length - 2);
+    for (let index = 2; index + 1 < buffer.length; index += 2) {
+      swapped[index - 2] = buffer[index + 1];
+      swapped[index - 1] = buffer[index];
+    }
+    return swapped.toString('utf16le');
+  }
+  if (hasUtf8Bom) return buffer.subarray(3).toString('utf8');
+
+  const sampleLength = Math.min(buffer.length, 80);
+  let nulOdd = 0;
+  let nulEven = 0;
+  for (let index = 0; index < sampleLength; index += 1) {
+    if (buffer[index] !== 0) continue;
+    if (index % 2 === 0) nulEven += 1;
+    else nulOdd += 1;
+  }
+
+  if (nulOdd > nulEven && nulOdd >= 4) return buffer.toString('utf16le');
+
+  return buffer.toString('utf8');
+}
+
+function parseJsonFile(full) {
+  const raw = readFileSync(full);
+  const text = decodeJsonBuffer(raw).replace(/^\uFEFF/, '').trim();
+  return JSON.parse(text);
+}
+
 function readJson(path) {
+  let firstFound = null;
+  let firstParseError = null;
+
   for (const root of repoRoots) {
     const full = relative(path, root);
     if (!existsSync(full)) continue;
+    if (!firstFound) firstFound = full;
+
     try {
       return {
-        json: JSON.parse(readFileSync(full, 'utf8')),
-        foundAt: full
-      };
-    } catch {
-      return {
-        json: null,
+        json: parseJsonFile(full),
         foundAt: full,
-        parseFailed: true
+        parseFailed: false,
+        encodingAware: true
       };
+    } catch (error) {
+      if (!firstParseError) {
+        firstParseError = error instanceof Error ? error.message : 'unknown_parse_error';
+      }
     }
   }
-  return { json: null, foundAt: null, parseFailed: false };
+
+  if (firstFound) {
+    return {
+      json: null,
+      foundAt: firstFound,
+      parseFailed: true,
+      parseError: firstParseError ?? 'unknown_parse_error',
+      encodingAware: true
+    };
+  }
+
+  return { json: null, foundAt: null, parseFailed: false, encodingAware: true };
 }
 
 function writeJson(path, value) {
@@ -73,7 +127,8 @@ function evidencePassed(path, finalBundleJson) {
     passed: reportEntryPassed(direct.json),
     source: 'individual-runtime-report',
     found: Boolean(direct.foundAt),
-    status: direct.json?.status ?? (direct.parseFailed ? 'parse_failed' : 'missing')
+    status: direct.json?.status ?? (direct.parseFailed ? 'parse_failed' : 'missing'),
+    parseError: direct.parseError ?? null
   };
 }
 
@@ -146,8 +201,12 @@ if (!report) {
     suppressedWarnings: originalWarnings.length - report.warnings.length,
     evidenceSource: finalBundle ? 'final-assembly-bundle' : 'individual-runtime-reports',
     finalBundleFound: Boolean(finalBundleRead.foundAt),
+    finalBundleParsed: Boolean(finalBundle),
+    finalBundleParseError: finalBundleRead.parseError ?? null,
     launchReportFound: Boolean(launchReport.foundAt),
+    launchReportParsed: Boolean(launchReport.json),
     rootCandidatesChecked: repoRoots.length,
+    jsonReader: 'encoding-aware-utf8-utf16le-bom',
     rule: 'Suppress source-boundary warnings only when matching runtime evidence is passed, reviewed, and redacted.',
     evidenceByWarningCode: warningEvidence
   };
