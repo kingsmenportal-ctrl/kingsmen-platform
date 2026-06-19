@@ -76,7 +76,6 @@ if (-not $BackendBaseUrl) { $BackendBaseUrl = $(if ($env:KINGSMEN_BACKEND_BASE_U
 
 $checks = @()
 $startedAt = Get-Date
-$correlationId = "obs-" + [Guid]::NewGuid().ToString("N")
 
 try {
   $health = Invoke-RestMethod -Method GET -Uri ($BackendBaseUrl.TrimEnd('/') + "/health") -TimeoutSec 15
@@ -130,12 +129,7 @@ $metrics = @{
   elapsedSeconds = $elapsed
 }
 
-$report = New-Report -Passed ([bool]$allPassed) -Checks $checks -Metrics $metrics -NextAction ($(if ($allPassed) { "Observability incident staging proof passed. Continue to legal/privacy publication proof or communications provider proof." } else { "Fix failed observability staging checks, then rerun this proof." }))
+$nextAction = $(if ($allPassed) { "Observability incident staging proof passed. Continue to legal/privacy publication proof or communications provider proof." } else { "Fix failed observability staging checks, then rerun this proof." })
+$report = New-Report -Passed ([bool]$allPassed) -Checks $checks -Metrics $metrics -NextAction $nextAction
 Write-Report -Report $report
 if (-not $allPassed) { exit 1 }
-} catch {
-  $checks = Add-Check $checks "observability_staging_exception" $false "runtime_exception_without_secret_output"
-  $report = New-Report -Passed $false -Checks $checks -Metrics @{} -NextAction "Fix the observability staging exception, then rerun this proof."
-  Write-Report -Report $report
-  exit 1
-}
