@@ -95,6 +95,76 @@ function Test-TcpPort {
   }
 }
 
+function Get-HttpFailureCategory {
+  param([object]$ErrorRecord)
+
+  $message = ""
+  try { $message = [string]$ErrorRecord.Exception.Message } catch { $message = "unknown" }
+  $lower = $message.ToLowerInvariant()
+
+  if ($lower.Contains("password authentication failed")) { return "health_endpoint_failed_database_auth" }
+  if ($lower.Contains("actively refused") -or $lower.Contains("unable to connect") -or $lower.Contains("connection refused")) { return "health_endpoint_connection_failed" }
+  if ($lower.Contains("timed out") -or $lower.Contains("timeout")) { return "health_endpoint_timeout" }
+  if ($lower.Contains("500") -or $lower.Contains("internal server error")) { return "health_endpoint_http_500" }
+  if ($lower.Contains("404")) { return "health_endpoint_http_404" }
+  if ($lower.Contains("401") -or $lower.Contains("403")) { return "health_endpoint_authz_failed" }
+  return "health_endpoint_failed"
+}
+
+function Get-ApiEndpointCandidates {
+  param([string]$BaseUrl)
+
+  $urls = New-Object System.Collections.Generic.List[string]
+  $primary = $BaseUrl.TrimEnd('/')
+  if (-not [string]::IsNullOrWhiteSpace($primary)) { $urls.Add($primary) }
+
+  try {
+    $uri = [Uri]$primary
+    $port = $(if ($uri.Port -gt 0) { $uri.Port } else { 80 })
+    if ($uri.Host -eq "127.0.0.1") { $urls.Add("$($uri.Scheme)://localhost:$port") }
+    if ($uri.Host -eq "localhost") { $urls.Add("$($uri.Scheme)://127.0.0.1:$port") }
+  } catch { }
+
+  return @($urls | Select-Object -Unique)
+}
+
+function Invoke-KingsmenApiHealthProbe {
+  param([string]$BaseUrl)
+
+  $candidates = Get-ApiEndpointCandidates -BaseUrl $BaseUrl
+  $lastDetail = "health_endpoint_not_checked"
+  $tcpOpen = $false
+  $attempted = 0
+
+  foreach ($candidate in $candidates) {
+    try {
+      $uri = [Uri]$candidate
+      $port = $(if ($uri.Port -gt 0) { $uri.Port } elseif ($uri.Scheme -eq "https") { 443 } else { 80 })
+      $tcpOpen = $tcpOpen -or (Test-TcpPort -HostName $uri.Host -Port ([int]$port) -TimeoutMs 1500)
+    } catch { }
+
+    foreach ($i in 1..3) {
+      $attempted += 1
+      try {
+        $health = Invoke-RestMethod -Method GET -Uri ($candidate.TrimEnd('/') + "/health") -TimeoutSec 15
+        $ok = $true
+        if ($health.ok -eq $false) { $ok = $false }
+        if ($health.status -and ([string]$health.status).ToLowerInvariant() -notin @("ok", "healthy")) { $ok = $false }
+        $storageMode = "unknown"
+        if ($health.storageMode) { $storageMode = [string]$health.storageMode }
+        elseif ($health.data.storageMode) { $storageMode = [string]$health.data.storageMode }
+        return @{ ok = [bool]$ok; detail = $(if ($ok) { "health_endpoint_reachable" } else { "health_endpoint_unhealthy_response" }); storageMode = $storageMode; tcpOpen = $tcpOpen; attempts = $attempted }
+      } catch {
+        $lastDetail = Get-HttpFailureCategory -ErrorRecord $_
+        Start-Sleep -Milliseconds 500
+      }
+    }
+  }
+
+  if ($tcpOpen -and $lastDetail -eq "health_endpoint_connection_failed") { $lastDetail = "api_tcp_open_health_endpoint_failed" }
+  return @{ ok = $false; detail = $lastDetail; storageMode = "unknown"; tcpOpen = $tcpOpen; attempts = $attempted }
+}
+
 function Test-DockerAvailable {
   try {
     docker info *> $null
@@ -167,21 +237,14 @@ if (-not $BackendBaseUrl) { $BackendBaseUrl = $(if ($env:KINGSMEN_BACKEND_BASE_U
 
 $checks = @()
 $startedAt = Get-Date
-$apiOk = $false
 $apiStorageMode = "unknown"
 $postgresContainerRunning = Ensure-DockerContainerRunning -Name $env:KINGSMEN_POSTGRES_CONTAINER
 $redisContainerRunning = Ensure-DockerContainerRunning -Name $env:KINGSMEN_REDIS_CONTAINER
 
-try {
-  $health = Invoke-RestMethod -Method GET -Uri ($BackendBaseUrl.TrimEnd('/') + "/health") -TimeoutSec 15
-  $apiOk = $true
-  if ($health.status -and ([string]$health.status).ToLowerInvariant() -notin @("ok", "healthy")) { $apiOk = $false }
-  if ($health.storageMode) { $apiStorageMode = [string]$health.storageMode }
-  elseif ($health.data.storageMode) { $apiStorageMode = [string]$health.data.storageMode }
-  $checks = Add-Check $checks "api_health_check" $apiOk "health_endpoint_reachable"
-} catch {
-  $checks = Add-Check $checks "api_health_check" $false "health_endpoint_failed"
-}
+$apiProbe = Invoke-KingsmenApiHealthProbe -BaseUrl $BackendBaseUrl
+$apiOk = [bool]$apiProbe.ok
+$apiStorageMode = [string]$apiProbe.storageMode
+$checks = Add-Check $checks "api_health_check" $apiOk ([string]$apiProbe.detail)
 
 $dbPassed = $false
 $dbDetail = "postgres_not_checked"
@@ -277,10 +340,13 @@ $metrics = @{
   dockerRequired = $false
   postgresContainerRunning = $postgresContainerRunning
   redisContainerRunning = $redisContainerRunning
+  apiTcpPortOpen = [bool]$apiProbe.tcpOpen
+  apiHealthAttempts = [int]$apiProbe.attempts
+  apiStorageMode = $apiStorageMode
   elapsedSeconds = $elapsed
 }
 
-$nextAction = $(if ($allPassed) { "Observability incident staging proof passed. Continue to legal/privacy publication proof or communications provider proof." } else { "Fix failed observability staging checks, then rerun this proof. For local proof, start Docker containers and the API on port 3001." })
+$nextAction = $(if ($allPassed) { "Observability incident staging proof passed. Continue to PayFast, communications, branch protection, or final assembly review." } else { "Fix failed observability staging checks, then rerun this proof. If api_health_check fails while Postgres/Redis pass, run Invoke-RestMethod http://127.0.0.1:3001/health and inspect the API terminal for the redacted failure category." })
 $report = New-Report -Passed ([bool]$allPassed) -Checks $checks -Metrics $metrics -NextAction $nextAction
 Write-Report -Report $report
 if (-not $allPassed) { exit 1 }
