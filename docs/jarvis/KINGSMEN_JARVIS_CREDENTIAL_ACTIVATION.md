@@ -9,7 +9,7 @@ Raw credentials must never be committed to Git, pasted into source files, copied
 Jarvis may only:
 
 1. inventory which credentials are required;
-2. reject placeholders such as `...`, `changeme`, `your_value_here`, or `example.com`;
+2. reject placeholders such as `...`, `changeme`, `your_value_here`, `example.com`, `REAL_VALUE`, `REAL_BUCKET`, `dummy_*`, or `fake_*`;
 3. confirm whether a credential is present in the current process environment;
 4. write redacted readiness evidence;
 5. tell the operator which staging proof can run next;
@@ -97,6 +97,12 @@ All reports must remain redacted.
 5. Run `npm run final:collect:evidence`.
 6. Run `npm run jarvis:activation:matrix`.
 7. Founder approves production-risk activation.
+
+## Dummy value rejection
+
+Values such as `REAL_VALUE`, `REAL_BUCKET`, `REAL_SECRET`, `REAL_KEY`, `REAL_TOKEN`, `dummy_*`, and `fake_*` are treated as placeholders. They must never create a passed staging proof or a ready activation matrix state.
+
+Use actual provider-issued values only in the current process environment, Oracle environment, GitHub secrets, or future vault/KMS.
 
 ## Document Vault storage staging proof
 
