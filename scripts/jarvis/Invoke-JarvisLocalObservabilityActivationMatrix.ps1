@@ -1,7 +1,7 @@
 #requires -Version 5.1
 [CmdletBinding()]
 param(
-  [string]$RepoRoot = (Resolve-Path (Join-Path $PSScriptRoot "..\..")).Path,
+  [string]$RepoRoot = "",
   [string]$EnvFile = ".local/kingsmen.local-postgres.env",
   [string]$BackendBaseUrl = "http://127.0.0.1:3001",
   [string]$RedisUrl = "redis://127.0.0.1:6379",
@@ -9,6 +9,23 @@ param(
 )
 
 $ErrorActionPreference = "Continue"
+
+function Resolve-KingsmenRepoRoot {
+  param([string]$Candidate)
+
+  if (-not [string]::IsNullOrWhiteSpace($Candidate)) {
+    return (Resolve-Path $Candidate).Path
+  }
+
+  if (-not [string]::IsNullOrWhiteSpace($PSScriptRoot)) {
+    return (Resolve-Path (Join-Path $PSScriptRoot "..\..")).Path
+  }
+
+  return (Get-Location).Path
+}
+
+$RepoRoot = Resolve-KingsmenRepoRoot -Candidate $RepoRoot
+Set-Location $RepoRoot
 
 function Write-WrapperReport {
   param([object]$Report)
@@ -28,23 +45,34 @@ function Get-LastExitCodeSafe {
   return [int]$global:LASTEXITCODE
 }
 
-Set-Location $RepoRoot
-
 $credentialScript = Join-Path $RepoRoot "scripts\jarvis\Invoke-JarvisCredentialReadiness.ps1"
 $observabilityScript = Join-Path $RepoRoot "scripts\staging\Invoke-KingsmenObservabilityIncidentStagingProof.ps1"
 $finalCollector = Join-Path $RepoRoot "scripts\staging\Collect-KingsmenFinalAssemblyEvidence.ps1"
 $matrixScript = Join-Path $RepoRoot "scripts\jarvis\Build-JarvisModuleActivationMatrix.ps1"
 
-& $credentialScript -RepoRoot $RepoRoot -EnvFile $EnvFile -BackendBaseUrl $BackendBaseUrl -RedisUrl $RedisUrl
+foreach ($requiredScript in @($credentialScript, $observabilityScript, $finalCollector, $matrixScript)) {
+  if (-not (Test-Path $requiredScript)) {
+    throw "Missing required Jarvis/Kingsmen script: $requiredScript"
+  }
+}
+
+& powershell -NoProfile -ExecutionPolicy Bypass -File $credentialScript `
+  -EnvFile $EnvFile `
+  -BackendBaseUrl $BackendBaseUrl `
+  -RedisUrl $RedisUrl
 $credentialScanExitCode = Get-LastExitCodeSafe
 
-& $observabilityScript -RepoRoot $RepoRoot -BackendBaseUrl $BackendBaseUrl -MarkOperatorReviewed
+& powershell -NoProfile -ExecutionPolicy Bypass -File $observabilityScript `
+  -RepoRoot $RepoRoot `
+  -BackendBaseUrl $BackendBaseUrl `
+  -MarkOperatorReviewed
 $observabilityProofExitCode = Get-LastExitCodeSafe
 
-& $finalCollector -RepoRoot $RepoRoot
+& powershell -NoProfile -ExecutionPolicy Bypass -File $finalCollector `
+  -RepoRoot $RepoRoot
 $finalEvidenceExitCode = Get-LastExitCodeSafe
 
-& $matrixScript -RepoRoot $RepoRoot
+& powershell -NoProfile -ExecutionPolicy Bypass -File $matrixScript
 $activationMatrixExitCode = Get-LastExitCodeSafe
 
 $report = [ordered]@{
