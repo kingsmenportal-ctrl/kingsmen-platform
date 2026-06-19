@@ -13,6 +13,8 @@
     "jarvis:validate:core": "node scripts/validators/validate-jarvis-core.mjs",
     "jarvis:validate:live-pass-02": "node scripts/validators/validate-jarvis-live-pass-02.mjs",
     "jarvis:validate:live-pass-03": "node scripts/validators/validate-jarvis-live-pass-03.mjs",
+    "jarvis:credentials:scan": "powershell -ExecutionPolicy Bypass -File scripts/jarvis/Invoke-JarvisCredentialReadiness.ps1",
+    "jarvis:activation:matrix": "powershell -ExecutionPolicy Bypass -File scripts/jarvis/Build-JarvisModuleActivationMatrix.ps1",
     "api:build": "npm --prefix apps/api run build",
     "api:start": "npm --prefix apps/api start",
     "api:validate": "npm --prefix apps/api run validate",
