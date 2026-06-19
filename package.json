@@ -39,6 +39,7 @@
     "legal:prove": "node scripts/proof/prove-legal-privacy-boundary.mjs",
     "legal:validate": "node scripts/validators/validate-legal-privacy-proof.mjs",
     "legal:staging": "powershell -ExecutionPolicy Bypass -File scripts/staging/Invoke-KingsmenLegalPrivacyPublicationProof.ps1",
+    "document-vault:staging": "powershell -ExecutionPolicy Bypass -File scripts/staging/Invoke-KingsmenDocumentVaultStorageStagingProof.ps1",
     "staging:prove:pack": "node scripts/proof/prove-staging-runtime-proof-pack.mjs",
     "staging:validate:pack": "node scripts/validators/validate-staging-runtime-proof-pack.mjs",
     "staging:prove:capture": "node scripts/proof/prove-staging-runtime-evidence-capture.mjs",
