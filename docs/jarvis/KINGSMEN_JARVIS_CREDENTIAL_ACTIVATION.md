@@ -12,7 +12,8 @@ Jarvis may only:
 2. reject placeholders such as `...`, `changeme`, `your_value_here`, or `example.com`;
 3. confirm whether a credential is present in the current process environment;
 4. write redacted readiness evidence;
-5. tell the operator which staging proof can run next.
+5. tell the operator which staging proof can run next;
+6. build a module activation matrix that combines credential readiness with Kingsmen evidence reports.
 
 Jarvis may not:
 
@@ -43,10 +44,10 @@ Scan current process credentials without printing raw values:
 npm run jarvis:credentials:scan
 ```
 
-Validate the source-level credential activation layer:
+Build the Jarvis module activation matrix:
 
 ```powershell
-npm run jarvis:credentials:validate
+npm run jarvis:activation:matrix
 ```
 
 Run full Jarvis validation:
@@ -63,13 +64,23 @@ Readiness scan report:
 reports/jarvis/jarvis-credential-readiness-latest.json
 ```
 
-Validation report:
+Module activation matrix:
 
 ```text
-reports/jarvis/jarvis-credential-orchestrator-validation-latest.json
+reports/jarvis/jarvis-module-activation-matrix-latest.json
 ```
 
 Both reports must remain redacted.
+
+## Activation matrix statuses
+
+| Status | Meaning |
+|---|---|
+| `BLOCKED_CREDENTIALS` | Required environment values are missing or placeholders. |
+| `BLOCKED_STAGING_EVIDENCE` | Credentials may be ready, but runtime proof is still missing or failed. |
+| `BLOCKED_FOUNDER_REVIEW` | Evidence exists but was not reviewed. |
+| `BLOCKED_REDACTION` | Evidence exists but redaction was not proven. |
+| `READY_FOR_LIVE_AFTER_APPROVAL` | Credentials and evidence are ready; founder approval is still required before production-risk activation. |
 
 ## Activation sequence
 
@@ -77,7 +88,8 @@ Both reports must remain redacted.
 2. Run `npm run jarvis:credentials:scan`.
 3. Replace any `PLACEHOLDER_REJECTED` or missing values.
 4. Run the module-specific staging proof.
-5. Collect final evidence.
-6. Founder approves production-risk activation.
+5. Run `npm run final:collect:evidence`.
+6. Run `npm run jarvis:activation:matrix`.
+7. Founder approves production-risk activation.
 
 Jarvis can coordinate the above sequence, but Kingsmen launch gates remain the authority.
