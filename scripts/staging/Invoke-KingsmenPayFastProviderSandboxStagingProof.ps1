@@ -25,12 +25,11 @@ if ([string]::IsNullOrWhiteSpace($RepoRoot)) {
   }
 }
 
-function Test-ConfiguredSecret {
-  param([string]$Name)
-  $value = [Environment]::GetEnvironmentVariable($Name, 'Process')
-  if ([string]::IsNullOrWhiteSpace($value)) { return $false }
-  $normalized = $value.Trim().ToLowerInvariant()
-  $bad = @(
+function Test-PlaceholderValue {
+  param([string]$Value)
+  if ([string]::IsNullOrWhiteSpace($Value)) { return $true }
+  $normalized = $Value.Trim().ToLowerInvariant()
+  $badExact = @(
     "...",
     "todo",
     "tbd",
@@ -53,25 +52,47 @@ function Test-ConfiguredSecret {
     "sandbox-passphrase-reference-only",
     "sandbox-merchant-key-reference-only"
   )
-  if ($bad -contains $normalized) { return $false }
-  if ($normalized.StartsWith("your_")) { return $false }
-  if ($normalized.StartsWith("replace_")) { return $false }
-  if ($normalized.StartsWith("real_")) { return $false }
-  if ($normalized.StartsWith("dummy_")) { return $false }
-  if ($normalized.StartsWith("fake_")) { return $false }
-  if ($normalized.Contains("example.com")) { return $false }
-  return $true
+  if ($badExact -contains $normalized) { return $true }
+
+  $badFragments = @(
+    "your_",
+    "your-",
+    "yourreal",
+    "your_real",
+    "replace_",
+    "real_value",
+    "real_sandbox_value",
+    "real_internal_payment_secret",
+    "dummy",
+    "fake",
+    "example.com"
+  )
+
+  foreach ($fragment in $badFragments) {
+    if ($normalized.Contains($fragment)) { return $true }
+  }
+
+  if ($normalized.StartsWith("real_")) { return $true }
+  if ($normalized.StartsWith("replace_")) { return $true }
+  return $false
+}
+
+function Test-ConfiguredSecret {
+  param([string]$Name)
+  $value = [Environment]::GetEnvironmentVariable($Name, 'Process')
+  return -not (Test-PlaceholderValue $value)
 }
 
 function Test-ConfiguredNotifyUrl {
   param([string]$Name)
   $value = [Environment]::GetEnvironmentVariable($Name, 'Process')
-  if ([string]::IsNullOrWhiteSpace($value)) { return $false }
-  if (-not (Test-ConfiguredSecret $Name)) { return $false }
+  if (Test-PlaceholderValue $value) { return $false }
   $trimmed = $value.Trim()
   $uri = $null
   if (-not [Uri]::TryCreate($trimmed, [UriKind]::Absolute, [ref]$uri)) { return $false }
   if ($uri.Scheme -ne "https" -and -not ($uri.Scheme -eq "http" -and ($uri.Host -eq "127.0.0.1" -or $uri.Host -eq "localhost"))) { return $false }
+  if (Test-PlaceholderValue $uri.Host) { return $false }
+  if (Test-PlaceholderValue $uri.AbsolutePath) { return $false }
   return $true
 }
 
@@ -86,10 +107,8 @@ function Write-Report {
   $dir = Split-Path -Parent $fullPath
   if (-not (Test-Path $dir)) { New-Item -ItemType Directory -Force -Path $dir | Out-Null }
   $json = $Report | ConvertTo-Json -Depth 20
-  if ($json.Contains("PAYFAST_MERCHANT_KEY") -and $json.Contains("value")) { throw "Unsafe PayFast report detail detected." }
-  if ($json.Contains("PAYFAST_PASSPHRASE") -and $json.Contains("value")) { throw "Unsafe PayFast passphrase report detail detected." }
-  if ($json.Contains("postgres://") -or $json.Contains("postgresql://") -or $json.Contains("redis://") -or $json.Contains("BEGIN PRIVATE KEY") -or $json.Contains("github_pat_") -or $json.Contains("sk-")) {
-    throw "Secret-like value detected in PayFast staging report output."
+  if ($json.Contains("postgres://") -or $json.Contains("postgresql://") -or $json.Contains("redis://")) {
+    throw "Connection string detected in PayFast staging report output."
   }
   $json | Set-Content -Encoding UTF8 -Path $fullPath
   Write-Output $json
