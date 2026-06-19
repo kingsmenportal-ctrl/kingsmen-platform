@@ -10,10 +10,35 @@ function Test-KingsmenPlaceholder {
   if ($null -eq $Value) { return $true }
   $normalized = $Value.Trim().ToLowerInvariant()
   if ($normalized.Length -eq 0) { return $true }
-  $bad = @("...", "changeme", "change_me", "todo", "placeholder", "your_value_here")
+  $bad = @(
+    "...",
+    "changeme",
+    "change_me",
+    "todo",
+    "tbd",
+    "placeholder",
+    "your_value_here",
+    "replace_me",
+    "real",
+    "real_value",
+    "real_bucket",
+    "real_secret",
+    "real_key",
+    "real_token",
+    "real_password",
+    "real_host",
+    "real_user",
+    "dummy",
+    "dummy_value",
+    "fake",
+    "fake_value"
+  )
   if ($bad -contains $normalized) { return $true }
   if ($normalized.StartsWith("your_")) { return $true }
   if ($normalized.StartsWith("replace_")) { return $true }
+  if ($normalized.StartsWith("real_")) { return $true }
+  if ($normalized.StartsWith("dummy_")) { return $true }
+  if ($normalized.StartsWith("fake_")) { return $true }
   if ($normalized.Contains("example.com")) { return $true }
   return $false
 }
