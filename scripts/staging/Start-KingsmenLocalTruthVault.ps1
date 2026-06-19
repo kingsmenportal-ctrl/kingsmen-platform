@@ -80,22 +80,57 @@ function Read-ExistingEnvValue {
   return ($line -replace "^$Name=", "")
 }
 
+function Invoke-ContainerSqlScalar {
+  param([string]$Name, [string]$User, [string]$Database, [string]$Sql)
+  & docker exec $Name psql -U $User -d $Database -v ON_ERROR_STOP=1 -q -t -c $Sql | Out-Null
+  return ($LASTEXITCODE -eq 0)
+}
+
 function Wait-PostgresReady {
   param([string]$Name, [string]$User, [string]$Database)
-  $ready = $false
-  for ($i = 0; $i -lt 45; $i++) {
+  $stableReadyCount = 0
+  $lastFailure = "not_checked"
+
+  for ($i = 0; $i -lt 90; $i++) {
+    $inspectStatus = (& docker inspect -f "{{.State.Status}} {{.State.Health.Status}} {{.RestartCount}}" $Name 2>$null)
+    if ($LASTEXITCODE -ne 0) { $lastFailure = "container_not_inspectable"; Start-Sleep -Seconds 2; continue }
+
     & docker exec $Name pg_isready -U $User -d $Database | Out-Null
-    if ($LASTEXITCODE -eq 0) { $ready = $true; break }
+    $pgReady = ($LASTEXITCODE -eq 0)
+
+    $selectReady = $false
+    if ($pgReady) {
+      $selectReady = Invoke-ContainerSqlScalar -Name $Name -User $User -Database $Database -Sql "select 1"
+    }
+
+    if ($pgReady -and $selectReady) {
+      $stableReadyCount += 1
+      if ($stableReadyCount -ge 3) { return }
+    } else {
+      $stableReadyCount = 0
+      $lastFailure = "pg_isready=$pgReady select_1=$selectReady inspect=$inspectStatus"
+    }
+
     Start-Sleep -Seconds 2
   }
-  if (-not $ready) { throw "PostgreSQL container did not become ready in time." }
+
+  throw "PostgreSQL container did not become stably ready in time. Last failure: $lastFailure"
 }
 
 function Invoke-ContainerPsqlFile {
   param([string]$Name, [string]$User, [string]$Database, [string]$SqlPath)
   $sql = Get-Content -Raw -Path $SqlPath
-  $sql | & docker exec -i $Name psql -U $User -d $Database -v ON_ERROR_STOP=1 | Out-Null
-  if ($LASTEXITCODE -ne 0) { throw "Migration failed: $SqlPath" }
+  $lastError = "not_attempted"
+
+  for ($attempt = 1; $attempt -le 5; $attempt++) {
+    Wait-PostgresReady -Name $Name -User $User -Database $Database
+    $sql | & docker exec -i $Name psql -U $User -d $Database -v ON_ERROR_STOP=1 | Out-Null
+    if ($LASTEXITCODE -eq 0) { return }
+    $lastError = "psql_exit_code_$LASTEXITCODE"
+    Start-Sleep -Seconds (2 * $attempt)
+  }
+
+  throw "Migration failed after retries: $SqlPath ($lastError)"
 }
 
 Assert-CommandAvailable -Name "docker"
@@ -147,7 +182,11 @@ if (-not $SkipMigrations) {
       Invoke-ContainerPsqlFile -Name $ContainerName -User $DatabaseUser -Database $DatabaseName -SqlPath $migration.FullName
       $migrationResults += [ordered]@{ name = $migration.Name; applied = $true; reason = "APPLIED" }
     } catch {
-      $migrationResults += [ordered]@{ name = $migration.Name; applied = $false; reason = "FAILED" }
+      $migrationResults += [ordered]@{ name = $migration.Name; applied = $false; reason = "FAILED_AFTER_RETRIES" }
+      Write-FailureReport `
+        -Status "LOCAL_TRUTH_VAULT_MIGRATION_FAILED" `
+        -Reason "Migration failed after PostgreSQL readiness retries. Migration: $($migration.Name)." `
+        -NextAction "Run docker logs $ContainerName --tail 80, then rerun scripts/staging/Start-KingsmenLocalTruthVault.cmd - or force reset with PowerShell: .\scripts\staging\Start-KingsmenLocalTruthVault.ps1 -ForceRecreate."
       throw
     }
   }
@@ -168,9 +207,7 @@ $envLines = @(
 )
 $envLines | Set-Content -Encoding UTF8 -Path $envPath
 
-$selectOk = $false
-& docker exec $ContainerName psql -U $DatabaseUser -d $DatabaseName -v ON_ERROR_STOP=1 -q -t -c "select 1" | Out-Null
-if ($LASTEXITCODE -eq 0) { $selectOk = $true }
+$selectOk = Invoke-ContainerSqlScalar -Name $ContainerName -User $DatabaseUser -Database $DatabaseName -Sql "select 1"
 
 $report = [ordered]@{
   schema = "kingsmen.local-truth-vault-postgres.v1"
