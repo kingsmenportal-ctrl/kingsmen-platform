@@ -143,6 +143,10 @@ function finalBundleReady(finalBundleJson) {
   );
 }
 
+function actionMatches(text, fragments) {
+  return fragments.some((fragment) => text.includes(fragment));
+}
+
 const original = spawnSync(process.execPath, ['scripts/validators/validate-kingsmen-launch-readiness.mjs', modeArg], {
   cwd: cwdRoot,
   encoding: 'utf8'
@@ -166,6 +170,59 @@ if (!report) {
     OBSERVABILITY_STAGING_PROOF_REQUIRED: 'reports/staging/observability-incident-staging-latest.json',
     LEGAL_PRIVACY_PUBLICATION_PROOF_REQUIRED: 'reports/staging/legal-privacy-publication-staging-latest.json'
   };
+
+  const evidenceByNextAction = [
+    {
+      key: 'api_truth_vault',
+      fragments: ['api truth vault', 'staging db integration proof'],
+      evidencePath: 'reports/staging/truth-vault-persistence-staging-latest.json'
+    },
+    {
+      key: 'web_backend_boundary',
+      fragments: ['web backend-boundary', 'kingSMEN_backend_base_url'.toLowerCase()],
+      evidencePath: 'reports/staging/web-backend-boundary-staging-latest.json'
+    },
+    {
+      key: 'payfast_sandbox',
+      fragments: ['payfast sandbox', 'provider sandbox checkout'],
+      evidencePath: 'reports/staging/payfast-provider-sandbox-staging-latest.json'
+    },
+    {
+      key: 'rls_security',
+      fragments: ['rls/security', 'role-isolation proof'],
+      evidencePath: 'reports/staging/rls-sql-isolation-staging-latest.json'
+    },
+    {
+      key: 'backup_restore',
+      fragments: ['backup/restore', 'backup and restore'],
+      evidencePath: 'reports/staging/backup-restore-drill-staging-latest.json'
+    },
+    {
+      key: 'branch_protection',
+      fragments: ['branch-protection', 'main protection', 'source-guard required'],
+      evidencePath: 'reports/repo/main-branch-protection-apply-latest.json'
+    },
+    {
+      key: 'secrets_runtime',
+      fragments: ['secrets wiring', 'masked runtime secret'],
+      evidencePath: 'reports/security/secrets-wiring-runtime-health-latest.json'
+    },
+    {
+      key: 'communications_provider',
+      fragments: ['communications proof', 'provider staging send', 'communications provider'],
+      evidencePath: 'reports/staging/communications-provider-staging-latest.json'
+    },
+    {
+      key: 'observability',
+      fragments: ['observability proof', 'staging health, queue/dlq', 'incident drill proof'],
+      evidencePath: 'reports/staging/observability-incident-staging-latest.json'
+    },
+    {
+      key: 'legal_privacy',
+      fragments: ['legal/privacy proof', 'publish/version policy', 'legal/founder review'],
+      evidencePath: 'reports/staging/legal-privacy-publication-staging-latest.json'
+    }
+  ];
 
   const originalWarnings = Array.isArray(report.warnings) ? report.warnings : [];
   const warningEvidence = {};
@@ -191,6 +248,43 @@ if (!report) {
     return !bundleIsReady;
   });
 
+  const originalNextActions = Array.isArray(report.nextActions) ? report.nextActions : [];
+  const nextActionEvidence = {};
+  const evidenceAwareNextActions = originalNextActions.filter((action) => {
+    const text = String(action).toLowerCase();
+
+    if (text.includes('staging runtime proof pack') || text.includes('staging runtime evidence')) {
+      nextActionEvidence.staging_runtime_pack = {
+        passed: bundleIsReady,
+        source: 'final-assembly-bundle',
+        found: Boolean(finalBundle),
+        status: finalBundle?.status ?? 'missing_or_unparsed'
+      };
+      return !bundleIsReady;
+    }
+
+    if (text.includes('final assembly evidence capture') || text.includes('founder-review the bundle')) {
+      nextActionEvidence.final_assembly_evidence = {
+        passed: bundleIsReady,
+        source: 'final-assembly-bundle',
+        found: Boolean(finalBundle),
+        status: finalBundle?.status ?? 'missing_or_unparsed'
+      };
+      return !bundleIsReady;
+    }
+
+    const match = evidenceByNextAction.find((rule) => actionMatches(text, rule.fragments));
+    if (!match) return true;
+
+    const result = evidencePassed(match.evidencePath, finalBundle);
+    nextActionEvidence[match.key] = {
+      evidencePath: match.evidencePath,
+      ...result
+    };
+    return !result.passed;
+  });
+
+  report.nextActions = evidenceAwareNextActions;
   report.summary = {
     ...report.summary,
     warnings: report.warnings.length
@@ -209,6 +303,16 @@ if (!report) {
     jsonReader: 'encoding-aware-utf8-utf16le-bom',
     rule: 'Suppress source-boundary warnings only when matching runtime evidence is passed, reviewed, and redacted.',
     evidenceByWarningCode: warningEvidence
+  };
+  report.evidenceAwareNextActions = true;
+  report.nextActionFilter = {
+    sourceValidator: 'validate-kingsmen-launch-readiness',
+    originalNextActionCount: originalNextActions.length,
+    remainingNextActionCount: report.nextActions.length,
+    suppressedNextActions: originalNextActions.length - report.nextActions.length,
+    evidenceSource: finalBundle ? 'final-assembly-bundle' : 'individual-runtime-reports',
+    rule: 'Suppress completed next actions only when matching runtime evidence is passed, reviewed, and redacted.',
+    evidenceByNextAction: nextActionEvidence
   };
 
   writeJson('reports/launch/kingsmen-launch-readiness-latest.json', report);
