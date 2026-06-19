@@ -105,7 +105,7 @@ function Invoke-DockerText {
     if ($process.ExitCode -ne 0) {
       $safeErr = ([string]$stderr).Trim()
       if ($safeErr.Length -gt 500) { $safeErr = $safeErr.Substring(0, 500) }
-      throw "DOCKER_COMMAND_FAILED:$Stage:$safeErr"
+      throw "DOCKER_COMMAND_FAILED:${Stage}:$safeErr"
     }
 
     return $stdout
