@@ -83,6 +83,73 @@ function Convert-OutputToText {
   return (($Output | ForEach-Object { [string]$_ }) -join "`n")
 }
 
+function Convert-ToProcessArgumentString {
+  param([string[]]$Arguments)
+  $quoted = @()
+  foreach ($argument in $Arguments) {
+    $text = [string]$argument
+    if ($text -match '^[A-Za-z0-9_./:@={}\-]+$') {
+      $quoted += $text
+      continue
+    }
+    $escaped = $text -replace '\\', '\\' -replace '"', '\"'
+    $quoted += '"' + $escaped + '"'
+  }
+  return ($quoted -join ' ')
+}
+
+function Invoke-NativeText {
+  param(
+    [string]$FilePath,
+    [string[]]$Arguments,
+    [string]$Stage,
+    [string]$StandardInput = $null
+  )
+
+  Write-Stage $Stage
+
+  $psi = New-Object System.Diagnostics.ProcessStartInfo
+  $psi.FileName = $FilePath
+  $psi.Arguments = Convert-ToProcessArgumentString -Arguments $Arguments
+  $psi.UseShellExecute = $false
+  $psi.RedirectStandardOutput = $true
+  $psi.RedirectStandardError = $true
+  $psi.CreateNoWindow = $true
+  if ($null -ne $StandardInput) { $psi.RedirectStandardInput = $true }
+
+  $process = New-Object System.Diagnostics.Process
+  $process.StartInfo = $psi
+
+  if (-not $process.Start()) { throw "NATIVE_COMMAND_START_FAILED:$Stage" }
+
+  $stdoutTask = $process.StandardOutput.ReadToEndAsync()
+  $stderrTask = $process.StandardError.ReadToEndAsync()
+
+  if ($null -ne $StandardInput) {
+    $process.StandardInput.Write($StandardInput)
+    $process.StandardInput.Close()
+  }
+
+  $timeoutMs = [Math]::Max(1, $CommandTimeoutSeconds) * 1000
+  if (-not $process.WaitForExit($timeoutMs)) {
+    try { $process.Kill() } catch { }
+    try { $process.WaitForExit(5000) | Out-Null } catch { }
+    throw "NATIVE_COMMAND_TIMEOUT:${Stage}:$($CommandTimeoutSeconds)s"
+  }
+
+  $stdout = [string]$stdoutTask.Result
+  $stderr = [string]$stderrTask.Result
+  $text = (($stdout, $stderr | Where-Object { $_ }) -join "`n").Trim()
+
+  if ($process.ExitCode -ne 0) {
+    $safeErr = $text
+    if ($safeErr.Length -gt 500) { $safeErr = $safeErr.Substring(0, 500) }
+    throw "NATIVE_COMMAND_FAILED:${Stage}:exit=$($process.ExitCode):$safeErr"
+  }
+
+  return [string]$text
+}
+
 function Invoke-DockerText {
   param(
     [string[]]$Arguments,
@@ -90,26 +157,7 @@ function Invoke-DockerText {
   )
   $docker = Get-Command docker -ErrorAction SilentlyContinue
   if (-not $docker) { throw "DOCKER_NOT_AVAILABLE" }
-
-  Write-Stage $Stage
-
-  $previousErrorActionPreference = $ErrorActionPreference
-  $ErrorActionPreference = "Continue"
-  try {
-    $output = & $docker.Source @Arguments 2>&1
-    $exitCode = $LASTEXITCODE
-  } finally {
-    $ErrorActionPreference = $previousErrorActionPreference
-  }
-  $text = Convert-OutputToText -Output $output
-
-  if ($exitCode -ne 0) {
-    $safeErr = ([string]$text).Trim()
-    if ($safeErr.Length -gt 500) { $safeErr = $safeErr.Substring(0, 500) }
-    throw "DOCKER_COMMAND_FAILED:${Stage}:$safeErr"
-  }
-
-  return [string]$text
+  return Invoke-NativeText -FilePath $docker.Source -Arguments $Arguments -Stage $Stage
 }
 
 function Resolve-PostgresContainer {
@@ -160,21 +208,7 @@ function Invoke-PsqlText {
   param([string]$DatabaseName, [string]$Sql, [string]$Stage = "psql_sql")
   $docker = Get-Command docker -ErrorAction SilentlyContinue
   if (-not $docker) { throw "DOCKER_NOT_AVAILABLE" }
-  Write-Stage $Stage
-  $previousErrorActionPreference = $ErrorActionPreference
-  $ErrorActionPreference = "Continue"
-  try {
-    $output = $Sql | & $docker.Source exec -i $env:KINGSMEN_POSTGRES_CONTAINER psql -U $env:KINGSMEN_POSTGRES_USER -d $DatabaseName -v ON_ERROR_STOP=1 -q -t -A 2>&1
-    $exitCode = $LASTEXITCODE
-  } finally {
-    $ErrorActionPreference = $previousErrorActionPreference
-  }
-  if ($exitCode -ne 0) {
-    $safeErr = (Convert-OutputToText -Output $output).Trim()
-    if ($safeErr.Length -gt 500) { $safeErr = $safeErr.Substring(0, 500) }
-    throw "PSQL_SQL_FAILED:${Stage}:$safeErr"
-  }
-  return $output
+  return Invoke-NativeText -FilePath $docker.Source -Arguments @("exec", "-i", $env:KINGSMEN_POSTGRES_CONTAINER, "psql", "-U", $env:KINGSMEN_POSTGRES_USER, "-d", $DatabaseName, "-v", "ON_ERROR_STOP=1", "-q", "-t", "-A") -Stage $Stage -StandardInput $Sql
 }
 
 function Get-TableCounts {
@@ -189,7 +223,7 @@ SELECT 'production_readiness_checks=' || count(*) FROM public.production_readine
 '@
   $lines = Invoke-PsqlText -DatabaseName $DatabaseName -Sql $sql -Stage "capture_counts_$DatabaseName"
   $counts = @{}
-  foreach ($line in $lines) {
+  foreach ($line in ($lines -split "`n")) {
     $text = ([string]$line).Trim()
     if (-not $text -or $text -notmatch '=') { continue }
     $parts = $text -split '=', 2
