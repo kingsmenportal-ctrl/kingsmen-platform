@@ -86,6 +86,14 @@ The local scan writes only redacted evidence and records `envFilesLoaded` status
 
 The local queue scan only makes `REDIS_URL` visible to Jarvis credential readiness. It does **not** prove Redis is running and does **not** mark queue fabric live. Queue fabric still requires the observability/incident staging proof.
 
+Run local queue credential scan, observability/incident staging proof, final evidence collection, and activation matrix rebuild in one command:
+
+```powershell
+npm run jarvis:activation:local:observability
+```
+
+This wrapper still keeps production disabled. It only promotes Queue Fabric when the existing Kingsmen observability proof confirms API health, database health, Redis queue health, DLQ probe, structured log correlation, alert route, runbook drill, and redaction.
+
 Build the Jarvis module activation matrix:
 
 ```powershell
@@ -112,10 +120,28 @@ Module activation matrix:
 reports/jarvis/jarvis-module-activation-matrix-latest.json
 ```
 
+Local queue wrapper report:
+
+```text
+reports/jarvis/jarvis-local-queue-activation-wrapper-latest.json
+```
+
+Local observability wrapper report:
+
+```text
+reports/jarvis/jarvis-local-observability-activation-wrapper-latest.json
+```
+
 Document Vault storage proof:
 
 ```text
 reports/staging/document-vault-storage-staging-latest.json
+```
+
+Observability / Queue Fabric proof:
+
+```text
+reports/staging/observability-incident-staging-latest.json
 ```
 
 All reports must remain redacted.
@@ -133,7 +159,7 @@ All reports must remain redacted.
 ## Activation sequence
 
 1. Operator adds credentials outside Git: local process environment, Oracle environment, GitHub secrets where appropriate, or vault/KMS later.
-2. Run `npm run jarvis:credentials:scan`, `npm run jarvis:credentials:scan:local`, `npm run jarvis:credentials:scan:local:queue`, or `npm run jarvis:activation:local:queue`.
+2. Run `npm run jarvis:credentials:scan`, `npm run jarvis:credentials:scan:local`, `npm run jarvis:credentials:scan:local:queue`, `npm run jarvis:activation:local:queue`, or `npm run jarvis:activation:local:observability`.
 3. Replace any `PLACEHOLDER_REJECTED` or missing values.
 4. Run the module-specific staging proof.
 5. Run `npm run final:collect:evidence`.
