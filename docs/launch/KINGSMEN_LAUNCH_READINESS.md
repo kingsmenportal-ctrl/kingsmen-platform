@@ -169,11 +169,12 @@ npm run communications:validate
 
 Provider staging proof still required: email send/receive, bounce handling, opt-out path, WhatsApp urgent-only approval evidence, SMS fallback-only evidence, and redacted evidence report.
 
-## Observability + incident proof command
+## observability + incident proof command
 
 ```bash
 npm run observability:prove
 npm run observability:validate
+npm run observability:staging
 ```
 
 Staging observability proof still required: API health proof, database health proof, queue/DLQ proof, structured log sample with correlationId, alert proof, SEV1/SEV2/SEV3 incident drill, founder escalation, and no PII or secrets in logs proof.
