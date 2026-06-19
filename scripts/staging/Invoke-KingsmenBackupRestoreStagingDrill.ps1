@@ -2,11 +2,17 @@ param(
   [string]$RepoRoot = (Resolve-Path (Join-Path $PSScriptRoot "..\..")).Path,
   [string]$ReportPath = "reports/staging/backup-restore-drill-staging-latest.json",
   [string]$RestoreDatabaseName = "",
+  [int]$CommandTimeoutSeconds = 180,
   [switch]$MarkOperatorReviewed,
   [switch]$PreserveRestoreDatabase
 )
 
 $ErrorActionPreference = "Stop"
+
+function Write-Stage {
+  param([string]$Name)
+  Write-Output "KINGSMEN_BACKUP_RESTORE_STAGE=$Name"
+}
 
 function Import-LocalRuntimeEnv {
   $envPath = Join-Path $RepoRoot ".local/kingsmen.local-postgres.env"
@@ -72,20 +78,49 @@ function Fail-Drill {
 }
 
 function Invoke-DockerText {
-  param([string[]]$Arguments)
+  param(
+    [string[]]$Arguments,
+    [string]$Stage = "docker_command"
+  )
   $docker = Get-Command docker -ErrorAction SilentlyContinue
   if (-not $docker) { throw "DOCKER_NOT_AVAILABLE" }
-  $output = & $docker.Source @Arguments
-  if ($LASTEXITCODE -ne 0) { throw "DOCKER_COMMAND_FAILED" }
-  return $output
+
+  Write-Stage $Stage
+
+  $id = [Guid]::NewGuid().ToString("N")
+  $stdoutPath = Join-Path $env:TEMP "kingsmen-docker-$id.out"
+  $stderrPath = Join-Path $env:TEMP "kingsmen-docker-$id.err"
+
+  try {
+    $process = Start-Process -FilePath $docker.Source -ArgumentList $Arguments -NoNewWindow -PassThru -RedirectStandardOutput $stdoutPath -RedirectStandardError $stderrPath
+    $completed = $process.WaitForExit($CommandTimeoutSeconds * 1000)
+    if (-not $completed) {
+      try { $process.Kill() } catch { }
+      throw "DOCKER_COMMAND_TIMEOUT:$Stage"
+    }
+
+    $stdout = if (Test-Path $stdoutPath) { Get-Content -Raw -Path $stdoutPath } else { "" }
+    $stderr = if (Test-Path $stderrPath) { Get-Content -Raw -Path $stderrPath } else { "" }
+
+    if ($process.ExitCode -ne 0) {
+      $safeErr = ([string]$stderr).Trim()
+      if ($safeErr.Length -gt 500) { $safeErr = $safeErr.Substring(0, 500) }
+      throw "DOCKER_COMMAND_FAILED:$Stage:$safeErr"
+    }
+
+    return $stdout
+  } finally {
+    try { Remove-Item -Force -ErrorAction SilentlyContinue $stdoutPath, $stderrPath } catch { }
+  }
 }
 
 function Invoke-PsqlText {
-  param([string]$DatabaseName, [string]$Sql)
+  param([string]$DatabaseName, [string]$Sql, [string]$Stage = "psql_sql")
   $docker = Get-Command docker -ErrorAction SilentlyContinue
   if (-not $docker) { throw "DOCKER_NOT_AVAILABLE" }
+  Write-Stage $Stage
   $Sql | & $docker.Source exec -i $env:KINGSMEN_POSTGRES_CONTAINER psql -U $env:KINGSMEN_POSTGRES_USER -d $DatabaseName -v ON_ERROR_STOP=1 -q -t -A
-  if ($LASTEXITCODE -ne 0) { throw "PSQL_SQL_FAILED" }
+  if ($LASTEXITCODE -ne 0) { throw "PSQL_SQL_FAILED:$Stage" }
 }
 
 function Get-TableCounts {
@@ -98,7 +133,7 @@ SELECT 'workflow_runs=' || count(*) FROM public.workflow_runs;
 SELECT 'audit_events=' || count(*) FROM public.audit_events;
 SELECT 'production_readiness_checks=' || count(*) FROM public.production_readiness_checks;
 '@
-  $lines = Invoke-PsqlText -DatabaseName $DatabaseName -Sql $sql
+  $lines = Invoke-PsqlText -DatabaseName $DatabaseName -Sql $sql -Stage "capture_counts_$DatabaseName"
   $counts = @{}
   foreach ($line in $lines) {
     $text = ([string]$line).Trim()
@@ -130,7 +165,7 @@ $docker = Get-Command docker -ErrorAction SilentlyContinue
 if (-not $docker) { Fail-Drill "DOCKER_NOT_AVAILABLE" }
 
 try {
-  Invoke-DockerText -Arguments @("inspect", $env:KINGSMEN_POSTGRES_CONTAINER) | Out-Null
+  Invoke-DockerText -Arguments @("inspect", $env:KINGSMEN_POSTGRES_CONTAINER) -Stage "inspect_postgres_container" | Out-Null
 } catch {
   Fail-Drill "POSTGRES_CONTAINER_NOT_AVAILABLE"
 }
@@ -153,14 +188,14 @@ try {
   $sourceCounts = Get-TableCounts -DatabaseName $env:KINGSMEN_POSTGRES_DATABASE
   $checks += @{ name = "source_counts_captured"; passed = $true; detail = "count_only" }
 
-  Invoke-DockerText -Arguments @("exec", $env:KINGSMEN_POSTGRES_CONTAINER, "pg_dump", "-U", $env:KINGSMEN_POSTGRES_USER, "-d", $env:KINGSMEN_POSTGRES_DATABASE, "-Fc", "-f", $dumpPath) | Out-Null
+  Invoke-DockerText -Arguments @("exec", $env:KINGSMEN_POSTGRES_CONTAINER, "pg_dump", "-U", $env:KINGSMEN_POSTGRES_USER, "-d", $env:KINGSMEN_POSTGRES_DATABASE, "-Fc", "-f", $dumpPath) -Stage "pg_dump_source_database" | Out-Null
   $checks += @{ name = "pg_dump_completed"; passed = $true; detail = "custom_format_dump_inside_container" }
 
-  Invoke-DockerText -Arguments @("exec", $env:KINGSMEN_POSTGRES_CONTAINER, "dropdb", "-U", $env:KINGSMEN_POSTGRES_USER, "--if-exists", $RestoreDatabaseName) | Out-Null
-  Invoke-DockerText -Arguments @("exec", $env:KINGSMEN_POSTGRES_CONTAINER, "createdb", "-U", $env:KINGSMEN_POSTGRES_USER, $RestoreDatabaseName) | Out-Null
+  Invoke-DockerText -Arguments @("exec", $env:KINGSMEN_POSTGRES_CONTAINER, "dropdb", "-U", $env:KINGSMEN_POSTGRES_USER, "--if-exists", $RestoreDatabaseName) -Stage "drop_existing_restore_database" | Out-Null
+  Invoke-DockerText -Arguments @("exec", $env:KINGSMEN_POSTGRES_CONTAINER, "createdb", "-U", $env:KINGSMEN_POSTGRES_USER, $RestoreDatabaseName) -Stage "create_restore_database" | Out-Null
   $checks += @{ name = "restore_database_created"; passed = $true; detail = "separate_restore_target" }
 
-  Invoke-DockerText -Arguments @("exec", $env:KINGSMEN_POSTGRES_CONTAINER, "pg_restore", "-U", $env:KINGSMEN_POSTGRES_USER, "-d", $RestoreDatabaseName, "--clean", "--if-exists", $dumpPath) | Out-Null
+  Invoke-DockerText -Arguments @("exec", $env:KINGSMEN_POSTGRES_CONTAINER, "pg_restore", "-U", $env:KINGSMEN_POSTGRES_USER, "-d", $RestoreDatabaseName, "--clean", "--if-exists", $dumpPath) -Stage "pg_restore_into_restore_database" | Out-Null
   $checks += @{ name = "pg_restore_completed"; passed = $true; detail = "restored_to_separate_database" }
 
   $restoreCounts = Get-TableCounts -DatabaseName $RestoreDatabaseName
@@ -171,11 +206,11 @@ try {
   $allPassed = -not ($checks | Where-Object { $_.passed -ne $true })
 
   if (-not $PreserveRestoreDatabase) {
-    Invoke-DockerText -Arguments @("exec", $env:KINGSMEN_POSTGRES_CONTAINER, "dropdb", "-U", $env:KINGSMEN_POSTGRES_USER, "--if-exists", $RestoreDatabaseName) | Out-Null
+    Invoke-DockerText -Arguments @("exec", $env:KINGSMEN_POSTGRES_CONTAINER, "dropdb", "-U", $env:KINGSMEN_POSTGRES_USER, "--if-exists", $RestoreDatabaseName) -Stage "cleanup_restore_database" | Out-Null
     $checks += @{ name = "restore_database_cleaned_up"; passed = $true; detail = "restore_target_removed" }
   }
 
-  Invoke-DockerText -Arguments @("exec", $env:KINGSMEN_POSTGRES_CONTAINER, "rm", "-f", $dumpPath) | Out-Null
+  Invoke-DockerText -Arguments @("exec", $env:KINGSMEN_POSTGRES_CONTAINER, "rm", "-f", $dumpPath) -Stage "remove_container_dump_file" | Out-Null
   $checks += @{ name = "container_dump_removed"; passed = $true; detail = "dump_not_left_in_container" }
 
   $metrics = @{
@@ -184,6 +219,7 @@ try {
     sourceTableCount = $sourceCounts.Keys.Count
     restoreTableCount = $restoreCounts.Keys.Count
     restoreDatabasePreserved = [bool]$PreserveRestoreDatabase
+    commandTimeoutSeconds = $CommandTimeoutSeconds
   }
 
   $report = New-BackupRestoreReport -Status ($(if ($allPassed) { "BACKUP_RESTORE_STAGING_DRILL_PASSED" } else { "PENDING_STAGING_CAPTURE" })) -Passed ([bool]$allPassed) -Checks $checks -Metrics $metrics -NextAction "Backup/restore drill passed. Continue to secrets runtime health proof."
@@ -191,11 +227,13 @@ try {
   Write-Output ($report | ConvertTo-Json -Depth 12)
   if (-not $allPassed) { exit 1 }
 } catch {
-  try { Invoke-DockerText -Arguments @("exec", $env:KINGSMEN_POSTGRES_CONTAINER, "rm", "-f", $dumpPath) | Out-Null } catch { }
+  try { Invoke-DockerText -Arguments @("exec", $env:KINGSMEN_POSTGRES_CONTAINER, "rm", "-f", $dumpPath) -Stage "cleanup_after_exception_remove_dump" | Out-Null } catch { }
   if (-not $PreserveRestoreDatabase -and $RestoreDatabaseName -and $RestoreDatabaseName -ne $env:KINGSMEN_POSTGRES_DATABASE) {
-    try { Invoke-DockerText -Arguments @("exec", $env:KINGSMEN_POSTGRES_CONTAINER, "dropdb", "-U", $env:KINGSMEN_POSTGRES_USER, "--if-exists", $RestoreDatabaseName) | Out-Null } catch { }
+    try { Invoke-DockerText -Arguments @("exec", $env:KINGSMEN_POSTGRES_CONTAINER, "dropdb", "-U", $env:KINGSMEN_POSTGRES_USER, "--if-exists", $RestoreDatabaseName) -Stage "cleanup_after_exception_drop_restore_database" | Out-Null } catch { }
   }
-  $report = New-BackupRestoreReport -Status "PENDING_STAGING_CAPTURE" -Passed $false -Checks ($checks + @(@{ name = "backup_restore_exception"; passed = $false; detail = "BACKUP_RESTORE_DRILL_FAILED" })) -NextAction "Inspect Docker/PostgreSQL state, then rerun the backup/restore drill."
+  $safeReason = ([string]$_.Exception.Message)
+  if ($safeReason.Length -gt 500) { $safeReason = $safeReason.Substring(0, 500) }
+  $report = New-BackupRestoreReport -Status "PENDING_STAGING_CAPTURE" -Passed $false -Checks ($checks + @(@{ name = "backup_restore_exception"; passed = $false; detail = $safeReason })) -NextAction "Inspect Docker/PostgreSQL state, then rerun the backup/restore drill."
   Write-Report -Report $report
   Write-Output ($report | ConvertTo-Json -Depth 12)
   exit 1
