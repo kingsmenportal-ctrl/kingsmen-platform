@@ -77,6 +77,12 @@ function Fail-Drill {
   exit 1
 }
 
+function Convert-OutputToText {
+  param([object[]]$Output)
+  if (-not $Output) { return "" }
+  return (($Output | ForEach-Object { [string]$_ }) -join "`n")
+}
+
 function Invoke-DockerText {
   param(
     [string[]]$Arguments,
@@ -87,31 +93,17 @@ function Invoke-DockerText {
 
   Write-Stage $Stage
 
-  $id = [Guid]::NewGuid().ToString("N")
-  $stdoutPath = Join-Path $env:TEMP "kingsmen-docker-$id.out"
-  $stderrPath = Join-Path $env:TEMP "kingsmen-docker-$id.err"
+  $output = & $docker.Source @Arguments 2>&1
+  $exitCode = $LASTEXITCODE
+  $text = Convert-OutputToText -Output $output
 
-  try {
-    $process = Start-Process -FilePath $docker.Source -ArgumentList $Arguments -NoNewWindow -PassThru -RedirectStandardOutput $stdoutPath -RedirectStandardError $stderrPath
-    $completed = $process.WaitForExit($CommandTimeoutSeconds * 1000)
-    if (-not $completed) {
-      try { $process.Kill() } catch { }
-      throw "DOCKER_COMMAND_TIMEOUT:${Stage}"
-    }
-
-    $stdout = if (Test-Path $stdoutPath) { Get-Content -Raw -Path $stdoutPath } else { "" }
-    $stderr = if (Test-Path $stderrPath) { Get-Content -Raw -Path $stderrPath } else { "" }
-
-    if ($process.ExitCode -ne 0) {
-      $safeErr = ([string]$stderr).Trim()
-      if ($safeErr.Length -gt 500) { $safeErr = $safeErr.Substring(0, 500) }
-      throw "DOCKER_COMMAND_FAILED:${Stage}:$safeErr"
-    }
-
-    return [string]$stdout
-  } finally {
-    try { Remove-Item -Force -ErrorAction SilentlyContinue $stdoutPath, $stderrPath } catch { }
+  if ($exitCode -ne 0) {
+    $safeErr = ([string]$text).Trim()
+    if ($safeErr.Length -gt 500) { $safeErr = $safeErr.Substring(0, 500) }
+    throw "DOCKER_COMMAND_FAILED:${Stage}:$safeErr"
   }
+
+  return [string]$text
 }
 
 function Resolve-PostgresContainer {
@@ -163,8 +155,14 @@ function Invoke-PsqlText {
   $docker = Get-Command docker -ErrorAction SilentlyContinue
   if (-not $docker) { throw "DOCKER_NOT_AVAILABLE" }
   Write-Stage $Stage
-  $Sql | & $docker.Source exec -i $env:KINGSMEN_POSTGRES_CONTAINER psql -U $env:KINGSMEN_POSTGRES_USER -d $DatabaseName -v ON_ERROR_STOP=1 -q -t -A
-  if ($LASTEXITCODE -ne 0) { throw "PSQL_SQL_FAILED:${Stage}" }
+  $output = $Sql | & $docker.Source exec -i $env:KINGSMEN_POSTGRES_CONTAINER psql -U $env:KINGSMEN_POSTGRES_USER -d $DatabaseName -v ON_ERROR_STOP=1 -q -t -A 2>&1
+  $exitCode = $LASTEXITCODE
+  if ($exitCode -ne 0) {
+    $safeErr = (Convert-OutputToText -Output $output).Trim()
+    if ($safeErr.Length -gt 500) { $safeErr = $safeErr.Substring(0, 500) }
+    throw "PSQL_SQL_FAILED:${Stage}:$safeErr"
+  }
+  return $output
 }
 
 function Get-TableCounts {
