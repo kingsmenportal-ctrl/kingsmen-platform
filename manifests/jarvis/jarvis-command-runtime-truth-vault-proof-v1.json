@@ -1,0 +1,28 @@
+{
+  "schema": "kingsmen.jarvis-command-runtime-truth-vault-proof.v1",
+  "module": "Jarvis Command Runtime Truth Vault Evidence",
+  "productionReady": false,
+  "publicLaunchAllowed": false,
+  "backendApiBoundaryRequired": true,
+  "postgresTruthVaultRequired": true,
+  "webRouteMustNotExecuteShell": true,
+  "webRouteMustNotAccessDatabaseDirectly": true,
+  "noFakeData": true,
+  "noRawSecrets": true,
+  "requiredRuntimeProofReport": "reports/jarvis/jarvis-command-runtime-proof-latest.json",
+  "requiredRuntimeChecks": [
+    "backend_health_reachable",
+    "jarvis_live_index_reachable",
+    "jarvis_command_post_accepted",
+    "backend_storage_mode_postgres_truth_vault",
+    "postgres_command_log_evidence",
+    "postgres_audit_event_evidence",
+    "postgres_idempotency_evidence"
+  ],
+  "expectedTables": [
+    "command_log",
+    "audit_events",
+    "idempotency_keys"
+  ],
+  "status": "foundation_built_pending_runtime_postgres_command_evidence"
+}
