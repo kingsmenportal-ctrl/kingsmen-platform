@@ -14,7 +14,11 @@ const commands = [
   { id: "FOUNDER_OVERRIDE_REVIEW", title: "Founder override review", description: "Requests a backend-led governance and approval-surface review. No override is executed by the web app.", category: "Governance", risk: "SAFE_READ" },
   { id: "PUBLIC_ROUTE_HOUSE_CHECK", title: "Public route house check", description: "Requests a backend-led public surface check.", category: "Web", risk: "SAFE_READ" },
   { id: "CANDIDATE_PORTAL_CHECK", title: "Candidate portal check", description: "Requests a backend-led candidate portal check.", category: "Web", risk: "SAFE_READ" },
-  { id: "OPENCLAW_GRIP_CHECK", title: "OpenClaw grip check", description: "Requests a backend-led operator grip check without giving OpenClaw direct production authority.", category: "OpenClaw", risk: "SAFE_READ" }
+  { id: "OPENCLAW_GRIP_CHECK", title: "OpenClaw grip check", description: "Requests a backend-led operator grip check without giving OpenClaw direct production authority.", category: "OpenClaw", risk: "SAFE_READ" },
+  { id: "AI_PROVIDER_ROUTER_CHECK", title: "AI provider router check", description: "Requests backend evidence for real AI provider routing, policy gates, and redacted provider status.", category: "AI", risk: "SAFE_READ" },
+  { id: "TOOLS_APPS_AGENTS_INDEX", title: "Tools, apps, agents index", description: "Requests backend evidence for integrations, tools, apps, and operator agents without dummy statuses.", category: "Technology", risk: "SAFE_READ" },
+  { id: "PAYFAST_STAGING_EVIDENCE", title: "PayFast staging evidence", description: "Requests backend review of PayFast sandbox checkout and ITN proof before any live payment is allowed.", category: "Payments", risk: "SAFE_READ" },
+  { id: "EVIDENCE_BUNDLE_REVIEW", title: "Final evidence bundle review", description: "Requests backend/founder review of the final staging evidence bundle and launch blockers.", category: "Evidence", risk: "SAFE_READ" }
 ];
 
 type BackendHealth = {
@@ -32,6 +36,7 @@ export async function GET() {
   const backendBoundary = getKingsmenBackendBoundary();
   const health = await getKingsmenApiHealth<BackendHealth>();
   const backendOk = health.ok && health.data?.ok === true;
+  const truthVaultOk = backendOk && health.data?.storageMode === "postgres_truth_vault";
 
   const cards = [
     {
@@ -46,11 +51,39 @@ export async function GET() {
     {
       key: "truth-vault-mode",
       title: "Truth Vault Mode",
-      state: health.data?.storageMode === "postgres_truth_vault" ? "POSTGRES" : "DEVELOPMENT",
+      state: truthVaultOk ? "POSTGRES" : "DEVELOPMENT",
       detail: health.data?.storageMode
         ? `API storage mode: ${health.data.storageMode}.`
         : "Storage mode unavailable until the backend API responds.",
-      ok: backendOk
+      ok: truthVaultOk
+    },
+    {
+      key: "jarvis-live-index",
+      title: "Jarvis Live Technology Index",
+      state: "AVAILABLE",
+      detail: "/api/jarvis/live-index exposes backend, AI, tools, apps, agents, PayFast, email, storage, OpenClaw, WhatsApp, and evidence boundaries with no fake status and no secrets returned.",
+      ok: true
+    },
+    {
+      key: "ai-provider-router",
+      title: "AI Provider Router",
+      state: "PENDING_RUNTIME_PROOF",
+      detail: "Real AI routing must be backend-controlled with provider credentials outside Git, policy gates, and live-call evidence before production claims.",
+      ok: false
+    },
+    {
+      key: "tool-app-agent-registry",
+      title: "Tools, Apps, Agents Registry",
+      state: "SOURCE_READY",
+      detail: "GitHub, n8n, Playwright, Airtable, PayFast, Email, Storage, OpenClaw, WhatsApp, and SMS are indexed as real integration boundaries, not dummy cards.",
+      ok: true
+    },
+    {
+      key: "payfast-provider-sandbox",
+      title: "PayFast Provider Sandbox Evidence",
+      state: "PENDING_STAGING_CAPTURE",
+      detail: "Source proof is clean. Real sandbox merchant configuration, checkout, ITN, duplicate rejection, failed payment rejection, return/cancel review, refund review, and founder review remain required.",
+      ok: false
     },
     {
       key: "web-boundary",
@@ -83,12 +116,15 @@ export async function GET() {
     backendHealth: health.data,
     cards,
     commands,
+    liveIndexPath: "/api/jarvis/live-index",
     doctrine: [
       "Jarvis is the founder/operator surface, not the backend authority.",
       "The web app must call the backend API boundary rather than local workstation commands.",
       "Backend state machine remains authority for candidate journeys.",
       "Every command must carry idempotency and correlation evidence.",
-      "Risky actions require policy gates and founder approval."
+      "Risky actions require policy gates and founder approval.",
+      "Jarvis must never invent fake candidate, payment, provider, AI, or tool status.",
+      "AI, tools, apps, and agents require real provider configuration plus redacted runtime evidence before production claims."
     ]
   });
 }
