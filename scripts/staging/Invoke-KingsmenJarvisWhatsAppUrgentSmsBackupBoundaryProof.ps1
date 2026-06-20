@@ -1,11 +1,11 @@
-$ErrorActionPreference = "Stop"
-
 param(
   [string]$EnvFile = ".local/kingsmen.local-postgres.env",
   [string]$WebBaseUrl = $env:KINGSMEN_WEB_BASE_URL,
   [string]$BackendBaseUrl = $env:KINGSMEN_BACKEND_BASE_URL,
   [string]$ReportPath = "reports/jarvis/jarvis-whatsapp-urgent-sms-backup-boundary-proof-latest.json"
 )
+
+$ErrorActionPreference = "Stop"
 
 function Test-KingsmenConfiguredValue {
   param([string]$Value)
