@@ -93,6 +93,12 @@ const registry = {
     risk: "SAFE_READ",
     backendAction: "ai_provider_router_check"
   },
+  GITHUB_TOOL_CONNECTOR_CHECK: {
+    title: "GitHub tool connector check",
+    category: "Tools",
+    risk: "SAFE_READ",
+    backendAction: "github_tool_connector_check"
+  },
   TOOLS_APPS_AGENTS_INDEX: {
     title: "Tools, apps, agents index",
     category: "Technology",
