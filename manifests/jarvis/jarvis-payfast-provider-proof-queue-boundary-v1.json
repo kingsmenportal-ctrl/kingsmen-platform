@@ -1,0 +1,39 @@
+{
+  "schema": "kingsmen.jarvis-payfast-provider-proof-queue-boundary.v1",
+  "module": "jarvis_payfast_provider_proof_queue_boundary",
+  "status": "source_ready_pending_runtime_proof",
+  "productionReady": false,
+  "publicLaunchAllowed": false,
+  "noFakeData": true,
+  "payfastEnvironment": "sandbox",
+  "livePaymentsEnabled": false,
+  "candidateCharged": false,
+  "backendGoverned": true,
+  "backendBoundaryMode": "backend_api_only",
+  "truthAuthority": "postgres_truth_vault",
+  "noRawSecrets": true,
+  "directProviderCallsFromWeb": false,
+  "browserMayCallPayFastDirectly": false,
+  "acceptedItnRequiredForPaidStatus": true,
+  "returnUrlMayMarkPaid": false,
+  "cancelUrlMayMarkPaid": false,
+  "refundsAutoApproved": false,
+  "refundHumanReviewRequired": true,
+  "commandEnvelope": {
+    "commandId": "PAYFAST_PROVIDER_PROOF_QUEUE_CHECK",
+    "backendAction": "payfast_provider_proof_queue_check",
+    "risk": "SAFE_READ"
+  },
+  "requiredEvidence": [
+    "sandbox_merchant_configured",
+    "sandbox_checkout_created",
+    "accepted_itn_received",
+    "signature_verified",
+    "amount_verified",
+    "duplicate_itn_rejected",
+    "failed_payment_rejected",
+    "return_cancel_not_paid_reviewed",
+    "refund_human_review_confirmed",
+    "founder_payment_approval"
+  ]
+}
