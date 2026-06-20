@@ -123,6 +123,12 @@ const registry = {
     risk: "SAFE_READ",
     backendAction: "payfast_provider_proof_queue_check"
   },
+  N8N_THIN_RELAY_CHECK: {
+    title: "n8n thin relay check",
+    category: "Automation",
+    risk: "SAFE_READ",
+    backendAction: "n8n_thin_relay_check"
+  },
   TOOLS_APPS_AGENTS_INDEX: {
     title: "Tools, apps, agents index",
     category: "Technology",
