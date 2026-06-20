@@ -80,6 +80,36 @@ const registry = {
     category: "OpenClaw",
     risk: "SAFE_READ",
     backendAction: "openclaw_grip_check"
+  },
+  COMMAND_PERSISTENCE_PROOF: {
+    title: "Truth Vault command evidence",
+    category: "Evidence",
+    risk: "SAFE_READ",
+    backendAction: "jarvis_command_persistence_proof"
+  },
+  AI_PROVIDER_ROUTER_CHECK: {
+    title: "AI provider router check",
+    category: "AI",
+    risk: "SAFE_READ",
+    backendAction: "ai_provider_router_check"
+  },
+  TOOLS_APPS_AGENTS_INDEX: {
+    title: "Tools, apps, agents index",
+    category: "Technology",
+    risk: "SAFE_READ",
+    backendAction: "tools_apps_agents_index"
+  },
+  PAYFAST_STAGING_EVIDENCE: {
+    title: "PayFast staging evidence",
+    category: "Payments",
+    risk: "SAFE_READ",
+    backendAction: "payfast_staging_evidence"
+  },
+  EVIDENCE_BUNDLE_REVIEW: {
+    title: "Final evidence bundle review",
+    category: "Evidence",
+    risk: "SAFE_READ",
+    backendAction: "evidence_bundle_review"
   }
 } satisfies Record<string, CommandRegistryEntry>;
 
@@ -139,6 +169,9 @@ export async function POST(request: NextRequest) {
       risk: command.risk,
       requestedAtIso: startedAt.toISOString(),
       webBoundary: "backend_api_only",
+      truthVaultEvidenceExpected: true,
+      commandLogTable: "command_log",
+      auditEventExpected: "command.accepted",
       localShellExecuted: false,
       localFileWritten: false,
       directDatabaseAccessFromWeb: false
@@ -163,7 +196,7 @@ export async function POST(request: NextRequest) {
       finishedAt: finishedAt.toISOString(),
       durationMs: finishedAt.getTime() - startedAt.getTime(),
       stdout: ok
-        ? "Jarvis command envelope accepted by backend API boundary. The web route did not execute local commands."
+        ? "Jarvis command envelope accepted by backend API boundary. The web route did not execute local commands. PostgreSQL Truth Vault evidence is expected when storageMode is postgres_truth_vault."
         : "",
       stderr: ok ? "" : backend.error ?? "Backend API boundary did not accept the command envelope.",
       backendStatus: backend.status,
@@ -171,11 +204,12 @@ export async function POST(request: NextRequest) {
       backendPolicy: backend.data?.policy ?? null,
       backendBoundary: backend.boundary,
       evidencePath: null,
+      truthVaultEvidenceExpected: true,
       localShellExecuted: false,
       localFileWritten: false,
       directDatabaseAccessFromWeb: false,
       message: ok
-        ? "Jarvis command was handed to the backend command boundary. Evidence must be recorded by the backend/Truth Vault layer."
+        ? "Jarvis command was handed to the backend command boundary. In postgres_truth_vault mode, the backend records command_log plus audit_events evidence."
         : "Jarvis command was not accepted by the backend boundary. Configure or repair KINGSMEN_BACKEND_BASE_URL."
     },
     { status: ok ? 202 : 502 }
