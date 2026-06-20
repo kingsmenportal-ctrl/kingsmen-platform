@@ -99,6 +99,12 @@ const registry = {
     risk: "SAFE_READ",
     backendAction: "tools_apps_agents_index"
   },
+  AI_TOOLS_RUNTIME_READINESS: {
+    title: "AI tools runtime readiness",
+    category: "Technology",
+    risk: "SAFE_READ",
+    backendAction: "ai_tools_runtime_readiness"
+  },
   PAYFAST_STAGING_EVIDENCE: {
     title: "PayFast staging evidence",
     category: "Payments",
