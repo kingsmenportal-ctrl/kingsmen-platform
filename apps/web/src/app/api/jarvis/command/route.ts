@@ -111,6 +111,12 @@ const registry = {
     risk: "SAFE_READ",
     backendAction: "email_primary_channel_check"
   },
+  WHATSAPP_URGENT_SMS_BACKUP_CHECK: {
+    title: "WhatsApp urgent SMS backup check",
+    category: "Communications",
+    risk: "SAFE_READ",
+    backendAction: "whatsapp_urgent_sms_backup_check"
+  },
   TOOLS_APPS_AGENTS_INDEX: {
     title: "Tools, apps, agents index",
     category: "Technology",
