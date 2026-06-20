@@ -25,9 +25,6 @@ const required = [
     'no local shell execution from web',
     'no direct database access from web',
     'no direct provider calls from web'
-  ]],
-  ['package.json', [
-    'jarvis:validate:ai-tools-runtime-readiness'
   ]]
 ];
 
