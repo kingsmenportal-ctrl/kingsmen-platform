@@ -35,10 +35,6 @@ const required = [
     'backendGoverned',
     'noRawSecrets',
     'pendingRuntimeModelCallProof'
-  ]],
-  ['package.json', [
-    'jarvis:ai:credential-proof',
-    'jarvis:validate:ai-provider-credential-boundary'
   ]]
 ];
 
@@ -82,7 +78,7 @@ console.log(JSON.stringify({
   checks,
   failedChecks,
   nextAction: passed
-    ? 'Run npm run jarvis:credentials:scan:local, then npm run jarvis:ai:credential-proof with backend and web running.'
+    ? 'Run node scripts/validators/validate-jarvis-ai-provider-credential-boundary.mjs, then run the PowerShell AI provider credential proof with backend and web running.'
     : 'Repair Jarvis AI provider credential boundary files.'
 }, null, 2));
 
