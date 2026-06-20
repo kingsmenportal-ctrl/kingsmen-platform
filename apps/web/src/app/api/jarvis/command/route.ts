@@ -99,6 +99,12 @@ const registry = {
     risk: "SAFE_READ",
     backendAction: "github_tool_connector_check"
   },
+  AIRTABLE_HUMAN_MIRROR_CHECK: {
+    title: "Airtable human mirror check",
+    category: "Apps",
+    risk: "SAFE_READ",
+    backendAction: "airtable_human_mirror_check"
+  },
   TOOLS_APPS_AGENTS_INDEX: {
     title: "Tools, apps, agents index",
     category: "Technology",
