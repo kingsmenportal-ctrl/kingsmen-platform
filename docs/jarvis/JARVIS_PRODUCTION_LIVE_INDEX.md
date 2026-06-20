@@ -18,8 +18,8 @@ The route `/api/jarvis/live-index` returns a real boundary index for the current
 
 ## Rules
 
-- No fake status.
-- No raw secrets.
+- no fake status.
+- no raw secrets.
 - No dummy provider cards.
 - Missing provider/runtime proof must stay `PENDING_RUNTIME_PROOF`.
 - Browser and Next web routes must not execute local shell commands.
