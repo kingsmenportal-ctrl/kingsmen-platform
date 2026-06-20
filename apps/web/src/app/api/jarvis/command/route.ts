@@ -117,6 +117,12 @@ const registry = {
     risk: "SAFE_READ",
     backendAction: "whatsapp_urgent_sms_backup_check"
   },
+  PAYFAST_PROVIDER_PROOF_QUEUE_CHECK: {
+    title: "PayFast provider proof queue check",
+    category: "Payments",
+    risk: "SAFE_READ",
+    backendAction: "payfast_provider_proof_queue_check"
+  },
   TOOLS_APPS_AGENTS_INDEX: {
     title: "Tools, apps, agents index",
     category: "Technology",
