@@ -19,7 +19,7 @@ export interface FounderControlPlaneQueueCard {
   queue: string;
   purpose: string;
   owner: string;
-  status: "OPEN" | "BLOCKED" | "PROOF_REQUIRED" | "FOUNDER_REVIEW_REQUIRED";
+  status: "OPEN" | "BLOCKED" | "PROOF_REQUIRED" | "PROVIDER_PROOF_REQUIRED" | "FOUNDER_REVIEW_REQUIRED";
   nextAction: string;
 }
 
