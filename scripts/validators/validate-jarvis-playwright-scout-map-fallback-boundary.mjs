@@ -36,6 +36,11 @@ function absent(pathKey, value) {
   add(`forbidden_absent:${path}:${value}`, !contents[pathKey].includes(value), value, path);
 }
 
+function absentRegex(pathKey, name, pattern) {
+  const path = files[pathKey];
+  add(`forbidden_absent:${path}:${name}`, !pattern.test(contents[pathKey]), name, path);
+}
+
 token("route", "kingsmen.jarvis-playwright-scout-map-fallback-boundary.v1");
 token("route", "Jarvis Playwright Scout MAP Fallback Boundary");
 token("route", "KINGSMEN_PLAYWRIGHT_SCOUT_MODE");
@@ -89,7 +94,8 @@ token("packageJson", "jarvis:validate:playwright-scout-map-fallback");
 token("packageJson", "jarvis:runtime:playwright-scout-map-fallback");
 
 absent("route", "chromium.launch");
-absent("route", "playwright");
+absentRegex("route", "from_playwright_import", /from\s+["']playwright["']/);
+absentRegex("route", "require_playwright", /require\(\s*["']playwright["']\s*\)/);
 absent("route", "child_process");
 absent("route", "writeFile");
 absent("route", "new Pool");
