@@ -44,6 +44,8 @@ export async function GET() {
   const backendLive = health.ok && health.data?.ok === true;
   const truthVaultLive = backendLive && health.data?.storageMode === "postgres_truth_vault";
 
+  const runtimeGroups = ["AI", "Tools", "Apps", "Agents", "Infrastructure"] as const;
+
   const entries: ReadinessEntry[] = [
     entry({
       id: "backend-policy-boundary",
@@ -168,6 +170,7 @@ export async function GET() {
     backendBoundary: boundary,
     backendHealthStatus: health.status,
     backendStorageMode: health.data?.storageMode ?? null,
+    runtimeGroups,
     summary,
     entries,
     nextAction: "Run backend-governed provider proofs before marking any AI, tool, app, or agent runtime live."
