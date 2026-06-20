@@ -105,6 +105,12 @@ const registry = {
     risk: "SAFE_READ",
     backendAction: "airtable_human_mirror_check"
   },
+  EMAIL_PRIMARY_CHANNEL_CHECK: {
+    title: "Email primary channel check",
+    category: "Communications",
+    risk: "SAFE_READ",
+    backendAction: "email_primary_channel_check"
+  },
   TOOLS_APPS_AGENTS_INDEX: {
     title: "Tools, apps, agents index",
     category: "Technology",
