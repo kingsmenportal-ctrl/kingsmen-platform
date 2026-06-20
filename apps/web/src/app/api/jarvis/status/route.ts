@@ -15,6 +15,7 @@ const commands = [
   { id: "PUBLIC_ROUTE_HOUSE_CHECK", title: "Public route house check", description: "Requests a backend-led public surface check.", category: "Web", risk: "SAFE_READ" },
   { id: "CANDIDATE_PORTAL_CHECK", title: "Candidate portal check", description: "Requests a backend-led candidate portal check.", category: "Web", risk: "SAFE_READ" },
   { id: "OPENCLAW_GRIP_CHECK", title: "OpenClaw grip check", description: "Requests a backend-led operator grip check without giving OpenClaw direct production authority.", category: "OpenClaw", risk: "SAFE_READ" },
+  { id: "COMMAND_PERSISTENCE_PROOF", title: "Truth Vault command evidence", description: "Sends a SAFE_READ Jarvis command envelope and expects backend command_log plus audit_events evidence when PostgreSQL Truth Vault is enabled.", category: "Evidence", risk: "SAFE_READ" },
   { id: "AI_PROVIDER_ROUTER_CHECK", title: "AI provider router check", description: "Requests backend evidence for real AI provider routing, policy gates, and redacted provider status.", category: "AI", risk: "SAFE_READ" },
   { id: "TOOLS_APPS_AGENTS_INDEX", title: "Tools, apps, agents index", description: "Requests backend evidence for integrations, tools, apps, and operator agents without dummy statuses.", category: "Technology", risk: "SAFE_READ" },
   { id: "PAYFAST_STAGING_EVIDENCE", title: "PayFast staging evidence", description: "Requests backend review of PayFast sandbox checkout and ITN proof before any live payment is allowed.", category: "Payments", risk: "SAFE_READ" },
@@ -55,6 +56,15 @@ export async function GET() {
       detail: health.data?.storageMode
         ? `API storage mode: ${health.data.storageMode}.`
         : "Storage mode unavailable until the backend API responds.",
+      ok: truthVaultOk
+    },
+    {
+      key: "jarvis-command-persistence",
+      title: "Jarvis Command Persistence",
+      state: truthVaultOk ? "POSTGRES_EVIDENCE_READY" : "PENDING_POSTGRES_TRUTH_VAULT",
+      detail: truthVaultOk
+        ? "Backend /api/commands accepts Jarvis envelopes and records command_log plus audit_events evidence in PostgreSQL Truth Vault."
+        : "Jarvis command persistence requires the backend API to run with KINGSMEN_TRUTH_VAULT_MODE=postgres and DATABASE_URL/KINGSMEN_DATABASE_URL configured.",
       ok: truthVaultOk
     },
     {
@@ -122,6 +132,7 @@ export async function GET() {
       "The web app must call the backend API boundary rather than local workstation commands.",
       "Backend state machine remains authority for candidate journeys.",
       "Every command must carry idempotency and correlation evidence.",
+      "Every accepted Jarvis command must be persisted by the backend in command_log and audit_events when PostgreSQL Truth Vault is enabled.",
       "Risky actions require policy gates and founder approval.",
       "Jarvis must never invent fake candidate, payment, provider, AI, or tool status.",
       "AI, tools, apps, and agents require real provider configuration plus redacted runtime evidence before production claims."
