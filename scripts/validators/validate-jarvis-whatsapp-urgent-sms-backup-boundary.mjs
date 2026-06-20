@@ -110,6 +110,19 @@ for (const [file, token] of forbidden) {
   checks.push({ name: `forbidden_absent:${file}:${token}`, passed: !text.includes(token), detail: token, path: file });
 }
 
+const runtimeProofPath = 'scripts/staging/Invoke-KingsmenJarvisWhatsAppUrgentSmsBackupBoundaryProof.ps1';
+const runtimeProofText = fs.existsSync(runtimeProofPath) ? fs.readFileSync(runtimeProofPath, 'utf8') : '';
+const firstExecutableLine = runtimeProofText
+  .split(/\r?\n/)
+  .map((line) => line.trim())
+  .filter((line) => line && !line.startsWith('#'))[0] ?? '';
+checks.push({
+  name: `powershell_parse_guard:${runtimeProofPath}:param_first`,
+  passed: firstExecutableLine === 'param(',
+  detail: firstExecutableLine || 'missing',
+  path: runtimeProofPath
+});
+
 const failedChecks = checks.filter((check) => !check.passed);
 const passed = failedChecks.length === 0;
 
