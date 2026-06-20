@@ -90,7 +90,8 @@ const forbidden = [
   ['scripts/staging/Invoke-KingsmenJarvisWhatsAppUrgentSmsBackupBoundaryProof.ps1', 'Write-Output $env:WHATSAPP_ACCESS_TOKEN'],
   ['scripts/staging/Invoke-KingsmenJarvisWhatsAppUrgentSmsBackupBoundaryProof.ps1', 'Write-Host $env:SMS_API_KEY'],
   ['scripts/staging/Invoke-KingsmenJarvisWhatsAppUrgentSmsBackupBoundaryProof.ps1', 'Write-Output $env:SMS_API_KEY'],
-  ['scripts/staging/Invoke-KingsmenJarvisWhatsAppUrgentSmsBackupBoundaryProof.ps1', 'bulk']
+  ['scripts/staging/Invoke-KingsmenJarvisWhatsAppUrgentSmsBackupBoundaryProof.ps1', 'Send-WhatsAppMessage'],
+  ['scripts/staging/Invoke-KingsmenJarvisWhatsAppUrgentSmsBackupBoundaryProof.ps1', 'Send-SmsMessage']
 ];
 
 const checks = [];
