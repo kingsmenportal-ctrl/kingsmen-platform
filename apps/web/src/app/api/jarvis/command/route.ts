@@ -129,6 +129,12 @@ const registry = {
     risk: "SAFE_READ",
     backendAction: "n8n_thin_relay_check"
   },
+  PLAYWRIGHT_SCOUT_MAP_FALLBACK_CHECK: {
+    title: "Playwright scout MAP fallback check",
+    category: "Automation",
+    risk: "SAFE_READ",
+    backendAction: "playwright_scout_map_fallback_check"
+  },
   TOOLS_APPS_AGENTS_INDEX: {
     title: "Tools, apps, agents index",
     category: "Technology",
