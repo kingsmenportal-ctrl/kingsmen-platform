@@ -1,0 +1,20 @@
+{
+  "schema": "kingsmen.jarvis-n8n-thin-relay-boundary.v1",
+  "module": "jarvis_n8n_thin_relay_boundary",
+  "status": "source_ready",
+  "productionReady": false,
+  "publicLaunchAllowed": false,
+  "backendGoverned": true,
+  "backend_api_only": true,
+  "truthVault": "postgres_truth_vault",
+  "thinRelayOnly": true,
+  "n8nMayBecomeAuthority": false,
+  "workflowMayWriteTruthVaultDirectly": false,
+  "browserMayCallN8nDirectly": false,
+  "directProviderCallsFromWeb": false,
+  "noRawSecrets": true,
+  "commandEnvelope": "N8N_THIN_RELAY_CHECK",
+  "route": "/api/jarvis/n8n-thin-relay-boundary",
+  "runtimeProof": "scripts/staging/Invoke-KingsmenJarvisN8nThinRelayBoundaryProof.ps1",
+  "reportPath": "reports/jarvis/jarvis-n8n-thin-relay-boundary-proof-latest.json"
+}
