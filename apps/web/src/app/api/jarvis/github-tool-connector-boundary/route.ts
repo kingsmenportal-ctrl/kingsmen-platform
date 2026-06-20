@@ -94,6 +94,7 @@ export async function GET() {
     directProviderCallsFromWeb: false,
     localShellExecutedFromWeb: false,
     directDatabaseAccessFromWeb: false,
+    backendBoundaryMode: "backend_api_only",
     backendBoundary: boundary,
     backendHealthStatus: health.status,
     backendStorageMode: health.data?.storageMode ?? null,
@@ -101,7 +102,7 @@ export async function GET() {
       title: "GitHub Tool Connector",
       group: "Tools",
       owner: "Kingsmen",
-      boundary: "backend_or_approved_tool_boundary_only",
+      boundary: "backend_api_only",
       requiredEvidence: [
         "redacted repository metadata read",
         "backend command envelope acceptance",
