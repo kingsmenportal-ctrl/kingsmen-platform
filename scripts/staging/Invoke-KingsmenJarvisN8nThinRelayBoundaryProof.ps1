@@ -41,6 +41,17 @@ function Test-KConfigured {
   return $true
 }
 
+function Resolve-KDetail {
+  param(
+    [object]$Value,
+    [string]$Fallback
+  )
+  if ($null -eq $Value) { return $Fallback }
+  $text = [string]$Value
+  if ([string]::IsNullOrWhiteSpace($text)) { return $Fallback }
+  return $text
+}
+
 $checks = New-Object System.Collections.ArrayList
 function Add-Check {
   param([string]$Name, [bool]$Passed, [string]$Detail)
@@ -64,9 +75,10 @@ $postgresTruthVault = $false
 try {
   $backendHealth = Invoke-RestMethod -Method Get -Uri "$BackendBaseUrl/health" -TimeoutSec 5
   $backendReachable = $true
-  $postgresTruthVault = $backendHealth.storageMode -eq "postgres_truth_vault"
+  $backendStorageMode = Resolve-KDetail $backendHealth.storageMode "missing"
+  $postgresTruthVault = $backendStorageMode -eq "postgres_truth_vault"
   Add-Check "backend_health_reachable" $true "reachable"
-  Add-Check "backend_storage_mode_postgres_truth_vault" $postgresTruthVault ($backendHealth.storageMode ?? "missing")
+  Add-Check "backend_storage_mode_postgres_truth_vault" $postgresTruthVault $backendStorageMode
 } catch {
   Add-Check "backend_health_reachable" $false $_.Exception.Message
   Add-Check "backend_storage_mode_postgres_truth_vault" $false "missing"
@@ -76,7 +88,8 @@ $webRouteReachable = $false
 try {
   $route = Invoke-RestMethod -Method Get -Uri "$WebBaseUrl/api/jarvis/n8n-thin-relay-boundary" -TimeoutSec 5
   $webRouteReachable = $true
-  Add-Check "web_boundary_route_reachable" $true ($route.status ?? "reachable")
+  $routeStatus = Resolve-KDetail $route.status "reachable"
+  Add-Check "web_boundary_route_reachable" $true $routeStatus
 } catch {
   Add-Check "web_boundary_route_reachable" $false $_.Exception.Message
 }
@@ -86,7 +99,8 @@ try {
   $body = @{ commandId = "N8N_THIN_RELAY_CHECK"; clientRequestId = "jarvis-n8n-thin-relay-boundary-proof" } | ConvertTo-Json -Depth 8
   $command = Invoke-RestMethod -Method Post -Uri "$WebBaseUrl/api/jarvis/command" -Body $body -ContentType "application/json" -TimeoutSec 8
   $commandAccepted = $command.ok -eq $true
-  Add-Check "jarvis_n8n_thin_relay_command_accepted" $commandAccepted ($command.message ?? "accepted")
+  $commandDetail = Resolve-KDetail $command.message "accepted"
+  Add-Check "jarvis_n8n_thin_relay_command_accepted" $commandAccepted $commandDetail
 } catch {
   Add-Check "jarvis_n8n_thin_relay_command_accepted" $false $_.Exception.Message
 }
