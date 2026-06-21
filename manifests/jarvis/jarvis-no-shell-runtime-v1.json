@@ -1,0 +1,31 @@
+{
+  "schema": "kingsmen.jarvis-no-shell-runtime.v1",
+  "status": "JARVIS_NODE_RUNTIME_ADDED",
+  "productionReady": false,
+  "publicLaunchAllowed": false,
+  "nodeRuntimeFiles": [
+    "scripts/lib/kingsmen-runtime.mjs",
+    "scripts/jarvis/scan-jarvis-credential-readiness.mjs",
+    "scripts/jarvis/build-jarvis-module-activation-matrix.mjs",
+    "scripts/jarvis/complete-jarvis-no-shell.mjs",
+    "scripts/staging/invoke-kingsmen-communications-provider-staging-proof.mjs",
+    "scripts/staging/collect-kingsmen-final-assembly-evidence.mjs"
+  ],
+  "replacesForJarvisCore": [
+    "Jarvis credential readiness",
+    "Jarvis module activation matrix",
+    "Jarvis completion status",
+    "communications staging evidence",
+    "final assembly evidence collection"
+  ],
+  "stillExternalProviderBlocked": [
+    "PayFast sandbox ITN evidence",
+    "GitHub branch protection account/admin review"
+  ],
+  "guarantees": {
+    "jarvisMayStoreSecrets": false,
+    "rawCredentialsPrinted": false,
+    "placeholderValuesAccepted": false,
+    "finalBundlePlaceholderScanRequiredForCommunications": true
+  }
+}
