@@ -32,6 +32,8 @@
     "jarvis:validate:n8n-thin-relay": "node scripts/validators/validate-jarvis-n8n-thin-relay-boundary.mjs",
     "jarvis:runtime:playwright-scout-map-fallback": "powershell -ExecutionPolicy Bypass -File scripts/staging/Invoke-KingsmenJarvisPlaywrightScoutMapFallbackBoundaryProof.ps1",
     "jarvis:validate:playwright-scout-map-fallback": "node scripts/validators/validate-jarvis-playwright-scout-map-fallback-boundary.mjs",
+    "jarvis:runtime:openclaw-operator-policy": "powershell -ExecutionPolicy Bypass -File scripts/staging/Invoke-KingsmenJarvisOpenClawOperatorPolicyBoundaryProof.ps1",
+    "jarvis:validate:openclaw-operator-policy": "node scripts/validators/validate-jarvis-openclaw-operator-policy-boundary.mjs",
     "jarvis:credentials:scan:local:queue": "powershell -ExecutionPolicy Bypass -File scripts/jarvis/Invoke-JarvisCredentialReadiness.ps1 -EnvFile .local/kingsmen.local-postgres.env -BackendBaseUrl http://127.0.0.1:3001 -RedisUrl $env:KINGSMEN_LOCAL_REDIS_URL",
     "jarvis:activation:local:queue": "powershell -ExecutionPolicy Bypass -File scripts/jarvis/Invoke-JarvisLocalQueueActivationMatrix.ps1",
     "jarvis:activation:local:observability": "powershell -ExecutionPolicy Bypass -File scripts/jarvis/Invoke-JarvisLocalObservabilityActivationMatrix.ps1",
