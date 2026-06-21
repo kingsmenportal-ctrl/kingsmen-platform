@@ -18,6 +18,7 @@ const commands = [
   { id: "COMMAND_PERSISTENCE_PROOF", title: "Truth Vault command evidence", description: "Sends a SAFE_READ Jarvis command envelope and expects backend command_log plus audit_events evidence when PostgreSQL Truth Vault is enabled.", category: "Evidence", risk: "SAFE_READ" },
   { id: "AI_PROVIDER_ROUTER_CHECK", title: "AI provider router check", description: "Requests backend evidence for real AI provider routing, policy gates, and redacted provider status.", category: "AI", risk: "SAFE_READ" },
   { id: "TOOLS_APPS_AGENTS_INDEX", title: "Tools, apps, agents index", description: "Requests backend evidence for integrations, tools, apps, and operator agents without dummy statuses.", category: "Technology", risk: "SAFE_READ" },
+  { id: "JARVIS_COMPLETION_BOARD_REVIEW", title: "Jarvis completion board review", description: "Reviews the Docker-independent Jarvis completion board and provider blocker lanes without claiming runtime proof.", category: "Jarvis", risk: "SAFE_READ" },
   { id: "PAYFAST_STAGING_EVIDENCE", title: "PayFast staging evidence", description: "Requests backend review of PayFast sandbox checkout and ITN proof before any live payment is allowed.", category: "Payments", risk: "SAFE_READ" },
   { id: "EVIDENCE_BUNDLE_REVIEW", title: "Final evidence bundle review", description: "Requests backend/founder review of the final staging evidence bundle and launch blockers.", category: "Evidence", risk: "SAFE_READ" }
 ];
@@ -38,6 +39,7 @@ export async function GET() {
   const health = await getKingsmenApiHealth<BackendHealth>();
   const backendOk = health.ok && health.data?.ok === true;
   const truthVaultOk = backendOk && health.data?.storageMode === "postgres_truth_vault";
+  const dockerIndependentBuildAllowed = true;
 
   const cards = [
     {
@@ -72,6 +74,13 @@ export async function GET() {
       title: "Jarvis Live Technology Index",
       state: "AVAILABLE",
       detail: "/api/jarvis/live-index exposes backend, AI, tools, apps, agents, PayFast, email, storage, OpenClaw, WhatsApp, and evidence boundaries with no fake status and no secrets returned.",
+      ok: true
+    },
+    {
+      key: "jarvis-completion-board",
+      title: "Jarvis Completion Board",
+      state: "DOCKER_INDEPENDENT_SOURCE_READY",
+      detail: "/api/jarvis/completion-board lets Kingsmen continue Jarvis source construction while Docker/API runtime is blocked. It does not claim production readiness or bypass runtime proof.",
       ok: true
     },
     {
@@ -121,15 +130,18 @@ export async function GET() {
   return NextResponse.json({
     ok: cards.every((card) => card.ok),
     generatedAt: new Date().toISOString(),
+    dockerIndependentBuildAllowed,
     backendBoundary,
     backendHealthStatus: health.status,
     backendHealth: health.data,
     cards,
     commands,
     liveIndexPath: "/api/jarvis/live-index",
+    completionBoardPath: "/api/jarvis/completion-board",
     doctrine: [
       "Jarvis is the founder/operator surface, not the backend authority.",
       "The web app must call the backend API boundary rather than local workstation commands.",
+      "Docker/API runtime failure blocks runtime proof only; it does not block source-safe Jarvis construction.",
       "Backend state machine remains authority for candidate journeys.",
       "Every command must carry idempotency and correlation evidence.",
       "Every accepted Jarvis command must be persisted by the backend in command_log and audit_events when PostgreSQL Truth Vault is enabled.",
