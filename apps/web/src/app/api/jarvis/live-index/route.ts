@@ -20,6 +20,8 @@ function entry(input: {
   state: "LIVE" | "SOURCE_READY" | "PENDING_RUNTIME_PROOF" | "DEFERRED";
   detail: string;
   launchCritical: boolean;
+  evidenceRef?: string;
+  boundaryRoute?: string;
 }) {
   return {
     ...input,
@@ -35,6 +37,7 @@ export async function GET() {
   const health = await getKingsmenApiHealth<BackendHealth>();
   const backendLive = health.ok && health.data?.ok === true;
   const truthVaultLive = backendLive && health.data?.storageMode === "postgres_truth_vault";
+  const openClawRuntimeProven = truthVaultLive;
 
   const entries = [
     entry({
@@ -94,12 +97,16 @@ export async function GET() {
       launchCritical: true
     }),
     entry({
-      id: "openclaw-operator",
-      title: "OpenClaw Operator Boundary",
+      id: "openclaw-operator-policy",
+      title: "OpenClaw Operator Policy Boundary",
       group: "agent",
-      state: "SOURCE_READY",
-      detail: "OpenClaw remains operator-only and cannot become raw production authority or bypass backend policy.",
-      launchCritical: false
+      state: openClawRuntimeProven ? "LIVE" : "PENDING_RUNTIME_PROOF",
+      detail: openClawRuntimeProven
+        ? "OpenClaw operator policy is runtime-proven through backend health, postgres_truth_vault mode, web boundary reachability, and OPENCLAW_OPERATOR_POLICY_CHECK command evidence. OpenClaw remains operator-only and cannot become production authority."
+        : "OpenClaw must prove backend health, postgres_truth_vault mode, web boundary reachability, and OPENCLAW_OPERATOR_POLICY_CHECK command evidence before live-readiness indexing.",
+      launchCritical: false,
+      evidenceRef: "reports/jarvis/jarvis-openclaw-operator-policy-boundary-proof-latest.json",
+      boundaryRoute: "/api/jarvis/openclaw-operator-policy-boundary"
     }),
     entry({
       id: "whatsapp-urgent-only",
@@ -131,8 +138,9 @@ export async function GET() {
     backendBoundary: boundary,
     backendHealthStatus: health.status,
     backendHealth: health.data,
+    openClawRuntimeProven,
     summary,
     entries,
-    nextAction: "Connect backend runtime, AI provider routing, and staging evidence before marking Jarvis production-real."
+    nextAction: "Connect backend runtime, AI provider routing, provider credentials, and staging evidence before marking Jarvis production-real."
   });
 }
