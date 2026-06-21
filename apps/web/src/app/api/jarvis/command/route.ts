@@ -81,6 +81,12 @@ const registry = {
     risk: "SAFE_READ",
     backendAction: "openclaw_grip_check"
   },
+  OPENCLAW_OPERATOR_POLICY_CHECK: {
+    title: "OpenClaw operator policy check",
+    category: "OpenClaw",
+    risk: "SAFE_READ",
+    backendAction: "openclaw_operator_policy_check"
+  },
   COMMAND_PERSISTENCE_PROOF: {
     title: "Truth Vault command evidence",
     category: "Evidence",
