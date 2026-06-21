@@ -64,6 +64,7 @@ const pkg = read(files.package);
   "KINGSMEN_N8N_WEBHOOK_SECRET",
   "N8N_THIN_RELAY_CHECK",
   "reports/jarvis/jarvis-n8n-thin-relay-boundary-proof-latest.json",
+  "Resolve-KDetail",
   "providerCredentialsPrinted = $false",
   "directProviderCallsFromWeb = $false",
   "n8nMayBecomeAuthority = $false",
@@ -114,6 +115,7 @@ const pkg = read(files.package);
 ].forEach((token) => requireAbsent(files.route, route, token));
 
 [
+  "??",
   "n8n.cloud",
   "api.n8n.io",
   "/webhook/",
