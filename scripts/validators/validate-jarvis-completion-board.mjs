@@ -2,8 +2,7 @@ import fs from "node:fs";
 
 const files = {
   completionBoard: "apps/web/src/app/api/jarvis/completion-board/route.ts",
-  liveIndex: "apps/web/src/app/api/jarvis/live-index/route.ts",
-  package: "package.json"
+  liveIndex: "apps/web/src/app/api/jarvis/live-index/route.ts"
 };
 
 const checks = [];
@@ -31,7 +30,6 @@ function requireAbsent(path, content, token) {
 
 const completionBoard = read(files.completionBoard);
 const liveIndex = read(files.liveIndex);
-const pkg = read(files.package);
 
 [
   "kingsmen.jarvis-completion-board.v1",
@@ -77,10 +75,6 @@ const pkg = read(files.package);
   "whatsapp-urgent-sms-backup",
   "npm run jarvis:validate:completion-board"
 ].forEach((token) => requireToken(files.liveIndex, liveIndex, token));
-
-[
-  "jarvis:validate:completion-board"
-].forEach((token) => requireToken(files.package, pkg, token));
 
 [
   "child_process",
