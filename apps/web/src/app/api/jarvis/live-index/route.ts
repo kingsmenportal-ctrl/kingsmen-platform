@@ -36,7 +36,8 @@ export async function GET() {
   const boundary = getKingsmenBackendBoundary();
   const health = await getKingsmenApiHealth<BackendHealth>();
   const backendLive = health.ok && health.data?.ok === true;
-  const truthVaultLive = backendLive && health.data?.storageMode === "postgres_truth_vault";
+  const backendStorageMode = health.data?.storageMode || "unreachable";
+  const truthVaultLive = backendLive && backendStorageMode === "postgres_truth_vault";
   const openClawRuntimeProven = truthVaultLive;
 
   const entries = [
@@ -137,6 +138,7 @@ export async function GET() {
     directDatabaseAccessFromWeb: false,
     backendBoundary: boundary,
     backendHealthStatus: health.status,
+    backendStorageMode,
     backendHealth: health.data,
     openClawRuntimeProven,
     summary,
