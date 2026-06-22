@@ -1,0 +1,27 @@
+{
+  "schema": "kingsmen.jarvis-gates.v1",
+  "status": "REGISTERED",
+  "ready": false,
+  "items": [
+    {
+      "ref": "payments",
+      "report": "reports/staging/payfast-provider-sandbox-staging-latest.json",
+      "runner": "scripts/staging/invoke-kingsmen-payfast-provider-sandbox-staging-proof.mjs"
+    },
+    {
+      "ref": "communications",
+      "report": "reports/staging/communications-provider-staging-latest.json",
+      "runner": "scripts/staging/invoke-kingsmen-communications-provider-staging-proof.mjs"
+    },
+    {
+      "ref": "repo_review",
+      "report": "reports/repo/main-branch-protection-apply-latest.json",
+      "runner": "scripts/staging/invoke-kingsmen-branch-protection-account-review.mjs"
+    },
+    {
+      "ref": "founder_review",
+      "report": "reports/final-assembly/final-founder-review-latest.json",
+      "runner": "scripts/staging/invoke-kingsmen-final-assembly-founder-review.mjs"
+    }
+  ]
+}
