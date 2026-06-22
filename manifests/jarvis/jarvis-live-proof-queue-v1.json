@@ -1,0 +1,34 @@
+{
+  "schema": "kingsmen.jarvis-live-proof-queue.v1",
+  "module": "Jarvis Live Proof Queue",
+  "status": "SOURCE_READY",
+  "jarvisSourceReady": true,
+  "jarvisRuntimeLive": false,
+  "productionReady": false,
+  "publicLaunchAllowed": false,
+  "launchBlocked": true,
+  "dockerIndependentBuildAllowed": true,
+  "routes": [
+    "/api/jarvis/live-proof-queue",
+    "/founder/launch-control/jarvis-live-proof-queue"
+  ],
+  "validator": "node scripts/validators/validate-jarvis-live-proof-queue.mjs",
+  "liveBlockers": [
+    "docker-api-truth-vault-runtime",
+    "ai-provider-live-call",
+    "email-primary-proof",
+    "payfast-itn-proof",
+    "n8n-thin-relay-proof",
+    "airtable-human-mirror-proof",
+    "github-tool-runtime-proof",
+    "branch-protection-proof"
+  ],
+  "boundaries": {
+    "noFakeData": true,
+    "rawSecretsReturned": false,
+    "secretValuesReturned": false,
+    "localShellExecuted": false,
+    "directDatabaseAccessFromWeb": false,
+    "noDirectProviderCallsFromWeb": true
+  }
+}
