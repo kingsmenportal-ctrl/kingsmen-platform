@@ -6,7 +6,7 @@ export default function AdminHomePage() {
       <section className="hero">
         <p className="eyebrow">Kingsmen Admin</p>
         <h1>Operator Console</h1>
-        <p>Open Jarvis runtime, launch gates, or backend status.</p>
+        <p>Open Jarvis runtime, launch gates, readiness, or backend status.</p>
       </section>
 
       <section className="cards">
@@ -20,6 +20,11 @@ export default function AdminHomePage() {
           <h2>Launch Gates</h2>
           <p>Track PayFast, communications, branch review, and final founder review.</p>
         </Link>
+        <Link href="/admin/jarvis-readiness" className="card">
+          <span>READY</span>
+          <h2>Live Readiness</h2>
+          <p>Check final bundle, launch audit, gate status, and founder approval reference.</p>
+        </Link>
         <Link href="/api/jarvis/status" className="card">
           <span>STATUS</span>
           <h2>Jarvis Status</h2>
@@ -29,15 +34,16 @@ export default function AdminHomePage() {
 
       <style jsx>{`
         .shell { min-height: 100vh; padding: 36px; background: #08111f; color: #eef5ff; font-family: Arial, sans-serif; }
-        .hero { max-width: 980px; margin: 0 auto 28px; }
+        .hero { max-width: 1100px; margin: 0 auto 28px; }
         .eyebrow { color: #8bb8ff; text-transform: uppercase; letter-spacing: 0.16em; font-size: 12px; }
         h1 { font-size: 40px; margin: 8px 0; }
-        .cards { max-width: 980px; margin: 0 auto; display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 18px; }
+        .cards { max-width: 1100px; margin: 0 auto; display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 18px; }
         .card { display: block; text-decoration: none; color: inherit; background: rgba(255,255,255,0.06); border: 1px solid rgba(255,255,255,0.13); border-radius: 20px; padding: 22px; }
         .card span { color: #8bb8ff; font-size: 12px; font-weight: 800; letter-spacing: 0.12em; }
         .card h2 { margin: 12px 0 8px; }
         .card p { color: #c8d5ea; line-height: 1.5; }
-        @media (max-width: 900px) { .cards { grid-template-columns: 1fr; } .shell { padding: 20px; } }
+        @media (max-width: 1100px) { .cards { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+        @media (max-width: 700px) { .cards { grid-template-columns: 1fr; } .shell { padding: 20px; } }
       `}</style>
     </main>
   );
