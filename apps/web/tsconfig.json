@@ -20,7 +20,8 @@
     ],
     "paths": {
       "@/*": ["./src/*"],
-      "@kingsmen/contracts/*": ["../../packages/contracts/src/*"]
+      "@kingsmen/contracts/*": ["../../packages/contracts/src/*"],
+      "@kingsmen/jarvis-core/*": ["../../packages/jarvis-core/src/*"]
     }
   },
   "include": ["next-env.d.ts", "src/**/*.ts", "src/**/*.tsx", ".next/types/**/*.ts"],
