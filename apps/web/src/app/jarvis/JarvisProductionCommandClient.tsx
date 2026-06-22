@@ -34,6 +34,71 @@ type JarvisStatusPayload = {
   doctrine?: string[];
 };
 
+type CompletionState = "SOURCE_READY" | "RUNTIME_PASSED" | "PENDING_RUNTIME_PROOF" | "PENDING_CREDENTIALS" | "DEFERRED" | "BLOCKED_BY_LOCAL_DOCKER";
+
+type CompletionItem = {
+  id: string;
+  title: string;
+  group: string;
+  state: CompletionState;
+  detail: string;
+  validatorScript?: string;
+  runtimeProofScript?: string;
+  boundaryRoute?: string;
+  evidenceRef?: string;
+  launchCritical: boolean;
+};
+
+type CompletionBoardPayload = {
+  schema: string;
+  module: string;
+  generatedAt: string;
+  productionReady: boolean;
+  publicLaunchAllowed: boolean;
+  dockerIndependentBuildAllowed: boolean;
+  noFakeData: boolean;
+  rawSecretsReturned: boolean;
+  localShellExecuted: boolean;
+  directDatabaseAccessFromWeb: boolean;
+  counts?: Record<CompletionState, number>;
+  completionItems?: CompletionItem[];
+  nextSourceBatches?: string[];
+  nextRuntimeGate?: string;
+};
+
+type LiveIndexEntry = {
+  id: string;
+  title: string;
+  group?: string;
+  state: string;
+  detail: string;
+  launchCritical?: boolean;
+  boundaryRoute?: string;
+  evidenceRef?: string;
+};
+
+type LiveIndexPayload = {
+  schema: string;
+  generatedAt: string;
+  productionReady: boolean;
+  publicLaunchAllowed: boolean;
+  dockerIndependentBuildAllowed?: boolean;
+  runtimeBlocker?: string;
+  backendHealthStatus?: number;
+  backendStorageMode?: string;
+  openClawRuntimeProven?: boolean;
+  summary?: {
+    total?: number;
+    live?: number;
+    sourceReady?: number;
+    pendingRuntimeProof?: number;
+    pendingCredentials?: number;
+    deferred?: number;
+    blockedByLocalDocker?: number;
+  };
+  entries?: LiveIndexEntry[];
+};
+
 type JarvisCommandResponse = {
   ok: boolean;
   commandId: string;
@@ -92,6 +157,19 @@ function normalizeHealthStatus(status?: JarvisStatusPayload | null) {
   return "REVIEW";
 }
 
+function stateClass(state?: string) {
+  const value = state ?? "PENDING_RUNTIME_PROOF";
+  if (value === "RUNTIME_PASSED" || value === "LIVE") return styles.runtimePassed;
+  if (value === "SOURCE_READY" || value === "DOCKER_INDEPENDENT_SOURCE_READY") return styles.sourceReady;
+  if (value === "BLOCKED_BY_LOCAL_DOCKER" || value.includes("BLOCKED")) return styles.blockedState;
+  if (value === "DEFERRED") return styles.deferredState;
+  return styles.pendingState;
+}
+
+function countFor(board: CompletionBoardPayload | null, state: CompletionState) {
+  return board?.counts?.[state] ?? 0;
+}
+
 function speak(text: string) {
   if (typeof window === "undefined" || !("speechSynthesis" in window)) return;
   window.speechSynthesis.cancel();
@@ -110,8 +188,17 @@ function speechRecognitionConstructor() {
   return api.SpeechRecognition || api.webkitSpeechRecognition;
 }
 
+async function readJson<T>(url: string) {
+  const response = await fetch(url, { cache: "no-store" });
+  const payload = (await response.json()) as T;
+  if (!response.ok) throw new Error(`${url} returned HTTP ${response.status}`);
+  return payload;
+}
+
 export default function JarvisProductionCommandClient() {
   const [status, setStatus] = useState<JarvisStatusPayload | null>(null);
+  const [completionBoard, setCompletionBoard] = useState<CompletionBoardPayload | null>(null);
+  const [liveIndex, setLiveIndex] = useState<LiveIndexPayload | null>(null);
   const [statusError, setStatusError] = useState<string>("");
   const [selectedCommandId, setSelectedCommandId] = useState<string>("");
   const [commandContext, setCommandContext] = useState<string>("Run live backend-safe proof and return evidence.");
@@ -120,7 +207,7 @@ export default function JarvisProductionCommandClient() {
       id: newId("boot"),
       role: "system",
       title: "Jarvis production shell booting",
-      detail: "This surface reads live Kingsmen API status and sends whitelisted command envelopes through the backend boundary. No fake data is rendered as truth.",
+      detail: "This surface reads Jarvis status, completion board, live index, and whitelisted backend command boundaries. No fake data is rendered as truth.",
       ok: true,
       generatedAt: stamp()
     }
@@ -139,41 +226,72 @@ export default function JarvisProductionCommandClient() {
   const healthState = normalizeHealthStatus(status);
   const onlineCount = statusCards.filter((card) => card.ok).length;
   const reviewCount = statusCards.length - onlineCount;
+  const completionItems = completionBoard?.completionItems ?? [];
+  const liveEntries = liveIndex?.entries ?? [];
+  const sourceReadyCount = countFor(completionBoard, "SOURCE_READY");
+  const runtimePassedCount = countFor(completionBoard, "RUNTIME_PASSED");
+  const pendingCredentialsCount = countFor(completionBoard, "PENDING_CREDENTIALS");
+  const localDockerBlocked = countFor(completionBoard, "BLOCKED_BY_LOCAL_DOCKER");
+  const launchCriticalPending = completionItems.filter((item) => item.launchCritical && !["SOURCE_READY", "RUNTIME_PASSED"].includes(item.state)).length;
+  const dockerRuntimeEntry = completionItems.find((item) => item.id === "local-docker-runtime");
+  const nextBatches = completionBoard?.nextSourceBatches ?? [];
 
   const evidenceEvents = useMemo(
     () => events.filter((event) => event.evidencePath || event.stderr || event.stdout),
     [events]
   );
 
-  const backendMode = status?.backendBoundary?.mode ?? "backend boundary pending";
-  const backendStatus = typeof status?.backendHealthStatus === "number" ? `HTTP ${status.backendHealthStatus}` : "not confirmed";
+  const backendMode = status?.backendBoundary?.mode ?? liveIndex?.runtimeBlocker ?? "backend boundary pending";
+  const backendStatus = typeof status?.backendHealthStatus === "number"
+    ? `HTTP ${status.backendHealthStatus}`
+    : typeof liveIndex?.backendHealthStatus === "number"
+      ? `HTTP ${liveIndex.backendHealthStatus}`
+      : "not confirmed";
 
   async function loadStatus() {
     setRefreshing(true);
-    try {
-      const response = await fetch("/api/jarvis/status", { cache: "no-store" });
-      const payload = (await response.json()) as JarvisStatusPayload;
+    const [statusResult, boardResult, liveIndexResult] = await Promise.allSettled([
+      readJson<JarvisStatusPayload>("/api/jarvis/status"),
+      readJson<CompletionBoardPayload>("/api/jarvis/completion-board"),
+      readJson<LiveIndexPayload>("/api/jarvis/live-index")
+    ]);
+
+    if (statusResult.status === "fulfilled") {
+      const payload = statusResult.value;
       setStatus(payload);
-      setStatusError(response.ok ? "" : `Status route returned HTTP ${response.status}`);
       const nextCommand = payload.commands?.[0]?.id ?? "";
       setSelectedCommandId((current) => current || nextCommand);
-    } catch (error) {
-      const message = error instanceof Error ? error.message : "Jarvis status request failed.";
-      setStatusError(message);
+    }
+
+    if (boardResult.status === "fulfilled") {
+      setCompletionBoard(boardResult.value);
+    }
+
+    if (liveIndexResult.status === "fulfilled") {
+      setLiveIndex(liveIndexResult.value);
+    }
+
+    const errors = [statusResult, boardResult, liveIndexResult]
+      .filter((result): result is PromiseRejectedResult => result.status === "rejected")
+      .map((result) => result.reason instanceof Error ? result.reason.message : "Jarvis request failed.");
+
+    setStatusError(errors.join(" · "));
+
+    if (errors.length) {
       setEvents((items) => [
         ...items,
         {
           id: newId("status_error"),
           role: "jarvis",
-          title: "Status boundary unavailable",
-          detail: message,
+          title: "Jarvis board partially unavailable",
+          detail: errors.join(" · "),
           ok: false,
           generatedAt: stamp()
         }
       ]);
-    } finally {
-      setRefreshing(false);
     }
+
+    setRefreshing(false);
   }
 
   async function runCommand(commandId = selectedCommand?.id) {
@@ -320,12 +438,14 @@ export default function JarvisProductionCommandClient() {
             <span className={styles.kicker}>KINGSMEN LIVE OPERATING SYSTEM · PRODUCTION COMMAND SURFACE</span>
             <h1>JARVIS COMMAND</h1>
             <p>
-              Live API status, whitelisted command envelopes, backend authority, voice, visual feed, evidence drawer, and no fake production claims.
+              Live API status, whitelisted command envelopes, backend authority, completion board, live index, voice, visual feed, evidence drawer, and no fake production claims.
             </p>
             <div className={styles.heroActions}>
               <button onClick={loadStatus} disabled={refreshing}>{refreshing ? "Refreshing" : "Refresh live state"}</button>
               <button onClick={startVoice}>Voice context</button>
               <button onClick={toggleVisual}>{visualActive ? "Stop visual" : "Start visual"}</button>
+              <button onClick={() => window.open("/api/jarvis/completion-board", "_blank", "noopener,noreferrer")}>Completion JSON</button>
+              <button onClick={() => window.open("/api/jarvis/live-index", "_blank", "noopener,noreferrer")}>Live index JSON</button>
             </div>
           </div>
           <aside className={styles.orbPanel}>
@@ -343,14 +463,36 @@ export default function JarvisProductionCommandClient() {
           <article><span>Online</span><strong>{onlineCount}</strong></article>
           <article><span>Review</span><strong>{reviewCount}</strong></article>
           <article><span>Commands</span><strong>{commands.length}</strong></article>
-          <article><span>Voice</span><strong>{voiceState}</strong></article>
-          <article><span>Visual</span><strong>{visualActive ? "active" : "standby"}</strong></article>
+          <article><span>Runtime passed</span><strong>{runtimePassedCount}</strong></article>
+          <article><span>Credentials</span><strong>{pendingCredentialsCount}</strong></article>
+          <article><span>Launch blockers</span><strong>{launchCriticalPending}</strong></article>
+          <article><span>Docker</span><strong>{localDockerBlocked ? "blocked" : "clear"}</strong></article>
         </section>
 
-        {statusError ? <div className={styles.alert}>Status warning: {statusError}</div> : null}
+        {statusError ? <div className={styles.alert}>Jarvis board warning: {statusError}</div> : null}
 
         <section className={styles.mainGrid}>
           <aside className={styles.leftRail}>
+            <section className={styles.panel}>
+              <h2>Jarvis completion board</h2>
+              <div className={styles.miniStats}>
+                <article><span>Source ready</span><strong>{sourceReadyCount}</strong></article>
+                <article><span>Runtime passed</span><strong>{runtimePassedCount}</strong></article>
+                <article><span>Pending creds</span><strong>{pendingCredentialsCount}</strong></article>
+                <article><span>Docker block</span><strong>{localDockerBlocked}</strong></article>
+              </div>
+              <div className={styles.completionCards}>
+                {completionItems.length ? completionItems.slice(0, 6).map((item) => (
+                  <article key={item.id} className={styles.completionCard}>
+                    <span className={`${styles.statePill} ${stateClass(item.state)}`}>{item.state}</span>
+                    <strong>{item.title}</strong>
+                    <p>{item.detail}</p>
+                    {item.validatorScript ? <code>{item.validatorScript}</code> : null}
+                  </article>
+                )) : <p className={styles.empty}>Waiting for /api/jarvis/completion-board. No placeholder data is substituted.</p>}
+              </div>
+            </section>
+
             <section className={styles.panel}>
               <h2>Live backend cards</h2>
               <div className={styles.statusCards}>
@@ -417,6 +559,26 @@ export default function JarvisProductionCommandClient() {
 
           <aside className={styles.rightRail}>
             <section className={styles.panel}>
+              <h2>Live index map</h2>
+              <div className={styles.miniStats}>
+                <article><span>Total</span><strong>{liveIndex?.summary?.total ?? liveEntries.length}</strong></article>
+                <article><span>Live</span><strong>{liveIndex?.summary?.live ?? 0}</strong></article>
+                <article><span>Runtime</span><strong>{liveIndex?.summary?.pendingRuntimeProof ?? 0}</strong></article>
+                <article><span>Mode</span><strong>{liveIndex?.backendStorageMode ?? "pending"}</strong></article>
+              </div>
+              <div className={styles.completionCards}>
+                {liveEntries.length ? liveEntries.slice(0, 7).map((entry) => (
+                  <article key={entry.id} className={styles.completionCard}>
+                    <span className={`${styles.statePill} ${stateClass(entry.state)}`}>{entry.state}</span>
+                    <strong>{entry.title}</strong>
+                    <p>{entry.detail}</p>
+                    {entry.boundaryRoute ? <code>{entry.boundaryRoute}</code> : null}
+                  </article>
+                )) : <p className={styles.empty}>Waiting for /api/jarvis/live-index. No placeholder data is substituted.</p>}
+              </div>
+            </section>
+
+            <section className={styles.panel}>
               <h2>Evidence drawer</h2>
               {evidenceEvents.length ? evidenceEvents.slice(-10).reverse().map((item) => (
                 <article key={item.id} className={styles.evidenceItem}>
@@ -424,6 +586,14 @@ export default function JarvisProductionCommandClient() {
                   <span>{item.evidencePath ?? "Backend response captured"}</span>
                 </article>
               )) : <p className={styles.empty}>No evidence captured in this browser session yet.</p>}
+            </section>
+
+            <section className={styles.panel}>
+              <h2>Next source batches</h2>
+              <ul className={styles.doctrineList}>
+                {nextBatches.length ? nextBatches.map((item) => <li key={item}>{item}</li>) : <li>Completion board will list next build batches.</li>}
+              </ul>
+              {dockerRuntimeEntry ? <p className={styles.blockerText}>{dockerRuntimeEntry.detail}</p> : null}
             </section>
 
             <section className={styles.panel}>
