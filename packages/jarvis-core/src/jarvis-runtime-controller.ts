@@ -1,13 +1,12 @@
 import type {
   JarvisActionRisk,
   JarvisCommandEnvelope,
-  JarvisDecision,
   JarvisEvidenceEvent,
   JarvisPolicyDecision,
   JarvisToolCapabilityCard
 } from '../../contracts/src/jarvis';
+import type { JarvisEvidenceLedger } from './jarvis-evidence-ledger';
 import {
-  JarvisEvidenceLedger,
   jarvisAppendPolicyDecision,
   jarvisAppendToolPlan,
   jarvisAppendValidatorResult,
