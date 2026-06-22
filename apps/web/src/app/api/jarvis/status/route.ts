@@ -23,6 +23,11 @@ type BackendHealth = {
   status?: string;
   storageMode?: string;
   truthVault?: unknown;
+  jarvisRuntime?: {
+    route?: string;
+    inMemoryResults?: number;
+    backendAuthority?: boolean;
+  };
   startedAtIso?: string;
   generatedAtIso?: string;
   routes?: string[];
@@ -32,6 +37,7 @@ export async function GET() {
   const backendBoundary = getKingsmenBackendBoundary();
   const health = await getKingsmenApiHealth<BackendHealth>();
   const backendOk = health.ok && health.data?.ok === true;
+  const jarvisRuntimeRoute = health.data?.routes?.includes("POST /api/jarvis/runtime-control") === true || health.data?.jarvisRuntime?.route === "POST /api/jarvis/runtime-control";
 
   const cards = [
     {
@@ -42,6 +48,15 @@ export async function GET() {
         ? `Backend ${health.data?.service ?? "kingsmen-api"} responded through ${backendBoundary.mode}.`
         : health.error ?? "Backend API boundary is not configured or did not respond.",
       ok: backendOk
+    },
+    {
+      key: "jarvis-runtime-authority",
+      title: "Jarvis Runtime Authority",
+      state: backendOk && jarvisRuntimeRoute ? "LIVE_ROUTE" : "REVIEW",
+      detail: backendOk && jarvisRuntimeRoute
+        ? "Backend exposes POST /api/jarvis/runtime-control for Jarvis decisions."
+        : "Backend has not confirmed the Jarvis runtime-control route yet.",
+      ok: backendOk && jarvisRuntimeRoute
     },
     {
       key: "truth-vault-mode",
@@ -56,7 +71,7 @@ export async function GET() {
       key: "web-boundary",
       title: "Web Runtime Boundary",
       state: "LOCKED",
-      detail: "This Next route only calls the backend API client. It performs no local shell execution, direct database access, or local proof-file writes.",
+      detail: "This Next route only calls the backend API client. It performs no workstation runtime commands, direct storage access, or local proof-file writes.",
       ok: true
     },
     {
@@ -81,6 +96,7 @@ export async function GET() {
     backendBoundary,
     backendHealthStatus: health.status,
     backendHealth: health.data,
+    jarvisRuntimeRouteConfirmed: jarvisRuntimeRoute,
     cards,
     commands,
     doctrine: [
