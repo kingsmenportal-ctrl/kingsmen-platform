@@ -21,6 +21,7 @@
     "jarvis:activation:matrix": "node scripts/jarvis/build-jarvis-module-activation-matrix.mjs",
     "jarvis:complete": "node scripts/jarvis/complete-jarvis-no-shell.mjs",
     "jarvis:gates:evaluate": "node scripts/jarvis/evaluate-jarvis-gates.mjs",
+    "jarvis:live:readiness": "node scripts/jarvis/complete-jarvis-live-readiness.mjs",
     "api:build": "npm --prefix apps/api run build",
     "api:start": "npm --prefix apps/api start",
     "api:validate": "npm --prefix apps/api run validate",
