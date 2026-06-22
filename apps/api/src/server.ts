@@ -16,6 +16,11 @@ import type {
 } from "./read-models/candidate-read-model";
 import type { KingsmenState } from "./state/state-machine";
 import { TruthVaultRepository } from "./db/truth-vault-repository";
+import {
+  handleJarvisRuntimeControlWithAdapter,
+  type JarvisRuntimeServerStore
+} from "./jarvis/jarvis-runtime-server-adapter";
+import type { ApiJarvisRuntimeResult } from "./jarvis/jarvis-runtime-api";
 
 const MAX_BODY_BYTES = 1_000_000;
 const SERVICE_NAME = "kingsmen-api";
@@ -35,10 +40,16 @@ type StoredWorkflowResult = {
   receivedAtIso: string;
 };
 
+type StoredJarvisRuntimeResult = {
+  result: ApiJarvisRuntimeResult;
+  receivedAtIso: string;
+};
+
 type ApiRuntimeStore = {
   commands: Map<string, StoredCommand>;
   idempotencyKeys: Map<string, string>;
   workflowResults: Map<string, StoredWorkflowResult>;
+  jarvisRuntimeResults: Map<string, StoredJarvisRuntimeResult>;
   candidates: Map<string, CandidateReadModel>;
   applications: Map<string, ApplicationWorkbenchReadModel>;
   startedAtIso: string;
@@ -53,6 +64,7 @@ const store: ApiRuntimeStore = {
   commands: new Map(),
   idempotencyKeys: new Map(),
   workflowResults: new Map(),
+  jarvisRuntimeResults: new Map(),
   candidates: new Map(),
   applications: new Map(),
   startedAtIso: new Date().toISOString()
@@ -291,6 +303,20 @@ async function handleCommand(request: IncomingMessage, response: ServerResponse)
   sendJson(response, 202, responseBody, command.correlationId);
 }
 
+async function handleJarvisRuntimeControl(request: IncomingMessage, response: ServerResponse): Promise<void> {
+  const jarvisStore: JarvisRuntimeServerStore = {
+    set: (commandRef, result) => store.jarvisRuntimeResults.set(commandRef, result)
+  };
+
+  await handleJarvisRuntimeControlWithAdapter(request, response, {
+    readJson,
+    sendJson,
+    nowIso,
+    storageMode: truthVault.storageMode,
+    store: jarvisStore
+  });
+}
+
 async function handleWorkflowResult(request: IncomingMessage, response: ServerResponse): Promise<void> {
   const body = await readJson(request);
   const result = assertWorkflowResult(body as WorkflowResultEnvelope);
@@ -357,12 +383,18 @@ async function handleHealth(response: ServerResponse): Promise<void> {
     status: "healthy",
     storageMode: truthVault.storageMode,
     truthVault: truthVaultHealth,
+    jarvisRuntime: {
+      route: "POST /api/jarvis/runtime-control",
+      inMemoryResults: store.jarvisRuntimeResults.size,
+      backendAuthority: true
+    },
     startedAtIso: store.startedAtIso,
     generatedAtIso: nowIso(),
     routes: [
       "GET /health",
       "GET /api/system/health",
       "POST /api/commands",
+      "POST /api/jarvis/runtime-control",
       "POST /api/workflow/result",
       "POST /api/workflow-results",
       "GET /api/candidates/:candidateId/status",
@@ -443,6 +475,11 @@ export function createKingsmenApiServer() {
 
       if (method === "GET" && (pathname === "/" || pathname === "/health" || pathname === "/api/system/health")) {
         await handleHealth(response);
+        return;
+      }
+
+      if (method === "POST" && pathname === "/api/jarvis/runtime-control") {
+        await handleJarvisRuntimeControl(request, response);
         return;
       }
 
