@@ -9,6 +9,7 @@ const validators = [
   "scripts/validators/validate-jarvis-provider-credential-checklist.mjs",
   "scripts/validators/validate-jarvis-final-command-room.mjs",
   "scripts/validators/validate-jarvis-final-command-room-live-proof-queue.mjs",
+  "scripts/validators/validate-jarvis-live-proof-runbook.mjs",
   "scripts/validators/validate-jarvis-final-launch-control.mjs",
   "scripts/validators/validate-jarvis-source-completion-seal.mjs",
   "scripts/validators/validate-jarvis-live-proof-queue.mjs",
@@ -27,6 +28,7 @@ const manifests = [
   "manifests/jarvis/jarvis-dashboard-completion-board-v1.json",
   "manifests/jarvis/jarvis-source-completion-seal-v1.json",
   "manifests/jarvis/jarvis-live-proof-queue-v1.json",
+  "manifests/jarvis/jarvis-live-proof-runbook-v1.json",
   "manifests/jarvis/jarvis-openclaw-operator-policy-boundary-v1.json",
   "manifests/jarvis/jarvis-playwright-scout-map-fallback-boundary-v1.json"
 ];
@@ -39,10 +41,12 @@ const routes = [
   "/founder/launch-control/jarvis",
   "/founder/launch-control/jarvis-source-seal",
   "/founder/launch-control/jarvis-live-proof-queue",
+  "/founder/launch-control/jarvis-live-proof-runbook",
   "/api/jarvis/final-command-hud",
   "/api/jarvis/final-launch-control",
   "/api/jarvis/source-completion-seal",
   "/api/jarvis/live-proof-queue",
+  "/api/jarvis/live-proof-runbook",
   "/api/jarvis/completion-board",
   "/api/jarvis/provider-credential-checklist",
   "/api/jarvis/evidence-collector",
@@ -63,6 +67,12 @@ const blockers = [
     title: "Live proof queue not cleared",
     state: "BLOCKED",
     detail: "Docker/API, provider, GitHub, branch-protection, and final audit proof items remain open."
+  },
+  {
+    id: "live-proof-runbook",
+    title: "Live proof runbook not executed",
+    state: "PENDING",
+    detail: "Runbook phases must be cleared in order with real evidence before production launch."
   },
   {
     id: "provider-credentials",
@@ -90,6 +100,7 @@ export async function GET() {
     jarvisFinalLaunchControlIndexed: true,
     jarvisSourceCompletionSealIndexed: true,
     jarvisLiveProofQueueIndexed: true,
+    jarvisLiveProofRunbookIndexed: true,
     dockerIndependentBuildAllowed: true,
     noFakeData: true,
     rawSecretsReturned: false,
@@ -101,6 +112,6 @@ export async function GET() {
     manifests,
     routes,
     blockers,
-    nextAction: "Jarvis source/design is sealed. Clear live proof queue, provider, security, and final launch audit blockers before public launch."
+    nextAction: "Jarvis source/design is sealed. Clear live proof queue, runbook, provider, security, and final launch audit blockers before public launch."
   });
 }
