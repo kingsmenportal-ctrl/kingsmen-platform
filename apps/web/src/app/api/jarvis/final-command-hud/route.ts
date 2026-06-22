@@ -1,0 +1,102 @@
+import { NextResponse } from "next/server";
+
+export const runtime = "nodejs";
+export const dynamic = "force-dynamic";
+
+const sourceSurfaces = [
+  {
+    id: "jarvis-main-command",
+    title: "Jarvis Main Command",
+    href: "/jarvis",
+    state: "SOURCE_READY",
+    detail: "Primary founder command surface with command envelopes, voice, visual feed, completion board, live index, and evidence drawer."
+  },
+  {
+    id: "completion-board",
+    title: "Completion Board",
+    href: "/api/jarvis/completion-board",
+    state: "SOURCE_READY",
+    detail: "Docker-independent source completion map for Jarvis, provider boundaries, runtime blockers, and next source batches."
+  },
+  {
+    id: "provider-credential-checklist",
+    title: "Provider Credential Checklist",
+    href: "/founder/providers/jarvis-credentials",
+    state: "SOURCE_READY",
+    detail: "Founder screen showing required credential names only. It never returns secret values."
+  },
+  {
+    id: "live-index",
+    title: "Live Index",
+    href: "/api/jarvis/live-index",
+    state: "SOURCE_READY",
+    detail: "Readiness index for backend, Truth Vault, AI, GitHub, Airtable, Email, PayFast, n8n, Playwright, OpenClaw, WhatsApp, and SMS."
+  },
+  {
+    id: "openclaw-operator-policy",
+    title: "OpenClaw Operator Policy",
+    href: "/api/jarvis/openclaw-operator-policy-boundary",
+    state: "RUNTIME_PASSED_PREVIOUSLY",
+    detail: "Operator-only boundary with no policy bypass, no direct Truth Vault writes, no raw secret access, and no portal submission without MAP."
+  },
+  {
+    id: "playwright-map-fallback",
+    title: "Playwright Scout + MAP Fallback",
+    href: "/api/jarvis/playwright-scout-map-fallback-boundary",
+    state: "RUNTIME_PASSED_PREVIOUSLY",
+    detail: "Playwright remains scout/probe only. CAPTCHA, OTP, portal changes, or access failure route to MAP/manual fallback."
+  }
+];
+
+const launchGates = [
+  "Docker/API runtime proof must pass when local engine is stable.",
+  "PostgreSQL Truth Vault must be reachable through backend health, not from the browser.",
+  "AI provider must have a real backend-controlled live-call proof.",
+  "Email provider must prove send, receive, bounce, opt-out, redaction, and evidence logging.",
+  "PayFast sandbox must prove checkout, accepted ITN, duplicate rejection, failed-payment rejection, refund review, and founder approval.",
+  "n8n must prove thin relay only with real credentials outside Git.",
+  "Airtable must prove human mirror only while Truth Vault remains authority.",
+  "GitHub connector must prove redacted repo metadata and no token exposure.",
+  "Branch protection and final launch gate audit must pass."
+];
+
+export async function GET() {
+  return NextResponse.json({
+    schema: "kingsmen.jarvis-final-command-hud.v1",
+    module: "Jarvis Final Command HUD",
+    generatedAt: new Date().toISOString(),
+    jarvisSourceDesignComplete: true,
+    productionReady: false,
+    publicLaunchAllowed: false,
+    dockerIndependentBuildAllowed: true,
+    noFakeData: true,
+    redacted: true,
+    rawSecretsReturned: false,
+    secretValuesReturned: false,
+    localShellExecuted: false,
+    localFileWritten: false,
+    directDatabaseAccessFromWeb: false,
+    noDirectProviderCallsFromWeb: true,
+    postgresTruthVaultRemainsAuthority: true,
+    emailPrimaryChannel: true,
+    whatsappUrgentOnly: true,
+    smsBackupOnly: true,
+    n8nThinRelayOnly: true,
+    airtableMirrorOnly: true,
+    playwrightScoutOnly: true,
+    openClawOperatorOnly: true,
+    sourceSurfaces,
+    launchGates,
+    designSections: [
+      "Founder command identity and active status orb",
+      "Jarvis completion board summary",
+      "Live index readiness map",
+      "Provider credential checklist access",
+      "Evidence drawer and proof references",
+      "Voice and visual context section",
+      "Runtime blocker banner",
+      "No fake data and no secret exposure locks"
+    ],
+    nextAction: "Use /jarvis/final as the source-complete Jarvis command HUD, then finish provider runtime proofs when infrastructure and credentials are ready."
+  });
+}
