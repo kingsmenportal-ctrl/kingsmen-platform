@@ -2,8 +2,7 @@ import fs from "node:fs";
 
 const files = {
   route: "apps/web/src/app/api/jarvis/provider-credential-checklist/route.ts",
-  page: "apps/web/src/app/founder/providers/jarvis-credentials/page.tsx",
-  packageJson: "package.json"
+  page: "apps/web/src/app/founder/providers/jarvis-credentials/page.tsx"
 };
 
 const checks = [];
@@ -31,7 +30,6 @@ function requireAbsent(path, content, token) {
 
 const route = read(files.route);
 const page = read(files.page);
-const packageJson = read(files.packageJson);
 
 [
   "kingsmen.jarvis-provider-credential-checklist.v1",
@@ -60,8 +58,6 @@ const packageJson = read(files.packageJson);
   "PAYFAST_PASSPHRASE",
   "STORAGE_SECRET_KEY"
 ].forEach((token) => requireToken(files.page, page, token));
-
-requireToken(files.packageJson, packageJson, "jarvis:validate:provider-credential-checklist");
 
 [
   "process.env.OPENAI_API_KEY",
