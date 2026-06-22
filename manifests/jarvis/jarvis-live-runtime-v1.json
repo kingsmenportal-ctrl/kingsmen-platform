@@ -1,10 +1,16 @@
 {
   "schema": "kingsmen.jarvis-live-runtime.v1",
-  "status": "JARVIS_LIVE_RUNTIME_SURFACE_ADDED",
+  "status": "JARVIS_LIVE_RUNTIME_BACKEND_AND_WEB_SURFACES_ADDED",
   "productionReady": false,
   "publicLaunchAllowed": false,
   "coreRuntime": "packages/jarvis-core/src/jarvis-runtime-controller.ts",
+  "backendRuntimeEvaluator": "apps/api/src/jarvis/jarvis-runtime-api.ts",
+  "backendRuntimeAdapter": "apps/api/src/jarvis/jarvis-runtime-server-adapter.ts",
+  "backendRuntimeRouteContract": "apps/api/src/jarvis/jarvis-runtime-route-contract.ts",
+  "backendServer": "apps/api/src/server.ts",
+  "backendRoute": "POST /api/jarvis/runtime-control",
   "webRuntimeRoute": "apps/web/src/app/api/jarvis/runtime-control/route.ts",
+  "operatorUi": "apps/web/src/app/admin/jarvis-live/page.tsx",
   "validators": [
     "scripts/validators/validate-jarvis-runtime-controller.mjs",
     "scripts/validators/validate-jarvis-runtime-live-route.mjs"
@@ -18,10 +24,12 @@
     "blocksUnsafeActions": true,
     "allowsSafeActions": true,
     "dryRunDefaultSafe": true,
+    "backendEvaluatorAvailable": true,
+    "backendServerRouteWired": true,
     "backendLedgerBoundaryAvailable": true,
-    "localShellExecuted": false,
-    "localFileWrittenFromWebRoute": false,
-    "directDatabaseAccessFromWebRoute": false
+    "noLocalProcessExecutionFromWebRoute": true,
+    "noLocalFileMutationFromWebRoute": true,
+    "noDirectDbAccessFromWebRoute": true
   },
   "externalGatesStillRequiredForPublicLaunch": [
     "PayFast sandbox ITN evidence",
