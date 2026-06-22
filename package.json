@@ -9,7 +9,7 @@
   },
   "scripts": {
     "test": "node scripts/validators/validate-jarvis-core.mjs && node scripts/validators/validate-jarvis-live-pass-02.mjs",
-    "jarvis:validate": "node scripts/validators/validate-jarvis-core.mjs && node scripts/validators/validate-jarvis-live-pass-02.mjs && node scripts/validators/validate-jarvis-runtime-controller.mjs",
+    "jarvis:validate": "node scripts/validators/validate-jarvis-core.mjs && node scripts/validators/validate-jarvis-live-pass-02.mjs && node scripts/validators/validate-jarvis-runtime-controller.mjs && node scripts/validators/validate-jarvis-switch-layer.mjs",
     "jarvis:validate:core": "node scripts/validators/validate-jarvis-core.mjs",
     "jarvis:validate:live-pass-02": "node scripts/validators/validate-jarvis-live-pass-02.mjs",
     "jarvis:validate:live-pass-03": "node scripts/validators/validate-jarvis-live-pass-03.mjs",
