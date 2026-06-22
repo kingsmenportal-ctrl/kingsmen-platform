@@ -1,0 +1,40 @@
+{
+  "schema": "kingsmen.jarvis-live-proof-evidence-ledger.v1",
+  "module": "Jarvis Live Proof Evidence Ledger",
+  "status": "SOURCE_READY",
+  "productionReady": false,
+  "publicLaunchAllowed": false,
+  "jarvisRuntimeLive": false,
+  "launchBlocked": true,
+  "dockerIndependentBuildAllowed": true,
+  "routes": [
+    "/api/jarvis/live-proof-evidence-ledger",
+    "/founder/proof-centre/jarvis-live-proof-evidence-ledger",
+    "/jarvis/final"
+  ],
+  "validator": "node scripts/validators/validate-jarvis-live-proof-evidence-ledger.mjs",
+  "ledgerStates": [
+    "SOURCE_READY",
+    "MISSING",
+    "BLOCKED",
+    "REJECTED",
+    "ACCEPTED_PREVIOUSLY"
+  ],
+  "launchCriticalMissingEvidence": [
+    "Docker/API/Truth Vault runtime proof",
+    "AI provider live-call proof",
+    "Email primary channel proof",
+    "PayFast accepted ITN proof",
+    "n8n/Airtable/GitHub runtime proof",
+    "Branch protection and final launch audit proof"
+  ],
+  "boundaries": {
+    "noFakeData": true,
+    "rawSecretsReturned": false,
+    "secretValuesReturned": false,
+    "localShellExecuted": false,
+    "directDatabaseAccessFromWeb": false,
+    "noDirectProviderCallsFromWeb": true
+  },
+  "nextAction": "Clear launch-critical evidence ledger items before Jarvis can become live."
+}
