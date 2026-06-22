@@ -8,8 +8,10 @@ const validators = [
   "scripts/validators/validate-jarvis-dashboard-completion-board.mjs",
   "scripts/validators/validate-jarvis-provider-credential-checklist.mjs",
   "scripts/validators/validate-jarvis-final-command-room.mjs",
+  "scripts/validators/validate-jarvis-final-command-room-live-proof-queue.mjs",
   "scripts/validators/validate-jarvis-final-launch-control.mjs",
   "scripts/validators/validate-jarvis-source-completion-seal.mjs",
+  "scripts/validators/validate-jarvis-live-proof-queue.mjs",
   "scripts/validators/validate-jarvis-openclaw-operator-policy-boundary.mjs",
   "scripts/validators/validate-jarvis-playwright-scout-map-fallback-boundary.mjs",
   "scripts/validators/validate-jarvis-live-index-openclaw-runtime.mjs"
@@ -24,6 +26,7 @@ const manifests = [
   "manifests/jarvis/jarvis-completion-board-v1.json",
   "manifests/jarvis/jarvis-dashboard-completion-board-v1.json",
   "manifests/jarvis/jarvis-source-completion-seal-v1.json",
+  "manifests/jarvis/jarvis-live-proof-queue-v1.json",
   "manifests/jarvis/jarvis-openclaw-operator-policy-boundary-v1.json",
   "manifests/jarvis/jarvis-playwright-scout-map-fallback-boundary-v1.json"
 ];
@@ -35,9 +38,11 @@ const routes = [
   "/founder/proof-centre/jarvis",
   "/founder/launch-control/jarvis",
   "/founder/launch-control/jarvis-source-seal",
+  "/founder/launch-control/jarvis-live-proof-queue",
   "/api/jarvis/final-command-hud",
   "/api/jarvis/final-launch-control",
   "/api/jarvis/source-completion-seal",
+  "/api/jarvis/live-proof-queue",
   "/api/jarvis/completion-board",
   "/api/jarvis/provider-credential-checklist",
   "/api/jarvis/evidence-collector",
@@ -52,6 +57,12 @@ const blockers = [
     title: "Local Docker/API runtime instability",
     state: "BLOCKED",
     detail: "Blocks runtime proof only. Source-safe Jarvis construction continues."
+  },
+  {
+    id: "live-proof-queue",
+    title: "Live proof queue not cleared",
+    state: "BLOCKED",
+    detail: "Docker/API, provider, GitHub, branch-protection, and final audit proof items remain open."
   },
   {
     id: "provider-credentials",
@@ -78,6 +89,7 @@ export async function GET() {
     jarvisFinalCommandRoomIndexed: true,
     jarvisFinalLaunchControlIndexed: true,
     jarvisSourceCompletionSealIndexed: true,
+    jarvisLiveProofQueueIndexed: true,
     dockerIndependentBuildAllowed: true,
     noFakeData: true,
     rawSecretsReturned: false,
@@ -89,6 +101,6 @@ export async function GET() {
     manifests,
     routes,
     blockers,
-    nextAction: "Jarvis source/design is sealed. Clear runtime/provider/security blockers before public launch."
+    nextAction: "Jarvis source/design is sealed. Clear live proof queue, provider, security, and final launch audit blockers before public launch."
   });
 }
