@@ -15,6 +15,7 @@ type FinalHudPayload = {
   module: string;
   generatedAt: string;
   jarvisSourceDesignComplete: boolean;
+  jarvisLiveProofQueueConnected?: boolean;
   productionReady: boolean;
   publicLaunchAllowed: boolean;
   dockerIndependentBuildAllowed: boolean;
@@ -98,6 +99,31 @@ type ProofPackPayload = {
   blockers?: Array<{ id: string; title: string; state: string; detail: string }>;
 };
 
+type LiveProofQueueItem = {
+  id: string;
+  title: string;
+  state: string;
+  owner: string;
+  launchCritical: boolean;
+  detail: string;
+  proofRoute?: string;
+  proofScript?: string;
+  evidenceRequired: string[];
+};
+
+type LiveProofQueuePayload = {
+  schema: string;
+  module: string;
+  jarvisSourceReady: boolean;
+  jarvisRuntimeLive: boolean;
+  productionReady: boolean;
+  publicLaunchAllowed: boolean;
+  launchBlocked: boolean;
+  counts?: Record<string, number>;
+  proofQueue?: LiveProofQueueItem[];
+  nextAction?: string;
+};
+
 async function readJson<T>(url: string): Promise<T | null> {
   try {
     const response = await fetch(url, { cache: "no-store" });
@@ -122,7 +148,7 @@ const colors = {
 
 function pillStyle(state: string) {
   if (state.includes("PASSED") || state.includes("CAPTURED") || state === "LIVE") return { borderColor: "rgba(157,255,203,0.44)", color: colors.green, background: "rgba(157,255,203,0.10)" };
-  if (state.includes("SOURCE")) return { borderColor: "rgba(112,247,255,0.42)", color: colors.cyan, background: "rgba(112,247,255,0.10)" };
+  if (state.includes("SOURCE") || state.includes("READY_FOR_RUNTIME")) return { borderColor: "rgba(112,247,255,0.42)", color: colors.cyan, background: "rgba(112,247,255,0.10)" };
   if (state.includes("BLOCK")) return { borderColor: "rgba(255,117,117,0.38)", color: colors.red, background: "rgba(255,117,117,0.10)" };
   if (state.includes("CREDENTIAL") || state.includes("PENDING")) return { borderColor: "rgba(255,227,163,0.38)", color: colors.amber, background: "rgba(255,227,163,0.10)" };
   return { borderColor: "rgba(236,251,255,0.22)", color: colors.muted, background: "rgba(236,251,255,0.08)" };
@@ -149,16 +175,18 @@ export default function JarvisFinalHudClient() {
   const [evidence, setEvidence] = useState<EvidencePayload | null>(null);
   const [launchGate, setLaunchGate] = useState<SourceLaunchGatePayload | null>(null);
   const [proofPack, setProofPack] = useState<ProofPackPayload | null>(null);
+  const [liveQueue, setLiveQueue] = useState<LiveProofQueuePayload | null>(null);
   const [loadedAt, setLoadedAt] = useState("");
 
   async function load() {
-    const [nextHud, nextCompletion, nextProviders, nextEvidence, nextLaunchGate, nextProofPack] = await Promise.all([
+    const [nextHud, nextCompletion, nextProviders, nextEvidence, nextLaunchGate, nextProofPack, nextLiveQueue] = await Promise.all([
       readJson<FinalHudPayload>("/api/jarvis/final-command-hud"),
       readJson<CompletionPayload>("/api/jarvis/completion-board"),
       readJson<ProviderPayload>("/api/jarvis/provider-credential-checklist"),
       readJson<EvidencePayload>("/api/jarvis/evidence-collector"),
       readJson<SourceLaunchGatePayload>("/api/jarvis/source-launch-gate"),
-      readJson<ProofPackPayload>("/api/jarvis/proof-pack-index")
+      readJson<ProofPackPayload>("/api/jarvis/proof-pack-index"),
+      readJson<LiveProofQueuePayload>("/api/jarvis/live-proof-queue")
     ]);
     setHud(nextHud);
     setCompletion(nextCompletion);
@@ -166,6 +194,7 @@ export default function JarvisFinalHudClient() {
     setEvidence(nextEvidence);
     setLaunchGate(nextLaunchGate);
     setProofPack(nextProofPack);
+    setLiveQueue(nextLiveQueue);
     setLoadedAt(new Date().toLocaleTimeString());
   }
 
@@ -186,6 +215,11 @@ export default function JarvisFinalHudClient() {
   const gates = launchGate?.gates ?? [];
   const proofRoutes = proofPack?.routes ?? [];
   const proofBlockers = proofPack?.blockers ?? [];
+  const queueItems = liveQueue?.proofQueue ?? [];
+  const queueBlocked = (liveQueue?.counts?.BLOCKED_BY_LOCAL_DOCKER ?? 0) + (liveQueue?.counts?.BLOCKED_BY_PROVIDER_EVIDENCE ?? 0) + (liveQueue?.counts?.BLOCKED_BY_SECURITY_GATE ?? 0);
+  const queueCredentials = liveQueue?.counts?.PENDING_CREDENTIALS ?? 0;
+  const queueRuntimeReady = liveQueue?.counts?.READY_FOR_RUNTIME_WHEN_AVAILABLE ?? 0;
+  const queueSourceReady = liveQueue?.counts?.SOURCE_READY ?? 0;
 
   return (
     <main style={{
@@ -201,12 +235,13 @@ export default function JarvisFinalHudClient() {
             <p style={{ color: colors.cyan, letterSpacing: "0.18em", textTransform: "uppercase", fontWeight: 900, margin: 0 }}>Kingsmen · Jarvis Final Command HUD</p>
             <h1 style={{ margin: "12px 0", fontSize: "clamp(3rem, 8vw, 7.8rem)", lineHeight: 0.84, letterSpacing: "-0.08em" }}>JARVIS</h1>
             <p style={{ maxWidth: 980, color: colors.muted, lineHeight: 1.68, fontSize: "1.02rem" }}>
-              Final source command room for founder control, completion tracking, provider readiness, evidence collection, launch gates, proof-pack index, runtime blockers, and no fake production claims.
+              Final source command room for founder control, completion tracking, provider readiness, live proof queue, evidence collection, launch gates, proof-pack index, runtime blockers, and no fake production claims.
             </p>
             <div style={{ display: "flex", gap: 10, flexWrap: "wrap", marginTop: 20 }}>
               <button onClick={load} style={buttonStyle}>Refresh HUD</button>
               <button onClick={() => window.open("/jarvis", "_blank", "noopener,noreferrer")} style={buttonStyle}>Open Command</button>
               <button onClick={() => window.open("/founder/proof-centre/jarvis", "_blank", "noopener,noreferrer")} style={buttonStyle}>Proof Centre</button>
+              <button onClick={() => window.open("/founder/launch-control/jarvis-live-proof-queue", "_blank", "noopener,noreferrer")} style={buttonStyle}>Live Proof Queue</button>
               <button onClick={() => window.open("/founder/providers/jarvis-credentials", "_blank", "noopener,noreferrer")} style={buttonStyle}>Credential Board</button>
               <button onClick={() => window.open("/api/jarvis/proof-pack-index", "_blank", "noopener,noreferrer")} style={buttonStyle}>Proof Pack JSON</button>
             </div>
@@ -218,6 +253,7 @@ export default function JarvisFinalHudClient() {
             </div>
             <p style={{ margin: 0, color: colors.green, fontWeight: 900, textAlign: "center" }}>SOURCE COMMAND ROOM</p>
             <p style={{ margin: "10px 0 0", color: colors.muted, textAlign: "center" }}>Production: {String(hud?.productionReady ?? false)} · Launch: {String(hud?.publicLaunchAllowed ?? false)}</p>
+            <p style={{ margin: "10px 0 0", color: colors.muted, textAlign: "center" }}>Runtime live: {String(liveQueue?.jarvisRuntimeLive ?? false)}</p>
             <p style={{ margin: "10px 0 0", color: colors.muted, textAlign: "center" }}>Loaded: {loadedAt || "waiting"}</p>
           </Card>
         </section>
@@ -227,6 +263,10 @@ export default function JarvisFinalHudClient() {
           <Card><Stat label="Runtime passed" value={completion?.counts?.RUNTIME_PASSED ?? 0} /></Card>
           <Card><Stat label="Credentials" value={completion?.counts?.PENDING_CREDENTIALS ?? 0} /></Card>
           <Card><Stat label="Critical pending" value={criticalPending} /></Card>
+          <Card><Stat label="Queue source" value={queueSourceReady} /></Card>
+          <Card><Stat label="Queue runtime" value={queueRuntimeReady} /></Card>
+          <Card><Stat label="Queue creds" value={queueCredentials} /></Card>
+          <Card><Stat label="Queue blocked" value={queueBlocked} /></Card>
           <Card><Stat label="Evidence captured" value={capturedEvidence} /></Card>
           <Card><Stat label="Evidence pending" value={pendingEvidence} /></Card>
           <Card><Stat label="Evidence blocked" value={blockedEvidence} /></Card>
@@ -238,7 +278,15 @@ export default function JarvisFinalHudClient() {
             <Card tone="danger">
               <p style={label}>Runtime blocker</p>
               <h2 style={h2}>Docker/API remains separate</h2>
-              <p style={p}>Local Docker instability blocks runtime proof only. It must not stop Jarvis source completion, design, validators, manifests, proof-pack index, or provider boundary screens.</p>
+              <p style={p}>Local Docker instability blocks runtime proof only. It must not stop Jarvis source completion, design, validators, manifests, proof-pack index, live proof queue, or provider boundary screens.</p>
+            </Card>
+
+            <Card>
+              <p style={label}>Live proof queue summary</p>
+              <p style={p}>Source ready: {String(liveQueue?.jarvisSourceReady ?? false)}</p>
+              <p style={p}>Runtime live: {String(liveQueue?.jarvisRuntimeLive ?? false)}</p>
+              <p style={p}>Launch blocked: {String(liveQueue?.launchBlocked ?? true)}</p>
+              <p style={{ ...p, marginTop: 10 }}>{liveQueue?.nextAction ?? "Waiting for live proof queue."}</p>
             </Card>
 
             <Card>
@@ -253,6 +301,21 @@ export default function JarvisFinalHudClient() {
           </div>
 
           <div style={{ display: "grid", gap: 18 }}>
+            <Card>
+              <p style={label}>Live proof queue</p>
+              <div style={gridCards}>
+                {queueItems.map((item) => (
+                  <article key={item.id} style={innerCard}>
+                    <span style={{ ...stateBase, ...pillStyle(item.state) }}>{item.state}</span>
+                    <h3 style={h3}>{item.title}</h3>
+                    <p style={p}>{item.detail}</p>
+                    <p style={{ ...p, marginTop: 8 }}>Owner: {item.owner} · launch critical: {String(item.launchCritical)}</p>
+                    {item.proofScript ? <code style={codeStyle}>{item.proofScript}</code> : null}
+                  </article>
+                ))}
+              </div>
+            </Card>
+
             <Card>
               <p style={label}>Source surfaces</p>
               <div style={gridCards}>
@@ -299,6 +362,7 @@ export default function JarvisFinalHudClient() {
           <div style={{ display: "grid", gap: 18 }}>
             <Card>
               <p style={label}>Provider credential board</p>
+              <p style={{ ...p, marginBottom: 10 }}>{credentialCount} credential names tracked. Values hidden.</p>
               {credentialProviders.map((provider) => (
                 <article key={provider.id} style={{ borderBottom: `1px solid ${colors.border}`, padding: "12px 0" }}>
                   <span style={{ ...stateBase, ...pillStyle(provider.state) }}>{provider.state}</span>
