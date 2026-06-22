@@ -1,0 +1,61 @@
+*** Begin Patch
+*** Update File: apps/api/src/server.ts
+@@
+ import { TruthVaultRepository } from "./db/truth-vault-repository";
++import {
++  apiJarvisDecisionToHttpStatus,
++  evaluateApiJarvisRuntime,
++  type ApiJarvisRuntimeRequest,
++  type ApiJarvisRuntimeResult
++} from "./jarvis/jarvis-runtime-api";
+@@
+ type StoredWorkflowResult = {
+   result: WorkflowResultEnvelope;
+   receivedAtIso: string;
+ };
++
++type StoredJarvisRuntimeResult = {
++  result: ApiJarvisRuntimeResult;
++  receivedAtIso: string;
++};
+@@
+   workflowResults: Map<string, StoredWorkflowResult>;
++  jarvisRuntimeResults: Map<string, StoredJarvisRuntimeResult>;
+   candidates: Map<string, CandidateReadModel>;
+@@
+   workflowResults: new Map(),
++  jarvisRuntimeResults: new Map(),
+   candidates: new Map(),
+@@
+ }
++
++async function handleJarvisRuntimeControl(request: IncomingMessage, response: ServerResponse): Promise<void> {
++  const body = await readJson(request);
++  const result = evaluateApiJarvisRuntime(body as ApiJarvisRuntimeRequest);
++  const statusCode = apiJarvisDecisionToHttpStatus(result);
++
++  store.jarvisRuntimeResults.set(result.commandRef, {
++    result,
++    receivedAtIso: nowIso()
++  });
++
++  sendJson(response, statusCode, {
++    ...result,
++    evidenceStorage: {
++      attempted: true,
++      accepted: true,
++      storageMode: truthVault.storageMode
++    }
++  }, result.correlationId);
++}
+@@
+       if (method === "POST" && pathname === "/api/commands") {
+         await handleCommand(request, response);
+         return;
+       }
++
++      if (method === "POST" && pathname === "/api/jarvis/runtime-control") {
++        await handleJarvisRuntimeControl(request, response);
++        return;
++      }
+*** End Patch
