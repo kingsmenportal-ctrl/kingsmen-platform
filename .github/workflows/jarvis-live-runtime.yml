@@ -1,0 +1,44 @@
+name: Jarvis Live Runtime
+
+on:
+  pull_request:
+    paths:
+      - 'packages/jarvis-core/**'
+      - 'apps/api/src/jarvis/**'
+      - 'apps/web/src/app/api/jarvis/**'
+      - 'apps/web/src/app/admin/jarvis-*/**'
+      - 'scripts/jarvis/**'
+      - 'scripts/validators/validate-jarvis-*.mjs'
+      - 'package.json'
+  push:
+    branches:
+      - main
+    paths:
+      - 'packages/jarvis-core/**'
+      - 'apps/api/src/jarvis/**'
+      - 'apps/web/src/app/api/jarvis/**'
+      - 'apps/web/src/app/admin/jarvis-*/**'
+      - 'scripts/jarvis/**'
+      - 'scripts/validators/validate-jarvis-*.mjs'
+      - 'package.json'
+
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: Validate Jarvis core
+        run: node scripts/validators/validate-jarvis-core.mjs
+
+      - name: Validate Jarvis runtime controller
+        run: node scripts/validators/validate-jarvis-runtime-controller.mjs
+
+      - name: Validate Jarvis live batch
+        run: node scripts/validators/validate-jarvis-complete-live-batch.mjs
