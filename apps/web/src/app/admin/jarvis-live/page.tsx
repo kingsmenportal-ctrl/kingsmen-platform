@@ -20,6 +20,10 @@ type JarvisRuntimeResponse = {
   toolRef?: string | null;
   ledger?: { eventRef: string; eventType: string; safeSummary: string; createdAtIso: string }[];
   evidenceWrite?: { attempted?: boolean; accepted?: boolean; status?: number; commandId?: string | null; error?: string | null };
+  evidenceStorage?: { attempted?: boolean; accepted?: boolean; storageMode?: string; commandId?: string | null; replay?: boolean };
+  backendStatus?: number;
+  backendBoundary?: { configured?: boolean; mode?: string; noLocalShell?: boolean; noLocalFileWrites?: boolean; noDirectDatabaseAccessFromWeb?: boolean };
+  webProxy?: boolean;
   localShellExecuted?: boolean;
   localFileWritten?: boolean;
   directDatabaseAccessFromWeb?: boolean;
@@ -103,8 +107,8 @@ export default function JarvisLivePage() {
         <p className="eyebrow">Kingsmen Jarvis</p>
         <h1>Jarvis Live Runtime Control</h1>
         <p>
-          This surface sends a command envelope into the Jarvis runtime controller. It returns the final decision,
-          exact reason, approval requirement, evidence blockers, and ledger events without running local shell commands.
+          This surface sends a command envelope through the web boundary into the backend Jarvis runtime authority.
+          It returns the final decision, exact reason, approval requirement, evidence blockers, and ledger events.
         </p>
       </section>
 
@@ -135,6 +139,12 @@ export default function JarvisLivePage() {
               </div>
 
               <article className="reasonBox">
+                <h3>Backend authority</h3>
+                <p>webProxy: {String(result.webProxy)} · backendStatus: {result.backendStatus ?? "—"} · configured: {String(result.backendBoundary?.configured)}</p>
+                <p>mode: {result.backendBoundary?.mode ?? "—"}</p>
+              </article>
+
+              <article className="reasonBox">
                 <h3>Exact safe reason</h3>
                 <p>{result.safeReason ?? "No reason returned yet."}</p>
               </article>
@@ -147,11 +157,10 @@ export default function JarvisLivePage() {
               </article>
 
               <article className="reasonBox">
-                <h3>Evidence write</h3>
+                <h3>Evidence storage</h3>
                 <p>
-                  attempted: {String(result.evidenceWrite?.attempted)} · accepted: {String(result.evidenceWrite?.accepted)} · status: {result.evidenceWrite?.status ?? 0}
+                  attempted: {String(result.evidenceStorage?.attempted ?? result.evidenceWrite?.attempted)} · accepted: {String(result.evidenceStorage?.accepted ?? result.evidenceWrite?.accepted)} · storage: {result.evidenceStorage?.storageMode ?? "—"}
                 </p>
-                {result.evidenceWrite?.error ? <p>{result.evidenceWrite.error}</p> : null}
               </article>
 
               <article className="reasonBox">
@@ -166,8 +175,8 @@ export default function JarvisLivePage() {
               </article>
 
               <article className="safetyBox">
-                <h3>Safety boundary</h3>
-                <p>localShellExecuted: {String(result.localShellExecuted)} · localFileWritten: {String(result.localFileWritten)} · directDatabaseAccessFromWeb: {String(result.directDatabaseAccessFromWeb)}</p>
+                <h3>Boundary</h3>
+                <p>web route proxies to backend authority. Browser does not submit directly to storage or runtime internals.</p>
               </article>
             </div>
           ) : (
