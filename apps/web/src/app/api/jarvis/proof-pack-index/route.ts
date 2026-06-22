@@ -7,6 +7,7 @@ const validators = [
   "scripts/validators/validate-jarvis-completion-board.mjs",
   "scripts/validators/validate-jarvis-dashboard-completion-board.mjs",
   "scripts/validators/validate-jarvis-provider-credential-checklist.mjs",
+  "scripts/validators/validate-jarvis-final-command-room.mjs",
   "scripts/validators/validate-jarvis-openclaw-operator-policy-boundary.mjs",
   "scripts/validators/validate-jarvis-playwright-scout-map-fallback-boundary.mjs",
   "scripts/validators/validate-jarvis-live-index-openclaw-runtime.mjs"
@@ -28,6 +29,7 @@ const routes = [
   "/jarvis",
   "/jarvis/final",
   "/founder/providers/jarvis-credentials",
+  "/founder/proof-centre/jarvis",
   "/api/jarvis/final-command-hud",
   "/api/jarvis/completion-board",
   "/api/jarvis/provider-credential-checklist",
@@ -66,6 +68,7 @@ export async function GET() {
     productionReady: false,
     publicLaunchAllowed: false,
     jarvisSourcePackReady: true,
+    jarvisFinalCommandRoomIndexed: true,
     dockerIndependentBuildAllowed: true,
     noFakeData: true,
     rawSecretsReturned: false,
