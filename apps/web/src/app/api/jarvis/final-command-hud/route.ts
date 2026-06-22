@@ -16,7 +16,14 @@ const sourceSurfaces = [
     title: "Jarvis Final HUD",
     href: "/jarvis/final",
     state: "SOURCE_READY",
-    detail: "Final command room combining completion board, provider credentials, evidence collector, source launch gate, proof pack, and runtime blockers."
+    detail: "Final command room combining completion board, provider credentials, evidence collector, source launch gate, proof pack, live proof queue, and runtime blockers."
+  },
+  {
+    id: "live-proof-queue",
+    title: "Live Proof Queue",
+    href: "/api/jarvis/live-proof-queue",
+    state: "SOURCE_READY",
+    detail: "Controlled queue for Docker/API, AI, Email, PayFast, n8n, Airtable, GitHub, branch protection, and launch audit proof."
   },
   {
     id: "completion-board",
@@ -95,6 +102,7 @@ export async function GET() {
     generatedAt: new Date().toISOString(),
     jarvisSourceDesignComplete: true,
     jarvisFinalCommandRoomConnected: true,
+    jarvisLiveProofQueueConnected: true,
     productionReady: false,
     publicLaunchAllowed: false,
     dockerIndependentBuildAllowed: true,
@@ -119,6 +127,7 @@ export async function GET() {
     designSections: [
       "Founder command identity and active status orb",
       "Jarvis completion board summary",
+      "Live proof queue and blocker tracker",
       "Live index readiness map",
       "Provider credential checklist access",
       "Evidence collector and proof references",
@@ -127,6 +136,6 @@ export async function GET() {
       "Runtime blocker banner",
       "No fake data and no secret exposure locks"
     ],
-    nextAction: "Use /jarvis/final as the connected Jarvis command room, then clear runtime, provider, security, and final launch audit blockers."
+    nextAction: "Use /jarvis/final as the connected Jarvis command room, then clear live proof queue blockers before production readiness can become true."
   });
 }
