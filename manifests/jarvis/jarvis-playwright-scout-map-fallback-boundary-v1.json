@@ -1,0 +1,16 @@
+{
+  "schema": "kingsmen.jarvis-playwright-scout-map-fallback-boundary.v1",
+  "module": "jarvis_playwright_scout_map_fallback_boundary",
+  "productionReady": false,
+  "publicLaunchAllowed": false,
+  "backend_api_only": true,
+  "postgres_truth_vault": true,
+  "playwrightScoutOnly": true,
+  "browserMayRunPlaywrightDirectly": false,
+  "portalAutomationMayBypassPolicy": false,
+  "captchaOtpMayBeAutomated": false,
+  "manualApplicationPackageRequired": true,
+  "phoenixFallbackRequired": true,
+  "commandEnvelope": "PLAYWRIGHT_SCOUT_MAP_FALLBACK_CHECK",
+  "evidenceReport": "reports/jarvis/jarvis-playwright-scout-map-fallback-boundary-proof-latest.json"
+}

@@ -1,0 +1,31 @@
+{
+  "schema": "kingsmen.jarvis-dashboard-completion-board.v1",
+  "module": "Jarvis Dashboard Completion Board Wiring",
+  "status": "SOURCE_READY",
+  "productionReady": false,
+  "publicLaunchAllowed": false,
+  "dockerIndependentBuildAllowed": true,
+  "routes": [
+    "/jarvis",
+    "/api/jarvis/status",
+    "/api/jarvis/completion-board",
+    "/api/jarvis/live-index"
+  ],
+  "validator": "npm run jarvis:validate:dashboard-completion-board",
+  "build": "npm --prefix apps/web run build",
+  "boundaries": {
+    "noFakeData": true,
+    "rawSecretsReturned": false,
+    "localShellExecuted": false,
+    "directDatabaseAccessFromWeb": false,
+    "postgresTruthVaultRemainsAuthority": true,
+    "airtableMirrorOnly": true,
+    "n8nThinRelayOnly": true,
+    "playWrightScoutOnly": true,
+    "whatsappUrgentOnly": true,
+    "emailPrimaryChannel": true,
+    "openClawOperatorOnly": true
+  },
+  "runtimeBlockerPolicy": "Docker/API runtime proof stays separate from source completion and must not be faked.",
+  "nextAction": "Run validator and web build, then open /jarvis with the web server only."
+}

@@ -1,0 +1,32 @@
+{
+  "schema": "kingsmen.jarvis-production-command-surface.v1",
+  "module": "Jarvis Production Command Surface",
+  "status": "source_built_pending_runtime_backend_proof",
+  "productionReady": false,
+  "publicLaunchAllowed": false,
+  "noFakeData": true,
+  "webLocalShellExecutionAllowed": false,
+  "webDirectDatabaseAccessAllowed": false,
+  "webLocalReportWritesAllowed": false,
+  "backendApiBoundaryRequired": true,
+  "voiceSupportedInBrowserOnly": true,
+  "visualFeedRequiresUserPermission": true,
+  "liveDataSources": [
+    "/api/jarvis/status",
+    "/api/jarvis/command",
+    "KINGSMEN_BACKEND_BASE_URL",
+    "backend health endpoint",
+    "backend command endpoint",
+    "PostgreSQL Truth Vault command and evidence ledger"
+  ],
+  "requiredUiCapabilities": [
+    "live backend status cards",
+    "clickable command deck from status API",
+    "backend command envelope submission",
+    "voice context capture",
+    "visual camera feed permission boundary",
+    "evidence drawer",
+    "doctrine lock",
+    "no fake data empty states"
+  ]
+}

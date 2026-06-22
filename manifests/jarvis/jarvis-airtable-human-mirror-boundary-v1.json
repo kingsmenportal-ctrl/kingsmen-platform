@@ -1,0 +1,32 @@
+{
+  "schema": "kingsmen.jarvis-airtable-human-mirror-boundary.v1",
+  "module": "jarvis_airtable_human_mirror_boundary",
+  "status": "source_ready_pending_runtime_proof",
+  "productionReady": false,
+  "publicLaunchAllowed": false,
+  "doctrine": {
+    "airtableRole": "human_mirror_only",
+    "truthAuthority": "postgres_truth_vault",
+    "backendGoverned": true,
+    "noRawSecrets": true,
+    "noProviderCredentialsPrinted": true,
+    "directProviderCallsFromWeb": false,
+    "browserMayCallAirtableDirectly": false,
+    "airtableMayBecomeTruth": false
+  },
+  "requiredRuntimeEvidence": [
+    "redacted_airtable_health_read",
+    "backend_command_envelope_acceptance",
+    "truth_vault_command_log",
+    "truth_vault_audit_events",
+    "postgres_remains_truth"
+  ],
+  "requiredEnvOutsideGit": [
+    "KINGSMEN_AIRTABLE_BASE_ID",
+    "KINGSMEN_AIRTABLE_API_KEY",
+    "KINGSMEN_AIRTABLE_CANDIDATES_TABLE"
+  ],
+  "reports": [
+    "reports/jarvis/jarvis-airtable-human-mirror-boundary-proof-latest.json"
+  ]
+}

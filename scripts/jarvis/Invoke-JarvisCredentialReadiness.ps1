@@ -113,6 +113,9 @@ $requirements = @(
   @{ envName = "DATABASE_URL"; provider = "postgresql"; moduleRef = "truth_vault"; requiredForBeta = $true; requiredForProduction = $true; risk = "critical"; secret = $true },
   @{ envName = "REDIS_URL"; provider = "redis"; moduleRef = "queue_fabric"; requiredForBeta = $true; requiredForProduction = $true; risk = "high"; secret = $true },
   @{ envName = "KINGSMEN_BACKEND_BASE_URL"; provider = "kingsmen-api"; moduleRef = "web_backend_boundary"; requiredForBeta = $true; requiredForProduction = $true; risk = "medium"; secret = $false },
+  @{ envName = "KINGSMEN_AI_PROVIDER"; provider = "ai"; moduleRef = "ai_provider_router"; requiredForBeta = $true; requiredForProduction = $true; risk = "high"; secret = $false },
+  @{ envName = "KINGSMEN_AI_MODEL"; provider = "ai"; moduleRef = "ai_provider_router"; requiredForBeta = $true; requiredForProduction = $true; risk = "medium"; secret = $false },
+  @{ envName = "OPENAI_API_KEY"; provider = "openai"; moduleRef = "ai_provider_router"; requiredForBeta = $true; requiredForProduction = $true; risk = "critical"; secret = $true },
   @{ envName = "SMTP_HOST"; provider = "email"; moduleRef = "communications"; requiredForBeta = $false; requiredForProduction = $true; risk = "medium"; secret = $false },
   @{ envName = "SMTP_USER"; provider = "email"; moduleRef = "communications"; requiredForBeta = $false; requiredForProduction = $true; risk = "medium"; secret = $true },
   @{ envName = "SMTP_PASSWORD"; provider = "email"; moduleRef = "communications"; requiredForBeta = $false; requiredForProduction = $true; risk = "high"; secret = $true },
@@ -187,7 +190,7 @@ $report = [ordered]@{
   checks = $checks
   modules = $modules
   generatedAt = (Get-Date).ToUniversalTime().ToString("o")
-  nextAction = if ($allReady) { "Run staging proofs for communications, PayFast, observability, storage, and final evidence before live activation." } else { "Replace placeholders outside Git, rerun Jarvis credential readiness, then run module staging proofs." }
+  nextAction = if ($allReady) { "Run staging proofs for AI provider routing, communications, PayFast, observability, storage, and final evidence before live activation." } else { "Replace placeholders outside Git, rerun Jarvis credential readiness, then run module staging proofs. AI provider routing requires KINGSMEN_AI_PROVIDER, KINGSMEN_AI_MODEL, and OPENAI_API_KEY outside Git." }
 }
 
 $fullReport = Join-Path (Get-Location) $ReportPath

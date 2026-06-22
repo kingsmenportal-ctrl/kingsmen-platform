@@ -1,0 +1,32 @@
+{
+  "schema": "kingsmen.jarvis-production-live-index.v1",
+  "module": "Jarvis Production Live Index",
+  "productionReady": false,
+  "publicLaunchAllowed": false,
+  "backendApiBoundaryRequired": true,
+  "noFakeData": true,
+  "rawSecretsReturned": false,
+  "localShellExecuted": false,
+  "directDatabaseAccessFromWeb": false,
+  "indexedBoundaries": [
+    "Backend API Authority",
+    "PostgreSQL Truth Vault",
+    "Jarvis Command Envelope",
+    "AI Provider Router",
+    "Tools and Apps Registry",
+    "PayFast Sandbox Provider Proof",
+    "Email Primary Channel",
+    "OpenClaw Operator Boundary",
+    "WhatsApp Urgent Only"
+  ],
+  "rules": {
+    "noDummyProviderCards": true,
+    "unavailableStatusMustRemainPending": true,
+    "providerRuntimeProofRequiredBeforeProductionClaim": true,
+    "webMayNotExecuteLocalShell": true,
+    "webMayNotWriteLocalProofFiles": true,
+    "webMayNotReadRawSecrets": true,
+    "backendCommandEvidenceRequired": true
+  },
+  "nextAction": "Run source validation, web production build, and live backend API proof before marking Jarvis production-real."
+}

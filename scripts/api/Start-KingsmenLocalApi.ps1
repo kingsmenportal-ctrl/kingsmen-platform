@@ -9,6 +9,7 @@ param(
   [int]$PostgresPort = 55432,
   [switch]$SkipBuild,
   [switch]$KillExistingPort,
+  [switch]$SkipDockerStart,
   [switch]$NoSyncPostgresPasswordFromContainer,
   [switch]$NoRepairPostgresRolePassword
 )
@@ -163,7 +164,10 @@ if ($KillExistingPort) {
 
 $postgresContainerStartAttempted = $false
 $redisContainerStartAttempted = $false
-if (Test-CommandAvailable "docker") {
+$dockerStartSkipped = $false
+if ($SkipDockerStart) {
+  $dockerStartSkipped = $true
+} elseif (Test-CommandAvailable "docker") {
   docker start $PostgresContainerName *> $null
   $postgresContainerStartAttempted = $true
   docker start kingsmen-redis-local *> $null
@@ -177,7 +181,7 @@ $containerPasswordAvailable = $false
 $databaseUrlCredentialsUrlEncoded = $false
 $postgresRolePasswordRepairAttempted = $false
 $postgresRolePasswordRepairSucceeded = $false
-if (-not $NoSyncPostgresPasswordFromContainer) {
+if (-not $NoSyncPostgresPasswordFromContainer -and -not $SkipDockerStart) {
   $containerPassword = Read-DockerContainerEnvValue -ContainerName $PostgresContainerName -EnvName "POSTGRES_PASSWORD"
   if (-not [string]::IsNullOrWhiteSpace($containerPassword)) {
     $containerPasswordAvailable = $true
@@ -216,6 +220,7 @@ Write-Host (@{
   module = "Kingsmen Local API Starter"
   envFileLoaded = $true
   envFileImportedCount = $envImportCount
+  dockerStartSkipped = $dockerStartSkipped
   postgresContainerStartAttempted = $postgresContainerStartAttempted
   redisContainerStartAttempted = $redisContainerStartAttempted
   postgresContainerPasswordAvailable = $containerPasswordAvailable

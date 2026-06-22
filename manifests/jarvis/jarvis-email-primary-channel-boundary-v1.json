@@ -1,0 +1,36 @@
+{
+  "schema": "kingsmen.jarvis-email-primary-channel-boundary.v1",
+  "module": "jarvis_email_primary_channel_boundary",
+  "status": "source_safe_pending_provider_runtime",
+  "productionReady": false,
+  "publicLaunchAllowed": false,
+  "doctrine": {
+    "emailPrimaryChannel": true,
+    "whatsappUrgentOnly": true,
+    "whatsappBulkAllowed": false,
+    "smsBackupOnly": true,
+    "backendGoverned": true,
+    "truthAuthority": "postgres_truth_vault",
+    "noRawSecrets": true,
+    "noFakeStatus": true,
+    "directProviderCallsFromWeb": false,
+    "browserMaySendEmailDirectly": false
+  },
+  "route": "/api/jarvis/email-primary-channel-boundary",
+  "commandEnvelope": "EMAIL_PRIMARY_CHANNEL_CHECK",
+  "proofScript": "scripts/staging/Invoke-KingsmenJarvisEmailPrimaryChannelBoundaryProof.ps1",
+  "validator": "scripts/validators/validate-jarvis-email-primary-channel-boundary.mjs",
+  "requiredEnv": [
+    "SMTP_HOST",
+    "SMTP_USER",
+    "SMTP_PASSWORD",
+    "EMAIL_FROM"
+  ],
+  "requiredProviderEvidence": [
+    "send_proof",
+    "receive_proof",
+    "bounce_proof",
+    "opt_out_proof",
+    "truth_vault_evidence_ledger_capture"
+  ]
+}

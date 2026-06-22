@@ -1,0 +1,38 @@
+{
+  "schema": "kingsmen.jarvis-completion-board-manifest.v1",
+  "module": "Jarvis Completion Board",
+  "status": "SOURCE_READY",
+  "productionReady": false,
+  "publicLaunchAllowed": false,
+  "dockerIndependentBuildAllowed": true,
+  "route": "/api/jarvis/completion-board",
+  "validator": "node scripts/validators/validate-jarvis-completion-board.mjs",
+  "sourceSafePurpose": "Continue Jarvis build work while local Docker/API runtime is blocked, without making fake production or runtime claims.",
+  "authorityRules": {
+    "postgresTruthVaultAuthority": true,
+    "airtableMirrorOnly": true,
+    "n8nThinRelayOnly": true,
+    "playwrightScoutOnly": true,
+    "emailPrimaryChannel": true,
+    "whatsappUrgentOnly": true,
+    "rawSecretsReturned": false,
+    "localShellExecutedFromWeb": false,
+    "directDatabaseAccessFromWeb": false
+  },
+  "completionLanes": [
+    "jarvis-command-surface",
+    "jarvis-live-index",
+    "jarvis-completion-board",
+    "openclaw-operator-policy",
+    "playwright-scout-map-fallback",
+    "n8n-thin-relay",
+    "github-tool-connector",
+    "airtable-human-mirror",
+    "email-primary-channel",
+    "whatsapp-urgent-sms-backup",
+    "payfast-provider-proof-queue",
+    "ai-provider-router",
+    "local-docker-runtime"
+  ],
+  "runtimeGate": "Backend API, postgres_truth_vault, provider credentials, staging evidence, and launch audit still control production readiness."
+}

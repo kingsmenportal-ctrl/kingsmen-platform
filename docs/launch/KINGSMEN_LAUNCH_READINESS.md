@@ -112,7 +112,7 @@ npm run security:prove:rls
 npm run security:validate:rls
 ```
 
-This does not authorize public candidate traffic. Apply the RLS hardening migration to staging and capture live SQL role-isolation proof.
+This RLS/security source-level boundary does not authorize public candidate traffic. Apply the RLS hardening migration to staging and capture live SQL role-isolation proof.
 
 ## Backup/restore proof command
 
@@ -166,6 +166,8 @@ Reports may show only configured/not-configured/masked status and must never pri
 npm run communications:prove
 npm run communications:validate
 ```
+
+This communications proof is source-level only and does not authorize live candidate messages.
 
 Provider staging proof still required: email send/receive, bounce handling, opt-out path, WhatsApp urgent-only approval evidence, SMS fallback-only evidence, and redacted evidence report.
 
@@ -258,12 +260,3 @@ npm run kingsmen:launch:gate
 ```
 
 The gate must remain blocked until the P0 launch blockers are fixed and evidenced.
-
-## Launch phases
-
-1. **Repo lock:** protect main, require validators, stop accidental package/release mistakes.
-2. **Staging runtime:** run API + web + PostgreSQL/Supabase + internal command flow + staging runtime proof pack.
-3. **Final assembly:** collect final assembly evidence bundle, founder-review every report, and keep public launch blocked until all P0 evidence passes.
-4. **Founder private beta:** process a small number of real test candidates manually with evidence.
-5. **Paid pilot:** only after PayFast, refunds, support, backup/restore, communications proof, legal/privacy proof, incident response, observability proof, staging pack, and final assembly evidence bundle pass.
-6. **Public launch:** only after every required launch gate opens.

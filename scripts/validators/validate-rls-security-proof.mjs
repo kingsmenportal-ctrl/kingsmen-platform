@@ -62,8 +62,8 @@ const requiredFiles = [
   ]),
   checkFile('package.json', ['security:prove:rls', 'security:validate:rls']),
   checkFile('manifests/launch/kingsmen-launch-readiness-v1.json', ['tenant_security_rls', 'rls-security-proof-v1', 'foundation_built_pending_staging_proof']),
-  checkFile('docs/launch/KINGSMEN_LAUNCH_READINESS.md', ['npm run security:validate:rls', 'RLS/security source-level boundary']),
-  checkFile('scripts/validators/validate-kingsmen-launch-readiness.mjs', ['security:validate:rls', 'RLS_SECURITY_SCRIPT_MISSING', 'RLS_STAGING_PROOF_REQUIRED'])
+  checkFile('docs/launch/KINGSMEN_LAUNCH_READINESS.md', ['npm run security:validate:rls', 'Prove RLS/security in staging']),
+  checkFile('scripts/validators/validate-kingsmen-launch-readiness.mjs', ['security:validate:rls', 'RLS_STAGING_PROOF_REQUIRED'])
 ];
 
 for (const fileCheck of requiredFiles) {

@@ -1,0 +1,37 @@
+{
+  "schema": "kingsmen.jarvis-github-tool-connector-boundary.v1",
+  "module": "Jarvis GitHub Tool Connector Boundary",
+  "status": "source_ready_pending_runtime_credentials_and_proof",
+  "productionReady": false,
+  "publicLaunchAllowed": false,
+  "connector": "github_tool_connector",
+  "group": "Tools",
+  "requiredCredentials": [
+    "KINGSMEN_GITHUB_REPOSITORY or GITHUB_REPOSITORY_FULL_NAME or GITHUB_REPOSITORY",
+    "GITHUB_TOKEN or GH_TOKEN"
+  ],
+  "requiredEvidence": [
+    "redacted_repository_metadata_read",
+    "backend_command_envelope",
+    "command_log",
+    "audit_events",
+    "idempotency_keys"
+  ],
+  "boundaries": {
+    "backendGoverned": true,
+    "noRawSecrets": true,
+    "providerCredentialsPrinted": false,
+    "directProviderCallsFromWeb": false,
+    "localShellExecutedFromWeb": false,
+    "directDatabaseAccessFromWeb": false,
+    "browserMayCallGitHubDirectly": false,
+    "jarvisMayStoreSecrets": false
+  },
+  "commands": {
+    "webRoute": "/api/jarvis/github-tool-connector-boundary",
+    "proofScript": "scripts/staging/Invoke-KingsmenJarvisGitHubToolConnectorBoundaryProof.ps1",
+    "validator": "scripts/validators/validate-jarvis-github-tool-connector-boundary.mjs",
+    "latestReport": "reports/jarvis/jarvis-github-tool-connector-boundary-proof-latest.json"
+  },
+  "nextAction": "Configure GitHub credentials outside Git, keep backend and web running, then run boundary proof."
+}

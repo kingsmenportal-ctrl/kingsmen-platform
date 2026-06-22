@@ -1,0 +1,44 @@
+{
+  "schema": "kingsmen.jarvis-whatsapp-urgent-sms-backup-boundary.v1",
+  "module": "jarvis_whatsapp_urgent_sms_backup_boundary",
+  "status": "source_ready_pending_runtime_proof",
+  "productionReady": false,
+  "publicLaunchAllowed": false,
+  "communicationDoctrine": {
+    "emailPrimaryChannel": true,
+    "whatsappUrgentOnly": true,
+    "whatsappBulkAllowed": false,
+    "smsBackupOnly": true,
+    "postgresTruthVault": "postgres_truth_vault"
+  },
+  "runtimeBoundary": {
+    "backendGoverned": true,
+    "backendBoundaryMode": "backend_api_only",
+    "noRawSecrets": true,
+    "providerCredentialsPrinted": false,
+    "directProviderCallsFromWeb": false,
+    "browserMaySendWhatsAppDirectly": false,
+    "browserMaySendSmsDirectly": false,
+    "browserMayBulkMessageDirectly": false
+  },
+  "proof": {
+    "commandEnvelope": "WHATSAPP_URGENT_SMS_BACKUP_CHECK",
+    "backendAction": "whatsapp_urgent_sms_backup_check",
+    "proofScript": "scripts/staging/Invoke-KingsmenJarvisWhatsAppUrgentSmsBackupBoundaryProof.ps1",
+    "latestReport": "reports/jarvis/jarvis-whatsapp-urgent-sms-backup-boundary-proof-latest.json"
+  },
+  "requiredEnvironment": [
+    "KINGSMEN_WHATSAPP_BUSINESS_ACCOUNT_ID",
+    "KINGSMEN_WHATSAPP_PHONE_NUMBER_ID",
+    "KINGSMEN_WHATSAPP_ACCESS_TOKEN",
+    "KINGSMEN_SMS_PROVIDER",
+    "KINGSMEN_SMS_API_KEY"
+  ],
+  "blockedUntil": [
+    "backend runtime reachable",
+    "postgres_truth_vault storage mode confirmed",
+    "urgent-only policy evidence captured",
+    "bulk WhatsApp path remains disabled",
+    "SMS backup-only evidence captured"
+  ]
+}

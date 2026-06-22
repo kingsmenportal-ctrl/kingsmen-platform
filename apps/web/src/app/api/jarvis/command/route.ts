@@ -80,6 +80,90 @@ const registry = {
     category: "OpenClaw",
     risk: "SAFE_READ",
     backendAction: "openclaw_grip_check"
+  },
+  OPENCLAW_OPERATOR_POLICY_CHECK: {
+    title: "OpenClaw operator policy check",
+    category: "OpenClaw",
+    risk: "SAFE_READ",
+    backendAction: "openclaw_operator_policy_check"
+  },
+  COMMAND_PERSISTENCE_PROOF: {
+    title: "Truth Vault command evidence",
+    category: "Evidence",
+    risk: "SAFE_READ",
+    backendAction: "jarvis_command_persistence_proof"
+  },
+  AI_PROVIDER_ROUTER_CHECK: {
+    title: "AI provider router check",
+    category: "AI",
+    risk: "SAFE_READ",
+    backendAction: "ai_provider_router_check"
+  },
+  GITHUB_TOOL_CONNECTOR_CHECK: {
+    title: "GitHub tool connector check",
+    category: "Tools",
+    risk: "SAFE_READ",
+    backendAction: "github_tool_connector_check"
+  },
+  AIRTABLE_HUMAN_MIRROR_CHECK: {
+    title: "Airtable human mirror check",
+    category: "Apps",
+    risk: "SAFE_READ",
+    backendAction: "airtable_human_mirror_check"
+  },
+  EMAIL_PRIMARY_CHANNEL_CHECK: {
+    title: "Email primary channel check",
+    category: "Communications",
+    risk: "SAFE_READ",
+    backendAction: "email_primary_channel_check"
+  },
+  WHATSAPP_URGENT_SMS_BACKUP_CHECK: {
+    title: "WhatsApp urgent SMS backup check",
+    category: "Communications",
+    risk: "SAFE_READ",
+    backendAction: "whatsapp_urgent_sms_backup_check"
+  },
+  PAYFAST_PROVIDER_PROOF_QUEUE_CHECK: {
+    title: "PayFast provider proof queue check",
+    category: "Payments",
+    risk: "SAFE_READ",
+    backendAction: "payfast_provider_proof_queue_check"
+  },
+  N8N_THIN_RELAY_CHECK: {
+    title: "n8n thin relay check",
+    category: "Automation",
+    risk: "SAFE_READ",
+    backendAction: "n8n_thin_relay_check"
+  },
+  PLAYWRIGHT_SCOUT_MAP_FALLBACK_CHECK: {
+    title: "Playwright scout MAP fallback check",
+    category: "Automation",
+    risk: "SAFE_READ",
+    backendAction: "playwright_scout_map_fallback_check"
+  },
+  TOOLS_APPS_AGENTS_INDEX: {
+    title: "Tools, apps, agents index",
+    category: "Technology",
+    risk: "SAFE_READ",
+    backendAction: "tools_apps_agents_index"
+  },
+  AI_TOOLS_RUNTIME_READINESS: {
+    title: "AI tools runtime readiness",
+    category: "Technology",
+    risk: "SAFE_READ",
+    backendAction: "ai_tools_runtime_readiness"
+  },
+  PAYFAST_STAGING_EVIDENCE: {
+    title: "PayFast staging evidence",
+    category: "Payments",
+    risk: "SAFE_READ",
+    backendAction: "payfast_staging_evidence"
+  },
+  EVIDENCE_BUNDLE_REVIEW: {
+    title: "Final evidence bundle review",
+    category: "Evidence",
+    risk: "SAFE_READ",
+    backendAction: "evidence_bundle_review"
   }
 } satisfies Record<string, CommandRegistryEntry>;
 
@@ -139,6 +223,9 @@ export async function POST(request: NextRequest) {
       risk: command.risk,
       requestedAtIso: startedAt.toISOString(),
       webBoundary: "backend_api_only",
+      truthVaultEvidenceExpected: true,
+      commandLogTable: "command_log",
+      auditEventExpected: "command.accepted",
       localShellExecuted: false,
       localFileWritten: false,
       directDatabaseAccessFromWeb: false
@@ -163,7 +250,7 @@ export async function POST(request: NextRequest) {
       finishedAt: finishedAt.toISOString(),
       durationMs: finishedAt.getTime() - startedAt.getTime(),
       stdout: ok
-        ? "Jarvis command envelope accepted by backend API boundary. The web route did not execute local commands."
+        ? "Jarvis command envelope accepted by backend API boundary. The web route did not execute local commands. PostgreSQL Truth Vault evidence is expected when storageMode is postgres_truth_vault."
         : "",
       stderr: ok ? "" : backend.error ?? "Backend API boundary did not accept the command envelope.",
       backendStatus: backend.status,
@@ -171,11 +258,12 @@ export async function POST(request: NextRequest) {
       backendPolicy: backend.data?.policy ?? null,
       backendBoundary: backend.boundary,
       evidencePath: null,
+      truthVaultEvidenceExpected: true,
       localShellExecuted: false,
       localFileWritten: false,
       directDatabaseAccessFromWeb: false,
       message: ok
-        ? "Jarvis command was handed to the backend command boundary. Evidence must be recorded by the backend/Truth Vault layer."
+        ? "Jarvis command was handed to the backend command boundary. In postgres_truth_vault mode, the backend records command_log plus audit_events evidence."
         : "Jarvis command was not accepted by the backend boundary. Configure or repair KINGSMEN_BACKEND_BASE_URL."
     },
     { status: ok ? 202 : 502 }

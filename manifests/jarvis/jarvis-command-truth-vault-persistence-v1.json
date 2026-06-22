@@ -1,0 +1,28 @@
+{
+  "schema": "kingsmen.jarvis-command-truth-vault-persistence.v1",
+  "module": "Jarvis Command Truth Vault Persistence",
+  "productionReady": false,
+  "publicLaunchAllowed": false,
+  "backendApiBoundaryRequired": true,
+  "postgresTruthVaultRequired": true,
+  "webLocalShellExecutionAllowed": false,
+  "webDirectDatabaseAccessAllowed": false,
+  "rawSecretsReturned": false,
+  "noFakeData": true,
+  "requiredEvidence": [
+    "apps/web/src/app/api/jarvis/command/route.ts",
+    "apps/api/src/server.ts",
+    "apps/api/src/db/truth-vault-repository.ts",
+    "command_log",
+    "audit_events",
+    "idempotency_keys"
+  ],
+  "runtimeProofStatus": "foundation_built_pending_postgres_runtime_command_proof",
+  "acceptedCommandEvidence": {
+    "route": "POST /api/commands",
+    "storageMode": "postgres_truth_vault",
+    "commandTable": "command_log",
+    "auditEvent": "command.accepted",
+    "idempotencyTable": "idempotency_keys"
+  }
+}
