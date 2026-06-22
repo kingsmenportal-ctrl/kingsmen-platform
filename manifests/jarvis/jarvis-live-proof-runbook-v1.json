@@ -1,0 +1,35 @@
+{
+  "schema": "kingsmen.jarvis-live-proof-runbook.v1",
+  "module": "Jarvis Live Proof Runbook",
+  "status": "SOURCE_READY",
+  "jarvisSourceDesignComplete": true,
+  "jarvisRuntimeLive": false,
+  "productionReady": false,
+  "publicLaunchAllowed": false,
+  "launchBlocked": true,
+  "dockerIndependentBuildAllowed": true,
+  "routes": [
+    "/api/jarvis/live-proof-runbook",
+    "/founder/launch-control/jarvis-live-proof-runbook",
+    "/jarvis/final"
+  ],
+  "validator": "node scripts/validators/validate-jarvis-live-proof-runbook.mjs",
+  "phases": [
+    "source-seal-validate",
+    "docker-api-truth-vault-runtime",
+    "ai-provider-live-proof",
+    "email-primary-proof",
+    "payfast-itn-proof",
+    "n8n-airtable-github-runtime",
+    "branch-protection-launch-audit"
+  ],
+  "boundaries": {
+    "noFakeData": true,
+    "rawSecretsReturned": false,
+    "secretValuesReturned": false,
+    "localShellExecuted": false,
+    "directDatabaseAccessFromWeb": false,
+    "noDirectProviderCallsFromWeb": true
+  },
+  "nextAction": "Clear the runbook phases with real evidence. Do not skip failed gates."
+}
