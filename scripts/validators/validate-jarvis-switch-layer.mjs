@@ -6,9 +6,10 @@ const root = process.cwd();
 const checks = [
   ['switch_api', 'apps/web/src/app/api/jarvis/switch-request/route.ts', 'JARVIS_SWITCH_REQUEST_BLOCKED'],
   ['switch_page', 'apps/web/src/app/admin/jarvis-switch/page.tsx', 'Controlled Switch Request'],
-  ['switch_simulator', 'scripts/jarvis/simulate-jarvis-controlled-switch.mjs', 'JARVIS_CONTROLLED_SWITCH_SIMULATION_BLOCKED'],
+  ['switch_simulator', 'scripts/jarvis/simulate-jarvis-switch-request.mjs', 'JARVIS_SWITCH_REQUEST_BLOCKED'],
   ['admin_link', 'apps/web/src/app/admin/page.tsx', '/admin/jarvis-switch'],
   ['readiness_api', 'apps/web/src/app/api/jarvis/live-readiness/route.ts', 'JARVIS_LIVE_READINESS_BLOCKED'],
+  ['package_script', 'package.json', 'jarvis:switch:request']
 ];
 
 const results = checks.map(([name, file, token]) => {
