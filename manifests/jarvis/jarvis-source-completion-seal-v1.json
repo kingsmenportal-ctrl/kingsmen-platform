@@ -1,0 +1,45 @@
+{
+  "schema": "kingsmen.jarvis-source-completion-seal.v1",
+  "module": "Jarvis Source Completion Seal",
+  "status": "SOURCE_DESIGN_SEALED",
+  "jarvisSourceDesignComplete": true,
+  "jarvisRuntimeLive": false,
+  "productionReady": false,
+  "publicLaunchAllowed": false,
+  "launchBlocked": true,
+  "dockerIndependentBuildAllowed": true,
+  "sourceSurfaces": [
+    "/jarvis/final",
+    "/api/jarvis/completion-board",
+    "/founder/providers/jarvis-credentials",
+    "/api/jarvis/evidence-collector",
+    "/api/jarvis/source-launch-gate",
+    "/api/jarvis/proof-pack-index",
+    "/founder/launch-control/jarvis",
+    "/api/jarvis/source-completion-seal"
+  ],
+  "remainingLiveBlockers": [
+    "backend_truth_vault_runtime_proof",
+    "provider_runtime_proofs",
+    "security_launch_proof",
+    "final_launch_audit"
+  ],
+  "boundaries": {
+    "noFakeData": true,
+    "rawSecretsReturned": false,
+    "secretValuesReturned": false,
+    "localShellExecuted": false,
+    "directDatabaseAccessFromWeb": false,
+    "noDirectProviderCallsFromWeb": true,
+    "postgresTruthVaultRemainsAuthority": true,
+    "emailPrimaryChannel": true,
+    "whatsappUrgentOnly": true,
+    "smsBackupOnly": true,
+    "airtableMirrorOnly": true,
+    "n8nThinRelayOnly": true,
+    "playwrightScoutOnly": true,
+    "openClawOperatorOnly": true
+  },
+  "validator": "node scripts/validators/validate-jarvis-source-completion-seal.mjs",
+  "build": "npm --prefix apps/web run build"
+}
