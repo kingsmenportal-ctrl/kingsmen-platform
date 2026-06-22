@@ -10,6 +10,7 @@ const validators = [
   "scripts/validators/validate-jarvis-final-command-room.mjs",
   "scripts/validators/validate-jarvis-final-command-room-live-proof-queue.mjs",
   "scripts/validators/validate-jarvis-live-proof-runbook.mjs",
+  "scripts/validators/validate-jarvis-live-proof-evidence-ledger.mjs",
   "scripts/validators/validate-jarvis-final-launch-control.mjs",
   "scripts/validators/validate-jarvis-source-completion-seal.mjs",
   "scripts/validators/validate-jarvis-live-proof-queue.mjs",
@@ -29,6 +30,7 @@ const manifests = [
   "manifests/jarvis/jarvis-source-completion-seal-v1.json",
   "manifests/jarvis/jarvis-live-proof-queue-v1.json",
   "manifests/jarvis/jarvis-live-proof-runbook-v1.json",
+  "manifests/jarvis/jarvis-live-proof-evidence-ledger-v1.json",
   "manifests/jarvis/jarvis-openclaw-operator-policy-boundary-v1.json",
   "manifests/jarvis/jarvis-playwright-scout-map-fallback-boundary-v1.json"
 ];
@@ -38,6 +40,7 @@ const routes = [
   "/jarvis/final",
   "/founder/providers/jarvis-credentials",
   "/founder/proof-centre/jarvis",
+  "/founder/proof-centre/jarvis-live-proof-evidence-ledger",
   "/founder/launch-control/jarvis",
   "/founder/launch-control/jarvis-source-seal",
   "/founder/launch-control/jarvis-live-proof-queue",
@@ -47,6 +50,7 @@ const routes = [
   "/api/jarvis/source-completion-seal",
   "/api/jarvis/live-proof-queue",
   "/api/jarvis/live-proof-runbook",
+  "/api/jarvis/live-proof-evidence-ledger",
   "/api/jarvis/completion-board",
   "/api/jarvis/provider-credential-checklist",
   "/api/jarvis/evidence-collector",
@@ -75,6 +79,12 @@ const blockers = [
     detail: "Runbook phases must be cleared in order with real evidence before production launch."
   },
   {
+    id: "live-proof-evidence-ledger",
+    title: "Live proof evidence ledger not accepted",
+    state: "PENDING",
+    detail: "Launch-critical evidence ledger entries must move from missing/blocked to accepted before public launch."
+  },
+  {
     id: "provider-credentials",
     title: "Provider credentials outside Git",
     state: "PENDING",
@@ -101,6 +111,7 @@ export async function GET() {
     jarvisSourceCompletionSealIndexed: true,
     jarvisLiveProofQueueIndexed: true,
     jarvisLiveProofRunbookIndexed: true,
+    jarvisLiveProofEvidenceLedgerIndexed: true,
     dockerIndependentBuildAllowed: true,
     noFakeData: true,
     rawSecretsReturned: false,
@@ -112,6 +123,6 @@ export async function GET() {
     manifests,
     routes,
     blockers,
-    nextAction: "Jarvis source/design is sealed. Clear live proof queue, runbook, provider, security, and final launch audit blockers before public launch."
+    nextAction: "Jarvis source/design is sealed. Clear live proof queue, runbook, evidence ledger, provider, security, and final launch audit blockers before public launch."
   });
 }
