@@ -1,0 +1,32 @@
+{
+  "schema": "kingsmen.jarvis-live-runtime.v1",
+  "status": "JARVIS_LIVE_RUNTIME_SURFACE_ADDED",
+  "productionReady": false,
+  "publicLaunchAllowed": false,
+  "coreRuntime": "packages/jarvis-core/src/jarvis-runtime-controller.ts",
+  "webRuntimeRoute": "apps/web/src/app/api/jarvis/runtime-control/route.ts",
+  "validators": [
+    "scripts/validators/validate-jarvis-runtime-controller.mjs",
+    "scripts/validators/validate-jarvis-runtime-live-route.mjs"
+  ],
+  "capabilities": {
+    "receivesCommand": true,
+    "checksPolicyGate": true,
+    "checksLaunchEvidenceState": true,
+    "requiresFounderApprovalWhereNeeded": true,
+    "returnsExactReason": true,
+    "blocksUnsafeActions": true,
+    "allowsSafeActions": true,
+    "dryRunDefaultSafe": true,
+    "backendLedgerBoundaryAvailable": true,
+    "localShellExecuted": false,
+    "localFileWrittenFromWebRoute": false,
+    "directDatabaseAccessFromWebRoute": false
+  },
+  "externalGatesStillRequiredForPublicLaunch": [
+    "PayFast sandbox ITN evidence",
+    "communications provider proof with real provider values",
+    "main branch protection or approved account-level decision",
+    "final assembly founder review"
+  ]
+}
