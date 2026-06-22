@@ -4,6 +4,7 @@ import path from 'node:path';
 
 const repoRoot = process.cwd();
 const runtimePath = path.join(repoRoot, 'packages/jarvis-core/src/jarvis-runtime-controller.ts');
+const policyPath = path.join(repoRoot, 'packages/jarvis-core/src/jarvis-policy-gate.ts');
 const indexPath = path.join(repoRoot, 'packages/jarvis-core/src/index.ts');
 
 function fail(code, detail) {
@@ -20,9 +21,11 @@ function fail(code, detail) {
 }
 
 if (!fs.existsSync(runtimePath)) fail('MISSING_RUNTIME_CONTROLLER', runtimePath);
+if (!fs.existsSync(policyPath)) fail('MISSING_POLICY_GATE', policyPath);
 if (!fs.existsSync(indexPath)) fail('MISSING_JARVIS_INDEX', indexPath);
 
 const runtime = fs.readFileSync(runtimePath, 'utf8');
+const policyGate = fs.readFileSync(policyPath, 'utf8');
 const index = fs.readFileSync(indexPath, 'utf8');
 
 const requiredRuntimeTokens = [
@@ -54,15 +57,17 @@ if (!index.includes("export * from './jarvis-runtime-controller';")) {
   fail('RUNTIME_CONTROLLER_NOT_EXPORTED', 'packages/jarvis-core/src/index.ts must export jarvis-runtime-controller');
 }
 
-const unsafePatterns = [
-  /force production without approval/i,
-  /skip validators/i,
-  /bypass otp/i,
-  /bypass captcha/i,
+const policyRequiredTokens = [
+  'BLOCKED_TERMS',
+  'bypass captcha',
+  'bypass otp',
+  'skip validators',
+  'force production without approval',
+  'JARVIS_BLOCKED_UNSAFE_ACTION',
 ];
-const unsafeMissing = unsafePatterns.filter((pattern) => !runtime.match(pattern));
-if (unsafeMissing.length === unsafePatterns.length) {
-  fail('BLOCKED_ACTION_CONTEXT_NOT_PRESENT', 'Runtime controller must remain integrated with policy gate blocked-action semantics.');
+const missingPolicyTokens = policyRequiredTokens.filter((token) => !policyGate.includes(token));
+if (missingPolicyTokens.length > 0) {
+  fail('POLICY_GATE_BLOCKED_TERMS_MISSING', { missingPolicyTokens });
 }
 
 const report = {
@@ -77,6 +82,7 @@ const report = {
     launchEvidenceGateIntegrated: true,
     founderApprovalHandled: true,
     exactReasonReturned: true,
+    blockedTermsRemainInPolicyGate: true,
   },
   generatedAtIso: new Date().toISOString(),
 };
