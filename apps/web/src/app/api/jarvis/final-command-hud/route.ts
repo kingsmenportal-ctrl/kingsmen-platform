@@ -12,6 +12,13 @@ const sourceSurfaces = [
     detail: "Primary founder command surface with command envelopes, voice, visual feed, completion board, live index, and evidence drawer."
   },
   {
+    id: "jarvis-final-hud",
+    title: "Jarvis Final HUD",
+    href: "/jarvis/final",
+    state: "SOURCE_READY",
+    detail: "Final command room combining completion board, provider credentials, evidence collector, source launch gate, proof pack, and runtime blockers."
+  },
+  {
     id: "completion-board",
     title: "Completion Board",
     href: "/api/jarvis/completion-board",
@@ -24,6 +31,27 @@ const sourceSurfaces = [
     href: "/founder/providers/jarvis-credentials",
     state: "SOURCE_READY",
     detail: "Founder screen showing required credential names only. It never returns secret values."
+  },
+  {
+    id: "evidence-collector",
+    title: "Evidence Collector",
+    href: "/api/jarvis/evidence-collector",
+    state: "SOURCE_READY",
+    detail: "Evidence map separating captured source/runtime evidence from blocked and pending provider proof."
+  },
+  {
+    id: "source-launch-gate",
+    title: "Source Launch Gate",
+    href: "/api/jarvis/source-launch-gate",
+    state: "SOURCE_READY",
+    detail: "Launch gate source map showing passed source gates and remaining runtime, provider, security, and final audit blockers."
+  },
+  {
+    id: "proof-pack-index",
+    title: "Proof Pack Index",
+    href: "/api/jarvis/proof-pack-index",
+    state: "SOURCE_READY",
+    detail: "Index of validators, reports, manifests, routes, and blockers used to finish Jarvis without fake readiness."
   },
   {
     id: "live-index",
@@ -66,6 +94,7 @@ export async function GET() {
     module: "Jarvis Final Command HUD",
     generatedAt: new Date().toISOString(),
     jarvisSourceDesignComplete: true,
+    jarvisFinalCommandRoomConnected: true,
     productionReady: false,
     publicLaunchAllowed: false,
     dockerIndependentBuildAllowed: true,
@@ -92,11 +121,12 @@ export async function GET() {
       "Jarvis completion board summary",
       "Live index readiness map",
       "Provider credential checklist access",
-      "Evidence drawer and proof references",
-      "Voice and visual context section",
+      "Evidence collector and proof references",
+      "Source launch gate board",
+      "Proof-pack index and blocker map",
       "Runtime blocker banner",
       "No fake data and no secret exposure locks"
     ],
-    nextAction: "Use /jarvis/final as the source-complete Jarvis command HUD, then finish provider runtime proofs when infrastructure and credentials are ready."
+    nextAction: "Use /jarvis/final as the connected Jarvis command room, then clear runtime, provider, security, and final launch audit blockers."
   });
 }
