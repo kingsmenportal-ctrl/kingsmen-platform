@@ -1,0 +1,34 @@
+{
+  "schema": "kingsmen.manifest.v1",
+  "module": "Jarvis n8n Airtable GitHub Runtime Proof Gate",
+  "route": "/api/jarvis/n8n-airtable-github-runtime-proof",
+  "founderPage": "/founder/launch-control/jarvis-provider-tool-runtime-proof",
+  "validator": "scripts/validators/validate-jarvis-n8n-airtable-github-runtime-proof.mjs",
+  "productionReady": false,
+  "publicLaunchAllowed": false,
+  "dockerIndependentBuildAllowed": true,
+  "providerToolProofAccepted": false,
+  "n8nThinRelayAccepted": false,
+  "airtableMirrorAccepted": false,
+  "githubConnectorAccepted": false,
+  "locks": {
+    "noFakeData": true,
+    "rawSecretsReturned": false,
+    "secretValuesReturned": false,
+    "localShellExecuted": false,
+    "directDatabaseAccessFromWeb": false,
+    "noDirectProviderCallsFromWeb": true,
+    "postgresTruthVaultRemainsAuthority": true,
+    "n8nThinRelayOnly": true,
+    "airtableMirrorOnly": true,
+    "githubTokensMayBeReturned": false
+  },
+  "requiredEvidence": [
+    "n8n thin relay runtime proof",
+    "Airtable human mirror runtime proof",
+    "GitHub connector runtime proof",
+    "Truth Vault authority proof",
+    "redacted output proof",
+    "no token exposure proof"
+  ]
+}
