@@ -98,9 +98,10 @@ const gates: AcceptanceGate[] = [
     state: "PENDING_EVIDENCE",
     launchCritical: true,
     proofQueueRef: "n8n-thin-relay-proof/airtable-human-mirror-proof/github-tool-runtime-proof",
-    acceptanceRule: "Accept only when n8n proves thin relay, Airtable proves mirror-only, GitHub proves controlled connector use, and all token values remain hidden.",
-    rejectionRule: "Reject any evidence where n8n or Airtable becomes authority, browser calls providers directly, or raw tokens are shown.",
-    requiredEvidence: ["n8n backend-mediated proof", "Airtable mirror reconciliation", "GitHub redacted metadata", "no token exposure", "audit trail"]
+    proofGateRoute: "/api/jarvis/n8n-airtable-github-runtime-proof",
+    acceptanceRule: "Accept only when n8n proves thin relay, Airtable proves mirror-only, GitHub proves controlled connector use, Truth Vault remains authority, and all token values remain hidden.",
+    rejectionRule: "Reject any evidence where n8n or Airtable becomes authority, browser calls providers directly, provider proof is only a static source route, or raw tokens are shown.",
+    requiredEvidence: ["n8n backend-mediated proof", "Airtable mirror reconciliation", "GitHub redacted metadata", "no token exposure", "Truth Vault authority proof", "audit trail"]
   },
   {
     id: "branch-protection-launch-audit-acceptance",
@@ -136,6 +137,7 @@ export async function GET() {
     dockerRuntimeProofGateConnected: true,
     aiEmailProviderProofGateConnected: true,
     payfastAcceptedItnProofGateConnected: true,
+    n8nAirtableGithubRuntimeProofGateConnected: true,
     jarvisRuntimeLive: false,
     productionReady: false,
     publicLaunchAllowed: false,
@@ -153,6 +155,6 @@ export async function GET() {
     counts,
     gates,
     launchBlocking,
-    nextAction: "Capture real Docker, AI, Email, PayFast ITN, provider, and security evidence, then move each gate from blocked or pending to accepted."
+    nextAction: "Capture real Docker, AI, Email, PayFast ITN, provider-tool, and security evidence, then move each gate from blocked or pending to accepted."
   });
 }
