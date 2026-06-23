@@ -104,8 +104,9 @@ const ledgerItems: EvidenceLedgerItem[] = [
     evidenceClass: "payment",
     acceptedEvidence: [],
     missingEvidence: ["sandbox checkout proof", "accepted ITN proof", "duplicate ITN rejection", "failed payment rejection", "refund review boundary", "founder approval"],
-    rejectionRules: ["reject if return URL marks paid", "reject if cancel URL marks paid", "reject if duplicate ITN is accepted"],
-    storageTarget: "reports/jarvis/payfast-accepted-itn-proof.json"
+    rejectionRules: ["reject if return URL marks paid", "reject if cancel URL marks paid", "reject if duplicate ITN is accepted", "reject if failed/pending/cancelled payment marks paid", "reject if founder approval is missing"],
+    storageTarget: "reports/jarvis/payfast-accepted-itn-proof.json",
+    proofGateRoute: "/api/jarvis/payfast-accepted-itn-proof"
   },
   {
     id: "n8n-airtable-github-evidence",
@@ -152,6 +153,7 @@ export async function GET() {
     jarvisSourceReady: true,
     dockerRuntimeProofGateConnected: true,
     aiEmailProviderProofGateConnected: true,
+    payfastAcceptedItnProofGateConnected: true,
     jarvisRuntimeLive: false,
     productionReady: false,
     publicLaunchAllowed: false,
@@ -166,6 +168,6 @@ export async function GET() {
     noDirectProviderCallsFromWeb: true,
     counts,
     ledgerItems,
-    nextAction: "Capture missing runtime/provider/security evidence, reject unsafe evidence, and keep launch blocked until all launch-critical ledger items are accepted."
+    nextAction: "Capture missing runtime/provider/security/payment evidence, reject unsafe evidence, and keep launch blocked until all launch-critical ledger items are accepted."
   });
 }
