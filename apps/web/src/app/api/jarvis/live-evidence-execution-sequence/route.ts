@@ -78,6 +78,8 @@ export async function GET() {
     module: "Jarvis Live Evidence Execution Sequence",
     generatedAt: new Date().toISOString(),
     sourceExecutionSequenceReady: true,
+    manualOperatorExecutionRequired: true,
+    browserMayExecuteLocalShell: false,
     liveEvidenceAccepted: false,
     jarvisRuntimeLive: false,
     productionReady: false,
@@ -91,10 +93,9 @@ export async function GET() {
     localShellExecutedFromBrowser: false,
     directDatabaseAccessFromWeb: false,
     noDirectProviderCallsFromWeb: true,
-    sequenceRunner: "scripts/proof/run-jarvis-live-evidence-capture-sequence.mjs",
     sequenceReportPath: "reports/jarvis/jarvis-live-evidence-execution-sequence-latest.json",
     sequenceValidator: "scripts/validators/validate-jarvis-live-evidence-execution-sequence.mjs",
     executionSteps,
-    nextAction: "Run the sequence only when runtime and accepted evidence files are available. Do not call Jarvis live until the acceptance pack passes and final audit approves."
+    nextAction: "Run each evidence command manually in order when runtime and accepted evidence files are available. Do not call Jarvis live until the acceptance pack passes and final audit approves."
   });
 }
