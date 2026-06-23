@@ -1,0 +1,30 @@
+{
+  "schema": "kingsmen.jarvis-runtime-evidence-capture-manifest.v1",
+  "module": "Jarvis Docker / API / Truth Vault Runtime Evidence Capture",
+  "status": "SOURCE_READY_RUNTIME_PENDING",
+  "runner": "scripts/proof/capture-jarvis-docker-truth-vault-runtime-evidence.mjs",
+  "validator": "scripts/validators/validate-jarvis-docker-truth-vault-runtime-evidence-capture.mjs",
+  "report": "reports/jarvis/jarvis-docker-truth-vault-runtime-evidence-capture-latest.json",
+  "apiRoute": "/api/jarvis/docker-truth-vault-runtime-proof",
+  "productionReady": false,
+  "publicLaunchAllowed": false,
+  "jarvisRuntimeLive": false,
+  "acceptedOnlyWhen": [
+    "apiHealthHttp200",
+    "storageModePostgresTruthVault",
+    "truthVaultHealthOk",
+    "jarvisCommandAcceptedByBackend",
+    "commandResponseStorageModePostgresTruthVault",
+    "redactedRuntimeOutput",
+    "noRawSecretsReturned",
+    "noBrowserDirectDatabaseAccess"
+  ],
+  "forbidden": [
+    "rawSecretValues",
+    "browserDirectDatabaseAccess",
+    "browserShellExecution",
+    "providerCallsFromWeb",
+    "fakeRuntimeReady"
+  ],
+  "nextAction": "Capture evidence only when backend runtime is available. Until the report passes, Jarvis remains not live."
+}
