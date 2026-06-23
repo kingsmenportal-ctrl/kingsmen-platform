@@ -1,0 +1,28 @@
+{
+  "schema": "kingsmen.manifest.v1",
+  "module": "Jarvis Final Source Closeout Seal",
+  "sourceControlBatchesRemaining": 0,
+  "liveProofBatchesRemaining": 5,
+  "productionReady": false,
+  "publicLaunchAllowed": false,
+  "dockerIndependentBuildAllowed": true,
+  "noFakeData": true,
+  "rawSecretsReturned": false,
+  "secretValuesReturned": false,
+  "localShellExecuted": false,
+  "directDatabaseAccessFromWeb": false,
+  "routes": [
+    "/api/jarvis/final-source-closeout-seal",
+    "/founder/launch-control/jarvis-final-source-closeout",
+    "/jarvis/final"
+  ],
+  "validator": "scripts/validators/validate-jarvis-final-source-closeout-seal.mjs",
+  "closeoutDecision": "SOURCE_CLOSED_OUT__LIVE_PROOF_REMAINS",
+  "remainingLiveProofBatches": [
+    "Docker/API/Truth Vault runtime proof",
+    "AI + Email provider live proof",
+    "PayFast accepted ITN proof",
+    "n8n + Airtable + GitHub runtime proof",
+    "Branch protection + final launch audit"
+  ]
+}
