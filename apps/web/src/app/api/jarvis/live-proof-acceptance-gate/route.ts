@@ -11,6 +11,7 @@ type AcceptanceGate = {
   state: AcceptanceState;
   launchCritical: boolean;
   proofQueueRef: string;
+  proofGateRoute?: string;
   acceptanceRule: string;
   rejectionRule: string;
   requiredEvidence: string[];
@@ -53,9 +54,10 @@ const gates: AcceptanceGate[] = [
     state: "BLOCKED",
     launchCritical: true,
     proofQueueRef: "docker-api-truth-vault-runtime",
-    acceptanceRule: "Accept only when API health returns HTTP 200, storage mode proves postgres_truth_vault, command log write proof exists, and audit event write proof exists.",
+    proofGateRoute: "/api/jarvis/docker-truth-vault-runtime-proof",
+    acceptanceRule: "Accept only when API health returns HTTP 200, storage mode proves postgres_truth_vault, command log write proof exists, audit event write proof exists, and redacted runtime proof is captured.",
     rejectionRule: "Reject any claim based on a web-only route, local UI success, Docker screenshot, or static source validator without backend health and Truth Vault write evidence.",
-    requiredEvidence: ["API health HTTP 200", "postgres_truth_vault mode", "command_log write proof", "audit_events write proof"]
+    requiredEvidence: ["Docker engine reachable", "API health HTTP 200", "postgres_truth_vault mode", "command_log write proof", "audit_events write proof", "redacted runtime output"]
   },
   {
     id: "ai-provider-acceptance",
@@ -128,6 +130,7 @@ export async function GET() {
     module: "Jarvis Live Proof Acceptance Gate",
     generatedAt: new Date().toISOString(),
     jarvisSourceReady: true,
+    dockerRuntimeProofGateConnected: true,
     jarvisRuntimeLive: false,
     productionReady: false,
     publicLaunchAllowed: false,
