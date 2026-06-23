@@ -2,12 +2,13 @@ export const dynamic = "force-dynamic";
 
 type SequencePayload = {
   sourceExecutionSequenceReady: boolean;
+  manualOperatorExecutionRequired: boolean;
+  browserMayExecuteLocalShell: boolean;
   liveEvidenceAccepted: boolean;
   jarvisRuntimeLive: boolean;
   productionReady: boolean;
   publicLaunchAllowed: boolean;
   launchBlocked: boolean;
-  sequenceRunner: string;
   sequenceReportPath: string;
   sequenceValidator: string;
   executionSteps: Array<{
@@ -71,12 +72,14 @@ export default async function JarvisLiveEvidenceExecutionSequencePage() {
           <p style={label}>Kingsmen · Jarvis live evidence execution sequence</p>
           <h1 style={{ margin: "10px 0", fontSize: "clamp(2.4rem, 6vw, 5.4rem)", lineHeight: 0.9 }}>Evidence execution, not fake launch</h1>
           <p style={{ ...p, maxWidth: 980 }}>
-            This page gives the ordered evidence capture sequence for moving Jarvis from source-closeout to final live evidence acceptance. It does not run shell from the browser and it does not expose secret values.
+            This page gives the ordered evidence capture sequence for moving Jarvis from source-closeout to final live evidence acceptance. The browser cannot run local shell and it cannot expose secret values.
           </p>
         </section>
 
         <section style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(220px, 1fr))", gap: 12 }}>
           <article style={card}><p style={label}>Sequence ready</p><strong>{String(data?.sourceExecutionSequenceReady ?? false)}</strong></article>
+          <article style={card}><p style={label}>Manual operator</p><strong>{String(data?.manualOperatorExecutionRequired ?? true)}</strong></article>
+          <article style={card}><p style={label}>Browser shell</p><strong>{String(data?.browserMayExecuteLocalShell ?? false)}</strong></article>
           <article style={card}><p style={label}>Runtime live</p><strong>{String(data?.jarvisRuntimeLive ?? false)}</strong></article>
           <article style={card}><p style={label}>Production</p><strong>{String(data?.productionReady ?? false)}</strong></article>
           <article style={card}><p style={label}>Public launch</p><strong>{String(data?.publicLaunchAllowed ?? false)}</strong></article>
@@ -84,8 +87,8 @@ export default async function JarvisLiveEvidenceExecutionSequencePage() {
         </section>
 
         <section style={card}>
-          <p style={label}>Single sequence runner</p>
-          <code style={code}>node {data?.sequenceRunner ?? "scripts/proof/run-jarvis-live-evidence-capture-sequence.mjs"}</code>
+          <p style={label}>Manual execution lock</p>
+          <p style={p}>These commands must be run by the operator in the repo runtime. The page only displays the sequence; it does not execute commands.</p>
           <p style={{ ...p, marginTop: 10 }}>Report: {data?.sequenceReportPath ?? "reports/jarvis/jarvis-live-evidence-execution-sequence-latest.json"}</p>
           <p style={p}>Validator: {data?.sequenceValidator ?? "scripts/validators/validate-jarvis-live-evidence-execution-sequence.mjs"}</p>
         </section>
