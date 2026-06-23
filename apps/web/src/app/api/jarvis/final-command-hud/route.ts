@@ -16,7 +16,7 @@ const sourceSurfaces = [
     title: "Jarvis Final HUD",
     href: "/jarvis/final",
     state: "SOURCE_READY",
-    detail: "Final command room combining completion board, provider credentials, evidence collector, source launch gate, proof pack, live proof queue, live proof runbook, live proof evidence ledger, and runtime blockers."
+    detail: "Final command room combining completion board, provider credentials, evidence collector, source launch gate, proof pack, live proof queue, live proof runbook, evidence ledger, acceptance gate, and runtime blockers."
   },
   {
     id: "live-proof-queue",
@@ -38,6 +38,13 @@ const sourceSurfaces = [
     href: "/founder/proof-centre/jarvis-live-proof-evidence-ledger",
     state: "SOURCE_READY",
     detail: "Evidence acceptance ledger for source, runtime, provider, payment, and security proof. Missing evidence keeps Jarvis blocked from launch."
+  },
+  {
+    id: "live-proof-acceptance-gate",
+    title: "Live Proof Acceptance Gate",
+    href: "/founder/launch-control/jarvis-live-proof-acceptance-gate",
+    state: "SOURCE_READY_BLOCK_LAUNCH",
+    detail: "Defines what evidence can be accepted, what stays pending, and what must be rejected before any live or production-ready claim is allowed."
   },
   {
     id: "completion-board",
@@ -119,6 +126,7 @@ export async function GET() {
     jarvisLiveProofQueueConnected: true,
     jarvisLiveProofRunbookConnected: true,
     jarvisLiveProofEvidenceLedgerConnected: true,
+    jarvisLiveProofAcceptanceGateConnected: true,
     productionReady: false,
     publicLaunchAllowed: false,
     dockerIndependentBuildAllowed: true,
@@ -146,6 +154,7 @@ export async function GET() {
       "Live proof queue and blocker tracker",
       "Live proof runbook",
       "Live proof evidence ledger",
+      "Live proof acceptance gate and rejection rules",
       "Live index readiness map",
       "Provider credential checklist access",
       "Evidence collector and proof references",
@@ -154,6 +163,6 @@ export async function GET() {
       "Runtime blocker banner",
       "No fake data and no secret exposure locks"
     ],
-    nextAction: "Use /jarvis/final as the connected Jarvis command room, then clear live proof queue blockers through the runbook and evidence ledger before production readiness can become true."
+    nextAction: "Use /jarvis/final as the connected Jarvis command room, then clear live proof queue blockers through the runbook, evidence ledger, and acceptance gate before production readiness can become true."
   });
 }
