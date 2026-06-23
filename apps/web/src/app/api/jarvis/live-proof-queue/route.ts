@@ -18,6 +18,7 @@ type ProofQueueItem = {
 };
 
 const providerToolCaptureRunner = "node scripts/proof/capture-jarvis-n8n-airtable-github-evidence.mjs";
+const branchFinalAuditCaptureRunner = "node scripts/proof/capture-jarvis-branch-protection-final-launch-audit-evidence.mjs";
 
 const proofQueue: ProofQueueItem[] = [
   {
@@ -115,8 +116,8 @@ const proofQueue: ProofQueueItem[] = [
     launchCritical: true,
     detail: "Launch cannot pass until main branch protection, required checks, rollback, staging evidence pack, final audit, and founder approval are confirmed.",
     proofRoute: "/api/jarvis/branch-protection-final-launch-audit",
-    proofScript: "npm run repo:validate:branch-protection && npm run kingsmen:launch:audit",
-    evidenceRequired: ["main branch protection", "required review/status checks", "rollback evidence", "staging evidence pack", "final launch audit", "founder approval"]
+    proofScript: branchFinalAuditCaptureRunner,
+    evidenceRequired: ["main branch protection", "required review/status checks", "rollback evidence", "staging evidence pack", "final launch audit", "founder approval", "redacted evidence capture report"]
   }
 ];
 
@@ -145,6 +146,7 @@ export async function GET() {
     n8nAirtableGithubRuntimeProofGateConnected: true,
     n8nAirtableGithubEvidenceCaptureConnected: true,
     branchProtectionFinalLaunchAuditGateConnected: true,
+    branchProtectionFinalLaunchAuditEvidenceCaptureConnected: true,
     jarvisRuntimeLive: false,
     productionReady: false,
     publicLaunchAllowed: false,
@@ -159,6 +161,6 @@ export async function GET() {
     noDirectProviderCallsFromWeb: true,
     counts,
     proofQueue,
-    nextAction: "Clear Docker/API runtime, AI+Email evidence capture, PayFast accepted ITN evidence capture, n8n/Airtable/GitHub evidence capture, branch protection, rollback, staging evidence, and final audit gates before calling Jarvis live."
+    nextAction: "Clear Docker/API runtime, AI+Email evidence capture, PayFast accepted ITN evidence capture, n8n/Airtable/GitHub evidence capture, branch protection/final audit evidence capture, rollback, staging evidence, and founder approval before calling Jarvis live."
   });
 }
