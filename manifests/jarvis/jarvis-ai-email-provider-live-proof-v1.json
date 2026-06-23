@@ -1,0 +1,30 @@
+{
+  "schema": "kingsmen.manifest.v1",
+  "module": "Jarvis AI Email Provider Live Proof Gate",
+  "status": "SOURCE_GATE_BUILT_PROVIDER_EVIDENCE_PENDING",
+  "productionReady": false,
+  "publicLaunchAllowed": false,
+  "dockerIndependentBuildAllowed": true,
+  "apiRoute": "/api/jarvis/ai-email-provider-live-proof",
+  "founderRoute": "/founder/launch-control/jarvis-ai-email-provider-proof",
+  "validator": "scripts/validators/validate-jarvis-ai-email-provider-live-proof.mjs",
+  "docs": "docs/jarvis/JARVIS_AI_EMAIL_PROVIDER_LIVE_PROOF.md",
+  "evidencePending": [
+    "backend controlled AI live call",
+    "policy gate",
+    "cost and rate boundary",
+    "email send proof",
+    "email delivery or receive proof",
+    "bounce handling",
+    "opt out proof",
+    "message evidence ledger"
+  ],
+  "hardLocks": {
+    "noFakeData": true,
+    "redacted": true,
+    "browserProviderCalls": false,
+    "emailPrimaryChannel": true,
+    "whatsappUrgentOnly": true,
+    "smsBackupOnly": true
+  }
+}
