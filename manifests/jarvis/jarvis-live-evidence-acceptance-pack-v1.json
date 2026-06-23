@@ -1,0 +1,29 @@
+{
+  "schema": "kingsmen.manifest.jarvis-live-evidence-acceptance-pack.v1",
+  "module": "Jarvis Live Evidence Acceptance Pack",
+  "status": "SOURCE_READY_EVIDENCE_PENDING",
+  "productionReady": false,
+  "publicLaunchAllowed": false,
+  "dockerIndependentBuildAllowed": true,
+  "routes": [
+    "/api/jarvis/live-evidence-acceptance-pack",
+    "/founder/launch-control/jarvis-live-evidence-acceptance-pack"
+  ],
+  "runner": "scripts/proof/accept-jarvis-live-evidence-pack.mjs",
+  "validator": "scripts/validators/validate-jarvis-live-evidence-acceptance-pack.mjs",
+  "outputReport": "reports/jarvis/jarvis-live-evidence-acceptance-pack-latest.json",
+  "requiredReports": [
+    "reports/jarvis/jarvis-docker-truth-vault-runtime-evidence-capture-latest.json",
+    "reports/jarvis/jarvis-ai-email-provider-live-evidence-capture-latest.json",
+    "reports/jarvis/jarvis-payfast-accepted-itn-evidence-capture-latest.json",
+    "reports/jarvis/jarvis-n8n-airtable-github-evidence-capture-latest.json",
+    "reports/jarvis/jarvis-branch-protection-final-launch-audit-evidence-capture-latest.json"
+  ],
+  "safety": {
+    "noFakeData": true,
+    "rawSecretsReturned": false,
+    "secretValuesReturned": false,
+    "directDatabaseAccessFromWeb": false,
+    "autoLaunchAllowed": false
+  }
+}
