@@ -10,6 +10,7 @@ type RunbookPhase = {
   owner: "founder" | "runtime" | "provider" | "security" | "jarvis";
   launchCritical: boolean;
   commandText?: string;
+  proofGateRoute?: string;
   evidenceExpected: string[];
   stopCondition: string;
 };
@@ -32,7 +33,8 @@ const phases: RunbookPhase[] = [
     owner: "runtime",
     launchCritical: true,
     commandText: "npm run api:start:local -- -KillExistingPort",
-    evidenceExpected: ["API health HTTP 200", "storageMode postgres_truth_vault", "command log proof", "audit event proof"],
+    proofGateRoute: "/api/jarvis/docker-truth-vault-runtime-proof",
+    evidenceExpected: ["Docker engine reachable", "API health HTTP 200", "storageMode postgres_truth_vault", "command log proof", "audit event proof", "redacted runtime output"],
     stopCondition: "Stop if Docker Desktop or API health fails. Keep source build valid and do not fake runtime readiness."
   },
   {
@@ -92,6 +94,7 @@ export async function GET() {
     module: "Jarvis Live Proof Runbook",
     generatedAt: new Date().toISOString(),
     jarvisSourceDesignComplete: true,
+    dockerRuntimeProofGateConnected: true,
     jarvisRuntimeLive: false,
     productionReady: false,
     publicLaunchAllowed: false,
