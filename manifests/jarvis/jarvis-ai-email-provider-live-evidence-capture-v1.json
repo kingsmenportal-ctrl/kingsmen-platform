@@ -1,0 +1,28 @@
+{
+  "schema": "kingsmen.manifest.v1",
+  "module": "Jarvis AI + Email Provider Live Evidence Capture",
+  "status": "SOURCE_READY_CAPTURE_RUNNER",
+  "productionReady": false,
+  "publicLaunchAllowed": false,
+  "dockerIndependentBuildAllowed": true,
+  "runner": "scripts/proof/capture-jarvis-ai-email-provider-live-evidence.mjs",
+  "validator": "scripts/validators/validate-jarvis-ai-email-provider-live-evidence-capture.mjs",
+  "report": "reports/jarvis/jarvis-ai-email-provider-live-evidence-capture-latest.json",
+  "gateRoute": "/api/jarvis/ai-email-provider-live-proof",
+  "evidenceInputs": [
+    "JARVIS_AI_LIVE_EVIDENCE_FILE",
+    "JARVIS_EMAIL_LIVE_EVIDENCE_FILE"
+  ],
+  "locks": {
+    "noFakeData": true,
+    "rawSecretsReturned": false,
+    "secretValuesReturned": false,
+    "localShellExecutedFromWeb": false,
+    "directDatabaseAccessFromWeb": false,
+    "noDirectProviderCallsFromWeb": true,
+    "backendControlledAiOnly": true,
+    "emailPrimaryChannel": true,
+    "whatsappUrgentOnly": true,
+    "smsBackupOnly": true
+  }
+}
