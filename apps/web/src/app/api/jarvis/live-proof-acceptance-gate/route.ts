@@ -87,8 +87,9 @@ const gates: AcceptanceGate[] = [
     state: "REJECTED_UNTIL_REAL_EVIDENCE",
     launchCritical: true,
     proofQueueRef: "payfast-itn-proof",
+    proofGateRoute: "/api/jarvis/payfast-accepted-itn-proof",
     acceptanceRule: "Accept only after sandbox checkout, accepted ITN, duplicate ITN rejection, failed-payment rejection, refund review boundary, and founder approval are captured.",
-    rejectionRule: "Reject any paid-state claim from return URL, cancel URL, screenshots, manual note, or missing accepted ITN evidence.",
+    rejectionRule: "Reject any paid-state claim from return URL, cancel URL, screenshots, manual note, missing accepted ITN evidence, duplicate credit, or failed/pending/cancelled payment.",
     requiredEvidence: ["sandbox checkout", "accepted ITN", "duplicate rejection", "failed-payment rejection", "refund review", "founder approval"]
   },
   {
@@ -134,6 +135,7 @@ export async function GET() {
     jarvisSourceReady: true,
     dockerRuntimeProofGateConnected: true,
     aiEmailProviderProofGateConnected: true,
+    payfastAcceptedItnProofGateConnected: true,
     jarvisRuntimeLive: false,
     productionReady: false,
     publicLaunchAllowed: false,
@@ -151,6 +153,6 @@ export async function GET() {
     counts,
     gates,
     launchBlocking,
-    nextAction: "Capture real Docker, AI, Email, provider, and security evidence, then move each gate from blocked or pending to accepted."
+    nextAction: "Capture real Docker, AI, Email, PayFast ITN, provider, and security evidence, then move each gate from blocked or pending to accepted."
   });
 }
