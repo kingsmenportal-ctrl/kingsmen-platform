@@ -19,6 +19,7 @@ const validators = [
   "scripts/validators/validate-jarvis-payfast-accepted-itn-proof.mjs",
   "scripts/validators/validate-jarvis-payfast-accepted-itn-evidence-capture.mjs",
   "scripts/validators/validate-jarvis-n8n-airtable-github-runtime-proof.mjs",
+  "scripts/validators/validate-jarvis-n8n-airtable-github-evidence-capture.mjs",
   "scripts/validators/validate-jarvis-branch-protection-final-launch-audit.mjs",
   "scripts/validators/validate-jarvis-final-source-closeout-seal.mjs",
   "scripts/validators/validate-jarvis-final-launch-control.mjs",
@@ -32,7 +33,8 @@ const validators = [
 const proofRunners = [
   "scripts/proof/capture-jarvis-docker-truth-vault-runtime-evidence.mjs",
   "scripts/proof/capture-jarvis-ai-email-provider-live-evidence.mjs",
-  "scripts/proof/capture-jarvis-payfast-accepted-itn-evidence.mjs"
+  "scripts/proof/capture-jarvis-payfast-accepted-itn-evidence.mjs",
+  "scripts/proof/capture-jarvis-n8n-airtable-github-evidence.mjs"
 ];
 
 const reports = [
@@ -40,7 +42,8 @@ const reports = [
   "reports/jarvis/jarvis-playwright-scout-map-fallback-boundary-proof-latest.json",
   "reports/jarvis/jarvis-docker-truth-vault-runtime-evidence-capture-latest.json",
   "reports/jarvis/jarvis-ai-email-provider-live-evidence-capture-latest.json",
-  "reports/jarvis/jarvis-payfast-accepted-itn-evidence-capture-latest.json"
+  "reports/jarvis/jarvis-payfast-accepted-itn-evidence-capture-latest.json",
+  "reports/jarvis/jarvis-n8n-airtable-github-evidence-capture-latest.json"
 ];
 
 const manifests = [
@@ -59,6 +62,7 @@ const manifests = [
   "manifests/jarvis/jarvis-payfast-accepted-itn-proof-v1.json",
   "manifests/jarvis/jarvis-payfast-accepted-itn-evidence-capture-v1.json",
   "manifests/jarvis/jarvis-n8n-airtable-github-runtime-proof-v1.json",
+  "manifests/jarvis/jarvis-n8n-airtable-github-evidence-capture-v1.json",
   "manifests/jarvis/jarvis-branch-protection-final-launch-audit-v1.json",
   "manifests/jarvis/jarvis-openclaw-operator-policy-boundary-v1.json",
   "manifests/jarvis/jarvis-playwright-scout-map-fallback-boundary-v1.json"
@@ -128,6 +132,12 @@ const blockers = [
     detail: "The capture runner can collect redacted PayFast sandbox checkout, accepted ITN, duplicate rejection, failed payment rejection, refund review, and founder approval evidence once real files and credentials are available."
   },
   {
+    id: "n8n-airtable-github-evidence-runner",
+    title: "n8n Airtable GitHub evidence capture runner ready",
+    state: "READY_FOR_PROVIDER_EVIDENCE",
+    detail: "The capture runner can collect redacted n8n thin relay, Airtable human mirror, and GitHub connector evidence once real credentials and accepted evidence files are available."
+  },
+  {
     id: "local-docker-runtime",
     title: "Local Docker/API runtime instability",
     state: "BLOCKED",
@@ -168,6 +178,12 @@ const blockers = [
     title: "n8n Airtable GitHub runtime proof gate not accepted",
     state: "PENDING",
     detail: "n8n thin relay, Airtable human mirror, GitHub connector, token redaction, and Truth Vault authority evidence are required."
+  },
+  {
+    id: "n8n-airtable-github-evidence-capture",
+    title: "n8n Airtable GitHub evidence capture not accepted",
+    state: "PENDING",
+    detail: "Provider tool evidence capture runner is ready, but accepted n8n, Airtable, and GitHub evidence files are still required."
   },
   {
     id: "branch-protection-final-launch-audit-gate",
@@ -236,6 +252,7 @@ export async function GET() {
     jarvisPayFastAcceptedItnProofIndexed: true,
     jarvisPayFastAcceptedItnEvidenceCaptureIndexed: true,
     jarvisN8nAirtableGithubRuntimeProofIndexed: true,
+    jarvisN8nAirtableGithubEvidenceCaptureIndexed: true,
     jarvisBranchProtectionFinalLaunchAuditIndexed: true,
     dockerIndependentBuildAllowed: true,
     noFakeData: true,
@@ -249,6 +266,6 @@ export async function GET() {
     manifests,
     routes,
     blockers,
-    nextAction: "Jarvis source/design is closed out. Capture redacted runtime and provider evidence, then clear all live proof gates and the final branch-protection launch audit before public launch."
+    nextAction: "Jarvis source/design is closed out. Execute evidence runners and final launch audit with real credentials and redacted evidence before public launch."
   });
 }
