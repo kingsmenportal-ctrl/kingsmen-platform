@@ -47,6 +47,7 @@ const manifests = [
   "manifests/jarvis/jarvis-live-proof-evidence-ledger-v1.json",
   "manifests/jarvis/jarvis-live-proof-acceptance-gate-v1.json",
   "manifests/jarvis/jarvis-docker-truth-vault-runtime-proof-v1.json",
+  "manifests/jarvis/jarvis-docker-truth-vault-runtime-evidence-capture-v1.json",
   "manifests/jarvis/jarvis-ai-email-provider-live-proof-v1.json",
   "manifests/jarvis/jarvis-payfast-accepted-itn-proof-v1.json",
   "manifests/jarvis/jarvis-n8n-airtable-github-runtime-proof-v1.json",
