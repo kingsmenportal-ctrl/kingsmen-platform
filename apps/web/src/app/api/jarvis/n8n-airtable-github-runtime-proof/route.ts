@@ -3,6 +3,10 @@ import { NextResponse } from "next/server";
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
 
+const captureRunner = "scripts/proof/capture-jarvis-n8n-airtable-github-evidence.mjs";
+const captureReportPath = "reports/jarvis/jarvis-n8n-airtable-github-evidence-capture-latest.json";
+const captureValidator = "scripts/validators/validate-jarvis-n8n-airtable-github-evidence-capture.mjs";
+
 type ToolGate = {
   id: string;
   title: string;
@@ -12,6 +16,9 @@ type ToolGate = {
   requiredEvidence: string[];
   rejectionRules: string[];
   proofScript?: string;
+  captureRunner?: string;
+  captureReportPath?: string;
+  captureValidator?: string;
 };
 
 const toolGates: ToolGate[] = [
@@ -29,7 +36,8 @@ const toolGates: ToolGate[] = [
       "webhook signature or shared secret verification proof",
       "no direct browser-to-n8n call proof",
       "Truth Vault remains authority proof",
-      "redacted runtime output"
+      "redacted runtime output",
+      "accepted n8n evidence file"
     ],
     rejectionRules: [
       "reject if n8n writes directly to Truth Vault",
@@ -38,7 +46,10 @@ const toolGates: ToolGate[] = [
       "reject if raw API key or webhook secret is printed",
       "reject if runtime proof is only a static source route"
     ],
-    proofScript: "npm run jarvis:runtime:n8n-thin-relay"
+    proofScript: "node scripts/proof/capture-jarvis-n8n-airtable-github-evidence.mjs",
+    captureRunner,
+    captureReportPath,
+    captureValidator
   },
   {
     id: "airtable-human-mirror-runtime-proof",
@@ -53,7 +64,8 @@ const toolGates: ToolGate[] = [
       "mirror write proof from backend only",
       "Truth Vault source record proof",
       "reconciliation proof",
-      "redacted Airtable metadata proof"
+      "redacted Airtable metadata proof",
+      "accepted Airtable evidence file"
     ],
     rejectionRules: [
       "reject if Airtable becomes authority",
@@ -62,7 +74,10 @@ const toolGates: ToolGate[] = [
       "reject if browser writes to Airtable directly",
       "reject if reconciliation evidence is missing"
     ],
-    proofScript: "npm run jarvis:runtime:airtable-human-mirror"
+    proofScript: "node scripts/proof/capture-jarvis-n8n-airtable-github-evidence.mjs",
+    captureRunner,
+    captureReportPath,
+    captureValidator
   },
   {
     id: "github-tool-connector-runtime-proof",
@@ -76,7 +91,8 @@ const toolGates: ToolGate[] = [
       "no token exposure proof",
       "branch and PR context proof",
       "audit trail or connector action trace",
-      "no fake commit status proof"
+      "no fake commit status proof",
+      "accepted GitHub evidence file"
     ],
     rejectionRules: [
       "reject if GitHub token is exposed",
@@ -85,7 +101,10 @@ const toolGates: ToolGate[] = [
       "reject if evidence lacks redaction",
       "reject if branch protection proof is replaced by GitHub metadata only"
     ],
-    proofScript: "npm run jarvis:runtime:github-tool-boundary"
+    proofScript: "node scripts/proof/capture-jarvis-n8n-airtable-github-evidence.mjs",
+    captureRunner,
+    captureReportPath,
+    captureValidator
   }
 ];
 
@@ -94,6 +113,9 @@ export async function GET() {
     schema: "kingsmen.jarvis-n8n-airtable-github-runtime-proof.v1",
     module: "Jarvis n8n Airtable GitHub Runtime Proof Gate",
     generatedAt: new Date().toISOString(),
+    captureRunner,
+    captureReportPath,
+    captureValidator,
     jarvisRuntimeLive: false,
     productionReady: false,
     publicLaunchAllowed: false,
@@ -101,6 +123,7 @@ export async function GET() {
     n8nThinRelayAccepted: false,
     airtableMirrorAccepted: false,
     githubConnectorAccepted: false,
+    n8nAirtableGithubEvidenceCaptureConnected: true,
     launchBlocked: true,
     dockerIndependentBuildAllowed: true,
     noFakeData: true,
@@ -112,9 +135,12 @@ export async function GET() {
     noDirectProviderCallsFromWeb: true,
     postgresTruthVaultRemainsAuthority: true,
     n8nThinRelayOnly: true,
+    n8nMayBecomeAuthority: false,
+    n8nMayWriteTruthVaultDirectly: false,
     airtableMirrorOnly: true,
+    airtableMayBecomeAuthority: false,
     githubTokensMayBeReturned: false,
     toolGates,
-    nextAction: "Capture real n8n, Airtable, and GitHub connector runtime evidence with secrets outside Git before this gate can be accepted."
+    nextAction: "Run the provider-tool evidence capture only when n8n, Airtable, and GitHub connector credentials and accepted redacted evidence files are available."
   });
 }
