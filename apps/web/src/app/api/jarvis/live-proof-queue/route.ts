@@ -47,7 +47,8 @@ const proofQueue: ProofQueueItem[] = [
     launchCritical: true,
     detail: "AI provider stays backend controlled. Live proof requires real provider credentials outside Git and redacted evidence of a policy-gated call.",
     proofRoute: "/api/jarvis/ai-email-provider-live-proof",
-    evidenceRequired: ["provider selected", "model selected", "key stored outside Git", "redacted live-call proof", "policy gate proof", "cost/rate boundary proof"]
+    proofScript: "node scripts/proof/capture-jarvis-ai-email-provider-live-evidence.mjs",
+    evidenceRequired: ["provider selected", "model selected", "key stored outside Git", "redacted live-call proof", "policy gate proof", "cost/rate boundary proof", "accepted AI evidence file"]
   },
   {
     id: "email-primary-proof",
@@ -57,8 +58,8 @@ const proofQueue: ProofQueueItem[] = [
     launchCritical: true,
     detail: "Email remains the primary communication channel. Launch needs provider evidence for send, bounce, opt-out, redaction, and evidence ledger capture.",
     proofRoute: "/api/jarvis/ai-email-provider-live-proof",
-    proofScript: "npm run jarvis:runtime:email-primary-channel",
-    evidenceRequired: ["SMTP/provider credential readiness", "test send evidence", "delivery or receive evidence", "bounce/failed-send handling", "opt-out rule", "message evidence ledger"]
+    proofScript: "node scripts/proof/capture-jarvis-ai-email-provider-live-evidence.mjs",
+    evidenceRequired: ["SMTP/provider credential readiness", "test send evidence", "delivery or receive evidence", "bounce/failed-send handling", "opt-out rule", "message evidence ledger", "accepted Email evidence file"]
   },
   {
     id: "payfast-itn-proof",
@@ -136,6 +137,7 @@ export async function GET() {
     generatedAt: new Date().toISOString(),
     jarvisSourceReady: true,
     aiEmailProviderProofGateConnected: true,
+    aiEmailProviderEvidenceCaptureConnected: true,
     payfastAcceptedItnProofGateConnected: true,
     n8nAirtableGithubRuntimeProofGateConnected: true,
     branchProtectionFinalLaunchAuditGateConnected: true,
@@ -153,6 +155,6 @@ export async function GET() {
     noDirectProviderCallsFromWeb: true,
     counts,
     proofQueue,
-    nextAction: "Clear Docker/API runtime, AI+Email, PayFast accepted ITN, n8n/Airtable/GitHub, branch protection, rollback, staging evidence, and final audit gates before calling Jarvis live."
+    nextAction: "Clear Docker/API runtime, AI+Email evidence capture, PayFast accepted ITN, n8n/Airtable/GitHub, branch protection, rollback, staging evidence, and final audit gates before calling Jarvis live."
   });
 }
