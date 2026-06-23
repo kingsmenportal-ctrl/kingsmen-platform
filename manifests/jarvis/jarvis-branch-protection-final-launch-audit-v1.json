@@ -1,0 +1,34 @@
+{
+  "schema": "kingsmen.jarvis-branch-protection-final-launch-audit.manifest.v1",
+  "module": "Jarvis Branch Protection Final Launch Audit",
+  "productionReady": false,
+  "publicLaunchAllowed": false,
+  "sourceGateBuilt": true,
+  "runtimeLive": false,
+  "route": "/api/jarvis/branch-protection-final-launch-audit",
+  "founderPage": "/founder/launch-control/jarvis-branch-final-audit",
+  "validator": "scripts/validators/validate-jarvis-branch-protection-final-launch-audit.mjs",
+  "requiredEvidence": [
+    "main branch protection",
+    "required PR review",
+    "required build and validator checks",
+    "rollback evidence",
+    "final staging evidence pack",
+    "final launch audit",
+    "founder launch approval"
+  ],
+  "forbiddenClaims": [
+    "public launch before final audit",
+    "productionReady true before all live proof gates accepted",
+    "branch protection assumed without evidence",
+    "rollback assumed without evidence"
+  ],
+  "safetyLocks": {
+    "noFakeData": true,
+    "rawSecretsReturned": false,
+    "secretValuesReturned": false,
+    "localShellExecuted": false,
+    "directDatabaseAccessFromWeb": false,
+    "noDirectProviderCallsFromWeb": true
+  }
+}
