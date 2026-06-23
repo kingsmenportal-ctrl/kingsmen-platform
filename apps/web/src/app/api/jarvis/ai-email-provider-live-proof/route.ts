@@ -17,6 +17,10 @@ type ProviderProofRequirement = {
   reportTarget: string;
 };
 
+const captureRunner = "scripts/proof/capture-jarvis-ai-email-provider-live-evidence.mjs";
+const captureReportPath = "reports/jarvis/jarvis-ai-email-provider-live-evidence-capture-latest.json";
+const captureValidator = "scripts/validators/validate-jarvis-ai-email-provider-live-evidence-capture.mjs";
+
 const proofRequirements: ProviderProofRequirement[] = [
   {
     id: "ai-provider-live-call-proof",
@@ -32,7 +36,8 @@ const proofRequirements: ProviderProofRequirement[] = [
       "backend-controlled live call succeeds",
       "policy gate applies before call",
       "cost/rate boundary recorded",
-      "redacted request and response evidence captured"
+      "redacted request and response evidence captured",
+      "AI evidence file accepted by capture runner"
     ],
     rejectionRules: [
       "reject browser-side provider calls",
@@ -57,7 +62,8 @@ const proofRequirements: ProviderProofRequirement[] = [
       "bounce or failed-send handling captured",
       "opt-out rule captured",
       "message evidence ledger write captured",
-      "redacted output captured"
+      "redacted output captured",
+      "Email evidence file accepted by capture runner"
     ],
     rejectionRules: [
       "reject WhatsApp/SMS as replacement for email primary proof",
@@ -95,7 +101,15 @@ export async function GET() {
     emailPrimaryChannel: true,
     whatsappUrgentOnly: true,
     smsBackupOnly: true,
+    captureRunner,
+    captureReportPath,
+    captureValidator,
+    requiredEvidenceSchemas: [
+      "kingsmen.jarvis-ai-live-call-evidence.v1",
+      "kingsmen.jarvis-email-primary-channel-evidence.v1",
+      "kingsmen.jarvis-ai-email-provider-live-evidence-capture.v1"
+    ],
     proofRequirements,
-    nextAction: "Supply real AI and Email credentials outside Git, run backend-controlled proofs, capture redacted evidence, and keep launch blocked until both provider proofs are accepted."
+    nextAction: "Supply real AI and Email credentials outside Git, capture redacted evidence files, run the capture runner, and keep launch blocked until both provider proofs are accepted."
   });
 }
