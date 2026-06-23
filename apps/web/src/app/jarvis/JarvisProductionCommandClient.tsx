@@ -1,396 +1,284 @@
 "use client";
 
-import { FormEvent, useEffect, useMemo, useRef, useState } from "react";
+import { FormEvent, useEffect, useRef, useState } from "react";
 import styles from "./JarvisProductionCommand.module.css";
 
-type JarvisCommand = {
+type JarvisAction = {
   id: string;
   title: string;
   description: string;
-  category: string;
-  risk: string;
 };
 
-type JarvisStatusPayload = {
-  ok?: boolean;
-  generatedAt?: string;
-  backendBoundary?: {
-    mode?: string;
-    baseUrl?: string;
-    configured?: boolean;
-  };
-  backendHealthStatus?: number;
-  backendHealth?: { storageMode?: string; status?: string; service?: string } | null;
-  cards?: Array<{ key: string; title: string; state: string; detail: string; ok: boolean }>;
-  commands?: JarvisCommand[];
-  doctrine?: string[];
-};
-
-type LiveIndexEntry = {
+type JarvisMessage = {
   id: string;
-  title: string;
-  group?: string;
-  state: string;
-  detail: string;
-  launchCritical?: boolean;
-  boundaryRoute?: string;
-  evidenceRef?: string;
+  role: "founder" | "jarvis" | "system";
+  text: string;
+  at: string;
+  ok?: boolean;
+};
+
+type ConversationResponse = {
+  ok?: boolean;
+  reply?: string;
+  actions?: JarvisAction[];
+  providerConfigured?: boolean;
+};
+
+type StatusPayload = {
+  backendHealthStatus?: number;
+  backendHealth?: { storageMode?: string } | null;
+  generatedAt?: string;
 };
 
 type LiveIndexPayload = {
-  schema?: string;
-  generatedAt?: string;
-  productionReady: boolean;
-  publicLaunchAllowed: boolean;
   runtimeBlocker?: string | null;
-  backendHealthStatus?: number;
-  backendStorageMode?: string;
-  openClawRuntimeProven?: boolean;
-  summary?: {
-    total?: number;
-    live?: number;
-    sourceReady?: number;
-    pendingRuntimeProof?: number;
-    pendingCredentials?: number;
-    deferred?: number;
-    blockedByLocalDocker?: number;
-  };
-  entries?: LiveIndexEntry[];
-};
-
-type AcceptanceGatePayload = {
-  generatedAt?: string;
   productionReady?: boolean;
   publicLaunchAllowed?: boolean;
-  acceptanceDecision?: string;
-  launchBlocked?: boolean;
-  launchBlockingCount?: number;
-  counts?: Record<string, number>;
-  gates?: Array<{ id: string; title: string; state: string; launchCritical?: boolean; proofGateRoute?: string; requiredEvidence?: string[] }>;
-  launchBlocking?: Array<{ id: string; title: string; state: string; launchCritical?: boolean; proofGateRoute?: string; requiredEvidence?: string[] }>;
+  backendHealthStatus?: number;
+  backendStorageMode?: string;
+  generatedAt?: string;
 };
 
-type JarvisCommandResponse = {
-  ok: boolean;
-  commandId: string;
-  backendCommandId?: string;
-  correlationId?: string;
-  idempotencyKey?: string;
-  title?: string;
-  category?: string;
-  risk?: string;
-  startedAt?: string;
-  finishedAt?: string;
-  durationMs?: number;
-  stdout?: string;
-  stderr?: string;
-  backendStatus?: number;
-  backendStorageMode?: string | null;
-  evidencePath?: string | null;
-  localShellExecuted?: boolean;
-  localFileWritten?: boolean;
-  directDatabaseAccessFromWeb?: boolean;
-  message?: string;
-};
-
-type JarvisEvent = {
-  id: string;
-  role: "founder" | "jarvis" | "system";
-  title: string;
-  detail: string;
-  ok?: boolean;
-  commandId?: string;
-  stdout?: string;
-  stderr?: string;
-  evidencePath?: string | null;
-  generatedAt: string;
-};
-
-const fallbackCommands: JarvisCommand[] = [
-  { id: "COMMAND_PERSISTENCE_PROOF", title: "Truth Vault command evidence", description: "Prove backend command_log and audit_events write boundary.", category: "Evidence", risk: "SAFE_READ" },
-  { id: "OPENCLAW_OPERATOR_POLICY_CHECK", title: "OpenClaw operator policy", description: "Confirm OpenClaw remains operator-only and cannot bypass policy.", category: "OpenClaw", risk: "SAFE_READ" },
-  { id: "PLAYWRIGHT_SCOUT_MAP_FALLBACK_CHECK", title: "Playwright MAP fallback", description: "Confirm scout/probe-only automation and manual fallback doctrine.", category: "Automation", risk: "SAFE_READ" },
-  { id: "AI_PROVIDER_ROUTER_CHECK", title: "AI provider router", description: "Review backend-controlled AI provider readiness without exposing keys.", category: "AI", risk: "SAFE_READ" },
-  { id: "EMAIL_PRIMARY_CHANNEL_CHECK", title: "Email primary channel", description: "Review email-first evidence boundary; WhatsApp and SMS cannot replace it.", category: "Communications", risk: "SAFE_READ" },
-  { id: "PAYFAST_PROVIDER_PROOF_QUEUE_CHECK", title: "PayFast proof queue", description: "Review PayFast sandbox, ITN, duplicate ITN, failed-payment, and founder approval gates.", category: "Payments", risk: "SAFE_READ" },
-  { id: "N8N_THIN_RELAY_CHECK", title: "n8n thin relay", description: "Review n8n as relay-only with no direct Truth Vault authority.", category: "Automation", risk: "SAFE_READ" },
-  { id: "GITHUB_TOOL_CONNECTOR_CHECK", title: "GitHub connector", description: "Review redacted GitHub connector boundary and repository metadata proof.", category: "Tools", risk: "SAFE_READ" }
+const CORE_ACTIONS: JarvisAction[] = [
+  { id: "SYSTEM_VALIDATE_N20", title: "System lock", description: "Validate the Kingsmen N20 lock and source-safe posture." },
+  { id: "COMMAND_PERSISTENCE_PROOF", title: "Truth Vault", description: "Send one backend-safe envelope and check command evidence." },
+  { id: "AI_PROVIDER_ROUTER_CHECK", title: "AI router", description: "Inspect AI provider readiness without exposing keys." },
+  { id: "EMAIL_PRIMARY_CHANNEL_CHECK", title: "Email channel", description: "Inspect the email-first communication boundary." },
+  { id: "PAYFAST_STAGING_EVIDENCE", title: "PayFast", description: "Review PayFast staging and accepted ITN evidence posture." },
+  { id: "N8N_THIN_RELAY_CHECK", title: "n8n relay", description: "Confirm relay-only automation boundary." },
+  { id: "GITHUB_TOOL_CONNECTOR_CHECK", title: "GitHub", description: "Review repo connector evidence and metadata boundary." },
+  { id: "EVIDENCE_BUNDLE_REVIEW", title: "Evidence", description: "Review launch evidence bundle and founder approval posture." }
 ];
 
-function stamp() {
-  return new Date().toISOString();
-}
-
-function newId(prefix: string) {
+function uid(prefix: string) {
   return `${prefix}_${Date.now()}_${Math.random().toString(36).slice(2, 8)}`;
 }
 
-function toArray<T = Record<string, unknown>>(value: unknown): T[] {
-  return Array.isArray(value) ? value as T[] : [];
+function now() {
+  return new Date().toISOString();
 }
 
-function stateTone(state?: string) {
-  const value = (state ?? "PENDING_RUNTIME_PROOF").toUpperCase();
-  if (["LIVE", "RUNTIME_PASSED", "ACCEPTED_PREVIOUS_RUNTIME", "ACCEPTED_SOURCE"].includes(value)) return styles.toneLive;
-  if (value.includes("SOURCE")) return styles.toneSource;
-  if (value.includes("BLOCK") || value.includes("REJECT")) return styles.toneBlocked;
-  if (value.includes("DEFER")) return styles.toneDeferred;
-  return styles.tonePending;
+function displayTime(value?: string) {
+  if (!value) return "not synced";
+  const date = new Date(value);
+  return Number.isNaN(date.getTime()) ? "not synced" : date.toLocaleTimeString();
 }
 
-async function readJson<T>(url: string) {
-  const response = await fetch(url, { cache: "no-store" });
-  const payload = (await response.json()) as T;
-  if (!response.ok) throw new Error(`${url} returned HTTP ${response.status}`);
-  return payload;
+function getRecognitionConstructor() {
+  const browser = window as unknown as {
+    SpeechRecognition?: new () => any;
+    webkitSpeechRecognition?: new () => any;
+  };
+  return browser.SpeechRecognition || browser.webkitSpeechRecognition;
 }
 
 function speak(text: string) {
   if (typeof window === "undefined" || !("speechSynthesis" in window)) return;
   window.speechSynthesis.cancel();
-  const voice = new SpeechSynthesisUtterance(text);
-  voice.lang = "en-ZA";
-  voice.rate = 0.88;
-  voice.pitch = 0.78;
-  voice.volume = 1;
-  window.speechSynthesis.speak(voice);
-}
-
-function speechRecognitionConstructor() {
-  const api = window as unknown as {
-    SpeechRecognition?: new () => any;
-    webkitSpeechRecognition?: new () => any;
-  };
-  return api.SpeechRecognition || api.webkitSpeechRecognition;
-}
-
-function safeTime(value?: string) {
-  if (!value) return "not synced";
-  const parsed = new Date(value);
-  return Number.isNaN(parsed.getTime()) ? "not synced" : parsed.toLocaleTimeString();
+  const utterance = new SpeechSynthesisUtterance(text);
+  utterance.lang = "en-ZA";
+  utterance.rate = 0.9;
+  utterance.pitch = 0.72;
+  utterance.volume = 1;
+  window.speechSynthesis.speak(utterance);
 }
 
 export default function JarvisProductionCommandClient() {
-  const [status, setStatus] = useState<JarvisStatusPayload | null>(null);
-  const [liveIndex, setLiveIndex] = useState<LiveIndexPayload | null>(null);
-  const [gate, setGate] = useState<AcceptanceGatePayload | null>(null);
-  const [proofQueue, setProofQueue] = useState<Record<string, unknown> | null>(null);
-  const [credentials, setCredentials] = useState<Record<string, unknown> | null>(null);
-  const [selectedCommandId, setSelectedCommandId] = useState("COMMAND_PERSISTENCE_PROOF");
-  const [commandContext, setCommandContext] = useState("Run one backend-safe Jarvis proof and return redacted evidence. No browser shell. No direct database access.");
-  const [events, setEvents] = useState<JarvisEvent[]>([
+  const [messages, setMessages] = useState<JarvisMessage[]>([
     {
-      id: newId("boot"),
+      id: uid("boot"),
       role: "jarvis",
-      title: "Hello sir, welcome to Kingsmen.",
-      detail: "Jarvis is loading the Kingsmen operating cockpit: runtime spine, command scripts, evidence queue, credentials, launch gates, voice and visual context. One Jarvis. One surface.",
-      ok: true,
-      generatedAt: stamp()
+      text: "Hello sir, welcome to Kingsmen. I am Jarvis. Say Jarvis, then tell me what you need.",
+      at: now(),
+      ok: true
     }
   ]);
-  const [running, setRunning] = useState(false);
-  const [refreshing, setRefreshing] = useState(false);
-  const [voiceState, setVoiceState] = useState("standby");
-  const [visualActive, setVisualActive] = useState(false);
-  const [errorText, setErrorText] = useState("");
+  const [input, setInput] = useState("");
+  const [voiceState, setVoiceState] = useState<"standby" | "listening" | "thinking" | "speaking" | "unsupported" | "blocked">("standby");
+  const [thinking, setThinking] = useState(false);
+  const [actions, setActions] = useState<JarvisAction[]>(CORE_ACTIONS.slice(0, 4));
+  const [status, setStatus] = useState<StatusPayload | null>(null);
+  const [liveIndex, setLiveIndex] = useState<LiveIndexPayload | null>(null);
+  const [visualOn, setVisualOn] = useState(false);
+  const [visualError, setVisualError] = useState("");
+  const recognitionRef = useRef<any>(null);
+  const voiceEnabledRef = useRef(false);
   const videoRef = useRef<HTMLVideoElement | null>(null);
   const streamRef = useRef<MediaStream | null>(null);
 
-  const liveEntries = liveIndex?.entries ?? [];
-  const commands = status?.commands?.length ? status.commands : fallbackCommands;
-  const selectedCommand = commands.find((command) => command.id === selectedCommandId) ?? commands[0];
-  const launchBlocking = gate?.launchBlocking ?? [];
-  const gateList = gate?.gates ?? [];
-  const queueItems = useMemo(() => {
-    if (!proofQueue) return [];
-    return [
-      ...toArray((proofQueue as Record<string, unknown>).proofs),
-      ...toArray((proofQueue as Record<string, unknown>).queue),
-      ...toArray((proofQueue as Record<string, unknown>).items),
-      ...toArray((proofQueue as Record<string, unknown>).entries)
-    ].slice(0, 6);
-  }, [proofQueue]);
+  const backendOnline = status?.backendHealthStatus === 200 || liveIndex?.backendHealthStatus === 200;
+  const truthVaultOnline = status?.backendHealth?.storageMode === "postgres_truth_vault" || liveIndex?.backendStorageMode === "postgres_truth_vault";
+  const productionReady = Boolean(liveIndex?.productionReady);
+  const publicLaunchAllowed = Boolean(liveIndex?.publicLaunchAllowed);
+  const liveLine = backendOnline
+    ? truthVaultOnline
+      ? "Truth Vault spine connected. Jarvis can route backend-safe actions."
+      : "Backend reached. Truth Vault evidence still needs confirmation."
+    : "Backend not connected. Conversation still opens, but command execution needs the API runtime.";
 
-  const backendLive = liveIndex?.backendHealthStatus === 200 || status?.backendHealthStatus === 200;
-  const truthVaultLive = liveIndex?.backendStorageMode === "postgres_truth_vault" || status?.backendHealth?.storageMode === "postgres_truth_vault";
-  const runtimeLive = Boolean(backendLive && truthVaultLive && !liveIndex?.runtimeBlocker);
-  const productionReady = Boolean(liveIndex?.productionReady || gate?.productionReady);
-  const publicLaunchAllowed = Boolean(liveIndex?.publicLaunchAllowed || gate?.publicLaunchAllowed);
-  const launchBlocked = gate?.launchBlocked ?? !publicLaunchAllowed;
-  const launchBlockerCount = gate?.launchBlockingCount ?? launchBlocking.length;
-  const credentialCount = Number((credentials?.credentialCount ?? credentials?.total ?? credentials?.requiredCredentialCount ?? 0) as number);
-  const credentialReady = Number((credentials?.readyCredentialCount ?? credentials?.configuredCount ?? credentials?.ready ?? 0) as number);
-  const evidenceEvents = events.filter((event) => event.evidencePath || event.stdout || event.stderr || event.ok === false);
-  const lastSynced = liveIndex?.generatedAt ?? gate?.generatedAt ?? status?.generatedAt;
+  function pushMessage(role: JarvisMessage["role"], text: string, ok = true) {
+    setMessages((items) => [...items, { id: uid(role), role, text, at: now(), ok }]);
+  }
 
-  const systemLine = runtimeLive
-    ? "Runtime spine is connected. Provider, payment and launch audit evidence still control public launch."
-    : liveIndex?.runtimeBlocker ?? errorText ?? "Runtime boundary is not confirmed yet.";
-
-  async function loadJarvis() {
-    setRefreshing(true);
-    const [statusResult, liveIndexResult, gateResult, queueResult, credentialResult] = await Promise.allSettled([
-      readJson<JarvisStatusPayload>("/api/jarvis/status"),
-      readJson<LiveIndexPayload>("/api/jarvis/live-index"),
-      readJson<AcceptanceGatePayload>("/api/jarvis/live-proof-acceptance-gate"),
-      readJson<Record<string, unknown>>("/api/jarvis/live-proof-queue"),
-      readJson<Record<string, unknown>>("/api/jarvis/provider-credential-checklist")
+  async function syncRuntime() {
+    const [statusResult, liveResult] = await Promise.allSettled([
+      fetch("/api/jarvis/status", { cache: "no-store" }).then((response) => response.json() as Promise<StatusPayload>),
+      fetch("/api/jarvis/live-index", { cache: "no-store" }).then((response) => response.json() as Promise<LiveIndexPayload>)
     ]);
+    if (statusResult.status === "fulfilled") setStatus(statusResult.value);
+    if (liveResult.status === "fulfilled") setLiveIndex(liveResult.value);
+  }
 
-    if (statusResult.status === "fulfilled") {
-      setStatus(statusResult.value);
-      const firstCommand = statusResult.value.commands?.[0]?.id;
-      if (firstCommand) setSelectedCommandId((current) => current || firstCommand);
+  async function askJarvis(text: string) {
+    const question = text.trim();
+    if (!question || thinking) return;
+    setInput("");
+    setThinking(true);
+    setVoiceState("thinking");
+    pushMessage("founder", question, true);
+
+    try {
+      const response = await fetch("/api/jarvis/conversation", {
+        method: "POST",
+        headers: { "content-type": "application/json" },
+        body: JSON.stringify({ message: question, surface: "kingsmen_jarvis_voice_companion" })
+      });
+      const payload = (await response.json()) as ConversationResponse;
+      const reply = payload.reply || "Sir, I heard you, but Jarvis returned no spoken answer.";
+      setActions(payload.actions?.length ? payload.actions : CORE_ACTIONS.slice(0, 4));
+      pushMessage("jarvis", reply, response.ok && payload.ok !== false);
+      setVoiceState("speaking");
+      speak(reply);
+      window.setTimeout(() => setVoiceState(voiceEnabledRef.current ? "listening" : "standby"), 1200);
+    } catch {
+      const reply = "Sir, Jarvis conversation route is unavailable. I cannot fake a brain response. Check the web route and backend provider configuration.";
+      pushMessage("jarvis", reply, false);
+      speak(reply);
+      setVoiceState(voiceEnabledRef.current ? "listening" : "standby");
+    } finally {
+      setThinking(false);
+      await syncRuntime();
     }
-    if (liveIndexResult.status === "fulfilled") setLiveIndex(liveIndexResult.value);
-    if (gateResult.status === "fulfilled") setGate(gateResult.value);
-    if (queueResult.status === "fulfilled") setProofQueue(queueResult.value);
-    if (credentialResult.status === "fulfilled") setCredentials(credentialResult.value);
-
-    const errors = [statusResult, liveIndexResult, gateResult, queueResult, credentialResult]
-      .filter((result): result is PromiseRejectedResult => result.status === "rejected")
-      .map((result) => result.reason instanceof Error ? result.reason.message : "Jarvis request failed.");
-
-    setErrorText(errors.join(" · "));
-    setRefreshing(false);
   }
 
-  function greetFounder() {
-    const greeting = runtimeLive
-      ? "Hello sir, welcome to Kingsmen. Jarvis is online. The Truth Vault is connected. Public launch remains locked until live evidence clears."
-      : "Hello sir, welcome to Kingsmen. Jarvis is standing by. Start the backend runtime to connect the Truth Vault spine.";
-    setEvents((items) => [
-      ...items,
-      { id: newId("greet"), role: "jarvis", title: "Kingsmen greeting", detail: greeting, ok: runtimeLive, generatedAt: stamp() }
-    ]);
-    speak(greeting);
-  }
-
-  async function runCommand(commandId = selectedCommand?.id) {
-    if (!commandId || running) return;
-    const command = commands.find((item) => item.id === commandId);
-    setRunning(true);
-    setEvents((items) => [
-      ...items,
-      {
-        id: newId("founder"),
-        role: "founder",
-        title: command?.title ?? commandId,
-        detail: commandContext || "No additional context supplied.",
-        ok: true,
-        commandId,
-        generatedAt: stamp()
-      }
-    ]);
-
+  async function executeAction(action: JarvisAction) {
+    pushMessage("founder", `Run Kingsmen action: ${action.title}.`, true);
+    setThinking(true);
+    setVoiceState("thinking");
     try {
       const response = await fetch("/api/jarvis/command", {
         method: "POST",
         headers: { "content-type": "application/json" },
         body: JSON.stringify({
-          commandId,
-          clientRequestId: newId("jarvis_ui"),
-          context: commandContext,
-          surface: "kingsmen_jarvis_single_cockpit",
+          commandId: action.id,
+          clientRequestId: uid("jarvis_action"),
+          surface: "kingsmen_jarvis_voice_companion",
           localShellRequested: false,
           directDatabaseAccessRequested: false
         })
       });
-      const payload = (await response.json()) as JarvisCommandResponse;
-      const ok = response.ok && payload.ok !== false;
-      const detail = payload.message || payload.stdout || payload.stderr || "Backend command boundary responded.";
-      setEvents((items) => [
-        ...items,
-        {
-          id: newId("jarvis"),
-          role: "jarvis",
-          title: payload.title ?? command?.title ?? commandId,
-          detail,
-          ok,
-          commandId,
-          stdout: payload.stdout,
-          stderr: payload.stderr,
-          evidencePath: payload.evidencePath ?? null,
-          generatedAt: stamp()
-        }
-      ]);
-      speak(ok ? `${payload.title ?? command?.title ?? commandId} accepted by the Kingsmen backend.` : "Command needs review.");
-      await loadJarvis();
-    } catch (error) {
-      const message = error instanceof Error ? error.message : "Jarvis command request failed.";
-      setEvents((items) => [
-        ...items,
-        { id: newId("jarvis_error"), role: "jarvis", title: "Backend command boundary unavailable", detail: message, ok: false, commandId, generatedAt: stamp() }
-      ]);
-      speak("Jarvis command boundary is unavailable. Check the backend runtime.");
+      const payload = await response.json().catch(() => ({}));
+      const reply = response.ok
+        ? `${action.title} was handed to the Kingsmen backend boundary. I will keep launch and payment authority locked until real evidence clears.`
+        : payload?.message || `${action.title} was not accepted by the backend boundary.`;
+      pushMessage("jarvis", reply, response.ok);
+      speak(reply);
+    } catch {
+      const reply = `${action.title} could not reach the backend boundary. Start the API runtime, then ask me again.`;
+      pushMessage("jarvis", reply, false);
+      speak(reply);
     } finally {
-      setRunning(false);
+      setThinking(false);
+      setVoiceState(voiceEnabledRef.current ? "listening" : "standby");
+      await syncRuntime();
     }
   }
 
   function submit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
-    runCommand();
+    askJarvis(input);
   }
 
-  async function startVoice() {
-    const Recognition = speechRecognitionConstructor();
+  async function enableVoice() {
+    const Recognition = getRecognitionConstructor();
     if (!Recognition) {
       setVoiceState("unsupported");
-      speak("Voice is unsupported in this browser. Use Chrome or Edge.");
+      speak("Voice recognition is not supported in this browser. Use Microsoft Edge or Chrome.");
       return;
     }
+
     try {
       const mic = await navigator.mediaDevices.getUserMedia({ audio: true });
       mic.getTracks().forEach((track) => track.stop());
     } catch {
-      setVoiceState("microphone blocked");
-      speak("Microphone access is blocked.");
+      setVoiceState("blocked");
+      speak("Microphone permission is blocked. Allow microphone access for Jarvis.");
       return;
     }
+
+    voiceEnabledRef.current = true;
     const recognition = new Recognition();
     recognition.lang = "en-ZA";
-    recognition.continuous = false;
+    recognition.continuous = true;
     recognition.interimResults = false;
     recognition.maxAlternatives = 1;
     recognition.onstart = () => setVoiceState("listening");
     recognition.onresult = (event: any) => {
-      const transcript = event.results?.[0]?.[0]?.transcript ?? "";
-      setCommandContext(transcript);
-      setVoiceState(`heard: ${transcript}`);
-      setEvents((items) => [
-        ...items,
-        { id: newId("voice"), role: "founder", title: "Voice context captured", detail: transcript, ok: true, generatedAt: stamp() }
-      ]);
+      const result = event.results?.[event.results.length - 1]?.[0]?.transcript ?? "";
+      const heard = String(result).trim();
+      if (!heard) return;
+      const lower = heard.toLowerCase();
+      if (lower.includes("jarvis")) {
+        const cleaned = heard.replace(/jarvis/ig, "").trim();
+        askJarvis(cleaned || "Hello Jarvis. Start the Kingsmen operating conversation.");
+      }
     };
-    recognition.onerror = (event: any) => setVoiceState(`voice error: ${event?.error ?? "unknown"}`);
-    recognition.onend = () => setVoiceState((current) => (current === "listening" ? "standby" : current));
+    recognition.onerror = () => setVoiceState("standby");
+    recognition.onend = () => {
+      if (voiceEnabledRef.current) {
+        window.setTimeout(() => recognition.start(), 600);
+      }
+    };
+    recognitionRef.current = recognition;
     recognition.start();
+    const greeting = "Hello sir, welcome to Kingsmen. Jarvis voice is active. Say Jarvis, then speak naturally.";
+    pushMessage("jarvis", greeting, true);
+    speak(greeting);
+  }
+
+  function stopVoice() {
+    voiceEnabledRef.current = false;
+    recognitionRef.current?.stop?.();
+    recognitionRef.current = null;
+    setVoiceState("standby");
   }
 
   async function toggleVisual() {
-    if (visualActive) {
+    if (visualOn) {
       streamRef.current?.getTracks().forEach((track) => track.stop());
       streamRef.current = null;
       if (videoRef.current) videoRef.current.srcObject = null;
-      setVisualActive(false);
+      setVisualOn(false);
       return;
     }
     try {
       const stream = await navigator.mediaDevices.getUserMedia({ video: true, audio: false });
       streamRef.current = stream;
       if (videoRef.current) videoRef.current.srcObject = stream;
-      setVisualActive(true);
+      setVisualOn(true);
+      setVisualError("");
     } catch {
-      setVisualActive(false);
+      setVisualError("Camera permission blocked.");
     }
   }
 
   useEffect(() => {
-    loadJarvis();
-    const id = window.setInterval(loadJarvis, 15000);
+    syncRuntime();
+    const timer = window.setInterval(syncRuntime, 15000);
     return () => {
-      window.clearInterval(id);
+      window.clearInterval(timer);
+      voiceEnabledRef.current = false;
+      recognitionRef.current?.stop?.();
       streamRef.current?.getTracks().forEach((track) => track.stop());
       if ("speechSynthesis" in window) window.speechSynthesis.cancel();
     };
@@ -398,161 +286,75 @@ export default function JarvisProductionCommandClient() {
 
   return (
     <main className={styles.shell}>
-      <div className={styles.aurora} />
-      <div className={styles.gridlines} />
-      <section className={styles.wrap}>
-        <header className={styles.hero}>
-          <div className={styles.brandPanel}>
-            <span className={styles.kicker}>KINGSMEN · FOUNDER OPERATING SYSTEM</span>
+      <div className={styles.glow} />
+      <section className={styles.stage}>
+        <header className={styles.header}>
+          <div>
+            <span className={styles.kicker}>KINGSMEN · VOICE OPERATING COMPANION</span>
             <h1>JARVIS</h1>
-            <p className={styles.greeting}>Hello sir, welcome to Kingsmen. I am Jarvis — the single command cockpit for runtime, Truth Vault, evidence, providers, payments, launch gates, voice and visual context.</p>
-            <div className={styles.actionRow}>
-              <button className={styles.goldButton} onClick={greetFounder}>Greet founder</button>
-              <button onClick={loadJarvis} disabled={refreshing}>{refreshing ? "Synchronising" : "Sync Jarvis"}</button>
-              <button onClick={() => runCommand("COMMAND_PERSISTENCE_PROOF")} disabled={running}>Truth Vault proof</button>
-              <button onClick={startVoice}>Voice: {voiceState}</button>
-              <button onClick={toggleVisual}>{visualActive ? "Stop visual" : "Start visual"}</button>
-            </div>
+            <p>I am listening for Kingsmen. Speak to me naturally. Say <b>Jarvis</b>, then ask me to think, research, inspect, plan or run a backend-safe Kingsmen action.</p>
           </div>
-
-          <aside className={styles.coreCard}>
-            <div className={`${styles.coreOrb} ${runtimeLive ? styles.coreOnline : styles.coreStandby}`}>
-              <span />
-              <b>J</b>
-            </div>
-            <p>{runtimeLive ? "KINGSMEN RUNTIME ONLINE" : "RUNTIME STANDBY"}</p>
-            <strong>{runtimeLive ? "Truth Vault connected" : "Backend runtime required"}</strong>
-            <small>{systemLine}</small>
+          <aside className={styles.statusOrb}>
+            <div className={`${styles.orb} ${voiceState === "listening" ? styles.orbLive : ""}`}><span>J</span></div>
+            <strong>{voiceState}</strong>
+            <small>{liveLine}</small>
           </aside>
         </header>
 
-        <section className={styles.missionStrip}>
-          <strong>Doctrine lock</strong>
-          <span>Email primary. WhatsApp urgent only. SMS backup. Playwright scout only. PostgreSQL Truth Vault authority. Airtable mirror only. n8n thin relay only.</span>
+        <section className={styles.controlBar}>
+          <button onClick={enableVoice}>Start Jarvis voice</button>
+          <button onClick={stopVoice}>Stop voice</button>
+          <button onClick={() => askJarvis("Hello Jarvis. Greet me and brief me on Kingsmen.")}>Speak with Jarvis</button>
+          <button onClick={toggleVisual}>{visualOn ? "Stop visual context" : "Start visual context"}</button>
+          <button onClick={syncRuntime}>Sync runtime</button>
         </section>
 
-        <section className={styles.statGrid}>
-          <article className={runtimeLive ? styles.goodStat : styles.warnStat}><span>Runtime</span><strong>{runtimeLive ? "LIVE" : "STANDBY"}</strong></article>
-          <article><span>Backend</span><strong>{backendLive ? "HTTP 200" : "OFFLINE"}</strong></article>
-          <article><span>Truth Vault</span><strong>{truthVaultLive ? "POSTGRES" : "PENDING"}</strong></article>
-          <article><span>Live proofs</span><strong>{liveIndex?.summary?.live ?? 0}</strong></article>
-          <article className={launchBlocked ? styles.warnStat : styles.goodStat}><span>Launch blockers</span><strong>{launchBlockerCount}</strong></article>
-          <article><span>Credentials</span><strong>{credentialReady}/{credentialCount}</strong></article>
-          <article><span>Production</span><strong>{productionReady ? "READY" : "LOCKED"}</strong></article>
-          <article><span>Public launch</span><strong>{publicLaunchAllowed ? "OPEN" : "LOCKED"}</strong></article>
+        <section className={styles.metrics}>
+          <article><span>Backend</span><strong>{backendOnline ? "online" : "offline"}</strong></article>
+          <article><span>Truth Vault</span><strong>{truthVaultOnline ? "connected" : "pending"}</strong></article>
+          <article><span>Production</span><strong>{productionReady ? "ready" : "locked"}</strong></article>
+          <article><span>Public launch</span><strong>{publicLaunchAllowed ? "open" : "locked"}</strong></article>
+          <article><span>Last sync</span><strong>{displayTime(liveIndex?.generatedAt ?? status?.generatedAt)}</strong></article>
         </section>
 
-        {errorText ? <section className={styles.warning}>Live boundary note: {errorText}</section> : null}
-
-        <section className={styles.cockpitGrid}>
-          <section className={styles.card}>
-            <div className={styles.cardHead}>
-              <span>Live operating spine</span>
-              <button onClick={() => window.open("/api/jarvis/live-index", "_blank", "noopener,noreferrer")}>Open JSON</button>
+        <section className={styles.mainGrid}>
+          <section className={styles.dialoguePanel}>
+            <div className={styles.panelHead}>
+              <span>Constructive dialogue</span>
+              <strong>{thinking ? "thinking" : "ready"}</strong>
             </div>
-            <div className={styles.spineList}>
-              {liveEntries.length ? liveEntries.slice(0, 10).map((entry) => (
-                <article key={entry.id} className={styles.spineItem}>
-                  <span className={`${styles.statusPill} ${stateTone(entry.state)}`}>{entry.state}</span>
-                  <strong>{entry.title}</strong>
-                  <p>{entry.detail}</p>
-                  {entry.boundaryRoute ? <code>{entry.boundaryRoute}</code> : null}
+            <div className={styles.messages}>
+              {messages.slice(-14).map((message) => (
+                <article key={message.id} className={message.role === "founder" ? styles.founderMessage : styles.jarvisMessage}>
+                  <span>{message.role === "founder" ? "FOUNDER" : "JARVIS"} · {new Date(message.at).toLocaleTimeString()}</span>
+                  <p>{message.text}</p>
                 </article>
-              )) : <p className={styles.empty}>Jarvis is waiting for the live index route. Nothing is fabricated.</p>}
+              ))}
             </div>
+            <form onSubmit={submit} className={styles.askBar}>
+              <textarea value={input} onChange={(event) => setInput(event.target.value)} placeholder="Ask Jarvis anything about Kingsmen, strategy, operations, research, build steps, providers, payments, candidates or launch..." />
+              <button disabled={thinking || !input.trim()}>{thinking ? "Jarvis thinking" : "Ask Jarvis"}</button>
+            </form>
           </section>
 
-          <section className={`${styles.card} ${styles.commandCore}`}>
-            <div className={styles.cardHead}>
-              <span>Kingsmen command scripts</span>
-              <b>{running ? "EXECUTING" : "READY"}</b>
+          <aside className={styles.actionPanel}>
+            <div className={styles.panelHead}>
+              <span>Kingsmen actions</span>
+              <strong>backend-safe</strong>
             </div>
-            <form onSubmit={submit} className={styles.commandForm}>
-              <label>
-                Command script
-                <select value={selectedCommandId} onChange={(event) => setSelectedCommandId(event.target.value)}>
-                  {commands.map((command) => <option key={command.id} value={command.id}>{command.title}</option>)}
-                </select>
-              </label>
-              <label>
-                Founder context
-                <textarea value={commandContext} onChange={(event) => setCommandContext(event.target.value)} />
-              </label>
-              <button className={styles.goldButton} disabled={running || !selectedCommand}>{running ? "Running script" : "Send to backend"}</button>
-            </form>
-
-            <div className={styles.scriptGrid}>
-              {commands.map((command) => (
-                <button key={command.id} className={styles.scriptTile} onClick={() => {
-                  setSelectedCommandId(command.id);
-                  runCommand(command.id);
-                }} disabled={running}>
-                  <span>{command.category}</span>
-                  <strong>{command.title}</strong>
-                  <small>{command.description}</small>
+            <div className={styles.actions}>
+              {(actions.length ? actions : CORE_ACTIONS).map((action) => (
+                <button key={action.id} onClick={() => executeAction(action)} disabled={thinking}>
+                  <span>{action.title}</span>
+                  <small>{action.description}</small>
                 </button>
               ))}
             </div>
-
-            <div className={styles.timeline}>
-              {events.slice(-8).reverse().map((event) => (
-                <article key={event.id} className={event.ok === false ? styles.badEvent : styles.event}>
-                  <div><strong>{event.role.toUpperCase()} · {event.title}</strong><span>{new Date(event.generatedAt).toLocaleTimeString()}</span></div>
-                  <p>{event.detail}</p>
-                  {event.stdout ? <pre>{event.stdout}</pre> : null}
-                  {event.stderr ? <pre>{event.stderr}</pre> : null}
-                  {event.evidencePath ? <code>Evidence: {event.evidencePath}</code> : null}
-                </article>
-              ))}
+            <div className={styles.visualBox}>
+              <video ref={videoRef} autoPlay muted playsInline className={visualOn ? styles.videoLive : styles.videoHidden} />
+              {!visualOn ? <p>{visualError || "Visual context standby"}</p> : null}
             </div>
-          </section>
-
-          <aside className={styles.rightStack}>
-            <section className={styles.card}>
-              <div className={styles.cardHead}>
-                <span>Launch gates</span>
-                <button onClick={() => window.open("/api/jarvis/live-proof-acceptance-gate", "_blank", "noopener,noreferrer")}>Open JSON</button>
-              </div>
-              <div className={styles.gateList}>
-                {(launchBlocking.length ? launchBlocking : gateList).slice(0, 7).map((item) => (
-                  <article key={item.id} className={styles.gateItem}>
-                    <span className={`${styles.statusPill} ${stateTone(item.state)}`}>{item.state}</span>
-                    <strong>{item.title}</strong>
-                    {item.proofGateRoute ? <code>{item.proofGateRoute}</code> : null}
-                  </article>
-                ))}
-                {!launchBlocking.length && !gateList.length ? <p className={styles.empty}>Acceptance gate unavailable. Launch remains locked.</p> : null}
-              </div>
-            </section>
-
-            <section className={styles.card}>
-              <div className={styles.cardHead}>
-                <span>Proof queue</span>
-                <button onClick={() => window.open("/api/jarvis/live-proof-queue", "_blank", "noopener,noreferrer")}>Open JSON</button>
-              </div>
-              <div className={styles.gateList}>
-                {queueItems.length ? queueItems.map((item: any, index) => (
-                  <article key={item.id ?? index} className={styles.gateItem}>
-                    <span className={`${styles.statusPill} ${stateTone(item.state)}`}>{item.state ?? "PENDING"}</span>
-                    <strong>{item.title ?? item.id ?? `Proof item ${index + 1}`}</strong>
-                    {item.proofRoute ? <code>{item.proofRoute}</code> : null}
-                  </article>
-                )) : <p className={styles.empty}>Proof queue will load from Jarvis routes. Values hidden.</p>}
-              </div>
-            </section>
-
-            <section className={styles.visualCard}>
-              <video ref={videoRef} autoPlay muted playsInline className={visualActive ? styles.videoLive : styles.videoHidden} />
-              {!visualActive ? <span>Visual context standby</span> : null}
-            </section>
           </aside>
-        </section>
-
-        <section className={styles.bottomDock}>
-          <article><span>Evidence drawer</span><strong>{evidenceEvents.length}</strong></article>
-          <article><span>Acceptance</span><strong>{gate?.acceptanceDecision ?? "PENDING"}</strong></article>
-          <article><span>Storage</span><strong>{liveIndex?.backendStorageMode ?? "UNKNOWN"}</strong></article>
-          <article><span>Last sync</span><strong>{safeTime(lastSynced)}</strong></article>
         </section>
       </section>
     </main>
