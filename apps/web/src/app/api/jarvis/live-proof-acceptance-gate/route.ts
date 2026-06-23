@@ -12,6 +12,7 @@ type AcceptanceGate = {
   launchCritical: boolean;
   proofQueueRef: string;
   proofGateRoute?: string;
+  evidenceCaptureRunner?: string;
   acceptanceRule: string;
   rejectionRule: string;
   requiredEvidence: string[];
@@ -55,6 +56,7 @@ const gates: AcceptanceGate[] = [
     launchCritical: true,
     proofQueueRef: "docker-api-truth-vault-runtime",
     proofGateRoute: "/api/jarvis/docker-truth-vault-runtime-proof",
+    evidenceCaptureRunner: "scripts/proof/capture-jarvis-docker-truth-vault-runtime-evidence.mjs",
     acceptanceRule: "Accept only when API health returns HTTP 200, storage mode proves postgres_truth_vault, command log write proof exists, audit event write proof exists, and redacted runtime proof is captured.",
     rejectionRule: "Reject any claim based on a web-only route, local UI success, Docker screenshot, or static source validator without backend health and Truth Vault write evidence.",
     requiredEvidence: ["Docker engine reachable", "API health HTTP 200", "postgres_truth_vault mode", "command_log write proof", "audit_events write proof", "redacted runtime output"]
@@ -66,6 +68,7 @@ const gates: AcceptanceGate[] = [
     launchCritical: true,
     proofQueueRef: "ai-provider-live-call",
     proofGateRoute: "/api/jarvis/ai-email-provider-live-proof",
+    evidenceCaptureRunner: "scripts/proof/capture-jarvis-ai-email-provider-live-evidence.mjs",
     acceptanceRule: "Accept only after a real backend-controlled AI call succeeds with provider, model, policy gate, cost boundary, redacted request/response evidence, and no key exposure.",
     rejectionRule: "Reject mock completions, browser-side provider calls, raw API key exposure, or unredacted prompts/responses in public evidence.",
     requiredEvidence: ["provider selected", "model selected", "redacted live-call proof", "policy gate proof", "cost/rate boundary proof", "no browser provider call"]
@@ -77,6 +80,7 @@ const gates: AcceptanceGate[] = [
     launchCritical: true,
     proofQueueRef: "email-primary-proof",
     proofGateRoute: "/api/jarvis/ai-email-provider-live-proof",
+    evidenceCaptureRunner: "scripts/proof/capture-jarvis-ai-email-provider-live-evidence.mjs",
     acceptanceRule: "Accept only after provider send, receive or delivery record, bounce/failed-send handling, opt-out rule, redaction, and message evidence ledger are proven.",
     rejectionRule: "Reject WhatsApp/SMS as a replacement for primary email evidence or any email provider proof without bounce and opt-out boundaries.",
     requiredEvidence: ["test send evidence", "delivery or receive evidence", "bounce handling", "opt-out rule", "message evidence ledger"]
@@ -88,6 +92,7 @@ const gates: AcceptanceGate[] = [
     launchCritical: true,
     proofQueueRef: "payfast-itn-proof",
     proofGateRoute: "/api/jarvis/payfast-accepted-itn-proof",
+    evidenceCaptureRunner: "scripts/proof/capture-jarvis-payfast-accepted-itn-evidence.mjs",
     acceptanceRule: "Accept only after sandbox checkout, accepted ITN, duplicate ITN rejection, failed-payment rejection, refund review boundary, and founder approval are captured.",
     rejectionRule: "Reject any paid-state claim from return URL, cancel URL, screenshots, manual note, missing accepted ITN evidence, duplicate credit, or failed/pending/cancelled payment.",
     requiredEvidence: ["sandbox checkout", "accepted ITN", "duplicate rejection", "failed-payment rejection", "refund review", "founder approval"]
@@ -99,6 +104,7 @@ const gates: AcceptanceGate[] = [
     launchCritical: true,
     proofQueueRef: "n8n-thin-relay-proof/airtable-human-mirror-proof/github-tool-runtime-proof",
     proofGateRoute: "/api/jarvis/n8n-airtable-github-runtime-proof",
+    evidenceCaptureRunner: "scripts/proof/capture-jarvis-n8n-airtable-github-evidence.mjs",
     acceptanceRule: "Accept only when n8n proves thin relay, Airtable proves mirror-only, GitHub proves controlled connector use, Truth Vault remains authority, and all token values remain hidden.",
     rejectionRule: "Reject any evidence where n8n or Airtable becomes authority, browser calls providers directly, provider proof is only a static source route, or raw tokens are shown.",
     requiredEvidence: ["n8n backend-mediated proof", "Airtable mirror reconciliation", "GitHub redacted metadata", "no token exposure", "Truth Vault authority proof", "audit trail"]
@@ -110,9 +116,10 @@ const gates: AcceptanceGate[] = [
     launchCritical: true,
     proofQueueRef: "branch-protection-proof",
     proofGateRoute: "/api/jarvis/branch-protection-final-launch-audit",
-    acceptanceRule: "Accept only when branch protection, required checks, rollback evidence, final staging evidence pack, final launch audit, and founder launch approval pass.",
-    rejectionRule: "Reject public launch if main branch can be pushed without review, required checks are absent, rollback proof is missing, final staging evidence pack is missing, founder approval is absent, or final audit fails.",
-    requiredEvidence: ["main branch protection", "required review/status checks", "rollback evidence", "staging evidence pack", "final launch audit", "founder approval"]
+    evidenceCaptureRunner: "scripts/proof/capture-jarvis-branch-protection-final-launch-audit-evidence.mjs",
+    acceptanceRule: "Accept only when branch protection, required checks, rollback evidence, final staging evidence pack, final launch audit, founder launch approval, and the branch-protection-final-launch-audit-evidence-capture report pass.",
+    rejectionRule: "Reject public launch if main branch can be pushed without review, required checks are absent, rollback proof is missing, final staging evidence pack is missing, founder approval is absent, final audit fails, or branch-protection-final-launch-audit-evidence-capture is missing.",
+    requiredEvidence: ["main branch protection", "required review/status checks", "rollback evidence", "staging evidence pack", "final launch audit", "founder approval", "branch-protection-final-launch-audit-evidence-capture"]
   }
 ];
 
@@ -140,6 +147,7 @@ export async function GET() {
     payfastAcceptedItnProofGateConnected: true,
     n8nAirtableGithubRuntimeProofGateConnected: true,
     branchProtectionFinalLaunchAuditGateConnected: true,
+    branchProtectionFinalLaunchAuditEvidenceCaptureConnected: true,
     jarvisRuntimeLive: false,
     productionReady: false,
     publicLaunchAllowed: false,
