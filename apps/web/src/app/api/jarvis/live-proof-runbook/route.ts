@@ -22,7 +22,7 @@ const phases: RunbookPhase[] = [
     state: "READY_TO_RUN_WHEN_RUNTIME_AVAILABLE",
     owner: "jarvis",
     launchCritical: true,
-    commandText: "node scripts\validators\validate-jarvis-source-completion-seal.mjs && node scripts\validators\validate-jarvis-final-command-room-live-proof-queue.mjs",
+    commandText: "node scripts\\validators\\validate-jarvis-source-completion-seal.mjs && node scripts\\validators\\validate-jarvis-final-command-room-live-proof-queue.mjs",
     evidenceExpected: ["source seal validator passed", "final HUD live proof queue validator passed", "productionReady remains false"],
     stopCondition: "Stop if any source validator fails. Do not continue to runtime proof until source validators pass."
   },
@@ -32,7 +32,7 @@ const phases: RunbookPhase[] = [
     state: "BLOCKED_BY_LOCAL_DOCKER",
     owner: "runtime",
     launchCritical: true,
-    commandText: "npm run api:start:local -- -KillExistingPort",
+    commandText: "node scripts/proof/capture-jarvis-docker-truth-vault-runtime-evidence.mjs",
     proofGateRoute: "/api/jarvis/docker-truth-vault-runtime-proof",
     evidenceExpected: ["Docker engine reachable", "API health HTTP 200", "storageMode postgres_truth_vault", "command log proof", "audit event proof", "redacted runtime output"],
     stopCondition: "Stop if Docker Desktop or API health fails. Keep source build valid and do not fake runtime readiness."
@@ -43,8 +43,9 @@ const phases: RunbookPhase[] = [
     state: "PENDING_CREDENTIALS",
     owner: "provider",
     launchCritical: true,
+    commandText: "node scripts/proof/capture-jarvis-ai-email-provider-live-evidence.mjs",
     proofGateRoute: "/api/jarvis/ai-email-provider-live-proof",
-    evidenceExpected: ["provider selected", "model selected", "API key stored outside Git", "backend-controlled live call", "redacted live-call proof", "policy gate proof", "cost/rate boundary proof"],
+    evidenceExpected: ["provider selected", "model selected", "API key stored outside Git", "backend-controlled live call", "redacted live-call proof", "policy gate proof", "cost/rate boundary proof", "accepted AI evidence file"],
     stopCondition: "Stop if provider credentials are absent, raw secrets appear, browser calls the provider, or live-call evidence is not redacted."
   },
   {
@@ -53,9 +54,9 @@ const phases: RunbookPhase[] = [
     state: "PENDING_CREDENTIALS",
     owner: "provider",
     launchCritical: true,
-    commandText: "npm run jarvis:runtime:email-primary-channel",
+    commandText: "node scripts/proof/capture-jarvis-ai-email-provider-live-evidence.mjs",
     proofGateRoute: "/api/jarvis/ai-email-provider-live-proof",
-    evidenceExpected: ["provider send proof", "delivery or receive evidence", "bounce/failed send handling", "opt-out proof", "redaction proof", "message evidence ledger"],
+    evidenceExpected: ["provider send proof", "delivery or receive evidence", "bounce/failed send handling", "opt-out proof", "redaction proof", "message evidence ledger", "accepted Email evidence file"],
     stopCondition: "Stop if email is not the primary tracked channel, WhatsApp/SMS replaces email, or proof lacks evidence ledger capture."
   },
   {
@@ -64,9 +65,9 @@ const phases: RunbookPhase[] = [
     state: "BLOCKED_BY_PROVIDER_EVIDENCE",
     owner: "provider",
     launchCritical: true,
-    commandText: "npm run jarvis:runtime:payfast-provider-proof-queue",
+    commandText: "node scripts/proof/capture-jarvis-payfast-accepted-itn-evidence.mjs",
     proofGateRoute: "/api/jarvis/payfast-accepted-itn-proof",
-    evidenceExpected: ["sandbox checkout proof", "accepted ITN proof", "duplicate ITN rejection", "failed-payment rejection", "refund review boundary", "founder approval"],
+    evidenceExpected: ["sandbox checkout proof", "accepted ITN proof", "duplicate ITN rejection", "failed-payment rejection", "refund review boundary", "founder approval", "accepted PayFast evidence files"],
     stopCondition: "Stop if return/cancel URL is treated as paid. Only accepted ITN may clear payment state."
   },
   {
@@ -75,10 +76,10 @@ const phases: RunbookPhase[] = [
     state: "PENDING_CREDENTIALS",
     owner: "provider",
     launchCritical: true,
-    commandText: "npm run jarvis:runtime:n8n-thin-relay && npm run jarvis:runtime:airtable-human-mirror && npm run jarvis:runtime:github-tool-boundary",
+    commandText: "node scripts/proof/capture-jarvis-n8n-airtable-github-evidence.mjs",
     proofGateRoute: "/api/jarvis/n8n-airtable-github-runtime-proof",
-    evidenceExpected: ["n8n thin relay proof", "Airtable mirror-only proof", "GitHub token redaction proof", "Truth Vault authority proof", "no direct browser-to-provider call proof", "redacted runtime output"],
-    stopCondition: "Stop if n8n or Airtable becomes authority, browser calls provider tools directly, or raw credentials are returned."
+    evidenceExpected: ["n8n thin relay proof", "Airtable mirror-only proof", "GitHub token redaction proof", "Truth Vault authority proof", "no direct browser-to-provider call proof", "redacted runtime output", "accepted n8n/Airtable/GitHub evidence files"],
+    stopCondition: "Stop if n8n or Airtable becomes authority, browser calls provider tools directly, raw credentials are returned, or evidence lacks redaction."
   },
   {
     id: "branch-protection-launch-audit",
@@ -101,8 +102,11 @@ export async function GET() {
     jarvisSourceDesignComplete: true,
     dockerRuntimeProofGateConnected: true,
     aiEmailProviderProofGateConnected: true,
+    aiEmailProviderEvidenceCaptureConnected: true,
     payfastAcceptedItnProofGateConnected: true,
+    payfastAcceptedItnEvidenceCaptureConnected: true,
     n8nAirtableGithubRuntimeProofGateConnected: true,
+    n8nAirtableGithubEvidenceCaptureConnected: true,
     branchProtectionFinalLaunchAuditGateConnected: true,
     jarvisRuntimeLive: false,
     productionReady: false,
