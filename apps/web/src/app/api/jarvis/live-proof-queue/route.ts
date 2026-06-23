@@ -67,7 +67,7 @@ const proofQueue: ProofQueueItem[] = [
     owner: "provider",
     launchCritical: true,
     detail: "PayFast cannot mark paid from return/cancel URLs. Only accepted ITN evidence may clear payment state, with duplicate and failed-payment rejection proof.",
-    proofRoute: "/api/jarvis/payfast-provider-proof-queue-boundary",
+    proofRoute: "/api/jarvis/payfast-accepted-itn-proof",
     proofScript: "npm run jarvis:runtime:payfast-provider-proof-queue",
     evidenceRequired: ["sandbox checkout proof", "accepted ITN proof", "duplicate ITN rejection", "failed payment rejection", "refund review boundary", "founder approval"]
   },
@@ -135,6 +135,7 @@ export async function GET() {
     generatedAt: new Date().toISOString(),
     jarvisSourceReady: true,
     aiEmailProviderProofGateConnected: true,
+    payfastAcceptedItnProofGateConnected: true,
     jarvisRuntimeLive: false,
     productionReady: false,
     publicLaunchAllowed: false,
@@ -149,6 +150,6 @@ export async function GET() {
     noDirectProviderCallsFromWeb: true,
     counts,
     proofQueue,
-    nextAction: "Clear Docker/API runtime through /api/jarvis/docker-truth-vault-runtime-proof, clear AI+Email through /api/jarvis/ai-email-provider-live-proof, then provider tooling and branch/security gates before calling Jarvis live."
+    nextAction: "Clear Docker/API runtime, AI+Email, PayFast accepted ITN, provider tooling, and branch/security gates before calling Jarvis live."
   });
 }
