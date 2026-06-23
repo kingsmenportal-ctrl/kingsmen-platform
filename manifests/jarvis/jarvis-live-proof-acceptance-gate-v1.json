@@ -1,0 +1,33 @@
+{
+  "schema": "kingsmen.jarvis-live-proof-acceptance-gate.v1",
+  "module": "Jarvis Live Proof Acceptance Gate",
+  "status": "SOURCE_READY_BLOCK_LAUNCH",
+  "jarvisSourceReady": true,
+  "jarvisRuntimeLive": false,
+  "productionReady": false,
+  "publicLaunchAllowed": false,
+  "acceptanceDecision": "BLOCK_LAUNCH",
+  "dockerIndependentBuildAllowed": true,
+  "routes": [
+    "/api/jarvis/live-proof-acceptance-gate",
+    "/founder/launch-control/jarvis-live-proof-acceptance-gate"
+  ],
+  "validator": "node scripts/validators/validate-jarvis-live-proof-acceptance-gate.mjs",
+  "boundaries": {
+    "noFakeData": true,
+    "redacted": true,
+    "rawSecretsReturned": false,
+    "secretValuesReturned": false,
+    "localShellExecuted": false,
+    "directDatabaseAccessFromWeb": false,
+    "noDirectProviderCallsFromWeb": true
+  },
+  "blockedUntil": [
+    "Docker/API/Truth Vault runtime proof accepted",
+    "AI provider live-call proof accepted",
+    "Email primary proof accepted",
+    "PayFast accepted ITN proof accepted",
+    "n8n/Airtable/GitHub runtime proof accepted",
+    "Branch protection and final launch audit accepted"
+  ]
+}
