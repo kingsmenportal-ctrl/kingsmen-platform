@@ -12,6 +12,10 @@ type RuntimeProofCheck = {
   expectedEvidence: string[];
 };
 
+const captureRunner = "scripts/proof/capture-jarvis-docker-truth-vault-runtime-evidence.mjs";
+const captureReport = "reports/jarvis/jarvis-docker-truth-vault-runtime-evidence-capture-latest.json";
+const captureValidator = "scripts/validators/validate-jarvis-docker-truth-vault-runtime-evidence-capture.mjs";
+
 const checks: RuntimeProofCheck[] = [
   {
     id: "docker-engine-reachable",
@@ -67,6 +71,20 @@ const checks: RuntimeProofCheck[] = [
     ]
   },
   {
+    id: "runtime-evidence-capture-runner",
+    title: "Runtime Evidence Capture Runner",
+    state: "SOURCE_READY",
+    launchCritical: true,
+    detail: "A redacted HTTP-only capture runner is available to collect API health, postgres_truth_vault storage mode, command acceptance, and indirect command_log/audit_events write proof when runtime is available.",
+    expectedEvidence: [
+      captureRunner,
+      captureReport,
+      captureValidator,
+      "rawSecretsReturned false",
+      "directDatabaseAccessFromWeb false"
+    ]
+  },
+  {
     id: "runtime-redaction-lock",
     title: "Runtime Redaction Lock",
     state: "SOURCE_READY",
@@ -107,12 +125,15 @@ export async function GET() {
     postgresTruthVaultRemainsAuthority: true,
     airtableMirrorOnly: true,
     n8nThinRelayOnly: true,
+    captureRunner,
+    captureReport,
+    captureValidator,
     checks,
     blockingCheckCount: blockingChecks.length,
     blockingChecks,
     acceptanceRoute: "/api/jarvis/live-proof-acceptance-gate",
     evidenceLedgerRoute: "/api/jarvis/live-proof-evidence-ledger",
     liveProofQueueRoute: "/api/jarvis/live-proof-queue",
-    nextAction: "Do not mark Jarvis live until Docker/API/Truth Vault runtime proof returns accepted evidence."
+    nextAction: "Run the redacted runtime capture only when Docker/API/Truth Vault runtime is available; do not mark Jarvis live until accepted evidence exists."
   });
 }
