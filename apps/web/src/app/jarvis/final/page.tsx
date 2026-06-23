@@ -1,7 +1,7 @@
-import JarvisFinalHudClient from "./JarvisFinalHudClient";
+import { redirect } from "next/navigation";
 
 export const dynamic = "force-dynamic";
 
 export default function JarvisFinalPage() {
-  return <JarvisFinalHudClient />;
+  redirect("/jarvis");
 }
