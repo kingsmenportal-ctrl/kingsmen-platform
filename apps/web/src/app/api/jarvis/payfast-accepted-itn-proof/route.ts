@@ -77,6 +77,10 @@ export async function GET() {
     generatedAt: new Date().toISOString(),
     jarvisSourceReady: true,
     payfastProofGateConnected: true,
+    payfastEvidenceCaptureConnected: true,
+    captureRunner: "scripts/proof/capture-jarvis-payfast-accepted-itn-evidence.mjs",
+    captureReportPath: "reports/jarvis/jarvis-payfast-accepted-itn-evidence-capture-latest.json",
+    captureValidator: "scripts/validators/validate-jarvis-payfast-accepted-itn-evidence-capture.mjs",
     payfastSandboxProofAccepted: false,
     payfastAcceptedItnProofAccepted: false,
     duplicateItnRejected: false,
@@ -103,6 +107,6 @@ export async function GET() {
     whatsappUrgentOnly: true,
     requirements,
     acceptanceDecision: "BLOCK_PAYFAST_LIVE_UNTIL_ACCEPTED_ITN_EVIDENCE",
-    nextAction: "Provide redacted PayFast sandbox checkout, accepted ITN, duplicate rejection, failed-payment rejection, refund review, and founder approval evidence before PayFast can pass."
+    nextAction: "Run scripts/proof/capture-jarvis-payfast-accepted-itn-evidence.mjs only after PayFast credentials and accepted redacted sandbox, ITN, rejection, refund, and founder approval evidence files exist."
   });
 }
