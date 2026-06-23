@@ -1,0 +1,27 @@
+{
+  "schema": "kingsmen.manifest.v1",
+  "module": "Jarvis Live Evidence Execution Sequence",
+  "status": "SOURCE_READY_MANUAL_OPERATOR_EXECUTION_REQUIRED",
+  "productionReady": false,
+  "publicLaunchAllowed": false,
+  "dockerIndependentBuildAllowed": true,
+  "noFakeData": true,
+  "browserMayExecuteLocalShell": false,
+  "rawSecretsReturned": false,
+  "secretValuesReturned": false,
+  "surfaces": {
+    "api": "/api/jarvis/live-evidence-execution-sequence",
+    "founderPage": "/founder/launch-control/jarvis-live-evidence-execution-sequence",
+    "validator": "scripts/validators/validate-jarvis-live-evidence-execution-sequence.mjs",
+    "docs": "docs/jarvis/JARVIS_LIVE_EVIDENCE_EXECUTION_SEQUENCE.md"
+  },
+  "evidenceOrder": [
+    "docker-api-truth-vault-runtime-evidence",
+    "ai-email-provider-live-evidence",
+    "payfast-accepted-itn-evidence",
+    "n8n-airtable-github-runtime-evidence",
+    "branch-protection-final-launch-audit-evidence",
+    "final-live-evidence-acceptance-pack"
+  ],
+  "launchRule": "Do not call Jarvis live until every launch-critical capture report is accepted, final acceptance passes, branch/final audit evidence is accepted, and founder approval is recorded."
+}
