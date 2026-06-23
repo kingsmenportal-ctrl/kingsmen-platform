@@ -129,9 +129,10 @@ const ledgerItems: EvidenceLedgerItem[] = [
     launchCritical: true,
     evidenceClass: "security",
     acceptedEvidence: [],
-    missingEvidence: ["main branch protection", "required checks", "rollback evidence", "final launch audit"],
-    rejectionRules: ["reject if branch protection is absent", "reject if launch audit fails", "reject if rollback evidence is absent"],
-    storageTarget: "reports/jarvis/final-launch-audit-proof.json"
+    missingEvidence: ["main branch protection", "required checks", "rollback evidence", "final staging evidence pack", "final launch audit", "founder approval"],
+    rejectionRules: ["reject if branch protection is absent", "reject if launch audit fails", "reject if rollback evidence is absent", "reject if founder approval is absent", "reject if publicLaunchAllowed is true before all launch-critical proof is accepted"],
+    storageTarget: "reports/jarvis/final-launch-audit-proof.json",
+    proofGateRoute: "/api/jarvis/branch-protection-final-launch-audit"
   }
 ];
 
@@ -156,6 +157,7 @@ export async function GET() {
     aiEmailProviderProofGateConnected: true,
     payfastAcceptedItnProofGateConnected: true,
     n8nAirtableGithubRuntimeProofGateConnected: true,
+    branchProtectionFinalLaunchAuditGateConnected: true,
     jarvisRuntimeLive: false,
     productionReady: false,
     publicLaunchAllowed: false,
