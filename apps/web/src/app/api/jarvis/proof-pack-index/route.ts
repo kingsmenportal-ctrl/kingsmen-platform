@@ -12,6 +12,7 @@ const validators = [
   "scripts/validators/validate-jarvis-live-proof-runbook.mjs",
   "scripts/validators/validate-jarvis-live-proof-evidence-ledger.mjs",
   "scripts/validators/validate-jarvis-live-proof-acceptance-gate.mjs",
+  "scripts/validators/validate-jarvis-final-source-closeout-seal.mjs",
   "scripts/validators/validate-jarvis-final-launch-control.mjs",
   "scripts/validators/validate-jarvis-source-completion-seal.mjs",
   "scripts/validators/validate-jarvis-live-proof-queue.mjs",
@@ -29,6 +30,7 @@ const manifests = [
   "manifests/jarvis/jarvis-completion-board-v1.json",
   "manifests/jarvis/jarvis-dashboard-completion-board-v1.json",
   "manifests/jarvis/jarvis-source-completion-seal-v1.json",
+  "manifests/jarvis/jarvis-final-source-closeout-seal-v1.json",
   "manifests/jarvis/jarvis-live-proof-queue-v1.json",
   "manifests/jarvis/jarvis-live-proof-runbook-v1.json",
   "manifests/jarvis/jarvis-live-proof-evidence-ledger-v1.json",
@@ -45,12 +47,14 @@ const routes = [
   "/founder/proof-centre/jarvis-live-proof-evidence-ledger",
   "/founder/launch-control/jarvis",
   "/founder/launch-control/jarvis-source-seal",
+  "/founder/launch-control/jarvis-final-source-closeout",
   "/founder/launch-control/jarvis-live-proof-queue",
   "/founder/launch-control/jarvis-live-proof-runbook",
   "/founder/launch-control/jarvis-live-proof-acceptance-gate",
   "/api/jarvis/final-command-hud",
   "/api/jarvis/final-launch-control",
   "/api/jarvis/source-completion-seal",
+  "/api/jarvis/final-source-closeout-seal",
   "/api/jarvis/live-proof-queue",
   "/api/jarvis/live-proof-runbook",
   "/api/jarvis/live-proof-evidence-ledger",
@@ -65,10 +69,16 @@ const routes = [
 
 const blockers = [
   {
+    id: "source-closeout-complete",
+    title: "Source/design closeout complete",
+    state: "PASSED_SOURCE",
+    detail: "No more source/UI layers should be added unless a validator fails or a real launch proof requires a correction."
+  },
+  {
     id: "local-docker-runtime",
     title: "Local Docker/API runtime instability",
     state: "BLOCKED",
-    detail: "Blocks runtime proof only. Source-safe Jarvis construction continues."
+    detail: "Blocks runtime proof only. Source-safe Jarvis construction is closed out."
   },
   {
     id: "live-proof-queue",
@@ -119,6 +129,7 @@ export async function GET() {
     jarvisFinalCommandRoomIndexed: true,
     jarvisFinalLaunchControlIndexed: true,
     jarvisSourceCompletionSealIndexed: true,
+    jarvisFinalSourceCloseoutSealIndexed: true,
     jarvisLiveProofQueueIndexed: true,
     jarvisLiveProofRunbookIndexed: true,
     jarvisLiveProofEvidenceLedgerIndexed: true,
@@ -134,6 +145,6 @@ export async function GET() {
     manifests,
     routes,
     blockers,
-    nextAction: "Jarvis source/design is sealed. Clear live proof queue, runbook, evidence ledger, acceptance gate, provider, security, and final launch audit blockers before public launch."
+    nextAction: "Jarvis source/design is closed out. Clear the five live proof batches before public launch."
   });
 }
