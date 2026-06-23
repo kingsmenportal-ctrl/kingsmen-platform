@@ -14,6 +14,7 @@ const validators = [
   "scripts/validators/validate-jarvis-live-proof-acceptance-gate.mjs",
   "scripts/validators/validate-jarvis-docker-truth-vault-runtime-proof.mjs",
   "scripts/validators/validate-jarvis-ai-email-provider-live-proof.mjs",
+  "scripts/validators/validate-jarvis-payfast-accepted-itn-proof.mjs",
   "scripts/validators/validate-jarvis-final-source-closeout-seal.mjs",
   "scripts/validators/validate-jarvis-final-launch-control.mjs",
   "scripts/validators/validate-jarvis-source-completion-seal.mjs",
@@ -39,6 +40,7 @@ const manifests = [
   "manifests/jarvis/jarvis-live-proof-acceptance-gate-v1.json",
   "manifests/jarvis/jarvis-docker-truth-vault-runtime-proof-v1.json",
   "manifests/jarvis/jarvis-ai-email-provider-live-proof-v1.json",
+  "manifests/jarvis/jarvis-payfast-accepted-itn-proof-v1.json",
   "manifests/jarvis/jarvis-openclaw-operator-policy-boundary-v1.json",
   "manifests/jarvis/jarvis-playwright-scout-map-fallback-boundary-v1.json"
 ];
@@ -57,6 +59,7 @@ const routes = [
   "/founder/launch-control/jarvis-live-proof-acceptance-gate",
   "/founder/launch-control/jarvis-docker-runtime-proof",
   "/founder/launch-control/jarvis-ai-email-provider-proof",
+  "/founder/launch-control/jarvis-payfast-itn-proof",
   "/api/jarvis/final-command-hud",
   "/api/jarvis/final-launch-control",
   "/api/jarvis/source-completion-seal",
@@ -67,6 +70,7 @@ const routes = [
   "/api/jarvis/live-proof-acceptance-gate",
   "/api/jarvis/docker-truth-vault-runtime-proof",
   "/api/jarvis/ai-email-provider-live-proof",
+  "/api/jarvis/payfast-accepted-itn-proof",
   "/api/jarvis/completion-board",
   "/api/jarvis/provider-credential-checklist",
   "/api/jarvis/evidence-collector",
@@ -101,6 +105,12 @@ const blockers = [
     detail: "AI backend live call and Email primary channel evidence are still required before provider readiness can pass."
   },
   {
+    id: "payfast-accepted-itn-proof-gate",
+    title: "PayFast accepted ITN proof gate not accepted",
+    state: "BLOCKED",
+    detail: "Sandbox checkout, accepted ITN, duplicate rejection, failed-payment rejection, refund review, and founder approval evidence are required."
+  },
+  {
     id: "live-proof-queue",
     title: "Live proof queue not cleared",
     state: "BLOCKED",
@@ -122,7 +132,7 @@ const blockers = [
     id: "live-proof-acceptance-gate",
     title: "Live proof acceptance gate still blocks launch",
     state: "BLOCKED",
-    detail: "Acceptance gate currently decides BLOCK_LAUNCH until real runtime, provider, and security evidence clears."
+    detail: "Acceptance gate currently decides BLOCK_LAUNCH until real runtime, provider, payment, and security evidence clears."
   },
   {
     id: "provider-credentials",
@@ -156,6 +166,7 @@ export async function GET() {
     jarvisLiveProofAcceptanceGateIndexed: true,
     jarvisDockerTruthVaultRuntimeProofIndexed: true,
     jarvisAiEmailProviderProofIndexed: true,
+    jarvisPayFastAcceptedItnProofIndexed: true,
     dockerIndependentBuildAllowed: true,
     noFakeData: true,
     rawSecretsReturned: false,
@@ -167,6 +178,6 @@ export async function GET() {
     manifests,
     routes,
     blockers,
-    nextAction: "Jarvis source/design is closed out. Clear the remaining live proof batches before public launch."
+    nextAction: "Jarvis source/design is closed out. Clear PayFast accepted ITN plus the remaining live proof batches before public launch."
   });
 }
