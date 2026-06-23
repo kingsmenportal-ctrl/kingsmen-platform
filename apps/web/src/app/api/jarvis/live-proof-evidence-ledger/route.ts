@@ -17,6 +17,7 @@ type EvidenceLedgerItem = {
   rejectionRules: string[];
   storageTarget: string;
   proofGateRoute?: string;
+  captureRunner?: string;
 };
 
 const ledgerItems: EvidenceLedgerItem[] = [
@@ -66,8 +67,9 @@ const ledgerItems: EvidenceLedgerItem[] = [
     acceptedEvidence: [],
     missingEvidence: ["Docker engine reachable", "API health HTTP 200", "postgres_truth_vault storage mode", "command log write proof", "audit event write proof", "redacted runtime output"],
     rejectionRules: ["reject if health is 500", "reject if storage mode is memory", "reject if browser writes database directly", "reject if proof is only a static source route"],
-    storageTarget: "reports/jarvis/backend-truth-vault-runtime-proof.json",
-    proofGateRoute: "/api/jarvis/docker-truth-vault-runtime-proof"
+    storageTarget: "reports/jarvis/jarvis-docker-truth-vault-runtime-evidence-capture-latest.json",
+    proofGateRoute: "/api/jarvis/docker-truth-vault-runtime-proof",
+    captureRunner: "scripts/proof/capture-jarvis-docker-truth-vault-runtime-evidence.mjs"
   },
   {
     id: "ai-live-call-evidence",
@@ -79,8 +81,9 @@ const ledgerItems: EvidenceLedgerItem[] = [
     acceptedEvidence: [],
     missingEvidence: ["provider selected", "model selected", "API key outside Git", "backend-controlled live-call proof", "policy gate proof", "cost/rate boundary proof", "redacted request/response evidence"],
     rejectionRules: ["reject if raw API key is printed", "reject if browser calls provider directly", "reject if policy gate is absent", "reject if mock completion is called live"],
-    storageTarget: "reports/jarvis/ai-provider-live-call-proof.json",
-    proofGateRoute: "/api/jarvis/ai-email-provider-live-proof"
+    storageTarget: "reports/jarvis/jarvis-ai-email-provider-live-evidence-capture-latest.json",
+    proofGateRoute: "/api/jarvis/ai-email-provider-live-proof",
+    captureRunner: "scripts/proof/capture-jarvis-ai-email-provider-live-evidence.mjs"
   },
   {
     id: "email-primary-evidence",
@@ -92,8 +95,9 @@ const ledgerItems: EvidenceLedgerItem[] = [
     acceptedEvidence: [],
     missingEvidence: ["SMTP/provider credentials outside Git", "test send proof", "delivery or receive evidence", "bounce handling", "opt-out proof", "redaction proof", "message evidence ledger"],
     rejectionRules: ["reject if WhatsApp becomes bulk channel", "reject if SMS replaces primary email", "reject if raw SMTP password is exposed", "reject if email evidence ledger is absent"],
-    storageTarget: "reports/jarvis/email-primary-channel-proof.json",
-    proofGateRoute: "/api/jarvis/ai-email-provider-live-proof"
+    storageTarget: "reports/jarvis/jarvis-ai-email-provider-live-evidence-capture-latest.json",
+    proofGateRoute: "/api/jarvis/ai-email-provider-live-proof",
+    captureRunner: "scripts/proof/capture-jarvis-ai-email-provider-live-evidence.mjs"
   },
   {
     id: "payfast-itn-evidence",
@@ -105,8 +109,9 @@ const ledgerItems: EvidenceLedgerItem[] = [
     acceptedEvidence: [],
     missingEvidence: ["sandbox checkout proof", "accepted ITN proof", "duplicate ITN rejection", "failed payment rejection", "refund review boundary", "founder approval"],
     rejectionRules: ["reject if return URL marks paid", "reject if cancel URL marks paid", "reject if duplicate ITN is accepted", "reject if failed/pending/cancelled payment marks paid", "reject if founder approval is missing"],
-    storageTarget: "reports/jarvis/payfast-accepted-itn-proof.json",
-    proofGateRoute: "/api/jarvis/payfast-accepted-itn-proof"
+    storageTarget: "reports/jarvis/jarvis-payfast-accepted-itn-evidence-capture-latest.json",
+    proofGateRoute: "/api/jarvis/payfast-accepted-itn-proof",
+    captureRunner: "scripts/proof/capture-jarvis-payfast-accepted-itn-evidence.mjs"
   },
   {
     id: "n8n-airtable-github-evidence",
@@ -118,8 +123,9 @@ const ledgerItems: EvidenceLedgerItem[] = [
     acceptedEvidence: [],
     missingEvidence: ["n8n thin relay proof", "Airtable mirror-only proof", "GitHub token redaction proof", "Truth Vault authority proof", "no direct browser-to-provider call proof", "redacted provider-tool runtime output"],
     rejectionRules: ["reject if n8n writes Truth Vault directly", "reject if Airtable becomes authority", "reject if GitHub token is exposed", "reject if browser calls provider tools directly", "reject if provider-tool proof is only a static source route"],
-    storageTarget: "reports/jarvis/tool-runtime-proof.json",
-    proofGateRoute: "/api/jarvis/n8n-airtable-github-runtime-proof"
+    storageTarget: "reports/jarvis/jarvis-n8n-airtable-github-evidence-capture-latest.json",
+    proofGateRoute: "/api/jarvis/n8n-airtable-github-runtime-proof",
+    captureRunner: "scripts/proof/capture-jarvis-n8n-airtable-github-evidence.mjs"
   },
   {
     id: "branch-protection-launch-audit-evidence",
@@ -129,10 +135,11 @@ const ledgerItems: EvidenceLedgerItem[] = [
     launchCritical: true,
     evidenceClass: "security",
     acceptedEvidence: [],
-    missingEvidence: ["main branch protection", "required checks", "rollback evidence", "final staging evidence pack", "final launch audit", "founder approval"],
+    missingEvidence: ["main branch protection", "required checks", "rollback evidence", "final staging evidence pack", "final launch audit", "founder approval", "accepted branch/final audit evidence capture report"],
     rejectionRules: ["reject if branch protection is absent", "reject if launch audit fails", "reject if rollback evidence is absent", "reject if founder approval is absent", "reject if publicLaunchAllowed is true before all launch-critical proof is accepted"],
-    storageTarget: "reports/jarvis/final-launch-audit-proof.json",
-    proofGateRoute: "/api/jarvis/branch-protection-final-launch-audit"
+    storageTarget: "reports/jarvis/jarvis-branch-protection-final-launch-audit-evidence-capture-latest.json",
+    proofGateRoute: "/api/jarvis/branch-protection-final-launch-audit",
+    captureRunner: "scripts/proof/capture-jarvis-branch-protection-final-launch-audit-evidence.mjs"
   }
 ];
 
@@ -158,6 +165,7 @@ export async function GET() {
     payfastAcceptedItnProofGateConnected: true,
     n8nAirtableGithubRuntimeProofGateConnected: true,
     branchProtectionFinalLaunchAuditGateConnected: true,
+    branchProtectionFinalLaunchAuditEvidenceCaptureConnected: true,
     jarvisRuntimeLive: false,
     productionReady: false,
     publicLaunchAllowed: false,
