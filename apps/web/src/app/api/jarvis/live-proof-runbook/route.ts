@@ -87,9 +87,9 @@ const phases: RunbookPhase[] = [
     state: "BLOCKED_BY_SECURITY_GATE",
     owner: "security",
     launchCritical: true,
-    commandText: "npm run repo:validate:branch-protection && npm run kingsmen:launch:audit",
+    commandText: "node scripts/proof/capture-jarvis-branch-protection-final-launch-audit-evidence.mjs",
     proofGateRoute: "/api/jarvis/branch-protection-final-launch-audit",
-    evidenceExpected: ["branch protection proof", "required status checks", "rollback evidence", "final staging evidence pack", "final launch audit", "founder approval"],
+    evidenceExpected: ["branch protection proof", "required status checks", "rollback evidence", "final staging evidence pack", "final launch audit", "founder approval", "accepted branch/final audit evidence capture report"],
     stopCondition: "Stop if branch protection, rollback proof, staging evidence pack, founder approval, or launch audit fails. Public launch remains false."
   }
 ];
@@ -108,6 +108,7 @@ export async function GET() {
     n8nAirtableGithubRuntimeProofGateConnected: true,
     n8nAirtableGithubEvidenceCaptureConnected: true,
     branchProtectionFinalLaunchAuditGateConnected: true,
+    branchProtectionFinalLaunchAuditEvidenceCaptureConnected: true,
     jarvisRuntimeLive: false,
     productionReady: false,
     publicLaunchAllowed: false,
@@ -121,6 +122,6 @@ export async function GET() {
     directDatabaseAccessFromWeb: false,
     noDirectProviderCallsFromWeb: true,
     phases,
-    nextAction: "Run phases in order only when runtime, provider credentials, security gates, rollback proof, and founder approval are actually available. Do not skip failed gates."
+    nextAction: "Run phases in order only when runtime, provider credentials, security gates, rollback proof, founder approval, and accepted redacted evidence files are actually available. Do not skip failed gates."
   });
 }
