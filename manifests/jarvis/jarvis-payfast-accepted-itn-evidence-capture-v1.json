@@ -1,0 +1,37 @@
+{
+  "schema": "kingsmen.jarvis-manifest.v1",
+  "module": "Jarvis PayFast Accepted ITN Evidence Capture",
+  "status": "SOURCE_READY__EVIDENCE_NOT_ACCEPTED",
+  "productionReady": false,
+  "publicLaunchAllowed": false,
+  "dockerIndependentBuildAllowed": true,
+  "runner": "scripts/proof/capture-jarvis-payfast-accepted-itn-evidence.mjs",
+  "validator": "scripts/validators/validate-jarvis-payfast-accepted-itn-evidence-capture.mjs",
+  "report": "reports/jarvis/jarvis-payfast-accepted-itn-evidence-capture-latest.json",
+  "gateRoute": "/api/jarvis/payfast-accepted-itn-proof",
+  "requiredEvidenceSchemas": [
+    "kingsmen.jarvis-payfast-sandbox-checkout-evidence.v1",
+    "kingsmen.jarvis-payfast-accepted-itn-evidence.v1",
+    "kingsmen.jarvis-payfast-rejection-evidence.v1",
+    "kingsmen.jarvis-payfast-refund-founder-approval-evidence.v1"
+  ],
+  "locks": {
+    "noFakeData": true,
+    "redacted": true,
+    "rawSecretsReturned": false,
+    "secretValuesReturned": false,
+    "payfastMayMarkPaidFromReturnUrl": false,
+    "payfastMayMarkPaidFromCancelUrl": false,
+    "truthVaultFinanceAuthorityRequired": true,
+    "emailPrimaryChannel": true,
+    "whatsappUrgentOnly": true
+  },
+  "remainingBeforeAccepted": [
+    "PayFast credentials outside Git",
+    "sandbox checkout evidence file",
+    "accepted ITN evidence file",
+    "duplicate/failed/return/cancel rejection evidence file",
+    "refund review and founder approval evidence file",
+    "backend command acceptance proof"
+  ]
+}
