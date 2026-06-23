@@ -78,9 +78,9 @@ const proofQueue: ProofQueueItem[] = [
     owner: "provider",
     launchCritical: true,
     detail: "n8n remains a thin relay only. It must not become authority and may not write directly to Truth Vault.",
-    proofRoute: "/api/jarvis/n8n-thin-relay-boundary",
+    proofRoute: "/api/jarvis/n8n-airtable-github-runtime-proof",
     proofScript: "npm run jarvis:runtime:n8n-thin-relay",
-    evidenceRequired: ["base URL readiness", "API key outside Git", "webhook secret outside Git", "backend-mediated command proof", "no direct browser call"]
+    evidenceRequired: ["base URL readiness", "API key outside Git", "webhook secret outside Git", "backend-mediated command proof", "no direct browser call", "Truth Vault authority proof"]
   },
   {
     id: "airtable-human-mirror-proof",
@@ -89,9 +89,9 @@ const proofQueue: ProofQueueItem[] = [
     owner: "provider",
     launchCritical: true,
     detail: "Airtable remains human mirror only. Truth Vault remains source of truth and reconciliation authority.",
-    proofRoute: "/api/jarvis/airtable-human-mirror-boundary",
+    proofRoute: "/api/jarvis/n8n-airtable-github-runtime-proof",
     proofScript: "npm run jarvis:runtime:airtable-human-mirror",
-    evidenceRequired: ["Airtable credentials outside Git", "mirror write proof", "Truth Vault authority proof", "reconciliation proof"]
+    evidenceRequired: ["Airtable credentials outside Git", "mirror write proof", "Truth Vault authority proof", "reconciliation proof", "redacted Airtable metadata proof"]
   },
   {
     id: "github-tool-runtime-proof",
@@ -100,9 +100,9 @@ const proofQueue: ProofQueueItem[] = [
     owner: "jarvis",
     launchCritical: true,
     detail: "GitHub boundary needs redacted runtime evidence that tool calls are controlled and do not expose tokens.",
-    proofRoute: "/api/jarvis/github-tool-connector-boundary",
+    proofRoute: "/api/jarvis/n8n-airtable-github-runtime-proof",
     proofScript: "npm run jarvis:runtime:github-tool-boundary",
-    evidenceRequired: ["redacted repo metadata", "tool boundary proof", "no token exposure", "audit trail"]
+    evidenceRequired: ["redacted repo metadata", "tool boundary proof", "no token exposure", "audit trail", "no fake connector status"]
   },
   {
     id: "branch-protection-proof",
@@ -136,6 +136,7 @@ export async function GET() {
     jarvisSourceReady: true,
     aiEmailProviderProofGateConnected: true,
     payfastAcceptedItnProofGateConnected: true,
+    n8nAirtableGithubRuntimeProofGateConnected: true,
     jarvisRuntimeLive: false,
     productionReady: false,
     publicLaunchAllowed: false,
@@ -150,6 +151,6 @@ export async function GET() {
     noDirectProviderCallsFromWeb: true,
     counts,
     proofQueue,
-    nextAction: "Clear Docker/API runtime, AI+Email, PayFast accepted ITN, provider tooling, and branch/security gates before calling Jarvis live."
+    nextAction: "Clear Docker/API runtime, AI+Email, PayFast accepted ITN, n8n/Airtable/GitHub, and branch/security gates before calling Jarvis live."
   });
 }
