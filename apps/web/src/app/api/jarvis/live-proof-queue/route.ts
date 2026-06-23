@@ -106,13 +106,14 @@ const proofQueue: ProofQueueItem[] = [
   },
   {
     id: "branch-protection-proof",
-    title: "Branch Protection / Release Gate Proof",
+    title: "Branch Protection / Final Launch Audit Proof",
     state: "BLOCKED_BY_SECURITY_GATE",
     owner: "security",
     launchCritical: true,
-    detail: "Launch cannot pass until main branch protection, release gate, rollback, and final audit evidence are confirmed.",
-    proofScript: "npm run repo:validate:branch-protection",
-    evidenceRequired: ["main branch protection", "required review/status checks", "rollback evidence", "final launch audit"]
+    detail: "Launch cannot pass until main branch protection, required checks, rollback, staging evidence pack, final audit, and founder approval are confirmed.",
+    proofRoute: "/api/jarvis/branch-protection-final-launch-audit",
+    proofScript: "npm run repo:validate:branch-protection && npm run kingsmen:launch:audit",
+    evidenceRequired: ["main branch protection", "required review/status checks", "rollback evidence", "staging evidence pack", "final launch audit", "founder approval"]
   }
 ];
 
@@ -137,6 +138,7 @@ export async function GET() {
     aiEmailProviderProofGateConnected: true,
     payfastAcceptedItnProofGateConnected: true,
     n8nAirtableGithubRuntimeProofGateConnected: true,
+    branchProtectionFinalLaunchAuditGateConnected: true,
     jarvisRuntimeLive: false,
     productionReady: false,
     publicLaunchAllowed: false,
@@ -151,6 +153,6 @@ export async function GET() {
     noDirectProviderCallsFromWeb: true,
     counts,
     proofQueue,
-    nextAction: "Clear Docker/API runtime, AI+Email, PayFast accepted ITN, n8n/Airtable/GitHub, and branch/security gates before calling Jarvis live."
+    nextAction: "Clear Docker/API runtime, AI+Email, PayFast accepted ITN, n8n/Airtable/GitHub, branch protection, rollback, staging evidence, and final audit gates before calling Jarvis live."
   });
 }
