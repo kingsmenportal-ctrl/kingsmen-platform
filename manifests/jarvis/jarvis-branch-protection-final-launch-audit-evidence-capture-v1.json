@@ -1,0 +1,19 @@
+{
+  "schema": "kingsmen.manifest.v1",
+  "module": "Jarvis Branch Final Audit Evidence Capture",
+  "status": "SOURCE_READY_NOT_ACCEPTED",
+  "productionReady": false,
+  "publicLaunchAllowed": false,
+  "dockerIndependentBuildAllowed": true,
+  "runner": "scripts/proof/capture-jarvis-branch-protection-final-launch-audit-evidence.mjs",
+  "validator": "scripts/validators/validate-jarvis-branch-protection-final-launch-audit-evidence-capture.mjs",
+  "report": "reports/jarvis/jarvis-branch-protection-final-launch-audit-evidence-capture-latest.json",
+  "proofGateRoute": "/api/jarvis/branch-protection-final-launch-audit",
+  "requiredAcceptedEvidenceFiles": [
+    "reports/jarvis/jarvis-main-branch-protection-evidence.accepted.json",
+    "reports/jarvis/jarvis-rollback-release-evidence.accepted.json",
+    "reports/jarvis/jarvis-final-staging-evidence-pack.accepted.json",
+    "reports/jarvis/jarvis-final-launch-audit-evidence.accepted.json",
+    "reports/jarvis/jarvis-founder-launch-approval.accepted.json"
+  ]
+}
