@@ -15,13 +15,17 @@ type AuditGate = {
   detail: string;
 };
 
+const captureRunner = "scripts/proof/capture-jarvis-branch-protection-final-launch-audit-evidence.mjs";
+const captureReportPath = "reports/jarvis/jarvis-branch-protection-final-launch-audit-evidence-capture-latest.json";
+const captureValidator = "scripts/validators/validate-jarvis-branch-protection-final-launch-audit-evidence-capture.mjs";
+
 const auditGates: AuditGate[] = [
   {
     id: "main-branch-protection",
     title: "Main Branch Protection",
     state: "BLOCKED",
     launchCritical: true,
-    requiredEvidence: ["main branch protected", "direct push blocked", "force push disabled", "deletion disabled", "admin bypass reviewed"],
+    requiredEvidence: ["main branch protected", "direct push blocked", "force push disabled", "deletion disabled", "admin bypass reviewed", "accepted branch protection evidence file"],
     rejectionRules: ["reject if main can be pushed without review", "reject if force push is allowed", "reject if branch protection is missing"],
     detail: "Main branch must be protected before public launch. Jarvis cannot call the system live while release control is weak."
   },
@@ -30,7 +34,7 @@ const auditGates: AuditGate[] = [
     title: "Required Reviews and Status Checks",
     state: "BLOCKED",
     launchCritical: true,
-    requiredEvidence: ["required PR review", "required build check", "required validator check", "required launch audit check"],
+    requiredEvidence: ["required PR review", "required build check", "required validator check", "required launch audit check", "accepted required checks evidence file"],
     rejectionRules: ["reject if PR reviews are optional", "reject if build can be skipped", "reject if validators are not required"],
     detail: "Launch needs mandatory review and checks so unfinished Jarvis code cannot land as production."
   },
@@ -39,7 +43,7 @@ const auditGates: AuditGate[] = [
     title: "Rollback and Release Gate",
     state: "PENDING_SECURITY_EVIDENCE",
     launchCritical: true,
-    requiredEvidence: ["release tag", "rollback command or procedure", "restore evidence", "failed release stop condition"],
+    requiredEvidence: ["release tag", "rollback command or procedure", "restore evidence", "failed release stop condition", "accepted rollback evidence file"],
     rejectionRules: ["reject if rollback evidence is missing", "reject if failed deploy has no stop condition", "reject if release tag is absent"],
     detail: "A public launch must be reversible. Rollback evidence must be captured before live status can pass."
   },
@@ -48,7 +52,7 @@ const auditGates: AuditGate[] = [
     title: "Final Staging Evidence Pack",
     state: "PENDING_SECURITY_EVIDENCE",
     launchCritical: true,
-    requiredEvidence: ["staging URL proof", "source validators passed", "runtime proof reports", "provider proof reports", "payment proof report", "security proof report"],
+    requiredEvidence: ["staging URL proof", "source validators passed", "runtime proof reports", "provider proof reports", "payment proof report", "security proof report", "accepted staging evidence pack file"],
     rejectionRules: ["reject source-only evidence as live proof", "reject screenshots without route/report evidence", "reject unredacted proof packs"],
     detail: "The final staging evidence pack must contain redacted route, report, and validator proof for every launch-critical gate."
   },
@@ -57,9 +61,9 @@ const auditGates: AuditGate[] = [
     title: "Final Launch Audit",
     state: "REJECTED_UNTIL_REAL_EVIDENCE",
     launchCritical: true,
-    requiredEvidence: ["all live proof gates accepted", "productionReady remains false until audit pass", "publicLaunchAllowed only after audit", "founder launch approval", "redacted closeout report"],
+    requiredEvidence: ["all live proof gates accepted", "productionReady remains false until audit pass", "publicLaunchAllowed only after audit", "founder launch approval", "redacted closeout report", "accepted final audit evidence file"],
     rejectionRules: ["reject if any live proof gate remains blocked", "reject if publicLaunchAllowed is true before audit", "reject if founder approval is missing", "reject if raw secrets appear"],
-    detail: "Final launch audit is rejected until Docker/API, providers, PayFast, provider tools, branch protection, rollback, and founder approval are proven."
+    detail: "Final launch audit is rejected until Docker/API, providers, PayFast, provider tools, branch protection, rollback, staging evidence pack, final audit, and founder approval are proven."
   }
 ];
 
@@ -72,6 +76,7 @@ export async function GET() {
     generatedAt: new Date().toISOString(),
     jarvisSourceDesignClosedOut: true,
     branchProtectionProofAccepted: false,
+    branchProtectionFinalLaunchAuditEvidenceCaptureConnected: true,
     finalLaunchAuditAccepted: false,
     rollbackProofAccepted: false,
     stagingEvidencePackAccepted: false,
@@ -90,10 +95,21 @@ export async function GET() {
     mainBranchMustBeProtected: true,
     requiredReviewsAndChecksRequired: true,
     rollbackEvidenceRequired: true,
+    stagingEvidencePackRequired: true,
     founderLaunchApprovalRequired: true,
+    captureRunner,
+    captureReportPath,
+    captureValidator,
+    requiredAcceptedEvidenceFiles: [
+      "reports/jarvis/jarvis-main-branch-protection-evidence.accepted.json",
+      "reports/jarvis/jarvis-rollback-release-evidence.accepted.json",
+      "reports/jarvis/jarvis-final-staging-evidence-pack.accepted.json",
+      "reports/jarvis/jarvis-final-launch-audit-evidence.accepted.json",
+      "reports/jarvis/jarvis-founder-launch-approval.accepted.json"
+    ],
     auditGates,
     launchBlockingCount: launchBlocking.length,
     launchBlocking,
-    nextAction: "Capture branch protection, required checks, rollback, staging evidence pack, final launch audit, and founder approval before public launch can pass."
+    nextAction: "Run the branch/final launch audit evidence capture runner after accepted redacted branch, rollback, staging, final audit, and founder approval evidence files exist."
   });
 }
