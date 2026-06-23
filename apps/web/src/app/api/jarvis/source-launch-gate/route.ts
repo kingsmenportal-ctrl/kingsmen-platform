@@ -20,7 +20,7 @@ const gates: LaunchGate[] = [
     title: "Jarvis Source Design",
     state: "PASSED_SOURCE",
     launchCritical: true,
-    detail: "Final command HUD, completion board, provider checklist, evidence collector, live proof queue, acceptance gate, and launch gate surfaces are source-built.",
+    detail: "Final command HUD, completion board, provider checklist, evidence collector, live proof queue, acceptance gate, final audit gate, and launch gate surfaces are source-built.",
     liveProofQueueRef: "jarvis-source-seal",
     acceptanceGateRef: "source-design-seal-acceptance"
   },
@@ -106,12 +106,13 @@ const gates: LaunchGate[] = [
   },
   {
     id: "branch-protection-proof",
-    title: "Branch Protection Proof",
+    title: "Branch Protection and Final Launch Audit Proof",
     state: "PENDING_SECURITY",
     launchCritical: true,
-    detail: "Requires repository branch protection evidence before launch.",
+    detail: "Requires repository branch protection, required checks, rollback proof, final staging evidence pack, final launch audit, and founder launch approval before launch.",
     liveProofQueueRef: "branch-protection-proof",
-    acceptanceGateRef: "branch-protection-launch-audit-acceptance"
+    acceptanceGateRef: "branch-protection-launch-audit-acceptance",
+    proofGateRoute: "/api/jarvis/branch-protection-final-launch-audit"
   },
   {
     id: "whatsapp-cost-gate",
@@ -133,6 +134,7 @@ export async function GET() {
     jarvisLiveProofQueueConnected: true,
     jarvisLiveProofAcceptanceGateConnected: true,
     jarvisN8nAirtableGithubRuntimeProofGateConnected: true,
+    jarvisBranchProtectionFinalLaunchAuditGateConnected: true,
     productionReady: false,
     publicLaunchAllowed: false,
     launchAllowedReason: "Source-safe Jarvis is closer, but live proof queue and acceptance gate runtime, provider, security, and final audit gates are not complete.",
@@ -145,9 +147,10 @@ export async function GET() {
     liveProofQueueRoute: "/api/jarvis/live-proof-queue",
     liveProofAcceptanceGateRoute: "/api/jarvis/live-proof-acceptance-gate",
     n8nAirtableGithubRuntimeProofGateRoute: "/api/jarvis/n8n-airtable-github-runtime-proof",
+    branchProtectionFinalLaunchAuditGateRoute: "/api/jarvis/branch-protection-final-launch-audit",
     gates,
     launchBlockingCount: launchBlocking.length,
     launchBlocking,
-    nextAction: "Work the live proof queue and acceptance gate until runtime, provider, and security gates can pass."
+    nextAction: "Work the live proof queue and acceptance gate until runtime, provider, security, and final audit gates can pass."
   });
 }
