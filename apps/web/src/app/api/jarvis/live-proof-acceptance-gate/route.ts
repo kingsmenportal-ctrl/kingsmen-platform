@@ -65,9 +65,10 @@ const gates: AcceptanceGate[] = [
     state: "PENDING_EVIDENCE",
     launchCritical: true,
     proofQueueRef: "ai-provider-live-call",
+    proofGateRoute: "/api/jarvis/ai-email-provider-live-proof",
     acceptanceRule: "Accept only after a real backend-controlled AI call succeeds with provider, model, policy gate, cost boundary, redacted request/response evidence, and no key exposure.",
     rejectionRule: "Reject mock completions, browser-side provider calls, raw API key exposure, or unredacted prompts/responses in public evidence.",
-    requiredEvidence: ["provider selected", "model selected", "redacted live-call proof", "policy gate proof", "no browser provider call"]
+    requiredEvidence: ["provider selected", "model selected", "redacted live-call proof", "policy gate proof", "cost/rate boundary proof", "no browser provider call"]
   },
   {
     id: "email-primary-acceptance",
@@ -75,6 +76,7 @@ const gates: AcceptanceGate[] = [
     state: "PENDING_EVIDENCE",
     launchCritical: true,
     proofQueueRef: "email-primary-proof",
+    proofGateRoute: "/api/jarvis/ai-email-provider-live-proof",
     acceptanceRule: "Accept only after provider send, receive or delivery record, bounce/failed-send handling, opt-out rule, redaction, and message evidence ledger are proven.",
     rejectionRule: "Reject WhatsApp/SMS as a replacement for primary email evidence or any email provider proof without bounce and opt-out boundaries.",
     requiredEvidence: ["test send evidence", "delivery or receive evidence", "bounce handling", "opt-out rule", "message evidence ledger"]
@@ -131,6 +133,7 @@ export async function GET() {
     generatedAt: new Date().toISOString(),
     jarvisSourceReady: true,
     dockerRuntimeProofGateConnected: true,
+    aiEmailProviderProofGateConnected: true,
     jarvisRuntimeLive: false,
     productionReady: false,
     publicLaunchAllowed: false,
@@ -148,6 +151,6 @@ export async function GET() {
     counts,
     gates,
     launchBlocking,
-    nextAction: "Capture real runtime/provider/security evidence, then move each gate from blocked or pending to accepted."
+    nextAction: "Capture real Docker, AI, Email, provider, and security evidence, then move each gate from blocked or pending to accepted."
   });
 }
