@@ -22,7 +22,7 @@ const phases: RunbookPhase[] = [
     state: "READY_TO_RUN_WHEN_RUNTIME_AVAILABLE",
     owner: "jarvis",
     launchCritical: true,
-    commandText: "node scripts\validators\validate-jarvis-source-completion-seal.mjs && node scripts\validators\validate-jarvis-final-command-room-live-proof-queue.mjs",
+    commandText: "node scripts\\validators\\validate-jarvis-source-completion-seal.mjs && node scripts\\validators\\validate-jarvis-final-command-room-live-proof-queue.mjs",
     evidenceExpected: ["source seal validator passed", "final HUD live proof queue validator passed", "productionReady remains false"],
     stopCondition: "Stop if any source validator fails. Do not continue to runtime proof until source validators pass."
   },
@@ -76,8 +76,9 @@ const phases: RunbookPhase[] = [
     owner: "provider",
     launchCritical: true,
     commandText: "npm run jarvis:runtime:n8n-thin-relay && npm run jarvis:runtime:airtable-human-mirror && npm run jarvis:runtime:github-tool-boundary",
-    evidenceExpected: ["n8n thin relay proof", "Airtable mirror-only proof", "GitHub token redaction proof", "Truth Vault authority proof"],
-    stopCondition: "Stop if any tool becomes authority or returns raw credentials."
+    proofGateRoute: "/api/jarvis/n8n-airtable-github-runtime-proof",
+    evidenceExpected: ["n8n thin relay proof", "Airtable mirror-only proof", "GitHub token redaction proof", "Truth Vault authority proof", "no direct browser-to-provider call proof", "redacted runtime output"],
+    stopCondition: "Stop if n8n or Airtable becomes authority, browser calls provider tools directly, or raw credentials are returned."
   },
   {
     id: "branch-protection-launch-audit",
@@ -100,6 +101,7 @@ export async function GET() {
     dockerRuntimeProofGateConnected: true,
     aiEmailProviderProofGateConnected: true,
     payfastAcceptedItnProofGateConnected: true,
+    n8nAirtableGithubRuntimeProofGateConnected: true,
     jarvisRuntimeLive: false,
     productionReady: false,
     publicLaunchAllowed: false,
