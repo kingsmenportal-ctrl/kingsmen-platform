@@ -43,8 +43,9 @@ const phases: RunbookPhase[] = [
     state: "PENDING_CREDENTIALS",
     owner: "provider",
     launchCritical: true,
-    evidenceExpected: ["provider selected", "model selected", "API key stored outside Git", "redacted live-call proof", "policy gate proof"],
-    stopCondition: "Stop if provider credentials are absent or live-call evidence is not redacted."
+    proofGateRoute: "/api/jarvis/ai-email-provider-live-proof",
+    evidenceExpected: ["provider selected", "model selected", "API key stored outside Git", "backend-controlled live call", "redacted live-call proof", "policy gate proof", "cost/rate boundary proof"],
+    stopCondition: "Stop if provider credentials are absent, raw secrets appear, browser calls the provider, or live-call evidence is not redacted."
   },
   {
     id: "email-primary-proof",
@@ -53,8 +54,9 @@ const phases: RunbookPhase[] = [
     owner: "provider",
     launchCritical: true,
     commandText: "npm run jarvis:runtime:email-primary-channel",
-    evidenceExpected: ["provider send proof", "bounce/failed send handling", "opt-out proof", "redaction proof", "message evidence ledger"],
-    stopCondition: "Stop if email is not the primary tracked channel or proof lacks evidence ledger capture."
+    proofGateRoute: "/api/jarvis/ai-email-provider-live-proof",
+    evidenceExpected: ["provider send proof", "delivery or receive evidence", "bounce/failed send handling", "opt-out proof", "redaction proof", "message evidence ledger"],
+    stopCondition: "Stop if email is not the primary tracked channel, WhatsApp/SMS replaces email, or proof lacks evidence ledger capture."
   },
   {
     id: "payfast-itn-proof",
@@ -95,6 +97,7 @@ export async function GET() {
     generatedAt: new Date().toISOString(),
     jarvisSourceDesignComplete: true,
     dockerRuntimeProofGateConnected: true,
+    aiEmailProviderProofGateConnected: true,
     jarvisRuntimeLive: false,
     productionReady: false,
     publicLaunchAllowed: false,
