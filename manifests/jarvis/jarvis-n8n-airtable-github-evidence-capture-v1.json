@@ -1,0 +1,29 @@
+{
+  "schema": "kingsmen.jarvis-manifest.v1",
+  "module": "Jarvis n8n Airtable GitHub Evidence Capture",
+  "status": "SOURCE_READY_EVIDENCE_NOT_ACCEPTED",
+  "productionReady": false,
+  "publicLaunchAllowed": false,
+  "dockerIndependentBuildAllowed": true,
+  "runner": "scripts/proof/capture-jarvis-n8n-airtable-github-evidence.mjs",
+  "validator": "scripts/validators/validate-jarvis-n8n-airtable-github-evidence-capture.mjs",
+  "reportPath": "reports/jarvis/jarvis-n8n-airtable-github-evidence-capture-latest.json",
+  "proofRoute": "/api/jarvis/n8n-airtable-github-runtime-proof",
+  "requiredEvidenceSchemas": [
+    "kingsmen.jarvis-n8n-thin-relay-evidence.v1",
+    "kingsmen.jarvis-airtable-human-mirror-evidence.v1",
+    "kingsmen.jarvis-github-connector-runtime-evidence.v1"
+  ],
+  "locks": {
+    "n8nThinRelayOnly": true,
+    "n8nMayBecomeAuthority": false,
+    "n8nMayWriteTruthVaultDirectly": false,
+    "airtableMirrorOnly": true,
+    "airtableMayBecomeAuthority": false,
+    "githubTokensMayBeReturned": false,
+    "noDirectProviderCallsFromWeb": true,
+    "postgresTruthVaultRemainsAuthority": true,
+    "rawSecretsReturned": false,
+    "secretValuesReturned": false
+  }
+}
