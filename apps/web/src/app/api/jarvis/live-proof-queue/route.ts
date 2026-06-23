@@ -46,8 +46,8 @@ const proofQueue: ProofQueueItem[] = [
     owner: "provider",
     launchCritical: true,
     detail: "AI provider stays backend controlled. Live proof requires real provider credentials outside Git and redacted evidence of a policy-gated call.",
-    proofRoute: "/api/jarvis/ai-tools-runtime-readiness",
-    evidenceRequired: ["provider selected", "model selected", "key stored outside Git", "redacted live-call proof", "policy gate proof"]
+    proofRoute: "/api/jarvis/ai-email-provider-live-proof",
+    evidenceRequired: ["provider selected", "model selected", "key stored outside Git", "redacted live-call proof", "policy gate proof", "cost/rate boundary proof"]
   },
   {
     id: "email-primary-proof",
@@ -56,9 +56,9 @@ const proofQueue: ProofQueueItem[] = [
     owner: "provider",
     launchCritical: true,
     detail: "Email remains the primary communication channel. Launch needs provider evidence for send, bounce, opt-out, redaction, and evidence ledger capture.",
-    proofRoute: "/api/jarvis/email-primary-channel-boundary",
+    proofRoute: "/api/jarvis/ai-email-provider-live-proof",
     proofScript: "npm run jarvis:runtime:email-primary-channel",
-    evidenceRequired: ["SMTP/provider credential readiness", "test send evidence", "bounce/failed-send handling", "opt-out rule", "message evidence ledger"]
+    evidenceRequired: ["SMTP/provider credential readiness", "test send evidence", "delivery or receive evidence", "bounce/failed-send handling", "opt-out rule", "message evidence ledger"]
   },
   {
     id: "payfast-itn-proof",
@@ -134,6 +134,7 @@ export async function GET() {
     module: "Jarvis Live Proof Queue",
     generatedAt: new Date().toISOString(),
     jarvisSourceReady: true,
+    aiEmailProviderProofGateConnected: true,
     jarvisRuntimeLive: false,
     productionReady: false,
     publicLaunchAllowed: false,
@@ -148,6 +149,6 @@ export async function GET() {
     noDirectProviderCallsFromWeb: true,
     counts,
     proofQueue,
-    nextAction: "Clear Docker/API runtime through /api/jarvis/docker-truth-vault-runtime-proof, then provider evidence and branch/security gates before calling Jarvis live."
+    nextAction: "Clear Docker/API runtime through /api/jarvis/docker-truth-vault-runtime-proof, clear AI+Email through /api/jarvis/ai-email-provider-live-proof, then provider tooling and branch/security gates before calling Jarvis live."
   });
 }
