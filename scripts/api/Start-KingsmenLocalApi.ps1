@@ -16,6 +16,10 @@ param(
 
 $ErrorActionPreference = "Stop"
 
+if ([string]::IsNullOrWhiteSpace($env:DOCKER_API_VERSION)) {
+  [Environment]::SetEnvironmentVariable("DOCKER_API_VERSION", "1.51", 'Process')
+}
+
 if ([string]::IsNullOrWhiteSpace($RepoRoot)) {
   if (-not [string]::IsNullOrWhiteSpace($PSScriptRoot)) {
     $RepoRoot = (Resolve-Path (Join-Path $PSScriptRoot "..\..")).Path
@@ -129,6 +133,51 @@ function ConvertTo-PostgresSqlLiteral {
   return "'" + ($Value -replace "'", "''") + "'"
 }
 
+function Wait-PostgresContainerReady {
+  param(
+    [string]$ContainerName,
+    [string]$Database,
+    [string]$User,
+    [int]$TimeoutSeconds = 90
+  )
+
+  if (-not (Test-CommandAvailable "docker")) { return $false }
+  if ([string]::IsNullOrWhiteSpace($ContainerName) -or [string]::IsNullOrWhiteSpace($Database) -or [string]::IsNullOrWhiteSpace($User)) { return $false }
+
+  $deadline = (Get-Date).AddSeconds($TimeoutSeconds)
+  $attempt = 0
+  do {
+    $attempt++
+    & docker exec $ContainerName pg_isready -U $User -d $Database *> $null
+    if ($LASTEXITCODE -eq 0) { return $true }
+
+    Write-Host "Waiting for PostgreSQL container readiness attempt ${attempt}..." -ForegroundColor Yellow
+    Start-Sleep -Seconds 3
+  } while ((Get-Date) -lt $deadline)
+
+  return $false
+}
+
+function Invoke-PostgresSqlWithRetry {
+  param(
+    [string]$ContainerName,
+    [string]$Database,
+    [string]$User,
+    [string]$Sql,
+    [int]$Attempts = 8
+  )
+
+  for ($i = 1; $i -le $Attempts; $i++) {
+    $Sql | & docker exec -i $ContainerName psql -U $User -d $Database -v ON_ERROR_STOP=1 *> $null
+    if ($LASTEXITCODE -eq 0) { return $true }
+
+    Write-Host "Retrying PostgreSQL SQL command after startup wait ${i}/${Attempts}..." -ForegroundColor Yellow
+    Start-Sleep -Seconds 3
+  }
+
+  return $false
+}
+
 function Repair-PostgresRolePassword {
   param(
     [string]$ContainerName,
@@ -140,15 +189,14 @@ function Repair-PostgresRolePassword {
   if (-not (Test-CommandAvailable "docker")) { return $false }
   if ([string]::IsNullOrWhiteSpace($ContainerName) -or [string]::IsNullOrWhiteSpace($Database) -or [string]::IsNullOrWhiteSpace($User) -or [string]::IsNullOrEmpty($Password)) { return $false }
 
+  Wait-PostgresContainerReady -ContainerName $ContainerName -Database $Database -User $User -TimeoutSeconds 90 | Out-Null
+
   $roleIdentifier = ConvertTo-PostgresSqlIdentifier -Value $User
   $passwordLiteral = ConvertTo-PostgresSqlLiteral -Value $Password
   $sql = "ALTER ROLE $roleIdentifier WITH PASSWORD $passwordLiteral;"
 
-  $sql | & docker exec -i $ContainerName psql -U $User -d $Database -v ON_ERROR_STOP=1 *> $null
-  if ($LASTEXITCODE -eq 0) { return $true }
-
-  $sql | & docker exec -i $ContainerName psql -U postgres -d $Database -v ON_ERROR_STOP=1 *> $null
-  return $LASTEXITCODE -eq 0
+  if (Invoke-PostgresSqlWithRetry -ContainerName $ContainerName -Database $Database -User $User -Sql $sql) { return $true }
+  return Invoke-PostgresSqlWithRetry -ContainerName $ContainerName -Database $Database -User "postgres" -Sql $sql
 }
 
 if ($KillExistingPort) {
@@ -165,11 +213,16 @@ if ($KillExistingPort) {
 $postgresContainerStartAttempted = $false
 $redisContainerStartAttempted = $false
 $dockerStartSkipped = $false
+$postgresReadyWaitAttempted = $false
+$postgresReadyBeforePasswordRepair = $false
 if ($SkipDockerStart) {
   $dockerStartSkipped = $true
 } elseif (Test-CommandAvailable "docker") {
   docker start $PostgresContainerName *> $null
   $postgresContainerStartAttempted = $true
+  $postgresReadyWaitAttempted = $true
+  $postgresReadyBeforePasswordRepair = Wait-PostgresContainerReady -ContainerName $PostgresContainerName -Database $PostgresDatabase -User $PostgresUser -TimeoutSeconds 90
+
   docker start kingsmen-redis-local *> $null
   $redisContainerStartAttempted = $true
 }
@@ -220,9 +273,12 @@ Write-Host (@{
   module = "Kingsmen Local API Starter"
   envFileLoaded = $true
   envFileImportedCount = $envImportCount
+  dockerApiVersionPinned = $env:DOCKER_API_VERSION
   dockerStartSkipped = $dockerStartSkipped
   postgresContainerStartAttempted = $postgresContainerStartAttempted
   redisContainerStartAttempted = $redisContainerStartAttempted
+  postgresReadyWaitAttempted = $postgresReadyWaitAttempted
+  postgresReadyBeforePasswordRepair = $postgresReadyBeforePasswordRepair
   postgresContainerPasswordAvailable = $containerPasswordAvailable
   postgresRolePasswordRepairAttempted = $postgresRolePasswordRepairAttempted
   postgresRolePasswordRepairSucceeded = $postgresRolePasswordRepairSucceeded
