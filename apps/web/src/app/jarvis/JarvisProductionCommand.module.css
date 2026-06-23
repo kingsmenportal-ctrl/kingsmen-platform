@@ -1,12 +1,15 @@
 .shell {
   --green-black: #020806;
-  --green-deep: #061913;
-  --green-royal: #0a2c20;
-  --green-panel: #0d3829;
+  --green-deep: #08261c;
+  --green-royal: #0f4d37;
+  --green-panel: #123f31;
+  --green-glow: #1a6a4b;
   --gold: #d7a93a;
   --gold-bright: #ffe08a;
+  --gold-soft: #f4c95f;
   --silver-dark: #151a1c;
-  --silver: #78858b;
+  --silver-panel: #242b2f;
+  --silver: #8f9aa0;
   --silver-light: #d6dde0;
   --cream: #f5eed8;
   --danger: #d16363;
@@ -15,10 +18,10 @@
   padding: 28px;
   color: var(--cream);
   background:
-    radial-gradient(circle at 15% 8%, rgba(215,169,58,.28), transparent 30%),
-    radial-gradient(circle at 88% 18%, rgba(120,133,139,.24), transparent 28%),
-    radial-gradient(circle at 70% 92%, rgba(10,44,32,.7), transparent 42%),
-    linear-gradient(135deg, var(--green-black), var(--green-deep) 40%, var(--silver-dark));
+    radial-gradient(circle at 10% 8%, rgba(255,224,138,.36), transparent 24%),
+    radial-gradient(circle at 82% 10%, rgba(143,154,160,.32), transparent 26%),
+    radial-gradient(circle at 70% 88%, rgba(26,106,75,.76), transparent 42%),
+    linear-gradient(135deg, #03100c 0%, #0a2e22 36%, #173c31 62%, #151a1c 100%);
   font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
   overflow-x: hidden;
 }
@@ -28,8 +31,9 @@
   inset: 0;
   pointer-events: none;
   background:
-    linear-gradient(120deg, rgba(215,169,58,.15), transparent 34%),
-    linear-gradient(310deg, rgba(214,221,224,.10), transparent 46%);
+    linear-gradient(120deg, rgba(215,169,58,.24), transparent 34%),
+    linear-gradient(310deg, rgba(214,221,224,.16), transparent 46%),
+    radial-gradient(circle at 46% 44%, rgba(26,106,75,.32), transparent 42%);
 }
 
 .stage {
@@ -47,35 +51,49 @@
 .actionPanel,
 .metrics article,
 .visualBox {
-  border: 1px solid rgba(255,224,138,.42);
+  border: 1px solid rgba(255,224,138,.58);
   border-radius: 32px;
   background:
-    linear-gradient(145deg, rgba(10,44,32,.94), rgba(21,26,28,.94)),
-    rgba(6,25,19,.92);
-  box-shadow: 0 30px 90px rgba(0,0,0,.42), inset 0 0 0 1px rgba(214,221,224,.08);
+    linear-gradient(145deg, rgba(15,77,55,.93), rgba(36,43,47,.92)),
+    rgba(8,38,28,.94);
+  box-shadow:
+    0 30px 90px rgba(0,0,0,.42),
+    inset 0 0 0 1px rgba(214,221,224,.12),
+    inset 0 0 44px rgba(255,224,138,.045);
 }
 
 .header {
-  min-height: 390px;
-  padding: clamp(40px, 5vw, 86px);
+  min-height: 420px;
+  padding: clamp(42px, 5vw, 90px);
   display: grid;
-  grid-template-columns: minmax(0, 1fr) 360px;
-  gap: 28px;
+  grid-template-columns: minmax(0, 1fr) 370px;
+  gap: 30px;
   align-items: center;
   overflow: hidden;
   position: relative;
 }
 
+.header::before {
+  content: "";
+  position: absolute;
+  inset: 18px;
+  border-radius: 24px;
+  border: 1px solid rgba(143,154,160,.22);
+  pointer-events: none;
+}
+
 .header::after {
   content: "";
   position: absolute;
-  right: -130px;
-  bottom: -220px;
-  width: 560px;
-  height: 560px;
+  right: -110px;
+  bottom: -190px;
+  width: 620px;
+  height: 620px;
   border-radius: 50%;
-  background: conic-gradient(from 220deg, rgba(215,169,58,.72), rgba(120,133,139,.2), rgba(10,44,32,.7), rgba(215,169,58,.72));
-  opacity: .42;
+  background:
+    radial-gradient(circle, rgba(255,224,138,.28), transparent 46%),
+    conic-gradient(from 220deg, rgba(215,169,58,.88), rgba(143,154,160,.36), rgba(26,106,75,.9), rgba(215,169,58,.88));
+  opacity: .64;
 }
 
 .kicker,
@@ -83,9 +101,9 @@
 .panelHead span {
   display: block;
   color: var(--gold-bright);
-  font-size: .72rem;
+  font-size: .74rem;
   font-weight: 950;
-  letter-spacing: .22em;
+  letter-spacing: .24em;
   text-transform: uppercase;
 }
 
@@ -96,17 +114,19 @@
   font-size: clamp(6rem, 13vw, 14rem);
   line-height: .76;
   letter-spacing: -.105em;
-  color: #fff5d1;
-  text-shadow: 0 0 42px rgba(215,169,58,.48), 0 8px 0 rgba(2,8,6,.74);
+  color: var(--gold-bright);
+  text-shadow:
+    0 0 45px rgba(215,169,58,.62),
+    0 8px 0 rgba(2,8,6,.74);
 }
 
 .header p {
   position: relative;
   z-index: 1;
   max-width: 1050px;
-  color: rgba(245,238,216,.88);
-  font-size: clamp(1.05rem, 1.55vw, 1.35rem);
-  line-height: 1.7;
+  color: rgba(245,238,216,.92);
+  font-size: clamp(1.08rem, 1.55vw, 1.38rem);
+  line-height: 1.75;
 }
 
 .statusOrb {
@@ -116,42 +136,48 @@
   place-items: center;
   gap: 14px;
   text-align: center;
+  border: 1px solid rgba(143,154,160,.28);
+  border-radius: 28px;
+  padding: 26px;
+  background: linear-gradient(145deg, rgba(36,43,47,.72), rgba(8,38,28,.72));
 }
 
 .orb {
-  width: 210px;
-  height: 210px;
+  width: 215px;
+  height: 215px;
   border-radius: 50%;
   display: grid;
   place-items: center;
-  border: 1px solid rgba(255,224,138,.45);
-  background: radial-gradient(circle, rgba(255,224,138,.24), rgba(10,44,32,.95) 48%, rgba(21,26,28,.92));
-  box-shadow: 0 0 90px rgba(215,169,58,.22), inset 0 0 50px rgba(214,221,224,.08);
+  border: 2px solid rgba(255,224,138,.55);
+  background:
+    radial-gradient(circle, rgba(255,224,138,.36), rgba(15,77,55,.95) 48%, rgba(36,43,47,.94));
+  box-shadow: 0 0 110px rgba(215,169,58,.28), inset 0 0 60px rgba(214,221,224,.12);
 }
 
 .orb span {
-  color: #fff5d1;
-  font-size: 4.2rem;
+  color: #fff8da;
+  font-size: 4.4rem;
   font-weight: 950;
 }
 
 .orbLive { animation: pulse 2.2s ease-in-out infinite; }
 .statusOrb strong { color: var(--gold-bright); text-transform: uppercase; letter-spacing: .18em; }
-.statusOrb small { max-width: 280px; color: rgba(245,238,216,.74); line-height: 1.55; }
+.statusOrb small { max-width: 280px; color: rgba(245,238,216,.78); line-height: 1.6; }
 
 .controlBar {
   padding: 18px;
   display: flex;
   flex-wrap: wrap;
   gap: 14px;
+  background: linear-gradient(135deg, rgba(36,43,47,.92), rgba(8,38,28,.9));
 }
 
 .controlBar button,
 .askBar button,
 .actions button {
-  border: 1px solid rgba(255,224,138,.48);
+  border: 1px solid rgba(255,224,138,.62);
   color: var(--cream);
-  background: linear-gradient(135deg, rgba(21,26,28,.82), rgba(10,44,32,.86));
+  background: linear-gradient(135deg, rgba(36,43,47,.92), rgba(15,77,55,.96));
   border-radius: 999px;
   padding: 14px 20px;
   font-weight: 950;
@@ -162,8 +188,8 @@
 .askBar button:hover,
 .actions button:hover {
   border-color: var(--gold-bright);
-  background: linear-gradient(135deg, rgba(215,169,58,.25), rgba(13,56,41,.92));
-  box-shadow: 0 16px 42px rgba(215,169,58,.18);
+  background: linear-gradient(135deg, rgba(255,224,138,.28), rgba(26,106,75,.96));
+  box-shadow: 0 16px 42px rgba(215,169,58,.22);
 }
 
 .metrics {
@@ -172,8 +198,18 @@
   gap: 18px;
 }
 
-.metrics article { padding: 22px; min-height: 115px; }
-.metrics strong { display: block; margin-top: 14px; color: #fff5d1; font-size: clamp(1.45rem, 2.4vw, 2.5rem); text-transform: uppercase; }
+.metrics article {
+  padding: 22px;
+  min-height: 118px;
+  background: linear-gradient(145deg, rgba(18,63,49,.96), rgba(36,43,47,.9));
+}
+.metrics strong {
+  display: block;
+  margin-top: 14px;
+  color: #fff5d1;
+  font-size: clamp(1.5rem, 2.4vw, 2.55rem);
+  text-transform: uppercase;
+}
 
 .mainGrid {
   display: grid;
@@ -200,17 +236,21 @@
 .jarvisMessage,
 .founderMessage {
   width: min(88%, 980px);
-  border: 1px solid rgba(255,224,138,.28);
+  border: 1px solid rgba(255,224,138,.38);
   border-radius: 24px;
   padding: 20px;
-  background: linear-gradient(145deg, rgba(13,56,41,.82), rgba(21,26,28,.76));
+  background: linear-gradient(145deg, rgba(18,63,49,.9), rgba(36,43,47,.76));
 }
 
-.founderMessage { margin-left: auto; border-color: rgba(214,221,224,.45); background: linear-gradient(145deg, rgba(33,40,43,.86), rgba(6,25,19,.78)); }
+.founderMessage {
+  margin-left: auto;
+  border-color: rgba(214,221,224,.58);
+  background: linear-gradient(145deg, rgba(45,54,59,.88), rgba(8,38,28,.82));
+}
 .jarvisMessage span,
 .founderMessage span { color: var(--gold-bright); font-weight: 950; letter-spacing: .12em; }
 .jarvisMessage p,
-.founderMessage p { color: rgba(245,238,216,.9); font-size: 1.05rem; line-height: 1.65; }
+.founderMessage p { color: rgba(245,238,216,.93); font-size: 1.05rem; line-height: 1.68; }
 
 .askBar {
   display: grid;
@@ -220,17 +260,17 @@
 }
 
 .askBar textarea {
-  min-height: 120px;
-  border: 1px solid rgba(255,224,138,.32);
+  min-height: 122px;
+  border: 1px solid rgba(255,224,138,.46);
   border-radius: 24px;
   color: var(--cream);
-  background: rgba(2,8,6,.72);
+  background: rgba(3,16,12,.82);
   padding: 18px;
   font: inherit;
   resize: vertical;
 }
 
-.askBar textarea::placeholder { color: rgba(255,224,138,.72); }
+.askBar textarea::placeholder { color: rgba(255,224,138,.78); }
 .askBar button { border-radius: 999px; color: #04120d; background: linear-gradient(135deg, #fff0ad, var(--gold), var(--silver)); }
 .askBar button:disabled { opacity: .55; cursor: not-allowed; }
 
@@ -241,24 +281,26 @@
   text-align: left;
   border-radius: 22px;
   padding: 18px;
+  background: linear-gradient(145deg, rgba(36,43,47,.9), rgba(15,77,55,.82));
 }
 .actions button span { color: #fff5d1; font-size: 1.08rem; }
-.actions button small { color: rgba(245,238,216,.72); line-height: 1.5; }
+.actions button small { color: rgba(245,238,216,.76); line-height: 1.52; }
 
 .visualBox {
   margin-top: 22px;
   min-height: 300px;
   display: grid;
   place-items: center;
-  color: rgba(245,238,216,.72);
+  color: rgba(245,238,216,.76);
   overflow: hidden;
+  background: linear-gradient(145deg, rgba(36,43,47,.88), rgba(8,38,28,.84));
 }
 .videoLive { width: 100%; min-height: 300px; object-fit: cover; }
 .videoHidden { display: none; }
 
 @keyframes pulse {
-  0%, 100% { transform: scale(1); box-shadow: 0 0 90px rgba(215,169,58,.22); }
-  50% { transform: scale(1.025); box-shadow: 0 0 135px rgba(255,224,138,.38); }
+  0%, 100% { transform: scale(1); box-shadow: 0 0 90px rgba(215,169,58,.26); }
+  50% { transform: scale(1.025); box-shadow: 0 0 135px rgba(255,224,138,.48); }
 }
 
 @media (max-width: 1180px) {
