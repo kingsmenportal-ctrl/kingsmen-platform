@@ -22,7 +22,7 @@ const phases: RunbookPhase[] = [
     state: "READY_TO_RUN_WHEN_RUNTIME_AVAILABLE",
     owner: "jarvis",
     launchCritical: true,
-    commandText: "node scripts\\validators\\validate-jarvis-source-completion-seal.mjs && node scripts\\validators\\validate-jarvis-final-command-room-live-proof-queue.mjs",
+    commandText: "node scripts\validators\validate-jarvis-source-completion-seal.mjs && node scripts\validators\validate-jarvis-final-command-room-live-proof-queue.mjs",
     evidenceExpected: ["source seal validator passed", "final HUD live proof queue validator passed", "productionReady remains false"],
     stopCondition: "Stop if any source validator fails. Do not continue to runtime proof until source validators pass."
   },
@@ -65,6 +65,7 @@ const phases: RunbookPhase[] = [
     owner: "provider",
     launchCritical: true,
     commandText: "npm run jarvis:runtime:payfast-provider-proof-queue",
+    proofGateRoute: "/api/jarvis/payfast-accepted-itn-proof",
     evidenceExpected: ["sandbox checkout proof", "accepted ITN proof", "duplicate ITN rejection", "failed-payment rejection", "refund review boundary", "founder approval"],
     stopCondition: "Stop if return/cancel URL is treated as paid. Only accepted ITN may clear payment state."
   },
@@ -98,6 +99,7 @@ export async function GET() {
     jarvisSourceDesignComplete: true,
     dockerRuntimeProofGateConnected: true,
     aiEmailProviderProofGateConnected: true,
+    payfastAcceptedItnProofGateConnected: true,
     jarvisRuntimeLive: false,
     productionReady: false,
     publicLaunchAllowed: false,
