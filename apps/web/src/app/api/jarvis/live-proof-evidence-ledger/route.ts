@@ -77,9 +77,10 @@ const ledgerItems: EvidenceLedgerItem[] = [
     launchCritical: true,
     evidenceClass: "provider",
     acceptedEvidence: [],
-    missingEvidence: ["provider selected", "model selected", "API key outside Git", "redacted live-call proof", "policy gate proof"],
-    rejectionRules: ["reject if raw API key is printed", "reject if browser calls provider directly", "reject if policy gate is absent"],
-    storageTarget: "reports/jarvis/ai-provider-live-call-proof.json"
+    missingEvidence: ["provider selected", "model selected", "API key outside Git", "backend-controlled live-call proof", "policy gate proof", "cost/rate boundary proof", "redacted request/response evidence"],
+    rejectionRules: ["reject if raw API key is printed", "reject if browser calls provider directly", "reject if policy gate is absent", "reject if mock completion is called live"],
+    storageTarget: "reports/jarvis/ai-provider-live-call-proof.json",
+    proofGateRoute: "/api/jarvis/ai-email-provider-live-proof"
   },
   {
     id: "email-primary-evidence",
@@ -89,9 +90,10 @@ const ledgerItems: EvidenceLedgerItem[] = [
     launchCritical: true,
     evidenceClass: "provider",
     acceptedEvidence: [],
-    missingEvidence: ["test send proof", "bounce handling", "opt-out proof", "redaction proof", "message evidence ledger"],
-    rejectionRules: ["reject if WhatsApp becomes bulk channel", "reject if email evidence ledger is absent"],
-    storageTarget: "reports/jarvis/email-primary-channel-proof.json"
+    missingEvidence: ["SMTP/provider credentials outside Git", "test send proof", "delivery or receive evidence", "bounce handling", "opt-out proof", "redaction proof", "message evidence ledger"],
+    rejectionRules: ["reject if WhatsApp becomes bulk channel", "reject if SMS replaces primary email", "reject if raw SMTP password is exposed", "reject if email evidence ledger is absent"],
+    storageTarget: "reports/jarvis/email-primary-channel-proof.json",
+    proofGateRoute: "/api/jarvis/ai-email-provider-live-proof"
   },
   {
     id: "payfast-itn-evidence",
@@ -149,6 +151,7 @@ export async function GET() {
     generatedAt: new Date().toISOString(),
     jarvisSourceReady: true,
     dockerRuntimeProofGateConnected: true,
+    aiEmailProviderProofGateConnected: true,
     jarvisRuntimeLive: false,
     productionReady: false,
     publicLaunchAllowed: false,
