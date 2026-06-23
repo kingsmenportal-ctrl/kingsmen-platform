@@ -35,9 +35,9 @@ const proofQueue: ProofQueueItem[] = [
     owner: "runtime",
     launchCritical: true,
     detail: "Local Docker instability blocks backend runtime proof only. Source completion remains valid, but live launch cannot pass until backend and Truth Vault are proven.",
-    proofRoute: "/api/system/health",
+    proofRoute: "/api/jarvis/docker-truth-vault-runtime-proof",
     proofScript: "npm run api:start:local -- -KillExistingPort",
-    evidenceRequired: ["API health HTTP 200", "postgres_truth_vault storage mode", "command log write proof", "audit event write proof"]
+    evidenceRequired: ["API health HTTP 200", "postgres_truth_vault storage mode", "command log write proof", "audit event write proof", "redacted runtime proof"]
   },
   {
     id: "ai-provider-live-call",
@@ -148,6 +148,6 @@ export async function GET() {
     noDirectProviderCallsFromWeb: true,
     counts,
     proofQueue,
-    nextAction: "Clear Docker/API runtime, provider evidence, and branch/security gates before calling Jarvis live."
+    nextAction: "Clear Docker/API runtime through /api/jarvis/docker-truth-vault-runtime-proof, then provider evidence and branch/security gates before calling Jarvis live."
   });
 }
