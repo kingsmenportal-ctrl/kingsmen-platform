@@ -12,6 +12,7 @@ const validators = [
   "scripts/validators/validate-jarvis-live-proof-runbook.mjs",
   "scripts/validators/validate-jarvis-live-proof-evidence-ledger.mjs",
   "scripts/validators/validate-jarvis-live-proof-acceptance-gate.mjs",
+  "scripts/validators/validate-jarvis-docker-truth-vault-runtime-proof.mjs",
   "scripts/validators/validate-jarvis-final-source-closeout-seal.mjs",
   "scripts/validators/validate-jarvis-final-launch-control.mjs",
   "scripts/validators/validate-jarvis-source-completion-seal.mjs",
@@ -35,6 +36,7 @@ const manifests = [
   "manifests/jarvis/jarvis-live-proof-runbook-v1.json",
   "manifests/jarvis/jarvis-live-proof-evidence-ledger-v1.json",
   "manifests/jarvis/jarvis-live-proof-acceptance-gate-v1.json",
+  "manifests/jarvis/jarvis-docker-truth-vault-runtime-proof-v1.json",
   "manifests/jarvis/jarvis-openclaw-operator-policy-boundary-v1.json",
   "manifests/jarvis/jarvis-playwright-scout-map-fallback-boundary-v1.json"
 ];
@@ -51,6 +53,7 @@ const routes = [
   "/founder/launch-control/jarvis-live-proof-queue",
   "/founder/launch-control/jarvis-live-proof-runbook",
   "/founder/launch-control/jarvis-live-proof-acceptance-gate",
+  "/founder/launch-control/jarvis-docker-runtime-proof",
   "/api/jarvis/final-command-hud",
   "/api/jarvis/final-launch-control",
   "/api/jarvis/source-completion-seal",
@@ -59,6 +62,7 @@ const routes = [
   "/api/jarvis/live-proof-runbook",
   "/api/jarvis/live-proof-evidence-ledger",
   "/api/jarvis/live-proof-acceptance-gate",
+  "/api/jarvis/docker-truth-vault-runtime-proof",
   "/api/jarvis/completion-board",
   "/api/jarvis/provider-credential-checklist",
   "/api/jarvis/evidence-collector",
@@ -78,7 +82,13 @@ const blockers = [
     id: "local-docker-runtime",
     title: "Local Docker/API runtime instability",
     state: "BLOCKED",
-    detail: "Blocks runtime proof only. Source-safe Jarvis construction is closed out."
+    detail: "Blocks runtime proof only. Source-safe Jarvis construction is closed out. The Docker runtime proof gate is now indexed."
+  },
+  {
+    id: "docker-truth-vault-proof-gate",
+    title: "Docker Truth Vault runtime proof gate not accepted",
+    state: "BLOCKED",
+    detail: "API health, postgres_truth_vault mode, command_log write, audit_events write, and redacted output are still required."
   },
   {
     id: "live-proof-queue",
@@ -134,6 +144,7 @@ export async function GET() {
     jarvisLiveProofRunbookIndexed: true,
     jarvisLiveProofEvidenceLedgerIndexed: true,
     jarvisLiveProofAcceptanceGateIndexed: true,
+    jarvisDockerTruthVaultRuntimeProofIndexed: true,
     dockerIndependentBuildAllowed: true,
     noFakeData: true,
     rawSecretsReturned: false,
