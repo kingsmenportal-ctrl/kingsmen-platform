@@ -15,6 +15,7 @@ const validators = [
   "scripts/validators/validate-jarvis-docker-truth-vault-runtime-proof.mjs",
   "scripts/validators/validate-jarvis-docker-truth-vault-runtime-evidence-capture.mjs",
   "scripts/validators/validate-jarvis-ai-email-provider-live-proof.mjs",
+  "scripts/validators/validate-jarvis-ai-email-provider-live-evidence-capture.mjs",
   "scripts/validators/validate-jarvis-payfast-accepted-itn-proof.mjs",
   "scripts/validators/validate-jarvis-n8n-airtable-github-runtime-proof.mjs",
   "scripts/validators/validate-jarvis-branch-protection-final-launch-audit.mjs",
@@ -28,13 +29,15 @@ const validators = [
 ];
 
 const proofRunners = [
-  "scripts/proof/capture-jarvis-docker-truth-vault-runtime-evidence.mjs"
+  "scripts/proof/capture-jarvis-docker-truth-vault-runtime-evidence.mjs",
+  "scripts/proof/capture-jarvis-ai-email-provider-live-evidence.mjs"
 ];
 
 const reports = [
   "reports/jarvis/jarvis-openclaw-operator-policy-boundary-proof-latest.json",
   "reports/jarvis/jarvis-playwright-scout-map-fallback-boundary-proof-latest.json",
-  "reports/jarvis/jarvis-docker-truth-vault-runtime-evidence-capture-latest.json"
+  "reports/jarvis/jarvis-docker-truth-vault-runtime-evidence-capture-latest.json",
+  "reports/jarvis/jarvis-ai-email-provider-live-evidence-capture-latest.json"
 ];
 
 const manifests = [
@@ -49,6 +52,7 @@ const manifests = [
   "manifests/jarvis/jarvis-docker-truth-vault-runtime-proof-v1.json",
   "manifests/jarvis/jarvis-docker-truth-vault-runtime-evidence-capture-v1.json",
   "manifests/jarvis/jarvis-ai-email-provider-live-proof-v1.json",
+  "manifests/jarvis/jarvis-ai-email-provider-live-evidence-capture-v1.json",
   "manifests/jarvis/jarvis-payfast-accepted-itn-proof-v1.json",
   "manifests/jarvis/jarvis-n8n-airtable-github-runtime-proof-v1.json",
   "manifests/jarvis/jarvis-branch-protection-final-launch-audit-v1.json",
@@ -108,6 +112,12 @@ const blockers = [
     detail: "The capture runner can collect redacted API health, postgres_truth_vault mode, command acceptance, and indirect command_log/audit_events write proof when API runtime is available."
   },
   {
+    id: "ai-email-evidence-runner",
+    title: "AI Email evidence capture runner ready",
+    state: "READY_FOR_PROVIDER_EVIDENCE",
+    detail: "The capture runner can collect redacted AI and Email evidence once real credentials and accepted evidence files are available."
+  },
+  {
     id: "local-docker-runtime",
     title: "Local Docker/API runtime instability",
     state: "BLOCKED",
@@ -124,6 +134,12 @@ const blockers = [
     title: "AI Email provider proof gate not accepted",
     state: "PENDING",
     detail: "AI backend live call and Email primary channel evidence are still required before provider readiness can pass."
+  },
+  {
+    id: "ai-email-provider-evidence-capture",
+    title: "AI Email provider evidence capture not accepted",
+    state: "PENDING",
+    detail: "AI and Email evidence capture runner is ready, but accepted evidence files and backend command proof are still required."
   },
   {
     id: "payfast-accepted-itn-proof-gate",
@@ -200,6 +216,7 @@ export async function GET() {
     jarvisDockerTruthVaultRuntimeProofIndexed: true,
     jarvisDockerTruthVaultRuntimeEvidenceCaptureIndexed: true,
     jarvisAiEmailProviderProofIndexed: true,
+    jarvisAiEmailProviderLiveEvidenceCaptureIndexed: true,
     jarvisPayFastAcceptedItnProofIndexed: true,
     jarvisN8nAirtableGithubRuntimeProofIndexed: true,
     jarvisBranchProtectionFinalLaunchAuditIndexed: true,
@@ -215,6 +232,6 @@ export async function GET() {
     manifests,
     routes,
     blockers,
-    nextAction: "Jarvis source/design is closed out. Capture redacted runtime evidence, then clear all live proof gates and the final branch-protection launch audit before public launch."
+    nextAction: "Jarvis source/design is closed out. Capture redacted runtime and provider evidence, then clear all live proof gates and the final branch-protection launch audit before public launch."
   });
 }
