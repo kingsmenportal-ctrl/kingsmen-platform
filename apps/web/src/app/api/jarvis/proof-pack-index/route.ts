@@ -21,6 +21,7 @@ const validators = [
   "scripts/validators/validate-jarvis-n8n-airtable-github-runtime-proof.mjs",
   "scripts/validators/validate-jarvis-n8n-airtable-github-evidence-capture.mjs",
   "scripts/validators/validate-jarvis-branch-protection-final-launch-audit.mjs",
+  "scripts/validators/validate-jarvis-branch-protection-final-launch-audit-evidence-capture.mjs",
   "scripts/validators/validate-jarvis-final-source-closeout-seal.mjs",
   "scripts/validators/validate-jarvis-final-launch-control.mjs",
   "scripts/validators/validate-jarvis-source-completion-seal.mjs",
@@ -34,7 +35,8 @@ const proofRunners = [
   "scripts/proof/capture-jarvis-docker-truth-vault-runtime-evidence.mjs",
   "scripts/proof/capture-jarvis-ai-email-provider-live-evidence.mjs",
   "scripts/proof/capture-jarvis-payfast-accepted-itn-evidence.mjs",
-  "scripts/proof/capture-jarvis-n8n-airtable-github-evidence.mjs"
+  "scripts/proof/capture-jarvis-n8n-airtable-github-evidence.mjs",
+  "scripts/proof/capture-jarvis-branch-protection-final-launch-audit-evidence.mjs"
 ];
 
 const reports = [
@@ -43,7 +45,8 @@ const reports = [
   "reports/jarvis/jarvis-docker-truth-vault-runtime-evidence-capture-latest.json",
   "reports/jarvis/jarvis-ai-email-provider-live-evidence-capture-latest.json",
   "reports/jarvis/jarvis-payfast-accepted-itn-evidence-capture-latest.json",
-  "reports/jarvis/jarvis-n8n-airtable-github-evidence-capture-latest.json"
+  "reports/jarvis/jarvis-n8n-airtable-github-evidence-capture-latest.json",
+  "reports/jarvis/jarvis-branch-protection-final-launch-audit-evidence-capture-latest.json"
 ];
 
 const manifests = [
@@ -64,6 +67,7 @@ const manifests = [
   "manifests/jarvis/jarvis-n8n-airtable-github-runtime-proof-v1.json",
   "manifests/jarvis/jarvis-n8n-airtable-github-evidence-capture-v1.json",
   "manifests/jarvis/jarvis-branch-protection-final-launch-audit-v1.json",
+  "manifests/jarvis/jarvis-branch-protection-final-launch-audit-evidence-capture-v1.json",
   "manifests/jarvis/jarvis-openclaw-operator-policy-boundary-v1.json",
   "manifests/jarvis/jarvis-playwright-scout-map-fallback-boundary-v1.json"
 ];
@@ -138,6 +142,12 @@ const blockers = [
     detail: "The capture runner can collect redacted n8n thin relay, Airtable human mirror, and GitHub connector evidence once real credentials and accepted evidence files are available."
   },
   {
+    id: "branch-final-audit-evidence-runner",
+    title: "Branch final audit evidence capture runner ready",
+    state: "READY_FOR_SECURITY_EVIDENCE",
+    detail: "The capture runner can collect redacted branch protection, rollback, staging pack, final audit, and founder approval evidence once accepted evidence files are available."
+  },
+  {
     id: "local-docker-runtime",
     title: "Local Docker/API runtime instability",
     state: "BLOCKED",
@@ -190,6 +200,12 @@ const blockers = [
     title: "Branch protection final launch audit gate not accepted",
     state: "BLOCKED",
     detail: "Main branch protection, required checks, rollback, staging evidence pack, final launch audit, and founder approval are required."
+  },
+  {
+    id: "branch-final-audit-evidence-capture",
+    title: "Branch final audit evidence capture not accepted",
+    state: "BLOCKED",
+    detail: "Branch/final audit evidence capture runner is ready, but accepted redacted branch, rollback, staging, final audit, and founder approval evidence files are still required."
   },
   {
     id: "live-proof-queue",
@@ -254,6 +270,7 @@ export async function GET() {
     jarvisN8nAirtableGithubRuntimeProofIndexed: true,
     jarvisN8nAirtableGithubEvidenceCaptureIndexed: true,
     jarvisBranchProtectionFinalLaunchAuditIndexed: true,
+    jarvisBranchProtectionFinalLaunchAuditEvidenceCaptureIndexed: true,
     dockerIndependentBuildAllowed: true,
     noFakeData: true,
     rawSecretsReturned: false,
