@@ -109,9 +109,10 @@ const gates: AcceptanceGate[] = [
     state: "BLOCKED",
     launchCritical: true,
     proofQueueRef: "branch-protection-proof",
-    acceptanceRule: "Accept only when branch protection, required checks, rollback evidence, final staging evidence pack, and final launch audit pass.",
-    rejectionRule: "Reject public launch if main branch can be pushed without review, required checks are absent, rollback proof is missing, or final audit fails.",
-    requiredEvidence: ["main branch protection", "required review/status checks", "rollback evidence", "staging evidence pack", "final launch audit"]
+    proofGateRoute: "/api/jarvis/branch-protection-final-launch-audit",
+    acceptanceRule: "Accept only when branch protection, required checks, rollback evidence, final staging evidence pack, final launch audit, and founder launch approval pass.",
+    rejectionRule: "Reject public launch if main branch can be pushed without review, required checks are absent, rollback proof is missing, final staging evidence pack is missing, founder approval is absent, or final audit fails.",
+    requiredEvidence: ["main branch protection", "required review/status checks", "rollback evidence", "staging evidence pack", "final launch audit", "founder approval"]
   }
 ];
 
@@ -138,6 +139,7 @@ export async function GET() {
     aiEmailProviderProofGateConnected: true,
     payfastAcceptedItnProofGateConnected: true,
     n8nAirtableGithubRuntimeProofGateConnected: true,
+    branchProtectionFinalLaunchAuditGateConnected: true,
     jarvisRuntimeLive: false,
     productionReady: false,
     publicLaunchAllowed: false,
@@ -155,6 +157,6 @@ export async function GET() {
     counts,
     gates,
     launchBlocking,
-    nextAction: "Capture real Docker, AI, Email, PayFast ITN, provider-tool, and security evidence, then move each gate from blocked or pending to accepted."
+    nextAction: "Capture real Docker, AI, Email, PayFast ITN, provider-tool, branch protection, rollback, staging, final audit, and founder approval evidence, then move each gate from blocked or pending to accepted."
   });
 }
