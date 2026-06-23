@@ -1,0 +1,31 @@
+{
+  "schema": "kingsmen.manifest.jarvis-docker-truth-vault-runtime-proof.v1",
+  "module": "Jarvis Docker / API / Truth Vault Runtime Proof Gate",
+  "batch": "LIVE_PROOF_BATCH_1",
+  "sourceCreated": true,
+  "runtimeProofAccepted": false,
+  "productionReady": false,
+  "publicLaunchAllowed": false,
+  "dockerIndependentBuildAllowed": true,
+  "routes": [
+    "/api/jarvis/docker-truth-vault-runtime-proof",
+    "/founder/launch-control/jarvis-docker-runtime-proof"
+  ],
+  "validator": "scripts/validators/validate-jarvis-docker-truth-vault-runtime-proof.mjs",
+  "requiredEvidence": [
+    "Docker engine reachable",
+    "API health HTTP 200",
+    "postgres_truth_vault storage mode",
+    "command_log write proof",
+    "audit_events write proof",
+    "redacted runtime output"
+  ],
+  "forbidden": [
+    "fake runtime readiness",
+    "raw secrets in output",
+    "browser direct database access",
+    "static source route treated as live proof",
+    "Airtable authority",
+    "n8n authority"
+  ]
+}
