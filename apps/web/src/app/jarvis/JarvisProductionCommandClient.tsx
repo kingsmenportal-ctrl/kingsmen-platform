@@ -20,7 +20,7 @@ type JarvisStatusPayload = {
     configured?: boolean;
   };
   backendHealthStatus?: number;
-  backendHealth?: Record<string, unknown> | null;
+  backendHealth?: { storageMode?: string; status?: string; service?: string } | null;
   cards?: Array<{ key: string; title: string; state: string; detail: string; ok: boolean }>;
   commands?: JarvisCommand[];
   doctrine?: string[];
@@ -112,7 +112,7 @@ const fallbackCommands: JarvisCommand[] = [
   { id: "PLAYWRIGHT_SCOUT_MAP_FALLBACK_CHECK", title: "Playwright MAP fallback", description: "Confirm scout/probe-only automation and manual fallback doctrine.", category: "Automation", risk: "SAFE_READ" },
   { id: "AI_PROVIDER_ROUTER_CHECK", title: "AI provider router", description: "Review backend-controlled AI provider readiness without exposing keys.", category: "AI", risk: "SAFE_READ" },
   { id: "EMAIL_PRIMARY_CHANNEL_CHECK", title: "Email primary channel", description: "Review email-first evidence boundary; WhatsApp and SMS cannot replace it.", category: "Communications", risk: "SAFE_READ" },
-  { id: "PAYFAST_PROVIDER_PROOF_QUEUE_CHECK", title: "PayFast proof queue", description: "Review PayFast sandbox, ITN, duplicate, failed-payment, and founder approval gates.", category: "Payments", risk: "SAFE_READ" },
+  { id: "PAYFAST_PROVIDER_PROOF_QUEUE_CHECK", title: "PayFast proof queue", description: "Review PayFast sandbox, ITN, duplicate ITN, failed-payment, and founder approval gates.", category: "Payments", risk: "SAFE_READ" },
   { id: "N8N_THIN_RELAY_CHECK", title: "n8n thin relay", description: "Review n8n as relay-only with no direct Truth Vault authority.", category: "Automation", risk: "SAFE_READ" },
   { id: "GITHUB_TOOL_CONNECTOR_CHECK", title: "GitHub connector", description: "Review redacted GitHub connector boundary and repository metadata proof.", category: "Tools", risk: "SAFE_READ" }
 ];
@@ -129,13 +129,13 @@ function toArray<T = Record<string, unknown>>(value: unknown): T[] {
   return Array.isArray(value) ? value as T[] : [];
 }
 
-function stateClass(state?: string) {
+function stateTone(state?: string) {
   const value = (state ?? "PENDING_RUNTIME_PROOF").toUpperCase();
-  if (["LIVE", "RUNTIME_PASSED", "ACCEPTED_PREVIOUS_RUNTIME", "ACCEPTED_SOURCE"].includes(value)) return styles.stateLive;
-  if (value.includes("SOURCE")) return styles.stateSource;
-  if (value.includes("BLOCK") || value.includes("REJECT")) return styles.stateBlocked;
-  if (value.includes("DEFER")) return styles.stateDeferred;
-  return styles.statePending;
+  if (["LIVE", "RUNTIME_PASSED", "ACCEPTED_PREVIOUS_RUNTIME", "ACCEPTED_SOURCE"].includes(value)) return styles.toneLive;
+  if (value.includes("SOURCE")) return styles.toneSource;
+  if (value.includes("BLOCK") || value.includes("REJECT")) return styles.toneBlocked;
+  if (value.includes("DEFER")) return styles.toneDeferred;
+  return styles.tonePending;
 }
 
 async function readJson<T>(url: string) {
@@ -150,8 +150,9 @@ function speak(text: string) {
   window.speechSynthesis.cancel();
   const voice = new SpeechSynthesisUtterance(text);
   voice.lang = "en-ZA";
-  voice.rate = 0.92;
-  voice.pitch = 0.85;
+  voice.rate = 0.88;
+  voice.pitch = 0.78;
+  voice.volume = 1;
   window.speechSynthesis.speak(voice);
 }
 
@@ -163,6 +164,12 @@ function speechRecognitionConstructor() {
   return api.SpeechRecognition || api.webkitSpeechRecognition;
 }
 
+function safeTime(value?: string) {
+  if (!value) return "not synced";
+  const parsed = new Date(value);
+  return Number.isNaN(parsed.getTime()) ? "not synced" : parsed.toLocaleTimeString();
+}
+
 export default function JarvisProductionCommandClient() {
   const [status, setStatus] = useState<JarvisStatusPayload | null>(null);
   const [liveIndex, setLiveIndex] = useState<LiveIndexPayload | null>(null);
@@ -170,13 +177,13 @@ export default function JarvisProductionCommandClient() {
   const [proofQueue, setProofQueue] = useState<Record<string, unknown> | null>(null);
   const [credentials, setCredentials] = useState<Record<string, unknown> | null>(null);
   const [selectedCommandId, setSelectedCommandId] = useState("COMMAND_PERSISTENCE_PROOF");
-  const [commandContext, setCommandContext] = useState("Run one live backend-safe Jarvis proof and return redacted evidence.");
+  const [commandContext, setCommandContext] = useState("Run one backend-safe Jarvis proof and return redacted evidence. No browser shell. No direct database access.");
   const [events, setEvents] = useState<JarvisEvent[]>([
     {
       id: newId("boot"),
-      role: "system",
-      title: "Unified Jarvis booted",
-      detail: "One Jarvis surface is loading live index, command boundary, proof queue, acceptance gate, credentials and evidence. No split command room. No fake production claim.",
+      role: "jarvis",
+      title: "Hello sir, welcome to Kingsmen.",
+      detail: "Jarvis is loading the Kingsmen operating cockpit: runtime spine, command scripts, evidence queue, credentials, launch gates, voice and visual context. One Jarvis. One surface.",
       ok: true,
       generatedAt: stamp()
     }
@@ -201,7 +208,7 @@ export default function JarvisProductionCommandClient() {
       ...toArray((proofQueue as Record<string, unknown>).queue),
       ...toArray((proofQueue as Record<string, unknown>).items),
       ...toArray((proofQueue as Record<string, unknown>).entries)
-    ].slice(0, 8);
+    ].slice(0, 6);
   }, [proofQueue]);
 
   const backendLive = liveIndex?.backendHealthStatus === 200 || status?.backendHealthStatus === 200;
@@ -213,11 +220,12 @@ export default function JarvisProductionCommandClient() {
   const launchBlockerCount = gate?.launchBlockingCount ?? launchBlocking.length;
   const credentialCount = Number((credentials?.credentialCount ?? credentials?.total ?? credentials?.requiredCredentialCount ?? 0) as number);
   const credentialReady = Number((credentials?.readyCredentialCount ?? credentials?.configuredCount ?? credentials?.ready ?? 0) as number);
-  const evidenceEvents = events.filter((event) => event.evidencePath || event.stdout || event.stderr);
+  const evidenceEvents = events.filter((event) => event.evidencePath || event.stdout || event.stderr || event.ok === false);
+  const lastSynced = liveIndex?.generatedAt ?? gate?.generatedAt ?? status?.generatedAt;
 
   const systemLine = runtimeLive
-    ? "Backend and Truth Vault are online. Provider/payment/security evidence still controls launch."
-    : liveIndex?.runtimeBlocker ?? errorText ?? "Waiting for live boundary.";
+    ? "Runtime spine is connected. Provider, payment and launch audit evidence still control public launch."
+    : liveIndex?.runtimeBlocker ?? errorText ?? "Runtime boundary is not confirmed yet.";
 
   async function loadJarvis() {
     setRefreshing(true);
@@ -234,7 +242,6 @@ export default function JarvisProductionCommandClient() {
       const firstCommand = statusResult.value.commands?.[0]?.id;
       if (firstCommand) setSelectedCommandId((current) => current || firstCommand);
     }
-
     if (liveIndexResult.status === "fulfilled") setLiveIndex(liveIndexResult.value);
     if (gateResult.status === "fulfilled") setGate(gateResult.value);
     if (queueResult.status === "fulfilled") setProofQueue(queueResult.value);
@@ -246,6 +253,17 @@ export default function JarvisProductionCommandClient() {
 
     setErrorText(errors.join(" · "));
     setRefreshing(false);
+  }
+
+  function greetFounder() {
+    const greeting = runtimeLive
+      ? "Hello sir, welcome to Kingsmen. Jarvis is online. The Truth Vault is connected. Public launch remains locked until live evidence clears."
+      : "Hello sir, welcome to Kingsmen. Jarvis is standing by. Start the backend runtime to connect the Truth Vault spine.";
+    setEvents((items) => [
+      ...items,
+      { id: newId("greet"), role: "jarvis", title: "Kingsmen greeting", detail: greeting, ok: runtimeLive, generatedAt: stamp() }
+    ]);
+    speak(greeting);
   }
 
   async function runCommand(commandId = selectedCommand?.id) {
@@ -273,7 +291,7 @@ export default function JarvisProductionCommandClient() {
           commandId,
           clientRequestId: newId("jarvis_ui"),
           context: commandContext,
-          surface: "unified_jarvis_surface",
+          surface: "kingsmen_jarvis_single_cockpit",
           localShellRequested: false,
           directDatabaseAccessRequested: false
         })
@@ -296,15 +314,15 @@ export default function JarvisProductionCommandClient() {
           generatedAt: stamp()
         }
       ]);
-      speak(ok ? `${payload.title ?? commandId} accepted by backend.` : `Command needs review.`);
+      speak(ok ? `${payload.title ?? command?.title ?? commandId} accepted by the Kingsmen backend.` : "Command needs review.");
       await loadJarvis();
     } catch (error) {
       const message = error instanceof Error ? error.message : "Jarvis command request failed.";
       setEvents((items) => [
         ...items,
-        { id: newId("jarvis_error"), role: "jarvis", title: "Command boundary failed", detail: message, ok: false, commandId, generatedAt: stamp() }
+        { id: newId("jarvis_error"), role: "jarvis", title: "Backend command boundary unavailable", detail: message, ok: false, commandId, generatedAt: stamp() }
       ]);
-      speak("Jarvis command boundary failed.");
+      speak("Jarvis command boundary is unavailable. Check the backend runtime.");
     } finally {
       setRunning(false);
     }
@@ -340,6 +358,10 @@ export default function JarvisProductionCommandClient() {
       const transcript = event.results?.[0]?.[0]?.transcript ?? "";
       setCommandContext(transcript);
       setVoiceState(`heard: ${transcript}`);
+      setEvents((items) => [
+        ...items,
+        { id: newId("voice"), role: "founder", title: "Voice context captured", detail: transcript, ok: true, generatedAt: stamp() }
+      ]);
     };
     recognition.onerror = (event: any) => setVoiceState(`voice error: ${event?.error ?? "unknown"}`);
     recognition.onend = () => setVoiceState((current) => (current === "listening" ? "standby" : current));
@@ -376,77 +398,92 @@ export default function JarvisProductionCommandClient() {
 
   return (
     <main className={styles.shell}>
-      <div className={styles.horizon} />
+      <div className={styles.aurora} />
+      <div className={styles.gridlines} />
       <section className={styles.wrap}>
         <header className={styles.hero}>
-          <div className={styles.heroCopy}>
-            <span className={styles.kicker}>KINGSMEN LIVE OPERATING SYSTEM</span>
+          <div className={styles.brandPanel}>
+            <span className={styles.kicker}>KINGSMEN · FOUNDER OPERATING SYSTEM</span>
             <h1>JARVIS</h1>
-            <p>One founder cockpit for runtime state, command execution, proof queue, acceptance gates, credentials, evidence and visual context. No duplicate Jarvis rooms. No fake launch claim.</p>
-            <div className={styles.actions}>
-              <button className={styles.primary} onClick={loadJarvis} disabled={refreshing}>{refreshing ? "Syncing" : "Sync Jarvis"}</button>
+            <p className={styles.greeting}>Hello sir, welcome to Kingsmen. I am Jarvis — the single command cockpit for runtime, Truth Vault, evidence, providers, payments, launch gates, voice and visual context.</p>
+            <div className={styles.actionRow}>
+              <button className={styles.goldButton} onClick={greetFounder}>Greet founder</button>
+              <button onClick={loadJarvis} disabled={refreshing}>{refreshing ? "Synchronising" : "Sync Jarvis"}</button>
               <button onClick={() => runCommand("COMMAND_PERSISTENCE_PROOF")} disabled={running}>Truth Vault proof</button>
               <button onClick={startVoice}>Voice: {voiceState}</button>
               <button onClick={toggleVisual}>{visualActive ? "Stop visual" : "Start visual"}</button>
             </div>
           </div>
 
-          <aside className={styles.corePanel}>
-            <div className={`${styles.statusOrb} ${runtimeLive ? styles.online : styles.offline}`}>
-              <span className={styles.orbRing} />
+          <aside className={styles.coreCard}>
+            <div className={`${styles.coreOrb} ${runtimeLive ? styles.coreOnline : styles.coreStandby}`}>
+              <span />
               <b>J</b>
             </div>
-            <strong>{runtimeLive ? "RUNTIME ONLINE" : "SYNCING RUNTIME"}</strong>
+            <p>{runtimeLive ? "KINGSMEN RUNTIME ONLINE" : "RUNTIME STANDBY"}</p>
+            <strong>{runtimeLive ? "Truth Vault connected" : "Backend runtime required"}</strong>
             <small>{systemLine}</small>
           </aside>
         </header>
 
-        <section className={styles.quickStats}>
-          <article className={runtimeLive ? styles.statOk : styles.statWarn}><span>runtime</span><strong>{runtimeLive ? "LIVE" : "WAIT"}</strong></article>
-          <article><span>backend</span><strong>{backendLive ? "HTTP 200" : "PENDING"}</strong></article>
-          <article><span>truth vault</span><strong>{truthVaultLive ? "POSTGRES" : "PENDING"}</strong></article>
-          <article><span>live cards</span><strong>{liveIndex?.summary?.live ?? 0}</strong></article>
-          <article className={launchBlocked ? styles.statWarn : styles.statOk}><span>launch blockers</span><strong>{launchBlockerCount}</strong></article>
-          <article><span>credentials</span><strong>{credentialReady}/{credentialCount}</strong></article>
-          <article><span>production</span><strong>{productionReady ? "TRUE" : "FALSE"}</strong></article>
-          <article><span>public launch</span><strong>{publicLaunchAllowed ? "TRUE" : "FALSE"}</strong></article>
+        <section className={styles.missionStrip}>
+          <strong>Doctrine lock</strong>
+          <span>Email primary. WhatsApp urgent only. SMS backup. Playwright scout only. PostgreSQL Truth Vault authority. Airtable mirror only. n8n thin relay only.</span>
         </section>
 
-        {errorText ? <section className={styles.alert}>Partial load: {errorText}</section> : null}
+        <section className={styles.statGrid}>
+          <article className={runtimeLive ? styles.goodStat : styles.warnStat}><span>Runtime</span><strong>{runtimeLive ? "LIVE" : "STANDBY"}</strong></article>
+          <article><span>Backend</span><strong>{backendLive ? "HTTP 200" : "OFFLINE"}</strong></article>
+          <article><span>Truth Vault</span><strong>{truthVaultLive ? "POSTGRES" : "PENDING"}</strong></article>
+          <article><span>Live proofs</span><strong>{liveIndex?.summary?.live ?? 0}</strong></article>
+          <article className={launchBlocked ? styles.warnStat : styles.goodStat}><span>Launch blockers</span><strong>{launchBlockerCount}</strong></article>
+          <article><span>Credentials</span><strong>{credentialReady}/{credentialCount}</strong></article>
+          <article><span>Production</span><strong>{productionReady ? "READY" : "LOCKED"}</strong></article>
+          <article><span>Public launch</span><strong>{publicLaunchAllowed ? "OPEN" : "LOCKED"}</strong></article>
+        </section>
 
-        <section className={styles.bodyGrid}>
-          <section className={styles.panel}>
-            <div className={styles.panelHeader}>
-              <span className={styles.kicker}>Live operating spine</span>
-              <button onClick={() => window.open("/api/jarvis/live-index", "_blank", "noopener,noreferrer")}>JSON</button>
+        {errorText ? <section className={styles.warning}>Live boundary note: {errorText}</section> : null}
+
+        <section className={styles.cockpitGrid}>
+          <section className={styles.card}>
+            <div className={styles.cardHead}>
+              <span>Live operating spine</span>
+              <button onClick={() => window.open("/api/jarvis/live-index", "_blank", "noopener,noreferrer")}>Open JSON</button>
             </div>
-            <div className={styles.liveList}>
-              {liveEntries.length ? liveEntries.map((entry) => (
-                <article key={entry.id} className={styles.liveItem}>
-                  <span className={`${styles.statePill} ${stateClass(entry.state)}`}>{entry.state}</span>
+            <div className={styles.spineList}>
+              {liveEntries.length ? liveEntries.slice(0, 10).map((entry) => (
+                <article key={entry.id} className={styles.spineItem}>
+                  <span className={`${styles.statusPill} ${stateTone(entry.state)}`}>{entry.state}</span>
                   <strong>{entry.title}</strong>
                   <p>{entry.detail}</p>
                   {entry.boundaryRoute ? <code>{entry.boundaryRoute}</code> : null}
                 </article>
-              )) : <p className={styles.empty}>Waiting for the live index. This is unavailable until the web route responds.</p>}
+              )) : <p className={styles.empty}>Jarvis is waiting for the live index route. Nothing is fabricated.</p>}
             </div>
           </section>
 
-          <section className={`${styles.panel} ${styles.commandConsole}`}>
-            <div className={styles.panelHeader}>
-              <span className={styles.kicker}>Backend-safe command core</span>
+          <section className={`${styles.card} ${styles.commandCore}`}>
+            <div className={styles.cardHead}>
+              <span>Kingsmen command scripts</span>
               <b>{running ? "EXECUTING" : "READY"}</b>
             </div>
             <form onSubmit={submit} className={styles.commandForm}>
-              <select value={selectedCommandId} onChange={(event) => setSelectedCommandId(event.target.value)}>
-                {commands.map((command) => <option key={command.id} value={command.id}>{command.title}</option>)}
-              </select>
-              <textarea value={commandContext} onChange={(event) => setCommandContext(event.target.value)} />
-              <button className={styles.primary} disabled={running || !selectedCommand}>{running ? "Running" : "Send to backend"}</button>
+              <label>
+                Command script
+                <select value={selectedCommandId} onChange={(event) => setSelectedCommandId(event.target.value)}>
+                  {commands.map((command) => <option key={command.id} value={command.id}>{command.title}</option>)}
+                </select>
+              </label>
+              <label>
+                Founder context
+                <textarea value={commandContext} onChange={(event) => setCommandContext(event.target.value)} />
+              </label>
+              <button className={styles.goldButton} disabled={running || !selectedCommand}>{running ? "Running script" : "Send to backend"}</button>
             </form>
-            <div className={styles.commandGrid}>
+
+            <div className={styles.scriptGrid}>
               {commands.map((command) => (
-                <button key={command.id} className={styles.commandButton} onClick={() => {
+                <button key={command.id} className={styles.scriptTile} onClick={() => {
                   setSelectedCommandId(command.id);
                   runCommand(command.id);
                 }} disabled={running}>
@@ -456,9 +493,10 @@ export default function JarvisProductionCommandClient() {
                 </button>
               ))}
             </div>
+
             <div className={styles.timeline}>
-              {events.slice(-10).reverse().map((event) => (
-                <article key={event.id} className={event.ok === false ? styles.eventBad : styles.event}>
+              {events.slice(-8).reverse().map((event) => (
+                <article key={event.id} className={event.ok === false ? styles.badEvent : styles.event}>
                   <div><strong>{event.role.toUpperCase()} · {event.title}</strong><span>{new Date(event.generatedAt).toLocaleTimeString()}</span></div>
                   <p>{event.detail}</p>
                   {event.stdout ? <pre>{event.stdout}</pre> : null}
@@ -469,52 +507,52 @@ export default function JarvisProductionCommandClient() {
             </div>
           </section>
 
-          <aside className={styles.sideStack}>
-            <section className={styles.panel}>
-              <div className={styles.panelHeader}>
-                <span className={styles.kicker}>Launch gates</span>
-                <button onClick={() => window.open("/api/jarvis/live-proof-acceptance-gate", "_blank", "noopener,noreferrer")}>JSON</button>
+          <aside className={styles.rightStack}>
+            <section className={styles.card}>
+              <div className={styles.cardHead}>
+                <span>Launch gates</span>
+                <button onClick={() => window.open("/api/jarvis/live-proof-acceptance-gate", "_blank", "noopener,noreferrer")}>Open JSON</button>
               </div>
               <div className={styles.gateList}>
-                {(launchBlocking.length ? launchBlocking : gateList).slice(0, 8).map((item) => (
+                {(launchBlocking.length ? launchBlocking : gateList).slice(0, 7).map((item) => (
                   <article key={item.id} className={styles.gateItem}>
-                    <span className={`${styles.statePill} ${stateClass(item.state)}`}>{item.state}</span>
+                    <span className={`${styles.statusPill} ${stateTone(item.state)}`}>{item.state}</span>
                     <strong>{item.title}</strong>
                     {item.proofGateRoute ? <code>{item.proofGateRoute}</code> : null}
                   </article>
                 ))}
-                {!launchBlocking.length && !gateList.length ? <p className={styles.empty}>Waiting for acceptance gate.</p> : null}
+                {!launchBlocking.length && !gateList.length ? <p className={styles.empty}>Acceptance gate unavailable. Launch remains locked.</p> : null}
               </div>
             </section>
 
-            <section className={styles.panel}>
-              <div className={styles.panelHeader}>
-                <span className={styles.kicker}>Proof queue</span>
-                <button onClick={() => window.open("/api/jarvis/live-proof-queue", "_blank", "noopener,noreferrer")}>JSON</button>
+            <section className={styles.card}>
+              <div className={styles.cardHead}>
+                <span>Proof queue</span>
+                <button onClick={() => window.open("/api/jarvis/live-proof-queue", "_blank", "noopener,noreferrer")}>Open JSON</button>
               </div>
               <div className={styles.gateList}>
                 {queueItems.length ? queueItems.map((item: any, index) => (
                   <article key={item.id ?? index} className={styles.gateItem}>
-                    <span className={`${styles.statePill} ${stateClass(item.state)}`}>{item.state ?? "PENDING"}</span>
+                    <span className={`${styles.statusPill} ${stateTone(item.state)}`}>{item.state ?? "PENDING"}</span>
                     <strong>{item.title ?? item.id ?? `Proof item ${index + 1}`}</strong>
                     {item.proofRoute ? <code>{item.proofRoute}</code> : null}
                   </article>
-                )) : <p className={styles.empty}>Queue route loaded when available. Values hidden.</p>}
+                )) : <p className={styles.empty}>Proof queue will load from Jarvis routes. Values hidden.</p>}
               </div>
             </section>
 
-            <section className={styles.visualPanel}>
+            <section className={styles.visualCard}>
               <video ref={videoRef} autoPlay muted playsInline className={visualActive ? styles.videoLive : styles.videoHidden} />
-              {!visualActive ? <span>Visual standby</span> : null}
+              {!visualActive ? <span>Visual context standby</span> : null}
             </section>
           </aside>
         </section>
 
-        <section className={styles.dock}>
+        <section className={styles.bottomDock}>
           <article><span>Evidence drawer</span><strong>{evidenceEvents.length}</strong></article>
           <article><span>Acceptance</span><strong>{gate?.acceptanceDecision ?? "PENDING"}</strong></article>
           <article><span>Storage</span><strong>{liveIndex?.backendStorageMode ?? "UNKNOWN"}</strong></article>
-          <article><span>Last sync</span><strong>{new Date(liveIndex?.generatedAt ?? gate?.generatedAt ?? status?.generatedAt ?? stamp()).toLocaleTimeString()}</strong></article>
+          <article><span>Last sync</span><strong>{safeTime(lastSynced)}</strong></article>
         </section>
       </section>
     </main>
