@@ -17,6 +17,8 @@ type ProofQueueItem = {
   evidenceRequired: string[];
 };
 
+const providerToolCaptureRunner = "node scripts/proof/capture-jarvis-n8n-airtable-github-evidence.mjs";
+
 const proofQueue: ProofQueueItem[] = [
   {
     id: "jarvis-source-seal",
@@ -80,8 +82,8 @@ const proofQueue: ProofQueueItem[] = [
     launchCritical: true,
     detail: "n8n remains a thin relay only. It must not become authority and may not write directly to Truth Vault.",
     proofRoute: "/api/jarvis/n8n-airtable-github-runtime-proof",
-    proofScript: "npm run jarvis:runtime:n8n-thin-relay",
-    evidenceRequired: ["base URL readiness", "API key outside Git", "webhook secret outside Git", "backend-mediated command proof", "no direct browser call", "Truth Vault authority proof"]
+    proofScript: providerToolCaptureRunner,
+    evidenceRequired: ["base URL readiness", "API key outside Git", "webhook secret outside Git", "backend-mediated command proof", "no direct browser call", "Truth Vault authority proof", "accepted n8n evidence file"]
   },
   {
     id: "airtable-human-mirror-proof",
@@ -91,8 +93,8 @@ const proofQueue: ProofQueueItem[] = [
     launchCritical: true,
     detail: "Airtable remains human mirror only. Truth Vault remains source of truth and reconciliation authority.",
     proofRoute: "/api/jarvis/n8n-airtable-github-runtime-proof",
-    proofScript: "npm run jarvis:runtime:airtable-human-mirror",
-    evidenceRequired: ["Airtable credentials outside Git", "mirror write proof", "Truth Vault authority proof", "reconciliation proof", "redacted Airtable metadata proof"]
+    proofScript: providerToolCaptureRunner,
+    evidenceRequired: ["Airtable credentials outside Git", "mirror write proof", "Truth Vault authority proof", "reconciliation proof", "redacted Airtable metadata proof", "accepted Airtable evidence file"]
   },
   {
     id: "github-tool-runtime-proof",
@@ -102,8 +104,8 @@ const proofQueue: ProofQueueItem[] = [
     launchCritical: true,
     detail: "GitHub boundary needs redacted runtime evidence that tool calls are controlled and do not expose tokens.",
     proofRoute: "/api/jarvis/n8n-airtable-github-runtime-proof",
-    proofScript: "npm run jarvis:runtime:github-tool-boundary",
-    evidenceRequired: ["redacted repo metadata", "tool boundary proof", "no token exposure", "audit trail", "no fake connector status"]
+    proofScript: providerToolCaptureRunner,
+    evidenceRequired: ["redacted repo metadata", "tool boundary proof", "no token exposure", "audit trail", "no fake connector status", "accepted GitHub evidence file"]
   },
   {
     id: "branch-protection-proof",
@@ -141,6 +143,7 @@ export async function GET() {
     payfastAcceptedItnProofGateConnected: true,
     payfastAcceptedItnEvidenceCaptureConnected: true,
     n8nAirtableGithubRuntimeProofGateConnected: true,
+    n8nAirtableGithubEvidenceCaptureConnected: true,
     branchProtectionFinalLaunchAuditGateConnected: true,
     jarvisRuntimeLive: false,
     productionReady: false,
@@ -156,6 +159,6 @@ export async function GET() {
     noDirectProviderCallsFromWeb: true,
     counts,
     proofQueue,
-    nextAction: "Clear Docker/API runtime, AI+Email evidence capture, PayFast accepted ITN evidence capture, n8n/Airtable/GitHub, branch protection, rollback, staging evidence, and final audit gates before calling Jarvis live."
+    nextAction: "Clear Docker/API runtime, AI+Email evidence capture, PayFast accepted ITN evidence capture, n8n/Airtable/GitHub evidence capture, branch protection, rollback, staging evidence, and final audit gates before calling Jarvis live."
   });
 }
