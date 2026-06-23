@@ -1,0 +1,32 @@
+{
+  "schema": "kingsmen.jarvis-manifest.v1",
+  "module": "Jarvis PayFast Accepted ITN Proof Gate",
+  "route": "/api/jarvis/payfast-accepted-itn-proof",
+  "founderPage": "/founder/launch-control/jarvis-payfast-itn-proof",
+  "validator": "scripts/validators/validate-jarvis-payfast-accepted-itn-proof.mjs",
+  "productionReady": false,
+  "publicLaunchAllowed": false,
+  "dockerIndependentBuildAllowed": true,
+  "sourceGateBuilt": true,
+  "payfastAcceptedItnProofAccepted": false,
+  "rules": {
+    "returnUrlMayMarkPaid": false,
+    "cancelUrlMayMarkPaid": false,
+    "acceptedItnRequired": true,
+    "duplicateItnMustBeIdempotent": true,
+    "failedPaymentMustNotMarkPaid": true,
+    "refundReviewRequired": true,
+    "founderApprovalRequired": true,
+    "truthVaultFinanceAuthorityRequired": true,
+    "rawSecretsReturned": false
+  },
+  "remainingEvidence": [
+    "PayFast credentials outside Git",
+    "sandbox checkout proof",
+    "accepted ITN proof",
+    "duplicate ITN rejection proof",
+    "failed payment rejection proof",
+    "refund review boundary",
+    "founder approval"
+  ]
+}
