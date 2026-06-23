@@ -116,9 +116,10 @@ const ledgerItems: EvidenceLedgerItem[] = [
     launchCritical: true,
     evidenceClass: "provider",
     acceptedEvidence: [],
-    missingEvidence: ["n8n thin relay proof", "Airtable mirror-only proof", "GitHub token redaction proof", "Truth Vault authority proof"],
-    rejectionRules: ["reject if n8n writes Truth Vault directly", "reject if Airtable becomes authority", "reject if GitHub token is exposed"],
-    storageTarget: "reports/jarvis/tool-runtime-proof.json"
+    missingEvidence: ["n8n thin relay proof", "Airtable mirror-only proof", "GitHub token redaction proof", "Truth Vault authority proof", "no direct browser-to-provider call proof", "redacted provider-tool runtime output"],
+    rejectionRules: ["reject if n8n writes Truth Vault directly", "reject if Airtable becomes authority", "reject if GitHub token is exposed", "reject if browser calls provider tools directly", "reject if provider-tool proof is only a static source route"],
+    storageTarget: "reports/jarvis/tool-runtime-proof.json",
+    proofGateRoute: "/api/jarvis/n8n-airtable-github-runtime-proof"
   },
   {
     id: "branch-protection-launch-audit-evidence",
@@ -154,6 +155,7 @@ export async function GET() {
     dockerRuntimeProofGateConnected: true,
     aiEmailProviderProofGateConnected: true,
     payfastAcceptedItnProofGateConnected: true,
+    n8nAirtableGithubRuntimeProofGateConnected: true,
     jarvisRuntimeLive: false,
     productionReady: false,
     publicLaunchAllowed: false,
