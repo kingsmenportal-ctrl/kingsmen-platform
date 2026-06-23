@@ -22,7 +22,7 @@ const phases: RunbookPhase[] = [
     state: "READY_TO_RUN_WHEN_RUNTIME_AVAILABLE",
     owner: "jarvis",
     launchCritical: true,
-    commandText: "node scripts\\validators\\validate-jarvis-source-completion-seal.mjs && node scripts\\validators\\validate-jarvis-final-command-room-live-proof-queue.mjs",
+    commandText: "node scripts\validators\validate-jarvis-source-completion-seal.mjs && node scripts\validators\validate-jarvis-final-command-room-live-proof-queue.mjs",
     evidenceExpected: ["source seal validator passed", "final HUD live proof queue validator passed", "productionReady remains false"],
     stopCondition: "Stop if any source validator fails. Do not continue to runtime proof until source validators pass."
   },
@@ -87,8 +87,9 @@ const phases: RunbookPhase[] = [
     owner: "security",
     launchCritical: true,
     commandText: "npm run repo:validate:branch-protection && npm run kingsmen:launch:audit",
-    evidenceExpected: ["branch protection proof", "required status checks", "rollback evidence", "final launch audit"],
-    stopCondition: "Stop if branch protection or launch audit fails. Public launch remains false."
+    proofGateRoute: "/api/jarvis/branch-protection-final-launch-audit",
+    evidenceExpected: ["branch protection proof", "required status checks", "rollback evidence", "final staging evidence pack", "final launch audit", "founder approval"],
+    stopCondition: "Stop if branch protection, rollback proof, staging evidence pack, founder approval, or launch audit fails. Public launch remains false."
   }
 ];
 
@@ -102,6 +103,7 @@ export async function GET() {
     aiEmailProviderProofGateConnected: true,
     payfastAcceptedItnProofGateConnected: true,
     n8nAirtableGithubRuntimeProofGateConnected: true,
+    branchProtectionFinalLaunchAuditGateConnected: true,
     jarvisRuntimeLive: false,
     productionReady: false,
     publicLaunchAllowed: false,
@@ -115,6 +117,6 @@ export async function GET() {
     directDatabaseAccessFromWeb: false,
     noDirectProviderCallsFromWeb: true,
     phases,
-    nextAction: "Run phases in order only when runtime and provider credentials are actually available. Do not skip failed gates."
+    nextAction: "Run phases in order only when runtime, provider credentials, security gates, rollback proof, and founder approval are actually available. Do not skip failed gates."
   });
 }
