@@ -16,7 +16,14 @@ const sourceSurfaces = [
     title: "Jarvis Final HUD",
     href: "/jarvis/final",
     state: "SOURCE_READY",
-    detail: "Final command room combining completion board, provider credentials, evidence collector, source launch gate, proof pack, live proof queue, live proof runbook, evidence ledger, acceptance gate, and runtime blockers."
+    detail: "Final command room combining completion board, provider credentials, evidence collector, source launch gate, proof pack, live proof queue, live proof runbook, evidence ledger, acceptance gate, closeout seal, and runtime blockers."
+  },
+  {
+    id: "final-source-closeout-seal",
+    title: "Final Source Closeout Seal",
+    href: "/founder/launch-control/jarvis-final-source-closeout",
+    state: "SOURCE_CLOSED_OUT",
+    detail: "Final source/design handover seal. It stops extra UI-layer building unless a validator fails and moves remaining work to live proof batches."
   },
   {
     id: "live-proof-queue",
@@ -127,6 +134,7 @@ export async function GET() {
     jarvisLiveProofRunbookConnected: true,
     jarvisLiveProofEvidenceLedgerConnected: true,
     jarvisLiveProofAcceptanceGateConnected: true,
+    jarvisFinalSourceCloseoutSealConnected: true,
     productionReady: false,
     publicLaunchAllowed: false,
     dockerIndependentBuildAllowed: true,
@@ -155,6 +163,7 @@ export async function GET() {
       "Live proof runbook",
       "Live proof evidence ledger",
       "Live proof acceptance gate and rejection rules",
+      "Final source closeout and handover seal",
       "Live index readiness map",
       "Provider credential checklist access",
       "Evidence collector and proof references",
@@ -163,6 +172,6 @@ export async function GET() {
       "Runtime blocker banner",
       "No fake data and no secret exposure locks"
     ],
-    nextAction: "Use /jarvis/final as the connected Jarvis command room, then clear live proof queue blockers through the runbook, evidence ledger, and acceptance gate before production readiness can become true."
+    nextAction: "Jarvis source/design/control surfaces are closed out. Clear the five live proof batches before production readiness can become true."
   });
 }
