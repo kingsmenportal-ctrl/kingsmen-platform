@@ -16,6 +16,7 @@ const validators = [
   "scripts/validators/validate-jarvis-ai-email-provider-live-proof.mjs",
   "scripts/validators/validate-jarvis-payfast-accepted-itn-proof.mjs",
   "scripts/validators/validate-jarvis-n8n-airtable-github-runtime-proof.mjs",
+  "scripts/validators/validate-jarvis-branch-protection-final-launch-audit.mjs",
   "scripts/validators/validate-jarvis-final-source-closeout-seal.mjs",
   "scripts/validators/validate-jarvis-final-launch-control.mjs",
   "scripts/validators/validate-jarvis-source-completion-seal.mjs",
@@ -43,6 +44,7 @@ const manifests = [
   "manifests/jarvis/jarvis-ai-email-provider-live-proof-v1.json",
   "manifests/jarvis/jarvis-payfast-accepted-itn-proof-v1.json",
   "manifests/jarvis/jarvis-n8n-airtable-github-runtime-proof-v1.json",
+  "manifests/jarvis/jarvis-branch-protection-final-launch-audit-v1.json",
   "manifests/jarvis/jarvis-openclaw-operator-policy-boundary-v1.json",
   "manifests/jarvis/jarvis-playwright-scout-map-fallback-boundary-v1.json"
 ];
@@ -63,6 +65,7 @@ const routes = [
   "/founder/launch-control/jarvis-ai-email-provider-proof",
   "/founder/launch-control/jarvis-payfast-itn-proof",
   "/founder/launch-control/jarvis-provider-tool-runtime-proof",
+  "/founder/launch-control/jarvis-branch-final-audit",
   "/api/jarvis/final-command-hud",
   "/api/jarvis/final-launch-control",
   "/api/jarvis/source-completion-seal",
@@ -75,6 +78,7 @@ const routes = [
   "/api/jarvis/ai-email-provider-live-proof",
   "/api/jarvis/payfast-accepted-itn-proof",
   "/api/jarvis/n8n-airtable-github-runtime-proof",
+  "/api/jarvis/branch-protection-final-launch-audit",
   "/api/jarvis/completion-board",
   "/api/jarvis/provider-credential-checklist",
   "/api/jarvis/evidence-collector",
@@ -119,6 +123,12 @@ const blockers = [
     title: "n8n Airtable GitHub runtime proof gate not accepted",
     state: "PENDING",
     detail: "n8n thin relay, Airtable human mirror, GitHub connector, token redaction, and Truth Vault authority evidence are required."
+  },
+  {
+    id: "branch-protection-final-launch-audit-gate",
+    title: "Branch protection final launch audit gate not accepted",
+    state: "BLOCKED",
+    detail: "Main branch protection, required checks, rollback, staging evidence pack, final launch audit, and founder approval are required."
   },
   {
     id: "live-proof-queue",
@@ -178,6 +188,7 @@ export async function GET() {
     jarvisAiEmailProviderProofIndexed: true,
     jarvisPayFastAcceptedItnProofIndexed: true,
     jarvisN8nAirtableGithubRuntimeProofIndexed: true,
+    jarvisBranchProtectionFinalLaunchAuditIndexed: true,
     dockerIndependentBuildAllowed: true,
     noFakeData: true,
     rawSecretsReturned: false,
@@ -189,6 +200,6 @@ export async function GET() {
     manifests,
     routes,
     blockers,
-    nextAction: "Jarvis source/design is closed out. Clear n8n/Airtable/GitHub provider-tool proof plus the final launch audit batch before public launch."
+    nextAction: "Jarvis source/design is closed out. Clear all live proof gates and the final branch-protection launch audit before public launch."
   });
 }
