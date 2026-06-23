@@ -16,6 +16,7 @@ type EvidenceLedgerItem = {
   missingEvidence: string[];
   rejectionRules: string[];
   storageTarget: string;
+  proofGateRoute?: string;
 };
 
 const ledgerItems: EvidenceLedgerItem[] = [
@@ -63,9 +64,10 @@ const ledgerItems: EvidenceLedgerItem[] = [
     launchCritical: true,
     evidenceClass: "runtime",
     acceptedEvidence: [],
-    missingEvidence: ["API health HTTP 200", "postgres_truth_vault storage mode", "command log write proof", "audit event write proof"],
-    rejectionRules: ["reject if health is 500", "reject if storage mode is memory", "reject if browser writes database directly"],
-    storageTarget: "reports/jarvis/backend-truth-vault-runtime-proof.json"
+    missingEvidence: ["Docker engine reachable", "API health HTTP 200", "postgres_truth_vault storage mode", "command log write proof", "audit event write proof", "redacted runtime output"],
+    rejectionRules: ["reject if health is 500", "reject if storage mode is memory", "reject if browser writes database directly", "reject if proof is only a static source route"],
+    storageTarget: "reports/jarvis/backend-truth-vault-runtime-proof.json",
+    proofGateRoute: "/api/jarvis/docker-truth-vault-runtime-proof"
   },
   {
     id: "ai-live-call-evidence",
@@ -146,6 +148,7 @@ export async function GET() {
     module: "Jarvis Live Proof Evidence Ledger",
     generatedAt: new Date().toISOString(),
     jarvisSourceReady: true,
+    dockerRuntimeProofGateConnected: true,
     jarvisRuntimeLive: false,
     productionReady: false,
     publicLaunchAllowed: false,
