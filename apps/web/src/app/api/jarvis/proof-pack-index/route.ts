@@ -17,6 +17,7 @@ const validators = [
   "scripts/validators/validate-jarvis-ai-email-provider-live-proof.mjs",
   "scripts/validators/validate-jarvis-ai-email-provider-live-evidence-capture.mjs",
   "scripts/validators/validate-jarvis-payfast-accepted-itn-proof.mjs",
+  "scripts/validators/validate-jarvis-payfast-accepted-itn-evidence-capture.mjs",
   "scripts/validators/validate-jarvis-n8n-airtable-github-runtime-proof.mjs",
   "scripts/validators/validate-jarvis-branch-protection-final-launch-audit.mjs",
   "scripts/validators/validate-jarvis-final-source-closeout-seal.mjs",
@@ -30,14 +31,16 @@ const validators = [
 
 const proofRunners = [
   "scripts/proof/capture-jarvis-docker-truth-vault-runtime-evidence.mjs",
-  "scripts/proof/capture-jarvis-ai-email-provider-live-evidence.mjs"
+  "scripts/proof/capture-jarvis-ai-email-provider-live-evidence.mjs",
+  "scripts/proof/capture-jarvis-payfast-accepted-itn-evidence.mjs"
 ];
 
 const reports = [
   "reports/jarvis/jarvis-openclaw-operator-policy-boundary-proof-latest.json",
   "reports/jarvis/jarvis-playwright-scout-map-fallback-boundary-proof-latest.json",
   "reports/jarvis/jarvis-docker-truth-vault-runtime-evidence-capture-latest.json",
-  "reports/jarvis/jarvis-ai-email-provider-live-evidence-capture-latest.json"
+  "reports/jarvis/jarvis-ai-email-provider-live-evidence-capture-latest.json",
+  "reports/jarvis/jarvis-payfast-accepted-itn-evidence-capture-latest.json"
 ];
 
 const manifests = [
@@ -54,6 +57,7 @@ const manifests = [
   "manifests/jarvis/jarvis-ai-email-provider-live-proof-v1.json",
   "manifests/jarvis/jarvis-ai-email-provider-live-evidence-capture-v1.json",
   "manifests/jarvis/jarvis-payfast-accepted-itn-proof-v1.json",
+  "manifests/jarvis/jarvis-payfast-accepted-itn-evidence-capture-v1.json",
   "manifests/jarvis/jarvis-n8n-airtable-github-runtime-proof-v1.json",
   "manifests/jarvis/jarvis-branch-protection-final-launch-audit-v1.json",
   "manifests/jarvis/jarvis-openclaw-operator-policy-boundary-v1.json",
@@ -118,6 +122,12 @@ const blockers = [
     detail: "The capture runner can collect redacted AI and Email evidence once real credentials and accepted evidence files are available."
   },
   {
+    id: "payfast-accepted-itn-evidence-runner",
+    title: "PayFast accepted ITN evidence capture runner ready",
+    state: "READY_FOR_PROVIDER_EVIDENCE",
+    detail: "The capture runner can collect redacted PayFast sandbox checkout, accepted ITN, duplicate rejection, failed payment rejection, refund review, and founder approval evidence once real files and credentials are available."
+  },
+  {
     id: "local-docker-runtime",
     title: "Local Docker/API runtime instability",
     state: "BLOCKED",
@@ -146,6 +156,12 @@ const blockers = [
     title: "PayFast accepted ITN proof gate not accepted",
     state: "BLOCKED",
     detail: "Sandbox checkout, accepted ITN, duplicate rejection, failed-payment rejection, refund review, and founder approval evidence are required."
+  },
+  {
+    id: "payfast-accepted-itn-evidence-capture",
+    title: "PayFast accepted ITN evidence capture not accepted",
+    state: "BLOCKED",
+    detail: "PayFast evidence capture runner is ready, but accepted redacted sandbox, ITN, rejection, refund, and founder approval evidence files are still required."
   },
   {
     id: "n8n-airtable-github-proof-gate",
@@ -218,6 +234,7 @@ export async function GET() {
     jarvisAiEmailProviderProofIndexed: true,
     jarvisAiEmailProviderLiveEvidenceCaptureIndexed: true,
     jarvisPayFastAcceptedItnProofIndexed: true,
+    jarvisPayFastAcceptedItnEvidenceCaptureIndexed: true,
     jarvisN8nAirtableGithubRuntimeProofIndexed: true,
     jarvisBranchProtectionFinalLaunchAuditIndexed: true,
     dockerIndependentBuildAllowed: true,
