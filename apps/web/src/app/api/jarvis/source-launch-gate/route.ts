@@ -11,6 +11,7 @@ type LaunchGate = {
   detail: string;
   liveProofQueueRef?: string;
   acceptanceGateRef?: string;
+  proofGateRoute?: string;
 };
 
 const gates: LaunchGate[] = [
@@ -60,7 +61,8 @@ const gates: LaunchGate[] = [
     launchCritical: true,
     detail: "Requires stable API/Truth Vault proof. Local Docker instability remains the current blocker.",
     liveProofQueueRef: "docker-api-truth-vault-runtime",
-    acceptanceGateRef: "docker-api-truth-vault-acceptance"
+    acceptanceGateRef: "docker-api-truth-vault-acceptance",
+    proofGateRoute: "/api/jarvis/docker-truth-vault-runtime-proof"
   },
   {
     id: "ai-live-proof",
@@ -69,7 +71,8 @@ const gates: LaunchGate[] = [
     launchCritical: true,
     detail: "Requires backend-controlled live provider proof and redacted evidence.",
     liveProofQueueRef: "ai-provider-live-call",
-    acceptanceGateRef: "ai-provider-acceptance"
+    acceptanceGateRef: "ai-provider-acceptance",
+    proofGateRoute: "/api/jarvis/ai-email-provider-live-proof"
   },
   {
     id: "email-live-proof",
@@ -78,7 +81,8 @@ const gates: LaunchGate[] = [
     launchCritical: true,
     detail: "Requires send, receive, bounce, opt-out, redaction, and evidence proof.",
     liveProofQueueRef: "email-primary-proof",
-    acceptanceGateRef: "email-primary-acceptance"
+    acceptanceGateRef: "email-primary-acceptance",
+    proofGateRoute: "/api/jarvis/ai-email-provider-live-proof"
   },
   {
     id: "payfast-itn-proof",
@@ -87,16 +91,18 @@ const gates: LaunchGate[] = [
     launchCritical: true,
     detail: "Requires sandbox checkout, accepted ITN proof, failed payment rejection, duplicate rejection, refund review, and founder approval.",
     liveProofQueueRef: "payfast-itn-proof",
-    acceptanceGateRef: "payfast-itn-acceptance"
+    acceptanceGateRef: "payfast-itn-acceptance",
+    proofGateRoute: "/api/jarvis/payfast-accepted-itn-proof"
   },
   {
     id: "n8n-airtable-github-proof",
     title: "n8n Airtable GitHub Runtime Proofs",
     state: "PENDING_RUNTIME",
     launchCritical: true,
-    detail: "Requires n8n thin relay proof, Airtable mirror-only proof, and GitHub connector proof.",
+    detail: "Requires n8n thin relay proof, Airtable mirror-only proof, GitHub connector proof, Truth Vault authority proof, and redacted provider-tool evidence.",
     liveProofQueueRef: "n8n-thin-relay-proof/airtable-human-mirror-proof/github-tool-runtime-proof",
-    acceptanceGateRef: "n8n-airtable-github-acceptance"
+    acceptanceGateRef: "n8n-airtable-github-acceptance",
+    proofGateRoute: "/api/jarvis/n8n-airtable-github-runtime-proof"
   },
   {
     id: "branch-protection-proof",
@@ -126,6 +132,7 @@ export async function GET() {
     jarvisSourceComplete: true,
     jarvisLiveProofQueueConnected: true,
     jarvisLiveProofAcceptanceGateConnected: true,
+    jarvisN8nAirtableGithubRuntimeProofGateConnected: true,
     productionReady: false,
     publicLaunchAllowed: false,
     launchAllowedReason: "Source-safe Jarvis is closer, but live proof queue and acceptance gate runtime, provider, security, and final audit gates are not complete.",
@@ -137,6 +144,7 @@ export async function GET() {
     directDatabaseAccessFromWeb: false,
     liveProofQueueRoute: "/api/jarvis/live-proof-queue",
     liveProofAcceptanceGateRoute: "/api/jarvis/live-proof-acceptance-gate",
+    n8nAirtableGithubRuntimeProofGateRoute: "/api/jarvis/n8n-airtable-github-runtime-proof",
     gates,
     launchBlockingCount: launchBlocking.length,
     launchBlocking,
