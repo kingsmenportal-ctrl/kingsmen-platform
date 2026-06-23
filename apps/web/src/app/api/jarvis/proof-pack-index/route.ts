@@ -13,6 +13,7 @@ const validators = [
   "scripts/validators/validate-jarvis-live-proof-evidence-ledger.mjs",
   "scripts/validators/validate-jarvis-live-proof-acceptance-gate.mjs",
   "scripts/validators/validate-jarvis-docker-truth-vault-runtime-proof.mjs",
+  "scripts/validators/validate-jarvis-docker-truth-vault-runtime-evidence-capture.mjs",
   "scripts/validators/validate-jarvis-ai-email-provider-live-proof.mjs",
   "scripts/validators/validate-jarvis-payfast-accepted-itn-proof.mjs",
   "scripts/validators/validate-jarvis-n8n-airtable-github-runtime-proof.mjs",
@@ -26,9 +27,14 @@ const validators = [
   "scripts/validators/validate-jarvis-live-index-openclaw-runtime.mjs"
 ];
 
+const proofRunners = [
+  "scripts/proof/capture-jarvis-docker-truth-vault-runtime-evidence.mjs"
+];
+
 const reports = [
   "reports/jarvis/jarvis-openclaw-operator-policy-boundary-proof-latest.json",
-  "reports/jarvis/jarvis-playwright-scout-map-fallback-boundary-proof-latest.json"
+  "reports/jarvis/jarvis-playwright-scout-map-fallback-boundary-proof-latest.json",
+  "reports/jarvis/jarvis-docker-truth-vault-runtime-evidence-capture-latest.json"
 ];
 
 const manifests = [
@@ -95,10 +101,16 @@ const blockers = [
     detail: "No more source/UI layers should be added unless a validator fails or a real launch proof requires a correction."
   },
   {
+    id: "docker-runtime-evidence-runner",
+    title: "Docker runtime evidence runner ready",
+    state: "READY_FOR_RUNTIME",
+    detail: "The capture runner can collect redacted API health, postgres_truth_vault mode, command acceptance, and indirect command_log/audit_events write proof when API runtime is available."
+  },
+  {
     id: "local-docker-runtime",
     title: "Local Docker/API runtime instability",
     state: "BLOCKED",
-    detail: "Blocks runtime proof only. Source-safe Jarvis construction is closed out. The Docker runtime proof gate is now indexed."
+    detail: "Blocks runtime proof only. Source-safe Jarvis construction is closed out. The Docker runtime proof gate and evidence capture runner are now indexed."
   },
   {
     id: "docker-truth-vault-proof-gate",
@@ -185,6 +197,7 @@ export async function GET() {
     jarvisLiveProofEvidenceLedgerIndexed: true,
     jarvisLiveProofAcceptanceGateIndexed: true,
     jarvisDockerTruthVaultRuntimeProofIndexed: true,
+    jarvisDockerTruthVaultRuntimeEvidenceCaptureIndexed: true,
     jarvisAiEmailProviderProofIndexed: true,
     jarvisPayFastAcceptedItnProofIndexed: true,
     jarvisN8nAirtableGithubRuntimeProofIndexed: true,
@@ -196,10 +209,11 @@ export async function GET() {
     localShellExecuted: false,
     directDatabaseAccessFromWeb: false,
     validators,
+    proofRunners,
     reports,
     manifests,
     routes,
     blockers,
-    nextAction: "Jarvis source/design is closed out. Clear all live proof gates and the final branch-protection launch audit before public launch."
+    nextAction: "Jarvis source/design is closed out. Capture redacted runtime evidence, then clear all live proof gates and the final branch-protection launch audit before public launch."
   });
 }
