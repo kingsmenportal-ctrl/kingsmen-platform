@@ -36,7 +36,7 @@ const proofQueue: ProofQueueItem[] = [
     launchCritical: true,
     detail: "Local Docker instability blocks backend runtime proof only. Source completion remains valid, but live launch cannot pass until backend and Truth Vault are proven.",
     proofRoute: "/api/jarvis/docker-truth-vault-runtime-proof",
-    proofScript: "npm run api:start:local -- -KillExistingPort",
+    proofScript: "node scripts/proof/capture-jarvis-docker-truth-vault-runtime-evidence.mjs",
     evidenceRequired: ["API health HTTP 200", "postgres_truth_vault storage mode", "command log write proof", "audit event write proof", "redacted runtime proof"]
   },
   {
@@ -69,8 +69,8 @@ const proofQueue: ProofQueueItem[] = [
     launchCritical: true,
     detail: "PayFast cannot mark paid from return/cancel URLs. Only accepted ITN evidence may clear payment state, with duplicate and failed-payment rejection proof.",
     proofRoute: "/api/jarvis/payfast-accepted-itn-proof",
-    proofScript: "npm run jarvis:runtime:payfast-provider-proof-queue",
-    evidenceRequired: ["sandbox checkout proof", "accepted ITN proof", "duplicate ITN rejection", "failed payment rejection", "refund review boundary", "founder approval"]
+    proofScript: "node scripts/proof/capture-jarvis-payfast-accepted-itn-evidence.mjs",
+    evidenceRequired: ["PayFast credentials outside Git", "sandbox checkout proof", "accepted ITN proof", "duplicate ITN rejection", "failed payment rejection", "refund review boundary", "founder approval", "redacted evidence capture report"]
   },
   {
     id: "n8n-thin-relay-proof",
@@ -139,6 +139,7 @@ export async function GET() {
     aiEmailProviderProofGateConnected: true,
     aiEmailProviderEvidenceCaptureConnected: true,
     payfastAcceptedItnProofGateConnected: true,
+    payfastAcceptedItnEvidenceCaptureConnected: true,
     n8nAirtableGithubRuntimeProofGateConnected: true,
     branchProtectionFinalLaunchAuditGateConnected: true,
     jarvisRuntimeLive: false,
@@ -155,6 +156,6 @@ export async function GET() {
     noDirectProviderCallsFromWeb: true,
     counts,
     proofQueue,
-    nextAction: "Clear Docker/API runtime, AI+Email evidence capture, PayFast accepted ITN, n8n/Airtable/GitHub, branch protection, rollback, staging evidence, and final audit gates before calling Jarvis live."
+    nextAction: "Clear Docker/API runtime, AI+Email evidence capture, PayFast accepted ITN evidence capture, n8n/Airtable/GitHub, branch protection, rollback, staging evidence, and final audit gates before calling Jarvis live."
   });
 }
