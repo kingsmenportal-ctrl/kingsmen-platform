@@ -10,6 +10,7 @@ type LaunchGate = {
   launchCritical: boolean;
   detail: string;
   liveProofQueueRef?: string;
+  acceptanceGateRef?: string;
 };
 
 const gates: LaunchGate[] = [
@@ -18,8 +19,9 @@ const gates: LaunchGate[] = [
     title: "Jarvis Source Design",
     state: "PASSED_SOURCE",
     launchCritical: true,
-    detail: "Final command HUD, completion board, provider checklist, evidence collector, live proof queue, and launch gate surfaces are source-built.",
-    liveProofQueueRef: "jarvis-source-seal"
+    detail: "Final command HUD, completion board, provider checklist, evidence collector, live proof queue, acceptance gate, and launch gate surfaces are source-built.",
+    liveProofQueueRef: "jarvis-source-seal",
+    acceptanceGateRef: "source-design-seal-acceptance"
   },
   {
     id: "no-fake-data-lock",
@@ -40,8 +42,16 @@ const gates: LaunchGate[] = [
     title: "Live Proof Queue Control",
     state: "PASSED_SOURCE",
     launchCritical: true,
-    detail: "Live blockers are now controlled through /api/jarvis/live-proof-queue and surfaced inside /jarvis/final.",
+    detail: "Live blockers are controlled through /api/jarvis/live-proof-queue and surfaced inside /jarvis/final.",
     liveProofQueueRef: "/api/jarvis/live-proof-queue"
+  },
+  {
+    id: "live-proof-acceptance-gate-control",
+    title: "Live Proof Acceptance Gate Control",
+    state: "PASSED_SOURCE",
+    launchCritical: true,
+    detail: "Acceptance rules are controlled through /api/jarvis/live-proof-acceptance-gate and must decide ACCEPT before launch can pass.",
+    acceptanceGateRef: "/api/jarvis/live-proof-acceptance-gate"
   },
   {
     id: "backend-truth-vault-runtime",
@@ -49,7 +59,8 @@ const gates: LaunchGate[] = [
     state: "BLOCKED",
     launchCritical: true,
     detail: "Requires stable API/Truth Vault proof. Local Docker instability remains the current blocker.",
-    liveProofQueueRef: "docker-api-truth-vault-runtime"
+    liveProofQueueRef: "docker-api-truth-vault-runtime",
+    acceptanceGateRef: "docker-api-truth-vault-acceptance"
   },
   {
     id: "ai-live-proof",
@@ -57,7 +68,8 @@ const gates: LaunchGate[] = [
     state: "PENDING_PROVIDER",
     launchCritical: true,
     detail: "Requires backend-controlled live provider proof and redacted evidence.",
-    liveProofQueueRef: "ai-provider-live-call"
+    liveProofQueueRef: "ai-provider-live-call",
+    acceptanceGateRef: "ai-provider-acceptance"
   },
   {
     id: "email-live-proof",
@@ -65,7 +77,8 @@ const gates: LaunchGate[] = [
     state: "PENDING_PROVIDER",
     launchCritical: true,
     detail: "Requires send, receive, bounce, opt-out, redaction, and evidence proof.",
-    liveProofQueueRef: "email-primary-proof"
+    liveProofQueueRef: "email-primary-proof",
+    acceptanceGateRef: "email-primary-acceptance"
   },
   {
     id: "payfast-itn-proof",
@@ -73,7 +86,8 @@ const gates: LaunchGate[] = [
     state: "PENDING_PROVIDER",
     launchCritical: true,
     detail: "Requires sandbox checkout, accepted ITN proof, failed payment rejection, duplicate rejection, refund review, and founder approval.",
-    liveProofQueueRef: "payfast-itn-proof"
+    liveProofQueueRef: "payfast-itn-proof",
+    acceptanceGateRef: "payfast-itn-acceptance"
   },
   {
     id: "n8n-airtable-github-proof",
@@ -81,7 +95,8 @@ const gates: LaunchGate[] = [
     state: "PENDING_RUNTIME",
     launchCritical: true,
     detail: "Requires n8n thin relay proof, Airtable mirror-only proof, and GitHub connector proof.",
-    liveProofQueueRef: "n8n-thin-relay-proof/airtable-human-mirror-proof/github-tool-runtime-proof"
+    liveProofQueueRef: "n8n-thin-relay-proof/airtable-human-mirror-proof/github-tool-runtime-proof",
+    acceptanceGateRef: "n8n-airtable-github-acceptance"
   },
   {
     id: "branch-protection-proof",
@@ -89,7 +104,8 @@ const gates: LaunchGate[] = [
     state: "PENDING_SECURITY",
     launchCritical: true,
     detail: "Requires repository branch protection evidence before launch.",
-    liveProofQueueRef: "branch-protection-proof"
+    liveProofQueueRef: "branch-protection-proof",
+    acceptanceGateRef: "branch-protection-launch-audit-acceptance"
   },
   {
     id: "whatsapp-cost-gate",
@@ -109,9 +125,10 @@ export async function GET() {
     generatedAt: new Date().toISOString(),
     jarvisSourceComplete: true,
     jarvisLiveProofQueueConnected: true,
+    jarvisLiveProofAcceptanceGateConnected: true,
     productionReady: false,
     publicLaunchAllowed: false,
-    launchAllowedReason: "Source-safe Jarvis is closer, but live proof queue runtime, provider, security, and final audit gates are not complete.",
+    launchAllowedReason: "Source-safe Jarvis is closer, but live proof queue and acceptance gate runtime, provider, security, and final audit gates are not complete.",
     dockerIndependentBuildAllowed: true,
     noFakeData: true,
     rawSecretsReturned: false,
@@ -119,9 +136,10 @@ export async function GET() {
     localShellExecuted: false,
     directDatabaseAccessFromWeb: false,
     liveProofQueueRoute: "/api/jarvis/live-proof-queue",
+    liveProofAcceptanceGateRoute: "/api/jarvis/live-proof-acceptance-gate",
     gates,
     launchBlockingCount: launchBlocking.length,
     launchBlocking,
-    nextAction: "Work the live proof queue until runtime, provider, and security gates can pass."
+    nextAction: "Work the live proof queue and acceptance gate until runtime, provider, and security gates can pass."
   });
 }
