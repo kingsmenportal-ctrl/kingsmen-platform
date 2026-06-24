@@ -40,6 +40,7 @@ type LiveIndexPayload = {
 };
 
 const VOICE_ARMED_KEY = "kingsmen_jarvis_voice_armed";
+const LOCAL_AI_KEY = "kingsmen_jarvis_local_openai_key";
 
 const CORE_ACTIONS: JarvisAction[] = [
   { id: "SYSTEM_VALIDATE_N20", title: "System lock", description: "Validate the Kingsmen N20 lock and source-safe posture." },
@@ -85,6 +86,15 @@ function speak(text: string) {
   window.speechSynthesis.speak(utterance);
 }
 
+function cleanKey(value: string) {
+  return value.trim().replace(/\s/g, "");
+}
+
+function getStoredAiKey() {
+  if (typeof window === "undefined") return "";
+  return cleanKey(window.localStorage.getItem(LOCAL_AI_KEY) || "");
+}
+
 export default function JarvisProductionCommandClient() {
   const [messages, setMessages] = useState<JarvisMessage[]>([
     {
@@ -103,6 +113,7 @@ export default function JarvisProductionCommandClient() {
   const [liveIndex, setLiveIndex] = useState<LiveIndexPayload | null>(null);
   const [visualOn, setVisualOn] = useState(false);
   const [visualError, setVisualError] = useState("");
+  const [localAiConnected, setLocalAiConnected] = useState(false);
   const recognitionRef = useRef<any>(null);
   const voiceEnabledRef = useRef(false);
   const videoRef = useRef<HTMLVideoElement | null>(null);
@@ -120,7 +131,9 @@ export default function JarvisProductionCommandClient() {
         ? "Jarvis is speaking. The microphone will re-arm after the response."
         : voiceState === "blocked"
           ? "Microphone permission is blocked in the browser."
-          : "Jarvis voice is ready. Press Start once to arm the always-on wake phrase.";
+          : localAiConnected
+            ? "AI brain key connected locally. Press Start once to arm wake phrase."
+            : "Jarvis voice is ready. Use Connect AI key once, then press Start to arm wake phrase.";
 
   function pushMessage(role: JarvisMessage["role"], text: string, ok = true) {
     setMessages((items) => [...items, { id: uid(role), role, text, at: now(), ok }]);
@@ -135,6 +148,27 @@ export default function JarvisProductionCommandClient() {
     if (liveResult.status === "fulfilled") setLiveIndex(liveResult.value);
   }
 
+  async function connectAiKeyFromClipboard() {
+    try {
+      const key = cleanKey(await navigator.clipboard.readText());
+      if (!key.startsWith("sk-")) {
+        const reply = "Sir, the clipboard does not contain a valid OpenAI key. Copy the new replacement key first, then press Connect AI key again.";
+        pushMessage("jarvis", reply, false);
+        speak(reply);
+        return;
+      }
+      window.localStorage.setItem(LOCAL_AI_KEY, key);
+      setLocalAiConnected(true);
+      const reply = "Jarvis AI key connected locally for this browser. The key is not committed to Git. I can now answer through the Jarvis conversation route.";
+      pushMessage("jarvis", reply, true);
+      speak(reply);
+    } catch {
+      const reply = "Clipboard permission was blocked. Allow clipboard access or use the browser prompt to paste the key into Jarvis.";
+      pushMessage("jarvis", reply, false);
+      speak(reply);
+    }
+  }
+
   async function askJarvis(text: string) {
     const question = text.trim();
     if (!question || thinking) return;
@@ -144,9 +178,13 @@ export default function JarvisProductionCommandClient() {
     pushMessage("founder", question, true);
 
     try {
+      const localKey = getStoredAiKey();
+      const headers: Record<string, string> = { "content-type": "application/json" };
+      if (localKey.startsWith("sk-")) headers["x-kingsmen-local-openai-key"] = localKey;
+
       const response = await fetch("/api/jarvis/conversation", {
         method: "POST",
-        headers: { "content-type": "application/json" },
+        headers,
         body: JSON.stringify({ message: question, surface: "kingsmen_jarvis_voice_companion" })
       });
       const payload = (await response.json()) as ConversationResponse;
@@ -294,6 +332,7 @@ export default function JarvisProductionCommandClient() {
   }
 
   useEffect(() => {
+    setLocalAiConnected(getStoredAiKey().startsWith("sk-"));
     syncRuntime();
     const timer = window.setInterval(syncRuntime, 15000);
     if (window.localStorage.getItem(VOICE_ARMED_KEY) === "true") {
@@ -326,6 +365,7 @@ export default function JarvisProductionCommandClient() {
         </header>
 
         <section className={styles.controlBar}>
+          <button onClick={connectAiKeyFromClipboard}>{localAiConnected ? "AI key connected" : "Connect AI key"}</button>
           <button onClick={() => enableVoice({ persist: true, greet: true })}>Start Jarvis voice</button>
           <button onClick={stopVoice}>Stop voice</button>
           <button onClick={() => askJarvis("Hello Jarvis. Greet me and brief me on Kingsmen.")}>Speak with Jarvis</button>
@@ -367,13 +407,13 @@ export default function JarvisProductionCommandClient() {
           <aside className={styles.actionPanel}>
             <div className={styles.panelHead}>
               <span>Kingsmen actions</span>
-              <strong>backend-safe</strong>
+              <strong>{backendOnline ? "backend-safe" : "API offline"}</strong>
             </div>
             <div className={styles.actions}>
               {(actions.length ? actions : CORE_ACTIONS).map((action) => (
-                <button key={action.id} onClick={() => executeAction(action)} disabled={thinking}>
+                <button key={action.id} onClick={() => executeAction(action)} disabled={thinking || !backendOnline}>
                   <span>{action.title}</span>
-                  <small>{action.description}</small>
+                  <small>{backendOnline ? action.description : "Backend API 3001 is offline. Tool stays locked; Jarvis conversation can still run."}</small>
                 </button>
               ))}
             </div>
