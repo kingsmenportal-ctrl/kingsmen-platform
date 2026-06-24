@@ -1,3 +1,5 @@
+import { readFileSync } from "node:fs";
+import { resolve } from "node:path";
 import { NextRequest, NextResponse } from "next/server";
 
 export const runtime = "nodejs";
@@ -49,6 +51,50 @@ function extractOutputText(payload: any): string {
   return "Sir, I processed the request, but the AI provider returned no spoken text.";
 }
 
+function cleanEnvValue(value: string): string {
+  return value.trim().replace(/^['\"]|['\"]$/g, "");
+}
+
+function readEnvValueFromFile(filePath: string, key: string): string | null {
+  try {
+    const text = readFileSync(filePath, "utf8");
+    for (const rawLine of text.split(/\r?\n/)) {
+      const line = rawLine.trim();
+      if (!line || line.startsWith("#")) continue;
+      const index = line.indexOf("=");
+      if (index === -1) continue;
+      const name = line.slice(0, index).trim();
+      if (name !== key) continue;
+      const value = cleanEnvValue(line.slice(index + 1));
+      return value || null;
+    }
+  } catch {
+    return null;
+  }
+  return null;
+}
+
+function getServerEnv(key: string): string | undefined {
+  const direct = process.env[key]?.trim();
+  if (direct) return direct;
+
+  const candidates = [
+    resolve(process.cwd(), ".env.local"),
+    resolve(process.cwd(), "..", "..", ".env.local"),
+    resolve(process.cwd(), "apps", "web", ".env.local")
+  ];
+
+  for (const candidate of candidates) {
+    const value = readEnvValueFromFile(candidate, key);
+    if (value) {
+      process.env[key] = value;
+      return value;
+    }
+  }
+
+  return undefined;
+}
+
 export async function POST(request: NextRequest) {
   const startedAt = new Date();
   const body = await request.json().catch(() => ({}));
@@ -69,15 +115,15 @@ export async function POST(request: NextRequest) {
     );
   }
 
-  const apiKey = process.env.OPENAI_API_KEY;
-  const model = process.env.OPENAI_MODEL || "gpt-4o-mini";
+  const apiKey = getServerEnv("OPENAI_API_KEY");
+  const model = getServerEnv("OPENAI_MODEL") || "gpt-4o-mini";
   const actions = selectActions(message);
 
-  if (!apiKey) {
+  if (!apiKey || !apiKey.startsWith("sk-")) {
     return NextResponse.json(
       {
         ok: false,
-        reply: "Sir, I am listening, but my live AI brain is not connected on the backend yet. Connect OPENAI_API_KEY outside Git and I will hold a real spoken conversation. I can still route source-safe Kingsmen actions through the backend command boundary.",
+        reply: "Sir, I am listening, but my live AI brain key is not available to the Jarvis server process yet. Save a replacement OPENAI_API_KEY in apps/web/.env.local, restart Jarvis web, and I will answer with the backend AI brain.",
         actions,
         providerConfigured: false,
         generatedAt: new Date().toISOString(),
