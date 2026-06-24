@@ -39,6 +39,8 @@ type LiveIndexPayload = {
   generatedAt?: string;
 };
 
+const VOICE_ARMED_KEY = "kingsmen_jarvis_voice_armed";
+
 const CORE_ACTIONS: JarvisAction[] = [
   { id: "SYSTEM_VALIDATE_N20", title: "System lock", description: "Validate the Kingsmen N20 lock and source-safe posture." },
   { id: "COMMAND_PERSISTENCE_PROOF", title: "Truth Vault", description: "Send one backend-safe envelope and check command evidence." },
@@ -110,11 +112,15 @@ export default function JarvisProductionCommandClient() {
   const truthVaultOnline = status?.backendHealth?.storageMode === "postgres_truth_vault" || liveIndex?.backendStorageMode === "postgres_truth_vault";
   const productionReady = Boolean(liveIndex?.productionReady);
   const publicLaunchAllowed = Boolean(liveIndex?.publicLaunchAllowed);
-  const liveLine = backendOnline
-    ? truthVaultOnline
-      ? "Truth Vault spine connected. Jarvis can route backend-safe actions."
-      : "Backend reached. Truth Vault evidence still needs confirmation."
-    : "Backend not connected. Conversation still opens, but command execution needs the API runtime.";
+  const voiceLine = voiceState === "listening"
+    ? "Wake phrase armed. Say Jarvis, then speak naturally."
+    : voiceState === "thinking"
+      ? "Jarvis is thinking through the request."
+      : voiceState === "speaking"
+        ? "Jarvis is speaking. The microphone will re-arm after the response."
+        : voiceState === "blocked"
+          ? "Microphone permission is blocked in the browser."
+          : "Jarvis voice is ready. Press Start once to arm the always-on wake phrase.";
 
   function pushMessage(role: JarvisMessage["role"], text: string, ok = true) {
     setMessages((items) => [...items, { id: uid(role), role, text, at: now(), ok }]);
@@ -180,11 +186,11 @@ export default function JarvisProductionCommandClient() {
       const payload = await response.json().catch(() => ({}));
       const reply = response.ok
         ? `${action.title} was handed to the Kingsmen backend boundary. I will keep launch and payment authority locked until real evidence clears.`
-        : payload?.message || `${action.title} was not accepted by the backend boundary.`;
+        : payload?.message || `${action.title} needs the Kingsmen backend runtime before it can execute.`;
       pushMessage("jarvis", reply, response.ok);
       speak(reply);
     } catch {
-      const reply = `${action.title} could not reach the backend boundary. Start the API runtime, then ask me again.`;
+      const reply = `${action.title} needs the Kingsmen backend runtime before it can execute. Voice conversation remains available through the Jarvis AI route.`;
       pushMessage("jarvis", reply, false);
       speak(reply);
     } finally {
@@ -199,7 +205,11 @@ export default function JarvisProductionCommandClient() {
     askJarvis(input);
   }
 
-  async function enableVoice() {
+  async function enableVoice(options: { persist?: boolean; greet?: boolean } = {}) {
+    const persist = options.persist ?? true;
+    const greet = options.greet ?? true;
+    if (recognitionRef.current && voiceEnabledRef.current) return;
+
     const Recognition = getRecognitionConstructor();
     if (!Recognition) {
       setVoiceState("unsupported");
@@ -217,6 +227,8 @@ export default function JarvisProductionCommandClient() {
     }
 
     voiceEnabledRef.current = true;
+    if (persist) window.localStorage.setItem(VOICE_ARMED_KEY, "true");
+
     const recognition = new Recognition();
     recognition.lang = "en-ZA";
     recognition.continuous = true;
@@ -233,21 +245,30 @@ export default function JarvisProductionCommandClient() {
         askJarvis(cleaned || "Hello Jarvis. Start the Kingsmen operating conversation.");
       }
     };
-    recognition.onerror = () => setVoiceState("standby");
+    recognition.onerror = () => setVoiceState(voiceEnabledRef.current ? "listening" : "standby");
     recognition.onend = () => {
       if (voiceEnabledRef.current) {
-        window.setTimeout(() => recognition.start(), 600);
+        window.setTimeout(() => {
+          try {
+            recognition.start();
+          } catch {
+            setVoiceState("listening");
+          }
+        }, 600);
       }
     };
     recognitionRef.current = recognition;
     recognition.start();
-    const greeting = "Hello sir, welcome to Kingsmen. Jarvis voice is active. Say Jarvis, then speak naturally.";
-    pushMessage("jarvis", greeting, true);
-    speak(greeting);
+    if (greet) {
+      const greeting = "Hello sir, welcome to Kingsmen. Jarvis voice is active and the wake phrase is armed. Say Jarvis, then speak naturally.";
+      pushMessage("jarvis", greeting, true);
+      speak(greeting);
+    }
   }
 
   function stopVoice() {
     voiceEnabledRef.current = false;
+    window.localStorage.removeItem(VOICE_ARMED_KEY);
     recognitionRef.current?.stop?.();
     recognitionRef.current = null;
     setVoiceState("standby");
@@ -275,6 +296,9 @@ export default function JarvisProductionCommandClient() {
   useEffect(() => {
     syncRuntime();
     const timer = window.setInterval(syncRuntime, 15000);
+    if (window.localStorage.getItem(VOICE_ARMED_KEY) === "true") {
+      window.setTimeout(() => enableVoice({ persist: true, greet: false }), 800);
+    }
     return () => {
       window.clearInterval(timer);
       voiceEnabledRef.current = false;
@@ -297,25 +321,28 @@ export default function JarvisProductionCommandClient() {
           <aside className={styles.statusOrb}>
             <div className={`${styles.orb} ${voiceState === "listening" ? styles.orbLive : ""}`}><span>J</span></div>
             <strong>{voiceState}</strong>
-            <small>{liveLine}</small>
+            <small>{voiceLine}</small>
           </aside>
         </header>
 
         <section className={styles.controlBar}>
-          <button onClick={enableVoice}>Start Jarvis voice</button>
+          <button onClick={() => enableVoice({ persist: true, greet: true })}>Start Jarvis voice</button>
           <button onClick={stopVoice}>Stop voice</button>
           <button onClick={() => askJarvis("Hello Jarvis. Greet me and brief me on Kingsmen.")}>Speak with Jarvis</button>
           <button onClick={toggleVisual}>{visualOn ? "Stop visual context" : "Start visual context"}</button>
           <button onClick={syncRuntime}>Sync runtime</button>
         </section>
 
-        <section className={styles.metrics}>
-          <article><span>Backend</span><strong>{backendOnline ? "online" : "offline"}</strong></article>
-          <article><span>Truth Vault</span><strong>{truthVaultOnline ? "connected" : "pending"}</strong></article>
-          <article><span>Production</span><strong>{productionReady ? "ready" : "locked"}</strong></article>
-          <article><span>Public launch</span><strong>{publicLaunchAllowed ? "open" : "locked"}</strong></article>
-          <article><span>Last sync</span><strong>{displayTime(liveIndex?.generatedAt ?? status?.generatedAt)}</strong></article>
-        </section>
+        <details className={styles.operationsDrawer}>
+          <summary>Operations evidence</summary>
+          <section className={styles.metrics}>
+            <article><span>Backend</span><strong>{backendOnline ? "online" : "offline"}</strong></article>
+            <article><span>Truth Vault</span><strong>{truthVaultOnline ? "connected" : "pending"}</strong></article>
+            <article><span>Production</span><strong>{productionReady ? "ready" : "locked"}</strong></article>
+            <article><span>Public launch</span><strong>{publicLaunchAllowed ? "open" : "locked"}</strong></article>
+            <article><span>Last sync</span><strong>{displayTime(liveIndex?.generatedAt ?? status?.generatedAt)}</strong></article>
+          </section>
+        </details>
 
         <section className={styles.mainGrid}>
           <section className={styles.dialoguePanel}>
