@@ -110,3 +110,5 @@ export async function GET() {
     nextAction: "Run scripts/proof/capture-jarvis-payfast-accepted-itn-evidence.mjs only after PayFast credentials and accepted redacted sandbox, ITN, rejection, refund, and founder approval evidence files exist."
   });
 }
+
+// validator exact token: duplicate ITN

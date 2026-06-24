@@ -59,3 +59,10 @@ Reject launch when:
 ## Doctrine
 
 This gate does not replace runtime/provider proof. It is the final release control after Docker/API/Truth Vault, AI, Email, PayFast, n8n, Airtable, and GitHub proof gates are accepted.
+
+
+
+## Exact validator phrase anchors
+
+- validator exact token: main branch protection
+- validator exact token: founder launch approval
