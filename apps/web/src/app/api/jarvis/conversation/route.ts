@@ -95,6 +95,11 @@ function getServerEnv(key: string): string | undefined {
   return undefined;
 }
 
+function getHeaderApiKey(request: NextRequest): string | undefined {
+  const value = cleanEnvValue(request.headers.get("x-kingsmen-local-openai-key") || "").replace(/\s/g, "");
+  return value.startsWith("sk-") ? value : undefined;
+}
+
 export async function POST(request: NextRequest) {
   const startedAt = new Date();
   const body = await request.json().catch(() => ({}));
@@ -115,7 +120,7 @@ export async function POST(request: NextRequest) {
     );
   }
 
-  const apiKey = getServerEnv("OPENAI_API_KEY");
+  const apiKey = getHeaderApiKey(request) || getServerEnv("OPENAI_API_KEY");
   const model = getServerEnv("OPENAI_MODEL") || "gpt-4o-mini";
   const actions = selectActions(message);
 
@@ -123,7 +128,7 @@ export async function POST(request: NextRequest) {
     return NextResponse.json(
       {
         ok: false,
-        reply: "Sir, I am listening, but my live AI brain key is not available to the Jarvis server process yet. Save a replacement OPENAI_API_KEY in apps/web/.env.local, restart Jarvis web, and I will answer with the backend AI brain.",
+        reply: "Sir, my live AI brain is not connected yet. Use Connect AI key once inside Jarvis, then I will answer through the backend-side conversation route without putting the key in Git or PowerShell.",
         actions,
         providerConfigured: false,
         generatedAt: new Date().toISOString(),
