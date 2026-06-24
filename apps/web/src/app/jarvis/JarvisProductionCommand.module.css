@@ -47,6 +47,7 @@
 
 .header,
 .controlBar,
+.operationsDrawer,
 .dialoguePanel,
 .actionPanel,
 .metrics article,
@@ -191,6 +192,22 @@
   background: linear-gradient(135deg, rgba(255,224,138,.34), rgba(20,122,82,.98));
   box-shadow: 0 18px 46px rgba(216,167,51,.28);
 }
+
+.operationsDrawer {
+  padding: 18px 20px;
+  background: linear-gradient(135deg, rgba(21,25,27,.96), rgba(4,32,22,.9));
+}
+
+.operationsDrawer summary {
+  cursor: pointer;
+  color: var(--king-gold-bright);
+  font-size: .82rem;
+  font-weight: 950;
+  letter-spacing: .22em;
+  text-transform: uppercase;
+}
+
+.operationsDrawer[open] summary { margin-bottom: 18px; }
 
 .metrics {
   display: grid;
