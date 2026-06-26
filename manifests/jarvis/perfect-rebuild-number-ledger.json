@@ -1,0 +1,172 @@
+{
+  "schema": "kingsmen.jarvis.perfect_rebuild_number_ledger.v1",
+  "status": "locked_manifest_pending_runtime_wiring",
+  "owner": "Commander",
+  "repository": "kingsmenportal-ctrl/kingsmen-platform",
+  "defaultBranch": "main",
+  "rule": "Numbers are immutable. Corrections are additive. Do not silently rename, replace, or skip numbers. Every number must be recorded in GitHub with path, commit, status, and build-match notes.",
+  "currentCanonicalNumber": 12,
+  "nextAllowedNumber": 13,
+  "nextGate": "Commander must say NEXT before Number 13 is created.",
+  "globalBuildMatchRule": "A markdown doctrine file is repo proof of documentation only. It is not runtime proof. Validators, manifests, components, APIs, screenshots, builds, and deployments must be tracked separately.",
+  "canonicalSequence": [
+    {
+      "number": 1,
+      "title": "Jarvis is not a basic chatbot",
+      "path": "docs/jarvis/perfect-rebuild/NUMBER_01_JARVIS_IS_NOT_A_BASIC_CHATBOT.md",
+      "commit": "2642d72f02cbdee7a1c88fab4f891030df97c9d1",
+      "status": "locked_doctrine_file_created",
+      "runtimeStatus": "pending",
+      "buildMatch": "Doctrine file created. Runtime implementation and validators not proven here."
+    },
+    {
+      "number": 2,
+      "title": "Jarvis is Commander-only",
+      "path": "docs/jarvis/perfect-rebuild/NUMBER_02_JARVIS_IS_COMMANDER_ONLY.md",
+      "commit": "82fa47611322b0a02eb37ba68e3b318ed89d90b3",
+      "status": "locked_doctrine_file_created",
+      "runtimeStatus": "pending",
+      "buildMatch": "Doctrine file created. Runtime access-control implementation not proven here."
+    },
+    {
+      "number": 3,
+      "title": "Jarvis must speak in command tone",
+      "path": "docs/jarvis/perfect-rebuild/NUMBER_03_JARVIS_MUST_SPEAK_IN_COMMAND_TONE.md",
+      "commit": "5a99d02917df59a56a651d42a43190584ee21797",
+      "status": "locked_doctrine_file_created",
+      "runtimeStatus": "pending",
+      "buildMatch": "Doctrine file created. Tone enforcement runtime and validators not proven here."
+    },
+    {
+      "number": 4,
+      "title": "Jarvis must have Kingsmen wake greeting",
+      "path": "docs/jarvis/perfect-rebuild/NUMBER_04_JARVIS_MUST_HAVE_KINGSMEN_WAKE_GREETING.md",
+      "commit": "77715e22e35eb70a9c478ed0173561aca238b803",
+      "status": "locked_doctrine_file_created",
+      "runtimeStatus": "pending",
+      "buildMatch": "Doctrine file created. Voice wake implementation not proven here."
+    },
+    {
+      "number": 5,
+      "title": "Jarvis must answer broadly, not only Kingsmen applications",
+      "path": "docs/jarvis/perfect-rebuild/NUMBER_05_JARVIS_MUST_ANSWER_BROADLY_NOT_ONLY_KINGSMEN_APPLICATIONS.md",
+      "commit": "923cd9c40a40183eec858aa74700290d927b225a",
+      "status": "locked_doctrine_file_created",
+      "runtimeStatus": "pending",
+      "buildMatch": "Doctrine file created. Broad answer routing not proven here."
+    },
+    {
+      "number": 6,
+      "title": "Jarvis must use live verification and source confidence",
+      "path": "docs/jarvis/perfect-rebuild/NUMBER_06_JARVIS_MUST_USE_LIVE_VERIFICATION_AND_SOURCE_CONFIDENCE.md",
+      "commit": "b3a34d4ffd38a6367201dc0881939efb01990a62",
+      "status": "locked_doctrine_file_created",
+      "runtimeStatus": "pending",
+      "buildMatch": "Doctrine file created. Live verification runtime not proven here."
+    },
+    {
+      "number": 7,
+      "title": "Jarvis must know Kingsmen internal knowledge and doctrine",
+      "path": "docs/jarvis/perfect-rebuild/NUMBER_07_JARVIS_MUST_KNOW_KINGSMEN_INTERNAL_KNOWLEDGE_AND_DOCTRINE.md",
+      "commit": "a42fa27e92a751cf3973481dbcf7e0c0cbba3f91",
+      "status": "locked_doctrine_file_created",
+      "runtimeStatus": "pending",
+      "buildMatch": "Doctrine file created. Doctrine retrieval runtime not proven here."
+    },
+    {
+      "number": 8,
+      "title": "Jarvis must have safe memory and continuity",
+      "path": "docs/jarvis/perfect-rebuild/NUMBER_08_JARVIS_MUST_HAVE_SAFE_MEMORY_AND_CONTINUITY.md",
+      "commit": "bb8ccdd7c710c49a307eeaeb96a62f92bbaed26a",
+      "status": "locked_doctrine_file_created",
+      "runtimeStatus": "pending",
+      "buildMatch": "Doctrine file created. Safe memory runtime not proven here."
+    },
+    {
+      "number": 9,
+      "title": "Jarvis must have a full visual HUD command cockpit",
+      "path": "docs/jarvis/perfect-rebuild/NUMBER_09_JARVIS_MUST_HAVE_FULL_VISUAL_HUD_COMMAND_COCKPIT.md",
+      "commit": "50c343d9803c829a14cf38c9c4d1e9738ea82477",
+      "status": "locked_doctrine_file_created",
+      "runtimeStatus": "pending",
+      "buildMatch": "Doctrine file created. Rendered HUD screenshot/runtime proof not proven here."
+    },
+    {
+      "number": 10,
+      "title": "Jarvis must have an agent stack and safe tool routing",
+      "path": "docs/jarvis/perfect-rebuild/NUMBER_10_JARVIS_MUST_HAVE_AGENT_STACK_AND_SAFE_TOOL_ROUTING.md",
+      "commit": "94880656a2959811676d312764c5593025455334",
+      "status": "locked_doctrine_file_created",
+      "runtimeStatus": "pending",
+      "buildMatch": "Doctrine file created. Agent registry/runtime proof not proven here."
+    },
+    {
+      "number": 11,
+      "title": "Jarvis full app stack / connector registry",
+      "path": "docs/jarvis/perfect-rebuild/NUMBER_11_CORRECTED_FROM_CREATED_SEQUENCE_APP_STACK_CONNECTOR_REGISTRY.md",
+      "commit": "84dcd28aa22232b8d6fdd15fad809b81fd949159",
+      "status": "locked_corrected_doctrine_file_created",
+      "runtimeStatus": "partial_manifest_and_validator_created",
+      "buildMatch": "Canonical corrected Number 11 created. Materialized app stack manifest and validator exist, but full runtime HUD/router wiring is pending."
+    },
+    {
+      "number": 12,
+      "title": "Jarvis immutable numbering, GitHub proof, and build-match ledger",
+      "path": "docs/jarvis/perfect-rebuild/NUMBER_12_JARVIS_IMMUTABLE_NUMBERING_GITHUB_PROOF_AND_BUILD_MATCH_LEDGER.md",
+      "commit": "93226c0bc296893a2f10918d08d078007d685323",
+      "status": "locked_doctrine_file_created",
+      "runtimeStatus": "manifest_created_validator_pending",
+      "buildMatch": "Doctrine file created. This ledger is being created as manifest proof. Runtime HUD/router enforcement remains pending."
+    }
+  ],
+  "correctionFiles": [
+    {
+      "path": "docs/jarvis/perfect-rebuild/NUMBER_11A_COMMANDER_CORRECTION_LOVABLE_MUST_BE_AVAILABLE_LIKE_OTHER_APPS.md",
+      "commit": "ab8d024d042562020a7ff43c229d95299ec040a5",
+      "purpose": "Additive correction: Lovable must be available like other apps, not future-only or absent."
+    },
+    {
+      "path": "docs/jarvis/perfect-rebuild/NUMBER_11B_COMMANDER_APP_STACK_ACCURACY_LOCK.md",
+      "commit": "f1cce2cc38af9bac6f9621c7c8f89e73f3986a93",
+      "purpose": "Additive correction: Commander app list must be recorded and future numbers must use accurate app stack."
+    },
+    {
+      "path": "docs/jarvis/perfect-rebuild/NUMBER_11C_COMMANDER_CORRECTION_APP_STACK_MUST_BE_MATERIALIZED_NOT_ONLY_DESCRIBED.md",
+      "commit": "010289db37d46cd65997b6816ffbb1ceb4a7b01a",
+      "purpose": "Additive correction: app stack must be materialized as registry and validator, not only described."
+    },
+    {
+      "path": "docs/jarvis/perfect-rebuild/NUMBER_11_CORRECTED_JARVIS_DOCUMENT_VAULT_AGENT.md",
+      "commit": "d72d3e0633de05d8f4635669b5c864204f443d0c",
+      "purpose": "Historical correction file from wrong sequence; not canonical for the created sequence. Preserved for audit, not used as canonical Number 11."
+    },
+    {
+      "path": "docs/jarvis/perfect-rebuild/NUMBER_11_JARVIS_MUST_USE_LOVABLE_AS_CONTROLLED_UI_PROTOTYPING_NOT_SOURCE_OF_TRUTH.md",
+      "commit": "5d1bc86b27be99b4bc8f6a914b9112008eb24b26",
+      "purpose": "Historical Lovable boundary file. Lovable is preserved as app-stack boundary, not canonical full Number 11."
+    }
+  ],
+  "materializedSupportFiles": [
+    {
+      "path": "manifests/jarvis/jarvis-commander-app-stack.json",
+      "commit": "42a7c6e3cbcd8a70a74dc711e5caad534148bb64",
+      "purpose": "Materialized Commander app/tool/connector stack registry."
+    },
+    {
+      "path": "scripts/validators/validate-jarvis-commander-app-stack.mjs",
+      "commit": "0d9cefe5e3dcca0f14c20aaf5380270e77154f37",
+      "purpose": "Validator for Commander app stack registry."
+    }
+  ],
+  "forbiddenBehaviors": [
+    "Do not silently change a number's meaning.",
+    "Do not replace an existing number instead of adding a correction.",
+    "Do not skip ahead without Commander NEXT.",
+    "Do not claim runtime proof from markdown files.",
+    "Do not claim validators passed unless they were run and output is available.",
+    "Do not ignore the Commander app stack registry in future numbers.",
+    "Do not treat Lovable as absent or as the whole Number 11.",
+    "Do not treat Airtable as final truth.",
+    "Do not treat GitHub docs as document validity or runtime proof."
+  ]
+}
