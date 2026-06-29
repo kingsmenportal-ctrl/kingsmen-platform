@@ -15,6 +15,7 @@
     "jarvis:validate:live-pass-03": "node scripts/validators/validate-jarvis-live-pass-03.mjs",
     "jarvis:validate:v5:number-16": "node scripts/validators/validate-jarvis-v5-number-16-postgresql.mjs",
     "jarvis:validate:v5:01-to-16": "node scripts/validators/validate-jarvis-v5-numbers-01-to-16-runtime.mjs",
+    "jarvis:validate:v5:01-to-38": "node scripts/validators/validate-jarvis-v5-script-library-01-to-38.mjs",
     "jarvis:validate:v5:number-17": "node scripts/validators/validate-jarvis-v5-number-17-supabase.mjs",
     "jarvis:validate:v5:number-18": "node scripts/validators/validate-jarvis-v5-number-18-github.mjs",
     "jarvis:validate:v5:number-19": "node scripts/validators/validate-jarvis-v5-number-19-powershell-creator.mjs",
