@@ -10,3 +10,5 @@ export * from './jarvis-repo-map';
 export * from './postgresql-truth-vault-boundary';
 export * from './jarvis-v5-script-library-runtime';
 export * from './supabase-platform-boundary';
+export * from './github-repo-boundary';
+export * from './jarvis-v5-script-library-runtime-17-18';
