@@ -12,3 +12,5 @@ export * from './jarvis-v5-script-library-runtime';
 export * from './supabase-platform-boundary';
 export * from './github-repo-boundary';
 export * from './jarvis-v5-script-library-runtime-17-18';
+export * from './powershell-creator-boundary';
+export * from './jarvis-v5-script-library-runtime-19';
