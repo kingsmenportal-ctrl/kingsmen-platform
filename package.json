@@ -13,6 +13,7 @@
     "jarvis:validate:core": "node scripts/validators/validate-jarvis-core.mjs",
     "jarvis:validate:live-pass-02": "node scripts/validators/validate-jarvis-live-pass-02.mjs",
     "jarvis:validate:live-pass-03": "node scripts/validators/validate-jarvis-live-pass-03.mjs",
+    "jarvis:validate:v5:number-16": "node scripts/validators/validate-jarvis-v5-number-16-postgresql.mjs",
     "jarvis:credentials:scan": "node scripts/jarvis/scan-jarvis-credential-readiness.mjs",
     "jarvis:credentials:scan:local": "node scripts/jarvis/scan-jarvis-credential-readiness.mjs",
     "jarvis:credentials:scan:local:queue": "node scripts/jarvis/scan-jarvis-credential-readiness.mjs",
