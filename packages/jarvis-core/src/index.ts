@@ -16,3 +16,5 @@ export * from './powershell-creator-boundary';
 export * from './jarvis-v5-script-library-runtime-19';
 export * from './payfast-payment-boundary';
 export * from './jarvis-v5-script-library-runtime-20';
+export * from './email-communication-boundary';
+export * from './jarvis-v5-script-library-runtime-21';
