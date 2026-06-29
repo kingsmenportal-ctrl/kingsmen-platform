@@ -18,3 +18,5 @@ export * from './payfast-payment-boundary';
 export * from './jarvis-v5-script-library-runtime-20';
 export * from './email-communication-boundary';
 export * from './jarvis-v5-script-library-runtime-21';
+export * from './document-evidence-boundary';
+export * from './jarvis-v5-script-library-runtime-23';
