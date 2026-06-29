@@ -52,3 +52,4 @@ export * from './evening-command-closeout-boundary';
 export * from './jarvis-v5-script-library-runtime-37';
 export * from './closing-lines-boundary';
 export * from './jarvis-v5-script-library-runtime-38';
+export * from './jarvis-v5-script-library-final-sequence';
