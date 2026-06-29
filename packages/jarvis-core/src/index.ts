@@ -7,3 +7,4 @@ export * from './jarvis-runtime-controller';
 export * from './jarvis-live-switch-guard';
 export * from './jarvis-mini-builder-core';
 export * from './jarvis-repo-map';
+export * from './postgresql-truth-vault-boundary';
