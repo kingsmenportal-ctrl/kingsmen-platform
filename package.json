@@ -36,6 +36,7 @@
     "jarvis:validate:v5:number-35": "node scripts/validators/validate-jarvis-v5-number-35-morning-command-brief.mjs",
     "jarvis:validate:v5:number-36": "node scripts/validators/validate-jarvis-v5-number-36-midday-command-brief.mjs",
     "jarvis:validate:v5:number-37": "node scripts/validators/validate-jarvis-v5-number-37-evening-command-closeout.mjs",
+    "jarvis:validate:v5:number-38": "node scripts/validators/validate-jarvis-v5-number-38.mjs",
     "jarvis:credentials:scan": "node scripts/jarvis/scan-jarvis-credential-readiness.mjs",
     "jarvis:credentials:scan:local": "node scripts/jarvis/scan-jarvis-credential-readiness.mjs",
     "jarvis:credentials:scan:local:queue": "node scripts/jarvis/scan-jarvis-credential-readiness.mjs",
