@@ -26,6 +26,7 @@
     "jarvis:validate:v5:number-25": "node scripts/validators/validate-jarvis-v5-number-25-strategy.mjs",
     "jarvis:validate:v5:number-27": "node scripts/validators/validate-jarvis-v5-number-27-inspection.mjs",
     "jarvis:validate:v5:number-28": "node scripts/validators/validate-jarvis-v5-number-28-deployment.mjs",
+    "jarvis:validate:v5:number-29": "node scripts/validators/validate-jarvis-v5-number-29-correction.mjs",
     "jarvis:credentials:scan": "node scripts/jarvis/scan-jarvis-credential-readiness.mjs",
     "jarvis:credentials:scan:local": "node scripts/jarvis/scan-jarvis-credential-readiness.mjs",
     "jarvis:credentials:scan:local:queue": "node scripts/jarvis/scan-jarvis-credential-readiness.mjs",
