@@ -30,3 +30,5 @@ export * from './repair-mode-boundary';
 export * from './jarvis-v5-script-library-runtime-26';
 export * from './inspection-command-boundary';
 export * from './jarvis-v5-script-library-runtime-27';
+export * from './deployment-command-boundary';
+export * from './jarvis-v5-script-library-runtime-28';
