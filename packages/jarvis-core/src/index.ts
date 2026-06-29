@@ -38,5 +38,7 @@ export * from './evidence-missing-boundary';
 export * from './jarvis-v5-script-library-runtime-30';
 export * from './system-stable-boundary';
 export * from './jarvis-v5-script-library-runtime-31';
+export * from './risk-rising-boundary';
+export * from './jarvis-v5-script-library-runtime-32';
 export * from './critical-incident-boundary';
 export * from './jarvis-v5-script-library-runtime-33';
