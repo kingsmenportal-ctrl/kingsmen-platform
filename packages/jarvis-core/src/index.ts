@@ -26,3 +26,5 @@ export * from './report-command-boundary';
 export * from './jarvis-v5-script-library-runtime-24';
 export * from './strategy-command-boundary';
 export * from './jarvis-v5-script-library-runtime-25';
+export * from './repair-mode-boundary';
+export * from './jarvis-v5-script-library-runtime-26';
