@@ -17,6 +17,7 @@
     "jarvis:validate:v5:01-to-16": "node scripts/validators/validate-jarvis-v5-numbers-01-to-16-runtime.mjs",
     "jarvis:validate:v5:number-17": "node scripts/validators/validate-jarvis-v5-number-17-supabase.mjs",
     "jarvis:validate:v5:number-18": "node scripts/validators/validate-jarvis-v5-number-18-github.mjs",
+    "jarvis:validate:v5:number-19": "node scripts/validators/validate-jarvis-v5-number-19-powershell-creator.mjs",
     "jarvis:credentials:scan": "node scripts/jarvis/scan-jarvis-credential-readiness.mjs",
     "jarvis:credentials:scan:local": "node scripts/jarvis/scan-jarvis-credential-readiness.mjs",
     "jarvis:credentials:scan:local:queue": "node scripts/jarvis/scan-jarvis-credential-readiness.mjs",
