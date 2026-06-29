@@ -46,3 +46,7 @@ export * from './command-complete-boundary';
 export * from './jarvis-v5-script-library-runtime-34';
 export * from './morning-command-brief-boundary';
 export * from './jarvis-v5-script-library-runtime-35';
+export * from './midday-command-brief-boundary';
+export * from './jarvis-v5-script-library-runtime-36';
+export * from './evening-command-closeout-boundary';
+export * from './jarvis-v5-script-library-runtime-37';
