@@ -42,3 +42,5 @@ export * from './risk-rising-boundary';
 export * from './jarvis-v5-script-library-runtime-32';
 export * from './critical-incident-boundary';
 export * from './jarvis-v5-script-library-runtime-33';
+export * from './command-complete-boundary';
+export * from './jarvis-v5-script-library-runtime-34';
