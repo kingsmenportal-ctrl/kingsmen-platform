@@ -14,3 +14,5 @@ export * from './github-repo-boundary';
 export * from './jarvis-v5-script-library-runtime-17-18';
 export * from './powershell-creator-boundary';
 export * from './jarvis-v5-script-library-runtime-19';
+export * from './payfast-payment-boundary';
+export * from './jarvis-v5-script-library-runtime-20';
