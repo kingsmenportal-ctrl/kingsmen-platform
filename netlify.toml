@@ -1,13 +1,14 @@
 [build]
   base = "apps/web"
-  command = "npm install && npm run build"
-  publish = ".next"
+  command = "node scripts/build-jarvis-os.cjs"
+  publish = "dist"
 
 [build.environment]
   NODE_VERSION = "22"
 
-[[plugins]]
-  package = "@netlify/plugin-nextjs"
+[functions]
+  directory = "netlify/functions"
+  node_bundler = "esbuild"
 
 [[headers]]
   for = "/*"
@@ -15,6 +16,4 @@
     X-Frame-Options = "DENY"
     X-Content-Type-Options = "nosniff"
     Referrer-Policy = "strict-origin-when-cross-origin"
-
-[functions]
-  included_files = ["../../packages/**", "../../docs/jarvis/v5/**"]
+    Cache-Control = "no-store"

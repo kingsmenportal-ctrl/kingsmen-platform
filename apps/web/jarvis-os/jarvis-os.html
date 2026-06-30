@@ -1,0 +1,167 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<title>Kingsmen Jarvis OS</title>
+<style>
+:root{
+  --obsidian:#02050b;--panel:rgba(6,14,26,.82);--panel2:rgba(9,20,38,.72);
+  --line:rgba(92,152,255,.24);--gold:#d8b15d;--gold2:#f2d38b;--blue:#4ca3ff;
+  --cyan:#5ff6ff;--green:#55ff9c;--red:#ff5f6f;--cream:#f8f0d6;--muted:#8fa4c7;
+}
+*{box-sizing:border-box}
+body{margin:0;min-height:100vh;color:var(--cream);font-family:Inter,Segoe UI,system-ui,Arial,sans-serif;background:
+radial-gradient(circle at 50% 8%,rgba(70,160,255,.32),transparent 22%),
+radial-gradient(circle at 16% 16%,rgba(216,177,93,.16),transparent 26%),
+linear-gradient(145deg,#010309,#061121 45%,#010309)}
+.shell{padding:14px;display:grid;grid-template-columns:330px minmax(560px,1fr) 390px;gap:14px;max-width:1800px;margin:0 auto}
+.panel{border:1px solid var(--line);background:linear-gradient(145deg,var(--panel),rgba(2,6,13,.86));border-radius:16px;box-shadow:0 0 55px rgba(57,120,255,.11),inset 0 0 35px rgba(92,152,255,.04);padding:14px}
+.header{grid-column:1/4;display:grid;grid-template-columns:330px 1fr 390px;gap:14px;align-items:center}
+.kicker{margin:0;color:var(--gold2);letter-spacing:.24em;text-transform:uppercase;font-size:11px;font-weight:900}
+h1{margin:0;text-align:center;font-size:76px;line-height:.8;letter-spacing:.12em;text-shadow:0 0 26px rgba(92,180,255,.55)}
+h2{margin:0 0 8px;font-size:17px;color:#dceaff}
+p{color:var(--muted);line-height:1.45}
+.small{font-size:12px;color:var(--muted)}
+.row{display:flex;gap:8px;align-items:center}.between{justify-content:space-between}
+.badge{border:1px solid rgba(255,255,255,.12);background:rgba(255,255,255,.05);border-radius:999px;padding:7px 10px;font-weight:800;font-size:11px;color:#dbe9ff}
+.live{color:#071018;background:linear-gradient(135deg,var(--green),#d7ffe7)}
+.gold{color:#0b0e15;background:linear-gradient(135deg,var(--gold2),var(--gold))}
+.left,.center,.right{display:grid;gap:14px;align-content:start}
+.commander{display:grid;grid-template-columns:76px 1fr;gap:12px}.seal{width:76px;height:76px;border-radius:50%;display:grid;place-items:center;border:2px solid var(--gold);font-size:34px;color:var(--gold2);box-shadow:0 0 26px rgba(216,177,93,.25)}
+.stats{display:grid;grid-template-columns:repeat(4,1fr);gap:8px}.stat{border:1px solid rgba(255,255,255,.1);border-radius:12px;padding:10px;background:rgba(255,255,255,.04)}.stat strong{display:block;color:var(--green);font-size:20px}.stat span{font-size:10px;color:var(--muted);text-transform:uppercase}
+.voiceOrb{height:110px;display:grid;place-items:center;background:radial-gradient(circle,rgba(80,190,255,.18),transparent 58%);border:1px solid rgba(95,246,255,.18);border-radius:14px}.mic{width:60px;height:60px;border-radius:50%;display:grid;place-items:center;border:2px solid var(--cyan);box-shadow:0 0 35px rgba(95,246,255,.32)}
+.routeMap{height:150px;border-radius:14px;background:radial-gradient(circle at 60% 55%,rgba(95,246,255,.24),transparent 8%),radial-gradient(circle at 30% 45%,rgba(216,177,93,.22),transparent 7%),radial-gradient(circle at 45% 70%,rgba(85,255,156,.2),transparent 7%),linear-gradient(160deg,rgba(6,22,42,.9),rgba(2,5,11,.5));position:relative;overflow:hidden}.routeMap:before{content:"";position:absolute;inset:0;background-image:linear-gradient(rgba(92,152,255,.08) 1px,transparent 1px),linear-gradient(90deg,rgba(92,152,255,.08) 1px,transparent 1px);background-size:26px 26px}
+.brain{min-height:360px;position:relative;overflow:hidden}.orbBig{width:250px;height:250px;border-radius:50%;margin:10px auto;display:grid;place-items:center;border:2px solid var(--cyan);box-shadow:0 0 70px rgba(95,246,255,.34),inset 0 0 80px rgba(95,246,255,.12);background:radial-gradient(circle,var(--blue),rgba(10,35,70,.2) 42%,transparent 68%);font-size:72px;font-weight:1000}.orbBig:before{content:"";position:absolute;width:620px;height:2px;background:linear-gradient(90deg,transparent,var(--cyan),transparent);opacity:.6;top:180px;left:calc(50% - 310px);box-shadow:0 0 22px var(--cyan)}
+.stream{position:absolute;left:14px;top:62px;width:220px}.stream div,.context div{display:flex;justify-content:space-between;border-bottom:1px solid rgba(255,255,255,.07);padding:6px 0;font-size:11px;color:#cbd9f5}
+.context{position:absolute;right:14px;top:62px;width:210px}
+.inputLine{display:flex;gap:8px;margin-top:6px}input{width:100%;background:#06101f;border:1px solid rgba(95,246,255,.28);border-radius:12px;color:white;padding:14px}button{background:linear-gradient(135deg,var(--gold2),var(--gold));color:#071018;border:0;border-radius:12px;padding:12px 14px;font-weight:1000;cursor:pointer}button.ghost{background:rgba(255,255,255,.05);color:#e6f0ff;border:1px solid rgba(255,255,255,.13)}
+.tabs{display:flex;gap:8px;flex-wrap:wrap;margin-top:10px}
+.workGrid{display:grid;grid-template-columns:repeat(7,1fr);gap:7px}.module,.provider,.action,.stackItem{border:1px solid rgba(92,152,255,.2);border-radius:10px;padding:9px;background:rgba(255,255,255,.04);cursor:pointer;min-height:58px}.module:hover,.provider:hover,.action:hover,.stackItem:hover{border-color:var(--gold);box-shadow:0 0 20px rgba(216,177,93,.16)}.module strong,.provider strong{display:block;color:#e6f0ff;font-size:12px}.module span,.provider span{font-size:10px;color:var(--muted)}
+.timeline{display:grid;grid-template-columns:1fr 1fr 1fr;gap:12px}.timeline pre,.output pre{white-space:pre-wrap;background:rgba(0,0,0,.28);border:1px solid rgba(255,255,255,.1);border-radius:12px;padding:12px;max-height:180px;overflow:auto;color:#dce8ff}
+.stack{display:grid;gap:8px}.stackItem{display:grid;grid-template-columns:34px 1fr auto;gap:8px;align-items:center}.num{width:26px;height:26px;border-radius:50%;display:grid;place-items:center;border:1px solid var(--cyan);color:var(--cyan)}
+.providers{display:grid;grid-template-columns:repeat(3,1fr);gap:7px}.provider{min-height:auto}
+.risk{display:grid;grid-template-columns:120px 1fr;gap:12px}.ring{width:105px;height:105px;border-radius:50%;display:grid;place-items:center;background:conic-gradient(var(--red) 0 22%,var(--gold) 22% 48%,var(--green) 48% 100%);color:#06101f;font-weight:1000}.ring div{width:70px;height:70px;border-radius:50%;background:#071120;color:#fff;display:grid;place-items:center}
+.evidence{display:grid;grid-template-columns:repeat(5,1fr);gap:7px}.ev{border:1px solid rgba(255,255,255,.1);border-radius:10px;padding:9px;background:rgba(255,255,255,.04)}.ev strong{display:block;color:var(--green);font-size:20px}.ev span{font-size:10px;color:var(--muted)}
+.messages{max-height:260px;overflow:auto;display:grid;gap:8px}.msg{border:1px solid rgba(255,255,255,.1);border-radius:12px;padding:10px;background:rgba(255,255,255,.04)}.msg.jarvis{border-color:rgba(216,177,93,.3);background:rgba(216,177,93,.06)}
+.footer{grid-column:1/4;display:flex;justify-content:space-between;gap:10px;color:var(--muted);font-size:12px}
+@media(max-width:1200px){.shell,.header{grid-template-columns:1fr}.header,.footer{grid-column:auto}.workGrid{grid-template-columns:repeat(3,1fr)}.providers{grid-template-columns:repeat(2,1fr)}.timeline{grid-template-columns:1fr}.stream,.context{position:static;width:auto}.orbBig:before{display:none}}
+</style>
+</head>
+<body>
+<main class="shell">
+  <header class="header">
+    <section class="panel commander">
+      <div class="seal">K</div><div><p class="kicker">Commander</p><h2>Kingsmen Founder</h2><p class="small">Founder / Operator · Clearance Founder · Session KMN-LIVE</p></div>
+    </section>
+    <section><h1>JARVIS</h1><p class="kicker" style="text-align:center">Kingsmen Command House · Founder AI Operating Assistant</p></section>
+    <section class="panel"><div class="row between"><span class="badge live">SYSTEM ONLINE</span><span class="badge">SECURE ENVIRONMENT</span><span class="badge gold">VISUAL LOCKED</span></div></section>
+  </header>
+
+  <aside class="left">
+    <section class="panel"><h2>Mission</h2><p>Expand access. Verify truth. Build futures.</p><div class="stats"><div class="stat"><strong>23</strong><span>Routes</span></div><div class="stat"><strong>47</strong><span>Tasks</span></div><div class="stat"><strong style="color:var(--red)">02</strong><span>Risk</span></div><div class="stat"><strong style="color:var(--gold)">01</strong><span>Blocked</span></div></div></section>
+    <section class="panel"><h2>Voice Link</h2><div class="voiceOrb"><div class="mic">🎙</div></div><button class="ghost" onclick="speakWake()">WAKE WORD: JARVIS</button></section>
+    <section class="panel"><h2>Candidate Operations Snapshot</h2><div class="stats"><div class="stat"><strong>47</strong><span>Intakes</span></div><div class="stat"><strong>128</strong><span>Docs</span></div><div class="stat"><strong>86</strong><span>Reviews</span></div><div class="stat"><strong>19</strong><span>Approvals</span></div></div></section>
+    <section class="panel"><h2>Route Universe</h2><div class="routeMap"></div><div class="tabs"><button class="ghost" onclick="run('Route Universe CAO NSFAS TVET SETA employers')">SCAN ROUTES</button><button class="ghost" onclick="run('Playwright Scout')">PLAYWRIGHT</button></div></section>
+  </aside>
+
+  <section class="center">
+    <section class="panel brain">
+      <p class="kicker">1 · Command Brain</p><h2>OpenAI-ready reasoning core</h2>
+      <div class="stream" id="stream"></div>
+      <div class="orbBig">J</div>
+      <div class="context" id="context"></div>
+      <form class="inputLine" onsubmit="event.preventDefault();run(document.getElementById('cmd').value)">
+        <input id="cmd" value="TELL ME ABOUT JARVIS BRAIN" />
+        <button>EXECUTE</button>
+      </form>
+      <div class="tabs">
+        <button class="ghost" onclick="run('Command Brain')">BRAIN</button>
+        <button class="ghost" onclick="run('OpenClaw Gateway')">OPENCLAW</button>
+        <button class="ghost" onclick="run('Playwright Scout')">PLAYWRIGHT</button>
+        <button class="ghost" onclick="run('Oracle Lite Runtime')">ORACLE LITE</button>
+        <button class="ghost" onclick="run('Evidence Proof Centre')">PROOF</button>
+      </div>
+    </section>
+
+    <section class="panel"><p class="kicker">5 · Kingsmen Work Map</p><h2>N00–N20 modules · not minimized</h2><div class="workGrid" id="workGrid"></div></section>
+
+    <section class="timeline">
+      <section class="panel"><h2>Live Execution Timeline</h2><pre id="timeline">09:41 Candidate intake received
+09:42 Document verification queued
+09:43 Route match: CAO / NSFAS
+09:44 Evidence ledger updated</pre></section>
+      <section class="panel"><h2>Active Incidents</h2><pre>High Risk Payment Detected
+Route Deviation Alert
+Verification Hold
+Manual Package Pending</pre></section>
+      <section class="panel"><h2>Route Safety Map</h2><pre>SAFE  · verified official route
+WATCH · portal behavior changed
+RISK  · manual review required
+BLOCK · MAP fallback required</pre></section>
+    </section>
+  </section>
+
+  <aside class="right">
+    <section class="panel stack" id="stack"></section>
+    <section class="panel"><p class="kicker">8 · Provider Matrix</p><h2>Connected services ecosystem</h2><div class="providers" id="providers"></div></section>
+    <section class="panel"><p class="kicker">10 · Founder Command Plane</p><h2>Execution control & approvals</h2><div class="risk"><div class="ring"><div>02<br>High</div></div><div id="actions"></div></div></section>
+    <section class="panel"><p class="kicker">9 · Evidence & Proof Centre</p><h2>Evidence-first truth locked</h2><div class="evidence"><div class="ev"><strong>184</strong><span>Deploys</span></div><div class="ev"><strong>372</strong><span>Checks</span></div><div class="ev"><strong style="color:var(--red)">03</strong><span>Incidents</span></div><div class="ev"><strong>98.7%</strong><span>Safety</span></div><div class="ev"><strong>5,421</strong><span>Evidence</span></div></div></section>
+    <section class="panel output"><h2>Jarvis Output</h2><div class="messages" id="messages"></div><pre id="output">Awaiting command.</pre></section>
+  </aside>
+
+  <footer class="panel footer"><span>KINGSMEN PROTOCOL · Zero Trust Architecture · Evidence Before Claims</span><span>Jarvis OS Visual Lock · Static Live Surface + Jarvis Agent Function</span></footer>
+</main>
+
+<script>
+const modules = [
+["N00","Constitution"],["N01","Foundation"],["N02","Backend Kernel"],["N03","Truth Vault"],["N04","Candidate Core"],["N05","Document Vault"],["N06","Route Universe"],["N07","Airtable Sync"],["N08","Control Plane"],["N09","Notifications"],["N10","Finance"],["N11","AI Decision"],["N12","Governance"],["N13","Observability"],["N14","Integrations"],["N15","Opportunity"],["N16","Execution"],["N17","Founder"],["N18","Public Site"],["N19","Mobile PWA"],["N20","Final Integration"]
+];
+const stack = [
+["2","OpenClaw Gateway","Command Registry · Policy Gate · Evidence Ledger","ADAPTER-GATED","OpenClaw Gateway"],
+["3","Playwright Scout","Probe · Manual Fallback · MAP Boundary","SCOUT","Playwright Scout"],
+["4","Oracle Lite Runtime","Local Commander Runtime Boundary","SAFE MODE","Oracle Lite Runtime"],
+["6","Candidate Operations","Intake · Documents · Workbench · Finance · Comms","LIVE","Candidate Operations"],
+["7","Route Universe","CAO · NSFAS · TVETs · SETA · Employers","LIVE","Route Universe"],
+["9","Evidence Centre","Deploy Logs · Validation · Incidents · Route Safety","VERIFIED","Evidence Proof Centre"],
+["10","Founder Plane","Actions · Risk · Approvals · Priority Queue","FOUNDER ONLY","Founder Command Plane"]
+];
+const providers = ["GitHub","Netlify","Google Drive","Gmail","Calendar","Airtable","Neon","Supabase","Canva","B12","Voice","Wisebase","OpenAI","Namecheap","Norton","Replit","Vivin","Softonic","Catalyst"];
+const actions = ["Mission Brief","System Health","W15 Override","Risk Digest","Route Scan","Deep Search","Approve Command","Open Evidence"];
+
+function el(id){return document.getElementById(id)}
+function render(){
+  el("stream").innerHTML = ["Understand objective","Inspect context","Map options","Assess risk","Retrieve evidence","Draft plan","Ready for action"].map((x,i)=>`<div><span>${x}</span><b>09:4${i}:0${i}</b></div>`).join("");
+  el("context").innerHTML = ["Session Context · 23k tokens","Memory Rules · Enforced","OpenClaw · Connected","Playwright · Scout","Oracle Lite · Local"].map(x=>`<div><span>${x}</span><b>ACTIVE</b></div>`).join("");
+  el("workGrid").innerHTML = modules.map(m=>`<div class="module" onclick="run('work map ${m[0]} ${m[1]}')"><strong>${m[0]}</strong><span>${m[1]}</span><br><span style="color:var(--green)">LIVE MAP</span></div>`).join("");
+  el("stack").innerHTML = stack.map(s=>`<div class="stackItem" onclick="run('${s[4]}')"><div class="num">${s[0]}</div><div><strong>${s[1]}</strong><br><span>${s[2]}</span></div><span class="badge">${s[3]}</span></div>`).join("");
+  el("providers").innerHTML = providers.map(p=>`<div class="provider" onclick="run('provider matrix ${p}')"><strong>${p}</strong><span>adapter-gated</span></div>`).join("");
+  el("actions").innerHTML = actions.map(a=>`<button class="ghost" style="width:100%;margin:4px 0" onclick="run('Founder Command ${a}')">${a}</button>`).join("");
+}
+function add(role, tool, text){
+  const box=document.createElement("div");box.className="msg "+(role==="JARVIS"?"jarvis":"commander");
+  box.innerHTML=`<b>${role}${tool?" · "+tool:""}</b><p>${String(text).replace(/[<>&]/g,c=>({"<":"&lt;",">":"&gt;","&":"&amp;"}[c]))}</p>`;
+  el("messages").prepend(box);
+}
+async function run(command){
+  if(!command) return;
+  el("cmd").value = command;
+  add("COMMANDER","",command);
+  try{
+    const r=await fetch("/api/jarvis/agent",{method:"POST",headers:{"content-type":"application/json"},body:JSON.stringify({message:command})});
+    const p=await r.json();
+    add("JARVIS",p.tool,p.reply);
+    el("output").textContent=p.stdout || p.reply;
+  }catch(e){
+    add("JARVIS","BROWSER FALLBACK","Jarvis OS command surface responded locally. API fallback used.");
+    el("output").textContent="Browser fallback. Command remains visible and routed in the UI.";
+  }
+}
+function speakWake(){
+  if("speechSynthesis" in window){speechSynthesis.cancel();speechSynthesis.speak(new SpeechSynthesisUtterance("Welcome to Kingsmen Command, Commander. Jarvis is online."));}
+}
+render();
+add("JARVIS","WAKE","Welcome to Kingsmen Command, Commander. The accepted Jarvis OS visual lock is active.");
+</script>
+</body>
+</html>
