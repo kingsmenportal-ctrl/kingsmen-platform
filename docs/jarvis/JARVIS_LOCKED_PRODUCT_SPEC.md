@@ -2,9 +2,11 @@
 
 Status: LOCKED
 Owner: Kingsmen Commander / Founder
-Purpose: Stop repeated drift, rebuild loops, black/white regressions, fake provider claims, and vague Jarvis definitions.
+Purpose: Stop repeated drift, rebuild loops, black/white regressions, fake provider claims, vague Jarvis definitions, and incompatible architecture merges.
 
-This file is the single source of truth for Jarvis. Every future Jarvis build must read this file before editing UI, scripts, providers, voice, agents, robots, tools, apps, or deployment.
+This file is the single source of truth for Jarvis. Every future Jarvis build must read this file before editing UI, scripts, providers, voice, agents, robots, tools, apps, deployment, docs, reports, or command runners.
+
+This file exists because the previous build pattern failed: huge one-shot script -> partial result -> rejected result -> new huge script -> repeated drift. Future work must be smaller, spec-led, repo-led, and validation-gated.
 
 ---
 
@@ -21,6 +23,7 @@ Required order:
 5. Generate a small, checkable change plan.
 6. Build only the missing verified piece.
 7. Validate against this file before commit.
+8. Do not deploy if validation fails.
 
 Banned pattern:
 
@@ -30,6 +33,7 @@ Banned pattern:
 - UI that hides agents, robots, tools, apps, providers, N00-N20, evidence, voice, OpenClaw, or Playwright
 - static fake dashboards
 - placeholder, mock, demo, dummy, hardcoded, or sample operational claims
+- drifting between incompatible architectures without explicit Commander decision
 
 ---
 
@@ -227,6 +231,12 @@ Kingsmen platform doctrine remains:
 
 If another tool/chat proposes Airtable as the actual truth store or n8n as the main system, it must be treated as a conflicting architecture proposal, not silently merged.
 
+Architecture conflict rule:
+
+- Do not merge the N-series/PostgreSQL/Next.js doctrine with an Airtable/n8n-as-truth architecture by accident.
+- If Commander chooses Airtable/n8n as the new primary architecture, record it as a formal doctrine change first.
+- Until that happens, PostgreSQL remains truth, Airtable remains mirror, and n8n remains thin wrapper.
+
 ---
 
 ## 10. N00-N20 module lock
@@ -307,6 +317,13 @@ Known audit baseline:
 - validator/report/evidence files: 1134
 - total keyword hits: 146364
 
+Known command mesh baseline:
+
+- Agents: 254
+- Robots: 52
+- Tools: 983
+- Apps: 90
+
 ---
 
 ## 13. Build gate checklist
@@ -325,5 +342,20 @@ Before any future Jarvis commit, verify:
 - Evidence links exist
 - no fake connected claims exist
 - no placeholder operational claims exist
+- no incompatible architecture shift occurred without explicit Commander approval
 
 If any item fails, do not deploy.
+
+---
+
+## 14. Future session start command
+
+Every future AI, code assistant, GitHub task, Claude Code session, or manual build session must start with:
+
+1. Read `docs/jarvis/JARVIS_LOCKED_PRODUCT_SPEC.md`.
+2. Read `reports/jarvis/JARVIS_FULL_REPO_INVENTORY_LATEST.json`.
+3. Read `reports/jarvis/JARVIS_AGENTS_ROBOTS_TOOLS_APPS_MATRIX_LATEST.json`.
+4. Read `reports/jarvis/JARVIS_PREMIUM_COMMAND_CENTRE_BUILD_PROOF_LATEST.md`.
+5. Run local validation before editing.
+
+If those files are unavailable, stop and recover the spec first.
