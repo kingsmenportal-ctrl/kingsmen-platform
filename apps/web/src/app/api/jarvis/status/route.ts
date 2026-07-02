@@ -71,7 +71,7 @@ export async function GET() {
       key: "web-boundary",
       title: "Web Runtime Boundary",
       state: "LOCKED",
-      detail: "This Next route only calls the backend API client. It performs no workstation runtime commands, direct storage access, or local proof-file writes.",
+      detail: "This Next route only calls the backend API client. It performs no local shell execution, no workstation runtime commands, no direct storage access, and no local proof-file writes.",
       ok: true
     },
     {
