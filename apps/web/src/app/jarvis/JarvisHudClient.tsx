@@ -173,10 +173,8 @@ export default function JarvisHudClient({ surface }: { surface: string }) {
   const [commandInput, setCommandInput] = useState("SYSTEM_VALIDATE_N20");
   const [running, setRunning] = useState<string | null>(null);
   const [result, setResult] = useState<JarvisResult | null>(null);
-  const [cameraActive, setCameraActive] = useState(false);
   const [voiceState, setVoiceState] = useState<"idle" | "listening" | "speaking" | "unsupported">("idle");
-  const videoRef = useRef<HTMLVideoElement | null>(null);
-  const streamRef = useRef<MediaStream | null>(null);
+  const hudRef = useRef<HTMLElement | null>(null);
 
   async function loadStatus() {
     try {
@@ -231,26 +229,6 @@ export default function JarvisHudClient({ surface }: { surface: string }) {
     runCommand(commandInput);
   }
 
-  async function toggleCamera() {
-    if (cameraActive) {
-      streamRef.current?.getTracks().forEach((track) => track.stop());
-      streamRef.current = null;
-      if (videoRef.current) videoRef.current.srcObject = null;
-      setCameraActive(false);
-      return;
-    }
-
-    try {
-      if (!navigator.mediaDevices?.getUserMedia) return;
-      const stream = await navigator.mediaDevices.getUserMedia({ video: true, audio: false });
-      streamRef.current = stream;
-      if (videoRef.current) videoRef.current.srcObject = stream;
-      setCameraActive(true);
-    } catch {
-      setCameraActive(false);
-    }
-  }
-
   function startVoice() {
     const SpeechRecognition =
       (window as unknown as { SpeechRecognition?: any; webkitSpeechRecognition?: any }).SpeechRecognition ||
@@ -287,8 +265,8 @@ export default function JarvisHudClient({ surface }: { surface: string }) {
     }
 
     const text = status?.ok
-      ? "Welcome to Kingsmen Command, Commander. Jarvis web surface is online. Backend boundary reports stable. No external provider is claimed live without runtime proof."
-      : "Welcome to Kingsmen Command, Commander. Jarvis web surface is awake. Backend proof is still under review. No external provider is claimed live without runtime proof.";
+      ? "Welcome to Kingsmen Command, Commander. Jarvis web surface is online through the status API. No external provider is claimed live without runtime proof."
+      : "Welcome to Kingsmen Command, Commander. Jarvis web surface is awake. Runtime proof is still required before live claims.";
 
     const utterance = new SpeechSynthesisUtterance(text);
     utterance.lang = "en-ZA";
@@ -306,7 +284,6 @@ export default function JarvisHudClient({ surface }: { surface: string }) {
     const timer = window.setInterval(loadStatus, 15000);
     return () => {
       window.clearInterval(timer);
-      streamRef.current?.getTracks().forEach((track) => track.stop());
       if ("speechSynthesis" in window) window.speechSynthesis.cancel();
     };
   }, []);
@@ -325,96 +302,113 @@ export default function JarvisHudClient({ surface }: { surface: string }) {
   const backendVerified = status?.cards.find((card) => card.key === "backend-api-boundary")?.ok === true;
   const runtimeVerified = status?.cards.find((card) => card.key === "jarvis-runtime-authority")?.ok === true;
 
+  const statusCards = status?.cards ?? [];
+  const proofNeededCount = status ? Math.max(totalCount - okCount, 0) : "proof-needed";
+  const commandCount = status ? status.commands.length : "proof-needed";
+  const syncLabel = status?.generatedAt ? new Date(status.generatedAt).toLocaleString() : "proof-needed";
+
+  const missionStats = [
+    { label: "API surfaces", value: status ? totalCount : "proof-needed" },
+    { label: "Confirmed", value: status ? okCount : "proof-needed" },
+    { label: "Proof needed", value: proofNeededCount },
+    { label: "Commands", value: commandCount }
+  ];
+
+  const executionTimeline = statusCards.length > 0 ? statusCards.slice(0, 5) : [];
+  const commandCategories = Object.keys(grouped);
+  const providerMatrix = [...providers, ...agents, ...robots, ...tools, ...apps];
+
   return (
-    <main className={styles.shell}>
+    <main className={styles.shell} ref={hudRef}>
       <div className={styles.gridGlow} />
 
-      <nav className={styles.topNav}>
-        <div className={styles.brand}>
-          <span>KINGSMEN</span>
-          <strong>JARVIS · COMMAND HOUSE</strong>
-        </div>
-        <div className={styles.navPills}>
-          <span>Overview</span>
-          <span>Agents</span>
-          <span>Robots</span>
-          <span>Providers</span>
-          <span>Evidence</span>
-          <span>Ledger</span>
-          <span>Founder</span>
-        </div>
-      </nav>
-
-      <section className={styles.hud}>
-        <header className={styles.header}>
-          <div>
-            <div className={styles.kicker}>FOUNDER · COMMANDER · {surface}</div>
-            <h1>JARVIS</h1>
-            <p>
-              Premium real wired command surface. This UI calls the backend API boundary, keeps risky actions proof-gated,
-              and refuses to claim apps, tools, robots, agents, or providers are live without runtime evidence.
-            </p>
-            <div className={styles.badgeRow}>
-              <span className={styles.badge}>PostgreSQL · truth</span>
-              <span className={styles.badge}>Airtable · mirror only</span>
-              <span className={styles.badge}>n8n · thin wrapper only</span>
-              <span className={styles.badge}>GitHub commits + validators = proof</span>
+      <section className={styles.lockedHud}>
+        <header className={styles.lockedTopBar}>
+          <div className={styles.lockedBrand}>
+            <span className={styles.crestMark}>K</span>
+            <div>
+              <span>KINGSMEN</span>
+              <strong>JARVIS · COMMAND HOUSE</strong>
             </div>
           </div>
 
-          <aside className={styles.topStatus}>
-            <span className={status?.ok ? styles.dotOk : styles.dotWarn} />
-            <strong>{status?.ok ? "SYSTEM GRIP STABLE" : "SYSTEM NEEDS REVIEW"}</strong>
-            <small>{status ? `${okCount}/${totalCount} surfaces confirmed` : "loading truth..."}</small>
-            <small>{status?.generatedAt ? `Last truth sync ${new Date(status.generatedAt).toLocaleTimeString()}` : "No status payload yet"}</small>
-          </aside>
+          <div className={styles.topMeta}>
+            <span className={status?.ok ? styles.stateVerified : styles.stateProof}>
+              {status?.ok ? "api-online" : "proof-needed"}
+            </span>
+            <span className={backendVerified ? styles.stateVerified : styles.stateProof}>
+              {backendVerified ? "backend verified" : "backend proof-needed"}
+            </span>
+            <span>{syncLabel}</span>
+          </div>
         </header>
 
-        <section className={styles.coreLayout}>
-          <aside className={styles.leftRail}>
-            <div className={styles.panelTitle}>Founder Command Plane</div>
-            <div className={styles.founderSeal}>
-              <span>COMMANDER</span>
-              <strong>{running ? "EXECUTING" : "READY"}</strong>
-              <small>Signed intent · sealed execution</small>
-            </div>
+        <section className={styles.lockedColumns}>
+          <aside className={styles.lockedLeft}>
+            <section className={styles.layoutPanel}>
+              <div className={styles.panelTitle}>Commander profile</div>
+              <div className={styles.commanderProfile}>
+                <span className={styles.crestMark}>K</span>
+                <div>
+                  <strong>Kingsmen Founder</strong>
+                  <p>Commander private surface · {surface}</p>
+                  <small>Runtime claims remain proof-gated.</small>
+                </div>
+              </div>
+            </section>
 
-            <div className={styles.doctrineBox}>
-              {(status?.doctrine ?? [
-                "Backend state machine remains authority.",
-                "Jarvis surfaces truth and safe actions.",
-                "Risky actions require policy and evidence gates."
-              ]).map((line) => (
-                <p key={line}>› {line}</p>
-              ))}
-            </div>
+            <section className={styles.layoutPanel}>
+              <div className={styles.panelTitle}>Mission stats</div>
+              <div className={styles.missionGrid}>
+                {missionStats.map((stat) => (
+                  <article key={stat.label}>
+                    <strong>{stat.value}</strong>
+                    <span>{stat.label}</span>
+                  </article>
+                ))}
+              </div>
+            </section>
 
-            <div className={styles.panelTitle}>System Truth</div>
-            <div className={styles.cardStack}>
-              {(status?.cards ?? []).map((card) => (
-                <article key={card.key} className={card.ok ? styles.truthCardOk : styles.truthCardWarn}>
-                  <div className={styles.cardState}>{card.state}</div>
-                  <h3>{card.title}</h3>
-                  <p>{card.detail}</p>
-                </article>
-              ))}
-              {statusError ? (
-                <article className={styles.truthCardWarn}>
-                  <div className={styles.cardState}>ERROR</div>
-                  <h3>Status API</h3>
-                  <p>{statusError}</p>
-                </article>
-              ) : null}
-            </div>
+            <section className={styles.layoutPanel}>
+              <div className={styles.panelTitle}>Voice Link</div>
+              <div className={styles.voiceWave}>
+                <div className={styles.waveform} />
+                <strong>{voiceState === "unsupported" ? "proof-needed" : voiceState}</strong>
+              </div>
+              <div className={styles.voiceButtons}>
+                <button type="button" onClick={speakStatus}>WAKE</button>
+                <button type="button" onClick={startVoice}>LISTEN</button>
+                <button type="button" onClick={speakStatus}>SPEAK</button>
+              </div>
+              <small className={styles.muted}>Jarvis will not fake voice, microphone access, or speech output.</small>
+            </section>
 
-            <div className={styles.panelTitle}>Providers · Honest States</div>
-            <div className={styles.deckStack}>
-              {providers.map((item) => <DeckCard key={item.name} item={item} />)}
-            </div>
+            <section className={styles.layoutPanel}>
+              <div className={styles.panelTitle}>Candidate Operations snapshot</div>
+              <div className={styles.snapshotList}>
+                <span>Intake · adapter-gated</span>
+                <span>Documents · proof-needed</span>
+                <span>Workbench · proof-needed</span>
+                <span>Finance/comms · proof-needed</span>
+              </div>
+            </section>
+
+            <section className={styles.layoutPanel}>
+              <div className={styles.panelTitle}>Route Universe map</div>
+              <div className={styles.routeMap}>
+                <span>CAO</span>
+                <span>NSFAS</span>
+                <span>TVET</span>
+                <span>SETA</span>
+                <span>Employer</span>
+              </div>
+              <small className={styles.muted}>Route counts stay proof-needed until route API proof exists.</small>
+            </section>
           </aside>
 
-          <section className={styles.centerCore}>
-            <section className={styles.orbWrap}>
+          <section className={styles.lockedCentre}>
+            <section className={styles.heroCore}>
+              <div className={styles.blueWave} />
               <div className={styles.ringOne} />
               <div className={styles.ringTwo} />
               <div className={styles.ringThree} />
@@ -422,70 +416,25 @@ export default function JarvisHudClient({ surface }: { surface: string }) {
                 <span>J</span>
               </div>
               <div className={styles.orbCaption}>
-                <strong>{running ? `EXECUTING ${running}` : "COMMAND BRAIN · JARVIS CORE"}</strong>
-                <small>{backendVerified ? "Backend boundary verified" : "Backend boundary needs runtime proof"}</small>
+                <strong>{running ? `EXECUTING ${running}` : "JARVIS COMMAND BRAIN"}</strong>
+                <small>{backendVerified ? "Backend boundary verified" : "Backend boundary proof-needed"}</small>
               </div>
             </section>
-
-            <section className={styles.statGrid}>
-              <article><span>Cortex Load</span><strong>{running ? "ACTIVE" : "STANDBY"}</strong></article>
-              <article><span>Truth Sync</span><strong>{backendVerified ? "OK" : "REVIEW"}</strong></article>
-              <article><span>Voice Bridge</span><strong>{voiceState.toUpperCase()}</strong></article>
-              <article><span>Evidence</span><strong>{result ? "RETURNED" : "WAITING"}</strong></article>
-              <article><span>Runtime</span><strong>{runtimeVerified ? "CONFIRMED" : "PROOF NEEDED"}</strong></article>
-              <article><span>Ledger</span><strong>GIT + API</strong></article>
-            </section>
-
-            <div className={styles.proofLine}>
-              No app, tool, robot or agent is claimed live without runtime proof.
-            </div>
 
             <form className={styles.commandForm} onSubmit={submitCommand}>
               <input
                 value={commandInput}
                 onChange={(event) => setCommandInput(event.target.value)}
-                placeholder="Type command e.g. DB_LEDGER_CHECK"
+                placeholder="Ask, plan, decide, or give an objective..."
                 aria-label="Jarvis command input"
               />
               <button type="submit" disabled={running !== null}>
                 {running ? "RUNNING" : "EXECUTE"}
               </button>
-              <button type="button" onClick={startVoice} disabled={running !== null} className={styles.secondaryButton}>
-                {voiceState === "listening" ? "LISTENING" : voiceState === "unsupported" ? "NO VOICE" : "LISTEN"}
-              </button>
-              <button type="button" onClick={speakStatus} className={styles.secondaryButton}>
-                {voiceState === "speaking" ? "SPEAKING" : "SPEAK"}
-              </button>
             </form>
 
-            <div className={styles.quickDeck}>
-              {quickCommands.map((command) => (
-                <button key={command} type="button" onClick={() => { setCommandInput(command); runCommand(command); }} disabled={running !== null}>
-                  {command}
-                </button>
-              ))}
-            </div>
-
-            <section className={styles.resultPanel}>
-              <div className={styles.panelTitle}>Live Command Result</div>
-              {result ? (
-                <>
-                  <div className={result.ok ? styles.resultOk : styles.resultFail}>
-                    {result.ok ? "SUCCESS" : "FAILED"} · {result.commandId} · {result.durationMs}ms
-                  </div>
-                  <p>{result.message}</p>
-                  <small>Evidence: {result.evidencePath ?? "backend evidence required"}</small>
-                  <pre>{safeOutput(result.stdout + (result.stderr ? `\n\nSTDERR:\n${result.stderr}` : ""))}</pre>
-                </>
-              ) : (
-                <p className={styles.muted}>
-                  Execute a SAFE_READ command. Jarvis will return backend-boundary output here. Evidence remains the authority.
-                </p>
-              )}
-            </section>
-
             <section className={styles.latticePanel}>
-              <div className={styles.panelTitle}>Node Mesh · N00 → N20</div>
+              <div className={styles.panelTitle}>Kingsmen Work Map · N00-N20</div>
               <div className={styles.nodeGrid}>
                 {nodeNames.map((name, index) => {
                   const state = nodeState(index);
@@ -493,84 +442,128 @@ export default function JarvisHudClient({ surface }: { surface: string }) {
                     <article key={name} className={styles.nodeCard}>
                       <strong>N{String(index).padStart(2, "0")}</strong>
                       <span>{name}</span>
-                      <small className={stateClass(state)}>{state}</small>
+                      <small className={stateClass(state)}>{state === "Referenced Only" ? "adapter-gated" : "proof-needed"}</small>
                     </article>
                   );
                 })}
               </div>
             </section>
+
+            <section className={styles.centreLowerGrid}>
+              <section className={styles.resultPanel}>
+                <div className={styles.panelTitle}>Live Execution Timeline</div>
+                {executionTimeline.length > 0 ? executionTimeline.map((card) => (
+                  <article key={card.key} className={card.ok ? styles.truthCardOk : styles.truthCardWarn}>
+                    <div className={styles.cardState}>{card.ok ? "API" : "PROOF"}</div>
+                    <h3>{card.title}</h3>
+                    <p>{card.detail}</p>
+                  </article>
+                )) : (
+                  <p className={styles.muted}>proof-needed · waiting for status API timeline.</p>
+                )}
+              </section>
+
+              <section className={styles.resultPanel}>
+                <div className={styles.panelTitle}>Active Incidents</div>
+                {statusError ? (
+                  <article className={styles.truthCardWarn}>
+                    <div className={styles.cardState}>ERROR</div>
+                    <h3>Status API</h3>
+                    <p>{statusError}</p>
+                  </article>
+                ) : result && !result.ok ? (
+                  <article className={styles.truthCardWarn}>
+                    <div className={styles.cardState}>INCIDENT</div>
+                    <h3>{result.title}</h3>
+                    <p>{result.message}</p>
+                  </article>
+                ) : (
+                  <p className={styles.muted}>adapter-gated / proof-needed incident feed.</p>
+                )}
+              </section>
+
+              <section className={styles.resultPanel}>
+                <div className={styles.panelTitle}>Route Safety mini-map</div>
+                <div className={styles.routeSafetyMap}>
+                  <span>SAFE · verified route proof-needed</span>
+                  <span>WATCH · portal behaviour proof-needed</span>
+                  <span>RISK · manual review required</span>
+                  <span>BLOCK · MAP fallback required</span>
+                </div>
+              </section>
+            </section>
           </section>
 
-          <aside className={styles.rightRail}>
-            <section className={styles.voicePanel}>
-              <div className={styles.panelTitle}>Voice · Commander Channel</div>
-              <h3>Jarvis Voice Bridge</h3>
-              <strong>{voiceState === "unsupported" ? "Unavailable in this browser" : "Browser Runtime Only"}</strong>
-              <p>Greeting: Welcome to Kingsmen Command, Commander.</p>
-              <div className={styles.voiceButtons}>
-                <button type="button" onClick={speakStatus}>WAKE</button>
-                <button type="button" onClick={startVoice}>LISTEN</button>
-                <button type="button" onClick={speakStatus}>SPEAK</button>
-              </div>
-              <small>STT/TTS provider claims remain proof-gated.</small>
+          <aside className={styles.lockedRight}>
+            <section className={styles.layoutPanel}>
+              <div className={styles.panelTitle}>OpenClaw Gateway</div>
+              <p>Command registry · policy gate · evidence ledger.</p>
+              <span className={styles.stateProof}>proof-needed</span>
+              <button className={styles.fullButton} type="button" onClick={() => runCommand("OPENCLAW_GRIP_CHECK")} disabled={running !== null}>
+                Run OpenClaw check
+              </button>
             </section>
 
-            <section className={styles.cameraPanel}>
-              <video ref={videoRef} autoPlay muted playsInline className={styles.video} />
-              {!cameraActive ? (
-                <div className={styles.cameraPlaceholder}>
-                  <strong>VISUAL FEED STANDBY</strong>
-                  <span>Enable camera only when founder visual mode is needed.</span>
-                </div>
-              ) : null}
-            </section>
-            <button className={styles.fullButton} type="button" onClick={toggleCamera}>
-              {cameraActive ? "STOP VISUAL FEED" : "START VISUAL FEED"}
-            </button>
-            <button className={styles.fullButton} type="button" onClick={() => runCommand("OPENCLAW_GRIP_CHECK")} disabled={running !== null}>
-              RUN OPENCLAW GRIP CHECK
-            </button>
-
-            <section className={styles.boundaryBox}>
-              <div>
-                <strong>Oracle Lite</strong>
-                <span>Read · Inspect · Report</span>
-              </div>
-              <div>
-                <strong>Commander</strong>
-                <span>Execute · Commit · Seal</span>
-              </div>
-              <p>Boundary enforced by founder command plane. Runtime mutation requires signed intent and evidence.</p>
+            <section className={styles.layoutPanel}>
+              <div className={styles.panelTitle}>Playwright Scout</div>
+              <p>Probe only · manual fallback · MAP boundary.</p>
+              <span className={styles.stateProof}>proof-needed</span>
             </section>
 
-            <div className={styles.panelTitle}>Agents</div>
-            <div className={styles.compactDeck}>{agents.map((item) => <DeckCard key={item.name} item={item} />)}</div>
+            <section className={styles.layoutPanel}>
+              <div className={styles.panelTitle}>Oracle Lite Runtime</div>
+              <p>Local Commander runtime boundary.</p>
+              <span className={runtimeVerified ? styles.stateVerified : styles.stateProof}>
+                {runtimeVerified ? "runtime verified" : "proof-needed"}
+              </span>
+            </section>
 
-            <div className={styles.panelTitle}>Robots · Runtime</div>
-            <div className={styles.compactDeck}>{robots.map((item) => <DeckCard key={item.name} item={item} />)}</div>
+            <section className={styles.layoutPanel}>
+              <div className={styles.panelTitle}>Provider Matrix</div>
+              <div className={styles.providerMatrix}>
+                {providerMatrix.map((item) => (
+                  <article key={`${item.name}-${item.role}`}>
+                    <strong>{item.name}</strong>
+                    <span className={stateClass(item.state)}>
+                      {item.state === "Runtime Verified" ? "runtime-verified" : item.state === "Blocked / Missing Credentials" ? "blocked / proof-needed" : "adapter-gated / proof-needed"}
+                    </span>
+                  </article>
+                ))}
+              </div>
+            </section>
 
-            <div className={styles.panelTitle}>Tools</div>
-            <div className={styles.compactDeck}>{tools.map((item) => <DeckCard key={item.name} item={item} />)}</div>
+            <section className={styles.layoutPanel}>
+              <div className={styles.panelTitle}>Founder Command Plane</div>
+              <div className={styles.founderActions}>
+                {quickCommands.slice(0, 7).map((command) => (
+                  <button key={command} type="button" onClick={() => { setCommandInput(command); runCommand(command); }} disabled={running !== null}>
+                    {command.replace(/_/g, " ")}
+                  </button>
+                ))}
+              </div>
+              <div className={styles.commandCategoryRail}>
+                {commandCategories.length > 0 ? commandCategories.map((category) => (
+                  <span key={category}>{category} · API</span>
+                )) : <span>Command registry · proof-needed</span>}
+              </div>
+            </section>
 
-            <div className={styles.panelTitle}>Apps</div>
-            <div className={styles.compactDeck}>{apps.map((item) => <DeckCard key={item.name} item={item} />)}</div>
-
-            <div className={styles.commandGroups}>
-              <div className={styles.panelTitle}>Command Registry</div>
-              {Object.entries(grouped).map(([category, commands]) => (
-                <details key={category} open={category === "System" || category === "OpenClaw"}>
-                  <summary>{category}</summary>
-                  {commands.map((command) => (
-                    <button key={command.id} type="button" onClick={() => { setCommandInput(command.id); runCommand(command.id); }} disabled={running !== null}>
-                      <strong>{command.id}</strong>
-                      <span>{command.description}</span>
-                    </button>
-                  ))}
-                </details>
-              ))}
-            </div>
+            <section className={styles.layoutPanel}>
+              <div className={styles.panelTitle}>Evidence & Proof Centre</div>
+              <div className={styles.evidenceGrid}>
+                <article><strong>{status ? totalCount : "proof-needed"}</strong><span>Checks</span></article>
+                <article><strong>{status ? okCount : "proof-needed"}</strong><span>Confirmed</span></article>
+                <article><strong>{status ? proofNeededCount : "proof-needed"}</strong><span>Proof needed</span></article>
+              </div>
+              <p className={styles.muted}>No app, tool, robot or agent is claimed live without runtime proof.</p>
+            </section>
           </aside>
         </section>
+
+        <footer className={styles.bottomStrip}>
+          <span>KINGSMEN PROTOCOL · Zero trust architecture · Evidence before claims</span>
+          <span>{status?.generatedAt ? `Truth sync ${syncLabel}` : "Truth sync proof-needed"}</span>
+        </footer>
       </section>
     </main>
   );

@@ -1,4 +1,4 @@
-# JARVIS LOCKED PRODUCT SPEC
+﻿# JARVIS LOCKED PRODUCT SPEC
 
 Status: LOCKED
 Owner: Kingsmen Commander / Founder
@@ -99,7 +99,30 @@ Jarvis must be direct, professional, operational, and evidence-first.
 
 ---
 
-## 4. Voice lock
+## 4. Layout lock
+
+Use the supplied futuristic command centre image only as visual and layout reference. Do not screenshot-match it. Jarvis must be implemented as a live, premium, wired command interface.
+
+Locked panel arrangement:
+
+- Top bar: Kingsmen crest/logo left, system online/proof status plus latest truth-sync date/time right.
+- Left column: Commander profile card, Mission stats with four values from the status API only, Voice Link waveform, Candidate Operations snapshot, Route Universe map.
+- Centre: JARVIS orb plus waveform, command input bar, Kingsmen Work Map N00-N20 grid, Live Execution Timeline, Active Incidents, Route Safety mini-map.
+- Right column: OpenClaw Gateway, Playwright Scout, Oracle Lite Runtime, Provider Matrix grid, Founder Command Plane, Evidence & Proof Centre.
+- Bottom: protocol/status strip.
+
+Data law:
+
+- Do not hardcode numbers copied from reference images.
+- Every number shown in the UI must come from a real API payload or display `proof-needed`.
+- Every provider, app, tool, robot, agent, route, or runtime status must come from a real API payload or display `adapter-gated`, `proof-needed`, or `blocked / proof-needed`.
+- Never display `connected`, `live`, `online`, `verified`, or `complete` unless runtime evidence exists.
+- The real implementation target is `apps/web/src/app/jarvis/JarvisHudClient.tsx`.
+- Do not implement this layout in `jarvis-os.html` or any rejected static surface.
+- The rejected black/white static Jarvis screen must never be treated as the accepted production surface.
+
+---
+## 5. Voice lock
 
 Voice is mandatory. It is not decoration.
 
@@ -118,7 +141,7 @@ Required voice boundary:
 
 ---
 
-## 5. Agents / robots / tools / apps lock
+## 6. Agents / robots / tools / apps lock
 
 Jarvis must surface the command mesh as first-class systems.
 
@@ -143,7 +166,7 @@ Runtime rule:
 
 ---
 
-## 6. Provider and app lock
+## 7. Provider and app lock
 
 Provider/app names are not proof of connection.
 
@@ -186,7 +209,7 @@ Never display `connected` unless the connector has runtime proof and credential 
 
 ---
 
-## 7. OpenClaw lock
+## 8. OpenClaw lock
 
 OpenClaw is the command gateway.
 
@@ -203,7 +226,7 @@ OpenClaw must never silently write files, run dangerous commands, bypass approva
 
 ---
 
-## 8. Playwright lock
+## 9. Playwright lock
 
 Playwright is a scout/probe only.
 
@@ -218,7 +241,7 @@ Playwright must support route reality checks, not fake admissions execution.
 
 ---
 
-## 9. Architecture lock
+## 10. Architecture lock
 
 Kingsmen platform doctrine remains:
 
@@ -301,11 +324,11 @@ No operational claim is complete without proof.
 
 Known verified commits:
 
-- `3c3d4f8` — Replace rejected black white Jarvis with premium command centre
-- `8677c61` — Seal Jarvis command mesh proof and matrix JSON
-- `6b57b9f` — Surface Jarvis agents robots tools and apps command mesh
-- `fea0507` — Build live Jarvis from registered repo inventory
-- `1d328d4` — Force-register Jarvis audit JSON inventory
+- `3c3d4f8` â€” Replace rejected black white Jarvis with premium command centre
+- `8677c61` â€” Seal Jarvis command mesh proof and matrix JSON
+- `6b57b9f` â€” Surface Jarvis agents robots tools and apps command mesh
+- `fea0507` â€” Build live Jarvis from registered repo inventory
+- `1d328d4` â€” Force-register Jarvis audit JSON inventory
 
 Known audit baseline:
 
@@ -359,3 +382,4 @@ Every future AI, code assistant, GitHub task, Claude Code session, or manual bui
 5. Run local validation before editing.
 
 If those files are unavailable, stop and recover the spec first.
+
