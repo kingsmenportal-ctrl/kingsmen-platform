@@ -139,6 +139,107 @@ button:hover{border-color:var(--gold);box-shadow:0 0 22px rgba(25,183,255,.24);t
 @media(max-width:1300px){.header,.grid{grid-template-columns:1fr}.brain{grid-template-columns:1fr}.meshGrid,.reportGrid,.providerGrid,.map,.footer,.statGrid{grid-template-columns:1fr 1fr}}
 @media(max-width:700px){.meshGrid,.reportGrid,.providerGrid,.map,.footer,.statGrid{grid-template-columns:1fr}.orb{width:190px;height:190px}}
 </style>
+
+<style id="kingsmen-final-colour-command-lock">
+  :root {
+    --km-void: #020612;
+    --km-obsidian: #050b18;
+    --km-navy: #071a3a;
+    --km-royal: #0d47ff;
+    --km-cyan: #00d9ff;
+    --km-gold: #f2d38b;
+    --km-cream: #fff6d8;
+  }
+
+  html,
+  body {
+    background:
+      radial-gradient(circle at 50% 8%, rgba(0, 217, 255, .24), transparent 30%),
+      radial-gradient(circle at 84% 18%, rgba(13, 71, 255, .20), transparent 34%),
+      radial-gradient(circle at 16% 20%, rgba(242, 211, 139, .14), transparent 30%),
+      linear-gradient(135deg, var(--km-void), var(--km-obsidian) 48%, #06112a 100%) !important;
+    color: var(--km-cream) !important;
+  }
+
+  body::before {
+    content: "";
+    position: fixed;
+    inset: 0;
+    pointer-events: none;
+    background:
+      linear-gradient(rgba(0,217,255,.045) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(0,217,255,.035) 1px, transparent 1px);
+    background-size: 44px 44px;
+    mask-image: radial-gradient(circle at 50% 18%, black, transparent 76%);
+    z-index: 0;
+  }
+
+  body > * {
+    position: relative;
+    z-index: 1;
+  }
+
+  section,
+  article,
+  aside,
+  header,
+  footer,
+  main > div,
+  button,
+  input,
+  textarea,
+  pre {
+    border-color: rgba(0, 217, 255, .38) !important;
+    box-shadow:
+      0 0 34px rgba(0, 217, 255, .11),
+      inset 0 0 24px rgba(242, 211, 139, .055) !important;
+  }
+
+  section,
+  article,
+  aside,
+  header,
+  footer,
+  main > div,
+  pre {
+    background:
+      linear-gradient(145deg, rgba(5, 11, 24, .94), rgba(7, 26, 58, .76)) !important;
+  }
+
+  h1,
+  h2,
+  h3,
+  strong,
+  b,
+  button {
+    color: var(--km-gold) !important;
+    text-shadow: 0 0 20px rgba(0, 217, 255, .24) !important;
+  }
+
+  p,
+  span,
+  small,
+  li,
+  pre {
+    color: #dbe9ff !important;
+  }
+
+  button,
+  input {
+    background: linear-gradient(135deg, rgba(0, 217, 255, .14), rgba(242, 211, 139, .11)) !important;
+    color: var(--km-cream) !important;
+  }
+
+  [class*="orb"],
+  [class*="ring"],
+  [class*="wave"],
+  [class*="brain"],
+  [class*="jarvis"] {
+    border-color: rgba(0, 217, 255, .52) !important;
+    color: var(--km-cyan) !important;
+    box-shadow: 0 0 54px rgba(0, 217, 255, .26) !important;
+  }
+</style>
 </head>
 <body>
 <div class="shell">
@@ -154,7 +255,7 @@ button:hover{border-color:var(--gold);box-shadow:0 0 22px rgba(25,183,255,.24);t
     <div class="hero">
       <div class="kicker">Kingsmen Premium Command House</div>
       <h1>JARVIS</h1>
-      <div class="sub">Founder AI Operating Assistant · Agents · Robots · Tools · Apps</div>
+      <div class="sub">Founder AI Operating Assistant Â· Agents Â· Robots Â· Tools Â· Apps</div>
     </div>
     <div class="panel">
       <div class="pills">
@@ -193,9 +294,9 @@ button:hover{border-color:var(--gold);box-shadow:0 0 22px rgba(25,183,255,.24);t
     <main class="stack">
       <div class="panel brain">
         <div>
-          <div class="kicker">1 · Command Brain</div>
+          <div class="kicker">1 Â· Command Brain</div>
           <h2>OpenAI-ready reasoning core</h2>
-          <p>Understand objective · inspect context · map options · assess risk · retrieve evidence · draft plan · ready for action.</p>
+          <p>Understand objective Â· inspect context Â· map options Â· assess risk Â· retrieve evidence Â· draft plan Â· ready for action.</p>
           <div class="commandInput">
             <input id="cmd" value="Tell me about Jarvis command mesh"/>
             <button id="send">Execute</button>
@@ -247,15 +348,15 @@ No app, tool, robot or agent is claimed live without runtime proof.</div>
       <div class="panel">
         <div class="kicker">Gateway Stack</div>
         <div class="meshGrid">
-          <div class="card"><b>OpenClaw Gateway</b><small>Command registry · policy gate · evidence ledger</small></div>
-          <div class="card"><b>Playwright Scout</b><small>Probe · manual fallback · MAP boundary</small></div>
+          <div class="card"><b>OpenClaw Gateway</b><small>Command registry Â· policy gate Â· evidence ledger</small></div>
+          <div class="card"><b>Playwright Scout</b><small>Probe Â· manual fallback Â· MAP boundary</small></div>
           <div class="card"><b>Oracle Lite Runtime</b><small>Local Commander runtime boundary</small></div>
-          <div class="card"><b>Evidence Centre</b><small>Deploy logs · validators · route safety</small></div>
+          <div class="card"><b>Evidence Centre</b><small>Deploy logs Â· validators Â· route safety</small></div>
         </div>
       </div>
       <div class="panel">
         <div class="kicker">Provider Matrix</div>
-        <div class="providerGrid"><div class="card"><b>OpenAI</b><small>FOUND_NEEDS_RUNTIME_PROOF · 232 hits</small></div><div class="card"><b>GitHub</b><small>FOUND_NEEDS_RUNTIME_PROOF · 2623 hits</small></div><div class="card"><b>Netlify</b><small>FOUND_NEEDS_RUNTIME_PROOF · 252 hits</small></div><div class="card"><b>Canva</b><small>REFERENCED_ONLY · 143 hits</small></div><div class="card"><b>Gmail</b><small>FOUND_NEEDS_RUNTIME_PROOF · 255 hits</small></div><div class="card"><b>Google Drive</b><small>FOUND_NEEDS_RUNTIME_PROOF · 273 hits</small></div><div class="card"><b>Google Calendar</b><small>FOUND_NEEDS_RUNTIME_PROOF · 735 hits</small></div><div class="card"><b>Airtable</b><small>FOUND_NEEDS_RUNTIME_PROOF · 4005 hits</small></div><div class="card"><b>Neon</b><small>FOUND_NEEDS_RUNTIME_PROOF · 164 hits</small></div><div class="card"><b>Supabase</b><small>FOUND_NEEDS_RUNTIME_PROOF · 836 hits</small></div><div class="card"><b>PayFast</b><small>FOUND_NEEDS_RUNTIME_PROOF · 3498 hits</small></div><div class="card"><b>AI Wisebase</b><small>REFERENCED_ONLY · 61 hits</small></div><div class="card"><b>B12</b><small>REFERENCED_ONLY · 103 hits</small></div><div class="card"><b>Norton</b><small>REFERENCED_ONLY · 44 hits</small></div><div class="card"><b>Replit</b><small>REFERENCED_ONLY · 44 hits</small></div><div class="card"><b>Catalyst</b><small>REFERENCED_ONLY · 44 hits</small></div><div class="card"><b>Lovable</b><small>FOUND_NEEDS_RUNTIME_PROOF · 65 hits</small></div><div class="card"><b>Namecheap</b><small>FOUND_NEEDS_RUNTIME_PROOF · 47 hits</small></div><div class="card"><b>Softonic</b><small>REFERENCED_ONLY · 41 hits</small></div><div class="card"><b>Vivin</b><small>REFERENCED_ONLY · 50 hits</small></div><div class="card"><b>Voice Generator</b><small>FOUND_NEEDS_RUNTIME_PROOF · 49 hits</small></div></div>
+        <div class="providerGrid"><div class="card"><b>OpenAI</b><small>FOUND_NEEDS_RUNTIME_PROOF Â· 232 hits</small></div><div class="card"><b>GitHub</b><small>FOUND_NEEDS_RUNTIME_PROOF Â· 2623 hits</small></div><div class="card"><b>Netlify</b><small>FOUND_NEEDS_RUNTIME_PROOF Â· 252 hits</small></div><div class="card"><b>Canva</b><small>REFERENCED_ONLY Â· 143 hits</small></div><div class="card"><b>Gmail</b><small>FOUND_NEEDS_RUNTIME_PROOF Â· 255 hits</small></div><div class="card"><b>Google Drive</b><small>FOUND_NEEDS_RUNTIME_PROOF Â· 273 hits</small></div><div class="card"><b>Google Calendar</b><small>FOUND_NEEDS_RUNTIME_PROOF Â· 735 hits</small></div><div class="card"><b>Airtable</b><small>FOUND_NEEDS_RUNTIME_PROOF Â· 4005 hits</small></div><div class="card"><b>Neon</b><small>FOUND_NEEDS_RUNTIME_PROOF Â· 164 hits</small></div><div class="card"><b>Supabase</b><small>FOUND_NEEDS_RUNTIME_PROOF Â· 836 hits</small></div><div class="card"><b>PayFast</b><small>FOUND_NEEDS_RUNTIME_PROOF Â· 3498 hits</small></div><div class="card"><b>AI Wisebase</b><small>REFERENCED_ONLY Â· 61 hits</small></div><div class="card"><b>B12</b><small>REFERENCED_ONLY Â· 103 hits</small></div><div class="card"><b>Norton</b><small>REFERENCED_ONLY Â· 44 hits</small></div><div class="card"><b>Replit</b><small>REFERENCED_ONLY Â· 44 hits</small></div><div class="card"><b>Catalyst</b><small>REFERENCED_ONLY Â· 44 hits</small></div><div class="card"><b>Lovable</b><small>FOUND_NEEDS_RUNTIME_PROOF Â· 65 hits</small></div><div class="card"><b>Namecheap</b><small>FOUND_NEEDS_RUNTIME_PROOF Â· 47 hits</small></div><div class="card"><b>Softonic</b><small>REFERENCED_ONLY Â· 41 hits</small></div><div class="card"><b>Vivin</b><small>REFERENCED_ONLY Â· 50 hits</small></div><div class="card"><b>Voice Generator</b><small>FOUND_NEEDS_RUNTIME_PROOF Â· 49 hits</small></div></div>
       </div>
       <div class="panel">
         <div class="kicker">Founder Command Plane</div>
@@ -295,8 +396,8 @@ const views = {
   agents: '<div class="meshGrid">' + data.mesh.agents.terms.map(x=>card(x,"agent command term")).join("") + '</div>',
   robots: '<div class="meshGrid">' + data.mesh.robots.terms.map(x=>card(x,"robot / automation term")).join("") + '</div>',
   tools: '<div class="meshGrid">' + data.mesh.tools.terms.map(x=>card(x,"tool / validator / proof term")).join("") + '</div>',
-  apps: '<div class="meshGrid">' + data.apps.map(x=>card(x,"registered app · runtime proof required")).join("") + '</div>',
-  providers: '<div class="providerGrid">' + data.providers.map(p=>card(p.provider,p.repoStatus+" · "+p.hitCount+" hits")).join("") + '</div>',
+  apps: '<div class="meshGrid">' + data.apps.map(x=>card(x,"registered app Â· runtime proof required")).join("") + '</div>',
+  providers: '<div class="providerGrid">' + data.providers.map(p=>card(p.provider,p.repoStatus+" Â· "+p.hitCount+" hits")).join("") + '</div>',
   modules: '<div class="map">' + data.modules.map(m=>'<div class="module"><b>'+m[0]+'</b><small>'+m[1]+'<br/>Live map</small></div>').join("") + '</div>',
   evidence: '<div class="reportGrid">' +
     '<a class="card" href="/jarvis/reports/JARVIS_FULL_REPO_INVENTORY_LATEST.md" target="_blank"><b>Inventory</b><small>Open proof</small></a>' +

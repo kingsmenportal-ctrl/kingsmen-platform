@@ -1019,3 +1019,63 @@
     grid-template-columns: 1fr;
   }
 }
+
+/* KINGSMEN FINAL COLOUR COMMAND LOCK */
+.shell {
+  background:
+    radial-gradient(circle at 50% 8%, rgba(0, 217, 255, .24), transparent 30%),
+    radial-gradient(circle at 84% 18%, rgba(13, 71, 255, .20), transparent 34%),
+    radial-gradient(circle at 16% 20%, rgba(242, 211, 139, .14), transparent 30%),
+    linear-gradient(135deg, #020612, #050b18 48%, #06112a 100%) !important;
+  color: #fff6d8 !important;
+}
+
+.lockedHud,
+.lockedTopBar,
+.layoutPanel,
+.heroCore,
+.resultPanel,
+.bottomStrip,
+.nodeCard,
+.providerMatrix article,
+.missionGrid article,
+.evidenceGrid article {
+  border-color: rgba(0, 217, 255, .38) !important;
+  background:
+    linear-gradient(145deg, rgba(5, 11, 24, .94), rgba(7, 26, 58, .76)) !important;
+  box-shadow:
+    0 0 34px rgba(0, 217, 255, .11),
+    inset 0 0 24px rgba(242, 211, 139, .055) !important;
+}
+
+.lockedBrand div > span,
+.panelTitle,
+.nodeCard strong,
+.missionGrid strong,
+.evidenceGrid strong,
+.orbCaption strong {
+  color: #f2d38b !important;
+  text-shadow: 0 0 20px rgba(0, 217, 255, .24) !important;
+}
+
+.commanderProfile p,
+.commanderProfile small,
+.layoutPanel p,
+.snapshotList span,
+.routeSafetyMap span,
+.commandCategoryRail span,
+.nodeCard span,
+.nodeCard small,
+.muted {
+  color: #dbe9ff !important;
+}
+
+.commandForm button,
+.voiceButtons button,
+.fullButton,
+.founderActions button {
+  border-color: rgba(0, 217, 255, .44) !important;
+  background: linear-gradient(135deg, rgba(0, 217, 255, .14), rgba(242, 211, 139, .11)) !important;
+  color: #fff6d8 !important;
+}
+
