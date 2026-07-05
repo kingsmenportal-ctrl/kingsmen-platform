@@ -45,7 +45,7 @@ function providerStatus(name) {
 }
 function cardList(items, kind) {
   return items.map(item => {
-    const name = Array.isArray(item) ? item[0] + " · " + item[1] : item;
+    const name = Array.isArray(item) ? item[0] + " Â· " + item[1] : item;
     const status = kind === "apps" ? providerStatus(item) : "live map";
     return `<button class="glassCard"><span>${esc(name)}</span><small>${esc(status)}</small></button>`;
   }).join("");
@@ -328,7 +328,7 @@ button:hover{border-color:var(--gold);box-shadow:0 0 22px rgba(25,183,255,.24);t
     <div class="hero">
       <div class="kicker">Kingsmen Premium Command House</div>
       <h1>JARVIS</h1>
-      <div class="sub">Founder AI Operating Assistant · Agents · Robots · Tools · Apps</div>
+      <div class="sub">Founder AI Operating Assistant Â· Agents Â· Robots Â· Tools Â· Apps</div>
     </div>
     <div class="panel">
       <div class="pills">
@@ -367,9 +367,9 @@ button:hover{border-color:var(--gold);box-shadow:0 0 22px rgba(25,183,255,.24);t
     <main class="stack">
       <div class="panel brain">
         <div>
-          <div class="kicker">1 · Command Brain</div>
+          <div class="kicker">1 Â· Command Brain</div>
           <h2>OpenAI-ready reasoning core</h2>
-          <p>Understand objective · inspect context · map options · assess risk · retrieve evidence · draft plan · ready for action.</p>
+          <p>Understand objective Â· inspect context Â· map options Â· assess risk Â· retrieve evidence Â· draft plan Â· ready for action.</p>
           <div class="commandInput">
             <input id="cmd" value="Tell me about Jarvis command mesh"/>
             <button id="send">Execute</button>
@@ -421,15 +421,15 @@ No app, tool, robot or agent is claimed live without runtime proof.</div>
       <div class="panel">
         <div class="kicker">Gateway Stack</div>
         <div class="meshGrid">
-          <div class="card"><b>OpenClaw Gateway</b><small>Command registry · policy gate · evidence ledger</small></div>
-          <div class="card"><b>Playwright Scout</b><small>Probe · manual fallback · MAP boundary</small></div>
+          <div class="card"><b>OpenClaw Gateway</b><small>Command registry Â· policy gate Â· evidence ledger</small></div>
+          <div class="card"><b>Playwright Scout</b><small>Probe Â· manual fallback Â· MAP boundary</small></div>
           <div class="card"><b>Oracle Lite Runtime</b><small>Local Commander runtime boundary</small></div>
-          <div class="card"><b>Evidence Centre</b><small>Deploy logs · validators · route safety</small></div>
+          <div class="card"><b>Evidence Centre</b><small>Deploy logs Â· validators Â· route safety</small></div>
         </div>
       </div>
       <div class="panel">
         <div class="kicker">Provider Matrix</div>
-        <div class="providerGrid">${providers.slice(0,21).map(p => `<div class="card"><b>${esc(p.provider)}</b><small>${esc(p.repoStatus)} · ${p.hitCount} hits</small></div>`).join("")}</div>
+        <div class="providerGrid">${providers.slice(0,21).map(p => `<div class="card"><b>${esc(p.provider)}</b><small>${esc(p.repoStatus)} Â· ${p.hitCount} hits</small></div>`).join("")}</div>
       </div>
       <div class="panel">
         <div class="kicker">Founder Command Plane</div>
@@ -469,8 +469,8 @@ const views = {
   agents: '<div class="meshGrid">' + data.mesh.agents.terms.map(x=>card(x,"agent command term")).join("") + '</div>',
   robots: '<div class="meshGrid">' + data.mesh.robots.terms.map(x=>card(x,"robot / automation term")).join("") + '</div>',
   tools: '<div class="meshGrid">' + data.mesh.tools.terms.map(x=>card(x,"tool / validator / proof term")).join("") + '</div>',
-  apps: '<div class="meshGrid">' + data.apps.map(x=>card(x,"registered app · runtime proof required")).join("") + '</div>',
-  providers: '<div class="providerGrid">' + data.providers.map(p=>card(p.provider,p.repoStatus+" · "+p.hitCount+" hits")).join("") + '</div>',
+  apps: '<div class="meshGrid">' + data.apps.map(x=>card(x,"registered app Â· runtime proof required")).join("") + '</div>',
+  providers: '<div class="providerGrid">' + data.providers.map(p=>card(p.provider,p.repoStatus+" Â· "+p.hitCount+" hits")).join("") + '</div>',
   modules: '<div class="map">' + data.modules.map(m=>'<div class="module"><b>'+m[0]+'</b><small>'+m[1]+'<br/>Live map</small></div>').join("") + '</div>',
   evidence: '<div class="reportGrid">' +
     '<a class="card" href="/jarvis/reports/JARVIS_FULL_REPO_INVENTORY_LATEST.md" target="_blank"><b>Inventory</b><small>Open proof</small></a>' +
@@ -533,7 +533,7 @@ export default function JarvisPage() {
   );
 }
 `;
-write("apps/web/src/app/jarvis/page.tsx", page);
+console.log("REAL_JARVIS_ROUTE_PRESERVED: static generator may update jarvis-os archive, but must not overwrite apps/web/src/app/jarvis/page.tsx");
 const proxy = `console.log("PREMIUM_JARVIS_BUILDER_ACTIVE: black/white Jarvis is banned.");
 require("./build-jarvis-premium-command-centre.cjs");
 `;
