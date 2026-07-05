@@ -1,4 +1,4 @@
-﻿const fs = require("fs");
+const fs = require("fs");
 const path = require("path");
 const root = process.cwd();
 function readJson(file) {
@@ -211,6 +211,107 @@ button:hover{border-color:var(--gold);box-shadow:0 0 22px rgba(25,183,255,.24);t
 }
 @media(max-width:1300px){.header,.grid{grid-template-columns:1fr}.brain{grid-template-columns:1fr}.meshGrid,.reportGrid,.providerGrid,.map,.footer,.statGrid{grid-template-columns:1fr 1fr}}
 @media(max-width:700px){.meshGrid,.reportGrid,.providerGrid,.map,.footer,.statGrid{grid-template-columns:1fr}.orb{width:190px;height:190px}}
+</style>
+
+<style id="kingsmen-final-colour-command-lock">
+  :root {
+    --km-void: #020612;
+    --km-obsidian: #050b18;
+    --km-navy: #071a3a;
+    --km-royal: #0d47ff;
+    --km-cyan: #00d9ff;
+    --km-gold: #f2d38b;
+    --km-cream: #fff6d8;
+  }
+
+  html,
+  body {
+    background:
+      radial-gradient(circle at 50% 8%, rgba(0, 217, 255, .24), transparent 30%),
+      radial-gradient(circle at 84% 18%, rgba(13, 71, 255, .20), transparent 34%),
+      radial-gradient(circle at 16% 20%, rgba(242, 211, 139, .14), transparent 30%),
+      linear-gradient(135deg, var(--km-void), var(--km-obsidian) 48%, #06112a 100%) !important;
+    color: var(--km-cream) !important;
+  }
+
+  body::before {
+    content: "";
+    position: fixed;
+    inset: 0;
+    pointer-events: none;
+    background:
+      linear-gradient(rgba(0,217,255,.045) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(0,217,255,.035) 1px, transparent 1px);
+    background-size: 44px 44px;
+    mask-image: radial-gradient(circle at 50% 18%, black, transparent 76%);
+    z-index: 0;
+  }
+
+  body > * {
+    position: relative;
+    z-index: 1;
+  }
+
+  section,
+  article,
+  aside,
+  header,
+  footer,
+  main > div,
+  button,
+  input,
+  textarea,
+  pre {
+    border-color: rgba(0, 217, 255, .38) !important;
+    box-shadow:
+      0 0 34px rgba(0, 217, 255, .11),
+      inset 0 0 24px rgba(242, 211, 139, .055) !important;
+  }
+
+  section,
+  article,
+  aside,
+  header,
+  footer,
+  main > div,
+  pre {
+    background:
+      linear-gradient(145deg, rgba(5, 11, 24, .94), rgba(7, 26, 58, .76)) !important;
+  }
+
+  h1,
+  h2,
+  h3,
+  strong,
+  b,
+  button {
+    color: var(--km-gold) !important;
+    text-shadow: 0 0 20px rgba(0, 217, 255, .24) !important;
+  }
+
+  p,
+  span,
+  small,
+  li,
+  pre {
+    color: #dbe9ff !important;
+  }
+
+  button,
+  input {
+    background: linear-gradient(135deg, rgba(0, 217, 255, .14), rgba(242, 211, 139, .11)) !important;
+    color: var(--km-cream) !important;
+  }
+
+  [class*="orb"],
+  [class*="ring"],
+  [class*="wave"],
+  [class*="brain"],
+  [class*="jarvis"] {
+    border-color: rgba(0, 217, 255, .52) !important;
+    color: var(--km-cyan) !important;
+    box-shadow: 0 0 54px rgba(0, 217, 255, .26) !important;
+  }
 </style>
 </head>
 <body>
