@@ -1,4 +1,4 @@
-﻿#!/usr/bin/env node
+#!/usr/bin/env node
 import fs from "node:fs";
 import path from "node:path";
 import net from "node:net";
@@ -202,7 +202,7 @@ function safeJson(text) {
 
 try {
   const required = [
-    "apps/web/public/founder/proof-centre/index.html",
+    "apps/web/src/app/founder/proof-centre/page.tsx",
     "apps/web/src/app/founder/proof-centre/page.tsx",
     "apps/web/public/founder/proof-centre/adapter.json",
     "reports/control-plane/founder-proof-centre-page-wiring-proof.json",
