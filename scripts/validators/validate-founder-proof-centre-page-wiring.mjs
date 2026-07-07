@@ -1,4 +1,4 @@
-﻿#!/usr/bin/env node
+#!/usr/bin/env node
 import fs from "node:fs";
 import path from "node:path";
 
@@ -11,7 +11,7 @@ const expectedFiles = [
   "packages/contracts/src/founder-proof-centre-page.ts",
   "scripts/proof/prove-founder-proof-centre-page-wiring.mjs",
   "scripts/validators/validate-founder-proof-centre-page-wiring.mjs",
-  "apps/web/public/founder/proof-centre/index.html",
+  "apps/web/src/app/founder/proof-centre/page.tsx",
   "apps/web/public/founder/proof-centre/adapter.json",
   "reports/control-plane/founder-proof-centre-page-wiring-proof.json"
 ];
@@ -50,11 +50,9 @@ const proof = exists("reports/control-plane/founder-proof-centre-page-wiring-pro
   ? readJson("reports/control-plane/founder-proof-centre-page-wiring-proof.json")
   : null;
 
-const html = exists("apps/web/public/founder/proof-centre/index.html")
-  ? readText("apps/web/public/founder/proof-centre/index.html")
-  : "";
+const route = exists("apps/web/src/app/founder/proof-centre/page.tsx") ? readText("apps/web/src/app/founder/proof-centre/page.tsx") : "";
 
-check("web-public-page-path", exists("apps/web/public/founder/proof-centre/index.html"), "static public page");
+check("web-next-route-path", exists("apps/web/src/app/founder/proof-centre/page.tsx"), "real Next route");
 check("web-public-adapter-path", exists("apps/web/public/founder/proof-centre/adapter.json"), "static public adapter");
 check("page-model-schema", pageModel?.schema === "kingsmen.founder-proof-centre-page.v1", pageModel?.schema ?? "missing");
 check("page-model-local-only", pageModel?.runtimeScope === "local_static_founder_page_wiring_only", pageModel?.runtimeScope ?? "missing");
@@ -64,11 +62,11 @@ check("page-model-no-production", pageModel?.productionReady === false && pageMo
 check("page-model-no-oracle", pageModel?.deployedToOracle === false && pageModel?.noOracleClaim === true, "oracle false");
 check("page-model-has-cards", Array.isArray(pageModel?.cards) && pageModel.cards.length >= 1, `cards=${pageModel?.cards?.length ?? 0}`);
 
-check("html-has-founder-title", html.includes("Kingsmen Founder Control Plane"), "founder title");
-check("html-has-proof-centre", html.includes("Build Proof Centre"), "proof centre");
-check("html-has-local-warning", html.includes("Local founder proof page only"), "local warning");
-check("html-has-no-production-claim", html.includes("does not claim production readiness"), "no production claim language");
-check("html-has-proven-badge", html.includes("PROVEN"), "proven badge");
+check("route-has-founder-title", route.includes("Kingsmen Founder Control Plane"), "founder title");
+check("route-has-proof-centre", route.includes("Build Proof Centre"), "proof centre");
+check("route-has-local-warning", route.includes("proof display only") || route.includes("Boundary: proof display only"), "proof display warning");
+check("route-has-no-production-claim", route.includes("does not claim production readiness"), "no production claim language");
+check("route-has-proven-badge", route.includes("PROVEN"), "proven badge");
 
 check("proof-schema", proof?.schema === "kingsmen.founder-proof-centre-page-wiring-proof.v1", proof?.schema ?? "missing");
 check("proof-status", proof?.status === "FOUNDER_PROOF_CENTRE_PAGE_WIRING_PROVEN", proof?.status ?? "missing");
@@ -88,7 +86,7 @@ const forbiddenHtmlPatterns = [
 ];
 
 for (const pattern of forbiddenHtmlPatterns) {
-  check(`html-no-forbidden:${pattern}`, !html.includes(pattern), pattern);
+  check(`route-no-forbidden:${pattern}`, !route.includes(pattern), pattern);
 }
 
 const failed = checks.filter((c) => c.passed !== true);
@@ -108,7 +106,7 @@ const validation = {
   oracle_lite_impact: "none_local_static_web_page_only",
   control_plane_impact: "Founder can view BATCH 24 proof cards through a tiny static web page once the local web app is running.",
   route_hint: "/founder/proof-centre/",
-  html: "apps/web/public/founder/proof-centre/index.html",
+  html: "apps/web/src/app/founder/proof-centre/page.tsx",
   public_adapter: "apps/web/public/founder/proof-centre/adapter.json",
   proof: "reports/control-plane/founder-proof-centre-page-wiring-proof.json",
   next_action: passed

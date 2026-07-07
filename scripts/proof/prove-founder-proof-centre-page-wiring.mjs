@@ -1,4 +1,4 @@
-﻿#!/usr/bin/env node
+#!/usr/bin/env node
 import fs from "node:fs";
 import path from "node:path";
 
@@ -11,7 +11,7 @@ const input = {
 };
 
 const output = {
-  html: "apps/web/public/founder/proof-centre/index.html",
+  nextRoute: "apps/web/src/app/founder/proof-centre/page.tsx",
   publicAdapter: "apps/web/public/founder/proof-centre/adapter.json",
   proof: "reports/control-plane/founder-proof-centre-page-wiring-proof.json"
 };
@@ -93,7 +93,7 @@ const pageModel = {
   routeHint: "/founder/proof-centre/",
   sourceAdapter: input.adapter,
   publicAdapterPath: output.publicAdapter,
-  htmlPath: output.html,
+  nextRoutePath: output.nextRoute,
   allCardsPassed,
   noProductionClaim,
   noOracleClaim,
@@ -316,10 +316,10 @@ const html = `<!doctype html>
 </html>
 `;
 
-writeText(output.html, html);
+// PUBLIC_FOUNDER_PROOF_CENTRE_INDEX_BLOCKED: no public route-shadow index is written.
 
 check("public-adapter-written", exists(output.publicAdapter), output.publicAdapter);
-check("founder-page-written", exists(output.html), output.html);
+check("founder-next-route-exists", exists(output.nextRoute), output.nextRoute);
 check("founder-page-local-only", pageModel.runtimeScope === "local_static_founder_page_wiring_only", pageModel.runtimeScope);
 check("founder-page-no-production", pageModel.productionReady === false && pageModel.canClaimProduction === false, "production false");
 check("founder-page-no-oracle", pageModel.deployedToOracle === false, "oracle false");
@@ -341,7 +341,7 @@ const proofReport = {
   deployedToOracle: false,
   generated_at: new Date().toISOString(),
   routeHint: "/founder/proof-centre/",
-  htmlPath: output.html,
+  nextRoutePath: output.nextRoute,
   publicAdapterPath: output.publicAdapter,
   sourceAdapter: input.adapter,
   checks,
