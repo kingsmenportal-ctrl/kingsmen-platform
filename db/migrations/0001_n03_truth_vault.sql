@@ -329,59 +329,59 @@ ALTER TABLE approval_requests ENABLE ROW LEVEL SECURITY;
 ALTER TABLE system_runtime_config ENABLE ROW LEVEL SECURITY;
 
 DROP POLICY IF EXISTS service_role_all_candidates ON candidates;
-CREATE POLICY service_role_all_candidates ON candidates
+CREATE POLICY service_role_all_candidates ON candidates TO service_role
   FOR ALL USING (true) WITH CHECK (true);
 
 DROP POLICY IF EXISTS service_role_all_candidate_profiles ON candidate_profiles;
-CREATE POLICY service_role_all_candidate_profiles ON candidate_profiles
+CREATE POLICY service_role_all_candidate_profiles ON candidate_profiles TO service_role
   FOR ALL USING (true) WITH CHECK (true);
 
 DROP POLICY IF EXISTS service_role_all_applications ON applications;
-CREATE POLICY service_role_all_applications ON applications
+CREATE POLICY service_role_all_applications ON applications TO service_role
   FOR ALL USING (true) WITH CHECK (true);
 
 DROP POLICY IF EXISTS service_role_all_idempotency_keys ON idempotency_keys;
-CREATE POLICY service_role_all_idempotency_keys ON idempotency_keys
+CREATE POLICY service_role_all_idempotency_keys ON idempotency_keys TO service_role
   FOR ALL USING (true) WITH CHECK (true);
 
 DROP POLICY IF EXISTS service_role_all_command_log ON command_log;
-CREATE POLICY service_role_all_command_log ON command_log
+CREATE POLICY service_role_all_command_log ON command_log TO service_role
   FOR ALL USING (true) WITH CHECK (true);
 
 DROP POLICY IF EXISTS service_role_all_workflow_runs ON workflow_runs;
-CREATE POLICY service_role_all_workflow_runs ON workflow_runs
+CREATE POLICY service_role_all_workflow_runs ON workflow_runs TO service_role
   FOR ALL USING (true) WITH CHECK (true);
 
 DROP POLICY IF EXISTS service_role_all_evidence_ledger ON evidence_ledger;
-CREATE POLICY service_role_all_evidence_ledger ON evidence_ledger
+CREATE POLICY service_role_all_evidence_ledger ON evidence_ledger TO service_role
   FOR ALL USING (true) WITH CHECK (true);
 
 DROP POLICY IF EXISTS service_role_all_audit_events ON audit_events;
-CREATE POLICY service_role_all_audit_events ON audit_events
+CREATE POLICY service_role_all_audit_events ON audit_events TO service_role
   FOR ALL USING (true) WITH CHECK (true);
 
 DROP POLICY IF EXISTS service_role_all_source_authorities ON source_authorities;
-CREATE POLICY service_role_all_source_authorities ON source_authorities
+CREATE POLICY service_role_all_source_authorities ON source_authorities TO service_role
   FOR ALL USING (true) WITH CHECK (true);
 
 DROP POLICY IF EXISTS service_role_all_route_sources ON route_sources;
-CREATE POLICY service_role_all_route_sources ON route_sources
+CREATE POLICY service_role_all_route_sources ON route_sources TO service_role
   FOR ALL USING (true) WITH CHECK (true);
 
 DROP POLICY IF EXISTS service_role_all_worker_heartbeats ON worker_heartbeats;
-CREATE POLICY service_role_all_worker_heartbeats ON worker_heartbeats
+CREATE POLICY service_role_all_worker_heartbeats ON worker_heartbeats TO service_role
   FOR ALL USING (true) WITH CHECK (true);
 
 DROP POLICY IF EXISTS service_role_all_dead_letter_queue ON dead_letter_queue;
-CREATE POLICY service_role_all_dead_letter_queue ON dead_letter_queue
+CREATE POLICY service_role_all_dead_letter_queue ON dead_letter_queue TO service_role
   FOR ALL USING (true) WITH CHECK (true);
 
 DROP POLICY IF EXISTS service_role_all_approval_requests ON approval_requests;
-CREATE POLICY service_role_all_approval_requests ON approval_requests
+CREATE POLICY service_role_all_approval_requests ON approval_requests TO service_role
   FOR ALL USING (true) WITH CHECK (true);
 
 DROP POLICY IF EXISTS service_role_all_system_runtime_config ON system_runtime_config;
-CREATE POLICY service_role_all_system_runtime_config ON system_runtime_config
+CREATE POLICY service_role_all_system_runtime_config ON system_runtime_config TO service_role
   FOR ALL USING (true) WITH CHECK (true);
 
 INSERT INTO system_runtime_config (key, value, description)
