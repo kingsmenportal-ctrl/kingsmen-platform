@@ -105,6 +105,10 @@ npm run payments:validate:sandbox
 
 This does not authorize live payments. Run real PayFast sandbox checkout against a staging notify URL before paid pilot.
 
+## RLS/security source-level boundary
+
+The source-level boundary is validated by `security:prove:rls` and `security:validate:rls`. These checks establish that the migration and isolation scenarios are present in source; they do **not** establish that staging PostgreSQL/Supabase has been migrated or that live role-isolation tests passed. Keep public launch blocked until a reviewed staging SQL isolation report exists.
+
 ## RLS/security proof command
 
 ```bash
