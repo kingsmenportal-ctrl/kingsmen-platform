@@ -33,6 +33,7 @@ check('candidate_public_ref_claim_function_exists', migration.includes('current_
 check('backend_service_context_trusted_claim', migration.includes("auth.jwt() -> 'app_metadata' ->> 'service_context'"), 'Backend context comes from server-managed JWT app_metadata, not client-settable GUCs.');
 check('candidate_claim_trusted_source', migration.includes("auth.jwt() -> 'app_metadata' ->> 'candidate_public_ref'"), 'Candidate public reference comes from server-managed JWT app_metadata.');
 check('definer_search_path_fixed', migration.includes('SET search_path = pg_catalog'), 'SECURITY DEFINER helper pins a safe search_path.');
+check('all_helper_search_paths_pinned', (migration.match(/SET search_path = pg_catalog/g) || []).length >= 7, 'All RLS helper functions pin search_path to pg_catalog.');
 check('no_public_helper_execute', !/GRANT\s+EXECUTE\s+ON\s+ALL\s+FUNCTIONS\s+IN\s+SCHEMA\s+kingsmen_security\s+TO\s+PUBLIC/i.test(migration), 'Security helper functions are not executable by PUBLIC.');
 check('broad_core_policies_role_scoped', (migration.match(/FOR ALL\s+TO service_role/g) || []).length >= 14, 'Broad backend policies are scoped to service_role.');
 check('candidate_own_row_policy_exists', migration.includes('candidates_candidate_read_own'), 'Candidate own-row policy exists.');
