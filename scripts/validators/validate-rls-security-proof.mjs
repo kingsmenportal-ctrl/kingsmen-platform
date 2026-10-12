@@ -57,7 +57,7 @@ const requiredFiles = [
   checkFile('scripts/proof/prove-rls-security-boundary.mjs', [
     'RLS_SECURITY_SOURCE_PROOF_PASSED',
     'candidate_cannot_read_other_candidate_row',
-    'service_role_key_absent_from_client_artifacts',
+    'backend_service_key_absent_from_client_artifacts',
     'backend_mutations_require_verified_server_context',
     'reports/security/rls-security-proof-latest.json'
   ]),
