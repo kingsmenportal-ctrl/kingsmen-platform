@@ -29,7 +29,7 @@ function check(name, passed, detail = '') {
 
 const requiredFiles = [
   checkFile('db/migrations/0001_n03_truth_vault.sql', ['ENABLE ROW LEVEL SECURITY', 'FOR ALL USING (true) WITH CHECK (true)']),
-  checkFile('db/migrations/0009_rls_security_boundary.sql', [
+  checkFile('db/migrations/0019_rls_security_boundary.sql', [
     'current_runtime_role',
     'current_service_context',
     'current_candidate_public_ref',
@@ -70,7 +70,7 @@ for (const fileCheck of requiredFiles) {
   check(`file:${fileCheck.path}`, fileCheck.passed, fileCheck.exists ? `missing=${fileCheck.missingTokens.join(', ')}` : 'missing file');
 }
 
-const hardeningMigration = read('db/migrations/0009_rls_security_boundary.sql') ?? '';
+const hardeningMigration = read('db/migrations/0019_rls_security_boundary.sql') ?? '';
 const broadTruePolicyPattern = /FOR\s+ALL\s+USING\s*\(\s*true\s*\)\s+WITH\s+CHECK\s*\(\s*true\s*\)/i;
 check('hardening_migration_no_broad_true_policy', !broadTruePolicyPattern.test(hardeningMigration), '0009 must not create tenant-blind true policies.');
 
