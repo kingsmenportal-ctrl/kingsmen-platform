@@ -25,6 +25,10 @@ The repo has source-level proof for backend API, PostgreSQL/Supabase Truth Vault
 11. **Capture the staging runtime proof pack.** Final assembly must not open until the staging runtime proof pack contains reviewed redacted runtime evidence for all P0 gates.
 12. **Capture final assembly evidence bundle.** The final assembly collector must summarize every required staging report with SHA-256/status/review/redaction fields and founder review must remain required.
 
+## RLS/security source-level boundary
+
+`RLS/security source-level boundary` is static evidence only; it is not proof of live tenant isolation. `RLS_SECURITY_SCRIPT_MISSING` means the required source validator or proof script is absent, and `RLS_STAGING_PROOF_REQUIRED` remains a hard launch gate until separate candidate, staff/operator, founder and backend identities have been tested against staging.
+
 ## Source proof command stack
 
 Run these commands for source-level proof only:
