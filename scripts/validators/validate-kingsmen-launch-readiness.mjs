@@ -86,7 +86,7 @@ const requiredFileChecks = [
   checkFile('db/migrations/0019_rls_security_boundary.sql', ['current_runtime_role', 'is_backend_service_role', 'candidates_candidate_read_own', 'applications_candidate_read_own', 'evidence_ledger_candidate_read_own_safe', 'route_sources_public_verified_read']),
   checkFile('manifests/security/rls-security-proof-v1.json', ['rls-security-proof-v1', 'foundation_built_pending_staging_proof', 'serviceRoleBypassesRLS', 'serviceRoleRequiresBackendContextAtApiLayer', 'candidateReadsOwnRowsOnly']),
   checkFile('docs/security/KINGSMEN_RLS_SECURITY_PROOF.md', ['trusted server-managed', 'service-role key bypasses RLS', 'staging proof']),
-  checkFile('scripts/proof/prove-rls-security-boundary.mjs', ['RLS_SECURITY_SOURCE_PROOF_PASSED', 'candidate_cannot_read_other_candidate_row', 'service_role_key_absent_from_client_artifacts', 'backend_mutations_require_verified_server_context']),
+  checkFile('scripts/proof/prove-rls-security-boundary.mjs', ['RLS_SECURITY_SOURCE_PROOF_PASSED', 'candidate_cannot_read_other_candidate_row', 'backend_service_key_absent_from_client_artifacts', 'backend_mutations_require_verified_server_context']),
   checkFile('scripts/validators/validate-rls-security-proof.mjs', ['RLS_SECURITY_PROOF_VALIDATED', 'security:validate:rls']),
 
   checkFile('db/migrations/0008_n10_finance_payfast.sql', ['payfast_payment_intents', 'payfast_itn_receipts', 'payment_evidence_ledger']),
