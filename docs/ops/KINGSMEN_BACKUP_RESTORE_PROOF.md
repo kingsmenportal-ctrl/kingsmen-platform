@@ -43,6 +43,7 @@ Configure source and restore database URLs in the staging operator's secure envi
 ```powershell
 $env:KINGSMEN_EXPECTED_SUPABASE_PROJECT_REF = "euhubhhnumtibbyufghm"
 $env:KINGSMEN_DATABASE_URL = "[source-staging-database-url-set-outside-git]"
+$env:KINGSMEN_RESTORE_ENVIRONMENT = "staging"
 $env:KINGSMEN_RESTORE_EXPECTED_SUPABASE_PROJECT_REF = "[distinct-disposable-staging-project-ref]"
 $env:KINGSMEN_RESTORE_DRILL_DATABASE_URL = "[distinct-restore-database-url-set-outside-git]"
 $env:KINGSMEN_BACKUP_EXPECTED_SHA256 = "[independently-captured-64-character-sha256]"
