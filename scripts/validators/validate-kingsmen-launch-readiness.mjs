@@ -88,6 +88,8 @@ const requiredFileChecks = [
   checkFile('docs/security/KINGSMEN_RLS_SECURITY_PROOF.md', ['app.kingsmen_role', 'app.service_context', 'staging proof']),
   checkFile('scripts/proof/prove-rls-security-boundary.mjs', ['RLS_SECURITY_SOURCE_PROOF_PASSED', 'candidate_cannot_read_other_candidate_row', 'service_role_without_backend_context_denied']),
   checkFile('scripts/validators/validate-rls-security-proof.mjs', ['RLS_SECURITY_PROOF_VALIDATED', 'security:validate:rls']),
+  // Explicit failure codes are kept in source so a missing RLS test harness cannot be mistaken for a pass.
+  checkFile('scripts/validators/validate-kingsmen-launch-readiness.mjs', ['RLS_SECURITY_SCRIPT_MISSING', 'RLS_STAGING_PROOF_REQUIRED']),
 
   checkFile('db/migrations/0008_n10_finance_payfast.sql', ['payfast_payment_intents', 'payfast_itn_receipts', 'payment_evidence_ledger']),
   checkFile('apps/api/src/finance/payfast-itn.ts', ['verifyPayFastSignature', 'expectedAmountCents', 'duplicate', 'ipValid']),
