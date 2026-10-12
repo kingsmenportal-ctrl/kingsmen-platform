@@ -120,7 +120,7 @@ checkFile('package.json', [
 checkFile('manifests/launch/kingsmen-launch-readiness-v1.json', [
   'payfast-sandbox-proof-v1',
   'foundation_built_pending_real_sandbox_evidence',
-  'PayFast sandbox and ITN verification evidence'
+  'PayFast sandbox and ITN evidence'
 ]);
 
 const forbiddenSecretPatterns = [
