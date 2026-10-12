@@ -1,10 +1,17 @@
 {
   "phase": "N18",
   "name": "Public Website / Route House Front Door",
-  "status": "foundation",
+  "status": "commercial_schedule_proposed_pending_founder_approval",
   "purpose": "Create the public-facing Kingsmen front door: route-house positioning, sector universe preview, free Destiny Map lead capture, pricing boundaries, trust language, proof-safe claims, and candidate portal handoff.",
   "side": "public_front_door",
-  "depends_on": ["N04", "N05", "N06", "N10", "N12", "N17"],
+  "depends_on": [
+    "N04",
+    "N05",
+    "N06",
+    "N10",
+    "N12",
+    "N17"
+  ],
   "locked_laws": [
     "Kingsmen must be publicly presented as a private route house / private route command house.",
     "Kingsmen must not be presented as a cheap application-help service.",
@@ -14,8 +21,8 @@
     "Free Destiny Map is R0 with 0 managed applications and all-sector preview only.",
     "Exact institution/company/portal/programme/bursary/accommodation targets, application links, and manual route plans remain sealed until package activation.",
     "CV Revamp is R49.99 and includes 15 personalised CV versions plus 15 matching motivation letters.",
-    "Accommodation Support Package is R179.00 for 8 accommodation applications/routes standalone.",
-    "Every paid Kingsmen package includes up to 8 ACC-01 accommodation routes.",
+    "Accommodation support is a privilege within the relevant package's managed-route allowance, with no separate fee for 8 accommodation applications/routes standalone.",
+    "Accommodation support, where relevant, uses one of the package's managed-route slots and is not guaranteed.",
     "Never invent fake experience, qualifications, references, certificates, skills, testimonials, acceptance claims, deadlines, fees, official status, or official relationships.",
     "Kingsmen is not an official university, TVET, SETA, NSFAS, CAO, employer, bursary provider, accommodation provider, payment provider, or government portal.",
     "No guarantee of admission, funding, employment, accommodation, approval, or official response speed.",
@@ -26,5 +33,6 @@
     "No public page may expose sealed route intelligence reserved for activated packages.",
     "The public website must be Oracle Lite deployable and static-first where possible."
   ],
-  "next": "N19 - Candidate Mobile / Public-to-Portal Experience"
+  "next": "N19 - Candidate Mobile / Public-to-Portal Experience",
+  "approval_note": "Public pricing changes must remain gated until the founder approves the proposed commercial schedule and legal terms."
 }
