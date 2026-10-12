@@ -100,7 +100,7 @@ const requiredFileChecks = [
   checkFile('manifests/ops/backup-restore-proof-v1.json', ['backup-restore-proof-v1', 'foundation_built_pending_staging_drill', 'restoreTargetMustDifferFromSource', 'backupStorageAllowedInGit']),
   checkFile('docs/ops/KINGSMEN_BACKUP_RESTORE_PROOF.md', ['pg_dump', 'pg_restore', 'RPO', 'RTO', 'Production ready: **false**']),
   checkFile('scripts/backup/New-KingsmenTruthVaultBackup.ps1', ['KINGSMEN_DATABASE_URL', 'pg_dump', 'Get-FileHash', 'databaseUrlRedacted', 'committedToGit = $false']),
-  checkFile('scripts/backup/Test-KingsmenTruthVaultRestore.ps1', ['KINGSMEN_RESTORE_DRILL_DATABASE_URL', 'SourceProjectRef', 'RestoreProjectRef', 'ExpectedSha256', 'gpg --batch --yes --decrypt', 'pg_restore --list', 'SOURCE_AND_RESTORE_DATABASE_IDENTITIES_MATCH', 'countOnly = $true', 'queryPassed = $true', 'rtoSeconds', 'if (-not $passed) { exit 1 }']),
+  checkFile('scripts/backup/Test-KingsmenTruthVaultRestore.ps1', ['KINGSMEN_RESTORE_DRILL_DATABASE_URL', 'KINGSMEN_RESTORE_ENVIRONMENT', 'SourceEnvironment', 'RestoreEnvironment', 'SourceProjectRef', 'RestoreProjectRef', 'ExpectedSha256', 'gpg --batch --yes --decrypt', 'pg_restore --list', 'SOURCE_AND_RESTORE_DATABASE_IDENTITIES_MATCH', 'countOnly = $true', 'queryPassed = $true', 'rtoSeconds', 'if (-not $passed) { exit 1 }']),
   checkFile('scripts/proof/prove-backup-restore-boundary.mjs', ['BACKUP_RESTORE_SOURCE_PROOF_PASSED', 'stagingRestoreDrillCompleted: false']),
   checkFile('scripts/validators/validate-backup-restore-proof.mjs', ['BACKUP_RESTORE_PROOF_VALIDATED', 'backup:validate:restore', 'BACKUP_RESTORE_STAGING_DRILL_REQUIRED']),
 
