@@ -60,7 +60,7 @@ LANGUAGE sql
 STABLE
 SECURITY DEFINER
 SET search_path = pg_catalog
-AS $
+AS $$
   SELECT id
   FROM public.candidates
   WHERE public_ref = kingsmen_security.current_candidate_public_ref()
@@ -72,8 +72,8 @@ REVOKE ALL ON ALL FUNCTIONS IN SCHEMA kingsmen_security FROM PUBLIC;
 GRANT USAGE ON SCHEMA kingsmen_security TO authenticated, service_role;
 GRANT EXECUTE ON ALL FUNCTIONS IN SCHEMA kingsmen_security TO authenticated, service_role;
 
--- Remove N03 bootstrap-wide policies. The service role remains allowed only through
--- app.kingsmen_role='service_role' and app.service_context='backend_api'.
+-- Remove N03 bootstrap-wide policies. Trusted runtime identity comes from server-managed JWT app_metadata;
+-- never trust client-settable GUCs or user_metadata. The Supabase service_role key bypasses RLS and is backend-only.
 DROP POLICY IF EXISTS service_role_all_candidates ON candidates;
 DROP POLICY IF EXISTS service_role_all_candidate_profiles ON candidate_profiles;
 DROP POLICY IF EXISTS service_role_all_applications ON applications;
