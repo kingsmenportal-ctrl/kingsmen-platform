@@ -1,6 +1,6 @@
 # Kingsmen Portal — Commercial Schedule v1.0
 
-**Decision status:** Approved as the implementation schedule for this workstream on 12 October 2026.  
+**Decision status:** Proposed schedule for explicit founder approval; not yet approved.  
 **Release status:** Not approved for public sale. Checkout remains blocked until the founder's final release review, legal/privacy publication review, staging proof, and payment verification are complete.
 
 All prices are in South African rand (ZAR). Package response targets are service targets during South African business hours, not guarantees of an application outcome, provider decision, funding, job placement, admission, or accommodation.
@@ -53,7 +53,7 @@ They must not promise admission, funding, employment, accommodation, provider pa
 
 ## 6. Implementation and release controls
 
-- The seven package definitions must match this schedule in the business manifest, API pricing catalogue, database seed, checkout/order validation, and candidate-facing UI.
+- The seven package definitions must match this schedule in the business manifest, API pricing catalogue, database seed, checkout/order validation, and candidate-facing UI. The numbers in this proposal are not approved commercial terms until the founder explicitly approves this version.
 - The finance schema must store the term, route entitlement, response target, upgrade bonus, and refund-policy version used for each order, so a later catalogue change cannot silently alter an existing purchase.
 - Review the migration and seed in code review before any staging write. Staging seeding is a separate, explicit step and must be followed by row-count/value verification.
 - Live checkout, real candidate charges, and a paid pilot remain blocked until separate-identity RLS tests, full staging journey, real PayFast sandbox/ITN matrix, backup/restore, runtime secret checks, observability/incident proof, legal/privacy publication, branch protection, evidence review, and founder release approval pass.
