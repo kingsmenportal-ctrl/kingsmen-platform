@@ -1,5 +1,8 @@
 import type { PublicPackageCard } from "./public-website-types";
 
+const responseDisclaimer = "Business-hour target after complete intake; not a guarantee of admission, funding, employment, provider decisions, or accommodation.";
+const accommodationBoundary = "Accommodation support, where relevant, uses one of the package's managed-route slots; no separate accommodation fee or extra route allowance. Subject to verification, availability and consent. Kingsmen does not receive or pay rent/deposits.";
+
 export const PUBLIC_PACKAGE_CARDS: PublicPackageCard[] = [
   {
     packageKey: "FREE_DESTINY_MAP",
@@ -9,9 +12,9 @@ export const PUBLIC_PACKAGE_CARDS: PublicPackageCard[] = [
     includedCvVersions: 0,
     includedMotivationLetters: 0,
     includedAccommodationRoutes: 0,
+    serviceTermDays: 0,
     routeVisibility: "PREVIEW_ONLY",
-    boundary:
-      "All-sector preview only. Exact targets, links, portals, manual route plans, bursary targets, and accommodation targets remain sealed until package activation."
+    boundary: "All-sector preview only. Exact targets, links, portals, manual route plans, bursary targets, and accommodation targets remain sealed until package activation."
   },
   {
     packageKey: "CV_REVAMP",
@@ -21,21 +24,122 @@ export const PUBLIC_PACKAGE_CARDS: PublicPackageCard[] = [
     includedCvVersions: 15,
     includedMotivationLetters: 15,
     includedAccommodationRoutes: 0,
+    serviceTermDays: 0,
+    acknowledgementTargetBusinessHours: 16,
+    firstResponseTargetBusinessHours: 24,
+    catalogueVersion: "1.0",
+    refundPolicyVersion: "ZA_CONSUMER_REVIEW_PENDING_PUBLICATION_V1",
+    responseTargetDisclaimer: responseDisclaimer,
     routeVisibility: "SEALED",
-    boundary:
-      "Includes 15 personalised CV versions and 15 matching motivation letters. Must remain truthful and may never invent experience, qualifications, references, certificates, or skills."
+    boundary: "One CV pack: 15 personalised truthful CV versions and 15 matching motivation letters. Delivery target is 3 business days after complete intake. Must never invent experience, qualifications, references, certificates, skills, or results."
   },
   {
-    packageKey: "ACCOMMODATION_SUPPORT",
-    packageName: "Accommodation Support Package",
-    priceLabel: "R179.00",
+    packageKey: "ARTISAN_CHARTER",
+    packageName: "Artisan Charter",
+    priceLabel: "R149.99",
+    managedApplicationCount: 3,
+    includedCvVersions: 0,
+    includedMotivationLetters: 0,
+    includedAccommodationRoutes: 0,
+    serviceTermDays: 30,
+    acknowledgementTargetBusinessHours: 16,
+    firstResponseTargetBusinessHours: 16,
+    upgradeBonusRoutesWhenCvRevampOwned: 2,
+    refundPolicyVersion: "ZA_CONSUMER_REVIEW_PENDING_PUBLICATION_V1",
+    catalogueVersion: "1.0",
+    responseTargetDisclaimer: responseDisclaimer,
+    routeVisibility: "SEALED",
+    boundary: "3 concurrent managed-route slots for 30 calendar days; work, skills, learnership, internship, apprenticeship and employment readiness. " + accommodationBoundary
+  },
+  {
+    packageKey: "FOUNDATIONAL_ACCORD",
+    packageName: "Foundational Accord",
+    priceLabel: "R169.99",
+    managedApplicationCount: 4,
+    includedCvVersions: 0,
+    includedMotivationLetters: 0,
+    includedAccommodationRoutes: 0,
+    serviceTermDays: 30,
+    acknowledgementTargetBusinessHours: 16,
+    firstResponseTargetBusinessHours: 16,
+    upgradeBonusRoutesWhenCvRevampOwned: 2,
+    refundPolicyVersion: "ZA_CONSUMER_REVIEW_PENDING_PUBLICATION_V1",
+    catalogueVersion: "1.0",
+    responseTargetDisclaimer: responseDisclaimer,
+    routeVisibility: "SEALED",
+    boundary: "4 concurrent managed-route slots for 30 calendar days across Higher Education, TVET, SETA/Learnership, Internship, Apprenticeship and Employment. " + accommodationBoundary
+  },
+  {
+    packageKey: "GUILDMASTERS_CHARTER",
+    packageName: "Guildmaster's Charter",
+    priceLabel: "R199.99",
+    managedApplicationCount: 5,
+    includedCvVersions: 0,
+    includedMotivationLetters: 0,
+    includedAccommodationRoutes: 0,
+    serviceTermDays: 30,
+    acknowledgementTargetBusinessHours: 16,
+    firstResponseTargetBusinessHours: 16,
+    upgradeBonusRoutesWhenCvRevampOwned: 2,
+    refundPolicyVersion: "ZA_CONSUMER_REVIEW_PENDING_PUBLICATION_V1",
+    catalogueVersion: "1.0",
+    responseTargetDisclaimer: responseDisclaimer,
+    routeVisibility: "SEALED",
+    boundary: "5 concurrent managed-route slots for 30 calendar days with increased work/skills monitoring. " + accommodationBoundary
+  },
+  {
+    packageKey: "COLLEGIATE_ORDINANCE",
+    packageName: "Collegiate Ordinance",
+    priceLabel: "R299.99",
     managedApplicationCount: 8,
     includedCvVersions: 0,
     includedMotivationLetters: 0,
-    includedAccommodationRoutes: 8,
-    routeVisibility: "ACTIVATED",
-    boundary:
-      "Standalone support for 8 accommodation applications/routes. Every paid Kingsmen package includes up to 8 ACC-01 accommodation routes."
+    includedAccommodationRoutes: 0,
+    serviceTermDays: 30,
+    acknowledgementTargetBusinessHours: 8,
+    firstResponseTargetBusinessHours: 8,
+    upgradeBonusRoutesWhenCvRevampOwned: 2,
+    refundPolicyVersion: "ZA_CONSUMER_REVIEW_PENDING_PUBLICATION_V1",
+    catalogueVersion: "1.0",
+    responseTargetDisclaimer: responseDisclaimer,
+    routeVisibility: "SEALED",
+    boundary: "8 concurrent managed-route slots for 30 calendar days with higher monitoring priority. " + accommodationBoundary
+  },
+  {
+    packageKey: "CHANCELLORS_WRIT",
+    packageName: "Chancellor's Writ",
+    priceLabel: "R399.99",
+    managedApplicationCount: 10,
+    includedCvVersions: 0,
+    includedMotivationLetters: 0,
+    includedAccommodationRoutes: 0,
+    serviceTermDays: 30,
+    acknowledgementTargetBusinessHours: 8,
+    firstResponseTargetBusinessHours: 8,
+    upgradeBonusRoutesWhenCvRevampOwned: 2,
+    refundPolicyVersion: "ZA_CONSUMER_REVIEW_PENDING_PUBLICATION_V1",
+    catalogueVersion: "1.0",
+    responseTargetDisclaimer: responseDisclaimer,
+    routeVisibility: "SEALED",
+    boundary: "10 concurrent managed-route slots for 30 calendar days with priority queue and deeper human review. " + accommodationBoundary
+  },
+  {
+    packageKey: "REGENCY_MANDATE",
+    packageName: "Regency Mandate",
+    priceLabel: "R469.99",
+    managedApplicationCount: 12,
+    includedCvVersions: 0,
+    includedMotivationLetters: 0,
+    includedAccommodationRoutes: 0,
+    serviceTermDays: 30,
+    acknowledgementTargetBusinessHours: 8,
+    firstResponseTargetBusinessHours: 8,
+    upgradeBonusRoutesWhenCvRevampOwned: 2,
+    refundPolicyVersion: "ZA_CONSUMER_REVIEW_PENDING_PUBLICATION_V1",
+    catalogueVersion: "1.0",
+    responseTargetDisclaimer: responseDisclaimer,
+    routeVisibility: "SEALED",
+    boundary: "12 concurrent managed-route slots for 30 calendar days with highest queue priority and escalation depth. " + accommodationBoundary
   }
 ];
 
@@ -61,14 +165,6 @@ export function cvRevampTruthBoundary(): true {
   const cv = getPublicPackageCard("CV_REVAMP");
   if (cv.priceLabel !== "R49.99" || cv.includedCvVersions !== 15 || cv.includedMotivationLetters !== 15) {
     throw new Error("CV_REVAMP_CANONICAL_PRICING_BROKEN");
-  }
-  return true;
-}
-
-export function accommodationSupportBoundary(): true {
-  const acc = getPublicPackageCard("ACCOMMODATION_SUPPORT");
-  if (acc.priceLabel !== "R179.00" || acc.includedAccommodationRoutes !== 8) {
-    throw new Error("ACCOMMODATION_SUPPORT_CANONICAL_PRICING_BROKEN");
   }
   return true;
 }
