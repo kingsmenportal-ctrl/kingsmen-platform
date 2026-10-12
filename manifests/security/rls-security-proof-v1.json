@@ -5,7 +5,7 @@
   "productionReady": false,
   "publicLaunchAllowed": false,
   "schemaAuthority": "PostgreSQL/Supabase Truth Vault",
-  "migrationPath": "db/migrations/0009_rls_security_boundary.sql",
+  "migrationPath": "db/migrations/0019_rls_security_boundary.sql",
   "runtimeClaims": {
     "roleSetting": "app.kingsmen_role",
     "serviceContextSetting": "app.service_context",
