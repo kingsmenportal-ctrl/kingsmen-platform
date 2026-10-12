@@ -37,8 +37,8 @@ const tokenChecks = {
     'Staging runtime evidence capture',
     'Production ready: **false**',
     'Public launch allowed: **false**',
-    'npm run staging:capture:evidence',
-    'npm run final:collect:evidence'
+    'scripts/staging/Invoke-KingsmenStagingRuntimeEvidencePack.ps1',
+    'scripts/staging/Collect-KingsmenFinalAssemblyEvidence.ps1'
   ],
   'manifests/launch/staging-runtime-evidence-capture-v1.json': [
     'kingsmen.staging-runtime-evidence-capture.v1',
@@ -49,7 +49,6 @@ const tokenChecks = {
   'package.json': [
     'staging:prove:capture',
     'staging:validate:capture',
-    'staging:prove:capture', 'staging:validate:capture'
   ],
   '.github/workflows/kingsmen-source-guard.yml': [
     'npm run staging:prove:capture',
