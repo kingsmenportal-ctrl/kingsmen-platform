@@ -40,12 +40,18 @@ if (existsSync(rel('scripts/backup/New-KingsmenTruthVaultBackup.ps1'))) {
   check('backup_uses_sha256', backupScript.includes('Get-FileHash') && backupScript.includes('SHA256'), 'backup checksum required', 'scripts/backup/New-KingsmenTruthVaultBackup.ps1');
   check('backup_redacts_database_url', backupScript.includes('databaseUrlRedacted') && backupScript.includes('Do not print'), 'database URL must be redacted', 'scripts/backup/New-KingsmenTruthVaultBackup.ps1');
   check('backup_blocks_git_claim', backupScript.includes('committedToGit = $false'), 'backup archives cannot be committed', 'scripts/backup/New-KingsmenTruthVaultBackup.ps1');
+  check('backup_staging_only', backupScript.includes('KINGSMEN_BACKUP_ENVIRONMENT') && backupScript.includes('ExpectedProjectRef'), 'backup is restricted to an explicitly identified staging project', 'scripts/backup/New-KingsmenTruthVaultBackup.ps1');
+  check('backup_encrypted', backupScript.includes('GpgRecipient') && backupScript.includes('GPG/OpenPGP') && backupScript.includes('Remove-Item -LiteralPath $plainFile'), 'plaintext archive is encrypted then removed', 'scripts/backup/New-KingsmenTruthVaultBackup.ps1');
+  check('backup_external_root_required', backupScript.includes('repository-local defaults are disabled'), 'backup storage must be external to repository', 'scripts/backup/New-KingsmenTruthVaultBackup.ps1');
 }
 
 if (existsSync(rel('scripts/backup/Test-KingsmenTruthVaultRestore.ps1'))) {
   const restoreScript = read('scripts/backup/Test-KingsmenTruthVaultRestore.ps1');
   check('restore_uses_pg_restore', restoreScript.includes('pg_restore'), 'pg_restore required for restore drill', 'scripts/backup/Test-KingsmenTruthVaultRestore.ps1');
-  check('restore_blocks_same_target', restoreScript.includes('Restore target matches source database') && restoreScript.includes('Restore drill blocked'), 'restore target must differ from source', 'scripts/backup/Test-KingsmenTruthVaultRestore.ps1');
+  check('restore_blocks_same_target', restoreScript.includes('Source and restore URLs resolve to the same database identity') && restoreScript.includes('Restore blocked'), 'restore target identity must differ from source', 'scripts/backup/Test-KingsmenTruthVaultRestore.ps1');
+  check('restore_requires_checksum', restoreScript.includes('ExpectedSha256') && restoreScript.includes('checksumMatches'), 'real restore requires independently supplied SHA-256', 'scripts/backup/Test-KingsmenTruthVaultRestore.ps1');
+  check('restore_validates_archive', restoreScript.includes('pg_restore --list') && restoreScript.includes('archiveValidated'), 'archive is validated before restore', 'scripts/backup/Test-KingsmenTruthVaultRestore.ps1');
+  check('restore_fails_closed', restoreScript.includes('$passed = (-not $DryRun)') && restoreScript.includes('if (-not $passed) { exit 1 }'), 'dry run and failed checks cannot report success', 'scripts/backup/Test-KingsmenTruthVaultRestore.ps1');
   check('restore_counts_only', restoreScript.includes('countOnly = $true') && restoreScript.includes('rawRowsReturned = $false'), 'restore report must use count-only verification', 'scripts/backup/Test-KingsmenTruthVaultRestore.ps1');
   check('restore_records_rto', restoreScript.includes('rtoSeconds'), 'restore drill must record RTO', 'scripts/backup/Test-KingsmenTruthVaultRestore.ps1');
 }
