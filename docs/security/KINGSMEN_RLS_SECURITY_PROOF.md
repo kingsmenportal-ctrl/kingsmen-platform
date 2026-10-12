@@ -21,7 +21,7 @@ The migration pins `search_path` for its `SECURITY DEFINER` candidate lookup and
 
 ## Important service-role boundary
 
-Supabase's `service_role` key bypasses RLS. A policy predicate cannot be treated as a restriction on that key. Therefore:
+The service-role key bypasses RLS by design in Supabase. A policy predicate cannot be treated as a restriction on that key. Therefore:
 
 - Never expose a service-role key to a browser, mobile app, public build artifact, or candidate.
 - Keep the service-role key in backend-only secret storage.
