@@ -45,19 +45,20 @@ const requiredFiles = [
   checkFile('manifests/security/rls-security-proof-v1.json', [
     'foundation_built_pending_staging_proof',
     'candidateReadsOwnRowsOnly',
-    'serviceRoleRequiresBackendContext',
+    'serviceRoleBypassesRLS',
+    'serviceRoleRequiresBackendContextAtApiLayer',
     'stagingExecutionRequired'
   ]),
   checkFile('docs/security/KINGSMEN_RLS_SECURITY_PROOF.md', [
-    'app.kingsmen_role',
-    'app.service_context',
-    'app.candidate_public_ref',
+    'trusted server-managed',
+    'service-role key bypasses RLS',
     'staging proof'
   ]),
   checkFile('scripts/proof/prove-rls-security-boundary.mjs', [
     'RLS_SECURITY_SOURCE_PROOF_PASSED',
     'candidate_cannot_read_other_candidate_row',
-    'service_role_without_backend_context_denied',
+    'service_role_key_absent_from_client_artifacts',
+    'backend_mutations_require_verified_server_context',
     'reports/security/rls-security-proof-latest.json'
   ]),
   checkFile('package.json', ['security:prove:rls', 'security:validate:rls']),
@@ -72,7 +73,7 @@ for (const fileCheck of requiredFiles) {
 
 const hardeningMigration = read('db/migrations/0019_rls_security_boundary.sql') ?? '';
 const broadTruePolicyPattern = /FOR\s+ALL\s+USING\s*\(\s*true\s*\)\s+WITH\s+CHECK\s*\(\s*true\s*\)/i;
-check('hardening_migration_no_broad_true_policy', !broadTruePolicyPattern.test(hardeningMigration), '0009 must not create tenant-blind true policies.');
+check('hardening_migration_no_broad_true_policy', !broadTruePolicyPattern.test(hardeningMigration), '0019 must not create tenant-blind true policies.');
 
 const requiredPolicyNames = [
   'candidates_service_role_backend_all',
