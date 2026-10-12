@@ -1,7 +1,7 @@
 {
   "schema": "kingsmen.package-catalogue.v1",
   "batch": "BATCH 01 — Merge Foundation",
-  "status": "BUILT_PENDING_VALIDATION",
+  "status": "COMMERCIAL_SCHEDULE_V1_APPROVED_PENDING_VALIDATION",
   "currency": "ZAR",
   "currency_symbol": "R",
   "access_law": "Packages change active managed quantity, speed, monitoring intensity, human depth, SLA, escalation, manual fallback intensity, and reporting depth. Packages do not hide the core Kingsmen route brain or core safety capabilities.",
@@ -32,7 +32,22 @@
       "price": 169.99,
       "currency": "ZAR",
       "status": "CANONICAL",
-      "controls": ["entry package", "lower active managed quantity", "standard queue", "standard monitoring"]
+      "controls": [
+        "entry package",
+        "lower active managed quantity",
+        "standard queue",
+        "standard monitoring",
+        "4 concurrent active managed route slots",
+        "30-calendar-day term from verified activation"
+      ],
+      "managed_route_slots": 4,
+      "service_term_days": 30,
+      "acknowledgement_target_business_hours": 16,
+      "first_response_target_business_hours": 16,
+      "service_scope": "Broad education and opportunity routes across Higher Education, TVET, SETA/Learnership, Internship, Apprenticeship and Employment.",
+      "upgrade_bonus_routes_when_cv_revamp_owned": 2,
+      "refund_policy_version": "ZA_CONSUMER_REVIEW_PENDING_PUBLICATION_V1",
+      "response_target_disclaimer": "Business-hour target after complete intake; not an outcome guarantee."
     },
     {
       "package_id": "collegiate_ordinance",
@@ -40,7 +55,21 @@
       "price": 299.99,
       "currency": "ZAR",
       "status": "CANONICAL",
-      "controls": ["higher active managed quantity", "stronger monitoring", "faster service intensity"]
+      "controls": [
+        "higher active managed quantity",
+        "stronger monitoring",
+        "faster service intensity",
+        "8 concurrent active managed route slots",
+        "30-calendar-day term from verified activation"
+      ],
+      "managed_route_slots": 8,
+      "service_term_days": 30,
+      "acknowledgement_target_business_hours": 8,
+      "first_response_target_business_hours": 8,
+      "service_scope": "Higher managed volume and monitoring priority across the six core gates.",
+      "upgrade_bonus_routes_when_cv_revamp_owned": 2,
+      "refund_policy_version": "ZA_CONSUMER_REVIEW_PENDING_PUBLICATION_V1",
+      "response_target_disclaimer": "Business-hour target after complete intake; not an outcome guarantee."
     },
     {
       "package_id": "chancellors_writ",
@@ -48,7 +77,21 @@
       "price": 399.99,
       "currency": "ZAR",
       "status": "CANONICAL",
-      "controls": ["priority intensity", "deeper human review", "stronger fallback support"]
+      "controls": [
+        "priority intensity",
+        "deeper human review",
+        "stronger fallback support",
+        "10 concurrent active managed route slots",
+        "30-calendar-day term from verified activation"
+      ],
+      "managed_route_slots": 10,
+      "service_term_days": 30,
+      "acknowledgement_target_business_hours": 8,
+      "first_response_target_business_hours": 8,
+      "service_scope": "Priority queue, deeper human review and stronger fallback support.",
+      "upgrade_bonus_routes_when_cv_revamp_owned": 2,
+      "refund_policy_version": "ZA_CONSUMER_REVIEW_PENDING_PUBLICATION_V1",
+      "response_target_disclaimer": "Business-hour target after complete intake; not an outcome guarantee."
     },
     {
       "package_id": "regency_mandate",
@@ -56,7 +99,21 @@
       "price": 469.99,
       "currency": "ZAR",
       "status": "CANONICAL",
-      "controls": ["highest package intensity", "highest queue priority", "deepest monitoring and escalation"]
+      "controls": [
+        "highest package intensity",
+        "highest queue priority",
+        "deepest monitoring and escalation",
+        "12 concurrent active managed route slots",
+        "30-calendar-day term from verified activation"
+      ],
+      "managed_route_slots": 12,
+      "service_term_days": 30,
+      "acknowledgement_target_business_hours": 8,
+      "first_response_target_business_hours": 8,
+      "service_scope": "Highest queue priority, monitoring intensity and escalation depth.",
+      "upgrade_bonus_routes_when_cv_revamp_owned": 2,
+      "refund_policy_version": "ZA_CONSUMER_REVIEW_PENDING_PUBLICATION_V1",
+      "response_target_disclaimer": "Business-hour target after complete intake; not an outcome guarantee."
     },
     {
       "package_id": "artisan_charter",
@@ -64,7 +121,21 @@
       "price": 149.99,
       "currency": "ZAR",
       "status": "CANONICAL",
-      "controls": ["work/skills route package", "standard active managed quantity", "CV/work readiness focus"]
+      "controls": [
+        "work/skills route package",
+        "standard active managed quantity",
+        "CV/work readiness focus",
+        "3 concurrent active managed route slots",
+        "30-calendar-day term from verified activation"
+      ],
+      "managed_route_slots": 3,
+      "service_term_days": 30,
+      "acknowledgement_target_business_hours": 16,
+      "first_response_target_business_hours": 16,
+      "service_scope": "Work, skills, learnership, internship, apprenticeship and employment readiness.",
+      "upgrade_bonus_routes_when_cv_revamp_owned": 2,
+      "refund_policy_version": "ZA_CONSUMER_REVIEW_PENDING_PUBLICATION_V1",
+      "response_target_disclaimer": "Business-hour target after complete intake; not an outcome guarantee."
     },
     {
       "package_id": "guildmasters_charter",
@@ -72,7 +143,21 @@
       "price": 199.99,
       "currency": "ZAR",
       "status": "CANONICAL",
-      "controls": ["stronger work/skills route intensity", "learnership/employment support", "higher monitoring"]
+      "controls": [
+        "stronger work/skills route intensity",
+        "learnership/employment support",
+        "higher monitoring",
+        "5 concurrent active managed route slots",
+        "30-calendar-day term from verified activation"
+      ],
+      "managed_route_slots": 5,
+      "service_term_days": 30,
+      "acknowledgement_target_business_hours": 16,
+      "first_response_target_business_hours": 16,
+      "service_scope": "Work and skills focus with increased monitoring and follow-up.",
+      "upgrade_bonus_routes_when_cv_revamp_owned": 2,
+      "refund_policy_version": "ZA_CONSUMER_REVIEW_PENDING_PUBLICATION_V1",
+      "response_target_disclaimer": "Business-hour target after complete intake; not an outcome guarantee."
     },
     {
       "package_id": "cv_revamp",
@@ -80,7 +165,21 @@
       "price": 49.99,
       "currency": "ZAR",
       "status": "CANONICAL",
-      "controls": ["standalone low-cost entry product", "CV improvement", "work/learnership/internship/apprenticeship/employment funnel"]
+      "controls": [
+        "standalone low-cost entry product",
+        "CV improvement",
+        "work/learnership/internship/apprenticeship/employment funnel",
+        "0 concurrent active managed route slots",
+        "one-off CV pack; 3-business-day delivery target"
+      ],
+      "managed_route_slots": 0,
+      "service_term_days": 0,
+      "acknowledgement_target_business_hours": 16,
+      "first_response_target_business_hours": 24,
+      "service_scope": "One CV pack: 15 personalised truthful CV versions and 15 matching motivation letters; delivery target within 3 business days after complete intake.",
+      "upgrade_bonus_routes_when_cv_revamp_owned": 0,
+      "refund_policy_version": "ZA_CONSUMER_REVIEW_PENDING_PUBLICATION_V1",
+      "response_target_disclaimer": "Business-hour target after complete intake; not an outcome guarantee."
     }
   ],
   "cv_revamp_upgrade_rule": {
@@ -101,6 +200,22 @@
   "growth_cap": {
     "starting_active_candidate_cap": 500,
     "cap_limits": "active managed volume, not core capability access",
-    "growth_modes": ["500_active_start", "1000_ready_design", "5000_ready_architecture_not_automatic"]
+    "growth_modes": [
+      "500_active_start",
+      "1000_ready_design",
+      "5000_ready_architecture_not_automatic"
+    ]
+  },
+  "catalogue_version": "1.0",
+  "service_terms": {
+    "business_hours": "Monday-Friday 09:00-17:00 Africa/Johannesburg, excluding South African public holidays",
+    "response_clock": "Starts only after complete required intake and evidence are received",
+    "response_target_disclaimer": "Business-hour service target, not a guarantee of application outcome, provider decision, funding, admission, employment, or accommodation",
+    "managed_route_definition": "A distinct source-verified opportunity/application pathway with a candidate-specific requirements checklist, evidence/readiness steps, available deadline/source checks, status tracking, and next human-step handoff. Preview, generic guidance, and duplicate listings do not consume a slot. Active slots are concurrent limits and may be reused after a route closes during the service term.",
+    "accommodation_policy": "Accommodation support where relevant consumes one managed-route slot, is subject to verification, availability and consent, and creates no extra route allowance or accommodation fee. Kingsmen does not receive or pay rent/deposits.",
+    "refund_policy_version": "ZA_CONSUMER_REVIEW_PENDING_PUBLICATION_V1",
+    "refund_policy": "No AI refund approval. Human review required. Before work starts, requests are eligible for full-refund review subject to applicable law/provider settlement. After work starts or a deliverable is provided, requests are reviewed individually under published terms and applicable South African consumer law. Do not publish a blanket no-refunds claim.",
+    "cv_revamp_upgrade_bonus_routes": 2,
+    "cv_revamp_upgrade_condition": "A verified prior CV Revamp purchase followed by upgrade to a Kingsmen package adds two concurrent active managed route slots. It is not a cash discount or price credit unless a separate approved promotion states otherwise."
   }
 }
