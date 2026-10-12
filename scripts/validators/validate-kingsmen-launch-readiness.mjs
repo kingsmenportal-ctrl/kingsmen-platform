@@ -165,6 +165,23 @@ function warn(code, title, detail, remediation, evidencePaths = []) {
   warnings.push({ code, title, detail, remediation, evidencePaths });
 }
 
+const rlsSecurityRequiredPaths = [
+  'db/migrations/0009_rls_security_boundary.sql',
+  'manifests/security/rls-security-proof-v1.json',
+  'scripts/proof/prove-rls-security-boundary.mjs',
+  'scripts/validators/validate-rls-security-proof.mjs'
+];
+const missingRlsSecurityPaths = rlsSecurityRequiredPaths.filter((path) => !existsSync(relative(path)));
+if (missingRlsSecurityPaths.length > 0) {
+  block(
+    'RLS_SECURITY_SCRIPT_MISSING',
+    'RLS security source proof is incomplete.',
+    `Missing RLS security source files: ${missingRlsSecurityPaths.join(', ')}`,
+    'Restore the RLS hardening migration, proof manifest, and proof/validator scripts before staging.',
+    missingRlsSecurityPaths
+  );
+}
+
 for (const check of requiredFileChecks) {
   if (!check.passed) {
     block('REQUIRED_FILE_OR_TOKEN_MISSING', `Required launch evidence missing: ${check.path}`, check.exists ? `Missing tokens: ${check.missingTokens.join(', ')}` : 'File does not exist.', 'Restore the file/tokens or update the launch manifest only with equivalent evidence.', [check.path]);
