@@ -1,0 +1,98 @@
+{
+  "schema": "kingsmen.rls-sql-isolation-staging.v1",
+  "module": "Kingsmen RLS SQL Isolation Staging Proof",
+  "status": "RLS_SQL_ISOLATION_STAGING_PASSED",
+  "passed": true,
+  "productionReady": false,
+  "publicLaunchAllowed": false,
+  "livePaymentsEnabled": false,
+  "candidateCharged": false,
+  "generatedAtIso": "2026-10-12T16:00:00Z",
+  "project": {
+    "ref": "euhubhhnumtibbyufghm",
+    "region": "eu-west-1",
+    "postgresVersion": "17.11.0.003"
+  },
+  "source": {
+    "repository": "kingsmenportal-ctrl/kingsmen-platform",
+    "branch": "fix/staging-migration-rls-restore",
+    "commit": "1bcca144c300325b87802a4494805cb565fef4df",
+    "orderedMigrationFilesApplied": 20,
+    "migrationPrefixRange": "0001-0020"
+  },
+  "databaseChecks": {
+    "publicBaseTables": 187,
+    "publicTablesWithRls": 187,
+    "publicTablesWithoutRls": 0,
+    "publicPolicies": 206,
+    "broadTruePoliciesForAnonOrAuthenticated": 0,
+    "securityAdvisorLintCount": 0,
+    "candidateRowsAfterCleanup": 0,
+    "candidateProfileRowsAfterCleanup": 0,
+    "applicationRowsAfterCleanup": 0,
+    "aiLearningRowsAfterCleanup": 0
+  },
+  "runtimeChecks": [
+    {
+      "name": "candidate_a_sees_only_own_candidate",
+      "passed": true,
+      "observedCount": 1
+    },
+    {
+      "name": "candidate_b_cannot_read_candidate_a",
+      "passed": true,
+      "observedCount": 0
+    },
+    {
+      "name": "candidate_a_can_read_own_profile",
+      "passed": true,
+      "observedCount": 1
+    },
+    {
+      "name": "anonymous_cannot_read_candidates",
+      "passed": true,
+      "observedCount": 0
+    },
+    {
+      "name": "candidate_insert_denied_by_rls",
+      "passed": true,
+      "detail": "insert rejected by RLS"
+    },
+    {
+      "name": "operator_can_read_candidates",
+      "passed": true,
+      "observedCount": 2
+    }
+  ],
+  "syntheticFixtures": {
+    "used": true,
+    "count": 2,
+    "removed": true,
+    "rawCandidateRowsReturned": false,
+    "personalDataUsed": false
+  },
+  "review": {
+    "sourceGuardPassed": true,
+    "jarvisLiveRuntimeWorkflowPassed": true,
+    "securityAdvisorClean": true,
+    "founderReviewRequired": true
+  },
+  "remainingGates": [
+    "Truth Vault API persistence integration test",
+    "web/backend boundary runtime proof",
+    "PayFast sandbox checkout and ITN verification",
+    "encrypted backup and distinct staging restore drill",
+    "staging-only secret runtime health",
+    "communications provider proof",
+    "observability and incident proof",
+    "legal/privacy/consent/refund publication review",
+    "final evidence bundle hash and founder approval"
+  ],
+  "evidenceSafety": {
+    "databaseUrlsIncluded": false,
+    "secretsIncluded": false,
+    "rawCandidateRowsIncluded": false,
+    "productionDataUsed": false,
+    "livePaymentsEnabled": false
+  }
+}
