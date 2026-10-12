@@ -1,5 +1,5 @@
 $ErrorActionPreference = "Stop"
-$Base = "C:\Kingsmen\kingsmen-platform"
+$Base = Split-Path -Parent (Split-Path -Parent $PSScriptRoot)
 Set-Location $Base
 
 $Failures = New-Object System.Collections.Generic.List[string]
@@ -49,8 +49,8 @@ Require-Contains "manifests\n18\public-website-route-house-front-door.json" "not
 Require-Contains "manifests\n18\public-website-route-house-front-door.json" "Free Destiny Map is R0 with 0 managed applications" "Manifest must lock Free Destiny Map boundary."
 Require-Contains "manifests\n18\public-website-route-house-front-door.json" "Exact institution/company/portal/programme/bursary/accommodation targets" "Manifest must seal exact route intelligence."
 Require-Contains "manifests\n18\public-website-route-house-front-door.json" "CV Revamp is R49.99" "Manifest must lock CV Revamp pricing."
-Require-Contains "manifests\n18\public-website-route-house-front-door.json" "Accommodation Support Package is R179.00" "Manifest must lock Accommodation pricing."
-Require-Contains "manifests\n18\public-website-route-house-front-door.json" "Every paid Kingsmen package includes up to 8 ACC-01 accommodation routes" "Manifest must lock ACC-01 paid package inclusion."
+Require-Contains "manifests\n18\public-website-route-house-front-door.json" "Accommodation support is a privilege" "Manifest must define accommodation as a package privilege."
+Require-Contains "manifests\n18\public-website-route-house-front-door.json" "managed-route slots" "Manifest must place accommodation within route allowance."
 Require-Contains "manifests\n18\public-website-route-house-front-door.json" "not an official university" "Manifest must state not official portal."
 Require-Contains "manifests\n18\public-website-route-house-front-door.json" "No guarantee of admission" "Manifest must block guarantees."
 Require-Contains "manifests\n18\public-website-route-house-front-door.json" "document-aware" "Manifest must require smart document-aware public forms."
