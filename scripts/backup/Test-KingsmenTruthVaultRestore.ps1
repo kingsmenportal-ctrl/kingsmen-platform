@@ -4,6 +4,8 @@ param(
   [Parameter(Mandatory=$true)][string]$BackupFile,
   [string]$RestoreDatabaseUrl = $env:KINGSMEN_RESTORE_DRILL_DATABASE_URL,
   [string]$SourceDatabaseUrl = $env:KINGSMEN_DATABASE_URL,
+  [string]$SourceProjectRef = $env:KINGSMEN_EXPECTED_SUPABASE_PROJECT_REF,
+  [string]$RestoreProjectRef = $env:KINGSMEN_RESTORE_EXPECTED_SUPABASE_PROJECT_REF,
   [string]$ExpectedSha256 = $env:KINGSMEN_BACKUP_EXPECTED_SHA256,
   [string]$ReportPath = "reports/ops/backup-restore-staging-drill-latest.json",
   [switch]$DryRun
@@ -11,102 +13,127 @@ param(
 
 $ErrorActionPreference = "Stop"
 $startedAt = Get-Date
+$endedAt = $startedAt
 $failureReasons = @()
-
-if ([string]::IsNullOrWhiteSpace($RestoreDatabaseUrl)) {
-  throw "KINGSMEN_RESTORE_DRILL_DATABASE_URL is required. Do not use the source database as the restore target."
-}
-if (-not (Test-Path -LiteralPath $BackupFile -PathType Leaf)) {
-  throw "Backup file not found."
-}
-if (-not $DryRun -and [string]::IsNullOrWhiteSpace($SourceDatabaseUrl)) {
-  throw "KINGSMEN_DATABASE_URL is required for source/restore target identity verification."
-}
-if (-not $DryRun -and [string]::IsNullOrWhiteSpace($ExpectedSha256)) {
-  throw "KINGSMEN_BACKUP_EXPECTED_SHA256 is required for a real restore drill."
-}
-if (-not $DryRun -and $ExpectedSha256 -notmatch '^[A-Fa-f0-9]{64}$') {
-  throw "Expected backup SHA-256 must be a 64-character hexadecimal digest."
-}
-
-$pgRestore = Get-Command "pg_restore" -ErrorAction SilentlyContinue
-if (-not $pgRestore) { throw "pg_restore is required for restore drill. Install PostgreSQL client tools." }
-$psql = Get-Command "psql" -ErrorAction SilentlyContinue
-if (-not $psql) { throw "psql is required for target identity and count-only verification." }
-
-$backupSha256 = (Get-FileHash -Algorithm SHA256 -LiteralPath $BackupFile).Hash
+$tableChecks = @()
+$backupSha256 = "NOT_COMPUTED"
 $checksumMatches = $false
-if (-not $DryRun) {
-  $checksumMatches = ($backupSha256 -ieq $ExpectedSha256)
-  if (-not $checksumMatches) { throw "Backup SHA-256 does not match the independently supplied expected digest." }
-}
-
-# Validate the archive before any restore attempt; output is deliberately not captured in the report.
-& pg_restore --list $BackupFile *> $null
-if ($LASTEXITCODE -ne 0) { throw "pg_restore archive validation failed. No restore was attempted." }
-$archiveValidated = $true
-
+$archiveValidated = $false
+$targetsDiffer = $false
+$sourceAndRestoreAreStaging = $false
+$allTableChecksPassed = $false
+$passed = $false
+$rtoSeconds = 0
+$rpoMinutesEstimate = $null
+$temporaryPlaintext = $null
+$restoreInputFile = $null
 $sourceIdentity = $null
 $restoreIdentity = $null
-$targetsDiffer = $false
-if (-not $DryRun) {
-  $identityQuery = "select current_database() || '|' || coalesce(inet_server_addr()::text, 'local') || '|' || current_setting('port');"
-  $sourceIdentity = (& psql $SourceDatabaseUrl -t -A -c $identityQuery 2>$null | Select-Object -First 1)
-  if ($LASTEXITCODE -ne 0 -or [string]::IsNullOrWhiteSpace($sourceIdentity)) {
-    throw "Could not verify source database identity; restore blocked."
-  }
-  $restoreIdentity = (& psql $RestoreDatabaseUrl -t -A -c $identityQuery 2>$null | Select-Object -First 1)
-  if ($LASTEXITCODE -ne 0 -or [string]::IsNullOrWhiteSpace($restoreIdentity)) {
-    throw "Could not verify restore database identity; restore blocked."
-  }
-  $targetsDiffer = ($sourceIdentity.Trim() -ne $restoreIdentity.Trim())
-  if (-not $targetsDiffer) { throw "Source and restore URLs resolve to the same database identity. Restore blocked." }
 
-  & pg_restore --clean --if-exists --no-owner --no-privileges --dbname=$RestoreDatabaseUrl $BackupFile
-  if ($LASTEXITCODE -ne 0) { throw "pg_restore failed. Database URLs remain redacted." }
-}
+try {
+  if ([string]::IsNullOrWhiteSpace($RestoreDatabaseUrl)) { throw "KINGSMEN_RESTORE_DRILL_DATABASE_URL_REQUIRED" }
+  if ([string]::IsNullOrWhiteSpace($SourceDatabaseUrl)) { throw "KINGSMEN_DATABASE_URL_REQUIRED" }
+  if (-not (Test-Path -LiteralPath $BackupFile -PathType Leaf)) { throw "BACKUP_FILE_MISSING" }
+  if ([string]::IsNullOrWhiteSpace($SourceProjectRef) -or $SourceProjectRef -notmatch '^[a-z0-9]{20}$') { throw "SOURCE_STAGING_PROJECT_REF_REQUIRED" }
+  if ([string]::IsNullOrWhiteSpace($RestoreProjectRef) -or $RestoreProjectRef -notmatch '^[a-z0-9]{20}$') { throw "RESTORE_STAGING_PROJECT_REF_REQUIRED" }
+  if ($SourceProjectRef -eq $RestoreProjectRef) { throw "SOURCE_AND_RESTORE_PROJECT_REFS_MUST_DIFFER" }
+  if ($SourceDatabaseUrl -notmatch [regex]::Escape($SourceProjectRef)) { throw "SOURCE_URL_DOES_NOT_MATCH_EXPECTED_STAGING_PROJECT" }
+  if ($RestoreDatabaseUrl -notmatch [regex]::Escape($RestoreProjectRef)) { throw "RESTORE_URL_DOES_NOT_MATCH_EXPECTED_STAGING_PROJECT" }
+  $sourceAndRestoreAreStaging = $true
 
-$coreTables = @(
-  "candidates", "applications", "idempotency_keys", "command_log",
-  "workflow_runs", "evidence_ledger", "audit_events", "dead_letter_queue",
-  "approval_requests"
-)
-$tableChecks = @()
-foreach ($table in $coreTables) {
-  $count = "DRY_RUN"
-  $queryPassed = $false
+  if (-not $DryRun -and [string]::IsNullOrWhiteSpace($ExpectedSha256)) { throw "EXPECTED_BACKUP_SHA256_REQUIRED" }
+  if (-not $DryRun -and $ExpectedSha256 -notmatch '^[A-Fa-f0-9]{64}$') { throw "EXPECTED_BACKUP_SHA256_INVALID" }
+
+  $pgRestore = Get-Command "pg_restore" -ErrorAction SilentlyContinue
+  $psql = Get-Command "psql" -ErrorAction SilentlyContinue
+  $gpg = Get-Command "gpg" -ErrorAction SilentlyContinue
+  if (-not $pgRestore) { throw "PG_RESTORE_REQUIRED" }
+  if (-not $psql) { throw "PSQL_REQUIRED" }
+  if (-not $DryRun -and -not $gpg) { throw "GPG_REQUIRED_FOR_ENCRYPTED_BACKUP" }
+  if (-not $BackupFile.EndsWith(".gpg", [StringComparison]::OrdinalIgnoreCase)) { throw "ENCRYPTED_GPG_BACKUP_REQUIRED" }
+
+  $backupSha256 = (Get-FileHash -Algorithm SHA256 -LiteralPath $BackupFile).Hash
   if (-not $DryRun) {
-    $query = "select case when to_regclass('public.$table') is null then 'MISSING' else (select count(*)::text from public.$table) end;"
-    $result = & psql $RestoreDatabaseUrl -t -A -c $query 2>$null
-    if ($LASTEXITCODE -eq 0) {
-      $value = (($result | Select-Object -First 1) -as [string]).Trim()
-      if ($value -match '^\d+$') { $count = $value; $queryPassed = $true }
-      else { $count = $value; $failureReasons += "TABLE_CHECK_$($table.ToUpper())_$value" }
-    } else {
-      $count = "QUERY_FAILED"
-      $failureReasons += "TABLE_CHECK_$($table.ToUpper())_QUERY_FAILED"
-    }
+    $checksumMatches = ($backupSha256 -ieq $ExpectedSha256)
+    if (-not $checksumMatches) { throw "BACKUP_SHA256_MISMATCH" }
   }
-  $tableChecks += [ordered]@{
-    table = $table
-    countOnly = $true
-    count = $count
-    queryPassed = $queryPassed
-    rawRowsReturned = $false
+
+  if (-not $DryRun) {
+    $identityQuery = "select current_database() || '|' || coalesce(inet_server_addr()::text, 'local') || '|' || current_setting('port');"
+    $sourceOutput = & psql $SourceDatabaseUrl -t -A -c $identityQuery 2>$null
+    $sourceExitCode = $LASTEXITCODE
+    $sourceIdentity = ($sourceOutput | Select-Object -First 1)
+    if ($sourceExitCode -ne 0 -or [string]::IsNullOrWhiteSpace($sourceIdentity)) { throw "SOURCE_DATABASE_IDENTITY_UNVERIFIED" }
+
+    $restoreOutput = & psql $RestoreDatabaseUrl -t -A -c $identityQuery 2>$null
+    $restoreExitCode = $LASTEXITCODE
+    $restoreIdentity = ($restoreOutput | Select-Object -First 1)
+    if ($restoreExitCode -ne 0 -or [string]::IsNullOrWhiteSpace($restoreIdentity)) { throw "RESTORE_DATABASE_IDENTITY_UNVERIFIED" }
+
+    $targetsDiffer = ($sourceIdentity.Trim() -ne $restoreIdentity.Trim())
+    if (-not $targetsDiffer) { throw "SOURCE_AND_RESTORE_DATABASE_IDENTITIES_MATCH" }
+
+    $temporaryPlaintext = Join-Path ([IO.Path]::GetTempPath()) ("kingsmen-restore-" + [guid]::NewGuid().ToString("N") + ".dump")
+    & gpg --batch --yes --decrypt --output $temporaryPlaintext $BackupFile *> $null
+    if ($LASTEXITCODE -ne 0 -or -not (Test-Path -LiteralPath $temporaryPlaintext -PathType Leaf)) { throw "GPG_DECRYPT_FAILED" }
+    $restoreInputFile = $temporaryPlaintext
+  }
+
+  if ($DryRun) {
+    # Dry-run validates only the encrypted file's presence and metadata; it does not claim archive or restore proof.
+    $restoreInputFile = $null
+  } else {
+    & pg_restore --list $restoreInputFile *> $null
+    if ($LASTEXITCODE -ne 0) { throw "PG_RESTORE_ARCHIVE_VALIDATION_FAILED" }
+    $archiveValidated = $true
+
+    & pg_restore --clean --if-exists --no-owner --no-privileges --dbname=$RestoreDatabaseUrl $restoreInputFile
+    if ($LASTEXITCODE -ne 0) { throw "PG_RESTORE_FAILED" }
+
+    $coreTables = @("candidates", "applications", "idempotency_keys", "command_log", "workflow_runs", "evidence_ledger", "audit_events", "dead_letter_queue", "approval_requests")
+    foreach ($table in $coreTables) {
+      $query = "select case when to_regclass('public.$table') is null then 'MISSING' else (select count(*)::text from public.$table) end;"
+      $result = & psql $RestoreDatabaseUrl -t -A -c $query 2>$null
+      $queryExitCode = $LASTEXITCODE
+      $value = (($result | Select-Object -First 1) -as [string])
+      if ($null -ne $value) { $value = $value.Trim() }
+      $queryPassed = ($queryExitCode -eq 0 -and $value -match '^\d+$')
+      if (-not $queryPassed) {
+        if ($queryExitCode -ne 0) { $value = "QUERY_FAILED" }
+        $failureReasons += "TABLE_CHECK_FAILED_$($table.ToUpper())"
+      }
+      $tableChecks += [ordered]@{
+        table = $table
+        countOnly = $true
+        count = $(if ($queryPassed) { $value } else { $value })
+        queryPassed = $queryPassed
+        rawRowsReturned = $false
+      }
+    }
+    $allTableChecksPassed = ($tableChecks.Count -eq 9) -and (@($tableChecks | Where-Object { -not $_.queryPassed }).Count -eq 0)
+    if (-not $allTableChecksPassed) { throw "REQUIRED_TABLE_CHECKS_FAILED" }
+    $rpoMinutesEstimate = [math]::Round(($startedAt - (Get-Item -LiteralPath $BackupFile).LastWriteTime).TotalMinutes, 2)
+    $passed = $archiveValidated -and $checksumMatches -and $targetsDiffer -and $sourceAndRestoreAreStaging -and $allTableChecksPassed
   }
 }
+catch {
+  $failureReasons += $_.Exception.Message
+  $passed = $false
+}
+finally {
+  if ($temporaryPlaintext -and (Test-Path -LiteralPath $temporaryPlaintext -PathType Leaf)) {
+    Remove-Item -LiteralPath $temporaryPlaintext -Force -ErrorAction SilentlyContinue
+  }
+  $endedAt = Get-Date
+  $rtoSeconds = [int]($endedAt - $startedAt).TotalSeconds
+}
 
-$endedAt = Get-Date
-$rtoSeconds = [int]($endedAt - $startedAt).TotalSeconds
-$rpoMinutesEstimate = [math]::Round(($startedAt - (Get-Item -LiteralPath $BackupFile).LastWriteTime).TotalMinutes, 2)
-$allTableChecksPassed = (-not $DryRun) -and ($tableChecks.Count -eq $coreTables.Count) -and (@($tableChecks | Where-Object { -not $_.queryPassed }).Count -eq 0)
-$passed = (-not $DryRun) -and $archiveValidated -and $checksumMatches -and $targetsDiffer -and $allTableChecksPassed
 if ($DryRun) { $status = "DRY_RUN_NOT_PROOF" }
 elseif ($passed) { $status = "RESTORE_DRILL_PASSED" }
 else { $status = "RESTORE_DRILL_FAILED" }
 
 $report = [ordered]@{
-  schema = "kingsmen.backup-restore-staging-drill.v2"
+  schema = "kingsmen.backup-restore-staging-drill.v3"
   module = "Kingsmen Backup Restore Drill"
   status = $status
   passed = $passed
@@ -120,9 +147,10 @@ $report = [ordered]@{
   checksumMatchesExpected = $checksumMatches
   archiveValidated = $archiveValidated
   databaseUrlsRedacted = $true
+  databaseIdentitiesRedacted = $true
+  sourceAndRestoreProjectRefsDiffer = ($SourceProjectRef -ne $RestoreProjectRef)
   sourceAndRestoreTargetsDiffer = $targetsDiffer
-  sourceIdentityReported = $false
-  restoreIdentityReported = $false
+  sourceAndRestoreAreStaging = $sourceAndRestoreAreStaging
   rawCandidateRowsReturned = $false
   serviceRoleReturned = $false
   rpoMinutesEstimateFromBackupFileTimestamp = $rpoMinutesEstimate
@@ -132,7 +160,7 @@ $report = [ordered]@{
   tableChecks = $tableChecks
   failureReasons = $failureReasons
   founderReviewRequired = $true
-  nextAction = "Review redacted report and checksum provenance; independently confirm RPO, offsite retention, encryption, and access controls."
+  nextAction = "Review redacted report; independently confirm RPO, offsite retention, encryption, and access controls."
 }
 New-Item -ItemType Directory -Force -Path (Split-Path -Parent $ReportPath) | Out-Null
 $report | ConvertTo-Json -Depth 20 | Set-Content -Encoding utf8 $ReportPath
