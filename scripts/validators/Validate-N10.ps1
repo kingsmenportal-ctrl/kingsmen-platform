@@ -27,6 +27,9 @@ function Require-NotContains([string]$Path,[string]$Needle,[string]$Message) {
 $Files = @(
   "manifests\n10\finance-payfast-runtime.json",
   "db\migrations\0008_n10_finance_payfast.sql",
+  "db\migrations\0019_n10_commercial_schedule_v1.sql",
+  "manifests\business\package-catalogue.json",
+  "docs\commercial\KINGSMEN_PACKAGE_COMMERCIAL_SCHEDULE_V1.md",
   "db\seeds\n10_finance_payfast_seed.sql",
   "runtime\payfast\payfast-runtime.example.json",
   "apps\api\src\finance\finance-types.ts",
@@ -54,6 +57,8 @@ Require-Contains "manifests\n10\finance-payfast-runtime.json" "PostgreSQL financ
 Require-Contains "manifests\n10\finance-payfast-runtime.json" "No AI refund approval" "Manifest must block AI refund approval."
 Require-Contains "manifests\n10\finance-payfast-runtime.json" "PayFast ITN receipts must be idempotent" "Manifest must lock ITN idempotency."
 Require-Contains "db\migrations\0008_n10_finance_payfast.sql" "finance_plan_catalog" "Migration missing plan catalog."
+Require-Contains "db\migrations\0019_n10_commercial_schedule_v1.sql" "entitlement_snapshot" "Commercial migration must snapshot order entitlements."
+Require-Contains "manifests\business\package-catalogue.json" "COMMERCIAL_SCHEDULE_V1_PROPOSED_PENDING_FOUNDER_APPROVAL" "Commercial schedule must remain explicitly pending founder approval."
 Require-Contains "db\migrations\0008_n10_finance_payfast.sql" "payfast_payment_intents" "Migration missing PayFast intents."
 Require-Contains "db\migrations\0008_n10_finance_payfast.sql" "payfast_itn_receipts" "Migration missing PayFast ITN receipts."
 Require-Contains "db\migrations\0008_n10_finance_payfast.sql" "finance_refund_requests" "Migration missing refund requests."
@@ -62,6 +67,12 @@ Require-Contains "db\migrations\0008_n10_finance_payfast.sql" "payment_evidence_
 Require-Contains "db\migrations\0008_n10_finance_payfast.sql" "enable row level security" "Migration must enable RLS."
 Require-Contains "db\seeds\n10_finance_payfast_seed.sql" "FREE_DESTINY_MAP_R0" "Seed missing Free Destiny Map."
 Require-Contains "db\seeds\n10_finance_payfast_seed.sql" "CV_REVAMP_R49_99" "Seed missing CV Revamp."
+Require-Contains "db\seeds\n10_finance_payfast_seed.sql" "ARTISAN_CHARTER_R149_99" "Seed missing Artisan Charter."
+Require-Contains "db\seeds\n10_finance_payfast_seed.sql" "FOUNDATIONAL_ACCORD_R169_99" "Seed missing Foundational Accord."
+Require-Contains "db\seeds\n10_finance_payfast_seed.sql" "GUILDMASTERS_CHARTER_R199_99" "Seed missing Guildmaster Charter."
+Require-Contains "db\seeds\n10_finance_payfast_seed.sql" "COLLEGIATE_ORDINANCE_R299_99" "Seed missing Collegiate Ordinance."
+Require-Contains "db\seeds\n10_finance_payfast_seed.sql" "CHANCELLORS_WRIT_R399_99" "Seed missing Chancellor Writ."
+Require-Contains "db\seeds\n10_finance_payfast_seed.sql" "REGENCY_MANDATE_R469_99" "Seed missing Regency Mandate."
 Require-Contains "db\seeds\n10_finance_payfast_seed.sql" "Never invent fake" "Seed must lock CV truth rule."
 Require-NotContains "apps\api\src\finance\pricing-catalog.ts" "ACCOMMODATION_SUPPORT_R179" "Standalone accommodation product must not be orderable."
 Require-NotContains "db\seeds\n10_finance_payfast_seed.sql" "('ACCOMMODATION_SUPPORT_R179'" "Seed must not insert a standalone accommodation product row."
