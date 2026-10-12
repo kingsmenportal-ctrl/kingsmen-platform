@@ -76,14 +76,14 @@ const scenarios = [
     claim: "trusted server-managed auth.jwt()->app_metadata.kingsmen_role='founder'"
   },
   {
-    scenario: 'service_role_without_backend_context_denied',
+    scenario: 'service_role_key_absent_from_client_artifacts',
     expected: 'deny',
-    claim: "service role claim without server-managed app_metadata.service_context='backend_api'"
+    claim: 'Service-role credentials must be absent from browser/mobile bundles and public artifacts.'
   },
   {
-    scenario: 'service_role_with_backend_context_can_write',
-    expected: 'allow',
-    claim: "service role claim plus server-managed app_metadata.service_context='backend_api'"
+    scenario: 'backend_mutations_require_verified_server_context',
+    expected: 'deny_without_verified_context',
+    claim: 'Backend API must verify trusted identity and authorization before using a backend-only service-role credential.'
   },
   {
     scenario: 'anonymous_cannot_read_candidate_data',
@@ -99,7 +99,7 @@ const scenarios = [
 
 check('all_required_scenarios_defined', scenarios.length === 10, `${scenarios.length} scenarios defined.`);
 check('scenario_denials_present', scenarios.filter((scenario) => scenario.expected.includes('deny')).length >= 4, 'Negative isolation scenarios are present.');
-check('scenario_service_context_present', includesAll(JSON.stringify(scenarios), ['service_role_without_backend_context_denied', 'service_role_with_backend_context_can_write']), 'Service context isolation scenarios are present.');
+check('scenario_service_context_present', includesAll(JSON.stringify(scenarios), ['service_role_key_absent_from_client_artifacts', 'backend_mutations_require_verified_server_context']), 'Backend credential isolation scenarios are present; runtime API proof is still required.');
 
 const failedChecks = checks.filter((item) => !item.passed);
 const passed = failedChecks.length === 0;
