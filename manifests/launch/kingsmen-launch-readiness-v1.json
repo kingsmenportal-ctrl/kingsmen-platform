@@ -52,7 +52,7 @@
       "gateKey": "tenant_security_rls",
       "title": "Scoped RLS and access boundary",
       "status": "foundation_built_pending_staging_proof",
-      "evidencePaths": ["db/migrations/0009_rls_security_boundary.sql", "manifests/security/rls-security-proof-v1.json", "reports/staging/rls-sql-isolation-staging-latest.json"],
+      "evidencePaths": ["db/migrations/0019_rls_security_boundary.sql", "manifests/security/rls-security-proof-v1.json", "reports/staging/rls-sql-isolation-staging-latest.json"],
       "remainingConstraint": "Capture live SQL role-isolation proof."
     },
     {
