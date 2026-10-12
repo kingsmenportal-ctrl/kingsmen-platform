@@ -42,7 +42,7 @@
     "founder_can_read_audit_events",
     "anonymous_cannot_read_candidate_data",
     "public_can_read_verified_route_sources_only",
-    "service_role_key_absent_from_client_artifacts",
+    "backend_service_key_absent_from_client_artifacts",
     "backend_mutations_require_verified_server_context"
   ],
   "proofRunner": "scripts/proof/prove-rls-security-boundary.mjs",
