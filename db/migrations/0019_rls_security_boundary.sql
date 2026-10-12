@@ -9,6 +9,7 @@ CREATE OR REPLACE FUNCTION kingsmen_security.current_runtime_role()
 RETURNS text
 LANGUAGE sql
 STABLE
+SET search_path = pg_catalog
 AS $$
   SELECT COALESCE(NULLIF(auth.jwt() -> 'app_metadata' ->> 'kingsmen_role', ''), NULLIF(auth.jwt() ->> 'role', ''), 'anonymous')
 $$;
@@ -17,6 +18,7 @@ CREATE OR REPLACE FUNCTION kingsmen_security.current_service_context()
 RETURNS text
 LANGUAGE sql
 STABLE
+SET search_path = pg_catalog
 AS $$
   SELECT COALESCE(NULLIF(auth.jwt() -> 'app_metadata' ->> 'service_context', ''), 'none')
 $$;
@@ -25,6 +27,7 @@ CREATE OR REPLACE FUNCTION kingsmen_security.current_candidate_public_ref()
 RETURNS text
 LANGUAGE sql
 STABLE
+SET search_path = pg_catalog
 AS $$
   SELECT NULLIF(auth.jwt() -> 'app_metadata' ->> 'candidate_public_ref', '')
 $$;
@@ -33,6 +36,7 @@ CREATE OR REPLACE FUNCTION kingsmen_security.is_backend_service_role()
 RETURNS boolean
 LANGUAGE sql
 STABLE
+SET search_path = pg_catalog
 AS $$
   SELECT kingsmen_security.current_runtime_role() = 'service_role'
     AND kingsmen_security.current_service_context() = 'backend_api'
@@ -42,6 +46,7 @@ CREATE OR REPLACE FUNCTION kingsmen_security.is_founder_or_operator()
 RETURNS boolean
 LANGUAGE sql
 STABLE
+SET search_path = pg_catalog
 AS $$
   SELECT kingsmen_security.current_runtime_role() IN ('founder', 'operator')
 $$;
@@ -50,6 +55,7 @@ CREATE OR REPLACE FUNCTION kingsmen_security.is_founder()
 RETURNS boolean
 LANGUAGE sql
 STABLE
+SET search_path = pg_catalog
 AS $$
   SELECT kingsmen_security.current_runtime_role() = 'founder'
 $$;
