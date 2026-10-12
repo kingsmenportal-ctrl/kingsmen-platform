@@ -28,7 +28,7 @@ function check(name, passed, detail = '') {
 }
 
 const requiredFiles = [
-  checkFile('db/migrations/0001_n03_truth_vault.sql', ['ENABLE ROW LEVEL SECURITY', 'FOR ALL USING (true) WITH CHECK (true)']),
+  checkFile('db/migrations/0001_n03_truth_vault.sql', ['ENABLE ROW LEVEL SECURITY', 'FOR ALL TO service_role USING (true) WITH CHECK (true)']),
   checkFile('db/migrations/0019_rls_security_boundary.sql', [
     'current_runtime_role',
     'current_service_context',
