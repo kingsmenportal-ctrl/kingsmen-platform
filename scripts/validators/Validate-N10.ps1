@@ -27,7 +27,7 @@ function Require-NotContains([string]$Path,[string]$Needle,[string]$Message) {
 $Files = @(
   "manifests\n10\finance-payfast-runtime.json",
   "db\migrations\0008_n10_finance_payfast.sql",
-  "db\migrations\0019_n10_commercial_schedule_v1.sql",
+  "db\migrations\0022_n10_commercial_schedule_v1.sql",
   "manifests\business\package-catalogue.json",
   "docs\commercial\KINGSMEN_PACKAGE_COMMERCIAL_SCHEDULE_V1.md",
   "db\seeds\n10_finance_payfast_seed.sql",
@@ -57,7 +57,7 @@ Require-Contains "manifests\n10\finance-payfast-runtime.json" "PostgreSQL financ
 Require-Contains "manifests\n10\finance-payfast-runtime.json" "No AI refund approval" "Manifest must block AI refund approval."
 Require-Contains "manifests\n10\finance-payfast-runtime.json" "PayFast ITN receipts must be idempotent" "Manifest must lock ITN idempotency."
 Require-Contains "db\migrations\0008_n10_finance_payfast.sql" "finance_plan_catalog" "Migration missing plan catalog."
-Require-Contains "db\migrations\0019_n10_commercial_schedule_v1.sql" "entitlement_snapshot" "Commercial migration must snapshot order entitlements."
+Require-Contains "db\migrations\0022_n10_commercial_schedule_v1.sql" "entitlement_snapshot" "Commercial migration must snapshot order entitlements."
 Require-Contains "manifests\business\package-catalogue.json" "COMMERCIAL_SCHEDULE_V1_PROPOSED_PENDING_FOUNDER_APPROVAL" "Commercial schedule must remain explicitly pending founder approval."
 Require-Contains "db\migrations\0008_n10_finance_payfast.sql" "payfast_payment_intents" "Migration missing PayFast intents."
 Require-Contains "db\migrations\0008_n10_finance_payfast.sql" "payfast_itn_receipts" "Migration missing PayFast ITN receipts."
