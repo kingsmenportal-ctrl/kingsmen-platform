@@ -90,124 +90,124 @@ DROP POLICY IF EXISTS service_role_all_approval_requests ON approval_requests;
 DROP POLICY IF EXISTS service_role_all_system_runtime_config ON system_runtime_config;
 
 -- Candidates.
-CREATE POLICY candidates_service_role_backend_all ON candidates TO service_role
-  FOR ALL USING (kingsmen_security.is_backend_service_role())
+CREATE POLICY candidates_service_role_backend_all ON candidates
+  FOR ALL TO service_role USING (kingsmen_security.is_backend_service_role())
   WITH CHECK (kingsmen_security.is_backend_service_role());
 
-CREATE POLICY candidates_founder_operator_read ON candidates TO authenticated, service_role
-  FOR SELECT USING (kingsmen_security.is_founder_or_operator());
+CREATE POLICY candidates_founder_operator_read ON candidates
+  FOR SELECT TO authenticated, service_role USING (kingsmen_security.is_founder_or_operator());
 
-CREATE POLICY candidates_candidate_read_own ON candidates TO authenticated
-  FOR SELECT USING (public_ref = kingsmen_security.current_candidate_public_ref());
+CREATE POLICY candidates_candidate_read_own ON candidates
+  FOR SELECT TO authenticated USING (public_ref = kingsmen_security.current_candidate_public_ref());
 
 -- Candidate profiles.
-CREATE POLICY candidate_profiles_service_role_backend_all ON candidate_profiles TO service_role
-  FOR ALL USING (kingsmen_security.is_backend_service_role())
+CREATE POLICY candidate_profiles_service_role_backend_all ON candidate_profiles
+  FOR ALL TO service_role USING (kingsmen_security.is_backend_service_role())
   WITH CHECK (kingsmen_security.is_backend_service_role());
 
-CREATE POLICY candidate_profiles_founder_operator_read ON candidate_profiles TO authenticated, service_role
-  FOR SELECT USING (kingsmen_security.is_founder_or_operator());
+CREATE POLICY candidate_profiles_founder_operator_read ON candidate_profiles
+  FOR SELECT TO authenticated, service_role USING (kingsmen_security.is_founder_or_operator());
 
-CREATE POLICY candidate_profiles_candidate_read_own ON candidate_profiles TO authenticated
-  FOR SELECT USING (candidate_id = kingsmen_security.current_candidate_id());
+CREATE POLICY candidate_profiles_candidate_read_own ON candidate_profiles
+  FOR SELECT TO authenticated USING (candidate_id = kingsmen_security.current_candidate_id());
 
 -- Applications.
-CREATE POLICY applications_service_role_backend_all ON applications TO service_role
-  FOR ALL USING (kingsmen_security.is_backend_service_role())
+CREATE POLICY applications_service_role_backend_all ON applications
+  FOR ALL TO service_role USING (kingsmen_security.is_backend_service_role())
   WITH CHECK (kingsmen_security.is_backend_service_role());
 
-CREATE POLICY applications_founder_operator_read ON applications TO authenticated, service_role
-  FOR SELECT USING (kingsmen_security.is_founder_or_operator());
+CREATE POLICY applications_founder_operator_read ON applications
+  FOR SELECT TO authenticated, service_role USING (kingsmen_security.is_founder_or_operator());
 
-CREATE POLICY applications_candidate_read_own ON applications TO authenticated
-  FOR SELECT USING (candidate_id = kingsmen_security.current_candidate_id());
+CREATE POLICY applications_candidate_read_own ON applications
+  FOR SELECT TO authenticated USING (candidate_id = kingsmen_security.current_candidate_id());
 
 -- Evidence and operational tables: candidates may read only their own safe rows where applicable.
-CREATE POLICY evidence_ledger_service_role_backend_all ON evidence_ledger TO service_role
-  FOR ALL USING (kingsmen_security.is_backend_service_role())
+CREATE POLICY evidence_ledger_service_role_backend_all ON evidence_ledger
+  FOR ALL TO service_role USING (kingsmen_security.is_backend_service_role())
   WITH CHECK (kingsmen_security.is_backend_service_role());
 
-CREATE POLICY evidence_ledger_founder_operator_read ON evidence_ledger TO authenticated, service_role
-  FOR SELECT USING (kingsmen_security.is_founder_or_operator());
+CREATE POLICY evidence_ledger_founder_operator_read ON evidence_ledger
+  FOR SELECT TO authenticated, service_role USING (kingsmen_security.is_founder_or_operator());
 
-CREATE POLICY evidence_ledger_candidate_read_own_safe ON evidence_ledger TO authenticated
-  FOR SELECT USING (
+CREATE POLICY evidence_ledger_candidate_read_own_safe ON evidence_ledger
+  FOR SELECT TO authenticated USING (
     candidate_id = kingsmen_security.current_candidate_id()
     AND protected_data = false
   );
 
-CREATE POLICY audit_events_service_role_backend_all ON audit_events TO service_role
-  FOR ALL USING (kingsmen_security.is_backend_service_role())
+CREATE POLICY audit_events_service_role_backend_all ON audit_events
+  FOR ALL TO service_role USING (kingsmen_security.is_backend_service_role())
   WITH CHECK (kingsmen_security.is_backend_service_role());
 
-CREATE POLICY audit_events_founder_read ON audit_events TO authenticated, service_role
-  FOR SELECT USING (kingsmen_security.is_founder());
+CREATE POLICY audit_events_founder_read ON audit_events
+  FOR SELECT TO authenticated, service_role USING (kingsmen_security.is_founder());
 
-CREATE POLICY workflow_runs_service_role_backend_all ON workflow_runs TO service_role
-  FOR ALL USING (kingsmen_security.is_backend_service_role())
+CREATE POLICY workflow_runs_service_role_backend_all ON workflow_runs
+  FOR ALL TO service_role USING (kingsmen_security.is_backend_service_role())
   WITH CHECK (kingsmen_security.is_backend_service_role());
 
-CREATE POLICY workflow_runs_founder_operator_read ON workflow_runs TO authenticated, service_role
-  FOR SELECT USING (kingsmen_security.is_founder_or_operator());
+CREATE POLICY workflow_runs_founder_operator_read ON workflow_runs
+  FOR SELECT TO authenticated, service_role USING (kingsmen_security.is_founder_or_operator());
 
-CREATE POLICY workflow_runs_candidate_read_own ON workflow_runs TO authenticated
-  FOR SELECT USING (candidate_id = kingsmen_security.current_candidate_id());
+CREATE POLICY workflow_runs_candidate_read_own ON workflow_runs
+  FOR SELECT TO authenticated USING (candidate_id = kingsmen_security.current_candidate_id());
 
-CREATE POLICY command_log_service_role_backend_all ON command_log TO service_role
-  FOR ALL USING (kingsmen_security.is_backend_service_role())
+CREATE POLICY command_log_service_role_backend_all ON command_log
+  FOR ALL TO service_role USING (kingsmen_security.is_backend_service_role())
   WITH CHECK (kingsmen_security.is_backend_service_role());
 
-CREATE POLICY command_log_founder_operator_read ON command_log TO authenticated, service_role
-  FOR SELECT USING (kingsmen_security.is_founder_or_operator());
+CREATE POLICY command_log_founder_operator_read ON command_log
+  FOR SELECT TO authenticated, service_role USING (kingsmen_security.is_founder_or_operator());
 
-CREATE POLICY idempotency_keys_service_role_backend_all ON idempotency_keys TO service_role
-  FOR ALL USING (kingsmen_security.is_backend_service_role())
+CREATE POLICY idempotency_keys_service_role_backend_all ON idempotency_keys
+  FOR ALL TO service_role USING (kingsmen_security.is_backend_service_role())
   WITH CHECK (kingsmen_security.is_backend_service_role());
 
-CREATE POLICY worker_heartbeats_service_role_backend_all ON worker_heartbeats TO service_role
-  FOR ALL USING (kingsmen_security.is_backend_service_role())
+CREATE POLICY worker_heartbeats_service_role_backend_all ON worker_heartbeats
+  FOR ALL TO service_role USING (kingsmen_security.is_backend_service_role())
   WITH CHECK (kingsmen_security.is_backend_service_role());
 
-CREATE POLICY worker_heartbeats_founder_operator_read ON worker_heartbeats TO authenticated, service_role
-  FOR SELECT USING (kingsmen_security.is_founder_or_operator());
+CREATE POLICY worker_heartbeats_founder_operator_read ON worker_heartbeats
+  FOR SELECT TO authenticated, service_role USING (kingsmen_security.is_founder_or_operator());
 
-CREATE POLICY dead_letter_queue_service_role_backend_all ON dead_letter_queue TO service_role
-  FOR ALL USING (kingsmen_security.is_backend_service_role())
+CREATE POLICY dead_letter_queue_service_role_backend_all ON dead_letter_queue
+  FOR ALL TO service_role USING (kingsmen_security.is_backend_service_role())
   WITH CHECK (kingsmen_security.is_backend_service_role());
 
-CREATE POLICY dead_letter_queue_founder_operator_read ON dead_letter_queue TO authenticated, service_role
-  FOR SELECT USING (kingsmen_security.is_founder_or_operator());
+CREATE POLICY dead_letter_queue_founder_operator_read ON dead_letter_queue
+  FOR SELECT TO authenticated, service_role USING (kingsmen_security.is_founder_or_operator());
 
-CREATE POLICY approval_requests_service_role_backend_all ON approval_requests TO service_role
-  FOR ALL USING (kingsmen_security.is_backend_service_role())
+CREATE POLICY approval_requests_service_role_backend_all ON approval_requests
+  FOR ALL TO service_role USING (kingsmen_security.is_backend_service_role())
   WITH CHECK (kingsmen_security.is_backend_service_role());
 
-CREATE POLICY approval_requests_founder_operator_read ON approval_requests TO authenticated, service_role
-  FOR SELECT USING (kingsmen_security.is_founder_or_operator());
+CREATE POLICY approval_requests_founder_operator_read ON approval_requests
+  FOR SELECT TO authenticated, service_role USING (kingsmen_security.is_founder_or_operator());
 
 -- Source metadata: only verified route/source rows can be read outside operator/founder/service contexts.
-CREATE POLICY source_authorities_service_role_backend_all ON source_authorities TO service_role
-  FOR ALL USING (kingsmen_security.is_backend_service_role())
+CREATE POLICY source_authorities_service_role_backend_all ON source_authorities
+  FOR ALL TO service_role USING (kingsmen_security.is_backend_service_role())
   WITH CHECK (kingsmen_security.is_backend_service_role());
 
-CREATE POLICY source_authorities_founder_operator_read ON source_authorities TO authenticated, service_role
-  FOR SELECT USING (kingsmen_security.is_founder_or_operator());
+CREATE POLICY source_authorities_founder_operator_read ON source_authorities
+  FOR SELECT TO authenticated, service_role USING (kingsmen_security.is_founder_or_operator());
 
-CREATE POLICY route_sources_service_role_backend_all ON route_sources TO service_role
-  FOR ALL USING (kingsmen_security.is_backend_service_role())
+CREATE POLICY route_sources_service_role_backend_all ON route_sources
+  FOR ALL TO service_role USING (kingsmen_security.is_backend_service_role())
   WITH CHECK (kingsmen_security.is_backend_service_role());
 
-CREATE POLICY route_sources_founder_operator_read ON route_sources TO authenticated, service_role
-  FOR SELECT USING (kingsmen_security.is_founder_or_operator());
+CREATE POLICY route_sources_founder_operator_read ON route_sources
+  FOR SELECT TO authenticated, service_role USING (kingsmen_security.is_founder_or_operator());
 
-CREATE POLICY route_sources_public_verified_read ON route_sources TO anon, authenticated, service_role
-  FOR SELECT USING (status = 'VERIFIED' AND confidence_band IN ('A', 'B'));
+CREATE POLICY route_sources_public_verified_read ON route_sources
+  FOR SELECT TO anon, authenticated, service_role USING (status = 'VERIFIED' AND confidence_band IN ('A', 'B'));
 
-CREATE POLICY system_runtime_config_service_role_backend_all ON system_runtime_config TO service_role
-  FOR ALL USING (kingsmen_security.is_backend_service_role())
+CREATE POLICY system_runtime_config_service_role_backend_all ON system_runtime_config
+  FOR ALL TO service_role USING (kingsmen_security.is_backend_service_role())
   WITH CHECK (kingsmen_security.is_backend_service_role());
 
-CREATE POLICY system_runtime_config_founder_operator_read ON system_runtime_config TO authenticated, service_role
-  FOR SELECT USING (kingsmen_security.is_founder_or_operator());
+CREATE POLICY system_runtime_config_founder_operator_read ON system_runtime_config
+  FOR SELECT TO authenticated, service_role USING (kingsmen_security.is_founder_or_operator());
 
 COMMENT ON SCHEMA kingsmen_security IS 'Kingsmen runtime-claim RLS helpers. Public launch still requires staging proof.';
