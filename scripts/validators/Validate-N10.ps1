@@ -1,5 +1,5 @@
 $ErrorActionPreference = "Stop"
-$Base = "C:\Kingsmen\kingsmen-platform"
+$Base = Split-Path -Parent (Split-Path -Parent $PSScriptRoot)
 Set-Location $Base
 
 $Failures = New-Object System.Collections.Generic.List[string]
