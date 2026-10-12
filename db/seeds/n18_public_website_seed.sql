@@ -7,9 +7,8 @@ insert into public.public_website_runtime_config (config_key, config_value, conf
 ('CV_REVAMP_PRICE_ZAR','49.99'::jsonb,'PRICING',true),
 ('CV_REVAMP_INCLUDED_CV_VERSIONS','15'::jsonb,'PRICING',true),
 ('CV_REVAMP_INCLUDED_MOTIVATION_LETTERS','15'::jsonb,'PRICING',true),
-('ACCOMMODATION_SUPPORT_PRICE_ZAR','179.00'::jsonb,'PRICING',true),
-('ACCOMMODATION_SUPPORT_INCLUDED_ROUTES','8'::jsonb,'PRICING',true),
-('PAID_PACKAGES_INCLUDE_ACC01_ROUTES','8'::jsonb,'PRICING',true),
+('ACCOMMODATION_SUPPORT_SEPARATE_FEE','false'::jsonb,'PRICING',true),
+('ACCOMMODATION_SUPPORT_COUNTS_TOWARD_MANAGED_ROUTE_ALLOWANCE','true'::jsonb,'PRICING',true),
 ('PUBLIC_SITE_EMAIL_FIRST_WHATSAPP_URGENT_ONLY','true'::jsonb,'COMMS',true),
 ('SMART_FORM_DOCUMENT_AWARE_PREFILL','true'::jsonb,'INTAKE',true),
 ('PUBLIC_SITE_ORACLE_LITE_STATIC_FIRST','true'::jsonb,'RUNTIME',true)
@@ -20,7 +19,7 @@ insert into public.public_website_pages
 values
 ('home','Kingsmen Route Command House','/','HOME','PUBLISHED','Kingsmen - Private Route Command House','South African route intelligence, document readiness, opportunity direction, and managed execution for study, work, funding, and accommodation routes.',false),
 ('destiny-map','Free Destiny Map','/destiny-map','DESTINY_MAP','PUBLISHED','Free Destiny Map - Kingsmen','Get an all-sector preview of possible study, work, funding, CV, and accommodation routes. Exact targets unlock after package activation.',false),
-('pricing','Kingsmen Packages','/pricing','PRICING','PUBLISHED','Kingsmen Packages and Pricing','Clear package boundaries for Destiny Map, CV Revamp, Accommodation Support, and activated route execution.',false),
+('pricing','Kingsmen Packages','/pricing','PRICING','PUBLISHED','Kingsmen Packages and Pricing','Seven package options with versioned route allowances and service terms; accommodation support where relevant is part of the managed-route allowance.',false),
 ('sectors','Route Universe','/sectors','SECTORS','PUBLISHED','Kingsmen Route Universe','Universities, TVET, SETA, learnerships, employers, bursaries, NSFAS, CAO, accommodation, and verified private provider route visibility.',false),
 ('trust-safety','Trust and Safety','/trust-safety','TRUST_SAFETY','PUBLISHED','Kingsmen Trust and Safety','How Kingsmen protects truth, privacy, official-source confidence, route integrity, communication evidence, and candidate dignity.',false),
 ('contact','Start With Kingsmen','/contact','CONTACT','PUBLISHED','Start With Kingsmen','Start with a smart form and document-aware route preview.',false)
