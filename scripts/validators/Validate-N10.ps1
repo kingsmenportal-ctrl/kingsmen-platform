@@ -58,7 +58,7 @@ Require-Contains "manifests\n10\finance-payfast-runtime.json" "No AI refund appr
 Require-Contains "manifests\n10\finance-payfast-runtime.json" "PayFast ITN receipts must be idempotent" "Manifest must lock ITN idempotency."
 Require-Contains "db\migrations\0008_n10_finance_payfast.sql" "finance_plan_catalog" "Migration missing plan catalog."
 Require-Contains "db\migrations\0022_n10_commercial_schedule_v1.sql" "entitlement_snapshot" "Commercial migration must snapshot order entitlements."
-Require-Contains "manifests\business\package-catalogue.json" "COMMERCIAL_SCHEDULE_V1_PROPOSED_PENDING_FOUNDER_APPROVAL" "Commercial schedule must remain explicitly pending founder approval."
+Require-Contains "manifests\business\package-catalogue.json" "COMMERCIAL_SCHEDULE_V1_APPROVED_PENDING_STAGING_VALIDATION" "Commercial schedule must remain explicitly pending founder approval."
 Require-Contains "db\migrations\0008_n10_finance_payfast.sql" "payfast_payment_intents" "Migration missing PayFast intents."
 Require-Contains "db\migrations\0008_n10_finance_payfast.sql" "payfast_itn_receipts" "Migration missing PayFast ITN receipts."
 Require-Contains "db\migrations\0008_n10_finance_payfast.sql" "finance_refund_requests" "Migration missing refund requests."
