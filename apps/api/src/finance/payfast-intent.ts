@@ -28,15 +28,52 @@ export function getPayFastProcessUrl(environment: "sandbox" | "live"): string {
     : "https://sandbox.payfast.co.za/eng/process";
 }
 
-export function createFinanceOrder(input: { candidateRef: string; planCode: FinancePlanCode }): FinanceOrder {
+export function createFinanceOrder(input: {
+  candidateRef: string;
+  planCode: FinancePlanCode;
+  /** Must come from server-verified finance history, never directly from a client request. */
+  verifiedPriorCvRevampPurchase?: boolean;
+}): FinanceOrder {
   const plan = getFinancePlan(input.planCode);
+  const upgradeBonusRoutes =
+    input.planCode !== "CV_REVAMP_R49_99" &&
+    input.planCode !== "FREE_DESTINY_MAP_R0" &&
+    input.verifiedPriorCvRevampPurchase === true
+      ? plan.upgradeBonusRoutesWhenCvRevampOwned
+      : 0;
+  const entitlementSnapshot = {
+    catalogueVersion: plan.catalogueVersion,
+    serviceTermDays: plan.serviceTermDays,
+    managedApplicationCount: plan.managedApplicationCount,
+    accommodationRouteCount: plan.accommodationRouteCount,
+    cvVersions: plan.cvVersions,
+    motivationLetters: plan.motivationLetters,
+    acknowledgementTargetBusinessHours: plan.acknowledgementTargetBusinessHours,
+    firstResponseTargetBusinessHours: plan.firstResponseTargetBusinessHours,
+    upgradeBonusRoutes,
+    refundPolicyVersion: plan.refundPolicyVersion,
+    serviceScope: plan.serviceScope,
+    responseTargetDisclaimer: plan.responseTargetDisclaimer
+  };
   return {
     orderRef: `ord_${Date.now()}_${Math.random().toString(36).slice(2, 10)}`,
     candidateRef: input.candidateRef,
     planCode: input.planCode,
     orderStatus: plan.amountCents === 0 ? "PAID" : "PENDING_PAYMENT",
     amountCents: plan.amountCents,
-    currency: "ZAR"
+    currency: "ZAR",
+    catalogueVersion: plan.catalogueVersion,
+    serviceTermDays: plan.serviceTermDays,
+    managedApplicationCount: plan.managedApplicationCount,
+    accommodationRouteCount: plan.accommodationRouteCount,
+    cvVersions: plan.cvVersions,
+    motivationLetters: plan.motivationLetters,
+    acknowledgementTargetBusinessHours: plan.acknowledgementTargetBusinessHours,
+    firstResponseTargetBusinessHours: plan.firstResponseTargetBusinessHours,
+    upgradeBonusRoutes,
+    refundPolicyVersion: plan.refundPolicyVersion,
+    serviceScope: plan.serviceScope,
+    entitlementSnapshot
   };
 }
 
