@@ -10,7 +10,7 @@ This document records the row-level-security boundary needed before Kingsmen can
 The original N03 Truth Vault migration correctly created the core tables and enabled RLS, but it used bootstrap-wide service policies. The launch hardening path now adds a second migration:
 
 ```txt
- db/migrations/0009_rls_security_boundary.sql
+ db/migrations/0019_rls_security_boundary.sql
 ```
 
 That migration replaces broad bootstrap policies with runtime-claim policies based on explicit backend settings.
