@@ -78,7 +78,8 @@
     "repo:prove:branch-protection": "node scripts/proof/prove-main-branch-protection-boundary.mjs",
     "repo:validate:branch-protection": "node scripts/validators/validate-main-branch-protection.mjs",
     "n10:validate": "pwsh -NoProfile -File scripts/validators/Validate-N10.ps1",
-    "staging:capture:evidence": "pwsh -NoProfile -File scripts/staging/Invoke-KingsmenStagingRuntimeEvidencePack.ps1"
+    "staging:capture:evidence": "pwsh -NoProfile -File scripts/staging/Invoke-KingsmenStagingRuntimeEvidencePack.ps1",
+    "n18:validate": "pwsh -NoProfile -File scripts/validators/Validate-N18.ps1"
   },
   "repository": {
     "type": "git",
