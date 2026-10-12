@@ -55,6 +55,7 @@
       "status": "foundation_built_pending_staging_proof",
       "evidencePaths": [
         "apps/api/src/db/truth-vault-repository.ts",
+        "db/migrations/0021_foreign_key_index_hardening.sql",
         "scripts/validators/validate-api-truth-vault-persistence.mjs",
         "reports/staging/truth-vault-persistence-staging-latest.json"
       ],
