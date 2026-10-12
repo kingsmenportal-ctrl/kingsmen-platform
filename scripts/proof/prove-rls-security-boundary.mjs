@@ -14,7 +14,7 @@ function includesAll(source, tokens) {
   return tokens.every((token) => source.includes(token));
 }
 
-const migration = read('db/migrations/0009_rls_security_boundary.sql');
+const migration = read('db/migrations/0019_rls_security_boundary.sql');
 const n03Migration = read('db/migrations/0001_n03_truth_vault.sql');
 const manifest = read('manifests/security/rls-security-proof-v1.json');
 
@@ -119,7 +119,7 @@ const report = {
   failedChecks,
   generatedAtIso: new Date().toISOString(),
   nextAction: passed
-    ? 'Apply db/migrations/0009_rls_security_boundary.sql to staging and run live SQL role-isolation tests.'
+    ? 'Apply db/migrations/0019_rls_security_boundary.sql to staging and run live SQL role-isolation tests.'
     : 'Repair RLS migration/proof files before staging.'
 };
 
