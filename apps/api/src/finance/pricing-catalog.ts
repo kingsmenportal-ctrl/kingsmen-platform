@@ -1,5 +1,10 @@
 import type { FinancePlan, FinancePlanCode } from "./finance-types";
 
+// This catalog intentionally exposes only plans that are currently approved for checkout.
+// Accommodation support remains a package privilege where relevant under the canonical
+// business catalogue; no standalone R179 accommodation product is approved for sale.
+// The seven canonical packages still need complete finance-plan specifications before
+// they can be enabled for checkout.
 export const KINGSMEN_PRICING_CATALOG: readonly FinancePlan[] = [
   {
     planCode: "FREE_DESTINY_MAP_R0",
@@ -24,18 +29,6 @@ export const KINGSMEN_PRICING_CATALOG: readonly FinancePlan[] = [
     cvVersions: 15,
     motivationLetters: 15,
     doctrineNotes: "Never invent fake experience, qualifications, references, certificates, skills, or results."
-  },
-  {
-    planCode: "ACCOMMODATION_SUPPORT_R179",
-    planName: "Accommodation Support Package",
-    description: "Standalone support for up to 8 accommodation applications/routes.",
-    amountCents: 17900,
-    currency: "ZAR",
-    managedApplicationCount: 8,
-    accommodationRouteCount: 8,
-    cvVersions: 0,
-    motivationLetters: 0,
-    doctrineNotes: "Accommodation route support with evidence-backed readiness."
   }
 ] as const;
 
