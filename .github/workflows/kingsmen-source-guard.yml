@@ -38,6 +38,9 @@ jobs:
       - name: N10 finance / PayFast validator
         run: npm run n10:validate
 
+      - name: N18 public website / package catalogue validator
+        run: npm run n18:validate
+
       - name: API Truth Vault persistence validator
         run: npm run api:validate:truth-vault
 
