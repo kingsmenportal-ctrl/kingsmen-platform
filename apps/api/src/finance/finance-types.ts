@@ -47,6 +47,18 @@ export interface FinanceOrder {
   orderStatus: OrderStatus;
   amountCents: number;
   currency: CurrencyCode;
+  catalogueVersion: string;
+  serviceTermDays: number;
+  managedApplicationCount: number;
+  accommodationRouteCount: number;
+  cvVersions: number;
+  motivationLetters: number;
+  acknowledgementTargetBusinessHours: number;
+  firstResponseTargetBusinessHours: number;
+  upgradeBonusRoutes: number;
+  refundPolicyVersion: string;
+  serviceScope: string;
+  entitlementSnapshot: Record<string, string | number | boolean>;
   evidenceRef?: string;
 }
 
