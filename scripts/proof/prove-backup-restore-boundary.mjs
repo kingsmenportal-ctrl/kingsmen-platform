@@ -48,7 +48,7 @@ if (existsSync(rel('scripts/backup/New-KingsmenTruthVaultBackup.ps1'))) {
 if (existsSync(rel('scripts/backup/Test-KingsmenTruthVaultRestore.ps1'))) {
   const restoreScript = read('scripts/backup/Test-KingsmenTruthVaultRestore.ps1');
   check('restore_uses_pg_restore', restoreScript.includes('pg_restore'), 'pg_restore required for restore drill', 'scripts/backup/Test-KingsmenTruthVaultRestore.ps1');
-  check('restore_blocks_same_target', restoreScript.includes('SOURCE_AND_RESTORE_DATABASE_IDENTITIES_MATCH') && restoreScript.includes('Restore blocked'), 'restore target identity must differ from source', 'scripts/backup/Test-KingsmenTruthVaultRestore.ps1');
+  check('restore_blocks_same_target', restoreScript.includes('SOURCE_AND_RESTORE_DATABASE_IDENTITIES_MATCH') && restoreScript.includes('SOURCE_AND_RESTORE_PROJECT_REFS_MUST_DIFFER'), 'restore target identity must differ from source', 'scripts/backup/Test-KingsmenTruthVaultRestore.ps1');
   check('restore_requires_checksum', restoreScript.includes('ExpectedSha256') && restoreScript.includes('checksumMatches'), 'real restore requires independently supplied SHA-256', 'scripts/backup/Test-KingsmenTruthVaultRestore.ps1');
   check('restore_validates_archive', restoreScript.includes('pg_restore --list') && restoreScript.includes('archiveValidated'), 'decrypted archive is validated before restore', 'scripts/backup/Test-KingsmenTruthVaultRestore.ps1');
   check('restore_decrypts_encrypted_archive', restoreScript.includes('gpg --batch --yes --decrypt') && restoreScript.includes('temporaryPlaintext'), 'encrypted archive is decrypted to a temporary file and removed in finally', 'scripts/backup/Test-KingsmenTruthVaultRestore.ps1');
