@@ -7,12 +7,13 @@ on:
     branches: [main]
   workflow_dispatch:
 
+permissions:
+  contents: read
+
 jobs:
   source-guard:
     name: source-guard
     runs-on: ubuntu-latest
-    permissions:
-      contents: read
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -23,80 +24,26 @@ jobs:
           node-version: '22'
           cache: 'npm'
 
-      - name: Install dependencies
+      - name: Install root dependencies
         run: npm ci
 
-      - name: API Truth Vault persistence validator
-        run: npm run api:validate:truth-vault
+      - name: Run core regression validators
+        run: npm test
+
+      - name: API persistence source validator
+        run: npm run api:validate
 
       - name: Safe web/backend boundary validator
         run: npm run web:validate:backend-boundary
 
-      - name: PayFast sandbox source proof
-        run: npm run payments:prove:sandbox
+      - name: Install API dependencies
+        run: npm install --prefix apps/api --ignore-scripts
 
-      - name: PayFast sandbox validator
-        run: npm run payments:validate:sandbox
+      - name: Build API
+        run: npm run api:build
 
-      - name: RLS/security source proof
-        run: npm run security:prove:rls
-
-      - name: RLS/security validator
-        run: npm run security:validate:rls
-
-      - name: Backup/restore source proof
-        run: npm run backup:prove:restore
-
-      - name: Backup/restore validator
-        run: npm run backup:validate:restore
-
-      - name: Secrets wiring source proof
-        run: npm run secrets:prove:wiring
-
-      - name: Secrets wiring validator
-        run: npm run secrets:validate:wiring
-
-      - name: Communications source proof
-        run: npm run communications:prove
-
-      - name: Communications validator
-        run: npm run communications:validate
-
-      - name: Observability source proof
-        run: npm run observability:prove
-
-      - name: Observability validator
-        run: npm run observability:validate
-
-      - name: Legal/privacy source proof
-        run: npm run legal:prove
-
-      - name: Legal/privacy validator
-        run: npm run legal:validate
-
-      - name: Staging pack source proof
-        run: npm run staging:prove:pack
-
-      - name: Staging pack validator
-        run: npm run staging:validate:pack
-
-      - name: Staging evidence capture source proof
-        run: npm run staging:prove:capture
-
-      - name: Staging evidence capture validator
-        run: npm run staging:validate:capture
-
-      - name: Final assembly evidence source proof
-        run: npm run final:prove:evidence
-
-      - name: Final assembly evidence validator
-        run: npm run final:validate:evidence
-
-      - name: Branch protection source proof
-        run: npm run repo:prove:branch-protection
-
-      - name: Branch protection validator
-        run: npm run repo:validate:branch-protection
-
-      - name: Launch audit report
+      - name: Produce launch-readiness audit
         run: npm run kingsmen:launch:audit
+
+      - name: Enforce launch-readiness gate
+        run: npm run kingsmen:launch:gate
