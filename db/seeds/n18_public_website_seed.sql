@@ -8,6 +8,8 @@ insert into public.public_website_runtime_config (config_key, config_value, conf
 ('CV_REVAMP_INCLUDED_CV_VERSIONS','15'::jsonb,'PRICING',true),
 ('CV_REVAMP_INCLUDED_MOTIVATION_LETTERS','15'::jsonb,'PRICING',true),
 ('ACCOMMODATION_SUPPORT_SEPARATE_FEE','false'::jsonb,'PRICING',true),
+('ACCOMMODATION_SUPPORT_PRICE_ZAR','0'::jsonb,'PRICING',true),
+('PAID_PACKAGES_INCLUDE_ACC01_ROUTES','true'::jsonb,'PRICING',true),
 ('ACCOMMODATION_SUPPORT_COUNTS_TOWARD_MANAGED_ROUTE_ALLOWANCE','true'::jsonb,'PRICING',true),
 ('PUBLIC_SITE_EMAIL_FIRST_WHATSAPP_URGENT_ONLY','true'::jsonb,'COMMS',true),
 ('SMART_FORM_DOCUMENT_AWARE_PREFILL','true'::jsonb,'INTAKE',true),
