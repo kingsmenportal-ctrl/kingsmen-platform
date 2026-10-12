@@ -66,6 +66,7 @@
       "status": "foundation_built_pending_staging_proof",
       "evidencePaths": [
         "db/migrations/0019_rls_security_boundary.sql",
+        "db/migrations/0020_rls_helper_search_path_hardening.sql",
         "manifests/security/rls-security-proof-v1.json",
         "reports/staging/rls-sql-isolation-staging-latest.json"
       ],
