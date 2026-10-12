@@ -1,5 +1,5 @@
 -- N10 commercial schedule v1.0; schema migration 0022.
--- Reviewed code migration only; do not apply to staging until PR review and approved rollout window.
+-- Reviewed additive schema migration. Authorized for staging only; production use requires a separate founder-approved release.
 alter table public.finance_plan_catalog
   add column if not exists service_term_days integer not null default 0,
   add column if not exists acknowledgement_target_business_hours integer not null default 0,
