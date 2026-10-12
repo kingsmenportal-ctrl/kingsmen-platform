@@ -29,8 +29,8 @@ const requiredTokens = {
   'docs/launch/KINGSMEN_STAGING_RUNTIME_EVIDENCE_CAPTURE.md': [
     'Staging runtime evidence capture',
     'Production ready: **false**',
-    'npm run staging:capture:evidence',
-    'npm run final:collect:evidence'
+    'scripts/staging/Invoke-KingsmenStagingRuntimeEvidencePack.ps1',
+    'scripts/staging/Collect-KingsmenFinalAssemblyEvidence.ps1'
   ]
 };
 
