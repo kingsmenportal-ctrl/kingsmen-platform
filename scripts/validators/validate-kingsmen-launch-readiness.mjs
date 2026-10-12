@@ -180,6 +180,17 @@ try {
   block('PACKAGE_JSON_INVALID', 'package.json is invalid JSON.', String(error), 'Repair package.json.', ['package.json']);
 }
 
+const rootPackage = json('package.json');
+if (!rootPackage?.scripts?.['security:prove:rls'] || !rootPackage?.scripts?.['security:validate:rls']) {
+  block(
+    'RLS_SECURITY_SCRIPT_MISSING',
+    'RLS/security proof or validator script is missing.',
+    'Both security:prove:rls and security:validate:rls must be wired to the checked-in proof and validator scripts.',
+    'Restore the RLS scripts in package.json and rerun the source guard.',
+    ['package.json', 'scripts/proof/prove-rls-security-boundary.mjs', 'scripts/validators/validate-rls-security-proof.mjs']
+  );
+}
+
 for (const routePath of [
   'apps/web/src/app/api/jarvis/status/route.ts',
   'apps/web/src/app/api/jarvis/command/route.ts',
