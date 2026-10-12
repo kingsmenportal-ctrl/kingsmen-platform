@@ -58,8 +58,14 @@ insert into public.public_website_package_cards
 (package_key, package_name, price_zar, price_label, package_type, managed_application_count, included_cv_versions, included_motivation_letters, included_accommodation_routes, route_visibility, package_boundary, active)
 values
 ('FREE_DESTINY_MAP','Free Destiny Map',0.00,'R0','FREE_PREVIEW',0,0,0,0,'PREVIEW_ONLY','All-sector preview only. Exact targets, links, portals, manual plans, bursary targets, and accommodation targets remain sealed until package activation.',true),
-('CV_REVAMP','CV Revamp',49.99,'R49.99','CV_SERVICE',0,15,15,0,'SEALED','Includes 15 personalised CV versions and 15 matching motivation letters. Must remain truthful and may never invent experience, qualifications, references, certificates, or skills.',true),
-('ACCOMMODATION_SUPPORT','Accommodation Support Package',179.00,'R179.00','ACCOMMODATION_SUPPORT',8,0,0,8,'ACTIVATED','Standalone support for 8 accommodation applications/routes. Every paid Kingsmen package includes up to 8 ACC-01 accommodation routes.',true)
+('CV_REVAMP','CV Revamp',49.99,'R49.99','CV_SERVICE',0,15,15,0,'SEALED','One CV pack: 15 personalised truthful CV versions and 15 matching motivation letters. Delivery target is 3 business days after complete intake.',true),
+('ARTISAN_CHARTER','Artisan Charter',149.99,'R149.99','PAID_ROUTE_PACKAGE_BOUNDARY',3,0,0,0,'SEALED','3 concurrent managed-route slots for 30 calendar days; work and skills focus. Accommodation support where relevant uses one route slot.',true),
+('FOUNDATIONAL_ACCORD','Foundational Accord',169.99,'R169.99','PAID_ROUTE_PACKAGE_BOUNDARY',4,0,0,0,'SEALED','4 concurrent managed-route slots for 30 calendar days across the six core gates. Accommodation support where relevant uses one route slot.',true),
+('GUILDMASTERS_CHARTER','Guildmaster''s Charter',199.99,'R199.99','PAID_ROUTE_PACKAGE_BOUNDARY',5,0,0,0,'SEALED','5 concurrent managed-route slots for 30 calendar days with increased work/skills monitoring. Accommodation support where relevant uses one route slot.',true),
+('COLLEGIATE_ORDINANCE','Collegiate Ordinance',299.99,'R299.99','PAID_ROUTE_PACKAGE_BOUNDARY',8,0,0,0,'SEALED','8 concurrent managed-route slots for 30 calendar days with higher monitoring priority. Accommodation support where relevant uses one route slot.',true),
+('CHANCELLORS_WRIT','Chancellor''s Writ',399.99,'R399.99','PAID_ROUTE_PACKAGE_BOUNDARY',10,0,0,0,'SEALED','10 concurrent managed-route slots for 30 calendar days with priority queue and deeper human review. Accommodation support where relevant uses one route slot.',true),
+('REGENCY_MANDATE','Regency Mandate',469.99,'R469.99','PAID_ROUTE_PACKAGE_BOUNDARY',12,0,0,0,'SEALED','12 concurrent managed-route slots for 30 calendar days with highest queue priority and escalation depth. Accommodation support where relevant uses one route slot.',true),
+('ACCOMMODATION_SUPPORT','Legacy accommodation product (inactive)',179.00,'R179.00','ACCOMMODATION_SUPPORT',0,0,0,0,'SEALED','Legacy record retained for compatibility only; not orderable or displayed. Accommodation support is a privilege within the relevant package allowance.',false)
 on conflict (package_key) do update set
   package_name = excluded.package_name,
   price_zar = excluded.price_zar,
@@ -105,7 +111,7 @@ values
 ('NO_FAKE_GUARANTEES','No fake guarantees','CLAIMS','BLOCK','Public copy must not guarantee admission, funding, employment, accommodation, official acceptance, or official response speed.',true),
 ('NO_OFFICIAL_IMPERSONATION','No official impersonation','LEGAL','BLOCK','Public copy must never imply Kingsmen is an official government, university, TVET, SETA, NSFAS, CAO, employer, bursary, accommodation, or payment portal.',true),
 ('SEALED_ROUTE_INTELLIGENCE','Seal exact route intelligence','SEALED_INTELLIGENCE','BLOCK','Free public pages may preview sectors but must not expose exact activated-package targets, links, portal plans, or manual route plans.',true),
-('PRICING_CANONICAL','Canonical public pricing','PRICING','BLOCK','Free Destiny Map R0, CV Revamp R49.99, Accommodation Support R179.00, and 8 ACC-01 routes included in every paid package must remain exact unless founder changes pricing.',true),
+('PRICING_CANONICAL','Canonical public pricing','PRICING','BLOCK','Seven package prices and route entitlements must match the versioned business catalogue. Accommodation support is a privilege within the relevant package route allowance, not a separate product.',true),
 ('TRUTHFUL_CV_BOUNDARY','Truthful CV boundary','PROOF','BLOCK','CV service copy must never invent fake experience, qualifications, references, certificates, skills, or achievements.',true),
 ('EMAIL_FIRST_COMMS','Email-first communication doctrine','COMMS','WARN','Public copy must set email as primary communication and WhatsApp as urgent-only.',true),
 ('POPIA_CONSENT','POPIA consent','PRIVACY','BLOCK','Lead capture and smart intake must request consent before profile handoff and document processing.',true),
