@@ -1,0 +1,50 @@
+{
+  "schema": "kingsmen.truth-vault-persistence-staging.v1",
+  "module": "Kingsmen Truth Vault PostgreSQL Persistence Staging Smoke",
+  "status": "TRUTH_VAULT_SQL_PERSISTENCE_SMOKE_PASSED",
+  "passed": true,
+  "productionReady": false,
+  "publicLaunchAllowed": false,
+  "productionDataAllowed": false,
+  "reviewed": false,
+  "founderReviewed": false,
+  "stagingReviewed": false,
+  "generatedAtIso": "2026-10-12T16:01:00Z",
+  "project": {
+    "ref": "euhubhhnumtibbyufghm",
+    "region": "eu-west-1",
+    "postgresVersion": "17.11.0.003"
+  },
+  "testMethod": "direct PostgreSQL smoke test through Supabase SQL execution; synthetic data only",
+  "checks": [
+    {
+      "name": "synthetic_candidate_inserted",
+      "passed": true
+    },
+    {
+      "name": "synthetic_application_inserted",
+      "passed": true
+    },
+    {
+      "name": "candidate_persisted_across_calls",
+      "passed": true,
+      "observedCount": 1
+    },
+    {
+      "name": "application_persisted_across_calls",
+      "passed": true,
+      "observedCount": 1
+    },
+    {
+      "name": "synthetic_rows_removed",
+      "passed": true
+    }
+  ],
+  "apiIntegrationProofPending": true,
+  "rawCandidateRowsReturned": false,
+  "personalDataUsed": false,
+  "databaseUrlsIncluded": false,
+  "secretsIncluded": false,
+  "livePaymentsEnabled": false,
+  "nextAction": "Run the application API repository integration test with staging-only secrets and verify read/write paths through the deployed backend."
+}
