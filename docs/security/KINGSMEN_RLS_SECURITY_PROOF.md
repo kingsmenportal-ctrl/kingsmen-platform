@@ -7,17 +7,13 @@ Production ready: `false`
 
 This document records the row-level-security boundary needed before Kingsmen can open to public users. The migration set is being hardened so broad bootstrap policies cannot be used by `anon` or ordinary `authenticated` clients.
 
-The final RLS boundary migration is:
-
-```txt
-db/migrations/0019_rls_security_boundary.sql
-```
+The RLS boundary migration is `db/migrations/0019_rls_security_boundary.sql`. The follow-on `db/migrations/0020_rls_helper_search_path_hardening.sql` pins `search_path = pg_catalog` on every helper as defense in depth.
 
 ## Trusted identity claims
 
 Candidate and founder/operator policies use claims obtained from `auth.jwt()`. The `kingsmen_role`, `candidate_public_ref`, and `service_context` values must be server-managed `app_metadata` claims populated by a trusted Auth hook/admin path. Do not use `user_metadata`, request parameters, or client-settable PostgreSQL custom GUCs for authorization.
 
-The migration pins `search_path` for its `SECURITY DEFINER` candidate lookup and qualifies the candidate table as `public.candidates`. Security helper functions are not executable by `PUBLIC`.
+The migrations pin `search_path` to `pg_catalog` for every security helper, including the `SECURITY DEFINER` candidate lookup and qualifies the candidate table as `public.candidates`. Security helper functions are not executable by `PUBLIC`.
 
 ## Important service-role boundary
 
