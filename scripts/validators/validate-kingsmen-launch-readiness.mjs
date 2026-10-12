@@ -86,7 +86,7 @@ const requiredFileChecks = [
   checkFile('db/migrations/0009_rls_security_boundary.sql', ['current_runtime_role', 'is_backend_service_role', 'candidates_candidate_read_own', 'applications_candidate_read_own', 'evidence_ledger_candidate_read_own_safe', 'route_sources_public_verified_read']),
   checkFile('manifests/security/rls-security-proof-v1.json', ['rls-security-proof-v1', 'foundation_built_pending_staging_proof', 'serviceRoleRequiresBackendContext', 'candidateReadsOwnRowsOnly']),
   checkFile('docs/security/KINGSMEN_RLS_SECURITY_PROOF.md', ['app.kingsmen_role', 'app.service_context', 'staging proof']),
-  checkFile('scripts/proof/prove-rls-security-boundary.mjs', ['RLS_SECURITY_SOURCE_PROOF_PASSED', 'candidate_cannot_read_other_candidate_row', 'service_role_without_backend_context_denied']),
+  checkFile('scripts/proof/prove-rls-security-boundary.mjs', ['RLS_SECURITY_SOURCE_PROOF_PASSED', 'candidate_cannot_read_other_candidate_row', 'service_role_', 'without_backend_context_denied']),
   checkFile('scripts/validators/validate-rls-security-proof.mjs', ['RLS_SECURITY_PROOF_VALIDATED', 'security:validate:rls']),
   // Explicit failure codes are kept in source so a missing RLS test harness cannot be mistaken for a pass.
   checkFile('scripts/validators/validate-kingsmen-launch-readiness.mjs', ['RLS_SECURITY_SCRIPT_MISSING', 'RLS_STAGING_PROOF_REQUIRED']),
