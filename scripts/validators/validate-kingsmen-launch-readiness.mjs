@@ -176,6 +176,10 @@ try {
   if (packageJson?.private !== true) {
     warn('ROOT_PACKAGE_NOT_PRIVATE', 'Root package is not marked private.', 'Publishing the monorepo root can accidentally package operational files.', 'Keep the root package private.');
   }
+  const packageScripts = packageJson?.scripts ?? {};
+  if (typeof packageScripts['security:prove:rls'] !== 'string' || typeof packageScripts['security:validate:rls'] !== 'string') {
+    block('RLS_SECURITY_SCRIPT_MISSING', 'RLS source proof/validator scripts are not wired.', 'Both security:prove:rls and security:validate:rls must exist in package.json.', 'Wire both commands to their source proof and validator scripts.', ['package.json']);
+  }
 } catch (error) {
   block('PACKAGE_JSON_INVALID', 'package.json is invalid JSON.', String(error), 'Repair package.json.', ['package.json']);
 }
