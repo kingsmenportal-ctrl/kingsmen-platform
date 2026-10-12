@@ -355,53 +355,53 @@ ALTER TABLE nsfas_support_cases ENABLE ROW LEVEL SECURITY;
 ALTER TABLE map_manual_packages ENABLE ROW LEVEL SECURITY;
 
 DROP POLICY IF EXISTS service_role_all_route_categories ON route_categories;
-CREATE POLICY service_role_all_route_categories ON route_categories
+CREATE POLICY service_role_all_route_categories ON route_categories TO service_role
   FOR ALL USING (true) WITH CHECK (true);
 
 DROP POLICY IF EXISTS service_role_all_route_providers ON route_providers;
-CREATE POLICY service_role_all_route_providers ON route_providers
+CREATE POLICY service_role_all_route_providers ON route_providers TO service_role
   FOR ALL USING (true) WITH CHECK (true);
 
 DROP POLICY IF EXISTS service_role_all_route_programmes ON route_programmes;
-CREATE POLICY service_role_all_route_programmes ON route_programmes
+CREATE POLICY service_role_all_route_programmes ON route_programmes TO service_role
   FOR ALL USING (true) WITH CHECK (true);
 
 DROP POLICY IF EXISTS service_role_all_route_requirements ON route_requirements;
-CREATE POLICY service_role_all_route_requirements ON route_requirements
+CREATE POLICY service_role_all_route_requirements ON route_requirements TO service_role
   FOR ALL USING (true) WITH CHECK (true);
 
 DROP POLICY IF EXISTS service_role_all_route_deadlines ON route_deadlines;
-CREATE POLICY service_role_all_route_deadlines ON route_deadlines
+CREATE POLICY service_role_all_route_deadlines ON route_deadlines TO service_role
   FOR ALL USING (true) WITH CHECK (true);
 
 DROP POLICY IF EXISTS service_role_all_route_fees ON route_fees;
-CREATE POLICY service_role_all_route_fees ON route_fees
+CREATE POLICY service_role_all_route_fees ON route_fees TO service_role
   FOR ALL USING (true) WITH CHECK (true);
 
 DROP POLICY IF EXISTS service_role_all_portal_dna ON portal_dna;
-CREATE POLICY service_role_all_portal_dna ON portal_dna
+CREATE POLICY service_role_all_portal_dna ON portal_dna TO service_role
   FOR ALL USING (true) WITH CHECK (true);
 
 DROP POLICY IF EXISTS service_role_all_portal_health_checks ON portal_health_checks;
-CREATE POLICY service_role_all_portal_health_checks ON portal_health_checks
+CREATE POLICY service_role_all_portal_health_checks ON portal_health_checks TO service_role
   FOR ALL USING (true) WITH CHECK (true);
 
 DROP POLICY IF EXISTS service_role_all_application_workbench_items ON application_workbench_items;
-CREATE POLICY service_role_all_application_workbench_items ON application_workbench_items
+CREATE POLICY service_role_all_application_workbench_items ON application_workbench_items TO service_role
   FOR ALL USING (true) WITH CHECK (true);
 
 DROP POLICY IF EXISTS service_role_all_route_readiness_snapshots ON route_readiness_snapshots;
-CREATE POLICY service_role_all_route_readiness_snapshots ON route_readiness_snapshots
+CREATE POLICY service_role_all_route_readiness_snapshots ON route_readiness_snapshots TO service_role
   FOR ALL USING (true) WITH CHECK (true);
 
 DROP POLICY IF EXISTS service_role_all_cao_choice_items ON cao_choice_items;
-CREATE POLICY service_role_all_cao_choice_items ON cao_choice_items
+CREATE POLICY service_role_all_cao_choice_items ON cao_choice_items TO service_role
   FOR ALL USING (true) WITH CHECK (true);
 
 DROP POLICY IF EXISTS service_role_all_nsfas_support_cases ON nsfas_support_cases;
-CREATE POLICY service_role_all_nsfas_support_cases ON nsfas_support_cases
+CREATE POLICY service_role_all_nsfas_support_cases ON nsfas_support_cases TO service_role
   FOR ALL USING (true) WITH CHECK (true);
 
 DROP POLICY IF EXISTS service_role_all_map_manual_packages ON map_manual_packages;
-CREATE POLICY service_role_all_map_manual_packages ON map_manual_packages
+CREATE POLICY service_role_all_map_manual_packages ON map_manual_packages TO service_role
   FOR ALL USING (true) WITH CHECK (true);
