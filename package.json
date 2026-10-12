@@ -77,7 +77,8 @@
     "final:validate:evidence": "node scripts/validators/validate-final-assembly-evidence-capture.mjs",
     "repo:prove:branch-protection": "node scripts/proof/prove-main-branch-protection-boundary.mjs",
     "repo:validate:branch-protection": "node scripts/validators/validate-main-branch-protection.mjs",
-    "n10:validate": "pwsh -NoProfile -File scripts/validators/Validate-N10.ps1"
+    "n10:validate": "pwsh -NoProfile -File scripts/validators/Validate-N10.ps1",
+    "staging:capture:evidence": "pwsh -NoProfile -File scripts/staging/Invoke-KingsmenStagingRuntimeEvidencePack.ps1"
   },
   "repository": {
     "type": "git",
