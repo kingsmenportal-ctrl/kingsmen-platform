@@ -196,33 +196,33 @@ ALTER TABLE candidate_financial_items ENABLE ROW LEVEL SECURITY;
 ALTER TABLE candidate_success_events ENABLE ROW LEVEL SECURITY;
 
 DROP POLICY IF EXISTS service_role_all_candidate_accounts ON candidate_accounts;
-CREATE POLICY service_role_all_candidate_accounts ON candidate_accounts
+CREATE POLICY service_role_all_candidate_accounts ON candidate_accounts TO service_role
   FOR ALL USING (true) WITH CHECK (true);
 
 DROP POLICY IF EXISTS service_role_all_candidate_sessions ON candidate_sessions;
-CREATE POLICY service_role_all_candidate_sessions ON candidate_sessions
+CREATE POLICY service_role_all_candidate_sessions ON candidate_sessions TO service_role
   FOR ALL USING (true) WITH CHECK (true);
 
 DROP POLICY IF EXISTS service_role_all_candidate_profile_field_sources ON candidate_profile_field_sources;
-CREATE POLICY service_role_all_candidate_profile_field_sources ON candidate_profile_field_sources
+CREATE POLICY service_role_all_candidate_profile_field_sources ON candidate_profile_field_sources TO service_role
   FOR ALL USING (true) WITH CHECK (true);
 
 DROP POLICY IF EXISTS service_role_all_candidate_profile_change_requests ON candidate_profile_change_requests;
-CREATE POLICY service_role_all_candidate_profile_change_requests ON candidate_profile_change_requests
+CREATE POLICY service_role_all_candidate_profile_change_requests ON candidate_profile_change_requests TO service_role
   FOR ALL USING (true) WITH CHECK (true);
 
 DROP POLICY IF EXISTS service_role_all_candidate_messages ON candidate_messages;
-CREATE POLICY service_role_all_candidate_messages ON candidate_messages
+CREATE POLICY service_role_all_candidate_messages ON candidate_messages TO service_role
   FOR ALL USING (true) WITH CHECK (true);
 
 DROP POLICY IF EXISTS service_role_all_candidate_support_tickets ON candidate_support_tickets;
-CREATE POLICY service_role_all_candidate_support_tickets ON candidate_support_tickets
+CREATE POLICY service_role_all_candidate_support_tickets ON candidate_support_tickets TO service_role
   FOR ALL USING (true) WITH CHECK (true);
 
 DROP POLICY IF EXISTS service_role_all_candidate_financial_items ON candidate_financial_items;
-CREATE POLICY service_role_all_candidate_financial_items ON candidate_financial_items
+CREATE POLICY service_role_all_candidate_financial_items ON candidate_financial_items TO service_role
   FOR ALL USING (true) WITH CHECK (true);
 
 DROP POLICY IF EXISTS service_role_all_candidate_success_events ON candidate_success_events;
-CREATE POLICY service_role_all_candidate_success_events ON candidate_success_events
+CREATE POLICY service_role_all_candidate_success_events ON candidate_success_events TO service_role
   FOR ALL USING (true) WITH CHECK (true);
