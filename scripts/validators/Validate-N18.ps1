@@ -70,7 +70,7 @@ Require-Contains "db\seeds\n18_public_website_seed.sql" "NOT_CHEAP_APPLICATION_H
 Require-Contains "db\seeds\n18_public_website_seed.sql" "FREE_DESTINY_MAP_PRICE_ZAR" "Seed missing Destiny Map price."
 Require-Contains "db\seeds\n18_public_website_seed.sql" "CV_REVAMP_PRICE_ZAR" "Seed missing CV price."
 Require-Contains "db\seeds\n18_public_website_seed.sql" "ACCOMMODATION_SUPPORT_SEPARATE_FEE" "Seed must state accommodation is not a separate product fee."
-Require-Contains "db\seeds\n18_public_website_seed.sql" "PAID_PACKAGES_INCLUDE_ACC01_ROUTES" "Seed missing paid ACC-01 route inclusion."
+Require-Contains "db\seeds\n18_public_website_seed.sql" "ACCOMMODATION_SUPPORT_COUNTS_TOWARD_MANAGED_ROUTE_ALLOWANCE" "Seed must count accommodation within the managed-route allowance."
 Require-Contains "db\seeds\n18_public_website_seed.sql" "NO_OFFICIAL_IMPERSONATION" "Seed missing official impersonation guardrail."
 Require-Contains "db\seeds\n18_public_website_seed.sql" "SEALED_ROUTE_INTELLIGENCE" "Seed missing sealed route guardrail."
 Require-Contains "db\seeds\n18_public_website_seed.sql" "EMAIL_FIRST" "Seed missing email-first disclosure."
