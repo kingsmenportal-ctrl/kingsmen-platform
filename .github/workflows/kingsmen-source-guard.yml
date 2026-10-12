@@ -8,6 +8,41 @@ on:
   workflow_dispatch:
 
 jobs:
+  api-build-and-n10:
+    name: api-build-and-n10
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: 'npm'
+
+      - name: Setup PowerShell
+        shell: bash
+        run: |
+          if ! command -v pwsh >/dev/null 2>&1; then
+            echo "PowerShell is required for the N10 validator." >&2
+            exit 1
+          fi
+
+      - name: Install root dependencies
+        run: npm ci
+
+      - name: N10 finance and PayFast source validator
+        run: npm run n10:validate
+
+      - name: Related root tests
+        run: npm test
+
+      - name: API TypeScript build
+        run: npm run api:build
+
   source-guard:
     name: source-guard
     runs-on: ubuntu-latest
