@@ -41,13 +41,15 @@ The backup script requires `pg_dump` and GPG, writes the encrypted `.dump.gpg` a
 Configure source and restore database URLs in the staging operator's secure environment. The restore target must be a distinct disposable staging database, never production:
 
 ```powershell
+$env:KINGSMEN_EXPECTED_SUPABASE_PROJECT_REF = "euhubhhnumtibbyufghm"
 $env:KINGSMEN_DATABASE_URL = "[source-staging-database-url-set-outside-git]"
+$env:KINGSMEN_RESTORE_EXPECTED_SUPABASE_PROJECT_REF = "[distinct-disposable-staging-project-ref]"
 $env:KINGSMEN_RESTORE_DRILL_DATABASE_URL = "[distinct-restore-database-url-set-outside-git]"
 $env:KINGSMEN_BACKUP_EXPECTED_SHA256 = "[independently-captured-64-character-sha256]"
 .\scripts\backup\Test-KingsmenTruthVaultRestore.ps1 -BackupFile "D:\KingsmenBackups\[encrypted-backup-file].dump.gpg"
 ```
 
-**Operational prerequisite:** the restore script must decrypt the GPG archive into a protected temporary file before calling `pg_restore`. The current implementation accepts a PostgreSQL custom-format archive and therefore the encrypted archive must be decrypted in a controlled operator step before execution; never place the plaintext archive in Git or the report directory. Do not run the restore drill until this decryption path has been implemented and reviewed.
+The restore script verifies the encrypted archive SHA-256, confirms both URLs match explicitly supplied staging project refs, checks that the source and restore database identities differ, decrypts the archive into a temporary file, validates it with `pg_restore --list`, performs the restore, runs all required count checks, and removes the plaintext temporary file in a `finally` block. A separate disposable staging project must be approved and provisioned as the restore target before the drill can run.
 
 The restore script fails closed if the expected checksum is missing or mismatched, the archive fails validation, the source/restore database identities cannot be verified or are the same, or any required table check fails. It records a file-timestamp-based RPO estimate that requires independent confirmation; that estimate is not itself proof of recovery point.
 
