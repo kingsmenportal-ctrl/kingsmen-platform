@@ -1,7 +1,7 @@
 {
   "schema": "kingsmen.package-catalogue.v1",
   "batch": "BATCH 01 — Merge Foundation",
-  "status": "COMMERCIAL_SCHEDULE_V1_APPROVED_PENDING_VALIDATION",
+  "status": "COMMERCIAL_SCHEDULE_V1_PROPOSED_PENDING_FOUNDER_APPROVAL",
   "currency": "ZAR",
   "currency_symbol": "R",
   "access_law": "Packages change active managed quantity, speed, monitoring intensity, human depth, SLA, escalation, manual fallback intensity, and reporting depth. Packages do not hide the core Kingsmen route brain or core safety capabilities.",
@@ -217,5 +217,6 @@
     "refund_policy": "No AI refund approval. Human review required. Before work starts, requests are eligible for full-refund review subject to applicable law/provider settlement. After work starts or a deliverable is provided, requests are reviewed individually under published terms and applicable South African consumer law. Do not publish a blanket no-refunds claim.",
     "cv_revamp_upgrade_bonus_routes": 2,
     "cv_revamp_upgrade_condition": "A verified prior CV Revamp purchase followed by upgrade to a Kingsmen package adds two concurrent active managed route slots. It is not a cash discount or price credit unless a separate approved promotion states otherwise."
-  }
+  },
+  "approval_note": "This version defines a proposed operational schedule for founder review. Values are not founder-approved commercial terms until the founder explicitly approves this version. Do not enable checkout or seed staging until approval is recorded."
 }
