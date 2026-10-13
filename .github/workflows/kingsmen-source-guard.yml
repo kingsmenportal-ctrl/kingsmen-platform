@@ -45,5 +45,8 @@ jobs:
       - name: Produce launch-readiness audit
         run: npm run kingsmen:launch:audit
 
+      - name: Credential-free source foundation checks
+        run: node scripts/validators/validate-credential-free-foundation.mjs
+
       - name: Enforce launch-readiness gate
         run: npm run kingsmen:launch:gate
