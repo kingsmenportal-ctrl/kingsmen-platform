@@ -11,11 +11,14 @@ on:
       - "apps/web/src/lib/supabase-auth.ts"
       - "apps/web/src/lib/founder-auth.ts"
       - "apps/web/src/app/candidate/dashboard/page.tsx"
+      - "apps/web/src/app/candidate/readiness/page.tsx"
+      - "apps/web/test/candidate-readiness.test.cjs"
       - "apps/web/src/app/candidate/profile/page.tsx"
       - "apps/web/src/app/candidate/documents/page.tsx"
       - "apps/web/src/app/candidate/workbench/page.tsx"
       - "apps/web/src/app/candidate/finance/page.tsx"
       - "apps/web/test/candidate-storage-security.test.cjs"
+      - "apps/web/test/candidate-readiness.test.cjs"
       - "apps/web/test/founder-control-plane.test.cjs"
       - "apps/web/test/founder-command-intake.test.cjs"
       - "db/migrations/0016_founder_audit_and_command_intake.sql"
@@ -55,4 +58,4 @@ jobs:
         with:
           node-version: 22
       - name: Run candidate and founder security regressions
-        run: node --test apps/web/test/candidate-storage-security.test.cjs apps/web/test/founder-control-plane.test.cjs apps/web/test/founder-command-intake.test.cjs
+        run: node --test apps/web/test/candidate-storage-security.test.cjs apps/web/test/candidate-readiness.test.cjs apps/web/test/founder-control-plane.test.cjs apps/web/test/founder-command-intake.test.cjs
