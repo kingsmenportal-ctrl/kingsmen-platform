@@ -403,6 +403,44 @@ async function handleHealth(response: ServerResponse): Promise<void> {
   });
 }
 
+async function handleReadiness(response: ServerResponse): Promise<void> {
+  // Readiness is deliberately stricter than liveness: volatile memory mode cannot serve
+  // as a ready staging/production backend even when the HTTP process is alive.
+  if (!truthVault.enabled) {
+    sendJson(response, 503, {
+      ok: false,
+      service: SERVICE_NAME,
+      status: "not_ready",
+      reason: "durable_truth_vault_disabled",
+      storageMode: truthVault.storageMode,
+      generatedAtIso: nowIso()
+    });
+    return;
+  }
+
+  try {
+    const health = await truthVault.healthCheck();
+    sendJson(response, health.ok ? 200 : 503, {
+      ok: health.ok,
+      service: SERVICE_NAME,
+      status: health.ok ? "ready" : "not_ready",
+      storageMode: truthVault.storageMode,
+      truthVault: health,
+      generatedAtIso: nowIso()
+    });
+  } catch {
+    // Do not leak database URLs, driver details, or credentials through health endpoints.
+    sendJson(response, 503, {
+      ok: false,
+      service: SERVICE_NAME,
+      status: "not_ready",
+      reason: "truth_vault_unavailable",
+      storageMode: truthVault.storageMode,
+      generatedAtIso: nowIso()
+    });
+  }
+}
+
 async function handleCandidateStatus(response: ServerResponse, candidateId: string): Promise<void> {
   if (truthVault.enabled) {
     const candidate = await truthVault.readCandidateStatus(candidateId);
@@ -475,6 +513,11 @@ export function createKingsmenApiServer() {
 
       if (method === "GET" && (pathname === "/" || pathname === "/health" || pathname === "/api/system/health")) {
         await handleHealth(response);
+        return;
+      }
+
+      if (method === "GET" && pathname === "/ready") {
+        await handleReadiness(response);
         return;
       }
 
