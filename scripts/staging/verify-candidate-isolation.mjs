@@ -63,19 +63,19 @@ try {
   assert.deepEqual(Buffer.from(await ownDownloadB.arrayBuffer()), documentB.bytes, "B download bytes must match uploaded fixture");
   record("private_document_upload_and_byte_integrity", true);
   const crossAB = await request(documentEndpoint(documentB.documentId), tokenA);
-  assert.ok([404, 503].includes(crossAB.status), "A must not download B document; got HTTP " + crossAB.status);
+  assert.equal(crossAB.status, 404, "A must receive not-found for B document; service errors are failures, got HTTP " + crossAB.status);
   const crossBA = await request(documentEndpoint(documentA.documentId), tokenB);
-  assert.ok([404, 503].includes(crossBA.status), "B must not download A document; got HTTP " + crossBA.status);
+  assert.equal(crossBA.status, 404, "B must receive not-found for A document; service errors are failures, got HTTP " + crossBA.status);
   record("bidirectional_private_document_isolation", true, { userARequest: crossAB.status, userBRequest: crossBA.status });
   const noAuth = await fetch(endpoint, { cache: "no-store", signal: AbortSignal.timeout(15000) });
   assert.ok([401, 503].includes(noAuth.status), "unauthenticated request must fail closed, got HTTP " + noAuth.status);
   record("unauthenticated_workspace_denied", true, { httpStatus: noAuth.status });
 } catch (error) { runError = error instanceof Error ? error.message : "Unknown test failure"; }
 finally {
-  try { if (documentA) await deleteSyntheticDocument(tokenA, documentA.documentId); } catch { results.push({ name: "cleanup_user_A_synthetic_document", passed: false }); }
-  try { if (documentB) await deleteSyntheticDocument(tokenB, documentB.documentId); } catch { results.push({ name: "cleanup_user_B_synthetic_document", passed: false }); }
-  try { if (modifiedA && originalA) await saveNotes(tokenA, typeof originalA.profile.notes === "string" ? originalA.profile.notes : ""); } catch { results.push({ name: "restore_user_A_notes", passed: false }); }
-  try { if (modifiedB && originalB) await saveNotes(tokenB, typeof originalB.profile.notes === "string" ? originalB.profile.notes : ""); } catch { results.push({ name: "restore_user_B_notes", passed: false }); }
+  try { if (documentA) await deleteSyntheticDocument(tokenA, documentA.documentId); record("cleanup_user_A_synthetic_document", true); } catch { results.push({ name: "cleanup_user_A_synthetic_document", passed: false }); }
+  try { if (documentB) await deleteSyntheticDocument(tokenB, documentB.documentId); record("cleanup_user_B_synthetic_document", true); } catch { results.push({ name: "cleanup_user_B_synthetic_document", passed: false }); }
+  try { if (modifiedA && originalA) { await saveNotes(tokenA, typeof originalA.profile.notes === "string" ? originalA.profile.notes : ""); record("restore_user_A_notes", true); } } catch { results.push({ name: "restore_user_A_notes", passed: false }); }
+  try { if (modifiedB && originalB) { await saveNotes(tokenB, typeof originalB.profile.notes === "string" ? originalB.profile.notes : ""); record("restore_user_B_notes", true); } } catch { results.push({ name: "restore_user_B_notes", passed: false }); }
 }
 const failed = results.filter((result) => !result.passed);
 const report = { schema: "kingsmen.candidate-staging-isolation.v1", runId, finishedAt: new Date().toISOString(), projectRef: expectedProject, deploymentHost: base.host, status: runError || failed.length ? "FAILED" : "PASSED", passed: !runError && failed.length === 0, reviewed: false, redacted: true, productionReady: false, publicLaunchAllowed: false, checks: results, error: runError ? "Sensitive details suppressed; inspect the named assertion and staging service logs." : undefined };
