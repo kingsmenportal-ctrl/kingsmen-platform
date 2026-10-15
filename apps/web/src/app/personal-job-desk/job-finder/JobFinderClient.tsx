@@ -152,11 +152,13 @@ export default function JobFinderClient() {
         })
       });
       const data = await response.json();
-      if (!response.ok || data.status !== "OPPORTUNITY_ADDED") {
+      if (!response.ok || !["OPPORTUNITY_ADDED", "OPPORTUNITY_ALREADY_EXISTS"].includes(data.status)) {
         throw new Error(data.error || "The opportunity was not saved to your candidate workspace.");
       }
       setSavedLeadKeys((current) => current.includes(key) ? current : [...current, key]);
-      setMessage(`Saved “${lead.title}” to your authenticated candidate workspace. Review it before preparing an application.`);
+      setMessage(data.status === "OPPORTUNITY_ALREADY_EXISTS"
+        ? `“${lead.title}” is already in your candidate workspace. Open the shortlist desk to review it.`
+        : `Saved “${lead.title}” to your authenticated candidate workspace. Review it before preparing an application.`);
     } catch (error) {
       setMessage(error instanceof Error ? error.message : "Could not save this opportunity.");
     } finally {
