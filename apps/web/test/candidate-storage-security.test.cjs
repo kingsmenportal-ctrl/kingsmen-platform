@@ -93,3 +93,9 @@ test("candidate state storage validates identity, response shape, and maximum se
   assert.match(storage, /if \(!Array\.isArray\(rows\)\) throw new Error\("Candidate storage returned an invalid response\."\)/);
   assert.match(storage, /Candidate storage returned an invalid state/);
 });
+
+
+test("authentication rejects malformed UUID identities before candidate data access", () => {
+  assert.match(auth, /!\/\^\[0-9a-f\]\{8\}-\[0-9a-f\]\{4\}-\[1-8\]\[0-9a-f\]\{3\}-\[89ab\]\[0-9a-f\]\{3\}-\[0-9a-f\]\{12\}\$\/i\.test\(user\.id\)/);
+  assert.match(auth, /user\.role === "service_role"/);
+});
