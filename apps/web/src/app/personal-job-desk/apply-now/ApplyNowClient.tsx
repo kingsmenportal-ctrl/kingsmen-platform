@@ -39,7 +39,7 @@ type ContactLogEntry = {
   createdAt: string;
 };
 
-type Store = {
+type FinanceLedgerEntry = { entryId: string; type: "FEE" | "PAYMENT" | "REFUND" | "ADJUSTMENT"; direction: "IN" | "OUT"; status: "RECORDED" | "PENDING" | "CONFIRMED" | "FAILED" | "CANCELLED"; amountCents: number; currency: "ZAR"; description: string; reference?: string; evidenceNote?: string; opportunityId?: string; occurredOn: string; createdAt: string; };\n\ntype Store = {
   profile: Profile;
   documents: any[];
   opportunities: any[];
@@ -71,7 +71,7 @@ export default function ApplyNowClient() {
   const [selectedOpportunity, setSelectedOpportunity] = useState("");
   const [proof, setProof] = useState("");
   const [taskDraft, setTaskDraft] = useState({ title: "", dueDate: "", priority: "NORMAL", opportunityId: "", notes: "" });
-  const [contactDraft, setContactDraft] = useState({ contactName: "", organisation: "", channel: "EMAIL", direction: "OUTBOUND", opportunityId: "", summary: "", followUpDate: "" });
+  const [financeDraft, setFinanceDraft] = useState({ type: "FEE", direction: "OUT", status: "RECORDED", amount: "", description: "", reference: "", evidenceNote: "", opportunityId: "", occurredOn: new Date().toISOString().slice(0, 10) });\n  const [contactDraft, setContactDraft] = useState({ contactName: "", organisation: "", channel: "EMAIL", direction: "OUTBOUND", opportunityId: "", summary: "", followUpDate: "" });
   const [opportunity, setOpportunity] = useState({
     title: "",
     organisation: "",
@@ -264,6 +264,19 @@ export default function ApplyNowClient() {
     } finally {
       setBusy("");
     }
+  }
+
+  async function addFinanceEntry() {
+    const amount = Number(financeDraft.amount);
+    if (!Number.isFinite(amount) || amount <= 0 || Math.round(amount * 100) !== amount * 100) { setMessage("Enter a positive amount with no more than two decimal places."); return; }
+    setBusy("finance-create");
+    try { const json = await api({ action: "addFinanceEntry", ...financeDraft, amountCents: Math.round(amount * 100) }); setStore(json.store); setFinanceDraft({ type: "FEE", direction: "OUT", status: "RECORDED", amount: "", description: "", reference: "", evidenceNote: "", opportunityId: "", occurredOn: new Date().toISOString().slice(0, 10) }); setMessage("Finance ledger entry saved. This does not process or verify a payment."); }
+    catch (error) { setMessage(error instanceof Error ? error.message : "Could not save ledger entry."); } finally { setBusy(""); }
+  }
+
+  async function deleteFinanceEntry(entryId: string) {
+    if (!window.confirm("Remove this ledger record? This only removes the portal record, not a bank/payment transaction.")) return;
+    setBusy(`finance-delete-${entryId}`); try { const json = await api({ action: "deleteFinanceEntry", entryId }); setStore(json.store); setMessage("Ledger record removed."); } catch (error) { setMessage(error instanceof Error ? error.message : "Could not remove ledger record."); } finally { setBusy(""); }
   }
 
   async function addContactLog() {
@@ -633,6 +646,30 @@ export default function ApplyNowClient() {
               <div style={cardActions}><button type="button" style={dangerButton} disabled={busy === `contact-delete-${entry.entryId}`} onClick={() => deleteContactLog(entry.entryId)}>Remove record</button></div>
             </article>;
           })}
+        </div>
+      </section>
+
+      <section style={panel}>
+        <div style={sectionHead}><div><p style={eyebrow}>07 / FINANCE TRACKING</p><h2 style={sectionTitle}>Fees & payment ledger</h2><p style={{ color: "#aab5c7", fontSize: 13, lineHeight: 1.6, margin: "6px 0 0" }}>Tracking and reconciliation only. This ledger does not charge money, connect to a bank, or independently verify transactions. CONFIRMED is a user-entered status supported by the reference or evidence note you supply. Never enter card PINs, passwords, or banking credentials.</p></div><span style={pill}>{(store.financeLedger || []).length} entries</span></div>
+        <div style={formGrid}>
+          <Select label="Entry type" value={financeDraft.type} onChange={(value) => setFinanceDraft((current) => ({ ...current, type: value }))} options={["FEE", "PAYMENT", "REFUND", "ADJUSTMENT"]} />
+          <Select label="Money direction" value={financeDraft.direction} onChange={(value) => setFinanceDraft((current) => ({ ...current, direction: value }))} options={["OUT", "IN"]} labels={["Money out", "Money in"]} />
+          <Field label="Amount (ZAR)" value={financeDraft.amount} onChange={(value) => setFinanceDraft((current) => ({ ...current, amount: value }))} />
+          <Select label="Status" value={financeDraft.status} onChange={(value) => setFinanceDraft((current) => ({ ...current, status: value }))} options={["RECORDED", "PENDING", "CONFIRMED", "FAILED", "CANCELLED"]} />
+          <Field label="Transaction date" value={financeDraft.occurredOn} onChange={(value) => setFinanceDraft((current) => ({ ...current, occurredOn: value }))} />
+          <Select label="Related opportunity (optional)" value={financeDraft.opportunityId} onChange={(value) => setFinanceDraft((current) => ({ ...current, opportunityId: value }))} options={["", ...store.opportunities.map((item) => item.opportunityId)]} labels={["Not linked", ...store.opportunities.map((item) => item.title)]} />
+          <Field label="Description" value={financeDraft.description} onChange={(value) => setFinanceDraft((current) => ({ ...current, description: value }))} />
+          <Field label="Payment / receipt reference (optional)" value={financeDraft.reference} onChange={(value) => setFinanceDraft((current) => ({ ...current, reference: value }))} />
+          <div style={{ gridColumn: "1 / -1" }}><Field label="Evidence note (optional; required with reference for CONFIRMED)" value={financeDraft.evidenceNote} onChange={(value) => setFinanceDraft((current) => ({ ...current, evidenceNote: value }))} multiline /></div>
+        </div>
+        <button type="button" style={primaryButton} disabled={busy === "finance-create"} onClick={addFinanceEntry}>{busy === "finance-create" ? "Saving…" : "Record ledger entry"}</button>
+        <div style={queue}>
+          {(store.financeLedger || []).length === 0 ? <div style={emptyState}>No finance entries yet. Record fees, payment references, refunds or adjustments for your own reconciliation.</div> : [...store.financeLedger].sort((a, b) => Date.parse(b.createdAt) - Date.parse(a.createdAt)).map((entry) => <article key={entry.entryId} style={oppCard}>
+            <div style={oppHeader}><div><h3 style={oppTitle}>{entry.description}</h3><p style={oppMeta}>{entry.type} · {entry.direction === "IN" ? "Money in" : "Money out"} · {entry.occurredOn}</p></div><span style={statusBadge}>{entry.status}</span></div>
+            <strong style={{ fontSize: 22, color: entry.direction === "IN" ? "#9de0b1" : "#ffc1b8" }}>{entry.direction === "IN" ? "+" : "−"}R {(entry.amountCents / 100).toLocaleString("en-ZA", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</strong>
+            {entry.reference ? <p style={oppMeta}>Reference: {entry.reference}</p> : null}{entry.evidenceNote ? <p style={{ ...oppMeta, whiteSpace: "pre-wrap" }}>Evidence note: {entry.evidenceNote}</p> : null}
+            <div style={cardActions}><button type="button" style={dangerButton} disabled={busy === `finance-delete-${entry.entryId}`} onClick={() => deleteFinanceEntry(entry.entryId)}>Remove ledger record</button></div>
+          </article>)}
         </div>
       </section>
 
