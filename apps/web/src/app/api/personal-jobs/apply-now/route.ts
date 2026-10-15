@@ -2,6 +2,13 @@ import fs from "node:fs";
 import path from "node:path";
 import { NextResponse } from "next/server";
 
+function privateJson(body: unknown, init?: ResponseInit) {
+  const headers = new Headers(init?.headers);
+  headers.set("Cache-Control", "private, no-store, max-age=0");
+  headers.set("Pragma", "no-cache");
+  return NextResponse.json(body, { ...init, headers });
+}
+
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
 
@@ -407,7 +414,7 @@ function buildPack(profile: CandidateProfile, opportunity: any) {
 
 export async function GET() {
   const store = readStore();
-  return NextResponse.json({
+  return privateJson({
     ...store,
     readiness: scoreReadiness(store)
   });
@@ -426,7 +433,7 @@ export async function POST(request: Request) {
       };
 
       writeStore(store);
-      return NextResponse.json({
+      return privateJson({
         status: "SAVED",
         store,
         readiness: scoreReadiness(store)
@@ -439,31 +446,31 @@ export async function POST(request: Request) {
       const dataUrl = String(body.dataUrl || "");
 
       if (!fileName || !dataUrl) {
-        return NextResponse.json({ status: "FAILED", error: "Missing file." }, { status: 400 });
+        return privateJson({ status: "FAILED", error: "Missing file." }, { status: 400 });
       }
       if (!ALLOWED_DOCUMENT_TYPES.has(type)) {
-        return NextResponse.json({ status: "FAILED", error: "Document type must be CV, ID or CERTIFICATE." }, { status: 400 });
+        return privateJson({ status: "FAILED", error: "Document type must be CV, ID or CERTIFICATE." }, { status: 400 });
       }
 
       const extension = path.extname(fileName).toLowerCase();
       const allowedMimes = ALLOWED_FILE_TYPES.get(extension);
       if (!allowedMimes) {
-        return NextResponse.json({ status: "FAILED", error: "Only PDF, DOCX and TXT documents are supported." }, { status: 415 });
+        return privateJson({ status: "FAILED", error: "Only PDF, DOCX and TXT documents are supported." }, { status: 415 });
       }
 
       let decoded: { mimeType: string; buffer: Buffer };
       try {
         decoded = decodeDataUrl(dataUrl);
       } catch (error) {
-        return NextResponse.json({ status: "FAILED", error: error instanceof Error ? error.message : "Invalid file upload." }, { status: 413 });
+        return privateJson({ status: "FAILED", error: error instanceof Error ? error.message : "Invalid file upload." }, { status: 413 });
       }
       if (!allowedMimes.has(decoded.mimeType)) {
-        return NextResponse.json({ status: "FAILED", error: "File extension and content type do not match." }, { status: 415 });
+        return privateJson({ status: "FAILED", error: "File extension and content type do not match." }, { status: 415 });
       }
       try {
         validateDocumentSignature(fileName, decoded.mimeType, decoded.buffer);
       } catch (error) {
-        return NextResponse.json({ status: "FAILED", error: error instanceof Error ? error.message : "Invalid document content." }, { status: 415 });
+        return privateJson({ status: "FAILED", error: error instanceof Error ? error.message : "Invalid document content." }, { status: 415 });
       }
 
       fs.mkdirSync(UPLOAD_DIR, { recursive: true });
@@ -509,7 +516,7 @@ export async function POST(request: Request) {
 
       writeStore(store);
 
-      return NextResponse.json({
+      return privateJson({
         status: "DOCUMENT_UPLOADED",
         document: documentRecord,
         extracted,
@@ -522,7 +529,7 @@ export async function POST(request: Request) {
       const opportunity = body.opportunity || {};
 
       if (!opportunity.title || !opportunity.organisation || !opportunity.sourceUrl) {
-        return NextResponse.json({
+        return privateJson({
           status: "FAILED",
           error: "Title, organisation and official/source link are required."
         }, { status: 400 });
@@ -546,7 +553,7 @@ export async function POST(request: Request) {
       store.opportunities = [record, ...store.opportunities];
       writeStore(store);
 
-      return NextResponse.json({
+      return privateJson({
         status: "OPPORTUNITY_ADDED",
         opportunity: record,
         store,
@@ -559,7 +566,7 @@ export async function POST(request: Request) {
       const opportunity = store.opportunities.find((item) => item.opportunityId === opportunityId);
 
       if (!opportunity) {
-        return NextResponse.json({ status: "FAILED", error: "Opportunity not found." }, { status: 404 });
+        return privateJson({ status: "FAILED", error: "Opportunity not found." }, { status: 404 });
       }
 
       const packText = buildPack(store.profile || {}, opportunity);
@@ -581,7 +588,7 @@ export async function POST(request: Request) {
 
       writeStore(store);
 
-      return NextResponse.json({
+      return privateJson({
         status: "PACK_READY",
         pack,
         store,
@@ -594,7 +601,7 @@ export async function POST(request: Request) {
       const proof = String(body.proof || "").trim();
 
       if (!opportunityId || !proof) {
-        return NextResponse.json({
+        return privateJson({
           status: "FAILED",
           error: "Proof or reference is required."
         }, { status: 400 });
@@ -616,7 +623,7 @@ export async function POST(request: Request) {
 
       writeStore(store);
 
-      return NextResponse.json({
+      return privateJson({
         status: "PROOF_CAPTURED",
         proof: proofRecord,
         store,
@@ -631,19 +638,19 @@ export async function POST(request: Request) {
       store.proofLog = store.proofLog.filter((item) => item.opportunityId !== opportunityId);
       writeStore(store);
 
-      return NextResponse.json({
+      return privateJson({
         status: "DELETED",
         store,
         readiness: scoreReadiness(store)
       });
     }
 
-    return NextResponse.json({
+    return privateJson({
       status: "FAILED",
       error: "Unknown action."
     }, { status: 400 });
   } catch (error) {
-    return NextResponse.json({
+    return privateJson({
       status: "ERROR_VISIBLE",
       error: error instanceof Error ? error.message : "Unknown Apply Desk error",
       stack: error instanceof Error ? error.stack : ""
