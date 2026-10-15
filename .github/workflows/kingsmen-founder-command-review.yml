@@ -8,6 +8,7 @@ on:
       - "apps/web/src/lib/founder-auth.ts"
       - "apps/web/test/founder-command-*.test.cjs"
       - "db/migrations/0016_founder_audit_and_command_intake.sql"
+      - "db/migrations/0017_founder_command_decisions.sql"
       - ".github/workflows/kingsmen-founder-command-review.yml"
   push:
     branches:
@@ -37,4 +38,4 @@ jobs:
         with:
           node-version: 22
       - name: Run founder command intake and review regressions
-        run: node --test apps/web/test/founder-command-intake.test.cjs apps/web/test/founder-command-review.test.cjs
+        run: node --test apps/web/test/founder-command-intake.test.cjs apps/web/test/founder-command-review.test.cjs apps/web/test/founder-command-decisions.test.cjs
