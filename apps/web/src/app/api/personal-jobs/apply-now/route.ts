@@ -78,13 +78,25 @@ function writeStore(store: Store) {
   fs.writeFileSync(STORE_PATH, `${JSON.stringify(store, null, 2)}\n`, "utf8");
 }
 
+const MAX_UPLOAD_BYTES = 10 * 1024 * 1024;
+const ALLOWED_DOCUMENT_TYPES = new Set(["CV", "ID", "CERTIFICATE"]);
+const ALLOWED_FILE_TYPES = new Map<string, Set<string>>([
+  [".pdf", new Set(["application/pdf", "application/octet-stream"])],
+  [".docx", new Set(["application/vnd.openxmlformats-officedocument.wordprocessingml.document", "application/octet-stream"])],
+  [".txt", new Set(["text/plain", "text/txt", "application/octet-stream"])]
+]);
+
 function decodeDataUrl(dataUrl: string) {
-  const match = dataUrl.match(/^data:([^;]+);base64,(.+)$/);
-  if (!match) throw new Error("Invalid file upload format.");
-  return {
-    mimeType: match[1],
-    buffer: Buffer.from(match[2], "base64")
-  };
+  if (dataUrl.length > Math.ceil(MAX_UPLOAD_BYTES * 4 / 3) + 256) {
+    throw new Error("File exceeds the 10 MB upload limit.");
+  }
+  const match = dataUrl.match(/^data:([^;,]+);base64,([A-Za-z0-9+/]*={0,2})$/);
+  if (!match) throw new Error("Upload must be a valid base64-encoded PDF, DOCX or TXT file.");
+  const mimeType = match[1].toLowerCase();
+  const buffer = Buffer.from(match[2], "base64");
+  if (buffer.length === 0) throw new Error("The uploaded file is empty.");
+  if (buffer.length > MAX_UPLOAD_BYTES) throw new Error("File exceeds the 10 MB upload limit.");
+  return { mimeType, buffer };
 }
 
 async function extractDocumentText(fileName: string, mimeType: string, buffer: Buffer) {
@@ -398,10 +410,28 @@ export async function POST(request: Request) {
       if (!fileName || !dataUrl) {
         return NextResponse.json({ status: "FAILED", error: "Missing file." }, { status: 400 });
       }
+      if (!ALLOWED_DOCUMENT_TYPES.has(type)) {
+        return NextResponse.json({ status: "FAILED", error: "Document type must be CV, ID or CERTIFICATE." }, { status: 400 });
+      }
+
+      const extension = path.extname(fileName).toLowerCase();
+      const allowedMimes = ALLOWED_FILE_TYPES.get(extension);
+      if (!allowedMimes) {
+        return NextResponse.json({ status: "FAILED", error: "Only PDF, DOCX and TXT documents are supported." }, { status: 415 });
+      }
+
+      let decoded: { mimeType: string; buffer: Buffer };
+      try {
+        decoded = decodeDataUrl(dataUrl);
+      } catch (error) {
+        return NextResponse.json({ status: "FAILED", error: error instanceof Error ? error.message : "Invalid file upload." }, { status: 413 });
+      }
+      if (!allowedMimes.has(decoded.mimeType)) {
+        return NextResponse.json({ status: "FAILED", error: "File extension and content type do not match." }, { status: 415 });
+      }
 
       fs.mkdirSync(UPLOAD_DIR, { recursive: true });
 
-      const decoded = decodeDataUrl(dataUrl);
       const safeName = fileName.replace(/[^a-zA-Z0-9._-]/g, "_");
       const storedName = `${Date.now()}-${safeName}`;
       const filePath = path.join(UPLOAD_DIR, storedName);
