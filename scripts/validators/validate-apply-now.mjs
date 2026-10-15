@@ -55,7 +55,8 @@ checks.push({
 checks.push({
   name: "production_fails_closed_without_durable_storage",
   passed: api.includes("function localCandidateStorageUnavailable()") &&
-    api.includes('process.env.NODE_ENV === "production"') &&
+    api.includes('return process.env.NODE_ENV === "production";') &&
+    !api.includes("KINGSMEN_ALLOW_LOCAL_CANDIDATE_STORAGE") &&
     api.includes('status: "STORAGE_NOT_CONFIGURED"') &&
     api.includes("return storageUnavailableResponse();"),
   detail: "Production must not silently serve candidate data from local JSON files."
