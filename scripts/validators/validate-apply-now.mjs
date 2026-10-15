@@ -53,6 +53,28 @@ checks.push({
 });
 
 checks.push({
+  name: "production_fails_closed_without_durable_storage",
+  passed: api.includes("function localCandidateStorageUnavailable()") &&
+    api.includes('process.env.NODE_ENV === "production"') &&
+    api.includes('status: "STORAGE_NOT_CONFIGURED"') &&
+    api.includes("return storageUnavailableResponse();"),
+  detail: "Production must not silently serve candidate data from local JSON files."
+});
+
+checks.push({
+  name: "private_local_file_permissions",
+  passed: api.includes("mode: 0o700") && api.includes("mode: 0o600") &&
+    api.includes("fs.chmodSync(filePath, 0o600)"),
+  detail: "Development candidate records and uploads must use restrictive filesystem permissions."
+});
+
+checks.push({
+  name: "does_not_expose_internal_file_path_or_stack",
+  passed: !api.includes("localPath: filePath") && !api.includes("stack: error instanceof Error ? error.stack"),
+  detail: "API responses must not expose server paths or exception stack traces."
+});
+
+checks.push({
   name: "has_add_opportunity_action",
   passed: api.includes('action === "addOpportunity"'),
   detail: "Opportunity action must exist."
