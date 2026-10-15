@@ -70,10 +70,10 @@ try {
   const noAuth = await fetch(endpoint, { cache: "no-store", signal: AbortSignal.timeout(15000) });
   assert.ok([401, 503].includes(noAuth.status), "unauthenticated request must fail closed, got HTTP " + noAuth.status);
   record("unauthenticated_workspace_denied", true, { httpStatus: noAuth.status });
-} catch (error) { runError = error instanceof Error ? error.message : "Unknown test failure"; }
+} catch (error) { runError = error instanceof Error ? error.message : "Unknown test failure"; results.push({ name: "staging_assertions_completed", passed: false, error: "Assertion or request failed; inspect local staging logs for details." }); }
 finally {
-  try { if (documentA) await deleteSyntheticDocument(tokenA, documentA.documentId); record("cleanup_user_A_synthetic_document", true); } catch { results.push({ name: "cleanup_user_A_synthetic_document", passed: false }); }
-  try { if (documentB) await deleteSyntheticDocument(tokenB, documentB.documentId); record("cleanup_user_B_synthetic_document", true); } catch { results.push({ name: "cleanup_user_B_synthetic_document", passed: false }); }
+  if (documentA) { try { await deleteSyntheticDocument(tokenA, documentA.documentId); record("cleanup_user_A_synthetic_document", true); } catch { results.push({ name: "cleanup_user_A_synthetic_document", passed: false }); } }
+  if (documentB) { try { await deleteSyntheticDocument(tokenB, documentB.documentId); record("cleanup_user_B_synthetic_document", true); } catch { results.push({ name: "cleanup_user_B_synthetic_document", passed: false }); } }
   try { if (modifiedA && originalA) { await saveNotes(tokenA, typeof originalA.profile.notes === "string" ? originalA.profile.notes : ""); record("restore_user_A_notes", true); } } catch { results.push({ name: "restore_user_A_notes", passed: false }); }
   try { if (modifiedB && originalB) { await saveNotes(tokenB, typeof originalB.profile.notes === "string" ? originalB.profile.notes : ""); record("restore_user_B_notes", true); } } catch { results.push({ name: "restore_user_B_notes", passed: false }); }
 }
