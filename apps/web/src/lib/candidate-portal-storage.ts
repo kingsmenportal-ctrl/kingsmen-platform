@@ -67,7 +67,7 @@ export async function loadCandidatePortalState(context: PortalContext): Promise<
     auth_user_id: `eq.${context.userId}`,
     limit: "1"
   });
-  const response = await portalFetch(context, `/rest/v1/candidate_portal_state?${query.toString()}`);
+  const response = await portalFetch(context, `/rest/v1/candidate_portal_state?${query.toString()}`, { headers: { Accept: "application/json" } });
   if (!response.ok) throw new Error("Candidate storage could not be read.");
   const declaredLength = Number(response.headers.get("content-length") || 0);
   if (declaredLength > MAX_CANDIDATE_STATE_BYTES) throw new Error("Candidate storage response exceeds the storage limit.");
@@ -92,7 +92,7 @@ export async function saveCandidatePortalState(context: PortalContext, state: Re
   if (Buffer.byteLength(body, "utf8") > MAX_CANDIDATE_STATE_BYTES) throw new Error("Candidate state exceeds the storage limit.");
   const response = await portalFetch(context, "/rest/v1/candidate_portal_state?on_conflict=auth_user_id", {
     method: "POST",
-    headers: { Prefer: "resolution=merge-duplicates,return=minimal" },
+    headers: { Prefer: "resolution=merge-duplicates,return=minimal", "Content-Length": String(Buffer.byteLength(body, "utf8")) },
     body
   });
   if (!response.ok) throw new Error("Candidate storage could not be saved.");
