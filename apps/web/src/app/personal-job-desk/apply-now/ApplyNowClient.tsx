@@ -185,6 +185,19 @@ export default function ApplyNowClient() {
     }
   }
 
+  async function updateOpportunityStatus(opportunityId: string, status: string) {
+    setBusy(`status-${opportunityId}`);
+    try {
+      const json = await api({ action: "updateOpportunityStatus", opportunityId, status });
+      setStore(json.store);
+      setMessage("Application status updated.");
+    } catch (error) {
+      setMessage(error instanceof Error ? error.message : "Could not update application status.");
+    } finally {
+      setBusy("");
+    }
+  }
+
   async function generatePack(opportunityId: string) {
     setBusy(`pack-${opportunityId}`);
 
@@ -449,7 +462,9 @@ export default function ApplyNowClient() {
               <article key={item.opportunityId} style={oppCard}>
                 <div style={oppHeader}>
                   <span style={routeBadge}>{item.category}</span>
-                  <span style={statusBadge}>{item.status}</span>
+                  <select aria-label={`Application status for ${item.title}`} style={{ ...input, width: "auto", maxWidth: "100%", minWidth: 145, padding: "6px 8px", fontSize: 11 }} value={item.status} disabled={busy === `status-${item.opportunityId}`} onChange={(event) => updateOpportunityStatus(item.opportunityId, event.target.value)}>
+                    {["READY_TO_PREPARE", "PREPARING", "PACK_READY", "INTERVIEW", "OFFER", "REJECTED", "WITHDRAWN", ...(item.status === "APPLIED_PROOF_CAPTURED" ? ["APPLIED_PROOF_CAPTURED"] : [])].map((status) => <option key={status} value={status}>{status.replaceAll("_", " ")}</option>)}
+                  </select>
                 </div>
 
                 <h3 style={oppTitle}>{item.title}</h3>
