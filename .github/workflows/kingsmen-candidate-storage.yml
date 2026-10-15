@@ -13,7 +13,8 @@ on:
       - "apps/web/src/app/candidate/documents/page.tsx"
       - "apps/web/src/app/candidate/workbench/page.tsx"
       - "apps/web/src/app/candidate/finance/page.tsx"
-      - "apps/web/test/candidate-storage-security.test.cjs"\n      - "apps/web/test/founder-control-plane.test.cjs"
+      - "apps/web/test/candidate-storage-security.test.cjs"
+      - "apps/web/test/founder-control-plane.test.cjs"\n      - "apps/web/test/founder-control-plane.test.cjs"
       - ".github/workflows/kingsmen-candidate-storage.yml"
   push:
     branches:
@@ -25,6 +26,7 @@ on:
       - "apps/web/src/lib/candidate-portal-storage.ts"
       - "apps/web/src/lib/supabase-auth.ts"
       - "apps/web/test/candidate-storage-security.test.cjs"
+      - "apps/web/test/founder-control-plane.test.cjs"
       - ".github/workflows/kingsmen-candidate-storage.yml"
 
 permissions:
