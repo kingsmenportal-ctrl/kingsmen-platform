@@ -10,6 +10,7 @@ on:
       - "apps/web/src/app/candidate/dashboard/page.tsx"
       - "apps/web/src/app/candidate/profile/page.tsx"
       - "apps/web/src/app/candidate/documents/page.tsx"
+      - "apps/web/src/app/candidate/workbench/page.tsx"
       - "apps/web/test/candidate-storage-security.test.cjs"
       - ".github/workflows/kingsmen-candidate-storage.yml"
   push:
