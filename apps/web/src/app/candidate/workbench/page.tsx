@@ -8,7 +8,7 @@ type Pack = { packId: string; opportunityId: string; title: string; body: string
 type Proof = { proofId: string; opportunityId: string; proof: string; createdAt?: string };
 type Contact = { entryId: string; opportunityId?: string; contactName: string; organisation: string; channel: string; direction: string; summary: string; followUpDate?: string; createdAt?: string };
 type Workspace = { profile?: { fullName?: string; email?: string }; opportunities?: Opportunity[]; tasks?: Task[]; applicationPacks?: Pack[]; proofLog?: Proof[]; contactLog?: Contact[]; error?: string };
-const STATUSES = ["READY_TO_PREPARE", "PREPARING", "PACK_READY", "INTERVIEW", "OFFER", "REJECTED", "WITHDRAWN"];
+const STATUSES = ["READY_TO_PREPARE", "PREPARING", "PACK_READY", "SUBMITTED_REPORTED", "INTERVIEW", "OFFER", "REJECTED", "WITHDRAWN"];
 const GATES = ["Higher Education", "TVET", "SETA / Learnership", "Internship", "Apprenticeship", "Employment"];
 
 function labelStatus(value?: string) {
@@ -45,6 +45,8 @@ export default function CandidateWorkbenchPage() {
   const [contactSummary, setContactSummary] = useState("");
   const [contactOpportunityId, setContactOpportunityId] = useState("");
   const [proofDrafts, setProofDrafts] = useState<Record<string, string>>({});
+  const [evidenceUrlDrafts, setEvidenceUrlDrafts] = useState<Record<string, string>>({});
+  const [submissionChannels, setSubmissionChannels] = useState<Record<string, string>>({});
 
   const opportunities = workspace.opportunities ?? [];
   const tasks = workspace.tasks ?? [];
@@ -132,17 +134,19 @@ export default function CandidateWorkbenchPage() {
           const opportunityProofs = proofs.filter((proof) => proof.opportunityId === opportunity.opportunityId);
           return <article key={opportunity.opportunityId} style={{ border: "1px solid #e2e8f0", borderRadius: 12, padding: 16 }}>
             <div style={{ display: "flex", justifyContent: "space-between", gap: 14, flexWrap: "wrap" }}><div style={{ minWidth: 0, flex: "1 1 300px" }}><h3 style={{ margin: "0 0 5px", fontSize: 17 }}>{opportunity.title}</h3><p style={{ margin: 0, color: "#64748b", fontSize: 13 }}>{opportunity.organisation} · {opportunity.category || "Opportunity"}</p><p style={{ margin: "7px 0 0", color: "#64748b", fontSize: 12 }}>Closing: {dateLabel(opportunity.closingDate)}</p>{opportunity.sourceUrl && <a href={opportunity.sourceUrl} target="_blank" rel="noreferrer" style={{ display: "inline-block", marginTop: 8, color: "#1d5675", fontSize: 13, fontWeight: 700 }}>Open source ↗</a>}</div>
-              <label style={{ display: "block", fontSize: 12, fontWeight: 800, minWidth: 190 }}>Application stage<select aria-label={`Stage for ${opportunity.title}`} value={opportunity.status || "READY_TO_PREPARE"} disabled={busy} onChange={(event) => void mutate("updateOpportunityStatus", { opportunityId: opportunity.opportunityId, status: event.target.value }, "Application stage updated.")} style={{ ...input, display: "block", marginTop: 6 }}>{STATUSES.map((status) => <option key={status} value={status}>{labelStatus(status)}</option>)}</select></label>
+              <label style={{ display: "block", fontSize: 12, fontWeight: 800, minWidth: 190 }}>Application stage<select aria-label={`Stage for ${opportunity.title}`} value={opportunity.status || "READY_TO_PREPARE"} disabled={busy} onChange={(event) => void mutate("updateOpportunityStatus", { opportunityId: opportunity.opportunityId, status: event.target.value }, "Application stage updated.")} style={{ ...input, display: "block", marginTop: 6 }}>{STATUSES.map((status) => <option key={status} value={status} disabled={status === "SUBMITTED_REPORTED"}>{labelStatus(status)}{status === "SUBMITTED_REPORTED" ? " · record evidence below" : ""}</option>)}</select></label>
             </div>
             <div style={{ display: "flex", flexWrap: "wrap", gap: 8, marginTop: 15 }}>
               <button type="button" disabled={busy} onClick={() => void mutate("generatePack", { opportunityId: opportunity.opportunityId }, "Application pack generated.")} style={button}>Generate / refresh pack</button>
               {opportunityPacks.map((pack) => <button key={pack.packId} type="button" onClick={() => downloadPack(pack)} style={{ border: "1px solid #cbd5e1", borderRadius: 9, padding: "9px 11px", background: "#fff", color: "#1d5675", fontWeight: 800, cursor: "pointer" }}>Download pack</button>)}
             </div>
-            <form onSubmit={(event) => { event.preventDefault(); const proof = proofDrafts[opportunity.opportunityId]?.trim(); if (proof) void mutate("markApplied", { opportunityId: opportunity.opportunityId, proof }, "Application evidence recorded."); }} style={{ display: "grid", gridTemplateColumns: "minmax(180px, 1fr) auto", gap: 8, marginTop: 14 }}>
-              <input aria-label={`Submission reference for ${opportunity.title}`} value={proofDrafts[opportunity.opportunityId] || ""} onChange={(event) => setProofDrafts((current) => ({ ...current, [opportunity.opportunityId]: event.target.value }))} maxLength={1200} placeholder="Submission reference or proof note" style={input} />
-              <button type="submit" disabled={busy || !(proofDrafts[opportunity.opportunityId] || "").trim()} style={button}>Record proof</button>
+            <form onSubmit={(event) => { event.preventDefault(); const proof = proofDrafts[opportunity.opportunityId]?.trim(); if (proof) void mutate("markApplied", { opportunityId: opportunity.opportunityId, proof, evidenceUrl: evidenceUrlDrafts[opportunity.opportunityId] || "", submissionChannel: submissionChannels[opportunity.opportunityId] || "OTHER" }, "Candidate-reported submission and evidence note recorded; it has not been independently verified."); }} style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(190px, 1fr))", gap: 8, marginTop: 14 }}>
+              <input aria-label={`Submission reference for ${opportunity.title}`} value={proofDrafts[opportunity.opportunityId] || ""} onChange={(event) => setProofDrafts((current) => ({ ...current, [opportunity.opportunityId]: event.target.value }))} maxLength={1200} minLength={3} placeholder="Submission reference / evidence note (required)" style={input} />
+              <select aria-label={`Submission channel for ${opportunity.title}`} value={submissionChannels[opportunity.opportunityId] || "OTHER"} onChange={(event) => setSubmissionChannels((current) => ({ ...current, [opportunity.opportunityId]: event.target.value }))} style={input}><option value="PORTAL">Organisation portal</option><option value="EMAIL">Email</option><option value="IN_PERSON">In person</option><option value="PHONE">Phone</option><option value="OTHER">Other / not specified</option></select>
+              <input aria-label={`Evidence link for ${opportunity.title}`} type="url" value={evidenceUrlDrafts[opportunity.opportunityId] || ""} onChange={(event) => setEvidenceUrlDrafts((current) => ({ ...current, [opportunity.opportunityId]: event.target.value }))} maxLength={1000} placeholder="Optional public evidence link" style={input} />
+              <button type="submit" disabled={busy || (proofDrafts[opportunity.opportunityId] || "").trim().length < 3} style={button}>Record submission evidence</button>
             </form>
-            {opportunityProofs.length > 0 && <p style={{ color: "#176345", fontSize: 12, margin: "9px 0 0" }}>✓ {opportunityProofs.length} proof record{opportunityProofs.length === 1 ? "" : "s"} saved. Evidence is recorded, not independently verified.</p>}
+            {opportunityProofs.length > 0 && <div style={{ color: "#176345", fontSize: 12, margin: "9px 0 0" }}>✓ {opportunityProofs.length} candidate-recorded evidence item{opportunityProofs.length === 1 ? "" : "s"}. Not independently verified.{opportunityProofs.slice(0, 3).map((item) => <p key={item.proofId} style={{ margin: "6px 0 0", color: "#53657a", overflowWrap: "anywhere" }}>{dateLabel(item.createdAt)} · {item.proof}{item.evidenceUrl ? <> · <a href={item.evidenceUrl} target="_blank" rel="noreferrer">Evidence link ↗</a></> : ""}</p>)}</div>}
           </article>;
         })}</div>}
       </section>
