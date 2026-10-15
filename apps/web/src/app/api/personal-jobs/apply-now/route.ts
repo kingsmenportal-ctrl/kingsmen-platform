@@ -638,48 +638,78 @@ export async function POST(request: Request) {
         try { fs.chmodSync(filePath, 0o600); } catch { /* Unsupported filesystem permissions in some dev environments. */ }
       }
 
-      const text = await extractDocumentText(fileName, decoded.mimeType, decoded.buffer);
-      const extracted = extractProfileFromText(text || "");
+      try {
+        const text = await extractDocumentText(fileName, decoded.mimeType, decoded.buffer);
+        const extracted = extractProfileFromText(text || "");
 
-      const documentRecord = {
-        documentId: `doc-${Date.now()}-${Math.random().toString(16).slice(2)}`,
-        type,
-        fileName,
-        storedName,
-        ...(storagePath ? { storagePath } : {}),
-        mimeType: decoded.mimeType,
-        sizeBytes: decoded.buffer.length,
-        extractedTextPreview: text ? text.slice(0, 1800) : "",
-        smartFields: extracted,
-        createdAt: new Date().toISOString()
-      };
-
-      store.documents = [documentRecord, ...store.documents];
-      store.profile = mergeSmartProfile(store.profile || {}, extracted);
-
-      store.smartExtraction = [
-        {
-          extractionId: `extract-${Date.now()}`,
-          documentId: documentRecord.documentId,
-          fileName,
+        const documentRecord = {
+          documentId: `doc-${Date.now()}-${Math.random().toString(16).slice(2)}`,
           type,
-          extracted,
-          textLength: text.length,
-          status: text.includes("extraction failed") ? "PARTIAL" : "EXTRACTED",
+          fileName,
+          storedName,
+          ...(storagePath ? { storagePath } : {}),
+          mimeType: decoded.mimeType,
+          sizeBytes: decoded.buffer.length,
+          extractedTextPreview: text ? text.slice(0, 1800) : "",
+          smartFields: extracted,
           createdAt: new Date().toISOString()
-        },
-        ...store.smartExtraction
-      ];
+        };
 
-      await persistStore(context, store);
+        store.documents = [documentRecord, ...store.documents];
+        store.profile = mergeSmartProfile(store.profile || {}, extracted);
 
-      return privateJson({
-        status: "DOCUMENT_UPLOADED",
-        document: documentRecord,
-        extracted,
-        store,
-        readiness: scoreReadiness(store)
-      });
+        store.smartExtraction = [
+          {
+            extractionId: `extract-${Date.now()}`,
+            documentId: documentRecord.documentId,
+            fileName,
+            type,
+            extracted,
+            textLength: text.length,
+            status: text.includes("extraction failed") ? "PARTIAL" : "EXTRACTED",
+            createdAt: new Date().toISOString()
+          },
+          ...store.smartExtraction
+        ];
+
+        await persistStore(context, store);
+
+        return privateJson({
+          status: "DOCUMENT_UPLOADED",
+          document: documentRecord,
+          extracted,
+          store,
+          readiness: scoreReadiness(store)
+        });
+      } catch (error) {
+        // A file must not be orphaned in private storage if extraction or state persistence fails.
+        // Cleanup is best-effort; preserve the original error so the route's generic handler applies.
+        try {
+          if (context && storagePath) {
+            const endpoint = new URL("/storage/v1/object/candidate-documents", context.url);
+            await fetch(endpoint, {
+              method: "DELETE",
+              headers: {
+                apikey: context.anonKey,
+                Authorization: `Bearer ${context.accessToken}`,
+                "Content-Type": "application/json"
+              },
+              body: JSON.stringify({ prefixes: [storagePath] }),
+              cache: "no-store",
+              signal: AbortSignal.timeout(10000)
+            });
+          } else if (!context) {
+            const filePath = path.join(UPLOAD_DIR, storedName);
+            try { fs.unlinkSync(filePath); }
+            catch (cleanupError) {
+              if ((cleanupError as NodeJS.ErrnoException).code !== "ENOENT") throw cleanupError;
+            }
+          }
+        } catch {
+          // Do not mask the primary failure or disclose storage internals to the client.
+        }
+        throw error;
+      }
     }
 
     if (action === "addOpportunity") {
