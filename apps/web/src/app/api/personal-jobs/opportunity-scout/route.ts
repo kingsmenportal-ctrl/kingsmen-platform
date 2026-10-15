@@ -6,6 +6,15 @@ import { NextResponse } from "next/server";
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
 
+const MAX_QUERY_LENGTH = 160;
+const MAX_LOCATION_LENGTH = 100;
+const ALLOWED_CATEGORIES = new Set(["JOB", "LEARNERSHIP", "INTERNSHIP", "FUNDING", "BURSARY"]);
+
+function boundedText(value: unknown, fallback: string, maxLength: number) {
+  if (typeof value !== "string") return fallback;
+  return value.trim().slice(0, maxLength);
+}
+
 function repoRoot() {
   const cwd = process.cwd();
   if (cwd.replace(/\\/g, "/").endsWith("apps/web")) return path.resolve(cwd, "../..");
@@ -166,13 +175,27 @@ export async function GET() {
 
 export async function POST(request: Request) {
   try {
-    const body = await request.json().catch(() => ({}));
-    const action = String(body.action || "").trim();
+    if (!request.headers.get("content-type")?.toLowerCase().includes("application/json")) {
+      return NextResponse.json({ status: "FAILED", error: "Content-Type must be application/json." }, { status: 415 });
+    }
+
+    const body = await request.json().catch(() => null);
+    if (!body || typeof body !== "object" || Array.isArray(body)) {
+      return NextResponse.json({ status: "FAILED", error: "Request body must be a JSON object." }, { status: 400 });
+    }
+    const action = typeof body.action === "string" ? body.action.trim() : "";
 
     if (action === "runScout") {
-      const query = String(body.query || "entry level general worker admin learnership internship").trim();
-      const location = String(body.location || "Johannesburg").trim();
-      const category = String(body.category || "JOB").trim();
+      const query = boundedText(body.query, "entry level general worker admin learnership internship", MAX_QUERY_LENGTH);
+      const location = boundedText(body.location, "Johannesburg", MAX_LOCATION_LENGTH);
+      const requestedCategory = boundedText(body.category, "JOB", 24).toUpperCase();
+      if (!query || !location) {
+        return NextResponse.json({ status: "FAILED", error: "Search and location are required." }, { status: 400 });
+      }
+      if (!ALLOWED_CATEGORIES.has(requestedCategory)) {
+        return NextResponse.json({ status: "FAILED", error: "Choose a supported opportunity category." }, { status: 400 });
+      }
+      const category = requestedCategory;
 
       const script = path.join(ROOT, "scripts", "agents", "personal-job-opportunity-scout.mjs");
       const fallbackLeads = sourceLinks(query, location, category);
@@ -241,7 +264,10 @@ export async function POST(request: Request) {
     }
 
     if (action === "importLead") {
-      const leadId = String(body.leadId || "");
+      const leadId = typeof body.leadId === "string" ? body.leadId.trim() : "";
+      if (!leadId || leadId.length > 200) {
+        return NextResponse.json({ status: "FAILED", error: "A valid lead identifier is required." }, { status: 400 });
+      }
       const scout = readJson(OUT, defaultScout());
       const lead = (scout.leads || []).find((x: any) => x.leadId === leadId);
 
@@ -249,7 +275,7 @@ export async function POST(request: Request) {
         return NextResponse.json({
           status: "FAILED",
           error: "Lead not found. Run scout again."
-        });
+        }, { status: 404 });
       }
 
       const store = readJson(APPLY_STORE, defaultApplyStore());
@@ -297,10 +323,10 @@ export async function POST(request: Request) {
       error: "Unknown action."
     });
   } catch (error) {
+    // Keep internal paths, stack traces and agent output out of public API responses.
     return NextResponse.json({
       status: "ERROR_VISIBLE",
-      error: error instanceof Error ? error.message : "POST failed.",
-      stack: error instanceof Error ? error.stack : ""
-    });
+      error: "Opportunity scout could not complete this request. Please retry."
+    }, { status: 503 });
   }
 }
