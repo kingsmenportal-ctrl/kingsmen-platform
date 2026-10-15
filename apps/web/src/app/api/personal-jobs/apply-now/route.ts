@@ -173,7 +173,7 @@ const PROFILE_FIELD_LIMITS: Record<keyof CandidateProfile, number> = {
   notes: 2_000
 };
 
-async function readBoundedJson(request: Request): Promise<Record<string, any>> {
+async async function readBoundedJson(request: Request): Promise<Record<string, any>> {
   const declaredLength = Number(request.headers.get("content-length") || 0);
   if (Number.isFinite(declaredLength) && declaredLength > MAX_JSON_BODY_BYTES) {
     throw new Error("Request body exceeds the allowed limit.");
