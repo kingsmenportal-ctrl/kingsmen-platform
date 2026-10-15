@@ -10,6 +10,9 @@ type DocumentRecord = {
   sizeBytes?: number;
   createdAt?: string;
   status?: string;
+  canonicalDocumentRef?: string;
+  evidenceRef?: string;
+  registryStatus?: "REGISTERED" | "LOCAL_ONLY";
 };
 type WorkspaceResponse = { documents?: DocumentRecord[]; error?: string; status?: string };
 const MAX_UPLOAD_BYTES = 10 * 1024 * 1024;
@@ -97,7 +100,9 @@ export default function CandidateDocumentsPage() {
       setSelectedFile(null);
       const input = document.getElementById("candidate-document-file") as HTMLInputElement | null;
       if (input) input.value = "";
-      setMessage("Document uploaded to your private workspace.");
+      setMessage(data.document?.registryStatus === "REGISTERED"
+        ? "Document uploaded and registered in the canonical vault. Verification is still pending."
+        : "Document uploaded to your private workspace. Canonical registry registration is unavailable in this local development mode.");
     } catch (reason) {
       setError(reason instanceof Error ? reason.message : "The document could not be uploaded.");
     } finally {
@@ -166,6 +171,11 @@ export default function CandidateDocumentsPage() {
             <div style={{ minWidth: 0, flex: "1 1 240px" }}>
               <div style={{ display: "flex", alignItems: "center", gap: 8, flexWrap: "wrap" }}><strong style={{ overflowWrap: "anywhere" }}>{document.fileName || "Uploaded document"}</strong><span style={{ borderRadius: 6, padding: "3px 7px", background: "#eaf0f6", color: "#35536c", fontSize: 11, fontWeight: 800 }}>{document.type || "DOCUMENT"}</span></div>
               <p style={{ margin: "6px 0 0", fontSize: 12, color: "#64748b" }}>{fileSize(document.sizeBytes)} · Added {dateLabel(document.createdAt)}</p>
+              <p style={{ margin: "6px 0 0", fontSize: 12, color: document.registryStatus === "REGISTERED" ? "#176345" : "#64748b" }}>
+                {document.registryStatus === "REGISTERED"
+                  ? `Canonical vault: registered · Verification pending · Ref ${document.canonicalDocumentRef || "recorded"}`
+                  : "Canonical vault registration not confirmed"}
+              </p>
             </div>
             <div style={{ display: "flex", gap: 8, flexWrap: "wrap" }}>
               <a href={`/api/personal-jobs/apply-now/documents/${encodeURIComponent(document.documentId)}`} target="_blank" rel="noreferrer" style={{ border: "1px solid #cbd5e1", borderRadius: 9, padding: "8px 11px", textDecoration: "none", color: "#1d5675", fontSize: 13, fontWeight: 800 }}>View / download</a>
