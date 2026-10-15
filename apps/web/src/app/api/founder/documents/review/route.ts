@@ -104,7 +104,22 @@ export async function POST(request: Request) {
     if (detail.includes("INVALID_DOCUMENT_REVIEW")) {
       return founderPrivateJson({ ok: false, error: "The database rejected the review references or decision.", productionReady: false }, { status: 400 });
     }
-    return founderPrivateJson({ ok: false, error: "Database did not accept the review. Confirm migration 0018 is applied and founder role claims are configured.", productionReady: false }, { status: 503 });
+    if (detail.includes("DOCUMENT_NOT_FOUND")) {
+      return founderPrivateJson({ ok: false, error: "That reference does not resolve to an active canonical document.", productionReady: false }, { status: 404 });
+    }
+    if (detail.includes("DOCUMENT_CANDIDATE_MISMATCH")) {
+      return founderPrivateJson({ ok: false, error: "The selected candidate does not match the canonical document record.", productionReady: false }, { status: 409 });
+    }
+    if (detail.includes("PROOF_REFERENCE_NOT_FOUND")) {
+      return founderPrivateJson({ ok: false, error: "The proof reference is not linked to this document.", productionReady: false }, { status: 422 });
+    }
+    if (detail.includes("VERIFICATION_PROOF_NOT_PASSED")) {
+      return founderPrivateJson({ ok: false, error: "A verified decision requires a linked verification record with PASSED status.", productionReady: false }, { status: 422 });
+    }
+    if (detail.includes("EVIDENCE_REFERENCE_NOT_FOUND")) {
+      return founderPrivateJson({ ok: false, error: "The evidence reference does not resolve to a supported record linked to this document.", productionReady: false }, { status: 422 });
+    }
+    return founderPrivateJson({ ok: false, error: "Database did not accept the review. Confirm migrations 0018 and 0019 are applied and founder role claims are configured.", productionReady: false }, { status: 503 });
   }
 
   let persisted: Record<string, unknown>;
@@ -116,7 +131,7 @@ export async function POST(request: Request) {
     return founderPrivateJson({ ok: false, error: "Could not verify the database persistence response. Check the review queue before retrying.", productionReady: false, persistenceUnknown: true }, { status: 502 });
   }
 
-  if (persisted.persisted !== true || persisted.sourceStatusChanged !== false || persisted.ownershipVerified !== false || persisted.evidenceResolved !== false) {
+  if (persisted.persisted !== true || persisted.sourceStatusChanged !== false || persisted.ownershipVerified !== true || persisted.evidenceResolved !== true) {
     return founderPrivateJson({ ok: false, error: "Database response did not satisfy the document-review safety contract.", productionReady: false, persistenceUnknown: true }, { status: 502 });
   }
 
@@ -131,10 +146,9 @@ export async function POST(request: Request) {
       safeNotes,
       persistedAt: new Date().toISOString()
     },
-    boundary: "Decision and audit event were persisted transactionally. The source document was not fetched or modified; document ownership and proof/evidence references have not been independently verified.",
+    boundary: "Decision and audit event were persisted transactionally after matching the document and candidate in the canonical registry and resolving linked proof/evidence records. The source document was not modified; evidence meaning still requires human review.",
     remainingRequirements: [
-      "Verify the document-to-candidate relationship against the canonical document registry.",
-      "Resolve proof and evidence references to immutable evidence records.",
+      "Review the linked evidence content and context; record existence alone does not establish its truth.",
       "Apply source document status changes only through the separately governed status-transition service."
     ]
   }, { status: 201 });
