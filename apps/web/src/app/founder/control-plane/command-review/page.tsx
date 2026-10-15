@@ -7,6 +7,7 @@ type RequestRow = {
   request_ref: string;
   command_key: string;
   command_name: string;
+  actor_user_id: string;
   actor_email: string;
   request_status: string;
   reason: string;
