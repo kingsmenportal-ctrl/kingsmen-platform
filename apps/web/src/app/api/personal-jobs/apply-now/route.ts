@@ -117,7 +117,7 @@ async function loadStoreForContext(context: PortalContext | null): Promise<Store
 }
 async function persistStore(context: PortalContext | null, store: Store) {
   if (context) { store.updatedAt = new Date().toISOString(); await saveCandidatePortalState(context, store as unknown as Record<string, unknown>); return; }
-  await persistStore(context, store);
+  writeStore(store);
 }
 function authOrStorageResponse(status: "not_configured" | "unauthenticated") {
   return status === "unauthenticated" ? privateJson({ status: "AUTHENTICATION_REQUIRED", error: "Sign in to access your private candidate workspace." }, { status: 401 }) : storageUnavailableResponse();
