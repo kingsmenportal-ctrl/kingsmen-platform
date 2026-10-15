@@ -875,15 +875,24 @@ export async function POST(request: Request) {
     }
 
     if (action === "updateOpportunityStatus") {
-      const opportunityId = String(body.opportunityId || "");
-      const nextStatus = String(body.status || "").toUpperCase();
+      const opportunityId = typeof body.opportunityId === "string" ? body.opportunityId.trim() : "";
+      const nextStatus = typeof body.status === "string" ? body.status.toUpperCase() : "";
       const allowedStatuses = ["READY_TO_PREPARE", "PREPARING", "PACK_READY", "INTERVIEW", "OFFER", "REJECTED", "WITHDRAWN"];
-      const exists = store.opportunities.some((item) => item.opportunityId === opportunityId);
-      if (!exists) return privateJson({ status: "FAILED", error: "Opportunity not found." }, { status: 404 });
+      const existing = store.opportunities.find((item) => item.opportunityId === opportunityId);
+      if (!existing) return privateJson({ status: "FAILED", error: "Opportunity not found in this workspace." }, { status: 404 });
       if (!allowedStatuses.includes(nextStatus)) {
-        return privateJson({ status: "FAILED", error: "Choose a valid application status. Record proof separately when an application has been submitted." }, { status: 400 });
+        return privateJson({ status: "FAILED", error: "Choose a valid preparation or outcome status. Submission must be recorded through the evidence form." }, { status: 400 });
       }
-      store.opportunities = store.opportunities.map((item) => item.opportunityId === opportunityId ? { ...item, status: nextStatus, updatedAt: new Date().toISOString() } : item);
+      if (existing.status === "SUBMITTED_REPORTED" && !["INTERVIEW", "OFFER", "REJECTED", "WITHDRAWN"].includes(nextStatus)) {
+        return privateJson({ status: "FAILED", error: "A candidate-reported submission cannot be moved back to preparation. Record a new outcome or contact the organisation." }, { status: 409 });
+      }
+      const now = new Date().toISOString();
+      store.opportunities = store.opportunities.map((item) => item.opportunityId === opportunityId ? {
+        ...item,
+        status: nextStatus,
+        statusHistory: [...(Array.isArray(item.statusHistory) ? item.statusHistory : []), { from: item.status || "READY_TO_PREPARE", to: nextStatus, changedAt: now, source: "CANDIDATE_WORKSPACE" }].slice(-100),
+        updatedAt: now
+      } : item);
       await persistStore(context, store);
       return privateJson({ status: "OPPORTUNITY_STATUS_UPDATED", store, readiness: scoreReadiness(store) });
     }
@@ -924,38 +933,50 @@ export async function POST(request: Request) {
     }
 
     if (action === "markApplied") {
-      const opportunityId = String(body.opportunityId || "");
-      const proof = String(body.proof || "").trim();
+      const opportunityId = typeof body.opportunityId === "string" ? body.opportunityId.trim() : "";
+      const proof = typeof body.proof === "string" ? body.proof.trim() : "";
+      const evidenceUrl = typeof body.evidenceUrl === "string" ? body.evidenceUrl.trim() : "";
+      const submissionChannel = typeof body.submissionChannel === "string" ? body.submissionChannel.toUpperCase() : "OTHER";
+      const opportunity = store.opportunities.find((item) => item.opportunityId === opportunityId);
 
-      if (!opportunityId || !proof) {
-        return privateJson({
-          status: "FAILED",
-          error: "Proof or reference is required."
-        }, { status: 400 });
+      if (!opportunity) return privateJson({ status: "FAILED", error: "Opportunity not found in this workspace." }, { status: 404 });
+      if (proof.length < 3 || proof.length > 1200) {
+        return privateJson({ status: "FAILED", error: "Add a submission reference or evidence note between 3 and 1,200 characters." }, { status: 400 });
+      }
+      if (!["PORTAL", "EMAIL", "IN_PERSON", "PHONE", "OTHER"].includes(submissionChannel)) {
+        return privateJson({ status: "FAILED", error: "Choose a valid submission channel." }, { status: 400 });
+      }
+      if (evidenceUrl) {
+        let parsedEvidence: URL;
+        try { parsedEvidence = new URL(evidenceUrl); }
+        catch { return privateJson({ status: "FAILED", error: "Evidence link must be a valid HTTP or HTTPS URL." }, { status: 400 }); }
+        if (!["http:", "https:"].includes(parsedEvidence.protocol) || parsedEvidence.username || parsedEvidence.password || evidenceUrl.length > 1000) {
+          return privateJson({ status: "FAILED", error: "Evidence link must be a public HTTP or HTTPS URL without embedded credentials (maximum 1,000 characters)." }, { status: 400 });
+        }
       }
 
+      const now = new Date().toISOString();
       const proofRecord = {
         proofId: `proof-${Date.now()}-${Math.random().toString(16).slice(2)}`,
         opportunityId,
         proof,
-        createdAt: new Date().toISOString()
+        submissionChannel,
+        ...(evidenceUrl ? { evidenceUrl } : {}),
+        recordType: "CANDIDATE_REPORTED_SUBMISSION",
+        verificationStatus: "NOT_INDEPENDENTLY_VERIFIED",
+        createdAt: now
       };
 
-      store.proofLog = [proofRecord, ...store.proofLog];
-      store.opportunities = store.opportunities.map((item) =>
-        item.opportunityId === opportunityId
-          ? { ...item, status: "APPLIED_PROOF_CAPTURED", updatedAt: new Date().toISOString() }
-          : item
-      );
+      store.proofLog = [proofRecord, ...store.proofLog].slice(0, 1000);
+      store.opportunities = store.opportunities.map((item) => item.opportunityId === opportunityId ? {
+        ...item,
+        status: "SUBMITTED_REPORTED",
+        statusHistory: [...(Array.isArray(item.statusHistory) ? item.statusHistory : []), { from: item.status || "READY_TO_PREPARE", to: "SUBMITTED_REPORTED", changedAt: now, source: "CANDIDATE_PROVIDED_EVIDENCE", proofId: proofRecord.proofId }].slice(-100),
+        updatedAt: now
+      } : item);
 
       await persistStore(context, store);
-
-      return privateJson({
-        status: "PROOF_CAPTURED",
-        proof: proofRecord,
-        store,
-        readiness: scoreReadiness(store)
-      });
+      return privateJson({ status: "CANDIDATE_SUBMISSION_RECORDED", proof: proofRecord, store, readiness: scoreReadiness(store) });
     }
 
     if (action === "addFinanceEntry") {
