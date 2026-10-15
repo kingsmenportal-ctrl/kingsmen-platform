@@ -201,17 +201,26 @@ function sendError(response: ServerResponse, statusCode: number, code: string, m
 function readBody(request: IncomingMessage): Promise<string> {
   return new Promise((resolve, reject) => {
     let body = "";
+    let rejectedForSize = false;
 
     request.on("data", (chunk: Buffer) => {
+      if (rejectedForSize) return;
       body += chunk.toString("utf8");
-      if (body.length > MAX_BODY_BYTES) {
-        request.destroy();
+      if (Buffer.byteLength(body, "utf8") > MAX_BODY_BYTES) {
+        // Stop retaining request data, but keep the socket alive long enough to return
+        // a structured 413 response instead of resetting the client's connection.
+        rejectedForSize = true;
+        body = "";
         reject(new Error("REQUEST_BODY_TOO_LARGE"));
       }
     });
 
-    request.on("end", () => resolve(body));
-    request.on("error", reject);
+    request.on("end", () => {
+      if (!rejectedForSize) resolve(body);
+    });
+    request.on("error", (error) => {
+      if (!rejectedForSize) reject(error);
+    });
   });
 }
 
