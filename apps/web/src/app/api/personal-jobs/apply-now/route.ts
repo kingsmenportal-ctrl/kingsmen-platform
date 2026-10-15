@@ -878,6 +878,49 @@ export async function POST(request: Request) {
       return privateJson({ status: "TASK_DELETED", store, readiness: scoreReadiness(store) });
     }
 
+    if (action === "deleteDocument") {
+      const documentId = String(body.documentId || "");
+      const document = store.documents.find((item) => item.documentId === documentId);
+      if (!document) return privateJson({ status: "FAILED", error: "Document not found." }, { status: 404 });
+
+      if (context && typeof document.storagePath === "string" && document.storagePath) {
+        const prefix = `${context.userId}/`;
+        const objectName = document.storagePath.startsWith(prefix) ? document.storagePath.slice(prefix.length) : "";
+        if (!objectName || objectName.includes("/") || !/^[a-zA-Z0-9._-]{1,180}$/.test(objectName)) {
+          return privateJson({ status: "FAILED", error: "Document storage reference is invalid; no records were removed." }, { status: 409 });
+        }
+        const endpoint = new URL("/storage/v1/object/candidate-documents", context.url);
+        const response = await fetch(endpoint, {
+          method: "DELETE",
+          headers: {
+            apikey: context.anonKey,
+            Authorization: `Bearer ${context.accessToken}`,
+            "Content-Type": "application/json"
+          },
+          body: JSON.stringify({ prefixes: [`${context.userId}/${objectName}`] }),
+          cache: "no-store",
+          signal: AbortSignal.timeout(15000)
+        });
+        if (!response.ok && response.status !== 404) {
+          return privateJson({ status: "STORAGE_FAILED", error: "The private file could not be deleted. The document record was kept." }, { status: 503 });
+        }
+      } else if (!context && process.env.NODE_ENV !== "production") {
+        const storedName = typeof document.storedName === "string" ? document.storedName : "";
+        if (!storedName || path.basename(storedName) !== storedName || !/^[a-zA-Z0-9._-]{1,180}$/.test(storedName)) {
+          return privateJson({ status: "FAILED", error: "Local document storage reference is invalid." }, { status: 409 });
+        }
+        try { fs.unlinkSync(path.join(UPLOAD_DIR, storedName)); }
+        catch (error) { if ((error as NodeJS.ErrnoException).code !== "ENOENT") return privateJson({ status: "STORAGE_FAILED", error: "The local file could not be deleted. The document record was kept." }, { status: 503 }); }
+      } else if (typeof document.storagePath !== "string" || !document.storagePath) {
+        return privateJson({ status: "STORAGE_FAILED", error: "The document has no safe storage reference; no records were removed." }, { status: 503 });
+      }
+
+      store.documents = store.documents.filter((item) => item.documentId !== documentId);
+      store.smartExtraction = store.smartExtraction.filter((item) => item.documentId !== documentId);
+      await persistStore(context, store);
+      return privateJson({ status: "DOCUMENT_DELETED", store, readiness: scoreReadiness(store) });
+    }
+
     if (action === "deleteOpportunity") {
       const opportunityId = String(body.opportunityId || "");
       store.opportunities = store.opportunities.filter((item) => item.opportunityId !== opportunityId);
