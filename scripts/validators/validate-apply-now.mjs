@@ -2,6 +2,7 @@ import fs from "node:fs";
 import path from "node:path";
 
 const root = process.cwd();
+const readTextIfExists = (file) => fs.existsSync(path.join(root, file)) ? fs.readFileSync(path.join(root, file), "utf8") : "";
 const reportPath = path.join(root, "reports/validation/apply-now-latest.json");
 
 const files = [
@@ -16,8 +17,8 @@ const checks = files.map((file) => ({
   detail: file
 }));
 
-const api = fs.readFileSync(path.join(root, "apps/web/src/app/api/personal-jobs/apply-now/route.ts"), "utf8");
-const client = fs.readFileSync(path.join(root, "apps/web/src/app/personal-job-desk/apply-now/ApplyNowClient.tsx"), "utf8");
+const api = readTextIfExists("apps/web/src/app/api/personal-jobs/apply-now/route.ts");
+const client = readTextIfExists("apps/web/src/app/personal-job-desk/apply-now/ApplyNowClient.tsx");
 
 checks.push({
   name: "has_upload_document_action",
@@ -122,17 +123,26 @@ for (const [name, file] of Object.entries(authFiles)) {
   });
 }
 
-const authHelper = fs.readFileSync(path.join(root, authFiles.helper), "utf8");
-const loginRoute = fs.readFileSync(path.join(root, authFiles.login), "utf8");
-const registerRoute = fs.readFileSync(path.join(root, authFiles.register), "utf8");
-const identityMigration = fs.readFileSync(path.join(root, authFiles.identityMigration), "utf8");
-const documentPolicyMigration = fs.readFileSync(path.join(root, authFiles.readPolicyMigration), "utf8");
+const authHelper = readTextIfExists(authFiles.helper);
+const loginRoute = readTextIfExists(authFiles.login);
+const registerRoute = readTextIfExists(authFiles.register);
+const identityMigration = readTextIfExists(authFiles.identityMigration);
+const documentPolicyMigration = readTextIfExists(authFiles.readPolicyMigration);
 
 checks.push({
   name: "auth_session_uses_http_only_cookie_and_no_store",
   passed: authHelper.includes("httpOnly") || (loginRoute.includes("httpOnly") && authHelper.includes("kingsmen-access-token")),
   detail: "Candidate session token must be held in an HTTP-only cookie."
 });
+checks.push({
+  name: "auth_user_lookup_fails_closed_on_timeout_and_invalid_cookie",
+  passed: authHelper.includes("AbortSignal.timeout(AUTH_LOOKUP_TIMEOUT_MS)") &&
+    authHelper.includes("return { configured: true as const, user: null };") &&
+    authHelper.includes("token.length > 8_192") &&
+    authHelper.includes('parsed.protocol !== "https:"'),
+  detail: "Session lookup must reject oversized/malformed tokens, require HTTPS in production, and fail closed on Auth timeouts."
+});
+
 checks.push({
   name: "auth_routes_require_supabase_public_configuration",
   passed: loginRoute.includes("supabaseAuthConfig()") && registerRoute.includes("supabaseAuthConfig()") &&
