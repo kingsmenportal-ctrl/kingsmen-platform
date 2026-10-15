@@ -124,8 +124,8 @@ function validateDocumentSignature(fileName: string, mimeType: string, buffer: B
 
   if (lower.endsWith(".txt") || mimeType.startsWith("text/")) {
     const text = buffer.toString("utf8");
-    if (text.includes("\\u0000") || text.includes("\\ufffd")) {
-      throw new Error("The TXT file must contain valid UTF-8 text.");
+    if (buffer.includes(0x00) || text.includes("\uFFFD")) {
+      throw new Error("The TXT file must contain valid UTF-8 text without NUL bytes.");
     }
   }
 }
