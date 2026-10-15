@@ -1010,7 +1010,10 @@ export async function POST(request: Request) {
     }
 
     if (action === "deleteDocument") {
-      const documentId = String(body.documentId || "");
+      const documentId = typeof body.documentId === "string" ? body.documentId.trim() : "";
+      if (!documentId || documentId.length > 180) {
+        return privateJson({ status: "FAILED", error: "A valid document ID is required." }, { status: 400 });
+      }
       const document = store.documents.find((item) => item.documentId === documentId);
       if (!document) return privateJson({ status: "FAILED", error: "Document not found." }, { status: 404 });
 
