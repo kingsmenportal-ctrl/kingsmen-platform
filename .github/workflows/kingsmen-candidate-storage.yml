@@ -3,6 +3,7 @@ name: Kingsmen candidate storage regression checks
 on:
   pull_request:
     paths:
+      - "apps/web/src/app/founder/**"
       - "apps/web/src/app/api/personal-jobs/**"
       - "apps/web/src/app/api/auth/**"
       - "apps/web/src/lib/candidate-portal-storage.ts"
@@ -18,6 +19,7 @@ on:
     branches:
       - "fix/kingsmen-ci-real-validation-gates"
     paths:
+      - "apps/web/src/app/founder/**"
       - "apps/web/src/app/api/personal-jobs/**"
       - "apps/web/src/app/api/auth/**"
       - "apps/web/src/lib/candidate-portal-storage.ts"
