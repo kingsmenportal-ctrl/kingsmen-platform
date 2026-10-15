@@ -80,9 +80,33 @@ function readStore(): Store {
 }
 
 function writeStore(store: Store) {
-  fs.mkdirSync(DATA_DIR, { recursive: true });
+  fs.mkdirSync(DATA_DIR, { recursive: true, mode: 0o700 });
+  try {
+    fs.chmodSync(DATA_DIR, 0o700);
+  } catch {
+    // Some development filesystems do not support POSIX permissions.
+  }
   store.updatedAt = new Date().toISOString();
-  fs.writeFileSync(STORE_PATH, `${JSON.stringify(store, null, 2)}\n`, "utf8");
+  fs.writeFileSync(STORE_PATH, `${JSON.stringify(store, null, 2)}\\n`, { encoding: "utf8", mode: 0o600 });
+  try {
+    fs.chmodSync(STORE_PATH, 0o600);
+  } catch {
+    // Some development filesystems do not support POSIX permissions.
+  }
+}
+
+function localCandidateStorageUnavailable() {
+  // File-backed candidate records are development-only until authenticated database
+  // and private object storage are wired. Never silently deploy this as production storage.
+  return process.env.NODE_ENV === "production" &&
+    process.env.KINGSMEN_ALLOW_LOCAL_CANDIDATE_STORAGE !== "true";
+}
+
+function storageUnavailableResponse() {
+  return privateJson({
+    status: "STORAGE_NOT_CONFIGURED",
+    error: "Candidate storage is not configured for production. Configure authenticated database and private document storage before enabling this workflow."
+  }, { status: 503 });
 }
 
 const MAX_UPLOAD_BYTES = 10 * 1024 * 1024;
@@ -473,13 +497,13 @@ export async function POST(request: Request) {
         return privateJson({ status: "FAILED", error: error instanceof Error ? error.message : "Invalid document content." }, { status: 415 });
       }
 
-      fs.mkdirSync(UPLOAD_DIR, { recursive: true });
+      fs.mkdirSync(UPLOAD_DIR, { recursive: true, mode: 0o700 });\n      try { fs.chmodSync(UPLOAD_DIR, 0o700); } catch { /* Unsupported filesystem permissions in some dev environments. */ }
 
       const safeName = fileName.replace(/[^a-zA-Z0-9._-]/g, "_");
       const storedName = `${Date.now()}-${safeName}`;
       const filePath = path.join(UPLOAD_DIR, storedName);
 
-      fs.writeFileSync(filePath, decoded.buffer);
+      fs.writeFileSync(filePath, decoded.buffer, { mode: 0o600 });\n      try { fs.chmodSync(filePath, 0o600); } catch { /* Unsupported filesystem permissions in some dev environments. */ }
 
       const text = await extractDocumentText(fileName, decoded.mimeType, decoded.buffer);
       const extracted = extractProfileFromText(text || "");
