@@ -53,3 +53,17 @@ jobs:
 
       - name: Enforce launch-readiness gate
         run: npm run kingsmen:launch:gate
+
+      - name: Preserve validation and launch-gate reports
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: kingsmen-source-guard-reports
+          if-no-files-found: warn
+          retention-days: 14
+          path: |
+            reports/validation/**
+            reports/launch/**
+            reports/staging/**
+            reports/security/**
+            reports/repo/**
