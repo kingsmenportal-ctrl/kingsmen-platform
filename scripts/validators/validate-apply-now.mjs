@@ -105,6 +105,55 @@ checks.push({
   detail: "Interface must not claim unsafe auto-submit."
 });
 
+const authFiles = {
+  helper: "apps/web/src/lib/supabase-auth.ts",
+  login: "apps/web/src/app/api/auth/login/route.ts",
+  register: "apps/web/src/app/api/auth/register/route.ts",
+  session: "apps/web/src/app/api/auth/session/route.ts",
+  page: "apps/web/src/app/sign-in/page.tsx",
+  identityMigration: "db/migrations/0023_candidate_auth_private_storage.sql",
+  readPolicyMigration: "db/migrations/0024_candidate_owned_application_document_reads.sql"
+};
+for (const [name, file] of Object.entries(authFiles)) {
+  checks.push({
+    name: `candidate_auth_file:${name}`,
+    passed: fs.existsSync(path.join(root, file)),
+    detail: `Candidate authentication artifact must exist: ${file}`
+  });
+}
+
+const authHelper = fs.readFileSync(path.join(root, authFiles.helper), "utf8");
+const loginRoute = fs.readFileSync(path.join(root, authFiles.login), "utf8");
+const registerRoute = fs.readFileSync(path.join(root, authFiles.register), "utf8");
+const identityMigration = fs.readFileSync(path.join(root, authFiles.identityMigration), "utf8");
+const documentPolicyMigration = fs.readFileSync(path.join(root, authFiles.readPolicyMigration), "utf8");
+
+checks.push({
+  name: "auth_session_uses_http_only_cookie_and_no_store",
+  passed: authHelper.includes("httpOnly") || (loginRoute.includes("httpOnly") && authHelper.includes("kingsmen-access-token")),
+  detail: "Candidate session token must be held in an HTTP-only cookie."
+});
+checks.push({
+  name: "auth_routes_require_supabase_public_configuration",
+  passed: loginRoute.includes("supabaseAuthConfig()") && registerRoute.includes("supabaseAuthConfig()") &&
+    loginRoute.includes("AUTH_NOT_CONFIGURED") && registerRoute.includes("AUTH_NOT_CONFIGURED"),
+  detail: "Sign-in and registration must fail closed when Supabase Auth is not configured."
+});
+checks.push({
+  name: "registration_does_not_auto_link_existing_candidate_by_email",
+  passed: registerRoute.includes("Do not auto-link a Supabase identity") &&
+    identityMigration.includes("no email-based auto-linking"),
+  detail: "Account registration must not claim an existing candidate record by email."
+});
+checks.push({
+  name: "private_storage_and_candidate_owned_policies_defined",
+  passed: identityMigration.includes("'candidate-documents'") &&
+    identityMigration.includes("candidate_documents_select_own") &&
+    identityMigration.includes("candidate_documents_insert_own") &&
+    documentPolicyMigration.includes("document_files_authenticated_own_account_read"),
+  detail: "Candidate documents must use a private bucket and account-scoped policies."
+});
+
 const failed = checks.filter((x) => !x.passed);
 
 const report = {
