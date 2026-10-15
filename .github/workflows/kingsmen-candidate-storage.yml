@@ -7,6 +7,7 @@ on:
       - "apps/web/test/founder-document-review.test.cjs"
       - "apps/web/src/app/api/founder/**"
       - "apps/web/src/app/api/personal-jobs/**"
+      - "apps/web/src/app/api/personal-jobs/apply-pack-builder/**"
       - "apps/web/src/app/api/auth/**"
       - "apps/web/src/lib/candidate-portal-storage.ts"
       - "apps/web/src/lib/supabase-auth.ts"
@@ -20,6 +21,7 @@ on:
       - "apps/web/src/app/candidate/finance/page.tsx"
       - "apps/web/test/candidate-storage-security.test.cjs"
       - "apps/web/test/candidate-document-lifecycle.test.cjs"
+      - "apps/web/test/application-pack-validation.test.cjs"
       - "apps/web/test/candidate-readiness.test.cjs"
       - "apps/web/test/founder-control-plane.test.cjs"
       - "apps/web/test/founder-command-intake.test.cjs"
@@ -79,4 +81,4 @@ jobs:
         with:
           node-version: 22
       - name: Run candidate and founder security regressions
-        run: node --test apps/web/test/candidate-storage-security.test.cjs apps/web/test/candidate-document-lifecycle.test.cjs apps/web/test/candidate-readiness.test.cjs apps/web/test/founder-control-plane.test.cjs apps/web/test/founder-command-intake.test.cjs apps/web/test/founder-document-review.test.cjs
+        run: node --test apps/web/test/candidate-storage-security.test.cjs apps/web/test/candidate-document-lifecycle.test.cjs apps/web/test/application-pack-validation.test.cjs apps/web/test/candidate-readiness.test.cjs apps/web/test/founder-control-plane.test.cjs apps/web/test/founder-command-intake.test.cjs apps/web/test/founder-document-review.test.cjs
