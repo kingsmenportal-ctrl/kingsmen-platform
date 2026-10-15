@@ -352,3 +352,23 @@ test("canonical upload registration is ownership-scoped, storage-backed and non-
   assert.match(migration, /revoke all on function public\.register_candidate_document_upload/);
   assert.doesNotMatch(migration, /verification_status\s*=\s*'VERIFIED'|document_status\s*=\s*'READY'/i);
 });
+
+
+test("post-registration workspace failures preserve objects referenced by canonical records", () => {
+  const start = route.indexOf('if (action === "uploadDocument")');
+  const end = route.indexOf('if (action === "addOpportunity")', start);
+  const block = route.slice(start, end);
+  assert.match(block, /let canonicalRegistered = false/);
+  assert.match(block, /canonicalRegistered = true/);
+  assert.match(block, /if \(context && storagePath && !canonicalRegistered\)/);
+  assert.match(block, /registryStatus: "REGISTERED"/);
+});
+
+test("candidate document page distinguishes registry registration from verification", () => {
+  const page = fs.readFileSync(path.resolve(__dirname, "../src/app/candidate/documents/page.tsx"), "utf8");
+  assert.match(page, /canonicalDocumentRef\?: string/);
+  assert.match(page, /registryStatus\?: "REGISTERED" \| "LOCAL_ONLY"/);
+  assert.match(page, /Canonical vault: registered/);
+  assert.match(page, /Verification pending/);
+  assert.match(page, /Canonical vault registration not confirmed/);
+});
