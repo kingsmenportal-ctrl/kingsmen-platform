@@ -15,6 +15,18 @@ type Profile = {
   notes?: string;
 };
 
+type FollowUpTask = {
+  taskId: string;
+  title: string;
+  dueDate: string;
+  priority: "LOW" | "NORMAL" | "HIGH";
+  status: "OPEN" | "DONE";
+  opportunityId?: string;
+  notes?: string;
+  createdAt: string;
+  updatedAt: string;
+};
+
 type Store = {
   profile: Profile;
   documents: any[];
@@ -22,6 +34,7 @@ type Store = {
   applicationPacks: any[];
   proofLog: any[];
   smartExtraction: any[];
+  tasks: FollowUpTask[];
   readiness?: number;
 };
 
@@ -32,6 +45,7 @@ const emptyStore: Store = {
   applicationPacks: [],
   proofLog: [],
   smartExtraction: [],
+  tasks: [],
   readiness: 0
 };
 
@@ -42,6 +56,7 @@ export default function ApplyNowClient() {
   const [message, setMessage] = useState("Ready.");
   const [selectedOpportunity, setSelectedOpportunity] = useState("");
   const [proof, setProof] = useState("");
+  const [taskDraft, setTaskDraft] = useState({ title: "", dueDate: "", priority: "NORMAL", opportunityId: "", notes: "" });
   const [opportunity, setOpportunity] = useState({
     title: "",
     organisation: "",
@@ -204,6 +219,46 @@ export default function ApplyNowClient() {
       setMessage("Proof captured.");
     } catch (error) {
       setMessage(error instanceof Error ? error.message : "Could not capture proof.");
+    } finally {
+      setBusy("");
+    }
+  }
+
+  async function addTask() {
+    setBusy("task-create");
+    try {
+      const json = await api({ action: "addTask", ...taskDraft });
+      setStore(json.store);
+      setTaskDraft({ title: "", dueDate: "", priority: "NORMAL", opportunityId: "", notes: "" });
+      setMessage("Follow-up task saved to your workspace.");
+    } catch (error) {
+      setMessage(error instanceof Error ? error.message : "Could not save task.");
+    } finally {
+      setBusy("");
+    }
+  }
+
+  async function updateTask(taskId: string, status: "OPEN" | "DONE") {
+    setBusy(`task-${taskId}`);
+    try {
+      const json = await api({ action: "updateTask", taskId, status });
+      setStore(json.store);
+      setMessage(status === "DONE" ? "Task marked complete." : "Task reopened.");
+    } catch (error) {
+      setMessage(error instanceof Error ? error.message : "Could not update task.");
+    } finally {
+      setBusy("");
+    }
+  }
+
+  async function deleteTask(taskId: string) {
+    setBusy(`task-${taskId}`);
+    try {
+      const json = await api({ action: "deleteTask", taskId });
+      setStore(json.store);
+      setMessage("Task removed.");
+    } catch (error) {
+      setMessage(error instanceof Error ? error.message : "Could not remove task.");
     } finally {
       setBusy("");
     }
@@ -433,7 +488,54 @@ export default function ApplyNowClient() {
       <section style={panel}>
         <div style={sectionHead}>
           <div>
-            <p style={eyebrow}>05 / APPLICATION PACK</p>
+            <p style={eyebrow}>05 / FOLLOW-UPS & DEADLINES</p>
+            <h2 style={sectionTitle}>My tasks</h2>
+            <p style={{ color: "#aab5c7", fontSize: 13, lineHeight: 1.6, margin: "6px 0 0" }}>Keep application deadlines, document requests, interview preparation and employer follow-ups in one private list.</p>
+          </div>
+          <span style={pill}>{(store.tasks || []).filter((task) => task.status === "OPEN").length} open</span>
+        </div>
+
+        <div style={{ ...formGrid, marginBottom: 12 }}>
+          <Field label="Task" value={taskDraft.title} onChange={(value) => setTaskDraft((current) => ({ ...current, title: value }))} />
+          <Field label="Due date" value={taskDraft.dueDate} onChange={(value) => setTaskDraft((current) => ({ ...current, dueDate: value }))} />
+          <Select label="Priority" value={taskDraft.priority} onChange={(value) => setTaskDraft((current) => ({ ...current, priority: value }))} options={["LOW", "NORMAL", "HIGH"]} />
+          <Select label="Related opportunity (optional)" value={taskDraft.opportunityId} onChange={(value) => setTaskDraft((current) => ({ ...current, opportunityId: value }))} options={["", ...store.opportunities.map((item) => item.opportunityId)]} labels={["Not linked", ...store.opportunities.map((item) => `${item.title} — ${item.organisation}`)]} />
+        </div>
+        <Field label="Notes (optional)" value={taskDraft.notes} onChange={(value) => setTaskDraft((current) => ({ ...current, notes: value }))} multiline />
+        <button onClick={addTask} style={primaryButton} disabled={busy === "task-create" || taskDraft.title.trim().length < 2}>
+          {busy === "task-create" ? "Saving task…" : "Add follow-up task"}
+        </button>
+
+        <div style={{ display: "grid", gap: 10, marginTop: 20 }}>
+          {(store.tasks || []).length ? [...store.tasks].sort((a, b) => (a.status === b.status ? (a.dueDate || "9999").localeCompare(b.dueDate || "9999") : a.status === "OPEN" ? -1 : 1)).map((task) => {
+            const linked = store.opportunities.find((item) => item.opportunityId === task.opportunityId);
+            const overdue = task.status === "OPEN" && task.dueDate && task.dueDate < new Date().toISOString().slice(0, 10);
+            return <article key={task.taskId} style={{ border: "1px solid #2b374c", borderRadius: 12, padding: 14, background: task.status === "DONE" ? "rgba(28,48,43,.28)" : "rgba(8,14,26,.45)", opacity: task.status === "DONE" ? .75 : 1 }}>
+              <div style={{ display: "flex", alignItems: "flex-start", justifyContent: "space-between", gap: 14, flexWrap: "wrap" }}>
+                <div style={{ minWidth: 0, flex: "1 1 260px" }}>
+                  <div style={{ display: "flex", gap: 8, alignItems: "center", flexWrap: "wrap" }}>
+                    <strong style={{ textDecoration: task.status === "DONE" ? "line-through" : "none" }}>{task.title}</strong>
+                    <span style={statusBadge}>{task.status}</span>
+                    <span style={{ ...routeBadge, color: task.priority === "HIGH" ? "#ffc1b8" : undefined }}>{task.priority}</span>
+                    {overdue ? <span style={{ ...statusBadge, color: "#ffc1b8", borderColor: "#87534d" }}>OVERDUE</span> : null}
+                  </div>
+                  <p style={{ ...oppMeta, margin: "7px 0 0" }}>Due: {task.dueDate || "No due date"}{linked ? ` · ${linked.title} — ${linked.organisation}` : ""}</p>
+                  {task.notes ? <p style={{ color: "#9eabc0", fontSize: 12, lineHeight: 1.6, whiteSpace: "pre-wrap", margin: "8px 0 0" }}>{task.notes}</p> : null}
+                </div>
+                <div style={{ display: "flex", gap: 8, flexWrap: "wrap" }}>
+                  <button onClick={() => updateTask(task.taskId, task.status === "DONE" ? "OPEN" : "DONE")} style={task.status === "DONE" ? ghostButton : primaryButton} disabled={busy === `task-${task.taskId}`}>{task.status === "DONE" ? "Reopen" : "Complete"}</button>
+                  <button onClick={() => deleteTask(task.taskId)} style={dangerButton} disabled={busy === `task-${task.taskId}`}>Remove</button>
+                </div>
+              </div>
+            </article>;
+          }) : <div style={emptyState}>No follow-up tasks yet. Add a deadline or next action above to start your task list.</div>}
+        </div>
+      </section>
+
+      <section style={panel}>
+        <div style={sectionHead}>
+          <div>
+            <p style={eyebrow}>06 / APPLICATION PACK</p>
             <h2 style={sectionTitle}>Latest prepared pack</h2>
           </div>
           <button onClick={copyPack} style={primaryButton} disabled={!latestPack}>Copy pack</button>
@@ -485,19 +587,21 @@ function Select({
   label,
   value,
   onChange,
-  options
+  options,
+  labels
 }: {
   label: string;
   value: string;
   onChange: (value: string) => void;
   options: string[];
+  labels?: string[];
 }) {
   return (
     <label style={field}>
       <span>{label}</span>
       <select style={input} value={value} onChange={(event) => onChange(event.target.value)}>
-        {options.map((option) => (
-          <option key={option} value={option}>{option}</option>
+        {options.map((option, index) => (
+          <option key={option || "none"} value={option}>{labels?.[index] ?? (option || "Not linked")}</option>
         ))}
       </select>
     </label>
