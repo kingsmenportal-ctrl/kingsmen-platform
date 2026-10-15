@@ -8,7 +8,8 @@ REVOKE ALL PRIVILEGES ON TABLE
   public.applications
 FROM anon, PUBLIC;
 
--- Preserve authenticated candidate workflows and trusted backend access explicitly.
+-- Candidate sessions only need reads on the identity map and candidate/application
+-- records, plus profile updates allowed by the existing own-candidate RLS policy.
 GRANT SELECT ON TABLE
   public.candidate_accounts,
   public.candidates,
@@ -16,14 +17,8 @@ GRANT SELECT ON TABLE
   public.applications
 TO authenticated;
 
-GRANT SELECT, INSERT, UPDATE, DELETE ON TABLE
-  public.candidate_profiles,
-  public.applications
-TO authenticated;
+GRANT UPDATE ON TABLE public.candidate_profiles TO authenticated;
 
--- The candidate identity mapping is operator/backend-managed only.
-REVOKE ALL PRIVILEGES ON TABLE public.candidate_accounts FROM authenticated;
-GRANT SELECT ON TABLE public.candidate_accounts TO authenticated;
-
--- Candidate records are read-only to candidate sessions; mutation remains trusted-backend-only.
-REVOKE INSERT, UPDATE, DELETE ON TABLE public.candidates FROM authenticated;
+-- The candidate identity mapping and candidate/application records remain
+-- backend-managed for writes; no authenticated insert/delete or application
+-- mutation privilege is introduced by this migration.
