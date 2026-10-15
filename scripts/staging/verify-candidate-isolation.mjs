@@ -5,14 +5,16 @@ import { randomUUID } from "node:crypto";
 const baseUrl = process.env.CANDIDATE_STAGING_BASE_URL;
 const tokenA = process.env.CANDIDATE_STAGING_USER_A_TOKEN;
 const tokenB = process.env.CANDIDATE_STAGING_USER_B_TOKEN;
+const supabaseUrl = process.env.CANDIDATE_STAGING_SUPABASE_URL;
 const expectedProject = process.env.CANDIDATE_STAGING_PROJECT_REF || "euhubhhnumtibbyufghm";
 const projectRefFromUrl = (value) => { try { return new URL(value).hostname.split(".")[0]; } catch { return ""; } };
 
-if (!baseUrl || !tokenA || !tokenB) { console.error("Missing required staging environment variables."); process.exit(2); }
+if (!baseUrl || !supabaseUrl || !tokenA || !tokenB) { console.error("Missing required staging environment variables."); process.exit(2); }
 if (tokenA === tokenB) { console.error("User A and User B must use distinct access tokens."); process.exit(2); }
 const base = new URL(baseUrl);
 if (base.protocol !== "https:" && base.hostname !== "localhost" && base.hostname !== "127.0.0.1") { console.error("Refusing non-HTTPS staging URL except localhost."); process.exit(2); }
-if (projectRefFromUrl(base.href) !== expectedProject) { console.error("Staging project ref mismatch; refusing unexpected project."); process.exit(2); }
+const supabase = new URL(supabaseUrl);
+if (supabase.protocol !== "https:" || projectRefFromUrl(supabase.href) !== expectedProject || expectedProject !== "euhubhhnumtibbyufghm") { console.error("Supabase staging project ref mismatch; refusing unexpected project."); process.exit(2); }
 if (process.env.PAYMENTS_LIVE === "true") { console.error("Refusing to run while PAYMENTS_LIVE=true."); process.exit(2); }
 
 const runId = "candidate-isolation-" + new Date().toISOString().replace(/[:.]/g, "-") + "-" + randomUUID().slice(0, 8);
