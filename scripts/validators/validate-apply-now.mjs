@@ -211,6 +211,25 @@ checks.push({
 });
 
 checks.push({
+  name: "private_document_download_requires_owner_authentication",
+  passed: readTextIfExists("apps/web/src/app/api/personal-jobs/apply-now/documents/[documentId]/route.ts").includes("getPortalContext()") &&
+    readTextIfExists("apps/web/src/app/api/personal-jobs/apply-now/documents/[documentId]/route.ts").includes("loadCandidatePortalState") &&
+    readTextIfExists("apps/web/src/app/api/personal-jobs/apply-now/documents/[documentId]/route.ts").includes("storage/v1/object/authenticated") &&
+    readTextIfExists("apps/web/src/app/api/personal-jobs/apply-now/documents/[documentId]/route.ts").includes("private, no-store") &&
+    client.includes("/api/personal-jobs/apply-now/documents/"),
+  detail: "Document downloads must resolve only metadata belonging to the authenticated candidate and use private, non-cacheable responses."
+});
+
+checks.push({
+  name: "candidate_document_bucket_is_forced_private",
+  passed: readTextIfExists("db/migrations/0028_harden_candidate_document_storage.sql").includes("SET public = false") &&
+    readTextIfExists("db/migrations/0028_harden_candidate_document_storage.sql").includes("candidate_documents_select_own") &&
+    readTextIfExists("db/migrations/0028_harden_candidate_document_storage.sql").includes("candidate_documents_insert_own") &&
+    readTextIfExists("db/migrations/0028_harden_candidate_document_storage.sql").includes("candidate-documents"),
+  detail: "Storage bucket configuration must explicitly enforce private access and user-folder policies."
+});
+
+checks.push({
   name: "durable_candidate_state_is_user_scoped_by_rls",
   passed: durableStateMigration.includes("CREATE TABLE IF NOT EXISTS public.candidate_portal_state") &&
     durableStateMigration.includes("ENABLE ROW LEVEL SECURITY") &&
