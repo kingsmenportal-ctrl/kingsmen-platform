@@ -52,18 +52,18 @@ test("database persists immutable decisions and audit events but never changes s
 });
 
 test("canonical validation resolves real document, proof and evidence records without changing source status", () => {
-  assert.match(validationMigration, /public\\.document_files d/);
-  assert.match(validationMigration, /d\\.document_ref = p_document_ref/);
+  assert.match(validationMigration, /public\.document_files d/);
+  assert.match(validationMigration, /d\.document_ref = p_document_ref/);
   assert.match(validationMigration, /v_candidate_id <> p_candidate_ref::uuid/);
-  assert.match(validationMigration, /public\\.document_verifications v/);
+  assert.match(validationMigration, /public\.document_verifications v/);
   assert.match(validationMigration, /PROOF_REFERENCE_NOT_FOUND/);
   assert.match(validationMigration, /VERIFICATION_PROOF_NOT_PASSED/);
   assert.match(validationMigration, /EVIDENCE_REFERENCE_NOT_FOUND/);
-  assert.match(validationMigration, /public\\.document_storage_events e/);
+  assert.match(validationMigration, /public\.document_storage_events e/);
   assert.match(validationMigration, /ownershipVerified',true/);
   assert.match(validationMigration, /evidenceResolved',true/);
   assert.match(validationMigration, /sourceStatusChanged',false/);
-  assert.doesNotMatch(validationMigration, /update public\\.document_files|update public\\.document_verifications/i);
+  assert.doesNotMatch(validationMigration, /update public\.document_files|update public\.document_verifications/i);
   assert.match(route, /ownershipVerified !== true/);
   assert.match(route, /evidenceResolved !== true/);
   assert.match(route, /canonical registry/);
