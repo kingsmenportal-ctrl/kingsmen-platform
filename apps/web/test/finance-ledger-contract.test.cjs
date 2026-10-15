@@ -3,61 +3,41 @@ const assert = require("node:assert/strict");
 const fs = require("node:fs");
 const path = require("node:path");
 
-const routePath = path.resolve(__dirname, "../src/app/api/personal-jobs/apply-now/route.ts");
-const route = fs.readFileSync(routePath, "utf8");
-const addBlock = route.split('if (action === "addFinanceEntry") {')[1]?.split('if (action === "updateFinanceEntry") {')[0] || "";
-const updateBlock = route.split('if (action === "updateFinanceEntry") {')[1]?.split('if (action === "deleteFinanceEntry") {')[0] || "";
-const deleteBlock = route.split('if (action === "deleteFinanceEntry") {')[1]?.split('if (action === "addContactLog") {')[0] || "";
+const route = fs.readFileSync(path.resolve(__dirname, "../src/app/api/personal-jobs/apply-now/route.ts"), "utf8");
+const helper = fs.readFileSync(path.resolve(__dirname, "../src/lib/candidate-finance-ledger.ts"), "utf8");
 
-test("finance ledger validates allowed entry type and direction", () => {
-  assert.match(addBlock, /\["FEE", "PAYMENT", "REFUND", "ADJUSTMENT"\]/);
-  assert.match(addBlock, /\["IN", "OUT"\]/);
+test("API route delegates finance validation to shared tested helpers", () => {
+  assert.match(route, /validateFinanceEntryInput\(/);
+  assert.match(route, /validateFinanceStatusUpdate\(/);
+  assert.match(route, /@\/lib\/candidate-finance-ledger/);
 });
 
-test("finance ledger rejects non-integer, non-positive and over-limit amounts", () => {
-  assert.match(addBlock, /Number\.isSafeInteger\(amountCents\)/);
-  assert.match(addBlock, /amountCents <= 0/);
-  assert.match(addBlock, /amountCents > 1000000000/);
+test("shared finance helper contains strict allowlists and amount ceiling", () => {
+  assert.match(helper, /FINANCE_ENTRY_TYPES = \["FEE", "PAYMENT", "REFUND", "ADJUSTMENT"\]/);
+  assert.match(helper, /FINANCE_DIRECTIONS = \["IN", "OUT"\]/);
+  assert.match(helper, /FINANCE_STATUSES = \["RECORDED", "PENDING", "CONFIRMED", "FAILED", "CANCELLED"\]/);
+  assert.match(helper, /FINANCE_MAX_AMOUNT_CENTS = 1_000_000_000/);
 });
 
-test("finance ledger validates real calendar dates rather than date-shaped strings only", () => {
-  assert.match(addBlock, /\^\\d\{4\}-\\d\{2\}-\\d\{2\}\$/);
-  assert.match(addBlock, /Date\.parse\(occurredOn \+ "T00:00:00Z"\)/);
-  assert.match(addBlock, /toISOString\(\)\.slice\(0, 10\) === occurredOn/);
+test("finance mutations persist through the authenticated workspace boundary", () => {
+  const add = route.split('if (action === "addFinanceEntry") {')[1]?.split('if (action === "updateFinanceEntry") {')[0] || "";
+  const update = route.split('if (action === "updateFinanceEntry") {')[1]?.split('if (action === "deleteFinanceEntry") {')[0] || "";
+  const remove = route.split('if (action === "deleteFinanceEntry") {')[1]?.split('if (action === "addContactLog") {')[0] || "";
+  assert.match(add, /await persistStore\(context, store\)/);
+  assert.match(update, /await persistStore\(context, store\)/);
+  assert.match(remove, /await persistStore\(context, store\)/);
 });
 
-test("confirmed entries require reference or evidence note on creation and update", () => {
-  assert.match(addBlock, /status === "CONFIRMED" && !reference && !evidenceNote/);
-  assert.match(updateBlock, /status === "CONFIRMED" && !reference && !evidenceNote && !existing\.reference && !existing\.evidenceNote/);
-});
-
-test("finance updates restrict status values and bound evidence fields", () => {
-  assert.match(updateBlock, /\["RECORDED", "PENDING", "CONFIRMED", "FAILED", "CANCELLED"\]/);
-  assert.match(updateBlock, /reference\.length > 120/);
-  assert.match(updateBlock, /evidenceNote\.length > 1000/);
-  assert.match(updateBlock, /entry\.entryId === entryId/);
-});
-
-test("linked opportunities must exist in the same loaded workspace", () => {
-  assert.match(addBlock, /store\.opportunities\.some\(\(item\) => item\.opportunityId === opportunityId\)/);
-  assert.match(updateBlock, /find\(\(entry\) => entry\.entryId === entryId\)/);
-});
-
-test("ledger changes persist through the authenticated workspace persistence boundary", () => {
-  assert.match(addBlock, /await persistStore\(context, store\)/);
-  assert.match(updateBlock, /await persistStore\(context, store\)/);
-  assert.match(deleteBlock, /await persistStore\(context, store\)/);
-});
-
-test("ledger caps stored entries and supports explicit deletion", () => {
-  assert.match(addBlock, /\.slice\(0, 1000\)/);
-  assert.match(deleteBlock, /filter\(\(entry\) => entry\.entryId !== entryId\)/);
-  assert.match(deleteBlock, /FINANCE_ENTRY_DELETED/);
+test("ledger caps entries, checks linked opportunities and supports deletion", () => {
+  const add = route.split('if (action === "addFinanceEntry") {')[1]?.split('if (action === "updateFinanceEntry") {')[0] || "";
+  const remove = route.split('if (action === "deleteFinanceEntry") {')[1]?.split('if (action === "addContactLog") {')[0] || "";
+  assert.match(add, /store\.opportunities\.some\(\(item\) => item\.opportunityId === opportunityId\)/);
+  assert.match(add, /\.slice\(0, 1000\)/);
+  assert.match(remove, /FINANCE_ENTRY_DELETED/);
 });
 
 test("candidate finance ledger is tracking only and does not process payments", () => {
-  const uiPath = path.resolve(__dirname, "../src/app/personal-job-desk/apply-now/ApplyNowClient.tsx");
-  const ui = fs.readFileSync(uiPath, "utf8");
+  const ui = fs.readFileSync(path.resolve(__dirname, "../src/app/personal-job-desk/apply-now/ApplyNowClient.tsx"), "utf8");
   assert.match(ui, /does not charge money/i);
   assert.match(ui, /independently verify transactions/i);
 });
