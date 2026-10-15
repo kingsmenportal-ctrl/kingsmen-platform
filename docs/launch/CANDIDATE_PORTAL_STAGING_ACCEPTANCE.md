@@ -52,3 +52,21 @@ A report is acceptable only when the checks were actually run, the output was re
 ## Separate launch gates
 
 This acceptance does not cover backup/restore rehearsal, PayFast sandbox callback verification, branch protection, communications provider delivery, secrets wiring, observability incident drills, legal/privacy publication review, or final evidence-bundle assembly. Those remain separate gates.
+
+## Automated two-user state persistence and isolation runner
+
+The repository includes `scripts/staging/verify-candidate-isolation.mjs`. It exercises the deployed candidate API using two distinct, already-verified staging Auth access tokens. It checks distinct identities, profile-note persistence after a fresh GET, bidirectional marker isolation, resistance to a caller-supplied `auth_user_id`, and unauthenticated denial. It temporarily replaces only each test user's profile notes and attempts to restore their original values in a `finally` block. Run only with dedicated synthetic test accounts.
+
+Run from the repository root with Node.js 22 or newer:
+
+```sh
+CANDIDATE_STAGING_BASE_URL='https://<staging-app-host>' \
+CANDIDATE_STAGING_SUPABASE_URL='https://euhubhhnumtibbyufghm.supabase.co' \
+CANDIDATE_STAGING_PROJECT_REF='euhubhhnumtibbyufghm' \
+CANDIDATE_STAGING_USER_A_TOKEN='<short-lived verified staging user A token>' \
+CANDIDATE_STAGING_USER_B_TOKEN='<short-lived verified staging user B token>' \
+PAYMENTS_LIVE=false \
+npm run staging:test:candidate-isolation
+```
+
+Supply tokens through a protected local environment or secret manager; never commit them, paste them into tickets, or save them in evidence. The runner rejects a project ref other than the approved staging ref, requires HTTPS except for localhost app URLs, requires distinct tokens, and refuses to run if `PAYMENTS_LIVE=true`. Its report deliberately sets `reviewed: false`, `productionReady: false`, and `publicLaunchAllowed: false`; a successful run is evidence for these specific checks only, not launch approval. Review the report and confirm that both original notes were restored before accepting the evidence. A failed restoration requires manual recovery of the dedicated test account.
