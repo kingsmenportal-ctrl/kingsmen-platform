@@ -285,3 +285,15 @@ test("message ledger records communications without claiming external delivery",
   assert.match(page, /credentials: "same-origin"/);
   assert.match(page, /cache: "no-store"/);
 });
+
+test("founder command centre consolidates operational modules and exposes readiness without claiming live execution", () => {
+  const page = fs.readFileSync(path.resolve(__dirname, "../src/app/founder/page.tsx"), "utf8");
+  for (const href of ["/founder/master-index", "/founder/control-plane/commands", "/founder/control-plane/digest", "/founder/providers/airtable", "/founder/launch-control/jarvis-live-proof-acceptance-gate"]) {
+    assert.ok(page.includes(href), `Founder command centre missing module link: ${href}`);
+  }
+  assert.match(page, /fetch\("\/api\/founder\/backend-readiness"/);
+  assert.match(page, /cache: "no-store"/);
+  assert.match(page, /no authorization boundary/i);
+  assert.match(page, /no live action is claimed/i);
+  assert.match(page, /productionReady/);
+});
