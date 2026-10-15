@@ -15,6 +15,7 @@ type HealthShell = {
 };
 
 const surfaces = [
+  { title: "Document review", detail: "Prepare an authenticated review proposal with proof, evidence and audit references. No status mutation is enabled.", href: "/founder/documents/review", state: "PROPOSAL ONLY" },
   { title: "Command review", detail: "Review command policy and required evidence before any action.", href: "/founder/control-plane/commands/", state: "CONTROLLED WORKFLOW" },
   { title: "Build Proof Centre", detail: "Inspect proof references and validation boundaries.", href: "/founder/proof-centre/", state: "EVIDENCE INDEX" },
   { title: "Master Index", detail: "Review component inventory and documented status.", href: "/founder/master-index/", state: "COMPONENT INDEX" },
