@@ -39,7 +39,10 @@ type ContactLogEntry = {
   createdAt: string;
 };
 
-type FinanceLedgerEntry = { entryId: string; type: "FEE" | "PAYMENT" | "REFUND" | "ADJUSTMENT"; direction: "IN" | "OUT"; status: "RECORDED" | "PENDING" | "CONFIRMED" | "FAILED" | "CANCELLED"; amountCents: number; currency: "ZAR"; description: string; reference?: string; evidenceNote?: string; opportunityId?: string; occurredOn: string; createdAt: string; };\n\ntype Store = {
+type FinanceLedgerEntry = { entryId: string; type: "FEE" | "PAYMENT" | "REFUND" | "ADJUSTMENT"; direction: "IN" | "OUT"; status: "RECORDED" | "PENDING" | "CONFIRMED" | "FAILED" | "CANCELLED"; amountCents: number; currency: "ZAR"; description: string; reference?: string; evidenceNote?: string; opportunityId?: string; occurredOn: string; createdAt: string;
+};
+
+type Store = {
   profile: Profile;
   documents: any[];
   opportunities: any[];
@@ -48,6 +51,7 @@ type FinanceLedgerEntry = { entryId: string; type: "FEE" | "PAYMENT" | "REFUND" 
   smartExtraction: any[];
   tasks: FollowUpTask[];
   contactLog: ContactLogEntry[];
+  financeLedger: FinanceLedgerEntry[];
   readiness?: number;
 };
 
@@ -60,6 +64,7 @@ const emptyStore: Store = {
   smartExtraction: [],
   tasks: [],
   contactLog: [],
+  financeLedger: [],
   readiness: 0
 };
 
@@ -71,7 +76,8 @@ export default function ApplyNowClient() {
   const [selectedOpportunity, setSelectedOpportunity] = useState("");
   const [proof, setProof] = useState("");
   const [taskDraft, setTaskDraft] = useState({ title: "", dueDate: "", priority: "NORMAL", opportunityId: "", notes: "" });
-  const [financeDraft, setFinanceDraft] = useState({ type: "FEE", direction: "OUT", status: "RECORDED", amount: "", description: "", reference: "", evidenceNote: "", opportunityId: "", occurredOn: new Date().toISOString().slice(0, 10) });\n  const [contactDraft, setContactDraft] = useState({ contactName: "", organisation: "", channel: "EMAIL", direction: "OUTBOUND", opportunityId: "", summary: "", followUpDate: "" });
+  const [financeDraft, setFinanceDraft] = useState({ type: "FEE", direction: "OUT", status: "RECORDED", amount: "", description: "", reference: "", evidenceNote: "", opportunityId: "", occurredOn: new Date().toISOString().slice(0, 10) });
+  const [contactDraft, setContactDraft] = useState({ contactName: "", organisation: "", channel: "EMAIL", direction: "OUTBOUND", opportunityId: "", summary: "", followUpDate: "" });
   const [opportunity, setOpportunity] = useState({
     title: "",
     organisation: "",
