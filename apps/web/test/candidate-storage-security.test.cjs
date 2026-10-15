@@ -143,3 +143,15 @@ test("document upload performs best-effort storage cleanup if extraction or pers
   assert.match(upload, /fs\.unlinkSync\(filePath\)/);
   assert.match(upload, /throw error;/);
 });
+
+
+test("local candidate store preserves corrupt data and bounds disk reads and writes", () => {
+  assert.match(route, /const MAX_LOCAL_STORE_BYTES = 2 \* 1024 \* 1024/);
+  assert.match(route, /if \(stat\.size > MAX_LOCAL_STORE_BYTES\)/);
+  assert.match(route, /Candidate local store is invalid; existing data was preserved/);
+  assert.match(route, /if \(\(error as NodeJS\.ErrnoException\)\.code === "ENOENT"\) return defaultStore\(\)/);
+  assert.match(route, /Buffer\.byteLength\(serialized, "utf8"\) > MAX_LOCAL_STORE_BYTES/);
+  assert.match(route, /fs\.writeFileSync\(temporaryPath, serialized, \{ encoding: "utf8", mode: 0o600, flag: "wx" \}\)/);
+  assert.match(route, /fs\.renameSync\(temporaryPath, STORE_PATH\)/);
+  assert.doesNotMatch(route, /function readStore\(\): Store \{[\s\S]*?catch \{\s*return defaultStore\(\);/);
+});
