@@ -389,6 +389,8 @@ test("canonical document deletion retires review eligibility before storage clea
   const end = route.indexOf('if (action === "deleteOpportunity")', start);
   const block = route.slice(start, end);
   assert.match(block, /retire_candidate_document_upload/);
+  assert.match(block, /retirementData\.storagePath !== document\.storagePath/);
+  assert.match(block, /CANONICAL_REFERENCE_MISMATCH/);
   assert.match(block, /record_candidate_document_deletion_result/);
   assert.ok(block.indexOf("retire_candidate_document_upload") < block.indexOf('method: "DELETE"'));
   assert.ok(block.indexOf('method: "DELETE"') < block.indexOf("recordCanonicalCleanup(true)"));
