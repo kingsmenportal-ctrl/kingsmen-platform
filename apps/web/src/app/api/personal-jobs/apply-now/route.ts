@@ -25,6 +25,18 @@ type CandidateProfile = {
   notes?: string;
 };
 
+type FollowUpTask = {
+  taskId: string;
+  title: string;
+  dueDate: string;
+  priority: "LOW" | "NORMAL" | "HIGH";
+  status: "OPEN" | "DONE";
+  opportunityId?: string;
+  notes?: string;
+  createdAt: string;
+  updatedAt: string;
+};
+
 type Store = {
   schema: string;
   updatedAt: string;
@@ -34,6 +46,7 @@ type Store = {
   applicationPacks: any[];
   proofLog: any[];
   smartExtraction: any[];
+  tasks: FollowUpTask[];
 };
 
 function repoRoot() {
@@ -58,7 +71,8 @@ function defaultStore(): Store {
     opportunities: [],
     applicationPacks: [],
     proofLog: [],
-    smartExtraction: []
+    smartExtraction: [],
+    tasks: []
   };
 }
 
@@ -73,7 +87,8 @@ function readStore(): Store {
       opportunities: Array.isArray(parsed.opportunities) ? parsed.opportunities : [],
       applicationPacks: Array.isArray(parsed.applicationPacks) ? parsed.applicationPacks : [],
       proofLog: Array.isArray(parsed.proofLog) ? parsed.proofLog : [],
-      smartExtraction: Array.isArray(parsed.smartExtraction) ? parsed.smartExtraction : []
+      smartExtraction: Array.isArray(parsed.smartExtraction) ? parsed.smartExtraction : [],
+      tasks: Array.isArray(parsed.tasks) ? parsed.tasks : []
     };
   } catch {
     return defaultStore();
@@ -113,7 +128,7 @@ async function loadStoreForContext(context: PortalContext | null): Promise<Store
   if (!context) return readStore();
   const saved = await loadCandidatePortalState(context);
   if (!saved || typeof saved !== "object") return defaultStore();
-  return { ...defaultStore(), ...saved, profile: saved.profile && typeof saved.profile === "object" ? saved.profile as CandidateProfile : {}, documents: Array.isArray(saved.documents) ? saved.documents : [], opportunities: Array.isArray(saved.opportunities) ? saved.opportunities : [], applicationPacks: Array.isArray(saved.applicationPacks) ? saved.applicationPacks : [], proofLog: Array.isArray(saved.proofLog) ? saved.proofLog : [], smartExtraction: Array.isArray(saved.smartExtraction) ? saved.smartExtraction : [] };
+  return { ...defaultStore(), ...saved, profile: saved.profile && typeof saved.profile === "object" ? saved.profile as CandidateProfile : {}, documents: Array.isArray(saved.documents) ? saved.documents : [], opportunities: Array.isArray(saved.opportunities) ? saved.opportunities : [], applicationPacks: Array.isArray(saved.applicationPacks) ? saved.applicationPacks : [], proofLog: Array.isArray(saved.proofLog) ? saved.proofLog : [], smartExtraction: Array.isArray(saved.smartExtraction) ? saved.smartExtraction : [], tasks: Array.isArray(saved.tasks) ? saved.tasks as FollowUpTask[] : [] };
 }
 async function persistStore(context: PortalContext | null, store: Store) {
   if (context) { store.updatedAt = new Date().toISOString(); await saveCandidatePortalState(context, store as unknown as Record<string, unknown>); return; }
@@ -749,6 +764,59 @@ export async function POST(request: Request) {
         store,
         readiness: scoreReadiness(store)
       });
+    }
+
+    if (action === "addTask") {
+      const title = typeof body.title === "string" ? body.title.trim() : "";
+      const dueDate = typeof body.dueDate === "string" ? body.dueDate.trim() : "";
+      const notes = typeof body.notes === "string" ? body.notes.trim() : "";
+      const priority = String(body.priority || "NORMAL").toUpperCase();
+      const opportunityId = typeof body.opportunityId === "string" ? body.opportunityId : "";
+
+      if (title.length < 2 || title.length > 160) {
+        return privateJson({ status: "FAILED", error: "Task title must be between 2 and 160 characters." }, { status: 400 });
+      }
+      if (dueDate && (!/^\d{4}-\d{2}-\d{2}$/.test(dueDate) || Number.isNaN(Date.parse(`${dueDate}T00:00:00Z`)) || new Date(`${dueDate}T00:00:00Z`).toISOString().slice(0, 10) !== dueDate)) {
+        return privateJson({ status: "FAILED", error: "Enter a valid task due date." }, { status: 400 });
+      }
+      if (!["LOW", "NORMAL", "HIGH"].includes(priority)) {
+        return privateJson({ status: "FAILED", error: "Task priority must be LOW, NORMAL or HIGH." }, { status: 400 });
+      }
+      if (notes.length > 1200) return privateJson({ status: "FAILED", error: "Task notes must be 1,200 characters or fewer." }, { status: 400 });
+      if (opportunityId && !store.opportunities.some((item) => item.opportunityId === opportunityId)) {
+        return privateJson({ status: "FAILED", error: "Linked opportunity was not found in this workspace." }, { status: 404 });
+      }
+
+      const now = new Date().toISOString();
+      const task: FollowUpTask = {
+        taskId: `task-${Date.now()}-${Math.random().toString(16).slice(2)}`,
+        title, dueDate, priority: priority as FollowUpTask["priority"], status: "OPEN",
+        ...(opportunityId ? { opportunityId } : {}), ...(notes ? { notes } : {}),
+        createdAt: now, updatedAt: now
+      };
+      store.tasks = [task, ...store.tasks];
+      await persistStore(context, store);
+      return privateJson({ status: "TASK_CREATED", task, store, readiness: scoreReadiness(store) });
+    }
+
+    if (action === "updateTask") {
+      const taskId = String(body.taskId || "");
+      const status = String(body.status || "").toUpperCase();
+      const existing = store.tasks.find((item) => item.taskId === taskId);
+      if (!existing) return privateJson({ status: "FAILED", error: "Task not found." }, { status: 404 });
+      if (!["OPEN", "DONE"].includes(status)) return privateJson({ status: "FAILED", error: "Task status must be OPEN or DONE." }, { status: 400 });
+      store.tasks = store.tasks.map((item) => item.taskId === taskId ? { ...item, status: status as FollowUpTask["status"], updatedAt: new Date().toISOString() } : item);
+      await persistStore(context, store);
+      return privateJson({ status: "TASK_UPDATED", store, readiness: scoreReadiness(store) });
+    }
+
+    if (action === "deleteTask") {
+      const taskId = String(body.taskId || "");
+      const beforeCount = store.tasks.length;
+      store.tasks = store.tasks.filter((item) => item.taskId !== taskId);
+      if (store.tasks.length === beforeCount) return privateJson({ status: "FAILED", error: "Task not found." }, { status: 404 });
+      await persistStore(context, store);
+      return privateJson({ status: "TASK_DELETED", store, readiness: scoreReadiness(store) });
     }
 
     if (action === "deleteOpportunity") {
