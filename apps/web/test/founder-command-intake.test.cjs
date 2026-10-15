@@ -29,5 +29,5 @@ test("request API is founder-gated, bounded, and explicitly does not dispatch", 
   assert.match(route, /record_founder_command_intake/);
   assert.match(route, /executed: false/);
   assert.match(route, /No command was approved, dispatched, or executed/);
-  assert.match(route, /service_role/i) === false;
+  assert.doesNotMatch(route, /service_role/i);
 });
