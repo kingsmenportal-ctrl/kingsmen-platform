@@ -155,3 +155,16 @@ test("local candidate store preserves corrupt data and bounds disk reads and wri
   assert.match(route, /fs\.renameSync\(temporaryPath, STORE_PATH\)/);
   assert.doesNotMatch(route, /function readStore\(\): Store \{[\s\S]*?catch \{\s*return defaultStore\(\);/);
 });
+
+test("local store rejects malformed existing collections instead of silently hiding saved data", () => {
+  assert.match(route, /if \(key in parsed && !Array\.isArray\(parsed\[key\]\)\)/);
+  assert.match(route, /Candidate local store collection \$\{key\} is invalid; existing data was preserved/);
+  assert.match(route, /if \("profile" in parsed && \(!parsed\.profile \|\| typeof parsed\.profile !== "object" \|\| Array\.isArray\(parsed\.profile\)\)\)/);
+});
+
+test("development GET returns a controlled 503 when local candidate storage cannot be read", () => {
+  const getStart = route.indexOf("export async function GET()");
+  const getEnd = route.indexOf("export async function POST(", getStart);
+  const getRoute = route.slice(getStart, getEnd);
+  assert.match(getRoute, /try \{[\s\S]*?const store = readStore\(\);[\s\S]*?catch \{\s*return privateJson\(\{ status: "STORAGE_UNAVAILABLE", error: "Candidate workspace could not be loaded\." \}, \{ status: 503 \}\);/);
+});
