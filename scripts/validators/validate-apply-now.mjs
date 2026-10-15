@@ -114,7 +114,10 @@ const authFiles = {
   page: "apps/web/src/app/sign-in/page.tsx",
   identityMigration: "db/migrations/0023_candidate_auth_private_storage.sql",
   readPolicyMigration: "db/migrations/0024_candidate_owned_application_document_reads.sql",
-  explicitBindingMigration: "db/migrations/0025_explicit_candidate_identity_binding.sql"
+  explicitBindingMigration: "db/migrations/0025_explicit_candidate_identity_binding.sql",
+  verifiedBindingMigration: "db/migrations/0026_require_verified_candidate_identity.sql",
+  provisioningScript: "scripts/provision-candidate-auth.mjs",
+  provisioningRunbook: "docs/security/candidate-identity-provisioning.md"
 };
 for (const [name, file] of Object.entries(authFiles)) {
   checks.push({
@@ -130,6 +133,9 @@ const registerRoute = readTextIfExists(authFiles.register);
 const identityMigration = readTextIfExists(authFiles.identityMigration);
 const documentPolicyMigration = readTextIfExists(authFiles.readPolicyMigration);
 const explicitBindingMigration = readTextIfExists(authFiles.explicitBindingMigration);
+const verifiedBindingMigration = readTextIfExists(authFiles.verifiedBindingMigration);
+const provisioningScript = readTextIfExists(authFiles.provisioningScript);
+const provisioningRunbook = readTextIfExists(authFiles.provisioningRunbook);
 
 checks.push({
   name: "auth_session_uses_http_only_cookie_and_no_store",
@@ -167,6 +173,28 @@ checks.push({
     explicitBindingMigration.includes("never matches by email") &&
     explicitBindingMigration.includes("already linked"),
   detail: "Candidate/Auth identity linking must require trusted service-role provisioning, reject reassignment, and never match by email."
+});
+
+checks.push({
+  name: "candidate_binding_requires_verified_auth_identity",
+  passed: verifiedBindingMigration.includes("u.email_confirmed_at") &&
+    verifiedBindingMigration.includes("Auth identity must have a verified email") &&
+    verifiedBindingMigration.includes("FROM anon") &&
+    verifiedBindingMigration.includes("FROM authenticated") &&
+    verifiedBindingMigration.includes("TO service_role"),
+  detail: "Trusted identity binding must require a confirmed Auth email and remain service-role-only."
+});
+
+checks.push({
+  name: "candidate_provisioning_is_operator_only_and_secret_safe",
+  passed: provisioningScript.includes("SUPABASE_SERVICE_ROLE_KEY") &&
+    provisioningScript.includes("AbortSignal.timeout(10_000)") &&
+    provisioningScript.includes('base.protocol !== "https:"') &&
+    provisioningScript.includes("BINDING_REQUEST_ACCEPTED") &&
+    !provisioningScript.includes("console.log(serviceRoleKey)") &&
+    provisioningRunbook.includes("no public HTTP endpoint") &&
+    provisioningRunbook.includes("two distinct verified test accounts"),
+  detail: "Provisioning must be an HTTPS-only operator CLI, keep service credentials out of logs, and document remaining isolation proof."
 });
 
 checks.push({
