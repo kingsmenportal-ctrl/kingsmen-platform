@@ -27,6 +27,26 @@ checks.push({
 });
 
 checks.push({
+  name: "bounds_json_request_body_before_parsing",
+  passed: api.includes("MAX_JSON_BODY_BYTES = 14 * 1024 * 1024") &&
+    api.includes("async function readBoundedJson(request: Request)") &&
+    api.includes("total > MAX_JSON_BODY_BYTES") &&
+    api.includes("request.body.getReader()") &&
+    api.includes("readBoundedJson(request)"),
+  detail: "Candidate API must bound streamed request bytes before JSON parsing, including requests without a Content-Length header."
+});
+
+checks.push({
+  name: "candidate_profile_patch_is_allowlisted_and_length_limited",
+  passed: api.includes("PROFILE_FIELD_LIMITS") &&
+    api.includes("function validateProfilePatch(input: unknown)") &&
+    api.includes("if (!(rawKey in PROFILE_FIELD_LIMITS)) continue") &&
+    api.includes("value.length > PROFILE_FIELD_LIMITS[key]") &&
+    api.includes("validateProfilePatch(body.profile)"),
+  detail: "Profile writes must accept only known text fields and enforce per-field length limits."
+});
+
+checks.push({
   name: "enforces_upload_size_limit",
   passed: api.includes("MAX_UPLOAD_BYTES = 10 * 1024 * 1024") && api.includes("buffer.length > MAX_UPLOAD_BYTES"),
   detail: "Uploads must enforce the 10 MB byte limit."
