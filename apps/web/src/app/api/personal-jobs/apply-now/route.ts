@@ -516,13 +516,19 @@ export async function POST(request: Request) {
         return privateJson({ status: "FAILED", error: error instanceof Error ? error.message : "Invalid document content." }, { status: 415 });
       }
 
-      fs.mkdirSync(UPLOAD_DIR, { recursive: true, mode: 0o700 });\n      try { fs.chmodSync(UPLOAD_DIR, 0o700); } catch { /* Unsupported filesystem permissions in some dev environments. */ }
-
       const safeName = fileName.replace(/[^a-zA-Z0-9._-]/g, "_");
       const storedName = `${Date.now()}-${safeName}`;
-      const filePath = path.join(UPLOAD_DIR, storedName);
-
-      fs.writeFileSync(filePath, decoded.buffer, { mode: 0o600 });\n      try { fs.chmodSync(filePath, 0o600); } catch { /* Unsupported filesystem permissions in some dev environments. */ }
+      let storagePath = "";
+      if (context) {
+        try { storagePath = await uploadCandidatePortalDocument(context, storedName, decoded.mimeType, decoded.buffer); }
+        catch { return privateJson({ status: "STORAGE_FAILED", error: "The document could not be saved to private storage." }, { status: 503 }); }
+      } else {
+        fs.mkdirSync(UPLOAD_DIR, { recursive: true, mode: 0o700 });
+        try { fs.chmodSync(UPLOAD_DIR, 0o700); } catch { /* Unsupported filesystem permissions in some dev environments. */ }
+        const filePath = path.join(UPLOAD_DIR, storedName);
+        fs.writeFileSync(filePath, decoded.buffer, { mode: 0o600 });
+        try { fs.chmodSync(filePath, 0o600); } catch { /* Unsupported filesystem permissions in some dev environments. */ }
+      }
 
       const text = await extractDocumentText(fileName, decoded.mimeType, decoded.buffer);
       const extracted = extractProfileFromText(text || "");
@@ -532,6 +538,7 @@ export async function POST(request: Request) {
         type,
         fileName,
         storedName,
+        ...(storagePath ? { storagePath } : {}),
         mimeType: decoded.mimeType,
         sizeBytes: decoded.buffer.length,
         extractedTextPreview: text ? text.slice(0, 1800) : "",
