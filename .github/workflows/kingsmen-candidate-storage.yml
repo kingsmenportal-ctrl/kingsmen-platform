@@ -28,6 +28,7 @@ on:
       - "db/migrations/0018_founder_document_review_decisions.sql"
       - "db/migrations/0019_founder_document_canonical_validation.sql"
       - "db/migrations/0020_candidate_document_upload_registration.sql"
+      - "db/migrations/0020_candidate_document_upload_registration.sql"
       - ".github/workflows/kingsmen-candidate-storage.yml"
   push:
     branches:
@@ -51,6 +52,7 @@ on:
       - "db/migrations/0017_founder_command_decisions.sql"
       - "db/migrations/0018_founder_document_review_decisions.sql"
       - "db/migrations/0019_founder_document_canonical_validation.sql"
+      - "db/migrations/0020_candidate_document_upload_registration.sql"
       - ".github/workflows/kingsmen-candidate-storage.yml"
 
 permissions:
