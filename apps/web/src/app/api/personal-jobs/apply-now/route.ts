@@ -49,7 +49,10 @@ type ContactLogEntry = {
   createdAt: string;
 };
 
-type FinanceLedgerEntry = { entryId: string; type: "FEE" | "PAYMENT" | "REFUND" | "ADJUSTMENT"; direction: "IN" | "OUT"; status: "RECORDED" | "PENDING" | "CONFIRMED" | "FAILED" | "CANCELLED"; amountCents: number; currency: "ZAR"; description: string; reference?: string; evidenceNote?: string; opportunityId?: string; occurredOn: string; createdAt: string; };\n\ntype Store = {
+type FinanceLedgerEntry = { entryId: string; type: "FEE" | "PAYMENT" | "REFUND" | "ADJUSTMENT"; direction: "IN" | "OUT"; status: "RECORDED" | "PENDING" | "CONFIRMED" | "FAILED" | "CANCELLED"; amountCents: number; currency: "ZAR"; description: string; reference?: string; evidenceNote?: string; opportunityId?: string; occurredOn: string; createdAt: string;
+};
+
+type Store = {
   schema: string;
   updatedAt: string;
   profile: CandidateProfile;
@@ -60,6 +63,7 @@ type FinanceLedgerEntry = { entryId: string; type: "FEE" | "PAYMENT" | "REFUND" 
   smartExtraction: any[];
   tasks: FollowUpTask[];
   contactLog: ContactLogEntry[];
+  financeLedger: FinanceLedgerEntry[];
 };
 
 function repoRoot() {
@@ -86,7 +90,8 @@ function defaultStore(): Store {
     proofLog: [],
     smartExtraction: [],
     tasks: [],
-    contactLog: []
+    contactLog: [],
+    financeLedger: []
   };
 }
 
@@ -103,7 +108,8 @@ function readStore(): Store {
       proofLog: Array.isArray(parsed.proofLog) ? parsed.proofLog : [],
       smartExtraction: Array.isArray(parsed.smartExtraction) ? parsed.smartExtraction : [],
       tasks: Array.isArray(parsed.tasks) ? parsed.tasks : [],
-      contactLog: Array.isArray(parsed.contactLog) ? parsed.contactLog : [],\n      financeLedger: Array.isArray(parsed.financeLedger) ? parsed.financeLedger : []
+      contactLog: Array.isArray(parsed.contactLog) ? parsed.contactLog : [],
+      financeLedger: Array.isArray(parsed.financeLedger) ? parsed.financeLedger : []
     };
   } catch {
     return defaultStore();
@@ -952,7 +958,8 @@ export async function POST(request: Request) {
       store.applicationPacks = store.applicationPacks.filter((item) => item.opportunityId !== opportunityId);
       store.proofLog = store.proofLog.filter((item) => item.opportunityId !== opportunityId);
       store.tasks = store.tasks.map((item) => item.opportunityId === opportunityId ? { ...item, opportunityId: undefined, updatedAt: new Date().toISOString() } : item);
-      store.contactLog = store.contactLog.map((item) => item.opportunityId === opportunityId ? { ...item, opportunityId: undefined } : item);\n      store.financeLedger = (store.financeLedger || []).map((item) => item.opportunityId === opportunityId ? { ...item, opportunityId: undefined } : item);
+      store.contactLog = store.contactLog.map((item) => item.opportunityId === opportunityId ? { ...item, opportunityId: undefined } : item);
+      store.financeLedger = (store.financeLedger || []).map((item) => item.opportunityId === opportunityId ? { ...item, opportunityId: undefined } : item);
       await persistStore(context, store);
 
       return privateJson({
