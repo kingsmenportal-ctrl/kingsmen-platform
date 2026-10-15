@@ -80,7 +80,10 @@ export default function ReviewLedgerClient() {
   const records = useMemo(() => ledger?.records ?? [], [ledger]);
 
   const filtered = useMemo(() => {
+    const today = new Date().toISOString().slice(0, 10);
     if (filter === "ALL") return records;
+    if (filter === "OVERDUE_FOLLOW_UPS") return records.filter((r) => r.review.followUpDate && r.review.followUpDate < today && !["INTERVIEW", "REJECTED", "OFFER", "WITHDRAWN"].includes(r.review.outcomeStatus));
+    if (filter === "UPCOMING_INTERVIEWS") return records.filter((r) => r.review.interviewAt && !Number.isNaN(Date.parse(r.review.interviewAt)) && Date.parse(r.review.interviewAt) >= Date.now());
     return records.filter((record) => record.actionState === filter || record.review.reviewStatus === filter);
   }, [records, filter]);
 
@@ -177,6 +180,9 @@ export default function ReviewLedgerClient() {
         <Stat label="Ready manual" value={ledger?.summary?.readyForManualSubmission ?? 0} />
         <Stat label="Proof captured" value={ledger?.summary?.proofCaptured ?? 0} />
         <Stat label="Outcomes" value={ledger?.summary?.outcomesRecorded ?? 0} />
+        <Stat label="Overdue follow-ups" value={ledger?.summary?.followUpsOverdue ?? 0} />
+        <Stat label="Follow-ups due today" value={ledger?.summary?.followUpsDueToday ?? 0} />
+        <Stat label="Upcoming interviews" value={ledger?.summary?.interviewsScheduled ?? 0} />
       </section>
 
       <section style={layout}>
@@ -188,6 +194,8 @@ export default function ReviewLedgerClient() {
             <option value="READY_FOR_MANUAL_SUBMISSION">Ready manual submission</option>
             <option value="PROOF_CAPTURED">Proof captured</option>
             <option value="OUTCOME_RECORDED">Outcome recorded</option>
+            <option value="OVERDUE_FOLLOW_UPS">Overdue follow-ups</option>
+            <option value="UPCOMING_INTERVIEWS">Upcoming interviews</option>
             <option value="BLOCKED_PROFILE_FIX">Blocked profile fix</option>
             {reviewStatuses.map((status) => <option key={status} value={status}>{status}</option>)}
           </select>
@@ -235,6 +243,8 @@ export default function ReviewLedgerClient() {
                   <Input label="Proof type" value={selected.review.proofType} onChange={(v) => patchSelected("proofType", v)} placeholder="screenshot / email / reference number" />
                   <Input label="Proof reference" value={selected.review.proofReference} onChange={(v) => patchSelected("proofReference", v)} />
                   <Input label="Follow-up date" value={selected.review.followUpDate} onChange={(v) => patchSelected("followUpDate", v)} placeholder="YYYY-MM-DD" />
+                  <Input label="Interview date/time" value={selected.review.interviewAt} onChange={(v) => patchSelected("interviewAt", v)} placeholder="ISO timestamp or YYYY-MM-DDTHH:mm" />
+                  <Input label="Next action" value={selected.review.nextAction} onChange={(v) => patchSelected("nextAction", v)} placeholder="e.g. Call recruiter after deadline" />
                 </div>
 
                 <label style={checkLabel}>
@@ -249,6 +259,8 @@ export default function ReviewLedgerClient() {
 
                 <TextArea label="Proof notes" value={selected.review.proofNotes} onChange={(v) => patchSelected("proofNotes", v)} />
                 <TextArea label="Outcome notes" value={selected.review.outcomeNotes} onChange={(v) => patchSelected("outcomeNotes", v)} />
+                <TextArea label="Response history (append dated entries)" value={selected.review.responseHistory} onChange={(v) => patchSelected("responseHistory", v)} />
+                <p style={muted}>Keep a dated note for each employer response or attempted follow-up. This is a manually maintained log, not a live employer inbox.</p>
                 <TextArea label="Reviewer notes" value={selected.review.reviewerNotes} onChange={(v) => patchSelected("reviewerNotes", v)} />
 
                 <button style={button} disabled={loading} onClick={() => saveSelected(selected)}>
