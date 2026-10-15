@@ -1,23 +1,11 @@
-export default function CandidateSupportPage() {
-  return (
-    <main>
-      <h1>Kingsmen Support Centre</h1>
-      <p>Use this page for help requests, manual assistance, deadline risk, portal blockers, and tribunal escalations.</p>
-
-      <section aria-label="Support Boundary">
-        <article>
-          <h2>Help Requests</h2>
-          <p>Routine support is email-first and copied into the portal.</p>
-        </article>
-        <article>
-          <h2>Manual Assistance</h2>
-          <p>Portal blockers, CAPTCHA/OTP, portal down, and source uncertainty trigger manual assistance or MAP fallback.</p>
-        </article>
-        <article>
-          <h2>Tribunal Intake</h2>
-          <p>Disputes require audit, evidence, and founder/operator review.</p>
-        </article>
-      </section>
-    </main>
-  );
+"use client";
+import { useEffect,useState } from "react";
+type Item={requestId:string;subject:string;category:string;priority:string;status:string;description:string;createdAt:string;reference?:string};
+export default function CandidateSupportPage(){
+const [items,setItems]=useState<Item[]>([]),[subject,S]=useState(""),[category,C]=useState("GENERAL"),[priority,P]=useState("NORMAL"),[description,D]=useState(""),[reference,R]=useState(""),[busy,B]=useState(false),[error,E]=useState(""),[note,N]=useState("");
+async function load(){try{const r=await fetch("/api/personal-jobs/apply-now",{credentials:"same-origin",cache:"no-store"});const d=await r.json();if(!r.ok)throw Error(d.error||"Could not load support requests");setItems(Array.isArray(d.supportRequests)?d.supportRequests:[])}catch(e){E(e instanceof Error?e.message:"Could not load support requests")}}
+useEffect(()=>{void load()},[]);
+async function submit(e:React.FormEvent){e.preventDefault();B(true);E("");N("");try{const r=await fetch("/api/personal-jobs/apply-now",{method:"POST",credentials:"same-origin",cache:"no-store",headers:{"Content-Type":"application/json"},body:JSON.stringify({action:"createSupportRequest",subject,category,priority,description,reference})});const d=await r.json();if(!r.ok||!d.request)throw Error(d.error||"Could not save request");setItems(d.store?.supportRequests||[d.request,...items]);S("");D("");R("");N("Saved to your private workspace. This does not mean an operator has reviewed or escalated it.")}catch(e){E(e instanceof Error?e.message:"Could not save request")}finally{B(false)}}
+const field={display:"block",width:"100%",boxSizing:"border-box" as const,padding:10,marginTop:5,border:"1px solid #cbd5e1",borderRadius:8,font:"inherit"};
+return <main style={{maxWidth:980,margin:"0 auto",padding:28,color:"#172033"}}><a href="/candidate/dashboard">← Candidate dashboard</a><h1>Support Centre</h1><p>Create and track requests about applications, documents, finance, disputes or deadline risks.</p>{error&&<p role="alert" style={{color:"#9f2218"}}>{error}<button onClick={()=>void load()}>Retry</button></p>}{note&&<p role="status">{note}</p>}<div style={{display:"grid",gridTemplateColumns:"repeat(auto-fit,minmax(280px,1fr))",gap:20}}><section style={{border:"1px solid #dbe3ec",borderRadius:12,padding:18}}><h2>New request</h2><form onSubmit={submit} style={{display:"grid",gap:12}}><label>Subject<input required minLength={4} maxLength={160} value={subject} onChange={e=>S(e.target.value)} style={field}/></label><label>Category<select value={category} onChange={e=>C(e.target.value)} style={field}>{[["GENERAL","General help"],["APPLICATION","Application"],["DOCUMENTS","Documents"],["FINANCE","Finance"],["URGENT_BLOCKER","Urgent blocker"],["DISPUTE","Dispute"]].map(([v,t])=><option key={v} value={v}>{t}</option>)}</select></label><label>Priority<select value={priority} onChange={e=>P(e.target.value)} style={field}><option value="NORMAL">Normal</option><option value="HIGH">High</option><option value="URGENT">Urgent</option></select></label><label>Details<textarea required minLength={10} maxLength={3000} rows={6} value={description} onChange={e=>D(e.target.value)} style={field}/></label><label>Reference (optional)<input maxLength={180} value={reference} onChange={e=>R(e.target.value)} style={field}/></label><button disabled={busy}>{busy?"Saving…":"Submit request"}</button></form></section><section style={{border:"1px solid #dbe3ec",borderRadius:12,padding:18}}><h2>Your requests</h2>{items.length===0?<p>No support requests recorded yet.</p>:items.map(x=><article key={x.requestId} style={{padding:12,border:"1px solid #e2e8f0",borderRadius:9,marginBottom:10}}><strong>{x.subject}</strong><p>{x.category.replaceAll("_"," ")} · {x.priority} · {x.status}</p><p style={{whiteSpace:"pre-wrap"}}>{x.description}</p><small>{new Date(x.createdAt).toLocaleString()}</small>{x.reference&&<p>Ref: {x.reference}</p>}</article>)}</section></div><p>Urgent requests are recorded only; this page does not automatically send email, SMS or WhatsApp alerts.</p></main>
 }
