@@ -31,6 +31,10 @@ test("staging runner verifies private document bytes and cross-account denial", 
   assert.match(runner, /private_document_upload_and_byte_integrity/);
   assert.match(runner, /cleanup_user_A_synthetic_document/);
   assert.match(runner, /cleanup_user_B_synthetic_document/);
+  assert.match(runner, /assert\.equal\(crossAB\.status, 404/);
+  assert.match(runner, /assert\.equal\(crossBA\.status, 404/);
+  assert.doesNotMatch(runner, /\[404, 503\]\.includes\(cross/);
+  assert.match(runner, /record\("restore_user_A_notes", true\)/);
 });
 
 test("staging evidence never implies production readiness automatically", () => {
