@@ -1,24 +1,11 @@
-export default function CandidateMessagesPage() {
-  return (
-    <main>
-      <h1>Kingsmen Messages</h1>
-      <p>Email is the primary tracked communication channel. Portal messages are safe copies for visibility.</p>
-      <p>WhatsApp is urgent-only. SMS is backup-only. Bulk WhatsApp reminders are not used.</p>
-
-      <section aria-label="Message Centre Boundary">
-        <article>
-          <h2>Routine updates</h2>
-          <p>Sent by email and copied here.</p>
-        </article>
-        <article>
-          <h2>Urgent alerts</h2>
-          <p>WhatsApp may be used only for urgent or ceremonial cases.</p>
-        </article>
-        <article>
-          <h2>Evidence</h2>
-          <p>Every message requires a message evidence ledger record.</p>
-        </article>
-      </section>
-    </main>
-  );
+"use client";
+import {useEffect,useState} from "react";
+type Item={messageId:string;subject:string;body:string;channel:string;direction:string;status:string;createdAt:string;reference?:string};
+export default function CandidateMessagesPage(){
+const [items,I]=useState<Item[]>([]),[subject,S]=useState(""),[body,BODY]=useState(""),[channel,C]=useState("EMAIL"),[direction,D]=useState("INBOUND"),[reference,R]=useState(""),[busy,B]=useState(false),[error,E]=useState(""),[note,N]=useState("");
+async function load(){try{const r=await fetch("/api/personal-jobs/apply-now",{credentials:"same-origin",cache:"no-store"});const d=await r.json();if(!r.ok)throw Error(d.error||"Could not load message history");I(Array.isArray(d.messageLedger)?d.messageLedger:[])}catch(e){E(e instanceof Error?e.message:"Could not load message history")}}
+useEffect(()=>{void load()},[]);
+async function submit(e:React.FormEvent){e.preventDefault();B(true);E("");N("");try{const r=await fetch("/api/personal-jobs/apply-now",{method:"POST",credentials:"same-origin",cache:"no-store",headers:{"Content-Type":"application/json"},body:JSON.stringify({action:"recordMessage",subject,body,channel,direction,reference})});const d=await r.json();if(!r.ok||!d.message)throw Error(d.error||"Could not record message");I(d.store?.messageLedger||[d.message,...items]);S("");BODY("");R("");N("Communication record saved. No external message was sent.")}catch(e){E(e instanceof Error?e.message:"Could not record message")}finally{B(false)}}
+const field={display:"block",width:"100%",boxSizing:"border-box" as const,padding:10,marginTop:5,border:"1px solid #cbd5e1",borderRadius:8,font:"inherit"};
+return <main style={{maxWidth:980,margin:"0 auto",padding:28,color:"#172033"}}><a href="/candidate/dashboard">← Candidate dashboard</a><h1>Messages & Communication Log</h1><p>Record actual communications and keep evidence in your private workspace. Saving here does not send an email, SMS, WhatsApp or portal message.</p>{error&&<p role="alert" style={{color:"#9f2218"}}>{error}<button onClick={()=>void load()}>Retry</button></p>}{note&&<p role="status">{note}</p>}<div style={{display:"grid",gridTemplateColumns:"repeat(auto-fit,minmax(280px,1fr))",gap:20}}><section style={{border:"1px solid #dbe3ec",borderRadius:12,padding:18}}><h2>Record communication</h2><form onSubmit={submit} style={{display:"grid",gap:12}}><label>Subject<input required minLength={2} maxLength={160} value={subject} onChange={e=>S(e.target.value)} style={field}/></label><label>Channel<select value={channel} onChange={e=>C(e.target.value)} style={field}>{["EMAIL","PORTAL","WHATSAPP","SMS","PHONE"].map(x=><option key={x} value={x}>{x}</option>)}</select></label><label>Direction<select value={direction} onChange={e=>D(e.target.value)} style={field}><option value="INBOUND">Received / inbound</option><option value="OUTBOUND">Sent / outbound</option></select></label><label>Message or factual summary<textarea required minLength={2} maxLength={4000} rows={6} value={body} onChange={e=>BODY(e.target.value)} style={field}/></label><label>External reference (optional)<input maxLength={180} value={reference} onChange={e=>R(e.target.value)} style={field}/></label><button disabled={busy}>{busy?"Saving…":"Save communication record"}</button></form></section><section style={{border:"1px solid #dbe3ec",borderRadius:12,padding:18}}><h2>History</h2>{items.length===0?<p>No communication records yet.</p>:items.map(x=><article key={x.messageId} style={{padding:12,border:"1px solid #e2e8f0",borderRadius:9,marginBottom:10}}><strong>{x.subject}</strong><p>{x.channel} · {x.direction} · {x.status}</p><p style={{whiteSpace:"pre-wrap"}}>{x.body}</p><small>{new Date(x.createdAt).toLocaleString()}</small>{x.reference&&<p>Ref: {x.reference}</p>}</article>)}</section></div><p>Do not mark a communication as sent or delivered unless you have evidence from the actual channel/provider.</p></main>
 }
