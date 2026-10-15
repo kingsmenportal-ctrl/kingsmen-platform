@@ -56,8 +56,12 @@ create policy founder_watchlist_items_founder on public.founder_watchlist_items 
 create policy founder_escalation_threads_founder on public.founder_escalation_threads for all to authenticated using (public.is_kingsmen_founder()) with check (public.is_kingsmen_founder());
 create policy founder_decision_log_founder on public.founder_decision_log for all to authenticated using (public.is_kingsmen_founder()) with check (public.is_kingsmen_founder());
 create policy founder_mobile_cards_founder on public.founder_mobile_cards for all to authenticated using (public.is_kingsmen_founder()) with check (public.is_kingsmen_founder());
-create policy founder_ops_audit_events_founder on public.founder_ops_audit_events for all to authenticated using (public.is_kingsmen_founder()) with check (public.is_kingsmen_founder());
-create policy founder_command_intake_founder on public.founder_command_intake for all to authenticated using (public.is_kingsmen_founder()) with check (public.is_kingsmen_founder());
+drop policy if exists founder_ops_audit_events_founder on public.founder_ops_audit_events;
+create policy founder_ops_audit_events_select on public.founder_ops_audit_events for select to authenticated using (public.is_kingsmen_founder());
+create policy founder_ops_audit_events_insert on public.founder_ops_audit_events for insert to authenticated with check (public.is_kingsmen_founder());
+drop policy if exists founder_command_intake_founder on public.founder_command_intake;
+create policy founder_command_intake_select on public.founder_command_intake for select to authenticated using (public.is_kingsmen_founder());
+create policy founder_command_intake_insert on public.founder_command_intake for insert to authenticated with check (public.is_kingsmen_founder());
 
 create or replace function public.record_founder_command_intake(
   p_request_ref text, p_command_key text, p_command_name text, p_actor_user_id uuid,
