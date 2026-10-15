@@ -112,7 +112,7 @@ function readStore(): Store {
 
   let parsed: Record<string, unknown>;
   try {
-    const value = JSON.parse(raw.replace(/^\\uFEFF/, ""));
+    const value = JSON.parse(raw.replace(/^\uFEFF/, ""));
     if (!value || typeof value !== "object" || Array.isArray(value)) {
       throw new Error("Candidate local store has an invalid shape.");
     }
@@ -145,7 +145,7 @@ function writeStore(store: Store) {
     // Some development filesystems do not support POSIX permissions.
   }
   store.updatedAt = new Date().toISOString();
-  const serialized = `${JSON.stringify(store, null, 2)}\\n`;
+  const serialized = `${JSON.stringify(store, null, 2)}\n`;
   if (Buffer.byteLength(serialized, "utf8") > MAX_LOCAL_STORE_BYTES) {
     throw new Error("Candidate local store exceeds the allowed size.");
   }
