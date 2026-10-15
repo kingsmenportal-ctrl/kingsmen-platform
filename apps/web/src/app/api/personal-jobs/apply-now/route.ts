@@ -708,7 +708,6 @@ export async function POST(request: Request) {
       }
 
       let canonicalRegistered = false;
-      let canonicalRegistered = false;
       try {
         let canonicalRegistration: { documentRef: string; evidenceRef: string } | null = null;
         if (context && storagePath) {
@@ -738,7 +737,6 @@ export async function POST(request: Request) {
             throw new Error("Canonical document registration failed.");
           }
           canonicalRegistration = { documentRef: registrationData.documentRef, evidenceRef: registrationData.evidenceRef };
-          canonicalRegistered = true;
           canonicalRegistered = true;
         }
 
@@ -1119,6 +1117,54 @@ export async function POST(request: Request) {
       const document = store.documents.find((item) => item.documentId === documentId);
       if (!document) return privateJson({ status: "FAILED", error: "Document not found." }, { status: 404 });
 
+      const canonicalDocumentRef = typeof document.canonicalDocumentRef === "string" ? document.canonicalDocumentRef : "";
+      const registeredCanonicalDocument = Boolean(context && document.registryStatus === "REGISTERED" && canonicalDocumentRef);
+      if (registeredCanonicalDocument && context) {
+        let retirement: Response;
+        try {
+          retirement = await fetch(new URL("/rest/v1/rpc/retire_candidate_document_upload", context.url), {
+            method: "POST",
+            headers: {
+              apikey: context.anonKey,
+              Authorization: `Bearer ${context.accessToken}`,
+              "Content-Type": "application/json",
+              Accept: "application/json",
+              "Cache-Control": "no-store"
+            },
+            body: JSON.stringify({ p_document_ref: canonicalDocumentRef }),
+            cache: "no-store",
+            signal: AbortSignal.timeout(10000)
+          });
+        } catch {
+          return privateJson({ status: "CANONICAL_RETIREMENT_FAILED", error: "The canonical vault could not be updated; the document was not removed." }, { status: 503 });
+        }
+        if (!retirement.ok) {
+          return privateJson({ status: "CANONICAL_RETIREMENT_FAILED", error: "The canonical vault could not be updated; the document was not removed." }, { status: 503 });
+        }
+      }
+
+      const recordCanonicalCleanup = async (success: boolean): Promise<boolean> => {
+        if (!registeredCanonicalDocument || !context) return true;
+        try {
+          const result = await fetch(new URL("/rest/v1/rpc/record_candidate_document_deletion_result", context.url), {
+            method: "POST",
+            headers: {
+              apikey: context.anonKey,
+              Authorization: `Bearer ${context.accessToken}`,
+              "Content-Type": "application/json",
+              Accept: "application/json",
+              "Cache-Control": "no-store"
+            },
+            body: JSON.stringify({ p_document_ref: canonicalDocumentRef, p_success: success }),
+            cache: "no-store",
+            signal: AbortSignal.timeout(10000)
+          });
+          return result.ok;
+        } catch {
+          return false;
+        }
+      };
+
       if (context && typeof document.storagePath === "string" && document.storagePath) {
         const prefix = `${context.userId}/`;
         const objectName = document.storagePath.startsWith(prefix) ? document.storagePath.slice(prefix.length) : "";
@@ -1140,10 +1186,25 @@ export async function POST(request: Request) {
             signal: AbortSignal.timeout(15000)
           });
         } catch {
-          return privateJson({ status: "STORAGE_FAILED", error: "The private file service could not be reached. The document record was kept." }, { status: 503 });
+          await recordCanonicalCleanup(false);
+          return privateJson({
+            status: "STORAGE_FAILED",
+            error: registeredCanonicalDocument
+              ? "The canonical document is retired, but private file cleanup is pending. Keep this record and retry later."
+              : "The private file service could not be reached. The document record was kept."
+          }, { status: 503 });
         }
         if (!response.ok && response.status !== 404) {
-          return privateJson({ status: "STORAGE_FAILED", error: "The private file could not be deleted. The document record was kept." }, { status: 503 });
+          await recordCanonicalCleanup(false);
+          return privateJson({
+            status: "STORAGE_FAILED",
+            error: registeredCanonicalDocument
+              ? "The canonical document is retired, but private file cleanup is pending. Keep this record and retry later."
+              : "The private file could not be deleted. The document record was kept."
+          }, { status: 503 });
+        }
+        if (!(await recordCanonicalCleanup(true))) {
+          return privateJson({ status: "CANONICAL_EVIDENCE_FAILED", error: "The file was deleted and the canonical record is retired, but cleanup evidence could not be recorded. The workspace record was kept for reconciliation." }, { status: 503 });
         }
       } else if (!context && process.env.NODE_ENV !== "production") {
         const storedName = typeof document.storedName === "string" ? document.storedName : "";
