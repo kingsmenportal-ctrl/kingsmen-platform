@@ -258,3 +258,30 @@ test("candidate finance view reads the private ledger and never provides a candi
   assert.match(page, /refund entries require finance review/i);
   assert.doesNotMatch(page, /action:\s*["']updateFinanceEntry["']/);
 });
+
+
+test("support requests are validated and persisted in the authenticated candidate workspace", () => {
+  assert.match(route, /type SupportRequest/);
+  assert.match(route, /action === "createSupportRequest"/);
+  assert.match(route, /subject\.length < 4/);
+  assert.match(route, /description\.length < 10/);
+  assert.match(route, /store\.supportRequests = \[requestRecord/);
+  assert.match(route, /await persistStore\(context, store\)/);
+  const page = fs.readFileSync(path.resolve(__dirname, "../src/app/candidate/support/page.tsx"), "utf8");
+  assert.match(page, /action: "createSupportRequest"/);
+  assert.match(page, /cache: "no-store"/);
+  assert.match(page, /credentials: "same-origin"/);
+  assert.match(page, /Urgent requests are recorded only/);
+});
+
+test("message ledger records communications without claiming external delivery", () => {
+  assert.match(route, /type MessageRecord/);
+  assert.match(route, /action === "recordMessage"/);
+  assert.match(route, /store\.messageLedger = \[messageRecord/);
+  assert.match(route, /messageBody\.length > 4000/);
+  const page = fs.readFileSync(path.resolve(__dirname, "../src/app/candidate/messages/page.tsx"), "utf8");
+  assert.match(page, /action: "recordMessage"/);
+  assert.match(page, /No external message was sent/);
+  assert.match(page, /credentials: "same-origin"/);
+  assert.match(page, /cache: "no-store"/);
+});
