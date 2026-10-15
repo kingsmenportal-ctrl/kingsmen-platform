@@ -301,7 +301,8 @@ export default function ApplyNowClient() {
                 <span style={docType}>{doc.type}</span>
                 <div>
                   <strong>{doc.fileName}</strong>
-                  <small>{doc.smartFields?.email || doc.smartFields?.phone || "Stored locally"}</small>
+                  <small>{doc.smartFields?.email || doc.smartFields?.phone || (doc.storagePath ? "Private storage" : "Local development storage")}</small>
+                  <a href={`/api/personal-jobs/apply-now/documents/${encodeURIComponent(String(doc.documentId))}`} style={smallButton} rel="noreferrer">Download</a>
                 </div>
               </div>
             )) : (
