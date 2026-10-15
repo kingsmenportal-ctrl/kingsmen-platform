@@ -81,6 +81,11 @@ export async function uploadCandidatePortalDocument(
   if (!/^[a-zA-Z0-9._-]{1,180}$/.test(objectKey) || objectKey === "." || objectKey === "..") {
     throw new Error("Invalid document storage key.");
   }
+  const extension = objectKey.toLowerCase().slice(objectKey.lastIndexOf("."));
+  const allowedMime = extension === ".pdf" ? "application/pdf" : extension === ".docx" ? "application/vnd.openxmlformats-officedocument.wordprocessingml.document" : extension === ".txt" ? "text/plain" : "";
+  if (!allowedMime || (mimeType !== allowedMime && mimeType !== "application/octet-stream" && mimeType !== "text/txt")) {
+    throw new Error("Document type does not match an allowed private-storage type.");
+  }
   const storagePath = `${context.userId}/${objectKey}`;
   const response = await fetch(
     new URL(`/storage/v1/object/candidate-documents/${storagePath.split("/").map(encodeURIComponent).join("/")}`, context.url),
@@ -89,7 +94,7 @@ export async function uploadCandidatePortalDocument(
       headers: {
         apikey: context.anonKey,
         Authorization: `Bearer ${context.accessToken}`,
-        "Content-Type": mimeType,
+        "Content-Type": allowedMime,
         "Cache-Control": "no-store",
         "x-upsert": "false"
       },
