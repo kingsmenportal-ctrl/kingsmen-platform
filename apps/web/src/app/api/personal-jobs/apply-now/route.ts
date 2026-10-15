@@ -983,10 +983,11 @@ export async function POST(request: Request) {
       status: "FAILED",
       error: "Unknown action."
     }, { status: 400 });
-  } catch (error) {
+  } catch {
+    // Do not disclose database, storage, filesystem, or upstream service details to clients.
     return privateJson({
-      status: "ERROR_VISIBLE",
-      error: error instanceof Error ? error.message : "Unknown Apply Desk error",
+      status: "INTERNAL_ERROR",
+      error: "The request could not be completed. Please try again.",
     }, { status: 500 });
   }
 }
