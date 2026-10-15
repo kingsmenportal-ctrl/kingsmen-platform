@@ -98,8 +98,7 @@ function writeStore(store: Store) {
 function localCandidateStorageUnavailable() {
   // File-backed candidate records are development-only until authenticated database
   // and private object storage are wired. Never silently deploy this as production storage.
-  return process.env.NODE_ENV === "production" &&
-    process.env.KINGSMEN_ALLOW_LOCAL_CANDIDATE_STORAGE !== "true";
+  return process.env.NODE_ENV === "production";
 }
 
 function storageUnavailableResponse() {
