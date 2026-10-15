@@ -1141,6 +1141,15 @@ export async function POST(request: Request) {
         if (!retirement.ok) {
           return privateJson({ status: "CANONICAL_RETIREMENT_FAILED", error: "The canonical vault could not be updated; the document was not removed." }, { status: 503 });
         }
+        const retirementData = await retirement.json().catch(() => null) as { retired?: boolean; storageBucket?: string; storagePath?: string } | null;
+        if (
+          retirementData?.retired !== true ||
+          retirementData.storageBucket !== "candidate-documents" ||
+          typeof document.storagePath !== "string" ||
+          retirementData.storagePath !== document.storagePath
+        ) {
+          return privateJson({ status: "CANONICAL_REFERENCE_MISMATCH", error: "The canonical storage reference does not match this workspace record. No file was deleted." }, { status: 409 });
+        }
       }
 
       const recordCanonicalCleanup = async (success: boolean): Promise<boolean> => {
