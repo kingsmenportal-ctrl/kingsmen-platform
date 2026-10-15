@@ -171,6 +171,20 @@ export default function ApplyNowClient() {
     }
   }
 
+  async function deleteDocument(documentId: string) {
+    if (!window.confirm("Permanently delete this uploaded document and its stored file?")) return;
+    setBusy(`document-delete-${documentId}`);
+    try {
+      const json = await api({ action: "deleteDocument", documentId });
+      setStore(json.store);
+      setMessage("Document and its stored file deleted.");
+    } catch (error) {
+      setMessage(error instanceof Error ? error.message : "Could not delete document.");
+    } finally {
+      setBusy("");
+    }
+  }
+
   async function addOpportunity() {
     setBusy("opportunity");
 
@@ -413,6 +427,7 @@ export default function ApplyNowClient() {
                   <strong>{doc.fileName}</strong>
                   <small>{doc.smartFields?.email || doc.smartFields?.phone || (doc.storagePath ? "Private storage" : "Local development storage")}</small>
                   <a href={`/api/personal-jobs/apply-now/documents/${encodeURIComponent(String(doc.documentId))}`} style={smallButton} rel="noreferrer">Download</a>
+                  <button type="button" onClick={() => deleteDocument(String(doc.documentId))} disabled={busy === `document-delete-${doc.documentId}`} style={{ ...smallButton, marginLeft: 6, borderColor: "#87534d", color: "#ffc1b8", cursor: "pointer" }}>{busy === `document-delete-${doc.documentId}` ? "Deleting…" : "Delete"}</button>
                 </div>
               </div>
             )) : (
