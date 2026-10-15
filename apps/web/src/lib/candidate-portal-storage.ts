@@ -86,6 +86,9 @@ export async function uploadCandidatePortalDocument(
   if (!allowedMime || (mimeType !== allowedMime && mimeType !== "application/octet-stream" && mimeType !== "text/txt")) {
     throw new Error("Document type does not match an allowed private-storage type.");
   }
+  if (!/^[0-9a-f]{8}-[0-9a-f]{4}-[1-8][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i.test(context.userId)) {
+    throw new Error("Authenticated candidate identity is invalid for private storage.");
+  }
   const storagePath = `${context.userId}/${objectKey}`;
   const response = await fetch(
     new URL(`/storage/v1/object/candidate-documents/${storagePath.split("/").map(encodeURIComponent).join("/")}`, context.url),
