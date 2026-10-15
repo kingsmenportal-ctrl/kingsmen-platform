@@ -75,6 +75,7 @@ export default function ApplyNowClient() {
   const [message, setMessage] = useState("Ready.");
   const [selectedOpportunity, setSelectedOpportunity] = useState("");
   const [proof, setProof] = useState("");
+  const [manualExport, setManualExport] = useState<any>(null);
   const [taskDraft, setTaskDraft] = useState({ title: "", dueDate: "", priority: "NORMAL", opportunityId: "", notes: "" });
   const [financeDraft, setFinanceDraft] = useState({ type: "FEE", direction: "OUT", status: "RECORDED", amount: "", description: "", reference: "", evidenceNote: "", opportunityId: "", occurredOn: new Date().toISOString().slice(0, 10) });
   const [contactDraft, setContactDraft] = useState({ contactName: "", organisation: "", channel: "EMAIL", direction: "OUTBOUND", opportunityId: "", summary: "", followUpDate: "" });
@@ -390,6 +391,31 @@ export default function ApplyNowClient() {
     }
   }
 
+  async function prepareManualExport(opportunityId: string) {
+    setBusy(`export-${opportunityId}`);
+    setManualExport(null);
+    try {
+      const json = await api({ action: "prepareManualExport", opportunityId });
+      setManualExport(json.bundle);
+      setSelectedOpportunity(opportunityId);
+      setMessage("Manual export checklist prepared. Review every item before sharing documents.");
+    } catch (error) {
+      setMessage(error instanceof Error ? error.message : "Could not prepare export checklist.");
+    } finally {
+      setBusy("");
+    }
+  }
+
+  async function copyManualExport() {
+    if (!manualExport) return;
+    try {
+      await navigator.clipboard.writeText(JSON.stringify(manualExport, null, 2));
+      setMessage("Manual export checklist copied. Review it before sharing anything.");
+    } catch {
+      setMessage("Clipboard unavailable. Review the checklist shown below.");
+    }
+  }
+
   function copyPack() {
     if (!latestPack?.body) return;
     navigator.clipboard.writeText(latestPack.body);
@@ -571,6 +597,9 @@ export default function ApplyNowClient() {
                   <button onClick={() => generatePack(item.opportunityId)} style={primaryButton}>
                     {busy === `pack-${item.opportunityId}` ? "Building..." : "Build pack"}
                   </button>
+                  <button onClick={() => prepareManualExport(item.opportunityId)} style={ghostButton} disabled={busy === `export-${item.opportunityId}`}>
+                    {busy === `export-${item.opportunityId}` ? "Preparing…" : "Export checklist"}
+                  </button>
                   <button onClick={() => setSelectedOpportunity(item.opportunityId)} style={ghostButton}>Proof</button>
                   <button onClick={() => deleteOpportunity(item.opportunityId)} style={dangerButton}>Remove</button>
                 </div>
@@ -595,6 +624,34 @@ export default function ApplyNowClient() {
           </div>
         </section>
       </section>
+
+      {manualExport ? (
+        <section style={panel} aria-live="polite">
+          <div style={sectionHead}>
+            <div>
+              <p style={eyebrow}>MANUAL EXPORT / CANDIDATE REVIEW</p>
+              <h2 style={sectionTitle}>{manualExport.opportunity?.title || "Application checklist"}</h2>
+              <p style={{ color: "#cfc2a4", fontSize: 13, lineHeight: 1.6 }}>Prepared for review only. Nothing has been submitted or sent.</p>
+            </div>
+            <button type="button" style={secondaryButton} onClick={copyManualExport}>Copy checklist</button>
+          </div>
+          <div style={queue}>
+            {(manualExport.checklist || []).map((item: any, index: number) => (
+              <div key={`${item.item}-${index}`} style={documentRow}>
+                <span style={docType}>{index + 1}</span>
+                <div>
+                  <strong>{item.item} — {item.status.replaceAll("_", " ")}</strong>
+                  <p style={{ margin: "5px 0 0", color: "#aab5c7", fontSize: 12 }}>{item.note}</p>
+                </div>
+              </div>
+            ))}
+          </div>
+          <p style={{ color: "#f4c968", fontSize: 13, lineHeight: 1.6 }}>{manualExport.notice}</p>
+          <div style={cardActions}>
+            <button type="button" style={ghostButton} onClick={() => setManualExport(null)}>Close checklist</button>
+          </div>
+        </section>
+      ) : null}
 
       <section style={panel}>
         <div style={sectionHead}>
