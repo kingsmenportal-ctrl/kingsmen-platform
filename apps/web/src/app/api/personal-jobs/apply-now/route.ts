@@ -53,6 +53,9 @@ type ContactLogEntry = {
 type FinanceLedgerEntry = { entryId: string; type: "FEE" | "PAYMENT" | "REFUND" | "ADJUSTMENT"; direction: "IN" | "OUT"; status: "RECORDED" | "PENDING" | "CONFIRMED" | "FAILED" | "CANCELLED"; amountCents: number; currency: "ZAR"; description: string; reference?: string; evidenceNote?: string; opportunityId?: string; occurredOn: string; createdAt: string;
 };
 
+type SupportRequest = { requestId: string; subject: string; category: "GENERAL" | "APPLICATION" | "DOCUMENTS" | "FINANCE" | "URGENT_BLOCKER" | "DISPUTE"; priority: "NORMAL" | "HIGH" | "URGENT"; status: "OPEN" | "IN_REVIEW" | "WAITING_FOR_CANDIDATE" | "RESOLVED" | "CLOSED"; description: string; reference?: string; createdAt: string; updatedAt: string; };
+type MessageRecord = { messageId: string; channel: "EMAIL" | "PORTAL" | "WHATSAPP" | "SMS" | "PHONE"; direction: "INBOUND" | "OUTBOUND"; subject: string; body: string; status: "DRAFT" | "RECORDED" | "SENT" | "DELIVERED" | "FAILED"; reference?: string; createdAt: string; };
+
 type Store = {
   schema: string;
   updatedAt: string;
@@ -65,6 +68,8 @@ type Store = {
   tasks: FollowUpTask[];
   contactLog: ContactLogEntry[];
   financeLedger: FinanceLedgerEntry[];
+  supportRequests: SupportRequest[];
+  messageLedger: MessageRecord[];
 };
 
 function repoRoot() {
@@ -92,7 +97,9 @@ function defaultStore(): Store {
     smartExtraction: [],
     tasks: [],
     contactLog: [],
-    financeLedger: []
+    financeLedger: [],
+    supportRequests: [],
+    messageLedger: []
   };
 }
 
@@ -124,7 +131,7 @@ function readStore(): Store {
 
   const collectionKeys = [
     "documents", "opportunities", "applicationPacks", "proofLog",
-    "smartExtraction", "tasks", "contactLog", "financeLedger"
+    "smartExtraction", "tasks", "contactLog", "financeLedger", "supportRequests", "messageLedger"
   ] as const;
   for (const key of collectionKeys) {
     // Missing collections are allowed for older store versions; malformed existing
@@ -149,7 +156,9 @@ function readStore(): Store {
     smartExtraction: parsed.smartExtraction === undefined ? [] : parsed.smartExtraction as any[],
     tasks: parsed.tasks === undefined ? [] : parsed.tasks as FollowUpTask[],
     contactLog: parsed.contactLog === undefined ? [] : parsed.contactLog as ContactLogEntry[],
-    financeLedger: parsed.financeLedger === undefined ? [] : parsed.financeLedger as FinanceLedgerEntry[]
+    financeLedger: parsed.financeLedger === undefined ? [] : parsed.financeLedger as FinanceLedgerEntry[],
+    supportRequests: parsed.supportRequests === undefined ? [] : parsed.supportRequests as SupportRequest[],
+    messageLedger: parsed.messageLedger === undefined ? [] : parsed.messageLedger as MessageRecord[]
   } as Store;
 }
 
@@ -203,7 +212,7 @@ async function loadStoreForContext(context: PortalContext | null): Promise<Store
   if (!context) return readStore();
   const saved = await loadCandidatePortalState(context);
   if (!saved || typeof saved !== "object") return defaultStore();
-  return { ...defaultStore(), ...saved, profile: saved.profile && typeof saved.profile === "object" ? saved.profile as CandidateProfile : {}, documents: Array.isArray(saved.documents) ? saved.documents : [], opportunities: Array.isArray(saved.opportunities) ? saved.opportunities : [], applicationPacks: Array.isArray(saved.applicationPacks) ? saved.applicationPacks : [], proofLog: Array.isArray(saved.proofLog) ? saved.proofLog : [], smartExtraction: Array.isArray(saved.smartExtraction) ? saved.smartExtraction : [], tasks: Array.isArray(saved.tasks) ? saved.tasks as FollowUpTask[] : [], contactLog: Array.isArray(saved.contactLog) ? saved.contactLog as ContactLogEntry[] : [], financeLedger: Array.isArray(saved.financeLedger) ? saved.financeLedger as FinanceLedgerEntry[] : [] };
+  return { ...defaultStore(), ...saved, profile: saved.profile && typeof saved.profile === "object" ? saved.profile as CandidateProfile : {}, documents: Array.isArray(saved.documents) ? saved.documents : [], opportunities: Array.isArray(saved.opportunities) ? saved.opportunities : [], applicationPacks: Array.isArray(saved.applicationPacks) ? saved.applicationPacks : [], proofLog: Array.isArray(saved.proofLog) ? saved.proofLog : [], smartExtraction: Array.isArray(saved.smartExtraction) ? saved.smartExtraction : [], tasks: Array.isArray(saved.tasks) ? saved.tasks as FollowUpTask[] : [], contactLog: Array.isArray(saved.contactLog) ? saved.contactLog as ContactLogEntry[] : [], financeLedger: Array.isArray(saved.financeLedger) ? saved.financeLedger as FinanceLedgerEntry[] : [], supportRequests: Array.isArray(saved.supportRequests) ? saved.supportRequests as SupportRequest[] : [], messageLedger: Array.isArray(saved.messageLedger) ? saved.messageLedger as MessageRecord[] : [] };
 }
 async function persistStore(context: PortalContext | null, store: Store) {
   if (context) { store.updatedAt = new Date().toISOString(); await saveCandidatePortalState(context, store as unknown as Record<string, unknown>); return; }
@@ -956,6 +965,40 @@ export async function POST(request: Request) {
       return privateJson({ status: "CONTACT_LOG_DELETED", store, readiness: scoreReadiness(store) });
     }
 
+    if (action === "createSupportRequest") {
+      const subject = typeof body.subject === "string" ? body.subject.trim() : "";
+      const description = typeof body.description === "string" ? body.description.trim() : "";
+      const category = String(body.category || "GENERAL").toUpperCase();
+      const priority = String(body.priority || "NORMAL").toUpperCase();
+      const reference = typeof body.reference === "string" ? body.reference.trim() : "";
+      if (subject.length < 4 || subject.length > 160) return privateJson({ status: "FAILED", error: "Subject must be between 4 and 160 characters." }, { status: 400 });
+      if (description.length < 10 || description.length > 3000) return privateJson({ status: "FAILED", error: "Describe the issue in 10 to 3,000 characters." }, { status: 400 });
+      if (!["GENERAL", "APPLICATION", "DOCUMENTS", "FINANCE", "URGENT_BLOCKER", "DISPUTE"].includes(category)) return privateJson({ status: "FAILED", error: "Choose a valid support category." }, { status: 400 });
+      if (!["NORMAL", "HIGH", "URGENT"].includes(priority)) return privateJson({ status: "FAILED", error: "Choose a valid support priority." }, { status: 400 });
+      if (reference.length > 180) return privateJson({ status: "FAILED", error: "Reference must be 180 characters or fewer." }, { status: 400 });
+      const now = new Date().toISOString();
+      const requestRecord: SupportRequest = { requestId: "support-" + Date.now() + "-" + Math.random().toString(16).slice(2), subject, description, category: category as SupportRequest["category"], priority: priority as SupportRequest["priority"], status: "OPEN", ...(reference ? { reference } : {}), createdAt: now, updatedAt: now };
+      store.supportRequests = [requestRecord, ...(store.supportRequests || [])];
+      await persistStore(context, store);
+      return privateJson({ status: "SUPPORT_REQUEST_CREATED", request: requestRecord, store, readiness: scoreReadiness(store) });
+    }
+
+    if (action === "recordMessage") {
+      const subject = typeof body.subject === "string" ? body.subject.trim() : "";
+      const messageBody = typeof body.body === "string" ? body.body.trim() : "";
+      const channel = String(body.channel || "PORTAL").toUpperCase();
+      const direction = String(body.direction || "INBOUND").toUpperCase();
+      const reference = typeof body.reference === "string" ? body.reference.trim() : "";
+      if (subject.length < 2 || subject.length > 160) return privateJson({ status: "FAILED", error: "Message subject must be between 2 and 160 characters." }, { status: 400 });
+      if (messageBody.length < 2 || messageBody.length > 4000) return privateJson({ status: "FAILED", error: "Message text must be between 2 and 4,000 characters." }, { status: 400 });
+      if (!["EMAIL", "PORTAL", "WHATSAPP", "SMS", "PHONE"].includes(channel)) return privateJson({ status: "FAILED", error: "Choose a valid message channel." }, { status: 400 });
+      if (!["INBOUND", "OUTBOUND"].includes(direction)) return privateJson({ status: "FAILED", error: "Choose a valid message direction." }, { status: 400 });
+      if (reference.length > 180) return privateJson({ status: "FAILED", error: "Message reference must be 180 characters or fewer." }, { status: 400 });
+      const messageRecord: MessageRecord = { messageId: "message-" + Date.now() + "-" + Math.random().toString(16).slice(2), subject, body: messageBody, channel: channel as MessageRecord["channel"], direction: direction as MessageRecord["direction"], status: "RECORDED", ...(reference ? { reference } : {}), createdAt: new Date().toISOString() };
+      store.messageLedger = [messageRecord, ...(store.messageLedger || [])];
+      await persistStore(context, store);
+      return privateJson({ status: "MESSAGE_RECORDED", message: messageRecord, store, readiness: scoreReadiness(store) });
+    }
     if (action === "addTask") {
       const title = typeof body.title === "string" ? body.title.trim() : "";
       const dueDate = typeof body.dueDate === "string" ? body.dueDate.trim() : "";
