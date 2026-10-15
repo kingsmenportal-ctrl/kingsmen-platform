@@ -168,3 +168,20 @@ test("development GET returns a controlled 503 when local candidate storage cann
   const getRoute = route.slice(getStart, getEnd);
   assert.match(getRoute, /try \{[\s\S]*?const store = readStore\(\);[\s\S]*?catch \{\s*return privateJson\(\{ status: "STORAGE_UNAVAILABLE", error: "Candidate workspace could not be loaded\." \}, \{ status: 503 \}\);/);
 });
+
+test("deleteOpportunity requires an existing non-empty ID before mutating linked records", () => {
+  const start = route.indexOf('if (action === "deleteOpportunity")');
+  const end = route.indexOf('return privateJson({\n      status: "FAILED",\n      error: "Unknown action."', start);
+  const block = route.slice(start, end);
+  assert.match(block, /if \(!opportunityId \|\| opportunityId\.length > 180\)/);
+  assert.match(block, /if \(!store\.opportunities\.some\(\(item\) => item\.opportunityId === opportunityId\)\)/);
+  assert.ok(block.indexOf("Opportunity not found.") < block.indexOf("store.applicationPacks ="));
+});
+
+test("document deletion converts private storage network failures to controlled 503 responses", () => {
+  const start = route.indexOf('if (action === "deleteDocument")');
+  const end = route.indexOf('if (action === "deleteOpportunity")', start);
+  const block = route.slice(start, end);
+  assert.match(block, /let response: Response;\s*try \{[\s\S]*?response = await fetch\(endpoint,[\s\S]*?catch \{\s*return privateJson\(\{ status: "STORAGE_FAILED"/);
+  assert.match(block, /The document record was kept\./);
+});
