@@ -926,6 +926,8 @@ export async function POST(request: Request) {
       store.opportunities = store.opportunities.filter((item) => item.opportunityId !== opportunityId);
       store.applicationPacks = store.applicationPacks.filter((item) => item.opportunityId !== opportunityId);
       store.proofLog = store.proofLog.filter((item) => item.opportunityId !== opportunityId);
+      store.tasks = store.tasks.map((item) => item.opportunityId === opportunityId ? { ...item, opportunityId: undefined, updatedAt: new Date().toISOString() } : item);
+      store.contactLog = store.contactLog.map((item) => item.opportunityId === opportunityId ? { ...item, opportunityId: undefined } : item);
       await persistStore(context, store);
 
       return privateJson({
