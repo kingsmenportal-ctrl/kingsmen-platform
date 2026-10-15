@@ -27,3 +27,31 @@ test("founder dashboard only reads health shell and does not invoke command muta
   assert.match(health, /productionReady: false/);
   assert.match(health, /serviceRoleVisibleToBrowser: false/);
 });
+
+const founderAuth = fs.readFileSync(path.join(root, "src/lib/founder-auth.ts"), "utf8");
+const founderReadiness = fs.readFileSync(path.join(root, "src/app/api/founder/backend-readiness/route.ts"), "utf8");
+const founderDigest = fs.readFileSync(path.join(root, "src/app/api/founder/digest/route.ts"), "utf8");
+const founderExecute = fs.readFileSync(path.join(root, "src/app/api/founder/commands/execute/route.ts"), "utf8");
+
+test("founder APIs fail closed unless Supabase trusted role metadata or server allowlist grants access", () => {
+  assert.match(founderAuth, /getCandidateAuthUser\(\)/);
+  assert.match(founderAuth, /user\.app_metadata/);
+  assert.match(founderAuth, /KINGSMEN_FOUNDER_EMAILS/);
+  assert.match(founderAuth, /status: 401/);
+  assert.match(founderAuth, /status: 403/);
+  assert.match(founderAuth, /status: 503/);
+  assert.doesNotMatch(founderAuth, /user_metadata\?\.role|headers\.get\(["']x-founder/i);
+  for (const route of [founderReadiness, founderDigest, founderExecute]) {
+    assert.match(route, /requireFounderAccess\(\)/);
+    assert.match(route, /founderAccessDenied\(access\)/);
+    assert.match(route, /founderPrivateJson/);
+  }
+});
+
+test("founder command endpoint is bounded and never claims a command was executed", () => {
+  assert.match(founderExecute, /MAX_BODY_BYTES = 16 \* 1024/);
+  assert.match(founderExecute, /Buffer\.byteLength\(raw, "utf8"\)/);
+  assert.match(founderExecute, /executed: false/);
+  assert.match(founderExecute, /No command was dispatched/);
+  assert.match(founderExecute, /Orchestrator integration and durable audit persistence are not implemented/);
+});
