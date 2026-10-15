@@ -189,6 +189,7 @@ export async function POST(request: Request) {
   }
   if (!validDateOnly(values.followUpDate)) return privateJson({ status: "FAILED", error: "followUpDate must be a valid YYYY-MM-DD date." }, { status: 400 });
   if (!validTimestamp(values.submittedAt)) return privateJson({ status: "FAILED", error: "submittedAt must be a valid timestamp." }, { status: 400 });
+  if (!validTimestamp(values.interviewAt)) return privateJson({ status: "FAILED", error: "interviewAt must be a valid timestamp." }, { status: 400 });
 
   record.review = {
     reviewStatus,
