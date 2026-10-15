@@ -34,7 +34,10 @@ on:
       - "apps/web/src/lib/candidate-portal-storage.ts"
       - "apps/web/src/lib/supabase-auth.ts"
       - "apps/web/src/lib/founder-auth.ts"
+      - "apps/web/src/app/candidate/dashboard/page.tsx"
+      - "apps/web/src/app/candidate/readiness/page.tsx"
       - "apps/web/test/candidate-storage-security.test.cjs"
+      - "apps/web/test/candidate-readiness.test.cjs"
       - "apps/web/test/founder-control-plane.test.cjs"
       - ".github/workflows/kingsmen-candidate-storage.yml"
 
