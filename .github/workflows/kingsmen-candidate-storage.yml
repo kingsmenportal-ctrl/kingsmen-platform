@@ -4,27 +4,31 @@ on:
   pull_request:
     paths:
       - "apps/web/src/app/founder/**"
+      - "apps/web/src/app/api/founder/**"
       - "apps/web/src/app/api/personal-jobs/**"
       - "apps/web/src/app/api/auth/**"
       - "apps/web/src/lib/candidate-portal-storage.ts"
       - "apps/web/src/lib/supabase-auth.ts"
+      - "apps/web/src/lib/founder-auth.ts"
       - "apps/web/src/app/candidate/dashboard/page.tsx"
       - "apps/web/src/app/candidate/profile/page.tsx"
       - "apps/web/src/app/candidate/documents/page.tsx"
       - "apps/web/src/app/candidate/workbench/page.tsx"
       - "apps/web/src/app/candidate/finance/page.tsx"
       - "apps/web/test/candidate-storage-security.test.cjs"
-      - "apps/web/test/founder-control-plane.test.cjs"\n      - "apps/web/test/founder-control-plane.test.cjs"
+      - "apps/web/test/founder-control-plane.test.cjs"
       - ".github/workflows/kingsmen-candidate-storage.yml"
   push:
     branches:
       - "fix/kingsmen-ci-real-validation-gates"
     paths:
       - "apps/web/src/app/founder/**"
+      - "apps/web/src/app/api/founder/**"
       - "apps/web/src/app/api/personal-jobs/**"
       - "apps/web/src/app/api/auth/**"
       - "apps/web/src/lib/candidate-portal-storage.ts"
       - "apps/web/src/lib/supabase-auth.ts"
+      - "apps/web/src/lib/founder-auth.ts"
       - "apps/web/test/candidate-storage-security.test.cjs"
       - "apps/web/test/founder-control-plane.test.cjs"
       - ".github/workflows/kingsmen-candidate-storage.yml"
@@ -48,5 +52,5 @@ jobs:
         uses: actions/setup-node@v4
         with:
           node-version: 22
-      - name: Run candidate storage regression tests
+      - name: Run candidate and founder security regressions
         run: node --test apps/web/test/candidate-storage-security.test.cjs apps/web/test/founder-control-plane.test.cjs
