@@ -220,7 +220,7 @@ function authorizeApiRequest(request: IncomingMessage, response: ServerResponse)
   }
 
   const authorization = request.headers.authorization ?? "";
-  const match = authorization.match(/^Bearer ([^\\s]+)$/);
+  const match = authorization.match(/^Bearer (\\S+)$/);
   const supplied = match?.[1] ?? "";
   const expectedBytes = Buffer.from(configuredToken, "utf8");
   const suppliedBytes = Buffer.from(supplied, "utf8");
