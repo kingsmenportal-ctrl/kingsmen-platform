@@ -106,7 +106,7 @@ export default function DashboardPage() {
   const dueTasks = [...openTasks].sort((a, b) => (a.dueDate || "9999-12-31").localeCompare(b.dueDate || "9999-12-31")).slice(0, 5);
   const proofLog = data?.proofLog ?? [];
   const outstanding = useMemo(
-    () => opportunities.filter((item) => !["APPLIED_PROOF_CAPTURED", "CLOSED", "WITHDRAWN"].includes(item.status || "")),
+    () => opportunities.filter((item) => !["APPLIED_PROOF_CAPTURED", "CLOSED", "WITHDRAWN", "REJECTED", "OFFER"].includes(item.status || "")),
     [opportunities]
   );
   const recentOpportunities = useMemo(
