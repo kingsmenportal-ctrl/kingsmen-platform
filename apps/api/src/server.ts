@@ -1,5 +1,6 @@
 import { createServer, type IncomingMessage, type ServerResponse } from "node:http";
 import { URL } from "node:url";
+import { timingSafeEqual } from "node:crypto";
 
 import {
   assertCommandEnvelope,
@@ -196,6 +197,42 @@ function sendError(response: ServerResponse, statusCode: number, code: string, m
     correlationId: correlationId ?? null,
     generatedAtIso: nowIso()
   }, correlationId);
+}
+
+function authorizeApiRequest(request: IncomingMessage, response: ServerResponse): boolean {
+  const runtimeEnvironment = (process.env.NODE_ENV ?? "development").toLowerCase();
+  const productionLike = runtimeEnvironment === "production" || runtimeEnvironment === "staging";
+  const configuredToken = process.env.KINGSMEN_API_AUTH_TOKEN ?? "";
+
+  // Local development stays credential-free unless a token is explicitly configured.
+  // Staging/production fail closed if the shared service-to-service token is absent or weak.
+  if (!configuredToken) {
+    if (productionLike) {
+      sendError(response, 503, "API_AUTH_NOT_CONFIGURED", "API authentication is not configured for this environment.");
+      return false;
+    }
+    return true;
+  }
+
+  if (configuredToken.length < 32) {
+    sendError(response, 503, "API_AUTH_MISCONFIGURED", "API authentication configuration is invalid.");
+    return false;
+  }
+
+  const authorization = request.headers.authorization ?? "";
+  const match = authorization.match(/^Bearer ([^\\s]+)$/);
+  const supplied = match?.[1] ?? "";
+  const expectedBytes = Buffer.from(configuredToken, "utf8");
+  const suppliedBytes = Buffer.from(supplied, "utf8");
+  const matches = suppliedBytes.length === expectedBytes.length && timingSafeEqual(suppliedBytes, expectedBytes);
+
+  if (!matches) {
+    response.setHeader("www-authenticate", "Bearer");
+    sendError(response, 401, "UNAUTHORIZED", "A valid bearer token is required.");
+    return false;
+  }
+
+  return true;
 }
 
 function readBody(request: IncomingMessage): Promise<string> {
@@ -529,6 +566,10 @@ export function createKingsmenApiServer() {
         await handleReadiness(response);
         return;
       }
+
+      // Health endpoints stay public for load balancers; all application/read-model routes
+      // require service authentication in staging/production.
+      if (!authorizeApiRequest(request, response)) return;
 
       if (method === "POST" && pathname === "/api/jarvis/runtime-control") {
         await handleJarvisRuntimeControl(request, response);
