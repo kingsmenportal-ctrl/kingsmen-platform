@@ -3,15 +3,15 @@
 import { useCallback, useEffect, useState } from "react";
 
 type Profile = { fullName?: string; email?: string; phone?: string; location?: string; highestEducation?: string; skills?: string; workExperience?: string };
-type DocumentRecord = { documentId?: string; type?: string; fileName?: string; status?: string };
-type Opportunity = { opportunityId?: string; title?: string; organisation?: string; status?: string; sourceUrl?: string };
+type DocumentRecord = { documentId?: string; type?: string; fileName?: string; status?: string; registryStatus?: string; createdAt?: string };
+type Opportunity = { opportunityId?: string; title?: string; organisation?: string; status?: string; sourceUrl?: string; closingDate?: string; updatedAt?: string };
 type Task = { taskId?: string; title?: string; dueDate?: string; status?: string; priority?: string };
 type Workspace = {
   profile?: Profile;
   documents?: DocumentRecord[];
   opportunities?: Opportunity[];
-  applicationPacks?: unknown[];
-  proofLog?: unknown[];
+  applicationPacks?: Array<{ packId?: string; opportunityId?: string; createdAt?: string; title?: string }>;
+  proofLog?: Array<{ opportunityId?: string; recordType?: string; verificationStatus?: string; createdAt?: string }>;
   tasks?: Task[];
   supportRequests?: Array<{ status?: string; priority?: string }>;
   financeLedger?: Array<{ status?: string; type?: string; amountCents?: number }>;
@@ -28,20 +28,28 @@ function checklist(data: Workspace): Check[] {
   const tasks = Array.isArray(data.tasks) ? data.tasks : [];
   const openTasks = tasks.filter((task) => task.status !== "DONE");
   const openSupport = (data.supportRequests || []).filter((request) => !["RESOLVED", "CLOSED"].includes(String(request.status)));
-  const profileReady = Boolean(profile.fullName?.trim() && profile.email?.trim() && profile.phone?.trim());
+  const profileReady = Boolean(profile.fullName?.trim() && /^[^\\s@]+@[^\\s@]+\\.[^\\s@]+$/.test(profile.email?.trim() || "") && profile.phone?.trim());
   const hasCv = documents.some((document) => String(document.type || "").toUpperCase() === "CV");
-  const sourcedOpportunities = opportunities.filter((item) => typeof item.sourceUrl === "string" && /^https?:\/\//i.test(item.sourceUrl));
-  const submittedStage = opportunities.filter((item) => ["APPLIED", "SUBMITTED", "APPLICATION_SUBMITTED"].includes(String(item.status || "").toUpperCase()));
+  const hasId = documents.some((document) => ["ID", "ID_DOCUMENT"].includes(String(document.type || "").toUpperCase()));
+  const sourcedOpportunities = opportunities.filter((item) => { if (typeof item.sourceUrl !== "string") return false; try { const url = new URL(item.sourceUrl); return ["http:", "https:"].includes(url.protocol) && !url.username && !url.password; } catch { return false; } });
+  const submittedStage = opportunities.filter((item) => ["SUBMITTED_REPORTED", "APPLIED", "SUBMITTED", "APPLICATION_SUBMITTED"].includes(String(item.status || "").toUpperCase()));
+  const packsByOpportunity = new Set(packs.map((pack) => pack.opportunityId).filter((id): id is string => typeof id === "string"));
+  const opportunitiesWithoutPacks = sourcedOpportunities.filter((item) => item.opportunityId && !packsByOpportunity.has(item.opportunityId));
+  const today = new Date(); today.setHours(0, 0, 0, 0);
+  const closingSoon = sourcedOpportunities.filter((item) => { if (!item.closingDate) return false; const date = new Date(item.closingDate); if (Number.isNaN(date.getTime())) return false; date.setHours(0, 0, 0, 0); const days = (date.getTime() - today.getTime()) / 86400000; return days >= 0 && days <= 7; });
+  const pastClosing = sourcedOpportunities.filter((item) => { if (!item.closingDate) return false; const date = new Date(item.closingDate); if (Number.isNaN(date.getTime())) return false; date.setHours(0, 0, 0, 0); return date < today; });
   return [
     { title: "Core candidate profile", detail: profileReady ? "Name, email and phone are present." : "Add your name, valid email and phone number before preparing packs.", state: profileReady ? "READY" : "ACTION", href: "/candidate/profile", action: profileReady ? "Review profile" : "Complete profile" },
     { title: "CV in document vault", detail: hasCv ? "A document is labelled CV. File content and truthfulness are not independently verified." : "Upload your current CV in PDF, DOCX or TXT format.", state: hasCv ? "READY" : "ACTION", href: "/candidate/documents", action: hasCv ? "Review documents" : "Add CV" },
+    { title: "Identity document availability", detail: hasId ? "An identity document is listed. Its authenticity and validity are not verified by this checklist." : "If the opportunity requires identity proof, upload the appropriate document to your private vault before applying.", state: hasId ? "READY" : "ACTION", href: "/candidate/documents", action: hasId ? "Review vault" : "Review required documents" },
     { title: "Source-backed opportunities", detail: sourcedOpportunities.length ? `${sourcedOpportunities.length} saved opportunity(ies) include an HTTP(S) source link.` : "Save opportunities with an official source link and check closing dates yourself.", state: sourcedOpportunities.length ? "READY" : "ACTION", href: "/personal-job-desk/opportunity-scout", action: "Find opportunities" },
-    { title: "Application preparation packs", detail: packs.length ? `${packs.length} pack(s) are available to review and download.` : "Generate a pack for an opportunity; review every detail before using it.", state: packs.length ? "READY" : "ACTION", href: "/candidate/workbench", action: "Prepare a pack" },
+    { title: "Application preparation packs", detail: !packs.length ? "Generate a pack for an opportunity; review every detail before using it." : opportunitiesWithoutPacks.length ? `${packs.length} pack(s) saved; ${opportunitiesWithoutPacks.length} sourced opportunity(ies) still have no pack.` : `${packs.length} pack(s) saved for your current sourced opportunities.`, state: !packs.length || opportunitiesWithoutPacks.length ? "ACTION" : "READY", href: "/candidate/workbench", action: opportunitiesWithoutPacks.length ? "Prepare missing packs" : "Review packs" },
+    { title: "Closing-date triage", detail: closingSoon.length || pastClosing.length ? `${closingSoon.length} opportunity(ies) close within 7 days; ${pastClosing.length} have a past closing date. Verify each deadline on the official source before acting.` : "No saved closing dates indicate a deadline within 7 days or already past. Missing or inaccurate dates are still possible.", state: closingSoon.length || pastClosing.length ? "REVIEW" : "READY", href: "/candidate/workbench", action: "Review deadlines" },
     { title: "Submission evidence", detail: proofs.length ? `${proofs.length} candidate-recorded proof record(s) exist; they are not independently verified.` : "After you actually submit through the official channel, record truthful evidence.", state: proofs.length ? "REVIEW" : "ACTION", href: "/candidate/workbench", action: proofs.length ? "Review evidence" : "Open workbench" },
     { title: "Follow-up discipline", detail: openTasks.length ? `${openTasks.length} follow-up task(s) remain open.` : "No open follow-up tasks are recorded.", state: openTasks.length ? "ACTION" : "READY", href: "/candidate/workbench", action: openTasks.length ? "Work open tasks" : "Manage follow-ups" },
     { title: "Support blockers", detail: openSupport.length ? `${openSupport.length} support request(s) are still open; check their current status.` : "No unresolved support requests are recorded.", state: openSupport.length ? "REVIEW" : "READY", href: "/candidate/support", action: openSupport.length ? "Review support" : "Open support centre" },
     { title: "Finance records", detail: (data.financeLedger || []).length ? "Finance entries exist. Check recorded statuses and evidence; this is not payment confirmation." : "No finance entries are recorded. Do not treat this as a balance or payment confirmation.", state: "REVIEW", href: "/candidate/finance", action: "Review finance" },
-    { title: "Application-stage accuracy", detail: submittedStage.length ? `${submittedStage.length} opportunity(ies) are marked submitted/applied. Confirm you have real submission proof.` : "Do not mark an application submitted until you have actually submitted it.", state: submittedStage.length ? "REVIEW" : "READY", href: "/candidate/workbench", action: "Check application stages" },
+    { title: "Application-stage accuracy", detail: submittedStage.length ? `${submittedStage.length} opportunity(ies) are marked submitted/reported. Check each matching evidence record; candidate-reported evidence is not independently verified.` : "Do not mark an application submitted until you have actually submitted it.", state: submittedStage.length ? "REVIEW" : "READY", href: "/candidate/workbench", action: "Check application stages" },
   ];
 }
 
