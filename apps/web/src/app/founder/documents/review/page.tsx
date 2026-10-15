@@ -6,6 +6,8 @@ type Status = "verified" | "rejected" | "needs_more_info" | "fraud_review";
 type ReviewResult = {
   ok?: boolean;
   persisted?: boolean;
+  ownershipVerified?: boolean;
+  evidenceResolved?: boolean;
   statusChanged?: boolean;
   boundary?: string;
   error?: string;
@@ -14,10 +16,10 @@ type ReviewResult = {
   persistenceUnknown?: boolean;
 };
 const fields: Array<{ key: "documentId" | "candidateId" | "proofId" | "evidenceId" | "auditId"; label: string; help: string }> = [
-  { key: "documentId", label: "Document reference", help: "Internal document reference only; not a public file URL. Ownership is not yet independently checked." },
-  { key: "candidateId", label: "Candidate reference", help: "Internal candidate reference; the document-to-candidate relationship remains unverified." },
-  { key: "proofId", label: "Proof record reference", help: "A real immutable proof reference is required; the service does not yet resolve it." },
-  { key: "evidenceId", label: "Evidence reference", help: "Evidence must support the decision; the service records the reference but does not validate its contents." },
+  { key: "documentId", label: "Document reference", help: "Must match an active document reference in the canonical document registry; never enter a public file URL." },
+  { key: "candidateId", label: "Candidate reference", help: "Must be the candidate UUID linked to this document in the canonical registry." },
+  { key: "proofId", label: "Proof record reference", help: "Must match a verification record linked to this document. A Verified decision requires PASSED status." },
+  { key: "evidenceId", label: "Evidence reference", help: "Must match an evidence reference on this document, its verification record, or a successful storage event." },
   { key: "auditId", label: "Audit reference", help: "A unique audit reference used for the transactional audit event." },
 ];
 export default function FounderDocumentReviewPage() {
@@ -44,8 +46,8 @@ export default function FounderDocumentReviewPage() {
   const panel = { border: "1px solid #dbe3ec", borderRadius: 14, padding: 18, background: "#fff" };
   return <main style={{ maxWidth: 920, margin: "0 auto", padding: "30px 20px 60px", color: "#172033" }}>
     <a href="/founder/control-plane" style={{ color: "#1d5675", fontWeight: 800, textDecoration: "none" }}>← Founder control plane</a>
-    <header style={{ margin: "22px 0" }}><p style={{ color: "#53657a", fontSize: 12, fontWeight: 800, letterSpacing: 1.5 }}>DOCUMENT GOVERNANCE · N05</p><h1 style={{ fontSize: "clamp(28px, 5vw, 40px)", margin: "8px 0" }}>Document review</h1><p style={{ color: "#53657a", lineHeight: 1.7 }}>Record a founder review decision with a transactional audit event. This records a decision and references only; it does not fetch files, independently verify evidence, or change the source document status.</p></header>
-    <div role="note" style={{ ...panel, borderColor: "#f5d08a", background: "#fffbeb", marginBottom: 16 }}><strong>Authority boundary:</strong> only authenticated founder accounts can access this API. The source document remains unchanged. Ownership, proof and evidence references must still be independently verified before a decision can be treated as operationally authoritative.</div>
+    <header style={{ margin: "22px 0" }}><p style={{ color: "#53657a", fontSize: 12, fontWeight: 800, letterSpacing: 1.5 }}>DOCUMENT GOVERNANCE · N05</p><h1 style={{ fontSize: "clamp(28px, 5vw, 40px)", margin: "8px 0" }}>Document review</h1><p style={{ color: "#53657a", lineHeight: 1.7 }}>Record a founder review decision with a transactional audit event. The service checks the document/candidate match and resolves proof/evidence references against canonical database records; it does not judge evidence truth or change source-document status.</p></header>
+    <div role="note" style={{ ...panel, borderColor: "#f5d08a", background: "#fffbeb", marginBottom: 16 }}><strong>Authority boundary:</strong> only authenticated founder accounts can access this API. The service requires an active canonical document record, a matching candidate, a linked verification record, and a linked evidence record. Record existence is not proof that the evidence is truthful; the source document status remains unchanged.</div>
     {error && <p role="alert" style={{ color: "#991b1b", background: "#fef2f2", padding: 12, borderRadius: 8 }}>{error}</p>}
     <form onSubmit={submit} style={{ ...panel, display: "grid", gap: 16 }}>
       {fields.map((field) => <label key={field.key} style={{ display: "grid", gap: 6, fontWeight: 800, fontSize: 14 }}>{field.label}<input required minLength={3} maxLength={180} value={values[field.key]} onChange={(e) => setValues((old) => ({ ...old, [field.key]: e.target.value }))} style={input} autoComplete="off" /><span style={{ fontWeight: 400, color: "#64748b", fontSize: 12 }}>{field.help}</span></label>)}
@@ -53,6 +55,6 @@ export default function FounderDocumentReviewPage() {
       <label style={{ display: "grid", gap: 6, fontWeight: 800, fontSize: 14 }}>Review notes<textarea rows={4} maxLength={1200} value={values.safeNotes} onChange={(e) => setValues((old) => ({ ...old, safeNotes: e.target.value }))} style={input} placeholder="Record objective observations; avoid unnecessary personal information."/><span style={{ color: "#64748b", fontSize: 12, fontWeight: 400 }}>{values.safeNotes.length}/1200 characters. Never include passwords, access tokens or unnecessary identity data.</span></label>
       <button disabled={busy} type="submit" style={{ justifySelf: "start", border: 0, borderRadius: 9, padding: "12px 16px", background: "#173e57", color: "#fff", fontWeight: 800, cursor: busy ? "wait" : "pointer" }}>{busy ? "Recording decision…" : "Record review decision"}</button>
     </form>
-    {result?.decision && <section aria-live="polite" style={{ ...panel, marginTop: 18, borderColor: "#b7d8c8" }}><p style={{ color: "#176345", fontWeight: 850, marginTop: 0 }}>Review decision recorded</p><h2 style={{ fontSize: 20 }}>Audit summary</h2><dl style={{ display: "grid", gridTemplateColumns: "minmax(120px, .6fr) 1fr", gap: 10, fontSize: 14 }}>{Object.entries({ "Decision reference": result.decision.decisionRef, "Document": result.decision.documentRef, "Candidate": result.decision.candidateRef, "Decision": result.decision.reviewStatus, "Audit reference": result.decision.auditRef, "Reviewer user ID": result.decision.reviewerUserId, "Persistence": result.persisted ? "Saved transactionally" : "Not confirmed", "Source status changed": result.statusChanged ? "Yes" : "No" }).map(([label, value]) => <div key={label} style={{ display: "contents" }}><dt style={{ color: "#64748b" }}>{label}</dt><dd style={{ margin: 0, overflowWrap: "anywhere", fontWeight: 700 }}>{String(value ?? "—")}</dd></div>)}</dl><h3>Remaining requirements</h3><ul style={{ color: "#53657a", lineHeight: 1.7 }}>{(result.remainingRequirements || []).map((item) => <li key={item}>{item}</li>)}</ul><p style={{ color: "#53657a", fontSize: 13 }}>{result.boundary}</p></section>}
+    {result?.decision && <section aria-live="polite" style={{ ...panel, marginTop: 18, borderColor: "#b7d8c8" }}><p style={{ color: "#176345", fontWeight: 850, marginTop: 0 }}>Review decision recorded</p><h2 style={{ fontSize: 20 }}>Audit summary</h2><dl style={{ display: "grid", gridTemplateColumns: "minmax(120px, .6fr) 1fr", gap: 10, fontSize: 14 }}>{Object.entries({ "Decision reference": result.decision.decisionRef, "Document": result.decision.documentRef, "Candidate": result.decision.candidateRef, "Decision": result.decision.reviewStatus, "Audit reference": result.decision.auditRef, "Reviewer user ID": result.decision.reviewerUserId, "Persistence": result.persisted ? "Saved transactionally" : "Not confirmed", "Ownership match": result.decision.ownershipVerified ? "Canonical match confirmed" : "Not confirmed", "Evidence reference": result.decision.evidenceResolved ? "Linked record found" : "Not resolved", "Source status changed": result.statusChanged ? "Yes" : "No" }).map(([label, value]) => <div key={label} style={{ display: "contents" }}><dt style={{ color: "#64748b" }}>{label}</dt><dd style={{ margin: 0, overflowWrap: "anywhere", fontWeight: 700 }}>{String(value ?? "—")}</dd></div>)}</dl><h3>Remaining requirements</h3><ul style={{ color: "#53657a", lineHeight: 1.7 }}>{(result.remainingRequirements || []).map((item) => <li key={item}>{item}</li>)}</ul><p style={{ color: "#53657a", fontSize: 13 }}>{result.boundary}</p></section>}
   </main>;
 }
