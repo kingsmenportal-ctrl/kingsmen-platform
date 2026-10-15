@@ -231,3 +231,18 @@ test("candidate document vault uses bounded supported uploads and private docume
   assert.match(page, /credentials: "same-origin"/);
   assert.match(page, /cache: "no-store"/);
 });
+
+
+test("candidate workbench connects opportunity stages, pack generation, proof and follow-up tasks to the workspace API", () => {
+  const page = fs.readFileSync(path.resolve(__dirname, "../src/app/candidate/workbench/page.tsx"), "utf8");
+  for (const action of ["updateOpportunityStatus", "generatePack", "markApplied", "addTask", "updateTask", "deleteTask", "addContactLog", "deleteContactLog"]) {
+    assert.match(page, new RegExp('mutate\\("' + action + '"'));
+  }
+  assert.match(page, /fetch\("\/api\/personal-jobs\/apply-now"/);
+  assert.match(page, /cache: "no-store"/);
+  assert.match(page, /credentials: "same-origin"/);
+  assert.match(page, /Evidence notes are candidate-recorded and are not independently verified/);
+  assert.match(page, /Application pack library/);
+  assert.match(page, /Follow-up tasks/);
+  assert.match(page, /Contact history/);
+});
