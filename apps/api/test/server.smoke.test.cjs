@@ -1,12 +1,12 @@
 const { after, before, test } = require("node:test");
 const assert = require("node:assert/strict");
+process.env.KINGSMEN_TRUTH_VAULT_MODE = "memory";
 const { createKingsmenApiServer } = require("../dist/server");
 
 let server;
 let baseUrl;
 
 before(async () => {
-  process.env.KINGSMEN_TRUTH_VAULT_MODE = "memory";
   server = createKingsmenApiServer();
   await new Promise((resolve, reject) => {
     server.once("error", reject);
@@ -45,7 +45,7 @@ test("unknown routes return a structured 404", async () => {
   const body = await response.json();
   assert.equal(response.status, 404);
   assert.equal(body.ok, false);
-  assert.equal(body.error?.code, "ROUTE_NOT_FOUND");
+  assert.equal(body.code, "ROUTE_NOT_FOUND");
 });
 
 test("oversized request bodies are rejected before command processing", async () => {
@@ -57,5 +57,5 @@ test("oversized request bodies are rejected before command processing", async ()
   const body = await response.json();
   assert.equal(response.status, 413);
   assert.equal(body.ok, false);
-  assert.equal(body.error?.code, "KINGSMEN_API_ERROR");
+  assert.equal(body.code, "KINGSMEN_API_ERROR");
 });
