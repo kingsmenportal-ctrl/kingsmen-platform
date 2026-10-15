@@ -58,6 +58,7 @@ function assertCandidateIdentity(context: PortalContext) {
 }
 
 const MAX_CANDIDATE_STATE_BYTES = 2 * 1024 * 1024;
+const MAX_CANDIDATE_DOCUMENT_BYTES = 15 * 1024 * 1024;
 
 export async function loadCandidatePortalState(context: PortalContext): Promise<Record<string, unknown> | null> {
   assertCandidateIdentity(context);
@@ -68,7 +69,13 @@ export async function loadCandidatePortalState(context: PortalContext): Promise<
   });
   const response = await portalFetch(context, `/rest/v1/candidate_portal_state?${query.toString()}`);
   if (!response.ok) throw new Error("Candidate storage could not be read.");
-  const rows = await response.json() as unknown;
+  const declaredLength = Number(response.headers.get("content-length") || 0);
+  if (declaredLength > MAX_CANDIDATE_STATE_BYTES) throw new Error("Candidate storage response exceeds the storage limit.");
+  const raw = await response.text();
+  if (Buffer.byteLength(raw, "utf8") > MAX_CANDIDATE_STATE_BYTES) throw new Error("Candidate storage response exceeds the storage limit.");
+  let rows: unknown;
+  try { rows = JSON.parse(raw) as unknown; }
+  catch { throw new Error("Candidate storage returned invalid JSON."); }
   if (!Array.isArray(rows)) throw new Error("Candidate storage returned an invalid response.");
   const state = (rows[0] as { state?: unknown } | undefined)?.state;
   if (state == null) return null;
@@ -79,7 +86,9 @@ export async function loadCandidatePortalState(context: PortalContext): Promise<
 export async function saveCandidatePortalState(context: PortalContext, state: Record<string, unknown>): Promise<void> {
   assertCandidateIdentity(context);
   if (!state || typeof state !== "object" || Array.isArray(state)) throw new Error("Candidate state must be an object.");
-  const body = JSON.stringify({ auth_user_id: context.userId, state });
+  let body: string;
+  try { body = JSON.stringify({ auth_user_id: context.userId, state }); }
+  catch { throw new Error("Candidate state could not be serialized."); }
   if (Buffer.byteLength(body, "utf8") > MAX_CANDIDATE_STATE_BYTES) throw new Error("Candidate state exceeds the storage limit.");
   const response = await portalFetch(context, "/rest/v1/candidate_portal_state?on_conflict=auth_user_id", {
     method: "POST",
@@ -104,6 +113,9 @@ export async function uploadCandidatePortalDocument(
     throw new Error("Document type does not match an allowed private-storage type.");
   }
   assertCandidateIdentity(context);
+  if (!Buffer.isBuffer(bytes) || bytes.length === 0 || bytes.length > MAX_CANDIDATE_DOCUMENT_BYTES) {
+    throw new Error("Document must be non-empty and no larger than 15 MiB.");
+  }
   const storagePath = `${context.userId}/${objectKey}`;
   const response = await fetch(
     new URL(`/storage/v1/object/candidate-documents/${storagePath.split("/").map(encodeURIComponent).join("/")}`, context.url),
