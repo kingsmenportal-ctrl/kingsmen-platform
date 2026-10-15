@@ -23,12 +23,21 @@ export async function GET(_request: Request, context: { params: Promise<{ docume
   if (!/^doc-[0-9]{10,}-[a-f0-9]+$/i.test(documentId)) return errorResponse("Document not found.", 404);
 
   const resolved = await getPortalContext();
-  if (resolved.status !== "ready") {
+  const localDevelopment = resolved.status === "not_configured" && process.env.NODE_ENV !== "production";
+  if (resolved.status !== "ready" && !localDevelopment) {
     return errorResponse(resolved.status === "unauthenticated" ? "Sign in to access this document." : "Private document storage is not configured.", resolved.status === "unauthenticated" ? 401 : 503);
   }
 
   try {
-    const store = await loadCandidatePortalState(resolved.context);
+    let store: Record<string, unknown> | null = null;
+    if (resolved.status === "ready") {
+      store = await loadCandidatePortalState(resolved.context);
+    } else {
+      const root = process.cwd().replace(/\\\\/g, "/").endsWith("/apps/web") ? path.resolve(process.cwd(), "../..") : process.cwd();
+      const localStorePath = path.resolve(root, "data", "personal-job-desk", "apply-now.local.json");
+      const parsed = JSON.parse(await fs.readFile(localStorePath, "utf8").then((value) => value.replace(/^\\uFEFF/, "")));
+      store = parsed && typeof parsed === "object" ? parsed as Record<string, unknown> : null;
+    }
     const documents = Array.isArray(store?.documents) ? store.documents as Array<Record<string, unknown>> : [];
     const document = documents.find((item) => item.documentId === documentId);
     if (!document) return errorResponse("Document not found.", 404);
@@ -45,7 +54,7 @@ export async function GET(_request: Request, context: { params: Promise<{ docume
     if (!allowedMime.has(mimeType)) return errorResponse("Document metadata is invalid.", 500);
 
     let bytes: ArrayBuffer | Uint8Array;
-    if (typeof document.storagePath === "string") {
+    if (resolved.status === "ready" && typeof document.storagePath === "string") {
       const prefix = `${resolved.context.userId}/`;
       const storagePath = document.storagePath;
       const objectName = storagePath.startsWith(prefix) ? storagePath.slice(prefix.length) : "";
@@ -67,7 +76,7 @@ export async function GET(_request: Request, context: { params: Promise<{ docume
       if (!response.ok) return errorResponse("Private document could not be retrieved.", response.status === 404 ? 404 : 503);
       bytes = await response.arrayBuffer();
     } else {
-      if (process.env.NODE_ENV === "production") return errorResponse("Private document storage reference is missing.", 503);
+      if (process.env.NODE_ENV === "production" || resolved.status !== "not_configured") return errorResponse("Private document storage reference is missing.", 503);
       const root = process.cwd().replace(/\\/g, "/").endsWith("/apps/web") ? path.resolve(process.cwd(), "../..") : process.cwd();
       const storedName = safeFileName(document.storedName);
       const filePath = path.resolve(root, "data", "personal-job-desk", "uploads", storedName);
