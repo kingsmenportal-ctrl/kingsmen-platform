@@ -707,6 +707,7 @@ export async function POST(request: Request) {
         try { fs.chmodSync(filePath, 0o600); } catch { /* Unsupported filesystem permissions in some dev environments. */ }
       }
 
+      let canonicalRegistered = false;
       try {
         let canonicalRegistration: { documentRef: string; evidenceRef: string } | null = null;
         if (context && storagePath) {
@@ -736,6 +737,7 @@ export async function POST(request: Request) {
             throw new Error("Canonical document registration failed.");
           }
           canonicalRegistration = { documentRef: registrationData.documentRef, evidenceRef: registrationData.evidenceRef };
+          canonicalRegistered = true;
         }
 
         const text = await extractDocumentText(fileName, decoded.mimeType, decoded.buffer);
@@ -785,7 +787,7 @@ export async function POST(request: Request) {
         // A file must not be orphaned in private storage if extraction or state persistence fails.
         // Cleanup is best-effort; preserve the original error so the route's generic handler applies.
         try {
-          if (context && storagePath) {
+          if (context && storagePath && !canonicalRegistered) {
             const endpoint = new URL("/storage/v1/object/candidate-documents", context.url);
             await fetch(endpoint, {
               method: "DELETE",
