@@ -696,6 +696,20 @@ export async function POST(request: Request) {
       });
     }
 
+    if (action === "updateOpportunityStatus") {
+      const opportunityId = String(body.opportunityId || "");
+      const nextStatus = String(body.status || "").toUpperCase();
+      const allowedStatuses = ["READY_TO_PREPARE", "PREPARING", "PACK_READY", "INTERVIEW", "OFFER", "REJECTED", "WITHDRAWN"];
+      const exists = store.opportunities.some((item) => item.opportunityId === opportunityId);
+      if (!exists) return privateJson({ status: "FAILED", error: "Opportunity not found." }, { status: 404 });
+      if (!allowedStatuses.includes(nextStatus)) {
+        return privateJson({ status: "FAILED", error: "Choose a valid application status. Record proof separately when an application has been submitted." }, { status: 400 });
+      }
+      store.opportunities = store.opportunities.map((item) => item.opportunityId === opportunityId ? { ...item, status: nextStatus, updatedAt: new Date().toISOString() } : item);
+      await persistStore(context, store);
+      return privateJson({ status: "OPPORTUNITY_STATUS_UPDATED", store, readiness: scoreReadiness(store) });
+    }
+
     if (action === "generatePack") {
       const opportunityId = String(body.opportunityId || "");
       const opportunity = store.opportunities.find((item) => item.opportunityId === opportunityId);
