@@ -26,6 +26,27 @@ checks.push({
 });
 
 checks.push({
+  name: "enforces_upload_size_limit",
+  passed: api.includes("MAX_UPLOAD_BYTES = 10 * 1024 * 1024") && api.includes("buffer.length > MAX_UPLOAD_BYTES"),
+  detail: "Uploads must enforce the 10 MB byte limit."
+});
+
+checks.push({
+  name: "validates_document_signatures",
+  passed: api.includes("function validateDocumentSignature") &&
+    api.includes('toString("ascii") !== "%PDF-"') &&
+    api.includes("validateDocumentSignature(fileName, decoded.mimeType, decoded.buffer)"),
+  detail: "PDF and DOCX content signatures must be checked before storage."
+});
+
+checks.push({
+  name: "rejects_malformed_base64",
+  passed: api.includes("Upload contains malformed base64 data.") &&
+    api.includes('buffer.toString("base64").replace(/=+$/, "")'),
+  detail: "Non-canonical base64 input must be rejected."
+});
+
+checks.push({
   name: "has_add_opportunity_action",
   passed: api.includes('action === "addOpportunity"'),
   detail: "Opportunity action must exist."
