@@ -403,3 +403,37 @@ test("candidate storage workflow watches the canonical retirement migration", ()
   const workflow = fs.readFileSync(workflowPath, "utf8");
   assert.equal((workflow.match(/db\/migrations\/0021_candidate_document_retirement\.sql/g) || []).length, 2);
 });
+
+
+test("candidate application lifecycle requires an owned opportunity and records bounded, explicitly unverified submission evidence", () => {
+  const statusStart = route.indexOf('if (action === "updateOpportunityStatus")');
+  const statusEnd = route.indexOf('if (action === "generatePack")', statusStart);
+  const statusBlock = route.slice(statusStart, statusEnd);
+  assert.match(statusBlock, /store\.opportunities\.find\(\(item\) => item\.opportunityId === opportunityId\)/);
+  assert.match(statusBlock, /statusHistory/);
+  assert.match(statusBlock, /CANDIDATE_WORKSPACE/);
+  assert.doesNotMatch(statusBlock, /allowedStatuses = \[[^\]]*SUBMITTED_REPORTED/);
+
+  const proofStart = route.indexOf('if (action === "markApplied")');
+  const proofEnd = route.indexOf('if (action === "addFinanceEntry")', proofStart);
+  const proofBlock = route.slice(proofStart, proofEnd);
+  assert.match(proofBlock, /if \(!opportunity\) return privateJson/);
+  assert.match(proofBlock, /proof\.length < 3 \|\| proof\.length > 1200/);
+  assert.match(proofBlock, /submissionChannel/);
+  assert.match(proofBlock, /evidenceUrl/);
+  assert.match(proofBlock, /recordType: "CANDIDATE_REPORTED_SUBMISSION"/);
+  assert.match(proofBlock, /verificationStatus: "NOT_INDEPENDENTLY_VERIFIED"/);
+  assert.match(proofBlock, /status: "SUBMITTED_REPORTED"/);
+  assert.match(proofBlock, /CANDIDATE_PROVIDED_EVIDENCE/);
+  assert.match(proofBlock, /slice\(-1000\)/);
+});
+
+test("candidate workbench captures submission channel and optional evidence link without implying external verification", () => {
+  const page = fs.readFileSync(path.resolve(__dirname, "../src/app/candidate/workbench/page.tsx"), "utf8");
+  assert.match(page, /Record submission evidence/);
+  assert.match(page, /submissionChannels/);
+  assert.match(page, /evidenceUrlDrafts/);
+  assert.match(page, /SUBMITTED_REPORTED/);
+  assert.match(page, /not been independently verified/);
+  assert.match(page, /Not independently verified/);
+});
