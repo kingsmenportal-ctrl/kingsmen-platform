@@ -284,8 +284,20 @@ export async function POST(request: Request) {
         }, { status: 404 });
       }
 
+      // Treat agent output and local JSON as untrusted input. Only import secure
+      // web URLs; reject javascript:, data:, credentialed URLs and malformed links.
+      let sourceUrl: URL;
+      try {
+        sourceUrl = new URL(String(lead.sourceUrl || ""));
+      } catch {
+        return NextResponse.json({ status: "FAILED", error: "This lead has an invalid source link and cannot be imported." }, { status: 422 });
+      }
+      if (sourceUrl.protocol !== "https:" || sourceUrl.username || sourceUrl.password) {
+        return NextResponse.json({ status: "FAILED", error: "Only secure HTTPS source links can be imported." }, { status: 422 });
+      }
+
       const store = readJson(APPLY_STORE, defaultApplyStore());
-      const exists = (store.opportunities || []).some((opp: any) => opp.sourceUrl === lead.sourceUrl);
+      const exists = (store.opportunities || []).some((opp: any) => opp.sourceUrl === sourceUrl.toString());
 
       if (!exists) {
         store.opportunities = [
@@ -295,7 +307,7 @@ export async function POST(request: Request) {
             organisation: lead.organisation || lead.source,
             category: lead.category || "JOB",
             location: lead.location || "",
-            sourceUrl: lead.sourceUrl,
+            sourceUrl: sourceUrl.toString(),
             applicationMethod: lead.applicationMethod || "PORTAL",
             emailTo: "",
             closingDate: "",
