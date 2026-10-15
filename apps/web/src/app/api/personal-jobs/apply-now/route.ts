@@ -1021,17 +1021,22 @@ export async function POST(request: Request) {
           return privateJson({ status: "FAILED", error: "Document storage reference is invalid; no records were removed." }, { status: 409 });
         }
         const endpoint = new URL("/storage/v1/object/candidate-documents", context.url);
-        const response = await fetch(endpoint, {
-          method: "DELETE",
-          headers: {
-            apikey: context.anonKey,
-            Authorization: `Bearer ${context.accessToken}`,
-            "Content-Type": "application/json"
-          },
-          body: JSON.stringify({ prefixes: [`${context.userId}/${objectName}`] }),
-          cache: "no-store",
-          signal: AbortSignal.timeout(15000)
-        });
+        let response: Response;
+        try {
+          response = await fetch(endpoint, {
+            method: "DELETE",
+            headers: {
+              apikey: context.anonKey,
+              Authorization: `Bearer ${context.accessToken}`,
+              "Content-Type": "application/json"
+            },
+            body: JSON.stringify({ prefixes: [`${context.userId}/${objectName}`] }),
+            cache: "no-store",
+            signal: AbortSignal.timeout(15000)
+          });
+        } catch {
+          return privateJson({ status: "STORAGE_FAILED", error: "The private file service could not be reached. The document record was kept." }, { status: 503 });
+        }
         if (!response.ok && response.status !== 404) {
           return privateJson({ status: "STORAGE_FAILED", error: "The private file could not be deleted. The document record was kept." }, { status: 503 });
         }
@@ -1053,7 +1058,13 @@ export async function POST(request: Request) {
     }
 
     if (action === "deleteOpportunity") {
-      const opportunityId = String(body.opportunityId || "");
+      const opportunityId = typeof body.opportunityId === "string" ? body.opportunityId.trim() : "";
+      if (!opportunityId || opportunityId.length > 180) {
+        return privateJson({ status: "FAILED", error: "A valid opportunity ID is required." }, { status: 400 });
+      }
+      if (!store.opportunities.some((item) => item.opportunityId === opportunityId)) {
+        return privateJson({ status: "FAILED", error: "Opportunity not found." }, { status: 404 });
+      }
       store.opportunities = store.opportunities.filter((item) => item.opportunityId !== opportunityId);
       store.applicationPacks = store.applicationPacks.filter((item) => item.opportunityId !== opportunityId);
       store.proofLog = store.proofLog.filter((item) => item.opportunityId !== opportunityId);
