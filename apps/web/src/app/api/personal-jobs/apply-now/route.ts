@@ -122,18 +122,34 @@ function readStore(): Store {
     throw new Error("Candidate local store is invalid; existing data was preserved.");
   }
 
+  const collectionKeys = [
+    "documents", "opportunities", "applicationPacks", "proofLog",
+    "smartExtraction", "tasks", "contactLog", "financeLedger"
+  ] as const;
+  for (const key of collectionKeys) {
+    // Missing collections are allowed for older store versions; malformed existing
+    // collections must not be silently replaced with empty arrays.
+    if (key in parsed && !Array.isArray(parsed[key])) {
+      throw new Error(`Candidate local store collection ${key} is invalid; existing data was preserved.`);
+    }
+  }
+  if ("profile" in parsed && (!parsed.profile || typeof parsed.profile !== "object" || Array.isArray(parsed.profile))) {
+    throw new Error("Candidate local store profile is invalid; existing data was preserved.");
+  }
+
+  const defaults = defaultStore();
   return {
-    ...defaultStore(),
+    ...defaults,
     ...parsed,
-    profile: parsed.profile && typeof parsed.profile === "object" && !Array.isArray(parsed.profile) ? parsed.profile : {},
-    documents: Array.isArray(parsed.documents) ? parsed.documents : [],
-    opportunities: Array.isArray(parsed.opportunities) ? parsed.opportunities : [],
-    applicationPacks: Array.isArray(parsed.applicationPacks) ? parsed.applicationPacks : [],
-    proofLog: Array.isArray(parsed.proofLog) ? parsed.proofLog : [],
-    smartExtraction: Array.isArray(parsed.smartExtraction) ? parsed.smartExtraction : [],
-    tasks: Array.isArray(parsed.tasks) ? parsed.tasks : [],
-    contactLog: Array.isArray(parsed.contactLog) ? parsed.contactLog : [],
-    financeLedger: Array.isArray(parsed.financeLedger) ? parsed.financeLedger : []
+    profile: "profile" in parsed ? parsed.profile as CandidateProfile : defaults.profile,
+    documents: parsed.documents === undefined ? [] : parsed.documents as any[],
+    opportunities: parsed.opportunities === undefined ? [] : parsed.opportunities as any[],
+    applicationPacks: parsed.applicationPacks === undefined ? [] : parsed.applicationPacks as any[],
+    proofLog: parsed.proofLog === undefined ? [] : parsed.proofLog as any[],
+    smartExtraction: parsed.smartExtraction === undefined ? [] : parsed.smartExtraction as any[],
+    tasks: parsed.tasks === undefined ? [] : parsed.tasks as FollowUpTask[],
+    contactLog: parsed.contactLog === undefined ? [] : parsed.contactLog as ContactLogEntry[],
+    financeLedger: parsed.financeLedger === undefined ? [] : parsed.financeLedger as FinanceLedgerEntry[]
   } as Store;
 }
 
@@ -590,7 +606,14 @@ function buildPack(profile: CandidateProfile, opportunity: any) {
 export async function GET() {
   const resolved = await getCandidatePortalContext();
   if (resolved.status !== "ready") {
-    if (resolved.status === "not_configured" && process.env.NODE_ENV !== "production") { const store = readStore(); return privateJson({ ...store, readiness: scoreReadiness(store) }); }
+    if (resolved.status === "not_configured" && process.env.NODE_ENV !== "production") {
+      try {
+        const store = readStore();
+        return privateJson({ ...store, readiness: scoreReadiness(store) });
+      } catch {
+        return privateJson({ status: "STORAGE_UNAVAILABLE", error: "Candidate workspace could not be loaded." }, { status: 503 });
+      }
+    }
     return authOrStorageResponse(resolved.status);
   }
   try { const store = await loadStoreForContext(resolved.context); return privateJson({ ...store, readiness: scoreReadiness(store) }); }
