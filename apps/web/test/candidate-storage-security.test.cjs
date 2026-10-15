@@ -203,3 +203,31 @@ test("candidate storage workflow runs the regression suite with read-only reposi
   assert.match(workflow, /node --test apps\/web\/test\/candidate-storage-security\.test\.cjs/);
   assert.match(workflow, /node-version: 22/);
 });
+
+
+test("candidate dashboard loads the private workspace and presents live workspace modules", () => {
+  const page = fs.readFileSync(path.resolve(__dirname, "../src/app/candidate/dashboard/page.tsx"), "utf8");
+  assert.match(page, /fetch\("\/api\/personal-jobs\/apply-now"/);
+  assert.match(page, /cache: "no-store"/);
+  assert.match(page, /Readiness checklist/);
+  assert.match(page, /Six opportunity gates/);
+  assert.match(page, /Please sign in to view your private candidate workspace/);
+});
+
+test("candidate profile persists edits through the validated saveProfile API action", () => {
+  const page = fs.readFileSync(path.resolve(__dirname, "../src/app/candidate/profile/page.tsx"), "utf8");
+  assert.match(page, /action: "saveProfile"/);
+  assert.match(page, /Full name, email and phone number are required/);
+  assert.match(page, /Your profile could not be saved/);
+  assert.match(page, /type="submit"/);
+});
+
+test("candidate document vault uses bounded supported uploads and private document endpoints", () => {
+  const page = fs.readFileSync(path.resolve(__dirname, "../src/app/candidate/documents/page.tsx"), "utf8");
+  assert.match(page, /MAX_UPLOAD_BYTES = 10 \* 1024 \* 1024/);
+  assert.match(page, /action: "uploadDocument"/);
+  assert.match(page, /action: "deleteDocument"/);
+  assert.match(page, /\/api\/personal-jobs\/apply-now\/documents\//);
+  assert.match(page, /credentials: "same-origin"/);
+  assert.match(page, /cache: "no-store"/);
+});
