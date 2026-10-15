@@ -34,7 +34,7 @@ export async function getCandidateAuthUser() {
       signal: AbortSignal.timeout(AUTH_LOOKUP_TIMEOUT_MS)
     });
     if (!response.ok) return { configured: true as const, user: null };
-    const user = await response.json() as { id?: string; email?: string; aud?: string; role?: string };
+    const user = await response.json() as { id?: string; email?: string; aud?: string; role?: string; app_metadata?: { role?: unknown; roles?: unknown }; user_metadata?: Record<string, unknown> };
     if (!user.id || !/^[0-9a-f]{8}-[0-9a-f]{4}-[1-8][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i.test(user.id) || user.role === "service_role") return { configured: true as const, user: null };
     return { configured: true as const, user };
   } catch {
