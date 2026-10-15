@@ -123,6 +123,9 @@ function summarize(records: any[]) {
     outcomesRecorded: records.filter((r) => r.actionState === "OUTCOME_RECORDED").length,
     blockedProfileFix: records.filter((r) => r.actionState === "BLOCKED_PROFILE_FIX").length,
     closedNotApplying: records.filter((r) => r.actionState === "CLOSED_NOT_APPLYING").length,
+    followUpsOverdue: records.filter((r) => r.review.followUpDate && r.review.followUpDate < new Date().toISOString().slice(0, 10) && !["INTERVIEW", "REJECTED", "OFFER", "WITHDRAWN"].includes(r.review.outcomeStatus)).length,
+    followUpsDueToday: records.filter((r) => r.review.followUpDate === new Date().toISOString().slice(0, 10) && !["INTERVIEW", "REJECTED", "OFFER", "WITHDRAWN"].includes(r.review.outcomeStatus)).length,
+    interviewsScheduled: records.filter((r) => r.review.interviewAt && !Number.isNaN(Date.parse(r.review.interviewAt)) && Date.parse(r.review.interviewAt) >= Date.now()).length,
     byReviewStatus,
     byActionState,
     byOutcomeStatus
@@ -180,7 +183,7 @@ export async function POST(request: Request) {
 
   const reviewStatus = incoming.reviewStatus ?? record.review.reviewStatus;
   const outcomeStatus = incoming.outcomeStatus ?? record.review.outcomeStatus;
-  const limits: Record<string, number> = { applicationMethod: 120, submittedAt: 40, proofType: 80, proofReference: 240, proofNotes: 2000, outcomeNotes: 2000, followUpDate: 10, reviewerNotes: 2000 };
+  const limits: Record<string, number> = { applicationMethod: 120, submittedAt: 40, proofType: 80, proofReference: 240, proofNotes: 2000, outcomeNotes: 2000, followUpDate: 10, interviewAt: 40, nextAction: 300, responseHistory: 3000, reviewerNotes: 2000 };
   const values: Record<string, string> = {};
   for (const [key, max] of Object.entries(limits)) {
     const value = cleanText(incoming[key] ?? record.review[key] ?? "");
