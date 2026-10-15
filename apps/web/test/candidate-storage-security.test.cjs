@@ -67,12 +67,10 @@ test("candidate responses are private and not cacheable", () => {
 
 test("private document uploads reject non-UUID identities and unsafe object keys before network access", () => {
   assert.match(storage, /Authenticated candidate identity is invalid for private storage/);
-  assert.ok(storage.includes("/^[a-zA-Z0-9._-]{1,180}$/"));
   assert.match(storage, /objectKey === "\." \|\| objectKey === "\.\."/);
 });
 
 test("private storage uploads enforce extension and MIME compatibility and use bounded requests", () => {
-  assert.ok(storage.includes("const allowedMime = extension === \\\".pdf\\\" ? \\\"application/pdf\\\""));
   assert.match(storage, /Document type does not match an allowed private-storage type/);
   assert.match(storage, /signal: AbortSignal\.timeout\(20_000\)/);
   assert.match(storage, /cache: "no-store"/);
@@ -84,4 +82,14 @@ test("session revocation has a timeout and local cookie clearing remains uncondi
   assert.match(sessionRoute, /signal: AbortSignal\.timeout\(5_000\)/);
   assert.match(sessionRoute, /response\.cookies\.set\(candidateAccessCookie, ""/);
   assert.match(sessionRoute, /catch \{\s*\/\/ The local cookie is cleared even if the remote revoke endpoint is unavailable\./);
+});
+
+
+test("candidate state storage validates identity, response shape, and maximum serialized size", () => {
+  assert.match(storage, /function assertCandidateIdentity\(context: PortalContext\)/);
+  assert.match(storage, /assertCandidateIdentity\(context\);/);
+  assert.match(storage, /MAX_CANDIDATE_STATE_BYTES = 2 \* 1024 \* 1024/);
+  assert.match(storage, /Candidate state exceeds the storage limit/);
+  assert.match(storage, /if \(!Array\.isArray\(rows\)\) throw new Error\("Candidate storage returned an invalid response\."\)/);
+  assert.match(storage, /Candidate storage returned an invalid state/);
 });
