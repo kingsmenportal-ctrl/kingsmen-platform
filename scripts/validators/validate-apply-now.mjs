@@ -117,7 +117,9 @@ const authFiles = {
   explicitBindingMigration: "db/migrations/0025_explicit_candidate_identity_binding.sql",
   verifiedBindingMigration: "db/migrations/0026_require_verified_candidate_identity.sql",
   provisioningScript: "scripts/provision-candidate-auth.mjs",
-  provisioningRunbook: "docs/security/candidate-identity-provisioning.md"
+  provisioningRunbook: "docs/security/candidate-identity-provisioning.md",
+  durableStateMigration: "db/migrations/0027_candidate_portal_durable_state.sql",
+  durableStorageHelper: "apps/web/src/lib/candidate-portal-storage.ts"
 };
 for (const [name, file] of Object.entries(authFiles)) {
   checks.push({
@@ -136,6 +138,8 @@ const explicitBindingMigration = readTextIfExists(authFiles.explicitBindingMigra
 const verifiedBindingMigration = readTextIfExists(authFiles.verifiedBindingMigration);
 const provisioningScript = readTextIfExists(authFiles.provisioningScript);
 const provisioningRunbook = readTextIfExists(authFiles.provisioningRunbook);
+const durableStateMigration = readTextIfExists(authFiles.durableStateMigration);
+const durableStorageHelper = readTextIfExists(authFiles.durableStorageHelper);
 
 checks.push({
   name: "auth_session_uses_http_only_cookie_and_no_store",
@@ -204,6 +208,32 @@ checks.push({
     identityMigration.includes("candidate_documents_insert_own") &&
     documentPolicyMigration.includes("document_files_authenticated_own_account_read"),
   detail: "Candidate documents must use a private bucket and account-scoped policies."
+});
+
+checks.push({
+  name: "durable_candidate_state_is_user_scoped_by_rls",
+  passed: durableStateMigration.includes("CREATE TABLE IF NOT EXISTS public.candidate_portal_state") &&
+    durableStateMigration.includes("ENABLE ROW LEVEL SECURITY") &&
+    durableStateMigration.includes("FORCE ROW LEVEL SECURITY") &&
+    durableStateMigration.includes("auth_user_id = (SELECT auth.uid())") &&
+    durableStateMigration.includes("FROM PUBLIC, anon") &&
+    durableStateMigration.includes("GRANT SELECT, INSERT, UPDATE ON public.candidate_portal_state TO authenticated"),
+  detail: "Durable portal state must be protected by row-level policies and deny anonymous access."
+});
+
+checks.push({
+  name: "apply_now_uses_authenticated_supabase_state_and_private_uploads",
+  passed: durableStorageHelper.includes("getCandidateAuthUser()") &&
+    durableStorageHelper.includes("candidate_portal_state") &&
+    durableStorageHelper.includes("candidate-documents") &&
+    durableStorageHelper.includes("AbortSignal.timeout") &&
+    api.includes("getCandidatePortalContext()") &&
+    api.includes("loadCandidatePortalState") &&
+    api.includes("saveCandidatePortalState") &&
+    api.includes("uploadCandidatePortalDocument") &&
+    api.includes("AUTHENTICATION_REQUIRED") &&
+    api.includes("STORAGE_UNAVAILABLE"),
+  detail: "Production candidate state and document bytes must use the authenticated Supabase API and private storage."
 });
 
 const failed = checks.filter((x) => !x.passed);
