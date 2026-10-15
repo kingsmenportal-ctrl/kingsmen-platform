@@ -99,3 +99,18 @@ test("authentication rejects malformed UUID identities before candidate data acc
   assert.match(auth, /!\/\^\[0-9a-f\]\{8\}-\[0-9a-f\]\{4\}-\[1-8\]\[0-9a-f\]\{3\}-\[89ab\]\[0-9a-f\]\{3\}-\[0-9a-f\]\{12\}\$\/i\.test\(user\.id\)/);
   assert.match(auth, /user\.role === "service_role"/);
 });
+
+
+test("candidate state reads and uploads have explicit byte limits and reject malformed JSON", () => {
+  assert.match(storage, /MAX_CANDIDATE_STATE_BYTES = 2 \* 1024 \* 1024/);
+  assert.match(storage, /MAX_CANDIDATE_DOCUMENT_BYTES = 15 \* 1024 \* 1024/);
+  assert.match(storage, /const raw = await response\.text\(\)/);
+  assert.match(storage, /Candidate storage returned invalid JSON/);
+  assert.match(storage, /Document must be non-empty and no larger than 15 MiB/);
+  assert.match(storage, /Buffer\.byteLength\(raw, "utf8"\) > MAX_CANDIDATE_STATE_BYTES/);
+});
+
+test("candidate state serialization failures are handled without making a storage request", () => {
+  assert.match(storage, /Candidate state could not be serialized/);
+  assert.match(storage, /try \{ body = JSON\.stringify\(\{ auth_user_id: context\.userId, state \}\); \}/);
+});
