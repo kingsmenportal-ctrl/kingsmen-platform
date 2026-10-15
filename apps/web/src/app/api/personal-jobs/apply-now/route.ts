@@ -96,25 +96,45 @@ function defaultStore(): Store {
   };
 }
 
+const MAX_LOCAL_STORE_BYTES = 2 * 1024 * 1024;
+
 function readStore(): Store {
+  let raw: string;
   try {
-    const parsed = JSON.parse(fs.readFileSync(STORE_PATH, "utf8").replace(/^\uFEFF/, ""));
-    return {
-      ...defaultStore(),
-      ...parsed,
-      profile: parsed.profile || {},
-      documents: Array.isArray(parsed.documents) ? parsed.documents : [],
-      opportunities: Array.isArray(parsed.opportunities) ? parsed.opportunities : [],
-      applicationPacks: Array.isArray(parsed.applicationPacks) ? parsed.applicationPacks : [],
-      proofLog: Array.isArray(parsed.proofLog) ? parsed.proofLog : [],
-      smartExtraction: Array.isArray(parsed.smartExtraction) ? parsed.smartExtraction : [],
-      tasks: Array.isArray(parsed.tasks) ? parsed.tasks : [],
-      contactLog: Array.isArray(parsed.contactLog) ? parsed.contactLog : [],
-      financeLedger: Array.isArray(parsed.financeLedger) ? parsed.financeLedger : []
-    };
-  } catch {
-    return defaultStore();
+    const stat = fs.statSync(STORE_PATH);
+    if (!stat.isFile()) throw new Error("Candidate local store is not a regular file.");
+    if (stat.size > MAX_LOCAL_STORE_BYTES) throw new Error("Candidate local store exceeds the allowed size.");
+    raw = fs.readFileSync(STORE_PATH, "utf8");
+  } catch (error) {
+    if ((error as NodeJS.ErrnoException).code === "ENOENT") return defaultStore();
+    throw error;
   }
+
+  let parsed: Record<string, unknown>;
+  try {
+    const value = JSON.parse(raw.replace(/^\\uFEFF/, ""));
+    if (!value || typeof value !== "object" || Array.isArray(value)) {
+      throw new Error("Candidate local store has an invalid shape.");
+    }
+    parsed = value as Record<string, unknown>;
+  } catch {
+    // Never silently replace a corrupt existing store with an empty workspace.
+    throw new Error("Candidate local store is invalid; existing data was preserved.");
+  }
+
+  return {
+    ...defaultStore(),
+    ...parsed,
+    profile: parsed.profile && typeof parsed.profile === "object" && !Array.isArray(parsed.profile) ? parsed.profile : {},
+    documents: Array.isArray(parsed.documents) ? parsed.documents : [],
+    opportunities: Array.isArray(parsed.opportunities) ? parsed.opportunities : [],
+    applicationPacks: Array.isArray(parsed.applicationPacks) ? parsed.applicationPacks : [],
+    proofLog: Array.isArray(parsed.proofLog) ? parsed.proofLog : [],
+    smartExtraction: Array.isArray(parsed.smartExtraction) ? parsed.smartExtraction : [],
+    tasks: Array.isArray(parsed.tasks) ? parsed.tasks : [],
+    contactLog: Array.isArray(parsed.contactLog) ? parsed.contactLog : [],
+    financeLedger: Array.isArray(parsed.financeLedger) ? parsed.financeLedger : []
+  } as Store;
 }
 
 function writeStore(store: Store) {
@@ -125,11 +145,28 @@ function writeStore(store: Store) {
     // Some development filesystems do not support POSIX permissions.
   }
   store.updatedAt = new Date().toISOString();
-  fs.writeFileSync(STORE_PATH, `${JSON.stringify(store, null, 2)}\n`, { encoding: "utf8", mode: 0o600 });
+  const serialized = `${JSON.stringify(store, null, 2)}\\n`;
+  if (Buffer.byteLength(serialized, "utf8") > MAX_LOCAL_STORE_BYTES) {
+    throw new Error("Candidate local store exceeds the allowed size.");
+  }
+
+  const temporaryPath = `${STORE_PATH}.${process.pid}.${Date.now()}.tmp`;
   try {
-    fs.chmodSync(STORE_PATH, 0o600);
-  } catch {
-    // Some development filesystems do not support POSIX permissions.
+    fs.writeFileSync(temporaryPath, serialized, { encoding: "utf8", mode: 0o600, flag: "wx" });
+    try {
+      fs.chmodSync(temporaryPath, 0o600);
+    } catch {
+      // Some development filesystems do not support POSIX permissions.
+    }
+    fs.renameSync(temporaryPath, STORE_PATH);
+  } catch (error) {
+    try { fs.unlinkSync(temporaryPath); }
+    catch (cleanupError) {
+      if ((cleanupError as NodeJS.ErrnoException).code !== "ENOENT") {
+        // Preserve the write/rename failure; cleanup is best-effort.
+      }
+    }
+    throw error;
   }
 }
 
