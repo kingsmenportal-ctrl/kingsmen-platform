@@ -437,6 +437,7 @@ function buildPack(profile: CandidateProfile, opportunity: any) {
 }
 
 export async function GET() {
+  if (localCandidateStorageUnavailable()) return storageUnavailableResponse();
   const store = readStore();
   return privateJson({
     ...store,
@@ -445,6 +446,7 @@ export async function GET() {
 }
 
 export async function POST(request: Request) {
+  if (localCandidateStorageUnavailable()) return storageUnavailableResponse();
   try {
     const body = await request.json().catch(() => ({}));
     const action = String(body.action || "");
@@ -513,7 +515,6 @@ export async function POST(request: Request) {
         type,
         fileName,
         storedName,
-        localPath: filePath,
         mimeType: decoded.mimeType,
         sizeBytes: decoded.buffer.length,
         extractedTextPreview: text ? text.slice(0, 1800) : "",
@@ -677,7 +678,6 @@ export async function POST(request: Request) {
     return privateJson({
       status: "ERROR_VISIBLE",
       error: error instanceof Error ? error.message : "Unknown Apply Desk error",
-      stack: error instanceof Error ? error.stack : ""
     }, { status: 500 });
   }
 }
