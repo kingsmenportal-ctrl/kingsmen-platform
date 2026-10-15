@@ -1,6 +1,7 @@
 import fs from "node:fs";
 import path from "node:path";
 import { NextResponse } from "next/server";
+import { getCandidatePortalContext, loadCandidatePortalState, saveCandidatePortalState, uploadCandidatePortalDocument, type PortalContext } from "@/lib/candidate-portal-storage";
 
 function privateJson(body: unknown, init?: ResponseInit) {
   const headers = new Headers(init?.headers);
@@ -108,6 +109,19 @@ function storageUnavailableResponse() {
   }, { status: 503 });
 }
 
+async function loadStoreForContext(context: PortalContext | null): Promise<Store> {
+  if (!context) return readStore();
+  const saved = await loadCandidatePortalState(context);
+  if (!saved || typeof saved !== "object") return defaultStore();
+  return { ...defaultStore(), ...saved, profile: saved.profile && typeof saved.profile === "object" ? saved.profile as CandidateProfile : {}, documents: Array.isArray(saved.documents) ? saved.documents : [], opportunities: Array.isArray(saved.opportunities) ? saved.opportunities : [], applicationPacks: Array.isArray(saved.applicationPacks) ? saved.applicationPacks : [], proofLog: Array.isArray(saved.proofLog) ? saved.proofLog : [], smartExtraction: Array.isArray(saved.smartExtraction) ? saved.smartExtraction : [] };
+}
+async function persistStore(context: PortalContext | null, store: Store) {
+  if (context) { store.updatedAt = new Date().toISOString(); await saveCandidatePortalState(context, store as unknown as Record<string, unknown>); return; }
+  await persistStore(context, store);
+}
+function authOrStorageResponse(status: "not_configured" | "unauthenticated") {
+  return status === "unauthenticated" ? privateJson({ status: "AUTHENTICATION_REQUIRED", error: "Sign in to access your private candidate workspace." }, { status: 401 }) : storageUnavailableResponse();
+}
 const MAX_UPLOAD_BYTES = 10 * 1024 * 1024;
 const ALLOWED_DOCUMENT_TYPES = new Set(["CV", "ID", "CERTIFICATE"]);
 const ALLOWED_FILE_TYPES = new Map<string, Set<string>>([
@@ -436,20 +450,24 @@ function buildPack(profile: CandidateProfile, opportunity: any) {
 }
 
 export async function GET() {
-  if (localCandidateStorageUnavailable()) return storageUnavailableResponse();
-  const store = readStore();
-  return privateJson({
-    ...store,
-    readiness: scoreReadiness(store)
-  });
+  const resolved = await getCandidatePortalContext();
+  if (resolved.status !== "ready") {
+    if (resolved.status === "not_configured" && process.env.NODE_ENV !== "production") { const store = readStore(); return privateJson({ ...store, readiness: scoreReadiness(store) }); }
+    return authOrStorageResponse(resolved.status);
+  }
+  try { const store = await loadStoreForContext(resolved.context); return privateJson({ ...store, readiness: scoreReadiness(store) }); }
+  catch { return privateJson({ status: "STORAGE_UNAVAILABLE", error: "Candidate workspace could not be loaded." }, { status: 503 }); }
 }
 
 export async function POST(request: Request) {
-  if (localCandidateStorageUnavailable()) return storageUnavailableResponse();
+  const resolved = await getCandidatePortalContext();
+  const localDevelopment = resolved.status === "not_configured" && process.env.NODE_ENV !== "production";
+  if (resolved.status !== "ready" && !localDevelopment) return authOrStorageResponse(resolved.status);
+  const context = resolved.status === "ready" ? resolved.context : null;
   try {
     const body = await request.json().catch(() => ({}));
     const action = String(body.action || "");
-    const store = readStore();
+    const store = await loadStoreForContext(context);
 
     if (action === "saveProfile") {
       store.profile = {
@@ -457,7 +475,7 @@ export async function POST(request: Request) {
         ...(body.profile || {})
       };
 
-      writeStore(store);
+      await persistStore(context, store);
       return privateJson({
         status: "SAVED",
         store,
@@ -538,7 +556,7 @@ export async function POST(request: Request) {
         ...store.smartExtraction
       ];
 
-      writeStore(store);
+      await persistStore(context, store);
 
       return privateJson({
         status: "DOCUMENT_UPLOADED",
@@ -575,7 +593,7 @@ export async function POST(request: Request) {
       };
 
       store.opportunities = [record, ...store.opportunities];
-      writeStore(store);
+      await persistStore(context, store);
 
       return privateJson({
         status: "OPPORTUNITY_ADDED",
@@ -610,7 +628,7 @@ export async function POST(request: Request) {
           : item
       );
 
-      writeStore(store);
+      await persistStore(context, store);
 
       return privateJson({
         status: "PACK_READY",
@@ -645,7 +663,7 @@ export async function POST(request: Request) {
           : item
       );
 
-      writeStore(store);
+      await persistStore(context, store);
 
       return privateJson({
         status: "PROOF_CAPTURED",
@@ -660,7 +678,7 @@ export async function POST(request: Request) {
       store.opportunities = store.opportunities.filter((item) => item.opportunityId !== opportunityId);
       store.applicationPacks = store.applicationPacks.filter((item) => item.opportunityId !== opportunityId);
       store.proofLog = store.proofLog.filter((item) => item.opportunityId !== opportunityId);
-      writeStore(store);
+      await persistStore(context, store);
 
       return privateJson({
         status: "DELETED",
