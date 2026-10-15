@@ -297,3 +297,27 @@ test("founder command centre consolidates operational modules and exposes readin
   assert.match(page, /no live action is claimed/i);
   assert.match(page, /productionReady/);
 });
+
+test("discovered job import validates public source URLs and deduplicates per candidate workspace", () => {
+  const start = route.indexOf('if (action === "addOpportunity")');
+  const end = route.indexOf('if (action === "updateOpportunityStatus")', start);
+  const block = route.slice(start, end);
+  assert.match(block, /new URL\(sourceUrl\)/);
+  assert.match(block, /\["http:", "https:"\]\.includes\(parsedSource\.protocol\)/);
+  assert.match(block, /parsedSource\.username \|\| parsedSource\.password/);
+  assert.match(block, /OPPORTUNITY_ALREADY_EXISTS/);
+  assert.match(block, /store\.opportunities\.find/);
+  assert.match(block, /notes\.length > 1800/);
+  assert.match(block, /sourceUrl\.length > 1000/);
+});
+
+test("job finder exposes a candidate-workspace save action and does not auto-submit applications", () => {
+  const pagePath = path.resolve(__dirname, "../src/app/personal-job-desk/job-finder/JobFinderClient.tsx");
+  const page = fs.readFileSync(pagePath, "utf8");
+  assert.match(page, /saveLeadToWorkspace/);
+  assert.match(page, /\/api\/personal-jobs\/apply-now/);
+  assert.match(page, /action: "addOpportunity"/);
+  assert.match(page, /Save to candidate workspace/);
+  assert.match(page, /manualApprovalRequired: true/);
+  assert.match(page, /does not submit applications/);
+});
