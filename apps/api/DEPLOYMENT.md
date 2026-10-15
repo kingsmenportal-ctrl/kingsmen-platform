@@ -10,7 +10,7 @@ npm run build
 npm start
 ```
 
-The API listens on `KINGSMEN_API_PORT` (default 8080). Its `/health` endpoint is a liveness check only; it must not be interpreted as proof that PostgreSQL, authentication, payments, communications, or candidate isolation are ready.
+The API listens on `KINGSMEN_API_PORT` (default 8080). `/health` is a liveness/diagnostic endpoint and is not proof that authentication, payments, communications, or candidate isolation are ready. `/ready` is stricter: it returns HTTP 200 only when the durable PostgreSQL Truth Vault is enabled and its connection check succeeds; it returns HTTP 503 in memory mode or when the database is unavailable. Use `/ready` for staging backend readiness checks, then run the separate authenticated acceptance suite before treating staging as launch-ready.
 
 ## Runtime configuration
 
