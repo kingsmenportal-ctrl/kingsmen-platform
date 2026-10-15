@@ -77,3 +77,11 @@ test("private storage uploads enforce extension and MIME compatibility and use b
   assert.match(storage, /signal: AbortSignal\.timeout\(20_000\)/);
   assert.match(storage, /cache: "no-store"/);
 });
+
+
+test("session revocation has a timeout and local cookie clearing remains unconditional", () => {
+  const sessionRoute = fs.readFileSync(path.resolve(__dirname, "../src/app/api/auth/session/route.ts"), "utf8");
+  assert.match(sessionRoute, /signal: AbortSignal\.timeout\(5_000\)/);
+  assert.match(sessionRoute, /response\.cookies\.set\(candidateAccessCookie, ""/);
+  assert.match(sessionRoute, /catch \{\s*\/\/ The local cookie is cleared even if the remote revoke endpoint is unavailable\./);
+});
