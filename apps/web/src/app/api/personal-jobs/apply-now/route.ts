@@ -708,6 +708,7 @@ export async function POST(request: Request) {
       }
 
       let canonicalRegistered = false;
+      let canonicalRegistered = false;
       try {
         let canonicalRegistration: { documentRef: string; evidenceRef: string } | null = null;
         if (context && storagePath) {
@@ -737,6 +738,7 @@ export async function POST(request: Request) {
             throw new Error("Canonical document registration failed.");
           }
           canonicalRegistration = { documentRef: registrationData.documentRef, evidenceRef: registrationData.evidenceRef };
+          canonicalRegistered = true;
           canonicalRegistered = true;
         }
 
