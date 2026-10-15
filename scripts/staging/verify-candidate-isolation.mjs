@@ -21,13 +21,16 @@ const runId = "candidate-isolation-" + new Date().toISOString().replace(/[:.]/g,
 const results = [];
 const endpoint = new URL("/api/personal-jobs/apply-now", base);
 const sessionEndpoint = new URL("/api/auth/session", base);
+const documentEndpoint = (id) => new URL("/api/personal-jobs/apply-now/documents/" + encodeURIComponent(id), base);
 async function request(url, token, init = {}) { return fetch(url, { ...init, headers: { ...(init.headers || {}), Cookie: "kingsmen-access-token=" + token, "Cache-Control": "no-store" }, cache: "no-store", signal: AbortSignal.timeout(15000) }); }
 async function readWorkspace(token) { const response = await request(endpoint, token); assert.equal(response.status, 200, "workspace GET HTTP " + response.status); const data = await response.json(); assert.equal(typeof data.profile, "object"); return data; }
 async function saveNotes(token, notes) { const response = await request(endpoint, token, { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ action: "saveProfile", profile: { notes } }) }); assert.equal(response.status, 200, "profile save HTTP " + response.status); const data = await response.json(); assert.equal(data.status, "SAVED"); return data; }
 async function checkSession(token) { const response = await request(sessionEndpoint, token); assert.equal(response.status, 200, "session endpoint HTTP " + response.status); const data = await response.json(); assert.equal(data.authenticated, true); assert.equal(data.configured, true); return data; }
+async function uploadSyntheticDocument(token, marker) { const bytes = Buffer.from("Kingsmen Portal synthetic staging fixture " + marker + "\n", "utf8"); const response = await request(endpoint, token, { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ action: "uploadDocument", fileName: marker + ".txt", documentType: "CV", dataUrl: "data:text/plain;base64," + bytes.toString("base64") }) }); assert.equal(response.status, 200, "synthetic document upload HTTP " + response.status); const data = await response.json(); assert.equal(data.status, "DOCUMENT_UPLOADED"); assert.ok(data.document && /^doc-[0-9]{10,}-[a-f0-9]+$/i.test(data.document.documentId), "upload must return a valid document ID"); assert.ok(String(data.document.storagePath || "").length > 0, "document must have a private storage path"); return { documentId: data.document.documentId, bytes }; }
+async function deleteSyntheticDocument(token, documentId) { const response = await request(endpoint, token, { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ action: "deleteDocument", documentId }) }); assert.equal(response.status, 200, "synthetic document cleanup HTTP " + response.status); const data = await response.json(); assert.equal(data.status, "DOCUMENT_DELETED"); }
 function record(name, passed, details = {}) { results.push({ name, passed: Boolean(passed), ...details }); }
 
-let originalA, originalB, modifiedA = false, modifiedB = false, runError = null;
+let originalA, originalB, modifiedA = false, modifiedB = false, documentA = null, documentB = null, runError = null;
 try {
   const [sessionA, sessionB] = await Promise.all([checkSession(tokenA), checkSession(tokenB)]);
   assert.ok(sessionA.user && sessionA.user.id && sessionB.user && sessionB.user.id);
