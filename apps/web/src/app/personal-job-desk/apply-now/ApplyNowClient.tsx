@@ -280,6 +280,26 @@ export default function ApplyNowClient() {
     catch (error) { setMessage(error instanceof Error ? error.message : "Could not save ledger entry."); } finally { setBusy(""); }
   }
 
+  async function updateFinanceEntry(entryId: string, status: string) {
+    const entry = (store.financeLedger || []).find((item) => item.entryId === entryId);
+    if (!entry) return;
+    let reference = entry.reference || "";
+    let evidenceNote = entry.evidenceNote || "";
+    if (status === "CONFIRMED" && !reference && !evidenceNote) {
+      reference = window.prompt("Enter a payment/receipt reference (or leave blank to provide an evidence note):", "") || "";
+      if (!reference.trim()) evidenceNote = window.prompt("Describe the evidence supporting this user-entered status:", "") || "";
+      if (!reference.trim() && !evidenceNote.trim()) { setMessage("Confirmation needs a reference or evidence note."); return; }
+    }
+    setBusy(`finance-status-${entryId}`);
+    try {
+      const json = await api({ action: "updateFinanceEntry", entryId, status, reference, evidenceNote });
+      setStore(json.store);
+      setMessage("Ledger status updated. This does not independently verify settlement.");
+    } catch (error) {
+      setMessage(error instanceof Error ? error.message : "Could not update ledger status.");
+    } finally { setBusy(""); }
+  }
+
   async function deleteFinanceEntry(entryId: string) {
     if (!window.confirm("Remove this ledger record? This only removes the portal record, not a bank/payment transaction.")) return;
     setBusy(`finance-delete-${entryId}`); try { const json = await api({ action: "deleteFinanceEntry", entryId }); setStore(json.store); setMessage("Ledger record removed."); } catch (error) { setMessage(error instanceof Error ? error.message : "Could not remove ledger record."); } finally { setBusy(""); }
@@ -674,7 +694,7 @@ export default function ApplyNowClient() {
             <div style={oppHeader}><div><h3 style={oppTitle}>{entry.description}</h3><p style={oppMeta}>{entry.type} · {entry.direction === "IN" ? "Money in" : "Money out"} · {entry.occurredOn}</p></div><span style={statusBadge}>{entry.status}</span></div>
             <strong style={{ fontSize: 22, color: entry.direction === "IN" ? "#9de0b1" : "#ffc1b8" }}>{entry.direction === "IN" ? "+" : "−"}R {(entry.amountCents / 100).toLocaleString("en-ZA", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</strong>
             {entry.reference ? <p style={oppMeta}>Reference: {entry.reference}</p> : null}{entry.evidenceNote ? <p style={{ ...oppMeta, whiteSpace: "pre-wrap" }}>Evidence note: {entry.evidenceNote}</p> : null}
-            <div style={cardActions}><button type="button" style={dangerButton} disabled={busy === `finance-delete-${entry.entryId}`} onClick={() => deleteFinanceEntry(entry.entryId)}>Remove ledger record</button></div>
+            <div style={cardActions}><Select label="Update status" value={entry.status} onChange={(value) => updateFinanceEntry(entry.entryId, value)} options={["RECORDED", "PENDING", "CONFIRMED", "FAILED", "CANCELLED"]} /><button type="button" style={dangerButton} disabled={busy === `finance-delete-${entry.entryId}`} onClick={() => deleteFinanceEntry(entry.entryId)}>Remove ledger record</button></div>
           </article>)}
         </div>
       </section>
