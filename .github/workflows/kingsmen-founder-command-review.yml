@@ -1,0 +1,40 @@
+name: Kingsmen founder command review regressions
+
+on:
+  pull_request:
+    paths:
+      - "apps/web/src/app/api/founder/commands/**"
+      - "apps/web/src/app/founder/control-plane/command-review/**"
+      - "apps/web/src/lib/founder-auth.ts"
+      - "apps/web/test/founder-command-*.test.cjs"
+      - "db/migrations/0016_founder_audit_and_command_intake.sql"
+      - ".github/workflows/kingsmen-founder-command-review.yml"
+  push:
+    branches:
+      - "fix/kingsmen-ci-real-validation-gates"
+    paths:
+      - "apps/web/src/app/api/founder/commands/**"
+      - "apps/web/src/app/founder/control-plane/command-review/**"
+      - "apps/web/src/lib/founder-auth.ts"
+      - "apps/web/test/founder-command-*.test.cjs"
+      - "db/migrations/0016_founder_audit_and_command_intake.sql"
+      - ".github/workflows/kingsmen-founder-command-review.yml"
+
+permissions:
+  contents: read
+
+concurrency:
+  group: kingsmen-founder-command-review-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  founder-command-review-regressions:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - name: Run founder command intake and review regressions
+        run: node --test apps/web/test/founder-command-intake.test.cjs apps/web/test/founder-command-review.test.cjs
