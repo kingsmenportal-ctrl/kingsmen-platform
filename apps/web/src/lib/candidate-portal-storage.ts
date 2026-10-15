@@ -92,7 +92,7 @@ export async function saveCandidatePortalState(context: PortalContext, state: Re
   if (Buffer.byteLength(body, "utf8") > MAX_CANDIDATE_STATE_BYTES) throw new Error("Candidate state exceeds the storage limit.");
   const response = await portalFetch(context, "/rest/v1/candidate_portal_state?on_conflict=auth_user_id", {
     method: "POST",
-    headers: { Prefer: "resolution=merge-duplicates,return=minimal", "Content-Length": String(Buffer.byteLength(body, "utf8")) },
+    headers: { Prefer: "resolution=merge-duplicates,return=minimal" },
     body
   });
   if (!response.ok) throw new Error("Candidate storage could not be saved.");
