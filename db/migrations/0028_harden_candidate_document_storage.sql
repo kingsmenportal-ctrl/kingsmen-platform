@@ -35,7 +35,6 @@ CREATE POLICY candidate_documents_delete_own
   );
 
 DROP POLICY IF EXISTS candidate_documents_update_own ON storage.objects;
-DROP POLICY IF EXISTS candidate_documents_update_own ON storage.objects;
 
 COMMENT ON TABLE storage.objects IS
   'Storage object access is policy-controlled; candidate-documents must remain private and folder-scoped by authenticated user ID.';
