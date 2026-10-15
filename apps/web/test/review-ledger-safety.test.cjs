@@ -37,3 +37,25 @@ test("review updates validate status enums, approval booleans, field lengths, an
 test("employer outcomes cannot be recorded before submission proof is captured", () => {
   assert.match(route, /Record submission proof before recording an employer outcome/);
 });
+
+test("follow-up and interview workflow exposes overdue, due-today, and upcoming-interview counts", () => {
+  const api = fs.readFileSync(path.resolve(__dirname, "../src/app/api/personal-jobs/review-ledger/route.ts"), "utf8");
+  const ui = fs.readFileSync(path.resolve(__dirname, "../src/app/personal-job-desk/review-ledger/ReviewLedgerClient.tsx"), "utf8");
+  const sync = fs.readFileSync(path.resolve(__dirname, "../../../scripts/agents/personal-job-review-ledger.mjs"), "utf8");
+  assert.match(api, /followUpsOverdue/);
+  assert.match(api, /followUpsDueToday/);
+  assert.match(api, /interviewsScheduled/);
+  assert.match(api, /interviewAt: 40/);
+  assert.match(ui, /OVERDUE_FOLLOW_UPS/);
+  assert.match(ui, /UPCOMING_INTERVIEWS/);
+  assert.match(ui, /Response history/);
+  assert.match(sync, /responseHistory: s\(existingReview\.responseHistory\)/);
+  assert.match(sync, /interviewAt: s\(existingReview\.interviewAt\)/);
+});
+
+test("follow-up and response history fields have bounded input sizes", () => {
+  const api = fs.readFileSync(path.resolve(__dirname, "../src/app/api/personal-jobs/review-ledger/route.ts"), "utf8");
+  assert.match(api, /nextAction: 300/);
+  assert.match(api, /responseHistory: 3000/);
+  assert.match(api, /followUpDate: 10/);
+});
