@@ -123,6 +123,70 @@ function authOrStorageResponse(status: "not_configured" | "unauthenticated") {
   return status === "unauthenticated" ? privateJson({ status: "AUTHENTICATION_REQUIRED", error: "Sign in to access your private candidate workspace." }, { status: 401 }) : storageUnavailableResponse();
 }
 const MAX_UPLOAD_BYTES = 10 * 1024 * 1024;
+const MAX_JSON_BODY_BYTES = 14 * 1024 * 1024;
+const PROFILE_FIELD_LIMITS: Record<keyof CandidateProfile, number> = {
+  fullName: 160,
+  idNumber: 40,
+  phone: 40,
+  email: 254,
+  location: 160,
+  highestEducation: 500,
+  workExperience: 4_000,
+  skills: 2_000,
+  notes: 2_000
+};
+
+async function readBoundedJson(request: Request): Promise<Record<string, any>> {
+  const declaredLength = Number(request.headers.get("content-length") || 0);
+  if (Number.isFinite(declaredLength) && declaredLength > MAX_JSON_BODY_BYTES) {
+    throw new Error("Request body exceeds the allowed limit.");
+  }
+  if (!request.body) throw new Error("Request body is required.");
+  const reader = request.body.getReader();
+  const chunks: Uint8Array[] = [];
+  let total = 0;
+  try {
+    while (true) {
+      const { done, value } = await reader.read();
+      if (done) break;
+      total += value.byteLength;
+      if (total > MAX_JSON_BODY_BYTES) {
+        await reader.cancel();
+        throw new Error("Request body exceeds the allowed limit.");
+      }
+      chunks.push(value);
+    }
+  } finally {
+    reader.releaseLock();
+  }
+  const bytes = new Uint8Array(total);
+  let offset = 0;
+  for (const chunk of chunks) { bytes.set(chunk, offset); offset += chunk.byteLength; }
+  const parsed = JSON.parse(new TextDecoder("utf-8", { fatal: true }).decode(bytes));
+  if (!parsed || typeof parsed !== "object" || Array.isArray(parsed)) {
+    throw new Error("Request body must be a JSON object.");
+  }
+  return parsed as Record<string, any>;
+}
+
+function validateProfilePatch(input: unknown): CandidateProfile {
+  if (!input || typeof input !== "object" || Array.isArray(input)) {
+    throw new Error("Profile must be an object.");
+  }
+  const source = input as Record<string, unknown>;
+  const patch: CandidateProfile = {};
+  for (const [rawKey, rawValue] of Object.entries(source)) {
+    if (!(rawKey in PROFILE_FIELD_LIMITS)) continue;
+    if (typeof rawValue !== "string") throw new Error("Profile fields must be text.");
+    const key = rawKey as keyof CandidateProfile;
+    const value = rawValue.trim();
+    if (value.length > PROFILE_FIELD_LIMITS[key]) {
+      throw new Error(`Profile field ${key} exceeds its allowed length.`);
+    }
+    patch[key] = value;
+  }
+  return patch;
+}
 const ALLOWED_DOCUMENT_TYPES = new Set(["CV", "ID", "CERTIFICATE"]);
 const ALLOWED_FILE_TYPES = new Map<string, Set<string>>([
   [".pdf", new Set(["application/pdf", "application/octet-stream"])],
@@ -465,15 +529,22 @@ export async function POST(request: Request) {
   if (resolved.status !== "ready" && !localDevelopment) return authOrStorageResponse(resolved.status);
   const context = resolved.status === "ready" ? resolved.context : null;
   try {
-    const body = await request.json().catch(() => ({}));
+    let body: Record<string, any>;
+    try { body = await readBoundedJson(request); }
+    catch (error) {
+      const message = error instanceof Error ? error.message : "Invalid request body.";
+      return privateJson({ status: "FAILED", error: message }, { status: message.includes("limit") ? 413 : 400 });
+    }
     const action = String(body.action || "");
     const store = await loadStoreForContext(context);
 
     if (action === "saveProfile") {
-      store.profile = {
-        ...store.profile,
-        ...(body.profile || {})
-      };
+      let profilePatch: CandidateProfile;
+      try { profilePatch = validateProfilePatch(body.profile); }
+      catch (error) {
+        return privateJson({ status: "FAILED", error: error instanceof Error ? error.message : "Invalid profile." }, { status: 400 });
+      }
+      store.profile = { ...store.profile, ...profilePatch };
 
       await persistStore(context, store);
       return privateJson({
@@ -488,7 +559,7 @@ export async function POST(request: Request) {
       const type = String(body.documentType || "CV").trim().toUpperCase();
       const dataUrl = String(body.dataUrl || "");
 
-      if (!fileName || !dataUrl) {
+      if (!fileName || !dataUrl || fileName.length > 180 || /[\\u0000-\\u001f\\u007f]/.test(fileName)) {
         return privateJson({ status: "FAILED", error: "Missing file." }, { status: 400 });
       }
       if (!ALLOWED_DOCUMENT_TYPES.has(type)) {
