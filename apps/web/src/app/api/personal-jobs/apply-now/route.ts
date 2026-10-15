@@ -897,6 +897,62 @@ export async function POST(request: Request) {
       return privateJson({ status: "OPPORTUNITY_STATUS_UPDATED", store, readiness: scoreReadiness(store) });
     }
 
+    if (action === "prepareManualExport") {
+      const opportunityId = typeof body.opportunityId === "string" ? body.opportunityId.trim() : "";
+      const opportunity = store.opportunities.find((item) => item.opportunityId === opportunityId);
+      if (!opportunity) {
+        return privateJson({ status: "FAILED", error: "Opportunity not found in this workspace." }, { status: 404 });
+      }
+
+      const docs = store.documents.filter((doc) => doc && typeof doc === "object" && !doc.deletedAt);
+      const hasType = (type: string) => docs.some((doc) => String(doc.type || "").toUpperCase() === type);
+      const checklist = [
+        { item: "Candidate profile reviewed", status: store.profile?.fullName && store.profile?.email && store.profile?.phone ? "READY_FOR_CANDIDATE_REVIEW" : "MISSING_PROFILE_FIELDS", note: "Confirm name, email, phone, location, experience and skills are accurate." },
+        { item: "Current CV", status: hasType("CV") ? "CANDIDATE_CONFIRMATION_REQUIRED" : "MISSING", note: "A record exists only if uploaded in this workspace; confirm it is current and appropriate." },
+        { item: "Identity document", status: hasType("ID") ? "CANDIDATE_CONFIRMATION_REQUIRED" : "NOT_ATTACHED", note: "Confirm whether the employer officially requires it before sharing." },
+        { item: "Qualifications / certificates", status: hasType("CERTIFICATE") ? "CANDIDATE_CONFIRMATION_REQUIRED" : "NOT_ATTACHED", note: "Attach only real, relevant documents requested by the employer." },
+        { item: "Vacancy requirements", status: opportunity.notes ? "CANDIDATE_REVIEW_REQUIRED" : "NOT_RECORDED", note: "Compare against the employer's official listing; source URL syntax does not prove authenticity." },
+        { item: "Submission proof", status: "NOT_APPLICABLE_UNTIL_SUBMITTED", note: "Capture a real confirmation/reference only after the candidate submits manually." }
+      ];
+      const bundle = {
+        schema: "kingsmen.manual-application-export.v1",
+        status: "PREPARED_FOR_CANDIDATE_REVIEW",
+        generatedAt: new Date().toISOString(),
+        opportunity: {
+          title: String(opportunity.title || ""),
+          organisation: String(opportunity.organisation || ""),
+          category: String(opportunity.category || ""),
+          applicationMethod: String(opportunity.applicationMethod || ""),
+          closingDate: String(opportunity.closingDate || ""),
+          sourceUrl: String(opportunity.sourceUrl || "")
+        },
+        candidateProfile: {
+          fullName: String(store.profile?.fullName || ""),
+          email: String(store.profile?.email || ""),
+          phone: String(store.profile?.phone || ""),
+          location: String(store.profile?.location || ""),
+          highestEducation: String(store.profile?.highestEducation || ""),
+          skills: String(store.profile?.skills || ""),
+          workExperience: String(store.profile?.workExperience || "")
+        },
+        documentInventory: docs.map((doc) => ({
+          type: String(doc.type || "OTHER"),
+          displayName: String(doc.fileName || doc.displayName || "Uploaded document"),
+          availability: doc.registryStatus === "REGISTERED" ? "CANONICAL_REGISTRY_RECORD_PRESENT" : "LOCAL_OR_UNVERIFIED_RECORD",
+          authenticityVerified: false,
+          storageLocationIncluded: false
+        })),
+        checklist,
+        candidateMustConfirmEveryItem: true,
+        applicationSubmitted: false,
+        employerRequirementsVerified: false,
+        documentAuthenticityVerified: false,
+        automaticSending: false,
+        notice: "Review and manually export only the documents you choose. This is a checklist, not a submission; canonical registry presence does not establish authenticity or employer acceptance."
+      };
+      return privateJson({ status: "PREPARED_FOR_CANDIDATE_REVIEW", bundle });
+    }
+
     if (action === "generatePack") {
       const opportunityId = String(body.opportunityId || "");
       const opportunity = store.opportunities.find((item) => item.opportunityId === opportunityId);
