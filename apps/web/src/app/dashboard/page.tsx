@@ -26,11 +26,22 @@ type Pack = {
   createdAt?: string;
 };
 
+type FollowUpTask = {
+  taskId: string;
+  title: string;
+  dueDate: string;
+  priority: "LOW" | "NORMAL" | "HIGH";
+  status: "OPEN" | "DONE";
+  opportunityId?: string;
+  notes?: string;
+};
+
 type PortalStore = {
   profile?: { fullName?: string; email?: string };
   opportunities?: Opportunity[];
   documents?: DocumentRecord[];
   applicationPacks?: Pack[];
+  tasks?: FollowUpTask[];
   proofLog?: Array<{ proofId: string; createdAt?: string; opportunityId?: string }>;
   readiness?: number;
 };
@@ -90,6 +101,9 @@ export default function DashboardPage() {
   const opportunities = data?.opportunities ?? [];
   const documents = data?.documents ?? [];
   const packs = data?.applicationPacks ?? [];
+  const tasks = data?.tasks ?? [];
+  const openTasks = tasks.filter((task) => task.status === "OPEN");
+  const dueTasks = [...openTasks].sort((a, b) => (a.dueDate || "9999-12-31").localeCompare(b.dueDate || "9999-12-31")).slice(0, 5);
   const proofLog = data?.proofLog ?? [];
   const outstanding = useMemo(
     () => opportunities.filter((item) => !["APPLIED_PROOF_CAPTURED", "CLOSED", "WITHDRAWN"].includes(item.status || "")),
@@ -211,6 +225,31 @@ export default function DashboardPage() {
               </div>
             </section>
           </div>
+        </section>
+
+        <section style={{ ...panel, marginTop: 16 }}>
+          <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", gap: 12, flexWrap: "wrap" }}>
+            <div>
+              <h2 style={{ margin: 0, fontFamily: "Georgia,serif", fontSize: 25, fontWeight: 500 }}>Next actions & deadlines</h2>
+              <p className="dash-muted" style={{ margin: "7px 0 0" }}>Your follow-up tasks, linked to your application workflow.</p>
+            </div>
+            <a href="/personal-job-desk/apply-now" style={linkStyle}>Manage tasks →</a>
+          </div>
+          {loading ? <p className="dash-muted">Loading tasks…</p> : dueTasks.length === 0 ? <div style={{ padding: "18px 0 0" }}>
+            <p style={{ margin: "0 0 7px", fontWeight: 700 }}>Nothing is waiting in your task list.</p>
+            <p className="dash-muted" style={{ margin: "0 0 14px" }}>Create a reminder for an application deadline, missing document, interview or employer follow-up.</p>
+            <a href="/personal-job-desk/apply-now" style={linkStyle}>Create a task ↗</a>
+          </div> : dueTasks.map((task) => {
+            const overdue = task.dueDate && task.dueDate < new Date().toISOString().slice(0, 10);
+            const linked = opportunities.find((item) => item.opportunityId === task.opportunityId);
+            return <div className="dash-row" key={task.taskId}>
+              <div style={{ minWidth: 0 }}>
+                <div style={{ fontSize: 14, fontWeight: 700 }}>{task.title}</div>
+                <div style={{ marginTop: 5, color: "#8f9bb0", fontSize: 12 }}>{task.dueDate ? `Due ${formatDate(task.dueDate)}` : "No due date"}{linked ? ` · ${linked.title}` : ""}</div>
+              </div>
+              <span className="dash-pill" style={overdue ? { borderColor: "#87534d", color: "#ffc1b8" } : task.priority === "HIGH" ? { borderColor: "#8a6a3e", color: "#f0d796" } : undefined}>{overdue ? "OVERDUE" : task.priority}</span>
+            </div>;
+          })}
         </section>
 
         <footer style={{ marginTop: 28, paddingTop: 18, borderTop: "1px solid rgba(255,255,255,.08)", color: "#77849a", fontSize: 11, display: "flex", flexWrap: "wrap", justifyContent: "space-between", gap: 12 }}>
