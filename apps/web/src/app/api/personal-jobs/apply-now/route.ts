@@ -49,7 +49,7 @@ type ContactLogEntry = {
   createdAt: string;
 };
 
-type Store = {
+type FinanceLedgerEntry = { entryId: string; type: "FEE" | "PAYMENT" | "REFUND" | "ADJUSTMENT"; direction: "IN" | "OUT"; status: "RECORDED" | "PENDING" | "CONFIRMED" | "FAILED" | "CANCELLED"; amountCents: number; currency: "ZAR"; description: string; reference?: string; evidenceNote?: string; opportunityId?: string; occurredOn: string; createdAt: string; };\n\ntype Store = {
   schema: string;
   updatedAt: string;
   profile: CandidateProfile;
@@ -103,7 +103,7 @@ function readStore(): Store {
       proofLog: Array.isArray(parsed.proofLog) ? parsed.proofLog : [],
       smartExtraction: Array.isArray(parsed.smartExtraction) ? parsed.smartExtraction : [],
       tasks: Array.isArray(parsed.tasks) ? parsed.tasks : [],
-      contactLog: Array.isArray(parsed.contactLog) ? parsed.contactLog : []
+      contactLog: Array.isArray(parsed.contactLog) ? parsed.contactLog : [],\n      financeLedger: Array.isArray(parsed.financeLedger) ? parsed.financeLedger : []
     };
   } catch {
     return defaultStore();
@@ -143,7 +143,7 @@ async function loadStoreForContext(context: PortalContext | null): Promise<Store
   if (!context) return readStore();
   const saved = await loadCandidatePortalState(context);
   if (!saved || typeof saved !== "object") return defaultStore();
-  return { ...defaultStore(), ...saved, profile: saved.profile && typeof saved.profile === "object" ? saved.profile as CandidateProfile : {}, documents: Array.isArray(saved.documents) ? saved.documents : [], opportunities: Array.isArray(saved.opportunities) ? saved.opportunities : [], applicationPacks: Array.isArray(saved.applicationPacks) ? saved.applicationPacks : [], proofLog: Array.isArray(saved.proofLog) ? saved.proofLog : [], smartExtraction: Array.isArray(saved.smartExtraction) ? saved.smartExtraction : [], tasks: Array.isArray(saved.tasks) ? saved.tasks as FollowUpTask[] : [], contactLog: Array.isArray(saved.contactLog) ? saved.contactLog as ContactLogEntry[] : [] };
+  return { ...defaultStore(), ...saved, profile: saved.profile && typeof saved.profile === "object" ? saved.profile as CandidateProfile : {}, documents: Array.isArray(saved.documents) ? saved.documents : [], opportunities: Array.isArray(saved.opportunities) ? saved.opportunities : [], applicationPacks: Array.isArray(saved.applicationPacks) ? saved.applicationPacks : [], proofLog: Array.isArray(saved.proofLog) ? saved.proofLog : [], smartExtraction: Array.isArray(saved.smartExtraction) ? saved.smartExtraction : [], tasks: Array.isArray(saved.tasks) ? saved.tasks as FollowUpTask[] : [], contactLog: Array.isArray(saved.contactLog) ? saved.contactLog as ContactLogEntry[] : [], financeLedger: Array.isArray(saved.financeLedger) ? saved.financeLedger as FinanceLedgerEntry[] : [] };
 }
 async function persistStore(context: PortalContext | null, store: Store) {
   if (context) { store.updatedAt = new Date().toISOString(); await saveCandidatePortalState(context, store as unknown as Record<string, unknown>); return; }
@@ -795,6 +795,31 @@ export async function POST(request: Request) {
       });
     }
 
+    if (action === "addFinanceEntry") {
+      const type = String(body.type || "").toUpperCase(), direction = String(body.direction || "").toUpperCase(), status = String(body.status || "RECORDED").toUpperCase();
+      const description = typeof body.description === "string" ? body.description.trim() : "", reference = typeof body.reference === "string" ? body.reference.trim() : "", evidenceNote = typeof body.evidenceNote === "string" ? body.evidenceNote.trim() : "", opportunityId = typeof body.opportunityId === "string" ? body.opportunityId : "", occurredOn = typeof body.occurredOn === "string" ? body.occurredOn.trim() : "", amountCents = body.amountCents;
+      const validDate = /^\\d{4}-\\d{2}-\\d{2}$/.test(occurredOn) && !Number.isNaN(Date.parse(occurredOn + "T00:00:00Z")) && new Date(occurredOn + "T00:00:00Z").toISOString().slice(0, 10) === occurredOn;
+      if (!["FEE", "PAYMENT", "REFUND", "ADJUSTMENT"].includes(type) || !["IN", "OUT"].includes(direction)) return privateJson({ status: "FAILED", error: "Choose a valid entry type and money direction." }, { status: 400 });
+      if (!["RECORDED", "PENDING", "CONFIRMED", "FAILED", "CANCELLED"].includes(status)) return privateJson({ status: "FAILED", error: "Choose a valid ledger status." }, { status: 400 });
+      if (!Number.isSafeInteger(amountCents) || amountCents <= 0 || amountCents > 1000000000) return privateJson({ status: "FAILED", error: "Amount must be positive integer cents, no more than R10,000,000." }, { status: 400 });
+      if (description.length < 2 || description.length > 180 || reference.length > 120 || evidenceNote.length > 1000) return privateJson({ status: "FAILED", error: "Description must be 2–180 characters; reference max 120 and evidence note max 1,000." }, { status: 400 });
+      if (!validDate) return privateJson({ status: "FAILED", error: "Enter a valid transaction date." }, { status: 400 });
+      if (status === "CONFIRMED" && !reference && !evidenceNote) return privateJson({ status: "FAILED", error: "A reference or evidence note is required before recording a user-confirmed status." }, { status: 400 });
+      if (opportunityId && !store.opportunities.some((item) => item.opportunityId === opportunityId)) return privateJson({ status: "FAILED", error: "Linked opportunity was not found in this workspace." }, { status: 404 });
+      const entry: FinanceLedgerEntry = { entryId: `finance-${Date.now()}-${Math.random().toString(16).slice(2)}`, type: type as FinanceLedgerEntry["type"], direction: direction as FinanceLedgerEntry["direction"], status: status as FinanceLedgerEntry["status"], amountCents, currency: "ZAR", description, ...(reference ? { reference } : {}), ...(evidenceNote ? { evidenceNote } : {}), ...(opportunityId ? { opportunityId } : {}), occurredOn, createdAt: new Date().toISOString() };
+      store.financeLedger = [entry, ...(store.financeLedger || [])].slice(0, 1000);
+      await persistStore(context, store);
+      return privateJson({ status: "FINANCE_ENTRY_CREATED", entry, store, readiness: scoreReadiness(store) });
+    }
+
+    if (action === "deleteFinanceEntry") {
+      const entryId = String(body.entryId || ""), before = (store.financeLedger || []).length;
+      store.financeLedger = (store.financeLedger || []).filter((entry) => entry.entryId !== entryId);
+      if (store.financeLedger.length === before) return privateJson({ status: "FAILED", error: "Finance entry not found." }, { status: 404 });
+      await persistStore(context, store);
+      return privateJson({ status: "FINANCE_ENTRY_DELETED", store, readiness: scoreReadiness(store) });
+    }
+
     if (action === "addContactLog") {
       const contactName = typeof body.contactName === "string" ? body.contactName.trim() : "";
       const organisation = typeof body.organisation === "string" ? body.organisation.trim() : "";
@@ -927,7 +952,7 @@ export async function POST(request: Request) {
       store.applicationPacks = store.applicationPacks.filter((item) => item.opportunityId !== opportunityId);
       store.proofLog = store.proofLog.filter((item) => item.opportunityId !== opportunityId);
       store.tasks = store.tasks.map((item) => item.opportunityId === opportunityId ? { ...item, opportunityId: undefined, updatedAt: new Date().toISOString() } : item);
-      store.contactLog = store.contactLog.map((item) => item.opportunityId === opportunityId ? { ...item, opportunityId: undefined } : item);
+      store.contactLog = store.contactLog.map((item) => item.opportunityId === opportunityId ? { ...item, opportunityId: undefined } : item);\n      store.financeLedger = (store.financeLedger || []).map((item) => item.opportunityId === opportunityId ? { ...item, opportunityId: undefined } : item);
       await persistStore(context, store);
 
       return privateJson({
