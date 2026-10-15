@@ -93,10 +93,41 @@ function decodeDataUrl(dataUrl: string) {
   const match = dataUrl.match(/^data:([^;,]+);base64,([A-Za-z0-9+/]*={0,2})$/);
   if (!match) throw new Error("Upload must be a valid base64-encoded PDF, DOCX or TXT file.");
   const mimeType = match[1].toLowerCase();
-  const buffer = Buffer.from(match[2], "base64");
+  const encoded = match[2];
+  const buffer = Buffer.from(encoded, "base64");
+  // Buffer.from is permissive; require canonical base64 so malformed input cannot be silently repaired.
+  if (buffer.toString("base64").replace(/=+$/, "") !== encoded.replace(/=+$/, "")) {
+    throw new Error("Upload contains malformed base64 data.");
+  }
   if (buffer.length === 0) throw new Error("The uploaded file is empty.");
   if (buffer.length > MAX_UPLOAD_BYTES) throw new Error("File exceeds the 10 MB upload limit.");
   return { mimeType, buffer };
+}
+
+function validateDocumentSignature(fileName: string, mimeType: string, buffer: Buffer) {
+  const lower = fileName.toLowerCase();
+  if (lower.endsWith(".pdf") || mimeType === "application/pdf") {
+    if (buffer.length < 8 || buffer.subarray(0, 5).toString("ascii") !== "%PDF-") {
+      throw new Error("The file does not contain a valid PDF signature.");
+    }
+    return;
+  }
+
+  if (lower.endsWith(".docx") || mimeType.includes("wordprocessingml")) {
+    // DOCX is an Open XML ZIP package. Check the ZIP local-file header before parsing.
+    if (buffer.length < 4 || buffer[0] !== 0x50 || buffer[1] !== 0x4b ||
+        !([0x03, 0x05, 0x07].includes(buffer[2]) && [0x04, 0x06, 0x08].includes(buffer[3]))) {
+      throw new Error("The file does not contain a valid DOCX/ZIP signature.");
+    }
+    return;
+  }
+
+  if (lower.endsWith(".txt") || mimeType.startsWith("text/")) {
+    const text = buffer.toString("utf8");
+    if (text.includes("\\u0000") || text.includes("\\ufffd")) {
+      throw new Error("The TXT file must contain valid UTF-8 text.");
+    }
+  }
 }
 
 async function extractDocumentText(fileName: string, mimeType: string, buffer: Buffer) {
@@ -428,6 +459,11 @@ export async function POST(request: Request) {
       }
       if (!allowedMimes.has(decoded.mimeType)) {
         return NextResponse.json({ status: "FAILED", error: "File extension and content type do not match." }, { status: 415 });
+      }
+      try {
+        validateDocumentSignature(fileName, decoded.mimeType, decoded.buffer);
+      } catch (error) {
+        return NextResponse.json({ status: "FAILED", error: error instanceof Error ? error.message : "Invalid document content." }, { status: 415 });
       }
 
       fs.mkdirSync(UPLOAD_DIR, { recursive: true });
