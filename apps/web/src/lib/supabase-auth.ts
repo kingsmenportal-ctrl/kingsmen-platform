@@ -1,6 +1,6 @@
 import { cookies } from "next/headers";
 
-const ACCESS_COOKIE = "__Host-kingsmen-access-token";
+const ACCESS_COOKIE = "kingsmen-access-token";
 
 function supabaseConfig() {
   const url = process.env.NEXT_PUBLIC_SUPABASE_URL;
