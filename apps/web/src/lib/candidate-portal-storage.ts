@@ -51,7 +51,16 @@ async function portalFetch(context: PortalContext, endpoint: string, init: Reque
   return response;
 }
 
+function assertCandidateIdentity(context: PortalContext) {
+  if (!/^[0-9a-f]{8}-[0-9a-f]{4}-[1-8][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i.test(context.userId)) {
+    throw new Error("Authenticated candidate identity is invalid.");
+  }
+}
+
+const MAX_CANDIDATE_STATE_BYTES = 2 * 1024 * 1024;
+
 export async function loadCandidatePortalState(context: PortalContext): Promise<Record<string, unknown> | null> {
+  assertCandidateIdentity(context);
   const query = new URLSearchParams({
     select: "state",
     auth_user_id: `eq.${context.userId}`,
@@ -59,15 +68,23 @@ export async function loadCandidatePortalState(context: PortalContext): Promise<
   });
   const response = await portalFetch(context, `/rest/v1/candidate_portal_state?${query.toString()}`);
   if (!response.ok) throw new Error("Candidate storage could not be read.");
-  const rows = await response.json() as Array<{ state?: Record<string, unknown> }>;
-  return rows[0]?.state || null;
+  const rows = await response.json() as unknown;
+  if (!Array.isArray(rows)) throw new Error("Candidate storage returned an invalid response.");
+  const state = (rows[0] as { state?: unknown } | undefined)?.state;
+  if (state == null) return null;
+  if (typeof state !== "object" || Array.isArray(state)) throw new Error("Candidate storage returned an invalid state.");
+  return state as Record<string, unknown>;
 }
 
 export async function saveCandidatePortalState(context: PortalContext, state: Record<string, unknown>): Promise<void> {
+  assertCandidateIdentity(context);
+  if (!state || typeof state !== "object" || Array.isArray(state)) throw new Error("Candidate state must be an object.");
+  const body = JSON.stringify({ auth_user_id: context.userId, state });
+  if (Buffer.byteLength(body, "utf8") > MAX_CANDIDATE_STATE_BYTES) throw new Error("Candidate state exceeds the storage limit.");
   const response = await portalFetch(context, "/rest/v1/candidate_portal_state?on_conflict=auth_user_id", {
     method: "POST",
     headers: { Prefer: "resolution=merge-duplicates,return=minimal" },
-    body: JSON.stringify({ auth_user_id: context.userId, state })
+    body
   });
   if (!response.ok) throw new Error("Candidate storage could not be saved.");
 }
@@ -86,9 +103,7 @@ export async function uploadCandidatePortalDocument(
   if (!allowedMime || (mimeType !== allowedMime && mimeType !== "application/octet-stream" && mimeType !== "text/txt")) {
     throw new Error("Document type does not match an allowed private-storage type.");
   }
-  if (!/^[0-9a-f]{8}-[0-9a-f]{4}-[1-8][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i.test(context.userId)) {
-    throw new Error("Authenticated candidate identity is invalid for private storage.");
-  }
+  assertCandidateIdentity(context);
   const storagePath = `${context.userId}/${objectKey}`;
   const response = await fetch(
     new URL(`/storage/v1/object/candidate-documents/${storagePath.split("/").map(encodeURIComponent).join("/")}`, context.url),
