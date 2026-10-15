@@ -321,3 +321,34 @@ test("job finder exposes a candidate-workspace save action and does not auto-sub
   assert.match(page, /manualApprovalRequired: true/);
   assert.match(page, /does not submit applications/);
 });
+
+
+test("authenticated uploads register canonical document and evidence references before workspace persistence", () => {
+  const start = route.indexOf('if (action === "uploadDocument")');
+  const end = route.indexOf('if (action === "addOpportunity")', start);
+  const block = route.slice(start, end);
+  assert.match(block, /register_candidate_document_upload/);
+  assert.match(block, /Authorization: `Bearer ${context\.accessToken}`/);
+  assert.match(block, /p_storage_path: storagePath/);
+  assert.match(block, /canonicalRegistration\.documentRef/);
+  assert.match(block, /registryStatus: "REGISTERED"/);
+  assert.match(block, /Canonical document registration failed/);
+  assert.ok(block.indexOf("register_candidate_document_upload") < block.indexOf("await persistStore(context, store)"));
+  assert.match(block, /A file must not be orphaned in private storage/);
+});
+
+test("canonical upload registration is ownership-scoped, storage-backed and non-verifying", () => {
+  const migration = fs.readFileSync(path.resolve(__dirname, "../../../db/migrations/0020_candidate_document_upload_registration.sql"), "utf8");
+  assert.match(migration, /auth\.uid\(\)/);
+  assert.match(migration, /c\.owner_user_id = auth\.uid\(\)/);
+  assert.match(migration, /cardinality\(v_candidate_ids\),0\) <> 1/);
+  assert.match(migration, /storage\.objects/);
+  assert.match(migration, /o\.bucket_id = v_bucket/);
+  assert.match(migration, /o\.owner_id = auth\.uid\(\)::text/);
+  assert.match(migration, /public\.document_files/);
+  assert.match(migration, /public\.document_storage_events/);
+  assert.match(migration, /'verificationStatus', 'PENDING'/);
+  assert.match(migration, /'documentStatus', 'UPLOADED'/);
+  assert.match(migration, /revoke all on function public\.register_candidate_document_upload/);
+  assert.doesNotMatch(migration, /verification_status\s*=\s*'VERIFIED'|document_status\s*=\s*'READY'/i);
+});
