@@ -26,6 +26,7 @@ on:
       - "db/migrations/0016_founder_audit_and_command_intake.sql"
       - "db/migrations/0017_founder_command_decisions.sql"
       - "db/migrations/0018_founder_document_review_decisions.sql"
+      - "db/migrations/0019_founder_document_canonical_validation.sql"
       - ".github/workflows/kingsmen-candidate-storage.yml"
   push:
     branches:
