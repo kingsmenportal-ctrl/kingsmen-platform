@@ -30,29 +30,34 @@ async function uploadSyntheticDocument(token, marker) { const bytes = Buffer.fro
 async function deleteSyntheticDocument(token, documentId) { const response = await request(endpoint, token, { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ action: "deleteDocument", documentId }) }); assert.equal(response.status, 200, "synthetic document cleanup HTTP " + response.status); const data = await response.json(); assert.equal(data.status, "DOCUMENT_DELETED"); }
 function record(name, passed, details = {}) { results.push({ name, passed: Boolean(passed), ...details }); }
 
-let originalA, originalB, modifiedA = false, modifiedB = false, documentA = null, documentB = null, runError = null;
+let originalA, originalB, modifiedA = false, modifiedB = false, documentA = null, documentB = null, runError = null, activeCheck = "authenticated_sessions";
 try {
   const [sessionA, sessionB] = await Promise.all([checkSession(tokenA), checkSession(tokenB)]);
   assert.ok(sessionA.user && sessionA.user.id && sessionB.user && sessionB.user.id);
   assert.notEqual(sessionA.user.id, sessionB.user.id, "A and B must be distinct Auth identities");
   record("distinct_authenticated_users", true, { userA: "A", userB: "B" });
+  activeCheck = "workspace_baseline_read";
   [originalA, originalB] = await Promise.all([readWorkspace(tokenA), readWorkspace(tokenB)]);
   const markerA = "KP_STAGING_A_" + runId, markerB = "KP_STAGING_B_" + runId;
+  activeCheck = "authenticated_profile_persistence_after_reload";
   await saveNotes(tokenA, markerA); modifiedA = true;
   await saveNotes(tokenB, markerB); modifiedB = true;
   const [reloadedA, reloadedB] = await Promise.all([readWorkspace(tokenA), readWorkspace(tokenB)]);
   assert.equal(reloadedA.profile.notes, markerA, "A marker must persist after reload");
   assert.equal(reloadedB.profile.notes, markerB, "B marker must persist after reload");
   record("authenticated_profile_persistence_after_reload", true);
+  activeCheck = "bidirectional_cross_account_read_isolation";
   assert.notEqual(reloadedA.profile.notes, markerB, "A must not receive B marker");
   assert.notEqual(reloadedB.profile.notes, markerA, "B must not receive A marker");
   record("bidirectional_cross_account_read_isolation", true);
+  activeCheck = "identity_spoof_field_cannot_cross_write";
   const spoof = await request(endpoint, tokenA, { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ action: "saveProfile", auth_user_id: sessionB.user.id, profile: { notes: "KP_SPOOF_" + runId } }) });
   assert.equal(spoof.status, 200, "identity field should be ignored by profile API");
   const [afterSpoofA, unchangedB] = await Promise.all([readWorkspace(tokenA), readWorkspace(tokenB)]);
   assert.equal(afterSpoofA.profile.notes, markerA, "spoof attempt must not change A marker");
   assert.equal(unchangedB.profile.notes, markerB, "spoof attempt must not change B data");
   record("identity_spoof_field_cannot_cross_write", true);
+  activeCheck = "private_document_upload_and_byte_integrity";
   documentA = await uploadSyntheticDocument(tokenA, "KP-A-" + runId.replace(/[^a-zA-Z0-9-]/g, ""));
   documentB = await uploadSyntheticDocument(tokenB, "KP-B-" + runId.replace(/[^a-zA-Z0-9-]/g, ""));
   const ownDownloadA = await request(documentEndpoint(documentA.documentId), tokenA);
@@ -62,15 +67,17 @@ try {
   assert.equal(ownDownloadB.status, 200, "B must download own private document");
   assert.deepEqual(Buffer.from(await ownDownloadB.arrayBuffer()), documentB.bytes, "B download bytes must match uploaded fixture");
   record("private_document_upload_and_byte_integrity", true);
+  activeCheck = "bidirectional_private_document_isolation";
   const crossAB = await request(documentEndpoint(documentB.documentId), tokenA);
   assert.equal(crossAB.status, 404, "A must receive not-found for B document; service errors are failures, got HTTP " + crossAB.status);
   const crossBA = await request(documentEndpoint(documentA.documentId), tokenB);
   assert.equal(crossBA.status, 404, "B must receive not-found for A document; service errors are failures, got HTTP " + crossBA.status);
   record("bidirectional_private_document_isolation", true, { userARequest: crossAB.status, userBRequest: crossBA.status });
+  activeCheck = "unauthenticated_workspace_denied";
   const noAuth = await fetch(endpoint, { cache: "no-store", signal: AbortSignal.timeout(15000) });
-  assert.ok([401, 503].includes(noAuth.status), "unauthenticated request must fail closed, got HTTP " + noAuth.status);
+  assert.equal(noAuth.status, 401, "unauthenticated request must return HTTP 401, got HTTP " + noAuth.status);
   record("unauthenticated_workspace_denied", true, { httpStatus: noAuth.status });
-} catch (error) { runError = error instanceof Error ? error.message : "Unknown test failure"; results.push({ name: "staging_assertions_completed", passed: false, error: "Assertion or request failed; inspect local staging logs for details." }); }
+} catch (error) { runError = error instanceof Error ? error.message : "Unknown test failure"; results.push({ name: "failed_check", check: activeCheck, passed: false, error: "Assertion or request failed; inspect local staging logs for details." }); }
 finally {
   if (documentA) { try { await deleteSyntheticDocument(tokenA, documentA.documentId); record("cleanup_user_A_synthetic_document", true); } catch { results.push({ name: "cleanup_user_A_synthetic_document", passed: false }); } }
   if (documentB) { try { await deleteSyntheticDocument(tokenB, documentB.documentId); record("cleanup_user_B_synthetic_document", true); } catch { results.push({ name: "cleanup_user_B_synthetic_document", passed: false }); } }
