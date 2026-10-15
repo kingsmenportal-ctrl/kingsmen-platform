@@ -63,3 +63,17 @@ test("candidate responses are private and not cacheable", () => {
   assert.match(route, /headers\.set\("Cache-Control", "private, no-store, max-age=0"\)/);
   assert.match(route, /headers\.set\("Pragma", "no-cache"\)/);
 });
+
+
+test("private document uploads reject non-UUID identities and unsafe object keys before network access", () => {
+  assert.match(storage, /Authenticated candidate identity is invalid for private storage/);
+  assert.match(storage, /!\/[\^a-zA-Z0-9._-\]\{1,180\}\$\//);
+  assert.match(storage, /objectKey === "\." \|\| objectKey === "\.\."/);
+});
+
+test("private storage uploads enforce extension and MIME compatibility and use bounded requests", () => {
+  assert.match(storage, /const allowedMime = extension === "\.pdf" \? "application\/pdf"/);
+  assert.match(storage, /Document type does not match an allowed private-storage type/);
+  assert.match(storage, /signal: AbortSignal\.timeout\(20_000\)/);
+  assert.match(storage, /cache: "no-store"/);
+});
