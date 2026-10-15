@@ -27,6 +27,18 @@ type FollowUpTask = {
   updatedAt: string;
 };
 
+type ContactLogEntry = {
+  entryId: string;
+  opportunityId?: string;
+  contactName: string;
+  organisation: string;
+  channel: "EMAIL" | "PHONE" | "PORTAL" | "IN_PERSON" | "OTHER";
+  direction: "OUTBOUND" | "INBOUND";
+  summary: string;
+  followUpDate?: string;
+  createdAt: string;
+};
+
 type Store = {
   profile: Profile;
   documents: any[];
@@ -35,6 +47,7 @@ type Store = {
   proofLog: any[];
   smartExtraction: any[];
   tasks: FollowUpTask[];
+  contactLog: ContactLogEntry[];
   readiness?: number;
 };
 
@@ -46,6 +59,7 @@ const emptyStore: Store = {
   proofLog: [],
   smartExtraction: [],
   tasks: [],
+  contactLog: [],
   readiness: 0
 };
 
@@ -57,6 +71,7 @@ export default function ApplyNowClient() {
   const [selectedOpportunity, setSelectedOpportunity] = useState("");
   const [proof, setProof] = useState("");
   const [taskDraft, setTaskDraft] = useState({ title: "", dueDate: "", priority: "NORMAL", opportunityId: "", notes: "" });
+  const [contactDraft, setContactDraft] = useState({ contactName: "", organisation: "", channel: "EMAIL", direction: "OUTBOUND", opportunityId: "", summary: "", followUpDate: "" });
   const [opportunity, setOpportunity] = useState({
     title: "",
     organisation: "",
@@ -232,6 +247,33 @@ export default function ApplyNowClient() {
       setMessage("Proof captured.");
     } catch (error) {
       setMessage(error instanceof Error ? error.message : "Could not capture proof.");
+    } finally {
+      setBusy("");
+    }
+  }
+
+  async function addContactLog() {
+    setBusy("contact-create");
+    try {
+      const json = await api({ action: "addContactLog", ...contactDraft });
+      setStore(json.store);
+      setContactDraft({ contactName: "", organisation: "", channel: "EMAIL", direction: "OUTBOUND", opportunityId: "", summary: "", followUpDate: "" });
+      setMessage("Employer contact saved to your private workspace.");
+    } catch (error) {
+      setMessage(error instanceof Error ? error.message : "Could not save contact.");
+    } finally {
+      setBusy("");
+    }
+  }
+
+  async function deleteContactLog(entryId: string) {
+    setBusy(`contact-delete-${entryId}`);
+    try {
+      const json = await api({ action: "deleteContactLog", entryId });
+      setStore(json.store);
+      setMessage("Contact log entry removed.");
+    } catch (error) {
+      setMessage(error instanceof Error ? error.message : "Could not remove contact entry.");
     } finally {
       setBusy("");
     }
@@ -544,6 +586,38 @@ export default function ApplyNowClient() {
               </div>
             </article>;
           }) : <div style={emptyState}>No follow-up tasks yet. Add a deadline or next action above to start your task list.</div>}
+        </div>
+      </section>
+
+      <section style={panel}>
+        <div style={sectionHead}>
+          <div>
+            <p style={eyebrow}>06 / EMPLOYER COMMUNICATIONS</p>
+            <h2 style={sectionTitle}>Contact log</h2>
+            <p style={{ color: "#aab5c7", fontSize: 13, lineHeight: 1.6, margin: "6px 0 0" }}>Keep a private record of employer calls, emails, portal messages and follow-up dates. Nothing is sent automatically.</p>
+          </div>
+          <span style={pill}>{(store.contactLog || []).length} recorded</span>
+        </div>
+        <div style={formGrid}>
+          <Field label="Contact / person" value={contactDraft.contactName} onChange={(value) => setContactDraft((current) => ({ ...current, contactName: value }))} />
+          <Field label="Organisation" value={contactDraft.organisation} onChange={(value) => setContactDraft((current) => ({ ...current, organisation: value }))} />
+          <Select label="Channel" value={contactDraft.channel} onChange={(value) => setContactDraft((current) => ({ ...current, channel: value }))} options={["EMAIL", "PHONE", "PORTAL", "IN_PERSON", "OTHER"]} />
+          <Select label="Direction" value={contactDraft.direction} onChange={(value) => setContactDraft((current) => ({ ...current, direction: value }))} options={["OUTBOUND", "INBOUND"]} />
+          <Select label="Linked opportunity (optional)" value={contactDraft.opportunityId} onChange={(value) => setContactDraft((current) => ({ ...current, opportunityId: value }))} options={["", ...store.opportunities.map((item) => item.opportunityId)]} labels={["No linked opportunity", ...store.opportunities.map((item) => item.title)]} />
+          <Field label="Follow-up date (optional)" type="date" value={contactDraft.followUpDate} onChange={(value) => setContactDraft((current) => ({ ...current, followUpDate: value }))} />
+          <div style={{ gridColumn: "1 / -1" }}><Field label="Summary / outcome" value={contactDraft.summary} onChange={(value) => setContactDraft((current) => ({ ...current, summary: value }))} /></div>
+        </div>
+        <div style={{ ...cardActions, marginTop: 12 }}><button type="button" style={primaryButton} disabled={busy === "contact-create"} onClick={addContactLog}>{busy === "contact-create" ? "Saving…" : "Save contact record"}</button></div>
+        <div style={{ ...queue, marginTop: 16 }}>
+          {(store.contactLog || []).length === 0 ? <div style={emptyState}>No employer contacts recorded yet. Log the outcome of your next call or email here.</div> : [...store.contactLog].sort((a, b) => Date.parse(b.createdAt) - Date.parse(a.createdAt)).map((entry) => {
+            const linked = store.opportunities.find((item) => item.opportunityId === entry.opportunityId);
+            return <article key={entry.entryId} style={oppCard}>
+              <div style={oppHeader}><div><h3 style={oppTitle}>{entry.contactName}</h3><p style={oppMeta}>{entry.organisation || "Organisation not recorded"} · {entry.channel.replaceAll("_", " ")} · {entry.direction.toLowerCase()}</p></div><span style={statusBadge}>{new Date(entry.createdAt).toLocaleDateString("en-ZA")}</span></div>
+              <p style={{ margin: 0, whiteSpace: "pre-wrap", overflowWrap: "anywhere" }}>{entry.summary}</p>
+              <p style={{ ...oppMeta, fontSize: 12 }}>{linked ? `Opportunity: ${linked.title} · ` : ""}{entry.followUpDate ? `Follow up by ${entry.followUpDate}` : "No follow-up date set"}</p>
+              <div style={cardActions}><button type="button" style={dangerButton} disabled={busy === `contact-delete-${entry.entryId}`} onClick={() => deleteContactLog(entry.entryId)}>Remove record</button></div>
+            </article>;
+          })}
         </div>
       </section>
 
