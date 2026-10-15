@@ -132,7 +132,7 @@ function summarize(records: any[]) {
   };
 }
 
-export async function GET() {
+export async function GET() {\n  if (process.env.NODE_ENV === "production") {\n    return privateJson({ status: "STORAGE_NOT_CONFIGURED", error: "Review ledger is disabled in production until authenticated, candidate-scoped persistent storage is configured." }, { status: 503 });\n  }
   const synced = syncLedger();
   if (!synced.ok) {
     return privateJson({ status: "FAILED", error: synced.error }, { status: synced.status });
@@ -141,7 +141,7 @@ export async function GET() {
   return privateJson(synced.output);
 }
 
-export async function POST(request: Request) {
+export async function POST(request: Request) {\n  if (process.env.NODE_ENV === "production") {\n    return privateJson({ status: "STORAGE_NOT_CONFIGURED", error: "Review ledger updates are disabled in production until authenticated, candidate-scoped persistent storage is configured." }, { status: 503 });\n  }
   const synced = syncLedger();
   if (!synced.ok) {
     return NextResponse.json({ status: "FAILED", error: synced.error }, { status: synced.status });
