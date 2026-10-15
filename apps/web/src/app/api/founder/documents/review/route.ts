@@ -66,7 +66,7 @@ export async function POST(request: Request) {
       evidenceId: body.evidenceId,
       auditId: body.auditId,
       safeNotes,
-      reviewerUserId: access.user.id,
+      reviewerUserId: access.userId,
       proposedAt: new Date().toISOString()
     },
     boundary: "Authenticated founder review proposal only. No document was fetched, verified, rejected, or modified.",
