@@ -131,3 +131,15 @@ test("bounded request-body reader is async and enforces actual streamed byte cou
   assert.match(route, /if \(total > MAX_JSON_BODY_BYTES\)/);
   assert.match(route, /new TextDecoder\("utf-8", \{ fatal: true \}\)/);
 });
+
+
+test("document upload performs best-effort storage cleanup if extraction or persistence fails", () => {
+  const uploadStart = route.indexOf('if (action === "uploadDocument")');
+  const uploadEnd = route.indexOf('if (action === "addOpportunity")', uploadStart);
+  const upload = route.slice(uploadStart, uploadEnd);
+  assert.match(upload, /catch \(error\) \{[\s\S]*?A file must not be orphaned in private storage/);
+  assert.match(upload, /method: "DELETE"/);
+  assert.match(upload, /body: JSON\.stringify\(\{ prefixes: \[storagePath\] \}\)/);
+  assert.match(upload, /fs\.unlinkSync\(filePath\)/);
+  assert.match(upload, /throw error;/);
+});
