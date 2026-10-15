@@ -87,7 +87,7 @@ function writeStore(store: Store) {
     // Some development filesystems do not support POSIX permissions.
   }
   store.updatedAt = new Date().toISOString();
-  fs.writeFileSync(STORE_PATH, `${JSON.stringify(store, null, 2)}\\n`, { encoding: "utf8", mode: 0o600 });
+  fs.writeFileSync(STORE_PATH, `${JSON.stringify(store, null, 2)}\n`, { encoding: "utf8", mode: 0o600 });
   try {
     fs.chmodSync(STORE_PATH, 0o600);
   } catch {
