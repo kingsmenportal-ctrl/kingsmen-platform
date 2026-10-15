@@ -37,6 +37,18 @@ type FollowUpTask = {
   updatedAt: string;
 };
 
+type ContactLogEntry = {
+  entryId: string;
+  opportunityId?: string;
+  contactName: string;
+  organisation: string;
+  channel: "EMAIL" | "PHONE" | "PORTAL" | "IN_PERSON" | "OTHER";
+  direction: "OUTBOUND" | "INBOUND";
+  summary: string;
+  followUpDate?: string;
+  createdAt: string;
+};
+
 type Store = {
   schema: string;
   updatedAt: string;
@@ -47,6 +59,7 @@ type Store = {
   proofLog: any[];
   smartExtraction: any[];
   tasks: FollowUpTask[];
+  contactLog: ContactLogEntry[];
 };
 
 function repoRoot() {
@@ -72,7 +85,8 @@ function defaultStore(): Store {
     applicationPacks: [],
     proofLog: [],
     smartExtraction: [],
-    tasks: []
+    tasks: [],
+    contactLog: []
   };
 }
 
@@ -88,7 +102,8 @@ function readStore(): Store {
       applicationPacks: Array.isArray(parsed.applicationPacks) ? parsed.applicationPacks : [],
       proofLog: Array.isArray(parsed.proofLog) ? parsed.proofLog : [],
       smartExtraction: Array.isArray(parsed.smartExtraction) ? parsed.smartExtraction : [],
-      tasks: Array.isArray(parsed.tasks) ? parsed.tasks : []
+      tasks: Array.isArray(parsed.tasks) ? parsed.tasks : [],
+      contactLog: Array.isArray(parsed.contactLog) ? parsed.contactLog : []
     };
   } catch {
     return defaultStore();
@@ -128,7 +143,7 @@ async function loadStoreForContext(context: PortalContext | null): Promise<Store
   if (!context) return readStore();
   const saved = await loadCandidatePortalState(context);
   if (!saved || typeof saved !== "object") return defaultStore();
-  return { ...defaultStore(), ...saved, profile: saved.profile && typeof saved.profile === "object" ? saved.profile as CandidateProfile : {}, documents: Array.isArray(saved.documents) ? saved.documents : [], opportunities: Array.isArray(saved.opportunities) ? saved.opportunities : [], applicationPacks: Array.isArray(saved.applicationPacks) ? saved.applicationPacks : [], proofLog: Array.isArray(saved.proofLog) ? saved.proofLog : [], smartExtraction: Array.isArray(saved.smartExtraction) ? saved.smartExtraction : [], tasks: Array.isArray(saved.tasks) ? saved.tasks as FollowUpTask[] : [] };
+  return { ...defaultStore(), ...saved, profile: saved.profile && typeof saved.profile === "object" ? saved.profile as CandidateProfile : {}, documents: Array.isArray(saved.documents) ? saved.documents : [], opportunities: Array.isArray(saved.opportunities) ? saved.opportunities : [], applicationPacks: Array.isArray(saved.applicationPacks) ? saved.applicationPacks : [], proofLog: Array.isArray(saved.proofLog) ? saved.proofLog : [], smartExtraction: Array.isArray(saved.smartExtraction) ? saved.smartExtraction : [], tasks: Array.isArray(saved.tasks) ? saved.tasks as FollowUpTask[] : [], contactLog: Array.isArray(saved.contactLog) ? saved.contactLog as ContactLogEntry[] : [] };
 }
 async function persistStore(context: PortalContext | null, store: Store) {
   if (context) { store.updatedAt = new Date().toISOString(); await saveCandidatePortalState(context, store as unknown as Record<string, unknown>); return; }
@@ -778,6 +793,36 @@ export async function POST(request: Request) {
         store,
         readiness: scoreReadiness(store)
       });
+    }
+
+    if (action === "addContactLog") {
+      const contactName = typeof body.contactName === "string" ? body.contactName.trim() : "";
+      const organisation = typeof body.organisation === "string" ? body.organisation.trim() : "";
+      const summary = typeof body.summary === "string" ? body.summary.trim() : "";
+      const channel = String(body.channel || "OTHER").toUpperCase();
+      const direction = String(body.direction || "OUTBOUND").toUpperCase();
+      const opportunityId = typeof body.opportunityId === "string" ? body.opportunityId : "";
+      const followUpDate = typeof body.followUpDate === "string" ? body.followUpDate.trim() : "";
+      const validDate = (value: string) => !value || (/^\\d{4}-\\d{2}-\\d{2}$/.test(value) && !Number.isNaN(Date.parse(value + "T00:00:00Z")) && new Date(value + "T00:00:00Z").toISOString().slice(0, 10) === value);
+      if (contactName.length < 2 || contactName.length > 120) return privateJson({ status: "FAILED", error: "Contact name must be 2–120 characters." }, { status: 400 });
+      if (organisation.length > 160 || summary.length < 2 || summary.length > 1600) return privateJson({ status: "FAILED", error: "Organisation must be at most 160 characters and summary 2–1,600 characters." }, { status: 400 });
+      if (!["EMAIL", "PHONE", "PORTAL", "IN_PERSON", "OTHER"].includes(channel)) return privateJson({ status: "FAILED", error: "Choose a valid contact channel." }, { status: 400 });
+      if (!["OUTBOUND", "INBOUND"].includes(direction)) return privateJson({ status: "FAILED", error: "Choose inbound or outbound direction." }, { status: 400 });
+      if (!validDate(followUpDate)) return privateJson({ status: "FAILED", error: "Enter a valid follow-up date." }, { status: 400 });
+      if (opportunityId && !store.opportunities.some((item) => item.opportunityId === opportunityId)) return privateJson({ status: "FAILED", error: "Linked opportunity was not found in this workspace." }, { status: 404 });
+      const entry: ContactLogEntry = { entryId: `contact-${Date.now()}-${Math.random().toString(16).slice(2)}`, contactName, organisation, summary, channel: channel as ContactLogEntry["channel"], direction: direction as ContactLogEntry["direction"], ...(opportunityId ? { opportunityId } : {}), ...(followUpDate ? { followUpDate } : {}), createdAt: new Date().toISOString() };
+      store.contactLog = [entry, ...(store.contactLog || [])].slice(0, 500);
+      await persistStore(context, store);
+      return privateJson({ status: "CONTACT_LOG_CREATED", entry, store, readiness: scoreReadiness(store) });
+    }
+
+    if (action === "deleteContactLog") {
+      const entryId = String(body.entryId || "");
+      const beforeCount = (store.contactLog || []).length;
+      store.contactLog = (store.contactLog || []).filter((item) => item.entryId !== entryId);
+      if (store.contactLog.length === beforeCount) return privateJson({ status: "FAILED", error: "Contact log entry not found." }, { status: 404 });
+      await persistStore(context, store);
+      return privateJson({ status: "CONTACT_LOG_DELETED", store, readiness: scoreReadiness(store) });
     }
 
     if (action === "addTask") {
