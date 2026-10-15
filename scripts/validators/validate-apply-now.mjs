@@ -113,7 +113,8 @@ const authFiles = {
   session: "apps/web/src/app/api/auth/session/route.ts",
   page: "apps/web/src/app/sign-in/page.tsx",
   identityMigration: "db/migrations/0023_candidate_auth_private_storage.sql",
-  readPolicyMigration: "db/migrations/0024_candidate_owned_application_document_reads.sql"
+  readPolicyMigration: "db/migrations/0024_candidate_owned_application_document_reads.sql",
+  explicitBindingMigration: "db/migrations/0025_explicit_candidate_identity_binding.sql"
 };
 for (const [name, file] of Object.entries(authFiles)) {
   checks.push({
@@ -128,6 +129,7 @@ const loginRoute = readTextIfExists(authFiles.login);
 const registerRoute = readTextIfExists(authFiles.register);
 const identityMigration = readTextIfExists(authFiles.identityMigration);
 const documentPolicyMigration = readTextIfExists(authFiles.readPolicyMigration);
+const explicitBindingMigration = readTextIfExists(authFiles.explicitBindingMigration);
 
 checks.push({
   name: "auth_session_uses_http_only_cookie_and_no_store",
@@ -155,6 +157,18 @@ checks.push({
     identityMigration.includes("no email-based auto-linking"),
   detail: "Account registration must not claim an existing candidate record by email."
 });
+checks.push({
+  name: "candidate_identity_binding_is_explicit_and_privileged",
+  passed: explicitBindingMigration.includes("FUNCTION kingsmen_security.bind_candidate_auth_user") &&
+    explicitBindingMigration.includes("REVOKE ALL ON FUNCTION kingsmen_security.bind_candidate_auth_user(uuid, uuid) FROM PUBLIC") &&
+    explicitBindingMigration.includes("FROM anon") &&
+    explicitBindingMigration.includes("FROM authenticated") &&
+    explicitBindingMigration.includes("TO service_role") &&
+    explicitBindingMigration.includes("never matches by email") &&
+    explicitBindingMigration.includes("already linked"),
+  detail: "Candidate/Auth identity linking must require trusted service-role provisioning, reject reassignment, and never match by email."
+});
+
 checks.push({
   name: "private_storage_and_candidate_owned_policies_defined",
   passed: identityMigration.includes("'candidate-documents'") &&
