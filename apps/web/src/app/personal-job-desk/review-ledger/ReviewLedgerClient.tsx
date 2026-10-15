@@ -33,6 +33,9 @@ type LedgerRecord = {
     outcomeStatus: string;
     outcomeNotes: string;
     followUpDate: string;
+    interviewAt: string;
+    nextAction: string;
+    responseHistory: string;
     reviewerNotes: string;
   };
 };
