@@ -28,7 +28,7 @@ function checklist(data: Workspace): Check[] {
   const tasks = Array.isArray(data.tasks) ? data.tasks : [];
   const openTasks = tasks.filter((task) => task.status !== "DONE");
   const openSupport = (data.supportRequests || []).filter((request) => !["RESOLVED", "CLOSED"].includes(String(request.status)));
-  const profileReady = Boolean(profile.fullName?.trim() && /^[^\\s@]+@[^\\s@]+\\.[^\\s@]+$/.test(profile.email?.trim() || "") && profile.phone?.trim());
+  const profileReady = Boolean(profile.fullName?.trim() && /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(profile.email?.trim() || "") && profile.phone?.trim());
   const hasCv = documents.some((document) => String(document.type || "").toUpperCase() === "CV");
   const hasId = documents.some((document) => ["ID", "ID_DOCUMENT"].includes(String(document.type || "").toUpperCase()));
   const sourcedOpportunities = opportunities.filter((item) => { if (typeof item.sourceUrl !== "string") return false; try { const url = new URL(item.sourceUrl); return ["http:", "https:"].includes(url.protocol) && !url.username && !url.password; } catch { return false; } });
