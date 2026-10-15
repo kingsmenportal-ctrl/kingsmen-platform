@@ -2,11 +2,7 @@
 -- Keep canonical metadata consistent and refuse links to retired or cross-candidate documents.
 alter table public.document_files
   add constraint document_files_size_nonnegative check (file_size_bytes >= 0),
-  add constraint document_files_metadata_object check (jsonb_typeof(metadata) = 'object'),
-  add constraint document_files_archived_status_consistency check (
-    (document_status in ('ARCHIVED','DELETED') and archived_at is not null)
-    or (document_status not in ('ARCHIVED','DELETED'))
-  );
+  add constraint document_files_metadata_object check (jsonb_typeof(metadata) = 'object');
 
 create index if not exists idx_document_files_candidate_application_active
   on public.document_files(candidate_id, application_id, document_type, uploaded_at desc)
