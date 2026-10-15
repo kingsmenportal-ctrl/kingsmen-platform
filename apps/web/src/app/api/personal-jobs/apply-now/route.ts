@@ -2,6 +2,7 @@ import fs from "node:fs";
 import path from "node:path";
 import { NextResponse } from "next/server";
 import { getCandidatePortalContext, loadCandidatePortalState, saveCandidatePortalState, uploadCandidatePortalDocument, type PortalContext } from "@/lib/candidate-portal-storage";
+import { validateFinanceEntryInput, validateFinanceStatusUpdate } from "@/lib/candidate-finance-ledger";
 
 function privateJson(body: unknown, init?: ResponseInit) {
   const headers = new Headers(init?.headers);
@@ -804,13 +805,8 @@ export async function POST(request: Request) {
     if (action === "addFinanceEntry") {
       const type = String(body.type || "").toUpperCase(), direction = String(body.direction || "").toUpperCase(), status = String(body.status || "RECORDED").toUpperCase();
       const description = typeof body.description === "string" ? body.description.trim() : "", reference = typeof body.reference === "string" ? body.reference.trim() : "", evidenceNote = typeof body.evidenceNote === "string" ? body.evidenceNote.trim() : "", opportunityId = typeof body.opportunityId === "string" ? body.opportunityId : "", occurredOn = typeof body.occurredOn === "string" ? body.occurredOn.trim() : "", amountCents = body.amountCents;
-      const validDate = /^\d{4}-\d{2}-\d{2}$/.test(occurredOn) && !Number.isNaN(Date.parse(occurredOn + "T00:00:00Z")) && new Date(occurredOn + "T00:00:00Z").toISOString().slice(0, 10) === occurredOn;
-      if (!["FEE", "PAYMENT", "REFUND", "ADJUSTMENT"].includes(type) || !["IN", "OUT"].includes(direction)) return privateJson({ status: "FAILED", error: "Choose a valid entry type and money direction." }, { status: 400 });
-      if (!["RECORDED", "PENDING", "CONFIRMED", "FAILED", "CANCELLED"].includes(status)) return privateJson({ status: "FAILED", error: "Choose a valid ledger status." }, { status: 400 });
-      if (!Number.isSafeInteger(amountCents) || amountCents <= 0 || amountCents > 1000000000) return privateJson({ status: "FAILED", error: "Amount must be positive integer cents, no more than R10,000,000." }, { status: 400 });
-      if (description.length < 2 || description.length > 180 || reference.length > 120 || evidenceNote.length > 1000) return privateJson({ status: "FAILED", error: "Description must be 2–180 characters; reference max 120 and evidence note max 1,000." }, { status: 400 });
-      if (!validDate) return privateJson({ status: "FAILED", error: "Enter a valid transaction date." }, { status: 400 });
-      if (status === "CONFIRMED" && !reference && !evidenceNote) return privateJson({ status: "FAILED", error: "A reference or evidence note is required before recording a user-confirmed status." }, { status: 400 });
+      const validationError = validateFinanceEntryInput({ type, direction, status, amountCents, description, reference, evidenceNote, opportunityId, occurredOn });
+      if (validationError) return privateJson({ status: "FAILED", error: validationError }, { status: 400 });
       if (opportunityId && !store.opportunities.some((item) => item.opportunityId === opportunityId)) return privateJson({ status: "FAILED", error: "Linked opportunity was not found in this workspace." }, { status: 404 });
       const entry: FinanceLedgerEntry = { entryId: `finance-${Date.now()}-${Math.random().toString(16).slice(2)}`, type: type as FinanceLedgerEntry["type"], direction: direction as FinanceLedgerEntry["direction"], status: status as FinanceLedgerEntry["status"], amountCents, currency: "ZAR", description, ...(reference ? { reference } : {}), ...(evidenceNote ? { evidenceNote } : {}), ...(opportunityId ? { opportunityId } : {}), occurredOn, createdAt: new Date().toISOString() };
       store.financeLedger = [entry, ...(store.financeLedger || [])].slice(0, 1000);
@@ -825,9 +821,8 @@ export async function POST(request: Request) {
       const evidenceNote = typeof body.evidenceNote === "string" ? body.evidenceNote.trim() : "";
       const existing = (store.financeLedger || []).find((entry) => entry.entryId === entryId);
       if (!existing) return privateJson({ status: "FAILED", error: "Finance entry not found." }, { status: 404 });
-      if (!["RECORDED", "PENDING", "CONFIRMED", "FAILED", "CANCELLED"].includes(status)) return privateJson({ status: "FAILED", error: "Choose a valid ledger status." }, { status: 400 });
-      if (reference.length > 120 || evidenceNote.length > 1000) return privateJson({ status: "FAILED", error: "Reference max 120 characters and evidence note max 1,000." }, { status: 400 });
-      if (status === "CONFIRMED" && !reference && !evidenceNote && !existing.reference && !existing.evidenceNote) return privateJson({ status: "FAILED", error: "A reference or evidence note is required before recording a user-confirmed status." }, { status: 400 });
+      const validationError = validateFinanceStatusUpdate({ status, reference, evidenceNote, existingReference: existing.reference, existingEvidenceNote: existing.evidenceNote });
+      if (validationError) return privateJson({ status: "FAILED", error: validationError }, { status: 400 });
       store.financeLedger = store.financeLedger.map((entry) => entry.entryId === entryId ? { ...entry, status: status as FinanceLedgerEntry["status"], reference: reference || existing.reference, evidenceNote: evidenceNote || existing.evidenceNote } : entry);
       await persistStore(context, store);
       return privateJson({ status: "FINANCE_ENTRY_UPDATED", store, readiness: scoreReadiness(store) });
