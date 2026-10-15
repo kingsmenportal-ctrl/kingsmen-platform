@@ -372,3 +372,32 @@ test("candidate document page distinguishes registry registration from verificat
   assert.match(page, /Verification pending/);
   assert.match(page, /Canonical vault registration not confirmed/);
 });
+
+test("canonical document deletion retires review eligibility before storage cleanup and records the outcome", () => {
+  const migration = fs.readFileSync(path.resolve(__dirname, "../../../db/migrations/0021_candidate_document_retirement.sql"), "utf8");
+  assert.match(migration, /function public\.retire_candidate_document_upload/);
+  assert.match(migration, /d\.candidate_id = v_candidate_id/);
+  assert.match(migration, /document_status = 'DELETED'/);
+  assert.match(migration, /archived_at = coalesce\(archived_at, now\(\)\)/);
+  assert.match(migration, /function public\.record_candidate_document_deletion_result/);
+  assert.match(migration, /event_type,event_ref/);
+  assert.match(migration, /case when p_success then 'OK' else 'FAILED' end/);
+  assert.match(migration, /revoke all on function public\.retire_candidate_document_upload/);
+  assert.match(migration, /revoke all on function public\.record_candidate_document_deletion_result/);
+
+  const start = route.indexOf('if (action === "deleteDocument")');
+  const end = route.indexOf('if (action === "deleteOpportunity")', start);
+  const block = route.slice(start, end);
+  assert.match(block, /retire_candidate_document_upload/);
+  assert.match(block, /record_candidate_document_deletion_result/);
+  assert.ok(block.indexOf("retire_candidate_document_upload") < block.indexOf('method: "DELETE"'));
+  assert.ok(block.indexOf('method: "DELETE"') < block.indexOf("recordCanonicalCleanup(true)"));
+  assert.match(block, /canonical document is retired, but private file cleanup is pending/i);
+  assert.match(block, /CANONICAL_EVIDENCE_FAILED/);
+});
+
+test("candidate storage workflow watches the canonical retirement migration", () => {
+  const workflowPath = path.resolve(__dirname, "../../../.github/workflows/kingsmen-candidate-storage.yml");
+  const workflow = fs.readFileSync(workflowPath, "utf8");
+  assert.equal((workflow.match(/db\/migrations\/0021_candidate_document_retirement\.sql/g) || []).length, 2);
+});
