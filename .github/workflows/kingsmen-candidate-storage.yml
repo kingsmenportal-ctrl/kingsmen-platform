@@ -21,7 +21,8 @@ on:
       - "apps/web/test/candidate-storage-security.test.cjs"
       - "apps/web/test/candidate-readiness.test.cjs"
       - "apps/web/test/founder-control-plane.test.cjs"
-      - "apps/web/test/founder-command-intake.test.cjs apps/web/test/founder-document-review.test.cjs"
+      - "apps/web/test/founder-command-intake.test.cjs"
+      - "apps/web/test/founder-document-review.test.cjs"
       - "db/migrations/0016_founder_audit_and_command_intake.sql"
       - ".github/workflows/kingsmen-candidate-storage.yml"
   push:
@@ -62,4 +63,4 @@ jobs:
         with:
           node-version: 22
       - name: Run candidate and founder security regressions
-        run: node --test apps/web/test/candidate-storage-security.test.cjs apps/web/test/candidate-readiness.test.cjs apps/web/test/founder-control-plane.test.cjs apps/web/test/founder-command-intake.test.cjs
+        run: node --test apps/web/test/candidate-storage-security.test.cjs apps/web/test/candidate-readiness.test.cjs apps/web/test/founder-control-plane.test.cjs apps/web/test/founder-command-intake.test.cjs apps/web/test/founder-document-review.test.cjs
