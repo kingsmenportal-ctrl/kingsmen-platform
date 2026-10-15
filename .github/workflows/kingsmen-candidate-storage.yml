@@ -24,6 +24,7 @@ on:
       - "apps/web/test/application-pack-validation.test.cjs"
       - "apps/web/test/review-ledger-safety.test.cjs"
       - "apps/web/test/document-pack-index-safety.test.cjs"
+      - "apps/web/test/manual-application-export.test.cjs"
       - "scripts/agents/personal-job-document-pack-index.mjs"
       - "apps/web/test/candidate-readiness.test.cjs"
       - "apps/web/test/founder-control-plane.test.cjs"
@@ -84,4 +85,4 @@ jobs:
         with:
           node-version: 22
       - name: Run candidate and founder security regressions
-        run: node --test apps/web/test/candidate-storage-security.test.cjs apps/web/test/candidate-document-lifecycle.test.cjs apps/web/test/application-pack-validation.test.cjs apps/web/test/review-ledger-safety.test.cjs apps/web/test/document-pack-index-safety.test.cjs apps/web/test/candidate-readiness.test.cjs apps/web/test/founder-control-plane.test.cjs apps/web/test/founder-command-intake.test.cjs apps/web/test/founder-document-review.test.cjs
+        run: node --test apps/web/test/candidate-storage-security.test.cjs apps/web/test/candidate-document-lifecycle.test.cjs apps/web/test/application-pack-validation.test.cjs apps/web/test/review-ledger-safety.test.cjs apps/web/test/document-pack-index-safety.test.cjs apps/web/test/manual-application-export.test.cjs apps/web/test/candidate-readiness.test.cjs apps/web/test/founder-control-plane.test.cjs apps/web/test/founder-command-intake.test.cjs apps/web/test/founder-document-review.test.cjs
