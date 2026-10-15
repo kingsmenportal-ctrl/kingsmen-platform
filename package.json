@@ -75,7 +75,8 @@
     "staging:validate:pack": "node scripts/validators/validate-credential-free-foundation.mjs --staging-source",
     "final:prove:evidence": "node scripts/validators/require-runtime-evidence.mjs",
     "final:validate:evidence": "node scripts/validators/validate-credential-free-foundation.mjs --final-source",
-    "final:collect:evidence": "node scripts/validators/require-runtime-evidence.mjs"
+    "final:collect:evidence": "node scripts/validators/require-runtime-evidence.mjs",
+    "staging:test:candidate-isolation": "node scripts/staging/verify-candidate-isolation.mjs"
   },
   "repository": {
     "type": "git",
