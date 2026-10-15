@@ -26,7 +26,24 @@ export async function GET() {
     }
     const requests = await response.json();
     if (!Array.isArray(requests)) return founderPrivateJson({ ok: false, error: "Review queue response was invalid." }, { status: 502 });
-    return founderPrivateJson({ ok: true, requests, count: requests.length, limit: 100, productionReady: false });
+
+    const decisionsResponse = await fetch(
+      `${config.url}/rest/v1/founder_command_decisions?select=id,decision_ref,request_ref,decision,reviewer_user_id,reviewer_email,reason,audit_ref,created_at&order=created_at.desc&limit=200`,
+      {
+        headers: { apikey: config.anonKey, Authorization: `Bearer ${token}`, Accept: "application/json" },
+        cache: "no-store",
+        signal: AbortSignal.timeout(8000)
+      }
+    );
+    if (!decisionsResponse.ok) {
+      return founderPrivateJson({ ok: false, error: "Could not load the decision history. Confirm migration 0017 is applied." }, { status: decisionsResponse.status === 401 || decisionsResponse.status === 403 ? 403 : 503 });
+    }
+    const decisions = await decisionsResponse.json();
+    if (!Array.isArray(decisions)) return founderPrivateJson({ ok: false, error: "Decision history response was invalid." }, { status: 502 });
+    return founderPrivateJson({
+      ok: true, requests, decisions, currentUserId: access.userId,
+      count: requests.length, limit: 100, productionReady: false
+    });
   } catch {
     return founderPrivateJson({ ok: false, error: "Review queue request timed out." }, { status: 503 });
   }
