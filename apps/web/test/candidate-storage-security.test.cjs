@@ -122,3 +122,12 @@ test("Apply Desk unexpected errors do not expose internal exception messages", (
   assert.match(route, /error: "The request could not be completed\. Please try again\."/);
   assert.doesNotMatch(route, /error: error instanceof Error \? error\.message/);
 });
+
+
+test("bounded request-body reader is async and enforces actual streamed byte counts", () => {
+  assert.match(route, /async function readBoundedJson\(request: Request\): Promise<Record<string, any>>/);
+  assert.match(route, /const reader = request\.body\.getReader\(\)/);
+  assert.match(route, /total \+= value\.byteLength/);
+  assert.match(route, /if \(total > MAX_JSON_BODY_BYTES\)/);
+  assert.match(route, /new TextDecoder\("utf-8", \{ fatal: true \}\)/);
+});
