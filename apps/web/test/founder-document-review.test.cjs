@@ -53,6 +53,6 @@ test("UI and API do not claim document ownership or evidence have been independe
   assert.match(route, /evidenceResolved: false/);
   assert.match(route, /sourceStatusChanged: false/);
   assert.match(route, /have not been independently verified/);
-  assert.match(page, /Document review proposal/);
-  assert.match(page, /does not yet verify ownership/);
+  assert.match(page, /Document review/);
+  assert.match(page, /ownership, proof and evidence references must still be independently verified/);
 });
