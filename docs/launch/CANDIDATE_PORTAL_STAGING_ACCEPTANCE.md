@@ -70,3 +70,7 @@ npm run staging:test:candidate-isolation
 ```
 
 Supply tokens through a protected local environment or secret manager; never commit them, paste them into tickets, or save them in evidence. The runner rejects a project ref other than the approved staging ref, requires HTTPS except for localhost app URLs, requires distinct tokens, and refuses to run if `PAYMENTS_LIVE=true`. Its report deliberately sets `reviewed: false`, `productionReady: false`, and `publicLaunchAllowed: false`; a successful run is evidence for these specific checks only, not launch approval. Review the report and confirm that both original notes were restored before accepting the evidence. A failed restoration requires manual recovery of the dedicated test account.
+
+### Private document isolation coverage
+
+The staging runner additionally uploads one synthetic plain-text fixture for each dedicated staging candidate, downloads each fixture as its owner, compares exact bytes, and attempts both cross-account downloads. Cross-account document retrieval must not return HTTP 200. The runner attempts to delete both synthetic document records and their private objects in its cleanup path; a failed cleanup is recorded as a failed check and requires manual inspection. Do not run this against real candidate accounts or production.
