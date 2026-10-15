@@ -4,6 +4,7 @@ on:
   pull_request:
     paths:
       - "apps/web/src/app/founder/**"
+      - "apps/web/test/founder-document-review.test.cjs"
       - "apps/web/src/app/api/founder/**"
       - "apps/web/src/app/api/personal-jobs/**"
       - "apps/web/src/app/api/auth/**"
@@ -20,7 +21,7 @@ on:
       - "apps/web/test/candidate-storage-security.test.cjs"
       - "apps/web/test/candidate-readiness.test.cjs"
       - "apps/web/test/founder-control-plane.test.cjs"
-      - "apps/web/test/founder-command-intake.test.cjs"
+      - "apps/web/test/founder-command-intake.test.cjs apps/web/test/founder-document-review.test.cjs"
       - "db/migrations/0016_founder_audit_and_command_intake.sql"
       - ".github/workflows/kingsmen-candidate-storage.yml"
   push:
