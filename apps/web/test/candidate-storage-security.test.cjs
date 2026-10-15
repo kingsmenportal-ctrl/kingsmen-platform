@@ -246,3 +246,15 @@ test("candidate workbench connects opportunity stages, pack generation, proof an
   assert.match(page, /Follow-up tasks/);
   assert.match(page, /Contact history/);
 });
+
+
+test("candidate finance view reads the private ledger and never provides a candidate payment-confirmation control", () => {
+  const page = fs.readFileSync(path.resolve(__dirname, "../src/app/candidate/finance/page.tsx"), "utf8");
+  assert.match(page, /fetch\("\/api\/personal-jobs\/apply-now"/);
+  assert.match(page, /cache: "no-store"/);
+  assert.match(page, /data\.financeLedger/);
+  assert.match(page, /Confirmed incoming payments/);
+  assert.match(page, /Candidates cannot mark their own payments as confirmed/);
+  assert.match(page, /refund entries require finance review/i);
+  assert.doesNotMatch(page, /action:\s*["']updateFinanceEntry["']/);
+});
