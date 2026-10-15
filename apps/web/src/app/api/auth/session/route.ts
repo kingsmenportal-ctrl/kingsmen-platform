@@ -31,7 +31,8 @@ export async function DELETE(request: NextRequest) {
       await fetch(`${new URL(url).origin}/auth/v1/logout`, {
         method: "POST",
         headers: { apikey: key, Authorization: `Bearer ${token}` },
-        cache: "no-store"
+        cache: "no-store",
+        signal: AbortSignal.timeout(5_000)
       });
     } catch {
       // The local cookie is cleared even if the remote revoke endpoint is unavailable.
