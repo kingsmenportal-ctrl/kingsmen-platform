@@ -708,11 +708,42 @@ export async function POST(request: Request) {
       }
 
       try {
+        let canonicalRegistration: { documentRef: string; evidenceRef: string } | null = null;
+        if (context && storagePath) {
+          const registration = await fetch(new URL("/rest/v1/rpc/register_candidate_document_upload", context.url), {
+            method: "POST",
+            headers: {
+              apikey: context.anonKey,
+              Authorization: `Bearer ${context.accessToken}`,
+              "Content-Type": "application/json",
+              Accept: "application/json",
+              "Cache-Control": "no-store"
+            },
+            body: JSON.stringify({
+              p_document_type: type === "CV" ? "CV" : type === "ID" ? "ID_DOCUMENT" : "ACADEMIC_RECORD",
+              p_display_name: fileName.slice(0, 180),
+              p_original_filename: fileName,
+              p_mime_type: decoded.mimeType,
+              p_file_size_bytes: decoded.buffer.length,
+              p_storage_path: storagePath
+            }),
+            cache: "no-store",
+            signal: AbortSignal.timeout(10000)
+          });
+          const registrationData = await registration.json().catch(() => null) as { registered?: boolean; documentRef?: string; evidenceRef?: string } | null;
+          if (!registration.ok || registrationData?.registered !== true ||
+            typeof registrationData.documentRef !== "string" || typeof registrationData.evidenceRef !== "string") {
+            throw new Error("Canonical document registration failed.");
+          }
+          canonicalRegistration = { documentRef: registrationData.documentRef, evidenceRef: registrationData.evidenceRef };
+        }
+
         const text = await extractDocumentText(fileName, decoded.mimeType, decoded.buffer);
         const extracted = extractProfileFromText(text || "");
 
         const documentRecord = {
           documentId: `doc-${Date.now()}-${Math.random().toString(16).slice(2)}`,
+          ...(canonicalRegistration ? { canonicalDocumentRef: canonicalRegistration.documentRef, evidenceRef: canonicalRegistration.evidenceRef, registryStatus: "REGISTERED" } : { registryStatus: "LOCAL_ONLY" }),
           type,
           fileName,
           storedName,
