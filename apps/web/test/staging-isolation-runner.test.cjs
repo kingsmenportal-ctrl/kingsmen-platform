@@ -27,6 +27,10 @@ test("staging runner verifies private document bytes and cross-account denial", 
   assert.match(runner, /bidirectional_private_document_isolation/);
   assert.match(runner, /deepEqual\(Buffer\.from\(await ownDownloadA\.arrayBuffer\(\)\), documentA\.bytes/);
   assert.match(runner, /deleteSyntheticDocument/);
+  assert.match(runner, /bidirectional_private_document_isolation/);
+  assert.match(runner, /private_document_upload_and_byte_integrity/);
+  assert.match(runner, /cleanup_user_A_synthetic_document/);
+  assert.match(runner, /cleanup_user_B_synthetic_document/);
 });
 
 test("staging evidence never implies production readiness automatically", () => {
