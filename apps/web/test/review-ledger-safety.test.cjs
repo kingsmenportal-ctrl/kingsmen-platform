@@ -1,0 +1,39 @@
+const test = require("node:test");
+const assert = require("node:assert/strict");
+const fs = require("node:fs");
+const path = require("node:path");
+
+const route = fs.readFileSync(path.resolve(__dirname, "../src/app/api/personal-jobs/review-ledger/route.ts"), "utf8");
+
+test("review ledger fails closed in production until authenticated candidate-scoped storage exists", () => {
+  assert.equal((route.match(/process\.env\.NODE_ENV === "production"/g) || []).length, 2);
+  assert.match(route, /STORAGE_NOT_CONFIGURED/);
+  assert.match(route, /authenticated, candidate-scoped persistent storage/);
+});
+
+test("review ledger responses are private and non-cacheable", () => {
+  assert.match(route, /Cache-Control", "private, no-store, max-age=0/);
+  assert.match(route, /Pragma", "no-cache/);
+});
+
+test("manual submission readiness requires both candidate approval and operator review", () => {
+  assert.match(route, /candidateApproved && record\.review\.founderReviewed/);
+  assert.match(route, /Both candidate approval and founder\/operator review are required/);
+});
+
+test("proof-captured state requires submission time, proof type, and proof reference", () => {
+  assert.match(route, /reviewStatus === "SUBMITTED_PROOF_CAPTURED"/);
+  assert.match(route, /record\.review\.submittedAt \|\| !record\.review\.proofType \|\| !record\.review\.proofReference/);
+});
+
+test("review updates validate status enums, approval booleans, field lengths, and dates", () => {
+  assert.match(route, /Unsupported review status/);
+  assert.match(route, /Unsupported outcome status/);
+  assert.match(route, /must be a boolean/);
+  assert.match(route, /followUpDate must be a valid YYYY-MM-DD date/);
+  assert.match(route, /exceeds .* characters/);
+});
+
+test("employer outcomes cannot be recorded before submission proof is captured", () => {
+  assert.match(route, /Record submission proof before recording an employer outcome/);
+});
