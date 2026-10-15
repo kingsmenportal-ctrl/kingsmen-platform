@@ -47,6 +47,12 @@ checks.push({
 });
 
 checks.push({
+  name: "rejects_invalid_text_upload_bytes",
+  passed: api.includes("buffer.includes(0x00)") && api.includes('text.includes("\\uFFFD")'),
+  detail: "TXT uploads must reject NUL bytes and invalid UTF-8 replacement characters."
+});
+
+checks.push({
   name: "has_add_opportunity_action",
   passed: api.includes('action === "addOpportunity"'),
   detail: "Opportunity action must exist."
