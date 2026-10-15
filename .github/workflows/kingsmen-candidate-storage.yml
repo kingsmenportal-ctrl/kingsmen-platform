@@ -19,6 +19,7 @@ on:
       - "apps/web/src/app/candidate/workbench/page.tsx"
       - "apps/web/src/app/candidate/finance/page.tsx"
       - "apps/web/test/candidate-storage-security.test.cjs"
+      - "apps/web/test/candidate-document-lifecycle.test.cjs"
       - "apps/web/test/candidate-readiness.test.cjs"
       - "apps/web/test/founder-control-plane.test.cjs"
       - "apps/web/test/founder-command-intake.test.cjs"
@@ -29,6 +30,9 @@ on:
       - "db/migrations/0019_founder_document_canonical_validation.sql"
       - "db/migrations/0020_candidate_document_upload_registration.sql"
       - "db/migrations/0021_candidate_document_retirement.sql"
+      - "db/migrations/0022_candidate_document_application_linkage.sql"
+      - "db/migrations/0021_candidate_document_retirement.sql"
+      - "db/migrations/0022_candidate_document_application_linkage.sql"
       - ".github/workflows/kingsmen-candidate-storage.yml"
   push:
     branches:
@@ -75,4 +79,4 @@ jobs:
         with:
           node-version: 22
       - name: Run candidate and founder security regressions
-        run: node --test apps/web/test/candidate-storage-security.test.cjs apps/web/test/candidate-readiness.test.cjs apps/web/test/founder-control-plane.test.cjs apps/web/test/founder-command-intake.test.cjs apps/web/test/founder-document-review.test.cjs
+        run: node --test apps/web/test/candidate-storage-security.test.cjs apps/web/test/candidate-document-lifecycle.test.cjs apps/web/test/candidate-readiness.test.cjs apps/web/test/founder-control-plane.test.cjs apps/web/test/founder-command-intake.test.cjs apps/web/test/founder-document-review.test.cjs
