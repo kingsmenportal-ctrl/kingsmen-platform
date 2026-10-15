@@ -185,3 +185,21 @@ test("document deletion converts private storage network failures to controlled 
   assert.match(block, /let response: Response;\s*try \{[\s\S]*?response = await fetch\(endpoint,[\s\S]*?catch \{\s*return privateJson\(\{ status: "STORAGE_FAILED"/);
   assert.match(block, /The document record was kept\./);
 });
+
+test("deleteDocument rejects empty and oversized identifiers before lookup or storage mutation", () => {
+  const start = route.indexOf('if (action === "deleteDocument")');
+  const end = route.indexOf('if (action === "deleteOpportunity")', start);
+  const block = route.slice(start, end);
+  assert.match(block, /typeof body\.documentId === "string" \? body\.documentId\.trim\(\) : ""/);
+  assert.match(block, /if \(!documentId \|\| documentId\.length > 180\)/);
+  assert.ok(block.indexOf("A valid document ID is required.") < block.indexOf("store.documents.find"));
+  assert.ok(block.indexOf("A valid document ID is required.") < block.indexOf('method: "DELETE"'));
+});
+
+test("candidate storage workflow runs the regression suite with read-only repository permissions", () => {
+  const workflowPath = path.resolve(__dirname, "../../../.github/workflows/kingsmen-candidate-storage.yml");
+  const workflow = fs.readFileSync(workflowPath, "utf8");
+  assert.match(workflow, /permissions:\s*contents: read/);
+  assert.match(workflow, /node --test apps\/web\/test\/candidate-storage-security\.test\.cjs/);
+  assert.match(workflow, /node-version: 22/);
+});
