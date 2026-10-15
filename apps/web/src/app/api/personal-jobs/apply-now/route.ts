@@ -783,27 +783,51 @@ export async function POST(request: Request) {
 
     if (action === "addOpportunity") {
       const opportunity = body.opportunity || {};
+      const title = typeof opportunity.title === "string" ? opportunity.title.trim() : "";
+      const organisation = typeof opportunity.organisation === "string" ? opportunity.organisation.trim() : "";
+      const sourceUrl = typeof opportunity.sourceUrl === "string" ? opportunity.sourceUrl.trim() : "";
+      const notes = typeof opportunity.notes === "string" ? opportunity.notes.trim() : "";
 
-      if (!opportunity.title || !opportunity.organisation || !opportunity.sourceUrl) {
+      if (title.length < 2 || title.length > 180 || organisation.length < 2 || organisation.length > 180 || !sourceUrl || sourceUrl.length > 1000) {
         return privateJson({
           status: "FAILED",
-          error: "Title, organisation and official/source link are required."
+          error: "Title and organisation must be 2–180 characters, and a source URL is required (maximum 1,000 characters)."
         }, { status: 400 });
       }
+      let parsedSource: URL;
+      try { parsedSource = new URL(sourceUrl); }
+      catch { return privateJson({ status: "FAILED", error: "Source URL must be a valid HTTP or HTTPS URL." }, { status: 400 }); }
+      if (!["http:", "https:"].includes(parsedSource.protocol) || parsedSource.username || parsedSource.password) {
+        return privateJson({ status: "FAILED", error: "Source URL must be a public HTTP or HTTPS URL without embedded credentials." }, { status: 400 });
+      }
+      if (notes.length > 1800) return privateJson({ status: "FAILED", error: "Opportunity notes must be 1,800 characters or fewer." }, { status: 400 });
 
+      const duplicate = store.opportunities.find((item) =>
+        typeof item.sourceUrl === "string" && item.sourceUrl.replace(/\\/$/, "").toLowerCase() === sourceUrl.replace(/\\/$/, "").toLowerCase()
+      );
+      if (duplicate) {
+        return privateJson({
+          status: "OPPORTUNITY_ALREADY_EXISTS",
+          opportunity: duplicate,
+          store,
+          readiness: scoreReadiness(store)
+        }, { status: 200 });
+      }
+
+      const now = new Date().toISOString();
       const record = {
         opportunityId: `opp-${Date.now()}-${Math.random().toString(16).slice(2)}`,
-        title: String(opportunity.title),
-        organisation: String(opportunity.organisation),
-        category: String(opportunity.category || "JOB"),
-        applicationMethod: String(opportunity.applicationMethod || "PORTAL"),
-        emailTo: String(opportunity.emailTo || ""),
-        closingDate: String(opportunity.closingDate || ""),
-        sourceUrl: String(opportunity.sourceUrl),
-        notes: String(opportunity.notes || ""),
+        title,
+        organisation,
+        category: typeof opportunity.category === "string" ? opportunity.category.slice(0, 80) : "JOB",
+        applicationMethod: typeof opportunity.applicationMethod === "string" ? opportunity.applicationMethod.slice(0, 80) : "PORTAL",
+        emailTo: typeof opportunity.emailTo === "string" ? opportunity.emailTo.slice(0, 254) : "",
+        closingDate: typeof opportunity.closingDate === "string" ? opportunity.closingDate.slice(0, 40) : "",
+        sourceUrl,
+        notes,
         status: "READY_TO_PREPARE",
-        createdAt: new Date().toISOString(),
-        updatedAt: new Date().toISOString()
+        createdAt: now,
+        updatedAt: now
       };
 
       store.opportunities = [record, ...store.opportunities];
