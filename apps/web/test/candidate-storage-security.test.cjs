@@ -114,3 +114,11 @@ test("candidate state serialization failures are handled without making a storag
   assert.match(storage, /Candidate state could not be serialized/);
   assert.match(storage, /try \{ body = JSON\.stringify\(\{ auth_user_id: context\.userId, state \}\); \}/);
 });
+
+
+test("Apply Desk unexpected errors do not expose internal exception messages", () => {
+  assert.match(route, /catch \{\s*\/\/ Do not disclose database, storage, filesystem, or upstream service details to clients\./);
+  assert.match(route, /status: "INTERNAL_ERROR"/);
+  assert.match(route, /error: "The request could not be completed\. Please try again\."/);
+  assert.doesNotMatch(route, /error: error instanceof Error \? error\.message/);
+});
