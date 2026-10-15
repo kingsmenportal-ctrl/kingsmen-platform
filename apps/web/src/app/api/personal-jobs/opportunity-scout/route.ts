@@ -222,9 +222,15 @@ export async function POST(request: Request) {
           maxBuffer: 1024 * 1024 * 30
         });
 
-        diagnostics.push(`agent_exit=${result.status}`);
-        if (result.stderr) diagnostics.push(result.stderr.slice(0, 5000));
-        if (result.stdout) diagnostics.push(result.stdout.slice(0, 5000));
+        diagnostics.push(
+          result.error
+            ? "Scout agent could not start."
+            : result.status === 0
+              ? "Scout agent completed."
+              : "Scout agent exited unsuccessfully."
+        );
+        // Never return raw process output: it can expose filesystem paths,
+        // environment details, source-page content, or other internal data.
 
         const agentOut = readJson(OUT, null);
         if (result.status === 0 && agentOut && Array.isArray(agentOut.leads) && agentOut.leads.length) {
