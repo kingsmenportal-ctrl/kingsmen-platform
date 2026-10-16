@@ -649,7 +649,7 @@ export async function GET() {
     if (resolved.status === "not_configured" && process.env.NODE_ENV !== "production") {
       try {
         const store = readStore();
-        return privateJson({ ...store, readiness: scoreReadiness(store), readinessAssessment: assessReadiness(store) });
+        return privateJson({ ...store, readiness: scoreReadiness(store), readinessAssessment: assessReadiness(store), emailNotificationReadiness: emailNotificationReadiness() });
       } catch {
         return privateJson({ status: "STORAGE_UNAVAILABLE", error: "Candidate workspace could not be loaded." }, { status: 503 });
       }
