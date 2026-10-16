@@ -9,7 +9,8 @@
     "build": "tsc -p tsconfig.json",
     "start": "node dist/server.js",
     "dev": "tsc -p tsconfig.json --watch",
-    "validate": "npm run build"
+    "validate": "npm run build && npm test",
+    "test": "npm run build && node --test dist/opportunity/opportunity-engine.test.js"
   },
   "engines": {
     "node": ">=20.0.0"
