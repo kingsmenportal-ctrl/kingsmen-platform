@@ -340,8 +340,10 @@ test("authenticated uploads register canonical document and evidence references 
 test("canonical upload registration is ownership-scoped, storage-backed and non-verifying", () => {
   const migration = fs.readFileSync(path.resolve(__dirname, "../../../db/migrations/0020_candidate_document_upload_registration.sql"), "utf8");
   assert.match(migration, /auth\.uid\(\)/);
-  assert.match(migration, /c\.owner_user_id = auth\.uid\(\)/);
-  assert.match(migration, /cardinality\(v_candidate_ids\),0\) <> 1/);
+  const identityMigration = fs.readFileSync(path.resolve(__dirname, "../../../db/migrations/0023_candidate_auth_private_storage.sql"), "utf8");
+  assert.match(migration, /kingsmen_security\.current_authenticated_candidate_id\(\)/);
+  assert.match(identityMigration, /auth_user_id uuid UNIQUE REFERENCES auth\.users\(id\)/);
+  assert.match(identityMigration, /WHERE ca\.auth_user_id = auth\.uid\(\)/);
   assert.match(migration, /storage\.objects/);
   assert.match(migration, /o\.bucket_id = v_bucket/);
   assert.match(migration, /o\.owner_id = auth\.uid\(\)::text/);
