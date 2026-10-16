@@ -194,13 +194,7 @@ export async function handlePayFastItn(request: IncomingMessage, response: Serve
       remoteAddress: request.socket.remoteAddress,
       allowedSourceIps
     });
-    if (result.accepted) {
-      const serverConfirmed = await confirmWithPayFast(fields);
-      if (!serverConfirmed) {
-        result.accepted = false;
-        result.rejectionReason = "PayFast server confirmation failed.";
-      }
-    }
+
 
     const itnRef = `itn_${crypto.randomUUID()}`;
     const idempotencyKey = result.idempotencyKey;
@@ -211,9 +205,13 @@ export async function handlePayFastItn(request: IncomingMessage, response: Serve
       result.accepted = false;
       result.rejectionReason = amounts.reason ?? "PayFast amount reconciliation failed."; 
     }
-    let grossCents: number | null = null;
-    try { grossCents = randToCents(grossText); } catch { /* rejected receipt remains auditable */ }
-
+    if (result.accepted) {
+      const serverConfirmed = await confirmWithPayFast(fields);
+      if (!serverConfirmed) {
+        result.accepted = false;
+        result.rejectionReason = "PayFast server confirmation failed."; 
+      }
+    }
     const receiptInsert = await client.query(
       `INSERT INTO public.payfast_itn_receipts
        (itn_ref, merchant_reference, provider_payment_id, payment_status, amount_gross, amount_fee, amount_net,
