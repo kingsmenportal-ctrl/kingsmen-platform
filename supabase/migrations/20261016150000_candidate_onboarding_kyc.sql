@@ -16,6 +16,25 @@ drop policy if exists kyc_candidate_read_own on public.kyc_verifications;
 create policy kyc_candidate_read_own on public.kyc_verifications for select to authenticated using(candidate_id=kingsmen_security.current_authenticated_candidate_id());
 drop policy if exists kyc_founder_read_all on public.kyc_verifications;
 create policy kyc_founder_read_all on public.kyc_verifications for select to authenticated using(kingsmen_security.is_kingsmen_founder());
+-- Candidate-controlled onboarding start: reuses an existing pending record and never accepts a candidate_id from the caller.
+create or replace function public.start_kyc()
+returns public.kyc_verifications language plpgsql security definer set search_path = ''
+as $
+declare v_candidate uuid; v_result public.kyc_verifications;
+begin
+ v_candidate := kingsmen_security.current_authenticated_candidate_id();
+ if v_candidate is null then raise exception 'authenticated candidate required' using errcode='42501'; end if;
+ select * into v_result from public.kyc_verifications
+  where candidate_id = v_candidate and status in ('pending','needs_review')
+  order by created_at desc limit 1 for update;
+ if found then return v_result; end if;
+ insert into public.kyc_verifications(candidate_id,status)
+ values(v_candidate,'pending') returning * into v_result;
+ return v_result;
+end $;
+revoke all on function public.start_kyc() from public, anon;
+grant execute on function public.start_kyc() to authenticated;
+
 create or replace function public.submit_kyc(p_verification_id uuid)
 returns public.kyc_verifications language plpgsql security definer set search_path = ''
 as $$
