@@ -30,7 +30,7 @@ test("candidate can append updates and reopen resolved or closed support request
 test("support UI presents active queue, urgency triage, impact fields, and request history", () => {
   for (const marker of [
     "Support & blocker resolution", "Deadline at risk", "Affected workflow",
-    "Impact:", "History", "Add to history", "Urgent requests", "Awaiting Kingsmen support assignment",
+    "Impact:", "History", "Add to history", "Deadline / urgent blockers", "Awaiting Kingsmen support assignment",
     "cache: \"no-store\"", "credentials: \"same-origin\"", "not an operator assignment"
   ]) assert.ok(page.includes(marker), `support UI missing ${marker}`);
   assert.match(page, /aria-label="Filter requests"/);
