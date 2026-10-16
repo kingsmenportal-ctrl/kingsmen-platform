@@ -116,3 +116,19 @@ This source-level proof does not replace real sandbox provider testing. Before K
 - refund review process
 
 Until those are captured, the launch gate remains blocked for live payments.
+
+## ITN callback implementation status (2026-10-16)
+
+The API now mounts `POST /api/finance/payfast/itn` and the handler has a fail-closed server-confirmation request to the fixed official PayFast sandbox/live validation endpoints. It validates the local signature, direct socket source IP, expected merchant/order/intent and gross amount before requesting confirmation. The server-confirmation response must be exactly `VALID`; the request has a five-second timeout and redirects are rejected.
+
+A follow-up migration, `db/migrations/0036_n11_payfast_provider_idempotency.sql`, adds unique provider-payment-ID indexes after a preflight that raises if historical duplicates exist. **This migration has only been committed to the repository; it has not been applied or validated against staging.**
+
+### Verification still required
+
+- Run API TypeScript build, unit tests, and the new route boundary validator in CI.
+- Confirm the deployed database has the expected finance tables and columns before applying migrations.
+- Apply migration 0036 only after the preflight and staging backup/restore safeguards are complete.
+- Add mocked HTTP/database integration tests for server confirmation, timeouts, duplicates, concurrent callbacks, and rollback.
+- Execute a PayFast sandbox payment and preserve the actual ITN and validation response as redacted evidence.
+
+No successful CI run, staging execution, or PayFast sandbox transaction is asserted by this document. Do not enable live payments based on source changes alone.
