@@ -28,7 +28,7 @@ test("candidate data requests use anon key plus candidate access token, never se
   assert.match(storage, /apikey: context\.anonKey/);
   assert.match(storage, /Authorization: \`Bearer \$\{context\.accessToken\}\`/);
   assert.doesNotMatch(storage, /SERVICE_ROLE|service_role|SUPABASE_SERVICE_ROLE_KEY/);
-  assert.match(auth, /if \(!user\.id \|\| user\.role === "service_role"\) return \{ configured: true as const, user: null \}/);
+  assert.match(auth, /if \(!user\.id \|\| !\/\^\[0-9a-f\]\{8\}-\[0-9a-f\]\{4\}-\[1-8\]\[0-9a-f\]\{3\}-\[89ab\]\[0-9a-f\]\{3\}-\[0-9a-f\]\{12\}\$\/i\.test\(user\.id\) \|\| user\.role === "service_role"\)/);
 });
 
 test("auth lookup rejects malformed tokens and disables caching", () => {
@@ -49,7 +49,7 @@ test("private document deletion refuses references outside the current user's pr
   assert.match(route, /const prefix = \`\$\{context\.userId\}\/\`/);
   assert.match(route, /document\.storagePath\.startsWith\(prefix\)/);
   assert.match(route, /objectName\.includes\("\/"\)/);
-  assert.match(route, /document storage reference is invalid; no records were removed/);
+  assert.match(route, /Document storage reference is invalid; no records were removed/i);
 });
 
 test("production requests fail closed when candidate storage/auth is unavailable", () => {
@@ -271,7 +271,7 @@ test("support requests are validated and persisted in the authenticated candidat
   assert.match(page, /action: "createSupportRequest"/);
   assert.match(page, /cache: "no-store"/);
   assert.match(page, /credentials: "same-origin"/);
-  assert.match(page, /Urgent requests are recorded only/);
+  assert.match(page, /urgent or deadline-risk items are flagged in this workspace only/i);
 });
 
 test("message ledger records communications without claiming external delivery", () => {
