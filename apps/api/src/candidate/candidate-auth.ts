@@ -1,4 +1,4 @@
-import { randomUUID } from "node:crypto";
+import { createHash, randomBytes, randomUUID, timingSafeEqual } from "node:crypto";
 
 export type CandidateAuthStatus = "PENDING" | "ACTIVE" | "LOCKED" | "RECOVERY_REQUIRED" | "DISABLED";
 export type DeviceTrustStatus = "TRUSTED" | "UNTRUSTED" | "BLOCKED";
@@ -54,4 +54,34 @@ export function assertCandidateCanLogin(status: CandidateAuthStatus): void {
   if (status !== "ACTIVE") {
     throw new Error(`Candidate account cannot login while status is ${status}.`);
   }
+}
+
+
+/**
+ * Creates an opaque session credential. Persist only its SHA-256 hash; never
+ * persist or log the returned raw token. This helper does not create a session.
+ */
+export function createOpaqueSessionToken(): { token: string; tokenHash: string } {
+  const token = randomBytes(32).toString("base64url");
+  return { token, tokenHash: hashSessionToken(token) };
+}
+
+/** Hashes an opaque session token for storage; rejects empty or malformed input. */
+export function hashSessionToken(token: string): string {
+  if (typeof token !== "string" || token.length < 32 || token.length > 512) {
+    throw new Error("Session token is invalid.");
+  }
+  return createHash("sha256").update(token, "utf8").digest("hex");
+}
+
+/** Constant-time comparison for fixed-length stored token hashes. */
+export function verifySessionToken(token: string, expectedHash: string): boolean {
+  if (typeof expectedHash !== "string" || !/^[a-f0-9]{64}$/i.test(expectedHash)) return false;
+  let actualHash: string;
+  try {
+    actualHash = hashSessionToken(token);
+  } catch {
+    return false;
+  }
+  return timingSafeEqual(Buffer.from(actualHash, "hex"), Buffer.from(expectedHash, "hex"));
 }
