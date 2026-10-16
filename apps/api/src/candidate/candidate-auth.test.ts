@@ -2,7 +2,7 @@ import { test } from "node:test";
 import assert from "node:assert/strict";
 import {
   assertCandidateCanLogin,
-  createCandidateSession,
+  createCandidateSession,\n  createOpaqueSessionToken,\n  hashSessionToken,\n  verifySessionToken,
   shouldRequireAccountRecovery
 } from "./candidate-auth";
 
@@ -44,4 +44,24 @@ test("recovery is required for locked, disabled, and recovery-required accounts"
   assert.equal(shouldRequireAccountRecovery("DISABLED"), true);
   assert.equal(shouldRequireAccountRecovery("RECOVERY_REQUIRED"), true);
   assert.equal(shouldRequireAccountRecovery("ACTIVE"), false);
+});
+
+
+test("opaque session credentials are high entropy and only hashes need persistence", () => {
+  const first = createOpaqueSessionToken();
+  const second = createOpaqueSessionToken();
+  assert.ok(first.token.length >= 40);
+  assert.match(first.tokenHash, /^[a-f0-9]{64}$/);
+  assert.notEqual(first.token, second.token);
+  assert.notEqual(first.tokenHash, second.tokenHash);
+  assert.equal(first.tokenHash, hashSessionToken(first.token));
+  assert.equal(verifySessionToken(first.token, first.tokenHash), true);
+  assert.equal(verifySessionToken(second.token, first.tokenHash), false);
+  assert.equal(verifySessionToken("", first.tokenHash), false);
+  assert.equal(verifySessionToken(first.token, "not-a-hash"), false);
+});
+
+test("session token hashing rejects too-short or oversized values", () => {
+  assert.throws(() => hashSessionToken("short"), /Session token is invalid/);
+  assert.throws(() => hashSessionToken("x".repeat(513)), /Session token is invalid/);
 });
