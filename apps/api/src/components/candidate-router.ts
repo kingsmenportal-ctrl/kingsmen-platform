@@ -31,6 +31,25 @@ export async function handleCandidateComponentRoute(
       return true;
     }
 
+    if (method === "GET" && pathname === "/api/candidate/compliance") {
+      const [medical, checks, eligibility] = await Promise.all([
+        supabaseUserRequest<unknown[]>(token, "medical_clearances?select=id,status,valid_until,recorded_at,reason_code&order=recorded_at.desc"),
+        supabaseUserRequest<unknown[]>(token, "compliance_checks?select=id,check_type,status,checked_at,created_at&order=created_at.desc"),
+        supabaseUserRequest<unknown[] | unknown>(token, "eligibility_status?select=candidate_id,status")
+      ]);
+      sendComponentJson(response, 200, { ok: true, medicalClearances: medical, complianceChecks: checks, eligibility });
+      return true;
+    }
+
+    if (method === "GET" && pathname === "/api/candidate/performance") {
+      const [metrics, decisions] = await Promise.all([
+        supabaseUserRequest<unknown[]>(token, "performance_metrics?select=id,metric_key,metric_value,recorded_at,notes&order=recorded_at.desc"),
+        supabaseUserRequest<unknown[]>(token, "selection_decisions?select=id,decision,decided_at,rationale&order=decided_at.desc")
+      ]);
+      sendComponentJson(response, 200, { ok: true, metrics, selectionDecisions: decisions });
+      return true;
+    }
+
     if (method === "GET" && pathname === "/api/candidate/invoices") {
       const invoices = await supabaseUserRequest<unknown[]>(token, "invoices?select=id,amount_cents,currency,status,created_at,issued_at,paid_at&order=created_at.desc");
       sendComponentJson(response, 200, { ok: true, invoices });
