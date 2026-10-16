@@ -51,3 +51,56 @@ test.describe("legacy application tracker API fail-closed boundary", () => {
     expect((await response.json()).code).toBe("CANDIDATE_AUTHORIZATION_NOT_CONFIGURED");
   });
 });
+
+
+test.describe("candidate document APIs fail closed until identity and ownership exist", () => {
+  test("upload URL endpoint never returns a placeholder or caller-selected candidate identity", async ({ request }) => {
+    const response = await request.post("/api/candidate/documents/upload-url", {
+      data: {
+        candidateId: CANDIDATE_A,
+        documentTypeCode: "SYNTHETIC_TEST",
+        filename: "synthetic.pdf",
+        mimeType: "application/pdf",
+        sizeBytes: 128
+      }
+    });
+    expect(response.status()).toBe(503);
+    const body = await response.json();
+    expect(body.code).toBe("CANDIDATE_AUTHORIZATION_NOT_CONFIGURED");
+    expect(body).not.toHaveProperty("signedUploadUrl");
+    expect(body).not.toHaveProperty("candidateId");
+    expect(response.headers()["cache-control"]).toContain("no-store");
+  });
+
+  test("read URL endpoint refuses caller-supplied candidate B document identifiers", async ({ request }) => {
+    const response = await request.post("/api/candidate/documents/read-url", {
+      data: { candidateId: CANDIDATE_B, documentId: "synthetic-document-b" }
+    });
+    expect(response.status()).toBe(503);
+    const body = await response.json();
+    expect(body.code).toBe("CANDIDATE_AUTHORIZATION_NOT_CONFIGURED");
+    expect(body).not.toHaveProperty("signedReadUrl");
+    expect(body).not.toHaveProperty("documentId");
+  });
+
+  test("document status does not return an unscoped read model", async ({ request }) => {
+    const response = await request.get("/api/candidate/documents/status");
+    expect(response.status()).toBe(503);
+    expect((await response.json()).code).toBe("CANDIDATE_AUTHORIZATION_NOT_CONFIGURED");
+    expect(response.headers()["cache-control"]).toContain("no-store");
+  });
+
+  test("founder document review does not accept caller-supplied proof IDs as authority", async ({ request }) => {
+    const response = await request.post("/api/founder/documents/review", {
+      data: {
+        documentId: "synthetic-document-b",
+        candidateId: CANDIDATE_B,
+        proofId: "synthetic-proof",
+        evidenceId: "synthetic-evidence",
+        auditId: "synthetic-audit"
+      }
+    });
+    expect(response.status()).toBe(503);
+    expect((await response.json()).code).toBe("FOUNDER_AUTHORIZATION_NOT_CONFIGURED");
+  });
+});
