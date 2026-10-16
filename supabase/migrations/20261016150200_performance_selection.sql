@@ -21,16 +21,29 @@ create policy selection_founder_read on public.selection_decisions for select to
 create or replace function public.record_selection_decision(p_candidate_id uuid,p_decision text,p_rationale text,p_idempotency_key text)
 returns uuid language plpgsql security definer set search_path = ''
 as $$
-declare v_id uuid;
+declare v_id uuid; v_existing public.selection_decisions%rowtype;
 begin
  if not kingsmen_security.is_kingsmen_founder() then raise exception 'founder role required' using errcode='42501'; end if;
+ if p_candidate_id is null or p_decision not in ('selected','waitlisted','rejected','pending')
+    or p_idempotency_key is null or length(p_idempotency_key) < 8 or length(p_idempotency_key) > 128 then
+   raise exception 'invalid selection decision input' using errcode='22023';
+ end if;
  insert into public.selection_decisions(candidate_id,decision,decided_by,rationale,idempotency_key)
  values(p_candidate_id,p_decision,auth.uid(),p_rationale,p_idempotency_key)
- on conflict(idempotency_key) do update set idempotency_key=excluded.idempotency_key returning id into v_id;
+ on conflict(idempotency_key) do nothing returning id into v_id;
+ if v_id is null then
+   select * into v_existing from public.selection_decisions where idempotency_key=p_idempotency_key;
+   if not found or v_existing.candidate_id <> p_candidate_id or v_existing.decision <> p_decision
+      or v_existing.rationale is distinct from p_rationale then
+     raise exception 'idempotency key reused with different decision' using errcode='23505';
+   end if;
+   return v_existing.id;
+ end if;
  insert into public.audit_log(actor_id,action,entity_type,entity_id,metadata,created_at)
- values(auth.uid(),'selection.decision.recorded','selection_decision',v_id,jsonb_build_object('candidate_id',p_candidate_id,'decision',p_decision),now());
+ values(auth.uid(),'selection.decision.recorded','selection_decision',v_id,
+        jsonb_build_object('candidate_id',p_candidate_id,'decision',p_decision),now());
  return v_id;
-end $$;
+end $;
 revoke all on function public.record_selection_decision(uuid,text,text,text) from public,anon;
 grant execute on function public.record_selection_decision(uuid,text,text,text) to authenticated;
 commit;
