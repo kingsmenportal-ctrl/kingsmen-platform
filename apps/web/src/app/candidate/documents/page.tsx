@@ -13,6 +13,7 @@ type DocumentRecord = {
   canonicalDocumentRef?: string;
   evidenceRef?: string;
   registryStatus?: "REGISTERED" | "LOCAL_ONLY";
+  candidateReview?: { status?: string; reviewedAt?: string; reviewType?: string; notice?: string };
 };
 type WorkspaceResponse = { documents?: DocumentRecord[]; error?: string; status?: string };
 const MAX_UPLOAD_BYTES = 10 * 1024 * 1024;
@@ -110,6 +111,23 @@ export default function CandidateDocumentsPage() {
     }
   }
 
+  async function reviewDocument(document: DocumentRecord, reviewStatus: "CANDIDATE_CONFIRMED_CONTENT" | "NEEDS_CORRECTION" | "REPLACEMENT_NEEDED") {
+    setBusy(true); setError(""); setMessage("");
+    try {
+      const response = await fetch("/api/personal-jobs/apply-now", {
+        method: "POST", credentials: "same-origin", cache: "no-store",
+        headers: { "Content-Type": "application/json", Accept: "application/json" },
+        body: JSON.stringify({ action: "recordDocumentReview", documentId: document.documentId, reviewStatus }),
+      });
+      const data = await response.json().catch(() => ({}));
+      if (!response.ok || data.status !== "DOCUMENT_REVIEW_RECORDED") throw new Error(typeof data.error === "string" ? data.error : "The review could not be recorded.");
+      setDocuments(Array.isArray(data.store?.documents) ? data.store.documents : []);
+      setMessage("Your self-review was recorded. This is not an independent authenticity or employer-acceptance check.");
+    } catch (reason) {
+      setError(reason instanceof Error ? reason.message : "The review could not be recorded.");
+    } finally { setBusy(false); }
+  }
+
   async function removeDocument(document: DocumentRecord) {
     if (!window.confirm(`Delete “${document.fileName || "this document"}” from your workspace?`)) return;
     setBusy(true); setError(""); setMessage("");
@@ -177,7 +195,12 @@ export default function CandidateDocumentsPage() {
                   : "Canonical vault registration not confirmed"}
               </p>
             </div>
+              <p style={{ margin: "6px 0 0", fontSize: 12, color: "#53657a" }}>Self-review: {document.candidateReview?.status || "NOT_REVIEWED"}{document.candidateReview?.reviewedAt ? ` · ${dateLabel(document.candidateReview.reviewedAt)}` : ""}. Independent verification: not performed.</p>
+            </div>
             <div style={{ display: "flex", gap: 8, flexWrap: "wrap" }}>
+              <button type="button" disabled={busy} onClick={() => void reviewDocument(document, "CANDIDATE_CONFIRMED_CONTENT")} style={{ border: "1px solid #b7e4ca", borderRadius: 9, padding: "8px 11px", background: "#fff", color: "#176345", fontSize: 12, fontWeight: 800 }}>Content looks correct</button>
+              <button type="button" disabled={busy} onClick={() => void reviewDocument(document, "NEEDS_CORRECTION")} style={{ border: "1px solid #fed7aa", borderRadius: 9, padding: "8px 11px", background: "#fff", color: "#9a3412", fontSize: 12, fontWeight: 800 }}>Needs correction</button>
+              <button type="button" disabled={busy} onClick={() => void reviewDocument(document, "REPLACEMENT_NEEDED")} style={{ border: "1px solid #fecaca", borderRadius: 9, padding: "8px 11px", background: "#fff", color: "#9f2d25", fontSize: 12, fontWeight: 800 }}>Replace document</button>
               <a href={`/api/personal-jobs/apply-now/documents/${encodeURIComponent(document.documentId)}`} target="_blank" rel="noreferrer" style={{ border: "1px solid #cbd5e1", borderRadius: 9, padding: "8px 11px", textDecoration: "none", color: "#1d5675", fontSize: 13, fontWeight: 800 }}>View / download</a>
               <button type="button" onClick={() => void removeDocument(document)} disabled={busy} style={{ border: "1px solid #fecaca", borderRadius: 9, padding: "8px 11px", background: "#fff", color: "#9f2d25", fontSize: 13, fontWeight: 800, cursor: busy ? "not-allowed" : "pointer" }}>Delete</button>
             </div>
