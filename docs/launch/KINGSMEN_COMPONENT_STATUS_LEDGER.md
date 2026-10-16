@@ -87,3 +87,8 @@ The partial investigation is documented in [Phase 1 Recovery Evidence](PHASE_1_R
 **Verification:** GitHub accepted the four file commits. No local Next.js build or browser test was run by this connector, so these are not marked Verified or Operational.
 
 **Foundation constraints remain unchanged:** Phase 0 API lockfile debt remains open; Phase 1 backup/restore remains blocked. No database migrations were created or applied. Neither phase is closed.
+
+
+### Phase A.1 follow-up — Free Destiny Map interaction
+
+Updated `apps/web/src/app/free-destiny-map/page.tsx` in commit `0becaf8a2b190a8b0d61305913283d1261566a81`. The form now validates the route selections and consent boundary, produces an on-page readiness preview with tailored next-step prompts, supports reset, and explicitly states that nothing is sent or persisted. Status: **Implemented; runtime not yet verified; not integrated with backend persistence**. This is a local-only preview, not a live matching or eligibility engine.
