@@ -153,11 +153,11 @@ export async function handlePayFastItn(request: IncomingMessage, response: Serve
     }
 
     // A previously accepted callback is idempotent even if its order has since advanced.
-    const idempotencyKey = ["payfast-itn", merchantReference, providerPaymentId, String(fields.payment_status ?? "unknown").toUpperCase()].join(":");
+    const retryLookupKey = ["payfast-itn", merchantReference, providerPaymentId, String(fields.payment_status ?? "unknown").toUpperCase()].join(":");
     const prior = await client.query<{ id: string }>(
       "SELECT id FROM public.payfast_itn_receipts WHERE accepted = true AND (provider_payment_id = $1 OR idempotency_key = $2) " +
       "UNION ALL SELECT id FROM public.finance_payments WHERE provider = 'PAYFAST' AND provider_payment_id = $1 LIMIT 1",
-      [providerPaymentId, idempotencyKey]
+      [providerPaymentId, retryLookupKey]
     );
     if (prior.rows.length > 0) {
       await client.query("ROLLBACK");
