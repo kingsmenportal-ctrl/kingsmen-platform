@@ -1,5 +1,6 @@
 import { randToCents } from "./money";
 import { verifyPayFastSignature, type PayFastFields } from "./payfast-signature";
+import { isAllowedPayFastSourceIp } from "./payfast-source-ip";
 
 export interface PayFastItnValidationInput {
   payload: PayFastFields;
@@ -7,8 +8,10 @@ export interface PayFastItnValidationInput {
   expectedAmountCents: number;
   passphrase?: string;
   duplicate?: boolean;
-  /** Must be set only after server-side source-IP allow-list verification. */
-  ipValid?: boolean;
+  /** Direct socket peer address; do not pass an untrusted forwarded header. */
+  remoteAddress?: string;
+  /** Operator-maintained exact IPs from the provider's current official guidance. */
+  allowedSourceIps?: string;
 }
 
 export interface PayFastItnValidationResult {
@@ -51,7 +54,7 @@ export function validatePayFastItn(input: PayFastItnValidationInput): PayFastItn
     && input.expectedAmountCents > 0
     && amountGrossCents === input.expectedAmountCents;
   const duplicate = input.duplicate === true;
-  const ipValid = input.ipValid === true;
+  const ipValid = isAllowedPayFastSourceIp(input.remoteAddress, input.allowedSourceIps);
   const idempotencyKey = ["payfast-itn", merchantReference || "missing-reference", providerPaymentId ?? "missing-provider-id", paymentStatus ?? "unknown"].join(":");
 
   const result = (accepted: boolean, rejectionReason?: string): PayFastItnValidationResult => ({
