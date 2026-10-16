@@ -78,6 +78,56 @@ test("candidate auth route enforces method and advertises the required method", 
 });
 
 
+
+function bodyRequestMock(body: string, contentType = "application/json") {
+  const request = requestMock("POST", "https://portal.example.test") as IncomingMessage & AsyncIterable<Buffer>;
+  request.headers = { origin: "https://portal.example.test", "content-type": contentType } as IncomingMessage["headers"];
+  (request as unknown as { [Symbol.asyncIterator]: () => AsyncIterator<Buffer> })[Symbol.asyncIterator] = async function* () {
+    yield Buffer.from(body);
+  };
+  return request;
+}
+
+test("candidate login rejects unsupported content types before credential verification", async () => {
+  process.env.KINGSMEN_CANDIDATE_PORTAL_ORIGIN = "https://portal.example.test";
+  let loginCalls = 0;
+  const service = { login: async () => { loginCalls += 1; throw new Error("must not be called"); } } as unknown as CandidateAuthService;
+  const res = responseMock();
+  await handleCandidateAuthRoute(bodyRequestMock('{"email":"synthetic@example.test","password":"not-real"}', "text/plain"), res.response,
+    "/api/candidate-auth/login", service,
+    (response, status, body) => { response.statusCode = status; response.end(JSON.stringify(body)); });
+  assert.equal(res.statusCode, 415);
+  assert.match(res.body, /UNSUPPORTED_MEDIA_TYPE/);
+  assert.equal(loginCalls, 0);
+});
+
+test("candidate login rejects malformed JSON before credential verification", async () => {
+  process.env.KINGSMEN_CANDIDATE_PORTAL_ORIGIN = "https://portal.example.test";
+  let loginCalls = 0;
+  const service = { login: async () => { loginCalls += 1; throw new Error("must not be called"); } } as unknown as CandidateAuthService;
+  const res = responseMock();
+  await handleCandidateAuthRoute(bodyRequestMock('{"email":'), res.response,
+    "/api/candidate-auth/login", service,
+    (response, status, body) => { response.statusCode = status; response.end(JSON.stringify(body)); });
+  assert.equal(res.statusCode, 400);
+  assert.match(res.body, /INVALID_JSON/);
+  assert.equal(loginCalls, 0);
+});
+
+test("candidate login rejects oversized request bodies before credential verification", async () => {
+  process.env.KINGSMEN_CANDIDATE_PORTAL_ORIGIN = "https://portal.example.test";
+  let loginCalls = 0;
+  const service = { login: async () => { loginCalls += 1; throw new Error("must not be called"); } } as unknown as CandidateAuthService;
+  const res = responseMock();
+  const oversized = "x".repeat(16_385);
+  await handleCandidateAuthRoute(bodyRequestMock(oversized), res.response,
+    "/api/candidate-auth/login", service,
+    (response, status, body) => { response.statusCode = status; response.end(JSON.stringify(body)); });
+  assert.equal(res.statusCode, 413);
+  assert.match(res.body, /REQUEST_BODY_TOO_LARGE/);
+  assert.equal(loginCalls, 0);
+});
+
 test("unrelated routes are not intercepted or given auth response headers", async () => {
   const res = responseMock();
   const handled = await handleCandidateAuthRoute(
