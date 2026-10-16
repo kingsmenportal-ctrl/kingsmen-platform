@@ -50,6 +50,14 @@ export async function handleCandidateComponentRoute(
       return true;
     }
 
+    const invoiceLineItemsMatch = pathname.match(/^\/api\/candidate\/invoices\/([0-9a-f-]{36})\/line-items$/i);
+    if (method === "GET" && invoiceLineItemsMatch) {
+      const invoiceId = invoiceLineItemsMatch[1];
+      const items = await supabaseUserRequest<unknown[]>(token, "invoice_line_items?select=id,invoice_id,description,amount_cents,created_at&invoice_id=eq." + encodeURIComponent(invoiceId) + "&order=created_at.asc");
+      sendComponentJson(response, 200, { ok: true, lineItems: items });
+      return true;
+    }
+
     if (method === "GET" && pathname === "/api/candidate/invoices") {
       const invoices = await supabaseUserRequest<unknown[]>(token, "invoices?select=id,amount_cents,currency,status,created_at,issued_at,paid_at&order=created_at.desc");
       sendComponentJson(response, 200, { ok: true, invoices });
