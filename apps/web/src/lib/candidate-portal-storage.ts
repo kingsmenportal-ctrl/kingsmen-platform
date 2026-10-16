@@ -58,7 +58,7 @@ function assertCandidateIdentity(context: PortalContext) {
 }
 
 const MAX_CANDIDATE_STATE_BYTES = 2 * 1024 * 1024;
-const MAX_CANDIDATE_DOCUMENT_BYTES = 15 * 1024 * 1024;
+const MAX_CANDIDATE_DOCUMENT_BYTES = 10 * 1024 * 1024;
 
 export async function loadCandidatePortalState(context: PortalContext): Promise<Record<string, unknown> | null> {
   assertCandidateIdentity(context);
@@ -114,7 +114,7 @@ export async function uploadCandidatePortalDocument(
   }
   assertCandidateIdentity(context);
   if (!Buffer.isBuffer(bytes) || bytes.length === 0 || bytes.length > MAX_CANDIDATE_DOCUMENT_BYTES) {
-    throw new Error("Document must be non-empty and no larger than 15 MiB.");
+    throw new Error("Document must be non-empty and no larger than 10 MiB.");
   }
   const storagePath = `${context.userId}/${objectKey}`;
   const response = await fetch(
