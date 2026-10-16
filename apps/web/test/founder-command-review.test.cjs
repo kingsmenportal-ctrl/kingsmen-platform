@@ -15,10 +15,10 @@ test("founder command queue is authenticated and uses private no-store responses
   assert.match(queue, /limit=100/);
 });
 
-test("founder command review UI is read-only and displays audit references", () => {
+test("founder command review records separate-duty decisions without executing commands and displays audit references", () => {
   assert.match(page, /\/api\/founder\/commands\/queue/);
   assert.match(page, /audit_ref/);
   assert.match(page, /evidence_ref/);
-  assert.match(page, /read-only/);
-  assert.match(page, /cannot approve or execute/);
+  assert.match(page, /A decision is not execution/);
+  assert.match(page, /will not execute the command/);
 });
