@@ -476,6 +476,12 @@ async function handleReadiness(response: ServerResponse): Promise<void> {
 }
 
 async function handleCandidateStatus(response: ServerResponse, candidateId: string): Promise<void> {
+  // No verified candidate identity is currently attached to requests. Never expose
+  // private read models by identifier alone; keep this route unavailable until auth
+  // middleware supplies a trusted, server-verified candidate principal.
+  sendError(response, 503, "CANDIDATE_AUTHORIZATION_NOT_CONFIGURED", "Candidate authorization is not configured.");
+  return;
+
   if (truthVault.enabled) {
     const candidate = await truthVault.readCandidateStatus(candidateId);
     if (!candidate) {
@@ -502,6 +508,11 @@ async function handleCandidateStatus(response: ServerResponse, candidateId: stri
 }
 
 async function handleApplicationWorkbench(response: ServerResponse, applicationId: string): Promise<void> {
+  // Application IDs are not credentials. Require verified ownership authorization
+  // before any database or in-memory read can occur.
+  sendError(response, 503, "CANDIDATE_AUTHORIZATION_NOT_CONFIGURED", "Candidate authorization is not configured.");
+  return;
+
   if (truthVault.enabled) {
     const application = await truthVault.readApplicationWorkbench(applicationId);
     if (!application) {
