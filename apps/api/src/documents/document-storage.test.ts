@@ -45,3 +45,20 @@ test("document record is explicitly pending review and not verified", () => {
   assert.equal(record.extractionStatus, "NOT_STARTED");
   assert.equal(record.protectedData, true);
 });
+
+
+test("document storage sanitizes path separators and unsafe filename characters", () => {
+  const result = prepareDocumentStorage({ ...validInput, originalFilename: "../../private\\report <final>.PDF" });
+  assert.ok(result.storagePath.startsWith(`${validInput.candidateId}/ID_DOCUMENT/`));
+  assert.equal(result.storagePath.includes("/../../"), false);
+  assert.equal(result.storagePath.includes("\\"), false);
+  assert.equal(result.storagePath.includes("<"), false);
+  assert.equal(result.storagePath.includes(">"), false);
+  assert.match(result.storagePath, /private-report-final-\.pdf$/);
+});
+
+test("document storage accepts exact maximum size and rejects blank or control-only filenames", () => {
+  assert.doesNotThrow(() => prepareDocumentStorage({ ...validInput, fileSizeBytes: 15 * 1024 * 1024 }));
+  assert.throws(() => prepareDocumentStorage({ ...validInput, originalFilename: " " }), /originalFilename is required/);
+  assert.throws(() => prepareDocumentStorage({ ...validInput, originalFilename: "\\u0000\\u0001" }), /originalFilename is invalid/);
+});
