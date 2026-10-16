@@ -18,10 +18,10 @@ const checks = [
   ["readiness endpoint is advertised in health metadata", /"GET \/ready"/.test(source)],
   ["production defaults to PostgreSQL Truth Vault", /isProduction/.test(truthVaultSource) && /PRODUCTION_REQUIRES_DURABLE_TRUTH_VAULT/.test(truthVaultSource)],
   ["production database connections verify TLS certificates", /ssl: isProduction/.test(truthVaultSource) && /rejectUnauthorized: true/.test(truthVaultSource)],
-  ["database TLS verifies server certificates", /KINGSMEN_DATABASE_SSL === "true" \? \{ rejectUnauthorized: true \}/.test(truthVaultSource)],
+  ["database TLS verifies server certificates", /ssl:\s*isProduction \|\| process\.env\.KINGSMEN_DATABASE_SSL === "true"\s*\?\s*\{ rejectUnauthorized: true \}/.test(truthVaultSource)],
   ["database TLS does not disable certificate verification", !/KINGSMEN_DATABASE_SSL === "true" \? \{ rejectUnauthorized: false \}/.test(truthVaultSource)],
-  ["candidate status reads fail closed without verified ownership authorization", /CANDIDATE_AUTHORIZATION_NOT_CONFIGURED/.test(source) && /Candidate status is unavailable until authenticated ownership checks are configured/.test(source)],
-  ["application workbench reads fail closed without verified ownership authorization", /Application workbench is unavailable until authenticated ownership checks are configured/.test(source)],
+  ["candidate status reads require authenticated owner-scoped lookup", /candidateAuthRuntime\.service\.authenticateToken\(token\)/.test(source) && /readCandidateStatusForOwner\(principal\.candidateId, candidateRef\)/.test(source) && /sendError\(response, 401/.test(source)],
+  ["application workbench reads require authenticated owner-scoped lookup", /candidateAuthRuntime\.service\.authenticateToken\(token\)/.test(source) && /readOwnedApplicationWorkbench\(applicationRef, principal\.candidateId\)/.test(source) && /sendError\(response, 401/.test(source)],
   ["internal errors are not returned to clients", /sendError\(response, 500, ["']KINGSMEN_API_ERROR["'], ["']The request could not be completed\.["']\)/.test(source)]
 ];
 const failed = checks.filter(([, passed]) => !passed);
