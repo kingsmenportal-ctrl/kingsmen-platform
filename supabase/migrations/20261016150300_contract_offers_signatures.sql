@@ -56,7 +56,7 @@ declare v_candidate uuid; v_sig uuid; v_offer public.contract_offers%rowtype;
 begin
  v_candidate:=kingsmen_security.current_authenticated_candidate_id();
  if v_candidate is null then raise exception 'candidate authentication required' using errcode='42501'; end if;
- if p_offer_id is null or p_signature_method not in ('typed_name','electronic_signature','external_signature')
+ if p_offer_id is null or p_signature_method is null or p_signature_method not in ('typed_name','electronic_signature','external_signature')
     or p_document_sha256 is null or p_document_sha256 !~ '^[0-9a-f]{64}
 revoke all on function public.issue_offer(uuid,integer,jsonb,timestamptz,text) from public,anon;
 grant execute on function public.issue_offer(uuid,integer,jsonb,timestamptz,text) to authenticated;
