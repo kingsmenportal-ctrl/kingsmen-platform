@@ -106,7 +106,7 @@ test("candidate state reads and uploads have explicit byte limits and reject mal
   assert.match(storage, /MAX_CANDIDATE_DOCUMENT_BYTES = 15 \* 1024 \* 1024/);
   assert.match(storage, /const raw = await response\.text\(\)/);
   assert.match(storage, /Candidate storage returned invalid JSON/);
-  assert.match(storage, /Document must be non-empty and no larger than 15 MiB/);
+  assert.match(storage, /Document must be non-empty and no larger than 10 MiB/);
   assert.match(storage, /Buffer\.byteLength\(raw, "utf8"\) > MAX_CANDIDATE_STATE_BYTES/);
 });
 
