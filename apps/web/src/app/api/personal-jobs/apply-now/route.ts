@@ -928,6 +928,46 @@ export async function POST(request: Request) {
       });
     }
 
+    if (action === "recordRequirementReview") {
+      const opportunityId = typeof body.opportunityId === "string" ? body.opportunityId.trim() : "";
+      const reviewSourceUrl = typeof body.reviewSourceUrl === "string" ? body.reviewSourceUrl.trim() : "";
+      const requirementNotes = typeof body.requirementNotes === "string" ? body.requirementNotes.trim() : "";
+      const checklist = Array.isArray(body.requirements) ? body.requirements : [];
+      const opportunity = store.opportunities.find((item) => item.opportunityId === opportunityId);
+      if (!opportunity) return privateJson({ status: "FAILED", error: "Opportunity not found in this workspace." }, { status: 404 });
+      if (reviewSourceUrl.length > 1000 || requirementNotes.length > 2000 || checklist.length > 30) {
+        return privateJson({ status: "FAILED", error: "Review source, notes or requirement list exceeds the allowed limit." }, { status: 400 });
+      }
+      let parsedReviewUrl: URL;
+      try { parsedReviewUrl = new URL(reviewSourceUrl); }
+      catch { return privateJson({ status: "FAILED", error: "Enter the official vacancy URL used for your review." }, { status: 400 }); }
+      if (parsedReviewUrl.protocol !== "https:" || parsedReviewUrl.username || parsedReviewUrl.password) {
+        return privateJson({ status: "FAILED", error: "The review source must be an HTTPS URL without embedded credentials." }, { status: 400 });
+      }
+      const requirements = [];
+      for (const item of checklist) {
+        if (!item || typeof item !== "object" || typeof item.label !== "string" || item.label.trim().length < 2 || item.label.trim().length > 160) {
+          return privateJson({ status: "FAILED", error: "Each requirement needs a label between 2 and 160 characters." }, { status: 400 });
+        }
+        const status = String(item.status || "UNKNOWN").toUpperCase();
+        if (!["REQUIRED", "NOT_REQUIRED", "UNKNOWN", "CANDIDATE_SATISFIED", "CANDIDATE_MISSING"].includes(status)) {
+          return privateJson({ status: "FAILED", error: "Invalid requirement status." }, { status: 400 });
+        }
+        requirements.push({ label: item.label.trim(), status, candidateAssessment: ["CANDIDATE_SATISFIED", "CANDIDATE_MISSING"].includes(status), reviewedAt: new Date().toISOString() });
+      }
+      const review = {
+        reviewSourceUrl,
+        requirementNotes,
+        requirements,
+        reviewStatus: "CANDIDATE_REVIEWED_NOT_INDEPENDENTLY_VERIFIED",
+        reviewedAt: new Date().toISOString(),
+        verificationNotice: "Candidate-recorded checklist only. The source, employer, requirements and candidate assessments have not been independently verified."
+      };
+      store.opportunities = store.opportunities.map((item) => item.opportunityId === opportunityId ? { ...item, requirementReview: review, updatedAt: new Date().toISOString() } : item);
+      await persistStore(context, store);
+      return privateJson({ status: "REQUIREMENT_REVIEW_RECORDED", opportunity: store.opportunities.find((item) => item.opportunityId === opportunityId), store, readiness: scoreReadiness(store) });
+    }
+
     if (action === "updateOpportunityStatus") {
       const opportunityId = typeof body.opportunityId === "string" ? body.opportunityId.trim() : "";
       const nextStatus = typeof body.status === "string" ? body.status.toUpperCase() : "";
