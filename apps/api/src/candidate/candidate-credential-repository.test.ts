@@ -143,3 +143,64 @@ test("custom lockout settings are bounded and honored", async () => {
   const lock = client.statements.find((entry) => /set auth_status = 'LOCKED'/i.test(entry.sql));
   assert.deepEqual(lock?.values, ["123e4567-e89b-42d3-a456-426614174000", 2, 7]);
 });
+
+
+class FailureFakeClient extends FakeClient {
+  failOn: RegExp | null = null;
+  override async query<T = Record<string, unknown>>(sql: string, values?: readonly unknown[]) {
+    this.statements.push({ sql, values });
+    if (this.failOn?.test(sql)) throw new Error("simulated credential database failure");
+    if (/select cc\\.candidate_id::text/i.test(sql)) return { rows: this.rows as T[], rowCount: this.rows.length };
+    return { rows: [] as T[], rowCount: this.rowCount };
+  }
+}
+
+test("credential lookup database failure rolls back and releases connection", async () => {
+  const client = new FailureFakeClient();
+  client.failOn = /select cc\\.candidate_id::text/i;
+  const repository = new CandidateCredentialRepository({ connect: async () => client });
+  await assert.rejects(
+    repository.authenticate("candidate@example.test", "test-only-password-123!"),
+    /simulated credential database failure/
+  );
+  assert.ok(client.statements.some((entry) => entry.sql === "begin"));
+  assert.ok(client.statements.some((entry) => /set_config\\('app\\.kingsmen_role', 'service_role', true\\)/i.test(entry.sql)));
+  assert.ok(client.statements.some((entry) => /set_config\\('app\\.service_context', 'backend_api', true\\)/i.test(entry.sql)));
+  assert.ok(client.statements.some((entry) => entry.sql === "rollback"));
+  assert.equal(client.statements.some((entry) => entry.sql === "commit"), false);
+  assert.equal(client.released, true);
+});
+
+test("invalid credential input is rejected before acquiring a database connection", async () => {
+  let connectCalls = 0;
+  const repository = new CandidateCredentialRepository({
+    connect: async () => {
+      connectCalls += 1;
+      throw new Error("database must not be touched for invalid input");
+    }
+  });
+  assert.deepEqual(await repository.authenticate("bad-email", "test-only-password-123!"), {
+    ok: false,
+    reason: "INVALID_CREDENTIALS"
+  });
+  assert.deepEqual(await repository.authenticate("candidate@example.test", ""), {
+    ok: false,
+    reason: "INVALID_CREDENTIALS"
+  });
+  assert.deepEqual(await repository.authenticate("candidate@example.test", "x".repeat(1025)), {
+    ok: false,
+    reason: "INVALID_CREDENTIALS"
+  });
+  assert.equal(connectCalls, 0);
+});
+
+test("malformed stored password hash fails closed without accepting credentials", async () => {
+  const { client, repository } = setup(activeRow("not-a-valid-scrypt-hash"));
+  assert.deepEqual(await repository.authenticate("candidate@example.test", "test-only-password-123!"), {
+    ok: false,
+    reason: "INVALID_CREDENTIALS"
+  });
+  assert.ok(client.statements.some((entry) => /failed_login_attempts = \\$2, updated_at/i.test(entry.sql)));
+  assert.equal(client.statements.at(-1)?.sql, "commit");
+  assert.equal(client.released, true);
+});
