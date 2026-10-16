@@ -63,9 +63,24 @@ Further read-only inspection found:
 - The `document_files_size_nonnegative` and `document_files_metadata_object` constraints from the repository lifecycle migration are absent. A read-only preflight found zero negative file sizes, zero non-object metadata rows, and zero duplicate `(storage_bucket, storage_path)` pairs at inspection time.
 - Storage object policies exist for authenticated candidate-owned INSERT, SELECT and DELETE in the private `candidate-documents` bucket. This is policy inspection only, not proof of cross-candidate runtime denial.
 
-Two **draft forward migrations** have been prepared on this PR branch:
+Four **draft forward migrations** have been prepared on this PR branch:
 
 1. `db/migrations/20261016144000_candidate_document_lifecycle_reconciliation.sql` — reinstates the candidate upload registration, retirement/deletion-result and application-link RPCs; adds the missing lifecycle constraints and event type; preflights duplicate storage paths before creating a unique index.
 2. `db/migrations/20261016144100_founder_document_review_reconciliation.sql` — restores the founder-role helper, decision table and canonical-validation review RPC. It intentionally does not change the staging `founder_ops_audit_events` service-role-only policy.
+3. `db/migrations/20261016144200_founder_command_review_reconciliation.sql` — restores the command intake/decision tables and guarded RPCs. Writes to the audit table are made through SECURITY DEFINER functions that validate the founder role and actor identity; the audit table itself remains service-role-only.
+4. `db/migrations/20261016144300_support_operations_reconciliation.sql` — restores the support event table and the candidate-create/operator-update RPCs, with explicit table grants and role-scoped RLS. It uses `kingsmen_security.current_authenticated_candidate_id()` rather than `candidates.owner_user_id`, which does not exist in the deployed `public.candidates` schema.
 
-These files are **not applied to Supabase**. They still require careful SQL review against the deployed schema and runtime contract, plus a verified staging backup/restore path. Do not apply either migration until those gates pass. Migration files use timestamp prefixes to avoid the existing four-digit suffix collisions with the timestamped staging history.
+A further code/schema mismatch was corrected: the private `candidate-documents` bucket is limited to 10 MiB, while the application upload helper previously allowed 15 MiB. The helper and its regression assertion now use 10 MiB to avoid accepting files that the bucket must reject.
+
+These files are **not applied to Supabase**. They still require SQL review against the deployed schema and runtime contract, plus a verified staging backup/restore path. Do not apply them until those gates pass. Migration files use timestamp prefixes to avoid the existing four-digit suffix collisions with the timestamped staging history.
+
+## Newly verified drift beyond the original five RPCs
+
+Read-only checks on 2026-10-16 also found:
+
+- `public.founder_command_intake` and `public.founder_command_decisions` are absent, and `record_founder_command_intake(...)` / `decide_founder_command_intake(...)` are absent. The current founder command queue reads these tables directly, so the missing schema prevents the queue from working end-to-end even though its source regression suite passes.
+- `public.candidate_support_ticket_events` is absent, and `create_candidate_support_ticket(...)` / `update_support_ticket_as_operator(...)` are absent. The canonical `candidate_support_tickets` table exists, but its only observed policy is service-role-only, which does not support the current founder route's authenticated PostgREST reads/updates.
+- The deployed `public.candidates` table has no `owner_user_id` column. The older repository migration `0023_support_operations_audit.sql` uses that column in its candidate-ticket RPC, so that source migration must not be applied verbatim to this staging schema. The timestamped draft resolves identity through the deployed `kingsmen_security.current_authenticated_candidate_id()` helper.
+- The founder operational tables inspected (`founder_command_catalog`, `founder_command_requests`, `founder_command_results`, `founder_daily_briefs`, `founder_decision_log`, `founder_escalation_threads`, `founder_mobile_cards`, `founder_operator_profiles`, `founder_runtime_config`, `founder_watchlist_items`, `founder_reports`, and `founder_report_sections`) currently expose only service-role policies. Do not broadly replace these policies until each active API path and required read/write permissions have been mapped.
+
+The timestamped founder-command and support migrations are drafts for review only. No staging DDL has been applied, and no real-user data or credentials were used for these checks.
