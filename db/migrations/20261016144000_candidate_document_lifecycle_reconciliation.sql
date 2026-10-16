@@ -23,8 +23,38 @@ begin
   end if;
 end $$;
 
-create unique index if not exists document_files_storage_bucket_path_key
-  on public.document_files(storage_bucket, storage_path);
+-- Do not trust IF NOT EXISTS: an existing index with this name may have
+-- a different definition. Fail closed if it does not match the intended unique key.
+do $
+declare
+  v_index_oid oid;
+  v_is_unique boolean;
+  v_is_valid boolean;
+  v_columns text[];
+begin
+  select i.indexrelid, i.indisunique, i.indisvalid,
+         array_agg(a.attname order by k.ordinality)
+    into v_index_oid, v_is_unique, v_is_valid, v_columns
+  from pg_index i
+  join pg_class idx on idx.oid = i.indexrelid
+  join pg_namespace ns on ns.oid = idx.relnamespace
+  join lateral unnest(i.indkey) with ordinality as k(attnum, ordinality) on true
+  join pg_attribute a on a.attrelid = i.indrelid and a.attnum = k.attnum
+  where ns.nspname = 'public'
+    and idx.relname = 'document_files_storage_bucket_path_key'
+    and i.indrelid = 'public.document_files'::regclass
+  group by i.indexrelid, i.indisunique, i.indisvalid;
+
+  if v_index_oid is not null then
+    if not v_is_unique or not v_is_valid
+       or v_columns is distinct from array['storage_bucket','storage_path']::text[] then
+      raise exception 'Existing index document_files_storage_bucket_path_key has an unexpected definition; manual review required';
+    end if;
+  else
+    create unique index document_files_storage_bucket_path_key
+      on public.document_files(storage_bucket, storage_path);
+  end if;
+end $;
 
 alter table public.document_storage_events
   drop constraint if exists document_storage_events_type_check;
