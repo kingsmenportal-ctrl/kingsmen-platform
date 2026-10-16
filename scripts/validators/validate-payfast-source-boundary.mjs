@@ -5,9 +5,13 @@ const root = process.cwd();
 const itnPath = path.join(root, "apps/api/src/finance/payfast-itn.ts");
 const helperPath = path.join(root, "apps/api/src/finance/payfast-source-ip.ts");
 const testsPath = path.join(root, "apps/api/src/finance/payfast-source-ip.test.ts");
+const moneyPath = path.join(root, "apps/api/src/finance/money.ts");
+const moneyTestsPath = path.join(root, "apps/api/src/finance/money.test.ts");
 const itn = fs.readFileSync(itnPath, "utf8");
 const helper = fs.readFileSync(helperPath, "utf8");
 const tests = fs.readFileSync(testsPath, "utf8");
+const money = fs.readFileSync(moneyPath, "utf8");
+const moneyTests = fs.readFileSync(moneyTestsPath, "utf8");
 const errors = [];
 
 if (!itn.includes('from "./payfast-source-ip"') || !itn.includes("isAllowedPayFastSourceIp(input.remoteAddress, input.allowedSourceIps)")) {
@@ -21,6 +25,12 @@ if (!helper.includes("normalizedEntries.some((entry) => entry === null)") || !he
 }
 for (const term of ["IPv4-mapped", "malformed", "allow-list"]) {
   if (!tests.toLowerCase().includes(term.toLowerCase())) errors.push(`Missing source-IP regression coverage: ${term}`);
+}
+if (!money.includes("at most two fractional digits") || !money.includes("Number.isSafeInteger(cents)")) {
+  errors.push("ZAR parser must reject excess decimal precision and unsafe integer cents.");
+}
+for (const term of ["locale commas", "exponent notation", "excess precision"]) {
+  if (!moneyTests.toLowerCase().includes(term.toLowerCase())) errors.push(`Missing strict-money regression coverage: ${term}`);
 }
 if (errors.length) {
   console.error("PayFast source boundary validation failed:");
