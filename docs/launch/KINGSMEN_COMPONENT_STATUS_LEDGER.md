@@ -92,3 +92,13 @@ The partial investigation is documented in [Phase 1 Recovery Evidence](PHASE_1_R
 ### Phase A.1 follow-up — Free Destiny Map interaction
 
 Updated `apps/web/src/app/free-destiny-map/page.tsx` in commit `0becaf8a2b190a8b0d61305913283d1261566a81`. The form now validates the route selections and consent boundary, produces an on-page readiness preview with tailored next-step prompts, supports reset, and explicitly states that nothing is sent or persisted. Status: **Implemented; runtime not yet verified; not integrated with backend persistence**. This is a local-only preview, not a live matching or eligibility engine.
+
+
+### Phase A.1 follow-up — public entry and registration usability (16 October 2026)
+
+- Updated `apps/web/src/app/page.tsx` on branch `feat/phase-a1-public-destiny-auth-foundation`: improved public navigation, route-category entry cards, clearer separation of free browser guidance from paid/managed support, and explicit non-guarantee wording. Status: **Implemented; build/browser verification pending**.
+- Updated `apps/web/src/app/auth/register/page.tsx`: added password confirmation and clearer validation/status copy; the form explicitly does not create an account, send details, or store credentials. Status: **Implemented UI; secure registration Blocked pending identity-provider integration**.
+- Existing `apps/web/src/app/free-destiny-map/page.tsx` already provides a local-only preview, required route selections, reset, tailored next-step prompts and a clear privacy boundary. Status: **Implemented as browser-only guidance; not backend-integrated; runtime verification pending**. No changes were made to migrations or database state.
+- Existing sign-in and recovery surfaces were reviewed: `apps/web/src/app/auth/login/page.tsx` and `apps/web/src/app/auth/passwordless/page.tsx` clearly disclose that credentials are not transmitted and recovery email is not sent. Status: **UI implemented; authentication/session/recovery integration Blocked**.
+- This update has not been built or browser-tested in the connector environment. GitHub file writes alone are not build/runtime evidence. Do not label this chunk Verified or Operational until CI/build and synthetic browser flows pass.
+- Phase 0 API lockfile remains **OPEN**; Phase 1 real backup/restore remains **BLOCKED**. No migrations were created or applied; neither foundation phase is closed.
