@@ -1,6 +1,7 @@
 import crypto from "node:crypto";
 import type { IncomingMessage, ServerResponse } from "node:http";
 import { randToCents } from "./money";
+import { reconcilePayFastAmounts } from "./payfast-amounts";
 import { validatePayFastItn } from "./payfast-itn";
 import type { PayFastFields } from "./payfast-signature";
 
@@ -204,6 +205,12 @@ export async function handlePayFastItn(request: IncomingMessage, response: Serve
     const itnRef = `itn_${crypto.randomUUID()}`;
     const idempotencyKey = result.idempotencyKey;
     const grossText = String(fields.amount_gross ?? "");
+    const amounts = reconcilePayFastAmounts(fields.amount_gross, fields.amount_fee, fields.amount_net, order.amount_cents);
+    const grossCents = amounts.grossCents;
+    if (result.accepted && !amounts.valid) {
+      result.accepted = false;
+      result.rejectionReason = amounts.reason ?? "PayFast amount reconciliation failed."; 
+    }
     let grossCents: number | null = null;
     try { grossCents = randToCents(grossText); } catch { /* rejected receipt remains auditable */ }
 
@@ -246,7 +253,7 @@ export async function handlePayFastItn(request: IncomingMessage, response: Serve
        VALUES ($1,'payfast_itn',$2,$3,$4,'PAYFAST_ITN_VALIDATED','Signed callback validated; entitlement activation withheld pending provider confirmation.',$5::jsonb)
        ON CONFLICT (evidence_ref) DO NOTHING`,
       [`pay_ev_${itnRef}`, itnRef, order.candidate_ref, order.order_ref,
-       JSON.stringify({ providerPaymentId, paymentStatus: result.paymentStatus, amountCents: grossCents, entitlementActivated: false })]
+       JSON.stringify({ providerPaymentId, paymentStatus: result.paymentStatus, grossCents, feeCents: amounts.feeCents, netCents: amounts.netCents, amountsReconciled: amounts.valid, entitlementActivated: false })]
     );
     await client.query("COMMIT");
     send(response, 200, "OK");
