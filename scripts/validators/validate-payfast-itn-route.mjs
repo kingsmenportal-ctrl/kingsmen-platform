@@ -11,12 +11,13 @@ const checks = [
   ["order is loaded from database and locked", /finance_orders WHERE order_ref = \$1 FOR UPDATE/.test(route)],
   ["merchant identity is checked", /fields\.merchant_id[\s\S]{0,100}merchantId/.test(route)],
   ["direct socket address is used for source validation", /remoteAddress:\s*request\.socket\.remoteAddress/.test(route)],
-  ["callback cannot activate entitlements", /entitlement activation withheld/.test(route) && !/order_status = ['"]PAID['"]/.test(route)],
+  ["callback cannot activate entitlements", /does not activate entitlements/.test(route) && !/order_status = .PAID./.test(route)],
   ["official sandbox and live confirmation endpoints are fixed", /https:\/\/sandbox\.payfast\.co\.za\/eng\/query\/validate/.test(route) && /https:\/\/www\.payfast\.co\.za\/eng\/query\/validate/.test(route)],
   ["server confirmation requires exact VALID response", /return text === "VALID"/.test(route)],
   ["server confirmation uses bounded timeout", /setTimeout\(\(\) => controller\.abort\(\), 5000\)/.test(route)],
   ["server confirmation is fail-closed before receipt acceptance", /if \(result\.accepted\)[\s\S]{0,180}confirmWithPayFast\(fields\)[\s\S]{0,180}result\.accepted = false/.test(route)],
   ["server mounts the ITN route", /pathname === ["']\/api\/finance\/payfast\/itn["']/.test(server) && /handlePayFastItn\(request, response\)/.test(server)],
+  ["ITN negative-path tests cover status, tampering, and missing IP allowlist", /payment status is not COMPLETE/i.test(readFileSync("apps/api/src/finance/payfast-itn.test.ts", "utf8")) && /signature no longer matches/i.test(readFileSync("apps/api/src/finance/payfast-itn.test.ts", "utf8")) && /source IP allowlist is missing/i.test(readFileSync("apps/api/src/finance/payfast-itn.test.ts", "utf8"))],
   ["errors fail closed without exposing details", /Payment notification temporarily unavailable/.test(route)]
 ];
 const failed = checks.filter(([, passed]) => !passed);
