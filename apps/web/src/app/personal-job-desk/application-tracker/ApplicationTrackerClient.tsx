@@ -71,6 +71,13 @@ const statuses = [
   "CLOSED_NOT_APPLYING"
 ];
 
+const statusLabels: Record<string, string> = {
+  ALL: "All statuses", REVIEW_REQUIRED: "Review required", READY_FOR_MANUAL_SUBMISSION: "Ready for manual submission",
+  MANUAL_SUBMISSION_IN_PROGRESS: "Manual submission in progress", SUBMITTED_PROOF_CAPTURED: "Submission proof recorded",
+  FOLLOW_UP_SCHEDULED: "Follow-up scheduled", INTERVIEW_STAGE: "Interview stage", REJECTED: "Rejected (recorded)",
+  OFFER_RECEIVED: "Offer received (recorded)", NO_RESPONSE_FOLLOWUP: "No response — follow-up", CLOSED_NOT_APPLYING: "Closed — not applying"
+};
+
 export default function ApplicationTrackerClient() {
   const [tracker, setTracker] = useState<TrackerOutput | null>(null);
   const [selectedId, setSelectedId] = useState("");
@@ -161,8 +168,9 @@ export default function ApplicationTrackerClient() {
         <p style={eyebrow}>PERSONAL-JOBS-24</p>
         <h1 style={{ fontSize: 40, margin: "8px 0" }}>Application Tracker</h1>
         <p style={muted}>
-          Candidate-safe progress view for PJ23 application records. Progress is shown with proof boundaries.
+          Local application-workbench view. These records are not authenticated, candidate-owned records and must not be treated as a candidate's official application history.
         </p>
+        <aside role="note" style={{ ...subPanel, border: "1px solid #a67b35", marginTop: 16 }}><strong>Integration boundary — not production candidate data</strong><p style={muted}>This page reads a repository-local workbench JSON file. No candidate login, ownership filter, or per-candidate access check is visible in this route. Do not enter personal information or use this view to expose real candidate records until authenticated access and isolation tests are implemented.</p><p style={muted}>“Proof captured” means a proof reference is present in the local workbench data; it does not independently confirm an employer received or accepted an application. Outcome labels are records, not guarantees.</p></aside>
         <button onClick={loadTracker} disabled={loading} style={button}>
           {loading ? "Working..." : "Refresh tracker"}
         </button>
@@ -182,7 +190,7 @@ export default function ApplicationTrackerClient() {
         <aside style={panel}>
           <h2>Applications</h2>
           <select value={filter} onChange={(e) => setFilter(e.target.value)} style={input}>
-            {statuses.map((status) => <option key={status} value={status}>{status}</option>)}
+            {statuses.map((status) => <option key={status} value={status}>{statusLabels[status] ?? status}</option>)}
           </select>
 
           <div style={{ display: "grid", gap: 10, marginTop: 14 }}>
@@ -197,7 +205,7 @@ export default function ApplicationTrackerClient() {
               >
                 <strong>{item.opportunity.title || "Untitled opportunity"}</strong>
                 <span>{item.opportunity.company || "Unknown company"} - {item.opportunity.location || "Unknown location"}</span>
-                <small>{item.candidateStatus}</small>
+                <small>{statusLabels[item.candidateStatus] ?? item.candidateStatus}</small>
               </button>
             ))}
           </div>
@@ -208,7 +216,7 @@ export default function ApplicationTrackerClient() {
             <p style={muted}>No tracker item selected.</p>
           ) : (
             <>
-              <p style={eyebrow}>{selected.candidateStatus}</p>
+              <p style={eyebrow}>{statusLabels[selected.candidateStatus] ?? selected.candidateStatus}</p>
               <h2>{selected.opportunity.title || "Untitled opportunity"}</h2>
               <p style={muted}>{selected.opportunity.company || "Unknown company"} - {selected.opportunity.location || "Unknown location"}</p>
               <p style={messageBox}>{selected.candidateMessage}</p>
@@ -262,9 +270,8 @@ export default function ApplicationTrackerClient() {
                   placeholder="Ask a question or add a note..."
                   style={textarea}
                 />
-                <button style={button} disabled={loading} onClick={() => saveSelected(selected)}>
-                  Save note
-                </button>
+                <button style={button} disabled title="Candidate-owned note saving is disabled until authenticated ownership and persistence are implemented.">Save note unavailable — auth integration required</button>
+                <p style={muted}>Notes cannot be safely saved from this shared local-workbench route yet. No candidate-specific audit trail or ownership enforcement is connected.</p>
               </section>
 
               <section style={subPanel}>
