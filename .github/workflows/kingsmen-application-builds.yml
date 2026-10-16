@@ -48,6 +48,8 @@ jobs:
           node --test .auth-test-dist/request-body.test.js
       - name: Validate Personal Jobs fail-closed backend boundary
         run: node scripts/validators/validate-personal-jobs-safe-boundary.mjs
+      - name: Validate candidate document ownership boundary
+        run: node scripts/validators/validate-candidate-document-boundary.mjs
       - name: Build web application
         working-directory: apps/web
         run: npm run build
