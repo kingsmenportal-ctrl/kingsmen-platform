@@ -64,3 +64,21 @@ test("rejects invalid-length signatures without throwing", () => {
   assert.equal(result.accepted, false);
   assert.equal(result.signatureValid, false);
 });
+
+
+test("rejects locale commas and amounts with more than two decimal places", () => {
+  for (const amount of ["49,99", "49.999", "4.999e1", "+49.99"]) {
+    const result = validatePayFastItn({ ...base, payload: signedPayload({ amount_gross: amount }) });
+    assert.equal(result.accepted, false, `unexpected acceptance for ${amount}`);
+    assert.equal(result.amountValid, false, `unexpected amount validity for ${amount}`);
+  }
+});
+
+test("rejects a signed notification for a different order reference", () => {
+  const result = validatePayFastItn({
+    ...base,
+    payload: signedPayload({ m_payment_id: "ord_other_synthetic_002" })
+  });
+  assert.equal(result.accepted, false);
+  assert.match(result.rejectionReason ?? "", /reference mismatch/i);
+});
