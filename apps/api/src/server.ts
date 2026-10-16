@@ -24,6 +24,7 @@ import type { ApiJarvisRuntimeResult } from "./jarvis/jarvis-runtime-api";
 import { closePayFastItnPool, handlePayFastItn } from "./finance/payfast-itn-route";
 import { createCandidateAuthRuntimeFromEnvironment } from "./candidate/candidate-auth-runtime";
 import { handleCandidateAuthRoute } from "./candidate/candidate-auth-http";
+import { readCandidateSessionCookie } from "./candidate/candidate-auth-service";
 
 const MAX_BODY_BYTES = 1_000_000;
 const SERVICE_NAME = "kingsmen-api";
@@ -481,26 +482,42 @@ async function handleReadiness(response: ServerResponse): Promise<void> {
   }
 }
 
-async function handleCandidateStatus(response: ServerResponse, _candidateId: string): Promise<void> {
-  // No verified candidate identity is attached to requests. Never expose private
-  // read models by identifier alone. Re-enable only behind verified auth middleware.
-  sendError(
-    response,
-    503,
-    "CANDIDATE_AUTHORIZATION_NOT_CONFIGURED",
-    "Candidate authorization is not configured."
-  );
+async function handleCandidateStatus(request: IncomingMessage, response: ServerResponse, candidateRef: string): Promise<void> {
+  if (!candidateAuthRuntime || !truthVault.enabled) {
+    sendError(response, 503, "CANDIDATE_AUTHORIZATION_NOT_CONFIGURED", "Candidate authorization is not configured.");
+    return;
+  }
+  const token = readCandidateSessionCookie(request.headers.cookie);
+  const principal = await candidateAuthRuntime.service.authenticateToken(token);
+  if (!principal.authenticated) {
+    sendError(response, 401, "CANDIDATE_AUTH_REQUIRED", "Sign in to view candidate information.");
+    return;
+  }
+  const candidate = await truthVault.readCandidateStatusForOwner(principal.candidateId, candidateRef);
+  if (!candidate) {
+    sendError(response, 404, "CANDIDATE_NOT_FOUND", "Candidate record was not found.");
+    return;
+  }
+  sendJson(response, 200, { ok: true, candidate });
 }
 
-async function handleApplicationWorkbench(response: ServerResponse, _applicationId: string): Promise<void> {
-  // Application IDs are not credentials. Require verified ownership authorization
-  // before any database or in-memory read can occur.
-  sendError(
-    response,
-    503,
-    "CANDIDATE_AUTHORIZATION_NOT_CONFIGURED",
-    "Candidate authorization is not configured."
-  );
+async function handleApplicationWorkbench(request: IncomingMessage, response: ServerResponse, applicationRef: string): Promise<void> {
+  if (!candidateAuthRuntime || !truthVault.enabled) {
+    sendError(response, 503, "CANDIDATE_AUTHORIZATION_NOT_CONFIGURED", "Candidate authorization is not configured.");
+    return;
+  }
+  const token = readCandidateSessionCookie(request.headers.cookie);
+  const principal = await candidateAuthRuntime.service.authenticateToken(token);
+  if (!principal.authenticated) {
+    sendError(response, 401, "CANDIDATE_AUTH_REQUIRED", "Sign in to view application information.");
+    return;
+  }
+  const application = await truthVault.readOwnedApplicationWorkbench(applicationRef, principal.candidateId);
+  if (!application) {
+    sendError(response, 404, "APPLICATION_NOT_FOUND", "Application record was not found.");
+    return;
+  }
+  sendJson(response, 200, { ok: true, application });
 }
 
 export function createKingsmenApiServer() {
@@ -576,13 +593,13 @@ export function createKingsmenApiServer() {
         // These records can contain candidate-identifying information. The API
         // currently has no verified caller-to-candidate authorization adapter,
         // so do not expose records merely because an identifier is known.
-        sendError(response, 503, "CANDIDATE_AUTHORIZATION_NOT_CONFIGURED", "Candidate status is unavailable until authenticated ownership checks are configured.");
+        await handleCandidateStatus(request, response, decodeURIComponent(candidateId));
         return;
       }
 
       const applicationId = getPathParam(/^\/api\/applications\/([^/]+)\/workbench$/, pathname);
       if (method === "GET" && applicationId) {
-        sendError(response, 503, "CANDIDATE_AUTHORIZATION_NOT_CONFIGURED", "Application workbench is unavailable until authenticated ownership checks are configured.");
+        await handleApplicationWorkbench(request, response, decodeURIComponent(applicationId));
         return;
       }
 
