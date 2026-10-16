@@ -24,6 +24,7 @@ declare v_candidate uuid; v_result public.kyc_verifications;
 begin
  v_candidate := kingsmen_security.current_authenticated_candidate_id();
  if v_candidate is null then raise exception 'authenticated candidate required' using errcode='42501'; end if;
+ perform pg_advisory_xact_lock(hashtextextended(v_candidate::text, 0));
  select * into v_result from public.kyc_verifications
   where candidate_id = v_candidate and status in ('pending','needs_review')
   order by created_at desc limit 1 for update;
