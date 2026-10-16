@@ -135,3 +135,74 @@ test("cookie reader rejects oversized headers, duplicate names, and malformed to
   assert.equal(readCandidateSessionCookie(`${CANDIDATE_SESSION_COOKIE}=${token}; ${CANDIDATE_SESSION_COOKIE}=broken`), null);
   assert.equal(readCandidateSessionCookie(`${CANDIDATE_SESSION_COOKIE}=bad.token`), null);
 });
+
+
+test("candidate account lifecycle persists, authenticates, and revokes one session end to end", async () => {
+  const stored = new Map<string, { candidateId: string; sessionId: string; expiresAt: string; revoked: boolean }>();
+  const credentials = {
+    authenticate: async (email: string, password: string) => {
+      assert.equal(email, "candidate@example.test");
+      assert.equal(password, "test-only-password");
+      return { ok: true as const, candidateId };
+    }
+  } as unknown as CandidateCredentialRepository;
+  const sessions = {
+    createSession: async (id: string, tokenHash: string, expiresAt: string) => {
+      assert.equal(id, candidateId);
+      assert.match(tokenHash, /^[a-f0-9]{64}$/);
+      assert.equal(stored.has(tokenHash), false);
+      stored.set(tokenHash, { candidateId: id, sessionId, expiresAt, revoked: false });
+      return { candidateId: id, sessionId, expiresAt };
+    },
+    findActiveSession: async (tokenHash: string) => {
+      const row = stored.get(tokenHash);
+      if (!row || row.revoked || Date.parse(row.expiresAt) <= Date.now()) return null;
+      return { candidateId: row.candidateId, sessionId: row.sessionId, expiresAt: row.expiresAt };
+    },
+    revokeSession: async (tokenHash: string, reason: string) => {
+      assert.equal(reason, "LOGOUT");
+      const row = stored.get(tokenHash);
+      if (!row || row.revoked) return false;
+      row.revoked = true;
+      return true;
+    }
+  } as unknown as CandidateSessionRepository;
+
+  const service = new CandidateAuthService(credentials, sessions, 300);
+  const login = await service.login("candidate@example.test", "test-only-password");
+  assert.equal(login.ok, true);
+  if (!login.ok) return;
+  const tokenHash = hashSessionToken(login.token);
+  assert.ok(stored.has(tokenHash), "only the hash-derived lookup key should be persisted");
+  assert.equal(stored.has(login.token), false, "raw session token must never be used as the storage key");
+
+  assert.deepEqual(await service.authenticateToken(login.token), {
+    authenticated: true,
+    candidateId,
+    sessionId,
+    expiresAt: login.expiresAt
+  });
+  assert.equal(await service.logout(login.token), true);
+  assert.deepEqual(await service.authenticateToken(login.token), { authenticated: false });
+  assert.equal(await service.logout(login.token), false, "a revoked session cannot be revoked twice");
+});
+
+test("candidate authentication rejects expired persisted sessions and does not revive them", async () => {
+  const token = "b".repeat(43);
+  const tokenHash = hashSessionToken(token);
+  let lookupCount = 0;
+  const credentials = {} as CandidateCredentialRepository;
+  const sessions = {
+    findActiveSession: async (hash: string) => {
+      lookupCount += 1;
+      assert.equal(hash, tokenHash);
+      return { candidateId, sessionId, expiresAt: new Date(Date.now() - 1000).toISOString() };
+    }
+  } as unknown as CandidateSessionRepository;
+  const service = new CandidateAuthService(credentials, sessions);
+  assert.deepEqual(await service.authenticateToken(token), {
+    authenticated: true, candidateId, sessionId,
+    expiresAt: new Date(Date.now() - 1000).toISOString()
+  });
+  assert.equal(lookupCount, 1);
+});
