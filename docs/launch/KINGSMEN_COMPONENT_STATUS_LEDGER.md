@@ -70,3 +70,20 @@ Source Guard is verified, and a path-by-path tracker report exists. Phase 0 rema
 ### Phase 1 exit gate: **NOT CLOSED — BLOCKED**
 
 The partial investigation is documented in [Phase 1 Recovery Evidence](PHASE_1_RECOVERY_EVIDENCE.md). A read-only schema inventory was captured from `kingsmen-portal-staging` at 2026-10-16 15:54 UTC; this does not establish that staging is the authoritative source. No logical backup was created, no backup timestamp/size/SHA-256 exists, no isolated restore or restore log exists, and no combined migration rehearsal was performed. Migration conflict/compatibility review is preliminary and records unresolved issues. **No staging migrations were applied by this work. Do not apply or push migrations to staging or production until the real backup/restore and isolated rehearsal gates pass.**
+
+
+## Phase A.1 — Public website and candidate authentication UI foundation (2026-10-16)
+
+| Component | Files | Status | Evidence / limits | Next action |
+|---|---|---|---|---|
+| Public entry page | `apps/web/src/app/page.tsx` | **Implemented**; runtime **not yet verified** | Added a responsive Kingsmen landing page with navigation to the Free Destiny Map, registration, sign-in and route-category summaries. Source is committed on the Phase 0 working branch. | Run the web app build and browser checks; review responsive layout and accessibility. |
+| Candidate registration UI | `apps/web/src/app/auth/register/page.tsx` | **Implemented**; secure registration **Blocked** | Client-side required-field, email, password-length and consent validation. It deliberately does not persist credentials or claim an account was created. | Integrate the approved server-side identity provider, privacy notice link, rate limits, email verification and synthetic-account E2E tests. |
+| Candidate sign-in UI | `apps/web/src/app/auth/login/page.tsx` | **Implemented**; authentication **Blocked** | Form and explicit non-connected status message are present; no credentials are transmitted or stored. | Wire secure server-side authentication and session lifecycle; test expiry, logout and protected routes. |
+| Account recovery UI | `apps/web/src/app/auth/passwordless/page.tsx` | **Implemented**; recovery delivery **Blocked** | Recovery request form explicitly states no email is sent until delivery and identity verification are integrated. | Integrate anti-enumeration-safe recovery, expiring single-use tokens, delivery provider and end-to-end tests. |
+| Free Destiny Map journey | `apps/web/src/app/free-destiny-map/page.tsx`; `apps/web/src/public-site/DestinyMapPreviewPanel.tsx` | **Existing source; integration/runtime verification pending** | Existing intake surface and preview component were inspected. This chunk did not claim that intake is persisted or that a completed candidate journey is operational. | Connect validated intake to the approved backend after the foundation constraints are resolved; add save/resume and synthetic journey tests. |
+
+**Chunk commits:** `8154c92aff926e931425437688b660a41cc2bf56` (public home), `3172e8785257a222d7c9fd64dd8ae3c0a7e42d8d` (registration), `77906736d8076bf00a38ed39ccc6abe2514a5e64` (sign-in), `6470bc123b0ce4b25e7f49e53a44ea08cfa784fd` (account recovery), all on `fix/kingsmen-phase0-source-guard-ledger`.
+
+**Verification:** GitHub accepted the four file commits. No local Next.js build or browser test was run by this connector, so these are not marked Verified or Operational.
+
+**Foundation constraints remain unchanged:** Phase 0 API lockfile debt remains open; Phase 1 backup/restore remains blocked. No database migrations were created or applied. Neither phase is closed.
