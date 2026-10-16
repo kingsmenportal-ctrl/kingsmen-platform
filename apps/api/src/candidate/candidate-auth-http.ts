@@ -74,6 +74,11 @@ export async function handleCandidateAuthRoute(
 ): Promise<boolean> {
   if (!["/api/candidate-auth/login", "/api/candidate-auth/logout", "/api/candidate-auth/session"].includes(pathname)) return false;
 
+  // Authentication responses must never be stored by browsers, shared proxies, or CDNs.
+  response.setHeader("cache-control", "no-store, no-cache, must-revalidate, private");
+  response.setHeader("pragma", "no-cache");
+  response.setHeader("x-content-type-options", "nosniff");
+
   const method = request.method ?? "GET";
   const expectedMethod = pathname.endsWith("/session") ? "GET" : "POST";
   if (method !== expectedMethod) {
