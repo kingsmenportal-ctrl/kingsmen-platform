@@ -56,3 +56,18 @@ test("readiness does not treat candidate-reported submission evidence as indepen
   assert.match(page, /candidate-reported evidence is not independently verified/);
   assert.match(page, /not independently verified/);
 });
+
+
+test("API readiness excludes identity and submission proof as universal pre-application gates", () => {
+  const route = fs.readFileSync(path.join(root, "apps/web/src/app/api/personal-jobs/apply-now/route.ts"), "utf8");
+  assert.match(route, /function assessReadiness\(store: Store\)/);
+  assert.match(route, /No universal ID or certificate requirement is assumed/);
+  assert.match(route, /Document records indicate availability only/);
+  assert.match(route, /Requirements are not verified from the employer/);
+  assert.match(route, /opportunitiesWithoutPacks/);
+  assert.match(route, /readinessAssessment: assessReadiness\(store\)/);
+  const scorer = route.slice(route.indexOf("function assessReadiness"), route.indexOf("function buildPack"));
+  assert.doesNotMatch(scorer, /hasId|hasProof/);
+  assert.match(scorer, /url\.protocol === "https:"/);
+  assert.match(scorer, /No submission or outcome verification/);
+});
