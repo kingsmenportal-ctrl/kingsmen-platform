@@ -11,7 +11,7 @@ test("converts valid ZAR decimal strings to exact integer cents", () => {
 
 test("rejects locale commas, exponent notation, signs, and excess precision", () => {
   for (const amount of ["49,99", "49.999", "4.999e1", "+49.99", "-1.00", ".99", ""]) {
-    assert.throws(() => randToCents(amount), undefined, `expected rejection for ${amount}`);
+    assert.throws(() => randToCents(amount), /Invalid ZAR amount/, `expected rejection for ${amount}`);
   }
 });
 
