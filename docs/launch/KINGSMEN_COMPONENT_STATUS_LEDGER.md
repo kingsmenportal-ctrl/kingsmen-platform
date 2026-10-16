@@ -2,7 +2,7 @@
 
 **Repository:** `kingsmenportal-ctrl/kingsmen-platform`  
 **Default-branch snapshot used for source/path checks:** `main` at `12fc775e8a162dfe25450249c4877151f9e6afa9`  
-**Working PR:** [#85 — Source Guard repair and component ledger](https://github.com/kingsmenportal-ctrl/kingsmen-platform/pull/85)  
+**Working PR:** [#86 — Phase A.1 public entry and candidate auth UI foundation](https://github.com/kingsmenportal-ctrl/kingsmen-platform/pull/86)  
 **Tracker audit:** [Build Tracker Reconciliation](KINGSMEN_BUILD_TRACKER_RECONCILIATION.md)
 
 ## Status rules
@@ -219,3 +219,11 @@ Foundation constraints remain unchanged: Phase 0 is **OPEN**, Phase 1 is **OPEN 
 - GitHub Actions lookup for the inspected auth-session commit `11913a0d376f15444c740d6f8ad9fc26a92b5ea4` returned no associated pull-request workflow runs. This does not prove no other workflows exist; it means there is no run evidence for that commit from this query.
 - **Next required action:** configure `SUPABASE_URL` and `SUPABASE_PUBLISHABLE_KEY` through an authorized Netlify SSO session or approved deployment workflow, verify Supabase Auth site/redirect/email settings, then trigger and retain a clean build and synthetic auth-contract test run. Do not paste secret values into the repository or chat.
 - No environment variable write, deployment, build, Playwright run, database migration, backup, or restore is claimed. Phase 0 and Phase 1 remain open.
+
+
+## PR #86 follow-up verification notes — 2026-10-16
+
+- Latest verified pre-follow-up API build/unit tests and application build checks passed on commit `9a1578efc9a38bf43d6d57c054ff28d6e7ddec28`; this is not verification of later commits.
+- Follow-up commit `7889cea965694afef065f69bc61c10108f99952f` adds candidate-auth HTTP regression cases for a missing Origin header, repeated failed login rate limiting (10 attempts per 15-minute window per hashed remote-address/email key), and the session endpoint method/cache policy.
+- The follow-up commit's workflow result is pending/not yet available at the time of this note. Do not treat these new tests as passed until CI reports a successful run on that exact commit.
+- The API lockfile gap remains open: `apps/api/package-lock.json` is absent; a valid generated lockfile has not been produced. Do not hand-author a lockfile or mark deterministic API installation as complete.
