@@ -24,34 +24,81 @@ create policy contract_signature_founder_read on public.contract_signatures for 
 create or replace function public.issue_offer(p_candidate_id uuid,p_offer_version integer,p_terms jsonb,p_expires_at timestamptz,p_idempotency_key text)
 returns uuid language plpgsql security definer set search_path = ''
 as $$
-declare v_id uuid;
+declare v_id uuid; v_existing public.contract_offers%rowtype;
 begin
  if not kingsmen_security.is_kingsmen_founder() then raise exception 'founder role required' using errcode='42501'; end if;
+ if p_candidate_id is null or p_offer_version is null or p_offer_version <= 0 or p_terms is null
+    or jsonb_typeof(p_terms) <> 'object' or p_idempotency_key is null
+    or length(p_idempotency_key) < 8 or length(p_idempotency_key) > 128 then
+   raise exception 'invalid contract offer input' using errcode='22023';
+ end if;
  insert into public.contract_offers(candidate_id,offer_version,terms,status,issued_by,issued_at,expires_at,idempotency_key)
  values(p_candidate_id,p_offer_version,p_terms,'issued',auth.uid(),now(),p_expires_at,p_idempotency_key)
- on conflict(idempotency_key) do update set idempotency_key=excluded.idempotency_key returning id into v_id;
+ on conflict(idempotency_key) do nothing returning id into v_id;
+ if v_id is null then
+   select * into v_existing from public.contract_offers where idempotency_key=p_idempotency_key;
+   if not found or v_existing.candidate_id <> p_candidate_id or v_existing.offer_version <> p_offer_version
+      or v_existing.terms is distinct from p_terms or v_existing.expires_at is distinct from p_expires_at then
+     raise exception 'idempotency key reused with different offer' using errcode='23505';
+   end if;
+   return v_existing.id;
+ end if;
  insert into public.audit_log(actor_id,action,entity_type,entity_id,metadata,created_at)
- values(auth.uid(),'contract.offer.issued','contract_offer',v_id,jsonb_build_object('candidate_id',p_candidate_id,'offer_version',p_offer_version),now());
+ values(auth.uid(),'contract.offer.issued','contract_offer',v_id,
+        jsonb_build_object('candidate_id',p_candidate_id,'offer_version',p_offer_version),now());
  return v_id;
-end $$;
+end $;
 create or replace function public.sign_offer(p_offer_id uuid,p_signature_method text,p_document_sha256 text,p_idempotency_key text)
 returns uuid language plpgsql security definer set search_path = ''
 as $$
-declare v_candidate uuid; v_sig uuid;
+declare v_candidate uuid; v_sig uuid; v_offer public.contract_offers%rowtype;
+        v_existing public.contract_signatures%rowtype; v_inserted boolean := false;
 begin
  v_candidate:=kingsmen_security.current_authenticated_candidate_id();
  if v_candidate is null then raise exception 'candidate authentication required' using errcode='42501'; end if;
+ if p_offer_id is null or p_signature_method not in ('typed_name','electronic_signature','external_signature')
+    or p_document_sha256 is null or p_document_sha256 !~ '^[0-9a-f]{64}
+revoke all on function public.issue_offer(uuid,integer,jsonb,timestamptz,text) from public,anon;
+grant execute on function public.issue_offer(uuid,integer,jsonb,timestamptz,text) to authenticated;
+revoke all on function public.sign_offer(uuid,text,text,text) from public,anon;
+grant execute on function public.sign_offer(uuid,text,text,text) to authenticated;
+commit;
+
+    or p_idempotency_key is null or length(p_idempotency_key) < 8 or length(p_idempotency_key) > 128 then
+   raise exception 'invalid signature input' using errcode='22023';
+ end if;
+ select * into v_offer from public.contract_offers
+  where id=p_offer_id and candidate_id=v_candidate for update;
+ if not found then raise exception 'offer unavailable' using errcode='P0002'; end if;
+ select * into v_existing from public.contract_signatures where idempotency_key=p_idempotency_key;
+ if found then
+   if v_existing.offer_id <> p_offer_id or v_existing.candidate_id <> v_candidate
+      or v_existing.signature_method <> p_signature_method
+      or v_existing.document_sha256 <> p_document_sha256 then
+     raise exception 'idempotency key reused with different signature' using errcode='23505';
+   end if;
+   return v_existing.id;
+ end if;
+ if v_offer.status <> 'issued' or (v_offer.expires_at is not null and v_offer.expires_at <= now()) then
+   raise exception 'offer unavailable or expired' using errcode='P0002';
+ end if;
  insert into public.contract_signatures(offer_id,candidate_id,signature_method,document_sha256,idempotency_key)
- select o.id,o.candidate_id,p_signature_method,p_document_sha256,p_idempotency_key from public.contract_offers o
- where o.id=p_offer_id and o.candidate_id=v_candidate and o.status='issued' and (o.expires_at is null or o.expires_at>now())
+ values(p_offer_id,v_candidate,p_signature_method,p_document_sha256,p_idempotency_key)
  on conflict(idempotency_key) do nothing returning id into v_sig;
- if v_sig is null then select id into v_sig from public.contract_signatures where idempotency_key=p_idempotency_key and candidate_id=v_candidate; end if;
- if v_sig is null then raise exception 'offer unavailable or idempotency conflict' using errcode='P0002'; end if;
+ if v_sig is null then
+   select * into v_existing from public.contract_signatures where idempotency_key=p_idempotency_key;
+   if not found or v_existing.offer_id <> p_offer_id or v_existing.candidate_id <> v_candidate
+      or v_existing.signature_method <> p_signature_method
+      or v_existing.document_sha256 <> p_document_sha256 then
+     raise exception 'idempotency key reused with different signature' using errcode='23505';
+   end if;
+   return v_existing.id;
+ end if;
  update public.contract_offers set status='accepted' where id=p_offer_id and candidate_id=v_candidate and status='issued';
  insert into public.audit_log(actor_id,action,entity_type,entity_id,metadata,created_at)
  values(auth.uid(),'contract.offer.signed','contract_signature',v_sig,jsonb_build_object('offer_id',p_offer_id),now());
  return v_sig;
-end $$;
+end $;
 revoke all on function public.issue_offer(uuid,integer,jsonb,timestamptz,text) from public,anon;
 grant execute on function public.issue_offer(uuid,integer,jsonb,timestamptz,text) to authenticated;
 revoke all on function public.sign_offer(uuid,text,text,text) from public,anon;
