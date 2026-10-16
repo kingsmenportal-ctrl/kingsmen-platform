@@ -6,7 +6,9 @@ type Profile = { fullName?: string; email?: string; phone?: string; location?: s
 type DocumentRecord = { documentId?: string; type?: string; fileName?: string; status?: string; registryStatus?: string; createdAt?: string };
 type Opportunity = { opportunityId?: string; title?: string; organisation?: string; status?: string; sourceUrl?: string; closingDate?: string; updatedAt?: string };
 type Task = { taskId?: string; title?: string; dueDate?: string; status?: string; priority?: string };
+type ReadinessAssessment = { score: number; checks: Array<{ key: string; title: string; state: "READY" | "ACTION" | "REVIEW"; detail: string }>; opportunitiesWithoutPacks: number; sourcedOpportunityCount: number; limitations: string[] };
 type Workspace = {
+  readinessAssessment?: ReadinessAssessment;
   profile?: Profile;
   documents?: DocumentRecord[];
   opportunities?: Opportunity[];
@@ -97,6 +99,16 @@ export default function CandidateReadinessPage() {
       <section aria-label="Readiness summary" style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(160px, 1fr))", gap: 12, marginBottom: 20 }}>
         {[[ready, "Ready / recorded"], [actions, "Actions to take"], [review, "Needs human review"]].map(([value, label]) => <div key={String(label)} style={panel}><div style={{ fontSize: 30, fontWeight: 850 }}>{value}</div><div style={{ color: "#64748b", fontSize: 13, marginTop: 4 }}>{label}</div></div>)}
       </section>
+      {workspace.readinessAssessment && <section aria-label="Application readiness assessment" style={{ ...panel, marginBottom: 18, borderColor: "#cbd5e1", background: "#f8fafc" }}>
+        <h2 style={{ margin: "0 0 6px", fontSize: 20 }}>Application preparation assessment: {workspace.readinessAssessment.score}%</h2>
+        <p style={{ margin: "0 0 14px", color: "#53657a", fontSize: 13, lineHeight: 1.6 }}>This score measures only profile fields, a CV record, HTTPS-linked opportunity records and pack coverage. It is not a probability of success or confirmation that you qualify.</p>
+        <div style={{ display: "grid", gap: 10 }}>
+          {workspace.readinessAssessment.checks.map((item) => <div key={item.key} style={{ borderTop: "1px solid #dbe3ec", paddingTop: 10 }}>
+            <div style={{ display: "flex", gap: 8, alignItems: "center", flexWrap: "wrap" }}><strong>{item.title}</strong><span style={{ fontSize: 10, fontWeight: 850, letterSpacing: .4, color: item.state === "READY" ? "#176345" : item.state === "ACTION" ? "#854d0e" : "#3730a3" }}>{item.state === "READY" ? "READY" : item.state === "ACTION" ? "ACTION NEEDED" : "HUMAN REVIEW"}</span></div>
+            <p style={{ color: "#53657a", fontSize: 13, lineHeight: 1.6, margin: "4px 0 0" }}>{item.detail}</p>
+          </div>)}
+        </div>
+      </section>}
       <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", gap: 12, flexWrap: "wrap", marginBottom: 14 }}>
         <p style={{ color: "#64748b", fontSize: 12, margin: 0 }}>Checks are calculated from your saved records. Last workspace update: {workspace.updatedAt ? new Date(workspace.updatedAt).toLocaleString("en-ZA") : "not provided"}.</p>
         <button type="button" disabled={refreshing} onClick={() => void load(true)} style={{ ...button, cursor: refreshing ? "wait" : "pointer" }}>{refreshing ? "Refreshing…" : "Refresh checklist"}</button>
