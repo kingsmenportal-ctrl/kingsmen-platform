@@ -20,7 +20,8 @@ const base = {
   expectedAmountCents: 4999,
   passphrase: "synthetic-passphrase",
   remoteAddress: "203.0.113.7",
-  allowedSourceIps: "203.0.113.7"
+  allowedSourceIps: "203.0.113.7",
+  idempotencyCheckCompleted: true
 };
 
 test("accepts only a complete, signed, matching ITN with provider payment ID and verified source", () => {
@@ -82,4 +83,10 @@ test("rejects a signed notification for a different order reference", () => {
   });
   assert.equal(result.accepted, false);
   assert.match(result.rejectionReason ?? "", /reference mismatch/i);
+});
+
+test("fails closed until durable ITN idempotency lookup completes", () => {
+  const result = validatePayFastItn({ ...base, idempotencyCheckCompleted: false, payload: signedPayload() });
+  assert.equal(result.accepted, false);
+  assert.match(result.rejectionReason ?? "", /idempotency check has not been completed/i);
 });
