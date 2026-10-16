@@ -21,7 +21,7 @@ import {
   type JarvisRuntimeServerStore
 } from "./jarvis/jarvis-runtime-server-adapter";
 import type { ApiJarvisRuntimeResult } from "./jarvis/jarvis-runtime-api";
-import { handlePayFastItn } from "./finance/payfast-itn-route";
+import { closePayFastItnPool, handlePayFastItn } from "./finance/payfast-itn-route";
 
 const MAX_BODY_BYTES = 1_000_000;
 const SERVICE_NAME = "kingsmen-api";
@@ -577,7 +577,7 @@ export function startKingsmenApiServer(options: KingsmenApiServerOptions = {}) {
       generatedAtIso: nowIso()
     }));
     server.close(() => {
-      truthVault.close().finally(() => process.exit(0));
+      Promise.all([truthVault.close(), closePayFastItnPool()]).finally(() => process.exit(0));
     });
   };
 
