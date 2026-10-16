@@ -399,11 +399,25 @@ async function handleWorkflowResult(request: IncomingMessage, response: ServerRe
 }
 
 async function handleHealth(response: ServerResponse): Promise<void> {
-  const truthVaultHealth = await truthVault.healthCheck();
+  // Liveness must remain available while dependencies recover. Readiness is
+  // reported separately so memory-only mode is never advertised as production-ready.
+  let truthVaultHealth: { ok: boolean; storageMode: string; message: string };
+  try {
+    truthVaultHealth = await truthVault.healthCheck();
+  } catch {
+    truthVaultHealth = {
+      ok: false,
+      storageMode: truthVault.storageMode,
+      message: "Truth Vault connection check failed."
+    };
+  }
+
+  const ready = truthVault.enabled && truthVaultHealth.ok;
   sendJson(response, 200, {
     ok: true,
     service: SERVICE_NAME,
-    status: "healthy",
+    status: ready ? "healthy" : "degraded",
+    readiness: ready ? "ready" : "not_ready",
     storageMode: truthVault.storageMode,
     truthVault: truthVaultHealth,
     jarvisRuntime: {
@@ -415,6 +429,7 @@ async function handleHealth(response: ServerResponse): Promise<void> {
     generatedAtIso: nowIso(),
     routes: [
       "GET /health",
+      "GET /ready",
       "POST /api/finance/payfast/itn",
       "GET /api/system/health",
       "POST /api/commands",
@@ -425,6 +440,39 @@ async function handleHealth(response: ServerResponse): Promise<void> {
       "GET /api/applications/:applicationId/workbench"
     ]
   });
+}
+
+async function handleReadiness(response: ServerResponse): Promise<void> {
+  try {
+    const truthVaultHealth = await truthVault.healthCheck();
+    if (!truthVault.enabled || !truthVaultHealth.ok) {
+      sendJson(response, 503, {
+        ok: false,
+        status: "not_ready",
+        code: truthVault.enabled ? "TRUTH_VAULT_UNHEALTHY" : "DURABLE_STORAGE_DISABLED",
+        storageMode: truthVault.storageMode,
+        truthVault: truthVaultHealth,
+        generatedAtIso: nowIso()
+      });
+      return;
+    }
+
+    sendJson(response, 200, {
+      ok: true,
+      status: "ready",
+      storageMode: truthVault.storageMode,
+      truthVault: truthVaultHealth,
+      generatedAtIso: nowIso()
+    });
+  } catch {
+    sendJson(response, 503, {
+      ok: false,
+      status: "not_ready",
+      code: "TRUTH_VAULT_UNHEALTHY",
+      storageMode: truthVault.storageMode,
+      generatedAtIso: nowIso()
+    });
+  }
 }
 
 async function handleCandidateStatus(response: ServerResponse, candidateId: string): Promise<void> {
@@ -504,6 +552,11 @@ export function createKingsmenApiServer() {
       if (method === "OPTIONS") {
         response.statusCode = 204;
         response.end();
+        return;
+      }
+
+      if (method === "GET" && pathname === "/ready") {
+        await handleReadiness(response);
         return;
       }
 
