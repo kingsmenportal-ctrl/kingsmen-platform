@@ -540,19 +540,6 @@ function extractProfileFromText(text: string): CandidateProfile {
   };
 }
 
-function mergeSmartProfile(existing: CandidateProfile, extracted: CandidateProfile) {
-  const merged: CandidateProfile = { ...existing };
-
-  for (const key of Object.keys(extracted) as Array<keyof CandidateProfile>) {
-    const value = extracted[key];
-    if (value && (!merged[key] || String(merged[key]).trim().length < 2)) {
-      merged[key] = value;
-    }
-  }
-
-  return merged;
-}
-
 function scoreReadiness(store: Store) {
   const profile = store.profile || {};
   const hasProfile = Boolean(profile.fullName && profile.phone && profile.email);
