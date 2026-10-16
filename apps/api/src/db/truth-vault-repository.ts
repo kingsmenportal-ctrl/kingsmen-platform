@@ -275,6 +275,46 @@ export class TruthVaultRepository {
     return { replay: false, workflowRunId: input.result.workflowRunId, responseBody: input.responseBody };
   }
 
+  /** Returns safe document metadata for the verified owner; never exposes storage paths or signed URLs. */
+  async listDocumentMetadataForOwner(candidateUuid: string): Promise<Array<{
+    documentRef: string;
+    documentType: string;
+    displayName: string;
+    mimeType: string;
+    fileSizeBytes: number;
+    documentStatus: string;
+    verificationStatus: string;
+    extractionStatus: string;
+    uploadedAt: string;
+  }>> {
+    this.assertEnabled();
+    if (!/^[0-9a-f]{8}-[0-9a-f]{4}-[1-8][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i.test(candidateUuid)) return [];
+    const result = await this.pool!.query<{
+      document_ref: string; document_type: string; display_name: string; mime_type: string;
+      file_size_bytes: string | number; document_status: string; verification_status: string;
+      extraction_status: string; uploaded_at: string;
+    }>(
+      `select document_ref, document_type, display_name, mime_type, file_size_bytes::text,
+              document_status, verification_status, extraction_status, uploaded_at::text
+       from document_files
+       where candidate_id = $1::uuid and archived_at is null and document_status <> 'DELETED'
+       order by uploaded_at desc
+       limit 200`,
+      [candidateUuid]
+    );
+    return result.rows.map((row) => ({
+      documentRef: row.document_ref,
+      documentType: row.document_type,
+      displayName: row.display_name,
+      mimeType: row.mime_type,
+      fileSizeBytes: Number(row.file_size_bytes),
+      documentStatus: row.document_status,
+      verificationStatus: row.verification_status,
+      extractionStatus: row.extraction_status,
+      uploadedAt: row.uploaded_at
+    }));
+  }
+
   /** Identity-scoped candidate read; candidateUuid must come from a verified session. */
   async readCandidateStatusForOwner(candidateUuid: string, candidateRef: string): Promise<CandidateReadModel | null> {
     this.assertEnabled();
