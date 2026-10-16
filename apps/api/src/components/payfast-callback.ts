@@ -49,7 +49,7 @@ export async function processPayFastCallback(
   config: CallbackConfig,
   store: PaymentCallbackStore,
   fetcher: typeof fetch = fetch
-): Promise<{ status: 200 | 202; body: { ok: true; outcome: "recorded" | "duplicate"; paymentId: string; invoiceStatus: string } }> {
+): Promise<{ status: 200; body: { ok: true; outcome: "recorded" | "duplicate"; paymentId: string; invoiceStatus: string } }> {
   const maxBytes = config.maxBodyBytes ?? 16_384;
   if (Buffer.byteLength(rawBody, "utf8") > maxBytes) throw new Error("PAYFAST_BODY_TOO_LARGE");
 
@@ -87,7 +87,7 @@ export async function processPayFastCallback(
   });
 
   return {
-    status: committed.outcome === "duplicate" ? 200 : 202,
+    status: 200,
     body: { ok: true, outcome: committed.outcome, paymentId: committed.paymentId, invoiceStatus: committed.invoiceStatus }
   };
 }
