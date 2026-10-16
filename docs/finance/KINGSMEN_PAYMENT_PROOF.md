@@ -142,3 +142,8 @@ These remain source-level tests. No claim is made that the API test suite or CI 
 Migration `0037_n11_payfast_retryable_rejected_itn.sql` scopes receipt uniqueness for provider payment IDs and idempotency keys to accepted receipts. The callback duplicate lookup likewise ignores rejected receipts. This avoids a failed transient provider confirmation or an invalid notification permanently consuming the provider payment ID/idempotency key and blocking a later valid retry.
 
 The migration is committed but has not been applied to staging. Before application, confirm the deployed schema matches the migration assumptions and complete the required backup, isolated restore, and migration rehearsal. No sandbox transaction or runtime test is claimed by this source change.
+## Accepted callback retry handling (2026-10-16)
+
+The ITN receiver now checks for an already-accepted provider payment/idempotency key before requiring the payment intent to remain in its pre-callback state. A previously accepted retry receives an idempotent HTTP 200 response, and `ITN_RECEIVED` remains an eligible state for processing a callback that has not yet been accepted.
+
+This source change does not prove concurrent callback behavior in PostgreSQL. Unique indexes and transaction serialization still require integration testing against the intended schema. Migration 0037 remains unapplied to staging pending backup, isolated restore, and rehearsal evidence.
