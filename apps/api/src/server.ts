@@ -1,3 +1,4 @@
+import { handleCandidateComponentRoute } from "./components/candidate-router";
 import { createServer, type IncomingMessage, type ServerResponse } from "node:http";
 import { URL } from "node:url";
 import { timingSafeEqual } from "node:crypto";
