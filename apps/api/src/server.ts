@@ -627,7 +627,17 @@ export function createKingsmenApiServer() {
       const pathname = url.pathname;
       const method = request.method ?? "GET";
 
-      response.setHeader("access-control-allow-origin", process.env.KINGSMEN_API_CORS_ORIGIN ?? "*");
+      // Never reflect arbitrary origins or use a production wildcard. Configure one or
+      // more exact origins (comma-separated); local development defaults to localhost only.
+      const configuredCors = process.env.KINGSMEN_API_CORS_ORIGIN ??
+        ((process.env.NODE_ENV ?? "development").toLowerCase() === "production" ||
+         (process.env.NODE_ENV ?? "development").toLowerCase() === "staging" ? "" : "http://localhost:3000");
+      const allowedOrigins = configuredCors.split(",").map((origin) => origin.trim()).filter(Boolean);
+      const requestOrigin = request.headers.origin;
+      if (requestOrigin && allowedOrigins.includes(requestOrigin)) {
+        response.setHeader("access-control-allow-origin", requestOrigin);
+        response.setHeader("vary", "Origin");
+      }
       response.setHeader("access-control-allow-methods", "GET,POST,OPTIONS");
       response.setHeader("access-control-allow-headers", "content-type,x-correlation-id,x-idempotency-key,authorization");
 
