@@ -132,3 +132,8 @@ A follow-up migration, `db/migrations/0036_n11_payfast_provider_idempotency.sql`
 - Execute a PayFast sandbox payment and preserve the actual ITN and validation response as redacted evidence.
 
 No successful CI run, staging execution, or PayFast sandbox transaction is asserted by this document. Do not enable live payments based on source changes alone.
+## Callback negative-path coverage update (2026-10-16)
+
+Additional synthetic unit tests now assert rejection of non-COMPLETE payment statuses, payload tampering after signing, and missing source-IP allowlists. The CI boundary validator checks for the presence of these tests.
+
+These remain source-level tests. No claim is made that the API test suite or CI has passed. The current callback intentionally records notification/evidence and does not mark orders paid or activate entitlements. Accounting reconciliation, full database integration tests, staging migration verification, and an actual sandbox payment remain release blockers.
