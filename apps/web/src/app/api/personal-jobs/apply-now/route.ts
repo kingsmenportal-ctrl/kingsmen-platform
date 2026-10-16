@@ -540,17 +540,38 @@ function extractProfileFromText(text: string): CandidateProfile {
   };
 }
 
-function scoreReadiness(store: Store) {
+function assessReadiness(store: Store) {
   const profile = store.profile || {};
-  const hasProfile = Boolean(profile.fullName && profile.phone && profile.email);
-  const hasCv = store.documents.some((doc) => String(doc.type).toUpperCase() === "CV");
-  const hasId = store.documents.some((doc) => String(doc.type).toUpperCase() === "ID");
-  const hasOpportunity = store.opportunities.length > 0;
-  const hasPack = store.applicationPacks.length > 0;
-  const hasProof = store.proofLog.length > 0;
+  const documents = Array.isArray(store.documents) ? store.documents : [];
+  const opportunities = Array.isArray(store.opportunities) ? store.opportunities : [];
+  const packs = Array.isArray(store.applicationPacks) ? store.applicationPacks : [];
+  const validEmail = /^[^\\s@]+@[^\\s@]+\\.[^\\s@]+$/.test(String(profile.email || "").trim());
+  const profileComplete = Boolean(String(profile.fullName || "").trim() && validEmail && String(profile.phone || "").trim());
+  const hasCvRecord = documents.some((doc) => String(doc?.type || "").toUpperCase() === "CV" && !["DELETED", "ARCHIVED", "REJECTED"].includes(String(doc?.status || "").toUpperCase()));
+  const sourcedOpportunities = opportunities.filter((item) => {
+    if (typeof item?.sourceUrl !== "string") return false;
+    try {
+      const url = new URL(item.sourceUrl);
+      return url.protocol === "https:" && !url.username && !url.password;
+    } catch { return false; }
+  });
+  const packOpportunityIds = new Set(packs.map((pack) => pack?.opportunityId).filter((id) => typeof id === "string"));
+  const opportunitiesWithoutPacks = sourcedOpportunities.filter((item) => item?.opportunityId && !packOpportunityIds.has(item.opportunityId));
+  const checks = [
+    { key: "profile", title: "Core profile", state: profileComplete ? "READY" : "ACTION", detail: profileComplete ? "Name, valid email and phone are present." : "Complete your name, valid email and phone." },
+    { key: "cv", title: "CV record", state: hasCvRecord ? "REVIEW" : "ACTION", detail: hasCvRecord ? "A CV record exists; file content, accuracy and authenticity are not verified." : "Add a CV record before preparing an application." },
+    { key: "opportunities", title: "Vacancy source", state: sourcedOpportunities.length ? "REVIEW" : "ACTION", detail: sourcedOpportunities.length ? `${sourcedOpportunities.length} opportunity record(s) have an HTTPS source URL. Employer, vacancy status and requirements are not verified.` : "Add an opportunity with an HTTPS source URL; the link itself will not be independently verified." },
+    { key: "packs", title: "Pack coverage", state: sourcedOpportunities.length === 0 ? "REVIEW" : opportunitiesWithoutPacks.length ? "ACTION" : "READY", detail: sourcedOpportunities.length === 0 ? "Cannot assess pack coverage until a sourced opportunity exists." : opportunitiesWithoutPacks.length ? `${opportunitiesWithoutPacks.length} sourced opportunity(ies) have no matching preparation pack.` : "Every saved sourced opportunity has a matching pack record; pack accuracy still needs human review." },
+    { key: "requirements", title: "Vacancy requirements", state: "REVIEW", detail: "Requirements are not verified from the employer. No universal ID or certificate requirement is assumed." },
+    { key: "documentVerification", title: "Document authenticity", state: "REVIEW", detail: "Document records indicate availability only; authenticity, validity and employer acceptance are not verified." }
+  ];
+  const scored = checks.filter((check) => ["profile", "cv", "opportunities", "packs"].includes(check.key));
+  const complete = scored.filter((check) => check.state === "READY" || (check.key === "cv" && check.state === "REVIEW") || (check.key === "opportunities" && check.state === "REVIEW")).length;
+  return { score: Math.round((complete / scored.length) * 100), checks, opportunitiesWithoutPacks: opportunitiesWithoutPacks.length, sourcedOpportunityCount: sourcedOpportunities.length, limitations: ["No document authenticity verification", "No employer requirement verification", "No submission or outcome verification"] };
+}
 
-  const checks = [hasProfile, hasCv, hasId, hasOpportunity, hasPack, hasProof];
-  return Math.round((checks.filter(Boolean).length / checks.length) * 100);
+function scoreReadiness(store: Store) {
+  return assessReadiness(store).score;
 }
 
 function buildPack(profile: CandidateProfile, opportunity: any) {
@@ -605,7 +626,7 @@ export async function GET() {
     if (resolved.status === "not_configured" && process.env.NODE_ENV !== "production") {
       try {
         const store = readStore();
-        return privateJson({ ...store, readiness: scoreReadiness(store) });
+        return privateJson({ ...store, readiness: scoreReadiness(store), readinessAssessment: assessReadiness(store) });
       } catch {
         return privateJson({ status: "STORAGE_UNAVAILABLE", error: "Candidate workspace could not be loaded." }, { status: 503 });
       }
