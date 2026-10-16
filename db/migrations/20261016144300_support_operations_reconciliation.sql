@@ -60,6 +60,8 @@ create policy founder_support_ticket_events_insert on public.candidate_support_t
     )
     and actor_user_id=auth.uid()
   );
+grant select, update on public.candidate_support_tickets to authenticated;
+grant select, insert on public.candidate_support_ticket_events to authenticated;
 comment on table public.candidate_support_ticket_events is
   'Append-only audit timeline for canonical support tickets; events do not imply external notification delivery.';
 
