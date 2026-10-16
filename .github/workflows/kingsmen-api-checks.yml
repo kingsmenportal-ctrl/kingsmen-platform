@@ -1,0 +1,43 @@
+name: Kingsmen API validation
+
+on:
+  pull_request:
+    paths:
+      - "apps/api/**"
+      - ".github/workflows/kingsmen-api-checks.yml"
+  push:
+    branches:
+      - main
+      - fix/kingsmen-ci-real-validation-gates
+    paths:
+      - "apps/api/**"
+      - ".github/workflows/kingsmen-api-checks.yml"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: kingsmen-api-${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  api-build-and-tests:
+    name: API build and unit tests
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+          cache-dependency-path: package-lock.json
+      - name: Install root dependencies from lockfile
+        run: npm ci
+      - name: Install API dependencies
+        run: npm install --prefix apps/api --no-audit --no-fund
+      - name: Compile API and run unit tests
+        run: npm --prefix apps/api test
