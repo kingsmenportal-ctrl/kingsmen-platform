@@ -28,7 +28,7 @@ for (const table of requiredTables) {
 }
 check("RLS explicitly enabled", /enable row level security/i.test(migration));
 check("legacy permissive all-policy is dropped", /drop policy if exists %I on public.%I/i.test(migration) && /policy_name := table_name || '_all'/i.test(migration));
-check("replacement policy is service_role only", /for all to service_role using (true) with check (true)/i.test(migration));
+check("replacement policy is service_role only", /for all to service_role using \(true\) with check \(true\)/i.test(migration));
 check("anon and authenticated table privileges are revoked", /revoke all on table public.%I from anon, authenticated/i.test(migration));
 check("backend role receives explicit table privileges", /grant select, insert, update, delete on table public.%I to service_role/i.test(migration));
 check("migration is transactional", /begin;/i.test(migration) && /commit;/i.test(migration));
