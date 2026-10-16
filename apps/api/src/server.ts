@@ -207,19 +207,34 @@ function readBody(request: IncomingMessage): Promise<string> {
   return new Promise((resolve, reject) => {
     let body = "";
     let receivedBytes = 0;
+    let exceededLimit = false;
+    let settled = false;
 
     request.on("data", (chunk: Buffer) => {
+      if (exceededLimit || settled) return;
       receivedBytes += chunk.length;
       if (receivedBytes > MAX_BODY_BYTES) {
+        exceededLimit = true;
+        settled = true;
         reject(new Error("REQUEST_BODY_TOO_LARGE"));
+        // Drain the request without retaining further bytes, avoiding both
+        // unbounded memory growth and an unread request stream.
         request.resume();
         return;
       }
       body += chunk.toString("utf8");
     });
 
-    request.on("end", () => resolve(body));
-    request.on("error", reject);
+    request.on("end", () => {
+      if (settled) return;
+      settled = true;
+      resolve(body);
+    });
+    request.on("error", (error) => {
+      if (settled) return;
+      settled = true;
+      reject(error);
+    });
   });
 }
 
