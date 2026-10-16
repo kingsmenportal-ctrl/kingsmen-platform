@@ -42,7 +42,7 @@ function send(response: ServerResponse, status: number, body: string): void {
   response.end(body);
 }
 
-function parseFields(body: string): PayFastFields {
+export function parsePayFastItnForm(body: string): PayFastFields {
   const params = new URLSearchParams(body);
   const fields: PayFastFields = {};
   for (const [key, value] of params.entries()) {
@@ -118,7 +118,7 @@ export async function handlePayFastItn(request: IncomingMessage, response: Serve
       send(response, 415, "Unsupported media type");
       return;
     }
-    fields = parseFields(await readForm(request));
+    fields = parsePayFastItnForm(await readForm(request));
   } catch (error) {
     send(response, error instanceof Error && error.message === "ITN_BODY_TOO_LARGE" ? 413 : 400, "Invalid ITN request");
     return;
