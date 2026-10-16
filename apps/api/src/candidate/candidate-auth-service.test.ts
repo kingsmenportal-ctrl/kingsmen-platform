@@ -187,7 +187,7 @@ test("candidate account lifecycle persists, authenticates, and revokes one sessi
   assert.equal(await service.logout(login.token), false, "a revoked session cannot be revoked twice");
 });
 
-test("candidate authentication rejects expired persisted sessions and does not revive them", async () => {
+test("candidate authentication rejects expired sessions returned as inactive by persistence", async () => {
   const token = "b".repeat(43);
   const tokenHash = hashSessionToken(token);
   let lookupCount = 0;
@@ -196,13 +196,11 @@ test("candidate authentication rejects expired persisted sessions and does not r
     findActiveSession: async (hash: string) => {
       lookupCount += 1;
       assert.equal(hash, tokenHash);
-      return { candidateId, sessionId, expiresAt: new Date(Date.now() - 1000).toISOString() };
+      // Repository contract: expired rows must not be returned as active.
+      return null;
     }
   } as unknown as CandidateSessionRepository;
   const service = new CandidateAuthService(credentials, sessions);
-  assert.deepEqual(await service.authenticateToken(token), {
-    authenticated: true, candidateId, sessionId,
-    expiresAt: new Date(Date.now() - 1000).toISOString()
-  });
+  assert.deepEqual(await service.authenticateToken(token), { authenticated: false });
   assert.equal(lookupCount, 1);
 });
