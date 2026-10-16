@@ -57,6 +57,9 @@ declare
   v_document_ref text;
   v_evidence_ref text;
   v_event_ref text;
+  v_existing_candidate_id uuid;
+  v_existing_document_ref text;
+  v_existing_evidence_ref text;
   v_bucket text := 'candidate-documents';
   v_object_name text;
 begin
@@ -98,17 +101,13 @@ begin
     raise exception 'UPLOADED_STORAGE_OBJECT_NOT_FOUND' using errcode = 'P0002';
   end if;
 
-  if exists (
-    select 1 from public.document_files d
-    where d.storage_bucket = v_bucket and d.storage_path = p_storage_path
-  ) then
-    raise exception 'DOCUMENT_ALREADY_REGISTERED' using errcode = '23505';
-  end if;
-
   v_document_ref := 'doc-' || gen_random_uuid()::text;
   v_evidence_ref := 'evidence-' || gen_random_uuid()::text;
   v_event_ref := 'event-' || gen_random_uuid()::text;
 
+  -- The unique storage-path index makes retries safe, including concurrent requests.
+  -- If a prior request committed but its HTTP response was lost, return the existing
+  -- canonical references rather than creating duplicate rows or reporting false failure.
   insert into public.document_files
     (candidate_id, document_ref, document_type, display_name, original_filename,
      mime_type, file_size_bytes, storage_provider, storage_bucket, storage_path,
@@ -119,7 +118,49 @@ begin
      p_mime_type, p_file_size_bytes, 'SUPABASE_STORAGE', v_bucket, p_storage_path,
      true, 'PORTAL', 'UPLOADED', 'PENDING', 'NOT_STARTED', 'C',
      v_evidence_ref, jsonb_build_object('registrationSource','authenticated_candidate_portal'))
+  on conflict (storage_bucket, storage_path) do nothing
   returning id into v_document_id;
+
+  if v_document_id is null then
+    select d.id, d.candidate_id, d.document_ref, d.evidence_ref
+      into v_document_id, v_existing_candidate_id, v_existing_document_ref, v_existing_evidence_ref
+    from public.document_files d
+    where d.storage_bucket = v_bucket and d.storage_path = p_storage_path
+    for update;
+    if not found or v_existing_candidate_id <> v_candidate_id then
+      raise exception 'DOCUMENT_ALREADY_REGISTERED' using errcode = '23505';
+    end if;
+
+    select e.event_ref into v_event_ref
+    from public.document_storage_events e
+    where e.document_id = v_document_id
+      and e.event_type = 'UPLOAD_COMPLETED'
+      and e.status = 'OK'
+    order by e.created_at desc
+    limit 1;
+
+    if v_event_ref is null then
+      v_event_ref := 'event-' || gen_random_uuid()::text;
+      insert into public.document_storage_events
+        (document_id, event_ref, event_type, storage_provider, storage_bucket,
+         storage_path, file_size_bytes, status, message, metadata)
+      values
+        (v_document_id, v_event_ref, 'UPLOAD_COMPLETED', 'SUPABASE_STORAGE', v_bucket,
+         p_storage_path, p_file_size_bytes, 'OK',
+         'Canonical upload registration reconciled after a retry; the existing storage object was retained.',
+         jsonb_build_object('registrationSource','authenticated_candidate_portal','reconciledRetry',true));
+    end if;
+
+    return jsonb_build_object(
+      'registered', true,
+      'documentRef', v_existing_document_ref,
+      'evidenceRef', v_existing_evidence_ref,
+      'storageEventRef', v_event_ref,
+      'candidateId', v_candidate_id,
+      'documentStatus', 'EXISTING_CANONICAL_RECORD',
+      'verificationStatus', 'UNCHANGED'
+    );
+  end if;
 
   insert into public.document_storage_events
     (document_id, event_ref, event_type, storage_provider, storage_bucket,
@@ -223,6 +264,8 @@ declare
   v_path text;
   v_size bigint;
   v_event_ref text;
+  v_existing_event_ref text;
+  v_existing_status text;
 begin
   if auth.uid() is null then
     raise exception 'CANDIDATE_AUTH_REQUIRED' using errcode = '42501';
@@ -244,6 +287,33 @@ begin
   for share;
   if not found then
     raise exception 'RETIRED_DOCUMENT_NOT_FOUND' using errcode = 'P0002';
+  end if;
+
+  -- Never let a caller claim successful cleanup while the private object still exists.
+  if p_success and exists (
+    select 1 from storage.objects o
+    where o.bucket_id = v_bucket and o.name = v_path
+  ) then
+    raise exception 'STORAGE_DELETE_NOT_CONFIRMED' using errcode = '23514';
+  end if;
+
+  -- Make repeated reports idempotent and never downgrade a previously confirmed cleanup.
+  select e.event_ref, e.status into v_existing_event_ref, v_existing_status
+  from public.document_storage_events e
+  where e.document_id = v_document_id
+    and e.event_type = 'DELETED'
+    and e.metadata ->> 'phase' = 'storage_cleanup'
+  order by e.created_at desc
+  limit 1;
+
+  if found and (v_existing_status = 'OK' or (v_existing_status = 'FAILED' and not p_success)) then
+    return jsonb_build_object(
+      'recorded', true,
+      'documentRef', p_document_ref,
+      'cleanupConfirmed', v_existing_status = 'OK',
+      'storageEventRef', v_existing_event_ref,
+      'idempotentReplay', true
+    );
   end if;
 
   v_event_ref := 'event-' || gen_random_uuid()::text;
