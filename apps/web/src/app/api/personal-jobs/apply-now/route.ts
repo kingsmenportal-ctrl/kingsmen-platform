@@ -660,6 +660,51 @@ export async function POST(request: Request) {
       });
     }
 
+    if (action === "confirmSmartExtraction") {
+      const extractionId = typeof body.extractionId === "string" ? body.extractionId.trim() : "";
+      const requestedFields = body.fields;
+      if (!extractionId || !requestedFields || typeof requestedFields !== "object" || Array.isArray(requestedFields)) {
+        return privateJson({ status: "FAILED", error: "Choose an extraction and one or more fields to confirm." }, { status: 400 });
+      }
+      const extraction = store.smartExtraction.find((item) => item && item.extractionId === extractionId);
+      if (!extraction) return privateJson({ status: "FAILED", error: "CV extraction was not found in this workspace." }, { status: 404 });
+      if (!["NEEDS_CANDIDATE_CONFIRMATION", "PARTIALLY_CONFIRMED"].includes(String(extraction.status))) {
+        return privateJson({ status: "FAILED", error: "This extraction has no pending fields to confirm." }, { status: 409 });
+      }
+      let fieldPatch: CandidateProfile;
+      try { fieldPatch = validateProfilePatch(requestedFields); }
+      catch (error) {
+        return privateJson({ status: "FAILED", error: error instanceof Error ? error.message : "Invalid extracted fields." }, { status: 400 });
+      }
+      const sourceFields = extraction.extracted && typeof extraction.extracted === "object" ? extraction.extracted as CandidateProfile : {};
+      const selectedKeys = Object.keys(fieldPatch) as Array<keyof CandidateProfile>;
+      if (!selectedKeys.length || selectedKeys.some((key) => !sourceFields[key] || String(sourceFields[key]).trim() !== String(fieldPatch[key]).trim())) {
+        return privateJson({ status: "FAILED", error: "Only values present in this extraction can be confirmed." }, { status: 400 });
+      }
+      const overwriteExisting = body.overwriteExisting === true;
+      const applied: string[] = [];
+      const skippedExisting: string[] = [];
+      for (const key of selectedKeys) {
+        const current = String(store.profile?.[key] || "").trim();
+        if (current && !overwriteExisting) {
+          skippedExisting.push(key);
+          continue;
+        }
+        store.profile[key] = String(fieldPatch[key] || "").trim();
+        applied.push(key);
+      }
+      extraction.confirmedFields = [...new Set([...(Array.isArray(extraction.confirmedFields) ? extraction.confirmedFields : []), ...applied])];
+      const remaining = Object.keys(sourceFields).filter((key) => {
+        const value = String(sourceFields[key as keyof CandidateProfile] || "").trim();
+        return value && !extraction.confirmedFields.includes(key);
+      });
+      extraction.status = remaining.length ? "PARTIALLY_CONFIRMED" : "CONFIRMED";
+      extraction.confirmedAt = new Date().toISOString();
+      extraction.lastConfirmation = { appliedFields: applied, skippedExistingFields: skippedExisting, overwriteExisting };
+      await persistStore(context, store);
+      return privateJson({ status: "EXTRACTION_FIELDS_CONFIRMED", appliedFields: applied, skippedExistingFields: skippedExisting, store, readiness: scoreReadiness(store) });
+    }
+
     if (action === "uploadDocument") {
       const fileName = String(body.fileName || "").trim();
       const type = String(body.documentType || "CV").trim().toUpperCase();
@@ -758,18 +803,19 @@ export async function POST(request: Request) {
         };
 
         store.documents = [documentRecord, ...store.documents];
-        store.profile = mergeSmartProfile(store.profile || {}, extracted);
 
         store.smartExtraction = [
           {
-            extractionId: `extract-${Date.now()}`,
+            extractionId: `extract-${Date.now()}-${Math.random().toString(16).slice(2)}`,
             documentId: documentRecord.documentId,
             fileName,
             type,
             extracted,
             textLength: text.length,
-            status: text.includes("extraction failed") ? "PARTIAL" : "EXTRACTED",
-            createdAt: new Date().toISOString()
+            status: text.includes("extraction failed") ? "PARTIAL" : "NEEDS_CANDIDATE_CONFIRMATION",
+            confirmedFields: [],
+            createdAt: new Date().toISOString(),
+            reviewNotice: "Extracted values are suggestions until the candidate confirms them."
           },
           ...store.smartExtraction
         ];
