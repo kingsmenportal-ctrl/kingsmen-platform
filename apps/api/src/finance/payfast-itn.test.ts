@@ -90,3 +90,23 @@ test("fails closed until durable ITN idempotency lookup completes", () => {
   assert.equal(result.accepted, false);
   assert.match(result.rejectionReason ?? "", /idempotency check has not been completed/i);
 });
+
+test("rejects a correctly signed notification whose payment status is not COMPLETE", () => {
+  const result = validatePayFastItn({ ...base, payload: signedPayload({ payment_status: "PENDING" }) });
+  assert.equal(result.accepted, false);
+  assert.match(result.rejectionReason ?? "", /not COMPLETE/i);
+});
+
+test("rejects a modified payload when the signature no longer matches", () => {
+  const payload = signedPayload();
+  payload.amount_gross = "50.00";
+  const result = validatePayFastItn({ ...base, payload });
+  assert.equal(result.accepted, false);
+  assert.equal(result.signatureValid, false);
+});
+
+test("rejects a valid signature when source IP allowlist is missing", () => {
+  const result = validatePayFastItn({ ...base, allowedSourceIps: "", payload: signedPayload() });
+  assert.equal(result.accepted, false);
+  assert.equal(result.ipValid, false);
+});
