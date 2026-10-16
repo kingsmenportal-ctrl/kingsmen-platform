@@ -93,4 +93,54 @@ test.describe("candidate API security boundary", () => {
     });
   }
 
+
+  test("candidate session introspection is private and reveals no candidate identifier", async ({ request }) => {
+    const response = await request.get("/api/candidate-auth/session");
+    expect([401, 503]).toContain(response.status());
+    expect(response.headers()["cache-control"]).toContain("no-store");
+    expect(response.headers()["x-content-type-options"]).toBe("nosniff");
+    const body = await response.json();
+    expect(body.ok).toBe(false);
+    expect(body).not.toHaveProperty("candidateId");
+    expect(body).not.toHaveProperty("candidate");
+    expect(body).not.toHaveProperty("sessionId");
+  });
+
+  test("candidate login rejects an untrusted or missing Origin before credential processing", async ({ request }) => {
+    const response = await request.post("/api/candidate-auth/login", {
+      data: { email: "kingsmen-test-a@staging.test", password: "not-a-real-password" },
+    });
+    expect(response.status()).toBe(403);
+    expect(response.headers()["cache-control"]).toContain("no-store");
+    expect(response.headers()["x-content-type-options"]).toBe("nosniff");
+    const body = await response.json();
+    expect(body.ok).toBe(false);
+    expect(body.code).toBe("ORIGIN_NOT_ALLOWED");
+    expect(response.headers()["set-cookie"] ?? "").not.toContain("kingsmen_candidate_session=");
+  });
+
+  test("candidate logout rejects an untrusted or missing Origin and does not clear arbitrary cookies", async ({ request }) => {
+    const response = await request.post("/api/candidate-auth/logout", {
+      headers: { cookie: "unrelated=keep-me" },
+    });
+    expect(response.status()).toBe(403);
+    expect(response.headers()["cache-control"]).toContain("no-store");
+    const body = await response.json();
+    expect(body.ok).toBe(false);
+    expect(body.code).toBe("ORIGIN_NOT_ALLOWED");
+    expect(response.headers()["set-cookie"] ?? "").not.toContain("kingsmen_candidate_session=");
+  });
+
+  test("candidate auth endpoints enforce their HTTP methods", async ({ request }) => {
+    const login = await request.get("/api/candidate-auth/login");
+    expect(login.status()).toBe(405);
+    expect(login.headers()["allow"]).toBe("POST");
+    expect(login.headers()["cache-control"]).toContain("no-store");
+
+    const logout = await request.get("/api/candidate-auth/logout");
+    expect(logout.status()).toBe(405);
+    expect(logout.headers()["allow"]).toBe("POST");
+    expect(logout.headers()["cache-control"]).toContain("no-store");
+  });
+
 });
