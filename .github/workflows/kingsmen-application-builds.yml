@@ -34,7 +34,8 @@ jobs:
       - name: Run same-origin guard regression tests
         working-directory: apps/web
         run: |
-          npx tsc --target ES2022 --lib dom,dom.iterable,es2022 --module ES2022 --moduleResolution bundler --skipLibCheck --types node --outDir .auth-test-dist src/lib/auth/csrf.ts src/lib/auth/csrf.test.ts
+          npx tsc --target ES2022 --lib dom,dom.iterable,es2022 --module commonjs --moduleResolution node --esModuleInterop --skipLibCheck --types node --outDir .auth-test-dist src/lib/auth/csrf.ts src/lib/auth/csrf.test.ts
+          printf '{"type":"commonjs"}\n' > .auth-test-dist/package.json
           node --test .auth-test-dist/csrf.test.js
       - name: Type-check bounded auth request parser and tests
         working-directory: apps/web
@@ -42,7 +43,8 @@ jobs:
       - name: Run bounded auth request parser regression tests
         working-directory: apps/web
         run: |
-          npx tsc --target ES2022 --lib dom,dom.iterable,es2022 --module ES2022 --moduleResolution bundler --skipLibCheck --types node --outDir .auth-test-dist src/lib/auth/request-body.ts src/lib/auth/request-body.test.ts
+          npx tsc --target ES2022 --lib dom,dom.iterable,es2022 --module commonjs --moduleResolution node --esModuleInterop --skipLibCheck --types node --outDir .auth-test-dist src/lib/auth/request-body.ts src/lib/auth/request-body.test.ts
+          printf '{"type":"commonjs"}\n' > .auth-test-dist/package.json
           node --test .auth-test-dist/request-body.test.js
       - name: Validate Personal Jobs fail-closed backend boundary
         run: node scripts/validators/validate-personal-jobs-safe-boundary.mjs
