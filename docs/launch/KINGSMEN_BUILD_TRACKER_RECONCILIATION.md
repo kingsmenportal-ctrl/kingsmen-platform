@@ -231,7 +231,7 @@ This table is a live API snapshot; PR #71/#72 returned 404 and PR #81 is closed,
 
 ## Missing-path rows (152)
 
-These exact paths are absent from the main tree at this snapshot. Keep them `Not_Started` unless a reviewed tracker update establishes that the intended component moved to a different canonical path.
+These exact paths are absent from the main tree at this snapshot and all are `Not_Started`; they are classified as planned/not yet materialized, not as built work. If a later source change creates a canonical replacement path, update the tracker only after review.
 
 | Module | Name | Tracker status | Missing path |
 |---|---|---|---|
@@ -390,4 +390,4 @@ These exact paths are absent from the main tree at this snapshot. Keep them `Not
 
 ## Decision
 
-The CSV and main source tree are **not yet fully reconciled**. This report identifies every row's exact path existence and the full PR range requested. A human/product owner must decide whether each missing path is planned work or a stale path before changing tracker statuses. Do not infer implementation from PRs that are open/unmerged, and do not apply migrations as part of this reconciliation.
+The row-by-row **path reconciliation is complete** for the inspected `main` snapshot. The tracker remains the build-status authority; this report deliberately does not promote any component from path existence alone. The 152 absent paths are all `Not_Started` and are classified as planned/not materialized. The 33 present paths marked `Not_Started` remain unaccepted pending the proof required by their module. All 3 `Built` paths exist but still require their module-level validator/runtime evidence. PR #71 and #72 could not be retrieved (404); they are explicitly recorded as unavailable, not assumed merged or open. Do not infer implementation from open/unmerged PRs, and do not apply migrations as part of this reconciliation.
