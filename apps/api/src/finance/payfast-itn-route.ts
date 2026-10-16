@@ -152,6 +152,19 @@ export async function handlePayFastItn(request: IncomingMessage, response: Serve
       return;
     }
 
+    // A previously accepted callback is idempotent even if its order has since advanced.
+    const idempotencyKey = ["payfast-itn", merchantReference, providerPaymentId, String(fields.payment_status ?? "unknown").toUpperCase()].join(":");
+    const prior = await client.query<{ id: string }>(
+      "SELECT id FROM public.payfast_itn_receipts WHERE accepted = true AND (provider_payment_id = $1 OR idempotency_key = $2) " +
+      "UNION ALL SELECT id FROM public.finance_payments WHERE provider = 'PAYFAST' AND provider_payment_id = $1 LIMIT 1",
+      [providerPaymentId, idempotencyKey]
+    );
+    if (prior.rows.length > 0) {
+      await client.query("ROLLBACK");
+      send(response, 200, "OK");
+      return;
+    }
+
     const orderResult = await client.query<{
       order_ref: string; candidate_ref: string; order_status: string; amount_cents: number; currency: string;
     }>(
@@ -165,16 +178,6 @@ export async function handlePayFastItn(request: IncomingMessage, response: Serve
       return;
     }
 
-    const prior = await client.query<{ id: string }>(
-      "SELECT id FROM public.payfast_itn_receipts WHERE accepted = true AND (provider_payment_id = $1 OR idempotency_key = $2) " +
-      "UNION ALL SELECT id FROM public.finance_payments WHERE provider = 'PAYFAST' AND provider_payment_id = $1 LIMIT 1",
-      [providerPaymentId, ["payfast-itn", merchantReference, providerPaymentId, String(fields.payment_status ?? "unknown").toUpperCase()].join(":")]
-    );
-    if (prior.rows.length > 0) {
-      await client.query("ROLLBACK");
-      send(response, 200, "OK");
-      return;
-    }
     const intentResult = await client.query<{
       intent_ref: string; intent_status: string; amount_cents: number; currency: string; merchant_reference: string;
     }>(
@@ -195,7 +198,7 @@ export async function handlePayFastItn(request: IncomingMessage, response: Serve
       expectedAmountCents: order.amount_cents,
       passphrase,
       idempotencyCheckCompleted: true,
-      duplicate: prior.rows.length > 0,
+      duplicate: false,
       remoteAddress: request.socket.remoteAddress,
       allowedSourceIps
     });
