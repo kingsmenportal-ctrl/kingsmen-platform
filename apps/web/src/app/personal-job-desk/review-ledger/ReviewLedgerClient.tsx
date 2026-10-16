@@ -180,10 +180,10 @@ export default function ReviewLedgerClient() {
     const csvCell = (value: unknown) => {
       const text = String(value ?? "");
       // Prevent spreadsheet formula injection while preserving ordinary text.
-      const safe = /^[=+@\\-\\t\\r]/.test(text) ? "'" + text : text;
+      const safe = text.length > 0 && ["=", "+", "-", "@", "\t", "\r"].includes(text[0]) ? "'" + text : text;
       return '"' + safe.replace(/"/g, '""') + '"';
     };
-    const csv = [columns, ...rows].map((row) => row.map(csvCell).join(",")).join("\\r\\n");
+    const csv = [columns, ...rows].map((row) => row.map(csvCell).join(",")).join("\r\n");
     const blob = new Blob(["\\uFEFF", csv], { type: "text/csv;charset=utf-8" });
     const url = URL.createObjectURL(blob);
     const anchor = document.createElement("a");
@@ -204,14 +204,14 @@ export default function ReviewLedgerClient() {
       "I remain interested and would appreciate any update on the recruitment timeline.",
       "",
       "Kind regards"
-    ].join("\\n");
+    ].join("\n");
     void copyText(draft);
   }
 
   function recordFollowUpAttempt(record: LedgerRecord) {
     const today = new Date().toISOString().slice(0, 10);
     const entry = `[${today}] Follow-up attempt recorded by user; outcome not independently verified.`;
-    const history = [record.review.responseHistory.trim(), entry].filter(Boolean).join("\\n");
+    const history = [record.review.responseHistory.trim(), entry].filter(Boolean).join("\n");
     const updatedRecords = records.map((item) => item.ledgerId === record.ledgerId
       ? { ...item, review: { ...item.review, responseHistory: history, followUpDate: "", nextAction: "Wait for employer response; set a new follow-up date if needed." } }
       : item);
