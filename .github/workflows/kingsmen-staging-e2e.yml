@@ -2,6 +2,17 @@ name: Kingsmen Staging Runtime E2E
 
 on:
   workflow_dispatch:
+  schedule:
+    - cron: "0 2 * * *" # 04:00 SAST (UTC+2)
+  push:
+    branches:
+      - fix/kingsmen-ci-real-validation-gates
+    paths:
+      - "e2e/**"
+      - "playwright.config.ts"
+      - "package.json"
+      - "package-lock.json"
+      - ".github/workflows/kingsmen-staging-e2e.yml"
 
 permissions:
   contents: read
@@ -15,6 +26,7 @@ jobs:
     name: Authenticated staging runtime journeys
     runs-on: ubuntu-latest
     timeout-minutes: 25
+    environment: staging
     steps:
       - name: Check out repository
         uses: actions/checkout@v4
@@ -46,11 +58,26 @@ jobs:
           FOUNDER_TEST_CANDIDATE_REF: ${{ secrets.FOUNDER_TEST_CANDIDATE_REF }}
           FOUNDER_TEST_PROOF_REF: ${{ secrets.FOUNDER_TEST_PROOF_REF }}
           FOUNDER_TEST_EVIDENCE_REF: ${{ secrets.FOUNDER_TEST_EVIDENCE_REF }}
+      - name: Add factual run summary
+        if: always()
+        env:
+          TARGET_REF: ${{ github.sha }}
+          RUN_URL: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
+          CONCLUSION: ${{ job.status }}
+        run: |
+          {
+            echo "## Kingsmen staging runtime E2E"
+            echo "- Workflow conclusion: ${CONCLUSION}"
+            echo "- Tested commit: ${TARGET_REF}"
+            echo "- Run: ${RUN_URL}"
+            echo "- Scenarios requested: candidate-owned document access, cross-candidate isolation, registration persistence, failed deletion handling, founder review persistence, fresh-session persistence."
+            echo "- Note: this report is test evidence only; it does not itself prove backup/restore, payment sandbox, communications delivery, or release approval."
+          } >> "$GITHUB_STEP_SUMMARY"
       - name: Upload redacted test result summary
         if: always()
         uses: actions/upload-artifact@v4
         with:
-          name: kingsmen-staging-runtime-e2e-results
+          name: kingsmen-staging-runtime-e2e-${{ github.run_number }}
           path: reports/staging/playwright-runtime-results.json
           if-no-files-found: warn
           retention-days: 7
