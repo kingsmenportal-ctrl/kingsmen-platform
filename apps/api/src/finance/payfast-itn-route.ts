@@ -12,16 +12,19 @@ type Client = {
 type Pool = { connect(): Promise<Client> };
 type PoolCtor = new (options: Record<string, unknown>) => Pool;
 
+let sharedPool: Pool | undefined;
 function getPool(): Pool {
+  if (sharedPool) return sharedPool;
   const databaseUrl = process.env.KINGSMEN_DATABASE_URL ?? process.env.DATABASE_URL;
   if (!databaseUrl) throw new Error("FINANCE_DATABASE_NOT_CONFIGURED");
   const pg = require("pg") as { Pool: PoolCtor };
-  return new pg.Pool({
+  sharedPool = new pg.Pool({
     connectionString: databaseUrl,
     max: 4,
     connectionTimeoutMillis: 5000,
     ssl: process.env.KINGSMEN_DATABASE_SSL === "true" ? { rejectUnauthorized: true } : undefined
   });
+  return sharedPool;
 }
 
 function send(response: ServerResponse, status: number, body: string): void {
@@ -174,14 +177,8 @@ export async function handlePayFastItn(request: IncomingMessage, response: Serve
     // Do not treat a provider callback alone as sufficient production confirmation.
     // Record the verified receipt/payment as pending secondary provider confirmation;
     // never grant entitlements or mark the order PAID in this foundation stage.
-    await client.query(
-      `INSERT INTO public.finance_payments
-       (payment_ref, order_ref, candidate_ref, provider, provider_payment_id, merchant_reference,
-        amount_gross_cents, amount_fee_cents, amount_net_cents, currency, payment_status, verified, evidence_ref)
-       VALUES ($1,$2,$3,'PAYFAST',$4,$5,$6,0,$6,'ZAR','PENDING',false,$7)
-       ON CONFLICT (payment_ref) DO NOTHING`,
-      [`pay_${crypto.randomUUID()}`, order.order_ref, order.candidate_ref, providerPaymentId, merchantReference, grossCents, `pay_ev_${itnRef}`]
-    );
+    // Receipt and evidence are durable, but we do not fabricate fee/net accounting
+    // from fields that have not been independently validated.
     await client.query(
       "UPDATE public.payfast_payment_intents SET intent_status = 'ITN_RECEIVED', updated_at = now() WHERE intent_ref = $1 AND intent_status IN ('CREATED','REDIRECTED','ITN_RECEIVED')",
       [intent.intent_ref]
