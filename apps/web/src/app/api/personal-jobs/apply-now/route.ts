@@ -1280,6 +1280,22 @@ export async function POST(request: Request) {
       return privateJson({ status: "TASK_DELETED", store, readiness: scoreReadiness(store) });
     }
 
+    if (action === "recordDocumentReview") {
+      const documentId = typeof body.documentId === "string" ? body.documentId.trim() : "";
+      const reviewStatus = typeof body.reviewStatus === "string" ? body.reviewStatus.toUpperCase() : "";
+      const allowedReviewStatuses = ["CANDIDATE_CONFIRMED_CONTENT", "NEEDS_CORRECTION", "REPLACEMENT_NEEDED"];
+      if (!allowedReviewStatuses.includes(reviewStatus)) {
+        return privateJson({ status: "FAILED", error: "Choose a valid candidate document review status." }, { status: 400 });
+      }
+      const existing = store.documents.find((item) => item.documentId === documentId);
+      if (!existing) return privateJson({ status: "FAILED", error: "Document not found in this workspace." }, { status: 404 });
+      const now = new Date().toISOString();
+      const review = { status: reviewStatus, reviewedAt: now, reviewType: "CANDIDATE_SELF_REVIEW", notice: "This records the candidate's own review only. It does not verify authenticity, validity, ownership or employer acceptance." };
+      store.documents = store.documents.map((item) => item.documentId === documentId ? { ...item, candidateReview: review } : item);
+      await persistStore(context, store);
+      return privateJson({ status: "DOCUMENT_REVIEW_RECORDED", document: store.documents.find((item) => item.documentId === documentId), store, readiness: scoreReadiness(store) });
+    }
+
     if (action === "deleteDocument") {
       const documentId = typeof body.documentId === "string" ? body.documentId.trim() : "";
       if (!documentId || documentId.length > 180) {
