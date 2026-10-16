@@ -73,4 +73,24 @@ test.describe("candidate API security boundary", () => {
       expect(body).not.toHaveProperty("uploadUrl");
     });
   }
+  for (const endpoint of [
+    { path: "/api/candidate/workbench/readiness", payload: { candidateId: "untrusted-candidate", routeId: "untrusted-route" } },
+    { path: "/api/candidate/workbench/cao-optimizer", payload: { candidateId: "untrusted-candidate", parentApplicationId: "untrusted-application" } },
+    { path: "/api/candidate/workbench/choice-optimizer", payload: { candidateId: "untrusted-candidate", routeId: "untrusted-route", gate: "untrusted-gate" } },
+  ]) {
+    test(`POST ${endpoint.path} does not trust caller-supplied ownership identifiers`, async ({ request }) => {
+      const response = await request.post(endpoint.path, { data: endpoint.payload });
+      expect(response.status()).toBe(503);
+      expect(response.headers()["cache-control"]).toContain("no-store");
+      const body = await response.json();
+      expect(body.ok).toBe(false);
+      expect(body.productionReady).toBe(false);
+      expect(body.code).toBe("CANDIDATE_AUTHORIZATION_NOT_CONFIGURED");
+      expect(body).not.toHaveProperty("candidate");
+      expect(body).not.toHaveProperty("application");
+      expect(body).not.toHaveProperty("result");
+      expect(body.serviceRoleVisibleToBrowser).toBe(false);
+    });
+  }
+
 });
