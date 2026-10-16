@@ -28,3 +28,19 @@ test("unverified official outcome wording is rejected", () => {
   assert.throws(() => assertCandidateStatusIsSafe("Your funding is guaranteed"), /NO_FAKE_STATUS/);
   assert.doesNotThrow(() => assertCandidateStatusIsSafe("Your application is prepared for review"));
 });
+
+
+test("disabled email falls back to portal unless backup SMS is explicitly enabled", () => {
+  const defaults = { ...defaultMobileNotificationPreference("synthetic-candidate"), emailEnabled: false };
+  assert.equal(chooseMobileChannel(defaults, "routine"), "portal");
+  assert.equal(chooseMobileChannel(defaults, "backup"), "portal");
+  const smsOptIn = { ...defaults, smsBackupEnabled: true };
+  assert.equal(chooseMobileChannel(smsOptIn, "backup"), "sms_backup");
+  assert.equal(chooseMobileChannel(smsOptIn, "routine"), "portal");
+});
+
+test("urgent WhatsApp requires explicit urgent-only policy and is not a delivery guarantee", () => {
+  assert.doesNotThrow(() => assertChannelAllowed("whatsapp_urgent", "urgent"));
+  assert.throws(() => assertChannelAllowed("whatsapp_urgent", "routine"), /WHATSAPP_URGENT_ONLY/);
+  assert.throws(() => assertChannelAllowed("sms_backup", "routine"), /SMS_BACKUP_ONLY/);
+});
