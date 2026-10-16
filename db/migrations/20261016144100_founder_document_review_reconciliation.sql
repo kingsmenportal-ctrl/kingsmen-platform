@@ -56,6 +56,7 @@ alter table public.founder_document_review_decisions enable row level security;
 drop policy if exists founder_document_review_select on public.founder_document_review_decisions;
 create policy founder_document_review_select on public.founder_document_review_decisions
   for select to authenticated using (public.is_kingsmen_founder());
+grant select on public.founder_document_review_decisions to authenticated;
 
 -- Validates the canonical document, verification proof and evidence records in one transaction.
 create or replace function public.record_founder_document_review(
