@@ -108,7 +108,7 @@ export default function CandidateRequirementsPage() {
       </section>
       {selected && <section style={{ ...panel, marginTop: 16 }}>
         <h2 style={{ marginTop: 0 }}>Source and checklist</h2>
-        <label style={{ display: "block", fontWeight: 800, marginBottom: 14 }}>Official vacancy source (HTTPS)
+        <label style={{ display: "block", fontWeight: 800, marginBottom: 14 }}>official vacancy source (HTTPS)
           <input value={sourceUrl} onChange={(event) => setSourceUrl(event.target.value)} placeholder="https://…" style={{ ...input, display: "block", marginTop: 7 }} />
         </label>
         <div style={{ display: "grid", gap: 12 }}>
