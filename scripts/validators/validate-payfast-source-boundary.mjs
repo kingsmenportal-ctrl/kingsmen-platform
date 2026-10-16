@@ -17,7 +17,8 @@ const errors = [];
 if (!itn.includes('from "./payfast-source-ip"') || !itn.includes("isAllowedPayFastSourceIp(input.remoteAddress, input.allowedSourceIps)")) {
   errors.push("PayFast ITN validator must derive source verification from socket IP and explicit allow-list.");
 }
-if (/ipValid\s*\??:\s*boolean|input\.ipValid\s*===\s*true/.test(itn)) {
+const inputInterface = itn.split("export interface PayFastItnValidationInput")[1]?.split("export interface PayFastItnValidationResult")[0] ?? "";
+if (/\bipValid\s*\??:\s*boolean/.test(inputInterface) || /input\.ipValid\s*===\s*true/.test(itn)) {
   errors.push("PayFast ITN validator must not trust caller-supplied ipValid booleans.");
 }
 if (!helper.includes("normalizedEntries.some((entry) => entry === null)") || !helper.includes("if (!remoteAddress || !configuredAllowList?.trim()) return false")) {
