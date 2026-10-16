@@ -23,7 +23,10 @@ function getPool(): Pool {
     connectionString: databaseUrl,
     max: 4,
     connectionTimeoutMillis: 5000,
-    ssl: process.env.KINGSMEN_DATABASE_SSL === "true" ? { rejectUnauthorized: true } : undefined
+    // Finance persistence must verify PostgreSQL TLS in production, matching the Truth Vault policy.
+    ssl: process.env.NODE_ENV === "production" || process.env.KINGSMEN_DATABASE_SSL === "true"
+      ? { rejectUnauthorized: true }
+      : undefined
   });
   return sharedPool;
 }
