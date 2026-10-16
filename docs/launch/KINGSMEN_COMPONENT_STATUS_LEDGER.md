@@ -59,3 +59,36 @@ For every status above **Implemented**, record:
 - unresolved failures or limits.
 
 **Do not promote a component to Runtime verified or Accepted from source inspection, a mocked provider, a metadata row, or a validator that only checks file contents.**
+
+## Latest verification snapshot — 2026-10-16
+
+### GitHub CI evidence
+
+- Source Guard run: [run 38924426301](https://github.com/kingsmenportal-ctrl/kingsmen-platform/actions/runs/38924426301) — **SUCCESS** on commit `5a81113e00d56550130e602ad4946ed2ae286a4e`. All 29 workflow steps completed successfully, including Truth Vault source validator, web/backend boundary, PayFast source proof + validator, RLS source proof + validator, backup/restore source proof + validator, secrets, communications, observability, legal/privacy, staging proof pack, staging evidence capture, final assembly, branch-protection source proof + validator, and launch audit.
+- Jarvis Live Runtime run: [run 38924426331](https://github.com/kingsmenportal-ctrl/kingsmen-platform/actions/runs/38924426331) — **SUCCESS**; Jarvis core, runtime controller, and live batch validators passed.
+- These are **source/CI validation results**, not proof that live staging recovery, RLS role isolation, real PayFast provider checkout, provider delivery, or production branch protection have been completed.
+- The Source Guard workflow command wiring was repaired in `package.json` using existing proof/validator scripts. A stale RLS validator assertion was corrected to check the current launch-gate diagnostic, the launch-readiness manifest now explicitly states the PayFast evidence requirement, and the staging evidence/final evidence collector commands are now declared.
+
+### Supabase read-only inspection
+
+Project: `kingsmen-portal-staging` (`euhubhhnumtibbyufghm`), region `eu-west-1`, status reported `ACTIVE_HEALTHY`, PostgreSQL 17.11.
+
+Read-only SQL/API inspection at 2026-10-16 15:25 UTC reported:
+- 188 public base tables;
+- 214 public RLS policies;
+- 10 application functions across `public` and `kingsmen_security`;
+- 30 applied migrations, through `20261015153651 / n30_revoke_unneeded_candidate_mutations_0030`;
+- Supabase security advisor returned no security lints;
+- performance advisor reported 162 unused-index findings (informational; not a reason to remove indexes without workload analysis).
+
+This is a metadata/schema inspection only. It is **not a backup** and does not prove recoverability or candidate isolation.
+
+### Build tracker reconciliation — initial measurement
+
+Default-branch `Kingsmen_Build_Tracker.csv` was read at blob SHA `51e3f84153d76e2d47a709351b807168f86a2225`. It contains 188 task rows across phases 0–14. Status values at that snapshot: 185 `Not_Started`, 3 `Built`. This does not by itself prove the rows are accurate against current source or runtime evidence; row-by-row path and evidence reconciliation remains open. Keep the CSV as the existing task-level tracker and this ledger as the major-component/gate view until the two are reconciled.
+
+## Current exit-gate decision
+
+- **Phase 0 CI wiring:** Source Guard and Jarvis Live Runtime checks are now green on the branch. The ledger and tracker exist, but detailed tracker row reconciliation and verified GitHub branch-protection settings remain open; do not claim the entire repository lock gate is closed yet.
+- **Phase 1 database recovery:** **BLOCKED.** No timestamped logical dump, size, SHA-256, isolated restore log, or schema/data verification report has been produced. No migration was applied and no database write was performed during this inspection.
+- **Migration rule remains active:** no Supabase migrations, schema pushes, or branch merges until a genuine backup is restored and verified in an isolated target.
