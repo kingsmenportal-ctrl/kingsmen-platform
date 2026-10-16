@@ -76,7 +76,8 @@
     "final:prove:evidence": "node scripts/validators/require-runtime-evidence.mjs",
     "final:validate:evidence": "node scripts/validators/validate-credential-free-foundation.mjs --final-source",
     "final:collect:evidence": "node scripts/validators/require-runtime-evidence.mjs",
-    "staging:test:candidate-isolation": "node scripts/staging/verify-candidate-isolation.mjs"
+    "staging:test:candidate-isolation": "node scripts/staging/verify-candidate-isolation.mjs",
+    "test:e2e": "playwright test e2e/kingsmen-runtime.spec.ts --project=chromium"
   },
   "repository": {
     "type": "git",
