@@ -2,7 +2,7 @@ name: Kingsmen Application Build Checks
 
 on:
   pull_request:
-    branches: [main]
+    branches: [main, fix/kingsmen-phase0-source-guard-ledger]
   push:
     branches: [main]
   workflow_dispatch:
