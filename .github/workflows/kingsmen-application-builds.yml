@@ -1,0 +1,60 @@
+name: Kingsmen Application Build Checks
+
+on:
+  pull_request:
+    branches: [main]
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  web-build:
+    name: Web production build and auth guard tests
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: npm
+          cache-dependency-path: apps/web/package-lock.json
+      - name: Install locked web dependencies
+        working-directory: apps/web
+        run: npm ci
+      - name: Type-check same-origin guard and regression tests
+        working-directory: apps/web
+        run: npx tsc --noEmit --target ES2022 --lib dom,dom.iterable,es2022 --module esnext --moduleResolution bundler --skipLibCheck --types node src/lib/auth/csrf.ts src/lib/auth/csrf.test.ts
+      - name: Run same-origin guard regression tests
+        working-directory: apps/web
+        run: |
+          npx tsc --target ES2022 --lib dom,dom.iterable,es2022 --module commonjs --moduleResolution node --esModuleInterop --skipLibCheck --types node --outDir .auth-test-dist src/lib/auth/csrf.ts src/lib/auth/csrf.test.ts
+          node --test .auth-test-dist/csrf.test.js
+      - name: Build web application
+        working-directory: apps/web
+        run: npm run build
+      - name: Clean temporary test output
+        if: always()
+        working-directory: apps/web
+        run: rm -rf .auth-test-dist
+
+  api-build:
+    name: API compile and test
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Install API dependencies
+        working-directory: apps/api
+        run: npm install
+      - name: Build and run API tests
+        working-directory: apps/api
+        run: npm run validate
