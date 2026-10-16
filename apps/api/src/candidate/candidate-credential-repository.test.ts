@@ -73,3 +73,73 @@ test("non-active accounts cannot authenticate", async () => {
   );
   assert.equal(client.statements.at(-1)?.sql, "commit");
 });
+
+
+test("expired temporary lock is cleared before valid credentials are accepted", async () => {
+  const hash = await hashCandidatePassword("test-only-password-123!");
+  const { client, repository } = setup({
+    ...activeRow(hash),
+    auth_status: "LOCKED",
+    failed_login_attempts: 5,
+    locked_until: new Date(Date.now() - 60_000).toISOString()
+  });
+  const result = await repository.authenticate("candidate@example.test", "test-only-password-123!");
+  assert.deepEqual(result, { ok: true, candidateId: "123e4567-e89b-42d3-a456-426614174000" });
+  assert.ok(client.statements.some((entry) => /set auth_status = 'ACTIVE', failed_login_attempts = 0/i.test(entry.sql)));
+  assert.equal(client.statements.at(-1)?.sql, "commit");
+  assert.equal(client.released, true);
+});
+
+test("permanent lock with no expiry is never auto-unlocked", async () => {
+  const hash = await hashCandidatePassword("test-only-password-123!");
+  const { client, repository } = setup({
+    ...activeRow(hash),
+    auth_status: "LOCKED",
+    failed_login_attempts: 5,
+    locked_until: null
+  });
+  assert.deepEqual(
+    await repository.authenticate("candidate@example.test", "test-only-password-123!"),
+    { ok: false, reason: "ACCOUNT_LOCKED" }
+  );
+  assert.equal(client.statements.some((entry) => /set auth_status = 'ACTIVE'/i.test(entry.sql)), false);
+  assert.equal(client.statements.at(-1)?.sql, "commit");
+});
+
+test("inactive candidate is rejected even when credential status is active", async () => {
+  const hash = await hashCandidatePassword("test-only-password-123!");
+  const { client, repository } = setup({ ...activeRow(hash), candidate_active: false });
+  assert.deepEqual(
+    await repository.authenticate("candidate@example.test", "test-only-password-123!"),
+    { ok: false, reason: "ACCOUNT_UNAVAILABLE" }
+  );
+  assert.equal(client.statements.some((entry) => /failed_login_attempts = 0/i.test(entry.sql)), false);
+});
+
+test("failed-password counter increments below threshold without prematurely locking", async () => {
+  const hash = await hashCandidatePassword("test-only-password-123!");
+  const { client, repository } = setup({ ...activeRow(hash), failed_login_attempts: 2 });
+  assert.deepEqual(
+    await repository.authenticate("candidate@example.test", "wrong-password-123!"),
+    { ok: false, reason: "INVALID_CREDENTIALS" }
+  );
+  const increment = client.statements.find((entry) => /set failed_login_attempts = \$2, updated_at/i.test(entry.sql));
+  assert.deepEqual(increment?.values, ["123e4567-e89b-42d3-a456-426614174000", 3]);
+  assert.equal(client.statements.some((entry) => /set auth_status = 'LOCKED'/i.test(entry.sql)), false);
+});
+
+test("custom lockout settings are bounded and honored", async () => {
+  const hash = await hashCandidatePassword("test-only-password-123!");
+  const client = new FakeClient();
+  client.rows = [{ ...activeRow(hash), failed_login_attempts: 1 }];
+  const repository = new CandidateCredentialRepository({ connect: async () => client }, {
+    maxFailedAttempts: 2,
+    lockDurationMinutes: 7
+  });
+  assert.deepEqual(
+    await repository.authenticate("candidate@example.test", "wrong-password-123!"),
+    { ok: false, reason: "ACCOUNT_LOCKED" }
+  );
+  const lock = client.statements.find((entry) => /set auth_status = 'LOCKED'/i.test(entry.sql));
+  assert.deepEqual(lock?.values, ["123e4567-e89b-42d3-a456-426614174000", 2, 7]);
+});
