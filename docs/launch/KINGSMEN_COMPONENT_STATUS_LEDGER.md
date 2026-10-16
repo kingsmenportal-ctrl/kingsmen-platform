@@ -152,3 +152,23 @@ Phase A.2 and A.3 source work remains unverified: no successful web build or Pla
 - The client no longer claims the disabled endpoint is actively reading the repository-local JSON workbench. Summary counters and application details render only when a successful API response supplies tracker data; when unavailable, the page does not present fabricated zero counts as candidate facts.
 - Status: **Fail-closed UI state implemented; runtime verification pending**. This does not establish server-side authentication or ownership. The route remains intentionally unavailable.
 - No migrations or database changes were made. Phase 0 remains **OPEN**; Phase 1 remains **OPEN / BLOCKED**. No web build or Playwright execution is evidenced by this source update.
+
+
+### Phase A.4 — consolidated security boundary audit (16 October 2026)
+
+This audit is the Phase A.4 exit assessment, not a claim that the phase is complete.
+
+| Security requirement | Current finding | Status | Exit evidence required |
+|---|---|---|---|
+| Trusted server-side candidate identity | Web package has no Supabase client dependency in its declared dependencies; inspected login UI explicitly says auth is not connected. No server session helper or middleware was found at the expected paths. API package currently declares only `pg` as a runtime dependency. | **Blocked** | Approved identity provider/session implementation, server-side token/session validation, logout/expiry handling, and tests against synthetic accounts. |
+| Legacy tracker shared-file exposure | `apps/web/src/app/api/personal-jobs/application-tracker/route.ts` GET/POST are disabled with a 503 fail-closed response and no filesystem access. | **Implemented as a shutdown mitigation** | Keep disabled until owner-scoped durable persistence, authorization, audit and isolation tests all pass. |
+| Profile/onboarding ownership | Candidate profile/onboarding use browser-local drafts; no server identity is bound to these drafts. | **Blocked** | Authenticated read/write routes derive owner from the verified session, never from request-supplied candidate IDs; negative tests for cross-owner access. |
+| Candidate document ownership/storage | Candidate page is a guide only. The active Phase A branch does not expose the previously inventoried document API route paths at the checked ref; no active private upload/read route was confirmed on this branch. | **Blocked / not integrated** | Verify exact branch routes, then implement or keep absent/disabled until verified identity, private bucket policy, scoped metadata and short-lived signed URL enforcement exist. |
+| Application tracker A/B isolation | Existing Playwright tests cover only unauthenticated requests to the disabled endpoint. They do not exercise authenticated A/B ownership. | **Not verified** | Seed synthetic Candidate A/B with independent records in isolated test environment; prove A can access own records and cannot read, update, delete, or obtain document URLs for B's records. Capture actual test output. |
+| Runtime verification | No web build or Playwright execution is evidenced for this branch head in the current work session. | **Blocked** | Successful clean install/build and executed browser/API security suite on the exact commit; record run IDs and commit SHA. |
+
+**Phase A.4 decision: NOT CLOSED.** The only established security outcome is that the known shared-file tracker API is disabled. Authenticated candidate identity, owner-scoped profile/application/document access, private storage integration, and authenticated Candidate A/B isolation remain incomplete. Do not describe the entire phase as complete, and do not enable candidate writes.
+
+**Implementation constraint:** The repository's declared web dependencies and inspected source do not establish an active server-side identity/session integration. Do not invent a cookie format, trust a client-supplied candidate ID, or use a service-role key as a substitute for identity. The next implementation delivery must integrate the approved identity provider on the server request path, then apply the verified session identity to every candidate-owned data access. If provider configuration or isolated synthetic accounts are unavailable, keep all candidate data APIs disabled and report the precise blocker.
+
+**Foundation gates unchanged:** Phase 0 API lockfile/`npm ci` remains **OPEN**. Phase 1 real backup, isolated restore and migration rehearsal remains **OPEN / BLOCKED**. No database migrations were applied.
