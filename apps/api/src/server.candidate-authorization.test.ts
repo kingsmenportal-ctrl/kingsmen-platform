@@ -19,7 +19,8 @@ test("candidate and application read routes fail closed without ownership author
   for (const path of [
     "/api/candidates/candidate-synthetic-001/status",
     "/api/applications/application-synthetic-001/workbench",
-    "/api/candidate/documents"
+    "/api/candidate/documents",
+    "/api/candidate/document-requests"
   ]) {
     const response = await fetch(base + path);
     assert.equal(response.status, 503, path);
