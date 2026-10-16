@@ -172,3 +172,23 @@ This audit is the Phase A.4 exit assessment, not a claim that the phase is compl
 **Implementation constraint:** The repository's declared web dependencies and inspected source do not establish an active server-side identity/session integration. Do not invent a cookie format, trust a client-supplied candidate ID, or use a service-role key as a substitute for identity. The next implementation delivery must integrate the approved identity provider on the server request path, then apply the verified session identity to every candidate-owned data access. If provider configuration or isolated synthetic accounts are unavailable, keep all candidate data APIs disabled and report the precise blocker.
 
 **Foundation gates unchanged:** Phase 0 API lockfile/`npm ci` remains **OPEN**. Phase 1 real backup, isolated restore and migration rehearsal remains **OPEN / BLOCKED**. No database migrations were applied.
+
+
+### Phase A.4 follow-up — candidate document and founder review API shutdown (16 October 2026)
+
+Source review found four additional API shells that returned `ok: true` despite lacking real identity/ownership enforcement. The upload/read endpoints returned placeholder strings as if they were signed URLs; upload/read/status accepted or reflected caller-selected identifiers; the founder review endpoint treated request-body proof/evidence/audit identifiers as if they were sufficient authority. These responses could mislead callers into believing secure workflows were operational.
+
+The following endpoints now fail closed with HTTP 503, `Cache-Control: no-store`, and no candidate/document identifiers or fake signed URLs in the response:
+
+- `apps/web/src/app/api/candidate/documents/upload-url/route.ts`
+- `apps/web/src/app/api/candidate/documents/read-url/route.ts`
+- `apps/web/src/app/api/candidate/documents/status/route.ts`
+- `apps/web/src/app/api/founder/documents/review/route.ts`
+
+The Playwright suite `e2e/candidate-security.spec.ts` now includes synthetic-only regression cases for those four endpoints in addition to the tracker cases. The tests assert the fail-closed contract and ensure placeholder signed URL fields are not returned.
+
+**Status: shutdown mitigations implemented; runtime execution pending.** These tests are authored only; they have not been executed here. This is not authenticated Candidate A/B isolation evidence and does not implement identity, private storage, founder authorization, or durable audit records. Keep these endpoints disabled until their real server-side identity, ownership, signer, and audit dependencies are implemented and verified.
+
+**Relevant commits:** upload route `a0a99fd6228eaebcb9603e39c130c7daee4f8f11`; read route `88a10c9896efc4521734e5c2e11fbba02cac0b58`; status route `286d50dfe6abc4a9a59e4185228c5cb8ebf94e04`; founder review route `729eec45049854e6192ea95d0aec3bf8dba912af`; tests `f75221a6488e7e3bf007cdb2be1bda8a502a3c22`.
+
+Foundation constraints remain unchanged: Phase 0 is **OPEN**, Phase 1 is **OPEN / BLOCKED**, no database migrations were applied, and no build/Playwright run is claimed.
