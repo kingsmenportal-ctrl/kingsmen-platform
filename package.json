@@ -54,7 +54,8 @@
     "web:validate:backend-boundary": "node scripts/validators/validate-safe-web-backend-boundary.mjs",
     "kingsmen:launch:audit": "node scripts/validators/validate-kingsmen-launch-readiness-evidence-aware.mjs --audit",
     "kingsmen:launch:gate": "node scripts/validators/validate-kingsmen-launch-readiness-evidence-aware.mjs --gate",
-    "api:validate:truth-vault": "node scripts/validators/validate-api-truth-vault-persistence.mjs"
+    "api:validate:truth-vault": "node scripts/validators/validate-api-truth-vault-persistence.mjs",
+    "payments:prove:sandbox": "node scripts/proof/prove-payfast-sandbox-boundary.mjs"
   },
   "repository": {
     "type": "git",
