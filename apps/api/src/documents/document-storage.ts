@@ -1,3 +1,4 @@
+import { randomUUID } from "node:crypto";
 import type { DocumentFileRecord, KingsmenDocumentType } from "./document-types";
 
 export interface DocumentStorageIntent {
@@ -17,10 +18,25 @@ export interface PreparedDocumentStorage {
   protectedData: true;
 }
 
+const UUID_PATTERN = /^[0-9a-f]{8}-[0-9a-f]{4}-[1-8][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i;
+const ALLOWED_MIME_TYPES = new Set(["application/pdf", "image/jpeg", "image/png", "image/webp"]);
+
 export function prepareDocumentStorage(input: DocumentStorageIntent): PreparedDocumentStorage {
-  if (!input.candidateId) throw new Error("candidateId is required.");
+  if (!UUID_PATTERN.test(input.candidateId)) throw new Error("candidateId must be a valid UUID.");
+  if (input.applicationId !== undefined && !UUID_PATTERN.test(input.applicationId)) {
+    throw new Error("applicationId must be a valid UUID.");
+  }
   if (!input.documentType) throw new Error("documentType is required.");
-  if (!input.originalFilename) throw new Error("originalFilename is required.");
+  if (typeof input.originalFilename !== "string" || input.originalFilename.trim().length < 2) {
+    throw new Error("originalFilename is required.");
+  }
+  if (input.originalFilename.length > 255 || /[\u0000-\u001f\u007f]/.test(input.originalFilename)) {
+    throw new Error("originalFilename is invalid.");
+  }
+  if (!ALLOWED_MIME_TYPES.has(input.mimeType)) throw new Error("Unsupported document MIME type.");
+  if (!Number.isSafeInteger(input.fileSizeBytes) || input.fileSizeBytes <= 0 || input.fileSizeBytes > 15 * 1024 * 1024) {
+    throw new Error("fileSizeBytes is outside the permitted range.");
+  }
 
   const safeName = input.originalFilename
     .toLowerCase()
@@ -28,7 +44,7 @@ export function prepareDocumentStorage(input: DocumentStorageIntent): PreparedDo
     .replace(/-+/g, "-")
     .slice(0, 120);
 
-  const documentRef = `doc_${Date.now()}_${Math.random().toString(36).slice(2, 10)}`;
+  const documentRef = `doc_${randomUUID()}`;
 
   return {
     documentRef,
