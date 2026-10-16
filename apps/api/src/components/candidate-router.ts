@@ -25,6 +25,44 @@ export async function handleCandidateComponentRoute(
       return true;
     }
 
+    if (method === "GET" && pathname === "/api/candidate/offers") {
+      const offers = await supabaseUserRequest<unknown[]>(token, "contract_offers?select=id,offer_version,terms,status,issued_at,expires_at,created_at&order=created_at.desc");
+      sendComponentJson(response, 200, { ok: true, offers });
+      return true;
+    }
+
+    if (method === "GET" && pathname === "/api/candidate/invoices") {
+      const invoices = await supabaseUserRequest<unknown[]>(token, "invoices?select=id,amount_cents,currency,status,created_at,issued_at,paid_at&order=created_at.desc");
+      sendComponentJson(response, 200, { ok: true, invoices });
+      return true;
+    }
+
+    if (method === "POST" && pathname === "/api/candidate/offers/sign") {
+      let raw = "";
+      for await (const chunk of request) {
+        raw += chunk.toString();
+        if (raw.length > 16384) throw new Error("REQUEST_BODY_TOO_LARGE");
+      }
+      let body: unknown = {};
+      try { body = raw.trim() ? JSON.parse(raw) : {}; } catch { throw new Error("INVALID_JSON_OBJECT"); }
+      if (!body || typeof body !== "object" || Array.isArray(body)) throw new Error("INVALID_JSON_OBJECT");
+      const data = body as Record<string, unknown>;
+      const offerId = data.offerId;
+      const signatureMethod = data.signatureMethod;
+      const documentSha256 = data.documentSha256;
+      const idempotencyKey = data.idempotencyKey;
+      if (typeof offerId !== "string" || !/^[0-9a-f-]{36}$/i.test(offerId)) throw new Error("INVALID_OFFER_ID");
+      if (typeof signatureMethod !== "string" || !["typed_name", "electronic_signature", "external_signature"].includes(signatureMethod)) throw new Error("INVALID_SIGNATURE_METHOD");
+      if (typeof documentSha256 !== "string" || !/^[0-9a-f]{64}$/i.test(documentSha256)) throw new Error("INVALID_DOCUMENT_SHA256");
+      if (typeof idempotencyKey !== "string" || !/^[A-Za-z0-9._:-]{8,128}$/.test(idempotencyKey)) throw new Error("INVALID_IDEMPOTENCY_KEY");
+      const result = await supabaseUserRequest<unknown>(token, "rpc/sign_offer", {
+        method: "POST",
+        body: JSON.stringify({ p_offer_id: offerId, p_signature_method: signatureMethod, p_document_sha256: documentSha256.toLowerCase(), p_idempotency_key: idempotencyKey })
+      });
+      sendComponentJson(response, 200, { ok: true, signatureId: result });
+      return true;
+    }
+
     if (method === "POST" && pathname === "/api/candidate/kyc/submit") {
       let raw = "";
       for await (const chunk of request) {
