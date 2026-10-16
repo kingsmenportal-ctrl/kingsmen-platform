@@ -163,7 +163,7 @@ CREATE OR REPLACE FUNCTION public.create_candidate_support_ticket(
   p_evidence_ref text DEFAULT NULL
 ) RETURNS jsonb
 LANGUAGE plpgsql
-SECURITY INVOKER
+SECURITY DEFINER
 SET search_path = ''
 AS $$
 DECLARE
