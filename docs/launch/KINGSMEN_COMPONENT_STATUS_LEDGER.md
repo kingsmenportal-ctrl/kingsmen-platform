@@ -192,3 +192,12 @@ The Playwright suite `e2e/candidate-security.spec.ts` now includes synthetic-onl
 **Relevant commits:** upload route `a0a99fd6228eaebcb9603e39c130c7daee4f8f11`; read route `88a10c9896efc4521734e5c2e11fbba02cac0b58`; status route `286d50dfe6abc4a9a59e4185228c5cb8ebf94e04`; founder review route `729eec45049854e6192ea95d0aec3bf8dba912af`; tests `f75221a6488e7e3bf007cdb2be1bda8a502a3c22`.
 
 Foundation constraints remain unchanged: Phase 0 is **OPEN**, Phase 1 is **OPEN / BLOCKED**, no database migrations were applied, and no build/Playwright run is claimed.
+
+### Phase A.4 follow-up — server-side identity and ownership readiness audit (16 October 2026)
+
+- Added [PHASE_A4_IDENTITY_OWNERSHIP_READINESS_AUDIT.md](PHASE_A4_IDENTITY_OWNERSHIP_READINESS_AUDIT.md) in commit `f937142408e5b3a18f225bee5af7877704dec4f7`.
+- Inspected the web/API dependency manifests, candidate login/registration/recovery disclosures, profile draft implementation, tracker/document/founder endpoints and expected auth middleware/helper/service paths on `feat/phase-a1-public-destiny-auth-foundation`.
+- The declared web dependencies do not include an identity-provider SDK; the API runtime declares `pg` only. The expected web middleware, server Supabase helper, web login API, API auth service/routes and candidate profile service/routes returned 404 at the exact inspected branch ref. This is a branch-scoped source finding, not a claim that no related source exists on every branch or deployment.
+- Documented the required server-side security contract, synthetic Candidate A/B negative-test matrix, identity/session provider decision, subject-to-candidate mapping, storage prerequisites and actual evidence required to exit A.4.
+- **Status: readiness audit documented; identity and ownership implementation still BLOCKED.** No authentication has been fabricated, no endpoint re-enabled, no migration applied, and no build or Playwright execution claimed. Existing tests remain shutdown-contract tests, not authenticated isolation proof.
+- Phase 0 API lockfile/`npm ci` remains **OPEN**. Phase 1 verified backup/restore/rehearsal remains **OPEN / BLOCKED**. **Phase A.4 remains OPEN; do not close Phase A or move to Phase B.**
