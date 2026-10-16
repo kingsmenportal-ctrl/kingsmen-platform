@@ -54,7 +54,7 @@ type FinanceLedgerEntry = { entryId: string; type: "FEE" | "PAYMENT" | "REFUND" 
 };
 
 type SupportRequest = { requestId: string; subject: string; category: "GENERAL" | "APPLICATION" | "DOCUMENTS" | "FINANCE" | "URGENT_BLOCKER" | "DISPUTE"; priority: "NORMAL" | "HIGH" | "URGENT"; status: "OPEN" | "IN_REVIEW" | "WAITING_FOR_CANDIDATE" | "RESOLVED" | "CLOSED"; description: string; reference?: string; affectedWorkflow?: string; deadlineDate?: string; blockerImpact?: string; owner?: "CANDIDATE" | "KINGSMEN_SUPPORT_UNASSIGNED"; history?: Array<{eventId:string;eventType:"REQUEST_CREATED"|"CANDIDATE_UPDATE"|"CANDIDATE_REOPENED";summary:string;fromStatus?:string;toStatus?:string;createdAt:string}>; createdAt: string; updatedAt: string; };
-type MessageRecord = { messageId: string; channel: "EMAIL" | "PORTAL" | "WHATSAPP" | "SMS" | "PHONE"; direction: "INBOUND" | "OUTBOUND"; subject: string; body: string; status: "DRAFT" | "RECORDED" | "SENT" | "DELIVERED" | "FAILED"; reference?: string; createdAt: string; };
+type MessageRecord = { messageId: string; channel: "EMAIL" | "PORTAL" | "WHATSAPP" | "SMS" | "PHONE"; direction: "INBOUND" | "OUTBOUND"; subject: string; body: string; status: "DRAFT" | "RECORDED" | "SENT" | "DELIVERED" | "FAILED"; deliveryState?: "PORTAL_LEDGER_ONLY" | "EMAIL_PROVIDER_NOT_CONFIGURED" | "EMAIL_DRAFT_READY" | "PROVIDER_ACCEPTED" | "DELIVERY_CONFIRMED" | "DELIVERY_FAILED"; supportRequestId?: string; reference?: string; createdAt: string; };
 
 type Store = {
   schema: string;
@@ -71,6 +71,29 @@ type Store = {
   supportRequests: SupportRequest[];
   messageLedger: MessageRecord[];
 };
+
+function recordSupportPortalMessage(store: Store, request: SupportRequest, eventLabel: string, summary: string, now: string) {
+  const message: MessageRecord = {
+    messageId: "message-" + Date.now() + "-" + Math.random().toString(16).slice(2),
+    channel: "PORTAL", direction: "INBOUND", subject: `Support request: ${request.subject}`,
+    body: `${eventLabel} — ${request.category} / ${request.priority} / ${request.status}\\nRequest: ${request.requestId}\\n${summary}`,
+    status: "RECORDED", deliveryState: "PORTAL_LEDGER_ONLY", supportRequestId: request.requestId, createdAt: now
+  };
+  store.messageLedger = [message, ...(store.messageLedger || [])].slice(0, 1000);
+}
+
+function emailNotificationReadiness() {
+  const mode = (process.env.EMAIL_PROVIDER || "no_send").trim().toLowerCase();
+  const endpointConfigured = Boolean(process.env.EMAIL_PROVIDER_ENDPOINT);
+  const secretConfigured = Boolean(process.env.EMAIL_PROVIDER_SECRET);
+  return {
+    providerMode: mode,
+    sendEnabled: false,
+    readiness: mode === "no_send" ? "DISABLED_NO_SEND_MODE" : (endpointConfigured && secretConfigured ? "PROVIDER_CREDENTIALS_PRESENT_BUT_SENDING_NOT_IMPLEMENTED" : "PROVIDER_CONFIGURATION_INCOMPLETE"),
+    endpointConfigured, secretConfigured,
+    notice: "Email sending is deliberately disabled in this component. A configured endpoint/secret is not proof of provider connectivity or delivery."
+  };
+}
 
 function repoRoot() {
   const cwd = process.cwd();
@@ -1223,8 +1246,9 @@ export async function POST(request: Request) {
         createdAt: now, updatedAt: now
       };
       store.supportRequests = [requestRecord, ...(store.supportRequests || [])].slice(0, 500);
+      recordSupportPortalMessage(store, requestRecord, "REQUEST_CREATED", "Candidate support request recorded. No external notification was sent.", now);
       await persistStore(context, store);
-      return privateJson({ status: "SUPPORT_REQUEST_CREATED", request: requestRecord, store, readiness: scoreReadiness(store) });
+      return privateJson({ status: "SUPPORT_REQUEST_CREATED", request: requestRecord, store, emailNotificationReadiness: emailNotificationReadiness(), readiness: scoreReadiness(store) });
     }
 
     if (action === "updateSupportRequest") {
@@ -1248,8 +1272,9 @@ export async function POST(request: Request) {
         }].slice(-100)
       };
       store.supportRequests = store.supportRequests.map((item) => item.requestId === requestId ? updated : item);
+      recordSupportPortalMessage(store, updated, eventType, updateText, now);
       await persistStore(context, store);
-      return privateJson({ status: requestedAction === "REOPEN" ? "SUPPORT_REQUEST_REOPENED" : "SUPPORT_UPDATE_RECORDED", request: updated, store, readiness: scoreReadiness(store) });
+      return privateJson({ status: requestedAction === "REOPEN" ? "SUPPORT_REQUEST_REOPENED" : "SUPPORT_UPDATE_RECORDED", request: updated, store, emailNotificationReadiness: emailNotificationReadiness(), readiness: scoreReadiness(store) });
     }
 
     if (action === "recordMessage") {
@@ -1263,7 +1288,7 @@ export async function POST(request: Request) {
       if (!["EMAIL", "PORTAL", "WHATSAPP", "SMS", "PHONE"].includes(channel)) return privateJson({ status: "FAILED", error: "Choose a valid message channel." }, { status: 400 });
       if (!["INBOUND", "OUTBOUND"].includes(direction)) return privateJson({ status: "FAILED", error: "Choose a valid message direction." }, { status: 400 });
       if (reference.length > 180) return privateJson({ status: "FAILED", error: "Message reference must be 180 characters or fewer." }, { status: 400 });
-      const messageRecord: MessageRecord = { messageId: "message-" + Date.now() + "-" + Math.random().toString(16).slice(2), subject, body: messageBody, channel: channel as MessageRecord["channel"], direction: direction as MessageRecord["direction"], status: "RECORDED", ...(reference ? { reference } : {}), createdAt: new Date().toISOString() };
+      const messageRecord: MessageRecord = { messageId: "message-" + Date.now() + "-" + Math.random().toString(16).slice(2), subject, body: messageBody, channel: channel as MessageRecord["channel"], direction: direction as MessageRecord["direction"], status: "RECORDED", deliveryState: "PORTAL_LEDGER_ONLY", ...(reference ? { reference } : {}), createdAt: new Date().toISOString() };
       store.messageLedger = [messageRecord, ...(store.messageLedger || [])];
       await persistStore(context, store);
       return privateJson({ status: "MESSAGE_RECORDED", message: messageRecord, store, readiness: scoreReadiness(store) });
