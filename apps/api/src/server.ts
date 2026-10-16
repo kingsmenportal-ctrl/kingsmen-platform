@@ -22,10 +22,13 @@ import {
 } from "./jarvis/jarvis-runtime-server-adapter";
 import type { ApiJarvisRuntimeResult } from "./jarvis/jarvis-runtime-api";
 import { closePayFastItnPool, handlePayFastItn } from "./finance/payfast-itn-route";
+import { createCandidateAuthRuntimeFromEnvironment } from "./candidate/candidate-auth-runtime";
+import { handleCandidateAuthRoute } from "./candidate/candidate-auth-http";
 
 const MAX_BODY_BYTES = 1_000_000;
 const SERVICE_NAME = "kingsmen-api";
 const truthVault = TruthVaultRepository.fromEnvironment();
+const candidateAuthRuntime = createCandidateAuthRuntimeFromEnvironment();
 
 type JsonObject = Record<string, unknown>;
 
@@ -436,6 +439,9 @@ async function handleHealth(response: ServerResponse): Promise<void> {
       "POST /api/jarvis/runtime-control",
       "POST /api/workflow/result",
       "POST /api/workflow-results",
+      "POST /api/candidate-auth/login",
+      "POST /api/candidate-auth/logout",
+      "GET /api/candidate-auth/session",
       "GET /api/candidates/:candidateId/status",
       "GET /api/applications/:applicationId/workbench"
     ]
@@ -523,6 +529,11 @@ export function createKingsmenApiServer() {
         response.statusCode = 204;
         response.end();
         return;
+      }
+
+      if (pathname.startsWith("/api/candidate-auth/")) {
+        const handled = await handleCandidateAuthRoute(request, response, pathname, candidateAuthRuntime?.service ?? null, sendJson);
+        if (handled) return;
       }
 
       if (method === "GET" && pathname === "/ready") {
@@ -618,7 +629,7 @@ export function startKingsmenApiServer(options: KingsmenApiServerOptions = {}) {
       generatedAtIso: nowIso()
     }));
     server.close(() => {
-      Promise.all([truthVault.close(), closePayFastItnPool()]).finally(() => process.exit(0));
+      Promise.all([truthVault.close(), candidateAuthRuntime?.close() ?? Promise.resolve(), closePayFastItnPool()]).finally(() => process.exit(0));
     });
   };
 
