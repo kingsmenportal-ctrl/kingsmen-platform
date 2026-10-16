@@ -73,7 +73,7 @@ declare
 begin
  if p_invoice_id is null or p_payment_reference is null
     or p_provider_payment_id is null or p_provider_payment_id !~ '^[0-9]{1,30}$'
-    or p_amount_cents is null or p_amount_cents<=0 or p_currency<>'ZAR'
+    or p_amount_cents is null or p_amount_cents<=0 or p_currency is distinct from 'ZAR'
     or p_event_fingerprint is null or p_event_fingerprint !~ '^[0-9a-f]{64}$' then
   raise exception 'invalid verified payment input' using errcode='22023';
  end if;
