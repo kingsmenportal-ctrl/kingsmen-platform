@@ -2,6 +2,7 @@ import { strict as assert } from "node:assert";
 import { test } from "node:test";
 import type { IncomingMessage, ServerResponse } from "node:http";
 import { handleCandidateAuthRoute } from "./candidate-auth-http";
+import type { CandidateAuthService } from "./candidate-auth-service";
 
 function responseMock() {
   const headers = new Map<string, string>();
