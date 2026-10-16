@@ -65,6 +65,41 @@ async function readForm(request: IncomingMessage): Promise<string> {
   return body;
 }
 
+async function confirmWithPayFast(fields: PayFastFields): Promise<boolean> {
+  const environment = (process.env.PAYFAST_ENVIRONMENT ?? "sandbox").trim().toLowerCase();
+  const endpoint = environment === "sandbox"
+    ? "https://sandbox.payfast.co.za/eng/query/validate"
+    : environment === "live"
+      ? "https://www.payfast.co.za/eng/query/validate"
+      : null;
+  if (!endpoint) return false;
+
+  const params = new URLSearchParams();
+  for (const [key, value] of Object.entries(fields)) {
+    if (key === "signature" || value === undefined || value === null) continue;
+    params.append(key, String(value));
+  }
+
+  const controller = new AbortController();
+  const timer = setTimeout(() => controller.abort(), 5000);
+  try {
+    const response = await fetch(endpoint, {
+      method: "POST",
+      headers: { "content-type": "application/x-www-form-urlencoded" },
+      body: params.toString(),
+      redirect: "error",
+      signal: controller.signal
+    });
+    if (!response.ok) return false;
+    const text = (await response.text()).trim();
+    return text === "VALID";
+  } catch {
+    return false;
+  } finally {
+    clearTimeout(timer);
+  }
+}
+
 /**
  * Minimal fail-closed ITN receiver. It intentionally does not activate entitlements:
  * provider server-confirmation, schema migration, and production evidence are separate gates.
@@ -136,7 +171,7 @@ export async function handlePayFastItn(request: IncomingMessage, response: Serve
       [order.order_ref, merchantReference]
     );
     const intent = intentResult.rows[0];
-    if (!intent || !["CREATED", "REDIRECTED", "ITN_RECEIVED"].includes(intent.intent_status)
+    if (!intent || !["CREATED", "REDIRECTED"].includes(intent.intent_status)
       || intent.amount_cents !== order.amount_cents || intent.currency !== order.currency) {
       await client.query("ROLLBACK");
       send(response, 400, "No matching payment intent");
@@ -157,6 +192,14 @@ export async function handlePayFastItn(request: IncomingMessage, response: Serve
       remoteAddress: request.socket.remoteAddress,
       allowedSourceIps
     });
+    if (result.accepted) {
+      const serverConfirmed = await confirmWithPayFast(fields);
+      if (!serverConfirmed) {
+        result.accepted = false;
+        result.rejectionReason = "PayFast server confirmation failed.";
+      }
+    }
+
     const itnRef = `itn_${crypto.randomUUID()}`;
     const idempotencyKey = result.idempotencyKey;
     const grossText = String(fields.amount_gross ?? "");
