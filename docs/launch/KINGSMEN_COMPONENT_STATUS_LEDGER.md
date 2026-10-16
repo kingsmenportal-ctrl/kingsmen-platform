@@ -201,3 +201,12 @@ Foundation constraints remain unchanged: Phase 0 is **OPEN**, Phase 1 is **OPEN 
 - Documented the required server-side security contract, synthetic Candidate A/B negative-test matrix, identity/session provider decision, subject-to-candidate mapping, storage prerequisites and actual evidence required to exit A.4.
 - **Status: readiness audit documented; identity and ownership implementation still BLOCKED.** No authentication has been fabricated, no endpoint re-enabled, no migration applied, and no build or Playwright execution claimed. Existing tests remain shutdown-contract tests, not authenticated isolation proof.
 - Phase 0 API lockfile/`npm ci` remains **OPEN**. Phase 1 verified backup/restore/rehearsal remains **OPEN / BLOCKED**. **Phase A.4 remains OPEN; do not close Phase A or move to Phase B.**
+
+
+### Phase A.4 follow-up — server-side Supabase Auth integration scaffold (16 October 2026)
+
+- Added `apps/web/src/lib/auth/supabase-rest.ts` and server route handlers for login, registration, recovery, refresh, logout and session validation. The implementation uses Supabase Auth REST and HttpOnly, SameSite=Lax cookies; session validation asks Supabase Auth to verify the access token server-side.
+- Connected candidate login, registration and recovery UI to the new routes. Added `apps/web/.env.example` and `e2e/kingsmen-auth-boundary.spec.ts` for required configuration and synthetic API contract checks.
+- **Status: auth scaffold implemented; provider configuration, build and runtime verification pending.** Configure `SUPABASE_URL` and `SUPABASE_PUBLISHABLE_KEY` in the deployment environment and confirm staging Auth URL/redirect/email settings before live tests.
+- Candidate profile, tracker and document APIs remain fail-closed or local-only. Provider-subject-to-candidate mapping, owner-scoped durable queries, private bucket/signing, founder role authorization, durable audit trail and authenticated A/B isolation are not implemented. Do not re-enable data APIs based on the auth session alone.
+- Phase 0 remains **OPEN** (API lockfile / reproducible API `npm ci`); Phase 1 remains **OPEN / BLOCKED** (verified backup, isolated restore and rehearsal). No migrations applied. Phase A.4 remains **OPEN** until auth, ownership, storage and isolation are verified.
