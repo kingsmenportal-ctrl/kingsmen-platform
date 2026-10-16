@@ -15,7 +15,6 @@ security definer
 set search_path = ''
 as $$
 declare
-  v_candidate_ids uuid[];
   v_candidate_id uuid;
   v_document_id uuid;
   v_document_ref text;
@@ -46,14 +45,10 @@ begin
     raise exception 'INVALID_CANDIDATE_DOCUMENT_UPLOAD' using errcode = '22023';
   end if;
 
-  select array_agg(c.id) into v_candidate_ids
-  from public.candidates c
-  where c.owner_user_id = auth.uid();
-
-  if coalesce(cardinality(v_candidate_ids),0) <> 1 then
-    raise exception 'CANDIDATE_RECORD_NOT_UNIQUE' using errcode = '23514';
+  v_candidate_id := kingsmen_security.current_authenticated_candidate_id();
+  if v_candidate_id is null then
+    raise exception 'CANDIDATE_RECORD_NOT_FOUND' using errcode = 'P0002';
   end if;
-  v_candidate_id := v_candidate_ids[1];
   v_object_name := p_storage_path;
 
   if not exists (
