@@ -27,6 +27,14 @@ function getPool(): Pool {
   return sharedPool;
 }
 
+export async function closePayFastItnPool(): Promise<void> {
+  if (!sharedPool) return;
+  const pool = sharedPool;
+  sharedPool = undefined;
+  // Pool implementations expose end() for graceful process shutdown.
+  await (pool as Pool & { end?: () => Promise<void> }).end?.();
+}
+
 function send(response: ServerResponse, status: number, body: string): void {
   response.statusCode = status;
   response.setHeader("content-type", "text/plain; charset=utf-8");
