@@ -34,7 +34,7 @@ test("candidate data requests use anon key plus candidate access token, never se
 test("auth lookup rejects malformed tokens and disables caching", () => {
   assert.match(auth, /token\.length > 8_192/);
   assert.match(auth, /!\/\^\[A-Za-z0-9\._~-\]\+\$\/\.test\(token\)/);
-  assert.match(auth, /cache: "no-store"/);
+  assert.match(auth, /cache\s*:\s*"no-store"/);
   assert.match(auth, /AbortSignal\.timeout\(AUTH_LOOKUP_TIMEOUT_MS\)/);
 });
 
