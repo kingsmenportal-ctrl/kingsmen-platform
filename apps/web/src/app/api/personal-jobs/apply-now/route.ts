@@ -1245,10 +1245,51 @@ export async function POST(request: Request) {
         history: [{ eventId: "support-event-" + Date.now(), eventType: "REQUEST_CREATED", summary: "Candidate created this request. No operator assignment or notification is implied.", fromStatus: "NEW", toStatus: "OPEN", createdAt: now }],
         createdAt: now, updatedAt: now
       };
+      // In authenticated environments, write to the canonical ticket table before
+      // reporting success so the founder operations queue can actually see the request.
+      // Local-only development remains clearly labelled and is never presented as shared.
+      let canonicalTicket: { created: boolean; ticket_ref?: string } | null = null;
+      if (context) {
+        let ticketResponse: Response;
+        try {
+          ticketResponse = await fetch(new URL("/rest/v1/rpc/create_candidate_support_ticket", context.url), {
+            method: "POST",
+            headers: {
+              apikey: context.anonKey,
+              Authorization: `Bearer ${context.accessToken}`,
+              "Content-Type": "application/json",
+              Accept: "application/json",
+              "Cache-Control": "no-store"
+            },
+            body: JSON.stringify({
+              p_ticket_ref: requestId,
+              p_category: category,
+              p_priority: effectivePriority,
+              p_title: subject,
+              p_description: description,
+              p_evidence_ref: reference || null
+            }),
+            cache: "no-store",
+            signal: AbortSignal.timeout(8000)
+          });
+        } catch {
+          return privateJson({ status: "SUPPORT_STORAGE_UNAVAILABLE", error: "The shared support queue could not be reached. No success was reported; please retry." }, { status: 503 });
+        }
+        const ticketResult = await ticketResponse.json().catch(() => null) as { created?: boolean; ticket_ref?: string } | null;
+        if (!ticketResponse.ok || ticketResult?.created !== true || ticketResult.ticket_ref !== requestId) {
+          return privateJson({ status: "SUPPORT_STORAGE_UNAVAILABLE", error: "The shared support queue did not confirm the request. Confirm migration 0023 and the candidate record before retrying." }, { status: 503 });
+        }
+        canonicalTicket = ticketResult;
+      }
       store.supportRequests = [requestRecord, ...(store.supportRequests || [])].slice(0, 500);
       recordSupportPortalMessage(store, requestRecord, "REQUEST_CREATED", "Candidate support request recorded. No external notification was sent.", now);
       await persistStore(context, store);
-      return privateJson({ status: "SUPPORT_REQUEST_CREATED", request: requestRecord, store, emailNotificationReadiness: emailNotificationReadiness(), readiness: scoreReadiness(store) });
+      return privateJson({
+        status: "SUPPORT_REQUEST_CREATED", request: requestRecord, store,
+        canonicalQueue: canonicalTicket ? { status: "SYNCED", ticketRef: canonicalTicket.ticket_ref } : { status: "LOCAL_DEVELOPMENT_ONLY" },
+        notice: canonicalTicket ? "Request saved to your candidate workspace and canonical support queue. No external notification was sent." : "Local development record only; it is not visible in the shared staff queue.",
+        emailNotificationReadiness: emailNotificationReadiness(), readiness: scoreReadiness(store)
+      });
     }
 
     if (action === "updateSupportRequest") {
