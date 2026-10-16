@@ -7,6 +7,7 @@ const root = path.resolve(__dirname, "../../..");
 const route = fs.readFileSync(path.join(root, "apps/web/src/app/api/personal-jobs/apply-now/route.ts"), "utf8");
 const page = fs.readFileSync(path.join(root, "apps/web/src/app/candidate/support/page.tsx"), "utf8");
 const dashboard = fs.readFileSync(path.join(root, "apps/web/src/app/candidate/dashboard/page.tsx"), "utf8");
+const supportMigration = fs.readFileSync(path.join(root, "db/migrations/0023_support_operations_audit.sql"), "utf8");
 
 test("support requests capture bounded blocker context and retain a candidate-visible timeline", () => {
   assert.match(route, /action === "createSupportRequest"/);
@@ -43,4 +44,8 @@ test("authenticated candidate support intake is confirmed by canonical shared qu
   assert.match(route, /SUPPORT_STORAGE_UNAVAILABLE/);
   assert.match(route, /LOCAL_DEVELOPMENT_ONLY/);
   assert.match(route, /No external notification was sent/);
+  assert.match(supportMigration, /FUNCTION public\.create_candidate_support_ticket/);
+  assert.match(supportMigration, /SECURITY DEFINER/);
+  assert.match(supportMigration, /c\.owner_user_id = auth\.uid\(\)/);
+  assert.match(supportMigration, /GRANT EXECUTE ON FUNCTION public\.create_candidate_support_ticket.*TO authenticated/);
 });
