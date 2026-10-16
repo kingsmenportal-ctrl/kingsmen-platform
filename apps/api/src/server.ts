@@ -592,13 +592,16 @@ export function createKingsmenApiServer() {
 
       const candidateId = getPathParam(/^\/api\/candidates\/([^/]+)\/status$/, pathname);
       if (method === "GET" && candidateId) {
-        await handleCandidateStatus(response, candidateId);
+        // These records can contain candidate-identifying information. The API
+        // currently has no verified caller-to-candidate authorization adapter,
+        // so do not expose records merely because an identifier is known.
+        sendError(response, 503, "CANDIDATE_AUTHORIZATION_NOT_CONFIGURED", "Candidate status is unavailable until authenticated ownership checks are configured.");
         return;
       }
 
       const applicationId = getPathParam(/^\/api\/applications\/([^/]+)\/workbench$/, pathname);
       if (method === "GET" && applicationId) {
-        await handleApplicationWorkbench(response, applicationId);
+        sendError(response, 503, "CANDIDATE_AUTHORIZATION_NOT_CONFIGURED", "Application workbench is unavailable until authenticated ownership checks are configured.");
         return;
       }
 
