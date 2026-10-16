@@ -21,6 +21,7 @@ import {
   type JarvisRuntimeServerStore
 } from "./jarvis/jarvis-runtime-server-adapter";
 import type { ApiJarvisRuntimeResult } from "./jarvis/jarvis-runtime-api";
+import { handlePayFastItn } from "./finance/payfast-itn-route";
 
 const MAX_BODY_BYTES = 1_000_000;
 const SERVICE_NAME = "kingsmen-api";
@@ -399,6 +400,7 @@ async function handleHealth(response: ServerResponse): Promise<void> {
     generatedAtIso: nowIso(),
     routes: [
       "GET /health",
+      "POST /api/finance/payfast/itn",
       "GET /api/system/health",
       "POST /api/commands",
       "POST /api/jarvis/runtime-control",
@@ -492,6 +494,16 @@ export function createKingsmenApiServer() {
 
       if (method === "GET" && (pathname === "/" || pathname === "/health" || pathname === "/api/system/health")) {
         await handleHealth(response);
+        return;
+      }
+
+      if (pathname === "/api/finance/payfast/itn") {
+        if (method !== "POST") {
+          response.setHeader("allow", "POST");
+          sendError(response, 405, "METHOD_NOT_ALLOWED", "Only POST is supported.");
+          return;
+        }
+        await handlePayFastItn(request, response);
         return;
       }
 
