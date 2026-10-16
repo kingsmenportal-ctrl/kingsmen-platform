@@ -22,6 +22,9 @@ const checks = [
   ["ITN idempotency uniqueness applies only to accepted receipts", /drop constraint if exists payfast_itn_receipts_idempotency_key_key/i.test(retryMigration) && /where accepted = true/i.test(retryMigration)] ,
   ["accepted callback retries are acknowledged before intent state checks", itnRoute.indexOf("if (prior.rows.length > 0)") >= 0 && itnRoute.indexOf("if (prior.rows.length > 0)") < itnRoute.indexOf("const intentResult = await client.query")],
   ["ITN_RECEIVED intent state remains retry-compatible", /\["CREATED", "REDIRECTED", "ITN_RECEIVED"\]\.includes\(intent\.intent_status\)/.test(itnRoute)],
+  ["accepted callback retry lookup precedes order eligibility checks", itnRoute.indexOf("if (prior.rows.length > 0)") >= 0 && itnRoute.indexOf("if (prior.rows.length > 0)") < itnRoute.indexOf("const orderResult = await client.query")],
+  ["intent update failure aborts the transaction", /if \(intentUpdate\.rowCount !== 1\) throw new Error\("PAYFAST_INTENT_STATE_CHANGED"\)/.test(itnRoute)],
+  ["evidence conflict aborts accepted callback transaction", /if \(evidenceInsert\.rowCount !== 1\) throw new Error\("PAYFAST_EVIDENCE_WRITE_CONFLICT"\)/.test(itnRoute)],
   ["server confirmation includes original ITN signature", /Object\.entries\(fields\)/.test(itnRoute) && !/key === ["']signature["']/.test(itnRoute)]
 ];
 const failed = checks.filter(([, passed]) => !passed);
