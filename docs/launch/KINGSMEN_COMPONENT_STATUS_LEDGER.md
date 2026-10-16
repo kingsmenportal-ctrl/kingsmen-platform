@@ -143,3 +143,12 @@ Phase A.2 and A.3 source work remains unverified: no successful web build or Pla
 **Verification status:** Source commits were accepted by GitHub. This connector has not run the web build or Playwright suite; no runtime result is claimed. Authenticated identity, durable candidate-scoped persistence, document metadata ownership, profile ownership, and true authenticated Candidate A/B isolation remain **not implemented / not verified**.
 
 **Foundation gates:** Phase 0 API lockfile remains **OPEN**. Phase 1 backup/isolated restore remains **OPEN — BLOCKED**. No database migrations were created or applied. Neither phase is closed. Do not enable candidate writes or introduce schema changes until the existing foundation and security gates permit them.
+
+
+### Phase A.4 follow-up — tracker client fail-closed UX (16 October 2026)
+
+- Updated `apps/web/src/app/personal-job-desk/application-tracker/ApplicationTrackerClient.tsx` in commit `a5c9c4c266ad9a791e51d66f5b81af11ff6aa80a`.
+- The client now recognises the API's `503 CANDIDATE_AUTHORIZATION_NOT_CONFIGURED` response, clears any in-memory tracker state, and displays an explicit unavailable/security-integration message. Other load failures also clear displayed tracker records.
+- The client no longer claims the disabled endpoint is actively reading the repository-local JSON workbench. Summary counters and application details render only when a successful API response supplies tracker data; when unavailable, the page does not present fabricated zero counts as candidate facts.
+- Status: **Fail-closed UI state implemented; runtime verification pending**. This does not establish server-side authentication or ownership. The route remains intentionally unavailable.
+- No migrations or database changes were made. Phase 0 remains **OPEN**; Phase 1 remains **OPEN / BLOCKED**. No web build or Playwright execution is evidenced by this source update.
