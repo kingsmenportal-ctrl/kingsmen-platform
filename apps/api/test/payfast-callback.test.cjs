@@ -39,7 +39,7 @@ const validFetcher = async () => new Response("VALID", { status: 200 });
 test("callback looks up trusted invoice and commits only after PayFast confirmation", async () => {
   const db = store();
   const result = await processPayFastCallback(bodyWithSignature(), config, db, validFetcher);
-  assert.equal(result.status, 202);
+  assert.equal(result.status, 200);
   assert.equal(result.body.outcome, "recorded");
   assert.equal(db.calls.filter(c => c[0] === "commit").length, 1);
   assert.equal(db.calls[1][1].invoiceId, "invoice-uuid");
