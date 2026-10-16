@@ -1,26 +1,20 @@
-export async function POST(request: Request) {
-  const body = await request.json();
+import { NextResponse } from "next/server";
 
-  if (!body?.candidateId || !body?.documentId) {
-    return Response.json(
-      {
-        ok: false,
-        productionReady: false,
-        error: "Missing candidateId or documentId"
-      },
-      { status: 400 }
-    );
-  }
+export const runtime = "nodejs";
+export const dynamic = "force-dynamic";
 
-  return Response.json({
-    ok: true,
-    productionReady: false,
-    boundary: "N05 signed read route shell",
-    candidateId: body.candidateId,
-    documentId: body.documentId,
-    rawPublicUrlAllowed: false,
-    serviceRoleVisibleToBrowser: false,
-    signedReadUrl: "SIGNER_RUNTIME_REQUIRED",
-    expiresInMinutes: 10
-  });
+/**
+ * Fail closed: a document ID supplied by a caller is not proof of ownership.
+ * No signed URL may be issued until identity and record ownership are verified.
+ */
+export async function POST() {
+  return NextResponse.json(
+    {
+      ok: false,
+      status: "BLOCKED",
+      code: "CANDIDATE_AUTHORIZATION_NOT_CONFIGURED",
+      error: "Document access is unavailable until authenticated ownership and private-storage signing are configured."
+    },
+    { status: 503, headers: { "Cache-Control": "no-store", Pragma: "no-cache" } }
+  );
 }
