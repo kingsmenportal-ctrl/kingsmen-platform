@@ -4,10 +4,13 @@ const fs = require("node:fs");
 const path = require("node:path");
 
 const migration = fs.readFileSync(path.resolve(__dirname, "../../../db/migrations/0022_candidate_document_application_linkage.sql"), "utf8");
+const identityMigration = fs.readFileSync(path.resolve(__dirname, "../../../db/migrations/0023_candidate_auth_private_storage.sql"), "utf8");
 
 test("application-pack document links require an authenticated candidate and unique owned candidate record", () => {
   assert.match(migration, /if auth\.uid\(\) is null then[\s\S]*CANDIDATE_AUTH_REQUIRED/);
-  assert.match(migration, /count\(\*\) from public\.candidates c where c\.owner_user_id = auth\.uid\(\)/);
+  assert.match(migration, /kingsmen_security\.current_authenticated_candidate_id\(\)/);
+  assert.match(identityMigration, /auth_user_id uuid UNIQUE REFERENCES auth\.users\(id\)/);
+  assert.match(identityMigration, /WHERE ca\.auth_user_id = auth\.uid\(\)/);
 });
 
 test("document links reject applications owned by another candidate", () => {
