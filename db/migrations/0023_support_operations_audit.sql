@@ -150,3 +150,54 @@ $$;
 
 REVOKE ALL ON FUNCTION public.update_support_ticket_as_operator(text,text,text,text,text,uuid,text,text) FROM PUBLIC;
 GRANT EXECUTE ON FUNCTION public.update_support_ticket_as_operator(text,text,text,text,text,uuid,text,text) TO authenticated;
+
+
+-- Candidate-originated support requests enter the same canonical queue used by
+-- founder operations. Candidate identity is derived from auth.uid(), never input.
+CREATE OR REPLACE FUNCTION public.create_candidate_support_ticket(
+  p_ticket_ref text,
+  p_category text,
+  p_priority text,
+  p_title text,
+  p_description text,
+  p_evidence_ref text DEFAULT NULL
+) RETURNS jsonb
+LANGUAGE plpgsql
+SECURITY INVOKER
+SET search_path = ''
+AS $$
+DECLARE
+  v_candidate_id uuid;
+  v_ticket public.candidate_support_tickets%ROWTYPE;
+BEGIN
+  IF auth.uid() IS NULL THEN RAISE EXCEPTION 'CANDIDATE_AUTH_REQUIRED' USING errcode='42501'; END IF;
+  IF char_length(coalesce(p_ticket_ref,'')) NOT BETWEEN 8 AND 160
+     OR char_length(coalesce(p_title,'')) NOT BETWEEN 4 AND 160
+     OR char_length(coalesce(p_description,'')) NOT BETWEEN 10 AND 3000
+     OR p_category NOT IN ('GENERAL','APPLICATION','DOCUMENTS','FINANCE','URGENT_BLOCKER','DISPUTE')
+     OR p_priority NOT IN ('NORMAL','HIGH','URGENT') THEN
+    RAISE EXCEPTION 'SUPPORT_TICKET_INPUT_INVALID' USING errcode='22023';
+  END IF;
+
+  SELECT c.id INTO v_candidate_id
+    FROM public.candidates c WHERE c.owner_user_id = auth.uid();
+  IF v_candidate_id IS NULL THEN
+    RAISE EXCEPTION 'CANDIDATE_RECORD_NOT_FOUND' USING errcode='P0002';
+  END IF;
+
+  INSERT INTO public.candidate_support_tickets
+    (ticket_ref,candidate_id,category,priority,status,title,description,evidence_ref)
+  VALUES
+    (p_ticket_ref,v_candidate_id,p_category,p_priority,'OPEN',p_title,p_description,nullif(p_evidence_ref,''))
+  ON CONFLICT(ticket_ref) DO NOTHING;
+
+  SELECT * INTO v_ticket FROM public.candidate_support_tickets WHERE ticket_ref=p_ticket_ref;
+  IF v_ticket.id IS NULL OR v_ticket.candidate_id <> v_candidate_id THEN
+    RAISE EXCEPTION 'SUPPORT_TICKET_REFERENCE_CONFLICT' USING errcode='23505';
+  END IF;
+  RETURN jsonb_build_object('created',true,'ticket_ref',v_ticket.ticket_ref,'status',v_ticket.status);
+END;
+$$;
+
+REVOKE ALL ON FUNCTION public.create_candidate_support_ticket(text,text,text,text,text,text) FROM PUBLIC, anon;
+GRANT EXECUTE ON FUNCTION public.create_candidate_support_ticket(text,text,text,text,text,text) TO authenticated;
