@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
 import { isSameOriginRequest } from "@/lib/auth/csrf";
+import { readAuthJson } from "@/lib/auth/request-body";
 import { authUnavailable, setAuthCookies, supabaseAuth } from "@/lib/auth/supabase-rest";
 
 export const runtime = "nodejs";
@@ -9,10 +10,12 @@ export async function POST(request: Request) {
   if (!isSameOriginRequest(request)) {
     return NextResponse.json({ ok: false, error: "Cross-origin request rejected." }, { status: 403, headers: { "Cache-Control": "no-store" } });
   }
-  let body: unknown;
-  try { body = await request.json(); } catch {
-    return NextResponse.json({ ok: false, error: "Invalid request." }, { status: 400, headers: { "Cache-Control": "no-store" } });
+  const parsed = await readAuthJson(request);
+  if (!parsed.ok) {
+    const message = parsed.code === "JSON_REQUIRED" ? "Send a JSON request." : parsed.code === "REQUEST_TOO_LARGE" ? "Request is too large." : "Invalid request.";
+    return NextResponse.json({ ok: false, code: parsed.code, error: message }, { status: parsed.status, headers: { "Cache-Control": "no-store", Pragma: "no-cache" } });
   }
+  const body = parsed.value;
   const value = body && typeof body === "object" ? body as Record<string, unknown> : {};
   const email = typeof value.email === "string" ? value.email.trim().toLowerCase() : "";
   const password = typeof value.password === "string" ? value.password : "";
