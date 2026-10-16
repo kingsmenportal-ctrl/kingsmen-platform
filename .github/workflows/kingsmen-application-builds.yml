@@ -57,6 +57,8 @@ jobs:
       - name: Install API dependencies
         working-directory: apps/api
         run: npm install
+      - name: Validate PayFast source-IP security boundary
+        run: node scripts/validators/validate-payfast-source-boundary.mjs
       - name: Build and run API tests
         working-directory: apps/api
         run: npm run validate
