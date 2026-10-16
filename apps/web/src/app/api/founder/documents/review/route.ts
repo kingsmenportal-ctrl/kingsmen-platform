@@ -1,25 +1,20 @@
-export async function POST(request: Request) {
-  const body = await request.json();
+import { NextResponse } from "next/server";
 
-  if (!body?.documentId || !body?.candidateId || !body?.proofId || !body?.evidenceId || !body?.auditId) {
-    return Response.json(
-      {
-        ok: false,
-        productionReady: false,
-        error: "Document review requires documentId, candidateId, proofId, evidenceId, and auditId"
-      },
-      { status: 400 }
-    );
-  }
+export const runtime = "nodejs";
+export const dynamic = "force-dynamic";
 
-  return Response.json({
-    ok: true,
-    productionReady: false,
-    boundary: "N05 founder/operator document review route shell",
-    documentId: body.documentId,
-    candidateId: body.candidateId,
-    reviewRequiresProofEvidenceAudit: true,
-    candidateReviewAuthorityBlocked: true,
-    serviceRoleVisibleToBrowser: false
-  });
+/**
+ * Fail closed: request-body IDs and proof strings do not establish founder
+ * authority, candidate ownership, or a durable audit record.
+ */
+export async function POST() {
+  return NextResponse.json(
+    {
+      ok: false,
+      status: "BLOCKED",
+      code: "FOUNDER_AUTHORIZATION_NOT_CONFIGURED",
+      error: "Document review is unavailable until server-side founder authorization, candidate/document ownership checks, and durable audit evidence are configured."
+    },
+    { status: 503, headers: { "Cache-Control": "no-store", Pragma: "no-cache" } }
+  );
 }
