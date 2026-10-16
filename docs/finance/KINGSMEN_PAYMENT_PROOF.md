@@ -137,3 +137,8 @@ No successful CI run, staging execution, or PayFast sandbox transaction is asser
 Additional synthetic unit tests now assert rejection of non-COMPLETE payment statuses, payload tampering after signing, and missing source-IP allowlists. The CI boundary validator checks for the presence of these tests.
 
 These remain source-level tests. No claim is made that the API test suite or CI has passed. The current callback intentionally records notification/evidence and does not mark orders paid or activate entitlements. Accounting reconciliation, full database integration tests, staging migration verification, and an actual sandbox payment remain release blockers.
+## Retry-safe callback idempotency update (2026-10-16)
+
+Migration `0037_n11_payfast_retryable_rejected_itn.sql` scopes receipt uniqueness for provider payment IDs and idempotency keys to accepted receipts. The callback duplicate lookup likewise ignores rejected receipts. This avoids a failed transient provider confirmation or an invalid notification permanently consuming the provider payment ID/idempotency key and blocking a later valid retry.
+
+The migration is committed but has not been applied to staging. Before application, confirm the deployed schema matches the migration assumptions and complete the required backup, isolated restore, and migration rehearsal. No sandbox transaction or runtime test is claimed by this source change.
