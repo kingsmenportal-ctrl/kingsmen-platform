@@ -1,8 +1,11 @@
 import type { Metadata } from "next";
 
 export const metadata: Metadata = {
-  title: "Kingsmen Portal",
-  description: "Kingsmen Free Destiny Map local runtime shell"
+  title: {
+    default: "Kingsmen | Your Next Step, Clearly",
+    template: "%s | Kingsmen"
+  },
+  description: "Explore study, training, work and funding-readiness pathways with the free Kingsmen Destiny Map. Practical guidance, no outcome guarantees."
 };
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
