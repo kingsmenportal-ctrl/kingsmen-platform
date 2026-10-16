@@ -20,6 +20,7 @@ const surfaces = [
   { title: "Build Proof Centre", detail: "Inspect proof references and validation boundaries.", href: "/founder/proof-centre/", state: "EVIDENCE INDEX" },
   { title: "Master Index", detail: "Review component inventory and documented status.", href: "/founder/master-index/", state: "COMPONENT INDEX" },
   { title: "Stop-selling operations", detail: "The control surface is documented; live enforcement is not asserted here.", href: "/founder/stop-selling/", state: "VERIFY BEFORE USE" },
+  { title: "Support Team Operations", detail: "Assign canonical support tickets, record status changes, and inspect the durable audit timeline.", href: "/founder/support/operations", state: "AUTHENTICATED OPERATIONS" },
 ];
 
 const boundaries = [
