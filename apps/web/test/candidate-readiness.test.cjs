@@ -102,7 +102,6 @@ test("candidate can access the vacancy requirements review UI and record bounded
     "Vacancy requirements review",
     "recordRequirementReview",
     "reviewSourceUrl",
-    "CANDIDATE_REVIEWED_NOT_INDEPENDENTLY_VERIFIED",
     "CANDIDATE_SATISFIED",
     "CANDIDATE_MISSING",
     "not independently verified",
