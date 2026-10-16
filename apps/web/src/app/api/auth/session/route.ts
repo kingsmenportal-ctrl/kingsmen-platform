@@ -1,10 +1,11 @@
 import { NextResponse } from "next/server";
-import { getVerifiedAuthUser } from "@/lib/auth/supabase-rest";
+import { authConfigured, authUnavailable, getVerifiedAuthUser } from "@/lib/auth/supabase-rest";
 
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
 
 export async function GET() {
+  if (!authConfigured()) return authUnavailable();
   try {
     const user = await getVerifiedAuthUser();
     if (!user) return NextResponse.json({ ok: true, authenticated: false }, { headers: { "Cache-Control": "no-store" } });
