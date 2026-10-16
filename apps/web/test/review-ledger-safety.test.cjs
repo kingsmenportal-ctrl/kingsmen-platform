@@ -59,3 +59,15 @@ test("follow-up and response history fields have bounded input sizes", () => {
   assert.match(api, /responseHistory: 3000/);
   assert.match(api, /followUpDate: 10/);
 });
+
+
+test("follow-up UI prepares a manual draft, records an explicit attempt, and exports a bounded task queue", () => {
+  const ui = fs.readFileSync(path.resolve(__dirname, "../src/app/personal-job-desk/review-ledger/ReviewLedgerClient.tsx"), "utf8");
+  assert.match(ui, /Prepare follow-up draft/);
+  assert.match(ui, /Record follow-up attempt/);
+  assert.match(ui, /follow-up attempt recorded by user/);
+  assert.match(ui, /kingsmen-follow-up-queue\\.csv/);
+  assert.match(ui, /Prevent spreadsheet formula injection/);
+  assert.match(ui, /nothing was sent/);
+  assert.match(ui, /Save the ledger record to persist/);
+});
