@@ -20,6 +20,8 @@ const checks = [
   ["amount reconciliation has malformed and inconsistent value tests", /internally inconsistent gross, fee, and net/.test(amountTests) && /malformed, over-precision, and unsafe values/.test(amountTests)],
   ["rejected ITNs do not consume provider payment IDs", /where accepted = true and provider_payment_id is not null/i.test(retryMigration) && /where accepted = true and \(provider_payment_id = \$1 or idempotency_key = \$2\)/i.test(itnRoute)],
   ["ITN idempotency uniqueness applies only to accepted receipts", /drop constraint if exists payfast_itn_receipts_idempotency_key_key/i.test(retryMigration) && /where accepted = true/i.test(retryMigration)] ,
+  ["accepted callback retries are acknowledged before intent state checks", itnRoute.indexOf("if (prior.rows.length > 0)") >= 0 && itnRoute.indexOf("if (prior.rows.length > 0)") < itnRoute.indexOf("const intentResult = await client.query")],
+  ["ITN_RECEIVED intent state remains retry-compatible", /\["CREATED", "REDIRECTED", "ITN_RECEIVED"\]\.includes\(intent\.intent_status\)/.test(itnRoute)],
   ["server confirmation includes original ITN signature", /Object\.entries\(fields\)/.test(itnRoute) && !/key === ["']signature["']/.test(itnRoute)]
 ];
 const failed = checks.filter(([, passed]) => !passed);
