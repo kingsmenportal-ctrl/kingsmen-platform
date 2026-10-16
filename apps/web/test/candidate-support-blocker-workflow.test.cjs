@@ -36,3 +36,11 @@ test("support UI presents active queue, urgency triage, impact fields, and reque
   assert.match(page, /aria-label="Filter requests"/);
   assert.match(dashboard, /href: "\/candidate\/support"/);
 });
+
+test("authenticated candidate support intake is confirmed by canonical shared queue before success", () => {
+  assert.match(route, /create_candidate_support_ticket/);
+  assert.match(route, /canonicalQueue: canonicalTicket \? \{ status: "SYNCED"/);
+  assert.match(route, /SUPPORT_STORAGE_UNAVAILABLE/);
+  assert.match(route, /LOCAL_DEVELOPMENT_ONLY/);
+  assert.match(route, /No external notification was sent/);
+});
