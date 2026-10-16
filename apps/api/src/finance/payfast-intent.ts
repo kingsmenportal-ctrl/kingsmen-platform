@@ -78,7 +78,9 @@ export function createPayFastPaymentIntent(input: {
   const merchantReference = order.orderRef;
   const payload: PayFastFields = {
     merchant_id: runtime.merchantId,
-    merchant_key: runtime.merchantKey,
+    // merchant_key is a private account credential, not a browser form field.
+    // The signed form is authenticated by the signature/passphrase, never by
+    // disclosing the merchant key to the payer.
     return_url: runtime.returnUrl,
     cancel_url: runtime.cancelUrl,
     notify_url: runtime.notifyUrl,
