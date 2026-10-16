@@ -33,8 +33,8 @@ test("finance ledger records entries without charging or independently verifying
   const end = route.indexOf('if (action === "addContactLog")', start);
   assert.ok(start >= 0 && end > start, "finance entry action block must exist");
   const financeBlock = route.slice(start, end);
-  assert.match(financeBlock, /validateFinanceEntryInput\\(/);
+  assert.match(financeBlock, /validateFinanceEntryInput\(/);
   assert.match(financeBlock, /FINANCE_ENTRY_CREATED/);
-  assert.doesNotMatch(financeBlock, /fetch\\(|payfast|stripe|payment provider|charge money/i);
-  assert.match(route, /validateFinanceStatusUpdate\\(/);
+  assert.doesNotMatch(financeBlock, /fetch\(|payfast|stripe|payment provider|charge money/i);
+  assert.match(route, /validateFinanceStatusUpdate\(/);
 });
