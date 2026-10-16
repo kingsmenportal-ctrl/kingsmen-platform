@@ -679,7 +679,7 @@ export async function POST(request: Request) {
       let profilePatch: CandidateProfile;
       try { profilePatch = validateProfilePatch(body.profile); }
       catch (error) {
-        return privateJson({ status: "FAILED", error: error instanceof Error ? error.message : "Invalid profile." }, { status: 400 });
+        return privateJson({ status: "FAILED", error: "Profile data is invalid." }, { status: 400 });
       }
       store.profile = { ...store.profile, ...profilePatch };
 
@@ -705,7 +705,7 @@ export async function POST(request: Request) {
       let fieldPatch: CandidateProfile;
       try { fieldPatch = validateProfilePatch(requestedFields); }
       catch (error) {
-        return privateJson({ status: "FAILED", error: error instanceof Error ? error.message : "Invalid extracted fields." }, { status: 400 });
+        return privateJson({ status: "FAILED", error: "The reviewed profile fields are invalid." }, { status: 400 });
       }
       const sourceFields = extraction.extracted && typeof extraction.extracted === "object" ? extraction.extracted as CandidateProfile : {};
       const selectedKeys = Object.keys(fieldPatch) as Array<keyof CandidateProfile>;
@@ -758,7 +758,7 @@ export async function POST(request: Request) {
       try {
         decoded = decodeDataUrl(dataUrl);
       } catch (error) {
-        return privateJson({ status: "FAILED", error: error instanceof Error ? error.message : "Invalid file upload." }, { status: 413 });
+        return privateJson({ status: "FAILED", error: "The document upload is invalid or exceeds the allowed size." }, { status: 413 });
       }
       if (!allowedMimes.has(decoded.mimeType)) {
         return privateJson({ status: "FAILED", error: "File extension and content type do not match." }, { status: 415 });
@@ -766,7 +766,7 @@ export async function POST(request: Request) {
       try {
         validateDocumentSignature(fileName, decoded.mimeType, decoded.buffer);
       } catch (error) {
-        return privateJson({ status: "FAILED", error: error instanceof Error ? error.message : "Invalid document content." }, { status: 415 });
+        return privateJson({ status: "FAILED", error: "The document content is not supported." }, { status: 415 });
       }
 
       const safeName = fileName.replace(/[^a-zA-Z0-9._-]/g, "_");
