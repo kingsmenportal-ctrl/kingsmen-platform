@@ -27,6 +27,7 @@ test("document storage rejects non-UUID owner identifiers before constructing a 
 
 test("document storage rejects unsupported MIME types and invalid sizes", () => {
   assert.throws(() => prepareDocumentStorage({ ...validInput, mimeType: "text/html" }), /Unsupported document MIME type/);
+  assert.throws(() => prepareDocumentStorage({ ...validInput, documentType: "../public" as never }), /Unsupported document type/);
   assert.throws(() => prepareDocumentStorage({ ...validInput, fileSizeBytes: 0 }), /fileSizeBytes is outside/);
   assert.throws(() => prepareDocumentStorage({ ...validInput, fileSizeBytes: 15 * 1024 * 1024 + 1 }), /fileSizeBytes is outside/);
   assert.throws(() => prepareDocumentStorage({ ...validInput, fileSizeBytes: 1.5 }), /fileSizeBytes is outside/);
