@@ -1277,6 +1277,49 @@ export async function POST(request: Request) {
       return privateJson({ status: requestedAction === "REOPEN" ? "SUPPORT_REQUEST_REOPENED" : "SUPPORT_UPDATE_RECORDED", request: updated, store, emailNotificationReadiness: emailNotificationReadiness(), readiness: scoreReadiness(store) });
     }
 
+    if (action === "prepareSupportEmailDraft") {
+      const requestId = typeof body.requestId === "string" ? body.requestId.trim() : "";
+      const request = (store.supportRequests || []).find((item) => item.requestId === requestId);
+      if (!request) return privateJson({ status: "FAILED", error: "Support request was not found in this candidate workspace." }, { status: 404 });
+      const now = new Date().toISOString();
+      const latestEvent = (Array.isArray(request.history) ? request.history : []).slice(-1)[0];
+      const draftBody = [
+        "Hello Kingsmen Support,",
+        "",
+        "I am following up on my support request.",
+        `Request reference: ${request.requestId}`,
+        `Category: ${request.category}`,
+        `Priority: ${request.priority}`,
+        `Status in my portal: ${request.status}`,
+        request.affectedWorkflow ? `Affected workflow: ${request.affectedWorkflow}` : "",
+        request.deadlineDate ? `Deadline at risk: ${request.deadlineDate}` : "",
+        request.blockerImpact ? `Impact: ${request.blockerImpact}` : "",
+        "",
+        "Request description:",
+        request.description,
+        "",
+        "Latest update:",
+        latestEvent?.summary || "No additional update.",
+        "",
+        "Please confirm receipt and advise on next steps.",
+        "",
+        "Regards"
+      ].filter(Boolean).join("\\n");
+      const emailDraft: MessageRecord = {
+        messageId: "message-" + Date.now() + "-" + Math.random().toString(16).slice(2),
+        channel: "EMAIL", direction: "OUTBOUND", subject: `Kingsmen support: ${request.subject}`,
+        body: draftBody, status: "DRAFT", deliveryState: "EMAIL_DRAFT_READY",
+        supportRequestId: request.requestId, createdAt: now
+      };
+      store.messageLedger = [emailDraft, ...(store.messageLedger || [])].slice(0, 1000);
+      await persistStore(context, store);
+      return privateJson({
+        status: "SUPPORT_EMAIL_DRAFT_PREPARED", message: emailDraft,
+        emailNotificationReadiness: emailNotificationReadiness(),
+        notice: "Draft saved in the candidate message ledger only. No email provider was called and nothing was sent."
+      });
+    }
+
     if (action === "recordMessage") {
       const subject = typeof body.subject === "string" ? body.subject.trim() : "";
       const messageBody = typeof body.body === "string" ? body.body.trim() : "";
