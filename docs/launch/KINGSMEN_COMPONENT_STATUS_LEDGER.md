@@ -227,3 +227,11 @@ Foundation constraints remain unchanged: Phase 0 is **OPEN**, Phase 1 is **OPEN 
 - Follow-up commit `7889cea965694afef065f69bc61c10108f99952f` adds candidate-auth HTTP regression cases for a missing Origin header, repeated failed login rate limiting (10 attempts per 15-minute window per hashed remote-address/email key), and the session endpoint method/cache policy.
 - The follow-up commit's workflow result is pending/not yet available at the time of this note. Do not treat these new tests as passed until CI reports a successful run on that exact commit.
 - The API lockfile gap remains open: `apps/api/package-lock.json` is absent; a valid generated lockfile has not been produced. Do not hand-author a lockfile or mark deterministic API installation as complete.
+
+
+## Follow-up component regression coverage — 2026-10-16
+
+- Candidate credential repository tests now cover database failure rollback/release, rejection of malformed input before database acquisition, and malformed stored password hashes failing closed. Commit: `b3f6558d0fa3dedebd5f0abfcf7674c9f5534a8e`.
+- Document storage tests now cover path-separator/unsafe filename sanitization and exact maximum-size boundary handling. Commit: `0884c0c898165e282dc45eba5301238f99a1619e`.
+- Candidate mobile notification preference tests now cover email-disabled portal fallback, explicit SMS backup opt-in, and routine-message restrictions. Commit: `3354a8212f654410155074db925b3b0d97a6c39b`.
+- CI workflow evidence for these follow-up commits has not yet been returned by GitHub at the time of this note. These are committed tests, not claimed passing tests. Document storage metadata tests do not establish a real private storage provider or signed URL implementation; notification policy tests do not establish message delivery.
