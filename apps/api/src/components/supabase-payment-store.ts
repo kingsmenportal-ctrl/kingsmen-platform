@@ -67,9 +67,9 @@ export class SupabasePaymentCallbackStore implements PaymentCallbackStore {
     if (!Array.isArray(rows) || rows.length === 0) return null;
     if (rows.length !== 1) throw new Error("PAYMENT_DATABASE_AMBIGUOUS_REFERENCE");
     const row = rows[0];
-    if (!Number.isSafeInteger(row.amount_cents) || row.amount_cents < 0 ||
-        !["ZAR"].includes(row.currency) ||
-        !["issued", "partially_paid", "paid", "cancelled", "void", "draft"].includes(row.invoice_status)) {
+    if (!Number.isSafeInteger(row.amount_cents) || row.amount_cents <= 0 ||
+        row.currency !== "ZAR" ||
+        !["issued", "paid", "void", "draft"].includes(row.invoice_status)) {
       throw new Error("PAYMENT_DATABASE_INVALID_INVOICE");
     }
     return {
