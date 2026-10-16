@@ -53,7 +53,7 @@ type ContactLogEntry = {
 type FinanceLedgerEntry = { entryId: string; type: "FEE" | "PAYMENT" | "REFUND" | "ADJUSTMENT"; direction: "IN" | "OUT"; status: "RECORDED" | "PENDING" | "CONFIRMED" | "FAILED" | "CANCELLED"; amountCents: number; currency: "ZAR"; description: string; reference?: string; evidenceNote?: string; opportunityId?: string; occurredOn: string; createdAt: string;
 };
 
-type SupportRequest = { requestId: string; subject: string; category: "GENERAL" | "APPLICATION" | "DOCUMENTS" | "FINANCE" | "URGENT_BLOCKER" | "DISPUTE"; priority: "NORMAL" | "HIGH" | "URGENT"; status: "OPEN" | "IN_REVIEW" | "WAITING_FOR_CANDIDATE" | "RESOLVED" | "CLOSED"; description: string; reference?: string; createdAt: string; updatedAt: string; };
+type SupportRequest = { requestId: string; subject: string; category: "GENERAL" | "APPLICATION" | "DOCUMENTS" | "FINANCE" | "URGENT_BLOCKER" | "DISPUTE"; priority: "NORMAL" | "HIGH" | "URGENT"; status: "OPEN" | "IN_REVIEW" | "WAITING_FOR_CANDIDATE" | "RESOLVED" | "CLOSED"; description: string; reference?: string; affectedWorkflow?: string; deadlineDate?: string; blockerImpact?: string; owner?: "CANDIDATE" | "KINGSMEN_SUPPORT_UNASSIGNED"; history?: Array<{eventId:string;eventType:"REQUEST_CREATED"|"CANDIDATE_UPDATE"|"CANDIDATE_REOPENED";summary:string;fromStatus?:string;toStatus?:string;createdAt:string}>; createdAt: string; updatedAt: string; };
 type MessageRecord = { messageId: string; channel: "EMAIL" | "PORTAL" | "WHATSAPP" | "SMS" | "PHONE"; direction: "INBOUND" | "OUTBOUND"; subject: string; body: string; status: "DRAFT" | "RECORDED" | "SENT" | "DELIVERED" | "FAILED"; reference?: string; createdAt: string; };
 
 type Store = {
@@ -1199,16 +1199,57 @@ export async function POST(request: Request) {
       const category = String(body.category || "GENERAL").toUpperCase();
       const priority = String(body.priority || "NORMAL").toUpperCase();
       const reference = typeof body.reference === "string" ? body.reference.trim() : "";
+      const affectedWorkflow = typeof body.affectedWorkflow === "string" ? body.affectedWorkflow.trim() : "";
+      const deadlineDate = typeof body.deadlineDate === "string" ? body.deadlineDate.trim() : "";
+      const blockerImpact = typeof body.blockerImpact === "string" ? body.blockerImpact.trim() : "";
+      const validDate = (value: string) => !value || (/^\\d{4}-\\d{2}-\\d{2}$/.test(value) && !Number.isNaN(Date.parse(value + "T00:00:00Z")) && new Date(value + "T00:00:00Z").toISOString().slice(0, 10) === value);
       if (subject.length < 4 || subject.length > 160) return privateJson({ status: "FAILED", error: "Subject must be between 4 and 160 characters." }, { status: 400 });
       if (description.length < 10 || description.length > 3000) return privateJson({ status: "FAILED", error: "Describe the issue in 10 to 3,000 characters." }, { status: 400 });
       if (!["GENERAL", "APPLICATION", "DOCUMENTS", "FINANCE", "URGENT_BLOCKER", "DISPUTE"].includes(category)) return privateJson({ status: "FAILED", error: "Choose a valid support category." }, { status: 400 });
       if (!["NORMAL", "HIGH", "URGENT"].includes(priority)) return privateJson({ status: "FAILED", error: "Choose a valid support priority." }, { status: 400 });
-      if (reference.length > 180) return privateJson({ status: "FAILED", error: "Reference must be 180 characters or fewer." }, { status: 400 });
+      if (reference.length > 180 || affectedWorkflow.length > 120 || blockerImpact.length > 1200) return privateJson({ status: "FAILED", error: "Reference, affected workflow or impact details exceed the allowed limit." }, { status: 400 });
+      if (!validDate(deadlineDate)) return privateJson({ status: "FAILED", error: "Enter a valid blocker deadline." }, { status: 400 });
+      const urgentBlocker = category === "URGENT_BLOCKER" || priority === "URGENT" || Boolean(deadlineDate);
+      const effectivePriority = urgentBlocker && priority === "NORMAL" ? "HIGH" : priority;
       const now = new Date().toISOString();
-      const requestRecord: SupportRequest = { requestId: "support-" + Date.now() + "-" + Math.random().toString(16).slice(2), subject, description, category: category as SupportRequest["category"], priority: priority as SupportRequest["priority"], status: "OPEN", ...(reference ? { reference } : {}), createdAt: now, updatedAt: now };
-      store.supportRequests = [requestRecord, ...(store.supportRequests || [])];
+      const requestId = "support-" + Date.now() + "-" + Math.random().toString(16).slice(2);
+      const requestRecord: SupportRequest = {
+        requestId, subject, description, category: category as SupportRequest["category"],
+        priority: effectivePriority as SupportRequest["priority"], status: "OPEN",
+        ...(reference ? { reference } : {}), ...(affectedWorkflow ? { affectedWorkflow } : {}),
+        ...(deadlineDate ? { deadlineDate } : {}), ...(blockerImpact ? { blockerImpact } : {}),
+        owner: "KINGSMEN_SUPPORT_UNASSIGNED",
+        history: [{ eventId: "support-event-" + Date.now(), eventType: "REQUEST_CREATED", summary: "Candidate created this request. No operator assignment or notification is implied.", fromStatus: "NEW", toStatus: "OPEN", createdAt: now }],
+        createdAt: now, updatedAt: now
+      };
+      store.supportRequests = [requestRecord, ...(store.supportRequests || [])].slice(0, 500);
       await persistStore(context, store);
       return privateJson({ status: "SUPPORT_REQUEST_CREATED", request: requestRecord, store, readiness: scoreReadiness(store) });
+    }
+
+    if (action === "updateSupportRequest") {
+      const requestId = typeof body.requestId === "string" ? body.requestId.trim() : "";
+      const updateText = typeof body.updateText === "string" ? body.updateText.trim() : "";
+      const requestedAction = String(body.requestAction || "ADD_UPDATE").toUpperCase();
+      const existing = (store.supportRequests || []).find((item) => item.requestId === requestId);
+      if (!existing) return privateJson({ status: "FAILED", error: "Support request was not found in this candidate workspace." }, { status: 404 });
+      if (updateText.length < 4 || updateText.length > 2000) return privateJson({ status: "FAILED", error: "Update must be between 4 and 2,000 characters." }, { status: 400 });
+      if (!["ADD_UPDATE", "REOPEN", "CANDIDATE_CONFIRMS_RESOLVED"].includes(requestedAction)) return privateJson({ status: "FAILED", error: "Choose a valid candidate support action." }, { status: 400 });
+      if (requestedAction === "REOPEN" && !["RESOLVED", "CLOSED"].includes(existing.status)) return privateJson({ status: "FAILED", error: "Only a resolved or closed request can be reopened." }, { status: 409 });
+      if (requestedAction === "CANDIDATE_CONFIRMS_RESOLVED" && !["RESOLVED", "CLOSED"].includes(existing.status)) return privateJson({ status: "FAILED", error: "Only an operator-resolved request can be confirmed resolved." }, { status: 409 });
+      const now = new Date().toISOString();
+      const nextStatus = requestedAction === "REOPEN" ? "OPEN" : existing.status;
+      const eventType = requestedAction === "REOPEN" ? "CANDIDATE_REOPENED" : "CANDIDATE_UPDATE";
+      const updated: SupportRequest = {
+        ...existing, status: nextStatus as SupportRequest["status"], updatedAt: now,
+        history: [...(Array.isArray(existing.history) ? existing.history : []), {
+          eventId: "support-event-" + Date.now() + "-" + Math.random().toString(16).slice(2),
+          eventType, summary: updateText, fromStatus: existing.status, toStatus: nextStatus, createdAt: now
+        }].slice(-100)
+      };
+      store.supportRequests = store.supportRequests.map((item) => item.requestId === requestId ? updated : item);
+      await persistStore(context, store);
+      return privateJson({ status: requestedAction === "REOPEN" ? "SUPPORT_REQUEST_REOPENED" : "SUPPORT_UPDATE_RECORDED", request: updated, store, readiness: scoreReadiness(store) });
     }
 
     if (action === "recordMessage") {
