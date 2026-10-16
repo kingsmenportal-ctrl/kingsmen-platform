@@ -80,7 +80,7 @@ If the owner does not authorize or configure these prerequisites, the safe deliv
 
 ## Build and test evidence
 
-- Source inspection completed through GitHub file contents API on the branch above. Added `apps/web/src/lib/auth/supabase-rest.ts`, six auth route handlers (login/register/recovery/refresh/logout/session), connected the three candidate auth UI pages, added `apps/web/.env.example`, and added `e2e/kingsmen-auth-boundary.spec.ts`.
+- Source inspection completed through GitHub file contents API on the branch above. Added the server auth helper, six auth route handlers, connected login/registration/recovery UI, added `apps/web/.env.example` and authored `e2e/kingsmen-auth-boundary.spec.ts`. Added `apps/web/src/lib/auth/supabase-rest.ts`, six auth route handlers (login/register/recovery/refresh/logout/session), connected the three candidate auth UI pages, added `apps/web/.env.example`, and added `e2e/kingsmen-auth-boundary.spec.ts`.
 - `apps/web/package.json` declares a `build` script (`next build`) but this audit did not execute it.
 - `e2e/candidate-security.spec.ts` exists and contains synthetic fail-closed regression cases; this audit did not execute Playwright.
 - No successful web build, browser run, authenticated Candidate A/B isolation test, storage test, or RLS test is claimed.
