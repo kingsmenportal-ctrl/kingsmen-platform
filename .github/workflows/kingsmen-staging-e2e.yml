@@ -12,6 +12,7 @@ on:
       - "playwright.config.ts"
       - "package.json"
       - "package-lock.json"
+      - "supabase/migrations/**"
       - ".github/workflows/kingsmen-staging-e2e.yml"
 
 permissions:
