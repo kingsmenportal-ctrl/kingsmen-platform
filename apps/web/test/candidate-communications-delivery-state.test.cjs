@@ -32,5 +32,5 @@ test("candidate communication log displays delivery state and links support queu
   assert.match(messages, /Linked support request/);
   assert.match(messages, /href="\/candidate\/support"/);
   assert.match(messages, /Saving here does not send an email/);
-  assert.match(support, /No email, SMS, WhatsApp or operator notification is sent|No email, SMS, WhatsApp or operator notification was sent/);
+  assert.match(support, /no email, SMS, WhatsApp or operator notification is sent|no email, SMS, WhatsApp or operator notification was sent/i);
 });
