@@ -71,3 +71,25 @@ test("API readiness excludes identity and submission proof as universal pre-appl
   assert.match(scorer, /url\.protocol === "https:"/);
   assert.match(scorer, /No submission or outcome verification/);
 });
+
+
+test("document self-review is explicitly candidate-reported and never claims verification", () => {
+  const route = fs.readFileSync(path.join(root, "apps/web/src/app/api/personal-jobs/apply-now/route.ts"), "utf8");
+  const documentsPage = fs.readFileSync(path.join(root, "apps/web/src/app/candidate/documents/page.tsx"), "utf8");
+  assert.match(route, /action === "recordDocumentReview"/);
+  assert.match(route, /CANDIDATE_SELF_REVIEW/);
+  assert.match(route, /does not verify authenticity, validity, ownership or employer acceptance/);
+  assert.match(documentsPage, /Content looks correct/);
+  assert.match(documentsPage, /Needs correction/);
+  assert.match(documentsPage, /Replace document/);
+  assert.match(documentsPage, /Independent verification: not performed/);
+});
+
+test("vacancy requirement review records source and explicit unverified status", () => {
+  const route = fs.readFileSync(path.join(root, "apps/web/src/app/api/personal-jobs/apply-now/route.ts"), "utf8");
+  assert.match(route, /action === "recordRequirementReview"/);
+  assert.match(route, /reviewStatus: "CANDIDATE_REVIEWED_NOT_INDEPENDENTLY_VERIFIED"/);
+  assert.match(route, /reviewSourceUrl/);
+  assert.match(route, /No universal ID or certificate requirement is assumed/);
+  assert.match(route, /The source, employer, requirements and candidate assessments have not been independently verified/);
+});
