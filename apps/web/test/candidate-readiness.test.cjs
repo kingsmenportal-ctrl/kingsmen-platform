@@ -93,3 +93,22 @@ test("vacancy requirement review records source and explicit unverified status",
   assert.match(route, /No universal ID or certificate requirement is assumed/);
   assert.match(route, /The source, employer, requirements and candidate assessments have not been independently verified/);
 });
+
+
+test("candidate can access the vacancy requirements review UI and record bounded, candidate-reported checklists", () => {
+  const page = fs.readFileSync(path.join(root, "apps/web/src/app/candidate/requirements/page.tsx"), "utf8");
+  const dashboard = fs.readFileSync(dashboardPath, "utf8");
+  for (const marker of [
+    "Vacancy requirements review",
+    "recordRequirementReview",
+    "reviewSourceUrl",
+    "CANDIDATE_REVIEWED_NOT_INDEPENDENTLY_VERIFIED",
+    "CANDIDATE_SATISFIED",
+    "CANDIDATE_MISSING",
+    "not independently verified",
+    "official vacancy source",
+    "Save requirement review",
+    "Add requirement",
+  ]) assert.ok(page.includes(marker), `requirements review UI missing ${marker}`);
+  assert.match(dashboard, /\/candidate\/requirements/);
+});
