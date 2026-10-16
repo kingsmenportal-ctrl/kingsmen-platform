@@ -59,6 +59,17 @@ export default function CandidateSupportPage() {
     if (saved) { setSubject(""); setDescription(""); setReference(""); setAffectedWorkflow(""); setDeadlineDate(""); setBlockerImpact(""); setCategory("GENERAL"); setPriority("NORMAL"); }
   }
 
+  async function prepareEmailDraft(item: Item) {
+    setBusy(true); setError(""); setNote("");
+    try {
+      const response = await fetch("/api/personal-jobs/apply-now", { method: "POST", credentials: "same-origin", cache: "no-store", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ action: "prepareSupportEmailDraft", requestId: item.requestId }) });
+      const data = await response.json();
+      if (!response.ok || !data.message) throw new Error(data.error || "Could not prepare email draft");
+      setNote("Email draft saved to your message ledger only. Nothing was sent. Open Messages to review or copy the draft.");
+    } catch (reason) { setError(reason instanceof Error ? reason.message : "Could not prepare email draft"); }
+    finally { setBusy(false); }
+  }
+
   async function updateRequest(item: Item, requestAction: string) {
     const updateText = (updates[item.requestId] || "").trim();
     if (updateText.length < 4) { setError("Add an update of at least four characters before saving."); return; }
@@ -110,11 +121,12 @@ export default function CandidateSupportPage() {
           <label>Add an update<textarea rows={3} minLength={4} maxLength={2000} value={updates[item.requestId] || ""} onChange={e=>setUpdates(current=>({...current,[item.requestId]:e.target.value}))} style={field} placeholder="What changed? Include evidence references, steps tried, or the latest blocker status."/></label>
           <div style={{ display: "flex", gap: 8, flexWrap: "wrap", marginTop: 10 }}>
             <button type="button" disabled={busy} onClick={()=>void updateRequest(item,"ADD_UPDATE")}>Add to history</button>
+            <button type="button" disabled={busy} onClick={()=>void prepareEmailDraft(item)}>Prepare email draft</button>
             {["RESOLVED","CLOSED"].includes(item.status) && <button type="button" disabled={busy} onClick={()=>void updateRequest(item,"REOPEN")}>Reopen request</button>}
           </div>
         </article>)}
       </section>
     </div>
-    <p style={{ marginTop: 24, padding: 14, borderRadius: 10, background: "#f1f5f9", color: "#53657a", lineHeight: 1.6 }}>Safety boundary: urgent or deadline-risk items are flagged in this workspace only. No email, SMS, WhatsApp or operator notification is sent. Assignment and resolution decisions must be recorded by an authorised support workflow; this candidate page cannot impersonate staff or mark a request resolved.</p>
+    <p style={{ marginTop: 24, padding: 14, borderRadius: 10, background: "#f1f5f9", color: "#53657a", lineHeight: 1.6 }}>Safety boundary: urgent or deadline-risk items are flagged in this workspace only. Email drafts can be prepared for review, but no email, SMS, WhatsApp or operator notification is sent. Assignment and resolution decisions must be recorded by an authorised support workflow; this candidate page cannot impersonate staff or mark a request resolved.</p>
   </main>;
 }
