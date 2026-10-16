@@ -210,3 +210,12 @@ Foundation constraints remain unchanged: Phase 0 is **OPEN**, Phase 1 is **OPEN 
 - **Status: auth scaffold implemented; provider configuration, build and runtime verification pending.** Configure `SUPABASE_URL` and `SUPABASE_PUBLISHABLE_KEY` in the deployment environment and confirm staging Auth URL/redirect/email settings before live tests.
 - Candidate profile, tracker and document APIs remain fail-closed or local-only. Provider-subject-to-candidate mapping, owner-scoped durable queries, private bucket/signing, founder role authorization, durable audit trail and authenticated A/B isolation are not implemented. Do not re-enable data APIs based on the auth session alone.
 - Phase 0 remains **OPEN** (API lockfile / reproducible API `npm ci`); Phase 1 remains **OPEN / BLOCKED** (verified backup, isolated restore and rehearsal). No migrations applied. Phase A.4 remains **OPEN** until auth, ownership, storage and isolation are verified.
+
+
+### Deployment configuration follow-up — staging auth wiring (16 October 2026)
+
+- Located the Netlify site `kingsmen-portal-staging` (site ID `fb27d0db-b116-4890-8f7f-14e654c27dbc`) and confirmed its non-production visitor controls require team SSO.
+- The Netlify environment-variable read returned an empty list. An attempt to write the Supabase URL and publishable key through the connected environment-variable action was blocked; no successful write response exists. **Do not treat staging auth configuration as complete.**
+- GitHub Actions lookup for the inspected auth-session commit `11913a0d376f15444c740d6f8ad9fc26a92b5ea4` returned no associated pull-request workflow runs. This does not prove no other workflows exist; it means there is no run evidence for that commit from this query.
+- **Next required action:** configure `SUPABASE_URL` and `SUPABASE_PUBLISHABLE_KEY` through an authorized Netlify SSO session or approved deployment workflow, verify Supabase Auth site/redirect/email settings, then trigger and retain a clean build and synthetic auth-contract test run. Do not paste secret values into the repository or chat.
+- No environment variable write, deployment, build, Playwright run, database migration, backup, or restore is claimed. Phase 0 and Phase 1 remain open.
