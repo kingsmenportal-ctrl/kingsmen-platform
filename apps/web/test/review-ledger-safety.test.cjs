@@ -41,7 +41,7 @@ test("employer outcomes cannot be recorded before submission proof is captured",
 test("follow-up and interview workflow exposes overdue, due-today, and upcoming-interview counts", () => {
   const api = fs.readFileSync(path.resolve(__dirname, "../src/app/api/personal-jobs/review-ledger/route.ts"), "utf8");
   const ui = fs.readFileSync(path.resolve(__dirname, "../src/app/personal-job-desk/review-ledger/ReviewLedgerClient.tsx"), "utf8");
-  const sync = fs.readFileSync(path.resolve(__dirname, "../../scripts/agents/personal-job-review-ledger.mjs"), "utf8");
+  const sync = fs.readFileSync(path.resolve(__dirname, "../../../scripts/agents/personal-job-review-ledger.mjs"), "utf8");
   assert.match(api, /followUpsOverdue/);
   assert.match(api, /followUpsDueToday/);
   assert.match(api, /interviewsScheduled/);
