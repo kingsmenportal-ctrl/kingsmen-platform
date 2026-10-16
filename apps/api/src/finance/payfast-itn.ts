@@ -7,6 +7,8 @@ export interface PayFastItnValidationInput {
   expectedMerchantReference: string;
   expectedAmountCents: number;
   passphrase?: string;
+  /** Must be true only after a durable ledger/idempotency lookup has completed. */
+  idempotencyCheckCompleted?: boolean;
   duplicate?: boolean;
   /** Direct socket peer address; do not pass an untrusted forwarded header. */
   remoteAddress?: string;
@@ -54,6 +56,7 @@ export function validatePayFastItn(input: PayFastItnValidationInput): PayFastItn
     && input.expectedAmountCents > 0
     && amountGrossCents === input.expectedAmountCents;
   const duplicate = input.duplicate === true;
+  const idempotencyCheckCompleted = input.idempotencyCheckCompleted === true;
   const ipValid = isAllowedPayFastSourceIp(input.remoteAddress, input.allowedSourceIps);
   const idempotencyKey = ["payfast-itn", merchantReference || "missing-reference", providerPaymentId ?? "missing-provider-id", paymentStatus ?? "unknown"].join(":");
 
@@ -68,6 +71,7 @@ export function validatePayFastItn(input: PayFastItnValidationInput): PayFastItn
   if (!signatureValid) return result(false, "Invalid PayFast signature.");
   if (!providerPaymentId) return result(false, "Missing PayFast provider payment ID.");
   if (!amountValid) return result(false, "PayFast amount mismatch or invalid expected amount.");
+  if (!idempotencyCheckCompleted) return result(false, "Durable ITN idempotency check has not been completed.");
   if (duplicate) return result(false, "Duplicate ITN receipt.");
   if (!ipValid) return result(false, "PayFast ITN IP/source not verified.");
   if (paymentStatus !== "COMPLETE") return result(false, "Payment status is not COMPLETE.");
