@@ -73,7 +73,7 @@ test("private document uploads reject non-UUID identities and unsafe object keys
 test("private storage uploads enforce extension and MIME compatibility and use bounded requests", () => {
   assert.match(storage, /Document type does not match an allowed private-storage type/);
   assert.match(storage, /signal: AbortSignal\.timeout\(20_000\)/);
-  assert.match(storage, /cache: "no-store"/);
+  assert.match(storage, /cache\s*:\s*"no-store"/);
 });
 
 
@@ -208,7 +208,7 @@ test("candidate storage workflow runs the regression suite with read-only reposi
 test("candidate dashboard loads the private workspace and presents live workspace modules", () => {
   const page = fs.readFileSync(path.resolve(__dirname, "../src/app/candidate/dashboard/page.tsx"), "utf8");
   assert.match(page, /fetch\("\/api\/personal-jobs\/apply-now"/);
-  assert.match(page, /cache: "no-store"/);
+  assert.match(page, /cache\s*:\s*"no-store"/);
   assert.match(page, /Readiness checklist/);
   assert.match(page, /Six opportunity gates/);
   assert.match(page, /Please sign in to view your private candidate workspace/);
@@ -229,7 +229,7 @@ test("candidate document vault uses bounded supported uploads and private docume
   assert.match(page, /action: "deleteDocument"/);
   assert.match(page, /\/api\/personal-jobs\/apply-now\/documents\//);
   assert.match(page, /credentials\s*:\s*"same-origin"/);
-  assert.match(page, /cache: "no-store"/);
+  assert.match(page, /cache\s*:\s*"no-store"/);
 });
 
 
@@ -239,7 +239,7 @@ test("candidate workbench connects opportunity stages, pack generation, proof an
     assert.match(page, new RegExp('mutate\\("' + action + '"'));
   }
   assert.match(page, /fetch\("\/api\/personal-jobs\/apply-now"/);
-  assert.match(page, /cache: "no-store"/);
+  assert.match(page, /cache\s*:\s*"no-store"/);
   assert.match(page, /credentials\s*:\s*"same-origin"/);
   assert.match(page, /Evidence notes are candidate-recorded and are not independently verified/);
   assert.match(page, /Application pack library/);
@@ -251,7 +251,7 @@ test("candidate workbench connects opportunity stages, pack generation, proof an
 test("candidate finance view reads the private ledger and never provides a candidate payment-confirmation control", () => {
   const page = fs.readFileSync(path.resolve(__dirname, "../src/app/candidate/finance/page.tsx"), "utf8");
   assert.match(page, /fetch\("\/api\/personal-jobs\/apply-now"/);
-  assert.match(page, /cache: "no-store"/);
+  assert.match(page, /cache\s*:\s*"no-store"/);
   assert.match(page, /data\.financeLedger/);
   assert.match(page, /Confirmed incoming payments/);
   assert.match(page, /Candidates cannot mark their own payments as confirmed/);
@@ -269,7 +269,7 @@ test("support requests are validated and persisted in the authenticated candidat
   assert.match(route, /await persistStore\(context, store\)/);
   const page = fs.readFileSync(path.resolve(__dirname, "../src/app/candidate/support/page.tsx"), "utf8");
   assert.match(page, /action: "createSupportRequest"/);
-  assert.match(page, /cache: "no-store"/);
+  assert.match(page, /cache\s*:\s*"no-store"/);
   assert.match(page, /credentials\s*:\s*"same-origin"/);
   assert.match(page, /urgent or deadline-risk items are flagged in this workspace only/i);
 });
@@ -283,7 +283,7 @@ test("message ledger records communications without claiming external delivery",
   assert.match(page, /action\s*:\s*"recordMessage"/);
   assert.match(page, /No external message was sent/);
   assert.match(page, /credentials\s*:\s*"same-origin"/);
-  assert.match(page, /cache: "no-store"/);
+  assert.match(page, /cache\s*:\s*"no-store"/);
 });
 
 test("founder command centre consolidates operational modules and exposes readiness without claiming live execution", () => {
@@ -292,7 +292,7 @@ test("founder command centre consolidates operational modules and exposes readin
     assert.ok(page.includes(href), `Founder command centre missing module link: ${href}`);
   }
   assert.match(page, /fetch\("\/api\/founder\/backend-readiness"/);
-  assert.match(page, /cache: "no-store"/);
+  assert.match(page, /cache\s*:\s*"no-store"/);
   assert.match(page, /not an authorization boundary/i);
   assert.match(page, /no live action is claimed/i);
   assert.match(page, /productionReady/);
