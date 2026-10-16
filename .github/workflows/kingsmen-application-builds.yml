@@ -61,6 +61,8 @@ jobs:
         run: node scripts/validators/validate-payfast-source-boundary.mjs
       - name: Validate finance database RLS boundary
         run: node scripts/validators/validate-finance-rls-boundary.mjs
+      - name: Validate API runtime security boundary
+        run: node scripts/validators/validate-api-runtime-boundary.mjs
       - name: Build and run API tests
         working-directory: apps/api
         run: npm run validate
