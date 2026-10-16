@@ -66,7 +66,7 @@ test("candidate responses are private and not cacheable", () => {
 
 
 test("private document uploads reject non-UUID identities and unsafe object keys before network access", () => {
-  assert.match(storage, /Authenticated candidate identity is invalid for private storage/);
+  assert.match(storage, /Authenticated candidate identity is invalid/);
   assert.match(storage, /objectKey === "\." \|\| objectKey === "\.\."/);
 });
 
@@ -182,7 +182,7 @@ test("document deletion converts private storage network failures to controlled 
   const start = route.indexOf('if (action === "deleteDocument")');
   const end = route.indexOf('if (action === "deleteOpportunity")', start);
   const block = route.slice(start, end);
-  assert.match(block, /let response: Response;\s*try \{[\s\S]*?response = await fetch\(endpoint,[\s\S]*?catch \{\s*return privateJson\(\{ status: "STORAGE_FAILED"/);
+  assert.match(block, /let response: Response;\s*try \{[\s\S]*?response = await fetch\(endpoint,[\s\S]*?catch \{\s*await recordCanonicalCleanup\(false\);\s*return privateJson\(\{\s*status: "STORAGE_FAILED"/);
   assert.match(block, /The document record was kept\./);
 });
 
@@ -280,7 +280,7 @@ test("message ledger records communications without claiming external delivery",
   assert.match(route, /store\.messageLedger = \[messageRecord/);
   assert.match(route, /messageBody\.length > 4000/);
   const page = fs.readFileSync(path.resolve(__dirname, "../src/app/candidate/messages/page.tsx"), "utf8");
-  assert.match(page, /action: "recordMessage"/);
+  assert.match(page, /action\s*:\s*"recordMessage"/);
   assert.match(page, /No external message was sent/);
   assert.match(page, /credentials: "same-origin"/);
   assert.match(page, /cache: "no-store"/);
@@ -293,7 +293,7 @@ test("founder command centre consolidates operational modules and exposes readin
   }
   assert.match(page, /fetch\("\/api\/founder\/backend-readiness"/);
   assert.match(page, /cache: "no-store"/);
-  assert.match(page, /no authorization boundary/i);
+  assert.match(page, /not an authorization boundary/i);
   assert.match(page, /no live action is claimed/i);
   assert.match(page, /productionReady/);
 });
