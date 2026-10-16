@@ -59,3 +59,27 @@ test("refund approval requires pending review, a human approval reference and ev
   assert.equal(approved.refundStatus, "APPROVED");
   assert.throws(() => approveRefund({ ...approved, approvalRef: "approval-again", evidenceRef: "evidence-synthetic" }), /pending review/);
 });
+
+test("payment intent rejects missing merchant configuration and unsafe callback credentials", () => {
+  const order = createFinanceOrder({ candidateRef: "candidate-synthetic", planCode: "CV_REVAMP_R49_99" });
+  assert.throws(() => createPayFastPaymentIntent({
+    order, runtime: { ...runtime, merchantId: " " }
+  }), /merchant credentials/);
+  assert.throws(() => createPayFastPaymentIntent({
+    order, runtime: { ...runtime, returnUrl: "https://user:secret@staging.example.test/return" }
+  }), /without embedded credentials/);
+  assert.throws(() => createPayFastPaymentIntent({
+    order, runtime: { ...runtime, cancelUrl: "not-a-url" }
+  }), /absolute HTTPS URL/);
+});
+
+test("free plans cannot create payment intents and live mode uses the live provider URL", () => {
+  const freeOrder = createFinanceOrder({ candidateRef: "candidate-synthetic", planCode: "FREE_DESTINY_MAP_R0" });
+  assert.throws(() => createPayFastPaymentIntent({ order: freeOrder, runtime }), /Free orders/);
+  const paidOrder = createFinanceOrder({ candidateRef: "candidate-synthetic", planCode: "CV_REVAMP_R49_99" });
+  const intent = createPayFastPaymentIntent({
+    order: paidOrder, runtime: { ...runtime, environment: "live" }
+  });
+  assert.equal(intent.paymentUrl, "https://www.payfast.co.za/eng/process");
+  assert.equal(intent.signedPayload.amount, "49.99");
+});
