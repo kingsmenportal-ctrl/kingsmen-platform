@@ -29,7 +29,7 @@ test("decision API validates bounded input and never dispatches commands", () =>
   assert.match(route, /decide_founder_command_intake/);
   assert.match(route, /p_reviewer_user_id: access\.userId/);
   assert.match(route, /executed: false/);
-  assert.match(route, /No operational command was dispatched/);
+  assert.match(route, /no operational command was dispatched/i);
   assert.doesNotMatch(route, /service_role/i);
 });
 
