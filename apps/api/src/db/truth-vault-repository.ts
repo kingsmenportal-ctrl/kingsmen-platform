@@ -279,7 +279,7 @@ export class TruthVaultRepository {
     this.assertEnabled();
     const result = await this.pool!.query<CandidateRow>(
       `select id::text, public_ref, email, display_name, current_state, active_package_code, updated_at::text
-       from candidates where public_ref = $1 or id::text = $1 limit 1`,
+       from candidates where public_ref = $1 limit 1`,
       [candidateRef]
     );
 
@@ -315,7 +315,7 @@ export class TruthVaultRepository {
          a.updated_at::text
        from applications a
        join candidates c on c.id = a.candidate_id
-       where a.id::text = $1 or a.metadata->>'applicationRef' = $1
+       where a.metadata->>'applicationRef' = $1
        limit 1`,
       [applicationRef]
     );
