@@ -28,7 +28,13 @@ test("finance records remain workspace-scoped and persistent", () => {
   assert.match(route, /financeLedger: Array\.isArray\(saved\.financeLedger\) \? saved\.financeLedger as FinanceLedgerEntry\[\] : \[\]/);
 });
 
-test("finance ledger does not process or independently verify payments", () => {
-  assert.match(route, /does not charge money/);
-  assert.match(route, /independently verify transactions/);
+test("finance ledger records entries without charging or independently verifying payments", () => {
+  const start = route.indexOf('if (action === "addFinanceEntry")');
+  const end = route.indexOf('if (action === "addContactLog")', start);
+  assert.ok(start >= 0 && end > start, "finance entry action block must exist");
+  const financeBlock = route.slice(start, end);
+  assert.match(financeBlock, /validateFinanceEntryInput\\(/);
+  assert.match(financeBlock, /FINANCE_ENTRY_CREATED/);
+  assert.doesNotMatch(financeBlock, /fetch\\(|payfast|stripe|payment provider|charge money/i);
+  assert.match(route, /validateFinanceStatusUpdate\\(/);
 });
