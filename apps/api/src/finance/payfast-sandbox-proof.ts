@@ -115,7 +115,9 @@ export function buildPayFastSandboxProofReport(): PayFastSandboxProofReport {
     expectedAmountCents,
     passphrase: sandboxPassphraseReference,
     duplicate: false,
-    ipValid: true
+    idempotencyCheckCompleted: true,
+    remoteAddress: "127.0.0.1",
+    allowedSourceIps: "127.0.0.1"
   });
 
   const failedPaymentPayload = buildSandboxPayload({ payment_status: "FAILED", pf_payment_id: "pf_sandbox_failed_001" });
@@ -125,7 +127,9 @@ export function buildPayFastSandboxProofReport(): PayFastSandboxProofReport {
     expectedAmountCents,
     passphrase: sandboxPassphraseReference,
     duplicate: false,
-    ipValid: true
+    idempotencyCheckCompleted: true,
+    remoteAddress: "127.0.0.1",
+    allowedSourceIps: "127.0.0.1"
   });
 
   const duplicate = validatePayFastItn({
@@ -134,7 +138,9 @@ export function buildPayFastSandboxProofReport(): PayFastSandboxProofReport {
     expectedAmountCents,
     passphrase: sandboxPassphraseReference,
     duplicate: true,
-    ipValid: true
+    idempotencyCheckCompleted: true,
+    remoteAddress: "127.0.0.1",
+    allowedSourceIps: "127.0.0.1"
   });
 
   const invalidSignature = validatePayFastItn({
@@ -143,7 +149,9 @@ export function buildPayFastSandboxProofReport(): PayFastSandboxProofReport {
     expectedAmountCents,
     passphrase: sandboxPassphraseReference,
     duplicate: false,
-    ipValid: true
+    idempotencyCheckCompleted: true,
+    remoteAddress: "127.0.0.1",
+    allowedSourceIps: "127.0.0.1"
   });
 
   const amountMismatch = validatePayFastItn({
@@ -152,7 +160,9 @@ export function buildPayFastSandboxProofReport(): PayFastSandboxProofReport {
     expectedAmountCents,
     passphrase: sandboxPassphraseReference,
     duplicate: false,
-    ipValid: true
+    idempotencyCheckCompleted: true,
+    remoteAddress: "127.0.0.1",
+    allowedSourceIps: "127.0.0.1"
   });
 
   const replayFirst = validatePayFastItn({
@@ -161,7 +171,9 @@ export function buildPayFastSandboxProofReport(): PayFastSandboxProofReport {
     expectedAmountCents,
     passphrase: sandboxPassphraseReference,
     duplicate: false,
-    ipValid: true
+    idempotencyCheckCompleted: true,
+    remoteAddress: "127.0.0.1",
+    allowedSourceIps: "127.0.0.1"
   });
 
   const replaySecond = validatePayFastItn({
@@ -170,7 +182,9 @@ export function buildPayFastSandboxProofReport(): PayFastSandboxProofReport {
     expectedAmountCents,
     passphrase: sandboxPassphraseReference,
     duplicate: true,
-    ipValid: true
+    idempotencyCheckCompleted: true,
+    remoteAddress: "127.0.0.1",
+    allowedSourceIps: "127.0.0.1"
   });
 
   const redacted = redactPayFastSecrets({ ...validPayload, passphrase: sandboxPassphraseReference });
