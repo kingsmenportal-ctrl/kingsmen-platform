@@ -87,6 +87,24 @@ export async function handleFounderComponentRoute(
       return true;
     }
 
+    if (method === "GET" && pathname === "/api/founder/finance/invoices") {
+      const invoices = await supabaseUserRequest<unknown[]>(token, "invoices?select=id,candidate_id,amount_cents,currency,status,idempotency_key,created_at,issued_at,paid_at&order=created_at.desc&limit=200");
+      sendComponentJson(response, 200, { ok: true, invoices });
+      return true;
+    }
+
+    if (method === "GET" && pathname === "/api/founder/finance/payments") {
+      const payments = await supabaseUserRequest<unknown[]>(token, "payments?select=id,invoice_id,provider,provider_payment_id,amount_cents,status,verified_at,created_at&order=created_at.desc&limit=200");
+      sendComponentJson(response, 200, { ok: true, payments });
+      return true;
+    }
+
+    if (method === "GET" && pathname === "/api/founder/finance/invoice-balances") {
+      const balances = await supabaseUserRequest<unknown[]>(token, "invoice_balance_check?select=invoice_id,amount_cents,line_total,difference_cents&order=invoice_id&limit=500");
+      sendComponentJson(response, 200, { ok: true, balances });
+      return true;
+    }
+
     if (method === "GET" && pathname === "/api/founder/reports") {
       const reports = await supabaseUserRequest<unknown[]>(token, "report_exports?select=id,report_type,status,created_at,completed_at&order=created_at.desc&limit=100");
       sendComponentJson(response, 200, { ok: true, reports });
