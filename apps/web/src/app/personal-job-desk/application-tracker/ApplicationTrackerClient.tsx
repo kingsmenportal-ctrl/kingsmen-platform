@@ -107,12 +107,23 @@ export default function ApplicationTrackerClient() {
     try {
       const response = await fetch("/api/personal-jobs/application-tracker", { method: "GET" });
       const json = await response.json();
-      if (!response.ok) throw new Error(json.error || "PJ24 load failed.");
+      if (!response.ok) {
+        setTracker(null);
+        setSelectedId("");
+        if (response.status === 503 && json.code === "CANDIDATE_AUTHORIZATION_NOT_CONFIGURED") {
+          setMessage("Tracker unavailable: authenticated candidate access and record ownership are not configured. No tracker records were loaded. Do not enter personal information here.");
+        } else {
+          setMessage("Tracker could not be loaded. No tracker records are available in this view.");
+        }
+        return;
+      }
       setTracker(json);
       setSelectedId(json.items?.[0]?.trackerId ?? "");
       setMessage(`PJ24 loaded ${json.trackerItemCount} tracker items.`);
-    } catch (error) {
-      setMessage(error instanceof Error ? error.message : "PJ24 load failed.");
+    } catch {
+      setTracker(null);
+      setSelectedId("");
+      setMessage("Tracker could not be reached. No tracker records are available in this view.");
     } finally {
       setLoading(false);
     }
@@ -170,13 +181,14 @@ export default function ApplicationTrackerClient() {
         <p style={muted}>
           Local application-workbench view. These records are not authenticated, candidate-owned records and must not be treated as a candidate's official application history.
         </p>
-        <aside role="note" style={{ ...subPanel, border: "1px solid #a67b35", marginTop: 16 }}><strong>Integration boundary — not production candidate data</strong><p style={muted}>This page reads a repository-local workbench JSON file. No candidate login, ownership filter, or per-candidate access check is visible in this route. Do not enter personal information or use this view to expose real candidate records until authenticated access and isolation tests are implemented.</p><p style={muted}>“Proof captured” means a proof reference is present in the local workbench data; it does not independently confirm an employer received or accepted an application. Outcome labels are records, not guarantees.</p></aside>
+        <aside role="note" style={{ ...subPanel, border: "1px solid #a67b35", marginTop: 16 }}><strong>Unavailable — security integration required</strong><p style={muted}>The legacy shared-file API has been disabled. This page does not currently have authenticated candidate identity, owner-scoped records, or a secure application data source. Do not enter personal information here.</p><p style={muted}>The interface is retained as a non-production shell only. Historic status/proof labels must not be interpreted as current application facts or employer confirmation.</p></aside>
         <button onClick={loadTracker} disabled={loading} style={button}>
           {loading ? "Working..." : "Refresh tracker"}
         </button>
-        {message ? <p style={{ color: "#ffd77a" }}>{message}</p> : null}
+        {message ? <p role="status" aria-live="polite" style={{ color: "#ffd77a" }}>{message}</p> : null}
       </section>
 
+      {tracker ? <>
       <section style={statsGrid}>
         <Stat label="Total" value={tracker?.summary?.totalItems ?? 0} />
         <Stat label="Review required" value={tracker?.summary?.reviewRequired ?? 0} />
@@ -282,6 +294,10 @@ export default function ApplicationTrackerClient() {
           )}
         </section>
       </section>
+      </> : <section role="status" aria-live="polite" style={{ ...panel, border: "1px solid #a67b35" }}>
+        <h2>Application records are unavailable</h2>
+        <p style={muted}>Candidate-specific application history will appear here only after authenticated identity, owner-scoped persistence, and isolation tests are implemented. No application count or status is being inferred.</p>
+      </section>}
     </main>
   );
 }
