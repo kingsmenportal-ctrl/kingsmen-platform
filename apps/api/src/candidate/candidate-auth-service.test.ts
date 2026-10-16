@@ -1,6 +1,6 @@
 import test from "node:test";
 import assert from "node:assert/strict";
-import { CandidateAuthService, clearCandidateSessionCookie, readCandidateSessionCookie, serializeCandidateSessionCookie } from "./candidate-auth-service";
+import { CANDIDATE_SESSION_COOKIE, CandidateAuthService, clearCandidateSessionCookie, readCandidateSessionCookie, serializeCandidateSessionCookie } from "./candidate-auth-service";
 import { hashSessionToken } from "./candidate-auth";
 import type { CandidateCredentialRepository } from "./candidate-credential-repository";
 import type { CandidateSessionRepository } from "./candidate-session-repository";
