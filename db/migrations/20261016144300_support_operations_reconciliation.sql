@@ -8,6 +8,10 @@ alter table public.candidate_support_tickets enable row level security;
 drop policy if exists service_role_all_candidate_support_tickets on public.candidate_support_tickets;
 drop policy if exists founder_support_ticket_select on public.candidate_support_tickets;
 drop policy if exists founder_support_ticket_update on public.candidate_support_tickets;
+drop policy if exists candidate_support_ticket_read_own on public.candidate_support_tickets;
+create policy candidate_support_ticket_read_own on public.candidate_support_tickets
+  for select to authenticated
+  using (candidate_id = kingsmen_security.current_authenticated_candidate_id());
 create policy founder_support_ticket_select on public.candidate_support_tickets
   for select to authenticated
   using (
