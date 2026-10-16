@@ -7,6 +7,7 @@ export interface PayFastItnValidationInput {
   expectedAmountCents: number;
   passphrase?: string;
   duplicate?: boolean;
+  /** Must be set only after server-side source-IP allow-list verification. */
   ipValid?: boolean;
 }
 
@@ -24,45 +25,46 @@ export interface PayFastItnValidationResult {
 }
 
 export function validatePayFastItn(input: PayFastItnValidationInput): PayFastItnValidationResult {
-  const payload = input.payload;
-  const merchantReference = String(payload.m_payment_id ?? "");
-  const providerPaymentId = payload.pf_payment_id ? String(payload.pf_payment_id) : undefined;
-  const paymentStatus = payload.payment_status ? String(payload.payment_status) : undefined;
-  const receivedSignature = String(payload.signature ?? "");
+  const payload = input.payload ?? {};
+  const merchantReference = String(payload.m_payment_id ?? "").trim();
+  const rawProviderPaymentId = String(payload.pf_payment_id ?? "").trim();
+  const providerPaymentId = rawProviderPaymentId || undefined;
+  const paymentStatus = String(payload.payment_status ?? "").trim().toUpperCase() || undefined;
+  const receivedSignature = String(payload.signature ?? "").trim();
   const signatureValid = receivedSignature
     ? verifyPayFastSignature(payload, receivedSignature, input.passphrase)
     : false;
 
-  const amountGrossCents = payload.amount_gross ? randToCents(String(payload.amount_gross)) : -1;
-  const amountValid = amountGrossCents === input.expectedAmountCents;
-  const duplicate = input.duplicate ?? false;
-  const ipValid = input.ipValid ?? false;
-
-  const idempotencyKey = ["payfast-itn", merchantReference, providerPaymentId ?? "no-provider-id", paymentStatus ?? "unknown"].join(":");
-
-  if (merchantReference !== input.expectedMerchantReference) {
-    return { accepted: false, merchantReference, providerPaymentId, paymentStatus, signatureValid, amountValid, duplicate, ipValid, rejectionReason: "Merchant reference mismatch.", idempotencyKey };
+  let amountGrossCents = -1;
+  try {
+    const rawAmount = payload.amount_gross;
+    if (rawAmount !== undefined && rawAmount !== null && String(rawAmount).trim() !== "") {
+      amountGrossCents = randToCents(String(rawAmount));
+    }
+  } catch {
+    amountGrossCents = -1;
   }
+  const amountValid = Number.isSafeInteger(input.expectedAmountCents)
+    && input.expectedAmountCents > 0
+    && amountGrossCents === input.expectedAmountCents;
+  const duplicate = input.duplicate === true;
+  const ipValid = input.ipValid === true;
+  const idempotencyKey = ["payfast-itn", merchantReference || "missing-reference", providerPaymentId ?? "missing-provider-id", paymentStatus ?? "unknown"].join(":");
 
-  if (!signatureValid) {
-    return { accepted: false, merchantReference, providerPaymentId, paymentStatus, signatureValid, amountValid, duplicate, ipValid, rejectionReason: "Invalid PayFast signature.", idempotencyKey };
+  const result = (accepted: boolean, rejectionReason?: string): PayFastItnValidationResult => ({
+    accepted, merchantReference, providerPaymentId, paymentStatus, signatureValid,
+    amountValid, duplicate, ipValid, ...(rejectionReason ? { rejectionReason } : {}), idempotencyKey
+  });
+
+  if (!input.expectedMerchantReference || merchantReference !== input.expectedMerchantReference) {
+    return result(false, "Merchant reference mismatch.");
   }
+  if (!signatureValid) return result(false, "Invalid PayFast signature.");
+  if (!providerPaymentId) return result(false, "Missing PayFast provider payment ID.");
+  if (!amountValid) return result(false, "PayFast amount mismatch or invalid expected amount.");
+  if (duplicate) return result(false, "Duplicate ITN receipt.");
+  if (!ipValid) return result(false, "PayFast ITN IP/source not verified.");
+  if (paymentStatus !== "COMPLETE") return result(false, "Payment status is not COMPLETE.");
 
-  if (!amountValid) {
-    return { accepted: false, merchantReference, providerPaymentId, paymentStatus, signatureValid, amountValid, duplicate, ipValid, rejectionReason: "PayFast amount mismatch.", idempotencyKey };
-  }
-
-  if (duplicate) {
-    return { accepted: false, merchantReference, providerPaymentId, paymentStatus, signatureValid, amountValid, duplicate, ipValid, rejectionReason: "Duplicate ITN receipt.", idempotencyKey };
-  }
-
-  if (!ipValid) {
-    return { accepted: false, merchantReference, providerPaymentId, paymentStatus, signatureValid, amountValid, duplicate, ipValid, rejectionReason: "PayFast ITN IP/source not verified.", idempotencyKey };
-  }
-
-  if (paymentStatus !== "COMPLETE") {
-    return { accepted: false, merchantReference, providerPaymentId, paymentStatus, signatureValid, amountValid, duplicate, ipValid, rejectionReason: "Payment status is not COMPLETE.", idempotencyKey };
-  }
-
-  return { accepted: true, merchantReference, providerPaymentId, paymentStatus, signatureValid, amountValid, duplicate, ipValid, idempotencyKey };
+  return result(true);
 }
