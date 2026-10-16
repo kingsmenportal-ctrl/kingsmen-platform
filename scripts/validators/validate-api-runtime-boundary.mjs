@@ -1,6 +1,8 @@
 import { readFileSync } from "node:fs";
 
 const source = readFileSync("apps/api/src/server.ts", "utf8");
+const truthVaultSource = readFileSync("apps/api/src/db/truth-vault-repository.ts", "utf8");
+
 const checks = [
   ["CORS must not default to wildcard", !/KINGSMEN_API_CORS_ORIGIN\s*\?\?\s*["']\*["']/.test(source) && !/access-control-allow-origin["']?,\s*["']\*["']/.test(source)],
   ["CORS requires exact configured origin match", /requestOrigin\s*===\s*configuredOrigin/.test(source)],
@@ -14,6 +16,8 @@ const checks = [
   ["readiness endpoint rejects memory-only mode", /pathname === "\/ready"/.test(source) && /DURABLE_STORAGE_DISABLED/.test(source) && /sendJson\(response, 503/.test(source)],
   ["readiness requires enabled healthy durable storage", /!truthVault\.enabled \|\| !truthVaultHealth\.ok/.test(source)],
   ["readiness endpoint is advertised in health metadata", /"GET \/ready"/.test(source)],
+  ["database TLS verifies server certificates", /KINGSMEN_DATABASE_SSL === "true" \? \{ rejectUnauthorized: true \}/.test(truthVaultSource)],
+  ["database TLS does not disable certificate verification", !/KINGSMEN_DATABASE_SSL === "true" \? \{ rejectUnauthorized: false \}/.test(truthVaultSource)],
   ["internal errors are not returned to clients", /sendError\(response, 500, ["']KINGSMEN_API_ERROR["'], ["']The request could not be completed\.["']\)/.test(source)]
 ];
 const failed = checks.filter(([, passed]) => !passed);
