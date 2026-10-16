@@ -55,6 +55,7 @@
     "kingsmen:launch:audit": "node scripts/validators/validate-kingsmen-launch-readiness-evidence-aware.mjs --audit",
     "kingsmen:launch:gate": "node scripts/validators/validate-kingsmen-launch-readiness-evidence-aware.mjs --gate",
     "api:validate:truth-vault": "node scripts/validators/validate-api-truth-vault-persistence.mjs",
+    "candidate:validate:document-boundary": "node scripts/validators/validate-candidate-document-boundary.mjs",
     "payments:prove:sandbox": "node scripts/proof/prove-payfast-sandbox-boundary.mjs",
     "payments:validate:sandbox": "node scripts/validators/validate-payfast-sandbox-proof.mjs",
     "security:prove:rls": "node scripts/proof/prove-rls-security-boundary.mjs",
