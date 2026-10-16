@@ -76,6 +76,7 @@ export default function ApplyNowClient() {
   const [selectedOpportunity, setSelectedOpportunity] = useState("");
   const [proof, setProof] = useState("");
   const [manualExport, setManualExport] = useState<any>(null);
+  const [overwriteExtractionExisting, setOverwriteExtractionExisting] = useState(false);
   const [taskDraft, setTaskDraft] = useState({ title: "", dueDate: "", priority: "NORMAL", opportunityId: "", notes: "" });
   const [financeDraft, setFinanceDraft] = useState({ type: "FEE", direction: "OUT", status: "RECORDED", amount: "", description: "", reference: "", evidenceNote: "", opportunityId: "", occurredOn: new Date().toISOString().slice(0, 10) });
   const [contactDraft, setContactDraft] = useState({ contactName: "", organisation: "", channel: "EMAIL", direction: "OUTBOUND", opportunityId: "", summary: "", followUpDate: "" });
@@ -391,6 +392,22 @@ export default function ApplyNowClient() {
     }
   }
 
+  async function confirmExtractedField(extractionId: string, key: string, value: string) {
+    setBusy(`extraction-${extractionId}-${key}`);
+    try {
+      const json = await api({ action: "confirmSmartExtraction", extractionId, fields: { [key]: value }, overwriteExisting: overwriteExtractionExisting });
+      setStore(json.store);
+      setProfile(json.store.profile || {});
+      const applied = (json.appliedFields || []).length;
+      const skipped = (json.skippedExistingFields || []).length;
+      setMessage(applied ? `Confirmed ${key}. Profile updated.` : skipped ? `${key} was not changed because a profile value already exists. Enable overwrite only if you intend to replace it.` : "No fields were changed.");
+    } catch (error) {
+      setMessage(error instanceof Error ? error.message : "Could not confirm extracted value.");
+    } finally {
+      setBusy("");
+    }
+  }
+
   async function prepareManualExport(opportunityId: string) {
     setBusy(`export-${opportunityId}`);
     setManualExport(null);
@@ -499,6 +516,39 @@ export default function ApplyNowClient() {
               <div style={emptyState}>No documents uploaded yet. Upload your CV first.</div>
             )}
           </div>
+        </section>
+
+        <section style={panel}>
+          <div style={sectionHead}>
+            <div>
+              <p style={eyebrow}>CV INTAKE / CONFIRM EXTRACTED VALUES</p>
+              <h2 style={sectionTitle}>Review CV suggestions</h2>
+              <p style={{ color: "#aab5c7", fontSize: 13, lineHeight: 1.6 }}>CV parsing produces suggestions only. Confirm each value before it updates your profile. Existing values are protected unless you explicitly allow overwrite.</p>
+            </div>
+            <label style={{ ...field, display: "flex", alignItems: "center", gap: 8, maxWidth: 220 }}>
+              <input type="checkbox" checked={overwriteExtractionExisting} onChange={(event) => setOverwriteExtractionExisting(event.target.checked)} />
+              Allow replacing existing values
+            </label>
+          </div>
+          {(store.smartExtraction || []).filter((item: any) => ["NEEDS_CANDIDATE_CONFIRMATION", "PARTIALLY_CONFIRMED"].includes(String(item.status))).length ? (
+            <div style={queue}>
+              {(store.smartExtraction || []).filter((item: any) => ["NEEDS_CANDIDATE_CONFIRMATION", "PARTIALLY_CONFIRMED"].includes(String(item.status))).slice(0, 5).map((item: any) => {
+                const extracted = item.extracted && typeof item.extracted === "object" ? item.extracted : {};
+                const keys = ["fullName", "email", "phone", "idNumber", "location", "highestEducation", "workExperience", "skills"];
+                const labels: Record<string, string> = { fullName: "Full name", email: "Email", phone: "Phone", idNumber: "ID / passport", location: "Location", highestEducation: "Highest education", workExperience: "Work experience", skills: "Skills" };
+                const available = keys.filter((key) => typeof extracted[key] === "string" && extracted[key].trim() && !(item.confirmedFields || []).includes(key));
+                return <article key={item.extractionId} style={oppCard}>
+                  <div style={oppHeader}><div><strong>{item.fileName || "Uploaded document"}</strong><p style={oppMeta}>{item.status.replaceAll("_", " ")} · {available.length} unconfirmed suggestion(s)</p></div><span style={routeBadge}>{item.type || "CV"}</span></div>
+                  {available.length ? available.map((key) => (
+                    <div key={key} style={{ ...documentRow, gridTemplateColumns: "minmax(0,1fr) auto" }}>
+                      <div><strong>{labels[key]}</strong><p style={{ margin: "5px 0 0", whiteSpace: "pre-wrap", overflowWrap: "anywhere", color: "#cfc2a4", fontSize: 13 }}>{extracted[key]}</p></div>
+                      <button type="button" style={primaryButton} disabled={busy === `extraction-${item.extractionId}-${key}`} onClick={() => confirmExtractedField(String(item.extractionId), key, String(extracted[key]))}>{busy === `extraction-${item.extractionId}-${key}` ? "Saving…" : "Confirm value"}</button>
+                    </div>
+                  )) : <p style={oppMeta}>No unconfirmed fields remain in this extraction.</p>}
+                </article>;
+              })}
+            </div>
+          ) : <div style={emptyState}>No extracted values awaiting confirmation. Upload a CV or supported document to create suggestions.</div>}
         </section>
 
         <section style={panel}>
