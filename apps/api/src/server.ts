@@ -475,67 +475,26 @@ async function handleReadiness(response: ServerResponse): Promise<void> {
   }
 }
 
-async function handleCandidateStatus(response: ServerResponse, candidateId: string): Promise<void> {
-  // No verified candidate identity is currently attached to requests. Never expose
-  // private read models by identifier alone; keep this route unavailable until auth
-  // middleware supplies a trusted, server-verified candidate principal.
-  sendError(response, 503, "CANDIDATE_AUTHORIZATION_NOT_CONFIGURED", "Candidate authorization is not configured.");
-  return;
-
-  if (truthVault.enabled) {
-    const candidate = await truthVault.readCandidateStatus(candidateId);
-    if (!candidate) {
-      sendError(response, 404, "CANDIDATE_READ_MODEL_NOT_FOUND", `No candidate read model found for ${candidateId}.`);
-      return;
-    }
-
-    sendJson(response, 200, { ok: true, candidate, storageMode: truthVault.storageMode, generatedAtIso: nowIso() });
-    return;
-  }
-
-  const candidate = store.candidates.get(candidateId);
-  if (!candidate) {
-    sendError(response, 404, "CANDIDATE_READ_MODEL_NOT_FOUND", `No candidate read model found for ${candidateId}.`);
-    return;
-  }
-
-  sendJson(response, 200, {
-    ok: true,
-    candidate,
-    storageMode: truthVault.storageMode,
-    generatedAtIso: nowIso()
-  });
+async function handleCandidateStatus(response: ServerResponse, _candidateId: string): Promise<void> {
+  // No verified candidate identity is attached to requests. Never expose private
+  // read models by identifier alone. Re-enable only behind verified auth middleware.
+  sendError(
+    response,
+    503,
+    "CANDIDATE_AUTHORIZATION_NOT_CONFIGURED",
+    "Candidate authorization is not configured."
+  );
 }
 
-async function handleApplicationWorkbench(response: ServerResponse, applicationId: string): Promise<void> {
+async function handleApplicationWorkbench(response: ServerResponse, _applicationId: string): Promise<void> {
   // Application IDs are not credentials. Require verified ownership authorization
   // before any database or in-memory read can occur.
-  sendError(response, 503, "CANDIDATE_AUTHORIZATION_NOT_CONFIGURED", "Candidate authorization is not configured.");
-  return;
-
-  if (truthVault.enabled) {
-    const application = await truthVault.readApplicationWorkbench(applicationId);
-    if (!application) {
-      sendError(response, 404, "APPLICATION_WORKBENCH_NOT_FOUND", `No application workbench found for ${applicationId}.`);
-      return;
-    }
-
-    sendJson(response, 200, { ok: true, application, storageMode: truthVault.storageMode, generatedAtIso: nowIso() });
-    return;
-  }
-
-  const application = store.applications.get(applicationId);
-  if (!application) {
-    sendError(response, 404, "APPLICATION_WORKBENCH_NOT_FOUND", `No application workbench found for ${applicationId}.`);
-    return;
-  }
-
-  sendJson(response, 200, {
-    ok: true,
-    application,
-    storageMode: truthVault.storageMode,
-    generatedAtIso: nowIso()
-  });
+  sendError(
+    response,
+    503,
+    "CANDIDATE_AUTHORIZATION_NOT_CONFIGURED",
+    "Candidate authorization is not configured."
+  );
 }
 
 export function createKingsmenApiServer() {
