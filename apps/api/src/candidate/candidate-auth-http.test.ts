@@ -40,6 +40,9 @@ test("candidate auth route rejects state changes without the configured exact or
   assert.equal(handled, true);
   assert.equal(res.statusCode, 403);
   assert.match(res.body, /ORIGIN_NOT_ALLOWED/);
+  assert.equal(res.headers.get("cache-control"), "no-store, no-cache, must-revalidate, private");
+  assert.equal(res.headers.get("pragma"), "no-cache");
+  assert.equal(res.headers.get("x-content-type-options"), "nosniff");
 });
 
 test("candidate auth route fails closed when durable auth is not configured", async () => {
@@ -56,6 +59,7 @@ test("candidate auth route fails closed when durable auth is not configured", as
   assert.equal(handled, true);
   assert.equal(res.statusCode, 503);
   assert.match(res.body, /CANDIDATE_AUTH_NOT_CONFIGURED/);
+  assert.equal(res.headers.get("cache-control"), "no-store, no-cache, must-revalidate, private");
 });
 
 test("candidate auth route enforces method and advertises the required method", async () => {
@@ -71,4 +75,20 @@ test("candidate auth route enforces method and advertises the required method", 
   assert.equal(handled, true);
   assert.equal(res.statusCode, 405);
   assert.equal(res.headers.get("allow"), "POST");
+});
+
+
+test("unrelated routes are not intercepted or given auth response headers", async () => {
+  const res = responseMock();
+  const handled = await handleCandidateAuthRoute(
+    requestMock("GET"), res.response,
+    "/api/candidate/profile", null,
+    (response, status, body) => {
+      response.statusCode = status;
+      response.end(JSON.stringify(body));
+    }
+  );
+  assert.equal(handled, false);
+  assert.equal(res.headers.has("cache-control"), false);
+  assert.equal(res.body, "");
 });
