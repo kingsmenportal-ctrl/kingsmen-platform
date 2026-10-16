@@ -1,0 +1,56 @@
+name: Kingsmen Staging Runtime E2E
+
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: kingsmen-staging-runtime-e2e
+  cancel-in-progress: false
+
+jobs:
+  staging-runtime-e2e:
+    name: Authenticated staging runtime journeys
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+      - name: Install locked root dependencies
+        run: npm ci
+      - name: Install Chromium
+        run: npx playwright install --with-deps chromium
+      - name: Prepare redacted result directory
+        run: mkdir -p reports/staging
+      - name: Run authenticated Kingsmen staging journeys
+        run: npm run test:e2e
+        env:
+          CI: "true"
+          KINGSMEN_STAGING_BASE_URL: ${{ secrets.KINGSMEN_STAGING_BASE_URL }}
+          NEXT_PUBLIC_SUPABASE_URL: ${{ secrets.NEXT_PUBLIC_SUPABASE_URL }}
+          NEXT_PUBLIC_SUPABASE_ANON_KEY: ${{ secrets.NEXT_PUBLIC_SUPABASE_ANON_KEY }}
+          TEST_A_EMAIL: ${{ secrets.TEST_A_EMAIL }}
+          TEST_A_PW: ${{ secrets.TEST_A_PW }}
+          TEST_B_EMAIL: ${{ secrets.TEST_B_EMAIL }}
+          TEST_B_PW: ${{ secrets.TEST_B_PW }}
+          FOUNDER_TEST_EMAIL: ${{ secrets.FOUNDER_TEST_EMAIL }}
+          FOUNDER_TEST_PW: ${{ secrets.FOUNDER_TEST_PW }}
+          FOUNDER_TEST_DOCUMENT_REF: ${{ secrets.FOUNDER_TEST_DOCUMENT_REF }}
+          FOUNDER_TEST_CANDIDATE_REF: ${{ secrets.FOUNDER_TEST_CANDIDATE_REF }}
+          FOUNDER_TEST_PROOF_REF: ${{ secrets.FOUNDER_TEST_PROOF_REF }}
+          FOUNDER_TEST_EVIDENCE_REF: ${{ secrets.FOUNDER_TEST_EVIDENCE_REF }}
+      - name: Upload redacted test result summary
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: kingsmen-staging-runtime-e2e-results
+          path: reports/staging/playwright-runtime-results.json
+          if-no-files-found: warn
+          retention-days: 7
