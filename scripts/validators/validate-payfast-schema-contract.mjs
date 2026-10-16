@@ -3,6 +3,7 @@ import { readFileSync } from "node:fs";
 const migration = readFileSync("db/migrations/0008_n10_finance_payfast.sql", "utf8");
 const itnRoute = readFileSync("apps/api/src/finance/payfast-itn-route.ts", "utf8");
 const indexMigration = readFileSync("db/migrations/0036_n11_payfast_provider_idempotency.sql", "utf8");
+const retryMigration = readFileSync("db/migrations/0037_n11_payfast_retryable_rejected_itn.sql", "utf8");
 const amountHelper = readFileSync("apps/api/src/finance/payfast-amounts.ts", "utf8");
 const amountTests = readFileSync("apps/api/src/finance/payfast-amounts.test.ts", "utf8");
 
@@ -17,6 +18,8 @@ const checks = [
   ["gross fee and net are reconciled before server confirmation", /reconcilePayFastAmounts\(fields\.amount_gross, fields\.amount_fee, fields\.amount_net, order\.amount_cents\)/.test(itnRoute) && itnRoute.indexOf("reconcilePayFastAmounts(fields.amount_gross") < itnRoute.indexOf("confirmWithPayFast(fields)")],
   ["amount helper validates signed fee arithmetic", /grossCents \+ feeCents !== netCents/.test(amountHelper)],
   ["amount reconciliation has malformed and inconsistent value tests", /internally inconsistent gross, fee, and net/.test(amountTests) && /malformed, over-precision, and unsafe values/.test(amountTests)],
+  ["rejected ITNs do not consume provider payment IDs", /where accepted = true and provider_payment_id is not null/i.test(retryMigration) && /where accepted = true and \(provider_payment_id = \$1 or idempotency_key = \$2\)/i.test(itnRoute)],
+  ["ITN idempotency uniqueness applies only to accepted receipts", /drop constraint if exists payfast_itn_receipts_idempotency_key_key/i.test(retryMigration) && /where accepted = true/i.test(retryMigration)] ,
   ["server confirmation includes original ITN signature", /Object\.entries\(fields\)/.test(itnRoute) && !/key === ["']signature["']/.test(itnRoute)]
 ];
 const failed = checks.filter(([, passed]) => !passed);
