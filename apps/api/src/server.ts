@@ -443,6 +443,7 @@ async function handleHealth(response: ServerResponse): Promise<void> {
       "POST /api/candidate-auth/login",
       "POST /api/candidate-auth/logout",
       "GET /api/candidate-auth/session",
+      "GET /api/candidate/documents",
       "GET /api/candidates/:candidateId/status",
       "GET /api/applications/:applicationId/workbench"
     ]
@@ -480,6 +481,28 @@ async function handleReadiness(response: ServerResponse): Promise<void> {
       generatedAtIso: nowIso()
     });
   }
+}
+
+async function handleCandidateDocuments(request: IncomingMessage, response: ServerResponse): Promise<void> {
+  if (!candidateAuthRuntime || !truthVault.enabled) {
+    sendError(response, 503, "CANDIDATE_AUTHORIZATION_NOT_CONFIGURED", "Candidate authorization is not configured.");
+    return;
+  }
+  const token = readCandidateSessionCookie(request.headers.cookie);
+  const principal = await candidateAuthRuntime.service.authenticateToken(token);
+  if (!principal.authenticated) {
+    sendError(response, 401, "CANDIDATE_AUTH_REQUIRED", "Sign in to view your documents.");
+    return;
+  }
+  const documents = await truthVault.listDocumentMetadataForOwner(principal.candidateId);
+  response.setHeader("cache-control", "private, no-store");
+  response.setHeader("pragma", "no-cache");
+  sendJson(response, 200, {
+    ok: true,
+    documents,
+    storageAvailable: false,
+    message: "This endpoint lists stored document metadata only. Upload and download storage are not enabled by this route."
+  });
 }
 
 async function handleCandidateStatus(request: IncomingMessage, response: ServerResponse, candidateRef: string): Promise<void> {
@@ -585,6 +608,16 @@ export function createKingsmenApiServer() {
 
       if (method === "POST" && (pathname === "/api/workflow/result" || pathname === "/api/workflow-results")) {
         await handleWorkflowResult(request, response);
+        return;
+      }
+
+      if (pathname === "/api/candidate/documents") {
+        if (method !== "GET") {
+          response.setHeader("allow", "GET");
+          sendError(response, 405, "METHOD_NOT_ALLOWED", "Only GET is supported.");
+          return;
+        }
+        await handleCandidateDocuments(request, response);
         return;
       }
 
