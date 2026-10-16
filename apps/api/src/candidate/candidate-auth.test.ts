@@ -2,7 +2,10 @@ import { test } from "node:test";
 import assert from "node:assert/strict";
 import {
   assertCandidateCanLogin,
-  createCandidateSession,\n  createOpaqueSessionToken,\n  hashSessionToken,\n  verifySessionToken,
+  createCandidateSession,
+  createOpaqueSessionToken,
+  hashSessionToken,
+  verifySessionToken,
   shouldRequireAccountRecovery
 } from "./candidate-auth";
 
