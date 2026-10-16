@@ -179,7 +179,8 @@ export async function handlePayFastItn(request: IncomingMessage, response: Serve
     }
 
     const prior = await client.query<{ id: string }>(
-      "SELECT id FROM public.payfast_itn_receipts WHERE provider_payment_id = $1 OR idempotency_key = $2 LIMIT 1",
+      "SELECT id FROM public.payfast_itn_receipts WHERE provider_payment_id = $1 OR idempotency_key = $2 " +
+      "UNION ALL SELECT id FROM public.finance_payments WHERE provider = 'PAYFAST' AND provider_payment_id = $1 LIMIT 1",
       [providerPaymentId, ["payfast-itn", merchantReference, providerPaymentId, String(fields.payment_status ?? "unknown").toUpperCase()].join(":")]
     );
     const result = validatePayFastItn({
