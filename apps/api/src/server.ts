@@ -514,7 +514,7 @@ export function createKingsmenApiServer() {
       // CORS is opt-in: never default to wildcard access. Requests without an
       // Origin (e.g. trusted server-to-server calls) continue through normal routing.
       const requestOrigin = request.headers.origin;
-      const configuredOrigin = process.env.KINGSMEN_API_CORS_ORIGIN?.trim();
+      const configuredOrigin = (process.env.KINGSMEN_API_CORS_ORIGIN ?? process.env.KINGSMEN_CANDIDATE_PORTAL_ORIGIN)?.trim();
       if (requestOrigin && configuredOrigin && requestOrigin === configuredOrigin) {
         response.setHeader("access-control-allow-origin", configuredOrigin);
         response.setHeader("vary", "Origin");
