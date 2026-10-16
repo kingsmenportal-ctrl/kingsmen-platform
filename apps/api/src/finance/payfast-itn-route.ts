@@ -76,7 +76,7 @@ async function confirmWithPayFast(fields: PayFastFields): Promise<boolean> {
 
   const params = new URLSearchParams();
   for (const [key, value] of Object.entries(fields)) {
-    if (key === "signature" || value === undefined || value === null) continue;
+    if (value === undefined || value === null) continue;
     params.append(key, String(value));
   }
 
@@ -206,18 +206,23 @@ export async function handlePayFastItn(request: IncomingMessage, response: Serve
     let grossCents: number | null = null;
     try { grossCents = randToCents(grossText); } catch { /* rejected receipt remains auditable */ }
 
-    await client.query(
+    const receiptInsert = await client.query(
       `INSERT INTO public.payfast_itn_receipts
        (itn_ref, merchant_reference, provider_payment_id, payment_status, amount_gross, amount_fee, amount_net,
         received_payload, received_signature, signature_valid, ip_valid, amount_valid, duplicate, accepted,
         rejection_reason, idempotency_key, evidence_ref)
        VALUES ($1,$2,$3,$4,$5,$6,$7,$8::jsonb,$9,$10,$11,$12,$13,$14,$15,$16,$17)
-       ON CONFLICT (idempotency_key) DO NOTHING`,
+       ON CONFLICT DO NOTHING`,
       [itnRef, merchantReference, providerPaymentId, result.paymentStatus ?? null, grossText || null,
        fields.amount_fee == null ? null : String(fields.amount_fee), fields.amount_net == null ? null : String(fields.amount_net),
        JSON.stringify(fields), String(fields.signature ?? ""), result.signatureValid, result.ipValid, result.amountValid,
        result.duplicate, result.accepted, result.rejectionReason ?? null, idempotencyKey, `pay_ev_${itnRef}`]
     );
+    if (receiptInsert.rowCount !== 1) {
+      await client.query("ROLLBACK");
+      send(response, 200, "OK");
+      return;
+    }
 
     if (!result.accepted) {
       await client.query("COMMIT");
