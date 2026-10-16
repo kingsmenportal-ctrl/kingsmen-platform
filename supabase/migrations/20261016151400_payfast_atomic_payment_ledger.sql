@@ -46,8 +46,33 @@ as $$
 declare v_invoice public.invoices%rowtype; v_payment public.payments%rowtype; v_existing public.payments%rowtype;
 begin
  if p_invoice_id is null or p_payment_reference is null or p_provider_payment_id !~ '^[0-9]{1,30}$'
- or p_amount_cents is null or p_amount_cents<=0 or p_currency<>'ZAR'
- or p_event_fingerprint !~ '^[0-9a-f]{64}$' then raise exception 'invalid verified payment input' using errcode='22023'; end if;
+ or p_amount_cents is null or p_amount_cents<=0 or p_currency is distinct from 'ZAR'
+ or p_event_fingerprint is null or p_event_fingerprint !~ '^[0-9a-f]{64} then raise exception 'invalid verified payment input' using errcode='22023'; end if;
+ select * into v_invoice from public.invoices where id=p_invoice_id and payment_reference=p_payment_reference for update;
+ if not found then raise exception 'invoice/reference mismatch' using errcode='P0002'; end if;
+ select * into v_existing from public.payments where provider='payfast' and
+ (provider_payment_id=p_provider_payment_id or event_fingerprint=p_event_fingerprint) limit 1 for update;
+ if found then
+  if v_existing.invoice_id<>v_invoice.id or v_existing.amount_cents<>p_amount_cents
+   or v_existing.provider_payment_id<>p_provider_payment_id or v_existing.event_fingerprint<>p_event_fingerprint
+   or v_existing.status<>'verified' then raise exception 'conflicting duplicate payment event' using errcode='23505'; end if;
+  return query select 'duplicate'::text,v_existing.id,v_invoice.status; return;
+ end if;
+ if v_invoice.status<>'issued' then raise exception 'invoice is not payable' using errcode='55000'; end if;
+ if v_invoice.currency<>p_currency or v_invoice.amount_cents<>p_amount_cents then raise exception 'payment amount/currency mismatch' using errcode='22023'; end if;
+ if exists(select 1 from public.payments p where p.invoice_id=v_invoice.id and p.status='verified') then raise exception 'invoice already has verified payment' using errcode='23505'; end if;
+ insert into public.payments(invoice_id,provider,provider_payment_id,amount_cents,status,verified_at,event_fingerprint)
+ values(v_invoice.id,'payfast',p_provider_payment_id,p_amount_cents,'verified',now(),p_event_fingerprint) returning * into v_payment;
+ insert into public.finance_ledger_entries(payment_id,invoice_id,entry_role,account_code,debit_cents,credit_cents)
+ values (v_payment.id,v_invoice.id,'cash_clearing_debit','PAYFAST_CLEARING',p_amount_cents,0),
+        (v_payment.id,v_invoice.id,'accounts_receivable_credit','ACCOUNTS_RECEIVABLE',0,p_amount_cents);
+ update public.invoices set status='paid',paid_at=now() where id=v_invoice.id and status='issued';
+ return query select 'recorded'::text,v_payment.id,'paid'::text;
+end $$;
+revoke all on function public.commit_verified_payfast_payment(uuid,text,text,integer,text,text) from public, anon, authenticated;
+grant execute on function public.commit_verified_payfast_payment(uuid,text,text,integer,text,text) to service_role;
+commit;
+ then raise exception 'invalid verified payment input' using errcode='22023'; end if;
  select * into v_invoice from public.invoices where id=p_invoice_id and payment_reference=p_payment_reference for update;
  if not found then raise exception 'invoice/reference mismatch' using errcode='P0002'; end if;
  select * into v_existing from public.payments where provider='payfast' and
