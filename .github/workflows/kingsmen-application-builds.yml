@@ -23,6 +23,8 @@ jobs:
           node-version: '22'
           cache: npm
           cache-dependency-path: apps/web/package-lock.json
+      - name: Validate web dependency manifest and lockfile
+        run: node scripts/validators/validate-web-dependency-lock.mjs
       - name: Install locked web dependencies
         working-directory: apps/web
         run: npm ci
