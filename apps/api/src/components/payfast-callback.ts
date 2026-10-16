@@ -5,7 +5,7 @@ export type ExpectedPayment = {
   paymentRef: string;
   amountCents: number;
   currency: "ZAR";
-  status: "issued" | "partially_paid" | "paid" | "cancelled" | "void";
+  status: "issued" | "paid" | "void" | "draft";
 };
 
 export type PaymentCommitInput = {
@@ -61,7 +61,8 @@ export async function processPayFastCallback(
   const expected = await store.findExpectedPayment(paymentRef);
   if (!expected) throw new Error("PAYFAST_INVOICE_NOT_FOUND");
   if (expected.currency !== "ZAR") throw new Error("PAYFAST_CURRENCY_UNSUPPORTED");
-  if (!["issued", "partially_paid"].includes(expected.status)) {
+  if (expected.amountCents <= 0) throw new Error("PAYFAST_AMOUNT_INVALID");
+  if (expected.status !== "issued") {
     throw new Error("PAYFAST_INVOICE_NOT_PAYABLE");
   }
 
