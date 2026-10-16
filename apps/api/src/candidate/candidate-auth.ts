@@ -1,3 +1,5 @@
+import { randomUUID } from "node:crypto";
+
 export type CandidateAuthStatus = "PENDING" | "ACTIVE" | "LOCKED" | "RECOVERY_REQUIRED" | "DISABLED";
 export type DeviceTrustStatus = "TRUSTED" | "UNTRUSTED" | "BLOCKED";
 
@@ -16,15 +18,30 @@ export interface CandidateSessionRecord extends CandidateSessionRequest {
   createdAt: string;
 }
 
+/**
+ * Creates a session record only; it does not authenticate a candidate or persist
+ * a session. Device metadata is not proof of identity or device trust.
+ */
 export function createCandidateSession(input: CandidateSessionRequest): CandidateSessionRecord {
-  if (!input.candidateId) throw new Error("candidateId is required.");
-  if (!input.expiresAt) throw new Error("expiresAt is required.");
+  if (typeof input.candidateId !== "string" || !input.candidateId.trim()) {
+    throw new Error("candidateId is required.");
+  }
+
+  const expiresAtMs = Date.parse(input.expiresAt);
+  if (!Number.isFinite(expiresAtMs)) {
+    throw new Error("expiresAt must be a valid ISO-compatible timestamp.");
+  }
+  if (expiresAtMs <= Date.now()) {
+    throw new Error("expiresAt must be in the future.");
+  }
 
   return {
     ...input,
-    sessionId: `sess_${Date.now()}_${Math.random().toString(36).slice(2, 12)}`,
+    candidateId: input.candidateId.trim(),
+    sessionId: `sess_${randomUUID()}`,
     deviceLabel: input.deviceLabel ?? "Unknown device",
-    trustStatus: input.deviceFingerprintHash ? "TRUSTED" : "UNTRUSTED",
+    // A fingerprint hash is client/device metadata, not a verified trust signal.
+    trustStatus: "UNTRUSTED",
     createdAt: new Date().toISOString()
   };
 }
