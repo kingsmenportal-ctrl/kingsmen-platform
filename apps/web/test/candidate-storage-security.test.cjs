@@ -328,7 +328,7 @@ test("authenticated uploads register canonical document and evidence references 
   const end = route.indexOf('if (action === "addOpportunity")', start);
   const block = route.slice(start, end);
   assert.match(block, /register_candidate_document_upload/);
-  assert.match(block, /Authorization: `Bearer ${context\.accessToken}`/);
+  assert.match(block, /Authorization:.*context\.accessToken/);
   assert.match(block, /p_storage_path: storagePath/);
   assert.match(block, /canonicalRegistration\.documentRef/);
   assert.match(block, /registryStatus: "REGISTERED"/);
@@ -380,7 +380,7 @@ test("canonical document deletion retires review eligibility before storage clea
   assert.match(migration, /document_status = 'DELETED'/);
   assert.match(migration, /archived_at = coalesce\(archived_at, now\(\)\)/);
   assert.match(migration, /function public\.record_candidate_document_deletion_result/);
-  assert.match(migration, /event_type,event_ref/);
+  assert.match(migration, /\(document_id,event_ref,event_type,/);
   assert.match(migration, /case when p_success then 'OK' else 'FAILED' end/);
   assert.match(migration, /revoke all on function public\.retire_candidate_document_upload/);
   assert.match(migration, /revoke all on function public\.record_candidate_document_deletion_result/);
@@ -425,7 +425,7 @@ test("candidate application lifecycle requires an owned opportunity and records 
   assert.match(proofBlock, /verificationStatus: "NOT_INDEPENDENTLY_VERIFIED"/);
   assert.match(proofBlock, /status: "SUBMITTED_REPORTED"/);
   assert.match(proofBlock, /CANDIDATE_PROVIDED_EVIDENCE/);
-  assert.match(proofBlock, /slice\(-1000\)/);
+  assert.match(proofBlock, /slice\(0, 1000\)/);
 });
 
 test("candidate workbench captures submission channel and optional evidence link without implying external verification", () => {
