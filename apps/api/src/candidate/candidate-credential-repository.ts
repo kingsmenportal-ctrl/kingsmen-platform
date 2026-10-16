@@ -61,8 +61,27 @@ export class CandidateCredentialRepository {
 
       const now = Date.now();
       const lockedUntil = credential.locked_until ? Date.parse(credential.locked_until) : NaN;
-      if (credential.auth_status === "LOCKED" && Number.isFinite(lockedUntil) && lockedUntil > now) {
-        return { ok: false, reason: "ACCOUNT_LOCKED" };
+      if (credential.auth_status === "LOCKED") {
+        if (Number.isFinite(lockedUntil) && lockedUntil > now) {
+          return { ok: false, reason: "ACCOUNT_LOCKED" };
+        }
+        // An expired temporary lock is cleared transactionally before checking
+        // the password again. Permanent lock states should use locked_until NULL
+        // and be handled by an explicit recovery process, not auto-unlocked.
+        if (Number.isFinite(lockedUntil)) {
+          await client.query(
+            `update candidate_credentials
+                set auth_status = 'ACTIVE', failed_login_attempts = 0,
+                    locked_until = null, updated_at = now()
+              where candidate_id = $1::uuid and auth_status = 'LOCKED'`,
+            [credential.candidate_id]
+          );
+          credential.auth_status = "ACTIVE";
+          credential.failed_login_attempts = 0;
+          credential.locked_until = null;
+        } else {
+          return { ok: false, reason: "ACCOUNT_LOCKED" };
+        }
       }
       if (credential.auth_status !== "ACTIVE" || !credential.candidate_active) {
         return { ok: false, reason: "ACCOUNT_UNAVAILABLE" };
