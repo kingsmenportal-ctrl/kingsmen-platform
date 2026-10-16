@@ -31,7 +31,7 @@ test("document review validates bounded input and distinct references before dat
 
 test("review endpoint calls authenticated transactional RPC and fails closed on database errors", () => {
   assert.match(route, /rest\/v1\/rpc\/record_founder_document_review/);
-  assert.match(route, /Authorization:\s*`Bearer \\$\\{token\\}`/);
+  assert.match(route, /Authorization:\s*`Bearer \$\{token\}`/);
   assert.match(route, /p_reviewer_user_id: access\.userId/);
   assert.match(route, /p_review_status: body\.reviewStatus/);
   assert.match(route, /migrations 0018 and 0019 are applied/);
