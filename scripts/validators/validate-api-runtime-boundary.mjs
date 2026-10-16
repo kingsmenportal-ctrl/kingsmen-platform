@@ -20,6 +20,8 @@ const checks = [
   ["production database connections verify TLS certificates", /ssl: isProduction/.test(truthVaultSource) && /rejectUnauthorized: true/.test(truthVaultSource)],
   ["database TLS verifies server certificates", /KINGSMEN_DATABASE_SSL === "true" \? \{ rejectUnauthorized: true \}/.test(truthVaultSource)],
   ["database TLS does not disable certificate verification", !/KINGSMEN_DATABASE_SSL === "true" \? \{ rejectUnauthorized: false \}/.test(truthVaultSource)],
+  ["candidate status reads fail closed without verified ownership authorization", /CANDIDATE_AUTHORIZATION_NOT_CONFIGURED/.test(source) && /Candidate status is unavailable until authenticated ownership checks are configured/.test(source)],
+  ["application workbench reads fail closed without verified ownership authorization", /Application workbench is unavailable until authenticated ownership checks are configured/.test(source)],
   ["internal errors are not returned to clients", /sendError\(response, 500, ["']KINGSMEN_API_ERROR["'], ["']The request could not be completed\.["']\)/.test(source)]
 ];
 const failed = checks.filter(([, passed]) => !passed);
