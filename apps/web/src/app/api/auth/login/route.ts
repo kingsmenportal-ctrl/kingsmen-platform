@@ -1,10 +1,14 @@
 import { NextResponse } from "next/server";
+import { isSameOriginRequest } from "@/lib/auth/csrf";
 import { authUnavailable, setAuthCookies, supabaseAuth } from "@/lib/auth/supabase-rest";
 
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
 
 export async function POST(request: Request) {
+  if (!isSameOriginRequest(request)) {
+    return NextResponse.json({ ok: false, error: "Cross-origin request rejected." }, { status: 403, headers: { "Cache-Control": "no-store" } });
+  }
   let body: unknown;
   try { body = await request.json(); } catch {
     return NextResponse.json({ ok: false, error: "Invalid request." }, { status: 400, headers: { "Cache-Control": "no-store" } });
