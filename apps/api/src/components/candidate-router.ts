@@ -19,6 +19,15 @@ export async function handleCandidateComponentRoute(
     const token = bearerToken(request.headers.authorization);
     const user = await authenticateSupabaseUser(token);
 
+    if (method === "POST" && pathname === "/api/candidate/kyc/start") {
+      const result = await supabaseUserRequest<unknown>(token, "rpc/start_kyc", {
+        method: "POST",
+        body: JSON.stringify({})
+      });
+      sendComponentJson(response, 201, { ok: true, verification: result });
+      return true;
+    }
+
     if (method === "GET" && pathname === "/api/candidate/kyc") {
       const rows = await supabaseUserRequest<unknown[]>(token, "kyc_verifications?select=id,status,submitted_at,reviewed_at,created_at,updated_at&order=created_at.desc");
       sendComponentJson(response, 200, { ok: true, userId: user.id, kyc: rows });
