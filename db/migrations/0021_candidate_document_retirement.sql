@@ -21,14 +21,9 @@ begin
     raise exception 'INVALID_DOCUMENT_REFERENCE' using errcode = '22023';
   end if;
 
-  select c.id into v_candidate_id
-  from public.candidates c
-  where c.owner_user_id = auth.uid();
-  if not found then
+  v_candidate_id := kingsmen_security.current_authenticated_candidate_id();
+  if v_candidate_id is null then
     raise exception 'CANDIDATE_RECORD_NOT_FOUND' using errcode = 'P0002';
-  end if;
-  if (select count(*) from public.candidates c where c.owner_user_id = auth.uid()) <> 1 then
-    raise exception 'CANDIDATE_RECORD_NOT_UNIQUE' using errcode = '23514';
   end if;
 
   select d.id, d.storage_bucket, d.storage_path, d.file_size_bytes
@@ -88,10 +83,9 @@ begin
     raise exception 'INVALID_DOCUMENT_DELETION_RESULT' using errcode = '22023';
   end if;
 
-  select c.id into v_candidate_id
-  from public.candidates c where c.owner_user_id = auth.uid();
-  if not found or (select count(*) from public.candidates c where c.owner_user_id = auth.uid()) <> 1 then
-    raise exception 'CANDIDATE_RECORD_NOT_UNIQUE' using errcode = '23514';
+  v_candidate_id := kingsmen_security.current_authenticated_candidate_id();
+  if v_candidate_id is null then
+    raise exception 'CANDIDATE_RECORD_NOT_FOUND' using errcode = 'P0002';
   end if;
 
   select d.id,d.storage_bucket,d.storage_path,d.file_size_bytes
