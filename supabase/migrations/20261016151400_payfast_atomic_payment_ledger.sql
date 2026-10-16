@@ -3,7 +3,7 @@
 begin;
 alter table public.invoices add column if not exists payment_reference text;
 update public.invoices set payment_reference = 'INV-' || upper(replace(gen_random_uuid()::text, '-', '')) where payment_reference is null;
-alter table public.invoices alter column payment_reference set not null;
+alter table public.invoices alter column payment_reference set default ('INV-' || upper(replace(gen_random_uuid()::text, '-', ''))), alter column payment_reference set not null;
 create unique index if not exists invoices_payment_reference_uidx on public.invoices(payment_reference);
 alter table public.payments add column if not exists event_fingerprint text;
 create unique index if not exists payments_payfast_provider_payment_uidx on public.payments(provider, provider_payment_id) where provider='payfast' and provider_payment_id is not null;
@@ -24,6 +24,7 @@ create table if not exists public.finance_ledger_entries (
 alter table public.finance_ledger_entries enable row level security;
 revoke all on public.finance_ledger_entries from public, anon, authenticated;
 grant select on public.finance_ledger_entries to authenticated;
+drop policy if exists finance_ledger_founder_read on public.finance_ledger_entries;
 create policy finance_ledger_founder_read on public.finance_ledger_entries for select to authenticated using (kingsmen_security.is_kingsmen_founder());
 create or replace function public.payfast_expected_payment(p_payment_reference text)
 returns table(invoice_id uuid, payment_reference text, amount_cents integer, currency text, invoice_status text)
