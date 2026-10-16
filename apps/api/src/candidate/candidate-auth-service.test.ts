@@ -83,3 +83,55 @@ test("session cookies are Secure, HttpOnly, SameSite and reject duplicate cookie
   assert.throws(() => serializeCandidateSessionCookie("not-a-token", 3600));
   assert.throws(() => serializeCandidateSessionCookie(token, -1));
 });
+
+
+test("session TTL rejects unsafe, too-short, and excessive lifetimes", () => {
+  const credentials = {} as CandidateCredentialRepository;
+  const sessions = {} as CandidateSessionRepository;
+  for (const ttl of [0, 299, 30 * 24 * 60 * 60 + 1, 1.5, Number.MAX_SAFE_INTEGER + 1]) {
+    assert.throws(() => new CandidateAuthService(credentials, sessions, ttl), /session TTL/i);
+  }
+  assert.doesNotThrow(() => new CandidateAuthService(credentials, sessions, 300));
+  assert.doesNotThrow(() => new CandidateAuthService(credentials, sessions, 30 * 24 * 60 * 60));
+});
+
+test("session persistence failure never returns a usable token and propagates the failure", async () => {
+  const credentials = {
+    authenticate: async () => ({ ok: true as const, candidateId })
+  } as unknown as CandidateCredentialRepository;
+  let attemptedHash = "";
+  const sessions = {
+    createSession: async (_id: string, hash: string) => {
+      attemptedHash = hash;
+      throw new Error("database unavailable");
+    }
+  } as unknown as CandidateSessionRepository;
+  const service = new CandidateAuthService(credentials, sessions);
+  await assert.rejects(service.login("candidate@example.test", "test-only-password"), /database unavailable/);
+  assert.match(attemptedHash, /^[a-f0-9]{64}$/);
+});
+
+test("login passes bounded-session metadata through to durable persistence", async () => {
+  const credentials = {
+    authenticate: async () => ({ ok: true as const, candidateId })
+  } as unknown as CandidateCredentialRepository;
+  let received: unknown;
+  const sessions = {
+    createSession: async (_id: string, _hash: string, expiry: string, metadata: unknown) => {
+      received = metadata;
+      return { sessionId, candidateId, expiresAt: expiry };
+    }
+  } as unknown as CandidateSessionRepository;
+  const service = new CandidateAuthService(credentials, sessions, 300);
+  const metadata = { deviceLabel: "test device", userAgent: "test agent" };
+  const result = await service.login("candidate@example.test", "test-only-password", metadata);
+  assert.equal(result.ok, true);
+  assert.equal(received, metadata);
+});
+
+test("cookie reader rejects oversized headers, duplicate names, and malformed token values", () => {
+  const token = "a".repeat(43);
+  assert.equal(readCandidateSessionCookie("x".repeat(16_385)), null);
+  assert.equal(readCandidateSessionCookie(`${CANDIDATE_SESSION_COOKIE}=${token}; ${CANDIDATE_SESSION_COOKIE}=broken`), null);
+  assert.equal(readCandidateSessionCookie(`${CANDIDATE_SESSION_COOKIE}=bad.token`), null);
+});
