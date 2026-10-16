@@ -19,7 +19,8 @@ const base = {
   expectedMerchantReference: "ord_synthetic_001",
   expectedAmountCents: 4999,
   passphrase: "synthetic-passphrase",
-  ipValid: true
+  remoteAddress: "203.0.113.7",
+  allowedSourceIps: "203.0.113.7"
 };
 
 test("accepts only a complete, signed, matching ITN with provider payment ID and verified source", () => {
@@ -52,7 +53,7 @@ test("rejects duplicate notifications and unverified source IPs", () => {
   assert.equal(duplicate.accepted, false);
   assert.match(duplicate.rejectionReason ?? "", /Duplicate/i);
 
-  const unverified = validatePayFastItn({ ...base, ipValid: false, payload: signedPayload() });
+  const unverified = validatePayFastItn({ ...base, remoteAddress: "203.0.113.8", payload: signedPayload() });
   assert.equal(unverified.accepted, false);
   assert.match(unverified.rejectionReason ?? "", /IP\/source/i);
 });
