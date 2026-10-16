@@ -183,6 +183,10 @@ function upsertReadModelsForWorkflowResult(result: WorkflowResultEnvelope): void
 function sendJson(response: ServerResponse, statusCode: number, body: unknown, correlationId?: string): void {
   response.statusCode = statusCode;
   response.setHeader("content-type", "application/json; charset=utf-8");
+  response.setHeader("cache-control", "no-store");
+  response.setHeader("pragma", "no-cache");
+  response.setHeader("x-content-type-options", "nosniff");
+  response.setHeader("referrer-policy", "no-referrer");
   response.setHeader("x-kingsmen-service", SERVICE_NAME);
   if (correlationId) response.setHeader("x-correlation-id", correlationId);
   response.end(`${JSON.stringify(body, null, 2)}\n`);
@@ -201,13 +205,16 @@ function sendError(response: ServerResponse, statusCode: number, code: string, m
 function readBody(request: IncomingMessage): Promise<string> {
   return new Promise((resolve, reject) => {
     let body = "";
+    let receivedBytes = 0;
 
     request.on("data", (chunk: Buffer) => {
-      body += chunk.toString("utf8");
-      if (body.length > MAX_BODY_BYTES) {
-        request.destroy();
+      receivedBytes += chunk.length;
+      if (receivedBytes > MAX_BODY_BYTES) {
         reject(new Error("REQUEST_BODY_TOO_LARGE"));
+        request.resume();
+        return;
       }
+      body += chunk.toString("utf8");
     });
 
     request.on("end", () => resolve(body));
@@ -463,9 +470,19 @@ export function createKingsmenApiServer() {
       const pathname = url.pathname;
       const method = request.method ?? "GET";
 
-      response.setHeader("access-control-allow-origin", process.env.KINGSMEN_API_CORS_ORIGIN ?? "*");
-      response.setHeader("access-control-allow-methods", "GET,POST,OPTIONS");
-      response.setHeader("access-control-allow-headers", "content-type,x-correlation-id,x-idempotency-key,authorization");
+      // CORS is opt-in: never default to wildcard access. Requests without an
+      // Origin (e.g. trusted server-to-server calls) continue through normal routing.
+      const requestOrigin = request.headers.origin;
+      const configuredOrigin = process.env.KINGSMEN_API_CORS_ORIGIN?.trim();
+      if (requestOrigin && configuredOrigin && requestOrigin === configuredOrigin) {
+        response.setHeader("access-control-allow-origin", configuredOrigin);
+        response.setHeader("vary", "Origin");
+        response.setHeader("access-control-allow-methods", "GET,POST,OPTIONS");
+        response.setHeader("access-control-allow-headers", "content-type,x-correlation-id,x-idempotency-key,authorization");
+      } else if (requestOrigin) {
+        sendError(response, 403, "CORS_ORIGIN_NOT_ALLOWED", "This request origin is not allowed.");
+        return;
+      }
 
       if (method === "OPTIONS") {
         response.statusCode = 204;
@@ -509,7 +526,17 @@ export function createKingsmenApiServer() {
     } catch (error) {
       const message = error instanceof Error ? error.message : "Unknown server error.";
       const statusCode = message === "REQUEST_BODY_TOO_LARGE" ? 413 : message.includes("Invalid") ? 422 : 500;
-      sendError(response, statusCode, "KINGSMEN_API_ERROR", message);
+      if (statusCode === 500) {
+        console.error(JSON.stringify({
+          service: SERVICE_NAME,
+          event: "request_failed",
+          errorName: error instanceof Error ? error.name : "UnknownError",
+          generatedAtIso: nowIso()
+        }));
+        sendError(response, 500, "KINGSMEN_API_ERROR", "The request could not be completed.");
+      } else {
+        sendError(response, statusCode, "KINGSMEN_API_ERROR", message);
+      }
     }
   });
 }
