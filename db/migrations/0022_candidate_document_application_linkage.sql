@@ -40,11 +40,9 @@ begin
     raise exception 'INVALID_APPLICATION_DOCUMENT_LINK' using errcode = '22023';
   end if;
 
-  select c.id into v_candidate_id
-    from public.candidates c
-    where c.owner_user_id = auth.uid();
-  if not found or (select count(*) from public.candidates c where c.owner_user_id = auth.uid()) <> 1 then
-    raise exception 'CANDIDATE_RECORD_NOT_UNIQUE' using errcode = '23514';
+  v_candidate_id := kingsmen_security.current_authenticated_candidate_id();
+  if v_candidate_id is null then
+    raise exception 'CANDIDATE_RECORD_NOT_FOUND' using errcode = 'P0002';
   end if;
 
   if not exists (
