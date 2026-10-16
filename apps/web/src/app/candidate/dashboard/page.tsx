@@ -38,6 +38,7 @@ const gates = [
 
 const links = [
   { title: "Readiness & next actions", description: "See profile, document, application and follow-up gaps in one checklist.", href: "/candidate/readiness", mark: "00" },
+  { title: "Vacancy requirements review", description: "Record vacancy-specific document and eligibility requirements before preparing a pack.", href: "/candidate/requirements", mark: "00A" },
   { title: "My profile", description: "Review the details used in application packs.", href: "/candidate/profile", mark: "01" },
   { title: "Document vault", description: "Keep your CV, ID and certificates organised.", href: "/candidate/documents", mark: "02" },
   { title: "Application workbench", description: "Review routes, opportunities and next steps.", href: "/candidate/workbench", mark: "03" },
