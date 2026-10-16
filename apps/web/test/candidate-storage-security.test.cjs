@@ -228,7 +228,7 @@ test("candidate document vault uses bounded supported uploads and private docume
   assert.match(page, /action: "uploadDocument"/);
   assert.match(page, /action: "deleteDocument"/);
   assert.match(page, /\/api\/personal-jobs\/apply-now\/documents\//);
-  assert.match(page, /credentials: "same-origin"/);
+  assert.match(page, /credentials\s*:\s*"same-origin"/);
   assert.match(page, /cache: "no-store"/);
 });
 
@@ -240,7 +240,7 @@ test("candidate workbench connects opportunity stages, pack generation, proof an
   }
   assert.match(page, /fetch\("\/api\/personal-jobs\/apply-now"/);
   assert.match(page, /cache: "no-store"/);
-  assert.match(page, /credentials: "same-origin"/);
+  assert.match(page, /credentials\s*:\s*"same-origin"/);
   assert.match(page, /Evidence notes are candidate-recorded and are not independently verified/);
   assert.match(page, /Application pack library/);
   assert.match(page, /Follow-up tasks/);
@@ -270,7 +270,7 @@ test("support requests are validated and persisted in the authenticated candidat
   const page = fs.readFileSync(path.resolve(__dirname, "../src/app/candidate/support/page.tsx"), "utf8");
   assert.match(page, /action: "createSupportRequest"/);
   assert.match(page, /cache: "no-store"/);
-  assert.match(page, /credentials: "same-origin"/);
+  assert.match(page, /credentials\s*:\s*"same-origin"/);
   assert.match(page, /urgent or deadline-risk items are flagged in this workspace only/i);
 });
 
@@ -282,7 +282,7 @@ test("message ledger records communications without claiming external delivery",
   const page = fs.readFileSync(path.resolve(__dirname, "../src/app/candidate/messages/page.tsx"), "utf8");
   assert.match(page, /action\s*:\s*"recordMessage"/);
   assert.match(page, /No external message was sent/);
-  assert.match(page, /credentials: "same-origin"/);
+  assert.match(page, /credentials\s*:\s*"same-origin"/);
   assert.match(page, /cache: "no-store"/);
 });
 
