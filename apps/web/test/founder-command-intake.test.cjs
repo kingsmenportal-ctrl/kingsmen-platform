@@ -18,7 +18,8 @@ test("founder command intake persists a request and audit event transactionally"
 test("founder operational tables no longer use the permissive migration-0015 policies", () => {
   assert.match(migration, /drop policy if exists founder_command_requests_all/);
   assert.match(migration, /create policy founder_command_requests_founder .*public\.is_kingsmen_founder\(\)/);
-  assert.match(migration, /create policy founder_ops_audit_events_founder .*public\.is_kingsmen_founder\(\)/);
+  assert.match(migration, /create policy founder_ops_audit_events_select on public\.founder_ops_audit_events for select to authenticated using \(public\.is_kingsmen_founder\(\)\)/);
+  assert.match(migration, /create policy founder_ops_audit_events_insert on public\.founder_ops_audit_events for insert to authenticated with check \(public\.is_kingsmen_founder\(\)\)/);
   assert.match(migration, /auth\.jwt\(\) -> 'app_metadata'/);
   assert.doesNotMatch(migration, /user_metadata/);
 });
