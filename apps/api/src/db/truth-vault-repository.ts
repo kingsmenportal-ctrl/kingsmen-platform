@@ -315,6 +315,42 @@ export class TruthVaultRepository {
     }));
   }
 
+  /** Lists only open document requests owned by the authenticated candidate. */
+  async listOpenDocumentRequestsForOwner(candidateUuid: string): Promise<Array<{
+    requestRef: string;
+    documentType: string;
+    reason: string;
+    priority: string;
+    dueAt: string | null;
+    createdAt: string;
+  }>> {
+    this.assertEnabled();
+    if (!/^[0-9a-f]{8}-[0-9a-f]{4}-[1-8][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i.test(candidateUuid)) return [];
+    const result = await this.pool!.query<{
+      request_ref: string;
+      document_type: string;
+      reason: string;
+      priority: string;
+      due_at: string | null;
+      created_at: string;
+    }>(
+      `select request_ref, document_type, reason, priority, due_at::text, created_at::text
+       from document_requests
+       where candidate_id = $1::uuid and request_status = 'OPEN'
+       order by due_at asc nulls last, created_at desc
+       limit 100`,
+      [candidateUuid]
+    );
+    return result.rows.map((row) => ({
+      requestRef: row.request_ref,
+      documentType: row.document_type,
+      reason: row.reason,
+      priority: row.priority,
+      dueAt: row.due_at,
+      createdAt: row.created_at
+    }));
+  }
+
   /** Identity-scoped candidate read; candidateUuid must come from a verified session. */
   async readCandidateStatusForOwner(candidateUuid: string, candidateRef: string): Promise<CandidateReadModel | null> {
     this.assertEnabled();
