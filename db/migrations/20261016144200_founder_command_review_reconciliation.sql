@@ -50,6 +50,7 @@ drop policy if exists founder_command_decisions_select on public.founder_command
 drop policy if exists founder_command_decisions_insert on public.founder_command_decisions;
 create policy founder_command_decisions_select on public.founder_command_decisions
   for select to authenticated using (public.is_kingsmen_founder());
+grant select on public.founder_command_intake, public.founder_command_decisions to authenticated;
 -- No direct INSERT/UPDATE/DELETE policy: decisions must go through the guarded RPC.
 
 create or replace function public.record_founder_command_intake(
