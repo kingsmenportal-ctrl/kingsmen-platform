@@ -203,6 +203,7 @@ export async function handlePayFastItn(request: IncomingMessage, response: Serve
     const grossCents = amounts.grossCents;
     if (result.accepted && !amounts.valid) {
       result.accepted = false;
+      result.amountValid = false;
       result.rejectionReason = amounts.reason ?? "PayFast amount reconciliation failed."; 
     }
     if (result.accepted) {
