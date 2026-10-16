@@ -51,3 +51,21 @@ Do not reapply existing migrations, edit applied migration history, or create mi
 - Approved signatures and reviewed SQL for the missing RPCs.
 - Authenticated runtime proof that founder review decisions persist atomically with audit records.
 - Runtime evidence for document upload, download, deletion and candidate isolation.
+
+
+## Additional schema checks and prepared forward migrations
+
+Further read-only inspection found:
+
+- `public.is_kingsmen_founder()` is absent from staging, as are the five RPCs listed above.
+- `public.founder_document_review_decisions` is absent, so the founder review route cannot persist its expected decision rows.
+- The deployed `document_storage_events_type_check` does not allow `APPLICATION_LINKED`. Even if the link RPC alone were installed, application linkage would fail when it records the event.
+- The `document_files_size_nonnegative` and `document_files_metadata_object` constraints from the repository lifecycle migration are absent. A read-only preflight found zero negative file sizes, zero non-object metadata rows, and zero duplicate `(storage_bucket, storage_path)` pairs at inspection time.
+- Storage object policies exist for authenticated candidate-owned INSERT, SELECT and DELETE in the private `candidate-documents` bucket. This is policy inspection only, not proof of cross-candidate runtime denial.
+
+Two **draft forward migrations** have been prepared on this PR branch:
+
+1. `db/migrations/20261016144000_candidate_document_lifecycle_reconciliation.sql` — reinstates the candidate upload registration, retirement/deletion-result and application-link RPCs; adds the missing lifecycle constraints and event type; preflights duplicate storage paths before creating a unique index.
+2. `db/migrations/20261016144100_founder_document_review_reconciliation.sql` — restores the founder-role helper, decision table and canonical-validation review RPC. It intentionally does not change the staging `founder_ops_audit_events` service-role-only policy.
+
+These files are **not applied to Supabase**. They still require careful SQL review against the deployed schema and runtime contract, plus a verified staging backup/restore path. Do not apply either migration until those gates pass. Migration files use timestamp prefixes to avoid the existing four-digit suffix collisions with the timestamped staging history.
