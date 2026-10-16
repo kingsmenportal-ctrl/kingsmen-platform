@@ -55,6 +55,14 @@
 - **Tracker reconciliation:** row-by-row path classification for all 188 rows and PRs #70–#85 is committed in `docs/launch/KINGSMEN_BUILD_TRACKER_RECONCILIATION.md`; absent paths remain `Not_Started`, and existing paths are not treated as proof.
 - **Supabase:** source-level inspection only. No backup or restore is claimed. No migrations have been applied by this work.
 
+### Temporary Phase 0 exception — 16 October 2026
+
+**TEMPORARY EXCEPTION (16 Oct 2026): Phase 0 exit gate is not fully closed due to missing API package-lock.json and unproven npm ci. Decision taken to proceed to Phase 1 (Database Recovery Gate) while this remains open debt. This item MUST be completed and verified before any production deployment or final launch. No claim is made that Phase 0 is complete.**
+
+- **API dependency lockfile:** Blocked / Outstanding — `apps/api/package-lock.json` is missing.
+- **API clean lockfile install:** Blocked / Outstanding — `npm ci --prefix apps/api` has not been proven against a committed API lockfile.
+- This is a documented sequencing exception only. It does not waive the Phase 0 debt, certify foundation readiness, authorize production deployment, or authorize migrations against staging/production. Phase 1 work remains subject to the isolated-target recovery gate; if no verified recovery path can be established, no migrations may be applied.
+
 ### Phase 0 exit gate: **NOT CLOSED**
 
 Source Guard is verified, and a path-by-path tracker report exists. Phase 0 remains open until API dependencies are reproducible from a committed API lockfile and clean `npm ci`, and the required CI result is re-run against the final PR head. The tracker path/status classification is complete; it does not certify component functionality.
