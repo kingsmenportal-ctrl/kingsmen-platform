@@ -165,6 +165,16 @@ export async function handlePayFastItn(request: IncomingMessage, response: Serve
       return;
     }
 
+    const prior = await client.query<{ id: string }>(
+      "SELECT id FROM public.payfast_itn_receipts WHERE accepted = true AND (provider_payment_id = $1 OR idempotency_key = $2) " +
+      "UNION ALL SELECT id FROM public.finance_payments WHERE provider = 'PAYFAST' AND provider_payment_id = $1 LIMIT 1",
+      [providerPaymentId, ["payfast-itn", merchantReference, providerPaymentId, String(fields.payment_status ?? "unknown").toUpperCase()].join(":")]
+    );
+    if (prior.rows.length > 0) {
+      await client.query("ROLLBACK");
+      send(response, 200, "OK");
+      return;
+    }
     const intentResult = await client.query<{
       intent_ref: string; intent_status: string; amount_cents: number; currency: string; merchant_reference: string;
     }>(
@@ -172,18 +182,13 @@ export async function handlePayFastItn(request: IncomingMessage, response: Serve
       [order.order_ref, merchantReference]
     );
     const intent = intentResult.rows[0];
-    if (!intent || !["CREATED", "REDIRECTED"].includes(intent.intent_status)
+    if (!intent || !["CREATED", "REDIRECTED", "ITN_RECEIVED"].includes(intent.intent_status)
       || intent.amount_cents !== order.amount_cents || intent.currency !== order.currency) {
       await client.query("ROLLBACK");
       send(response, 400, "No matching payment intent");
       return;
     }
 
-    const prior = await client.query<{ id: string }>(
-      "SELECT id FROM public.payfast_itn_receipts WHERE accepted = true AND (provider_payment_id = $1 OR idempotency_key = $2) " +
-      "UNION ALL SELECT id FROM public.finance_payments WHERE provider = 'PAYFAST' AND provider_payment_id = $1 LIMIT 1",
-      [providerPaymentId, ["payfast-itn", merchantReference, providerPaymentId, String(fields.payment_status ?? "unknown").toUpperCase()].join(":")]
-    );
     const result = validatePayFastItn({
       payload: fields,
       expectedMerchantReference: order.order_ref,
