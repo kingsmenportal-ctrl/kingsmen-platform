@@ -56,6 +56,18 @@ test("callback does not commit when invoice is missing or not payable", async ()
   assert.equal(paid.calls.some(c => c[0] === "commit"), false);
 });
 
+
+test("callback rejects zero-value invoices before contacting PayFast", async () => {
+  const db = store({ expected: { invoiceId: "i", paymentRef: "invoice-0001", amountCents: 0, currency: "ZAR", status: "issued" } });
+  let contacted = false;
+  await assert.rejects(() => processPayFastCallback(bodyWithSignature(), config, db, async () => {
+    contacted = true;
+    return new Response("VALID", { status: 200 });
+  }), /PAYFAST_AMOUNT_INVALID/);
+  assert.equal(contacted, false);
+  assert.equal(db.calls.some(c => c[0] === "commit"), false);
+});
+
 test("callback does not commit when PayFast server confirmation fails", async () => {
   const db = store();
   await assert.rejects(() => processPayFastCallback(bodyWithSignature(), config, db, async () => new Response("INVALID", { status: 200 })), /PAYFAST_CONFIRMATION_INVALID/);
