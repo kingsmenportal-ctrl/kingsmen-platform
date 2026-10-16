@@ -24,3 +24,9 @@ test("fails closed when source or allow-list is absent or malformed", () => {
   assert.equal(isAllowedPayFastSourceIp("203.0.113.7", undefined), false);
   assert.equal(isAllowedPayFastSourceIp("203.0.113.7", "203.0.113.7,not-an-ip"), false);
 });
+
+test("fails closed for absent source address, absent allow-list, and malformed configured entries", () => {
+  assert.equal(isAllowedPayFastSourceIp(undefined, "203.0.113.7"), false);
+  assert.equal(isAllowedPayFastSourceIp("203.0.113.7", undefined), false);
+  assert.equal(isAllowedPayFastSourceIp("203.0.113.7", "203.0.113.7,not-an-ip"), false);
+});
