@@ -43,7 +43,7 @@ test("rejects a tampered order amount instead of signing a client-controlled pri
 
 test("rejects a currency mismatch and an order that is not pending payment", () => {
   const wrongCurrency = createFinanceOrder({ candidateRef: "candidate_synthetic_005", planCode: "CV_REVAMP_R49_99" });
-  wrongCurrency.currency = "USD" as typeof wrongCurrency.currency;
+  wrongCurrency.currency = "USD" as unknown as typeof wrongCurrency.currency;
   assert.throws(() => createPayFastPaymentIntent({ order: wrongCurrency, runtime }), /does not match the trusted pricing catalogue/i);
 
   const wrongStatus = createFinanceOrder({ candidateRef: "candidate_synthetic_006", planCode: "CV_REVAMP_R49_99" });
