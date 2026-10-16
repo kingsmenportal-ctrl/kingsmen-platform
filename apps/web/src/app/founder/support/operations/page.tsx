@@ -89,7 +89,7 @@ export default function FounderSupportOperationsPage() {
       <a href="/founder/control-plane" style={{ color: "#f8d77a" }}>← Founder Control Plane</a>
       <p style={{ color: "#f8d77a", fontSize: 12, fontWeight: 900, letterSpacing: ".15em", textTransform: "uppercase" }}>Founder operations · Support</p>
       <h1 style={{ fontSize: "clamp(30px,4vw,46px)", margin: "8px 0" }}>Support Team Operations</h1>
-      <p style={{ ...text, maxWidth: 850 }}>Assign canonical database tickets, update workflow status, document resolution and preserve an audit trail. No external notification is sent by these actions. This is not the candidate-local support queue; the two stores are not automatically mirrored.</p>
+      <p style={{ ...text, maxWidth: 850 }}>Assign canonical database tickets, update workflow status, document resolution and preserve an audit trail. No external notification was sent by these actions. No email, SMS, WhatsApp or operator notification is sent. This is not the candidate-local support queue; the two stores are not automatically mirrored.</p>
       <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit,minmax(150px,1fr))", gap: 12, margin: "22px 0" }}>
         {[[tickets.length,"Canonical tickets"],[active.length,"Active"],[unassigned.length,"Unassigned"],[urgent.length,"Urgent / high priority"],[older24h.length,"Active >24 hours"]].map(([value,label])=><div key={String(label)} style={card}><strong style={{ fontSize: 27 }}>{value}</strong><div style={{ ...text, fontSize: 13 }}>{label}</div></div>)}
       </div>
