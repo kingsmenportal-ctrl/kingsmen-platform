@@ -66,7 +66,7 @@ test("follow-up UI prepares a manual draft, records an explicit attempt, and exp
   assert.match(ui, /Prepare follow-up draft/);
   assert.match(ui, /Record follow-up attempt/);
   assert.match(ui, /Follow-up attempt recorded by user/);
-  assert.match(ui, /kingsmen-follow-up-queue\\.csv/);
+  assert.ok(ui.includes('anchor.download = "kingsmen-follow-up-queue.csv"'));
   assert.match(ui, /Prevent spreadsheet formula injection/);
   assert.match(ui, /nothing was sent/);
   assert.match(ui, /Save the ledger record to persist/);
