@@ -67,6 +67,8 @@ jobs:
         run: node scripts/validators/validate-payfast-intent-secrets.mjs
       - name: Validate PayFast ITN route boundary
         run: node scripts/validators/validate-payfast-itn-route.mjs
+      - name: Validate PayFast route and schema contract
+        run: node scripts/validators/validate-payfast-schema-contract.mjs
       - name: Build and run API tests
         working-directory: apps/api
         run: npm run validate
