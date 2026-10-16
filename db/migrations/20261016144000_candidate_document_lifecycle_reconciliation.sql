@@ -78,7 +78,8 @@ begin
     or char_length(coalesce(p_storage_path,'')) not between 38 and 220
     or split_part(p_storage_path,'/',1) <> auth.uid()::text
     or split_part(p_storage_path,'/',2) = ''
-    or split_part(p_storage_path,'/',3) <> '' then
+    or split_part(p_storage_path,'/',3) <> ''
+    or length(p_storage_path) - length(replace(p_storage_path,'/','')) <> 1 then
     raise exception 'INVALID_CANDIDATE_DOCUMENT_UPLOAD' using errcode = '22023';
   end if;
 
@@ -184,7 +185,8 @@ begin
   if v_storage_bucket <> 'candidate-documents'
     or split_part(v_storage_path,'/',1) <> auth.uid()::text
     or split_part(v_storage_path,'/',2) = ''
-    or split_part(v_storage_path,'/',3) <> '' then
+    or split_part(v_storage_path,'/',3) <> ''
+    or length(v_storage_path) - length(replace(v_storage_path,'/','')) <> 1 then
     raise exception 'UNSAFE_DOCUMENT_STORAGE_REFERENCE' using errcode = '23514';
   end if;
 
@@ -312,6 +314,13 @@ begin
   end if;
   if v_status in ('ARCHIVED','DELETED','REJECTED') then
     raise exception 'DOCUMENT_NOT_ACTIVE' using errcode = '23514';
+  end if;
+  if v_bucket <> 'candidate-documents'
+    or split_part(v_path,'/',1) <> auth.uid()::text
+    or split_part(v_path,'/',2) = ''
+    or split_part(v_path,'/',3) <> ''
+    or length(v_path) - length(replace(v_path,'/','')) <> 1 then
+    raise exception 'UNSAFE_DOCUMENT_STORAGE_REFERENCE' using errcode = '23514';
   end if;
   if v_old_application_id = p_application_id then
     return jsonb_build_object('linked',true,'unchanged',true,'documentRef',p_document_ref,'applicationId',p_application_id);
