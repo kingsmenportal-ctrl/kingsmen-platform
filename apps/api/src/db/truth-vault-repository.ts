@@ -275,6 +275,31 @@ export class TruthVaultRepository {
     return { replay: false, workflowRunId: input.result.workflowRunId, responseBody: input.responseBody };
   }
 
+  /** Identity-scoped candidate read; candidateUuid must come from a verified session. */
+  async readCandidateStatusForOwner(candidateUuid: string, candidateRef: string): Promise<CandidateReadModel | null> {
+    this.assertEnabled();
+    if (!/^[0-9a-f]{8}-[0-9a-f]{4}-[1-8][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i.test(candidateUuid)) return null;
+    const result = await this.pool!.query<CandidateRow>(
+      "select id::text, public_ref, email, display_name, current_state, active_package_code, updated_at::text from candidates where id = $1::uuid and public_ref = $2 limit 1",
+      [candidateUuid, candidateRef]
+    );
+    const row = result.rows[0];
+    if (!row) return null;
+    return { candidateId: row.public_ref, displayName: row.display_name, email: row.email, currentState: row.current_state, activePackageCode: row.active_package_code ?? undefined, profileConfidence: "LOW", documentReadiness: "PARTIAL", applicationReadiness: "NOT_READY", lastUpdatedAt: row.updated_at };
+  }
+
+  /** Returns an application only when it belongs to the verified candidate UUID. */
+  async readOwnedApplicationWorkbench(applicationRef: string, candidateUuid: string): Promise<ApplicationWorkbenchReadModel | null> {
+    this.assertEnabled();
+    if (!/^[0-9a-f]{8}-[0-9a-f]{4}-[1-8][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i.test(candidateUuid)) return null;
+    const result = await this.pool!.query<ApplicationRow>(
+      "select a.id::text, coalesce(a.metadata->>'applicationRef', a.id::text) as application_ref, c.public_ref as candidate_ref, a.route_type, a.source_confidence_band, a.current_state, a.portal_health, a.map_fallback_required, a.last_evidence_ref, a.updated_at::text from applications a join candidates c on c.id = a.candidate_id where a.metadata->>'applicationRef' = $1 and a.candidate_id = $2::uuid limit 1",
+      [applicationRef, candidateUuid]
+    );
+    const row = result.rows[0];
+    if (!row) return null;
+    return { applicationId: row.application_ref, candidateId: row.candidate_ref, routeType: row.route_type, sourceConfidenceBand: row.source_confidence_band, currentState: row.current_state, portalHealth: row.portal_health, mapFallbackRequired: row.map_fallback_required, lastEvidenceRef: row.last_evidence_ref ?? undefined, lastUpdatedAt: row.updated_at };
+  }
   async readCandidateStatus(candidateRef: string): Promise<CandidateReadModel | null> {
     this.assertEnabled();
     const result = await this.pool!.query<CandidateRow>(
