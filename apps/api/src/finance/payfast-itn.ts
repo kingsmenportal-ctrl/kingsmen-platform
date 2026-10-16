@@ -38,8 +38,11 @@ export function validatePayFastItn(input: PayFastItnValidationInput): PayFastItn
   let amountGrossCents = -1;
   try {
     const rawAmount = payload.amount_gross;
-    if (rawAmount !== undefined && rawAmount !== null && String(rawAmount).trim() !== "") {
-      amountGrossCents = randToCents(String(rawAmount));
+    const amountText = rawAmount === undefined || rawAmount === null ? "" : String(rawAmount).trim();
+    // Provider ITNs use a decimal point and at most two fractional digits.
+    // Reject locale commas, exponent notation, and over-precision instead of rounding them.
+    if (/^\d+(?:\.\d{1,2})?$/.test(amountText)) {
+      amountGrossCents = randToCents(amountText);
     }
   } catch {
     amountGrossCents = -1;
