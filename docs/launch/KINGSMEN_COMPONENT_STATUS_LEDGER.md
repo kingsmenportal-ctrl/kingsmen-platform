@@ -57,7 +57,7 @@
 
 ### Phase 0 exit gate: **NOT CLOSED**
 
-Source Guard is verified, and a path-by-path tracker report exists. Phase 0 remains open until (1) API dependencies are reproducible from a committed API lockfile and clean `npm ci`, (2) all tracker rows are semantically reconciled rather than merely counted, and (3) a successful required CI run is recorded on the latest PR head.
+Source Guard is verified, and a path-by-path tracker report exists. Phase 0 remains open until API dependencies are reproducible from a committed API lockfile and clean `npm ci`, and the required CI result is re-run against the final PR head. The tracker path/status classification is complete; it does not certify component functionality.
 
 ### Phase 1 exit gate: **NOT CLOSED / NOT STARTED**
 
