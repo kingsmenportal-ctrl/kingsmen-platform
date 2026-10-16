@@ -24,7 +24,7 @@ as $$
 declare v_id uuid; v_existing public.selection_decisions%rowtype;
 begin
  if not kingsmen_security.is_kingsmen_founder() then raise exception 'founder role required' using errcode='42501'; end if;
- if p_candidate_id is null or p_decision not in ('selected','waitlisted','rejected','pending')
+ if p_candidate_id is null or p_decision is null or p_decision not in ('selected','waitlisted','rejected','pending')
     or p_idempotency_key is null or length(p_idempotency_key) < 8 or length(p_idempotency_key) > 128 then
    raise exception 'invalid selection decision input' using errcode='22023';
  end if;
