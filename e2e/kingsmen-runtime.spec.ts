@@ -1,4 +1,4 @@
-import { test, expect, type BrowserContext, type Page } from "playwright/test";
+import { test, expect, type Page } from "playwright/test";
 
 const BASE_URL = process.env.KINGSMEN_STAGING_BASE_URL || "";
 const SUPABASE_URL = process.env.NEXT_PUBLIC_SUPABASE_URL || "";
@@ -118,7 +118,7 @@ test.describe("Kingsmen Portal — staging runtime evidence", () => {
     page.once("dialog", (dialog) => dialog.accept());
     await page.getByRole("button", { name: "Delete", exact: true }).first().click();
     await expect(page.getByRole("alert")).toContainText("private file could not be deleted");
-    await expect(page.getByRole("status")).not.toContainText("Document deleted.");
+    await expect(page.getByText("Document deleted.", { exact: true })).toHaveCount(0);
     await page.unroute("**/api/personal-jobs/apply-now");
 
     const stillPresent = await getDocument(page, document.documentId);
