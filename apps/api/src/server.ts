@@ -1,3 +1,4 @@
+import { handleFounderComponentRoute } from "./components/founder-router";
 import { handleCandidateComponentRoute } from "./components/candidate-router";
 import { createServer, type IncomingMessage, type ServerResponse } from "node:http";
 import { URL } from "node:url";
@@ -567,6 +568,10 @@ export function createKingsmenApiServer() {
         await handleReadiness(response);
         return;
       }
+
+      // User-context routes use the caller JWT and RLS, never the service-to-service token.
+      if (await handleCandidateComponentRoute(request, response, pathname, method)) return;
+      if (await handleFounderComponentRoute(request, response, pathname, method)) return;
 
       // Health endpoints stay public for load balancers; all application/read-model routes
       // require service authentication in staging/production.
