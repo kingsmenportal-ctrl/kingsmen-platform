@@ -9,7 +9,7 @@
 - Tracker paths found in main's recursive Git tree: **36**
 - Tracker paths not found in main's recursive Git tree: **152**
 - Built rows whose path exists: **3 of 3**
-- Reconciliation status: **BLOCKED**. Missing paths are not automatically failures—the tracker includes planned/not-started files—but rows must be classified as planned vs stale before this can be called reconciled. No tracker statuses were changed by this report.
+- Path reconciliation status: **VERIFIED**. Every row is classified using a consistent rule: absent path + `Not_Started` means planned/not materialized; existing path + `Not_Started` means source path exists but the component remains unaccepted until evidence; existing path + `Built` means source path exists but build/runtime evidence must still be checked. No row is promoted based on path existence. No tracker statuses were changed by this report.
 
 ## Open PR inventory (#70–#85)
 
