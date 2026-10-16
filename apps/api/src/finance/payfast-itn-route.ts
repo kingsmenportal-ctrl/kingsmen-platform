@@ -250,11 +250,13 @@ export async function handlePayFastItn(request: IncomingMessage, response: Serve
     // never grant entitlements or mark the order PAID in this foundation stage.
     // Receipt and evidence are durable, but we do not fabricate fee/net accounting
     // from fields that have not been independently validated.
-    await client.query(
+    const intentUpdate = await client.query(
       "UPDATE public.payfast_payment_intents SET intent_status = 'ITN_RECEIVED', updated_at = now() WHERE intent_ref = $1 AND intent_status IN ('CREATED','REDIRECTED','ITN_RECEIVED')",
       [intent.intent_ref]
     );
-    await client.query(
+    if (intentUpdate.rowCount !== 1) throw new Error("PAYFAST_INTENT_STATE_CHANGED");
+
+    const evidenceInsert = await client.query(
       `INSERT INTO public.payment_evidence_ledger
        (evidence_ref, source_type, source_ref, candidate_ref, order_ref, event_name, event_summary, proof_payload)
        VALUES ($1,'payfast_itn',$2,$3,$4,'PAYFAST_ITN_VALIDATED','Signed callback validated; entitlement activation withheld pending provider confirmation.',$5::jsonb)
@@ -262,6 +264,7 @@ export async function handlePayFastItn(request: IncomingMessage, response: Serve
       [`pay_ev_${itnRef}`, itnRef, order.candidate_ref, order.order_ref,
        JSON.stringify({ providerPaymentId, paymentStatus: result.paymentStatus, grossCents, feeCents: amounts.feeCents, netCents: amounts.netCents, amountsReconciled: amounts.valid, entitlementActivated: false })]
     );
+    if (evidenceInsert.rowCount !== 1) throw new Error("PAYFAST_EVIDENCE_WRITE_CONFLICT");
     await client.query("COMMIT");
     send(response, 200, "OK");
   } catch (error) {
