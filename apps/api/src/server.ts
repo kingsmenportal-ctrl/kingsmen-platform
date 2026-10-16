@@ -1,6 +1,5 @@
 import { handleFounderComponentRoute } from "./components/founder-router";
 import { handleCandidateComponentRoute } from "./components/candidate-router";
-import { handlePayFastWebhook } from "./components/payfast-webhook";
 import { processPayFastCallback } from "./components/payfast-callback";
 import { SupabasePaymentCallbackStore } from "./components/supabase-payment-store";
 import { createServer, type IncomingMessage, type ServerResponse } from "node:http";
@@ -654,9 +653,6 @@ export function createKingsmenApiServer() {
         await handlePayFastWebhook(request, response);
         return;
       }
-
-      // Provider ITNs are public callbacks; handler validates raw form, signature, PayFast confirmation and durable commit.
-      if (await handlePayFastWebhook(request, response)) return;
 
       // User-context routes use the caller JWT and RLS, never the service-to-service token.
       if (await handleCandidateComponentRoute(request, response, pathname, method)) return;
