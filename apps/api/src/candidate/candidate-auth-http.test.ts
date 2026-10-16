@@ -143,3 +143,46 @@ test("unrelated routes are not intercepted or given auth response headers", asyn
   assert.equal(res.headers.has("cache-control"), false);
   assert.equal(res.body, "");
 });
+
+
+test("candidate login rejects missing origin even when durable auth is available", async () => {
+  process.env.KINGSMEN_CANDIDATE_PORTAL_ORIGIN = "https://portal.example.test";
+  let loginCalls = 0;
+  const service = { login: async () => { loginCalls += 1; return { ok: false, reason: "INVALID_CREDENTIALS" }; } } as unknown as CandidateAuthService;
+  const request = bodyRequestMock('{"email":"originless@example.test","password":"test-only-password"}');
+  request.headers = { "content-type": "application/json" } as IncomingMessage["headers"];
+  const res = responseMock();
+  await handleCandidateAuthRoute(request, res.response, "/api/candidate-auth/login", service,
+    (response, status, body) => { response.statusCode = status; response.end(JSON.stringify(body)); });
+  assert.equal(res.statusCode, 403);
+  assert.match(res.body, /ORIGIN_NOT_ALLOWED/);
+  assert.equal(loginCalls, 0);
+});
+
+test("candidate login rate limits repeated failures by remote address and normalized email", async () => {
+  process.env.KINGSMEN_CANDIDATE_PORTAL_ORIGIN = "https://portal.example.test";
+  let loginCalls = 0;
+  const service = { login: async () => { loginCalls += 1; return { ok: false, reason: "INVALID_CREDENTIALS" }; } } as unknown as CandidateAuthService;
+  let finalResponse: ReturnType<typeof responseMock> | undefined;
+  for (let index = 0; index < 11; index += 1) {
+    const request = bodyRequestMock('{"email":"RateLimit-Case@example.test","password":"test-only-password"}');
+    const res = responseMock();
+    await handleCandidateAuthRoute(request, res.response, "/api/candidate-auth/login", service,
+      (response, status, body) => { response.statusCode = status; response.end(JSON.stringify(body)); });
+    finalResponse = res;
+    if (index < 10) assert.equal(res.statusCode, 401);
+  }
+  assert.equal(finalResponse?.statusCode, 429);
+  assert.match(finalResponse?.body ?? "", /LOGIN_RATE_LIMITED/);
+  assert.equal(finalResponse?.headers.get("retry-after"), "900");
+  assert.equal(loginCalls, 10, "the limited request must not reach credential verification");
+});
+
+test("candidate auth session endpoint requires GET and returns no-store headers", async () => {
+  const res = responseMock();
+  await handleCandidateAuthRoute(requestMock("POST"), res.response, "/api/candidate-auth/session", null,
+    (response, status, body) => { response.statusCode = status; response.end(JSON.stringify(body)); });
+  assert.equal(res.statusCode, 405);
+  assert.equal(res.headers.get("allow"), "GET");
+  assert.equal(res.headers.get("cache-control"), "no-store, no-cache, must-revalidate, private");
+});
