@@ -72,10 +72,16 @@ export class TruthVaultRepository {
   }
 
   static fromEnvironment(): TruthVaultRepository {
-    const mode = process.env.KINGSMEN_TRUTH_VAULT_MODE ?? "memory";
+    const isProduction = process.env.NODE_ENV === "production";
+    const mode = process.env.KINGSMEN_TRUTH_VAULT_MODE ?? (isProduction ? "postgres" : "memory");
     const databaseUrl = process.env.KINGSMEN_DATABASE_URL ?? process.env.DATABASE_URL;
 
-    if (mode !== "postgres") return new TruthVaultRepository(null);
+    if (mode !== "postgres") {
+      if (isProduction) {
+        throw new Error("PRODUCTION_REQUIRES_DURABLE_TRUTH_VAULT");
+      }
+      return new TruthVaultRepository(null);
+    }
     if (!databaseUrl) throw new Error("KINGSMEN_TRUTH_VAULT_MODE=postgres requires KINGSMEN_DATABASE_URL or DATABASE_URL.");
 
     const pg = require("pg") as { Pool: PgPoolConstructor };
@@ -84,7 +90,9 @@ export class TruthVaultRepository {
       max: Number(process.env.KINGSMEN_DATABASE_POOL_MAX ?? 8),
       idleTimeoutMillis: 30_000,
       connectionTimeoutMillis: 10_000,
-      ssl: process.env.KINGSMEN_DATABASE_SSL === "true" ? { rejectUnauthorized: true } : undefined
+      ssl: isProduction || process.env.KINGSMEN_DATABASE_SSL === "true"
+        ? { rejectUnauthorized: true }
+        : undefined
     }));
   }
 
