@@ -16,6 +16,8 @@ const checks = [
   ["readiness endpoint rejects memory-only mode", /pathname === "\/ready"/.test(source) && /DURABLE_STORAGE_DISABLED/.test(source) && /sendJson\(response, 503/.test(source)],
   ["readiness requires enabled healthy durable storage", /!truthVault\.enabled \|\| !truthVaultHealth\.ok/.test(source)],
   ["readiness endpoint is advertised in health metadata", /"GET \/ready"/.test(source)],
+  ["production defaults to PostgreSQL Truth Vault", /isProduction/.test(truthVaultSource) && /PRODUCTION_REQUIRES_DURABLE_TRUTH_VAULT/.test(truthVaultSource)],
+  ["production database connections verify TLS certificates", /ssl: isProduction/.test(truthVaultSource) && /rejectUnauthorized: true/.test(truthVaultSource)],
   ["database TLS verifies server certificates", /KINGSMEN_DATABASE_SSL === "true" \? \{ rejectUnauthorized: true \}/.test(truthVaultSource)],
   ["database TLS does not disable certificate verification", !/KINGSMEN_DATABASE_SSL === "true" \? \{ rejectUnauthorized: false \}/.test(truthVaultSource)],
   ["internal errors are not returned to clients", /sendError\(response, 500, ["']KINGSMEN_API_ERROR["'], ["']The request could not be completed\.["']\)/.test(source)]
