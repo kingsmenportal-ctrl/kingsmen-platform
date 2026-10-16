@@ -20,13 +20,18 @@ export interface PreparedDocumentStorage {
 
 const UUID_PATTERN = /^[0-9a-f]{8}-[0-9a-f]{4}-[1-8][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i;
 const ALLOWED_MIME_TYPES = new Set(["application/pdf", "image/jpeg", "image/png", "image/webp"]);
+const ALLOWED_DOCUMENT_TYPES = new Set<KingsmenDocumentType>([
+  "CV", "ID_DOCUMENT", "MATRIC_CERTIFICATE", "ACADEMIC_RECORD", "PROOF_OF_ADDRESS",
+  "BANK_LETTER", "PARENT_GUARDIAN_ID", "PAYSLIP", "AFFIDAVIT", "APPLICATION_PROOF",
+  "NSFAS_DOCUMENT", "OTHER"
+]);
 
 export function prepareDocumentStorage(input: DocumentStorageIntent): PreparedDocumentStorage {
   if (!UUID_PATTERN.test(input.candidateId)) throw new Error("candidateId must be a valid UUID.");
   if (input.applicationId !== undefined && !UUID_PATTERN.test(input.applicationId)) {
     throw new Error("applicationId must be a valid UUID.");
   }
-  if (!input.documentType) throw new Error("documentType is required.");
+  if (!ALLOWED_DOCUMENT_TYPES.has(input.documentType)) throw new Error("Unsupported document type.");
   if (typeof input.originalFilename !== "string" || input.originalFilename.trim().length < 2) {
     throw new Error("originalFilename is required.");
   }
