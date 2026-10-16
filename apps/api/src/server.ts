@@ -1,5 +1,7 @@
 import { handleFounderComponentRoute } from "./components/founder-router";
 import { handleCandidateComponentRoute } from "./components/candidate-router";
+import { processPayFastCallback } from "./components/payfast-callback";
+import { SupabasePaymentCallbackStore } from "./components/supabase-payment-store";
 import { createServer, type IncomingMessage, type ServerResponse } from "node:http";
 import { URL } from "node:url";
 import { timingSafeEqual } from "node:crypto";
@@ -261,6 +263,82 @@ function readBody(request: IncomingMessage): Promise<string> {
       if (!rejectedForSize) reject(error);
     });
   });
+}
+
+async function readPayFastRawBody(request: IncomingMessage): Promise<string> {
+  const contentType = (request.headers["content-type"] ?? "").split(";")[0].trim().toLowerCase();
+  if (contentType !== "application/x-www-form-urlencoded") throw new Error("PAYFAST_CONTENT_TYPE_INVALID");
+  return await new Promise((resolve, reject) => {
+    const chunks: Buffer[] = [];
+    let size = 0;
+    let settled = false;
+    request.on("data", (chunk: Buffer) => {
+      if (settled) return;
+      size += chunk.length;
+      if (size > 16_384) {
+        settled = true;
+        chunks.length = 0;
+        reject(new Error("PAYFAST_BODY_TOO_LARGE"));
+        return;
+      }
+      chunks.push(chunk);
+    });
+    request.on("end", () => {
+      if (!settled) resolve(Buffer.concat(chunks).toString("utf8"));
+    });
+    request.on("error", (error) => {
+      if (!settled) reject(error);
+    });
+  });
+}
+
+function payFastConfigFromEnvironment() {
+  const merchantId = process.env.PAYFAST_MERCHANT_ID ?? "";
+  const passphrase = process.env.PAYFAST_PASSPHRASE ?? "";
+  const environment = (process.env.PAYFAST_ENVIRONMENT ?? "sandbox").toLowerCase();
+  if (!merchantId || !passphrase || (environment !== "sandbox" && environment !== "live")) {
+    throw new Error("PAYFAST_NOT_CONFIGURED");
+  }
+  if (environment === "live" && process.env.NODE_ENV !== "production") {
+    throw new Error("PAYFAST_LIVE_REQUIRES_PRODUCTION");
+  }
+  return { merchantId, passphrase, environment: environment as "sandbox" | "live" };
+}
+
+async function handlePayFastWebhook(request: IncomingMessage, response: ServerResponse): Promise<void> {
+  try {
+    const rawBody = await readPayFastRawBody(request);
+    const result = await processPayFastCallback(
+      rawBody,
+      payFastConfigFromEnvironment(),
+      new SupabasePaymentCallbackStore()
+    );
+    // A 200 is emitted only after the persistence RPC has committed successfully.
+    sendJson(response, 200, result.body);
+  } catch (error) {
+    const code = error instanceof Error ? error.message : "";
+    const clientErrors = new Set([
+      "PAYFAST_BODY_TOO_LARGE", "PAYFAST_CONTENT_TYPE_INVALID", "PAYFAST_DUPLICATE_PARAMETER",
+      "PAYFAST_SIGNATURE_MISSING", "PAYFAST_SIGNATURE_INVALID", "PAYFAST_PAYMENT_REFERENCE_INVALID",
+      "PAYFAST_PROVIDER_PAYMENT_ID_INVALID", "PAYFAST_MERCHANT_ID_MISMATCH", "PAYFAST_PAYMENT_STATUS_INVALID",
+      "PAYFAST_PAYMENT_REFERENCE_MISMATCH", "PAYFAST_AMOUNT_MISMATCH", "PAYFAST_INVOICE_NOT_FOUND",
+      "PAYFAST_INVOICE_NOT_PAYABLE", "PAYFAST_CURRENCY_UNSUPPORTED", "PAYFAST_CONFIRMATION_INVALID",
+      "PAYFAST_CONFIRMATION_HTTP_ERROR"
+    ]);
+    const unavailable = new Set([
+      "PAYFAST_NOT_CONFIGURED", "PAYFAST_LIVE_REQUIRES_PRODUCTION", "PAYFAST_CONFIRMATION_UNAVAILABLE",
+      "PAYMENT_DATABASE_NOT_CONFIGURED", "PAYMENT_DATABASE_URL_INVALID", "PAYMENT_DATABASE_UNAVAILABLE",
+      "PAYMENT_DATABASE_SCHEMA_NOT_READY", "PAYMENT_DATABASE_WRITE_FAILED"
+    ]);
+    const status = clientErrors.has(code) ? 400 : unavailable.has(code) ? 503 : 500;
+    sendJson(response, status, {
+      ok: false,
+      code: /^[A-Z0-9_]+$/.test(code) ? code : "PAYFAST_PROCESSING_FAILED",
+      message: status === 400 ? "PayFast notification was rejected." :
+        status === 503 ? "Payment verification or persistence is temporarily unavailable." :
+        "Payment notification could not be safely committed."
+    });
+  }
 }
 
 async function readJson(request: IncomingMessage): Promise<unknown> {
@@ -566,6 +644,13 @@ export function createKingsmenApiServer() {
 
       if (method === "GET" && pathname === "/ready") {
         await handleReadiness(response);
+        return;
+      }
+
+      // Provider webhook: raw form body, PayFast verification, and durable atomic commit.
+      // This route intentionally bypasses the shared service token; verification is its authentication.
+      if (method === "POST" && pathname === "/api/webhooks/payfast/itn") {
+        await handlePayFastWebhook(request, response);
         return;
       }
 
