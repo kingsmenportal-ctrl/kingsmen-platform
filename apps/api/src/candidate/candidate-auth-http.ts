@@ -31,6 +31,10 @@ function rateLimited(request: IncomingMessage, email: string): boolean {
   const now = Date.now();
   for (const [key, value] of attempts) if (value.resetAt <= now) attempts.delete(key);
   const key = requestKey(request, email);
+  if (!attempts.has(key) && attempts.size >= 10_000) {
+    const oldestKey = attempts.keys().next().value;
+    if (oldestKey) attempts.delete(oldestKey);
+  }
   const current = attempts.get(key);
   if (!current || current.resetAt <= now) {
     attempts.set(key, { count: 1, resetAt: now + WINDOW_MS });
