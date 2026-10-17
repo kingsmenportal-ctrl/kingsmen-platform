@@ -92,6 +92,42 @@ test("health response identifies the Kingsmen service", async () => {
   assert.equal(body.routes.includes("POST /api/workflow/result"), true);
 });
 
+test("malformed JSON returns a client error instead of an internal server error", async () => {
+  const response = await fetch(`${baseUrl}/api/commands`, {
+    method: "POST",
+    headers: { "content-type": "application/json" },
+    body: "{ definitely not json"
+  });
+  assert.equal(response.status, 400);
+  const body = await response.json();
+  assert.equal(body.ok, false);
+  assert.equal(body.code, "INVALID_JSON");
+});
+
+test("request body limit is enforced in bytes and returns structured 413", async () => {
+  const response = await fetch(`${baseUrl}/api/commands`, {
+    method: "POST",
+    headers: { "content-type": "application/json" },
+    body: "x".repeat(1_000_001)
+  });
+  assert.equal(response.status, 413);
+  const body = await response.json();
+  assert.equal(body.ok, false);
+  assert.equal(body.code, "REQUEST_BODY_TOO_LARGE");
+});
+
+test("multibyte request content cannot bypass the byte limit", async () => {
+  const response = await fetch(`${baseUrl}/api/commands`, {
+    method: "POST",
+    headers: { "content-type": "application/json" },
+    body: "€".repeat(400_001)
+  });
+  assert.equal(response.status, 413);
+  const body = await response.json();
+  assert.equal(body.code, "REQUEST_BODY_TOO_LARGE");
+});
+
+
 test("production persistence mode fails closed without database URL", () => {
   const child = spawnSync(process.execPath, [path.resolve(__dirname, "../dist/server.js")], {
     encoding: "utf8",
