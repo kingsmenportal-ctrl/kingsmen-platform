@@ -1,0 +1,28 @@
+name: N10 Packages Payments Refunds
+on:
+  pull_request:
+    paths:
+      - 'db/migrations/0064_n10_packages_payments_refunds.sql'
+      - 'apps/web/src/app/api/candidate/finance/**'
+      - 'apps/web/src/app/api/reviewer/finance/**'
+      - 'apps/web/src/app/candidate/finance/**'
+      - 'apps/web/src/app/reviewer/finance/**'
+      - 'scripts/validators/validate-n10-finance.mjs'
+      - 'scripts/tests/n10-finance-contract.mjs'
+      - 'docs/n10/**'
+      - 'reports/n10/**'
+      - 'package.json'
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  n10-finance-contract:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - run: node -e "JSON.parse(require('fs').readFileSync('package.json','utf8'))"
+      - run: npm run n10:finance:validate
+      - run: npm run n10:finance:test
