@@ -16,8 +16,11 @@ const journeys = [
     purpose: "Use connected candidate account, profile correction, verified discovery, saved opportunity, application tracker, document, finance, outcome and message surfaces.",
     steps: [
       ["Candidate dashboard", "/candidate/dashboard"],
+      ["Profile", "/candidate/profile"],
+      ["Discover opportunities", "/candidate/discover"],
       ["Saved opportunities", "/candidate/saved-opportunities"],
-      ["Applications and outcomes", "/candidate/outcomes"],
+      ["Application tracker", "/candidate/applications"],
+      ["Outcomes", "/candidate/outcomes"],
       ["Documents", "/candidate/documents"],
       ["Finance", "/candidate/finance"],
       ["Messages", "/candidate/messages"]
@@ -32,6 +35,11 @@ const journeys = [
       ["Proof centre", "/founder/proof-centre"],
       ["Build proof", "/founder/build-proof"]
     ]
+  },
+  {
+    role: "Partner organisation",
+    purpose: "Submit organisation claims and listings for verification; publication remains reviewer-controlled.",
+    steps: [["Partner operations", "/partner"], ["Sign in / register", "/auth/login"]]
   }
 ];
 
