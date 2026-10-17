@@ -1,0 +1,18 @@
+import fs from "node:fs";
+import assert from "node:assert/strict";
+const sql=fs.readFileSync("db/migrations/0066_n11_service_fulfilment_entitlements.sql","utf8");
+const n10=fs.readFileSync("db/migrations/0064_n10_packages_payments_refunds.sql","utf8");
+assert.match(sql,/v_order\.status <> 'PAID'/);
+assert.match(sql,/v_payment\.event_type <> 'PAYMENT_CONFIRMED'/);
+assert.match(sql,/v_payment\.source <> 'VERIFIED_PROVIDER_WEBHOOK'/);
+assert.match(sql,/upper\(coalesce\(v_payment\.provider,''\)\) <> 'PAYFAST'/);
+assert.match(sql,/v_payment\.amount_minor IS DISTINCT FROM v_order\.amount_minor/);
+assert.match(sql,/coalesce\(v_payment\.metadata->>'server_validation',''\) <> 'VALID'/);
+assert.match(sql,/order creation or manual evidence cannot grant entitlement/);
+assert.match(sql,/ON CONFLICT|idempotency_key/);
+assert.match(sql,/candidate_entitlement_events/);
+assert.match(sql,/n11_prevent_entitlement_event_mutation/);
+assert.match(sql,/status='REVOKED'/);
+assert.match(sql,/REVOKE ALL ON FUNCTION public\.n11_grant_entitlement/);
+assert.match(n10,/UNIQUE\(candidate_id,idempotency_key\)/);
+console.log("N11 contract tests passed: an order or manual evidence cannot activate entitlement; grants require matching server-validated PayFast confirmation; hold/revoke events are audited.");
