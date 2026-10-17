@@ -16,8 +16,14 @@ type PgQueryResult<T = Record<string, unknown>> = {
   rowCount: number | null;
 };
 
-type PgPool = {
+type PgQueryable = {
   query<T = Record<string, unknown>>(sql: string, values?: readonly unknown[]): Promise<PgQueryResult<T>>;
+};
+
+type PgClient = PgQueryable & { release(): void };
+
+type PgPool = PgQueryable & {
+  connect(): Promise<PgClient>;
   end(): Promise<void>;
 };
 
@@ -105,15 +111,32 @@ export class TruthVaultRepository {
     return { ok: true, storageMode: this.storageMode, message: "PostgreSQL Truth Vault connection is healthy." };
   }
 
+  private async withTransaction<T>(work: (client: PgClient) => Promise<T>): Promise<T> {
+    this.assertEnabled();
+    const client = await this.pool!.connect();
+    try {
+      await client.query("BEGIN");
+      const result = await work(client);
+      await client.query("COMMIT");
+      return result;
+    } catch (error) {
+      await client.query("ROLLBACK").catch(() => undefined);
+      throw error;
+    } finally {
+      client.release();
+    }
+  }
+
   async recordCommand(input: {
     command: CommandEnvelope;
     policy: PolicyDecision;
     status: "ACCEPTED" | "PENDING_APPROVAL";
     responseBody: JsonObject;
   }): Promise<TruthVaultStoredCommandResult> {
-    this.assertEnabled();
+    return this.withTransaction(async (client) => {
+      await client.query("select pg_advisory_xact_lock(hashtext($1))", [input.command.idempotencyKey]);
 
-    const existing = await this.pool!.query<{ command_id: string | null; response_body: JsonObject | null }>(
+    const existing = await client.query<{ command_id: string | null; response_body: JsonObject | null }>(
       "select command_id, response_body from idempotency_keys where idempotency_key = $1 and status = 'COMPLETED' limit 1",
       [input.command.idempotencyKey]
     );
@@ -126,18 +149,18 @@ export class TruthVaultRepository {
       };
     }
 
-    const candidateUuid = await this.upsertCandidateForCommand(input.command);
-    const applicationUuid = await this.upsertApplicationForCommand(input.command, candidateUuid);
+    const candidateUuid = await this.upsertCandidateForCommand(input.command, client);
+    const applicationUuid = await this.upsertApplicationForCommand(input.command, candidateUuid, client);
     const dbStatus = input.status === "PENDING_APPROVAL" ? "APPROVAL_REQUIRED" : "ACCEPTED";
 
-    await this.pool!.query(
+    await client.query(
       `insert into idempotency_keys (idempotency_key, command_id, correlation_id, status)
        values ($1,$2,$3,'CLAIMED')
        on conflict (idempotency_key) do update set command_id = excluded.command_id, correlation_id = excluded.correlation_id`,
       [input.command.idempotencyKey, input.command.commandId, input.command.correlationId]
     );
 
-    await this.pool!.query(
+    await client.query(
       `insert into command_log (
          command_id, command_type, idempotency_key, correlation_id, actor_type, actor_id,
          source, candidate_id, application_id, policy_decision, payload, status
@@ -168,7 +191,7 @@ export class TruthVaultRepository {
       applicationUuid,
       message: `Command ${input.command.commandId} persisted to PostgreSQL Truth Vault.`,
       metadata: { commandType: input.command.commandType, storageMode: this.storageMode }
-    });
+    }, client);
 
     if (input.status === "PENDING_APPROVAL") {
       await this.createApprovalRequest({
@@ -179,24 +202,26 @@ export class TruthVaultRepository {
         approvalType: input.command.commandType,
         reason: "Policy requires founder/operator approval before execution.",
         payload: { commandType: input.command.commandType }
-      });
+      }, client);
     }
 
-    await this.pool!.query(
+    await client.query(
       `update idempotency_keys set status = 'COMPLETED', response_body = $2::jsonb, completed_at = now() where idempotency_key = $1`,
       [input.command.idempotencyKey, JSON.stringify(input.responseBody)]
     );
 
     return { replay: false, commandId: input.command.commandId, responseBody: input.responseBody };
+    });
   }
 
   async recordWorkflowResult(input: {
     result: WorkflowResultEnvelope;
     responseBody: JsonObject;
   }): Promise<TruthVaultStoredWorkflowResult> {
-    this.assertEnabled();
+    return this.withTransaction(async (client) => {
+      await client.query("select pg_advisory_xact_lock(hashtext($1))", [input.result.idempotencyKey]);
 
-    const existing = await this.pool!.query<{ workflow_run_id: string }>(
+    const existing = await client.query<{ workflow_run_id: string }>(
       "select workflow_run_id from workflow_runs where workflow_run_id = $1 limit 1",
       [input.result.workflowRunId]
     );
@@ -205,10 +230,10 @@ export class TruthVaultRepository {
       return { replay: true, workflowRunId: input.result.workflowRunId, responseBody: input.responseBody };
     }
 
-    const candidateUuid = await this.upsertCandidateForWorkflowResult(input.result);
-    const applicationUuid = await this.upsertApplicationForWorkflowResult(input.result, candidateUuid);
+    const candidateUuid = await this.upsertCandidateForWorkflowResult(input.result, client);
+    const applicationUuid = await this.upsertApplicationForWorkflowResult(input.result, candidateUuid, client);
 
-    await this.pool!.query(
+    await client.query(
       `insert into workflow_runs (
          workflow_run_id, workflow_code, idempotency_key, correlation_id, candidate_id,
          application_id, previous_state, final_state, status, evidence_ref, error_code, message, payload, completed_at
@@ -230,7 +255,7 @@ export class TruthVaultRepository {
       ]
     );
 
-    await this.pool!.query(
+    await client.query(
       `insert into evidence_ledger (evidence_ref, evidence_type, candidate_id, application_id, workflow_run_id, source_name, summary, payload)
        values ($1,'workflow_result',$2,$3,$4,$5,$6,$7::jsonb)
        on conflict (evidence_ref) do nothing`,
@@ -255,9 +280,9 @@ export class TruthVaultRepository {
       evidenceRef: input.result.evidenceRef ?? `ev_${input.result.workflowRunId}`,
       message: `Workflow result ${input.result.workflowRunId} persisted to PostgreSQL Truth Vault.`,
       metadata: { workflow: input.result.workflow, status: input.result.status }
-    });
+    }, client);
 
-    await this.pool!.query(
+    await client.query(
       `insert into idempotency_keys (idempotency_key, command_id, correlation_id, status, response_body, completed_at)
        values ($1,$2,$3,'COMPLETED',$4::jsonb,now())
        on conflict (idempotency_key) do update set status = 'COMPLETED', response_body = excluded.response_body, completed_at = now()`,
@@ -265,6 +290,7 @@ export class TruthVaultRepository {
     );
 
     return { replay: false, workflowRunId: input.result.workflowRunId, responseBody: input.responseBody };
+    });
   }
 
   async readCandidateStatus(candidateRef: string): Promise<CandidateReadModel | null> {
@@ -404,9 +430,9 @@ export class TruthVaultRepository {
     approvalType: string;
     reason: string;
     payload?: Record<string, unknown>;
-  }): Promise<TruthVaultWriteResult> {
+  }, client: PgQueryable = this.pool!): Promise<TruthVaultWriteResult> {
     this.assertEnabled();
-    await this.pool!.query(
+    await client.query(
       `insert into approval_requests (approval_ref, command_id, correlation_id, requested_by, approval_type, reason, payload)
        values ($1,$2,$3,$4,$5,$6,$7::jsonb)
        on conflict (approval_ref) do nothing`,
@@ -415,13 +441,13 @@ export class TruthVaultRepository {
     return { ok: true, ref: input.approvalRef, message: "Approval request persisted to PostgreSQL Truth Vault." };
   }
 
-  private async upsertCandidateForCommand(command: CommandEnvelope): Promise<string | null> {
+  private async upsertCandidateForCommand(command: CommandEnvelope, client: PgQueryable = this.pool!): Promise<string | null> {
     const payload = this.objectPayload(command.payload);
     const candidateRef = command.candidateId ?? this.safeString(payload.candidateId, "");
     if (!candidateRef) return null;
 
     const currentState = this.stateForCommand(command.commandType);
-    const result = await this.pool!.query<{ id: string }>(
+    const result = await client.query<{ id: string }>(
       `insert into candidates (public_ref, email, display_name, current_state, active_package_code)
        values ($1,$2,$3,$4,$5)
        on conflict (public_ref) do update set
@@ -443,10 +469,10 @@ export class TruthVaultRepository {
     return result.rows[0]?.id ?? null;
   }
 
-  private async upsertCandidateForWorkflowResult(result: WorkflowResultEnvelope): Promise<string | null> {
+  private async upsertCandidateForWorkflowResult(result: WorkflowResultEnvelope, client: PgQueryable = this.pool!): Promise<string | null> {
     if (!result.candidateId) return null;
 
-    const query = await this.pool!.query<{ id: string }>(
+    const query = await client.query<{ id: string }>(
       `insert into candidates (public_ref, email, display_name, current_state)
        values ($1,$2,$3,$4)
        on conflict (public_ref) do update set current_state = excluded.current_state, updated_at = now()
@@ -457,12 +483,12 @@ export class TruthVaultRepository {
     return query.rows[0]?.id ?? null;
   }
 
-  private async upsertApplicationForCommand(command: CommandEnvelope, candidateUuid: string | null): Promise<string | null> {
+  private async upsertApplicationForCommand(command: CommandEnvelope, candidateUuid: string | null, client: PgQueryable = this.pool!): Promise<string | null> {
     const payload = this.objectPayload(command.payload);
     const applicationRef = command.applicationId ?? this.safeString(payload.applicationId, "");
     if (!applicationRef || !candidateUuid) return null;
 
-    const lookup = await this.pool!.query<{ id: string }>(
+    const lookup = await client.query<{ id: string }>(
       "select id::text from applications where metadata->>'applicationRef' = $1 limit 1",
       [applicationRef]
     );
@@ -471,7 +497,7 @@ export class TruthVaultRepository {
 
     const routeType = this.safeRouteType(payload.routeType);
     const currentState = this.stateForCommand(command.commandType);
-    const result = await this.pool!.query<{ id: string }>(
+    const result = await client.query<{ id: string }>(
       `insert into applications (candidate_id, route_type, route_name, institution_or_provider, current_state, metadata)
        values ($1,$2,$3,$4,$5,$6::jsonb)
        returning id::text`,
@@ -488,23 +514,23 @@ export class TruthVaultRepository {
     return result.rows[0]?.id ?? null;
   }
 
-  private async upsertApplicationForWorkflowResult(result: WorkflowResultEnvelope, candidateUuid: string | null): Promise<string | null> {
+  private async upsertApplicationForWorkflowResult(result: WorkflowResultEnvelope, candidateUuid: string | null, client: PgQueryable = this.pool!): Promise<string | null> {
     if (!result.applicationId || !candidateUuid) return null;
 
-    const lookup = await this.pool!.query<{ id: string }>(
+    const lookup = await client.query<{ id: string }>(
       "select id::text from applications where metadata->>'applicationRef' = $1 limit 1",
       [result.applicationId]
     );
 
     if (lookup.rows[0]?.id) {
-      await this.pool!.query(
+      await client.query(
         `update applications set current_state = $2, map_fallback_required = map_fallback_required or $3, last_evidence_ref = coalesce($4, last_evidence_ref), updated_at = now() where id::text = $1`,
         [lookup.rows[0].id, result.finalState, result.status === "MANUAL_REQUIRED", result.evidenceRef ?? null]
       );
       return lookup.rows[0].id;
     }
 
-    const inserted = await this.pool!.query<{ id: string }>(
+    const inserted = await client.query<{ id: string }>(
       `insert into applications (candidate_id, route_type, route_name, current_state, source_confidence_band, map_fallback_required, last_evidence_ref, metadata)
        values ($1,'UNIVERSITY',$2,$3,'D',$4,$5,$6::jsonb)
        returning id::text`,
@@ -524,8 +550,8 @@ export class TruthVaultRepository {
     evidenceRef?: string | null;
     message: string;
     metadata?: Record<string, unknown>;
-  }): Promise<void> {
-    await this.pool!.query(
+  }, client: PgQueryable = this.pool!): Promise<void> {
+    await client.query(
       `insert into audit_events (event_id, event_type, severity, correlation_id, actor_id, candidate_id, application_id, evidence_ref, message, metadata)
        values ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10::jsonb)`,
       [
