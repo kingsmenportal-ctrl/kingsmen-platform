@@ -154,7 +154,7 @@ DECLARE
 BEGIN
   IF v_actor IS NULL OR NOT kingsmen_security.is_founder_or_operator()
   THEN RAISE EXCEPTION 'FOUNDER_OR_OPERATOR_REQUIRED' USING ERRCODE = '42501'; END IF;
-  IF p_package_id IS NULL OR p_decision NOT IN ('APPROVE','REJECT','VERIFY_COMPLETION')
+  IF p_package_id IS NULL OR p_decision IS NULL OR p_decision NOT IN ('APPROVE','REJECT','VERIFY_COMPLETION')
      OR length(v_notes) < 8 OR cardinality(v_evidence) > 10
   THEN RAISE EXCEPTION 'INVALID_MAP_REVIEW' USING ERRCODE = '22023'; END IF;
   IF EXISTS (SELECT 1 FROM unnest(v_evidence) u(value)
