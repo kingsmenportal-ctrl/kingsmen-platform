@@ -108,13 +108,13 @@ export async function supabaseAuth(path: "signup" | "token?grant_type=password" 
   return data as Record<string, unknown>;
 }
 
-export async function linkCandidateAccount(candidateReference = "") {
+export async function linkCandidateAccount(candidateReference = "", displayName = "") {
   const session = readKingsmenSession();
   if (!session) throw new Error("Sign in again before linking your candidate account.");
   const response = await fetch("/api/auth/link-candidate", {
     method: "POST",
     headers: { authorization: `Bearer ${session.access_token}`, "content-type": "application/json" },
-    body: JSON.stringify({ candidateReference }),
+    body: JSON.stringify({ candidateReference, displayName }),
     cache: "no-store"
   });
   const result = await response.json().catch(() => ({}));
