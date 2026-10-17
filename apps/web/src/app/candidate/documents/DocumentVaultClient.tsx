@@ -156,8 +156,8 @@ export default function DocumentVaultClient() {
       setMessage("Choose a document file first.");
       return;
     }
-    if (file.size < 1 || file.size > 10 * 1024 * 1024) {
-      setMessage("Documents must be between 1 byte and 10 MiB.");
+    if (file.size < 1 || file.size > 15 * 1024 * 1024) {
+      setMessage("Documents must be between 1 byte and 15 MiB.");
       return;
     }
 
