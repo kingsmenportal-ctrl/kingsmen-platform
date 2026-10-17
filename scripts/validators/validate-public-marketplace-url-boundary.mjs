@@ -10,9 +10,12 @@ const partnerOrganisations = read("apps/web/src/app/api/partners/organisations/r
 const reviewer = read("apps/web/src/app/api/admin/marketplace-review/route.ts");
 
 assert.match(helper, /url\.protocol !== "https:"/, "public URLs must require HTTPS");
+assert.match(helper, /sanitizePublicSearchQuery/, "public search input must be normalized before composing PostgREST filters");
 assert.match(helper, /url\.username \|\| url\.password/, "URLs with embedded credentials must be rejected");
 assert.match(helper, /localhost|\.local|\.internal/, "local-only hostnames must be rejected");
 assert.match(publicRead, /isPublicHttpsUrl\(r\.source_url\)/, "public route programmes must expose only secure source links");
+assert.match(publicRead, /sanitizePublicSearchQuery/, "search input must be normalized before filter composition");
+assert.match(publicRead, /INVALID_PROVINCE/, "province filters must be allowlisted");
 assert.match(publicRead, /isPublicHttpsUrl\(l\.official_source_url\)/, "public partner listings must expose only secure official sources");
 assert.match(publicRead, /!l\.application_url\|\|isPublicHttpsUrl\(l\.application_url\)/, "unsafe application destinations must not enter the directory");
 assert.match(partnerListings, /const http=\(s:string\)=>isPublicHttpsUrl\(s\)/, "partner listing intake must reject insecure source/application URLs");
