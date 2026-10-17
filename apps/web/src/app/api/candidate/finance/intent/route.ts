@@ -10,11 +10,14 @@ type Row = Record<string, unknown>;
 function safeHttps(value: string) {
   try { const url = new URL(value); return url.protocol === "https:" && !url.username && !url.password; } catch { return false; }
 }
+function payFastEncode(value: string) {
+  return encodeURIComponent(value).replace(/[!'()*~]/g, char => '%' + char.charCodeAt(0).toString(16).toUpperCase()).replace(/%20/g, '+');
+}
 function signatureFor(fields: Record<string, string>, passphrase: string) {
   const canonical = Object.entries(fields)
     .filter(([key, value]) => key !== "signature" && key !== "passphrase" && value !== "")
-    .map(([key, value]) => `${key}=${encodeURIComponent(value.trim()).replace(/%20/g, "+")}`);
-  if (passphrase) canonical.push(`passphrase=${encodeURIComponent(passphrase.trim()).replace(/%20/g, "+")}`);
+    .map(([key, value]) => `${key}=${payFastEncode(value.trim())}`);
+  if (passphrase) canonical.push(`passphrase=${payFastEncode(passphrase.trim())}`);
   return createHash("md5").update(canonical.join("&")).digest("hex");
 }
 
