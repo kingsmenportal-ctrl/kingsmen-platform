@@ -287,3 +287,13 @@ Foundation constraints remain unchanged: Phase 0 is **OPEN**, Phase 1 is **OPEN 
 - The separately stored signature remains part of the existing receipt contract; this change is narrowly about credential-like fields in the JSON payload, not a claim that all payment data is minimised or that retention policy is complete.
 - Commit: `6a4703ffd9c1d01456cb51132c6b7d88467268d1`. Verification for this commit is pending; do not infer passing tests from prior successful workflow runs.
 - No live payment, provider configuration, database migration, deployment, or merge was performed. PayFast live readiness remains **NOT APPROVED**; sandbox proof remains synthetic source-level evidence only. Phase 0 API lockfile/clean `npm ci` remains **OPEN**; Phase 1 backup, isolated restore, and migration rehearsal remains **OPEN / BLOCKED**.
+
+
+### Phase A.1 follow-up — candidate bridge CI source gates (17 October 2026)
+
+- Added the package command `candidate:validate:application-identity-bridge` and aggregate `candidate:validate:phase-a1-bridges` to run the candidate transaction, identity-link lifecycle/admin runtime, application identity/tracker, document ownership/metadata/request and support-ticket source validators as one suite.
+- Added the `candidate-bridge-source-guards` job to `.github/workflows/kingsmen-application-builds.yml` so these source boundaries are checked in pull-request CI alongside the existing web build and API compile/test jobs.
+- Detailed scope and acceptance criteria are recorded in `docs/launch/PR86_PHASE_A1_CANDIDATE_BRIDGE_CI_GATE_2026-10-17.md`.
+- **Status: CI guard authored; execution not yet verified on this head.** A configured workflow is not a passing workflow. No authenticated end-to-end candidate ownership isolation or live PostgreSQL/RLS integration test is claimed.
+- Migration `0040_candidate_auth_identity_link.sql` remains unapplied. Trusted operator adapter, actual candidate Auth-to-record mapping integration, private document storage/upload/download, and authorized staging tests remain open.
+- Phase 0 API lockfile/reproducible `npm ci` remains **OPEN**. Phase 1 backup, isolated restore and migration rehearsal remain **OPEN / BLOCKED**. No deployment, migration, data/policy change, or merge was performed.
