@@ -524,7 +524,7 @@ export class TruthVaultRepository {
             and d.archived_at is null
             and d.document_status <> 'DELETED'
           order by d.uploaded_at desc, d.id asc
-          limit 200`,
+          limit 201`,
         [supabaseUserId]
       );
       // No matching account means the identity is not linked. An empty array
@@ -533,6 +533,27 @@ export class TruthVaultRepository {
         "select exists(select 1 from public.candidate_auth_identity_links ca join public.candidates c on c.id=ca.candidate_id and c.is_active=true where ca.supabase_user_id=$1::uuid and ca.link_status='VERIFIED') as linked",
         [supabaseUserId]
       );
+      if (linked.rows[0]?.linked === true && result.rows.length > 200) {
+        throw new Error("CANDIDATE_DOCUMENT_RESULT_LIMIT_EXCEEDED");
+      }
+      if (linked.rows[0]?.linked === true) {
+        const correlationId = `candidate_documents_${Date.now()}_${Math.random().toString(36).slice(2, 10)}`;
+        await client.query(
+          `insert into audit_events
+             (event_id, event_type, severity, correlation_id, actor_id, candidate_id, message, metadata)
+           values ($1,$2,$3,$4,$5,$6,$7,$8::jsonb)`,
+          [
+            `evt_${Date.now()}_${Math.random().toString(36).slice(2, 10)}`,
+            "candidate.documents.listed",
+            "INFO",
+            correlationId,
+            linked.rows[0] ? supabaseUserId : "unknown",
+            null,
+            "Verified Supabase identity candidate document metadata read completed.",
+            JSON.stringify({ returnedCount: result.rows.length, responseLimit: 200 })
+          ]
+        );
+      }
       await client.query("COMMIT");
       if (linked.rows[0]?.linked !== true) return null;
       return result.rows.map((row) => ({
