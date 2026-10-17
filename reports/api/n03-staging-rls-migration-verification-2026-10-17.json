@@ -1,0 +1,49 @@
+{
+  "schema": "kingsmen.n03.staging.rls-migration-verification.v1",
+  "result": "N03_STAGING_MIGRATION_APPLIED_CATALOG_VERIFIED",
+  "productionReady": false,
+  "target": {
+    "name": "kingsmen-portal-staging",
+    "projectRef": "euhubhhnumtibbyufghm",
+    "statusBeforeMigration": "ACTIVE_HEALTHY"
+  },
+  "migrationName": "n03_truth_vault_0002_rls_hardening",
+  "applyOperation": "Supabase migration operation",
+  "applyResult": "success",
+  "expectedPolicies": 14,
+  "observedPolicies": 14,
+  "policyRole": "service_role",
+  "policyCommand": "ALL",
+  "usingPredicate": "true",
+  "withCheckPredicate": "true",
+  "publicRolePresentInExpectedPolicies": false,
+  "checks": [
+    {
+      "check": "all_14_expected_policy_names_present",
+      "passed": true
+    },
+    {
+      "check": "all_14_policies_explicitly_target_service_role",
+      "passed": true
+    },
+    {
+      "check": "all_14_policies_have_using_and_with_check_true",
+      "passed": true
+    },
+    {
+      "check": "production_database_modified",
+      "passed": false
+    },
+    {
+      "check": "live_anon_authenticated_service_role_request_tests",
+      "passed": false
+    }
+  ],
+  "limitations": [
+    "Catalog verification does not replace requests executed under anon, authenticated, and service_role contexts.",
+    "API persistence and process restart proof have not run.",
+    "Workflow rollback after an induced late failure has not been proven."
+  ],
+  "verifiedAt": "2026-10-17",
+  "secretsRedacted": true
+}
