@@ -13,7 +13,7 @@ type HealthPayload = {
 const journeys = [
   {
     role: "Candidate / learner",
-    purpose: "Use the current candidate surfaces to review saved opportunities, application progress, documents, finance, and messages.",
+    purpose: "Use connected candidate account, profile correction, verified discovery, saved opportunity, application tracker, document, finance, outcome and message surfaces.",
     steps: [
       ["Candidate dashboard", "/candidate/dashboard"],
       ["Saved opportunities", "/candidate/saved-opportunities"],
@@ -25,8 +25,9 @@ const journeys = [
   },
   {
     role: "Founder",
-    purpose: "Inspect operational control, review evidence, and check build/runtime proof.",
+    purpose: "Review marketplace submissions with evidence-backed, database-authorised decisions, and inspect operational/build proof.",
     steps: [
+      ["Marketplace review queue", "/founder/marketplace-review"],
       ["Founder control plane", "/founder/control-plane"],
       ["Proof centre", "/founder/proof-centre"],
       ["Build proof", "/founder/build-proof"]
@@ -80,16 +81,16 @@ export default async function KingsmenWorkspacePage() {
       </div>
 
       <section style={{ marginTop: 26, borderRadius: 16, background: "#202020", padding: 18 }}>
-        <h2 style={{ marginTop: 0 }}>Critical workflow gaps — not marked complete</h2>
+        <h2 style={{ marginTop: 0 }}>Deployment gates still open</h2>
         <ul style={{ color: "#d0d0d0", lineHeight: 1.75 }}>
-          <li>Authentication and candidate identity must be connected end to end before private records can be relied on.</li>
-          <li>Candidate profile and route discovery currently lack real page implementations.</li>
-          <li>Partner registration, organisation verification, listing submission, and reviewer publication need connected daily workflows.</li>
-          <li>Founder command queues, analytics, and communications need working operational screens.</li>
-          <li>Application outcomes must use official evidence; payments become settled only through verified provider callbacks and ledger records.</li>
+          <li>Migration 0059 (manual identity-link request queue) and migration 0060 (atomic marketplace review plus audit) are committed in the code branch but have not been applied to Supabase staging.</li>
+          <li>The web candidate APIs require the server-only SUPABASE_SERVICE_ROLE_KEY at runtime; it is not configured on the inspected Netlify staging site. Never place it in a NEXT_PUBLIC variable.</li>
+          <li>GitHub Actions returned no workflow runs for this PR head; build, tests, browser journeys, and connected staging behaviour remain unverified.</li>
+          <li>Netlify staging is SSO-restricted for non-production access; no new deploy was triggered by this batch.</li>
+          <li>Payment provider callback/signature and ledger logic exists in the API codebase but still needs reproducible CI and PayFast sandbox end-to-end evidence before any live payment workflow is claimed ready.</li>
         </ul>
         <p style={{ color: "#d0d0d0", lineHeight: 1.65, marginBottom: 0 }}>
-          Never bypass identity, listing verification, official-outcome evidence, or payment-ledger controls to make a workflow appear complete.
+          Identity links and marketplace publication remain reviewer-controlled; candidate-reported submissions never become provider-confirmed outcomes, and browser return URLs never settle payments.
         </p>
       </section>
     </main>
