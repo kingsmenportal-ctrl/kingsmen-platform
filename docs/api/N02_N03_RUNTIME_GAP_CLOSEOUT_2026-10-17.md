@@ -10,7 +10,7 @@
 - Post-apply catalog check: all 14 expected policy names were present on their matching tables. Each row reported role `{service_role}`, command `ALL`, `qual=true`, and `with_check=true`.
 - No production database was targeted.
 
-This verifies the catalog state, not live RLS behavior under three real request roles.
+Read-only SQL role-context checks were also executed: `anon` was denied SELECT on `public.candidates` at the table privilege boundary; `authenticated` could SELECT but saw zero rows without an authenticated JWT and had no INSERT/UPDATE privileges; `service_role` could SELECT and had SELECT/INSERT/UPDATE privileges. No row contents were recorded. This is stronger than catalog inspection alone, but it is not a Supabase REST/JWT test and does not prove candidate-to-candidate isolation.
 
 ## 2. Persistence proof and restart — blocked on staging runtime inputs
 
@@ -41,9 +41,9 @@ The repository now wraps command and workflow persistence in explicit PostgreSQL
 Catalog checks verified 14 explicit `service_role` policies. The security advisor also reports five other RLS-enabled public tables without policies (`candidate_payment_events`, `candidate_refund_requests`, `candidate_service_orders`, `finance_audit_events`, `service_packages`) and six functions with mutable search paths. These are separate findings to triage; this batch did not modify them or relax the N05 Document Vault controls.
 
 Outstanding live tests:
-- anonymous cannot read/write Truth Vault private rows;
-- authenticated users cannot read/write other candidates' private rows;
-- approved server-side role can perform only intended service operations;
+- anonymous cannot read/write Truth Vault private rows (table privilege denial verified for `public.candidates`; full table sweep remains);
+- authenticated users with real JWTs cannot read/write other candidates' private rows (still outstanding);
+- approved server-side role can perform only intended service operations (candidate table role privileges verified; API-level access remains outstanding);
 - workflow result survives restart;
 - duplicate races and late-failure rollback;
 - deployed API service credentials and route-level auth verified after restart.
