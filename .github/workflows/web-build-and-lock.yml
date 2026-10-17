@@ -46,6 +46,23 @@ jobs:
       - name: Verify candidate journey and MAP fallback contracts
         run: node scripts/verify-portal-journey-contracts.mjs
 
+  backend-build:
+    name: Compile backend API and MAP contracts
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - name: Install backend API dependencies
+        working-directory: apps/api
+        run: npm install --no-audit --no-fund
+      - name: Compile backend API
+        working-directory: apps/api
+        run: npm run build
+
   web-build:
     name: Resolve dependencies, type-check, and build
     runs-on: ubuntu-latest
