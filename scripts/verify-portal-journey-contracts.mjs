@@ -19,6 +19,7 @@ const exists = async (relative) => {
 };
 
 const dashboard = await read("apps/web/src/app/candidate/dashboard/page.tsx");
+const opportunitiesClient = await read("apps/web/src/components/candidate-opportunities-client.tsx");
 const trackerPage = await read("apps/web/src/app/candidate/applications/page.tsx");
 const trackerApi = await read("apps/web/src/app/api/candidate/applications/route.ts");
 const identityRuntime = await read("apps/web/src/lib/candidate-document-runtime.ts");
@@ -32,6 +33,9 @@ for (const route of [
   "/candidate/profile", "/candidate/discover", "/candidate/saved-opportunities",
   "/candidate/applications", "/candidate/outcomes", "/candidate/documents",
   "/candidate/finance", "/candidate/messages"
+check(dashboard.includes("/candidate/map-packages"), "Candidate dashboard does not link to MAP package handling.");
+for (const pathway of ["higher_education", "tvet", "seta_learnership", "internship", "apprenticeship", "employment"]) check(dashboard.includes(pathway) && opportunitiesClient.includes(pathway), `Six-pathway dashboard/discovery filter is missing ${pathway}.`);
+check(opportunitiesClient.includes("Filter pathway") && opportunitiesClient.includes("not a claim that eligibility has been assessed"), "Opportunity discovery does not distinguish pathway category filters from an eligibility decision.");
 ]) check(dashboard.includes(route), `Candidate dashboard is not wired to ${route}`);
 
 check(trackerPage.includes('fetch("/api/candidate/applications"'), "Application tracker does not call its same-origin API route.");
