@@ -1,0 +1,60 @@
+name: N05 Candidate Document Vault
+
+on:
+  pull_request:
+    paths:
+      - "apps/web/src/app/api/candidate/documents/**"
+      - "apps/web/src/app/candidate/documents/**"
+      - "apps/web/src/lib/candidate-document-runtime.ts"
+      - "scripts/validators/validate-n05-document-vault.mjs"
+      - "package.json"
+      - "apps/web/package.json"
+      - ".github/workflows/n05-document-vault.yml"
+  push:
+    branches:
+      - candidate-document-runtime-wiring-2026-10-17
+    paths:
+      - "apps/web/src/app/api/candidate/documents/**"
+      - "apps/web/src/app/candidate/documents/**"
+      - "apps/web/src/lib/candidate-document-runtime.ts"
+      - "scripts/validators/validate-n05-document-vault.mjs"
+      - "package.json"
+      - "apps/web/package.json"
+      - ".github/workflows/n05-document-vault.yml"
+
+permissions:
+  contents: read
+
+jobs:
+  static-guards:
+    name: N05 source security and lifecycle guards
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - name: Run N05 static validation
+        run: npm run n05:validate
+
+  web-build:
+    name: Next.js TypeScript and production build
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+          cache-dependency-path: apps/web/package-lock.json
+      - name: Install web dependencies
+        run: npm ci
+        working-directory: apps/web
+      - name: Build web application
+        run: npm run build
+        working-directory: apps/web
+        env:
+          # Build-only placeholders; never used to validate staging connectivity.
+          SUPABASE_URL: https://example.supabase.co
+          SUPABASE_ANON_KEY: build-placeholder-anon-key
+          SUPABASE_SERVICE_ROLE_KEY: build-placeholder-service-role-key
