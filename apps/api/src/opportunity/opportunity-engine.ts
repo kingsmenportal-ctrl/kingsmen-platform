@@ -110,7 +110,8 @@ export function assertNoFakeOpportunityClaim(input: {
 }
 
 export function isStaleObservation(observation: SourceObservation, nowIso = new Date().toISOString()): boolean {
-  if (!observation.staleAfter) return false;
+  // Missing expiry is not evidence of freshness; require an explicit review window.
+  if (!observation.staleAfter) return true;
   const staleAfterMs = Date.parse(observation.staleAfter);
   const nowMs = Date.parse(nowIso);
   // Invalid timestamps must never make a source look fresh.
