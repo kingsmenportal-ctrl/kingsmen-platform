@@ -14,6 +14,7 @@ $RequiredFiles = @(
   "apps\api\src\candidate\candidate-auth.ts",
   "apps\api\src\candidate\profile-review.ts",
   "apps\api\src\candidate\candidate-portal-read-model.ts",
+  "apps\api\src\candidate\candidate-portal-read-model.test.ts",
   "apps\api\src\candidate\candidate-messages.ts",
   "apps\api\src\candidate\candidate-success-loop.ts",
   "apps\api\src\candidate\index.ts",
