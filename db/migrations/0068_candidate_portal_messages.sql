@@ -22,7 +22,7 @@ BEGIN
   IF p_auth_user_id IS NULL OR p_candidate_id IS NULL
     OR length(trim(COALESCE(p_subject,''))) < 3 OR length(p_subject) > 180
     OR length(trim(COALESCE(p_body,''))) < 10 OR length(p_body) > 8000
-    OR p_urgency NOT IN ('ROUTINE','IMPORTANT','URGENT')
+    OR p_urgency IS NULL OR p_urgency NOT IN ('ROUTINE','IMPORTANT','URGENT')
   THEN
     RAISE EXCEPTION 'INVALID_CANDIDATE_MESSAGE' USING ERRCODE = '22023';
   END IF;
