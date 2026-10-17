@@ -120,7 +120,7 @@ export async function verifyPendingCandidateIdentityLink(
   const actorId = await authorize(actor);
   const result = await db.query<{ id: string; link_status: CandidateIdentityLinkStatus }>(
     `update public.candidate_auth_identity_links as link
-        set link_status = 'VERIFIED', verified_at = now(), verified_by = $4, updated_at = now()
+        set link_status = 'VERIFIED', verified_at = now(), verified_by = $3, updated_at = now()
        from public.candidates as candidate
       where link.supabase_user_id = $1::uuid
         and link.candidate_id = $2::uuid
@@ -128,7 +128,7 @@ export async function verifyPendingCandidateIdentityLink(
         and candidate.id = link.candidate_id
         and candidate.is_active = true
      returning link.id, link.link_status`,
-    [command.supabaseUserId, command.candidateId, command.correlationId, actorId]
+    [command.supabaseUserId, command.candidateId, actorId]
   );
   if (result.rows.length !== 1) throw new Error("CANDIDATE_IDENTITY_LINK_PENDING_LINK_REQUIRED");
   const link = result.rows[0];
