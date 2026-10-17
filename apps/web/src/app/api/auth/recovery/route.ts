@@ -19,7 +19,7 @@ export async function POST(request: Request) {
 
   const value = parsed.value && typeof parsed.value === "object" ? parsed.value as Record<string, unknown> : {};
   const email = typeof value.email === "string" ? value.email.trim().toLowerCase() : "";
-  if (!email || !/^[^\\s@]+@[^\\s@]+\\.[^\\s@]+$/.test(email) || email.length > 320) {
+  if (!email || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email) || email.length > 320) {
     return NextResponse.json({ ok: false, error: "Enter a valid email address." }, { status: 400, headers: { "Cache-Control": "no-store" } });
   }
 
