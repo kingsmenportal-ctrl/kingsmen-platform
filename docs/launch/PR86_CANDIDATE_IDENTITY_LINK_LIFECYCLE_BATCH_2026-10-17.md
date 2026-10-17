@@ -16,7 +16,7 @@ Branch: `feat/phase-a1-public-destiny-auth-foundation`
 
 1. Callers must execute lifecycle functions inside `withCandidateBackendTransaction(pool, ...)`.
 2. `isAuthorizedOperator` must be backed by a real server-verified operator session/permission source. Never pass a boolean or actor ID from an untrusted request body.
-3. This is not evidence that PostgreSQL RLS or the migration works in a live database. Migration 0018 is committed but must be applied and tested in staging by an authorized operator.
+3. This is not evidence that PostgreSQL RLS or the migration works in a live database. Migration 0040 is committed but must be applied and tested in staging by an authorized operator.
 4. No candidate route has been enabled by this change; existing fail-closed behavior remains.
 5. Unit tests and validator are committed but have not been executed in this environment. CI/runtime status must be checked independently.
 
