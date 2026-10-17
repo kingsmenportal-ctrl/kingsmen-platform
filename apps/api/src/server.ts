@@ -463,12 +463,26 @@ export function createKingsmenApiServer() {
       const pathname = url.pathname;
       const method = request.method ?? "GET";
 
-      response.setHeader("access-control-allow-origin", process.env.KINGSMEN_API_CORS_ORIGIN ?? "*");
-      response.setHeader("access-control-allow-methods", "GET,POST,OPTIONS");
-      response.setHeader("access-control-allow-headers", "content-type,x-correlation-id,x-idempotency-key,authorization");
+      // CORS is opt-in and exact-origin only. Never emit wildcard CORS for
+      // candidate or application data. Configure the trusted frontend origin
+      // explicitly in each environment.
+      const configuredCorsOrigin = process.env.KINGSMEN_API_CORS_ORIGIN;
+      const requestOrigin = request.headers.origin;
+      const corsOriginAllowed = Boolean(
+        configuredCorsOrigin &&
+        requestOrigin &&
+        requestOrigin === configuredCorsOrigin
+      );
+
+      if (corsOriginAllowed) {
+        response.setHeader("access-control-allow-origin", configuredCorsOrigin as string);
+        response.setHeader("vary", "Origin");
+        response.setHeader("access-control-allow-methods", "GET,POST,OPTIONS");
+        response.setHeader("access-control-allow-headers", "content-type,x-correlation-id,x-idempotency-key,authorization");
+      }
 
       if (method === "OPTIONS") {
-        response.statusCode = 204;
+        response.statusCode = corsOriginAllowed ? 204 : 403;
         response.end();
         return;
       }
