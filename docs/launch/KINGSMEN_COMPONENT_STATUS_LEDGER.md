@@ -221,6 +221,15 @@ Foundation constraints remain unchanged: Phase 0 is **OPEN**, Phase 1 is **OPEN 
 - No environment variable write, deployment, build, Playwright run, database migration, backup, or restore is claimed. Phase 0 and Phase 1 remain open.
 
 
+### Auth boundary follow-up — bounded recovery requests (17 October 2026)
+
+- Latest pre-follow-up head `d700f9a25f0369016f4dc42e03dd8ef3e510cbf6` completed both **Kingsmen Application Build Checks #55** and **Jarvis Live Runtime #734** successfully. These results verify that exact head only.
+- Source review found the password-recovery handler parsed request JSON directly, unlike login and registration, leaving that endpoint without the shared 16 KiB streamed-body limit and common malformed-content handling.
+- Commit `d0878518345b66c13239dac1c52cb7dde7c9b73f` updates `apps/web/src/app/api/auth/recovery/route.ts` to use the bounded JSON parser, reject non-JSON/malformed/oversized bodies consistently, validate email format, and preserve no-store responses and non-enumerating success messaging.
+- **Verification for the new commit is pending.** Do not infer that the new fix passed just because the preceding head passed CI. This change does not configure Supabase, prove provider delivery, or enable candidate data APIs.
+- Phase 0 API lockfile/clean `npm ci` remains **OPEN**. Phase 1 verified backup, isolated restore and migration rehearsal remains **OPEN / BLOCKED**. No migrations, secret changes, or deployments were made.
+
+
 ## PR #86 follow-up verification notes — 2026-10-16
 
 - Latest verified pre-follow-up API build/unit tests and application build checks passed on commit `9a1578efc9a38bf43d6d57c054ff28d6e7ddec28`; this is not verification of later commits.
