@@ -19,9 +19,13 @@ export function createPayFastSignature(fields: PayFastFields, passphrase?: strin
   return crypto.createHash("md5").update(canonical).digest("hex");
 }
 
+/** Compare provider signatures without leaking the first differing character via timing. */
 export function verifyPayFastSignature(fields: PayFastFields, receivedSignature: string, passphrase?: string): boolean {
+  if (!/^[a-fA-F0-9]{32}$/.test(receivedSignature)) return false;
   const calculated = createPayFastSignature(fields, passphrase);
-  return calculated.toLowerCase() === receivedSignature.toLowerCase();
+  const expected = Buffer.from(calculated, "hex");
+  const received = Buffer.from(receivedSignature, "hex");
+  return expected.length === received.length && crypto.timingSafeEqual(expected, received);
 }
 
 export function redactPayFastSecrets(fields: PayFastFields): PayFastFields {

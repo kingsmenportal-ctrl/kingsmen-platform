@@ -87,6 +87,16 @@ export function assertOpportunityEvidence(evidenceRefs: string[]): void {
   if (evidenceRefs.length === 0) throw new Error("OPPORTUNITY_EVIDENCE_REQUIRED");
 }
 
+function isSafeHttpUrl(value: string | undefined): value is string {
+  if (!value) return false;
+  try {
+    const url = new URL(value);
+    return url.protocol === "https:" || url.protocol === "http:";
+  } catch {
+    return false;
+  }
+}
+
 export function assertNoFakeOpportunityClaim(input: {
   claim: string;
   sourceUrl?: string;
@@ -95,13 +105,18 @@ export function assertNoFakeOpportunityClaim(input: {
 }): void {
   if (!input.claim.trim()) throw new Error("OPPORTUNITY_CLAIM_REQUIRED");
   assertOpportunityEvidence(input.evidenceRefs);
-  if (!input.sourceUrl) throw new Error("NO_FAKE_LINKS_SOURCE_URL_REQUIRED");
+  if (!isSafeHttpUrl(input.sourceUrl)) throw new Error("NO_FAKE_LINKS_SOURCE_URL_REQUIRED");
   if (input.sourceConfidence === "LOW") throw new Error("LOW_CONFIDENCE_OPPORTUNITY_REQUIRES_REVIEW");
 }
 
 export function isStaleObservation(observation: SourceObservation, nowIso = new Date().toISOString()): boolean {
-  if (!observation.staleAfter) return false;
-  return new Date(nowIso).getTime() > new Date(observation.staleAfter).getTime();
+  // Missing expiry is not evidence of freshness; require an explicit review window.
+  if (!observation.staleAfter) return true;
+  const staleAfterMs = Date.parse(observation.staleAfter);
+  const nowMs = Date.parse(nowIso);
+  // Invalid timestamps must never make a source look fresh.
+  if (!Number.isFinite(staleAfterMs) || !Number.isFinite(nowMs)) return true;
+  return nowMs > staleAfterMs;
 }
 
 export function normalizeSourceObservation(input: {
@@ -163,9 +178,9 @@ export function verifyProgrammeCandidateFacingSafety(programme: OpportunityProgr
   assertOpportunityEvidence(programme.evidenceRefs);
   const safe =
     provider.safeToRecommend &&
-    programme.openingStatus !== "UNKNOWN" &&
+    (programme.openingStatus === "OPEN" || programme.openingStatus === "UPCOMING") &&
     programme.sourceConfidence !== "LOW" &&
-    Boolean(programme.exactLink);
+    isSafeHttpUrl(programme.exactLink);
 
   return {
     ...programme,
@@ -182,6 +197,8 @@ export function buildOpportunityMatch(input: {
   evidenceRefs: string[];
 }): CandidateOpportunityMatch {
   assertOpportunityEvidence(input.evidenceRefs);
+  if (!input.candidateRef.trim()) throw new Error("CANDIDATE_REF_REQUIRED");
+  if (!Number.isFinite(input.fitScore)) throw new Error("OPPORTUNITY_FIT_SCORE_MUST_BE_FINITE");
   const sourceConfidence = confidenceRank[input.programme.sourceConfidence] < confidenceRank[input.provider.sourceConfidence]
     ? input.programme.sourceConfidence
     : input.provider.sourceConfidence;

@@ -16,8 +16,13 @@ type PgQueryResult<T = Record<string, unknown>> = {
   rowCount: number | null;
 };
 
+type PgClient = {
+  query<T = Record<string, unknown>>(sql: string, values?: readonly unknown[]): Promise<PgQueryResult<T>>;
+  release(): void;
+};
 type PgPool = {
   query<T = Record<string, unknown>>(sql: string, values?: readonly unknown[]): Promise<PgQueryResult<T>>;
+  connect(): Promise<PgClient>;
   end(): Promise<void>;
 };
 
@@ -72,10 +77,16 @@ export class TruthVaultRepository {
   }
 
   static fromEnvironment(): TruthVaultRepository {
-    const mode = process.env.KINGSMEN_TRUTH_VAULT_MODE ?? "memory";
+    const isProduction = process.env.NODE_ENV === "production";
+    const mode = process.env.KINGSMEN_TRUTH_VAULT_MODE ?? (isProduction ? "postgres" : "memory");
     const databaseUrl = process.env.KINGSMEN_DATABASE_URL ?? process.env.DATABASE_URL;
 
-    if (mode !== "postgres") return new TruthVaultRepository(null);
+    if (mode !== "postgres") {
+      if (isProduction) {
+        throw new Error("PRODUCTION_REQUIRES_DURABLE_TRUTH_VAULT");
+      }
+      return new TruthVaultRepository(null);
+    }
     if (!databaseUrl) throw new Error("KINGSMEN_TRUTH_VAULT_MODE=postgres requires KINGSMEN_DATABASE_URL or DATABASE_URL.");
 
     const pg = require("pg") as { Pool: PgPoolConstructor };
@@ -84,7 +95,9 @@ export class TruthVaultRepository {
       max: Number(process.env.KINGSMEN_DATABASE_POOL_MAX ?? 8),
       idleTimeoutMillis: 30_000,
       connectionTimeoutMillis: 10_000,
-      ssl: process.env.KINGSMEN_DATABASE_SSL === "true" ? { rejectUnauthorized: false } : undefined
+      ssl: isProduction || process.env.KINGSMEN_DATABASE_SSL === "true"
+        ? { rejectUnauthorized: true }
+        : undefined
     }));
   }
 
@@ -267,11 +280,279 @@ export class TruthVaultRepository {
     return { replay: false, workflowRunId: input.result.workflowRunId, responseBody: input.responseBody };
   }
 
+  /** Returns safe document metadata for the verified owner; never exposes storage paths or signed URLs. */
+  async listDocumentMetadataForOwner(candidateUuid: string): Promise<Array<{
+    documentRef: string;
+    documentType: string;
+    displayName: string;
+    mimeType: string;
+    fileSizeBytes: number;
+    documentStatus: string;
+    verificationStatus: string;
+    extractionStatus: string;
+    uploadedAt: string;
+  }>> {
+    this.assertEnabled();
+    if (!/^[0-9a-f]{8}-[0-9a-f]{4}-[1-8][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i.test(candidateUuid)) return [];
+    const result = await this.pool!.query<{
+      document_ref: string; document_type: string; display_name: string; mime_type: string;
+      file_size_bytes: string | number; document_status: string; verification_status: string;
+      extraction_status: string; uploaded_at: string;
+    }>(
+      `select document_ref, document_type, display_name, mime_type, file_size_bytes::text,
+              document_status, verification_status, extraction_status, uploaded_at::text
+       from document_files
+       where candidate_id = $1::uuid and archived_at is null and document_status <> 'DELETED'
+       order by uploaded_at desc
+       limit 200`,
+      [candidateUuid]
+    );
+    return result.rows.map((row) => ({
+      documentRef: row.document_ref,
+      documentType: row.document_type,
+      displayName: row.display_name,
+      mimeType: row.mime_type,
+      fileSizeBytes: Number(row.file_size_bytes),
+      documentStatus: row.document_status,
+      verificationStatus: row.verification_status,
+      extractionStatus: row.extraction_status,
+      uploadedAt: row.uploaded_at
+    }));
+  }
+
+  /** Lists only open document requests owned by the authenticated candidate. */
+  async listOpenDocumentRequestsForOwner(candidateUuid: string): Promise<Array<{
+    requestRef: string;
+    documentType: string;
+    reason: string;
+    priority: string;
+    dueAt: string | null;
+    createdAt: string;
+  }>> {
+    this.assertEnabled();
+    if (!/^[0-9a-f]{8}-[0-9a-f]{4}-[1-8][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i.test(candidateUuid)) return [];
+    const result = await this.pool!.query<{
+      request_ref: string;
+      document_type: string;
+      reason: string;
+      priority: string;
+      due_at: string | null;
+      created_at: string;
+    }>(
+      `select request_ref, document_type, reason, priority, due_at::text, created_at::text
+       from document_requests
+       where candidate_id = $1::uuid and request_status = 'OPEN'
+       order by due_at asc nulls last, created_at desc
+       limit 100`,
+      [candidateUuid]
+    );
+    return result.rows.map((row) => ({
+      requestRef: row.request_ref,
+      documentType: row.document_type,
+      reason: row.reason,
+      priority: row.priority,
+      dueAt: row.due_at,
+      createdAt: row.created_at
+    }));
+  }
+
+  /** Lists only application tracker rows belonging to the verified candidate UUID. */
+  async listOwnedApplicationsForOwner(candidateUuid: string): Promise<ApplicationWorkbenchReadModel[]> {
+    this.assertEnabled();
+    if (!/^[0-9a-f]{8}-[0-9a-f]{4}-[1-8][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i.test(candidateUuid)) return [];
+    const result = await this.pool!.query<ApplicationRow>(
+      `select a.id::text,
+              coalesce(a.metadata->>'applicationRef', a.id::text) as application_ref,
+              c.public_ref as candidate_ref,
+              a.route_type, a.source_confidence_band, a.current_state,
+              a.portal_health, a.map_fallback_required, a.last_evidence_ref,
+              a.updated_at::text
+         from applications a
+         join candidates c on c.id = a.candidate_id
+        where a.candidate_id = $1::uuid
+        order by a.updated_at desc, a.id asc
+        limit 200`,
+      [candidateUuid]
+    );
+    return result.rows.map((row) => ({
+      applicationId: row.application_ref,
+      candidateId: row.candidate_ref,
+      routeType: row.route_type,
+      sourceConfidenceBand: row.source_confidence_band,
+      currentState: row.current_state,
+      portalHealth: row.portal_health,
+      mapFallbackRequired: row.map_fallback_required,
+      lastEvidenceRef: row.last_evidence_ref ?? undefined,
+      lastUpdatedAt: row.updated_at
+    }));
+  }
+
+  /** Lists application rows via the explicit Supabase Auth UUID binding used by staging RLS. */
+  async listApplicationsForVerifiedSupabaseUser(supabaseUserId: string): Promise<ApplicationWorkbenchReadModel[] | null> {
+    this.assertEnabled();
+    if (!/^[0-9a-f]{8}-[0-9a-f]{4}-[1-8][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i.test(supabaseUserId)) return null;
+    const client = await this.pool!.connect();
+    try {
+      await client.query("BEGIN");
+      await client.query(
+        "select set_config('app.kingsmen_role', $1, true), set_config('app.service_context', $2, true)",
+        ["service_role", "backend_api"]
+      );
+      const linked = await client.query<{ candidate_id: string }>(
+        `select ca.candidate_id::text
+           from public.candidate_auth_identity_links ca
+           join public.candidates c on c.id=ca.candidate_id and c.is_active=true
+          where ca.supabase_user_id=$1::uuid and ca.link_status='VERIFIED'
+          limit 1`,
+        [supabaseUserId]
+      );
+      if (!linked.rows[0]) {
+        await client.query("COMMIT");
+        return null;
+      }
+      const result = await client.query<ApplicationRow>(
+        `select a.id::text,
+                coalesce(a.metadata->>'applicationRef', a.id::text) as application_ref,
+                c.public_ref as candidate_ref,
+                a.route_type, a.source_confidence_band, a.current_state,
+                a.portal_health, a.map_fallback_required, a.last_evidence_ref,
+                a.updated_at::text
+           from public.applications a
+           join public.candidates c on c.id=a.candidate_id and c.is_active=true
+          where a.candidate_id=$1::uuid
+          order by a.updated_at desc, a.id asc
+          limit 200`,
+        [linked.rows[0].candidate_id]
+      );
+      await client.query("COMMIT");
+      return result.rows.map((row) => ({
+        applicationId: row.application_ref, candidateId: row.candidate_ref, routeType: row.route_type,
+        sourceConfidenceBand: row.source_confidence_band, currentState: row.current_state,
+        portalHealth: row.portal_health, mapFallbackRequired: row.map_fallback_required,
+        lastEvidenceRef: row.last_evidence_ref ?? undefined, lastUpdatedAt: row.updated_at
+      }));
+    } catch (error) {
+      try { await client.query("ROLLBACK"); } catch { /* preserve original error */ }
+      throw error;
+    } finally {
+      client.release();
+    }
+  }
+
+  /** Lists safe document metadata by the Supabase Auth UUID-to-candidate binding. */
+  async listDocumentsForVerifiedSupabaseUser(supabaseUserId: string): Promise<Array<{
+    documentRef: string; documentType: string; displayName: string; mimeType: string;
+    fileSizeBytes: number; documentStatus: string; verificationStatus: string;
+    extractionStatus: string; uploadedAt: string;
+  }> | null> {
+    this.assertEnabled();
+    if (!/^[0-9a-f]{8}-[0-9a-f]{4}-[1-8][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i.test(supabaseUserId)) return null;
+    const client = await this.pool!.connect();
+    try {
+      await client.query("BEGIN");
+      await client.query(
+        "select set_config('app.kingsmen_role', $1, true), set_config('app.service_context', $2, true)",
+        ["service_role", "backend_api"]
+      );
+      const result = await client.query<{
+        document_ref: string; document_type: string; display_name: string; mime_type: string;
+        file_size_bytes: string | number; document_status: string; verification_status: string;
+        extraction_status: string; uploaded_at: string;
+      }>(
+        `select d.document_ref, d.document_type, d.display_name, d.mime_type,
+                d.file_size_bytes::text, d.document_status, d.verification_status,
+                d.extraction_status, d.uploaded_at::text
+           from public.candidate_auth_identity_links ca
+           join public.candidates c on c.id = ca.candidate_id and c.is_active = true
+           join public.document_files d on d.candidate_id = c.id
+          where ca.supabase_user_id = $1::uuid and ca.link_status = 'VERIFIED'
+            and d.archived_at is null
+            and d.document_status <> 'DELETED'
+          order by d.uploaded_at desc, d.id asc
+          limit 200`,
+        [supabaseUserId]
+      );
+      // No matching account means the identity is not linked. An empty array
+      // with a matching account means the candidate has no visible documents.
+      const linked = await client.query<{ linked: boolean }>(
+        "select exists(select 1 from public.candidate_auth_identity_links ca join public.candidates c on c.id=ca.candidate_id and c.is_active=true where ca.supabase_user_id=$1::uuid and ca.link_status='VERIFIED') as linked",
+        [supabaseUserId]
+      );
+      await client.query("COMMIT");
+      if (linked.rows[0]?.linked !== true) return null;
+      return result.rows.map((row) => ({
+        documentRef: row.document_ref, documentType: row.document_type, displayName: row.display_name,
+        mimeType: row.mime_type, fileSizeBytes: Number(row.file_size_bytes),
+        documentStatus: row.document_status, verificationStatus: row.verification_status,
+        extractionStatus: row.extraction_status, uploadedAt: row.uploaded_at
+      }));
+    } catch (error) {
+      try { await client.query("ROLLBACK"); } catch { /* preserve original error */ }
+      throw error;
+    } finally {
+      client.release();
+    }
+  }
+
+  /** Resolves Supabase Auth UUID to the candidate ID using the same explicit binding used by RLS. */
+  async resolveCandidateUuidForSupabaseUser(supabaseUserId: string): Promise<string | null> {
+    this.assertEnabled();
+    if (!/^[0-9a-f]{8}-[0-9a-f]{4}-[1-8][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i.test(supabaseUserId)) return null;
+    const client = await this.pool!.connect();
+    try {
+      await client.query("BEGIN");
+      await client.query(
+        "select set_config('app.kingsmen_role', $1, true), set_config('app.service_context', $2, true)",
+        ["service_role", "backend_api"]
+      );
+      const result = await client.query<{ candidate_id: string }>(
+        `select ca.candidate_id::text
+           from public.candidate_auth_identity_links ca
+           join public.candidates c on c.id=ca.candidate_id and c.is_active=true
+          where ca.supabase_user_id=$1::uuid and ca.link_status='VERIFIED'
+          limit 1`,
+        [supabaseUserId]
+      );
+      await client.query("COMMIT");
+      return result.rows[0]?.candidate_id ?? null;
+    } catch (error) {
+      try { await client.query("ROLLBACK"); } catch { /* preserve original error */ }
+      throw error;
+    } finally {
+      client.release();
+    }
+  }
+
+  /** Identity-scoped candidate read; candidateUuid must come from a verified session. */
+  async readCandidateStatusForOwner(candidateUuid: string, candidateRef: string): Promise<CandidateReadModel | null> {
+    this.assertEnabled();
+    if (!/^[0-9a-f]{8}-[0-9a-f]{4}-[1-8][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i.test(candidateUuid)) return null;
+    const result = await this.pool!.query<CandidateRow>(
+      "select id::text, public_ref, email, display_name, current_state, active_package_code, updated_at::text from candidates where id = $1::uuid and public_ref = $2 limit 1",
+      [candidateUuid, candidateRef]
+    );
+    const row = result.rows[0];
+    if (!row) return null;
+    return { candidateId: row.public_ref, displayName: row.display_name, email: row.email, currentState: row.current_state, activePackageCode: row.active_package_code ?? undefined, profileConfidence: "LOW", documentReadiness: "PARTIAL", applicationReadiness: "NOT_READY", lastUpdatedAt: row.updated_at };
+  }
+
+  /** Returns an application only when it belongs to the verified candidate UUID. */
+  async readOwnedApplicationWorkbench(applicationRef: string, candidateUuid: string): Promise<ApplicationWorkbenchReadModel | null> {
+    this.assertEnabled();
+    if (!/^[0-9a-f]{8}-[0-9a-f]{4}-[1-8][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i.test(candidateUuid)) return null;
+    const result = await this.pool!.query<ApplicationRow>(
+      "select a.id::text, coalesce(a.metadata->>'applicationRef', a.id::text) as application_ref, c.public_ref as candidate_ref, a.route_type, a.source_confidence_band, a.current_state, a.portal_health, a.map_fallback_required, a.last_evidence_ref, a.updated_at::text from applications a join candidates c on c.id = a.candidate_id where a.metadata->>'applicationRef' = $1 and a.candidate_id = $2::uuid limit 1",
+      [applicationRef, candidateUuid]
+    );
+    const row = result.rows[0];
+    if (!row) return null;
+    return { applicationId: row.application_ref, candidateId: row.candidate_ref, routeType: row.route_type, sourceConfidenceBand: row.source_confidence_band, currentState: row.current_state, portalHealth: row.portal_health, mapFallbackRequired: row.map_fallback_required, lastEvidenceRef: row.last_evidence_ref ?? undefined, lastUpdatedAt: row.updated_at };
+  }
   async readCandidateStatus(candidateRef: string): Promise<CandidateReadModel | null> {
     this.assertEnabled();
     const result = await this.pool!.query<CandidateRow>(
       `select id::text, public_ref, email, display_name, current_state, active_package_code, updated_at::text
-       from candidates where public_ref = $1 or id::text = $1 limit 1`,
+       from candidates where public_ref = $1 limit 1`,
       [candidateRef]
     );
 
@@ -307,7 +588,7 @@ export class TruthVaultRepository {
          a.updated_at::text
        from applications a
        join candidates c on c.id = a.candidate_id
-       where a.id::text = $1 or a.metadata->>'applicationRef' = $1
+       where a.metadata->>'applicationRef' = $1
        limit 1`,
       [applicationRef]
     );
@@ -541,6 +822,109 @@ export class TruthVaultRepository {
         JSON.stringify(input.metadata ?? {})
       ]
     );
+  }
+
+  /** Lists open document requests through the server-verified Supabase Auth binding. */
+  async listDocumentRequestsForVerifiedSupabaseUser(supabaseUserId: string): Promise<Array<{
+    requestRef: string; documentType: string; reason: string; priority: string;
+    dueAt: string | null; createdAt: string;
+  }> | null> {
+    this.assertEnabled();
+    if (!/^[0-9a-f]{8}-[0-9a-f]{4}-[1-8][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i.test(supabaseUserId)) return null;
+    const client = await this.pool!.connect();
+    try {
+      await client.query("BEGIN");
+      await client.query(
+        "select set_config('app.kingsmen_role', $1, true), set_config('app.service_context', $2, true)",
+        ["service_role", "backend_api"]
+      );
+      const linked = await client.query<{ candidate_id: string }>(
+        `select ca.candidate_id::text
+           from public.candidate_auth_identity_links ca
+           join public.candidates c on c.id = ca.candidate_id and c.is_active = true
+          where ca.supabase_user_id = $1::uuid and ca.link_status = 'VERIFIED'
+          limit 1`,
+        [supabaseUserId]
+      );
+      if (!linked.rows[0]) {
+        await client.query("COMMIT");
+        return null;
+      }
+      const result = await client.query<{
+        request_ref: string; document_type: string; reason: string; priority: string;
+        due_at: string | null; created_at: string;
+      }>(
+        `select request_ref, document_type, reason, priority, due_at::text, created_at::text
+           from public.document_requests
+          where candidate_id = $1::uuid and request_status = 'OPEN'
+          order by due_at asc nulls last, created_at desc
+          limit 100`,
+        [linked.rows[0].candidate_id]
+      );
+      await client.query("COMMIT");
+      return result.rows.map((row) => ({
+        requestRef: row.request_ref, documentType: row.document_type, reason: row.reason,
+        priority: row.priority, dueAt: row.due_at, createdAt: row.created_at
+      }));
+    } catch (error) {
+      try { await client.query("ROLLBACK"); } catch { /* preserve original error */ }
+      throw error;
+    } finally {
+      client.release();
+    }
+  }
+
+
+  /** Lists safe support-ticket status metadata for the active candidate bound to verified Auth. */
+  async listSupportTicketsForVerifiedSupabaseUser(supabaseUserId: string): Promise<Array<{
+    ticketRef: string; category: string; priority: string; status: string;
+    title: string; createdAt: string; updatedAt: string; closedAt: string | null;
+  }> | null> {
+    this.assertEnabled();
+    if (!/^[0-9a-f]{8}-[0-9a-f]{4}-[1-8][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i.test(supabaseUserId)) return null;
+    const client = await this.pool!.connect();
+    try {
+      await client.query("BEGIN");
+      await client.query(
+        "select set_config('app.kingsmen_role', $1, true), set_config('app.service_context', $2, true)",
+        ["service_role", "backend_api"]
+      );
+      const linked = await client.query<{ candidate_id: string }>(
+        `select ca.candidate_id::text
+           from public.candidate_auth_identity_links ca
+           join public.candidates c on c.id = ca.candidate_id and c.is_active = true
+          where ca.supabase_user_id = $1::uuid and ca.link_status = 'VERIFIED'
+          limit 1`,
+        [supabaseUserId]
+      );
+      if (!linked.rows[0]) {
+        await client.query("COMMIT");
+        return null;
+      }
+      const result = await client.query<{
+        ticket_ref: string; category: string; priority: string; status: string;
+        title: string; created_at: string; updated_at: string; closed_at: string | null;
+      }>(
+        `select ticket_ref, category, priority, status, title,
+                created_at::text, updated_at::text, closed_at::text
+           from public.candidate_support_tickets
+          where candidate_id = $1::uuid
+          order by updated_at desc, created_at desc
+          limit 100`,
+        [linked.rows[0].candidate_id]
+      );
+      await client.query("COMMIT");
+      return result.rows.map((row) => ({
+        ticketRef: row.ticket_ref, category: row.category, priority: row.priority,
+        status: row.status, title: row.title, createdAt: row.created_at,
+        updatedAt: row.updated_at, closedAt: row.closed_at
+      }));
+    } catch (error) {
+      try { await client.query("ROLLBACK"); } catch { /* preserve original error */ }
+      throw error;
+    } finally {
+      client.release();
+    }
   }
 
   private assertEnabled(): void {

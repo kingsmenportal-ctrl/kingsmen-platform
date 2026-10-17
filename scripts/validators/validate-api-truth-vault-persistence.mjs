@@ -10,6 +10,7 @@ const requiredFiles = [
   "apps/api/src/server.ts",
   "apps/api/package.json",
   "db/migrations/0001_n03_truth_vault.sql",
+  "db/migrations/0040_candidate_auth_identity_link.sql",
   "docs/api/KINGSMEN_TRUTH_VAULT_PERSISTENCE.md"
 ];
 
@@ -35,6 +36,23 @@ const requiredTokens = {
     "approval_requests",
     "metadata->>'applicationRef'",
     "await this.pool"
+  ],
+  "apps/api/src/db/truth-vault-repository.ts": [
+    "candidate_auth_identity_links",
+    "supabase_user_id",
+    "link_status = 'VERIFIED'",
+    "listApplicationsForVerifiedSupabaseUser",
+    "listDocumentsForVerifiedSupabaseUser",
+    "resolveCandidateUuidForSupabaseUser",
+    "listDocumentRequestsForVerifiedSupabaseUser",
+    "listSupportTicketsForVerifiedSupabaseUser"
+  ],
+  "db/migrations/0040_candidate_auth_identity_link.sql": [
+    "supabase_user_id uuid NOT NULL UNIQUE",
+    "candidate_id uuid NOT NULL UNIQUE",
+    "link_status IN ('PENDING', 'VERIFIED', 'REVOKED')",
+    "candidate_auth_identity_links_backend_all",
+    "Never resolve this link by email"
   ],
   "apps/api/src/server.ts": [
     "TruthVaultRepository",

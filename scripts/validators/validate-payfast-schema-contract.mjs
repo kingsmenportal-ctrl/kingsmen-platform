@@ -1,0 +1,32 @@
+import { readFileSync } from "node:fs";
+
+const migration = readFileSync("db/migrations/0008_n10_finance_payfast.sql", "utf8");
+const itnRoute = readFileSync("apps/api/src/finance/payfast-itn-route.ts", "utf8");
+const indexMigration = readFileSync("db/migrations/0036_n11_payfast_provider_idempotency.sql", "utf8");
+const retryMigration = readFileSync("db/migrations/0037_n11_payfast_retryable_rejected_itn.sql", "utf8");
+const amountHelper = readFileSync("apps/api/src/finance/payfast-amounts.ts", "utf8");
+const amountTests = readFileSync("apps/api/src/finance/payfast-amounts.test.ts", "utf8");
+
+const checks = [
+  ["finance orders include expected order fields", /create table if not exists public\.finance_orders[\s\S]*?order_ref text unique not null[\s\S]*?candidate_ref text not null[\s\S]*?order_status text not null[\s\S]*?amount_cents integer not null[\s\S]*?currency text not null/.test(migration)],
+  ["payment intents include callback lookup and state fields", /create table if not exists public\.payfast_payment_intents[\s\S]*?intent_ref text unique not null[\s\S]*?order_ref text not null[\s\S]*?merchant_reference text unique not null[\s\S]*?intent_status text not null/.test(migration)],
+  ["ITN receipt insert fields exist in schema", /create table if not exists public\.payfast_itn_receipts[\s\S]*?itn_ref text unique not null[\s\S]*?received_payload jsonb[\s\S]*?received_signature text[\s\S]*?idempotency_key text unique not null/.test(migration)],
+  ["finance payment fields exist in schema", /create table if not exists public\.finance_payments[\s\S]*?provider_payment_id text[\s\S]*?amount_gross_cents integer not null[\s\S]*?verified boolean not null/.test(migration)],
+  ["provider ID migration includes preflight and unique indexes", /Duplicate PayFast provider_payment_id[\s\S]*?create unique index if not exists uq_finance_payments_payfast_provider_payment_id[\s\S]*?create unique index if not exists uq_payfast_itn_receipts_provider_payment_id/.test(indexMigration)],
+  ["route records receipts and payment evidence transactionally", /BEGIN[\s\S]*?INSERT INTO public\.payfast_itn_receipts[\s\S]*?INSERT INTO public\.payment_evidence_ledger[\s\S]*?COMMIT/.test(itnRoute)],
+  ["duplicate receipt insert prevents further processing", /receiptInsert\.rowCount !== 1[\s\S]*?ROLLBACK[\s\S]*?return/.test(itnRoute)],
+  ["gross fee and net are reconciled before server confirmation", /reconcilePayFastAmounts\(fields\.amount_gross, fields\.amount_fee, fields\.amount_net, order\.amount_cents\)/.test(itnRoute) && itnRoute.indexOf("reconcilePayFastAmounts(fields.amount_gross") < itnRoute.indexOf("confirmWithPayFast(fields)")],
+  ["amount helper validates signed fee arithmetic", /grossCents \+ feeCents !== netCents/.test(amountHelper)],
+  ["amount reconciliation has malformed and inconsistent value tests", /internally inconsistent gross, fee, and net/.test(amountTests) && /malformed, over-precision, and unsafe values/.test(amountTests)],
+  ["rejected ITNs do not consume provider payment IDs", /where accepted = true and provider_payment_id is not null/i.test(retryMigration) && /where accepted = true and \(provider_payment_id = \$1 or idempotency_key = \$2\)/i.test(itnRoute)],
+  ["ITN idempotency uniqueness applies only to accepted receipts", /drop constraint if exists payfast_itn_receipts_idempotency_key_key/i.test(retryMigration) && /where accepted = true/i.test(retryMigration)] ,
+  ["accepted callback retries are acknowledged before intent state checks", itnRoute.indexOf("if (prior.rows.length > 0)") >= 0 && itnRoute.indexOf("if (prior.rows.length > 0)") < itnRoute.indexOf("const intentResult = await client.query")],
+  ["ITN_RECEIVED intent state remains retry-compatible", /\["CREATED", "REDIRECTED", "ITN_RECEIVED"\]\.includes\(intent\.intent_status\)/.test(itnRoute)],
+  ["accepted callback retry lookup precedes order eligibility checks", itnRoute.indexOf("if (prior.rows.length > 0)") >= 0 && itnRoute.indexOf("if (prior.rows.length > 0)") < itnRoute.indexOf("const orderResult = await client.query")],
+  ["intent update failure aborts the transaction", /if \(intentUpdate\.rowCount !== 1\) throw new Error\("PAYFAST_INTENT_STATE_CHANGED"\)/.test(itnRoute)],
+  ["evidence conflict aborts accepted callback transaction", /if \(evidenceInsert\.rowCount !== 1\) throw new Error\("PAYFAST_EVIDENCE_WRITE_CONFLICT"\)/.test(itnRoute)],
+  ["server confirmation includes original ITN signature", /Object\.entries\(fields\)/.test(itnRoute) && !/key === ["']signature["']/.test(itnRoute)]
+];
+const failed = checks.filter(([, passed]) => !passed);
+for (const [name, passed] of checks) console.log(`${passed ? "PASS" : "FAIL"} ${name}`);
+if (failed.length) process.exitCode = 1;

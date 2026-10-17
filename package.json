@@ -55,6 +55,7 @@
     "kingsmen:launch:audit": "node scripts/validators/validate-kingsmen-launch-readiness-evidence-aware.mjs --audit",
     "kingsmen:launch:gate": "node scripts/validators/validate-kingsmen-launch-readiness-evidence-aware.mjs --gate",
     "api:validate:truth-vault": "node scripts/validators/validate-api-truth-vault-persistence.mjs",
+    "candidate:validate:document-boundary": "node scripts/validators/validate-candidate-document-boundary.mjs",
     "payments:prove:sandbox": "node scripts/proof/prove-payfast-sandbox-boundary.mjs",
     "payments:validate:sandbox": "node scripts/validators/validate-payfast-sandbox-proof.mjs",
     "security:prove:rls": "node scripts/proof/prove-rls-security-boundary.mjs",
@@ -78,7 +79,23 @@
     "repo:prove:branch-protection": "node scripts/proof/prove-main-branch-protection-boundary.mjs",
     "repo:validate:branch-protection": "node scripts/validators/validate-main-branch-protection.mjs",
     "staging:capture:evidence": "pwsh -NoProfile -File scripts/staging/Invoke-KingsmenStagingRuntimeEvidencePack.ps1",
-    "final:collect:evidence": "pwsh -NoProfile -File scripts/staging/Collect-KingsmenFinalAssemblyEvidence.ps1"
+    "final:collect:evidence": "pwsh -NoProfile -File scripts/staging/Collect-KingsmenFinalAssemblyEvidence.ps1",
+    "candidate:validate:ownership-integrity": "node scripts/validators/validate-candidate-ownership-and-application-integrity.mjs",
+    "candidate:validate:application-read": "node scripts/validators/validate-candidate-application-read-boundary.mjs",
+    "candidate:validate:transaction": "node scripts/validators/validate-candidate-backend-transaction.mjs",
+    "candidate:validate:identity-link-lifecycle": "node scripts/validators/validate-candidate-identity-link-lifecycle.mjs",
+    "candidate:validate:identity-link-admin-runtime": "node scripts/validators/validate-candidate-identity-link-admin-runtime.mjs",
+    "candidate:validate:document-vault": "node scripts/validators/validate-candidate-document-vault.mjs",
+    "candidate:validate:document-upload-policy": "node scripts/validators/validate-candidate-document-upload-policy.mjs",
+    "candidate:validate:document-review": "node scripts/validators/validate-candidate-document-review.mjs",
+    "candidate:validate:application-tracker-api": "node scripts/validators/validate-candidate-application-tracker-api.mjs",
+    "candidate:validate:application-tracker-ui": "node scripts/validators/validate-candidate-application-tracker-ui.mjs",
+    "candidate:validate:document-metadata-bridge": "node scripts/validators/validate-candidate-document-metadata-bridge.mjs",
+    "candidate:validate:document-request-bridge": "node scripts/validators/validate-candidate-document-request-bridge.mjs",
+    "candidate:validate:support-ticket-bridge": "node scripts/validators/validate-candidate-support-ticket-bridge.mjs",
+    "candidate:validate:application-identity-bridge": "node scripts/validators/validate-candidate-application-identity-bridge.mjs",
+    "candidate:validate:phase-a1-bridges": "npm run auth:validate:provider-boundary && npm run candidate:validate:transaction && npm run candidate:validate:identity-link-lifecycle && npm run candidate:validate:identity-link-admin-runtime && npm run candidate:validate:ownership-integrity && npm run candidate:validate:application-read && npm run candidate:validate:application-identity-bridge && npm run candidate:validate:application-tracker-api && npm run candidate:validate:application-tracker-ui && npm run candidate:validate:document-boundary && npm run candidate:validate:document-vault && npm run candidate:validate:document-upload-policy && npm run candidate:validate:document-review && npm run candidate:validate:document-metadata-bridge && npm run candidate:validate:document-request-bridge && npm run candidate:validate:support-ticket-bridge",
+    "auth:validate:provider-boundary": "node scripts/validators/validate-web-auth-provider-boundary.mjs"
   },
   "repository": {
     "type": "git",
@@ -98,7 +115,7 @@
   },
   "homepage": "https://github.com/kingsmenportal-ctrl/kingsmen-platform#readme",
   "devDependencies": {
-    "playwright": "^1.60.0",
-    "typescript": "^6.0.3"
+    "playwright": "1.60.0",
+    "typescript": "6.0.3"
   }
 }

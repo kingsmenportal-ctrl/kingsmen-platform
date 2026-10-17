@@ -1,23 +1,25 @@
-export async function POST(request: Request) {
-  const body = await request.json();
+import { NextResponse } from "next/server";
 
-  if (!body?.candidateId || !body?.routeId || !body?.gate) {
-    return Response.json(
-      { ok: false, productionReady: false, error: "Missing candidateId, routeId, or gate" },
-      { status: 400 }
-    );
-  }
+export const runtime = "nodejs";
+export const dynamic = "force-dynamic";
 
-  return Response.json({
-    ok: true,
-    productionReady: false,
-    boundary: "N06 candidate-safe choice optimizer route shell",
-    candidateId: body.candidateId,
-    routeId: body.routeId,
-    gate: body.gate,
-    safeToProceed: false,
-    noGuaranteeLanguageRequired: true,
-    candidateCanVerifySource: false,
-    serviceRoleVisibleToBrowser: false
-  });
+/**
+ * Fail closed until route/gate decisions are derived from trusted candidate
+ * identity and authoritative records rather than client-supplied identifiers.
+ */
+export async function POST() {
+  return NextResponse.json(
+    {
+      ok: false,
+      productionReady: false,
+      status: "BLOCKED",
+      code: "CANDIDATE_AUTHORIZATION_NOT_CONFIGURED",
+      error: "Choice optimization is unavailable until authenticated candidate ownership and authoritative pathway records are connected.",
+      safeToProceed: false,
+      noGuaranteeLanguageRequired: true,
+      candidateCanVerifySource: false,
+      serviceRoleVisibleToBrowser: false
+    },
+    { status: 503, headers: { "Cache-Control": "no-store", Pragma: "no-cache" } }
+  );
 }

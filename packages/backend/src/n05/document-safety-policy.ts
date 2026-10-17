@@ -1,19 +1,12 @@
-const ALLOWED_MIME_TYPES = new Set([
-  "application/pdf",
-  "image/jpeg",
-  "image/png",
-  "image/webp"
-]);
-
-const ALLOWED_EXTENSIONS = new Set([
-  ".pdf",
-  ".jpg",
-  ".jpeg",
-  ".png",
-  ".webp"
-]);
+const MIME_TO_EXTENSIONS: Record<string, ReadonlySet<string>> = {
+  "application/pdf": new Set([".pdf"]),
+  "image/jpeg": new Set([".jpg", ".jpeg"]),
+  "image/png": new Set([".png"]),
+  "image/webp": new Set([".webp"])
+};
 
 const MAX_DOCUMENT_SIZE_BYTES = 10 * 1024 * 1024;
+const MAX_FILENAME_LENGTH = 255;
 
 export function assertN05DocumentUploadSafe(input: {
   filename: string;
@@ -22,18 +15,27 @@ export function assertN05DocumentUploadSafe(input: {
   rawPublicUrlAllowed?: boolean;
   serviceRoleVisibleToBrowser?: boolean;
 }) {
-  const lower = input.filename.toLowerCase();
-  const hasAllowedExtension = [...ALLOWED_EXTENSIONS].some((ext) => lower.endsWith(ext));
-
-  if (!ALLOWED_MIME_TYPES.has(input.mimeType)) {
-    throw new Error(`N05 upload blocked: unsupported MIME type ${input.mimeType}`);
+  if (typeof input.filename !== "string" || input.filename.length === 0 ||
+      input.filename.length > MAX_FILENAME_LENGTH ||
+      input.filename !== input.filename.trim() ||
+      input.filename.includes("/") || input.filename.includes("\\") ||
+      [...input.filename].some((character) => character.charCodeAt(0) < 32 || character.charCodeAt(0) === 127) ||
+      input.filename === "." || input.filename === ".." ||
+      input.filename.includes("..")) {
+    throw new Error("N05 upload blocked: unsafe filename");
   }
 
-  if (!hasAllowedExtension) {
-    throw new Error(`N05 upload blocked: unsupported file extension for ${input.filename}`);
+  const extension = input.filename.slice(input.filename.lastIndexOf(".")).toLowerCase();
+  const allowedExtensions = MIME_TO_EXTENSIONS[input.mimeType];
+  if (!allowedExtensions) {
+    throw new Error("N05 upload blocked: unsupported MIME type");
   }
 
-  if (input.sizeBytes <= 0 || input.sizeBytes > MAX_DOCUMENT_SIZE_BYTES) {
+  if (!allowedExtensions.has(extension)) {
+    throw new Error("N05 upload blocked: MIME type and file extension do not match");
+  }
+
+  if (!Number.isSafeInteger(input.sizeBytes) || input.sizeBytes <= 0 || input.sizeBytes > MAX_DOCUMENT_SIZE_BYTES) {
     throw new Error("N05 upload blocked: file size exceeds allowed boundary");
   }
 
@@ -49,9 +51,10 @@ export function assertN05DocumentUploadSafe(input: {
 }
 
 export const N05_DOCUMENT_UPLOAD_LIMITS = {
-  allowedMimeTypes: [...ALLOWED_MIME_TYPES],
-  allowedExtensions: [...ALLOWED_EXTENSIONS],
+  allowedMimeTypes: Object.keys(MIME_TO_EXTENSIONS),
+  allowedExtensions: [...new Set([...MIME_TO_EXTENSIONS.values()].flatMap((extensions) => [...extensions]))],
   maxDocumentSizeBytes: MAX_DOCUMENT_SIZE_BYTES,
+  maxFilenameLength: MAX_FILENAME_LENGTH,
   rawPublicUrlAllowed: false,
   serviceRoleBackendOnly: true,
   productionReady: false

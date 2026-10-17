@@ -1,22 +1,25 @@
-export async function POST(request: Request) {
-  const body = await request.json();
+import { NextResponse } from "next/server";
 
-  if (!body?.candidateId || !body?.parentApplicationId) {
-    return Response.json(
-      { ok: false, productionReady: false, error: "Missing candidateId or parentApplicationId" },
-      { status: 400 }
-    );
-  }
+export const runtime = "nodejs";
+export const dynamic = "force-dynamic";
 
-  return Response.json({
-    ok: true,
-    productionReady: false,
-    boundary: "N06 CAO parent-child optimizer route shell",
-    candidateId: body.candidateId,
-    parentApplicationId: body.parentApplicationId,
-    countsAsOneKingsmenApplication: true,
-    childChoiceCountsAsSeparateKingsmenApplication: false,
-    noGuaranteeLanguageRequired: true,
-    serviceRoleVisibleToBrowser: false
-  });
+/**
+ * Fail closed until parent-application ownership is verified from a trusted
+ * session and authoritative application records. Never echo client identity.
+ */
+export async function POST() {
+  return NextResponse.json(
+    {
+      ok: false,
+      productionReady: false,
+      status: "BLOCKED",
+      code: "CANDIDATE_AUTHORIZATION_NOT_CONFIGURED",
+      error: "The CAO parent/child optimizer is unavailable until authenticated ownership and authoritative application records are connected.",
+      countsAsOneKingsmenApplication: true,
+      childChoiceCountsAsSeparateKingsmenApplication: false,
+      noGuaranteeLanguageRequired: true,
+      serviceRoleVisibleToBrowser: false
+    },
+    { status: 503, headers: { "Cache-Control": "no-store", Pragma: "no-cache" } }
+  );
 }

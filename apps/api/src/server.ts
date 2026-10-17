@@ -1,4 +1,5 @@
 import { createServer, type IncomingMessage, type ServerResponse } from "node:http";
+import { timingSafeEqual } from "node:crypto";
 import { URL } from "node:url";
 
 import {
@@ -21,10 +22,15 @@ import {
   type JarvisRuntimeServerStore
 } from "./jarvis/jarvis-runtime-server-adapter";
 import type { ApiJarvisRuntimeResult } from "./jarvis/jarvis-runtime-api";
+import { closePayFastItnPool, handlePayFastItn } from "./finance/payfast-itn-route";
+import { createCandidateAuthRuntimeFromEnvironment } from "./candidate/candidate-auth-runtime";
+import { handleCandidateAuthRoute } from "./candidate/candidate-auth-http";
+import { readCandidateSessionCookie } from "./candidate/candidate-auth-service";
 
 const MAX_BODY_BYTES = 1_000_000;
 const SERVICE_NAME = "kingsmen-api";
 const truthVault = TruthVaultRepository.fromEnvironment();
+const candidateAuthRuntime = createCandidateAuthRuntimeFromEnvironment();
 
 type JsonObject = Record<string, unknown>;
 
@@ -183,6 +189,10 @@ function upsertReadModelsForWorkflowResult(result: WorkflowResultEnvelope): void
 function sendJson(response: ServerResponse, statusCode: number, body: unknown, correlationId?: string): void {
   response.statusCode = statusCode;
   response.setHeader("content-type", "application/json; charset=utf-8");
+  response.setHeader("cache-control", "no-store");
+  response.setHeader("pragma", "no-cache");
+  response.setHeader("x-content-type-options", "nosniff");
+  response.setHeader("referrer-policy", "no-referrer");
   response.setHeader("x-kingsmen-service", SERVICE_NAME);
   if (correlationId) response.setHeader("x-correlation-id", correlationId);
   response.end(`${JSON.stringify(body, null, 2)}\n`);
@@ -201,17 +211,35 @@ function sendError(response: ServerResponse, statusCode: number, code: string, m
 function readBody(request: IncomingMessage): Promise<string> {
   return new Promise((resolve, reject) => {
     let body = "";
+    let receivedBytes = 0;
+    let exceededLimit = false;
+    let settled = false;
 
     request.on("data", (chunk: Buffer) => {
-      body += chunk.toString("utf8");
-      if (body.length > MAX_BODY_BYTES) {
-        request.destroy();
+      if (exceededLimit || settled) return;
+      receivedBytes += chunk.length;
+      if (receivedBytes > MAX_BODY_BYTES) {
+        exceededLimit = true;
+        settled = true;
         reject(new Error("REQUEST_BODY_TOO_LARGE"));
+        // Drain the request without retaining further bytes, avoiding both
+        // unbounded memory growth and an unread request stream.
+        request.resume();
+        return;
       }
+      body += chunk.toString("utf8");
     });
 
-    request.on("end", () => resolve(body));
-    request.on("error", reject);
+    request.on("end", () => {
+      if (settled) return;
+      settled = true;
+      resolve(body);
+    });
+    request.on("error", (error) => {
+      if (settled) return;
+      settled = true;
+      reject(error);
+    });
   });
 }
 
@@ -376,11 +404,25 @@ async function handleWorkflowResult(request: IncomingMessage, response: ServerRe
 }
 
 async function handleHealth(response: ServerResponse): Promise<void> {
-  const truthVaultHealth = await truthVault.healthCheck();
+  // Liveness must remain available while dependencies recover. Readiness is
+  // reported separately so memory-only mode is never advertised as production-ready.
+  let truthVaultHealth: { ok: boolean; storageMode: string; message: string };
+  try {
+    truthVaultHealth = await truthVault.healthCheck();
+  } catch {
+    truthVaultHealth = {
+      ok: false,
+      storageMode: truthVault.storageMode,
+      message: "Truth Vault connection check failed."
+    };
+  }
+
+  const ready = truthVault.enabled && truthVaultHealth.ok;
   sendJson(response, 200, {
     ok: true,
     service: SERVICE_NAME,
-    status: "healthy",
+    status: ready ? "healthy" : "degraded",
+    readiness: ready ? "ready" : "not_ready",
     storageMode: truthVault.storageMode,
     truthVault: truthVaultHealth,
     jarvisRuntime: {
@@ -392,67 +434,328 @@ async function handleHealth(response: ServerResponse): Promise<void> {
     generatedAtIso: nowIso(),
     routes: [
       "GET /health",
+      "GET /ready",
+      "POST /api/finance/payfast/itn",
       "GET /api/system/health",
       "POST /api/commands",
       "POST /api/jarvis/runtime-control",
       "POST /api/workflow/result",
       "POST /api/workflow-results",
+      "POST /api/candidate-auth/login",
+      "POST /api/candidate-auth/logout",
+      "GET /api/candidate-auth/session",
+      "GET /api/candidate/applications",
+      "POST /api/internal/candidate/applications",
+      "POST /api/internal/candidate/session",
+      "POST /api/internal/candidate/documents",
+      "POST /api/internal/candidate/document-requests",
+      "POST /api/internal/candidate/support-tickets",
+      "GET /api/candidate/documents",
+      "GET /api/candidate/document-requests",
       "GET /api/candidates/:candidateId/status",
       "GET /api/applications/:applicationId/workbench"
     ]
   });
 }
 
-async function handleCandidateStatus(response: ServerResponse, candidateId: string): Promise<void> {
-  if (truthVault.enabled) {
-    const candidate = await truthVault.readCandidateStatus(candidateId);
-    if (!candidate) {
-      sendError(response, 404, "CANDIDATE_READ_MODEL_NOT_FOUND", `No candidate read model found for ${candidateId}.`);
+async function handleReadiness(response: ServerResponse): Promise<void> {
+  try {
+    const truthVaultHealth = await truthVault.healthCheck();
+    if (!truthVault.enabled || !truthVaultHealth.ok) {
+      sendJson(response, 503, {
+        ok: false,
+        status: "not_ready",
+        code: truthVault.enabled ? "TRUTH_VAULT_UNHEALTHY" : "DURABLE_STORAGE_DISABLED",
+        storageMode: truthVault.storageMode,
+        truthVault: truthVaultHealth,
+        generatedAtIso: nowIso()
+      });
       return;
     }
 
-    sendJson(response, 200, { ok: true, candidate, storageMode: truthVault.storageMode, generatedAtIso: nowIso() });
+    sendJson(response, 200, {
+      ok: true,
+      status: "ready",
+      storageMode: truthVault.storageMode,
+      truthVault: truthVaultHealth,
+      generatedAtIso: nowIso()
+    });
+  } catch {
+    sendJson(response, 503, {
+      ok: false,
+      status: "not_ready",
+      code: "TRUTH_VAULT_UNHEALTHY",
+      storageMode: truthVault.storageMode,
+      generatedAtIso: nowIso()
+    });
+  }
+}
+
+async function handleCandidateDocuments(request: IncomingMessage, response: ServerResponse): Promise<void> {
+  if (!candidateAuthRuntime || !truthVault.enabled) {
+    sendError(response, 503, "CANDIDATE_AUTHORIZATION_NOT_CONFIGURED", "Candidate authorization is not configured.");
     return;
   }
-
-  const candidate = store.candidates.get(candidateId);
-  if (!candidate) {
-    sendError(response, 404, "CANDIDATE_READ_MODEL_NOT_FOUND", `No candidate read model found for ${candidateId}.`);
+  const token = readCandidateSessionCookie(request.headers.cookie);
+  const principal = await candidateAuthRuntime.service.authenticateToken(token);
+  if (!principal.authenticated) {
+    sendError(response, 401, "CANDIDATE_AUTH_REQUIRED", "Sign in to view your documents.");
     return;
   }
-
+  const documents = await truthVault.listDocumentMetadataForOwner(principal.candidateId);
+  response.setHeader("cache-control", "private, no-store");
+  response.setHeader("pragma", "no-cache");
   sendJson(response, 200, {
     ok: true,
-    candidate,
-    storageMode: truthVault.storageMode,
-    generatedAtIso: nowIso()
+    documents,
+    storageAvailable: false,
+    message: "This endpoint lists stored document metadata only. Upload and download storage are not enabled by this route."
   });
 }
 
-async function handleApplicationWorkbench(response: ServerResponse, applicationId: string): Promise<void> {
-  if (truthVault.enabled) {
-    const application = await truthVault.readApplicationWorkbench(applicationId);
-    if (!application) {
-      sendError(response, 404, "APPLICATION_WORKBENCH_NOT_FOUND", `No application workbench found for ${applicationId}.`);
-      return;
-    }
-
-    sendJson(response, 200, { ok: true, application, storageMode: truthVault.storageMode, generatedAtIso: nowIso() });
+async function handleCandidateDocumentRequests(request: IncomingMessage, response: ServerResponse): Promise<void> {
+  if (!candidateAuthRuntime || !truthVault.enabled) {
+    sendError(response, 503, "CANDIDATE_AUTHORIZATION_NOT_CONFIGURED", "Candidate authorization is not configured.");
     return;
   }
+  const token = readCandidateSessionCookie(request.headers.cookie);
+  const principal = await candidateAuthRuntime.service.authenticateToken(token);
+  if (!principal.authenticated) {
+    sendError(response, 401, "CANDIDATE_AUTH_REQUIRED", "Sign in to view your requested documents.");
+    return;
+  }
+  const requests = await truthVault.listOpenDocumentRequestsForOwner(principal.candidateId);
+  response.setHeader("cache-control", "private, no-store");
+  response.setHeader("pragma", "no-cache");
+  sendJson(response, 200, { ok: true, requests });
+}
 
-  const application = store.applications.get(applicationId);
+async function handleCandidateStatus(request: IncomingMessage, response: ServerResponse, candidateRef: string): Promise<void> {
+  if (!candidateAuthRuntime || !truthVault.enabled) {
+    sendError(response, 503, "CANDIDATE_AUTHORIZATION_NOT_CONFIGURED", "Candidate authorization is not configured.");
+    return;
+  }
+  const token = readCandidateSessionCookie(request.headers.cookie);
+  const principal = await candidateAuthRuntime.service.authenticateToken(token);
+  if (!principal.authenticated) {
+    sendError(response, 401, "CANDIDATE_AUTH_REQUIRED", "Sign in to view candidate information.");
+    return;
+  }
+  const candidate = await truthVault.readCandidateStatusForOwner(principal.candidateId, candidateRef);
+  if (!candidate) {
+    sendError(response, 404, "CANDIDATE_NOT_FOUND", "Candidate record was not found.");
+    return;
+  }
+  sendJson(response, 200, { ok: true, candidate });
+}
+
+async function handleApplicationWorkbench(request: IncomingMessage, response: ServerResponse, applicationRef: string): Promise<void> {
+  if (!candidateAuthRuntime || !truthVault.enabled) {
+    sendError(response, 503, "CANDIDATE_AUTHORIZATION_NOT_CONFIGURED", "Candidate authorization is not configured.");
+    return;
+  }
+  const token = readCandidateSessionCookie(request.headers.cookie);
+  const principal = await candidateAuthRuntime.service.authenticateToken(token);
+  if (!principal.authenticated) {
+    sendError(response, 401, "CANDIDATE_AUTH_REQUIRED", "Sign in to view application information.");
+    return;
+  }
+  const application = await truthVault.readOwnedApplicationWorkbench(applicationRef, principal.candidateId);
   if (!application) {
-    sendError(response, 404, "APPLICATION_WORKBENCH_NOT_FOUND", `No application workbench found for ${applicationId}.`);
+    sendError(response, 404, "APPLICATION_NOT_FOUND", "Application record was not found.");
     return;
   }
+  sendJson(response, 200, { ok: true, application });
+}
 
-  sendJson(response, 200, {
-    ok: true,
-    application,
-    storageMode: truthVault.storageMode,
-    generatedAtIso: nowIso()
-  });
+async function handleInternalCandidateApplications(request: IncomingMessage, response: ServerResponse): Promise<void> {
+  const configuredSecret = process.env.KINGSMEN_WEB_INTERNAL_API_KEY;
+  const suppliedSecret = request.headers["x-kingsmen-internal-key"];
+  const supplied = Array.isArray(suppliedSecret) ? suppliedSecret[0] : suppliedSecret;
+  const configuredBytes = Buffer.from(configuredSecret ?? "");
+  const suppliedBytes = Buffer.from(supplied ?? "");
+  if (!configuredSecret || !supplied || configuredBytes.length === 0 ||
+      configuredBytes.length !== suppliedBytes.length || !timingSafeEqual(configuredBytes, suppliedBytes)) {
+    sendError(response, 401, "INTERNAL_SERVICE_AUTH_REQUIRED", "Internal service authorization is required.");
+    return;
+  }
+  if (!truthVault.enabled) {
+    sendError(response, 503, "DURABLE_STORAGE_DISABLED", "Candidate application storage is not ready.");
+    return;
+  }
+  const body = await readJson(request);
+  if (!body || typeof body !== "object" || Array.isArray(body) ||
+      typeof (body as { supabaseUserId?: unknown }).supabaseUserId !== "string") {
+    sendError(response, 400, "VERIFIED_USER_ID_REQUIRED", "A server-verified identity is required.");
+    return;
+  }
+  const supabaseUserId = (body as { supabaseUserId: string }).supabaseUserId;
+  if (!/^[0-9a-f]{8}-[0-9a-f]{4}-[1-8][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i.test(supabaseUserId)) {
+    sendError(response, 400, "VERIFIED_USER_ID_INVALID", "The identity format is invalid.");
+    return;
+  }
+  const applications = await truthVault.listApplicationsForVerifiedSupabaseUser(supabaseUserId);
+  if (applications === null) {
+    sendError(response, 403, "CANDIDATE_PROFILE_LINK_REQUIRED", "No verified candidate profile is linked to this account.");
+    return;
+  }
+  response.setHeader("cache-control", "private, no-store");
+  sendJson(response, 200, { ok: true, applications });
+}
+
+async function handleInternalCandidateSession(request: IncomingMessage, response: ServerResponse): Promise<void> {
+  const configuredSecret = process.env.KINGSMEN_WEB_INTERNAL_API_KEY;
+  const suppliedHeader = request.headers["x-kingsmen-internal-key"];
+  const suppliedSecret = Array.isArray(suppliedHeader) ? suppliedHeader[0] : suppliedHeader;
+  const expected = Buffer.from(configuredSecret ?? "");
+  const supplied = Buffer.from(suppliedSecret ?? "");
+  if (!configuredSecret || !suppliedSecret || expected.length === 0 ||
+      expected.length !== supplied.length || !timingSafeEqual(expected, supplied)) {
+    sendError(response, 401, "INTERNAL_SERVICE_AUTH_REQUIRED", "Internal service authorization is required.");
+    return;
+  }
+  if (!truthVault.enabled) {
+    sendError(response, 503, "DURABLE_STORAGE_DISABLED", "Candidate identity-link status is not ready.");
+    return;
+  }
+  const body = await readJson(request);
+  if (!body || typeof body !== "object" || Array.isArray(body) ||
+      typeof (body as { supabaseUserId?: unknown }).supabaseUserId !== "string") {
+    sendError(response, 400, "VERIFIED_USER_ID_REQUIRED", "A server-verified identity is required.");
+    return;
+  }
+  const supabaseUserId = (body as { supabaseUserId: string }).supabaseUserId;
+  if (!/^[0-9a-f]{8}-[0-9a-f]{4}-[1-8][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i.test(supabaseUserId)) {
+    sendError(response, 400, "VERIFIED_USER_ID_INVALID", "The identity format is invalid.");
+    return;
+  }
+  // Return only the linkage boolean. The internal candidate UUID never leaves the backend.
+  const candidateId = await truthVault.resolveCandidateUuidForSupabaseUser(supabaseUserId);
+  response.setHeader("cache-control", "private, no-store");
+  response.setHeader("pragma", "no-cache");
+  sendJson(response, 200, { ok: true, candidateRecordLinked: candidateId !== null });
+}
+
+async function handleInternalCandidateSupportTickets(request: IncomingMessage, response: ServerResponse): Promise<void> {
+  if (!truthVault.enabled) {
+    sendError(response, 503, "SUPPORT_TICKET_SERVICE_NOT_CONFIGURED", "Support ticket status is not configured.");
+    return;
+  }
+  const configuredSecret = process.env.KINGSMEN_WEB_INTERNAL_API_KEY;
+  const suppliedHeader = request.headers["x-kingsmen-internal-key"];
+  const suppliedSecret = Array.isArray(suppliedHeader) ? suppliedHeader[0] : suppliedHeader;
+  const expected = Buffer.from(configuredSecret ?? "");
+  const supplied = Buffer.from(suppliedSecret ?? "");
+  if (!configuredSecret || !suppliedSecret || expected.length === 0 ||
+      expected.length !== supplied.length || !timingSafeEqual(expected, supplied)) {
+    sendError(response, 401, "INTERNAL_AUTH_REQUIRED", "Internal service authentication is required.");
+    return;
+  }
+  const body = await readJson(request);
+  if (!body || typeof body !== "object" || Array.isArray(body)) {
+    sendError(response, 400, "INVALID_REQUEST", "A valid request body is required.");
+    return;
+  }
+  const supabaseUserId = (body as Record<string, unknown>).supabaseUserId;
+  if (typeof supabaseUserId !== "string" ||
+      !/^[0-9a-f]{8}-[0-9a-f]{4}-[1-8][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i.test(supabaseUserId)) {
+    sendError(response, 400, "INVALID_AUTH_ID", "A valid authenticated identity is required.");
+    return;
+  }
+  const tickets = await truthVault.listSupportTicketsForVerifiedSupabaseUser(supabaseUserId);
+  if (tickets === null) {
+    sendError(response, 403, "CANDIDATE_PROFILE_LINK_REQUIRED", "This account is not linked to an active candidate profile.");
+    return;
+  }
+  response.setHeader("cache-control", "private, no-store");
+  response.setHeader("pragma", "no-cache");
+  sendJson(response, 200, { ok: true, tickets });
+}
+
+async function handleInternalCandidateDocumentRequests(request: IncomingMessage, response: ServerResponse): Promise<void> {
+  if (!truthVault.enabled) {
+    sendError(response, 503, "DOCUMENT_REQUEST_SERVICE_NOT_CONFIGURED", "Document request status is not configured.");
+    return;
+  }
+  const configuredSecret = process.env.KINGSMEN_WEB_INTERNAL_API_KEY;
+  const suppliedSecret = request.headers["x-kingsmen-internal-key"];
+  const supplied = typeof suppliedSecret === "string" ? Buffer.from(suppliedSecret) : Buffer.alloc(0);
+  const expected = configuredSecret ? Buffer.from(configuredSecret) : Buffer.alloc(0);
+  if (!expected.length || supplied.length !== expected.length || !timingSafeEqual(supplied, expected)) {
+    sendError(response, 401, "INTERNAL_AUTH_REQUIRED", "Internal service authentication is required.");
+    return;
+  }
+  const body = await readJson(request);
+  if (!body || typeof body !== "object" || Array.isArray(body)) {
+    sendError(response, 400, "INVALID_REQUEST", "A valid request body is required.");
+    return;
+  }
+  const supabaseUserId = (body as Record<string, unknown>).supabaseUserId;
+  if (typeof supabaseUserId !== "string" || !/^[0-9a-f]{8}-[0-9a-f]{4}-[1-8][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i.test(supabaseUserId)) {
+    sendError(response, 400, "INVALID_AUTH_ID", "A valid authenticated identity is required.");
+    return;
+  }
+  const requests = await truthVault.listDocumentRequestsForVerifiedSupabaseUser(supabaseUserId);
+  if (requests === null) {
+    sendError(response, 403, "CANDIDATE_PROFILE_LINK_REQUIRED", "This account is not linked to an active candidate profile.");
+    return;
+  }
+  response.setHeader("cache-control", "private, no-store");
+  response.setHeader("pragma", "no-cache");
+  sendJson(response, 200, { ok: true, requests });
+}
+
+async function handleInternalCandidateDocuments(request: IncomingMessage, response: ServerResponse): Promise<void> {
+  const configuredSecret = process.env.KINGSMEN_WEB_INTERNAL_API_KEY;
+  const suppliedHeader = request.headers["x-kingsmen-internal-key"];
+  const suppliedSecret = Array.isArray(suppliedHeader) ? suppliedHeader[0] : suppliedHeader;
+  const configuredBytes = Buffer.from(configuredSecret ?? "");
+  const suppliedBytes = Buffer.from(suppliedSecret ?? "");
+  if (!configuredSecret || !suppliedSecret || configuredBytes.length === 0 ||
+      configuredBytes.length !== suppliedBytes.length || !timingSafeEqual(configuredBytes, suppliedBytes)) {
+    sendError(response, 401, "INTERNAL_SERVICE_AUTH_REQUIRED", "Internal service authorization is required.");
+    return;
+  }
+  if (!truthVault.enabled) {
+    sendError(response, 503, "DURABLE_STORAGE_DISABLED", "Document metadata storage is not ready.");
+    return;
+  }
+  const body = await readJson(request);
+  if (!body || typeof body !== "object" || Array.isArray(body) ||
+      typeof (body as { supabaseUserId?: unknown }).supabaseUserId !== "string") {
+    sendError(response, 400, "VERIFIED_USER_ID_REQUIRED", "A server-verified identity is required.");
+    return;
+  }
+  const supabaseUserId = (body as { supabaseUserId: string }).supabaseUserId;
+  if (!/^[0-9a-f]{8}-[0-9a-f]{4}-[1-8][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i.test(supabaseUserId)) {
+    sendError(response, 400, "VERIFIED_USER_ID_INVALID", "The identity format is invalid.");
+    return;
+  }
+  const documents = await truthVault.listDocumentsForVerifiedSupabaseUser(supabaseUserId);
+  if (documents === null) {
+    sendError(response, 403, "CANDIDATE_PROFILE_LINK_REQUIRED", "No active candidate profile is linked to this account.");
+    return;
+  }
+  response.setHeader("cache-control", "private, no-store");
+  response.setHeader("pragma", "no-cache");
+  sendJson(response, 200, { ok: true, documents });
+}
+
+async function handleCandidateApplications(request: IncomingMessage, response: ServerResponse): Promise<void> {
+  if (!candidateAuthRuntime || !truthVault.enabled) {
+    sendError(response, 503, "CANDIDATE_AUTHORIZATION_NOT_CONFIGURED", "Candidate application access is not configured.");
+    return;
+  }
+  const token = readCandidateSessionCookie(request.headers.cookie);
+  const principal = await candidateAuthRuntime.service.authenticateToken(token);
+  if (!principal.authenticated) {
+    sendError(response, 401, "CANDIDATE_AUTH_REQUIRED", "Sign in to view your applications.");
+    return;
+  }
+  const applications = await truthVault.listOwnedApplicationsForOwner(principal.candidateId);
+  response.setHeader("cache-control", "private, no-store");
+  response.setHeader("pragma", "no-cache");
+  sendJson(response, 200, { ok: true, applications });
 }
 
 export function createKingsmenApiServer() {
@@ -463,9 +766,19 @@ export function createKingsmenApiServer() {
       const pathname = url.pathname;
       const method = request.method ?? "GET";
 
-      response.setHeader("access-control-allow-origin", process.env.KINGSMEN_API_CORS_ORIGIN ?? "*");
-      response.setHeader("access-control-allow-methods", "GET,POST,OPTIONS");
-      response.setHeader("access-control-allow-headers", "content-type,x-correlation-id,x-idempotency-key,authorization");
+      // CORS is opt-in: never default to wildcard access. Requests without an
+      // Origin (e.g. trusted server-to-server calls) continue through normal routing.
+      const requestOrigin = request.headers.origin;
+      const configuredOrigin = (process.env.KINGSMEN_API_CORS_ORIGIN ?? process.env.KINGSMEN_CANDIDATE_PORTAL_ORIGIN)?.trim();
+      if (requestOrigin && configuredOrigin && requestOrigin === configuredOrigin) {
+        response.setHeader("access-control-allow-origin", configuredOrigin);
+        response.setHeader("vary", "Origin");
+        response.setHeader("access-control-allow-methods", "GET,POST,OPTIONS");
+        response.setHeader("access-control-allow-headers", "content-type,x-correlation-id,x-idempotency-key,authorization");
+      } else if (requestOrigin) {
+        sendError(response, 403, "CORS_ORIGIN_NOT_ALLOWED", "This request origin is not allowed.");
+        return;
+      }
 
       if (method === "OPTIONS") {
         response.statusCode = 204;
@@ -473,8 +786,28 @@ export function createKingsmenApiServer() {
         return;
       }
 
+      if (pathname.startsWith("/api/candidate-auth/")) {
+        const handled = await handleCandidateAuthRoute(request, response, pathname, candidateAuthRuntime?.service ?? null, sendJson);
+        if (handled) return;
+      }
+
+      if (method === "GET" && pathname === "/ready") {
+        await handleReadiness(response);
+        return;
+      }
+
       if (method === "GET" && (pathname === "/" || pathname === "/health" || pathname === "/api/system/health")) {
         await handleHealth(response);
+        return;
+      }
+
+      if (pathname === "/api/finance/payfast/itn") {
+        if (method !== "POST") {
+          response.setHeader("allow", "POST");
+          sendError(response, 405, "METHOD_NOT_ALLOWED", "Only POST is supported.");
+          return;
+        }
+        await handlePayFastItn(request, response);
         return;
       }
 
@@ -493,15 +826,98 @@ export function createKingsmenApiServer() {
         return;
       }
 
+      if (pathname === "/api/internal/candidate/support-tickets") {
+        if (method !== "POST") {
+          response.setHeader("allow", "POST");
+          sendError(response, 405, "METHOD_NOT_ALLOWED", "Only POST is supported.");
+          return;
+        }
+        await handleInternalCandidateSupportTickets(request, response);
+        return;
+      }
+
+      if (pathname === "/api/internal/candidate/document-requests") {
+        if (method !== "POST") {
+          response.setHeader("allow", "POST");
+          sendError(response, 405, "METHOD_NOT_ALLOWED", "Only POST is supported.");
+          return;
+        }
+        await handleInternalCandidateDocumentRequests(request, response);
+        return;
+      }
+
+      if (pathname === "/api/internal/candidate/documents") {
+        if (method !== "POST") {
+          response.setHeader("allow", "POST");
+          sendError(response, 405, "METHOD_NOT_ALLOWED", "Only POST is supported.");
+          return;
+        }
+        await handleInternalCandidateDocuments(request, response);
+        return;
+      }
+
+      if (pathname === "/api/internal/candidate/session") {
+        if (method !== "POST") {
+          response.setHeader("allow", "POST");
+          sendError(response, 405, "METHOD_NOT_ALLOWED", "Only POST is supported.");
+          return;
+        }
+        await handleInternalCandidateSession(request, response);
+        return;
+      }
+
+      if (pathname === "/api/internal/candidate/applications") {
+        if (method !== "POST") {
+          response.setHeader("allow", "POST");
+          sendError(response, 405, "METHOD_NOT_ALLOWED", "Only POST is supported.");
+          return;
+        }
+        await handleInternalCandidateApplications(request, response);
+        return;
+      }
+
+if (pathname === "/api/candidate/applications") {
+        if (method !== "GET") {
+          response.setHeader("allow", "GET");
+          sendError(response, 405, "METHOD_NOT_ALLOWED", "Only GET is supported.");
+          return;
+        }
+        await handleCandidateApplications(request, response);
+        return;
+      }
+
+      if (pathname === "/api/candidate/documents") {
+        if (method !== "GET") {
+          response.setHeader("allow", "GET");
+          sendError(response, 405, "METHOD_NOT_ALLOWED", "Only GET is supported.");
+          return;
+        }
+        await handleCandidateDocuments(request, response);
+        return;
+      }
+
+      if (pathname === "/api/candidate/document-requests") {
+        if (method !== "GET") {
+          response.setHeader("allow", "GET");
+          sendError(response, 405, "METHOD_NOT_ALLOWED", "Only GET is supported.");
+          return;
+        }
+        await handleCandidateDocumentRequests(request, response);
+        return;
+      }
+
       const candidateId = getPathParam(/^\/api\/candidates\/([^/]+)\/status$/, pathname);
       if (method === "GET" && candidateId) {
-        await handleCandidateStatus(response, candidateId);
+        // These records can contain candidate-identifying information. The API
+        // currently has no verified caller-to-candidate authorization adapter,
+        // so do not expose records merely because an identifier is known.
+        await handleCandidateStatus(request, response, decodeURIComponent(candidateId));
         return;
       }
 
       const applicationId = getPathParam(/^\/api\/applications\/([^/]+)\/workbench$/, pathname);
       if (method === "GET" && applicationId) {
-        await handleApplicationWorkbench(response, applicationId);
+        await handleApplicationWorkbench(request, response, decodeURIComponent(applicationId));
         return;
       }
 
@@ -509,7 +925,17 @@ export function createKingsmenApiServer() {
     } catch (error) {
       const message = error instanceof Error ? error.message : "Unknown server error.";
       const statusCode = message === "REQUEST_BODY_TOO_LARGE" ? 413 : message.includes("Invalid") ? 422 : 500;
-      sendError(response, statusCode, "KINGSMEN_API_ERROR", message);
+      if (statusCode === 500) {
+        console.error(JSON.stringify({
+          service: SERVICE_NAME,
+          event: "request_failed",
+          errorName: error instanceof Error ? error.name : "UnknownError",
+          generatedAtIso: nowIso()
+        }));
+        sendError(response, 500, "KINGSMEN_API_ERROR", "The request could not be completed.");
+      } else {
+        sendError(response, statusCode, "KINGSMEN_API_ERROR", message);
+      }
     }
   });
 }
@@ -538,7 +964,7 @@ export function startKingsmenApiServer(options: KingsmenApiServerOptions = {}) {
       generatedAtIso: nowIso()
     }));
     server.close(() => {
-      truthVault.close().finally(() => process.exit(0));
+      Promise.all([truthVault.close(), candidateAuthRuntime?.close() ?? Promise.resolve(), closePayFastItnPool()]).finally(() => process.exit(0));
     });
   };
 

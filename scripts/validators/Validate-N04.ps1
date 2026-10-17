@@ -8,10 +8,13 @@ $RequiredFiles = @(
   "db\migrations\0002_n04_candidate_core.sql",
   "db\seeds\n04_runtime_config_seed.sql",
   "apps\api\src\candidate\candidate-types.ts",
+  "apps\api\src\candidate\candidate-profile-readiness.ts",
+  "apps\api\src\candidate\candidate-profile-readiness.test.ts",
   "apps\api\src\candidate\smart-intake.ts",
   "apps\api\src\candidate\candidate-auth.ts",
   "apps\api\src\candidate\profile-review.ts",
   "apps\api\src\candidate\candidate-portal-read-model.ts",
+  "apps\api\src\candidate\candidate-portal-read-model.test.ts",
   "apps\api\src\candidate\candidate-messages.ts",
   "apps\api\src\candidate\candidate-success-loop.ts",
   "apps\api\src\candidate\index.ts",
@@ -85,6 +88,32 @@ foreach ($Marker in @(
   }
 }
 
+$ProfileReadiness = Get-Content "$Base\apps\api\src\candidate\candidate-profile-readiness.ts" -Raw
+foreach ($Marker in @(
+  "evaluateCandidateProfileReadiness",
+  "DOCUMENT_READINESS_OWNERSHIP_MISMATCH",
+  "IDENTITY_LINK_",
+  "CANDIDATE_ACCOUNT_NOT_ACTIVE",
+  "missingFields",
+  "nextActions"
+)) {
+  if ($ProfileReadiness -notmatch [regex]::Escape($Marker)) {
+    $Failures += "Candidate profile readiness missing marker: $Marker"
+  }
+}
+
+$ProfileReadinessTest = Get-Content "$Base\apps\api\src\candidate\candidate-profile-readiness.test.ts" -Raw
+foreach ($Marker in @(
+  "ready requires active account",
+  "pending identity prevents ready state",
+  "disabled and suspended accounts are blocked",
+  "fails closed if document readiness belongs to another candidate"
+)) {
+  if ($ProfileReadinessTest -notmatch [regex]::Escape($Marker)) {
+    $Failures += "Candidate profile readiness regression test missing marker: $Marker"
+  }
+}
+
 $MessagePolicy = Get-Content "$Base\apps\api\src\candidate\candidate-messages.ts" -Raw
 if ($MessagePolicy -notmatch "WhatsApp is urgent-only") {
   $Failures += "Candidate message policy missing WhatsApp urgent-only rule."
@@ -103,6 +132,30 @@ if ($PortalShell -notmatch "Kingsmen Candidate Portal") {
 $ApiIndex = Get-Content "$Base\apps\api\src\index.ts" -Raw
 if ($ApiIndex -notmatch [regex]::Escape('export * from "./candidate";')) {
   $Failures += "API index missing candidate export."
+}
+
+$PortalReadModel = Get-Content "$Base\apps\api\src\candidate\candidate-portal-read-model.ts" -Raw
+foreach ($Marker in @(
+  "CANDIDATE_PORTAL_READINESS_OWNERSHIP_MISMATCH",
+  "readiness.ready",
+  "IDENTITY_LINK_REJECTED",
+  "Applications are blocked until the account and identity requirements are resolved"
+)) {
+  if ($PortalReadModel -notmatch [regex]::Escape($Marker)) {
+    $Failures += "Candidate portal readiness gate missing marker: $Marker"
+  }
+}
+
+$PortalReadModelTest = Get-Content "$Base\apps\api\src\candidate\candidate-portal-read-model.test.ts" -Raw
+foreach ($Marker in @(
+  "application card is ready only when server readiness is ready",
+  "legacy READY application summary is gated",
+  "rejected identity blocks application card",
+  "candidate ownership mismatch fails closed"
+)) {
+  if ($PortalReadModelTest -notmatch [regex]::Escape($Marker)) {
+    $Failures += "Candidate portal readiness regression test missing marker: $Marker"
+  }
 }
 
 $Result = [ordered]@{

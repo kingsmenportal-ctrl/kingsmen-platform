@@ -1,26 +1,21 @@
-export async function POST(request: Request) {
-  const body = await request.json();
+import { NextResponse } from "next/server";
 
-  if (!body?.candidateId || !body?.documentTypeCode || !body?.filename || !body?.mimeType || !body?.sizeBytes) {
-    return Response.json(
-      {
-        ok: false,
-        productionReady: false,
-        error: "Missing required document upload fields"
-      },
-      { status: 400 }
-    );
-  }
+export const runtime = "nodejs";
+export const dynamic = "force-dynamic";
 
-  return Response.json({
-    ok: true,
-    productionReady: false,
-    boundary: "N05 signed upload route shell",
-    candidateId: body.candidateId,
-    documentTypeCode: body.documentTypeCode,
-    rawPublicUrlAllowed: false,
-    serviceRoleVisibleToBrowser: false,
-    signedUploadUrl: "SIGNER_RUNTIME_REQUIRED",
-    expiresInMinutes: 15
-  });
+/**
+ * Fail closed: the previous route echoed caller-supplied candidate IDs and
+ * returned a placeholder string as if it were an upload URL. No signer,
+ * authenticated identity, or ownership check is wired here.
+ */
+export async function POST() {
+  return NextResponse.json(
+    {
+      ok: false,
+      status: "BLOCKED",
+      code: "CANDIDATE_AUTHORIZATION_NOT_CONFIGURED",
+      error: "Document upload is unavailable until server-side candidate identity, owner-scoped metadata, and a real private-storage signer are configured."
+    },
+    { status: 503, headers: { "Cache-Control": "no-store", Pragma: "no-cache" } }
+  );
 }

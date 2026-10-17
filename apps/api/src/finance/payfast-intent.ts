@@ -1,4 +1,5 @@
-import { centsToRand } from "./money";
+import crypto from "crypto";
+import { centsToRand, assertPositiveOrZeroCents } from "./money";
 import { getFinancePlan } from "./pricing-catalog";
 import type { FinanceOrder, FinancePlanCode } from "./finance-types";
 import { createPayFastSignature, type PayFastFields } from "./payfast-signature";
@@ -29,15 +30,27 @@ export function getPayFastProcessUrl(environment: "sandbox" | "live"): string {
 }
 
 export function createFinanceOrder(input: { candidateRef: string; planCode: FinancePlanCode }): FinanceOrder {
+  if (!input.candidateRef?.trim()) throw new Error("Candidate reference is required to create an order.");
   const plan = getFinancePlan(input.planCode);
   return {
-    orderRef: `ord_${Date.now()}_${Math.random().toString(36).slice(2, 10)}`,
-    candidateRef: input.candidateRef,
+    orderRef: `ord_${crypto.randomUUID()}`,
+    candidateRef: input.candidateRef.trim(),
     planCode: input.planCode,
-    orderStatus: plan.amountCents === 0 ? "PAID" : "PENDING_PAYMENT",
+    // A zero-cost preview is not a payment and must not be represented as a paid order.
+    orderStatus: plan.amountCents === 0 ? "DRAFT" : "PENDING_PAYMENT",
     amountCents: plan.amountCents,
     currency: "ZAR"
   };
+}
+
+function assertSafeCallbackUrl(value: string | undefined, name: string, required: boolean): void {
+  if (!value && !required) return;
+  if (!value) throw new Error(`PayFast ${name} is required.`);
+  let url: URL;
+  try { url = new URL(value); } catch { throw new Error(`PayFast ${name} must be an absolute HTTPS URL.`); }
+  if (url.protocol !== "https:" || url.username || url.password) {
+    throw new Error(`PayFast ${name} must be an absolute HTTPS URL without embedded credentials.`);
+  }
 }
 
 export function createPayFastPaymentIntent(input: {
@@ -46,33 +59,48 @@ export function createPayFastPaymentIntent(input: {
   candidateName?: string;
   runtime: PayFastRuntimeConfig;
 }): PayFastPaymentIntent {
-  if (input.order.amountCents <= 0) throw new Error("Free orders do not need PayFast payment intents.");
+  const { order, runtime } = input;
+  if (!order.orderRef?.trim() || !order.candidateRef?.trim()) throw new Error("A valid order and candidate reference are required.");
+  assertPositiveOrZeroCents(order.amountCents);
+  const plan = getFinancePlan(order.planCode);
+  if (order.amountCents !== plan.amountCents || order.currency !== plan.currency) {
+    throw new Error("Order amount/currency does not match the trusted pricing catalogue.");
+  }
+  if (order.amountCents <= 0) throw new Error("Free orders do not need PayFast payment intents.");
+  if (order.orderStatus !== "PENDING_PAYMENT") throw new Error("Only pending-payment orders can create PayFast intents.");
+  if (!runtime.merchantId.trim() || !runtime.merchantKey.trim() || !runtime.notifyUrl.trim()) {
+    throw new Error("PayFast merchant credentials and notify URL are required.");
+  }
+  assertSafeCallbackUrl(runtime.notifyUrl, "notify URL", true);
+  assertSafeCallbackUrl(runtime.returnUrl, "return URL", false);
+  assertSafeCallbackUrl(runtime.cancelUrl, "cancel URL", false);
 
-  const plan = getFinancePlan(input.order.planCode);
-  const merchantReference = input.order.orderRef;
+  const merchantReference = order.orderRef;
   const payload: PayFastFields = {
-    merchant_id: input.runtime.merchantId,
-    merchant_key: input.runtime.merchantKey,
-    return_url: input.runtime.returnUrl,
-    cancel_url: input.runtime.cancelUrl,
-    notify_url: input.runtime.notifyUrl,
+    merchant_id: runtime.merchantId,
+    // merchant_key is a private account credential, not a browser form field.
+    // The signed form is authenticated by the signature/passphrase, never by
+    // disclosing the merchant key to the payer.
+    return_url: runtime.returnUrl,
+    cancel_url: runtime.cancelUrl,
+    notify_url: runtime.notifyUrl,
     m_payment_id: merchantReference,
-    amount: centsToRand(input.order.amountCents),
+    amount: centsToRand(plan.amountCents),
     item_name: plan.planName,
     item_description: plan.description,
     email_address: input.candidateEmail,
     name_first: input.candidateName
   };
 
-  const signature = createPayFastSignature(payload, input.runtime.passphrase);
+  const signature = createPayFastSignature(payload, runtime.passphrase);
   const signedPayload = { ...payload, signature };
 
   return {
-    intentRef: `pf_intent_${Date.now()}_${Math.random().toString(36).slice(2, 10)}`,
+    intentRef: `pf_intent_${crypto.randomUUID()}`,
     merchantReference,
-    paymentUrl: getPayFastProcessUrl(input.runtime.environment),
+    paymentUrl: getPayFastProcessUrl(runtime.environment),
     signedPayload,
     signature,
-    idempotencyKey: ["payfast-intent", input.order.orderRef, input.order.amountCents].join(":")
+    idempotencyKey: ["payfast-intent", order.orderRef, plan.amountCents].join(":")
   };
 }

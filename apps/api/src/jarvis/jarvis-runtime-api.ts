@@ -230,10 +230,18 @@ export function evaluateApiJarvisRuntime(input: ApiJarvisRuntimeRequest): ApiJar
     safeReason = "Founder approval reference is present and launch/evidence gates allow this action.";
   }
 
+  // A request is a dry run by default. Never report a policy-allowed command as
+  // executable unless the caller explicitly opts into execution.
+  if (finalDecision === "ALLOW" && input.dryRun !== false) {
+    finalDecision = "DRY_RUN_ONLY";
+    reasonCode = "JARVIS_API_DRY_RUN_DEFAULT";
+    safeReason = "Jarvis evaluated the command without executing it; explicit execution intent is required.";
+  }
+
   ledger.push(makeEvent(commandRef, correlationId, 2, finalDecision === "BLOCK" ? "blocked" : "policy_decision", `${reasonCode}: ${safeReason}`));
   ledger.push(makeEvent(commandRef, correlationId, 3, "validator_result", `Jarvis API runtime final decision ${finalDecision}: ${reasonCode}.`));
 
-  const executable = finalDecision === "ALLOW" || finalDecision === "DRY_RUN_ONLY";
+  const executable = finalDecision === "ALLOW";
 
   return {
     ok: executable,

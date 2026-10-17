@@ -5,7 +5,7 @@ export function defaultMobileNotificationPreference(candidateId: string): Mobile
   return {
     candidateId,
     emailEnabled: true,
-    whatsappUrgentOnly: true,
+    whatsappUrgentOnly: false,
     smsBackupEnabled: false,
     quietHoursStart: "20:00",
     quietHoursEnd: "07:00",

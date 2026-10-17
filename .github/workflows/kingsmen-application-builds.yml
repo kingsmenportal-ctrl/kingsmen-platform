@@ -1,0 +1,111 @@
+name: Kingsmen Application Build Checks
+
+on:
+  pull_request:
+    branches: [main, fix/kingsmen-phase0-source-guard-ledger]
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  web-build:
+    name: Web production build and auth guard tests
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: npm
+          cache-dependency-path: apps/web/package-lock.json
+      - name: Validate web dependency manifest and lockfile
+        run: node scripts/validators/validate-web-dependency-lock.mjs
+      - name: Install locked web dependencies
+        working-directory: apps/web
+        run: npm ci
+      - name: Type-check same-origin guard and regression tests
+        working-directory: apps/web
+        run: npx tsc --noEmit --target ES2022 --lib dom,dom.iterable,es2022 --module esnext --moduleResolution bundler --skipLibCheck --types node src/lib/auth/csrf.ts src/lib/auth/csrf.test.ts
+      - name: Run same-origin guard regression tests
+        working-directory: apps/web
+        run: |
+          npx tsc --target ES2022 --lib dom,dom.iterable,es2022 --module commonjs --moduleResolution node --esModuleInterop --skipLibCheck --types node --outDir .auth-test-dist src/lib/auth/csrf.ts src/lib/auth/csrf.test.ts
+          printf '{"type":"commonjs"}\n' > .auth-test-dist/package.json
+          node --test .auth-test-dist/csrf.test.js
+      - name: Type-check bounded auth request parser and tests
+        working-directory: apps/web
+        run: npx tsc --noEmit --target ES2022 --lib dom,dom.iterable,es2022 --module esnext --moduleResolution bundler --skipLibCheck --types node src/lib/auth/request-body.ts src/lib/auth/request-body.test.ts
+      - name: Run bounded auth request parser regression tests
+        working-directory: apps/web
+        run: |
+          npx tsc --target ES2022 --lib dom,dom.iterable,es2022 --module commonjs --moduleResolution node --esModuleInterop --skipLibCheck --types node --outDir .auth-test-dist src/lib/auth/request-body.ts src/lib/auth/request-body.test.ts
+          printf '{"type":"commonjs"}\n' > .auth-test-dist/package.json
+          node --test .auth-test-dist/request-body.test.js
+      - name: Type-check bounded auth token helper and regression tests
+        working-directory: apps/web
+        run: npx tsc --noEmit --target ES2022 --lib dom,dom.iterable,es2022 --module esnext --moduleResolution bundler --skipLibCheck --types node src/lib/auth/token-bounds.ts src/lib/auth/token-bounds.test.ts
+      - name: Run bounded auth token regression tests
+        working-directory: apps/web
+        run: |
+          npx tsc --target ES2022 --lib dom,dom.iterable,es2022 --module commonjs --moduleResolution node --esModuleInterop --skipLibCheck --types node --outDir .auth-test-dist src/lib/auth/token-bounds.ts src/lib/auth/token-bounds.test.ts
+          printf '{"type":"commonjs"}\n' > .auth-test-dist/package.json
+          node --test .auth-test-dist/token-bounds.test.js
+      - name: Validate Personal Jobs fail-closed backend boundary
+        run: node scripts/validators/validate-personal-jobs-safe-boundary.mjs
+      - name: Validate candidate document ownership boundary
+        run: node scripts/validators/validate-candidate-document-boundary.mjs
+      - name: Build web application
+        working-directory: apps/web
+        run: npm run build
+      - name: Clean temporary test output
+        if: always()
+        working-directory: apps/web
+        run: rm -rf .auth-test-dist
+
+  api-build:
+    name: API compile and test
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Install API dependencies
+        working-directory: apps/api
+        run: npm install
+      - name: Validate PayFast source-IP security boundary
+        run: node scripts/validators/validate-payfast-source-boundary.mjs
+      - name: Validate finance database RLS boundary
+        run: node scripts/validators/validate-finance-rls-boundary.mjs
+      - name: Validate API runtime security boundary
+        run: node scripts/validators/validate-api-runtime-boundary.mjs
+      - name: Validate PayFast intent secret boundary
+        run: node scripts/validators/validate-payfast-intent-secrets.mjs
+      - name: Validate PayFast ITN route boundary
+        run: node scripts/validators/validate-payfast-itn-route.mjs
+      - name: Validate PayFast route and schema contract
+        run: node scripts/validators/validate-payfast-schema-contract.mjs
+      - name: Build and run API tests
+        working-directory: apps/api
+        run: npm run validate
+
+
+  candidate-bridge-source-guards:
+    name: Candidate identity and bridge source guards
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Validate candidate Phase A.1 source boundaries
+        run: npm run candidate:validate:phase-a1-bridges
