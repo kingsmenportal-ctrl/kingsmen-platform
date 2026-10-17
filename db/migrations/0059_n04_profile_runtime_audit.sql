@@ -3,6 +3,18 @@
 ALTER TABLE public.candidate_accounts
   ADD COLUMN IF NOT EXISTS auth_user_id uuid;
 
+DO $
+BEGIN
+  IF EXISTS (
+    SELECT 1 FROM public.candidate_accounts
+    WHERE auth_user_id IS NOT NULL
+    GROUP BY auth_user_id HAVING COUNT(*) > 1
+  ) THEN
+    RAISE EXCEPTION 'N04 migration blocked: duplicate auth_user_id mappings need authorised identity review first';
+  END IF;
+END;
+$;
+
 CREATE UNIQUE INDEX IF NOT EXISTS uq_candidate_accounts_auth_user_id
   ON public.candidate_accounts(auth_user_id)
   WHERE auth_user_id IS NOT NULL;
@@ -31,6 +43,7 @@ CREATE INDEX IF NOT EXISTS idx_candidate_profile_access_actor_time
   ON public.candidate_profile_access_audit(actor_auth_user_id, created_at DESC);
 
 ALTER TABLE public.candidate_profile_access_audit ENABLE ROW LEVEL SECURITY;
+GRANT SELECT, INSERT ON TABLE public.candidate_profile_access_audit TO service_role;
 DROP POLICY IF EXISTS service_role_all_candidate_profile_access_audit ON public.candidate_profile_access_audit;
 CREATE POLICY service_role_all_candidate_profile_access_audit
   ON public.candidate_profile_access_audit
