@@ -12,7 +12,7 @@ const gates = [
 ] as const;
 
 type OnboardingDraft = { fullName: string; preferredName: string; province: string; goals: string[]; completed: string[] };
-type SessionStatus = "loading" | "authenticated_unlinked" | "signed_out" | "unavailable" | "error";
+type SessionStatus = "loading" | "authenticated_linked" | "authenticated_unlinked" | "signed_out" | "unavailable" | "error";
 const STORAGE_KEY = "kingsmen.candidate.onboarding.v1";
 
 function readDraft(): OnboardingDraft | null {
@@ -37,6 +37,7 @@ export default function CandidateDashboardPage() {
         const body = await response.json().catch(() => ({}));
         if (!active) return;
         if (response.status === 401 && body?.status === "SIGNED_OUT") setSession("signed_out");
+        else if (response.ok && body?.authenticated === true && body?.candidateRecordLinked === true) setSession("authenticated_linked");
         else if (response.ok && body?.authenticated === true && body?.candidateRecordLinked === false) setSession("authenticated_unlinked");
         else if (response.status === 503) setSession("unavailable");
         else setSession("error");
@@ -56,6 +57,7 @@ export default function CandidateDashboardPage() {
     <section aria-labelledby="account-heading" aria-live="polite" style={{ border: "1px solid #45424a", borderRadius: 14, padding: 20, margin: "24px 0" }}>
       <h2 id="account-heading">Account connection</h2>
       {session === "loading" && <p>Checking secure sign-in status…</p>}
+      {session === "authenticated_linked" && <><p><strong>Signed in — verified candidate profile link found.</strong></p><p>The server confirmed an active candidate identity link. This confirms linkage only; profile readiness, documents, and application records are checked separately by their own services.</p></>}
       {session === "authenticated_unlinked" && <><p><strong>Signed in — candidate profile not linked.</strong></p><p>Your account session was verified by the server, but this dashboard cannot yet confirm a matching candidate record or application history.</p></>}
       {session === "signed_out" && <><p><strong>You are not signed in.</strong></p><p>Sign in to access account features. Local draft information below is not an account record.</p><a href="/candidate/login" style={{ color: "#f1d48b" }}>Go to candidate sign in →</a></>}
       {session === "unavailable" && <p><strong>Secure sign-in status is unavailable.</strong> The identity provider is not configured or could not verify the session. Try again later.</p>}
