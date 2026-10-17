@@ -28,6 +28,8 @@ export default function CandidateFinancePage() {
   })().catch(e => setMessage(e instanceof Error ? e.message : "Finance records could not be loaded.")); }, []);
 
   async function purchase(planCode: string) {
+    if (buyingPlan) return;
+    setBuyingPlan(planCode);
     setMessage("Preparing a verified payment intent…");
     try {
       const session = await getKingsmenSession();
@@ -52,6 +54,7 @@ export default function CandidateFinancePage() {
       form.submit();
     } catch (e) {
       setMessage(e instanceof Error ? e.message : "Payment intent could not be created.");
+      setBuyingPlan("");
     }
   }
 
@@ -63,7 +66,7 @@ export default function CandidateFinancePage() {
     <section style={panel}><h2>Refund requests ({data.refunds.length})</h2>{data.refunds.length ? <div style={stack}>{data.refunds.map(row => <article key={row.id} style={card}><strong>{str(row,"refund_ref")}</strong><p>{str(row,"refund_status")} · {money(row.amount_cents,row.currency)}</p><p>{str(row,"reason")}</p><small>{str(row,"created_at")}</small></article>)}</div> : <p>No refund requests found.</p>}</section>
     <section style={panel}><h2>Ledger entries ({data.ledger.length})</h2>{data.ledger.length ? <div style={stack}>{data.ledger.map(row => <article key={row.id} style={card}><strong>{str(row,"entry_type")} · {str(row,"ledger_ref")}</strong><p>{str(row,"description")}</p><p>Debit {money(row.debit_cents,row.currency)} · Credit {money(row.credit_cents,row.currency)}</p><small>{str(row,"created_at")} · Evidence {str(row,"evidence_ref")}</small></article>)}</div> : <p>No ledger entries found.</p>}</section>
     <section style={panel}><h2>Additional finance items ({data.items.length})</h2>{data.items.length ? <div style={stack}>{data.items.map(row => <article key={row.id} style={card}><strong>{str(row,"description")}</strong><p>{str(row,"item_ref")} · {str(row,"status")} · {money(row.amount_cents,row.currency)}</p></article>)}</div> : <p>No additional items found.</p>}</section>
-    <section style={panel}><h2>Active service packages</h2><p>Pricing and entitlements are read from the connected plan catalogue. Checkout creates an idempotent order, invoice and signed payment intent; it never marks payment as complete.</p>{data.plans.length ? <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit,minmax(240px,1fr))", gap: 12 }}>{data.plans.map(plan => <article key={plan.plan_code} style={card}><h3>{plan.plan_name}</h3><p>{money(plan.amount_cents,plan.currency)}</p><p>{plan.description}</p>{plan.service_scope && <small>{plan.service_scope}</small>}<p><button disabled={Number(plan.amount_cents)<=0} onClick={() => void purchase(plan.plan_code)}>Continue to secure checkout</button></p></article>)}</div> : <p>No active plans were returned by the connected catalogue.</p>}</section>
+    <section style={panel}><h2>Active service packages</h2><p>Pricing and entitlements are read from the connected plan catalogue. Checkout creates an idempotent order, invoice and signed payment intent; it never marks payment as complete.</p>{data.plans.length ? <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit,minmax(240px,1fr))", gap: 12 }}>{data.plans.map(plan => <article key={plan.plan_code} style={card}><h3>{plan.plan_name}</h3><p>{money(plan.amount_cents,plan.currency)}</p><p>{plan.description}</p>{plan.service_scope && <small>{plan.service_scope}</small>}<p><button disabled={Number(plan.amount_cents)<=0 || Boolean(buyingPlan)} onClick={() => void purchase(plan.plan_code)}>{buyingPlan===plan.plan_code ? "Preparing checkout…" : "Continue to secure checkout"}</button></p></article>)}</div> : <p>No active plans were returned by the connected catalogue.</p>}</section>
     <section style={panel}><h2>Payment integrity</h2><p>Paid status requires a verified provider callback or authorised finance review. Browser return URLs cannot mark payments as paid. Refunds require finance review. Ledger entries are read-only in this candidate portal.</p></section>
   </main>;
 }
