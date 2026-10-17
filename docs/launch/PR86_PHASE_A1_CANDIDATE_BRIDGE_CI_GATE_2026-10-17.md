@@ -6,13 +6,15 @@ Branch: `feat/phase-a1-public-destiny-auth-foundation`
 ## Batch outcome
 
 - Added `candidate:validate:application-identity-bridge` so the existing identity-bridge validator has a first-class package command.
-- Added `candidate:validate:phase-a1-bridges`, a single deterministic command that chains the candidate transaction, identity-link lifecycle/admin runtime, application identity/tracker, document ownership/metadata/request, and support-ticket source validators.
+- Added `auth:validate:provider-boundary` and a static validator for HTTPS provider configuration, bounded request parsing, same-origin guards, HttpOnly/SameSite cookies, no-store responses, server-side session verification, recovery non-enumeration, and no service-role key in the web auth boundary.
+- Added `candidate:validate:phase-a1-bridges`, a single deterministic command that chains the auth provider boundary, candidate transaction, identity-link lifecycle/admin runtime, ownership/application reads, application identity/tracker, document ownership/vault/upload/review/metadata/request, and support-ticket source validators.
 - Added a dedicated `candidate-bridge-source-guards` job to `.github/workflows/kingsmen-application-builds.yml` to run the suite on pull requests targeting the configured branches.
 - The existing API build/test job remains responsible for TypeScript compilation and unit tests. The new job complements it; it is not a substitute for a real database integration test.
 
 ## Scope of checks
 
 The suite covers:
+- web authentication provider/session boundary checks;
 - backend transaction boundaries;
 - operator authorization and identity-link lifecycle predicates;
 - server-verified Supabase Auth identity propagation;
