@@ -382,6 +382,46 @@ export class TruthVaultRepository {
     }));
   }
 
+  /**
+   * Resolves an explicit verified Supabase Auth UUID link, then lists only that
+   * candidate's application rows. Never matches by email or accepts candidate IDs.
+   */
+  async listApplicationsForVerifiedSupabaseUser(supabaseUserId: string): Promise<ApplicationWorkbenchReadModel[] | null> {
+    this.assertEnabled();
+    if (!/^[0-9a-f]{8}-[0-9a-f]{4}-[1-8][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i.test(supabaseUserId)) return null;
+    const result = await this.pool!.query<ApplicationRow>(
+      `select a.id::text,
+              coalesce(a.metadata->>'applicationRef', a.id::text) as application_ref,
+              c.public_ref as candidate_ref,
+              a.route_type, a.source_confidence_band, a.current_state,
+              a.portal_health, a.map_fallback_required, a.last_evidence_ref,
+              a.updated_at::text
+         from public.candidate_auth_identity_links link
+         join public.candidates c on c.id = link.candidate_id
+         left join public.applications a on a.candidate_id = c.id
+        where link.supabase_user_id = $1::uuid
+          and link.link_status = 'VERIFIED'
+          and c.is_active = true
+        order by a.updated_at desc nulls last, a.id asc nulls last
+        limit 201`,
+      [supabaseUserId]
+    );
+    // No row means there is no verified link; one null application row means
+    // the verified candidate has no applications.
+    if (result.rows.length === 0) return null;
+    return result.rows.filter((row) => row.id !== null && row.application_ref !== null).slice(0, 200).map((row) => ({
+      applicationId: row.application_ref,
+      candidateId: row.candidate_ref,
+      routeType: row.route_type,
+      sourceConfidenceBand: row.source_confidence_band,
+      currentState: row.current_state,
+      portalHealth: row.portal_health,
+      mapFallbackRequired: row.map_fallback_required,
+      lastEvidenceRef: row.last_evidence_ref ?? undefined,
+      lastUpdatedAt: row.updated_at
+    }));
+  }
+
   /** Identity-scoped candidate read; candidateUuid must come from a verified session. */
   async readCandidateStatusForOwner(candidateUuid: string, candidateRef: string): Promise<CandidateReadModel | null> {
     this.assertEnabled();
