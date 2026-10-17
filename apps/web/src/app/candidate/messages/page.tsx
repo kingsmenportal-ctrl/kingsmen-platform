@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { FormEvent, useEffect, useState } from "react";
+import { useEffect, useState, type FormEvent } from "react";
 import { getKingsmenSession } from "../../../lib/supabase-browser-auth";
 
 type Message = { id: string; channel: string; direction: string; urgency: string; subject: string | null; body: string; delivery_status: string; created_at: string; read_at: string | null };
