@@ -10,6 +10,7 @@ const gates = [
 ] as const;
 
 const dailyActions = [
+  ["Profile", "/candidate/profile", "Review linked identity, evidence-backed profile fields, and correction requests."],
   ["Saved opportunities", "/candidate/saved-opportunities", "Return to opportunities saved to your account."],
   ["Applications and outcomes", "/candidate/outcomes", "Review application tracking and recorded outcomes."],
   ["Documents", "/candidate/documents", "Review your document checklist and status."],
@@ -22,7 +23,7 @@ export default function CandidateDashboardPage() {
     <main style={{ maxWidth: 1080, margin: "0 auto", padding: "24px 18px 48px" }}>
       <p><Link href="/workspace">← Daily operations workspace</Link></p>
       <h1>Kingsmen Candidate Dashboard</h1>
-      <p>Use the current candidate surfaces below to continue your journey. All six opportunity gates are part of the Kingsmen model; the route-discovery and profile-editing screens still need their connected implementation.</p>
+      <p>Use the current candidate surfaces below to continue your journey. All six opportunity gates are part of the Kingsmen model. Profile and identity review are available through the connected profile workflow.</p>
 
       <section aria-label="Six Gate View" style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(220px, 1fr))", gap: 14 }}>
         {gates.map(([code, label, description]) => (
