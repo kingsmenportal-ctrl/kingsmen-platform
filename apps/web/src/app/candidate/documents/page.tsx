@@ -1,6 +1,8 @@
 "use client";
 import { useCallback, useEffect, useState } from "react";
-type CandidateDocument = { documentRef: string; documentType: string; displayName: string; mimeType: string; fileSizeBytes: number; documentStatus: string; verificationStatus: string; extractionStatus: string; uploadedAt: string };\ntype CandidateDocumentRequest = { requestRef: string; documentType: string; reason: string; priority: string; dueAt: string | null; createdAt: string };\ntype RequestState = { kind: "loading" } | { kind: "blocked"; message: string } | { kind: "ready"; requests: CandidateDocumentRequest[] };
+type CandidateDocument = { documentRef: string; documentType: string; displayName: string; mimeType: string; fileSizeBytes: number; documentStatus: string; verificationStatus: string; extractionStatus: string; uploadedAt: string };
+type CandidateDocumentRequest = { requestRef: string; documentType: string; reason: string; priority: string; dueAt: string | null; createdAt: string };
+type RequestState = { kind: "loading" } | { kind: "blocked"; message: string } | { kind: "ready"; requests: CandidateDocumentRequest[] };
 type DocumentStatus = { ok?: boolean; status?: string; code?: string; error?: string; message?: string; documents?: CandidateDocument[] };
 type ViewState = { kind: "loading" } | { kind: "blocked"; message: string; code?: string } | { kind: "error" } | { kind: "ready"; data: DocumentStatus };
 const stages = [
@@ -11,7 +13,8 @@ const stages = [
  { status: "Accepted / verified", meaning: "Only an authorised, evidence-backed review service may set this status. This page does not verify documents." },
 ];
 export default function CandidateDocumentsPage() {
- const [view, setView] = useState<ViewState>({ kind: "loading" });\n const [requestState, setRequestState] = useState<RequestState>({ kind: "loading" });
+ const [view, setView] = useState<ViewState>({ kind: "loading" });
+ const [requestState, setRequestState] = useState<RequestState>({ kind: "loading" });
  const refreshStatus = useCallback(async () => {
   setView({ kind: "loading" });
   try {
