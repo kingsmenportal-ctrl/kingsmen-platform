@@ -17,7 +17,7 @@ BEGIN
       m.subject, m.body, m.urgency, m.delivery_status, m.correlation_id, m.created_at
     FROM public.candidate_messages m
     JOIN public.candidates c ON c.id = m.candidate_id
-    WHERE m.channel = 'PORTAL' AND m.direction = 'OUTBOUND'
+    WHERE c.is_active = true AND m.channel = 'PORTAL' AND m.direction = 'OUTBOUND'
       AND m.delivery_status IN ('QUEUED','DELIVERED') AND m.read_at IS NULL
     ORDER BY m.created_at ASC
     LIMIT LEAST(GREATEST(COALESCE(p_limit,100),1),200)
