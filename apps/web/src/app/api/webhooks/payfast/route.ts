@@ -79,9 +79,35 @@ export async function POST(request: Request) {
     });
     if (!rpcResponse.ok) return response(502, "PAYMENT_EVENT_PERSISTENCE_FAILED");
     const result = await rpcResponse.json().catch(() => null);
-    if (!Array.isArray(result) || result.length !== 1 || result[0]?.order_status !== "PAID") {
+    if (!Array.isArray(result) || result.length !== 1 || result[0]?.order_status !== "PAID" || typeof result[0]?.payment_event_id !== "string") {
       return response(502, "PAYMENT_CONFIRMATION_UNCERTAIN");
     }
+
+    // N11 is deliberately downstream of the committed N10 payment event. If this fails,
+    // the ITN may retry; N10 payment persistence and N11 grant are both idempotent.
+    const grantResponse = await fetch(supabaseUrl + "/rest/v1/rpc/n11_grant_entitlement", {
+      method: "POST",
+      headers: {
+        apikey: serviceRoleKey,
+        authorization: "Bearer " + serviceRoleKey,
+        "content-type": "application/json",
+        accept: "application/json"
+      },
+      body: JSON.stringify({
+        p_order_id: order.id,
+        p_financial_event_id: result[0].payment_event_id,
+        p_actor_type: "SYSTEM",
+        p_actor_auth_user_id: null,
+        p_reason: "PayFast signature, trusted source and server confirmation passed; payment was atomically recorded.",
+        p_idempotency_key: "n11-grant:" + order.id + ":" + providerPaymentId
+      }),
+      cache: "no-store"
+    });
+    if (!grantResponse.ok) return response(502, "ENTITLEMENT_ACTIVATION_PENDING");
+    const grantResult = await grantResponse.json().catch(() => null);
+    const grantId = typeof grantResult === "string" ? grantResult :
+      Array.isArray(grantResult) && typeof grantResult[0] === "string" ? grantResult[0] : null;
+    if (!grantId) return response(502, "ENTITLEMENT_ACTIVATION_UNCERTAIN");
     return response(200, "OK");
   } catch {
     return response(503, "PAYMENT_CONFIRMATION_UNAVAILABLE");
