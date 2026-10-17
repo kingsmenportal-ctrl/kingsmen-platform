@@ -17,7 +17,7 @@ function config() {
   return { url, anonKey, storageKey: `sb-${projectRef}-auth-token` };
 }
 
-export function readKingsmenSession(): KingsmenSession | null {
+function readStoredSession(): KingsmenSession | null {
   if (typeof window === "undefined") return null;
   try {
     const cfg = config();
@@ -30,6 +30,52 @@ export function readKingsmenSession(): KingsmenSession | null {
   } catch {
     return null;
   }
+}
+
+export function readKingsmenSession(): KingsmenSession | null {
+  const session = readStoredSession();
+  if (!session) return null;
+  if (session.expires_at && session.expires_at <= Math.floor(Date.now() / 1000)) return null;
+  return session;
+}
+
+export async function getKingsmenSession(): Promise<KingsmenSession | null> {
+  const session = readStoredSession();
+  if (!session) return null;
+  const expiresAt = session.expires_at || 0;
+  if (expiresAt > Math.floor(Date.now() / 1000) + 60) return session;
+  if (!session.refresh_token) { clearKingsmenSession(); return null; }
+  try {
+    const cfg = config();
+    const response = await fetch(`${cfg.url}/auth/v1/token?grant_type=refresh_token`, {
+      method: "POST",
+      headers: { apikey: cfg.anonKey, "content-type": "application/json" },
+      body: JSON.stringify({ refresh_token: session.refresh_token }),
+      cache: "no-store"
+    });
+    const next = await response.json().catch(() => ({})) as Partial<KingsmenSession>;
+    if (!response.ok || !next.access_token || !next.user?.id) { clearKingsmenSession(); return null; }
+    const normalized = { ...session, ...next } as KingsmenSession;
+    storeKingsmenSession(normalized);
+    return readKingsmenSession();
+  } catch {
+    return session.expires_at && session.expires_at > Math.floor(Date.now() / 1000) ? session : null;
+  }
+}
+
+export async function signOutKingsmen() {
+  const session = readStoredSession();
+  if (session?.access_token) {
+    try {
+      const cfg = config();
+      await fetch(`${cfg.url}/auth/v1/logout`, {
+        method: "POST",
+        headers: { apikey: cfg.anonKey, authorization: `Bearer ${session.access_token}` },
+        cache: "no-store"
+      });
+    } catch {}
+  }
+  clearKingsmenSession();
 }
 
 export function storeKingsmenSession(session: KingsmenSession) {
