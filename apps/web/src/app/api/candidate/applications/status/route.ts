@@ -1,5 +1,5 @@
 import { randomUUID } from "node:crypto";
-import { requireCandidateSession, supabaseAdminFetch } from "../../../../../../lib/candidate-document-runtime";
+import { requireCandidateSession, supabaseAdminFetch } from "../../../../../lib/candidate-document-runtime";
 const fail=(status:number,code:string,error:string)=>Response.json({ok:false,productionReady:false,code,error},{status,headers:{"cache-control":"no-store"}});
 const transitions:Record<string,string[]>={DRAFT:["WITHDRAWN","CANCELLED"],READINESS_BLOCKED:["DRAFT","WITHDRAWN","CANCELLED"],READY_FOR_REVIEW:["DRAFT","WITHDRAWN"],READY_TO_SUBMIT:["DRAFT","WITHDRAWN"],SUBMISSION_PENDING:["MANUAL_ACTION_REQUIRED","SUBMITTED_CONFIRMED","WITHDRAWN"],SUBMITTED_CONFIRMED:["PROVIDER_REVIEW","MANUAL_ACTION_REQUIRED","REJECTED","WITHDRAWN"],PROVIDER_REVIEW:["SHORTLISTED","INTERVIEW","OFFERED","REJECTED","MANUAL_ACTION_REQUIRED"],SHORTLISTED:["INTERVIEW","OFFERED","REJECTED","WITHDRAWN"],INTERVIEW:["OFFERED","REJECTED","WITHDRAWN"],OFFERED:["ACCEPTED","REJECTED","WITHDRAWN"],MANUAL_ACTION_REQUIRED:["SUBMISSION_PENDING","SUBMITTED_CONFIRMED","WITHDRAWN"]};
 export async function POST(request:Request){
