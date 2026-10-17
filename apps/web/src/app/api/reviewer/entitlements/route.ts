@@ -1,5 +1,17 @@
 import { requireReviewerSession, reviewerFetch, reviewerFail } from "../../../../lib/n07-reviewer-runtime";
 const fail=(status:number,code:string,error:string)=>reviewerFail(status,code,error);
+export async function GET(request:Request){
+ const auth=await requireReviewerSession(request,["FINANCE_REVIEWER"]);if(!auth.ok)return fail(auth.status,auth.code,auth.message);
+ const q=new URLSearchParams({select:"id,entitlement_ref,candidate_id,order_id,package_code,status,hold_reason,revoked_reason,granted_at,held_at,revoked_at,created_at,updated_at",order:"created_at.desc",limit:"200"});
+ const e=new URLSearchParams({select:"id,event_ref,entitlement_id,candidate_id,order_id,event_type,from_status,to_status,actor_type,reason,created_at",order:"created_at.desc",limit:"500"});
+ try{
+  const [a,b]=await Promise.all([reviewerFetch(auth.session,"/rest/v1/candidate_entitlements?"+q),reviewerFetch(auth.session,"/rest/v1/candidate_entitlement_events?"+e)]);
+  if(!a.ok||!b.ok)return fail(502,"ENTITLEMENT_QUEUE_FAILED","Entitlement queue unavailable; confirm N11 migration is applied.");
+  const [entitlements,events]=await Promise.all([a.json(),b.json()]);
+  if(!Array.isArray(entitlements)||!Array.isArray(events))return fail(502,"ENTITLEMENT_QUEUE_INVALID","Entitlement queue returned invalid data.");
+  return Response.json({ok:true,productionReady:false,entitlements,events,activationRule:"Only server-verified PayFast payment events grant paid service."},{headers:{"cache-control":"no-store"}});
+ }catch{return fail(503,"ENTITLEMENT_QUEUE_UNAVAILABLE","Entitlement queue is temporarily unavailable.");}
+}
 export async function POST(request:Request){
  const auth=await requireReviewerSession(request,["FINANCE_REVIEWER"]);if(!auth.ok)return fail(auth.status,auth.code,auth.message);
  let input:unknown;try{input=await request.json();}catch{return fail(400,"INVALID_JSON","Send valid JSON.");}
