@@ -38,7 +38,7 @@ export default function FounderMarketplaceReviewPage() {
   async function decide(kind: "ORGANISATION" | "LISTING", id: string, decision: string) {
     const key = `${kind}:${id}`;
     const draft = drafts[key] || { evidence: "", notes: "" };
-    const evidenceUrls = draft.evidence.split(/[\n,]/).map(v => v.trim()).filter(Boolean);
+    const evidenceUrls = draft.evidence.split(String.fromCharCode(10)).flatMap(v => v.split(",")).map(v => v.trim()).filter(Boolean);
     if (["VERIFIED","PUBLISHED"].includes(decision) && !evidenceUrls.length) { setNotice("Enter at least one HTTPS evidence URL before verifying or publishing."); return; }
     setBusy(key); setNotice("");
     try {
