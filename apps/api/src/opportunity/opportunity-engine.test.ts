@@ -78,3 +78,18 @@ test("invalid exact links are never candidate-facing safe", () => {
   );
   assert.equal(result.candidateFacingSafe, false);
 });
+
+test("observations without an explicit freshness deadline fail closed as stale", () => {
+  const observation: SourceObservation = {
+    observationRef: "obs-no-expiry",
+    sourceUrl: "https://example.org",
+    sourceTitle: "Synthetic source",
+    sector: "EMPLOYER",
+    observedClaim: "Synthetic claim",
+    sourceConfidence: "HIGH",
+    observationStatus: "NEEDS_REVIEW",
+    observedAt: "2026-01-01T00:00:00.000Z",
+    evidenceRefs
+  };
+  assert.equal(isStaleObservation(observation, "2026-01-02T00:00:00.000Z"), true);
+});
