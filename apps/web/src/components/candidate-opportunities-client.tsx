@@ -30,6 +30,24 @@ export default function CandidateOpportunitiesClient({ savedOnly = false }: { sa
 
   useEffect(() => { void load().catch(e => setNotice(e instanceof Error ? e.message : "Opportunities could not be loaded.")); }, [load]);
 
+  async function trackApplication(kind: "listing" | "route", sourceId: string) {
+    setBusy(`track:${kind}:${sourceId}`); setNotice("");
+    try {
+      const session = await getKingsmenSession();
+      if (!session) throw new Error("Sign in again to track an application.");
+      const response = await fetch("/api/candidate/applications", {
+        method: "POST",
+        headers: { authorization: `Bearer ${session.access_token}`, "content-type": "application/json" },
+        body: JSON.stringify({ kind, sourceId }),
+        cache: "no-store"
+      });
+      const data = await response.json();
+      if (!response.ok || !data.ok) throw new Error(data.error || "Application could not be tracked.");
+      setNotice(data.message || "Opportunity added to your application tracker.");
+    } catch (e) { setNotice(e instanceof Error ? e.message : "Application could not be tracked."); }
+    finally { setBusy(""); }
+  }
+
   async function save(kind: "listing" | "route", id: string, currentlySaved: boolean) {
     setBusy(`${kind}:${id}`); setNotice("");
     try {
@@ -65,7 +83,7 @@ export default function CandidateOpportunitiesClient({ savedOnly = false }: { sa
       <p style={{ margin: 0, color: "#cbd5e1" }}>{String(isRoute ? row.eligibility_summary || row.qualification_type || "" : row.description || row.eligibility || "")}</p>
       <p style={{ margin: 0, color: "#b8c0d9" }}>{[row.province, row.location_text, row.closes_at ? `Closes ${new Date(String(row.closes_at)).toLocaleDateString()}` : ""].filter(Boolean).join(" · ")}</p>
       <div style={{ display: "flex", gap: 10, flexWrap: "wrap" }}>
-        <button disabled={busy === `${kind}:${row.id}`} onClick={() => void save(kind,row.id,saved)} style={{ padding: "9px 12px", borderRadius: 8 }}>{busy === `${kind}:${row.id}` ? "Saving…" : saved ? "Remove saved" : "Save opportunity"}</button>
+        <button disabled={busy === `${kind}:${row.id}`} onClick={() => void save(kind,row.id,saved)} style={{ padding: "9px 12px", borderRadius: 8 }}>{busy === `${kind}:${row.id}` ? "Saving…" : saved ? "Remove saved" : "Save opportunity"}</button><button disabled={busy === `track:${kind}:${row.id}`} onClick={() => void trackApplication(kind,row.id)} style={{ padding: "9px 12px", borderRadius: 8 }}>{busy === `track:${kind}:${row.id}` ? "Adding…" : "Track application"}</button>
         {source.startsWith("https://") && <a href={source} target="_blank" rel="noopener noreferrer" style={{ padding: "9px 12px", borderRadius: 8, color: "#c7d2fe" }}>Official source ↗</a>}
       </div>
     </article>;
