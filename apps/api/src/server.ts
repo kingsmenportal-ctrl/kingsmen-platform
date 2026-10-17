@@ -446,6 +446,7 @@ async function handleHealth(response: ServerResponse): Promise<void> {
       "GET /api/candidate-auth/session",
       "GET /api/candidate/applications",
       "POST /api/internal/candidate/applications",
+      "POST /api/internal/candidate/documents",
       "GET /api/candidate/documents",
       "GET /api/candidate/document-requests",
       "GET /api/candidates/:candidateId/status",
@@ -568,8 +569,10 @@ async function handleInternalCandidateApplications(request: IncomingMessage, res
   const configuredSecret = process.env.KINGSMEN_WEB_INTERNAL_API_KEY;
   const suppliedSecret = request.headers["x-kingsmen-internal-key"];
   const supplied = Array.isArray(suppliedSecret) ? suppliedSecret[0] : suppliedSecret;
-  if (!configuredSecret || !supplied || configuredSecret.length !== supplied.length ||
-      !timingSafeEqual(Buffer.from(configuredSecret), Buffer.from(supplied))) {
+  const configuredBytes = Buffer.from(configuredSecret ?? "");
+  const suppliedBytes = Buffer.from(supplied ?? "");
+  if (!configuredSecret || !supplied || configuredBytes.length === 0 ||
+      configuredBytes.length !== suppliedBytes.length || !timingSafeEqual(configuredBytes, suppliedBytes)) {
     sendError(response, 401, "INTERNAL_SERVICE_AUTH_REQUIRED", "Internal service authorization is required.");
     return;
   }
@@ -595,6 +598,42 @@ async function handleInternalCandidateApplications(request: IncomingMessage, res
   }
   response.setHeader("cache-control", "private, no-store");
   sendJson(response, 200, { ok: true, applications });
+}
+
+async function handleInternalCandidateDocuments(request: IncomingMessage, response: ServerResponse): Promise<void> {
+  const configuredSecret = process.env.KINGSMEN_WEB_INTERNAL_API_KEY;
+  const suppliedHeader = request.headers["x-kingsmen-internal-key"];
+  const suppliedSecret = Array.isArray(suppliedHeader) ? suppliedHeader[0] : suppliedHeader;
+  const configuredBytes = Buffer.from(configuredSecret ?? "");
+  const suppliedBytes = Buffer.from(suppliedSecret ?? "");
+  if (!configuredSecret || !suppliedSecret || configuredBytes.length === 0 ||
+      configuredBytes.length !== suppliedBytes.length || !timingSafeEqual(configuredBytes, suppliedBytes)) {
+    sendError(response, 401, "INTERNAL_SERVICE_AUTH_REQUIRED", "Internal service authorization is required.");
+    return;
+  }
+  if (!truthVault.enabled) {
+    sendError(response, 503, "DURABLE_STORAGE_DISABLED", "Document metadata storage is not ready.");
+    return;
+  }
+  const body = await readJson(request);
+  if (!body || typeof body !== "object" || Array.isArray(body) ||
+      typeof (body as { supabaseUserId?: unknown }).supabaseUserId !== "string") {
+    sendError(response, 400, "VERIFIED_USER_ID_REQUIRED", "A server-verified identity is required.");
+    return;
+  }
+  const supabaseUserId = (body as { supabaseUserId: string }).supabaseUserId;
+  if (!/^[0-9a-f]{8}-[0-9a-f]{4}-[1-8][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i.test(supabaseUserId)) {
+    sendError(response, 400, "VERIFIED_USER_ID_INVALID", "The identity format is invalid.");
+    return;
+  }
+  const documents = await truthVault.listDocumentsForVerifiedSupabaseUser(supabaseUserId);
+  if (documents === null) {
+    sendError(response, 403, "CANDIDATE_PROFILE_LINK_REQUIRED", "No active candidate profile is linked to this account.");
+    return;
+  }
+  response.setHeader("cache-control", "private, no-store");
+  response.setHeader("pragma", "no-cache");
+  sendJson(response, 200, { ok: true, documents });
 }
 
 async function handleCandidateApplications(request: IncomingMessage, response: ServerResponse): Promise<void> {
@@ -679,6 +718,16 @@ export function createKingsmenApiServer() {
 
       if (method === "POST" && (pathname === "/api/workflow/result" || pathname === "/api/workflow-results")) {
         await handleWorkflowResult(request, response);
+        return;
+      }
+
+      if (pathname === "/api/internal/candidate/documents") {
+        if (method !== "POST") {
+          response.setHeader("allow", "POST");
+          sendError(response, 405, "METHOD_NOT_ALLOWED", "Only POST is supported.");
+          return;
+        }
+        await handleInternalCandidateDocuments(request, response);
         return;
       }
 
