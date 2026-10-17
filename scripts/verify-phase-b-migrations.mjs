@@ -45,7 +45,7 @@ function fail(message) {
   process.exitCode = 1;
 }
 
-const actualFiles = (await readdir(migrationDir)).filter((name) => /^00(5[9]|6[0-9]|7[01])_.*\.sql$/.test(name)).sort();
+const actualFiles = (await readdir(migrationDir)).filter((name) => name.endsWith(".sql") && Number(name.slice(0, 4)) >= 59 && Number(name.slice(0, 4)) <= 72).sort();
 for (const name of expected) {
   const count = actualFiles.filter((file) => file === name).length;
   if (count !== 1) fail(`Expected exactly one ${name}; found ${count}`);
