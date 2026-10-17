@@ -158,8 +158,11 @@ BEGIN
      OR length(v_notes) < 8 OR cardinality(v_evidence) > 10
   THEN RAISE EXCEPTION 'INVALID_MAP_REVIEW' USING ERRCODE = '22023'; END IF;
   IF EXISTS (SELECT 1 FROM unnest(v_evidence) u(value)
-    WHERE length(value)>2048 OR value !~* '^https://[A-Za-z0-9.-]+(:[0-9]{1,5})?([/?#][^[:space:]]*)?
-  THEN RAISE EXCEPTION 'INVALID_MAP_REVIEW_EVIDENCE_URL' USING ERRCODE = '22023'; END IF;
+    WHERE length(value)>2048 OR value !~* '^https://[A-Za-z0-9.-]+(:[0-9]{1,5})?([/?#][^[:space:]]*)?$'
+       OR lower(substring(value from '^https://([^/:?#]+)')) IN ('localhost')
+       OR lower(substring(value from '^https://([^/:?#]+)')) LIKE '%.localhost'
+       OR lower(substring(value from '^https://([^/:?#]+)')) LIKE '%.local'
+       OR lower(substring(value from '^https://([^/:?#]+)')) LIKE '%.internal')
 
   SELECT * INTO v_package FROM public.candidate_manual_application_packages WHERE id=p_package_id FOR UPDATE;
   IF NOT FOUND THEN RAISE EXCEPTION 'MAP_PACKAGE_NOT_FOUND' USING ERRCODE = 'P0002'; END IF;
