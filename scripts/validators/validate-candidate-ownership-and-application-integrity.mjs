@@ -48,9 +48,9 @@ for (const [path, method] of documentRoutes) {
   const source = read(path);
   assert.match(source, new RegExp(`export async function ${method}\\(\\s*\\)`));
   assert.match(source, /CANDIDATE_AUTHORIZATION_NOT_CONFIGURED/);
-  assert.match(source, /status:\\s*503/);
+  assert.match(source, /status:\s*503/);
   assert.match(source, /Cache-Control/);
-  assert.doesNotMatch(source, /createSignedUrl|createSignedUploadUrl|signedUrl\\s*:/i);
+  assert.doesNotMatch(source, /createSignedUrl|createSignedUploadUrl|signedUrl\s*:/i);
 }
 
 console.log(JSON.stringify({
