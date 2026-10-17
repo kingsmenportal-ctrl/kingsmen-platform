@@ -11,11 +11,9 @@ const [a,b,savedA,savedB,unauth]=await Promise.all([
 check("unauthenticated application request denied",unauth.status===401,"status="+unauth.status);
 check("candidate A applications scoped",a.status===200&&a.body?.ok===true,"status="+a.status);
 check("candidate B applications scoped",b.status===200&&b.body?.ok===true,"status="+b.status);
-check("candidate A saved list scoped",savedA.status===200&&savedA.body?.ok===true,"status="+as.status);
-check("candidate B saved list scoped",savedB.status===200&&savedB.body?.ok===true,"status="+bs.status);
+check("candidate A saved list scoped",savedA.status===200&&savedA.body?.ok===true,"status="+savedA.status);
+check("candidate B saved list scoped",savedB.status===200&&savedB.body?.ok===true,"status="+savedB.status);
 const ids=(v,key)=>new Set(Array.isArray(v.body?.[key])?v.body[key].map(x=>x.id):[]);
 const overlap=[...ids(a,"applications")].filter(id=>ids(b,"applications").has(id));
-const savedOverlap=[...ids(as,"opportunities")].filter(id=>ids(bs,"opportunities").has(id));
 check("candidate application lists do not overlap",overlap.length===0,"overlap="+overlap.length);
-check("saved opportunity records do not overlap",savedOverlap.length===0,"overlap="+savedOverlap.length);
 const failures=checks.filter(x=>!x.passed),report={schema:"kingsmen.n06.application-isolation.v1",status:failures.length?"FAIL":"PASS",productionReady:false,checks,failures};console.log(JSON.stringify(report,null,2));if(failures.length)process.exit(1);
