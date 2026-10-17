@@ -166,7 +166,7 @@ BEGIN
   IF v_actor IS NULL OR NOT kingsmen_security.is_founder_or_operator() THEN
     RAISE EXCEPTION 'FOUNDER_OR_OPERATOR_REQUIRED' USING ERRCODE = '42501';
   END IF;
-  IF p_dead_letter_id IS NULL OR p_decision NOT IN ('RESOLVED','IGNORED') OR length(v_notes) < 8 THEN
+  IF p_dead_letter_id IS NULL OR p_decision IS NULL OR p_decision NOT IN ('RESOLVED','IGNORED') OR length(v_notes) < 8 THEN
     RAISE EXCEPTION 'DEAD_LETTER_DECISION_AND_REASON_REQUIRED' USING ERRCODE = '22023';
   END IF;
   SELECT * INTO v_dead FROM public.dead_letter_queue WHERE id = p_dead_letter_id FOR UPDATE;
@@ -176,7 +176,7 @@ BEGIN
   INSERT INTO public.founder_ops_audit_events(
     audit_ref, actor_ref, action_key, target_ref, severity, audit_message, audit_payload, evidence_refs
   ) VALUES (
-    v_audit_ref, v_actor::text, 'DEAD_LETTER_' || p_decision, v_dead.correlation_id,
+    v_audit_ref, v_actor::text, 'DEAD_LETTER_' || p_decision, v_dead.correlation_id::text,
     CASE WHEN p_decision = 'IGNORED' THEN 'WARNING' ELSE 'INFO' END,
     'Founder/operator closed a dead-letter item after recording the reason.',
     jsonb_build_object('dead_letter_id', p_dead_letter_id, 'source', v_dead.source,
