@@ -10,7 +10,7 @@ const files={
 const content=Object.fromEntries(Object.entries(files).map(([k,p])=>[k,fs.readFileSync(p,"utf8")]));
 for(const [key,needles] of Object.entries({
  migration:["service_packages","candidate_service_orders","candidate_payment_events","candidate_refund_requests","finance_audit_events","n10_prevent_finance_audit_mutation","ENABLE ROW LEVEL SECURITY","FINANCE_REVIEWER"],
- candidateApi:["requireCandidateSession","candidate_id","CREATE_ORDER","REQUEST_REFUND","idempotencyKey","checkoutConfigured:false","does not mark it paid","PAID","amount_minor"],
+ candidateApi:["requireCandidateSession","candidate_id","CREATE_ORDER","REQUEST_REFUND","idempotencyKey","checkoutConfigured:false","the order is not marked paid","PAID","amount_minor"],
  reviewerApi:["requireReviewerSession","FINANCE_REVIEWER","CONFIRM_MANUAL_PAYMENT","evidenceSha256","REVIEW_REFUND","providerRefundExecutionConfigured:false","finance_audit_events"],
  candidateUi:["Available packages","Your orders","Refund requests","Candidates cannot mark an order paid"],
  reviewerUi:["Confirm payment with evidence","Approve refund","Reject refund","does not verify a bank settlement"],

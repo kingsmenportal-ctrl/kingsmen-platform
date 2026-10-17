@@ -11,7 +11,7 @@ assert.match(candidate,/candidate_id:"eq\."\+auth\.session\.candidateId/);
 assert.match(candidate,/Only a confirmed paid order can be submitted for refund review/);
 assert.match(candidate,/No payment was taken and the order is not marked paid/);
 assert.match(reviewer,/Payment reference, evidence locator and SHA-256 evidence hash are required/);
-assert.match(reviewer,/this does not independently verify a bank settlement/);
+assert.match(reviewer,/this does not independently verify a bank settlement/);\nassert.match(reviewer,/REFUND_SETTLEMENT_EVIDENCE_REQUIRED/);\nassert.match(reviewer,/settlementSha/);
 assert.doesNotMatch(candidate,/checkoutConfigured:true/);
 assert.doesNotMatch(reviewer,/providerRefundExecutionConfigured:true/);
 console.log("N10 finance contract tests passed: "+packages.length+" catalogue entries, candidate isolation, evidence-gated payment and manual refund boundaries.");
