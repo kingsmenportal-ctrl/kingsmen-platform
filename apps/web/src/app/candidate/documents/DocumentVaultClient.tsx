@@ -122,6 +122,29 @@ export default function DocumentVaultClient() {
     if (accessToken) void refresh();
   }, [accessToken, refresh]);
 
+  async function openDocument(documentId: string) {
+    const token = accessToken || getStoredAccessToken();
+    if (!token) {
+      setMessage("No signed-in session was found. Sign in before reading private documents.");
+      return;
+    }
+    try {
+      const response = await fetch("/api/candidate/documents/read-url", {
+        method: "POST",
+        headers: { "content-type": "application/json", authorization: `Bearer ${token}` },
+        body: JSON.stringify({ documentId })
+      });
+      const result = await response.json();
+      if (!response.ok || !result.ok || typeof result.signedReadUrl !== "string") {
+        throw new Error(result.error || "Could not create a private document link.");
+      }
+      const opened = window.open(result.signedReadUrl, "_blank", "noopener,noreferrer");
+      if (!opened) window.location.assign(result.signedReadUrl);
+    } catch (error) {
+      setMessage(error instanceof Error ? error.message : "Could not open private document.");
+    }
+  }
+
   async function uploadDocument(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
     const token = accessToken || getStoredAccessToken();
@@ -215,7 +238,7 @@ export default function DocumentVaultClient() {
         {documents.length === 0 && <p>{loading ? "Loading your private document records…" : "No document records were returned for this candidate."}</p>}
         {documents.length > 0 && <div style={{ overflowX: "auto" }}>
           <table style={{ width: "100%", borderCollapse: "collapse", marginTop: 12 }}>
-            <thead><tr>{["Document", "Type", "Size", "Document status", "Verification", "Uploaded"].map((label) => <th key={label} scope="col" style={{ textAlign: "left", padding: 8, borderBottom: "1px solid #555" }}>{label}</th>)}</tr></thead>
+            <thead><tr>{["Document", "Type", "Size", "Document status", "Verification", "Uploaded", "Private file"].map((label) => <th key={label} scope="col" style={{ textAlign: "left", padding: 8, borderBottom: "1px solid #555" }}>{label}</th>)}</tr></thead>
             <tbody>{documents.map((item) => <tr key={item.id}>
               <td style={{ padding: 8, borderBottom: "1px solid #333" }}>{item.display_name}</td>
               <td style={{ padding: 8, borderBottom: "1px solid #333" }}>{item.document_type}</td>
@@ -223,6 +246,7 @@ export default function DocumentVaultClient() {
               <td style={{ padding: 8, borderBottom: "1px solid #333" }}>{item.document_status}</td>
               <td style={{ padding: 8, borderBottom: "1px solid #333" }}>{item.verification_status}</td>
               <td style={{ padding: 8, borderBottom: "1px solid #333" }}>{new Date(item.uploaded_at).toLocaleString()}</td>
+              <td style={{ padding: 8, borderBottom: "1px solid #333" }}><button type="button" onClick={() => void openDocument(item.id)}>Open temporary link</button></td>
             </tr>)}</tbody>
           </table>
         </div>}
