@@ -21,6 +21,15 @@
       "detail": "14 expected policies explicitly target service_role with USING/WITH CHECK true."
     },
     {
+      "check": "sql_role_context_checked_across_14_truth_vault_tables",
+      "passed": true,
+      "detail": "anon denied SELECT on three tables and saw zero rows on the other 11; authenticated saw zero rows on all 14 without JWT identity; service_role SELECT succeeded on all 14."
+    },
+    {
+      "check": "authenticated_jwt_cross_candidate_isolation",
+      "passed": false
+    },
+    {
       "check": "staging_api_origin_available_to_runner",
       "passed": false
     },
@@ -31,9 +40,21 @@
     {
       "check": "approved_staging_database_connection_available_to_runner",
       "passed": false
+    },
+    {
+      "check": "api_persistence_and_concurrent_duplicate_proof",
+      "passed": false
+    },
+    {
+      "check": "post_restart_persistence_proof",
+      "passed": false
+    },
+    {
+      "check": "controlled_late_failure_rollback_proof",
+      "passed": false
     }
   ],
-  "message": "The runtime proof was not started because the approved staging API origin, server-side bearer tokens, and database connection values were not available in the execution environment. No secrets were written to this report.",
+  "message": "The API runtime proof was not started because the approved staging API origin, server-side bearer tokens, and database connection values were not available in the execution environment. Migration and SQL role-context checks are recorded separately. No secrets were written to this report.",
   "secretsRedacted": true,
   "generatedAtIso": "2026-10-17"
 }
