@@ -10,9 +10,9 @@ export type KingsmenSession = {
 };
 
 function config() {
-  const url = process.env.NEXT_PUBLIC_SUPABASE_URL?.trim().replace(/\/+$/, "");
-  const anonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY?.trim();
-  if (!url || !anonKey) throw new Error("Sign-in is not configured on this deployment. Set NEXT_PUBLIC_SUPABASE_URL and NEXT_PUBLIC_SUPABASE_ANON_KEY.");
+  const url = (process.env.NEXT_PUBLIC_SUPABASE_URL || process.env.KINGSMEN_PUBLIC_SUPABASE_URL)?.trim().replace(/\/+$/, "");
+  const anonKey = (process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY || process.env.KINGSMEN_PUBLIC_SUPABASE_KEY)?.trim();
+  if (!url || !anonKey) throw new Error("Sign-in is not configured on this deployment. Set the public Supabase URL and anon/publishable key in the Netlify build environment.");
   const projectRef = new URL(url).hostname.split(".")[0];
   return { url, anonKey, storageKey: `sb-${projectRef}-auth-token` };
 }
