@@ -10,7 +10,7 @@
 - Post-apply catalog check: all 14 expected policy names were present on their matching tables. Each row reported role `{service_role}`, command `ALL`, `qual=true`, and `with_check=true`.
 - No production database was targeted.
 
-Read-only SQL role-context checks were also executed: `anon` was denied SELECT on `public.candidates` at the table privilege boundary; `authenticated` could SELECT but saw zero rows without an authenticated JWT and had no INSERT/UPDATE privileges; `service_role` could SELECT and had SELECT/INSERT/UPDATE privileges. No row contents were recorded. This is stronger than catalog inspection alone, but it is not a Supabase REST/JWT test and does not prove candidate-to-candidate isolation.
+Read-only SQL `SET ROLE` checks covered all 14 Truth Vault tables: `anon` was denied SELECT at the table-privilege boundary on `candidates`, `candidate_profiles`, and `applications`; SELECT on the other 11 tables returned zero visible rows under RLS. `authenticated` returned zero visible rows across all 14 tables without a JWT identity. `service_role` SELECT succeeded across all 14 tables. No row contents were recorded. These are SQL role-context checks, not real Supabase REST/JWT tests; they do not prove candidate-to-candidate isolation or actively test write denial across every table. Some roles retain broad table grants, so private-table safety still depends on RLS.
 
 ## 2. Persistence proof and restart — blocked on staging runtime inputs
 
