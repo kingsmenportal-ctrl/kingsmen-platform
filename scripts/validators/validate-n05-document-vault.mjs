@@ -38,14 +38,14 @@ includes("runtime", "SUPABASE_SERVICE_ROLE_KEY", "server-only service role confi
 includes("runtime", "cache: \"no-store\"", "disable caching for privileged requests");
 
 // Upload constraints, opaque candidate scope, and private storage configuration.
-includes("upload", "MAX_UPLOAD_BYTES = 10 * 1024 * 1024", "10 MiB upload cap");
+includes("upload", "MAX_UPLOAD_BYTES = 15 * 1024 * 1024", "15 MiB upload cap");
 includes("upload", "DOCUMENT_TYPE_MIME_NOT_ALLOWED", "document type allowlist");
 includes("upload", "FILENAME_MIME_MISMATCH", "filename extension validation");
 includes("upload", "verifyPrivateDocumentsBucket", "verify bucket privacy and policy");
 includes("upload", "SIGNED_UPLOAD_CREATED", "audit signed upload issuance");
 includes("upload", "UPLOAD_AUDIT_FAILED", "fail closed if upload audit fails");
 includes("runtime", "bucket.public === false", "bucket must be private");
-includes("runtime", "configuredLimit === 10 * 1024 * 1024", "exact bucket size limit");
+includes("runtime", "configuredLimit === 15 * 1024 * 1024", "exact bucket size limit");
 includes("runtime", "requiredMimeTypes.every", "bucket MIME policy");
 
 // Completion validates stored bytes before recording the canonical document record.
