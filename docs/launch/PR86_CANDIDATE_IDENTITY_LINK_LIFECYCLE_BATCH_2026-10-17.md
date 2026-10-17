@@ -6,7 +6,8 @@ Branch: `feat/phase-a1-public-destiny-auth-foundation`
 ## Delivered
 
 - Added `candidate-identity-link-lifecycle.ts` with operator-authorized pending-link creation, exact-pair pending-to-verified transition, and reasoned revocation.
-- Uses existing `candidate_auth_identity_links` migration and the existing `audit_events` table; no new schema or migration was invented.
+- Uses the new `db/migrations/0040_candidate_auth_identity_link.sql` mapping table and the existing `audit_events` table.
+- The schema now rejects `VERIFIED` links without a non-empty verification actor and timestamp, and rejects `REVOKED` links without a non-empty reason (bounded to 500 characters).
 - State transition and audit insert use the same injected transaction database. Audit failure throws so the enclosing transaction can roll back.
 - Does not link by email, does not permit candidate self-assignment, checks active candidate status, records the trusted actor ID and correlation ID, and rejects malformed UUIDs.
 - Added unit tests for authorization, UUID validation, state transition predicates, audit writes, and audit failure propagation.
