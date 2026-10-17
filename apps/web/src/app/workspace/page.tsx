@@ -13,44 +13,26 @@ type HealthPayload = {
 const journeys = [
   {
     role: "Candidate / learner",
-    purpose: "Move from account access to a documented next step.",
+    purpose: "Use the current candidate surfaces to review saved opportunities, application progress, documents, finance, and messages.",
     steps: [
-      ["Open candidate dashboard", "/candidate/dashboard"],
-      ["Complete or review profile", "/candidate/profile"],
-      ["Explore route options", "/candidate/routes"],
-      ["Review saved opportunities", "/candidate/saved-opportunities"],
-      ["Track applications and outcomes", "/candidate/outcomes"],
-      ["Manage documents", "/candidate/documents"],
-      ["Review payments and invoices", "/candidate/finance"],
-      ["Get help or contact support", "/candidate/support"]
+      ["Candidate dashboard", "/candidate/dashboard"],
+      ["Saved opportunities", "/candidate/saved-opportunities"],
+      ["Applications and outcomes", "/candidate/outcomes"],
+      ["Documents", "/candidate/documents"],
+      ["Finance", "/candidate/finance"],
+      ["Messages", "/candidate/messages"]
     ]
   },
   {
     role: "Founder",
-    purpose: "Run the daily control loop: inspect, decide, approve, record, and follow up.",
+    purpose: "Inspect operational control, review evidence, and check build/runtime proof.",
     steps: [
-      ["Open control plane", "/founder/control-plane"],
-      ["Review pending commands", "/founder/commands"],
-      ["Review proof and evidence", "/founder/proof-centre"],
-      ["Inspect operational analytics", "/founder/analytics"],
-      ["Review communications", "/founder/comms"],
-      ["Review build and runtime proof", "/founder/build-proof"]
-    ]
-  },
-  {
-    role: "Partner / organisation",
-    purpose: "Prepare the organisation, submit opportunities, and wait for verification before publication.",
-    steps: [
-      ["Open partner area", "/partner"],
-      ["Sign in", "/auth/login"],
-      ["Read public marketplace", "/marketplace"]
+      ["Founder control plane", "/founder/control-plane"],
+      ["Proof centre", "/founder/proof-centre"],
+      ["Build proof", "/founder/build-proof"]
     ]
   }
 ];
-
-function hrefFor(path: string): string {
-  return path.endsWith("/") ? path : path;
-}
 
 export default async function KingsmenWorkspacePage() {
   const healthResult = await getKingsmenApiHealth<HealthPayload>();
@@ -61,10 +43,10 @@ export default async function KingsmenWorkspacePage() {
     <main style={{ maxWidth: 1120, margin: "0 auto", padding: "28px 18px 56px", color: "#f5f5f5" }}>
       <header style={{ borderBottom: "1px solid #353535", paddingBottom: 22, marginBottom: 24 }}>
         <p style={{ color: "#d6b25e", fontWeight: 800, letterSpacing: "0.12em", textTransform: "uppercase" }}>Kingsmen daily operations</p>
-        <h1 style={{ fontSize: "clamp(2rem, 5vw, 3.2rem)", lineHeight: 1.08, margin: "8px 0 12px" }}>One workspace. Every daily journey.</h1>
+        <h1 style={{ fontSize: "clamp(2rem, 5vw, 3.2rem)", lineHeight: 1.08, margin: "8px 0 12px" }}>Daily operations workspace</h1>
         <p style={{ maxWidth: 760, color: "#c6c6c6", lineHeight: 1.65 }}>
-          Start here each day. Choose your role, follow the steps in order, and return to this workspace when you need another operation.
-          Sensitive actions must still pass the relevant identity, permission, evidence, and approval checks.
+          Use this as the entry point for the currently implemented daily-use surfaces. Only routes that exist in the repository are linked below;
+          missing journeys must be implemented rather than treated as complete.
         </p>
       </header>
 
@@ -87,10 +69,10 @@ export default async function KingsmenWorkspacePage() {
         {journeys.map((journey) => (
           <section key={journey.role} style={{ border: "1px solid #393939", borderRadius: 16, padding: 18 }}>
             <h2 style={{ marginTop: 0 }}>{journey.role}</h2>
-            <p style={{ color: "#c6c6c6", minHeight: 52, lineHeight: 1.5 }}>{journey.purpose}</p>
+            <p style={{ color: "#c6c6c6", lineHeight: 1.5 }}>{journey.purpose}</p>
             <ol style={{ paddingLeft: 22, lineHeight: 1.9 }}>
               {journey.steps.map(([label, path]) => (
-                <li key={path}><Link href={hrefFor(path)} style={{ color: "#f0d58a", textUnderlineOffset: 4 }}>{label}</Link></li>
+                <li key={path}><Link href={path} style={{ color: "#f0d58a", textUnderlineOffset: 4 }}>{label}</Link></li>
               ))}
             </ol>
           </section>
@@ -98,11 +80,16 @@ export default async function KingsmenWorkspacePage() {
       </div>
 
       <section style={{ marginTop: 26, borderRadius: 16, background: "#202020", padding: 18 }}>
-        <h2 style={{ marginTop: 0 }}>Daily operating rule</h2>
+        <h2 style={{ marginTop: 0 }}>Critical workflow gaps — not marked complete</h2>
+        <ul style={{ color: "#d0d0d0", lineHeight: 1.75 }}>
+          <li>Authentication and candidate identity must be connected end to end before private records can be relied on.</li>
+          <li>Candidate profile and route discovery currently lack real page implementations.</li>
+          <li>Partner registration, organisation verification, listing submission, and reviewer publication need connected daily workflows.</li>
+          <li>Founder command queues, analytics, and communications need working operational screens.</li>
+          <li>Application outcomes must use official evidence; payments become settled only through verified provider callbacks and ledger records.</li>
+        </ul>
         <p style={{ color: "#d0d0d0", lineHeight: 1.65, marginBottom: 0 }}>
-          A page link is not proof that a workflow is complete. Listings must remain unpublished until the organisation and source are verified;
-          application outcomes must come from official evidence; payments become settled only through verified provider callbacks and ledger records;
-          and candidate records must be scoped to the signed-in candidate. Do not bypass these controls to make a queue appear complete.
+          Never bypass identity, listing verification, official-outcome evidence, or payment-ledger controls to make a workflow appear complete.
         </p>
       </section>
     </main>
