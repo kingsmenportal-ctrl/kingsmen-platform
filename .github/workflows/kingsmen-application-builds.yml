@@ -86,3 +86,17 @@ jobs:
       - name: Build and run API tests
         working-directory: apps/api
         run: npm run validate
+
+
+  candidate-bridge-source-guards:
+    name: Candidate identity and bridge source guards
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Validate candidate Phase A.1 source boundaries
+        run: npm run candidate:validate:phase-a1-bridges
