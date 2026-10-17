@@ -44,6 +44,7 @@ type CleanScanJob = {
   scanner_version: string | null;
   scanner_result: string | null;
   completed_at: string | null;
+  reconciled_at?: string | null;
 };
 
 function secureEqual(left: string, right: string): boolean {
@@ -308,6 +309,7 @@ export async function POST(request: Request) {
   cleanJobsUrl.searchParams.set("status", "eq.CLEAN");
   cleanJobsUrl.searchParams.set("scanner_result", "eq.CLEAN");
   cleanJobsUrl.searchParams.set("completed_at", "not.is.null");
+  cleanJobsUrl.searchParams.set("reconciled_at", "is.null");
   cleanJobsUrl.searchParams.set("order", "completed_at.asc");
   cleanJobsUrl.searchParams.set("limit", "100");
   const cleanJobs = await getRows<CleanScanJob>(cfg, `/rest/v1/document_scan_jobs?${cleanJobsUrl.searchParams.toString()}`);
@@ -377,28 +379,43 @@ export async function POST(request: Request) {
       })
     });
     const released = release.ok ? await release.json().catch(() => []) as unknown[] : [];
-    if (Array.isArray(released) && released.length === 1) {
+    let releaseConfirmed = Array.isArray(released) && released.length === 1;
+    if (releaseConfirmed) {
       cleanDocumentsReleased += 1;
-      cleanResultsInspected += 1;
+    } else if (!release.ok) {
+      cleanReleaseErrors += 1;
       continue;
+    } else {
+      // A concurrent worker may already have released this exact checksum. Treat only that exact
+      // persisted state as success; all other no-row updates remain an error for operator review.
+      const currentUrl = new URL(`${cfg.url}/rest/v1/document_files`);
+      currentUrl.searchParams.set("select", "id");
+      currentUrl.searchParams.set("id", `eq.${job.document_id}`);
+      currentUrl.searchParams.set("checksum_sha256", `eq.${job.checksum_sha256}`);
+      currentUrl.searchParams.set("document_status", "eq.READY");
+      currentUrl.searchParams.set("malware_scan_status", "eq.CLEAN");
+      currentUrl.searchParams.set("limit", "1");
+      const currentRows = await getRows<{ id: string }>(cfg, `/rest/v1/document_files?${currentUrl.searchParams.toString()}`);
+      releaseConfirmed = Boolean(currentRows?.length);
+      if (!releaseConfirmed) {
+        cleanReleaseErrors += 1;
+        continue;
+      }
     }
-    if (!release.ok) {
+
+    // Mark the durable queue row so a successful historical result does not starve newer work
+    // on every bounded reconciliation run. A failed marker write is safe to retry idempotently.
+    const marked = await supabaseAdminFetch(cfg, `/rest/v1/document_scan_jobs?id=eq.${job.id}&status=eq.CLEAN&reconciled_at=is.null`, {
+      method: "PATCH",
+      headers: { "content-type": "application/json", Prefer: "return=representation" },
+      body: JSON.stringify({ reconciled_at: now.toISOString(), updated_at: now.toISOString() })
+    });
+    const markedRows = marked.ok ? await marked.json().catch(() => []) as unknown[] : [];
+    if (!Array.isArray(markedRows) || markedRows.length !== 1) {
       cleanReleaseErrors += 1;
       continue;
     }
-
-    // A concurrent worker may already have released this exact checksum. Treat only that exact
-    // persisted state as success; all other no-row updates remain an error for operator review.
-    const currentUrl = new URL(`${cfg.url}/rest/v1/document_files`);
-    currentUrl.searchParams.set("select", "id");
-    currentUrl.searchParams.set("id", `eq.${job.document_id}`);
-    currentUrl.searchParams.set("checksum_sha256", `eq.${job.checksum_sha256}`);
-    currentUrl.searchParams.set("document_status", "eq.READY");
-    currentUrl.searchParams.set("malware_scan_status", "eq.CLEAN");
-    currentUrl.searchParams.set("limit", "1");
-    const currentRows = await getRows<{ id: string }>(cfg, `/rest/v1/document_files?${currentUrl.searchParams.toString()}`);
-    if (currentRows?.length) cleanResultsInspected += 1;
-    else cleanReleaseErrors += 1;
+    cleanResultsInspected += 1;
   }
 
   return Response.json({
