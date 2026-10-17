@@ -874,6 +874,59 @@ export class TruthVaultRepository {
     }
   }
 
+
+  /** Lists safe support-ticket status metadata for the active candidate bound to verified Auth. */
+  async listSupportTicketsForVerifiedSupabaseUser(supabaseUserId: string): Promise<Array<{
+    ticketRef: string; category: string; priority: string; status: string;
+    title: string; createdAt: string; updatedAt: string; closedAt: string | null;
+  }> | null> {
+    this.assertEnabled();
+    if (!/^[0-9a-f]{8}-[0-9a-f]{4}-[1-8][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i.test(supabaseUserId)) return null;
+    const client = await this.pool!.connect();
+    try {
+      await client.query("BEGIN");
+      await client.query(
+        "select set_config('app.kingsmen_role', $1, true), set_config('app.service_context', $2, true)",
+        ["service_role", "backend_api"]
+      );
+      const linked = await client.query<{ candidate_id: string }>(
+        `select ca.candidate_id::text
+           from public.candidate_accounts ca
+           join public.candidates c on c.id = ca.candidate_id and c.is_active = true
+          where ca.auth_user_id = $1::uuid
+          limit 1`,
+        [supabaseUserId]
+      );
+      if (!linked.rows[0]) {
+        await client.query("COMMIT");
+        return null;
+      }
+      const result = await client.query<{
+        ticket_ref: string; category: string; priority: string; status: string;
+        title: string; created_at: string; updated_at: string; closed_at: string | null;
+      }>(
+        `select ticket_ref, category, priority, status, title,
+                created_at::text, updated_at::text, closed_at::text
+           from public.candidate_support_tickets
+          where candidate_id = $1::uuid
+          order by updated_at desc, created_at desc
+          limit 100`,
+        [linked.rows[0].candidate_id]
+      );
+      await client.query("COMMIT");
+      return result.rows.map((row) => ({
+        ticketRef: row.ticket_ref, category: row.category, priority: row.priority,
+        status: row.status, title: row.title, createdAt: row.created_at,
+        updatedAt: row.updated_at, closedAt: row.closed_at
+      }));
+    } catch (error) {
+      try { await client.query("ROLLBACK"); } catch { /* preserve original error */ }
+      throw error;
+    } finally {
+      client.release();
+    }
+  }
+
   private assertEnabled(): void {
     if (!this.pool) throw new Error("PostgreSQL Truth Vault persistence is not enabled for this process.");
   }
