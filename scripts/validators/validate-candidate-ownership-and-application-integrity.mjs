@@ -6,6 +6,19 @@ const read = (path) => readFileSync(resolve(process.cwd(), path), "utf8");
 const trackerRoute = "apps/web/src/app/api/candidate/applications/route.ts";
 const tracker = read(trackerRoute);
 
+// API private-read responses must not be cached, and path parameters must only
+// be decoded once (getPathParam owns decoding for these routes).
+const apiServer = read("apps/api/src/server.ts");
+assert.match(apiServer, /handleCandidateStatus\(request, response, candidateId\)/, "candidate status route must not double-decode path parameters");
+assert.match(apiServer, /handleApplicationWorkbench\(request, response, applicationId\)/, "application workbench route must not double-decode path parameters");
+for (const handler of ["handleCandidateStatus", "handleApplicationWorkbench"]) {
+  const start = apiServer.indexOf(`async function ${handler}`);
+  const end = apiServer.indexOf("\nasync function ", start + 1);
+  const body = apiServer.slice(start, end < 0 ? apiServer.length : end);
+  assert.match(body, /cache-control", "private, no-store"/, `${handler} must prevent shared/private caching`);
+  assert.match(body, /pragma", "no-cache"/, `${handler} must prevent legacy cache reuse`);
+}
+
 // Authentication must be checked before the route returns any application data.
 assert.match(tracker, /authConfigured\(\)/, "tracker route must detect missing identity-provider configuration");
 assert.match(tracker, /getVerifiedAuthUser\(\)/, "tracker route must resolve a verified server-side identity");
