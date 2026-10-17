@@ -692,7 +692,7 @@ export function createKingsmenApiServer() {
         return;
       }
 
-async function handleCandidateApplications(request: IncomingMessage, response: ServerResponse): Promise<void> {
+if (pathname === "/api/candidate/applications") {
         if (method !== "GET") {
           response.setHeader("allow", "GET");
           sendError(response, 405, "METHOD_NOT_ALLOWED", "Only GET is supported.");
