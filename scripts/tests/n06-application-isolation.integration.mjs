@@ -3,7 +3,7 @@ const base=(process.env.N06_BASE_URL||"").trim().replace(/\/+$/,""),aToken=(proc
 if(!base||!aToken||!bToken){console.error("BLOCKED: set N06_BASE_URL, N06_CANDIDATE_A_TOKEN and N06_CANDIDATE_B_TOKEN for dedicated synthetic staging candidates.");process.exit(2);}
 async function call(token,path){const r=await fetch(base+path,{headers:{authorization:"Bearer "+token},cache:"no-store"});return {status:r.status,body:await r.json().catch(()=>null)};}
 const checks=[];function check(name,passed,detail=""){checks.push({name,passed:Boolean(passed),detail});}
-const [a,b,as,bs,unauth]=await Promise.all([
+const [a,b,savedA,savedB,unauth]=await Promise.all([
  call(aToken,"/api/candidate/applications"),call(bToken,"/api/candidate/applications"),
  call(aToken,"/api/candidate/opportunities?saved=true"),call(bToken,"/api/candidate/opportunities?saved=true"),
  fetch(base+"/api/candidate/applications",{cache:"no-store"}).then(async r=>({status:r.status,body:await r.json().catch(()=>null)}))
