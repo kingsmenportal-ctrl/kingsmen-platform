@@ -29,7 +29,7 @@ The migration seeds the catalogue using insert-on-conflict-do-nothing; existing 
 - No payment-provider checkout or webhook is configured in this batch.
 - Manual payment confirmation is limited to explicitly provisioned `FINANCE_REVIEWER` / `PLATFORM_ADMIN` roles and requires payment reference, evidence locator, SHA-256 evidence hash and review reason.
 - A payment event is recorded before the order is changed to PAID; if the status update fails, the response explicitly reports the partial failure and reconciliation is required.
-- Refund request is not approval. Approval is not external refund execution. Marking completed is a finance assertion, not proof of bank settlement.
+- Refund request is not approval. Approval is not external refund execution. Marking completed requires a settlement reference, evidence locator and SHA-256 hash. It records a finance assertion but does not independently prove bank settlement.
 - Finance audit rows reject update/delete at database trigger level.
 - Tables use RLS with no client policies; the server APIs use server-side service-role credentials and candidate identity resolved from verified Supabase sessions.
 
