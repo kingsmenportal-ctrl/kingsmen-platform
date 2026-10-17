@@ -74,6 +74,8 @@ export async function POST(request:Request) {
       return fail(409,"PAYFAST_REFUND_NOT_AVAILABLE","PayFast reports that the requested amount is not currently refundable.");
     }
     const original = minor(preflight?.amount_original);
+    if (original===null || original<amountMinor) return fail(409,"PAYFAST_ORIGINAL_AMOUNT_INVALID","PayFast returned an invalid original transaction amount.");
+    const expectedProviderRefundTotal = original - available + amountMinor;
     const method = original===amountMinor ? preflight?.refund_full?.method : preflight?.refund_partial?.method;
     if (method!=="PAYMENT_SOURCE") {
       return fail(409,"PAYFAST_REFUND_METHOD_UNSUPPORTED","PayFast does not offer a payment-source refund for this request. A separately approved secure bank-payout workflow is required.");
@@ -126,6 +128,9 @@ export async function POST(request:Request) {
       return Number.isFinite(value)?sum+Math.abs(Math.round(value)):sum;
     },0);
     const evidenceJson = JSON.stringify(ledger.raw);
+    if (reconciledTotal < expectedProviderRefundTotal) {
+      return Response.json({ok:false,productionReady:false,code:"PAYFAST_RECONCILIATION_PENDING",error:"The provider ledger does not yet show the expected increase in refunded funds. Refund remains PROCESSING."},{status:202,headers:{"cache-control":"no-store"}});
+    }
     const settlementKey = "payfast-refund-reconciled:"+refund.id;
     const settled = await reviewerFetch(auth.session,"/rest/v1/rpc/n10_record_payfast_refund_reconciliation",{
       method:"POST",headers:{"content-type":"application/json"},
