@@ -18,7 +18,8 @@ export function assertN05DocumentUploadSafe(input: {
   if (typeof input.filename !== "string" || input.filename.length === 0 ||
       input.filename.length > MAX_FILENAME_LENGTH ||
       input.filename !== input.filename.trim() ||
-      /[\\/\\\\\\u0000-\\u001f\\u007f]/.test(input.filename) ||
+      input.filename.includes("/") || input.filename.includes("\\\\") ||
+      [...input.filename].some((character) => character.charCodeAt(0) < 32 || character.charCodeAt(0) === 127) ||
       input.filename === "." || input.filename === ".." ||
       input.filename.includes("..")) {
     throw new Error("N05 upload blocked: unsafe filename");
