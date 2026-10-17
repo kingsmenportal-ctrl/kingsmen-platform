@@ -14,7 +14,7 @@ AS $$
 DECLARE
   v_previous text;
   v_next text;
-  v_transaction_id uuid := gen_random_uuid();
+  v_transaction_id bigint := txid_current();
   v_event_id uuid;
   v_actor uuid := auth.uid();
   v_evidence text[] := COALESCE(p_evidence_urls, ARRAY[]::text[]);
@@ -101,7 +101,7 @@ BEGIN
   INSERT INTO public.marketplace_review_events(
     entity_kind, entity_id, actor_id, action, previous_state, new_state, evidence_urls, occurred_at, transaction_id
   ) VALUES (
-    p_entity_kind, p_entity_id, v_actor, p_decision, v_previous, v_next, v_evidence, now(), v_transaction_id
+    lower(p_entity_kind), p_entity_id, v_actor, p_decision, v_previous, v_next, v_evidence, now(), v_transaction_id
   ) RETURNING id INTO v_event_id;
 
   RETURN jsonb_build_object(
