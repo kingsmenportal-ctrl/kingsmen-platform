@@ -62,10 +62,10 @@ BEGIN
     SELECT * INTO v_profile FROM public.candidate_profiles WHERE candidate_id = v_request.candidate_id FOR UPDATE;
     CASE v_request.field_name
       WHEN 'display_name' THEN v_current_value := v_candidate.display_name;
-      WHEN 'phone' THEN v_current_value := v_candidate.phone;
-      WHEN 'city' THEN v_current_value := v_profile.city;
-      WHEN 'province' THEN v_current_value := v_profile.province;
-      WHEN 'highest_grade' THEN v_current_value := v_profile.highest_grade;
+      WHEN 'phone' THEN v_current_value := COALESCE(v_candidate.phone, '');
+      WHEN 'city' THEN v_current_value := COALESCE(v_profile.city, '');
+      WHEN 'province' THEN v_current_value := COALESCE(v_profile.province, '');
+      WHEN 'highest_grade' THEN v_current_value := COALESCE(v_profile.highest_grade, '');
       ELSE RAISE EXCEPTION 'PROFILE_FIELD_NOT_APPROVABLE' USING ERRCODE = '22023';
     END CASE;
     IF v_current_value IS DISTINCT FROM v_request.old_value THEN
