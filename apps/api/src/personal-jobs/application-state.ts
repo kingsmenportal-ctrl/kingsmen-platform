@@ -76,15 +76,22 @@ export function decideApplicationTransition(request: TransitionRequest): Transit
     if (!evidence.reference.trim() || !Number.isFinite(Date.parse(evidence.recordedAt))) {
       return { allowed: false, code: "INVALID_EVIDENCE" };
     }
-    if (required && evidence.kind !== required) return { allowed: false, code: "EVIDENCE_MISMATCH" };
+
+    // Evidence must match the outcome it purports to support. Accepting a
+    // valid-but-unrelated evidence kind can make the audit trail misleading.
+    const expectedEvidence = required ?? (request.to === "closed" ? "candidate_closure_note" : undefined);
+    if (!expectedEvidence || evidence.kind !== expectedEvidence) {
+      return { allowed: false, code: "EVIDENCE_MISMATCH" };
+    }
+
     if (employerOnlyStates.has(request.to)
-        && (evidence.recordedBy !== "employer" && evidence.recordedBy !== "authorized_staff")) {
+        && evidence.recordedBy !== "employer" && evidence.recordedBy !== "authorized_staff") {
       return { allowed: false, code: "EVIDENCE_MISMATCH" };
     }
     if (request.to === "submitted_verified" && evidence.recordedBy !== "candidate") {
       return { allowed: false, code: "EVIDENCE_MISMATCH" };
     }
-    if (request.to === "closed" && evidence.kind !== "candidate_closure_note") {
+    if (request.to === "closed" && evidence.recordedBy !== "candidate" && evidence.recordedBy !== "authorized_staff") {
       return { allowed: false, code: "EVIDENCE_MISMATCH" };
     }
   } else if (request.to === "closed" && request.from !== "rejected" && request.from !== "offer_received") {
