@@ -138,3 +138,40 @@ test("malformed identity IDs fail before a database mutation", async () => {
   await assert.rejects(runtime.execute("create",{}, {...COMMAND,supabaseUserId:"not-a-uuid"}),/INVALID_AUTH_USER/);
   assert.equal(connects,0);
 });
+
+
+test("invalid candidate and correlation inputs fail before operator resolution or database access", async () => {
+  let resolves = 0;
+  let connects = 0;
+  const runtime = new CandidateIdentityLinkAdminRuntime({async connect(){connects++; throw new Error("must not connect");}},{
+    async resolve(){resolves++; return {actorId:"operator:trusted-1",permissions:["candidate.identity_link.create"]};}
+  });
+  await assert.rejects(runtime.execute("create",{}, {...COMMAND,candidateId:"bad"}),/INVALID_CANDIDATE/);
+  await assert.rejects(runtime.execute("create",{}, {...COMMAND,correlationId:"   "}),/INVALID_CORRELATION_ID/);
+  await assert.rejects(runtime.execute("create",{}, {...COMMAND,reason:"r".repeat(501)}),/INVALID_REASON/);
+  assert.equal(resolves,0);
+  assert.equal(connects,0);
+});
+
+test("unsupported runtime action fails closed before resolving operator or connecting", async () => {
+  let resolves = 0;
+  let connects = 0;
+  const runtime = new CandidateIdentityLinkAdminRuntime({async connect(){connects++; throw new Error("must not connect");}},{
+    async resolve(){resolves++; return {actorId:"operator:trusted-1",permissions:[]};}
+  });
+  await assert.rejects(
+    runtime.execute("link" as "create",{},COMMAND),
+    /ACTION_UNSUPPORTED/
+  );
+  assert.equal(resolves,0);
+  assert.equal(connects,0);
+});
+
+test("overlong trusted operator actor ID fails before opening a database connection", async () => {
+  let connects = 0;
+  const runtime = new CandidateIdentityLinkAdminRuntime({async connect(){connects++; throw new Error("must not connect");}},{
+    async resolve(){return {actorId:"x".repeat(201),permissions:["candidate.identity_link.create"]};}
+  });
+  await assert.rejects(runtime.execute("create",{},COMMAND),/OPERATOR_REQUIRED/);
+  assert.equal(connects,0);
+});
