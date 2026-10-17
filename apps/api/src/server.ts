@@ -546,6 +546,8 @@ async function handleCandidateStatus(request: IncomingMessage, response: ServerR
     sendError(response, 404, "CANDIDATE_NOT_FOUND", "Candidate record was not found.");
     return;
   }
+  response.setHeader("cache-control", "private, no-store");
+  response.setHeader("pragma", "no-cache");
   sendJson(response, 200, { ok: true, candidate });
 }
 
@@ -565,6 +567,8 @@ async function handleApplicationWorkbench(request: IncomingMessage, response: Se
     sendError(response, 404, "APPLICATION_NOT_FOUND", "Application record was not found.");
     return;
   }
+  response.setHeader("cache-control", "private, no-store");
+  response.setHeader("pragma", "no-cache");
   sendJson(response, 200, { ok: true, application });
 }
 
@@ -911,13 +915,13 @@ if (pathname === "/api/candidate/applications") {
         // These records can contain candidate-identifying information. The API
         // currently has no verified caller-to-candidate authorization adapter,
         // so do not expose records merely because an identifier is known.
-        await handleCandidateStatus(request, response, decodeURIComponent(candidateId));
+        await handleCandidateStatus(request, response, candidateId);
         return;
       }
 
       const applicationId = getPathParam(/^\/api\/applications\/([^/]+)\/workbench$/, pathname);
       if (method === "GET" && applicationId) {
-        await handleApplicationWorkbench(request, response, decodeURIComponent(applicationId));
+        await handleApplicationWorkbench(request, response, applicationId);
         return;
       }
 
