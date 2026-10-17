@@ -10,7 +10,8 @@ Branch: `feat/phase-a1-public-destiny-auth-foundation`
 - The schema now rejects `VERIFIED` links without a non-empty verification actor and timestamp, and rejects `REVOKED` links without a non-empty reason (bounded to 500 characters).
 - State transition and audit insert use the same injected transaction database. Audit failure throws so the enclosing transaction can roll back.
 - Does not link by email, does not permit candidate self-assignment, checks active candidate status, records the trusted actor ID and correlation ID, and rejects malformed UUIDs.
-- Added unit tests for authorization, UUID validation, state transition predicates, audit writes, and audit failure propagation.
+- Added unit tests for authorization, UUID validation, state transition predicates, audit writes, audit failure propagation, malformed candidate IDs, empty correlation IDs, and overlong revocation reasons.
+- Expanded the lifecycle validator to check the non-conflicting migration filename, one-to-one Auth-user/candidate mapping, permitted statuses, backend-only RLS, and verification/revocation metadata constraints.
 - Added a source-boundary validator.
 
 ## Important integration requirements
