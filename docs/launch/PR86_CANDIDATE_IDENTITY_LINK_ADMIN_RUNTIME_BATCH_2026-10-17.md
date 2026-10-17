@@ -12,4 +12,4 @@ Date: 2026-10-17
 ## Still intentionally not live-wired
 There is no confirmed, production-ready founder/operator session resolver in the current candidate API. The runtime therefore requires a trusted resolver to be injected by a real server-side authorization system. Do not implement that resolver by trusting request body, query parameters, unsigned headers, client-supplied role names, or decoded-but-unverified JWT claims.
 
-No public/admin HTTP route is enabled by this batch. Migration 0040 is not confirmed applied to staging; no live database/RLS integration result is claimed. Unit tests are committed but not executed in this environment.
+No public/admin HTTP route is enabled by this batch. Read-only staging inventory now confirms migration `candidate_auth_identity_link_0040` is recorded, the table exists with RLS enabled and a backend-only policy, and the table contains zero mappings. No candidate identity-link runtime or authorised operator session has been exercised against staging. Unit tests are committed but not executed in this environment.
