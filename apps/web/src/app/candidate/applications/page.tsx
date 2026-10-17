@@ -62,7 +62,7 @@ export default function CandidateApplicationsPage() {
   }
 
   return <main style={{ maxWidth: 1050, margin: "0 auto", padding: 24, color: "#f4f6ff", fontFamily: "system-ui, sans-serif" }}>
-    <p><Link href="/candidate/dashboard" style={{ color: "#a5b4fc" }}>← Candidate dashboard</Link></p><div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", flexWrap: "wrap", gap: 12 }}><h1>Application tracker</h1><nav style={{ display: "flex", gap: 12 }}><Link href="/candidate/discover">Discover opportunities</Link><Link href="/candidate/saved-opportunities">Saved opportunities</Link></nav></div>
+    <p><Link href="/candidate/dashboard" style={{ color: "#a5b4fc" }}>← Candidate dashboard</Link></p><div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", flexWrap: "wrap", gap: 12 }}><h1>Application tracker</h1><nav style={{ display: "flex", gap: 12 }}><Link href="/candidate/discover">Discover opportunities</Link><Link href="/candidate/saved-opportunities">Saved opportunities</Link><Link href="/candidate/map-packages">Manual packages</Link></nav></div>
     <p>Track your preparation and external submission. A candidate-reported submission is not provider acknowledgement, acceptance, or a verified outcome.</p>
     {notice && <p role="status" style={{ padding: 12, borderRadius: 8, background: "#172554" }}>{notice}</p>}
     <section><h2>My tracked opportunities</h2>{tracker.length === 0 && !notice && <p>No opportunities are in your tracker yet. Use Discover opportunities to add a verified listing or route.</p>}
