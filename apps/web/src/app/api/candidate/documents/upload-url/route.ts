@@ -49,6 +49,15 @@ export async function POST(request: Request) {
   if (!Object.hasOwn(ALLOWED_TYPES, documentTypeCode) || !ALLOWED_TYPES[documentTypeCode].includes(mimeType)) {
     return Response.json({ ok: false, code: "DOCUMENT_TYPE_MIME_NOT_ALLOWED", error: "This document type and file format combination is not allowed." }, { status: 415 });
   }
+  const lowerFilename = filename.toLowerCase();
+  const extensionMatches =
+    (mimeType === "application/pdf" && lowerFilename.endsWith(".pdf")) ||
+    (mimeType === "application/vnd.openxmlformats-officedocument.wordprocessingml.document" && lowerFilename.endsWith(".docx")) ||
+    (mimeType === "text/plain" && lowerFilename.endsWith(".txt"));
+  if (!extensionMatches) {
+    return Response.json({ ok: false, code: "FILENAME_MIME_MISMATCH", error: "The filename extension must match the declared file format (.pdf, .docx, or .txt)." }, { status: 415 });
+  }
+
   if (sizeBytes < 1 || sizeBytes > MAX_UPLOAD_BYTES) {
     return Response.json({ ok: false, code: "FILE_SIZE_OUT_OF_RANGE", error: "Documents must be between 1 byte and 10 MiB for the configured private storage bucket." }, { status: 413 });
   }
