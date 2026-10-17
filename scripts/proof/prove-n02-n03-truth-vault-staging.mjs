@@ -124,6 +124,41 @@ try {
   const after = await pool.query("select count(*)::int as count from command_log where idempotency_key = $1", [idempotencyKey]);
   checks.push({ check: "replay_did_not_duplicate_command", passed: Number(after.rows[0]?.count) === Number(before.rows[0]?.count) + 1 });
 
+  const concurrentCommand = {
+    ...command,
+    commandId: `proof_cmd_race_${randomUUID()}`,
+    idempotencyKey: `proof_idem_race_${randomUUID()}`,
+    correlationId: `proof_corr_race_${randomUUID()}`,
+    candidateId: `KM-RACE-${randomUUID()}`,
+    payload: {
+      displayName: "Synthetic Concurrent Duplicate Proof",
+      email: `race-${randomUUID()}@example.invalid`,
+      proofOnly: true
+    }
+  };
+  const concurrentCommandResponses = await Promise.all([
+    request("/api/commands", concurrentCommand),
+    request("/api/commands", concurrentCommand),
+    request("/api/commands", concurrentCommand)
+  ]);
+  const acceptedCommandCount = concurrentCommandResponses.filter(x => x.status === 202 && x.body?.status === "ACCEPTED").length;
+  const replayCommandCount = concurrentCommandResponses.filter(x => x.status === 200 && x.body?.status === "IDEMPOTENT_REPLAY").length;
+  checks.push({ check: "concurrent_command_duplicate_responses", passed: acceptedCommandCount === 1 && replayCommandCount === 2 });
+  if (acceptedCommandCount !== 1 || replayCommandCount !== 2) throw new Error("Concurrent duplicate command submissions did not produce one acceptance and two idempotent replays.");
+
+  const concurrentCommandPersisted = await pool.query(
+    `select (select count(*)::int from command_log where idempotency_key = $1) as command_count,
+            (select count(*)::int from audit_events where correlation_id = $2 and event_type = 'command.accepted') as audit_count,
+            (select count(*)::int from idempotency_keys where idempotency_key = $1 and status = 'COMPLETED') as completed_key_count`,
+    [concurrentCommand.idempotencyKey, concurrentCommand.correlationId]
+  );
+  checks.push({
+    check: "concurrent_command_race_persisted_once",
+    passed: Number(concurrentCommandPersisted.rows[0]?.command_count) === 1 &&
+      Number(concurrentCommandPersisted.rows[0]?.audit_count) === 1 &&
+      Number(concurrentCommandPersisted.rows[0]?.completed_key_count) === 1
+  });
+
   if (!workflowServiceToken) throw new Error("KINGSMEN_WORKFLOW_SERVICE_TOKEN is required to prove workflow-result persistence.");
 
   const workflowRunId = `proof_wf_${randomUUID()}`;
@@ -196,6 +231,7 @@ try {
     restartPersistenceProven: false,
     workflowPersistenceProven: checks.some(x => x.check === "workflow_result_evidence_audit_and_idempotency_persisted" && x.passed),
     concurrentWorkflowDuplicateSubmissionProven: checks.some(x => x.check === "concurrent_workflow_duplicate_responses" && x.passed),
+    concurrentCommandDuplicateSubmissionProven: checks.some(x => x.check === "concurrent_command_duplicate_responses" && x.passed),
     rollbackProven: false,
     note: "This run proves live command/workflow persistence and concurrent workflow duplicate handling when all checks pass. Process restart, command duplicate races, and controlled late-failure rollback still require separate staging checks.",
     generatedAtIso: new Date().toISOString(),
