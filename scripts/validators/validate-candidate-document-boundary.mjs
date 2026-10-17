@@ -16,11 +16,7 @@ const routes = [
     method: "POST",
     reason: "read signing must remain blocked until identity and document ownership are verified"
   },
-  {
-    path: "apps/web/src/app/api/candidate/documents/status/route.ts",
-    method: "GET",
-    reason: "document status must remain blocked until identity-scoped lookup exists"
-  }
+
 ];
 
 for (const route of routes) {
@@ -34,6 +30,15 @@ for (const route of routes) {
   assert.doesNotMatch(source, /createSignedUrl|createSignedUploadUrl|signedUrl\s*:/i, `${route.path}: must not pretend a storage signer exists`);
   console.log(`PASS ${route.path} — ${route.reason}`);
 }
+
+const statusRoute = readFileSync(resolve(root, "apps/web/src/app/api/candidate/documents/status/route.ts"), "utf8");
+assert.match(statusRoute, /getVerifiedAuthUser/);
+assert.match(statusRoute, /KINGSMEN_WEB_INTERNAL_API_KEY/);
+assert.match(statusRoute, /api\/internal\/candidate\/documents/);
+assert.match(statusRoute, /Cache-Control["']?\s*:\s*["']no-store/);
+assert.match(statusRoute, /Pragma["']?\s*:\s*["']no-cache/);
+assert.doesNotMatch(statusRoute, /storage_path|storage_bucket|checksum_sha256|createSignedUrl|signedUrl\s*:/i);
+console.log("PASS document status route — verified-user metadata bridge only; no storage credentials or signed links");
 
 const profile = readFileSync(resolve(root, "apps/web/src/app/api/candidate/profile/route.ts"), "utf8");
 assert.match(profile, /CANDIDATE_PROFILE_LINK_REQUIRED/);
