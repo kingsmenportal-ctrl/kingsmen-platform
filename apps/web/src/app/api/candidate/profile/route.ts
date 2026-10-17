@@ -71,6 +71,19 @@ export async function POST(request: Request) {
   const oldValue = typeof current[field] === "string" ? current[field] as string : "";
   if (oldValue === value) return json({ ok: true, unchanged: true, message: "That value already matches your saved profile." });
 
+  const duplicateUrl = new URL(`${auth.config.url}/rest/v1/candidate_profile_change_requests`);
+  duplicateUrl.searchParams.set("select", "id,field_name,old_value,requested_value,reason,sensitivity,status,requested_at,decided_at,decision_notes");
+  duplicateUrl.searchParams.set("candidate_id", `eq.${auth.session.candidateId}`);
+  duplicateUrl.searchParams.set("field_name", `eq.${field}`);
+  duplicateUrl.searchParams.set("requested_value", `eq.${value}`);
+  duplicateUrl.searchParams.set("status", "eq.PENDING");
+  duplicateUrl.searchParams.set("limit", "1");
+  const duplicateResponse = await supabaseAdminFetch(auth.config, `/rest/v1/candidate_profile_change_requests?${duplicateUrl.searchParams}`).catch(() => null);
+  if (!duplicateResponse || !duplicateResponse.ok) return json({ ok: false, code: "CHANGE_REQUEST_DEDUPE_UNAVAILABLE", error: "Existing correction requests could not be checked. No new request was created." }, 503);
+  const duplicateRows = await duplicateResponse.json().catch(() => null);
+  if (!Array.isArray(duplicateRows)) return json({ ok: false, code: "CHANGE_REQUEST_DEDUPE_INVALID", error: "Existing correction requests could not be checked. No new request was created." }, 502);
+  if (duplicateRows.length > 0) return json({ ok: true, duplicate: true, changeRequest: duplicateRows[0], message: "An identical profile correction request is already pending review." });
+
   const inserted = await supabaseAdminFetch(auth.config, "/rest/v1/candidate_profile_change_requests", {
     method: "POST",
     headers: { "content-type": "application/json", prefer: "return=representation" },
