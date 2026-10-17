@@ -1,6 +1,6 @@
 import fs from "node:fs";
 import assert from "node:assert/strict";
-const sql=fs.readFileSync("db/migrations/0066_n11_service_fulfilment_entitlements.sql","utf8");
+const sql=fs.readFileSync("db/migrations/0071_n11_service_fulfilment_entitlements.sql","utf8");
 const webhook=fs.readFileSync("apps/web/src/app/api/webhooks/payfast/route.ts","utf8");
 const candidateApi=fs.readFileSync("apps/web/src/app/api/candidate/entitlements/route.ts","utf8");
 const reviewerApi=fs.readFileSync("apps/web/src/app/api/reviewer/entitlements/route.ts","utf8");
@@ -16,6 +16,9 @@ assert.match(sql,/ON CONFLICT|idempotency_key/);
 assert.match(sql,/candidate_entitlement_events/);
 assert.match(sql,/n11_prevent_entitlement_event_mutation/);
 assert.match(sql,/status='REVOKED'/);
+assert.match(sql,/hold idempotency key was reused for a different operation/);
+assert.match(sql,/grant idempotency key was reused for a different operation/);
+assert.match(sql,/transition idempotency key was reused for a different operation/);
 assert.match(sql,/REVOKE ALL ON FUNCTION public\.n11_grant_entitlement/);
 assert.match(n10,/UNIQUE\(candidate_id,idempotency_key\)/);
 console.log("N11 contract tests passed: an order or manual evidence cannot activate entitlement; grants require matching server-validated PayFast confirmation; hold/revoke events are audited.");
