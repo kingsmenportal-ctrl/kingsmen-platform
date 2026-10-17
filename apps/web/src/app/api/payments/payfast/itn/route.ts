@@ -1,4 +1,4 @@
-import { createHash, createHmac, timingSafeEqual } from "node:crypto";
+import { createHash, timingSafeEqual } from "node:crypto";
 
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
@@ -30,11 +30,10 @@ function getAllowedIps() {
 
 export async function POST(request: Request) {
   const url = process.env.SUPABASE_URL?.trim().replace(/\/+$/, "");
-  const anonKey = process.env.SUPABASE_ANON_KEY?.trim();
   const serviceKey = process.env.SUPABASE_SERVICE_ROLE_KEY?.trim();
   const merchantId = process.env.PAYFAST_MERCHANT_ID?.trim();
   const passphrase = process.env.PAYFAST_PASSPHRASE;
-  if (!url || !anonKey || !serviceKey || !merchantId || passphrase === undefined) {
+  if (!url || !serviceKey || !merchantId || passphrase === undefined) {
     return json({ ok: false, code: "PAYFAST_RUNTIME_NOT_CONFIGURED", error: "PayFast callback processing requires Supabase server credentials, merchant ID, passphrase, and the private ITN IP allowlist." }, 503);
   }
   const contentType = request.headers.get("content-type") || "";
@@ -121,6 +120,9 @@ export async function POST(request: Request) {
 
   if (result.accepted === true || result.duplicate === true || result.failureRecorded === true) {
     return new Response("OK", { status: 200, headers: { ...noStore, "content-type": "text/plain; charset=utf-8" } });
+  }
+  if (allowedIps.size === 0) {
+    return json({ ok: false, code: "PAYFAST_IP_ALLOWLIST_NOT_CONFIGURED", error: "The rejected callback was recorded; configure PAYFAST_ITN_ALLOWED_IPS before accepting payments." }, 503);
   }
   if (result.retryable === true || providerValidation === "UNAVAILABLE") {
     return json({ ok: false, code: "PAYFAST_ITN_RETRYABLE", error: "Provider validation was unavailable; the rejected attempt was recorded and may be retried." }, 503);
