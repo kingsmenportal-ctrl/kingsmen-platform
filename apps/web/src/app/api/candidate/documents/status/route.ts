@@ -44,7 +44,7 @@ export async function GET(request: Request) {
 
   return Response.json({
     ok: true,
-    productionReady: true,
+    productionReady: false,
     candidateId: auth.session.candidateId,
     documents,
     requests,
