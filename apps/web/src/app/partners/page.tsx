@@ -1,4 +1,5 @@
 import PartnerOnboardingForm from "../../components/partner-onboarding-form";
+import PartnerListingIntake from "../../components/partner-listing-intake";
 
 const gold = "#d8b66a";
 const card = { border: "1px solid rgba(255,255,255,.12)", borderRadius: 18, background: "rgba(255,255,255,.045)", padding: 24 };
@@ -16,7 +17,7 @@ export default function PartnersPage() {
    <h1 style={{ fontSize:"clamp(38px,6vw,64px)", lineHeight:1.05, maxWidth:850, margin:"12px 0" }}>Bring real opportunities closer to the people who need them.</h1>
    <p style={{ color:"#c4c9d4", fontSize:18, lineHeight:1.75, maxWidth:820 }}>Kingsmen connects candidates with education, employment, training, funding and accommodation pathways. Partner listings must be reviewed and supported by source evidence before they appear as verified opportunities.</p>
    <div style={{ display:"grid", gridTemplateColumns:"repeat(auto-fit,minmax(230px,1fr))", gap:14, marginTop:30 }}>{pathways.map(([title,desc])=><article key={title} style={card}><h2 style={{ color:gold, fontSize:20, marginTop:0 }}>{title}</h2><p style={{ color:"#c4c9d4", lineHeight:1.7 }}>{desc}</p></article>)}</div>
-   <section style={{ ...card, marginTop:20 }}><h2 style={{ marginTop:0 }}>Partner onboarding</h2><p style={{ color:"#c4c9d4", lineHeight:1.7 }}>Organisation verification and listing publication are separate steps. A submitted organisation profile is not considered verified, and a submitted listing is not visible to candidates until authorised review confirms its source and status.</p><ol style={{ color:"#c4c9d4", lineHeight:1.9 }}><li>Create or sign in to an authorised account.</li><li>Provide organisation identity and official website details.</li><li>Submit each listing with the official source and application URL.</li><li>Wait for source and organisation review before public publication.</li></ol><PartnerOnboardingForm /></section>
+   <section style={{ ...card, marginTop:20 }}><h2 style={{ marginTop:0 }}>Partner onboarding</h2><p style={{ color:"#c4c9d4", lineHeight:1.7 }}>Organisation verification and listing publication are separate steps. A submitted organisation profile is not considered verified, and a submitted listing is not visible to candidates until authorised review confirms its source and status.</p><ol style={{ color:"#c4c9d4", lineHeight:1.9 }}><li>Create or sign in to an authorised account.</li><li>Provide organisation identity and official website details.</li><li>Submit each listing with the official source and application URL.</li><li>Wait for source and organisation review before public publication.</li></ol><PartnerOnboardingForm /><PartnerListingIntake /></section>
   </section>
  </main>;
 }
