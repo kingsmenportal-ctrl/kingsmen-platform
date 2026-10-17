@@ -12,6 +12,8 @@
 - Added RLS-limited public reads for route providers and programmes. Public listings require a verified provider, source confidence A/B, verified/open-or-future programme state and an update within 90 days.
 - Added indexes for marketplace foreign keys and consolidated listing-read policies.
 - Configured Netlify staging with the Supabase project URL, publishable key and public anon JWT. No service-role key is used by the public opportunity route.
+- Added a shared strict HTTPS URL validator for public provider links, partner website/source/application URLs, and reviewer evidence. It rejects non-HTTPS schemes, malformed URLs, embedded credentials, local-only hostnames and oversized values.
+- Added regression tests and a static integration validator, wired into the web CI workflow before the production build. CI must still run against the latest PR head before this is considered verified.
 
 ## Routes
 
@@ -41,7 +43,7 @@ The public endpoint combines curated `route_programmes`/`route_providers` with p
 
 ## Current operational status
 
-- Database migrations `0041` through `0055` applied to staging successfully.
+- Database migrations `0041` through `0056` applied to staging successfully, including the review-event audit migration.
 - Supabase security advisor returned no security lint findings immediately after the schema change.
 - Staging currently contains **zero verified programme records meeting the public directory rules**, and the marketplace tables contain no partner submissions or candidate trackers yet. The directory will therefore show an empty state until authorised staff add and verify real records. No fictional opportunities were inserted.
 - Partner onboarding and listing submission are connected, but reviewer role assignment and end-to-end reviewer testing remain unverified.
@@ -57,3 +59,10 @@ The public endpoint combines curated `route_programmes`/`route_providers` with p
 4. Verify the Next.js production build and end-to-end journeys in CI and a protected staging environment.
 5. Complete the existing candidate identity-to-profile mapping and secure candidate profile/document services; the existing legacy provider-connected application endpoint still requires this mapping and internal API configuration.
 6. Continue the launch-readiness checklist: private document upload/download, communications, payment sandbox, backup/restore and final runtime proof.
+
+
+## Candidate identity, document and application lifecycle boundary status
+
+The same draft PR also contains source-level candidate identity-link lifecycle/admin workflows, owner-scoped application/document metadata reads, transaction-scoped application tracker reads with audit evidence, document-readiness ownership checks, private/no-store response handling, and candidate application state evidence matching. These safeguards are intended to fail closed when identity mapping, ownership, evidence, or database configuration is missing.
+
+**Runtime proof is still outstanding:** the current PR head has no recorded passing commit status in the connected status lookup. TypeScript builds, Node regression suites, static validators, signed-in candidate journeys, reviewer-role checks, and live transaction/RLS behavior must pass before these source changes are treated as runtime-verified. The API manifest is pinned but has no committed apps/api/package-lock.json; the current workflow still installs API dependencies with npm install, so reproducible API dependency installation remains an open gate.
