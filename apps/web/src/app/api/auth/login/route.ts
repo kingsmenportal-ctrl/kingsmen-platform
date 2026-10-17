@@ -1,7 +1,7 @@
 import { NextResponse } from "next/server";
 import { isSameOriginRequest } from "@/lib/auth/csrf";
 import { readAuthJson } from "@/lib/auth/request-body";
-import { authUnavailable, setAuthCookies, supabaseAuth } from "@/lib/auth/supabase-rest";
+import { authUnavailable, hasValidAuthTokenPair, setAuthCookies, supabaseAuth } from "@/lib/auth/supabase-rest";
 
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
@@ -24,7 +24,7 @@ export async function POST(request: Request) {
   }
   try {
     const { response, payload } = await supabaseAuth("token?grant_type=password", { email, password });
-    if (!response.ok || typeof payload.access_token !== "string" || typeof payload.refresh_token !== "string") {
+    if (!response.ok || !hasValidAuthTokenPair(payload)) {
       return NextResponse.json({ ok: false, error: "Sign-in failed. Check your details or confirm your email address." }, { status: 401, headers: { "Cache-Control": "no-store" } });
     }
     await setAuthCookies(payload.access_token, payload.refresh_token, Number(payload.expires_in || 3600));
