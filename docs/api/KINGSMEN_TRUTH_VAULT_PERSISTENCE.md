@@ -128,6 +128,7 @@ curl -s http://localhost:8080/api/candidates/KM-DEMO-001/status \\
 
 ```bash
 curl -s -X POST http://localhost:8080/api/workflow/result \
+  -H "authorization: Bearer $KINGSMEN_WORKFLOW_SERVICE_TOKEN" \\
   -H "content-type: application/json" \
   -d '{
     "workflowRunId": "wf_truth_vault_001",
