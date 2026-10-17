@@ -30,7 +30,7 @@ export async function POST(request: Request) {
     const orders = await orderResponse.json() as Array<Record<string, unknown>>;
     if (!Array.isArray(orders) || orders.length !== 1) return fail(404, "ORDER_NOT_FOUND", "Order does not belong to the signed-in candidate.");
     const order = orders[0];
-    if (order.currency !== "ZAR" || !Number.isSafeInteger(order.amount_minor) || Number(order.amount_minor) < 500) {
+    if (order.currency !== "ZAR" || !Number.isSafeInteger(Number(order.amount_minor)) || Number(order.amount_minor) < 500) {
       return fail(409, "ORDER_AMOUNT_INVALID", "PayFast checkout requires a positive ZAR order of at least R5.00.");
     }
     if (order.status !== "PENDING_PAYMENT" && order.status !== "PAYMENT_FAILED") {
