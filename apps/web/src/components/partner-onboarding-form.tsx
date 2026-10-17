@@ -17,7 +17,7 @@ export default function PartnerOnboardingForm() {
  const [error,setError]=useState(false);
  const [record,setRecord]=useState<{id:string;display_name:string;verification_status:string}|null>(null);
  async function submit(event:FormEvent<HTMLFormElement>) {
-  event.preventDefault(); setBusy(true); setMessage(""); setError(false); setRecord(null);
+  event.preventDefault(); const formElement = event.currentTarget; setBusy(true); setMessage(""); setError(false); setRecord(null);
   const formData=new FormData(event.currentTarget);
   const body={
    displayName:String(formData.get("displayName")||"").trim(),
@@ -36,7 +36,7 @@ export default function PartnerOnboardingForm() {
    }
    setRecord(payload.organisation);
    setMessage(payload.message||"Your organisation profile is submitted for review.");
-   event.currentTarget.reset();
+   formElement.reset();
   } catch { setError(true);setMessage("The partner service is currently unavailable. Your details have not been confirmed as saved."); }
   finally { setBusy(false); }
  }
