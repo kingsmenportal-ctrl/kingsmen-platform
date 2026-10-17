@@ -824,6 +824,56 @@ export class TruthVaultRepository {
     );
   }
 
+  /** Lists open document requests through the server-verified Supabase Auth binding. */
+  async listDocumentRequestsForVerifiedSupabaseUser(supabaseUserId: string): Promise<Array<{
+    requestRef: string; documentType: string; reason: string; priority: string;
+    dueAt: string | null; createdAt: string;
+  }> | null> {
+    this.assertEnabled();
+    if (!/^[0-9a-f]{8}-[0-9a-f]{4}-[1-8][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i.test(supabaseUserId)) return null;
+    const client = await this.pool!.connect();
+    try {
+      await client.query("BEGIN");
+      await client.query(
+        "select set_config('app.kingsmen_role', $1, true), set_config('app.service_context', $2, true)",
+        ["service_role", "backend_api"]
+      );
+      const linked = await client.query<{ candidate_id: string }>(
+        `select ca.candidate_id::text
+           from public.candidate_accounts ca
+           join public.candidates c on c.id = ca.candidate_id and c.is_active = true
+          where ca.auth_user_id = $1::uuid
+          limit 1`,
+        [supabaseUserId]
+      );
+      if (!linked.rows[0]) {
+        await client.query("COMMIT");
+        return null;
+      }
+      const result = await client.query<{
+        request_ref: string; document_type: string; reason: string; priority: string;
+        due_at: string | null; created_at: string;
+      }>(
+        `select request_ref, document_type, reason, priority, due_at::text, created_at::text
+           from public.document_requests
+          where candidate_id = $1::uuid and request_status = 'OPEN'
+          order by due_at asc nulls last, created_at desc
+          limit 100`,
+        [linked.rows[0].candidate_id]
+      );
+      await client.query("COMMIT");
+      return result.rows.map((row) => ({
+        requestRef: row.request_ref, documentType: row.document_type, reason: row.reason,
+        priority: row.priority, dueAt: row.due_at, createdAt: row.created_at
+      }));
+    } catch (error) {
+      try { await client.query("ROLLBACK"); } catch { /* preserve original error */ }
+      throw error;
+    } finally {
+      client.release();
+    }
+  }
+
   private assertEnabled(): void {
     if (!this.pool) throw new Error("PostgreSQL Truth Vault persistence is not enabled for this process.");
   }
