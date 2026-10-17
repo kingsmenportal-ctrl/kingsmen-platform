@@ -35,6 +35,7 @@ check(trackerApi.includes("requireCandidateSession"), "Application tracker API d
 check(trackerApi.includes("map_fallback_required,last_evidence_ref"), "Application API omits MAP fallback state or evidence reference.");
 check(trackerPage.includes("Manual Application Package (MAP) required"), "Candidate tracker does not surface MAP/manual fallback state.");
 check(trackerPage.includes("OTP_REQUIRED") && trackerPage.includes("CAPTCHA_BLOCKED") && trackerPage.includes("MANUAL_ONLY"), "Candidate tracker does not cover known portal blockers.");
+check(trackerPage.includes('["C","D"].includes(row.source_confidence_band)'), "Candidate tracker does not route low-confidence source records to manual review.");
 check(trackerPage.includes("not a successful submission") && trackerPage.includes("Contact support"), "MAP UI must distinguish fallback from successful submission and expose support escalation.");
 
 check(identityRuntime.includes("candidate_auth_identity_links") && identityRuntime.includes('link_status", "eq.VERIFIED"'), "Candidate runtime does not require an explicit verified identity link.");
