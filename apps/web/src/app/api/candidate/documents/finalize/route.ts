@@ -17,7 +17,7 @@ export async function POST(request: Request) {
     const rows = await n05Rest("document_files?" + query);
     if (!Array.isArray(rows) || rows.length !== 1) throw new N05Error(404, "Document upload was not found for this candidate.");
     const document = rows[0] as any;
-    if (document.document_status === "UPLOADED" || document.document_status === "PROCESSING") {
+    if (document.document_status === "PROCESSING") {
       const encodedPath = String(document.storage_path).split("/").map(encodeURIComponent).join("/");
       const info = await fetch(actor.baseUrl + "/storage/v1/object/info/" + encodeURIComponent(document.storage_bucket) + "/" + encodedPath, {
         headers: { apikey: actor.serviceKey, authorization: "Bearer " + actor.serviceKey },
