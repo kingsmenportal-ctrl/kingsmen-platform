@@ -64,6 +64,7 @@ CREATE TABLE IF NOT EXISTS public.document_scan_jobs (
   created_at timestamptz NOT NULL DEFAULT now(),
   updated_at timestamptz NOT NULL DEFAULT now(),
   completed_at timestamptz,
+  reconciled_at timestamptz,
   CONSTRAINT document_scan_jobs_status_check CHECK (
     status IN ('QUEUED', 'LEASED', 'RETRY_WAIT', 'CLEAN', 'INFECTED', 'DEAD_LETTER', 'CANCELLED')
   ),
