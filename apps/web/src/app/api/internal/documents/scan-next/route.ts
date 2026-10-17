@@ -231,7 +231,7 @@ export async function POST(request: Request) {
       metadata: { jobRef: job.job_ref, provider, version, scannerSignaturePresent: Boolean(result.signature) }
     });
     if (!eventOk) return jsonError(502, "SCAN_RESULT_AUDIT_FAILED", "The clean scan result is persisted but its audit event failed; the document remains quarantined until reconciliation.");
-    const docUpdate = await supabaseAdminFetch(cfg, `/rest/v1/document_files?id=eq.${job.document_id}&document_status=eq.QUARANTINED&malware_scan_status=in.(PENDING,ERROR,SCANNING)`, {
+    const docUpdate = await supabaseAdminFetch(cfg, `/rest/v1/document_files?id=eq.${job.document_id}&document_status=eq.QUARANTINED&malware_scan_status=in.(PENDING,ERROR,SCANNING)&checksum_sha256=eq.${job.checksum_sha256}`, {
       method: "PATCH",
       headers: { "content-type": "application/json", Prefer: "return=representation" },
       body: JSON.stringify({ malware_scan_status: "CLEAN", malware_scanned_at: scannedAt, malware_scanner_provider: provider, malware_scanner_version: version, document_status: "READY", updated_at: scannedAt, malware_scan_last_error: null, malware_scan_next_attempt_at: null })
@@ -249,7 +249,7 @@ export async function POST(request: Request) {
     });
     const infectedJobRows = rejectedJob.ok ? await rejectedJob.json().catch(() => []) as unknown[] : [];
     if (!Array.isArray(infectedJobRows) || infectedJobRows.length !== 1) return jsonError(502, "INFECTED_JOB_STATE_FAILED", "The infected result could not be persisted to the scan queue; the document remains unavailable.");
-    const rejectedDocument = await supabaseAdminFetch(cfg, `/rest/v1/document_files?id=eq.${job.document_id}&document_status=eq.QUARANTINED`, {
+    const rejectedDocument = await supabaseAdminFetch(cfg, `/rest/v1/document_files?id=eq.${job.document_id}&document_status=eq.QUARANTINED&checksum_sha256=eq.${job.checksum_sha256}`, {
       method: "PATCH",
       headers: { "content-type": "application/json", Prefer: "return=representation" },
       body: JSON.stringify({ malware_scan_status: "INFECTED", malware_scanned_at: scannedAt, malware_scanner_provider: provider, malware_scanner_version: version, document_status: "REJECTED", updated_at: scannedAt, malware_scan_last_error: "Scanner reported INFECTED." })
