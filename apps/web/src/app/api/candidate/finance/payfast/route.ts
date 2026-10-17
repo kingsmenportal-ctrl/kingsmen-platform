@@ -1,4 +1,3 @@
-import { randomUUID } from "node:crypto";
 import { requireCandidateSession, supabaseAdminFetch } from "../../../../../lib/candidate-document-runtime";
 import { createPayFastItnSignature, getPayFastRuntime, payFastProcessUrl } from "../../../../../lib/payfast-runtime";
 
@@ -64,23 +63,18 @@ export async function POST(request: Request) {
     if (displayName) fields.name_first = displayName.split(/\s+/)[0].slice(0, 100);
     fields.signature = createPayFastItnSignature(fields, runtime.passphrase);
 
-    const initiation = await supabaseAdminFetch(auth.config, "/rest/v1/candidate_payment_events?on_conflict=idempotency_key", {
+    const initiation = await supabaseAdminFetch(auth.config, "/rest/v1/rpc/n10_record_payfast_intent", {
       method: "POST",
-      headers: { "content-type": "application/json", Prefer: "resolution=ignore-duplicates,return=minimal" },
+      headers: { "content-type": "application/json" },
       body: JSON.stringify({
-        event_ref: "KMPAYEVT-" + randomUUID(),
-        order_id: order.id,
-        candidate_id: order.candidate_id,
-        event_type: "PAYMENT_INITIATION_REQUESTED",
-        source: "SYSTEM",
-        amount_minor: order.amount_minor,
-        provider: "PAYFAST",
-        provider_reference: order.order_ref,
-        idempotency_key: "payfast-intent:" + order.id,
-        metadata: { environment: runtime.environment, checkout_url: payFastProcessUrl(runtime.environment) }
+        p_order_id: order.id,
+        p_candidate_id: auth.session.candidateId,
+        p_idempotency_key: "payfast-intent:" + order.id
       })
     });
     if (!initiation.ok) return fail(502, "PAYMENT_INITIATION_AUDIT_FAILED", "Checkout could not be safely recorded; no payment form was issued.");
+    const intentRows = await initiation.json();
+    if (!Array.isArray(intentRows) || intentRows.length !== 1) return fail(502, "PAYMENT_INITIATION_UNCONFIRMED", "Checkout intent could not be confirmed; no payment form was issued.");
 
     return Response.json({
       ok: true,
