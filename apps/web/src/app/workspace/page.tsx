@@ -34,6 +34,7 @@ const journeys = [
       ["Profile correction queue", "/founder/profile-review"],
       ["Finance exceptions", "/founder/finance"],
       ["Notifications and dead letters", "/founder/operations"],
+      ["Candidate message queue", "/founder/messages"],
       ["Marketplace review queue", "/founder/marketplace-review"],
       ["Founder control plane", "/founder/control-plane"],
       ["Proof centre", "/founder/proof-centre"],
