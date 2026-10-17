@@ -15,3 +15,11 @@ export function isPublicHttpsUrl(value: unknown, maxLength = 2048): value is str
     return false;
   }
 }
+
+/**
+ * Keep user search text from introducing PostgREST filter grammar or wildcard
+ * operators. Search remains Unicode-aware for South African names and places.
+ */
+export function sanitizePublicSearchQuery(value: string, maxLength = 100): string {
+  return value.normalize("NFKC").replace(/[^\\p{L}\\p{N}\\s'-]/gu, "").trim().slice(0, maxLength);
+}
