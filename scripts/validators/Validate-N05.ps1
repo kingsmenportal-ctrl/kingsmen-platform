@@ -90,10 +90,27 @@ foreach ($Marker in @(
   "missingDocumentTypes",
   "readyDocumentTypes",
   "reviewRequiredDocumentTypes",
+  "DOCUMENT_OWNERSHIP_MISMATCH",
+  "applicationId === input.applicationId",
+  '"ARCHIVED"',
+  '"DELETED"',
+  "new Set(input.requiredDocumentTypes",
   "READY"
 )) {
   if ($ReadinessTs -notmatch $Marker) {
     $Failures += "Document readiness missing marker: $Marker"
+  }
+}
+
+$ReadinessTest = Get-Content "$Base\apps\api\src\documents\document-readiness.test.ts" -Raw
+foreach ($Marker in @(
+  "DOCUMENT_OWNERSHIP_MISMATCH",
+  "ignores documents attached to a different application",
+  "does not count archived or deleted files as ready",
+  "requires verified, ready documents"
+)) {
+  if ($ReadinessTest -notmatch [regex]::Escape($Marker)) {
+    $Failures += "Document readiness regression test missing marker: $Marker"
   }
 }
 
