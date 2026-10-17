@@ -159,7 +159,7 @@ export async function POST(request: Request) {
 
   return Response.json({
     ok: true,
-    productionReady: true,
+    productionReady: false,
     document,
     review: { status: "PENDING", note: "Upload does not mean the document is verified. Verification and outcome decisions remain restricted to authorised review workflows." }
   }, { status: 201, headers: { "cache-control": "no-store" } });
