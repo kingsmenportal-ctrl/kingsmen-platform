@@ -14,6 +14,8 @@ const str = (row: Row, key: string, fallback = "—") => typeof row[key] === "st
 export default function CandidateFinancePage() {
   const [data, setData] = useState<FinanceData>({ items: [], orders: [], invoices: [], payments: [], refunds: [], ledger: [], plans: [] });
   const [candidateRef, setCandidateRef] = useState("");
+  const [buyingPlan, setBuyingPlan] = useState("");
+  const [checkoutKeys, setCheckoutKeys] = useState<Record<string,string>>({});
   const [message, setMessage] = useState("Loading your finance records…");
   useEffect(() => { void (async () => {
     const session = await getKingsmenSession();
@@ -30,9 +32,11 @@ export default function CandidateFinancePage() {
     try {
       const session = await getKingsmenSession();
       if (!session) throw new Error("Sign in again before starting checkout.");
+      const key = checkoutKeys[planCode] || window.crypto.randomUUID();
+      if (!checkoutKeys[planCode]) setCheckoutKeys(current => ({ ...current, [planCode]: key }));
       const response = await fetch("/api/candidate/finance/intent", {
         method: "POST",
-        headers: { authorization: `Bearer ${session.access_token}`, "content-type": "application/json", "idempotency-key": window.crypto.randomUUID() },
+        headers: { authorization: `Bearer ${session.access_token}`, "content-type": "application/json", "idempotency-key": key },
         body: JSON.stringify({ planCode }),
         cache: "no-store"
       });
