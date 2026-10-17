@@ -99,7 +99,7 @@ export default async function KingsmenWorkspacePage() {
           <li>Migrations 0059–0071 (identity linking, marketplace review, PayFast reconciliation, finance exceptions, founder operations, messages, and profile-change approvals) are committed in this code branch but have not been applied to Supabase staging.</li>
           <li>Candidate-owned profile, document, application, finance, message and outcome APIs require server-only SUPABASE_SERVICE_ROLE_KEY; it is not configured on the inspected Netlify staging site. Never place it in a NEXT_PUBLIC variable. Public browser configuration now maps only the existing anon/publishable key and project URL.</li>
           <li>The web build workflow has been added, but no workflow run is currently visible for this PR head; typecheck, production build, browser journeys, and connected staging behaviour remain unverified.</li>
-          <li>Netlify staging is SSO-restricted for non-production access; no new deploy was triggered by this batch.</li>
+          <li>Netlify staging is SSO-restricted for non-production access, which may block PayFast's external ITN callback. Use a sanctioned publicly reachable callback path; do not weaken staging SSO to make payments work. No new deploy was triggered by this batch.</li>
           <li>Payment provider callback/signature and ledger logic exists in the API codebase but still needs reproducible CI and PayFast sandbox end-to-end evidence before any live payment workflow is claimed ready.</li>
         </ul>
         <p style={{ color: "#d0d0d0", lineHeight: 1.65, marginBottom: 0 }}>
