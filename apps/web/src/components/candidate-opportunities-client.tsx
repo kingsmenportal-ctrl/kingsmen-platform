@@ -14,6 +14,7 @@ export default function CandidateOpportunitiesClient({ savedOnly = false }: { sa
   const [savedRoutes, setSavedRoutes] = useState<string[]>([]);
   const [search, setSearch] = useState("");
   const [province, setProvince] = useState("ALL");
+  const [pathway, setPathway] = useState("ALL");
   const [notice, setNotice] = useState("Loading verified opportunities…");
   const [busy, setBusy] = useState("");
 
@@ -68,8 +69,23 @@ export default function CandidateOpportunitiesClient({ savedOnly = false }: { sa
   }
 
   const normalizedSearch = search.trim().toLowerCase();
-  const visibleListings = listings.filter(row => (!savedOnly || savedListings.includes(row.id)) && (province === "ALL" || row.province === province) && (!normalizedSearch || [row.title,row.description,row.eligibility,row.location_text,(row.organisation as Record<string,unknown> | undefined)?.display_name].some(value => String(value || "").toLowerCase().includes(normalizedSearch))));
-  const visibleRoutes = routes.filter(row => (!savedOnly || savedRoutes.includes(row.id)) && (province === "ALL" || row.province === province) && (!normalizedSearch || [row.programme_name,row.route_type,row.qualification_type,row.eligibility_summary,(row.provider as Record<string,unknown> | undefined)?.provider_name].some(value => String(value || "").toLowerCase().includes(normalizedSearch))));
+  const pathwayMatches = (row: Opportunity, kind: "listing" | "route") => {
+    if (pathway === "ALL") return true;
+    const typeText = String(kind === "route" ? row.route_type || "" : row.listing_type || "").toLowerCase().replace(/[\\s-]+/g, "_");
+    const programmeText = String(kind === "route" ? row.programme_name || "" : row.title || "").toLowerCase();
+    const tokens: Record<string, string[]> = {
+      higher_education: ["higher_education", "higher education", "university", "tertiary"],
+      tvet: ["tvet", "technical_vocational", "technical and vocational", "vocational training"],
+      seta_learnership: ["seta", "learnership", "skills_programme", "skills programme"],
+      internship: ["internship", "intern"],
+      apprenticeship: ["apprenticeship", "apprentice", "trade_training"],
+      employment: ["employment", "job_vacancy", "job vacancy", "recruitment"]
+    };
+    const terms = tokens[pathway] || [];
+    return terms.some(term => typeText.includes(term) || programmeText.includes(term));
+  };
+  const visibleListings = listings.filter(row => (!savedOnly || savedListings.includes(row.id)) && (province === "ALL" || row.province === province) && pathwayMatches(row, "listing") && (!normalizedSearch || [row.title,row.description,row.eligibility,row.location_text,(row.organisation as Record<string,unknown> | undefined)?.display_name].some(value => String(value || "").toLowerCase().includes(normalizedSearch))));
+  const visibleRoutes = routes.filter(row => (!savedOnly || savedRoutes.includes(row.id)) && (province === "ALL" || row.province === province) && pathwayMatches(row, "route") && (!normalizedSearch || [row.programme_name,row.route_type,row.qualification_type,row.eligibility_summary,(row.provider as Record<string,unknown> | undefined)?.provider_name].some(value => String(value || "").toLowerCase().includes(normalizedSearch))));
   const provinces = [...new Set([...listings, ...routes].map(row => String(row.province || "")).filter(Boolean))].sort();
   function card(row: Opportunity, kind: "listing" | "route") {
     const isRoute = kind === "route";
@@ -92,8 +108,8 @@ export default function CandidateOpportunitiesClient({ savedOnly = false }: { sa
   return <main style={{ maxWidth: 1100, margin: "0 auto", padding: 24, color: "#f4f6ff", fontFamily: "system-ui, sans-serif" }}>
     <p><Link href="/candidate/dashboard" style={{ color: "#a5b4fc" }}>← Candidate dashboard</Link></p>
     <div style={{ display: "flex", justifyContent: "space-between", gap: 12, alignItems: "center", flexWrap: "wrap" }}><h1>{savedOnly ? "Saved opportunities" : "Discover opportunities"}</h1><nav style={{ display: "flex", gap: 12 }}><Link href="/candidate/discover">Discover</Link><Link href="/candidate/saved-opportunities">Saved</Link><Link href="/candidate/applications">Application tracker</Link></nav></div>
-    <p>Only current verified route providers and published listings from verified organisations are shown. An external application link is a handoff, not proof of submission or acceptance.</p>
-    <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit,minmax(220px,1fr))", gap: 10, margin: "18px 0" }}><input aria-label="Search opportunities" placeholder="Search provider, title or eligibility" value={search} onChange={e => setSearch(e.target.value)} style={fieldStyle}/><select aria-label="Filter province" value={province} onChange={e => setProvince(e.target.value)} style={fieldStyle}><option value="ALL">All provinces</option>{provinces.map(p => <option key={p} value={p}>{p}</option>)}</select><button type="button" onClick={() => void load().catch(e => setNotice(e instanceof Error ? e.message : "Refresh failed."))}>Refresh verified records</button></div>
+    <p>Only current verified route providers and published listings from verified organisations are shown. Filter by one of the six pathway families; a record appears only when its provider-supplied route/listing type or programme title identifies that family. This is category filtering, not a claim that eligibility has been assessed. An external application link is a handoff, not proof of submission or acceptance.</p>
+    <div id="pathway-filters" style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit,minmax(220px,1fr))", gap: 10, margin: "18px 0" }}><input aria-label="Search opportunities" placeholder="Search provider, title or eligibility" value={search} onChange={e => setSearch(e.target.value)} style={fieldStyle}/><select aria-label="Filter pathway" value={pathway} onChange={e => setPathway(e.target.value)} style={fieldStyle}><option value="ALL">All six pathways</option><option value="higher_education">Higher education</option><option value="tvet">TVET</option><option value="seta_learnership">SETA / learnerships</option><option value="internship">Internships</option><option value="apprenticeship">Apprenticeships</option><option value="employment">Employment</option></select><select aria-label="Filter province" value={province} onChange={e => setProvince(e.target.value)} style={fieldStyle}><option value="ALL">All provinces</option>{provinces.map(p => <option key={p} value={p}>{p}</option>)}</select><button type="button" onClick={() => void load().catch(e => setNotice(e instanceof Error ? e.message : "Refresh failed."))}>Refresh verified records</button></div>
     {notice && <p role="status" style={{ padding: 12, background: "#172554", borderRadius: 8 }}>{notice}</p>}
     <section><h2>Partner opportunities</h2>{visibleListings.length ? <div style={{ display: "grid", gap: 12 }}>{visibleListings.map(row => card(row,"listing"))}</div> : <p>No matching published opportunities in the connected source records.</p>}</section>
     <section style={{ marginTop: 28 }}><h2>Verified routes and programmes</h2>{visibleRoutes.length ? <div style={{ display: "grid", gap: 12 }}>{visibleRoutes.map(row => card(row,"route"))}</div> : <p>No matching verified routes in the connected source records.</p>}</section>
