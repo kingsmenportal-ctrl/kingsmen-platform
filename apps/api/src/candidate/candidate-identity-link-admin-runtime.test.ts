@@ -175,3 +175,13 @@ test("overlong trusted operator actor ID fails before opening a database connect
   await assert.rejects(runtime.execute("create",{},COMMAND),/OPERATOR_REQUIRED/);
   assert.equal(connects,0);
 });
+
+
+test("non-canonical trusted operator actor ID fails before opening a database connection", async () => {
+  let connects = 0;
+  const runtime = new CandidateIdentityLinkAdminRuntime({async connect(){connects++; throw new Error("must not connect");}},{
+    async resolve(){return {actorId:" operator:trusted-1 ",permissions:["candidate.identity_link.create"]};}
+  });
+  await assert.rejects(runtime.execute("create",{},COMMAND),/OPERATOR_REQUIRED/);
+  assert.equal(connects,0);
+});
