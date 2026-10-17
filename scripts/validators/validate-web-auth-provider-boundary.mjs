@@ -30,7 +30,9 @@ const checks = [
   ["provider access and refresh token lengths are bounded", /MAX_AUTH_ACCESS_TOKEN_CHARS = 16_384/.test(tokens) && /MAX_AUTH_REFRESH_TOKEN_CHARS = 4_096/.test(tokens) && /MIN_AUTH_TOKEN_CHARS = 16/.test(tokens)],
   ["recovery uses same-origin guard and bounded JSON parser", /isSameOriginRequest\(request\)/.test(recovery) && /readAuthJson\(request\)/.test(recovery)],
   ["recovery response does not disclose account existence", /If an account exists for that address/.test(recovery)],
-  ["refresh uses same-origin guard and validates token bounds", /isSameOriginRequest\(request\)/.test(refresh) && /refreshToken\.length > 4096/.test(refresh) && /access_token\.length > 16384/.test(refresh)],
+  ["refresh uses same-origin guard and shared token-pair validation", /isSameOriginRequest\(request\)/.test(refresh) && /hasValidAuthTokenPair\(payload\)/.test(refresh)],
+  ["login validates provider token pair before setting cookies", /hasValidAuthTokenPair\(payload\)/.test(login) && /setAuthCookies\(payload\.access_token, payload\.refresh_token/.test(login)],
+  ["registration validates partial or invalid token pair before setting cookies", /hasValidAuthTokenPair\(payload\)/.test(register) && /AUTH_TOKEN_PAIR_INVALID/.test(register)],
   ["logout clears local cookies even if provider logout fails", /catch \{ \/\* Clear local session even if the provider is unavailable\. \*\//.test(logout) && /await clearAuthCookies\(\)/.test(logout)],
   ["session route verifies identity server-side", /getVerifiedAuthUser\(\)/.test(session) && /authConfigured\(\)/.test(session)],
   ["service-role credentials are not used by web auth boundary", !/SUPABASE_SERVICE_ROLE_KEY|service_role/i.test(auth + login + register + recovery + refresh + logout + session)]
