@@ -92,8 +92,8 @@ export default async function KingsmenWorkspacePage() {
       <section style={{ marginTop: 26, borderRadius: 16, background: "#202020", padding: 18 }}>
         <h2 style={{ marginTop: 0 }}>Deployment gates still open</h2>
         <ul style={{ color: "#d0d0d0", lineHeight: 1.75 }}>
-          <li>Migration 0059 (manual identity-link request queue) and migration 0060 (atomic marketplace review plus audit) are committed in the code branch but have not been applied to Supabase staging.</li>
-          <li>The web candidate APIs require the server-only SUPABASE_SERVICE_ROLE_KEY at runtime; it is not configured on the inspected Netlify staging site. Never place it in a NEXT_PUBLIC variable.</li>
+          <li>Migrations 0059–0062 (identity request queue, atomic marketplace review, authorised identity review, and safe candidate registration) are committed in this code branch but have not been applied to Supabase staging.</li>
+          <li>Candidate-owned profile, document, application, finance, message and outcome APIs require server-only SUPABASE_SERVICE_ROLE_KEY; it is not configured on the inspected Netlify staging site. Never place it in a NEXT_PUBLIC variable. Public browser configuration now maps only the existing anon/publishable key and project URL.</li>
           <li>GitHub Actions returned no workflow runs for this PR head; build, tests, browser journeys, and connected staging behaviour remain unverified.</li>
           <li>Netlify staging is SSO-restricted for non-production access; no new deploy was triggered by this batch.</li>
           <li>Payment provider callback/signature and ledger logic exists in the API codebase but still needs reproducible CI and PayFast sandbox end-to-end evidence before any live payment workflow is claimed ready.</li>
