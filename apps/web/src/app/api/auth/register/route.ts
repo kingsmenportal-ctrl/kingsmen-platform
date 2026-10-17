@@ -1,7 +1,7 @@
 import { NextResponse } from "next/server";
 import { isSameOriginRequest } from "@/lib/auth/csrf";
 import { readAuthJson } from "@/lib/auth/request-body";
-import { authUnavailable, setAuthCookies, supabaseAuth } from "@/lib/auth/supabase-rest";
+import { authUnavailable, hasValidAuthTokenPair, setAuthCookies, supabaseAuth } from "@/lib/auth/supabase-rest";
 
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
@@ -25,7 +25,10 @@ export async function POST(request: Request) {
   try {
     const { response, payload } = await supabaseAuth("signup", { email, password });
     if (!response.ok) return NextResponse.json({ ok: false, error: "Registration could not be completed. Check the details or try again later." }, { status: 400, headers: { "Cache-Control": "no-store" } });
-    if (typeof payload.access_token === "string" && typeof payload.refresh_token === "string") {
+    if (payload.access_token !== undefined || payload.refresh_token !== undefined) {
+      if (!hasValidAuthTokenPair(payload)) {
+        return NextResponse.json({ ok: false, code: "AUTH_PROVIDER_RESPONSE_INVALID" }, { status: 502, headers: { "Cache-Control": "no-store", Pragma: "no-cache" } });
+      }
       await setAuthCookies(payload.access_token, payload.refresh_token, Number(payload.expires_in || 3600));
       return NextResponse.json({ ok: true, confirmationRequired: false }, { headers: { "Cache-Control": "no-store" } });
     }
