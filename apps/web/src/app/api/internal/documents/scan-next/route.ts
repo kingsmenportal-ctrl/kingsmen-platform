@@ -23,6 +23,7 @@ type ScannerResult = {
   provider?: string;
   version?: string;
   signature?: string;
+  sha256?: string;
   errorCode?: string;
   message?: string;
 };
@@ -204,6 +205,10 @@ export async function POST(request: Request) {
   const result = scannerResponse.ok ? await scannerResponse.json().catch(() => null) as ScannerResult | null : null;
   if (!scannerResponse.ok || !result || !["CLEAN", "INFECTED", "ERROR"].includes(String(result.status))) {
     return await retryOrDeadLetter(cfg, job, leaseToken, attempts, "SCANNER_RESPONSE_INVALID", "Scanner response was unavailable or did not match the required result contract.");
+  }
+
+  if (String(result.sha256 || "").toLowerCase() !== String(job.checksum_sha256).toLowerCase()) {
+    return await retryOrDeadLetter(cfg, job, leaseToken, attempts, "SCANNER_CHECKSUM_MISMATCH", "Scanner response digest did not match the persisted object checksum.");
   }
 
   const scannedAt = new Date().toISOString();
