@@ -30,6 +30,7 @@ const journeys = [
     role: "Founder",
     purpose: "Review marketplace submissions with evidence-backed, database-authorised decisions, and inspect operational/build proof.",
     steps: [
+      ["Identity-link review queue", "/founder/identity-link-queue"],
       ["Marketplace review queue", "/founder/marketplace-review"],
       ["Founder control plane", "/founder/control-plane"],
       ["Proof centre", "/founder/proof-centre"],
