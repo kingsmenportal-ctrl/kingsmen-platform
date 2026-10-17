@@ -13,7 +13,7 @@ check("candidate A applications scoped",a.status===200&&a.body?.ok===true,"statu
 check("candidate B applications scoped",b.status===200&&b.body?.ok===true,"status="+b.status);
 check("candidate A saved list scoped",as.status===200&&as.body?.ok===true,"status="+as.status);
 check("candidate B saved list scoped",bs.status===200&&bs.body?.ok===true,"status="+bs.status);
-const ids=(v:any,key:string)=>new Set(Array.isArray(v.body?.[key])?v.body[key].map((x:any)=>x.id):[]);
+const ids=(v,key)=>new Set(Array.isArray(v.body?.[key])?v.body[key].map(x=>x.id):[]);
 const overlap=[...ids(a,"applications")].filter(id=>ids(b,"applications").has(id));
 const savedOverlap=[...ids(as,"opportunities")].filter(id=>ids(bs,"opportunities").has(id));
 check("candidate application lists do not overlap",overlap.length===0,"overlap="+overlap.length);
