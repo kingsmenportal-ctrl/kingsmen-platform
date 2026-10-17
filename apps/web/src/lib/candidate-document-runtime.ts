@@ -160,6 +160,32 @@ export async function requireCandidateSession(request: Request): Promise<
     return { ok: false, status: 403, code: "CANDIDATE_ACCOUNT_NOT_ACTIVE", message: "The linked candidate account is not active or requires recovery." };
   }
 
+  const candidateUrl = new URL(`${cfg.url}/rest/v1/candidates`);
+  candidateUrl.searchParams.set("select", "id,is_active");
+  candidateUrl.searchParams.set("id", `eq.${candidateId}`);
+  candidateUrl.searchParams.set("limit", "1");
+  let candidateResponse: Response;
+  try {
+    candidateResponse = await fetch(candidateUrl, {
+      method: "GET",
+      headers: {
+        apikey: cfg.serviceRoleKey,
+        authorization: `Bearer ${cfg.serviceRoleKey}`,
+        accept: "application/json"
+      },
+      cache: "no-store"
+    });
+  } catch {
+    return { ok: false, status: 503, code: "CANDIDATE_STATUS_LOOKUP_UNAVAILABLE", message: "Kingsmen could not check candidate account status." };
+  }
+  if (!candidateResponse.ok) {
+    return { ok: false, status: 503, code: "CANDIDATE_STATUS_QUERY_FAILED", message: "Kingsmen could not check candidate account status." };
+  }
+  const candidateRows = await candidateResponse.json().catch(() => null) as Array<{ id?: string; is_active?: boolean }> | null;
+  if (!Array.isArray(candidateRows) || candidateRows.length !== 1 || candidateRows[0].id !== candidateId || candidateRows[0].is_active !== true) {
+    return { ok: false, status: 403, code: "CANDIDATE_RECORD_INACTIVE", message: "This candidate record is inactive or unavailable." };
+  }
+
   return { ok: true, config: cfg, session: { userId: user.id, candidateId } };
 }
 
