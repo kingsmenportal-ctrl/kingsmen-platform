@@ -79,7 +79,8 @@
     "repo:prove:branch-protection": "node scripts/proof/prove-main-branch-protection-boundary.mjs",
     "repo:validate:branch-protection": "node scripts/validators/validate-main-branch-protection.mjs",
     "staging:capture:evidence": "pwsh -NoProfile -File scripts/staging/Invoke-KingsmenStagingRuntimeEvidencePack.ps1",
-    "final:collect:evidence": "pwsh -NoProfile -File scripts/staging/Collect-KingsmenFinalAssemblyEvidence.ps1"
+    "final:collect:evidence": "pwsh -NoProfile -File scripts/staging/Collect-KingsmenFinalAssemblyEvidence.ps1",
+    "candidate:validate:ownership-integrity": "node scripts/validators/validate-candidate-ownership-and-application-integrity.mjs"
   },
   "repository": {
     "type": "git",
