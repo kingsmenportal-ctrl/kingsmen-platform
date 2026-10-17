@@ -43,7 +43,7 @@ BEGIN
     candidate_id, channel, direction, urgency, subject, body,
     delivery_status, correlation_id, created_at
   ) VALUES (
-    p_candidate_id, 'PORTAL', 'INBOUND', p_urgency, trim(p_subject), trim(p_body),
+    p_candidate_id, 'PORTAL', 'OUTBOUND', p_urgency, trim(p_subject), trim(p_body),
     'QUEUED', v_correlation::text, now()
   ) RETURNING * INTO v_message;
 
@@ -91,7 +91,7 @@ BEGIN
   UPDATE public.candidate_messages
     SET delivery_status = 'READ', read_at = COALESCE(read_at, now())
     WHERE id = p_message_id AND candidate_id = p_candidate_id
-      AND direction IN ('OUTBOUND','SYSTEM')
+      AND direction IN ('INBOUND','SYSTEM')
     RETURNING * INTO v_message;
   IF NOT FOUND THEN RAISE EXCEPTION 'CANDIDATE_MESSAGE_NOT_FOUND_OR_NOT_READABLE' USING ERRCODE = 'P0002'; END IF;
 
