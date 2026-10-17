@@ -127,7 +127,5 @@ jobs:
         uses: actions/setup-node@v4
         with:
           node-version: '22'
-      - name: Validate candidate Phase A.1 source boundaries
-        run: npm run candidate:validate:phase-a1-bridges
-      - name: Validate candidate identity live-readiness boundary
-        run: npm run candidate:validate:live-readiness
+      - name: Validate complete Phase B candidate, identity, document and marketplace boundaries
+        run: npm run candidate:validate:phase-b
