@@ -89,7 +89,8 @@
     "candidate:validate:document-upload-policy": "node scripts/validators/validate-candidate-document-upload-policy.mjs",
     "candidate:validate:document-review": "node scripts/validators/validate-candidate-document-review.mjs",
     "candidate:validate:application-tracker-api": "node scripts/validators/validate-candidate-application-tracker-api.mjs",
-    "candidate:validate:application-tracker-ui": "node scripts/validators/validate-candidate-application-tracker-ui.mjs"
+    "candidate:validate:application-tracker-ui": "node scripts/validators/validate-candidate-application-tracker-ui.mjs",
+    "candidate:validate:document-metadata-bridge": "node scripts/validators/validate-candidate-document-metadata-bridge.mjs"
   },
   "repository": {
     "type": "git",
