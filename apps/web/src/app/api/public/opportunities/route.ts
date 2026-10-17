@@ -1,102 +1,20 @@
-import { NextResponse } from "next/server";
-
-export const runtime = "nodejs";
-export const dynamic = "force-dynamic";
-
-type Row = {
-  id: string;
-  programme_name: string;
-  route_type: string;
-  qualification_type: string | null;
-  province: string | null;
-  delivery_mode: string;
-  application_method: string;
-  source_url: string;
-  source_confidence_band: string;
-  route_status: string;
-  availability_status: string;
-  eligibility_summary: string;
-  updated_at: string;
-  route_providers?: {
-    provider_name: string;
-    provider_type: string;
-    base_url: string | null;
-    verification_status: string;
-    public_safe: boolean;
-  };
-};
-
-function unavailable(message: string, status = 503) {
-  return NextResponse.json(
-    { ok: false, status: "UNAVAILABLE", code: "PUBLIC_OPPORTUNITY_READ_UNAVAILABLE", message },
-    { status, headers: { "Cache-Control": "no-store", "X-Content-Type-Options": "nosniff" } }
-  );
-}
-
-export async function GET(request: Request) {
-  const base = process.env.SUPABASE_URL ?? process.env.KINGSMEN_SUPABASE_URL;
-  const apiKey = process.env.SUPABASE_PUBLISHABLE_KEY ?? process.env.NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY;
-  const anonToken = process.env.SUPABASE_ANON_KEY;
-  if (!base || !apiKey || !anonToken) {
-    return unavailable("The verified opportunity data connection is not configured. No sample opportunities are shown as real.");
-  }
-
-  const url = new URL(request.url);
-  const sector = url.searchParams.get("sector")?.trim().toUpperCase();
-  const province = url.searchParams.get("province")?.trim();
-  const search = url.searchParams.get("q")?.trim().slice(0, 100);
-  const allowedSectors = new Set(["UNIVERSITY", "TVET", "SETA", "LEARNERSHIP", "BURSARY", "ACCOMMODATION", "EMPLOYER", "PRIVATE_COLLEGE", "NSFAS", "CAO"]);
-  if (sector && !allowedSectors.has(sector)) {
-    return NextResponse.json({ ok: false, code: "INVALID_SECTOR" }, { status: 400 });
-  }
-
-  const query = new URL("/rest/v1/route_programmes", base);
-  query.searchParams.set("select", "id,programme_name,route_type,qualification_type,province,delivery_mode,application_method,source_url,source_confidence_band,route_status,availability_status,eligibility_summary,updated_at,route_providers!inner(provider_name,provider_type,base_url,verification_status,public_safe)");
-  query.searchParams.set("route_status", "eq.VERIFIED");
-  query.searchParams.set("availability_status", "in.(OPEN,FUTURE)");
-  query.searchParams.set("source_confidence_band", "in.(A,B)");
-  query.searchParams.set("route_providers.public_safe", "eq.true");
-  query.searchParams.set("route_providers.verification_status", "eq.VERIFIED");
-  query.searchParams.set("order", "updated_at.desc");
-  query.searchParams.set("limit", "100");
-  if (sector) query.searchParams.set("route_type", "eq." + sector);
-  if (province) query.searchParams.set("province", "eq." + province);
-  if (search) query.searchParams.set("or", "(programme_name.ilike.*" + search.replace(/[(),.*%_]/g, "") + "*,eligibility_summary.ilike.*" + search.replace(/[(),.*%_]/g, "") + "*)");
-
-  try {
-    const response = await fetch(query, {
-      headers: { apikey: apiKey, Authorization: "Bearer " + anonToken, Accept: "application/json" },
-      cache: "no-store",
-      signal: AbortSignal.timeout(8000)
-    });
-    if (!response.ok) return unavailable("The verified opportunity source could not be reached.");
-    const rows = await response.json() as Row[];
-    const now = Date.now();
-    const opportunities = rows.filter(row => {
-      if (!row.route_providers?.public_safe || row.route_providers.verification_status !== "VERIFIED") return false;
-      if (!row.source_url || !/^https?:\/\//i.test(row.source_url)) return false;
-      if (!row.updated_at || !Number.isFinite(Date.parse(row.updated_at)) || now - Date.parse(row.updated_at) > 1000 * 60 * 60 * 24 * 90) return false;
-      return true;
-    }).map(row => ({
-      id: row.id,
-      title: row.programme_name,
-      category: row.route_type,
-      qualification: row.qualification_type,
-      province: row.province,
-      deliveryMode: row.delivery_mode,
-      applicationMethod: row.application_method,
-      sourceUrl: row.source_url,
-      provider: row.route_providers?.provider_name ?? "Verified provider",
-      eligibilitySummary: row.eligibility_summary,
-      availability: row.availability_status,
-      verifiedAt: row.updated_at,
-      sourceConfidence: row.source_confidence_band
-    }));
-    return NextResponse.json(
-      { ok: true, source: "verified_database", count: opportunities.length, opportunities, checkedAt: new Date().toISOString() },
-      { headers: { "Cache-Control": "public, max-age=60, stale-while-revalidate=120", "X-Content-Type-Options": "nosniff" } }
-    );
-  } catch {
-    return unavailable("The verified opportunity source timed out or was unavailable.");
-  }
+import {NextResponse} from "next/server";
+export const runtime="nodejs";export const dynamic="force-dynamic";
+type Provider={provider_name:string;provider_type:string;base_url:string|null;verification_status:string;public_safe:boolean};
+type RouteRow={id:string;programme_name:string;route_type:string;qualification_type:string|null;province:string|null;delivery_mode:string;application_method:string;source_url:string|null;source_confidence_band:string;route_status:string;availability_status:string;eligibility_summary:string;updated_at:string;route_providers?:Provider};
+type PartnerRow={id:string;title:string;listing_type:string;description:string;province:string|null;location_text:string|null;official_source_url:string;application_url:string|null;application_method:string;eligibility:Record<string,unknown>|null;opens_at:string|null;closes_at:string|null;source_verified_at:string|null;updated_at:string;organisations?:{display_name:string;official_website:string|null;verification_status:string}};
+type Opportunity={id:string;sourceKind:"ROUTE_PROGRAMME"|"PARTNER_LISTING";title:string;category:string;qualification:string|null;province:string|null;deliveryMode:string;applicationMethod:string;sourceUrl:string;applicationUrl:string|null;provider:string;eligibilitySummary:string;availability:string;verifiedAt:string;sourceConfidence:string};
+function unavailable(message:string,status=503){return NextResponse.json({ok:false,status:"UNAVAILABLE",code:"PUBLIC_OPPORTUNITY_READ_UNAVAILABLE",message},{status,headers:{"Cache-Control":"no-store","X-Content-Type-Options":"nosniff"}});}
+function partnerCategory(type:string):string|null{switch(type){case"JOB":case"INTERNSHIP":return"EMPLOYER";case"LEARNERSHIP":case"APPRENTICESHIP":return"LEARNERSHIP";case"BURSARY":case"FUNDING":return"BURSARY";case"UNIVERSITY_COURSE":return"UNIVERSITY";case"TVET_COURSE":return"TVET";case"TRAINING":return"SETA";case"ACCOMMODATION":return"ACCOMMODATION";default:return null;}}
+function eligibilityText(value:Record<string,unknown>|null):string{if(!value)return"Confirm requirements, eligibility and current deadlines with the official provider before applying.";for(const key of ["summary","requirements","eligibility","description"]){const v=value[key];if(typeof v==="string"&&v.trim())return v.trim().slice(0,2000);}return"Confirm requirements, eligibility and current deadlines with the official provider before applying.";}
+export async function GET(request:Request){
+ const base=process.env.SUPABASE_URL??process.env.KINGSMEN_SUPABASE_URL;const apiKey=process.env.SUPABASE_PUBLISHABLE_KEY??process.env.NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY;const anonToken=process.env.SUPABASE_ANON_KEY;
+ if(!base||!apiKey||!anonToken)return unavailable("The verified opportunity data connection is not configured. No sample opportunities are shown as real.");
+ const incoming=new URL(request.url);const sector=incoming.searchParams.get("sector")?.trim().toUpperCase();const province=incoming.searchParams.get("province")?.trim();const rawSearch=incoming.searchParams.get("q")?.trim().slice(0,100)||"";const search=rawSearch.replace(/[(),.*%_]/g,"").trim();
+ const allowed=new Set(["UNIVERSITY","TVET","SETA","LEARNERSHIP","BURSARY","ACCOMMODATION","EMPLOYER","PRIVATE_COLLEGE","NSFAS","CAO"]);
+ if(sector&&!allowed.has(sector))return NextResponse.json({ok:false,code:"INVALID_SECTOR"},{status:400});
+ const cutoff=new Date(Date.now()-90*24*60*60*1000).toISOString();const now=new Date().toISOString();
+ const routesUrl=new URL("/rest/v1/route_programmes",base);routesUrl.searchParams.set("select","id,programme_name,route_type,qualification_type,province,delivery_mode,application_method,source_url,source_confidence_band,route_status,availability_status,eligibility_summary,updated_at,route_providers!inner(provider_name,provider_type,base_url,verification_status,public_safe)");routesUrl.searchParams.set("route_status","eq.VERIFIED");routesUrl.searchParams.set("availability_status","in.(OPEN,FUTURE)");routesUrl.searchParams.set("source_confidence_band","in.(A,B)");routesUrl.searchParams.set("route_providers.public_safe","eq.true");routesUrl.searchParams.set("route_providers.verification_status","eq.VERIFIED");routesUrl.searchParams.set("updated_at","gte."+cutoff);routesUrl.searchParams.set("order","updated_at.desc");routesUrl.searchParams.set("limit","100");if(province)routesUrl.searchParams.set("province","eq."+province);if(search)routesUrl.searchParams.set("or","(programme_name.ilike.*"+search+"*,eligibility_summary.ilike.*"+search+"*)");
+ const listingsUrl=new URL("/rest/v1/organisation_listings",base);listingsUrl.searchParams.set("select","id,title,listing_type,description,province,location_text,official_source_url,application_url,application_method,eligibility,opens_at,closes_at,source_verified_at,updated_at,organisations!inner(display_name,official_website,verification_status)");listingsUrl.searchParams.set("status","eq.PUBLISHED");listingsUrl.searchParams.set("source_verified_at","gte."+cutoff);listingsUrl.searchParams.set("organisations.verification_status","eq.VERIFIED");listingsUrl.searchParams.set("order","source_verified_at.desc");listingsUrl.searchParams.set("limit","100");listingsUrl.searchParams.set("or","(closes_at.is.null,closes_at.gte."+now+")");if(province)listingsUrl.searchParams.set("province","eq."+province);if(search)listingsUrl.searchParams.set("or","(title.ilike.*"+search+"*,description.ilike.*"+search+"*)");
+ try{const headers={apikey:apiKey,Authorization:"Bearer "+anonToken,Accept:"application/json"};const [routeResponse,listingResponse]=await Promise.all([fetch(routesUrl,{headers,cache:"no-store",signal:AbortSignal.timeout(8000)}),fetch(listingsUrl,{headers,cache:"no-store",signal:AbortSignal.timeout(8000)})]);if(!routeResponse.ok||!listingResponse.ok)return unavailable("The verified opportunity source could not be reached.");const routeRows=await routeResponse.json() as RouteRow[];const listingRows=await listingResponse.json() as PartnerRow[];const routeOpportunities:Opportunity[]=routeRows.filter(r=>r.route_providers?.public_safe&&r.route_providers.verification_status==="VERIFIED"&&r.source_url&&/^https?:\/\//i.test(r.source_url)&&Number.isFinite(Date.parse(r.updated_at))&&Date.now()-Date.parse(r.updated_at)<=90*86400000).map(r=>({id:r.id,sourceKind:"ROUTE_PROGRAMME",title:r.programme_name,category:r.route_type,qualification:r.qualification_type,province:r.province,deliveryMode:r.delivery_mode,applicationMethod:r.application_method,sourceUrl:r.source_url!,applicationUrl:null,provider:r.route_providers?.provider_name??"Verified provider",eligibilitySummary:r.eligibility_summary,availability:r.availability_status,verifiedAt:r.updated_at,sourceConfidence:r.source_confidence_band}));const listingOpportunities:Opportunity[]=listingRows.filter(l=>l.organisations?.verification_status==="VERIFIED"&&l.source_verified_at&&Number.isFinite(Date.parse(l.source_verified_at))&&Date.now()-Date.parse(l.source_verified_at)<=90*86400000&&l.official_source_url&&/^https?:\/\//i.test(l.official_source_url)&&(!l.closes_at||Date.parse(l.closes_at)>=Date.now())).map(l=>({id:l.id,sourceKind:"PARTNER_LISTING",title:l.title,category:partnerCategory(l.listing_type)||"OTHER",qualification:null,province:l.province,deliveryMode:l.location_text||"SEE_LISTING",applicationMethod:l.application_method,sourceUrl:l.official_source_url,applicationUrl:l.application_url,provider:l.organisations?.display_name||"Verified partner",eligibilitySummary:eligibilityText(l.eligibility),availability:l.opens_at&&Date.parse(l.opens_at)>Date.now()?"FUTURE":"OPEN",verifiedAt:l.source_verified_at!,sourceConfidence:"A"})).filter(l=>l.category!=="OTHER");let opportunities=[...routeOpportunities,...listingOpportunities];if(sector)opportunities=opportunities.filter(o=>o.category===sector);if(province)opportunities=opportunities.filter(o=>o.province===province);if(search){const needle=search.toLowerCase();opportunities=opportunities.filter(o=>(o.title+" "+o.provider+" "+o.eligibilitySummary).toLowerCase().includes(needle));}opportunities.sort((a,b)=>Date.parse(b.verifiedAt)-Date.parse(a.verifiedAt));opportunities=opportunities.slice(0,100);return NextResponse.json({ok:true,source:"verified_database",count:opportunities.length,opportunities,checkedAt:new Date().toISOString()},{headers:{"Cache-Control":"public, max-age=60, stale-while-revalidate=120","X-Content-Type-Options":"nosniff"}});}catch{return unavailable("The verified opportunity source timed out or was unavailable.");}
 }
