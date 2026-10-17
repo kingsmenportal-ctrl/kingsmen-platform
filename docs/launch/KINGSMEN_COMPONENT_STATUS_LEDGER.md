@@ -262,3 +262,11 @@ Foundation constraints remain unchanged: Phase 0 is **OPEN**, Phase 1 is **OPEN 
 - GitHub Actions confirmed that commit `12cf7bd6e119f3f8cd5e1b6d5e8239f21b5d696b` passed **Kingsmen Application Build Checks #59** and **Jarvis Live Runtime #738**. These runs validate that prior head, not the newly added PayFast tests or the latest recovery changes.
 - **New PayFast test verification is pending** until CI passes on the commit containing this test. This test suite is a source-level proof-contract check only; it does not simulate a real provider checkout, exercise database concurrency, apply migrations, or establish live payment readiness.
 - Live payments remain disabled. Migration 0036/0037 remain unapplied pending backup, isolated restore, and rehearsal gates. Phase 0 API lockfile/`npm ci` remains **OPEN**; Phase 1 backup/restore remains **OPEN / BLOCKED**. No secrets, migrations, deployments, or live payment actions were performed.
+
+
+### Mobile notifications follow-up — explicit urgent-channel opt-in (17 October 2026)
+
+- Changed the default candidate mobile notification preference so WhatsApp urgent messaging is **disabled by default**. WhatsApp is selected only when a preference explicitly enables the urgent-only channel; routine notifications remain email-first, with portal fallback when email is disabled and SMS available only when backup is explicitly enabled.
+- Expanded synthetic policy tests to assert the safe default and explicit urgent opt-in behavior. This is channel-selection policy only: no provider is connected, no message delivery is claimed, and quiet-hours enforcement/durable preference storage remain separate integration requirements.
+- Source/test commits: `ca4d25a8cbce77d5c07658d4fd66ffb9f26a9be2` and `370abbf9e48915caf9ed1bf751acf0c5b14bd579`. CI must run against the resulting PR head before treating the tests as verified.
+- Phase 0 API lockfile/clean `npm ci` remains **OPEN**. Phase 1 backup, isolated restore and migration rehearsal remains **OPEN / BLOCKED**. No migrations, secret changes, deployments or merges were made.
