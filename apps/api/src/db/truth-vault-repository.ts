@@ -356,35 +356,71 @@ export class TruthVaultRepository {
     }));
   }
 
-  /** Lists only application tracker rows belonging to the verified candidate UUID. */
+  /** Lists only application tracker rows belonging to the authenticated candidate UUID.
+   * The owner filter, RLS context, and access-audit event share one transaction.
+   * Fetch one row beyond the response cap so large accounts never see a silent partial list.
+   */
   async listOwnedApplicationsForOwner(candidateUuid: string): Promise<ApplicationWorkbenchReadModel[]> {
     this.assertEnabled();
     if (!/^[0-9a-f]{8}-[0-9a-f]{4}-[1-8][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i.test(candidateUuid)) return [];
-    const result = await this.pool!.query<ApplicationRow>(
-      `select a.id::text,
-              coalesce(a.metadata->>'applicationRef', a.id::text) as application_ref,
-              c.public_ref as candidate_ref,
-              a.route_type, a.source_confidence_band, a.current_state,
-              a.portal_health, a.map_fallback_required, a.last_evidence_ref,
-              a.updated_at::text
-         from applications a
-         join candidates c on c.id = a.candidate_id
-        where a.candidate_id = $1::uuid
-        order by a.updated_at desc, a.id asc
-        limit 200`,
-      [candidateUuid]
-    );
-    return result.rows.map((row) => ({
-      applicationId: row.application_ref,
-      candidateId: row.candidate_ref,
-      routeType: row.route_type,
-      sourceConfidenceBand: row.source_confidence_band,
-      currentState: row.current_state,
-      portalHealth: row.portal_health,
-      mapFallbackRequired: row.map_fallback_required,
-      lastEvidenceRef: row.last_evidence_ref ?? undefined,
-      lastUpdatedAt: row.updated_at
-    }));
+    const client = await this.pool!.connect();
+    const correlationId = `candidate_applications_${Date.now()}_${Math.random().toString(36).slice(2, 10)}`;
+    try {
+      await client.query("BEGIN");
+      await client.query(
+        "select set_config('app.kingsmen_role', $1, true), set_config('app.service_context', $2, true)",
+        ["service_role", "backend_api"]
+      );
+      const result = await client.query<ApplicationRow>(
+        `select a.id::text,
+                coalesce(a.metadata->>'applicationRef', a.id::text) as application_ref,
+                c.public_ref as candidate_ref,
+                a.route_type, a.source_confidence_band, a.current_state,
+                a.portal_health, a.map_fallback_required, a.last_evidence_ref,
+                a.updated_at::text
+           from applications a
+           join candidates c on c.id = a.candidate_id
+          where a.candidate_id = $1::uuid
+          order by a.updated_at desc, a.id asc
+          limit 201`,
+        [candidateUuid]
+      );
+      if (result.rows.length > 200) {
+        throw new Error("CANDIDATE_APPLICATION_RESULT_LIMIT_EXCEEDED");
+      }
+      await client.query(
+        `insert into audit_events
+           (event_id, event_type, severity, correlation_id, actor_id, candidate_id, message, metadata)
+         values ($1,$2,$3,$4,$5,$6,$7,$8::jsonb)`,
+        [
+          `evt_${Date.now()}_${Math.random().toString(36).slice(2, 10)}`,
+          "candidate.applications.listed",
+          "INFO",
+          correlationId,
+          candidateUuid,
+          candidateUuid,
+          "Authenticated candidate application tracker read completed.",
+          JSON.stringify({ returnedCount: result.rows.length, responseLimit: 200 })
+        ]
+      );
+      await client.query("COMMIT");
+      return result.rows.map((row) => ({
+        applicationId: row.application_ref,
+        candidateId: row.candidate_ref,
+        routeType: row.route_type,
+        sourceConfidenceBand: row.source_confidence_band,
+        currentState: row.current_state,
+        portalHealth: row.portal_health,
+        mapFallbackRequired: row.map_fallback_required,
+        lastEvidenceRef: row.last_evidence_ref ?? undefined,
+        lastUpdatedAt: row.updated_at
+      }));
+    } catch (error) {
+      await client.query("ROLLBACK").catch(() => undefined);
+      throw error;
+    } finally {
+      client.release();
+    }
   }
 
   /** Lists application rows via the explicit Supabase Auth UUID binding used by staging RLS. */
