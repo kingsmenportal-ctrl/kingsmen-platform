@@ -33,6 +33,12 @@ assert.match(policy, /EVIDENCE_MISMATCH/, "mismatched evidence must fail closed"
 const applicationRead = read("apps/api/src/candidate/candidate-application-read.ts");
 assert.ok(applicationRead.includes("result.rows.length > 500"), "application tracker must detect result overflow");
 assert.ok(applicationRead.includes("CANDIDATE_APPLICATION_RESULT_LIMIT_EXCEEDED"), "application tracker must not silently truncate results");
+assert.ok(applicationRead.includes("CANDIDATE_APPLICATION_ROW_INVALID"), "application tracker must reject malformed database rows");
+assert.ok(applicationRead.includes("Number.isFinite(Date.parse(row.updated_at))"), "application tracker must validate application timestamps");
+const applicationReadTests = read("apps/api/src/candidate/candidate-application-read.test.ts");
+assert.ok(applicationReadTests.includes("fails closed when a joined application row has missing required fields"));
+assert.ok(applicationReadTests.includes("fails closed when application timestamps are malformed"));
+assert.ok(applicationReadTests.includes("allows nullable optional institution and evidence references"));
 assert.ok(read("apps/api/src/candidate/candidate-application-read.test.ts").includes("fails closed rather than silently truncating more than 500 applications"));
 
 const policyTests = read("apps/api/src/personal-jobs/application-state.test.ts");
