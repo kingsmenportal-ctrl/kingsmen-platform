@@ -46,6 +46,15 @@ function cookieOptions(maxAge: number) {
   return { httpOnly: true, secure: process.env.NODE_ENV === "production", sameSite: "lax" as const, path: "/", maxAge };
 }
 
+export function hasValidAuthTokenPair(payload: unknown): payload is { access_token: string; refresh_token: string } {
+  if (!payload || typeof payload !== "object") return false;
+  const value = payload as Record<string, unknown>;
+  return typeof value.access_token === "string" &&
+    value.access_token.length >= 16 && value.access_token.length <= 16_384 &&
+    typeof value.refresh_token === "string" &&
+    value.refresh_token.length >= 16 && value.refresh_token.length <= 4_096;
+}
+
 export async function setAuthCookies(accessToken: string, refreshToken: string, expiresIn?: number) {
   const jar = await cookies();
   jar.set(ACCESS_COOKIE, accessToken, cookieOptions(Math.max(60, Math.min(Number(expiresIn || 3600), 86400))));
