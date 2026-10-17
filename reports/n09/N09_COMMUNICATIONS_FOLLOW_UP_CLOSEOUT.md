@@ -1,0 +1,12 @@
+# N09 Implementation Closeout
+- Branch: n09-communications-follow-up-2026-10-17
+- Parent: n08-outcomes-progression-2026-10-17
+- Migration: db/migrations/0063_n09_communications_follow_up.sql
+- Candidate endpoints: GET history/tasks and acknowledge a delivered message.
+- Reviewer endpoints: prepare a message, create/update tasks, record provider event states.
+- Candidate page: /candidate/messages (API: /api/candidate/communications)
+- Reviewer page: /reviewer/communications (API: /api/reviewer/communications)
+- Validator: npm run n09:communications:validate
+- Contract checks: npm run n09:communications:test
+- Safety: no sender integration; no claim of actual sending/delivery. productionReady=false.
+- Release gates: apply migrations 0060–0063 in order; confirm service-role server-side configuration; fix existing Actions failures with logs; run full app build, authorization/isolation tests, authenticated provider webhook tests, consent tests, dedupe/retry tests and staging smoke tests.

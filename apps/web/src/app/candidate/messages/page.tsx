@@ -1,24 +1,8 @@
-export default function CandidateMessagesPage() {
-  return (
-    <main>
-      <h1>Kingsmen Messages</h1>
-      <p>Email is the primary tracked communication channel. Portal messages are safe copies for visibility.</p>
-      <p>WhatsApp is urgent-only. SMS is backup-only. Bulk WhatsApp reminders are not used.</p>
-
-      <section aria-label="Message Centre Boundary">
-        <article>
-          <h2>Routine updates</h2>
-          <p>Sent by email and copied here.</p>
-        </article>
-        <article>
-          <h2>Urgent alerts</h2>
-          <p>WhatsApp may be used only for urgent or ceremonial cases.</p>
-        </article>
-        <article>
-          <h2>Evidence</h2>
-          <p>Every message requires a message evidence ledger record.</p>
-        </article>
-      </section>
-    </main>
-  );
-}
+"use client";
+import {useCallback,useEffect,useState} from "react";
+type Row=Record<string,any>;
+export default function CandidateMessagesPage(){const [data,setData]=useState<{communications:Row[];tasks:Row[]}>({communications:[],tasks:[]}),[error,setError]=useState(""),[busy,setBusy]=useState("");
+const load=useCallback(async()=>{try{const r=await fetch("/api/candidate/communications",{cache:"no-store"});const j=await r.json();if(!r.ok||!j.ok)throw new Error(j.error||"Communication history unavailable.");setData({communications:j.communications||[],tasks:j.tasks||[]});setError("");}catch(e){setError(e instanceof Error?e.message:"Unable to load messages.");}},[]);
+useEffect(()=>{void load();},[load]);
+async function acknowledge(id:string){setBusy(id);try{const r=await fetch("/api/candidate/communications",{method:"POST",headers:{"content-type":"application/json"},body:JSON.stringify({communicationId:id})});const j=await r.json();if(!r.ok||!j.ok)throw new Error(j.error||"Acknowledgement failed.");await load();}catch(e){setError(e instanceof Error?e.message:"Acknowledgement failed.");}finally{setBusy("");}}
+return <main style={{maxWidth:960,margin:"0 auto",padding:24}}><h1>Messages & follow-up</h1><p>Messages are shown with their verified state. Prepared does not mean sent; sent does not mean delivered. Acknowledgement is available only after a delivery receipt is recorded.</p>{error&&<p role="alert">{error}</p>}<button onClick={()=>void load()}>Refresh</button><h2>Communication history</h2>{data.communications.length===0?<p>No messages recorded.</p>:data.communications.map(m=><article key={m.id} style={{border:"1px solid #aaa",borderRadius:8,padding:16,margin:"12px 0"}}><h3>{m.subject||m.event_key}</h3><p>{m.body}</p><p>Channel: {m.channel} · Priority: {m.priority} · State: <strong>{m.state}</strong></p><p>Created: {m.created_at} {m.sent_at&&" · Sent: "+m.sent_at}{m.delivered_at&&" · Delivered: "+m.delivered_at}{m.acknowledged_at&&" · Acknowledged: "+m.acknowledged_at}</p>{m.last_error_code&&<p>Last error: {m.last_error_code}</p>}{m.state==="DELIVERED"&&<button disabled={busy===m.id} onClick={()=>void acknowledge(m.id)}>{busy===m.id?"Saving…":"Acknowledge receipt"}</button>}</article>)}<h2>Open follow-up tasks</h2>{data.tasks.length===0?<p>No open follow-up tasks.</p>:data.tasks.map(t=><article key={t.id} style={{border:"1px solid #aaa",borderRadius:8,padding:16,margin:"12px 0"}}><h3>{t.title}</h3><p>{t.description}</p><p>{t.task_type} · {t.status} {t.due_at&&" · Due "+t.due_at}</p></article>)}</main>}
