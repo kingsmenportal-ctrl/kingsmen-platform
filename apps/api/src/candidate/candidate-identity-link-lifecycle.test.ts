@@ -85,6 +85,28 @@ test("empty reason is rejected and no database changes occur", async () => {
   assert.equal(f.calls.length, 0);
 });
 
+test("rejects malformed candidate UUID and empty correlation ID before database access", async () => {
+  const candidateDb = fakeDb();
+  await assert.rejects(createPendingCandidateIdentityLink(candidateDb.db, OPERATOR, {...COMMAND, candidateId: "bad"}), /INVALID_CANDIDATE/);
+  assert.equal(candidateDb.calls.length, 0);
+
+  const correlationDb = fakeDb();
+  await assert.rejects(createPendingCandidateIdentityLink(correlationDb.db, OPERATOR, {...COMMAND, correlationId: "  "}), /INVALID_CORRELATION_ID/);
+  assert.equal(correlationDb.calls.length, 0);
+});
+
+test("rejects overlong revocation reason before database access", async () => {
+  const f = fakeDb();
+  await assert.rejects(revokeCandidateIdentityLink(f.db, OPERATOR, {...COMMAND, reason: "r".repeat(501)}), /INVALID_REASON/);
+  assert.equal(f.calls.length, 0);
+});
+
+test("failed verification audit insert propagates for transaction rollback", async () => {
+  const f = fakeDb({failAudit:true});
+  await assert.rejects(verifyPendingCandidateIdentityLink(f.db, OPERATOR, COMMAND), /audit insert failed/);
+  assert.equal(f.calls.length, 2);
+});
+
 test("failed audit insert bubbles so caller transaction can roll back the state change", async () => {
   const f = fakeDb({failAudit:true});
   await assert.rejects(revokeCandidateIdentityLink(f.db, OPERATOR, COMMAND), /audit insert failed/);
