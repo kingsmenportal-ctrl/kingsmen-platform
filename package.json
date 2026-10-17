@@ -84,7 +84,8 @@
     "candidate:validate:application-read": "node scripts/validators/validate-candidate-application-read-boundary.mjs",
     "candidate:validate:transaction": "node scripts/validators/validate-candidate-backend-transaction.mjs",
     "candidate:validate:identity-link-lifecycle": "node scripts/validators/validate-candidate-identity-link-lifecycle.mjs",
-    "candidate:validate:identity-link-admin-runtime": "node scripts/validators/validate-candidate-identity-link-admin-runtime.mjs"
+    "candidate:validate:identity-link-admin-runtime": "node scripts/validators/validate-candidate-identity-link-admin-runtime.mjs",
+    "candidate:validate:document-vault": "node scripts/validators/validate-candidate-document-vault.mjs"
   },
   "repository": {
     "type": "git",
