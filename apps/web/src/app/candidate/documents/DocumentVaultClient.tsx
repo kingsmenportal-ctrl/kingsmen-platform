@@ -1,6 +1,7 @@
 "use client";
 
-import { useCallback, useEffect, useState, type FormEvent } from "react";\nimport { getKingsmenSession } from "../../../../lib/supabase-browser-auth";
+import { useCallback, useEffect, useState, type FormEvent } from "react";
+import { getKingsmenSession } from "../../../../lib/supabase-browser-auth";
 
 type DocumentRow = {
   id: string;
@@ -46,31 +47,6 @@ const documentTypes = [
   ["OTHER", "Other document"]
 ] as const;
 
-function getStoredAccessToken(): string | null {
-  try {
-    for (let index = 0; index < localStorage.length; index += 1) {
-      const key = localStorage.key(index);
-      if (!key || !key.startsWith("sb-") || !key.endsWith("-auth-token")) continue;
-      const raw = localStorage.getItem(key);
-      if (!raw) continue;
-      let parsed: unknown;
-      try {
-        const normalized = raw.startsWith("base64-") ? atob(raw.slice(7)) : raw;
-        parsed = JSON.parse(normalized);
-      } catch {
-        continue;
-      }
-      if (parsed && typeof parsed === "object" && "access_token" in parsed) {
-        const token = (parsed as { access_token?: unknown }).access_token;
-        if (typeof token === "string" && token.length > 20) return token;
-      }
-    }
-  } catch {
-    return null;
-  }
-  return null;
-}
-
 function readableBytes(value: number | string): string {
   const bytes = Number(value);
   if (!Number.isFinite(bytes) || bytes < 0) return "Unknown size";
@@ -90,12 +66,12 @@ export default function DocumentVaultClient() {
   const [message, setMessage] = useState("");
 
   useEffect(() => {
-    setAccessToken(getStoredAccessToken());
-    setLoading(false);
+    void getKingsmenSession().then(session => setAccessToken(session?.access_token || null)).finally(() => setLoading(false));
   }, []);
 
   const refresh = useCallback(async () => {
-    const session = await getKingsmenSession();\n    const token = session?.access_token || accessToken;
+    const session = await getKingsmenSession();
+    const token = session?.access_token || accessToken;
     if (!token) {
       setMessage("No signed-in Supabase session was found in this browser. Sign in before opening private documents.");
       return;
@@ -123,7 +99,8 @@ export default function DocumentVaultClient() {
   }, [accessToken, refresh]);
 
   async function openDocument(documentId: string) {
-    const session = await getKingsmenSession();\n    const token = session?.access_token || accessToken;
+    const session = await getKingsmenSession();
+    const token = session?.access_token || accessToken;
     if (!token) {
       setMessage("No signed-in session was found. Sign in before reading private documents.");
       return;
@@ -147,7 +124,8 @@ export default function DocumentVaultClient() {
 
   async function uploadDocument(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
-    const session = await getKingsmenSession();\n    const token = session?.access_token || accessToken;
+    const session = await getKingsmenSession();
+    const token = session?.access_token || accessToken;
     if (!token) {
       setMessage("No signed-in session was found. Sign in before uploading private documents.");
       return;
