@@ -26,6 +26,7 @@ CREATE TABLE IF NOT EXISTS public.candidate_outcome_correction_requests (
 );
 CREATE INDEX IF NOT EXISTS idx_n08_correction_candidate ON public.candidate_outcome_correction_requests(candidate_id,created_at DESC);
 CREATE INDEX IF NOT EXISTS idx_n08_correction_queue ON public.candidate_outcome_correction_requests(status,created_at ASC);
+CREATE UNIQUE INDEX IF NOT EXISTS idx_n08_one_open_correction_per_outcome ON public.candidate_outcome_correction_requests(outcome_id) WHERE status IN ('OPEN','UNDER_REVIEW');
 ALTER TABLE public.candidate_outcomes ENABLE ROW LEVEL SECURITY;
 ALTER TABLE public.candidate_outcome_correction_requests ENABLE ROW LEVEL SECURITY;
 GRANT SELECT,INSERT,UPDATE ON public.candidate_outcomes TO service_role;
@@ -44,7 +45,12 @@ BEGIN
  OR NEW.opportunity_id IS DISTINCT FROM OLD.opportunity_id OR NEW.outcome_type IS DISTINCT FROM OLD.outcome_type
  OR NEW.evidence_id IS DISTINCT FROM OLD.evidence_id OR NEW.evidence_ref IS DISTINCT FROM OLD.evidence_ref
  OR NEW.confirmed_by_auth_user_id IS DISTINCT FROM OLD.confirmed_by_auth_user_id OR NEW.confirmed_at IS DISTINCT FROM OLD.confirmed_at
- THEN RAISE EXCEPTION 'candidate outcome identity and evidence are immutable'; END IF;
+ OR NEW.outcome_ref IS DISTINCT FROM OLD.outcome_ref OR NEW.provider_name IS DISTINCT FROM OLD.provider_name
+ OR NEW.provider_reference IS DISTINCT FROM OLD.provider_reference OR NEW.summary IS DISTINCT FROM OLD.summary
+ OR NEW.next_step IS DISTINCT FROM OLD.next_step OR NEW.created_at IS DISTINCT FROM OLD.created_at
+ THEN RAISE EXCEPTION 'candidate outcome identity, evidence and content are immutable'; END IF;
+ IF NEW.outcome_status IS DISTINCT FROM OLD.outcome_status AND NOT (OLD.outcome_status='CONFIRMED' AND NEW.outcome_status IN ('DISPUTED','SUPERSEDED')) AND NOT (OLD.outcome_status='DISPUTED' AND NEW.outcome_status='SUPERSEDED')
+ THEN RAISE EXCEPTION 'invalid outcome status transition'; END IF;
  RETURN NEW;
 END; $$;
 DROP TRIGGER IF EXISTS n08_outcomes_identity_immutable ON public.candidate_outcomes;
