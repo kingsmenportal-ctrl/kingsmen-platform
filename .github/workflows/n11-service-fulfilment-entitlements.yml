@@ -13,7 +13,7 @@ on:
       - '.github/workflows/n11-service-fulfilment-entitlements.yml'
   push:
     branches:
-      - 'n11-service-fulfilment-entitlements-2026-10-17'
+      - 'n11-service-fulfilment-entitlements-integrated-2026-10-17'
     paths:
       - 'db/migrations/0071_n11_service_fulfilment_entitlements.sql'
       - 'scripts/validators/validate-n11-entitlements.mjs'
