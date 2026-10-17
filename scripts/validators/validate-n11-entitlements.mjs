@@ -4,6 +4,8 @@ const sql=fs.readFileSync("db/migrations/0071_n11_service_fulfilment_entitlement
 const webhook=fs.readFileSync("apps/web/src/app/api/webhooks/payfast/route.ts","utf8");
 const candidateApi=fs.readFileSync("apps/web/src/app/api/candidate/entitlements/route.ts","utf8");
 const reviewerApi=fs.readFileSync("apps/web/src/app/api/reviewer/entitlements/route.ts","utf8");
+const candidatePage=fs.readFileSync("apps/web/src/app/candidate/entitlements/page.tsx","utf8");
+const reviewerPage=fs.readFileSync("apps/web/src/app/reviewer/entitlements/page.tsx","utf8");
 for(const needle of [
  "candidate_entitlements","candidate_entitlement_events","UNIQUE",
  "n11_hold_entitlement_for_order","n11_grant_entitlement","n11_transition_entitlement",
@@ -28,4 +30,11 @@ assert.match(candidateApi,/events/);
 assert.match(reviewerApi,/n11_hold_entitlement_for_order/);
 assert.match(reviewerApi,/n11_transition_entitlement/);
 assert.doesNotMatch(reviewerApi,/n11_grant_entitlement/);
+assert.match(reviewerApi,/export async function GET/);
+assert.match(candidatePage,/My services & entitlements/);
+assert.match(candidatePage,/candidate_entitlements/);
+assert.match(reviewerPage,/Service fulfilment review/);
+assert.match(reviewerPage,/Place hold/);
+assert.match(reviewerPage,/Revoke service/);
+assert.doesNotMatch(reviewerPage,/n11_grant_entitlement/);
 console.log("N11 entitlement validator passed: verified-payment gate, idempotency, holds, revocation, privilege boundary and immutable events.");
