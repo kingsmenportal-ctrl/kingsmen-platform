@@ -3,7 +3,7 @@ import { resolve } from "node:path";
 
 const root = process.cwd();
 const service = readFileSync(resolve(root, "apps/api/src/candidate/candidate-identity-link-lifecycle.ts"), "utf8");
-const migration = readFileSync(resolve(root, "db/migrations/0018_n20_candidate_auth_identity_link.sql"), "utf8");
+const migration = readFileSync(resolve(root, "db/migrations/0040_candidate_auth_identity_link.sql"), "utf8");
 const checks = [
   ["operator authorization required", /isAuthorizedOperator\(actorId\)/.test(service)],
   ["pending-only verification", /link\.link_status = 'PENDING'/.test(service)],
