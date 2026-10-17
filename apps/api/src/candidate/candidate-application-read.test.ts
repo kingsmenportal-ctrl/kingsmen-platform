@@ -99,3 +99,26 @@ test("fails closed rather than silently truncating more than 500 applications", 
     /CANDIDATE_APPLICATION_RESULT_LIMIT_EXCEEDED/
   );
 });
+
+test("fails closed when a joined application row has missing required fields", async () => {
+  await assert.rejects(
+    listApplicationsForVerifiedAuthUser(fakeDatabase([{ ...appRow, route_name: null }]), AUTH_USER_ID),
+    /CANDIDATE_APPLICATION_ROW_INVALID/
+  );
+});
+
+test("fails closed when application timestamps are malformed", async () => {
+  await assert.rejects(
+    listApplicationsForVerifiedAuthUser(fakeDatabase([{ ...appRow, updated_at: "not-a-date" }]), AUTH_USER_ID),
+    /CANDIDATE_APPLICATION_ROW_INVALID/
+  );
+});
+
+test("allows nullable optional institution and evidence references", async () => {
+  const rows = await listApplicationsForVerifiedAuthUser(
+    fakeDatabase([{ ...appRow, institution_or_provider: null, last_evidence_ref: null }]),
+    AUTH_USER_ID
+  );
+  assert.equal(rows?.[0].institutionOrProvider, null);
+  assert.equal(rows?.[0].lastEvidenceRef, null);
+});
