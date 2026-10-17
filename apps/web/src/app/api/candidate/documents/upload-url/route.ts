@@ -1,4 +1,4 @@
-import { n05Candidate, n05ErrorResponse, n05Rest, n05SafeFilename, n05Ref, validateN05Upload, N05Error } from "../../../../lib/n05-server";
+import { n05Candidate, n05ErrorResponse, n05Rest, n05SafeFilename, n05Ref, validateN05Upload, N05Error } from "../../../../../lib/n05-server";
 
 export async function POST(request: Request) {
   try {
