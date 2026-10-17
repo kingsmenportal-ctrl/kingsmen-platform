@@ -32,9 +32,9 @@ Review of `apps/api/src/server.ts` found the command, workflow-result, Jarvis ru
 
 A missing server token returns `503 API_AUTH_NOT_CONFIGURED`; missing/incorrect credentials return `401 UNAUTHENTICATED`. Comparisons use `timingSafeEqual`. These are service-to-service credentials only, not candidate identity or candidate-level authorisation. Keep the routes behind a trusted backend boundary; do not expose these credentials to browser clients. Candidate-scoped access requires a separate identity-bound API design before public exposure.
 
-## 4. Workflow concurrency and rollback — still open
+## 4. Workflow concurrency and rollback — implementation added; runtime proof open
 
-The current repository write paths issue multiple statements without an explicit transaction. The existing code therefore does not yet establish atomic rollback for candidate/application upserts, workflow rows, evidence, audit, and idempotency records. Concurrent duplicate command/workflow submissions have not been proven safe. Do not mark these controls complete until the repository uses transaction-scoped locking/unique conflict handling and staging tests prove exactly one logical result and zero partial rows after an induced late failure.
+The repository now wraps command and workflow persistence in explicit PostgreSQL transactions, uses transaction-scoped advisory locks for command idempotency and workflow idempotency/run identity, and passes the transaction client to candidate/application, evidence, audit and idempotency writes. The staging proof now exercises concurrent duplicate command and workflow submissions. However, those checks have not been executed against the deployed API/database; rollback after a controlled late failure remains unproven. Do not mark these controls complete until the API build and staging checks pass.
 
 ## 5. RLS role-boundary tests — partially evidenced
 
