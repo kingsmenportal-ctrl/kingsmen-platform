@@ -1,4 +1,4 @@
-import { createDocumentUploadId, requireCandidateSession, supabaseAdminFetch } from "../../../../../lib/candidate-document-runtime";
+import { createDocumentUploadId, requireCandidateSession, supabaseAdminFetch, verifyPrivateDocumentsBucket } from "../../../../../lib/candidate-document-runtime";
 
 const MAX_UPLOAD_BYTES = 15 * 1024 * 1024;
 const ALLOWED_TYPES: Record<string, string[]> = {
@@ -53,6 +53,10 @@ export async function POST(request: Request) {
     return Response.json({ ok: false, code: "FILE_SIZE_OUT_OF_RANGE", error: "Documents must be between 1 byte and 15 MiB." }, { status: 413 });
   }
 
+  if (!(await verifyPrivateDocumentsBucket(auth.config))) {
+    return Response.json({ ok: false, code: "DOCUMENT_BUCKET_NOT_PRIVATE", error: "The configured document bucket must exist and be private before uploads are enabled." }, { status: 503 });
+  }
+
   const uploadId = createDocumentUploadId();
   const objectPath = `${auth.session.candidateId}/${uploadId}/${safeFilename(filename)}`;
   const encodedPath = objectPath.split("/").map(encodeURIComponent).join("/");
@@ -85,7 +89,7 @@ export async function POST(request: Request) {
 
   return Response.json({
     ok: true,
-    productionReady: true,
+    productionReady: false,
     candidateId: auth.session.candidateId,
     documentTypeCode,
     uploadId,
