@@ -15,7 +15,7 @@ BEGIN
     RAISE EXCEPTION 'candidate order inputs are invalid';
   END IF;
   IF NOT EXISTS (SELECT 1 FROM public.candidate_accounts
-    WHERE candidate_id=p_candidate_id AND auth_user_id=p_actor_auth_user_id) THEN
+    WHERE candidate_id=p_candidate_id AND auth_user_id=p_actor_auth_user_id AND email_verified IS TRUE) THEN
     RAISE EXCEPTION 'authenticated user is not linked to this candidate';
   END IF;
   SELECT * INTO v_order FROM public.candidate_service_orders
@@ -75,7 +75,7 @@ BEGIN
     RAISE EXCEPTION 'refund request inputs are invalid';
   END IF;
   IF NOT EXISTS (SELECT 1 FROM public.candidate_accounts
-    WHERE candidate_id=p_candidate_id AND auth_user_id=p_actor_auth_user_id) THEN
+    WHERE candidate_id=p_candidate_id AND auth_user_id=p_actor_auth_user_id AND email_verified IS TRUE) THEN
     RAISE EXCEPTION 'authenticated user is not linked to this candidate';
   END IF;
   SELECT * INTO v_refund FROM public.candidate_refund_requests
@@ -136,6 +136,7 @@ LANGUAGE plpgsql SECURITY DEFINER SET search_path = public, pg_temp AS $$
 DECLARE
   v_order public.candidate_service_orders%ROWTYPE;
   v_event public.candidate_payment_events%ROWTYPE;
+  v_old_status text;
 BEGIN
   IF p_actor_auth_user_id IS NULL OR length(coalesce(p_payment_reference,''))<1
      OR length(coalesce(p_evidence_locator,''))<1
@@ -153,6 +154,7 @@ BEGIN
   IF FOUND THEN RETURN QUERY SELECT v_order.id,v_order.order_ref,v_order.status,v_order.amount_minor,v_order.currency,true; RETURN; END IF;
   IF v_order.status NOT IN ('PENDING_PAYMENT','PAYMENT_FAILED') THEN RAISE EXCEPTION 'order state does not permit manual review'; END IF;
 
+  v_old_status := v_order.status;
   INSERT INTO public.candidate_payment_events(
     event_ref,order_id,candidate_id,event_type,source,amount_minor,provider_reference,
     evidence_locator,evidence_sha256,note,actor_auth_user_id,idempotency_key,metadata
@@ -170,7 +172,7 @@ BEGIN
     'KMFINAUDIT-'||replace(gen_random_uuid()::text,'-',''),p_actor_auth_user_id,
     CASE WHEN EXISTS(SELECT 1 FROM public.platform_reviewers WHERE auth_user_id=p_actor_auth_user_id AND role_code='PLATFORM_ADMIN' AND is_active=true AND revoked_at IS NULL) THEN 'PLATFORM_ADMIN' ELSE 'FINANCE_REVIEWER' END,
     'MANUAL_PAYMENT_CONFIRMED','ORDER',v_order.id,
-    jsonb_build_object('status','PENDING_PAYMENT'),
+    jsonb_build_object('status',v_old_status),
     jsonb_build_object('status','PAID','payment_reference',p_payment_reference,'evidence_sha256',lower(p_evidence_sha256)),p_reason
   );
   RETURN QUERY SELECT v_order.id,v_order.order_ref,v_order.status,v_order.amount_minor,v_order.currency,false;
