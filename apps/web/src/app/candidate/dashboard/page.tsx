@@ -11,6 +11,7 @@ const gates = [
 
 const dailyActions = [
   ["Profile", "/candidate/profile", "Review linked identity, evidence-backed profile fields, and correction requests."],
+  ["Applications", "/candidate/applications", "Discover opportunities, check readiness, track application drafts, and prepare manual action packages."],
   ["Saved opportunities", "/candidate/saved-opportunities", "Return to opportunities saved to your account."],
   ["Applications and outcomes", "/candidate/outcomes", "Review application tracking and recorded outcomes."],
   ["Documents", "/candidate/documents", "Review your document checklist and status."],
