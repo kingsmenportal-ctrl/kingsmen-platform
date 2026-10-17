@@ -20,11 +20,18 @@ on:
   push:
     branches:
       - candidate-document-runtime-wiring-2026-10-17
+      - n05-quarantine-scan-reconciliation-2026-10-17
     paths:
       - "apps/web/src/app/api/candidate/documents/**"
       - "apps/web/src/app/candidate/documents/**"
+      - "apps/web/src/app/api/internal/documents/**"
       - "apps/web/src/lib/candidate-document-runtime.ts"
       - "scripts/validators/validate-n05-document-vault.mjs"
+      - "scripts/validators/validate-n05-quarantine-scan.mjs"
+      - "scripts/tests/n05-document-isolation.integration.mjs"
+      - "db/migrations/0005_n05_quarantine_scan_reconciliation.sql"
+      - "scripts/db/Run-N05Migration.ps1"
+      - "docs/api/N05_QUARANTINE_MALWARE_SCAN_RECONCILIATION.md"
       - "package.json"
       - "apps/web/package.json"
       - ".github/workflows/n05-document-vault.yml"
