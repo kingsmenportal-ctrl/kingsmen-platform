@@ -362,3 +362,46 @@ A feature is “operational” only when all applicable checks are true:
 Build for the real day: a real person registers, confirms identity, gives consent, uploads a private document for a named reason, sees it stored and reviewed, selects a specific route, tracks a specific application, receives accurate communication, and sees an evidenced outcome. At the same time, the Founder wakes to a truthful operational brief, handles the highest-risk decisions, and can see what the workers did overnight.
 
 If the code cannot identify **who did what, when, why, against which candidate/route/document, where the bytes/state live, what evidence proves it, what failed, and who must act next**, the workflow is not finished.
+
+
+## 12. Additional source recovery — pricing, application constraints, and Founder clock
+
+A second pass through `config/environment/.env.template` found additional package values and operating constraints that were missing from the first summary. These are **repository-recorded configuration values**, not yet independently reconciled against every Commander-approved pricing record, production catalogue, checkout and finance path. Preserve them for reconciliation; do not silently publish/charge from the environment template alone.
+
+| Environment key | Recorded value |
+|---|---:|
+| `KINGSMEN_FOUNDATIONAL_ACCORD_PRICE` | R169.99 |
+| `KINGSMEN_COLLEGIATE_ORDINANCE_PRICE` | R299.99 |
+| `KINGSMEN_CHANCELLORS_WRIT_PRICE` | R399.99 |
+| `KINGSMEN_REGENCY_MANDATE_PRICE` | R469.99 |
+| `KINGSMEN_ARTISAN_CHARTER_PRICE` | R149.99 |
+| `KINGSMEN_GUILDMASTERS_CHARTER_PRICE` | R199.99 |
+| `KINGSMEN_CV_REVAMP_PRICE` | R49.99 |
+| `KINGSMEN_CV_REVAMP_UPGRADE_EXTRA_ROUTES` | 2 |
+| `KINGSMEN_NSFA_FEE_TASKS_ALLOWED` | false |
+| `KINGSMEN_CAO_PARENT_APPLICATION_MODEL` | true |
+| `KINGSMEN_FAST_SUBMISSION_TARGET_MINUTES` | 60 |
+
+The template also records:
+- `KINGSMEN_TIMEZONE=Africa/Johannesburg`
+- `FOUNDER_MORNING_DIGEST_HOUR=08`
+- `FOUNDER_END_OF_DAY_CHECK_HOUR=18`
+- `FOUNDER_ACTION_PACKETS_ENABLED=true`
+- `FOUNDER_URGENT_ALERTS_ENABLED=true`
+- `FOUNDER_STOP_SELLING_ALERTS_ENABLED=true`
+- `KINGSMEN_STOP_SELLING_AT_CAP=true`
+- `KINGSMEN_WORKER_CONCURRENCY=2`
+- `KINGSMEN_PLAYWRIGHT_MAX_CONCURRENCY=1`
+- `SUPABASE_STORAGE_BUCKET=kingsmen-documents`
+- `SUPABASE_SIGNED_UPLOAD_TTL_SECONDS=900`
+- `SUPABASE_RLS_REQUIRED=true`
+- `SIGNED_UPLOADS_REQUIRED=true`
+- `SERVICE_ROLE_BROWSER_EXPOSURE_ALLOWED=false`
+
+Operational interpretation:
+1. The configured morning digest target is 08:00 Africa/Johannesburg and the end-of-day check target is 18:00 Africa/Johannesburg. The scheduler must honour the configured timezone, detect late/missed runs, and record actual start/delivery timestamps; these settings do not prove the scheduler is deployed or delivering.
+2. The 60-minute fast-submission value is a target, not a guarantee. Use it only for eligible work after source, documents, consent and provider availability are ready; never bypass OTP/CAPTCHA or official review to meet it.
+3. NSFAS fee tasks are explicitly disabled in the template; never represent Kingsmen as paying official NSFAS fees or enable fee-related actions without a Commander-approved policy change.
+4. The CAO parent-application model is a declared configuration constraint and must be reflected in candidate intake, consent/guardian requirements where applicable, application records and tests.
+5. The Supabase bucket and signed-upload TTL are declared configuration, not proof that storage exists or is secure. The actual upload endpoint must enforce candidate ownership, private bucket policy, short-lived scoped upload, metadata persistence, MIME/signature and size checks, audit and application linkage.
+6. Reconcile these keys with the package codex, public copy, database seeds/catalogues, checkout snapshots, entitlements and finance ledger before paid launch. Conflicts must block checkout rather than trigger an inferred price.
