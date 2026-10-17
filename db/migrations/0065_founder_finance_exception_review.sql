@@ -110,6 +110,9 @@ BEGIN
   IF p_refund_request_id IS NULL OR p_decision IS NULL OR p_decision NOT IN ('APPROVE','REJECT') THEN
     RAISE EXCEPTION 'INVALID_REFUND_REVIEW_ACTION' USING ERRCODE = '22023';
   END IF;
+  IF p_decision = 'APPROVE' AND (p_evidence_url IS NULL OR length(trim(v_notes)) < 8) THEN
+    RAISE EXCEPTION 'REFUND_APPROVAL_EVIDENCE_AND_REASON_REQUIRED' USING ERRCODE = '22023';
+  END IF;
   IF p_evidence_url IS NOT NULL AND (
     length(p_evidence_url) > 2048 OR p_evidence_url !~* '^https://[A-Za-z0-9.-]+(:[0-9]{1,5})?([/?#][^[:space:]]*)?$'
   ) THEN
