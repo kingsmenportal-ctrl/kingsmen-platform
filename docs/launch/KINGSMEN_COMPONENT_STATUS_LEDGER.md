@@ -253,3 +253,12 @@ Foundation constraints remain unchanged: Phase 0 is **OPEN**, Phase 1 is **OPEN 
 - The regex correction has **not yet been verified by CI**. Do not treat the prior successful runs as proof for this latest head.
 - Recovery now uses the shared bounded JSON parser; provider delivery remains unverified and Supabase configuration remains outstanding. This does not enable candidate data APIs.
 - Phase 0 API lockfile/reproducible `npm ci` remains **OPEN**. Phase 1 verified backup, isolated restore and migration rehearsal remains **OPEN / BLOCKED**. No migrations, secret changes, or deployments were made.
+
+
+### PayFast proof contract regression coverage — 17 October 2026
+
+- Added `apps/api/src/finance/payfast-sandbox-proof.test.ts` in commit `3b67f65b5e9091e78ee1d996d1f42edf354fd557`.
+- The new API tests assert the proof report includes all ten required scenario keys exactly once, passes the synthetic source-level validations, remains explicitly non-production/sandbox-only, labels every evidence record as synthetic/no-charge, and keeps secret-redaction assertions explicit.
+- GitHub Actions confirmed that commit `12cf7bd6e119f3f8cd5e1b6d5e8239f21b5d696b` passed **Kingsmen Application Build Checks #59** and **Jarvis Live Runtime #738**. These runs validate that prior head, not the newly added PayFast tests or the latest recovery changes.
+- **New PayFast test verification is pending** until CI passes on the commit containing this test. This test suite is a source-level proof-contract check only; it does not simulate a real provider checkout, exercise database concurrency, apply migrations, or establish live payment readiness.
+- Live payments remain disabled. Migration 0036/0037 remain unapplied pending backup, isolated restore, and rehearsal gates. Phase 0 API lockfile/`npm ci` remains **OPEN**; Phase 1 backup/restore remains **OPEN / BLOCKED**. No secrets, migrations, deployments, or live payment actions were performed.
