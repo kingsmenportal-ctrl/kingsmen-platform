@@ -46,6 +46,15 @@ jobs:
           npx tsc --target ES2022 --lib dom,dom.iterable,es2022 --module commonjs --moduleResolution node --esModuleInterop --skipLibCheck --types node --outDir .auth-test-dist src/lib/auth/request-body.ts src/lib/auth/request-body.test.ts
           printf '{"type":"commonjs"}\n' > .auth-test-dist/package.json
           node --test .auth-test-dist/request-body.test.js
+      - name: Type-check bounded auth token helper and regression tests
+        working-directory: apps/web
+        run: npx tsc --noEmit --target ES2022 --lib dom,dom.iterable,es2022 --module esnext --moduleResolution bundler --skipLibCheck --types node src/lib/auth/token-bounds.ts src/lib/auth/token-bounds.test.ts
+      - name: Run bounded auth token regression tests
+        working-directory: apps/web
+        run: |
+          npx tsc --target ES2022 --lib dom,dom.iterable,es2022 --module commonjs --moduleResolution node --esModuleInterop --skipLibCheck --types node --outDir .auth-test-dist src/lib/auth/token-bounds.ts src/lib/auth/token-bounds.test.ts
+          printf '{\"type\":\"commonjs\"}\\n' > .auth-test-dist/package.json
+          node --test .auth-test-dist/token-bounds.test.js
       - name: Validate Personal Jobs fail-closed backend boundary
         run: node scripts/validators/validate-personal-jobs-safe-boundary.mjs
       - name: Validate candidate document ownership boundary
