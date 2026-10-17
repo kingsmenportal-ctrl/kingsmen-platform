@@ -1,6 +1,6 @@
 import fs from "node:fs";
 import assert from "node:assert/strict";
-const sql=fs.readFileSync("db/migrations/0066_n11_service_fulfilment_entitlements.sql","utf8");
+const sql=fs.readFileSync("db/migrations/0071_n11_service_fulfilment_entitlements.sql","utf8");
 const webhook=fs.readFileSync("apps/web/src/app/api/webhooks/payfast/route.ts","utf8");
 const candidateApi=fs.readFileSync("apps/web/src/app/api/candidate/entitlements/route.ts","utf8");
 const reviewerApi=fs.readFileSync("apps/web/src/app/api/reviewer/entitlements/route.ts","utf8");
