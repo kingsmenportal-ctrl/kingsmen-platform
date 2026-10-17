@@ -13,6 +13,7 @@ DECLARE
   v_itn jsonb;
   v_refunds jsonb;
   v_stale_orders jsonb;
+  v_failed_orders jsonb;
   v_invoice_exceptions jsonb;
   v_payment_mismatches jsonb;
 BEGIN
@@ -49,6 +50,16 @@ BEGIN
     ORDER BY o.created_at ASC LIMIT v_limit
   ) x;
 
+  SELECT COALESCE(jsonb_agg(to_jsonb(x) ORDER BY x.updated_at DESC), '[]'::jsonb) INTO v_failed_orders
+  FROM (
+    SELECT o.id, o.order_ref, o.candidate_ref, o.plan_code, o.order_status,
+      o.amount_cents, o.currency, o.created_at, o.updated_at
+    FROM public.finance_orders o
+    WHERE o.order_status IN ('FAILED','CANCELLED')
+      AND o.updated_at > now() - interval '30 days'
+    ORDER BY o.updated_at DESC LIMIT v_limit
+  ) x;
+
   SELECT COALESCE(jsonb_agg(to_jsonb(x) ORDER BY x.issued_at ASC), '[]'::jsonb) INTO v_invoice_exceptions
   FROM (
     SELECT i.id, i.invoice_ref, i.order_ref, i.candidate_ref, i.invoice_status,
@@ -77,6 +88,7 @@ BEGIN
     'rejectedItns', v_itn,
     'refundExceptions', v_refunds,
     'staleOrders', v_stale_orders,
+    'failedOrders', v_failed_orders,
     'invoiceExceptions', v_invoice_exceptions,
     'paymentMismatches', v_payment_mismatches,
     'generatedAt', now()
