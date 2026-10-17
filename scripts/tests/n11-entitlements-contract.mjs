@@ -30,4 +30,18 @@ assert.match(candidatePage,/My services & entitlements/);
 assert.match(reviewerPage,/Service fulfilment review/);
 assert.match(reviewerApi,/export async function GET/);
 assert.doesNotMatch(reviewerApi,/n11_grant_entitlement/);
+assert.match(sql,/IF NEW\.status='REFUNDED' AND OLD\.status IS DISTINCT FROM NEW\.status/);
+assert.match(sql,/n11_revoke_entitlement_after_full_refund/);
+assert.match(sql,/AFTER UPDATE OF status ON public\.candidate_service_orders/);
+assert.match(sql,/n11-full-refund-revoke:/);
+assert.match(sql,/partial refunds do not automatically revoke service/i);
+assert.match(sql,/SET search_path = public, pg_temp/);
+assert.match(sql,/REVOKE ALL PRIVILEGES ON TABLE public\.candidate_entitlements, public\.candidate_entitlement_events/);
+assert.match(webhook,/n10_record_verified_payfast_payment/);
+assert.match(webhook,/ENTITLEMENT_ACTIVATION_PENDING/);
+assert.ok(webhook.indexOf("n10_record_verified_payfast_payment") < webhook.indexOf("n11_grant_entitlement"),
+  "N11 grant must run only after the N10 verified payment RPC");
+assert.doesNotMatch(reviewerApi,/n11_grant_entitlement/);
+assert.doesNotMatch(reviewerPage,/n11_grant_entitlement/);
+
 console.log("N11 contract tests passed: an order or manual evidence cannot activate entitlement; grants require matching server-validated PayFast confirmation; hold/revoke events are audited.");
