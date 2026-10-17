@@ -10,8 +10,8 @@ const gates = [
 ] as const;
 
 const dailyActions = [
-  ["Saved opportunities", "/candidate/saved-opportunities", "Return to opportunities saved to your account."],
-  ["Applications and outcomes", "/candidate/outcomes", "Review application tracking and recorded outcomes."],
+  ["Discover opportunities", "/candidate/discover", "Browse currently verified route programmes and partner listings."],\n  ["Saved opportunities", "/candidate/saved-opportunities", "Return to opportunities saved to your account."],\n  ["Application tracker", "/candidate/applications", "Track preparation and candidate-reported submission evidence."],
+  ["Outcomes", "/candidate/outcomes", "Review persisted proof-backed outcomes and evidence."],
   ["Documents", "/candidate/documents", "Review your document checklist and status."],
   ["Finance", "/candidate/finance", "Review invoices and payment information."],
   ["Messages", "/candidate/messages", "Check portal communications."]
