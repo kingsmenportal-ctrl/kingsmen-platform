@@ -8,6 +8,8 @@ $RequiredFiles = @(
   "db\migrations\0002_n04_candidate_core.sql",
   "db\seeds\n04_runtime_config_seed.sql",
   "apps\api\src\candidate\candidate-types.ts",
+  "apps\api\src\candidate\candidate-profile-readiness.ts",
+  "apps\api\src\candidate\candidate-profile-readiness.test.ts",
   "apps\api\src\candidate\smart-intake.ts",
   "apps\api\src\candidate\candidate-auth.ts",
   "apps\api\src\candidate\profile-review.ts",
@@ -82,6 +84,32 @@ foreach ($Marker in @(
 )) {
   if ($SmartIntake -notmatch $Marker) {
     $Failures += "Smart intake missing marker: $Marker"
+  }
+}
+
+$ProfileReadiness = Get-Content "$Base\apps\api\src\candidate\candidate-profile-readiness.ts" -Raw
+foreach ($Marker in @(
+  "evaluateCandidateProfileReadiness",
+  "DOCUMENT_READINESS_OWNERSHIP_MISMATCH",
+  "IDENTITY_LINK_",
+  "CANDIDATE_ACCOUNT_NOT_ACTIVE",
+  "missingFields",
+  "nextActions"
+)) {
+  if ($ProfileReadiness -notmatch [regex]::Escape($Marker)) {
+    $Failures += "Candidate profile readiness missing marker: $Marker"
+  }
+}
+
+$ProfileReadinessTest = Get-Content "$Base\apps\api\src\candidate\candidate-profile-readiness.test.ts" -Raw
+foreach ($Marker in @(
+  "ready requires active account",
+  "pending identity prevents ready state",
+  "disabled and suspended accounts are blocked",
+  "fails closed if document readiness belongs to another candidate"
+)) {
+  if ($ProfileReadinessTest -notmatch [regex]::Escape($Marker)) {
+    $Failures += "Candidate profile readiness regression test missing marker: $Marker"
   }
 }
 
