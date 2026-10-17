@@ -124,6 +124,68 @@ try {
   const after = await pool.query("select count(*)::int as count from command_log where idempotency_key = $1", [idempotencyKey]);
   checks.push({ check: "replay_did_not_duplicate_command", passed: Number(after.rows[0]?.count) === Number(before.rows[0]?.count) + 1 });
 
+  if (!workflowServiceToken) throw new Error("KINGSMEN_WORKFLOW_SERVICE_TOKEN is required to prove workflow-result persistence.");
+
+  const workflowRunId = `proof_wf_${randomUUID()}`;
+  const workflowIdempotencyKey = `proof_wf_idem_${randomUUID()}`;
+  const workflowCorrelationId = `proof_wf_corr_${randomUUID()}`;
+  const applicationId = `APP-PROOF-${randomUUID()}`;
+  const workflowResult = {
+    workflowRunId,
+    workflow: "W01",
+    candidateId,
+    applicationId,
+    idempotencyKey: workflowIdempotencyKey,
+    correlationId: workflowCorrelationId,
+    previousState: "INTAKE_PENDING",
+    finalState: "EVALUATION_PENDING",
+    status: "SUCCESS",
+    evidenceRef: `proof_evidence_${randomUUID()}`,
+    message: "Synthetic workflow result persistence proof.",
+    createdAt: new Date().toISOString(),
+    payload: { proofOnly: true }
+  };
+
+  const workflowBefore = await pool.query("select count(*)::int as count from workflow_runs where workflow_run_id = $1", [workflowRunId]);
+  const concurrentWorkflowResponses = await Promise.all([
+    request("/api/workflow/result", workflowResult),
+    request("/api/workflow/result", workflowResult),
+    request("/api/workflow/result", workflowResult)
+  ]);
+  const acceptedWorkflowCount = concurrentWorkflowResponses.filter(x => x.status === 202 && x.body?.status === "WORKFLOW_RESULT_ACCEPTED").length;
+  const replayWorkflowCount = concurrentWorkflowResponses.filter(x => x.status === 200 && x.body?.status === "IDEMPOTENT_WORKFLOW_REPLAY").length;
+  checks.push({ check: "concurrent_workflow_duplicate_responses", passed: acceptedWorkflowCount === 1 && replayWorkflowCount === 2 });
+  if (acceptedWorkflowCount !== 1 || replayWorkflowCount !== 2) throw new Error("Concurrent duplicate workflow submissions did not produce one acceptance and two idempotent replays.");
+
+  const workflowPersisted = await pool.query(
+    `select w.workflow_run_id, i.status as idempotency_status,
+            (select count(*)::int from evidence_ledger e where e.workflow_run_id = w.workflow_run_id) as evidence_count,
+            (select count(*)::int from audit_events a where a.correlation_id = w.correlation_id and a.event_type = 'workflow.result.received') as audit_count
+       from workflow_runs w
+       join idempotency_keys i on i.idempotency_key = w.idempotency_key
+      where w.workflow_run_id = $1`,
+    [workflowRunId]
+  );
+  checks.push({
+    check: "workflow_result_evidence_audit_and_idempotency_persisted",
+    passed: workflowPersisted.rowCount === 1 &&
+      workflowPersisted.rows[0]?.idempotency_status === "COMPLETED" &&
+      Number(workflowPersisted.rows[0]?.evidence_count) === 1 &&
+      Number(workflowPersisted.rows[0]?.audit_count) === 1
+  });
+  if (workflowPersisted.rowCount !== 1) throw new Error("Workflow result did not persist exactly one workflow row.");
+
+  const workbench = await request(`/api/applications/${encodeURIComponent(applicationId)}/workbench`);
+  checks.push({
+    check: "workflow_application_workbench_read_model",
+    passed: workbench.body?.application?.applicationId === applicationId &&
+      workbench.body?.application?.candidateId === candidateId &&
+      workbench.body?.application?.currentState === "EVALUATION_PENDING"
+  });
+
+  const workflowAfter = await pool.query("select count(*)::int as count from workflow_runs where workflow_run_id = $1", [workflowRunId]);
+  checks.push({ check: "workflow_duplicate_race_did_not_duplicate_rows", passed: Number(workflowAfter.rows[0]?.count) === Number(workflowBefore.rows[0]?.count) + 1 });
+
   const failures = checks.filter(x => !x.passed);
   const report = {
     schema: "kingsmen.n02-n03.staging-runtime-proof.v1",
@@ -132,7 +194,10 @@ try {
     productionReady: false,
     runtimeProof: true,
     restartPersistenceProven: false,
-    note: "This run proves the live configured API/database round trip and idempotent replay; persistence across a process restart still requires a separate restart-and-reread run.",
+    workflowPersistenceProven: checks.some(x => x.check === "workflow_result_evidence_audit_and_idempotency_persisted" && x.passed),
+    concurrentWorkflowDuplicateSubmissionProven: checks.some(x => x.check === "concurrent_workflow_duplicate_responses" && x.passed),
+    rollbackProven: false,
+    note: "This run proves live command/workflow persistence and concurrent workflow duplicate handling when all checks pass. Process restart, command duplicate races, and controlled late-failure rollback still require separate staging checks.",
     generatedAtIso: new Date().toISOString(),
     correlationId,
     syntheticCandidateRef: candidateId,
