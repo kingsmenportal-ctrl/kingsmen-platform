@@ -37,7 +37,7 @@ export async function GET(request: Request) {
   try {
     const [tracker, existing] = await Promise.all([
       rows(auth.config, "candidate_route_applications", new URLSearchParams({ select: "id,source_kind,route_programme_id,organisation_listing_id,status,candidate_submission_reference,candidate_submission_note,candidate_reported_submitted_at,created_at,updated_at", user_id: `eq.${auth.session.userId}`, order: "updated_at.desc", limit: "200" })),
-      rows(auth.config, "applications", new URLSearchParams({ select: "id,route_type,route_name,institution_or_provider,current_state,source_confidence_band,portal_health,last_evidence_ref,created_at,updated_at", candidate_id: `eq.${auth.session.candidateId}`, order: "updated_at.desc", limit: "200" }))
+      rows(auth.config, "applications", new URLSearchParams({ select: "id,route_type,route_name,institution_or_provider,current_state,source_confidence_band,portal_health,map_fallback_required,last_evidence_ref,created_at,updated_at", candidate_id: `eq.${auth.session.candidateId}`, order: "updated_at.desc", limit: "200" }))
     ]);
     return json({ ok: true, tracker, existingApplications: existing, authority: { candidateCanReportOwnSubmission: true, candidateCanSetProviderDecision: false, acceptedOrRejectedRequiresAuthorisedEvidence: true } });
   } catch {
