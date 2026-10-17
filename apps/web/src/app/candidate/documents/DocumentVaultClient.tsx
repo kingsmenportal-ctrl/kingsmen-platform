@@ -156,8 +156,8 @@ export default function DocumentVaultClient() {
       setMessage("Choose a document file first.");
       return;
     }
-    if (file.size < 1 || file.size > 15 * 1024 * 1024) {
-      setMessage("Documents must be between 1 byte and 15 MiB.");
+    if (file.size < 1 || file.size > 10 * 1024 * 1024) {
+      setMessage("Documents must be between 1 byte and 10 MiB.");
       return;
     }
 
@@ -220,7 +220,7 @@ export default function DocumentVaultClient() {
             </select>
           </label>
           <label>
-            File (PDF, JPEG, PNG, or DOCX where allowed; maximum 15 MiB)
+            File (PDF, DOCX, or plain text where allowed; maximum 10 MiB)
             <input id="candidate-document-file" type="file" required onChange={(event) => setFile(event.target.files?.[0] || null)} style={{ display: "block", marginTop: 5 }} />
           </label>
           <button type="submit" disabled={uploading || loading} style={{ width: "fit-content", padding: "10px 16px", borderRadius: 8, fontWeight: 800 }}>
