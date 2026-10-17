@@ -55,7 +55,7 @@ for (const phrase of [
   "unsafe filename",
   "Number.isSafeInteger(input.sizeBytes)",
   'input.filename.includes("/")',
-  'input.filename.includes("\\\\\\\\")'
+  'character.charCodeAt(0) === 127'
 ]) {
   if (!safety.includes(phrase)) failures.push(`Document safety policy missing phrase: ${phrase}`);
 }
