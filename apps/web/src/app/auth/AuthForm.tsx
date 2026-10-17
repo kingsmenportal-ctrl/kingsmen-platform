@@ -8,7 +8,7 @@ export default function AuthForm({ mode }: { mode: "login" | "register" }) {
   const registering = mode === "register";
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-  const [displayName, setDisplayName] = useState("");
+  const [displayName, setDisplayName] = useState("");\n  const [candidateReference, setCandidateReference] = useState("");
   const [busy, setBusy] = useState(false);
   const [notice, setNotice] = useState("");
   const [error, setError] = useState("");
@@ -24,13 +24,13 @@ export default function AuthForm({ mode }: { mode: "login" | "register" }) {
       if (session.access_token && session.user?.id) {
         storeKingsmenSession(session);
         try {
-          const linked = await linkCandidateAccount();
+          const linked = await linkCandidateAccount(candidateReference);
           if (linked.linked) {
             setNotice("Signed in. Your candidate account is linked securely.");
             window.location.assign("/candidate/dashboard");
             return;
           }
-          setNotice(linked.message || "Your sign-in is active. Candidate account linking is pending review; no existing record was claimed.");
+          setNotice(linked.message || "Your sign-in is active. Candidate identity linking is pending authorised review; no candidate record was claimed.");
           return;
         } catch (linkError) {
           setNotice(linkError instanceof Error ? linkError.message : "Signed in, but candidate account linking needs attention.");
@@ -48,9 +48,9 @@ export default function AuthForm({ mode }: { mode: "login" | "register" }) {
   return <main style={{ maxWidth: 520, margin: "7vh auto", padding: 24, color: "#f4f6ff", fontFamily: "system-ui, sans-serif" }}>
     <p style={{ color: "#a5b4fc", fontWeight: 700, letterSpacing: 2 }}>KINGSMEN PORTAL</p>
     <h1>{registering ? "Create your account" : "Welcome back"}</h1>
-    <p style={{ color: "#b8c0d9", lineHeight: 1.6 }}>{registering ? "Create a secure sign-in. Existing candidate records are linked only after email ownership and record uniqueness are verified." : "Sign in with your verified portal credentials to continue your candidate journey."}</p>
+    <p style={{ color: "#b8c0d9", lineHeight: 1.6 }}>{registering ? "Create a secure sign-in. Existing candidate records are linked only after authorised identity review and a verified identity link." : "Sign in with your verified portal credentials to continue your candidate journey."}</p>
     <form onSubmit={submit} style={{ display: "grid", gap: 14, marginTop: 24 }}>
-      {registering && <label style={{ display: "grid", gap: 6 }}>Full name<input required autoComplete="name" value={displayName} onChange={e => setDisplayName(e.target.value)} style={fieldStyle} /></label>}
+      {registering && <label style={{ display: "grid", gap: 6 }}>Full name<input required autoComplete="name" value={displayName} onChange={e => setDisplayName(e.target.value)} style={fieldStyle} /></label>}\n      <label style={{ display: "grid", gap: 6 }}>Existing candidate reference (optional)<input maxLength={100} autoComplete="off" value={candidateReference} onChange={e => setCandidateReference(e.target.value)} style={fieldStyle} /><small style={{ color: "#b8c0d9" }}>This is only a review hint. It does not prove ownership or link your candidate record.</small></label>
       <label style={{ display: "grid", gap: 6 }}>Email address<input required type="email" autoComplete="email" value={email} onChange={e => setEmail(e.target.value)} style={fieldStyle} /></label>
       <label style={{ display: "grid", gap: 6 }}>Password<input required type="password" minLength={8} autoComplete={registering ? "new-password" : "current-password"} value={password} onChange={e => setPassword(e.target.value)} style={fieldStyle} /></label>
       <button disabled={busy} type="submit" style={{ padding: 13, border: 0, borderRadius: 10, background: busy ? "#526078" : "#a5b4fc", color: "#111827", fontWeight: 800, cursor: busy ? "wait" : "pointer" }}>{busy ? "Working…" : registering ? "Create secure account" : "Sign in"}</button>
