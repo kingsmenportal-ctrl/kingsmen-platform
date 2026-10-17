@@ -23,11 +23,11 @@ BEGIN
   IF FOUND THEN
     IF v_order.package_code<>upper(p_package_code) THEN RAISE EXCEPTION 'idempotency key was reused for a different package'; END IF;
     RETURN QUERY SELECT v_order.id,v_order.order_ref,v_order.package_code,v_order.package_name,
-      v_order.currency,v_order.amount_minor,v_order.status,v_order.created_at,true;
+      v_order.currency::text,v_order.amount_minor,v_order.status,v_order.created_at,true;
     RETURN;
   END IF;
-  SELECT * INTO v_package FROM public.service_packages
-    WHERE package_code=upper(p_package_code) AND active=true;
+  SELECT * INTO v_package FROM public.service_packages AS sp
+    WHERE sp.package_code=upper(p_package_code) AND sp.active=true;
   IF NOT FOUND THEN RAISE EXCEPTION 'active service package not found'; END IF;
 
   INSERT INTO public.candidate_service_orders(
@@ -86,8 +86,8 @@ BEGIN
       v_refund.reason,v_refund.status,v_refund.created_at,true;
     RETURN;
   END IF;
-  SELECT * INTO v_order FROM public.candidate_service_orders
-    WHERE id=p_order_id AND candidate_id=p_candidate_id FOR UPDATE;
+  SELECT * INTO v_order FROM public.candidate_service_orders AS o
+    WHERE o.id=p_order_id AND o.candidate_id=p_candidate_id FOR UPDATE;
   IF NOT FOUND THEN RAISE EXCEPTION 'order not found for candidate'; END IF;
   IF v_order.status<>'PAID' THEN RAISE EXCEPTION 'only a paid order can enter refund review'; END IF;
   IF NOT EXISTS (SELECT 1 FROM public.candidate_payment_events
@@ -147,7 +147,7 @@ BEGIN
       AND role_code IN ('FINANCE_REVIEWER','PLATFORM_ADMIN')) THEN
     RAISE EXCEPTION 'active finance reviewer role required';
   END IF;
-  SELECT * INTO v_order FROM public.candidate_service_orders WHERE id=p_order_id FOR UPDATE;
+  SELECT * INTO v_order FROM public.candidate_service_orders AS o WHERE o.id=p_order_id FOR UPDATE;
   IF NOT FOUND THEN RAISE EXCEPTION 'order not found'; END IF;
   SELECT * INTO v_event FROM public.candidate_payment_events
     WHERE idempotency_key='manual-payment:'||v_order.id::text FOR UPDATE;
@@ -201,9 +201,9 @@ BEGIN
     WHERE auth_user_id=p_actor_auth_user_id AND is_active=true AND revoked_at IS NULL
       AND role_code IN ('FINANCE_REVIEWER','PLATFORM_ADMIN') LIMIT 1;
   IF NOT FOUND THEN RAISE EXCEPTION 'active finance reviewer role required'; END IF;
-  SELECT * INTO v_refund FROM public.candidate_refund_requests WHERE id=p_refund_id FOR UPDATE;
+  SELECT * INTO v_refund FROM public.candidate_refund_requests AS r WHERE r.id=p_refund_id FOR UPDATE;
   IF NOT FOUND THEN RAISE EXCEPTION 'refund request not found'; END IF;
-  SELECT * INTO v_order FROM public.candidate_service_orders WHERE id=v_refund.order_id FOR UPDATE;
+  SELECT * INTO v_order FROM public.candidate_service_orders AS o WHERE o.id=v_refund.order_id FOR UPDATE;
   IF v_refund.status IN ('APPROVED','REJECTED') THEN
     IF (p_decision='APPROVE' AND v_refund.status='APPROVED') OR (p_decision='REJECT' AND v_refund.status='REJECTED') THEN
       RETURN QUERY SELECT v_refund.id,v_refund.refund_ref,v_refund.order_id,v_refund.status,true;
