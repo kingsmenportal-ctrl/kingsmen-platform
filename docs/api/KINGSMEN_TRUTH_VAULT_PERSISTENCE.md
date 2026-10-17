@@ -7,7 +7,7 @@ Production ready: **false until DB integration proof passes on staging**
 
 This document records the second launch build item: replacing the backend API's memory-only command/result store with real PostgreSQL/Supabase Truth Vault persistence.
 
-The API can now run in two explicit modes. Business routes require server-to-server bearer authentication; `/health` remains public. Never put either service token in browser code. `KINGSMEN_API_SERVICE_TOKEN` protects command intake, Jarvis runtime-control, and read-model routes. `KINGSMEN_WORKFLOW_SERVICE_TOKEN` separately protects workflow-result intake. These service credentials do not establish candidate identity or candidate-level authorisation, so the protected routes are backend-only.
+The API can now run in two explicit modes. Business routes require server-to-server bearer authentication; `/health` remains public. Never put either service token in browser code. `KINGSMEN_API_SERVICE_TOKEN` protects command intake, Jarvis runtime-control, and read-model routes. `KINGSMEN_WORKFLOW_SERVICE_TOKEN` separately protects workflow-result intake. Both configured tokens must be at least 32 characters. These service credentials do not establish candidate identity or candidate-level authorisation, so the protected routes are backend-only.
 
 The API can run in these explicit storage modes:
 
@@ -65,7 +65,7 @@ KINGSMEN_TRUTH_VAULT_MODE=postgres
 KINGSMEN_DATABASE_URL=postgres://user:password@host:5432/database
 KINGSMEN_DATABASE_SSL=true
 KINGSMEN_DATABASE_POOL_MAX=8
-KINGSMEN_API_SERVICE_TOKEN=<server-only-random-token>
+KINGSMEN_API_SERVICE_TOKEN=<server-only-random-token-at-least-32-characters>
 KINGSMEN_WORKFLOW_SERVICE_TOKEN=<separate-server-only-random-token>
 ```
 
