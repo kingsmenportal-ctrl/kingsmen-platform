@@ -25,3 +25,12 @@ test("rejects non-string and oversized values", () => {
   assert.equal(isPublicHttpsUrl("https://example.org/" + "x".repeat(2048)), false);
   assert.equal(isPublicHttpsUrl("https://example.org", 10), false);
 });
+
+import { sanitizePublicSearchQuery } from "./public-url";
+
+test("sanitizes PostgREST search grammar while preserving useful Unicode text", () => {
+  assert.equal(sanitizePublicSearchQuery("Bursary (2026), 50%_*"), "Bursary 2026 50");
+  assert.equal(sanitizePublicSearchQuery("King's Park - Gauteng"), "King's Park - Gauteng");
+  assert.equal(sanitizePublicSearchQuery("  NSFAS\\n2027  "), "NSFAS\\n2027");
+  assert.equal(sanitizePublicSearchQuery("x".repeat(120)), "x".repeat(100));
+});
