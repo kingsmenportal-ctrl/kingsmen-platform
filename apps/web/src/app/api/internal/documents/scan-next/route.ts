@@ -161,12 +161,7 @@ export async function POST(request: Request) {
     metadata: { jobRef: job.job_ref, attempt: attempts }
   });
   if (!scanStarted) {
-    await supabaseAdminFetch(cfg, `/rest/v1/document_scan_jobs?id=eq.${job.id}&lease_token=eq.${leaseToken}`, {
-      method: "PATCH",
-      headers: { "content-type": "application/json", Prefer: "return=minimal" },
-      body: JSON.stringify({ status: "RETRY_WAIT", available_at: new Date(Date.now() + 60_000).toISOString(), lease_token: null, leased_at: null, last_error_code: "SCAN_START_AUDIT_FAILED", last_error_message: "Could not persist scan-start audit event.", updated_at: new Date().toISOString() })
-    });
-    return jsonError(502, "SCAN_START_AUDIT_FAILED", "The scan-start audit could not be persisted; the document remains quarantined.");
+    return await retryOrDeadLetter(cfg, job, leaseToken, attempts, "SCAN_START_AUDIT_FAILED", "The scan-start audit could not be persisted; the document remains quarantined.");
   }
 
   // Signed object URL is short-lived and sent only to the configured server-side scanner.
@@ -235,7 +230,7 @@ export async function POST(request: Request) {
       metadata: { jobRef: job.job_ref, provider, version, scannerSignaturePresent: Boolean(result.signature) }
     });
     if (!eventOk) return jsonError(502, "SCAN_RESULT_AUDIT_FAILED", "The clean scan result is persisted but its audit event failed; the document remains quarantined until reconciliation.");
-    const docUpdate = await supabaseAdminFetch(cfg, `/rest/v1/document_files?id=eq.${job.document_id}&malware_scan_status=in.(PENDING,ERROR,SCANNING)`, {
+    const docUpdate = await supabaseAdminFetch(cfg, `/rest/v1/document_files?id=eq.${job.document_id}&document_status=eq.QUARANTINED&malware_scan_status=in.(PENDING,ERROR,SCANNING)`, {
       method: "PATCH",
       headers: { "content-type": "application/json", Prefer: "return=minimal" },
       body: JSON.stringify({ malware_scan_status: "CLEAN", malware_scanned_at: scannedAt, malware_scanner_provider: provider, malware_scanner_version: version, document_status: "READY", updated_at: scannedAt, malware_scan_last_error: null, malware_scan_next_attempt_at: null })
@@ -250,7 +245,7 @@ export async function POST(request: Request) {
       headers: { "content-type": "application/json", Prefer: "return=minimal" },
       body: JSON.stringify({ status: "INFECTED", scanner_provider: provider, scanner_version: version, scanner_result: "INFECTED", completed_at: scannedAt, lease_token: null, leased_at: null, updated_at: scannedAt })
     });
-    await supabaseAdminFetch(cfg, `/rest/v1/document_files?id=eq.${job.document_id}`, {
+    await supabaseAdminFetch(cfg, `/rest/v1/document_files?id=eq.${job.document_id}&document_status=eq.QUARANTINED`, {
       method: "PATCH",
       headers: { "content-type": "application/json", Prefer: "return=minimal" },
       body: JSON.stringify({ malware_scan_status: "INFECTED", malware_scanned_at: scannedAt, malware_scanner_provider: provider, malware_scanner_version: version, document_status: "REJECTED", updated_at: scannedAt, malware_scan_last_error: "Scanner reported INFECTED." })
