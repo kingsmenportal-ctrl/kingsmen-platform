@@ -42,15 +42,27 @@ jobs:
           cache: npm
           cache-dependency-path: package-lock.json
 
-      - name: Install repository tools
+      - name: Install repository tools reproducibly
         run: npm ci --ignore-scripts --no-audit --no-fund
 
-      - name: Install API dependencies
-        run: npm install --prefix apps/api --no-package-lock --ignore-scripts --no-audit --no-fund
+      - name: Require the committed API lockfile
+        run: |
+          if [ ! -f apps/api/package-lock.json ]; then
+            echo "::error file=apps/api/package-lock.json::API lockfile is missing. Generate and review it from apps/api/package.json in a trusted network-enabled environment; do not bypass this gate with npm install."
+            exit 1
+          fi
+
+      - name: Install API dependencies reproducibly
+        run: npm ci --prefix apps/api --ignore-scripts --no-audit --no-fund
 
       - name: Build API and run runtime smoke tests
         run: npm --prefix apps/api test
 
-      - name: Run repository validator suite
+      - name: Run repository regression suite
         run: npm test
 
+      - name: Validate API Truth Vault persistence contract
+        run: npm run api:validate
+
+      - name: Validate web/backend security boundary
+        run: npm run web:validate:backend-boundary
