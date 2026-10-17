@@ -3,7 +3,7 @@ import type { IncomingMessage, ServerResponse } from "node:http";
 import { randToCents } from "./money";
 import { reconcilePayFastAmounts } from "./payfast-amounts";
 import { validatePayFastItn } from "./payfast-itn";
-import type { PayFastFields } from "./payfast-signature";
+import { redactPayFastSecrets, type PayFastFields } from "./payfast-signature";
 
 type QueryResult<T> = { rows: T[]; rowCount: number | null };
 type Client = {
@@ -233,7 +233,7 @@ export async function handlePayFastItn(request: IncomingMessage, response: Serve
        ON CONFLICT DO NOTHING`,
       [itnRef, merchantReference, providerPaymentId, result.paymentStatus ?? null, grossText || null,
        fields.amount_fee == null ? null : String(fields.amount_fee), fields.amount_net == null ? null : String(fields.amount_net),
-       JSON.stringify(fields), String(fields.signature ?? ""), result.signatureValid, result.ipValid, result.amountValid,
+       JSON.stringify(redactPayFastSecrets(fields)), String(fields.signature ?? ""), result.signatureValid, result.ipValid, result.amountValid,
        result.duplicate, result.accepted, result.rejectionReason ?? null, idempotencyKey, `pay_ev_${itnRef}`]
     );
     if (receiptInsert.rowCount !== 1) {
