@@ -1,5 +1,5 @@
 import { randomUUID } from "node:crypto";
-import { requireCandidateSession, supabaseAdminFetch } from "../../../../../../lib/candidate-document-runtime";
+import { requireCandidateSession, supabaseAdminFetch } from "../../../../../lib/candidate-document-runtime";
 const fail=(status:number,code:string,error:string)=>Response.json({ok:false,productionReady:false,code,error},{status,headers:{"cache-control":"no-store"}});
 export async function POST(request:Request){
  const auth=await requireCandidateSession(request);if(!auth.ok)return fail(auth.status,auth.code,auth.message);let body:unknown;try{body=await request.json();}catch{return fail(400,"INVALID_JSON","Send a valid request.");}const x=body&&typeof body==="object"?body as Record<string,unknown>:{},id=typeof x.applicationId==="string"?x.applicationId.trim():"";if(!id)return fail(400,"APPLICATION_REQUIRED","Select an application.");
