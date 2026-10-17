@@ -87,7 +87,8 @@
     "candidate:validate:identity-link-admin-runtime": "node scripts/validators/validate-candidate-identity-link-admin-runtime.mjs",
     "candidate:validate:document-vault": "node scripts/validators/validate-candidate-document-vault.mjs",
     "candidate:validate:document-upload-policy": "node scripts/validators/validate-candidate-document-upload-policy.mjs",
-    "candidate:validate:document-review": "node scripts/validators/validate-candidate-document-review.mjs"
+    "candidate:validate:document-review": "node scripts/validators/validate-candidate-document-review.mjs",
+    "candidate:validate:application-tracker-api": "node scripts/validators/validate-candidate-application-tracker-api.mjs"
   },
   "repository": {
     "type": "git",
