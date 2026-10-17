@@ -12,7 +12,7 @@ async function rows(cfg: Parameters<typeof supabaseAdminFetch>[0], table: string
   return data as Row[];
 }
 
-async function audit(cfg: Parameters<typeof supabaseAdminFetch>[0], userId: string, candidateId: string, applicationId: string, eventType: string, message: string) {
+async function audit(cfg: Parameters<typeof supabaseAdminFetch>[0], userId: string, candidateId: string, trackerId: string, eventType: string, message: string) {
   const response = await supabaseAdminFetch(cfg, "/rest/v1/audit_events", {
     method: "POST",
     headers: { "content-type": "application/json", prefer: "return=minimal" },
@@ -25,7 +25,7 @@ async function audit(cfg: Parameters<typeof supabaseAdminFetch>[0], userId: stri
       candidate_id: candidateId,
       application_id: applicationId,
       message,
-      metadata: { source: "candidate_portal_application_tracker" }
+      metadata: { source: "candidate_portal_application_tracker", tracker_id: trackerId }
     })
   }).catch(() => null);
   return Boolean(response?.ok);
