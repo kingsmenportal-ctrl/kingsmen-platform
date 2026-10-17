@@ -155,3 +155,16 @@ export async function supabaseAdminFetch(
     cache: "no-store"
   });
 }
+
+export async function verifyPrivateDocumentsBucket(cfg: SupabaseConfig): Promise<boolean> {
+  let response: Response;
+  try {
+    response = await supabaseAdminFetch(cfg, `/storage/v1/bucket/${encodeURIComponent(cfg.documentsBucket)}`);
+  } catch {
+    return false;
+  }
+  if (!response.ok) return false;
+  const bucket = await response.json().catch(() => null) as { id?: string; name?: string; public?: boolean } | null;
+  return !!bucket && bucket.public === false &&
+    (bucket.id === cfg.documentsBucket || bucket.name === cfg.documentsBucket);
+}
