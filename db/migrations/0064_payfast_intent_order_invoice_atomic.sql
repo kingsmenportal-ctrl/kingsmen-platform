@@ -39,13 +39,14 @@ BEGIN
     OR p_order_ref IS NULL OR p_invoice_ref IS NULL OR p_intent_ref IS NULL
     OR p_amount_cents IS NULL OR p_amount_cents <= 0
     OR upper(COALESCE(p_currency,'')) <> 'ZAR'
-    OR p_environment NOT IN ('sandbox','live')
+    OR p_environment IS NULL OR p_environment NOT IN ('sandbox','live')
     OR p_signature IS NULL OR length(p_signature) <> 32
     OR p_signed_payload IS NULL OR jsonb_typeof(p_signed_payload) <> 'object'
   THEN
     RAISE EXCEPTION 'INVALID_PAYMENT_INTENT_REQUEST' USING ERRCODE = '22023';
   END IF;
-  IF p_payment_url <> CASE WHEN p_environment = 'live'
+  IF p_payment_url IS NULL OR p_notify_url IS NULL OR p_return_url IS NULL OR p_cancel_url IS NULL
+    OR p_payment_url <> CASE WHEN p_environment = 'live'
     THEN 'https://www.payfast.co.za/eng/process'
     ELSE 'https://sandbox.payfast.co.za/eng/process' END
     OR p_notify_url !~* '^https://[A-Za-z0-9.-]+(:[0-9]{1,5})?([/?#][^[:space:]]*)?$'
