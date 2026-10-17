@@ -529,11 +529,11 @@ export class TruthVaultRepository {
       );
       // No matching account means the identity is not linked. An empty array
       // with a matching account means the candidate has no visible documents.
-      const linked = await client.query<{ linked: boolean }>(
-        "select exists(select 1 from public.candidate_auth_identity_links ca join public.candidates c on c.id=ca.candidate_id and c.is_active=true where ca.supabase_user_id=$1::uuid and ca.link_status='VERIFIED') as linked",
+      const linked = await client.query<{ candidate_id: string }>(
+        "select ca.candidate_id::text from public.candidate_auth_identity_links ca join public.candidates c on c.id=ca.candidate_id and c.is_active=true where ca.supabase_user_id=$1::uuid and ca.link_status='VERIFIED' limit 1",
         [supabaseUserId]
       );
-      if (linked.rows[0]?.linked === true && result.rows.length > 200) {
+      if (Boolean(linked.rows[0]?.candidate_id) && result.rows.length > 200) {
         throw new Error("CANDIDATE_DOCUMENT_RESULT_LIMIT_EXCEEDED");
       }
       if (linked.rows[0]?.linked === true) {
@@ -547,8 +547,8 @@ export class TruthVaultRepository {
             "candidate.documents.listed",
             "INFO",
             correlationId,
-            linked.rows[0] ? supabaseUserId : "unknown",
-            null,
+            supabaseUserId,
+            linked.rows[0].candidate_id,
             "Verified Supabase identity candidate document metadata read completed.",
             JSON.stringify({ returnedCount: result.rows.length, responseLimit: 200 })
           ]
