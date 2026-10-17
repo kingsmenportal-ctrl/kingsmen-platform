@@ -154,7 +154,7 @@ BEGIN
     RETURN jsonb_build_object('ok', true, 'accepted', false, 'duplicate', true, 'alreadyAccepted', true, 'receiptId', v_receipt_id, 'rejectionReason', v_rejection);
   END IF;
   IF NOT v_accepted THEN
-    RETURN jsonb_build_object('ok', true, 'accepted', false, 'duplicate', false, 'receiptId', v_receipt_id, 'rejectionReason', v_rejection, 'retryable', p_provider_validation IS DISTINCT FROM 'VALID');
+    RETURN jsonb_build_object('ok', true, 'accepted', false, 'duplicate', false, 'receiptId', v_receipt_id, 'rejectionReason', v_rejection, 'retryable', p_provider_validation = 'UNAVAILABLE');
   END IF;
 
   IF v_payment_status = 'FAILED' THEN
