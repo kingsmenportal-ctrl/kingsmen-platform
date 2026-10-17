@@ -87,6 +87,26 @@ export async function POST(request: Request) {
     ? rawSignedPath
     : `${auth.config.url}/storage/v1${rawSignedPath.startsWith("/") ? rawSignedPath : `/${rawSignedPath}`}`;
 
+  const auditResponse = await supabaseAdminFetch(auth.config, "/rest/v1/document_storage_events", {
+    method: "POST",
+    headers: { "content-type": "application/json", Prefer: "return=minimal" },
+    body: JSON.stringify({
+      document_id: null,
+      event_ref: `DOC-UPLOAD-ISSUED-${uploadId}`,
+      event_type: "SIGNED_UPLOAD_CREATED",
+      storage_provider: "SUPABASE",
+      storage_bucket: auth.config.documentsBucket,
+      storage_path: objectPath,
+      file_size_bytes: sizeBytes,
+      status: "OK",
+      message: "Signed upload capability created for an authenticated candidate identity.",
+      metadata: { upload_id: uploadId, candidate_id: auth.session.candidateId, authenticated_user_id: auth.session.userId }
+    })
+  });
+  if (!auditResponse.ok) {
+    return Response.json({ ok: false, code: "UPLOAD_AUDIT_FAILED", error: "Kingsmen could not record the upload intent, so the temporary upload link was not returned." }, { status: 502 });
+  }
+
   return Response.json({
     ok: true,
     productionReady: false,
