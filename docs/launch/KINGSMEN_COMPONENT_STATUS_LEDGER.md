@@ -244,3 +244,12 @@ Foundation constraints remain unchanged: Phase 0 is **OPEN**, Phase 1 is **OPEN 
 - Document storage tests now cover path-separator/unsafe filename sanitization and exact maximum-size boundary handling. Commit: `0884c0c898165e282dc45eba5301238f99a1619e`.
 - Candidate mobile notification preference tests now cover email-disabled portal fallback, explicit SMS backup opt-in, and routine-message restrictions. Commit: `3354a8212f654410155074db925b3b0d97a6c39b`.
 - CI workflow evidence for these follow-up commits has not yet been returned by GitHub at the time of this note. These are committed tests, not claimed passing tests. Document storage metadata tests do not establish a real private storage provider or signed URL implementation; notification policy tests do not establish message delivery.
+
+
+### Auth recovery follow-up — CI review and regex correction (17 October 2026)
+
+- GitHub Actions completed successfully for commit `24a1bf9f6b75bb35c50e879ef237c8103a4d325c`: Kingsmen Application Build Checks run #57 and Jarvis Live Runtime run #736. These runs preceded the subsequent email-validation correction.
+- Review of the recovery route found its newly added email regex was over-escaped, so it could reject valid addresses. Commit `e2fe63de7b1b50bfb113e381d2c19ca058cf727d` corrects the regex to the intended whitespace and dot escapes.
+- The regex correction has **not yet been verified by CI**. Do not treat the prior successful runs as proof for this latest head.
+- Recovery now uses the shared bounded JSON parser; provider delivery remains unverified and Supabase configuration remains outstanding. This does not enable candidate data APIs.
+- Phase 0 API lockfile/reproducible `npm ci` remains **OPEN**. Phase 1 verified backup, isolated restore and migration rehearsal remains **OPEN / BLOCKED**. No migrations, secret changes, or deployments were made.
