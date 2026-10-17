@@ -448,6 +448,7 @@ async function handleHealth(response: ServerResponse): Promise<void> {
       "POST /api/internal/candidate/applications",
       "POST /api/internal/candidate/documents",
       "POST /api/internal/candidate/document-requests",
+      "POST /api/internal/candidate/support-tickets",
       "GET /api/candidate/documents",
       "GET /api/candidate/document-requests",
       "GET /api/candidates/:candidateId/status",
@@ -601,6 +602,42 @@ async function handleInternalCandidateApplications(request: IncomingMessage, res
   sendJson(response, 200, { ok: true, applications });
 }
 
+async function handleInternalCandidateSupportTickets(request: IncomingMessage, response: ServerResponse): Promise<void> {
+  if (!truthVault.enabled) {
+    sendError(response, 503, "SUPPORT_TICKET_SERVICE_NOT_CONFIGURED", "Support ticket status is not configured.");
+    return;
+  }
+  const configuredSecret = process.env.KINGSMEN_WEB_INTERNAL_API_KEY;
+  const suppliedHeader = request.headers["x-kingsmen-internal-key"];
+  const suppliedSecret = Array.isArray(suppliedHeader) ? suppliedHeader[0] : suppliedHeader;
+  const expected = Buffer.from(configuredSecret ?? "");
+  const supplied = Buffer.from(suppliedSecret ?? "");
+  if (!configuredSecret || !suppliedSecret || expected.length === 0 ||
+      expected.length !== supplied.length || !timingSafeEqual(expected, supplied)) {
+    sendError(response, 401, "INTERNAL_AUTH_REQUIRED", "Internal service authentication is required.");
+    return;
+  }
+  const body = await readJson(request);
+  if (!body || typeof body !== "object" || Array.isArray(body)) {
+    sendError(response, 400, "INVALID_REQUEST", "A valid request body is required.");
+    return;
+  }
+  const supabaseUserId = (body as Record<string, unknown>).supabaseUserId;
+  if (typeof supabaseUserId !== "string" ||
+      !/^[0-9a-f]{8}-[0-9a-f]{4}-[1-8][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i.test(supabaseUserId)) {
+    sendError(response, 400, "INVALID_AUTH_ID", "A valid authenticated identity is required.");
+    return;
+  }
+  const tickets = await truthVault.listSupportTicketsForVerifiedSupabaseUser(supabaseUserId);
+  if (tickets === null) {
+    sendError(response, 403, "CANDIDATE_PROFILE_LINK_REQUIRED", "This account is not linked to an active candidate profile.");
+    return;
+  }
+  response.setHeader("cache-control", "private, no-store");
+  response.setHeader("pragma", "no-cache");
+  sendJson(response, 200, { ok: true, tickets });
+}
+
 async function handleInternalCandidateDocumentRequests(request: IncomingMessage, response: ServerResponse): Promise<void> {
   if (!truthVault.enabled) {
     sendError(response, 503, "DOCUMENT_REQUEST_SERVICE_NOT_CONFIGURED", "Document request status is not configured.");
@@ -752,6 +789,16 @@ export function createKingsmenApiServer() {
 
       if (method === "POST" && (pathname === "/api/workflow/result" || pathname === "/api/workflow-results")) {
         await handleWorkflowResult(request, response);
+        return;
+      }
+
+      if (pathname === "/api/internal/candidate/support-tickets") {
+        if (method !== "POST") {
+          response.setHeader("allow", "POST");
+          sendError(response, 405, "METHOD_NOT_ALLOWED", "Only POST is supported.");
+          return;
+        }
+        await handleInternalCandidateSupportTickets(request, response);
         return;
       }
 
