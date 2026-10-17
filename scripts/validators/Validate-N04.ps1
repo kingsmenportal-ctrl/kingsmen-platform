@@ -134,6 +134,30 @@ if ($ApiIndex -notmatch [regex]::Escape('export * from "./candidate";')) {
   $Failures += "API index missing candidate export."
 }
 
+$PortalReadModel = Get-Content "$Base\apps\api\src\candidate\candidate-portal-read-model.ts" -Raw
+foreach ($Marker in @(
+  "CANDIDATE_PORTAL_READINESS_OWNERSHIP_MISMATCH",
+  "readiness.ready",
+  "IDENTITY_LINK_REJECTED",
+  "Applications are blocked until the account and identity requirements are resolved"
+)) {
+  if ($PortalReadModel -notmatch [regex]::Escape($Marker)) {
+    $Failures += "Candidate portal readiness gate missing marker: $Marker"
+  }
+}
+
+$PortalReadModelTest = Get-Content "$Base\apps\api\src\candidate\candidate-portal-read-model.test.ts" -Raw
+foreach ($Marker in @(
+  "application card is ready only when server readiness is ready",
+  "legacy READY application summary is gated",
+  "rejected identity blocks application card",
+  "candidate ownership mismatch fails closed"
+)) {
+  if ($PortalReadModelTest -notmatch [regex]::Escape($Marker)) {
+    $Failures += "Candidate portal readiness regression test missing marker: $Marker"
+  }
+}
+
 $Result = [ordered]@{
   module = "N04"
   name = "Candidate Core & Portal"
