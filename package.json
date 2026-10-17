@@ -62,7 +62,9 @@
     "n06:applications:validate": "node scripts/validators/validate-n06-applications-runtime.mjs",
     "n06:applications:test": "node scripts/tests/n06-application-isolation.integration.mjs",
     "n07:review:validate": "node scripts/validators/validate-n07-provider-review-runtime.mjs",
-    "n07:review:test": "node --check scripts/tests/n07-reviewer-isolation.integration.mjs && node scripts/tests/n07-reviewer-isolation.integration.mjs"
+    "n07:review:test": "node --check scripts/tests/n07-reviewer-isolation.integration.mjs && node scripts/tests/n07-reviewer-isolation.integration.mjs",
+    "n08:outcomes:validate": "node scripts/validators/validate-n08-outcomes-progression.mjs",
+    "n08:outcomes:test": "node --check scripts/tests/n08-outcomes-isolation.integration.mjs && node scripts/tests/n08-outcomes-isolation.integration.mjs"
   },
   "repository": {
     "type": "git",
