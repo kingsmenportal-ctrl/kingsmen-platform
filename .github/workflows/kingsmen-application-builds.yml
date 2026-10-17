@@ -130,4 +130,4 @@ jobs:
       - name: Validate candidate Phase A.1 source boundaries
         run: npm run candidate:validate:phase-a1-bridges
       - name: Validate candidate identity live-readiness boundary
-        run: node scripts/validators/validate-candidate-identity-live-readiness.mjs
+        run: npm run candidate:validate:live-readiness
