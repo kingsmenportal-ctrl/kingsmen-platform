@@ -24,6 +24,24 @@ export interface CandidateIdentityLinkOperatorResolver<TRequestContext> {
 
 export type CandidateIdentityLinkAdminAction = "create" | "verify" | "revoke";
 
+const UUID = /^[0-9a-f]{8}-[0-9a-f]{4}-[1-8][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i;
+
+function validateActionAndCommand(action: string, command: CandidateIdentityLinkCommand): asserts action is CandidateIdentityLinkAdminAction {
+  if (action !== "create" && action !== "verify" && action !== "revoke") {
+    throw new Error("CANDIDATE_IDENTITY_LINK_ACTION_UNSUPPORTED");
+  }
+  if (!command || typeof command !== "object" || !UUID.test(command.supabaseUserId)) {
+    throw new Error("CANDIDATE_IDENTITY_LINK_INVALID_AUTH_USER");
+  }
+  if (!UUID.test(command.candidateId)) throw new Error("CANDIDATE_IDENTITY_LINK_INVALID_CANDIDATE");
+  if (typeof command.reason !== "string" || !command.reason.trim() || command.reason.trim().length > 500) {
+    throw new Error("CANDIDATE_IDENTITY_LINK_INVALID_REASON");
+  }
+  if (typeof command.correlationId !== "string" || !command.correlationId.trim() || command.correlationId.trim().length > 200) {
+    throw new Error("CANDIDATE_IDENTITY_LINK_INVALID_CORRELATION_ID");
+  }
+}
+
 const REQUIRED_PERMISSION: Record<CandidateIdentityLinkAdminAction, string> = {
   create: "candidate.identity_link.create",
   verify: "candidate.identity_link.verify",
@@ -49,8 +67,9 @@ export class CandidateIdentityLinkAdminRuntime<TRequestContext> {
     requestContext: TRequestContext,
     command: CandidateIdentityLinkCommand
   ): Promise<CandidateIdentityLinkResult> {
+    validateActionAndCommand(action, command);
     const principal = await this.operatorResolver.resolve(requestContext);
-    if (!principal || typeof principal.actorId !== "string" || !principal.actorId.trim()) {
+    if (!principal || typeof principal.actorId !== "string" || !principal.actorId.trim() || principal.actorId.trim().length > 200) {
       throw new Error("CANDIDATE_IDENTITY_LINK_OPERATOR_REQUIRED");
     }
     if (!Array.isArray(principal.permissions) || !principal.permissions.includes(REQUIRED_PERMISSION[action])) {
