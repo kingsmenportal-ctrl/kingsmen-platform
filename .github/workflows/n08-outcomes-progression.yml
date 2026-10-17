@@ -1,0 +1,29 @@
+name: N08 Outcomes and Progression
+on:
+  pull_request:
+    paths:
+      - "db/migrations/0062_n08_outcomes_progression.sql"
+      - "apps/web/src/app/api/candidate/outcomes/**"
+      - "apps/web/src/app/api/reviewer/outcomes/**"
+      - "apps/web/src/app/candidate/outcomes/**"
+      - "apps/web/src/app/reviewer/outcomes/**"
+      - "scripts/validators/validate-n08-outcomes-progression.mjs"
+      - "scripts/tests/n08-outcomes-isolation.integration.mjs"
+      - ".github/workflows/n08-outcomes-progression.yml"
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  n08-source-guards:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - run: node --check scripts/validators/validate-n08-outcomes-progression.mjs
+      - run: node --check scripts/tests/n08-outcomes-isolation.integration.mjs
+      - run: node scripts/validators/validate-n08-outcomes-progression.mjs
+      - name: Validate migration markers
+        run: |
+          node --input-type=module -e 'import {readFileSync} from "node:fs"; const s=readFileSync("db/migrations/0062_n08_outcomes_progression.sql","utf8"); for (const t of ["candidate_outcomes","candidate_outcome_correction_requests","ENABLE ROW LEVEL SECURITY","OUTCOME_RECORDED"]) if (!s.includes(t)) throw new Error("Missing N08 migration marker: "+t); console.log("N08 migration markers passed; migration not applied by CI.");'
