@@ -196,8 +196,16 @@ BEGIN
       debit_cents, credit_cents, currency, description, evidence_ref
     ) VALUES (
       'PAYFAST:PAYMENT_RECEIVED:' || v_merchant_ref, v_order.candidate_ref, v_order.order_ref,
-      v_intent.invoice_ref, v_payment_ref, 'PAYMENT_RECEIVED', 0, v_gross,
-      v_currency, 'Verified PayFast gross payment received.', v_evidence_ref
+      v_intent.invoice_ref, v_payment_ref, 'PAYMENT_RECEIVED', v_net, 0,
+      v_currency, 'Verified PayFast net settlement received.', v_evidence_ref
+    ) ON CONFLICT (ledger_ref) DO NOTHING;
+    INSERT INTO public.finance_ledger_entries(
+      ledger_ref, candidate_ref, order_ref, invoice_ref, payment_ref, entry_type,
+      debit_cents, credit_cents, currency, description, evidence_ref
+    ) VALUES (
+      'PAYFAST:SETTLEMENT_CLEARING:' || v_merchant_ref, v_order.candidate_ref, v_order.order_ref,
+      v_intent.invoice_ref, v_payment_ref, 'ADJUSTMENT', 0, v_gross,
+      v_currency, 'Gross receivable clearing offset for verified PayFast settlement.', v_evidence_ref
     ) ON CONFLICT (ledger_ref) DO NOTHING;
     IF v_fee > 0 THEN
       INSERT INTO public.finance_ledger_entries(
