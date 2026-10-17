@@ -43,6 +43,8 @@ includes("upload", "DOCUMENT_TYPE_MIME_NOT_ALLOWED", "document type allowlist");
 includes("upload", "FILENAME_MIME_MISMATCH", "filename extension validation");
 includes("upload", "verifyPrivateDocumentsBucket", "verify bucket privacy and policy");
 includes("upload", "SIGNED_UPLOAD_CREATED", "audit signed upload issuance");
+includes("upload", "expiresIn: 900", "request short-lived upload capability");
+includes("upload", "expiresInSeconds: 900", "report 15-minute upload capability TTL");
 includes("upload", "UPLOAD_AUDIT_FAILED", "fail closed if upload audit fails");
 includes("runtime", "bucket.public === false", "bucket must be private");
 includes("runtime", "configuredLimit === 15 * 1024 * 1024", "exact bucket size limit");
@@ -72,7 +74,7 @@ includes("status", "candidateCanVerify: false", "candidate cannot verify documen
 includes("status", "candidateCanReject: false", "candidate cannot reject documents");
 includes("client", "authorization: `Bearer ${token}`", "authenticated browser requests");
 includes("client", "method: \"POST\"", "signed upload HTTP method");
-includes("client", "10 * 1024 * 1024", "client-side upload cap");
+includes("client", "15 * 1024 * 1024", "client-side 15 MiB upload cap");
 includes("page", "does not mark a document verified", "honest pending-review UX");
 
 // Fail-closed / non-production assertions: these are intentional until staging proof.
