@@ -8,7 +8,7 @@ const page = read("apps/web/src/app/candidate/support/page.tsx");
 const checks = [
   ["ticket reads bind to verified Supabase Auth UUID", /listSupportTicketsForVerifiedSupabaseUser[\s\S]*?where ca\.auth_user_id = \$1::uuid/.test(repository)],
   ["ticket reads require an active candidate", /listSupportTicketsForVerifiedSupabaseUser[\s\S]*?c\.is_active = true/.test(repository)],
-  ["ticket reads are candidate-scoped and metadata-only", /from public\.candidate_support_tickets[\s\S]*?where candidate_id = \$1::uuid/.test(repository) && !/listSupportTicketsForVerifiedSupabaseUser[\s\S]*?select[\s\S]*?description|evidence_ref|assigned_to/.test(repository)],
+  ["ticket reads are candidate-scoped and metadata-only", (() => { const match = /listSupportTicketsForVerifiedSupabaseUser[\s\S]*?select([\s\S]*?)from public\.candidate_support_tickets/.exec(repository); return /from public\.candidate_support_tickets[\s\S]*?where candidate_id = \$1::uuid/.test(repository) && Boolean(match) && !/\b(description|evidence_ref|assigned_to)\b/.test(match[1]); })()],
   ["identity binding runs in a transaction with rollback", /listSupportTicketsForVerifiedSupabaseUser[\s\S]*?BEGIN[\s\S]*?set_config\('app\.kingsmen_role', \$1, true\)[\s\S]*?COMMIT[\s\S]*?ROLLBACK/.test(repository)],
   ["internal endpoint is POST-only and authenticated", /pathname === "\/api\/internal\/candidate\/support-tickets"[\s\S]*?method !== "POST"[\s\S]*?handleInternalCandidateSupportTickets/.test(server) && /handleInternalCandidateSupportTickets[\s\S]*?KINGSMEN_WEB_INTERNAL_API_KEY[\s\S]*?timingSafeEqual/.test(server)],
   ["web bridge derives identity from server-verified Auth", /getVerifiedAuthUser\(\)/.test(route) && /JSON\.stringify\(\{ supabaseUserId: user\.id \}\)/.test(route)],
