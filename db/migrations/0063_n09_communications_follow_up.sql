@@ -2,7 +2,7 @@
 CREATE TABLE IF NOT EXISTS public.candidate_communication_preferences (
  id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
  candidate_id uuid NOT NULL UNIQUE REFERENCES public.candidates(id) ON DELETE RESTRICT,
- email_address text, phone_e164 text,
+ email_address text, phone_e164 text, phone_verified_at timestamptz,
  email_transactional boolean NOT NULL DEFAULT true,
  whatsapp_urgent boolean NOT NULL DEFAULT false,
  sms_backup boolean NOT NULL DEFAULT false,
@@ -37,7 +37,7 @@ CREATE INDEX IF NOT EXISTS idx_n09_communications_queue ON public.candidate_comm
 CREATE INDEX IF NOT EXISTS idx_n09_communications_application ON public.candidate_communications(application_id,created_at DESC);
 CREATE TABLE IF NOT EXISTS public.candidate_communication_attempts (
  id uuid PRIMARY KEY DEFAULT gen_random_uuid(), communication_id uuid NOT NULL REFERENCES public.candidate_communications(id) ON DELETE RESTRICT,
- attempt_no integer NOT NULL CHECK(attempt_no BETWEEN 1 AND 3), action text NOT NULL CHECK(action IN ('PREPARED','SEND_REQUESTED','SENT','DELIVERED','FAILED','RETRY_SCHEDULED','ACKNOWLEDGED','CANCELLED')),
+ attempt_no integer NOT NULL CHECK(attempt_no BETWEEN 1 AND 3 OR (attempt_no=0 AND action='PREPARED')), action text NOT NULL CHECK(action IN ('PREPARED','SEND_REQUESTED','SENT','DELIVERED','FAILED','RETRY_SCHEDULED','ACKNOWLEDGED','CANCELLED')),
  provider_event_id text, provider_message_id text, error_code text, actor_auth_user_id uuid,
  details jsonb NOT NULL DEFAULT '{}'::jsonb, occurred_at timestamptz NOT NULL DEFAULT now(),
  UNIQUE(communication_id,attempt_no,action,provider_event_id)
