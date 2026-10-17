@@ -12,6 +12,7 @@ SET search_path = public, pg_temp
 AS $$
 DECLARE
   v_payment public.finance_payments%ROWTYPE;
+  v_existing_refund public.finance_refund_requests%ROWTYPE;
   v_candidate_ref text;
   v_candidate public.candidates%ROWTYPE;
   v_prior_refunds integer := 0;
@@ -58,6 +59,17 @@ BEGIN
       AND o.order_status = 'PAID'
   ) THEN
     RAISE EXCEPTION 'REFUND_ORDER_NOT_SETTLED' USING ERRCODE = '23514';
+  END IF;
+
+  SELECT * INTO v_existing_refund FROM public.finance_refund_requests
+    WHERE payment_ref = p_payment_ref AND candidate_ref = v_candidate_ref
+      AND amount_cents = p_amount_cents AND reason = v_reason
+      AND refund_status = 'PENDING_REVIEW'
+    ORDER BY created_at DESC LIMIT 1 FOR UPDATE;
+  IF FOUND THEN
+    RETURN jsonb_build_object('ok', true, 'refundRequestId', v_existing_refund.id,
+      'refundRef', v_existing_refund.refund_ref, 'refundStatus', v_existing_refund.refund_status,
+      'replayed', true, 'message', 'An identical refund request is already pending review.');
   END IF;
 
   SELECT COALESCE(sum(amount_cents),0)::integer INTO v_prior_refunds
