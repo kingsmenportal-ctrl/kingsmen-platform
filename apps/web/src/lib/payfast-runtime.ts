@@ -101,11 +101,11 @@ export async function validatePayFastItnAtProvider(rawBody: string, environment:
 }
 
 export function payFastApiSignature(fields: Record<string, string>, passphrase: string): string {
-  const parts = Object.entries(fields)
+  const values = { ...fields, ...(passphrase ? { passphrase } : {}) };
+  const parts = Object.entries(values)
     .filter(([, value]) => value !== "")
     .sort(([a], [b]) => a.localeCompare(b))
     .map(([key, value]) => key + "=" + encodePayFastValue(value));
-  if (passphrase) parts.push("passphrase=" + encodePayFastValue(passphrase));
   return createHash("md5").update(parts.join("&")).digest("hex");
 }
 
