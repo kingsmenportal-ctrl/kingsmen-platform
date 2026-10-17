@@ -5,6 +5,7 @@ const repository = read("apps/api/src/db/truth-vault-repository.ts");
 const server = read("apps/api/src/server.ts");
 const web = read("apps/web/src/app/api/candidate/applications/route.ts");
 const sessionWeb = read("apps/web/src/app/api/candidate/session/route.ts");
+const dashboard = read("apps/web/src/app/candidate/dashboard/page.tsx");
 const checks = [
  ["Supabase UUID format validated", /listApplicationsForVerifiedSupabaseUser[\s\S]*?test\(supabaseUserId\)/.test(repository)],
  ["ownership uses explicit supabase_user_id binding and active candidate", /listApplicationsForVerifiedSupabaseUser[\s\S]*?ca\.supabase_user_id=\$1::uuid[\s\S]*?c\.is_active=true/.test(repository)],
@@ -20,7 +21,9 @@ const checks = [
  ["dashboard linkage is resolved by internal API, not hard-coded false", /api\\/internal\\/candidate\\/session/.test(sessionWeb) && /payload\\.candidateRecordLinked/.test(sessionWeb)],
  ["internal linkage endpoint uses timing-safe service authentication", /handleInternalCandidateSession[\\s\\S]*?timingSafeEqual/.test(server)],
  ["internal linkage endpoint resolves verified mapping without exposing candidate UUID", /resolveCandidateUuidForSupabaseUser\\(supabaseUserId\\)/.test(server) && /candidateRecordLinked: candidateId !== null/.test(server)],
- ["internal linkage endpoint is POST-only", /pathname === "\\/api\\/internal\\/candidate\\/session"[\\s\\S]*?method !== "POST"/.test(server)]
+ ["internal linkage endpoint is POST-only", /pathname === "\\/api\\/internal\\/candidate\\/session"[\\s\\S]*?method !== "POST"/.test(server)],
+ ["dashboard renders linked and unlinked states", /session === "authenticated_linked"/.test(dashboard) && /session === "authenticated_unlinked"/.test(dashboard)],
+ ["dashboard distinguishes identity linkage from profile readiness", /profile readiness, documents, and application records are checked separately/.test(dashboard)]
 ];
 let failed = false;
 for (const [label, passed] of checks) { console.log(`${passed ? "PASS" : "FAIL"} ${label}`); if (!passed) failed = true; }
