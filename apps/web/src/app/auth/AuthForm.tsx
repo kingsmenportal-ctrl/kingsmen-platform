@@ -10,6 +10,7 @@ export default function AuthForm({ mode }: { mode: "login" | "register" }) {
   const [password, setPassword] = useState("");
   const [displayName, setDisplayName] = useState("");
   const [candidateReference, setCandidateReference] = useState("");
+  const [accountType, setAccountType] = useState<"candidate" | "partner">("candidate");
   const [busy, setBusy] = useState(false);
   const [notice, setNotice] = useState("");
   const [error, setError] = useState("");
@@ -19,7 +20,7 @@ export default function AuthForm({ mode }: { mode: "login" | "register" }) {
     setBusy(true); setNotice(""); setError("");
     try {
       const data = await supabaseAuth(registering ? "signup" : "token?grant_type=password", registering
-        ? { email: email.trim().toLowerCase(), password, data: { display_name: displayName.trim(), portal: "kingsmen" } }
+        ? { email: email.trim().toLowerCase(), password, data: { display_name: displayName.trim(), account_type: accountType, portal: "kingsmen" } }
         : { email: email.trim().toLowerCase(), password });
       const session = data as unknown as KingsmenSession;
       if (session.access_token && session.user?.id) {
@@ -49,10 +50,11 @@ export default function AuthForm({ mode }: { mode: "login" | "register" }) {
   return <main style={{ maxWidth: 520, margin: "7vh auto", padding: 24, color: "#f4f6ff", fontFamily: "system-ui, sans-serif" }}>
     <p style={{ color: "#a5b4fc", fontWeight: 700, letterSpacing: 2 }}>KINGSMEN PORTAL</p>
     <h1>{registering ? "Create your account" : "Welcome back"}</h1>
-    <p style={{ color: "#b8c0d9", lineHeight: 1.6 }}>{registering ? "Create a secure sign-in. Existing candidate records are linked only after authorised identity review and a verified identity link." : "Sign in with your verified portal credentials to continue your candidate journey."}</p>
+    <p style={{ color: "#b8c0d9", lineHeight: 1.6 }}>{registering ? "Create a secure sign-in. Candidate accounts require authorised identity review; partner organisations require verification before listing publication." : "Sign in with your verified portal credentials to continue your candidate journey."}</p>
     <form onSubmit={submit} style={{ display: "grid", gap: 14, marginTop: 24 }}>
       {registering && <label style={{ display: "grid", gap: 6 }}>Full name<input required autoComplete="name" value={displayName} onChange={e => setDisplayName(e.target.value)} style={fieldStyle} /></label>}
       <label style={{ display: "grid", gap: 6 }}>Existing candidate reference (optional)<input maxLength={100} autoComplete="off" value={candidateReference} onChange={e => setCandidateReference(e.target.value)} style={fieldStyle} /><small style={{ color: "#b8c0d9" }}>This is only a review hint. It does not prove ownership or link your candidate record.</small></label>
+      <label style={{ display: "grid", gap: 6 }}>I am signing in as<select value={accountType} onChange={e => setAccountType(e.target.value as "candidate" | "partner")} style={fieldStyle}><option value="candidate">Candidate</option><option value="partner">Partner organisation</option></select></label>
       <label style={{ display: "grid", gap: 6 }}>Email address<input required type="email" autoComplete="email" value={email} onChange={e => setEmail(e.target.value)} style={fieldStyle} /></label>
       <label style={{ display: "grid", gap: 6 }}>Password<input required type="password" minLength={8} autoComplete={registering ? "new-password" : "current-password"} value={password} onChange={e => setPassword(e.target.value)} style={fieldStyle} /></label>
       <button disabled={busy} type="submit" style={{ padding: 13, border: 0, borderRadius: 10, background: busy ? "#526078" : "#a5b4fc", color: "#111827", fontWeight: 800, cursor: busy ? "wait" : "pointer" }}>{busy ? "Working…" : registering ? "Create secure account" : "Sign in"}</button>
