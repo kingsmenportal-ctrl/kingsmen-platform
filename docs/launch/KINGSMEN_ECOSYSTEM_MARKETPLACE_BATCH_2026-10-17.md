@@ -86,3 +86,8 @@ The same draft PR also contains source-level candidate identity-link lifecycle/a
 - Added per-job timeouts and concurrency cancellation so superseded branch runs do not consume CI indefinitely.
 - Live staging read-only check: identity mapping table exists; 2 active candidate rows; 0 verified identity links; 0 pending identity links; 0 verified organisations; 0 published partner listings. This is a blocker/evidence snapshot, not a claim that a real reviewer or candidate journey has passed.
 - No migration was applied, no secrets changed, no deployment was triggered, and the PR was not merged. CI/build execution remains unverified until a runner result is available.
+
+
+## Staging verification correction — read-only inventory (2026-10-17)
+
+The live Supabase migration inventory confirms `candidate_auth_identity_link_0040` and marketplace migrations `0041` through `0058` are recorded. A read-only catalog query confirms RLS is enabled on `candidate_auth_identity_links`, with the backend-only `candidate_auth_identity_links_backend_all` policy. The table currently has zero rows (zero pending, verified or revoked mappings). There are two active candidate rows, but no verified organisation or published partner listing. Schema presence is confirmed; real candidate identity-linking and reviewer workflows are still not proven end to end.
