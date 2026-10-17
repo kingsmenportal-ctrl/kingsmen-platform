@@ -6,7 +6,8 @@
  *   N05_BASE_URL
  *   N05_CANDIDATE_A_TOKEN
  *   N05_CANDIDATE_B_TOKEN
- *   N05_CANDIDATE_A_DOCUMENT_ID (a real active document owned by candidate A)
+ *   N05_CANDIDATE_A_DOCUMENT_ID (a real active CLEAN document owned by candidate A)
+ *   N05_CANDIDATE_A_QUARANTINED_DOCUMENT_ID (a real quarantined document owned by candidate A)
  *
  * This test does not create, delete, or modify documents. The A read-url check
  * creates an access-audit event and returns a short-lived signed URL.
@@ -17,6 +18,7 @@ const baseUrl = process.env.N05_BASE_URL?.trim().replace(/\/+$/, "");
 const tokenA = process.env.N05_CANDIDATE_A_TOKEN?.trim();
 const tokenB = process.env.N05_CANDIDATE_B_TOKEN?.trim();
 const documentIdA = process.env.N05_CANDIDATE_A_DOCUMENT_ID?.trim();
+const quarantinedDocumentIdA = process.env.N05_CANDIDATE_A_QUARANTINED_DOCUMENT_ID?.trim();
 
 function requireEnv(name, value) {
   if (!value) {
@@ -28,6 +30,7 @@ requireEnv("N05_BASE_URL", baseUrl);
 requireEnv("N05_CANDIDATE_A_TOKEN", tokenA);
 requireEnv("N05_CANDIDATE_B_TOKEN", tokenB);
 requireEnv("N05_CANDIDATE_A_DOCUMENT_ID", documentIdA);
+requireEnv("N05_CANDIDATE_A_QUARANTINED_DOCUMENT_ID", quarantinedDocumentIdA);
 assert.notEqual(tokenA, tokenB, "Candidate A and B must use separate authenticated sessions.");
 
 async function request(path, token, body) {
@@ -79,6 +82,11 @@ record("candidate B cannot read candidate A document", crossRead.status === 404 
   crossRead.data?.code === "DOCUMENT_NOT_FOUND",
   `expected 404 DOCUMENT_NOT_FOUND, received HTTP ${crossRead.status} (${crossRead.data?.code || "no code"})`);
 
+const quarantinedRead = await request("/api/candidate/documents/read-url", tokenA, { documentId: quarantinedDocumentIdA });
+record("owner cannot download quarantined document", quarantinedRead.status === 423 &&
+  quarantinedRead.data?.code === "DOCUMENT_QUARANTINED" && quarantinedRead.data?.downloadable === false,
+  `expected 423 DOCUMENT_QUARANTINED, received HTTP ${quarantinedRead.status} (${quarantinedRead.data?.code || "no code"})`);
+
 const ownerRead = await request("/api/candidate/documents/read-url", tokenA, { documentId: documentIdA });
 record("candidate A can read own active document", ownerRead.status === 200 &&
   ownerRead.data?.ok === true && typeof ownerRead.data?.signedReadUrl === "string" &&
@@ -93,6 +101,6 @@ console.log(JSON.stringify({
   checks: results.length,
   failed: failed.length,
   results,
-  note: "Requires two dedicated staging candidates and a known active document belonging to candidate A. Does not bypass authentication or modify document data."
+  note: "Requires two dedicated staging candidates, one clean active document and one quarantined document belonging to candidate A. Does not bypass authentication or modify document data; the quarantine check must not issue a signed URL."
 }, null, 2));
 if (failed.length) process.exitCode = 1;

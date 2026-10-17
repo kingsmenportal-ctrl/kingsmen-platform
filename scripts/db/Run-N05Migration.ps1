@@ -9,6 +9,7 @@ $SqlFiles = @(
   "$Base\db\migrations\0002_n04_candidate_core.sql",
   "$Base\db\seeds\n04_runtime_config_seed.sql",
   "$Base\db\migrations\0003_n05_document_vault.sql",
+  "$Base\db\migrations\0005_n05_quarantine_scan_reconciliation.sql",
   "$Base\db\seeds\n05_runtime_config_seed.sql"
 )
 

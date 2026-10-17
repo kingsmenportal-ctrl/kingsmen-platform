@@ -7,6 +7,7 @@ type StoredDocument = {
   storage_path: string;
   display_name: string;
   document_status: string;
+  malware_scan_status?: string;
   archived_at: string | null;
   file_size_bytes: number | string;
 };
@@ -33,7 +34,7 @@ export async function POST(request: Request) {
   }
 
   const documentUrl = new URL(`${auth.config.url}/rest/v1/document_files`);
-  documentUrl.searchParams.set("select", "id,candidate_id,storage_bucket,storage_path,display_name,document_status,archived_at,file_size_bytes");
+  documentUrl.searchParams.set("select", "id,candidate_id,storage_bucket,storage_path,display_name,document_status,malware_scan_status,archived_at,file_size_bytes");
   documentUrl.searchParams.set("id", `eq.${documentId}`);
   documentUrl.searchParams.set("candidate_id", `eq.${auth.session.candidateId}`);
   documentUrl.searchParams.set("archived_at", "is.null");
@@ -52,6 +53,18 @@ export async function POST(request: Request) {
   if (document.document_status === "DELETED" || document.document_status === "ARCHIVED") {
     return Response.json({ ok: false, code: "DOCUMENT_NOT_READABLE", error: "This document is archived or deleted." }, { status: 410 });
   }
+  // Fail closed: owner identity alone never bypasses quarantine. Only a persisted clean scan
+  // result plus the READY state permits the server to mint a signed download URL.
+  if (document.malware_scan_status !== "CLEAN" || document.document_status !== "READY") {
+    return Response.json({
+      ok: false,
+      code: "DOCUMENT_QUARANTINED",
+      error: "This document is not available for download until the configured malware scanner reports CLEAN and the release state is persisted.",
+      malwareScanStatus: document.malware_scan_status || "PENDING",
+      downloadable: false
+    }, { status: 423, headers: { "cache-control": "no-store" } });
+  }
+
   if (document.storage_bucket !== auth.config.documentsBucket) {
     return Response.json({ ok: false, code: "DOCUMENT_BUCKET_MISMATCH", error: "The document is not in the configured private candidate bucket." }, { status: 409 });
   }

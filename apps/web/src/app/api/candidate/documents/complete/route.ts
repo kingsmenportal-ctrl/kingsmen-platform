@@ -1,4 +1,4 @@
-import { requireCandidateSession, supabaseAdminFetch, verifyStoredDocumentSignature } from "../../../../../lib/candidate-document-runtime";
+import { requireCandidateSession, supabaseAdminFetch, verifyStoredDocumentSignature, type SupabaseConfig } from "../../../../../lib/candidate-document-runtime";
 
 const ALLOWED_TYPES: Record<string, string[]> = {
   CV: ["application/pdf", "application/vnd.openxmlformats-officedocument.wordprocessingml.document", "text/plain"],
@@ -19,6 +19,46 @@ type StorageObject = {
   name?: string;
   metadata?: { size?: number | string; mimetype?: string; contentType?: string; [key: string]: unknown };
 };
+
+async function cleanupRejectedUpload(
+  cfg: SupabaseConfig,
+  input: { uploadId: string; storagePath: string; sizeBytes: number; reason: string; userId: string; candidateId: string }
+): Promise<"DELETED" | "PENDING" | "UNRECORDED"> {
+  const encodedPath = input.storagePath.split("/").map(encodeURIComponent).join("/");
+  let deletion: Response | null = null;
+  try {
+    deletion = await supabaseAdminFetch(cfg, `/storage/v1/object/${encodeURIComponent(cfg.documentsBucket)}/${encodedPath}`, { method: "DELETE" });
+  } catch {
+    deletion = null;
+  }
+  const deleted = !!deletion && (deletion.ok || deletion.status === 404);
+  const eventResponse = await supabaseAdminFetch(cfg, "/rest/v1/document_storage_events?on_conflict=event_ref", {
+    method: "POST",
+    headers: { "content-type": "application/json", Prefer: "resolution=ignore-duplicates,return=minimal" },
+    body: JSON.stringify({
+      document_id: null,
+      event_ref: deleted ? `DOC-UPLOAD-REJECTED-CLEANUP-DONE-${input.uploadId}` : `DOC-UPLOAD-REJECTED-CLEANUP-${input.uploadId}`,
+      event_type: deleted ? "QUARANTINE_CLEANUP_COMPLETED" : "QUARANTINE_CLEANUP_PENDING",
+      storage_provider: "SUPABASE",
+      storage_bucket: cfg.documentsBucket,
+      storage_path: input.storagePath,
+      file_size_bytes: input.sizeBytes,
+      status: deleted ? "OK" : "WARNING",
+      message: deleted
+        ? "Rejected upload object was deleted or already absent."
+        : "Rejected upload object could not be deleted immediately and requires reconciliation.",
+      metadata: {
+        upload_id: input.uploadId,
+        reason: input.reason,
+        authenticated_user_id: input.userId,
+        candidate_id: input.candidateId,
+        cleanupStatus: deleted ? "COMPLETED" : "PENDING"
+      }
+    })
+  }).catch(() => null);
+  if (!eventResponse?.ok) return "UNRECORDED";
+  return deleted ? "DELETED" : "PENDING";
+}
 
 export async function POST(request: Request) {
   const auth = await requireCandidateSession(request);
@@ -82,18 +122,31 @@ export async function POST(request: Request) {
   const mimeType = String(object.metadata?.mimetype || object.metadata?.contentType || "").toLowerCase();
   const sizeBytes = Number(object.metadata?.size);
   if (!ALLOWED_TYPES[documentTypeCode]?.includes(mimeType) || !Number.isSafeInteger(sizeBytes) || sizeBytes < 1 || sizeBytes > 15 * 1024 * 1024) {
-    return Response.json({ ok: false, code: "STORED_FILE_METADATA_REJECTED", error: "Stored file type or size is outside Kingsmen's document policy." }, { status: 415 });
+    const cleanup = await cleanupRejectedUpload(auth.config, {
+      uploadId, storagePath, sizeBytes: Number.isSafeInteger(sizeBytes) && sizeBytes >= 0 ? sizeBytes : 0,
+      reason: "STORED_FILE_METADATA_REJECTED", userId: auth.session.userId, candidateId: auth.session.candidateId
+    });
+    return Response.json({
+      ok: false, code: "STORED_FILE_METADATA_REJECTED",
+      error: "Stored file type or size is outside Kingsmen document policy.",
+      privateObjectCleanup: cleanup, reconciliationRequired: cleanup === "PENDING" || cleanup === "UNRECORDED"
+    }, { status: 415, headers: { "cache-control": "no-store" } });
   }
 
   const signature = await verifyStoredDocumentSignature(auth.config, storagePath, mimeType, sizeBytes);
   if (!signature.ok) {
+    const cleanup = await cleanupRejectedUpload(auth.config, {
+      uploadId, storagePath, sizeBytes,
+      reason: "STORED_FILE_SIGNATURE_REJECTED", userId: auth.session.userId, candidateId: auth.session.candidateId
+    });
     return Response.json({
       ok: false,
       code: "STORED_FILE_SIGNATURE_REJECTED",
       error: signature.reason,
       metadataPersisted: false,
-      privateObjectCleanup: "PENDING_RECONCILIATION"
-    }, { status: 415 });
+      privateObjectCleanup: cleanup,
+      reconciliationRequired: cleanup === "PENDING" || cleanup === "UNRECORDED"
+    }, { status: 415, headers: { "cache-control": "no-store" } });
   }
 
   const documentRef = `DOC-${uploadId}`;
@@ -118,7 +171,9 @@ export async function POST(request: Request) {
         storage_path: storagePath,
         protected_data: true,
         source_channel: "PORTAL",
-        document_status: "UPLOADED",
+        document_status: "QUARANTINED",
+        malware_scan_status: "PENDING",
+        quarantine_started_at: new Date().toISOString(),
         verification_status: "PENDING",
         extraction_status: "NOT_STARTED",
         source_confidence_band: "C",
@@ -137,7 +192,7 @@ export async function POST(request: Request) {
   let document = Array.isArray(returnedRows) ? returnedRows[0] : undefined;
   if (!document) {
     const existingUrl = new URL(`${auth.config.url}/rest/v1/document_files`);
-    existingUrl.searchParams.set("select", "id,document_ref,document_type,display_name,mime_type,file_size_bytes,document_status,verification_status,uploaded_at");
+    existingUrl.searchParams.set("select", "id,document_ref,document_type,display_name,mime_type,file_size_bytes,document_status,malware_scan_status,verification_status,uploaded_at");
     existingUrl.searchParams.set("document_ref", `eq.${documentRef}`);
     existingUrl.searchParams.set("candidate_id", `eq.${auth.session.candidateId}`);
     existingUrl.searchParams.set("limit", "1");
@@ -148,6 +203,79 @@ export async function POST(request: Request) {
 
   if (!document) {
     return Response.json({ ok: false, code: "DOCUMENT_RECORD_NOT_CONFIRMED", error: "The upload completed, but Kingsmen could not confirm its document record." }, { status: 502 });
+  }
+
+  // Persist a durable scan job. If this write fails, the object and metadata remain quarantined;
+  // the reconciler must discover stale quarantined records. No download URL is issued here.
+  const scanJobResponse = await supabaseAdminFetch(auth.config, "/rest/v1/document_scan_jobs?on_conflict=job_ref", {
+    method: "POST",
+    headers: { "content-type": "application/json", Prefer: "resolution=ignore-duplicates,return=representation" },
+    body: JSON.stringify({
+      job_ref: `DOC-SCAN-${uploadId}`,
+      document_id: document.id,
+      candidate_id: auth.session.candidateId,
+      storage_bucket: auth.config.documentsBucket,
+      storage_path: storagePath,
+      checksum_sha256: signature.checksumSha256,
+      file_size_bytes: sizeBytes,
+      mime_type: mimeType,
+      status: "QUEUED",
+      available_at: new Date().toISOString()
+    })
+  });
+  if (!scanJobResponse.ok) {
+    await supabaseAdminFetch(auth.config, "/rest/v1/document_storage_events", {
+      method: "POST",
+      headers: { "content-type": "application/json", Prefer: "return=minimal" },
+      body: JSON.stringify({
+        document_id: document.id,
+        event_ref: `DOC-SCAN-QUEUE-FAILED-${uploadId}`,
+        event_type: "MALWARE_SCAN_FAILED",
+        storage_provider: "SUPABASE",
+        storage_bucket: auth.config.documentsBucket,
+        storage_path: storagePath,
+        file_size_bytes: sizeBytes,
+        checksum_sha256: signature.checksumSha256,
+        status: "FAILED",
+        message: "Scan queue write failed; document remains quarantined for reconciliation.",
+        metadata: { upload_id: uploadId, reason: "SCAN_QUEUE_WRITE_FAILED" }
+      })
+    }).catch(() => undefined);
+    return Response.json({
+      ok: false,
+      code: "DOCUMENT_SCAN_QUEUE_UNAVAILABLE",
+      error: "The document is safely quarantined but the scan job could not be queued. It cannot be downloaded until reconciliation and a clean scan complete.",
+      documentId: document.id,
+      malwareScanStatus: "PENDING",
+      cleanup: "RECONCILIATION_REQUIRED"
+    }, { status: 503, headers: { "cache-control": "no-store" } });
+  }
+
+  const scanEventResponse = await supabaseAdminFetch(auth.config, "/rest/v1/document_storage_events?on_conflict=event_ref", {
+    method: "POST",
+    headers: { "content-type": "application/json", Prefer: "resolution=ignore-duplicates,return=minimal" },
+    body: JSON.stringify({
+      document_id: document.id,
+      event_ref: `DOC-SCAN-QUEUED-${uploadId}`,
+      event_type: "MALWARE_SCAN_QUEUED",
+      storage_provider: "SUPABASE",
+      storage_bucket: auth.config.documentsBucket,
+      storage_path: storagePath,
+      file_size_bytes: sizeBytes,
+      checksum_sha256: signature.checksumSha256,
+      status: "OK",
+      message: "Document quarantined and durable malware scan job queued; no user download is permitted before a clean result.",
+      metadata: { upload_id: uploadId, queue_job_ref: `DOC-SCAN-${uploadId}` }
+    })
+  });
+  if (!scanEventResponse.ok) {
+    return Response.json({
+      ok: false,
+      code: "DOCUMENT_SCAN_AUDIT_FAILED",
+      error: "The document remains quarantined with a durable scan job, but the queue audit event needs reconciliation.",
+      documentId: document.id,
+      malwareScanStatus: "PENDING"
+    }, { status: 502, headers: { "cache-control": "no-store" } });
   }
 
   const eventUrl = `/rest/v1/document_storage_events?on_conflict=event_ref`;
@@ -177,6 +305,7 @@ export async function POST(request: Request) {
     ok: true,
     productionReady: false,
     document,
-    review: { status: "PENDING", note: "Upload does not mean the document is verified. Verification and outcome decisions remain restricted to authorised review workflows." }
-  }, { status: 201, headers: { "cache-control": "no-store" } });
+    malwareScan: { status: "PENDING", queued: true, downloadable: false },
+    review: { status: "PENDING", note: "Upload does not mean the document is safe or verified. A configured malware scanner must report CLEAN before downloads are enabled; verification and outcome decisions remain restricted to authorised review workflows." }
+  }, { status: 202, headers: { "cache-control": "no-store" } });
 }

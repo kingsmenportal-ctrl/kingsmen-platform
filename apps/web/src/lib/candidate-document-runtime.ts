@@ -5,7 +5,7 @@ export type CandidateSession = {
   candidateId: string;
 };
 
-type SupabaseConfig = {
+export type SupabaseConfig = {
   url: string;
   anonKey: string;
   serviceRoleKey: string;
@@ -23,6 +23,10 @@ function config(): SupabaseConfig | null {
     serviceRoleKey,
     documentsBucket: process.env.SUPABASE_DOCUMENTS_BUCKET?.trim() || process.env.SUPABASE_STORAGE_BUCKET?.trim() || "candidate-documents"
   };
+}
+
+export function getDocumentRuntimeConfig(): SupabaseConfig | null {
+  return config();
 }
 
 export function createDocumentUploadId(): string {
