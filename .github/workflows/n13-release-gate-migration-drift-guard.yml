@@ -1,0 +1,65 @@
+name: N13 Release Gate & Migration Drift Guard
+on:
+  pull_request:
+    paths:
+      - 'db/migrations/0071_n11_service_fulfilment_entitlements.sql'
+      - 'db/migrations/0072_n12_function_search_path_hardening.sql'
+      - 'scripts/validators/validate-n13-release-gates.mjs'
+      - 'scripts/tests/n13-release-gates-contract.mjs'
+      - 'docs/n11/**'
+      - 'docs/n13/**'
+      - 'package.json'
+      - '.github/workflows/n13-release-gate-migration-drift-guard.yml'
+  push:
+    branches:
+      - 'n13-release-gate-migration-drift-guard-2026-10-17'
+    paths:
+      - 'db/migrations/0071_n11_service_fulfilment_entitlements.sql'
+      - 'db/migrations/0072_n12_function_search_path_hardening.sql'
+      - 'scripts/validators/validate-n13-release-gates.mjs'
+      - 'scripts/tests/n13-release-gates-contract.mjs'
+      - 'docs/n11/**'
+      - 'docs/n13/**'
+      - 'package.json'
+      - '.github/workflows/n13-release-gate-migration-drift-guard.yml'
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  release-gate-contract:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - name: Checkout exact commit
+        uses: actions/checkout@v4
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - name: Run validator and retain exit code
+        shell: bash
+        run: |
+          set +e
+          mkdir -p n13-ci-logs
+          node --version > n13-ci-logs/runtime.txt 2>&1
+          npm run n13:release:validate 2>&1 | tee n13-ci-logs/validate.log
+          code=${PIPESTATUS[0]}
+          echo "exit_code=$code" > n13-ci-logs/validate.exit
+          exit "$code"
+      - name: Run source-contract tests and retain exit code
+        if: always()
+        shell: bash
+        run: |
+          set +e
+          npm run n13:release:test 2>&1 | tee n13-ci-logs/test.log
+          code=${PIPESTATUS[0]}
+          echo "exit_code=$code" > n13-ci-logs/test.exit
+          exit "$code"
+      - name: Upload N13 diagnostics
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: n13-release-gate-diagnostics
+          path: n13-ci-logs/
+          if-no-files-found: warn
+          retention-days: 14
