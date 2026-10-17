@@ -1,5 +1,7 @@
 import { isIP } from "node:net";
 
+import { isIP } from "node:net";
+
 /**
  * Accept only well-formed HTTPS URLs intended to be shown as public provider
  * links or stored as reviewer evidence. This function does not fetch the URL.
