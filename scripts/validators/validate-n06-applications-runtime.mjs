@@ -8,7 +8,7 @@ for(const p of ["HIGHER_EDUCATION","TVET","SETA_LEARNERSHIP","INTERNSHIP","APPRE
 has("migration","candidate_application_events","append-only event table");has("migration","prevent_candidate_application_event_mutation","event mutation prevention");
 has("applications","requireCandidateSession","session authentication");has("applications","auth.session.candidateId","server-owned candidate ID");has("applications","OPPORTUNITY_SOURCE_UNVERIFIED","verified opportunity gate");
 has("readiness","candidate_profile_field_sources","profile readiness");has("readiness","document_files","document readiness");has("readiness","submissionPermitted:false","readiness does not submit");
-has("status","transitions:Record","explicit transition graph");has("status","REVIEWER_TRANSITION_REQUIRED","provider outcomes reserved for authorised review");has("status","status=eq."+ "app.status","optimistic transition guard");
+has("status","transitions:Record","explicit transition graph");has("status","REVIEWER_TRANSITION_REQUIRED","provider outcomes reserved for authorised review");has("status","status=eq.","optimistic transition guard");has("status","app.status","previous status condition");
 has("manual","MANUAL_PACKAGE_CREATED","manual package audit");has("opportunities","auth.session.candidateId","candidate scoped saved records");
 has("client","/api/candidate/applications/readiness","readiness UI");has("client","/api/candidate/applications/manual-package","manual UI");has("client","HIGHER_EDUCATION","six-pathway UI");lacks("client","SUPABASE_SERVICE_ROLE_KEY","no service-role secret in browser");
 has("dashboard","/candidate/applications","dashboard link");
