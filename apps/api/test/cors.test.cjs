@@ -62,3 +62,30 @@ test("preflight without an Origin is rejected", async () => {
   const response = await fetch(`${baseUrl}/api/commands`, { method: "OPTIONS" });
   assert.equal(response.status, 403);
 });
+
+test("health alias reports explicit development-only storage mode", async () => {
+  const response = await fetch(`${baseUrl}/api/system/health`);
+  assert.equal(response.status, 200);
+  const body = await response.json();
+  assert.equal(body.ok, true);
+  assert.equal(body.service, "kingsmen-api");
+  assert.equal(body.storageMode, "memory_development_only");
+  assert.equal(body.truthVault.ok, true);
+  assert.match(body.truthVault.message, /memory-only development mode/i);
+});
+
+test("unknown API route returns structured 404", async () => {
+  const response = await fetch(`${baseUrl}/api/not-a-real-route`);
+  assert.equal(response.status, 404);
+  const body = await response.json();
+  assert.equal(body.ok, false);
+  assert.equal(body.code, "ROUTE_NOT_FOUND");
+});
+
+test("health response identifies the Kingsmen service", async () => {
+  const response = await fetch(`${baseUrl}/health`);
+  assert.equal(response.headers.get("x-kingsmen-service"), "kingsmen-api");
+  const body = await response.json();
+  assert.equal(body.routes.includes("POST /api/commands"), true);
+  assert.equal(body.routes.includes("POST /api/workflow/result"), true);
+});
