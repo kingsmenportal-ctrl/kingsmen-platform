@@ -2,7 +2,7 @@ name: N11 Service Fulfilment Entitlements
 on:
   pull_request:
     paths:
-      - 'db/migrations/0066_n11_service_fulfilment_entitlements.sql'
+      - 'db/migrations/0071_n11_service_fulfilment_entitlements.sql'
       - 'scripts/validators/validate-n11-entitlements.mjs'
       - 'apps/web/src/app/api/candidate/entitlements/**'
       - 'apps/web/src/app/api/reviewer/entitlements/**'
@@ -15,7 +15,7 @@ on:
     branches:
       - 'n11-service-fulfilment-entitlements-2026-10-17'
     paths:
-      - 'db/migrations/0066_n11_service_fulfilment_entitlements.sql'
+      - 'db/migrations/0071_n11_service_fulfilment_entitlements.sql'
       - 'scripts/validators/validate-n11-entitlements.mjs'
       - 'apps/web/src/app/api/candidate/entitlements/**'
       - 'apps/web/src/app/api/reviewer/entitlements/**'
