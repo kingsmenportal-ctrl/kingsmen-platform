@@ -20,7 +20,7 @@ assert.match(migration, /candidate_auth_identity_links_backend_all[\s\S]*?is_bac
 assert.match(resolver, /link\.link_status = 'VERIFIED'/, "only verified mappings may resolve candidate identity");
 assert.match(resolver, /candidate\.is_active = true/, "inactive candidate records must not resolve");
 assert.match(resolver, /limit 2/i, "identity resolution must detect duplicate rows and fail closed");
-const identityQuery = resolver.match(/`select link\\.candidate_id[\\s\\S]*?`/)?.[0] ?? "";
+const identityQuery = resolver.match(/`select link\.candidate_id[\s\S]*?`/)?.[0] ?? "";
 assert.ok(identityQuery.length > 0, "identity resolver must expose its explicit SQL lookup");
 assert.doesNotMatch(identityQuery, /email/i, "identity mapping query must never fall back to email matching");
 assert.match(adminRuntime, /operatorResolver\.resolve\(requestContext\)/, "identity link lifecycle must resolve trusted operator context");
