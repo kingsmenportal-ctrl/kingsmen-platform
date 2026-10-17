@@ -22,13 +22,13 @@ export async function GET(request: Request) {
   try {
     const [packagesResponse, applicationsResponse] = await Promise.all([
       supabaseAdminFetch(auth.config, `/rest/v1/candidate_manual_application_packages?select=id,map_ref,application_id,candidate_id,reason_code,reason_summary,source_links,required_documents,manual_steps,review_evidence_urls,status,review_notes,reviewed_at,delivered_at,delivery_confirmed_at,completion_evidence_ref,created_at,updated_at&candidate_id=eq.${auth.session.candidateId}&order=updated_at.desc&limit=100`),
-      supabaseAdminFetch(auth.config, `/rest/v1/applications?select=id,route_type,route_name,institution_or_provider,portal_health,map_fallback_required,last_evidence_ref,current_state&candidate_id=eq.${auth.session.candidateId}&order=updated_at.desc&limit=200`)
+      supabaseAdminFetch(auth.config, `/rest/v1/applications?select=id,route_type,route_name,institution_or_provider,portal_health,map_fallback_required,last_evidence_ref,current_state,source_confidence_band&candidate_id=eq.${auth.session.candidateId}&order=updated_at.desc&limit=200`)
     ]);
     if (!packagesResponse.ok || !applicationsResponse.ok) return json({ ok: false, code: "MAP_QUERY_FAILED", error: "Manual Application Packages could not be loaded. Confirm migration 0072 is deployed." }, 503);
     const [packages, applications] = await Promise.all([packagesResponse.json(), applicationsResponse.json()]);
     if (!Array.isArray(packages) || !Array.isArray(applications)) return json({ ok: false, code: "MAP_RESPONSE_INVALID", error: "The package service returned an invalid response." }, 502);
     const eligible = applications.filter((a: Record<string, unknown>) =>
-      a.map_fallback_required === true || ["OTP_REQUIRED", "CAPTCHA_BLOCKED", "DOWN", "MANUAL_ONLY", "SOURCE_REVIEW_REQUIRED"].includes(String(a.portal_health))
+      a.map_fallback_required === true || ["OTP_REQUIRED", "CAPTCHA_BLOCKED", "DOWN", "PORTAL_DOWN", "MANUAL_ONLY", "SOURCE_REVIEW_REQUIRED"].includes(String(a.portal_health)) || ["C", "D"].includes(String(a.source_confidence_band))
     );
     return json({ ok: true, packages, applications: eligible, authority: { candidateCanCreateDraft: true, candidateCanApproveOrVerify: false, providerSubmissionImplied: false } });
   } catch {
