@@ -31,31 +31,8 @@ jobs:
     timeout-minutes: 5
     steps:
       - uses: actions/checkout@v4
-      - name: Verify each migration exists
-        shell: bash
-        run: |
-          set -euo pipefail
-          for file in \
-            0059_candidate_identity_link_requests.sql \
-            0060_atomic_marketplace_review.sql \
-            0061_candidate_identity_review_workflow.sql \
-            0062_candidate_registration_identity_request.sql \
-            0063_atomic_payfast_itn_reconciliation.sql \
-            0064_payfast_intent_order_invoice_atomic.sql \
-            0065_founder_finance_exception_review.sql \
-            0066_founder_operations_notification_queue.sql \
-            0067_founder_control_plane_approval_actions.sql \
-            0068_candidate_portal_messages.sql \
-            0069_founder_profile_change_review.sql \
-            0070_candidate_refund_requests.sql \
-            0071_founder_candidate_portal_messaging.sql; do
-            path="db/migrations/$file"
-            if [ ! -f "$path" ]; then
-              echo "::error::Missing migration: $path"
-              exit 1
-            fi
-            echo "Found $path"
-          done
+      - name: Verify migration files and RPC contracts
+        run: node scripts/verify-phase-b-migrations.mjs
 
   web-build:
     name: Resolve dependencies, type-check, and build
