@@ -132,7 +132,7 @@ export async function POST(request: Request) {
         mime_type: doc.mime_type,
         status: "QUEUED",
         attempts,
-        max_attempts: Math.max(1, 5 - attempts),
+        max_attempts: 5,
         available_at: now.toISOString()
       })
     });
