@@ -2,7 +2,7 @@
 import {useCallback,useEffect,useState} from "react";
 type Row=Record<string,any>;
 const money=(n:number,c="ZAR")=>new Intl.NumberFormat("en-ZA",{style:"currency",currency:c}).format((n||0)/100);
-function token(){if(typeof window==="undefined")return "";return window.localStorage.getItem("kingsmen_access_token")||"";}
+function token(){try{for(let i=0;i<localStorage.length;i++){const k=localStorage.key(i);if(!k?.startsWith("sb-")||!k.endsWith("-auth-token"))continue;const raw=localStorage.getItem(k);if(!raw)continue;const parsed=JSON.parse(raw.startsWith("base64-")?atob(raw.slice(7)):raw);if(typeof parsed.access_token==="string"&&parsed.access_token.length>20)return parsed.access_token;}}catch{}return "";}
 export default function CandidateFinancePage(){
  const [data,setData]=useState<{packages:Row[];orders:Row[];refunds:Row[]}>({packages:[],orders:[],refunds:[]}),[reason,setReason]=useState<Record<string,string>>({}),[error,setError]=useState(""),[busy,setBusy]=useState("");
  const load=useCallback(async()=>{try{const r=await fetch("/api/candidate/finance",{headers:{authorization:"Bearer "+token()},cache:"no-store"});const j=await r.json();if(!r.ok||!j.ok)throw new Error(j.error||"Finance data unavailable.");setData({packages:j.packages||[],orders:j.orders||[],refunds:j.refunds||[]});setError("");}catch(e){setError(e instanceof Error?e.message:"Finance data unavailable.");}},[]);
