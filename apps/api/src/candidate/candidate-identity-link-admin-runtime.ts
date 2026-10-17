@@ -71,6 +71,8 @@ export class CandidateIdentityLinkAdminRuntime<TRequestContext> {
           return verifyPendingCandidateIdentityLink(db, actor, command);
         case "revoke":
           return revokeCandidateIdentityLink(db, actor, command);
+        default:
+          throw new Error("CANDIDATE_IDENTITY_LINK_ACTION_UNSUPPORTED");
       }
     });
   }
