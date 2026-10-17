@@ -1,4 +1,4 @@
-import { requireCandidateSession, supabaseAdminFetch, verifyStoredDocumentSignature } from "../../../../../lib/candidate-document-runtime";
+import { requireCandidateSession, supabaseAdminFetch, verifyStoredDocumentSignature, type SupabaseConfig } from "../../../../../lib/candidate-document-runtime";
 
 const ALLOWED_TYPES: Record<string, string[]> = {
   CV: ["application/pdf", "application/vnd.openxmlformats-officedocument.wordprocessingml.document", "text/plain"],
@@ -19,6 +19,46 @@ type StorageObject = {
   name?: string;
   metadata?: { size?: number | string; mimetype?: string; contentType?: string; [key: string]: unknown };
 };
+
+async function cleanupRejectedUpload(
+  cfg: SupabaseConfig,
+  input: { uploadId: string; storagePath: string; sizeBytes: number; reason: string; userId: string; candidateId: string }
+): Promise<"DELETED" | "PENDING" | "UNRECORDED"> {
+  const encodedPath = input.storagePath.split("/").map(encodeURIComponent).join("/");
+  let deletion: Response | null = null;
+  try {
+    deletion = await supabaseAdminFetch(cfg, `/storage/v1/object/${encodeURIComponent(cfg.documentsBucket)}/${encodedPath}`, { method: "DELETE" });
+  } catch {
+    deletion = null;
+  }
+  const deleted = !!deletion && (deletion.ok || deletion.status === 404);
+  const eventResponse = await supabaseAdminFetch(cfg, "/rest/v1/document_storage_events?on_conflict=event_ref", {
+    method: "POST",
+    headers: { "content-type": "application/json", Prefer: "resolution=ignore-duplicates,return=minimal" },
+    body: JSON.stringify({
+      document_id: null,
+      event_ref: deleted ? `DOC-UPLOAD-REJECTED-CLEANUP-DONE-${input.uploadId}` : `DOC-UPLOAD-REJECTED-CLEANUP-${input.uploadId}`,
+      event_type: deleted ? "QUARANTINE_CLEANUP_COMPLETED" : "QUARANTINE_CLEANUP_PENDING",
+      storage_provider: "SUPABASE",
+      storage_bucket: cfg.documentsBucket,
+      storage_path: input.storagePath,
+      file_size_bytes: input.sizeBytes,
+      status: deleted ? "OK" : "WARNING",
+      message: deleted
+        ? "Rejected upload object was deleted or already absent."
+        : "Rejected upload object could not be deleted immediately and requires reconciliation.",
+      metadata: {
+        upload_id: input.uploadId,
+        reason: input.reason,
+        authenticated_user_id: input.userId,
+        candidate_id: input.candidateId,
+        cleanupStatus: deleted ? "COMPLETED" : "PENDING"
+      }
+    })
+  }).catch(() => null);
+  if (!eventResponse?.ok) return "UNRECORDED";
+  return deleted ? "DELETED" : "PENDING";
+}
 
 export async function POST(request: Request) {
   const auth = await requireCandidateSession(request);
@@ -82,18 +122,31 @@ export async function POST(request: Request) {
   const mimeType = String(object.metadata?.mimetype || object.metadata?.contentType || "").toLowerCase();
   const sizeBytes = Number(object.metadata?.size);
   if (!ALLOWED_TYPES[documentTypeCode]?.includes(mimeType) || !Number.isSafeInteger(sizeBytes) || sizeBytes < 1 || sizeBytes > 15 * 1024 * 1024) {
-    return Response.json({ ok: false, code: "STORED_FILE_METADATA_REJECTED", error: "Stored file type or size is outside Kingsmen's document policy." }, { status: 415 });
+    const cleanup = await cleanupRejectedUpload(auth.config, {
+      uploadId, storagePath, sizeBytes: Number.isSafeInteger(sizeBytes) && sizeBytes >= 0 ? sizeBytes : 0,
+      reason: "STORED_FILE_METADATA_REJECTED", userId: auth.session.userId, candidateId: auth.session.candidateId
+    });
+    return Response.json({
+      ok: false, code: "STORED_FILE_METADATA_REJECTED",
+      error: "Stored file type or size is outside Kingsmen document policy.",
+      privateObjectCleanup: cleanup, reconciliationRequired: cleanup === "PENDING" || cleanup === "UNRECORDED"
+    }, { status: 415, headers: { "cache-control": "no-store" } });
   }
 
   const signature = await verifyStoredDocumentSignature(auth.config, storagePath, mimeType, sizeBytes);
   if (!signature.ok) {
+    const cleanup = await cleanupRejectedUpload(auth.config, {
+      uploadId, storagePath, sizeBytes,
+      reason: "STORED_FILE_SIGNATURE_REJECTED", userId: auth.session.userId, candidateId: auth.session.candidateId
+    });
     return Response.json({
       ok: false,
       code: "STORED_FILE_SIGNATURE_REJECTED",
       error: signature.reason,
       metadataPersisted: false,
-      privateObjectCleanup: "PENDING_RECONCILIATION"
-    }, { status: 415 });
+      privateObjectCleanup: cleanup,
+      reconciliationRequired: cleanup === "PENDING" || cleanup === "UNRECORDED"
+    }, { status: 415, headers: { "cache-control": "no-store" } });
   }
 
   const documentRef = `DOC-${uploadId}`;
