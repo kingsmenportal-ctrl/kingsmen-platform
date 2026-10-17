@@ -51,7 +51,7 @@ if (lockExists) {
 
 let docker = "";
 try { docker = readFileSync(dockerPath, "utf8"); } catch {}
-check("Container uses reproducible npm ci", (docker.match(/^RUN npm ci(?: --omit=dev)?$/gm) ?? []).length === 2 && !/^RUN npm install\\b/m.test(docker), "Both build and runtime stages must use npm ci, not unpinned npm install.");
+check("Container uses reproducible npm ci", (docker.match(/^RUN npm ci(?: --omit=dev)?$/gm) ?? []).length === 2 && !/^RUN npm install\b/m.test(docker), "Both build and runtime stages must use npm ci, not unpinned npm install.");
 check("Container requires durable persistence", /KINGSMEN_TRUTH_VAULT_MODE=postgres/.test(docker), "Production container must fail closed rather than silently use in-memory storage.");
 check("Container runs as non-root", /^USER node$/m.test(docker), "Runtime image must run as the unprivileged node user.");
 check("Container exposes a health check", /^HEALTHCHECK /m.test(docker) && /\/health/.test(docker), "Container must probe the API health endpoint.");
