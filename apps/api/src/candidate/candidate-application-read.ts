@@ -24,11 +24,9 @@ export interface CandidateApplicationSummary {
 
 /**
  * Reads applications through the verified Auth->candidate link in one SQL
- * statement. The caller must pass a Supabase Auth user UUID validated by
- * Supabase Auth on the server. Never accept candidateId/publicRef from a client.
- *
- * This is a read boundary only; it does not configure trusted DB session claims,
- * create identity links, or prove that PostgreSQL RLS is correctly deployed.
+ * statement. Returns null when no verified identity exists and [] when a
+ * verified candidate has no applications. Never accepts candidateId/publicRef
+ * from a client. The caller must pass a server-verified Supabase Auth UUID.
  */
 export async function listApplicationsForVerifiedAuthUser(
   database: CandidateApplicationDatabase,
@@ -37,23 +35,23 @@ export async function listApplicationsForVerifiedAuthUser(
   if (
     typeof verifiedSupabaseUserId !== "string" ||
     !/^[0-9a-f]{8}-[0-9a-f]{4}-[1-8][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i.test(verifiedSupabaseUserId)
-  ) {
-    return null;
-  }
+  ) return null;
 
   const result = await database.query<{
-    application_id: string;
-    route_type: string;
-    route_name: string;
+    verified_candidate_id: string;
+    application_id: string | null;
+    route_type: string | null;
+    route_name: string | null;
     institution_or_provider: string | null;
-    current_state: string;
-    source_confidence_band: string;
-    portal_health: string;
-    map_fallback_required: boolean;
+    current_state: string | null;
+    source_confidence_band: string | null;
+    portal_health: string | null;
+    map_fallback_required: boolean | null;
     last_evidence_ref: string | null;
-    updated_at: string;
+    updated_at: string | null;
   }>(
-    `select application.id as application_id,
+    `select candidate.id as verified_candidate_id,
+            application.id as application_id,
             application.route_type,
             application.route_name,
             application.institution_or_provider,
@@ -66,26 +64,32 @@ export async function listApplicationsForVerifiedAuthUser(
        from public.candidate_auth_identity_links as link
        join public.candidates as candidate
          on candidate.id = link.candidate_id
-       join public.applications as application
+       left join public.applications as application
          on application.candidate_id = candidate.id
       where link.supabase_user_id = $1::uuid
         and link.link_status = 'VERIFIED'
         and candidate.is_active = true
-      order by application.updated_at desc, application.id asc
-      limit 500`,
+      order by application.updated_at desc nulls last, application.id asc nulls last
+      limit 501`,
     [verifiedSupabaseUserId]
   );
 
-  return result.rows.map((row) => ({
-    applicationId: row.application_id,
-    routeType: row.route_type,
-    routeName: row.route_name,
-    institutionOrProvider: row.institution_or_provider,
-    currentState: row.current_state,
-    sourceConfidenceBand: row.source_confidence_band,
-    portalHealth: row.portal_health,
-    mapFallbackRequired: row.map_fallback_required,
-    lastEvidenceRef: row.last_evidence_ref,
-    updatedAt: row.updated_at
-  }));
+  // Zero rows = no verified identity. One row with a null application ID =
+  // verified candidate with no applications. Do not conflate authorization
+  // failure with a genuinely empty list.
+  if (result.rows.length === 0) return null;
+  return result.rows
+    .filter((row) => row.application_id !== null)
+    .map((row) => ({
+      applicationId: row.application_id!,
+      routeType: row.route_type!,
+      routeName: row.route_name!,
+      institutionOrProvider: row.institution_or_provider,
+      currentState: row.current_state!,
+      sourceConfidenceBand: row.source_confidence_band!,
+      portalHealth: row.portal_health!,
+      mapFallbackRequired: row.map_fallback_required!,
+      lastEvidenceRef: row.last_evidence_ref,
+      updatedAt: row.updated_at!
+    }));
 }
