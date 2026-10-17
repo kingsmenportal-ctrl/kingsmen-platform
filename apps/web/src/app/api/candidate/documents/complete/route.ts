@@ -81,7 +81,7 @@ export async function POST(request: Request) {
 
   const mimeType = String(object.metadata?.mimetype || object.metadata?.contentType || "").toLowerCase();
   const sizeBytes = Number(object.metadata?.size);
-  if (!ALLOWED_TYPES[documentTypeCode]?.includes(mimeType) || !Number.isSafeInteger(sizeBytes) || sizeBytes < 1 || sizeBytes > 10 * 1024 * 1024) {
+  if (!ALLOWED_TYPES[documentTypeCode]?.includes(mimeType) || !Number.isSafeInteger(sizeBytes) || sizeBytes < 1 || sizeBytes > 15 * 1024 * 1024) {
     return Response.json({ ok: false, code: "STORED_FILE_METADATA_REJECTED", error: "Stored file type or size is outside Kingsmen's document policy." }, { status: 415 });
   }
 
