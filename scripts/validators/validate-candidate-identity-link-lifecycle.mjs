@@ -11,6 +11,8 @@ const checks = [
   ["audit events in lifecycle", /insert into public\.audit_events/.test(service)],
   ["transaction caller explicitly required", /withCandidateBackendTransaction\(\)/.test(service)],
   ["identity link backend-only RLS", /USING \(kingsmen_security\.is_backend_service_role\(\)\)/.test(migration)],
+  ["verified links require non-empty verification actor", /verified_by IS NOT NULL AND length\(btrim\(verified_by\)\) BETWEEN 1 AND 200/.test(migration)],
+  ["revoked links require an explicit bounded reason", /revocation_reason IS NOT NULL AND length\(btrim\(revocation_reason\)\) BETWEEN 1 AND 500/.test(migration)],
   ["no email-based identity matching", !/where\s+.*email\s*=/.test(service)]
 ];
 let failed = false;
