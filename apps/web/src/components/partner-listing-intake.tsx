@@ -1,0 +1,34 @@
+"use client";
+import { FormEvent,useEffect,useState } from "react";
+const gold="#d8b66a";const input:React.CSSProperties={width:"100%",boxSizing:"border-box",background:"#0d1120",color:"#f7f4ec",border:"1px solid #424657",borderRadius:10,padding:"12px 13px",font:"inherit",minHeight:44};
+const label:React.CSSProperties={display:"grid",gap:7,color:"#c4c9d4",fontSize:13};
+const kinds=[["JOB","Job"],["INTERNSHIP","Internship"],["LEARNERSHIP","Learnership"],["APPRENTICESHIP","Apprenticeship"],["BURSARY","Bursary"],["FUNDING","Funding"],["UNIVERSITY_COURSE","University course"],["TVET_COURSE","TVET course"],["TRAINING","Training"],["ACCOMMODATION","Accommodation"],["SERVICE","Other service"]];
+const provinces=["Eastern Cape","Free State","Gauteng","KwaZulu-Natal","Limpopo","Mpumalanga","Northern Cape","North West","Western Cape"];
+type Org={id:string;display_name:string;verification_status:string};type Listing={id:string;title:string;status:string;created_at:string};
+export default function PartnerListingIntake(){
+ const [orgs,setOrgs]=useState<Org[]>([]);const [listings,setListings]=useState<Listing[]>([]);const [loading,setLoading]=useState(true);const [busy,setBusy]=useState(false);const [message,setMessage]=useState("");const [error,setError]=useState(false);const [signedOut,setSignedOut]=useState(false);
+ async function load(){setLoading(true);try{const r=await fetch("/api/partners/listings",{cache:"no-store",credentials:"same-origin"});const b=await r.json().catch(()=>({}));if(r.status===401){setSignedOut(true);setMessage("Sign in to submit or track partner listings.");return;}if(!r.ok||b.ok!==true){setMessage("Partner listing service is unavailable.");setError(true);return;}setOrgs(Array.isArray(b.organisations)?b.organisations:[]);setListings(Array.isArray(b.listings)?b.listings:[]);}catch{setMessage("Partner listing service is unavailable.");setError(true);}finally{setLoading(false);}}
+ useEffect(()=>{void load();},[]);
+ async function submit(e:FormEvent<HTMLFormElement>){e.preventDefault();setBusy(true);setMessage("");setError(false);const fd=new FormData(e.currentTarget);const body={organisationId:String(fd.get("organisationId")||""),listingType:String(fd.get("listingType")||""),title:String(fd.get("title")||"").trim(),description:String(fd.get("description")||"").trim(),province:String(fd.get("province")||""),locationText:String(fd.get("locationText")||"").trim(),officialSourceUrl:String(fd.get("officialSourceUrl")||"").trim(),applicationUrl:String(fd.get("applicationUrl")||"").trim(),opensAt:String(fd.get("opensAt")||""),closesAt:String(fd.get("closesAt")||""),eligibility:{requirements:String(fd.get("requirements")||"").trim()}};try{const r=await fetch("/api/partners/listings",{method:"POST",credentials:"same-origin",headers:{"Content-Type":"application/json"},body:JSON.stringify(body)});const b=await r.json().catch(()=>({}));if(!r.ok||b.ok!==true){setError(true);setMessage(b.message||(r.status===401?"Sign in first.":"The listing was not submitted."));return;}setMessage(b.message||"Listing submitted for review.");e.currentTarget.reset();await load();}catch{setError(true);setMessage("Submission could not be confirmed.");}finally{setBusy(false);}}
+ return <section style={{marginTop:18,padding:24,border:"1px solid rgba(255,255,255,.12)",borderRadius:18,background:"rgba(255,255,255,.04)"}}>
+ <h2 style={{marginTop:0}}>Submit an opportunity listing</h2><p style={{color:"#c4c9d4",lineHeight:1.7}}>Submit a real opportunity with its official source. Every submission starts as pending review and remains hidden until authorised verification. Do not include applicant personal information.</p>
+ {loading?<p>Loading partner workspace…</p>:signedOut?<p>{message} <a href="/auth/login" style={{color:gold}}>Sign in →</a></p>:null}
+ {!loading&&!signedOut&&orgs.length===0&&<div style={{padding:14,border:"1px solid #5b5038",borderRadius:10,color:"#d5d0c3"}}>Submit an organisation profile above first. Your profile must be reviewed before listings can be verified or published.</div>}
+ {!loading&&!signedOut&&orgs.length>0&&<form onSubmit={submit} style={{display:"grid",gridTemplateColumns:"repeat(auto-fit,minmax(min(100%,260px),1fr))",gap:14,marginTop:18}}>
+ <label style={label}>Organisation<select name="organisationId" required style={input} defaultValue=""><option value="" disabled>Select your organisation</option>{orgs.map(o=><option key={o.id} value={o.id}>{o.display_name} · {o.verification_status.replaceAll("_"," ")}</option>)}</select></label>
+ <label style={label}>Listing category<select name="listingType" required style={input} defaultValue="JOB">{kinds.map(([v,t])=><option key={v} value={v}>{t}</option>)}</select></label>
+ <label style={label}>Opportunity title<input name="title" required minLength={3} maxLength={220} style={input}/></label>
+ <label style={label}>Province<select name="province" style={input} defaultValue=""><option value="">Not province-specific</option>{provinces.map(p=><option key={p}>{p}</option>)}</select></label>
+ <label style={label}>Location (optional)<input name="locationText" maxLength={300} style={input}/></label>
+ <label style={label}>Official source URL<input name="officialSourceUrl" type="url" required maxLength={2048} placeholder="https://official-provider.example.za" style={input}/></label>
+ <label style={label}>Application URL (optional)<input name="applicationUrl" type="url" maxLength={2048} style={input}/></label>
+ <label style={label}>Opening date (optional)<input name="opensAt" type="date" style={input}/></label>
+ <label style={label}>Closing date (optional)<input name="closesAt" type="date" style={input}/></label>
+ <label style={{...label,gridColumn:"1 / -1"}}>Description<textarea name="description" required minLength={10} maxLength={12000} rows={5} style={input}/></label>
+ <label style={{...label,gridColumn:"1 / -1"}}>Eligibility / requirements<textarea name="requirements" maxLength={4000} rows={3} style={input}/></label>
+ <button disabled={busy} type="submit" style={{background:gold,color:"#080b14",border:0,borderRadius:10,padding:"13px 18px",fontWeight:850,minHeight:46,cursor:busy?"wait":"pointer"}}>{busy?"Submitting…":"Submit listing for review →"}</button>
+ </form>}
+ {message&&!signedOut&&<p role="status" style={{color:error?"#f0a4a4":"#b9d9c1",marginTop:14}}>{message}</p>}
+ {!loading&&!signedOut&&<div style={{marginTop:24}}><h3>Your submitted listings</h3>{listings.length===0?<p style={{color:"#c4c9d4"}}>No submitted listings yet.</p>:<div style={{display:"grid",gap:9}}>{listings.map(l=><div key={l.id} style={{display:"flex",justifyContent:"space-between",gap:12,flexWrap:"wrap",padding:13,border:"1px solid #383b4a",borderRadius:10}}><span>{l.title}</span><span style={{fontSize:12,color:gold}}>{l.status.replaceAll("_"," ")}</span></div>)}</div>}</div>}
+ </section>;
+}
