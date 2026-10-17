@@ -79,7 +79,7 @@ async function audit(
 export async function POST(request: Request) {
   const workerToken = process.env.N05_SCAN_WORKER_TOKEN?.trim() || "";
   const authorization = request.headers.get("authorization") || "";
-  const presented = authorization.match(/^Bearer\\s+(.+)$/i)?.[1]?.trim() || "";
+  const presented = authorization.match(/^Bearer\s+(.+)$/i)?.[1]?.trim() || "";
   if (workerToken.length < 32 || !presented || !secureEqual(workerToken, presented)) {
     return jsonError(401, "SCAN_WORKER_AUTH_REQUIRED", "A configured server-to-server scan worker token is required.");
   }
