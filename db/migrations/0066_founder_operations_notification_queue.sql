@@ -61,7 +61,7 @@ BEGIN
       target_ref, summary, evidence_refs, requested_by_operator_ref, reviewed_by_operator_ref,
       decision, decision_reason, created_at, decided_at
     FROM public.control_plane_approval_queue
-    WHERE decision IS NULL
+    WHERE decision = 'PENDING'
     ORDER BY created_at ASC LIMIT v_limit
   ) x;
 
@@ -118,7 +118,7 @@ BEGIN
   SELECT * INTO v_notification FROM public.notification_outbox
     WHERE id = p_notification_id FOR UPDATE;
   IF NOT FOUND THEN RAISE EXCEPTION 'NOTIFICATION_NOT_FOUND' USING ERRCODE = 'P0002'; END IF;
-  IF v_notification.status NOT IN ('FAILED','QUEUED') OR v_notification.sent_at IS NOT NULL THEN
+  IF (v_notification.status NOT IN ('FAILED','QUEUED') AND NOT (v_notification.status = 'SENDING' AND v_notification.locked_at < now() - interval '15 minutes')) OR v_notification.sent_at IS NOT NULL THEN
     RAISE EXCEPTION 'NOTIFICATION_NOT_RETRYABLE' USING ERRCODE = '23514';
   END IF;
   IF EXISTS (
