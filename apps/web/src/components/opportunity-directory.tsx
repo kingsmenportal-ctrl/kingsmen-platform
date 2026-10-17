@@ -6,9 +6,9 @@ import StartApplicationButton from "./start-application-button";
 import { useEffect, useMemo, useState } from "react";
 
 type Opportunity = {
-  id: string; title: string; category: string; qualification: string | null;
+  id: string; sourceKind: "ROUTE_PROGRAMME" | "PARTNER_LISTING"; title: string; category: string; qualification: string | null;
   province: string | null; deliveryMode: string; applicationMethod: string;
-  sourceUrl: string; provider: string; eligibilitySummary: string; availability: string;
+  sourceUrl: string; applicationUrl: string | null; provider: string; eligibilitySummary: string; availability: string;
   verifiedAt: string; sourceConfidence: string;
 };
 type Props = { initialSector?: string; title?: string; intro?: string };
@@ -105,8 +105,9 @@ export default function OpportunityDirectory({ initialSector = "ALL", title = "O
           <p style={{ color: "#8e97a8", fontSize: 12, margin: 0 }}>Record last updated {new Date(row.verifiedAt).toLocaleDateString("en-ZA")} · Confidence band {row.sourceConfidence}</p>
           <div style={{ display: "flex", gap: 10, flexWrap: "wrap", marginTop: 5 }}>
             <a href={row.sourceUrl} target="_blank" rel="noopener noreferrer" style={{ ...buttonStyle, textDecoration: "none" }}>Open official source ↗</a>
-            <SaveOpportunityButton routeProgrammeId={row.id} />
-            <StartApplicationButton sourceId={row.id} />
+            {row.applicationUrl && <a href={row.applicationUrl} target="_blank" rel="noopener noreferrer" style={{ ...buttonStyle, textDecoration: "none" }}>Open application portal ↗</a>}
+            <SaveOpportunityButton sourceId={row.id} sourceKind={row.sourceKind} />
+            <StartApplicationButton sourceId={row.id} sourceKind={row.sourceKind} />
           </div>
           <p style={{ color: "#8e97a8", fontSize: 11, margin: 0 }}>Opening the source does not submit an application. Availability and eligibility must be confirmed with the provider.</p>
         </article>)}
