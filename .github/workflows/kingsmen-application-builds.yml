@@ -59,6 +59,17 @@ jobs:
         run: node scripts/validators/validate-personal-jobs-safe-boundary.mjs
       - name: Validate candidate document ownership boundary
         run: node scripts/validators/validate-candidate-document-boundary.mjs
+      - name: Type-check public URL boundary helper and tests
+        working-directory: apps/web
+        run: npx tsc --noEmit --target ES2022 --lib dom,dom.iterable,es2022 --module esnext --moduleResolution bundler --skipLibCheck --types node src/lib/security/public-url.ts src/lib/security/public-url.test.ts
+      - name: Run public URL boundary regression tests
+        working-directory: apps/web
+        run: |
+          npx tsc --target ES2022 --lib dom,dom.iterable,es2022 --module commonjs --moduleResolution node --esModuleInterop --skipLibCheck --types node --outDir .auth-test-dist src/lib/security/public-url.ts src/lib/security/public-url.test.ts
+          printf '{"type":"commonjs"}\n' > .auth-test-dist/package.json
+          node --test .auth-test-dist/public-url.test.js
+      - name: Validate public marketplace URL boundary integrations
+        run: node scripts/validators/validate-public-marketplace-url-boundary.mjs
       - name: Build web application
         working-directory: apps/web
         run: npm run build
