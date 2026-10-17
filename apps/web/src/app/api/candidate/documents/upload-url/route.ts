@@ -128,7 +128,7 @@ export async function POST(request: Request) {
     sizeBytes,
     signedUploadUrl,
     uploadToken: signer?.token || null,
-    expiresInSeconds: null,
+    expiresInSeconds: 7200,
     rawPublicUrlAllowed: false,
     serviceRoleVisibleToBrowser: false,
     nextStep: "Upload the bytes to signedUploadUrl, then call the authenticated document completion route to verify the stored object and write document metadata."
