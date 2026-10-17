@@ -270,8 +270,10 @@ export async function POST(request: Request) {
     });
     // Delete is best-effort; failed deletion is recorded for reconciliation and never re-released.
     const deleteResponse = await supabaseAdminFetch(cfg, `/storage/v1/object/${encodeURIComponent(job.storage_bucket)}/${encodedPath}`, { method: "DELETE" });
-    if (!deleteResponse.ok) {
-      await audit(cfg, {
+    const objectDeleted = deleteResponse.ok || deleteResponse.status === 404;
+    let cleanupAuditOk = true;
+    if (!objectDeleted) {
+      cleanupAuditOk = await audit(cfg, {
         documentId: job.document_id,
         jobRef: `DOC-QUARANTINE-CLEANUP-PENDING-${safeJobRef}`,
         eventType: "QUARANTINE_CLEANUP_PENDING",
@@ -283,8 +285,22 @@ export async function POST(request: Request) {
         message: "Infected private object deletion failed and requires cleanup reconciliation.",
         metadata: { jobRef: job.job_ref, provider, version }
       });
+    } else {
+      cleanupAuditOk = await audit(cfg, {
+        documentId: job.document_id,
+        jobRef: `DOC-QUARANTINE-CLEANUP-DONE-${safeJobRef}`,
+        eventType: "QUARANTINE_CLEANUP_COMPLETED",
+        bucket: job.storage_bucket,
+        path: job.storage_path,
+        size: Number(job.file_size_bytes),
+        checksum: job.checksum_sha256,
+        status: "OK",
+        message: "Infected private object deletion confirmed.",
+        metadata: { jobRef: job.job_ref, provider, version }
+      });
     }
-    return Response.json({ ok: eventOk, productionReady: false, jobRef: job.job_ref, result: "INFECTED", documentReleased: false, objectDeleted: deleteResponse.ok, cleanupReconciliationRequired: !deleteResponse.ok }, { status: eventOk ? 200 : 502, headers: { "cache-control": "no-store" } });
+    const ok = eventOk && cleanupAuditOk;
+    return Response.json({ ok, productionReady: false, jobRef: job.job_ref, result: "INFECTED", documentReleased: false, objectDeleted, cleanupReconciliationRequired: !objectDeleted, auditComplete: ok }, { status: ok ? 200 : 502, headers: { "cache-control": "no-store" } });
   }
 
   return await retryOrDeadLetter(cfg, job, leaseToken, attempts, String(result.errorCode || "SCANNER_ERROR").slice(0, 100), "Scanner returned ERROR; document remains quarantined.");
