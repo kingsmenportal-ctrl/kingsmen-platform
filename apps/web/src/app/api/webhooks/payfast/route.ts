@@ -21,6 +21,8 @@ export async function POST(request: Request) {
     if (Object.prototype.hasOwnProperty.call(fields, key)) return response(400, "DUPLICATE_ITN_FIELD");
     fields[key] = value;
   }
+  if (params.getAll("signature").length !== 1 || params.keys().next().done) return response(400, "ITN_SIGNATURE_REQUIRED");
+  if (Array.from(params.keys()).at(-1) !== "signature") return response(400, "ITN_SIGNATURE_MUST_BE_LAST");
   if (fields.merchant_id !== runtime.merchantId) return response(400, "MERCHANT_MISMATCH");
   if (!verifyPayFastItnSignature(fields, runtime.passphrase)) return response(400, "INVALID_SIGNATURE");
   if (fields.payment_status !== "COMPLETE") return response(200, "IGNORED_NON_COMPLETE");
@@ -32,7 +34,8 @@ export async function POST(request: Request) {
   }
 
   // PayFast's server confirmation is mandatory; a valid-looking browser return is not payment proof.
-  if (!(await validatePayFastItnAtProvider(rawBody, runtime.environment))) return response(502, "PROVIDER_VALIDATION_FAILED");
+  const serverValidationBody = rawBody.split("&").slice(0, -1).join("&");
+  if (!serverValidationBody || !(await validatePayFastItnAtProvider(serverValidationBody, runtime.environment))) return response(502, "PROVIDER_VALIDATION_FAILED");
 
   const supabaseUrl = process.env.SUPABASE_URL?.trim().replace(/\/+$/, "");
   const serviceRoleKey = (process.env.SUPABASE_SERVICE_ROLE_KEY || process.env.SUPABASE_SERVICE_ROLE)?.trim();
