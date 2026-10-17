@@ -61,6 +61,14 @@ assert.ok(verifiedApplications.includes("candidate.applications.listed"), "verif
 assert.ok(verifiedApplications.includes("await client.query(\"COMMIT\")") && verifiedApplications.includes("await client.query(\"ROLLBACK\")"), "verified-identity tracker data and audit must share transaction boundary");
 const apiServerSource = read("apps/api/src/server.ts");
 assert.ok(apiServerSource.includes("CANDIDATE_APPLICATION_RESULT_LIMIT_EXCEEDED"), "API must return an explicit non-partial-result response when tracker output exceeds its cap");
+assert.ok(apiServerSource.includes("CANDIDATE_DOCUMENT_RESULT_LIMIT_EXCEEDED"), "API must return an explicit non-partial-result response when candidate document metadata exceeds its cap");
+const verifiedDocumentsStart = truthVault.indexOf("async listDocumentsForVerifiedSupabaseUser");
+const verifiedDocumentsEnd = truthVault.indexOf("async resolveCandidateUuidForSupabaseUser", verifiedDocumentsStart);
+const verifiedDocuments = truthVault.slice(verifiedDocumentsStart, verifiedDocumentsEnd);
+assert.ok(verifiedDocuments.includes("limit 201") && verifiedDocuments.includes("result.rows.length > 200"), "verified-identity document metadata must detect overflow rather than silently truncate");
+assert.ok(verifiedDocuments.includes("candidate.documents.listed"), "verified-identity document metadata reads must be audited");
+assert.ok(verifiedDocuments.includes("linked.rows[0].candidate_id") && verifiedDocuments.includes("supabaseUserId"), "document access audit must bind the actor and candidate to the verified identity link");
+assert.ok(verifiedDocuments.includes("await client.query(\"COMMIT\")") && verifiedDocuments.includes("await client.query(\"ROLLBACK\")"), "document metadata read and audit must share transaction boundaries");
 assert.ok(apiServerSource.includes('throw new Error("INVALID_JSON")'), "malformed JSON must map to a client error");
 const applicationRead = read("apps/api/src/candidate/candidate-application-read.ts");
 assert.ok(applicationRead.includes("result.rows.length > 500"), "application tracker must detect result overflow");
