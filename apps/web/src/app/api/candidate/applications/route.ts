@@ -116,6 +116,9 @@ export async function PATCH(request: Request) {
   if (status === "CANDIDATE_REPORTED_SUBMITTED") {
     payload.candidate_submission_reference = reference;
     payload.candidate_reported_submitted_at = new Date().toISOString();
+  } else {
+    payload.candidate_submission_reference = null;
+    payload.candidate_reported_submitted_at = null;
   }
   const response = await supabaseAdminFetch(auth.config, `/rest/v1/candidate_route_applications?${url.searchParams}`, {
     method: "PATCH", headers: { "content-type": "application/json", prefer: "return=representation" }, body: JSON.stringify(payload)
