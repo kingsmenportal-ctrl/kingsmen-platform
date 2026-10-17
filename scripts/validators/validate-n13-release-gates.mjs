@@ -37,7 +37,7 @@ check("N11 activation remains bound to verified PayFast evidence", () => {
 });
 check("N12 pins all six reviewed trigger guards", () => {
   const sql = read("db/migrations/0072_n12_function_search_path_hardening.sql");
-  const alters = [...sql.matchAll(/ALTER FUNCTION public\.[a-z_]+\(\)\s+SET search_path = pg_catalog, public, pg_temp;/g)];
+  const alters = [...sql.matchAll(/ALTER FUNCTION public\.[a-z0-9_]+\(\)\s+SET search_path = pg_catalog, public, pg_temp;/g)];
   assert.equal(alters.length, 6, "expected exactly six explicit, pinned search_path alterations");
   for (const name of [
     "prevent_candidate_application_event_mutation",
