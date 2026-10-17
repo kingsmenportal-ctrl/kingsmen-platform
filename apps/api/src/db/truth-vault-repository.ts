@@ -457,8 +457,27 @@ export class TruthVaultRepository {
            join public.candidates c on c.id=a.candidate_id and c.is_active=true
           where a.candidate_id=$1::uuid
           order by a.updated_at desc, a.id asc
-          limit 200`,
+          limit 201`,
         [linked.rows[0].candidate_id]
+      );
+      if (result.rows.length > 200) {
+        throw new Error("CANDIDATE_APPLICATION_RESULT_LIMIT_EXCEEDED");
+      }
+      const auditCorrelationId = `candidate_applications_${Date.now()}_${Math.random().toString(36).slice(2, 10)}`;
+      await client.query(
+        `insert into audit_events
+           (event_id, event_type, severity, correlation_id, actor_id, candidate_id, message, metadata)
+         values ($1,$2,$3,$4,$5,$6,$7,$8::jsonb)`,
+        [
+          `evt_${Date.now()}_${Math.random().toString(36).slice(2, 10)}`,
+          "candidate.applications.listed",
+          "INFO",
+          auditCorrelationId,
+          linked.rows[0].candidate_id,
+          linked.rows[0].candidate_id,
+          "Verified Supabase identity application tracker read completed.",
+          JSON.stringify({ returnedCount: result.rows.length, responseLimit: 200 })
+        ]
       );
       await client.query("COMMIT");
       return result.rows.map((row) => ({
