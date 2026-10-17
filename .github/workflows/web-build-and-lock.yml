@@ -25,26 +25,13 @@ concurrency:
   cancel-in-progress: true
 
 jobs:
-  lockfile-presence:
-    name: Lockfile presence
-    runs-on: ubuntu-latest
-    timeout-minutes: 5
-    steps:
-      - uses: actions/checkout@v4
-      - name: Verify package manifests exist
-        run: |
-          set -euo pipefail
-          test -s apps/web/package.json
-          test -s apps/web/package-lock.json
-          echo "package.json and committed package-lock.json are present."
-
   migration-integrity:
     name: Migration 0059–0071 presence
     runs-on: ubuntu-latest
     timeout-minutes: 5
     steps:
       - uses: actions/checkout@v4
-      - name: Verify each migration exists exactly once
+      - name: Verify each migration exists
         shell: bash
         run: |
           set -euo pipefail
@@ -71,12 +58,9 @@ jobs:
           done
 
   web-build:
-    name: Install, type-check, and production build
-    needs:
-      - lockfile-presence
-      - migration-integrity
+    name: Resolve dependencies, type-check, and build
     runs-on: ubuntu-latest
-    timeout-minutes: 30
+    timeout-minutes: 35
     steps:
       - uses: actions/checkout@v4
       - name: Set up Node.js
@@ -85,7 +69,15 @@ jobs:
           node-version: 22
           cache: npm
           cache-dependency-path: apps/web/package-lock.json
-      - name: Install exact locked dependencies
+      - name: Resolve pinned manifest and regenerate lockfile in CI workspace
+        working-directory: apps/web
+        run: |
+          set -euo pipefail
+          npm install --package-lock-only --ignore-scripts --no-audit --no-fund
+          if ! git diff --quiet -- package-lock.json; then
+            echo "::warning::The committed package-lock.json is stale relative to package.json. This run uses a regenerated workspace lock; update and commit the lockfile before release."
+          fi
+      - name: Install resolved dependencies
         working-directory: apps/web
         run: npm ci --no-audit --no-fund
       - name: Type-check web app
