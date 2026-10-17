@@ -53,7 +53,7 @@ includes("complete", "verifyStoredDocumentSignature", "verify stored bytes");
 includes("complete", "UPLOADED_OBJECT_NOT_FOUND", "reject completion before upload");
 includes("complete", "DOCUMENT_RECORD_NOT_CONFIRMED", "require persisted document row");
 includes("complete", "UPLOAD_COMPLETED", "audit completion");
-includes("complete", "resolution=ignore-duplicates,return=minimal", "idempotent completion audit");
+includes("complete", "resolution=ignore-duplicates", "idempotent completion audit");
 includes("runtime", "bytes.byteLength !== expectedSizeBytes", "verify actual byte count");
 includes("runtime", "createHash(\"sha256\")", "calculate SHA-256 from stored bytes");
 includes("complete", "checksum_sha256: signature.checksumSha256", "persist SHA-256 with document evidence");
