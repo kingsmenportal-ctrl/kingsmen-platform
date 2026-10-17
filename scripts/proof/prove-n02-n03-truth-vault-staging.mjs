@@ -11,6 +11,13 @@ const apiServiceToken = process.env.KINGSMEN_API_SERVICE_TOKEN;
 const workflowServiceToken = process.env.KINGSMEN_WORKFLOW_SERVICE_TOKEN;
 const databaseUrl = process.env.KINGSMEN_DATABASE_URL ?? process.env.DATABASE_URL;
 
+function redactError(value) {
+  return String(value)
+    .replace(/(?:postgres(?:ql)?|https?):\/\/[^\s"' ]+/gi, "[REDACTED_URL]")
+    .replace(/Bearer\s+\S+/gi, "Bearer [REDACTED]")
+    .replace(/(password|token|secret|key)=\S+/gi, "$1=[REDACTED]");
+}
+
 function writeRedactedReport(report) {
   const reportPath = join(process.cwd(), "reports/api/n02-n03-staging-runtime-proof-latest.json");
   mkdirSync(dirname(reportPath), { recursive: true });
@@ -240,7 +247,7 @@ try {
     concurrentWorkflowDuplicateSubmissionProven: checks.some(x => x.check === "concurrent_workflow_duplicate_responses" && x.passed),
     concurrentCommandDuplicateSubmissionProven: checks.some(x => x.check === "concurrent_command_duplicate_responses" && x.passed),
     rollbackProven: false,
-    note: "This run proves live command/workflow persistence and concurrent workflow duplicate handling when all checks pass. Process restart, command duplicate races, and controlled late-failure rollback still require separate staging checks.",
+    note: "This run proves live command/workflow persistence and concurrent duplicate command/workflow handling when all checks pass. Process restart and controlled late-failure rollback still require separate staging checks.",
     generatedAtIso: new Date().toISOString(),
     preRestartStartedAtIso: health.body?.startedAtIso ?? null,
     correlationId,
@@ -262,7 +269,7 @@ try {
     productionReady: false,
     correlationId,
     syntheticCandidateRef: candidateId,
-    error: error instanceof Error ? error.message : String(error),
+    error: redactError(error instanceof Error ? error.message : String(error)),
     checks,
     secretsRedacted: true
   };
