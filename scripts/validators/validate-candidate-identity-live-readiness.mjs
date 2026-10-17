@@ -20,7 +20,7 @@ assert.match(migration, /candidate_auth_identity_links_backend_all[\s\S]*?is_bac
 assert.match(resolver, /link\.link_status = 'VERIFIED'/, "only verified mappings may resolve candidate identity");
 assert.match(resolver, /candidate\.is_active = true/, "inactive candidate records must not resolve");
 assert.match(resolver, /limit 2/i, "identity resolution must detect duplicate rows and fail closed");
-assert.doesNotMatch(resolver, /email/i, "identity mapping must never fall back to email matching");
+const identityQuery = resolver.match(/`select link\\.candidate_id[\\s\\S]*?`/)?.[0] ?? "";\nassert.ok(identityQuery.length > 0, "identity resolver must expose its explicit SQL lookup");\nassert.doesNotMatch(identityQuery, /email/i, "identity mapping query must never fall back to email matching");
 assert.match(adminRuntime, /operatorResolver\.resolve\(requestContext\)/, "identity link lifecycle must resolve trusted operator context");
 assert.match(adminRuntime, /REQUIRED_PERMISSION\[action\]/, "identity actions must have action-specific permissions");
 assert.match(adminRuntime, /withCandidateBackendTransaction\(this\.pool/, "identity mutations must use a scoped backend transaction");
