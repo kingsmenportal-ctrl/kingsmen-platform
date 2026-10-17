@@ -1,6 +1,9 @@
 import fs from "node:fs";
 import assert from "node:assert/strict";
 const sql=fs.readFileSync("db/migrations/0066_n11_service_fulfilment_entitlements.sql","utf8");
+const webhook=fs.readFileSync("apps/web/src/app/api/webhooks/payfast/route.ts","utf8");
+const candidateApi=fs.readFileSync("apps/web/src/app/api/candidate/entitlements/route.ts","utf8");
+const reviewerApi=fs.readFileSync("apps/web/src/app/api/reviewer/entitlements/route.ts","utf8");
 for(const needle of [
  "candidate_entitlements","candidate_entitlement_events","UNIQUE",
  "n11_hold_entitlement_for_order","n11_grant_entitlement","n11_transition_entitlement",
@@ -16,4 +19,11 @@ assert.match(sql,/grant_idempotency_key text NOT NULL UNIQUE/);
 assert.match(sql,/idempotency_key text NOT NULL UNIQUE/);
 assert.match(sql,/status <> 'ACTIVE' OR \(financial_event_id IS NOT NULL AND granted_at IS NOT NULL\)/);
 assert.match(sql,/revoked entitlement cannot be reactivated/);
+assert.match(webhook,/n11_grant_entitlement/);
+assert.match(webhook,/ENTITLEMENT_ACTIVATION_PENDING/);
+assert.match(candidateApi,/candidate_id/);
+assert.match(candidateApi,/activationRule/);
+assert.match(reviewerApi,/n11_hold_entitlement_for_order/);
+assert.match(reviewerApi,/n11_transition_entitlement/);
+assert.doesNotMatch(reviewerApi,/n11_grant_entitlement/);
 console.log("N11 entitlement validator passed: verified-payment gate, idempotency, holds, revocation, privilege boundary and immutable events.");
