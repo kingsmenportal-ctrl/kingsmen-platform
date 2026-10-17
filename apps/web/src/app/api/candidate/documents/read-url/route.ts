@@ -1,4 +1,4 @@
-import { requireCandidateSession, supabaseAdminFetch, verifyPrivateDocumentsBucket } from "../../../../../lib/candidate-document-runtime";
+import { createDocumentUploadId, requireCandidateSession, supabaseAdminFetch, verifyPrivateDocumentsBucket } from "../../../../../lib/candidate-document-runtime";
 
 type StoredDocument = {
   id: string;
@@ -8,6 +8,7 @@ type StoredDocument = {
   display_name: string;
   document_status: string;
   archived_at: string | null;
+  file_size_bytes: number | string;
 };
 
 export async function POST(request: Request) {
@@ -32,7 +33,7 @@ export async function POST(request: Request) {
   }
 
   const documentUrl = new URL(`${auth.config.url}/rest/v1/document_files`);
-  documentUrl.searchParams.set("select", "id,candidate_id,storage_bucket,storage_path,display_name,document_status,archived_at");
+  documentUrl.searchParams.set("select", "id,candidate_id,storage_bucket,storage_path,display_name,document_status,archived_at,file_size_bytes");
   documentUrl.searchParams.set("id", `eq.${documentId}`);
   documentUrl.searchParams.set("candidate_id", `eq.${auth.session.candidateId}`);
   documentUrl.searchParams.set("archived_at", "is.null");
@@ -78,6 +79,26 @@ export async function POST(request: Request) {
   const signedReadUrl = rawSignedPath.startsWith("http")
     ? rawSignedPath
     : `${auth.config.url}/storage/v1${rawSignedPath.startsWith("/") ? rawSignedPath : `/${rawSignedPath}`}`;
+
+  const auditResponse = await supabaseAdminFetch(auth.config, "/rest/v1/document_storage_events", {
+    method: "POST",
+    headers: { "content-type": "application/json", Prefer: "return=minimal" },
+    body: JSON.stringify({
+      document_id: document.id,
+      event_ref: `DOC-READ-${createDocumentUploadId()}`,
+      event_type: "FILE_ACCESSED",
+      storage_provider: "SUPABASE",
+      storage_bucket: document.storage_bucket,
+      storage_path: document.storage_path,
+      file_size_bytes: Number(document.file_size_bytes) || 0,
+      status: "OK",
+      message: "Temporary signed read URL issued to the authenticated owner of this document.",
+      metadata: { authenticated_user_id: auth.session.userId, candidate_id: auth.session.candidateId }
+    })
+  });
+  if (!auditResponse.ok) {
+    return Response.json({ ok: false, code: "DOCUMENT_READ_AUDIT_FAILED", error: "Kingsmen could not record the document access event, so no temporary link was returned." }, { status: 502 });
+  }
 
   return Response.json({
     ok: true,
