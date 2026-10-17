@@ -107,4 +107,4 @@ END;
 $$;
 
 REVOKE ALL ON FUNCTION public.review_marketplace_entity(text, uuid, text, text[], text) FROM PUBLIC, anon;
-GRANT EXECUTE ON FUNCTION public.review_marketplace_entity(text, uuid, text, text[]) TO authenticated;
+GRANT EXECUTE ON FUNCTION public.review_marketplace_entity(text, uuid, text, text[], text) TO authenticated;
