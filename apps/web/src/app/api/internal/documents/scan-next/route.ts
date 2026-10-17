@@ -213,10 +213,11 @@ export async function POST(request: Request) {
   if (result.status === "CLEAN") {
     const jobUpdate = await supabaseAdminFetch(cfg, `/rest/v1/document_scan_jobs?id=eq.${job.id}&lease_token=eq.${leaseToken}`, {
       method: "PATCH",
-      headers: { "content-type": "application/json", Prefer: "return=minimal" },
+      headers: { "content-type": "application/json", Prefer: "return=representation" },
       body: JSON.stringify({ status: "CLEAN", scanner_provider: provider, scanner_version: version, scanner_result: "CLEAN", completed_at: scannedAt, lease_token: null, leased_at: null, updated_at: scannedAt, last_error_code: null, last_error_message: null })
     });
-    if (!jobUpdate.ok) return jsonError(502, "SCAN_RESULT_PERSIST_FAILED", "The clean result could not be persisted to the durable queue; document remains quarantined.");
+    const cleanJobRows = jobUpdate.ok ? await jobUpdate.json().catch(() => []) as unknown[] : [];
+    if (!Array.isArray(cleanJobRows) || cleanJobRows.length !== 1) return jsonError(502, "SCAN_RESULT_PERSIST_FAILED", "The clean result could not be persisted to the durable queue; document remains quarantined.");
     const eventOk = await audit(cfg, {
       documentId: job.document_id,
       jobRef: `DOC-SCAN-CLEAN-${safeJobRef}`,
@@ -232,26 +233,29 @@ export async function POST(request: Request) {
     if (!eventOk) return jsonError(502, "SCAN_RESULT_AUDIT_FAILED", "The clean scan result is persisted but its audit event failed; the document remains quarantined until reconciliation.");
     const docUpdate = await supabaseAdminFetch(cfg, `/rest/v1/document_files?id=eq.${job.document_id}&document_status=eq.QUARANTINED&malware_scan_status=in.(PENDING,ERROR,SCANNING)`, {
       method: "PATCH",
-      headers: { "content-type": "application/json", Prefer: "return=minimal" },
+      headers: { "content-type": "application/json", Prefer: "return=representation" },
       body: JSON.stringify({ malware_scan_status: "CLEAN", malware_scanned_at: scannedAt, malware_scanner_provider: provider, malware_scanner_version: version, document_status: "READY", updated_at: scannedAt, malware_scan_last_error: null, malware_scan_next_attempt_at: null })
     });
-    if (!docUpdate.ok) return jsonError(502, "DOCUMENT_RELEASE_PERSIST_FAILED", "The clean scan is recorded but the document remains quarantined until release-state reconciliation succeeds.");
+    const releasedRows = docUpdate.ok ? await docUpdate.json().catch(() => []) as unknown[] : [];
+    if (!Array.isArray(releasedRows) || releasedRows.length !== 1) return jsonError(502, "DOCUMENT_RELEASE_PERSIST_FAILED", "The clean scan is recorded but the document remains quarantined until release-state reconciliation succeeds.");
     return Response.json({ ok: true, productionReady: false, jobRef: job.job_ref, result: "CLEAN", documentReleased: true, scanner: { provider, version } }, { headers: { "cache-control": "no-store" } });
   }
 
   if (result.status === "INFECTED") {
     const rejectedJob = await supabaseAdminFetch(cfg, `/rest/v1/document_scan_jobs?id=eq.${job.id}&lease_token=eq.${leaseToken}`, {
       method: "PATCH",
-      headers: { "content-type": "application/json", Prefer: "return=minimal" },
+      headers: { "content-type": "application/json", Prefer: "return=representation" },
       body: JSON.stringify({ status: "INFECTED", scanner_provider: provider, scanner_version: version, scanner_result: "INFECTED", completed_at: scannedAt, lease_token: null, leased_at: null, updated_at: scannedAt })
     });
-    if (!rejectedJob.ok) return jsonError(502, "INFECTED_JOB_STATE_FAILED", "The infected result could not be persisted to the scan queue; the document remains unavailable.");
+    const infectedJobRows = rejectedJob.ok ? await rejectedJob.json().catch(() => []) as unknown[] : [];
+    if (!Array.isArray(infectedJobRows) || infectedJobRows.length !== 1) return jsonError(502, "INFECTED_JOB_STATE_FAILED", "The infected result could not be persisted to the scan queue; the document remains unavailable.");
     const rejectedDocument = await supabaseAdminFetch(cfg, `/rest/v1/document_files?id=eq.${job.document_id}&document_status=eq.QUARANTINED`, {
       method: "PATCH",
-      headers: { "content-type": "application/json", Prefer: "return=minimal" },
+      headers: { "content-type": "application/json", Prefer: "return=representation" },
       body: JSON.stringify({ malware_scan_status: "INFECTED", malware_scanned_at: scannedAt, malware_scanner_provider: provider, malware_scanner_version: version, document_status: "REJECTED", updated_at: scannedAt, malware_scan_last_error: "Scanner reported INFECTED." })
     });
-    if (!rejectedDocument.ok) return jsonError(502, "INFECTED_DOCUMENT_STATE_FAILED", "The infected result is recorded but the document remains quarantined until rejection state is reconciled.");
+    const rejectedRows = rejectedDocument.ok ? await rejectedDocument.json().catch(() => []) as unknown[] : [];
+    if (!Array.isArray(rejectedRows) || rejectedRows.length !== 1) return jsonError(502, "INFECTED_DOCUMENT_STATE_FAILED", "The infected result is recorded but the document remains quarantined until rejection state is reconciled.");
     const eventOk = await audit(cfg, {
       documentId: job.document_id,
       jobRef: `DOC-SCAN-INFECTED-${safeJobRef}`,
