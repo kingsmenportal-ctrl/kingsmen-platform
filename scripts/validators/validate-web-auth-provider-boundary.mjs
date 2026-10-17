@@ -5,6 +5,7 @@ const root = process.cwd();
 const read = (path) => readFileSync(resolve(root, path), "utf8");
 const auth = read("apps/web/src/lib/auth/supabase-rest.ts");
 const body = read("apps/web/src/lib/auth/request-body.ts");
+const tokens = read("apps/web/src/lib/auth/token-bounds.ts");
 const login = read("apps/web/src/app/api/auth/login/route.ts");
 const register = read("apps/web/src/app/api/auth/register/route.ts");
 const recovery = read("apps/web/src/app/api/auth/recovery/route.ts");
@@ -21,6 +22,9 @@ const checks = [
   ["auth body parser rejects non-JSON and malformed JSON", /JSON_REQUIRED/.test(body) && /INVALID_JSON/.test(body)],
   ["login uses same-origin guard and bounded JSON parser", /isSameOriginRequest\(request\)/.test(login) && /readAuthJson\(request\)/.test(login)],
   ["registration uses same-origin guard and bounded JSON parser", /isSameOriginRequest\(request\)/.test(register) && /readAuthJson\(request\)/.test(register)],
+  ["login validates provider token pair before setting cookies", /hasValidAuthTokenPair\(payload\)/.test(login)],
+  ["registration validates any returned token pair before setting cookies", /hasValidAuthTokenPair\(payload\)/.test(register) && /AUTH_PROVIDER_RESPONSE_INVALID/.test(register)],
+  ["provider access and refresh token lengths are bounded", /MAX_AUTH_ACCESS_TOKEN_CHARS = 16_384/.test(tokens) && /MAX_AUTH_REFRESH_TOKEN_CHARS = 4_096/.test(tokens) && /MIN_AUTH_TOKEN_CHARS = 16/.test(tokens)],
   ["recovery uses same-origin guard and bounded JSON parser", /isSameOriginRequest\(request\)/.test(recovery) && /readAuthJson\(request\)/.test(recovery)],
   ["recovery response does not disclose account existence", /If an account exists for that address/.test(recovery)],
   ["refresh uses same-origin guard and validates token bounds", /isSameOriginRequest\(request\)/.test(refresh) && /refreshToken\.length > 4096/.test(refresh) && /access_token\.length > 16384/.test(refresh)],
