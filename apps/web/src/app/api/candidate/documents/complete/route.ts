@@ -14,12 +14,6 @@ const ALLOWED_TYPES: Record<string, string[]> = {
   NSFAS_DOCUMENT: ["application/pdf", "image/jpeg", "image/png"],
   OTHER: ["application/pdf", "image/jpeg", "image/png", "application/vnd.openxmlformats-officedocument.wordprocessingml.document"]
 };
-const ALLOWED_MIME_TYPES = new Set([
-  "application/pdf",
-  "image/jpeg",
-  "image/png",
-  "application/vnd.openxmlformats-officedocument.wordprocessingml.document"
-]);
 
 type StorageObject = {
   name?: string;
