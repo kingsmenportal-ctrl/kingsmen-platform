@@ -1,4 +1,5 @@
 import { createServer, type IncomingMessage, type ServerResponse } from "node:http";
+import { timingSafeEqual } from "node:crypto";
 import { URL } from "node:url";
 
 import {
@@ -196,6 +197,31 @@ function sendError(response: ServerResponse, statusCode: number, code: string, m
     correlationId: correlationId ?? null,
     generatedAtIso: nowIso()
   }, correlationId);
+}
+
+function authorizeApiRequest(request: IncomingMessage, response: ServerResponse, audience: "service" | "workflow"): boolean {
+  const configuredToken = audience === "workflow"
+    ? process.env.KINGSMEN_WORKFLOW_SERVICE_TOKEN
+    : process.env.KINGSMEN_API_SERVICE_TOKEN;
+
+  if (!configuredToken) {
+    sendError(response, 503, "API_AUTH_NOT_CONFIGURED", "This backend route is unavailable until its server-side service credential is configured.");
+    return false;
+  }
+
+  const authorization = request.headers.authorization ?? "";
+  const suppliedToken = authorization.startsWith("Bearer ") ? authorization.slice(7) : "";
+  const expected = Buffer.from(configuredToken, "utf8");
+  const supplied = Buffer.from(suppliedToken, "utf8");
+  const matches = expected.length === supplied.length && timingSafeEqual(expected, supplied);
+
+  if (!matches) {
+    response.setHeader("www-authenticate", "Bearer");
+    sendError(response, 401, "UNAUTHENTICATED", "A valid server-side bearer credential is required.");
+    return false;
+  }
+
+  return true;
 }
 
 function readBody(request: IncomingMessage): Promise<string> {
@@ -479,28 +505,33 @@ export function createKingsmenApiServer() {
       }
 
       if (method === "POST" && pathname === "/api/jarvis/runtime-control") {
+        if (!authorizeApiRequest(request, response, "service")) return;
         await handleJarvisRuntimeControl(request, response);
         return;
       }
 
       if (method === "POST" && pathname === "/api/commands") {
+        if (!authorizeApiRequest(request, response, "service")) return;
         await handleCommand(request, response);
         return;
       }
 
       if (method === "POST" && (pathname === "/api/workflow/result" || pathname === "/api/workflow-results")) {
+        if (!authorizeApiRequest(request, response, "workflow")) return;
         await handleWorkflowResult(request, response);
         return;
       }
 
       const candidateId = getPathParam(/^\/api\/candidates\/([^/]+)\/status$/, pathname);
       if (method === "GET" && candidateId) {
+        if (!authorizeApiRequest(request, response, "service")) return;
         await handleCandidateStatus(response, candidateId);
         return;
       }
 
       const applicationId = getPathParam(/^\/api\/applications\/([^/]+)\/workbench$/, pathname);
       if (method === "GET" && applicationId) {
+        if (!authorizeApiRequest(request, response, "service")) return;
         await handleApplicationWorkbench(response, applicationId);
         return;
       }
