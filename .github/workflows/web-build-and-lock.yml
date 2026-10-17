@@ -1,61 +1,74 @@
-name: Web Build and Lockfile
+name: Web CI
 
 on:
+  pull_request:
+    branches:
+      - "**"
+    paths:
+      - "apps/web/**"
+      - "db/migrations/**"
+      - "netlify.toml"
+      - ".github/workflows/web-build-and-lock.yml"
   push:
     branches:
       - "auth-identity-profile-batch-*"
     paths:
       - "apps/web/**"
+      - "db/migrations/**"
       - "netlify.toml"
       - ".github/workflows/web-build-and-lock.yml"
   workflow_dispatch:
 
 permissions:
-  contents: write
+  contents: read
 
 concurrency:
-  group: web-build-${{ github.ref }}
+  group: web-ci-${{ github.workflow }}-${{ github.ref }}
   cancel-in-progress: true
 
 jobs:
   web-build:
-    name: Install, typecheck, and build web app
+    name: Lockfile, migrations, typecheck, and production build
     runs-on: ubuntu-latest
-    timeout-minutes: 25
-    defaults:
-      run:
-        working-directory: apps/web
+    timeout-minutes: 30
     steps:
-      - name: Checkout branch
+      - name: Checkout repository
         uses: actions/checkout@v4
-        with:
-          persist-credentials: true
 
       - name: Set up Node.js
         uses: actions/setup-node@v4
         with:
           node-version: 22
+          cache: npm
+          cache-dependency-path: apps/web/package-lock.json
 
-      - name: Generate deterministic dependency lock
-        run: npm install --package-lock-only --ignore-scripts --no-audit --no-fund
-
-      - name: Commit generated lockfile when missing or changed
-        working-directory: .
+      - name: Verify committed dependency lockfile
+        working-directory: apps/web
         run: |
-          if ! git ls-files --error-unmatch apps/web/package-lock.json >/dev/null 2>&1 || ! git diff --quiet -- apps/web/package-lock.json; then
-            git config user.name "github-actions[bot]"
-            git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-            git add apps/web/package-lock.json
-            git commit -m "build(web): lock npm dependency graph"
-            git push origin "HEAD:${GITHUB_REF_NAME}"
-          fi
-          git config --unset-all http.https://github.com/.extraheader || true
+          test -s package-lock.json
+          npm ci --ignore-scripts --no-audit --no-fund
 
-      - name: Install exactly from lockfile
-        run: npm ci --no-audit --no-fund
+      - name: Verify phase migration files are present and ordered
+        shell: bash
+        run: |
+          set -euo pipefail
+          for version in $(seq -w 59 71); do
+            file="db/migrations/00${version}_"
+            count=$(find db/migrations -maxdepth 1 -type f -name "${file}*.sql" | wc -l)
+            if [ "$count" -ne 1 ]; then
+              echo "::error::Expected exactly one migration file matching ${file}*.sql; found $count"
+              exit 1
+            fi
+          done
+          echo "Migrations 0059–0071 are present exactly once."
 
-      - name: Type-check
+      - name: Type-check web app
+        working-directory: apps/web
         run: npm run typecheck
 
-      - name: Build production bundle
+      - name: Build production web bundle
+        working-directory: apps/web
+        env:
+          SUPABASE_URL: https://example.supabase.co
+          SUPABASE_ANON_KEY: ci-public-anon-placeholder
         run: npm run build
