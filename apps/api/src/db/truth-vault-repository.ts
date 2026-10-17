@@ -387,6 +387,58 @@ export class TruthVaultRepository {
     }));
   }
 
+  /** Lists application rows via the explicit Supabase Auth UUID binding used by staging RLS. */
+  async listApplicationsForVerifiedSupabaseUser(supabaseUserId: string): Promise<ApplicationWorkbenchReadModel[] | null> {
+    this.assertEnabled();
+    if (!/^[0-9a-f]{8}-[0-9a-f]{4}-[1-8][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i.test(supabaseUserId)) return null;
+    const client = await this.pool!.connect();
+    try {
+      await client.query("BEGIN");
+      await client.query(
+        "select set_config('app.kingsmen_role', $1, true), set_config('app.service_context', $2, true)",
+        ["service_role", "backend_api"]
+      );
+      const linked = await client.query<{ candidate_id: string }>(
+        `select ca.candidate_id::text
+           from public.candidate_accounts ca
+           join public.candidates c on c.id=ca.candidate_id and c.is_active=true
+          where ca.auth_user_id=$1::uuid
+          limit 1`,
+        [supabaseUserId]
+      );
+      if (!linked.rows[0]) {
+        await client.query("COMMIT");
+        return null;
+      }
+      const result = await client.query<ApplicationRow>(
+        `select a.id::text,
+                coalesce(a.metadata->>'applicationRef', a.id::text) as application_ref,
+                c.public_ref as candidate_ref,
+                a.route_type, a.source_confidence_band, a.current_state,
+                a.portal_health, a.map_fallback_required, a.last_evidence_ref,
+                a.updated_at::text
+           from public.applications a
+           join public.candidates c on c.id=a.candidate_id and c.is_active=true
+          where a.candidate_id=$1::uuid
+          order by a.updated_at desc, a.id asc
+          limit 200`,
+        [linked.rows[0].candidate_id]
+      );
+      await client.query("COMMIT");
+      return result.rows.map((row) => ({
+        applicationId: row.application_ref, candidateId: row.candidate_ref, routeType: row.route_type,
+        sourceConfidenceBand: row.source_confidence_band, currentState: row.current_state,
+        portalHealth: row.portal_health, mapFallbackRequired: row.map_fallback_required,
+        lastEvidenceRef: row.last_evidence_ref ?? undefined, lastUpdatedAt: row.updated_at
+      }));
+    } catch (error) {
+      try { await client.query("ROLLBACK"); } catch { /* preserve original error */ }
+      throw error;
+    } finally {
+      client.release();
+    }
+  }
+
   /** Lists safe document metadata by the Supabase Auth UUID-to-candidate binding. */
   async listDocumentsForVerifiedSupabaseUser(supabaseUserId: string): Promise<Array<{
     documentRef: string; documentType: string; displayName: string; mimeType: string;
