@@ -536,7 +536,7 @@ export class TruthVaultRepository {
       if (Boolean(linked.rows[0]?.candidate_id) && result.rows.length > 200) {
         throw new Error("CANDIDATE_DOCUMENT_RESULT_LIMIT_EXCEEDED");
       }
-      if (linked.rows[0]?.linked === true) {
+      if (Boolean(linked.rows[0]?.candidate_id)) {
         const correlationId = `candidate_documents_${Date.now()}_${Math.random().toString(36).slice(2, 10)}`;
         await client.query(
           `insert into audit_events
@@ -555,7 +555,7 @@ export class TruthVaultRepository {
         );
       }
       await client.query("COMMIT");
-      if (linked.rows[0]?.linked !== true) return null;
+      if (!linked.rows[0]?.candidate_id) return null;
       return result.rows.map((row) => ({
         documentRef: row.document_ref, documentType: row.document_type, displayName: row.display_name,
         mimeType: row.mime_type, fileSizeBytes: Number(row.file_size_bytes),
