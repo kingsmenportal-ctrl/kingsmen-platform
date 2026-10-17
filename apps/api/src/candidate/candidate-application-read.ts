@@ -83,18 +83,36 @@ export async function listApplicationsForVerifiedAuthUser(
   if (result.rows.length > 500) {
     throw new Error("CANDIDATE_APPLICATION_RESULT_LIMIT_EXCEEDED");
   }
-  return result.rows
-    .filter((row) => row.application_id !== null)
-    .map((row) => ({
-      applicationId: row.application_id!,
-      routeType: row.route_type!,
-      routeName: row.route_name!,
-      institutionOrProvider: row.institution_or_provider,
-      currentState: row.current_state!,
-      sourceConfidenceBand: row.source_confidence_band!,
-      portalHealth: row.portal_health!,
-      mapFallbackRequired: row.map_fallback_required!,
-      lastEvidenceRef: row.last_evidence_ref,
-      updatedAt: row.updated_at!
-    }));
+  const applicationRows = result.rows.filter((row) => row.application_id !== null);
+  for (const row of applicationRows) {
+    if (
+      typeof row.verified_candidate_id !== "string" || !row.verified_candidate_id.trim() ||
+      typeof row.application_id !== "string" || !row.application_id.trim() ||
+      typeof row.route_type !== "string" || !row.route_type.trim() ||
+      typeof row.route_name !== "string" || !row.route_name.trim() ||
+      typeof row.current_state !== "string" || !row.current_state.trim() ||
+      typeof row.source_confidence_band !== "string" || !row.source_confidence_band.trim() ||
+      typeof row.portal_health !== "string" || !row.portal_health.trim() ||
+      typeof row.map_fallback_required !== "boolean" ||
+      typeof row.updated_at !== "string" || !Number.isFinite(Date.parse(row.updated_at)) ||
+      (row.institution_or_provider !== null && typeof row.institution_or_provider !== "string") ||
+      (row.last_evidence_ref !== null && typeof row.last_evidence_ref !== "string")
+    ) {
+      // A malformed row must never be serialized as undefined or misleading data.
+      throw new Error("CANDIDATE_APPLICATION_ROW_INVALID");
+    }
+  }
+
+  return applicationRows.map((row) => ({
+    applicationId: row.application_id!,
+    routeType: row.route_type!,
+    routeName: row.route_name!,
+    institutionOrProvider: row.institution_or_provider,
+    currentState: row.current_state!,
+    sourceConfidenceBand: row.source_confidence_band!,
+    portalHealth: row.portal_health!,
+    mapFallbackRequired: row.map_fallback_required!,
+    lastEvidenceRef: row.last_evidence_ref,
+    updatedAt: row.updated_at!
+  }));
 }
