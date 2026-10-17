@@ -190,6 +190,7 @@ DECLARE
   v_status text;
   v_event_type text;
   v_actor_role text;
+  v_old_status text;
 BEGIN
   IF p_decision NOT IN ('APPROVE','REJECT') OR length(coalesce(p_reason,''))<12 OR length(p_reason)>2000 THEN
     RAISE EXCEPTION 'refund decision or reason is invalid';
@@ -209,6 +210,7 @@ BEGIN
     RAISE EXCEPTION 'refund decision conflicts with current state';
   END IF;
   IF v_refund.status NOT IN ('REQUESTED','UNDER_REVIEW') THEN RAISE EXCEPTION 'refund state does not permit review'; END IF;
+  v_old_status := v_refund.status;
   v_status := CASE WHEN p_decision='APPROVE' THEN 'APPROVED' ELSE 'REJECTED' END;
   v_event_type := CASE WHEN p_decision='APPROVE' THEN 'REFUND_APPROVED' ELSE 'REFUND_REJECTED' END;
   UPDATE public.candidate_refund_requests SET status=v_status,reviewer_auth_user_id=p_actor_auth_user_id,
@@ -227,7 +229,7 @@ BEGIN
     event_ref,actor_auth_user_id,actor_role,action,entity_type,entity_id,before_snapshot,after_snapshot,reason
   ) VALUES (
     'KMFINAUDIT-'||replace(gen_random_uuid()::text,'-',''),p_actor_auth_user_id,v_actor_role,
-    'REFUND_'||v_status,'REFUND',v_refund.id,jsonb_build_object('status',p_decision='APPROVE'?'REQUESTED':'REQUESTED'),
+    'REFUND_'||v_status,'REFUND',v_refund.id,jsonb_build_object('status',v_old_status),
     jsonb_build_object('status',v_status),p_reason
   );
   RETURN QUERY SELECT v_refund.id,v_refund.refund_ref,v_refund.order_id,v_refund.status,false;
