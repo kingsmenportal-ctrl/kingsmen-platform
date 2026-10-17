@@ -9,7 +9,7 @@ const checks = [
   ["no HTTP role parsing", !/request\.body\.role|headers\[['"]x-role['"]\]/i.test(source)],
   ["explicit fail-closed principal check", /CANDIDATE_IDENTITY_LINK_OPERATOR_REQUIRED/.test(source)],
   ["explicit fail-closed permission check", /CANDIDATE_IDENTITY_LINK_PERMISSION_REQUIRED/.test(source)],
-  ["action and command validated before transaction", /validateActionAndCommand\(action, command\);[\\s\\S]*?operatorResolver\\.resolve/.test(source)],
+  ["action and command validated before transaction", /validateActionAndCommand\(action, command\);[\s\S]*?operatorResolver\.resolve/.test(source)],
   ["bounded operator actor ID", /principal\.actorId\.trim\(\)\.length > 200/.test(source)],
   ["correlation ID length validated", /command\.correlationId\.trim\(\)\.length > 200/.test(source)],
   ["reason length validated before transaction", /command\.reason\.trim\(\)\.length > 500/.test(source)]
