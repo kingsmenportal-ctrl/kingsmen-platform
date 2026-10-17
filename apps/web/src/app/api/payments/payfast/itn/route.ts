@@ -9,7 +9,7 @@ const json = (body: Record<string, unknown>, status = 200) => Response.json(body
 function canonicalPayFast(params: URLSearchParams, passphrase: string) {
   const entries: string[] = [];
   for (const [key, raw] of params.entries()) {
-    if (["signature", "merchant_key", "passphrase"].includes(key) || raw === "") continue;
+    if (["signature", "passphrase"].includes(key) || raw === "") continue;
     entries.push(`${key}=${encodeURIComponent(raw.trim()).replace(/%20/g, "+")}`);
   }
   if (passphrase) entries.push(`passphrase=${encodeURIComponent(passphrase.trim()).replace(/%20/g, "+")}`);
