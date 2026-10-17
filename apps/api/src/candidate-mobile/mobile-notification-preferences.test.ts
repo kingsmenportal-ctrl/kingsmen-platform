@@ -6,10 +6,11 @@ import { assertChannelAllowed, assertCandidateStatusIsSafe } from "./mobile-poli
 test("defaults keep email primary and optional channels restricted", () => {
   const preference = defaultMobileNotificationPreference("synthetic-candidate");
   assert.equal(preference.emailEnabled, true);
-  assert.equal(preference.whatsappUrgentOnly, true);
+  assert.equal(preference.whatsappUrgentOnly, false);
   assert.equal(preference.smsBackupEnabled, false);
   assert.equal(chooseMobileChannel(preference, "routine"), "email");
   assert.equal(chooseMobileChannel(preference, "backup"), "email");
+  assert.equal(chooseMobileChannel(preference, "urgent"), "email");
 });
 
 test("WhatsApp is never selected for routine messages", () => {
@@ -41,6 +42,8 @@ test("disabled email falls back to portal unless backup SMS is explicitly enable
 
 test("urgent WhatsApp requires explicit urgent-only policy and is not a delivery guarantee", () => {
   assert.doesNotThrow(() => assertChannelAllowed("whatsapp_urgent", "urgent"));
+  const optedIn = { ...defaultMobileNotificationPreference("synthetic-candidate"), whatsappUrgentOnly: true };
+  assert.equal(chooseMobileChannel(optedIn, "urgent"), "whatsapp_urgent");
   assert.throws(() => assertChannelAllowed("whatsapp_urgent", "routine"), /WHATSAPP_URGENT_ONLY/);
   assert.throws(() => assertChannelAllowed("sms_backup", "routine"), /SMS_BACKUP_ONLY/);
 });
