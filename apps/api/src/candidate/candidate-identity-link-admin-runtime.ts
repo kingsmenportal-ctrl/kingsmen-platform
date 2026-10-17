@@ -69,7 +69,7 @@ export class CandidateIdentityLinkAdminRuntime<TRequestContext> {
   ): Promise<CandidateIdentityLinkResult> {
     validateActionAndCommand(action, command);
     const principal = await this.operatorResolver.resolve(requestContext);
-    if (!principal || typeof principal.actorId !== "string" || !principal.actorId.trim() || principal.actorId.trim().length > 200) {
+    if (!principal || typeof principal.actorId !== "string" || !principal.actorId.trim() || principal.actorId !== principal.actorId.trim() || principal.actorId.length > 200) {
       throw new Error("CANDIDATE_IDENTITY_LINK_OPERATOR_REQUIRED");
     }
     if (!Array.isArray(principal.permissions) || !principal.permissions.includes(REQUIRED_PERMISSION[action])) {
