@@ -181,7 +181,7 @@ export async function verifyPrivateDocumentsBucket(cfg: SupabaseConfig): Promise
     bucket.public === false &&
     (bucket.id === cfg.documentsBucket || bucket.name === cfg.documentsBucket) &&
     Number.isFinite(configuredLimit) &&
-    configuredLimit === 10 * 1024 * 1024 &&
+    configuredLimit === 15 * 1024 * 1024 &&
     Array.isArray(bucket.allowed_mime_types) &&
     requiredMimeTypes.every((mime) => bucket.allowed_mime_types?.includes(mime));
 }
@@ -192,7 +192,7 @@ export async function verifyStoredDocumentSignature(
   mimeType: string,
   expectedSizeBytes: number
 ): Promise<{ ok: boolean; reason: string; checksumSha256?: string }> {
-  if (!Number.isSafeInteger(expectedSizeBytes) || expectedSizeBytes < 1 || expectedSizeBytes > 10 * 1024 * 1024) {
+  if (!Number.isSafeInteger(expectedSizeBytes) || expectedSizeBytes < 1 || expectedSizeBytes > 15 * 1024 * 1024) {
     return { ok: false, reason: "Stored object size is outside the configured limit." };
   }
   const encodedPath = storagePath.split("/").map(encodeURIComponent).join("/");
@@ -207,7 +207,7 @@ export async function verifyStoredDocumentSignature(
   }
   if (!response.ok) return { ok: false, reason: "Stored bytes could not be read for signature validation." };
   const bytes = new Uint8Array(await response.arrayBuffer());
-  if (bytes.byteLength !== expectedSizeBytes || bytes.byteLength > 10 * 1024 * 1024) {
+  if (bytes.byteLength !== expectedSizeBytes || bytes.byteLength > 15 * 1024 * 1024) {
     return { ok: false, reason: "Stored byte count does not match the Storage metadata." };
   }
 
