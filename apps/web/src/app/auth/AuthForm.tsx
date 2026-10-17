@@ -1,6 +1,6 @@
 "use client";
 
-import { FormEvent, useState } from "react";
+import { useState, type FormEvent } from "react";
 import Link from "next/link";
 import { linkCandidateAccount, storeKingsmenSession, supabaseAuth, type KingsmenSession } from "../../lib/supabase-browser-auth";
 
