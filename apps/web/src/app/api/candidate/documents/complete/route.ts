@@ -112,6 +112,7 @@ export async function POST(request: Request) {
         original_filename: filename,
         mime_type: mimeType,
         file_size_bytes: sizeBytes,
+        checksum_sha256: signature.checksumSha256,
         storage_provider: "SUPABASE",
         storage_bucket: auth.config.documentsBucket,
         storage_path: storagePath,
@@ -161,6 +162,7 @@ export async function POST(request: Request) {
       storage_bucket: auth.config.documentsBucket,
       storage_path: storagePath,
       file_size_bytes: sizeBytes,
+      checksum_sha256: signature.checksumSha256,
       status: "OK",
       message: "Candidate-owned object existence and stored metadata checked by the server.",
       metadata: { upload_id: uploadId, authenticated_user_id: auth.session.userId }
