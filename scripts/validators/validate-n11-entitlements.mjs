@@ -32,7 +32,7 @@ assert.match(reviewerApi,/n11_transition_entitlement/);
 assert.doesNotMatch(reviewerApi,/n11_grant_entitlement/);
 assert.match(reviewerApi,/export async function GET/);
 assert.match(candidatePage,/My services & entitlements/);
-assert.match(candidatePage,/candidate_entitlements/);
+assert.match(candidatePage,/\/api\/candidate\/entitlements/);
 assert.match(reviewerPage,/Service fulfilment review/);
 assert.match(reviewerPage,/Place hold/);
 assert.match(reviewerPage,/Revoke service/);
