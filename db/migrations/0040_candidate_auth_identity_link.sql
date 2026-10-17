@@ -14,8 +14,13 @@ CREATE TABLE IF NOT EXISTS public.candidate_auth_identity_links (
   updated_at timestamptz NOT NULL DEFAULT now(),
   CONSTRAINT candidate_auth_identity_verified_fields_check
     CHECK (
-      (link_status = 'VERIFIED' AND verified_at IS NOT NULL AND verified_by IS NOT NULL)
-      OR link_status <> 'VERIFIED'
+      link_status <> 'VERIFIED'
+      OR (verified_at IS NOT NULL AND length(btrim(verified_by)) > 0)
+    ),
+  CONSTRAINT candidate_auth_identity_revocation_reason_check
+    CHECK (
+      link_status <> 'REVOKED'
+      OR (revocation_reason IS NOT NULL AND length(btrim(revocation_reason)) BETWEEN 1 AND 500)
     )
 );
 
