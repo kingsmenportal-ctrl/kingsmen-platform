@@ -1,0 +1,33 @@
+name: N04 Candidate Profile Runtime
+
+on:
+  pull_request:
+    paths:
+      - "apps/web/src/app/api/candidate/profile/**"
+      - "apps/web/src/app/api/candidate/identity/**"
+      - "apps/web/src/app/candidate/profile/**"
+      - "apps/web/src/lib/candidate-document-runtime.ts"
+      - "db/migrations/0059_n04_profile_runtime_audit.sql"
+      - "scripts/validators/validate-n04-profile-runtime.mjs"
+      - "scripts/tests/n04-profile-api-contract.mjs"
+      - ".github/workflows/n04-profile-runtime.yml"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  n04-source-guards:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - name: Validate profile runtime source boundaries
+        run: node scripts/validators/validate-n04-profile-runtime.mjs
+      - name: Validate API contract test syntax
+        run: node --check scripts/tests/n04-profile-api-contract.mjs
+      - name: Validate migration safety markers
+        run: |
+          node --input-type=module -e 'import {readFileSync} from "node:fs"; const s=readFileSync("db/migrations/0059_n04_profile_runtime_audit.sql","utf8"); for (const t of ["ADD COLUMN IF NOT EXISTS auth_user_id","candidate_profile_access_audit","ENABLE ROW LEVEL SECURITY","prevent_candidate_profile_audit_mutation"]) if (!s.includes(t)) throw new Error("Missing migration marker: "+t); console.log("N04 migration source markers passed; migration not applied by CI.");'
