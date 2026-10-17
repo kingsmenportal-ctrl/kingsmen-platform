@@ -4,10 +4,11 @@ const card = "rgba(255,255,255,.055)";
 const action = { display:"inline-flex", alignItems:"center", justifyContent:"center", padding:"13px 18px", borderRadius:12, fontWeight:850, textDecoration:"none" as const, minHeight:46 };
 
 const pathways = [
-  { title:"Study & training", text:"Explore university, TVET, skills and training routes.", href:"/free-destiny-map", tag:"Explore routes" },
-  { title:"Work & experience", text:"Organise your job search, CV preparation and next steps.", href:"/free-destiny-map", tag:"Plan next steps" },
-  { title:"Funding readiness", text:"Understand common preparation steps and what to verify with funders.", href:"/free-destiny-map", tag:"Check readiness" },
-  { title:"Documents & deadlines", text:"Identify what you may need to prepare before applying.", href:"/free-destiny-map", tag:"Build a checklist" },
+  { title:"Study & training", text:"Explore university, TVET, skills and training routes.", href:"/schools", tag:"Explore education" },
+  { title:"Work & experience", text:"Explore employment, internships and career pathways.", href:"/jobs", tag:"Explore jobs" },
+  { title:"Funding readiness", text:"Explore bursaries, funding and student-support routes.", href:"/funding", tag:"Explore funding" },
+  { title:"Accommodation", text:"Explore student accommodation and provider application routes.", href:"/accommodation", tag:"Explore accommodation" },
+  { title:"Documents & deadlines", text:"Identify what you may need to prepare before applying.", href:"/candidate/dashboard", tag:"Open candidate space" },
 ];
 
 export default function HomePage() {
