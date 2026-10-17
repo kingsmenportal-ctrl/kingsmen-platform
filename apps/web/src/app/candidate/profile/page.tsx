@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { FormEvent, useEffect, useState } from "react";
-import { readKingsmenSession } from "../../../lib/supabase-browser-auth";
+import { getKingsmenSession, signOutKingsmen } from "../../../lib/supabase-browser-auth";
 
 type ProfileData = { candidate: Record<string, unknown>; profile: Record<string, unknown> | null; changeRequests: Array<Record<string, unknown>> };
 const fields = [
@@ -25,7 +25,7 @@ export default function CandidateProfilePage() {
   const [error, setError] = useState("");
 
   async function load() {
-    const session = readKingsmenSession();
+    const session = await getKingsmenSession();
     if (!session) { setError("Sign in first to access your private candidate profile."); setLoading(false); return; }
     const response = await fetch("/api/candidate/profile", { headers: { authorization: `Bearer ${session.access_token}` }, cache: "no-store" });
     const result = await response.json().catch(() => ({}));
@@ -56,7 +56,7 @@ export default function CandidateProfilePage() {
 
   return <main style={{ maxWidth: 1000, margin: "0 auto", padding: 24, color: "#f4f6ff", fontFamily: "system-ui, sans-serif" }}>
     <p><Link href="/candidate/dashboard" style={{ color: "#a5b4fc" }}>← Candidate dashboard</Link></p>
-    <h1>My profile</h1>
+    <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", gap: 12, flexWrap: "wrap" }}><h1>My profile</h1><button onClick={async () => { await signOutKingsmen(); window.location.assign("/auth/login"); }} style={{ padding: 10, borderRadius: 8, border: "1px solid #39445e", background: "#111a2e", color: "#fff" }}>Sign out</button></div>
     <p style={{ color: "#b8c0d9" }}>Your profile is read from persisted candidate records. Corrections are submitted as review requests; they do not silently overwrite trusted data.</p>
     {loading && <p>Loading your saved profile…</p>}
     {error && <p role="alert" style={{ background: "#451a1a", padding: 12, borderRadius: 8 }}>{error}</p>}
