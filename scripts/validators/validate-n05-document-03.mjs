@@ -49,7 +49,13 @@ for (const phrase of [
   "image/webp",
   "10 * 1024 * 1024",
   "raw public URL is not allowed",
-  "service_role must never be visible"
+  "service_role must never be visible",
+  "MAX_FILENAME_LENGTH = 255",
+  "MIME type and file extension do not match",
+  "unsafe filename",
+  "Number.isSafeInteger(input.sizeBytes)",
+  'input.filename.includes("/")',
+  'input.filename.includes("\\\\\\\\")'
 ]) {
   if (!safety.includes(phrase)) failures.push(`Document safety policy missing phrase: ${phrase}`);
 }
