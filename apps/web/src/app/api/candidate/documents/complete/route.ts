@@ -118,7 +118,9 @@ export async function POST(request: Request) {
         storage_path: storagePath,
         protected_data: true,
         source_channel: "PORTAL",
-        document_status: "UPLOADED",
+        document_status: "QUARANTINED",
+        malware_scan_status: "PENDING",
+        quarantine_started_at: new Date().toISOString(),
         verification_status: "PENDING",
         extraction_status: "NOT_STARTED",
         source_confidence_band: "C",
@@ -137,7 +139,7 @@ export async function POST(request: Request) {
   let document = Array.isArray(returnedRows) ? returnedRows[0] : undefined;
   if (!document) {
     const existingUrl = new URL(`${auth.config.url}/rest/v1/document_files`);
-    existingUrl.searchParams.set("select", "id,document_ref,document_type,display_name,mime_type,file_size_bytes,document_status,verification_status,uploaded_at");
+    existingUrl.searchParams.set("select", "id,document_ref,document_type,display_name,mime_type,file_size_bytes,document_status,malware_scan_status,verification_status,uploaded_at");
     existingUrl.searchParams.set("document_ref", `eq.${documentRef}`);
     existingUrl.searchParams.set("candidate_id", `eq.${auth.session.candidateId}`);
     existingUrl.searchParams.set("limit", "1");
@@ -148,6 +150,79 @@ export async function POST(request: Request) {
 
   if (!document) {
     return Response.json({ ok: false, code: "DOCUMENT_RECORD_NOT_CONFIRMED", error: "The upload completed, but Kingsmen could not confirm its document record." }, { status: 502 });
+  }
+
+  // Persist a durable scan job. If this write fails, the object and metadata remain quarantined;
+  // the reconciler must discover stale quarantined records. No download URL is issued here.
+  const scanJobResponse = await supabaseAdminFetch(auth.config, "/rest/v1/document_scan_jobs?on_conflict=job_ref", {
+    method: "POST",
+    headers: { "content-type": "application/json", Prefer: "resolution=ignore-duplicates,return=representation" },
+    body: JSON.stringify({
+      job_ref: `DOC-SCAN-${uploadId}`,
+      document_id: document.id,
+      candidate_id: auth.session.candidateId,
+      storage_bucket: auth.config.documentsBucket,
+      storage_path: storagePath,
+      checksum_sha256: signature.checksumSha256,
+      file_size_bytes: sizeBytes,
+      mime_type: mimeType,
+      status: "QUEUED",
+      available_at: new Date().toISOString()
+    })
+  });
+  if (!scanJobResponse.ok) {
+    await supabaseAdminFetch(auth.config, "/rest/v1/document_storage_events", {
+      method: "POST",
+      headers: { "content-type": "application/json", Prefer: "return=minimal" },
+      body: JSON.stringify({
+        document_id: document.id,
+        event_ref: `DOC-SCAN-QUEUE-FAILED-${uploadId}`,
+        event_type: "MALWARE_SCAN_FAILED",
+        storage_provider: "SUPABASE",
+        storage_bucket: auth.config.documentsBucket,
+        storage_path: storagePath,
+        file_size_bytes: sizeBytes,
+        checksum_sha256: signature.checksumSha256,
+        status: "FAILED",
+        message: "Scan queue write failed; document remains quarantined for reconciliation.",
+        metadata: { upload_id: uploadId, reason: "SCAN_QUEUE_WRITE_FAILED" }
+      })
+    }).catch(() => undefined);
+    return Response.json({
+      ok: false,
+      code: "DOCUMENT_SCAN_QUEUE_UNAVAILABLE",
+      error: "The document is safely quarantined but the scan job could not be queued. It cannot be downloaded until reconciliation and a clean scan complete.",
+      documentId: document.id,
+      malwareScanStatus: "PENDING",
+      cleanup: "RECONCILIATION_REQUIRED"
+    }, { status: 503, headers: { "cache-control": "no-store" } });
+  }
+
+  const scanEventResponse = await supabaseAdminFetch(auth.config, "/rest/v1/document_storage_events?on_conflict=event_ref", {
+    method: "POST",
+    headers: { "content-type": "application/json", Prefer: "resolution=ignore-duplicates,return=minimal" },
+    body: JSON.stringify({
+      document_id: document.id,
+      event_ref: `DOC-SCAN-QUEUED-${uploadId}`,
+      event_type: "MALWARE_SCAN_QUEUED",
+      storage_provider: "SUPABASE",
+      storage_bucket: auth.config.documentsBucket,
+      storage_path: storagePath,
+      file_size_bytes: sizeBytes,
+      checksum_sha256: signature.checksumSha256,
+      status: "OK",
+      message: "Document quarantined and durable malware scan job queued; no user download is permitted before a clean result.",
+      metadata: { upload_id: uploadId, queue_job_ref: `DOC-SCAN-${uploadId}` }
+    })
+  });
+  if (!scanEventResponse.ok) {
+    return Response.json({
+      ok: false,
+      code: "DOCUMENT_SCAN_AUDIT_FAILED",
+      error: "The document remains quarantined with a durable scan job, but the queue audit event needs reconciliation.",
+      documentId: document.id,
+      malwareScanStatus: "PENDING"
+    }, { status: 502, headers: { "cache-control": "no-store" } });
   }
 
   const eventUrl = `/rest/v1/document_storage_events?on_conflict=event_ref`;
@@ -177,6 +252,7 @@ export async function POST(request: Request) {
     ok: true,
     productionReady: false,
     document,
-    review: { status: "PENDING", note: "Upload does not mean the document is verified. Verification and outcome decisions remain restricted to authorised review workflows." }
-  }, { status: 201, headers: { "cache-control": "no-store" } });
+    malwareScan: { status: "PENDING", queued: true, downloadable: false },
+    review: { status: "PENDING", note: "Upload does not mean the document is safe or verified. A configured malware scanner must report CLEAN before downloads are enabled; verification and outcome decisions remain restricted to authorised review workflows." }
+  }, { status: 202, headers: { "cache-control": "no-store" } });
 }
