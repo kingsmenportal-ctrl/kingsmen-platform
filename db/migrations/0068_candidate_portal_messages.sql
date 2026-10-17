@@ -14,7 +14,7 @@ AS $$
 DECLARE
   v_message public.candidate_messages%ROWTYPE;
   v_event_id uuid := gen_random_uuid();
-  v_correlation text := COALESCE(NULLIF(p_correlation_id,''), gen_random_uuid()::text);
+  v_correlation uuid := COALESCE(NULLIF(p_correlation_id,'')::uuid, gen_random_uuid());
 BEGIN
   IF auth.role() IS DISTINCT FROM 'service_role' THEN
     RAISE EXCEPTION 'SERVER_SIDE_MESSAGE_PROCESSOR_REQUIRED' USING ERRCODE = '42501';
@@ -44,7 +44,7 @@ BEGIN
     delivery_status, correlation_id, created_at
   ) VALUES (
     p_candidate_id, 'PORTAL', 'INBOUND', p_urgency, trim(p_subject), trim(p_body),
-    'QUEUED', v_correlation, now()
+    'QUEUED', v_correlation::text, now()
   ) RETURNING * INTO v_message;
 
   INSERT INTO public.audit_events(
@@ -71,7 +71,7 @@ AS $$
 DECLARE
   v_message public.candidate_messages%ROWTYPE;
   v_event_id uuid := gen_random_uuid();
-  v_correlation text := gen_random_uuid()::text;
+  v_correlation uuid := gen_random_uuid();
 BEGIN
   IF auth.role() IS DISTINCT FROM 'service_role' THEN
     RAISE EXCEPTION 'SERVER_SIDE_MESSAGE_PROCESSOR_REQUIRED' USING ERRCODE = '42501';
