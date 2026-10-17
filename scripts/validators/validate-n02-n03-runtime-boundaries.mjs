@@ -28,6 +28,7 @@ for (const marker of [
   'process.env.KINGSMEN_WORKFLOW_SERVICE_TOKEN',
   'timingSafeEqual',
   'API_AUTH_NOT_CONFIGURED',
+  'configuredToken.length < 32',
   'UNAUTHENTICATED'
 ]) {
   if (!server.includes(marker)) failures.push(`Missing API authentication control: ${marker}`);
