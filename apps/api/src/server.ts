@@ -246,7 +246,11 @@ function readBody(request: IncomingMessage): Promise<string> {
 async function readJson(request: IncomingMessage): Promise<unknown> {
   const body = await readBody(request);
   if (!body.trim()) return {};
-  return JSON.parse(body);
+  try {
+    return JSON.parse(body);
+  } catch {
+    throw new Error("INVALID_JSON");
+  }
 }
 
 function getPathParam(pattern: RegExp, pathname: string): string | null {
