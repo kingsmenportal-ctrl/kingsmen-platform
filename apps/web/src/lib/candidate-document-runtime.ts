@@ -164,9 +164,27 @@ export async function verifyPrivateDocumentsBucket(cfg: SupabaseConfig): Promise
     return false;
   }
   if (!response.ok) return false;
-  const bucket = await response.json().catch(() => null) as { id?: string; name?: string; public?: boolean } | null;
-  return !!bucket && bucket.public === false &&
-    (bucket.id === cfg.documentsBucket || bucket.name === cfg.documentsBucket);
+  const bucket = await response.json().catch(() => null) as {
+    id?: string;
+    name?: string;
+    public?: boolean;
+    file_size_limit?: number | string | null;
+    allowed_mime_types?: string[] | null;
+  } | null;
+  const requiredMimeTypes = [
+    "application/pdf",
+    "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
+    "text/plain"
+  ];
+  const configuredLimit = Number(bucket?.file_size_limit);
+  return !!bucket &&
+    bucket.public === false &&
+    (bucket.id === cfg.documentsBucket || bucket.name === cfg.documentsBucket) &&
+    Number.isFinite(configuredLimit) &&
+    configuredLimit > 0 &&
+    configuredLimit <= 10 * 1024 * 1024 &&
+    Array.isArray(bucket.allowed_mime_types) &&
+    requiredMimeTypes.every((mime) => bucket.allowed_mime_types?.includes(mime));
 }
 
 export async function verifyStoredDocumentSignature(
