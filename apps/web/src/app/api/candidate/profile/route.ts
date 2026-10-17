@@ -17,16 +17,20 @@ async function audit(
   resourceType: string,
   resourceRef?: string
 ): Promise<boolean> {
-  const response = await supabaseAdminFetch(config, "/rest/v1/candidate_profile_access_audit", {
-    method: "POST",
-    headers: { "content-type": "application/json", Prefer: "return=minimal" },
-    body: JSON.stringify({
-      candidate_id: candidateId, actor_auth_user_id: actorId, action,
-      resource_type: resourceType, resource_ref: resourceRef || null,
-      outcome: "RECORDED", correlation_id: randomUUID()
-    })
-  });
-  return response.ok;
+  try {
+    const response = await supabaseAdminFetch(config, "/rest/v1/candidate_profile_access_audit", {
+      method: "POST",
+      headers: { "content-type": "application/json", Prefer: "return=minimal" },
+      body: JSON.stringify({
+        candidate_id: candidateId, actor_auth_user_id: actorId, action,
+        resource_type: resourceType, resource_ref: resourceRef || null,
+        outcome: "RECORDED", correlation_id: randomUUID()
+      })
+    });
+    return response.ok;
+  } catch {
+    return false;
+  }
 }
 
 function jsonError(status: number, code: string, error: string) {
