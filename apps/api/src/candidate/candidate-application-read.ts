@@ -78,6 +78,11 @@ export async function listApplicationsForVerifiedAuthUser(
   // verified candidate with no applications. Do not conflate authorization
   // failure with a genuinely empty list.
   if (result.rows.length === 0) return null;
+  // The query deliberately fetches one row beyond the response cap. Never
+  // silently return a partial tracker when a candidate exceeds that cap.
+  if (result.rows.length > 500) {
+    throw new Error("CANDIDATE_APPLICATION_RESULT_LIMIT_EXCEEDED");
+  }
   return result.rows
     .filter((row) => row.application_id !== null)
     .map((row) => ({
