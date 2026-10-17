@@ -92,7 +92,9 @@
     "candidate:validate:application-tracker-ui": "node scripts/validators/validate-candidate-application-tracker-ui.mjs",
     "candidate:validate:document-metadata-bridge": "node scripts/validators/validate-candidate-document-metadata-bridge.mjs",
     "candidate:validate:document-request-bridge": "node scripts/validators/validate-candidate-document-request-bridge.mjs",
-    "candidate:validate:support-ticket-bridge": "node scripts/validators/validate-candidate-support-ticket-bridge.mjs"
+    "candidate:validate:support-ticket-bridge": "node scripts/validators/validate-candidate-support-ticket-bridge.mjs",
+    "candidate:validate:application-identity-bridge": "node scripts/validators/validate-candidate-application-identity-bridge.mjs",
+    "candidate:validate:phase-a1-bridges": "npm run candidate:validate:transaction && npm run candidate:validate:identity-link-lifecycle && npm run candidate:validate:identity-link-admin-runtime && npm run candidate:validate:application-identity-bridge && npm run candidate:validate:application-tracker-api && npm run candidate:validate:application-tracker-ui && npm run candidate:validate:document-boundary && npm run candidate:validate:document-metadata-bridge && npm run candidate:validate:document-request-bridge && npm run candidate:validate:support-ticket-bridge"
   },
   "repository": {
     "type": "git",
