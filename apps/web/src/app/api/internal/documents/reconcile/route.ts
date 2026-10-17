@@ -28,6 +28,8 @@ type CleanupEvent = {
   metadata?: Record<string, unknown>;
 };
 
+type SignedUploadEvent = CleanupEvent & { created_at: string };
+
 function secureEqual(left: string, right: string): boolean {
   const a = Buffer.from(left);
   const b = Buffer.from(right);
@@ -207,8 +209,84 @@ export async function POST(request: Request) {
     } else cleanupPending += 1;
   }
 
+  // Expired signed-upload intents with no document record are storage orphans. After 24 hours,
+  // delete the private object (or queue cleanup) and mark the source event to make this idempotent.
+  const orphanUrl = new URL(`${cfg.url}/rest/v1/document_storage_events`);
+  orphanUrl.searchParams.set("select", "id,event_ref,document_id,storage_bucket,storage_path,file_size_bytes,checksum_sha256,metadata,created_at");
+  orphanUrl.searchParams.set("event_type", "eq.SIGNED_UPLOAD_CREATED");
+  orphanUrl.searchParams.set("status", "eq.OK");
+  orphanUrl.searchParams.set("created_at", `lt.${new Date(now.getTime() - 24 * 60 * 60_000).toISOString()}`);
+  orphanUrl.searchParams.set("metadata->>orphanReconciledAt", "is.null");
+  orphanUrl.searchParams.set("order", "created_at.asc");
+  orphanUrl.searchParams.set("limit", "100");
+  const orphanEvents = await getRows<SignedUploadEvent>(cfg, `/rest/v1/document_storage_events?${orphanUrl.searchParams.toString()}`);
+  if (!orphanEvents) return Response.json({ ok: false, productionReady: false, code: "ORPHAN_QUERY_FAILED" }, { status: 502, headers: { "cache-control": "no-store" } });
+
+  let orphanChecked = 0;
+  let orphanDeleted = 0;
+  let orphanCleanupPending = 0;
+  for (const event of orphanEvents) {
+    const docUrl = new URL(`${cfg.url}/rest/v1/document_files`);
+    docUrl.searchParams.set("select", "id");
+    docUrl.searchParams.set("storage_path", `eq.${event.storage_path}`);
+    docUrl.searchParams.set("limit", "1");
+    const existingDocs = await getRows<{ id: string }>(cfg, `/rest/v1/document_files?${docUrl.searchParams.toString()}`);
+    if (!existingDocs) {
+      orphanCleanupPending += 1;
+      continue;
+    }
+    if (existingDocs.length) {
+      const marked = await supabaseAdminFetch(cfg, `/rest/v1/document_storage_events?id=eq.${event.id}`, {
+        method: "PATCH",
+        headers: { "content-type": "application/json", Prefer: "return=minimal" },
+        body: JSON.stringify({ metadata: { ...(event.metadata || {}), orphanReconciledAt: now.toISOString(), orphanCleanupResult: "DOCUMENT_RECORD_EXISTS" } })
+      });
+      if (marked.ok) orphanChecked += 1;
+      else orphanCleanupPending += 1;
+      continue;
+    }
+
+    const encodedPath = event.storage_path.split("/").map(encodeURIComponent).join("/");
+    const deletion = await supabaseAdminFetch(cfg, `/storage/v1/object/${encodeURIComponent(event.storage_bucket)}/${encodedPath}`, { method: "DELETE" });
+    const deleted = deletion.ok || deletion.status === 404;
+    const safeRef = event.event_ref.replace(/[^a-zA-Z0-9_-]/g, "_");
+    const cleanupEvent = await supabaseAdminFetch(cfg, "/rest/v1/document_storage_events?on_conflict=event_ref", {
+      method: "POST",
+      headers: { "content-type": "application/json", Prefer: "resolution=ignore-duplicates,return=minimal" },
+      body: JSON.stringify({
+        document_id: null,
+        event_ref: deleted ? `DOC-ORPHAN-CLEANUP-DONE-${safeRef}` : `DOC-ORPHAN-CLEANUP-${safeRef}`,
+        event_type: deleted ? "QUARANTINE_CLEANUP_COMPLETED" : "QUARANTINE_CLEANUP_PENDING",
+        storage_provider: "SUPABASE",
+        storage_bucket: event.storage_bucket,
+        storage_path: event.storage_path,
+        file_size_bytes: Number(event.file_size_bytes),
+        checksum_sha256: event.checksum_sha256,
+        status: deleted ? "OK" : "WARNING",
+        message: deleted ? "Expired upload object with no document record was deleted or already absent." : "Expired upload object could not be deleted and requires cleanup retry.",
+        metadata: { sourceEventRef: event.event_ref, cleanupReason: "EXPIRED_SIGNED_UPLOAD_WITHOUT_DOCUMENT" }
+      })
+    });
+    if (!cleanupEvent.ok) {
+      orphanCleanupPending += 1;
+      continue;
+    }
+    const marked = await supabaseAdminFetch(cfg, `/rest/v1/document_storage_events?id=eq.${event.id}`, {
+      method: "PATCH",
+      headers: { "content-type": "application/json", Prefer: "return=minimal" },
+      body: JSON.stringify({ metadata: { ...(event.metadata || {}), orphanReconciledAt: now.toISOString(), orphanCleanupResult: deleted ? "DELETED" : "PENDING_CLEANUP" } })
+    });
+    if (!marked.ok) {
+      orphanCleanupPending += 1;
+      continue;
+    }
+    orphanChecked += 1;
+    if (deleted) orphanDeleted += 1;
+    else orphanCleanupPending += 1;
+  }
+
   return Response.json({
-    ok: reconciliationErrors === 0 && cleanupPending === 0,
+    ok: reconciliationErrors === 0 && cleanupPending === 0 && orphanCleanupPending === 0,
     productionReady: false,
     recoveredStaleLeases: Array.isArray(recoveredLeases) ? recoveredLeases.length : 0,
     inspectedQuarantinedDocuments: documents.length,
@@ -218,6 +296,10 @@ export async function POST(request: Request) {
     cleanupEventsInspected: cleanupEvents.length,
     cleanupResolved,
     cleanupPending,
+    orphanUploadEventsInspected: orphanEvents.length,
+    orphanUploadEventsChecked: orphanChecked,
+    orphanObjectsDeleted: orphanDeleted,
+    orphanCleanupPending,
     note: "Reconciliation never marks a document CLEAN. A configured scanner must return CLEAN before the scan worker can release it."
-  }, { status: reconciliationErrors || cleanupPending ? 207 : 200, headers: { "cache-control": "no-store" } });
+  }, { status: reconciliationErrors || cleanupPending || orphanCleanupPending ? 207 : 200, headers: { "cache-control": "no-store" } });
 }
