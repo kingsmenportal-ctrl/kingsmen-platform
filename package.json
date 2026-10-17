@@ -85,6 +85,7 @@
     "candidate:validate:transaction": "node scripts/validators/validate-candidate-backend-transaction.mjs",
     "candidate:validate:identity-link-lifecycle": "node scripts/validators/validate-candidate-identity-link-lifecycle.mjs",
     "candidate:validate:identity-link-admin-runtime": "node scripts/validators/validate-candidate-identity-link-admin-runtime.mjs",
+    "candidate:validate:live-readiness": "node scripts/validators/validate-candidate-identity-live-readiness.mjs",
     "candidate:validate:document-vault": "node scripts/validators/validate-candidate-document-vault.mjs",
     "candidate:validate:document-upload-policy": "node scripts/validators/validate-candidate-document-upload-policy.mjs",
     "candidate:validate:document-review": "node scripts/validators/validate-candidate-document-review.mjs",
