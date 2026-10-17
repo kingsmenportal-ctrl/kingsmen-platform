@@ -61,6 +61,7 @@ let serverSource = "";
 try { serverSource = readFileSync(resolve(apiDir, "src/server.ts"), "utf8"); } catch {}
 check("CORS is exact-origin and opt-in", serverSource.includes("requestOrigin === configuredCorsOrigin") && !serverSource.includes('process.env.KINGSMEN_API_CORS_ORIGIN ?? "*"'), "API must only emit CORS headers for the exact configured frontend origin; wildcard fallback is prohibited.");
 check("Untrusted preflight is denied", serverSource.includes("response.statusCode = corsOriginAllowed ? 204 : 403"), "OPTIONS requests from unconfigured origins must be denied.");
+check("API regression suite is present", existsSync(resolve(apiDir, "test/cors.test.cjs")), "API health, routing, and CORS runtime regression tests must be committed.");
 
 const report = {
   validator: "api-container-contract",
