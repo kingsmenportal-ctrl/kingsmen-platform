@@ -106,7 +106,7 @@ BEGIN
     ) VALUES (
       'KMENT-'||replace(gen_random_uuid()::text,'-',''),v_order.candidate_id,v_order.id,
       v_order.package_code,v_order.entitlement_snapshot,'ON_HOLD',
-      'n11-hold:'||p_order_id::text,p_reason,now()
+      'n11-pending-grant:'||p_order_id::text,p_reason,now()
     ) RETURNING * INTO v_ent;
     INSERT INTO public.candidate_entitlement_events(
       event_ref,entitlement_id,candidate_id,order_id,event_type,from_status,to_status,
@@ -186,7 +186,7 @@ BEGIN
     SELECT * INTO v_ent FROM public.candidate_entitlements WHERE id=(SELECT entitlement_id FROM public.candidate_entitlement_events WHERE id=v_existing_event);
     IF v_ent.order_id <> p_order_id OR EXISTS (
       SELECT 1 FROM public.candidate_entitlement_events
-      WHERE id=v_existing_event AND event_type NOT IN ('GRANTED','HOLD_RELEASED')
+      WHERE id=v_existing_event AND (event_type NOT IN ('GRANTED','HOLD_RELEASED') OR financial_event_id IS DISTINCT FROM p_financial_event_id)
     ) THEN RAISE EXCEPTION 'grant idempotency key was reused for a different operation'; END IF;
     RETURN v_ent.id;
   END IF;
@@ -216,7 +216,7 @@ BEGIN
   END IF;
   v_from_status := v_ent.status;
   UPDATE public.candidate_entitlements SET status='ACTIVE',financial_event_id=v_payment.id,
-    granted_at=now(),hold_reason=NULL,updated_at=now() WHERE id=v_ent.id RETURNING * INTO v_ent;
+    grant_idempotency_key=p_idempotency_key,granted_at=now(),hold_reason=NULL,updated_at=now() WHERE id=v_ent.id RETURNING * INTO v_ent;
   INSERT INTO public.candidate_entitlement_events(
     event_ref,entitlement_id,candidate_id,order_id,financial_event_id,event_type,from_status,to_status,
     actor_type,actor_auth_user_id,idempotency_key,reason,metadata
@@ -290,3 +290,32 @@ REVOKE ALL ON FUNCTION public.n11_transition_entitlement(uuid,text,text,uuid,tex
 GRANT EXECUTE ON FUNCTION public.n11_hold_entitlement_for_order(uuid,text,uuid,text,text) TO service_role;
 GRANT EXECUTE ON FUNCTION public.n11_grant_entitlement(uuid,uuid,text,uuid,text,text) TO service_role;
 GRANT EXECUTE ON FUNCTION public.n11_transition_entitlement(uuid,text,text,uuid,text,text) TO service_role;
+
+
+-- A fully reconciled refund revokes any active entitlement in the same transaction.
+-- Partial refunds do not automatically revoke service; policy/review can place a hold.
+CREATE OR REPLACE FUNCTION public.n11_revoke_entitlement_on_full_refund()
+RETURNS trigger
+LANGUAGE plpgsql SECURITY DEFINER SET search_path = public, pg_temp AS $$
+DECLARE
+  v_ent public.candidate_entitlements%ROWTYPE;
+BEGIN
+  IF NEW.status='REFUNDED' AND OLD.status IS DISTINCT FROM NEW.status THEN
+    SELECT * INTO v_ent FROM public.candidate_entitlements
+      WHERE order_id=NEW.id FOR UPDATE;
+    IF FOUND AND v_ent.status <> 'REVOKED' THEN
+      PERFORM public.n11_transition_entitlement(
+        v_ent.id,'REVOKED','SYSTEM',NULL,
+        'The complete PayFast refund was reconciled against the provider ledger.',
+        'n11-full-refund-revoke:'||NEW.id::text
+      );
+    END IF;
+  END IF;
+  RETURN NEW;
+END;
+$$;
+REVOKE ALL ON FUNCTION public.n11_revoke_entitlement_on_full_refund() FROM PUBLIC, anon, authenticated;
+DROP TRIGGER IF EXISTS n11_revoke_entitlement_after_full_refund ON public.candidate_service_orders;
+CREATE TRIGGER n11_revoke_entitlement_after_full_refund
+AFTER UPDATE OF status ON public.candidate_service_orders
+FOR EACH ROW EXECUTE FUNCTION public.n11_revoke_entitlement_on_full_refund();
