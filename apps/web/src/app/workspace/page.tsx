@@ -32,6 +32,7 @@ const journeys = [
     steps: [
       ["Identity-link review queue", "/founder/identity-link-queue"],
       ["Finance exceptions", "/founder/finance"],
+      ["Notifications and dead letters", "/founder/operations"],
       ["Marketplace review queue", "/founder/marketplace-review"],
       ["Founder control plane", "/founder/control-plane"],
       ["Proof centre", "/founder/proof-centre"],
