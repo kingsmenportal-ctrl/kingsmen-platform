@@ -96,7 +96,7 @@ export default async function KingsmenWorkspacePage() {
       <section style={{ marginTop: 26, borderRadius: 16, background: "#202020", padding: 18 }}>
         <h2 style={{ marginTop: 0 }}>Deployment gates still open</h2>
         <ul style={{ color: "#d0d0d0", lineHeight: 1.75 }}>
-          <li>Migrations 0059–0070 (identity linking, marketplace review, PayFast reconciliation, finance exceptions, founder operations, messages, and profile-change approvals) are committed in this code branch but have not been applied to Supabase staging.</li>
+          <li>Migrations 0059–0071 (identity linking, marketplace review, PayFast reconciliation, finance exceptions, founder operations, messages, and profile-change approvals) are committed in this code branch but have not been applied to Supabase staging.</li>
           <li>Candidate-owned profile, document, application, finance, message and outcome APIs require server-only SUPABASE_SERVICE_ROLE_KEY; it is not configured on the inspected Netlify staging site. Never place it in a NEXT_PUBLIC variable. Public browser configuration now maps only the existing anon/publishable key and project URL.</li>
           <li>The web build workflow has been added, but no workflow run is currently visible for this PR head; typecheck, production build, browser journeys, and connected staging behaviour remain unverified.</li>
           <li>Netlify staging is SSO-restricted for non-production access; no new deploy was triggered by this batch.</li>
