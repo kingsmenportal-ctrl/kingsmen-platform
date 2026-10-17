@@ -1,0 +1,18 @@
+import fs from "node:fs";
+import assert from "node:assert/strict";
+const migration=fs.readFileSync("db/migrations/0063_n09_communications_follow_up.sql","utf8");
+const reviewer=fs.readFileSync("apps/web/src/app/api/reviewer/communications/route.ts","utf8");
+const candidate=fs.readFileSync("apps/web/src/app/api/candidate/communications/route.ts","utf8");
+assert.match(migration,/idempotency_key text NOT NULL UNIQUE/);
+assert.match(migration,/CHECK\(channel <> 'WHATSAPP' OR priority='URGENT'\)/);
+assert.match(migration,/state IN \('PREPARED','QUEUED','SENDING','SENT','DELIVERED','ACKNOWLEDGED','FAILED','CANCELLED'\)/);
+assert.match(migration,/provider_delivery_event_id IS NOT NULL/);
+assert.match(migration,/attempt_count BETWEEN 0 AND 3/);
+assert.match(reviewer,/CHANNEL_PREFERENCES_REQUIRED/);
+assert.match(reviewer,/WHATSAPP_URGENT_ONLY/);
+assert.match(reviewer,/SMS_BACKUP_ONLY/);
+assert.match(reviewer,/DELIVERY_RECEIPT_REQUIRED/);
+assert.match(reviewer,/No provider sender is configured/);
+assert.match(candidate,/DELIVERY_NOT_CONFIRMED/);
+assert.match(candidate,/requireCandidateSession/);
+console.log("N09 communications contract checks passed. These are source-contract checks, not live database or provider integration tests.");

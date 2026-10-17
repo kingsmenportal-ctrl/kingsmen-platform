@@ -64,7 +64,9 @@
     "n07:review:validate": "node scripts/validators/validate-n07-provider-review-runtime.mjs",
     "n07:review:test": "node --check scripts/tests/n07-reviewer-isolation.integration.mjs && node scripts/tests/n07-reviewer-isolation.integration.mjs",
     "n08:outcomes:validate": "node scripts/validators/validate-n08-outcomes-progression.mjs",
-    "n08:outcomes:test": "node --check scripts/tests/n08-outcomes-isolation.integration.mjs && node scripts/tests/n08-outcomes-isolation.integration.mjs"
+    "n08:outcomes:test": "node --check scripts/tests/n08-outcomes-isolation.integration.mjs && node scripts/tests/n08-outcomes-isolation.integration.mjs",
+    "n09:communications:validate": "node scripts/validators/validate-n09-communications.mjs",
+    "n09:communications:test": "node --check scripts/tests/n09-communications-contract.mjs && node scripts/tests/n09-communications-contract.mjs"
   },
   "repository": {
     "type": "git",

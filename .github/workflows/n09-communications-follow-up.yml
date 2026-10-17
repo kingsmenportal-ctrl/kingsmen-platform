@@ -1,0 +1,24 @@
+name: N09 Communications & Candidate Follow-up
+on:
+  pull_request:
+    paths:
+      - 'db/migrations/0063_n09_communications_follow_up.sql'
+      - 'apps/web/src/app/api/candidate/communications/**'
+      - 'apps/web/src/app/api/reviewer/communications/**'
+      - 'apps/web/src/app/candidate/messages/**'
+      - 'apps/web/src/app/reviewer/communications/**'
+      - 'scripts/validators/validate-n09-communications.mjs'
+      - 'scripts/tests/n09-communications-contract.mjs'
+      - 'package.json'
+  push:
+    branches: ['n09-communications-follow-up-2026-10-17']
+jobs:
+  n09-contract:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - run: npm run n09:communications:validate
+      - run: npm run n09:communications:test
