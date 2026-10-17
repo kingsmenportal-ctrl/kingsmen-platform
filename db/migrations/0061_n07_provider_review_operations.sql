@@ -56,6 +56,7 @@ CREATE TABLE IF NOT EXISTS public.candidate_application_submission_jobs (
 );
 CREATE INDEX IF NOT EXISTS idx_n07_submission_queue ON public.candidate_application_submission_jobs(job_status,created_at DESC);
 CREATE INDEX IF NOT EXISTS idx_n07_submission_candidate ON public.candidate_application_submission_jobs(candidate_id,created_at DESC);
+CREATE UNIQUE INDEX IF NOT EXISTS idx_n07_one_active_submission_per_application ON public.candidate_application_submission_jobs(application_id) WHERE job_status IN ('PREPARED','AUTHORIZED','MANUAL_REQUIRED','DISPATCHING','PROVIDER_ACKNOWLEDGED');
 ALTER TABLE public.platform_reviewers ENABLE ROW LEVEL SECURITY;
 ALTER TABLE public.candidate_application_evidence ENABLE ROW LEVEL SECURITY;
 ALTER TABLE public.candidate_application_submission_jobs ENABLE ROW LEVEL SECURITY;
