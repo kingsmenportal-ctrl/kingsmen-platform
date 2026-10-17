@@ -65,6 +65,9 @@ has("worker", "authorization.match(/^Bearer\\s+(.+)$/i)", "bearer authorization 
 notHas("worker", "Bearer\\\\s+", "no double-escaped bearer regex");
 has("worker", "N05_MALWARE_SCANNER_URL", "scanner endpoint must be configured");
 has("worker", "N05_MALWARE_SCANNER_TOKEN", "scanner token remains server-side");
+has("worker", "scannerToken.length < 32", "scanner token has a minimum length");
+has("worker", 'redirect: "error"', "scanner redirects cannot receive signed object URLs");
+has("worker", "parsedScannerUrl.username || parsedScannerUrl.password || parsedScannerUrl.hash", "scanner URL cannot embed credentials or fragments");
 has("worker", "MALWARE_SCANNER_NOT_CONFIGURED", "no scanner means no job is claimed");
 has("worker", "expiresIn: 300", "five-minute private scanner URL");
 has("worker", '["CLEAN", "INFECTED", "ERROR"]', "strict scanner result contract");
