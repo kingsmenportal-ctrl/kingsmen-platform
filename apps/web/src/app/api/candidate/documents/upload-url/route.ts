@@ -1,6 +1,6 @@
 import { createDocumentUploadId, requireCandidateSession, supabaseAdminFetch, verifyPrivateDocumentsBucket } from "../../../../../lib/candidate-document-runtime";
 
-const MAX_UPLOAD_BYTES = 10 * 1024 * 1024;
+const MAX_UPLOAD_BYTES = 15 * 1024 * 1024;
 const ALLOWED_TYPES: Record<string, string[]> = {
   CV: ["application/pdf", "application/vnd.openxmlformats-officedocument.wordprocessingml.document", "text/plain"],
   ID_DOCUMENT: ["application/pdf"],
@@ -59,7 +59,7 @@ export async function POST(request: Request) {
   }
 
   if (sizeBytes < 1 || sizeBytes > MAX_UPLOAD_BYTES) {
-    return Response.json({ ok: false, code: "FILE_SIZE_OUT_OF_RANGE", error: "Documents must be between 1 byte and 10 MiB for the configured private storage bucket." }, { status: 413 });
+    return Response.json({ ok: false, code: "FILE_SIZE_OUT_OF_RANGE", error: "Documents must be between 1 byte and 15 MiB for the configured private storage bucket." }, { status: 413 });
   }
 
   if (!(await verifyPrivateDocumentsBucket(auth.config))) {
@@ -79,7 +79,7 @@ export async function POST(request: Request) {
       {
         method: "POST",
         headers: { "content-type": "application/json" },
-        body: JSON.stringify({ upsert: false })
+        body: JSON.stringify({ upsert: false, expiresIn: 900 })
       }
     );
   } catch {
@@ -128,7 +128,7 @@ export async function POST(request: Request) {
     sizeBytes,
     signedUploadUrl,
     uploadToken: signer?.token || null,
-    expiresInSeconds: 7200,
+    expiresInSeconds: 900,
     rawPublicUrlAllowed: false,
     serviceRoleVisibleToBrowser: false,
     nextStep: "Upload the bytes to signedUploadUrl, then call the authenticated document completion route to verify the stored object and write document metadata."
