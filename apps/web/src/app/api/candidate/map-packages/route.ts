@@ -1,4 +1,4 @@
-import { requireCandidateSession, supabaseAdminFetch } from "../../../../../lib/candidate-document-runtime";
+import { requireCandidateSession, supabaseAdminFetch } from "../../../../lib/candidate-document-runtime";
 
 const json = (body: Record<string, unknown>, status = 200) =>
   Response.json(body, { status, headers: { "cache-control": "private, no-store", pragma: "no-cache" } });
