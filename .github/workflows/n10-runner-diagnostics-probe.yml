@@ -3,8 +3,6 @@ on:
   push:
     branches:
       - 'n10-packages-payments-refunds-2026-10-17'
-    paths:
-      - '.github/workflows/n10-runner-diagnostics-probe.yml'
   workflow_dispatch:
 permissions:
   contents: read
