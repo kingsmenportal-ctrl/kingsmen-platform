@@ -23,6 +23,10 @@ const trackerPage = await read("apps/web/src/app/candidate/applications/page.tsx
 const trackerApi = await read("apps/web/src/app/api/candidate/applications/route.ts");
 const identityRuntime = await read("apps/web/src/lib/candidate-document-runtime.ts");
 const mapBuilder = await read("apps/api/src/routes/map-fallback.ts");
+const mapPage = await read("apps/web/src/app/candidate/map-packages/page.tsx");
+const mapApi = await read("apps/web/src/app/api/candidate/map-packages/route.ts");
+const founderMapPage = await read("apps/web/src/app/founder/map-packages/page.tsx");
+const founderMapApi = await read("apps/web/src/app/api/founder/map-packages/route.ts");
 
 for (const route of [
   "/candidate/profile", "/candidate/discover", "/candidate/saved-opportunities",
@@ -45,12 +49,19 @@ check(mapBuilder.includes('import { randomUUID } from "node:crypto"'), "MAP refe
 check(mapBuilder.includes("source.protocol !== \"https:\""), "MAP source links are not restricted to HTTPS.");
 check(mapBuilder.includes("source.username || source.password"), "MAP source links do not reject embedded URL credentials.");
 check(mapBuilder.includes('packageStatus: "DRAFT"'), "New MAP packages must start in DRAFT pending authorised review.");
+check(mapPage.includes("Save draft for authorised review"), "Candidate MAP page is missing draft creation.");
+check(mapApi.includes("create_candidate_manual_application_package") && mapApi.includes("requireCandidateSession"), "Candidate MAP API is not connected to verified session and durable creation RPC.");
+check(mapApi.includes("confirm_candidate_map_package_delivery") && mapApi.includes("update_candidate_map_package_progress"), "Candidate MAP delivery and progress actions are not wired.");
+check(founderMapPage.includes("Approve and release to candidate") && founderMapPage.includes("Verify completion with evidence"), "Founder MAP review UI is missing approval or evidence-backed completion.");
+check(founderMapApi.includes("review_candidate_manual_application_package") && founderMapApi.includes("requirePortalUser"), "Founder MAP review API is missing authorised database review.");
 
 for (const route of [
   "apps/web/src/app/api/candidate/documents/upload-url/route.ts",
   "apps/web/src/app/api/candidate/documents/complete/route.ts",
   "apps/web/src/app/api/candidate/documents/status/route.ts",
   "apps/web/src/app/api/candidate/documents/read-url/route.ts"
+  "apps/web/src/app/api/candidate/map-packages/route.ts",
+  "apps/web/src/app/api/founder/map-packages/route.ts"
 ]) check(await exists(route), `Document vault API route is missing: ${route}`);
 
 if (errors.length) {
