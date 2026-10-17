@@ -8,7 +8,8 @@ export default function AuthForm({ mode }: { mode: "login" | "register" }) {
   const registering = mode === "register";
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-  const [displayName, setDisplayName] = useState("");\n  const [candidateReference, setCandidateReference] = useState("");
+  const [displayName, setDisplayName] = useState("");
+  const [candidateReference, setCandidateReference] = useState("");
   const [busy, setBusy] = useState(false);
   const [notice, setNotice] = useState("");
   const [error, setError] = useState("");
@@ -50,7 +51,8 @@ export default function AuthForm({ mode }: { mode: "login" | "register" }) {
     <h1>{registering ? "Create your account" : "Welcome back"}</h1>
     <p style={{ color: "#b8c0d9", lineHeight: 1.6 }}>{registering ? "Create a secure sign-in. Existing candidate records are linked only after authorised identity review and a verified identity link." : "Sign in with your verified portal credentials to continue your candidate journey."}</p>
     <form onSubmit={submit} style={{ display: "grid", gap: 14, marginTop: 24 }}>
-      {registering && <label style={{ display: "grid", gap: 6 }}>Full name<input required autoComplete="name" value={displayName} onChange={e => setDisplayName(e.target.value)} style={fieldStyle} /></label>}\n      <label style={{ display: "grid", gap: 6 }}>Existing candidate reference (optional)<input maxLength={100} autoComplete="off" value={candidateReference} onChange={e => setCandidateReference(e.target.value)} style={fieldStyle} /><small style={{ color: "#b8c0d9" }}>This is only a review hint. It does not prove ownership or link your candidate record.</small></label>
+      {registering && <label style={{ display: "grid", gap: 6 }}>Full name<input required autoComplete="name" value={displayName} onChange={e => setDisplayName(e.target.value)} style={fieldStyle} /></label>}
+      <label style={{ display: "grid", gap: 6 }}>Existing candidate reference (optional)<input maxLength={100} autoComplete="off" value={candidateReference} onChange={e => setCandidateReference(e.target.value)} style={fieldStyle} /><small style={{ color: "#b8c0d9" }}>This is only a review hint. It does not prove ownership or link your candidate record.</small></label>
       <label style={{ display: "grid", gap: 6 }}>Email address<input required type="email" autoComplete="email" value={email} onChange={e => setEmail(e.target.value)} style={fieldStyle} /></label>
       <label style={{ display: "grid", gap: 6 }}>Password<input required type="password" minLength={8} autoComplete={registering ? "new-password" : "current-password"} value={password} onChange={e => setPassword(e.target.value)} style={fieldStyle} /></label>
       <button disabled={busy} type="submit" style={{ padding: 13, border: 0, borderRadius: 10, background: busy ? "#526078" : "#a5b4fc", color: "#111827", fontWeight: 800, cursor: busy ? "wait" : "pointer" }}>{busy ? "Working…" : registering ? "Create secure account" : "Sign in"}</button>
