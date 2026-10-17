@@ -11,7 +11,8 @@ const files = {
   status: "apps/web/src/app/api/candidate/documents/status/route.ts",
   worker: "apps/web/src/app/api/internal/documents/scan-next/route.ts",
   reconcile: "apps/web/src/app/api/internal/documents/reconcile/route.ts",
-  docs: "docs/api/N05_QUARANTINE_MALWARE_SCAN_RECONCILIATION.md"
+  docs: "docs/api/N05_QUARANTINE_MALWARE_SCAN_RECONCILIATION.md",
+  isolationTest: "scripts/tests/n05-document-isolation.integration.mjs"
 };
 const source = {};
 const checks = [];
@@ -48,6 +49,7 @@ has("complete", "/rest/v1/document_scan_jobs?on_conflict=job_ref", "durable idem
 has("complete", "MALWARE_SCAN_QUEUED", "scan queue audit");
 has("complete", "status: 202", "asynchronous scan response");
 has("complete", "RECONCILIATION_REQUIRED", "queue failure remains recoverable");
+has("complete", "cleanupRejectedUpload", "invalid uploads trigger private object cleanup");
 
 // Download release is double-gated by persisted scan result and release state.
 has("read", 'document.malware_scan_status !== "CLEAN" || document.document_status !== "READY"', "fail-closed download gate");
@@ -76,7 +78,11 @@ has("reconcile", "DOC-RECONCILE-", "missing scan job reconstruction");
 has("reconcile", "QUARANTINE_CLEANUP_COMPLETED", "infected object cleanup confirmation");
 has("reconcile", "malware_scan_attempts", "bounded retry history is respected");
 has("reconcile", "never marks a document CLEAN", "reconciliation never releases documents");
+has("reconcile", "EXPIRED_SIGNED_UPLOAD_WITHOUT_DOCUMENT", "expired signed-upload orphan cleanup");
+has("reconcile", "orphanReconciledAt", "orphan reconciliation is idempotent");
 has("docs", "No scanner vendor or working scanner is assumed", "real provider is an external deployment prerequisite");
+has("isolationTest", "N05_CANDIDATE_A_QUARANTINED_DOCUMENT_ID", "integration fixture for quarantine denial");
+has("isolationTest", "DOCUMENT_QUARANTINED", "quarantine denial integration assertion");
 notHas("worker", "SUPABASE_SERVICE_ROLE_KEY =", "no hardcoded service-role secret");
 notHas("reconcile", "SUPABASE_SERVICE_ROLE_KEY =", "no hardcoded service-role secret");
 
