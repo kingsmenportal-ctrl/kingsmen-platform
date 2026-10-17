@@ -1,5 +1,7 @@
 const { after, before, test } = require("node:test");
 const assert = require("node:assert/strict");
+const { spawnSync } = require("node:child_process");
+const path = require("node:path");
 
 process.env.KINGSMEN_TRUTH_VAULT_MODE = "memory";
 process.env.KINGSMEN_API_CORS_ORIGIN = "https://portal.example.test";
@@ -88,4 +90,20 @@ test("health response identifies the Kingsmen service", async () => {
   const body = await response.json();
   assert.equal(body.routes.includes("POST /api/commands"), true);
   assert.equal(body.routes.includes("POST /api/workflow/result"), true);
+});
+
+test("production persistence mode fails closed without database URL", () => {
+  const child = spawnSync(process.execPath, [path.resolve(__dirname, "../dist/server.js")], {
+    encoding: "utf8",
+    timeout: 5000,
+    env: {
+      ...process.env,
+      KINGSMEN_TRUTH_VAULT_MODE: "postgres",
+      KINGSMEN_DATABASE_URL: "",
+      DATABASE_URL: "",
+      PORT: "0"
+    }
+  });
+  assert.notEqual(child.status, 0);
+  assert.match(child.stderr, /requires KINGSMEN_DATABASE_URL or DATABASE_URL/i);
 });
