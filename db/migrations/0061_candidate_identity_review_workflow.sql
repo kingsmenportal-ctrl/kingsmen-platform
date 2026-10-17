@@ -50,6 +50,7 @@ DECLARE
   v_account public.candidate_accounts%ROWTYPE;
   v_link public.candidate_auth_identity_links%ROWTYPE;
   v_event_id uuid := gen_random_uuid();
+  v_link_count integer := 0;
   v_correlation uuid := gen_random_uuid();
   v_evidence text[] := COALESCE(p_evidence_urls, ARRAY[]::text[]);
   v_notes text := left(COALESCE(p_notes, ''), 2000);
@@ -57,7 +58,7 @@ BEGIN
   IF v_actor IS NULL OR NOT kingsmen_security.is_founder_or_operator() THEN
     RAISE EXCEPTION 'FOUNDER_OR_OPERATOR_REQUIRED' USING ERRCODE = '42501';
   END IF;
-  IF p_request_id IS NULL OR p_decision NOT IN ('APPROVE','REJECT') THEN
+  IF p_request_id IS NULL OR p_decision IS NULL OR p_decision NOT IN ('APPROVE','REJECT') THEN
     RAISE EXCEPTION 'INVALID_IDENTITY_REVIEW_ACTION' USING ERRCODE = '22023';
   END IF;
   IF cardinality(v_evidence) > 10 THEN
@@ -97,10 +98,14 @@ BEGIN
     IF v_account.auth_user_id IS NOT NULL AND v_account.auth_user_id <> v_request.auth_user_id THEN
       RAISE EXCEPTION 'CANDIDATE_ALREADY_BOUND_TO_ANOTHER_AUTH_USER' USING ERRCODE = '23505';
     END IF;
-    SELECT * INTO v_link FROM public.candidate_auth_identity_links
-      WHERE candidate_id = p_candidate_id OR supabase_user_id = v_request.auth_user_id
-      FOR UPDATE;
-    IF FOUND THEN
+    SELECT count(*) INTO v_link_count FROM public.candidate_auth_identity_links
+      WHERE candidate_id = p_candidate_id OR supabase_user_id = v_request.auth_user_id;
+    IF v_link_count > 1 THEN
+      RAISE EXCEPTION 'IDENTITY_LINK_CONFLICT' USING ERRCODE = '23505';
+    ELSIF v_link_count = 1 THEN
+      SELECT * INTO v_link FROM public.candidate_auth_identity_links
+        WHERE candidate_id = p_candidate_id OR supabase_user_id = v_request.auth_user_id
+        FOR UPDATE;
       IF v_link.candidate_id <> p_candidate_id OR v_link.supabase_user_id <> v_request.auth_user_id OR v_link.link_status <> 'VERIFIED' THEN
         RAISE EXCEPTION 'IDENTITY_LINK_CONFLICT' USING ERRCODE = '23505';
       END IF;
