@@ -14,7 +14,7 @@ test("rejects non-HTTPS and non-web schemes", () => {
 });
 
 test("rejects malformed, credential-bearing and local-only URLs", () => {
-  for (const value of ["https://", "not a url", "https://user:secret@example.org", "https://localhost", "https://app.local", "https://api.internal", " https://example.org"]) {
+  for (const value of ["https://", "not a url", "https://user:secret@example.org", "https://localhost", "https://app.local", "https://api.internal", "https://host.test", "https://127.0.0.1", "https://192.168.1.10", "https://169.254.169.254", "https://[::1]", "https://intranet", " https://example.org"]) {
     assert.equal(isPublicHttpsUrl(value), false, value);
   }
 });
