@@ -43,7 +43,6 @@ if (!apiBase || !apiToken || !databaseUrl) blocked("KINGSMEN_API_BASE_URL, KINGS
 let apiUrl;
 try { apiUrl = new URL(apiBase); } catch { blocked("KINGSMEN_API_BASE_URL must be a valid absolute URL."); }
 if (apiUrl.protocol !== "https:" || apiUrl.pathname !== "/" || apiUrl.search || apiUrl.hash) blocked("Use the approved HTTPS staging API origin without a path, query, or fragment.");
-if (!readFileSync) blocked("File runtime unavailable.");
 let prior;
 try { prior = JSON.parse(readFileSync(priorReportPath, "utf8")); } catch { blocked("A prior successful reports/api/n02-n03-staging-runtime-proof-latest.json is required."); }
 if (prior.result !== "N02_N03_STAGING_PROOF_PASSED" || prior.target !== "staging") blocked("The prior staging persistence proof did not pass; refusing to claim restart persistence.");
