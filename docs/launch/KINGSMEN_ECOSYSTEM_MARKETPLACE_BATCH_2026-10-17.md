@@ -91,3 +91,26 @@ The same draft PR also contains source-level candidate identity-link lifecycle/a
 ## Staging verification correction — read-only inventory (2026-10-17)
 
 The live Supabase migration inventory confirms `candidate_auth_identity_link_0040` and marketplace migrations `0041` through `0058` are recorded. A read-only catalog query confirms RLS is enabled on `candidate_auth_identity_links`, with the backend-only `candidate_auth_identity_links_backend_all` policy. The table currently has zero rows (zero pending, verified or revoked mappings). There are two active candidate rows, but no verified organisation or published partner listing. Schema presence is confirmed; real candidate identity-linking and reviewer workflows are still not proven end to end.
+
+
+## Phase B — Candidate identity assurance and launch-gate integration (2026-10-17)
+
+### Added in this implementation batch
+
+- Added `scripts/validators/validate-candidate-identity-live-readiness.mjs` as a fail-closed source gate across the identity-link schema, verified resolver, operator lifecycle, legacy profile/application endpoints and private document URL routes.
+- The gate checks that Auth-user and candidate IDs are uniquely bound, mappings are RLS-protected and backend-only, only `VERIFIED` links to active candidates resolve, duplicate resolver rows fail closed, and email-based identity matching is absent.
+- The gate also checks action-specific trusted operator permissions, transaction-scoped identity mutations, audit event types for create/verify/revoke, and verifies that document signing routes return unavailable rather than fabricate signed URLs while the real identity/storage adapter remains unconfigured.
+- Added the named root command `npm run candidate:validate:live-readiness` and wired it into the candidate bridge source-guard job, so the same explicit gate can be run locally and in CI.
+- Existing API unit coverage already includes verified identity resolution, malformed UUID rejection, duplicate-row fail-closed behavior, operator authorization, pending-only verification, audit writes and transaction rollback. These tests are included by the API's TypeScript build and Node test suite; they have **not** been reported as passing on the current head until CI evidence is returned.
+- Read-only staging inspection confirmed the identity-link table exists; the staging project has two active candidate rows, zero verified or pending identity links, zero verified organisations and zero published partner listings. No candidate identities or opportunities were fabricated to make the counts look healthy.
+- No additional database migration was required for this batch; the identity-link schema and marketplace migrations through `0058` are already applied to staging.
+
+### Remaining Phase B gates
+
+- The API manifest still has no committed `apps/api/package-lock.json`; the current workflow still uses `npm install`. Reproducible API dependency installation remains unresolved.
+- No trusted operator-session adapter is wired to the identity-link lifecycle, so the admin runtime remains deliberately unexposed rather than allowing browser-supplied role claims to bind candidate identities.
+- The legacy profile endpoint remains fail-closed until identity resolution is connected to a verified mapping. Candidate document upload/download remains unavailable until real private-storage signing and ownership checks are wired.
+- A green current-head CI run, successful Next.js/API production build, signed-in candidate journey, reviewer-session journey and successful current-head Netlify deploy are still required. The Netlify staging site continues to require team SSO.
+- The staging opportunity directory currently has no qualifying verified source records. Real source evidence and authorised reviewer decisions are required before listings can appear.
+
+**Status:** source and CI-gate changes committed; staging schema/security state inspected. This is not a production launch certification, and no successful CI, live reviewer session, candidate identity-link operation or deployment is claimed.
