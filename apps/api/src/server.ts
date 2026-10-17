@@ -204,8 +204,8 @@ function authorizeApiRequest(request: IncomingMessage, response: ServerResponse,
     ? process.env.KINGSMEN_WORKFLOW_SERVICE_TOKEN
     : process.env.KINGSMEN_API_SERVICE_TOKEN;
 
-  if (!configuredToken) {
-    sendError(response, 503, "API_AUTH_NOT_CONFIGURED", "This backend route is unavailable until its server-side service credential is configured.");
+  if (!configuredToken || configuredToken.length < 32) {
+    sendError(response, 503, "API_AUTH_NOT_CONFIGURED", "This backend route is unavailable until its server-side service credential is configured with at least 32 characters.");
     return false;
   }
 
