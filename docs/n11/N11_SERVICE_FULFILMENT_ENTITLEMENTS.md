@@ -10,11 +10,12 @@ Implementation draft on the N10 dependency branch; ordered after N10 migrations 
 - Manual evidence, a return URL, an order row, a candidate assertion or a merely signed-but-unconfirmed notification cannot activate paid service.
 - One entitlement per order; grant and transition requests are idempotency-keyed.
 - Holds are non-active. A verified grant may release a hold. Revoked entitlements cannot be reactivated.
+- A fully reconciled refund changes the order to `REFUNDED` and revokes the related entitlement in the same database transaction. Partial refunds do not automatically revoke service.
 - Entitlement events are append-only; browser roles and direct service-role table writes are revoked. State transitions occur through audited SECURITY DEFINER functions.
 - Every mutation records actor type, reason, from/to status, financial event reference where applicable, and idempotency key.
 
 ## API integration
-- Candidate `GET /api/candidate/entitlements` returns only the authenticated candidate's entitlement state.
+- Candidate `GET /api/candidate/entitlements` returns only the authenticated candidate's entitlement state and candidate-scoped event history.
 - Reviewer `POST /api/reviewer/entitlements` supports audited `HOLD` and `REVOKE`; reviewers cannot grant or reactivate entitlements.
 - The PayFast ITN route calls `n11_grant_entitlement` only after N10 has persisted the server-validated provider event. If grant processing fails after payment confirmation, the ITN remains retryable and both stages are idempotent.
 
@@ -27,7 +28,7 @@ Implementation draft on the N10 dependency branch; ordered after N10 migrations 
 - `npm run n11:entitlements:validate`
 - `npm run n11:entitlements:test`
 
-These are source-contract checks, not authenticated integration tests. Before rollout, add the PayFast ITN caller that writes `merchant_reference`, `provider_status`, and `server_validation` only after signature, trusted source, exact order/amount, and server validation all pass. Run the functions in a rollback transaction with test fixtures, then test the complete workflow against a sandbox-confirmed payment and refund.
+These are source-contract checks, not authenticated integration tests. The existing PayFast ITN caller writes `merchant_reference`, `provider_status`, and `server_validation` only after signature, trusted source, exact order/amount/currency, and provider server validation pass. Before rollout, test the complete workflow against a sandbox-confirmed payment and refund, including retry, full-refund revocation, and candidate/reviewer access controls.
 
 ## Rollout gate
-N10 must have a genuine green Actions run, authenticated candidate-isolation and reviewer-authorization tests, a PayFast sandbox transaction, and refund reconciliation evidence. Only then apply migration 0066 to staging and test hold/grant/revoke behavior.
+N10 must have a genuine green Actions run, authenticated candidate-isolation and reviewer-authorization tests, a PayFast sandbox transaction, and refund reconciliation evidence. Only then apply migration 0071 to staging and test hold/grant/revoke behavior.
