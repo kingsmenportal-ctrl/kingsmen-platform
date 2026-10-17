@@ -13,28 +13,54 @@ export function buildDocumentReadinessSnapshot(input: {
   requiredDocumentTypes?: KingsmenDocumentType[];
   documents: DocumentFileRecord[];
 }): DocumentReadinessSnapshot {
-  const required = input.requiredDocumentTypes ?? DEFAULT_CORE_DOCUMENT_TYPES;
+  if (!input.candidateId.trim()) throw new Error("CANDIDATE_ID_REQUIRED");
+  if (input.applicationId !== undefined && !input.applicationId.trim()) {
+    throw new Error("APPLICATION_ID_INVALID");
+  }
+
+  // Fail closed instead of allowing a mistakenly broad repository query to
+  // let another candidate's verified documents satisfy this candidate's gate.
+  if (input.documents.some((document) => document.candidateId !== input.candidateId)) {
+    throw new Error("DOCUMENT_OWNERSHIP_MISMATCH");
+  }
+
+  // An application-specific readiness check may use candidate-wide documents
+  // and documents explicitly attached to that application, never documents
+  // attached to a different application.
+  const scopedDocuments = input.documents.filter((document) =>
+    input.applicationId === undefined ||
+    document.applicationId === undefined ||
+    document.applicationId === input.applicationId
+  );
+  const required = [...new Set(input.requiredDocumentTypes ?? DEFAULT_CORE_DOCUMENT_TYPES)];
   const readyDocumentTypes: KingsmenDocumentType[] = [];
   const reviewRequiredDocumentTypes: KingsmenDocumentType[] = [];
   const missingDocumentTypes: KingsmenDocumentType[] = [];
 
   for (const requiredType of required) {
-    const matching = input.documents.filter((document) => document.documentType === requiredType);
+    const matching = scopedDocuments.filter((document) =>
+      document.documentType === requiredType &&
+      document.documentStatus !== "ARCHIVED" &&
+      document.documentStatus !== "DELETED"
+    );
 
     if (matching.length === 0) {
       missingDocumentTypes.push(requiredType);
       continue;
     }
 
-    const ready = matching.some(
-      (document) => document.documentStatus === "READY" && document.verificationStatus === "VERIFIED"
+    const ready = matching.some((document) =>
+      document.documentStatus === "READY" &&
+      document.verificationStatus === "VERIFIED" &&
+      document.extractionStatus !== "REVIEW_REQUIRED"
     );
 
-    const review = matching.some(
-      (document) =>
-        document.verificationStatus === "REVIEW_REQUIRED" ||
-        document.extractionStatus === "REVIEW_REQUIRED" ||
-        document.documentStatus === "PROCESSING"
+    const review = matching.some((document) =>
+      document.verificationStatus === "REVIEW_REQUIRED" ||
+      document.extractionStatus === "REVIEW_REQUIRED" ||
+      document.documentStatus === "PROCESSING" ||
+      document.verificationStatus === "PENDING" ||
+      document.verificationStatus === "EXPIRED"
     );
 
     if (ready) {
