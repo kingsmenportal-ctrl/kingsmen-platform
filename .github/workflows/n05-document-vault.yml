@@ -1,12 +1,14 @@
 name: N05 Candidate Document Vault
 
 on:
+  workflow_dispatch:
   pull_request:
     paths:
       - "apps/web/src/app/api/candidate/documents/**"
       - "apps/web/src/app/candidate/documents/**"
       - "apps/web/src/lib/candidate-document-runtime.ts"
       - "scripts/validators/validate-n05-document-vault.mjs"
+      - "scripts/tests/n05-document-isolation.integration.mjs"
       - "package.json"
       - "apps/web/package.json"
       - ".github/workflows/n05-document-vault.yml"
@@ -34,6 +36,8 @@ jobs:
       - uses: actions/setup-node@v4
         with:
           node-version: 22
+      - name: Check isolation harness syntax
+        run: node --check scripts/tests/n05-document-isolation.integration.mjs
       - name: Run N05 static validation
         run: npm run n05:validate
       - name: Upload N05 validation report
