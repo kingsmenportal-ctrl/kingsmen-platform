@@ -70,6 +70,8 @@ jobs:
           node --test .auth-test-dist/public-url.test.js
       - name: Validate public marketplace URL boundary integrations
         run: node scripts/validators/validate-public-marketplace-url-boundary.mjs
+      - name: Validate marketplace review audit visibility and immutability
+        run: node scripts/validators/validate-marketplace-review-audit.mjs
       - name: Build web application
         working-directory: apps/web
         run: npm run build
