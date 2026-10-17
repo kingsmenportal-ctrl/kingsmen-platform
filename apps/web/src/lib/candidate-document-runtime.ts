@@ -168,3 +168,49 @@ export async function verifyPrivateDocumentsBucket(cfg: SupabaseConfig): Promise
   return !!bucket && bucket.public === false &&
     (bucket.id === cfg.documentsBucket || bucket.name === cfg.documentsBucket);
 }
+
+export async function verifyStoredDocumentSignature(
+  cfg: SupabaseConfig,
+  storagePath: string,
+  mimeType: string,
+  expectedSizeBytes: number
+): Promise<{ ok: boolean; reason: string }> {
+  if (!Number.isSafeInteger(expectedSizeBytes) || expectedSizeBytes < 1 || expectedSizeBytes > 10 * 1024 * 1024) {
+    return { ok: false, reason: "Stored object size is outside the configured limit." };
+  }
+  const encodedPath = storagePath.split("/").map(encodeURIComponent).join("/");
+  let response: Response;
+  try {
+    response = await supabaseAdminFetch(
+      cfg,
+      `/storage/v1/object/authenticated/${encodeURIComponent(cfg.documentsBucket)}/${encodedPath}`
+    );
+  } catch {
+    return { ok: false, reason: "Stored bytes could not be read for signature validation." };
+  }
+  if (!response.ok) return { ok: false, reason: "Stored bytes could not be read for signature validation." };
+  const bytes = new Uint8Array(await response.arrayBuffer());
+  if (bytes.byteLength !== expectedSizeBytes || bytes.byteLength > 10 * 1024 * 1024) {
+    return { ok: false, reason: "Stored byte count does not match the Storage metadata." };
+  }
+
+  if (mimeType === "application/pdf") {
+    const signature = new TextDecoder().decode(bytes.slice(0, 5));
+    return signature === "%PDF-" ? { ok: true, reason: "PDF signature matched." } : { ok: false, reason: "File content does not have a PDF signature." };
+  }
+  if (mimeType === "application/vnd.openxmlformats-officedocument.wordprocessingml.document") {
+    const zipMagic = bytes.length >= 4 && bytes[0] === 0x50 && bytes[1] === 0x4b &&
+      ((bytes[2] === 0x03 && bytes[3] === 0x04) || (bytes[2] === 0x05 && bytes[3] === 0x06) || (bytes[2] === 0x07 && bytes[3] === 0x08));
+    return zipMagic ? { ok: true, reason: "DOCX ZIP container signature matched; archive content and malware remain unverified." } : { ok: false, reason: "File content does not have a DOCX ZIP container signature." };
+  }
+  if (mimeType === "text/plain") {
+    try {
+      new TextDecoder("utf-8", { fatal: true }).decode(bytes);
+      if (bytes.some((byte) => byte === 0)) return { ok: false, reason: "Text document contains binary null bytes." };
+      return { ok: true, reason: "UTF-8 text encoding validated." };
+    } catch {
+      return { ok: false, reason: "Text document is not valid UTF-8." };
+    }
+  }
+  return { ok: false, reason: "Unsupported document signature policy." };
+}
