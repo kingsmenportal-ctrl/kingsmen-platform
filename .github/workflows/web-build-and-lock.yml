@@ -46,7 +46,7 @@ jobs:
         working-directory: apps/web
         run: |
           test -s package-lock.json
-          npm ci --ignore-scripts --no-audit --no-fund
+          npm ci --no-audit --no-fund
 
       - name: Verify phase migration files are present and ordered
         shell: bash
