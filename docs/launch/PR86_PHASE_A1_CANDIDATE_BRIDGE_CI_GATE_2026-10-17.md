@@ -6,7 +6,8 @@ Branch: `feat/phase-a1-public-destiny-auth-foundation`
 ## Batch outcome
 
 - Added `candidate:validate:application-identity-bridge` so the existing identity-bridge validator has a first-class package command.
-- Added `auth:validate:provider-boundary` and a static validator for HTTPS provider configuration, bounded request parsing, same-origin guards, HttpOnly/SameSite cookies, no-store responses, server-side session verification, recovery non-enumeration, and no service-role key in the web auth boundary.
+- Added `auth:validate:provider-boundary` and a static validator for HTTPS provider configuration, bounded request parsing, same-origin guards, HttpOnly/SameSite cookies, no-store responses, server-side session verification, recovery non-enumeration, bounded access/refresh token sizes, and no service-role key in the web auth boundary.
+- Added a pure token-bounds helper and regression tests for missing, partial, non-string, undersized and oversized access/refresh tokens; login and registration validate provider tokens before setting cookies. The web CI job type-checks and executes these tests.
 - Added `candidate:validate:phase-a1-bridges`, a single deterministic command that chains the auth provider boundary, candidate transaction, identity-link lifecycle/admin runtime, ownership/application reads, application identity/tracker, document ownership/vault/upload/review/metadata/request, and support-ticket source validators.
 - Added a dedicated `candidate-bridge-source-guards` job to `.github/workflows/kingsmen-application-builds.yml` to run the suite on pull requests targeting the configured branches.
 - The existing API build/test job remains responsible for TypeScript compilation and unit tests. The new job complements it; it is not a substitute for a real database integration test.
@@ -27,6 +28,7 @@ The suite covers:
 ## What this does not prove
 
 - This commit does not run the validators by itself. The new workflow job must execute and return a successful result on the current head.
+- Run IDs `39008225972` (Jarvis Live Runtime) and `39008226020` (Kingsmen Application Build Checks) on head `8b1de029d3ed08735e898d78b6acdedde1156ec5` reported failures within about two seconds; all jobs had `runner_id=0`, no steps, and their logs returned `BlobNotFound`. Reruns showed the same no-runner/no-log condition. This is insufficient to diagnose source failures and does not count as a test result.
 - No database migration is applied. `db/migrations/0040_candidate_auth_identity_link.sql` remains pending.
 - No live operator identity provider, candidate Auth session, file-storage provider, email delivery, upload/download, or end-to-end staging path is enabled by this change.
 - Source validators cannot replace PostgreSQL integration tests for RLS, uniqueness, concurrent state transitions, rollback, or staging data integrity.
