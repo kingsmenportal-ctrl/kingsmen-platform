@@ -1,4 +1,4 @@
-import { requireCandidateSession, supabaseAdminFetch } from "../../../../../lib/candidate-document-runtime";
+import { requireCandidateSession, supabaseAdminFetch, verifyStoredDocumentSignature } from "../../../../../lib/candidate-document-runtime";
 
 const ALLOWED_TYPES: Record<string, string[]> = {
   CV: ["application/pdf", "application/vnd.openxmlformats-officedocument.wordprocessingml.document", "text/plain"],
@@ -83,6 +83,17 @@ export async function POST(request: Request) {
   const sizeBytes = Number(object.metadata?.size);
   if (!ALLOWED_TYPES[documentTypeCode]?.includes(mimeType) || !Number.isSafeInteger(sizeBytes) || sizeBytes < 1 || sizeBytes > 10 * 1024 * 1024) {
     return Response.json({ ok: false, code: "STORED_FILE_METADATA_REJECTED", error: "Stored file type or size is outside Kingsmen's document policy." }, { status: 415 });
+  }
+
+  const signature = await verifyStoredDocumentSignature(auth.config, storagePath, mimeType, sizeBytes);
+  if (!signature.ok) {
+    return Response.json({
+      ok: false,
+      code: "STORED_FILE_SIGNATURE_REJECTED",
+      error: signature.reason,
+      metadataPersisted: false,
+      privateObjectCleanup: "PENDING_RECONCILIATION"
+    }, { status: 415 });
   }
 
   const documentRef = `DOC-${uploadId}`;
