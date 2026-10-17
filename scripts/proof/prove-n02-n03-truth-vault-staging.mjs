@@ -258,7 +258,8 @@ try {
     workflowIdempotencyKey,
     applicationId,
     checks,
-    failures
+    failures,
+    secretsRedacted: true
   };
   writeRedactedReport(report);
   console.log(JSON.stringify(report, null, 2));
