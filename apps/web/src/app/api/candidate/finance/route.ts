@@ -17,7 +17,7 @@ export async function GET(request: Request) {
     const candidateRows = await readRows(auth.config, "candidates", new URLSearchParams({ select: "id,public_ref", id: `eq.${auth.session.candidateId}`, limit: "1" }));
     if (candidateRows.length !== 1 || !candidateRows[0].public_ref) return json({ ok: false, code: "CANDIDATE_FINANCE_REFERENCE_MISSING", error: "The candidate finance reference could not be resolved." }, 409);
     const candidateRef = String(candidateRows[0].public_ref);
-    const [items, orders, invoices, payments, refunds, ledger] = await Promise.all([
+    const [items, orders, invoices, payments, refunds, ledger, plans] = await Promise.all([
       readRows(auth.config, "candidate_financial_items", new URLSearchParams({ select: "id,item_type,item_ref,description,amount_cents,currency,status,provider,provider_ref,evidence_ref,created_at,updated_at", candidate_id: `eq.${auth.session.candidateId}`, order: "created_at.desc", limit: "200" })),
       readRows(auth.config, "finance_orders", new URLSearchParams({ select: "id,order_ref,plan_code,order_status,amount_cents,currency,evidence_ref,created_at,updated_at", candidate_ref: `eq.${candidateRef}`, order: "created_at.desc", limit: "200" })),
       readRows(auth.config, "finance_invoices", new URLSearchParams({ select: "id,invoice_ref,order_ref,invoice_status,amount_cents,currency,issued_at,due_at,paid_at,evidence_ref,created_at", candidate_ref: `eq.${candidateRef}`, order: "issued_at.desc", limit: "200" })),
@@ -26,7 +26,7 @@ export async function GET(request: Request) {
       readRows(auth.config, "finance_ledger_entries", new URLSearchParams({ select: "id,ledger_ref,order_ref,invoice_ref,payment_ref,refund_ref,entry_type,debit_cents,credit_cents,currency,description,evidence_ref,created_at", candidate_ref: `eq.${candidateRef}`, order: "created_at.desc", limit: "300" }))
     ]);
     return json({
-      ok: true, candidateReference: candidateRef, items, orders, invoices, payments, refunds, ledger,
+      ok: true, candidateReference: candidateRef, items, orders, invoices, payments, refunds, ledger, plans,
       authority: { candidateCanMarkPaid: false, returnUrlCanMarkPaid: false, verifiedPaymentRequiresProviderCallback: true, ledgerIsReadOnly: true }
     });
   } catch {
