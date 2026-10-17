@@ -23,6 +23,8 @@ assert.match(webhook,/n11_grant_entitlement/);
 assert.match(webhook,/ENTITLEMENT_ACTIVATION_PENDING/);
 assert.match(candidateApi,/candidate_id/);
 assert.match(candidateApi,/activationRule/);
+assert.match(candidateApi,/candidate_entitlement_events/);
+assert.match(candidateApi,/events/);
 assert.match(reviewerApi,/n11_hold_entitlement_for_order/);
 assert.match(reviewerApi,/n11_transition_entitlement/);
 assert.doesNotMatch(reviewerApi,/n11_grant_entitlement/);
