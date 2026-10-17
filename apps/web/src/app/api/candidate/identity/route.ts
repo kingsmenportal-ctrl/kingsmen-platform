@@ -1,8 +1,23 @@
-import { requireCandidateSession, supabaseAdminFetch } from "../../../../../lib/candidate-document-runtime";
+import { randomUUID } from "node:crypto";
+import { requireCandidateSession, supabaseAdminFetch } from "../../../../lib/candidate-document-runtime";
 
 export async function GET(request: Request) {
   const auth = await requireCandidateSession(request);
   if (!auth.ok) return Response.json({ ok: false, productionReady: false, code: auth.code, error: auth.message }, { status: auth.status, headers: { "cache-control": "no-store" } });
+  const auditResponse = await supabaseAdminFetch(auth.config, "/rest/v1/candidate_profile_access_audit", {
+    method: "POST",
+    headers: { "content-type": "application/json", Prefer: "return=minimal" },
+    body: JSON.stringify({
+      candidate_id: auth.session.candidateId,
+      actor_auth_user_id: auth.session.userId,
+      action: "IDENTITY_VIEW",
+      resource_type: "candidate_identity",
+      resource_ref: null,
+      outcome: "RECORDED",
+      correlation_id: randomUUID()
+    })
+  });
+  if (!auditResponse.ok) return Response.json({ ok: false, productionReady: false, code: "IDENTITY_AUDIT_UNAVAILABLE", error: "Privacy access evidence could not be recorded. Identity data was not returned." }, { status: 503, headers: { "cache-control": "no-store" } });
   const url = new URL(`${auth.config.url}/rest/v1/candidate_accounts`);
   url.searchParams.set("select", "candidate_id,email,auth_user_id,auth_status,email_verified,account_recovery_required,device_trust_required,created_at,updated_at");
   url.searchParams.set("candidate_id", `eq.${auth.session.candidateId}`);
