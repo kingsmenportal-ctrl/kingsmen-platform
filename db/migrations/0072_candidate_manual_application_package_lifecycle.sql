@@ -164,6 +164,7 @@ BEGIN
        OR lower(substring(value from '^https://([^/:?#]+)')) LIKE '%.local'
        OR lower(substring(value from '^https://([^/:?#]+)')) LIKE '%.internal')
 
+  THEN RAISE EXCEPTION 'INVALID_MAP_REVIEW_EVIDENCE_URL' USING ERRCODE = '22023'; END IF;
   SELECT * INTO v_package FROM public.candidate_manual_application_packages WHERE id=p_package_id FOR UPDATE;
   IF NOT FOUND THEN RAISE EXCEPTION 'MAP_PACKAGE_NOT_FOUND' USING ERRCODE = 'P0002'; END IF;
   IF p_decision='APPROVE' THEN
