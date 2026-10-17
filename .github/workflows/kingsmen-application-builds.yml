@@ -4,7 +4,7 @@ on:
   pull_request:
     branches: [main, fix/kingsmen-phase0-source-guard-ledger]
   push:
-    branches: [main]
+    branches: [main, feat/phase-a1-public-destiny-auth-foundation]
   workflow_dispatch:
 
 permissions:
