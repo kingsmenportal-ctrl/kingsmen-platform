@@ -2,7 +2,7 @@ import { requireReviewerSession, reviewerFetch, reviewerFail } from "../../../..
 import { getPayFastRuntime, payFastApiHeaders, sha256Hex } from "../../../../../../lib/payfast-runtime";
 
 const fail = (status:number, code:string, error:string) => reviewerFail(status,code,error);
-const minor = (value:unknown) => Number.isSafeInteger(Number(value)) ? Number(value) : null;
+const minor = (value:unknown) => { if(value===null||value===undefined||value==="") return null; const n=Number(value); return Number.isSafeInteger(n)?n:null; };
 
 function apiUrl(runtime:NonNullable<ReturnType<typeof getPayFastRuntime>>, path:string) {
   return runtime.apiBaseUrl + path + (runtime.environment === "sandbox" ? (path.includes("?") ? "&" : "?") + "testing=true" : "");
@@ -65,26 +65,35 @@ export async function POST(request:Request) {
     const providerPaymentId = typeof payment.provider_reference==="string" ? payment.provider_reference : "";
     if (!providerPaymentId||Number(payment.amount_minor)!==Number(order.amount_minor)) return fail(409,"PAYMENT_ORDER_MISMATCH","Verified payment does not match the order.");
 
-    const queryUrl = apiUrl(runtime,"/refunds/query/"+encodeURIComponent(providerPaymentId));
-    const preflightResponse = await fetch(queryUrl,{method:"GET",headers:payFastApiHeaders(runtime),cache:"no-store",signal:AbortSignal.timeout(10000)});
-    if (!preflightResponse.ok) return fail(502,"PAYFAST_REFUND_PREFLIGHT_FAILED","PayFast could not confirm refund eligibility.");
-    const preflight = await preflightResponse.json() as any;
-    const available = minor(preflight?.amount_available_for_refund);
-    if (preflight?.status!=="REFUNDABLE"||available===null||available<amountMinor) {
-      return fail(409,"PAYFAST_REFUND_NOT_AVAILABLE","PayFast reports that the requested amount is not currently refundable.");
-    }
-    const original = minor(preflight?.amount_original);
-    if (original===null || original<amountMinor) return fail(409,"PAYFAST_ORIGINAL_AMOUNT_INVALID","PayFast returned an invalid original transaction amount.");
-    const expectedProviderRefundTotal = original - available + amountMinor;
-    const method = original===amountMinor ? preflight?.refund_full?.method : preflight?.refund_partial?.method;
-    if (method!=="PAYMENT_SOURCE") {
-      return fail(409,"PAYFAST_REFUND_METHOD_UNSUPPORTED","PayFast does not offer a payment-source refund for this request. A separately approved secure bank-payout workflow is required.");
-    }
-
+    let expectedProviderRefundTotal:number;
     if (refund.status==="APPROVED") {
+      const queryUrl = apiUrl(runtime,"/refunds/query/"+encodeURIComponent(providerPaymentId));
+      const preflightResponse = await fetch(queryUrl,{method:"GET",headers:payFastApiHeaders(runtime),cache:"no-store",signal:AbortSignal.timeout(10000)});
+      if (!preflightResponse.ok) return fail(502,"PAYFAST_REFUND_PREFLIGHT_FAILED","PayFast could not confirm refund eligibility.");
+      const preflight = await preflightResponse.json() as any;
+      const available = minor(preflight?.amount_available_for_refund);
+      const original = minor(preflight?.amount_original);
+      if (preflight?.status!=="REFUNDABLE"||available===null||available<amountMinor) {
+        return fail(409,"PAYFAST_REFUND_NOT_AVAILABLE","PayFast reports that the requested amount is not currently refundable.");
+      }
+      if (original===null || original!==Number(order.amount_minor) || original<amountMinor) {
+        return fail(409,"PAYFAST_ORIGINAL_AMOUNT_INVALID","PayFast returned an invalid original transaction amount.");
+      }
+      expectedProviderRefundTotal = original - available + amountMinor;
+      const method = original===amountMinor ? preflight?.refund_full?.method : preflight?.refund_partial?.method;
+      if (method!=="PAYMENT_SOURCE") {
+        return fail(409,"PAYFAST_REFUND_METHOD_UNSUPPORTED","PayFast does not offer a payment-source refund for this request. A separately approved secure bank-payout workflow is required.");
+      }
+
       const claim = await reviewerFetch(auth.session,"/rest/v1/rpc/n10_claim_payfast_refund",{
         method:"POST",headers:{"content-type":"application/json"},
-        body:JSON.stringify({p_refund_id:refund.id,p_actor_auth_user_id:auth.session.userId,p_idempotency_key:"payfast-refund-claim:"+refund.id})
+        body:JSON.stringify({
+          p_refund_id:refund.id,
+          p_actor_auth_user_id:auth.session.userId,
+          p_preflight_original_minor:original,
+          p_preflight_available_minor:available,
+          p_idempotency_key:"payfast-refund-claim:"+refund.id
+        })
       });
       if (!claim.ok) return fail(409,"REFUND_CLAIM_FAILED","Refund could not be atomically claimed for one-time execution.");
       const claimRows = await claim.json() as Array<{refund_status?:string;claimed?:boolean}>;
@@ -108,9 +117,24 @@ export async function POST(request:Request) {
       const accepted = createResponse.ok && createJson?.status==="success" &&
         (createJson?.data?.response===true||createJson?.data?.response?.response===true);
       if (!accepted) {
-        // Leave PROCESSING. Do not automatically retry a provider operation with uncertain outcome.
         return Response.json({ok:false,productionReady:false,code:"PAYFAST_REFUND_SUBMISSION_UNCERTAIN",error:"PayFast did not return a conclusive success response. The refund remains PROCESSING and must be reconciled; it will not be resubmitted automatically."},{status:502,headers:{"cache-control":"no-store"}});
       }
+    } else {
+      // A PROCESSING retry only reconciles the provider ledger; it never resubmits a refund.
+      const claimUrl = new URL(auth.session.config.url + "/rest/v1/candidate_payment_events");
+      claimUrl.searchParams.set("select","metadata");
+      claimUrl.searchParams.set("idempotency_key","eq.payfast-refund-claim:"+refund.id);
+      claimUrl.searchParams.set("limit","2");
+      const claimResponse = await reviewerFetch(auth.session,"/rest/v1/candidate_payment_events?"+claimUrl.searchParams.toString());
+      if (!claimResponse.ok) return fail(502,"REFUND_CLAIM_LOOKUP_FAILED","Stored refund preflight evidence could not be loaded.");
+      const claimRows = await claimResponse.json() as Array<{metadata?:Record<string,unknown>}>;
+      if (!Array.isArray(claimRows)||claimRows.length!==1) return fail(409,"REFUND_CLAIM_EVIDENCE_MISSING","A refund execution claim with provider preflight evidence is required.");
+      const original = minor(claimRows[0].metadata?.preflight_original_minor);
+      const available = minor(claimRows[0].metadata?.preflight_available_minor);
+      if (original===null||available===null||original!==Number(order.amount_minor)||available<amountMinor||available>original) {
+        return fail(409,"REFUND_CLAIM_EVIDENCE_INVALID","Stored PayFast preflight evidence is invalid.");
+      }
+      expectedProviderRefundTotal = original - available + amountMinor;
     }
 
     // Query the provider ledger after submission, or on retry for an already PROCESSING refund.
