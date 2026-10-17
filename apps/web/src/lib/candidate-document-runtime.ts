@@ -1,4 +1,4 @@
-import { randomUUID } from "node:crypto";
+import { createHash, randomUUID } from "node:crypto";
 
 export type CandidateSession = {
   userId: string;
@@ -191,7 +191,7 @@ export async function verifyStoredDocumentSignature(
   storagePath: string,
   mimeType: string,
   expectedSizeBytes: number
-): Promise<{ ok: boolean; reason: string }> {
+): Promise<{ ok: boolean; reason: string; checksumSha256?: string }> {
   if (!Number.isSafeInteger(expectedSizeBytes) || expectedSizeBytes < 1 || expectedSizeBytes > 10 * 1024 * 1024) {
     return { ok: false, reason: "Stored object size is outside the configured limit." };
   }
@@ -211,20 +211,22 @@ export async function verifyStoredDocumentSignature(
     return { ok: false, reason: "Stored byte count does not match the Storage metadata." };
   }
 
+  const checksumSha256 = createHash("sha256").update(bytes).digest("hex");
+
   if (mimeType === "application/pdf") {
     const signature = new TextDecoder().decode(bytes.slice(0, 5));
-    return signature === "%PDF-" ? { ok: true, reason: "PDF signature matched." } : { ok: false, reason: "File content does not have a PDF signature." };
+    return signature === "%PDF-" ? { ok: true, reason: "PDF signature matched.", checksumSha256 } : { ok: false, reason: "File content does not have a PDF signature." };
   }
   if (mimeType === "application/vnd.openxmlformats-officedocument.wordprocessingml.document") {
     const zipMagic = bytes.length >= 4 && bytes[0] === 0x50 && bytes[1] === 0x4b &&
       ((bytes[2] === 0x03 && bytes[3] === 0x04) || (bytes[2] === 0x05 && bytes[3] === 0x06) || (bytes[2] === 0x07 && bytes[3] === 0x08));
-    return zipMagic ? { ok: true, reason: "DOCX ZIP container signature matched; archive content and malware remain unverified." } : { ok: false, reason: "File content does not have a DOCX ZIP container signature." };
+    return zipMagic ? { ok: true, reason: "DOCX ZIP container signature matched; archive content and malware remain unverified.", checksumSha256 } : { ok: false, reason: "File content does not have a DOCX ZIP container signature." };
   }
   if (mimeType === "text/plain") {
     try {
       new TextDecoder("utf-8", { fatal: true }).decode(bytes);
       if (bytes.some((byte) => byte === 0)) return { ok: false, reason: "Text document contains binary null bytes." };
-      return { ok: true, reason: "UTF-8 text encoding validated." };
+      return { ok: true, reason: "UTF-8 text encoding validated.", checksumSha256 };
     } catch {
       return { ok: false, reason: "Text document is not valid UTF-8." };
     }
