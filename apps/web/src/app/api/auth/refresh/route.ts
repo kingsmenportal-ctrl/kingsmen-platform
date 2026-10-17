@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import { isSameOriginRequest } from "@/lib/auth/csrf";
 import { authConfigured, authUnavailable, clearAuthCookies, getSessionTokens, setAuthCookies, supabaseAuth } from "@/lib/auth/supabase-rest";
+import { hasValidAuthTokenPair } from "@/lib/auth/token-bounds";
 
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
@@ -21,7 +22,7 @@ export async function POST(request: Request) {
   }
   try {
     const { response, payload } = await supabaseAuth("token?grant_type=refresh_token", { refresh_token: refreshToken });
-    if (!response.ok || typeof payload.access_token !== "string" || payload.access_token.length < 16 || payload.access_token.length > 16384 || typeof payload.refresh_token !== "string" || payload.refresh_token.length < 16 || payload.refresh_token.length > 4096) {
+    if (!response.ok || !hasValidAuthTokenPair(payload)) {
       await clearAuthCookies();
       return NextResponse.json({ ok: false, code: "AUTH_SESSION_EXPIRED", authenticated: false }, { status: 401, headers: { "Cache-Control": "no-store", Pragma: "no-cache" } });
     }
