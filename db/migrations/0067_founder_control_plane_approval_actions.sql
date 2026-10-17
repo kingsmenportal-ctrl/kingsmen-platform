@@ -28,7 +28,7 @@ BEGIN
   IF NOT FOUND THEN RAISE EXCEPTION 'APPROVAL_NOT_FOUND' USING ERRCODE = 'P0002'; END IF;
   IF v_approval.decision <> 'PENDING' THEN RAISE EXCEPTION 'APPROVAL_ALREADY_DECIDED' USING ERRCODE = '23514'; END IF;
   IF p_decision = 'APPROVED' AND v_approval.risk_level IN ('HIGH','CRITICAL')
-    AND cardinality(v_approval.evidence_refs) = 0 THEN
+    AND COALESCE(cardinality(v_approval.evidence_refs), 0) = 0 THEN
     RAISE EXCEPTION 'HIGH_RISK_APPROVAL_EVIDENCE_REQUIRED' USING ERRCODE = '23514';
   END IF;
 
@@ -79,7 +79,7 @@ BEGIN
     WHERE id = p_exception_id FOR UPDATE;
   IF NOT FOUND THEN RAISE EXCEPTION 'POLICY_EXCEPTION_NOT_FOUND' USING ERRCODE = 'P0002'; END IF;
   IF v_exception.exception_status <> 'PENDING_REVIEW' THEN RAISE EXCEPTION 'POLICY_EXCEPTION_ALREADY_REVIEWED' USING ERRCODE = '23514'; END IF;
-  IF p_decision = 'APPROVED' AND (v_exception.expiry_at IS NULL OR v_exception.expiry_at <= now() OR cardinality(v_exception.evidence_refs) = 0) THEN
+  IF p_decision = 'APPROVED' AND (v_exception.expiry_at IS NULL OR v_exception.expiry_at <= now() OR COALESCE(cardinality(v_exception.evidence_refs), 0) = 0) THEN
     RAISE EXCEPTION 'POLICY_EXCEPTION_NEEDS_FUTURE_EXPIRY_AND_EVIDENCE' USING ERRCODE = '23514';
   END IF;
 
