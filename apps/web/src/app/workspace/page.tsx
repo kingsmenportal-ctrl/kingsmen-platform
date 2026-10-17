@@ -31,6 +31,7 @@ const journeys = [
     purpose: "Review marketplace submissions with evidence-backed, database-authorised decisions, and inspect operational/build proof.",
     steps: [
       ["Identity-link review queue", "/founder/identity-link-queue"],
+      ["Profile correction queue", "/founder/profile-review"],
       ["Finance exceptions", "/founder/finance"],
       ["Notifications and dead letters", "/founder/operations"],
       ["Marketplace review queue", "/founder/marketplace-review"],
