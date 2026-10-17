@@ -3,6 +3,7 @@ on:
   pull_request:
     paths:
       - 'db/migrations/0064_n10_packages_payments_refunds.sql'
+      - 'db/migrations/0065_n10_finance_privilege_hardening.sql'
       - 'apps/web/src/app/api/candidate/finance/**'
       - 'apps/web/src/app/api/reviewer/finance/**'
       - 'apps/web/src/app/candidate/finance/**'
@@ -18,6 +19,7 @@ on:
       - 'n10-packages-payments-refunds-2026-10-17'
     paths:
       - 'db/migrations/0064_n10_packages_payments_refunds.sql'
+      - 'db/migrations/0065_n10_finance_privilege_hardening.sql'
       - 'apps/web/src/app/api/candidate/finance/**'
       - 'apps/web/src/app/api/reviewer/finance/**'
       - 'apps/web/src/app/candidate/finance/**'
