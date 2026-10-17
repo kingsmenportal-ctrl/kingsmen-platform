@@ -1,4 +1,4 @@
-import { createHash, createHmac, timingSafeEqual } from "node:crypto";
+import { createHash, timingSafeEqual } from "node:crypto";
 import { isIP } from "node:net";
 
 export type PayFastEnvironment = "sandbox" | "live";
