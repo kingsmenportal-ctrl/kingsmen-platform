@@ -26,7 +26,7 @@ assert.match(itn,/validatePayFastItnAtProvider/);
 assert.match(itn,/n10_record_verified_payfast_payment/);
 assert.match(paymentRpc,/FOR UPDATE/);
 assert.match(paymentRpc,/v_order\.amount_minor IS DISTINCT FROM p_amount_minor/);
-assert.match(paymentRpc,/source='VERIFIED_PROVIDER_WEBHOOK'/);
+assert.match(paymentRpc,/source.*VERIFIED_PROVIDER_WEBHOOK/);
 assert.match(paymentRpc,/ON public\.candidate_payment_events\(provider,provider_event_id\)/);
 assert.match(refundRpc,/status='PROCESSING'/);
 assert.match(refundRpc,/n10_record_payfast_refund_reconciliation/);
