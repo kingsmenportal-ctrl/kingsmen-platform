@@ -1,10 +1,19 @@
 import { requireCandidateSession, supabaseAdminFetch } from "../../../../../lib/candidate-document-runtime";
 
-const ALLOWED_TYPES = new Set([
-  "CV", "ID_DOCUMENT", "MATRIC_CERTIFICATE", "ACADEMIC_RECORD", "PROOF_OF_ADDRESS",
-  "BANK_LETTER", "PARENT_GUARDIAN_ID", "PAYSLIP", "AFFIDAVIT", "APPLICATION_PROOF",
-  "NSFAS_DOCUMENT", "OTHER"
-]);
+const ALLOWED_TYPES: Record<string, string[]> = {
+  CV: ["application/pdf", "application/vnd.openxmlformats-officedocument.wordprocessingml.document"],
+  ID_DOCUMENT: ["application/pdf", "image/jpeg", "image/png"],
+  MATRIC_CERTIFICATE: ["application/pdf", "image/jpeg", "image/png"],
+  ACADEMIC_RECORD: ["application/pdf", "image/jpeg", "image/png"],
+  PROOF_OF_ADDRESS: ["application/pdf", "image/jpeg", "image/png"],
+  BANK_LETTER: ["application/pdf", "image/jpeg", "image/png"],
+  PARENT_GUARDIAN_ID: ["application/pdf", "image/jpeg", "image/png"],
+  PAYSLIP: ["application/pdf", "image/jpeg", "image/png"],
+  AFFIDAVIT: ["application/pdf", "image/jpeg", "image/png"],
+  APPLICATION_PROOF: ["application/pdf", "image/jpeg", "image/png"],
+  NSFAS_DOCUMENT: ["application/pdf", "image/jpeg", "image/png"],
+  OTHER: ["application/pdf", "image/jpeg", "image/png", "application/vnd.openxmlformats-officedocument.wordprocessingml.document"]
+};
 const ALLOWED_MIME_TYPES = new Set([
   "application/pdf",
   "image/jpeg",
@@ -35,7 +44,7 @@ export async function POST(request: Request) {
   const storagePath = typeof body.storagePath === "string" ? body.storagePath : "";
   const expectedPrefix = `${auth.session.candidateId}/${uploadId}/`;
 
-  if (!/^[0-9a-f-]{36}$/i.test(uploadId) || !ALLOWED_TYPES.has(documentTypeCode) || !storagePath.startsWith(expectedPrefix)) {
+  if (!/^[0-9a-f-]{36}$/i.test(uploadId) || !Object.hasOwn(ALLOWED_TYPES, documentTypeCode) || !storagePath.startsWith(expectedPrefix)) {
     return Response.json({ ok: false, code: "INVALID_COMPLETION_REQUEST", error: "A valid uploadId, document type, and candidate-owned storage path are required." }, { status: 400 });
   }
   if (body.candidateId && body.candidateId !== auth.session.candidateId) {
@@ -78,7 +87,7 @@ export async function POST(request: Request) {
 
   const mimeType = String(object.metadata?.mimetype || object.metadata?.contentType || "").toLowerCase();
   const sizeBytes = Number(object.metadata?.size);
-  if (!ALLOWED_MIME_TYPES.has(mimeType) || !Number.isSafeInteger(sizeBytes) || sizeBytes < 1 || sizeBytes > 15 * 1024 * 1024) {
+  if (!ALLOWED_TYPES[documentTypeCode]?.includes(mimeType) || !Number.isSafeInteger(sizeBytes) || sizeBytes < 1 || sizeBytes > 15 * 1024 * 1024) {
     return Response.json({ ok: false, code: "STORED_FILE_METADATA_REJECTED", error: "Stored file type or size is outside Kingsmen's document policy." }, { status: 415 });
   }
 
