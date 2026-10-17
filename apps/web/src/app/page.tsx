@@ -49,6 +49,24 @@ export default function HomePage() {
       <div><h2 style={{ marginTop:0, fontSize:22 }}>Free guidance</h2><p style={{ color:"#bfc5d0", lineHeight:1.7 }}>A browser-based readiness preview with practical actions. No account, payment or personal contact details required.</p></div>
       <div><h2 style={{ marginTop:0, fontSize:22 }}>Managed support</h2><p style={{ color:"#bfc5d0", lineHeight:1.7 }}>Separate services may offer deeper planning or execution support. Scope and availability must be confirmed before any service is purchased.</p><a href="/pricing" style={{ color:"#f0d38b", fontWeight:800 }}>Review packages →</a></div>
     </section>
+    <section aria-labelledby="workspace-heading" style={{ maxWidth:1112, margin:"0 auto 54px", padding:"0 24px", width:"calc(100% - 48px)" }}>
+      <div style={{ borderTop:"1px solid rgba(255,255,255,.08)", paddingTop:28 }}>
+        <p style={{ color:gold, fontWeight:850, letterSpacing:".15em", textTransform:"uppercase", fontSize:12 }}>Continue in the portal</p>
+        <h2 id="workspace-heading" style={{ fontSize:"clamp(26px,4vw,38px)", margin:"8px 0 18px" }}>Move from planning to organised action.</h2>
+        <div style={{ display:"grid", gridTemplateColumns:"repeat(auto-fit,minmax(240px,1fr))", gap:14 }}>
+          <article style={{ padding:22, borderRadius:18, background:card, border:"1px solid rgba(216,182,106,.25)" }}>
+            <h3 style={{ marginTop:0, color:gold }}>Candidate Portal</h3>
+            <p style={{ color:"#c2c7d2", lineHeight:1.7 }}>Continue onboarding, review your account connection and open candidate profile, document and application areas. Private records remain gated by server-side verification.</p>
+            <a href="/candidate/dashboard" style={{ color:"#f0d38b", fontWeight:850 }}>Open candidate dashboard →</a>
+          </article>
+          <article style={{ padding:22, borderRadius:18, background:card, border:"1px solid rgba(216,182,106,.25)" }}>
+            <h3 style={{ marginTop:0, color:gold }}>Personal Job Desk</h3>
+            <p style={{ color:"#c2c7d2", lineHeight:1.7 }}>Open the job-search workspace for opportunity scouting, application preparation, document readiness and submission-proof tracking.</p>
+            <a href="/personal-job-desk" style={{ color:"#f0d38b", fontWeight:850 }}>Open Personal Job Desk →</a>
+          </article>
+        </div>
+      </div>
+    </section>
     <footer style={{ padding:"22px 24px 32px", textAlign:"center", color:"#8e95a4", fontSize:12, lineHeight:1.8 }}>
       Kingsmen Portal · Make informed decisions and verify official requirements directly.<br/>
       Kingsmen guidance is not an official decision-maker and does not guarantee outcomes.
