@@ -40,7 +40,7 @@ The script refuses to run without the target and acknowledgement variables, chec
 
 - This script does not restart the deployed process, so it does not by itself prove survival across a process restart.
 - Run live requests under `anon`, `authenticated`, and authorised server-side roles. Catalog inspection confirms the 14 named policies are scoped to `service_role`; actual role-context denial/success tests are still outstanding.
-- Exercise workflow-result persistence, command/workflow concurrent duplicate races, partial-write rollback, candidate isolation, and audit integrity.
+- Run the expanded staging proof for workflow-result persistence, command/workflow concurrent duplicate races and audit integrity; separately run a controlled late-failure rollback test and process restart/re-read.
 - API review found command, workflow-result, Jarvis runtime-control, and read-model routes had no request authentication. This branch now requires a server-side bearer token for business routes (`KINGSMEN_API_SERVICE_TOKEN`) and a separate token for workflow results (`KINGSMEN_WORKFLOW_SERVICE_TOKEN`); keep both server-only and do not put them in browser code. Candidate-specific user auth/ownership is not implemented by these service tokens, so these endpoints remain backend-service-only.
 - Keep N05 upload/read/status routes and private bucket/security gates unchanged; this batch does not bypass them.
 - Production readiness remains false until runtime evidence and founder review are recorded.
