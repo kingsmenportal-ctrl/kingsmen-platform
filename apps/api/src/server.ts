@@ -928,18 +928,29 @@ if (pathname === "/api/candidate/applications") {
       sendError(response, 404, "ROUTE_NOT_FOUND", `${method} ${pathname} is not a Kingsmen API route.`);
     } catch (error) {
       const message = error instanceof Error ? error.message : "Unknown server error.";
-      const statusCode = message === "REQUEST_BODY_TOO_LARGE" ? 413 : message.includes("Invalid") ? 422 : 500;
-      if (statusCode === 500) {
-        console.error(JSON.stringify({
-          service: SERVICE_NAME,
-          event: "request_failed",
-          errorName: error instanceof Error ? error.name : "UnknownError",
-          generatedAtIso: nowIso()
-        }));
-        sendError(response, 500, "KINGSMEN_API_ERROR", "The request could not be completed.");
-      } else {
-        sendError(response, statusCode, "KINGSMEN_API_ERROR", message);
+      if (message === "REQUEST_BODY_TOO_LARGE") {
+        sendError(response, 413, "REQUEST_BODY_TOO_LARGE", "The request body exceeds the allowed size.");
+        return;
       }
+      if (message === "CANDIDATE_APPLICATION_RESULT_LIMIT_EXCEEDED") {
+        sendError(response, 503, "CANDIDATE_APPLICATION_RESULT_LIMIT_EXCEEDED", "The application list exceeds the current response limit. No partial list was returned.");
+        return;
+      }
+      if (message === "INVALID_JSON") {
+        sendError(response, 400, "INVALID_JSON", "The request body must contain valid JSON.");
+        return;
+      }
+      if (message.includes("Invalid")) {
+        sendError(response, 422, "INVALID_REQUEST", "The request did not satisfy validation requirements.");
+        return;
+      }
+      console.error(JSON.stringify({
+        service: SERVICE_NAME,
+        event: "request_failed",
+        errorName: error instanceof Error ? error.name : "UnknownError",
+        generatedAtIso: nowIso()
+      }));
+      sendError(response, 500, "KINGSMEN_API_ERROR", "The request could not be completed.");
     }
   });
 }
