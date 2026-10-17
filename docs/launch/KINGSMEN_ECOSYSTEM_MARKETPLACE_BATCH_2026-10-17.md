@@ -44,8 +44,8 @@ The public endpoint combines curated `route_programmes`/`route_providers` with p
 
 ## Current operational status
 
-- Database migrations `0041` through `0057` applied to staging successfully, including review-event audit and database-enforced HTTPS URL constraints.
-- Supabase security advisor returned no security lint findings immediately after the schema change.
+- Database migrations `0041` through `0058` applied to staging successfully, including review-event audit, database-enforced HTTPS URL constraints, and rejection of raw IP-literal source hosts.
+- Supabase security advisor returned no security lint findings after the URL-boundary schema changes. Performance advisor still reports pre-existing informational unused-index findings across the broader database.
 - Staging currently contains **zero verified programme records meeting the public directory rules**, and the marketplace tables contain no partner submissions or candidate trackers yet. The directory will therefore show an empty state until authorised staff add and verify real records. No fictional opportunities were inserted.
 - Partner onboarding and listing submission are connected, but reviewer role assignment and end-to-end reviewer testing remain unverified.
 - The staging Netlify project requires team SSO for non-production deploys; the public preview must not be described as openly accessible.
@@ -67,3 +67,12 @@ The public endpoint combines curated `route_programmes`/`route_providers` with p
 The same draft PR also contains source-level candidate identity-link lifecycle/admin workflows, owner-scoped application/document metadata reads, transaction-scoped application tracker reads with audit evidence, document-readiness ownership checks, private/no-store response handling, and candidate application state evidence matching. These safeguards are intended to fail closed when identity mapping, ownership, evidence, or database configuration is missing.
 
 **Runtime proof is still outstanding:** the current PR head has no recorded passing commit status in the connected status lookup. TypeScript builds, Node regression suites, static validators, signed-in candidate journeys, reviewer-role checks, and live transaction/RLS behavior must pass before these source changes are treated as runtime-verified. The API manifest is pinned but has no committed apps/api/package-lock.json; the current workflow still installs API dependencies with npm install, so reproducible API dependency installation remains an open gate.
+
+
+## Batch 13 — Public DNS URL boundary (2026-10-17)
+
+- Tightened the shared URL validator to reject raw IPv4/IPv6 address hosts, single-label intranet hostnames, and reserved local/test/invalid suffixes in addition to non-HTTPS, malformed, credential-bearing, and oversized URLs.
+- Added regression cases for loopback/private/link-local IP literals and intranet names; search sanitization tests preserve Unicode, apostrophes, hyphens and whitespace while removing PostgREST grammar/wildcards.
+- Added migration 0058 with database checks rejecting raw dotted-quad IP literal hosts for organisation websites, partner source/application links, curated provider base URLs and programme source URLs.
+- Applied migration 0058 to staging. A read-only catalogue query confirmed all five constraints exist; the Supabase security advisor still reports zero findings.
+- Updated the static integration validator to require both code-level host rejection and the database migration. CI execution remains blocked by the repository's runner assignment problem; no green build or deployment is claimed.
