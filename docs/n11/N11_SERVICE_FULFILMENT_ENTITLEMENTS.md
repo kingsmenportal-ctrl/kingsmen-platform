@@ -13,6 +13,11 @@ Draft implementation on the N10 dependency branch. Do not apply to staging or ac
 - Entitlement events are append-only; browser roles and direct service-role table writes are revoked. State transitions occur through audited SECURITY DEFINER functions.
 - Every mutation records actor type, reason, from/to status, financial event reference where applicable, and idempotency key.
 
+## API integration
+- Candidate `GET /api/candidate/entitlements` returns only the authenticated candidate's entitlement state.
+- Reviewer `POST /api/reviewer/entitlements` supports audited `HOLD` and `REVOKE`; reviewers cannot grant or reactivate entitlements.
+- The PayFast ITN route calls `n11_grant_entitlement` only after N10 has persisted the server-validated provider event. If grant processing fails after payment confirmation, the ITN remains retryable and both stages are idempotent.
+
 ## Database functions
 - `n11_hold_entitlement_for_order`: create a non-active hold or hold an existing entitlement.
 - `n11_grant_entitlement`: activate only after the N10 payment event and order satisfy the strict verified-PayFast contract.
