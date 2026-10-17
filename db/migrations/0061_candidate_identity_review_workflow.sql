@@ -48,6 +48,7 @@ DECLARE
   v_actor uuid := auth.uid();
   v_request public.candidate_identity_link_requests%ROWTYPE;
   v_account public.candidate_accounts%ROWTYPE;
+  v_candidate public.candidates%ROWTYPE;
   v_link public.candidate_auth_identity_links%ROWTYPE;
   v_event_id uuid := gen_random_uuid();
   v_link_count integer := 0;
@@ -91,12 +92,23 @@ BEGIN
   IF p_decision = 'APPROVE' THEN
     SELECT * INTO v_account FROM public.candidate_accounts
       WHERE candidate_id = p_candidate_id FOR UPDATE;
-    IF NOT FOUND THEN RAISE EXCEPTION 'CANDIDATE_ACCOUNT_NOT_FOUND' USING ERRCODE = 'P0002'; END IF;
-    IF v_account.auth_status NOT IN ('PENDING','ACTIVE') OR v_account.account_recovery_required THEN
-      RAISE EXCEPTION 'CANDIDATE_ACCOUNT_RESTRICTED' USING ERRCODE = '42501';
-    END IF;
-    IF v_account.auth_user_id IS NOT NULL AND v_account.auth_user_id <> v_request.auth_user_id THEN
-      RAISE EXCEPTION 'CANDIDATE_ALREADY_BOUND_TO_ANOTHER_AUTH_USER' USING ERRCODE = '23505';
+    IF NOT FOUND THEN
+      SELECT * INTO v_candidate FROM public.candidates WHERE id = p_candidate_id FOR UPDATE;
+      IF NOT FOUND THEN RAISE EXCEPTION 'CANDIDATE_ACCOUNT_NOT_FOUND' USING ERRCODE = 'P0002'; END IF;
+      INSERT INTO public.candidate_accounts(
+        candidate_id, email, auth_status, email_verified, auth_user_id,
+        account_recovery_required, device_trust_required, created_at, updated_at
+      ) VALUES (
+        v_candidate.id, lower(v_candidate.email), 'ACTIVE', true, v_request.auth_user_id,
+        false, true, now(), now()
+      ) RETURNING * INTO v_account;
+    ELSE
+      IF v_account.auth_status NOT IN ('PENDING','ACTIVE') OR v_account.account_recovery_required THEN
+        RAISE EXCEPTION 'CANDIDATE_ACCOUNT_RESTRICTED' USING ERRCODE = '42501';
+      END IF;
+      IF v_account.auth_user_id IS NOT NULL AND v_account.auth_user_id <> v_request.auth_user_id THEN
+        RAISE EXCEPTION 'CANDIDATE_ALREADY_BOUND_TO_ANOTHER_AUTH_USER' USING ERRCODE = '23505';
+      END IF;
     END IF;
     SELECT count(*) INTO v_link_count FROM public.candidate_auth_identity_links
       WHERE candidate_id = p_candidate_id OR supabase_user_id = v_request.auth_user_id;
