@@ -1,14 +1,12 @@
 "use client";
-
 import { useState } from "react";
-
-export default function SaveOpportunityButton({listingId}:{listingId:string}) {
+export default function SaveOpportunityButton({routeProgrammeId}:{routeProgrammeId:string}) {
  const [state,setState]=useState<"idle"|"saving"|"saved"|"error"|"signedout">("idle");
  const [message,setMessage]=useState("");
  async function save() {
   setState("saving");setMessage("");
   try {
-   const response=await fetch("/api/candidate/saved-listings",{method:"POST",credentials:"same-origin",headers:{"Content-Type":"application/json"},body:JSON.stringify({listingId})});
+   const response=await fetch("/api/candidate/saved-listings",{method:"POST",credentials:"same-origin",headers:{"Content-Type":"application/json"},body:JSON.stringify({routeProgrammeId})});
    const body=await response.json().catch(()=>({}));
    if(response.status===401){setState("signedout");setMessage("Sign in to save this opportunity.");return;}
    if(!response.ok||body.ok!==true){setState("error");setMessage("Could not save this opportunity. It may no longer be available.");return;}
