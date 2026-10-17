@@ -15,6 +15,13 @@
 
 ## Routes
 
+- `/candidate/saved-opportunities`
+- `/candidate/application-tracker`
+- `/api/candidate/saved-listings` (saved verified route records)
+- `/api/candidate/route-applications`
+- `/api/partners/organisations`
+- `/api/partners/listings`
+
 - `/opportunities`
 - `/schools`
 - `/jobs`
@@ -31,9 +38,9 @@ The public endpoint reads existing `route_programmes` and `route_providers` reco
 
 ## Current operational status
 
-- Database migrations `0041`, `0042`, and `0043` applied to staging successfully.
+- Database migrations `0041` through `0049` applied to staging successfully.
 - Supabase security advisor returned no security lint findings immediately after the schema change.
-- Staging currently contains **zero verified programme records meeting the public directory rules**. The directory will therefore show an empty state until authorised staff add and verify real records. No fictional opportunities were inserted.
+- Staging currently contains **zero verified programme records meeting the public directory rules**, and the marketplace tables contain no partner submissions or candidate trackers yet. The directory will therefore show an empty state until authorised staff add and verify real records. No fictional opportunities were inserted.
 - Partner onboarding copy explicitly says the account/listing submission workflow is not yet connected to the page. Do not claim that provider self-service submissions work.
 - The staging Netlify project requires team SSO for non-production deploys; the public preview must not be described as openly accessible.
 - The existing GitHub Actions runs inspected during this batch were failed runs for an earlier commit; job logs were unavailable. A green production build, browser journey test, and new CI result for the current head have not been established by this batch.
@@ -43,6 +50,7 @@ The public endpoint reads existing `route_programmes` and `route_providers` reco
 
 1. Add and source-review actual current provider/programme records, capturing evidence and review dates.
 2. Connect candidate identity to saved listings and application records through the existing secure backend boundary.
-3. Implement authorised organisation onboarding and listing-review UI/API, including reviewer roles and audit evidence.
+3. Configure the authorised reviewer identity/role boundary and implement the review queue, review evidence and publication action; intake exists but cannot self-verify or publish.
 4. Verify the Next.js production build and end-to-end journeys in CI and a protected staging environment.
-5. Continue the launch-readiness checklist: durable application writes, private document upload/download, communications, payment sandbox, backup/restore and final runtime proof.
+5. Complete the existing candidate identity-to-profile mapping and secure candidate profile/document services; the existing legacy provider-connected application endpoint still requires this mapping and internal API configuration.
+6. Continue the launch-readiness checklist: private document upload/download, communications, payment sandbox, backup/restore and final runtime proof.
