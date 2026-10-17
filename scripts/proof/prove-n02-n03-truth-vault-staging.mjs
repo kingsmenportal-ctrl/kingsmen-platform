@@ -253,7 +253,9 @@ try {
     correlationId,
     syntheticCandidateRef: candidateId,
     commandId,
+    idempotencyKey,
     workflowRunId,
+    workflowIdempotencyKey,
     applicationId,
     checks,
     failures
