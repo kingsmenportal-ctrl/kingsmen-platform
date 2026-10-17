@@ -8,7 +8,7 @@ export async function GET(request: Request) {
 
   const candidateFilter = `eq.${auth.session.candidateId}`;
   const documentsUrl = new URL(`${auth.config.url}/rest/v1/document_files`);
-  documentsUrl.searchParams.set("select", "id,document_type,display_name,original_filename,mime_type,file_size_bytes,document_status,verification_status,extraction_status,uploaded_at,updated_at");
+  documentsUrl.searchParams.set("select", "id,document_type,display_name,original_filename,mime_type,file_size_bytes,document_status,malware_scan_status,malware_scanned_at,malware_scan_last_error,verification_status,extraction_status,uploaded_at,updated_at");
   documentsUrl.searchParams.set("candidate_id", candidateFilter);
   documentsUrl.searchParams.set("archived_at", "is.null");
   documentsUrl.searchParams.set("order", "uploaded_at.desc");
@@ -51,6 +51,8 @@ export async function GET(request: Request) {
     counts: {
       documents: documents.length,
       pendingVerification: documents.filter((item: { verification_status?: string }) => item.verification_status === "PENDING" || item.verification_status === "REVIEW_REQUIRED").length,
+      quarantined: documents.filter((item: { malware_scan_status?: string }) => item.malware_scan_status !== "CLEAN").length,
+      scanFailedOrRetrying: documents.filter((item: { malware_scan_status?: string }) => item.malware_scan_status === "ERROR").length,
       openRequests: requests.filter((item: { request_status?: string }) => item.request_status === "OPEN").length
     },
     authority: {
@@ -58,7 +60,8 @@ export async function GET(request: Request) {
       candidateCanReject: false,
       candidateCanMarkOutcome: false,
       rawPublicUrlAllowed: false,
-      serviceRoleVisibleToBrowser: false
+      serviceRoleVisibleToBrowser: false,
+      downloadRequiresMalwareScanClean: true
     }
   }, { headers: { "cache-control": "no-store" } });
 }
