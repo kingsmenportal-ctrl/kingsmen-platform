@@ -53,7 +53,7 @@ jobs:
         working-directory: apps/web
         run: |
           npx tsc --target ES2022 --lib dom,dom.iterable,es2022 --module commonjs --moduleResolution node --esModuleInterop --skipLibCheck --types node --outDir .auth-test-dist src/lib/auth/token-bounds.ts src/lib/auth/token-bounds.test.ts
-          printf '{\"type\":\"commonjs\"}\\n' > .auth-test-dist/package.json
+          printf '{"type":"commonjs"}\n' > .auth-test-dist/package.json
           node --test .auth-test-dist/token-bounds.test.js
       - name: Validate Personal Jobs fail-closed backend boundary
         run: node scripts/validators/validate-personal-jobs-safe-boundary.mjs
