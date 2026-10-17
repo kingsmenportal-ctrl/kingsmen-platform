@@ -28,6 +28,12 @@ assert.match(policy, /EVIDENCE_MISMATCH/);
 assert.match(policy, /requiresAudit:\s*true/);
 assert.match(policy, /requiresAtomicPersistence:\s*true/);
 assert.match(policy, /employerOnlyStates/, "employer-reported outcomes must have actor restrictions");
+assert.match(policy, /expectedEvidence/, "provided evidence must match the requested lifecycle outcome");
+assert.match(policy, /EVIDENCE_MISMATCH/, "mismatched evidence must fail closed");
+const applicationRead = read("apps/api/src/candidate/candidate-application-read.ts");
+assert.ok(applicationRead.includes("result.rows.length > 500"), "application tracker must detect result overflow");
+assert.ok(applicationRead.includes("CANDIDATE_APPLICATION_RESULT_LIMIT_EXCEEDED"), "application tracker must not silently truncate results");
+assert.ok(read("apps/api/src/candidate/candidate-application-read.test.ts").includes("fails closed rather than silently truncating more than 500 applications"));
 
 const policyTests = read("apps/api/src/personal-jobs/application-state.test.ts");
 for (const phrase of [
