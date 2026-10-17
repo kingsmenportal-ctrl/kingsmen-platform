@@ -16,8 +16,13 @@ type PgQueryResult<T = Record<string, unknown>> = {
   rowCount: number | null;
 };
 
+type PgClient = {
+  query<T = Record<string, unknown>>(sql: string, values?: readonly unknown[]): Promise<PgQueryResult<T>>;
+  release(): void;
+};
 type PgPool = {
   query<T = Record<string, unknown>>(sql: string, values?: readonly unknown[]): Promise<PgQueryResult<T>>;
+  connect(): Promise<PgClient>;
   end(): Promise<void>;
 };
 
@@ -380,42 +385,59 @@ export class TruthVaultRepository {
       lastEvidenceRef: row.last_evidence_ref ?? undefined,
       lastUpdatedAt: row.updated_at
     }));
-  }
-
-  /**
-   * Resolves an explicit verified Supabase Auth UUID link, then lists only that
-   * candidate's application rows. Never matches by email or accepts candidate IDs.
-   */
-  async listApplicationsForVerifiedSupabaseUser(supabaseUserId: string): Promise<ApplicationWorkbenchReadModel[] | null> {
+  }  async listApplicationsForVerifiedSupabaseUser(supabaseUserId: string): Promise<ApplicationWorkbenchReadModel[] | null> {
     this.assertEnabled();
     if (!/^[0-9a-f]{8}-[0-9a-f]{4}-[1-8][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i.test(supabaseUserId)) return null;
-    const result = await this.pool!.query<ApplicationRow>(
-      `select a.id::text,
-              coalesce(a.metadata->>'applicationRef', a.id::text) as application_ref,
-              c.public_ref as candidate_ref,
-              a.route_type, a.source_confidence_band, a.current_state,
-              a.portal_health, a.map_fallback_required, a.last_evidence_ref,
-              a.updated_at::text
-         from public.candidate_auth_identity_links link
-         join public.candidates c on c.id = link.candidate_id
-         left join public.applications a on a.candidate_id = c.id
-        where link.supabase_user_id = $1::uuid
-          and link.link_status = 'VERIFIED'
-          and c.is_active = true
-        order by a.updated_at desc nulls last, a.id asc nulls last
-        limit 201`,
-      [supabaseUserId]
-    );
-    // No row means there is no verified link; one null application row means
-    // the verified candidate has no applications.
-    if (result.rows.length === 0) return null;
-    return result.rows.filter((row) => row.id !== null && row.application_ref !== null).slice(0, 200).map((row) => ({
-      applicationId: row.application_ref,
-      candidateId: row.candidate_ref,
-      routeType: row.route_type,
-      sourceConfidenceBand: row.source_confidence_band,
-      currentState: row.current_state,
-      portalHealth: row.portal_health,
+    const client = await this.pool!.connect();
+    try {
+      await client.query("BEGIN");
+      await client.query(
+        "select set_config('app.kingsmen_role', $1, true), set_config('app.service_context', $2, true)",
+        ["service_role", "backend_api"]
+      );
+      const result = await client.query<ApplicationRow>(
+        `select a.id::text,
+                coalesce(a.metadata->>'applicationRef', a.id::text) as application_ref,
+                c.public_ref as candidate_ref,
+                a.route_type, a.source_confidence_band, a.current_state,
+                a.portal_health, a.map_fallback_required, a.last_evidence_ref,
+                a.updated_at::text
+           from public.candidate_auth_identity_links link
+           join public.candidates c on c.id = link.candidate_id
+           left join public.applications a on a.candidate_id = c.id
+          where link.supabase_user_id = $1::uuid
+            and link.link_status = 'VERIFIED'
+            and c.is_active = true
+          order by a.updated_at desc nulls last, a.id asc nulls last
+          limit 201`,
+        [supabaseUserId]
+      );
+      if (result.rows.length === 0) {
+        await client.query("COMMIT");
+        return null;
+      }
+      const applications = result.rows.filter((row) => row.id !== null && row.application_ref !== null).slice(0, 200).map((row) => ({
+        applicationId: row.application_ref,
+        candidateId: row.candidate_ref,
+        routeType: row.route_type,
+        sourceConfidenceBand: row.source_confidence_band,
+        currentState: row.current_state,
+        portalHealth: row.portal_health,
+        mapFallbackRequired: row.map_fallback_required,
+        lastEvidenceRef: row.last_evidence_ref ?? undefined,
+        lastUpdatedAt: row.updated_at
+      }));
+      await client.query("COMMIT");
+      return applications;
+    } catch (error) {
+      try { await client.query("ROLLBACK"); } catch { /* preserve original error */ }
+      throw error;
+    } finally {
+      client.release();
+    }
+  }
+
+.portal_health,
       mapFallbackRequired: row.map_fallback_required,
       lastEvidenceRef: row.last_evidence_ref ?? undefined,
       lastUpdatedAt: row.updated_at
