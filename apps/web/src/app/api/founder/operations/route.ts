@@ -18,7 +18,7 @@ export async function GET(request: Request) {
 export async function POST(request: Request) {
   const auth = await requirePortalUser(request);
   if (!auth.ok) return json({ ok: false, code: auth.code, error: auth.message }, auth.status);
-  const body = await request.json().catch(() => null) as { action?: unknown; notificationId?: unknown; deadLetterId?: unknown; decision?: unknown; notes?: unknown } | null;
+  const body = await request.json().catch(() => null) as { action?: unknown; notificationId?: unknown; deadLetterId?: unknown; approvalId?: unknown; exceptionId?: unknown; decision?: unknown; notes?: unknown } | null;
   const action = typeof body?.action === "string" ? body.action : "";
   const notes = typeof body?.notes === "string" ? body.notes.trim().slice(0, 2000) : "";
   if (notes.length < 8) return json({ ok: false, code: "OPERATOR_REASON_REQUIRED", error: "Enter at least eight characters explaining the operational action." }, 400);
@@ -33,8 +33,14 @@ export async function POST(request: Request) {
   } else if (action === "IGNORE_DEAD_LETTER" && typeof body?.deadLetterId === "string" && body?.decision === "IGNORED") {
     path = "/rest/v1/rpc/founder_resolve_dead_letter";
     args = { p_dead_letter_id: body.deadLetterId, p_decision: "IGNORED", p_notes: notes };
+  } else if (action === "REVIEW_CONTROL_PLANE_APPROVAL" && typeof body?.approvalId === "string" && (body.decision === "APPROVED" || body.decision === "REJECTED")) {
+    path = "/rest/v1/rpc/founder_review_control_plane_approval";
+    args = { p_approval_id: body.approvalId, p_decision: body.decision, p_reason: notes };
+  } else if (action === "REVIEW_POLICY_EXCEPTION" && typeof body?.exceptionId === "string" && (body.decision === "APPROVED" || body.decision === "REJECTED")) {
+    path = "/rest/v1/rpc/founder_review_policy_exception";
+    args = { p_exception_id: body.exceptionId, p_decision: body.decision, p_notes: notes };
   } else {
-    return json({ ok: false, code: "INVALID_OPS_ACTION", error: "Choose a supported notification or dead-letter action." }, 400);
+    return json({ ok: false, code: "INVALID_OPS_ACTION", error: "Choose a supported notification, dead-letter, approval, or policy exception action." }, 400);
   }
   const response = await supabaseUserFetch(auth.config, auth.user.accessToken, path, {
     method: "POST", headers: { "content-type": "application/json" }, body: JSON.stringify(args)
