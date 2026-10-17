@@ -17,11 +17,11 @@ const checks = [
  ["web route sends only server-verified UUID", /JSON\.stringify\(\{ supabaseUserId: user\.id \}\)/.test(web)],
  ["web route fails closed when service configuration is missing", /APPLICATION_SERVICE_NOT_CONFIGURED/.test(web)],
  ["responses are not cached", /Cache-Control": "no-store, private"/.test(web)],
- ["dashboard session uses server-verified Supabase identity", /getVerifiedAuthUser\\(\\)/.test(sessionWeb)],
- ["dashboard linkage is resolved by internal API, not hard-coded false", /api\\/internal\\/candidate\\/session/.test(sessionWeb) && /payload\\.candidateRecordLinked/.test(sessionWeb)],
- ["internal linkage endpoint uses timing-safe service authentication", /handleInternalCandidateSession[\\s\\S]*?timingSafeEqual/.test(server)],
- ["internal linkage endpoint resolves verified mapping without exposing candidate UUID", /resolveCandidateUuidForSupabaseUser\\(supabaseUserId\\)/.test(server) && /candidateRecordLinked: candidateId !== null/.test(server)],
- ["internal linkage endpoint is POST-only", /pathname === "\\/api\\/internal\\/candidate\\/session"[\\s\\S]*?method !== "POST"/.test(server)],
+ ["dashboard session uses server-verified Supabase identity", /getVerifiedAuthUser\(\)/.test(sessionWeb)],
+ ["dashboard linkage is resolved by internal API, not hard-coded false", /api\/internal\/candidate\/session/.test(sessionWeb) && /payload\.candidateRecordLinked/.test(sessionWeb)],
+ ["internal linkage endpoint uses timing-safe service authentication", /handleInternalCandidateSession[\s\S]*?timingSafeEqual/.test(server)],
+ ["internal linkage endpoint resolves verified mapping without exposing candidate UUID", /resolveCandidateUuidForSupabaseUser\(supabaseUserId\)/.test(server) && /candidateRecordLinked: candidateId !== null/.test(server)],
+ ["internal linkage endpoint is POST-only", /pathname === "\/api\/internal\/candidate\/session"[\s\S]*?method !== "POST"/.test(server)],
  ["dashboard renders linked and unlinked states", /session === "authenticated_linked"/.test(dashboard) && /session === "authenticated_unlinked"/.test(dashboard)],
  ["dashboard distinguishes identity linkage from profile readiness", /profile readiness, documents, and application records are checked separately/.test(dashboard)]
 ];
