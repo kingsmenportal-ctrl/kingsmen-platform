@@ -70,7 +70,8 @@
     "n10:finance:validate": "node scripts/validators/validate-n10-finance.mjs",
     "n10:finance:test": "node --check scripts/tests/n10-finance-contract.mjs && node scripts/tests/n10-finance-contract.mjs && node --check scripts/tests/n10-payfast-contract.mjs && node scripts/tests/n10-payfast-contract.mjs",
     "n11:entitlements:validate": "node scripts/validators/validate-n11-entitlements.mjs",
-    "n11:entitlements:test": "node --check scripts/tests/n11-entitlements-contract.mjs && node scripts/tests/n11-entitlements-contract.mjs"
+    "n11:entitlements:test": "node --check scripts/tests/n11-entitlements-contract.mjs && node scripts/tests/n11-entitlements-contract.mjs",
+    "n12:security:validate": "node scripts/validators/validate-n12-search-path-hardening.mjs"
   },
   "repository": {
     "type": "git",
