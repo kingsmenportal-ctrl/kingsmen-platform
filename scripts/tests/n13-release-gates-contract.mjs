@@ -11,7 +11,7 @@ assert.match(migration, /VERIFIED_PROVIDER_WEBHOOK/);
 assert.match(migration, /server_validation/);
 assert.match(migration, /provider_status/);
 assert.match(migration, /entitlement events are immutable/);
-assert.equal([...hardening.matchAll(/ALTER FUNCTION public\.[a-z_]+\(\)\s+SET search_path = pg_catalog, public, pg_temp;/g)].length, 6);
+assert.equal([...hardening.matchAll(/ALTER FUNCTION public\.[a-z0-9_]+\(\)\s+SET search_path = pg_catalog, public, pg_temp;/g)].length, 6);
 assert.equal(pkg.scripts["n13:release:validate"], "node scripts/validators/validate-n13-release-gates.mjs");
 assert.match(docs, /Not approved for staging activation/);
 assert.match(docs, /PayFast sandbox/i);
