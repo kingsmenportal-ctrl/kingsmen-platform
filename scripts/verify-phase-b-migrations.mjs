@@ -22,6 +22,7 @@ const expected = [
   "0069_founder_profile_change_review.sql",
   "0070_candidate_refund_requests.sql",
   "0071_founder_candidate_portal_messaging.sql",
+  "0072_candidate_manual_application_package_lifecycle.sql",
 ];
 const requiredFunctions = new Map([
   ["0060_atomic_marketplace_review.sql", ["review_marketplace_entity"]],
@@ -36,6 +37,7 @@ const requiredFunctions = new Map([
   ["0069_founder_profile_change_review.sql", ["get_founder_profile_change_queue", "review_candidate_profile_change"]],
   ["0070_candidate_refund_requests.sql", ["request_candidate_refund"]],
   ["0071_founder_candidate_portal_messaging.sql", ["get_founder_candidate_messages", "founder_reply_candidate_message"]],
+  ["0072_candidate_manual_application_package_lifecycle.sql", ["create_candidate_manual_application_package", "get_founder_map_package_queue", "review_candidate_manual_application_package", "confirm_candidate_map_package_delivery", "update_candidate_map_package_progress"]],
 ]);
 
 function fail(message) {
