@@ -92,9 +92,32 @@ BEGIN
     );
   END IF;
 
-  INSERT INTO public.finance_orders(order_ref, candidate_ref, plan_code, order_status, amount_cents, currency)
-    VALUES (p_order_ref, p_candidate_ref, p_plan_code, 'PENDING_PAYMENT', p_amount_cents, upper(p_currency))
-    RETURNING * INTO v_order;
+  INSERT INTO public.finance_orders(
+    order_ref, candidate_ref, plan_code, order_status, amount_cents, currency,
+    catalogue_version, service_term_days, managed_application_count, accommodation_route_count,
+    cv_versions, motivation_letters, acknowledgement_target_business_hours,
+    first_response_target_business_hours, upgrade_bonus_routes, refund_policy_version,
+    service_scope, entitlement_snapshot
+  ) VALUES (
+    p_order_ref, p_candidate_ref, p_plan_code, 'PENDING_PAYMENT', p_amount_cents, upper(p_currency),
+    v_plan.catalogue_version, v_plan.service_term_days, v_plan.managed_application_count,
+    v_plan.accommodation_route_count, v_plan.cv_versions, v_plan.motivation_letters,
+    v_plan.acknowledgement_target_business_hours, v_plan.first_response_target_business_hours,
+    v_plan.upgrade_bonus_routes_when_cv_revamp_owned, v_plan.refund_policy_version,
+    v_plan.service_scope,
+    jsonb_build_object(
+      'plan_code', v_plan.plan_code, 'plan_name', v_plan.plan_name,
+      'catalogue_version', v_plan.catalogue_version, 'service_term_days', v_plan.service_term_days,
+      'managed_application_count', v_plan.managed_application_count,
+      'accommodation_route_count', v_plan.accommodation_route_count,
+      'cv_versions', v_plan.cv_versions, 'motivation_letters', v_plan.motivation_letters,
+      'acknowledgement_target_business_hours', v_plan.acknowledgement_target_business_hours,
+      'first_response_target_business_hours', v_plan.first_response_target_business_hours,
+      'upgrade_bonus_routes', v_plan.upgrade_bonus_routes_when_cv_revamp_owned,
+      'refund_policy_version', v_plan.refund_policy_version, 'service_scope', v_plan.service_scope,
+      'response_target_disclaimer', v_plan.response_target_disclaimer
+    )
+  ) RETURNING * INTO v_order;
   INSERT INTO public.finance_invoices(invoice_ref, order_ref, candidate_ref, invoice_status, amount_cents, currency)
     VALUES (p_invoice_ref, p_order_ref, p_candidate_ref, 'OPEN', p_amount_cents, upper(p_currency))
     RETURNING * INTO v_invoice;
