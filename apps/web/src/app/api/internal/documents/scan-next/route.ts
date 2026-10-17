@@ -240,16 +240,18 @@ export async function POST(request: Request) {
   }
 
   if (result.status === "INFECTED") {
-    await supabaseAdminFetch(cfg, `/rest/v1/document_scan_jobs?id=eq.${job.id}&lease_token=eq.${leaseToken}`, {
+    const rejectedJob = await supabaseAdminFetch(cfg, `/rest/v1/document_scan_jobs?id=eq.${job.id}&lease_token=eq.${leaseToken}`, {
       method: "PATCH",
       headers: { "content-type": "application/json", Prefer: "return=minimal" },
       body: JSON.stringify({ status: "INFECTED", scanner_provider: provider, scanner_version: version, scanner_result: "INFECTED", completed_at: scannedAt, lease_token: null, leased_at: null, updated_at: scannedAt })
     });
-    await supabaseAdminFetch(cfg, `/rest/v1/document_files?id=eq.${job.document_id}&document_status=eq.QUARANTINED`, {
+    if (!rejectedJob.ok) return jsonError(502, "INFECTED_JOB_STATE_FAILED", "The infected result could not be persisted to the scan queue; the document remains unavailable.");
+    const rejectedDocument = await supabaseAdminFetch(cfg, `/rest/v1/document_files?id=eq.${job.document_id}&document_status=eq.QUARANTINED`, {
       method: "PATCH",
       headers: { "content-type": "application/json", Prefer: "return=minimal" },
       body: JSON.stringify({ malware_scan_status: "INFECTED", malware_scanned_at: scannedAt, malware_scanner_provider: provider, malware_scanner_version: version, document_status: "REJECTED", updated_at: scannedAt, malware_scan_last_error: "Scanner reported INFECTED." })
     });
+    if (!rejectedDocument.ok) return jsonError(502, "INFECTED_DOCUMENT_STATE_FAILED", "The infected result is recorded but the document remains quarantined until rejection state is reconciled.");
     const eventOk = await audit(cfg, {
       documentId: job.document_id,
       jobRef: `DOC-SCAN-INFECTED-${safeJobRef}`,
@@ -312,7 +314,7 @@ async function retryOrDeadLetter(
       updated_at: now.toISOString()
     })
   });
-  await supabaseAdminFetch(cfg, `/rest/v1/document_files?id=eq.${job.document_id}`, {
+  await supabaseAdminFetch(cfg, `/rest/v1/document_files?id=eq.${job.document_id}&document_status=eq.QUARANTINED`, {
     method: "PATCH",
     headers: { "content-type": "application/json", Prefer: "return=minimal" },
     body: JSON.stringify({
