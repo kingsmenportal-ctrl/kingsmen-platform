@@ -36,6 +36,13 @@ jobs:
           node-version: 22
       - name: Run N05 static validation
         run: npm run n05:validate
+      - name: Upload N05 validation report
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: n05-static-validation-report
+          path: reports/n05/n05-document-vault-validation-latest.json
+          if-no-files-found: warn
 
   web-build:
     name: Next.js TypeScript and production build
@@ -45,10 +52,10 @@ jobs:
       - uses: actions/setup-node@v4
         with:
           node-version: 22
-          cache: npm
-          cache-dependency-path: apps/web/package-lock.json
+      # This repository currently has no committed package-lock.json in apps/web.
+      # npm ci requires a lockfile; use npm install until a reviewed lockfile is added.
       - name: Install web dependencies
-        run: npm ci
+        run: npm install --no-package-lock --no-audit --no-fund
         working-directory: apps/web
       - name: Build web application
         run: npm run build
