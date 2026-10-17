@@ -69,14 +69,6 @@ BEGIN
     RAISE EXCEPTION 'VERIFIED_ACTIVE_CANDIDATE_REQUIRED' USING ERRCODE = '42501';
   END IF;
 
-  SELECT * INTO v_plan FROM public.finance_plan_catalog
-    WHERE plan_code = p_plan_code AND active = true;
-  IF NOT FOUND THEN RAISE EXCEPTION 'ACTIVE_FINANCE_PLAN_NOT_FOUND' USING ERRCODE = 'P0002'; END IF;
-  IF v_plan.amount_cents <> p_amount_cents OR v_plan.currency <> upper(p_currency)
-    OR v_plan.plan_name <> p_item_name OR v_plan.description <> p_item_description THEN
-    RAISE EXCEPTION 'FINANCE_PLAN_PRICE_MISMATCH' USING ERRCODE = '23514';
-  END IF;
-
   SELECT * INTO v_existing FROM public.payfast_payment_intents
     WHERE idempotency_key = p_idempotency_key FOR UPDATE;
   IF FOUND THEN
@@ -91,6 +83,14 @@ BEGIN
       'invoiceRef', v_existing.invoice_ref, 'amountCents', v_existing.amount_cents,
       'currency', v_existing.currency, 'environment', v_existing.payfast_environment
     );
+  END IF;
+
+  SELECT * INTO v_plan FROM public.finance_plan_catalog
+    WHERE plan_code = p_plan_code AND active = true;
+  IF NOT FOUND THEN RAISE EXCEPTION 'ACTIVE_FINANCE_PLAN_NOT_FOUND' USING ERRCODE = 'P0002'; END IF;
+  IF v_plan.amount_cents <> p_amount_cents OR v_plan.currency <> upper(p_currency)
+    OR v_plan.plan_name <> p_item_name OR v_plan.description <> p_item_description THEN
+    RAISE EXCEPTION 'FINANCE_PLAN_PRICE_MISMATCH' USING ERRCODE = '23514';
   END IF;
 
   INSERT INTO public.finance_orders(
