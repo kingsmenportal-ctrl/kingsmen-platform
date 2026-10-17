@@ -2,7 +2,7 @@
 
 ## Added
 
-- `db/migrations/0018_n20_candidate_auth_identity_link.sql`
+- `db/migrations/0040_candidate_auth_identity_link.sql`
   - Adds a one-to-one mapping from Supabase Auth user UUID to candidate UUID.
   - Requires explicit `VERIFIED` status and verification metadata.
   - Uses unique constraints on both IDs, so one Auth identity cannot point to multiple candidates and one candidate cannot silently be linked to multiple Auth identities.
@@ -21,7 +21,7 @@
 
 ## Integration boundary — still required
 
-This batch does not claim that the migration has been applied, that RLS has been proven against a live database, or that the web candidate applications route is enabled. The resolver is a backend building block, not an endpoint and not a substitute for a trusted database connection.
+Migration sequence correction: this identity-link migration is numbered 0040, after the existing 0039 migration; it no longer collides with the unrelated 0018 migration. This batch does not claim that the migration has been applied, that RLS has been proven against a live database, or that the web candidate applications route is enabled. The resolver is a backend building block, not an endpoint and not a substitute for a trusted database connection.
 
 Before connecting the web route:
 1. Run and review the migration through the repository's normal migration process; do not apply it to production from this change.
