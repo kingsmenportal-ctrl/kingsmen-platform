@@ -1,19 +1,19 @@
 import { createDocumentUploadId, requireCandidateSession, supabaseAdminFetch, verifyPrivateDocumentsBucket } from "../../../../../lib/candidate-document-runtime";
 
-const MAX_UPLOAD_BYTES = 15 * 1024 * 1024;
+const MAX_UPLOAD_BYTES = 10 * 1024 * 1024;
 const ALLOWED_TYPES: Record<string, string[]> = {
-  CV: ["application/pdf", "application/vnd.openxmlformats-officedocument.wordprocessingml.document"],
-  ID_DOCUMENT: ["application/pdf", "image/jpeg", "image/png"],
-  MATRIC_CERTIFICATE: ["application/pdf", "image/jpeg", "image/png"],
-  ACADEMIC_RECORD: ["application/pdf", "image/jpeg", "image/png"],
-  PROOF_OF_ADDRESS: ["application/pdf", "image/jpeg", "image/png"],
-  BANK_LETTER: ["application/pdf", "image/jpeg", "image/png"],
-  PARENT_GUARDIAN_ID: ["application/pdf", "image/jpeg", "image/png"],
-  PAYSLIP: ["application/pdf", "image/jpeg", "image/png"],
-  AFFIDAVIT: ["application/pdf", "image/jpeg", "image/png"],
-  APPLICATION_PROOF: ["application/pdf", "image/jpeg", "image/png"],
-  NSFAS_DOCUMENT: ["application/pdf", "image/jpeg", "image/png"],
-  OTHER: ["application/pdf", "image/jpeg", "image/png", "application/vnd.openxmlformats-officedocument.wordprocessingml.document"]
+  CV: ["application/pdf", "application/vnd.openxmlformats-officedocument.wordprocessingml.document", "text/plain"],
+  ID_DOCUMENT: ["application/pdf"],
+  MATRIC_CERTIFICATE: ["application/pdf"],
+  ACADEMIC_RECORD: ["application/pdf"],
+  PROOF_OF_ADDRESS: ["application/pdf"],
+  BANK_LETTER: ["application/pdf"],
+  PARENT_GUARDIAN_ID: ["application/pdf"],
+  PAYSLIP: ["application/pdf"],
+  AFFIDAVIT: ["application/pdf"],
+  APPLICATION_PROOF: ["application/pdf"],
+  NSFAS_DOCUMENT: ["application/pdf"],
+  OTHER: ["application/pdf", "application/vnd.openxmlformats-officedocument.wordprocessingml.document", "text/plain"]
 };
 
 function safeFilename(value: string): string {
@@ -50,7 +50,7 @@ export async function POST(request: Request) {
     return Response.json({ ok: false, code: "DOCUMENT_TYPE_MIME_NOT_ALLOWED", error: "This document type and file format combination is not allowed." }, { status: 415 });
   }
   if (sizeBytes < 1 || sizeBytes > MAX_UPLOAD_BYTES) {
-    return Response.json({ ok: false, code: "FILE_SIZE_OUT_OF_RANGE", error: "Documents must be between 1 byte and 15 MiB." }, { status: 413 });
+    return Response.json({ ok: false, code: "FILE_SIZE_OUT_OF_RANGE", error: "Documents must be between 1 byte and 10 MiB for the configured private storage bucket." }, { status: 413 });
   }
 
   if (!(await verifyPrivateDocumentsBucket(auth.config))) {
