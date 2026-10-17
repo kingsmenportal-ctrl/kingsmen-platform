@@ -11,7 +11,7 @@ function fakeDatabase<T>(rows: T[], observe?: (sql: string, values: readonly unk
   return {
     async query<R>(sql: string, values: readonly unknown[] = []) {
       observe?.(sql, values);
-      return { rows: rows as R[] };
+      return { rows: rows as unknown as R[] };
     }
   };
 }
