@@ -102,7 +102,7 @@ export default function OpportunityDirectory({ initialSector = "ALL", title = "O
           <p style={{ color: "#8e97a8", fontSize: 12, margin: 0 }}>Record last updated {new Date(row.verifiedAt).toLocaleDateString("en-ZA")} · Confidence band {row.sourceConfidence}</p>
           <div style={{ display: "flex", gap: 10, flexWrap: "wrap", marginTop: 5 }}>
             <a href={row.sourceUrl} target="_blank" rel="noopener noreferrer" style={{ ...buttonStyle, textDecoration: "none" }}>Open official source ↗</a>
-            <a href="/auth/register" style={{ color: gold, alignSelf: "center", fontWeight: 800, fontSize: 13 }}>Save in portal →</a>
+            <a href="/auth/register" style={{ color: gold, alignSelf: "center", fontWeight: 800, fontSize: 13 }}>Create account →</a>
           </div>
           <p style={{ color: "#8e97a8", fontSize: 11, margin: 0 }}>Opening the source does not submit an application. Availability and eligibility must be confirmed with the provider.</p>
         </article>)}
