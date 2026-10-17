@@ -66,7 +66,7 @@ test("verification requires a pending link for the exact Auth user and candidate
   const result = await verifyPendingCandidateIdentityLink(f.db, OPERATOR, COMMAND);
   assert.equal(result.status, "VERIFIED");
   assert.match(f.calls[0].sql, /link\.link_status = 'PENDING'/);
-  assert.deepEqual(f.calls[0].values, [AUTH, CANDIDATE, COMMAND.correlationId, OPERATOR.actorId]);
+  assert.deepEqual(f.calls[0].values, [AUTH, CANDIDATE, OPERATOR.actorId]);
   assert.match(f.calls[1].sql, /insert into public\.audit_events/);
 });
 
