@@ -81,7 +81,8 @@
     "staging:capture:evidence": "pwsh -NoProfile -File scripts/staging/Invoke-KingsmenStagingRuntimeEvidencePack.ps1",
     "final:collect:evidence": "pwsh -NoProfile -File scripts/staging/Collect-KingsmenFinalAssemblyEvidence.ps1",
     "candidate:validate:ownership-integrity": "node scripts/validators/validate-candidate-ownership-and-application-integrity.mjs",
-    "candidate:validate:application-read": "node scripts/validators/validate-candidate-application-read-boundary.mjs"
+    "candidate:validate:application-read": "node scripts/validators/validate-candidate-application-read-boundary.mjs",
+    "candidate:validate:transaction": "node scripts/validators/validate-candidate-backend-transaction.mjs"
   },
   "repository": {
     "type": "git",
