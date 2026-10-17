@@ -1,23 +1,20 @@
 import Link from "next/link";
 
 const gates = [
-  ["higher_education", "Higher Education", "Find and compare university routes."],
-  ["tvet", "TVET", "Review technical and vocational training routes."],
-  ["seta_learnership", "SETA / Learnership", "Review learnership and skills pathways."],
-  ["internship", "Internship", "Find structured work-experience opportunities."],
-  ["apprenticeship", "Apprenticeship", "Review practical trade-training routes."],
-  ["employment", "Employment", "Explore employment opportunities."]
+  ["higher_education", "Higher Education", "University and higher-education pathways."],
+  ["tvet", "TVET", "Technical and vocational training pathways."],
+  ["seta_learnership", "SETA / Learnership", "Skills and learnership pathways."],
+  ["internship", "Internship", "Structured work-experience pathways."],
+  ["apprenticeship", "Apprenticeship", "Practical trade-training pathways."],
+  ["employment", "Employment", "Employment pathways."]
 ] as const;
 
 const dailyActions = [
-  ["My profile", "/candidate/profile", "Keep your personal and education details current."],
-  ["Explore routes", "/candidate/routes", "Compare possible next steps across the six gates."],
-  ["Saved opportunities", "/candidate/saved-opportunities", "Return to opportunities you saved."],
-  ["Applications and outcomes", "/candidate/outcomes", "Track application progress and record verified outcomes."],
-  ["Documents", "/candidate/documents", "Review required documents and their review status."],
+  ["Saved opportunities", "/candidate/saved-opportunities", "Return to opportunities saved to your account."],
+  ["Applications and outcomes", "/candidate/outcomes", "Review application tracking and recorded outcomes."],
+  ["Documents", "/candidate/documents", "Review your document checklist and status."],
   ["Finance", "/candidate/finance", "Review invoices and payment information."],
-  ["Messages", "/candidate/messages", "Check portal communications."],
-  ["Support", "/candidate/support", "Ask for help when a route is blocked."]
+  ["Messages", "/candidate/messages", "Check portal communications."]
 ] as const;
 
 export default function CandidateDashboardPage() {
@@ -25,20 +22,20 @@ export default function CandidateDashboardPage() {
     <main style={{ maxWidth: 1080, margin: "0 auto", padding: "24px 18px 48px" }}>
       <p><Link href="/workspace">← Daily operations workspace</Link></p>
       <h1>Kingsmen Candidate Dashboard</h1>
-      <p>Start with your profile, compare routes, save suitable opportunities, track applications, and keep documents and payments in order. Your package changes service intensity, not access to the six gates.</p>
+      <p>Use the current candidate surfaces below to continue your journey. All six opportunity gates are part of the Kingsmen model; the route-discovery and profile-editing screens still need their connected implementation.</p>
 
       <section aria-label="Six Gate View" style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(220px, 1fr))", gap: 14 }}>
         {gates.map(([code, label, description]) => (
           <article key={code} data-gate={code} style={{ border: "1px solid #454545", borderRadius: 12, padding: 16 }}>
             <h2>{label}</h2>
             <p>{description}</p>
-            <Link href="/candidate/routes">Explore this gate →</Link>
+            <p style={{ fontSize: 13, color: "#a8a8a8" }}>Route discovery: implementation required</p>
           </article>
         ))}
       </section>
 
       <section aria-label="Daily Candidate Actions" style={{ marginTop: 28 }}>
-        <h2>Your daily actions — follow in order</h2>
+        <h2>Available candidate actions</h2>
         <ol style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(240px, 1fr))", gap: 18, paddingLeft: 24 }}>
           {dailyActions.map(([label, href, description]) => (
             <li key={href} style={{ padding: 8 }}>
