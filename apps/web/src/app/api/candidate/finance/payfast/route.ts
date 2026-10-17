@@ -50,6 +50,7 @@ export async function POST(request: Request) {
 
     const fields: Record<string, string> = {
       merchant_id: runtime.merchantId,
+      merchant_key: runtime.merchantKey,
       return_url: runtime.returnUrl,
       cancel_url: runtime.cancelUrl,
       notify_url: runtime.notifyUrl,
