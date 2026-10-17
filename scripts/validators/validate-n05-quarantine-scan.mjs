@@ -66,6 +66,7 @@ has("worker", "MALWARE_SCANNER_NOT_CONFIGURED", "no scanner means no job is clai
 has("worker", "expiresIn: 300", "five-minute private scanner URL");
 has("worker", '["CLEAN", "INFECTED", "ERROR"]', "strict scanner result contract");
 has("worker", "SCANNER_CHECKSUM_MISMATCH", "scanner digest must match stored checksum");
+has("worker", "checksum_sha256=eq.${job.checksum_sha256}", "state transitions bind to the expected object checksum");
 has("worker", '"DEAD_LETTER" : "RETRY_WAIT"', "bounded retries end in dead letter");
 has("worker", 'document_status: "READY"', "only clean scan can release");
 has("worker", 'document_status: "REJECTED"', "infected document rejected");
