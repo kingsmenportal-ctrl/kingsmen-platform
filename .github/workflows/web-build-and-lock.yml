@@ -34,7 +34,7 @@ concurrency:
 
 jobs:
   migration-integrity:
-    name: Migration 0059–0071 presence
+    name: Migration 0059–0072 presence
     runs-on: ubuntu-latest
     timeout-minutes: 5
     steps:
