@@ -23,7 +23,7 @@ async function audit(cfg: Parameters<typeof supabaseAdminFetch>[0], userId: stri
       correlation_id: randomUUID(),
       actor_id: userId,
       candidate_id: candidateId,
-      application_id: applicationId,
+      application_id: null,
       message,
       metadata: { source: "candidate_portal_application_tracker", tracker_id: trackerId }
     })
