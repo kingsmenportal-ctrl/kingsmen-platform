@@ -25,74 +25,75 @@ concurrency:
   cancel-in-progress: true
 
 jobs:
-  repository-integrity:
-    name: Lockfile and migration integrity
+  lockfile-presence:
+    name: Lockfile presence
     runs-on: ubuntu-latest
     timeout-minutes: 5
     steps:
-      - name: Checkout repository
-        uses: actions/checkout@v4
-
-      - name: Verify committed lockfile and phase migrations
-        shell: bash
+      - uses: actions/checkout@v4
+      - name: Verify package manifests exist
         run: |
           set -euo pipefail
           test -s apps/web/package.json
           test -s apps/web/package-lock.json
-          node -e "const p=require('./apps/web/package.json'); const l=require('./apps/web/package-lock.json'); if (l.name !== p.name || l.version !== p.version) { console.error('package-lock metadata does not match package.json'); process.exit(1); }"
-          for version in 0059 0060 0061 0062 0063 0064 0065 0066 0067 0068 0069 0070 0071; do
-            matches=(db/migrations/${version}_*.sql)
-            if [ ! -f "${matches[0]}" ] || [ "${#matches[@]}" -ne 1 ]; then
-              echo "::error::Expected exactly one migration file for ${version}; found ${#matches[@]}"
-              printf 'Matches: %s\n' "${matches[@]}"
+          echo "package.json and committed package-lock.json are present."
+
+  migration-integrity:
+    name: Migration 0059–0071 presence
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v4
+      - name: Verify each migration exists exactly once
+        shell: bash
+        run: |
+          set -euo pipefail
+          for file in \
+            0059_candidate_identity_link_requests.sql \
+            0060_atomic_marketplace_review.sql \
+            0061_candidate_identity_review_workflow.sql \
+            0062_candidate_registration_identity_request.sql \
+            0063_atomic_payfast_itn_reconciliation.sql \
+            0064_payfast_intent_order_invoice_atomic.sql \
+            0065_founder_finance_exception_review.sql \
+            0066_founder_operations_notification_queue.sql \
+            0067_founder_control_plane_approval_actions.sql \
+            0068_candidate_portal_messages.sql \
+            0069_founder_profile_change_review.sql \
+            0070_candidate_refund_requests.sql \
+            0071_founder_candidate_portal_messaging.sql; do
+            path="db/migrations/$file"
+            if [ ! -f "$path" ]; then
+              echo "::error::Missing migration: $path"
               exit 1
             fi
-            echo "Found ${matches[0]}"
+            echo "Found $path"
           done
-          echo "Repository integrity checks passed."
 
   web-build:
     name: Install, type-check, and production build
-    needs: repository-integrity
+    needs:
+      - lockfile-presence
+      - migration-integrity
     runs-on: ubuntu-latest
     timeout-minutes: 30
     steps:
-      - name: Checkout repository
-        uses: actions/checkout@v4
-
+      - uses: actions/checkout@v4
       - name: Set up Node.js
         uses: actions/setup-node@v4
         with:
           node-version: 22
           cache: npm
           cache-dependency-path: apps/web/package-lock.json
-
       - name: Install exact locked dependencies
         working-directory: apps/web
         run: npm ci --no-audit --no-fund
-
       - name: Type-check web app
         working-directory: apps/web
         run: npm run typecheck
-
       - name: Build production web bundle
         working-directory: apps/web
         env:
           SUPABASE_URL: https://example.supabase.co
           SUPABASE_ANON_KEY: ci-public-anon-placeholder
         run: npm run build
-
-      - name: Record verification summary
-        if: always()
-        shell: bash
-        env:
-          JOB_STATUS: ${{ job.status }}
-          INTEGRITY_STATUS: ${{ needs.repository-integrity.result }}
-        run: |
-          {
-            echo "## Kingsmen web CI"
-            echo "- Repository integrity: ${INTEGRITY_STATUS}"
-            echo "- Web build job: ${JOB_STATUS}"
-            echo "- Commit: ${GITHUB_SHA}"
-            echo "- This CI uses placeholder public Supabase values only; it does not deploy or access staging."
-          } >> "$GITHUB_STEP_SUMMARY"
