@@ -55,6 +55,8 @@ includes("complete", "DOCUMENT_RECORD_NOT_CONFIRMED", "require persisted documen
 includes("complete", "UPLOAD_COMPLETED", "audit completion");
 includes("complete", "resolution=ignore-duplicates,return=minimal", "idempotent completion audit");
 includes("runtime", "bytes.byteLength !== expectedSizeBytes", "verify actual byte count");
+includes("runtime", "createHash(\"sha256\")", "calculate SHA-256 from stored bytes");
+includes("complete", "checksum_sha256: signature.checksumSha256", "persist SHA-256 with document evidence");
 includes("runtime", "%PDF-", "PDF signature check");
 includes("runtime", "valid UTF-8", "text encoding validation");
 
