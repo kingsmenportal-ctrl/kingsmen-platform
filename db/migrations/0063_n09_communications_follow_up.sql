@@ -3,7 +3,7 @@ CREATE TABLE IF NOT EXISTS public.candidate_communication_preferences (
  id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
  candidate_id uuid NOT NULL UNIQUE REFERENCES public.candidates(id) ON DELETE RESTRICT,
  email_address text, phone_e164 text, phone_verified_at timestamptz,
- email_transactional boolean NOT NULL DEFAULT true,
+ email_transactional boolean NOT NULL DEFAULT false,
  whatsapp_urgent boolean NOT NULL DEFAULT false,
  sms_backup boolean NOT NULL DEFAULT false,
  preferences_updated_at timestamptz NOT NULL DEFAULT now(),
