@@ -86,7 +86,7 @@ export async function POST(request: Request) {
 
   const scannerUrl = process.env.N05_MALWARE_SCANNER_URL?.trim() || "";
   const scannerToken = process.env.N05_MALWARE_SCANNER_TOKEN?.trim() || "";
-  if (!scannerUrl || scannerToken.length < 16) {
+  if (!scannerUrl || scannerToken.length < 32) {
     return jsonError(503, "MALWARE_SCANNER_NOT_CONFIGURED", "No approved malware scanner adapter is configured. Jobs remain queued and documents remain quarantined.");
   }
 
@@ -95,6 +95,9 @@ export async function POST(request: Request) {
     parsedScannerUrl = new URL(scannerUrl);
   } catch {
     return jsonError(503, "MALWARE_SCANNER_CONFIG_INVALID", "The configured scanner endpoint is invalid.");
+  }
+  if (parsedScannerUrl.username || parsedScannerUrl.password || parsedScannerUrl.hash) {
+    return jsonError(503, "MALWARE_SCANNER_CONFIG_INVALID", "The scanner endpoint must not embed credentials or a URL fragment.");
   }
   if (parsedScannerUrl.protocol !== "https:" && process.env.NODE_ENV === "production") {
     return jsonError(503, "MALWARE_SCANNER_TLS_REQUIRED", "The production scanner endpoint must use HTTPS.");
@@ -191,6 +194,7 @@ export async function POST(request: Request) {
         sizeBytes: Number(job.file_size_bytes)
       }),
       cache: "no-store",
+      redirect: "error",
       signal: AbortSignal.timeout(30_000)
     });
   } catch {
