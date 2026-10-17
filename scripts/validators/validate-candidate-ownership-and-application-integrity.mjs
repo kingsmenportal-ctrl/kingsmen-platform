@@ -53,6 +53,12 @@ assert.ok(ownedApplicationList.includes('set_config(\'app.kingsmen_role\''), "ca
 assert.ok(ownedApplicationList.includes("limit 201") && ownedApplicationList.includes("result.rows.length > 200"), "candidate application tracker must detect overflow instead of silently truncating");
 assert.ok(ownedApplicationList.includes("candidate.applications.listed"), "candidate application tracker reads must emit audit evidence");
 assert.ok(ownedApplicationList.includes('await client.query("COMMIT")') && ownedApplicationList.includes('await client.query("ROLLBACK")'), "candidate application tracker read and audit must commit or roll back together");
+const verifiedApplicationsStart = truthVault.indexOf("async listApplicationsForVerifiedSupabaseUser");
+const verifiedApplicationsEnd = truthVault.indexOf("async listDocumentsForVerifiedSupabaseUser", verifiedApplicationsStart);
+const verifiedApplications = truthVault.slice(verifiedApplicationsStart, verifiedApplicationsEnd);
+assert.ok(verifiedApplications.includes("limit 201") && verifiedApplications.includes("result.rows.length > 200"), "verified-identity tracker must detect overflow rather than silently truncate at 200");
+assert.ok(verifiedApplications.includes("candidate.applications.listed"), "verified-identity tracker reads must be audited");
+assert.ok(verifiedApplications.includes("await client.query(\"COMMIT\")") && verifiedApplications.includes("await client.query(\"ROLLBACK\")"), "verified-identity tracker data and audit must share transaction boundary");
 const apiServerSource = read("apps/api/src/server.ts");
 assert.ok(apiServerSource.includes("CANDIDATE_APPLICATION_RESULT_LIMIT_EXCEEDED"), "API must return an explicit non-partial-result response when tracker output exceeds its cap");
 assert.ok(apiServerSource.includes('throw new Error("INVALID_JSON")'), "malformed JSON must map to a client error");
