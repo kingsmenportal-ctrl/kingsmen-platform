@@ -940,6 +940,10 @@ if (pathname === "/api/candidate/applications") {
         sendError(response, 503, "CANDIDATE_APPLICATION_RESULT_LIMIT_EXCEEDED", "The application list exceeds the current response limit. No partial list was returned.");
         return;
       }
+      if (message === "CANDIDATE_DOCUMENT_RESULT_LIMIT_EXCEEDED") {
+        sendError(response, 503, "CANDIDATE_DOCUMENT_RESULT_LIMIT_EXCEEDED", "The document list exceeds the current response limit. No partial list was returned.");
+        return;
+      }
       if (message === "INVALID_JSON") {
         sendError(response, 400, "INVALID_JSON", "The request body must contain valid JSON.");
         return;
