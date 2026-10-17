@@ -20,10 +20,12 @@ CREATE TABLE IF NOT EXISTS public.candidate_manual_application_packages (
   delivered_at timestamptz,
   delivery_confirmed_at timestamptz,
   completion_evidence_ref text,
+  completion_verified_by uuid REFERENCES auth.users(id) ON DELETE RESTRICT,
+  completion_verified_at timestamptz,
   created_at timestamptz NOT NULL DEFAULT now(),
   updated_at timestamptz NOT NULL DEFAULT now(),
   CHECK (status NOT IN ('READY','DELIVERED','IN_PROGRESS','COMPLETED') OR (reviewer_id IS NOT NULL AND reviewed_at IS NOT NULL)),
-  CHECK (status <> 'COMPLETED' OR (completion_evidence_ref IS NOT NULL AND length(trim(completion_evidence_ref)) >= 3))
+  CHECK (status <> 'COMPLETED' OR (completion_evidence_ref IS NOT NULL AND length(trim(completion_evidence_ref)) >= 3 AND completion_verified_by IS NOT NULL AND completion_verified_at IS NOT NULL))
 );
 
 CREATE INDEX IF NOT EXISTS candidate_map_candidate_updated_idx
@@ -176,8 +178,8 @@ BEGIN
     IF v_package.status NOT IN ('DELIVERED','IN_PROGRESS') OR cardinality(v_evidence)=0
        OR length(trim(COALESCE(p_completion_evidence_ref,''))) < 3
     THEN RAISE EXCEPTION 'MAP_COMPLETION_REQUIRES_DELIVERY_AND_EVIDENCE' USING ERRCODE = '23514'; END IF;
-    UPDATE public.candidate_manual_application_packages SET status='COMPLETED',reviewer_id=v_actor,
-      reviewed_at=now(),review_notes=v_notes,review_evidence_urls=v_evidence,
+    UPDATE public.candidate_manual_application_packages SET status='COMPLETED',
+      completion_verified_by=v_actor,completion_verified_at=now(),review_notes=v_notes,review_evidence_urls=v_evidence,
       completion_evidence_ref=trim(p_completion_evidence_ref),updated_at=now()
       WHERE id=p_package_id RETURNING * INTO v_package;
   END IF;
@@ -215,7 +217,7 @@ BEGIN
     UPDATE public.candidate_manual_application_packages SET status='DELIVERED',delivered_at=now(),
       delivery_confirmed_at=now(),updated_at=now() WHERE id=p_package_id RETURNING * INTO v_package;
   ELSIF v_package.status='DELIVERED' THEN
-    NULL;
+    RETURN jsonb_build_object('ok',true,'package',to_jsonb(v_package),'alreadyConfirmed',true);
   ELSE RAISE EXCEPTION 'MAP_PACKAGE_NOT_READY_FOR_DELIVERY' USING ERRCODE='23514'; END IF;
   INSERT INTO public.audit_events(event_id,event_type,severity,correlation_id,actor_id,candidate_id,application_id,message,metadata)
   VALUES(v_event_id,'CANDIDATE_MAP_PACKAGE_DELIVERY_CONFIRMED','INFO',v_correlation,v_actor,v_candidate_id,v_package.application_id,
