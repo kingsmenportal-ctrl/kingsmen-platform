@@ -38,7 +38,7 @@ export default function CandidateProfilePage() {
   async function submit(event: FormEvent) {
     event.preventDefault(); setBusy(true); setError(""); setMessage("");
     try {
-      const session = readKingsmenSession();
+      const session = await getKingsmenSession();
       if (!session) throw new Error("Your session expired. Sign in again.");
       const response = await fetch("/api/candidate/profile", { method: "POST", headers: { authorization: `Bearer ${session.access_token}`, "content-type": "application/json" }, body: JSON.stringify({ field, value, reason }), cache: "no-store" });
       const result = await response.json().catch(() => ({}));
