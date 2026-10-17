@@ -181,8 +181,7 @@ export async function verifyPrivateDocumentsBucket(cfg: SupabaseConfig): Promise
     bucket.public === false &&
     (bucket.id === cfg.documentsBucket || bucket.name === cfg.documentsBucket) &&
     Number.isFinite(configuredLimit) &&
-    configuredLimit > 0 &&
-    configuredLimit <= 10 * 1024 * 1024 &&
+    configuredLimit === 10 * 1024 * 1024 &&
     Array.isArray(bucket.allowed_mime_types) &&
     requiredMimeTypes.every((mime) => bucket.allowed_mime_types?.includes(mime));
 }
