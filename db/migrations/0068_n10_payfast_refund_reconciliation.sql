@@ -6,6 +6,8 @@ ALTER TABLE public.candidate_refund_requests ADD CONSTRAINT candidate_refund_req
 CREATE OR REPLACE FUNCTION public.n10_claim_payfast_refund(
   p_refund_id uuid,
   p_actor_auth_user_id uuid,
+  p_preflight_original_minor integer,
+  p_preflight_available_minor integer,
   p_idempotency_key text
 ) RETURNS TABLE(refund_id uuid, refund_status text, claimed boolean)
 LANGUAGE plpgsql SECURITY DEFINER SET search_path = public, pg_temp AS $$
@@ -34,8 +36,11 @@ BEGIN
   IF v_refund.status <> 'APPROVED' THEN
     RAISE EXCEPTION 'refund must be approved and not previously claimed';
   END IF;
-  IF v_refund.amount_minor <= 0 OR v_refund.amount_minor > v_order.amount_minor THEN
-    RAISE EXCEPTION 'refund amount is outside the order value';
+  IF v_refund.amount_minor <= 0 OR v_refund.amount_minor > v_order.amount_minor
+     OR p_preflight_original_minor IS NULL OR p_preflight_original_minor <> v_order.amount_minor
+     OR p_preflight_available_minor IS NULL OR p_preflight_available_minor < v_refund.amount_minor
+     OR p_preflight_available_minor > p_preflight_original_minor THEN
+    RAISE EXCEPTION 'refund amount or provider preflight balance is invalid';
   END IF;
 
   UPDATE public.candidate_refund_requests SET status='PROCESSING',
@@ -49,7 +54,9 @@ BEGIN
     'REFUND_APPROVED','FINANCE_MANUAL_REVIEW',v_refund.amount_minor,'PAYFAST',
     v_payment.provider_reference,'payfast-api:/refunds/query/'||v_payment.provider_reference,
     'Refund execution claimed once after human approval.',p_actor_auth_user_id,p_idempotency_key,
-    jsonb_build_object('refund_ref',v_refund.refund_ref,'execution_claimed',true)
+    jsonb_build_object('refund_ref',v_refund.refund_ref,'execution_claimed',true,
+      'preflight_original_minor',p_preflight_original_minor,
+      'preflight_available_minor',p_preflight_available_minor)
   );
   RETURN QUERY SELECT v_refund.id,'PROCESSING'::text,true;
 END;
@@ -145,7 +152,7 @@ BEGIN
 END;
 $$;
 
-REVOKE ALL ON FUNCTION public.n10_claim_payfast_refund(uuid,uuid,text) FROM PUBLIC, anon, authenticated;
+REVOKE ALL ON FUNCTION public.n10_claim_payfast_refund(uuid,uuid,integer,integer,text) FROM PUBLIC, anon, authenticated;
 REVOKE ALL ON FUNCTION public.n10_record_payfast_refund_reconciliation(uuid,uuid,text,integer,text,text) FROM PUBLIC, anon, authenticated;
-GRANT EXECUTE ON FUNCTION public.n10_claim_payfast_refund(uuid,uuid,text) TO service_role;
+GRANT EXECUTE ON FUNCTION public.n10_claim_payfast_refund(uuid,uuid,integer,integer,text) TO service_role;
 GRANT EXECUTE ON FUNCTION public.n10_record_payfast_refund_reconciliation(uuid,uuid,text,integer,text,text) TO service_role;
