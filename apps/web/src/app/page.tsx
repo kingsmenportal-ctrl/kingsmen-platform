@@ -65,6 +65,11 @@ export default function HomePage() {
             <p style={{ color:"#c2c7d2", lineHeight:1.7 }}>Open the job-search workspace for opportunity scouting, application preparation, document readiness and submission-proof tracking.</p>
             <a href="/personal-job-desk" style={{ color:"#f0d38b", fontWeight:850 }}>Open Personal Job Desk →</a>
           </article>
+          <article style={{ padding:22, borderRadius:18, background:card, border:"1px solid rgba(216,182,106,.25)" }}>
+            <h3 style={{ marginTop:0, color:gold }}>Application Tracker</h3>
+            <p style={{ color:"#c2c7d2", lineHeight:1.7 }}>Keep a private checklist for each verified route, open the official application portal and record your own submission reference without confusing a handoff with provider confirmation.</p>
+            <a href="/candidate/application-tracker" style={{ color:"#f0d38b", fontWeight:850 }}>Open application tracker →</a>
+          </article>
         </div>
       </div>
     </section>
