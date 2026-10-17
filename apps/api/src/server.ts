@@ -443,6 +443,7 @@ async function handleHealth(response: ServerResponse): Promise<void> {
       "POST /api/candidate-auth/login",
       "POST /api/candidate-auth/logout",
       "GET /api/candidate-auth/session",
+      "GET /api/candidate/applications",
       "GET /api/candidate/documents",
       "GET /api/candidate/document-requests",
       "GET /api/candidates/:candidateId/status",
@@ -561,6 +562,23 @@ async function handleApplicationWorkbench(request: IncomingMessage, response: Se
   sendJson(response, 200, { ok: true, application });
 }
 
+async function handleCandidateApplications(request: IncomingMessage, response: ServerResponse): Promise<void> {
+  if (!candidateAuthRuntime || !truthVault.enabled) {
+    sendError(response, 503, "CANDIDATE_AUTHORIZATION_NOT_CONFIGURED", "Candidate application access is not configured.");
+    return;
+  }
+  const token = readCandidateSessionCookie(request.headers.cookie);
+  const principal = await candidateAuthRuntime.service.authenticateToken(token);
+  if (!principal.authenticated) {
+    sendError(response, 401, "CANDIDATE_AUTH_REQUIRED", "Sign in to view your applications.");
+    return;
+  }
+  const applications = await truthVault.listOwnedApplicationsForOwner(principal.candidateId);
+  response.setHeader("cache-control", "private, no-store");
+  response.setHeader("pragma", "no-cache");
+  sendJson(response, 200, { ok: true, applications });
+}
+
 export function createKingsmenApiServer() {
   return createServer(async (request, response) => {
     try {
@@ -626,6 +644,16 @@ export function createKingsmenApiServer() {
 
       if (method === "POST" && (pathname === "/api/workflow/result" || pathname === "/api/workflow-results")) {
         await handleWorkflowResult(request, response);
+        return;
+      }
+
+      if (pathname === "/api/candidate/applications") {
+        if (method !== "GET") {
+          response.setHeader("allow", "GET");
+          sendError(response, 405, "METHOD_NOT_ALLOWED", "Only GET is supported.");
+          return;
+        }
+        await handleCandidateApplications(request, response);
         return;
       }
 
