@@ -43,6 +43,7 @@ The migration seeds the catalogue using insert-on-conflict-do-nothing; existing 
 - `0065_n10_finance_privilege_hardening.sql`: revoke direct anon/authenticated privileges on finance tables.
 - `0067_n10_atomic_payfast_payment_confirmation.sql`: atomic, idempotent verified ITN persistence and PAID transition.
 - `0068_n10_payfast_refund_reconciliation.sql`: one-shot refund claim and atomic provider-ledger reconciliation.
+- `0069_n10_atomic_finance_workflows.sql`: atomic candidate order creation, refund request, manual finance review, and approve/reject decisions. Candidate order and refund creation require an email-verified account linked to the authenticated user.
 
 Apply migrations in order only after the prior N06–N09 schema has been reviewed and the staging rollout approved. Migration 0066 belongs to the N11 draft and is not part of N10 staging rollout.
 
@@ -55,7 +56,7 @@ Configure privately in the authorized Netlify environment; never commit or paste
 - `PAYFAST_ENVIRONMENT=sandbox` for sandbox only.
 - `PAYFAST_MERCHANT_ID`, `PAYFAST_MERCHANT_KEY`, `PAYFAST_PASSPHRASE`.
 - `PAYFAST_RETURN_URL`, `PAYFAST_CANCEL_URL`, `PAYFAST_NOTIFY_URL` (notify URL must target `/api/webhooks/payfast`).
-- `PAYFAST_ITN_ALLOWED_CIDRS` as a comma-separated, operator-verified allowlist of PayFast's current documented source ranges.
+- `PAYFAST_ITN_ALLOWED_CIDRS` as a comma-separated, operator-verified allowlist of PayFast's current documented source ranges. PayFast's current developer documentation lists `197.97.145.144/28`, `41.74.179.192/27`, `102.216.36.0/28`, `102.216.36.128/28`, and `144.126.193.139/32`; verify against the provider's live documentation before configuration.
 - `SUPABASE_SERVICE_ROLE_KEY` (or the already supported `SUPABASE_SERVICE_ROLE`) is required by server routes and must remain server-side only.
 
 ## Not yet release-ready
