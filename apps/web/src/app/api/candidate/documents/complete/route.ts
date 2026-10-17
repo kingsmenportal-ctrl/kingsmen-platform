@@ -1,18 +1,18 @@
 import { requireCandidateSession, supabaseAdminFetch } from "../../../../../lib/candidate-document-runtime";
 
 const ALLOWED_TYPES: Record<string, string[]> = {
-  CV: ["application/pdf", "application/vnd.openxmlformats-officedocument.wordprocessingml.document"],
-  ID_DOCUMENT: ["application/pdf", "image/jpeg", "image/png"],
-  MATRIC_CERTIFICATE: ["application/pdf", "image/jpeg", "image/png"],
-  ACADEMIC_RECORD: ["application/pdf", "image/jpeg", "image/png"],
-  PROOF_OF_ADDRESS: ["application/pdf", "image/jpeg", "image/png"],
-  BANK_LETTER: ["application/pdf", "image/jpeg", "image/png"],
-  PARENT_GUARDIAN_ID: ["application/pdf", "image/jpeg", "image/png"],
-  PAYSLIP: ["application/pdf", "image/jpeg", "image/png"],
-  AFFIDAVIT: ["application/pdf", "image/jpeg", "image/png"],
-  APPLICATION_PROOF: ["application/pdf", "image/jpeg", "image/png"],
-  NSFAS_DOCUMENT: ["application/pdf", "image/jpeg", "image/png"],
-  OTHER: ["application/pdf", "image/jpeg", "image/png", "application/vnd.openxmlformats-officedocument.wordprocessingml.document"]
+  CV: ["application/pdf", "application/vnd.openxmlformats-officedocument.wordprocessingml.document", "text/plain"],
+  ID_DOCUMENT: ["application/pdf"],
+  MATRIC_CERTIFICATE: ["application/pdf"],
+  ACADEMIC_RECORD: ["application/pdf"],
+  PROOF_OF_ADDRESS: ["application/pdf"],
+  BANK_LETTER: ["application/pdf"],
+  PARENT_GUARDIAN_ID: ["application/pdf"],
+  PAYSLIP: ["application/pdf"],
+  AFFIDAVIT: ["application/pdf"],
+  APPLICATION_PROOF: ["application/pdf"],
+  NSFAS_DOCUMENT: ["application/pdf"],
+  OTHER: ["application/pdf", "application/vnd.openxmlformats-officedocument.wordprocessingml.document", "text/plain"]
 };
 
 type StorageObject = {
@@ -81,7 +81,7 @@ export async function POST(request: Request) {
 
   const mimeType = String(object.metadata?.mimetype || object.metadata?.contentType || "").toLowerCase();
   const sizeBytes = Number(object.metadata?.size);
-  if (!ALLOWED_TYPES[documentTypeCode]?.includes(mimeType) || !Number.isSafeInteger(sizeBytes) || sizeBytes < 1 || sizeBytes > 15 * 1024 * 1024) {
+  if (!ALLOWED_TYPES[documentTypeCode]?.includes(mimeType) || !Number.isSafeInteger(sizeBytes) || sizeBytes < 1 || sizeBytes > 10 * 1024 * 1024) {
     return Response.json({ ok: false, code: "STORED_FILE_METADATA_REJECTED", error: "Stored file type or size is outside Kingsmen's document policy." }, { status: 415 });
   }
 
