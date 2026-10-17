@@ -35,6 +35,8 @@ jobs:
         run: node scripts/verify-phase-b-migrations.mjs
       - name: Verify client/server secret boundary and PayFast guards
         run: node scripts/verify-portal-security-boundaries.mjs
+      - name: Verify candidate journey and MAP fallback contracts
+        run: node scripts/verify-portal-journey-contracts.mjs
 
   web-build:
     name: Resolve dependencies, type-check, and build
