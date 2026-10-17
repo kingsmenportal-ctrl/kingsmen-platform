@@ -2,6 +2,7 @@ import { NextResponse } from "next/server";
 import { isSameOriginRequest } from "@/lib/auth/csrf";
 import { readAuthJson } from "@/lib/auth/request-body";
 import { authConfigured, getSessionTokens, getVerifiedAuthUser } from "@/lib/auth/supabase-rest";
+import { isPublicHttpsUrl } from "@/lib/security/public-url";
 
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
@@ -58,7 +59,7 @@ export async function POST(request: Request) {
   const province = typeof body.province === "string" ? body.province : "";
   if (displayName.length < 2 || displayName.length > 180 || !types.has(type) ||
       !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email) || email.length > 320 ||
-      (website && (!/^https?:\/\//i.test(website) || website.length > 2048)) ||
+      (website && !isPublicHttpsUrl(website)) ||
       (province && !provinces.has(province))) {
     return NextResponse.json({ok:false,code:"INVALID_ORGANISATION_DETAILS",message:"Check the organisation name, type, contact email, website and province."},{status:400,headers});
   }
