@@ -25,7 +25,6 @@ function readStoredSession(): KingsmenSession | null {
     if (!raw) return null;
     const session = JSON.parse(raw) as KingsmenSession;
     if (!session.access_token || !session.user?.id) return null;
-    if (session.expires_at && session.expires_at <= Math.floor(Date.now() / 1000)) return null;
     return session;
   } catch {
     return null;
