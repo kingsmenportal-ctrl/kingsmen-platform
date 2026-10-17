@@ -5,7 +5,7 @@ import { FormEvent, useEffect, useState } from "react";
 import { getKingsmenSession, signOutKingsmen } from "../../lib/supabase-browser-auth";
 
 type Organisation = { id: string; display_name: string; organisation_type: string; official_website: string | null; verification_status: string; province: string | null; created_at: string };
-type Listing = { id: string; organisation_id: string; title: string; listing_type: string; status: string; official_source_url: string; application_url: string | null; created_at: string; reviewed_at: string | null; review_notes: string | null };
+type Listing = { id: string; organisation_id: string; title: string; listing_type: string; description: string; status: string; official_source_url: string; application_url: string | null; application_method: string; province: string | null; location_text: string | null; eligibility: unknown; opens_at: string | null; closes_at: string | null; source_verified_at: string | null; created_at: string; reviewed_at: string | null; review_notes: string | null };
 const field: React.CSSProperties = { width: "100%", boxSizing: "border-box", padding: 11, borderRadius: 8, border: "1px solid #39445e", background: "#0f172a", color: "#fff" };
 const organisationTypes = ["EMPLOYER","RECRUITER","UNIVERSITY","TVET","PRIVATE_COLLEGE","TRAINING_PROVIDER","SETA","FUNDER","ACCOMMODATION_PROVIDER","COMMUNITY_PARTNER","OTHER"];
 const listingTypes = ["JOB","INTERNSHIP","LEARNERSHIP","APPRENTICESHIP","BURSARY","FUNDING","UNIVERSITY_COURSE","TVET_COURSE","TRAINING","ACCOMMODATION","SERVICE"];
@@ -19,6 +19,7 @@ export default function PartnerPortalPage() {
   const [website, setWebsite] = useState("");
   const [province, setProvince] = useState("");
   const [organisationId, setOrganisationId] = useState("");
+  const [editingListingId, setEditingListingId] = useState("");
   const [listingType, setListingType] = useState("JOB");
   const [title, setTitle] = useState("");
   const [description, setDescription] = useState("");
@@ -54,7 +55,7 @@ export default function PartnerPortalPage() {
     e.preventDefault(); setBusy(true); setError(""); setNotice("");
     try {
       const result = await call("/api/partner/organisations", "POST", { displayName, organisationType, website, province });
-      setNotice(result.message || "Organisation submitted for verification."); setDisplayName(""); setWebsite(""); await load();
+      setDisplayName(""); setWebsite(""); await load(); setNotice(result.message || "Organisation submitted for verification.");
     } catch (e) { setError(e instanceof Error ? e.message : "Organisation onboarding failed."); }
     finally { setBusy(false); }
   }
@@ -65,6 +66,18 @@ export default function PartnerPortalPage() {
       setNotice(result.message || "Listing submitted for review."); setTitle(""); setDescription(""); setSourceUrl(""); setApplicationUrl(""); setEligibility(""); await load();
     } catch (e) { setError(e instanceof Error ? e.message : "Listing submission failed."); }
     finally { setBusy(false); }
+  }
+
+  function editListing(listing: Listing) {
+    setEditingListingId(listing.id); setOrganisationId(listing.organisation_id);
+    setListingType(listing.listing_type); setTitle(listing.title); setDescription(listing.description);
+    setSourceUrl(listing.official_source_url); setApplicationUrl(listing.application_url || "");
+    setApplicationMethod(listing.application_method); setProvince(listing.province || "");
+    setLocationText(listing.location_text || "");
+    const eligibilityObject = listing.eligibility as { summary?: unknown } | null;
+    setEligibility(typeof eligibilityObject?.summary === "string" ? eligibilityObject.summary : "");
+    setOpensAt(toLocalInput(listing.opens_at)); setClosesAt(toLocalInput(listing.closes_at));
+    setNotice("Editing a pending listing. Saving will keep it pending; it cannot self-publish.");
   }
 
   return <main style={{ maxWidth: 1080, margin: "0 auto", padding: 24, color: "#f4f6ff", fontFamily: "system-ui, sans-serif" }}>
@@ -81,7 +94,7 @@ export default function PartnerPortalPage() {
       <button disabled={busy} type="submit">{busy ? "Submitting…" : "Submit organisation for review"}</button>
     </form>
     <h3>My organisations</h3>{organisations.length ? <div style={{ display: "grid", gap: 8 }}>{organisations.map(org => <article key={org.id} style={card}><strong>{org.display_name}</strong><p>{org.organisation_type} · <b>{org.verification_status}</b></p><small>{org.official_website || "No website supplied"} · {org.province || "Province not supplied"}</small></article>)}</div> : <p>No organisations are linked to this sign-in yet.</p>}</section>
-    <section style={panel}><h2>Submit a listing</h2>{!organisations.length && <p>Submit an organisation above first. Listing creation is still constrained by database ownership policy.</p>}<form onSubmit={submitListing} style={grid}>
+    <section style={panel}><h2>{editingListingId ? "Edit pending listing" : "Submit a listing"}</h2>{!organisations.length && <p>Submit an organisation above first. Listing creation is still constrained by database ownership policy.</p>}<form onSubmit={submitListing} style={grid}>
       <label>Organisation<select required disabled={!organisations.length} style={field} value={organisationId} onChange={e => setOrganisationId(e.target.value)}>{organisations.map(org => <option key={org.id} value={org.id}>{org.display_name} · {org.verification_status}</option>)}</select></label>
       <label>Listing type<select style={field} value={listingType} onChange={e => setListingType(e.target.value)}>{listingTypes.map(t => <option key={t}>{t}</option>)}</select></label>
       <label>Title<input required minLength={3} maxLength={220} style={field} value={title} onChange={e => setTitle(e.target.value)} /></label>
@@ -94,11 +107,13 @@ export default function PartnerPortalPage() {
       <label>Closes at<input type="datetime-local" style={field} value={closesAt} onChange={e => setClosesAt(e.target.value)} /></label>
       <label style={{ gridColumn: "1 / -1" }}>Description<textarea required minLength={10} maxLength={12000} rows={4} style={field} value={description} onChange={e => setDescription(e.target.value)} /></label>
       <label style={{ gridColumn: "1 / -1" }}>Eligibility summary<textarea maxLength={4000} rows={2} style={field} value={eligibility} onChange={e => setEligibility(e.target.value)} /></label>
-      <button disabled={busy || !organisations.length} type="submit">{busy ? "Submitting…" : "Submit listing for review"}</button>
+      <button disabled={busy || !organisations.length} type="submit">{busy ? "Saving…" : editingListingId ? "Save pending listing" : "Submit listing for review"}</button>{editingListingId && <button type="button" disabled={busy} onClick={() => setEditingListingId("")}>Cancel edit</button>}
     </form></section>
-    <section style={panel}><h2>My submitted listings</h2>{listings.length ? <div style={{ display: "grid", gap: 10 }}>{listings.map(listing => <article key={listing.id} style={card}><div style={{ display: "flex", justifyContent: "space-between", gap: 12, flexWrap: "wrap" }}><strong>{listing.title}</strong><b>{listing.status}</b></div><p>{listing.listing_type} · Submitted {new Date(listing.created_at).toLocaleString()}</p><p>Source: <a href={listing.official_source_url} target="_blank" rel="noopener noreferrer">{listing.official_source_url}</a></p>{listing.review_notes && <p>Review note: {listing.review_notes}</p>}</article>)}</div> : <p>No listing submissions yet.</p>}</section>
+    <section style={panel}><h2>My submitted listings</h2>{listings.length ? <div style={{ display: "grid", gap: 10 }}>{listings.map(listing => <article key={listing.id} style={card}><div style={{ display: "flex", justifyContent: "space-between", gap: 12, flexWrap: "wrap" }}><strong>{listing.title}</strong><b>{listing.status}</b></div><p>{listing.listing_type} · Submitted {new Date(listing.created_at).toLocaleString()}</p><p>Source: <a href={listing.official_source_url} target="_blank" rel="noopener noreferrer">{listing.official_source_url}</a></p>{listing.review_notes && <p>Review note: {listing.review_notes}</p>}{["DRAFT","PENDING_REVIEW"].includes(listing.status) && !listing.source_verified_at && <button type="button" onClick={() => editListing(listing)}>Edit pending listing</button>}</article>)}</div> : <p>No listing submissions yet.</p>}</section>
   </main>;
 }
 const panel: React.CSSProperties = { marginTop: 20, padding: 18, border: "1px solid #303b53", borderRadius: 12, background: "#0b1222" };
 const card: React.CSSProperties = { padding: 12, border: "1px solid #39445e", borderRadius: 8 };
 const grid: React.CSSProperties = { display: "grid", gridTemplateColumns: "repeat(auto-fit,minmax(230px,1fr))", gap: 12, alignItems: "end" };
+
+function toLocalInput(value: string | null) { if (!value) return ""; const date = new Date(value); if (Number.isNaN(date.getTime())) return ""; return new Date(date.getTime() - date.getTimezoneOffset() * 60000).toISOString().slice(0, 16); }
