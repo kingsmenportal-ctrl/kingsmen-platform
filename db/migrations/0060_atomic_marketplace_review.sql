@@ -15,7 +15,7 @@ DECLARE
   v_previous text;
   v_next text;
   v_transaction_id bigint := txid_current();
-  v_event_id uuid;
+  v_event_id bigint;
   v_actor uuid := auth.uid();
   v_evidence text[] := COALESCE(p_evidence_urls, ARRAY[]::text[]);
   v_notes text := left(COALESCE(p_notes, ''), 2000);
