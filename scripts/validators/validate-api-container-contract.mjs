@@ -57,6 +57,10 @@ check("Container runs as non-root", /^USER node$/m.test(docker), "Runtime image 
 check("Container exposes a health check", /^HEALTHCHECK /m.test(docker) && /\/health/.test(docker), "Container must probe the API health endpoint.");
 check("Credential-free env template exists", existsSync(envExamplePath), "apps/api/.env.example must be committed.");
 check("API deployment docs declare lockfile gate", existsSync(readmePath) && /package-lock\.json/.test(readFileSync(readmePath, "utf8")), "API README must document the lockfile prerequisite.");
+let serverSource = "";
+try { serverSource = readFileSync(resolve(apiDir, "src/server.ts"), "utf8"); } catch {}
+check("CORS is exact-origin and opt-in", serverSource.includes("requestOrigin === configuredCorsOrigin") && !serverSource.includes('process.env.KINGSMEN_API_CORS_ORIGIN ?? "*"'), "API must only emit CORS headers for the exact configured frontend origin; wildcard fallback is prohibited.");
+check("Untrusted preflight is denied", serverSource.includes("response.statusCode = corsOriginAllowed ? 204 : 403"), "OPTIONS requests from unconfigured origins must be denied.");
 
 const report = {
   validator: "api-container-contract",
