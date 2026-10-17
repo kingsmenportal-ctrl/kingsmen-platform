@@ -35,7 +35,7 @@ function unavailable(message: string, status = 503) {
 
 export async function GET(request: Request) {
   const base = process.env.SUPABASE_URL ?? process.env.KINGSMEN_SUPABASE_URL;
-  const key = process.env.SUPABASE_SERVICE_ROLE_KEY;
+  const key = process.env.SUPABASE_PUBLISHABLE_KEY ?? process.env.NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY;
   if (!base || !key) {
     return unavailable("The verified opportunity data connection is not configured. No sample opportunities are shown as real.");
   }
