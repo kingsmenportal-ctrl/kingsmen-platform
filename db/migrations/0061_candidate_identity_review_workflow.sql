@@ -125,7 +125,7 @@ BEGIN
       INSERT INTO public.candidate_auth_identity_links(
         supabase_user_id, candidate_id, link_status, verified_at, verified_by, created_at, updated_at
       ) VALUES (
-        v_request.auth_user_id, p_candidate_id, 'VERIFIED', now(), v_actor, now(), now()
+        v_request.auth_user_id, p_candidate_id, 'VERIFIED', now(), v_actor::text, now(), now()
       );
     END IF;
     UPDATE public.candidate_accounts
