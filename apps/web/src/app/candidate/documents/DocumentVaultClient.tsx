@@ -1,6 +1,6 @@
 "use client";
 
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useEffect, useState, type FormEvent } from "react";
 
 type DocumentRow = {
   id: string;
@@ -122,7 +122,7 @@ export default function DocumentVaultClient() {
     if (accessToken) void refresh();
   }, [accessToken, refresh]);
 
-  async function uploadDocument(event: React.FormEvent<HTMLFormElement>) {
+  async function uploadDocument(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
     const token = accessToken || getStoredAccessToken();
     if (!token) {
