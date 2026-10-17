@@ -220,6 +220,7 @@ export class TruthVaultRepository {
   }): Promise<TruthVaultStoredWorkflowResult> {
     return this.withTransaction(async (client) => {
       await client.query("select pg_advisory_xact_lock(hashtext($1))", [input.result.idempotencyKey]);
+      await client.query("select pg_advisory_xact_lock(hashtext($1))", [`workflow:${input.result.workflowRunId}`]);
 
     const existing = await client.query<{ workflow_run_id: string }>(
       "select workflow_run_id from workflow_runs where workflow_run_id = $1 limit 1",
