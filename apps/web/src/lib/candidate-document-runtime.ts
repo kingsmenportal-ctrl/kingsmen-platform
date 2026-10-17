@@ -79,7 +79,7 @@ export async function requireCandidateSession(request: Request): Promise<
     };
   }
 
-  const user = (await userResponse.json().catch(() => null)) as { id?: string } | null;
+  const user = (await userResponse.json().catch(() => null)) as { id?: string; email_confirmed_at?: string | null; confirmed_at?: string | null } | null;
   if (!user?.id) {
     return {
       ok: false,
@@ -87,6 +87,10 @@ export async function requireCandidateSession(request: Request): Promise<
       code: "INVALID_SESSION",
       message: "The identity provider returned no user identity."
     };
+  }
+
+  if (!(user.email_confirmed_at || user.confirmed_at)) {
+    return { ok: false, status: 403, code: "EMAIL_CONFIRMATION_REQUIRED", message: "Confirm your email address before accessing candidate records." };
   }
 
   const linkUrl = new URL(`${cfg.url}/rest/v1/candidate_auth_identity_links`);
