@@ -55,7 +55,8 @@
     "kingsmen:launch:audit": "node scripts/validators/validate-kingsmen-launch-readiness-evidence-aware.mjs --audit",
     "kingsmen:launch:gate": "node scripts/validators/validate-kingsmen-launch-readiness-evidence-aware.mjs --gate",
     "api:validate:truth-vault:rls-hardening": "node scripts/validators/validate-n03-truth-vault-rls-hardening.mjs",
-    "api:prove:truth-vault:staging": "node scripts/proof/prove-n02-n03-truth-vault-staging.mjs"
+    "api:prove:truth-vault:staging": "node scripts/proof/prove-n02-n03-truth-vault-staging.mjs",
+    "api:validate:runtime-boundaries": "node scripts/validators/validate-n02-n03-runtime-boundaries.mjs"
   },
   "repository": {
     "type": "git",
