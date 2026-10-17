@@ -16,6 +16,7 @@ export default function CandidateFinancePage() {
   const [candidateRef, setCandidateRef] = useState("");
   const [buyingPlan, setBuyingPlan] = useState("");
   const [checkoutKeys, setCheckoutKeys] = useState<Record<string,string>>({});
+  const [refundDrafts, setRefundDrafts] = useState<Record<string,{amountRands:string;reason:string}>>({});
   const [message, setMessage] = useState("Loading your finance records…");
   useEffect(() => { void (async () => {
     const session = await getKingsmenSession();
@@ -26,6 +27,41 @@ export default function CandidateFinancePage() {
     setData({ items: result.items || [], orders: result.orders || [], invoices: result.invoices || [], payments: result.payments || [], refunds: result.refunds || [], ledger: result.ledger || [], plans: result.plans || [] });
     setCandidateRef(result.candidateReference || ""); setMessage("");
   })().catch(e => setMessage(e instanceof Error ? e.message : "Finance records could not be loaded.")); }, []);
+
+  async function submitRefund(payment: Row) {
+    const paymentRef = String(payment.payment_ref || "");
+    const draft = refundDrafts[paymentRef] || { amountRands: "", reason: "" };
+    const amountCents = Math.round(Number(draft.amountRands) * 100);
+    if (!paymentRef || !Number.isSafeInteger(amountCents) || amountCents <= 0 || draft.reason.trim().length < 10) {
+      setMessage("Enter a positive refund amount and a reason of at least ten characters.");
+      return;
+    }
+    setMessage("Submitting refund request…");
+    try {
+      const session = await getKingsmenSession();
+      if (!session) throw new Error("Sign in again before requesting a refund.");
+      const response = await fetch("/api/candidate/finance", {
+        method: "POST",
+        headers: { authorization: `Bearer ${session.access_token}`, "content-type": "application/json" },
+        body: JSON.stringify({ paymentRef, amountCents, reason: draft.reason.trim() }),
+        cache: "no-store"
+      });
+      const result = await response.json();
+      if (!response.ok || !result.ok) throw new Error(result.error || "Refund request could not be submitted.");
+      setData(current => ({
+        ...current,
+        refunds: [{
+          id: String(result.refundRequestId), refund_ref: String(result.refundRef), payment_ref: paymentRef,
+          order_ref: String(payment.order_ref || ""), amount_cents: amountCents, currency: String(payment.currency || "ZAR"),
+          reason: draft.reason.trim(), refund_status: "PENDING_REVIEW", created_at: new Date().toISOString()
+        }, ...current.refunds]
+      }));
+      setRefundDrafts(current => ({ ...current, [paymentRef]: { amountRands: "", reason: "" } }));
+      setMessage(result.message || "Refund request submitted for authorised review. No money has been refunded.");
+    } catch (e) {
+      setMessage(e instanceof Error ? e.message : "Refund request could not be submitted.");
+    }
+  }
 
   async function purchase(planCode: string) {
     if (buyingPlan) return;
@@ -62,7 +98,7 @@ export default function CandidateFinancePage() {
     <p><Link href="/candidate/dashboard">← Candidate dashboard</Link></p><h1>Kingsmen Financial View</h1><p>Candidate finance reference: {candidateRef || "Unavailable"}. These are persisted records. This screen cannot initiate payments or mark an item paid.</p>{message && <p role="status">{message}</p>}
     <section style={panel}><h2>Orders ({data.orders.length})</h2>{data.orders.length ? <div style={stack}>{data.orders.map(row => <article key={row.id} style={card}><strong>{str(row,"plan_code","Service order")}</strong><p>{str(row,"order_ref")} · {str(row,"order_status")}</p><p>{money(row.amount_cents,row.currency)}</p><small>{str(row,"created_at")}</small></article>)}</div> : <p>No service orders are attached to this candidate yet.</p>}</section>
     <section style={panel}><h2>Invoices ({data.invoices.length})</h2>{data.invoices.length ? <div style={stack}>{data.invoices.map(row => <article key={row.id} style={card}><strong>{str(row,"invoice_ref")}</strong><p>Order {str(row,"order_ref")} · {str(row,"invoice_status")}</p><p>{money(row.amount_cents,row.currency)}</p><p>Issued {str(row,"issued_at")} · Due {str(row,"due_at")}</p>{row.paid_at && <p>Paid at {str(row,"paid_at")}</p>}</article>)}</div> : <p>No invoices found.</p>}</section>
-    <section style={panel}><h2>Payments ({data.payments.length})</h2>{data.payments.length ? <div style={stack}>{data.payments.map(row => <article key={row.id} style={card}><strong>{str(row,"payment_ref")}</strong><p>{str(row,"provider")} · {str(row,"payment_status")} · {row.verified === true ? "Verified" : "Not verified"}</p><p>Gross {money(row.amount_gross_cents,row.currency)} · Fee {money(row.amount_fee_cents,row.currency)} · Net {money(row.amount_net_cents,row.currency)}</p><small>{str(row,"created_at")}</small></article>)}</div> : <p>No payment records found.</p>}</section>
+    <section style={panel}><h2>Payments ({data.payments.length})</h2>{data.payments.length ? <div style={stack}>{data.payments.map(row => { const paymentRef = String(row.payment_ref || ""); const draft = refundDrafts[paymentRef] || { amountRands: "", reason: "" }; return <article key={row.id} style={card}><strong>{str(row,"payment_ref")}</strong><p>{str(row,"provider")} · {str(row,"payment_status")} · {row.verified === true ? "Verified" : "Not verified"}</p><p>Gross {money(row.amount_gross_cents,row.currency)} · Fee {money(row.amount_fee_cents,row.currency)} · Net {money(row.amount_net_cents,row.currency)}</p><small>{str(row,"created_at")}</small>{row.verified === true && row.payment_status === "COMPLETE" && <form onSubmit={e => { e.preventDefault(); void submitRefund(row); }} style={{ display: "grid", gap: 8, marginTop: 12 }}><strong>Request a refund</strong><label>Amount in ZAR<input required type="number" min="0.01" max={(Number(row.amount_gross_cents)||0)/100} step="0.01" value={draft.amountRands} onChange={e => setRefundDrafts(current => ({ ...current, [paymentRef]: { ...draft, amountRands: e.target.value } }))} style={fieldStyle} /></label><label>Reason<textarea required minLength={10} maxLength={1000} rows={2} value={draft.reason} onChange={e => setRefundDrafts(current => ({ ...current, [paymentRef]: { ...draft, reason: e.target.value } }))} style={fieldStyle} /></label><button type="submit" disabled={Number(draft.amountRands)<=0 || draft.reason.trim().length<10}>Submit refund request</button><small>Requests are checked against verified payment balance and require finance approval. Submission does not issue a refund.</small></form>}</article>; })}</div> : <p>No payment records found.</p>}</section>
     <section style={panel}><h2>Refund requests ({data.refunds.length})</h2>{data.refunds.length ? <div style={stack}>{data.refunds.map(row => <article key={row.id} style={card}><strong>{str(row,"refund_ref")}</strong><p>{str(row,"refund_status")} · {money(row.amount_cents,row.currency)}</p><p>{str(row,"reason")}</p><small>{str(row,"created_at")}</small></article>)}</div> : <p>No refund requests found.</p>}</section>
     <section style={panel}><h2>Ledger entries ({data.ledger.length})</h2>{data.ledger.length ? <div style={stack}>{data.ledger.map(row => <article key={row.id} style={card}><strong>{str(row,"entry_type")} · {str(row,"ledger_ref")}</strong><p>{str(row,"description")}</p><p>Debit {money(row.debit_cents,row.currency)} · Credit {money(row.credit_cents,row.currency)}</p><small>{str(row,"created_at")} · Evidence {str(row,"evidence_ref")}</small></article>)}</div> : <p>No ledger entries found.</p>}</section>
     <section style={panel}><h2>Additional finance items ({data.items.length})</h2>{data.items.length ? <div style={stack}>{data.items.map(row => <article key={row.id} style={card}><strong>{str(row,"description")}</strong><p>{str(row,"item_ref")} · {str(row,"status")} · {money(row.amount_cents,row.currency)}</p></article>)}</div> : <p>No additional items found.</p>}</section>
