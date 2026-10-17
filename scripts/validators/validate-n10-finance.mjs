@@ -18,6 +18,6 @@ for(const [key,needles] of Object.entries({
 assert.match(content.migration,/price_minor integer NOT NULL CHECK\(price_minor>=0\)/);
 assert.match(content.migration,/UNIQUE\(candidate_id,idempotency_key\)/);
 assert.match(content.migration,/UNIQUE\(candidate_id,candidate_idempotency_key\)/);
-assert.match(content.reviewerApi,/\^\[a-fA-F0-9\]\{64\}\$/);
+assert.ok(content.reviewerApi.includes("/^[a-fA-F0-9]{64}$/"),"reviewer payment evidence hash format missing");
 const pkg=JSON.parse(fs.readFileSync("package.json","utf8"));assert.equal(pkg.scripts["n10:finance:validate"],"node scripts/validators/validate-n10-finance.mjs");assert.equal(pkg.scripts["n10:finance:test"],"node --check scripts/tests/n10-finance-contract.mjs && node scripts/tests/n10-finance-contract.mjs");
 console.log("N10 finance validator passed: "+Object.keys(files).length+" artifacts and financial integrity contracts checked.");
