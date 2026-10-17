@@ -19,6 +19,7 @@
 - `/candidate/application-tracker`
 - `/api/candidate/saved-listings` (saved verified route records)
 - `/api/candidate/route-applications`
+- `/api/candidate/saved-listings` supports both route programmes and partner listings
 - `/admin/marketplace-review`
 - `/api/admin/marketplace-review`
 - `/api/partners/organisations`
@@ -36,11 +37,11 @@
 
 ## Data and safety contract
 
-The public endpoint reads existing `route_programmes` and `route_providers` records only when their RLS and query filters allow them. It does not generate sample listings. Opening a provider's source is not represented as an application submission. The organisation listing intake table defaults to pending review and client policies do not permit a submitter to publish or mark a source verified. Candidate saved listings are owner-scoped by `auth.uid()`.
+The public endpoint combines curated `route_programmes`/`route_providers` with partner `organisation_listings`. Both sources require current freshness and database RLS; partner listings additionally require an approved organisation, published status, and source-review evidence. It does not generate sample listings. Opening a provider's source is not represented as an application submission. The organisation listing intake table defaults to pending review and client policies do not permit a submitter to publish or mark a source verified. Candidate saved listings are owner-scoped by `auth.uid()`.
 
 ## Current operational status
 
-- Database migrations `0041` through `0052` applied to staging successfully.
+- Database migrations `0041` through `0055` applied to staging successfully.
 - Supabase security advisor returned no security lint findings immediately after the schema change.
 - Staging currently contains **zero verified programme records meeting the public directory rules**, and the marketplace tables contain no partner submissions or candidate trackers yet. The directory will therefore show an empty state until authorised staff add and verify real records. No fictional opportunities were inserted.
 - Partner onboarding and listing submission are connected, but reviewer role assignment and end-to-end reviewer testing remain unverified.
