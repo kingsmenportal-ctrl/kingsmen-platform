@@ -291,7 +291,7 @@ Foundation constraints remain unchanged: Phase 0 is **OPEN**, Phase 1 is **OPEN 
 
 ### Phase A.1 follow-up — candidate bridge CI source gates (17 October 2026)
 
-- Added the package command `candidate:validate:application-identity-bridge` and aggregate `candidate:validate:phase-a1-bridges` to run the candidate transaction, identity-link lifecycle/admin runtime, application identity/tracker, document ownership/metadata/request and support-ticket source validators as one suite.
+- Added the package command `candidate:validate:application-identity-bridge`, static `auth:validate:provider-boundary`, and aggregate `candidate:validate:phase-a1-bridges`. The aggregate runs web Auth provider/session guards plus candidate transaction, identity-link lifecycle/admin runtime, ownership/application reads, application identity/tracker, document ownership/vault/upload/review/metadata/request and support-ticket source validators.
 - Added the `candidate-bridge-source-guards` job to `.github/workflows/kingsmen-application-builds.yml` so these source boundaries are checked in pull-request CI alongside the existing web build and API compile/test jobs.
 - Detailed scope and acceptance criteria are recorded in `docs/launch/PR86_PHASE_A1_CANDIDATE_BRIDGE_CI_GATE_2026-10-17.md`.
 - **Status: CI guard authored; execution not yet verified on this head.** A configured workflow is not a passing workflow. No authenticated end-to-end candidate ownership isolation or live PostgreSQL/RLS integration test is claimed.
