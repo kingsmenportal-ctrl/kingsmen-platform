@@ -11,8 +11,8 @@ const [a,b,savedA,savedB,unauth]=await Promise.all([
 check("unauthenticated application request denied",unauth.status===401,"status="+unauth.status);
 check("candidate A applications scoped",a.status===200&&a.body?.ok===true,"status="+a.status);
 check("candidate B applications scoped",b.status===200&&b.body?.ok===true,"status="+b.status);
-check("candidate A saved list scoped",as.status===200&&as.body?.ok===true,"status="+as.status);
-check("candidate B saved list scoped",bs.status===200&&bs.body?.ok===true,"status="+bs.status);
+check("candidate A saved list scoped",savedA.status===200&&savedA.body?.ok===true,"status="+as.status);
+check("candidate B saved list scoped",savedB.status===200&&savedB.body?.ok===true,"status="+bs.status);
 const ids=(v,key)=>new Set(Array.isArray(v.body?.[key])?v.body[key].map(x=>x.id):[]);
 const overlap=[...ids(a,"applications")].filter(id=>ids(b,"applications").has(id));
 const savedOverlap=[...ids(as,"opportunities")].filter(id=>ids(bs,"opportunities").has(id));
