@@ -1,4 +1,5 @@
 import { createServer, type IncomingMessage, type ServerResponse } from "node:http";
+import { timingSafeEqual } from "node:crypto";
 import { URL } from "node:url";
 
 import {
@@ -444,6 +445,7 @@ async function handleHealth(response: ServerResponse): Promise<void> {
       "POST /api/candidate-auth/logout",
       "GET /api/candidate-auth/session",
       "GET /api/candidate/applications",
+      "POST /api/internal/candidate/applications",
       "GET /api/candidate/documents",
       "GET /api/candidate/document-requests",
       "GET /api/candidates/:candidateId/status",
@@ -562,6 +564,39 @@ async function handleApplicationWorkbench(request: IncomingMessage, response: Se
   sendJson(response, 200, { ok: true, application });
 }
 
+async function handleInternalCandidateApplications(request: IncomingMessage, response: ServerResponse): Promise<void> {
+  const configuredSecret = process.env.KINGSMEN_WEB_INTERNAL_API_KEY;
+  const suppliedSecret = request.headers["x-kingsmen-internal-key"];
+  const supplied = Array.isArray(suppliedSecret) ? suppliedSecret[0] : suppliedSecret;
+  if (!configuredSecret || !supplied || configuredSecret.length !== supplied.length ||
+      !timingSafeEqual(Buffer.from(configuredSecret), Buffer.from(supplied))) {
+    sendError(response, 401, "INTERNAL_SERVICE_AUTH_REQUIRED", "Internal service authorization is required.");
+    return;
+  }
+  if (!truthVault.enabled) {
+    sendError(response, 503, "DURABLE_STORAGE_DISABLED", "Candidate application storage is not ready.");
+    return;
+  }
+  const body = await readJson(request);
+  if (!body || typeof body !== "object" || Array.isArray(body) ||
+      typeof (body as { supabaseUserId?: unknown }).supabaseUserId !== "string") {
+    sendError(response, 400, "VERIFIED_USER_ID_REQUIRED", "A server-verified identity is required.");
+    return;
+  }
+  const supabaseUserId = (body as { supabaseUserId: string }).supabaseUserId;
+  if (!/^[0-9a-f]{8}-[0-9a-f]{4}-[1-8][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i.test(supabaseUserId)) {
+    sendError(response, 400, "VERIFIED_USER_ID_INVALID", "The identity format is invalid.");
+    return;
+  }
+  const applications = await truthVault.listApplicationsForVerifiedSupabaseUser(supabaseUserId);
+  if (applications === null) {
+    sendError(response, 403, "CANDIDATE_PROFILE_LINK_REQUIRED", "No verified candidate profile is linked to this account.");
+    return;
+  }
+  response.setHeader("cache-control", "private, no-store");
+  sendJson(response, 200, { ok: true, applications });
+}
+
 async function handleCandidateApplications(request: IncomingMessage, response: ServerResponse): Promise<void> {
   if (!candidateAuthRuntime || !truthVault.enabled) {
     sendError(response, 503, "CANDIDATE_AUTHORIZATION_NOT_CONFIGURED", "Candidate application access is not configured.");
@@ -647,7 +682,17 @@ export function createKingsmenApiServer() {
         return;
       }
 
-      if (pathname === "/api/candidate/applications") {
+      if (pathname === "/api/internal/candidate/applications") {
+        if (method !== "POST") {
+          response.setHeader("allow", "POST");
+          sendError(response, 405, "METHOD_NOT_ALLOWED", "Only POST is supported.");
+          return;
+        }
+        await handleInternalCandidateApplications(request, response);
+        return;
+      }
+
+async function handleCandidateApplications(request: IncomingMessage, response: ServerResponse): Promise<void> {
         if (method !== "GET") {
           response.setHeader("allow", "GET");
           sendError(response, 405, "METHOD_NOT_ALLOWED", "Only GET is supported.");
