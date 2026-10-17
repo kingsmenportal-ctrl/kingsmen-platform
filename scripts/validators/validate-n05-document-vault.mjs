@@ -52,6 +52,10 @@ includes("runtime", "requiredMimeTypes.every", "bucket MIME policy");
 
 // Completion validates stored bytes before recording the canonical document record.
 includes("complete", "verifyStoredDocumentSignature", "verify stored bytes");
+includes("complete", "STORED_FILE_SIGNATURE_REJECTED", "reject mismatched stored bytes");
+includes("complete", "method: \"DELETE\"", "attempt cleanup of rejected untrusted object");
+includes("complete", "PENDING_RECONCILIATION", "surface rejected-object cleanup failures");
+includes("complete", "metadataPersisted: false", "never persist rejected document metadata");
 includes("complete", "UPLOADED_OBJECT_NOT_FOUND", "reject completion before upload");
 includes("complete", "DOCUMENT_RECORD_NOT_CONFIRMED", "require persisted document row");
 includes("complete", "UPLOAD_COMPLETED", "audit completion");
