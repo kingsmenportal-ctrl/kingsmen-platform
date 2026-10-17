@@ -1,0 +1,39 @@
+{
+  "schema": "kingsmen.n02-n03.staging-runtime-proof.v1",
+  "result": "N02_N03_STAGING_PROOF_BLOCKED",
+  "target": "staging",
+  "productionReady": false,
+  "runtimeProofExecuted": false,
+  "restartPersistenceProven": false,
+  "workflowPersistenceProven": false,
+  "concurrentCommandDuplicateSubmissionProven": false,
+  "concurrentWorkflowDuplicateSubmissionProven": false,
+  "rollbackProven": false,
+  "checks": [
+    {
+      "check": "staging_rls_migration_applied",
+      "passed": true,
+      "evidence": "reports/api/n03-staging-rls-migration-verification-2026-10-17.json"
+    },
+    {
+      "check": "staging_policy_catalog_verified",
+      "passed": true,
+      "detail": "14 expected policies explicitly target service_role with USING/WITH CHECK true."
+    },
+    {
+      "check": "staging_api_origin_available_to_runner",
+      "passed": false
+    },
+    {
+      "check": "server_side_api_and_workflow_tokens_available_to_runner",
+      "passed": false
+    },
+    {
+      "check": "approved_staging_database_connection_available_to_runner",
+      "passed": false
+    }
+  ],
+  "message": "The runtime proof was not started because the approved staging API origin, server-side bearer tokens, and database connection values were not available in the execution environment. No secrets were written to this report.",
+  "secretsRedacted": true,
+  "generatedAtIso": "2026-10-17"
+}
