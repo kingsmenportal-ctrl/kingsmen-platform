@@ -4,6 +4,10 @@ on:
   pull_request:
     paths:
       - "apps/web/**"
+      - "apps/api/**"
+      - "packages/**"
+      - "scripts/**"
+      - "docs/constitution/**"
       - "db/migrations/**"
       - "netlify.toml"
       - ".github/workflows/web-build-and-lock.yml"
@@ -12,6 +16,10 @@ on:
       - "auth-identity-profile-batch-*"
     paths:
       - "apps/web/**"
+      - "apps/api/**"
+      - "packages/**"
+      - "scripts/**"
+      - "docs/constitution/**"
       - "db/migrations/**"
       - "netlify.toml"
       - ".github/workflows/web-build-and-lock.yml"
