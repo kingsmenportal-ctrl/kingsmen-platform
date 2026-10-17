@@ -37,9 +37,11 @@ BEGIN
   END IF;
 
   SELECT * INTO v_event FROM public.candidate_payment_events
-    WHERE idempotency_key=p_idempotency_key
-       OR (provider='PAYFAST' AND provider_event_id=p_provider_payment_id)
-    FOR UPDATE;
+    WHERE idempotency_key=p_idempotency_key FOR UPDATE;
+  IF NOT FOUND THEN
+    SELECT * INTO v_event FROM public.candidate_payment_events
+      WHERE provider='PAYFAST' AND provider_event_id=p_provider_payment_id FOR UPDATE;
+  END IF;
   IF FOUND THEN
     IF v_event.order_id IS DISTINCT FROM v_order.id
        OR v_event.candidate_id IS DISTINCT FROM v_order.candidate_id
