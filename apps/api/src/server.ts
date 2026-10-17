@@ -446,6 +446,7 @@ async function handleHealth(response: ServerResponse): Promise<void> {
       "GET /api/candidate-auth/session",
       "GET /api/candidate/applications",
       "POST /api/internal/candidate/applications",
+      "POST /api/internal/candidate/session",
       "POST /api/internal/candidate/documents",
       "POST /api/internal/candidate/document-requests",
       "POST /api/internal/candidate/support-tickets",
@@ -600,6 +601,39 @@ async function handleInternalCandidateApplications(request: IncomingMessage, res
   }
   response.setHeader("cache-control", "private, no-store");
   sendJson(response, 200, { ok: true, applications });
+}
+
+async function handleInternalCandidateSession(request: IncomingMessage, response: ServerResponse): Promise<void> {
+  const configuredSecret = process.env.KINGSMEN_WEB_INTERNAL_API_KEY;
+  const suppliedHeader = request.headers["x-kingsmen-internal-key"];
+  const suppliedSecret = Array.isArray(suppliedHeader) ? suppliedHeader[0] : suppliedHeader;
+  const expected = Buffer.from(configuredSecret ?? "");
+  const supplied = Buffer.from(suppliedSecret ?? "");
+  if (!configuredSecret || !suppliedSecret || expected.length === 0 ||
+      expected.length !== supplied.length || !timingSafeEqual(expected, supplied)) {
+    sendError(response, 401, "INTERNAL_SERVICE_AUTH_REQUIRED", "Internal service authorization is required.");
+    return;
+  }
+  if (!truthVault.enabled) {
+    sendError(response, 503, "DURABLE_STORAGE_DISABLED", "Candidate identity-link status is not ready.");
+    return;
+  }
+  const body = await readJson(request);
+  if (!body || typeof body !== "object" || Array.isArray(body) ||
+      typeof (body as { supabaseUserId?: unknown }).supabaseUserId !== "string") {
+    sendError(response, 400, "VERIFIED_USER_ID_REQUIRED", "A server-verified identity is required.");
+    return;
+  }
+  const supabaseUserId = (body as { supabaseUserId: string }).supabaseUserId;
+  if (!/^[0-9a-f]{8}-[0-9a-f]{4}-[1-8][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i.test(supabaseUserId)) {
+    sendError(response, 400, "VERIFIED_USER_ID_INVALID", "The identity format is invalid.");
+    return;
+  }
+  // Return only the linkage boolean. The internal candidate UUID never leaves the backend.
+  const candidateId = await truthVault.resolveCandidateUuidForSupabaseUser(supabaseUserId);
+  response.setHeader("cache-control", "private, no-store");
+  response.setHeader("pragma", "no-cache");
+  sendJson(response, 200, { ok: true, candidateRecordLinked: candidateId !== null });
 }
 
 async function handleInternalCandidateSupportTickets(request: IncomingMessage, response: ServerResponse): Promise<void> {
@@ -819,6 +853,16 @@ export function createKingsmenApiServer() {
           return;
         }
         await handleInternalCandidateDocuments(request, response);
+        return;
+      }
+
+      if (pathname === "/api/internal/candidate/session") {
+        if (method !== "POST") {
+          response.setHeader("allow", "POST");
+          sendError(response, 405, "METHOD_NOT_ALLOWED", "Only POST is supported.");
+          return;
+        }
+        await handleInternalCandidateSession(request, response);
         return;
       }
 
