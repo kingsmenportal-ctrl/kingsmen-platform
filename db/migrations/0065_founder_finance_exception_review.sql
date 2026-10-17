@@ -99,6 +99,7 @@ DECLARE
   v_refund public.finance_refund_requests%ROWTYPE;
   v_payment public.finance_payments%ROWTYPE;
   v_candidate_id uuid;
+  v_prior_refunds integer := 0;
   v_event_id uuid := gen_random_uuid();
   v_correlation uuid := gen_random_uuid();
   v_approval_ref text;
@@ -131,6 +132,13 @@ BEGIN
     OR v_refund.amount_cents <= 0 OR v_refund.amount_cents > v_payment.amount_gross_cents
   THEN
     RAISE EXCEPTION 'REFUND_NOT_BACKED_BY_VERIFIED_PAYMENT' USING ERRCODE = '23514';
+  END IF;
+  SELECT COALESCE(sum(amount_cents),0)::integer INTO v_prior_refunds
+    FROM public.finance_refund_requests
+    WHERE payment_ref = v_refund.payment_ref AND id <> p_refund_request_id
+      AND refund_status IN ('APPROVED','PROCESSING','COMPLETED','REFUNDED');
+  IF p_decision = 'APPROVE' AND v_prior_refunds + v_refund.amount_cents > v_payment.amount_gross_cents THEN
+    RAISE EXCEPTION 'REFUND_TOTAL_EXCEEDS_VERIFIED_PAYMENT' USING ERRCODE = '23514';
   END IF;
   IF v_payment.order_ref <> v_refund.order_ref OR v_payment.candidate_ref <> v_refund.candidate_ref THEN
     RAISE EXCEPTION 'REFUND_PAYMENT_OWNERSHIP_MISMATCH' USING ERRCODE = '23514';
