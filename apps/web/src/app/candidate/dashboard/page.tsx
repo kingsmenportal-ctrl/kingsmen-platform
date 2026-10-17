@@ -79,7 +79,7 @@ export default function CandidateDashboardPage() {
       </div>
     </section>
     <nav aria-label="Candidate tools" style={{ display: "flex", flexWrap: "wrap", gap: 16, marginTop: 24 }}>
-      <a href="/candidate/applications" style={{ color: "#f1d48b" }}>Applications & outcomes</a><a href="/candidate/saved-opportunities" style={{ color: "#f1d48b" }}>Saved opportunities</a><a href="/candidate/profile" style={{ color: "#f1d48b" }}>Candidate profile</a><a href="/candidate/documents" style={{ color: "#f1d48b" }}>Documents information</a><a href="/free-destiny-map" style={{ color: "#f1d48b" }}>Free Destiny Map</a>
+      <a href="/candidate/application-tracker" style={{ color: "#f1d48b" }}>Application tracker</a><a href="/candidate/applications" style={{ color: "#f1d48b" }}>Provider-connected outcomes</a><a href="/candidate/saved-opportunities" style={{ color: "#f1d48b" }}>Saved opportunities</a><a href="/candidate/profile" style={{ color: "#f1d48b" }}>Candidate profile</a><a href="/candidate/documents" style={{ color: "#f1d48b" }}>Documents information</a><a href="/free-destiny-map" style={{ color: "#f1d48b" }}>Free Destiny Map</a>
     </nav>
     <p data-boundary="browser-safe" style={{ borderTop: "1px solid #45424a", marginTop: 28, paddingTop: 16, fontSize: 13 }}>No service-role authority, payment confirmation, submitted application, verified outcome, or external decision is represented here. Demo/local draft data is not an authoritative candidate record.</p>
   </main>;
