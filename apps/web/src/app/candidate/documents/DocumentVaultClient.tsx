@@ -174,7 +174,7 @@ export default function DocumentVaultClient() {
 
       setMessage("Uploading file to private storage…");
       const uploadResponse = await fetch(linkResult.signedUploadUrl as string, {
-        method: "PUT",
+        method: "POST",
         headers: { "content-type": file.type || "application/octet-stream", "x-upsert": "false" },
         body: file
       });
