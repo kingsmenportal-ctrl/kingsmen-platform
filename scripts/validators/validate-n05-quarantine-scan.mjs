@@ -35,6 +35,7 @@ function notHas(key, token, label = token) {
 // Schema: durable queue, bounded retries, audit events, and service-only RLS.
 has("migration", "CREATE TABLE IF NOT EXISTS public.document_scan_jobs", "durable scan queue");
 has("migration", "max_attempts BETWEEN 1 AND 10", "bounded scan retry policy");
+has("migration", "reconciled_at timestamptz", "durable clean-result reconciliation marker");
 has("migration", "idx_document_scan_jobs_one_live_job", "one live scan job per document");
 has("migration", "'QUARANTINED'", "quarantine status");
 has("migration", "malware_scan_status IN ('PENDING', 'SCANNING', 'CLEAN', 'INFECTED', 'ERROR', 'NOT_REQUIRED')", "explicit malware states");
@@ -60,6 +61,8 @@ has("status", "downloadRequiresMalwareScanClean: true", "readiness contract disc
 
 // Worker auth, real scanner adapter, checksum verification, retry/dead-letter and release ordering.
 has("worker", "N05_SCAN_WORKER_TOKEN", "server-to-server worker authentication");
+has("worker", "authorization.match(/^Bearer\\s+(.+)$/i)", "bearer authorization whitespace parsing");
+notHas("worker", "Bearer\\\\s+", "no double-escaped bearer regex");
 has("worker", "N05_MALWARE_SCANNER_URL", "scanner endpoint must be configured");
 has("worker", "N05_MALWARE_SCANNER_TOKEN", "scanner token remains server-side");
 has("worker", "MALWARE_SCANNER_NOT_CONFIGURED", "no scanner means no job is claimed");
@@ -75,6 +78,10 @@ has("worker", "productionReady: false", "worker does not claim production readin
 
 // Reconciliation is bounded, authenticated, and never self-asserts clean status.
 has("reconcile", "STALE_SCAN_LEASE_RECOVERED", "stale worker lease recovery");
+has("reconcile", "CLEAN_RESULT_RECONCILIATION_QUERY_FAILED", "recover interrupted clean-result transitions");
+has("reconcile", "reconciled_at", "bounded clean-result reconciliation does not starve newer jobs");
+has("reconcile", "DOC-SCAN-CLEAN-", "clean release reconciliation requires durable audit evidence");
+has("reconcile", "document_status", "reconciler checks document release state");
 has("reconcile", "DOC-RECONCILE-", "missing scan job reconstruction");
 has("reconcile", "QUARANTINE_CLEANUP_COMPLETED", "infected object cleanup confirmation");
 has("reconcile", "malware_scan_attempts", "bounded retry history is respected");
