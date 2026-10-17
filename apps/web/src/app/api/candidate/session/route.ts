@@ -5,9 +5,8 @@ export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
 
 /**
- * Reports only whether the server verified the Supabase Auth session.
- * This deliberately does not claim that a candidate profile or application
- * record is linked; that requires an explicit identity mapping.
+ * Reports the server-verified Supabase session and resolves candidate linkage
+ * through the authenticated internal API. It never exposes the candidate UUID.
  */
 export async function GET() {
   const headers = { "Cache-Control": "no-store", Pragma: "no-cache" };
