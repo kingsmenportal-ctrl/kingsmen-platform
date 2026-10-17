@@ -31,7 +31,7 @@ export default function AuthForm({ mode }: { mode: "login" | "register" }) {
           return;
         }
         try {
-          const linked = await linkCandidateAccount(candidateReference);
+          const linked = await linkCandidateAccount(candidateReference, displayName);
           if (linked.linked) {
             setNotice("Signed in. Your candidate account is linked securely.");
             window.location.assign("/candidate/dashboard");
