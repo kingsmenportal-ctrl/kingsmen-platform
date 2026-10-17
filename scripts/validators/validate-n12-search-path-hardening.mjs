@@ -17,7 +17,7 @@ for (const name of functions) {
   );
   assert.match(migration, statement, "Missing pinned search_path for " + name);
 }
-assert.equal((migration.match(/ALTER\\s+FUNCTION/gi) || []).length, functions.length,
+assert.equal((migration.match(/ALTER\s+FUNCTION/gi) || []).length, functions.length,
   "Migration must alter exactly the six reviewed trigger functions");
 assert.match(migration, /pg_catalog, public, pg_temp/);
 assert.match(migration, /RLS-deny-by-default finance tables unchanged/);
