@@ -87,3 +87,15 @@ test("does not expose internal identity columns in the candidate response", asyn
   assert.equal("verifiedCandidateId" in rows[0], false);
   assert.equal("candidateId" in rows[0], false);
 });
+
+
+test("fails closed rather than silently truncating more than 500 applications", async () => {
+  const rows = Array.from({ length: 501 }, (_, index) => ({
+    ...appRow,
+    application_id: `6ba7b812-9dad-41d1-80b4-${String(index).padStart(12, "0")}`
+  }));
+  await assert.rejects(
+    listApplicationsForVerifiedAuthUser(fakeDatabase(rows), AUTH_USER_ID),
+    /CANDIDATE_APPLICATION_RESULT_LIMIT_EXCEEDED/
+  );
+});
