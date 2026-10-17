@@ -1,6 +1,6 @@
 # N08 — Candidate Outcomes & Progression
 
-N08 extends N07 with an evidence-backed outcomes ledger, candidate-visible timeline, correction/dispute requests, and a reviewer correction queue. An application or Kingsmen status alone does not prove a provider outcome.
+N08 extends N07 with an evidence-backed outcomes ledger, candidate-visible timeline, correction/dispute requests, and a reviewer correction queue. An application or Kingsmen status alone does not prove a provider outcome. Kingsmen does not guarantee admission, funding, placement, employment, or any provider decision.
 
 ## Outcome recording
 An explicitly provisioned APPLICATION_REVIEWER or PROVIDER_OPERATOR records an outcome only when the application status is compatible with the selected outcome and a matching evidence record is VERIFIED and of type PROVIDER_OUTCOME_NOTICE. The ledger retains application, candidate, opportunity, provider, evidence reference, reviewer, confirmation timestamp, summary and next step.
