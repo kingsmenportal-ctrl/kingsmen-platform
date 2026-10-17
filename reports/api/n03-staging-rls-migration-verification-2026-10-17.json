@@ -36,21 +36,6 @@
       "migrationVersion": "20261017174940"
     },
     {
-      "check": "anon_candidate_select_denied",
-      "passed": true,
-      "detail": "Role-context SELECT failed with permission denied for public.candidates; anon has no SELECT/INSERT/UPDATE table privileges."
-    },
-    {
-      "check": "authenticated_candidate_select_is_rls_filtered_without_identity",
-      "passed": true,
-      "detail": "SET ROLE authenticated returned zero visible candidate rows without an authenticated JWT identity; SELECT privilege exists, INSERT/UPDATE do not."
-    },
-    {
-      "check": "service_role_authorised_candidate_access",
-      "passed": true,
-      "detail": "SET ROLE service_role could SELECT the candidate table and has SELECT/INSERT/UPDATE table privileges; row contents were not recorded."
-    },
-    {
       "check": "production_database_modified",
       "passed": false
     },
@@ -62,6 +47,30 @@
     {
       "check": "live_api_persistence_and_restart_test",
       "passed": false
+    },
+    {
+      "check": "anon_role_boundary_checked_across_all_14_tables",
+      "passed": true,
+      "detail": "Three sensitive tables deny SELECT at the table privilege boundary; other 11 SELECTs returned zero visible rows under anon."
+    },
+    {
+      "check": "authenticated_role_boundary_checked_across_all_14_tables_without_jwt",
+      "passed": true,
+      "detail": "All 14 SELECT checks returned zero visible rows without a JWT identity; candidate_profiles UPDATE remains row-scoped by existing authenticated policy."
+    },
+    {
+      "check": "service_role_select_checked_across_all_14_tables",
+      "passed": true
+    },
+    {
+      "check": "authenticated_candidate_jwt_and_cross_candidate_isolation_test",
+      "passed": false,
+      "detail": "No real authenticated user JWT was available; candidate ownership isolation is not yet proven."
+    },
+    {
+      "check": "write_denial_tests_for_anon_and_authenticated_across_all_14_tables",
+      "passed": false,
+      "detail": "No destructive/insert attempts were made; write-denial evidence is from privileges and policy catalog only."
     }
   ],
   "limitations": [
@@ -72,22 +81,108 @@
   "verifiedAt": "2026-10-17",
   "secretsRedacted": true,
   "roleBoundaryTest": {
-    "execution": "read-only SQL role-context checks against staging",
+    "execution": "read-only SQL SET ROLE checks against staging; no row contents captured",
     "anon": {
-      "select": "denied at table privilege boundary",
-      "insert": "denied",
-      "update": "denied"
+      "selectDeniedAtPrivilegeBoundary": [
+        "candidates",
+        "candidate_profiles",
+        "applications"
+      ],
+      "selectPermittedButZeroRowsUnderRls": [
+        "idempotency_keys",
+        "command_log",
+        "workflow_runs",
+        "evidence_ledger",
+        "audit_events",
+        "source_authorities",
+        "route_sources",
+        "worker_heartbeats",
+        "dead_letter_queue",
+        "approval_requests",
+        "system_runtime_config"
+      ],
+      "insertUpdate": "no table privileges on candidates/candidate_profiles/applications; remaining tables have broad table grants but returned zero rows under SELECT and have no anon policies for protected operations; write denial was not actively attempted"
     },
     "authenticated": {
-      "select": "permitted but RLS returned zero rows without JWT identity",
-      "insert": "denied",
-      "update": "denied"
+      "selectVisibleRows": [
+        {
+          "table": "candidates",
+          "count": 0
+        },
+        {
+          "table": "candidate_profiles",
+          "count": 0
+        },
+        {
+          "table": "applications",
+          "count": 0
+        },
+        {
+          "table": "idempotency_keys",
+          "count": 0
+        },
+        {
+          "table": "command_log",
+          "count": 0
+        },
+        {
+          "table": "workflow_runs",
+          "count": 0
+        },
+        {
+          "table": "evidence_ledger",
+          "count": 0
+        },
+        {
+          "table": "audit_events",
+          "count": 0
+        },
+        {
+          "table": "source_authorities",
+          "count": 0
+        },
+        {
+          "table": "route_sources",
+          "count": 0
+        },
+        {
+          "table": "worker_heartbeats",
+          "count": 0
+        },
+        {
+          "table": "dead_letter_queue",
+          "count": 0
+        },
+        {
+          "table": "approval_requests",
+          "count": 0
+        },
+        {
+          "table": "system_runtime_config",
+          "count": 0
+        }
+      ],
+      "insertUpdate": "privilege varies by table; candidate_profiles has authenticated UPDATE privilege but row access is RLS-scoped. No JWT identity was set for these SQL role checks."
     },
     "serviceRole": {
-      "select": "permitted",
-      "insert": "permitted",
-      "update": "permitted"
+      "selectSucceededForAllTables": [
+        "candidates",
+        "candidate_profiles",
+        "applications",
+        "idempotency_keys",
+        "command_log",
+        "workflow_runs",
+        "evidence_ledger",
+        "audit_events",
+        "source_authorities",
+        "route_sources",
+        "worker_heartbeats",
+        "dead_letter_queue",
+        "approval_requests",
+        "system_runtime_config"
+      ],
+      "candidateTableInsertUpdatePrivileges": true
     },
-    "caveat": "This uses SET ROLE in SQL; it is not a Supabase REST request with real anon/authenticated JWTs and does not prove candidate-to-candidate isolation."
+    "caveat": "SQL SET ROLE checks are not Supabase REST/JWT tests, do not prove candidate-to-candidate isolation, and do not test mutation denials across all tables. The anon table grants on several tables mean the system continues to rely on RLS policies for zero-row/no-write enforcement; do not add public policies to private Truth Vault tables."
   }
 }
