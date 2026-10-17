@@ -298,3 +298,11 @@ Foundation constraints remain unchanged: Phase 0 is **OPEN**, Phase 1 is **OPEN 
 - **Status: CI guard authored; execution not yet verified on this head.** The initial run pair on commit `8b1de029d3ed08735e898d78b6acdedde1156ec5` failed before any runner started (`runner_id=0`, empty step lists, logs unavailable as `BlobNotFound`); reruns reproduced the same condition. This does not diagnose code correctness. A configured workflow is not a passing workflow. No authenticated end-to-end candidate ownership isolation or live PostgreSQL/RLS integration test is claimed.
 - Migration `0040_candidate_auth_identity_link.sql` remains unapplied. Trusted operator adapter, actual candidate Auth-to-record mapping integration, private document storage/upload/download, and authorized staging tests remain open.
 - Phase 0 API lockfile/reproducible `npm ci` remains **OPEN**. Phase 1 backup, isolated restore and migration rehearsal remain **OPEN / BLOCKED**. No deployment, migration, data/policy change, or merge was performed.
+
+
+### Auth hardening follow-up — bounded provider I/O and token storage (17 October 2026)
+
+- Supabase Auth REST calls now have an eight-second timeout. Session cookies are only written after access/refresh token lengths are validated, and tokens read from cookies are length-bounded before provider use.
+- Login, registration and refresh share the pure token-pair validator. Regression tests cover absent, partial, non-string, too-short and oversized token pairs; a static validator checks the route wiring.
+- **Verification status: source changes committed; not executed.** The latest head has no workflow runs returned. The last observed workflow attempt failed with zero job steps and no runner IDs; logs were unavailable, so the source-versus-runner cause is unresolved.
+- This does not finish the portal. Live provider configuration, identity-to-candidate mapping, trusted operator authorization, owner-scoped durable profile/application reads, private document storage, and authenticated cross-candidate isolation remain open. API lockfile/reproducible installation and Phase 1 isolated migration rehearsal remain blockers. No migration, deployment, staging data/policy change, or merge was performed.
