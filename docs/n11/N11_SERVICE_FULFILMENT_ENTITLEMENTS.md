@@ -15,7 +15,8 @@ Implementation draft on the N10 dependency branch; ordered after N10 migrations 
 - Every mutation records actor type, reason, from/to status, financial event reference where applicable, and idempotency key.
 
 ## API integration
-- Candidate `GET /api/candidate/entitlements` returns only the authenticated candidate's entitlement state and candidate-scoped event history.
+- Candidate `GET /api/candidate/entitlements` returns only the authenticated candidate's entitlement state and candidate-scoped event history; `/candidate/entitlements` renders that state.
+- Reviewer `GET /api/reviewer/entitlements` returns the restricted queue and audit history; `/reviewer/entitlements` provides hold/revoke controls with required reason codes.
 - Reviewer `POST /api/reviewer/entitlements` supports audited `HOLD` and `REVOKE`; reviewers cannot grant or reactivate entitlements.
 - The PayFast ITN route calls `n11_grant_entitlement` only after N10 has persisted the server-validated provider event. If grant processing fails after payment confirmation, the ITN remains retryable and both stages are idempotent.
 
