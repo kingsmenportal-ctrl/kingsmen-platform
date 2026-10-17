@@ -1,6 +1,6 @@
-import SaveOpportunityButton from "./save-opportunity-button";
-
 "use client";
+
+import SaveOpportunityButton from "./save-opportunity-button";
 
 import { useEffect, useMemo, useState } from "react";
 
@@ -104,7 +104,7 @@ export default function OpportunityDirectory({ initialSector = "ALL", title = "O
           <p style={{ color: "#8e97a8", fontSize: 12, margin: 0 }}>Record last updated {new Date(row.verifiedAt).toLocaleDateString("en-ZA")} · Confidence band {row.sourceConfidence}</p>
           <div style={{ display: "flex", gap: 10, flexWrap: "wrap", marginTop: 5 }}>
             <a href={row.sourceUrl} target="_blank" rel="noopener noreferrer" style={{ ...buttonStyle, textDecoration: "none" }}>Open official source ↗</a>
-            <SaveOpportunityButton listingId={row.id} />
+            <SaveOpportunityButton routeProgrammeId={row.id} />
           </div>
           <p style={{ color: "#8e97a8", fontSize: 11, margin: 0 }}>Opening the source does not submit an application. Availability and eligibility must be confirmed with the provider.</p>
         </article>)}
