@@ -11,6 +11,7 @@ Branch: `feat/phase-a1-public-destiny-auth-foundation`
 - State transition and audit insert use the same injected transaction database. Audit failure throws so the enclosing transaction can roll back.
 - Does not link by email, does not permit candidate self-assignment, checks active candidate status, records the trusted actor ID and correlation ID, and rejects malformed UUIDs.
 - Added unit tests for authorization, UUID validation, state transition predicates, audit writes, audit failure propagation, malformed candidate IDs, empty correlation IDs, and overlong revocation reasons.
+- Hardened the admin runtime to reject unsupported actions, malformed IDs, empty/oversized reason and correlation values, and oversized actor IDs before opening a database transaction; added regression tests and validator checks for these pre-transaction gates.
 - Expanded the lifecycle validator to check the non-conflicting migration filename, one-to-one Auth-user/candidate mapping, permitted statuses, backend-only RLS, and verification/revocation metadata constraints.
 - Added a source-boundary validator.
 
