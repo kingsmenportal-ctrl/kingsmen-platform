@@ -3,6 +3,7 @@
 CREATE OR REPLACE FUNCTION public.process_payfast_itn(
   p_payload jsonb,
   p_signature_valid boolean,
+  p_merchant_valid boolean,
   p_ip_valid boolean,
   p_provider_validation text,
   p_source_ip text,
@@ -28,6 +29,7 @@ DECLARE
   v_net integer := -1;
   v_amount_valid boolean := false;
   v_provider_valid boolean := COALESCE(p_provider_validation, '') = 'VALID';
+  v_merchant_valid boolean := COALESCE(p_merchant_valid, false);
   v_accepted boolean := false;
   v_duplicate boolean := false;
   v_failure_recorded boolean := false;
@@ -106,6 +108,8 @@ BEGIN
     v_rejection := 'No payment intent matches the merchant reference.';
   ELSIF COALESCE(p_signature_valid, false) IS NOT TRUE THEN
     v_rejection := 'Invalid PayFast signature.';
+  ELSIF NOT v_merchant_valid THEN
+    v_rejection := 'PayFast merchant identifier mismatch.';
   ELSIF COALESCE(p_ip_valid, false) IS NOT TRUE THEN
     v_rejection := 'PayFast source IP is not allowlisted.';
   ELSIF NOT v_provider_valid THEN
@@ -143,7 +147,7 @@ BEGIN
     v_audit_ref, v_merchant_ref,
     CASE WHEN v_accepted AND NOT v_duplicate THEN 'ACCEPTED' WHEN v_duplicate THEN 'DUPLICATE' ELSE 'REJECTED' END,
     COALESCE(p_signature_valid, false), p_canonical_hash,
-    left(concat_ws('; ', v_rejection, 'provider_validation=' || COALESCE(p_provider_validation,'UNAVAILABLE'), 'source_ip=' || COALESCE(p_source_ip,'unknown')), 2000)
+    left(concat_ws('; ', v_rejection, 'provider_validation=' || COALESCE(p_provider_validation,'UNAVAILABLE'), 'merchant_id_valid=' || v_merchant_valid::text, 'source_ip=' || COALESCE(p_source_ip,'unknown')), 2000)
   );
 
   IF v_duplicate THEN
@@ -225,5 +229,5 @@ BEGIN
 END;
 $$;
 
-REVOKE ALL ON FUNCTION public.process_payfast_itn(jsonb, boolean, boolean, text, text, text, text, text) FROM PUBLIC, anon, authenticated;
-GRANT EXECUTE ON FUNCTION public.process_payfast_itn(jsonb, boolean, boolean, text, text, text, text, text) TO service_role;
+REVOKE ALL ON FUNCTION public.process_payfast_itn(jsonb, boolean, boolean, boolean, text, text, text, text, text) FROM PUBLIC, anon, authenticated;
+GRANT EXECUTE ON FUNCTION public.process_payfast_itn(jsonb, boolean, boolean, boolean, text, text, text, text, text) TO service_role;
