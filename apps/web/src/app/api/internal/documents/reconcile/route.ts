@@ -30,6 +30,22 @@ type CleanupEvent = {
 
 type SignedUploadEvent = CleanupEvent & { created_at: string };
 
+type CleanScanJob = {
+  id: string;
+  job_ref: string;
+  document_id: string;
+  candidate_id: string;
+  storage_bucket: string;
+  storage_path: string;
+  checksum_sha256: string;
+  file_size_bytes: number | string;
+  mime_type: string;
+  scanner_provider: string | null;
+  scanner_version: string | null;
+  scanner_result: string | null;
+  completed_at: string | null;
+};
+
 function secureEqual(left: string, right: string): boolean {
   const a = Buffer.from(left);
   const b = Buffer.from(right);
@@ -49,7 +65,7 @@ async function getRows<T>(cfg: NonNullable<ReturnType<typeof getDocumentRuntimeC
 
 export async function POST(request: Request) {
   const expected = process.env.N05_SCAN_WORKER_TOKEN?.trim() || "";
-  const presented = (request.headers.get("authorization") || "").match(/^Bearer\\s+(.+)$/i)?.[1]?.trim() || "";
+  const presented = (request.headers.get("authorization") || "").match(/^Bearer\s+(.+)$/i)?.[1]?.trim() || "";
   if (expected.length < 32 || !presented || !secureEqual(expected, presented)) {
     return Response.json({ ok: false, productionReady: false, code: "SCAN_WORKER_AUTH_REQUIRED" }, { status: 401, headers: { "cache-control": "no-store" } });
   }
@@ -285,8 +301,108 @@ export async function POST(request: Request) {
     else orphanCleanupPending += 1;
   }
 
+  // Recover the interrupted CLEAN transition: the scanner result is already durable in the queue,
+  // but the audit or document READY update may have failed after the queue was marked CLEAN.
+  const cleanJobsUrl = new URL(`${cfg.url}/rest/v1/document_scan_jobs`);
+  cleanJobsUrl.searchParams.set("select", "id,job_ref,document_id,candidate_id,storage_bucket,storage_path,checksum_sha256,file_size_bytes,mime_type,scanner_provider,scanner_version,scanner_result,completed_at");
+  cleanJobsUrl.searchParams.set("status", "eq.CLEAN");
+  cleanJobsUrl.searchParams.set("scanner_result", "eq.CLEAN");
+  cleanJobsUrl.searchParams.set("completed_at", "not.is.null");
+  cleanJobsUrl.searchParams.set("order", "completed_at.asc");
+  cleanJobsUrl.searchParams.set("limit", "100");
+  const cleanJobs = await getRows<CleanScanJob>(cfg, `/rest/v1/document_scan_jobs?${cleanJobsUrl.searchParams.toString()}`);
+  if (!cleanJobs) return Response.json({ ok: false, productionReady: false, code: "CLEAN_RESULT_RECONCILIATION_QUERY_FAILED" }, { status: 502, headers: { "cache-control": "no-store" } });
+
+  let cleanResultsInspected = 0;
+  let cleanDocumentsReleased = 0;
+  let cleanReleaseErrors = 0;
+  for (const job of cleanJobs) {
+    if (!job.checksum_sha256 || !job.completed_at || !job.scanner_provider) {
+      cleanReleaseErrors += 1;
+      continue;
+    }
+    const safeJobRef = job.job_ref.replace(/[^a-zA-Z0-9_-]/g, "_");
+    const cleanEventRef = `DOC-SCAN-CLEAN-${safeJobRef}`;
+    const auditUrl = new URL(`${cfg.url}/rest/v1/document_storage_events`);
+    auditUrl.searchParams.set("select", "id");
+    auditUrl.searchParams.set("event_ref", `eq.${cleanEventRef}`);
+    auditUrl.searchParams.set("status", "eq.OK");
+    auditUrl.searchParams.set("limit", "1");
+    const auditRows = await getRows<{ id: string }>(cfg, `/rest/v1/document_storage_events?${auditUrl.searchParams.toString()}`);
+    if (!auditRows) {
+      cleanReleaseErrors += 1;
+      continue;
+    }
+    if (!auditRows.length) {
+      const auditWrite = await supabaseAdminFetch(cfg, "/rest/v1/document_storage_events?on_conflict=event_ref", {
+        method: "POST",
+        headers: { "content-type": "application/json", Prefer: "resolution=ignore-duplicates,return=minimal" },
+        body: JSON.stringify({
+          document_id: job.document_id,
+          event_ref: cleanEventRef,
+          event_type: "MALWARE_SCAN_CLEAN",
+          storage_provider: "SUPABASE",
+          storage_bucket: job.storage_bucket,
+          storage_path: job.storage_path,
+          file_size_bytes: Number(job.file_size_bytes),
+          checksum_sha256: job.checksum_sha256,
+          status: "OK",
+          message: "Reconciler recovered the persisted CLEAN scan result; checksum and queue state were verified.",
+          metadata: { jobRef: job.job_ref, provider: job.scanner_provider, version: job.scanner_version || "unspecified", recovered: true }
+        })
+      });
+      if (!auditWrite.ok) {
+        cleanReleaseErrors += 1;
+        continue;
+      }
+    }
+
+    const releaseUrl = new URL(`${cfg.url}/rest/v1/document_files`);
+    releaseUrl.searchParams.set("id", `eq.${job.document_id}`);
+    releaseUrl.searchParams.set("checksum_sha256", `eq.${job.checksum_sha256}`);
+    releaseUrl.searchParams.set("document_status", "eq.QUARANTINED");
+    releaseUrl.searchParams.set("malware_scan_status", "in.(PENDING,ERROR,SCANNING)");
+    const release = await supabaseAdminFetch(cfg, `/rest/v1/document_files?${releaseUrl.searchParams.toString()}`, {
+      method: "PATCH",
+      headers: { "content-type": "application/json", Prefer: "return=representation" },
+      body: JSON.stringify({
+        malware_scan_status: "CLEAN",
+        malware_scanned_at: job.completed_at,
+        malware_scanner_provider: job.scanner_provider,
+        malware_scanner_version: job.scanner_version || "unspecified",
+        document_status: "READY",
+        malware_scan_last_error: null,
+        malware_scan_next_attempt_at: null,
+        updated_at: now.toISOString()
+      })
+    });
+    const released = release.ok ? await release.json().catch(() => []) as unknown[] : [];
+    if (Array.isArray(released) && released.length === 1) {
+      cleanDocumentsReleased += 1;
+      cleanResultsInspected += 1;
+      continue;
+    }
+    if (!release.ok) {
+      cleanReleaseErrors += 1;
+      continue;
+    }
+
+    // A concurrent worker may already have released this exact checksum. Treat only that exact
+    // persisted state as success; all other no-row updates remain an error for operator review.
+    const currentUrl = new URL(`${cfg.url}/rest/v1/document_files`);
+    currentUrl.searchParams.set("select", "id");
+    currentUrl.searchParams.set("id", `eq.${job.document_id}`);
+    currentUrl.searchParams.set("checksum_sha256", `eq.${job.checksum_sha256}`);
+    currentUrl.searchParams.set("document_status", "eq.READY");
+    currentUrl.searchParams.set("malware_scan_status", "eq.CLEAN");
+    currentUrl.searchParams.set("limit", "1");
+    const currentRows = await getRows<{ id: string }>(cfg, `/rest/v1/document_files?${currentUrl.searchParams.toString()}`);
+    if (currentRows?.length) cleanResultsInspected += 1;
+    else cleanReleaseErrors += 1;
+  }
+
   return Response.json({
-    ok: reconciliationErrors === 0 && cleanupPending === 0 && orphanCleanupPending === 0,
+    ok: reconciliationErrors === 0 && cleanupPending === 0 && orphanCleanupPending === 0 && cleanReleaseErrors === 0,
     productionReady: false,
     recoveredStaleLeases: Array.isArray(recoveredLeases) ? recoveredLeases.length : 0,
     inspectedQuarantinedDocuments: documents.length,
@@ -300,6 +416,9 @@ export async function POST(request: Request) {
     orphanUploadEventsChecked: orphanChecked,
     orphanObjectsDeleted: orphanDeleted,
     orphanCleanupPending,
+    cleanResultsInspected,
+    cleanDocumentsReleased,
+    cleanReleaseErrors,
     note: "Reconciliation never marks a document CLEAN. A configured scanner must return CLEAN before the scan worker can release it."
-  }, { status: reconciliationErrors || cleanupPending || orphanCleanupPending ? 207 : 200, headers: { "cache-control": "no-store" } });
+  }, { status: reconciliationErrors || cleanupPending || orphanCleanupPending || cleanReleaseErrors ? 207 : 200, headers: { "cache-control": "no-store" } });
 }
