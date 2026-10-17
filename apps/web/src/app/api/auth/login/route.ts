@@ -3,7 +3,6 @@ import { isSameOriginRequest } from "@/lib/auth/csrf";
 import { readAuthJson } from "@/lib/auth/request-body";
 import { authUnavailable, setAuthCookies, supabaseAuth } from "@/lib/auth/supabase-rest";
 import { hasValidAuthTokenPair } from "@/lib/auth/token-bounds";
-import { hasValidAuthTokenPair } from "@/lib/auth/token-bounds";
 
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
