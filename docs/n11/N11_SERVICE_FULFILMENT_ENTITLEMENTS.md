@@ -1,7 +1,7 @@
 # N11 — Service Fulfilment & Entitlement Management
 
 ## Status
-Draft implementation on the N10 dependency branch. Do not apply to staging or activate service until N10's Actions, authenticated staging and PayFast sandbox gates are green.
+Implementation draft on the N10 dependency branch; ordered after N10 migrations 0067–0070. Not approved for staging activation. Do not apply to staging or activate service until N10's Actions, authenticated staging and PayFast sandbox gates are green.
 
 ## Invariants
 - Creating an order does not create an ACTIVE entitlement.
