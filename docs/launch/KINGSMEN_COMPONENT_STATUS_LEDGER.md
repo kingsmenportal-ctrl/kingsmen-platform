@@ -279,3 +279,11 @@ Foundation constraints remain unchanged: Phase 0 is **OPEN**, Phase 1 is **OPEN 
 - Source and test commits: `fdcf92d64f4ee1127807a4d57eb4532ca0b9329b` and `36002258d55bf6a8db12e6a0910f12b36486f7ff`. CI must pass on the resulting PR head before these changes are considered verified.
 - This is a fail-closed freshness rule, not proof that an external source was checked, a deadline is accurate, or an opportunity is actually open. Durable source observations and candidate-facing workflow verification remain outstanding.
 - Phase 0 API lockfile/reproducible `npm ci` remains **OPEN**. Phase 1 backup, isolated restore and migration rehearsal remains **OPEN / BLOCKED**. No migrations, secret changes, deployments or merges were made.
+
+
+### PayFast ITN payload minimisation — 17 October 2026
+
+- Updated `apps/api/src/finance/payfast-itn-route.ts` to pass the received callback fields through `redactPayFastSecrets` before serializing the payload into the durable ITN receipt record. This prevents unexpected `merchant_key` or `passphrase` fields from being persisted in the raw JSON payload.
+- The separately stored signature remains part of the existing receipt contract; this change is narrowly about credential-like fields in the JSON payload, not a claim that all payment data is minimised or that retention policy is complete.
+- Commit: `6a4703ffd9c1d01456cb51132c6b7d88467268d1`. Verification for this commit is pending; do not infer passing tests from prior successful workflow runs.
+- No live payment, provider configuration, database migration, deployment, or merge was performed. PayFast live readiness remains **NOT APPROVED**; sandbox proof remains synthetic source-level evidence only. Phase 0 API lockfile/clean `npm ci` remains **OPEN**; Phase 1 backup, isolated restore, and migration rehearsal remains **OPEN / BLOCKED**.
