@@ -86,7 +86,7 @@ export async function POST(request: Request) {
   };
   const signature = signatureFor(fields, passphrase);
   const signedPayload = { ...fields, signature };
-  const idempotencyKey = `candidate:${auth.session.userId}:${clientKey}`;
+  const idempotencyKey = `candidate:${auth.session.userId}:${createHash("sha256").update(clientKey).digest("hex")}`;
 
   const rpc = await supabaseAdminFetch(auth.config, "/rest/v1/rpc/create_payfast_payment_intent", {
     method: "POST",
