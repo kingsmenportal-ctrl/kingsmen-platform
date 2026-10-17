@@ -400,9 +400,9 @@ export class TruthVaultRepository {
       );
       const linked = await client.query<{ candidate_id: string }>(
         `select ca.candidate_id::text
-           from public.candidate_accounts ca
+           from public.candidate_auth_identity_links ca
            join public.candidates c on c.id=ca.candidate_id and c.is_active=true
-          where ca.auth_user_id=$1::uuid
+          where ca.supabase_user_id=$1::uuid and ca.link_status='VERIFIED'
           limit 1`,
         [supabaseUserId]
       );
@@ -462,10 +462,10 @@ export class TruthVaultRepository {
         `select d.document_ref, d.document_type, d.display_name, d.mime_type,
                 d.file_size_bytes::text, d.document_status, d.verification_status,
                 d.extraction_status, d.uploaded_at::text
-           from public.candidate_accounts ca
+           from public.candidate_auth_identity_links ca
            join public.candidates c on c.id = ca.candidate_id and c.is_active = true
            join public.document_files d on d.candidate_id = c.id
-          where ca.auth_user_id = $1::uuid
+          where ca.supabase_user_id = $1::uuid and ca.link_status = 'VERIFIED'
             and d.archived_at is null
             and d.document_status <> 'DELETED'
           order by d.uploaded_at desc, d.id asc
@@ -475,7 +475,7 @@ export class TruthVaultRepository {
       // No matching account means the identity is not linked. An empty array
       // with a matching account means the candidate has no visible documents.
       const linked = await client.query<{ linked: boolean }>(
-        "select exists(select 1 from public.candidate_accounts ca join public.candidates c on c.id=ca.candidate_id and c.is_active=true where ca.auth_user_id=$1::uuid) as linked",
+        "select exists(select 1 from public.candidate_auth_identity_links ca join public.candidates c on c.id=ca.candidate_id and c.is_active=true where ca.supabase_user_id=$1::uuid and ca.link_status='VERIFIED') as linked",
         [supabaseUserId]
       );
       await client.query("COMMIT");
@@ -507,9 +507,9 @@ export class TruthVaultRepository {
       );
       const result = await client.query<{ candidate_id: string }>(
         `select ca.candidate_id::text
-           from public.candidate_accounts ca
+           from public.candidate_auth_identity_links ca
            join public.candidates c on c.id=ca.candidate_id and c.is_active=true
-          where ca.auth_user_id=$1::uuid
+          where ca.supabase_user_id=$1::uuid and ca.link_status='VERIFIED'
           limit 1`,
         [supabaseUserId]
       );
@@ -840,9 +840,9 @@ export class TruthVaultRepository {
       );
       const linked = await client.query<{ candidate_id: string }>(
         `select ca.candidate_id::text
-           from public.candidate_accounts ca
+           from public.candidate_auth_identity_links ca
            join public.candidates c on c.id = ca.candidate_id and c.is_active = true
-          where ca.auth_user_id = $1::uuid
+          where ca.supabase_user_id = $1::uuid and ca.link_status = 'VERIFIED'
           limit 1`,
         [supabaseUserId]
       );
@@ -891,9 +891,9 @@ export class TruthVaultRepository {
       );
       const linked = await client.query<{ candidate_id: string }>(
         `select ca.candidate_id::text
-           from public.candidate_accounts ca
+           from public.candidate_auth_identity_links ca
            join public.candidates c on c.id = ca.candidate_id and c.is_active = true
-          where ca.auth_user_id = $1::uuid
+          where ca.supabase_user_id = $1::uuid and ca.link_status = 'VERIFIED'
           limit 1`,
         [supabaseUserId]
       );
