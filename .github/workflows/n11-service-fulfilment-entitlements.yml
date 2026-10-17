@@ -4,6 +4,9 @@ on:
     paths:
       - 'db/migrations/0066_n11_service_fulfilment_entitlements.sql'
       - 'scripts/validators/validate-n11-entitlements.mjs'
+      - 'apps/web/src/app/api/candidate/entitlements/**'
+      - 'apps/web/src/app/api/reviewer/entitlements/**'
+      - 'apps/web/src/app/api/webhooks/payfast/**'
       - 'scripts/tests/n11-entitlements-contract.mjs'
       - 'docs/n11/**'
       - 'package.json'
@@ -14,6 +17,9 @@ on:
     paths:
       - 'db/migrations/0066_n11_service_fulfilment_entitlements.sql'
       - 'scripts/validators/validate-n11-entitlements.mjs'
+      - 'apps/web/src/app/api/candidate/entitlements/**'
+      - 'apps/web/src/app/api/reviewer/entitlements/**'
+      - 'apps/web/src/app/api/webhooks/payfast/**'
       - 'scripts/tests/n11-entitlements-contract.mjs'
       - 'docs/n11/**'
       - 'package.json'
