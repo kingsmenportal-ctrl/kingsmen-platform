@@ -1,6 +1,6 @@
 "use client";
 
-import { useCallback, useEffect, useState, type FormEvent } from "react";
+import { useCallback, useEffect, useState, type FormEvent } from "react";\nimport { getKingsmenSession } from "../../../../lib/supabase-browser-auth";
 
 type DocumentRow = {
   id: string;
@@ -95,7 +95,7 @@ export default function DocumentVaultClient() {
   }, []);
 
   const refresh = useCallback(async () => {
-    const token = accessToken || getStoredAccessToken();
+    const session = await getKingsmenSession();\n    const token = session?.access_token || accessToken;
     if (!token) {
       setMessage("No signed-in Supabase session was found in this browser. Sign in before opening private documents.");
       return;
@@ -123,7 +123,7 @@ export default function DocumentVaultClient() {
   }, [accessToken, refresh]);
 
   async function openDocument(documentId: string) {
-    const token = accessToken || getStoredAccessToken();
+    const session = await getKingsmenSession();\n    const token = session?.access_token || accessToken;
     if (!token) {
       setMessage("No signed-in session was found. Sign in before reading private documents.");
       return;
@@ -147,7 +147,7 @@ export default function DocumentVaultClient() {
 
   async function uploadDocument(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
-    const token = accessToken || getStoredAccessToken();
+    const session = await getKingsmenSession();\n    const token = session?.access_token || accessToken;
     if (!token) {
       setMessage("No signed-in session was found. Sign in before uploading private documents.");
       return;
