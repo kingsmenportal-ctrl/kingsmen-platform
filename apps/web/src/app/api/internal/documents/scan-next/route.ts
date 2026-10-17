@@ -230,7 +230,7 @@ export async function POST(request: Request) {
       metadata: { jobRef: job.job_ref, provider, version, scannerSignaturePresent: Boolean(result.signature) }
     });
     if (!eventOk) return jsonError(502, "SCAN_RESULT_AUDIT_FAILED", "The clean scan result is persisted but its audit event failed; the document remains quarantined until reconciliation.");
-    const docUpdate = await supabaseAdminFetch(cfg, `/rest/v1/document_files?id=eq.${job.document_id}&malware_scan_status=eq.PENDING`, {
+    const docUpdate = await supabaseAdminFetch(cfg, `/rest/v1/document_files?id=eq.${job.document_id}&malware_scan_status=in.(PENDING,ERROR,SCANNING)`, {
       method: "PATCH",
       headers: { "content-type": "application/json", Prefer: "return=minimal" },
       body: JSON.stringify({ malware_scan_status: "CLEAN", malware_scanned_at: scannedAt, malware_scanner_provider: provider, malware_scanner_version: version, document_status: "READY", updated_at: scannedAt, malware_scan_last_error: null, malware_scan_next_attempt_at: null })
