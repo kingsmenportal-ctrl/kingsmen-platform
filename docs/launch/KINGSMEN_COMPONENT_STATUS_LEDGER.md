@@ -270,3 +270,12 @@ Foundation constraints remain unchanged: Phase 0 is **OPEN**, Phase 1 is **OPEN 
 - Expanded synthetic policy tests to assert the safe default and explicit urgent opt-in behavior. This is channel-selection policy only: no provider is connected, no message delivery is claimed, and quiet-hours enforcement/durable preference storage remain separate integration requirements.
 - Source/test commits: `ca4d25a8cbce77d5c07658d4fd66ffb9f26a9be2` and `370abbf9e48915caf9ed1bf751acf0c5b14bd579`. CI must run against the resulting PR head before treating the tests as verified.
 - Phase 0 API lockfile/clean `npm ci` remains **OPEN**. Phase 1 backup, isolated restore and migration rehearsal remains **OPEN / BLOCKED**. No migrations, secret changes, deployments or merges were made.
+
+
+### Opportunities follow-up — missing freshness deadlines fail closed (17 October 2026)
+
+- Updated `apps/api/src/opportunity/opportunity-engine.ts`: an observation without an explicit `staleAfter` deadline is now considered stale instead of implicitly fresh. This closes a source-freshness gap where missing expiry metadata could otherwise leave an opportunity looking current.
+- Added a synthetic regression test for observations with no freshness deadline. Existing invalid-timestamp tests remain in place.
+- Source and test commits: `fdcf92d64f4ee1127807a4d57eb4532ca0b9329b` and `36002258d55bf6a8db12e6a0910f12b36486f7ff`. CI must pass on the resulting PR head before these changes are considered verified.
+- This is a fail-closed freshness rule, not proof that an external source was checked, a deadline is accurate, or an opportunity is actually open. Durable source observations and candidate-facing workflow verification remain outstanding.
+- Phase 0 API lockfile/reproducible `npm ci` remains **OPEN**. Phase 1 backup, isolated restore and migration rehearsal remains **OPEN / BLOCKED**. No migrations, secret changes, deployments or merges were made.
