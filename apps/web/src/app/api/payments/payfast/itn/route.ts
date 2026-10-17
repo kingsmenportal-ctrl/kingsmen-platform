@@ -6,13 +6,17 @@ export const dynamic = "force-dynamic";
 const noStore = { "cache-control": "no-store", pragma: "no-cache" };
 const json = (body: Record<string, unknown>, status = 200) => Response.json(body, { status, headers: noStore });
 
+function payFastEncode(value: string) {
+  return encodeURIComponent(value).replace(/[!'()*~]/g, char => '%' + char.charCodeAt(0).toString(16).toUpperCase()).replace(/%20/g, '+');
+}
+
 function canonicalPayFast(params: URLSearchParams, passphrase: string) {
   const entries: string[] = [];
   for (const [key, raw] of params.entries()) {
     if (["signature", "passphrase"].includes(key) || raw === "") continue;
-    entries.push(`${key}=${encodeURIComponent(raw.trim()).replace(/%20/g, "+")}`);
+    entries.push(`${key}=${payFastEncode(raw.trim())}`);
   }
-  if (passphrase) entries.push(`passphrase=${encodeURIComponent(passphrase.trim()).replace(/%20/g, "+")}`);
+  if (passphrase) entries.push(`passphrase=${payFastEncode(passphrase.trim())}`);
   return entries.join("&");
 }
 
