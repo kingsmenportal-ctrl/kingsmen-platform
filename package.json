@@ -82,7 +82,8 @@
     "final:collect:evidence": "pwsh -NoProfile -File scripts/staging/Collect-KingsmenFinalAssemblyEvidence.ps1",
     "candidate:validate:ownership-integrity": "node scripts/validators/validate-candidate-ownership-and-application-integrity.mjs",
     "candidate:validate:application-read": "node scripts/validators/validate-candidate-application-read-boundary.mjs",
-    "candidate:validate:transaction": "node scripts/validators/validate-candidate-backend-transaction.mjs"
+    "candidate:validate:transaction": "node scripts/validators/validate-candidate-backend-transaction.mjs",
+    "candidate:validate:identity-link-lifecycle": "node scripts/validators/validate-candidate-identity-link-lifecycle.mjs"
   },
   "repository": {
     "type": "git",
