@@ -3,7 +3,7 @@
 -- An authorised reviewer resolves the candidate and creates the verified identity link.
 CREATE TABLE IF NOT EXISTS public.candidate_identity_link_requests (
   id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
-  auth_user_id uuid NOT NULL,
+  auth_user_id uuid NOT NULL REFERENCES auth.users(id) ON DELETE CASCADE,
   verified_email text NOT NULL,
   candidate_reference text,
   status text NOT NULL DEFAULT 'PENDING',
