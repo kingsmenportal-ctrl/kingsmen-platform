@@ -1,3 +1,5 @@
+import { randomUUID } from "node:crypto";
+
 export type MapFallbackReasonCode =
   | "OTP_REQUIRED"
   | "CAPTCHA_BLOCKED"
@@ -34,9 +36,22 @@ export function buildManualApplicationPackage(input: ManualApplicationPackageInp
   if (!input.applicationId) throw new Error("applicationId is required.");
   if (!input.candidateId) throw new Error("candidateId is required.");
   if (!input.reasonSummary || input.reasonSummary.trim().length < 5) throw new Error("reasonSummary is required.");
+  if (!Array.isArray(input.sourceLinks) || input.sourceLinks.length === 0) {
+    throw new Error("At least one independently verified official HTTPS source link is required.");
+  }
+  for (const value of input.sourceLinks) {
+    let source: URL;
+    try { source = new URL(value); } catch { throw new Error("Every MAP source link must be a valid HTTPS URL."); }
+    if (source.protocol !== "https:" || source.username || source.password) {
+      throw new Error("Every MAP source link must be an HTTPS URL without embedded credentials.");
+    }
+  }
+  if (!Array.isArray(input.requiredDocuments) || input.requiredDocuments.some((value) => typeof value !== "string" || !value.trim())) {
+    throw new Error("requiredDocuments must contain only non-empty document labels; do not invent missing requirements.");
+  }
 
   return {
-    mapRef: `map_${Date.now()}_${Math.random().toString(36).slice(2, 10)}`,
+    mapRef: `map_${randomUUID()}`,
     applicationId: input.applicationId,
     candidateId: input.candidateId,
     reasonCode: input.reasonCode,
