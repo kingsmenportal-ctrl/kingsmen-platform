@@ -50,9 +50,9 @@ CREATE INDEX IF NOT EXISTS idx_n11_entitlement_events_candidate
 ALTER TABLE public.candidate_entitlements ENABLE ROW LEVEL SECURITY;
 ALTER TABLE public.candidate_entitlement_events ENABLE ROW LEVEL SECURITY;
 REVOKE ALL PRIVILEGES ON TABLE public.candidate_entitlements, public.candidate_entitlement_events
-  FROM PUBLIC, anon, authenticated;
-GRANT SELECT, INSERT, UPDATE ON TABLE public.candidate_entitlements TO service_role;
-GRANT SELECT, INSERT ON TABLE public.candidate_entitlement_events TO service_role;
+  FROM PUBLIC, anon, authenticated, service_role;
+-- All mutations go through the audited SECURITY DEFINER transition functions below.
+GRANT SELECT ON TABLE public.candidate_entitlements, public.candidate_entitlement_events TO service_role;
 
 CREATE OR REPLACE FUNCTION public.n11_prevent_entitlement_event_mutation()
 RETURNS trigger LANGUAGE plpgsql AS $$
