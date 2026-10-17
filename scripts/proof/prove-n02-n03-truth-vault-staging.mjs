@@ -1,7 +1,8 @@
 #!/usr/bin/env node
 import { randomUUID } from "node:crypto";
 import { createRequire } from "node:module";
-import { resolve } from "node:path";
+import { mkdirSync, writeFileSync } from "node:fs";
+import { dirname, join, resolve } from "node:path";
 
 const target = process.env.KINGSMEN_TRUTH_VAULT_PROOF_TARGET;
 const acknowledgement = process.env.KINGSMEN_TRUTH_VAULT_PROOF_ACK;
@@ -9,6 +10,12 @@ const apiBase = process.env.KINGSMEN_API_BASE_URL;
 const apiServiceToken = process.env.KINGSMEN_API_SERVICE_TOKEN;
 const workflowServiceToken = process.env.KINGSMEN_WORKFLOW_SERVICE_TOKEN;
 const databaseUrl = process.env.KINGSMEN_DATABASE_URL ?? process.env.DATABASE_URL;
+
+function writeRedactedReport(report) {
+  const reportPath = join(process.cwd(), "reports/api/n02-n03-staging-runtime-proof-latest.json");
+  mkdirSync(dirname(reportPath), { recursive: true });
+  writeFileSync(reportPath, JSON.stringify(report, null, 2) + "\n");
+}
 
 function fail(message) {
   console.error(JSON.stringify({ result: "N02_N03_STAGING_PROOF_BLOCKED", productionReady: false, message }, null, 2));
@@ -235,16 +242,20 @@ try {
     rollbackProven: false,
     note: "This run proves live command/workflow persistence and concurrent workflow duplicate handling when all checks pass. Process restart, command duplicate races, and controlled late-failure rollback still require separate staging checks.",
     generatedAtIso: new Date().toISOString(),
+    preRestartStartedAtIso: health.body?.startedAtIso ?? null,
     correlationId,
     syntheticCandidateRef: candidateId,
     commandId,
+    workflowRunId,
+    applicationId,
     checks,
     failures
   };
+  writeRedactedReport(report);
   console.log(JSON.stringify(report, null, 2));
   if (failures.length) process.exitCode = 1;
 } catch (error) {
-  console.error(JSON.stringify({
+  const report = {
     schema: "kingsmen.n02-n03.staging-runtime-proof.v1",
     result: "N02_N03_STAGING_PROOF_FAILED",
     target: "staging",
@@ -252,8 +263,11 @@ try {
     correlationId,
     syntheticCandidateRef: candidateId,
     error: error instanceof Error ? error.message : String(error),
-    checks
-  }, null, 2));
+    checks,
+    secretsRedacted: true
+  };
+  writeRedactedReport(report);
+  console.error(JSON.stringify(report, null, 2));
   process.exitCode = 1;
 } finally {
   await pool.end().catch(() => undefined);
