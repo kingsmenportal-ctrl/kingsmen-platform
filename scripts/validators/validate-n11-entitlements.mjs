@@ -11,7 +11,7 @@ for(const needle of [
  "REVOKE ALL ON FUNCTION public.n11_grant_entitlement",
  "GRANT EXECUTE ON FUNCTION public.n11_grant_entitlement"
 ]) assert.ok(sql.includes(needle),"N11 migration missing safety contract: "+needle);
-assert.match(sql,/UNIQUE \(order_id\)/);
+assert.match(sql,/order_id uuid NOT NULL UNIQUE/);
 assert.match(sql,/grant_idempotency_key text NOT NULL UNIQUE/);
 assert.match(sql,/idempotency_key text NOT NULL UNIQUE/);
 assert.match(sql,/status <> 'ACTIVE' OR \(financial_event_id IS NOT NULL AND granted_at IS NOT NULL\)/);
