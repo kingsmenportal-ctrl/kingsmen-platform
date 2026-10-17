@@ -30,9 +30,9 @@ const report = {
   productionReady: false,
   tablesChecked: tables.length,
   runtimeRlsProofExecuted: false,
-  migrationApplied: false,
+  migrationApplied: "not_checked_by_source_validator",
   failures,
-  nextAction: "Review and apply the migration through the approved staging migration process, then test anonymous/authenticated denial and service-role access."
+  nextAction: "Confirm the live migration record, then run role-context tests for anon, authenticated, and server-side service_role access."
 };
 const reportPath = join(root, "reports/api/n03-rls-hardening-source-validation-latest.json");
 mkdirSync(dirname(reportPath), { recursive: true });
