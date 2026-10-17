@@ -25,6 +25,11 @@ export default function AuthForm({ mode }: { mode: "login" | "register" }) {
       const session = data as unknown as KingsmenSession;
       if (session.access_token && session.user?.id) {
         storeKingsmenSession(session);
+        if (accountType === "partner") {
+          setNotice("Signed in. Continue organisation onboarding and listing submission; verification is required before publication.");
+          window.location.assign("/partner");
+          return;
+        }
         try {
           const linked = await linkCandidateAccount(candidateReference);
           if (linked.linked) {
