@@ -1,4 +1,4 @@
-import { requirePortalUser, supabaseUserFetch } from "../../../../../lib/supabase-user-runtime";
+import { requirePortalUser, supabaseUserFetch } from "../../../../lib/supabase-user-runtime";
 
 const json = (body: Record<string, unknown>, status = 200) =>
   Response.json(body, { status, headers: { "cache-control": "private, no-store", pragma: "no-cache" } });
