@@ -34,7 +34,7 @@ export default function RegisterPage() {
           <label style={{ display:"grid", gap:7 }}>Email address<input name="email" type="email" autoComplete="email" required style={fieldStyle}/></label>
           <label style={{ display:"grid", gap:7 }}>Password (12+ characters)<input name="password" type="password" autoComplete="new-password" minLength={12} required style={fieldStyle}/></label>
           <label style={{ display:"grid", gap:7 }}>Confirm password<input name="confirmPassword" type="password" autoComplete="new-password" minLength={12} required style={fieldStyle}/></label>
-          <label style={{ display:"flex", alignItems:"flex-start", gap:10, color:"#c2c7d2", fontSize:13, lineHeight:1.5 }}><input name="consent" type="checkbox" required style={{ marginTop:3 }}/>I have read the privacy notice and understand that account creation does not verify my identity or guarantee any outcome.</label>
+          <label style={{ display:"flex", alignItems:"flex-start", gap:10, color:"#c2c7d2", fontSize:13, lineHeight:1.5 }}><input name="consent" type="checkbox" required style={{ marginTop:3 }}/>I have read the <a href="/privacy" target="_blank" rel="noreferrer" style={{ color:"#d8b66a" }}>privacy notice</a> and understand that account creation does not verify my identity or guarantee any outcome.</label>
           <button disabled={busy} type="submit" style={{ padding:14, border:0, borderRadius:12, background:"#d8b66a", color:"#080b14", fontWeight:900 }}>{busy ? "Creating account…" : "Create account"}</button>
         </form>
         {message && <p role="status" aria-live="polite" style={{ marginTop:16, color:"#f1d99a", lineHeight:1.6 }}>{message}</p>}
