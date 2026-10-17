@@ -1,5 +1,5 @@
 import { randomUUID } from "node:crypto";
-import { requireCandidateSession, supabaseAdminFetch } from "../../../../../lib/candidate-document-runtime";
+import { requireCandidateSession, supabaseAdminFetch } from "../../../../lib/candidate-document-runtime";
 const PATHWAYS=["HIGHER_EDUCATION","TVET","SETA_LEARNERSHIP","INTERNSHIP","APPRENTICESHIP","EMPLOYMENT"];
 const fail=(status:number,code:string,error:string)=>Response.json({ok:false,productionReady:false,code,error},{status,headers:{"cache-control":"no-store","x-content-type-options":"nosniff"}});
 const ref=(prefix:string)=>prefix+"-"+randomUUID();
