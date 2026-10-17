@@ -87,12 +87,27 @@ export async function POST(request: Request) {
 
   const signature = await verifyStoredDocumentSignature(auth.config, storagePath, mimeType, sizeBytes);
   if (!signature.ok) {
+    // The upload is still an untrusted private object. Remove only the exact
+    // server-derived candidate/upload path; never accept metadata for rejected bytes.
+    const encodedRejectedPath = storagePath.split("/").map(encodeURIComponent).join("/");
+    let cleanupStatus: "DELETED" | "PENDING_RECONCILIATION" = "PENDING_RECONCILIATION";
+    try {
+      const cleanupResponse = await supabaseAdminFetch(
+        auth.config,
+        `/storage/v1/object/${encodeURIComponent(auth.config.documentsBucket)}/${encodedRejectedPath}`,
+        { method: "DELETE" }
+      );
+      if (cleanupResponse.ok || cleanupResponse.status === 404) cleanupStatus = "DELETED";
+    } catch {
+      // Keep the failure explicit; the private object needs operational reconciliation.
+    }
     return Response.json({
       ok: false,
       code: "STORED_FILE_SIGNATURE_REJECTED",
       error: signature.reason,
       metadataPersisted: false,
-      privateObjectCleanup: "PENDING_RECONCILIATION"
+      privateObjectCleanup: cleanupStatus,
+      retryable: cleanupStatus !== "DELETED"
     }, { status: 415 });
   }
 
