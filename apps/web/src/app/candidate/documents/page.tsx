@@ -1,6 +1,7 @@
 "use client";
 import { useCallback, useEffect, useState } from "react";
-type DocumentStatus = { ok?: boolean; status?: string; code?: string; error?: string; message?: string };
+type CandidateDocument = { documentRef: string; documentType: string; displayName: string; mimeType: string; fileSizeBytes: number; documentStatus: string; verificationStatus: string; extractionStatus: string; uploadedAt: string };
+type DocumentStatus = { ok?: boolean; status?: string; code?: string; error?: string; message?: string; documents?: CandidateDocument[] };
 type ViewState = { kind: "loading" } | { kind: "blocked"; message: string; code?: string } | { kind: "error" } | { kind: "ready"; data: DocumentStatus };
 const stages = [
  { status: "Not started", meaning: "No upload or document record has been created in this view." },
@@ -34,7 +35,7 @@ export default function CandidateDocumentsPage() {
    {view.kind === "loading" && <p role="status">Checking whether secure document status is available…</p>}
    {view.kind === "blocked" && <><p><strong>Secure document status is currently unavailable.</strong></p><p>{view.message}</p>{view.code && <p style={{ fontSize: 13, opacity: .8 }}>Reference: {view.code}</p>}<p>No personal document information has been returned. Upload, download, signed-link access, and document review remain unavailable until authenticated ownership and storage integration are enabled.</p><button type="button" onClick={() => void refreshStatus()} style={buttonStyle}>Check again</button></>}
    {view.kind === "error" && <><p><strong>Could not contact the document status service.</strong></p><p>No document data is shown. Please try again later.</p><button type="button" onClick={() => void refreshStatus()} style={buttonStyle}>Retry</button></>}
-   {view.kind === "ready" && <><p role="status">The status endpoint responded successfully.</p><p>{typeof view.data.message === "string" ? view.data.message : "This response does not include document records."}</p><p>Document records will only be shown when the endpoint returns owner-authorised metadata.</p></>}
+   {view.kind === "ready" && <><p role="status">Secure document metadata loaded.</p>{(view.data.documents ?? []).length === 0 ? <p>No active document records were found for this account.</p> : <div style={{ overflowX: "auto" }}><table style={{ width: "100%", borderCollapse: "collapse", textAlign: "left" }}><thead><tr>{["Document","Type","Status","Verification","Extraction","Size","Uploaded"].map(label => <th key={label} scope="col" style={{ padding: 10, borderBottom: "1px solid #45424a" }}>{label}</th>)}</tr></thead><tbody>{(view.data.documents ?? []).map(doc => <tr key={doc.documentRef}><td style={cell}>{doc.displayName}</td><td style={cell}>{doc.documentType}</td><td style={cell}>{doc.documentStatus}</td><td style={cell}>{doc.verificationStatus}</td><td style={cell}>{doc.extractionStatus}</td><td style={cell}>{formatBytes(doc.fileSizeBytes)}</td><td style={cell}>{formatDate(doc.uploadedAt)}</td></tr>)}</tbody></table></div>}<p>These are metadata-only records. This screen does not expose file contents or download links, and automated extraction is not document approval.</p><button type="button" onClick={() => void refreshStatus()} style={buttonStyle}>Refresh documents</button></>}
   </section>
   <section aria-label="Document handling boundaries" style={{ display: "grid", gap: 12 }}>
    <article style={panel}><h2>Private storage boundary</h2><p>Files must remain private and access-controlled per authenticated candidate. Public file URLs are not appropriate for identity or application documents.</p></article>
@@ -46,3 +47,15 @@ export default function CandidateDocumentsPage() {
 }
 const panel = { border: "1px solid #45424a", borderRadius: 12, padding: 18 };
 const buttonStyle = { background: "#f1d48b", color: "#080b14", border: 0, borderRadius: 8, padding: "10px 14px", fontWeight: 700, cursor: "pointer" };
+
+const cell = { padding: 10, borderBottom: "1px solid #45424a", verticalAlign: "top" as const };
+function formatBytes(value: number): string {
+ if (!Number.isFinite(value) || value < 0) return "—";
+ if (value < 1024) return `${value} B`;
+ if (value < 1024 * 1024) return `${(value / 1024).toFixed(1)} KB`;
+ return `${(value / (1024 * 1024)).toFixed(1)} MB`;
+}
+function formatDate(value: string): string {
+ const date = new Date(value);
+ return Number.isNaN(date.getTime()) ? "—" : date.toLocaleDateString();
+}
