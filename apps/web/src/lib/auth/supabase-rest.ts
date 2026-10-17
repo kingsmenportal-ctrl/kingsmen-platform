@@ -36,7 +36,8 @@ export async function supabaseAuth(path: string, body?: unknown, accessToken?: s
       ...(accessToken ? { Authorization: `Bearer ${accessToken}` } : {})
     },
     ...(body === undefined ? {} : { body: JSON.stringify(body) }),
-    cache: "no-store"
+    cache: "no-store",
+    signal: AbortSignal.timeout(8_000)
   });
   const payload = await response.json().catch(() => ({}));
   return { response, payload };
@@ -47,8 +48,16 @@ function cookieOptions(maxAge: number) {
 }
 
 export async function setAuthCookies(accessToken: string, refreshToken: string, expiresIn?: number) {
+  if (typeof accessToken !== "string" || accessToken.length < 16 || accessToken.length > 16_384) {
+    throw new Error("AUTH_ACCESS_TOKEN_INVALID");
+  }
+  if (typeof refreshToken !== "string" || refreshToken.length < 16 || refreshToken.length > 4_096) {
+    throw new Error("AUTH_REFRESH_TOKEN_INVALID");
+  }
+  const requestedLifetime = Number(expiresIn);
+  const lifetime = Number.isFinite(requestedLifetime) && requestedLifetime > 0 ? requestedLifetime : 3600;
   const jar = await cookies();
-  jar.set(ACCESS_COOKIE, accessToken, cookieOptions(Math.max(60, Math.min(Number(expiresIn || 3600), 86400))));
+  jar.set(ACCESS_COOKIE, accessToken, cookieOptions(Math.max(60, Math.min(lifetime, 86_400))));
   jar.set(REFRESH_COOKIE, refreshToken, cookieOptions(60 * 60 * 24 * 30));
 }
 
@@ -63,7 +72,7 @@ export async function getVerifiedAuthUser() {
   if (!cfg) return null;
   const jar = await cookies();
   const access = jar.get(ACCESS_COOKIE)?.value;
-  if (!access) return null;
+  if (!access || access.length < 16 || access.length > 16_384) return null;
   // Supabase Auth validates the access token server-side; never trust decoded client claims.
   const { response, payload } = await supabaseAuth("user", undefined, access);
   if (!response.ok || !payload || typeof payload.id !== "string") return null;
@@ -72,5 +81,10 @@ export async function getVerifiedAuthUser() {
 
 export async function getSessionTokens() {
   const jar = await cookies();
-  return { accessToken: jar.get(ACCESS_COOKIE)?.value || null, refreshToken: jar.get(REFRESH_COOKIE)?.value || null };
+  const access = jar.get(ACCESS_COOKIE)?.value || null;
+  const refresh = jar.get(REFRESH_COOKIE)?.value || null;
+  return {
+    accessToken: access && access.length >= 16 && access.length <= 16_384 ? access : null,
+    refreshToken: refresh && refresh.length >= 16 && refresh.length <= 4_096 ? refresh : null
+  };
 }
