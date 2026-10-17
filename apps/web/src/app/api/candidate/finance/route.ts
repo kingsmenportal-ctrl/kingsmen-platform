@@ -34,3 +34,25 @@ export async function GET(request: Request) {
     return json({ ok: false, code: "FINANCE_QUERY_FAILED", error: "Finance records could not be loaded from the connected ledger tables. Check schema and server configuration." }, 502);
   }
 }
+
+
+export async function POST(request: Request) {
+  const auth = await requireCandidateSession(request);
+  if (!auth.ok) return json({ ok: false, code: auth.code, error: auth.message }, auth.status);
+  const body = await request.json().catch(() => null) as { paymentRef?: unknown; amountCents?: unknown; reason?: unknown } | null;
+  const paymentRef = typeof body?.paymentRef === "string" ? body.paymentRef.trim() : "";
+  const amountCents = Number(body?.amountCents);
+  const reason = typeof body?.reason === "string" ? body.reason.trim() : "";
+  if (!paymentRef || paymentRef.length > 100 || !Number.isSafeInteger(amountCents) || amountCents <= 0 || reason.length < 10 || reason.length > 1000) {
+    return json({ ok: false, code: "INVALID_REFUND_REQUEST", error: "Choose a verified payment, enter a positive amount in cents, and provide a 10–1,000 character reason." }, 400);
+  }
+  const response = await supabaseAdminFetch(auth.config, "/rest/v1/rpc/request_candidate_refund", {
+    method: "POST", headers: { "content-type": "application/json" },
+    body: JSON.stringify({ p_auth_user_id: auth.session.userId, p_candidate_id: auth.session.candidateId, p_payment_ref: paymentRef, p_amount_cents: amountCents, p_reason: reason })
+  }).catch(() => null);
+  if (!response) return json({ ok: false, code: "REFUND_REQUEST_UNAVAILABLE", error: "Refund request service could not be reached." }, 503);
+  if (!response.ok) return json({ ok: false, code: "REFUND_REQUEST_REJECTED", error: "Refund request was rejected. Only a verified completed PayFast payment with available refundable balance can be used." }, 409);
+  const result = await response.json().catch(() => null);
+  if (!result || result.ok !== true) return json({ ok: false, code: "REFUND_REQUEST_UNCONFIRMED", error: "The database did not confirm the refund request." }, 502);
+  return json(result, 201);
+}
