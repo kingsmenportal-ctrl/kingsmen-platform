@@ -80,15 +80,14 @@ export async function POST(request: Request) {
   const fieldName = typeof input.fieldName === "string" ? input.fieldName.trim() : "";
   const requestedValue = typeof input.requestedValue === "string" ? input.requestedValue.trim() : "";
   const reason = typeof input.reason === "string" ? input.reason.trim() : "";
-  const sourceEvidenceRef = typeof input.sourceEvidenceRef === "string" ? input.sourceEvidenceRef.trim().slice(0, 200) : "";
   if (!PROFILE_FIELDS.includes(fieldName as ProfileField)) return jsonError(400, "FIELD_NOT_ALLOWED", "Choose a supported profile field.");
   if (!requestedValue || requestedValue.length > 2000) return jsonError(400, "INVALID_VALUE", "The proposed value must be between 1 and 2,000 characters.");
   if (!reason || reason.length < 8 || reason.length > 1000) return jsonError(400, "REASON_REQUIRED", "Explain the correction in 8 to 1,000 characters.");
 
   const legalIdentity = fieldName === "idNumber" || fieldName === "legalName";
-  const sensitive = legalIdentity || ["dateOfBirth", "bankAccount", "bankName", "academicResults", "highestGrade", "qualificationSummary"].includes(fieldName);
+  const sensitive = legalIdentity || ["email", "phone", "dateOfBirth", "bankAccount", "bankName", "academicResults", "highestGrade", "qualificationSummary"].includes(fieldName);
   const sensitivity = legalIdentity ? "LEGAL_IDENTITY" : sensitive ? (["bankAccount", "bankName"].includes(fieldName) ? "FINANCE" : ["academicResults", "highestGrade", "qualificationSummary"].includes(fieldName) ? "ACADEMIC" : "SENSITIVE") : "NORMAL";
-  const evidenceRef = sourceEvidenceRef || `candidate-correction:${randomUUID()}`;
+  const evidenceRef = `candidate-correction:${randomUUID()}`;
   const audited = await audit(auth.config, auth.session.candidateId, auth.session.userId, "CORRECTION_REQUEST", "candidate_profile_change_request", evidenceRef);
   if (!audited) return jsonError(503, "PROFILE_AUDIT_UNAVAILABLE", "Privacy access evidence could not be recorded. The correction was not submitted.");
 
