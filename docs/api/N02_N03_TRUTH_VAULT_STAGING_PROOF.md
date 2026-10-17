@@ -38,7 +38,7 @@ The script refuses to run without the target and acknowledgement variables, chec
 
 ## Remaining gates
 
-- This script does not restart the deployed process, so it does not by itself prove survival across a process restart.
+- After a successful persistence proof, restart the staging API through its actual hosting provider, then run `npm run api:prove:truth-vault:restart` to prove persistence across process restart.
 - Complete real Supabase REST/JWT tests: authenticated user with no candidate binding, own-candidate access, and cross-candidate denial. SQL `SET ROLE` checks are recorded but do not prove user JWT ownership boundaries.
 - Run the expanded staging proof for workflow-result persistence, command/workflow concurrent duplicate races and audit integrity; separately run a controlled late-failure rollback test and process restart/re-read.
 - API review found command, workflow-result, Jarvis runtime-control, and read-model routes had no request authentication. This branch now requires a server-side bearer token for business routes (`KINGSMEN_API_SERVICE_TOKEN`) and a separate token for workflow results (`KINGSMEN_WORKFLOW_SERVICE_TOKEN`); keep both server-only and do not put them in browser code. Candidate-specific user auth/ownership is not implemented by these service tokens, so these endpoints remain backend-service-only.
