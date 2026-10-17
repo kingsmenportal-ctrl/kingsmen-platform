@@ -35,8 +35,9 @@ function unavailable(message: string, status = 503) {
 
 export async function GET(request: Request) {
   const base = process.env.SUPABASE_URL ?? process.env.KINGSMEN_SUPABASE_URL;
-  const key = process.env.SUPABASE_PUBLISHABLE_KEY ?? process.env.NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY;
-  if (!base || !key) {
+  const apiKey = process.env.SUPABASE_PUBLISHABLE_KEY ?? process.env.NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY;
+  const anonToken = process.env.SUPABASE_ANON_KEY;
+  if (!base || !apiKey || !anonToken) {
     return unavailable("The verified opportunity data connection is not configured. No sample opportunities are shown as real.");
   }
 
@@ -64,7 +65,7 @@ export async function GET(request: Request) {
 
   try {
     const response = await fetch(query, {
-      headers: { apikey: key, Authorization: "Bearer " + key, Accept: "application/json" },
+      headers: { apikey: apiKey, Authorization: "Bearer " + anonToken, Accept: "application/json" },
       cache: "no-store",
       signal: AbortSignal.timeout(8000)
     });
