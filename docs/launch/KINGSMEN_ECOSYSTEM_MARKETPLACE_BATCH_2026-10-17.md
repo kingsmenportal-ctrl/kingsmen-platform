@@ -13,6 +13,7 @@
 - Added indexes for marketplace foreign keys and consolidated listing-read policies.
 - Configured Netlify staging with the Supabase project URL, publishable key and public anon JWT. No service-role key is used by the public opportunity route.
 - Added a shared strict HTTPS URL validator for public provider links, partner website/source/application URLs, and reviewer evidence. It rejects non-HTTPS schemes, malformed URLs, embedded credentials, local-only hostnames and oversized values.
+- Added migration `0057_marketplace_https_url_constraints.sql`; Supabase staging accepted it successfully. Database constraints now reject non-HTTPS, malformed, credential-shaped and local-only public URLs even if a future client bypasses the current web validators.
 - Added regression tests and a static integration validator, wired into the web CI workflow before the production build. CI must still run against the latest PR head before this is considered verified.
 
 ## Routes
@@ -43,7 +44,7 @@ The public endpoint combines curated `route_programmes`/`route_providers` with p
 
 ## Current operational status
 
-- Database migrations `0041` through `0056` applied to staging successfully, including the review-event audit migration.
+- Database migrations `0041` through `0057` applied to staging successfully, including review-event audit and database-enforced HTTPS URL constraints.
 - Supabase security advisor returned no security lint findings immediately after the schema change.
 - Staging currently contains **zero verified programme records meeting the public directory rules**, and the marketplace tables contain no partner submissions or candidate trackers yet. The directory will therefore show an empty state until authorised staff add and verify real records. No fictional opportunities were inserted.
 - Partner onboarding and listing submission are connected, but reviewer role assignment and end-to-end reviewer testing remain unverified.
