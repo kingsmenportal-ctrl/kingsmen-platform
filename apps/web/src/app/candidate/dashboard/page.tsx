@@ -16,7 +16,8 @@ const dailyActions = [
   ["Outcomes", "/candidate/outcomes", "Review persisted proof-backed outcomes and evidence."],
   ["Documents", "/candidate/documents", "Review your document checklist and status."],
   ["Finance", "/candidate/finance", "Review invoices and payment information."],
-  ["Messages", "/candidate/messages", "Check portal communications."]
+  ["Messages", "/candidate/messages", "Check portal communications."],
+  ["Manual Application Packages", "/candidate/map-packages", "Request a safe, evidence-reviewed manual hand-off when portal automation is blocked."]
 ] as const;
 
 export default function CandidateDashboardPage() {
@@ -32,7 +33,8 @@ export default function CandidateDashboardPage() {
           <article key={code} data-gate={code} style={{ border: "1px solid #454545", borderRadius: 12, padding: 16 }}>
             <h2>{label}</h2>
             <p>{description}</p>
-            <p style={{ fontSize: 13, color: "#a8a8a8" }}>Route discovery is shown only when backed by verified route records.</p>
+            <p style={{ fontSize: 13, color: "#a8a8a8" }}>Route discovery is shown only when backed by verified route records. Category is not an eligibility decision.</p>
+            <p><Link href="/candidate/discover#pathway-filters">Explore this pathway</Link></p>
           </article>
         ))}
       </section>
