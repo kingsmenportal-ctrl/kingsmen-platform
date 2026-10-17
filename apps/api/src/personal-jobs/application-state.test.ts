@@ -49,3 +49,31 @@ test("closure from active states requires a documented closure note", () => {
     kind: "candidate_closure_note", reference: "candidate-request-1", recordedBy: "candidate", recordedAt: "2026-10-17T04:00:00.000Z"
   } }).allowed, true);
 });
+
+
+test("rejects evidence that is unrelated to the requested lifecycle outcome", () => {
+  assert.deepEqual(decideApplicationTransition({
+    from: "preparation",
+    to: "ready_for_manual_submission",
+    evidence: candidateReceipt
+  }), { allowed: false, code: "EVIDENCE_MISMATCH" });
+
+  assert.deepEqual(decideApplicationTransition({
+    from: "submitted_verified",
+    to: "interview",
+    evidence: { ...employerInterview, kind: "employer_offer" }
+  }), { allowed: false, code: "EVIDENCE_MISMATCH" });
+});
+
+test("rejects unsupported evidence actors when closing an application", () => {
+  assert.deepEqual(decideApplicationTransition({
+    from: "preparation",
+    to: "closed",
+    evidence: {
+      kind: "candidate_closure_note",
+      reference: "operator-free-text",
+      recordedBy: "employer",
+      recordedAt: "2026-10-17T04:00:00.000Z"
+    }
+  }), { allowed: false, code: "EVIDENCE_MISMATCH" });
+});
