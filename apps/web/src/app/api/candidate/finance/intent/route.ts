@@ -1,5 +1,5 @@
 import { randomUUID, createHash } from "node:crypto";
-import { requireCandidateSession, supabaseAdminFetch } from "../../../../../../lib/candidate-document-runtime";
+import { requireCandidateSession, supabaseAdminFetch } from "../../../../../lib/candidate-document-runtime";
 
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
