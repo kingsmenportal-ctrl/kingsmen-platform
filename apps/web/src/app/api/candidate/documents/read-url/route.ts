@@ -1,4 +1,4 @@
-import { requireCandidateSession, supabaseAdminFetch } from "../../../../../lib/candidate-document-runtime";
+import { requireCandidateSession, supabaseAdminFetch, verifyPrivateDocumentsBucket } from "../../../../../lib/candidate-document-runtime";
 
 type StoredDocument = {
   id: string;
@@ -53,6 +53,10 @@ export async function POST(request: Request) {
   }
   if (document.storage_bucket !== auth.config.documentsBucket) {
     return Response.json({ ok: false, code: "DOCUMENT_BUCKET_MISMATCH", error: "The document is not in the configured private candidate bucket." }, { status: 409 });
+  }
+
+  if (!(await verifyPrivateDocumentsBucket(auth.config))) {
+    return Response.json({ ok: false, code: "DOCUMENT_BUCKET_NOT_PRIVATE", error: "The configured document bucket must exist and be private before downloads are enabled." }, { status: 503 });
   }
 
   const encodedPath = document.storage_path.split("/").map(encodeURIComponent).join("/");
