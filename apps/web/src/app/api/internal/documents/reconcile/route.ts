@@ -338,7 +338,7 @@ export async function POST(request: Request) {
     if (!auditRows.length) {
       const auditWrite = await supabaseAdminFetch(cfg, "/rest/v1/document_storage_events?on_conflict=event_ref", {
         method: "POST",
-        headers: { "content-type": "application/json", Prefer: "resolution=ignore-duplicates,return=minimal" },
+        headers: { "content-type": "application/json", Prefer: "resolution=merge-duplicates,return=minimal" },
         body: JSON.stringify({
           document_id: job.document_id,
           event_ref: cleanEventRef,
