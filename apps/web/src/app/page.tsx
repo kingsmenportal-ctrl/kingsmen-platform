@@ -49,6 +49,15 @@ export default function HomePage() {
       <div><h2 style={{ marginTop:0, fontSize:22 }}>Free guidance</h2><p style={{ color:"#bfc5d0", lineHeight:1.7 }}>A browser-based readiness preview with practical actions. No account, payment or personal contact details required.</p></div>
       <div><h2 style={{ marginTop:0, fontSize:22 }}>Managed support</h2><p style={{ color:"#bfc5d0", lineHeight:1.7 }}>Separate services may offer deeper planning or execution support. Scope and availability must be confirmed before any service is purchased.</p><a href="/pricing" style={{ color:"#f0d38b", fontWeight:800 }}>Review packages →</a></div>
     </section>
-    <footer style={{ padding:"22px 24px 32px", textAlign:"center", color:"#8e95a4", fontSize:12, lineHeight:1.8 }}>Kingsmen Portal · Make informed decisions and verify official requirements directly.<br/>Kingsmen guidance is not an official decision-maker and does not guarantee outcomes.</footer>
+    <footer style={{ padding:"22px 24px 32px", textAlign:"center", color:"#8e95a4", fontSize:12, lineHeight:1.8 }}>
+      Kingsmen Portal · Make informed decisions and verify official requirements directly.<br/>
+      Kingsmen guidance is not an official decision-maker and does not guarantee outcomes.
+      <nav aria-label="Footer navigation" style={{ display:"flex", justifyContent:"center", flexWrap:"wrap", gap:18, marginTop:14 }}>
+        <a href="/pricing" style={{ color:"#f0d38b" }}>Packages</a>
+        <a href="/privacy" style={{ color:"#f0d38b" }}>Privacy notice</a>
+        <a href="/auth/login" style={{ color:"#f0d38b" }}>Sign in</a>
+        <a href="/auth/register" style={{ color:"#f0d38b" }}>Create account</a>
+      </nav>
+    </footer>
   </main>;
 }
