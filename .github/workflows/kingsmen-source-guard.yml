@@ -29,6 +29,9 @@ jobs:
       - name: API Truth Vault persistence validator
         run: npm run api:validate:truth-vault
 
+      - name: API container and lockfile contract validator
+        run: npm run api:container:validate
+
       - name: Safe web/backend boundary validator
         run: npm run web:validate:backend-boundary
 
