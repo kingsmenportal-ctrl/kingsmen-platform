@@ -4,6 +4,8 @@ const sql=fs.readFileSync("db/migrations/0071_n11_service_fulfilment_entitlement
 const webhook=fs.readFileSync("apps/web/src/app/api/webhooks/payfast/route.ts","utf8");
 const candidateApi=fs.readFileSync("apps/web/src/app/api/candidate/entitlements/route.ts","utf8");
 const reviewerApi=fs.readFileSync("apps/web/src/app/api/reviewer/entitlements/route.ts","utf8");
+const candidatePage=fs.readFileSync("apps/web/src/app/candidate/entitlements/page.tsx","utf8");
+const reviewerPage=fs.readFileSync("apps/web/src/app/reviewer/entitlements/page.tsx","utf8");
 const n10=fs.readFileSync("db/migrations/0064_n10_packages_payments_refunds.sql","utf8");
 assert.match(sql,/v_order\.status <> 'PAID'/);
 assert.match(sql,/v_payment\.event_type <> 'PAYMENT_CONFIRMED'/);
@@ -24,4 +26,8 @@ assert.match(sql,/n11-full-refund-revoke:/);
 assert.match(sql,/grant_idempotency_key=p_idempotency_key/);
 assert.match(sql,/REVOKE ALL ON FUNCTION public\.n11_grant_entitlement/);
 assert.match(n10,/UNIQUE\(candidate_id,idempotency_key\)/);
+assert.match(candidatePage,/My services & entitlements/);
+assert.match(reviewerPage,/Service fulfilment review/);
+assert.match(reviewerApi,/export async function GET/);
+assert.doesNotMatch(reviewerApi,/n11_grant_entitlement/);
 console.log("N11 contract tests passed: an order or manual evidence cannot activate entitlement; grants require matching server-validated PayFast confirmation; hold/revoke events are audited.");
