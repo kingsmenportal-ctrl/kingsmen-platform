@@ -8,6 +8,7 @@ type Row = Record<string, unknown> & { id: string };
 type Plan = Row & { plan_code: string; plan_name: string; description: string; amount_cents: number; currency: string; service_scope?: string; catalogue_version?: string };
 type FinanceData = { items: Row[]; orders: Row[]; invoices: Row[]; payments: Row[]; refunds: Row[]; ledger: Row[]; plans: Plan[] };
 const panel: React.CSSProperties = { marginTop: 24, padding: 16, border: "1px solid #39445e", borderRadius: 12 };
+const fieldStyle: React.CSSProperties = { width: "100%", boxSizing: "border-box", padding: 11, borderRadius: 8, border: "1px solid #39445e", background: "#0f172a", color: "#fff" };
 const money = (cents: unknown, currency: unknown) => new Intl.NumberFormat("en-ZA", { style: "currency", currency: typeof currency === "string" && currency ? currency : "ZAR" }).format((Number(cents) || 0) / 100);
 const str = (row: Row, key: string, fallback = "—") => typeof row[key] === "string" && row[key] ? String(row[key]) : fallback;
 
