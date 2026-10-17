@@ -1,0 +1,52 @@
+name: N12 Database Search-Path Hardening
+on:
+  pull_request:
+    paths:
+      - 'db/migrations/0072_n12_function_search_path_hardening.sql'
+      - 'scripts/validators/validate-n12-search-path-hardening.mjs'
+      - 'docs/n12/**'
+      - 'package.json'
+      - '.github/workflows/n12-database-search-path-hardening.yml'
+  push:
+    branches:
+      - 'n12-search-path-hardening-2026-10-17'
+    paths:
+      - 'db/migrations/0072_n12_function_search_path_hardening.sql'
+      - 'scripts/validators/validate-n12-search-path-hardening.mjs'
+      - 'docs/n12/**'
+      - 'package.json'
+      - '.github/workflows/n12-database-search-path-hardening.yml'
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  n12-search-path-contract:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - name: Checkout exact commit
+        uses: actions/checkout@v4
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - name: Validate migration and retain output
+        shell: bash
+        run: |
+          set +e
+          mkdir -p n12-ci-logs
+          node --version > n12-ci-logs/runtime.txt 2>&1
+          node --check scripts/validators/validate-n12-search-path-hardening.mjs 2>&1 | tee n12-ci-logs/syntax.log
+          syntax_code=${PIPESTATUS[0]}
+          node scripts/validators/validate-n12-search-path-hardening.mjs 2>&1 | tee n12-ci-logs/validate.log
+          validate_code=${PIPESTATUS[0]}
+          printf 'syntax_exit_code=%s\\nvalidator_exit_code=%s\\n' "$syntax_code" "$validate_code" > n12-ci-logs/exit-codes.txt
+          test "$syntax_code" -eq 0 && test "$validate_code" -eq 0
+      - name: Upload N12 diagnostics
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: n12-search-path-ci-diagnostics
+          path: n12-ci-logs/
+          if-no-files-found: warn
+          retention-days: 14
