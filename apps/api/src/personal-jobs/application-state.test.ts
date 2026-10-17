@@ -47,5 +47,5 @@ test("closure from active states requires a documented closure note", () => {
   assert.deepEqual(decideApplicationTransition({ from: "preparation", to: "closed" }), { allowed: false, code: "EVIDENCE_REQUIRED" });
   assert.equal(decideApplicationTransition({ from: "preparation", to: "closed", evidence: {
     kind: "candidate_closure_note", reference: "candidate-request-1", recordedBy: "candidate", recordedAt: "2026-10-17T04:00:00.000Z"
-  }).allowed, true);
+  } }).allowed, true);
 });
