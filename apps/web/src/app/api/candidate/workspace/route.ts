@@ -23,7 +23,7 @@ export async function GET(request: Request) {
         `select=completed_tasks,priority_pathway,revision,updated_at&candidate_id=eq.${encodeURIComponent(candidateId)}&limit=1`
       ),
       truthVaultRequest<Array<{ id: string; title: string; organisation: string; official_url: string; pathway: string; closing_date: string | null; created_at: string }>>(
-        "candidate_saved_opportunities",
+        "candidate_workspace_saved_opportunities",
         `select=id,title,organisation,official_url,pathway,closing_date,created_at&candidate_id=eq.${encodeURIComponent(candidateId)}&order=created_at.desc&limit=100`
       )
     ]);
@@ -77,7 +77,7 @@ export async function POST(request: Request) {
       return NextResponse.json({ ok: false, error: "Opportunity details are invalid." }, { status: 400 });
     }
     const rows = await truthVaultRequest<Array<{ id: string; candidate_id: string; title: string; organisation: string; official_url: string; pathway: string; closing_date: string | null; created_at: string }>>(
-      "candidate_saved_opportunities",
+      "candidate_workspace_saved_opportunities",
       "on_conflict=candidate_id,official_url",
       "POST",
       { candidate_id: candidateId, title, organisation, official_url: url.toString(), pathway, closing_date: closingDate || null, updated_at: new Date().toISOString() }
@@ -96,7 +96,7 @@ export async function DELETE(request: Request) {
       return NextResponse.json({ ok: false, error: "A valid saved opportunity ID is required." }, { status: 400 });
     }
     const rows = await truthVaultRequest<Array<{ id: string }>>(
-      "candidate_saved_opportunities",
+      "candidate_workspace_saved_opportunities",
       `id=eq.${encodeURIComponent(id)}&candidate_id=eq.${encodeURIComponent(candidateId)}&select=id`,
       "DELETE"
     );
