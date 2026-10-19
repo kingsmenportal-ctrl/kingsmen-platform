@@ -144,6 +144,12 @@ export default function CandidateDashboardPage() {
         <a href="/candidate/identity-review" style={{ display: "inline-block", padding: ".7rem .95rem", borderRadius: 9, background: "#23466d", color: "#fff", textDecoration: "none", fontWeight: 700 }}>Request identity review</a>
       </section>
 
+      <section aria-labelledby="application-tracker-link-title" style={{ marginTop: "1.5rem", padding: "1.1rem", border: "1px solid #cbdcf4", borderRadius: 12, background: "#edf5ff" }}>
+        <h2 id="application-tracker-link-title" style={{ marginTop: 0 }}>Track your applications</h2>
+        <p style={{ lineHeight: 1.6 }}>Keep candidate-owned progress, evidence references, follow-ups and status history for saved opportunities. A submission status is recorded as candidate-reported and is not an official institution confirmation.</p>
+        <a href="/candidate/applications" style={{ display: "inline-block", padding: ".7rem .95rem", borderRadius: 9, background: "#23466d", color: "#fff", textDecoration: "none", fontWeight: 700 }}>Open application tracker</a>
+      </section>
+
       <section aria-labelledby="safety-title" style={{ marginTop: "1.75rem", padding: "1rem 1.1rem", borderLeft: "4px solid #b7791f", background: "#fff8e8" }}>
         <h2 id="safety-title" style={{ marginTop: 0 }}>Important status and safety rules</h2>
         <ul style={{ lineHeight: 1.7, paddingLeft: "1.25rem", marginBottom: 0 }}>

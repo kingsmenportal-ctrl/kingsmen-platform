@@ -1,0 +1,35 @@
+name: Candidate Application Tracker Build
+on:
+  pull_request:
+    paths:
+      - "db/migrations/0077_candidate_application_tracker.sql"
+      - "db/migrations/0078_candidate_application_preparation_readiness.sql"
+      - "apps/web/src/app/api/candidate/applications/**"
+      - "apps/web/src/app/candidate/applications/**"
+      - "apps/web/src/lib/candidate-workspace-client.ts"
+      - "scripts/validators/validate-candidate-application-tracker.mjs"
+      - "scripts/tests/test-candidate-application-tracker-api.mjs"
+      - ".github/workflows/candidate-application-tracker-build.yml"
+  push:
+    branches: ["feat/candidate-application-tracker"]
+    paths:
+      - "db/migrations/0077_candidate_application_tracker.sql"
+      - "apps/web/src/app/api/candidate/applications/**"
+      - "apps/web/src/app/candidate/applications/**"
+      - "apps/web/src/lib/candidate-workspace-client.ts"
+      - "scripts/validators/validate-candidate-application-tracker.mjs"
+      - ".github/workflows/candidate-application-tracker-build.yml"
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+      - run: npm ci
+      - run: node scripts/validators/validate-candidate-application-tracker.mjs
+      - run: npm --prefix apps/web install --no-audit --no-fund
+      - run: npm --prefix apps/web run build
+      - run: node scripts/tests/test-candidate-application-tracker-api.mjs
