@@ -58,7 +58,7 @@ for (const [path, tokens] of requiredTokens.entries()) {
   }
 
   const scanText = path === 'scripts/validators/validate-kingsmen-launch-readiness.mjs'
-    ? text.split('\\n').filter((line) => !(line.trim().startsWith('/') && line.trim().endsWith('/i,'))).join('\\n')
+    ? text.split('\n').filter((line) => !(line.trim().startsWith('/') && line.trim().endsWith('/i,'))).join('\n')
     : text;
 
   for (const pattern of forbiddenSecretPatterns) {
