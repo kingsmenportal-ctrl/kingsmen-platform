@@ -20,7 +20,7 @@ for (const token of [
   'authenticated_can_select=false',
   'service_role_can_select=true',
   'policy_count=0',
-  'not prove reviewer identity authorization',
+  'does not prove reviewer identity authorization',
   'separate release gates'
 ]) {
   if (!doc.toLowerCase().includes(token.toLowerCase())) failures.push({ issue: 'missing documented proof contract', token });
