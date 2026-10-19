@@ -1,0 +1,85 @@
+(() => {
+  "use strict";
+  const KEY = "kingsmen-one-demo-v1";
+  const pathways = [
+    {id:"higher-education",name:"Higher education",icon:"⌂",desc:"Universities, colleges and recognised post-school study routes."},
+    {id:"tvet",name:"TVET",icon:"⚒",desc:"Technical and vocational education and occupational training."},
+    {id:"seta",name:"SETA & skills",icon:"✳",desc:"Learnerships, skills programmes and sector training routes."},
+    {id:"employment",name:"Employment",icon:"↗",desc:"Prepare for work and track suitable job opportunities."},
+    {id:"entrepreneurship",name:"Entrepreneurship",icon:"◇",desc:"Explore business support, enterprise development and funding routes."},
+    {id:"unconfirmed-sixth",name:"Sixth pathway — name to confirm",icon:"?",desc:"Not displayed as a real pathway until the canonical name is verified from the Kingsmen source of truth.",unconfirmed:true}
+  ];
+  const opportunities = [
+    {id:"opp-1",provider:"DEMO LISTING · VERIFY SOURCE",title:"Study opportunity preparation",type:"Education",location:"South Africa · details to verify",deadline:"Confirm official deadline",desc:"Use this sample to practise saving an opportunity and preparing your application. Not a verified live listing."},
+    {id:"opp-2",provider:"DEMO LISTING · VERIFY SOURCE",title:"Skills programme readiness",type:"Skills",location:"South Africa · details to verify",deadline:"Confirm official deadline",desc:"A sample skills-route record for testing document readiness and follow-up tasks. Not a provider offer."},
+    {id:"opp-3",provider:"DEMO LISTING · VERIFY SOURCE",title:"Entry-level job preparation",type:"Employment",location:"South Africa · details to verify",deadline:"Confirm official deadline",desc:"A sample employment listing used to demonstrate the workflow. Employer and vacancy must be independently verified."}
+  ];
+  const initial = () => ({tasks:[{id:"profile",title:"Review your candidate profile",detail:"Keep contact and education details up to date.",done:false},{id:"id",title:"Prepare identity document",detail:"A reviewer must verify identity through the authorised process.",done:false},{id:"results",title:"Gather academic results",detail:"Prepare readable copies; upload is not enabled in this demo.",done:false},{id:"route",title:"Choose a pathway to explore",detail:"Review eligibility and official source requirements.",done:false}],saved:[],applicationNotes:{},documents:{},noticeVisible:true});
+  let state;
+  try { state = JSON.parse(localStorage.getItem(KEY)) || initial(); } catch { state = initial(); }
+  const root = document.getElementById("view-root");
+  const crumb = document.getElementById("current-crumb");
+  let activeView = "home";
+  const escapeHtml = value => String(value).replace(/[&<>"']/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
+  const save = () => { try { localStorage.setItem(KEY, JSON.stringify(state)); } catch {} };
+  const toast = text => { const el=document.getElementById("toast"); el.textContent=text; el.classList.add("show"); clearTimeout(toast.timer); toast.timer=setTimeout(()=>el.classList.remove("show"),2300); };
+  const heading = (title,sub,action="") => `<div class="section-head"><div><h2>${title}</h2><p>${sub}</p></div>${action}</div>`;
+  const button = (text,attrs="",secondary=true) => `<button class="${secondary?"secondary-button":"primary-button"}" ${attrs}>${text}</button>`;
+  const taskList = (limit=10) => state.tasks.slice(0,limit).map(t=>`<div class="task-row"><button class="task-check ${t.done?"done":""}" data-task="${t.id}" aria-label="${t.done?"Mark incomplete":"Mark complete"}: ${escapeHtml(t.title)}">${t.done?"✓":""}</button><div class="task-info"><strong>${escapeHtml(t.title)}</strong><small>${escapeHtml(t.detail)}</small></div><span class="tag ${t.done?"done":"pending"}">${t.done?"Complete":"To do"}</span></div>`).join("");
+  const progress = () => Math.round(state.tasks.filter(t=>t.done).length / state.tasks.length * 100);
+  function home() {
+    return `${heading("Your overview","A practical view of what is ready and what needs attention.",button("View my tasks",'data-view="applications"'))}
+      <div class="stats-grid">
+        <div class="stat-card"><div class="stat-top">Preparation progress <span class="stat-icon">✓</span></div><div class="stat-value">${progress()}%</div><div class="stat-foot">Based on your demo checklist</div><div class="progress-track"><div class="progress-fill" style="width:${progress()}%"></div></div></div>
+        <div class="stat-card"><div class="stat-top">Saved opportunities <span class="stat-icon">☆</span></div><div class="stat-value">${state.saved.length}</div><div class="stat-foot">Saved in this browser only</div></div>
+        <div class="stat-card"><div class="stat-top">Applications tracked <span class="stat-icon">▤</span></div><div class="stat-value">${Object.keys(state.applicationNotes).length}</div><div class="stat-foot">No provider submission is implied</div></div>
+        <div class="stat-card"><div class="stat-top">Documents prepared <span class="stat-icon">▧</span></div><div class="stat-value">${Object.values(state.documents).filter(v=>v==="prepared").length}</div><div class="stat-foot">No files are uploaded or stored</div></div>
+      </div>
+      <div class="content-grid"><div class="panel"><h3>Your next steps</h3><p class="panel-subtitle">Small, trackable actions to help you prepare.</p><div class="task-list">${taskList(4)}</div><div style="margin-top:16px">${button("Continue preparation","data-view=\"applications\"",false)}</div></div>
+      <div class="panel"><h3>Where you are heading</h3><p class="panel-subtitle">Explore routes that fit your next chapter.</p><div class="task-list">${pathways.slice(0,3).map(p=>`<div class="task-row"><span class="task-check" aria-hidden="true">${p.icon}</span><div class="task-info"><strong>${p.name}</strong><small>${p.unconfirmed?"Canonical name not yet confirmed":"Explore route requirements and preparation."}</small></div></div>`).join("")}</div><div class="next-step"><strong>One next step at a time.</strong><p>Choose a pathway, review requirements and prepare your documents before applying.</p>${button("Explore pathways","data-view=\"pathways\"",false)}</div></div></div>`;
+  }
+  function pathwaysView() {
+    return `${heading("My pathways","Explore the routes in the Kingsmen journey. Availability and eligibility must be verified against official sources.")}<div class="path-grid">${pathways.map(p=>`<article class="path-card"><div class="card-icon">${p.icon}</div><h3>${p.name}</h3><p>${p.desc}</p>${p.unconfirmed?'<span class="tag pending">Source confirmation required</span>':button("Explore preparation",`data-path="${p.id}"`)}</article>`).join("")}</div><p class="muted-note">Pathway labels are a working navigation inventory. The sixth canonical pathway must be confirmed from the authoritative Kingsmen catalogue before production.</p>`;
+  }
+  function opportunitiesView() {
+    return `${heading("Opportunities","Sample records only. Verify the provider, eligibility, deadline and fees on official sources before acting.")}<div class="filter-row"><input id="opportunity-search" class="filter-input" placeholder="Search opportunities…" aria-label="Search opportunities"><select id="opportunity-filter" class="filter-select" aria-label="Filter opportunity type"><option value="all">All types</option><option>Education</option><option>Skills</option><option>Employment</option></select></div><div class="opportunity-grid" id="opportunity-results"></div><p class="muted-note">These demo listings are not live or verified opportunities. Saving one does not submit an application or contact a provider.</p>`;
+  }
+  function renderOpportunityCards() {
+    const target=document.getElementById("opportunity-results"); if(!target)return;
+    const q=(document.getElementById("opportunity-search")?.value||"").toLowerCase();
+    const type=document.getElementById("opportunity-filter")?.value||"all";
+    const list=opportunities.filter(o=>(type==="all"||o.type===type)&&[o.title,o.desc,o.provider,o.type].join(" ").toLowerCase().includes(q));
+    target.innerHTML=list.length?list.map(o=>{const saved=state.saved.includes(o.id);return `<article class="opportunity-card"><span class="provider">${o.provider}</span><h3>${o.title}</h3><p>${o.desc}</p><div class="details">${o.type} · ${o.location}<br><br>Deadline: ${o.deadline}</div>${button(saved?"★ Saved":"☆ Save opportunity",`data-save="${o.id}" class="${saved?"secondary-button saved":"secondary-button"}`)}</article>`;}).join(""):'<div class="empty-state"><strong>No matching opportunities</strong><p>Try a different search or filter.</p></div>';
+  }
+  function applicationsView() {
+    return `${heading("Application preparation","Track preparation separately from any actual submission or provider decision.")}<div class="content-grid"><div class="panel"><h3>Preparation checklist</h3><p class="panel-subtitle">Your progress is a candidate-reported demo state, not an independently verified outcome.</p><div class="task-list">${taskList()}</div><p class="muted-note">Checking an item records your own demo progress. It does not certify a document, submit an application or change provider status.</p></div><div class="panel"><h3>Application tracker</h3><p class="panel-subtitle">Create a local preparation record from a saved opportunity.</p>${state.saved.length?state.saved.map(id=>{const o=opportunities.find(x=>x.id===id);if(!o)return "";return `<div class="task-row"><div class="task-info"><strong>${o.title}</strong><small>${state.applicationNotes[id]?"Preparation record created":"Saved opportunity · not submitted"}</small></div>${button(state.applicationNotes[id]?"Prepared":"Start prep",`data-application="${id}"`)}</div>`;}).join(""):'<div class="empty-state"><strong>No saved opportunities yet</strong><p>Save a demo opportunity first, then create a preparation record here.</p></div>'}<p class="muted-note">“Prepared” means you created a local prep record only. No provider has received an application.</p></div></div>`;
+  }
+  function documentsView() {
+    const docs=[["identity","Identity document","Prepare a clear copy. Identity matching requires authorised review."],["results","Academic results","Gather your latest official results or transcripts."],["cv","CV / résumé","Check contact details, dates and relevant experience."],["proof-address","Proof of address","Check the receiving organisation's current requirements."]];
+    return `${heading("Document readiness","A readiness checklist—not a document vault. No files are uploaded or stored in this demo.")}<div class="document-grid">${docs.map(([id,title,desc])=>{const status=state.documents[id]||"not-started";return `<article class="doc-card"><div class="card-icon">▧</div><h3>${title}</h3><p>${desc}</p><span class="tag doc-status ${status==="prepared"?"done":"pending"}">${status==="prepared"?"Candidate marked prepared":"Not prepared"}</span>${button(status==="prepared"?"Mark not prepared":"Mark prepared",`data-document="${id}"`)}</article>`;}).join("")}</div><div class="notice"><span>ⓘ</span><p>Real document upload must use private storage, authenticated access and reviewer-controlled verification. Never upload sensitive documents to this demo.</p></div>`;
+  }
+  function activityView() {
+    const events=[...state.tasks.filter(t=>t.done).map(t=>({title:"Candidate marked preparation item complete",detail:t.title,kind:"Candidate-reported",date:"This browser session"})),...state.saved.map(id=>({title:"Opportunity saved",detail:opportunities.find(o=>o.id===id)?.title||id,kind:"Candidate action",date:"This browser session"})),...Object.keys(state.applicationNotes).map(id=>({title:"Preparation record created",detail:opportunities.find(o=>o.id===id)?.title||id,kind:"Candidate-reported",date:"This browser session"}))];
+    return `${heading("Activity & evidence","See what you reported or prepared. Independently verified evidence is not available in demo mode.")}<div class="panel"><h3>Recent activity</h3><p class="panel-subtitle">Local actions only · no server-side audit record</p>${events.length?'<div class="activity-list">'+events.reverse().map(e=>`<div class="activity-item"><span class="activity-dot"></span><div><strong>${e.title}</strong><p>${e.detail}</p><small>${e.kind} · ${e.date}</small></div></div>`).join("")+'</div>':'<div class="empty-state"><strong>No activity yet</strong><p>Save an opportunity or complete a preparation item to see local activity here.</p></div>'}<p class="muted-note">Candidate-reported progress is not the same as reviewer-verified evidence or a provider-confirmed outcome.</p></div>`;
+  }
+  const views={home,pathways:pathwaysView,opportunities:opportunitiesView,applications:applicationsView,documents:documentsView,activity:activityView};
+  function render(view=activeView) {
+    activeView=view; const labels={home:"Overview",pathways:"My pathways",opportunities:"Opportunities",applications:"Applications",documents:"Documents",activity:"Activity & evidence"};
+    crumb.textContent=labels[view]||"Overview";
+    document.querySelectorAll(".nav-item").forEach(b=>b.classList.toggle("active",b.dataset.view===view));
+    document.getElementById("welcome").classList.toggle("hidden",view!=="home");
+    root.innerHTML=(views[view]||home)();
+    if(view==="opportunities"){renderOpportunityCards();document.getElementById("opportunity-search").addEventListener("input",renderOpportunityCards);document.getElementById("opportunity-filter").addEventListener("change",renderOpportunityCards);}
+  }
+  document.addEventListener("click",e=>{
+    const nav=e.target.closest("[data-view]");if(nav){e.preventDefault();render(nav.dataset.view);return;}
+    const task=e.target.closest("[data-task]");if(task){const t=state.tasks.find(x=>x.id===task.dataset.task);if(t){t.done=!t.done;save();render();toast("Demo preparation progress updated.");}return;}
+    const saveButton=e.target.closest("[data-save]");if(saveButton){const id=saveButton.dataset.save;state.saved=state.saved.includes(id)?state.saved.filter(x=>x!==id):[...state.saved,id];save();renderOpportunityCards();toast(state.saved.includes(id)?"Saved in this browser.":"Removed from saved opportunities.");return;}
+    const app=e.target.closest("[data-application]");if(app){state.applicationNotes[app.dataset.application]=true;save();render();toast("Local preparation record created—not submitted.");return;}
+    const doc=e.target.closest("[data-document]");if(doc){const id=doc.dataset.document;state.documents[id]=state.documents[id]==="prepared"?"not-started":"prepared";save();render();toast("Demo readiness state updated.");return;}
+    const path=e.target.closest("[data-path]");if(path){toast("Pathway requirements need authoritative source data before this route can be activated.");return;}
+  });
+  document.getElementById("dismiss-notice").addEventListener("click",()=>{document.querySelector(".notice").classList.add("hidden");state.noticeVisible=false;save();});
+  document.getElementById("reset-demo").addEventListener("click",()=>{if(confirm("Reset all Kingsmen One demo progress saved in this browser?")){state=initial();save();render("home");document.querySelector(".notice").classList.remove("hidden");toast("Demo state reset.");}});
+  render();
+})();
