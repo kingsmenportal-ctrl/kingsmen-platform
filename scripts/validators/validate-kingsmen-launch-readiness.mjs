@@ -165,6 +165,23 @@ function warn(code, title, detail, remediation, evidencePaths = []) {
   warnings.push({ code, title, detail, remediation, evidencePaths });
 }
 
+// Keep the RLS proof entry points explicit so a missing or renamed security
+// proof cannot be mistaken for a completed launch gate.
+const rlsProofPaths = [
+  'scripts/proof/prove-rls-security-boundary.mjs',
+  'scripts/validators/validate-rls-security-proof.mjs'
+];
+const missingRlsProofPaths = rlsProofPaths.filter((path) => !existsSync(relative(path)));
+if (missingRlsProofPaths.length > 0) {
+  block(
+    'RLS_SECURITY_SCRIPT_MISSING',
+    'RLS security proof scripts are missing.',
+    missingRlsProofPaths.join(', '),
+    'Restore the RLS source proof and validator before staging or launch.',
+    missingRlsProofPaths
+  );
+}
+
 for (const check of requiredFileChecks) {
   if (!check.passed) {
     block('REQUIRED_FILE_OR_TOKEN_MISSING', `Required launch evidence missing: ${check.path}`, check.exists ? `Missing tokens: ${check.missingTokens.join(', ')}` : 'File does not exist.', 'Restore the file/tokens or update the launch manifest only with equivalent evidence.', [check.path]);
