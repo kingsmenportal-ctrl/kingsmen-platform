@@ -84,7 +84,9 @@
     "final:collect:evidence": "node scripts/staging/collect-kingsmen-final-assembly-evidence.mjs",
     "staging:e2e": "node scripts/staging/run-kingsmen-authenticated-e2e.mjs",
     "staging:e2e:validate": "node scripts/validators/validate-staging-authenticated-e2e-runner.mjs",
-    "staging:e2e:test": "node scripts/staging/test-kingsmen-authenticated-e2e.mjs"
+    "staging:e2e:test": "node scripts/staging/test-kingsmen-authenticated-e2e.mjs",
+    "kingsmen:inventory": "node scripts/validators/validate-kingsmen-repository-operating-inventory.mjs",
+    "kingsmen:inventory:verify": "node scripts/validators/validate-kingsmen-repository-operating-inventory.mjs"
   },
   "repository": {
     "type": "git",
