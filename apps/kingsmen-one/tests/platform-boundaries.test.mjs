@@ -75,3 +75,13 @@ test("candidate identifiers are resolved from verified server-side identity, not
     assert.match(source, /link\.candidate_id/);
   }
 });
+
+test("route-universe seed creates only official source anchors and keeps them out of live-open listings", async () => {
+  const seed = await readFile(resolve(repoRoot, "db/seeds/n06_route_universe_seed.sql"), "utf8");
+  assert.match(seed, /https:\/\/www\.cao\.ac\.za\//);
+  assert.match(seed, /https:\/\/www\.nsfas\.org\.za\/content\/how-to-apply\.html/);
+  assert.match(seed, /'cao_route_anchor'[\s\S]*?'MANUAL_CHECK_REQUIRED'/);
+  assert.match(seed, /'nsfas_support_anchor'[\s\S]*?'MANUAL_CHECK_REQUIRED'/);
+  assert.match(seed, /'PRIVATE_COLLEGE'[\s\S]*?true/);
+  assert.doesNotMatch(seed, /DELETE\s+FROM|TRUNCATE|DROP\s+TABLE/i);
+});
