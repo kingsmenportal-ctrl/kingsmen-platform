@@ -69,3 +69,15 @@ test("saving a verified route requires a signed-in user and uses owner-scoped RL
   assert.match(js, /from\("candidate_saved_routes"\)\.insert/);
   assert.match(js, /user_id:authSession\.user\.id/);
 });
+
+test("identity-link claims go through authenticated manual-review endpoint", async () => {
+  const js = await read("app.js");
+  const fn = await readFile(resolve(root, "../..", "supabase/functions/candidate-identity-review-request/index.ts"), "utf8");
+  assert.match(js, /identity-review-form/);
+  assert.match(js, /functions\.invoke\("candidate-identity-review-request"/);
+  assert.match(fn, /auth\.getUser/);
+  assert.match(fn, /request_status:\s*"PENDING"/);
+  assert.match(fn, /does not verify identity or link a candidate record/i);
+  assert.match(fn, /SUPABASE_SERVICE_ROLE_KEY/);
+  assert.doesNotMatch(fn, /console\.log\(.*claimant|console\.log\(.*candidate_reference/i);
+});
