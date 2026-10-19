@@ -8,7 +8,8 @@ This inventory is the cross-module map for Kingsmen. It is generated from the ch
 - Required release gates and their declared blockers come from `manifests/launch/kingsmen-launch-readiness-v1.json`.
 - File counts are measured from the current checked-out tree when the validator runs.
 - Evidence-file presence is reported, but **file presence does not mean evidence is current, reviewed, redacted, or a live test passed**.
-- Remote branch count, open-PR count, live database state, provider credentials, and actual production deployment are not guessed from the local checkout.
+- In authenticated GitHub Actions, the generator also paginates the live GitHub API to capture every repository branch, open pull request (including head/base, changed-file count and mergeability), and open issue (including labels). The job has read-only `contents`, `pull-requests`, and `issues` permissions. If the live census cannot be fetched in CI, verification fails rather than silently reporting a partial remote inventory.
+- Live database state, provider credentials, and actual production deployment are not inferred from GitHub metadata.
 
 ## Module map: N00–N20
 
@@ -80,7 +81,7 @@ npm run kingsmen:inventory
 npm run kingsmen:inventory:verify
 ```
 
-The generator writes `reports/architecture/kingsmen-repository-operating-inventory-latest.json`. CI output reports current checkout counts and integrity failures. Use the artifact/report from a specific commit to compare growth; do not compare an old scan's counts with current values as if they came from the same revision.
+The generator writes `reports/architecture/kingsmen-repository-operating-inventory-latest.json`. CI output reports current checkout counts, live branch/PR/issue counts, and integrity failures. The JSON contains the full branch list, every open PR with its base/head, and open issue titles/labels, so competing branches and stacked work are visible in one revisioned evidence artifact. Use the artifact/report from a specific commit to compare growth; do not compare an old scan's counts with current values as if they came from the same revision.
 
 ## Contribution accounting rule
 
