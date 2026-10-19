@@ -38,3 +38,16 @@ test("canonical sixth pathway is explicitly blocked pending source confirmation"
   assert.match(js, /Sixth pathway — name to confirm/);
   assert.match(js, /Canonical name not yet confirmed/);
 });
+test("account entry point uses Supabase Auth without claiming candidate identity", async () => {
+  const html = await read("index.html");
+  const js = await read("app.js");
+  const client = await read("supabase-client.js");
+  assert.match(html, /data-view="account"/);
+  assert.match(html, /supabase-js@2/);
+  assert.match(client, /sb_publishable_/);
+  assert.doesNotMatch(client, /service_role|SUPABASE_SERVICE_ROLE_KEY/i);
+  assert.match(js, /signInWithPassword/);
+  assert.match(js, /resetPasswordForEmail/);
+  assert.match(js, /candidate identity has not been linked or verified/i);
+  assert.match(js, /onAuthStateChange/);
+});
