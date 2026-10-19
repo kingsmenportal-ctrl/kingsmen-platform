@@ -39,3 +39,12 @@ The linked Supabase project `kingsmen-portal-staging` (ref `euhubhhnumtibbyufghm
 - Accepted task IDs and pathway IDs are allowlisted server-side; browser-supplied candidate IDs are not accepted.
 - Accounts without a verified identity link remain in local preview mode. This batch does not persist profile edits or enable private document uploads.
 - Static source-contract test added; CI and authenticated browser E2E must still be inspected before claiming end-to-end verification.
+
+
+## Persistent application tracker and preparation checklist (implemented; E2E pending)
+- Deployed `candidate-application-preparation` with JWT verification on.
+- Reads/writes are scoped to a candidate resolved server-side from a verified identity link, never a browser-supplied candidate ID.
+- Tracker creation requires a saved `candidate_saved_routes` record owned by the authenticated user and a still-verified catalogue entry with HTTPS source; data is synchronised to `candidate_workspace_saved_opportunities` and `candidate_application_tracker`.
+- New trackers receive four default checklist items. Additional task/document items, notes, candidate-reported readiness and evidence-reference strings are supported with field bounds.
+- Candidate-reported submission remains separate from independently confirmed provider submission. No provider status or outcome is written by this feature.
+- Automated source-contract test added. Still required: authenticated staging browser tests (verified and unverified identities, cross-candidate denial, duplicate tracker, checklist mutations), frontend deploy and runtime/log verification.
