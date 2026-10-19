@@ -67,20 +67,20 @@ try {
     { id: 'bad id contains PII', role: 'anonymous', path: '/must-not-run', expectedStatus: 200 }
   ]);
   assert.equal(invalid.status, 2, 'unsafe case ID must fail preflight');
-  assert.ok(invalid.stdout.includes('BLOCKED_INVALID_CASE'));
+  assert.ok(invalid.stderr.includes('BLOCKED_INVALID_CASE'));
   assert.equal(requests, beforeInvalid, 'preflight must block the entire plan before any request');
 
   const mutation = await run([{ id: 'mutate', role: 'anonymous', method: 'POST', path: '/write', expectedStatus: 200 }]);
   assert.equal(mutation.status, 2, 'mutations must be opt-in');
-  assert.ok(mutation.stdout.includes('BLOCKED_MUTATION_NOT_AUTHORISED'));
+  assert.ok(mutation.stderr.includes('BLOCKED_MUTATION_NOT_AUTHORISED'));
 
   const missingSession = await run([{ id: 'reviewer', role: 'reviewer', path: '/review', expectedStatus: 401 }]);
   assert.equal(missingSession.status, 2, 'reviewer session must be explicitly provided');
-  assert.ok(missingSession.stdout.includes('BLOCKED_SESSION_MISSING'));
+  assert.ok(missingSession.stderr.includes('BLOCKED_SESSION_MISSING'));
 
   const invalidTimeout = await run([{ id: 'timeout', role: 'anonymous', path: '/x', expectedStatus: 200 }], { KINGSMEN_E2E_TIMEOUT_MS: '999999' });
   assert.equal(invalidTimeout.status, 2, 'timeout must be bounded');
-  assert.ok(invalidTimeout.stdout.includes('BLOCKED_INVALID_TIMEOUT'));
+  assert.ok(invalidTimeout.stderr.includes('BLOCKED_INVALID_TIMEOUT'));
 
   console.log(JSON.stringify({
     schema: 'kingsmen.staging-e2e-unit-tests.v1',
