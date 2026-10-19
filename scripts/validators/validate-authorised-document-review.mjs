@@ -2,7 +2,7 @@ import fs from "node:fs";
 const paths = [
  "db/migrations/0080_authorised_candidate_document_review.sql",
  "apps/web/src/app/api/reviewer/documents/route.ts",
- "apps/web/src/app/api/reviewer/documents/read-url/route.ts"
+ "apps/web/src/app/api/reviewer/documents/read-url/route.ts",\n "apps/web/src/app/reviewer/documents/page.tsx"
 ];
 const failures = [];
 const src = {};
