@@ -26,16 +26,30 @@ jobs:
       - name: Install dependencies
         run: npm ci
 
+      - name: Install backend API dependencies
+        run: npm --prefix apps/api install --ignore-scripts --no-package-lock
+
+      - name: Build backend API
+        run: npm run api:build
+
+      - name: API runtime authentication and fail-closed smoke tests
+        run: npm run api:validate:runtime-boundaries
+
       - name: API Truth Vault persistence validator
         run: npm run api:validate:truth-vault
 
       - name: Safe web/backend boundary validator
         run: npm run web:validate:backend-boundary
 
+      # Payment proof is deliberately opt-in until the owner creates/configures
+      # a PayFast sandbox account. This does not bypass payment verification
+      # in the application; it only skips account-dependent CI proof.
       - name: PayFast sandbox source proof
+        if: ${{ vars.PAYFAST_SANDBOX_ENABLED == 'true' }}
         run: npm run payments:prove:sandbox
 
       - name: PayFast sandbox validator
+        if: ${{ vars.PAYFAST_SANDBOX_ENABLED == 'true' }}
         run: npm run payments:validate:sandbox
 
       - name: RLS/security source proof

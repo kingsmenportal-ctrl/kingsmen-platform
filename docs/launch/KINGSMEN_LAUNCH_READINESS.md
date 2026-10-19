@@ -6,7 +6,7 @@ This document is the real finish-line map for launching Kingsmen. A module can b
 
 **Public launch is blocked.**
 
-The repo has source-level proof for backend API, PostgreSQL/Supabase Truth Vault persistence, safe web-to-backend boundary, PayFast sandbox boundary, RLS/security, backup/restore, branch protection, secrets wiring, communications, observability + incident handling, legal + privacy + consent + refund policy, the staging runtime proof pack, and final assembly evidence capture. It is still not safe to open to public candidates or take money because real staging evidence and final founder review are still pending.
+The repo has source-level proof for backend API, PostgreSQL/Supabase Truth Vault persistence, safe web-to-backend boundary, PayFast sandbox boundary, RLS/security, backup/restore, branch protection, secrets wiring, communications, observability + incident handling, legal + privacy + consent + refund policy, the staging runtime proof pack, and final assembly evidence capture. The RLS/security source-level boundary is validated by `npm run security:prove:rls` and `npm run security:validate:rls`. It is still not safe to open to public candidates or take money because real staging evidence and final founder review are still pending.
 
 ## Exact blockers
 

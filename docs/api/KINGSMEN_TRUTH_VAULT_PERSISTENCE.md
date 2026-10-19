@@ -7,7 +7,9 @@ Production ready: **false until DB integration proof passes on staging**
 
 This document records the second launch build item: replacing the backend API's memory-only command/result store with real PostgreSQL/Supabase Truth Vault persistence.
 
-The API can now run in two explicit modes:
+The API can now run in two explicit modes. Business routes require server-to-server bearer authentication; `/health` remains public. Never put either service token in browser code. `KINGSMEN_API_SERVICE_TOKEN` protects command intake, Jarvis runtime-control, and read-model routes. `KINGSMEN_WORKFLOW_SERVICE_TOKEN` separately protects workflow-result intake. Both configured tokens must be at least 32 characters. These service credentials do not establish candidate identity or candidate-level authorisation, so the protected routes are backend-only.
+
+The API can run in these explicit storage modes:
 
 ```txt
 KINGSMEN_TRUTH_VAULT_MODE=memory
@@ -63,6 +65,8 @@ KINGSMEN_TRUTH_VAULT_MODE=postgres
 KINGSMEN_DATABASE_URL=postgres://user:password@host:5432/database
 KINGSMEN_DATABASE_SSL=true
 KINGSMEN_DATABASE_POOL_MAX=8
+KINGSMEN_API_SERVICE_TOKEN=<server-only-random-token-at-least-32-characters>
+KINGSMEN_WORKFLOW_SERVICE_TOKEN=<separate-server-only-random-token>
 ```
 
 For local Docker PostgreSQL without SSL:
@@ -116,13 +120,15 @@ curl -s -X POST http://localhost:8080/api/commands \
 Then prove the read model:
 
 ```bash
-curl -s http://localhost:8080/api/candidates/KM-DEMO-001/status
+curl -s http://localhost:8080/api/candidates/KM-DEMO-001/status \\
+  -H "authorization: Bearer $KINGSMEN_API_SERVICE_TOKEN"
 ```
 
 ## Workflow result proof flow
 
 ```bash
 curl -s -X POST http://localhost:8080/api/workflow/result \
+  -H "authorization: Bearer $KINGSMEN_WORKFLOW_SERVICE_TOKEN" \\
   -H "content-type: application/json" \
   -d '{
     "workflowRunId": "wf_truth_vault_001",
@@ -144,7 +150,8 @@ curl -s -X POST http://localhost:8080/api/workflow/result \
 Then prove the application workbench:
 
 ```bash
-curl -s http://localhost:8080/api/applications/APP-DEMO-001/workbench
+curl -s http://localhost:8080/api/applications/APP-DEMO-001/workbench \\
+  -H "authorization: Bearer $KINGSMEN_API_SERVICE_TOKEN"
 ```
 
 ## Safety boundaries
