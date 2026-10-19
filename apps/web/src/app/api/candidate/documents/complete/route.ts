@@ -27,8 +27,8 @@ export async function POST(request: Request) {
     });
     if (!info.ok) return NextResponse.json({ ok: false, error: "The uploaded object is not available in private storage yet." }, { status: 409 });
     const object = await info.json() as Record<string, unknown>;
-    const actualSize = Number(object.size ?? object.metadata && (object.metadata as Record<string, unknown>).size);
-    const actualType = String(object.mimetype ?? object.contentType ?? object.metadata && (object.metadata as Record<string, unknown>).mimetype ?? "");
+    const metadata = object.metadata && typeof object.metadata === "object" ? object.metadata as Record<string, unknown> : {};\n    const actualSize = Number(object.size ?? metadata.size);
+    const actualType = String(object.mimetype ?? object.contentType ?? metadata.mimetype ?? "");
     if (!Number.isFinite(actualSize) || actualSize < 1 || actualSize > 10 * 1024 * 1024 ||
         actualSize !== Number(doc.size_bytes) || (actualType && actualType !== doc.mime_type)) {
       await truthVaultRequest("candidate_private_documents", `id=eq.${documentId}&candidate_id=eq.${encodeURIComponent(candidateId)}`, "PATCH",
