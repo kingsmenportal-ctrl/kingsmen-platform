@@ -19,7 +19,7 @@ test("candidate workspace has responsive accessible shell and demo disclosure", 
 
 test("workflow implements pathways, saving, preparation and document readiness", async () => {
   const js = await read("app.js");
-  for (const marker of ["higher-education", "tvet", "seta", "employment", "entrepreneurship", "unconfirmed-sixth", "data-save", "data-application", "data-document", "candidate-reported", "localStorage", "function profileView()", "profile-form", "profile-readiness"]) {
+  for (const marker of ["higher-education", "tvet", "seta", "employment", "entrepreneurship", "unconfirmed-sixth", "data-save", "data-application", "data-document", "candidate-reported", "localStorage", "function profileView()", "profile-form", "Profile readiness"]) {
     assert.ok(js.includes(marker), `expected workflow marker: ${marker}`);
   }
   assert.match(js, /not submitted/i);
