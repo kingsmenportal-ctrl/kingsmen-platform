@@ -31,12 +31,57 @@
   let authSession = null;
   let authMessage = "";
   let authBusy = false;
+  let workspacePersistenceAvailable = false;
+  let workspaceLoadedForUser = null;
+  async function loadPersistentReadiness(force = false) {
+    const userId = authSession?.user?.id;
+    if (!supabaseClient || !userId) {
+      workspacePersistenceAvailable = false;
+      workspaceLoadedForUser = null;
+      return false;
+    }
+    if (!force && workspaceLoadedForUser === userId) return workspacePersistenceAvailable;
+    try {
+      const { data, error } = await supabaseClient.functions.invoke("candidate-workspace-readiness", { body: { action: "load" } });
+      if (error) throw error;
+      if (data?.ready !== true) throw new Error("Verified candidate workspace is unavailable.");
+      const completed = new Set(Array.isArray(data.completed_tasks) ? data.completed_tasks : []);
+      state.tasks.forEach(task => { task.done = completed.has(task.id); });
+      state.priorityPathway = typeof data.priority_pathway === "string" ? data.priority_pathway : "";
+      workspacePersistenceAvailable = true;
+      workspaceLoadedForUser = userId;
+      save();
+      if (activeView !== "account") render(activeView);
+      return true;
+    } catch {
+      workspacePersistenceAvailable = false;
+      workspaceLoadedForUser = userId;
+      return false;
+    }
+  }
+  async function persistReadiness() {
+    if (!workspacePersistenceAvailable || !authSession?.user) return false;
+    const payload = {
+      action: "save",
+      completed_tasks: state.tasks.filter(task => task.done).map(task => task.id),
+      priority_pathway: state.priorityPathway || ""
+    };
+    try {
+      const { data, error } = await supabaseClient.functions.invoke("candidate-workspace-readiness", { body: payload });
+      if (error || data?.ready !== true) throw error || new Error("Workspace save was not confirmed.");
+      return true;
+    } catch {
+      toast("Server sync failed; your progress remains in this browser.");
+      return false;
+    }
+  }
   async function refreshAuthSession() {
     if (!supabaseClient) return;
     try {
       const { data, error } = await supabaseClient.auth.getSession();
       if (error) throw error;
       authSession = data.session;
+      await loadPersistentReadiness(true);
       if (activeView === "account") render("account");
       updateAuthStatus();
     } catch (error) { authMessage = error.message || "Unable to read account session."; }
@@ -198,7 +243,7 @@
       const m=document.getElementById("auth-message");if(m)m.textContent=authMessage;return;
     }
     const nav=e.target.closest("[data-view]");if(nav){e.preventDefault();render(nav.dataset.view);return;}
-    const task=e.target.closest("[data-task]");if(task){const t=state.tasks.find(x=>x.id===task.dataset.task);if(t){t.done=!t.done;save();render();toast("Demo preparation progress updated.");}return;}
+    const task=e.target.closest("[data-task]");if(task){const t=state.tasks.find(x=>x.id===task.dataset.task);if(t){t.done=!t.done;save();render();if(workspacePersistenceAvailable)await persistReadiness();toast(workspacePersistenceAvailable?"Preparation progress updated.":"Demo preparation progress updated.");}return;}
     const saveButton=e.target.closest("[data-save]");if(saveButton){const id=saveButton.dataset.save;state.saved=state.saved.includes(id)?state.saved.filter(x=>x!==id):[...state.saved,id];save();renderOpportunityCards();toast(state.saved.includes(id)?"Saved in this browser.":"Removed from saved opportunities.");return;}
     const liveSave=e.target.closest("[data-save-route]");
     if(liveSave){
@@ -220,8 +265,9 @@
       const id=path.dataset.path;
       if(!state.profile)state.profile={fullName:"",province:"",qualification:"",interests:[]};
       state.profile.interests=Array.from(new Set([...(state.profile.interests||[]),id]));
+      state.priorityPathway=id;
       const routeTask=state.tasks.find(t=>t.id==="route");if(routeTask)routeTask.done=true;
-      save();render("profile");toast("Pathway interest saved. Check official eligibility before applying.");return;
+      save();render("profile");if(workspacePersistenceAvailable)await persistReadiness();toast("Pathway interest saved. Check official eligibility before applying.");return;
     }
   });
   document.getElementById("dismiss-notice").addEventListener("click",()=>{document.querySelector(".notice").classList.add("hidden");state.noticeVisible=false;save();});
@@ -230,6 +276,8 @@
     supabaseClient.auth.onAuthStateChange((_event,session)=>{
       authSession=session;
       updateAuthStatus();
+      if(session?.user) void loadPersistentReadiness();
+      else {workspacePersistenceAvailable=false;workspaceLoadedForUser=null;}
       if(activeView==="account")render("account");
     });
     refreshAuthSession();
