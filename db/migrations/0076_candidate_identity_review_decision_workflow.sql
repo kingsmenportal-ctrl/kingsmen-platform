@@ -2,11 +2,15 @@
 -- Reviewer authorization is checked against the existing platform_reviewers registry.
 -- Approval creates a verified link only after exact candidate public_ref resolution and
 -- only when neither the account nor candidate is already linked elsewhere.
+ALTER TABLE public.candidate_identity_review_requests
+  ADD COLUMN IF NOT EXISTS candidate_response text NOT NULL DEFAULT '' CHECK (length(candidate_response) <= 1200);
+
 CREATE TABLE IF NOT EXISTS public.candidate_identity_review_audit (
   id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
   request_id uuid NOT NULL REFERENCES public.candidate_identity_review_requests(id) ON DELETE RESTRICT,
-  reviewer_auth_user_id uuid NOT NULL REFERENCES auth.users(id),
-  action text NOT NULL CHECK (action IN ('APPROVED','REJECTED','NEEDS_INFORMATION')),
+  actor_auth_user_id uuid NOT NULL REFERENCES auth.users(id),
+  actor_role text NOT NULL CHECK (actor_role IN ('CANDIDATE','PLATFORM_ADMIN')),
+  action text NOT NULL CHECK (action IN ('APPROVED','REJECTED','NEEDS_INFORMATION','CANDIDATE_RESPONSE')),
   candidate_id uuid REFERENCES public.candidates(id),
   note text NOT NULL CHECK (length(trim(note)) BETWEEN 3 AND 1200),
   before_status text NOT NULL,
@@ -125,9 +129,9 @@ BEGIN
   WHERE id = v_request.id;
 
   INSERT INTO public.candidate_identity_review_audit
-    (request_id, reviewer_auth_user_id, action, candidate_id, note, before_status, after_status)
+    (request_id, actor_auth_user_id, actor_role, action, candidate_id, note, before_status, after_status)
   VALUES
-    (v_request.id, p_reviewer_auth_user_id, p_decision,
+    (v_request.id, p_reviewer_auth_user_id, 'PLATFORM_ADMIN', p_decision,
      CASE WHEN p_decision = 'APPROVED' THEN v_candidate.id ELSE NULL END,
      v_note, v_request.request_status, v_status);
 
@@ -143,3 +147,44 @@ $function$;
 
 REVOKE ALL ON FUNCTION public.decide_candidate_identity_review(uuid,uuid,text,text,text) FROM PUBLIC, anon, authenticated;
 GRANT EXECUTE ON FUNCTION public.decide_candidate_identity_review(uuid,uuid,text,text,text) TO service_role;
+
+
+CREATE OR REPLACE FUNCTION public.respond_candidate_identity_review(
+  p_request_id uuid,
+  p_candidate_auth_user_id uuid,
+  p_message text
+) RETURNS jsonb
+LANGUAGE plpgsql
+SECURITY DEFINER
+SET search_path = ''
+AS $function$
+DECLARE
+  v_request public.candidate_identity_review_requests%ROWTYPE;
+  v_message text := trim(coalesce(p_message, ''));
+BEGIN
+  IF p_request_id IS NULL OR p_candidate_auth_user_id IS NULL
+     OR length(v_message) < 3 OR length(v_message) > 1200 THEN
+    RAISE EXCEPTION 'A request, authenticated candidate and 3–1200 character response are required' USING ERRCODE = '22023';
+  END IF;
+  SELECT * INTO v_request
+    FROM public.candidate_identity_review_requests
+    WHERE id = p_request_id AND supabase_user_id = p_candidate_auth_user_id
+    FOR UPDATE;
+  IF NOT FOUND THEN RAISE EXCEPTION 'Identity review request not found for this account' USING ERRCODE = 'P0002'; END IF;
+  IF v_request.request_status <> 'NEEDS_INFORMATION' THEN
+    RAISE EXCEPTION 'This request is not awaiting candidate information' USING ERRCODE = '55000';
+  END IF;
+  UPDATE public.candidate_identity_review_requests
+    SET candidate_response = v_message, request_status = 'PENDING',
+        reviewer_note = NULL, reviewed_by = NULL, reviewed_at = NULL, updated_at = now()
+    WHERE id = v_request.id;
+  INSERT INTO public.candidate_identity_review_audit
+    (request_id, actor_auth_user_id, actor_role, action, candidate_id, note, before_status, after_status)
+  VALUES
+    (v_request.id, p_candidate_auth_user_id, 'CANDIDATE', 'CANDIDATE_RESPONSE',
+     NULL, v_message, v_request.request_status, 'PENDING');
+  RETURN jsonb_build_object('request_id', v_request.id, 'status', 'PENDING');
+END;
+$function$;
+REVOKE ALL ON FUNCTION public.respond_candidate_identity_review(uuid,uuid,text) FROM PUBLIC, anon, authenticated;
+GRANT EXECUTE ON FUNCTION public.respond_candidate_identity_review(uuid,uuid,text) TO service_role;
