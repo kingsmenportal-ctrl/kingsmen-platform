@@ -11,8 +11,8 @@ test("candidate workspace has responsive accessible shell and demo disclosure", 
   const html = await read("index.html");
   assert.match(html, /name="viewport"/);
   assert.match(html, /aria-live="polite"/);
-  assert.match(html, /DEMO MODE/);
-  assert.match(html, /No real account, provider submission, payment or verified outcome/);
+  assert.match(html, /ACCOUNT \+ DEMO MODE/);
+  assert.match(html, /Supabase Auth provides account sign-in/);
   assert.match(html, /styles\.css/);
   assert.match(html, /app\.js/);
 });
