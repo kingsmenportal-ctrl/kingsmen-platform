@@ -63,7 +63,7 @@ CREATE POLICY candidate_entitlement_events_service_role_read
   ON public.candidate_entitlement_events FOR SELECT TO service_role USING (true);
 
 CREATE OR REPLACE FUNCTION public.n11_prevent_entitlement_event_mutation()
-RETURNS trigger LANGUAGE plpgsql AS $$
+RETURNS trigger LANGUAGE plpgsql SET search_path = '' AS $
 BEGIN
   RAISE EXCEPTION 'entitlement events are immutable';
 END;
