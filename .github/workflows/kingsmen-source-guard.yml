@@ -23,8 +23,23 @@ jobs:
           node-version: '22'
           cache: 'npm'
 
-      - name: Install dependencies
+      - name: Install root dependencies
         run: npm ci
+
+      - name: Install API dependencies
+        run: npm install --prefix apps/api --ignore-scripts
+
+      - name: API build
+        run: npm run api:build
+
+      - name: Repository test suite
+        run: npm test
+
+      - name: N10 finance / PayFast validator
+        run: npm run n10:validate
+
+      - name: N18 public website / package catalogue validator
+        run: npm run n18:validate
 
       - name: API Truth Vault persistence validator
         run: npm run api:validate:truth-vault

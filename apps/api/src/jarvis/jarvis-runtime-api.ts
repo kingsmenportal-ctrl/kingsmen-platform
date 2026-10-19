@@ -233,7 +233,7 @@ export function evaluateApiJarvisRuntime(input: ApiJarvisRuntimeRequest): ApiJar
   ledger.push(makeEvent(commandRef, correlationId, 2, finalDecision === "BLOCK" ? "blocked" : "policy_decision", `${reasonCode}: ${safeReason}`));
   ledger.push(makeEvent(commandRef, correlationId, 3, "validator_result", `Jarvis API runtime final decision ${finalDecision}: ${reasonCode}.`));
 
-  const executable = finalDecision === "ALLOW" || finalDecision === "DRY_RUN_ONLY";
+  const executable = finalDecision === "ALLOW";
 
   return {
     ok: executable,

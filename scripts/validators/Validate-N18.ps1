@@ -1,5 +1,5 @@
 $ErrorActionPreference = "Stop"
-$Base = "C:\Kingsmen\kingsmen-platform"
+$Base = Split-Path -Parent (Split-Path -Parent $PSScriptRoot)
 Set-Location $Base
 
 $Failures = New-Object System.Collections.Generic.List[string]
@@ -49,8 +49,8 @@ Require-Contains "manifests\n18\public-website-route-house-front-door.json" "not
 Require-Contains "manifests\n18\public-website-route-house-front-door.json" "Free Destiny Map is R0 with 0 managed applications" "Manifest must lock Free Destiny Map boundary."
 Require-Contains "manifests\n18\public-website-route-house-front-door.json" "Exact institution/company/portal/programme/bursary/accommodation targets" "Manifest must seal exact route intelligence."
 Require-Contains "manifests\n18\public-website-route-house-front-door.json" "CV Revamp is R49.99" "Manifest must lock CV Revamp pricing."
-Require-Contains "manifests\n18\public-website-route-house-front-door.json" "Accommodation Support Package is R179.00" "Manifest must lock Accommodation pricing."
-Require-Contains "manifests\n18\public-website-route-house-front-door.json" "Every paid Kingsmen package includes up to 8 ACC-01 accommodation routes" "Manifest must lock ACC-01 paid package inclusion."
+Require-Contains "manifests\n18\public-website-route-house-front-door.json" "Accommodation support is a privilege" "Manifest must define accommodation as a package privilege."
+Require-Contains "manifests\n18\public-website-route-house-front-door.json" "managed-route slots" "Manifest must place accommodation within route allowance."
 Require-Contains "manifests\n18\public-website-route-house-front-door.json" "not an official university" "Manifest must state not official portal."
 Require-Contains "manifests\n18\public-website-route-house-front-door.json" "No guarantee of admission" "Manifest must block guarantees."
 Require-Contains "manifests\n18\public-website-route-house-front-door.json" "document-aware" "Manifest must require smart document-aware public forms."
@@ -69,8 +69,8 @@ Require-Contains "db\seeds\n18_public_website_seed.sql" "PUBLIC_IDENTITY_PRIVATE
 Require-Contains "db\seeds\n18_public_website_seed.sql" "NOT_CHEAP_APPLICATION_HELP_SERVICE" "Seed must block cheap positioning."
 Require-Contains "db\seeds\n18_public_website_seed.sql" "FREE_DESTINY_MAP_PRICE_ZAR" "Seed missing Destiny Map price."
 Require-Contains "db\seeds\n18_public_website_seed.sql" "CV_REVAMP_PRICE_ZAR" "Seed missing CV price."
-Require-Contains "db\seeds\n18_public_website_seed.sql" "ACCOMMODATION_SUPPORT_PRICE_ZAR" "Seed missing accommodation price."
-Require-Contains "db\seeds\n18_public_website_seed.sql" "PAID_PACKAGES_INCLUDE_ACC01_ROUTES" "Seed missing paid ACC-01 route inclusion."
+Require-Contains "db\seeds\n18_public_website_seed.sql" "ACCOMMODATION_SUPPORT_SEPARATE_FEE" "Seed must state accommodation is not a separate product fee."
+Require-Contains "db\seeds\n18_public_website_seed.sql" "ACCOMMODATION_SUPPORT_COUNTS_TOWARD_MANAGED_ROUTE_ALLOWANCE" "Seed must count accommodation within the managed-route allowance."
 Require-Contains "db\seeds\n18_public_website_seed.sql" "NO_OFFICIAL_IMPERSONATION" "Seed missing official impersonation guardrail."
 Require-Contains "db\seeds\n18_public_website_seed.sql" "SEALED_ROUTE_INTELLIGENCE" "Seed missing sealed route guardrail."
 Require-Contains "db\seeds\n18_public_website_seed.sql" "EMAIL_FIRST" "Seed missing email-first disclosure."
@@ -84,7 +84,8 @@ Require-Contains "runtime\public-website\public-website-runtime.example.json" "r
 Require-Contains "apps\api\src\public-website\route-house-copy.ts" "PRIVATE_ROUTE_COMMAND_HOUSE" "Route-house copy must validate command positioning."
 Require-Contains "apps\api\src\public-website\package-boundaries.ts" "FREE_DESTINY_MAP" "Package boundary missing free Destiny Map."
 Require-Contains "apps\api\src\public-website\package-boundaries.ts" "R49.99" "Package boundary missing CV price."
-Require-Contains "apps\api\src\public-website\package-boundaries.ts" "R179.00" "Package boundary missing accommodation price."
+Require-Contains "apps\api\src\public-website\package-boundaries.ts" "ARTISAN_CHARTER" "Package boundary missing Artisan Charter."
+Require-Contains "apps\api\src\public-website\package-boundaries.ts" "REGENCY_MANDATE" "Package boundary missing Regency Mandate."
 Require-Contains "apps\api\src\public-website\sector-universe.ts" "PRIVATE_COLLEGE" "Sector universe missing private colleges."
 Require-Contains "apps\api\src\public-website\sector-universe.ts" "exactTargetsRemainSealed" "Sector universe must seal targets."
 Require-Contains "apps\api\src\public-website\destiny-map-preview.ts" "managedApplications: 0" "Destiny preview must have 0 managed applications."
@@ -100,7 +101,7 @@ Require-Contains "apps\web\src\public-site\PublicHomePage.tsx" "private route co
 Require-Contains "apps\web\src\public-site\RouteHouseHero.tsx" "Not cheap application help" "Hero must block cheap positioning."
 Require-Contains "apps\web\src\public-site\DestinyMapPreviewPanel.tsx" "0 managed applications" "Destiny UI must state zero managed applications."
 Require-Contains "apps\web\src\public-site\PricingBoundaryPanel.tsx" "R49.99" "Pricing UI missing CV price."
-Require-Contains "apps\web\src\public-site\PricingBoundaryPanel.tsx" "R179.00" "Pricing UI missing accommodation price."
+Require-Contains "apps\web\src\public-site\PricingBoundaryPanel.tsx" "R469.99" "Pricing UI missing Regency Mandate."
 Require-Contains "apps\web\src\public-site\SectorUniversePanel.tsx" "All sectors visible" "Sector UI must show all sectors visible."
 Require-Contains "apps\web\src\public-site\TrustSafetyPanel.tsx" "not an official university" "Trust UI must state not official portal."
 Require-Contains "apps\web\src\public-site\SmartLeadCapturePanel.tsx" "Do not type what your documents already say" "Smart intake UI must avoid repeated typing."

@@ -1,7 +1,7 @@
 {
   "phase": "N10",
   "name": "Finance / PayFast Runtime",
-  "status": "foundation",
+  "status": "commercial_schedule_proposed_pending_founder_approval",
   "laws": [
     "PostgreSQL finance ledger is truth.",
     "PayFast is the payment processor, not Kingsmen truth.",
@@ -13,12 +13,18 @@
     "PayFast signatures must be verified before payment status changes.",
     "Refunds require human approval.",
     "Finance messages follow email-primary doctrine.",
-    "CV Revamp must never invent fake experience, certificates, references, skills, or qualifications."
+    "CV Revamp must never invent fake experience, certificates, references, skills, or qualifications.",
+    "Seven-package catalogue version 1.0 is proposed and must not be activated until founder approval is recorded."
   ],
   "pricing_locked": [
     "FREE_DESTINY_MAP_R0",
     "CV_REVAMP_R49_99",
-    "ACCOMMODATION_SUPPORT_R179"
+    "ARTISAN_CHARTER_R149_99",
+    "FOUNDATIONAL_ACCORD_R169_99",
+    "GUILDMASTERS_CHARTER_R199_99",
+    "COLLEGIATE_ORDINANCE_R299_99",
+    "CHANCELLORS_WRIT_R399_99",
+    "REGENCY_MANDATE_R469_99"
   ],
   "runtime_surfaces": [
     "Plan Catalog",
