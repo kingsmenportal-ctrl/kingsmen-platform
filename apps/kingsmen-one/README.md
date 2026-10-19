@@ -21,3 +21,9 @@ Before production use, wire real Supabase Auth, bind the authenticated user to t
 
 ## Delivery state
 This is the first tracked foundation batch, not a claim that the full Kingsmen platform is complete, tested in a live environment, connected to every provider, or deployed.
+
+
+## Verified-candidate readiness persistence
+The candidate workspace now calls the Supabase Edge Function `candidate-workspace-readiness` to load and save preparation-task completion and the selected priority pathway. The function requires a valid Supabase Auth session, resolves the candidate exclusively through `candidate_auth_identity_links` with `link_status=VERIFIED` and a non-null `verified_at`, and only then reads/writes `candidate_workspace_readiness`. The browser never supplies an authoritative `candidate_id`, and the service-role key remains server-side.
+
+Accounts without a verified identity link keep using the local preview state and cannot read or write candidate readiness records. This endpoint does not persist profile fields, upload documents, submit applications, or independently verify a candidate's reported progress. Automated source-contract tests cover the boundary; authenticated browser E2E still requires a controlled verified test account.
