@@ -39,7 +39,7 @@ for (const marker of [
 if (!repository.includes('private async withTransaction') || !repository.includes('client.query("ROLLBACK")')) {
   failures.push("Truth Vault command/workflow writes must use a transaction helper with rollback.");
 }
-if ((repository.match(/pg_advisory_xact_lock\\(hashtext\\(\\$1\\)\\)/g) ?? []).length < 3) {
+if ((repository.match(/pg_advisory_xact_lock\(hashtext\(\$1\)\)/g) ?? []).length < 3) {
   failures.push("Expected transaction-scoped advisory locks for command idempotency and workflow idempotency/run identity.");
 }
 checks.push({ check: "source_auth_and_transaction_boundaries", passed: failures.length === 0 });
