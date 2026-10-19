@@ -29,5 +29,13 @@ The linked Supabase project `kingsmen-portal-staging` (ref `euhubhhnumtibbyufghm
 - Email/password sign-in, account creation and password-reset request use Supabase Auth.
 - Auth session changes update the account view and sign-out action.
 - Signing in does not match an existing candidate by email and does not unlock or write candidate data.
-- Candidate profile/preparation controls remain browser-local demo state until an identity-link workflow and owner-scoped persistence are implemented and tested.
+- Candidate profile fields remain browser-local demo state; preparation task completion and priority pathway now persist through `candidate-workspace-readiness` only after a server-verified `VERIFIED` identity link. The full authenticated browser journey remains unverified.
 - The current staging database has no RLS policies on candidate_identity_review_requests in the inspected policy catalogue; Kingsmen One must not submit identity claims directly to that table until the correct policy or server-side RPC is designed, reviewed and tested.
+
+
+## Verified candidate readiness persistence (implemented)
+- Added and deployed Supabase Edge Function `candidate-workspace-readiness` with JWT verification enabled.
+- The function validates the caller token using Supabase Auth, resolves the candidate only from a `VERIFIED` identity link with `verified_at`, and reads/writes only that candidate's existing `candidate_workspace_readiness` row.
+- Accepted task IDs and pathway IDs are allowlisted server-side; browser-supplied candidate IDs are not accepted.
+- Accounts without a verified identity link remain in local preview mode. This batch does not persist profile edits or enable private document uploads.
+- Static source-contract test added; CI and authenticated browser E2E must still be inspected before claiming end-to-end verification.
