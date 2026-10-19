@@ -8,7 +8,7 @@ const BUCKET = "kingsmen-candidate-documents";
 const MAX_BYTES = 10 * 1024 * 1024;
 const types = new Set(["application/pdf", "image/jpeg", "image/png"]);
 const uuid = /^[0-9a-f]{8}-[0-9a-f]{4}-[1-8][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i;
-const filenameSafe = (value: string) => value.replace(/[\\/\\u0000-\\u001f\\u007f]/g, "_").replace(/\\s+/g, " ").trim().slice(0, 180) || "document";
+const filenameSafe = (value: string) => value.replace(/[\\/\u0000-\u001f\u007f]/g, "_").replace(/\s+/g, " ").trim().slice(0, 180) || "document";
 
 function fail(error: unknown) {
   if (error instanceof WorkspaceAuthError) return NextResponse.json({ ok: false, error: error.message }, { status: error.status });
