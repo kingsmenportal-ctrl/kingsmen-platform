@@ -12,7 +12,7 @@
   },
   "nonNegotiableLaunchRules": [
     "No public users until launch gate is open.",
-    "No production payment flow until PayFast sandbox and ITN evidence pass.",
+    "No production payment flow until PayFast sandbox and ITN verification evidence pass.",
     "No candidate data writes outside PostgreSQL/Supabase Truth Vault.",
     "No workflow execution without idempotency key, correlation ID, and audit evidence.",
     "No secrets in git, chat, reports, screenshots, or package artifacts.",
