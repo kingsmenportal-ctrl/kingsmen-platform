@@ -69,7 +69,7 @@ export async function POST(request: Request) {
       return NextResponse.json({ ok: false, error: "Checklist type, title, notes, HTTPS source, evidence reference or due date is invalid." }, { status: 400 });
     }
     if (!await ownTracker(trackerId, candidateId)) return NextResponse.json({ ok: false, error: "Application tracker item was not found for this candidate." }, { status: 404 });
-    const status = typeof body.status === "string" && statuses.has(body.status) ? body.status : "NOT_STARTED";
+    if (body.status !== undefined && (typeof body.status !== "string" || !statuses.has(body.status))) {\n      return NextResponse.json({ ok: false, error: "Checklist status is invalid." }, { status: 400 });\n    }\n    const status = typeof body.status === "string" ? body.status : "NOT_STARTED";
     if (status === "READY_CANDIDATE_REPORTED" && !evidenceReference) {
       return NextResponse.json({ ok: false, error: "Add an evidence reference before reporting this item ready." }, { status: 400 });
     }
