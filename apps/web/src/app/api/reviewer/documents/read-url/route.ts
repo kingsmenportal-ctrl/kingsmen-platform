@@ -27,10 +27,10 @@ export async function POST(request: Request) {
     const documentId = typeof body.documentId === "string" ? body.documentId : "";
     if (!/^[0-9a-f]{8}-[0-9a-f]{4}-[1-8][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i.test(documentId))
       return NextResponse.json({ ok: false, error: "A valid document ID is required." }, { status: 400 });
-    const lookup = await fetch(`${auth.url}/rest/v1/candidate_private_documents?select=id,storage_bucket,storage_path,status&id=eq.${encodeURIComponent(documentId)}&limit=1`,
+    const lookup = await fetch(`${auth.url}/rest/v1/candidate_private_documents?select=id,candidate_id,storage_bucket,storage_path,status&id=eq.${encodeURIComponent(documentId)}&limit=1`,
       { headers: { apikey: auth.service, Authorization: `Bearer ${auth.service}` }, cache: "no-store" });
     if (!lookup.ok) throw new Error("Document lookup failed.");
-    const docs = await lookup.json() as Array<{ id: string; storage_bucket: string; storage_path: string; status: string }>;
+    const docs = await lookup.json() as Array<{ id: string; candidate_id: string; storage_bucket: string; storage_path: string; status: string }>;
     if (docs.length !== 1) return NextResponse.json({ ok: false, error: "Document not found." }, { status: 404 });
     if (!["UPLOADED_CANDIDATE_REPORTED", "UNDER_REVIEW"].includes(docs[0].status))
       return NextResponse.json({ ok: false, error: "Only documents awaiting review can be opened for review." }, { status: 409 });
@@ -42,6 +42,15 @@ export async function POST(request: Request) {
     const path = payload.signedURL || payload.signedUrl;
     if (!path) throw new Error("Signed reviewer read response was incomplete.");
     const readUrl = path.startsWith("http") ? path : `${auth.url}${path.startsWith("/") ? "" : "/"}${path}`;
+    const audit = await fetch(`${auth.url}/rest/v1/candidate_private_document_events`, {
+      method: "POST",
+      headers: { apikey: auth.service, Authorization: `Bearer ${auth.service}`, "Content-Type": "application/json", Prefer: "return=minimal" },
+      body: JSON.stringify({ document_id: docs[0].id, candidate_id: docs[0].candidate_id, actor_type: "REVIEWER",
+        event_type: "READ_LINK_ISSUED", from_status: docs[0].status, to_status: docs[0].status,
+        metadata: { reviewer_auth_user_id: auth.userId, expires_in_seconds: 600 } }),
+      cache: "no-store"
+    });
+    if (!audit.ok) throw new Error("Reviewer document read audit could not be persisted.");
     return NextResponse.json({ ok: true, readUrl, expiresInSeconds: 600 }, { headers: { "Cache-Control": "private, no-store", Pragma: "no-cache" } });
   } catch { return NextResponse.json({ ok: false, error: "Reviewer document access failed safely." }, { status: 503 }); }
 }
