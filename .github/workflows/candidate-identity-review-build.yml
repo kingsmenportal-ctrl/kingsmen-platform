@@ -10,6 +10,7 @@ on:
       - "apps/web/src/app/candidate/identity-review/**"
       - "apps/web/src/app/reviewer/identity-requests/**"
       - "scripts/validators/validate-candidate-identity-review-intake.mjs"
+      - "scripts/tests/test-candidate-identity-review-api.mjs"
       - ".github/workflows/candidate-identity-review-build.yml"
   push:
     branches:
@@ -41,6 +42,8 @@ jobs:
         run: npm ci
       - name: Validate identity review security contract
         run: node scripts/validators/validate-candidate-identity-review-intake.mjs
+      - name: Run identity review API integration tests
+        run: node scripts/tests/test-candidate-identity-review-api.mjs
       - name: Install web dependencies
         run: npm install --prefix apps/web --no-audit --no-fund
       - name: Build Next.js web application
