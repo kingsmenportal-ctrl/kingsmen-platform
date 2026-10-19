@@ -1,0 +1,33 @@
+name: Kingsmen One smoke tests
+
+on:
+  pull_request:
+    paths:
+      - "apps/kingsmen-one/**"
+      - ".github/workflows/kingsmen-one-smoke.yml"
+  push:
+    branches:
+      - "feat/kingsmen-one-foundation-2026-10-19"
+    paths:
+      - "apps/kingsmen-one/**"
+      - ".github/workflows/kingsmen-one-smoke.yml"
+
+permissions:
+  contents: read
+
+jobs:
+  smoke:
+    name: Static candidate workflow smoke tests
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: apps/kingsmen-one
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+      - name: Set up Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+      - name: Run smoke tests
+        run: npm test
