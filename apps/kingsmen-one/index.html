@@ -7,6 +7,8 @@
   <meta name="description" content="Kingsmen One candidate workspace for pathways, opportunities and application readiness.">
   <title>Kingsmen One | Your next step, made clearer</title>
   <link rel="stylesheet" href="./styles.css">
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="./supabase-client.js" defer></script>
   <script src="./app.js" defer></script>
 </head>
 <body>
@@ -26,7 +28,7 @@
       <div class="sidebar-bottom"><span class="avatar">KM</span><div><strong>Demo candidate</strong><small>Local preview profile</small></div><span class="online-dot" title="Demo mode"></span></div>
     </aside>
     <main class="main">
-      <header class="topbar"><div class="crumb">Candidate workspace <span>/</span> <strong id="current-crumb">Overview</strong></div><div class="top-actions"><span class="demo-pill"><i></i> DEMO MODE</span><button class="icon-button" id="reset-demo" title="Reset demo data" aria-label="Reset demo data">↻</button></div></header>
+      <header class="topbar"><div class="crumb">Candidate workspace <span>/</span> <strong id="current-crumb">Overview</strong></div><div class="top-actions"><span class="demo-pill"><i></i> PREVIEW</span><button class="icon-button" id="reset-demo" title="Reset demo data" aria-label="Reset demo data">↻</button></div></header>
       <section class="welcome" id="welcome">
         <div><p class="eyebrow">MONDAY, YOUR NEXT CHAPTER</p><h1>Your future, <em>in motion.</em></h1><p class="welcome-copy">One clear place to prepare, track and take your next step.</p></div>
         <div class="welcome-art" aria-hidden="true"><div class="sun"></div><div class="hill hill-one"></div><div class="hill hill-two"></div><div class="path-line"></div></div>
