@@ -37,6 +37,11 @@
   let profileChangeRequests = [];
   let profileReviewAvailable = false;
   let profileLoadedForUser = null;
+  let applicationTrackers = [];
+  let applicationItems = [];
+  let applicationSavedRoutes = [];
+  let applicationWorkspaceLoadedForUser = null;
+  let applicationWorkspaceAvailable = false;
   async function loadOfficialProfile(force = false) {
     const userId=authSession?.user?.id;
     if(!supabaseClient||!userId){profileReviewAvailable=false;officialProfile=null;profileChangeRequests=[];profileLoadedForUser=null;return false;}
@@ -174,8 +179,43 @@
     const list=opportunities.filter(o=>(type==="all"||o.type===type)&&[o.title,o.desc,o.provider,o.type].join(" ").toLowerCase().includes(q));
     target.innerHTML=list.length?list.map(o=>{const saved=state.saved.includes(o.id);return `<article class="opportunity-card"><span class="provider">${o.provider}</span><h3>${o.title}</h3><p>${o.desc}</p><div class="details">${o.type} · ${o.location}<br><br>Deadline: ${o.deadline}</div>${button(saved?"★ Saved":"☆ Save opportunity",`data-save="${o.id}" class="${saved?"secondary-button saved":"secondary-button"}`)}</article>`;}).join(""):'<div class="empty-state"><strong>No matching opportunities</strong><p>Try a different search or filter.</p></div>';
   }
+  async function loadApplicationWorkspace(force = false) {
+    const userId=authSession?.user?.id;
+    if(!supabaseClient||!userId){applicationTrackers=[];applicationItems=[];applicationSavedRoutes=[];applicationWorkspaceAvailable=false;applicationWorkspaceLoadedForUser=null;return false;}
+    if(!force&&applicationWorkspaceLoadedForUser===userId)return applicationWorkspaceAvailable;
+    try {
+      const [workspace, saved] = await Promise.all([
+        supabaseClient.functions.invoke("candidate-application-preparation",{body:{action:"load"}}),
+        supabaseClient.from("candidate_saved_routes").select("route_programme_id,route_programmes(id,programme_name,route_type,source_url,route_status,availability_status)").eq("user_id",userId)
+      ]);
+      if(workspace.error)throw workspace.error;
+      if(workspace.data?.ready!==true)throw new Error("Verified candidate identity is required.");
+      if(saved.error)throw saved.error;
+      applicationTrackers=Array.isArray(workspace.data.trackers)?workspace.data.trackers:[];
+      applicationItems=Array.isArray(workspace.data.items)?workspace.data.items:[];
+      applicationSavedRoutes=(saved.data||[]).map(row=>row.route_programmes).filter(route=>route&&route.route_status==="VERIFIED"&&route.source_url);
+      applicationWorkspaceAvailable=true;applicationWorkspaceLoadedForUser=userId;
+      return true;
+    } catch {
+      applicationWorkspaceAvailable=false;applicationWorkspaceLoadedForUser=userId;
+      applicationTrackers=[];applicationItems=[];applicationSavedRoutes=[];
+      return false;
+    }
+  }
+  function applicationWorkspaceView() {
+    const routeCards=applicationSavedRoutes.map(route=>{
+      const tracked=applicationTrackers.some(t=>t.candidate_workspace_saved_opportunities?.official_url===route.source_url);
+      return `<div class="task-row"><div class="task-info"><strong>${escapeHtml(route.programme_name)}</strong><small>Verified catalogue entry · saved to your account · not submitted</small></div>${button(tracked?"Tracker created":"Create tracker",`data-start-tracker="${escapeHtml(route.id)}"`,!tracked)}</div>`;
+    }).join("");
+    const trackerCards=applicationTrackers.map(t=>{
+      const opp=Array.isArray(t.candidate_workspace_saved_opportunities)?t.candidate_workspace_saved_opportunities[0]:t.candidate_workspace_saved_opportunities;
+      const items=applicationItems.filter(i=>i.tracker_id===t.id).map(i=>`<div class="task-row"><div class="task-info"><strong>${escapeHtml(i.title)}</strong><small>${escapeHtml(i.item_type)} · ${escapeHtml(i.status.replaceAll("_"," "))}${i.evidence_reference?" · evidence reference recorded":""}</small></div>${button(i.status==="NOT_STARTED"?"Start":i.status==="IN_PROGRESS"?"Mark ready":"Update",`data-update-item="${escapeHtml(i.id)}" data-item-status="${escapeHtml(i.status)}"`)}</div>`).join("");
+      return `<article class="panel application-tracker-card"><h3>${escapeHtml(opp?.title||"Saved opportunity")}</h3><p class="panel-subtitle">${escapeHtml(opp?.organisation||"Official provider")} · ${escapeHtml(t.status.replaceAll("_"," "))}</p><label class="form-label" for="tracker-note-${t.id}">Preparation note</label><textarea class="filter-input form-control" id="tracker-note-${t.id}" maxlength="1200" rows="2">${escapeHtml(t.candidate_note||"")}</textarea><button class="secondary-button" data-save-tracker-note="${escapeHtml(t.id)}">Save note</button><div class="task-list">${items||'<p class="muted-note">No checklist items yet.</p>'}</div><form class="add-preparation-item" data-add-item="${escapeHtml(t.id)}"><label class="form-label">Add checklist item</label><input class="filter-input form-control" name="title" required minlength="2" maxlength="160" placeholder="e.g. Request certified academic results"><select class="filter-select form-control" name="item_type"><option value="TASK">Task</option><option value="DOCUMENT">Document</option></select><label class="form-label">Official source URL (optional)</label><input class="filter-input form-control" type="url" name="official_source_url" placeholder="https://…"><button class="secondary-button" type="submit">Add item</button></form><p class="muted-note">Checklist progress and evidence references are candidate-reported. Creating a tracker never submits an application to a provider.</p></article>`;
+    }).join("");
+    return `<div class="panel"><h3>Saved verified opportunities</h3><p class="panel-subtitle">Start a persistent tracker only from a saved, verified catalogue entry. Demo listings are excluded.</p><div class="task-list">${routeCards||'<p class="muted-note">No verified opportunities are saved to this account yet. Save one from Opportunities first.</p>'}</div></div><div class="application-tracker-list">${trackerCards||'<div class="panel"><h3>No persistent trackers yet</h3><p>Choose a saved verified opportunity above to create a tracker and its preparation checklist.</p></div>'}</div>`;
+  }
   function applicationsView() {
-    return `${heading("Application preparation","Track preparation separately from any actual submission or provider decision.")}<div class="content-grid"><div class="panel"><h3>Preparation checklist</h3><p class="panel-subtitle">Your progress is candidate-reported, not an independently verified outcome. ${workspacePersistenceAvailable?"Saved to your verified candidate workspace.":"Progress remains local until an authorised reviewer verifies your candidate identity link."}</p><div class="task-list">${taskList()}</div><p class="muted-note">Checking an item records your own demo progress. It does not certify a document, submit an application or change provider status.</p></div><div class="panel"><h3>Application tracker</h3><p class="panel-subtitle">Create a local preparation record from a saved opportunity.</p>${state.saved.length?state.saved.map(id=>{const o=opportunities.find(x=>x.id===id);if(!o)return "";return `<div class="task-row"><div class="task-info"><strong>${o.title}</strong><small>${state.applicationNotes[id]?"Preparation record created":"Saved opportunity · not submitted"}</small></div>${button(state.applicationNotes[id]?"Prepared":"Start prep",`data-application="${id}"`)}</div>`;}).join(""):'<div class="empty-state"><strong>No saved opportunities yet</strong><p>Save a demo opportunity first, then create a preparation record here.</p></div>'}<p class="muted-note">“Prepared” means you created a local prep record only. No provider has received an application.</p></div></div>`;
+    return `${heading("Application preparation","Persistent trackers connect saved verified opportunities to checklists and candidate-reported evidence references.")}<div class="content-grid"><div class="panel"><h3>General readiness checklist</h3><p class="panel-subtitle">${workspacePersistenceAvailable?"Saved to your verified candidate workspace.":"Local preview only until candidate identity is verified."}</p><div class="task-list">${taskList()}</div><p class="muted-note">Completing a task does not certify documents or submit an application.</p></div><div class="panel"><h3>Persistent application tracker</h3><p class="panel-subtitle">${applicationWorkspaceAvailable?"Connected to your verified candidate workspace.":"Sign in and complete authorised candidate identity review to access persistent trackers."}</p>${applicationWorkspaceAvailable?applicationWorkspaceView():'<p class="muted-note">Your tracker records are not available in preview mode. No candidate data is shown until the server verifies your identity link.</p>'}</div></div>`;
   }
   function documentsView() {
     const docs=[["identity","Identity document","Prepare a clear copy. Identity matching requires authorised review."],["results","Academic results","Gather your latest official results or transcripts."],["cv","CV / résumé","Check contact details, dates and relevant experience."],["proof-address","Proof of address","Check the receiving organisation's current requirements."]];
@@ -192,9 +232,19 @@
     document.querySelectorAll(".nav-item").forEach(b=>b.classList.toggle("active",b.dataset.view===view));
     document.getElementById("welcome").classList.toggle("hidden",view!=="home");
     root.innerHTML=(views[view]||home)();
-    if(view==="opportunities"){renderOpportunityCards();loadVerifiedOpportunities();document.getElementById("opportunity-search").addEventListener("input",renderOpportunityCards);document.getElementById("opportunity-filter").addEventListener("change",renderOpportunityCards);} if(view==="profile"&&authSession?.user) void loadOfficialProfile();
+    if(view==="opportunities"){renderOpportunityCards();loadVerifiedOpportunities();document.getElementById("opportunity-search").addEventListener("input",renderOpportunityCards);document.getElementById("opportunity-filter").addEventListener("change",renderOpportunityCards);} if(view==="profile"&&authSession?.user) void loadOfficialProfile(); if(view==="applications"&&authSession?.user) void loadApplicationWorkspace().then(()=>{if(activeView==="applications")render("applications");});
   }
   document.addEventListener("submit",async e=>{
+    if(e.target.matches("[data-add-item]")) {
+      e.preventDefault();
+      if(!applicationWorkspaceAvailable){toast("Verified candidate workspace required.");return;}
+      const form=new FormData(e.target), trackerId=e.target.dataset.addItem;
+      const payload={action:"add_item",tracker_id:trackerId,title:String(form.get("title")||"").trim(),item_type:String(form.get("item_type")||"TASK"),official_source_url:String(form.get("official_source_url")||"").trim()};
+      const submit=e.target.querySelector('button[type="submit"]');if(submit)submit.disabled=true;
+      try{const {data,error}=await supabaseClient.functions.invoke("candidate-application-preparation",{body:payload});if(error||data?.ready!==true)throw error||new Error(data?.error||"Could not add item.");await loadApplicationWorkspace(true);render("applications");toast("Checklist item saved.");}
+      catch(error){toast(error.message||"Could not add checklist item.");if(submit)submit.disabled=false;}
+      return;
+    }
     if(e.target.id==="identity-review-form") {
       e.preventDefault();
       if(!supabaseClient||!authSession?.user){toast("Sign in before requesting identity review.");render("account");return;}
@@ -290,6 +340,32 @@
       finally {liveSave.disabled=false;}
       return;
     }
+    const startTracker=e.target.closest("[data-start-tracker]");
+    if(startTracker){
+      if(!applicationWorkspaceAvailable){toast("Verified candidate identity is required.");return;}
+      startTracker.disabled=true;
+      try{const {data,error}=await supabaseClient.functions.invoke("candidate-application-preparation",{body:{action:"start_from_saved_route",route_programme_id:startTracker.dataset.startTracker}});if(error||data?.ready!==true)throw error||new Error(data?.error||"Could not create tracker.");await loadApplicationWorkspace(true);render("applications");toast(data.message||"Persistent tracker created.");}
+      catch(error){toast(error.message||"Could not create tracker.");startTracker.disabled=false;}
+      return;
+    }
+    const saveNote=e.target.closest("[data-save-tracker-note]");
+    if(saveNote){
+      const note=document.getElementById("tracker-note-"+saveNote.dataset.saveTracker)?.value||"";
+      const tracker=applicationTrackers.find(t=>t.id===saveNote.dataset.saveTracker);if(!tracker)return;
+      try{const {data,error}=await supabaseClient.functions.invoke("candidate-application-preparation",{body:{action:"update_tracker",tracker_id:tracker.id,status:tracker.status,candidate_note:note,evidence_reference:tracker.evidence_reference||""}});if(error||data?.ready!==true)throw error||new Error(data?.error||"Could not save note.");await loadApplicationWorkspace(true);render("applications");toast("Preparation note saved.");}
+      catch(error){toast(error.message||"Could not save note.");}
+      return;
+    }
+    const updateItem=e.target.closest("[data-update-item]");
+    if(updateItem){
+      const item=applicationItems.find(i=>i.id===updateItem.dataset.updateItem);if(!item)return;
+      let status=item.status==="NOT_STARTED"?"IN_PROGRESS":item.status==="IN_PROGRESS"?"READY_CANDIDATE_REPORTED":"IN_PROGRESS";
+      let evidence=item.evidence_reference||"";
+      if(status==="READY_CANDIDATE_REPORTED"){evidence=prompt("Add a reference to the evidence you prepared (not the document itself):",evidence)||"";if(!evidence.trim()){toast("Evidence reference is required to mark this item ready.");return;}}
+      try{const {data,error}=await supabaseClient.functions.invoke("candidate-application-preparation",{body:{action:"update_item",item_id:item.id,status,candidate_note:item.candidate_note||"",evidence_reference:evidence}});if(error||data?.ready!==true)throw error||new Error(data?.error||"Could not update item.");await loadApplicationWorkspace(true);render("applications");toast(data.message||"Checklist updated.");}
+      catch(error){toast(error.message||"Could not update checklist.");}
+      return;
+    }
     const app=e.target.closest("[data-application]");if(app){state.applicationNotes[app.dataset.application]=true;save();render();toast("Local preparation record created—not submitted.");return;}
     const doc=e.target.closest("[data-document]");if(doc){const id=doc.dataset.document;state.documents[id]=state.documents[id]==="prepared"?"not-started":"prepared";save();render();toast("Demo readiness state updated.");return;}
     const path=e.target.closest("[data-path]");if(path){
@@ -307,8 +383,8 @@
     supabaseClient.auth.onAuthStateChange((_event,session)=>{
       authSession=session;
       updateAuthStatus();
-      if(session?.user) {void loadPersistentReadiness();void loadOfficialProfile(true);}
-      else {workspacePersistenceAvailable=false;workspaceLoadedForUser=null;profileReviewAvailable=false;officialProfile=null;profileChangeRequests=[];profileLoadedForUser=null;}
+      if(session?.user) {void loadPersistentReadiness();void loadOfficialProfile(true);void loadApplicationWorkspace(true);}
+      else {workspacePersistenceAvailable=false;workspaceLoadedForUser=null;applicationTrackers=[];applicationItems=[];applicationSavedRoutes=[];applicationWorkspaceAvailable=false;applicationWorkspaceLoadedForUser=null;profileReviewAvailable=false;officialProfile=null;profileChangeRequests=[];profileLoadedForUser=null;}
       if(activeView==="account")render("account");
     });
     refreshAuthSession();
