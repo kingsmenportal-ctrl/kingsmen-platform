@@ -61,3 +61,11 @@ test("opportunities use the verified-public route catalogue before demo samples"
   assert.match(js, /Practice with demo listings/);
   assert.match(js, /Open official source/);
 });
+
+test("saving a verified route requires a signed-in user and uses owner-scoped RLS table", async () => {
+  const js = await read("app.js");
+  assert.match(js, /data-save-route/);
+  assert.match(js, /Sign in first to save a verified opportunity/);
+  assert.match(js, /from\("candidate_saved_routes"\)\.insert/);
+  assert.match(js, /user_id:authSession\.user\.id/);
+});
