@@ -32,8 +32,8 @@ CREATE INDEX IF NOT EXISTS candidate_application_tracker_owner_updated_idx
 
 CREATE TABLE IF NOT EXISTS public.candidate_application_tracker_events (
   id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
-  tracker_id uuid NOT NULL,
-  candidate_id uuid NOT NULL,
+  tracker_id uuid NOT NULL REFERENCES public.candidate_application_tracker(id) ON DELETE CASCADE,
+  candidate_id uuid NOT NULL REFERENCES public.candidates(id) ON DELETE CASCADE,
   previous_status text,
   new_status text NOT NULL,
   candidate_note text NOT NULL DEFAULT '',
