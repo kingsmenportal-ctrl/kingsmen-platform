@@ -115,3 +115,24 @@ test("official profile corrections require a verified identity link and reviewer
   assert.doesNotMatch(fn, /from\("candidate_profiles"\)\.update/);
   assert.doesNotMatch(fn, /payload\.candidate_id/);
 });
+
+test("persistent application preparation is gated by verified candidate identity", async () => {
+  const js = await read("app.js");
+  const fn = await readFile(resolve(root, "../..", "supabase/functions/candidate-application-preparation/index.ts"), "utf8");
+  assert.match(js, /candidate-application-preparation/);
+  assert.match(js, /data-start-tracker/);
+  assert.match(js, /data-add-item/);
+  assert.match(js, /data-update-item/);
+  assert.match(fn, /auth\.auth\.getUser|auth\.getUser/);
+  assert.match(fn, /candidate_auth_identity_links/);
+  assert.match(fn, /eq\("link_status",\s*"VERIFIED"\)/);
+  assert.match(fn, /verified_at/);
+  assert.match(fn, /candidate_saved_routes/);
+  assert.match(fn, /route_programmes/);
+  assert.match(fn, /candidate_application_tracker/);
+  assert.match(fn, /candidate_application_preparation_items/);
+  assert.match(fn, /SUBMITTED_CANDIDATE_REPORTED/);
+  assert.match(fn, /No provider submission is implied|not a provider application/i);
+  assert.doesNotMatch(fn, /payload\.candidate_id|p\.candidate_id/);
+  assert.match(fn, /Cache-Control.*no-store/);
+});
