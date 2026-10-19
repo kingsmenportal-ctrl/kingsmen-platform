@@ -12,7 +12,7 @@ CREATE TABLE IF NOT EXISTS candidate_workspace_readiness (
   )
 );
 
-CREATE TABLE IF NOT EXISTS candidate_saved_opportunities (
+CREATE TABLE IF NOT EXISTS candidate_workspace_saved_opportunities (
   id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
   candidate_id uuid NOT NULL REFERENCES candidates(id) ON DELETE CASCADE,
   title text NOT NULL CHECK (length(trim(title)) BETWEEN 1 AND 180),
@@ -24,11 +24,11 @@ CREATE TABLE IF NOT EXISTS candidate_saved_opportunities (
   updated_at timestamptz NOT NULL DEFAULT now(),
   UNIQUE(candidate_id, official_url)
 );
-CREATE INDEX IF NOT EXISTS candidate_saved_opportunities_owner_created_idx
-  ON candidate_saved_opportunities(candidate_id, created_at DESC);
+CREATE INDEX IF NOT EXISTS candidate_workspace_saved_opportunities_owner_created_idx
+  ON candidate_workspace_saved_opportunities(candidate_id, created_at DESC);
 
 ALTER TABLE candidate_workspace_readiness ENABLE ROW LEVEL SECURITY;
-ALTER TABLE candidate_saved_opportunities ENABLE ROW LEVEL SECURITY;
+ALTER TABLE candidate_workspace_saved_opportunities ENABLE ROW LEVEL SECURITY;
 
 -- Identity-link rows are intentionally hidden behind backend-only RLS. This fixed-purpose
 -- SECURITY DEFINER helper exposes only the verified candidate UUID for auth.uid().
@@ -60,15 +60,15 @@ CREATE POLICY candidate_workspace_readiness_update_own ON candidate_workspace_re
   FOR UPDATE USING (candidate_id = (SELECT public.current_verified_candidate_id()))
   WITH CHECK (candidate_id = (SELECT public.current_verified_candidate_id()));
 
-DROP POLICY IF EXISTS candidate_saved_opportunities_read_own ON candidate_saved_opportunities;
-CREATE POLICY candidate_saved_opportunities_read_own ON candidate_saved_opportunities
+DROP POLICY IF EXISTS candidate_workspace_saved_opportunities_read_own ON candidate_workspace_saved_opportunities;
+CREATE POLICY candidate_workspace_saved_opportunities_read_own ON candidate_workspace_saved_opportunities
   FOR SELECT USING (candidate_id = (SELECT public.current_verified_candidate_id()));
-DROP POLICY IF EXISTS candidate_saved_opportunities_insert_own ON candidate_saved_opportunities;
-CREATE POLICY candidate_saved_opportunities_insert_own ON candidate_saved_opportunities
+DROP POLICY IF EXISTS candidate_workspace_saved_opportunities_insert_own ON candidate_workspace_saved_opportunities;
+CREATE POLICY candidate_workspace_saved_opportunities_insert_own ON candidate_workspace_saved_opportunities
   FOR INSERT WITH CHECK (candidate_id = (SELECT public.current_verified_candidate_id()));
-DROP POLICY IF EXISTS candidate_saved_opportunities_delete_own ON candidate_saved_opportunities;
-CREATE POLICY candidate_saved_opportunities_delete_own ON candidate_saved_opportunities
+DROP POLICY IF EXISTS candidate_workspace_saved_opportunities_delete_own ON candidate_workspace_saved_opportunities;
+CREATE POLICY candidate_workspace_saved_opportunities_delete_own ON candidate_workspace_saved_opportunities
   FOR DELETE USING (candidate_id = (SELECT public.current_verified_candidate_id()));
 
 GRANT SELECT, INSERT, UPDATE, DELETE ON candidate_workspace_readiness TO authenticated;
-GRANT SELECT, INSERT, UPDATE, DELETE ON candidate_saved_opportunities TO authenticated;
+GRANT SELECT, INSERT, UPDATE, DELETE ON candidate_workspace_saved_opportunities TO authenticated;
