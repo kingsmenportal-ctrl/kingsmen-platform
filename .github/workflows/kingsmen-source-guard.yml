@@ -26,6 +26,9 @@ jobs:
       - name: Install dependencies
         run: npm ci
 
+      - name: Candidate dashboard behaviour validator
+        run: npm run candidate:validate:dashboard
+
       - name: API Truth Vault persistence validator
         run: npm run api:validate:truth-vault
 
