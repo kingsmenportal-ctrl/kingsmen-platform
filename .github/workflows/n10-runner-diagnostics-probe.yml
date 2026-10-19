@@ -1,0 +1,23 @@
+name: N10 Runner Diagnostics Probe
+on:
+  push:
+    branches:
+      - 'n10-packages-payments-refunds-2026-10-17'
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  runner-probe:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - name: Prove runner executes shell commands
+        shell: bash
+        run: |
+          set -euo pipefail
+          echo "N10_RUNNER_PROBE_BEGIN"
+          echo "event=$GITHUB_EVENT_NAME"
+          echo "commit=$GITHUB_SHA"
+          uname -a
+          date -u
+          echo "N10_RUNNER_PROBE_PASS"

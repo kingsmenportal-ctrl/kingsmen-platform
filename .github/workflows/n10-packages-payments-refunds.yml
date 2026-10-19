@@ -1,0 +1,96 @@
+name: N10 Packages Payments Refunds
+on:
+  pull_request:
+    paths:
+      - 'db/migrations/0064_n10_packages_payments_refunds.sql'
+      - 'db/migrations/0065_n10_finance_privilege_hardening.sql'
+      - 'db/migrations/0067_n10_atomic_payfast_payment_confirmation.sql'
+      - 'db/migrations/0068_n10_payfast_refund_reconciliation.sql'
+      - 'db/migrations/0069_n10_atomic_finance_workflows.sql'
+      - 'db/migrations/0070_n10_finance_rpc_only_writes.sql'
+      - 'apps/web/src/app/api/candidate/finance/**'
+      - 'apps/web/src/app/api/reviewer/finance/**'
+      - 'apps/web/src/app/api/webhooks/payfast/**'
+      - 'apps/web/src/lib/payfast-runtime.ts'
+      - 'apps/web/src/app/candidate/finance/**'
+      - 'apps/web/src/app/reviewer/finance/**'
+      - 'scripts/validators/validate-n10-finance.mjs'
+      - 'scripts/tests/n10-finance-contract.mjs'
+      - 'scripts/tests/n10-payfast-contract.mjs'
+      - 'docs/n10/**'
+      - 'reports/n10/**'
+      - 'package.json'
+      - '.github/workflows/n10-packages-payments-refunds.yml'
+  push:
+    branches:
+      - 'n10-packages-payments-refunds-2026-10-17'
+    paths:
+      - 'db/migrations/0064_n10_packages_payments_refunds.sql'
+      - 'db/migrations/0065_n10_finance_privilege_hardening.sql'
+      - 'db/migrations/0067_n10_atomic_payfast_payment_confirmation.sql'
+      - 'db/migrations/0068_n10_payfast_refund_reconciliation.sql'
+      - 'db/migrations/0069_n10_atomic_finance_workflows.sql'
+      - 'db/migrations/0070_n10_finance_rpc_only_writes.sql'
+      - 'apps/web/src/app/api/candidate/finance/**'
+      - 'apps/web/src/app/api/reviewer/finance/**'
+      - 'apps/web/src/app/api/webhooks/payfast/**'
+      - 'apps/web/src/lib/payfast-runtime.ts'
+      - 'apps/web/src/app/candidate/finance/**'
+      - 'apps/web/src/app/reviewer/finance/**'
+      - 'scripts/validators/validate-n10-finance.mjs'
+      - 'scripts/tests/n10-finance-contract.mjs'
+      - 'scripts/tests/n10-payfast-contract.mjs'
+      - 'docs/n10/**'
+      - 'reports/n10/**'
+      - 'package.json'
+      - '.github/workflows/n10-packages-payments-refunds.yml'
+  workflow_dispatch:
+permissions:
+  contents: read
+  actions: read
+jobs:
+  n10-finance-contract:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout exact PR commit
+        uses: actions/checkout@v4
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - name: Record runtime and package metadata
+        shell: bash
+        run: |
+          mkdir -p n10-ci-logs
+          {
+            echo "commit=$GITHUB_SHA"
+            echo "event=$GITHUB_EVENT_NAME"
+            node --version
+            npm --version
+            node -e "const p=require('./package.json'); console.log(JSON.stringify({name:p.name,scripts:{validate:p.scripts['n10:finance:validate'],test:p.scripts['n10:finance:test']}},null,2))"
+          } 2>&1 | tee n10-ci-logs/runtime.txt
+      - name: Validate N10 finance source contracts
+        shell: bash
+        run: |
+          set +e
+          npm run n10:finance:validate 2>&1 | tee n10-ci-logs/validate.log
+          code=${PIPESTATUS[0]}
+          echo "exit_code=$code" | tee n10-ci-logs/validate.exit
+          exit "$code"
+      - name: Test N10 finance contract
+        if: always()
+        shell: bash
+        run: |
+          set +e
+          npm run n10:finance:test 2>&1 | tee n10-ci-logs/test.log
+          code=${PIPESTATUS[0]}
+          echo "exit_code=$code" | tee n10-ci-logs/test.exit
+          exit "$code"
+      - name: Upload actionable CI diagnostics
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: n10-finance-ci-diagnostics
+          path: n10-ci-logs/
+          if-no-files-found: warn
+          retention-days: 14

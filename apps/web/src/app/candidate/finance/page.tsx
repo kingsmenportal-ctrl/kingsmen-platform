@@ -1,34 +1,13 @@
-const packages = [
-  ["Foundational Accord", "R169.99"],
-  ["Collegiate Ordinance", "R299.99"],
-  ["Chancellor's Writ", "R399.99"],
-  ["Regency Mandate", "R469.99"],
-  ["Artisan Charter", "R149.99"],
-  ["Guildmaster's Charter", "R199.99"],
-  ["CV Revamp", "R49.99"]
-] as const;
-
-export default function CandidateFinancePage() {
-  return (
-    <main>
-      <h1>Kingsmen Financial View</h1>
-      <p>View your service orders, package, payment status, and refund status. This page is visibility only.</p>
-
-      <section aria-label="Official Package Prices">
-        {packages.map(([name, price]) => (
-          <article key={name}>
-            <h2>{name}</h2>
-            <p>{price}</p>
-          </article>
-        ))}
-      </section>
-
-      <section aria-label="Payment Boundary">
-        <p>Candidate cannot mark paid. Return URL cannot mark paid.</p>
-        <p>Paid status requires verified webhook or manual finance review.</p>
-        <p>Refund requests are visible but require manual finance review and are not auto-approved.</p>
-        <p>CV Revamp upgrade keeps trust: later package upgrade grants two additional active managed applications/routes.</p>
-      </section>
-    </main>
-  );
+"use client";
+import {useCallback,useEffect,useState} from "react";
+type Row=Record<string,any>;
+const money=(n:number,c="ZAR")=>new Intl.NumberFormat("en-ZA",{style:"currency",currency:c}).format((n||0)/100);
+function token(){try{for(let i=0;i<localStorage.length;i++){const k=localStorage.key(i);if(!k?.startsWith("sb-")||!k.endsWith("-auth-token"))continue;const raw=localStorage.getItem(k);if(!raw)continue;const parsed=JSON.parse(raw.startsWith("base64-")?atob(raw.slice(7)):raw);if(typeof parsed.access_token==="string"&&parsed.access_token.length>20)return parsed.access_token;}}catch{}return "";}
+export default function CandidateFinancePage(){
+ const [data,setData]=useState<{packages:Row[];orders:Row[];refunds:Row[]}>({packages:[],orders:[],refunds:[]}),[reason,setReason]=useState<Record<string,string>>({}),[error,setError]=useState(""),[busy,setBusy]=useState("");
+ const load=useCallback(async()=>{try{const r=await fetch("/api/candidate/finance",{headers:{authorization:"Bearer "+token()},cache:"no-store"});const j=await r.json();if(!r.ok||!j.ok)throw new Error(j.error||"Finance data unavailable.");setData({packages:j.packages||[],orders:j.orders||[],refunds:j.refunds||[]});setError("");}catch(e){setError(e instanceof Error?e.message:"Finance data unavailable.");}},[]);
+ useEffect(()=>{void load();},[load]);
+ async function act(body:Record<string,unknown>){setBusy(String(body.packageCode||body.orderId||"request"));try{const r=await fetch("/api/candidate/finance",{method:"POST",headers:{"content-type":"application/json",authorization:"Bearer "+token()},body:JSON.stringify(body)});const j=await r.json();if(!r.ok||!j.ok)throw new Error(j.error||"Finance action failed.");setError(j.message||"Request recorded. Payment is not automatically confirmed.");await load();}catch(e){setError(e instanceof Error?e.message:"Finance action failed.");}finally{setBusy("");}}
+ async function checkout(order:Row){setBusy(order.id);try{const r=await fetch("/api/candidate/finance/payfast",{method:"POST",headers:{"content-type":"application/json",authorization:"Bearer "+token()},body:JSON.stringify({orderId:order.id})});const j=await r.json();if(!r.ok||!j.ok)throw new Error(j.error||"PayFast checkout could not be prepared.");const form=document.createElement("form");form.method="POST";form.action=j.paymentUrl;form.style.display="none";for(const [key,value] of Object.entries(j.fields as Record<string,string>)){const input=document.createElement("input");input.type="hidden";input.name=key;input.value=value;form.appendChild(input);}document.body.appendChild(form);form.submit();}catch(e){setError(e instanceof Error?e.message:"PayFast checkout unavailable.");setBusy("");}}
+ return <main><h1>Kingsmen Finance</h1><p>Prices and order records are loaded from the official catalogue. Creating an order does not take payment or mark it paid.</p>{error&&<p role="status">{error}</p>}<button onClick={()=>void load()}>Refresh</button><section><h2>Available packages</h2>{data.packages.map(p=><article key={p.package_code}><h3>{p.display_name}</h3><p>{money(p.price_minor,p.currency)}</p><button disabled={!!busy} onClick={()=>void act({action:"CREATE_ORDER",packageCode:p.package_code,idempotencyKey:crypto.randomUUID()})}>{busy===p.package_code?"Creating…":"Create order"}</button></article>)}</section><section><h2>Your orders</h2>{data.orders.length===0?<p>No orders recorded.</p>:data.orders.map(o=><article key={o.id}><h3>{o.package_name}</h3><p>{o.order_ref} · {money(o.amount_minor,o.currency)} · {o.status}</p><p>Paid at: {o.paid_at||"Not confirmed"}</p>{(o.status==="PENDING_PAYMENT"||o.status==="PAYMENT_FAILED")&&<button disabled={!!busy} onClick={()=>void checkout(o)}>{busy===o.id?"Preparing PayFast…":"Pay with PayFast"}</button>}{o.status==="PAID"&&<><label>Refund reason (minimum 20 characters)<textarea value={reason[o.id]||""} onChange={e=>setReason({...reason,[o.id]:e.target.value})}/></label><button disabled={!!busy||((reason[o.id]||"").trim().length<20)} onClick={()=>void act({action:"REQUEST_REFUND",orderId:o.id,reason:reason[o.id],idempotencyKey:crypto.randomUUID()})}>Request refund review</button></>}</article>)}</section><section><h2>Refund requests</h2>{data.refunds.length===0?<p>No refund requests.</p>:data.refunds.map(r=><article key={r.id}><p>{r.refund_ref} · {money(r.amount_minor)} · {r.status}</p><p>{r.reason}</p>{r.reviewer_note&&<p>Reviewer note: {r.reviewer_note}</p>}</article>)}</section><section><h2>Payment and refund safeguards</h2><ul><li>Candidates cannot mark an order paid.</li><li>A return URL is not proof of payment.</li><li>Paid status is set only after a server-validated PayFast ITN or authorised finance review; a browser return is never proof.</li><li>Refund requests are reviewed by finance; approval is not the same as settlement.</li></ul></section></main>;
 }
