@@ -74,6 +74,9 @@ Require-Contains "apps\web\src\finance\PaymentStatusPanel.tsx" "Verified before 
 Require-Contains "apps\web\src\finance\RefundReviewPanel.tsx" "No AI refund approval" "Refund UI must show no-AI boundary."
 Require-Contains "reports\n10\N10_FINANCE_PAYFAST_REPORT.md" "PayFast is the payment processor" "Report must state PayFast processor boundary."
 
+Require-Contains "db\migrations\0083_retire_legacy_accommodation_checkout.sql" "active = false" "Legacy accommodation checkout migration must deactivate the plan."
+Require-Contains "db\seeds\n10_finance_payfast_seed.sql" "active = false" "Finance seed must deactivate the legacy accommodation plan."
+
 $Result = [ordered]@{
   phase = "N10"
   name = "Finance / PayFast Runtime"
@@ -94,5 +97,3 @@ if ($Failures.Count -gt 0) {
 Write-Host "N10 validation passed." -ForegroundColor Green
 Write-Host "Report: reports\n10\N10_VALIDATION_RESULT.json" -ForegroundColor Green
 exit 0
-Require-Contains "db\migrations\0083_retire_legacy_accommodation_checkout.sql" "active = false" "Legacy accommodation checkout migration must deactivate the plan."
-Require-Contains "db\seeds\n10_finance_payfast_seed.sql" "active = false" "Finance seed must deactivate the legacy accommodation plan."
