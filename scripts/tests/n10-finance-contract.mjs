@@ -14,7 +14,7 @@ assert.match(candidate,/candidate_id:"eq\."\+auth\.session\.candidateId/);
 assert.match(candidate,/Refund request requires a paid order with a verified PayFast payment event/);
 assert.match(candidate,/Creating an order never takes payment or marks it paid./);
 assert.match(reviewer,/Payment reference, evidence locator and SHA-256 evidence hash are required/);
-assert.match(reviewer,/this does not independently verify a bank settlement/);
+assert.match(reviewer,/not a provider-verified PayFast event/);
 assert.match(reviewer,/REFUND_SETTLEMENT_EVIDENCE_REQUIRED/);
 assert.match(reviewer,/settlementSha/);
 assert.doesNotMatch(candidate,/checkoutConfigured:true/);
