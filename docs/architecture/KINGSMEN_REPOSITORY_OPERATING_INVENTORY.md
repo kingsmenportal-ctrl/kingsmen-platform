@@ -94,3 +94,8 @@ For every future batch, record:
 - newly closed launch blockers and any blockers still open.
 
 A change is credited as source implementation until its test, integration, live-runtime, and release evidence gates pass. This prevents source volume from being mistaken for functional completion.
+
+
+## Migration version collision remediation
+
+Source Guard exposed that N11 AI decision migration and the RLS security boundary migration both used numeric prefix `0009`. The N11 source migration is assigned the next unique repository prefix `0084`; the N11 runner and validator now reference the new path. This is a source-tree naming correction only. Before running N11 against any database that may already have consumed the old filename, reconcile that database's migration ledger and schema; do not blindly replay or assume the migration is unapplied.
