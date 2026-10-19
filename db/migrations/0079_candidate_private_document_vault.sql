@@ -31,7 +31,7 @@ CREATE TABLE IF NOT EXISTS public.candidate_private_documents (
   updated_at timestamptz NOT NULL DEFAULT now(),
   CONSTRAINT candidate_private_documents_preparation_owner_fk
     FOREIGN KEY (preparation_item_id, candidate_id)
-    REFERENCES public.candidate_application_preparation_items(id, candidate_id) ON DELETE SET NULL
+    REFERENCES public.candidate_application_preparation_items(id, candidate_id) ON DELETE SET NULL (preparation_item_id)
 );
 CREATE INDEX IF NOT EXISTS candidate_private_documents_owner_time_idx
   ON public.candidate_private_documents(candidate_id, created_at DESC);
