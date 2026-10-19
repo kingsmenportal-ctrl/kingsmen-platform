@@ -29,6 +29,9 @@ jobs:
       - name: FK index hardening migration source contract
         run: npm run db:validate:fk-index-hardening
 
+      - name: Private review table access contract
+        run: npm run security:validate:review-tables
+
       - name: API Truth Vault persistence validator
         run: npm run api:validate:truth-vault
 
