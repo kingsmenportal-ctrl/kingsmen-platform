@@ -32,6 +32,9 @@ jobs:
       - name: Build backend API
         run: npm run api:build
 
+      - name: API runtime authentication and fail-closed smoke tests
+        run: npm run api:validate:runtime-boundaries
+
       - name: API Truth Vault persistence validator
         run: npm run api:validate:truth-vault
 
