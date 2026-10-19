@@ -43,6 +43,9 @@ jobs:
       - name: Validate Truth Vault persistence contract
         run: npm run api:validate
 
+      - name: Verify Jarvis runtime execution modes
+        run: node scripts/ci/validate-jarvis-runtime-modes.mjs
+
       - name: Validate safe web-to-backend boundary
         run: npm run web:validate:backend-boundary
 
