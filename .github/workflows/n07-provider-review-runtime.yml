@@ -1,0 +1,31 @@
+name: N07 Provider Review and Submission Evidence
+on:
+  pull_request:
+    paths:
+      - "apps/web/src/app/api/reviewer/applications/**"
+      - "apps/web/src/app/reviewer/applications/**"
+      - "apps/web/src/lib/n07-reviewer-runtime.ts"
+      - "db/migrations/0061_n07_provider_review_operations.sql"
+      - "scripts/validators/validate-n07-provider-review-runtime.mjs"
+      - "scripts/tests/n07-reviewer-isolation.integration.mjs"
+      - ".github/workflows/n07-provider-review-runtime.yml"
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  n07-source-guards:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - name: Validate N07 source boundaries
+        run: node scripts/validators/validate-n07-provider-review-runtime.mjs
+      - name: Check validator and integration probe syntax
+        run: |
+          node --check scripts/validators/validate-n07-provider-review-runtime.mjs
+          node --check scripts/tests/n07-reviewer-isolation.integration.mjs
+      - name: Validate migration markers
+        run: |
+          node --input-type=module -e 'import {readFileSync} from "node:fs"; const s=readFileSync("db/migrations/0061_n07_provider_review_operations.sql","utf8"); for (const t of ["platform_reviewers","candidate_application_evidence","candidate_application_submission_jobs","ENABLE ROW LEVEL SECURITY","NONE_CONFIGURED"]) if (!s.includes(t)) throw new Error("Missing N07 migration marker: "+t); console.log("N07 migration markers passed; migration not applied by CI.");'
