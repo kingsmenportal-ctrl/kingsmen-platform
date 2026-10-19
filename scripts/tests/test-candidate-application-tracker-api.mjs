@@ -18,6 +18,8 @@ const saved = [
 ];
 const trackers = [];
 const events = [];
+const preparationItems = [];
+const preparationEvents = [];
 let nextId = 1;
 let app;
 let logs = "";
