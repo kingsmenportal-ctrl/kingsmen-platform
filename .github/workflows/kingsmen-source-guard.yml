@@ -98,5 +98,8 @@ jobs:
       - name: Branch protection validator
         run: npm run repo:validate:branch-protection
 
+      - name: Repository-wide module and launch inventory
+        run: npm run kingsmen:inventory:verify
+
       - name: Launch audit report
         run: npm run kingsmen:launch:audit
