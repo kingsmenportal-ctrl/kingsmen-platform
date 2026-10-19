@@ -18,7 +18,7 @@ function Require-Contains([string]$Path,[string]$Needle,[string]$Message) {
 
 $Files = @(
   "manifests\n11\ai-decision-matching-engine.json",
-  "db\migrations\0009_n11_ai_decision_matching.sql",
+  "db\migrations\0084_n11_ai_decision_matching.sql",
   "db\seeds\n11_ai_decision_seed.sql",
   "runtime\ai\ai-decision-runtime.example.json",
   "apps\api\src\ai-decision\ai-decision-types.ts",
@@ -50,15 +50,15 @@ Require-Contains "manifests\n11\ai-decision-matching-engine.json" "No silent lea
 Require-Contains "manifests\n11\ai-decision-matching-engine.json" "No uncontrolled reinforcement learning" "Manifest must block uncontrolled RL."
 Require-Contains "manifests\n11\ai-decision-matching-engine.json" "No Phoenix false rescue" "Manifest must block Phoenix false rescue."
 
-Require-Contains "db\migrations\0009_n11_ai_decision_matching.sql" "candidate_decision_signals" "Migration missing candidate decision signals."
-Require-Contains "db\migrations\0009_n11_ai_decision_matching.sql" "eligibility_screen_results" "Migration missing eligibility screen results."
-Require-Contains "db\migrations\0009_n11_ai_decision_matching.sql" "route_match_candidates" "Migration missing route match candidates."
-Require-Contains "db\migrations\0009_n11_ai_decision_matching.sql" "placement_scores" "Migration missing placement scores."
-Require-Contains "db\migrations\0009_n11_ai_decision_matching.sql" "route_recommendations" "Migration missing route recommendations."
-Require-Contains "db\migrations\0009_n11_ai_decision_matching.sql" "destiny_maps" "Migration missing destiny maps."
-Require-Contains "db\migrations\0009_n11_ai_decision_matching.sql" "phoenix_fallback_plans" "Migration missing Phoenix fallback plans."
-Require-Contains "db\migrations\0009_n11_ai_decision_matching.sql" "ai_learning_signals" "Migration missing AI learning signals."
-Require-Contains "db\migrations\0009_n11_ai_decision_matching.sql" "enable row level security" "Migration must enable RLS."
+Require-Contains "db\migrations\0084_n11_ai_decision_matching.sql" "candidate_decision_signals" "Migration missing candidate decision signals."
+Require-Contains "db\migrations\0084_n11_ai_decision_matching.sql" "eligibility_screen_results" "Migration missing eligibility screen results."
+Require-Contains "db\migrations\0084_n11_ai_decision_matching.sql" "route_match_candidates" "Migration missing route match candidates."
+Require-Contains "db\migrations\0084_n11_ai_decision_matching.sql" "placement_scores" "Migration missing placement scores."
+Require-Contains "db\migrations\0084_n11_ai_decision_matching.sql" "route_recommendations" "Migration missing route recommendations."
+Require-Contains "db\migrations\0084_n11_ai_decision_matching.sql" "destiny_maps" "Migration missing destiny maps."
+Require-Contains "db\migrations\0084_n11_ai_decision_matching.sql" "phoenix_fallback_plans" "Migration missing Phoenix fallback plans."
+Require-Contains "db\migrations\0084_n11_ai_decision_matching.sql" "ai_learning_signals" "Migration missing AI learning signals."
+Require-Contains "db\migrations\0084_n11_ai_decision_matching.sql" "enable row level security" "Migration must enable RLS."
 
 Require-Contains "db\seeds\n11_ai_decision_seed.sql" "AI_BLOCKED_DECISIONS" "Seed missing blocked decisions config."
 Require-Contains "db\seeds\n11_ai_decision_seed.sql" "official_status" "Seed must block official status governance."
