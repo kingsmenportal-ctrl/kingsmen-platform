@@ -1,0 +1,38 @@
+name: Kingsmen Main Branch Protection Evidence
+
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  administration: read
+
+jobs:
+  verify-protection:
+    name: verify-main-branch-protection
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+
+      - name: Verify protection using read-only GitHub API
+        env:
+          GITHUB_REPOSITORY: ${{ github.repository }}
+          GITHUB_TOKEN: ${{ github.token }}
+          GITHUB_API_URL: ${{ github.api_url }}
+        run: node scripts/ci/capture-main-branch-protection.mjs
+
+      - name: Upload redacted protection evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: kingsmen-main-branch-protection-${{ github.run_id }}
+          path: reports/repo/main-branch-protection-apply-latest.json
+          if-no-files-found: error
+          retention-days: 14

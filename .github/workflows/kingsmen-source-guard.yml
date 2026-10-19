@@ -2,9 +2,9 @@ name: Kingsmen Source Guard
 
 on:
   pull_request:
-    branches: [main]
+    branches: [main, feat/release-engineering-evidence-pipeline]
   push:
-    branches: [main]
+    branches: [main, feat/staging-authenticated-e2e-gate]
   workflow_dispatch:
 
 jobs:
@@ -25,6 +25,21 @@ jobs:
 
       - name: Install dependencies
         run: npm ci
+
+      - name: FK index hardening migration source contract
+        run: npm run db:validate:fk-index-hardening
+
+      - name: Private review table access contract
+        run: npm run security:validate:review-tables
+
+      - name: Main branch protection evidence capture source contract
+        run: npm run repo:validate:branch-protection-capture
+
+      - name: Authenticated staging E2E runner source contract
+        run: npm run staging:e2e:validate
+
+      - name: Authenticated staging E2E runner regression tests
+        run: npm run staging:e2e:test
 
       - name: API Truth Vault persistence validator
         run: npm run api:validate:truth-vault
@@ -97,6 +112,9 @@ jobs:
 
       - name: Branch protection validator
         run: npm run repo:validate:branch-protection
+
+      - name: Repository-wide module and launch inventory
+        run: npm run kingsmen:inventory:verify
 
       - name: Launch audit report
         run: npm run kingsmen:launch:audit
