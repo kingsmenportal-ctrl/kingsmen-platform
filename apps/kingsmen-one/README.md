@@ -1,0 +1,23 @@
+# Kingsmen One — isolated application foundation
+
+Kingsmen One is a separate, mobile-first candidate portal foundation within the Kingsmen platform repository. It does not replace Kingsmen Gateway or alter the existing production/staging deployment.
+
+## Current delivery boundary
+- Responsive candidate workspace with dashboard, pathway overview, opportunities, application preparation, document readiness and activity views.
+- Local demo state is explicitly labelled and stored only in the browser. It is not a real account, secure document store, provider submission, payment, or verified outcome.
+- Candidate-reported progress is kept distinct from independently verified outcomes.
+- The canonical sixth pathway name is intentionally not guessed; it must be read from an authoritative Kingsmen source before being shown as a real pathway.
+- Supabase staging was inspected read-only. No schema, RLS policy, row, or credential was changed by this foundation commit.
+- Replit app creation currently returns `requires_active_subscription`; no Replit app URL was returned.
+- Netlify is not yet connected to this branch and no Kingsmen One deploy has been made.
+
+## Run locally
+Serve this folder with any static HTTP server, or open `index.html` directly. The smoke test uses Node's built-in test runner and requires no install:
+
+`node --test tests/smoke.test.mjs`
+
+## Integration gates
+Before production use, wire real Supabase Auth, bind the authenticated user to the correct candidate only through the authorised identity-review flow (never email matching), enforce server-side authorization and RLS, use private Storage for document bytes, and add authenticated end-to-end tests. Provider submissions, payments, refunds and entitlements must use verified evidence and server-side workflows. Never place service-role secrets in browser code.
+
+## Delivery state
+This is the first tracked foundation batch, not a claim that the full Kingsmen platform is complete, tested in a live environment, connected to every provider, or deployed.
