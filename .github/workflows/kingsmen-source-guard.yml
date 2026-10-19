@@ -13,6 +13,8 @@ jobs:
     runs-on: ubuntu-latest
     permissions:
       contents: read
+      pull-requests: read
+      issues: read
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -114,6 +116,8 @@ jobs:
         run: npm run repo:validate:branch-protection
 
       - name: Repository-wide module and launch inventory
+        env:
+          GITHUB_TOKEN: ${{ github.token }}
         run: npm run kingsmen:inventory:verify
 
       - name: Launch audit report
