@@ -99,3 +99,19 @@ test("verified candidate readiness sync uses server-verified identity and bounde
   assert.doesNotMatch(fn, /payload\.candidate_id/);
   assert.match(fn, /Cache-Control.*no-store/);
 });
+
+test("official profile corrections require a verified identity link and reviewer approval", async () => {
+  const js = await read("app.js");
+  const fn = await readFile(resolve(root, "../..", "supabase/functions/candidate-profile-review/index.ts"), "utf8");
+  assert.match(js, /functions\.invoke\("candidate-profile-review"/);
+  assert.match(js, /Submit correction requests/);
+  assert.match(js, /official profile has not been changed/i);
+  assert.match(fn, /auth\.getUser/);
+  assert.match(fn, /candidate_auth_identity_links/);
+  assert.match(fn, /eq\("link_status",\s*"VERIFIED"\)/);
+  assert.match(fn, /candidate_profile_change_requests/);
+  assert.match(fn, /status:\s*"PENDING"/);
+  assert.match(fn, /FIELDS/);
+  assert.doesNotMatch(fn, /from\("candidate_profiles"\)\.update/);
+  assert.doesNotMatch(fn, /payload\.candidate_id/);
+});
