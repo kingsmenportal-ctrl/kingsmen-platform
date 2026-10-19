@@ -2,9 +2,9 @@ name: Kingsmen Source Guard
 
 on:
   pull_request:
-    branches: [main]
+    branches: [main, feat/release-engineering-evidence-pipeline]
   push:
-    branches: [main, feat/candidate-dashboard-actionable-readiness]
+    branches: [main, feat/staging-authenticated-e2e-gate]
   workflow_dispatch:
 
 jobs:
@@ -13,6 +13,8 @@ jobs:
     runs-on: ubuntu-latest
     permissions:
       contents: read
+      pull-requests: read
+      issues: read
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -26,20 +28,20 @@ jobs:
       - name: Install dependencies
         run: npm ci
 
-      - name: Candidate dashboard behaviour validator
-        run: npm run candidate:validate:dashboard
+      - name: FK index hardening migration source contract
+        run: npm run db:validate:fk-index-hardening
 
-      - name: Candidate account persistence and ownership validator
-        run: npm run candidate:validate:workspace
+      - name: Private review table access contract
+        run: npm run security:validate:review-tables
 
-      - name: Install web dependencies
-        run: npm install --prefix apps/web --no-audit --no-fund
+      - name: Main branch protection evidence capture source contract
+        run: npm run repo:validate:branch-protection-capture
 
-      - name: Build candidate web application
-        run: npm --prefix apps/web run build
+      - name: Authenticated staging E2E runner source contract
+        run: npm run staging:e2e:validate
 
-      - name: Candidate workspace API integration test
-        run: npm run candidate:test:workspace:e2e
+      - name: Authenticated staging E2E runner regression tests
+        run: npm run staging:e2e:test
 
       - name: API Truth Vault persistence validator
         run: npm run api:validate:truth-vault
@@ -112,6 +114,11 @@ jobs:
 
       - name: Branch protection validator
         run: npm run repo:validate:branch-protection
+
+      - name: Repository-wide module and launch inventory
+        env:
+          GITHUB_TOKEN: ${{ github.token }}
+        run: npm run kingsmen:inventory:verify
 
       - name: Launch audit report
         run: npm run kingsmen:launch:audit
