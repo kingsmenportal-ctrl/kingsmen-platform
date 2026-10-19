@@ -3,8 +3,6 @@
 -- on 2026-10-19. This migration changes indexes only: no rows, grants, or RLS.
 -- Before applying, capture the preflight query in docs/performance/KINGSMEN_FK_INDEX_HARDENING.md.
 
-begin;
-
 create index if not exists candidate_application_events_candidate_id_idx
   on public.candidate_application_events using btree (candidate_id);
 create index if not exists candidate_application_evidence_candidate_id_idx
@@ -94,4 +92,3 @@ begin
   end loop;
 end $$;
 
-commit;
