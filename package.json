@@ -56,7 +56,9 @@
     "kingsmen:launch:gate": "node scripts/validators/validate-kingsmen-launch-readiness-evidence-aware.mjs --gate",
     "n05:validate": "node scripts/validators/validate-n05-document-vault.mjs",
     "n05:validate:full": "npm run n05:validate && npm --prefix apps/web run build",
-    "n05:test:isolation": "node scripts/tests/n05-document-isolation.integration.mjs"
+    "n05:test:isolation": "node scripts/tests/n05-document-isolation.integration.mjs",
+    "n04:profile:validate": "node scripts/validators/validate-n04-profile-runtime.mjs",
+    "n04:profile:test": "node scripts/tests/n04-profile-api-contract.mjs"
   },
   "repository": {
     "type": "git",
