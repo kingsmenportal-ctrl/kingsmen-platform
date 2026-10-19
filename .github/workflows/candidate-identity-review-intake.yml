@@ -1,0 +1,32 @@
+name: Candidate Identity Review Intake
+
+on:
+  pull_request:
+    paths:
+      - "db/migrations/0075_candidate_identity_review_requests.sql"
+      - "apps/web/src/app/api/candidate/identity-review/route.ts"
+      - "scripts/validators/validate-candidate-identity-review-intake.mjs"
+      - ".github/workflows/candidate-identity-review-intake.yml"
+  push:
+    branches:
+      - "feat/candidate-identity-review-lifecycle"
+    paths:
+      - "db/migrations/0075_candidate_identity_review_requests.sql"
+      - "apps/web/src/app/api/candidate/identity-review/route.ts"
+      - "scripts/validators/validate-candidate-identity-review-intake.mjs"
+      - ".github/workflows/candidate-identity-review-intake.yml"
+
+permissions:
+  contents: read
+
+jobs:
+  identity-review-contract:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - name: Validate identity review persistence and security contract
+        run: node scripts/validators/validate-candidate-identity-review-intake.mjs

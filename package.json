@@ -81,7 +81,9 @@
     "repo:prove:branch-protection": "node scripts/proof/prove-main-branch-protection-boundary.mjs",
     "repo:validate:branch-protection": "node scripts/validators/validate-main-branch-protection.mjs",
     "staging:capture:evidence": "pwsh -NoProfile -File scripts/staging/Invoke-KingsmenStagingRuntimeEvidencePack.ps1",
-    "final:collect:evidence": "pwsh -NoProfile -File scripts/staging/Collect-KingsmenFinalAssemblyEvidence.ps1"
+    "final:collect:evidence": "pwsh -NoProfile -File scripts/staging/Collect-KingsmenFinalAssemblyEvidence.ps1",
+    "candidate:validate:identity-review": "node scripts/validators/validate-candidate-identity-review-intake.mjs",
+    "candidate:test:identity-review:e2e": "node scripts/tests/test-candidate-identity-review-api.mjs"
   },
   "repository": {
     "type": "git",
