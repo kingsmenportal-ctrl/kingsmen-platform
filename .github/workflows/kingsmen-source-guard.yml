@@ -28,6 +28,12 @@ jobs:
       - name: Install dependencies
         run: npm ci
 
+      - name: Canonical finance checkout catalogue contract
+        run: npm run finance:validate:canonical-catalogue
+
+      - name: Canonical finance checkout catalogue regression tests
+        run: npm run finance:test:canonical-catalogue
+
       - name: FK index hardening migration source contract
         run: npm run db:validate:fk-index-hardening
 

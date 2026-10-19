@@ -86,7 +86,9 @@
     "staging:e2e:validate": "node scripts/validators/validate-staging-authenticated-e2e-runner.mjs",
     "staging:e2e:test": "node scripts/staging/test-kingsmen-authenticated-e2e.mjs",
     "kingsmen:inventory": "node scripts/validators/validate-kingsmen-repository-operating-inventory.mjs",
-    "kingsmen:inventory:verify": "node scripts/validators/validate-kingsmen-repository-operating-inventory.mjs"
+    "kingsmen:inventory:verify": "node scripts/validators/validate-kingsmen-repository-operating-inventory.mjs",
+    "finance:validate:canonical-catalogue": "node scripts/validators/validate-finance-canonical-catalogue.mjs",
+    "finance:test:canonical-catalogue": "node scripts/validators/test-finance-canonical-catalogue.mjs"
   },
   "repository": {
     "type": "git",
