@@ -217,6 +217,30 @@ for (const [path, unsafeFields] of [
   }
 }
 
+const rlsValidatorPath = 'scripts/validators/validate-rls-security-proof.mjs';
+const rlsValidatorContent = read(rlsValidatorPath);
+if (!rlsValidatorContent) {
+  block(
+    'RLS_SECURITY_SCRIPT_MISSING',
+    'RLS security validator is missing.',
+    'The launch audit cannot validate the RLS source boundary without its dedicated validator.',
+    'Restore scripts/validators/validate-rls-security-proof.mjs and run npm run security:validate:rls.',
+    [rlsValidatorPath]
+  );
+} else {
+  for (const token of ['RLS_SECURITY_PROOF_VALIDATED', 'security:validate:rls', 'RLS_STAGING_PROOF_REQUIRED']) {
+    if (!rlsValidatorContent.includes(token)) {
+      block(
+        'RLS_SECURITY_SCRIPT_CONTRACT_INVALID',
+        'RLS security validator is missing a required launch contract.',
+        `Required token is absent: ${token}.`,
+        'Restore the RLS validator contract and rerun the launch audit.',
+        [rlsValidatorPath]
+      );
+    }
+  }
+}
+
 const warningRules = [
   ['manifests/repo/main-branch-protection-v1.json', 'foundation_built_pending_github_apply', 'MAIN_BRANCH_PROTECTION_APPLY_REQUIRED', 'Branch protection source boundary is built but GitHub protection must still be applied.', 'The workflow and apply script exist, but main is not proven protected until GitHub settings confirm source-guard is required and force-push/deletion are disabled.', 'Run scripts/github/Set-KingsmenMainBranchProtection.ps1 with GitHub admin permissions and verify through GitHub UI or gh api.', ['scripts/github/Set-KingsmenMainBranchProtection.ps1']],
   ['manifests/security/rls-security-proof-v1.json', 'foundation_built_pending_staging_proof', 'RLS_STAGING_PROOF_REQUIRED', 'RLS/security source-level boundary is built but staging proof is still required.', 'Live SQL role-isolation proof against staging PostgreSQL/Supabase is required before public users.', 'Apply db/migrations/0009_rls_security_boundary.sql to staging and store a passing live proof report.', ['db/migrations/0009_rls_security_boundary.sql']],
