@@ -54,7 +54,7 @@ npm run build
 npm start
 ```
 
-Current API storage mode is `memory_development_only`. The next launch build must replace this with real PostgreSQL/Supabase Truth Vault persistence.
+The API supports memory-only local development and PostgreSQL/Supabase Truth Vault persistence. In production, the repository defaults to PostgreSQL and fails closed if the database URL is missing or memory mode is explicitly selected. Configure `KINGSMEN_TRUTH_VAULT_MODE=postgres` and `KINGSMEN_DATABASE_URL` (or `DATABASE_URL`) only in the backend runtime's secret settings; never expose a database URL or service-role credential to browser code. The staging persistence and post-restart proofs must pass before production launch.
 
 ## Kingsmen launch readiness gate
 
