@@ -134,6 +134,9 @@ test("persistent application preparation is gated by verified candidate identity
   assert.match(fn, /route_providers\(public_safe,verification_status,default_confidence_band\)/);
   assert.match(fn, /verification_status!=="VERIFIED"/);
   assert.match(fn, /gte\("updated_at",new Date\(Date\.now\(\)-90\*24\*60\*60\*1000\)/);
+  assert.match(fn, /existing checklist was checked and repaired if missing/);
+  assert.match(fn, /partial tracker cleanup failed/);
+  assert.match(fn, /Tracker creation was rolled back/);
   assert.match(fn, /candidate_application_tracker/);
   assert.match(fn, /candidate_application_preparation_items/);
   assert.match(fn, /SUBMITTED_CANDIDATE_REPORTED/);
