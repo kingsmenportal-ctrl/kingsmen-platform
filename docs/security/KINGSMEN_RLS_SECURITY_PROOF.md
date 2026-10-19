@@ -85,6 +85,13 @@ Then run the launch audit:
 npm run kingsmen:launch:audit
 ```
 
+## Supabase security-advisor triage (staging snapshot, 2026-10-19)
+
+The staging security advisor reported three RLS-enabled tables without policies:
+`candidate_identity_review_audit`, `candidate_identity_review_requests`, and `candidate_private_document_reviews`. Read-only catalog checks showed that `anon` and `authenticated` do not have SELECT privileges on these tables, while `service_role` does. This is a service-only design, not a reason to add broad candidate-facing policies. Recheck table privileges and all grants whenever migrations change.
+
+The advisor also flagged `public.current_verified_candidate_id()` because authenticated users can execute a SECURITY DEFINER function. Staging inspection confirmed an empty `search_path` and a function body scoped to `auth.uid()`, `link_status = 'VERIFIED'`, and non-null `verified_at`. Existing candidate-owned RLS policies call this helper. Do **not** revoke authenticated EXECUTE without first redesigning those policies and proving candidate-owned reads still work; the warning must remain tracked and reviewed rather than being hidden. Live candidate isolation is still unverified.
+
 ## Remaining production constraint
 
 This proof is source-level. It does not replace staging execution.
