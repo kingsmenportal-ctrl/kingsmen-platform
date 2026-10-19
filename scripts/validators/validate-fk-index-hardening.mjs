@@ -28,12 +28,12 @@ for (const [table, column, index] of expected) {
   );
   if (!pattern.test(migration)) failures.push({ table, column, index, issue: 'missing idempotent index definition' });
 }
-const count = (migration.match(/create\\s+index\\s+if\\s+not\\s+exists/gi) ?? []).length;
+const count = (migration.match(/create\s+index\s+if\s+not\s+exists/gi) ?? []).length;
 if (count !== expected.length) failures.push({ issue: 'unexpected index statement count', expected: expected.length, actual: count });
 for (const token of ['do $', 'pg_index', 'indisvalid', 'indisready', 'indpred is null', 'raise exception']) {
   if (!migration.toLowerCase().includes(token.toLowerCase())) failures.push({ issue: 'missing postflight/transaction contract', token });
 }
-if (/grant\\s+|create\\s+policy|enable\\s+row level security|drop\\s+table|delete\\s+from/i.test(migration)) {
+if (/grant\s+|create\s+policy|enable\s+row level security|drop\s+table|delete\s+from/i.test(migration)) {
   failures.push({ issue: 'migration contains out-of-scope privilege, RLS, or destructive DML/DDL' });
 }
 const report = {
