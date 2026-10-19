@@ -129,6 +129,8 @@ test("persistent application preparation is gated by verified candidate identity
   assert.match(fn, /verified_at/);
   assert.match(fn, /candidate_saved_routes/);
   assert.match(fn, /route_programmes/);
+  assert.match(fn, /in\("availability_status",\s*\["OPEN","FUTURE"\]\)/);
+  assert.match(fn, /in\("source_confidence_band",\s*\["A","B"\]\)/);
   assert.match(fn, /candidate_application_tracker/);
   assert.match(fn, /candidate_application_preparation_items/);
   assert.match(fn, /SUBMITTED_CANDIDATE_REPORTED/);
