@@ -42,8 +42,11 @@ Deno.serve(async(req:Request)=>{
   if(!/^[0-9a-f-]{36}$/i.test(routeId))return reply(400,{error:"A valid saved opportunity identifier is required."},origin);
   const {data:saved,error:savedError}=await admin.from("candidate_saved_routes").select("id,route_programme_id").eq("user_id",authData.user.id).eq("route_programme_id",routeId).maybeSingle();
   if(savedError||!saved){if(savedError)console.error("saved route lookup failed",savedError.code??"unknown");return reply(404,{error:"Save this opportunity to your account before creating its tracker."},origin);}
-  const {data:route,error:routeError}=await admin.from("route_programmes").select("id,programme_name,provider_id,route_type,source_url,source_confidence_band,route_status,availability_status,metadata").eq("id",routeId).eq("route_status","VERIFIED").in("availability_status",["OPEN","FUTURE"]).in("source_confidence_band",["A","B"]).maybeSingle();
-  if(routeError||!route){if(routeError)console.error("verified route lookup failed",routeError.code??"unknown");return reply(409,{error:"This opportunity is no longer available as a verified route."},origin);}
+  const {data:route,error:routeError}=await admin.from("route_programmes").select("id,programme_name,provider_id,route_type,source_url,source_confidence_band,route_status,availability_status,updated_at,metadata,route_providers(public_safe,verification_status,default_confidence_band)").eq("id",routeId).eq("route_status","VERIFIED").in("availability_status",["OPEN","FUTURE"]).in("source_confidence_band",["A","B"]).gte("updated_at",new Date(Date.now()-90*24*60*60*1000).toISOString()).maybeSingle();
+  if(routeError||!route){if(routeError)console.error("verified route lookup failed",routeError.code??"unknown");return reply(409,{error:"This opportunity is no longer available as a recent verified route."},origin);}
+  const providerValue=route.route_providers as unknown;
+  const provider=Array.isArray(providerValue)?providerValue[0] as Record<string,unknown>|undefined:providerValue as Record<string,unknown>|null;
+  if(!provider||provider.public_safe!==true||provider.verification_status!=="VERIFIED"||!(["A","B"] as unknown[]).includes(provider.default_confidence_band))return reply(409,{error:"The provider is not currently verified and publicly approved for this opportunity."},origin);
   const officialUrl=typeof route.source_url==="string"?route.source_url:"";
   if(!/^https:\/\//i.test(officialUrl))return reply(409,{error:"The opportunity has no usable HTTPS official source, so a tracker cannot be created."},origin);
   const meta=route.metadata&&typeof route.metadata==="object"?route.metadata as Record<string,unknown>:{};
