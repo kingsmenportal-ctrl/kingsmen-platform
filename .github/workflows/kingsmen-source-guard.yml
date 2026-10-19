@@ -29,6 +29,9 @@ jobs:
       - name: Candidate dashboard behaviour validator
         run: npm run candidate:validate:dashboard
 
+      - name: Candidate account persistence and ownership validator
+        run: npm run candidate:validate:workspace
+
       - name: Install web dependencies
         run: npm install --prefix apps/web --no-audit --no-fund
 
