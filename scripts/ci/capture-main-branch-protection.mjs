@@ -10,7 +10,7 @@ const branch = 'main';
 const outputPath = 'reports/repo/main-branch-protection-apply-latest.json';
 const checkedAt = new Date().toISOString();
 
-function finish(status, checks, httpStatus = null) {
+async function finish(status, checks, httpStatus = null) {
   const base = {
     schema: 'kingsmen.branch-protection-evidence.v1',
     evidenceType: 'read_only_branch_protection_verification',
@@ -27,7 +27,7 @@ function finish(status, checks, httpStatus = null) {
   };
   const canonical = JSON.stringify(base);
   const report = { ...base, sha256: createHash('sha256').update(canonical).digest('hex') };
-  awaitWrite(report);
+  await awaitWrite(report);
   return report;
 }
 async function awaitWrite(report) {
