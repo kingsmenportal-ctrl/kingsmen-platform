@@ -153,11 +153,16 @@
     if(!supabaseClient){target.innerHTML="<p class=\"muted-note\">Supabase client unavailable. Live listings cannot be loaded.</p>";return;}
     target.innerHTML="<p class=\"muted-note\">Checking official-source records…</p>";
     try {
+      const freshSince=new Date(Date.now()-90*24*60*60*1000).toISOString();
       const result=await supabaseClient.from("route_programmes")
-        .select("id,programme_name,route_type,province,source_url,source_confidence_band,route_status,availability_status,eligibility_summary,updated_at")
+        .select("id,programme_name,route_type,province,source_url,source_confidence_band,route_status,availability_status,eligibility_summary,updated_at,route_providers!inner(provider_name,public_safe,verification_status,default_confidence_band)")
         .eq("route_status","VERIFIED")
         .in("availability_status",["OPEN","FUTURE"])
         .in("source_confidence_band",["A","B"])
+        .eq("route_providers.public_safe",true)
+        .eq("route_providers.verification_status","VERIFIED")
+        .in("route_providers.default_confidence_band",["A","B"])
+        .gte("updated_at",freshSince)
         .not("source_url","is",null)
         .order("updated_at",{ascending:false})
         .limit(30);
