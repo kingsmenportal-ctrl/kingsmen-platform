@@ -8,6 +8,8 @@ const candidatePage=fs.readFileSync("apps/web/src/app/candidate/entitlements/pag
 const reviewerPage=fs.readFileSync("apps/web/src/app/reviewer/entitlements/page.tsx","utf8");
 for(const needle of [
  "candidate_entitlements","candidate_entitlement_events","UNIQUE",
+ "candidate_entitlements_service_role_read","candidate_entitlement_events_service_role_read",
+ "SET search_path = ''",
  "n11_hold_entitlement_for_order","n11_grant_entitlement","n11_transition_entitlement",
  "VERIFIED_PROVIDER_WEBHOOK","PAYMENT_CONFIRMED","PAYFAST","server_validation",
  "merchant_reference","provider_status","amount_minor","entitlement_snapshot",
