@@ -1,4 +1,4 @@
-name: Export all branch snapshots
+name: Export complete repository source and evidence
 
 on:
   workflow_dispatch:
@@ -10,42 +10,80 @@ on:
 
 permissions:
   contents: read
+  actions: read
+  pull-requests: read
 
 jobs:
   export:
-    name: Package every branch snapshot
+    name: Package every branch, history, and repository evidence
     runs-on: ubuntu-latest
     steps:
-      - name: Checkout repository history and refs
+      - name: Checkout full repository
         uses: actions/checkout@v4
         with:
           fetch-depth: 0
+          fetch-tags: true
 
-      - name: Export each branch into its own directory
+      - name: Fetch every remote branch and build source snapshots
         shell: bash
         run: |
           set -euo pipefail
-          mkdir -p all-branches
-          : > all-branches/BRANCH-MANIFEST.txt
-
-          while IFS= read -r branch; do
-            [ -n "$branch" ] || continue
+          mkdir -p package/branches package/evidence package/manifests
+          git fetch --prune origin '+refs/heads/*:refs/remotes/origin/*'
+          git bundle create package/kingsmen-platform-all-history.bundle --all
+          git show-ref > package/manifests/git-refs.txt
+          git log --all --date=iso-strict --format='%H%x09%P%x09%an%x09%ae%x09%ad%x09%s' > package/manifests/commit-history.tsv
+          printf 'branch\tcommit_sha\tsnapshot_directory\n' > package/manifests/BRANCH-MANIFEST.tsv
+          while IFS= read -r ref; do
+            [ -n "$ref" ] || continue
+            branch="${ref#refs/remotes/origin/}"
+            [ "$branch" = "HEAD" ] && continue
+            sha="$(git rev-parse "$ref")"
             safe_name="$(printf '%s' "$branch" | sed 's#[/]#__#g' | sed 's#[^A-Za-z0-9._-]#_#g')"
-            target="all-branches/$safe_name"
+            target="package/branches/$safe_name"
             mkdir -p "$target"
-            printf '%s\t%s\n' "$branch" "$safe_name" >> all-branches/BRANCH-MANIFEST.txt
-            git archive "$branch" | tar -x -C "$target"
-            echo "Exported $branch -> $target"
-          done < <(git for-each-ref --format='%(refname:short)' refs/remotes/origin | sed 's#^origin/##' | grep -v '^HEAD$' | sort -u)
+            printf '%s\t%s\t%s\n' "$branch" "$sha" "$safe_name" >> package/manifests/BRANCH-MANIFEST.tsv
+            git archive "$sha" | tar -x -C "$target"
+            printf '%s\t%s\n' "$branch" "$sha"
+          done < <(git for-each-ref --format='%(refname)' refs/remotes/origin | sort -u)
+          git branch -a -vv > package/manifests/branch-details.txt
+          git tag --list --format='%(refname:short)\t%(objectname)' > package/manifests/tags.tsv
+          git count-objects -v > package/manifests/git-object-count.txt
+          {
+            echo "Repository: $GITHUB_REPOSITORY"
+            echo "Export commit: $GITHUB_SHA"
+            echo "Export UTC: $(date -u +%Y-%m-%dT%H:%M:%SZ)"
+            echo "Branch snapshots: $(($(wc -l < package/manifests/BRANCH-MANIFEST.tsv) - 1))"
+            echo "Git bundle: package/kingsmen-platform-all-history.bundle"
+            echo "Note: each branch directory is a snapshot at its recorded commit; the bundle preserves Git history and refs."
+          } > package/README.txt
 
-          echo "Exported branch snapshots:"
-          wc -l all-branches/BRANCH-MANIFEST.txt
+      - name: Collect pull request and workflow-run metadata
+        env:
+          GH_TOKEN: ${{ github.token }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          gh api --paginate "repos/$GITHUB_REPOSITORY/pulls?state=all&per_page=100" > package/evidence/pull-requests-pages.json
+          gh api --paginate "repos/$GITHUB_REPOSITORY/actions/runs?per_page=100" > package/evidence/workflow-runs-pages.json
+          gh api "repos/$GITHUB_REPOSITORY/actions/runs/$GITHUB_RUN_ID" > package/evidence/export-workflow-run.json
+          gh api "repos/$GITHUB_REPOSITORY/actions/runs/$GITHUB_RUN_ID/jobs" > package/evidence/export-workflow-jobs.json
 
-      - name: Upload one ZIP containing all branch snapshots
+      - name: Create checksums and file inventory
+        shell: bash
+        run: |
+          set -euo pipefail
+          find package -type f ! -path 'package/manifests/SHA256SUMS.txt' ! -path 'package/manifests/FILE-INVENTORY.tsv' -print0 | sort -z | xargs -0 sha256sum > package/manifests/SHA256SUMS.txt
+          find package -type f -printf '%P\t%s bytes\n' | sort > package/manifests/FILE-INVENTORY.tsv
+          echo "Files: $(wc -l < package/manifests/FILE-INVENTORY.tsv)"
+          echo "Branch snapshots: $(($(wc -l < package/manifests/BRANCH-MANIFEST.tsv) - 1))"
+          git bundle verify package/kingsmen-platform-all-history.bundle
+
+      - name: Upload complete Kingsmen source and evidence ZIP
         uses: actions/upload-artifact@v4
         with:
-          name: kingsmen-all-branches
-          path: all-branches/
+          name: kingsmen-complete-source-and-evidence
+          path: package/
           if-no-files-found: error
           compression-level: 6
-          retention-days: 14
+          retention-days: 30
