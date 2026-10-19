@@ -18,6 +18,8 @@ CREATE INDEX IF NOT EXISTS candidate_identity_review_audit_request_idx
 ALTER TABLE public.candidate_identity_review_audit ENABLE ROW LEVEL SECURITY;
 REVOKE ALL ON public.candidate_identity_review_audit FROM PUBLIC, anon, authenticated;
 GRANT SELECT, INSERT ON public.candidate_identity_review_audit TO service_role;
+GRANT SELECT, INSERT, UPDATE ON public.candidate_identity_review_requests TO service_role;
+GRANT SELECT, INSERT, UPDATE ON public.candidate_auth_identity_links TO service_role;
 
 CREATE OR REPLACE FUNCTION public.decide_candidate_identity_review(
   p_request_id uuid,
@@ -35,6 +37,7 @@ DECLARE
   v_candidate public.candidates%ROWTYPE;
   v_existing public.candidate_auth_identity_links%ROWTYPE;
   v_status text;
+  v_link_count integer := 0;
   v_note text := trim(coalesce(p_note, ''));
 BEGIN
   IF p_request_id IS NULL OR p_reviewer_auth_user_id IS NULL THEN
@@ -77,6 +80,11 @@ BEGIN
       RAISE EXCEPTION 'Candidate reference did not resolve to one active candidate' USING ERRCODE = 'P0002';
     END IF;
 
+    SELECT count(*) INTO v_link_count FROM public.candidate_auth_identity_links
+    WHERE supabase_user_id = v_request.supabase_user_id OR candidate_id = v_candidate.id;
+    IF v_link_count > 1 THEN
+      RAISE EXCEPTION 'Account and candidate are linked to conflicting records; manual conflict resolution is required' USING ERRCODE = '23505';
+    END IF;
     SELECT * INTO v_existing FROM public.candidate_auth_identity_links
     WHERE supabase_user_id = v_request.supabase_user_id OR candidate_id = v_candidate.id
     FOR UPDATE;
