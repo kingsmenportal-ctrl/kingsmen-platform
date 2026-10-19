@@ -50,7 +50,7 @@ for (const phrase of [
   '"use client"',
   "Readiness checklist",
   "localStorage",
-  "Your priority",
+  "Your current priority",
   "Make this my priority",
   "not an official verification result",
   "not yet synced to your Kingsmen account",
