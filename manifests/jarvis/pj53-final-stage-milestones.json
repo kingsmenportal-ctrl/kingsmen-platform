@@ -1,0 +1,276 @@
+{
+  "id": "PJ53_FINAL_STAGE_JARVIS_MILESTONES",
+  "status": "founder_requested",
+  "current_rating": 45,
+  "target_rating": 95,
+  "doctrine": [
+    "Jarvis is the founder/operator surface, not the backend authority.",
+    "Backend command bus and PostgreSQL truth vault remain authority.",
+    "Every action must pass policy and evidence requirements.",
+    "Sensitive actions require approval.",
+    "No external tool may silently mutate Kingsmen truth."
+  ],
+  "final_runtime_chain": [
+    "HUD_OR_VOICE_OR_COMMAND_INPUT",
+    "API_RUNTIME_BRIDGE",
+    "JARVIS_KERNEL",
+    "INTENT_ROUTER",
+    "COMMAND_REGISTRY",
+    "POLICY_GATE",
+    "APPROVAL_GATE_WHEN_REQUIRED",
+    "TOOL_ROUTER_OR_ADAPTER_SELECTOR",
+    "APPROVED_ADAPTER",
+    "SOURCE_CONFIDENCE_AND_PRIVACY_GATE",
+    "EVIDENCE_LEDGER",
+    "RESPONSE_COMPOSER",
+    "HUD_OR_VOICE_OUTPUT"
+  ],
+  "milestones": [
+    {
+      "id": "PJ53.1",
+      "name": "Jarvis Kernel Chain",
+      "rating_after": 55,
+      "purpose": "Centralise Jarvis runtime into one governed kernel path.",
+      "files_to_create": [
+        "apps/web/src/lib/jarvis/kernel/JarvisKernel.ts",
+        "apps/web/src/lib/jarvis/kernel/JarvisKernel.types.ts",
+        "apps/web/src/lib/jarvis/kernel/JarvisRuntimeContext.ts",
+        "apps/web/src/lib/jarvis/kernel/JarvisResponseComposer.ts",
+        "apps/web/src/app/api/jarvis/kernel/route.ts"
+      ],
+      "acceptance": [
+        "Kernel returns typed result for safe command.",
+        "Unknown command returns BLOCKED.",
+        "Every result includes evidence reference and policy outcome."
+      ]
+    },
+    {
+      "id": "PJ53.2",
+      "name": "Intent Router and Command Registry",
+      "rating_after": 60,
+      "purpose": "Replace loose phrase matching with typed intents and registered commands.",
+      "files_to_create": [
+        "apps/web/src/lib/jarvis/intent/JarvisIntentRouter.ts",
+        "apps/web/src/lib/jarvis/intent/JarvisIntentCatalog.ts",
+        "apps/web/src/lib/jarvis/commands/JarvisCommandRegistry.ts",
+        "apps/web/src/lib/jarvis/commands/JarvisCommand.types.ts"
+      ],
+      "acceptance": [
+        "HUD command cards can be generated from registry.",
+        "Low-confidence command does not execute sensitive action.",
+        "Unknown commands are blocked."
+      ]
+    },
+    {
+      "id": "PJ53.3",
+      "name": "Executable Policy Gate",
+      "rating_after": 64,
+      "purpose": "Turn Jarvis laws into runtime decisions.",
+      "files_to_create": [
+        "apps/web/src/lib/jarvis/policy/JarvisPolicyGate.ts",
+        "apps/web/src/lib/jarvis/policy/JarvisPolicyResult.ts",
+        "apps/web/src/lib/jarvis/policy/JarvisApprovalPolicyLoader.ts"
+      ],
+      "acceptance": [
+        "Safe read command passes.",
+        "Sensitive write command returns APPROVAL_REQUIRED.",
+        "Blocked command includes a human-readable reason."
+      ]
+    },
+    {
+      "id": "PJ53.4",
+      "name": "Evidence Ledger Upgrade",
+      "rating_after": 68,
+      "purpose": "Move from only local JSONL evidence toward queryable evidence events.",
+      "files_to_create": [
+        "apps/web/src/lib/jarvis/evidence/JarvisEvidenceLedger.ts",
+        "apps/web/src/lib/jarvis/evidence/JarvisEvidence.types.ts",
+        "apps/web/src/app/api/jarvis/evidence/route.ts",
+        "database/migrations/*_jarvis_evidence_events.sql"
+      ],
+      "acceptance": [
+        "Every command creates evidence.",
+        "Evidence has command id, risk, result, output hash, and timestamp.",
+        "Sensitive values are redacted."
+      ]
+    },
+    {
+      "id": "PJ53.5",
+      "name": "Approval Centre",
+      "rating_after": 72,
+      "purpose": "Allow Jarvis to prepare sensitive actions without executing them silently.",
+      "files_to_create": [
+        "apps/web/src/lib/jarvis/approvals/JarvisApprovalStore.ts",
+        "apps/web/src/lib/jarvis/approvals/JarvisApproval.types.ts",
+        "apps/web/src/app/api/jarvis/approvals/route.ts",
+        "apps/web/src/app/jarvis/components/JarvisApprovalDrawer.tsx"
+      ],
+      "acceptance": [
+        "Approval request appears in HUD.",
+        "Reject prevents execution.",
+        "Approve executes only the prepared command and records evidence."
+      ]
+    },
+    {
+      "id": "PJ53.6",
+      "name": "Adapter Registry",
+      "rating_after": 78,
+      "purpose": "Convert direct command execution into governed adapters.",
+      "files_to_create": [
+        "apps/web/src/lib/jarvis/adapters/JarvisAdapterRegistry.ts",
+        "apps/web/src/lib/jarvis/adapters/JarvisAdapter.types.ts",
+        "apps/web/src/lib/jarvis/adapters/system/SystemStatusAdapter.ts",
+        "apps/web/src/lib/jarvis/adapters/database/DatabaseReadAdapter.ts",
+        "apps/web/src/lib/jarvis/adapters/routes/RouteHealthAdapter.ts"
+      ],
+      "acceptance": [
+        "Kernel calls adapters by registered id.",
+        "Adapter timeout and failure are handled cleanly.",
+        "Adapter output appears in evidence drawer."
+      ]
+    },
+    {
+      "id": "PJ53.7",
+      "name": "Final HUD Components",
+      "rating_after": 80,
+      "purpose": "Turn current Jarvis HUD into maintainable final command cockpit components.",
+      "files_to_create": [
+        "apps/web/src/app/jarvis/components/JarvisOrb.tsx",
+        "apps/web/src/app/jarvis/components/JarvisCommandDeck.tsx",
+        "apps/web/src/app/jarvis/components/JarvisEvidenceDrawer.tsx",
+        "apps/web/src/app/jarvis/components/JarvisApprovalDrawer.tsx",
+        "apps/web/src/app/jarvis/components/JarvisMissionBoard.tsx",
+        "apps/web/src/app/jarvis/components/JarvisVoicePanel.tsx",
+        "apps/web/src/app/jarvis/components/JarvisMemoryPanel.tsx"
+      ],
+      "acceptance": [
+        "Founder can use Jarvis without developer console.",
+        "Every claim shows evidence or confidence.",
+        "Risky action shows approval card."
+      ]
+    },
+    {
+      "id": "PJ53.8",
+      "name": "Real Voice Stack",
+      "rating_after": 85,
+      "purpose": "Add wake word, local speech-to-text, and speech output with browser fallback.",
+      "files_to_create": [
+        "tools/jarvis-voice/README.md",
+        "tools/jarvis-voice/wakeword-service/",
+        "tools/jarvis-voice/stt-service/",
+        "tools/jarvis-voice/tts-service/",
+        "apps/web/src/app/api/jarvis/voice/session/route.ts",
+        "apps/web/src/app/jarvis/components/JarvisVoicePanel.tsx"
+      ],
+      "external_references": [
+        "dscripka/openWakeWord",
+        "ggml-org/whisper.cpp",
+        "OHF-Voice/piper1-gpl"
+      ],
+      "acceptance": [
+        "Voice transcript appears in HUD.",
+        "Safe voice command runs.",
+        "Sensitive voice command asks for approval."
+      ]
+    },
+    {
+      "id": "PJ53.9",
+      "name": "Document Smart Intake",
+      "rating_after": 88,
+      "purpose": "Use documents to prefill candidate smart forms.",
+      "files_to_create": [
+        "apps/web/src/lib/jarvis/adapters/documents/DocumentSmartIntakeAdapter.ts",
+        "apps/web/src/lib/documents/extraction/DocumentExtractionService.ts",
+        "apps/web/src/lib/documents/extraction/DocumentFieldMapper.ts",
+        "apps/web/src/app/api/documents/extract/route.ts",
+        "apps/web/src/app/candidate/profile/review/page.tsx"
+      ],
+      "external_references": [
+        "DS4SD/docling",
+        "Unstructured-IO/unstructured"
+      ],
+      "acceptance": [
+        "CV upload creates draft work history fields.",
+        "Identity/legal fields require review.",
+        "No extracted field becomes truth until approved."
+      ]
+    },
+    {
+      "id": "PJ53.10",
+      "name": "Portal Scout",
+      "rating_after": 90,
+      "purpose": "Inspect route/source health and generate evidence for MAP/manual fallback.",
+      "files_to_create": [
+        "apps/web/src/lib/jarvis/adapters/scout/PortalScoutAdapter.ts",
+        "apps/web/src/lib/routes/scout/RouteScoutService.ts",
+        "apps/web/src/app/api/routes/scout/route.ts",
+        "apps/web/src/app/jarvis/components/RouteScoutPanel.tsx"
+      ],
+      "external_references": [
+        "microsoft/playwright",
+        "microsoft/playwright-mcp",
+        "browserbase/stagehand"
+      ],
+      "acceptance": [
+        "Scout can inspect a public route page.",
+        "Scout result updates route health read model.",
+        "Uncertain route goes to manual review."
+      ]
+    },
+    {
+      "id": "PJ53.11",
+      "name": "Kingsmen Operational Adapters",
+      "rating_after": 93,
+      "purpose": "Make Jarvis useful across candidate, application, document, finance, comms, and fallback operations.",
+      "files_to_create": [
+        "apps/web/src/lib/jarvis/adapters/candidates/CandidateStatusAdapter.ts",
+        "apps/web/src/lib/jarvis/adapters/applications/ApplicationWorkbenchAdapter.ts",
+        "apps/web/src/lib/jarvis/adapters/documents/DocumentPipelineAdapter.ts",
+        "apps/web/src/lib/jarvis/adapters/comms/CommunicationDraftAdapter.ts",
+        "apps/web/src/lib/jarvis/adapters/finance/FinanceReviewAdapter.ts",
+        "apps/web/src/lib/jarvis/adapters/fallback/ManualFallbackAdapter.ts",
+        "apps/web/src/lib/jarvis/adapters/founder/FounderDigestAdapter.ts"
+      ],
+      "acceptance": [
+        "Jarvis can explain what blocks a candidate.",
+        "Jarvis can draft email-first messages for approval.",
+        "Jarvis can prepare a manual package draft."
+      ]
+    },
+    {
+      "id": "PJ53.12",
+      "name": "Brain Provider and Deployment Modes",
+      "rating_after": 95,
+      "purpose": "Add AI reasoning behind policy and make Jarvis runnable in local, server, and hybrid modes.",
+      "files_to_create": [
+        "apps/web/src/lib/jarvis/brain/JarvisBrainProvider.ts",
+        "apps/web/src/lib/jarvis/brain/OllamaJarvisProvider.ts",
+        "apps/web/src/lib/jarvis/brain/OpenAIJarvisProvider.ts",
+        "docs/jarvis/JARVIS_DEPLOYMENT_MODES.md",
+        "scripts/windows/START_JARVIS_PRODUCTION.cmd",
+        "scripts/linux/start-jarvis.sh"
+      ],
+      "acceptance": [
+        "Model can explain results but cannot execute unregistered commands.",
+        "Local mode starts with one command.",
+        "Server mode has no Windows-only hard dependency.",
+        "Hybrid mode can run safe remote commands."
+      ]
+    }
+  ],
+  "final_definition_of_done": [
+    "Founder can launch Jarvis with one command.",
+    "Founder can talk or type to Jarvis.",
+    "Jarvis understands command intent.",
+    "Jarvis blocks unsafe actions.",
+    "Jarvis asks approval for sensitive actions.",
+    "Jarvis executes approved tools through adapters.",
+    "Jarvis records evidence for every action.",
+    "Jarvis can read Kingsmen status across candidate, document, route, finance, comms, and system surfaces.",
+    "Jarvis can draft but not silently send sensitive communication.",
+    "Jarvis can prepare manual packages.",
+    "Jarvis can explain blockers.",
+    "Jarvis can run in local and server modes.",
+    "Jarvis remains inside Kingsmen law."
+  ]
+}
