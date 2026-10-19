@@ -8,7 +8,7 @@ ALTER TABLE public.candidate_identity_review_requests
 CREATE TABLE IF NOT EXISTS public.candidate_identity_review_audit (
   id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
   request_id uuid NOT NULL, -- Retain the audit trail even if a claimant account/request is later deleted.
-  actor_auth_user_id uuid NOT NULL REFERENCES auth.users(id),
+  actor_auth_user_id uuid NOT NULL, -- Immutable actor reference retained for audit even after account deletion.
   actor_role text NOT NULL CHECK (actor_role IN ('CANDIDATE','PLATFORM_ADMIN')),
   action text NOT NULL CHECK (action IN ('APPROVED','REJECTED','NEEDS_INFORMATION','CANDIDATE_RESPONSE')),
   candidate_id uuid REFERENCES public.candidates(id),
