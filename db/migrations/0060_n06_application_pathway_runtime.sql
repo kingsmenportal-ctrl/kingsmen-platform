@@ -40,6 +40,10 @@ ALTER TABLE public.candidate_opportunities ENABLE ROW LEVEL SECURITY;
 ALTER TABLE public.candidate_saved_opportunities ENABLE ROW LEVEL SECURITY;
 ALTER TABLE public.candidate_applications ENABLE ROW LEVEL SECURITY;
 ALTER TABLE public.candidate_application_events ENABLE ROW LEVEL SECURITY;
+REVOKE ALL ON TABLE public.candidate_opportunities FROM PUBLIC, anon, authenticated;
+REVOKE ALL ON TABLE public.candidate_saved_opportunities FROM PUBLIC, anon, authenticated;
+REVOKE ALL ON TABLE public.candidate_applications FROM PUBLIC, anon, authenticated;
+REVOKE ALL ON TABLE public.candidate_application_events FROM PUBLIC, anon, authenticated;
 GRANT SELECT, INSERT, UPDATE, DELETE ON TABLE public.candidate_opportunities TO service_role;
 GRANT SELECT, INSERT, UPDATE, DELETE ON TABLE public.candidate_saved_opportunities TO service_role;
 GRANT SELECT, INSERT, UPDATE, DELETE ON TABLE public.candidate_applications TO service_role;
@@ -52,7 +56,7 @@ DROP POLICY IF EXISTS n06_service_role_applications ON public.candidate_applicat
 CREATE POLICY n06_service_role_applications ON public.candidate_applications FOR ALL TO service_role USING(true) WITH CHECK(true);
 DROP POLICY IF EXISTS n06_service_role_application_events ON public.candidate_application_events;
 CREATE POLICY n06_service_role_application_events ON public.candidate_application_events FOR ALL TO service_role USING(true) WITH CHECK(true);
-CREATE OR REPLACE FUNCTION public.prevent_candidate_application_event_mutation() RETURNS trigger LANGUAGE plpgsql AS $$
+CREATE OR REPLACE FUNCTION public.prevent_candidate_application_event_mutation() RETURNS trigger LANGUAGE plpgsql SECURITY DEFINER SET search_path = '' AS $
 BEGIN RAISE EXCEPTION 'candidate application events are append-only'; END; $$;
 DROP TRIGGER IF EXISTS n06_application_event_no_update ON public.candidate_application_events;
 CREATE TRIGGER n06_application_event_no_update BEFORE UPDATE OR DELETE ON public.candidate_application_events FOR EACH ROW EXECUTE FUNCTION public.prevent_candidate_application_event_mutation();

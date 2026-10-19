@@ -15,6 +15,12 @@ This is a reversible feature increment intended to be corrected or extended duri
 - Manual application action package with audit event and no false claim of provider submission.
 - Append-only application event table, source validator, staging isolation probe, dashboard link and CI workflow.
 
+## Follow-up implementation hardening
+- Connected the candidate dashboard controls to the missing READY_FOR_REVIEW → READY_TO_SUBMIT → SUBMISSION_PENDING progression, with the existing readiness guard retained.
+- Hardened the N06 migration by explicitly revoking table access from PUBLIC/anon/authenticated before granting service-role access, and pinned the append-only trigger function to an empty search path.
+- Added conditional rollback when a status transition cannot be audited, with a distinct error when rollback cannot be confirmed.
+- Extended the N06 source validator to guard the progression and rollback contract.
+
 ## Validation status
 - Source files and package commands are committed.
 - CI and TypeScript/Next.js build are not yet confirmed green.

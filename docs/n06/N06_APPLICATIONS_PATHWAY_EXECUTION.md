@@ -12,6 +12,11 @@ Status: Implementation batch pushed for review; CI, migration, and staging gates
 - Manual application action packages for external portal, email, in-person, and manual-only workflows.
 - Append-only application event trail, source validator, candidate dashboard and staging isolation probe.
 
+## Candidate application progression
+- After a readiness check returns READY, the candidate can explicitly move READY_FOR_REVIEW → READY_TO_SUBMIT → SUBMISSION_PENDING.
+- SUBMISSION_PENDING records an attempt/workflow state only; it does not assert a provider submission. Provider-confirmed submission and outcomes remain reviewer-only and require evidence.
+- If a status transition audit insert fails, the API attempts a compare-and-set rollback and reports whether rollback was confirmed.
+
 ## Truth and safety boundaries
 - Candidate identity comes from the authenticated session; browser-supplied candidate IDs are not accepted.
 - Readiness is an internal checklist, not a provider decision or submission.
