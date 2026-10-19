@@ -1,0 +1,23 @@
+#!/usr/bin/env node
+import { existsSync, readFileSync } from 'node:fs';
+const path = 'scripts/staging/run-kingsmen-authenticated-e2e.mjs';
+const source = existsSync(path) ? readFileSync(path, 'utf8') : '';
+const required = [
+  'KINGSMEN_STAGING_BASE_URL', 'KINGSMEN_E2E_PLAN', 'KINGSMEN_E2E_CANDIDATE_A_TOKEN',
+  'KINGSMEN_E2E_CANDIDATE_B_TOKEN', 'KINGSMEN_E2E_REVIEWER_TOKEN',
+  'BLOCKED_MUTATION_NOT_AUTHORISED', 'BLOCKED_CROSS_ORIGIN_CASE',
+  "redirect: 'manual'", 'AbortSignal.timeout', 'planSha256',
+  'STAGING_E2E_PASSED', 'STAGING_E2E_FAILED', 'results'
+];
+const failures = required.filter((token) => !source.includes(token));
+const report = {
+  schema: 'kingsmen.validation-report.v1',
+  module: 'Authenticated Staging E2E Runner Source Contract',
+  status: failures.length ? 'STAGING_E2E_RUNNER_VALIDATION_FAILED' : 'STAGING_E2E_RUNNER_SOURCE_VALIDATED',
+  passed: failures.length === 0,
+  liveRuntimeExecuted: false,
+  requiredContracts: required.length,
+  failures
+};
+console.log(JSON.stringify(report, null, 2));
+if (failures.length) process.exitCode = 1;
