@@ -85,3 +85,11 @@ test("route-universe seed creates only official source anchors and keeps them ou
   assert.match(seed, /'PRIVATE_COLLEGE'[\s\S]*?true/);
   assert.doesNotMatch(seed, /DELETE\s+FROM|TRUNCATE|DROP\s+TABLE/i);
 });
+
+test("deployed Netlify CORS allowlists never permit insecure HTTP site origins", async () => {
+  for (const name of functions.map((entry) => entry.name)) {
+    const source = await functionSource(name);
+    assert.doesNotMatch(source, /"http:\/\/kingsmen-portal-staging\.netlify\.app"/);
+    assert.doesNotMatch(source, /"http:\/\/6ad61ee1da20fa786856f07e--kingsmen-portal-staging\.netlify\.app"/);
+  }
+});
