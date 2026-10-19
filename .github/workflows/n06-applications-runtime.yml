@@ -1,0 +1,33 @@
+name: N06 Applications and Pathway Execution
+on:
+  pull_request:
+    paths:
+      - "apps/web/src/app/api/candidate/applications/**"
+      - "apps/web/src/app/api/candidate/opportunities/**"
+      - "apps/web/src/app/candidate/applications/**"
+      - "apps/web/src/components/saved-opportunities-client.tsx"
+      - "apps/web/src/app/candidate/dashboard/page.tsx"
+      - "apps/web/src/lib/candidate-document-runtime.ts"
+      - "db/migrations/0060_n06_application_pathway_runtime.sql"
+      - "db/migrations/0073_n06_application_privilege_hardening.sql"
+      - "scripts/validators/validate-n06-applications-runtime.mjs"
+      - "scripts/tests/n06-application-isolation.integration.mjs"
+      - ".github/workflows/n06-applications-runtime.yml"
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  n06-source-guards:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - name: Validate N06 source boundaries
+        run: node scripts/validators/validate-n06-applications-runtime.mjs
+      - name: Validate integration test syntax
+        run: node --check scripts/tests/n06-application-isolation.integration.mjs
+      - name: Validate migration markers
+        run: |
+          node --input-type=module -e 'import {readFileSync} from "node:fs"; const s=readFileSync("db/migrations/0060_n06_application_pathway_runtime.sql","utf8"); for (const t of ["candidate_opportunities","candidate_applications","candidate_application_events","ENABLE ROW LEVEL SECURITY","prevent_candidate_application_event_mutation"]) if (!s.includes(t)) throw new Error("Missing N06 migration marker: "+t); console.log("N06 migration source markers passed; migration not applied by CI.");'
