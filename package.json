@@ -8,7 +8,7 @@
     "doc": "docs"
   },
   "scripts": {
-    "test": "node scripts/validators/validate-jarvis-core.mjs && node scripts/validators/validate-jarvis-live-pass-02.mjs && npm run candidate:validate:dashboard",
+    "test": "node scripts/validators/validate-jarvis-core.mjs && node scripts/validators/validate-jarvis-live-pass-02.mjs && npm run candidate:validate:dashboard && npm run candidate:validate:workspace",
     "jarvis:validate": "node scripts/validators/validate-jarvis-connected-live.mjs",
     "jarvis:validate:core": "node scripts/validators/validate-jarvis-core.mjs",
     "jarvis:validate:live-pass-02": "node scripts/validators/validate-jarvis-live-pass-02.mjs",
@@ -55,6 +55,7 @@
     "kingsmen:launch:audit": "node scripts/validators/validate-kingsmen-launch-readiness-evidence-aware.mjs --audit",
     "kingsmen:launch:gate": "node scripts/validators/validate-kingsmen-launch-readiness-evidence-aware.mjs --gate",
     "candidate:validate:dashboard": "node scripts/validators/validate-n04-candidate-03.mjs",
+    "candidate:validate:workspace": "node scripts/validators/validate-candidate-workspace-persistence.mjs",
     "api:validate:truth-vault": "node scripts/validators/validate-api-truth-vault-persistence.mjs",
     "payments:prove:sandbox": "node scripts/proof/prove-payfast-sandbox-boundary.mjs",
     "payments:validate:sandbox": "node scripts/validators/validate-payfast-sandbox-proof.mjs",
