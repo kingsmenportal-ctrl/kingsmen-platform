@@ -14,7 +14,7 @@ It checks all five release-contract requirements:
 
 The report includes the HTTP status, pass/fail booleans, timestamp, and SHA-256 digest of its canonical fields. It never includes the token or raw API response. The report always sets `reviewed: false`; a passing API response is evidence of current configuration, not founder review or final assembly approval.
 
-Run it from GitHub Actions → **Kingsmen Main Branch Protection Evidence** → **Run workflow**. The workflow is intentionally manual so a permissions or configuration gap does not make every pull request fail. Its artifact is retained for 14 days.
+After this workflow file is present on the repository's default branch, run it from GitHub Actions → **Kingsmen Main Branch Protection Evidence** → **Run workflow**. GitHub does not offer a newly introduced `workflow_dispatch` workflow from an unmerged feature branch. The workflow is intentionally manual so a permissions or configuration gap does not make every pull request fail. Its artifact is retained for 14 days.
 
 Interpretation:
 - `VERIFIED_REQUIRED_PROTECTION_ACTIVE`: all five controls were observed active.
