@@ -4,7 +4,7 @@ on:
   pull_request:
     branches: [main]
   push:
-    branches: [main]
+    branches: [main, feat/candidate-dashboard-actionable-readiness]
   workflow_dispatch:
 
 jobs:
@@ -25,6 +25,21 @@ jobs:
 
       - name: Install dependencies
         run: npm ci
+
+      - name: Candidate dashboard behaviour validator
+        run: npm run candidate:validate:dashboard
+
+      - name: Candidate account persistence and ownership validator
+        run: npm run candidate:validate:workspace
+
+      - name: Install web dependencies
+        run: npm install --prefix apps/web --no-audit --no-fund
+
+      - name: Build candidate web application
+        run: npm --prefix apps/web run build
+
+      - name: Candidate workspace API integration test
+        run: npm run candidate:test:workspace:e2e
 
       - name: API Truth Vault persistence validator
         run: npm run api:validate:truth-vault
