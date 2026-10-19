@@ -37,6 +37,8 @@ assert.match(sql,/n11-full-refund-revoke:/);
 assert.match(sql,/partial refunds do not automatically revoke service/i);
 assert.match(sql,/SET search_path = ''/);
 assert.doesNotMatch(sql,/SET search_path = public, pg_temp/);
+assert.doesNotMatch(sql,/AS \$\n/,"PL/pgSQL function bodies must use valid dollar-quote openers");
+assert.equal((sql.match(/AS \$\$\n/g)||[]).length,(sql.match(/^\$\$;$/gm)||[]).length,"PL/pgSQL dollar-quoted bodies must be balanced");
 assert.match(sql,/REVOKE ALL PRIVILEGES ON TABLE public\.candidate_entitlements, public\.candidate_entitlement_events/);
 assert.match(webhook,/n10_record_verified_payfast_payment/);
 assert.match(webhook,/ENTITLEMENT_ACTIVATION_PENDING/);
