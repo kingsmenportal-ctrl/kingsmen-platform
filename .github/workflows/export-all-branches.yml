@@ -1,0 +1,51 @@
+name: Export all branch snapshots
+
+on:
+  workflow_dispatch:
+  push:
+    branches:
+      - main
+    paths:
+      - ".github/workflows/export-all-branches.yml"
+
+permissions:
+  contents: read
+
+jobs:
+  export:
+    name: Package every branch snapshot
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository history and refs
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Export each branch into its own directory
+        shell: bash
+        run: |
+          set -euo pipefail
+          mkdir -p all-branches
+          : > all-branches/BRANCH-MANIFEST.txt
+
+          while IFS= read -r branch; do
+            [ -n "$branch" ] || continue
+            safe_name="$(printf '%s' "$branch" | sed 's#[/]#__#g' | sed 's#[^A-Za-z0-9._-]#_#g')"
+            target="all-branches/$safe_name"
+            mkdir -p "$target"
+            printf '%s\t%s\n' "$branch" "$safe_name" >> all-branches/BRANCH-MANIFEST.txt
+            git archive "$branch" | tar -x -C "$target"
+            echo "Exported $branch -> $target"
+          done < <(git for-each-ref --format='%(refname:short)' refs/remotes/origin | sed 's#^origin/##' | grep -v '^HEAD$' | sort -u)
+
+          echo "Exported branch snapshots:"
+          wc -l all-branches/BRANCH-MANIFEST.txt
+
+      - name: Upload one ZIP containing all branch snapshots
+        uses: actions/upload-artifact@v4
+        with:
+          name: kingsmen-all-branches
+          path: all-branches/
+          if-no-files-found: error
+          compression-level: 6
+          retention-days: 14
