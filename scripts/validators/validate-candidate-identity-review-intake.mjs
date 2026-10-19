@@ -22,6 +22,7 @@ const checks = [
   ["candidate request listing is owner-scoped", /supabase_user_id=eq\.\$\{encodeURIComponent\(auth\.userId\)\}/.test(candidateRoute)],
   ["duplicate open request conflict", /already have an open identity review request/.test(candidateRoute)],
   ["no cache for identity records", /Cache-Control.*no-store/.test(candidateRoute)],
+  ["null reviewer decisions fail closed", /p_decision IS NULL OR p_decision NOT IN/.test(decisions)],
   ["reviewer registry is authoritative", /public\.platform_reviewers/.test(decisions) && /role_code = 'PLATFORM_ADMIN'/.test(decisions) && /revoked_at IS NULL/.test(decisions)],
   ["decision transaction is atomic PL/pgSQL", /CREATE OR REPLACE FUNCTION public\.decide_candidate_identity_review/.test(decisions) && /FOR UPDATE/.test(decisions)],
   ["approval resolves exact active candidate reference", /public_ref = trim\(p_candidate_reference\) AND is_active = true/.test(decisions)],
