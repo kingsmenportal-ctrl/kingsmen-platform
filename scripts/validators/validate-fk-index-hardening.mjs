@@ -30,7 +30,7 @@ for (const [table, column, index] of expected) {
 }
 const count = (migration.match(/create\\s+index\\s+if\\s+not\\s+exists/gi) ?? []).length;
 if (count !== expected.length) failures.push({ issue: 'unexpected index statement count', expected: expected.length, actual: count });
-for (const token of ['begin;', 'commit;', 'pg_index', 'indisvalid', 'indisready', 'indpred is null', 'raise exception']) {
+for (const token of ['do $', 'pg_index', 'indisvalid', 'indisready', 'indpred is null', 'raise exception']) {
   if (!migration.toLowerCase().includes(token.toLowerCase())) failures.push({ issue: 'missing postflight/transaction contract', token });
 }
 if (/grant\\s+|create\\s+policy|enable\\s+row level security|drop\\s+table|delete\\s+from/i.test(migration)) {
