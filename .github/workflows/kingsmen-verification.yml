@@ -1,0 +1,61 @@
+name: Kingsmen Verification Gate
+
+on:
+  pull_request:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: kingsmen-verification-${{ github.ref }}
+  cancel-in-progress: false
+
+jobs:
+  verify:
+    name: Build, validators, and launch audit
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          package-manager-cache: false
+
+      - name: Install root dependencies
+        run: npm install --no-audit --no-fund
+
+      - name: Install API dependencies
+        run: npm --prefix apps/api install --no-audit --no-fund
+
+      - name: Run repository test command
+        run: npm test
+
+      - name: Build API
+        run: npm run api:build
+
+      - name: Validate API persistence boundary
+        run: npm run api:validate
+
+      - name: Validate web-to-backend boundary
+        run: npm run web:validate:backend-boundary
+
+      - name: Generate launch readiness audit
+        run: npm run kingsmen:launch:audit
+
+      - name: Upload verification reports
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: kingsmen-verification-reports
+          if-no-files-found: warn
+          retention-days: 14
+          path: |
+            reports/launch/kingsmen-launch-readiness-latest.json
+            reports/api/
+            reports/final-assembly/
