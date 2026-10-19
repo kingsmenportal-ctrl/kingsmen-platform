@@ -28,5 +28,5 @@ jobs:
           cache: npm
       - run: npm ci
       - run: node scripts/validators/validate-candidate-application-tracker.mjs
-      - run: npm --prefix apps/web ci
+      - run: npm --prefix apps/web install --no-audit --no-fund
       - run: npm --prefix apps/web run build
