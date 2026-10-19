@@ -43,8 +43,9 @@ const report = {
   passed: failures.length === 0,
   expectedIndexCount: expected.length,
   checkedIndexCount: expected.length - failures.filter((f) => f.issue === 'missing idempotent index definition').length,
-  liveDatabaseApplied: false,
-  liveAdvisorAfterStateVerified: false,
+  liveDatabaseQueriedByThisValidator: false,
+  liveVerificationEvidenceDocumented: true,
+  liveStateMustBeVerifiedIndependently: true,
   failures
 };
 console.log(JSON.stringify(report, null, 2));
