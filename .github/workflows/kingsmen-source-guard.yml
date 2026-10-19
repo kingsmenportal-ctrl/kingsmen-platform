@@ -38,6 +38,9 @@ jobs:
       - name: Authenticated staging E2E runner source contract
         run: npm run staging:e2e:validate
 
+      - name: Authenticated staging E2E runner regression tests
+        run: npm run staging:e2e:test
+
       - name: API Truth Vault persistence validator
         run: npm run api:validate:truth-vault
 
