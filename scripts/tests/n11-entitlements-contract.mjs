@@ -7,6 +7,7 @@ const reviewerApi=fs.readFileSync("apps/web/src/app/api/reviewer/entitlements/ro
 const candidatePage=fs.readFileSync("apps/web/src/app/candidate/entitlements/page.tsx","utf8");
 const reviewerPage=fs.readFileSync("apps/web/src/app/reviewer/entitlements/page.tsx","utf8");
 const n10=fs.readFileSync("db/migrations/0064_n10_packages_payments_refunds.sql","utf8");
+const n10PaymentRpc=fs.readFileSync("db/migrations/0067_n10_atomic_payfast_payment_confirmation.sql","utf8");
 assert.match(sql,/v_order\.status <> 'PAID'/);
 assert.match(sql,/v_payment\.event_type <> 'PAYMENT_CONFIRMED'/);
 assert.match(sql,/v_payment\.source <> 'VERIFIED_PROVIDER_WEBHOOK'/);
@@ -14,6 +15,10 @@ assert.match(sql,/upper\(coalesce\(v_payment\.provider,''\)\) <> 'PAYFAST'/);
 assert.match(sql,/v_payment\.amount_minor IS DISTINCT FROM v_order\.amount_minor/);
 assert.match(sql,/coalesce\(v_payment\.metadata->>'server_validation',''\) <> 'VALID'/);
 assert.match(sql,/order creation or manual evidence cannot grant entitlement/);
+assert.match(n10PaymentRpc, /'merchant_reference',p_merchant_reference/);
+assert.match(n10PaymentRpc, /'provider_status','COMPLETE'/);
+assert.match(n10PaymentRpc, /'server_validation','VALID'/);
+assert.match(n10PaymentRpc, /'PAYMENT_CONFIRMED','VERIFIED_PROVIDER_WEBHOOK'/);
 assert.match(sql,/ON CONFLICT|idempotency_key/);
 assert.match(sql,/candidate_entitlement_events/);
 assert.match(sql,/n11_prevent_entitlement_event_mutation/);
