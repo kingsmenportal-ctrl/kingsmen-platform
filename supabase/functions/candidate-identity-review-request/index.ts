@@ -5,9 +5,9 @@ const SUPABASE_ANON_KEY = Deno.env.get("SUPABASE_ANON_KEY") ?? "";
 const SUPABASE_SERVICE_ROLE_KEY = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY") ?? "";
 const allowedOrigins = new Set([
   "https://kingsmen-portal-staging.netlify.app",
-  "http://kingsmen-portal-staging.netlify.app",
+  
   "https://6ad61ee1da20fa786856f07e--kingsmen-portal-staging.netlify.app",
-  "http://6ad61ee1da20fa786856f07e--kingsmen-portal-staging.netlify.app",
+  
   "http://localhost:8888",
   "http://127.0.0.1:8888"
 ]);
