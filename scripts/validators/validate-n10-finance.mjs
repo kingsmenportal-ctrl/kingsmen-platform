@@ -24,7 +24,7 @@ for(const [key,needles] of Object.entries({
  refundRpc:["n10_claim_payfast_refund","n10_record_payfast_refund_reconciliation","PROCESSING","REFUND_COMPLETED","finance_audit_events","p_reconciled_total_minor","preflight_original_minor","REVOKE ALL ON FUNCTION"],
  atomicRpc:["n10_create_candidate_order","n10_request_candidate_refund","n10_confirm_manual_payment","n10_review_refund_request","email_verified IS TRUE","FOR UPDATE","finance_audit_events","REVOKE ALL ON FUNCTION"],
  rpcOnly:["n10_record_payfast_intent","REVOKE INSERT, UPDATE, DELETE ON TABLE","public.finance_audit_events","FROM service_role","GRANT SELECT ON TABLE"],
- candidateApi:["requireCandidateSession","candidate_id","CREATE_ORDER","REQUEST_REFUND","idempotencyKey","n10_create_candidate_order","n10_request_candidate_refund","the order is not marked paid","PAID","amount_minor"],
+ candidateApi:["requireCandidateSession","candidate_id","CREATE_ORDER","REQUEST_REFUND","idempotencyKey","n10_create_candidate_order","n10_request_candidate_refund","Creating an order never takes payment or marks it paid.","PAID","amount_minor"],
  checkoutApi:["requireCandidateSession","PAYFAST_NOT_CONFIGURED","PENDING_PAYMENT","n10_record_payfast_intent","createPayFastItnSignature","paymentUrl"],
  itnApi:["isTrustedPayFastItnSource","verifyPayFastItnSignature","validatePayFastItnAtProvider","n10_record_verified_payfast_payment","PAYMENT_CONFIRMATION_UNCERTAIN","sha256Hex"],
  reviewerApi:["requireReviewerSession","FINANCE_REVIEWER","CONFIRM_MANUAL_PAYMENT","n10_confirm_manual_payment","n10_review_refund_request","PROVIDER_REFUND_RECONCILIATION_REQUIRED"],
