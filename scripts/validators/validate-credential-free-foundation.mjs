@@ -1,0 +1,10 @@
+import { existsSync, readFileSync } from "node:fs";
+const required=["apps/api/src/server.ts","apps/api/src/db/truth-vault-repository.ts","db/migrations/0001_n03_truth_vault.sql","manifests/launch/staging-runtime-proof-pack-v1.json","docs/launch/KINGSMEN_STAGING_RUNTIME_PROOF_PACK.md"];
+const missing=required.filter(path=>!existsSync(path));
+const envExample=existsSync(".env.example")?readFileSync(".env.example","utf8"):"";
+const secretAssignments=envExample.split(/\r?\n/).filter(line=>/(?:DATABASE_URL|SUPABASE_SERVICE_ROLE_KEY|PAYFAST_.*(?:KEY|SECRET|PASSPHRASE)|.*_TOKEN)\s*=\s*[^#\s]/i.test(line));
+const pkg=JSON.parse(readFileSync("package.json","utf8"));
+const requiredScripts=["api:validate:truth-vault","payments:prove:sandbox","payments:validate:sandbox","security:prove:rls","security:validate:rls","backup:prove:restore","backup:validate:restore","repo:prove:branch-protection","repo:validate:branch-protection","secrets:prove:wiring","secrets:validate:wiring","communications:prove","communications:validate","observability:prove","observability:validate","legal:prove","legal:validate","staging:prove:pack","staging:validate:pack","final:prove:evidence","final:validate:evidence","final:collect:evidence"];
+const missingScripts=requiredScripts.filter(name=>typeof pkg.scripts?.[name]!=="string");
+const result={schema:"kingsmen.credential-free-foundation-source-check.v1",status:missing.length||secretAssignments.length||missingScripts.length?"failed":"passed",passed:missing.length===0&&secretAssignments.length===0&&missingScripts.length===0,scope:"static_source_only_not_runtime_acceptance",missingFiles:missing,nonPlaceholderSecretAssignmentsInEnvExample:secretAssignments.length,missingScriptEntries:missingScripts,runtimeEvidenceStillRequired:true,publicLaunchAllowed:false};
+console.log(JSON.stringify(result,null,2));if(!result.passed)process.exitCode=1;

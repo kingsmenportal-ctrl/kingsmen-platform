@@ -63,11 +63,17 @@ function fitLabel(score?: number) {
   return "Research first";
 }
 
+function keyForLead(lead: Lead, index: number) {
+  return [lead.title, lead.company, lead.location, lead.applyUrl || lead.sourceUrl || index].join("|").toLowerCase();
+}
+
 export default function JobFinderClient() {
   const [running, setRunning] = useState(false);
   const [runResult, setRunResult] = useState<RunResult | null>(null);
   const [leads, setLeads] = useState<Lead[]>([]);
   const [message, setMessage] = useState("");
+  const [savedLeadKeys, setSavedLeadKeys] = useState<string[]>([]);
+  const [savingLeadKey, setSavingLeadKey] = useState("");
 
   useEffect(() => {
     setLeads(readStoredLeads());
@@ -116,6 +122,47 @@ export default function JobFinderClient() {
       setMessage(error instanceof Error ? error.message : String(error));
     } finally {
       setRunning(false);
+    }
+  }
+
+  async function saveLeadToWorkspace(lead: Lead, key: string) {
+    const sourceUrl = lead.applyUrl || lead.sourceUrl || "";
+    if (!lead.title.trim() || !lead.company.trim() || !sourceUrl) {
+      setMessage("This lead needs a title, organisation, and source URL before it can be saved.");
+      return;
+    }
+    setSavingLeadKey(key);
+    setMessage("");
+    try {
+      const response = await fetch("/api/personal-jobs/apply-now", {
+        method: "POST",
+        credentials: "same-origin",
+        cache: "no-store",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          action: "addOpportunity",
+          opportunity: {
+            title: lead.title.slice(0, 180),
+            organisation: lead.company.slice(0, 180),
+            category: "JOB",
+            applicationMethod: "PORTAL",
+            sourceUrl: sourceUrl.slice(0, 1000),
+            notes: [lead.location, lead.description || lead.notes || "", lead.sourceLabel || lead.sourceName || "Job discovery", typeof lead.fitScore === "number" ? `Fit score: ${lead.fitScore}/100` : ""].filter(Boolean).join(" | ").slice(0, 1800)
+          }
+        })
+      });
+      const data = await response.json();
+      if (!response.ok || !["OPPORTUNITY_ADDED", "OPPORTUNITY_ALREADY_EXISTS"].includes(data.status)) {
+        throw new Error(data.error || "The opportunity was not saved to your candidate workspace.");
+      }
+      setSavedLeadKeys((current) => current.includes(key) ? current : [...current, key]);
+      setMessage(data.status === "OPPORTUNITY_ALREADY_EXISTS"
+        ? `“${lead.title}” is already in your candidate workspace. Open the shortlist desk to review it.`
+        : `Saved “${lead.title}” to your authenticated candidate workspace. Review it before preparing an application.`);
+    } catch (error) {
+      setMessage(error instanceof Error ? error.message : "Could not save this opportunity.");
+    } finally {
+      setSavingLeadKey("");
     }
   }
 
@@ -221,11 +268,25 @@ export default function JobFinderClient() {
                 <p className="muted">{lead.location}</p>
                 <p>{(lead.description || lead.notes || "").slice(0, 240)}</p>
                 {lead.applyUrl || lead.sourceUrl ? (
-                  <a href={lead.applyUrl || lead.sourceUrl} target="_blank" rel="noreferrer">
-                    Review source
-                  </a>
+                  <>
+                    <a href={lead.applyUrl || lead.sourceUrl} target="_blank" rel="noreferrer">
+                      Review source
+                    </a>
+                    <button
+                      type="button"
+                      disabled={savedLeadKeys.includes(String(lead.id ?? keyForLead(lead, index))) || Boolean(savingLeadKey)}
+                      onClick={() => void saveLeadToWorkspace(lead, String(lead.id ?? keyForLead(lead, index)))}
+                      style={{ marginTop: 10 }}
+                    >
+                      {savedLeadKeys.includes(String(lead.id ?? keyForLead(lead, index)))
+                        ? "Saved to workspace"
+                        : savingLeadKey === String(lead.id ?? keyForLead(lead, index))
+                          ? "Saving…"
+                          : "Save to candidate workspace"}
+                    </button>
+                  </>
                 ) : (
-                  <span className="muted">No source URL captured</span>
+                  <span className="muted">No source URL captured — cannot save until a source is verified</span>
                 )}
               </article>
             ))}

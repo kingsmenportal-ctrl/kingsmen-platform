@@ -1,5 +1,6 @@
 import { createServer, type IncomingMessage, type ServerResponse } from "node:http";
 import { URL } from "node:url";
+import { timingSafeEqual } from "node:crypto";
 
 import {
   assertCommandEnvelope,
@@ -198,20 +199,65 @@ function sendError(response: ServerResponse, statusCode: number, code: string, m
   }, correlationId);
 }
 
+function authorizeApiRequest(request: IncomingMessage, response: ServerResponse): boolean {
+  const runtimeEnvironment = (process.env.NODE_ENV ?? "development").toLowerCase();
+  const productionLike = runtimeEnvironment === "production" || runtimeEnvironment === "staging";
+  const configuredToken = process.env.KINGSMEN_API_AUTH_TOKEN ?? "";
+
+  // Local development stays credential-free unless a token is explicitly configured.
+  // Staging/production fail closed if the shared service-to-service token is absent or weak.
+  if (!configuredToken) {
+    if (productionLike) {
+      sendError(response, 503, "API_AUTH_NOT_CONFIGURED", "API authentication is not configured for this environment.");
+      return false;
+    }
+    return true;
+  }
+
+  if (configuredToken.length < 32) {
+    sendError(response, 503, "API_AUTH_MISCONFIGURED", "API authentication configuration is invalid.");
+    return false;
+  }
+
+  const authorization = request.headers.authorization ?? "";
+  const match = authorization.match(/^Bearer (\S+)$/);
+  const supplied = match?.[1] ?? "";
+  const expectedBytes = Buffer.from(configuredToken, "utf8");
+  const suppliedBytes = Buffer.from(supplied, "utf8");
+  const matches = suppliedBytes.length === expectedBytes.length && timingSafeEqual(suppliedBytes, expectedBytes);
+
+  if (!matches) {
+    response.setHeader("www-authenticate", "Bearer");
+    sendError(response, 401, "UNAUTHORIZED", "A valid bearer token is required.");
+    return false;
+  }
+
+  return true;
+}
+
 function readBody(request: IncomingMessage): Promise<string> {
   return new Promise((resolve, reject) => {
     let body = "";
+    let rejectedForSize = false;
 
     request.on("data", (chunk: Buffer) => {
+      if (rejectedForSize) return;
       body += chunk.toString("utf8");
-      if (body.length > MAX_BODY_BYTES) {
-        request.destroy();
+      if (Buffer.byteLength(body, "utf8") > MAX_BODY_BYTES) {
+        // Stop retaining request data, but keep the socket alive long enough to return
+        // a structured 413 response instead of resetting the client's connection.
+        rejectedForSize = true;
+        body = "";
         reject(new Error("REQUEST_BODY_TOO_LARGE"));
       }
     });
 
-    request.on("end", () => resolve(body));
-    request.on("error", reject);
+    request.on("end", () => {
+      if (!rejectedForSize) resolve(body);
+    });
+    request.on("error", (error) => {
+      if (!rejectedForSize) reject(error);
+    });
   });
 }
 
@@ -403,6 +449,44 @@ async function handleHealth(response: ServerResponse): Promise<void> {
   });
 }
 
+async function handleReadiness(response: ServerResponse): Promise<void> {
+  // Readiness is deliberately stricter than liveness: volatile memory mode cannot serve
+  // as a ready staging/production backend even when the HTTP process is alive.
+  if (!truthVault.enabled) {
+    sendJson(response, 503, {
+      ok: false,
+      service: SERVICE_NAME,
+      status: "not_ready",
+      reason: "durable_truth_vault_disabled",
+      storageMode: truthVault.storageMode,
+      generatedAtIso: nowIso()
+    });
+    return;
+  }
+
+  try {
+    const health = await truthVault.healthCheck();
+    sendJson(response, health.ok ? 200 : 503, {
+      ok: health.ok,
+      service: SERVICE_NAME,
+      status: health.ok ? "ready" : "not_ready",
+      storageMode: truthVault.storageMode,
+      truthVault: health,
+      generatedAtIso: nowIso()
+    });
+  } catch {
+    // Do not leak database URLs, driver details, or credentials through health endpoints.
+    sendJson(response, 503, {
+      ok: false,
+      service: SERVICE_NAME,
+      status: "not_ready",
+      reason: "truth_vault_unavailable",
+      storageMode: truthVault.storageMode,
+      generatedAtIso: nowIso()
+    });
+  }
+}
+
 async function handleCandidateStatus(response: ServerResponse, candidateId: string): Promise<void> {
   if (truthVault.enabled) {
     const candidate = await truthVault.readCandidateStatus(candidateId);
@@ -477,6 +561,15 @@ export function createKingsmenApiServer() {
         await handleHealth(response);
         return;
       }
+
+      if (method === "GET" && pathname === "/ready") {
+        await handleReadiness(response);
+        return;
+      }
+
+      // Health endpoints stay public for load balancers; all application/read-model routes
+      // require service authentication in staging/production.
+      if (!authorizeApiRequest(request, response)) return;
 
       if (method === "POST" && pathname === "/api/jarvis/runtime-control") {
         await handleJarvisRuntimeControl(request, response);

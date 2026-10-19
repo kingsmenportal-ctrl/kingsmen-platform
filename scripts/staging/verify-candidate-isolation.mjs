@@ -1,0 +1,90 @@
+#!/usr/bin/env node
+import assert from "node:assert/strict";
+import { randomUUID } from "node:crypto";
+
+const baseUrl = process.env.CANDIDATE_STAGING_BASE_URL;
+const tokenA = process.env.CANDIDATE_STAGING_USER_A_TOKEN;
+const tokenB = process.env.CANDIDATE_STAGING_USER_B_TOKEN;
+const supabaseUrl = process.env.CANDIDATE_STAGING_SUPABASE_URL;
+const expectedProject = process.env.CANDIDATE_STAGING_PROJECT_REF || "euhubhhnumtibbyufghm";
+const projectRefFromUrl = (value) => { try { return new URL(value).hostname.split(".")[0]; } catch { return ""; } };
+
+if (!baseUrl || !supabaseUrl || !tokenA || !tokenB) { console.error("Missing required staging environment variables."); process.exit(2); }
+if (tokenA === tokenB) { console.error("User A and User B must use distinct access tokens."); process.exit(2); }
+const base = new URL(baseUrl);
+if (base.protocol !== "https:" && base.hostname !== "localhost" && base.hostname !== "127.0.0.1") { console.error("Refusing non-HTTPS staging URL except localhost."); process.exit(2); }
+const supabase = new URL(supabaseUrl);
+if (supabase.protocol !== "https:" || projectRefFromUrl(supabase.href) !== expectedProject || expectedProject !== "euhubhhnumtibbyufghm") { console.error("Supabase staging project ref mismatch; refusing unexpected project."); process.exit(2); }
+if (process.env.PAYMENTS_LIVE === "true") { console.error("Refusing to run while PAYMENTS_LIVE=true."); process.exit(2); }
+
+const runId = "candidate-isolation-" + new Date().toISOString().replace(/[:.]/g, "-") + "-" + randomUUID().slice(0, 8);
+const results = [];
+const endpoint = new URL("/api/personal-jobs/apply-now", base);
+const sessionEndpoint = new URL("/api/auth/session", base);
+const documentEndpoint = (id) => new URL("/api/personal-jobs/apply-now/documents/" + encodeURIComponent(id), base);
+async function request(url, token, init = {}) { return fetch(url, { ...init, headers: { ...(init.headers || {}), Cookie: "kingsmen-access-token=" + token, "Cache-Control": "no-store" }, cache: "no-store", signal: AbortSignal.timeout(15000) }); }
+async function readWorkspace(token) { const response = await request(endpoint, token); assert.equal(response.status, 200, "workspace GET HTTP " + response.status); const data = await response.json(); assert.equal(typeof data.profile, "object"); return data; }
+async function saveNotes(token, notes) { const response = await request(endpoint, token, { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ action: "saveProfile", profile: { notes } }) }); assert.equal(response.status, 200, "profile save HTTP " + response.status); const data = await response.json(); assert.equal(data.status, "SAVED"); return data; }
+async function checkSession(token) { const response = await request(sessionEndpoint, token); assert.equal(response.status, 200, "session endpoint HTTP " + response.status); const data = await response.json(); assert.equal(data.authenticated, true); assert.equal(data.configured, true); return data; }
+async function uploadSyntheticDocument(token, marker) { const bytes = Buffer.from("Kingsmen Portal synthetic staging fixture " + marker + "\n", "utf8"); const response = await request(endpoint, token, { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ action: "uploadDocument", fileName: marker + ".txt", documentType: "CV", dataUrl: "data:text/plain;base64," + bytes.toString("base64") }) }); assert.equal(response.status, 200, "synthetic document upload HTTP " + response.status); const data = await response.json(); assert.equal(data.status, "DOCUMENT_UPLOADED"); assert.ok(data.document && /^doc-[0-9]{10,}-[a-f0-9]+$/i.test(data.document.documentId), "upload must return a valid document ID"); assert.ok(String(data.document.storagePath || "").length > 0, "document must have a private storage path"); return { documentId: data.document.documentId, bytes }; }
+async function deleteSyntheticDocument(token, documentId) { const response = await request(endpoint, token, { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ action: "deleteDocument", documentId }) }); assert.equal(response.status, 200, "synthetic document cleanup HTTP " + response.status); const data = await response.json(); assert.equal(data.status, "DOCUMENT_DELETED"); }
+function record(name, passed, details = {}) { results.push({ name, passed: Boolean(passed), ...details }); }
+
+let originalA, originalB, modifiedA = false, modifiedB = false, documentA = null, documentB = null, runError = null, activeCheck = "authenticated_sessions";
+try {
+  const [sessionA, sessionB] = await Promise.all([checkSession(tokenA), checkSession(tokenB)]);
+  assert.ok(sessionA.user && sessionA.user.id && sessionB.user && sessionB.user.id);
+  assert.notEqual(sessionA.user.id, sessionB.user.id, "A and B must be distinct Auth identities");
+  record("distinct_authenticated_users", true, { userA: "A", userB: "B" });
+  activeCheck = "workspace_baseline_read";
+  [originalA, originalB] = await Promise.all([readWorkspace(tokenA), readWorkspace(tokenB)]);
+  const markerA = "KP_STAGING_A_" + runId, markerB = "KP_STAGING_B_" + runId;
+  activeCheck = "authenticated_profile_persistence_after_reload";
+  await saveNotes(tokenA, markerA); modifiedA = true;
+  await saveNotes(tokenB, markerB); modifiedB = true;
+  const [reloadedA, reloadedB] = await Promise.all([readWorkspace(tokenA), readWorkspace(tokenB)]);
+  assert.equal(reloadedA.profile.notes, markerA, "A marker must persist after reload");
+  assert.equal(reloadedB.profile.notes, markerB, "B marker must persist after reload");
+  record("authenticated_profile_persistence_after_reload", true);
+  activeCheck = "bidirectional_cross_account_read_isolation";
+  assert.notEqual(reloadedA.profile.notes, markerB, "A must not receive B marker");
+  assert.notEqual(reloadedB.profile.notes, markerA, "B must not receive A marker");
+  record("bidirectional_cross_account_read_isolation", true);
+  activeCheck = "identity_spoof_field_cannot_cross_write";
+  const spoof = await request(endpoint, tokenA, { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ action: "saveProfile", auth_user_id: sessionB.user.id, profile: { notes: "KP_SPOOF_" + runId } }) });
+  assert.equal(spoof.status, 200, "identity field should be ignored by profile API");
+  const [afterSpoofA, unchangedB] = await Promise.all([readWorkspace(tokenA), readWorkspace(tokenB)]);
+  assert.equal(afterSpoofA.profile.notes, markerA, "spoof attempt must not change A marker");
+  assert.equal(unchangedB.profile.notes, markerB, "spoof attempt must not change B data");
+  record("identity_spoof_field_cannot_cross_write", true);
+  activeCheck = "private_document_upload_and_byte_integrity";
+  documentA = await uploadSyntheticDocument(tokenA, "KP-A-" + runId.replace(/[^a-zA-Z0-9-]/g, ""));
+  documentB = await uploadSyntheticDocument(tokenB, "KP-B-" + runId.replace(/[^a-zA-Z0-9-]/g, ""));
+  const ownDownloadA = await request(documentEndpoint(documentA.documentId), tokenA);
+  assert.equal(ownDownloadA.status, 200, "A must download own private document");
+  assert.deepEqual(Buffer.from(await ownDownloadA.arrayBuffer()), documentA.bytes, "A download bytes must match uploaded fixture");
+  const ownDownloadB = await request(documentEndpoint(documentB.documentId), tokenB);
+  assert.equal(ownDownloadB.status, 200, "B must download own private document");
+  assert.deepEqual(Buffer.from(await ownDownloadB.arrayBuffer()), documentB.bytes, "B download bytes must match uploaded fixture");
+  record("private_document_upload_and_byte_integrity", true);
+  activeCheck = "bidirectional_private_document_isolation";
+  const crossAB = await request(documentEndpoint(documentB.documentId), tokenA);
+  assert.equal(crossAB.status, 404, "A must receive not-found for B document; service errors are failures, got HTTP " + crossAB.status);
+  const crossBA = await request(documentEndpoint(documentA.documentId), tokenB);
+  assert.equal(crossBA.status, 404, "B must receive not-found for A document; service errors are failures, got HTTP " + crossBA.status);
+  record("bidirectional_private_document_isolation", true, { userARequest: crossAB.status, userBRequest: crossBA.status });
+  activeCheck = "unauthenticated_workspace_denied";
+  const noAuth = await fetch(endpoint, { cache: "no-store", signal: AbortSignal.timeout(15000) });
+  assert.equal(noAuth.status, 401, "unauthenticated request must return HTTP 401, got HTTP " + noAuth.status);
+  record("unauthenticated_workspace_denied", true, { httpStatus: noAuth.status });
+} catch (error) { runError = error instanceof Error ? error.message : "Unknown test failure"; results.push({ name: "failed_check", check: activeCheck, passed: false, error: "Assertion or request failed; inspect local staging logs for details." }); }
+finally {
+  if (documentA) { try { await deleteSyntheticDocument(tokenA, documentA.documentId); record("cleanup_user_A_synthetic_document", true); } catch { results.push({ name: "cleanup_user_A_synthetic_document", passed: false }); } }
+  if (documentB) { try { await deleteSyntheticDocument(tokenB, documentB.documentId); record("cleanup_user_B_synthetic_document", true); } catch { results.push({ name: "cleanup_user_B_synthetic_document", passed: false }); } }
+  try { if (modifiedA && originalA) { await saveNotes(tokenA, typeof originalA.profile.notes === "string" ? originalA.profile.notes : ""); record("restore_user_A_notes", true); } } catch { results.push({ name: "restore_user_A_notes", passed: false }); }
+  try { if (modifiedB && originalB) { await saveNotes(tokenB, typeof originalB.profile.notes === "string" ? originalB.profile.notes : ""); record("restore_user_B_notes", true); } } catch { results.push({ name: "restore_user_B_notes", passed: false }); }
+}
+const failed = results.filter((result) => !result.passed);
+const report = { schema: "kingsmen.candidate-staging-isolation.v1", runId, finishedAt: new Date().toISOString(), projectRef: expectedProject, deploymentHost: base.host, status: runError || failed.length ? "FAILED" : "PASSED", passed: !runError && failed.length === 0, reviewed: false, redacted: true, productionReady: false, publicLaunchAllowed: false, checks: results, error: runError ? "Sensitive details suppressed; inspect the named assertion and staging service logs." : undefined };
+console.log(JSON.stringify(report, null, 2));
+if (runError || failed.length) process.exitCode = 1;

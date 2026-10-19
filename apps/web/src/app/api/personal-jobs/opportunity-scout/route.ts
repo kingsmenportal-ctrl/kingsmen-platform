@@ -6,6 +6,15 @@ import { NextResponse } from "next/server";
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
 
+const MAX_QUERY_LENGTH = 160;
+const MAX_LOCATION_LENGTH = 100;
+const ALLOWED_CATEGORIES = new Set(["JOB", "LEARNERSHIP", "INTERNSHIP", "FUNDING", "BURSARY"]);
+
+function boundedText(value: unknown, fallback: string, maxLength: number) {
+  if (typeof value !== "string") return fallback;
+  return value.trim().slice(0, maxLength);
+}
+
 function repoRoot() {
   const cwd = process.cwd();
   if (cwd.replace(/\\/g, "/").endsWith("apps/web")) return path.resolve(cwd, "../..");
@@ -166,13 +175,27 @@ export async function GET() {
 
 export async function POST(request: Request) {
   try {
-    const body = await request.json().catch(() => ({}));
-    const action = String(body.action || "").trim();
+    if (!request.headers.get("content-type")?.toLowerCase().includes("application/json")) {
+      return NextResponse.json({ status: "FAILED", error: "Content-Type must be application/json." }, { status: 415 });
+    }
+
+    const body = await request.json().catch(() => null);
+    if (!body || typeof body !== "object" || Array.isArray(body)) {
+      return NextResponse.json({ status: "FAILED", error: "Request body must be a JSON object." }, { status: 400 });
+    }
+    const action = typeof body.action === "string" ? body.action.trim() : "";
 
     if (action === "runScout") {
-      const query = String(body.query || "entry level general worker admin learnership internship").trim();
-      const location = String(body.location || "Johannesburg").trim();
-      const category = String(body.category || "JOB").trim();
+      const query = boundedText(body.query, "entry level general worker admin learnership internship", MAX_QUERY_LENGTH);
+      const location = boundedText(body.location, "Johannesburg", MAX_LOCATION_LENGTH);
+      const requestedCategory = boundedText(body.category, "JOB", 24).toUpperCase();
+      if (!query || !location) {
+        return NextResponse.json({ status: "FAILED", error: "Search and location are required." }, { status: 400 });
+      }
+      if (!ALLOWED_CATEGORIES.has(requestedCategory)) {
+        return NextResponse.json({ status: "FAILED", error: "Choose a supported opportunity category." }, { status: 400 });
+      }
+      const category = requestedCategory;
 
       const script = path.join(ROOT, "scripts", "agents", "personal-job-opportunity-scout.mjs");
       const fallbackLeads = sourceLinks(query, location, category);
@@ -199,9 +222,15 @@ export async function POST(request: Request) {
           maxBuffer: 1024 * 1024 * 30
         });
 
-        diagnostics.push(`agent_exit=${result.status}`);
-        if (result.stderr) diagnostics.push(result.stderr.slice(0, 5000));
-        if (result.stdout) diagnostics.push(result.stdout.slice(0, 5000));
+        diagnostics.push(
+          result.error
+            ? "Scout agent could not start."
+            : result.status === 0
+              ? "Scout agent completed."
+              : "Scout agent exited unsuccessfully."
+        );
+        // Never return raw process output: it can expose filesystem paths,
+        // environment details, source-page content, or other internal data.
 
         const agentOut = readJson(OUT, null);
         if (result.status === 0 && agentOut && Array.isArray(agentOut.leads) && agentOut.leads.length) {
@@ -241,7 +270,10 @@ export async function POST(request: Request) {
     }
 
     if (action === "importLead") {
-      const leadId = String(body.leadId || "");
+      const leadId = typeof body.leadId === "string" ? body.leadId.trim() : "";
+      if (!leadId || leadId.length > 200) {
+        return NextResponse.json({ status: "FAILED", error: "A valid lead identifier is required." }, { status: 400 });
+      }
       const scout = readJson(OUT, defaultScout());
       const lead = (scout.leads || []).find((x: any) => x.leadId === leadId);
 
@@ -249,11 +281,23 @@ export async function POST(request: Request) {
         return NextResponse.json({
           status: "FAILED",
           error: "Lead not found. Run scout again."
-        });
+        }, { status: 404 });
+      }
+
+      // Treat agent output and local JSON as untrusted input. Only import secure
+      // web URLs; reject javascript:, data:, credentialed URLs and malformed links.
+      let sourceUrl: URL;
+      try {
+        sourceUrl = new URL(String(lead.sourceUrl || ""));
+      } catch {
+        return NextResponse.json({ status: "FAILED", error: "This lead has an invalid source link and cannot be imported." }, { status: 422 });
+      }
+      if (sourceUrl.protocol !== "https:" || sourceUrl.username || sourceUrl.password) {
+        return NextResponse.json({ status: "FAILED", error: "Only secure HTTPS source links can be imported." }, { status: 422 });
       }
 
       const store = readJson(APPLY_STORE, defaultApplyStore());
-      const exists = (store.opportunities || []).some((opp: any) => opp.sourceUrl === lead.sourceUrl);
+      const exists = (store.opportunities || []).some((opp: any) => opp.sourceUrl === sourceUrl.toString());
 
       if (!exists) {
         store.opportunities = [
@@ -263,7 +307,7 @@ export async function POST(request: Request) {
             organisation: lead.organisation || lead.source,
             category: lead.category || "JOB",
             location: lead.location || "",
-            sourceUrl: lead.sourceUrl,
+            sourceUrl: sourceUrl.toString(),
             applicationMethod: lead.applicationMethod || "PORTAL",
             emailTo: "",
             closingDate: "",
@@ -297,10 +341,10 @@ export async function POST(request: Request) {
       error: "Unknown action."
     });
   } catch (error) {
+    // Keep internal paths, stack traces and agent output out of public API responses.
     return NextResponse.json({
       status: "ERROR_VISIBLE",
-      error: error instanceof Error ? error.message : "POST failed.",
-      stack: error instanceof Error ? error.stack : ""
-    });
+      error: "Opportunity scout could not complete this request. Please retry."
+    }, { status: 503 });
   }
 }

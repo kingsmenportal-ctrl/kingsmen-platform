@@ -1,0 +1,94 @@
+name: Kingsmen candidate storage regression checks
+
+on:
+  pull_request:
+    paths:
+      - "apps/web/src/app/founder/**"
+      - "apps/web/test/founder-document-review.test.cjs"
+      - "apps/web/src/app/api/founder/**"
+      - "apps/web/src/app/api/personal-jobs/**"
+      - "apps/web/src/app/api/personal-jobs/apply-pack-builder/**"
+      - "apps/web/src/app/api/auth/**"
+      - "apps/web/src/lib/candidate-portal-storage.ts"
+      - "apps/web/src/lib/supabase-auth.ts"
+      - "apps/web/src/lib/founder-auth.ts"
+      - "apps/web/src/app/candidate/dashboard/page.tsx"
+      - "apps/web/src/app/candidate/readiness/page.tsx"
+      - "apps/web/test/candidate-readiness.test.cjs"
+      - "apps/web/test/review-ledger-safety.test.cjs"
+      - "apps/web/src/app/personal-job-desk/review-ledger/ReviewLedgerClient.tsx"
+      - "apps/web/src/app/candidate/profile/page.tsx"
+      - "apps/web/src/app/candidate/documents/page.tsx"
+      - "apps/web/src/app/candidate/workbench/page.tsx"
+      - "apps/web/src/app/candidate/finance/page.tsx"
+      - "apps/web/test/candidate-storage-security.test.cjs"
+      - "apps/web/test/candidate-document-lifecycle.test.cjs"
+      - "apps/web/test/application-pack-validation.test.cjs"
+      - "apps/web/test/review-ledger-safety.test.cjs"
+      - "apps/web/src/app/personal-job-desk/review-ledger/ReviewLedgerClient.tsx"
+      - "apps/web/test/document-pack-index-safety.test.cjs"
+      - "apps/web/test/manual-application-export.test.cjs"
+      - "apps/web/test/cv-intake-confirmation.test.cjs"
+      - "apps/web/src/app/api/personal-jobs/apply-now/route.ts"
+      - "apps/web/src/app/personal-job-desk/apply-now/ApplyNowClient.tsx"
+      - "scripts/agents/personal-job-document-pack-index.mjs"
+      - "apps/web/test/candidate-readiness.test.cjs"
+      - "apps/web/test/founder-control-plane.test.cjs"
+      - "apps/web/test/founder-command-intake.test.cjs"
+      - "apps/web/test/founder-document-review.test.cjs"
+      - "db/migrations/0016_founder_audit_and_command_intake.sql"
+      - "db/migrations/0017_founder_command_decisions.sql"
+      - "db/migrations/0018_founder_document_review_decisions.sql"
+      - "db/migrations/0019_founder_document_canonical_validation.sql"
+      - "db/migrations/0020_candidate_document_upload_registration.sql"
+      - "db/migrations/0021_candidate_document_retirement.sql"
+      - "db/migrations/0022_candidate_document_application_linkage.sql"
+      - "db/migrations/0021_candidate_document_retirement.sql"
+      - "db/migrations/0022_candidate_document_application_linkage.sql"
+      - ".github/workflows/kingsmen-candidate-storage.yml"
+  push:
+    branches:
+      - "fix/kingsmen-ci-real-validation-gates"
+    paths:
+      - "apps/web/src/app/founder/**"
+      - "apps/web/src/app/api/founder/**"
+      - "apps/web/src/app/api/personal-jobs/**"
+      - "apps/web/src/app/api/auth/**"
+      - "apps/web/src/lib/candidate-portal-storage.ts"
+      - "apps/web/src/lib/supabase-auth.ts"
+      - "apps/web/src/lib/founder-auth.ts"
+      - "apps/web/src/app/candidate/dashboard/page.tsx"
+      - "apps/web/src/app/candidate/readiness/page.tsx"
+      - "apps/web/test/candidate-storage-security.test.cjs"
+      - "apps/web/test/candidate-readiness.test.cjs"
+      - "apps/web/test/founder-control-plane.test.cjs"
+      - "apps/web/test/founder-command-intake.test.cjs"
+      - "apps/web/test/founder-document-review.test.cjs"
+      - "db/migrations/0016_founder_audit_and_command_intake.sql"
+      - "db/migrations/0017_founder_command_decisions.sql"
+      - "db/migrations/0018_founder_document_review_decisions.sql"
+      - "db/migrations/0019_founder_document_canonical_validation.sql"
+      - "db/migrations/0020_candidate_document_upload_registration.sql"
+      - ".github/workflows/kingsmen-candidate-storage.yml"
+
+permissions:
+  contents: read
+
+concurrency:
+  group: kingsmen-candidate-storage-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  candidate-storage-regressions:
+    name: Candidate storage security regressions
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - name: Run candidate and founder security regressions
+        run: node --test apps/web/test/candidate-storage-security.test.cjs apps/web/test/candidate-document-lifecycle.test.cjs apps/web/test/application-pack-validation.test.cjs apps/web/test/review-ledger-safety.test.cjs apps/web/test/document-pack-index-safety.test.cjs apps/web/test/manual-application-export.test.cjs apps/web/test/cv-intake-confirmation.test.cjs apps/web/test/candidate-readiness.test.cjs apps/web/test/founder-control-plane.test.cjs apps/web/test/founder-command-intake.test.cjs apps/web/test/founder-document-review.test.cjs

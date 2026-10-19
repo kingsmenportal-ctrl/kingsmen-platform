@@ -153,12 +153,12 @@ function evidenceAttachment(item) {
     evidenceAvailable: b(item.evidence?.proofAvailable),
     evidenceLevel: s(item.evidence?.evidenceLevel),
     visibility: s(item.evidence?.visibility),
-    proofReference: s(item.evidence?.proofReference),
+    proofReferencePresent: Boolean(s(item.evidence?.proofReference)),
     proofType: s(item.evidence?.proofType),
-    auditReference: s(item.evidence?.auditReference),
+    auditReferencePresent: Boolean(s(item.evidence?.auditReference)),
     redacted: s(item.evidence?.visibility) === "INTERNAL_ONLY_REDACTED",
     attachableNow: b(item.evidence?.proofAvailable) && s(item.evidence?.visibility) !== "INTERNAL_ONLY_REDACTED",
-    safeNote: "Evidence is attached only as a safe summary; sensitive proof locations remain hidden."
+    safeNote: "Sensitive proof references and audit identifiers are deliberately omitted; only presence indicators are exposed."
   };
 }
 
@@ -296,6 +296,20 @@ export function runDocumentPackIndex() {
   const input = readJson(INPUT);
   if (input?.status !== "COMPLETED" || !Array.isArray(input?.snapshotItems)) {
     throw new Error("PJ33 requires PJ32 completed public-snapshot.local.json with snapshotItems array.");
+  }
+
+  if (input.snapshotItems.length > 10000) {
+    throw new Error("PJ33 refuses more than 10,000 snapshot items.");
+  }
+  const seenSnapshotIds = new Set();
+  for (const [index, item] of input.snapshotItems.entries()) {
+    if (!item || typeof item !== "object" || Array.isArray(item)) {
+      throw new Error("PJ33 snapshot item " + (index + 1) + " must be an object.");
+    }
+    const snapshotId = s(item.snapshotItemId);
+    if (!snapshotId) throw new Error("PJ33 snapshot item " + (index + 1) + " has no snapshotItemId.");
+    if (seenSnapshotIds.has(snapshotId)) throw new Error("PJ33 has duplicate snapshotItemId: " + snapshotId + ".");
+    seenSnapshotIds.add(snapshotId);
   }
 
   const documentPacks = input.snapshotItems.map((item, index) => makePack(item, index));

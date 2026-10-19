@@ -1,0 +1,84 @@
+name: Kingsmen Staging Runtime E2E
+
+on:
+  workflow_dispatch:
+  schedule:
+    - cron: "0 2 * * *" # 04:00 SAST (UTC+2)
+  push:
+    branches:
+      - fix/kingsmen-ci-real-validation-gates
+    paths:
+      - "e2e/**"
+      - "playwright.config.ts"
+      - "package.json"
+      - "package-lock.json"
+      - "supabase/migrations/**"
+      - ".github/workflows/kingsmen-staging-e2e.yml"
+
+permissions:
+  contents: read
+
+concurrency:
+  group: kingsmen-staging-runtime-e2e
+  cancel-in-progress: false
+
+jobs:
+  staging-runtime-e2e:
+    name: Authenticated staging runtime journeys
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+    environment: staging
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+      - name: Install locked root dependencies
+        run: npm ci
+      - name: Install Chromium
+        run: npx playwright install --with-deps chromium
+      - name: Prepare redacted result directory
+        run: mkdir -p reports/staging
+      - name: Run authenticated Kingsmen staging journeys
+        run: npm run test:e2e
+        env:
+          CI: "true"
+          KINGSMEN_STAGING_BASE_URL: ${{ secrets.KINGSMEN_STAGING_BASE_URL }}
+          NEXT_PUBLIC_SUPABASE_URL: ${{ secrets.NEXT_PUBLIC_SUPABASE_URL }}
+          NEXT_PUBLIC_SUPABASE_ANON_KEY: ${{ secrets.NEXT_PUBLIC_SUPABASE_ANON_KEY }}
+          TEST_A_EMAIL: ${{ secrets.TEST_A_EMAIL }}
+          TEST_A_PW: ${{ secrets.TEST_A_PW }}
+          TEST_B_EMAIL: ${{ secrets.TEST_B_EMAIL }}
+          TEST_B_PW: ${{ secrets.TEST_B_PW }}
+          FOUNDER_TEST_EMAIL: ${{ secrets.FOUNDER_TEST_EMAIL }}
+          FOUNDER_TEST_PW: ${{ secrets.FOUNDER_TEST_PW }}
+          FOUNDER_TEST_DOCUMENT_REF: ${{ secrets.FOUNDER_TEST_DOCUMENT_REF }}
+          FOUNDER_TEST_CANDIDATE_REF: ${{ secrets.FOUNDER_TEST_CANDIDATE_REF }}
+          FOUNDER_TEST_PROOF_REF: ${{ secrets.FOUNDER_TEST_PROOF_REF }}
+          FOUNDER_TEST_EVIDENCE_REF: ${{ secrets.FOUNDER_TEST_EVIDENCE_REF }}
+      - name: Add factual run summary
+        if: always()
+        env:
+          TARGET_REF: ${{ github.sha }}
+          RUN_URL: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
+          CONCLUSION: ${{ job.status }}
+        run: |
+          {
+            echo "## Kingsmen staging runtime E2E"
+            echo "- Workflow conclusion: ${CONCLUSION}"
+            echo "- Tested commit: ${TARGET_REF}"
+            echo "- Run: ${RUN_URL}"
+            echo "- Scenarios requested: candidate-owned document access, cross-candidate isolation, registration persistence, failed deletion handling, founder review persistence, fresh-session persistence."
+            echo "- Note: this report is test evidence only; it does not itself prove backup/restore, payment sandbox, communications delivery, or release approval."
+          } >> "$GITHUB_STEP_SUMMARY"
+      - name: Upload redacted test result summary
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: kingsmen-staging-runtime-e2e-${{ github.run_number }}
+          path: reports/staging/playwright-runtime-results.json
+          if-no-files-found: warn
+          retention-days: 7

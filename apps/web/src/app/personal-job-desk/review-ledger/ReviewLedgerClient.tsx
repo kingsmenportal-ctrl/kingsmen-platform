@@ -33,6 +33,9 @@ type LedgerRecord = {
     outcomeStatus: string;
     outcomeNotes: string;
     followUpDate: string;
+    interviewAt: string;
+    nextAction: string;
+    responseHistory: string;
     reviewerNotes: string;
   };
 };
@@ -77,7 +80,10 @@ export default function ReviewLedgerClient() {
   const records = useMemo(() => ledger?.records ?? [], [ledger]);
 
   const filtered = useMemo(() => {
+    const today = new Date().toISOString().slice(0, 10);
     if (filter === "ALL") return records;
+    if (filter === "OVERDUE_FOLLOW_UPS") return records.filter((r) => r.review.followUpDate && r.review.followUpDate < today && !["INTERVIEW", "REJECTED", "OFFER", "WITHDRAWN"].includes(r.review.outcomeStatus));
+    if (filter === "UPCOMING_INTERVIEWS") return records.filter((r) => r.review.interviewAt && !Number.isNaN(Date.parse(r.review.interviewAt)) && Date.parse(r.review.interviewAt) >= Date.now());
     return records.filter((record) => record.actionState === filter || record.review.reviewStatus === filter);
   }, [records, filter]);
 
@@ -149,8 +155,68 @@ export default function ReviewLedgerClient() {
   }
 
   async function copyText(text: string) {
-    await navigator.clipboard.writeText(text);
-    setMessage("Copied to clipboard.");
+    try {
+      await navigator.clipboard.writeText(text);
+      setMessage("Copied to clipboard.");
+    } catch {
+      setMessage("Clipboard access was unavailable. Select and copy the text manually.");
+    }
+  }
+
+  function exportFollowUpQueue() {
+    const actionable = records
+      .filter((record) => record.review.followUpDate && !["INTERVIEW", "REJECTED", "OFFER", "WITHDRAWN"].includes(record.review.outcomeStatus))
+      .sort((a, b) => a.review.followUpDate.localeCompare(b.review.followUpDate));
+    const columns = ["followUpDate", "company", "role", "reviewStatus", "outcomeStatus", "nextAction", "sourceUrl"];
+    const rows = actionable.map((record) => [
+      record.review.followUpDate,
+      record.pack.company,
+      record.pack.title,
+      record.review.reviewStatus,
+      record.review.outcomeStatus,
+      record.review.nextAction,
+      record.pack.sourceUrl
+    ]);
+    const csvCell = (value: unknown) => {
+      const text = String(value ?? "");
+      // Prevent spreadsheet formula injection while preserving ordinary text.
+      const safe = text.length > 0 && ["=", "+", "-", "@", "\t", "\r"].includes(text[0]) ? "'" + text : text;
+      return '"' + safe.replace(/"/g, '""') + '"';
+    };
+    const csv = [columns, ...rows].map((row) => row.map(csvCell).join(",")).join("\r\n");
+    const blob = new Blob(["\\uFEFF", csv], { type: "text/csv;charset=utf-8" });
+    const url = URL.createObjectURL(blob);
+    const anchor = document.createElement("a");
+    anchor.href = url;
+    anchor.download = "kingsmen-follow-up-queue.csv";
+    anchor.click();
+    URL.revokeObjectURL(url);
+    setMessage(`Exported ${actionable.length} follow-up tasks. Export is a local file; nothing was sent.`);
+  }
+
+  function prepareFollowUpDraft(record: LedgerRecord) {
+    const draft = [
+      "Subject: Follow-up on application",
+      "",
+      `Hello ${record.pack.company || "Hiring Team"},`,
+      "",
+      `I am following up on my application for ${record.pack.title || "the advertised role"}.`,
+      "I remain interested and would appreciate any update on the recruitment timeline.",
+      "",
+      "Kind regards"
+    ].join("\n");
+    void copyText(draft);
+  }
+
+  function recordFollowUpAttempt(record: LedgerRecord) {
+    const today = new Date().toISOString().slice(0, 10);
+    const entry = `[${today}] Follow-up attempt recorded by user; outcome not independently verified.`;
+    const history = [record.review.responseHistory.trim(), entry].filter(Boolean).join("\n");
+    const updatedRecords = records.map((item) => item.ledgerId === record.ledgerId
+      ? { ...item, review: { ...item.review, responseHistory: history, followUpDate: "", nextAction: "Wait for employer response; set a new follow-up date if needed." } }
+      : item);
+    setLedger(ledger ? { ...ledger, records: updatedRecords } : ledger);
+    setMessage("Follow-up attempt added to the unsaved draft. Click Save ledger record to persist it; no message was sent.");
   }
 
   return (
@@ -162,10 +228,16 @@ export default function ReviewLedgerClient() {
           Review PJ21 application packs, record approval, capture submission proof, and track outcomes.
           PJ22 does not send applications or contact employers automatically.
         </p>
-        <button onClick={loadLedger} disabled={loading} style={button}>
-          {loading ? "Working..." : "Refresh ledger"}
-        </button>
+        <div style={{ display: "flex", gap: 10, flexWrap: "wrap" }}>
+          <button onClick={loadLedger} disabled={loading} style={button}>
+            {loading ? "Working..." : "Refresh ledger"}
+          </button>
+          <button onClick={exportFollowUpQueue} disabled={!records.length} style={{ ...smallButton, marginTop: 14 }}>
+            Export follow-up queue (CSV)
+          </button>
+        </div>
         {message ? <p style={{ color: "#ffd77a" }}>{message}</p> : null}
+        <p style={muted}>Follow-up actions are reminders and drafts only. The portal does not send messages or create calendar notifications.</p>
       </section>
 
       <section style={statsGrid}>
@@ -174,6 +246,9 @@ export default function ReviewLedgerClient() {
         <Stat label="Ready manual" value={ledger?.summary?.readyForManualSubmission ?? 0} />
         <Stat label="Proof captured" value={ledger?.summary?.proofCaptured ?? 0} />
         <Stat label="Outcomes" value={ledger?.summary?.outcomesRecorded ?? 0} />
+        <Stat label="Overdue follow-ups" value={ledger?.summary?.followUpsOverdue ?? 0} />
+        <Stat label="Follow-ups due today" value={ledger?.summary?.followUpsDueToday ?? 0} />
+        <Stat label="Upcoming interviews" value={ledger?.summary?.interviewsScheduled ?? 0} />
       </section>
 
       <section style={layout}>
@@ -185,6 +260,8 @@ export default function ReviewLedgerClient() {
             <option value="READY_FOR_MANUAL_SUBMISSION">Ready manual submission</option>
             <option value="PROOF_CAPTURED">Proof captured</option>
             <option value="OUTCOME_RECORDED">Outcome recorded</option>
+            <option value="OVERDUE_FOLLOW_UPS">Overdue follow-ups</option>
+            <option value="UPCOMING_INTERVIEWS">Upcoming interviews</option>
             <option value="BLOCKED_PROFILE_FIX">Blocked profile fix</option>
             {reviewStatuses.map((status) => <option key={status} value={status}>{status}</option>)}
           </select>
@@ -223,6 +300,27 @@ export default function ReviewLedgerClient() {
               </div>
 
               <section style={subPanel}>
+                <h3>Follow-up task actions</h3>
+                <p style={muted}>
+                  {selected.review.followUpDate
+                    ? `Scheduled follow-up: ${selected.review.followUpDate}`
+                    : "No follow-up date is currently scheduled for this record."}
+                  {selected.review.nextAction ? ` Next action: ${selected.review.nextAction}` : ""}
+                </p>
+                <div style={{ display: "flex", gap: 10, flexWrap: "wrap" }}>
+                  <button style={smallButton} onClick={() => prepareFollowUpDraft(selected)}>Prepare follow-up draft</button>
+                  <button
+                    style={smallButton}
+                    disabled={!selected.review.followUpDate}
+                    onClick={() => recordFollowUpAttempt(selected)}
+                  >
+                    Record follow-up attempt
+                  </button>
+                </div>
+                <p style={muted}>“Record follow-up attempt” only adds a dated entry to the unsaved review draft and clears the current due date. Save the ledger record to persist. It does not prove an employer was contacted.</p>
+              </section>
+
+              <section style={subPanel}>
                 <h3>Review controls</h3>
                 <div style={formGrid}>
                   <Select label="Review status" value={selected.review.reviewStatus} options={reviewStatuses} onChange={(v) => patchSelected("reviewStatus", v)} />
@@ -232,6 +330,8 @@ export default function ReviewLedgerClient() {
                   <Input label="Proof type" value={selected.review.proofType} onChange={(v) => patchSelected("proofType", v)} placeholder="screenshot / email / reference number" />
                   <Input label="Proof reference" value={selected.review.proofReference} onChange={(v) => patchSelected("proofReference", v)} />
                   <Input label="Follow-up date" value={selected.review.followUpDate} onChange={(v) => patchSelected("followUpDate", v)} placeholder="YYYY-MM-DD" />
+                  <Input label="Interview date/time" value={selected.review.interviewAt} onChange={(v) => patchSelected("interviewAt", v)} placeholder="ISO timestamp or YYYY-MM-DDTHH:mm" />
+                  <Input label="Next action" value={selected.review.nextAction} onChange={(v) => patchSelected("nextAction", v)} placeholder="e.g. Call recruiter after deadline" />
                 </div>
 
                 <label style={checkLabel}>
@@ -246,6 +346,8 @@ export default function ReviewLedgerClient() {
 
                 <TextArea label="Proof notes" value={selected.review.proofNotes} onChange={(v) => patchSelected("proofNotes", v)} />
                 <TextArea label="Outcome notes" value={selected.review.outcomeNotes} onChange={(v) => patchSelected("outcomeNotes", v)} />
+                <TextArea label="Response history (append dated entries)" value={selected.review.responseHistory} onChange={(v) => patchSelected("responseHistory", v)} />
+                <p style={muted}>Keep a dated note for each employer response or attempted follow-up. This is a manually maintained log, not a live employer inbox.</p>
                 <TextArea label="Reviewer notes" value={selected.review.reviewerNotes} onChange={(v) => patchSelected("reviewerNotes", v)} />
 
                 <button style={button} disabled={loading} onClick={() => saveSelected(selected)}>

@@ -122,6 +122,9 @@ function cleanReview(existingReview = {}) {
     outcomeStatus,
     outcomeNotes: s(existingReview.outcomeNotes),
     followUpDate: s(existingReview.followUpDate),
+    interviewAt: s(existingReview.interviewAt),
+    nextAction: s(existingReview.nextAction),
+    responseHistory: s(existingReview.responseHistory),
     reviewerNotes: s(existingReview.reviewerNotes)
   };
 }

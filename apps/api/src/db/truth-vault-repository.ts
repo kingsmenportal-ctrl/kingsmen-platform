@@ -74,17 +74,30 @@ export class TruthVaultRepository {
   static fromEnvironment(): TruthVaultRepository {
     const mode = process.env.KINGSMEN_TRUTH_VAULT_MODE ?? "memory";
     const databaseUrl = process.env.KINGSMEN_DATABASE_URL ?? process.env.DATABASE_URL;
+    const runtimeEnvironment = (process.env.NODE_ENV ?? "development").toLowerCase();
+    const requiresDurableStorage = runtimeEnvironment === "production" || runtimeEnvironment === "staging";
+
+    // Never let a deployed staging/production process silently accept work into volatile memory.
+    if (requiresDurableStorage && mode !== "postgres") {
+      throw new Error("KINGSMEN_TRUTH_VAULT_MODE=postgres is required when NODE_ENV is staging or production.");
+    }
 
     if (mode !== "postgres") return new TruthVaultRepository(null);
     if (!databaseUrl) throw new Error("KINGSMEN_TRUTH_VAULT_MODE=postgres requires KINGSMEN_DATABASE_URL or DATABASE_URL.");
 
+    const configuredPoolMax = Number(process.env.KINGSMEN_DATABASE_POOL_MAX ?? 8);
+    if (!Number.isInteger(configuredPoolMax) || configuredPoolMax < 1 || configuredPoolMax > 50) {
+      throw new Error("KINGSMEN_DATABASE_POOL_MAX must be an integer between 1 and 50.");
+    }
+
     const pg = require("pg") as { Pool: PgPoolConstructor };
     return new TruthVaultRepository(new pg.Pool({
       connectionString: databaseUrl,
-      max: Number(process.env.KINGSMEN_DATABASE_POOL_MAX ?? 8),
+      max: configuredPoolMax,
       idleTimeoutMillis: 30_000,
       connectionTimeoutMillis: 10_000,
-      ssl: process.env.KINGSMEN_DATABASE_SSL === "true" ? { rejectUnauthorized: false } : undefined
+      // If TLS is explicitly enabled, validate the database server certificate.
+      ssl: process.env.KINGSMEN_DATABASE_SSL === "true" ? { rejectUnauthorized: true } : undefined
     }));
   }
 
