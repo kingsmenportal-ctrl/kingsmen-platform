@@ -89,7 +89,7 @@ test("verified candidate readiness sync uses server-verified identity and bounde
   assert.match(js, /workspacePersistenceAvailable/);
   assert.match(fn, /auth\.getUser/);
   assert.match(fn, /candidate_auth_identity_links/);
-  assert.match(fn, /link_status","VERIFIED"/);
+  assert.match(fn, /eq\("link_status",\s*"VERIFIED"\)/);
   assert.match(fn, /verified_at/);
   assert.match(fn, /candidate_workspace_readiness/);
   assert.match(fn, /upsert\(/);
