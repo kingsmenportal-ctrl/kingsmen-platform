@@ -61,7 +61,7 @@ export default function CandidateApplicationsPage() {
     <header style={{ padding: "1.5rem", borderRadius: 16, background: "#10233f", color: "#fff" }}>
       <p style={{ marginTop: 0, letterSpacing: ".12em", textTransform: "uppercase", fontSize: ".78rem" }}>Kingsmen · Candidate workspace</p>
       <h1 style={{ fontSize: "clamp(1.8rem,5vw,2.5rem)" }}>Application tracker</h1>
-      <p style={{ maxWidth: 720, lineHeight: 1.6 }}>Track preparation, next steps and responses for opportunities you have saved. Statuses are your own records; Kingsmen does not claim an institution received or accepted an application.</p>
+      <p style={{ maxWidth: 720, lineHeight: 1.6 }}>Track preparation, next steps and responses for opportunities you have saved. Statuses are your own records; Kingsmen does not claim an institution received or accepted an application.</p>\n      <p><a href="/candidate/applications/preparation" style={{ color: "#fff", fontWeight: 700 }}>Open application preparation &amp; document readiness →</a></p>
     </header>
     <p role="status" aria-live="polite">{message}</p>
     <section style={{ marginTop: "1.25rem" }}>
