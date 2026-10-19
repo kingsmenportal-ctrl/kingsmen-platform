@@ -43,6 +43,6 @@ export async function POST(request: Request) {
       document_id: documentId, candidate_id: candidateId, actor_type: "CANDIDATE", event_type: "READ_LINK_ISSUED",
       from_status: String(doc.status), to_status: String(doc.status), metadata: { expiresInSeconds: 600 }
     });
-    return NextResponse.json({ ok: true, documentId, signedReadUrl: (raw.startsWith("http://") || raw.startsWith("https://")) ? raw : `${configUrl}/storage/v1/${raw.replace(/^\\/+/, "")}`, expiresInSeconds: 600 }, { headers: { "Cache-Control": "no-store" } });
+    return NextResponse.json({ ok: true, documentId, signedReadUrl: (raw.startsWith("http://") || raw.startsWith("https://")) ? raw : configUrl + "/storage/v1/" + raw.replace(/^\/+/, ""), expiresInSeconds: 600 }, { headers: { "Cache-Control": "no-store" } });
   } catch (error) { return fail(error); }
 }
