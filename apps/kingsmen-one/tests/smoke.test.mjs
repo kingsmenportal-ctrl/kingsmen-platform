@@ -81,3 +81,21 @@ test("identity-link claims go through authenticated manual-review endpoint", asy
   assert.match(fn, /SUPABASE_SERVICE_ROLE_KEY/);
   assert.doesNotMatch(fn, /console\.log\(.*claimant|console\.log\(.*candidate_reference/i);
 });
+
+test("verified candidate readiness sync uses server-verified identity and bounded fields", async () => {
+  const js = await read("app.js");
+  const fn = await readFile(resolve(root, "../..", "supabase/functions/candidate-workspace-readiness/index.ts"), "utf8");
+  assert.match(js, /functions\.invoke\("candidate-workspace-readiness"/);
+  assert.match(js, /workspacePersistenceAvailable/);
+  assert.match(fn, /auth\.getUser/);
+  assert.match(fn, /candidate_auth_identity_links/);
+  assert.match(fn, /link_status","VERIFIED"/);
+  assert.match(fn, /verified_at/);
+  assert.match(fn, /candidate_workspace_readiness/);
+  assert.match(fn, /upsert\(/);
+  assert.match(fn, /IDENTITY_NOT_VERIFIED/);
+  assert.match(fn, /taskIds/);
+  assert.match(fn, /pathwayIds/);
+  assert.doesNotMatch(fn, /payload\.candidate_id/);
+  assert.match(fn, /Cache-Control.*no-store/);
+});
