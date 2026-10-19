@@ -128,7 +128,6 @@
       return;
     }
     if(e.target.id!=="profile-form")return;
-    if(e.target.id!=="profile-form")return;
     e.preventDefault();
     const form=new FormData(e.target);
     state.profile={fullName:String(form.get("fullName")||"").trim(),province:String(form.get("province")||""),qualification:String(form.get("qualification")||""),interests:form.getAll("interest").map(String)};
@@ -162,5 +161,13 @@
   });
   document.getElementById("dismiss-notice").addEventListener("click",()=>{document.querySelector(".notice").classList.add("hidden");state.noticeVisible=false;save();});
   document.getElementById("reset-demo").addEventListener("click",()=>{if(confirm("Reset all Kingsmen One demo progress saved in this browser?")){state=initial();save();render("home");document.querySelector(".notice").classList.remove("hidden");toast("Demo state reset.");}});
+  if(supabaseClient) {
+    supabaseClient.auth.onAuthStateChange((_event,session)=>{
+      authSession=session;
+      updateAuthStatus();
+      if(activeView==="account")render("account");
+    });
+    refreshAuthSession();
+  }
   render();
 })();
