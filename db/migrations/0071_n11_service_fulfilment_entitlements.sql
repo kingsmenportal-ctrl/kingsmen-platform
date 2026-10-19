@@ -63,7 +63,7 @@ CREATE POLICY candidate_entitlement_events_service_role_read
   ON public.candidate_entitlement_events FOR SELECT TO service_role USING (true);
 
 CREATE OR REPLACE FUNCTION public.n11_prevent_entitlement_event_mutation()
-RETURNS trigger LANGUAGE plpgsql SET search_path = '' AS $
+RETURNS trigger LANGUAGE plpgsql SET search_path = '' AS $$
 BEGIN
   RAISE EXCEPTION 'entitlement events are immutable';
 END;
@@ -83,7 +83,7 @@ CREATE OR REPLACE FUNCTION public.n11_hold_entitlement_for_order(
   p_reason text,
   p_idempotency_key text
 ) RETURNS uuid
-LANGUAGE plpgsql SECURITY DEFINER SET search_path = '' AS $
+LANGUAGE plpgsql SECURITY DEFINER SET search_path = '' AS $$
 DECLARE
   v_order public.candidate_service_orders%ROWTYPE;
   v_ent public.candidate_entitlements%ROWTYPE;
@@ -159,7 +159,7 @@ CREATE OR REPLACE FUNCTION public.n11_grant_entitlement(
   p_reason text,
   p_idempotency_key text
 ) RETURNS uuid
-LANGUAGE plpgsql SECURITY DEFINER SET search_path = '' AS $
+LANGUAGE plpgsql SECURITY DEFINER SET search_path = '' AS $$
 DECLARE
   v_order public.candidate_service_orders%ROWTYPE;
   v_payment public.candidate_payment_events%ROWTYPE;
@@ -246,7 +246,7 @@ CREATE OR REPLACE FUNCTION public.n11_transition_entitlement(
   p_reason text,
   p_idempotency_key text
 ) RETURNS uuid
-LANGUAGE plpgsql SECURITY DEFINER SET search_path = '' AS $
+LANGUAGE plpgsql SECURITY DEFINER SET search_path = '' AS $$
 DECLARE
   v_ent public.candidate_entitlements%ROWTYPE;
   v_event_id uuid;
@@ -304,7 +304,7 @@ GRANT EXECUTE ON FUNCTION public.n11_transition_entitlement(uuid,text,text,uuid,
 -- Partial refunds do not automatically revoke service; policy/review can place a hold.
 CREATE OR REPLACE FUNCTION public.n11_revoke_entitlement_on_full_refund()
 RETURNS trigger
-LANGUAGE plpgsql SECURITY DEFINER SET search_path = '' AS $
+LANGUAGE plpgsql SECURITY DEFINER SET search_path = '' AS $$
 DECLARE
   v_ent public.candidate_entitlements%ROWTYPE;
 BEGIN
