@@ -3,7 +3,8 @@
 export async function candidateWorkspaceRequest<T>(method: "GET" | "PATCH" | "POST" | "DELETE", body?: unknown, query = ""): Promise<T> {
   const token = readSupabaseAccessToken();
   if (!token) throw new Error("Sign in to sync your Kingsmen candidate workspace.");
-  const response = await fetch(`/api/candidate/workspace${query}`, {
+  const endpoint = query.startsWith("/api/") ? query : `/api/candidate/workspace${query}`;
+  const response = await fetch(endpoint, {
     method,
     headers: {
       Authorization: `Bearer ${token}`,
