@@ -64,7 +64,7 @@
     },
     {
       "gateKey": "payments",
-      "title": "PayFast sandbox and ITN evidence",
+      "title": "PayFast sandbox and ITN verification evidence",
       "status": "foundation_built_pending_real_sandbox_evidence",
       "evidencePaths": ["manifests/payment/payfast-sandbox-proof-v1.json", "docs/finance/KINGSMEN_PAYMENT_PROOF.md", "reports/staging/payfast-provider-sandbox-staging-latest.json"],
       "remainingConstraint": "Capture real PayFast sandbox checkout against staging notify URL."
