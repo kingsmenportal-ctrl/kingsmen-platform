@@ -1,0 +1,71 @@
+name: N11 Service Fulfilment Entitlements
+on:
+  pull_request:
+    paths:
+      - 'db/migrations/0071_n11_service_fulfilment_entitlements.sql'
+      - 'scripts/validators/validate-n11-entitlements.mjs'
+      - 'apps/web/src/app/api/candidate/entitlements/**'
+      - 'apps/web/src/app/candidate/entitlements/**'
+      - 'apps/web/src/app/candidate/dashboard/**'
+      - 'apps/web/src/app/api/reviewer/entitlements/**'
+      - 'apps/web/src/app/reviewer/entitlements/**'
+      - 'apps/web/src/app/reviewer/finance/**'
+      - 'apps/web/src/app/api/webhooks/payfast/**'
+      - 'scripts/tests/n11-entitlements-contract.mjs'
+      - 'docs/n11/**'
+      - 'package.json'
+      - '.github/workflows/n11-service-fulfilment-entitlements.yml'
+  push:
+    branches:
+      - 'n11-service-fulfilment-entitlements-integrated-2026-10-17'
+    paths:
+      - 'db/migrations/0071_n11_service_fulfilment_entitlements.sql'
+      - 'scripts/validators/validate-n11-entitlements.mjs'
+      - 'apps/web/src/app/api/candidate/entitlements/**'
+      - 'apps/web/src/app/api/reviewer/entitlements/**'
+      - 'apps/web/src/app/api/webhooks/payfast/**'
+      - 'scripts/tests/n11-entitlements-contract.mjs'
+      - 'docs/n11/**'
+      - 'package.json'
+      - '.github/workflows/n11-service-fulfilment-entitlements.yml'
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  n11-entitlement-contract:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - name: Checkout exact commit
+        uses: actions/checkout@v4
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - name: Run N11 validator with retained output
+        shell: bash
+        run: |
+          set +e
+          mkdir -p n11-ci-logs
+          node --version > n11-ci-logs/runtime.txt 2>&1
+          npm run n11:entitlements:validate 2>&1 | tee n11-ci-logs/validate.log
+          code=${PIPESTATUS[0]}
+          echo "exit_code=$code" > n11-ci-logs/validate.exit
+          exit "$code"
+      - name: Run N11 contract tests with retained output
+        if: always()
+        shell: bash
+        run: |
+          set +e
+          npm run n11:entitlements:test 2>&1 | tee n11-ci-logs/test.log
+          code=${PIPESTATUS[0]}
+          echo "exit_code=$code" > n11-ci-logs/test.exit
+          exit "$code"
+      - name: Upload N11 diagnostics
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: n11-entitlement-ci-diagnostics
+          path: n11-ci-logs/
+          if-no-files-found: warn
+          retention-days: 14

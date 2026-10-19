@@ -68,7 +68,9 @@
     "n09:communications:validate": "node scripts/validators/validate-n09-communications.mjs",
     "n09:communications:test": "node --check scripts/tests/n09-communications-contract.mjs && node scripts/tests/n09-communications-contract.mjs",
     "n10:finance:validate": "node scripts/validators/validate-n10-finance.mjs",
-    "n10:finance:test": "node --check scripts/tests/n10-finance-contract.mjs && node scripts/tests/n10-finance-contract.mjs && node --check scripts/tests/n10-payfast-contract.mjs && node scripts/tests/n10-payfast-contract.mjs"
+    "n10:finance:test": "node --check scripts/tests/n10-finance-contract.mjs && node scripts/tests/n10-finance-contract.mjs && node --check scripts/tests/n10-payfast-contract.mjs && node scripts/tests/n10-payfast-contract.mjs",
+    "n11:entitlements:validate": "node scripts/validators/validate-n11-entitlements.mjs",
+    "n11:entitlements:test": "node --check scripts/tests/n11-entitlements-contract.mjs && node scripts/tests/n11-entitlements-contract.mjs"
   },
   "repository": {
     "type": "git",

@@ -16,6 +16,7 @@ const dailyActions = [
   ["Applications and outcomes", "/candidate/outcomes", "Review application tracking and recorded outcomes."],
   ["Documents", "/candidate/documents", "Review your document checklist and status."],
   ["Finance", "/candidate/finance", "Review invoices and payment information."],
+  ["Services and entitlements", "/candidate/entitlements", "Check service activation, holds, revocations, and your entitlement audit history."],
   ["Messages", "/candidate/messages", "Check portal communications."]
 ] as const;
 
