@@ -30,3 +30,4 @@ jobs:
       - run: node scripts/validators/validate-candidate-application-tracker.mjs
       - run: npm --prefix apps/web install --no-audit --no-fund
       - run: npm --prefix apps/web run build
+      - run: node scripts/tests/test-candidate-application-tracker-api.mjs
