@@ -81,7 +81,9 @@
     "kingsmen:launch:audit": "node scripts/validators/validate-kingsmen-launch-readiness-evidence-aware.mjs --audit",
     "kingsmen:launch:gate": "node scripts/validators/validate-kingsmen-launch-readiness-evidence-aware.mjs --gate",
     "staging:capture:evidence": "pwsh -NoProfile -File scripts/staging/Invoke-KingsmenStagingRuntimeEvidencePack.ps1",
-    "final:collect:evidence": "node scripts/staging/collect-kingsmen-final-assembly-evidence.mjs"
+    "final:collect:evidence": "node scripts/staging/collect-kingsmen-final-assembly-evidence.mjs",
+    "kingsmen:inventory": "node scripts/validators/validate-kingsmen-repository-operating-inventory.mjs",
+    "kingsmen:inventory:verify": "node scripts/validators/validate-kingsmen-repository-operating-inventory.mjs"
   },
   "repository": {
     "type": "git",
