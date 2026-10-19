@@ -31,6 +31,9 @@ jobs:
       - name: Supabase migration integrity gate
         run: npm run db:validate:migration-integrity
 
+      - name: Supabase migration integrity regression tests
+        run: npm run db:validate:migration-integrity:test
+
       - name: FK index hardening migration source contract
         run: npm run db:validate:fk-index-hardening
 
