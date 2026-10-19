@@ -59,7 +59,7 @@ from targets t
 order by t.table_name, t.column_name;
 ```
 
-Expected baseline from the 2026-10-19 advisor/catalog snapshot: 14 rows with `has_valid_leading_index = false`. Re-capture before applying; do not assume the baseline has not changed.
+**Captured before applying on 2026-10-19:** all 14 rows returned `has_valid_leading_index = false`. This is the recorded preflight evidence for this migration.
 
 ## After applying — verify database state
 
@@ -95,11 +95,11 @@ where ns.nspname='public'
 order by tbl.relname, ix.relname;
 ```
 
-Attach before/after SQL output and the post-migration advisor response to the PR/release evidence. The SQL postflight inside the migration is a fail-fast structural assertion, not a substitute for the post-apply advisor check.
+**Live after-state captured on 2026-10-19 at 12:27 UTC:** the same 14-row catalog query returned `has_expected_valid_index = true` for all 14. The post-migration Supabase performance advisor no longer returned an `unindexed_foreign_keys` lint (zero remaining findings in that category). Migration ledger entry: version `20261019122713`, name `fk_index_hardening_0082`. The `unused_index` INFO count rose from 224 to 238 immediately after adding these 14 indexes; that is expected before workload has exercised them, and is not evidence that the indexes should be removed. Monitor index usage before any future cleanup. The SQL postflight inside the migration is a fail-fast structural assertion; the post-apply catalog and advisor queries above independently verify the live result.
 
 ## Release boundary
 
-The migration has **not** been applied to staging or production by this PR. No live after-state is claimed. Apply only after migration review/approval and through the repository's normal migration process. Live RLS role-isolation, authenticated candidate/reviewer journey, Netlify deployment identity, and post-deployment request evidence remain separate release gates; FK index work cannot satisfy or waive them.
+The migration was applied to **staging only** on 2026-10-19 at 12:27 UTC after the PR branch's source guards passed. The 14-index live postflight and advisor after-check passed as documented above. It has **not** been applied to production. Keep the PR open for review/merge; the staging application does not imply production promotion. Live RLS role-isolation, authenticated candidate/reviewer journey, Netlify deployment identity, and post-deployment request evidence remain separate release gates; FK index work cannot satisfy or waive them.
 
 ## Source validation
 
