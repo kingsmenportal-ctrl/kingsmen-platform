@@ -144,41 +144,41 @@ alter table public.airtable_webhook_receipts enable row level security;
 drop policy if exists airtable_base_registry_service_all on public.airtable_base_registry;
 create policy airtable_base_registry_service_all
   on public.airtable_base_registry
-  for all
+  for all TO service_role
   using (true)
   with check (true);
 
 drop policy if exists airtable_sync_targets_service_all on public.airtable_sync_targets;
 create policy airtable_sync_targets_service_all
   on public.airtable_sync_targets
-  for all
+  for all TO service_role
   using (true)
   with check (true);
 
 drop policy if exists airtable_field_mappings_service_all on public.airtable_field_mappings;
 create policy airtable_field_mappings_service_all
   on public.airtable_field_mappings
-  for all
+  for all TO service_role
   using (true)
   with check (true);
 
 drop policy if exists airtable_sync_outbox_service_all on public.airtable_sync_outbox;
 create policy airtable_sync_outbox_service_all
   on public.airtable_sync_outbox
-  for all
+  for all TO service_role
   using (true)
   with check (true);
 
 drop policy if exists airtable_sync_runs_service_all on public.airtable_sync_runs;
 create policy airtable_sync_runs_service_all
   on public.airtable_sync_runs
-  for all
+  for all TO service_role
   using (true)
   with check (true);
 
 drop policy if exists airtable_webhook_receipts_service_all on public.airtable_webhook_receipts;
 create policy airtable_webhook_receipts_service_all
   on public.airtable_webhook_receipts
-  for all
+  for all TO service_role
   using (true)
   with check (true);

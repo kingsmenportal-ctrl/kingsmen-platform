@@ -162,31 +162,31 @@ alter table public.candidate_portal_resume_tokens enable row level security;
 alter table public.candidate_mobile_accessibility_preferences enable row level security;
 
 drop policy if exists service_all_candidate_mobile_devices on public.candidate_mobile_devices;
-create policy service_all_candidate_mobile_devices on public.candidate_mobile_devices for all using (true) with check (true);
+create policy service_all_candidate_mobile_devices on public.candidate_mobile_devices for all TO service_role using (true) with check (true);
 
 drop policy if exists service_all_candidate_mobile_sessions on public.candidate_mobile_sessions;
-create policy service_all_candidate_mobile_sessions on public.candidate_mobile_sessions for all using (true) with check (true);
+create policy service_all_candidate_mobile_sessions on public.candidate_mobile_sessions for all TO service_role using (true) with check (true);
 
 drop policy if exists service_all_public_to_portal_claims on public.public_to_portal_claims;
-create policy service_all_public_to_portal_claims on public.public_to_portal_claims for all using (true) with check (true);
+create policy service_all_public_to_portal_claims on public.public_to_portal_claims for all TO service_role using (true) with check (true);
 
 drop policy if exists service_all_candidate_onboarding_checklist on public.candidate_onboarding_checklist;
-create policy service_all_candidate_onboarding_checklist on public.candidate_onboarding_checklist for all using (true) with check (true);
+create policy service_all_candidate_onboarding_checklist on public.candidate_onboarding_checklist for all TO service_role using (true) with check (true);
 
 drop policy if exists service_all_candidate_mobile_quick_actions on public.candidate_mobile_quick_actions;
-create policy service_all_candidate_mobile_quick_actions on public.candidate_mobile_quick_actions for all using (true) with check (true);
+create policy service_all_candidate_mobile_quick_actions on public.candidate_mobile_quick_actions for all TO service_role using (true) with check (true);
 
 drop policy if exists service_all_candidate_mobile_status_cards on public.candidate_mobile_status_cards;
-create policy service_all_candidate_mobile_status_cards on public.candidate_mobile_status_cards for all using (true) with check (true);
+create policy service_all_candidate_mobile_status_cards on public.candidate_mobile_status_cards for all TO service_role using (true) with check (true);
 
 drop policy if exists service_all_candidate_mobile_notification_preferences on public.candidate_mobile_notification_preferences;
-create policy service_all_candidate_mobile_notification_preferences on public.candidate_mobile_notification_preferences for all using (true) with check (true);
+create policy service_all_candidate_mobile_notification_preferences on public.candidate_mobile_notification_preferences for all TO service_role using (true) with check (true);
 
 drop policy if exists service_all_candidate_mobile_activity_events on public.candidate_mobile_activity_events;
-create policy service_all_candidate_mobile_activity_events on public.candidate_mobile_activity_events for all using (true) with check (true);
+create policy service_all_candidate_mobile_activity_events on public.candidate_mobile_activity_events for all TO service_role using (true) with check (true);
 
 drop policy if exists service_all_candidate_portal_resume_tokens on public.candidate_portal_resume_tokens;
-create policy service_all_candidate_portal_resume_tokens on public.candidate_portal_resume_tokens for all using (true) with check (true);
+create policy service_all_candidate_portal_resume_tokens on public.candidate_portal_resume_tokens for all TO service_role using (true) with check (true);
 
 drop policy if exists service_all_candidate_mobile_accessibility_preferences on public.candidate_mobile_accessibility_preferences;
-create policy service_all_candidate_mobile_accessibility_preferences on public.candidate_mobile_accessibility_preferences for all using (true) with check (true);
+create policy service_all_candidate_mobile_accessibility_preferences on public.candidate_mobile_accessibility_preferences for all TO service_role using (true) with check (true);

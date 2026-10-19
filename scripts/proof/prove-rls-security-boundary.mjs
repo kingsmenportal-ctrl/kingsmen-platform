@@ -14,7 +14,7 @@ function includesAll(source, tokens) {
   return tokens.every((token) => source.includes(token));
 }
 
-const migration = read('db/migrations/0009_rls_security_boundary.sql');
+const migration = read('db/migrations/0019_rls_security_boundary.sql');
 const n03Migration = read('db/migrations/0001_n03_truth_vault.sql');
 const manifest = read('manifests/security/rls-security-proof-v1.json');
 
@@ -30,7 +30,12 @@ check('drops_bootstrap_broad_candidate_policy', migration.includes('DROP POLICY 
 check('drops_bootstrap_broad_application_policy', migration.includes('DROP POLICY IF EXISTS service_role_all_applications ON applications'), 'Bootstrap application policy is dropped.');
 check('runtime_role_claim_function_exists', migration.includes('current_runtime_role'), 'Runtime role claim helper exists.');
 check('candidate_public_ref_claim_function_exists', migration.includes('current_candidate_public_ref'), 'Candidate public ref claim helper exists.');
-check('backend_service_context_required', migration.includes("current_service_context() = 'backend_api'"), 'Backend service role requires backend_api context.');
+check('backend_service_context_trusted_claim', migration.includes("auth.jwt() -> 'app_metadata' ->> 'service_context'"), 'Backend context comes from server-managed JWT app_metadata, not client-settable GUCs.');
+check('candidate_claim_trusted_source', migration.includes("auth.jwt() -> 'app_metadata' ->> 'candidate_public_ref'"), 'Candidate public reference comes from server-managed JWT app_metadata.');
+check('definer_search_path_fixed', migration.includes('SET search_path = pg_catalog'), 'SECURITY DEFINER helper pins a safe search_path.');
+check('all_helper_search_paths_pinned', (migration.match(/SET search_path = pg_catalog/g) || []).length >= 7, 'All RLS helper functions pin search_path to pg_catalog.');
+check('no_public_helper_execute', !/GRANT\s+EXECUTE\s+ON\s+ALL\s+FUNCTIONS\s+IN\s+SCHEMA\s+kingsmen_security\s+TO\s+PUBLIC/i.test(migration), 'Security helper functions are not executable by PUBLIC.');
+check('broad_core_policies_role_scoped', (migration.match(/FOR ALL\s+TO service_role/g) || []).length >= 14, 'Broad backend policies are scoped to service_role.');
 check('candidate_own_row_policy_exists', migration.includes('candidates_candidate_read_own'), 'Candidate own-row policy exists.');
 check('candidate_own_application_policy_exists', migration.includes('applications_candidate_read_own'), 'Candidate own application policy exists.');
 check('protected_evidence_hidden_from_candidate', migration.includes('protected_data = false'), 'Protected evidence hidden from candidate context.');
@@ -44,12 +49,12 @@ const scenarios = [
   {
     scenario: 'candidate_can_read_own_candidate_row',
     expected: 'allow',
-    claim: "app.kingsmen_role='candidate', app.candidate_public_ref=own public_ref"
+    claim: "trusted server-managed auth.jwt()->app_metadata.kingsmen_role='candidate' and candidate_public_ref=own public_ref"
   },
   {
     scenario: 'candidate_cannot_read_other_candidate_row',
     expected: 'deny',
-    claim: "app.kingsmen_role='candidate', app.candidate_public_ref=different public_ref"
+    claim: "trusted server-managed app_metadata candidate_public_ref differs; client cannot override claims"
   },
   {
     scenario: 'candidate_can_read_own_applications',
@@ -64,22 +69,22 @@ const scenarios = [
   {
     scenario: 'operator_can_read_candidate_workbench',
     expected: 'allow_read_only',
-    claim: "app.kingsmen_role='operator'"
+    claim: "trusted server-managed auth.jwt()->app_metadata.kingsmen_role='operator'"
   },
   {
     scenario: 'founder_can_read_audit_events',
     expected: 'allow_read_only',
-    claim: "app.kingsmen_role='founder'"
+    claim: "trusted server-managed auth.jwt()->app_metadata.kingsmen_role='founder'"
   },
   {
-    scenario: 'service_role_without_backend_context_denied',
+    scenario: 'backend_service_key_absent_from_client_artifacts',
     expected: 'deny',
-    claim: "app.kingsmen_role='service_role' without app.service_context='backend_api'"
+    claim: 'Service-role credentials must be absent from browser/mobile bundles and public artifacts.'
   },
   {
-    scenario: 'service_role_with_backend_context_can_write',
-    expected: 'allow',
-    claim: "app.kingsmen_role='service_role', app.service_context='backend_api'"
+    scenario: 'backend_mutations_require_verified_server_context',
+    expected: 'deny_without_verified_context',
+    claim: 'Backend API must verify trusted identity and authorization before using a backend-only service-role credential.'
   },
   {
     scenario: 'anonymous_cannot_read_candidate_data',
@@ -95,7 +100,7 @@ const scenarios = [
 
 check('all_required_scenarios_defined', scenarios.length === 10, `${scenarios.length} scenarios defined.`);
 check('scenario_denials_present', scenarios.filter((scenario) => scenario.expected.includes('deny')).length >= 4, 'Negative isolation scenarios are present.');
-check('scenario_service_context_present', includesAll(JSON.stringify(scenarios), ['service_role_without_backend_context_denied', 'service_role_with_backend_context_can_write']), 'Service context isolation scenarios are present.');
+check('scenario_service_context_present', includesAll(JSON.stringify(scenarios), ['backend_service_key_absent_from_client_artifacts', 'backend_mutations_require_verified_server_context']), 'Backend credential isolation scenarios are present; runtime API proof is still required.');
 
 const failedChecks = checks.filter((item) => !item.passed);
 const passed = failedChecks.length === 0;
@@ -110,16 +115,18 @@ const report = {
   proofLevel: 'source_static_boundary',
   stagingProofRequired: true,
   runtimeClaimModel: {
-    roleSetting: 'app.kingsmen_role',
-    serviceContextSetting: 'app.service_context',
-    candidatePublicRefSetting: 'app.candidate_public_ref'
+    roleSource: "auth.jwt()->>'role' or auth.jwt()->app_metadata.kingsmen_role",
+    serviceContextSource: 'server-managed auth.jwt()->app_metadata.service_context',
+    candidatePublicRefSource: 'server-managed auth.jwt()->app_metadata.candidate_public_ref',
+    clientSettableGucsTrusted: false,
+    userMetadataTrusted: false
   },
   scenarios,
   checks,
   failedChecks,
   generatedAtIso: new Date().toISOString(),
   nextAction: passed
-    ? 'Apply db/migrations/0009_rls_security_boundary.sql to staging and run live SQL role-isolation tests.'
+    ? 'Apply db/migrations/0019_rls_security_boundary.sql to staging and run live SQL role-isolation tests.'
     : 'Repair RLS migration/proof files before staging.'
 };
 

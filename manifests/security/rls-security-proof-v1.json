@@ -5,22 +5,27 @@
   "productionReady": false,
   "publicLaunchAllowed": false,
   "schemaAuthority": "PostgreSQL/Supabase Truth Vault",
-  "migrationPath": "db/migrations/0009_rls_security_boundary.sql",
+  "migrationPath": "db/migrations/0019_rls_security_boundary.sql",
   "runtimeClaims": {
-    "roleSetting": "app.kingsmen_role",
-    "serviceContextSetting": "app.service_context",
-    "candidatePublicRefSetting": "app.candidate_public_ref",
+    "roleSource": "auth.jwt()->>'role' or trusted auth.jwt()->app_metadata.kingsmen_role",
+    "serviceContextSource": "trusted auth.jwt()->app_metadata.service_context",
+    "candidatePublicRefSource": "trusted auth.jwt()->app_metadata.candidate_public_ref",
+    "clientSettableGucsTrusted": false,
+    "userMetadataTrusted": false,
     "allowedRoles": [
       "anonymous",
-      "candidate",
-      "operator",
-      "founder",
-      "service_role"
+      "authenticated_candidate",
+      "authenticated_operator",
+      "authenticated_founder",
+      "backend_service"
     ]
   },
   "securityBoundaries": {
-    "backendServiceWritesOnly": true,
-    "serviceRoleRequiresBackendContext": true,
+    "broadPoliciesScopedToServiceRole": true,
+    "serviceRoleBypassesRLS": true,
+    "serviceRoleKeyBackendOnly": true,
+    "backendAuthorizationGateRequired": true,
+    "serviceRoleRequiresBackendContextAtApiLayer": true,
     "candidateReadsOwnRowsOnly": true,
     "candidateCannotReadProtectedEvidence": true,
     "operatorFounderReadOnlyPolicies": true,
@@ -35,10 +40,10 @@
     "candidate_cannot_read_protected_evidence",
     "operator_can_read_candidate_workbench",
     "founder_can_read_audit_events",
-    "service_role_without_backend_context_denied",
-    "service_role_with_backend_context_can_write",
     "anonymous_cannot_read_candidate_data",
-    "public_can_read_verified_route_sources_only"
+    "public_can_read_verified_route_sources_only",
+    "backend_service_key_absent_from_client_artifacts",
+    "backend_mutations_require_verified_server_context"
   ],
   "proofRunner": "scripts/proof/prove-rls-security-boundary.mjs",
   "validator": "scripts/validators/validate-rls-security-proof.mjs",

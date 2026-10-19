@@ -5,67 +5,39 @@ Production ready: `false`
 
 ## Purpose
 
-This document records the row-level-security boundary needed before Kingsmen can open to public users.
+This document records the row-level-security boundary needed before Kingsmen can open to public users. The migration set is being hardened so broad bootstrap policies cannot be used by `anon` or ordinary `authenticated` clients.
 
-The original N03 Truth Vault migration correctly created the core tables and enabled RLS, but it used bootstrap-wide service policies. The launch hardening path now adds a second migration:
+The RLS boundary migration is `db/migrations/0019_rls_security_boundary.sql`. The follow-on `db/migrations/0020_rls_helper_search_path_hardening.sql` pins `search_path = pg_catalog` on every helper as defense in depth.
 
-```txt
- db/migrations/0009_rls_security_boundary.sql
-```
+## Trusted identity claims
 
-That migration replaces broad bootstrap policies with runtime-claim policies based on explicit backend settings.
+Candidate and founder/operator policies use claims obtained from `auth.jwt()`. The `kingsmen_role`, `candidate_public_ref`, and `service_context` values must be server-managed `app_metadata` claims populated by a trusted Auth hook/admin path. Do not use `user_metadata`, request parameters, or client-settable PostgreSQL custom GUCs for authorization.
 
-## Runtime claims
+The migrations pin `search_path` to `pg_catalog` for every security helper, including the `SECURITY DEFINER` candidate lookup and qualifies the candidate table as `public.candidates`. Security helper functions are not executable by `PUBLIC`.
 
-The API/backend must set these PostgreSQL settings per request/session before touching candidate data:
+## Important service-role boundary
 
-```sql
-SET LOCAL app.kingsmen_role = 'service_role';
-SET LOCAL app.service_context = 'backend_api';
-```
+The service-role key bypasses RLS by design in Supabase. A policy predicate cannot be treated as a restriction on that key. Therefore:
 
-For candidate scoped read sessions, the backend must set:
-
-```sql
-SET LOCAL app.kingsmen_role = 'candidate';
-SET LOCAL app.candidate_public_ref = 'KM-EXAMPLE-0001';
-```
-
-Founder/operator read contexts use:
-
-```sql
-SET LOCAL app.kingsmen_role = 'founder';
--- or
-SET LOCAL app.kingsmen_role = 'operator';
-```
+- Never expose a service-role key to a browser, mobile app, public build artifact, or candidate.
+- Keep the service-role key in backend-only secret storage.
+- Enforce user authorization and service-context checks in the backend before database calls.
+- Prove the web/backend boundary separately from database RLS.
+- Test candidate isolation with authenticated non-service-role sessions and two distinct synthetic candidates.
 
 ## Boundaries enforced by the migration
 
-- Backend service writes require both `service_role` and `backend_api` context.
-- Candidate reads are limited to their own `public_ref` mapping.
-- Candidate application/evidence reads are limited to their own candidate id.
+- Broad `USING (true)` / `WITH CHECK (true)` policies in schema migrations are explicitly scoped to `service_role`, not the default PUBLIC audience.
+- Candidate reads use trusted candidate claims and are limited to the candidate's own public reference and candidate id.
 - Protected evidence is hidden from candidate read policies.
-- Founder/operator policies are read-oriented where possible.
+- Founder/operator policies are read-oriented where possible and use trusted server-managed claims.
 - Audit events are founder-readable only.
-- Verified public source rows are limited to status `VERIFIED` and confidence bands `A` or `B`.
-- The hardening migration must not contain `FOR ALL USING (true) WITH CHECK (true)` policies.
+- Public route-source reads are limited to rows with status `VERIFIED` and confidence bands `A` or `B`.
+- The hardening migration itself must not contain broad tenant-blind true policies.
 
-## Proof scenarios
+## Required staging proof
 
-The source-level proof covers:
-
-1. candidate can read own candidate row
-2. candidate cannot read another candidate row
-3. candidate can read own applications
-4. candidate cannot read protected evidence
-5. operator can read candidate workbench
-6. founder can read audit events
-7. service role without backend context is denied
-8. service role with backend context can write
-9. anonymous cannot read candidate data
-10. public can read verified route sources only
-
-## Commands
+Source checks are not live security proof. On the isolated staging project, test with two synthetic candidates, ordinary authenticated sessions, an operator claim, a founder claim, an anonymous session, and backend API calls. Confirm that one candidate cannot read another candidate's data, that unauthenticated writes fail, and that service-role credentials never appear in client artifacts. Capture redacted SQL/API evidence.
 
 Run source proof:
 
@@ -85,14 +57,10 @@ Then run the launch audit:
 npm run kingsmen:launch:audit
 ```
 
-## Remaining production constraint
-
-This proof is source-level. It does not replace staging execution.
-
-Before public users, run live SQL isolation tests against staging PostgreSQL/Supabase using two test candidates, an operator context, a founder context, an anonymous context, and a backend service context. Store the report under:
+Store staging proof under:
 
 ```txt
 reports/security/rls-security-staging-proof-latest.json
 ```
 
-Public launch remains blocked until that staging proof exists and passes.
+Public launch remains blocked until staging proof exists, passes, is reviewed, and is included in the final evidence bundle.

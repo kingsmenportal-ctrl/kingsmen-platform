@@ -148,28 +148,28 @@ alter table public.operational_runbooks enable row level security;
 alter table public.final_system_manifest_snapshots enable row level security;
 
 drop policy if exists service_all_release_module_registry on public.release_module_registry;
-create policy service_all_release_module_registry on public.release_module_registry for all using (true) with check (true);
+create policy service_all_release_module_registry on public.release_module_registry for all TO service_role using (true) with check (true);
 
 drop policy if exists service_all_system_release_locks on public.system_release_locks;
-create policy service_all_system_release_locks on public.system_release_locks for all using (true) with check (true);
+create policy service_all_system_release_locks on public.system_release_locks for all TO service_role using (true) with check (true);
 
 drop policy if exists service_all_production_readiness_checks on public.production_readiness_checks;
-create policy service_all_production_readiness_checks on public.production_readiness_checks for all using (true) with check (true);
+create policy service_all_production_readiness_checks on public.production_readiness_checks for all TO service_role using (true) with check (true);
 
 drop policy if exists service_all_launch_gate_decisions on public.launch_gate_decisions;
-create policy service_all_launch_gate_decisions on public.launch_gate_decisions for all using (true) with check (true);
+create policy service_all_launch_gate_decisions on public.launch_gate_decisions for all TO service_role using (true) with check (true);
 
 drop policy if exists service_all_deployment_environment_registry on public.deployment_environment_registry;
-create policy service_all_deployment_environment_registry on public.deployment_environment_registry for all using (true) with check (true);
+create policy service_all_deployment_environment_registry on public.deployment_environment_registry for all TO service_role using (true) with check (true);
 
 drop policy if exists service_all_release_artifact_evidence on public.release_artifact_evidence;
-create policy service_all_release_artifact_evidence on public.release_artifact_evidence for all using (true) with check (true);
+create policy service_all_release_artifact_evidence on public.release_artifact_evidence for all TO service_role using (true) with check (true);
 
 drop policy if exists service_all_backup_restore_drills on public.backup_restore_drills;
-create policy service_all_backup_restore_drills on public.backup_restore_drills for all using (true) with check (true);
+create policy service_all_backup_restore_drills on public.backup_restore_drills for all TO service_role using (true) with check (true);
 
 drop policy if exists service_all_operational_runbooks on public.operational_runbooks;
-create policy service_all_operational_runbooks on public.operational_runbooks for all using (true) with check (true);
+create policy service_all_operational_runbooks on public.operational_runbooks for all TO service_role using (true) with check (true);
 
 drop policy if exists service_all_final_system_manifest_snapshots on public.final_system_manifest_snapshots;
-create policy service_all_final_system_manifest_snapshots on public.final_system_manifest_snapshots for all using (true) with check (true);
+create policy service_all_final_system_manifest_snapshots on public.final_system_manifest_snapshots for all TO service_role using (true) with check (true);

@@ -356,52 +356,52 @@ ALTER TABLE map_manual_packages ENABLE ROW LEVEL SECURITY;
 
 DROP POLICY IF EXISTS service_role_all_route_categories ON route_categories;
 CREATE POLICY service_role_all_route_categories ON route_categories
-  FOR ALL USING (true) WITH CHECK (true);
+  FOR ALL TO service_role USING (true) WITH CHECK (true);
 
 DROP POLICY IF EXISTS service_role_all_route_providers ON route_providers;
 CREATE POLICY service_role_all_route_providers ON route_providers
-  FOR ALL USING (true) WITH CHECK (true);
+  FOR ALL TO service_role USING (true) WITH CHECK (true);
 
 DROP POLICY IF EXISTS service_role_all_route_programmes ON route_programmes;
 CREATE POLICY service_role_all_route_programmes ON route_programmes
-  FOR ALL USING (true) WITH CHECK (true);
+  FOR ALL TO service_role USING (true) WITH CHECK (true);
 
 DROP POLICY IF EXISTS service_role_all_route_requirements ON route_requirements;
 CREATE POLICY service_role_all_route_requirements ON route_requirements
-  FOR ALL USING (true) WITH CHECK (true);
+  FOR ALL TO service_role USING (true) WITH CHECK (true);
 
 DROP POLICY IF EXISTS service_role_all_route_deadlines ON route_deadlines;
 CREATE POLICY service_role_all_route_deadlines ON route_deadlines
-  FOR ALL USING (true) WITH CHECK (true);
+  FOR ALL TO service_role USING (true) WITH CHECK (true);
 
 DROP POLICY IF EXISTS service_role_all_route_fees ON route_fees;
 CREATE POLICY service_role_all_route_fees ON route_fees
-  FOR ALL USING (true) WITH CHECK (true);
+  FOR ALL TO service_role USING (true) WITH CHECK (true);
 
 DROP POLICY IF EXISTS service_role_all_portal_dna ON portal_dna;
 CREATE POLICY service_role_all_portal_dna ON portal_dna
-  FOR ALL USING (true) WITH CHECK (true);
+  FOR ALL TO service_role USING (true) WITH CHECK (true);
 
 DROP POLICY IF EXISTS service_role_all_portal_health_checks ON portal_health_checks;
 CREATE POLICY service_role_all_portal_health_checks ON portal_health_checks
-  FOR ALL USING (true) WITH CHECK (true);
+  FOR ALL TO service_role USING (true) WITH CHECK (true);
 
 DROP POLICY IF EXISTS service_role_all_application_workbench_items ON application_workbench_items;
 CREATE POLICY service_role_all_application_workbench_items ON application_workbench_items
-  FOR ALL USING (true) WITH CHECK (true);
+  FOR ALL TO service_role USING (true) WITH CHECK (true);
 
 DROP POLICY IF EXISTS service_role_all_route_readiness_snapshots ON route_readiness_snapshots;
 CREATE POLICY service_role_all_route_readiness_snapshots ON route_readiness_snapshots
-  FOR ALL USING (true) WITH CHECK (true);
+  FOR ALL TO service_role USING (true) WITH CHECK (true);
 
 DROP POLICY IF EXISTS service_role_all_cao_choice_items ON cao_choice_items;
 CREATE POLICY service_role_all_cao_choice_items ON cao_choice_items
-  FOR ALL USING (true) WITH CHECK (true);
+  FOR ALL TO service_role USING (true) WITH CHECK (true);
 
 DROP POLICY IF EXISTS service_role_all_nsfas_support_cases ON nsfas_support_cases;
 CREATE POLICY service_role_all_nsfas_support_cases ON nsfas_support_cases
-  FOR ALL USING (true) WITH CHECK (true);
+  FOR ALL TO service_role USING (true) WITH CHECK (true);
 
 DROP POLICY IF EXISTS service_role_all_map_manual_packages ON map_manual_packages;
 CREATE POLICY service_role_all_map_manual_packages ON map_manual_packages
-  FOR ALL USING (true) WITH CHECK (true);
+  FOR ALL TO service_role USING (true) WITH CHECK (true);

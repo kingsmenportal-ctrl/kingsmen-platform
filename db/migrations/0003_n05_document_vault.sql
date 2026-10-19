@@ -224,28 +224,28 @@ ALTER TABLE document_readiness_snapshots ENABLE ROW LEVEL SECURITY;
 
 DROP POLICY IF EXISTS service_role_all_document_files ON document_files;
 CREATE POLICY service_role_all_document_files ON document_files
-  FOR ALL USING (true) WITH CHECK (true);
+  FOR ALL TO service_role USING (true) WITH CHECK (true);
 
 DROP POLICY IF EXISTS service_role_all_document_requests ON document_requests;
 CREATE POLICY service_role_all_document_requests ON document_requests
-  FOR ALL USING (true) WITH CHECK (true);
+  FOR ALL TO service_role USING (true) WITH CHECK (true);
 
 DROP POLICY IF EXISTS service_role_all_document_analysis ON document_analysis;
 CREATE POLICY service_role_all_document_analysis ON document_analysis
-  FOR ALL USING (true) WITH CHECK (true);
+  FOR ALL TO service_role USING (true) WITH CHECK (true);
 
 DROP POLICY IF EXISTS service_role_all_document_verifications ON document_verifications;
 CREATE POLICY service_role_all_document_verifications ON document_verifications
-  FOR ALL USING (true) WITH CHECK (true);
+  FOR ALL TO service_role USING (true) WITH CHECK (true);
 
 DROP POLICY IF EXISTS service_role_all_document_fraud_flags ON document_fraud_flags;
 CREATE POLICY service_role_all_document_fraud_flags ON document_fraud_flags
-  FOR ALL USING (true) WITH CHECK (true);
+  FOR ALL TO service_role USING (true) WITH CHECK (true);
 
 DROP POLICY IF EXISTS service_role_all_document_storage_events ON document_storage_events;
 CREATE POLICY service_role_all_document_storage_events ON document_storage_events
-  FOR ALL USING (true) WITH CHECK (true);
+  FOR ALL TO service_role USING (true) WITH CHECK (true);
 
 DROP POLICY IF EXISTS service_role_all_document_readiness_snapshots ON document_readiness_snapshots;
 CREATE POLICY service_role_all_document_readiness_snapshots ON document_readiness_snapshots
-  FOR ALL USING (true) WITH CHECK (true);
+  FOR ALL TO service_role USING (true) WITH CHECK (true);

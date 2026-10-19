@@ -83,10 +83,10 @@ const requiredFileChecks = [
   checkFile('scripts/validators/validate-safe-web-backend-boundary.mjs', ['SAFE_WEB_BACKEND_BOUNDARY_VALIDATED', 'KINGSMEN_BACKEND_BASE_URL']),
 
   checkFile('db/migrations/0001_n03_truth_vault.sql', ['CREATE TABLE IF NOT EXISTS candidates', 'ENABLE ROW LEVEL SECURITY']),
-  checkFile('db/migrations/0009_rls_security_boundary.sql', ['current_runtime_role', 'is_backend_service_role', 'candidates_candidate_read_own', 'applications_candidate_read_own', 'evidence_ledger_candidate_read_own_safe', 'route_sources_public_verified_read']),
-  checkFile('manifests/security/rls-security-proof-v1.json', ['rls-security-proof-v1', 'foundation_built_pending_staging_proof', 'serviceRoleRequiresBackendContext', 'candidateReadsOwnRowsOnly']),
-  checkFile('docs/security/KINGSMEN_RLS_SECURITY_PROOF.md', ['app.kingsmen_role', 'app.service_context', 'staging proof']),
-  checkFile('scripts/proof/prove-rls-security-boundary.mjs', ['RLS_SECURITY_SOURCE_PROOF_PASSED', 'candidate_cannot_read_other_candidate_row', 'service_role_without_backend_context_denied']),
+  checkFile('db/migrations/0019_rls_security_boundary.sql', ['current_runtime_role', 'is_backend_service_role', 'candidates_candidate_read_own', 'applications_candidate_read_own', 'evidence_ledger_candidate_read_own_safe', 'route_sources_public_verified_read']),
+  checkFile('manifests/security/rls-security-proof-v1.json', ['rls-security-proof-v1', 'foundation_built_pending_staging_proof', 'serviceRoleBypassesRLS', 'serviceRoleRequiresBackendContextAtApiLayer', 'candidateReadsOwnRowsOnly']),
+  checkFile('docs/security/KINGSMEN_RLS_SECURITY_PROOF.md', ['trusted server-managed', 'service-role key bypasses RLS', 'staging proof']),
+  checkFile('scripts/proof/prove-rls-security-boundary.mjs', ['RLS_SECURITY_SOURCE_PROOF_PASSED', 'candidate_cannot_read_other_candidate_row', 'backend_service_key_absent_from_client_artifacts', 'backend_mutations_require_verified_server_context']),
   checkFile('scripts/validators/validate-rls-security-proof.mjs', ['RLS_SECURITY_PROOF_VALIDATED', 'security:validate:rls']),
 
   checkFile('db/migrations/0008_n10_finance_payfast.sql', ['payfast_payment_intents', 'payfast_itn_receipts', 'payment_evidence_ledger']),
@@ -100,7 +100,7 @@ const requiredFileChecks = [
   checkFile('manifests/ops/backup-restore-proof-v1.json', ['backup-restore-proof-v1', 'foundation_built_pending_staging_drill', 'restoreTargetMustDifferFromSource', 'backupStorageAllowedInGit']),
   checkFile('docs/ops/KINGSMEN_BACKUP_RESTORE_PROOF.md', ['pg_dump', 'pg_restore', 'RPO', 'RTO', 'Production ready: **false**']),
   checkFile('scripts/backup/New-KingsmenTruthVaultBackup.ps1', ['KINGSMEN_DATABASE_URL', 'pg_dump', 'Get-FileHash', 'databaseUrlRedacted', 'committedToGit = $false']),
-  checkFile('scripts/backup/Test-KingsmenTruthVaultRestore.ps1', ['KINGSMEN_RESTORE_DRILL_DATABASE_URL', 'pg_restore', 'Restore target matches source database', 'countOnly = $true', 'rtoSeconds']),
+  checkFile('scripts/backup/Test-KingsmenTruthVaultRestore.ps1', ['KINGSMEN_RESTORE_DRILL_DATABASE_URL', 'KINGSMEN_RESTORE_ENVIRONMENT', 'SourceEnvironment', 'RestoreEnvironment', 'SourceProjectRef', 'RestoreProjectRef', 'ExpectedSha256', 'gpg --batch --yes --decrypt', 'pg_restore --list', 'SOURCE_AND_RESTORE_DATABASE_IDENTITIES_MATCH', 'countOnly = $true', 'queryPassed = $true', 'rtoSeconds', 'if (-not $passed) { exit 1 }']),
   checkFile('scripts/proof/prove-backup-restore-boundary.mjs', ['BACKUP_RESTORE_SOURCE_PROOF_PASSED', 'stagingRestoreDrillCompleted: false']),
   checkFile('scripts/validators/validate-backup-restore-proof.mjs', ['BACKUP_RESTORE_PROOF_VALIDATED', 'backup:validate:restore', 'BACKUP_RESTORE_STAGING_DRILL_REQUIRED']),
 
@@ -176,6 +176,10 @@ try {
   if (packageJson?.private !== true) {
     warn('ROOT_PACKAGE_NOT_PRIVATE', 'Root package is not marked private.', 'Publishing the monorepo root can accidentally package operational files.', 'Keep the root package private.');
   }
+  const packageScripts = packageJson?.scripts ?? {};
+  if (typeof packageScripts['security:prove:rls'] !== 'string' || typeof packageScripts['security:validate:rls'] !== 'string') {
+    block('RLS_SECURITY_SCRIPT_MISSING', 'RLS source proof/validator scripts are not wired.', 'Both security:prove:rls and security:validate:rls must exist in package.json.', 'Wire both commands to their source proof and validator scripts.', ['package.json']);
+  }
 } catch (error) {
   block('PACKAGE_JSON_INVALID', 'package.json is invalid JSON.', String(error), 'Repair package.json.', ['package.json']);
 }
@@ -219,7 +223,7 @@ for (const [path, unsafeFields] of [
 
 const warningRules = [
   ['manifests/repo/main-branch-protection-v1.json', 'foundation_built_pending_github_apply', 'MAIN_BRANCH_PROTECTION_APPLY_REQUIRED', 'Branch protection source boundary is built but GitHub protection must still be applied.', 'The workflow and apply script exist, but main is not proven protected until GitHub settings confirm source-guard is required and force-push/deletion are disabled.', 'Run scripts/github/Set-KingsmenMainBranchProtection.ps1 with GitHub admin permissions and verify through GitHub UI or gh api.', ['scripts/github/Set-KingsmenMainBranchProtection.ps1']],
-  ['manifests/security/rls-security-proof-v1.json', 'foundation_built_pending_staging_proof', 'RLS_STAGING_PROOF_REQUIRED', 'RLS/security source-level boundary is built but staging proof is still required.', 'Live SQL role-isolation proof against staging PostgreSQL/Supabase is required before public users.', 'Apply db/migrations/0009_rls_security_boundary.sql to staging and store a passing live proof report.', ['db/migrations/0009_rls_security_boundary.sql']],
+  ['manifests/security/rls-security-proof-v1.json', 'foundation_built_pending_staging_proof', 'RLS_STAGING_PROOF_REQUIRED', 'RLS/security source-level boundary is built but staging proof is still required.', 'Live SQL role-isolation proof against staging PostgreSQL/Supabase is required before public users.', 'Apply db/migrations/0019_rls_security_boundary.sql to staging and store a passing live proof report.', ['db/migrations/0019_rls_security_boundary.sql']],
   ['manifests/ops/backup-restore-proof-v1.json', 'foundation_built_pending_staging_drill', 'BACKUP_RESTORE_STAGING_DRILL_REQUIRED', 'Backup/restore source-level boundary is built but staging restore proof is still required.', 'Production personal data requires a live backup and restore drill with RPO/RTO evidence.', 'Run the backup and restore PowerShell scripts against staging and store a counts-only report.', ['scripts/backup/New-KingsmenTruthVaultBackup.ps1', 'scripts/backup/Test-KingsmenTruthVaultRestore.ps1']],
   ['manifests/credentials/secrets-wiring-proof-v1.json', 'foundation_built_pending_runtime_secret_health_proof', 'SECRETS_RUNTIME_HEALTH_PROOF_REQUIRED', 'Secrets wiring source-level boundary is built but masked runtime health proof is still required.', 'Real environment variables must be configured outside Git and checked with masked status-only reports before staging/public launch.', 'Run scripts/security/Test-KingsmenSecretWiring.ps1 in staging/Oracle after configuring env vars outside Git.', ['scripts/security/Test-KingsmenSecretWiring.ps1', 'manifests/credentials/secrets-wiring-proof-v1.json']],
   ['manifests/communications/communications-proof-v1.json', 'foundation_built_pending_provider_staging_proof', 'COMMUNICATIONS_PROVIDER_STAGING_PROOF_REQUIRED', 'Communications source-level boundary is built but provider staging proof is still required.', 'Candidate notifications require provider send/receive, bounce, opt-out, WhatsApp urgent-only, SMS fallback, and redacted evidence proof.', 'Run communications staging proof before enabling real candidate notifications.', ['manifests/communications/communications-proof-v1.json', 'docs/communications/KINGSMEN_COMMUNICATIONS_PROOF.md']],
