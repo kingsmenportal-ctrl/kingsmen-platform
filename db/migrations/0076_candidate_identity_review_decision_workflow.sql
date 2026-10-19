@@ -43,7 +43,7 @@ BEGIN
   IF p_request_id IS NULL OR p_reviewer_auth_user_id IS NULL THEN
     RAISE EXCEPTION 'Request and reviewer are required' USING ERRCODE = '22023';
   END IF;
-  IF p_decision NOT IN ('APPROVED','REJECTED','NEEDS_INFORMATION') THEN
+  IF p_decision IS NULL OR p_decision NOT IN ('APPROVED','REJECTED','NEEDS_INFORMATION') THEN
     RAISE EXCEPTION 'Unsupported identity review decision' USING ERRCODE = '22023';
   END IF;
   IF length(v_note) < 3 OR length(v_note) > 1200 THEN
