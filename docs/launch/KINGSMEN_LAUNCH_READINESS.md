@@ -267,3 +267,7 @@ The gate must remain blocked until the P0 launch blockers are fixed and evidence
 4. **Founder private beta:** process a small number of real test candidates manually with evidence.
 5. **Paid pilot:** only after PayFast, refunds, support, backup/restore, communications proof, legal/privacy proof, incident response, observability proof, staging pack, and final assembly evidence bundle pass.
 6. **Public launch:** only after every required launch gate opens.
+
+### RLS/security source-level boundary
+
+The RLS/security source-level boundary is present and source validators check the candidate, anonymous, founder/operator, and backend-service policy contracts. This is source-level evidence only; it does not substitute for live role-isolation proof against the restored staging database. The migration remains blocked until the backup and isolated-restore gate is reviewed.
