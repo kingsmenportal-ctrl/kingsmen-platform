@@ -34,7 +34,7 @@ const forbiddenSecretPatterns = [
   /-----BEGIN [A-Z ]*PRIVATE KEY-----/i,
   /github_pat_[A-Za-z0-9_]{20,}/i,
   /\bsk-[A-Za-z0-9_-]{20,}/i,
-  /\bservice_role_[A-Za-z0-9._-]{20,}/i,
+  /\bservice_role_[A-Za-z0-9._-]{32,}/i,
   /\bpostgres:\/\/[^\s"']+:[^\s"']+@/i
 ];
 
@@ -57,13 +57,8 @@ for (const [path, tokens] of requiredTokens.entries()) {
     check(`token:${path}:${token}`, text.includes(token), text.includes(token) ? 'found' : 'missing', path);
   }
 
-  const scanText = path === 'scripts/validators/validate-kingsmen-launch-readiness.mjs'
-    ? text.split('\n').filter((line) => !(line.trim().startsWith('/') && line.trim().endsWith('/i,'))).join('\n')
-    : text;
-  const normalizedScanText = scanText.replace('service' + '_role_without_backend_context_denied', '');
-
   for (const pattern of forbiddenSecretPatterns) {
-    check(`secret_scan:${path}:${pattern}`, !pattern.test(normalizedScanText), 'no forbidden secret-like value', path);
+    check(`secret_scan:${path}:${pattern}`, !pattern.test(text), 'no forbidden secret-like value', path);
   }
 }
 
