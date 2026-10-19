@@ -96,3 +96,9 @@ CREATE TRIGGER candidate_application_preparation_event_update
     OLD.status IS DISTINCT FROM NEW.status OR OLD.title IS DISTINCT FROM NEW.title
     OR OLD.evidence_reference IS DISTINCT FROM NEW.evidence_reference
   ) EXECUTE FUNCTION public.record_candidate_application_preparation_event();
+
+
+-- Composite key required by the private document vault to enforce that a document's
+-- preparation item and candidate owner are the same row, not merely matching UUIDs.
+CREATE UNIQUE INDEX IF NOT EXISTS candidate_application_preparation_items_id_candidate_uidx
+  ON public.candidate_application_preparation_items(id, candidate_id);
