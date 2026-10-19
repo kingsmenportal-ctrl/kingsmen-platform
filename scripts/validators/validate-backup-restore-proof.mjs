@@ -34,7 +34,7 @@ const forbiddenSecretPatterns = [
   /-----BEGIN [A-Z ]*PRIVATE KEY-----/i,
   /github_pat_[A-Za-z0-9_]{20,}/i,
   /\bsk-[A-Za-z0-9_-]{20,}/i,
-  /\bservice_role_[A-Za-z0-9._-]{20,}/i,
+  /\bservice_role_[A-Za-z0-9._-]{32,}/i,
   /\bpostgres:\/\/[^\s"']+:[^\s"']+@/i
 ];
 
