@@ -16,16 +16,17 @@ const testPath = 'scripts/staging/test-kingsmen-authenticated-e2e.mjs';
 const testSource = existsSync(testPath) ? readFileSync(testPath, 'utf8') : '';
 const testContracts = ['BLOCKED_MUTATION_NOT_AUTHORISED', 'BLOCKED_SESSION_MISSING', 'response-body redaction', 'whole-plan preflight'];
 const missingTests = testContracts.filter((token) => !testSource.includes(token));
+const allFailures = [...failures, ...missingTests.map((token) => 'test:' + token)];
 const report = {
   schema: 'kingsmen.validation-report.v1',
   module: 'Authenticated Staging E2E Runner Source Contract',
-  status: failures.length ? 'STAGING_E2E_RUNNER_VALIDATION_FAILED' : 'STAGING_E2E_RUNNER_SOURCE_VALIDATED',
-  passed: failures.length === 0,
+  status: allFailures.length ? 'STAGING_E2E_RUNNER_VALIDATION_FAILED' : 'STAGING_E2E_RUNNER_SOURCE_VALIDATED',
+  passed: allFailures.length === 0,
   liveRuntimeExecuted: false,
   requiredContracts: required.length,
-  failures: [...failures, ...missingTests.map((token) => 'test:' + token)],
+  failures: allFailures,
   regressionTestContracts: testContracts.length,
   missingRegressionContracts: missingTests
 };
 console.log(JSON.stringify(report, null, 2));
-if (failures.length) process.exitCode = 1;
+if (allFailures.length) process.exitCode = 1;
