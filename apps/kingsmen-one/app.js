@@ -33,6 +33,22 @@
   let authBusy = false;
   let workspacePersistenceAvailable = false;
   let workspaceLoadedForUser = null;
+  let officialProfile = null;
+  let profileChangeRequests = [];
+  let profileReviewAvailable = false;
+  let profileLoadedForUser = null;
+  async function loadOfficialProfile(force = false) {
+    const userId=authSession?.user?.id;
+    if(!supabaseClient||!userId){profileReviewAvailable=false;officialProfile=null;profileChangeRequests=[];profileLoadedForUser=null;return false;}
+    if(!force&&profileLoadedForUser===userId)return profileReviewAvailable;
+    try {
+      const {data,error}=await supabaseClient.functions.invoke('candidate-profile-review',{body:{action:'load'}});
+      if(error||data?.ready!==true)throw error||new Error('Official profile access unavailable.');
+      officialProfile=data.profile||null;profileChangeRequests=Array.isArray(data.change_requests)?data.change_requests:[];profileReviewAvailable=true;profileLoadedForUser=userId;
+      if(officialProfile){state.profile={...(state.profile||{}),province:officialProfile.province||'',qualification:officialProfile.highest_grade||''};save();}
+      if(activeView==='profile')render('profile');return true;
+    } catch {profileReviewAvailable=false;profileLoadedForUser=userId;return false;}
+  }
   async function loadPersistentReadiness(force = false) {
     const userId = authSession?.user?.id;
     if (!supabaseClient || !userId) {
@@ -115,7 +131,7 @@
     const interests=p.interests||[];
     const fields=[["higher-education","Higher education"],["tvet","TVET"],["seta","SETA & skills"],["employment","Employment"],["entrepreneurship","Entrepreneurship"]];
     const completed=[p.fullName,p.province,p.qualification,interests.length>0].filter(Boolean).length;
-    return `${heading("My profile","Tell Kingsmen what you are working towards. This demo profile stays in this browser.")}<div class="content-grid"><form class="panel" id="profile-form"><h3>Candidate details</h3><p class="panel-subtitle">Only enter sample information in this preview. This is not a verified identity profile.</p><label class="form-label" for="profile-name">Preferred name</label><input class="filter-input form-control" id="profile-name" name="fullName" maxlength="80" autocomplete="name" value="${escapeHtml(p.fullName)}" placeholder="How should we address you?"><label class="form-label" for="profile-province">Province</label><select class="filter-select form-control" id="profile-province" name="province"><option value="">Choose province</option>${["Eastern Cape","Free State","Gauteng","KwaZulu-Natal","Limpopo","Mpumalanga","Northern Cape","North West","Western Cape"].map(v=>`<option ${p.province===v?"selected":""}>${v}</option>`).join("")}</select><label class="form-label" for="profile-qualification">Highest qualification / current study</label><select class="filter-select form-control" id="profile-qualification" name="qualification"><option value="">Choose an option</option>${["Still at school","Matric / Grade 12","Certificate","Diploma","Degree","Postgraduate","TVET / occupational qualification","Other / not sure"].map(v=>`<option ${p.qualification===v?"selected":""}>${v}</option>`).join("")}</select><fieldset class="interest-fieldset"><legend>What would you like help with?</legend>${fields.map(([id,label])=>`<label class="interest-option"><input type="checkbox" name="interest" value="${id}" ${interests.includes(id)?"checked":""}> <span>${label}</span></label>`).join("")}</fieldset><button class="primary-button" type="submit">Save demo profile</button><p class="muted-note">Saving records your own input only. It does not verify identity, eligibility or qualifications.</p></form><div class="panel"><h3>Profile readiness</h3><p class="panel-subtitle">A quick guide to what you have filled in.</p><div class="stat-value">${Math.round(completed/4*100)}%</div><div class="progress-track"><div class="progress-fill" style="width:${completed/4*100}%"></div></div><div class="task-list"><div class="task-row"><span class="task-check ${p.fullName?"done":""}">${p.fullName?"✓":""}</span><div class="task-info"><strong>Preferred name</strong><small>Helps personalise your workspace.</small></div></div><div class="task-row"><span class="task-check ${p.province?"done":""}">${p.province?"✓":""}</span><div class="task-info"><strong>Province</strong><small>Can help narrow relevant opportunities.</small></div></div><div class="task-row"><span class="task-check ${p.qualification?"done":""}">${p.qualification?"✓":""}</span><div class="task-info"><strong>Study / qualification</strong><small>Useful for preparation and eligibility checks.</small></div></div><div class="task-row"><span class="task-check ${interests.length?"done":""}">${interests.length?"✓":""}</span><div class="task-info"><strong>Pathway interests</strong><small>Choose at least one route to explore.</small></div></div></div><div class="next-step"><strong>Keep your information in your control.</strong><p>Real Kingsmen will need secure sign-in, authorised candidate matching and correction review before this becomes an official profile.</p>${button("Explore pathways",'data-view="pathways"',false)}</div></div></div>`;
+    return `${heading("My profile",profileReviewAvailable?"Official candidate profile is read-only; request authorised corrections.":"Until your identity link is verified, profile details stay in this browser.")}<div class="content-grid"><form class="panel" id="profile-form"><h3>Candidate details</h3><p class="panel-subtitle">${profileReviewAvailable?"Official profile access verified. Corrections remain pending until a reviewer decides them.":"Preview mode: this is not an official identity profile."}</p><label class="form-label" for="profile-name">Preferred name</label><input class="filter-input form-control" id="profile-name" name="fullName" maxlength="80" autocomplete="name" value="${escapeHtml(p.fullName)}" placeholder="How should we address you?"><label class="form-label" for="profile-province">Province</label><select class="filter-select form-control" id="profile-province" name="province"><option value="">Choose province</option>${["Eastern Cape","Free State","Gauteng","KwaZulu-Natal","Limpopo","Mpumalanga","Northern Cape","North West","Western Cape"].map(v=>`<option ${p.province===v?"selected":""}>${v}</option>`).join("")}</select><label class="form-label" for="profile-qualification">Highest qualification / current study</label><select class="filter-select form-control" id="profile-qualification" name="qualification"><option value="">Choose an option</option>${["Still at school","Matric / Grade 12","Certificate","Diploma","Degree","Postgraduate","TVET / occupational qualification","Other / not sure"].map(v=>`<option ${p.qualification===v?"selected":""}>${v}</option>`).join("")}</select><fieldset class="interest-fieldset"><legend>What would you like help with?</legend>${fields.map(([id,label])=>`<label class="interest-option"><input type="checkbox" name="interest" value="${id}" ${interests.includes(id)?"checked":""}> <span>${label}</span></label>`).join("")}</fieldset><label class="form-label" for="profile-change-reason">Reason for correction</label><textarea class="filter-input form-control" id="profile-change-reason" name="changeReason" maxlength="800" rows="3" placeholder="Explain why the official field needs correction"></textarea><button class="primary-button" type="submit">${profileReviewAvailable?"Submit correction requests":"Save demo profile"}</button><p id="profile-review-message" class="muted-note" role="status" aria-live="polite">${profileReviewAvailable?"Official province and qualification changes require review. Preferred name and interests remain local preferences.":"Saving records your own input only. It does not verify identity, eligibility or qualifications."}</p></form><div class="panel"><h3>Profile readiness</h3><p class="panel-subtitle">A quick guide to what you have filled in.</p><div class="stat-value">${Math.round(completed/4*100)}%</div><div class="progress-track"><div class="progress-fill" style="width:${completed/4*100}%"></div></div><div class="task-list"><div class="task-row"><span class="task-check ${p.fullName?"done":""}">${p.fullName?"✓":""}</span><div class="task-info"><strong>Preferred name</strong><small>Helps personalise your workspace.</small></div></div><div class="task-row"><span class="task-check ${p.province?"done":""}">${p.province?"✓":""}</span><div class="task-info"><strong>Province</strong><small>Can help narrow relevant opportunities.</small></div></div><div class="task-row"><span class="task-check ${p.qualification?"done":""}">${p.qualification?"✓":""}</span><div class="task-info"><strong>Study / qualification</strong><small>Useful for preparation and eligibility checks.</small></div></div><div class="task-row"><span class="task-check ${interests.length?"done":""}">${interests.length?"✓":""}</span><div class="task-info"><strong>Pathway interests</strong><small>Choose at least one route to explore.</small></div></div></div><div class="next-step"><strong>Keep your information in your control.</strong><p>Real Kingsmen will need secure sign-in, authorised candidate matching and correction review before this becomes an official profile.</p>${button("Explore pathways",'data-view="pathways"',false)}</div></div></div>`;
   }
   function pathwaysView() {
     return `${heading("My pathways","Explore the routes in the Kingsmen journey. Availability and eligibility must be verified against official sources.")}<div class="path-grid">${pathways.map(p=>`<article class="path-card"><div class="card-icon">${p.icon}</div><h3>${p.name}</h3><p>${p.desc}</p>${p.unconfirmed?'<span class="tag pending">Source confirmation required</span>':button("Explore preparation",`data-path="${p.id}"`)}</article>`).join("")}</div><p class="muted-note">Pathway labels are a working navigation inventory. The sixth canonical pathway must be confirmed from the authoritative Kingsmen catalogue before production.</p>`;
@@ -176,7 +192,7 @@
     document.querySelectorAll(".nav-item").forEach(b=>b.classList.toggle("active",b.dataset.view===view));
     document.getElementById("welcome").classList.toggle("hidden",view!=="home");
     root.innerHTML=(views[view]||home)();
-    if(view==="opportunities"){renderOpportunityCards();loadVerifiedOpportunities();document.getElementById("opportunity-search").addEventListener("input",renderOpportunityCards);document.getElementById("opportunity-filter").addEventListener("change",renderOpportunityCards);}
+    if(view==="opportunities"){renderOpportunityCards();loadVerifiedOpportunities();document.getElementById("opportunity-search").addEventListener("input",renderOpportunityCards);document.getElementById("opportunity-filter").addEventListener("change",renderOpportunityCards);} if(view==="profile"&&authSession?.user) void loadOfficialProfile();
   }
   document.addEventListener("submit",async e=>{
     if(e.target.id==="identity-review-form") {
@@ -226,8 +242,23 @@
     if(e.target.id!=="profile-form")return;
     e.preventDefault();
     const form=new FormData(e.target);
-    state.profile={fullName:String(form.get("fullName")||"").trim(),province:String(form.get("province")||""),qualification:String(form.get("qualification")||""),interests:form.getAll("interest").map(String)};
-    save();render("profile");toast("Demo profile saved in this browser.");
+    const next={fullName:String(form.get("fullName")||"").trim(),province:String(form.get("province")||""),qualification:String(form.get("qualification")||""),interests:form.getAll("interest").map(String)};
+    if(profileReviewAvailable&&supabaseClient&&authSession?.user){
+      const reason=String(form.get("changeReason")||"").trim(),changes=[];
+      if((officialProfile?.province||"")!==next.province&&next.province)changes.push({field_name:"province",requested_value:next.province,reason});
+      if((officialProfile?.highest_grade||"")!==next.qualification&&next.qualification)changes.push({field_name:"highest_grade",requested_value:next.qualification,reason});
+      if(changes.length&&reason.length<5){const msg=document.getElementById("profile-review-message");if(msg)msg.textContent="Enter a reason of at least 5 characters for official corrections.";return;}
+      const msg=document.getElementById("profile-review-message"),submit=e.target.querySelector('button[type="submit"]');if(submit)submit.disabled=true;
+      try{
+        for(const change of changes){const {data,error}=await supabaseClient.functions.invoke("candidate-profile-review",{body:{action:"request_change",...change}});if(error)throw error;}
+        state.profile={...(state.profile||{}),fullName:next.fullName,interests:next.interests};save();
+        if(changes.length) await loadOfficialProfile(true);
+        if(msg)msg.textContent=changes.length?`${changes.length} correction request(s) submitted. The official profile has not been changed.`:"No official field changes detected. Preferred name and interests are local only.";
+        toast(changes.length?"Correction submitted for review.":"Local preferences saved.");
+      }catch(error){if(msg)msg.textContent=error.message||"Could not submit correction request.";}finally{if(submit)submit.disabled=false;}
+      return;
+    }
+    state.profile=next;save();render("profile");toast("Demo profile saved in this browser.");
   });
   document.addEventListener("click",async e=>{
     if(e.target.closest("#sign-out-button")) {
@@ -276,8 +307,8 @@
     supabaseClient.auth.onAuthStateChange((_event,session)=>{
       authSession=session;
       updateAuthStatus();
-      if(session?.user) void loadPersistentReadiness();
-      else {workspacePersistenceAvailable=false;workspaceLoadedForUser=null;}
+      if(session?.user) {void loadPersistentReadiness();void loadOfficialProfile(true);}
+      else {workspacePersistenceAvailable=false;workspaceLoadedForUser=null;profileReviewAvailable=false;officialProfile=null;profileChangeRequests=[];profileLoadedForUser=null;}
       if(activeView==="account")render("account");
     });
     refreshAuthSession();
