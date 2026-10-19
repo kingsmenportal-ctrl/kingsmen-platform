@@ -1,0 +1,97 @@
+name: Web CI
+
+on:
+  pull_request:
+    paths:
+      - "apps/web/**"
+      - "apps/api/**"
+      - "packages/**"
+      - "scripts/**"
+      - "docs/constitution/**"
+      - "db/migrations/**"
+      - "netlify.toml"
+      - ".github/workflows/web-build-and-lock.yml"
+  push:
+    branches:
+      - "auth-identity-profile-batch-*"
+    paths:
+      - "apps/web/**"
+      - "apps/api/**"
+      - "packages/**"
+      - "scripts/**"
+      - "docs/constitution/**"
+      - "db/migrations/**"
+      - "netlify.toml"
+      - ".github/workflows/web-build-and-lock.yml"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: web-ci-${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  migration-integrity:
+    name: Migration 0059–0072 presence
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v4
+      - name: Verify migration files and RPC contracts
+        run: node scripts/verify-phase-b-migrations.mjs
+      - name: Verify client/server secret boundary and PayFast guards
+        run: node scripts/verify-portal-security-boundaries.mjs
+      - name: Verify candidate journey and MAP fallback contracts
+        run: node scripts/verify-portal-journey-contracts.mjs
+
+  backend-build:
+    name: Compile backend API and MAP contracts
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - name: Install backend API dependencies
+        working-directory: apps/api
+        run: npm install --no-audit --no-fund
+      - name: Compile backend API
+        working-directory: apps/api
+        run: npm run build
+
+  web-build:
+    name: Resolve dependencies, type-check, and build
+    runs-on: ubuntu-latest
+    timeout-minutes: 35
+    steps:
+      - uses: actions/checkout@v4
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+          cache-dependency-path: apps/web/package-lock.json
+      - name: Resolve pinned manifest and regenerate lockfile in CI workspace
+        working-directory: apps/web
+        run: |
+          set -euo pipefail
+          npm install --package-lock-only --ignore-scripts --no-audit --no-fund
+          if ! git diff --quiet -- package-lock.json; then
+            echo "::warning::The committed package-lock.json is stale relative to package.json. This run uses a regenerated workspace lock; update and commit the lockfile before release."
+          fi
+      - name: Install resolved dependencies
+        working-directory: apps/web
+        run: npm ci --no-audit --no-fund
+      - name: Type-check web app
+        working-directory: apps/web
+        run: npm run typecheck
+      - name: Build production web bundle
+        working-directory: apps/web
+        env:
+          SUPABASE_URL: https://example.supabase.co
+          SUPABASE_ANON_KEY: ci-public-anon-placeholder
+        run: npm run build

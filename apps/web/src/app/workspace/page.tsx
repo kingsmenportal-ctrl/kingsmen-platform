@@ -13,24 +13,40 @@ type HealthPayload = {
 const journeys = [
   {
     role: "Candidate / learner",
-    purpose: "Use the current candidate surfaces to review saved opportunities, application progress, documents, finance, and messages.",
+    purpose: "Use connected candidate account, profile correction, verified discovery, saved opportunity, application tracker, document, finance, outcome and message surfaces.",
     steps: [
       ["Candidate dashboard", "/candidate/dashboard"],
+      ["Profile", "/candidate/profile"],
+      ["Discover opportunities", "/candidate/discover"],
       ["Saved opportunities", "/candidate/saved-opportunities"],
-      ["Applications and outcomes", "/candidate/outcomes"],
+      ["Application tracker", "/candidate/applications"],
+      ["Outcomes", "/candidate/outcomes"],
       ["Documents", "/candidate/documents"],
       ["Finance", "/candidate/finance"],
-      ["Messages", "/candidate/messages"]
+      ["Messages", "/candidate/messages"],
+      ["Manual Application Packages", "/candidate/map-packages"]
     ]
   },
   {
     role: "Founder",
-    purpose: "Inspect operational control, review evidence, and check build/runtime proof.",
+    purpose: "Review marketplace submissions with evidence-backed, database-authorised decisions, and inspect operational/build proof.",
     steps: [
+      ["Identity-link review queue", "/founder/identity-link-queue"],
+      ["Profile correction queue", "/founder/profile-review"],
+      ["Finance exceptions", "/founder/finance"],
+      ["Notifications and dead letters", "/founder/operations"],
+      ["Candidate message queue", "/founder/messages"],
+      ["Marketplace review queue", "/founder/marketplace-review"],
+      ["Manual Application Package review", "/founder/map-packages"],
       ["Founder control plane", "/founder/control-plane"],
       ["Proof centre", "/founder/proof-centre"],
       ["Build proof", "/founder/build-proof"]
     ]
+  },
+  {
+    role: "Partner organisation",
+    purpose: "Submit organisation claims and listings for verification; publication remains reviewer-controlled.",
+    steps: [["Partner operations", "/partner"], ["Sign in / register", "/auth/login"]]
   }
 ];
 
@@ -80,16 +96,16 @@ export default async function KingsmenWorkspacePage() {
       </div>
 
       <section style={{ marginTop: 26, borderRadius: 16, background: "#202020", padding: 18 }}>
-        <h2 style={{ marginTop: 0 }}>Critical workflow gaps — not marked complete</h2>
+        <h2 style={{ marginTop: 0 }}>Deployment gates still open</h2>
         <ul style={{ color: "#d0d0d0", lineHeight: 1.75 }}>
-          <li>Authentication and candidate identity must be connected end to end before private records can be relied on.</li>
-          <li>Candidate profile and route discovery currently lack real page implementations.</li>
-          <li>Partner registration, organisation verification, listing submission, and reviewer publication need connected daily workflows.</li>
-          <li>Founder command queues, analytics, and communications need working operational screens.</li>
-          <li>Application outcomes must use official evidence; payments become settled only through verified provider callbacks and ledger records.</li>
+          <li>Migrations 0059–0072 (identity linking, marketplace review, PayFast reconciliation, finance exceptions, founder operations, messages, profile-change approvals, and the MAP package lifecycle) are committed in this code branch but have not been applied to Supabase staging.</li>
+          <li>Candidate-owned profile, document, application, finance, message and outcome APIs require server-only SUPABASE_SERVICE_ROLE_KEY; it is not configured on the inspected Netlify staging site. Never place it in a NEXT_PUBLIC variable. Public browser configuration now maps only the existing anon/publishable key and project URL.</li>
+          <li>The web build workflow has been added, but no workflow run is currently visible for this PR head; typecheck, production build, browser journeys, and connected staging behaviour remain unverified.</li>
+          <li>Netlify staging is SSO-restricted for non-production access, which may block PayFast's external ITN callback. Use a sanctioned publicly reachable callback path; do not weaken staging SSO to make payments work. No new deploy was triggered by this batch.</li>
+          <li>Payment provider callback/signature and ledger logic exists in the API codebase but still needs reproducible CI and PayFast sandbox end-to-end evidence before any live payment workflow is claimed ready.</li>
         </ul>
         <p style={{ color: "#d0d0d0", lineHeight: 1.65, marginBottom: 0 }}>
-          Never bypass identity, listing verification, official-outcome evidence, or payment-ledger controls to make a workflow appear complete.
+          Identity links and marketplace publication remain reviewer-controlled; candidate-reported submissions never become provider-confirmed outcomes, and browser return URLs never settle payments.
         </p>
       </section>
     </main>

@@ -10,6 +10,11 @@ const nextConfig = {
   poweredByHeader: false,
   reactStrictMode: true,
   outputFileTracingRoot: kingsmenRepoRoot,
+  // Only public Supabase client credentials are inlined into browser code. Never map server secrets here.
+  env: {
+    KINGSMEN_PUBLIC_SUPABASE_URL: process.env.SUPABASE_URL || "",
+    KINGSMEN_PUBLIC_SUPABASE_KEY: process.env.SUPABASE_ANON_KEY || process.env.SUPABASE_PUBLISHABLE_KEY || ""
+  },
   experimental: {
     externalDir: true
   }

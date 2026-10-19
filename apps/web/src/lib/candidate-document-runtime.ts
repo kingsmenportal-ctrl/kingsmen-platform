@@ -79,7 +79,7 @@ export async function requireCandidateSession(request: Request): Promise<
     };
   }
 
-  const user = (await userResponse.json().catch(() => null)) as { id?: string } | null;
+  const user = (await userResponse.json().catch(() => null)) as { id?: string; email_confirmed_at?: string | null; confirmed_at?: string | null } | null;
   if (!user?.id) {
     return {
       ok: false,
@@ -89,14 +89,21 @@ export async function requireCandidateSession(request: Request): Promise<
     };
   }
 
-  const mappingUrl = new URL(`${cfg.url}/rest/v1/candidate_accounts`);
-  mappingUrl.searchParams.set("select", "candidate_id,auth_user_id");
-  mappingUrl.searchParams.set("auth_user_id", `eq.${user.id}`);
-  mappingUrl.searchParams.set("limit", "2");
+  if (!(user.email_confirmed_at || user.confirmed_at)) {
+    return { ok: false, status: 403, code: "EMAIL_CONFIRMATION_REQUIRED", message: "Confirm your email address before accessing candidate records." };
+  }
 
-  let mappingResponse: Response;
+  const linkUrl = new URL(`${cfg.url}/rest/v1/candidate_auth_identity_links`);
+  linkUrl.searchParams.set("select", "candidate_id,supabase_user_id,link_status,verified_at,verified_by");
+  linkUrl.searchParams.set("supabase_user_id", `eq.${user.id}`);
+  linkUrl.searchParams.set("link_status", "eq.VERIFIED");
+  linkUrl.searchParams.set("verified_at", "not.is.null");
+  linkUrl.searchParams.set("verified_by", "not.is.null");
+  linkUrl.searchParams.set("limit", "2");
+
+  let linkResponse: Response;
   try {
-    mappingResponse = await fetch(mappingUrl, {
+    linkResponse = await fetch(linkUrl, {
       method: "GET",
       headers: {
         apikey: cfg.serviceRoleKey,
@@ -106,38 +113,84 @@ export async function requireCandidateSession(request: Request): Promise<
       cache: "no-store"
     });
   } catch {
+    return { ok: false, status: 503, code: "VERIFIED_IDENTITY_LOOKUP_UNAVAILABLE", message: "Kingsmen could not verify the candidate identity link." };
+  }
+  if (!linkResponse.ok) {
+    return { ok: false, status: 503, code: "VERIFIED_IDENTITY_QUERY_FAILED", message: "Kingsmen could not verify the candidate identity link." };
+  }
+  const links = (await linkResponse.json().catch(() => null)) as Array<{
+    candidate_id?: string; supabase_user_id?: string; link_status?: string; verified_at?: string | null; verified_by?: string | null;
+  }> | null;
+  if (!Array.isArray(links) || links.length !== 1 || !links[0]?.candidate_id ||
+      links[0].supabase_user_id !== user.id || links[0].link_status !== "VERIFIED" ||
+      !links[0].verified_at || !links[0].verified_by) {
     return {
-      ok: false,
-      status: 503,
-      code: "CANDIDATE_MAPPING_UNAVAILABLE",
-      message: "Kingsmen could not resolve the signed-in candidate account."
+      ok: false, status: 403,
+      code: links && links.length > 1 ? "AMBIGUOUS_VERIFIED_IDENTITY" : "CANDIDATE_IDENTITY_NOT_VERIFIED",
+      message: "A single authorised, verified candidate identity link is required before accessing candidate records."
     };
   }
 
-  if (!mappingResponse.ok) {
-    return {
-      ok: false,
-      status: 503,
-      code: "CANDIDATE_MAPPING_QUERY_FAILED",
-      message: "Kingsmen could not resolve the signed-in candidate account."
-    };
+  const candidateId = links[0].candidate_id;
+  const accountUrl = new URL(`${cfg.url}/rest/v1/candidate_accounts`);
+  accountUrl.searchParams.set("select", "candidate_id,auth_status,email_verified,account_recovery_required");
+  accountUrl.searchParams.set("candidate_id", `eq.${candidateId}`);
+  accountUrl.searchParams.set("limit", "2");
+
+  let accountResponse: Response;
+  try {
+    accountResponse = await fetch(accountUrl, {
+      method: "GET",
+      headers: {
+        apikey: cfg.serviceRoleKey,
+        authorization: `Bearer ${cfg.serviceRoleKey}`,
+        accept: "application/json"
+      },
+      cache: "no-store"
+    });
+  } catch {
+    return { ok: false, status: 503, code: "CANDIDATE_ACCOUNT_LOOKUP_UNAVAILABLE", message: "Kingsmen could not check the linked candidate account status." };
+  }
+  if (!accountResponse.ok) {
+    return { ok: false, status: 503, code: "CANDIDATE_ACCOUNT_QUERY_FAILED", message: "Kingsmen could not check the linked candidate account status." };
+  }
+  const accounts = (await accountResponse.json().catch(() => null)) as Array<{
+    candidate_id?: string; auth_status?: string; email_verified?: boolean; account_recovery_required?: boolean;
+  }> | null;
+  if (!Array.isArray(accounts) || accounts.length !== 1 || accounts[0]?.candidate_id !== candidateId) {
+    return { ok: false, status: 403, code: "CANDIDATE_ACCOUNT_NOT_FOUND_OR_AMBIGUOUS", message: "The verified identity has no unique candidate account. Contact authorised support." };
+  }
+  if (accounts[0].auth_status !== "ACTIVE" || accounts[0].email_verified !== true || accounts[0].account_recovery_required === true) {
+    return { ok: false, status: 403, code: "CANDIDATE_ACCOUNT_NOT_ACTIVE", message: "The linked candidate account is not active or requires recovery." };
   }
 
-  const mappings = (await mappingResponse.json().catch(() => [])) as Array<{ candidate_id?: string; auth_user_id?: string }>;
-  if (mappings.length !== 1 || !mappings[0]?.candidate_id || mappings[0].auth_user_id !== user.id) {
-    return {
-      ok: false,
-      status: 403,
-      code: "CANDIDATE_IDENTITY_NOT_LINKED",
-      message: "This signed-in user does not have exactly one linked candidate account."
-    };
+  const candidateUrl = new URL(`${cfg.url}/rest/v1/candidates`);
+  candidateUrl.searchParams.set("select", "id,is_active");
+  candidateUrl.searchParams.set("id", `eq.${candidateId}`);
+  candidateUrl.searchParams.set("limit", "1");
+  let candidateResponse: Response;
+  try {
+    candidateResponse = await fetch(candidateUrl, {
+      method: "GET",
+      headers: {
+        apikey: cfg.serviceRoleKey,
+        authorization: `Bearer ${cfg.serviceRoleKey}`,
+        accept: "application/json"
+      },
+      cache: "no-store"
+    });
+  } catch {
+    return { ok: false, status: 503, code: "CANDIDATE_STATUS_LOOKUP_UNAVAILABLE", message: "Kingsmen could not check candidate account status." };
+  }
+  if (!candidateResponse.ok) {
+    return { ok: false, status: 503, code: "CANDIDATE_STATUS_QUERY_FAILED", message: "Kingsmen could not check candidate account status." };
+  }
+  const candidateRows = await candidateResponse.json().catch(() => null) as Array<{ id?: string; is_active?: boolean }> | null;
+  if (!Array.isArray(candidateRows) || candidateRows.length !== 1 || candidateRows[0].id !== candidateId || candidateRows[0].is_active !== true) {
+    return { ok: false, status: 403, code: "CANDIDATE_RECORD_INACTIVE", message: "This candidate record is inactive or unavailable." };
   }
 
-  return {
-    ok: true,
-    config: cfg,
-    session: { userId: user.id, candidateId: mappings[0].candidate_id }
-  };
+  return { ok: true, config: cfg, session: { userId: user.id, candidateId } };
 }
 
 export async function supabaseAdminFetch(

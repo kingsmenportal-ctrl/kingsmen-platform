@@ -10,11 +10,14 @@ const gates = [
 ] as const;
 
 const dailyActions = [
+  ["Discover opportunities", "/candidate/discover", "Browse currently verified route programmes and partner listings."],
   ["Saved opportunities", "/candidate/saved-opportunities", "Return to opportunities saved to your account."],
-  ["Applications and outcomes", "/candidate/outcomes", "Review application tracking and recorded outcomes."],
+  ["Application tracker", "/candidate/applications", "Track preparation and candidate-reported submission evidence."],
+  ["Outcomes", "/candidate/outcomes", "Review persisted proof-backed outcomes and evidence."],
   ["Documents", "/candidate/documents", "Review your document checklist and status."],
   ["Finance", "/candidate/finance", "Review invoices and payment information."],
-  ["Messages", "/candidate/messages", "Check portal communications."]
+  ["Messages", "/candidate/messages", "Check portal communications."],
+  ["Manual Application Packages", "/candidate/map-packages", "Request a safe, evidence-reviewed manual hand-off when portal automation is blocked."]
 ] as const;
 
 export default function CandidateDashboardPage() {
@@ -22,14 +25,16 @@ export default function CandidateDashboardPage() {
     <main style={{ maxWidth: 1080, margin: "0 auto", padding: "24px 18px 48px" }}>
       <p><Link href="/workspace">← Daily operations workspace</Link></p>
       <h1>Kingsmen Candidate Dashboard</h1>
-      <p>Use the current candidate surfaces below to continue your journey. All six opportunity gates are part of the Kingsmen model; the route-discovery and profile-editing screens still need their connected implementation.</p>
+      <p>Continue your candidate journey using your persisted profile, saved opportunities, application records, documents, finance and portal messages. Sign-in is required for private records.</p>
+      <p><Link href="/candidate/profile">My profile and correction requests</Link> · <Link href="/auth/login">Sign in</Link> · <Link href="/auth/register">Create account</Link></p>
 
       <section aria-label="Six Gate View" style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(220px, 1fr))", gap: 14 }}>
         {gates.map(([code, label, description]) => (
           <article key={code} data-gate={code} style={{ border: "1px solid #454545", borderRadius: 12, padding: 16 }}>
             <h2>{label}</h2>
             <p>{description}</p>
-            <p style={{ fontSize: 13, color: "#a8a8a8" }}>Route discovery: implementation required</p>
+            <p style={{ fontSize: 13, color: "#a8a8a8" }}>Route discovery is shown only when backed by verified route records. Category is not an eligibility decision.</p>
+            <p><Link href="/candidate/discover#pathway-filters">Explore this pathway</Link></p>
           </article>
         ))}
       </section>
