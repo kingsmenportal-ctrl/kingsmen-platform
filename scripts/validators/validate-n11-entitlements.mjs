@@ -20,8 +20,8 @@ for(const needle of [
  "GRANT EXECUTE ON FUNCTION public.n11_grant_entitlement"
 ]) assert.ok(sql.includes(needle),"N11 migration missing safety contract: "+needle);
 assert.match(sql,/order_id uuid NOT NULL UNIQUE/);
-assert.match(sql,/AS \\$\\$\\n/,"N11 PL/pgSQL function bodies must use valid dollar quotes");
-assert.equal((sql.match(/AS \\$\\$\\n/g)||[]).length,(sql.match(/^\\$\\$;$/gm)||[]).length,"N11 PL/pgSQL dollar quotes must be balanced");
+assert.ok(!sql.includes("AS $\\n"), "N11 PL/pgSQL function bodies must use valid dollar quotes");
+assert.equal(sql.split("AS $$\\n").length - 1, sql.split("\\n$$;").length - 1, "N11 PL/pgSQL dollar quotes must be balanced");
 assert.match(n10PaymentRpc, /'merchant_reference',p_merchant_reference/);
 assert.match(n10PaymentRpc, /'provider_status','COMPLETE'/);
 assert.match(n10PaymentRpc, /'server_validation','VALID'/);
