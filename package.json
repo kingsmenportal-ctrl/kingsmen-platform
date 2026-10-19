@@ -88,7 +88,9 @@
     "kingsmen:inventory": "node scripts/validators/validate-kingsmen-repository-operating-inventory.mjs",
     "kingsmen:inventory:verify": "node scripts/validators/validate-kingsmen-repository-operating-inventory.mjs",
     "finance:validate:canonical-catalogue": "node scripts/validators/validate-finance-canonical-catalogue.mjs",
-    "finance:test:canonical-catalogue": "node scripts/validators/test-finance-canonical-catalogue.mjs"
+    "finance:test:canonical-catalogue": "node scripts/validators/test-finance-canonical-catalogue.mjs",
+    "db:validate:migration-integrity": "node scripts/validators/validate-supabase-migration-integrity.mjs",
+    "db:validate:migration-integrity:test": "node scripts/staging/test-supabase-migration-integrity.mjs"
   },
   "repository": {
     "type": "git",
