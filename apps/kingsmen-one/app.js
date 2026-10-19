@@ -118,10 +118,11 @@
           : await supabaseClient.auth.signInWithPassword({email,password});
         if(result.error) throw result.error;
         authSession=result.data.session||null;
+        authBusy=false;
         authMessage=action==="signup"&&!authSession?"Account created if permitted. Check your email for a confirmation link before signing in.": "Sign-in successful.";
         if(authSession) authMessage="Account authenticated. Candidate identity has not been linked or verified.";
         render("account");updateAuthStatus();
-      } catch(error) { authMessage=error.message||"Account action failed.";render("account"); }
+      } catch(error) { authBusy=false;authMessage=error.message||"Account action failed.";render("account"); }
       finally {authBusy=false;}
       const msg=document.getElementById("auth-message");if(msg)msg.textContent=authMessage;
       return;
