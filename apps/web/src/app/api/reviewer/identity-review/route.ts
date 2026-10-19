@@ -53,7 +53,7 @@ export async function GET(request: Request) {
       ? "or=(request_status.eq.PENDING,request_status.eq.NEEDS_INFORMATION)"
       : `request_status=eq.${encodeURIComponent(status)}`;
     const response = await fetch(
-      `${auth.url}/rest/v1/candidate_identity_review_requests?select=id,supabase_user_id,candidate_reference,claimant_name,claimant_message,request_status,reviewer_note,created_at,updated_at,reviewed_by,reviewed_at&${allowed}&order=created_at.asc&limit=100`,
+      `${auth.url}/rest/v1/candidate_identity_review_requests?select=id,supabase_user_id,candidate_reference,claimant_name,claimant_message,candidate_response,request_status,reviewer_note,created_at,updated_at,reviewed_by,reviewed_at&${allowed}&order=created_at.asc&limit=100`,
       { headers: { apikey: auth.service, Authorization: `Bearer ${auth.service}` }, cache: "no-store" }
     );
     if (!response.ok) throw new Error("Identity review queue could not be loaded.");
