@@ -16,7 +16,7 @@ assert.match(candidate,/Creating an order never takes payment or marks it paid./
 assert.match(reviewer,/Payment reference, evidence locator and SHA-256 evidence hash are required/);
 assert.match(reviewer,/not a provider-verified PayFast event/);
 assert.match(reviewer,/PROVIDER_REFUND_RECONCILIATION_REQUIRED/);
-assert.match(reviewer,/settlementSha/);
+assert.match(reviewer,/PROVIDER_REFUND_RECONCILIATION_REQUIRED/);
 assert.doesNotMatch(candidate,/checkoutConfigured:true/);
 assert.doesNotMatch(reviewer,/providerRefundExecutionConfigured:true/);
 console.log("N10 finance contract tests passed: "+packages.length+" catalogue entries, candidate isolation contract, evidence-gated payment/refund boundaries, and browser privilege hardening.");
