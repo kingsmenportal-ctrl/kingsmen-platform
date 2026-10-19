@@ -62,7 +62,7 @@ begin
   loop
     select c.oid into table_oid
       from pg_class c join pg_namespace n on n.oid=c.relnamespace
-      where n.nspname='public' and c.relname=target.table_name and c.relkind='r';
+      where n.nspname='public' and c.relname=target.table_name and c.relkind in ('r','p');
     if table_oid is null then
       raise exception 'FK index postflight: public.% table missing', target.table_name;
     end if;
@@ -79,6 +79,7 @@ begin
       select 1
         from pg_index i
         join pg_class ix on ix.oid=i.indexrelid
+        join pg_am am on am.oid=ix.relam and am.amname='btree'
         where i.indrelid=table_oid
           and ix.relname=target.index_name
           and i.indisvalid and i.indisready
