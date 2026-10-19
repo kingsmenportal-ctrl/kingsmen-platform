@@ -60,6 +60,48 @@ const mock = createServer(async (request, response) => {
     const id = eqParam(url, "id");
     return send(response, 200, saved.filter((item) => item.candidate_id === candidateId && (!id || item.id === id)).map(({ id, ...rest }) => ({ id, ...rest })));
   }
+  if (table === "candidate_application_preparation_items" && request.method === "GET") {
+    const candidateId = eqParam(url, "candidate_id");
+    const trackerId = eqParam(url, "tracker_id");
+    return send(response, 200, preparationItems.filter((item) => item.candidate_id === candidateId && (!trackerId || item.tracker_id === trackerId)));
+  }
+  if (table === "candidate_application_preparation_events" && request.method === "GET") {
+    const candidateId = eqParam(url, "candidate_id");
+    const trackerId = eqParam(url, "tracker_id");
+    return send(response, 200, preparationEvents.filter((item) => item.candidate_id === candidateId && (!trackerId || item.tracker_id === trackerId)));
+  }
+  if (table === "candidate_application_preparation_items" && request.method === "POST") {
+    const body = await bodyOf(request);
+    const tracker = trackers.find((item) => item.id === body.tracker_id && item.candidate_id === body.candidate_id);
+    if (!tracker) return send(response, 409, { message: "tracker owner mismatch" });
+    const item = { ...body, id: `ffffffff-ffff-4fff-8fff-${String(nextId++).padStart(12, "0")}`, created_at: new Date().toISOString(), updated_at: new Date().toISOString() };
+    preparationItems.push(item);
+    preparationEvents.unshift({ id: `abababab-abab-4bab-8bab-${String(nextId++).padStart(12, "0")}`, item_id: item.id, tracker_id: item.tracker_id, candidate_id: item.candidate_id, previous_status: null, new_status: item.status, item_title: item.title, evidence_reference: item.evidence_reference, changed_at: new Date().toISOString() });
+    return send(response, 201, [item]);
+  }
+  if (table === "candidate_application_preparation_items" && request.method === "PATCH") {
+    const id = eqParam(url, "id");
+    const candidateId = eqParam(url, "candidate_id");
+    const item = preparationItems.find((row) => row.id === id && row.candidate_id === candidateId);
+    if (!item) return send(response, 200, []);
+    const body = await bodyOf(request);
+    const previousStatus = item.status;
+    Object.assign(item, body);
+    item.updated_at = new Date().toISOString();
+    if (previousStatus !== item.status || body.title !== undefined || body.evidence_reference !== undefined) {
+      preparationEvents.unshift({ id: `abababab-abab-4bab-8bab-${String(nextId++).padStart(12, "0")}`, item_id: item.id, tracker_id: item.tracker_id, candidate_id: item.candidate_id, previous_status: previousStatus, new_status: item.status, item_title: item.title, evidence_reference: item.evidence_reference, changed_at: new Date().toISOString() });
+    }
+    return send(response, 200, [item]);
+  }
+  if (table === "candidate_application_preparation_items" && request.method === "DELETE") {
+    const id = eqParam(url, "id");
+    const candidateId = eqParam(url, "candidate_id");
+    const index = preparationItems.findIndex((row) => row.id === id && row.candidate_id === candidateId);
+    if (index < 0) return send(response, 200, []);
+    const [removed] = preparationItems.splice(index, 1);
+    for (let i = preparationEvents.length - 1; i >= 0; i -= 1) if (preparationEvents[i].item_id === removed.id) preparationEvents.splice(i, 1);
+    return send(response, 200, [{ id: removed.id }]);
+  }
   if (table === "candidate_application_tracker" && request.method === "GET") {
     const candidateId = eqParam(url, "candidate_id");
     return send(response, 200, trackers.filter((item) => item.candidate_id === candidateId));
@@ -166,6 +208,42 @@ try {
   assert.equal(events.at(-1)?.new_status === "SUBMITTED_CANDIDATE_REPORTED" || events[0]?.new_status === "SUBMITTED_CANDIDATE_REPORTED", true,
     "status changes create an audit event");
 
+  const prepPath = "/api/candidate/applications/preparation";
+  const badReady = await api("POST", "candidate-a", {
+    trackerId: tracker.id, itemType: "DOCUMENT", title: "Qualification copy", status: "READY_CANDIDATE_REPORTED",
+    candidateNote: "", officialSourceUrl: "https://example.org/requirements", evidenceReference: ""
+  }, "", prepPath);
+  assert.equal(badReady.status, 400, "candidate cannot report document ready without evidence");
+  const createPrep = await api("POST", "candidate-a", {
+    trackerId: tracker.id, itemType: "DOCUMENT", title: "Qualification copy", status: "NOT_STARTED",
+    candidateNote: "Confirm certification validity", officialSourceUrl: "https://example.org/requirements",
+    evidenceReference: "", requiredByCandidate: true, dueDate: ""
+  }, "", prepPath);
+  assert.equal(createPrep.status, 201, "candidate can add a preparation checklist item");
+  const prepItem = (await createPrep.json()).item;
+  assert.equal(prepItem.candidate_id, candidateA, "preparation owner is derived server-side");
+  assert.equal(prepItem.tracker_id, tracker.id, "preparation item is bound to the candidate-owned tracker");
+  const crossPrep = await api("GET", "candidate-b", undefined, `?trackerId=${encodeURIComponent(tracker.id)}`, prepPath);
+  assert.equal(crossPrep.status, 404, "another candidate cannot inspect preparation checklist");
+  const prepUpdateMissingEvidence = await api("PATCH", "candidate-a", {
+    id: prepItem.id, title: prepItem.title, status: "READY_CANDIDATE_REPORTED",
+    candidateNote: prepItem.candidate_note, officialSourceUrl: prepItem.official_source_url,
+    evidenceReference: "", requiredByCandidate: true, dueDate: ""
+  }, "", prepPath);
+  assert.equal(prepUpdateMissingEvidence.status, 400, "readiness update requires evidence");
+  const prepUpdate = await api("PATCH", "candidate-a", {
+    id: prepItem.id, title: prepItem.title, status: "READY_CANDIDATE_REPORTED",
+    candidateNote: prepItem.candidate_note, officialSourceUrl: prepItem.official_source_url,
+    evidenceReference: "secure-document-reference-42", requiredByCandidate: true, dueDate: ""
+  }, "", prepPath);
+  assert.equal(prepUpdate.status, 200, "candidate can report evidenced readiness");
+  assert.equal((await prepUpdate.json()).item.status, "READY_CANDIDATE_REPORTED");
+  const prepHistory = await api("GET", "candidate-a", undefined, `?trackerId=${encodeURIComponent(tracker.id)}`, prepPath);
+  assert.equal((await prepHistory.json()).events.length >= 2, true, "preparation changes are auditable");
+  assert.equal((await api("DELETE", "candidate-a", undefined, `?id=${encodeURIComponent(prepItem.id)}`, prepPath)).status, 200);
+  assert.equal(preparationItems.length, 0, "candidate can remove own preparation item");
+  assert.equal(preparationEvents.length, 0, "removing a preparation item removes its history");
+
   const candidateBRead = await api("GET", "candidate-b");
   assert.equal((await candidateBRead.json()).applications.length, 0, "candidate B cannot see candidate A tracker");
   assert.equal((await api("PATCH", "candidate-b", {
@@ -178,7 +256,7 @@ try {
   assert.equal(trackers.length, 0, "candidate can remove own tracker");
   assert.equal(events.some((event) => event.tracker_id === tracker.id), false, "removing tracker removes its retained notes/history");
 
-  console.log("Candidate application tracker API integration PASSED: session gates, reviewed identity binding, cross-candidate isolation, saved-opportunity ownership, evidence-gated submission claims, audit history, and deletion cleanup.");
+  console.log("Candidate application tracker and preparation API integration PASSED: session gates, reviewed identity binding, cross-candidate isolation, saved-opportunity ownership, evidence-gated submission and document readiness claims, preparation audit history, and deletion cleanup.");
 } catch (error) {
   console.error(error);
   if (logs) console.error("Next.js server logs:\n" + logs.slice(-8000));
