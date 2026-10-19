@@ -1,6 +1,7 @@
 import fs from "node:fs";
 import assert from "node:assert/strict";
 const sql=fs.readFileSync("db/migrations/0071_n11_service_fulfilment_entitlements.sql","utf8");
+const n10PaymentRpc=fs.readFileSync("db/migrations/0067_n10_atomic_payfast_payment_confirmation.sql","utf8");
 const webhook=fs.readFileSync("apps/web/src/app/api/webhooks/payfast/route.ts","utf8");
 const candidateApi=fs.readFileSync("apps/web/src/app/api/candidate/entitlements/route.ts","utf8");
 const reviewerApi=fs.readFileSync("apps/web/src/app/api/reviewer/entitlements/route.ts","utf8");
@@ -19,6 +20,11 @@ for(const needle of [
  "GRANT EXECUTE ON FUNCTION public.n11_grant_entitlement"
 ]) assert.ok(sql.includes(needle),"N11 migration missing safety contract: "+needle);
 assert.match(sql,/order_id uuid NOT NULL UNIQUE/);
+assert.match(sql,/AS \\$\\$\\n/,"N11 PL/pgSQL function bodies must use valid dollar quotes");
+assert.equal((sql.match(/AS \\$\\$\\n/g)||[]).length,(sql.match(/^\\$\\$;$/gm)||[]).length,"N11 PL/pgSQL dollar quotes must be balanced");
+assert.match(n10PaymentRpc, /'merchant_reference',p_merchant_reference/);
+assert.match(n10PaymentRpc, /'provider_status','COMPLETE'/);
+assert.match(n10PaymentRpc, /'server_validation','VALID'/);
 assert.match(sql,/grant_idempotency_key text NOT NULL UNIQUE/);
 assert.match(sql,/idempotency_key text NOT NULL UNIQUE/);
 assert.match(sql,/status <> 'ACTIVE' OR \(financial_event_id IS NOT NULL AND granted_at IS NOT NULL\)/);
