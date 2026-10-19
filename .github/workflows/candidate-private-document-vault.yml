@@ -1,0 +1,35 @@
+name: Candidate Private Document Vault
+on:
+  pull_request:
+    paths:
+      - "db/migrations/0079_candidate_private_document_vault.sql"
+      - "apps/web/src/app/api/candidate/documents/**"
+      - "apps/web/src/app/candidate/documents/**"
+      - "apps/web/src/lib/candidate-workspace-*.ts"
+      - "scripts/validators/validate-candidate-private-document-vault.mjs"
+      - ".github/workflows/candidate-private-document-vault.yml"
+  push:
+    branches: ["feat/candidate-private-document-vault"]
+    paths:
+      - "db/migrations/0079_candidate_private_document_vault.sql"
+      - "apps/web/src/app/api/candidate/documents/**"
+      - "apps/web/src/app/candidate/documents/**"
+      - "apps/web/src/lib/candidate-workspace-*.ts"
+      - "scripts/validators/validate-candidate-private-document-vault.mjs"
+      - ".github/workflows/candidate-private-document-vault.yml"
+jobs:
+  verify:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+      - run: npm ci
+      - name: Validate private document security contract
+        run: node scripts/validators/validate-candidate-private-document-vault.mjs
+      - name: Install web dependencies
+        run: npm --prefix apps/web install --no-audit --no-fund
+      - name: Build Next.js production bundle
+        run: npm --prefix apps/web run build
