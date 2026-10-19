@@ -35,6 +35,9 @@ jobs:
       - name: Main branch protection evidence capture source contract
         run: npm run repo:validate:branch-protection-capture
 
+      - name: Authenticated staging E2E runner source contract
+        run: npm run staging:e2e:validate
+
       - name: API Truth Vault persistence validator
         run: npm run api:validate:truth-vault
 
