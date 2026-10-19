@@ -5,6 +5,7 @@ on:
       - "apps/web/src/app/api/candidate/applications/**"
       - "apps/web/src/app/api/candidate/opportunities/**"
       - "apps/web/src/app/candidate/applications/**"
+      - "apps/web/src/components/saved-opportunities-client.tsx"
       - "apps/web/src/app/candidate/dashboard/page.tsx"
       - "apps/web/src/lib/candidate-document-runtime.ts"
       - "db/migrations/0060_n06_application_pathway_runtime.sql"
