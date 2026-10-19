@@ -17,8 +17,7 @@
   ],
   "pricing_locked": [
     "FREE_DESTINY_MAP_R0",
-    "CV_REVAMP_R49_99",
-    "ACCOMMODATION_SUPPORT_R179"
+    "CV_REVAMP_R49_99"
   ],
   "runtime_surfaces": [
     "Plan Catalog",
@@ -32,5 +31,13 @@
     "Payment Evidence Ledger",
     "Candidate Finance View"
   ],
-  "next": "N11 - AI Decision / Matching Engine"
+  "next": "N11 - AI Decision / Matching Engine",
+  "retired_legacy_plan_codes": [
+    {
+      "plan_code": "ACCOMMODATION_SUPPORT_R179",
+      "status": "retired_not_selectable",
+      "reason": "Conflicts with canonical package catalogue and includes an unapproved invented route quantity; retain only for historical-order compatibility."
+    }
+  ],
+  "checkout_guard": "Only FREE_DESTINY_MAP_R0 and CV_REVAMP_R49_99 are currently represented by this legacy N10 finance catalogue. The seven canonical package prices in manifests/business/package-catalogue.json are not activated for checkout until founder-approved quantities, duration, service limits, refund terms, and provider sandbox evidence are reconciled."
 }
