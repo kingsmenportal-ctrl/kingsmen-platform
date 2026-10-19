@@ -1,0 +1,71 @@
+name: Kingsmen Release Evidence
+
+on:
+  pull_request:
+    branches: [main]
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: kingsmen-release-evidence-${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  build-validate-smoke:
+    name: Build, validate, and smoke-test
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - name: Check out source
+        uses: actions/checkout@v4
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+          cache-dependency-path: apps/api/package.json
+
+      - name: Install API dependencies
+        run: npm install --prefix apps/api --no-audit --no-fund
+
+      - name: Run repository test suite
+        run: npm test
+
+      - name: Validate Jarvis connected contract
+        run: npm run jarvis:validate
+
+      - name: Build backend API
+        run: npm run api:build
+
+      - name: Validate Truth Vault persistence contract
+        run: npm run api:validate
+
+      - name: Validate safe web-to-backend boundary
+        run: npm run web:validate:backend-boundary
+
+      - name: Capture evidence-aware launch readiness audit
+        run: npm run kingsmen:launch:audit
+
+      - name: Start API and exercise live health endpoints
+        env:
+          KINGSMEN_TRUTH_VAULT_MODE: memory_development_only
+          PORT: 4387
+          KINGSMEN_API_HOST: 127.0.0.1
+        run: node scripts/ci/smoke-api.mjs
+
+      - name: Upload generated validation evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: kingsmen-release-evidence-${{ github.run_id }}
+          path: |
+            reports/api/
+            reports/web/
+            reports/launch/
+          if-no-files-found: warn
+          retention-days: 14
