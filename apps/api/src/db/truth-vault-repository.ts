@@ -78,10 +78,18 @@ export class TruthVaultRepository {
   }
 
   static fromEnvironment(): TruthVaultRepository {
-    const mode = process.env.KINGSMEN_TRUTH_VAULT_MODE ?? "memory";
+    // Keep the local developer experience convenient, but never let a production
+    // process silently fall back to volatile memory and report itself healthy.
+    const mode = process.env.KINGSMEN_TRUTH_VAULT_MODE
+      ?? (process.env.NODE_ENV === "production" ? "postgres" : "memory");
     const databaseUrl = process.env.KINGSMEN_DATABASE_URL ?? process.env.DATABASE_URL;
 
-    if (mode !== "postgres") return new TruthVaultRepository(null);
+    if (mode !== "postgres") {
+      if (process.env.NODE_ENV === "production") {
+        throw new Error("Production requires PostgreSQL Truth Vault; memory mode is development-only.");
+      }
+      return new TruthVaultRepository(null);
+    }
     if (!databaseUrl) throw new Error("KINGSMEN_TRUTH_VAULT_MODE=postgres requires KINGSMEN_DATABASE_URL or DATABASE_URL.");
 
     const pg = require("pg") as { Pool: PgPoolConstructor };
