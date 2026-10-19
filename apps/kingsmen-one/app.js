@@ -91,7 +91,13 @@
     const saveButton=e.target.closest("[data-save]");if(saveButton){const id=saveButton.dataset.save;state.saved=state.saved.includes(id)?state.saved.filter(x=>x!==id):[...state.saved,id];save();renderOpportunityCards();toast(state.saved.includes(id)?"Saved in this browser.":"Removed from saved opportunities.");return;}
     const app=e.target.closest("[data-application]");if(app){state.applicationNotes[app.dataset.application]=true;save();render();toast("Local preparation record created—not submitted.");return;}
     const doc=e.target.closest("[data-document]");if(doc){const id=doc.dataset.document;state.documents[id]=state.documents[id]==="prepared"?"not-started":"prepared";save();render();toast("Demo readiness state updated.");return;}
-    const path=e.target.closest("[data-path]");if(path){toast("Pathway requirements need authoritative source data before this route can be activated.");return;}
+    const path=e.target.closest("[data-path]");if(path){
+      const id=path.dataset.path;
+      if(!state.profile)state.profile={fullName:"",province:"",qualification:"",interests:[]};
+      state.profile.interests=Array.from(new Set([...(state.profile.interests||[]),id]));
+      const routeTask=state.tasks.find(t=>t.id==="route");if(routeTask)routeTask.done=true;
+      save();render("profile");toast("Pathway interest saved. Check official eligibility before applying.");return;
+    }
   });
   document.getElementById("dismiss-notice").addEventListener("click",()=>{document.querySelector(".notice").classList.add("hidden");state.noticeVisible=false;save();});
   document.getElementById("reset-demo").addEventListener("click",()=>{if(confirm("Reset all Kingsmen One demo progress saved in this browser?")){state=initial();save();render("home");document.querySelector(".notice").classList.remove("hidden");toast("Demo state reset.");}});
