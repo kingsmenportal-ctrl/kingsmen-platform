@@ -76,7 +76,9 @@
     "repo:validate:branch-protection": "node scripts/validators/validate-main-branch-protection.mjs",
     "web:validate:backend-boundary": "node scripts/validators/validate-safe-web-backend-boundary.mjs",
     "kingsmen:launch:audit": "node scripts/validators/validate-kingsmen-launch-readiness-evidence-aware.mjs --audit",
-    "kingsmen:launch:gate": "node scripts/validators/validate-kingsmen-launch-readiness-evidence-aware.mjs --gate"
+    "kingsmen:launch:gate": "node scripts/validators/validate-kingsmen-launch-readiness-evidence-aware.mjs --gate",
+    "staging:capture:evidence": "pwsh -NoProfile -File scripts/staging/Invoke-KingsmenStagingRuntimeEvidencePack.ps1",
+    "final:collect:evidence": "node scripts/staging/collect-kingsmen-final-assembly-evidence.mjs"
   },
   "repository": {
     "type": "git",
