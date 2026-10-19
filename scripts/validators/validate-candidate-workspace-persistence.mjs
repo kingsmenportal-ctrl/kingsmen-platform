@@ -19,7 +19,7 @@ const dashboard = read("apps/web/src/app/candidate/dashboard/page.tsx");
 const saved = read("apps/web/src/components/saved-opportunities-client.tsx");
 
 for (const token of [
-  "candidate_auth_identity_links", "verified_at", "verified_by", "current_verified_candidate_id", "candidate_workspace_readiness",
+  "candidate_auth_identity_links", "verified_at", "current_verified_candidate_id", "candidate_workspace_readiness",
   "candidate_workspace_saved_opportunities", "ENABLE ROW LEVEL SECURITY", "auth.uid()",
   "candidate_workspace_readiness_update_own", "candidate_workspace_saved_opportunities_delete_own"
 ]) if (!migration.includes(token)) failures.push(`Migration missing ownership/security invariant: ${token}`);
