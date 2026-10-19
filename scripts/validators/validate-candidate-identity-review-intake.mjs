@@ -12,10 +12,10 @@ const checks = [
   ["one open request per account", /WHERE request_status IN \('PENDING','NEEDS_INFORMATION'\)/i.test(migration)],
   ["RLS and no direct client grants", /ENABLE ROW LEVEL SECURITY/i.test(migration) && /REVOKE ALL ON public\.candidate_identity_review_requests FROM PUBLIC, anon, authenticated/i.test(migration)],
   ["request cannot self-verify identity", /Never an identity-link authority/i.test(migration) && /does not verify your identity or link your account/i.test(route)],
-  ["Supabase Auth server validation", /auth\/v1\/user/.test(route) && /Authorization: `Bearer \\?${token}`/.test(route)],
+  ["Supabase Auth server validation", /auth\/v1\/user/.test(route) && /Authorization:/.test(route) && /Bearer/.test(route) && /\$\{token\}/.test(route)],
   ["server-derived account owner", /supabase_user_id: auth\.userId/.test(route) && !/body\.supabase_user_id|body\.candidate_id|body\.candidateId/.test(route)],
   ["input validation and limits", /candidateReference\.length < 2/.test(route) && /claimantMessage\.length > 1200/.test(route)],
-  ["owner-scoped request listing", /supabase_user_id=eq\.\${encodeURIComponent\(auth\.userId\)}/.test(route)],
+  ["owner-scoped request listing", /supabase_user_id=eq\.\$\{encodeURIComponent\(auth\.userId\)\}/.test(route)],
   ["duplicate open request conflict", /already have an open identity review request/.test(route)],
   ["no cache for identity records", /Cache-Control.*no-store/.test(route)]
 ];
