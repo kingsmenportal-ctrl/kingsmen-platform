@@ -84,6 +84,73 @@ let rootPackage = null;
 try { rootPackage = JSON.parse(read('package.json') ?? 'null'); } catch { failures.push('root-package-json-invalid'); }
 const scripts = Object.keys(rootPackage?.scripts ?? {});
 const validationScripts = scripts.filter((key) => /validate|verify|test|audit|gate|prove/.test(key));
+async function fetchAllPages(path, token, apiBase) {
+  const values = [];
+  for (let page = 1; page <= 20; page += 1) {
+    const response = await fetch(`${apiBase}/repos/${process.env.GITHUB_REPOSITORY}/${path}?per_page=100&page=${page}`, {
+      headers: { accept: 'application/vnd.github+json', authorization: `Bearer ${token}`, 'x-github-api-version': '2022-11-28' },
+      signal: AbortSignal.timeout(15000)
+    });
+    if (!response.ok) throw new Error(`GitHub API ${path} returned HTTP ${response.status}`);
+    const batch = await response.json();
+    if (!Array.isArray(batch)) throw new Error(`GitHub API ${path} did not return an array`);
+    values.push(...batch);
+    if (batch.length < 100) return values;
+  }
+  throw new Error(`GitHub API ${path} exceeded 2000 records; census is incomplete`);
+}
+
+let remoteInventory = {
+  status: 'NOT_AVAILABLE_OUTSIDE_AUTHENTICATED_GITHUB_ACTIONS',
+  branches: [],
+  openPullRequests: [],
+  openIssues: [],
+  failures: []
+};
+if (process.env.GITHUB_TOKEN && process.env.GITHUB_REPOSITORY) {
+  const apiBase = (process.env.GITHUB_API_URL || 'https://api.github.com').replace(/\\/$/, '');
+  try {
+    const [branchRows, pullRows, issueRows] = await Promise.all([
+      fetchAllPages('branches', process.env.GITHUB_TOKEN, apiBase),
+      fetchAllPages('pulls?state=open'.split('?')[0], process.env.GITHUB_TOKEN, apiBase),
+      fetchAllPages('issues?state=open'.split('?')[0], process.env.GITHUB_TOKEN, apiBase)
+    ]);
+    // The collection helper owns pagination; apply state filters locally so every page uses the same endpoint.
+    const openPullRequests = pullRows.filter((pr) => pr.state === 'open').map((pr) => ({
+      number: pr.number, title: pr.title, url: pr.html_url,
+      head: pr.head?.ref ?? null, base: pr.base?.ref ?? null,
+      changedFiles: pr.changed_files ?? null, additions: pr.additions ?? null, deletions: pr.deletions ?? null,
+      draft: Boolean(pr.draft), mergeable: pr.mergeable ?? null
+    }));
+    const openIssues = issueRows.filter((issue) => !issue.pull_request && issue.state === 'open').map((issue) => ({
+      number: issue.number, title: issue.title, url: issue.html_url,
+      labels: (issue.labels ?? []).map((label) => typeof label === 'string' ? label : label.name)
+    }));
+    remoteInventory = {
+      status: 'LIVE_GITHUB_API_CENSUS_PASSED',
+      capturedAt: new Date().toISOString(),
+      branchCount: branchRows.length,
+      branches: branchRows.map((branch) => branch.name),
+      openPullRequestCount: openPullRequests.length,
+      openPullRequests,
+      openIssueCount: openIssues.length,
+      openIssues,
+      failures: []
+    };
+  } catch (error) {
+    remoteInventory = {
+      status: 'LIVE_GITHUB_API_CENSUS_FAILED',
+      branches: [], openPullRequests: [], openIssues: [],
+      failures: [String(error?.message ?? error)]
+    };
+    failures.push('live-github-census-failed');
+  }
+} else if (process.env.GITHUB_ACTIONS === 'true') {
+  remoteInventory.status = 'LIVE_GITHUB_API_CENSUS_FAILED';
+  remoteInventory.failures = ['GITHUB_TOKEN or GITHUB_REPOSITORY missing inside GitHub Actions'];
+  failures.push('live-github-census-credentials-missing');
+}
+
 const registeredValidated = modules.filter((m) => m.registeredReleaseStatus === 'validated').length;
 const registeredLocked = modules.filter((m) => m.registeredReleaseStatus === 'locked').length;
 const gatesWithDeclaredBlockers = gates.filter((g) => g.remainingConstraint).length;
@@ -91,13 +158,14 @@ const gatesWithAllEvidenceFiles = gateEvidence.filter((g) => g.declaredEvidenceP
 const report = {
   schema: 'kingsmen.repository-operating-inventory.v1',
   generatedAt: new Date().toISOString(),
-  scope: 'Current checked-out repository tree and source registries; not all remote branches or live provider state.',
+  scope: 'Current checked-out repository tree, source registries, and (when authenticated in CI) paginated live GitHub branches/open pull requests/open issues; not live provider or database state.',
   sourceOfTruth: {
     moduleRegistry: registryPath,
     launchManifest: manifestPath,
     rootPackage: 'package.json'
   },
   counts,
+  remoteInventory,
   inventoryCoverage: {
     registeredModules: modules.length,
     expectedModules: 21,
@@ -134,6 +202,10 @@ console.log(JSON.stringify({
   workflowFiles: counts.workflowFiles,
   packageManifests: counts.packageManifests,
   launchGatesWithConstraints: gatesWithDeclaredBlockers,
+  remoteInventoryStatus: remoteInventory.status,
+  remoteBranchCount: remoteInventory.branchCount ?? null,
+  remoteOpenPullRequestCount: remoteInventory.openPullRequestCount ?? null,
+  remoteOpenIssueCount: remoteInventory.openIssueCount ?? null,
   failures,
   reportPath: outputPath
 }, null, 2));
