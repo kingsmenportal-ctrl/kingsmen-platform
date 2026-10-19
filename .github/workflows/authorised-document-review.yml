@@ -1,0 +1,35 @@
+name: Authorised Candidate Document Review
+on:
+  pull_request:
+    paths:
+      - "db/migrations/0080_authorised_candidate_document_review.sql"
+      - "apps/web/src/app/api/reviewer/documents/**"
+      - "scripts/validators/validate-authorised-document-review.mjs"
+      - ".github/workflows/authorised-document-review.yml"
+  push:
+    branches: ["feat/authorised-document-review"]
+    paths:
+      - "db/migrations/0080_authorised_candidate_document_review.sql"
+      - "apps/web/src/app/api/reviewer/documents/**"
+      - "scripts/validators/validate-authorised-document-review.mjs"
+      - ".github/workflows/authorised-document-review.yml"
+jobs:
+  source-contract:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - run: node scripts/validators/validate-authorised-document-review.mjs
+  production-build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+      - run: npm install
+      - run: npm --prefix apps/web install
+      - run: npm --prefix apps/web run build
