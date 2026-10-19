@@ -94,3 +94,5 @@ if ($Failures.Count -gt 0) {
 Write-Host "N10 validation passed." -ForegroundColor Green
 Write-Host "Report: reports\n10\N10_VALIDATION_RESULT.json" -ForegroundColor Green
 exit 0
+Require-Contains "db\migrations\0083_retire_legacy_accommodation_checkout.sql" "active = false" "Legacy accommodation checkout migration must deactivate the plan."
+Require-Contains "db\seeds\n10_finance_payfast_seed.sql" "active = false" "Finance seed must deactivate the legacy accommodation plan."
