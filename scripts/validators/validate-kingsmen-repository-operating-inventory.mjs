@@ -108,7 +108,7 @@ let remoteInventory = {
   failures: []
 };
 if (process.env.GITHUB_TOKEN && process.env.GITHUB_REPOSITORY) {
-  const apiBase = (process.env.GITHUB_API_URL || 'https://api.github.com').replace(/\\/$/, '');
+  const apiBase = (process.env.GITHUB_API_URL || 'https://api.github.com').replace(/\/$/, '');
   try {
     const [branchRows, pullRows, issueRows] = await Promise.all([
       fetchAllPages('branches', process.env.GITHUB_TOKEN, apiBase),
