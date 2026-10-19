@@ -83,7 +83,8 @@
     "staging:capture:evidence": "pwsh -NoProfile -File scripts/staging/Invoke-KingsmenStagingRuntimeEvidencePack.ps1",
     "final:collect:evidence": "node scripts/staging/collect-kingsmen-final-assembly-evidence.mjs",
     "staging:e2e": "node scripts/staging/run-kingsmen-authenticated-e2e.mjs",
-    "staging:e2e:validate": "node scripts/validators/validate-staging-authenticated-e2e-runner.mjs"
+    "staging:e2e:validate": "node scripts/validators/validate-staging-authenticated-e2e-runner.mjs",
+    "staging:e2e:test": "node scripts/staging/test-kingsmen-authenticated-e2e.mjs"
   },
   "repository": {
     "type": "git",
