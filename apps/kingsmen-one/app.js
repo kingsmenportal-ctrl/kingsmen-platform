@@ -24,7 +24,7 @@
   const save = () => { try { localStorage.setItem(KEY, JSON.stringify(state)); } catch {} };
   const toast = text => { const el=document.getElementById("toast"); el.textContent=text; el.classList.add("show"); clearTimeout(toast.timer); toast.timer=setTimeout(()=>el.classList.remove("show"),2300); };
   const heading = (title,sub,action="") => `<div class="section-head"><div><h2>${title}</h2><p>${sub}</p></div>${action}</div>`;
-  const button = (text,attrs="",secondary=true) => `<button class="${secondary?"secondary-button":"primary-button"}" ${attrs}>${text}</button>`;
+  const button = (text,attrs="",secondary=true) => { const match=attrs.match(/\\sclass="([^"]+)"/); const classes=match?match[1]:(secondary?"secondary-button":"primary-button"); const clean=attrs.replace(/\\sclass="[^"]+"/,""); return `<button class="${classes}" ${clean}>${text}</button>`; };
   const taskList = (limit=10) => state.tasks.slice(0,limit).map(t=>`<div class="task-row"><button class="task-check ${t.done?"done":""}" data-task="${t.id}" aria-label="${t.done?"Mark incomplete":"Mark complete"}: ${escapeHtml(t.title)}">${t.done?"✓":""}</button><div class="task-info"><strong>${escapeHtml(t.title)}</strong><small>${escapeHtml(t.detail)}</small></div><span class="tag ${t.done?"done":"pending"}">${t.done?"Complete":"To do"}</span></div>`).join("");
   const progress = () => Math.round(state.tasks.filter(t=>t.done).length / state.tasks.length * 100);
   function home() {
