@@ -7,6 +7,7 @@ type ReviewRequest = {
   candidate_reference: string;
   claimant_name: string;
   claimant_message: string;
+  candidate_response?: string;
   request_status: string;
   reviewer_note: string | null;
   created_at: string;
@@ -34,7 +35,7 @@ function accessToken(): string {
   return "";
 }
 
-async function api<T>(method: "GET" | "POST", body?: unknown): Promise<T> {
+async function api<T>(method: "GET" | "POST" | "PATCH", body?: unknown): Promise<T> {
   const token = accessToken();
   if (!token) throw new Error("Sign in to submit or check an identity review request.");
   const response = await fetch("/api/candidate/identity-review", {
@@ -61,6 +62,7 @@ export default function CandidateIdentityReviewPage() {
   const [candidateReference, setCandidateReference] = useState("");
   const [claimantName, setClaimantName] = useState("");
   const [message, setMessage] = useState("");
+  const [responses, setResponses] = useState<Record<string, string>>({});
   const [requests, setRequests] = useState<ReviewRequest[]>([]);
   const [status, setStatus] = useState("Load your identity review status after signing in.");
   const [busy, setBusy] = useState(false);
@@ -128,6 +130,26 @@ export default function CandidateIdentityReviewPage() {
             <p style={{ marginTop: 0 }}><strong>{item.request_status.replaceAll("_", " ")}</strong> · {new Date(item.created_at).toLocaleString("en-ZA")}</p>
             <p>{statusText(item.request_status)}</p>
             {item.reviewer_note && <p><strong>Reviewer note:</strong> {item.reviewer_note}</p>}
+            {item.candidate_response && <p><strong>Your latest response:</strong> {item.candidate_response}</p>}
+            {item.request_status === "NEEDS_INFORMATION" && <form onSubmit={async (event) => {
+              event.preventDefault();
+              const responseMessage = (responses[item.id] || "").trim();
+              if (responseMessage.length < 3) { setStatus("Please provide at least 3 characters of additional information."); return; }
+              setBusy(true);
+              setStatus("Sending your response securely…");
+              try {
+                const result = await api<{ notice: string }>("PATCH", { requestId: item.id, message: responseMessage });
+                setResponses((current) => ({ ...current, [item.id]: "" }));
+                setStatus(result.notice);
+                await load();
+              } catch (error) { setStatus(error instanceof Error ? error.message : "Your response could not be recorded."); }
+              finally { setBusy(false); }
+            }} style={{ display: "grid", gap: ".6rem", marginTop: ".9rem" }}>
+              <label style={{ display: "grid", gap: ".35rem" }}><strong>Provide the additional information requested</strong>
+                <textarea value={responses[item.id] || ""} onChange={(event) => setResponses((current) => ({ ...current, [item.id]: event.target.value }))} maxLength={1200} minLength={3} required rows={3} style={{ padding: ".7rem", border: "1px solid #b8c4d4", borderRadius: 8, font: "inherit" }} />
+              </label>
+              <button type="submit" disabled={busy} style={{ justifySelf: "start", padding: ".65rem .9rem", border: 0, borderRadius: 8, background: "#23466d", color: "#fff", fontWeight: 700 }}>{busy ? "Sending…" : "Send additional information"}</button>
+            </form>}
           </article>)}
         </div>}
       </section>
