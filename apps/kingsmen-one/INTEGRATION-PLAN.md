@@ -6,7 +6,7 @@ The linked Supabase project `kingsmen-portal-staging` (ref `euhubhhnumtibbyufghm
 ## Integration order
 1. **Identity boundary:** use Supabase Auth for the session, then resolve the candidate only through a server-verified identity link and authorised identity-review workflow. Never link candidates solely by matching email. Supabase Auth email/password sign-in, account creation and password-reset request UI are now wired through the public publishable key. Account sessions do not unlock candidate records. Identity-link review and candidate-data access remain blocked until an authenticated, policy-backed workflow is verified.
 2. **Profile:** read/write only the authenticated candidate's own profile through reviewed RLS policies. Corrections should be explicit review requests, not silent changes to authoritative fields.
-3. **Pathway/opportunity catalogue:** use authoritative provider/source records, source confidence and verification status. The staging `route_categories` query returned no rows, so Kingsmen One must not infer the canonical sixth pathway or advertise sample records as live.
+3. **Pathway/opportunity catalogue:** staging is now seeded from the repository's idempotent `db/seeds/n06_route_universe_seed.sql`: 10 route categories, 7 official source-authority anchors, 2 provider anchors, 2 route-programme anchors and 2 portal-DNA records. The CAO and NSFAS anchors intentionally remain `MANUAL_CHECK_REQUIRED`; they are not open opportunities and the candidate app must not present them as currently open listings. Programme-specific deadlines, eligibility and availability require current source review. The canonical sixth pathway remains unconfirmed and must not be inferred.
 4. **Preparation:** map candidate checklist actions to `candidate_application_preparation_items` and append-only events, with idempotency and ownership checks. Candidate-reported progress remains separate from reviewer evidence.
 5. **Documents:** private Supabase Storage only; metadata in the private-document tables; server-issued signed access; reviewer verification must be explicit and auditable. Never expose file bytes publicly.
 6. **Applications:** use the application tracker and append-only event/evidence tables. Prepared, authorised, submitted, received and accepted are distinct states. Do not infer a provider submission from a local click.
@@ -48,3 +48,10 @@ The linked Supabase project `kingsmen-portal-staging` (ref `euhubhhnumtibbyufghm
 - New trackers receive four default checklist items. Additional task/document items, notes, candidate-reported readiness and evidence-reference strings are supported with field bounds.
 - Candidate-reported submission remains separate from independently confirmed provider submission. No provider status or outcome is written by this feature.
 - Automated source-contract test added. Still required: authenticated staging browser tests (verified and unverified identities, cross-candidate denial, duplicate tracker, checklist mutations), frontend deploy and runtime/log verification.
+
+
+## Staging route-universe seed evidence (2026-10-19)
+- Applied the existing idempotent `db/seeds/n06_route_universe_seed.sql` after confirming the target tables and constraints existed and the seed's target rows were empty.
+- Post-write counts: `route_categories` 10; `source_authorities` 7; `route_providers` 2; `route_programmes` 2; `portal_dna` 2.
+- Both programme anchors use official HTTPS source URLs, confidence A and verified provider/source anchors, but remain `MANUAL_CHECK_REQUIRED`. Eligible open/future opportunity count is still zero by design until current programme-specific availability is verified.
+- No candidate identities, candidate applications, private documents, payments, or entitlements were created or changed by this seed.
