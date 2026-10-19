@@ -15,7 +15,7 @@ assert.match(candidate,/Refund request requires a paid order with a verified Pay
 assert.match(candidate,/Creating an order never takes payment or marks it paid./);
 assert.match(reviewer,/Payment reference, evidence locator and SHA-256 evidence hash are required/);
 assert.match(reviewer,/not a provider-verified PayFast event/);
-assert.match(reviewer,/REFUND_SETTLEMENT_EVIDENCE_REQUIRED/);
+assert.match(reviewer,/PROVIDER_REFUND_RECONCILIATION_REQUIRED/);
 assert.match(reviewer,/settlementSha/);
 assert.doesNotMatch(candidate,/checkoutConfigured:true/);
 assert.doesNotMatch(reviewer,/providerRefundExecutionConfigured:true/);
