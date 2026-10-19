@@ -26,6 +26,9 @@ jobs:
       - name: Install dependencies
         run: npm ci
 
+      - name: FK index hardening migration source contract
+        run: npm run db:validate:fk-index-hardening
+
       - name: API Truth Vault persistence validator
         run: npm run api:validate:truth-vault
 
