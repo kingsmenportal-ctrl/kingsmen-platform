@@ -51,3 +51,13 @@ test("account entry point uses Supabase Auth without claiming candidate identity
   assert.match(js, /candidate identity has not been linked or verified/i);
   assert.match(js, /onAuthStateChange/);
 });
+
+test("opportunities use the verified-public route catalogue before demo samples", async () => {
+  const js = await read("app.js");
+  assert.match(js, /from\("route_programmes"\)/);
+  assert.match(js, /eq\("route_status",\s*"VERIFIED"\)/);
+  assert.match(js, /source_confidence_band/);
+  assert.match(js, /No verified live listings are currently available/);
+  assert.match(js, /Practice with demo listings/);
+  assert.match(js, /Open official source/);
+});
