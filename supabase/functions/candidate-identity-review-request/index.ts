@@ -29,7 +29,7 @@ Deno.serve(async (req: Request) => {
     return new Response(null, {
       status: 204,
       headers: {
-        "Access-Control-Allow-Origin": origin ?? "",
+        ...(origin && allowedOrigins.has(origin) ? { "Access-Control-Allow-Origin": origin } : {}),
         "Access-Control-Allow-Headers": "authorization, apikey, content-type, x-client-info",
         "Access-Control-Allow-Methods": "POST, OPTIONS",
         "Access-Control-Max-Age": "600",
