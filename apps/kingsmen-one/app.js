@@ -76,7 +76,32 @@
     return `${heading("My pathways","Explore the routes in the Kingsmen journey. Availability and eligibility must be verified against official sources.")}<div class="path-grid">${pathways.map(p=>`<article class="path-card"><div class="card-icon">${p.icon}</div><h3>${p.name}</h3><p>${p.desc}</p>${p.unconfirmed?'<span class="tag pending">Source confirmation required</span>':button("Explore preparation",`data-path="${p.id}"`)}</article>`).join("")}</div><p class="muted-note">Pathway labels are a working navigation inventory. The sixth canonical pathway must be confirmed from the authoritative Kingsmen catalogue before production.</p>`;
   }
   function opportunitiesView() {
-    return `${heading("Opportunities","Sample records only. Verify the provider, eligibility, deadline and fees on official sources before acting.")}<div class="filter-row"><input id="opportunity-search" class="filter-input" placeholder="Search opportunities…" aria-label="Search opportunities"><select id="opportunity-filter" class="filter-select" aria-label="Filter opportunity type"><option value="all">All types</option><option>Education</option><option>Skills</option><option>Employment</option></select></div><div class="opportunity-grid" id="opportunity-results"></div><p class="muted-note">These demo listings are not live or verified opportunities. Saving one does not submit an application or contact a provider.</p>`;
+    return `${heading("Opportunities","Verified source records appear first. Demo listings are separated and labelled for practice.")}<div class="panel verified-opportunities-panel"><h3>Official-source opportunities</h3><p class="panel-subtitle">Only records allowed by Kingsmen’s verified-public database policy are shown here.</p><div id="verified-opportunity-results"><p class="muted-note">Loading verified records…</p></div></div><h3 class="subsection-title">Practice with demo listings</h3><p class="muted-note">These records are not real opportunities. Use them only to practise the save and preparation interface.</p><div class="filter-row"><input id="opportunity-search" class="filter-input" placeholder="Search opportunities…" aria-label="Search opportunities"><select id="opportunity-filter" class="filter-select" aria-label="Filter opportunity type"><option value="all">All types</option><option>Education</option><option>Skills</option><option>Employment</option></select></div><div class="opportunity-grid" id="opportunity-results"></div><p class="muted-note">These demo listings are not live or verified opportunities. Saving one does not submit an application or contact a provider.</p>`;
+  }
+  async function loadVerifiedOpportunities() {
+    const target=document.getElementById("verified-opportunity-results");
+    if(!target)return;
+    if(!supabaseClient){target.innerHTML="<p class=\"muted-note\">Supabase client unavailable. Live listings cannot be loaded.</p>";return;}
+    target.innerHTML="<p class=\"muted-note\">Checking official-source records…</p>";
+    try {
+      const result=await supabaseClient.from("route_programmes")
+        .select("id,programme_name,route_type,province,source_url,source_confidence_band,route_status,availability_status,eligibility_summary,updated_at")
+        .eq("route_status","VERIFIED")
+        .in("availability_status",["OPEN","FUTURE"])
+        .in("source_confidence_band",["A","B"])
+        .not("source_url","is",null)
+        .order("updated_at",{ascending:false})
+        .limit(30);
+      if(result.error)throw result.error;
+      const rows=Array.isArray(result.data)?result.data:[];
+      if(!rows.length){
+        target.innerHTML="<div class=\"empty-state\"><strong>No verified live listings are currently available.</strong><p>Kingsmen will not invent listings or show practice records as real opportunities. Check again later, or use the clearly separated demo records to practise.</p></div>";
+        return;
+      }
+      target.innerHTML="<div class=\"opportunity-grid\">"+rows.map(o=>"<article class=\"opportunity-card\"><span class=\"provider\">VERIFIED SOURCE · "+escapeHtml(o.source_confidence_band||"")+"</span><h3>"+escapeHtml(o.programme_name||"Opportunity")+"</h3><p>"+escapeHtml(o.eligibility_summary||"Review official eligibility requirements at the source.")+"</p><div class=\"details\">"+escapeHtml(o.route_type||"Pathway")+" · "+escapeHtml(o.province||"South Africa")+"<br><br>Status: "+escapeHtml(o.availability_status||"Verify availability")+"<br>Source checked: "+escapeHtml(o.updated_at?new Date(o.updated_at).toLocaleDateString():"date unavailable")+"</div><a class=\"secondary-button\" href=\""+escapeHtml(o.source_url)+"\" target=\"_blank\" rel=\"noopener noreferrer\">Open official source ↗</a></article>").join("")+"</div>";
+    } catch(error) {
+      target.innerHTML="<div class=\"empty-state\"><strong>Verified listings could not be loaded.</strong><p>The live source check failed. Demo records remain clearly labelled separately.</p></div>";
+    }
   }
   function renderOpportunityCards() {
     const target=document.getElementById("opportunity-results"); if(!target)return;
@@ -103,7 +128,7 @@
     document.querySelectorAll(".nav-item").forEach(b=>b.classList.toggle("active",b.dataset.view===view));
     document.getElementById("welcome").classList.toggle("hidden",view!=="home");
     root.innerHTML=(views[view]||home)();
-    if(view==="opportunities"){renderOpportunityCards();document.getElementById("opportunity-search").addEventListener("input",renderOpportunityCards);document.getElementById("opportunity-filter").addEventListener("change",renderOpportunityCards);}
+    if(view==="opportunities"){renderOpportunityCards();loadVerifiedOpportunities();document.getElementById("opportunity-search").addEventListener("input",renderOpportunityCards);document.getElementById("opportunity-filter").addEventListener("change",renderOpportunityCards);}
   }
   document.addEventListener("submit",async e=>{
     if(e.target.id==="auth-form") {
