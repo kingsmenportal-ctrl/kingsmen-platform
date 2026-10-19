@@ -30,7 +30,7 @@ jobs:
         run: npm run candidate:validate:dashboard
 
       - name: Install web dependencies
-        run: npm ci --prefix apps/web
+        run: npm install --prefix apps/web --no-audit --no-fund
 
       - name: Build candidate web application
         run: npm --prefix apps/web run build
