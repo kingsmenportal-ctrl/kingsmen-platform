@@ -3,6 +3,7 @@ on:
   pull_request:
     paths:
       - "db/migrations/0080_authorised_candidate_document_review.sql"
+      - "db/migrations/0081_candidate_document_preparation_detach_and_fk_indexes.sql"
       - "apps/web/src/app/api/reviewer/documents/**"
       - "apps/web/src/app/reviewer/documents/**"
       - "scripts/validators/validate-authorised-document-review.mjs"
