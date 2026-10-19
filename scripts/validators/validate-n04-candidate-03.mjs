@@ -46,8 +46,24 @@ for (const gate of ["higher_education", "tvet", "seta_learnership", "internship"
   if (!dashboard.includes(gate)) failures.push(`Candidate dashboard missing gate: ${gate}`);
 }
 
-for (const phrase of ["package changes service intensity", "No service_role", "paid verification", "submitted verification", "outcome verification"]) {
-  if (!dashboard.includes(phrase)) failures.push(`Candidate dashboard missing phrase: ${phrase}`);
+for (const phrase of [
+  '"use client"',
+  "Readiness checklist",
+  "localStorage",
+  "Your priority",
+  "Make this my priority",
+  "not an official verification result",
+  "not yet synced to your Kingsmen account",
+  "does not claim that your identity",
+  "An order or payment return page alone does not activate a paid service",
+  "higher_education",
+  "tvet",
+  "seta_learnership",
+  "internship",
+  "apprenticeship",
+  "employment"
+]) {
+  if (!dashboard.includes(phrase)) failures.push(`Candidate dashboard missing required behaviour or safety copy: ${phrase}`);
 }
 
 const report = {
