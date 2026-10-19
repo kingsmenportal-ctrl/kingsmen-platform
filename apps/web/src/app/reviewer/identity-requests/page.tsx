@@ -7,6 +7,7 @@ type ReviewRequest = {
   candidate_reference: string;
   claimant_name: string;
   claimant_message: string;
+  candidate_response?: string;
   request_status: string;
   reviewer_note: string | null;
   created_at: string;
@@ -108,6 +109,7 @@ export default function CandidateIdentityReviewPage() {
               <p><strong>Claimed candidate reference:</strong> {item.candidate_reference}</p>
               <p><strong>Submitted:</strong> {new Date(item.created_at).toLocaleString("en-ZA")}</p>
               <p style={{ whiteSpace: "pre-wrap", lineHeight: 1.6 }}><strong>Claimant message:</strong><br />{item.claimant_message || "No additional message supplied."}</p>
+              {item.candidate_response && <p style={{ whiteSpace: "pre-wrap", lineHeight: 1.6, padding: ".8rem", background: "#edf5ff", borderRadius: 8 }}><strong>Candidate follow-up response:</strong><br />{item.candidate_response}</p>}
               <label style={{ display: "grid", gap: ".35rem", marginTop: ".9rem" }}>
                 <strong>Exact candidate public reference (required to approve)</strong>
                 <input value={references[item.id] ?? item.candidate_reference} onChange={(event) => setReferences((current) => ({ ...current, [item.id]: event.target.value }))} maxLength={120} autoComplete="off" style={{ width: "100%", boxSizing: "border-box", padding: ".7rem", border: "1px solid #b8c4d4", borderRadius: 8 }} />
