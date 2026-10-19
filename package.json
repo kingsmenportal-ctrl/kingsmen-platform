@@ -77,7 +77,8 @@
     "staging:validate:capture": "node scripts/validators/validate-staging-runtime-evidence-capture.mjs",
     "final:prove:evidence": "node scripts/proof/prove-final-assembly-evidence-capture.mjs",
     "final:validate:evidence": "node scripts/validators/validate-final-assembly-evidence-capture.mjs",
-    "final:collect:evidence": "node scripts/staging/collect-kingsmen-final-assembly-evidence.mjs"
+    "final:collect:evidence": "node scripts/staging/collect-kingsmen-final-assembly-evidence.mjs",
+    "staging:capture:evidence": "pwsh -NoProfile -File scripts/staging/Invoke-KingsmenStagingRuntimeEvidencePack.ps1"
   },
   "repository": {
     "type": "git",
