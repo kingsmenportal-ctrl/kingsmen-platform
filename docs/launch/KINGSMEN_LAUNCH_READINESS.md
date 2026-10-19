@@ -36,6 +36,8 @@ npm run payments:prove:sandbox
 npm run payments:validate:sandbox
 npm run security:prove:rls
 npm run security:validate:rls
+
+RLS/security source-level boundary is implemented and validated; staging role-isolation proof remains required.
 npm run backup:prove:restore
 npm run backup:validate:restore
 npm run secrets:prove:wiring
