@@ -55,7 +55,8 @@ const mock = createServer(async (request, response) => {
       created_at: new Date().toISOString(), updated_at: new Date().toISOString()
     };
     requests.set(item.id, item);
-    return send(response, 201, [item]);
+    const { id, candidate_reference, claimant_name, claimant_message, request_status, created_at } = item;
+    return send(response, 201, [{ id, candidate_reference, claimant_name, claimant_message, request_status, created_at }]);
   }
   if (resource === "candidate_identity_review_requests" && request.method === "GET") {
     const owner = url.searchParams.get("supabase_user_id")?.replace(/^eq\./, "");
