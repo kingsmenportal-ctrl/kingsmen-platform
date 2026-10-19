@@ -61,7 +61,7 @@ test("application preparation accepts only fresh verified routes and safe verifi
   assert.match(source, /90\s*\*\s*24\s*\*\s*60\s*\*\s*60\s*\*\s*1000/);
   assert.match(source, /public_safe/);
   assert.match(source, /verification_status/);
-  assert.match(source, /officialUrl\.startsWith\(["']https:\/\//);
+  assert.match(source, /https:.*test\(officialUrl\)/);
 });
 
 test("candidate identifiers are resolved from verified server-side identity, not trusted from browser input", async () => {
