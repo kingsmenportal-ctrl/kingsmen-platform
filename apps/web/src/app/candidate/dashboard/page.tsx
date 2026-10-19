@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import { candidateWorkspaceRequest } from "@/lib/candidate-workspace-client";
 
 const pathways = [
   { code: "higher_education", title: "Higher Education", description: "Universities, colleges and formal post-school study.", next: "Confirm your preferred qualification and institution requirements." },
@@ -25,31 +26,54 @@ const STORAGE_KEY = "kingsmen-candidate-dashboard-progress-v1";
 export default function CandidateDashboardPage() {
   const [progress, setProgress] = useState<Progress>({ tasks: [], pathway: "" });
   const [loaded, setLoaded] = useState(false);
+  const [syncStatus, setSyncStatus] = useState("Checking your Kingsmen account session…");
 
   useEffect(() => {
-    try {
-      const saved = window.localStorage.getItem(STORAGE_KEY);
-      if (saved) {
-        const parsed = JSON.parse(saved) as Partial<Progress>;
+    let cancelled = false;
+    async function loadWorkspace() {
+      try {
+        const result = await candidateWorkspaceRequest<{ readiness: { tasks: string[]; pathway: string }; source: string }>("GET");
+        if (cancelled) return;
         setProgress({
-          tasks: Array.isArray(parsed.tasks) ? parsed.tasks.filter((id): id is string => typeof id === "string" && tasks.some((task) => task.id === id)) : [],
-          pathway: typeof parsed.pathway === "string" && pathways.some((pathway) => pathway.code === parsed.pathway) ? parsed.pathway : ""
+          tasks: Array.isArray(result.readiness?.tasks) ? result.readiness.tasks.filter((id) => tasks.some((task) => task.id === id)) : [],
+          pathway: typeof result.readiness?.pathway === "string" && pathways.some((pathway) => pathway.code === result.readiness.pathway) ? result.readiness.pathway : ""
         });
+        setSyncStatus("Synced with your authenticated Kingsmen account and Truth Vault.");
+      } catch (error) {
+        if (cancelled) return;
+        try {
+          const saved = window.localStorage.getItem(STORAGE_KEY);
+          if (saved) {
+            const parsed = JSON.parse(saved) as Partial<Progress>;
+            setProgress({
+              tasks: Array.isArray(parsed.tasks) ? parsed.tasks.filter((id): id is string => typeof id === "string" && tasks.some((task) => task.id === id)) : [],
+              pathway: typeof parsed.pathway === "string" && pathways.some((pathway) => pathway.code === parsed.pathway) ? parsed.pathway : ""
+            });
+          }
+        } catch { /* Local fallback is optional; never blocks the workspace. */ }
+        setSyncStatus(error instanceof Error ? error.message : "Account sync is unavailable. Changes remain local until you sign in.");
+      } finally {
+        if (!cancelled) setLoaded(true);
       }
-    } catch {
-      // A blocked or invalid local-storage entry must not prevent the dashboard from rendering.
     }
-    setLoaded(true);
+    void loadWorkspace();
+    return () => { cancelled = true; };
   }, []);
 
   useEffect(() => {
     if (!loaded) return;
-    try {
-      window.localStorage.setItem(STORAGE_KEY, JSON.stringify(progress));
-    } catch {
-      // Progress remains usable for this page session if browser storage is unavailable.
+    try { window.localStorage.setItem(STORAGE_KEY, JSON.stringify(progress)); } catch { /* Optional offline fallback. */ }
+    if (syncStatus.startsWith("Synced") || syncStatus.startsWith("Saving")) {
+      setSyncStatus("Saving to your Kingsmen account…");
+      const timer = window.setTimeout(() => {
+        void candidateWorkspaceRequest<{ ok: boolean }>("PATCH", progress)
+          .then(() => setSyncStatus("Synced with your authenticated Kingsmen account and Truth Vault."))
+          .catch((error) => setSyncStatus(error instanceof Error ? error.message : "Account sync failed; your last local copy remains on this device."));
+      }, 250);
+      return () => window.clearTimeout(timer);
     }
   }, [loaded, progress]);
+
 
   function toggleTask(id: string) {
     setProgress((current) => ({
@@ -83,7 +107,7 @@ export default function CandidateDashboardPage() {
             </label>
           ))}
         </div>
-        <p style={{ fontSize: ".9rem", color: "#526176", marginBottom: 0 }}>Checklist progress is saved in this browser on this device. It is not yet synced to your Kingsmen account.</p>
+        <p role="status" aria-live="polite" style={{ fontSize: ".9rem", color: "#526176", marginBottom: 0 }}>{syncStatus}</p>
       </section>
 
       <section aria-labelledby="pathways-title" style={{ marginTop: "1.75rem" }}>
