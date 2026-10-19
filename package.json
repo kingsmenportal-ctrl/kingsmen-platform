@@ -54,6 +54,7 @@
     "api:validate:truth-vault": "node scripts/validators/validate-api-truth-vault-persistence.mjs",
     "db:validate:fk-index-hardening": "node scripts/validators/validate-fk-index-hardening.mjs",
     "db:validate:migration-integrity": "node scripts/validators/validate-supabase-migration-integrity.mjs",
+    "db:validate:migration-integrity:test": "node scripts/staging/test-supabase-migration-integrity.mjs",
     "security:validate:review-tables": "node scripts/validators/validate-review-table-access-contract.mjs",
     "repo:validate:branch-protection-capture": "node scripts/validators/validate-branch-protection-capture.mjs",
     "payments:prove:sandbox": "node scripts/proof/prove-payfast-sandbox-boundary.mjs",
