@@ -44,7 +44,7 @@ jobs:
         run: node scripts/validators/validate-candidate-identity-review-intake.mjs
       - name: Install web dependencies
         run: npm install --prefix apps/web --no-audit --no-fund
-      - name: Run identity review API integration tests
-        run: node scripts/tests/test-candidate-identity-review-api.mjs
       - name: Build Next.js web application
         run: npm --prefix apps/web run build
+      - name: Run identity review API integration tests
+        run: node scripts/tests/test-candidate-identity-review-api.mjs
