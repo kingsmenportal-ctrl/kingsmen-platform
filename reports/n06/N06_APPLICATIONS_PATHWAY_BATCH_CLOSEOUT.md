@@ -23,21 +23,19 @@ This is a reversible feature increment intended to be corrected or extended duri
 
 ## Validation status
 - Source files and package commands are committed.
-- CI and TypeScript/Next.js build are not yet confirmed green.
-- Migration 0060 is not applied.
+- N06 source-guard CI passed on the current branch commit; the TypeScript/Next.js production build is still running.
+- Migration 0060 is already recorded in staging. Follow-up migration 0073 revokes direct browser-role grants from N06 tables and restricts event-table writes to service_role.
 - Live API contract and candidate isolation probe are not run.
 - Opportunity data is not seeded; an authorised source-review/ingestion process must publish and verify real opportunities.
 - No live provider portal is automated or submitted by this batch.
 - productionReady remains false.
 
 ## Release gates
-1. Obtain actionable CI logs and resolve any failing source/build checks.
-2. Review migration 0060 against the actual staging schema; confirm document and profile field names.
-3. Apply migration through the approved migration process.
-4. Run source validator and production build.
-5. Run isolation probe using two dedicated synthetic staging candidate sessions.
-6. Add an authorised reviewer workflow for provider-confirmed submission/outcome status changes.
-7. Validate accessibility, retention, error recovery, and application lifecycle end-to-end.
+1. Confirm all GitHub Actions source-guard and production-build checks are green.
+2. Verify migration 0073's effective table grants and RLS policies in staging.
+3. Run the two-candidate isolation probe using dedicated synthetic staging sessions.
+4. Validate candidate-to-reviewer handoff with authenticated synthetic data.
+5. Validate accessibility, retention, error recovery, and application lifecycle end-to-end.
 
 ## Fix-forward contract
 Future work may alter schema, UI, readiness rules, provider ingestion, review queues, and evidence handling. Preserve the rule that internal readiness does not equal submission, and candidate assertions do not equal provider confirmation. Add fixes as follow-up commits with their own validation evidence.

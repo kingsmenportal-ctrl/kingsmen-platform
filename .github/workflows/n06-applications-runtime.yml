@@ -8,6 +8,7 @@ on:
       - "apps/web/src/app/candidate/dashboard/page.tsx"
       - "apps/web/src/lib/candidate-document-runtime.ts"
       - "db/migrations/0060_n06_application_pathway_runtime.sql"
+      - "db/migrations/0073_n06_application_privilege_hardening.sql"
       - "scripts/validators/validate-n06-applications-runtime.mjs"
       - "scripts/tests/n06-application-isolation.integration.mjs"
       - ".github/workflows/n06-applications-runtime.yml"

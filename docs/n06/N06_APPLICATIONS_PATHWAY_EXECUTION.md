@@ -1,6 +1,6 @@
 # N06 Applications and Pathway Execution
 
-Status: Implementation batch pushed for review; CI, migration, and staging gates remain open.
+Status: N06 implementation is on the feature branch; source-guard CI passed on the current batch, and staging schema dependencies are present. The authenticated two-candidate isolation proof remains unexecuted.
 
 ## Included
 - Six pathway types: higher education, TVET, SETA/learnerships, internships, apprenticeships, employment.
@@ -24,12 +24,12 @@ Status: Implementation batch pushed for review; CI, migration, and staging gates
 - Provider submission, interview, offer, acceptance, and rejection cannot be asserted without evidence and provider references.
 - Manual packages are guidance; they do not bypass OTP/CAPTCHA or claim success.
 - This batch does not invent or seed provider opportunities. Only published records appear, and sources must be verified through an authorised review process.
-- SQL migration is not applied by CI or this code push.
+- Migration 0060 and the N07–N09 migrations are already recorded in staging; migration 0073 is a separate least-privilege hardening migration.
 - Integration tests must use synthetic staging candidates, never real candidate PII.
 
 ## Validation
 - Source validator command: npm run n06:applications:validate
 - Isolation probe command: npm run n06:applications:test
 - Probe requires N06_BASE_URL, N06_CANDIDATE_A_TOKEN, and N06_CANDIDATE_B_TOKEN. Missing values are BLOCKED, not PASS.
-- Confirm staging schema field names and migration review before runtime testing.
+- The staging schema contains candidates, document_files, and candidate_profile_field_sources; the authenticated isolation probe still requires dedicated synthetic candidate sessions.
 - productionReady remains false until CI, production build, migration, API contract, and isolation checks pass.
