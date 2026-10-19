@@ -107,6 +107,8 @@ This does not authorize live payments. Run real PayFast sandbox checkout against
 
 ## RLS/security proof command
 
+RLS/security source-level boundary is implemented and validated; staging role-isolation proof remains required.
+
 ```bash
 npm run security:prove:rls
 npm run security:validate:rls
