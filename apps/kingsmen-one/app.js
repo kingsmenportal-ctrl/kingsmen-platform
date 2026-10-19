@@ -27,6 +27,33 @@
   const button = (text,attrs="",secondary=true) => { const match=attrs.match(/\sclass="([^"]+)"/); const classes=match?match[1]:(secondary?"secondary-button":"primary-button"); const clean=attrs.replace(/\sclass="[^"]+"/,""); return `<button class="${classes}" ${clean}>${text}</button>`; };
   const taskList = (limit=10) => state.tasks.slice(0,limit).map(t=>`<div class="task-row"><button class="task-check ${t.done?"done":""}" data-task="${t.id}" aria-label="${t.done?"Mark incomplete":"Mark complete"}: ${escapeHtml(t.title)}">${t.done?"✓":""}</button><div class="task-info"><strong>${escapeHtml(t.title)}</strong><small>${escapeHtml(t.detail)}</small></div><span class="tag ${t.done?"done":"pending"}">${t.done?"Complete":"To do"}</span></div>`).join("");
   const progress = () => Math.round(state.tasks.filter(t=>t.done).length / state.tasks.length * 100);
+  const supabaseClient = window.kingsmenSupabase || null;
+  let authSession = null;
+  let authMessage = "";
+  let authBusy = false;
+  async function refreshAuthSession() {
+    if (!supabaseClient) return;
+    try {
+      const { data, error } = await supabaseClient.auth.getSession();
+      if (error) throw error;
+      authSession = data.session;
+      if (activeView === "account") render("account");
+      updateAuthStatus();
+    } catch (error) { authMessage = error.message || "Unable to read account session."; }
+  }
+  function updateAuthStatus() {
+    const user = authSession?.user;
+    const side = document.querySelector(".sidebar-bottom");
+    if (side) side.innerHTML = `<span class="avatar">${user?"✓":"KM"}</span><div><strong>${user?escapeHtml(user.email||"Signed in"):"Preview candidate"}</strong><small>${user?"Account authenticated · candidate link pending":"Local preview profile"}</small></div><span class="online-dot" title="${user?"Authenticated account":"Preview mode"}"></span>`;
+    const notice=document.querySelector(".notice p");
+    if (notice && user) notice.innerHTML="<strong>Account authenticated.</strong> Your account is not yet linked to an authorised Kingsmen candidate record. Candidate records and documents remain unavailable until identity review is completed.";
+  }
+  function accountView() {
+    const user=authSession?.user;
+    if (!supabaseClient) return `${heading("Account access","Authentication could not initialise. Check network access and the Supabase client configuration.")}<div class="panel"><p>Account actions are unavailable until the Supabase client loads.</p></div>`;
+    if (user) return `${heading("Your account","Your Supabase Auth session is active. This does not establish candidate identity.")}<div class="panel"><span class="tag done">Authenticated</span><h3 style="margin-top:14px">${escapeHtml(user.email||"Signed-in user")}</h3><p class="panel-subtitle">Account ID: ${escapeHtml(user.id)}</p><div class="notice"><span>ⓘ</span><p>Your account is not yet linked to an authorised Kingsmen candidate record. No existing candidate data is loaded or changed. Do not enter sensitive information in the local preview.</p></div><button class="primary-button" id="sign-out-button" type="button" ${authBusy?"disabled":""}>Sign out</button><p class="muted-note">Next required step: request identity review using the official candidate reference. Email matching alone will never link your account.</p></div>`;
+    return `${heading("Sign in or create an account","Use a real account session. Signing in does not automatically claim an existing candidate record.")}<div class="content-grid"><form class="panel" id="auth-form"><h3>Account access</h3><p class="panel-subtitle">Use an email you control. A confirmation email may be required.</p><label class="form-label" for="auth-email">Email address</label><input class="filter-input form-control" type="email" id="auth-email" name="email" autocomplete="email" required maxlength="254" placeholder="you@example.com"><label class="form-label" for="auth-password">Password</label><input class="filter-input form-control" type="password" id="auth-password" name="password" autocomplete="current-password" required minlength="8" maxlength="128" placeholder="At least 8 characters"><div class="auth-actions"><button class="primary-button" type="submit" name="auth-action" value="signin" ${authBusy?"disabled":""}>Sign in</button><button class="secondary-button" type="submit" name="auth-action" value="signup" ${authBusy?"disabled":""}>Create account</button></div><button class="text-button" type="button" id="reset-password-button">Send password reset email</button><p id="auth-message" class="muted-note" role="status" aria-live="polite">${escapeHtml(authMessage||"")}</p></form><div class="panel"><h3>Identity protection</h3><div class="task-list"><div class="task-row"><span class="task-check done">✓</span><div class="task-info"><strong>Secure account session</strong><small>Handled by Supabase Auth.</small></div></div><div class="task-row"><span class="task-check done">✓</span><div class="task-info"><strong>No automatic candidate matching</strong><small>An email match alone cannot establish identity.</small></div></div><div class="task-row"><span class="task-check">!</span><div class="task-info"><strong>Authorised identity review still required</strong><small>Candidate records stay locked until the link is verified.</small></div></div></div><p class="muted-note">Do not upload identity documents to this preview. The private document flow is not yet connected to this interface.</p></div></div>`;
+  }
   function home() {
     return `${heading("Your overview","A practical view of what is ready and what needs attention.",button("View my tasks",'data-view="applications"'))}
       <div class="stats-grid">
@@ -69,23 +96,56 @@
     const events=[...state.tasks.filter(t=>t.done).map(t=>({title:"Candidate marked preparation item complete",detail:t.title,kind:"Candidate-reported",date:"This browser session"})),...state.saved.map(id=>({title:"Opportunity saved",detail:opportunities.find(o=>o.id===id)?.title||id,kind:"Candidate action",date:"This browser session"})),...Object.keys(state.applicationNotes).map(id=>({title:"Preparation record created",detail:opportunities.find(o=>o.id===id)?.title||id,kind:"Candidate-reported",date:"This browser session"}))];
     return `${heading("Activity & evidence","See what you reported or prepared. Independently verified evidence is not available in demo mode.")}<div class="panel"><h3>Recent activity</h3><p class="panel-subtitle">Local actions only · no server-side audit record</p>${events.length?'<div class="activity-list">'+events.reverse().map(e=>`<div class="activity-item"><span class="activity-dot"></span><div><strong>${e.title}</strong><p>${e.detail}</p><small>${e.kind} · ${e.date}</small></div></div>`).join("")+'</div>':'<div class="empty-state"><strong>No activity yet</strong><p>Save an opportunity or complete a preparation item to see local activity here.</p></div>'}<p class="muted-note">Candidate-reported progress is not the same as reviewer-verified evidence or a provider-confirmed outcome.</p></div>`;
   }
-  const views={home,profile:profileView,pathways:pathwaysView,opportunities:opportunitiesView,applications:applicationsView,documents:documentsView,activity:activityView};
+  const views={home,account:accountView,profile:profileView,pathways:pathwaysView,opportunities:opportunitiesView,applications:applicationsView,documents:documentsView,activity:activityView};
   function render(view=activeView) {
-    activeView=view; const labels={home:"Overview",profile:"My profile",pathways:"My pathways",opportunities:"Opportunities",applications:"Applications",documents:"Documents",activity:"Activity & evidence"};
+    activeView=view; const labels={home:"Overview",account:"Sign in / account",profile:"My profile",pathways:"My pathways",opportunities:"Opportunities",applications:"Applications",documents:"Documents",activity:"Activity & evidence"};
     crumb.textContent=labels[view]||"Overview";
     document.querySelectorAll(".nav-item").forEach(b=>b.classList.toggle("active",b.dataset.view===view));
     document.getElementById("welcome").classList.toggle("hidden",view!=="home");
     root.innerHTML=(views[view]||home)();
     if(view==="opportunities"){renderOpportunityCards();document.getElementById("opportunity-search").addEventListener("input",renderOpportunityCards);document.getElementById("opportunity-filter").addEventListener("change",renderOpportunityCards);}
   }
-  document.addEventListener("submit",e=>{
+  document.addEventListener("submit",async e=>{
+    if(e.target.id==="auth-form") {
+      e.preventDefault();
+      if(!supabaseClient){toast("Account service unavailable.");return;}
+      const form=new FormData(e.target), email=String(form.get("email")||"").trim(), password=String(form.get("password")||"");
+      const action=e.submitter?.value||"signin";
+      authBusy=true;authMessage="Working securely with Supabase Auth…";render("account");
+      try {
+        const result=action==="signup"
+          ? await supabaseClient.auth.signUp({email,password})
+          : await supabaseClient.auth.signInWithPassword({email,password});
+        if(result.error) throw result.error;
+        authSession=result.data.session||null;
+        authMessage=action==="signup"&&!authSession?"Account created if permitted. Check your email for a confirmation link before signing in.": "Sign-in successful.";
+        if(authSession) authMessage="Account authenticated. Candidate identity has not been linked or verified.";
+        render("account");updateAuthStatus();
+      } catch(error) { authMessage=error.message||"Account action failed.";render("account"); }
+      finally {authBusy=false;}
+      const msg=document.getElementById("auth-message");if(msg)msg.textContent=authMessage;
+      return;
+    }
+    if(e.target.id!=="profile-form")return;
     if(e.target.id!=="profile-form")return;
     e.preventDefault();
     const form=new FormData(e.target);
     state.profile={fullName:String(form.get("fullName")||"").trim(),province:String(form.get("province")||""),qualification:String(form.get("qualification")||""),interests:form.getAll("interest").map(String)};
     save();render("profile");toast("Demo profile saved in this browser.");
   });
-  document.addEventListener("click",e=>{
+  document.addEventListener("click",async e=>{
+    if(e.target.closest("#sign-out-button")) {
+      if(supabaseClient){const {error}=await supabaseClient.auth.signOut();if(error){toast("Could not sign out.");return;}}
+      authSession=null;authMessage="Signed out.";render("account");updateAuthStatus();return;
+    }
+    if(e.target.closest("#reset-password-button")) {
+      if(!supabaseClient){toast("Account service unavailable.");return;}
+      const email=String(document.getElementById("auth-email")?.value||"").trim();
+      if(!email){authMessage="Enter your email address first.";const m=document.getElementById("auth-message");if(m)m.textContent=authMessage;return;}
+      const {error}=await supabaseClient.auth.resetPasswordForEmail(email);
+      authMessage=error?(error.message||"Password reset could not be requested."):"If the account exists, a password reset email will be sent.";
+      const m=document.getElementById("auth-message");if(m)m.textContent=authMessage;return;
+    }
     const nav=e.target.closest("[data-view]");if(nav){e.preventDefault();render(nav.dataset.view);return;}
     const task=e.target.closest("[data-task]");if(task){const t=state.tasks.find(x=>x.id===task.dataset.task);if(t){t.done=!t.done;save();render();toast("Demo preparation progress updated.");}return;}
     const saveButton=e.target.closest("[data-save]");if(saveButton){const id=saveButton.dataset.save;state.saved=state.saved.includes(id)?state.saved.filter(x=>x!==id):[...state.saved,id];save();renderOpportunityCards();toast(state.saved.includes(id)?"Saved in this browser.":"Removed from saved opportunities.");return;}
