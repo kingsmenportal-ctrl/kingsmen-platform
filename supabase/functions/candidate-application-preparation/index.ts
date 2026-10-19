@@ -59,12 +59,25 @@ Deno.serve(async(req:Request)=>{
   if(oppError||!opportunity){console.error("saved opportunity sync failed",oppError?.code??"unknown");return reply(503,{error:"Could not connect the saved opportunity to the candidate workspace."},origin);}
   const {data:existing,error:existingError}=await admin.from("candidate_application_tracker").select("id,candidate_id,saved_opportunity_id,status,candidate_note,evidence_reference,created_at,updated_at").eq("candidate_id",candidateId).eq("saved_opportunity_id",opportunity.id).maybeSingle();
   if(existingError){console.error("tracker duplicate lookup failed",existingError.code??"unknown");return reply(503,{error:"Could not check the application tracker."},origin);}
-  if(existing)return reply(200,{ready:true,tracker:existing,already_exists:true,message:"This saved opportunity already has a preparation tracker."},origin);
+  const defaults=[{item_type:"TASK",title:"Review the official opportunity requirements"},{item_type:"DOCUMENT",title:"Prepare the documents requested by the provider"},{item_type:"TASK",title:"Check eligibility and closing date"},{item_type:"TASK",title:"Review the application before any submission"}];
+  if(existing){
+   const {data:existingItems,error:existingItemsError}=await admin.from("candidate_application_preparation_items").select("id").eq("tracker_id",existing.id).eq("candidate_id",candidateId).limit(1);
+   if(existingItemsError){console.error("existing checklist lookup failed",existingItemsError.code??"unknown");return reply(503,{error:"Could not check the existing preparation checklist."},origin);}
+   if(!existingItems?.length){
+    const {error:repairError}=await admin.from("candidate_application_preparation_items").insert(defaults.map(i=>({...i,tracker_id:existing.id,candidate_id:candidateId,candidate_note:"",official_source_url:officialUrl,evidence_reference:"",status:"NOT_STARTED",required_by_candidate:true})));
+    if(repairError){console.error("existing checklist repair failed",repairError.code??"unknown");return reply(503,{error:"The tracker exists, but its checklist still needs repair. Please retry shortly."},origin);}
+   }
+   return reply(200,{ready:true,tracker:existing,already_exists:true,message:"This saved opportunity already has a preparation tracker; its default checklist was checked and repaired if missing."},origin);
+  }
   const {data:tracker,error:trackerError}=await admin.from("candidate_application_tracker").insert({candidate_id:candidateId,saved_opportunity_id:opportunity.id,status:"SAVED",candidate_note:"",evidence_reference:""}).select("id,candidate_id,saved_opportunity_id,status,candidate_note,evidence_reference,created_at,updated_at").single();
   if(trackerError||!tracker){console.error("tracker create failed",trackerError?.code??"unknown");return reply(503,{error:"Could not create the application tracker."},origin);}
-  const defaults=[{item_type:"TASK",title:"Review the official opportunity requirements"},{item_type:"DOCUMENT",title:"Prepare the documents requested by the provider"},{item_type:"TASK",title:"Check eligibility and closing date"},{item_type:"TASK",title:"Review the application before any submission"}];
   const {error:itemError}=await admin.from("candidate_application_preparation_items").insert(defaults.map(i=>({...i,tracker_id:tracker.id,candidate_id:candidateId,candidate_note:"",official_source_url:officialUrl,evidence_reference:"",status:"NOT_STARTED",required_by_candidate:true})));
-  if(itemError){console.error("default checklist create failed",itemError.code??"unknown");return reply(503,{error:"Tracker created, but its checklist could not be completed. Reload the tracker and contact support before retrying."},origin);}
+  if(itemError){
+   console.error("default checklist create failed",itemError.code??"unknown");
+   const {error:cleanupError}=await admin.from("candidate_application_tracker").delete().eq("id",tracker.id).eq("candidate_id",candidateId);
+   if(cleanupError)console.error("partial tracker cleanup failed",cleanupError.code??"unknown");
+   return reply(503,{error:cleanupError?"Tracker creation failed and needs support cleanup; do not retry repeatedly.":"Tracker creation was rolled back; retry shortly."},origin);
+  }
   return reply(201,{ready:true,tracker,already_exists:false,message:"Preparation tracker and four checklist items created. This is not a provider application or submission."},origin);
  }
  if(p.action==="update_tracker"){
