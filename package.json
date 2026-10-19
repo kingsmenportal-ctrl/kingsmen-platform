@@ -52,6 +52,7 @@
     "api:start": "npm --prefix apps/api start",
     "api:validate": "node scripts/validators/validate-api-truth-vault-persistence.mjs",
     "api:validate:truth-vault": "node scripts/validators/validate-api-truth-vault-persistence.mjs",
+    "db:validate:fk-index-hardening": "node scripts/validators/validate-fk-index-hardening.mjs",
     "payments:prove:sandbox": "node scripts/proof/prove-payfast-sandbox-boundary.mjs",
     "payments:validate:sandbox": "node scripts/validators/validate-payfast-sandbox-proof.mjs",
     "security:prove:rls": "node scripts/proof/prove-rls-security-boundary.mjs",
