@@ -1,6 +1,6 @@
 # N06 Applications and Pathway Execution
 
-Status: N06 implementation is on the feature branch; source-guard CI passed on the current batch, and staging schema dependencies are present. The authenticated two-candidate isolation proof remains unexecuted.
+Status: N06 implementation is on the feature branch. Source guards and the Next.js production build passed on commit abeccea18d3a0d76d9ded9b2d2ce6d1122bf1d9b. Staging migration 0073 is applied and privilege checks are verified. The authenticated two-candidate isolation proof remains unexecuted.
 
 ## Included
 - Six pathway types: higher education, TVET, SETA/learnerships, internships, apprenticeships, employment.
@@ -31,5 +31,6 @@ Status: N06 implementation is on the feature branch; source-guard CI passed on t
 - Source validator command: npm run n06:applications:validate
 - Isolation probe command: npm run n06:applications:test
 - Probe requires N06_BASE_URL, N06_CANDIDATE_A_TOKEN, and N06_CANDIDATE_B_TOKEN. Missing values are BLOCKED, not PASS.
-- The staging schema contains candidates, document_files, and candidate_profile_field_sources; the authenticated isolation probe still requires dedicated synthetic candidate sessions.
+- The staging schema contains candidates, document_files, and candidate_profile_field_sources. The database proof confirmed RLS on all four N06 tables, service-role-only policies, no anon/authenticated table privileges, and append-only event-table permissions. The Supabase security advisor returned no lints.
+- Authenticated two-candidate API isolation remains unexecuted; no live proof is claimed from static CI.
 - productionReady remains false until CI, production build, migration, API contract, and isolation checks pass.

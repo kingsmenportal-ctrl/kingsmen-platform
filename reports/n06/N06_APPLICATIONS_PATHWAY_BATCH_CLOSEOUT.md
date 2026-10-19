@@ -23,9 +23,9 @@ This is a reversible feature increment intended to be corrected or extended duri
 
 ## Validation status
 - Source files and package commands are committed.
-- N06 source-guard CI passed on the current branch commit; the TypeScript/Next.js production build is still running.
-- Migration 0060 is already recorded in staging. Follow-up migration 0073 revokes direct browser-role grants from N06 tables and restricts event-table writes to service_role.
-- Live API contract and candidate isolation probe are not run.
+- N06 source guards, shared validation, N05 source guards, and the Next.js production build all passed on commit abeccea18d3a0d76d9ded9b2d2ce6d1122bf1d9b.
+- Migration 0060 is already recorded in staging; migration 0073 was applied at 2026-10-19 08:29 UTC. Post-migration SQL verified RLS enabled, service_role-only policies, no anon/authenticated table privileges, and event-table SELECT/INSERT-only service-role grants. The Supabase security advisor returned no lints.
+- Authenticated live API contract and two-candidate isolation probe remain unexecuted; source/build/database proofs are not represented as a substitute for this runtime proof.
 - Opportunity data is not seeded; an authorised source-review/ingestion process must publish and verify real opportunities.
 - No live provider portal is automated or submitted by this batch.
 - productionReady remains false.
