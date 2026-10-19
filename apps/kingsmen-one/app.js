@@ -98,7 +98,7 @@
         target.innerHTML="<div class=\"empty-state\"><strong>No verified live listings are currently available.</strong><p>Kingsmen will not invent listings or show practice records as real opportunities. Check again later, or use the clearly separated demo records to practise.</p></div>";
         return;
       }
-      target.innerHTML="<div class=\"opportunity-grid\">"+rows.map(o=>"<article class=\"opportunity-card\"><span class=\"provider\">VERIFIED SOURCE · "+escapeHtml(o.source_confidence_band||"")+"</span><h3>"+escapeHtml(o.programme_name||"Opportunity")+"</h3><p>"+escapeHtml(o.eligibility_summary||"Review official eligibility requirements at the source.")+"</p><div class=\"details\">"+escapeHtml(o.route_type||"Pathway")+" · "+escapeHtml(o.province||"South Africa")+"<br><br>Status: "+escapeHtml(o.availability_status||"Verify availability")+"<br>Source checked: "+escapeHtml(o.updated_at?new Date(o.updated_at).toLocaleDateString():"date unavailable")+"</div><a class=\"secondary-button\" href=\""+escapeHtml(o.source_url)+"\" target=\"_blank\" rel=\"noopener noreferrer\">Open official source ↗</a></article>").join("")+"</div>";
+      target.innerHTML="<div class=\"opportunity-grid\">"+rows.map(o=>"<article class=\"opportunity-card\"><span class=\"provider\">VERIFIED SOURCE · "+escapeHtml(o.source_confidence_band||"")+"</span><h3>"+escapeHtml(o.programme_name||"Opportunity")+"</h3><p>"+escapeHtml(o.eligibility_summary||"Review official eligibility requirements at the source.")+"</p><div class=\"details\">"+escapeHtml(o.route_type||"Pathway")+" · "+escapeHtml(o.province||"South Africa")+"<br><br>Status: "+escapeHtml(o.availability_status||"Verify availability")+"<br>Source checked: "+escapeHtml(o.updated_at?new Date(o.updated_at).toLocaleDateString():"date unavailable")+"</div><a class=\"secondary-button\" href=\""+escapeHtml(o.source_url)+"\" target=\"_blank\" rel=\"noopener noreferrer\">Open official source ↗</a><button class=\\"secondary-button\\" data-save-route=\\""+escapeHtml(o.id)+"\\">Save to my account</button></article>").join("")+"</div>";
     } catch(error) {
       target.innerHTML="<div class=\"empty-state\"><strong>Verified listings could not be loaded.</strong><p>The live source check failed. Demo records remain clearly labelled separately.</p></div>";
     }
@@ -174,6 +174,20 @@
     const nav=e.target.closest("[data-view]");if(nav){e.preventDefault();render(nav.dataset.view);return;}
     const task=e.target.closest("[data-task]");if(task){const t=state.tasks.find(x=>x.id===task.dataset.task);if(t){t.done=!t.done;save();render();toast("Demo preparation progress updated.");}return;}
     const saveButton=e.target.closest("[data-save]");if(saveButton){const id=saveButton.dataset.save;state.saved=state.saved.includes(id)?state.saved.filter(x=>x!==id):[...state.saved,id];save();renderOpportunityCards();toast(state.saved.includes(id)?"Saved in this browser.":"Removed from saved opportunities.");return;}
+    const liveSave=e.target.closest("[data-save-route]");
+    if(liveSave){
+      if(!supabaseClient||!authSession?.user){toast("Sign in first to save a verified opportunity to your account.");render("account");return;}
+      liveSave.disabled=true;
+      try {
+        const result=await supabaseClient.from("candidate_saved_routes").insert({user_id:authSession.user.id,route_programme_id:liveSave.dataset.saveRoute});
+        if(result.error) {
+          if(result.error.code==="23505"){toast("This opportunity is already saved to your account.");}
+          else throw result.error;
+        } else toast("Verified opportunity saved to your account.");
+      } catch(error) {toast(error.message||"Could not save this opportunity. Your account policy may block it.");}
+      finally {liveSave.disabled=false;}
+      return;
+    }
     const app=e.target.closest("[data-application]");if(app){state.applicationNotes[app.dataset.application]=true;save();render();toast("Local preparation record created—not submitted.");return;}
     const doc=e.target.closest("[data-document]");if(doc){const id=doc.dataset.document;state.documents[id]=state.documents[id]==="prepared"?"not-started":"prepared";save();render();toast("Demo readiness state updated.");return;}
     const path=e.target.closest("[data-path]");if(path){
