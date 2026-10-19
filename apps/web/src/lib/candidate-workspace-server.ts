@@ -33,13 +33,13 @@ export async function resolveReviewedCandidate(request: Request): Promise<{ cand
   if (!user?.id) throw new WorkspaceAuthError("Your session could not be verified.");
 
   const identityResponse = await fetch(
-    `${config.url}/rest/v1/candidate_auth_identities?select=candidate_id,link_status,reviewed_at,auth_user_id&auth_user_id=eq.${encodeURIComponent(user.id)}&link_status=eq.ACTIVE&reviewed_at=not.is.null&limit=1`,
+    `${config.url}/rest/v1/candidate_auth_identity_links?select=candidate_id,link_status,verified_at,supabase_user_id&supabase_user_id=eq.${encodeURIComponent(user.id)}&link_status=eq.VERIFIED&verified_at=not.is.null&limit=1`,
     { headers: { apikey: config.service, Authorization: `Bearer ${config.service}` }, cache: "no-store" }
   );
   if (!identityResponse.ok) throw new WorkspaceAuthError("Candidate identity could not be verified.", 503);
-  const links = await identityResponse.json() as Array<{ candidate_id: string; auth_user_id: string }>;
-  if (links.length !== 1 || links[0].auth_user_id !== user.id || !links[0].candidate_id) {
-    throw new WorkspaceAuthError("Your account is not linked to a candidate record through authorised review.", 403);
+  const links = await identityResponse.json() as Array<{ candidate_id: string; supabase_user_id: string }>;
+  if (links.length !== 1 || links[0].supabase_user_id !== user.id || !links[0].candidate_id) {
+    throw new WorkspaceAuthError("Your account is not linked to a verified candidate record through authorised review.", 403);
   }
   return { candidateId: links[0].candidate_id, authUserId: user.id };
 }
