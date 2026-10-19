@@ -1,6 +1,7 @@
 "use client";
 
 import { FormEvent, useEffect, useState } from "react";
+import { candidateWorkspaceRequest } from "@/lib/candidate-workspace-client";
 
 type SavedOpportunity = {
   id: string;
@@ -26,38 +27,50 @@ export default function SavedOpportunitiesClient() {
   const [items, setItems] = useState<SavedOpportunity[]>([]);
   const [loaded, setLoaded] = useState(false);
   const [error, setError] = useState("");
+  const [syncStatus, setSyncStatus] = useState("Checking your Kingsmen account session…");
+  const [syncEnabled, setSyncEnabled] = useState(false);
   const [form, setForm] = useState({ title: "", organisation: "", url: "", pathway: "employment", closingDate: "" });
 
   useEffect(() => {
-    try {
-      const raw = window.localStorage.getItem(STORAGE_KEY);
-      if (raw) {
-        const parsed: unknown = JSON.parse(raw);
-        if (Array.isArray(parsed)) {
-          setItems(parsed.filter((item): item is SavedOpportunity =>
-            !!item && typeof item.id === "string" && typeof item.title === "string" &&
-            typeof item.organisation === "string" && typeof item.url === "string" &&
-            typeof item.pathway === "string" && typeof item.closingDate === "string" &&
-            typeof item.savedAt === "string"
-          ));
-        }
+    let cancelled = false;
+    async function loadWorkspace() {
+      try {
+        const result = await candidateWorkspaceRequest<{ opportunities: SavedOpportunity[] }>("GET");
+        if (cancelled) return;
+        setItems(Array.isArray(result.opportunities) ? result.opportunities : []);
+        setSyncEnabled(true);
+        setSyncStatus("Synced with your authenticated Kingsmen account and Truth Vault.");
+      } catch (failure) {
+        if (cancelled) return;
+        try {
+          const raw = window.localStorage.getItem(STORAGE_KEY);
+          if (raw) {
+            const parsed: unknown = JSON.parse(raw);
+            if (Array.isArray(parsed)) setItems(parsed.filter((item): item is SavedOpportunity =>
+              !!item && typeof item.id === "string" && typeof item.title === "string" &&
+              typeof item.organisation === "string" && typeof item.url === "string" &&
+              typeof item.pathway === "string" && typeof item.closingDate === "string" &&
+              typeof item.savedAt === "string"
+            ));
+          }
+        } catch { /* Offline cache is optional. */ }
+        setSyncStatus(failure instanceof Error ? failure.message : "Sign in to sync your shortlist.");
+      } finally {
+        if (!cancelled) setLoaded(true);
       }
-    } catch {
-      setError("Saved items could not be read from this browser. You can still add items during this session.");
     }
-    setLoaded(true);
+    void loadWorkspace();
+    return () => { cancelled = true; };
   }, []);
 
   useEffect(() => {
     if (!loaded) return;
-    try {
-      window.localStorage.setItem(STORAGE_KEY, JSON.stringify(items));
-    } catch {
-      setError("Browser storage is unavailable. Changes may not survive leaving this page.");
-    }
+    try { window.localStorage.setItem(STORAGE_KEY, JSON.stringify(items)); }
+    catch { /* Local cache is optional; Truth Vault remains the source of truth when signed in. */ }
   }, [items, loaded]);
 
-  function addOpportunity(event: FormEvent<HTMLFormElement>) {
+
+  async function addOpportunity(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
     setError("");
     let parsedUrl: URL;
@@ -84,11 +97,33 @@ export default function SavedOpportunitiesClient() {
       closingDate: form.closingDate,
       savedAt: new Date().toISOString()
     };
-    setItems((current) => [item, ...current]);
+    if (syncEnabled) {
+      try {
+        const result = await candidateWorkspaceRequest<{ opportunity: SavedOpportunity }>("POST", {
+          title: item.title, organisation: item.organisation, url: item.url, pathway: item.pathway, closingDate: item.closingDate
+        });
+        setItems((current) => [result.opportunity, ...current.filter((saved) => saved.id !== result.opportunity.id)]);
+        setSyncStatus("Synced with your authenticated Kingsmen account and Truth Vault.");
+      } catch (failure) {
+        setError(failure instanceof Error ? failure.message : "Could not save to your Kingsmen account.");
+        return;
+      }
+    } else {
+      setItems((current) => [item, ...current]);
+      setSyncStatus("Saved locally only. Sign in with an authorised candidate account to sync to the Truth Vault.");
+    }
     setForm({ title: "", organisation: "", url: "", pathway: "employment", closingDate: "" });
   }
 
-  function removeOpportunity(id: string) {
+  async function removeOpportunity(id: string) {
+    if (syncEnabled) {
+      try {
+        await candidateWorkspaceRequest<{ deleted: boolean }>("DELETE", undefined, `?id=${encodeURIComponent(id)}`);
+      } catch (failure) {
+        setError(failure instanceof Error ? failure.message : "Could not remove this saved opportunity.");
+        return;
+      }
+    }
     setItems((current) => current.filter((item) => item.id !== id));
   }
 
@@ -150,7 +185,7 @@ export default function SavedOpportunitiesClient() {
           </div>
         )}
       </section>
-      <p style={{ marginTop: "1.5rem", padding: "1rem", background: "#fff8e8", borderLeft: "4px solid #b7791f", lineHeight: 1.6 }}>This shortlist is saved only in this browser on this device; it is not synced to your Kingsmen account. Saving a link does not submit an application, verify an opportunity, or guarantee eligibility. Confirm details on the official institution or employer website.</p>
+      <p role="status" aria-live="polite" style={{ marginTop: "1.5rem", padding: "1rem", background: "#fff8e8", borderLeft: "4px solid #b7791f", lineHeight: 1.6 }}>{syncStatus} Saving a link does not submit an application, verify an opportunity, or guarantee eligibility. Confirm details on the official institution or employer website.</p>
     </main>
   );
 }
