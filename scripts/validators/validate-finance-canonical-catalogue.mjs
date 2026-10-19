@@ -26,7 +26,7 @@ assertContract(manifest.retired_legacy_plan_codes?.some((p) => p.plan_code === "
 assertContract(business.packages?.length === 7 && business.packages.every((p) => p.status === "CANONICAL"), "canonical-seven-package-manifest-changed");
 assertContract(seed.includes("active = false") && migration.includes("active = false"), "legacy-plan-not-deactivated-in-both-seed-and-migration");
 assertContract(!/up to 8 accommodation applications\/routes|up to 8 ACC-01 accommodation routes/i.test(seed), "unapproved-accommodation-quantity-remains-in-seed");
-assertContract(report.includes("new checkout disabled") && report.includes("Paid checkout remains blocked"), "finance-report-does-not-explain-release-boundary");
+assertContract(report.includes("not selectable for new checkout") && report.includes("Paid checkout remains blocked"), "finance-report-does-not-explain-release-boundary");
 
 const result = { schema: "kingsmen.finance-canonical-catalogue-contract.v1", passed: failures.length === 0, failures, canonicalPackageCount: business.packages?.length ?? 0, selectableLegacyN10Codes: manifest.pricing_locked, retiredLegacyPlan: "ACCOMMODATION_SUPPORT_R179", note: "Source contract only; does not apply migrations or prove provider checkout." };
 console.log(JSON.stringify(result, null, 2));
