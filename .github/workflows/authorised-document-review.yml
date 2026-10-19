@@ -3,7 +3,8 @@ on:
   pull_request:
     paths:
       - "db/migrations/0080_authorised_candidate_document_review.sql"
-      - "apps/web/src/app/api/reviewer/documents/**"\n      - "apps/web/src/app/reviewer/documents/**"
+      - "apps/web/src/app/api/reviewer/documents/**"
+      - "apps/web/src/app/reviewer/documents/**"
       - "scripts/validators/validate-authorised-document-review.mjs"
       - ".github/workflows/authorised-document-review.yml"
   push:
