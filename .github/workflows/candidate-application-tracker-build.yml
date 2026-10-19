@@ -7,6 +7,7 @@ on:
       - "apps/web/src/app/candidate/applications/**"
       - "apps/web/src/lib/candidate-workspace-client.ts"
       - "scripts/validators/validate-candidate-application-tracker.mjs"
+      - "scripts/tests/test-candidate-application-tracker-api.mjs"
       - ".github/workflows/candidate-application-tracker-build.yml"
   push:
     branches: ["feat/candidate-application-tracker"]
