@@ -70,7 +70,7 @@ export async function POST(request: Request) {
     if (!raw) throw new WorkspaceAuthError("Private storage returned no signed upload URL.", 503);
     return NextResponse.json({
       ok: true, source: "truth_vault", document: inserted[0],
-      signedUploadUrl: (raw.startsWith("http://") || raw.startsWith("https://")) ? raw : `${configUrl}/storage/v1/${raw.replace(/^\\/+/, "")}`,
+      signedUploadUrl: (raw.startsWith("http://") || raw.startsWith("https://")) ? raw : configUrl + "/storage/v1/" + raw.replace(/^\/+/, ""),
       uploadToken: data.token || null, expiresInSeconds: 600,
       uploadHeaders: { "Content-Type": mimeType },
       boundary: "Private signed upload; candidate-reported until upload confirmation and authorised review."
