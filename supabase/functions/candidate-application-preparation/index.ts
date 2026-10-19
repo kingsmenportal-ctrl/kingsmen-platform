@@ -74,9 +74,7 @@ Deno.serve(async(req:Request)=>{
   const {error:itemError}=await admin.from("candidate_application_preparation_items").insert(defaults.map(i=>({...i,tracker_id:tracker.id,candidate_id:candidateId,candidate_note:"",official_source_url:officialUrl,evidence_reference:"",status:"NOT_STARTED",required_by_candidate:true})));
   if(itemError){
    console.error("default checklist create failed",itemError.code??"unknown");
-   const {error:cleanupError}=await admin.from("candidate_application_tracker").delete().eq("id",tracker.id).eq("candidate_id",candidateId);
-   if(cleanupError)console.error("partial tracker cleanup failed",cleanupError.code??"unknown");
-   return reply(503,{error:cleanupError?"Tracker creation failed and needs support cleanup; do not retry repeatedly.":"Tracker creation was rolled back; retry shortly."},origin);
+   return reply(503,{error:"Tracker exists but its checklist could not be completed. Retry creating the tracker to repair the missing checklist; existing candidate data will be preserved."},origin);
   }
   return reply(201,{ready:true,tracker,already_exists:false,message:"Preparation tracker and four checklist items created. This is not a provider application or submission."},origin);
  }
