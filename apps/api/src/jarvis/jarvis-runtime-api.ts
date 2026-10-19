@@ -194,10 +194,12 @@ export function evaluateApiJarvisRuntime(input: ApiJarvisRuntimeRequest): ApiJar
     makeEvent(commandRef, correlationId, 1, "command_received", `Jarvis API command received in ${mode}.`)
   ];
 
-  let finalDecision: ApiJarvisFinalDecision = "ALLOW";
+  let finalDecision: ApiJarvisFinalDecision = input.dryRun === false ? "ALLOW" : "DRY_RUN_ONLY";
   let risk: ApiJarvisRuntimeResult["risk"] = "LOW_INFORMATIONAL";
-  let reasonCode = "JARVIS_API_ALLOWED_BY_POLICY";
-  let safeReason = "Jarvis API command is allowed inside runtime policy and evidence gates.";
+  let reasonCode = input.dryRun === false ? "JARVIS_API_ALLOWED_BY_POLICY" : "JARVIS_API_DRY_RUN_ONLY";
+  let safeReason = input.dryRun === false
+    ? "Jarvis API command is allowed inside runtime policy and evidence gates."
+    : "Dry-run only: no external action will be executed.";
   let approvalRequired = false;
   let evidenceRequired = true;
 
@@ -212,28 +214,38 @@ export function evaluateApiJarvisRuntime(input: ApiJarvisRuntimeRequest): ApiJar
   const gateOpen = live ? isLaunchGateOpen(input.launchEvidence) : true;
   const blockedBy = live && !gateOpen ? launchBlockers(input.launchEvidence) : [];
 
-  if (finalDecision !== "BLOCK" && live && !gateOpen) {
+  if (finalDecision === "ALLOW" && live && !gateOpen) {
     finalDecision = "BLOCK";
     risk = "HIGH_PRODUCTION_RISK";
     reasonCode = "JARVIS_API_LAUNCH_EVIDENCE_GATE_BLOCKED";
     safeReason = `Jarvis API blocked the live action because launch evidence is incomplete: ${blockedBy.join(", ")}.`;
-  } else if (finalDecision !== "BLOCK" && live && !founderApprovalRef) {
+  } else if (finalDecision === "ALLOW" && live && !founderApprovalRef) {
     finalDecision = "APPROVAL_REQUIRED";
     risk = "HIGH_PRODUCTION_RISK";
     reasonCode = "JARVIS_API_FOUNDER_APPROVAL_REQUIRED";
     safeReason = "Jarvis API requires founder approval before this live/high-risk action can run.";
     approvalRequired = true;
-  } else if (finalDecision !== "BLOCK" && live && founderApprovalRef) {
+  } else if (finalDecision === "ALLOW" && live && founderApprovalRef) {
     finalDecision = "ALLOW";
     risk = "HIGH_PRODUCTION_RISK";
     reasonCode = "JARVIS_API_APPROVAL_PRESENT_RUNTIME_ALLOWED";
     safeReason = "Founder approval reference is present and launch/evidence gates allow this action.";
   }
 
+  if (finalDecision === "DRY_RUN_ONLY" && live) {
+    risk = "HIGH_PRODUCTION_RISK";
+    if (!gateOpen) {
+      reasonCode = "JARVIS_API_DRY_RUN_ONLY_LAUNCH_GATE_CLOSED";
+      safeReason = `Dry-run only; the live action was not executed because launch evidence is incomplete: ${blockedBy.join(", ")}.`;
+    } else {
+      safeReason = "Dry-run only: launch evidence is present, but the live action was not executed. Explicit non-dry-run mode and required approvals are still necessary.";
+    }
+  }
+
   ledger.push(makeEvent(commandRef, correlationId, 2, finalDecision === "BLOCK" ? "blocked" : "policy_decision", `${reasonCode}: ${safeReason}`));
   ledger.push(makeEvent(commandRef, correlationId, 3, "validator_result", `Jarvis API runtime final decision ${finalDecision}: ${reasonCode}.`));
 
-  const executable = finalDecision === "ALLOW" || finalDecision === "DRY_RUN_ONLY";
+  const executable = finalDecision === "ALLOW";
 
   return {
     ok: executable,
