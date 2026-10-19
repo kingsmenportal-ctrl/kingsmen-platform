@@ -161,8 +161,8 @@ async function waitForApp() {
   }
   throw new Error("Timed out waiting for Next.js.");
 }
-async function api(method, token, body, query = "") {
-  return fetch(`http://127.0.0.1:${appPort}/api/candidate/applications${query}`, {
+async function api(method, token, body, query = "", path = "/api/candidate/applications") {
+  return fetch(`http://127.0.0.1:${appPort}${path}${query}`, {
     method,
     headers: { ...(token ? { Authorization: `Bearer ${token}` } : {}), ...(body === undefined ? {} : { "Content-Type": "application/json" }) },
     ...(body === undefined ? {} : { body: JSON.stringify(body) })
