@@ -20,8 +20,8 @@ const saved = read("apps/web/src/components/saved-opportunities-client.tsx");
 
 for (const token of [
   "candidate_auth_identity_links", "verified_at", "verified_by", "current_verified_candidate_id", "candidate_workspace_readiness",
-  "candidate_saved_opportunities", "ENABLE ROW LEVEL SECURITY", "auth.uid()",
-  "candidate_workspace_readiness_update_own", "candidate_saved_opportunities_delete_own"
+  "candidate_workspace_saved_opportunities", "ENABLE ROW LEVEL SECURITY", "auth.uid()",
+  "candidate_workspace_readiness_update_own", "candidate_workspace_saved_opportunities_delete_own"
 ]) if (!migration.includes(token)) failures.push(`Migration missing ownership/security invariant: ${token}`);
 
 for (const token of [
@@ -31,7 +31,7 @@ for (const token of [
 if (/user\.email\s*===?|email\s*===?\s*.*candidate/i.test(server)) failures.push("Identity must never be linked by email matching.");
 if (server.includes("NEXT_PUBLIC_SUPABASE_SERVICE_ROLE_KEY")) failures.push("Service role key must never use a public environment variable.");
 
-for (const token of ["resolveReviewedCandidate", "candidate_id: candidateId", "candidate_saved_opportunities", "candidate_workspace_readiness", "candidateId"]) {
+for (const token of ["resolveReviewedCandidate", "candidate_id: candidateId", "candidate_workspace_saved_opportunities", "candidate_workspace_readiness", "candidateId"]) {
   if (!route.includes(token)) failures.push(`API route missing ownership/persistence control: ${token}`);
 }
 for (const token of ["candidateWorkspaceRequest", '"PATCH"', "Truth Vault"]) {
