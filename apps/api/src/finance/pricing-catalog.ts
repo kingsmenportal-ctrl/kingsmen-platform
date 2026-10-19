@@ -24,18 +24,6 @@ export const KINGSMEN_PRICING_CATALOG: readonly FinancePlan[] = [
     cvVersions: 15,
     motivationLetters: 15,
     doctrineNotes: "Never invent fake experience, qualifications, references, certificates, skills, or results."
-  },
-  {
-    planCode: "ACCOMMODATION_SUPPORT_R179",
-    planName: "Accommodation Support Package",
-    description: "Standalone support for up to 8 accommodation applications/routes.",
-    amountCents: 17900,
-    currency: "ZAR",
-    managedApplicationCount: 8,
-    accommodationRouteCount: 8,
-    cvVersions: 0,
-    motivationLetters: 0,
-    doctrineNotes: "Accommodation route support with evidence-backed readiness."
   }
 ] as const;
 
