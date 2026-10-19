@@ -1,6 +1,6 @@
-# N10 â€” Finance / PayFast Runtime
+# N10 — Finance / PayFast Runtime
 
-Status: Built and validation-ready.
+Status: Source foundation present; staging runtime validation and founder approval pending.
 
 N10 creates the Kingsmen finance and PayFast runtime foundation.
 
@@ -23,10 +23,22 @@ Created:
 - N10 migration runner
 - N10 validator
 
-Locked pricing:
+Currently approved finance-catalog entries:
 - FREE_DESTINY_MAP_R0 = R0.00
 - CV_REVAMP_R49_99 = R49.99
-- ACCOMMODATION_SUPPORT_R179 = R179.00
+
+The seven canonical Kingsmen packages and prices are defined in
+`manifests/business/package-catalogue.json`, but their exact managed quantities,
+durations, service limits, and checkout specifications still require completion before
+they can be enabled for payment.
+
+Accommodation policy:
+- Accommodation support is a package privilege where relevant, subject to verification,
+  availability, consent, and no rent/payment handling by Kingsmen.
+- The standalone ACCOMMODATION_SUPPORT_R179 plan is not approved for checkout and is
+  not seeded as an active plan.
+- Do not claim a specific number of included accommodation routes until the canonical
+  package specification has been approved.
 
 Finance doctrine:
 - No payment secrets committed.

@@ -3,6 +3,9 @@ export type CurrencyCode = "ZAR";
 export type FinancePlanCode =
   | "FREE_DESTINY_MAP_R0"
   | "CV_REVAMP_R49_99"
+  // Legacy compatibility only. This code is intentionally absent from the active
+  // pricing catalog and must not be used to create new orders unless the founder
+  // explicitly approves a separate accommodation product.
   | "ACCOMMODATION_SUPPORT_R179";
 
 export type OrderStatus = "DRAFT" | "PENDING_PAYMENT" | "PAID" | "CANCELLED" | "EXPIRED" | "REFUNDED" | "FAILED";

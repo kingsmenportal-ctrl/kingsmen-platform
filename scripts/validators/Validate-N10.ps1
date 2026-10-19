@@ -1,5 +1,5 @@
 $ErrorActionPreference = "Stop"
-$Base = "C:\Kingsmen\kingsmen-platform"
+$Base = (Resolve-Path (Join-Path $PSScriptRoot "../..")).Path
 Set-Location $Base
 
 $Failures = New-Object System.Collections.Generic.List[string]
@@ -13,6 +13,14 @@ function Require-Contains([string]$Path,[string]$Needle,[string]$Message) {
   if (Test-Path $Path) {
     $Text = Get-Content $Path -Raw
     if ($Text -notlike "*$Needle*") { $Failures.Add($Message) }
+  }
+}
+
+function Require-NotContains([string]$Path,[string]$Needle,[string]$Message) {
+  Require-File $Path
+  if (Test-Path $Path) {
+    $Text = Get-Content $Path -Raw
+    if ($Text -like "*$Needle*") { $Failures.Add($Message) }
   }
 }
 
@@ -54,8 +62,10 @@ Require-Contains "db\migrations\0008_n10_finance_payfast.sql" "payment_evidence_
 Require-Contains "db\migrations\0008_n10_finance_payfast.sql" "enable row level security" "Migration must enable RLS."
 Require-Contains "db\seeds\n10_finance_payfast_seed.sql" "FREE_DESTINY_MAP_R0" "Seed missing Free Destiny Map."
 Require-Contains "db\seeds\n10_finance_payfast_seed.sql" "CV_REVAMP_R49_99" "Seed missing CV Revamp."
-Require-Contains "db\seeds\n10_finance_payfast_seed.sql" "ACCOMMODATION_SUPPORT_R179" "Seed missing Accommodation Support."
 Require-Contains "db\seeds\n10_finance_payfast_seed.sql" "Never invent fake" "Seed must lock CV truth rule."
+Require-NotContains "apps\api\src\finance\pricing-catalog.ts" "ACCOMMODATION_SUPPORT_R179" "Standalone accommodation product must not be orderable."
+Require-NotContains "db\seeds\n10_finance_payfast_seed.sql" "('ACCOMMODATION_SUPPORT_R179'" "Seed must not insert a standalone accommodation product row."
+Require-Contains "db\seeds\n10_finance_payfast_seed.sql" "set active = false" "Seed must deactivate any legacy standalone accommodation product."
 Require-Contains "runtime\payfast\payfast-runtime.example.json" "PAYFAST_MERCHANT_ID" "Runtime example missing merchant ID."
 Require-Contains "runtime\payfast\payfast-runtime.example.json" "Never commit real PayFast credentials" "Runtime example must block secrets."
 Require-Contains "apps\api\src\finance\finance-policy.ts" "NO_AI_REFUND_APPROVAL" "Policy must block AI refund approval."

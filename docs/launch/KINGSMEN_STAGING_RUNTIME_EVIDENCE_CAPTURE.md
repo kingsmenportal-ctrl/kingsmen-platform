@@ -19,7 +19,7 @@ This module adds the staging command that writes the 10 runtime evidence reports
 Root npm wrapper:
 
 ```bash
-npm run staging:capture:evidence
+pwsh -NoProfile -File scripts/staging/Invoke-KingsmenStagingRuntimeEvidencePack.ps1
 ```
 
 ## What the command writes
@@ -79,7 +79,7 @@ Both probes require environment variables configured outside Git.
 Final assembly still requires:
 
 ```bash
-npm run final:collect:evidence
+pwsh -NoProfile -File scripts/staging/Collect-KingsmenFinalAssemblyEvidence.ps1
 ```
 
 and a founder review of `reports/final-assembly/final-assembly-evidence-bundle-latest.json`.

@@ -37,8 +37,8 @@ const tokenChecks = {
     'Staging runtime evidence capture',
     'Production ready: **false**',
     'Public launch allowed: **false**',
-    'npm run staging:capture:evidence',
-    'npm run final:collect:evidence'
+    'scripts/staging/Invoke-KingsmenStagingRuntimeEvidencePack.ps1',
+    'scripts/staging/Collect-KingsmenFinalAssemblyEvidence.ps1'
   ],
   'manifests/launch/staging-runtime-evidence-capture-v1.json': [
     'kingsmen.staging-runtime-evidence-capture.v1',
@@ -49,7 +49,6 @@ const tokenChecks = {
   'package.json': [
     'staging:prove:capture',
     'staging:validate:capture',
-    'staging:capture:evidence'
   ],
   '.github/workflows/kingsmen-source-guard.yml': [
     'npm run staging:prove:capture',
@@ -87,7 +86,7 @@ const report = {
   failed_checks: failed,
   checks,
   generated_at: new Date().toISOString(),
-  next_action: 'Run staging:capture:evidence in staging, then complete remaining provider-specific runtime reports.'
+  next_action: 'Run scripts/staging/Invoke-KingsmenStagingRuntimeEvidencePack.ps1 in staging, then complete remaining provider-specific runtime reports.'
 };
 
 const out = join(repoRoot, 'reports/staging/staging-runtime-evidence-capture-validation-latest.json');
