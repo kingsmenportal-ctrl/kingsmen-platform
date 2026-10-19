@@ -41,7 +41,7 @@ export async function GET(request: Request) {
     const auth = await authenticatedUser(request);
     if ("response" in auth) return auth.response;
     const result = await fetch(
-      `${auth.url}/rest/v1/candidate_identity_review_requests?select=id,candidate_reference,claimant_name,claimant_message,request_status,reviewer_note,created_at,updated_at&supabase_user_id=eq.${encodeURIComponent(auth.userId)}&order=created_at.desc&limit=20`,
+      `${auth.url}/rest/v1/candidate_identity_review_requests?select=id,candidate_reference,claimant_name,claimant_message,candidate_response,request_status,reviewer_note,created_at,updated_at&supabase_user_id=eq.${encodeURIComponent(auth.userId)}&order=created_at.desc&limit=20`,
       { headers: { apikey: auth.service, Authorization: `Bearer ${auth.service}` }, cache: "no-store" }
     );
     if (!result.ok) throw new Error("Identity review read failed.");
@@ -98,5 +98,42 @@ export async function POST(request: Request) {
       request: rows[0],
       notice: "Your request is awaiting authorised review. Submitting this form does not verify your identity or link your account to a candidate record."
     }, { status: 201, headers: { "Cache-Control": "no-store" } });
+  } catch (error) { return fail(error); }
+}
+
+
+export async function PATCH(request: Request) {
+  try {
+    const auth = await authenticatedUser(request);
+    if ("response" in auth) return auth.response;
+    let body: Record<string, unknown>;
+    try { body = await request.json() as Record<string, unknown>; }
+    catch { return NextResponse.json({ ok: false, error: "Provide a valid JSON response." }, { status: 400 }); }
+    const requestId = typeof body.requestId === "string" ? body.requestId : "";
+    const message = typeof body.message === "string" ? body.message.trim() : "";
+    if (!/^[0-9a-f]{8}-[0-9a-f]{4}-[1-8][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i.test(requestId) ||
+        message.length < 3 || message.length > 1200) {
+      return NextResponse.json({ ok: false, error: "A valid request ID and 3–1,200 character response are required." }, { status: 400 });
+    }
+    const result = await fetch(`${auth.url}/rest/v1/rpc/respond_candidate_identity_review`, {
+      method: "POST",
+      headers: { apikey: auth.service, Authorization: `Bearer ${auth.service}`, "Content-Type": "application/json" },
+      body: JSON.stringify({ p_request_id: requestId, p_candidate_auth_user_id: auth.userId, p_message: message }),
+      cache: "no-store"
+    });
+    if (!result.ok) {
+      const detail = await result.text().catch(() => "");
+      if (detail.includes("not found") || detail.includes("P0002")) {
+        return NextResponse.json({ ok: false, error: "Review request was not found for this account." }, { status: 404 });
+      }
+      if (detail.includes("not awaiting candidate information") || detail.includes("55000")) {
+        return NextResponse.json({ ok: false, error: "This request is not awaiting additional information. Refresh its status." }, { status: 409 });
+      }
+      if (detail.includes("22023") || detail.includes("required")) {
+        return NextResponse.json({ ok: false, error: "The response is invalid." }, { status: 400 });
+      }
+      throw new Error("Candidate response could not be recorded.");
+    }
+    return NextResponse.json({ ok: true, result: await result.json(), notice: "Your response was recorded and the request returned to the authorised review queue." }, { headers: { "Cache-Control": "no-store" } });
   } catch (error) { return fail(error); }
 }
