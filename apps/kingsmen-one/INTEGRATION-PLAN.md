@@ -55,3 +55,11 @@ The linked Supabase project `kingsmen-portal-staging` (ref `euhubhhnumtibbyufghm
 - Post-write counts: `route_categories` 10; `source_authorities` 7; `route_providers` 2; `route_programmes` 2; `portal_dna` 2.
 - Both programme anchors use official HTTPS source URLs, confidence A and verified provider/source anchors, but remain `MANUAL_CHECK_REQUIRED`. Eligible open/future opportunity count is still zero by design until current programme-specific availability is verified.
 - No candidate identities, candidate applications, private documents, payments, or entitlements were created or changed by this seed.
+
+## Candidate profile correction history (2026-10-20)
+- The candidate profile screen now renders the latest correction requests returned by the authenticated profile-review endpoint, including field, requested value, candidate-provided reason, request date and current status.
+- All database-backed display values are HTML-escaped before rendering. Empty history has an explicit state.
+- This is status visibility only: candidate requests do not mutate authoritative profile fields, and a request status is not represented as approval unless the stored review status says so.
+- The new smoke test checks that history rendering is connected to the server-returned request list, escapes user/database text, and preserves the read-only authoritative-profile boundary.
+- The updated smoke workflow passed on commit `6e268d4be8a95eb6a400ec75e454b885f86654b6`; source-guard and release-evidence runs were still in progress at the time of the change.
+
