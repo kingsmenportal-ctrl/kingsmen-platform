@@ -204,3 +204,15 @@ test("private document lifecycle requires verified identity and scopes every rec
   assert.match(fn, /Cache-Control/);
   assert.doesNotMatch(fn, /p\.candidate_id|payload\.candidate_id/);
 });
+
+
+test("candidate document interface uses the private lifecycle and never treats candidate uploads as verified", async () => {
+  const app = await readFile(resolve(root, "../app.js"), "utf8");
+  assert.match(app, /candidate-private-documents/);
+  assert.match(app, /uploadToSignedUrl/);
+  assert.match(app, /finalize_upload/);
+  assert.match(app, /create_download_url/);
+  assert.match(app, /privateDocumentsLoadedForUser/);
+  assert.match(app, /It is not independently verified/);
+  assert.match(app, /10\s*\*\s*1024\s*\*\s*1024/);
+});
