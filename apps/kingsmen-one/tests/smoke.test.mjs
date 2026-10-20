@@ -149,3 +149,16 @@ test("persistent application preparation is gated by verified candidate identity
   assert.doesNotMatch(fn, /payload\.candidate_id|p\.candidate_id/);
   assert.match(fn, /Cache-Control.*no-store/);
 });
+
+
+test("official profile displays escaped correction-request history without mutating authoritative fields", async () => {
+  const js = await read("app.js");
+  const fn = await readFile(resolve(root, "../..", "supabase/functions/candidate-profile-review/index.ts"), "utf8");
+  assert.match(js, /Correction request history/);
+  assert.match(js, /profileChangeRequests\.map/);
+  assert.match(js, /escapeHtml\(r\.requested_value/);
+  assert.match(js, /escapeHtml\(r\.status/);
+  assert.match(js, /No correction requests yet/);
+  assert.match(fn, /\.select\("id,field_name,requested_value,reason,status,requested_at"\)/);
+  assert.doesNotMatch(fn, /from\("candidate_profiles"\)\.update/);
+});
