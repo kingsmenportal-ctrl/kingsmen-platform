@@ -44,6 +44,7 @@
       privateDocumentsLoadedForUser = null;
       privateDocumentsLoadingForUser = null;
       privateDocumentsError = "";
+      reviewerQueue=[]; reviewerQueueLoadedForUser=null; reviewerQueueLoadingForUser=null; reviewerQueueError="";
       save();
     }
   }
@@ -332,6 +333,27 @@
     if(view==="opportunities"){renderOpportunityCards();loadVerifiedOpportunities();document.getElementById("opportunity-search").addEventListener("input",renderOpportunityCards);document.getElementById("opportunity-filter").addEventListener("change",renderOpportunityCards);} if(view==="profile"&&authSession?.user) void loadOfficialProfile(); if(view==="applications"&&authSession?.user&&applicationWorkspaceLoadedForUser!==authSession.user.id) void loadApplicationWorkspace().then(()=>{if(activeView==="applications")render("applications");}); if(view==="documents"&&authSession?.user&&privateDocumentsLoadedForUser!==authSession.user.id&&privateDocumentsLoadingForUser!==authSession.user.id) void loadPrivateDocuments(); if(view==="documents"&&authSession?.user&&applicationWorkspaceLoadedForUser!==authSession.user.id) void loadApplicationWorkspace().then(()=>{if(activeView==="documents")render("documents");}); if(view==="reviewer"&&authSession?.user&&reviewerQueueLoadedForUser!==authSession.user.id&&reviewerQueueLoadingForUser!==authSession.user.id) void loadReviewerQueue();
   }
   document.addEventListener("submit",async e=>{
+    if(e.target.matches("[data-review-decision]")) {
+      e.preventDefault();
+      const userId=authSession?.user?.id;
+      if(!supabaseClient||!userId){toast("Sign in with an authorised reviewer account.");return;}
+      const form=e.target, fields=new FormData(form);
+      const decision=String(fields.get("decision")||"");
+      const reviewerNote=String(fields.get("reviewer_note")||"").trim();
+      const evidenceReference=String(fields.get("evidence_reference")||"").trim();
+      if(decision!=="START_REVIEW"&&(reviewerNote.length<3||reviewerNote.length>1200||evidenceReference.length<3||evidenceReference.length>500)){
+        toast("Final decisions require a reviewer note and evidence reference.");return;
+      }
+      const submit=form.querySelector('button[type="submit"]');if(submit)submit.disabled=true;
+      try{
+        const {data,error}=await supabaseClient.functions.invoke("candidate-private-documents",{body:{action:"review_document",document_id:form.dataset.documentId,decision,reviewer_note:reviewerNote,evidence_reference:evidenceReference}});
+        if(authSession?.user?.id!==userId)throw new Error("Your account changed. Sign in again before continuing.");
+        if(error||data?.ready!==true)throw error||new Error(data?.error||"Could not save reviewer decision.");
+        toast(data.message||"Reviewer decision saved.");
+        await loadReviewerQueue(true);
+      }catch(error){toast(error?.message||"Could not save reviewer decision.");if(submit)submit.disabled=false;}
+      return;
+    }
     if(e.target.id==="private-document-upload-form") {
       e.preventDefault();
       const userId=authSession?.user?.id;
@@ -447,6 +469,22 @@
       authMessage=error?(error.message||"Password reset could not be requested."):"If the account exists, a password reset email will be sent.";
       const m=document.getElementById("auth-message");if(m)m.textContent=authMessage;return;
     }
+    if(e.target.closest("#refresh-reviewer-queue")){await loadReviewerQueue(true);return;}
+    const reviewerDownload=e.target.closest("[data-reviewer-download]");
+    if(reviewerDownload){
+      const userId=authSession?.user?.id;
+      if(!supabaseClient||!userId){toast("Sign in with an authorised reviewer account.");return;}
+      reviewerDownload.disabled=true;
+      try{
+        const {data,error}=await supabaseClient.functions.invoke("candidate-private-documents",{body:{action:"create_reviewer_download_url",document_id:reviewerDownload.dataset.reviewerDownload}});
+        if(authSession?.user?.id!==userId)throw new Error("Your account changed. Sign in again before continuing.");
+        if(error||data?.ready!==true||!data?.signed_download_url)throw error||new Error(data?.error||"Could not create a reviewer download link.");
+        const anchor=document.createElement("a");anchor.href=data.signed_download_url;anchor.target="_blank";anchor.rel="noopener noreferrer";anchor.click();
+        toast("Temporary reviewer download link issued and audited.");
+      }catch(error){toast(error?.message||"Reviewer download unavailable.");}
+      finally{reviewerDownload.disabled=false;}
+      return;
+    }
     if(e.target.closest("#refresh-private-documents")){await loadPrivateDocuments(true);return;}
     const privateDownload=e.target.closest("[data-private-download]");
     if(privateDownload){
@@ -524,7 +562,7 @@
       setAuthSession(session);
       updateAuthStatus();
       if(session?.user) {void loadPersistentReadiness();void loadOfficialProfile(true);void loadApplicationWorkspace(true);}
-      else {privateDocuments=[];privateDocumentsLoadedForUser=null;privateDocumentsLoadingForUser=null;privateDocumentsError="";workspacePersistenceAvailable=false;workspaceLoadedForUser=null;applicationTrackers=[];applicationItems=[];applicationSavedRoutes=[];applicationWorkspaceAvailable=false;applicationWorkspaceLoadedForUser=null;profileReviewAvailable=false;officialProfile=null;profileChangeRequests=[];profileLoadedForUser=null;}
+      else {privateDocuments=[];privateDocumentsLoadedForUser=null;privateDocumentsLoadingForUser=null;privateDocumentsError="";reviewerQueue=[];reviewerQueueLoadedForUser=null;reviewerQueueLoadingForUser=null;reviewerQueueError="";workspacePersistenceAvailable=false;workspaceLoadedForUser=null;applicationTrackers=[];applicationItems=[];applicationSavedRoutes=[];applicationWorkspaceAvailable=false;applicationWorkspaceLoadedForUser=null;profileReviewAvailable=false;officialProfile=null;profileChangeRequests=[];profileLoadedForUser=null;}
       if(activeView==="account")render("account");
     });
     refreshAuthSession();
