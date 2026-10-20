@@ -228,3 +228,25 @@ test("candidate document interface uses the private lifecycle and never treats c
   assert.match(app, /It is not independently verified/);
   assert.match(app, /10\s*\*\s*1024\s*\*\s*1024/);
 });
+
+
+test("private document reviewer decisions require an active evidence reviewer and persist transitions atomically", async () => {
+  const fn = await readFile(resolve(root, "../..", "supabase/functions/candidate-private-documents/index.ts"), "utf8");
+  const migration = await readFile(resolve(root, "../..", "supabase/migrations/20261020130000_n12_candidate_private_document_review.sql"), "utf8");
+  assert.match(fn, /p\.action === "review_document"/);
+  assert.match(fn, /platform_reviewers/);
+  assert.match(fn, /eq\("is_active", true\)/);
+  assert.match(fn, /is\("revoked_at", null\)/);
+  assert.match(fn, /EVIDENCE_VERIFIER/);
+  assert.match(fn, /PLATFORM_ADMIN/);
+  assert.match(fn, /admin\.rpc\("review_candidate_private_document"/);
+  assert.match(fn, /CORRECTION_REQUIRED/);
+  assert.match(migration, /security invoker/i);
+  assert.match(migration, /for update/i);
+  assert.match(migration, /candidate_private_document_reviews/);
+  assert.match(migration, /candidate_private_document_events/);
+  assert.match(migration, /REVIEW_STATUS_CHANGED/);
+  assert.match(migration, /revoke all on function public\.review_candidate_private_document[\s\S]*from public, anon, authenticated/i);
+  assert.match(migration, /grant execute on function public\.review_candidate_private_document[\s\S]*to service_role/i);
+  assert.match(migration, /v_doc\.status <> 'UNDER_REVIEW'/);
+});
