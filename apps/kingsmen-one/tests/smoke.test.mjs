@@ -269,7 +269,7 @@ test("reviewer console connects the authenticated UI to permission-checked queue
   assert.match(app, /action:"create_reviewer_download_url"/);
   assert.match(app, /action:"review_document"/);
   assert.match(app, /reviewerQueueLoadedForUser===authSession\.user\.id/);
-  assert.match(app, /reviewerQueue=\\[\\];\\s*reviewerQueueLoadedForUser=null/);
+  assert.match(app, /reviewerQueue=\[\];\s*reviewerQueueLoadedForUser=null/);
   assert.match(app, /Final decisions require a reviewer note and evidence reference/);
   assert.match(app, /Temporary reviewer download link issued and audited/);
 });
