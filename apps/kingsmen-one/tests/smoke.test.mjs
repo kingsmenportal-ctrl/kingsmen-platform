@@ -232,7 +232,7 @@ test("candidate document interface uses the private lifecycle and never treats c
 
 test("private document reviewer decisions require an active evidence reviewer and persist transitions atomically", async () => {
   const fn = await readFile(resolve(root, "../..", "supabase/functions/candidate-private-documents/index.ts"), "utf8");
-  const migration = await readFile(resolve(root, "../..", "supabase/migrations/20261020130000_n12_candidate_private_document_review.sql"), "utf8");
+  const migration = await readFile(resolve(root, "../..", "supabase/migrations/20261020031028_n12_candidate_private_document_review.sql"), "utf8");
   assert.match(fn, /p\.action === "review_document"/);
   assert.match(fn, /platform_reviewers/);
   assert.match(fn, /eq\("is_active", true\)/);
