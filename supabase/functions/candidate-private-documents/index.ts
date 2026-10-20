@@ -53,6 +53,56 @@ Deno.serve(async (req: Request) => {
   let p: Record<string,unknown>;
   try { p = await req.json(); } catch { return reply(400, { error: "Request body must be valid JSON." }, origin); }
   const admin = createClient(URL, SERVICE, { auth: { persistSession: false, autoRefreshToken: false } });
+
+  // Reviewer actions are handled before candidate-link resolution: reviewers are
+  // authorised by the platform reviewer registry, never by candidate identity.
+  if (p.action === "review_document") {
+    const reviewerRoles = await admin.from("platform_reviewers")
+      .select("role_code").eq("auth_user_id", authData.user.id)
+      .eq("is_active", true).is("revoked_at", null)
+      .in("role_code", ["EVIDENCE_VERIFIER", "PLATFORM_ADMIN"]);
+    if (reviewerRoles.error) {
+      console.error("document reviewer permission lookup failed", reviewerRoles.error.code ?? "unknown");
+      return reply(503, { error: "Could not verify reviewer permissions." }, origin);
+    }
+    if (!(reviewerRoles.data ?? []).length) {
+      return reply(403, { code: "DOCUMENT_REVIEWER_REQUIRED", error: "An active evidence-verifier permission is required." }, origin);
+    }
+    const documentId = typeof p.document_id === "string" ? p.document_id : "";
+    const decision = typeof p.decision === "string" ? p.decision : "";
+    const note = typeof p.reviewer_note === "string" ? p.reviewer_note.trim() : "";
+    const evidenceReference = typeof p.evidence_reference === "string" ? p.evidence_reference.trim() : "";
+    if (!/^[0-9a-f-]{36}$/i.test(documentId)) {
+      return reply(400, { error: "A valid document identifier is required." }, origin);
+    }
+    if (!["START_REVIEW", "VERIFIED", "CORRECTION_REQUIRED", "REJECTED"].includes(decision)) {
+      return reply(400, { error: "Decision must be START_REVIEW, VERIFIED, CORRECTION_REQUIRED or REJECTED." }, origin);
+    }
+    if (decision !== "START_REVIEW" &&
+        (note.length < 3 || note.length > 1200 || evidenceReference.length < 3 || evidenceReference.length > 500)) {
+      return reply(400, { error: "Final decisions require a reviewer note (3–1200 characters) and evidence reference (3–500 characters)." }, origin);
+    }
+    const { data: result, error: reviewError } = await admin.rpc("review_candidate_private_document", {
+      p_document_id: documentId,
+      p_reviewer_auth_user_id: authData.user.id,
+      p_decision: decision,
+      p_reviewer_note: note,
+      p_evidence_reference: evidenceReference,
+    });
+    if (reviewError) {
+      const code = reviewError.code ?? "";
+      const status = code === "42501" ? 403 : code === "P0002" ? 404 :
+        code === "22023" ? 400 : code === "40001" ? 409 : 503;
+      if (status === 503) console.error("document review transaction failed", code || "unknown");
+      return reply(status, { error: status === 403 ? "Reviewer permission is required." :
+        status === 404 ? "Private document record not found." :
+        status === 409 ? "The document is not in a state eligible for this decision." :
+        status === 400 ? "The reviewer decision or evidence fields are invalid." :
+        "Could not persist the review decision and audit history." }, origin);
+    }
+    return reply(200, { ready: true, review: result, message: "Reviewer decision and audit history were persisted transactionally." }, origin);
+  }
+
   const { data: link, error: linkError } = await admin.from("candidate_auth_identity_links")
     .select("candidate_id").eq("supabase_user_id", authData.user.id)
     .eq("link_status", "VERIFIED").not("verified_at", "is", null).limit(1).maybeSingle();
