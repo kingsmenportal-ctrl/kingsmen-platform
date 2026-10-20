@@ -207,7 +207,7 @@ test("private document lifecycle requires verified identity and scopes every rec
 
 
 test("candidate document interface uses the private lifecycle and never treats candidate uploads as verified", async () => {
-  const app = await readFile(resolve(root, "../app.js"), "utf8");
+  const app = await read("app.js");
   assert.match(app, /candidate-private-documents/);
   assert.match(app, /uploadToSignedUrl/);
   assert.match(app, /finalize_upload/);
