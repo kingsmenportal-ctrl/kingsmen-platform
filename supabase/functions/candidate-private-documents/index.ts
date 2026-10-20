@@ -12,11 +12,13 @@ const MIME_EXT: Record<string,string> = {
 };
 const origins = new Set([
   "https://kingsmen-portal-staging.netlify.app",
-  "https://6ad61ee1da20fa786856f07e--kingsmen-portal-staging.netlify.app",
   "http://localhost:8888",
   "http://127.0.0.1:8888",
 ]);
 
+function isAllowedOrigin(origin: string): boolean {
+  return origins.has(origin) || /^https:\/\/[a-z0-9-]+--kingsmen-portal-staging\.netlify\.app$/i.test(origin);
+}
 function reply(status: number, body: Record<string,unknown>, origin: string | null) {
   const headers: Record<string,string> = {
     "Content-Type": "application/json; charset=utf-8",
@@ -24,7 +26,7 @@ function reply(status: number, body: Record<string,unknown>, origin: string | nu
     "Pragma": "no-cache",
     "Vary": "Origin",
   };
-  if (origin && origins.has(origin)) headers["Access-Control-Allow-Origin"] = origin;
+  if (origin && isAllowedOrigin(origin)) headers["Access-Control-Allow-Origin"] = origin;
   return new Response(JSON.stringify(body), { status, headers });
 }
 function safeFilename(value: unknown): string {
@@ -33,7 +35,7 @@ function safeFilename(value: unknown): string {
 }
 Deno.serve(async (req: Request) => {
   const origin = req.headers.get("Origin");
-  if (origin && !origins.has(origin)) return reply(403, { error: "Origin not allowed." }, null);
+  if (origin && !isAllowedOrigin(origin)) return reply(403, { error: "Origin not allowed." }, null);
   if (req.method === "OPTIONS") return new Response(null, { status: 204, headers: {
     ...(origin && origins.has(origin) ? { "Access-Control-Allow-Origin": origin } : {}),
     "Access-Control-Allow-Headers": "authorization, apikey, content-type, x-client-info",
