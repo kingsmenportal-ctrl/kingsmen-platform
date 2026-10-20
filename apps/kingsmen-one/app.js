@@ -29,6 +29,16 @@
   const progress = () => Math.round(state.tasks.filter(t=>t.done).length / state.tasks.length * 100);
   const supabaseClient = window.kingsmenSupabase || null;
   let authSession = null;
+  // Browser-local demo data must never follow a session from one account to another.
+  function setAuthSession(session) {
+    const previousUserId = authSession?.user?.id || null;
+    const nextUserId = session?.user?.id || null;
+    authSession = session;
+    if (previousUserId !== nextUserId) {
+      state = initial();
+      save();
+    }
+  }
   let authMessage = "";
   let authBusy = false;
   let workspacePersistenceAvailable = false;
@@ -101,7 +111,7 @@
     try {
       const { data, error } = await supabaseClient.auth.getSession();
       if (error) throw error;
-      authSession = data.session;
+      setAuthSession(data.session);
       await loadPersistentReadiness(true);
       if (activeView === "account") render("account");
       updateAuthStatus();
@@ -395,7 +405,7 @@
   document.getElementById("reset-demo").addEventListener("click",()=>{if(confirm("Reset all Kingsmen One demo progress saved in this browser?")){state=initial();save();render("home");document.querySelector(".notice").classList.remove("hidden");toast("Demo state reset.");}});
   if(supabaseClient) {
     supabaseClient.auth.onAuthStateChange((_event,session)=>{
-      authSession=session;
+      setAuthSession(session);
       updateAuthStatus();
       if(session?.user) {void loadPersistentReadiness();void loadOfficialProfile(true);void loadApplicationWorkspace(true);}
       else {workspacePersistenceAvailable=false;workspaceLoadedForUser=null;applicationTrackers=[];applicationItems=[];applicationSavedRoutes=[];applicationWorkspaceAvailable=false;applicationWorkspaceLoadedForUser=null;profileReviewAvailable=false;officialProfile=null;profileChangeRequests=[];profileLoadedForUser=null;}
