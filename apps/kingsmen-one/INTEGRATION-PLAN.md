@@ -64,9 +64,10 @@ The linked Supabase project `kingsmen-portal-staging` (ref `euhubhhnumtibbyufghm
 - The updated smoke workflow passed on commit `6e268d4be8a95eb6a400ec75e454b885f86654b6`; source-guard and release-evidence runs were still in progress at the time of the change.
 
 ## Private document lifecycle — staging function deployed; UI and static checks connected (2026-10-20)
-- Deployed `candidate-private-documents` to Supabase staging with JWT verification enabled; staging function reports ACTIVE, version 3.
+- Deployed `candidate-private-documents` to Supabase staging with JWT verification enabled; staging function reports ACTIVE, version 4.
 - The function requires a valid Supabase Auth token and resolves the candidate only from `candidate_auth_identity_links` where `link_status=VERIFIED` and `verified_at` is present. Caller-supplied candidate IDs are never used for scoping.
 - Candidate document metadata is listed by resolved candidate; uploads are limited to PDF/JPEG/PNG and 10 MiB; storage is private; signed upload tickets are short-lived; finalization downloads and inspects the stored bytes, checks actual size and MIME signature, computes SHA-256, and downloads use 60-second signed URLs.
+- CORS permits the staging site and only HTTPS deploy-preview hostnames belonging to `kingsmen-portal-staging.netlify.app`; it does not wildcard arbitrary Netlify sites. The staging preview origin is therefore not tied to a single stale deploy hash.
 - Uploads remain `UPLOADED_CANDIDATE_REPORTED`; this is not independent reviewer verification. The endpoint validates optional checklist-item ownership before linking. Invalid file signatures or sizes are rejected, the object is removed when possible, and an `UPLOAD_FAILED` event is appended.
 - Runtime schema inspection confirmed the document table's size/MIME/status/path constraints and the event table's allowed event types. The endpoint uses allowed `UPLOAD_CONFIRMED` and now records `READ_LINK_ISSUED` before returning a download link; audit failure prevents the link from being returned.
 - The Kingsmen One document screen is connected to the endpoint for listing, uploading, finalization and downloading. It loads real application-preparation data and presents a dropdown of the candidate's own `DOCUMENT` checklist items rather than requiring a raw UUID.
