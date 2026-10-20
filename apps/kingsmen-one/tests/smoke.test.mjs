@@ -200,6 +200,10 @@ test("private document lifecycle requires verified identity and scopes every rec
   assert.match(fn, /event_type:\s*"UPLOAD_CONFIRMED"/);
   assert.match(fn, /event_type:\s*"READ_LINK_ISSUED"/);
   assert.match(fn, /download audit failed/);
+  assert.match(fn, /signatureValid/);
+  assert.match(fn, /crypto\.subtle\.digest\("SHA-256"/);
+  assert.match(fn, /event_type:\s*"UPLOAD_FAILED"/);
+  assert.match(fn, /sha256_hex:\s*sha256Hex/);
   assert.doesNotMatch(fn, /event_type:\s*"UPLOAD_FINALIZED"/);
   assert.match(fn, /auditError/);
   assert.match(fn, /It is not independently verified/);
