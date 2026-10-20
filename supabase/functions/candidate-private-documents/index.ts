@@ -1,0 +1,182 @@
+import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
+
+const URL = Deno.env.get("SUPABASE_URL") ?? "";
+const ANON = Deno.env.get("SUPABASE_ANON_KEY") ?? "";
+const SERVICE = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY") ?? "";
+const BUCKET = "kingsmen-candidate-documents";
+const MAX_BYTES = 10 * 1024 * 1024;
+const MIME_EXT: Record<string,string> = {
+  "application/pdf": "pdf",
+  "image/jpeg": "jpg",
+  "image/png": "png",
+};
+const origins = new Set([
+  "https://kingsmen-portal-staging.netlify.app",
+  "https://6ad61ee1da20fa786856f07e--kingsmen-portal-staging.netlify.app",
+  "http://localhost:8888",
+  "http://127.0.0.1:8888",
+]);
+
+function reply(status: number, body: Record<string,unknown>, origin: string | null) {
+  const headers: Record<string,string> = {
+    "Content-Type": "application/json; charset=utf-8",
+    "Cache-Control": "no-store",
+    "Pragma": "no-cache",
+    "Vary": "Origin",
+  };
+  if (origin && origins.has(origin)) headers["Access-Control-Allow-Origin"] = origin;
+  return new Response(JSON.stringify(body), { status, headers });
+}
+function safeFilename(value: unknown): string {
+  if (typeof value !== "string") return "";
+  return value.normalize("NFKC").replace(/[\\/\\\\\u0000-\u001f\u007f]/g, "_").trim().slice(0,180);
+}
+Deno.serve(async (req: Request) => {
+  const origin = req.headers.get("Origin");
+  if (origin && !origins.has(origin)) return reply(403, { error: "Origin not allowed." }, null);
+  if (req.method === "OPTIONS") return new Response(null, { status: 204, headers: {
+    ...(origin && origins.has(origin) ? { "Access-Control-Allow-Origin": origin } : {}),
+    "Access-Control-Allow-Headers": "authorization, apikey, content-type, x-client-info",
+    "Access-Control-Allow-Methods": "POST, OPTIONS",
+    "Access-Control-Max-Age": "600",
+    "Vary": "Origin",
+  }});
+  if (req.method !== "POST") return reply(405, { error: "Method not allowed." }, origin);
+  if (!URL || !ANON || !SERVICE) return reply(503, { error: "Private document service is not configured." }, origin);
+  const token = /^Bearer\s+(.+)$/i.exec(req.headers.get("Authorization") ?? "")?.[1];
+  if (!token) return reply(401, { error: "A signed-in account is required." }, origin);
+  const auth = createClient(URL, ANON, { auth: { persistSession: false, autoRefreshToken: false } });
+  const { data: authData, error: authError } = await auth.auth.getUser(token);
+  if (authError || !authData.user) return reply(401, { error: "Your session is invalid or expired. Sign in again." }, origin);
+  let p: Record<string,unknown>;
+  try { p = await req.json(); } catch { return reply(400, { error: "Request body must be valid JSON." }, origin); }
+  const admin = createClient(URL, SERVICE, { auth: { persistSession: false, autoRefreshToken: false } });
+  const { data: link, error: linkError } = await admin.from("candidate_auth_identity_links")
+    .select("candidate_id").eq("supabase_user_id", authData.user.id)
+    .eq("link_status", "VERIFIED").not("verified_at", "is", null).limit(1).maybeSingle();
+  if (linkError) {
+    console.error("private document identity lookup failed", linkError.code ?? "unknown");
+    return reply(503, { error: "Could not verify candidate access." }, origin);
+  }
+  if (!link?.candidate_id) return reply(403, {
+    code: "IDENTITY_NOT_VERIFIED",
+    error: "Private documents are locked until an authorised reviewer verifies your candidate identity.",
+  }, origin);
+  const candidateId = String(link.candidate_id);
+
+  if (p.action === "list") {
+    const { data, error } = await admin.from("candidate_private_documents")
+      .select("id,preparation_item_id,original_filename,mime_type,size_bytes,status,uploaded_at,created_at,updated_at")
+      .eq("candidate_id", candidateId).order("created_at", { ascending: false });
+    if (error) {
+      console.error("private document list failed", error.code ?? "unknown");
+      return reply(503, { error: "Could not load private document records." }, origin);
+    }
+    return reply(200, { ready: true, documents: data ?? [], message: "Private document metadata loaded. File contents are not returned by this action." }, origin);
+  }
+
+  if (p.action === "create_upload") {
+    const filename = safeFilename(p.filename);
+    const mime = typeof p.mime_type === "string" ? p.mime_type : "";
+    const size = Number(p.size_bytes);
+    if (!filename || filename.length > 180 || !MIME_EXT[mime] || !Number.isSafeInteger(size) || size < 1 || size > MAX_BYTES) {
+      return reply(400, { error: "Provide a filename, PDF/JPEG/PNG MIME type, and file size from 1 byte to 10 MiB." }, origin);
+    }
+    let preparationItemId: string | null = null;
+    if (p.preparation_item_id !== undefined && p.preparation_item_id !== null && p.preparation_item_id !== "") {
+      if (typeof p.preparation_item_id !== "string" || !/^[0-9a-f-]{36}$/i.test(p.preparation_item_id)) {
+        return reply(400, { error: "Preparation item identifier is invalid." }, origin);
+      }
+      const { data: item, error } = await admin.from("candidate_application_preparation_items")
+        .select("id").eq("id", p.preparation_item_id).eq("candidate_id", candidateId).maybeSingle();
+      if (error || !item) return reply(404, { error: "That preparation item was not found in your verified workspace." }, origin);
+      preparationItemId = item.id;
+    }
+    const id = crypto.randomUUID();
+    const path = candidateId + "/" + id + "." + MIME_EXT[mime];
+    const { data: record, error: insertError } = await admin.from("candidate_private_documents").insert({
+      id, candidate_id: candidateId, preparation_item_id: preparationItemId,
+      storage_bucket: BUCKET, storage_path: path, original_filename: filename,
+      mime_type: mime, size_bytes: size, status: "UPLOAD_PENDING",
+    }).select("id,status,original_filename,mime_type,size_bytes,created_at").single();
+    if (insertError || !record) {
+      console.error("private document record create failed", insertError?.code ?? "unknown");
+      return reply(503, { error: "Could not create a private document record." }, origin);
+    }
+    const { data: signed, error: signError } = await admin.storage.from(BUCKET).createSignedUploadUrl(path, { upsert: false });
+    if (signError || !signed) {
+      await admin.from("candidate_private_documents").delete().eq("id", id).eq("candidate_id", candidateId).eq("status", "UPLOAD_PENDING");
+      console.error("private document upload ticket failed", signError?.message ?? "unknown");
+      return reply(503, { error: "Could not prepare a secure upload. No file has been uploaded." }, origin);
+    }
+    return reply(201, {
+      ready: true, document: record, bucket: BUCKET, path,
+      signed_upload_url: signed.signedUrl, upload_token: signed.token,
+      expires_in_seconds: 120,
+      next_action: "Upload the file to the returned signed URL, then call finalize_upload with this document_id. The record remains unverified until a reviewer acts.",
+    }, origin);
+  }
+
+  if (p.action === "finalize_upload") {
+    const id = typeof p.document_id === "string" ? p.document_id : "";
+    if (!/^[0-9a-f-]{36}$/i.test(id)) return reply(400, { error: "A valid document identifier is required." }, origin);
+    const { data: doc, error: docError } = await admin.from("candidate_private_documents")
+      .select("id,candidate_id,storage_bucket,storage_path,original_filename,mime_type,size_bytes,status")
+      .eq("id", id).eq("candidate_id", candidateId).maybeSingle();
+    if (docError || !doc) return reply(404, { error: "Private document record not found." }, origin);
+    if (doc.status === "UPLOADED_CANDIDATE_REPORTED" || doc.status === "UNDER_REVIEW" || doc.status === "VERIFIED") {
+      return reply(200, { ready: true, document: { id: doc.id, status: doc.status }, already_finalized: true }, origin);
+    }
+    if (doc.status !== "UPLOAD_PENDING" || doc.storage_bucket !== BUCKET || !String(doc.storage_path).startsWith(candidateId + "/")) {
+      return reply(409, { error: "This document is not eligible for upload finalization." }, origin);
+    }
+    const folder = String(doc.storage_path).split("/")[0];
+    const basename = String(doc.storage_path).split("/")[1];
+    const { data: objects, error: listError } = await admin.storage.from(BUCKET).list(folder, { search: basename, limit: 10 });
+    if (listError) {
+      console.error("private document object check failed", listError.message);
+      return reply(503, { error: "Could not verify that the uploaded file exists. Retry shortly." }, origin);
+    }
+    const object = (objects ?? []).find((entry: any) => entry.name === basename);
+    if (!object) return reply(409, { error: "The file is not present in private storage yet. Upload it before finalizing." }, origin);
+    const actualSize = Number(object.metadata?.size ?? object.metadata?.contentLength ?? 0);
+    if (!Number.isFinite(actualSize) || actualSize < 1 || actualSize > MAX_BYTES || actualSize !== Number(doc.size_bytes)) {
+      await admin.storage.from(BUCKET).remove([doc.storage_path]);
+      await admin.from("candidate_private_documents").update({ status: "UPLOAD_FAILED", updated_at: new Date().toISOString() })
+        .eq("id", id).eq("candidate_id", candidateId).eq("status", "UPLOAD_PENDING");
+      return reply(409, { error: "Uploaded file size did not match the declared size or exceeded the 10 MiB limit. The invalid upload was removed." }, origin);
+    }
+    const now = new Date().toISOString();
+    const { data: updated, error: updateError } = await admin.from("candidate_private_documents")
+      .update({ status: "UPLOADED_CANDIDATE_REPORTED", uploaded_at: now, updated_at: now })
+      .eq("id", id).eq("candidate_id", candidateId).eq("status", "UPLOAD_PENDING")
+      .select("id,original_filename,mime_type,size_bytes,status,uploaded_at").maybeSingle();
+    if (updateError || !updated) {
+      console.error("private document finalize failed", updateError?.code ?? "unknown");
+      return reply(503, { error: "The file is present, but its record could not be finalized. Retry shortly." }, origin);
+    }
+    await admin.from("candidate_private_document_events").insert({
+      document_id: id, candidate_id: candidateId, actor_type: "CANDIDATE",
+      event_type: "UPLOAD_FINALIZED", from_status: "UPLOAD_PENDING",
+      to_status: "UPLOADED_CANDIDATE_REPORTED", metadata: { source: "authenticated_candidate_endpoint" },
+    });
+    return reply(200, { ready: true, document: updated, message: "Upload recorded as candidate-reported. It is not independently verified." }, origin);
+  }
+
+  if (p.action === "create_download_url") {
+    const id = typeof p.document_id === "string" ? p.document_id : "";
+    if (!/^[0-9a-f-]{36}$/i.test(id)) return reply(400, { error: "A valid document identifier is required." }, origin);
+    const { data: doc, error } = await admin.from("candidate_private_documents")
+      .select("id,storage_bucket,storage_path,status").eq("id", id).eq("candidate_id", candidateId).maybeSingle();
+    if (error || !doc) return reply(404, { error: "Private document record not found." }, origin);
+    if (doc.storage_bucket !== BUCKET || !String(doc.storage_path).startsWith(candidateId + "/") ||
+        !["UPLOADED_CANDIDATE_REPORTED", "UNDER_REVIEW", "VERIFIED", "REJECTED"].includes(doc.status)) {
+      return reply(409, { error: "This document is not available for download." }, origin);
+    }
+    const { data: signed, error: signError } = await admin.storage.from(BUCKET).createSignedUrl(doc.storage_path, 60, { download: true });
+    if (signError || !signed) return reply(503, { error: "Could not create a temporary download link." }, origin);
+    return reply(200, { ready: true, signed_download_url: signed.signedUrl, expires_in_seconds: 60 }, origin);
+  }
+
+  return reply(400, { error: "Unsupported document action. Use list, create_upload, finalize_upload, or create_download_url." }, origin);
+});
