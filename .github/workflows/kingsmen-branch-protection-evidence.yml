@@ -2,6 +2,9 @@ name: Kingsmen Main Branch Protection Evidence
 
 on:
   workflow_dispatch:
+  push:
+    branches:
+      - feat/kingsmen-one-foundation-2026-10-19
 
 permissions:
   contents: read
