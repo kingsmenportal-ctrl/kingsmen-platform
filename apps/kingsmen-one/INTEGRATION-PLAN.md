@@ -93,3 +93,9 @@ The linked Supabase project `kingsmen-portal-staging` (ref `euhubhhnumtibbyufghm
 - Latest verified commit before this evidence refresh: `17f2353452ef5e207bb9efbd3eee12e332e7734b`; smoke tests, Source Guard and Release Evidence passed there. This filename correction will trigger a new CI run.
 - Branch-protection evidence run `39363092200` now executes and produces an artifact, confirming the workflow syntax is fixed. Its report is `UNVERIFIED_PERMISSION_DENIED`, HTTP 403, because `BRANCH_PROTECTION_READ_TOKEN` is not configured and the fallback Actions token has only Contents: read and Metadata: read. The workflow now emits this explicit warning rather than bypassing the check.
 - Netlify still returns `currentDeploy: {}` with no deploy ID/commit SHA, and request-log results are empty. The connected tool does not expose deploy history/listing, and this runtime's browser/network path cannot open the staging URL. The exact deployed commit and rendered build remain unverified.
+
+## Reviewer console UI (2026-10-20)
+- Added a Reviewer console navigation view in Kingsmen One, wired to the authenticated `list_review_queue`, `create_reviewer_download_url`, and `review_document` actions.
+- Each queue item shows document metadata and offers a 60-second audited download plus a decision form. Final decisions require reviewer notes and evidence references. Decision selection is explicit; no decision is preselected.
+- Queue state is scoped to the authenticated user and cleared when the account changes. API permission checks remain authoritative; showing the UI does not grant reviewer access.
+- Added smoke coverage for UI wiring and reviewer endpoints. Actual reviewer/candidate journey remains unverified until authorised staging identities and fixture documents exist.
