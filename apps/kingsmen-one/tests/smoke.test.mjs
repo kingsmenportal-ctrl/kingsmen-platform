@@ -197,6 +197,9 @@ test("private document lifecycle requires verified identity and scopes every rec
   assert.match(fn, /"image\/png"/);
   assert.match(fn, /UPLOAD_PENDING/);
   assert.match(fn, /UPLOADED_CANDIDATE_REPORTED/);
+  assert.match(fn, /event_type:\s*"UPLOAD_CONFIRMED"/);
+  assert.doesNotMatch(fn, /event_type:\s*"UPLOAD_FINALIZED"/);
+  assert.match(fn, /auditError/);
   assert.match(fn, /It is not independently verified/);
   assert.match(fn, /Cache-Control/);
   assert.doesNotMatch(fn, /p\.candidate_id|payload\.candidate_id/);
