@@ -162,3 +162,13 @@ test("official profile displays escaped correction-request history without mutat
   assert.match(fn, /\.select\("id,field_name,requested_value,reason,status,requested_at"\)/);
   assert.doesNotMatch(fn, /from\("candidate_profiles"\)\.update/);
 });
+
+test("browser-local demo state is reset when the authenticated account changes", async () => {
+  const js = await read("app.js");
+  assert.match(js, /function setAuthSession\(session\)/);
+  assert.match(js, /previousUserId = authSession\?\.user\?\.id \|\| null/);
+  assert.match(js, /nextUserId = session\?\.user\?\.id \|\| null/);
+  assert.match(js, /if \(previousUserId !== nextUserId\) \{\s*state = initial\(\);\s*save\(\);\s*\}/);
+  assert.match(js, /setAuthSession\(data\.session\)/);
+  assert.match(js, /setAuthSession\(session\)/);
+});
