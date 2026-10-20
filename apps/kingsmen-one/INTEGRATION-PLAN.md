@@ -63,3 +63,9 @@ The linked Supabase project `kingsmen-portal-staging` (ref `euhubhhnumtibbyufghm
 - The new smoke test checks that history rendering is connected to the server-returned request list, escapes user/database text, and preserves the read-only authoritative-profile boundary.
 - The updated smoke workflow passed on commit `6e268d4be8a95eb6a400ec75e454b885f86654b6`; source-guard and release-evidence runs were still in progress at the time of the change.
 
+## Private document lifecycle endpoint — code added, deployment pending (2026-10-20)
+- Added `supabase/functions/candidate-private-documents/index.ts` with verified-identity gating, candidate-scoped metadata listing, bounded PDF/JPEG/PNG upload-ticket creation (10 MiB maximum), upload finalization by checking private storage, and 60-second signed downloads.
+- Candidate identity is resolved from the server-verified `candidate_auth_identity_links` record; requests cannot choose a candidate ID. Optional preparation-item associations are checked against the same candidate.
+- Upload status remains `UPLOADED_CANDIDATE_REPORTED`; this endpoint does not grant reviewer verification. The existing private bucket is non-public and the endpoint only signs paths under the resolved candidate ID.
+- Added smoke-test assertions for the identity gate, candidate scoping, MIME/size bounds, signed URL expiry, and separation of candidate-reported upload from verification.
+- **Not yet deployed or runtime-verified.** Before enabling the UI, validate Edge Function compilation, the storage SDK's returned object metadata for upload-size reconciliation, document-event constraints, real authenticated upload/download, cross-candidate denial, and reviewer authorization. The current static documents screen remains a readiness checklist and does not expose this endpoint yet.
