@@ -172,3 +172,11 @@ test("browser-local demo state is reset when the authenticated account changes",
   assert.match(js, /setAuthSession\(data\.session\)/);
   assert.match(js, /setAuthSession\(session\)/);
 });
+
+test("stale async responses cannot overwrite a different signed-in candidate workspace", async () => {
+  const js = await read("app.js");
+  assert.match(js, /if \(authSession\?\.user\?\.id !== userId\) return false;/);
+  assert.match(js, /loadOfficialProfile[\s\S]*?await supabaseClient\.functions\.invoke\('candidate-profile-review',[\s\S]*?authSession\?\.user\?\.id !== userId/);
+  assert.match(js, /loadPersistentReadiness[\s\S]*?await supabaseClient\.functions\.invoke\("candidate-workspace-readiness",[\s\S]*?authSession\?\.user\?\.id !== userId/);
+  assert.match(js, /loadApplicationWorkspace[\s\S]*?Promise\.all\([\s\S]*?authSession\?\.user\?\.id !== userId/);
+});
