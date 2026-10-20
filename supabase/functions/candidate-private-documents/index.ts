@@ -156,16 +156,39 @@ Deno.serve(async (req: Request) => {
     }
     const object = (objects ?? []).find((entry: any) => entry.name === basename);
     if (!object) return reply(409, { error: "The file is not present in private storage yet. Upload it before finalizing." }, origin);
-    const actualSize = Number(object.metadata?.size ?? object.metadata?.contentLength ?? 0);
-    if (!Number.isFinite(actualSize) || actualSize < 1 || actualSize > MAX_BYTES || actualSize !== Number(doc.size_bytes)) {
-      await admin.storage.from(BUCKET).remove([doc.storage_path]);
-      await admin.from("candidate_private_documents").update({ status: "UPLOAD_FAILED", updated_at: new Date().toISOString() })
-        .eq("id", id).eq("candidate_id", candidateId).eq("status", "UPLOAD_PENDING");
-      return reply(409, { error: "Uploaded file size did not match the declared size or exceeded the 10 MiB limit. The invalid upload was removed." }, origin);
+    const { data: storedFile, error: downloadError } = await admin.storage.from(BUCKET).download(doc.storage_path);
+    if (downloadError || !storedFile) {
+      console.error("private document content check failed", downloadError?.message ?? "unknown");
+      return reply(503, { error: "Could not inspect the uploaded file safely. Retry shortly." }, origin);
     }
+    const bytes = await storedFile.arrayBuffer();
+    const actualSize = bytes.byteLength;
+    const head = new Uint8Array(bytes.slice(0, 8));
+    const startsWith = (signature: number[]) => signature.every((value, index) => head[index] === value);
+    const signatureValid = doc.mime_type === "application/pdf"
+      ? new TextDecoder().decode(bytes.slice(0, 5)) === "%PDF-"
+      : doc.mime_type === "image/jpeg"
+        ? startsWith([0xff, 0xd8, 0xff])
+        : doc.mime_type === "image/png"
+          ? startsWith([0x89, 0x50, 0x4e, 0x47, 0x0d, 0x0a, 0x1a, 0x0a])
+          : false;
+    if (!Number.isFinite(actualSize) || actualSize < 1 || actualSize > MAX_BYTES || actualSize !== Number(doc.size_bytes) || !signatureValid) {
+      const { error: removeError } = await admin.storage.from(BUCKET).remove([doc.storage_path]);
+      const { error: failError } = await admin.from("candidate_private_documents").update({ status: "UPLOAD_FAILED", updated_at: new Date().toISOString() })
+        .eq("id", id).eq("candidate_id", candidateId).eq("status", "UPLOAD_PENDING");
+      const { error: failAuditError } = await admin.from("candidate_private_document_events").insert({
+        document_id: id, candidate_id: candidateId, actor_type: "SYSTEM",
+        event_type: "UPLOAD_FAILED", from_status: "UPLOAD_PENDING", to_status: "UPLOAD_FAILED",
+        metadata: { reason: "size_or_file_signature_invalid", object_removed: !removeError },
+      });
+      if (removeError || failError || failAuditError) console.error("invalid upload cleanup incomplete", removeError?.message ?? failError?.code ?? failAuditError?.code ?? "unknown");
+      return reply(409, { error: "The uploaded file size or file signature did not match the declared PDF/JPEG/PNG type. The upload was rejected." }, origin);
+    }
+    const digest = await crypto.subtle.digest("SHA-256", bytes);
+    const sha256Hex = Array.from(new Uint8Array(digest)).map(value => value.toString(16).padStart(2, "0")).join("");
     const now = new Date().toISOString();
     const { data: updated, error: updateError } = await admin.from("candidate_private_documents")
-      .update({ status: "UPLOADED_CANDIDATE_REPORTED", uploaded_at: now, updated_at: now })
+      .update({ status: "UPLOADED_CANDIDATE_REPORTED", sha256_hex: sha256Hex, uploaded_at: now, updated_at: now })
       .eq("id", id).eq("candidate_id", candidateId).eq("status", "UPLOAD_PENDING")
       .select("id,original_filename,mime_type,size_bytes,status,uploaded_at").maybeSingle();
     if (updateError || !updated) {
