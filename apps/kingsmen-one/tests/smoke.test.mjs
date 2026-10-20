@@ -198,6 +198,8 @@ test("private document lifecycle requires verified identity and scopes every rec
   assert.match(fn, /UPLOAD_PENDING/);
   assert.match(fn, /UPLOADED_CANDIDATE_REPORTED/);
   assert.match(fn, /event_type:\s*"UPLOAD_CONFIRMED"/);
+  assert.match(fn, /event_type:\s*"READ_LINK_ISSUED"/);
+  assert.match(fn, /download audit failed/);
   assert.doesNotMatch(fn, /event_type:\s*"UPLOAD_FINALIZED"/);
   assert.match(fn, /auditError/);
   assert.match(fn, /It is not independently verified/);
@@ -212,6 +214,9 @@ test("candidate document interface uses the private lifecycle and never treats c
   assert.match(app, /uploadToSignedUrl/);
   assert.match(app, /finalize_upload/);
   assert.match(app, /create_download_url/);
+  assert.match(app, /documentChecklistItems/);
+  assert.match(app, /item_type==="DOCUMENT"/);
+  assert.doesNotMatch(app, /Optional preparation checklist item ID/);
   assert.match(app, /privateDocumentsLoadedForUser/);
   assert.match(app, /It is not independently verified/);
   assert.match(app, /10\s*\*\s*1024\s*\*\s*1024/);
