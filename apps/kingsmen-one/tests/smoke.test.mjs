@@ -234,6 +234,8 @@ test("private document reviewer decisions require an active evidence reviewer an
   const fn = await readFile(resolve(root, "../..", "supabase/functions/candidate-private-documents/index.ts"), "utf8");
   const migration = await readFile(resolve(root, "../..", "supabase/migrations/20261020031028_n12_candidate_private_document_review.sql"), "utf8");
   assert.match(fn, /p\.action === "list_review_queue"/);
+  assert.match(fn, /origin && isAllowedOrigin\(origin\) \? \{ "Access-Control-Allow-Origin": origin \}/);
+  assert.match(fn, /signed_download_url: signed\.signedUrl, expires_in_seconds: 60 \}, origin\)/);
   assert.match(fn, /p\.action === "create_reviewer_download_url"/);
   assert.match(fn, /authenticated_reviewer_endpoint/);
   assert.match(fn, /actor_type: "REVIEWER"/);
