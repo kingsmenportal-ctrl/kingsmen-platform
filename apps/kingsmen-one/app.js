@@ -286,14 +286,50 @@
     const events=[...state.tasks.filter(t=>t.done).map(t=>({title:"Candidate marked preparation item complete",detail:t.title,kind:"Candidate-reported",date:"This browser session"})),...state.saved.map(id=>({title:"Opportunity saved",detail:opportunities.find(o=>o.id===id)?.title||id,kind:"Candidate action",date:"This browser session"})),...Object.keys(state.applicationNotes).map(id=>({title:"Preparation record created",detail:opportunities.find(o=>o.id===id)?.title||id,kind:"Candidate-reported",date:"This browser session"}))];
     return `${heading("Activity & evidence","See what you reported or prepared. Independently verified evidence is not available in demo mode.")}<div class="panel"><h3>Recent activity</h3><p class="panel-subtitle">Local actions only · no server-side audit record</p>${events.length?'<div class="activity-list">'+events.reverse().map(e=>`<div class="activity-item"><span class="activity-dot"></span><div><strong>${e.title}</strong><p>${e.detail}</p><small>${e.kind} · ${e.date}</small></div></div>`).join("")+'</div>':'<div class="empty-state"><strong>No activity yet</strong><p>Save an opportunity or complete a preparation item to see local activity here.</p></div>'}<p class="muted-note">Candidate-reported progress is not the same as reviewer-verified evidence or a provider-confirmed outcome.</p></div>`;
   }
-  const views={home,account:accountView,profile:profileView,pathways:pathwaysView,opportunities:opportunitiesView,applications:applicationsView,documents:documentsView,activity:activityView};
+
+  let reviewerQueue = [];
+  let reviewerQueueLoadedForUser = null;
+  let reviewerQueueLoadingForUser = null;
+  let reviewerQueueError = "";
+  async function loadReviewerQueue(force = false) {
+    const userId=authSession?.user?.id;
+    if(!supabaseClient||!userId){reviewerQueue=[];reviewerQueueLoadedForUser=null;reviewerQueueError="Sign in with an authorised reviewer account to access the review queue.";return false;}
+    if(!force&&reviewerQueueLoadedForUser===userId)return true;
+    if(reviewerQueueLoadingForUser===userId)return false;
+    reviewerQueueLoadingForUser=userId;reviewerQueueError="";
+    try {
+      const {data,error}=await supabaseClient.functions.invoke("candidate-private-documents",{body:{action:"list_review_queue"}});
+      if(authSession?.user?.id!==userId)return false;
+      if(error||data?.ready!==true)throw error||new Error(data?.error||"Reviewer queue unavailable.");
+      reviewerQueue=Array.isArray(data.documents)?data.documents:[];
+      reviewerQueueLoadedForUser=userId;
+      return true;
+    } catch(error) {
+      reviewerQueue=[];reviewerQueueLoadedForUser=null;
+      reviewerQueueError=error?.message||"Reviewer queue unavailable.";
+      return false;
+    } finally {
+      if(reviewerQueueLoadingForUser===userId)reviewerQueueLoadingForUser=null;
+      if(activeView==="reviewer"&&authSession?.user?.id===userId)render("reviewer");
+    }
+  }
+  function reviewerView() {
+    if(!authSession?.user) return `${heading("Reviewer console","Private evidence review is restricted to authorised reviewers.")}<div class="panel"><p>Sign in using your assigned reviewer account. Candidate accounts cannot access the review queue.</p><button class="primary-button" type="button" data-view="account">Sign in</button></div>`;
+    const rows=reviewerQueueLoadedForUser===authSession.user.id?reviewerQueue.map(d=>{
+      const date=d.created_at?new Date(d.created_at).toLocaleString():"Date unavailable";
+      const decisionOptions='<option value="START_REVIEW">Start review</option><option value="VERIFIED">Verify evidence</option><option value="CORRECTION_REQUIRED">Request correction</option><option value="REJECTED">Reject document</option>';
+      return `<article class="panel reviewer-document" style="margin-bottom:14px"><div class="section-head"><div><h3>${escapeHtml(d.original_filename||"Private document")}</h3><p>${escapeHtml(d.mime_type||"Unknown type")} · ${Math.ceil(Number(d.size_bytes||0)/1024)} KB · Added ${escapeHtml(date)}</p></div><span class="tag ${d.status==="UNDER_REVIEW"?"done":"pending"}">${escapeHtml(d.status||"Unknown status")}</span></div><p class="panel-subtitle">Document ID: <code>${escapeHtml(d.id)}</code></p><p class="panel-subtitle">Candidate record: <code>${escapeHtml(d.candidate_id||"Not available")}</code></p><div class="auth-actions"><button class="secondary-button" type="button" data-reviewer-download="${escapeHtml(d.id)}">Open secure download (60 sec)</button></div><form data-review-decision data-document-id="${escapeHtml(d.id)}"><label class="form-label" for="review-decision-${escapeHtml(d.id)}">Decision</label><select class="filter-select form-control" id="review-decision-${escapeHtml(d.id)}" name="decision">${decisionOptions}</select><label class="form-label" for="review-note-${escapeHtml(d.id)}">Reviewer note (required for final decisions)</label><textarea class="filter-input form-control" id="review-note-${escapeHtml(d.id)}" name="reviewer_note" rows="2" maxlength="1200" placeholder="Explain the decision and any correction required"></textarea><label class="form-label" for="review-evidence-${escapeHtml(d.id)}">Evidence reference (required for final decisions)</label><input class="filter-input form-control" id="review-evidence-${escapeHtml(d.id)}" name="evidence_reference" maxlength="500" placeholder="Reference to the evidence checked"><button class="primary-button" type="submit">Save reviewer decision</button><p class="muted-note">Final decisions and audit events are saved transactionally. A candidate-reported upload is not verified until an authorised reviewer confirms it.</p></form></article>`;
+    }).join(""):'<p class="muted-note">Load the queue to retrieve authorised review records.</p>';
+    return `${heading("Reviewer console","Review candidate-reported evidence with permission-checked access and an auditable decision history.",'<button class="secondary-button" id="refresh-reviewer-queue" type="button">Refresh queue</button>')}<div class="panel"><span class="tag ${reviewerQueueLoadedForUser===authSession.user.id?"done":"pending"}">${reviewerQueueLoadedForUser===authSession.user.id?"Queue loaded":"Authorisation required"}</span><p class="panel-subtitle">Signed in as ${escapeHtml(authSession.user.email||"authenticated user")}. The server checks reviewer permissions for every action; sign-in alone does not grant reviewer access.</p>${reviewerQueueError?`<p class="muted-note" role="status">${escapeHtml(reviewerQueueError)}</p>`:""}${reviewerQueueLoadedForUser===authSession.user.id&&!reviewerQueue.length?'<p>No documents are awaiting review. This may mean the queue is empty, or staging has no review fixtures.</p>':""}</div><div style="margin-top:16px">${rows}</div><div class="notice"><span>ⓘ</span><p>Only access documents for an authorised review purpose. Downloads expire after 60 seconds. Decision notes and evidence references are retained in the review audit trail.</p></div>`;
+  }
+\n    const views={home,account:accountView,profile:profileView,pathways:pathwaysView,opportunities:opportunitiesView,applications:applicationsView,documents:documentsView,activity:activityView,reviewer:reviewerView};
   function render(view=activeView) {
-    activeView=view; const labels={home:"Overview",account:"Sign in / account",profile:"My profile",pathways:"My pathways",opportunities:"Opportunities",applications:"Applications",documents:"Documents",activity:"Activity & evidence"};
+    activeView=view; const labels={home:"Overview",account:"Sign in / account",profile:"My profile",pathways:"My pathways",opportunities:"Opportunities",applications:"Applications",documents:"Documents",activity:"Activity & evidence",reviewer:"Reviewer console"};
     crumb.textContent=labels[view]||"Overview";
     document.querySelectorAll(".nav-item").forEach(b=>b.classList.toggle("active",b.dataset.view===view));
     document.getElementById("welcome").classList.toggle("hidden",view!=="home");
     root.innerHTML=(views[view]||home)();
-    if(view==="opportunities"){renderOpportunityCards();loadVerifiedOpportunities();document.getElementById("opportunity-search").addEventListener("input",renderOpportunityCards);document.getElementById("opportunity-filter").addEventListener("change",renderOpportunityCards);} if(view==="profile"&&authSession?.user) void loadOfficialProfile(); if(view==="applications"&&authSession?.user&&applicationWorkspaceLoadedForUser!==authSession.user.id) void loadApplicationWorkspace().then(()=>{if(activeView==="applications")render("applications");}); if(view==="documents"&&authSession?.user&&privateDocumentsLoadedForUser!==authSession.user.id&&privateDocumentsLoadingForUser!==authSession.user.id) void loadPrivateDocuments(); if(view==="documents"&&authSession?.user&&applicationWorkspaceLoadedForUser!==authSession.user.id) void loadApplicationWorkspace().then(()=>{if(activeView==="documents")render("documents");});
+    if(view==="opportunities"){renderOpportunityCards();loadVerifiedOpportunities();document.getElementById("opportunity-search").addEventListener("input",renderOpportunityCards);document.getElementById("opportunity-filter").addEventListener("change",renderOpportunityCards);} if(view==="profile"&&authSession?.user) void loadOfficialProfile(); if(view==="applications"&&authSession?.user&&applicationWorkspaceLoadedForUser!==authSession.user.id) void loadApplicationWorkspace().then(()=>{if(activeView==="applications")render("applications");}); if(view==="documents"&&authSession?.user&&privateDocumentsLoadedForUser!==authSession.user.id&&privateDocumentsLoadingForUser!==authSession.user.id) void loadPrivateDocuments(); if(view==="documents"&&authSession?.user&&applicationWorkspaceLoadedForUser!==authSession.user.id) void loadApplicationWorkspace().then(()=>{if(activeView==="documents")render("documents");}); if(view==="reviewer"&&authSession?.user&&reviewerQueueLoadedForUser!==authSession.user.id&&reviewerQueueLoadingForUser!==authSession.user.id) void loadReviewerQueue();
   }
   document.addEventListener("submit",async e=>{
     if(e.target.id==="private-document-upload-form") {
