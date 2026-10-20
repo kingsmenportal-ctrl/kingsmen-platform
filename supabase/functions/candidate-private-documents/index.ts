@@ -37,7 +37,7 @@ Deno.serve(async (req: Request) => {
   const origin = req.headers.get("Origin");
   if (origin && !isAllowedOrigin(origin)) return reply(403, { error: "Origin not allowed." }, null);
   if (req.method === "OPTIONS") return new Response(null, { status: 204, headers: {
-    ...(origin && origins.has(origin) ? { "Access-Control-Allow-Origin": origin } : {}),
+    ...(origin && isAllowedOrigin(origin) ? { "Access-Control-Allow-Origin": origin } : {}),
     "Access-Control-Allow-Headers": "authorization, apikey, content-type, x-client-info",
     "Access-Control-Allow-Methods": "POST, OPTIONS",
     "Access-Control-Max-Age": "600",
@@ -101,7 +101,7 @@ Deno.serve(async (req: Request) => {
       console.error("reviewer document download audit failed", auditError.code ?? "unknown");
       return reply(503, { error: "A download link could not be issued because its audit record could not be saved. Retry shortly." }, origin);
     }
-    return reply(200, { ready: true, signed_download_url: signed.signedUrl, expires_in_seconds: 60 });
+    return reply(200, { ready: true, signed_download_url: signed.signedUrl, expires_in_seconds: 60 }, origin);
   }
 
   // Reviewer actions are handled before candidate-link resolution: reviewers are
