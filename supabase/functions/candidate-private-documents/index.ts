@@ -125,6 +125,23 @@ Deno.serve(async (req: Request) => {
       .eq("id", id).eq("candidate_id", candidateId).maybeSingle();
     if (docError || !doc) return reply(404, { error: "Private document record not found." }, origin);
     if (doc.status === "UPLOADED_CANDIDATE_REPORTED" || doc.status === "UNDER_REVIEW" || doc.status === "VERIFIED") {
+      const { data: audit, error: auditReadError } = await admin.from("candidate_private_document_events")
+        .select("id").eq("document_id", id).eq("event_type", "UPLOAD_CONFIRMED").limit(1);
+      if (auditReadError) {
+        console.error("private document audit lookup failed", auditReadError.code ?? "unknown");
+        return reply(503, { error: "The document is finalized, but its audit record could not be checked. Retry shortly." }, origin);
+      }
+      if (!(audit ?? []).length) {
+        const { error: auditRepairError } = await admin.from("candidate_private_document_events").insert({
+          document_id: id, candidate_id: candidateId, actor_type: "CANDIDATE",
+          event_type: "UPLOAD_CONFIRMED", from_status: "UPLOAD_PENDING",
+          to_status: doc.status, metadata: { source: "authenticated_candidate_endpoint", recovered: true },
+        });
+        if (auditRepairError) {
+          console.error("private document audit recovery failed", auditRepairError.code ?? "unknown");
+          return reply(503, { error: "The document is finalized, but its audit record could not be restored. Retry shortly." }, origin);
+        }
+      }
       return reply(200, { ready: true, document: { id: doc.id, status: doc.status }, already_finalized: true }, origin);
     }
     if (doc.status !== "UPLOAD_PENDING" || doc.storage_bucket !== BUCKET || !String(doc.storage_path).startsWith(candidateId + "/")) {
@@ -155,11 +172,21 @@ Deno.serve(async (req: Request) => {
       console.error("private document finalize failed", updateError?.code ?? "unknown");
       return reply(503, { error: "The file is present, but its record could not be finalized. Retry shortly." }, origin);
     }
-    await admin.from("candidate_private_document_events").insert({
+    const { error: auditError } = await admin.from("candidate_private_document_events").insert({
       document_id: id, candidate_id: candidateId, actor_type: "CANDIDATE",
-      event_type: "UPLOAD_FINALIZED", from_status: "UPLOAD_PENDING",
+      event_type: "UPLOAD_CONFIRMED", from_status: "UPLOAD_PENDING",
       to_status: "UPLOADED_CANDIDATE_REPORTED", metadata: { source: "authenticated_candidate_endpoint" },
     });
+    if (auditError) {
+      console.error("private document audit insert failed", auditError.code ?? "unknown");
+      // Keep the record retryable if audit persistence failed. If this conditional
+      // rollback also fails, the idempotent retry path repairs the missing audit.
+      const { error: rollbackError } = await admin.from("candidate_private_documents")
+        .update({ status: "UPLOAD_PENDING", uploaded_at: null, updated_at: new Date().toISOString() })
+        .eq("id", id).eq("candidate_id", candidateId).eq("status", "UPLOADED_CANDIDATE_REPORTED");
+      if (rollbackError) console.error("private document audit rollback failed", rollbackError.code ?? "unknown");
+      return reply(503, { error: "The file is present, but its audit record could not be saved. Retry finalization shortly." }, origin);
+    }
     return reply(200, { ready: true, document: updated, message: "Upload recorded as candidate-reported. It is not independently verified." }, origin);
   }
 
