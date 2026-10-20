@@ -29,7 +29,7 @@ function reply(status: number, body: Record<string,unknown>, origin: string | nu
 }
 function safeFilename(value: unknown): string {
   if (typeof value !== "string") return "";
-  return value.normalize("NFKC").replace(/[\\/\\\\\u0000-\u001f\u007f]/g, "_").trim().slice(0,180);
+  return value.normalize("NFKC").replace(/[\/\\\x00-\x1f\x7f]/g, "_").trim().slice(0,180);
 }
 Deno.serve(async (req: Request) => {
   const origin = req.headers.get("Origin");
