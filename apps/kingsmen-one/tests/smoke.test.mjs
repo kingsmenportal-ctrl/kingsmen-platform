@@ -263,6 +263,10 @@ test("reviewer console connects the authenticated UI to permission-checked queue
   const html = await read("index.html");
   assert.match(html, /data-view="reviewer"/);
   assert.match(app, /function reviewerView\(\)/);
+  assert.match(app, /id="reviewer-queue-search"/);
+  assert.match(app, /id="reviewer-queue-status"/);
+  assert.match(app, /data-reviewer-card/);
+  assert.match(app, /function applyReviewerQueueFilters\(\)/);
   assert.match(app, /data-review-decision/);
   assert.match(app, /data-reviewer-download/);
   assert.match(app, /action:"list_review_queue"/);
