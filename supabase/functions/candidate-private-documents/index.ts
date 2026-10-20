@@ -202,6 +202,15 @@ Deno.serve(async (req: Request) => {
     }
     const { data: signed, error: signError } = await admin.storage.from(BUCKET).createSignedUrl(doc.storage_path, 60, { download: true });
     if (signError || !signed) return reply(503, { error: "Could not create a temporary download link." }, origin);
+    const { error: auditError } = await admin.from("candidate_private_document_events").insert({
+      document_id: id, candidate_id: candidateId, actor_type: "CANDIDATE",
+      event_type: "READ_LINK_ISSUED", from_status: doc.status, to_status: doc.status,
+      metadata: { source: "authenticated_candidate_endpoint", expires_in_seconds: 60 },
+    });
+    if (auditError) {
+      console.error("private document download audit failed", auditError.code ?? "unknown");
+      return reply(503, { error: "A download link could not be issued because its audit record could not be saved. Retry shortly." }, origin);
+    }
     return reply(200, { ready: true, signed_download_url: signed.signedUrl, expires_in_seconds: 60 }, origin);
   }
 
