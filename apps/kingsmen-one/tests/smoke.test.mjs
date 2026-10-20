@@ -180,3 +180,24 @@ test("stale async responses cannot overwrite a different signed-in candidate wor
   assert.match(js, /loadPersistentReadiness[\s\S]*?await supabaseClient\.functions\.invoke\("candidate-workspace-readiness",[\s\S]*?authSession\?\.user\?\.id !== userId/);
   assert.match(js, /loadApplicationWorkspace[\s\S]*?Promise\.all\([\s\S]*?authSession\?\.user\?\.id !== userId/);
 });
+
+test("private document lifecycle requires verified identity and scopes every record to the resolved candidate", async () => {
+  const fn = await readFile(resolve(root, "../..", "supabase/functions/candidate-private-documents/index.ts"), "utf8");
+  assert.match(fn, /auth\.auth\.getUser|auth\.getUser/);
+  assert.match(fn, /candidate_auth_identity_links/);
+  assert.match(fn, /eq\("link_status",\s*"VERIFIED"\)/);
+  assert.match(fn, /verified_at/);
+  assert.match(fn, /candidate_private_documents/);
+  assert.match(fn, /eq\("candidate_id", candidateId\)/);
+  assert.match(fn, /createSignedUploadUrl/);
+  assert.match(fn, /createSignedUrl\(doc\.storage_path, 60/);
+  assert.match(fn, /MAX_BYTES = 10 \* 1024 \* 1024/);
+  assert.match(fn, /"application\/pdf"/);
+  assert.match(fn, /"image\/jpeg"/);
+  assert.match(fn, /"image\/png"/);
+  assert.match(fn, /UPLOAD_PENDING/);
+  assert.match(fn, /UPLOADED_CANDIDATE_REPORTED/);
+  assert.match(fn, /It is not independently verified/);
+  assert.match(fn, /Cache-Control/);
+  assert.doesNotMatch(fn, /p\.candidate_id|payload\.candidate_id/);
+});
