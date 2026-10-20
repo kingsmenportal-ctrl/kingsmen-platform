@@ -168,7 +168,7 @@ test("browser-local demo state is reset when the authenticated account changes",
   assert.match(js, /function setAuthSession\(session\)/);
   assert.match(js, /previousUserId = authSession\?\.user\?\.id \|\| null/);
   assert.match(js, /nextUserId = session\?\.user\?\.id \|\| null/);
-  assert.match(js, /if \(previousUserId !== nextUserId\) \{\s*state = initial\(\);\s*save\(\);\s*\}/);
+  assert.match(js, /if \(previousUserId !== nextUserId\) \{[\s\S]*?state = initial\(\);[\s\S]*?privateDocuments = \[\];[\s\S]*?save\(\);\s*\}/);
   assert.match(js, /setAuthSession\(data\.session\)/);
   assert.match(js, /setAuthSession\(session\)/);
 });
