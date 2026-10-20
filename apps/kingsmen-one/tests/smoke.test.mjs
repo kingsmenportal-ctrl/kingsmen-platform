@@ -257,3 +257,19 @@ test("private document reviewer decisions require an active evidence reviewer an
   assert.match(migration, /grant execute on function public\.review_candidate_private_document[\s\S]*to service_role/i);
   assert.match(migration, /v_doc\.status <> 'UNDER_REVIEW'/);
 });
+
+test("reviewer console connects the authenticated UI to permission-checked queue, download and decision endpoints", async () => {
+  const app = await read("app.js");
+  const html = await read("index.html");
+  assert.match(html, /data-view="reviewer"/);
+  assert.match(app, /function reviewerView\(\)/);
+  assert.match(app, /data-review-decision/);
+  assert.match(app, /data-reviewer-download/);
+  assert.match(app, /action:"list_review_queue"/);
+  assert.match(app, /action:"create_reviewer_download_url"/);
+  assert.match(app, /action:"review_document"/);
+  assert.match(app, /reviewerQueueLoadedForUser===authSession\.user\.id/);
+  assert.match(app, /reviewerQueue=\[\];reviewerQueueLoadedForUser=null/);
+  assert.match(app, /Final decisions require a reviewer note and evidence reference/);
+  assert.match(app, /Temporary reviewer download link issued and audited/);
+});
