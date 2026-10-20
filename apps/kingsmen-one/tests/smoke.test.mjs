@@ -201,6 +201,9 @@ test("private document lifecycle requires verified identity and scopes every rec
   assert.match(fn, /event_type:\s*"READ_LINK_ISSUED"/);
   assert.match(fn, /download audit failed/);
   assert.match(fn, /signatureValid/);
+  assert.match(fn, /function isAllowedOrigin\(origin: string\): boolean/);
+  assert.match(fn, /kingsmen-portal-staging\\\.netlify\\\.app/);
+  assert.match(fn, /if \(origin && !isAllowedOrigin\(origin\)\)/);
   assert.match(fn, /crypto\.subtle\.digest\("SHA-256"/);
   assert.match(fn, /event_type:\s*"UPLOAD_FAILED"/);
   assert.match(fn, /sha256_hex:\s*sha256Hex/);
