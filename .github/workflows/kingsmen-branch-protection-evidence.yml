@@ -21,8 +21,12 @@ jobs:
           node-version: '22'
 
       - name: Explain required read-only credential
-        if: ${{ secrets.BRANCH_PROTECTION_READ_TOKEN == '' }}
-        run: echo "::warning::BRANCH_PROTECTION_READ_TOKEN is not configured; the fallback GITHUB_TOKEN may not have repository administration-read access. Add a fine-grained read-only token with repository administration read permission as BRANCH_PROTECTION_READ_TOKEN."
+        env:
+          BRANCH_PROTECTION_READ_TOKEN_CONFIGURED: ${{ secrets.BRANCH_PROTECTION_READ_TOKEN != '' }}
+        run: |
+          if [ "$BRANCH_PROTECTION_READ_TOKEN_CONFIGURED" != "true" ]; then
+            echo "::warning::BRANCH_PROTECTION_READ_TOKEN is not configured; the fallback GITHUB_TOKEN may not have repository administration-read access. Add a fine-grained read-only token with repository administration read permission as BRANCH_PROTECTION_READ_TOKEN."
+          fi
       - name: Verify protection using read-only GitHub API
         env:
           GITHUB_REPOSITORY: ${{ github.repository }}
