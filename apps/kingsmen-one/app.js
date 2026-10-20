@@ -58,11 +58,15 @@
     if(!force&&profileLoadedForUser===userId)return profileReviewAvailable;
     try {
       const {data,error}=await supabaseClient.functions.invoke('candidate-profile-review',{body:{action:'load'}});
+      if (authSession?.user?.id !== userId) return false;
       if(error||data?.ready!==true)throw error||new Error('Official profile access unavailable.');
       officialProfile=data.profile||null;profileChangeRequests=Array.isArray(data.change_requests)?data.change_requests:[];profileReviewAvailable=true;profileLoadedForUser=userId;
       if(officialProfile){state.profile={...(state.profile||{}),province:officialProfile.province||'',qualification:officialProfile.highest_grade||''};save();}
       if(activeView==='profile')render('profile');return true;
-    } catch {profileReviewAvailable=false;profileLoadedForUser=userId;return false;}
+    } catch {
+      if (authSession?.user?.id !== userId) return false;
+      profileReviewAvailable=false;profileLoadedForUser=userId;return false;
+    }
   }
   async function loadPersistentReadiness(force = false) {
     const userId = authSession?.user?.id;
@@ -74,6 +78,7 @@
     if (!force && workspaceLoadedForUser === userId) return workspacePersistenceAvailable;
     try {
       const { data, error } = await supabaseClient.functions.invoke("candidate-workspace-readiness", { body: { action: "load" } });
+      if (authSession?.user?.id !== userId) return false;
       if (error) throw error;
       if (data?.ready !== true) throw new Error("Verified candidate workspace is unavailable.");
       const completed = new Set(Array.isArray(data.completed_tasks) ? data.completed_tasks : []);
@@ -85,6 +90,7 @@
       if (activeView !== "account") render(activeView);
       return true;
     } catch {
+      if (authSession?.user?.id !== userId) return false;
       workspacePersistenceAvailable = false;
       workspaceLoadedForUser = userId;
       return false;
@@ -209,6 +215,7 @@
         supabaseClient.functions.invoke("candidate-application-preparation",{body:{action:"load"}}),
         supabaseClient.from("candidate_saved_routes").select("route_programme_id,route_programmes(id,programme_name,route_type,source_url,route_status,availability_status)").eq("user_id",userId)
       ]);
+      if (authSession?.user?.id !== userId) return false;
       if(workspace.error)throw workspace.error;
       if(workspace.data?.ready!==true)throw new Error("Verified candidate identity is required.");
       if(saved.error)throw saved.error;
@@ -218,6 +225,7 @@
       applicationWorkspaceAvailable=true;applicationWorkspaceLoadedForUser=userId;
       return true;
     } catch {
+      if (authSession?.user?.id !== userId) return false;
       applicationWorkspaceAvailable=false;applicationWorkspaceLoadedForUser=userId;
       applicationTrackers=[];applicationItems=[];applicationSavedRoutes=[];
       return false;
