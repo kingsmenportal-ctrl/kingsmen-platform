@@ -29,6 +29,10 @@
   const progress = () => Math.round(state.tasks.filter(t=>t.done).length / state.tasks.length * 100);
   const supabaseClient = window.kingsmenSupabase || null;
   let authSession = null;
+  let privateDocuments = [];
+  let privateDocumentsLoadedForUser = null;
+  let privateDocumentsLoadingForUser = null;
+  let privateDocumentsError = "";
   // Browser-local demo data must never follow a session from one account to another.
   function setAuthSession(session) {
     const previousUserId = authSession?.user?.id || null;
@@ -36,6 +40,10 @@
     authSession = session;
     if (previousUserId !== nextUserId) {
       state = initial();
+      privateDocuments = [];
+      privateDocumentsLoadedForUser = null;
+      privateDocumentsLoadingForUser = null;
+      privateDocumentsError = "";
       save();
     }
   }
@@ -246,9 +254,31 @@
   function applicationsView() {
     return `${heading("Application preparation","Persistent trackers connect saved verified opportunities to checklists and candidate-reported evidence references.")}<div class="content-grid"><div class="panel"><h3>General readiness checklist</h3><p class="panel-subtitle">${workspacePersistenceAvailable?"Saved to your verified candidate workspace.":"Local preview only until candidate identity is verified."}</p><div class="task-list">${taskList()}</div><p class="muted-note">Completing a task does not certify documents or submit an application.</p></div><div class="panel"><h3>Persistent application tracker</h3><p class="panel-subtitle">${applicationWorkspaceAvailable?"Connected to your verified candidate workspace.":"Sign in and complete authorised candidate identity review to access persistent trackers."}</p>${applicationWorkspaceAvailable?applicationWorkspaceView():'<p class="muted-note">Your tracker records are not available in preview mode. No candidate data is shown until the server verifies your identity link.</p>'}</div></div>`;
   }
+  async function loadPrivateDocuments(force=false) {
+    const userId=authSession?.user?.id;
+    if(!supabaseClient||!userId){privateDocuments=[];privateDocumentsLoadedForUser=null;privateDocumentsError="Sign in to access private documents.";return;}
+    if(privateDocumentsLoadingForUser===userId||(!force&&privateDocumentsLoadedForUser===userId))return;
+    privateDocumentsLoadingForUser=userId;privateDocumentsError="";
+    try{
+      const {data,error}=await supabaseClient.functions.invoke("candidate-private-documents",{body:{action:"list"}});
+      if(authSession?.user?.id!==userId)return;
+      if(error||data?.ready!==true)throw error||new Error(data?.error||"Private document service is unavailable.");
+      privateDocuments=Array.isArray(data.documents)?data.documents:[];
+      privateDocumentsLoadedForUser=userId;
+    }catch(error){
+      if(authSession?.user?.id===userId){privateDocumentsError=error.message||"Could not load private documents.";privateDocumentsLoadedForUser=null;}
+    }finally{
+      if(privateDocumentsLoadingForUser===userId)privateDocumentsLoadingForUser=null;
+      if(activeView==="documents"&&authSession?.user?.id===userId)render("documents");
+    }
+  }
   function documentsView() {
     const docs=[["identity","Identity document","Prepare a clear copy. Identity matching requires authorised review."],["results","Academic results","Gather your latest official results or transcripts."],["cv","CV / résumé","Check contact details, dates and relevant experience."],["proof-address","Proof of address","Check the receiving organisation's current requirements."]];
-    return `${heading("Document readiness","A readiness checklist—not a document vault. No files are uploaded or stored in this demo.")}<div class="document-grid">${docs.map(([id,title,desc])=>{const status=state.documents[id]||"not-started";return `<article class="doc-card"><div class="card-icon">▧</div><h3>${title}</h3><p>${desc}</p><span class="tag doc-status ${status==="prepared"?"done":"pending"}">${status==="prepared"?"Candidate marked prepared":"Not prepared"}</span>${button(status==="prepared"?"Mark not prepared":"Mark prepared",`data-document="${id}"`)}</article>`;}).join("")}</div><div class="notice"><span>ⓘ</span><p>Real document upload must use private storage, authenticated access and reviewer-controlled verification. Never upload sensitive documents to this demo.</p></div>`;
+    const identityReady=privateDocumentsLoadedForUser===authSession?.user?.id&&!!authSession?.user;
+    const statusText=s=>({"UPLOAD_PENDING":"Upload pending","UPLOADED_CANDIDATE_REPORTED":"Uploaded · awaiting review","UNDER_REVIEW":"Under review","VERIFIED":"Reviewer verified","REJECTED":"Reviewer requested correction","UPLOAD_FAILED":"Upload failed"}[s]||s);
+    const liveDocs=identityReady?privateDocuments.map(d=>`<div class="task-row"><span class="task-check ${d.status==="VERIFIED"?"done":""}">${d.status==="VERIFIED"?"✓":"▧"}</span><div class="task-info"><strong>${escapeHtml(d.original_filename)}</strong><small>${escapeHtml(d.mime_type)} · ${Math.ceil(Number(d.size_bytes||0)/1024)} KB · ${escapeHtml(statusText(d.status))} · ${d.uploaded_at?escapeHtml(new Date(d.uploaded_at).toLocaleDateString()):"Not finalized"}</small></div>${["UPLOADED_CANDIDATE_REPORTED","UNDER_REVIEW","VERIFIED","REJECTED"].includes(d.status)?button("Download",`data-private-download="${escapeHtml(d.id)}"`):""}</div>`).join(""):'<p class="muted-note">Private records load only after the server verifies your candidate identity.</p>';
+    const livePanel=authSession?.user?`<div class="panel"><h3>Private document vault</h3><p class="panel-subtitle">Private storage · verified identity required · candidate uploads are not treated as verified evidence.</p>${privateDocumentsError?`<p class="muted-note" role="status">${escapeHtml(privateDocumentsError)}</p>`:''}<button class="secondary-button" type="button" id="refresh-private-documents">Refresh private documents</button><form id="private-document-upload-form" style="margin-top:18px"><label class="form-label" for="private-document-file">Choose a document (PDF, JPEG or PNG; max 10 MiB)</label><input class="filter-input form-control" id="private-document-file" name="file" type="file" accept="application/pdf,image/jpeg,image/png" required><label class="form-label" for="private-document-preparation-item">Optional preparation checklist item ID</label><input class="filter-input form-control" id="private-document-preparation-item" name="preparation_item_id" maxlength="36" placeholder="Leave blank to upload without linking"><button class="primary-button" type="submit">Upload securely</button><p class="muted-note" id="private-document-upload-status" role="status" aria-live="polite">The server checks your verified identity before creating a private upload link.</p></form><h4 style="margin-top:22px">Your uploaded files</h4><div class="task-list">${liveDocs||'<p class="muted-note">No private documents uploaded yet.</p>'}</div></div>`:'<div class="panel"><h3>Private document vault</h3><p class="panel-subtitle">Sign in and complete authorised candidate identity verification before uploading private documents.</p><button class="primary-button" type="button" data-view="account">Sign in / request identity review</button></div>';
+    return `${heading("Document readiness","Prepare your application documents and securely upload them after your candidate identity is verified.")}<div class="document-grid">${docs.map(([id,title,desc])=>{const status=state.documents[id]||"not-started";return `<article class="doc-card"><div class="card-icon">▧</div><h3>${title}</h3><p>${desc}</p><span class="tag doc-status ${status==="prepared"?"done":"pending"}">${status==="prepared"?"Candidate marked prepared":"Not prepared"}</span>${button(status==="prepared"?"Mark not prepared":"Mark prepared",`data-document="${id}"`)}</article>`;}).join("")}</div>${livePanel}<div class="notice"><span>ⓘ</span><p>Uploaded files remain candidate-reported until an authorised reviewer changes the status. Do not upload documents you are not authorised to share.</p></div>`;
   }
   function activityView() {
     const events=[...state.tasks.filter(t=>t.done).map(t=>({title:"Candidate marked preparation item complete",detail:t.title,kind:"Candidate-reported",date:"This browser session"})),...state.saved.map(id=>({title:"Opportunity saved",detail:opportunities.find(o=>o.id===id)?.title||id,kind:"Candidate action",date:"This browser session"})),...Object.keys(state.applicationNotes).map(id=>({title:"Preparation record created",detail:opportunities.find(o=>o.id===id)?.title||id,kind:"Candidate-reported",date:"This browser session"}))];
@@ -261,9 +291,36 @@
     document.querySelectorAll(".nav-item").forEach(b=>b.classList.toggle("active",b.dataset.view===view));
     document.getElementById("welcome").classList.toggle("hidden",view!=="home");
     root.innerHTML=(views[view]||home)();
-    if(view==="opportunities"){renderOpportunityCards();loadVerifiedOpportunities();document.getElementById("opportunity-search").addEventListener("input",renderOpportunityCards);document.getElementById("opportunity-filter").addEventListener("change",renderOpportunityCards);} if(view==="profile"&&authSession?.user) void loadOfficialProfile(); if(view==="applications"&&authSession?.user&&applicationWorkspaceLoadedForUser!==authSession.user.id) void loadApplicationWorkspace().then(()=>{if(activeView==="applications")render("applications");});
+    if(view==="opportunities"){renderOpportunityCards();loadVerifiedOpportunities();document.getElementById("opportunity-search").addEventListener("input",renderOpportunityCards);document.getElementById("opportunity-filter").addEventListener("change",renderOpportunityCards);} if(view==="profile"&&authSession?.user) void loadOfficialProfile(); if(view==="applications"&&authSession?.user&&applicationWorkspaceLoadedForUser!==authSession.user.id) void loadApplicationWorkspace().then(()=>{if(activeView==="applications")render("applications");}); if(view==="documents"&&authSession?.user&&privateDocumentsLoadedForUser!==authSession.user.id&&privateDocumentsLoadingForUser!==authSession.user.id) void loadPrivateDocuments();
   }
   document.addEventListener("submit",async e=>{
+    if(e.target.id==="private-document-upload-form") {
+      e.preventDefault();
+      const userId=authSession?.user?.id;
+      const file=e.target.elements.file?.files?.[0];
+      const status=document.getElementById("private-document-upload-status");
+      const submit=e.target.querySelector('button[type="submit"]');
+      if(!supabaseClient||!userId){if(status)status.textContent="Sign in before uploading.";return;}
+      if(!file){if(status)status.textContent="Choose a file first.";return;}
+      const allowed=["application/pdf","image/jpeg","image/png"];
+      if(!allowed.includes(file.type)||file.size<1||file.size>10*1024*1024){if(status)status.textContent="Choose a PDF, JPEG or PNG between 1 byte and 10 MiB.";return;}
+      if(submit)submit.disabled=true;
+      if(status)status.textContent="Checking identity and preparing secure upload…";
+      try{
+        const {data:ticket,error:ticketError}=await supabaseClient.functions.invoke("candidate-private-documents",{body:{action:"create_upload",filename:file.name,mime_type:file.type,size_bytes:file.size,preparation_item_id:String(new FormData(e.target).get("preparation_item_id")||"").trim()||null}});
+        if(authSession?.user?.id!==userId)throw new Error("Your account changed. Sign in again before retrying.");
+        if(ticketError||ticket?.ready!==true)throw ticketError||new Error(ticket?.error||"Could not prepare the upload.");
+        const {error:uploadError}=await supabaseClient.storage.from(ticket.bucket).uploadToSignedUrl(ticket.path,ticket.upload_token,file,{contentType:file.type,upsert:false});
+        if(uploadError)throw uploadError;
+        if(status)status.textContent="File uploaded to private storage. Confirming file size and recording the upload…";
+        const {data:finalized,error:finalizeError}=await supabaseClient.functions.invoke("candidate-private-documents",{body:{action:"finalize_upload",document_id:ticket.document.id}});
+        if(finalizeError||finalized?.ready!==true)throw finalizeError||new Error(finalized?.error||"Upload is stored but could not be finalized. Refresh and retry.");
+        if(status)status.textContent="Upload recorded as candidate-reported. It is not independently verified.";
+        e.target.reset();await loadPrivateDocuments(true);toast("Private document uploaded; reviewer verification is still required.");
+      }catch(error){if(status)status.textContent=error.message||"Private upload failed. Retry after checking your session."; }
+      finally{if(submit)submit.disabled=false;}
+      return;
+    }
     if(e.target.matches("[data-add-item]")) {
       e.preventDefault();
       if(!applicationWorkspaceAvailable){toast("Verified candidate workspace required.");return;}
@@ -352,6 +409,19 @@
       authMessage=error?(error.message||"Password reset could not be requested."):"If the account exists, a password reset email will be sent.";
       const m=document.getElementById("auth-message");if(m)m.textContent=authMessage;return;
     }
+    if(e.target.closest("#refresh-private-documents")){await loadPrivateDocuments(true);return;}
+    const privateDownload=e.target.closest("[data-private-download]");
+    if(privateDownload){
+      if(!supabaseClient||!authSession?.user){toast("Sign in before downloading.");return;}
+      privateDownload.disabled=true;
+      try{
+        const {data,error}=await supabaseClient.functions.invoke("candidate-private-documents",{body:{action:"create_download_url",document_id:privateDownload.dataset.privateDownload}});
+        if(error||data?.ready!==true||!data?.signed_download_url)throw error||new Error(data?.error||"Could not create a download link.");
+        const anchor=document.createElement("a");anchor.href=data.signed_download_url;anchor.target="_blank";anchor.rel="noopener noreferrer";anchor.click();
+      }catch(error){toast(error.message||"Download unavailable.");}
+      finally{privateDownload.disabled=false;}
+      return;
+    }
     const nav=e.target.closest("[data-view]");if(nav){e.preventDefault();render(nav.dataset.view);return;}
     const task=e.target.closest("[data-task]");if(task){const t=state.tasks.find(x=>x.id===task.dataset.task);if(t){t.done=!t.done;save();render();if(workspacePersistenceAvailable)await persistReadiness();toast(workspacePersistenceAvailable?"Preparation progress updated.":"Demo preparation progress updated.");}return;}
     const saveButton=e.target.closest("[data-save]");if(saveButton){const id=saveButton.dataset.save;state.saved=state.saved.includes(id)?state.saved.filter(x=>x!==id):[...state.saved,id];save();renderOpportunityCards();toast(state.saved.includes(id)?"Saved in this browser.":"Removed from saved opportunities.");return;}
@@ -416,7 +486,7 @@
       setAuthSession(session);
       updateAuthStatus();
       if(session?.user) {void loadPersistentReadiness();void loadOfficialProfile(true);void loadApplicationWorkspace(true);}
-      else {workspacePersistenceAvailable=false;workspaceLoadedForUser=null;applicationTrackers=[];applicationItems=[];applicationSavedRoutes=[];applicationWorkspaceAvailable=false;applicationWorkspaceLoadedForUser=null;profileReviewAvailable=false;officialProfile=null;profileChangeRequests=[];profileLoadedForUser=null;}
+      else {privateDocuments=[];privateDocumentsLoadedForUser=null;privateDocumentsLoadingForUser=null;privateDocumentsError="";workspacePersistenceAvailable=false;workspaceLoadedForUser=null;applicationTrackers=[];applicationItems=[];applicationSavedRoutes=[];applicationWorkspaceAvailable=false;applicationWorkspaceLoadedForUser=null;profileReviewAvailable=false;officialProfile=null;profileChangeRequests=[];profileLoadedForUser=null;}
       if(activeView==="account")render("account");
     });
     refreshAuthSession();
