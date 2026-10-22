@@ -246,6 +246,19 @@ test("official South African source expansion stays idempotent and never implies
   assert.match(migration, /https:\/\//);
 });
 
+test("candidate readiness supports all six canonical pathways and both endpoints allow only HTTPS Kingsmen previews", async () => {
+  const readiness = await readFile(resolve(root, "../..", "supabase/functions/candidate-workspace-readiness/index.ts"), "utf8");
+  const preparation = await readFile(resolve(root, "../..", "supabase/functions/candidate-application-preparation/index.ts"), "utf8");
+  assert.match(readiness, /const pathwayIds = new Set\(\["", "higher-education", "tvet", "seta", "internships", "apprenticeships", "employment"\]\)/);
+  assert.doesNotMatch(readiness, /const pathwayIds[^\n]*entrepreneurship/);
+  for (const fn of [readiness, preparation]) {
+    assert.match(fn, /function isAllowedOrigin\(origin: string\): boolean/);
+    assert.match(fn, /\^https:\\\/\\\/[a-z0-9-]+--kingsmen-portal-staging\\\.netlify\\\.app\$/);
+    assert.match(fn, /if\s*\(origin\s*&&\s*!isAllowedOrigin\(origin\)\)/);
+    assert.doesNotMatch(fn, /https:\/\/6ad61ee1da20fa786856f07e--kingsmen-portal-staging\.netlify\.app/);
+  }
+});
+
 test("private document lifecycle requires verified identity and scopes every record to the resolved candidate", async () => {
   const fn = await readFile(resolve(root, "../..", "supabase/functions/candidate-private-documents/index.ts"), "utf8");
   assert.match(fn, /auth\.auth\.getUser|auth\.getUser/);
