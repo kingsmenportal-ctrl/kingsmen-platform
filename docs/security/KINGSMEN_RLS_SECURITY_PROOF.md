@@ -101,7 +101,7 @@ The following read-only checks were executed against the connected staging datab
 
 ## Remaining production constraint
 
-The checks above prove RLS is enabled across the inspected public tables and validate selected grants/functions. They do **not** prove policy correctness for every table, candidate A/B isolation through authenticated HTTP, private object isolation, signed URL expiry, or the reviewer decision lifecycle. A real authenticated candidate and reviewer test remains a release gate. No reviewer was provisioned, no candidate data was written, and no production migration was applied during this check.
+A live staging proof remains required before public launch. The checks above prove RLS is enabled across the inspected public tables and validate selected grants/functions. They do **not** prove policy correctness for every table, candidate A/B isolation through authenticated HTTP, private object isolation, signed URL expiry, or the reviewer decision lifecycle. A real authenticated candidate and reviewer test remains a release gate. No reviewer was provisioned, no candidate data was written, and no production migration was applied during this check.
 
 The full isolation test must use two authorised candidate sessions, an authorised reviewer session, anonymous access, and backend service context; preserve only redacted evidence. Store the reviewed result under:
 
