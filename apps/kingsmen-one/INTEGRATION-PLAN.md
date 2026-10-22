@@ -99,3 +99,13 @@ The linked Supabase project `kingsmen-portal-staging` (ref `euhubhhnumtibbyufghm
 - Each queue item shows document metadata and offers a 60-second audited download plus a decision form. Final decisions require reviewer notes and evidence references. Decision selection is explicit; no decision is preselected.
 - Queue state is scoped to the authenticated user and cleared when the account changes. API permission checks remain authoritative; showing the UI does not grant reviewer access.
 - Added smoke coverage for UI wiring and reviewer endpoints. Actual reviewer/candidate journey remains unverified until authorised staging identities and fixture documents exist.
+
+
+## Identity-review submission route reconciliation — 2026-10-22
+- Candidate account UI calls the JWT-verified `candidate-identity-review-request` Edge Function; the browser never calls the privileged submission RPC directly.
+- The function validates the Supabase bearer token with Auth, derives the account ID from that validated session, bounds request fields, and calls a service-role-only transactional RPC. Duplicate open requests return HTTP 409 with a stable `IDENTITY_REVIEW_ALREADY_OPEN` code.
+- The client now marks the reviewer message as required (minimum 3 characters, matching server/database validation), parses structured Edge Function error responses, gives a specific duplicate-request instruction, and guards against displaying an in-flight response after the active account changes.
+- The three applied staging migration sources and deployed Edge Function source are reconciled in this branch: identity-link ledger privilege hardening, server-side transactional submission, and audit-schema compatibility.
+- Static regression tests cover endpoint invocation, server JWT validation, privileged RPC use, duplicate error handling and client/server field agreement.
+- Live staging duplicate rejection and privilege checks passed on 2026-10-22 in the related identity-review staging batch. GitHub Release Evidence and Source Guard passed on commit `a1fde77489b3eab62ccb65c0f4fcaaaaac8b7440` in the identity-review endpoint branch.
+- **Still not proven end-to-end:** no live authenticated HTTP submission was run with a real candidate session; staging has zero active reviewers, so the reviewer decision lifecycle remains blocked. Netlify's current project metadata does not provide a verifiable published deploy ID/commit for these changes. No reviewer was fabricated and no production deploy is claimed.
