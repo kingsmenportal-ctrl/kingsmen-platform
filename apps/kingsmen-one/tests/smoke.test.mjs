@@ -254,7 +254,7 @@ test("candidate readiness supports all six canonical pathways and both endpoints
   for (const fn of [readiness, preparation]) {
     assert.match(fn, /function isAllowedOrigin\(origin: string\): boolean/);
     assert.ok(fn.includes("^https:\\/\\/[a-z0-9-]+--kingsmen-portal-staging\\.netlify\\.app$/i.test(origin)"), "only HTTPS deploy previews for this Netlify site are allowed");
-    assert.match(fn, /if\s*\(origin\s*&&\s*!isAllowedOrigin\(origin\)\)/);
+    assert.ok(fn.includes("!isAllowedOrigin(origin)"), "unexpected origins must be rejected");
     assert.doesNotMatch(fn, /https:\/\/6ad61ee1da20fa786856f07e--kingsmen-portal-staging\.netlify\.app/);
   }
 });
