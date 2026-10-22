@@ -3,7 +3,7 @@
   "observedAt": "2026-10-22",
   "repository": "kingsmenportal-ctrl/kingsmen-platform",
   "branch": "feat/kingsmen-one-foundation-2026-10-19",
-  "assessedCommit": "2aab5ed76e31a57cf67db53592fbca67b44293ae",
+  "assessedCommit": "150bde4b03d1b6e7e0430d1f8bf400db9758ad58",
   "environment": {
     "kind": "staging",
     "supabaseProjectRef": "euhubhhnumtibbyufghm",
@@ -12,20 +12,20 @@
   "automatedChecks": {
     "kingsmenOneSmoke": {
       "status": "PASSED",
-      "runId": 39842755887,
-      "commit": "2aab5ed76e31a57cf67db53592fbca67b44293ae"
+      "runId": 39843803856,
+      "commit": "150bde4b03d1b6e7e0430d1f8bf400db9758ad58"
     },
     "sourceGuard": {
       "status": "PASSED",
-      "runId": 39842755908,
-      "commit": "2aab5ed76e31a57cf67db53592fbca67b44293ae"
+      "runId": 39843803590,
+      "commit": "150bde4b03d1b6e7e0430d1f8bf400db9758ad58"
     },
     "releaseEvidence": {
       "status": "PASSED",
-      "runId": 39842755925,
-      "commit": "2aab5ed76e31a57cf67db53592fbca67b44293ae"
+      "runId": 39843803550,
+      "commit": "150bde4b03d1b6e7e0430d1f8bf400db9758ad58"
     },
-    "scopeNote": "These CI checks include source contracts, repository tests/build, backend health smoke, and static candidate tests. They are not proof of a real authenticated candidate/reviewer journey."
+    "scopeNote": "All three checks passed on this exact code commit. They include static/source contracts, repository tests/build and backend health smoke; they do not prove a real authenticated candidate/reviewer journey."
   },
   "N03_truthVault": {
     "status": "PARTIAL",
@@ -123,6 +123,25 @@
       "evidence-linked provider submission",
       "provider acknowledgement",
       "independently confirmed outcome"
+    ],
+    "preparationEndpoint": {
+      "slug": "candidate-application-preparation",
+      "status": "ACTIVE",
+      "version": 9,
+      "verifyJwt": true,
+      "deployedSha256": "933022817f402692b3b864a454e87f21d8235e02ef7497039bad808bdff2d77c"
+    },
+    "readinessEndpoint": {
+      "slug": "candidate-workspace-readiness",
+      "status": "ACTIVE",
+      "version": 4,
+      "verifyJwt": true,
+      "deployedSha256": "3cfe816c81252df062cfebfaf17be1d8b431f89c387d180e310a37c7ac9226a1"
+    },
+    "implementedCorrections": [
+      "server-side pathway map now supports the six canonical pathways and removes entrepreneurship-as-employment alias",
+      "candidate workspace readiness validates all six canonical pathways",
+      "both candidate functions use a strict HTTPS Netlify deploy-preview allowlist and reject stale/unapproved origins"
     ]
   },
   "N09_N14_communicationsIntegrations": {
@@ -175,7 +194,14 @@
     "merged": false,
     "payFast": "DEFERRED; no payment-success simulation; unpaid candidate journeys remain the permitted build target",
     "publicLaunchAllowed": false,
-    "productionDeployClaimed": false
+    "productionDeployClaimed": false,
+    "branchProtectionVerification": {
+      "status": "UNVERIFIED_PERMISSION_DENIED",
+      "httpStatus": 403,
+      "requiredReadOnlyCredential": "BRANCH_PROTECTION_READ_TOKEN",
+      "protectionChanged": false,
+      "bypassed": false
+    }
   },
   "dataIntegrity": {
     "noCandidateFixturesCreated": true,
@@ -184,5 +210,5 @@
     "oneExpiringTestIdempotencyRowRetained": true,
     "oneRedactedStagingProbeAuditEventRetained": true
   },
-  "verdict": "NOT PRODUCTION READY. Source/CI and selected database-level probes passed; authenticated candidate/reviewer, document-storage, provider, recovery, published deployment, and founder release gates remain open."
+  "verdict": "NOT PRODUCTION READY. Exact-head source/CI checks passed and candidate preparation/readiness functions were deployed to staging with JWT verification. Authenticated candidate/reviewer, document-storage, provider, recovery, published Netlify deployment, branch-protection verification, and founder release gates remain open."
 }
