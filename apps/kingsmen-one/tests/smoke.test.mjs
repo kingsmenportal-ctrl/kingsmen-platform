@@ -33,12 +33,15 @@ test("no client-side privileged secret or production credential is embedded", as
   assert.doesNotMatch(files, /service_role|SUPABASE_SERVICE_ROLE_KEY|sk-[A-Za-z0-9]{20,}/i);
 });
 
-test("all six required Kingsmen pathways are present and distinctly named", async () => {
+test("all six required Kingsmen pathways are present in canonical journey order", async () => {
   const js = await read("app.js");
-  for (const pathway of ["higher-education", "tvet", "seta", "internships", "apprenticeships", "employment"]) {
-    assert.ok(js.includes(`id:"${pathway}"`), `missing required pathway: ${pathway}`);
-  }
+  const expected = ["higher-education", "tvet", "seta", "internships", "apprenticeships", "employment"];
+  const block = js.match(/const pathways = \[([\s\S]*?)\n  \];/);
+  assert.ok(block, "pathway catalogue must be declared");
+  const actual = [...block[1].matchAll(/id:"([^"]+)"/g)].map((match) => match[1]);
+  assert.deepEqual(actual, expected, "pathway navigation must follow the six-pathway canonical order");
   assert.doesNotMatch(js, /unconfirmed-sixth|Sixth pathway — name to confirm/);
+  assert.doesNotMatch(block[1], /id:"entrepreneurship"/, "entrepreneurship must not replace a required pathway");
 });
 test("account entry point uses Supabase Auth without claiming candidate identity", async () => {
   const html = await read("index.html");
