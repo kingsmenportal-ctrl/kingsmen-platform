@@ -358,7 +358,7 @@ test("reviewer console connects the authenticated UI to permission-checked queue
 
 test("N09 communications and consent ledgers are backend-only until candidate-scoped policies are implemented", async () => {
   const legacyMigration = await readFile(resolve(root, "../..", "db/migrations/0007_n09_notifications_communications.sql"), "utf8");
-  const hardeningMigration = await readFile(resolve(root, "../..", "supabase/migrations/20261022210000_n09_communications_backend_only.sql"), "utf8");
+  const hardeningMigration = await readFile(resolve(root, "../..", "supabase/migrations/20261022202953_n09_communications_backend_only.sql"), "utf8");
   const mirroredMigration = await readFile(resolve(root, "../..", "db/migrations/0018_n09_communications_backend_only.sql"), "utf8");
   const policy = await readFile(resolve(root, "../..", "apps/api/src/communications/communication-policy.ts"), "utf8");
   const proofBoundary = await readFile(resolve(root, "../..", "apps/api/src/communications/communications-proof-boundary.ts"), "utf8");
