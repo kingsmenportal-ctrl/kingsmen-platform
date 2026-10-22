@@ -109,3 +109,22 @@ The linked Supabase project `kingsmen-portal-staging` (ref `euhubhhnumtibbyufghm
 - Static regression tests cover endpoint invocation, server JWT validation, privileged RPC use, duplicate error handling and client/server field agreement.
 - Live staging duplicate rejection and privilege checks passed on 2026-10-22 in the related identity-review staging batch. GitHub Release Evidence and Source Guard passed on commit `a1fde77489b3eab62ccb65c0f4fcaaaaac8b7440` in the identity-review endpoint branch.
 - **Still not proven end-to-end:** no live authenticated HTTP submission was run with a real candidate session; staging has zero active reviewers, so the reviewer decision lifecycle remains blocked. Netlify's current project metadata does not provide a verifiable published deploy ID/commit for these changes. No reviewer was fabricated and no production deploy is claimed.
+
+
+## Production release gates — current status checked 2026-10-22
+
+This checklist deliberately distinguishes source correctness from a production release. Do not mark Kingsmen One production-ready until every required gate has recorded evidence tied to the exact commit and published deploy.
+
+| Gate | Required evidence | Current disposition |
+|---|---|---|
+| Canonical pathways | Automated test asserts exact ordered IDs: higher education, TVET, SETA/skills, internships, apprenticeships, employment | Source updated; CI for latest head must be confirmed |
+| Source and regression checks | Smoke tests, Source Guard and Release Evidence succeed on the exact proposed release commit | Earlier head passed; latest head pending fresh run evidence |
+| Identity boundary | Live authenticated request, invalid-token rejection, duplicate-open-request rejection, and no cross-account disclosure | DB/RPC probes passed; authenticated HTTP proof still outstanding |
+| Reviewer workflow | Real authorised reviewer performs approve/correction/reject; each decision and audit row verified | Blocked: staging has zero active reviewers; do not fabricate or self-authorise a reviewer |
+| Candidate journey | Two authorised test accounts, candidate-owned tracker/document, signed private download, cross-account denial, reviewer outcome | Not end-to-end verified; requires authorised fixtures and reviewer |
+| Database security | RLS/policy and grants reviewed; backend-only tables inaccessible to client roles; security advisor findings triaged | Privilege probes passed for identity RPCs; three backend-only RLS/no-policy INFO findings and leaked-password-protection WARN remain to triage/configure |
+| Published frontend | Netlify deploy state is ready and published commit SHA equals approved release commit; render and smoke-test live URL | Blocked: Netlify connector reports no verifiable published deploy ID/commit |
+| Release approval | Required PR reviews and repository branch protection pass; no bypass | PR remains open; merge/deploy not claimed |
+
+### Release rule
+A green source test is not a live integration proof. A staging migration is not a production deploy. A successful Netlify build is not proof of the published commit. Keep each gate open until its own evidence is available. Never use real candidate data as test fixtures without authorisation and consent.
