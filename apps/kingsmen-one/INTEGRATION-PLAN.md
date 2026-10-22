@@ -128,3 +128,35 @@ This checklist deliberately distinguishes source correctness from a production r
 
 ### Release rule
 A green source test is not a live integration proof. A staging migration is not a production deploy. A successful Netlify build is not proof of the published commit. Keep each gate open until its own evidence is available. Never use real candidate data as test fixtures without authorisation and consent.
+
+## Cross-module live staging evidence refresh — 2026-10-22 22:40 SAST
+
+This refresh records only probes actually executed against the connected Supabase staging project. It does not upgrade source-only checks into end-to-end proof.
+
+| Area | Observed staging evidence | Result / still open |
+|---|---|---|
+| N03 Truth Vault | Inserted a uniquely prefixed synthetic idempotency row and audit event; read both back in a separate SQL call; attempted the same unique keys again; both duplicate inserts were blocked; removed both probe rows and verified cleanup counts. | **DB persistence/readback + unique-key duplicate guard passed.** This did not restart the API process and does not prove API transaction atomicity, worker restart recovery, or backup restore. |
+| N04 identity | Three Auth users currently exist; identity request/audit/link tables contain zero rows. Identity submission Edge Function is ACTIVE v3 with JWT verification enabled. | Privileged RPC/grant probes from the earlier identity batch passed; real authenticated candidate submissions, two-candidate isolation, and reviewer decisions remain unproven. No test identities or reviewer roles were invented. |
+| N05 Document Vault | Two storage buckets are private and capped at 10 MiB. 'kingsmen-candidate-documents' permits PDF/JPEG/PNG and its object policies use the verified-candidate resolver. The legacy 'candidate-documents' bucket separately permits PDF/DOCX/plain text and scopes object paths to Auth UID. Document/event/review tables currently have zero rows. | Configuration and policy shape observed. Real upload bytes, MIME/signature mismatch rejection, size rejection, signed URL access/expiry, and cross-candidate denial were not exercised. Treat legacy and verified-candidate buckets as separate paths; do not claim a full document E2E pass. |
+| N06/N15 opportunities | Staging has 21 source authority anchors, including 14 added official South African source anchors. All 21 require programme-level verification. There are 2 programme anchors and 0 recently verified OPEN/FUTURE opportunities. | Source discovery expanded; no invented open programmes, deadlines, or outcomes. Programme-level crawl/verification and official-source freshness remain open. |
+| Applications/outcomes | Tracker, tracker-event, and submission-job tables currently contain zero rows. | Canonical pathway mapping source and regression tests are in the branch. Real preparation → evidence → submission state → provider-confirmed outcome lifecycle remains unproven. |
+| N09 communications | Applied migration '20261022202953_n09_communications_backend_only'. Queried actual grants and RLS policies: all checked communications/consent tables have no 'anon' or 'authenticated' table grants; service role grants exist; policies target 'service_role'. | Backend-only database boundary verified. No provider send was performed; consent-based dispatch, email delivery, retries/backoff, bounce evidence, dead-letter recovery and real provider receipts remain unproven. |
+| N12/N13/N16 operations | Repository Release Evidence workflow includes health endpoints and readiness checks; exact-head smoke, Source Guard and Release Evidence all succeeded at commit '3954b615e83b5e2061fccf460013d11fb24c1270'. | Source/CI gate green. Live monitoring/pager, worker kill/restart recovery, queue redrive, and incident escalation have not been exercised against a running worker. |
+| N17/N18/N19 and deployment | Netlify project metadata still reports an empty 'currentDeploy' object; no published deploy ID/commit is available from the connected project response. | Founder/public/mobile journeys cannot be certified from source/UI alone. Published commit equality and live browser workflow remain release blockers. |
+
+### Exact-head automated checks
+
+- Kingsmen One smoke tests: success, run https://github.com/kingsmenportal-ctrl/kingsmen-platform/actions/runs/39849762807
+- Kingsmen Source Guard: success, run https://github.com/kingsmenportal-ctrl/kingsmen-platform/actions/runs/39849762828
+- Kingsmen Release Evidence: success, run https://github.com/kingsmenportal-ctrl/kingsmen-platform/actions/runs/39849762760
+
+### Non-negotiable remaining release gates
+
+1. Run the authenticated staging E2E plan with authorised candidate A/B and reviewer sessions; verify 401/403 denials and candidate isolation.
+2. Upload controlled synthetic document bytes through the deployed authenticated endpoint; assert MIME/signature/size checks, signed access and expiry, then prove cross-candidate denial and clean fixtures.
+3. Run API PostgreSQL integration with restart: persist a command and audit evidence, restart the API process, replay the same idempotency key, and prove one logical command and unchanged response.
+4. Exercise notification consent/policy gate, real provider staging delivery evidence, retry/backoff, terminal dead-letter and recovery with non-user test recipients.
+5. Execute worker interruption/restart, health failure, incident create/triage/resolve and restore drills with redacted evidence.
+6. Verify Netlify deploy ID, published commit SHA, HTTPS rendered route and live smoke tests; merge only through repository-required reviews/protections.
+
+Do not mark these gates complete until their respective runtime evidence is attached. No real candidate data or external provider send was used for the probes above.
