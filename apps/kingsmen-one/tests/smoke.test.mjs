@@ -19,7 +19,7 @@ test("candidate workspace has responsive accessible shell and demo disclosure", 
 
 test("workflow implements pathways, saving, preparation and document readiness", async () => {
   const js = await read("app.js");
-  for (const marker of ["higher-education", "tvet", "seta", "employment", "entrepreneurship", "unconfirmed-sixth", "data-save", "data-application", "data-document", "candidate-reported", "localStorage", "function profileView()", "profile-form", "Profile readiness"]) {
+  for (const marker of ["higher-education", "tvet", "seta", "internships", "apprenticeships", "employment", "data-save", "data-application", "data-document", "candidate-reported", "localStorage", "function profileView()", "profile-form", "Profile readiness"]) {
     assert.ok(js.includes(marker), `expected workflow marker: ${marker}`);
   }
   assert.match(js, /not submitted/i);
@@ -33,10 +33,12 @@ test("no client-side privileged secret or production credential is embedded", as
   assert.doesNotMatch(files, /service_role|SUPABASE_SERVICE_ROLE_KEY|sk-[A-Za-z0-9]{20,}/i);
 });
 
-test("canonical sixth pathway is explicitly blocked pending source confirmation", async () => {
+test("all six required Kingsmen pathways are present and distinctly named", async () => {
   const js = await read("app.js");
-  assert.match(js, /Sixth pathway — name to confirm/);
-  assert.match(js, /Canonical name not yet confirmed/);
+  for (const pathway of ["higher-education", "tvet", "seta", "internships", "apprenticeships", "employment"]) {
+    assert.ok(js.includes(`id:"${pathway}"`), `missing required pathway: ${pathway}`);
+  }
+  assert.doesNotMatch(js, /unconfirmed-sixth|Sixth pathway — name to confirm/);
 });
 test("account entry point uses Supabase Auth without claiming candidate identity", async () => {
   const html = await read("index.html");
