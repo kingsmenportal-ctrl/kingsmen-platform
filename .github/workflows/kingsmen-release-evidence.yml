@@ -40,6 +40,9 @@ jobs:
       - name: Build backend API
         run: npm run api:build
 
+      - name: Prove production refuses memory-only Truth Vault
+        run: node scripts/ci/test-api-production-storage-guard.mjs
+
       - name: Validate Truth Vault persistence contract
         run: npm run api:validate
 
