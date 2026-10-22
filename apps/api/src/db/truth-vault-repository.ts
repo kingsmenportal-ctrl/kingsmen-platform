@@ -100,15 +100,6 @@ export class TruthVaultRepository {
       throw new Error("Memory-only Truth Vault is forbidden in NODE_ENV=production. Configure PostgreSQL Truth Vault.");
     }
     return new TruthVaultRepository(null);
-
-    const pg = require("pg") as { Pool: PgPoolConstructor };
-    return new TruthVaultRepository(new pg.Pool({
-      connectionString: databaseUrl,
-      max: Number(process.env.KINGSMEN_DATABASE_POOL_MAX ?? 8),
-      idleTimeoutMillis: 30_000,
-      connectionTimeoutMillis: 10_000,
-      ssl: process.env.KINGSMEN_DATABASE_SSL === "true" ? { rejectUnauthorized: false } : undefined
-    }));
   }
 
   get enabled(): boolean {
