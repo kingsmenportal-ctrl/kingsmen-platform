@@ -6,8 +6,8 @@
     {id:"tvet",name:"TVET",icon:"⚒",desc:"Technical and vocational education and occupational training."},
     {id:"seta",name:"SETA & skills",icon:"✳",desc:"Learnerships, skills programmes and sector training routes."},
     {id:"employment",name:"Employment",icon:"↗",desc:"Prepare for work and track suitable job opportunities."},
-    {id:"entrepreneurship",name:"Entrepreneurship",icon:"◇",desc:"Explore business support, enterprise development and funding routes."},
-    {id:"unconfirmed-sixth",name:"Sixth pathway — name to confirm",icon:"?",desc:"Not displayed as a real pathway until the canonical name is verified from the Kingsmen source of truth.",unconfirmed:true}
+    {id:"internships",name:"Internships",icon:"↗",desc:"Find and prepare for internships, workplace exposure and structured work-integrated learning."},
+    {id:"apprenticeships",name:"Apprenticeships",icon:"⚙",desc:"Explore apprenticeship pathways combining supervised workplace practice with occupational training."}
   ];
   const opportunities = [
     {id:"opp-1",provider:"DEMO LISTING · VERIFY SOURCE",title:"Study opportunity preparation",type:"Education",location:"South Africa · details to verify",deadline:"Confirm official deadline",desc:"Use this sample to practise saving an opportunity and preparing your application. Not a verified live listing."},
