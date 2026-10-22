@@ -8,6 +8,14 @@ This document is the real finish-line map for launching Kingsmen. A module can b
 
 The repo has source-level proof for backend API, PostgreSQL/Supabase Truth Vault persistence, safe web-to-backend boundary, PayFast sandbox boundary, RLS/security, backup/restore, branch protection, secrets wiring, communications, observability + incident handling, legal + privacy + consent + refund policy, the staging runtime proof pack, and final assembly evidence capture. The RLS/security source-level boundary is built, but staging role-isolation proof remains a separate required gate. It is still not safe to open to public candidates or take money because real staging evidence and final founder review are still pending.
 
+## Verified staging evidence snapshot (2026-10-22)
+
+- A live read-only catalog query inspected 225 public base tables: RLS is enabled on all 225 and disabled on none.
+- Exactly three RLS-enabled backend-only review/audit tables have no client policies; live grant checks confirm `anon` and `authenticated` cannot SELECT them while `service_role` can. Do not add client policies just to silence the informational advisor notices.
+- The identity helper is in the non-exposed `private` schema; the public-schema helper is absent. The identity-review submission Edge Function is ACTIVE v3 with JWT verification enabled.
+- These checks do **not** prove policy correctness for all tables, authenticated candidate A/B isolation, private object isolation, reviewer decisions, or a published frontend commit. There are zero active platform reviewers, identity-review requests, verified identity links, and private documents in staging.
+- Machine-readable evidence: `reports/security/rls-security-staging-snapshot-2026-10-22.json`. This is explicitly a partial catalog/privilege snapshot, not the full release proof.
+
 ## Exact blockers
 
 ### P0 — Must be fixed before any public users
@@ -16,7 +24,7 @@ The repo has source-level proof for backend API, PostgreSQL/Supabase Truth Vault
 2. **Prove Truth Vault persistence on staging.** A live staging run must prove command log, idempotency, workflow run, evidence ledger, audit, approval, heartbeat, and DLQ paths.
 3. **Prove RLS/security in staging.** Apply the hardening migration to staging and test candidate, operator, founder, anonymous, and backend service isolation.
 4. **Prove safe web-to-backend boundary in staging.** The deployed web app must prove `KINGSMEN_BACKEND_BASE_URL` calls API health and command intake without local shell, local file writes, or direct database access.
-5. **Prove PayFast sandbox + ITN against provider sandbox.** No real payments until sandbox success/cancel/return/failure/duplicate/invalid-signature/replay/amount-mismatch/refund-review evidence exists from staging.
+5. **Payment collection gate (PayFast deferred).** PayFast account setup is deferred and must not block building or testing unpaid candidate journeys. Until an account exists and sandbox success/cancel/return/failure/duplicate/invalid-signature/replay/amount-mismatch/refund-review evidence passes in staging, keep checkout/payment collection and payment-dependent entitlements disabled. Never simulate a successful payment or mark an order paid without a verified provider event.
 6. **Prove backup and restore.** No production personal data until a real staging restore drill proves backup archive checksum, target/source separation, counts-only verification, RPO/RTO, and redaction.
 7. **Wire secrets outside git.** Launch requires masked runtime health evidence proving required environment variables are configured outside Git without printing values.
 8. **Prove communications provider boundary.** Candidate notifications require provider staging send/receive, bounce, opt-out, WhatsApp urgent-only, SMS fallback-only, and redacted evidence proof.
