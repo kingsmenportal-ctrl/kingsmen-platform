@@ -80,10 +80,16 @@ test("identity-link claims go through authenticated manual-review endpoint", asy
   const fn = await readFile(resolve(root, "../..", "supabase/functions/candidate-identity-review-request/index.ts"), "utf8");
   assert.match(js, /identity-review-form/);
   assert.match(js, /functions\.invoke\("candidate-identity-review-request"/);
-  assert.match(fn, /auth\.getUser/);
-  assert.match(fn, /request_status:\s*"PENDING"/);
+  assert.match(fn, /auth\.auth\.getUser/);
+  assert.match(fn, /submit_candidate_identity_review_for_user/);
+  assert.match(fn, /IDENTITY_REVIEW_ALREADY_OPEN/);
   assert.match(fn, /does not verify identity or link a candidate record/i);
   assert.match(fn, /SUPABASE_SERVICE_ROLE_KEY/);
+  assert.match(js, /Message for the reviewer \(required\)/);
+  assert.match(js, /identity-claimant-message[\s\S]*?required minlength="3"/);
+  assert.match(js, /response\.json\(\)/);
+  assert.match(js, /Check back for an update rather than submitting another request/);
+
   assert.doesNotMatch(fn, /console\.log\(.*claimant|console\.log\(.*candidate_reference/i);
 });
 
