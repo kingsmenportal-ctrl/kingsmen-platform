@@ -222,6 +222,30 @@ test("application tracker maps every canonical pathway and never silently conver
   assert.equal(Object.hasOwn(pathwayMap, "ENTREPRENEURSHIP"), false);
 });
 
+test("official South African source expansion stays idempotent and never implies live availability", async () => {
+  const seed = await readFile(resolve(root, "../..", "db/seeds/n06_route_universe_seed.sql"), "utf8");
+  const migration = await readFile(resolve(root, "../..", "supabase/migrations/20261022203000_expand_sa_official_source_catalog.sql"), "utf8");
+  const keys = [
+    "govza_government_jobs", "labour_vacancies", "etdp_seta_official",
+    "services_seta_official", "merseta_official", "ewseta_official",
+    "agriseta_official", "bankseta_official", "teta_official",
+    "foodbev_seta_official", "fasset_official", "ceta_official",
+    "mict_seta_official", "dhet_career_advice"
+  ];
+  for (const key of keys) {
+    assert.ok(seed.includes(`('${key}'`), `re-runnable seed must include ${key}`);
+    assert.ok(migration.includes(`('${key}'`), `staging migration must include ${key}`);
+  }
+  assert.match(seed, /ON CONFLICT \(source_key\) DO UPDATE/);
+  assert.match(migration, /ON CONFLICT \(source_key\) DO UPDATE/);
+  assert.match(seed, /verification_required, verification_notes/);
+  assert.match(migration, /verification_required, verification_notes/);
+  assert.match(seed, /not programme listings/i);
+  assert.match(migration, /not live listings/i);
+  assert.match(seed, /https:\/\//);
+  assert.match(migration, /https:\/\//);
+});
+
 test("private document lifecycle requires verified identity and scopes every record to the resolved candidate", async () => {
   const fn = await readFile(resolve(root, "../..", "supabase/functions/candidate-private-documents/index.ts"), "utf8");
   assert.match(fn, /auth\.auth\.getUser|auth\.getUser/);
