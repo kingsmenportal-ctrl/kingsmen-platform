@@ -224,7 +224,7 @@ test("application tracker maps every canonical pathway and never silently conver
 
 test("official South African source expansion stays idempotent and never implies live availability", async () => {
   const seed = await readFile(resolve(root, "../..", "db/seeds/n06_route_universe_seed.sql"), "utf8");
-  const migration = await readFile(resolve(root, "../..", "supabase/migrations/20261022203000_expand_sa_official_source_catalog.sql"), "utf8");
+  const migration = await readFile(resolve(root, "../..", "supabase/migrations/20261022194413_expand_sa_official_source_catalog.sql"), "utf8");
   const keys = [
     "govza_government_jobs", "labour_vacancies", "etdp_seta_official",
     "services_seta_official", "merseta_official", "ewseta_official",
