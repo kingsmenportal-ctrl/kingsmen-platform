@@ -54,7 +54,7 @@ npm run build
 npm start
 ```
 
-Current API storage mode is `memory_development_only`. The next launch build must replace this with real PostgreSQL/Supabase Truth Vault persistence.
+The API supports PostgreSQL/Supabase Truth Vault persistence and an explicitly non-production memory mode. In `NODE_ENV=production`, it defaults to PostgreSQL and refuses to start if database configuration is missing or a memory-only mode is selected. A real staging persistence/restart proof is still required before launch.
 
 ## Kingsmen launch readiness gate
 
