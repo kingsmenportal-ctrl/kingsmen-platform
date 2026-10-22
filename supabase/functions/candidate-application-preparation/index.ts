@@ -3,19 +3,22 @@ import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
 const URL = Deno.env.get("SUPABASE_URL") ?? "";
 const ANON = Deno.env.get("SUPABASE_ANON_KEY") ?? "";
 const SERVICE = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY") ?? "";
-const origins = new Set(["https://kingsmen-portal-staging.netlify.app","https://6ad61ee1da20fa786856f07e--kingsmen-portal-staging.netlify.app","http://localhost:8888","http://127.0.0.1:8888"]);
+const origins = new Set(["https://kingsmen-portal-staging.netlify.app","http://localhost:8888","http://127.0.0.1:8888"]);
+function isAllowedOrigin(origin: string): boolean {
+  return origins.has(origin) || /^https:\/\/[a-z0-9-]+--kingsmen-portal-staging\.netlify\.app$/i.test(origin);
+}
 const trackerStatuses = new Set(["SAVED","PREPARING","READY_TO_APPLY","SUBMITTED_CANDIDATE_REPORTED","RESPONSE_RECEIVED","INTERVIEW","OFFER_RECEIVED","REJECTED","CLOSED"]);
 const itemStatuses = new Set(["NOT_STARTED","IN_PROGRESS","READY_CANDIDATE_REPORTED"]);
 const pathwayMap: Record<string,string> = {"HIGHER_EDUCATION":"higher_education","TVET":"tvet","SETA":"seta_learnership","SETA_LEARNERSHIP":"seta_learnership","INTERNSHIP":"internship","INTERNSHIPS":"internship","APPRENTICESHIP":"apprenticeship","APPRENTICESHIPS":"apprenticeship","EMPLOYMENT":"employment","higher_education":"higher_education","tvet":"tvet","seta":"seta_learnership","seta_learnership":"seta_learnership","internship":"internship","internships":"internship","apprenticeship":"apprenticeship","apprenticeships":"apprenticeship","employment":"employment"};
 function reply(status:number, body:Record<string,unknown>, origin:string|null) {
  const headers:Record<string,string>={"Content-Type":"application/json; charset=utf-8","Cache-Control":"no-store","Vary":"Origin"};
- if(origin&&origins.has(origin))headers["Access-Control-Allow-Origin"]=origin;
+ if(origin&&isAllowedOrigin(origin))headers["Access-Control-Allow-Origin"]=origin;
  return new Response(JSON.stringify(body),{status,headers});
 }
 Deno.serve(async(req:Request)=>{
  const origin=req.headers.get("Origin");
  if(origin&&!origins.has(origin))return reply(403,{error:"Origin not allowed."},null);
- if(req.method==="OPTIONS")return new Response(null,{status:204,headers:{...(origin&&origins.has(origin)?{"Access-Control-Allow-Origin":origin}:{}),"Access-Control-Allow-Headers":"authorization, apikey, content-type, x-client-info","Access-Control-Allow-Methods":"POST, OPTIONS","Access-Control-Max-Age":"600","Vary":"Origin"}});
+ if(req.method==="OPTIONS")return new Response(null,{status:204,headers:{...(origin&&isAllowedOrigin(origin)?{"Access-Control-Allow-Origin":origin}:{}),"Access-Control-Allow-Headers":"authorization, apikey, content-type, x-client-info","Access-Control-Allow-Methods":"POST, OPTIONS","Access-Control-Max-Age":"600","Vary":"Origin"}});
  if(req.method!=="POST")return reply(405,{error:"Method not allowed."},origin);
  if(!URL||!ANON||!SERVICE)return reply(503,{error:"Application preparation service is not configured."},origin);
  const token=/^Bearer\s+(.+)$/i.exec(req.headers.get("Authorization")??"")?.[1];
