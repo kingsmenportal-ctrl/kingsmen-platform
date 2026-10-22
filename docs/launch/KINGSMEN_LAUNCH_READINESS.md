@@ -16,6 +16,20 @@ The repo has source-level proof for backend API, PostgreSQL/Supabase Truth Vault
 - These checks do **not** prove policy correctness for all tables, authenticated candidate A/B isolation, private object isolation, reviewer decisions, or a published frontend commit. There are zero active platform reviewers, identity-review requests, verified identity links, and private documents in staging.
 - Machine-readable evidence: `reports/security/rls-security-staging-snapshot-2026-10-22.json`. This is explicitly a partial catalog/privilege snapshot, not the full release proof.
 
+## Cross-module staging evidence — 2026-10-22
+
+The current machine-readable review is `reports/validation/cross-module-staging-audit-2026-10-22.json`. It is a partial staging audit, not a production approval.
+
+- **N03 Truth Vault:** a staging-only PostgreSQL probe inserted an expiring idempotency row; a duplicate insert returned no row and did not overwrite the original response; an independent subsequent read confirmed the original record; a redacted `STAGING_PERSISTENCE_PROBE` audit event was persisted and re-read. This proves the database-level unique-key/read/write path only—not the application command path, process restart recovery, or backup/restore.
+- **N04/N05:** identity review is ACTIVE v3 and private documents ACTIVE v7 with JWT verification. There are no verified identity links, active reviewers, review requests, or private documents, so authenticated candidate/reviewer and real binary storage journeys remain untested.
+- **N06/N15:** 14 official South African source authority anchors were added to the idempotent seed and staging catalog. Staging now has 21 authorities, all requiring programme-level verification. There are still only 2 route-programme anchors and 0 eligible recent OPEN/FUTURE listings; the source anchors do not assert current programme availability.
+- **Applications/outcomes:** staging has zero candidate application trackers, preparation items, submission jobs, or outcomes; provider acknowledgement and independently confirmed outcomes remain unproven.
+- **N09/N14:** notification outbox, delivery attempts, consent records, integration outbox and dead-letter queues have zero rows. Real provider delivery, consent enforcement, retries and replay are not verified.
+- **N12/N13/N16:** RLS is enabled on all 225 inspected public tables. Three intentionally backend-only tables have no client policies and no client SELECT grant. Health snapshots, service checks, incidents and worker heartbeats are currently zero; operational recovery has not been exercised.
+- **N17/N18/N19 and release:** Netlify metadata still provides no current deploy ID or published commit. PR #134 remains open/draft. Public release stays blocked.
+
+For the current code commit `2aab5ed76e31a57cf67db53592fbca67b44293ae`, Kingsmen One smoke tests, Source Guard and Release Evidence all passed (runs `39842755887`, `39842755908`, `39842755925`). Those checks are repository/build/health evidence, not authenticated user-flow evidence.
+
 ## Exact blockers
 
 ### P0 — Must be fixed before any public users
