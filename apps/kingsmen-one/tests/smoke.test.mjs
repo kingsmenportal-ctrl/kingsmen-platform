@@ -192,6 +192,36 @@ test("stale async responses cannot overwrite a different signed-in candidate wor
   assert.match(js, /loadApplicationWorkspace[\s\S]*?Promise\.all\([\s\S]*?authSession\?\.user\?\.id !== userId/);
 });
 
+test("application tracker maps every canonical pathway and never silently converts entrepreneurship into employment", async () => {
+  const fn = await readFile(resolve(root, "../..", "supabase/functions/candidate-application-preparation/index.ts"), "utf8");
+  const mapBlock = fn.match(/const pathwayMap: Record<string,string> = (\{[^\n]+\});/);
+  assert.ok(mapBlock, "server pathway mapping must be explicit and reviewable");
+  const pathwayMap = JSON.parse(mapBlock[1]);
+  for (const [input, expected] of [
+    ["HIGHER_EDUCATION", "higher_education"],
+    ["higher_education", "higher_education"],
+    ["TVET", "tvet"],
+    ["tvet", "tvet"],
+    ["SETA", "seta_learnership"],
+    ["SETA_LEARNERSHIP", "seta_learnership"],
+    ["seta", "seta_learnership"],
+    ["INTERNSHIP", "internship"],
+    ["INTERNSHIPS", "internship"],
+    ["internship", "internship"],
+    ["internships", "internship"],
+    ["APPRENTICESHIP", "apprenticeship"],
+    ["APPRENTICESHIPS", "apprenticeship"],
+    ["apprenticeship", "apprenticeship"],
+    ["apprenticeships", "apprenticeship"],
+    ["EMPLOYMENT", "employment"],
+    ["employment", "employment"]
+  ]) {
+    assert.equal(pathwayMap[input], expected, `wrong application pathway mapping for ${input}`);
+  }
+  assert.equal(Object.hasOwn(pathwayMap, "entrepreneurship"), false);
+  assert.equal(Object.hasOwn(pathwayMap, "ENTREPRENEURSHIP"), false);
+});
+
 test("private document lifecycle requires verified identity and scopes every record to the resolved candidate", async () => {
   const fn = await readFile(resolve(root, "../..", "supabase/functions/candidate-private-documents/index.ts"), "utf8");
   assert.match(fn, /auth\.auth\.getUser|auth\.getUser/);
