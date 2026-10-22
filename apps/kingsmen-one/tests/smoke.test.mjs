@@ -374,8 +374,8 @@ test("N09 communications and consent ledgers are backend-only until candidate-sc
     assert.match(mirroredMigration, new RegExp(`CREATE POLICY ${table}_backend_only ON public\\.${table}\\s+FOR ALL TO service_role`, "i"), `mirrored migration must match staging migration: ${table}`);
   }
   for (const migration of [hardeningMigration, mirroredMigration]) {
-    assert.match(migration, /REVOKE ALL PRIVILEGES ON TABLE public\\.%I FROM anon, authenticated/i);
-    assert.match(migration, /GRANT SELECT, INSERT, UPDATE, DELETE ON TABLE public\\.%I TO service_role/i);
+    assert.match(migration, /REVOKE ALL PRIVILEGES ON TABLE public\.%I FROM anon, authenticated/i);
+    assert.match(migration, /GRANT SELECT, INSERT, UPDATE, DELETE ON TABLE public\.%I TO service_role/i);
     assert.match(migration, /privacy_consent_records_backend_only[\\s\\S]*FOR ALL TO service_role/i);
   }
   assert.match(policy, /WHATSAPP_URGENT_ONLY/);
