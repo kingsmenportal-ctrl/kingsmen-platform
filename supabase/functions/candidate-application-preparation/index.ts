@@ -6,7 +6,7 @@ const SERVICE = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY") ?? "";
 const origins = new Set(["https://kingsmen-portal-staging.netlify.app","https://6ad61ee1da20fa786856f07e--kingsmen-portal-staging.netlify.app","http://localhost:8888","http://127.0.0.1:8888"]);
 const trackerStatuses = new Set(["SAVED","PREPARING","READY_TO_APPLY","SUBMITTED_CANDIDATE_REPORTED","RESPONSE_RECEIVED","INTERVIEW","OFFER_RECEIVED","REJECTED","CLOSED"]);
 const itemStatuses = new Set(["NOT_STARTED","IN_PROGRESS","READY_CANDIDATE_REPORTED"]);
-const pathwayMap: Record<string,string> = {"HIGHER_EDUCATION":"higher_education","TVET":"tvet","SETA_LEARNERSHIP":"seta_learnership","INTERNSHIP":"internship","APPRENTICESHIP":"apprenticeship","EMPLOYMENT":"employment","higher_education":"higher_education","tvet":"tvet","seta":"seta_learnership","employment":"employment","entrepreneurship":"employment"};
+const pathwayMap: Record<string,string> = {"HIGHER_EDUCATION":"higher_education","TVET":"tvet","SETA":"seta_learnership","SETA_LEARNERSHIP":"seta_learnership","INTERNSHIP":"internship","INTERNSHIPS":"internship","APPRENTICESHIP":"apprenticeship","APPRENTICESHIPS":"apprenticeship","EMPLOYMENT":"employment","higher_education":"higher_education","tvet":"tvet","seta":"seta_learnership","seta_learnership":"seta_learnership","internship":"internship","internships":"internship","apprenticeship":"apprenticeship","apprenticeships":"apprenticeship","employment":"employment"};
 function reply(status:number, body:Record<string,unknown>, origin:string|null) {
  const headers:Record<string,string>={"Content-Type":"application/json; charset=utf-8","Cache-Control":"no-store","Vary":"Origin"};
  if(origin&&origins.has(origin))headers["Access-Control-Allow-Origin"]=origin;
