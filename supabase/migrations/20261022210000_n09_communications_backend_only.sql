@@ -15,7 +15,8 @@ BEGIN
     'urgent_whatsapp_escalations',
     'communication_quiet_hours',
     'communication_rate_limits',
-    'message_evidence_ledger'
+    'message_evidence_ledger',
+    'privacy_consent_records'
   ] LOOP
     IF to_regclass(format('public.%I', t)) IS NOT NULL THEN
       EXECUTE format('ALTER TABLE public.%I ENABLE ROW LEVEL SECURITY', t);
@@ -64,3 +65,7 @@ COMMENT ON TABLE public.notification_delivery_attempts IS
   'Backend-only delivery evidence; provider responses and recipient metadata are not exposed to browser roles.';
 COMMENT ON TABLE public.privacy_consent_records IS
   'Backend-only POPIA consent ledger; consent must be checked by trusted server-side dispatch before non-essential messaging.';
+
+DROP POLICY IF EXISTS privacy_consent_records_all ON public.privacy_consent_records;
+CREATE POLICY privacy_consent_records_backend_only ON public.privacy_consent_records
+  FOR ALL TO service_role USING (true) WITH CHECK (true);
