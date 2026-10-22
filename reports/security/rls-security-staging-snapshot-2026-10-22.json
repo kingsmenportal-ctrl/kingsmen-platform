@@ -1,0 +1,63 @@
+{
+  "schema": "kingsmen.staging-security-snapshot.v1",
+  "observedAt": "2026-10-22",
+  "environment": "Supabase staging project euhubhhnumtibbyufghm",
+  "classification": "partial-live-catalog-and-privilege-evidence",
+  "database": {
+    "publicBaseTables": 225,
+    "rlsEnabled": 225,
+    "rlsDisabled": 0,
+    "rlsEnabledWithoutPolicies": 3,
+    "forceRlsTables": 1,
+    "backendOnlyTables": [
+      "candidate_identity_review_audit",
+      "candidate_identity_review_requests",
+      "candidate_private_document_reviews"
+    ],
+    "backendOnlyPrivileges": {
+      "anonSelect": false,
+      "authenticatedSelect": false,
+      "serviceRoleSelect": true
+    }
+  },
+  "identityBoundary": {
+    "verifiedCandidateHelperSchema": "private",
+    "publicHelperPresent": false,
+    "securityDefiner": true,
+    "emptySearchPath": true,
+    "anonExecute": false,
+    "authenticatedExecute": true,
+    "note": "authenticated EXECUTE is required by existing RLS policies; do not revoke without a reviewed policy redesign"
+  },
+  "identityReviewSubmission": {
+    "edgeFunction": "candidate-identity-review-request",
+    "status": "ACTIVE",
+    "version": 3,
+    "verifyJwt": true,
+    "browserRpcSubmissionAllowed": false,
+    "duplicateOpenRequestDatabaseProbe": "passed; probe writes rolled back"
+  },
+  "readinessCounts": {
+    "activePlatformReviewers": 0,
+    "identityReviewRequests": 0,
+    "verifiedIdentityLinks": 0,
+    "privateDocuments": 0
+  },
+  "advisor": {
+    "informationalFindings": 3,
+    "leakedPasswordProtectionWarning": true,
+    "leakedPasswordProtectionStatus": "not enabled; current project plan does not expose this setting"
+  },
+  "notProven": [
+    "authenticated candidate A/B HTTP isolation",
+    "real authenticated identity-review HTTP submission",
+    "reviewer approval/correction/rejection lifecycle",
+    "private storage object isolation and signed URL expiry",
+    "all 225 table policies semantically correct",
+    "Netlify published deploy commit",
+    "production readiness"
+  ],
+  "dataChangesMadeBySnapshotCheck": false,
+  "productionMigrationsApplied": false,
+  "releaseVerdict": "BLOCKED — partial database hardening evidence only; authorised live end-to-end tests and founder review remain required"
+}
