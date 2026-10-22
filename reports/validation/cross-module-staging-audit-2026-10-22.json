@@ -1,0 +1,188 @@
+{
+  "schema": "kingsmen.cross-module-staging-audit.v1",
+  "observedAt": "2026-10-22",
+  "repository": "kingsmenportal-ctrl/kingsmen-platform",
+  "branch": "feat/kingsmen-one-foundation-2026-10-19",
+  "assessedCommit": "2aab5ed76e31a57cf67db53592fbca67b44293ae",
+  "environment": {
+    "kind": "staging",
+    "supabaseProjectRef": "euhubhhnumtibbyufghm",
+    "netlifySiteId": "fb27d0db-b116-4890-8f7f-14e654c27dbc"
+  },
+  "automatedChecks": {
+    "kingsmenOneSmoke": {
+      "status": "PASSED",
+      "runId": 39842755887,
+      "commit": "2aab5ed76e31a57cf67db53592fbca67b44293ae"
+    },
+    "sourceGuard": {
+      "status": "PASSED",
+      "runId": 39842755908,
+      "commit": "2aab5ed76e31a57cf67db53592fbca67b44293ae"
+    },
+    "releaseEvidence": {
+      "status": "PASSED",
+      "runId": 39842755925,
+      "commit": "2aab5ed76e31a57cf67db53592fbca67b44293ae"
+    },
+    "scopeNote": "These CI checks include source contracts, repository tests/build, backend health smoke, and static candidate tests. They are not proof of a real authenticated candidate/reviewer journey."
+  },
+  "N03_truthVault": {
+    "status": "PARTIAL",
+    "liveProbe": {
+      "idempotencyKey": "staging-probe:2026-10-22:cross-module-01",
+      "firstInsert": "PASSED",
+      "duplicateInsert": "NO_OP; no returned row",
+      "independentReadAfterWrite": "PASSED; original command and response preserved",
+      "auditEvent": "staging-probe-2026-10-22-cross-module-01 persisted and re-read",
+      "candidateDataTouched": false
+    },
+    "stagingCounts": {
+      "idempotencyKeysIncludingExpiringProbe": 1,
+      "auditEventsIncludingProbe": 3
+    },
+    "notProven": [
+      "application API write path",
+      "process restart recovery",
+      "backup restore drill",
+      "full workflow/evidence/approval/heartbeat/DLQ runtime"
+    ]
+  },
+  "N04_candidateIdentity": {
+    "status": "BLOCKED_FOR_AUTHENTICATED_E2E",
+    "authUsersObserved": 3,
+    "activePlatformReviewers": 0,
+    "identityReviewRequests": 0,
+    "verifiedIdentityLinks": 0,
+    "endpoint": {
+      "slug": "candidate-identity-review-request",
+      "status": "ACTIVE",
+      "version": 3,
+      "verifyJwt": true
+    },
+    "proven": [
+      "database duplicate-open-request guard probe",
+      "service-only RPC privilege checks",
+      "JWT verification configuration"
+    ],
+    "notProven": [
+      "real bearer-token HTTP submission",
+      "candidate A/B isolation",
+      "reviewer approval/correction/rejection lifecycle"
+    ]
+  },
+  "N05_documentVault": {
+    "status": "BLOCKED_FOR_LIVE_FILE_E2E",
+    "endpoint": {
+      "slug": "candidate-private-documents",
+      "status": "ACTIVE",
+      "version": 7,
+      "verifyJwt": true
+    },
+    "counts": {
+      "documents": 0,
+      "events": 0,
+      "reviews": 0
+    },
+    "sourceContracts": [
+      "PDF/JPEG/PNG allowlist",
+      "10 MiB source limit",
+      "SHA-256 evidence",
+      "60-second signed read URL",
+      "audit-required read path"
+    ],
+    "notProven": [
+      "real binary upload",
+      "magic-byte/signature rejection against live storage",
+      "oversize rejection against live storage",
+      "signed URL expiry",
+      "candidate A/B object denial",
+      "reviewer download/decision"
+    ]
+  },
+  "N06_N15_routeUniverse": {
+    "status": "SOURCE_CATALOG_EXPANDED_LISTINGS_NOT_VERIFIED",
+    "officialSourceAuthorities": 21,
+    "addedAuthorityAnchors": 14,
+    "allAuthoritiesRequireProgrammeVerification": true,
+    "newlyAddedAuthoritiesHaveLastVerifiedAt": false,
+    "routeProgrammeAnchors": 2,
+    "recentlyVerifiedOpenOrFutureProgrammeListings": 0,
+    "externalSourceObservations": 0,
+    "rule": "Authority anchors are not listings. No active programme, closing date, eligibility, or outcome is inferred."
+  },
+  "applicationsAndOutcomes": {
+    "status": "BLOCKED_FOR_CANDIDATE_LIFECYCLE_E2E",
+    "candidateApplicationTrackers": 0,
+    "preparationItems": 0,
+    "submissionJobs": 0,
+    "outcomes": 0,
+    "outcomeCorrectionRequests": 0,
+    "notProven": [
+      "candidate-owned authenticated persistence",
+      "evidence-linked provider submission",
+      "provider acknowledgement",
+      "independently confirmed outcome"
+    ]
+  },
+  "N09_N14_communicationsIntegrations": {
+    "status": "BLOCKED_FOR_PROVIDER_E2E",
+    "notificationOutbox": 0,
+    "notificationDeliveryAttempts": 0,
+    "privacyConsentRecords": 0,
+    "urgentWhatsappEscalations": 0,
+    "integrationOutbox": 0,
+    "integrationDeadLetterQueue": 0,
+    "policyInSource": "email primary; SMS backup; WhatsApp urgent-only",
+    "notProven": [
+      "consent enforcement with real candidate",
+      "provider delivery/bounce/opt-out",
+      "retry/dead-letter recovery",
+      "integration replay/idempotency"
+    ]
+  },
+  "N12_N13_N16_governanceOperations": {
+    "status": "BLOCKED_FOR_OPERATIONAL_E2E",
+    "publicTables": 225,
+    "rlsEnabled": 225,
+    "rlsDisabled": 0,
+    "backendOnlyRlsTablesWithoutClientPolicies": 3,
+    "healthSnapshots": 0,
+    "serviceHealthChecks": 0,
+    "incidents": 0,
+    "incidentTimelineEntries": 0,
+    "workerHeartbeats": 0,
+    "notProven": [
+      "candidate/operator/founder/service runtime authorisation matrix",
+      "real alert/incident lifecycle",
+      "worker crash/restart recovery",
+      "restore and capacity drill"
+    ]
+  },
+  "N17_N18_N19_founderWebsiteMobile": {
+    "status": "BLOCKED_FOR_PUBLISHED_RUNTIME_VERIFICATION",
+    "founderOperationalRowsNotProven": true,
+    "netlifyCurrentDeployId": null,
+    "netlifyPublishedCommit": null,
+    "publicSiteDeploymentVerified": false,
+    "candidateBrowserE2E": false
+  },
+  "release": {
+    "status": "BLOCKED",
+    "prNumber": 134,
+    "prState": "OPEN",
+    "prDraft": true,
+    "merged": false,
+    "payFast": "DEFERRED; no payment-success simulation; unpaid candidate journeys remain the permitted build target",
+    "publicLaunchAllowed": false,
+    "productionDeployClaimed": false
+  },
+  "dataIntegrity": {
+    "noCandidateFixturesCreated": true,
+    "noReviewerFixturesCreated": true,
+    "noProgrammeAvailabilityInvented": true,
+    "oneExpiringTestIdempotencyRowRetained": true,
+    "oneRedactedStagingProbeAuditEventRetained": true
+  },
+  "verdict": "NOT PRODUCTION READY. Source/CI and selected database-level probes passed; authenticated candidate/reviewer, document-storage, provider, recovery, published deployment, and founder release gates remain open."
+}
