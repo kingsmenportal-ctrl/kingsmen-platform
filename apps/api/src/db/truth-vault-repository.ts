@@ -72,11 +72,34 @@ export class TruthVaultRepository {
   }
 
   static fromEnvironment(): TruthVaultRepository {
-    const mode = process.env.KINGSMEN_TRUTH_VAULT_MODE ?? "memory";
+    // Production must never silently start with ephemeral, non-durable state.
+    // Default production to PostgreSQL and require an explicit non-production mode
+    // for local/test-only memory storage.
+    const mode = process.env.KINGSMEN_TRUTH_VAULT_MODE ??
+      (process.env.NODE_ENV === "production" ? "postgres" : "memory");
     const databaseUrl = process.env.KINGSMEN_DATABASE_URL ?? process.env.DATABASE_URL;
 
-    if (mode !== "postgres") return new TruthVaultRepository(null);
-    if (!databaseUrl) throw new Error("KINGSMEN_TRUTH_VAULT_MODE=postgres requires KINGSMEN_DATABASE_URL or DATABASE_URL.");
+    if (mode === "postgres") {
+      if (!databaseUrl) {
+        throw new Error("KINGSMEN_TRUTH_VAULT_MODE=postgres requires KINGSMEN_DATABASE_URL or DATABASE_URL.");
+      }
+      const pg = require("pg") as { Pool: PgPoolConstructor };
+      return new TruthVaultRepository(new pg.Pool({
+        connectionString: databaseUrl,
+        max: Number(process.env.KINGSMEN_DATABASE_POOL_MAX ?? 8),
+        idleTimeoutMillis: 30_000,
+        connectionTimeoutMillis: 10_000,
+        ssl: process.env.KINGSMEN_DATABASE_SSL === "true" ? { rejectUnauthorized: false } : undefined
+      }));
+    }
+
+    if (mode !== "memory" && mode !== "memory_development_only") {
+      throw new Error("Unsupported KINGSMEN_TRUTH_VAULT_MODE. Use postgres or an explicit non-production memory mode.");
+    }
+    if (process.env.NODE_ENV === "production") {
+      throw new Error("Memory-only Truth Vault is forbidden in NODE_ENV=production. Configure PostgreSQL Truth Vault.");
+    }
+    return new TruthVaultRepository(null);
 
     const pg = require("pg") as { Pool: PgPoolConstructor };
     return new TruthVaultRepository(new pg.Pool({
