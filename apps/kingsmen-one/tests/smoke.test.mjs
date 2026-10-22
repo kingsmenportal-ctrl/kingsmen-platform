@@ -355,3 +355,34 @@ test("reviewer console connects the authenticated UI to permission-checked queue
   assert.match(app, /Final decisions require a reviewer note and evidence reference/);
   assert.match(app, /Temporary reviewer download link issued and audited/);
 });
+
+test("N09 communications and consent ledgers are backend-only until candidate-scoped policies are implemented", async () => {
+  const legacyMigration = await readFile(resolve(root, "../..", "db/migrations/0007_n09_notifications_communications.sql"), "utf8");
+  const hardeningMigration = await readFile(resolve(root, "../..", "supabase/migrations/20261022210000_n09_communications_backend_only.sql"), "utf8");
+  const mirroredMigration = await readFile(resolve(root, "../..", "db/migrations/0018_n09_communications_backend_only.sql"), "utf8");
+  const policy = await readFile(resolve(root, "../..", "apps/api/src/communications/communication-policy.ts"), "utf8");
+  const proofBoundary = await readFile(resolve(root, "../..", "apps/api/src/communications/communications-proof-boundary.ts"), "utf8");
+  const tables = [
+    "communication_templates", "communication_threads", "notification_outbox",
+    "notification_delivery_attempts", "inbound_messages", "candidate_portal_messages",
+    "urgent_whatsapp_escalations", "communication_quiet_hours",
+    "communication_rate_limits", "message_evidence_ledger"
+  ];
+  for (const table of tables) {
+    assert.match(legacyMigration, new RegExp(`create policy ${table}_all on public\\.${table} for all to service_role`, "i"), `legacy N09 policy must be backend-only: ${table}`);
+    assert.match(hardeningMigration, new RegExp(`CREATE POLICY ${table}_backend_only ON public\\.${table}\\s+FOR ALL TO service_role`, "i"), `hardening migration must recreate backend-only policy: ${table}`);
+    assert.match(mirroredMigration, new RegExp(`CREATE POLICY ${table}_backend_only ON public\\.${table}\\s+FOR ALL TO service_role`, "i"), `mirrored migration must match staging migration: ${table}`);
+  }
+  for (const migration of [hardeningMigration, mirroredMigration]) {
+    assert.match(migration, /REVOKE ALL PRIVILEGES ON TABLE public\\.%I FROM anon, authenticated/i);
+    assert.match(migration, /GRANT SELECT, INSERT, UPDATE, DELETE ON TABLE public\\.%I TO service_role/i);
+    assert.match(migration, /privacy_consent_records_backend_only[\\s\\S]*FOR ALL TO service_role/i);
+  }
+  assert.match(policy, /WHATSAPP_URGENT_ONLY/);
+  assert.match(policy, /SMS_BACKUP_ONLY/);
+  assert.match(policy, /assertEvidenceReady/);
+  assert.match(proofBoundary, /marketingRequiresExplicitConsent/);
+  assert.match(proofBoundary, /recipientCount > 1/);
+  assert.match(proofBoundary, /liveSendExecuted: false/);
+});
+
