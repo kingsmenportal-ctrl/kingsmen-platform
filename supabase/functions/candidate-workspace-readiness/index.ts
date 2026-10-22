@@ -5,12 +5,14 @@ const SUPABASE_ANON_KEY = Deno.env.get("SUPABASE_ANON_KEY") ?? "";
 const SUPABASE_SERVICE_ROLE_KEY = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY") ?? "";
 const allowedOrigins = new Set([
   "https://kingsmen-portal-staging.netlify.app",
-  "https://6ad61ee1da20fa786856f07e--kingsmen-portal-staging.netlify.app",
   "http://localhost:8888",
   "http://127.0.0.1:8888"
 ]);
+function isAllowedOrigin(origin: string): boolean {
+  return allowedOrigins.has(origin) || /^https:\/\/[a-z0-9-]+--kingsmen-portal-staging\.netlify\.app$/i.test(origin);
+}
 const taskIds = new Set(["profile", "id", "results", "route"]);
-const pathwayIds = new Set(["", "higher-education", "tvet", "seta", "employment", "entrepreneurship"]);
+const pathwayIds = new Set(["", "higher-education", "tvet", "seta", "internships", "apprenticeships", "employment"]);
 
 function response(status: number, body: Record<string, unknown>, origin: string | null) {
   const headers: Record<string, string> = {
@@ -18,18 +20,18 @@ function response(status: number, body: Record<string, unknown>, origin: string 
     "Cache-Control": "no-store",
     "Vary": "Origin"
   };
-  if (origin && allowedOrigins.has(origin)) headers["Access-Control-Allow-Origin"] = origin;
+  if (origin && isAllowedOrigin(origin)) headers["Access-Control-Allow-Origin"] = origin;
   return new Response(JSON.stringify(body), { status, headers });
 }
 
 Deno.serve(async (req: Request) => {
   const origin = req.headers.get("Origin");
-  if (origin && !allowedOrigins.has(origin)) return response(403, { error: "Origin not allowed." }, null);
+  if (origin && !isAllowedOrigin(origin)) return response(403, { error: "Origin not allowed." }, null);
   if (req.method === "OPTIONS") {
     return new Response(null, {
       status: 204,
       headers: {
-        ...(origin && allowedOrigins.has(origin) ? { "Access-Control-Allow-Origin": origin } : {}),
+        ...(origin && isAllowedOrigin(origin) ? { "Access-Control-Allow-Origin": origin } : {}),
         "Access-Control-Allow-Headers": "authorization, apikey, content-type, x-client-info",
         "Access-Control-Allow-Methods": "POST, OPTIONS",
         "Access-Control-Max-Age": "600",
