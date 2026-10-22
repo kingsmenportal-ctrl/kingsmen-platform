@@ -376,7 +376,7 @@ test("N09 communications and consent ledgers are backend-only until candidate-sc
   for (const migration of [hardeningMigration, mirroredMigration]) {
     assert.match(migration, /REVOKE ALL PRIVILEGES ON TABLE public\.%I FROM anon, authenticated/i);
     assert.match(migration, /GRANT SELECT, INSERT, UPDATE, DELETE ON TABLE public\.%I TO service_role/i);
-    assert.match(migration, /privacy_consent_records_backend_only[\\s\\S]*FOR ALL TO service_role/i);
+    assert.match(migration, /privacy_consent_records_backend_only[\s\S]*FOR ALL TO service_role/i);
   }
   assert.match(policy, /WHATSAPP_URGENT_ONLY/);
   assert.match(policy, /SMS_BACKUP_ONLY/);
