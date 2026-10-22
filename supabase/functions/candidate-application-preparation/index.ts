@@ -17,7 +17,7 @@ function reply(status:number, body:Record<string,unknown>, origin:string|null) {
 }
 Deno.serve(async(req:Request)=>{
  const origin=req.headers.get("Origin");
- if(origin&&!origins.has(origin))return reply(403,{error:"Origin not allowed."},null);
+ if(origin&&!isAllowedOrigin(origin))return reply(403,{error:"Origin not allowed."},null);
  if(req.method==="OPTIONS")return new Response(null,{status:204,headers:{...(origin&&isAllowedOrigin(origin)?{"Access-Control-Allow-Origin":origin}:{}),"Access-Control-Allow-Headers":"authorization, apikey, content-type, x-client-info","Access-Control-Allow-Methods":"POST, OPTIONS","Access-Control-Max-Age":"600","Vary":"Origin"}});
  if(req.method!=="POST")return reply(405,{error:"Method not allowed."},origin);
  if(!URL||!ANON||!SERVICE)return reply(503,{error:"Application preparation service is not configured."},origin);
