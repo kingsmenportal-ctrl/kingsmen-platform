@@ -23,8 +23,9 @@ All behavioral tests ran inside explicit transactions followed by `ROLLBACK`, so
 ## Not proven yet
 
 - Static Node contract test has not been executed in GitHub Actions or a local shell.
-- No authenticated founder/operator route adapter is wired; the public enqueue route correctly returns 503 and `queued:false`.
-- No real worker service or Airtable provider call was executed.
+- The authenticated enqueue adapter is now wired through the web route to the deployed `n07-airtable-enqueue` Edge Function (version 2, `verify_jwt=true`). It forwards the caller JWT and public anon key only; service_role stays server-side.
+- No live authorized HTTP request has been proven yet because staging has zero active outbound target mappings and zero active reviewer grants. The function must reject unauthorized callers and cannot enqueue without a valid target.
+- No worker service or Airtable provider call was executed; the database claim/finish RPCs were exercised transactionally.
 - No active outbound target/base mapping exists in staging.
 - Candidate journey independence from a live deployment has not been run as an end-to-end browser test.
 - No production deployment or production readiness is claimed.
@@ -32,7 +33,7 @@ All behavioral tests ran inside explicit transactions followed by `ROLLBACK`, so
 ## Next gates
 
 1. Pass repository CI and source contract test.
-2. Implement the authenticated server-side route adapter without exposing service_role.
+2. Verify the deployed Edge Function with valid/invalid JWTs and reviewer grants.
 3. Implement and supervise a worker that calls the claim/finish RPCs and provider adapter.
 4. Add and review an approved outbound target mapping only after Airtable is connected.
 5. Run staging browser/runtime tests for founder authorization and candidate journey independence.
