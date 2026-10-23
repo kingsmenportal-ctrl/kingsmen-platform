@@ -1,0 +1,162 @@
+{
+  "id": "kingsmen-n00-n20-operating-inventory",
+  "version": "1.0.0",
+  "status": "architecture_baseline",
+  "evidence_policy": "A module definition is not implementation or release evidence.",
+  "modules": [
+    {
+      "id": "N00",
+      "name": "Constitution and Doctrine",
+      "responsibility": "constitution, doctrine, laws, Commander decisions, authority"
+    },
+    {
+      "id": "N01",
+      "name": "Foundation and Runtime",
+      "responsibility": "monorepo/runtime, Oracle Lite deployment discipline, environments"
+    },
+    {
+      "id": "N02",
+      "name": "Backend API Kernel",
+      "responsibility": "API, command/state machine, idempotency, policy gates"
+    },
+    {
+      "id": "N03",
+      "name": "PostgreSQL Truth Vault",
+      "responsibility": "authoritative persistence, read models, evidence, audit"
+    },
+    {
+      "id": "N04",
+      "name": "Candidate Core",
+      "responsibility": "authentication, exact identity linkage, profile, correction review"
+    },
+    {
+      "id": "N05",
+      "name": "Private Document Vault",
+      "responsibility": "requests, private storage, extraction, verification, retention"
+    },
+    {
+      "id": "N06",
+      "name": "Route Universe and Application Workbench",
+      "responsibility": "routes, pathways, application preparation and workbench"
+    },
+    {
+      "id": "N07",
+      "name": "Airtable Sync/Mirror",
+      "responsibility": "scoped synchronisation and reconciliation; not authoritative truth"
+    },
+    {
+      "id": "N08",
+      "name": "Control Plane",
+      "responsibility": "operator read models and bounded command surfaces"
+    },
+    {
+      "id": "N09",
+      "name": "Notifications and Communications",
+      "responsibility": "delivery, preferences, retries, delivery evidence"
+    },
+    {
+      "id": "N10",
+      "name": "Finance and Payments",
+      "responsibility": "packages, orders, invoices, PayFast ITN, payments, refunds, ledger"
+    },
+    {
+      "id": "N11",
+      "name": "AI Decision Support",
+      "responsibility": "recommendations; no replacement of authorised human decisions"
+    },
+    {
+      "id": "N12",
+      "name": "Governance and Review",
+      "responsibility": "approvals, risk, compliance, tribunal and review boundaries"
+    },
+    {
+      "id": "N13",
+      "name": "Observability and Resilience",
+      "responsibility": "health, queues, reports, incidents, backup and capacity evidence"
+    },
+    {
+      "id": "N14",
+      "name": "Provider and Workflow Adapters",
+      "responsibility": "external integrations, contracts, failure mapping"
+    },
+    {
+      "id": "N15",
+      "name": "Opportunity Engine",
+      "responsibility": "source intelligence, freshness, matching and provenance"
+    },
+    {
+      "id": "N16",
+      "name": "Orchestrator and Execution Runtime",
+      "responsibility": "worker actions, retries, compensation and recovery"
+    },
+    {
+      "id": "N17",
+      "name": "Founder Command Ops",
+      "responsibility": "mobile cockpit, briefs, watchlist, escalations and decisions"
+    },
+    {
+      "id": "N18",
+      "name": "Public Website / Route House",
+      "responsibility": "public front door and candidate discovery"
+    },
+    {
+      "id": "N19",
+      "name": "Candidate Mobile / PWA",
+      "responsibility": "mobile candidate experience and public-to-portal continuity"
+    },
+    {
+      "id": "N20",
+      "name": "Final Integration and Release",
+      "responsibility": "system lock, integration, release gates and readiness evidence"
+    }
+  ],
+  "cross_module_invariants": [
+    "N00 policy is enforced by server-side gates; UI visibility is not authority.",
+    "N02 owns command/state transitions and idempotency; N03 persists authoritative state and audit evidence.",
+    "N04 binds authenticated users to exact candidate records; never infer identity from email alone.",
+    "N05 document signature validation is not malware scanning; release remains gated until scanning/quarantine evidence exists.",
+    "N07 is a mirror/adapter, not the authoritative truth store.",
+    "N10 verified financial events, not order existence alone, gate downstream service fulfilment.",
+    "N11 recommendations do not replace authorised human decisions.",
+    "N16 workers execute only policy-approved, authorised work.",
+    "N20 must block production readiness when critical evidence is missing."
+  ],
+  "required_inventory_fields": [
+    "module_id",
+    "responsibility",
+    "non_responsibilities",
+    "owner",
+    "dependencies",
+    "source_paths",
+    "api_routes",
+    "tables_and_migrations",
+    "provider_adapters",
+    "commands_and_events",
+    "state_transitions",
+    "idempotency",
+    "policy_gates",
+    "permissions",
+    "data_classification",
+    "audit_events",
+    "validators",
+    "unit_integration_e2e_tests",
+    "latest_verification",
+    "environment",
+    "observability",
+    "reconciliation",
+    "known_blockers",
+    "next_safe_action",
+    "release_impact",
+    "evidence_links",
+    "last_verified_at"
+  ],
+  "allowed_evidence_statuses": [
+    "defined",
+    "planned",
+    "implemented_unverified",
+    "validated",
+    "blocked",
+    "production_approved"
+  ],
+  "release_rule": "productionReady=false until all required evidence for the target environment is verified and approved."
+}
