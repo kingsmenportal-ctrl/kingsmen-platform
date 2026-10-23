@@ -17,6 +17,9 @@ add("manifest covers six pathways", ["UNIVERSITY","TVET","SETA","INTERNSHIP","AP
 add("migration records observed and checked timestamps", /observed_at\s+timestamptz/i.test(migration) && /last_checked_at\s+timestamptz/i.test(migration));
 add("migration stores evidence references", /evidence_refs\s+text\[\]/i.test(migration));
 add("migration models source freshness boundary", /stale_after\s+timestamptz/i.test(migration) && /observation_status/i.test(migration));
+add("authority registry bridge is idempotent", /from public\.source_authorities/i.test(bridge) && /on conflict \(authority_ref\) do update/i.test(bridge));
+add("authority bridge does not invent opportunity status", /not proof of an open opportunity/i.test(bridge));
+add("authority bridge imports HTTPS anchors only", /base_url is not null/i.test(bridge) && /https:\/\/%/.test(bridge));
 add("HTTPS is required", canonicalizeSourceUrl("http://invalid.example").reason === "HTTPS_REQUIRED");
 add("registered authority domain match is exact/subdomain only", assessSourceAuthority({sourceUrl:"https://dhet.gov.za.fake.example",registeredAuthorityUrls:["https://dhet.gov.za"],claimedOfficial:true}).authorityMatched === false);
 add("missing freshness check fails closed", assessFreshness({observedAt:new Date().toISOString(),staleAfter:new Date(Date.now()+86400000).toISOString()}).candidateFacingSafe === false);
