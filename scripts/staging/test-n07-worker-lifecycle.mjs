@@ -69,9 +69,15 @@ async function rows(id) {
 }
 async function claim(worker) {
   return await request("/rest/v1/rpc/n07_claim_airtable_mirror_batch", {
-    method: "POST", body: { p_worker_ref: worker, p_batch_size: 50 }
+    method: "POST", body: { p_worker_ref: worker, p_batch_size: 1 }
   });
 }
+
+// This staging probe uses the global claim RPC, so fail closed if there are
+// existing claimable jobs rather than risk leasing another test/operator job.
+const preflight = await request("/rest/v1/airtable_sync_outbox?select=id&status=in.(PENDING,LOCKED)&limit=1");
+assert.equal(preflight.length, 0,
+  "staging outbox has existing pending/locked work; isolate this lifecycle test before running");
 async function finish(id, worker, succeeded, errorCode = null) {
   const result = await request("/rest/v1/rpc/n07_finish_airtable_mirror_job", {
     method: "POST",
