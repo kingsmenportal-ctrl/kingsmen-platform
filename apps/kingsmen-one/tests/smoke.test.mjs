@@ -435,3 +435,15 @@ test("verified private documents link only to their candidate-owned application 
   assert.match(submissionGuard, /PROVIDER_SUBMISSION_RECEIPT.*PROVIDER_REFERENCE/s);
   assert.doesNotMatch(submissionGuard, /e\.evidence_type IN \([^)]*CANDIDATE_DOCUMENT/s);
 });
+
+
+test("public and application routes fail closed for expired or undated opportunities", async () => {
+  const policy = await readFile(resolve(root, "../..", "db/migrations/0089_route_availability_expiry_guards.sql"), "utf8");
+  const edge = await readFile(resolve(root, "../..", "supabase/functions/candidate-application-preparation/index.ts"), "utf8");
+  assert.match(policy, /availability_status = 'OPEN'[\s\S]*?metadata->>'closing_date'[\s\S]*?current_date/);
+  assert.match(policy, /availability_status = 'FUTURE'[\s\S]*?metadata->>'opening_date'[\s\S]*?current_date/);
+  assert.match(policy, /updated_at >= now\(\) - interval '90 days'/);
+  assert.match(edge, /route\.av\w+==="OPEN"&&\(!closingDate\|\|closingDate<southAfricanToday\)/);
+  assert.match(edge, /route\.av\w+==="FUTURE"&&\(!openingDate\|\|openingDate<=southAfricanToday/);
+  assert.match(edge, /Africa\/Johannesburg/);
+});
