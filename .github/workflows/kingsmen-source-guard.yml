@@ -58,6 +58,9 @@ jobs:
       - name: API Truth Vault persistence validator
         run: npm run api:validate:truth-vault
 
+      - name: Install N11 API build dependencies
+        run: npm install --prefix apps/api --no-package-lock
+
       - name: N11 AI decision input and boundary regression suite
         run: npm run ai:n11:test
 
