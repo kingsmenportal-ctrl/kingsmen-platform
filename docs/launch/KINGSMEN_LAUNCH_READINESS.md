@@ -342,3 +342,16 @@ The first application/outcome truth-guard migration exposed its SECURITY DEFINER
 Live privilege query confirms both trigger functions are no longer executable by `anon` or `authenticated`; `service_role` retains execute permission. PostgreSQL triggers still invoke the functions as required. Supabase security advisor no longer reports the two new SECURITY DEFINER function warnings. The remaining findings are three INFO notices for intentionally backend-only RLS tables with no client policies and the pre-existing leaked-password-protection WARN.
 
 A regression smoke test asserts that each function has explicit revocations for PUBLIC, anon and authenticated. This latest test change still needs its exact-head GitHub Actions run to complete before it can be called CI-verified.
+
+
+## Database guard behavior probe — 2026-10-23
+
+A staging-only synthetic fixture probe ran inside a PostgreSQL subtransaction and deliberately rolled back every write. It exercised these assertions against the live triggers:
+
+- Attempting to advance an application to `SUBMITTED_CONFIRMED` without verified provider-submission evidence was rejected.
+- Adding synthetic verified submission-receipt evidence allowed the application state transition.
+- Attempting to create a confirmed outcome using a submission receipt instead of a provider-outcome notice was rejected.
+- A confirmed outcome referencing synthetic verified `PROVIDER_OUTCOME_NOTICE` evidence for the same candidate/application/opportunity was accepted within the test transaction.
+- The fixture transaction was intentionally rolled back because the outcome ledger is append-only; no test outcome was retained.
+
+This validates the database trigger behavior in staging only. It does not prove a real provider supplied the evidence, a real reviewer is authorized, or a candidate browser journey works. On commit `06c2f866918c07529c965d466d9235936f8d4f82`, Kingsmen One smoke tests, Source Guard and Release Evidence all passed; the branch-protection evidence workflow still fails because repository protection could not be verified. PR #134 remains open/draft.
