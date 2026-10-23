@@ -50,14 +50,20 @@ Deno.serve(async(req:Request)=>{
   const providerValue=route.route_providers as unknown;
   const provider=Array.isArray(providerValue)?providerValue[0] as Record<string,unknown>|undefined:providerValue as Record<string,unknown>|null;
   if(!provider||provider.public_safe!==true||provider.verification_status!=="VERIFIED"||!(["A","B"] as unknown[]).includes(provider.default_confidence_band))return reply(409,{error:"The provider is not currently verified and publicly approved for this opportunity."},origin);
+  const meta=route.metadata&&typeof route.metadata==="object"?route.metadata as Record<string,unknown>:{};
+  const dateParts=new Intl.DateTimeFormat("en-CA",{timeZone:"Africa/Johannesburg",year:"numeric",month:"2-digit",day:"2-digit"}).formatToParts(new Date());
+  const datePart=(kind:string)=>dateParts.find((part)=>part.type===kind)?.value??"";
+  const southAfricanToday=`${datePart("year")}-${datePart("month")}-${datePart("day")}`;
+  const openingDate=typeof meta.opening_date==="string"&&/^\\d{4}-\\d{2}-\\d{2}$/.test(meta.opening_date)?meta.opening_date:null;
+  const closingDate=typeof meta.closing_date==="string"&&/^\\d{4}-\\d{2}-\\d{2}$/.test(meta.closing_date)?meta.closing_date:null;
+  if(route.availability_status==="OPEN"&&(!closingDate||closingDate<southAfricanToday))return reply(409,{error:"This opportunity is expired or has no verified closing date. Refresh the official listing before tracking it."},origin);
+  if(route.availability_status==="FUTURE"&&(!openingDate||openingDate<=southAfricanToday||(closingDate!==null&&closingDate<southAfricanToday)))return reply(409,{error:"This upcoming opportunity has no valid future opening date or its closing date has passed."},origin);
   const officialUrl=typeof route.source_url==="string"?route.source_url:"";
   if(!/^https:\/\//i.test(officialUrl))return reply(409,{error:"The opportunity has no usable HTTPS official source, so a tracker cannot be created."},origin);
-  const meta=route.metadata&&typeof route.metadata==="object"?route.metadata as Record<string,unknown>:{};
   const organisation=String(meta.organisation??meta.provider_name??"Official provider").trim().slice(0,180)||"Official provider";
   const rawPathway=String(route.route_type??"");
   const pathway=pathwayMap[rawPathway]??pathwayMap[rawPathway.toUpperCase()];
   if(!pathway)return reply(409,{error:"This route type needs catalogue mapping before it can be tracked."},origin);
-  const closingDate=typeof meta.closing_date==="string"&&/^\d{4}-\d{2}-\d{2}$/.test(meta.closing_date)?meta.closing_date:null;
   const {data:opportunity,error:oppError}=await admin.from("candidate_workspace_saved_opportunities").upsert({candidate_id:candidateId,title:String(route.programme_name).trim().slice(0,180),organisation,official_url:officialUrl,pathway,closing_date:closingDate,updated_at:new Date().toISOString()},{onConflict:"candidate_id,official_url"}).select("id").single();
   if(oppError||!opportunity){console.error("saved opportunity sync failed",oppError?.code??"unknown");return reply(503,{error:"Could not connect the saved opportunity to the candidate workspace."},origin);}
   const {data:existing,error:existingError}=await admin.from("candidate_application_tracker").select("id,candidate_id,saved_opportunity_id,status,candidate_note,evidence_reference,created_at,updated_at").eq("candidate_id",candidateId).eq("saved_opportunity_id",opportunity.id).maybeSingle();
