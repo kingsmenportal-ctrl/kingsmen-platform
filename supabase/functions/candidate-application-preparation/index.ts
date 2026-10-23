@@ -9,7 +9,7 @@ function isAllowedOrigin(origin: string): boolean {
 }
 const trackerStatuses = new Set(["SAVED","PREPARING","READY_TO_APPLY","SUBMITTED_CANDIDATE_REPORTED","RESPONSE_RECEIVED","INTERVIEW","OFFER_RECEIVED","REJECTED","CLOSED"]);
 const itemStatuses = new Set(["NOT_STARTED","IN_PROGRESS","READY_CANDIDATE_REPORTED"]);
-const pathwayMap: Record<string,string> = {"HIGHER_EDUCATION":"higher_education","TVET":"tvet","SETA":"seta_learnership","SETA_LEARNERSHIP":"seta_learnership","INTERNSHIP":"internship","INTERNSHIPS":"internship","APPRENTICESHIP":"apprenticeship","APPRENTICESHIPS":"apprenticeship","EMPLOYMENT":"employment","higher_education":"higher_education","tvet":"tvet","seta":"seta_learnership","seta_learnership":"seta_learnership","internship":"internship","internships":"internship","apprenticeship":"apprenticeship","apprenticeships":"apprenticeship","employment":"employment"};
+const pathwayMap: Record<string,string> = {"HIGHER_EDUCATION":"higher_education","TVET":"tvet","SETA":"seta_learnership","SETA_LEARNERSHIP":"seta_learnership","INTERNSHIP":"internship","INTERNSHIPS":"internship","APPRENTICESHIP":"apprenticeship","APPRENTICESHIPS":"apprenticeship","EMPLOYMENT":"employment","EMPLOYER":"employment","higher_education":"higher_education","tvet":"tvet","seta":"seta_learnership","seta_learnership":"seta_learnership","internship":"internship","internships":"internship","apprenticeship":"apprenticeship","apprenticeships":"apprenticeship","employment":"employment","EMPLOYER":"employment","employer":"employment"};
 function reply(status:number, body:Record<string,unknown>, origin:string|null) {
  const headers:Record<string,string>={"Content-Type":"application/json; charset=utf-8","Cache-Control":"no-store","Vary":"Origin"};
  if(origin&&isAllowedOrigin(origin))headers["Access-Control-Allow-Origin"]=origin;
@@ -130,7 +130,7 @@ Deno.serve(async(req:Request)=>{
    console.error("default checklist create failed",itemError.code??"unknown");
    return reply(503,{error:"Tracker exists but its checklist could not be completed. Retry creating the tracker to repair the missing checklist; existing candidate data will be preserved."},origin);
   }
-  return reply(201,{ready:true,tracker,already_exists:false,message:"Preparation tracker and four checklist items created. This is not a provider application or submission."},origin);
+  return reply(201,{ready:true,tracker,already_exists:false,message:`Preparation tracker and ${defaults.length} pathway-specific checklist items created. This is not a provider application or submission.`},origin);
  }
  if(p.action==="update_tracker"){
   const id=typeof p.tracker_id==="string"?p.tracker_id:"";
