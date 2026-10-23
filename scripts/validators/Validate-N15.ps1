@@ -70,6 +70,14 @@ Require-Contains "apps\web\src\opportunity\SourceReviewPanel.tsx" "Review before
 Require-Contains "apps\web\src\opportunity\OpportunityAlertsPanel.tsx" "Openings, deadlines, stale sources, risk" "Alerts UI missing core alert types."
 Require-Contains "reports\n15\N15_OPPORTUNITY_ENGINE_SOURCE_INTELLIGENCE_REPORT.md" "No fake deadlines" "Report must state no fake deadlines."
 
+Require-Contains "db\migrations\0092_n15_current_verified_opportunity_feed.sql" "current_verified_route_opportunities" "Current verified opportunity feed migration is missing."
+Require-Contains "db\migrations\0092_n15_current_verified_opportunity_feed.sql" "availability_status = 'OPEN'" "Feed must exclude non-open programmes."
+Require-Contains "db\migrations\0092_n15_current_verified_opportunity_feed.sql" "interval '90 days'" "Feed must enforce source freshness."
+Require-Contains "db\migrations\0092_n15_current_verified_opportunity_feed.sql" "v.public_safe = true" "Feed must require public-safe provider."
+Require-Contains "db\migrations\0092_n15_current_verified_opportunity_feed.sql" "Africa/Johannesburg" "Feed must evaluate deadlines in South African time."
+Require-Contains "db\migrations\0092_n15_current_verified_opportunity_feed.sql" "revoke all on public.current_verified_route_opportunities from public, anon, authenticated" "Feed must not be directly readable by public client roles."
+Require-Contains "reports\n15\N15_CURRENT_VERIFIED_OPPORTUNITY_FEED_2026-10-23.md" "anon SELECT=false" "Report must capture verified client-role denial."
+
 $Result = [ordered]@{
   phase = "N15"
   name = "Opportunity Engine / External Source Intelligence"
