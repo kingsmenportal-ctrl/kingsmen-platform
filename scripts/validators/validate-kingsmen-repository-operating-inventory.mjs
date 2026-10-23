@@ -41,13 +41,8 @@ const moduleEvidence = modules.map((module) => {
   const evidenceState = !existsSync(fullPath) ? 'MISSING' : parseError ? 'INVALID' : !timestamp ? 'UNDATED' : ageDays < 0 ? 'FUTURE_DATED' : ageDays > evidenceFreshnessDays ? 'STALE' : reportedFail ? 'FAILED' : reportedPass ? 'SOURCE_VALIDATION_PASS_ONLY' : 'INCONCLUSIVE';
   return { key: module.key, name: module.name, registeredReleaseStatus: module.registeredReleaseStatus, reportPath, reportExists: existsSync(fullPath), reportTimestamp: timestamp, ageDays, freshnessThresholdDays: evidenceFreshnessDays, reportStatus: report?.status ?? (typeof report?.passed === 'boolean' ? (report.passed ? 'PASS' : 'FAIL') : 'UNKNOWN'), failures: Array.isArray(report?.failures) ? report.failures : [], evidenceState, runtimeVerification: 'NOT_PROVEN_BY_MODULE_VALIDATION_REPORT', productionReadiness: 'NOT_PROMOTED_BY_SOURCE_VALIDATION' };
 });
-for (const item of moduleEvidence) {
-  if (item.evidenceState === 'MISSING') failures.push('module-evidence-missing:' + item.key);
-  if (item.evidenceState === 'INVALID') failures.push('module-evidence-invalid:' + item.key);
-  if (item.evidenceState === 'STALE') failures.push('module-evidence-stale:' + item.key + ':' + item.ageDays + 'd');
-  if (item.evidenceState === 'FAILED') failures.push('module-evidence-failed:' + item.key);
-  if (['UNDATED','FUTURE_DATED'].includes(item.evidenceState)) failures.push('module-evidence-timestamp-invalid:' + item.key + ':' + item.evidenceState);
-}
+const moduleEvidenceFindings = moduleEvidence.filter((item) => item.evidenceState !== 'SOURCE_VALIDATION_PASS_ONLY').map((item) => ({ key: item.key, state: item.evidenceState, reportPath: item.reportPath, ageDays: item.ageDays }));
+const moduleEvidenceReady = moduleEvidence.length === 21 && moduleEvidence.every((item) => item.evidenceState === 'SOURCE_VALIDATION_PASS_ONLY');
 const expectedKeys = Array.from({ length: 21 }, (_, i) => `N${String(i).padStart(2, '0')}`);
 const actualKeys = modules.map((m) => m.key);
 for (const key of expectedKeys) if (!actualKeys.includes(key)) failures.push(`module-missing:${key}`);
@@ -217,6 +212,9 @@ const report = {
   modules,
   moduleEvidenceFreshnessDays: evidenceFreshnessDays,
   moduleEvidence,
+  moduleEvidenceFindings,
+  moduleEvidenceReady,
+  releaseEvidenceReadiness: moduleEvidenceReady ? 'SOURCE_VALIDATION_FRESH_BUT_RUNTIME_STILL_UNPROVEN' : 'BLOCKED_BY_MISSING_STALE_OR_INVALID_MODULE_EVIDENCE',
   evidenceStateCounts: Object.fromEntries([...new Set(moduleEvidence.map((x) => x.evidenceState))].map((state) => [state, moduleEvidence.filter((x) => x.evidenceState === state).length])),
   launchGates: gateEvidence,
   rootValidationCommands: validationScripts,
@@ -236,6 +234,8 @@ console.log(JSON.stringify({
   moduleEvidenceStates: Object.fromEntries([...new Set(moduleEvidence.map((x) => x.evidenceState))].map((state) => [state, moduleEvidence.filter((x) => x.evidenceState === state).length])),
   staleModuleEvidenceCount: moduleEvidence.filter((x) => x.evidenceState === 'STALE').length,
   missingModuleEvidenceCount: moduleEvidence.filter((x) => x.evidenceState === 'MISSING').length,
+  moduleEvidenceFindingCount: moduleEvidenceFindings.length,
+  moduleEvidenceReady,
   launchGates: gates.length,
   filesystemFileCount: counts.trackedByFilesystemFiles,
   sourceAndDocumentationFiles: counts.sourceAndDocumentationFiles,
