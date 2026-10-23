@@ -84,8 +84,8 @@ Deno.serve(async (req: Request) => {
     count(admin, "platform_reviewers", "is_active", ["true"], "revoked_at"),
     oldestPendingAgeMinutes(admin),
     admin.from("incident_events").select("incident_ref,severity,status,opened_at,resolved_at").in("status", ["OPEN", "ACKNOWLEDGED", "MITIGATING"]).limit(500),
-    admin.from("service_health_checks").select("check_ref,service_name,service_domain,status,checked_at,reason").order("checked_at", { ascending: false }).limit(200),
-    admin.from("integration_health_snapshots").select("health_ref,connector_key,health_status,captured_at,reason").order("captured_at", { ascending: false }).limit(200),
+    admin.from("service_health_checks").select("check_ref,service_name,service_domain,status,checked_at,reason").gte("checked_at", new Date(Date.now() - FRESHNESS_MINUTES * 60000).toISOString()).order("checked_at", { ascending: false }).limit(200),
+    admin.from("integration_health_snapshots").select("health_ref,connector_key,health_status,captured_at,reason").gte("captured_at", new Date(Date.now() - FRESHNESS_MINUTES * 60000).toISOString()).order("captured_at", { ascending: false }).limit(200),
     admin.from("system_health_snapshots").select("snapshot_ref,status,incident_open_count,failed_workflows,oracle_lite_pressure,captured_at").order("captured_at", { ascending: false }).limit(1).maybeSingle(),
   ]);
 
