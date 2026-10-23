@@ -386,3 +386,18 @@ test("N09 communications and consent ledgers are backend-only until candidate-sc
   assert.match(proofBoundary, /liveSendExecuted: false/);
 });
 
+
+test("application and outcome status cannot outrun independently verified provider evidence", async () => {
+  const migration = await readFile(resolve(root, "../..", "supabase/migrations/20261023220000_cross_module_application_outcome_truth_guards.sql"), "utf8");
+  assert.match(migration, /candidate_application_submission_truth_guard/);
+  assert.match(migration, /SUBMITTED_CONFIRMED[\s\S]*PROVIDER_REVIEW[\s\S]*SHORTLISTED[\s\S]*INTERVIEW[\s\S]*OFFERED[\s\S]*ACCEPTED[\s\S]*REJECTED/);
+  assert.match(migration, /PROVIDER_SUBMISSION_RECEIPT/);
+  assert.match(migration, /verification_status = 'VERIFIED'/);
+  assert.match(migration, /verified_by_auth_user_id IS NOT NULL/);
+  assert.match(migration, /verified_at IS NOT NULL/);
+  assert.match(migration, /candidate_outcome_evidence_truth_guard/);
+  assert.match(migration, /PROVIDER_OUTCOME_NOTICE/);
+  assert.match(migration, /Outcome evidence must belong to the same candidate and application/);
+  assert.match(migration, /Candidate reports, predictions[\s\S]*are not confirmed outcomes/);
+  assert.match(migration, /SECURITY DEFINER[\s\S]*SET search_path = ''/);
+});
