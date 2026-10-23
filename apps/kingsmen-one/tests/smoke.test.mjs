@@ -401,3 +401,13 @@ test("application and outcome status cannot outrun independently verified provid
   assert.match(migration, /Candidate reports, predictions[\s\S]*are not confirmed outcomes/);
   assert.match(migration, /SECURITY DEFINER[\s\S]*SET search_path = ''/);
 });
+
+
+test("truth-guard trigger functions cannot be called directly through client RPC", async () => {
+  const migration = await readFile(resolve(root, "../..", "supabase/migrations/20261023153000_revoke_client_execute_application_outcome_guard_functions.sql"), "utf8");
+  for (const fn of ["guard_candidate_application_submission_truth", "guard_candidate_outcome_evidence_truth"]) {
+    assert.match(migration, new RegExp("REVOKE ALL ON FUNCTION public\\." + fn + "\\\\(\\\\) FROM PUBLIC"));
+    assert.match(migration, new RegExp("REVOKE ALL ON FUNCTION public\\." + fn + "\\\\(\\\\) FROM anon"));
+    assert.match(migration, new RegExp("REVOKE ALL ON FUNCTION public\\." + fn + "\\\\(\\\\) FROM authenticated"));
+  }
+});
