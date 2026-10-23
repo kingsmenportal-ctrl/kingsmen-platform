@@ -48,6 +48,27 @@ export const COMMUNICATIONS_BOUNDARY_POLICY = {
 } as const;
 
 export function decideCommunicationBoundary(request: CommunicationBoundaryRequest): CommunicationBoundaryDecision {
+  // Reject malformed or ambiguous recipient counts before applying channel policy.
+  // This boundary never sends live messages; malformed requests must not be queued.
+  if (!Number.isSafeInteger(request.recipientCount) || request.recipientCount !== 1) {
+    return {
+      allowed: false,
+      queuedOnly: true,
+      reason: "invalidRecipientCount",
+      channel: request.channel,
+      evidence: {
+        policyRef: "COMMUNICATIONS_BOUNDARY_SOURCE_ONLY",
+        emailPrimary: true,
+        whatsappUrgentOnly: true,
+        smsBackupOnly: true,
+        bulkMarketingDenied: true,
+        providerSendRequiresStagingProof: true,
+        rawRecipientDataRedacted: true,
+        liveSendExecuted: false
+      }
+    };
+  }
+
   const evidence = {
     policyRef: "COMMUNICATIONS_BOUNDARY_SOURCE_ONLY" as const,
     emailPrimary: true as const,
