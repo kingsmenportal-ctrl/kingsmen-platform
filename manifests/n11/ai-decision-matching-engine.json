@@ -12,7 +12,10 @@
     "No route recommendation without explanation.",
     "No official application submission is triggered by AI alone.",
     "Human/operator override is required for sensitive or high-risk decisions.",
-    "Candidate success signals are used for quality improvement, not experimentation on candidates."
+    "Candidate success signals are used for quality improvement, not experimentation on candidates.",
+    "Candidate and route scoring inputs must be finite numeric values from 0 through 100.",
+    "Every candidate signal and route recommendation calculation requires non-empty evidence references at the API boundary and database layer.",
+    "Recommendations without OFFICIAL_VERIFIED source confidence must require human review."
   ],
   "runtime_surfaces": [
     "Candidate Signal Builder",
@@ -24,7 +27,8 @@
     "Phoenix Fallback Planner",
     "Learning Signal Ledger",
     "AI Budget Guard",
-    "Human Override Queue"
+    "Human Override Queue",
+    "Fail-closed Decision Input Guard"
   ],
   "capacity_rule": "Cap limits volume, not route capability.",
   "next": "N12 - Governance / Policy Runtime"
