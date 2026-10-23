@@ -355,3 +355,14 @@ A staging-only synthetic fixture probe ran inside a PostgreSQL subtransaction an
 - The fixture transaction was intentionally rolled back because the outcome ledger is append-only; no test outcome was retained.
 
 This validates the database trigger behavior in staging only. It does not prove a real provider supplied the evidence, a real reviewer is authorized, or a candidate browser journey works. On commit `06c2f866918c07529c965d466d9235936f8d4f82`, Kingsmen One smoke tests, Source Guard and Release Evidence all passed; the branch-protection evidence workflow still fails because repository protection could not be verified. PR #134 remains open/draft.
+
+
+## Application-linked private-document evidence — 2026-10-23
+
+- Added nullable `candidate_private_documents.application_id` with a composite foreign key to `candidate_applications(id, candidate_id)`; a document cannot be attached to another candidate's application.
+- The authenticated `candidate-private-documents` upload action accepts an optional application ID only after resolving the signed-in user's verified candidate identity and checking application ownership. Existing profile-only documents remain valid and unlinked.
+- Staging migration applied: verified document reviews now atomically create a `CANDIDATE_DOCUMENT` row in `candidate_application_evidence` for the exact linked application, using the server-computed SHA-256, reviewer identity, review note and timestamps. The transaction fails closed if the finalized hash or owner/application linkage is missing or conflicts.
+- Candidate-document evidence is intentionally **not** accepted as a provider submission receipt or provider outcome. The existing submission/outcome truth guards remain in force.
+- Deployed `candidate-private-documents` ACTIVE v8 with JWT verification enabled. Live catalog checks confirm the application ID column, composite owner foreign key, evidence-link trigger/function, and existing submission truth guard are present.
+- Repository smoke test, Source Guard and Release Evidence workflows are running against the code batch; their completion must be checked at exact head. The smoke workflow has already passed for the preceding test commit.
+- Still unproven: a real authenticated candidate upload, actual reviewer decision with a registered active reviewer, candidate A/B denial, and resulting application evidence row. Staging currently has no active reviewer and no private document records, so no synthetic identity or reviewer was fabricated.
