@@ -70,6 +70,10 @@ begin
     raise exception 'Payload must be a JSON object' using errcode = '22023';
   end if;
 
+  if p_payload ?| array['candidateName', 'candidateEmail', 'candidatePhone', 'idNumber', 'documentRef', 'cvRawText', 'accessToken', 'refreshToken', 'serviceRoleKey', 'apiKey'] then
+    raise exception 'Mirror payload contains a disallowed personal or secret field' using errcode = '22023';
+  end if;
+
   select * into v_target
     from public.airtable_sync_targets
    where id = p_sync_target_id and is_active = true
