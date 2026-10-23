@@ -27,4 +27,4 @@ ENV KINGSMEN_ENABLE_LOCAL_INTAKE_WRITE=false
 COPY --from=builder /repo/apps/web apps/web
 COPY --from=builder /repo/packages packages
 EXPOSE 3000
-CMD ["sh", "-lc", "cd apps/web && npm run start -- --hostname 0.0.0.0 --port ${PORT:-3000}"]
+CMD ["sh", "-lc", "cd apps/web && ./node_modules/.bin/next start --hostname 0.0.0.0 --port ${PORT:-3000}"]
