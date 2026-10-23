@@ -31,4 +31,4 @@ for (const action of ["money","refunds","official status","submissions","fraud",
 assert.equal(aiCanSubmitOfficialApplication(),false);
 assert.equal(aiCanApproveRefund(),false);
 assert.equal(aiCanConfirmFraud(),false);
-console.log(JSON.stringify({passed:true,checks:15,scope:"N11 AI decision input guard",liveProviderCalls:0,officialSubmissions:0},null,2));
+console.log(JSON.stringify({passed:true,checks:21,scope:"N11 AI decision input guard",liveProviderCalls:0,officialSubmissions:0},null,2));
