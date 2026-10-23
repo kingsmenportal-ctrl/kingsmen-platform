@@ -19,9 +19,10 @@ function tokenRole(req: Request): string {
     return JSON.parse(atob(payload.replace(/-/g, "+").replace(/_/g, "/"))).role ?? "";
   } catch { return ""; }
 }
-async function count(admin: any, table: string, column?: string, values?: string[]) {
+async function count(admin: any, table: string, column?: string, values?: string[], nullColumn?: string) {
   let query = admin.from(table).select("id", { count: "exact", head: true });
   if (column && values) query = query.in(column, values);
+  if (nullColumn) query = query.is(nullColumn, null);
   const { count: total, error } = await query;
   return { count: total ?? 0, available: !error, errorCode: error ? "HEALTH_QUERY_FAILED" : null };
 }
@@ -68,7 +69,7 @@ Deno.serve(async (req: Request) => {
     count(admin, "founder_escalation_threads", "escalation_status", ["OPEN", "ASSIGNED", "WAITING_APPROVAL"]),
     count(admin, "n15_ingestion_runs", "status", ["FAILED"]),
     count(admin, "airtable_sync_targets", "is_active", ["true"]),
-    count(admin, "platform_reviewers", "is_active", ["true"]),
+    count(admin, "platform_reviewers", "is_active", ["true"], "revoked_at"),
     oldestPendingAgeMinutes(admin)
   ]);
 
