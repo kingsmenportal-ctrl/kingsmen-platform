@@ -483,3 +483,31 @@ The live Supabase security advisor still reports three INFO findings for RLS-ena
 The currently deployed candidate functions observed in Supabase are ACTIVE with JWT verification enabled: `candidate-identity-review-request` v3, `candidate-application-preparation` v10, and `candidate-private-documents` v13. This is deployment evidence for those functions only, not candidate-journey E2E. Netlify project `kingsmen-portal-staging` still returns an empty published `currentDeploy` payload; no published commit SHA can be asserted. GitHub branch-protection inspection previously returned HTTP 403 to the connected integration; the protection state is unknown and must not be bypassed.
 
 No synthetic candidate, reviewer grant, private document, consent, communication, or incident was inserted during this recheck. PayFast remains deferred. Public release remains blocked until the missing authenticated/provider/operational E2E evidence and published-commit match are obtained.
+
+
+## Runtime security recheck — 2026-10-23 (read-only staging probes)
+
+A further read-only pass inspected the live Postgres function grants and current runtime inventory. No production data was inserted or changed by this pass.
+
+- The identity-review RPCs (`submit_candidate_identity_review`, `submit_candidate_identity_review_for_user`, `respond_candidate_identity_review`, `decide_candidate_identity_review`), document-review RPC (`review_candidate_private_document`) and verified-document/evidence linker are executable by `service_role`; the inspected functions are not executable by `anon` or `authenticated`. The candidate-facing Edge Functions must continue to validate the caller JWT and derive the authenticated user ID server-side before invoking privileged RPCs. Do not grant direct client execution as a shortcut.
+- The document and identity Edge Functions are active with JWT verification enabled. This confirms deployment/configuration only; it does not prove upload, reviewer decision, cross-candidate denial or audit persistence over HTTP.
+- The current staging database has no identity review requests, verified identity links, active reviewers, private documents, document reviews, application evidence, communications, consent records, outbox entries, worker heartbeats or incident records. Authenticated runtime drills therefore remain unexecuted; no live candidate credentials or authorised reviewer session were available through the connected read-only checks.
+- Security advisor remains at 3 INFO findings for intentionally client-inaccessible RLS tables and 1 WARN for disabled leaked-password protection. The INFO findings are not to be “fixed” by exposing the tables. Enable leaked-password protection through Supabase Auth project settings and rerun the advisor.
+- Netlify's project metadata still has no deploy ID or commit SHA in `currentDeploy`. A deploy-to-reviewed-commit comparison cannot be asserted from the available project metadata. Do not deploy or merge around branch protection to manufacture a green result.
+
+### Evidence status after recheck
+
+| Gate | Result | Status |
+|---|---|---|
+| Privileged RPC grants | Six relevant RPCs denied to anon/authenticated and executable by service_role | PASS — grant boundary only |
+| JWT-required identity/document functions | Active, JWT verification enabled | PASS — configuration only |
+| Two-candidate HTTP lifecycle | No authorised candidate sessions used | NOT RUN |
+| Reviewer approval/rejection | No active reviewer account | BLOCKED |
+| Real document upload/signature/expiry/isolation | No test session or document fixture | NOT RUN |
+| PostgreSQL app-path idempotency/restart recovery | No isolated runtime runner executed in this pass | NOT RUN |
+| Provider consent/retry/bounce/DLQ | No configured delivery test evidence observed | NOT RUN |
+| Worker/incident recovery | No worker or incident drill executed | NOT RUN |
+| Leaked-password protection | Advisor warning remains | BLOCKED |
+| Published Netlify commit match | Deploy identifier/commit absent | BLOCKED |
+
+This recheck is intentionally read-only. The next end-to-end run requires two existing authorised candidate sessions, an authorised reviewer session, and a provider's non-production delivery configuration; do not substitute invented tokens or fabricated outcomes.
