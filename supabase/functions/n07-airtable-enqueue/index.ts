@@ -135,7 +135,6 @@ Deno.serve(async (req: Request) => {
     queued: true,
     jobId: row.id,
     jobStatus: row.status,
-    idempotent: row.status !== "PENDING" || Number(row.attempts ?? 0) > 0,
     postgresTruthPreserved: true,
     airtableMirrorOnly: true,
     productionReady: false
