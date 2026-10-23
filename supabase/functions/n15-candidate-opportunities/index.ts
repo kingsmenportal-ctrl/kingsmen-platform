@@ -40,6 +40,15 @@ Deno.serve(async (req: Request) => {
   if (matchError) return json({ status: "DATABASE_ERROR", reason: "MATCH_LOOKUP_FAILED" }, 500);
 
   const now = new Date();
+  const pathwayMap: Record<string, string[]> = {
+    UNIVERSITY: ["HIGHER_EDUCATION"], CAO: ["HIGHER_EDUCATION"], TVET: ["TVET"],
+    SETA: ["SETA_LEARNERSHIPS", "APPRENTICESHIPS"], LEARNERSHIP: ["SETA_LEARNERSHIPS"],
+    INTERNSHIP: ["INTERNSHIPS"], APPRENTICESHIP: ["APPRENTICESHIPS"], EMPLOYER: ["EMPLOYMENT"],
+    BURSARY: ["HIGHER_EDUCATION", "TVET", "SETA_LEARNERSHIPS", "INTERNSHIPS", "APPRENTICESHIPS"],
+    NSFAS: ["HIGHER_EDUCATION", "TVET"], QCTO: ["SETA_LEARNERSHIPS", "APPRENTICESHIPS"],
+    ACCOMMODATION: ["HIGHER_EDUCATION", "TVET", "SETA_LEARNERSHIPS", "INTERNSHIPS", "APPRENTICESHIPS", "EMPLOYMENT"],
+    PRIVATE_COLLEGE: ["HIGHER_EDUCATION", "TVET", "SETA_LEARNERSHIPS"]
+  };
   const cutoff = new Date(now.getTime() - 24 * 3600_000).toISOString();
   const results = [];
   for (const match of matches ?? []) {
@@ -70,7 +79,8 @@ Deno.serve(async (req: Request) => {
       match_ref: match.candidate_match_ref,
       title: programme.programme_name,
       provider: provider.provider_name,
-      pathway: match.sector,
+      sector: match.sector,
+      pathways: pathwayMap[match.sector] ?? [],
       location: programme.location_text ?? null,
       official_link: programme.exact_link,
       match_score: match.match_score,
