@@ -168,13 +168,21 @@ Deno.serve(async (req: Request) => {
 
   if (p.action === "list") {
     const { data, error } = await admin.from("candidate_private_documents")
-      .select("id,preparation_item_id,original_filename,mime_type,size_bytes,status,uploaded_at,created_at,updated_at")
+      .select("id,preparation_item_id,application_id,original_filename,mime_type,size_bytes,status,uploaded_at,created_at,updated_at")
       .eq("candidate_id", candidateId).order("created_at", { ascending: false });
     if (error) {
       console.error("private document list failed", error.code ?? "unknown");
       return reply(503, { error: "Could not load private document records." }, origin);
     }
-    return reply(200, { ready: true, documents: data ?? [], message: "Private document metadata loaded. File contents are not returned by this action." }, origin);
+    const { data: applications, error: applicationsError } = await admin.from("candidate_applications")
+      .select("id,application_ref,pathway_type,status,created_at")
+      .eq("candidate_id", candidateId).order("created_at", { ascending: false }).limit(100);
+    if (applicationsError) {
+      console.error("candidate-owned application list failed", applicationsError.code ?? "unknown");
+      return reply(503, { error: "Could not load applications for document linking." }, origin);
+    }
+    return reply(200, { ready: true, documents: data ?? [], applications: applications ?? [],
+      message: "Candidate-owned private document and application metadata loaded; file contents and storage paths are not returned." }, origin);
   }
 
   if (p.action === "create_upload") {
