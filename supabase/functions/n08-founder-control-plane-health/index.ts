@@ -87,7 +87,7 @@ Deno.serve(async (req: Request) => {
   const degradedCount = [
     !queue.available, !submissionBacklog.available, !commandWaiting.available,
     !escalationOpen.available, !ingestionFailed.available, !activeTargets.available,
-    !activeReviewers.available
+    !activeReviewers.available, activeTargets.count === 0, activeReviewers.count === 0
   ].filter(Boolean).length;
 
   return json({
