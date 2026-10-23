@@ -68,6 +68,7 @@
     "observability:prove": "node scripts/proof/prove-observability-incident-boundary.mjs",
     "observability:validate": "node scripts/validators/validate-observability-incident-proof.mjs",
     "founder:incident:validate": "node scripts/validators/validate-founder-incident-record.mjs",
+    "founder:readiness:validate": "node scripts/validators/validate-founder-readiness-report.mjs",
     "legal:prove": "node scripts/proof/prove-legal-privacy-boundary.mjs",
     "legal:validate": "node scripts/validators/validate-legal-privacy-proof.mjs",
     "staging:prove:pack": "node scripts/proof/prove-staging-runtime-proof-pack.mjs",
