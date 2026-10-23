@@ -1,5 +1,33 @@
 # Kingsmen Launch Readiness
 
+## Live staging evidence snapshot — 2026-10-23
+
+This snapshot records directly queried staging facts, not a claim of production readiness.
+
+| Gate | Live observation | Disposition |
+|---|---|---|
+| Official source catalog | 14 new official South African source-authority anchors are present in staging. Each requires separate programme-level verification. | Source discovery expanded; not proof of open opportunities. |
+| Verified opportunity availability | 0 route-programme rows currently satisfy the query for VERIFIED + OPEN/FUTURE + A/B confidence + updated in the last 90 days. | Do not display any as currently open from this result. |
+| Private document bucket | `kingsmen-candidate-documents` exists, is private, has a 10 MiB limit and allows PDF/JPEG/PNG. | Configuration verified; real upload/signature/expiry/cross-candidate HTTP journey still pending. |
+| Candidate identity workflow | Staging counts returned 0 identity-review requests and 0 active reviewers. | Authenticated two-account lifecycle and approval/rejection/correction cannot be claimed verified. |
+| Private document lifecycle | Staging count returned 0 private document records. | Real signed access, expiry, audit-on-read and cross-candidate denial remain unproven by live candidate data. |
+| Communications | N09 backend-only migration `20261022202953` is applied; outbox and consent ledgers are service-role-only. | Client access is constrained; provider delivery, consent capture, retries and dead-letter recovery still require runtime evidence. |
+| Security advisor | 3 INFO findings report RLS enabled with no policies on backend-only identity/document-review tables; 1 WARN reports leaked-password protection disabled. | No-policy INFOs deny client access by default; the password-protection warning remains open for Auth configuration. |
+| CI at branch head `fdaa02abfc067d0c29c665bff76eeed0ba26778e` | Kingsmen Source Guard, Kingsmen One smoke tests and Kingsmen Release Evidence all completed successfully. | Repository-level gates pass; these checks do not replace authenticated E2E or provider tests. |
+| Published frontend | Netlify project metadata returned an empty `currentDeploy` object with no verifiable published deploy ID/commit. | Deployment verification remains blocked; do not infer that the branch head is published. |
+| Release governance | PR #134 remains open and the working branch is not the protected main release. | Keep the release gate closed; do not bypass required reviews or branch controls. |
+
+### Minimum remaining live proofs
+
+1. Run the authenticated staging E2E runner using two explicitly authorised candidate sessions and an authorised reviewer; capture only redacted reports.
+2. Execute a real private document upload with valid and invalid MIME/signature/size cases; verify signed URL expiry, audit persistence, and candidate A/B denial.
+3. Run transaction/idempotency/restart-recovery tests against PostgreSQL using isolated synthetic fixtures and verify durable audit rows.
+4. Execute consent-gated provider staging delivery with bounce/opt-out, retry and dead-letter evidence; no live bulk sends.
+5. Exercise health alerts, worker lease/recovery, incident severity and founder escalation against staging.
+6. Identify the actual published Netlify deploy and match its commit SHA to the reviewed release commit.
+7. Clear the Auth leaked-password-protection warning through supported project configuration, then rerun security advisors.
+
+
 This document is the real finish-line map for launching Kingsmen. A module can be present in the repo and still be blocked from public launch until runtime evidence exists.
 
 ## Current verdict
