@@ -1,0 +1,67 @@
+{
+  "schema": "kingsmen.founder-incident-record.v1",
+  "module": "Founder Operations / Incident Command",
+  "templateOnly": true,
+  "productionReady": false,
+  "requiredFields": [
+    "incidentId",
+    "severity",
+    "status",
+    "detectedAt",
+    "updatedAt",
+    "correlationId",
+    "affectedSubsystem",
+    "summaryRedacted",
+    "customerImpact",
+    "dataExposureAssessment",
+    "containmentAction",
+    "ownerRole",
+    "founderEscalation",
+    "evidenceReferences",
+    "rootCause",
+    "correctiveActions",
+    "reopenCriteria",
+    "closedAt"
+  ],
+  "severityValues": [
+    "SEV1",
+    "SEV2",
+    "SEV3"
+  ],
+  "statusValues": [
+    "OPEN",
+    "CONTAINED",
+    "INVESTIGATING",
+    "MITIGATED",
+    "CLOSED"
+  ],
+  "ownerRoleValues": [
+    "FOUNDER",
+    "PLATFORM_OPERATOR",
+    "SECURITY_REVIEWER",
+    "FINANCE_OPERATOR",
+    "COMMUNICATIONS_OPERATOR"
+  ],
+  "redactionRules": {
+    "rawCandidatePiiAllowed": false,
+    "rawMessageBodiesAllowed": false,
+    "providerSecretsAllowed": false,
+    "authTokensAllowed": false,
+    "databaseUrlsAllowed": false,
+    "paymentCredentialsAllowed": false
+  },
+  "escalationRules": {
+    "SEV1": "Immediate founder escalation; stop affected unsafe flow; preserve redacted evidence.",
+    "SEV2": "Prompt founder/operator notification; contain affected workflow and track recovery.",
+    "SEV3": "Track remediation and review before release promotion."
+  },
+  "closeRequirements": [
+    "rootCause documented or explicitly unknown",
+    "corrective actions have owners and evidence",
+    "recovery verification recorded",
+    "follow-up and reopen criteria recorded",
+    "no raw PII or secrets in evidence"
+  ],
+  "runtimeEvidenceRequired": true,
+  "sampleIncidentIncluded": false
+}
