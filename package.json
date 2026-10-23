@@ -49,6 +49,7 @@
     "jarvis:live:readiness": "node scripts/jarvis/complete-jarvis-live-readiness.mjs",
     "jarvis:switch:request": "node scripts/jarvis/simulate-jarvis-switch-request.mjs",
     "api:build": "npm --prefix apps/api run build",
+    "ai:n11:test": "npm run api:build && node scripts/validators/test-n11-ai-decision-input-guard.mjs",
     "api:start": "npm --prefix apps/api start",
     "api:validate": "node scripts/validators/validate-api-truth-vault-persistence.mjs",
     "api:validate:truth-vault": "node scripts/validators/validate-api-truth-vault-persistence.mjs",
