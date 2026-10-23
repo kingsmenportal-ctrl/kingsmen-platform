@@ -34,6 +34,9 @@ try {
 }
 
 for (const token of [
+  'Number.isSafeInteger(request.recipientCount)',
+  'request.recipientCount !== 1',
+  'invalidRecipientCount',
   'COMMUNICATIONS_BOUNDARY_SOURCE_ONLY',
   'emailPrimary',
   'whatsappUrgentOnly',
@@ -66,6 +69,7 @@ for (const token of [
 }
 
 const scenarios = [
+  { name: 'malformed_or_multi_recipient_request_denied', passed: boundary.includes('Number.isSafeInteger(request.recipientCount)') && boundary.includes('request.recipientCount !== 1') && boundary.includes('invalidRecipientCount') },
   { name: 'transactional_email_queued_primary', passed: boundary.includes('providerSendRequiresStagingProof') && boundary.includes('emailPrimary') },
   { name: 'marketing_email_without_consent_denied', passed: boundary.includes('marketingRequiresExplicitConsent') },
   { name: 'bulk_message_denied', passed: boundary.includes('bulkMarketingDenied') },
