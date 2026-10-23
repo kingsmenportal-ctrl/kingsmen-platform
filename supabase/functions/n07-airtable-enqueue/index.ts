@@ -19,7 +19,7 @@ function json(body: unknown, status = 200) {
   return new Response(JSON.stringify(body), { status, headers: cors });
 }
 function tokenRole(req: Request): string {
-  const token = (req.headers.get("authorization") ?? "").replace(/^Bearer\\s+/i, "");
+  const token = (req.headers.get("authorization") ?? "").replace(/^Bearer\s+/i, "");
   try {
     const payload = token.split(".")[1];
     return JSON.parse(atob(payload.replace(/-/g, "+").replace(/_/g, "/"))).role ?? "";
@@ -52,7 +52,7 @@ Deno.serve(async (req: Request) => {
   }
 
   const authorization = req.headers.get("authorization") ?? "";
-  const bearer = authorization.replace(/^Bearer\\s+/i, "");
+  const bearer = authorization.replace(/^Bearer\s+/i, "");
   if (!bearer) return json({ status: "UNAUTHENTICATED" }, 401);
 
   // The gateway validates JWT signatures (verify_jwt=true). For user tokens,
