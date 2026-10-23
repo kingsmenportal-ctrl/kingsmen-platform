@@ -46,11 +46,11 @@ create or replace function public.n07_enqueue_airtable_mirror(
 )
 returns public.airtable_sync_outbox
 language plpgsql
-security definer
+security invoker
 set search_path = pg_catalog, public
 as $$
 declare
-  v_role text := coalesce(auth.role(), '');
+  v_role text := current_user;
   v_row public.airtable_sync_outbox;
   v_target public.airtable_sync_targets;
 begin
@@ -104,11 +104,11 @@ create or replace function public.n07_claim_airtable_mirror_batch(
 )
 returns setof public.airtable_sync_outbox
 language plpgsql
-security definer
+security invoker
 set search_path = pg_catalog, public
 as $$
 begin
-  if coalesce(auth.role(), '') <> 'service_role' then
+  if current_user <> 'service_role' then
     raise exception 'N07 worker claim requires service role' using errcode = '42501';
   end if;
   if p_worker_ref is null or length(btrim(p_worker_ref)) < 3 or length(p_worker_ref) > 120 then
@@ -167,14 +167,14 @@ create or replace function public.n07_finish_airtable_mirror_job(
 )
 returns public.airtable_sync_outbox
 language plpgsql
-security definer
+security invoker
 set search_path = pg_catalog, public
 as $$
 declare
   v_row public.airtable_sync_outbox;
   v_delay_seconds integer;
 begin
-  if coalesce(auth.role(), '') <> 'service_role' then
+  if current_user <> 'service_role' then
     raise exception 'N07 job completion requires service role' using errcode = '42501';
   end if;
   if p_worker_ref is null or length(btrim(p_worker_ref)) < 3 then
