@@ -58,6 +58,9 @@ jobs:
       - name: API Truth Vault persistence validator
         run: npm run api:validate:truth-vault
 
+      - name: N11 AI decision input and boundary regression suite
+        run: npm run ai:n11:test
+
       - name: Safe web/backend boundary validator
         run: npm run web:validate:backend-boundary
 
