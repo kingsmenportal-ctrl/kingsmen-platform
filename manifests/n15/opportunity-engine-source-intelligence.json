@@ -1,7 +1,7 @@
 {
   "phase": "N15",
   "name": "Opportunity Engine / External Source Intelligence",
-  "status": "foundation",
+  "status": "hardened-policy-awaiting-live-source-verification",
   "purpose": "Create verified external source intelligence for universities, TVETs, SETA/QCTO routes, learnerships, bursaries, accommodation, employers, internships, NSFAS, CAO, and private colleges.",
   "locked_doctrine": [
     "No fake deadlines.",
@@ -16,7 +16,14 @@
     "SETA, QCTO, learnership, and employer routes require provider evidence before promotion.",
     "Opportunity intelligence may recommend and route; it must not submit official applications by itself.",
     "Playwright/source scouts observe only and route blocked or uncertain findings to manual review.",
-    "All sectors remain open from day one; packages control campaign weight and managed execution count."
+    "All sectors remain open from day one; packages control campaign weight and managed execution count.",
+    "Source freshness requires an explicit last-checked timestamp and stale-after boundary; missing freshness evidence fails closed.",
+    "Source host matching must use exact registered domains or true subdomains; lookalike domains never qualify as authority.",
+    "Duplicate observations are grouped for reconciliation and are not silently deleted; provenance must be preserved.",
+    "Deadline claims require evidence and CONFIRMED status; estimated, missing or expired deadlines are not candidate-safe.",
+    "Missing eligibility rules remain UNKNOWN; evidence-backed rules still require human review.",
+    "Six core pathways are higher education, TVET, SETA/learnerships, internships, apprenticeships, and employment.",
+    "Sector routing and match scores are not eligibility determinations or provider-confirmed outcomes."
   ],
   "opportunity_sectors": [
     "UNIVERSITY",
@@ -24,6 +31,7 @@
     "SETA",
     "QCTO",
     "LEARNERSHIP",
+    "APPRENTICESHIP",
     "BURSARY",
     "ACCOMMODATION",
     "EMPLOYER",
@@ -32,5 +40,13 @@
     "CAO",
     "PRIVATE_COLLEGE"
   ],
-  "next": "N16 - Orchestrator / Execution Runtime"
+  "next": "N16 - Orchestrator / Execution Runtime",
+  "core_pathways": [
+    "HIGHER_EDUCATION",
+    "TVET",
+    "SETA_LEARNERSHIPS",
+    "INTERNSHIPS",
+    "APPRENTICESHIPS",
+    "EMPLOYMENT"
+  ]
 }

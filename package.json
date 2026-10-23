@@ -8,7 +8,7 @@
     "doc": "docs"
   },
   "scripts": {
-    "test": "node scripts/validators/validate-jarvis-core.mjs && node scripts/validators/validate-jarvis-live-pass-02.mjs && node scripts/staging/test-kingsmen-operating-evidence-reconciliation.mjs && npm run n14:connectors:check",
+    "test": "node scripts/validators/validate-jarvis-core.mjs && node scripts/validators/validate-jarvis-live-pass-02.mjs && node scripts/staging/test-kingsmen-operating-evidence-reconciliation.mjs && npm run n14:connectors:check && npm run n15:sources:check",
     "jarvis:validate": "node scripts/validators/validate-jarvis-connected-live.mjs",
     "jarvis:validate:core": "node scripts/validators/validate-jarvis-core.mjs",
     "jarvis:validate:live-pass-02": "node scripts/validators/validate-jarvis-live-pass-02.mjs",
@@ -94,7 +94,10 @@
     "db:validate:migration-integrity:test": "node scripts/staging/test-supabase-migration-integrity.mjs",
     "n14:connectors:validate": "node scripts/validators/validate-n14-connector-contract.mjs",
     "n14:connectors:test": "node scripts/staging/test-n14-connector-contract.mjs",
-    "n14:connectors:check": "npm run n14:connectors:validate && npm run n14:connectors:test"
+    "n14:connectors:check": "npm run n14:connectors:validate && npm run n14:connectors:test",
+    "n15:sources:validate": "node scripts/validators/validate-n15-source-intelligence.mjs",
+    "n15:sources:test": "node scripts/staging/test-n15-source-intelligence-policy.mjs",
+    "n15:sources:check": "npm run n15:sources:validate && npm run n15:sources:test"
   },
   "repository": {
     "type": "git",
