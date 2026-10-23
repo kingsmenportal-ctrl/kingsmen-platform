@@ -17,7 +17,7 @@ for (const [label, pattern] of [
   ["dead-letter terminal state", /status = 'DEAD_LETTER'/i],
   ["exponential retry delay", /make_interval\(secs => least\(900/i],
   ["target restricted to outbound mirror", /direction = 'POSTGRES_TO_AIRTABLE'/i],
-  ["payload object only", /jsonb_typeof\(payload\) = 'object'/i]
+  ["payload object only", /jsonb_typeof\(payload\) = 'object'/i],
   ["sensitive and secret payload rejection", /p_payload \?\| array\[.*candidateEmail.*serviceRoleKey/s],
   ["functions use invoker security", /security invoker/i]
 ]) {
