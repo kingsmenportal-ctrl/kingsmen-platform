@@ -366,3 +366,24 @@ This validates the database trigger behavior in staging only. It does not prove 
 - Deployed `candidate-private-documents` ACTIVE v8 with JWT verification enabled. Live catalog checks confirm the application ID column, composite owner foreign key, evidence-link trigger/function, and existing submission truth guard are present.
 - Repository smoke test, Source Guard and Release Evidence workflows are running against the code batch; their completion must be checked at exact head. The smoke workflow has already passed for the preceding test commit.
 - Still unproven: a real authenticated candidate upload, actual reviewer decision with a registered active reviewer, candidate A/B denial, and resulting application evidence row. Staging currently has no active reviewer and no private document records, so no synthetic identity or reviewer was fabricated.
+
+
+## Document-to-application integration — staging verification update (2026-10-23)
+
+- Applied migration `20261023170000_application_linked_private_document_evidence` to staging. The private-document row now supports an explicit `application_id`, with a composite foreign key enforcing that the application belongs to the same candidate.
+- A final `VERIFIED` document-review record creates `CANDIDATE_DOCUMENT` application evidence transactionally only when the document is finalized, has a SHA-256 hash, and is uploaded. Evidence includes the reviewer's authenticated-user identifier, review timestamp, note, hash, and private-document reference. This evidence is explicitly not accepted as provider submission or provider outcome proof.
+- Updated `candidate-private-documents` Edge Function deployed to staging as ACTIVE version 10, with `verify_jwt=true`. Deployed source hash: `903e183def11beb0dcd12275e005f8754e56771dbf8a09a582ba20191c2545b5`. The deployed version was retrieved after deployment and confirmed active.
+- Current live staging counts: 0 candidate applications, 0 private document records, 0 verified application-evidence rows, and 0 active evidence reviewers. Consequently, the real two-candidate authenticated journey, actual reviewer decision, and candidate-visible post-review state have NOT been executed. Do not mark these end-to-end gates passed.
+- Current strict route eligibility query returned 0 eligible routes. No fake opening or deadline was seeded.
+- Communications staging currently has 0 communication records and 0 sent/delivered/failed attempts. Provider delivery, webhook reconciliation, retries and dead-letter recovery remain unverified.
+- GitHub branch-protection endpoint still returns HTTP 403 `Resource not accessible by integration`; this is lack of independent evidence, not proof protection is disabled. Do not bypass protection.
+- Netlify project metadata does not expose a concrete current published deploy/commit (empty `currentDeploy` object), so publication matching the reviewed commit remains unverified.
+- Supabase security advisor still reports leaked-password protection disabled. No supported Auth configuration mutation is available through the connected staging toolset; enable it in Supabase Auth settings and re-query the advisor.
+- PayFast remains deferred pending account availability.
+
+### What was actually tested
+
+- GitHub smoke tests, Source Guard and Release Evidence reported success on the most recent observed workflow set (runs 39963154529, 39963154615, 39963154396). Treat this as repository CI evidence; it does not substitute for authenticated browser/API E2E.
+- Database migration is present in staging migration history.
+- Edge Function version 10 is active with JWT verification enabled.
+- Database observations above are live staging queries.
