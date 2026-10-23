@@ -118,7 +118,7 @@ Deno.serve(async(req:Request)=>{
    const {data:existingItems,error:existingItemsError}=await admin.from("candidate_application_preparation_items").select("id").eq("tracker_id",existing.id).eq("candidate_id",candidateId).limit(1);
    if(existingItemsError){console.error("existing checklist lookup failed",existingItemsError.code??"unknown");return reply(503,{error:"Could not check the existing preparation checklist."},origin);}
    if(!existingItems?.length){
-    const {error:repairError}=await admin.from("candidate_application_preparation_items").insert(defaults.map(i=>({...i,tracker_id:existing.id,candidate_id:candidateId,candidate_note:"",official_source_url:officialUrl,evidence_reference:"",status:"NOT_STARTED",required_by_candidate:true})));
+    const {error:repairError}=await admin.from("candidate_application_preparation_items").insert(defaults.map(i=>({...i,tracker_id:existing.id,candidate_id:candidateId,candidate_note:"",official_source_url:officialUrl,evidence_reference:"",status:"NOT_STARTED",required_by_candidate:i.item_type==="TASK"})));
     if(repairError){console.error("existing checklist repair failed",repairError.code??"unknown");return reply(503,{error:"The tracker exists, but its checklist still needs repair. Please retry shortly."},origin);}
    }
    return reply(200,{ready:true,tracker:existing,already_exists:true,message:"This saved opportunity already has a preparation tracker; its default checklist was checked and repaired if missing."},origin);
