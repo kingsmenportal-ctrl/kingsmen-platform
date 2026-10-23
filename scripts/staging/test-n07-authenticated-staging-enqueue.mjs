@@ -82,7 +82,7 @@ const rows = await verifyResponse.json();
 assert.equal(rows.length, 1, "exactly one durable outbox row must exist for the idempotency key");
 assert.equal(rows[0].id, first.jobId, "database row ID must match the enqueue response");
 assert.equal(rows[0].idempotency_key, idempotencyKey);
-assert.ok(["PENDING", "LOCKED", "DONE", "FAILED", "DEAD_LETTER"].includes(rows[0].status),
+assert.ok(["PENDING", "LOCKED", "COMPLETED", "FAILED", "DEAD_LETTER"].includes(rows[0].status),
   "database must return a recognised persisted queue state");
 
 console.log(JSON.stringify({
