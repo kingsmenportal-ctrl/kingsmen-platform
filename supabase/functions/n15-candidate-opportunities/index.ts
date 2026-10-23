@@ -35,6 +35,7 @@ Deno.serve(async (req: Request) => {
   const { data: matches, error: matchError } = await admin.from("candidate_opportunity_matches")
     .select("candidate_match_ref,programme_ref,provider_ref,sector,match_score,source_confidence,recommendation_summary,evidence_refs,created_at")
     .eq("candidate_ref", candidateRef).eq("match_status", "APPROVED")
+    .eq("source_confidence", "OFFICIAL_VERIFIED")
     .eq("human_review_required", false).eq("sealed_exact_target", false)
     .order("match_score", { ascending: false }).limit(100);
   if (matchError) return json({ status: "DATABASE_ERROR", reason: "MATCH_LOOKUP_FAILED" }, 500);
