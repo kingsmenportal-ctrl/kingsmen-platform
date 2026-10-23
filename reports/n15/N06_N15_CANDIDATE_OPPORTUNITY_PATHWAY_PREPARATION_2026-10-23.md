@@ -9,39 +9,47 @@
 - Candidate application preparation Edge Function is ACTIVE v14 with `verify_jwt=true`.
 - Tracker creation supplies pathway-specific preparation items for higher education, TVET, SETA/learnerships, internships, apprenticeships and employment. Provider-specific requirements must be confirmed; document items are not universally mandatory by default.
 - Candidate tracker progress remains candidate-reported. A candidate-reported submission is not provider receipt, and neither is a provider-confirmed outcome.
-- Added migration `0094_n05_document_application_owner_index.sql` to cover the composite (application_id, candidate_id) foreign key for private documents. The staging migration was applied successfully.
+- Added migration `0094_n05_document_application_owner_index.sql` to cover the composite (application_id, candidate_id) foreign key for private documents. The staging migration was applied successfully and the index was verified present.
 
 ## Live staging checks
 
-- Current verified opportunity view returned 6 eligible records in the earlier live snapshot.
-- Earlier feed checks: 0 non-HTTPS rows, 0 stale rows (>90 days), 0 rows not marked OPEN, and 0 eligible rows with an expired verified deadline.
+- Current verified opportunity view returned 6 eligible records: 0 non-HTTPS, 0 stale (>90 days), 0 non-OPEN.
 - Candidate application preparation: ACTIVE v14, `verify_jwt=true`.
-- Staging ownership/security inventory currently reports 0 verified candidate identity links, 0 trackers, 0 private document rows, 0 document-review rows, 0 identity-review requests and 0 communication attempts. These empty tables mean there is no real candidate journey evidence to claim yet.
-- The composite ownership index migration succeeded. Post-migration index and advisor re-checks are still required before calling the performance finding resolved.
-
-## Automated verification
-
-- GitHub Actions workflow `Kingsmen One smoke tests`, run #348, passed on commit `698f278effe3829da81c01abb57fa4599fc80636`.
-- Node syntax checks passed for `app.js` and `supabase-client.js`.
-- All 33 candidate-workflow smoke tests passed (33 passed, 0 failed), including the fail-closed verified-feed UI assertion.
-- Run evidence: https://github.com/kingsmenportal-ctrl/kingsmen-platform/actions/runs/39973477430
-
-## Communications, worker recovery and release gates — current findings
-
-- Communication attempt and submission queue tables have durable idempotency/queue indexes; the database currently has 0 communication-attempt rows and 0 submission jobs. That proves schema presence, not delivery or retry behavior.
-- Worker registry and heartbeat tables exist, but both the registry and heartbeat table currently have 0 rows. Worker recovery/heartbeat success is therefore not runtime-verified.
-- Security advisor currently reports informational RLS-without-policy findings on identity-review requests/audit and private-document reviews. Those tables fail closed to direct client access; reviewer operations must remain behind the authenticated Edge Function and service-side transaction. Do not add broad client policies to silence the lint.
+- Current staging inventory: 0 verified candidate identity links, 0 trackers, 0 private document rows, 0 document-review rows, 0 identity-review requests and 0 communication attempts. There is no real candidate journey evidence to claim yet.
+- Post-migration performance advisor no longer reports the composite document/application ownership FK as unindexed. It still reports a broad unused-index inventory (informational; no indexes were removed).
+- Security advisor still reports informational RLS-without-policy findings on identity-review requests/audit and private-document reviews. These tables fail closed to direct client access; reviewer operations must remain behind the authenticated Edge Function and service-side transaction. Do not add broad client policies to silence the lint.
 - Security advisor also reports leaked-password protection disabled. This remains an Auth configuration gate; it is not safely changed through a database migration.
-- Performance advisor reported the composite document/application ownership FK as unindexed. Migration 0094 adds the matching composite index. The next advisor run must confirm whether the finding clears.
-- Netlify project metadata returned no usable published deploy ID or published commit SHA. Public-site HTTP checks from this runtime could not resolve the Netlify host. Therefore the live candidate UI deployment and published-commit match are **not verified**.
+
+## Automated verification on the current source commit
+
+Commit `de54519cd975009d93f956fba70a245fda8a113c` completed these PR workflows successfully:
+- Kingsmen One smoke tests: [run #39974382407](https://github.com/kingsmenportal-ctrl/kingsmen-platform/actions/runs/39974382407).
+- Kingsmen Release Evidence: [run #39974382396](https://github.com/kingsmenportal-ctrl/kingsmen-platform/actions/runs/39974382396).
+- Kingsmen Source Guard: [run #39974382433](https://github.com/kingsmenportal-ctrl/kingsmen-platform/actions/runs/39974382433).
+- The separate Main Branch Protection Evidence job failed because branch protection could not be verified with the workflow's available read-only credential/permissions. The report explicitly did not change branch protection. Do not bypass this gate.
+
+The earlier smoke run recorded 33 tests passed, 0 failed. The current commit's smoke workflow also completed successfully; it is static/repository verification, not the authenticated candidate E2E journey.
+
+## Communications, worker recovery and outcomes
+
+- Communication attempt and submission queue tables have durable idempotency/queue indexes; staging currently has 0 communication-attempt rows and 0 submission jobs. This proves schema presence, not provider delivery, retry or callback behavior.
+- Worker registry and heartbeat tables exist, but the registry and heartbeat table currently have 0 rows. Worker recovery/heartbeat success is not runtime-verified.
+- Candidate-reported tracker states and checklist evidence remain separate from independently verified provider receipt/outcomes. No provider outcome was fabricated.
+- Controlled tests still need to exercise consent, email-primary behavior, SMS fallback, urgent-only WhatsApp, provider callbacks, retry/idempotency, dead-letter recovery, worker heartbeat/lease expiry, safe replay and founder alerting.
+
+## Netlify deployment verification
+
+- Netlify project metadata identifies `kingsmen-portal-staging` and a changing branch-preview alias, most recently `http://6adb7660011b3a9ca76a4d0c--kingsmen-portal-staging.netlify.app`.
+- The integration did not return a usable published deploy ID or commit SHA. The available runtime could not resolve the Netlify host for an HTTP check, and Netlify observability returned no request records in the queried 24-hour window.
+- Therefore the candidate UI's live HTTP response, deployed asset contents, and published-commit match remain **unverified**. A changed branch alias alone is not proof of a successful deployment.
 
 ## Required gates before full end-to-end sign-off
 
-1. Identify two explicitly authorised test candidate accounts and one authorised reviewer account; do not infer authority from email addresses or existing Auth-user count.
-2. Complete reviewer-approved identity linking for the two candidates, then exercise login, feed read, tracker create/read/update, durable reload/restart, private upload, signed read expiry/audit, review decisions and candidate-A-to-candidate-B denial.
-3. Verify communication consent, email-primary behavior, SMS fallback, urgent-only WhatsApp, idempotent retries, provider callbacks and dead-letter/recovery paths using controlled test providers.
+1. Identify two explicitly authorised test candidate accounts and one authorised reviewer account; do not infer authority from email addresses or the existing Auth-user count.
+2. Complete reviewer-approved identity linking for both candidates, then exercise login, feed read, tracker create/read/update, durable reload/restart, private upload, signed read expiry/audit, review decisions and candidate-A-to-candidate-B denial.
+3. Verify communications and queue behavior with controlled test providers.
 4. Verify worker heartbeat/lease expiry/recovery, safe replay/idempotency, incident evidence and founder alerting.
-5. Confirm Netlify's published deploy ID, commit SHA, response status and candidate app bundle match the reviewed source commit.
-6. Re-run Supabase security/performance advisors and repository tests; do not bypass branch protection or SSO.
+5. Confirm Netlify's published deploy ID, commit SHA, HTTP status and candidate app bundle match the reviewed source commit.
+6. Re-run Supabase security/performance advisors and repository tests; resolve the Auth leaked-password-protection configuration gate and obtain a valid read-only branch-protection evidence path.
 
-No fake candidate, reviewer, identity link, document, provider outcome or delivery event was inserted. No full E2E completion is claimed.
+No fake candidate, reviewer, identity link, document, provider outcome or delivery event was inserted. Full E2E completion is not claimed.
