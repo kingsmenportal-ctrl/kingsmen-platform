@@ -443,6 +443,9 @@ test("public and application routes fail closed for expired or undated opportuni
   assert.match(policy, /availability_status = 'OPEN'[\s\S]*?metadata->>'closing_date'[\s\S]*?current_date/);
   assert.match(policy, /availability_status = 'FUTURE'[\s\S]*?metadata->>'opening_date'[\s\S]*?current_date/);
   assert.match(policy, /updated_at >= now\(\) - interval '90 days'/);
+  const saDatePolicy = await readFile(resolve(root, "../..", "db/migrations/0091_route_availability_sa_timezone.sql"), "utf8");
+  assert.match(saDatePolicy, /Africa\/Johannesburg/);
+  assert.match(saDatePolicy, /closing_date[\s\S]*Africa\/Johannesburg/);
   assert.match(edge, /route\.av\w+==="OPEN"&&\(!closingDate\|\|closingDate<southAfricanToday\)/);
   assert.match(edge, /route\.av\w+==="FUTURE"&&\(!openingDate\|\|openingDate<=southAfricanToday/);
   assert.match(edge, /Africa\/Johannesburg/);
