@@ -388,3 +388,18 @@ This validates the database trigger behavior in staging only. It does not prove 
 - Edge Function version 11 is active with JWT verification enabled and the deployed source was re-read to confirm candidate-owned application validation is present.
 - A negative authorization probe invoked the reviewer RPC with a synthetic, non-existent reviewer identity and was rejected with `insufficient_privilege`; no reviewer or candidate fixture was created.
 - Database observations above are live staging queries.
+
+
+## Verified live employment routes — 2026-10-23
+
+The official Department of Employment and Labour vacancy listing was checked on 2026-10-23. Six individual vacancy references listed as Open with a 30 October 2026 closing date were added idempotently to staging under a verified, public-safe government provider:
+- HR4/4/8/194 — Client Service Officer: Public Employment Services
+- HR 4/4/8/190 — BCEA Inspector (X4 Posts)
+- HR4/4/9/29 — Administration Officer: Employer Service
+- HR4/26/10/02HO — Senior State Accountant: Financial Reporting
+- HR4/4/8/192 — BCEA Inspector
+- HR4/4/8/193 — Assistant Director: Labour Activation Programme
+
+Official source: https://www.labour.gov.za/vacancies/Pages/Vacancies-List.aspx?PageFirstRow=31&Paged=TRUE&PagedPrev=TRUE&View=%7BF01EEABA-46DC-4830-90E3-2E7A96B86015%7D&p_Created=20250711+15%3A39%3A14&p_ID=2370
+
+The staging query now returns 6 eligible routes using VERIFIED route status, OPEN/FUTURE availability, A/B confidence, official source URL, freshness under 90 days, and a verified/public-safe A/B provider. The seed deliberately excludes the Personnel Officer listing because the official vacancy results also showed a withdrawal erratum for that reference. The six rows preserve reference number and closing date in metadata and explicitly require candidates to inspect each official advert for qualifications and submission instructions. This is a verified availability snapshot, not a guarantee that any candidate is eligible or will receive an outcome. Recheck freshness and closing dates before use after 30 October 2026.
