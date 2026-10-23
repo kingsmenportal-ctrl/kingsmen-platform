@@ -372,7 +372,7 @@ This validates the database trigger behavior in staging only. It does not prove 
 
 - Applied migration `20261023170000_application_linked_private_document_evidence` to staging. The private-document row now supports an explicit `application_id`, with a composite foreign key enforcing that the application belongs to the same candidate.
 - A final `VERIFIED` document-review record creates `CANDIDATE_DOCUMENT` application evidence transactionally only when the document is finalized, has a SHA-256 hash, and is uploaded. Evidence includes the reviewer's authenticated-user identifier, review timestamp, note, hash, and private-document reference. This evidence is explicitly not accepted as provider submission or provider outcome proof.
-- Updated `candidate-private-documents` Edge Function deployed to staging as ACTIVE version 10, with `verify_jwt=true`. Deployed source hash: `903e183def11beb0dcd12275e005f8754e56771dbf8a09a582ba20191c2545b5`. The deployed version was retrieved after deployment and confirmed active.
+- Updated `candidate-private-documents` Edge Function deployed to staging as ACTIVE version 11, with `verify_jwt=true`. Deployed source hash: `ca8177177adad0a497a0167bd62c32e289b2cbef0a50776e4c53153ec155f356`. The deployed version was retrieved after deployment and confirmed active.
 - Current live staging counts: 0 candidate applications, 0 private document records, 0 verified application-evidence rows, and 0 active evidence reviewers. Consequently, the real two-candidate authenticated journey, actual reviewer decision, and candidate-visible post-review state have NOT been executed. Do not mark these end-to-end gates passed.
 - Current strict route eligibility query returned 0 eligible routes. No fake opening or deadline was seeded.
 - Communications staging currently has 0 communication records and 0 sent/delivered/failed attempts. Provider delivery, webhook reconciliation, retries and dead-letter recovery remain unverified.
@@ -385,5 +385,6 @@ This validates the database trigger behavior in staging only. It does not prove 
 
 - GitHub smoke tests, Source Guard and Release Evidence reported success on the most recent observed workflow set (runs 39963154529, 39963154615, 39963154396). Treat this as repository CI evidence; it does not substitute for authenticated browser/API E2E.
 - Database migration is present in staging migration history.
-- Edge Function version 10 is active with JWT verification enabled.
+- Edge Function version 11 is active with JWT verification enabled and the deployed source was re-read to confirm candidate-owned application validation is present.
+- A negative authorization probe invoked the reviewer RPC with a synthetic, non-existent reviewer identity and was rejected with `insufficient_privilege`; no reviewer or candidate fixture was created.
 - Database observations above are live staging queries.
