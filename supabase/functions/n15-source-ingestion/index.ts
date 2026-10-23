@@ -178,7 +178,7 @@ Deno.serve(async (req: Request) => {
     const { data: reviewer, error: reviewerError } = await reviewerClient.from("platform_reviewers")
       .select("role_code").eq("auth_user_id", userData.user.id).eq("is_active", true)
       .in("role_code", ["PLATFORM_ADMIN", "PROVIDER_OPERATOR", "APPLICATION_REVIEWER", "EVIDENCE_VERIFIER"])
-      .maybeSingle();
+      .limit(1).maybeSingle();
     if (reviewerError) return json({ status: "DATABASE_ERROR", reason: "REVIEWER_AUTHORIZATION_LOOKUP_FAILED" }, 500);
     if (!reviewer) return json({ status: "FORBIDDEN", reason: "ACTIVE_OPPORTUNITY_REVIEWER_REQUIRED" }, 403);
   }
