@@ -11,6 +11,7 @@ Supabase staging project: `euhubhhnumtibbyufghm`
 - Uses the server-side service key only inside the Edge Function; the web route forwards the caller JWT and public anon key and does not read a service-role secret.
 - Returns aggregate counts only for the Airtable outbox, submission queue, founder command queue, escalation queue, ingestion failures, active mirror targets, and reviewer grants. No candidate records or payloads are returned.
 - Computes an Oracle-Lite queue safety signal and a founder-review/stop-selling recommendation without taking automatic destructive action.
+- Treats zero active outbound targets and zero active founder reviewer grants as degraded readiness, not healthy.
 - Added static source-contract checks to the repository test gate.
 
 ## Boundaries and limitations
