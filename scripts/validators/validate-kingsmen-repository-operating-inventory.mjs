@@ -32,7 +32,7 @@ const moduleEvidence = modules.map((module) => {
   const reportPath = 'reports/' + module.key.toLowerCase() + '/' + module.key + '_VALIDATION_RESULT.json';
   const fullPath = join(root, reportPath);
   let report = null; let parseError = null;
-  if (existsSync(fullPath)) { try { report = JSON.parse(readFileSync(fullPath, 'utf8').replace(/^\\uFEFF/, '')); } catch (error) { parseError = String(error?.message ?? error); } }
+  if (existsSync(fullPath)) { try { report = JSON.parse(readFileSync(fullPath, 'utf8').replace(/^\uFEFF/, '')); } catch (error) { parseError = String(error?.message ?? error); } }
   const rawTimestamp = report?.checked_at ?? report?.checkedAt ?? report?.validated_at ?? report?.validatedAt ?? report?.generatedAt ?? report?.generated_at ?? null;
   const timestamp = rawTimestamp && !Number.isNaN(Date.parse(rawTimestamp)) ? new Date(rawTimestamp).toISOString() : null;
   const ageDays = timestamp ? Math.floor((Date.now() - Date.parse(timestamp)) / 86400000) : null;
@@ -69,7 +69,7 @@ const gateEvidence = gates.map((gate) => {
     let evidenceState = exists ? 'PRESENT_NOT_VALIDATED' : 'MISSING'; let ageDays = null; let evidenceStatus = null;
     if (exists && isReport) {
       try {
-        const raw = JSON.parse(readFileSync(full, 'utf8').replace(/^\\uFEFF/, ''));
+        const raw = JSON.parse(readFileSync(full, 'utf8').replace(/^\uFEFF/, ''));
         const ts = raw?.checked_at ?? raw?.checkedAt ?? raw?.validated_at ?? raw?.validatedAt ?? raw?.generatedAt ?? raw?.generated_at ?? raw?.capturedAt ?? raw?.captured_at ?? null;
         const parsed = ts && !Number.isNaN(Date.parse(ts)) ? Date.parse(ts) : null; ageDays = parsed === null ? null : Math.floor((Date.now() - parsed) / 86400000);
         const passed = raw?.passed === true || String(raw?.status ?? '').toUpperCase() === 'PASS';
