@@ -13,6 +13,10 @@ This increment hardens the existing N15 opportunity engine. It does not replace 
 - Six pathways remain available: higher education, TVET, SETA/learnerships, internships, apprenticeships and employment. Sector-to-pathway mappings are routing hints, not an eligibility decision.
 - Candidate-facing opportunity approval is never inferred by this helper alone. Match output always retains human review.
 
+## Staging authority registry bridge
+
+Migration `0085_n15_source_authority_registry_bridge.sql` idempotently mirrors the existing curated `public.source_authorities` entries into N15's `public.opportunity_source_authorities` registry, limited to HTTPS URLs. It assigns `HIGH` confidence to a directory anchor and explicitly states that this is not proof of a live opening, deadline, eligibility, accreditation, or outcome. The existing source catalogue's 21 entries are source anchors only; individual claims still require dated evidence and review. This migration does not create or seed opportunity listings.
+
 ## Commands
 - `npm run n15:sources:validate`
 - `npm run n15:sources:test`
