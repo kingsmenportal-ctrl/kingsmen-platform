@@ -1,4 +1,5 @@
 import type { CandidateDecisionSignals, PlacementScore, RouteOptionSignal, ScoreBand } from "./ai-decision-types";
+import { assertDecisionInputs } from "./decision-input-guard";
 
 function clampScore(value: number): number {
   if (!Number.isFinite(value)) return 0;
@@ -26,6 +27,7 @@ export function calculatePlacementScore(input: {
   candidate: CandidateDecisionSignals;
   route: RouteOptionSignal;
 }): PlacementScore {
+  assertDecisionInputs(input.candidate, input.route);
   const academicScore = clampScore((input.candidate.academicFit + input.route.academicFit) / 2);
   const documentScore = clampScore((input.candidate.documentReadiness + input.route.documentFit) / 2);
   const deadlineScore = clampScore(input.route.deadlineUrgency);
