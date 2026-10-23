@@ -1,0 +1,43 @@
+{
+  "schema": "kingsmen.n11-evidence-review-guard-proof.v1",
+  "capturedAt": "2026-10-23T15:45:00Z",
+  "scope": "N11 AI decision input validation, evidence-required persistence, and non-official recommendation human-review boundary",
+  "sourceCommit": "f77bf455aabc9237a1bdc75946b7da1809dda97b",
+  "results": {
+    "apiTypeScriptBuild": "PASS",
+    "aiDecisionRegressionSuite": "PASS",
+    "checksInRegressionSuite": 15,
+    "githubSourceGuard": "PASS",
+    "githubSourceGuardRun": "https://github.com/kingsmenportal-ctrl/kingsmen-platform/actions/runs/39978714093",
+    "githubSmokeTests": "PASS",
+    "githubSmokeTestsRun": "https://github.com/kingsmenportal-ctrl/kingsmen-platform/actions/runs/39978713890",
+    "githubReleaseEvidenceWorkflow": "PASS",
+    "githubReleaseEvidenceRun": "https://github.com/kingsmenportal-ctrl/kingsmen-platform/actions/runs/39978713892",
+    "stagingMigrationApplied": true,
+    "databaseConstraintsFound": 10,
+    "databaseConstraintsValidated": 10,
+    "negativeDatabaseChecks": {
+      "emptyEvidenceRejected": true,
+      "nonOfficialRecommendationWithoutHumanReviewRejected": true,
+      "testRecordsPersisted": false
+    }
+  },
+  "guardrails": {
+    "aiMaySubmitOfficialApplication": false,
+    "aiMayApproveRefund": false,
+    "aiMayConfirmFraud": false,
+    "sixSouthAfricanPathwaysPreserved": true,
+    "initialActiveCandidateCap": 500,
+    "candidateDataInserted": false,
+    "productionReady": false,
+    "publicLaunchAllowed": false
+  },
+  "remaining": {
+    "apiOrFrontendDeploymentCommitVerified": false,
+    "authenticatedCandidateJourneyVerified": false,
+    "reviewerWorkflowVerified": false,
+    "productionRuntimeE2eVerified": false,
+    "branchProtectionVerified": false
+  },
+  "interpretation": "Verified implementation and automated tests plus staging database enforcement. This is not evidence of a deployed public application or authenticated candidate/reviewer end-to-end journey."
+}
