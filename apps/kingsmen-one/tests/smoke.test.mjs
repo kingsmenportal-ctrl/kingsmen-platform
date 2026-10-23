@@ -425,5 +425,7 @@ test("verified private documents link only to their candidate-owned application 
   assert.match(migration, /v_document\.sha256_hex/);
   assert.match(migration, /ON CONFLICT \(evidence_ref\) DO NOTHING/);
   assert.match(migration, /never substitutes for a provider receipt or outcome notice/i);
-  assert.doesNotMatch(migration, /'CANDIDATE_DOCUMENT'.{0,300}'PROVIDER_SUBMISSION_RECEIPT'/s);
+  const submissionGuard = await readFile(resolve(root, "../..", "db/migrations/0086_cross_module_application_outcome_truth_guards.sql"), "utf8");
+  assert.match(submissionGuard, /PROVIDER_SUBMISSION_RECEIPT.*PROVIDER_REFERENCE/s);
+  assert.doesNotMatch(submissionGuard, /e\.evidence_type IN \([^)]*CANDIDATE_DOCUMENT/s);
 });
