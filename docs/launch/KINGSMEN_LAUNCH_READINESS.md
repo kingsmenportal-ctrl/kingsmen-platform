@@ -453,3 +453,12 @@ Official listing and advert checks:
 - BCEA Inspector (HR4/4/8/192): https://www.labour.gov.za/bcea-inspector-%2813%29
 
 This corrects only the six current staging rows; it does not mean all 14 source authorities have live programmes, nor does it verify candidate-specific eligibility. The vacancy list must be refreshed and each advert rechecked after the closing date. Applications remain candidate-controlled unless the provider confirms receipt; these listings are not outcome evidence.
+
+
+## Opportunity expiry enforcement — 2026-10-23
+
+- Applied `20261023190000_route_availability_expiry_guards` and the follow-up `20261023200000_route_availability_sa_timezone` to staging. Public route reads now require verified/public-safe A/B sources, freshness within 90 days, a closing date not earlier than the South African local date for OPEN routes, and a future opening date for FUTURE routes.
+- Deployed `candidate-application-preparation` as **ACTIVE v10**, `verify_jwt=true`. Its server-side tracking action now rejects OPEN routes with missing/expired closing dates and FUTURE routes without a valid future opening date or with expired closing dates.
+- The corrected staging eligibility query returned **6 currently displayable Employment and Labour vacancies** with metadata closing date 2026-10-30. The source page was checked against the official Department vacancy listing on 2026-10-23. This is six verified current listings, not proof that every national institution has an open opportunity.
+- Runtime-safe SQL probe confirmed the new policy is installed; the current eligible-row count is 6. Automated CI on commit `f4304e94d77c95a394871950f1eac3cd0e2272f3` passed Kingsmen One smoke tests (39969610084), Release Evidence (39969610120) and Source Guard (39969610194).
+- No provider outcome is inferred from a listing. The candidate-application endpoint still requires candidate identity and provider-grade evidence for provider-confirmed status progression.
