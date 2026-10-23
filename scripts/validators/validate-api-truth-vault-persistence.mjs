@@ -16,6 +16,8 @@ const requiredFiles = [
 const requiredTokens = {
   "apps/api/src/db/truth-vault-repository.ts": [
     "fromEnvironment",
+    "NODE_ENV",
+    "Memory-only Truth Vault is forbidden in NODE_ENV=production",
     "KINGSMEN_TRUTH_VAULT_MODE",
     "KINGSMEN_DATABASE_URL",
     "postgres_truth_vault",
