@@ -1,25 +1,55 @@
 export async function POST(request: Request) {
-  const body = await request.json();
+  let body: unknown;
 
-  if (!body?.sourceEntityType || !body?.sourceEntityId || !body?.targetBaseName || !body?.targetTableName) {
+  try {
+    body = await request.json();
+  } catch {
     return Response.json(
       {
         ok: false,
         productionReady: false,
-        error: "Missing Airtable mirror source or target fields"
+        error: "Request body must be valid JSON",
+        queued: false
       },
       { status: 400 }
     );
   }
 
-  return Response.json({
-    ok: true,
-    productionReady: false,
-    boundary: "N07 Airtable sync enqueue route shell",
-    mirrorOnly: true,
-    postgresTruthPreserved: true,
-    airtableTruthAuthorityBlocked: true,
-    serviceRoleVisibleToBrowser: false,
-    queued: true
-  });
+  const input = body as Record<string, unknown> | null;
+  if (
+    !input ||
+    typeof input.sourceEntityType !== "string" ||
+    typeof input.sourceEntityId !== "string" ||
+    typeof input.targetBaseName !== "string" ||
+    typeof input.targetTableName !== "string"
+  ) {
+    return Response.json(
+      {
+        ok: false,
+        productionReady: false,
+        error: "Missing or invalid Airtable mirror source or target fields",
+        queued: false
+      },
+      { status: 400 }
+    );
+  }
+
+  // Fail closed until this route is connected to the authenticated,
+  // service-side durable outbox writer. Never claim a job was queued
+  // when no database write has occurred.
+  return Response.json(
+    {
+      ok: false,
+      productionReady: false,
+      boundary: "N07 Airtable sync enqueue is not connected to the durable outbox",
+      reason: "QUEUE_ADAPTER_NOT_CONFIGURED",
+      mirrorOnly: true,
+      postgresTruthPreserved: true,
+      airtableTruthAuthorityBlocked: true,
+      serviceRoleVisibleToBrowser: false,
+      queued: false,
+      retryable: false
+    },
+    { status: 503 }
+  );
 }
