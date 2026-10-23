@@ -16,7 +16,7 @@
 - Feed checks: 0 non-HTTPS rows, 0 rows older than 90 days, 0 rows with non-OPEN status.
 - Expired verified deadlines excluded in current snapshot: 0.
 - Access checks: `anon` and `authenticated` have SELECT on the public-safe view; base route-programme and provider SELECT grants exist. The view remains constrained by its predicate and underlying RLS.
-- Edge Function `candidate-application-preparation`: ACTIVE v11, `verify_jwt=true`.
+- Edge Function `candidate-application-preparation`: ACTIVE v12, `verify_jwt=true`.
 
 ## Explicit verification limits
 
