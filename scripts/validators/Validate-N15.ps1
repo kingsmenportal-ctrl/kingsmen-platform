@@ -90,7 +90,7 @@ Require-Contains "supabase\functions\candidate-application-preparation\index.ts"
 Require-Contains "supabase\functions\candidate-application-preparation\index.ts" "internship" "Internship checklist is missing."
 Require-Contains "supabase\functions\candidate-application-preparation\index.ts" "apprenticeship" "Apprenticeship checklist is missing."
 Require-Contains "supabase\functions\candidate-application-preparation\index.ts" "employment" "Employment checklist is missing."
-Require-Contains "reports\n15\N06_N15_CANDIDATE_OPPORTUNITY_PATHWAY_PREPARATION_2026-10-23.md" "ACTIVE v12" "Report must record the deployed function version."
+Require-Contains "reports\n15\N06_N15_CANDIDATE_OPPORTUNITY_PATHWAY_PREPARATION_2026-10-23.md" "ACTIVE v13" "Report must record the deployed function version."
 
 $Result = [ordered]@{
   phase = "N15"
