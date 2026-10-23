@@ -97,6 +97,9 @@ jobs:
       - name: Observability validator
         run: npm run observability:validate
 
+      - name: Founder incident record safety contract
+        run: npm run founder:incident:validate
+
       - name: Legal/privacy source proof
         run: npm run legal:prove
 
