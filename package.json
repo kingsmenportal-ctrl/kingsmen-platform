@@ -8,7 +8,7 @@
     "doc": "docs"
   },
   "scripts": {
-    "test": "node scripts/validators/validate-jarvis-core.mjs && node scripts/validators/validate-jarvis-live-pass-02.mjs",
+    "test": "node scripts/validators/validate-jarvis-core.mjs && node scripts/validators/validate-jarvis-live-pass-02.mjs && node scripts/staging/test-kingsmen-operating-evidence-reconciliation.mjs",
     "jarvis:validate": "node scripts/validators/validate-jarvis-connected-live.mjs",
     "jarvis:validate:core": "node scripts/validators/validate-jarvis-core.mjs",
     "jarvis:validate:live-pass-02": "node scripts/validators/validate-jarvis-live-pass-02.mjs",
@@ -85,8 +85,9 @@
     "staging:e2e": "node scripts/staging/run-kingsmen-authenticated-e2e.mjs",
     "staging:e2e:validate": "node scripts/validators/validate-staging-authenticated-e2e-runner.mjs",
     "staging:e2e:test": "node scripts/staging/test-kingsmen-authenticated-e2e.mjs",
-    "kingsmen:inventory": "node scripts/validators/validate-kingsmen-repository-operating-inventory.mjs",
-    "kingsmen:inventory:verify": "node scripts/validators/validate-kingsmen-repository-operating-inventory.mjs",
+    "kingsmen:inventory": "node scripts/validators/validate-kingsmen-repository-operating-inventory.mjs && node scripts/validators/reconcile-kingsmen-operating-evidence.mjs",
+    "kingsmen:inventory:verify": "node scripts/validators/validate-kingsmen-repository-operating-inventory.mjs && node scripts/validators/reconcile-kingsmen-operating-evidence.mjs",
+    "kingsmen:inventory:test": "node scripts/staging/test-kingsmen-operating-evidence-reconciliation.mjs",
     "finance:validate:canonical-catalogue": "node scripts/validators/validate-finance-canonical-catalogue.mjs",
     "finance:test:canonical-catalogue": "node scripts/validators/test-finance-canonical-catalogue.mjs",
     "db:validate:migration-integrity": "node scripts/validators/validate-supabase-migration-integrity.mjs",
