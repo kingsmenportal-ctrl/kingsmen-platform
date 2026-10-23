@@ -194,13 +194,23 @@ Deno.serve(async (req: Request) => {
       if (error || !item) return reply(404, { error: "That preparation item was not found in your verified workspace." }, origin);
       preparationItemId = item.id;
     }
+    let applicationId: string | null = null;
+    if (p.application_id !== undefined && p.application_id !== null && p.application_id !== "") {
+      if (typeof p.application_id !== "string" || !/^[0-9a-f-]{36}$/i.test(p.application_id)) {
+        return reply(400, { error: "Application identifier is invalid." }, origin);
+      }
+      const { data: application, error: applicationError } = await admin.from("candidate_applications")
+        .select("id").eq("id", p.application_id).eq("candidate_id", candidateId).maybeSingle();
+      if (applicationError || !application) return reply(404, { error: "That application was not found in your verified workspace." }, origin);
+      applicationId = application.id;
+    }
     const id = crypto.randomUUID();
     const path = candidateId + "/" + id + "." + MIME_EXT[mime];
     const { data: record, error: insertError } = await admin.from("candidate_private_documents").insert({
-      id, candidate_id: candidateId, preparation_item_id: preparationItemId,
+      id, candidate_id: candidateId, preparation_item_id: preparationItemId, application_id: applicationId,
       storage_bucket: BUCKET, storage_path: path, original_filename: filename,
       mime_type: mime, size_bytes: size, status: "UPLOAD_PENDING",
-    }).select("id,status,original_filename,mime_type,size_bytes,created_at").single();
+    }).select("id,status,original_filename,mime_type,size_bytes,application_id,created_at").single();
     if (insertError || !record) {
       console.error("private document record create failed", insertError?.code ?? "unknown");
       return reply(503, { error: "Could not create a private document record." }, origin);
