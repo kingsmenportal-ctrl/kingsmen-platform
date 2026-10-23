@@ -57,19 +57,16 @@ test("account entry point uses Supabase Auth without claiming candidate identity
   assert.match(js, /onAuthStateChange/);
 });
 
-test("opportunities use the verified-public route catalogue before demo samples", async () => {
+test("opportunities use the fail-closed public verified feed before demo samples", async () => {
   const js = await read("app.js");
-  assert.match(js, /from\("route_programmes"\)/);
-  assert.match(js, /eq\("route_status",\s*"VERIFIED"\)/);
+  assert.match(js, /from\("current_verified_route_opportunities"\)/);
+  assert.match(js, /programme_id/);
+  assert.match(js, /last_verified_record_update/);
   assert.match(js, /source_confidence_band/);
-  assert.match(js, /route_providers!inner\(provider_name,public_safe,verification_status,default_confidence_band\)/);
-  assert.match(js, /route_providers\.public_safe/);
-  assert.match(js, /route_providers\.verification_status/);
-  assert.match(js, /route_providers\.default_confidence_band/);
-  assert.match(js, /90\*24\*60\*60\*1000/);
   assert.match(js, /No verified live listings are currently available/);
   assert.match(js, /Practice with demo listings/);
   assert.match(js, /Open official source/);
+  assert.match(js, /will not fall back to unfiltered programme records/);
 });
 
 test("saving a verified route requires a signed-in user and uses owner-scoped RLS table", async () => {
