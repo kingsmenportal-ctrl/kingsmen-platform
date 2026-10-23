@@ -5,8 +5,10 @@ import { CORE_PATHWAYS, SECTOR_TO_PATHWAYS, canonicalizeSourceUrl, assessSourceA
 const root = process.cwd();
 const manifestPath = path.join(root, "manifests/n15/opportunity-engine-source-intelligence.json");
 const migrationPath = path.join(root, "db/migrations/0013_n15_opportunity_engine.sql");
+const bridgePath = path.join(root, "db/migrations/0085_n15_source_authority_registry_bridge.sql");
 const manifest = JSON.parse(fs.readFileSync(manifestPath, "utf8"));
 const migration = fs.readFileSync(migrationPath, "utf8");
+const bridge = fs.readFileSync(bridgePath, "utf8");
 const checks = [];
 const add = (name, passed, detail = "") => checks.push({ name, passed: Boolean(passed), detail });
 add("six national pathways present in policy", CORE_PATHWAYS.length === 6 && CORE_PATHWAYS.every(x => Object.values(SECTOR_TO_PATHWAYS).flat().includes(x)));
