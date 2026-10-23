@@ -62,4 +62,4 @@ const blocked = reconcileOperatingInventory({
 }, { now, readReport: () => null });
 assert.equal(blocked.blockedGateCount, 1);
 assert.equal(blocked.gates[0].runtimeEvidenceStatus, "BLOCKED");
-console.log("Kingsmen operating evidence reconciliation tests passed (7 cases).");
+console.log("Kingsmen operating evidence reconciliation tests passed (8 cases).");
