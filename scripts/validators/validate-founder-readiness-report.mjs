@@ -18,7 +18,21 @@ if(founder.productionReady!==false||founder.publicLaunchAllowed!==false) failure
 if(!six.every(p=>packageCatalogue.core_gates_visible_to_all.includes(p))) failures.push("six-pathway-scope-changed");
 if(packageCatalogue.growth_cap?.starting_active_candidate_cap!==500) failures.push("initial-active-candidate-cap-changed");
 if(!governance.rules.some(x=>x.includes("Candidate-reported submission"))) failures.push("submission-vs-outcome-doctrine-missing");
-const domains=founder.readinessDomains.map(d=>({...d,evidenceFileExists:existsSync(resolve(root,d.evidencePath)),evidenceState:existsSync(resolve(root,d.evidencePath))?d.status:"MISSING"}));
+const domains=founder.readinessDomains.map(d=>{
+  const full=resolve(root,d.evidencePath);
+  const evidenceFileExists=existsSync(full);
+  let evidenceState="MISSING";
+  let evidenceStatus="missing";
+  if(evidenceFileExists){
+    try{
+      const evidence=JSON.parse(readFileSync(full,"utf8"));
+      const valid=evidence.passed===true&&evidence.reviewed===true&&evidence.redacted===true&&evidence.exists!==false;
+      evidenceState=valid?"VERIFIED":(d.status==="BLOCKED"?"BLOCKED":"STALE");
+      evidenceStatus=evidence.status??(valid?"passed":"present_but_not_verified");
+    }catch{evidenceState="STALE";evidenceStatus="invalid_json";}
+  }else if(d.status==="BLOCKED"){evidenceState="BLOCKED";evidenceStatus="required_external_proof_unavailable";}
+  return {...d,evidenceFileExists,evidenceState,evidenceStatus};
+});
 const counts=Object.fromEntries(founder.statusValues.map(s=>[s,domains.filter(d=>d.evidenceState===s).length]));
 const report={schema:"kingsmen.founder-readiness-report-output.v1",passed:failures.length===0,failures,productionReady:false,publicLaunchAllowed:false,generatedReportIsEvidence:false,initialActiveCandidateCap:500,corePathways:six,domainCounts:counts,domains,missingEvidencePaths:domains.filter(d=>!d.evidenceFileExists).map(d=>d.evidencePath),interpretation:"This is an evidence inventory, not proof that missing gates passed. Source-level checks cannot promote runtime, deployment or end-to-end status."};
 console.log(JSON.stringify(report,null,2));
