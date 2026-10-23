@@ -51,3 +51,12 @@ powershell -ExecutionPolicy Bypass -File C:\Kingsmen\kingsmen-platform\scripts\d
 
 Next:
 N12 - Governance / Policy Runtime.
+
+## N11 safety hardening — 2026-10-23
+
+- Added a shared fail-closed input guard for candidate/route references, score ranges, source-confidence and portal-health enums, and evidence references.
+- Integrated the guard into route matching, placement scoring, and eligibility screening.
+- Added automated regression tests for valid scoring, invalid/NaN/out-of-range inputs, missing evidence, invalid enums, and AI action prohibitions.
+- Added migration 0095 to enforce non-empty evidence references on all nine N11 evidence-bearing tables and require human review for recommendations not marked OFFICIAL_VERIFIED.
+- Staging migration application returned success. Runtime database constraint verification and CI execution are tracked separately; this report does not claim live candidate journey verification.
+- AI remains advisory only. It cannot submit official applications, approve refunds, or confirm fraud. No candidate records or official submissions were created by this batch.
