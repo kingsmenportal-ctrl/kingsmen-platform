@@ -23,6 +23,7 @@ assert.match(edge, /candidateRecordsReturned: false/, "health output must declar
 assert.match(edge, /airtableConnectionCanBlockCandidateFlows: false/, "Airtable must remain optional");
 assert.match(edge, /activeTargets.count === 0/, "missing target setup must be reported as degraded");
 assert.match(edge, /activeReviewers.count === 0/, "missing reviewer grants must be reported as degraded");
+assert.match(edge, /count\(admin, "platform_reviewers", "is_active", \["true"\], "revoked_at"\)/, "revoked reviewer grants must not count as active");
 assert.match(edge, /productionReady: false/, "health view must not claim production readiness");
 assert.doesNotMatch(edge, /select\("\*"/, "health function must not select all columns or PII");
 
