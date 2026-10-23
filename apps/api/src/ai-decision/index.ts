@@ -10,3 +10,4 @@ export * from "./phoenix-fallback-planner";
 export * from "./learning-signals";
 export * from "./ai-budget-guard";
 export * from "./ai-decision-repository";
+export * from "./decision-input-guard";
