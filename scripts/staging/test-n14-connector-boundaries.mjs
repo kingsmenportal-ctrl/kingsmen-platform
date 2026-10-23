@@ -4,9 +4,9 @@ import path from "node:path";
 import { createRequire } from "node:module";
 import { fileURLToPath } from "node:url";
 
-const require = createRequire(import.meta.url);
-const ts = require("typescript");
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "../..");
+const require = createRequire(path.join(root, "apps/api/package.json"));
+const ts = require("typescript");
 const sourcePath = path.join(root, "apps/api/src/integrations/integrations.ts");
 const source = fs.readFileSync(sourcePath, "utf8");
 const compiled = ts.transpileModule(source, {
