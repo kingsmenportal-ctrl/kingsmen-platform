@@ -63,6 +63,7 @@
   let applicationSavedRoutes = [];
   let applicationWorkspaceLoadedForUser = null;
   let applicationWorkspaceAvailable = false;
+  let applicationWorkspaceLoadingForUser = null;
   async function loadOfficialProfile(force = false) {
     const userId=authSession?.user?.id;
     if(!supabaseClient||!userId){profileReviewAvailable=false;officialProfile=null;profileChangeRequests=[];profileLoadedForUser=null;return false;}
@@ -148,15 +149,33 @@
     return `${heading("Sign in or create an account","Use a real account session. Signing in does not automatically claim an existing candidate record.")}<div class="content-grid"><form class="panel" id="auth-form"><h3>Account access</h3><p class="panel-subtitle">Use an email you control. A confirmation email may be required.</p><label class="form-label" for="auth-email">Email address</label><input class="filter-input form-control" type="email" id="auth-email" name="email" autocomplete="email" required maxlength="254" placeholder="you@example.com"><label class="form-label" for="auth-password">Password</label><input class="filter-input form-control" type="password" id="auth-password" name="password" autocomplete="current-password" required minlength="8" maxlength="128" placeholder="At least 8 characters"><div class="auth-actions"><button class="primary-button" type="submit" name="auth-action" value="signin" ${authBusy?"disabled":""}>Sign in</button><button class="secondary-button" type="submit" name="auth-action" value="signup" ${authBusy?"disabled":""}>Create account</button></div><button class="text-button" type="button" id="reset-password-button">Send password reset email</button><p id="auth-message" class="muted-note" role="status" aria-live="polite">${escapeHtml(authMessage||"")}</p></form><div class="panel"><h3>Identity protection</h3><div class="task-list"><div class="task-row"><span class="task-check done">✓</span><div class="task-info"><strong>Secure account session</strong><small>Handled by Supabase Auth.</small></div></div><div class="task-row"><span class="task-check done">✓</span><div class="task-info"><strong>No automatic candidate matching</strong><small>An email match alone cannot establish identity.</small></div></div><div class="task-row"><span class="task-check">!</span><div class="task-info"><strong>Authorised identity review still required</strong><small>Candidate records stay locked until the link is verified.</small></div></div></div><p class="muted-note">Do not upload identity documents to this preview. Private uploads are available after authorised candidate identity verification.</p></div></div>`;
   }
   function home() {
-    return `${heading("Your overview","A practical view of what is ready and what needs attention.",button("View my tasks",'data-view="applications"'))}
+    const userId=authSession?.user?.id||null;
+    const workspaceReady=!!userId&&workspacePersistenceAvailable&&workspaceLoadedForUser===userId;
+    const applicationsReady=!!userId&&applicationWorkspaceAvailable&&applicationWorkspaceLoadedForUser===userId;
+    const documentsReady=!!userId&&privateDocumentsLoadedForUser===userId&&!privateDocumentsError;
+    const preparationValue=workspaceReady?progress()+"%":"—";
+    const preparationLabel=workspaceReady?"Server-saved preparation checklist":"Sign in and verify candidate identity for server-backed progress";
+    const savedValue=applicationsReady?String(applicationSavedRoutes.length):"—";
+    const savedLabel=applicationsReady?"Verified routes saved to your account":"Account-backed saved routes not yet verified";
+    const trackerValue=applicationsReady?String(applicationTrackers.length):"—";
+    const trackerLabel=applicationsReady?"Persistent application trackers · not submissions":"Persistent trackers not yet verified";
+    const documentValue=documentsReady?String(privateDocuments.length):"—";
+    const documentLabel=documentsReady?"Private documents recorded on the server":"Private document count unavailable until authorised access";
+    const previewNotice=userId
+      ? (workspaceReady&&applicationsReady
+          ? "<p class=\"muted-note\">Account-backed status shown. A saved route or tracker is not proof that a provider received an application or made a decision.</p>"
+          : "<p class=\"muted-note\">You are signed in, but server-backed candidate metrics stay unavailable until the identity and workspace checks pass. Demo values are not presented as your account data.</p>")
+      : "<p class=\"muted-note\">Preview mode: progress, saves and checklist actions may be stored in this browser only. Sign in and complete authorised identity review to access account-backed records.</p>";
+    return `${heading("Your overview","A single view of your verified Kingsmen journey.",button("View my applications",'data-view="applications"'))}
       <div class="stats-grid">
-        <div class="stat-card"><div class="stat-top">Preparation progress <span class="stat-icon">✓</span></div><div class="stat-value">${progress()}%</div><div class="stat-foot">Based on your demo checklist</div><div class="progress-track"><div class="progress-fill" style="width:${progress()}%"></div></div></div>
-        <div class="stat-card"><div class="stat-top">Saved opportunities <span class="stat-icon">☆</span></div><div class="stat-value">${state.saved.length}</div><div class="stat-foot">Saved in this browser only</div></div>
-        <div class="stat-card"><div class="stat-top">Applications tracked <span class="stat-icon">▤</span></div><div class="stat-value">${Object.keys(state.applicationNotes).length}</div><div class="stat-foot">No provider submission is implied</div></div>
-        <div class="stat-card"><div class="stat-top">Documents prepared <span class="stat-icon">▧</span></div><div class="stat-value">${Object.values(state.documents).filter(v=>v==="prepared").length}</div><div class="stat-foot">No files are uploaded or stored</div></div>
+        <div class="stat-card"><div class="stat-top">Preparation progress <span class="stat-icon">✓</span></div><div class="stat-value">${preparationValue}</div><div class="stat-foot">${preparationLabel}</div><div class="progress-track"><div class="progress-fill" style="width:${workspaceReady?progress():0}%"></div></div></div>
+        <div class="stat-card"><div class="stat-top">Saved opportunities <span class="stat-icon">☆</span></div><div class="stat-value">${savedValue}</div><div class="stat-foot">${savedLabel}</div></div>
+        <div class="stat-card"><div class="stat-top">Applications tracked <span class="stat-icon">▤</span></div><div class="stat-value">${trackerValue}</div><div class="stat-foot">${trackerLabel}</div></div>
+        <div class="stat-card"><div class="stat-top">Private documents <span class="stat-icon">▧</span></div><div class="stat-value">${documentValue}</div><div class="stat-foot">${documentLabel}</div></div>
       </div>
-      <div class="content-grid"><div class="panel"><h3>Your next steps</h3><p class="panel-subtitle">Small, trackable actions to help you prepare.</p><div class="task-list">${taskList(4)}</div><div style="margin-top:16px">${button("Continue preparation","data-view=\"applications\"",false)}</div></div>
-      <div class="panel"><h3>Where you are heading</h3><p class="panel-subtitle">Explore routes that fit your next chapter.</p><div class="task-list">${pathways.slice(0,3).map(p=>`<div class="task-row"><span class="task-check" aria-hidden="true">${p.icon}</span><div class="task-info"><strong>${p.name}</strong><small>Explore route requirements and preparation.</small></div></div>`).join("")}</div><div class="next-step"><strong>One next step at a time.</strong><p>Choose a pathway, review requirements and prepare your documents before applying.</p>${button("Explore pathways","data-view=\"pathways\"",false)}</div></div></div>`;
+      ${previewNotice}
+      <div class="content-grid"><div class="panel"><h3>Your next steps</h3><p class="panel-subtitle">${workspaceReady?"Tasks loaded from your verified server workspace.":"Preview checklist only until authorised account access is ready."}</p><div class="task-list">${taskList(4)}</div><div style="margin-top:16px">${button("Continue preparation","data-view=\"applications\"",false)}</div></div>
+      <div class="panel"><h3>All six pathways</h3><p class="panel-subtitle">One connected platform for study, skills and work.</p><div class="task-list">${pathways.map(p=>`<div class="task-row"><span class="task-check" aria-hidden="true">${p.icon}</span><div class="task-info"><strong>${escapeHtml(p.name)}</strong><small>${escapeHtml(p.desc)}</small></div></div>`).join("")}</div><div class="next-step"><strong>Verified sources. Clear next steps.</strong><p>Review official requirements, prepare evidence and track progress without treating a candidate report as a provider-confirmed outcome.</p>${button("Explore verified opportunities",'data-view="opportunities"',false)}</div></div></div>`;
   }
   function profileView() {
     const p=state.profile||{fullName:"",province:"",qualification:"",interests:[]};
@@ -328,6 +347,7 @@
     document.querySelectorAll(".nav-item").forEach(b=>b.classList.toggle("active",b.dataset.view===view));
     document.getElementById("welcome").classList.toggle("hidden",view!=="home");
     root.innerHTML=(views[view]||home)();
+    if(view==="home"&&authSession?.user){const userId=authSession.user.id;if(applicationWorkspaceLoadedForUser!==userId&&!applicationWorkspaceLoadingForUser){applicationWorkspaceLoadingForUser=userId;void loadApplicationWorkspace(true).finally(()=>{if(applicationWorkspaceLoadingForUser===userId)applicationWorkspaceLoadingForUser=null;if(activeView==="home"&&authSession?.user?.id===userId)render("home");});}if(privateDocumentsLoadedForUser!==userId&&privateDocumentsLoadingForUser!==userId)void loadPrivateDocuments();}
     if(view==="opportunities"){renderOpportunityCards();loadVerifiedOpportunities();document.getElementById("opportunity-search").addEventListener("input",renderOpportunityCards);document.getElementById("opportunity-filter").addEventListener("change",renderOpportunityCards);} if(view==="profile"&&authSession?.user) void loadOfficialProfile(); if(view==="applications"&&authSession?.user&&applicationWorkspaceLoadedForUser!==authSession.user.id) void loadApplicationWorkspace().then(()=>{if(activeView==="applications")render("applications");}); if(view==="documents"&&authSession?.user&&privateDocumentsLoadedForUser!==authSession.user.id&&privateDocumentsLoadingForUser!==authSession.user.id) void loadPrivateDocuments(); if(view==="documents"&&authSession?.user&&applicationWorkspaceLoadedForUser!==authSession.user.id) void loadApplicationWorkspace().then(()=>{if(activeView==="documents")render("documents");}); if(view==="reviewer"&&authSession?.user&&reviewerQueueLoadedForUser!==authSession.user.id&&reviewerQueueLoadingForUser!==authSession.user.id&&!reviewerQueueError) void loadReviewerQueue();
   }
   document.addEventListener("submit",async e=>{
