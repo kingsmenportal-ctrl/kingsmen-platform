@@ -1,0 +1,25 @@
+#!/usr/bin/env node
+import { existsSync, readFileSync } from "node:fs";
+import { dirname, resolve } from "node:path";
+import { fileURLToPath } from "node:url";
+const root=resolve(dirname(fileURLToPath(import.meta.url)),"../..");
+const readJson=(p)=>JSON.parse(readFileSync(resolve(root,p),"utf8"));
+const failures=[];
+const governance=readJson("manifests/governance/release-evidence-contract-v1.json");
+const founder=readJson("manifests/ops/founder-readiness-report-v1.json");
+const registry=readFileSync(resolve(root,"apps/api/src/final-assembly/module-registry.ts"),"utf8");
+const packageCatalogue=readJson("manifests/business/package-catalogue.json");
+const six=["Higher Education","TVET","SETA / Learnership","Internship","Apprenticeship","Employment"];
+const missingModules=governance.expectedCoreModules.filter(k=>!new RegExp('moduleKey: "'+k+'"').test(registry));
+if(missingModules.length) failures.push("missing-core-modules:"+missingModules.join(","));
+if(governance.failClosedOnMissingEvidence!==true) failures.push("missing-evidence-must-fail-closed");
+if(founder.generatedReportIsEvidence!==false) failures.push("readiness-report-must-not-self-certify");
+if(founder.productionReady!==false||founder.publicLaunchAllowed!==false) failures.push("report-must-not-claim-production-readiness");
+if(!six.every(p=>packageCatalogue.core_gates_visible_to_all.includes(p))) failures.push("six-pathway-scope-changed");
+if(packageCatalogue.growth_cap?.starting_active_candidate_cap!==500) failures.push("initial-active-candidate-cap-changed");
+if(!governance.rules.some(x=>x.includes("Candidate-reported submission"))) failures.push("submission-vs-outcome-doctrine-missing");
+const domains=founder.readinessDomains.map(d=>({...d,evidenceFileExists:existsSync(resolve(root,d.evidencePath)),evidenceState:existsSync(resolve(root,d.evidencePath))?d.status:"MISSING"}));
+const counts=Object.fromEntries(founder.statusValues.map(s=>[s,domains.filter(d=>d.evidenceState===s).length]));
+const report={schema:"kingsmen.founder-readiness-report-output.v1",passed:failures.length===0,failures,productionReady:false,publicLaunchAllowed:false,generatedReportIsEvidence:false,initialActiveCandidateCap:500,corePathways:six,domainCounts:counts,domains,missingEvidencePaths:domains.filter(d=>!d.evidenceFileExists).map(d=>d.evidencePath),interpretation:"This is an evidence inventory, not proof that missing gates passed. Source-level checks cannot promote runtime, deployment or end-to-end status."};
+console.log(JSON.stringify(report,null,2));
+if(failures.length) process.exitCode=1;
