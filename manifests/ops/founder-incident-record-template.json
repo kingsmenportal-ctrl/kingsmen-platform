@@ -1,0 +1,26 @@
+{
+  "schema": "kingsmen.founder-incident-record.v1",
+  "incidentId": "",
+  "severity": "SEV3",
+  "status": "OPEN",
+  "detectedAt": "",
+  "updatedAt": "",
+  "correlationId": "",
+  "affectedSubsystem": "",
+  "summaryRedacted": "",
+  "customerImpact": "UNKNOWN_PENDING_ASSESSMENT",
+  "dataExposureAssessment": "NOT_YET_ASSESSED",
+  "containmentAction": "",
+  "ownerRole": "FOUNDER",
+  "founderEscalation": {
+    "required": true,
+    "notifiedAt": "",
+    "acknowledgementReference": ""
+  },
+  "evidenceReferences": [],
+  "rootCause": "UNKNOWN",
+  "correctiveActions": [],
+  "reopenCriteria": "",
+  "closedAt": null,
+  "notes": "Template only. Do not place candidate PII, message bodies, tokens, secrets, database URLs, or payment credentials here."
+}
