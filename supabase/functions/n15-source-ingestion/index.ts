@@ -163,10 +163,25 @@ async function inspectAuthority(authority: any, supabase: any) {
 Deno.serve(async (req: Request) => {
   if (req.method === "OPTIONS") return new Response("ok", { headers: cors });
   if (req.method !== "POST") return json({ status: "METHOD_NOT_ALLOWED" }, 405);
-  if (tokenRole(req) !== "service_role") return json({ status: "FORBIDDEN", reason: "SERVICE_ROLE_REQUIRED" }, 403);
   const url = Deno.env.get("SUPABASE_URL");
   const key = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY");
-  if (!url || !key) return json({ status: "CONFIGURATION_ERROR", reason: "SUPABASE_SERVICE_CONFIGURATION_MISSING" }, 500);
+  const anonKey = Deno.env.get("SUPABASE_ANON_KEY");
+  if (!url || !key || !anonKey) return json({ status: "CONFIGURATION_ERROR", reason: "SUPABASE_SERVICE_CONFIGURATION_MISSING" }, 500);
+
+  const bearer = (req.headers.get("authorization") ?? "").replace(/^Bearer\\s+/i, "");
+  const callerRole = tokenRole(req);
+  if (callerRole !== "service_role") {
+    const authClient = createClient(url, anonKey, { auth: { persistSession: false, autoRefreshToken: false } });
+    const { data: userData, error: authError } = await authClient.auth.getUser(bearer);
+    if (authError || !userData.user) return json({ status: "UNAUTHENTICATED" }, 401);
+    const reviewerClient = createClient(url, key, { auth: { persistSession: false, autoRefreshToken: false } });
+    const { data: reviewer, error: reviewerError } = await reviewerClient.from("platform_reviewers")
+      .select("role_code").eq("auth_user_id", userData.user.id).eq("is_active", true)
+      .in("role_code", ["PLATFORM_ADMIN", "PROVIDER_OPERATOR", "APPLICATION_REVIEWER", "EVIDENCE_VERIFIER"])
+      .maybeSingle();
+    if (reviewerError) return json({ status: "DATABASE_ERROR", reason: "REVIEWER_AUTHORIZATION_LOOKUP_FAILED" }, 500);
+    if (!reviewer) return json({ status: "FORBIDDEN", reason: "ACTIVE_OPPORTUNITY_REVIEWER_REQUIRED" }, 403);
+  }
   const supabase = createClient(url, key, { auth: { persistSession: false, autoRefreshToken: false } });
   const runRef = "n15_run_" + crypto.randomUUID();
   const startedAt = new Date().toISOString();
