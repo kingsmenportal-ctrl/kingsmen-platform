@@ -411,3 +411,19 @@ test("truth-guard trigger functions cannot be called directly through client RPC
     assert.ok(migration.includes(`REVOKE ALL ON FUNCTION public.${fn}() FROM authenticated;`));
   }
 });
+
+
+test("verified private documents link only to their candidate-owned application and never impersonate provider proof", async () => {
+  const fn = await readFile(resolve(root, "../..", "supabase/functions/candidate-private-documents/index.ts"), "utf8");
+  const migration = await readFile(resolve(root, "../..", "db/migrations/0088_application_linked_private_document_evidence.sql"), "utf8");
+  assert.match(fn, /p\.application_id/);
+  assert.match(fn, /from\("candidate_applications"\)[\s\S]*?eq\("candidate_id", candidateId\)/);
+  assert.match(fn, /application_id: applicationId/);
+  assert.match(migration, /FOREIGN KEY \(application_id, candidate_id\)[\s\S]*?REFERENCES public\.candidate_applications \(id, candidate_id\)/);
+  assert.match(migration, /WHEN \(NEW\.decision = 'VERIFIED'\)/);
+  assert.match(migration, /'CANDIDATE_DOCUMENT'/);
+  assert.match(migration, /v_document\.sha256_hex/);
+  assert.match(migration, /ON CONFLICT \(evidence_ref\) DO NOTHING/);
+  assert.match(migration, /never substitutes for a provider receipt or outcome notice/i);
+  assert.doesNotMatch(migration, /'CANDIDATE_DOCUMENT'.{0,300}'PROVIDER_SUBMISSION_RECEIPT'/s);
+});
