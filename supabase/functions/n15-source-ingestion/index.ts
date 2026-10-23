@@ -168,7 +168,7 @@ Deno.serve(async (req: Request) => {
   const anonKey = Deno.env.get("SUPABASE_ANON_KEY");
   if (!url || !key || !anonKey) return json({ status: "CONFIGURATION_ERROR", reason: "SUPABASE_SERVICE_CONFIGURATION_MISSING" }, 500);
 
-  const bearer = (req.headers.get("authorization") ?? "").replace(/^Bearer\\s+/i, "");
+  const bearer = (req.headers.get("authorization") ?? "").replace(/^Bearer\s+/i, "");
   const callerRole = tokenRole(req);
   if (callerRole !== "service_role") {
     const authClient = createClient(url, anonKey, { auth: { persistSession: false, autoRefreshToken: false } });
