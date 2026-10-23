@@ -24,7 +24,7 @@ export async function POST(request: Request) {
   }
 
   const authorization = request.headers.get("authorization");
-  if (!authorization || !/^Bearer\\s+\\S+/i.test(authorization)) {
+  if (!authorization || !/^Bearer\s+\S+/i.test(authorization)) {
     return Response.json(
       { ok: false, productionReady: false, error: "Authenticated operator session required", queued: false },
       { status: 401 }
@@ -44,7 +44,7 @@ export async function POST(request: Request) {
   // never read or exposed by this route; reviewer authorization happens server-side.
   let upstream: Response;
   try {
-    upstream = await fetch(`${supabaseUrl.replace(/\\/$/, "")}/functions/v1/n07-airtable-enqueue`, {
+    upstream = await fetch(`${supabaseUrl.replace(/\/$/, "")}/functions/v1/n07-airtable-enqueue`, {
       method: "POST",
       headers: {
         authorization,
