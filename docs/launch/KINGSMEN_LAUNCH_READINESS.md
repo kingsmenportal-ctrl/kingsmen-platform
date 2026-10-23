@@ -318,3 +318,16 @@ The gate must remain blocked until the P0 launch blockers are fixed and evidence
 4. **Founder private beta:** process a small number of real test candidates manually with evidence.
 5. **Paid pilot:** only after PayFast, refunds, support, backup/restore, communications proof, legal/privacy proof, incident response, observability proof, staging pack, and final assembly evidence bundle pass.
 6. **Public launch:** only after every required launch gate opens.
+
+
+## Cross-module truth guard added — 2026-10-23
+
+Migration `20261023220000_cross_module_application_outcome_truth_guards.sql` is committed and applied to staging. The matching database migration mirror is `db/migrations/0086_cross_module_application_outcome_truth_guards.sql`.
+
+- `candidate_applications` cannot enter `SUBMITTED_CONFIRMED` or later provider-progress states unless a verified provider submission receipt/reference exists for the same candidate and application, with reviewer identity and verification timestamp.
+- `candidate_outcomes` inserts must match the application’s candidate and opportunity and point to a verified `PROVIDER_OUTCOME_NOTICE` for that same candidate/application. Candidate reports, predictions and submission receipts cannot be used as confirmed outcome evidence.
+- Trigger installation was queried directly in staging and both guards are present.
+- Kingsmen One smoke tests and Source Guard passed on the migration/test commit sequence. Release Evidence workflow completed its build/validation/smoke job successfully; this is still not authenticated candidate E2E.
+- This guard is intentionally fail-closed. If any existing application/outcome writer does not persist the required verified evidence before updating status, that writer must be integrated with the evidence workflow before it can advance state. Do not weaken the guard to make a test pass.
+
+This reduces false-confirmation risk but does not replace the two-candidate isolation tests, reviewer-authorised evidence verification, provider staging delivery, document binary E2E, full PostgreSQL restart/recovery proof, or published Netlify commit verification.
