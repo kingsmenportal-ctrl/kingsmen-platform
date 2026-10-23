@@ -7,7 +7,7 @@ const migration = fs.readFileSync(migrationPath, "utf8");
 const route = fs.readFileSync(routePath, "utf8");
 
 for (const [label, pattern] of [
-  ["idempotent enqueue", /on conflict \\(idempotency_key\\) do update/i],
+  ["idempotent enqueue", /on conflict \(idempotency_key\) do update/i],
   ["service role required", /v_role := current_user;[\s\S]{0,100}service_role/i],
   ["browser roles cannot access outbox", /revoke all on table public\.airtable_sync_outbox from anon, authenticated/i],
   ["service role only executes enqueue", /grant execute on function public\.n07_enqueue_airtable_mirror[\s\S]{0,160}to service_role/i],
