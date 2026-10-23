@@ -1,0 +1,13 @@
+{
+  "schema": "kingsmen.n15.source-intelligence.validation.v1",
+  "module": "N15",
+  "status": "NOT_RUN",
+  "passed": false,
+  "generatedAt": null,
+  "checks": [],
+  "failed": [],
+  "limitations": [
+    "Placeholder until CI executes validator.",
+    "Does not prove live source crawling, current opportunities, database persistence, or production deployment."
+  ]
+}
