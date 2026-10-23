@@ -436,3 +436,20 @@ The staging query now returns 6 eligible routes using VERIFIED route status, OPE
 - Live staging still reports **0 private documents** and **0 active evidence reviewers**. Therefore this proves deployed function code and schema wiring, not the authenticated two-candidate upload/review/download journey.
 - Release gates still open: real two-candidate authenticated HTTP E2E; reviewer decision with actual authorized identity; signed URL expiry; provider delivery/retry/bounce/opt-out/dead-letter runtime; Auth leaked-password protection; eligible live opportunity validation; published Netlify commit; and independently readable branch protection.
 - GitHub branch-protection API continues to return HTTP 403 to the connected read-only integration. This is an access limitation, not proof that branch protection is absent. Netlify project metadata still has no published deploy ID/SHA, so no deployment of the reviewed PR head is claimed.
+
+
+## Opportunity-query correction — 2026-10-23
+
+A follow-up schema-aware query corrected the earlier “zero eligible routes” report. The previous check used `route_status='OPEN'` and `availability_status='FUTURE'`, but this staging schema represents a verified route as `route_status='VERIFIED'` and a currently accepting listing as `availability_status='OPEN'`. That earlier zero was a query-contract error, not a valid count of eligible listings.
+
+The corrected staging query returned **6** route rows meeting: route VERIFIED, availability OPEN, confidence A/B, official source URL present, updated in the last 90 days, and provider VERIFIED/public-safe/confidence A/B. The six listings are Department of Employment and Labour vacancies with reference numbers HR4/4/8/194, HR 4/4/8/190, HR4/4/9/29, HR4/26/10/02HO, HR4/4/8/192, and HR4/4/8/193. Their staging metadata records a 2026-10-30 closing date and a 2026-10-23 source check. The official Department listing independently showed these six titles as Open with 30 October 2026 closing dates when checked on 2026-10-23.
+
+Official listing and advert checks:
+- Department of Employment and Labour vacancy list: https://www.labour.gov.za/vacancies/Pages/Vacancies-List.aspx
+- Client Service Officer: Public Employment Services (HR4/4/8/194): https://www.labour.gov.za/Vacancies/Pages/Vacancies-List.aspx?PageFirstRow=31&Paged=TRUE&PagedPrev=TRUE&View=%7BF01EEABA-46DC-4830-90E3-2E7A96B86015%7D&p_Created=20250711+15%3A39%3A14&p_ID=2370
+- BCEA Inspector (X4 Posts) (HR 4/4/8/190): https://www.labour.gov.za/bcea-inspector-%28x4-posts%29-%284%29
+- Administration Officer: Employer Service (HR4/4/9/29): https://www.labour.gov.za/administration-officer-employer-service
+- Senior State Accountant: Financial Reporting (HR4/26/10/02HO): https://www.labour.gov.za/senior-state-accountant-financial-reporting-%283%29
+- BCEA Inspector (HR4/4/8/192): https://www.labour.gov.za/bcea-inspector-%2813%29
+
+This corrects only the six current staging rows; it does not mean all 14 source authorities have live programmes, nor does it verify candidate-specific eligibility. The vacancy list must be refreshed and each advert rechecked after the closing date. Applications remain candidate-controlled unless the provider confirms receipt; these listings are not outcome evidence.
