@@ -1,0 +1,12 @@
+{
+  "module": "N14",
+  "validator": "validate-n14-connector-contract",
+  "status": "not_run",
+  "checksPassed": 0,
+  "checksTotal": 0,
+  "generatedAt": null,
+  "limitations": [
+    "Report is a placeholder until the validator runs in CI or a repository checkout.",
+    "Static contract checks do not prove a provider is configured or live."
+  ]
+}
