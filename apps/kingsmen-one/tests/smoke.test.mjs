@@ -416,6 +416,12 @@ test("truth-guard trigger functions cannot be called directly through client RPC
 test("verified private documents link only to their candidate-owned application and never impersonate provider proof", async () => {
   const fn = await readFile(resolve(root, "../..", "supabase/functions/candidate-private-documents/index.ts"), "utf8");
   const migration = await readFile(resolve(root, "../..", "db/migrations/0088_application_linked_private_document_evidence.sql"), "utf8");
+  const app = await read("app.js");
+  assert.match(app, /private-document-application/);
+  assert.match(app, /name="application_id"/);
+  assert.match(app, /application_id:String\(new FormData\(e\.target\)\.get\("application_id"\)/);
+  assert.match(fn, /from\("candidate_applications"\)[\s\S]*?eq\("candidate_id", candidateId\)/);
+  assert.match(fn, /applications: applications \?\? \[\]/);
   assert.match(fn, /p\.application_id/);
   assert.match(fn, /from\("candidate_applications"\)[\s\S]*?eq\("candidate_id", candidateId\)/);
   assert.match(fn, /application_id: applicationId/);
