@@ -18,6 +18,13 @@
 - Access checks: `anon` and `authenticated` have SELECT on the public-safe view; base route-programme and provider SELECT grants exist. The view remains constrained by its predicate and underlying RLS.
 - Edge Function `candidate-application-preparation`: ACTIVE v14, `verify_jwt=true`.
 
+## Repository smoke verification
+
+- GitHub Actions workflow `Kingsmen One smoke tests`, run #348, passed on commit `698f278effe3829da81c01abb57fa4599fc80636`.
+- Node syntax checks passed for `app.js` and `supabase-client.js`.
+- All 33 candidate-workflow smoke tests passed (33 passed, 0 failed), including the updated assertion that the candidate UI uses the fail-closed public verified feed.
+- Run evidence: https://github.com/kingsmenportal-ctrl/kingsmen-platform/actions/runs/39973477430
+
 ## Explicit verification limits
 
 No authorised candidate identity link currently exists in staging, so the candidate-owned tracker/checklist mutation journey could not be exercised with a real authorised test candidate without provisioning or using an explicitly authorised test account. No fake candidate, reviewer, or document was inserted. The candidate UI/API runtime journey, Netlify published commit match, and production deployment remain unverified. The public view and Edge Function deployment are verified; full E2E is not claimed.
