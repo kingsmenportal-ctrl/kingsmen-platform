@@ -7,7 +7,7 @@ This snapshot records directly queried staging facts, not a claim of production 
 | Gate | Live observation | Disposition |
 |---|---|---|
 | Official source catalog | 14 new official South African source-authority anchors are present in staging. Each requires separate programme-level verification. | Source discovery expanded; not proof of open opportunities. |
-| Verified opportunity availability | 0 route-programme rows currently satisfy the query for VERIFIED + OPEN/FUTURE + A/B confidence + updated in the last 90 days. | Do not display any as currently open from this result. |
+| Verified opportunity availability | The schema-correct staging query on 2026-10-23 returned 6 VERIFIED + OPEN + A/B route-programme records with official HTTPS sources, verified/public-safe providers, freshness under 90 days, and closing dates not earlier than the South African local date. | Six current Department of Employment and Labour listings are eligible in the Route Universe; recheck dates before display. This does not mean all 14 authority anchors have open programmes, and the separate legacy candidate_opportunities table remains unpopulated for its stricter published-record predicate. |
 | Private document bucket | `kingsmen-candidate-documents` exists, is private, has a 10 MiB limit and allows PDF/JPEG/PNG. | Configuration verified; real upload/signature/expiry/cross-candidate HTTP journey still pending. |
 | Candidate identity workflow | Staging counts returned 0 identity-review requests and 0 active reviewers. | Authenticated two-account lifecycle and approval/rejection/correction cannot be claimed verified. |
 | Private document lifecycle | Staging count returned 0 private document records. | Real signed access, expiry, audit-on-read and cross-candidate denial remain unproven by live candidate data. |
@@ -462,3 +462,24 @@ This corrects only the six current staging rows; it does not mean all 14 source 
 - The corrected staging eligibility query returned **6 currently displayable Employment and Labour vacancies** with metadata closing date 2026-10-30. The source page was checked against the official Department vacancy listing on 2026-10-23. This is six verified current listings, not proof that every national institution has an open opportunity.
 - Runtime-safe SQL probe confirmed the new policy is installed; the current eligible-row count is 6. Automated CI on commit `f4304e94d77c95a394871950f1eac3cd0e2272f3` passed Kingsmen One smoke tests (39969610084), Release Evidence (39969610120) and Source Guard (39969610194).
 - No provider outcome is inferred from a listing. The candidate-application endpoint still requires candidate identity and provider-grade evidence for provider-confirmed status progression.
+
+
+## Live staging recheck — 2026-10-23 (connector-observed)
+
+A fresh read-only query was executed against Supabase project `euhubhhnumtibbyufghm` after the deployment and route-expiry updates. Counts are live observations, not synthetic fixtures:
+
+| Signal | Current count | Interpretation |
+|---|---:|---|
+| Eligible Route Universe listings | 6 | Six Employment and Labour vacancies satisfy the current schema-aware eligibility predicate. Their advertised closing date is 2026-10-30; refresh after that date and do not infer candidate eligibility. |
+| Identity review requests / verified identity links | 0 / 0 | No authenticated candidate identity lifecycle was created or verified. |
+| Active platform reviewers | 0 | Reviewer approval cannot be exercised until an authorised reviewer account is registered. |
+| Private documents / document reviews / application evidence | 0 / 0 / 0 | No real upload, signed read, expiry, audit-on-read, reviewer decision or candidate A/B isolation was exercised. |
+| Communications / delivery attempts / consent records | 0 / 0 / 0 | Provider delivery, consent enforcement, bounce/opt-out and retry/dead-letter runtime remain unproven. No live messages were sent. |
+| Notification outbox / integration outbox | 0 / 0 | No dispatch/replay/recovery drill was run. |
+| Worker heartbeats / incidents | 0 / 0 | Worker crash recovery and incident escalation remain unproven. |
+
+The live Supabase security advisor still reports three INFO findings for RLS-enabled backend-only reviewer tables without client policies, plus one WARN for disabled leaked-password protection. The backend-only tables intentionally remain inaccessible to anon/authenticated clients; do not add client policies to silence these INFOs. The connected Supabase actions do not expose a supported Auth leaked-password-protection setting mutation, so that warning remains an owner-console configuration gate.
+
+The currently deployed candidate functions observed in Supabase are ACTIVE with JWT verification enabled: `candidate-identity-review-request` v3, `candidate-application-preparation` v10, and `candidate-private-documents` v13. This is deployment evidence for those functions only, not candidate-journey E2E. Netlify project `kingsmen-portal-staging` still returns an empty published `currentDeploy` payload; no published commit SHA can be asserted. GitHub branch-protection inspection previously returned HTTP 403 to the connected integration; the protection state is unknown and must not be bypassed.
+
+No synthetic candidate, reviewer grant, private document, consent, communication, or incident was inserted during this recheck. PayFast remains deferred. Public release remains blocked until the missing authenticated/provider/operational E2E evidence and published-commit match are obtained.
