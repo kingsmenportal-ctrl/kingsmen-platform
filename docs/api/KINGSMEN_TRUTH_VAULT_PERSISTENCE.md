@@ -54,6 +54,12 @@ applications.id::text
 applications.metadata->>'applicationRef'
 ```
 
+## Production startup guard
+
+When `NODE_ENV=production`, the API defaults to PostgreSQL mode and refuses to start unless `KINGSMEN_DATABASE_URL` or `DATABASE_URL` is configured. Explicit `memory` and `memory_development_only` modes are permitted only outside production. This is a fail-closed safety gate: a production process cannot report healthy while silently losing commands, idempotency keys, workflow results, or read models on restart.
+
+The release workflow tests both production failure paths: missing database configuration and an explicitly requested memory-only mode. This source test does not replace a real staging PostgreSQL persistence and restart test.
+
 ## Environment
 
 Minimum runtime environment for PostgreSQL mode:
