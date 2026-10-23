@@ -1,0 +1,43 @@
+name: N13 N08 isolated staging health drill
+
+on:
+  workflow_dispatch:
+    inputs:
+      confirm_staging_only:
+        description: "Type STAGING_ONLY to permit synthetic records in the isolated staging project"
+        required: true
+        type: string
+
+permissions:
+  contents: read
+
+jobs:
+  persisted-health-drill:
+    if: ${{ inputs.confirm_staging_only == 'STAGING_ONLY' }}
+    runs-on: ubuntu-latest
+    environment: staging
+    timeout-minutes: 10
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - name: Require staging credentials
+        shell: bash
+        env:
+          SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
+          SUPABASE_SERVICE_ROLE_KEY: ${{ secrets.SUPABASE_SERVICE_ROLE_KEY }}
+        run: |
+          test -n "$SUPABASE_URL" || { echo "::error::Missing staging SUPABASE_URL secret"; exit 2; }
+          test -n "$SUPABASE_SERVICE_ROLE_KEY" || { echo "::error::Missing staging SUPABASE_SERVICE_ROLE_KEY secret"; exit 2; }
+          case "$SUPABASE_URL" in
+            *euhubhhnumtibbyufghm*) echo "Target project identifier confirmed." ;;
+            *) echo "::error::Refusing to run: URL does not identify the approved staging project."; exit 2 ;;
+          esac
+      - name: Run database-backed N13/N08 transitions
+        env:
+          SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
+          SUPABASE_SERVICE_ROLE_KEY: ${{ secrets.SUPABASE_SERVICE_ROLE_KEY }}
+        run: node scripts/staging/test-n13-n08-persisted-health.mjs
