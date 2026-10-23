@@ -2,11 +2,11 @@
   "schema": "kingsmen.n11-evidence-review-guard-proof.v1",
   "capturedAt": "2026-10-23T15:45:00Z",
   "scope": "N11 AI decision input validation, evidence-required persistence, and non-official recommendation human-review boundary",
-  "sourceCommit": "f77bf455aabc9237a1bdc75946b7da1809dda97b",
+  "sourceCommit": "c2fb3b450210fcec0274d1a0a16404745a8b5d4f",
   "results": {
     "apiTypeScriptBuild": "PASS",
     "aiDecisionRegressionSuite": "PASS",
-    "checksInRegressionSuite": 15,
+    "checksInRegressionSuite": 21,
     "githubSourceGuard": "PASS",
     "githubSourceGuardRun": "https://github.com/kingsmenportal-ctrl/kingsmen-platform/actions/runs/39978714093",
     "githubSmokeTests": "PASS",
