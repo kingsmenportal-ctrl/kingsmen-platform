@@ -333,3 +333,12 @@ Migration `20261023220000_cross_module_application_outcome_truth_guards.sql` is 
 This reduces false-confirmation risk but does not replace the two-candidate isolation tests, reviewer-authorised evidence verification, provider staging delivery, document binary E2E, full PostgreSQL restart/recovery proof, or published Netlify commit verification.
 
 - **Database negative-path proof (2026-10-23):** staging exercised the new guards with isolated synthetic candidate/opportunity/application fixtures. Attempting to advance an application to `SUBMITTED_CONFIRMED` without verified submission evidence was rejected by the database guard; attempting to insert an outcome without linked evidence was rejected. All synthetic fixtures were removed; a follow-up query confirmed zero test fixtures remained. This is a negative-path database proof, not a complete authenticated candidate journey.
+
+
+## Follow-up security correction — 2026-10-23
+
+The first application/outcome truth-guard migration exposed its SECURITY DEFINER trigger functions to direct client RPC by default. A follow-up migration, `20261023153000_revoke_client_execute_application_outcome_guard_functions.sql`, has now been applied to staging and committed alongside database mirror `db/migrations/0087_revoke_client_execute_application_outcome_guard_functions.sql`.
+
+Live privilege query confirms both trigger functions are no longer executable by `anon` or `authenticated`; `service_role` retains execute permission. PostgreSQL triggers still invoke the functions as required. Supabase security advisor no longer reports the two new SECURITY DEFINER function warnings. The remaining findings are three INFO notices for intentionally backend-only RLS tables with no client policies and the pre-existing leaked-password-protection WARN.
+
+A regression smoke test asserts that each function has explicit revocations for PUBLIC, anon and authenticated. This latest test change still needs its exact-head GitHub Actions run to complete before it can be called CI-verified.
