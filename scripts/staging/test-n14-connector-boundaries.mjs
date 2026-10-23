@@ -35,6 +35,8 @@ const validEnvelope = {
 check(() => api.assertThinWorkerResult(validEnvelope));
 rejects(() => api.assertThinWorkerResult({ ...validEnvelope, workerNodeCount: 7 }), /WORKER_STANDARD_8_NODE_CONTRACT_REQUIRED/);
 rejects(() => api.assertThinWorkerResult({ ...validEnvelope, airtableWriteCount: 2 }), /WORKER_AIRTABLE_WRITE_LIMIT_EXCEEDED/);
+rejects(() => api.assertThinWorkerResult({ ...validEnvelope, airtableWriteCount: -1 }), /WORKER_AIRTABLE_WRITE_LIMIT_EXCEEDED/);
+rejects(() => api.assertThinWorkerResult({ ...validEnvelope, airtableWriteCount: 0.5 }), /WORKER_AIRTABLE_WRITE_LIMIT_EXCEEDED/);
 rejects(() => api.assertThinWorkerResult({ ...validEnvelope, backendResultPostCount: 0 }), /WORKER_MUST_POST_EXACTLY_ONE_BACKEND_RESULT/);
 rejects(() => api.assertThinWorkerResult({ ...validEnvelope, backendResultPostCount: 2 }), /WORKER_MUST_POST_EXACTLY_ONE_BACKEND_RESULT/);
 rejects(() => api.assertThinWorkerResult({ ...validEnvelope, evidenceRefs: [] }), /WORKER_RESULT_EVIDENCE_REQUIRED/);
@@ -43,6 +45,8 @@ check(() => api.assertAirtableCannotOverrideTruth("POSTGRES_TO_AIRTABLE_MIRROR")
 rejects(() => api.assertAirtableCannotOverrideTruth("AIRTABLE_TO_POSTGRES_REVIEW_ONLY"), /AIRTABLE_TO_POSTGRES_REQUIRES_OPERATOR_REVIEW/);
 check(() => assert.equal(api.buildPlaywrightProbeResult({ blockReason: "CAPTCHA", evidenceRefs: ["test:probe"] }).probeStatus, "MAP_REQUIRED"));
 check(() => assert.equal(api.buildPlaywrightProbeResult({ blockReason: "OTP", evidenceRefs: ["test:probe"] }).mapRequired, true));
+check(() => assert.equal(api.buildPlaywrightProbeResult({ blockReason: "UNKNOWN", evidenceRefs: ["test:probe"] }).probeStatus, "MAP_REQUIRED"));
+check(() => assert.equal(api.buildPlaywrightProbeResult({ blockReason: "UNKNOWN", evidenceRefs: ["test:probe"] }).mapRequired, true));
 check(() => assert.equal(api.buildPlaywrightProbeResult({ evidenceRefs: ["test:probe"] }).probeStatus, "SUCCESS"));
 rejects(() => api.buildPlaywrightProbeResult({ blockReason: "CAPTCHA", evidenceRefs: [] }), /PLAYWRIGHT_PROBE_EVIDENCE_REQUIRED/);
 
