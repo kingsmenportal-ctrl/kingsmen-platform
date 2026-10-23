@@ -438,7 +438,7 @@ test("verified private documents link only to their candidate-owned application 
 
 
 test("public and application routes fail closed for expired or undated opportunities", async () => {
-  const policy = await readFile(resolve(root, "../..", "db/migrations/0089_route_availability_expiry_guards.sql"), "utf8");
+  const policy = await readFile(resolve(root, "../..", "db/migrations/0090_route_availability_expiry_guards.sql"), "utf8");
   const edge = await readFile(resolve(root, "../..", "supabase/functions/candidate-application-preparation/index.ts"), "utf8");
   assert.match(policy, /availability_status = 'OPEN'[\s\S]*?metadata->>'closing_date'[\s\S]*?current_date/);
   assert.match(policy, /availability_status = 'FUTURE'[\s\S]*?metadata->>'opening_date'[\s\S]*?current_date/);
