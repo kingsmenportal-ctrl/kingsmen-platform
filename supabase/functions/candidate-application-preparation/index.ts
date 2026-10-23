@@ -68,7 +68,52 @@ Deno.serve(async(req:Request)=>{
   if(oppError||!opportunity){console.error("saved opportunity sync failed",oppError?.code??"unknown");return reply(503,{error:"Could not connect the saved opportunity to the candidate workspace."},origin);}
   const {data:existing,error:existingError}=await admin.from("candidate_application_tracker").select("id,candidate_id,saved_opportunity_id,status,candidate_note,evidence_reference,created_at,updated_at").eq("candidate_id",candidateId).eq("saved_opportunity_id",opportunity.id).maybeSingle();
   if(existingError){console.error("tracker duplicate lookup failed",existingError.code??"unknown");return reply(503,{error:"Could not check the application tracker."},origin);}
-  const defaults=[{item_type:"TASK",title:"Review the official opportunity requirements"},{item_type:"DOCUMENT",title:"Prepare the documents requested by the provider"},{item_type:"TASK",title:"Check eligibility and closing date"},{item_type:"TASK",title:"Review the application before any submission"}];
+  const defaultsByPathway: Record<string,Array<{item_type:"TASK"|"DOCUMENT";title:string}>> = {
+   higher_education:[
+    {item_type:"DOCUMENT",title:"Prepare identity document; confirm certification rules with the institution"},
+    {item_type:"DOCUMENT",title:"Prepare latest school/tertiary results and qualification records requested by the institution"},
+    {item_type:"TASK",title:"Check programme-specific admission requirements and subject/point thresholds"},
+    {item_type:"TASK",title:"Confirm application fee, closing date and required submission channel"},
+    {item_type:"TASK",title:"Check funding options separately; do not assume bursary or NSFAS approval"}
+   ],
+   tvet:[
+    {item_type:"DOCUMENT",title:"Prepare identity document and proof of residence if the college requests it"},
+    {item_type:"DOCUMENT",title:"Prepare latest school results, certificates or prior qualification records requested"},
+    {item_type:"TASK",title:"Confirm NC(V), NATED/Report 191 or occupational programme entry requirements"},
+    {item_type:"TASK",title:"Confirm campus, intake, fees and the official closing date"},
+    {item_type:"TASK",title:"Review the college's application form and required supporting evidence"}
+   ],
+   seta_learnership:[
+    {item_type:"DOCUMENT",title:"Prepare an up-to-date CV tailored to the learnership or skills programme"},
+    {item_type:"DOCUMENT",title:"Prepare identity and qualification/results records requested by the SETA or host"},
+    {item_type:"TASK",title:"Check age, qualification, employment and other published eligibility conditions"},
+    {item_type:"TASK",title:"Confirm whether the opportunity is a learnership, internship or skills programme"},
+    {item_type:"TASK",title:"Verify the host, stipend terms, closing date and official application channel"}
+   ],
+   internship:[
+    {item_type:"DOCUMENT",title:"Prepare a role-specific CV and a concise motivation letter if requested"},
+    {item_type:"DOCUMENT",title:"Prepare academic records and proof of study/completion requested by the host"},
+    {item_type:"TASK",title:"Check study-year, qualification, experience and work-authorisation requirements"},
+    {item_type:"TASK",title:"Confirm internship duration, location, stipend and closing date"},
+    {item_type:"TASK",title:"Review all answers and attachments before applying through the official channel"}
+   ],
+   apprenticeship:[
+    {item_type:"DOCUMENT",title:"Prepare CV, identity document and school/technical qualification records requested"},
+    {item_type:"DOCUMENT",title:"Prepare trade, aptitude or prior-learning evidence only where the host requests it"},
+    {item_type:"TASK",title:"Confirm the trade, occupational qualification and training-provider details"},
+    {item_type:"TASK",title:"Check entry criteria, workplace location, duration and stipend/contract terms"},
+    {item_type:"TASK",title:"Verify the employer or training provider and official application channel"}
+   ],
+   employment:[
+    {item_type:"DOCUMENT",title:"Prepare a vacancy-targeted CV and motivation letter if requested"},
+    {item_type:"DOCUMENT",title:"Prepare identity, qualification and work-authorisation evidence requested by the employer"},
+    {item_type:"TASK",title:"Check essential requirements, experience, location, shifts and closing date"},
+    {item_type:"TASK",title:"Prepare references or portfolio evidence only where the vacancy asks for them"},
+    {item_type:"TASK",title:"Review the vacancy and application details before submitting to the employer"}
+   ]
+  };
+  const defaults=defaultsByPathway[pathway];
+  if(!defaults)return reply(409,{error:"A pathway-specific preparation checklist is not configured; no generic checklist was created."},origin);
   if(existing){
    const {data:existingItems,error:existingItemsError}=await admin.from("candidate_application_preparation_items").select("id").eq("tracker_id",existing.id).eq("candidate_id",candidateId).limit(1);
    if(existingItemsError){console.error("existing checklist lookup failed",existingItemsError.code??"unknown");return reply(503,{error:"Could not check the existing preparation checklist."},origin);}
