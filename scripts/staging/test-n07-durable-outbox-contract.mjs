@@ -25,7 +25,7 @@ for (const [label, pattern] of [
 }
 
 assert.match(route, /Authenticated operator session required/, "route must require caller JWT");
-assert.match(route, /functions\\/v1\\/n07-airtable-enqueue/, "route must proxy to the secured Edge Function");
+assert.match(route, /functions\/v1\/n07-airtable-enqueue/, "route must proxy to the secured Edge Function");
 assert.doesNotMatch(route, /SUPABASE_SERVICE_ROLE_KEY/, "service-role key must not be used by the web route");
 assert.match(route, /queued: false/, "route must report queued=false until a database write is verified");
 assert.match(route, /status: 503/, "route must return 503 while the adapter is unavailable");
