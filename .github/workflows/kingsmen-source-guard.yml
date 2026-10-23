@@ -100,6 +100,9 @@ jobs:
       - name: Founder incident record safety contract
         run: npm run founder:incident:validate
 
+      - name: Founder readiness evidence report
+        run: npm run founder:readiness:validate
+
       - name: Legal/privacy source proof
         run: npm run legal:prove
 
