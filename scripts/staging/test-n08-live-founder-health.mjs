@@ -21,6 +21,8 @@ assert.match(edge, /ALLOWED_FOUNDER_ROLES = \["PLATFORM_ADMIN"\]/, "health view 
 assert.match(edge, /select\("id", \{ count: "exact", head: true \}\)/, "health metrics must use aggregate counts");
 assert.match(edge, /candidateRecordsReturned: false/, "health output must declare no candidate records returned");
 assert.match(edge, /airtableConnectionCanBlockCandidateFlows: false/, "Airtable must remain optional");
+assert.match(edge, /activeTargets.count === 0/, "missing target setup must be reported as degraded");
+assert.match(edge, /activeReviewers.count === 0/, "missing reviewer grants must be reported as degraded");
 assert.match(edge, /productionReady: false/, "health view must not claim production readiness");
 assert.doesNotMatch(edge, /select\("\*"/, "health function must not select all columns or PII");
 
