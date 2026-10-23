@@ -70,6 +70,28 @@ Require-Contains "apps\web\src\opportunity\SourceReviewPanel.tsx" "Review before
 Require-Contains "apps\web\src\opportunity\OpportunityAlertsPanel.tsx" "Openings, deadlines, stale sources, risk" "Alerts UI missing core alert types."
 Require-Contains "reports\n15\N15_OPPORTUNITY_ENGINE_SOURCE_INTELLIGENCE_REPORT.md" "No fake deadlines" "Report must state no fake deadlines."
 
+Require-Contains "db\migrations\0092_n15_current_verified_opportunity_feed.sql" "current_verified_route_opportunities" "Current verified opportunity feed migration is missing."
+Require-Contains "db\migrations\0092_n15_current_verified_opportunity_feed.sql" "availability_status = 'OPEN'" "Feed must exclude non-open programmes."
+Require-Contains "db\migrations\0092_n15_current_verified_opportunity_feed.sql" "interval '90 days'" "Feed must enforce source freshness."
+Require-Contains "db\migrations\0092_n15_current_verified_opportunity_feed.sql" "v.public_safe = true" "Feed must require public-safe provider."
+Require-Contains "db\migrations\0092_n15_current_verified_opportunity_feed.sql" "Africa/Johannesburg" "Feed must evaluate deadlines in South African time."
+Require-Contains "db\migrations\0092_n15_current_verified_opportunity_feed.sql" "revoke all on public.current_verified_route_opportunities from public, anon, authenticated" "Feed must not be directly readable by public client roles."
+Require-Contains "reports\n15\N15_CURRENT_VERIFIED_OPPORTUNITY_FEED_2026-10-23.md" "anon SELECT=false" "Report must capture verified client-role denial."
+
+Require-Contains "db\migrations\0093_n15_public_safe_opportunity_feed.sql" "current_verified_route_opportunities" "Public-safe verified opportunity feed migration is missing."
+Require-Contains "db\migrations\0093_n15_public_safe_opportunity_feed.sql" "security_invoker = true" "Public opportunity view must preserve underlying RLS."
+Require-Contains "db\migrations\0093_n15_public_safe_opportunity_feed.sql" "grant select on public.current_verified_route_opportunities to anon, authenticated, service_role" "Public-safe view grants are missing."
+Require-Contains "apps\kingsmen-one\app.js" 'from("current_verified_route_opportunities")' "Candidate UI must query the verified opportunity feed."
+Require-Contains "apps\kingsmen-one\app.js" "programme_id" "Candidate UI must use the feed's programme identifier."
+Require-Contains "supabase\functions\candidate-application-preparation\index.ts" "defaultsByPathway" "Application preparation must use pathway-specific checklists."
+Require-Contains "supabase\functions\candidate-application-preparation\index.ts" "higher_education" "Higher education checklist is missing."
+Require-Contains "supabase\functions\candidate-application-preparation\index.ts" "tvet" "TVET checklist is missing."
+Require-Contains "supabase\functions\candidate-application-preparation\index.ts" "seta_learnership" "SETA/learnership checklist is missing."
+Require-Contains "supabase\functions\candidate-application-preparation\index.ts" "internship" "Internship checklist is missing."
+Require-Contains "supabase\functions\candidate-application-preparation\index.ts" "apprenticeship" "Apprenticeship checklist is missing."
+Require-Contains "supabase\functions\candidate-application-preparation\index.ts" "employment" "Employment checklist is missing."
+Require-Contains "reports\n15\N06_N15_CANDIDATE_OPPORTUNITY_PATHWAY_PREPARATION_2026-10-23.md" "ACTIVE v14" "Report must record the deployed function version."
+
 $Result = [ordered]@{
   phase = "N15"
   name = "Opportunity Engine / External Source Intelligence"

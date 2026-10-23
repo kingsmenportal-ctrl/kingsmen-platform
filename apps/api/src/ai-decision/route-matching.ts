@@ -1,4 +1,5 @@
 import type { CandidateDecisionSignals, RouteMatchCandidate, RouteOptionSignal } from "./ai-decision-types";
+import { assertDecisionInputs } from "./decision-input-guard";
 
 function clampScore(value: number): number {
   if (!Number.isFinite(value)) return 0;
@@ -30,6 +31,7 @@ export function calculateRouteMatch(input: {
   candidate: CandidateDecisionSignals;
   route: RouteOptionSignal;
 }): RouteMatchCandidate {
+  assertDecisionInputs(input.candidate, input.route);
   const academic = (input.candidate.academicFit + input.route.academicFit) / 2;
   const documents = (input.candidate.documentReadiness + input.route.documentFit) / 2;
   const funding = input.candidate.fundingNeed > 0 ? input.route.fundingFit : 50;

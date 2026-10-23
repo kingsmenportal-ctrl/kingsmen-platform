@@ -85,21 +85,28 @@ Then run the launch audit:
 npm run kingsmen:launch:audit
 ```
 
-## Supabase security-advisor triage (staging snapshot, 2026-10-19)
+## Supabase security review — live staging snapshot (2026-10-22)
 
-The staging security advisor reported three RLS-enabled tables without policies:
-`candidate_identity_review_audit`, `candidate_identity_review_requests`, and `candidate_private_document_reviews`. Read-only catalog checks showed that `anon` and `authenticated` do not have SELECT privileges on these tables, while `service_role` does. This is a service-only design, not a reason to add broad candidate-facing policies. Recheck table privileges and all grants whenever migrations change.
+The following read-only checks were executed against the connected staging database on 2026-10-22; they are database observations, not source-only assertions:
 
-The advisor also flagged `public.current_verified_candidate_id()` because authenticated users can execute a SECURITY DEFINER function. Staging inspection confirmed an empty `search_path` and a function body scoped to `auth.uid()`, `link_status = 'VERIFIED'`, and non-null `verified_at`. Existing candidate-owned RLS policies call this helper. Do **not** revoke authenticated EXECUTE without first redesigning those policies and proving candidate-owned reads still work; the warning must remain tracked and reviewed rather than being hidden. Live candidate isolation is still unverified.
+- Public base tables inspected: **225**.
+- Tables with RLS enabled: **225**; tables with RLS disabled: **0**.
+- RLS-enabled tables with no policies: **3** — `candidate_identity_review_audit`, `candidate_identity_review_requests`, and `candidate_private_document_reviews`.
+- Forced RLS is enabled on **1** public table.
+- For each of those three backend-only review/audit tables, `anon` and `authenticated` have no SELECT privilege; `service_role` retains SELECT. Do not add broad client policies merely to silence an informational advisor finding.
+- The verified-candidate helper resides in the non-exposed `private` schema; the public-schema copy is absent. It is SECURITY DEFINER with an empty `search_path`; `anon` cannot execute it and `authenticated` can execute it for existing RLS policy evaluation.
+- Privilege checks confirm the legacy identity-review submission RPC and the service-only submission/decision RPCs cannot be executed by `anon` or `authenticated`; service-role execution is retained where required.
+- Supabase Security Advisor reports three INFO notices for the intentionally backend-only tables and a separate leaked-password-protection WARN. The current Free plan does not expose the setting required to enable leaked-password protection; this is a platform-plan constraint, not a reason to weaken database policy.
+- Current staging readiness counts are zero active platform reviewers, zero identity-review requests, zero verified identity links, and zero private documents. No reviewer or candidate fixtures were fabricated.
 
 ## Remaining production constraint
 
-This proof is source-level. It does not replace staging execution.
+A live staging proof remains required before public launch. This staging proof must be captured from authorised staging sessions; source validators alone do not satisfy it. The checks above prove RLS is enabled across the inspected public tables and validate selected grants/functions. They do **not** prove policy correctness for every table, candidate A/B isolation through authenticated HTTP, private object isolation, signed URL expiry, or the reviewer decision lifecycle. A real authenticated candidate and reviewer test remains a release gate. No reviewer was provisioned, no candidate data was written, and no production migration was applied during this check.
 
-Before public users, run live SQL isolation tests against staging PostgreSQL/Supabase using two test candidates, an operator context, a founder context, an anonymous context, and a backend service context. Store the report under:
+The full isolation test must use two authorised candidate sessions, an authorised reviewer session, anonymous access, and backend service context; preserve only redacted evidence. Store the reviewed result under:
 
 ```txt
 reports/security/rls-security-staging-proof-latest.json
 ```
 
-Public launch remains blocked until that staging proof exists and passes.
+Public launch remains blocked until those runtime isolation checks pass and the founder reviews the release evidence.

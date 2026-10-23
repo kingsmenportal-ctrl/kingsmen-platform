@@ -58,6 +58,12 @@ jobs:
       - name: API Truth Vault persistence validator
         run: npm run api:validate:truth-vault
 
+      - name: Install N11 API build dependencies
+        run: npm install --prefix apps/api --no-package-lock
+
+      - name: N11 AI decision input and boundary regression suite
+        run: npm run ai:n11:test
+
       - name: Safe web/backend boundary validator
         run: npm run web:validate:backend-boundary
 
@@ -96,6 +102,12 @@ jobs:
 
       - name: Observability validator
         run: npm run observability:validate
+
+      - name: Founder incident record safety contract
+        run: npm run founder:incident:validate
+
+      - name: Founder readiness evidence report
+        run: npm run founder:readiness:validate
 
       - name: Legal/privacy source proof
         run: npm run legal:prove

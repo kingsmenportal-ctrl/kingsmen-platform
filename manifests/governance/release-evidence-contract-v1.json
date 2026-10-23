@@ -1,0 +1,48 @@
+{
+  "schema": "kingsmen.release-governance-contract.v1",
+  "module": "Repository-wide Governance / Evidence Integrity",
+  "expectedCoreModules": [
+    "N00",
+    "N01",
+    "N02",
+    "N03",
+    "N04",
+    "N05",
+    "N06",
+    "N07",
+    "N08",
+    "N09",
+    "N10",
+    "N11",
+    "N12",
+    "N13",
+    "N14",
+    "N15",
+    "N16",
+    "N17",
+    "N18",
+    "N19",
+    "N20"
+  ],
+  "releaseStates": [
+    "SOURCE_ONLY",
+    "CI_VERIFIED",
+    "STAGING_VERIFIED",
+    "PRODUCTION_DEPLOYED",
+    "END_TO_END_VERIFIED",
+    "BLOCKED_MISSING_EVIDENCE"
+  ],
+  "rules": [
+    "Source files and validators are not runtime evidence.",
+    "A missing evidence file must remain MISSING, never inferred PASS.",
+    "Production deployment requires a verifiable deploy ID and commit SHA.",
+    "Authenticated end-to-end status requires runtime evidence for each required journey.",
+    "Branch protection is not considered verified when the credentials cannot read its rules.",
+    "Candidate-reported submission is not provider-confirmed receipt or outcome.",
+    "The initial active-candidate cap is 500 and does not reduce route or institution scope.",
+    "All six candidate pathways remain available in the platform scope.",
+    "PayFast remains deferred until account and sandbox evidence are available."
+  ],
+  "runtimeProofRequired": true,
+  "failClosedOnMissingEvidence": true
+}

@@ -1,0 +1,25 @@
+import assert from "node:assert/strict";
+import { readFileSync } from "node:fs";
+import { fileURLToPath } from "node:url";
+import { dirname, resolve } from "node:path";
+
+const root = resolve(dirname(fileURLToPath(import.meta.url)), "../..");
+const schema = JSON.parse(readFileSync(resolve(root, "manifests/ops/founder-incident-record-v1.json"), "utf8"));
+const template = JSON.parse(readFileSync(resolve(root, "manifests/ops/founder-incident-record-template.json"), "utf8"));
+const boundary = readFileSync(resolve(root, "apps/api/src/ops/observability-incident-proof-boundary.ts"), "utf8");
+const failures = [];
+const check = (ok, code) => { if (!ok) failures.push(code); };
+check(schema.schema === "kingsmen.founder-incident-record.v1", "schema-version");
+check(schema.templateOnly === true && schema.productionReady === false, "template-must-not-claim-production");
+check(schema.requiredFields.includes("founderEscalation") && schema.requiredFields.includes("evidenceReferences"), "escalation-and-evidence-required");
+check(["SEV1", "SEV2", "SEV3"].every((v) => schema.severityValues.includes(v)), "severity-taxonomy");
+check(["OPEN", "CONTAINED", "INVESTIGATING", "MITIGATED", "CLOSED"].every((v) => schema.statusValues.includes(v)), "incident-status-taxonomy");
+check(Object.values(schema.redactionRules).every((v) => v === false), "all-sensitive-content-prohibited");
+check(schema.closeRequirements.length >= 5 && schema.runtimeEvidenceRequired === true, "closure-evidence-required");
+check(template.schema === schema.schema && template.status === "OPEN", "template-schema-and-open-default");
+check(template.incidentId === "" && template.evidenceReferences.length === 0 && template.closedAt === null, "template-must-not-fabricate-incident");
+check(template.founderEscalation.required === true && template.founderEscalation.notifiedAt === "", "founder-escalation-explicit");
+check(boundary.includes("piiRedactionRequired") && boundary.includes("founderEscalationRequired"), "observability-boundary-aligned");
+const report = { schema: "kingsmen.founder-incident-record-validation.v1", passed: failures.length === 0, failures, checkedAt: new Date().toISOString(), runtimeIncidentCreated: false, productionReady: false };
+console.log(JSON.stringify(report, null, 2));
+if (failures.length) process.exitCode = 1;

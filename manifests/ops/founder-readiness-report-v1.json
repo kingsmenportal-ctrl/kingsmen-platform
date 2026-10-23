@@ -1,0 +1,82 @@
+{
+  "schema": "kingsmen.founder-readiness-report.v1",
+  "module": "Founder Operational Readiness",
+  "generatedReportIsEvidence": false,
+  "productionReady": false,
+  "publicLaunchAllowed": false,
+  "statusValues": [
+    "VERIFIED",
+    "MISSING",
+    "BLOCKED",
+    "STALE",
+    "NOT_APPLICABLE"
+  ],
+  "readinessDomains": [
+    {
+      "key": "repository_governance",
+      "label": "Repository governance and required checks",
+      "evidencePath": "reports/architecture/kingsmen-repository-operating-inventory-latest.json",
+      "status": "MISSING"
+    },
+    {
+      "key": "branch_protection",
+      "label": "Protected main branch and required release checks",
+      "evidencePath": "reports/repo/main-branch-protection-apply-latest.json",
+      "status": "BLOCKED"
+    },
+    {
+      "key": "staging_authenticated_e2e",
+      "label": "Two-candidate identity, ownership, document and reviewer journey",
+      "evidencePath": "reports/staging/authenticated-e2e-latest.json",
+      "status": "BLOCKED"
+    },
+    {
+      "key": "candidate_opportunity_feed",
+      "label": "Verified public-safe opportunity feed",
+      "evidencePath": "reports/n15/current-verified-opportunity-feed-staging-latest.json",
+      "status": "VERIFIED"
+    },
+    {
+      "key": "private_document_lifecycle",
+      "label": "Private upload, signed access, expiry and cross-candidate denial",
+      "evidencePath": "reports/staging/private-document-e2e-latest.json",
+      "status": "MISSING"
+    },
+    {
+      "key": "communications_delivery",
+      "label": "Consent-aware provider delivery, retries and dead-letter recovery",
+      "evidencePath": "reports/staging/communications-provider-staging-latest.json",
+      "status": "MISSING"
+    },
+    {
+      "key": "observability_and_founder_escalation",
+      "label": "Live monitoring, alerting, redaction and founder escalation",
+      "evidencePath": "reports/staging/observability-incident-staging-latest.json",
+      "status": "MISSING"
+    },
+    {
+      "key": "finance_payment_integrity",
+      "label": "Canonical catalogue and verified payment evidence",
+      "evidencePath": "reports/staging/payfast-provider-sandbox-staging-latest.json",
+      "status": "BLOCKED"
+    },
+    {
+      "key": "published_frontend",
+      "label": "Netlify deploy ID, commit SHA and public HTTP verification",
+      "evidencePath": "reports/deploy/netlify-published-commit-latest.json",
+      "status": "BLOCKED"
+    },
+    {
+      "key": "security_configuration",
+      "label": "Supabase Auth and RLS security configuration evidence",
+      "evidencePath": "reports/security/auth-security-configuration-latest.json",
+      "status": "BLOCKED"
+    }
+  ],
+  "summaryRules": {
+    "verifiedMeans": "A current evidence record exists and passed its own validation.",
+    "missingMeans": "No verifiable evidence record was supplied.",
+    "blockedMeans": "A required external configuration, account, credential or deployment proof is unavailable.",
+    "neverPromoteOnSourceOnly": true
+  }
+}

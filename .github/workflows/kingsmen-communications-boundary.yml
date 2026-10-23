@@ -1,0 +1,36 @@
+name: Kingsmen communications boundary
+on:
+  pull_request:
+    paths:
+      - "apps/api/src/communications/communications-proof-boundary.ts"
+      - "scripts/proof/prove-communications-boundary.mjs"
+      - "scripts/validators/validate-communications-proof.mjs"
+      - ".github/workflows/kingsmen-communications-boundary.yml"
+  push:
+    branches:
+      - "feat/kingsmen-one-foundation-2026-10-19"
+    paths:
+      - "apps/api/src/communications/communications-proof-boundary.ts"
+      - "scripts/proof/prove-communications-boundary.mjs"
+      - "scripts/validators/validate-communications-proof.mjs"
+      - ".github/workflows/kingsmen-communications-boundary.yml"
+permissions:
+  contents: read
+jobs:
+  communications-boundary:
+    name: Communications boundary proof and regression validation
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+      - name: Set up Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+          cache: npm
+      - name: Install locked dependencies
+        run: npm ci
+      - name: Prove communications source boundary
+        run: npm run communications:prove
+      - name: Validate communications proof
+        run: npm run communications:validate

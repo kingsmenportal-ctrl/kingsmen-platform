@@ -27,6 +27,22 @@ if (registryText) {
     });
   }
 }
+const evidenceFreshnessDays = 90;
+const moduleEvidence = modules.map((module) => {
+  const reportPath = 'reports/' + module.key.toLowerCase() + '/' + module.key + '_VALIDATION_RESULT.json';
+  const fullPath = join(root, reportPath);
+  let report = null; let parseError = null;
+  if (existsSync(fullPath)) { try { report = JSON.parse(readFileSync(fullPath, 'utf8').replace(/^\uFEFF/, '')); } catch (error) { parseError = String(error?.message ?? error); } }
+  const rawTimestamp = report?.checked_at ?? report?.checkedAt ?? report?.validated_at ?? report?.validatedAt ?? report?.generatedAt ?? report?.generated_at ?? null;
+  const timestamp = rawTimestamp && !Number.isNaN(Date.parse(rawTimestamp)) ? new Date(rawTimestamp).toISOString() : null;
+  const ageDays = timestamp ? Math.floor((Date.now() - Date.parse(timestamp)) / 86400000) : null;
+  const reportedPass = report?.passed === true || String(report?.status ?? '').toUpperCase() === 'PASS';
+  const reportedFail = report?.passed === false || ['FAIL','FAILED','BLOCKED'].includes(String(report?.status ?? '').toUpperCase()) || (Array.isArray(report?.failures) && report.failures.length > 0);
+  const evidenceState = !existsSync(fullPath) ? 'MISSING' : parseError ? 'INVALID' : !timestamp ? 'UNDATED' : ageDays < 0 ? 'FUTURE_DATED' : ageDays > evidenceFreshnessDays ? 'STALE' : reportedFail ? 'FAILED' : reportedPass ? 'SOURCE_VALIDATION_PASS_ONLY' : 'INCONCLUSIVE';
+  return { key: module.key, name: module.name, registeredReleaseStatus: module.registeredReleaseStatus, reportPath, reportExists: existsSync(fullPath), reportTimestamp: timestamp, ageDays, freshnessThresholdDays: evidenceFreshnessDays, reportStatus: report?.status ?? (typeof report?.passed === 'boolean' ? (report.passed ? 'PASS' : 'FAIL') : 'UNKNOWN'), failures: Array.isArray(report?.failures) ? report.failures : [], evidenceState, runtimeVerification: 'NOT_PROVEN_BY_MODULE_VALIDATION_REPORT', productionReadiness: 'NOT_PROMOTED_BY_SOURCE_VALIDATION' };
+});
+const moduleEvidenceFindings = moduleEvidence.filter((item) => item.evidenceState !== 'SOURCE_VALIDATION_PASS_ONLY').map((item) => ({ key: item.key, state: item.evidenceState, reportPath: item.reportPath, ageDays: item.ageDays }));
+const moduleEvidenceReady = moduleEvidence.length === 21 && moduleEvidence.every((item) => item.evidenceState === 'SOURCE_VALIDATION_PASS_ONLY');
 const expectedKeys = Array.from({ length: 21 }, (_, i) => `N${String(i).padStart(2, '0')}`);
 const actualKeys = modules.map((m) => m.key);
 for (const key of expectedKeys) if (!actualKeys.includes(key)) failures.push(`module-missing:${key}`);
@@ -43,7 +59,22 @@ const gates = Array.isArray(manifest?.requiredLaunchGates) ? manifest.requiredLa
 if (!gates.length) failures.push('launch-gates-missing');
 const gateEvidence = gates.map((gate) => {
   const paths = Array.isArray(gate.evidencePaths) ? gate.evidencePaths : [];
-  const evidence = paths.map((path) => ({ path, exists: existsSync(join(root, path)) }));
+  const evidence = paths.map((path) => {
+    const full = join(root, path); const exists = existsSync(full); const isReport = path.startsWith('reports/') && path.endsWith('.json');
+    let evidenceState = exists ? 'PRESENT_NOT_VALIDATED' : 'MISSING'; let ageDays = null; let evidenceStatus = null;
+    if (exists && isReport) {
+      try {
+        const raw = JSON.parse(readFileSync(full, 'utf8').replace(/^\uFEFF/, ''));
+        const ts = raw?.checked_at ?? raw?.checkedAt ?? raw?.validated_at ?? raw?.validatedAt ?? raw?.generatedAt ?? raw?.generated_at ?? raw?.capturedAt ?? raw?.captured_at ?? null;
+        const parsed = ts && !Number.isNaN(Date.parse(ts)) ? Date.parse(ts) : null; ageDays = parsed === null ? null : Math.floor((Date.now() - parsed) / 86400000);
+        const passed = raw?.passed === true || String(raw?.status ?? '').toUpperCase() === 'PASS';
+        const failed = raw?.passed === false || ['FAIL','FAILED','BLOCKED'].includes(String(raw?.status ?? '').toUpperCase()) || (Array.isArray(raw?.failures) && raw.failures.length > 0);
+        evidenceStatus = raw?.status ?? (typeof raw?.passed === 'boolean' ? (raw.passed ? 'PASS' : 'FAIL') : 'UNKNOWN');
+        evidenceState = parsed === null ? 'UNDATED' : ageDays < 0 ? 'FUTURE_DATED' : ageDays > evidenceFreshnessDays ? 'STALE' : failed ? 'FAILED' : passed ? 'SOURCE_VALIDATION_PASS_ONLY' : 'INCONCLUSIVE';
+      } catch { evidenceState = 'INVALID'; }
+    }
+    return { path, exists, evidenceState, ageDays, evidenceStatus, isRuntimeProof: false };
+  });
   return {
     key: gate.gateKey,
     title: gate.title,
@@ -179,6 +210,14 @@ const report = {
     publicLaunchStatus: manifest?.publicLaunchStatus ?? 'UNKNOWN'
   },
   modules,
+  moduleEvidenceFreshnessDays: evidenceFreshnessDays,
+  moduleEvidence,
+  moduleEvidenceFindings,
+  moduleEvidenceReady,
+  registeredStatusConflicts: moduleEvidence.filter((item) => ['validated','locked'].includes(item.registeredReleaseStatus) && item.evidenceState !== 'SOURCE_VALIDATION_PASS_ONLY').map((item) => ({ key: item.key, registeredReleaseStatus: item.registeredReleaseStatus, evidenceState: item.evidenceState })),
+  launchGateEvidenceStateCounts: Object.fromEntries([...new Set(gateEvidence.flatMap((g) => g.evidence.map((e) => e.evidenceState)))].map((state) => [state, gateEvidence.reduce((sum, g) => sum + g.evidence.filter((e) => e.evidenceState === state).length, 0)])),
+  releaseEvidenceReadiness: moduleEvidenceReady ? 'SOURCE_VALIDATION_FRESH_BUT_RUNTIME_STILL_UNPROVEN' : 'BLOCKED_BY_MISSING_STALE_OR_INVALID_MODULE_EVIDENCE',
+  evidenceStateCounts: Object.fromEntries([...new Set(moduleEvidence.map((x) => x.evidenceState))].map((state) => [state, moduleEvidence.filter((x) => x.evidenceState === state).length])),
   launchGates: gateEvidence,
   rootValidationCommands: validationScripts,
   integrity: {
@@ -194,6 +233,11 @@ console.log(JSON.stringify({
   status: failures.length ? 'FAILED' : 'PASSED',
   passed: failures.length === 0,
   modules: modules.length,
+  moduleEvidenceStates: Object.fromEntries([...new Set(moduleEvidence.map((x) => x.evidenceState))].map((state) => [state, moduleEvidence.filter((x) => x.evidenceState === state).length])),
+  staleModuleEvidenceCount: moduleEvidence.filter((x) => x.evidenceState === 'STALE').length,
+  missingModuleEvidenceCount: moduleEvidence.filter((x) => x.evidenceState === 'MISSING').length,
+  moduleEvidenceFindingCount: moduleEvidenceFindings.length,
+  moduleEvidenceReady,
   launchGates: gates.length,
   filesystemFileCount: counts.trackedByFilesystemFiles,
   sourceAndDocumentationFiles: counts.sourceAndDocumentationFiles,

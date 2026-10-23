@@ -1,4 +1,5 @@
 import type { CandidateDecisionSignals, EligibilityScreenResult, RouteOptionSignal } from "./ai-decision-types";
+import { assertDecisionInputs } from "./decision-input-guard";
 
 export function screenEligibility(input: {
   candidate: CandidateDecisionSignals;
@@ -6,6 +7,7 @@ export function screenEligibility(input: {
   requiredDocuments?: string[];
   candidateDocuments?: string[];
 }): EligibilityScreenResult {
+  assertDecisionInputs(input.candidate, input.route);
   const requiredDocuments = input.requiredDocuments ?? [];
   const candidateDocuments = new Set((input.candidateDocuments ?? []).map((doc) => doc.toLowerCase()));
   const missingDocuments = requiredDocuments.filter((doc) => !candidateDocuments.has(doc.toLowerCase()));

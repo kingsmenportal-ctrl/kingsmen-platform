@@ -1,0 +1,45 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#102b26">
+  <meta name="description" content="Kingsmen One candidate workspace for pathways, opportunities and application readiness.">
+  <title>Kingsmen One | Your next step, made clearer</title>
+  <link rel="stylesheet" href="./styles.css">
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="./supabase-client.js" defer></script>
+  <script src="./app.js" defer></script>
+</head>
+<body>
+  <div class="app-shell">
+    <aside class="sidebar" aria-label="Main navigation">
+      <a class="brand" href="#home" aria-label="Kingsmen One home"><span class="brand-mark">K</span><span>KINGSMEN<span class="brand-light">ONE</span></span></a>
+      <p class="nav-label">YOUR WORKSPACE</p>
+      <nav id="navigation">
+        <button class="nav-item active" data-view="home"><span>◫</span> Overview</button>
+        <button class="nav-item" data-view="account"><span>⇄</span> Sign in / account</button>
+        <button class="nav-item" data-view="profile"><span>◎</span> My profile</button>
+        <button class="nav-item" data-view="pathways"><span>⌘</span> My pathways</button>
+        <button class="nav-item" data-view="opportunities"><span>⌕</span> Opportunities</button>
+        <button class="nav-item" data-view="applications"><span>▤</span> Applications</button>
+        <button class="nav-item" data-view="documents"><span>▧</span> Documents</button>
+        <button class="nav-item" data-view="activity"><span>↗</span> Activity & evidence</button>
+        <button class="nav-item" data-view="reviewer"><span>✓</span> Reviewer console</button>
+      </nav>
+      <div class="sidebar-bottom"><span class="avatar">KM</span><div><strong>Demo candidate</strong><small>Local preview profile</small></div><span class="online-dot" title="Demo mode"></span></div>
+    </aside>
+    <main class="main">
+      <header class="topbar"><div class="crumb">Candidate workspace <span>/</span> <strong id="current-crumb">Overview</strong></div><div class="top-actions"><span class="demo-pill"><i></i> ACCOUNT + DEMO MODE</span><button class="icon-button" id="reset-demo" title="Reset demo data" aria-label="Reset demo data">↻</button></div></header>
+      <section class="welcome" id="welcome">
+        <div><p class="eyebrow">MONDAY, YOUR NEXT CHAPTER</p><h1>Your future, <em>in motion.</em></h1><p class="welcome-copy">One clear place to prepare, track and take your next step.</p></div>
+        <div class="welcome-art" aria-hidden="true"><div class="sun"></div><div class="hill hill-one"></div><div class="hill hill-two"></div><div class="path-line"></div></div>
+      </section>
+      <div class="notice" role="status"><span>ⓘ</span><p><strong>Candidate workflow preview.</strong> Supabase Auth provides account sign-in. Signed-in users can request manual identity review; a request does not link or verify a candidate. Live provider submissions, payments and verified outcomes still require their respective verified integrations. Private document uploads require authorised identity verification. Preparation and profile changes remain local to this browser.</p><button id="dismiss-notice" aria-label="Dismiss notice">×</button></div>
+      <section id="view-root" aria-live="polite"></section>
+      <footer><span>© Kingsmen One</span><span>Built for clarity. Designed for your next step.</span></footer>
+    </main>
+  </div>
+  <div class="toast" id="toast" role="status" aria-live="polite"></div>
+</body>
+</html>
