@@ -93,3 +93,14 @@ test("deployed Netlify CORS allowlists never permit insecure HTTP site origins",
     assert.doesNotMatch(source, /"http:\/\/6ad61ee1da20fa786856f07e--kingsmen-portal-staging\.netlify\.app"/);
   }
 });
+
+test("overview metrics never present browser-demo values as verified account data", async () => {
+  const app = await readFile(resolve(repoRoot, "apps/kingsmen-one/app.js"), "utf8");
+  assert.match(app, /workspaceReady=!!userId&&workspacePersistenceAvailable&&workspaceLoadedForUser===userId/);
+  assert.match(app, /applicationsReady=!!userId&&applicationWorkspaceAvailable&&applicationWorkspaceLoadedForUser===userId/);
+  assert.match(app, /documentsReady=!!userId&&privateDocumentsLoadedForUser===userId&&!privateDocumentsError/);
+  assert.match(app, /Server-saved preparation checklist/);
+  assert.match(app, /Preview mode: progress, saves and checklist actions may be stored in this browser only/);
+  assert.match(app, /A saved route or tracker is not proof that a provider received an application or made a decision/);
+  assert.match(app, /pathways\.map\(p=>/);
+});
