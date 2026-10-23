@@ -214,6 +214,8 @@ const report = {
   moduleEvidence,
   moduleEvidenceFindings,
   moduleEvidenceReady,
+  registeredStatusConflicts: moduleEvidence.filter((item) => ['validated','locked'].includes(item.registeredReleaseStatus) && item.evidenceState !== 'SOURCE_VALIDATION_PASS_ONLY').map((item) => ({ key: item.key, registeredReleaseStatus: item.registeredReleaseStatus, evidenceState: item.evidenceState })),
+  launchGateEvidenceStateCounts: Object.fromEntries([...new Set(gateEvidence.flatMap((g) => g.evidence.map((e) => e.evidenceState)))].map((state) => [state, gateEvidence.reduce((sum, g) => sum + g.evidence.filter((e) => e.evidenceState === state).length, 0)])),
   releaseEvidenceReadiness: moduleEvidenceReady ? 'SOURCE_VALIDATION_FRESH_BUT_RUNTIME_STILL_UNPROVEN' : 'BLOCKED_BY_MISSING_STALE_OR_INVALID_MODULE_EVIDENCE',
   evidenceStateCounts: Object.fromEntries([...new Set(moduleEvidence.map((x) => x.evidenceState))].map((state) => [state, moduleEvidence.filter((x) => x.evidenceState === state).length])),
   launchGates: gateEvidence,
