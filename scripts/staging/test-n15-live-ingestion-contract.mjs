@@ -21,6 +21,8 @@ const checks = [
   ["ingestion uses deterministic idempotency key", /onConflict: "observation_ref"/.test(ingestion) && /SHA-256/.test(ingestion)],
   ["ingestion run ledger is auditable and service-role protected", /n15_ingestion_runs/.test(migration) && /to service_role using \(true\)/.test(migration)],
   ["candidate feed verifies bearer session with Supabase Auth", /auth\.getUser\(token\)/.test(candidate)],
+  ["candidate feed selects only explicit public programme/provider fields", !/from\("opportunity_programmes"\)\.select\("\*"\)/.test(candidate) && !/from\("opportunity_providers"\)\.select\("\*"\)/.test(candidate)],
+  ["candidate feed fails closed on programme/provider/source/deadline query errors", ["PROGRAMME_LOOKUP_FAILED","PROVIDER_LOOKUP_FAILED","SOURCE_EVIDENCE_LOOKUP_FAILED","DEADLINE_LOOKUP_FAILED"].every(x => candidate.includes(x)) && /error: programmeError/.test(candidate) && /error: providerError/.test(candidate) && /error: observationError/.test(candidate) && /error: deadlineError/.test(candidate)],
   ["candidate feed requires authorised identity link", /link_status !== "VERIFIED"/.test(candidate)],
   ["candidate feed requires approved, official, human-reviewed matches", /eq\("match_status", "APPROVED"\)/.test(candidate) && /eq\("source_confidence", "OFFICIAL_VERIFIED"\)/.test(candidate) && /eq\("human_review_required", false\)/.test(candidate)],
   ["candidate feed withholds stale/unverified source observations", /eq\("observation_status", "VERIFIED"\)/.test(candidate) && /eq\("source_confidence", "OFFICIAL_VERIFIED"\)/.test(candidate) && /gt\("stale_after", now\.toISOString\(\)\)/.test(candidate)],
