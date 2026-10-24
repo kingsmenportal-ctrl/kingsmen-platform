@@ -21,13 +21,13 @@ async function rest(table, method, query, body) {
       apikey: serviceKey,
       authorization: `Bearer ${serviceKey}`,
       "content-type": "application/json",
-      prefer: "return=minimal",
+      prefer: "resolution=merge-duplicates,return=minimal",
     },
     body: body === undefined ? undefined : JSON.stringify(body),
   });
   if (!response.ok) {
-    const safeText = (await response.text()).slice(0, 300);
-    throw new Error(`STAGING_FIXTURE_${method}_FAILED table=${table} status=${response.status} detail=${safeText}`);
+    // Avoid echoing raw PostgREST/database error bodies into CI logs.
+    throw new Error(`STAGING_FIXTURE_${method}_FAILED table=${table} status=${response.status}`);
   }
 }
 async function cleanup() {
