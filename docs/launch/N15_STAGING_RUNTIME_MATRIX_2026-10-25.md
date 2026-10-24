@@ -18,6 +18,7 @@ Runtime identities:
 - `N15_REVIEWER_ACCESS_TOKEN`: active authorised reviewer; used for live ingestion only when explicitly enabled.
 - `N15_CANDIDATE_A_ACCESS_TOKEN` and `N15_CANDIDATE_B_ACCESS_TOKEN`: separate candidate sessions, each expected to resolve to a different verified candidate link.
 - `N15_RUN_LIVE_INGESTION=true`: explicit opt-in to crawl the configured active source authorities and write ingestion ledger/observation rows.
+- `N15_TEST_BACKEND_SERVICE_PATH=true`: additionally call the source-ingestion endpoint using the exact server-held service-role key and verify its durable run ledger. This also requires the live-ingestion opt-in and performs an additional crawl.
 
 ## Runtime cases
 
