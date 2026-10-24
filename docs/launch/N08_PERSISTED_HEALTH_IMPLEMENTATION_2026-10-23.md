@@ -24,3 +24,9 @@ At code preparation time, staging health tables were empty and the deployed N08 
 - Verify backend-only reviewer tables have no client grants; preserve intentional no-policy RLS if confirmed. Resolve leaked-password protection warning through Supabase Auth configuration.
 - Run candidate A/B, anonymous, reviewer, and backend-role isolation tests.
 - Reconcile the complete runtime proof pack and keep final assembly blocked until all gates have evidence.
+
+## Additional security hardening — 2026-10-25
+
+A security review found that the initial implementation decoded the bearer JWT payload and treated a payload claiming `role=service_role` as sufficient to skip user verification. JWT payload decoding alone does not verify a token signature. The service bypass now requires the bearer to exactly equal the server-held `SUPABASE_SERVICE_ROLE_KEY`; all other bearer tokens go through Supabase Auth `getUser` and an active, non-revoked `PLATFORM_ADMIN` reviewer grant lookup. The endpoint still returns aggregated health only and always reports `productionReady: false`.
+
+A static regression guard was added at `scripts/validators/validate-n08-founder-health-auth.mjs` and is invoked by the isolated staging-drill workflow before it checks credentials. This source-level guard is not a substitute for authenticated staging tests. Deploy only after review and CI, then verify that unauthenticated requests are rejected, ordinary users without an active founder grant are forbidden, and a legitimate backend service-key call succeeds.
