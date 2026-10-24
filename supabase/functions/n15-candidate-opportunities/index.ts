@@ -54,26 +54,32 @@ Deno.serve(async (req: Request) => {
   const results = [];
   for (const match of matches ?? []) {
     if (!match.programme_ref || !match.provider_ref) continue;
-    const { data: programme } = await admin.from("opportunity_programmes").select("*")
+    const { data: programme, error: programmeError } = await admin.from("opportunity_programmes")
+      .select("programme_ref,programme_name,opening_status,candidate_facing_safe,source_confidence,evidence_refs,exact_link,location_text")
       .eq("programme_ref", match.programme_ref).maybeSingle();
-    const { data: provider } = await admin.from("opportunity_providers").select("*")
+    if (programmeError) return json({ status: "DATABASE_ERROR", reason: "PROGRAMME_LOOKUP_FAILED" }, 500);
+    const { data: provider, error: providerError } = await admin.from("opportunity_providers")
+      .select("provider_ref,provider_name,source_confidence,safe_to_recommend,accreditation_status,evidence_refs")
       .eq("provider_ref", match.provider_ref).maybeSingle();
+    if (providerError) return json({ status: "DATABASE_ERROR", reason: "PROVIDER_LOOKUP_FAILED" }, 500);
     if (!programme || !provider) continue;
     if (programme.opening_status !== "OPEN" || programme.candidate_facing_safe !== true) continue;
     if (programme.source_confidence !== "OFFICIAL_VERIFIED" || provider.source_confidence !== "OFFICIAL_VERIFIED") continue;
     if (provider.safe_to_recommend !== true || provider.accreditation_status === "REJECTED") continue;
     if (!Array.isArray(programme.evidence_refs) || !programme.evidence_refs.length ||
         !Array.isArray(provider.evidence_refs) || !provider.evidence_refs.length) continue;
-    const { data: observations } = await admin.from("external_source_observations")
+    const { data: observations, error: observationError } = await admin.from("external_source_observations")
       .select("observation_ref,source_url,source_title,observed_at,last_checked_at,stale_after,evidence_refs")
       .eq("observation_status", "VERIFIED").eq("source_confidence", "OFFICIAL_VERIFIED")
       .eq("source_url", programme.exact_link).gte("last_checked_at", cutoff)
       .gt("stale_after", now.toISOString()).limit(1);
+    if (observationError) return json({ status: "DATABASE_ERROR", reason: "SOURCE_EVIDENCE_LOOKUP_FAILED" }, 500);
     if (!observations?.length) continue;
-    const { data: deadlines } = await admin.from("opportunity_deadlines")
+    const { data: deadlines, error: deadlineError } = await admin.from("opportunity_deadlines")
       .select("deadline_ref,opens_at,closes_at,deadline_status,evidence_refs,timezone")
       .eq("programme_ref", programme.programme_ref).eq("deadline_status", "CONFIRMED")
       .gt("closes_at", now.toISOString()).order("closes_at", { ascending: true }).limit(1);
+    if (deadlineError) return json({ status: "DATABASE_ERROR", reason: "DEADLINE_LOOKUP_FAILED" }, 500);
     const deadline = deadlines?.[0] ?? null;
     if (deadline && (!Array.isArray(deadline.evidence_refs) || !deadline.evidence_refs.length)) continue;
     results.push({
