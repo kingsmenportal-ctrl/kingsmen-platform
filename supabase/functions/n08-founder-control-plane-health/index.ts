@@ -13,13 +13,6 @@ const FRESHNESS_MINUTES = 15;
 function json(body: unknown, status = 200) {
   return new Response(JSON.stringify(body), { status, headers: cors });
 }
-function tokenRole(req: Request): string {
-  const token = (req.headers.get("authorization") ?? "").replace(/^Bearer\s+/i, "");
-  try {
-    const payload = token.split(".")[1];
-    return JSON.parse(atob(payload.replace(/-/g, "+").replace(/_/g, "/"))).role ?? "";
-  } catch { return ""; }
-}
 function ageMinutes(value: string | null | undefined, now = Date.now()): number | null {
   if (!value) return null;
   const parsed = Date.parse(value);
@@ -57,7 +50,10 @@ Deno.serve(async (req: Request) => {
   if (!bearer) return json({ status: "UNAUTHENTICATED" }, 401);
   const admin = createClient(url, serviceKey, { auth: { persistSession: false, autoRefreshToken: false } });
 
-  if (tokenRole(req) !== "service_role") {
+  // Never authorize by decoding an unverified JWT payload. The service-role bypass is
+  // allowed only when the presented bearer is exactly the server-held service key;
+  // all other tokens must be verified by Supabase Auth and mapped to an active reviewer.
+  if (bearer !== serviceKey) {
     const authClient = createClient(url, anonKey, { auth: { persistSession: false, autoRefreshToken: false } });
     const { data: userData, error: authError } = await authClient.auth.getUser(bearer);
     if (authError || !userData.user) return json({ status: "UNAUTHENTICATED" }, 401);
