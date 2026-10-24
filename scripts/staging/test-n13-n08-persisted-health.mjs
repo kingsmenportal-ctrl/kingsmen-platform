@@ -12,6 +12,7 @@ const refs = {
   incident: `${runRef}_incident`,
   service: `${runRef}_service`,
   snapshot: `${runRef}_snapshot`,
+  integration: `${runRef}_integration`,
 };
 
 async function rest(table, method, query, body) {
@@ -35,6 +36,7 @@ async function cleanup() {
     ["incident_events", `incident_ref=eq.${encodeURIComponent(refs.incident)}`],
     ["service_health_checks", `check_ref=eq.${encodeURIComponent(refs.service)}`],
     ["system_health_snapshots", `snapshot_ref=eq.${encodeURIComponent(refs.snapshot)}`],
+    ["integration_health_snapshots", `health_ref=eq.${encodeURIComponent(refs.integration)}`],
   ];
   const errors = [];
   for (const [table, query] of filters) {
@@ -66,6 +68,19 @@ async function setService(status) {
     fix_path: "Remove isolated fixture after verification.",
     evidence_refs: [runRef],
     checked_at: new Date().toISOString(),
+  }]);
+}
+async function setIntegration(status) {
+  await rest("integration_health_snapshots", "POST", "on_conflict=health_ref", [{
+    health_ref: refs.integration,
+    connector_key: "ISOLATED_N13_HEALTH_DRILL",
+    health_status: status,
+    failure_rate: status === "UP" ? 0 : 1,
+    backlog_count: 0,
+    reason: "Synthetic isolated N13/N08 integration status test; no candidate data.",
+    fix_path: "Remove isolated fixture after verification.",
+    evidence_refs: [runRef],
+    captured_at: new Date().toISOString(),
   }]);
 }
 async function setSnapshot(status, incidentCount) {
@@ -105,6 +120,7 @@ try {
   // Fail closed if the fixture namespace collides with pre-existing data.
   await cleanup();
   await setService("UP");
+  await setIntegration("UP");
   await setSnapshot("GREEN", 0);
   let body = await readStatus("GREEN");
   console.log(JSON.stringify({ test: "fresh healthy sources", passed: true, status: body.persistedHealth.status, runRef }));
@@ -124,6 +140,12 @@ try {
   await setSnapshot("RED", 0);
   body = await readStatus("RED");
   console.log(JSON.stringify({ test: "down service", passed: true, status: body.persistedHealth.status, runRef }));
+
+  await setService("UP");
+  await setIntegration("DOWN");
+  await setSnapshot("GREEN", 0);
+  body = await readStatus("RED");
+  console.log(JSON.stringify({ test: "down integration", passed: true, status: body.persistedHealth.status, runRef }));
 } finally {
   await cleanup();
   console.log(JSON.stringify({ cleanup: "passed", runRef, candidateDataUsed: false }));
