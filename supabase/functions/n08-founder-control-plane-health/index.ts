@@ -104,6 +104,8 @@ Deno.serve(async (req: Request) => {
   const openSev1 = incidents.filter((i: any) => i.severity === "SEV1").length;
   const downServices = services.filter((s: any) => ["DOWN", "BLOCKED"].includes(s.status));
   const degradedServices = services.filter((s: any) => ["DEGRADED", "UNKNOWN"].includes(s.status));
+  const downIntegrations = integrations.filter((s: any) => ["DOWN", "BLOCKED", "RED"].includes(s.health_status));
+  const degradedIntegrations = integrations.filter((s: any) => ["DEGRADED", "UNKNOWN", "AMBER"].includes(s.health_status));
   const latestServiceAt = services.reduce((latest: string | null, s: any) =>
     !latest || Date.parse(s.checked_at ?? "") > Date.parse(latest) ? s.checked_at : latest, null);
   const latestIntegrationAt = integrations.reduce((latest: string | null, s: any) =>
@@ -115,8 +117,8 @@ Deno.serve(async (req: Request) => {
 
   let persistedHealthStatus: "GREEN" | "AMBER" | "RED" | "UNKNOWN" = "UNKNOWN";
   if (!sourceAvailable) persistedHealthStatus = "UNKNOWN";
-  else if (openSev1 > 0 || downServices.length > 0 || latestSnapshot?.status === "RED") persistedHealthStatus = "RED";
-  else if (openIncidents > 0 || degradedServices.length > 0 || latestSnapshot?.status === "AMBER"
+  else if (openSev1 > 0 || downServices.length > 0 || downIntegrations.length > 0 || latestSnapshot?.status === "RED") persistedHealthStatus = "RED";
+  else if (openIncidents > 0 || degradedServices.length > 0 || degradedIntegrations.length > 0 || latestSnapshot?.status === "AMBER"
     || (latestSnapshot?.oracle_lite_pressure && latestSnapshot.oracle_lite_pressure !== "LOW")
     || (latestSnapshot?.failed_workflows ?? 0) > 0) persistedHealthStatus = "AMBER";
   else if (telemetryComplete && latestSnapshot?.status === "GREEN"
@@ -157,6 +159,8 @@ Deno.serve(async (req: Request) => {
       openSev1Count: openSev1,
       downOrBlockedServiceCount: downServices.length,
       degradedOrUnknownServiceCount: degradedServices.length,
+      downOrBlockedIntegrationCount: downIntegrations.length,
+      degradedOrUnknownIntegrationCount: degradedIntegrations.length,
       serviceObservationCount: services.length,
       integrationObservationCount: integrations.length,
       latestSystemSnapshot: latestSnapshot ? {
