@@ -19,11 +19,13 @@ The N15 live-ingestion contract test now asserts:
 - Backend bypass requires exact server-held service-key equality.
 - Other bearer tokens are verified by Supabase Auth.
 - Reviewer privilege is tied to the verified user ID and active reviewer status.
+- Candidate feed selects only explicitly required programme/provider columns instead of `SELECT *`.
+- Candidate feed fails closed with a generic database error if programme, provider, source-evidence or deadline lookups fail.
 
 ## Evidence status
 
 - Implementation: committed on branch `fix/n15-source-ingestion-auth-hardening-2026-10-25`.
-- Regression test: committed; workflow result pending at report creation.
+- Regression test: committed; includes candidate-feed data minimisation and query-error fail-closed contracts. Workflow result for the latest head: NOT AVAILABLE (no run returned).
 - Supabase deployment: NOT DEPLOYED by this change.
 - Live authentication matrix: NOT RUN.
 - External source crawl and database persistence: NOT RUN.
