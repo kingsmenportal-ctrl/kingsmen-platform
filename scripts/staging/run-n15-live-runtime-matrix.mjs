@@ -79,13 +79,13 @@ try {
     record("authorised reviewer can execute real source ingestion", [200,502].includes(run.status) && !!run.data.run_ref, `HTTP ${run.status}; run_ref present=${!!run.data.run_ref}`);
     assert.ok([200,502].includes(run.status), JSON.stringify(run.data).slice(0,300));
     assert.ok(run.data.run_ref, "Ingestion response did not include run_ref");
-    const [ledger] = await rest(`n15_ingestion_runs?run_ref=eq.${encodeURIComponent(run.data.run_ref)}&select=run_ref,status,sources_checked,sources_succeeded,observations_created,observations_updated,summary,finished_at`);
+    const [ledger] = await rest(`n15_ingestion_runs?run_ref=eq.${encodeURIComponent(run.data.run_ref)}&select=run_ref,status,sources_checked,sources_succeeded,observations_created,observations_updated,summary,started_at,finished_at`);
     assert.ok(ledger, "Run ledger row missing after source ingestion");
     assert.equal(ledger.run_ref, run.data.run_ref);
     assert.ok(ledger.finished_at, "Run ledger was not finalised");
     record("ingestion run is durably persisted and finalised", !!ledger.finished_at, `status=${ledger.status}; sources=${ledger.sources_checked}; created=${ledger.observations_created}`);
 
-    const runObservations = await rest(`external_source_observations?select=observation_ref,observation_status,source_confidence,review_reason&observed_at=gte.${encodeURIComponent(ledger.started_at ?? new Date(Date.now()-10*60_000).toISOString())}&order=observed_at.desc&limit=200`);
+    const runObservations = await rest(`external_source_observations?select=observation_ref,observation_status,source_confidence,review_reason,observed_at&observed_at=gte.${encodeURIComponent(ledger.started_at)}&order=observed_at.desc&limit=200`);
     const reviewOnly = runObservations.every(x => x.observation_status === "NEEDS_REVIEW" && /HUMAN_VERIFICATION_REQUIRED/.test(x.review_reason ?? ""));
     record("newly observed sources remain NEEDS_REVIEW", reviewOnly, `${runObservations.length} recent observations inspected`);
     assert.ok(reviewOnly, "A recent observation was not review-only");
