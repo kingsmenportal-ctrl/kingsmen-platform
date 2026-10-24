@@ -24,6 +24,8 @@ jobs:
         uses: actions/setup-node@v4
         with:
           node-version: 22
+      - name: Verify N08 authentication boundary contract
+        run: node scripts/validators/validate-n08-founder-health-auth.mjs
       - name: Require staging credentials
         shell: bash
         env:
