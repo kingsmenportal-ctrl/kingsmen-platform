@@ -7,8 +7,13 @@ const ingestion = fs.readFileSync(path.join(root, "supabase/functions/n15-source
 const candidate = fs.readFileSync(path.join(root, "supabase/functions/n15-candidate-opportunities/index.ts"), "utf8");
 const migration = fs.readFileSync(path.join(root, "db/migrations/0086_n15_live_ingestion_candidate_feed.sql"), "utf8");
 const page = fs.readFileSync(path.join(root, "apps/web/src/app/candidate/opportunity-matches/page.tsx"), "utf8");
+const runtime = fs.readFileSync(path.join(root, "scripts/staging/run-n15-live-runtime-matrix.mjs"), "utf8");
 
 const checks = [
+  ["runtime matrix covers missing/invalid/tampered tokens and ordinary-user denial", /rejects missing bearer/.test(runtime) && /rejects invalid bearer/.test(runtime) && /forged\/tampered service-role claim/.test(runtime) && /ordinary authenticated user cannot ingest/.test(runtime)],
+  ["runtime matrix can verify persisted run ledger and review-only observations", /n15_ingestion_runs/.test(runtime) && /newly observed sources remain NEEDS_REVIEW/.test(runtime) && /published opportunities/.test(runtime)],
+  ["runtime matrix checks separate candidate sessions and identity isolation", /N15_CANDIDATE_A_ACCESS_TOKEN/.test(runtime) && /N15_CANDIDATE_B_ACCESS_TOKEN/.test(runtime) && /distinct identities/.test(runtime)],
+  ["runtime matrix requires explicit opt-in before live source crawl", /N15_RUN_LIVE_INGESTION === "true"/.test(runtime)],
   ["ingestion never trusts decoded JWT role claims", !/function tokenRole\(/.test(ingestion) && !/JSON\.parse\(atob\(/.test(ingestion)],
   ["backend bypass requires exact server-held service key", /if \(bearer !== key\)/.test(ingestion) && !/callerRole/.test(ingestion)],
   ["all non-service bearers are verified by Supabase Auth", /authClient\.auth\.getUser\(bearer\)/.test(ingestion)],
