@@ -8,6 +8,7 @@ const ordinaryToken = process.env.N15_ORDINARY_USER_ACCESS_TOKEN ?? "";
 const candidateAToken = process.env.N15_CANDIDATE_A_ACCESS_TOKEN ?? "";
 const candidateBToken = process.env.N15_CANDIDATE_B_ACCESS_TOKEN ?? "";
 const runIngestion = process.env.N15_RUN_LIVE_INGESTION === "true";
+const testServicePath = process.env.N15_TEST_BACKEND_SERVICE_PATH === "true";
 
 for (const [name, value] of [["SUPABASE_URL",baseUrl],["SUPABASE_ANON_KEY",anonKey],["SUPABASE_SERVICE_ROLE_KEY",serviceKey]]) {
   assert.ok(value, `Missing required environment variable: ${name}`);
@@ -69,6 +70,17 @@ try {
     assert.equal(ordinary.status, 403);
   } else {
     record("ordinary-user denial", false, "N15_ORDINARY_USER_ACCESS_TOKEN not supplied");
+  }
+
+  if (testServicePath) {
+    assert.ok(runIngestion, "N15_TEST_BACKEND_SERVICE_PATH=true also requires N15_RUN_LIVE_INGESTION=true");
+    const serviceCall = await call(endpoint, serviceKey);
+    record("exact backend service-role path is accepted", [200,502].includes(serviceCall.status) && !!serviceCall.data.run_ref, `HTTP ${serviceCall.status}; run_ref present=${!!serviceCall.data.run_ref}`);
+    assert.ok([200,502].includes(serviceCall.status), JSON.stringify(serviceCall.data).slice(0,300));
+    assert.ok(serviceCall.data.run_ref, "Backend service-role path did not return run_ref");
+    const [serviceLedger] = await rest(`n15_ingestion_runs?run_ref=eq.${encodeURIComponent(serviceCall.data.run_ref)}&select=run_ref,status,started_at,finished_at,summary`);
+    assert.ok(serviceLedger?.finished_at, "Backend service-role path did not persist a finalised run");
+    record("backend service-role run has durable ledger evidence", true, `status=${serviceLedger.status}; run_ref persisted`);
   }
 
   if (runIngestion) {
