@@ -12,6 +12,7 @@ const runtime = fs.readFileSync(path.join(root, "scripts/staging/run-n15-live-ru
 const checks = [
   ["runtime matrix covers missing/invalid/tampered tokens and ordinary-user denial", /rejects missing bearer/.test(runtime) && /rejects invalid bearer/.test(runtime) && /forged\/tampered service-role claim/.test(runtime) && /ordinary authenticated user cannot ingest/.test(runtime)],
   ["runtime matrix can verify persisted run ledger and review-only observations", /n15_ingestion_runs/.test(runtime) && /newly observed sources remain NEEDS_REVIEW/.test(runtime) && /published opportunities/.test(runtime)],
+  ["runtime matrix has explicit exact service-role backend path test", /N15_TEST_BACKEND_SERVICE_PATH/.test(runtime) && /exact backend service-role path is accepted/.test(runtime)],
   ["runtime matrix checks separate candidate sessions and identity isolation", /N15_CANDIDATE_A_ACCESS_TOKEN/.test(runtime) && /N15_CANDIDATE_B_ACCESS_TOKEN/.test(runtime) && /distinct identities/.test(runtime)],
   ["runtime matrix requires explicit opt-in before live source crawl", /N15_RUN_LIVE_INGESTION === "true"/.test(runtime)],
   ["ingestion never trusts decoded JWT role claims", !/function tokenRole\(/.test(ingestion) && !/JSON\.parse\(atob\(/.test(ingestion)],
