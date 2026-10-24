@@ -9,7 +9,10 @@ const migration = fs.readFileSync(path.join(root, "db/migrations/0086_n15_live_i
 const page = fs.readFileSync(path.join(root, "apps/web/src/app/candidate/opportunity-matches/page.tsx"), "utf8");
 
 const checks = [
-  ["ingestion endpoint requires service role or active reviewer", /callerRole !== "service_role"/.test(ingestion) && /platform_reviewers/.test(ingestion) && /ACTIVE_OPPORTUNITY_REVIEWER_REQUIRED/.test(ingestion)],
+  ["ingestion never trusts decoded JWT role claims", !/function tokenRole\(/.test(ingestion) && !/JSON\.parse\(atob\(/.test(ingestion)],
+  ["backend bypass requires exact server-held service key", /if \(bearer !== key\)/.test(ingestion) && !/callerRole/.test(ingestion)],
+  ["all non-service bearers are verified by Supabase Auth", /authClient\.auth\.getUser\(bearer\)/.test(ingestion)],
+  ["reviewer privilege is tied to verified user ID and active status", /eq\("auth_user_id", userData\.user\.id\)/.test(ingestion) && /eq\("is_active", true\)/.test(ingestion) && /ACTIVE_OPPORTUNITY_REVIEWER_REQUIRED/.test(ingestion)],
   ["source fetch is HTTPS-only", /url\.protocol !== "https:"/.test(ingestion)],
   ["source fetch rejects credentials", /url\.username \|\| url\.password/.test(ingestion)],
   ["source crawling is restricted to authority host", /withinAuthority\(canonical\.hostname\.toLowerCase\(\), authorityHost\)/.test(ingestion)],
