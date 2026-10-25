@@ -6,6 +6,9 @@ const page = readFileSync(
   "utf8"
 );
 const login = readFileSync("apps/web/src/app/auth/login/page.tsx", "utf8");
+const reviewer = readFileSync("apps/web/src/app/reviewer/identity-reviews/page.tsx", "utf8");
+const decision = readFileSync("supabase/functions/candidate-identity-review-decision/index.ts", "utf8");
+const queue = readFileSync("supabase/functions/candidate-identity-review-queue/index.ts", "utf8");
 const normalized = page.replace(/\s+/g, " ");
 const checks = [
   ["candidate-facing identity review route exists", page.includes("Request an identity review")],
@@ -18,7 +21,11 @@ const checks = [
   ["no password or service-role credential is included", !page.includes("password:") && !page.includes("service_role")],
   ["login requests email OTP through Supabase Auth", login.includes("/otp") && login.includes("create_user: true")],
   ["login verifies OTP before creating browser session", login.includes("/verify") && login.includes("type: \"email\"") && login.includes("body.access_token")],
-  ["login session contains no server-side service credential", !login.includes("SERVICE_ROLE") && !login.includes("service_role")]
+  ["login session contains no server-side service credential", !login.includes("SERVICE_ROLE") && !login.includes("service_role")],
+  ["reviewer queue calls a dedicated server-side authorization endpoint", reviewer.includes("candidate-identity-review-queue") && reviewer.includes("IDENTITY_REVIEWER")],
+  ["reviewer UI does not expose approval without evidence", reviewer.includes("Approve — blocked pending evidence workflow")],
+  ["review queue verifies reviewer grant before reading requests", queue.includes('.eq("role_code", "IDENTITY_REVIEWER")') && queue.indexOf("if (!grant)") < queue.indexOf('.from("candidate_identity_review_requests")')],
+  ["decision API blocks approval until evidence review exists", decision.includes("IDENTITY_EVIDENCE_WORKFLOW_REQUIRED") && decision.includes('if (decision === "APPROVED")')]
 ];
 for (const [label, passed] of checks) {
   console.log(`${passed ? "PASS" : "FAIL"} ${label}`);
