@@ -36,6 +36,10 @@ begin
   if v_url is null or v_url !~ '^https://' then
     return jsonb_build_object('ok',false,'code','OFFICIAL_HTTPS_URL_REQUIRED');
   end if;
+  if v_app.status not in ('DRAFT','READINESS_BLOCKED','READY_FOR_REVIEW','READY_TO_SUBMIT','MANUAL_ACTION_REQUIRED') then
+    return jsonb_build_object('ok',false,'code','APPLICATION_ALREADY_SUBMITTED_OR_TRACKED',
+      'message','This application has moved beyond the manual preparation stage. Use the existing evidence-backed tracking workflow.');
+  end if;
   if v_app.application_method not in ('EXTERNAL_PORTAL','MANUAL_ONLY') then
     return jsonb_build_object('ok',false,'code','MANUAL_PORTAL_NOT_APPLICABLE',
       'message','This opportunity is not configured for an external-portal handoff.');
@@ -65,15 +69,11 @@ begin
     if not found then raise exception 'MANUAL_PORTAL_JOB_NOT_PERSISTED' using errcode = '55000'; end if;
   end if;
 
-  if v_app.status in ('DRAFT','READINESS_BLOCKED','READY_FOR_REVIEW','READY_TO_SUBMIT','MANUAL_ACTION_REQUIRED') then
-    update public.candidate_applications
-    set status='MANUAL_ACTION_REQUIRED',
-        last_status_reason='External portal handoff prepared. Candidate must complete provider steps and attach receipt evidence; no submission was sent by Kingsmen.',
-        updated_at=now()
-    where id=p_application_id and candidate_id=v_candidate_id;
-  elsif v_app.status not in ('SUBMISSION_PENDING','SUBMITTED_CONFIRMED','PROVIDER_REVIEW','SHORTLISTED','INTERVIEW','OFFERED','ACCEPTED','REJECTED','WITHDRAWN','CANCELLED','EXPIRED') then
-    return jsonb_build_object('ok',false,'code','APPLICATION_STATUS_NOT_ELIGIBLE');
-  end if;
+  update public.candidate_applications
+  set status='MANUAL_ACTION_REQUIRED',
+      last_status_reason='External portal handoff prepared. Candidate must complete provider steps and attach receipt evidence; no submission was sent by Kingsmen.',
+      updated_at=now()
+  where id=p_application_id and candidate_id=v_candidate_id;
 
   insert into public.candidate_application_events(
     event_ref,application_id,candidate_id,actor_auth_user_id,event_type,from_status,to_status,
