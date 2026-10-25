@@ -1,6 +1,6 @@
 import fs from "node:fs";
 import assert from "node:assert/strict";
-const migration = fs.readFileSync("supabase/migrations/20261025150000_candidate_identity_review_followup_status.sql", "utf8").toLowerCase();
+const migration = fs.readFileSync("supabase/migrations/20261025112103_candidate_identity_review_followup_status.sql", "utf8").toLowerCase();
 const followup = fs.readFileSync("supabase/functions/candidate-identity-review-followup/index.ts", "utf8");
 const status = fs.readFileSync("supabase/functions/candidate-identity-review-status/index.ts", "utf8");
 const page = fs.readFileSync("apps/web/src/app/candidate/identity-review/status/page.tsx", "utf8");
