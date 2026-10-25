@@ -1,0 +1,80 @@
+name: Generate API lockfile pull request
+
+on:
+  workflow_dispatch:
+  push:
+    branches: [main]
+    paths:
+      - apps/api/package.json
+      - .github/workflows/api-lockfile-refresh.yml
+
+permissions:
+  contents: write
+  pull-requests: write
+
+concurrency:
+  group: kingsmen-api-lockfile-refresh
+  cancel-in-progress: false
+
+jobs:
+  generate-lockfile:
+    name: Generate and propose authentic API lockfile
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - name: Checkout main
+        uses: actions/checkout@v4
+        with:
+          ref: main
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+          cache-dependency-path: package-lock.json
+
+      - name: Generate API lockfile from declared manifest
+        run: npm install --package-lock-only --ignore-scripts --no-audit --no-fund --prefix apps/api
+
+      - name: Validate generated lockfile contract
+        run: |
+          node --input-type=commonjs <<'NODE'
+          const fs = require('node:fs');
+          const assert = require('node:assert/strict');
+          const manifest = JSON.parse(fs.readFileSync('apps/api/package.json', 'utf8'));
+          const lock = JSON.parse(fs.readFileSync('apps/api/package-lock.json', 'utf8'));
+          assert.equal(lock.name, manifest.name, 'lockfile package name must match manifest');
+          assert.equal(lock.version, manifest.version, 'lockfile package version must match manifest');
+          assert.equal(lock.lockfileVersion, 3, 'API lockfile must use npm lockfile v3');
+          assert.deepEqual(lock.packages[''].dependencies || {}, manifest.dependencies || {}, 'runtime dependencies must match manifest');
+          assert.deepEqual(lock.packages[''].devDependencies || {}, manifest.devDependencies || {}, 'development dependencies must match manifest');
+          for (const [name, entry] of Object.entries(lock.packages)) {
+            if (name === '') continue;
+            if (entry.resolved && !entry.resolved.startsWith('https://')) {
+              throw new Error(`Non-HTTPS package resolution in ${name}`);
+            }
+          }
+          console.log('PASS: generated API lockfile matches manifest and uses HTTPS package resolutions.');
+          NODE
+
+      - name: Create or update lockfile pull request
+        uses: peter-evans/create-pull-request@v7
+        with:
+          token: ${{ github.token }}
+          branch: automation/api-package-lock
+          delete-branch: false
+          add-paths: apps/api/package-lock.json
+          commit-message: "build(api): add reproducible npm lockfile"
+          title: "build(api): add reproducible npm lockfile"
+          body: |
+            ## API dependency reproducibility
+
+            This PR contains an npm-generated lockfile produced on a GitHub-hosted Node 22 runner from `apps/api/package.json` using `npm install --package-lock-only --ignore-scripts`.
+
+            The workflow checks the lockfile version, manifest alignment, and HTTPS package resolutions before opening this PR.
+
+            After review and merge, update API CI/release workflows to use `npm ci --prefix apps/api` and remove lockfile-generation-on-the-fly behavior. This PR intentionally does not claim that dependency installation or the API build has passed.
+          labels: |
+            dependencies
+            build
