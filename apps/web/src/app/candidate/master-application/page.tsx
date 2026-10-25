@@ -64,7 +64,9 @@ export default function MasterApplicationPage() {
   const [error, setError] = useState("");
   const [savedAt, setSavedAt] = useState("");
 
-  const [token, setToken] = useState<string | null>(null);\n\n  useEffect(() => { setToken(accessToken()); }, []);
+  const [token, setToken] = useState<string | null>(null);
+
+  useEffect(() => { setToken(accessToken()); }, []);
 
   useEffect(() => {
     const params = new URLSearchParams(window.location.search);
