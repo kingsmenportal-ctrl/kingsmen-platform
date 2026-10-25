@@ -15,13 +15,6 @@ const KEYWORDS = /opportunit|vacanc|career|job|learnership|internship|apprentice
 function json(body: unknown, status = 200) {
   return new Response(JSON.stringify(body), { status, headers: cors });
 }
-function tokenRole(req: Request): string {
-  const token = (req.headers.get("authorization") ?? "").replace(/^Bearer\s+/i, "");
-  try {
-    const payload = token.split(".")[1];
-    return JSON.parse(atob(payload.replace(/-/g, "+").replace(/_/g, "/"))).role ?? "";
-  } catch { return ""; }
-}
 function canonicalHttps(input: string): URL | null {
   try {
     const url = new URL(input);
@@ -169,8 +162,11 @@ Deno.serve(async (req: Request) => {
   if (!url || !key || !anonKey) return json({ status: "CONFIGURATION_ERROR", reason: "SUPABASE_SERVICE_CONFIGURATION_MISSING" }, 500);
 
   const bearer = (req.headers.get("authorization") ?? "").replace(/^Bearer\s+/i, "");
-  const callerRole = tokenRole(req);
-  if (callerRole !== "service_role") {
+  // Never trust a decoded JWT payload as authentication. Only the exact server-held
+  // service-role secret may use the backend path; every other bearer is verified
+  // cryptographically by Supabase Auth and then mapped to an active reviewer.
+  if (bearer !== key) {
+    if (!bearer) return json({ status: "UNAUTHENTICATED" }, 401);
     const authClient = createClient(url, anonKey, { auth: { persistSession: false, autoRefreshToken: false } });
     const { data: userData, error: authError } = await authClient.auth.getUser(bearer);
     if (authError || !userData.user) return json({ status: "UNAUTHENTICATED" }, 401);

@@ -99,7 +99,8 @@
     "n15:sources:test": "node scripts/staging/test-n15-source-intelligence-policy.mjs",
     "n15:sources:check": "npm run n15:sources:validate && npm run n15:sources:test",
     "n15:ingestion:test": "node scripts/staging/test-n15-live-ingestion-contract.mjs",
-    "n15:ingestion:check": "npm run n15:ingestion:test"
+    "n15:ingestion:check": "npm run n15:ingestion:test",
+    "n15:runtime:matrix": "node scripts/staging/run-n15-live-runtime-matrix.mjs"
   },
   "repository": {
     "type": "git",
