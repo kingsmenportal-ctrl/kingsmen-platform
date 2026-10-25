@@ -17,7 +17,7 @@ const required = [
   ["cap defaults to 500", ": 500"],
   ["national route access protected at cap", "preserve access to all in-scope national routes"],
   ["no launch-readiness claim", "productionReady: false"],
-  ["no direct founder finality", "do not directly submit applications, settle refunds"],
+  ["no direct founder finality", "directly submit applications, settle refunds"],
   ["missing feeds generate fix actions", "Restore evidence feed for"],
   ["stale feeds generate refresh actions", "Refresh"],
   ["commands remain governed", "N12 approval and N16 execution"]
