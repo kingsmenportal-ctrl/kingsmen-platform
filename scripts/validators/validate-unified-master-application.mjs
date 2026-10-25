@@ -8,6 +8,12 @@ const schema = read("../../db/migrations/0087_unified_candidate_master_applicati
 const rpc = read("../../db/migrations/0088_unified_candidate_master_application_rpc.sql");
 const guard = read("../../db/migrations/0089_unified_master_application_source_confidence_guard.sql");
 const workbench = read("../../apps/web/src/app/candidate/workbench/page.tsx");
+const lifecycle = read("../../db/migrations/0090_master_target_to_application_lifecycle_bridge.sql");
+const documents = read("../../apps/web/src/app/candidate/documents/page.tsx");
+const documentUpload = read("../../apps/web/src/app/api/candidate/documents/upload-url/route.ts");
+const documentFinalize = read("../../apps/web/src/app/api/candidate/documents/finalize/route.ts");
+const preparation = read("../../apps/web/src/app/candidate/applications/preparation/page.tsx");
+const preparationApi = read("../../apps/web/src/app/api/candidate/applications/preparation/route.ts");
 const matches = read("../../apps/web/src/app/candidate/opportunity-matches/page.tsx");
 
 for (const pathway of ["HIGHER_EDUCATION", "TVET", "SETA_LEARNERSHIP", "INTERNSHIP", "APPRENTICESHIP", "EMPLOYMENT", "FUNDING", "ACCOMMODATION", "WIL"]) {
@@ -30,6 +36,16 @@ assert.ok(rpc.includes("security invoker"), "Save RPC must respect caller RLS");
 assert.ok(rpc.includes("'provider_submissions_sent', 0"), "RPC must never claim provider submission");
 assert.ok(rpc.includes("on conflict (candidate_id, target_key) do update"), "Repeated saves must upsert targets");
 assert.ok(workbench.includes("/candidate/master-application"), "Candidate workbench must link to master application");
+assert.ok(page.includes("setToken(accessToken())"), "Auth session must be read after client hydration");
+assert.ok(route.includes("rpc/prepare_candidate_application_from_master_target"), "N15 target must be bridged to application-specific lifecycle");
+assert.ok(lifecycle.includes("m.match_status='APPROVED'") || lifecycle.includes("m.match_status = 'APPROVED'"), "Application bridge must require approved match");
+assert.ok(lifecycle.includes("o.last_checked_at>=now()-interval '24 hours'") || lifecycle.includes("o.last_checked_at >= now() - interval '24 hours'"), "Application bridge must require fresh official evidence");
+assert.ok(lifecycle.includes("provider_submission_sent',false") || lifecycle.includes("'provider_submission_sent', false"), "Application bridge must not claim provider submission");
+assert.ok(documents.includes("/api/candidate/documents/upload-url"), "Document page must call authenticated upload endpoint");
+assert.ok(documentUpload.includes("candidate-private-documents"), "Document upload endpoint must use the private document service");
+assert.ok(documentFinalize.includes("finalize_upload"), "Document finalization must verify uploaded object and file signature");
+assert.ok(preparation.includes("/api/candidate/applications/preparation"), "Preparation UI must call persisted preparation workflow");
+assert.ok(preparationApi.includes("candidate-application-preparation"), "Preparation API must use authenticated preparation edge function");
 assert.ok(matches.includes("Add to my master application"), "Verified match cards must feed the unified master application");
 assert.ok(page.includes("N15 match reference"), "Master application must preserve the originating match reference");
 console.log("PASS: unified master application static contract checks");
