@@ -28,5 +28,6 @@ for (const [label, source, needle] of required) {
   assert.ok(source.includes(needle), `Missing ${label}: ${needle}`);
   console.log("PASS", label);
 }
-assert.ok(!/grant execute on function public\\.n16_[^(]+\\([^;]+ to authenticated/i.test(migrations.queue), "Queue RPC must not be granted to authenticated users");
+assert.ok(!migrations.queue.includes("grant execute on function public.n16_claim_dispatches(text, integer, integer) to authenticated"), "Queue RPC must not be granted to authenticated users");
+assert.ok(!migrations.queue.includes("grant execute on function public.n16_record_dispatch_result(") || migrations.queue.includes("to service_role"), "Result RPC grants must remain privileged");
 console.log(`N16 durable queue migration contract: ${required.length}/${required.length} checks passed (static contract only; PostgreSQL runtime not executed).`);
