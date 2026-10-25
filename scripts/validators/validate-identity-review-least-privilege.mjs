@@ -33,7 +33,7 @@ const required = [
 const decisionFunction = fs.readFileSync('supabase/functions/candidate-identity-review-decision/index.ts', 'utf8').toLowerCase();
 assert.match(decisionFunction, /decision\s*===\s*"approved"/, 'approval path must be explicit');
 assert.match(decisionFunction, /candidate_identity_review_evidence/, 'approval must consult private identity evidence');
-assert.match(decisionFunction, /review_status"\)\s*\.eq\("accepted"\)/, 'approval requires explicitly accepted evidence');
+assert.match(decisionFunction, /\.eq\("review_status",\s*"accepted"\)/, 'approval requires explicitly accepted evidence');
 assert.match(decisionFunction, /reviewed_by/, 'accepted evidence must identify its reviewer');
 assert.match(decisionFunction, /reviewed_at/, 'accepted evidence must have a review timestamp');
 assert.match(decisionFunction, /identity_evidence_workflow_required/, 'approval must fail closed when accepted evidence is missing');
