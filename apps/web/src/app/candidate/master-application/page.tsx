@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";\nimport type { FormEvent } from "react";
 
 const PATHWAYS = [
   ["HIGHER_EDUCATION", "Higher education / universities / UoTs"],
@@ -106,7 +106,7 @@ export default function MasterApplicationPage() {
     setTargets(current => current.map((target, i) => i === index ? { ...target, [field]: value } : target));
   }
 
-  async function save(event: React.FormEvent<HTMLFormElement>) {
+  async function save(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
     setError(""); setMessage("");
     if (!token) { setError("Please sign in first. Kingsmen will not save candidate information without your authenticated session."); return; }
