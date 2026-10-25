@@ -14,6 +14,8 @@ const documentUpload = read("../../apps/web/src/app/api/candidate/documents/uplo
 const documentFinalize = read("../../apps/web/src/app/api/candidate/documents/finalize/route.ts");
 const preparation = read("../../apps/web/src/app/candidate/applications/preparation/page.tsx");
 const preparationApi = read("../../apps/web/src/app/api/candidate/applications/preparation/route.ts");
+const manualPortal = read("../../db/migrations/0092_candidate_manual_portal_handoff.sql");
+const manualPortalApi = read("../../apps/web/src/app/api/candidate/applications/manual-portal/route.ts");
 const matches = read("../../apps/web/src/app/candidate/opportunity-matches/page.tsx");
 
 for (const pathway of ["HIGHER_EDUCATION", "TVET", "SETA_LEARNERSHIP", "INTERNSHIP", "APPRENTICESHIP", "EMPLOYMENT", "FUNDING", "ACCOMMODATION", "WIL"]) {
@@ -46,6 +48,10 @@ assert.ok(documentUpload.includes("candidate-private-documents"), "Document uplo
 assert.ok(documentFinalize.includes("finalize_upload"), "Document finalization must verify uploaded object and file signature");
 assert.ok(preparation.includes("/api/candidate/applications/preparation"), "Preparation UI must call persisted preparation workflow");
 assert.ok(preparationApi.includes("candidate-application-preparation"), "Preparation API must use authenticated preparation edge function");
+assert.ok(manualPortal.includes("MANUAL_REQUIRED"), "Unconfigured providers must use an explicit manual-only job state");
+assert.ok(manualPortal.includes("provider_submission_sent',false") || manualPortal.includes("'provider_submission_sent',false"), "Manual handoff must never claim a provider submission");
+assert.ok(manualPortal.includes("source_checked_at < now()-interval '24 hours'"), "Manual handoff must fail closed on stale official source evidence");
+assert.ok(manualPortalApi.includes("prepare_candidate_manual_portal_submission"), "Manual portal route must call the audited database RPC");
 assert.ok(matches.includes("Add to my master application"), "Verified match cards must feed the unified master application");
 assert.ok(page.includes("N15 match reference"), "Master application must preserve the originating match reference");
 console.log("PASS: unified master application static contract checks");
