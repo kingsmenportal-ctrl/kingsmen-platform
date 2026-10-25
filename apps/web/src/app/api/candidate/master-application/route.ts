@@ -66,14 +66,20 @@ export async function GET(request: Request) {
   if (profile instanceof Response) return profile;
   const targets = await candidateRequest(
     request,
-    "candidate_master_application_targets?select=id,target_key,pathway_type,provider_name,programme_or_role,provider_application_url,source_reference,source_confidence,planning_status,created_at,updated_at&order=created_at.desc"
+    "candidate_master_application_targets?select=id,target_key,pathway_type,provider_name,programme_or_role,provider_application_url,source_reference,source_confidence,planning_status,application_id,created_at,updated_at&order=created_at.desc"
   );
   if (targets instanceof Response) return targets;
+  const applications = await candidateRequest(
+    request,
+    "candidate_applications?select=id,application_ref,opportunity_id,pathway_type,status,readiness_status,provider_reference,submission_evidence_ref,submitted_at,created_at,updated_at&order=created_at.desc"
+  );
+  if (applications instanceof Response) return applications;
   return Response.json({
     ok: true,
     profile: Array.isArray(profile.data) ? profile.data[0] ?? null : null,
     targets: Array.isArray(targets.data) ? targets.data : [],
-    boundary: "Candidate-owned persisted profile and planning targets; no provider submission implied."
+    applications: Array.isArray(applications.data) ? applications.data : [],
+    boundary: "Candidate-owned persisted profile, targets and application records; provider submission/outcomes require separate evidence."
   });
 }
 
@@ -130,9 +136,25 @@ export async function POST(request: Request) {
     })
   });
   if (result instanceof Response) return result;
+  const applicationPreparations: Array<Record<string, unknown>> = [];
+  for (const target of targets) {
+    if (!target.source_reference?.startsWith("N15 match reference: ")) continue;
+    const prepared = await candidateRequest(request, "rpc/prepare_candidate_application_from_master_target", {
+      method: "POST",
+      body: JSON.stringify({ p_target_key: target.target_key })
+    });
+    if (prepared instanceof Response) {
+      let detail: unknown = null;
+      try { detail = await prepared.json(); } catch {}
+      applicationPreparations.push({ targetKey: target.target_key, ok: false, error: detail || "APPLICATION_PREPARATION_UNAVAILABLE" });
+    } else {
+      applicationPreparations.push({ targetKey: target.target_key, ...(prepared.data as Record<string, unknown>) });
+    }
+  }
   return Response.json({
     ok: true,
     result: result.data,
-    message: "Your reusable profile and planning targets were saved. Provider applications have not been submitted."
+    applicationPreparations,
+    message: "Your reusable profile and targets were saved. Verified N15 targets may also create a draft application record; no provider application was submitted."
   });
 }
