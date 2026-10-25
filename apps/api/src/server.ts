@@ -21,6 +21,7 @@ import {
   type JarvisRuntimeServerStore
 } from "./jarvis/jarvis-runtime-server-adapter";
 import type { ApiJarvisRuntimeResult } from "./jarvis/jarvis-runtime-api";
+import { handleFounderLiveBrief } from "./founder-ops/founder-live-brief-runtime";
 
 const MAX_BODY_BYTES = 1_000_000;
 const SERVICE_NAME = "kingsmen-api";
@@ -470,6 +471,11 @@ export function createKingsmenApiServer() {
       if (method === "OPTIONS") {
         response.statusCode = 204;
         response.end();
+        return;
+      }
+
+      if ((method === "GET" || method === "POST") && pathname === "/api/founder/brief") {
+        await handleFounderLiveBrief(request, response);
         return;
       }
 
