@@ -10,6 +10,7 @@ on:
       - 'scripts/validators/validate-identity-review-follow-up-status.mjs'
       - 'scripts/security/test-identity-review-follow-up-cleanup.sql'
       - 'scripts/security/test-identity-review-conflicting-link-cleanup.sql'
+      - '.github/workflows/identity-review-follow-up-status.yml'
   push:
     branches: ['feat/identity-review-follow-up-status-*']
     paths:
@@ -18,6 +19,7 @@ on:
       - 'supabase/functions/candidate-identity-review-status/**'
       - 'apps/web/src/app/candidate/identity-review/status/**'
       - 'scripts/validators/validate-identity-review-follow-up-status.mjs'
+      - '.github/workflows/identity-review-follow-up-status.yml'
 permissions:
   contents: read
 jobs:
