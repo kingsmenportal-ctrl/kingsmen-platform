@@ -2,8 +2,8 @@ export const dynamic = "force-dynamic";
 
 export async function GET(request: Request) {
   const authorization = request.headers.get("authorization") || "";
-  if (!/^Bearer\\s+\\S+$/i.test(authorization)) return Response.json({ error: "AUTHENTICATION_REQUIRED" }, { status: 401 });
-  const base = process.env.NEXT_PUBLIC_SUPABASE_URL?.replace(/\\/$/, "");
+  if (!/^Bearer\s+\S+$/i.test(authorization)) return Response.json({ error: "AUTHENTICATION_REQUIRED" }, { status: 401 });
+  const base = process.env.NEXT_PUBLIC_SUPABASE_URL?.replace(/\/$/, "");
   const key = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
   if (!base || !key) return Response.json({ error: "IDENTITY_REVIEW_NOT_CONFIGURED" }, { status: 503 });
   try {
