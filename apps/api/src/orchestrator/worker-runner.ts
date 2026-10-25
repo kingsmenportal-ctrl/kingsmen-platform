@@ -56,6 +56,8 @@ export function createWorkerHandlerRegistry(env: NodeJS.ProcessEnv = process.env
       sideEffect: true,
       requiresHumanApproval: true,
       async execute({ dispatch, now }) {
+        const delayMs = Math.min(60_000, Math.max(0, Number(env.KINGSMEN_N16_POST_SENT_DELAY_MS ?? 0)));
+        if (delayMs) await new Promise((resolve) => setTimeout(resolve, delayMs));
         if (dispatch.payload.syntheticOnly !== true || dispatch.payload.approvalGranted !== true) {
           return { workerStatus: "NEEDS_APPROVAL", proposedState: "SAME", failureClass: "POLICY", failureCode: "SYNTHETIC_PROBE_APPROVAL_REQUIRED", payload: { handler: "n16.staging-recovery-probe" } };
         }
@@ -127,6 +129,10 @@ export class AuthenticatedWorkerRunner {
       }
 
       try {
+        if (handler.sideEffect && dispatch.worker_code === "n16.staging-recovery-probe" && process.env.KINGSMEN_WORKER_ENV === "staging") {
+          const delayMs = Math.min(60_000, Math.max(0, Number(process.env.KINGSMEN_N16_PRE_SENT_DELAY_MS ?? 0)));
+          if (delayMs) await new Promise((resolve) => setTimeout(resolve, delayMs));
+        }
         if (handler.sideEffect) await this.queue.markSent(dispatch.dispatch_ref, this.workerId, 120);
         const outcome = await handler.execute({ workerId: this.workerId, dispatch, now: () => new Date().toISOString() });
         const finalEvidence = outcome.evidenceRefs ?? evidenceRefs;
