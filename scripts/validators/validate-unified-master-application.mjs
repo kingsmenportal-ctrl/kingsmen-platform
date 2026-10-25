@@ -25,6 +25,10 @@ const reviewRpcGuard = read("../../db/migrations/0096_lock_document_review_rpc_t
 const outcomeReviewUi = read("../../apps/web/src/app/admin/application-outcomes/page.tsx");
 const outcomeReviewApi = read("../../apps/web/src/app/api/admin/application-outcomes/route.ts");
 const outcomeReviewFunction = read("../../supabase/functions/candidate-application-outcome-review/index.ts");
+const identityPage = read("../../apps/web/src/app/candidate/identity-review/page.tsx");
+const identityRequestApi = read("../../apps/web/src/app/api/candidate/identity-review/route.ts");
+const identityQueuePage = read("../../apps/web/src/app/admin/identity-review/page.tsx");
+const identityDecisionApi = read("../../apps/web/src/app/api/admin/identity-review/decision/route.ts");
 const matches = read("../../apps/web/src/app/candidate/opportunity-matches/page.tsx");
 
 for (const pathway of ["HIGHER_EDUCATION", "TVET", "SETA_LEARNERSHIP", "INTERNSHIP", "APPRENTICESHIP", "EMPLOYMENT", "FUNDING", "ACCOMMODATION", "WIL"]) {
@@ -77,6 +81,12 @@ assert.ok(reviewRpcGuard.includes("from public, anon, authenticated"), "Document
 assert.ok(outcomeReviewUi.includes("Confirm outcome with verified evidence"), "Authorised reviewer UI must confirm provider outcomes");
 assert.ok(outcomeReviewApi.includes("candidate-application-outcome-review"), "Outcome reviewer API must use reviewer-gated service");
 assert.ok(outcomeReviewFunction.includes("APPLICATION_REVIEWER"), "Outcome reviewer service must require dedicated reviewer permission");
+assert.ok(identityPage.includes("Submit for manual identity review"), "Candidate identity review journey must submit a real request");
+assert.ok(identityPage.includes("Upload privately for reviewer inspection"), "Candidate identity journey must support private evidence upload");
+assert.ok(identityRequestApi.includes("candidate-identity-review-request"), "Candidate identity API must use the authenticated request service");
+assert.ok(identityQueuePage.includes("Accept evidence"), "Identity reviewer UI must require explicit evidence decisions");
+assert.ok(identityQueuePage.includes("Approve and link candidate"), "Identity reviewer UI must expose the authorised final decision");
+assert.ok(identityDecisionApi.includes("candidate-identity-review-decision"), "Identity decision API must call the reviewer-gated service");
 assert.ok(matches.includes("Add to my master application"), "Verified match cards must feed the unified master application");
 assert.ok(page.includes("N15 match reference"), "Master application must preserve the originating match reference");
 console.log("PASS: unified master application static contract checks");
