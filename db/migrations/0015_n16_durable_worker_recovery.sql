@@ -11,6 +11,12 @@ update public.orchestrator_dispatch_queue
 set idempotency_key = 'legacy:' || dispatch_ref
 where idempotency_key is null;
 
+-- Backfill leases on pre-existing active rows so old LOCKED/SENT work is recoverable.
+update public.orchestrator_dispatch_queue
+set lease_expires_at = coalesce(locked_at, created_at) + interval '60 seconds',
+    updated_at = clock_timestamp()
+where queue_status in ('LOCKED','SENT') and lease_expires_at is null;
+
 create unique index if not exists orchestrator_dispatch_idempotency_uq
   on public.orchestrator_dispatch_queue(idempotency_key)
   where idempotency_key is not null;
