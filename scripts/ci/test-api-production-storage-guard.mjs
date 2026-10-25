@@ -30,7 +30,7 @@ function runCase(name, mode, expectedMessage) {
 try {
   runCase("production_defaults_to_postgres_and_requires_database_url", null, "Production startup blocked: KINGSMEN_TRUTH_VAULT_MODE=postgres and a database URL are required; memory-only storage is development-only.");
   runCase("production_rejects_explicit_memory_mode", "memory", "Production startup blocked: KINGSMEN_TRUTH_VAULT_MODE=postgres and a database URL are required; memory-only storage is development-only.");
-  runCase("production_rejects_explicit_memory_development_only_mode", "memory_development_only", "Memory-only Truth Vault is forbidden in NODE_ENV=production");
+  runCase("production_rejects_explicit_memory_development_only_mode", "memory_development_only", "Production startup blocked: KINGSMEN_TRUTH_VAULT_MODE=postgres and a database URL are required; memory-only storage is development-only.");
   console.log(JSON.stringify({ suite: "api-production-storage-guard", passed: true, cases: 3 }));
 } catch (error) {
   console.error(error instanceof Error ? error.stack : String(error));
