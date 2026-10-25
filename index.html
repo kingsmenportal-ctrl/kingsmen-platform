@@ -1,0 +1,58 @@
+<!doctype html>
+<html lang="en-ZA">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#10243a">
+  <meta name="description" content="Kingsmen helps South Africans explore education, training, funding, internships and employment opportunities.">
+  <title>Kingsmen | Your next opportunity</title>
+  <style>
+    :root{font-family:system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;color:#17283b;background:#f4f7fb;font-synthesis:none;text-rendering:optimizeLegibility}
+    *{box-sizing:border-box}body{margin:0;line-height:1.6}.header{display:flex;justify-content:space-between;align-items:center;gap:1rem;padding:1.1rem max(5vw,1rem);background:#10243a;color:#fff}.brand{font-weight:850;letter-spacing:.14em;color:#fff;text-decoration:none}.nav{display:flex;flex-wrap:wrap;gap:1rem}.nav a{color:#fff;text-decoration:none}.nav a:hover,.nav a:focus-visible{text-decoration:underline}
+    main{max-width:1100px;margin:auto;padding:2rem 1.2rem 4rem}.hero{padding:clamp(2rem,7vw,5rem);border-radius:1.25rem;background:linear-gradient(135deg,#e2ebf7,#fff)}.eyebrow{font-weight:750;letter-spacing:.12em;font-size:.8rem}.hero h1{max-width:780px;margin:.6rem 0;font-size:clamp(2.5rem,8vw,5rem);line-height:1.04;letter-spacing:-.04em}.hero p{max-width:680px}.actions{display:flex;flex-wrap:wrap;gap:.8rem;margin-top:1.6rem}.button{display:inline-block;padding:.8rem 1.1rem;border-radius:.6rem;font-weight:700;text-decoration:none}.primary{background:#10243a;color:#fff}.secondary{border:1px solid #10243a;color:#10243a}.section{margin-top:2.8rem}.cards{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:1rem}.card,.notice{background:#fff;border:1px solid #d8e0eb;border-radius:.8rem;padding:1.2rem}.card h3{margin-top:.2rem}.notice{margin-top:2rem;background:#fff8e8;border-color:#ead9ae}.notice p{margin-bottom:0}footer{display:flex;justify-content:space-between;gap:1rem;padding:1.4rem max(5vw,1rem);background:#10243a;color:#fff}footer a{color:#fff}
+    @media(max-width:700px){.header{align-items:flex-start;flex-direction:column}.cards{grid-template-columns:1fr}footer{flex-direction:column}}
+  </style>
+</head>
+<body>
+  <header class="header">
+    <a class="brand" href="./" aria-label="Kingsmen home">KINGSMEN</a>
+    <nav class="nav" aria-label="Main navigation">
+      <a href="#pathways">Pathways</a>
+      <a href="#how-it-works">How it works</a>
+      <a href="#status">Platform status</a>
+    </nav>
+  </header>
+  <main>
+    <section class="hero">
+      <p class="eyebrow">YOUR FUTURE. YOUR OPPORTUNITIES.</p>
+      <h1>Make your next move count.</h1>
+      <p>Kingsmen is being built to help South Africans navigate education, training, funding and employment opportunities through one organised journey.</p>
+      <div class="actions">
+        <a class="button primary" href="#pathways">Explore pathways</a>
+        <a class="button secondary" href="#status">See what is available</a>
+      </div>
+    </section>
+    <section class="section" id="pathways">
+      <h2>Six opportunity pathways</h2>
+      <div class="cards">
+        <article class="card"><h3>Higher education</h3><p>Universities, universities of technology, applications and admission preparation.</p></article>
+        <article class="card"><h3>TVET & skills</h3><p>TVET colleges, occupational learning and skills-development routes.</p></article>
+        <article class="card"><h3>SETA & learnerships</h3><p>Explore structured learning and work-based training opportunities.</p></article>
+        <article class="card"><h3>Internships</h3><p>Build experience and prepare for workplace opportunities.</p></article>
+        <article class="card"><h3>Apprenticeships</h3><p>Discover practical training pathways and trade-related opportunities.</p></article>
+        <article class="card"><h3>Employment</h3><p>Organise your job search and prepare for opportunities.</p></article>
+      </div>
+    </section>
+    <section class="section" id="how-it-works">
+      <h2>One place to prepare</h2>
+      <p>The intended Kingsmen journey brings together opportunity discovery, application preparation, document readiness, funding information and progress tracking. Provider-confirmed outcomes must remain distinct from candidate-reported submissions.</p>
+    </section>
+    <section class="notice" id="status">
+      <h2>Temporary website — early access setup</h2>
+      <p>This free GitHub Pages site is a public information frontend. Candidate accounts, private documents, live application processing, email delivery and verified payment processing are not provided by this static page. Do not submit personal or payment information here.</p>
+    </section>
+  </main>
+  <footer><span>© <span id="year"></span> Kingsmen</span><a href="./404.html">Help</a></footer>
+  <script>document.getElementById("year").textContent=new Date().getFullYear();</script>
+</body>
+</html>
