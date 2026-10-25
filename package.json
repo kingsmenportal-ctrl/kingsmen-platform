@@ -8,7 +8,7 @@
     "doc": "docs"
   },
   "scripts": {
-    "test": "node scripts/validators/validate-jarvis-core.mjs && node scripts/validators/validate-jarvis-live-pass-02.mjs && node scripts/staging/test-kingsmen-operating-evidence-reconciliation.mjs && npm run n14:connectors:check && npm run n15:sources:check && npm run n15:ingestion:check && npm run n16:recovery:check",
+    "test": "node scripts/validators/validate-jarvis-core.mjs && node scripts/validators/validate-jarvis-live-pass-02.mjs && node scripts/staging/test-kingsmen-operating-evidence-reconciliation.mjs && npm run n14:connectors:check && npm run n15:sources:check && npm run n15:ingestion:check && npm run n16:recovery:check && npm run n16:queue:check",
     "jarvis:validate": "node scripts/validators/validate-jarvis-connected-live.mjs",
     "jarvis:validate:core": "node scripts/validators/validate-jarvis-core.mjs",
     "jarvis:validate:live-pass-02": "node scripts/validators/validate-jarvis-live-pass-02.mjs",
@@ -101,7 +101,9 @@
     "n15:ingestion:test": "node scripts/staging/test-n15-live-ingestion-contract.mjs",
     "n15:ingestion:check": "npm run n15:ingestion:test",
     "n16:recovery:test": "npm --prefix apps/api run build && node scripts/staging/test-n16-worker-recovery.mjs",
-    "n16:recovery:check": "npm run n16:recovery:test"
+    "n16:recovery:check": "npm run n16:recovery:test",
+    "n16:queue:contract": "node scripts/staging/test-n16-durable-queue-contract.mjs",
+    "n16:queue:check": "npm run n16:queue:contract"
   },
   "repository": {
     "type": "git",
