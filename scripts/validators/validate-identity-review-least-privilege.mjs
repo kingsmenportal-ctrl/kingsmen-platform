@@ -5,6 +5,10 @@ import assert from 'node:assert/strict';
 const path = 'supabase/migrations/20261025120000_identity_review_least_privilege_role.sql';
 const sql = fs.readFileSync(path, 'utf8').replace(/--[^\n]*/g, ' ').toLowerCase();
 const required = [
+  [/alter\\s+table\\s+public\\.platform_reviewers/, 'updates reviewer role registry constraint'],
+  [/platform_reviewers_role_code_check/, 'replaces reviewer role-code constraint'],
+  [/candidate_identity_review_audit_actor_role_check/, 'replaces audit actor-role constraint'],
+  [/identity_reviewer'::text/, 'allows the dedicated role in schema constraints'],
   [/create\s+or\s+replace\s+function\s+public\.decide_candidate_identity_review\s*\(/, 'replaces the live decision function'],
   [/r\.role_code\s*=\s*'identity_reviewer'/, 'requires the dedicated identity-review role'],
   [/r\.is_active\s*=\s*true/, 'requires active reviewer grant'],
