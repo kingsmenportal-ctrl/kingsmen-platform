@@ -230,24 +230,29 @@ export async function handleFounderLiveBrief(request: IncomingMessage, response:
     const cols = briefColumns(brief);
     const evidenceRefs = brief.evidenceRefs;
     const inserted = await db.query<{ brief_ref: string; created_at: string }>(
-      `insert into public.founder_daily_briefs
-       (brief_ref, brief_type, brief_date, brief_status, system_health, queue_summary, finance_summary,
-        document_summary, matching_summary, map_playwright_summary, incident_summary, capacity_summary,
-        urgent_candidates, recommended_actions, evidence_refs)
-       values ($1,$2,(now() at time zone 'Africa/Johannesburg')::date,$3,$4::jsonb,$5::jsonb,$6::jsonb,
-        $7::jsonb,$8::jsonb,$9::jsonb,$10::jsonb,$11::jsonb,$12::jsonb,$13::jsonb,$14::text[])
-       returning brief_ref, created_at::text`,
+      \`with inserted as (
+         insert into public.founder_daily_briefs
+         (brief_ref, brief_type, brief_date, brief_status, system_health, queue_summary, finance_summary,
+          document_summary, matching_summary, map_playwright_summary, incident_summary, capacity_summary,
+          urgent_candidates, recommended_actions, evidence_refs)
+         values ($1,$2,(now() at time zone 'Africa/Johannesburg')::date,$3,$4::jsonb,$5::jsonb,$6::jsonb,
+          $7::jsonb,$8::jsonb,$9::jsonb,$10::jsonb,$11::jsonb,$12::jsonb,$13::jsonb,$14::text[])
+         returning brief_ref, created_at
+       ), audited as (
+         insert into public.founder_ops_audit_events
+         (audit_ref, actor_ref, action_key, target_ref, severity, audit_message, audit_payload, evidence_refs)
+         select $15, $16, 'FOUNDER_LIVE_BRIEF_READ', inserted.brief_ref, $17, $18, $19::jsonb, $20::text[]
+         from inserted returning audit_ref
+       )
+       select inserted.brief_ref, inserted.created_at::text
+       from inserted join audited on audited.audit_ref = $15\`,
       [ref, brief.briefType, brief.overallState === "HEALTHY" || brief.overallState === "WATCH" ? "READY" : "DRAFT",
         cols.systemHealth, cols.queueSummary, cols.financeSummary, cols.documentSummary, cols.matchingSummary,
         cols.mapPlaywrightSummary, cols.incidentSummary, cols.capacitySummary,
         JSON.stringify({ ...brief.sections.find((section) => section.domain === "urgent_candidates"), aggregateOnly: true }),
-        JSON.stringify(brief.recommendedActions), evidenceRefs]
-    );
-    await db.query(
-      `insert into public.founder_ops_audit_events
-       (audit_ref, actor_ref, action_key, target_ref, severity, audit_message, audit_payload, evidence_refs)
-       values ($1,$2,'FOUNDER_LIVE_BRIEF_READ',$3,$4,$5,$6::jsonb,$7::text[])`,
-      [`audit_${ref}`, userId, ref, brief.overallState === "CRITICAL" ? "CRITICAL" : brief.overallState === "DEGRADED" ? "WARNING" : "INFO",
+        JSON.stringify(brief.recommendedActions), evidenceRefs,
+        \`audit_\${ref}\`, userId,
+        brief.overallState === "CRITICAL" ? "CRITICAL" : brief.overallState === "DEGRADED" ? "WARNING" : "INFO",
         "Authenticated founder generated a persisted operational brief.",
         JSON.stringify({ briefType: brief.briefType, overallState: brief.overallState, sectionStates: brief.sections.map((section) => ({ domain: section.domain, state: section.state })), sourceErrors: loaded.sourceErrors }),
         evidenceRefs]
