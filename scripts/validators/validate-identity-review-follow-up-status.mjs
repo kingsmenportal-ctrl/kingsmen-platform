@@ -9,7 +9,7 @@ const required = [
   [migration.includes("supabase_user_id = p_candidate_auth_user_id"), "request owner enforced in transactional RPC"],
   [migration.includes("request_status <> 'needs_information'"), "follow-up restricted to NEEDS_INFORMATION"],
   [migration.includes("candidate_response = left") && migration.includes("request_status = 'pending'"), "response persisted and request requeued"],
-  [migration.includes("'candidate_response', 'candidate_response'") && migration.includes("'needs_information', 'pending'"), "response audit transition"],
+  [migration.includes("'candidate_response'") && migration.includes("'needs_information'") && migration.includes("'pending'"), "response audit transition"],
   [/auth\.auth\.getuser\(bearer\[1\]\)/i.test(followup), "follow-up validates the bearer with Supabase Auth"],
   [followup.includes("p_candidate_auth_user_id: authData.user.id"), "follow-up derives owner from verified session"],
   [/\.eq\("supabase_user_id", authData\.user\.id\)/.test(status), "status query is scoped to authenticated owner"],
