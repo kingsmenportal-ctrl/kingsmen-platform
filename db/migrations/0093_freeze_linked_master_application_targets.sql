@@ -101,7 +101,14 @@ begin
        nullif(trim(v_target->>'provider_application_url'), ''),
        nullif(trim(v_target->>'source_reference'), ''),
        'UNVERIFIED', 'PLANNING', p_idempotency_key, v_user_id)
-    on conflict (candidate_id, target_key) do update set\n      pathway_type = excluded.pathway_type,\n      provider_name = excluded.provider_name,\n      programme_or_role = excluded.programme_or_role,\n      provider_application_url = excluded.provider_application_url,\n      source_reference = excluded.source_reference,\n      updated_at = now()\n    where public.candidate_master_application_targets.application_id is null and public.candidate_master_application_targets.planning_status in ('PLANNING','PREPARING');
+    on conflict (candidate_id, target_key) do update set
+      pathway_type = excluded.pathway_type,
+      provider_name = excluded.provider_name,
+      programme_or_role = excluded.programme_or_role,
+      provider_application_url = excluded.provider_application_url,
+      source_reference = excluded.source_reference,
+      updated_at = now()
+    where public.candidate_master_application_targets.application_id is null and public.candidate_master_application_targets.planning_status in ('PLANNING','PREPARING');
     get diagnostics v_inserted = row_count;
     v_target_count := v_target_count + v_inserted;
   end loop;
