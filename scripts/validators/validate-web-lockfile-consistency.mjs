@@ -18,7 +18,7 @@ for (const [name, spec] of Object.entries(declared)) {
   if (lockedRoot[name] !== spec) {
     errors.push(`root lock mismatch for ${name}: package.json=${spec}, lockfile=${lockedRoot[name] ?? "<missing>"}`);
   }
-  if (!/^\d+\\.\d+\\.\d+(?:-[0-9A-Za-z.-]+)?$/.test(spec)) {
+  if (!/^\d+\.\d+\.\d+(?:-[0-9A-Za-z.-]+)?$/.test(spec)) {
     errors.push(`dependency is not pinned to an exact version: ${name}=${spec}`);
   }
   const resolved = lock.packages?.[`node_modules/${name}`]?.version;
