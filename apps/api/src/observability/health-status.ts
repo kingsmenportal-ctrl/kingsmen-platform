@@ -14,13 +14,14 @@ function worstPressure(levels: PressureLevel[]): PressureLevel {
 export function deriveHealthStatus(input: {
   openSev1Count: number;
   openSev2Count: number;
+  openIncidentCount?: number;
   failedWorkflows: number;
   capacityPressure: PressureLevel;
   downServices: number;
   degradedServices: number;
 }): HealthStatus {
   if (input.openSev1Count > 0 || input.capacityPressure === "CRITICAL" || input.downServices > 0) return "RED";
-  if (input.openSev2Count > 0 || input.failedWorkflows > 0 || input.capacityPressure === "HIGH" || input.degradedServices > 0) return "AMBER";
+  if ((input.openIncidentCount ?? 0) > 0 || input.openSev2Count > 0 || input.failedWorkflows > 0 || input.capacityPressure === "HIGH" || input.capacityPressure === "MEDIUM" || input.degradedServices > 0) return "AMBER";
   return "GREEN";
 }
 
@@ -46,13 +47,14 @@ export function buildSystemHealthSnapshot(input: {
   const status = deriveHealthStatus({
     openSev1Count: input.openSev1Count,
     openSev2Count: input.openSev2Count,
+    openIncidentCount: input.incidentOpenCount,
     failedWorkflows: input.failedWorkflows,
     capacityPressure: pressure,
     downServices,
     degradedServices
   });
 
-  return {
+  const snapshot: SystemHealthSnapshot = {
     snapshotRef: ref("health"),
     status,
     activeCandidates: input.activeCandidates,
@@ -68,6 +70,9 @@ export function buildSystemHealthSnapshot(input: {
     summary: `System is ${status}. Active candidates ${input.activeCandidates}/${input.activeCandidateCap ?? 500}; open incidents ${input.incidentOpenCount}.`,
     evidenceRefs: input.evidenceRefs
   };
+
+  assertNoFalseGreen(snapshot);
+  return snapshot;
 }
 
 export function assertNoFalseGreen(snapshot: SystemHealthSnapshot): void {
