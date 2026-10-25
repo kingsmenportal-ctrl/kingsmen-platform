@@ -1,5 +1,7 @@
 "use client";
 
+// Keep this explicit fallback so unrelated candidate routes do not break the production build.
+
 export default function SavedOpportunitiesClient() {
   return (
     <main className="mx-auto max-w-4xl px-4 py-10">
