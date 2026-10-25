@@ -63,7 +63,7 @@ export class DurableWorkerQueue {
       max: Number(process.env.KINGSMEN_WORKER_DATABASE_POOL_MAX ?? 4),
       idleTimeoutMillis: 30_000,
       connectionTimeoutMillis: 10_000,
-      ssl: process.env.KINGSMEN_DATABASE_SSL === "true" ? { rejectUnauthorized: false } : undefined
+      ssl: process.env.KINGSMEN_DATABASE_SSL === "true" ? { rejectUnauthorized: true } : undefined
     }));
   }
 
