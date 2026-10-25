@@ -16,6 +16,9 @@ const preparation = read("../../apps/web/src/app/candidate/applications/preparat
 const preparationApi = read("../../apps/web/src/app/api/candidate/applications/preparation/route.ts");
 const manualPortal = read("../../db/migrations/0092_candidate_manual_portal_handoff.sql");
 const manualPortalApi = read("../../apps/web/src/app/api/candidate/applications/manual-portal/route.ts");
+const outcomes = read("../../apps/web/src/app/candidate/outcomes/page.tsx");
+const outcomesApi = read("../../apps/web/src/app/api/candidate/outcomes/route.ts");
+const outcomesFunction = read("../../supabase/functions/candidate-application-outcomes/index.ts");
 const matches = read("../../apps/web/src/app/candidate/opportunity-matches/page.tsx");
 
 for (const pathway of ["HIGHER_EDUCATION", "TVET", "SETA_LEARNERSHIP", "INTERNSHIP", "APPRENTICESHIP", "EMPLOYMENT", "FUNDING", "ACCOMMODATION", "WIL"]) {
@@ -52,6 +55,11 @@ assert.ok(manualPortal.includes("MANUAL_REQUIRED"), "Unconfigured providers must
 assert.ok(manualPortal.includes("provider_submission_sent',false") || manualPortal.includes("'provider_submission_sent',false"), "Manual handoff must never claim a provider submission");
 assert.ok(manualPortal.includes("source_checked_at < now()-interval '24 hours'"), "Manual handoff must fail closed on stale official source evidence");
 assert.ok(manualPortalApi.includes("prepare_candidate_manual_portal_submission"), "Manual portal route must call the audited database RPC");
+assert.ok(outcomes.includes("Provider outcome verified"), "Candidate outcomes page must distinguish verified outcomes");
+assert.ok(outcomesApi.includes("candidate-application-outcomes"), "Outcome API must use authenticated candidate-safe read model");
+assert.ok(outcomesFunction.includes("PROVIDER_OUTCOME_NOTICE"), "Outcome read model must inspect provider outcome evidence");
+assert.ok(outcomesFunction.includes("outcome_requires_verified_provider_outcome_notice"), "Outcome read model must declare evidence policy");
+assert.ok(!outcomesFunction.includes("storage_path"), "Outcome read model must not expose private storage paths");
 assert.ok(matches.includes("Add to my master application"), "Verified match cards must feed the unified master application");
 assert.ok(page.includes("N15 match reference"), "Master application must preserve the originating match reference");
 console.log("PASS: unified master application static contract checks");
