@@ -162,7 +162,7 @@ export default function MasterApplicationPage() {
         })
       });
       const body = await response.json();
-      if (!response.ok) throw new Error(body.detail?.message || body.error || "The master application could not be saved.");
+      if (!response.ok) throw new Error(body.message || body.detail?.message || body.error || "The master application could not be saved.");
       setSavedAt(new Date().toISOString());
       setMessage(`Saved securely. ${body.result?.new_targets_saved ?? 0} new target record(s) created or updated. No provider application was submitted.`);
     } catch (e) {
