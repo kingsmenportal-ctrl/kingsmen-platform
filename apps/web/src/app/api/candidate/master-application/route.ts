@@ -45,7 +45,14 @@ async function candidateRequest(request: Request, path: string, init: RequestIni
   let data: unknown = null;
   try { data = raw ? JSON.parse(raw) : null; } catch { data = { message: "Invalid backend response" }; }
   if (!response.ok) {
-    const status = response.status === 401 || response.status === 403 ? response.status : response.status >= 500 ? 502 : 400;
+    const status = response.status === 401 ? 401 : response.status === 403 ? 403 : response.status >= 500 ? 502 : 400;
+    if (status === 403) {
+      return Response.json({
+        ok: false,
+        error: "IDENTITY_REVIEW_OR_PERMISSION_REQUIRED",
+        message: "Your account is authenticated, but Kingsmen could not resolve an authorised candidate identity for this action. Complete the candidate identity-review process or contact Kingsmen support; do not create a second account or link by email alone."
+      }, { status });
+    }
     return Response.json({ ok: false, error: "PERSISTENCE_REQUEST_FAILED", detail: status === 400 ? data : undefined }, { status });
   }
   return { user, data };
