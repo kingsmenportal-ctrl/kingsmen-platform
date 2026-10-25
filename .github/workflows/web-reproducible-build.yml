@@ -44,7 +44,7 @@ jobs:
         run: npm ci --no-audit --no-fund
 
       - name: Validate exact manifest and lockfile parity
-        working-directory: .
+        working-directory: ${{ github.workspace }}
         run: npm run web:validate:lockfile
 
       - name: Build Next.js production application
