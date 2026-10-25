@@ -6,7 +6,9 @@ const page = read("../../apps/web/src/app/candidate/master-application/page.tsx"
 const route = read("../../apps/web/src/app/api/candidate/master-application/route.ts");
 const schema = read("../../db/migrations/0087_unified_candidate_master_application.sql");
 const rpc = read("../../db/migrations/0088_unified_candidate_master_application_rpc.sql");
+const guard = read("../../db/migrations/0089_unified_master_application_source_confidence_guard.sql");
 const workbench = read("../../apps/web/src/app/candidate/workbench/page.tsx");
+const matches = read("../../apps/web/src/app/candidate/opportunity-matches/page.tsx");
 
 for (const pathway of ["HIGHER_EDUCATION", "TVET", "SETA_LEARNERSHIP", "INTERNSHIP", "APPRENTICESHIP", "EMPLOYMENT", "FUNDING", "ACCOMMODATION", "WIL"]) {
   assert.ok(page.includes(pathway), `UI missing pathway: ${pathway}`);
@@ -22,9 +24,12 @@ assert.ok(!route.includes("service_role"), "Browser/API source must not depend o
 assert.ok(schema.includes("enable row level security"), "All master application tables require RLS");
 assert.ok(schema.includes("kingsmen_security.current_authenticated_candidate_id()"), "RLS must bind data to approved candidate identity");
 assert.ok(schema.includes("source_confidence text not null default 'UNVERIFIED'"), "Candidate-entered sources must default to unverified");
+assert.ok(guard.includes("source_confidence = 'UNVERIFIED'"), "Candidates must not self-certify source confidence");
 assert.ok(schema.includes("unique (candidate_id, target_key)"), "Targets must not duplicate on repeat saves");
 assert.ok(rpc.includes("security invoker"), "Save RPC must respect caller RLS");
 assert.ok(rpc.includes("'provider_submissions_sent', 0"), "RPC must never claim provider submission");
 assert.ok(rpc.includes("on conflict (candidate_id, target_key) do update"), "Repeated saves must upsert targets");
 assert.ok(workbench.includes("/candidate/master-application"), "Candidate workbench must link to master application");
+assert.ok(matches.includes("Add to my master application"), "Verified match cards must feed the unified master application");
+assert.ok(page.includes("N15 match reference"), "Master application must preserve the originating match reference");
 console.log("PASS: unified master application static contract checks");
