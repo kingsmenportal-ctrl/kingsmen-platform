@@ -40,6 +40,9 @@ jobs:
       - name: Build backend API
         run: npm run api:build
 
+      - name: Validate unified candidate master application contract
+        run: node scripts/validators/validate-unified-master-application.mjs
+
       - name: Install web dependencies
         run: npm install --prefix apps/web --no-audit --no-fund
 
