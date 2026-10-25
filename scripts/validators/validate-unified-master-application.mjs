@@ -19,6 +19,7 @@ const manualPortalApi = read("../../apps/web/src/app/api/candidate/applications/
 const outcomes = read("../../apps/web/src/app/candidate/outcomes/page.tsx");
 const outcomesApi = read("../../apps/web/src/app/api/candidate/outcomes/route.ts");
 const outcomesFunction = read("../../supabase/functions/candidate-application-outcomes/index.ts");
+const e2e = read("../../scripts/staging/run-master-application-e2e.mjs");
 const matches = read("../../apps/web/src/app/candidate/opportunity-matches/page.tsx");
 
 for (const pathway of ["HIGHER_EDUCATION", "TVET", "SETA_LEARNERSHIP", "INTERNSHIP", "APPRENTICESHIP", "EMPLOYMENT", "FUNDING", "ACCOMMODATION", "WIL"]) {
@@ -60,6 +61,10 @@ assert.ok(outcomesApi.includes("candidate-application-outcomes"), "Outcome API m
 assert.ok(outcomesFunction.includes("PROVIDER_OUTCOME_NOTICE"), "Outcome read model must inspect provider outcome evidence");
 assert.ok(outcomesFunction.includes("outcome_requires_verified_provider_outcome_notice"), "Outcome read model must declare evidence policy");
 assert.ok(!outcomesFunction.includes("storage_path"), "Outcome read model must not expose private storage paths");
+assert.ok(rpc.includes("application_id is null"), "Candidate target upsert must not mutate linked application targets");
+assert.ok(e2e.includes("KINGSMEN_E2E_CANDIDATE_A_TOKEN") && e2e.includes("KINGSMEN_E2E_CANDIDATE_B_TOKEN"), "Authenticated E2E requires two separate staging candidate sessions");
+assert.ok(e2e.includes("candidate B must not see A document"), "Authenticated E2E must verify cross-candidate private document isolation");
+assert.ok(e2e.includes("provider_submissions_sent"), "Authenticated E2E must assert no false provider submission");
 assert.ok(matches.includes("Add to my master application"), "Verified match cards must feed the unified master application");
 assert.ok(page.includes("N15 match reference"), "Master application must preserve the originating match reference");
 console.log("PASS: unified master application static contract checks");
