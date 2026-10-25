@@ -46,6 +46,12 @@ jobs:
       - name: Build Next.js web application
         run: npm run build --prefix apps/web
 
+      - name: Install Chromium for browser verification
+        run: npx --yes playwright install chromium
+
+      - name: Verify Free Destiny Map in a real browser
+        run: npm run test:free-destiny-map:e2e --prefix apps/web
+
       - name: Validate Truth Vault persistence contract
         run: npm run api:validate
 
