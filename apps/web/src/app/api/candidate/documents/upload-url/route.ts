@@ -21,6 +21,7 @@ export async function POST(request: Request) {
       headers: { apikey: key, Authorization: authorization, "Content-Type": "application/json" },
       body: JSON.stringify({
         action: "create_upload", filename, mime_type: mimeType, size_bytes: sizeBytes,
+        ...(typeof body.evidencePurpose === "string" ? { evidence_purpose: body.evidencePurpose } : {}),
         ...(typeof body.applicationId === "string" ? { application_id: body.applicationId } : {}),
         ...(typeof body.preparationItemId === "string" ? { preparation_item_id: body.preparationItemId } : {})
       }),
