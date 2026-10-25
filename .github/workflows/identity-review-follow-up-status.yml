@@ -1,0 +1,43 @@
+name: Identity Review Follow-up and Candidate Status Contract
+on:
+  pull_request:
+    branches: ['**']
+    paths:
+      - 'supabase/migrations/*identity_review_followup*'
+      - 'supabase/functions/candidate-identity-review-followup/**'
+      - 'supabase/functions/candidate-identity-review-status/**'
+      - 'apps/web/src/app/candidate/identity-review/status/**'
+      - 'apps/web/src/components/saved-opportunities-client.tsx'
+      - 'scripts/validators/validate-identity-review-follow-up-status.mjs'
+      - 'scripts/security/test-identity-review-follow-up-cleanup.sql'
+      - 'scripts/security/test-identity-review-conflicting-link-cleanup.sql'
+      - '.github/workflows/identity-review-follow-up-status.yml'
+  push:
+    branches: ['feat/identity-review-follow-up-status-*']
+    paths:
+      - 'supabase/migrations/*identity_review_followup*'
+      - 'supabase/functions/candidate-identity-review-followup/**'
+      - 'supabase/functions/candidate-identity-review-status/**'
+      - 'apps/web/src/app/candidate/identity-review/status/**'
+      - 'scripts/validators/validate-identity-review-follow-up-status.mjs'
+      - '.github/workflows/identity-review-follow-up-status.yml'
+permissions:
+  contents: read
+jobs:
+  candidate-follow-up-status:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: npm
+          cache-dependency-path: apps/web/package-lock.json
+      - name: Install frontend dependencies and reconcile lockfile drift in the isolated CI checkout
+        run: npm install --prefix apps/web --no-audit --no-fund
+      - name: Build the actual Next.js frontend
+        run: npm --prefix apps/web run build
+        env:
+          NEXT_PUBLIC_SUPABASE_ANON_KEY: build-contract-placeholder-not-a-credential
+      - name: Validate candidate ownership, follow-up, status and evidence contract
+        run: node scripts/validators/validate-identity-review-follow-up-status.mjs

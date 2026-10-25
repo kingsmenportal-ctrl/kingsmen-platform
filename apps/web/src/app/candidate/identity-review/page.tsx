@@ -154,6 +154,10 @@ export default function CandidateIdentityReviewPage() {
           </p>
         </header>
 
+        <nav className="mt-4 rounded-xl border border-slate-800 bg-slate-900 p-4 text-sm">
+          <a className="font-semibold text-emerald-300 underline" href="/candidate/identity-review/status">View my saved request status and reviewer response</a>
+        </nav>
+
         <form
           onSubmit={submit}
           className="mt-6 space-y-5 rounded-2xl border border-slate-800 bg-slate-900 p-6"
