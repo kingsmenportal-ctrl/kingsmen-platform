@@ -90,7 +90,10 @@ function sectionFor(domain: FounderOperationalDomain, observation: FounderOperat
   }
 
   const timestamp = Date.parse(observation.generatedAt);
-  if (typeof observation.sourceRef !== "string" || !observation.sourceRef.trim() ||\n      typeof observation.summary !== "string" ||\n      !["OK", "WATCH", "CRITICAL", "UNKNOWN"].includes(observation.state) ||\n      !Number.isFinite(timestamp) || timestamp > nowMs + 30_000) {
+  if (typeof observation.sourceRef !== "string" || !observation.sourceRef.trim() ||
+      typeof observation.summary !== "string" ||
+      !["OK", "WATCH", "CRITICAL", "UNKNOWN"].includes(observation.state) ||
+      !Number.isFinite(timestamp) || timestamp > nowMs + 30_000) {
     return { domain, state: "DEGRADED", sourceRef: null, generatedAt: observation.generatedAt, ageSeconds: null, severity: "UNKNOWN", summary: "Evidence metadata is invalid; source result cannot be trusted.", metrics: {} };
   }
 
