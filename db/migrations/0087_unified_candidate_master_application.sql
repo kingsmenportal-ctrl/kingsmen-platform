@@ -29,7 +29,7 @@ create table if not exists public.candidate_master_application_targets (
   created_by_auth_user_id uuid not null,
   created_at timestamptz not null default now(),
   updated_at timestamptz not null default now(),
-  unique (candidate_id, idempotency_key, target_key),
+  unique (candidate_id, target_key),
   constraint candidate_master_target_url_scheme check (
     provider_application_url is null or provider_application_url ~ '^https://'
   )
