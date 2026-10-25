@@ -9,7 +9,7 @@ type Item = { id:string; tracker_id:string; item_type:string; title:string; cand
 function readToken():string|null {try{const base=process.env.NEXT_PUBLIC_SUPABASE_URL;if(!base)return null;const ref=new URL(base).hostname.split(".")[0];const raw=localStorage.getItem(`sb-${ref}-auth-token`);const session=raw?JSON.parse(raw):null;return typeof session?.access_token==="string"?session.access_token:null;}catch{return null;}}
 const input="mt-1 w-full rounded-xl border border-slate-300 bg-white px-3 py-2.5 text-sm text-slate-900";
 const button="rounded-xl bg-slate-950 px-4 py-2.5 text-sm font-bold text-white disabled:opacity-50";
-const TRACKER_STATUSES=["SAVED","PREPARING","READY_TO_APPLY","SUBMITTED_CANDIDATE_REPORTED","RESPONSE_RECEIVED","INTERVIEW","OFFER_RECEIVED","REJECTED","CLOSED"];
+const TRACKER_STATUSES=["SAVED","PREPARING","READY_TO_APPLY","SUBMITTED_CANDIDATE_REPORTED"];
 const ITEM_STATUSES=["NOT_STARTED","IN_PROGRESS","READY_CANDIDATE_REPORTED"];
 
 export default function ApplicationPreparationPage(){
