@@ -4,7 +4,7 @@ import { useEffect, useState } from "react";
 import type { FormEvent } from "react";
 
 type DocumentRecord = {
-  id: string; preparation_item_id?: string | null; application_id?: string | null;
+  id: string; preparation_item_id?: string | null; application_id?: string | null; evidence_purpose?: string;
   original_filename: string; mime_type: string; size_bytes: number; status: string;
   uploaded_at?: string | null; created_at: string;
 };
@@ -28,6 +28,7 @@ export default function CandidateDocumentsPage() {
   const [documents,setDocuments] = useState<DocumentRecord[]>([]);
   const [applications,setApplications] = useState<ApplicationRecord[]>([]);
   const [applicationId,setApplicationId] = useState("");
+  const [evidencePurpose,setEvidencePurpose] = useState("CANDIDATE_DOCUMENT");
   const [file,setFile] = useState<File|null>(null);
   const [busy,setBusy] = useState(false);
   const [error,setError] = useState("");
@@ -51,7 +52,7 @@ export default function CandidateDocumentsPage() {
     try {
       const ticketResponse=await fetch("/api/candidate/documents/upload-url",{
         method:"POST",headers:{Authorization:`Bearer ${token}`,"Content-Type":"application/json"},
-        body:JSON.stringify({filename:file.name,mimeType:file.type,sizeBytes:file.size,...(applicationId?{applicationId}:{})})
+        body:JSON.stringify({filename:file.name,mimeType:file.type,sizeBytes:file.size,evidencePurpose,...(applicationId?{applicationId}:{})})
       });
       const ticket=await ticketResponse.json();
       if(!ticketResponse.ok || !ticket.signed_upload_url || !ticket.document?.id) throw new Error(ticket.error || "A private upload ticket could not be issued.");
@@ -100,14 +101,16 @@ export default function CandidateDocumentsPage() {
       <form onSubmit={upload} className="space-y-4 rounded-3xl border border-slate-200 bg-white p-5 sm:p-7">
         <h2 className="text-xl font-black">Upload a document once</h2>
         <label className="block text-sm font-semibold">File (PDF, JPEG or PNG; maximum 10 MiB)<input id="candidate-private-file" className={field} type="file" accept=".pdf,.jpg,.jpeg,.png,application/pdf,image/jpeg,image/png" onChange={e=>setFile(e.target.files?.[0]||null)} required /></label>
-        <label className="block text-sm font-semibold">Link to an existing application (optional)<select className={field} value={applicationId} onChange={e=>setApplicationId(e.target.value)}><option value="">Keep in my document vault for reuse</option>{applications.map(app=><option key={app.id} value={app.id}>{app.application_ref} · {app.pathway_type} · {app.status}</option>)}</select></label>
+        <label className="block text-sm font-semibold">Document purpose<select className={field} value={evidencePurpose} onChange={e=>setEvidencePurpose(e.target.value)}><option value="CANDIDATE_DOCUMENT">CV / certificate / general candidate document</option><option value="PRE_SUBMISSION_CHECKLIST">Pre-submission checklist evidence</option><option value="PROVIDER_SUBMISSION_RECEIPT">Provider submission receipt</option><option value="PROVIDER_REFERENCE">Provider application/reference number proof</option><option value="PROVIDER_STATUS_NOTICE">Provider status notice</option><option value="PROVIDER_OUTCOME_NOTICE">Provider outcome notice (offer/rejection/decision)</option></select></label>
+        <label className="block text-sm font-semibold">Link to an existing application<select className={field} value={applicationId} onChange={e=>setApplicationId(e.target.value)}><option value="">Keep in my document vault for reuse (not for provider evidence)</option>{applications.map(app=><option key={app.id} value={app.id}>{app.application_ref} · {app.pathway_type} · {app.status}</option>)}</select></label>
+        {evidencePurpose.startsWith("PROVIDER_")&&!applicationId&&<p className="rounded-xl border border-amber-300 bg-amber-50 p-3 text-xs text-amber-950">Provider evidence must be linked to a specific application. Choose an application above; otherwise the backend will reject this upload request.</p>}
         <button className={button} disabled={!token||busy}>{busy?"Uploading and verifying file signature…":"Upload to private vault"}</button>
         <p className="text-xs leading-5 text-slate-500">Supported formats only. No public file URL is created. Uploads use a short-lived signed ticket; document status and application ownership are checked by the backend.</p>
       </form>
       <section className="rounded-3xl border border-slate-200 bg-white p-5 sm:p-7">
         <div className="flex flex-wrap items-center justify-between gap-3"><h2 className="text-xl font-black">My documents</h2><button type="button" className="rounded-xl border border-slate-300 px-3 py-2 text-sm font-bold" onClick={()=>token&&load(token).catch(e=>setError(e instanceof Error?e.message:"Reload failed."))}>Refresh</button></div>
         {!documents.length?<p className="mt-4 text-sm text-slate-600">No private documents are available in this verified candidate workspace yet.</p>:<div className="mt-4 space-y-3">{documents.map(doc=><article key={doc.id} className="flex flex-col justify-between gap-3 rounded-2xl border border-slate-200 p-4 sm:flex-row sm:items-center">
-          <div className="min-w-0"><h3 className="break-words font-bold">{doc.original_filename}</h3><p className="mt-1 text-xs text-slate-600">{doc.mime_type} · {(doc.size_bytes/1024/1024).toFixed(2)} MiB · {doc.status.replaceAll("_"," ")}</p><p className="mt-1 text-xs text-slate-500">{doc.application_id?"Linked to an application":"Available for reuse"} · Added {new Date(doc.created_at).toLocaleDateString()}</p></div>
+          <div className="min-w-0"><h3 className="break-words font-bold">{doc.original_filename}</h3><p className="mt-1 text-xs text-slate-600">{doc.mime_type} · {(doc.size_bytes/1024/1024).toFixed(2)} MiB · {doc.status.replaceAll("_"," ")}</p><p className="mt-1 text-xs text-slate-500">Purpose: {(doc.evidence_purpose||"CANDIDATE_DOCUMENT").replaceAll("_"," ")}</p><p className="mt-1 text-xs text-slate-500">{doc.application_id?"Linked to an application":"Available for reuse"} · Added {new Date(doc.created_at).toLocaleDateString()}</p></div>
           <button type="button" className="rounded-xl border border-slate-300 px-4 py-2 text-sm font-bold" onClick={()=>void download(doc.id)}>Private download</button>
         </article>)}</div>}
       </section>
