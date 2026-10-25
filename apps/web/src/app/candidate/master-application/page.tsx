@@ -103,7 +103,8 @@ export default function MasterApplicationPage() {
         });
         const body = await response.json();
         if (!response.ok) throw new Error(body.error === "AUTHENTICATION_REQUIRED" ? "Your sign-in has expired. Sign in again, then reopen this form." : "Could not load your saved master application.");
-        setApplications(Array.isArray(body.applications) ? body.applications : []);
+        const outcomeResponse = await fetch("/api/candidate/outcomes", { headers: { Authorization: `Bearer ${token}` }, cache: "no-store" });
+        if (outcomeResponse.ok) { const outcomeBody = await outcomeResponse.json(); setApplications(Array.isArray(outcomeBody.applications) ? outcomeBody.applications : []); }
         if (body.profile?.profile_data) {
           const data = body.profile.profile_data;
           setProfile(current => ({ ...current, ...data }));
@@ -148,7 +149,7 @@ export default function MasterApplicationPage() {
       setMessage("Manual provider handoff prepared. Kingsmen has not submitted the application. Complete the official provider steps, then upload the receipt linked to this application for review.");
       const refreshed = await fetch("/api/candidate/master-application", { headers: { Authorization: `Bearer ${token}` }, cache: "no-store" });
       const saved = await refreshed.json();
-      if (refreshed.ok && Array.isArray(saved.applications)) setApplications(saved.applications);
+      if (refreshed.ok) { const outcomeResponse = await fetch("/api/candidate/outcomes", { headers: { Authorization: `Bearer ${token}` }, cache: "no-store" }); if (outcomeResponse.ok) { const outcomeBody = await outcomeResponse.json(); setApplications(Array.isArray(outcomeBody.applications) ? outcomeBody.applications : []); } }
     } catch (e) {
       setError(e instanceof Error ? e.message : "External portal handoff failed.");
     }
@@ -196,7 +197,8 @@ export default function MasterApplicationPage() {
       });
       const saved = await refreshed.json();
       if (refreshed.ok) {
-        setApplications(Array.isArray(saved.applications) ? saved.applications : []);
+        const outcomeResponse = await fetch("/api/candidate/outcomes", { headers: { Authorization: `Bearer ${token}` }, cache: "no-store" });
+        if (outcomeResponse.ok) { const outcomeBody = await outcomeResponse.json(); setApplications(Array.isArray(outcomeBody.applications) ? outcomeBody.applications : []); }
         if (Array.isArray(saved.targets)) {
           setTargets(saved.targets.map((item: any) => ({
             targetKey: item.target_key, pathwayType: item.pathway_type,
