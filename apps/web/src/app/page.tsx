@@ -1,5 +1,3 @@
-import Link from "next/link";
-
 const pathways = [
   { n: "01", title: "Higher education", detail: "Universities, Universities of Technology, CAO programme choices and application preparation.", tags: "UNIVERSITIES · UoTs · CAO" },
   { n: "02", title: "TVET & college routes", detail: "TVET colleges, NC(V), NATED / Report 191 and accredited private-college pathways.", tags: "TVET · NC(V) · NATED" },
