@@ -24,7 +24,7 @@ assert.ok(schema.includes("kingsmen_security.current_authenticated_candidate_id(
 assert.ok(schema.includes("source_confidence text not null default 'UNVERIFIED'"), "Candidate-entered sources must default to unverified");
 assert.ok(schema.includes("unique (candidate_id, target_key)"), "Targets must not duplicate on repeat saves");
 assert.ok(rpc.includes("security invoker"), "Save RPC must respect caller RLS");
-assert.ok(rpc.includes("provider_submissions_sent',0"), "RPC must never claim provider submission");
+assert.ok(rpc.includes("'provider_submissions_sent', 0"), "RPC must never claim provider submission");
 assert.ok(rpc.includes("on conflict (candidate_id, target_key) do update"), "Repeated saves must upsert targets");
 assert.ok(workbench.includes("/candidate/master-application"), "Candidate workbench must link to master application");
 console.log("PASS: unified master application static contract checks");
