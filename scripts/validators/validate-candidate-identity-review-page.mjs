@@ -6,7 +6,7 @@ const page = readFileSync(
   "utf8"
 );
 const login = readFileSync("apps/web/src/app/auth/login/page.tsx", "utf8");
-const normalized = page.replace(/\\s+/g, " ");
+const normalized = page.replace(/\s+/g, " ");
 const checks = [
   ["candidate-facing identity review route exists", page.includes("Request an identity review")],
   ["submission requires exact candidate reference", page.includes('name="candidate_reference"') && page.includes("candidateReference.trim()")],
