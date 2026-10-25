@@ -1,12 +1,13 @@
 "use client";
 
 import Link from "next/link";
-import { FormEvent, useState } from "react";
+import { useState } from "react";
+import type { CSSProperties, FormEvent } from "react";
 
 type Intake = { stage: string; province: string; route: string; blocker: string; goal: string };
 type Plan = { title: string; summary: string; steps: string[]; caution: string };
 
-const fieldStyle: React.CSSProperties = {
+const fieldStyle: CSSProperties = {
   width: "100%", padding: "13px 14px", borderRadius: 4, border: "1px solid #485264",
   background: "#101722", color: "#f4f0e7", font: "inherit", minHeight: 48
 };
