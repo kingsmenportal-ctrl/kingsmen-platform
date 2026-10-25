@@ -10,7 +10,7 @@ begin
     select * from public.orchestrator_dispatch_queue
     where queue_status = 'LOCKED' and lease_expires_at <= clock_timestamp()
       and attempt_count >= max_attempts
-    order by lease_expires_at for update skip locked limit p_limit
+    order by lease_expires_at limit p_limit for update skip locked
   loop
     update public.orchestrator_dispatch_queue
     set queue_status = 'DEAD_LETTER', lease_expires_at = null,
