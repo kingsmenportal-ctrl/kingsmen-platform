@@ -6,7 +6,9 @@
   "scripts": {
     "dev": "next dev -H 127.0.0.1 -p 3000",
     "build": "next build",
-    "start": "next start -H 127.0.0.1 -p 3000"
+    "start": "next start -H 127.0.0.1 -p 3000",
+    "start:e2e": "next start -H 127.0.0.1 -p 4173",
+    "test:free-destiny-map:e2e": "node scripts/test-free-destiny-map-e2e.mjs"
   },
   "dependencies": {
     "mammoth": "^1.12.0",
