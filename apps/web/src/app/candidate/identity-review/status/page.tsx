@@ -11,7 +11,8 @@ function token(): string | null {
   try {
     const raw = window.localStorage.getItem(`sb-${PROJECT_REF}-auth-token`);
     if (!raw) return null;
-    const parsed = JSON.parse(raw) as { access_token?: string };
+    const parsed = JSON.parse(raw) as { access_token?: string; expires_at?: number };
+    if (typeof parsed.expires_at === "number" && parsed.expires_at <= Math.floor(Date.now() / 1000)) return null;
     return typeof parsed.access_token === "string" ? parsed.access_token : null;
   } catch { return null; }
 }
