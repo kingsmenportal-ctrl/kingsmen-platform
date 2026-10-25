@@ -1,36 +1,313 @@
 "use client";
 
-import { useEffect, useState } from "react";
-import type { FormEvent } from "react";
+import { FormEvent, useMemo, useState } from "react";
 
-function readToken():string|null{try{const base=process.env.NEXT_PUBLIC_SUPABASE_URL;if(!base)return null;const ref=new URL(base).hostname.split(".")[0];const raw=localStorage.getItem(`sb-${ref}-auth-token`);const parsed=raw?JSON.parse(raw):null;return typeof parsed?.access_token==="string"?parsed.access_token:null;}catch{return null;}}
-type Evidence={id:string;original_filename:string;mime_type:string;size_bytes:number;review_status:string;reviewer_note?:string|null;uploaded_at:string;reviewed_at?:string|null};
-type RequestRecord={id:string;candidate_reference:string;request_status:string;claimant_message:string;candidate_response?:string|null;reviewer_note?:string|null;created_at:string;updated_at:string;reviewed_at?:string|null;evidence:Evidence[]};
-const field="mt-1 w-full rounded-xl border border-slate-300 bg-white px-3 py-3 text-sm text-slate-900";
-const button="rounded-xl bg-slate-950 px-4 py-3 text-sm font-bold text-white disabled:opacity-50";
+type SubmissionResult = {
+  request_id?: string;
+  status?: string;
+  message?: string;
+  error?: string;
+};
 
-export default function CandidateIdentityReviewPage(){
- const [token,setToken]=useState<string|null>(null);const [requests,setRequests]=useState<RequestRecord[]>([]);
- const [candidateReference,setCandidateReference]=useState("");const [claimantName,setClaimantName]=useState("");const [claimantMessage,setClaimantMessage]=useState("");
- const [files,setFiles]=useState<Record<string,File|null>>({});const [responses,setResponses]=useState<Record<string,string>>({});
- const [busy,setBusy]=useState(false);const [error,setError]=useState("");const [message,setMessage]=useState("");
- useEffect(()=>{setToken(readToken());},[]);
- async function load(){if(!token)return;setError("");const response=await fetch("/api/candidate/identity-review/status",{headers:{Authorization:`Bearer ${token}`},cache:"no-store"});const body=await response.json();if(!response.ok)throw new Error(body.error||"Could not load identity-review status.");setRequests(Array.isArray(body.requests)?body.requests:[]);}
- useEffect(()=>{if(token)void load().catch(e=>setError(e instanceof Error?e.message:"Could not load identity-review status."));},[token]);
- async function submit(event:FormEvent<HTMLFormElement>){event.preventDefault();if(!token){setError("Sign in first.");return;}setBusy(true);setError("");setMessage("");try{const response=await fetch("/api/candidate/identity-review",{method:"POST",headers:{Authorization:`Bearer ${token}`,"Content-Type":"application/json"},body:JSON.stringify({candidate_reference:candidateReference.trim(),claimant_name:claimantName.trim(),claimant_message:claimantMessage.trim()})});const body=await response.json();if(!response.ok)throw new Error(body.error||"Identity-review request could not be submitted.");setMessage(body.message||"Identity-review request submitted for manual review.");setCandidateReference("");setClaimantMessage("");await load();}catch(e){setError(e instanceof Error?e.message:"Request failed.");}finally{setBusy(false);}}
- async function uploadEvidence(event:FormEvent<HTMLFormElement>,requestId:string){event.preventDefault();const file=files[requestId];if(!token||!file){setError("Choose a supporting evidence file.");return;}setBusy(true);setError("");setMessage("");try{const form=new FormData();form.append("request_id",requestId);form.append("file",file);const response=await fetch("/api/candidate/identity-review/evidence",{method:"POST",headers:{Authorization:`Bearer ${token}`},body:form});const body=await response.json();if(!response.ok)throw new Error(body.error||"Evidence upload failed.");setMessage(body.message||"Evidence uploaded privately and queued for review. It is not yet verified.");setFiles(current=>({...current,[requestId]:null}));await load();}catch(e){setError(e instanceof Error?e.message:"Evidence upload failed.");}finally{setBusy(false);}}
- async function followup(event:FormEvent<HTMLFormElement>,requestId:string){event.preventDefault();if(!token)return;setBusy(true);setError("");setMessage("");try{const response=await fetch("/api/candidate/identity-review/followup",{method:"POST",headers:{Authorization:`Bearer ${token}`,"Content-Type":"application/json"},body:JSON.stringify({request_id:requestId,response:responses[requestId]||""})});const body=await response.json();if(!response.ok)throw new Error(body.error||"Response could not be saved.");setMessage(body.message||"Your response was saved and returned to the reviewer queue.");setResponses(current=>({...current,[requestId]:""}));await load();}catch(e){setError(e instanceof Error?e.message:"Follow-up failed.");}finally{setBusy(false);}}
- return <main className="min-h-screen bg-slate-100 px-4 py-8 text-slate-900 sm:px-6"><div className="mx-auto max-w-4xl space-y-5">
- <header className="rounded-3xl bg-slate-950 p-6 text-white sm:p-8"><p className="text-xs font-black uppercase tracking-[.2em] text-amber-300">Kingsmen · N04 Secure Identity Linkage</p><h1 className="mt-3 text-3xl font-black">Request candidate identity review</h1><p className="mt-3 text-sm leading-6 text-slate-200">This is the required manual review step before Kingsmen can link your sign-in to an existing candidate record. A request or file upload never verifies your identity by itself. An authorised reviewer must inspect the claim and accept supporting evidence before approving the link.</p><div className="mt-5 flex flex-wrap gap-3"><a href="/candidate/login?next=%2Fcandidate%2Fidentity-review" className="rounded-xl border border-white/30 px-4 py-2.5 text-sm font-bold">Candidate sign-in</a><a href="/candidate/master-application" className="rounded-xl border border-white/30 px-4 py-2.5 text-sm font-bold">Master application</a></div></header>
- {!token&&<p className="rounded-xl border border-amber-300 bg-amber-50 p-4 text-sm">Sign in with the existing Supabase Auth account first. <a className="font-bold underline" href="/candidate/login?next=%2Fcandidate%2Fidentity-review">Sign in</a></p>}
- {error&&<p role="alert" className="rounded-xl border border-rose-300 bg-rose-50 p-4 text-sm text-rose-900">{error}</p>}{message&&<p role="status" className="rounded-xl border border-emerald-300 bg-emerald-50 p-4 text-sm text-emerald-900">{message}</p>}
- <form onSubmit={submit} className="space-y-4 rounded-3xl border border-slate-200 bg-white p-5 sm:p-7"><h2 className="text-xl font-black">1. Submit your identity claim</h2><label className="block text-sm font-semibold">Existing Kingsmen candidate reference<input className={field} value={candidateReference} onChange={e=>setCandidateReference(e.target.value)} minLength={2} maxLength={120} required placeholder="Use the reference Kingsmen already assigned you"/></label><p className="-mt-2 text-xs leading-5 text-slate-500">Do not guess a reference or enter another person's details. If you do not know your candidate reference, contact Kingsmen support before submitting.</p><label className="block text-sm font-semibold">Your full name<input className={field} value={claimantName} onChange={e=>setClaimantName(e.target.value)} minLength={2} maxLength={160} required autoComplete="name"/></label><label className="block text-sm font-semibold">Explain the account-to-candidate link<textarea className={field} rows={4} value={claimantMessage} onChange={e=>setClaimantMessage(e.target.value)} minLength={3} maxLength={1200} required placeholder="Explain which existing candidate record you believe is yours and how support can verify the match."/></label><button className={button} disabled={!token||busy}>{busy?"Submitting securely…":"Submit for manual identity review"}</button><p className="text-xs leading-5 text-slate-500">The request is private and audited. It does not automatically link by email, create a new candidate, or expose candidate records.</p></form>
- <section className="rounded-3xl border border-slate-200 bg-white p-5 sm:p-7"><div className="flex flex-wrap items-center justify-between gap-3"><h2 className="text-xl font-black">2. Your requests and evidence</h2><button type="button" className="rounded-xl border border-slate-300 px-4 py-2 text-sm font-bold" disabled={!token||busy} onClick={()=>void load().catch(e=>setError(e instanceof Error?e.message:"Refresh failed."))}>Refresh status</button></div>
- {!requests.length?<p className="mt-3 text-sm text-slate-600">No identity-review requests are associated with this signed-in account yet.</p>:<div className="mt-4 space-y-4">{requests.map(request=><article key={request.id} className="rounded-2xl border border-slate-200 p-4 sm:p-5"><div className="flex flex-wrap items-start justify-between gap-3"><div><h3 className="font-bold">Request {request.id}</h3><p className="mt-1 text-xs text-slate-500">Candidate reference: {request.candidate_reference} · Created {new Date(request.created_at).toLocaleString()}</p></div><span className="rounded-full bg-amber-100 px-3 py-1 text-xs font-bold text-amber-950">{request.request_status.replaceAll("_"," ")}</span></div><p className="mt-3 whitespace-pre-wrap text-sm leading-6">{request.claimant_message}</p>{request.reviewer_note&&<p className="mt-3 rounded-xl bg-slate-50 p-3 text-sm"><strong>Reviewer note:</strong> {request.reviewer_note}</p>}{request.candidate_response&&<p className="mt-2 rounded-xl bg-slate-50 p-3 text-sm"><strong>Your last response:</strong> {request.candidate_response}</p>}
- <div className="mt-4"><h4 className="text-sm font-bold">Supporting evidence</h4>{!request.evidence.length?<p className="mt-1 text-xs text-slate-600">No evidence uploaded. Approval is blocked until an authorised identity reviewer inspects and accepts supporting evidence.</p>:<div className="mt-2 space-y-2">{request.evidence.map(ev=><div key={ev.id} className="flex flex-wrap items-center justify-between gap-2 rounded-xl bg-slate-50 p-3"><div><p className="text-sm font-semibold">{ev.original_filename}</p><p className="mt-1 text-xs text-slate-500">{ev.mime_type} · {(ev.size_bytes/1024/1024).toFixed(2)} MiB · {new Date(ev.uploaded_at).toLocaleString()}</p></div><span className="rounded-full bg-white px-3 py-1 text-xs font-bold">{ev.review_status.replaceAll("_"," ")}</span>{ev.reviewer_note&&<p className="w-full text-xs text-slate-600">{ev.reviewer_note}</p>}</div>)}</div>}</div>
- {["PENDING","NEEDS_INFORMATION"].includes(request.request_status)&&<form onSubmit={e=>void uploadEvidence(e,request.id)} className="mt-4 space-y-2 rounded-xl border border-dashed border-slate-300 p-3"><label className="block text-sm font-semibold">Upload supporting evidence (PDF/JPEG/PNG, maximum 8 MiB)<input className={field} type="file" accept=".pdf,.jpg,.jpeg,.png,application/pdf,image/jpeg,image/png" onChange={e=>setFiles(current=>({...current,[request.id]:e.target.files?.[0]||null}))}/></label><button className={button} disabled={busy||!files[request.id]}>Upload privately for reviewer inspection</button></form>}
- {request.request_status==="NEEDS_INFORMATION"&&<form onSubmit={e=>void followup(e,request.id)} className="mt-4 space-y-2 rounded-xl border border-amber-200 bg-amber-50 p-3"><label className="block text-sm font-semibold">Response requested by reviewer<textarea className={field} rows={3} value={responses[request.id]||""} onChange={e=>setResponses(current=>({...current,[request.id]:e.target.value}))} minLength={3} maxLength={1200} required/></label><button className={button} disabled={busy}>Send response to reviewer</button></form>}
- </article>)}</div>}</section>
- <footer className="text-xs leading-5 text-slate-500">Identity-review evidence is stored privately and integrity-checked. Only an authorised identity reviewer can accept/reject evidence and approve/reject/request information. The master application stays blocked until a verified identity link exists.</footer>
- </div></main>;
+const PROJECT_REF = "euhubhhnumtibbyufghm";
+
+function readAccessToken(): string | null {
+  if (typeof window === "undefined") return null;
+  // Supabase Auth's default browser storage key. Never send a token to our own
+  // server or log it; it is used only as the bearer for the Supabase function.
+  const keys = [
+    `sb-${PROJECT_REF}-auth-token`,
+    ...Object.keys(window.localStorage).filter(
+      (key) => key.startsWith("sb-") && key.endsWith("-auth-token")
+    )
+  ];
+  for (const key of [...new Set(keys)]) {
+    try {
+      const stored = window.localStorage.getItem(key);
+      if (!stored) continue;
+      const parsed = JSON.parse(stored) as {
+        access_token?: unknown;
+        currentSession?: { access_token?: unknown };
+        session?: { access_token?: unknown };
+      };
+      const token =
+        parsed.access_token ??
+        parsed.currentSession?.access_token ??
+        parsed.session?.access_token;
+      if (typeof token === "string" && token.length > 20) return token;
+    } catch {
+      // Ignore unrelated or invalid local-storage entries.
+    }
+  }
+  return null;
+}
+
+export default function CandidateIdentityReviewPage() {
+  const endpoint = useMemo(
+    () => `https://${PROJECT_REF}.supabase.co/functions/v1/candidate-identity-review-request`,
+    []
+  );
+  const [candidateReference, setCandidateReference] = useState("");
+  const [claimantName, setClaimantName] = useState("");
+  const [claimantMessage, setClaimantMessage] = useState("");
+  const [evidenceSummary, setEvidenceSummary] = useState("");
+  const [evidenceFile, setEvidenceFile] = useState<File | null>(null);
+  const [result, setResult] = useState<SubmissionResult | null>(null);
+  const [busy, setBusy] = useState(false);
+
+  async function submit(event: FormEvent<HTMLFormElement>) {
+    event.preventDefault();
+    setResult(null);
+    const accessToken = readAccessToken();
+    if (!accessToken) {
+      setResult({
+        error:
+          "No active Kingsmen staging sign-in was found in this browser. Sign in first, then return to this page."
+      });
+      return;
+    }
+
+    const message = [
+      claimantMessage.trim(),
+      evidenceSummary.trim()
+        ? `Supporting evidence described by candidate (not independently verified):\n${evidenceSummary.trim()}`
+        : "Supporting evidence description: not supplied in this submission."
+    ].join("\n\n");
+    if (message.length > 1200) {
+      setResult({ error: "Your explanation and evidence description together must be 1,200 characters or fewer. Shorten the text and try again." });
+      return;
+    }
+
+    setBusy(true);
+    try {
+      const response = await fetch(endpoint, {
+        method: "POST",
+        headers: {
+          Authorization: `Bearer ${accessToken}`,
+          "Content-Type": "application/json"
+        },
+        body: JSON.stringify({
+          candidate_reference: candidateReference.trim(),
+          claimant_name: claimantName.trim(),
+          claimant_message: message
+        })
+      });
+      const body = (await response.json().catch(() => ({}))) as SubmissionResult;
+      if (!response.ok) {
+        setResult({
+          error:
+            body.error ??
+            `Kingsmen could not save this request (HTTP ${response.status}). No submission is confirmed.`
+        });
+      } else {
+        let finalResult = body;
+        if (body.request_id && evidenceFile) {
+          const upload = new FormData();
+          upload.set("request_id", body.request_id);
+          upload.set("file", evidenceFile);
+          try {
+            const uploadResponse = await fetch(`https://${PROJECT_REF}.supabase.co/functions/v1/candidate-identity-review-evidence-upload`, {
+              method: "POST",
+              headers: { Authorization: `Bearer ${accessToken}` },
+              body: upload
+            });
+            const uploadBody = await uploadResponse.json().catch(() => ({})) as { message?: string; error?: string; evidence?: { id?: string } };
+            if (uploadResponse.ok) {
+              finalResult = { ...body, message: `${body.message ?? "Request received."} Evidence file uploaded privately (evidence ID: ${uploadBody.evidence?.id ?? "recorded"}). ${uploadBody.message ?? "It is awaiting reviewer inspection."}` };
+            } else {
+              finalResult = { ...body, message: `${body.message ?? "Request received."} WARNING: the request exists, but the evidence upload failed: ${uploadBody.error ?? "upload not confirmed"}. Keep the request ID and retry evidence upload through the secure flow.` };
+            }
+          } catch {
+            finalResult = { ...body, message: `${body.message ?? "Request received."} WARNING: the request exists, but the evidence upload could not be confirmed. Check the reviewer queue before retrying.` };
+          }
+        }
+        setResult(finalResult);
+        setCandidateReference("");
+        setClaimantName("");
+        setClaimantMessage("");
+        setEvidenceSummary("");
+        setEvidenceFile(null);
+      }
+    } catch {
+      setResult({
+        error:
+          "Kingsmen could not be reached. The request may not have been saved; check your review queue before retrying."
+      });
+    } finally {
+      setBusy(false);
+    }
+  }
+
+  return (
+    <main className="min-h-screen bg-slate-950 px-4 py-8 text-white">
+      <div className="mx-auto max-w-3xl">
+        <header className="rounded-2xl border border-slate-800 bg-slate-900 p-6">
+          <p className="text-xs font-semibold uppercase tracking-[0.22em] text-emerald-300">
+            Kingsmen · Candidate account support
+          </p>
+          <h1 className="mt-3 text-3xl font-bold">Request an identity review</h1>
+          <p className="mt-3 leading-7 text-slate-300">
+            Use this form if your signed-in account needs to be linked to an existing
+            Kingsmen candidate record. A reviewer will inspect the claim before making
+            any decision. Submitting this form does not verify your identity or change
+            your candidate record.
+          </p>
+        </header>
+
+        <nav className="mt-4 rounded-xl border border-slate-800 bg-slate-900 p-4 text-sm">
+          <a className="font-semibold text-emerald-300 underline" href="/candidate/identity-review/status">View my saved request status and reviewer response</a>
+        </nav>
+
+        <form
+          onSubmit={submit}
+          className="mt-6 space-y-5 rounded-2xl border border-slate-800 bg-slate-900 p-6"
+        >
+          <div>
+            <label htmlFor="candidate-reference" className="mb-2 block font-semibold">
+              Exact existing Kingsmen candidate reference
+            </label>
+            <input
+              id="candidate-reference"
+              name="candidate_reference"
+              required
+              minLength={2}
+              maxLength={120}
+              autoComplete="off"
+              value={candidateReference}
+              onChange={(event) => setCandidateReference(event.target.value)}
+              className="w-full rounded-xl border border-slate-700 bg-slate-950 px-4 py-3 text-white"
+              placeholder="Enter the reference exactly as issued"
+            />
+            <p className="mt-2 text-sm text-slate-400">
+              Do not enter another person's password, access token, or other secret.
+            </p>
+          </div>
+
+          <div>
+            <label htmlFor="claimant-name" className="mb-2 block font-semibold">
+              Your full name
+            </label>
+            <input
+              id="claimant-name"
+              name="claimant_name"
+              required
+              minLength={2}
+              maxLength={160}
+              autoComplete="name"
+              value={claimantName}
+              onChange={(event) => setClaimantName(event.target.value)}
+              className="w-full rounded-xl border border-slate-700 bg-slate-950 px-4 py-3 text-white"
+            />
+          </div>
+
+          <div>
+            <label htmlFor="claimant-message" className="mb-2 block font-semibold">
+              Explain the identity-linking problem
+            </label>
+            <textarea
+              id="claimant-message"
+              name="claimant_message"
+              required
+              minLength={3}
+              maxLength={1000}
+              rows={5}
+              value={claimantMessage}
+              onChange={(event) => setClaimantMessage(event.target.value)}
+              className="w-full rounded-xl border border-slate-700 bg-slate-950 px-4 py-3 text-white"
+              placeholder="Explain why this account should be linked to that candidate record."
+            />
+          </div>
+
+          <div>
+            <label htmlFor="evidence-summary" className="mb-2 block font-semibold">
+              Supporting evidence description (recommended)
+            </label>
+            <textarea
+              id="evidence-summary"
+              name="evidence_summary"
+              maxLength={1000}
+              rows={4}
+              value={evidenceSummary}
+              onChange={(event) => setEvidenceSummary(event.target.value)}
+              className="w-full rounded-xl border border-slate-700 bg-slate-950 px-4 py-3 text-white"
+              placeholder="Describe relevant evidence and where a reviewer can find it. Do not paste passwords, OTPs, or access tokens."
+            />
+            <p className="mt-2 text-sm text-amber-200">
+              This field records your description only; it does not upload or verify a
+              document. Do not include sensitive document numbers unless the reviewer
+              specifically requests them through an approved secure channel.
+            </p>
+          </div>
+
+          <div>
+            <label htmlFor="evidence-file" className="mb-2 block font-semibold">
+              Supporting evidence file (optional but strongly recommended)
+            </label>
+            <input
+              id="evidence-file"
+              name="evidence_file"
+              type="file"
+              accept="application/pdf,image/jpeg,image/png"
+              onChange={(event) => setEvidenceFile(event.target.files?.[0] ?? null)}
+              className="block w-full rounded-xl border border-slate-700 bg-slate-950 px-4 py-3 text-sm text-slate-200"
+            />
+            <p className="mt-2 text-sm text-slate-400">
+              Private upload accepts PDF, JPEG, or PNG up to 8 MB. The file is not considered verified merely because it uploads; a reviewer must inspect it and record an evidence decision.
+            </p>
+          </div>
+
+          <button
+            type="submit"
+            disabled={busy}
+            className="w-full rounded-xl bg-emerald-400 px-5 py-3 font-bold text-slate-950 disabled:cursor-not-allowed disabled:opacity-60"
+          >
+            {busy ? "Submitting securely…" : "Submit for manual review"}
+          </button>
+        </form>
+
+        {result ? (
+          <section
+            aria-live="polite"
+            className="mt-6 rounded-2xl border border-slate-700 bg-slate-900 p-6"
+          >
+            {result.request_id ? (
+              <>
+                <h2 className="text-xl font-bold text-emerald-300">
+                  Request received
+                </h2>
+                <p className="mt-3 text-slate-200">
+                  Request ID: <code className="break-all">{result.request_id}</code>
+                </p>
+                <p className="mt-2 text-slate-300">
+                  Persisted status returned by Kingsmen:{" "}
+                  <strong>{result.status ?? "Pending status confirmation"}</strong>
+                </p>
+                <p className="mt-3 text-sm text-slate-400">
+                  {result.message ??
+                    "Your request was sent for manual review. Identity is not yet verified."}
+                </p>
+                <p className="mt-3 text-sm text-amber-200">
+                  Keep the request ID. Do not assume your candidate records are linked
+                  until a reviewer completes an audited decision.
+                </p>
+              </>
+            ) : (
+              <>
+                <h2 className="text-xl font-bold text-amber-200">
+                  Submission not confirmed
+                </h2>
+                <p className="mt-3 text-slate-200">{result.error}</p>
+              </>
+            )}
+          </section>
+        ) : null}
+
+        <p className="mt-6 text-sm leading-6 text-slate-500">
+          Privacy: the submission is associated with your verified sign-in session.
+          Access to the review request and any identity-link change remains controlled
+          by backend authorization and manual review.
+        </p>
+      </div>
+    </main>
+  );
 }
