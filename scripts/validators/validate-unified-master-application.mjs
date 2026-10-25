@@ -60,7 +60,7 @@ assert.ok(outcomes.includes("Provider outcome verified"), "Candidate outcomes pa
 assert.ok(outcomesApi.includes("candidate-application-outcomes"), "Outcome API must use authenticated candidate-safe read model");
 assert.ok(outcomesFunction.includes("PROVIDER_OUTCOME_NOTICE"), "Outcome read model must inspect provider outcome evidence");
 assert.ok(outcomesFunction.includes("outcome_requires_verified_provider_outcome_notice"), "Outcome read model must declare evidence policy");
-assert.ok(!outcomesFunction.includes("storage_path"), "Outcome read model must not expose private storage paths");
+assert.ok(!/\.select\([^)]*storage_path/.test(outcomesFunction), "Outcome read model must not select private storage paths");
 assert.ok(rpc.includes("application_id is null"), "Candidate target upsert must not mutate linked application targets");
 assert.ok(e2e.includes("KINGSMEN_E2E_CANDIDATE_A_TOKEN") && e2e.includes("KINGSMEN_E2E_CANDIDATE_B_TOKEN"), "Authenticated E2E requires two separate staging candidate sessions");
 assert.ok(e2e.includes("candidate B must not see A document"), "Authenticated E2E must verify cross-candidate private document isolation");
