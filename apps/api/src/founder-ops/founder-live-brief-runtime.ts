@@ -230,7 +230,7 @@ export async function handleFounderLiveBrief(request: IncomingMessage, response:
     const cols = briefColumns(brief);
     const evidenceRefs = brief.evidenceRefs;
     const inserted = await db.query<{ brief_ref: string; created_at: string }>(
-      \`with inserted as (
+      `with inserted as (
          insert into public.founder_daily_briefs
          (brief_ref, brief_type, brief_date, brief_status, system_health, queue_summary, finance_summary,
           document_summary, matching_summary, map_playwright_summary, incident_summary, capacity_summary,
@@ -245,13 +245,13 @@ export async function handleFounderLiveBrief(request: IncomingMessage, response:
          from inserted returning audit_ref
        )
        select inserted.brief_ref, inserted.created_at::text
-       from inserted join audited on audited.audit_ref = $15\`,
+       from inserted join audited on audited.audit_ref = $15`,
       [ref, brief.briefType, brief.overallState === "HEALTHY" || brief.overallState === "WATCH" ? "READY" : "DRAFT",
         cols.systemHealth, cols.queueSummary, cols.financeSummary, cols.documentSummary, cols.matchingSummary,
         cols.mapPlaywrightSummary, cols.incidentSummary, cols.capacitySummary,
         JSON.stringify({ ...brief.sections.find((section) => section.domain === "urgent_candidates"), aggregateOnly: true }),
         JSON.stringify(brief.recommendedActions), evidenceRefs,
-        \`audit_\${ref}\`, userId,
+        `audit_${ref}`, userId,
         brief.overallState === "CRITICAL" ? "CRITICAL" : brief.overallState === "DEGRADED" ? "WARNING" : "INFO",
         "Authenticated founder generated a persisted operational brief.",
         JSON.stringify({ briefType: brief.briefType, overallState: brief.overallState, sectionStates: brief.sections.map((section) => ({ domain: section.domain, state: section.state })), sourceErrors: loaded.sourceErrors }),
