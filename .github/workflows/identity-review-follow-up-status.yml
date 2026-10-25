@@ -1,0 +1,30 @@
+name: Identity Review Follow-up and Candidate Status Contract
+on:
+  pull_request:
+    branches: ['**']
+    paths:
+      - 'supabase/migrations/*identity_review_followup*'
+      - 'supabase/functions/candidate-identity-review-followup/**'
+      - 'supabase/functions/candidate-identity-review-status/**'
+      - 'apps/web/src/app/candidate/identity-review/status/**'
+      - 'scripts/validators/validate-identity-review-follow-up-status.mjs'
+  push:
+    branches: ['feat/identity-review-follow-up-status-*']
+    paths:
+      - 'supabase/migrations/*identity_review_followup*'
+      - 'supabase/functions/candidate-identity-review-followup/**'
+      - 'supabase/functions/candidate-identity-review-status/**'
+      - 'apps/web/src/app/candidate/identity-review/status/**'
+      - 'scripts/validators/validate-identity-review-follow-up-status.mjs'
+permissions:
+  contents: read
+jobs:
+  candidate-follow-up-status:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Validate candidate ownership, follow-up, status and evidence contract
+        run: node scripts/validators/validate-identity-review-follow-up-status.mjs
