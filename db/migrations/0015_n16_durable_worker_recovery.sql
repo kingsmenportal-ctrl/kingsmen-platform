@@ -282,8 +282,8 @@ begin
     select * from public.orchestrator_dispatch_queue
     where queue_status = 'SENT' and lease_expires_at <= clock_timestamp()
     order by lease_expires_at
-    for update skip locked
     limit p_limit
+    for update skip locked
   loop
     insert into public.orchestrator_manual_handoffs
       (handoff_ref, run_ref, step_ref, handoff_type, reason, fix_path, evidence_refs)
