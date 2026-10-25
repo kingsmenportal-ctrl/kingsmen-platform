@@ -64,7 +64,7 @@ export default function MasterApplicationPage() {
   const [error, setError] = useState("");
   const [savedAt, setSavedAt] = useState("");
 
-  const token = useMemo(() => typeof window === "undefined" ? null : accessToken(), []);
+  const [token, setToken] = useState<string | null>(null);\n\n  useEffect(() => { setToken(accessToken()); }, []);
 
   useEffect(() => {
     const params = new URLSearchParams(window.location.search);
