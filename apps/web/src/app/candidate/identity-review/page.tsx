@@ -51,6 +51,7 @@ export default function CandidateIdentityReviewPage() {
   const [claimantName, setClaimantName] = useState("");
   const [claimantMessage, setClaimantMessage] = useState("");
   const [evidenceSummary, setEvidenceSummary] = useState("");
+  const [evidenceFile, setEvidenceFile] = useState<File | null>(null);
   const [result, setResult] = useState<SubmissionResult | null>(null);
   const [busy, setBusy] = useState(false);
 
@@ -99,11 +100,33 @@ export default function CandidateIdentityReviewPage() {
             `Kingsmen could not save this request (HTTP ${response.status}). No submission is confirmed.`
         });
       } else {
-        setResult(body);
+        let finalResult = body;
+        if (body.request_id && evidenceFile) {
+          const upload = new FormData();
+          upload.set("request_id", body.request_id);
+          upload.set("file", evidenceFile);
+          try {
+            const uploadResponse = await fetch(`https://${PROJECT_REF}.supabase.co/functions/v1/candidate-identity-review-evidence-upload`, {
+              method: "POST",
+              headers: { Authorization: `Bearer ${accessToken}` },
+              body: upload
+            });
+            const uploadBody = await uploadResponse.json().catch(() => ({})) as { message?: string; error?: string; evidence?: { id?: string } };
+            if (uploadResponse.ok) {
+              finalResult = { ...body, message: `${body.message ?? "Request received."} Evidence file uploaded privately (evidence ID: ${uploadBody.evidence?.id ?? "recorded"}). ${uploadBody.message ?? "It is awaiting reviewer inspection."}` };
+            } else {
+              finalResult = { ...body, message: `${body.message ?? "Request received."} WARNING: the request exists, but the evidence upload failed: ${uploadBody.error ?? "upload not confirmed"}. Keep the request ID and retry evidence upload through the secure flow.` };
+            }
+          } catch {
+            finalResult = { ...body, message: `${body.message ?? "Request received."} WARNING: the request exists, but the evidence upload could not be confirmed. Check the reviewer queue before retrying.` };
+          }
+        }
+        setResult(finalResult);
         setCandidateReference("");
         setClaimantName("");
         setClaimantMessage("");
         setEvidenceSummary("");
+        setEvidenceFile(null);
       }
     } catch {
       setResult({
@@ -209,6 +232,23 @@ export default function CandidateIdentityReviewPage() {
               This field records your description only; it does not upload or verify a
               document. Do not include sensitive document numbers unless the reviewer
               specifically requests them through an approved secure channel.
+            </p>
+          </div>
+
+          <div>
+            <label htmlFor="evidence-file" className="mb-2 block font-semibold">
+              Supporting evidence file (optional but strongly recommended)
+            </label>
+            <input
+              id="evidence-file"
+              name="evidence_file"
+              type="file"
+              accept="application/pdf,image/jpeg,image/png"
+              onChange={(event) => setEvidenceFile(event.target.files?.[0] ?? null)}
+              className="block w-full rounded-xl border border-slate-700 bg-slate-950 px-4 py-3 text-sm text-slate-200"
+            />
+            <p className="mt-2 text-sm text-slate-400">
+              Private upload accepts PDF, JPEG, or PNG up to 8 MB. The file is not considered verified merely because it uploads; a reviewer must inspect it and record an evidence decision.
             </p>
           </div>
 
