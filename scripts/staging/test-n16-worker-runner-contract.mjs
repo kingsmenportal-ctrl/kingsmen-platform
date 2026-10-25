@@ -20,7 +20,8 @@ const checks = [
   ["worker can recover expired SENT and exhausted LOCKED", runner, "this.queue.recoverExpiredSent(50)"],
   ["long-running process has graceful shutdown", main, 'process.once("SIGTERM", stop)'],
   ["polling loop has controlled batch size", main, "KINGSMEN_WORKER_BATCH_SIZE"],
-  ["queue uses server-side database connection", queue, "process.env.KINGSMEN_DATABASE_URL ?? process.env.DATABASE_URL"]
+  ["queue uses server-side database connection", queue, "process.env.KINGSMEN_DATABASE_URL ?? process.env.DATABASE_URL"],
+  ["server-side PostgreSQL TLS certificate verification is enabled", queue, "rejectUnauthorized: true"]
 ];
 for (const [label, source, needle] of checks) {
   assert.ok(source.includes(needle), `Missing ${label}: ${needle}`);
