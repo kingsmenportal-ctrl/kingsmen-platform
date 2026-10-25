@@ -45,6 +45,7 @@ Deno.serve(async (req: Request) => {
   const ids = (apps ?? []).map((app:any)=>app.id);
   let evidence: any[] = [];
   let events: any[] = [];
+  let outcomes: any[] = [];
   if (ids.length) {
     const evidenceResult = await admin.from("candidate_application_evidence")
       .select("evidence_ref,application_id,evidence_type,source_label,captured_at,verification_status,verification_note,verified_at")
@@ -59,6 +60,12 @@ Deno.serve(async (req: Request) => {
       .order("created_at",{ascending:false}).limit(1000);
     if (eventResult.error) { console.error("candidate outcome event query failed",eventResult.error.code ?? "unknown"); return reply(503,{error:"Could not load application history."},origin); }
     events = eventResult.data ?? [];
+    const outcomesResult = await admin.from("candidate_outcomes")
+      .select("outcome_ref,application_id,outcome_type,outcome_status,provider_name,evidence_ref,provider_reference,confirmed_at,summary,next_step")
+      .eq("candidate_id",link.candidate_id).in("application_id",ids)
+      .order("confirmed_at",{ascending:false}).limit(500);
+    if (outcomesResult.error) { console.error("candidate outcome ledger query failed",outcomesResult.error.code ?? "unknown"); return reply(503,{error:"Could not load confirmed outcome records."},origin); }
+    outcomes = outcomesResult.data ?? [];
   }
   const applications = (apps ?? []).map((app:any) => {
     const ownEvidence = evidence.filter(item=>item.application_id===app.id).map(item=>({
@@ -70,8 +77,13 @@ Deno.serve(async (req: Request) => {
     const verified = ownEvidence.filter(item=>item.verification_status==="VERIFIED" && item.verified_at);
     const receiptVerified = verified.some(item=>["PROVIDER_SUBMISSION_RECEIPT","PROVIDER_REFERENCE"].includes(item.evidence_type));
     const statusVerified = verified.some(item=>item.evidence_type==="PROVIDER_STATUS_NOTICE");
-    const outcomeVerified = verified.some(item=>item.evidence_type==="PROVIDER_OUTCOME_NOTICE") &&
-      ["OFFERED","ACCEPTED","REJECTED"].includes(app.status);
+    const ownOutcomes = outcomes.filter(item=>item.application_id===app.id).map(item=>({
+      outcome_ref:item.outcome_ref,outcome_type:item.outcome_type,outcome_status:item.outcome_status,
+      provider_name:item.provider_name,evidence_ref:item.evidence_ref,provider_reference:item.provider_reference,
+      confirmed_at:item.confirmed_at,summary:item.summary,next_step:item.next_step
+    }));
+    const outcomeVerified = ownOutcomes.some(item=>item.outcome_status==="CONFIRMED" &&
+      verified.some(ev=>ev.evidence_type==="PROVIDER_OUTCOME_NOTICE" && ev.evidence_ref===item.evidence_ref));
     return {
       id:app.id,application_ref:app.application_ref,pathway_type:app.pathway_type,status:app.status,
       readiness_status:app.readiness_status,provider_reference:app.provider_reference,
@@ -79,7 +91,8 @@ Deno.serve(async (req: Request) => {
       created_at:app.created_at,updated_at:app.updated_at,
       opportunity:Array.isArray(app.candidate_opportunities)?app.candidate_opportunities[0] ?? null:app.candidate_opportunities ?? null,
       provider_receipt_verified:receiptVerified,provider_status_evidence_verified:statusVerified,
-      outcome_verified:outcomeVerified,evidence:ownEvidence,
+      outcome_verified:outcomeVerified,
+      evidence:ownEvidence,
       history:events.filter(event=>event.application_id===app.id).map(event=>({
         event_ref:event.event_ref,event_type:event.event_type,from_status:event.from_status,
         to_status:event.to_status,reason_code:event.reason_code,evidence_ref:event.evidence_ref,created_at:event.created_at
