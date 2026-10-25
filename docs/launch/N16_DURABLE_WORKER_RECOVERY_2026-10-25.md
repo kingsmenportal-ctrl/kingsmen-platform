@@ -48,3 +48,27 @@ These checks prove database function behavior for the scenarios above. The crash
 ## Next release gates
 
 Wire the adapter into an explicit, authenticated worker runner that obtains server-only credentials from the runtime secret store; add an allowlisted handler registry and no-op/side-effect boundary tests; run the real worker against staging; perform actual process-kill drills before and after SENT; run the source/contract CI checks; and obtain independent review. Do not enable external portal actions until provider-specific authorization, evidence and human-approval gates are enforced.
+
+
+## Worker runner implementation added — not yet runtime-verified
+
+The PR now adds:
+
+- `apps/api/src/orchestrator/worker-runner.ts`: authenticated-by-server-credential runner over the durable PostgreSQL adapter, explicit handler registry, unknown-handler manual handoff, evidence-required gate, and approval + linked approval-evidence gate before the SENT boundary.
+- `apps/api/src/orchestrator/worker-main.ts`: long-running process with bounded polling/batch settings, recovery on each cycle, structured logs, and SIGTERM/SIGINT shutdown.
+- `scripts/staging/test-n16-worker-runner-contract.mjs` and root `n16:worker:contract` / `n16:worker:start` commands.
+- The only side-effect-capable default test handler is `n16.staging-recovery-probe`; it is registered only when `KINGSMEN_WORKER_ENV=staging` and `KINGSMEN_N16_ENABLE_SYNTHETIC_PROBE=true`. It requires `syntheticOnly=true`, explicit approval and an approval evidence reference already linked to the dispatch. It performs no provider or candidate action. The read-only `evidence.verify` handler is also explicitly registered. All other worker codes are handed off rather than dynamically loaded.
+- Test-only delays `KINGSMEN_N16_PRE_SENT_DELAY_MS` and `KINGSMEN_N16_POST_SENT_DELAY_MS` are capped at 60 seconds and only affect the synthetic staging probe. They allow controlled process termination before and after SENT without touching a provider.
+
+### Runtime secret boundary
+
+The runner fails closed unless `KINGSMEN_WORKER_ENABLED=true`, `KINGSMEN_TRUTH_VAULT_MODE=postgres`, and a server-only `KINGSMEN_DATABASE_URL` (or `DATABASE_URL`) are present. The database URL must be stored as a secret in the runtime environment with runtime scope; it must not be a client/public build variable or committed to Git. The currently inspected Netlify project environment contained only public Supabase URL/client keys and did not contain a privileged database URL. No fake value was installed and the worker was not enabled. Supplying the real privileged credential requires creating it in the deployment secret store from Supabase's project connection details; do not paste it into source, logs, or this PR.
+
+### Required real-process kill drill (blocked until secret and runtime are configured)
+
+1. Enable the worker only in isolated staging and insert one synthetic dispatch with a real linked evidence reference, `worker_code='n16.staging-recovery-probe'`, `syntheticOnly=true`, `approvalGranted=true`, and `approvalEvidenceRef` equal to one of its linked evidence references.
+2. **Before SENT:** set `KINGSMEN_N16_PRE_SENT_DELAY_MS=20000`, start `npm run n16:worker:start`, verify the dispatch is `LOCKED`, then terminate the actual process during the delay. Wait for lease expiry and restart the worker. Verify the attempt advances, only one worker owns each lease, and no external action occurred.
+3. **After SENT:** use a fresh synthetic dispatch, set `KINGSMEN_N16_POST_SENT_DELAY_MS=20000`, start the worker, wait until the durable queue says `SENT`, terminate the actual process, and wait for lease expiry. Restart recovery and verify the dispatch becomes `FAILED` with `EXPIRED_SENT_REQUIRES_RECONCILIATION`, a single handoff/quarantine event exists, and it is never returned to `READY`.
+4. Save timestamps, dispatch refs, process exit signal, sanitized logs, queue rows, handoff/event refs, and cleanup counts as the evidence artifact. Delete only the synthetic fixtures after assertions pass. Never use real candidate/provider work for this drill.
+
+The runner implementation has been committed to this PR, but the TypeScript build, contract script, live worker execution, real process-kill drills, and secret-store setup are **not yet verified** in this environment. Do not mark this release gate green until those steps actually run and evidence is attached.
