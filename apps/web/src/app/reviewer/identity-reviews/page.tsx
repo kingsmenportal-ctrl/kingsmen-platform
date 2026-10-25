@@ -5,6 +5,16 @@ import { useCallback, useEffect, useState } from "react";
 const PROJECT_REF = "euhubhhnumtibbyufghm";
 const FUNCTION_BASE = `https://${PROJECT_REF}.supabase.co/functions/v1`;
 
+type Evidence = {
+  id: string;
+  original_filename: string;
+  mime_type: string;
+  size_bytes: number;
+  sha256_hex: string;
+  review_status: string;
+  reviewed_at?: string | null;
+  reviewer_note?: string | null;
+};
 type ReviewRequest = {
   id: string;
   candidate_reference: string;
@@ -13,6 +23,7 @@ type ReviewRequest = {
   request_status: string;
   created_at: string;
   candidate_response?: string | null;
+  evidence?: Evidence[];
 };
 type QueueResponse = {
   requests?: ReviewRequest[];
@@ -61,6 +72,8 @@ export default function IdentityReviewQueuePage() {
   const [notice, setNotice] = useState("");
   const [notes, setNotes] = useState<Record<string, string>>({});
   const [candidateReferences, setCandidateReferences] = useState<Record<string, string>>({});
+  const [evidenceNotes, setEvidenceNotes] = useState<Record<string, string>>({});
+  const [evidenceLinks, setEvidenceLinks] = useState<Record<string, string>>({});
 
   const loadQueue = useCallback(async () => {
     setBusy(true);
@@ -91,6 +104,52 @@ export default function IdentityReviewQueuePage() {
   }, []);
 
   useEffect(() => { void loadQueue(); }, [loadQueue]);
+
+  async function openEvidence(evidence: Evidence) {
+    setError("");
+    const token = readAccessToken();
+    if (!token) { setError("Your reviewer session is missing or expired."); return; }
+    try {
+      const response = await fetch(`${FUNCTION_BASE}/candidate-identity-review-evidence-read`, {
+        method: "POST",
+        headers: { Authorization: `Bearer ${token}`, "Content-Type": "application/json" },
+        body: JSON.stringify({ evidence_id: evidence.id })
+      });
+      const body = await response.json().catch(() => ({})) as { signed_url?: string; error?: string };
+      if (!response.ok || !body.signed_url) {
+        setError(body.error ?? "A private evidence link could not be created.");
+        return;
+      }
+      setEvidenceLinks((old) => ({ ...old, [evidence.id]: body.signed_url! }));
+    } catch {
+      setError("Could not create a short-lived private evidence link.");
+    }
+  }
+
+  async function decideEvidence(evidence: Evidence, decision: "ACCEPTED" | "REJECTED") {
+    setError("");
+    setNotice("");
+    const token = readAccessToken();
+    const note = (evidenceNotes[evidence.id] ?? "").trim();
+    if (!token) { setError("Your reviewer session is missing or expired."); return; }
+    if (note.length < 3) { setError("Record what you inspected and why this evidence is accepted or rejected."); return; }
+    setBusy(true);
+    try {
+      const response = await fetch(`${FUNCTION_BASE}/candidate-identity-review-evidence-decision`, {
+        method: "POST",
+        headers: { Authorization: `Bearer ${token}`, "Content-Type": "application/json" },
+        body: JSON.stringify({ evidence_id: evidence.id, decision, note })
+      });
+      const body = await response.json().catch(() => ({})) as { error?: string; request_id?: string; review_status?: string };
+      if (!response.ok) { setError(body.error ?? "Evidence review was not recorded."); return; }
+      setNotice(`Evidence ${evidence.id} recorded as ${body.review_status}. Refreshing the queue.`);
+      await loadQueue();
+    } catch {
+      setError("Evidence review could not be confirmed. Refresh the queue before retrying.");
+    } finally {
+      setBusy(false);
+    }
+  }
 
   async function decide(request: ReviewRequest, decision: "REJECTED" | "NEEDS_INFORMATION") {
     setError("");
@@ -181,6 +240,34 @@ export default function IdentityReviewQueuePage() {
                   <dd className="mt-2 whitespace-pre-wrap text-sm leading-6 text-slate-200">{request.claimant_message}</dd>
                 </div>
               </dl>
+              <section className="mt-5 rounded-xl border border-slate-800 p-4" aria-label="Private supporting evidence">
+                <h3 className="font-semibold">Supporting evidence ({request.evidence?.length ?? 0})</h3>
+                {(request.evidence ?? []).length === 0 ? (
+                  <p className="mt-2 text-sm text-amber-200">No private evidence file is attached. Do not approve this identity claim.</p>
+                ) : (
+                  <div className="mt-3 space-y-4">
+                    {(request.evidence ?? []).map((evidence) => (
+                      <div key={evidence.id} className="rounded-lg border border-slate-700 p-3">
+                        <p className="break-all font-semibold">{evidence.original_filename}</p>
+                        <p className="mt-1 text-xs text-slate-400">{evidence.mime_type} · {Math.ceil(evidence.size_bytes / 1024)} KB · SHA-256 {evidence.sha256_hex}</p>
+                        <p className="mt-1 text-sm">Evidence review: <strong>{evidence.review_status}</strong>{evidence.reviewer_note ? ` — ${evidence.reviewer_note}` : ""}</p>
+                        <button type="button" disabled={busy} onClick={() => void openEvidence(evidence)} className="mt-3 rounded-lg border border-sky-700 px-3 py-2 text-sm font-semibold text-sky-200 disabled:opacity-50">Create private 60-second view link</button>
+                        {evidenceLinks[evidence.id] ? <p className="mt-2"><a href={evidenceLinks[evidence.id]} target="_blank" rel="noreferrer" className="break-all text-sm text-sky-300 underline">Open evidence file (expires shortly)</a></p> : null}
+                        {evidence.review_status === "PENDING" ? (
+                          <>
+                            <label htmlFor={`evidence-note-${evidence.id}`} className="mt-3 block text-sm font-semibold">Evidence inspection note</label>
+                            <textarea id={`evidence-note-${evidence.id}`} rows={2} maxLength={1200} value={evidenceNotes[evidence.id] ?? ""} onChange={(event) => setEvidenceNotes((old) => ({ ...old, [evidence.id]: event.target.value }))} className="mt-2 w-full rounded-lg border border-slate-700 bg-slate-950 px-3 py-2" placeholder="Record that you opened and inspected the file, its relevance, and any concerns." />
+                            <div className="mt-2 flex flex-wrap gap-2">
+                              <button type="button" disabled={busy} onClick={() => void decideEvidence(evidence, "ACCEPTED")} className="rounded-lg border border-emerald-700 px-3 py-2 text-sm font-semibold text-emerald-200 disabled:opacity-50">Accept evidence</button>
+                              <button type="button" disabled={busy} onClick={() => void decideEvidence(evidence, "REJECTED")} className="rounded-lg border border-rose-800 px-3 py-2 text-sm font-semibold text-rose-200 disabled:opacity-50">Reject evidence</button>
+                            </div>
+                          </>
+                        ) : null}
+                      </div>
+                    ))}
+                  </div>
+                )}
+              </section>
               <div className="mt-4">
                 <label htmlFor={`ref-${request.id}`} className="mb-2 block text-sm font-semibold">Exact candidate reference for any decision</label>
                 <input id={`ref-${request.id}`} value={candidateReferences[request.id] ?? request.candidate_reference} onChange={(event) => setCandidateReferences((old) => ({ ...old, [request.id]: event.target.value }))} className="w-full rounded-xl border border-slate-700 bg-slate-950 px-4 py-3 font-mono" />
