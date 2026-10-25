@@ -20,6 +20,11 @@ const outcomes = read("../../apps/web/src/app/candidate/outcomes/page.tsx");
 const outcomesApi = read("../../apps/web/src/app/api/candidate/outcomes/route.ts");
 const outcomesFunction = read("../../supabase/functions/candidate-application-outcomes/index.ts");
 const e2e = read("../../scripts/staging/run-master-application-e2e.mjs");
+const evidenceLifecycle = read("../../db/migrations/0095_verified_submission_and_outcome_workflow.sql");
+const reviewRpcGuard = read("../../db/migrations/0096_lock_document_review_rpc_to_service_role.sql");
+const outcomeReviewUi = read("../../apps/web/src/app/admin/application-outcomes/page.tsx");
+const outcomeReviewApi = read("../../apps/web/src/app/api/admin/application-outcomes/route.ts");
+const outcomeReviewFunction = read("../../supabase/functions/candidate-application-outcome-review/index.ts");
 const matches = read("../../apps/web/src/app/candidate/opportunity-matches/page.tsx");
 
 for (const pathway of ["HIGHER_EDUCATION", "TVET", "SETA_LEARNERSHIP", "INTERNSHIP", "APPRENTICESHIP", "EMPLOYMENT", "FUNDING", "ACCOMMODATION", "WIL"]) {
@@ -65,6 +70,13 @@ assert.ok(rpc.includes("application_id is null"), "Candidate target upsert must 
 assert.ok(e2e.includes("KINGSMEN_E2E_CANDIDATE_A_TOKEN") && e2e.includes("KINGSMEN_E2E_CANDIDATE_B_TOKEN"), "Authenticated E2E requires two separate staging candidate sessions");
 assert.ok(e2e.includes("candidate B must not see A document"), "Authenticated E2E must verify cross-candidate private document isolation");
 assert.ok(e2e.includes("provider_submissions_sent"), "Authenticated E2E must assert no false provider submission");
+assert.ok(evidenceLifecycle.includes("PROVIDER_ACKNOWLEDGED"), "Verified provider receipt must update application tracking");
+assert.ok(evidenceLifecycle.includes("record_candidate_application_outcome"), "Outcome ledger must require reviewer confirmation");
+assert.ok(evidenceLifecycle.includes("PROVIDER_OUTCOME_NOTICE"), "Outcome confirmation must require provider outcome evidence");
+assert.ok(reviewRpcGuard.includes("from public, anon, authenticated"), "Document review transaction must not be callable directly by candidate JWTs");
+assert.ok(outcomeReviewUi.includes("Confirm outcome with verified evidence"), "Authorised reviewer UI must confirm provider outcomes");
+assert.ok(outcomeReviewApi.includes("candidate-application-outcome-review"), "Outcome reviewer API must use reviewer-gated service");
+assert.ok(outcomeReviewFunction.includes("APPLICATION_REVIEWER"), "Outcome reviewer service must require dedicated reviewer permission");
 assert.ok(matches.includes("Add to my master application"), "Verified match cards must feed the unified master application");
 assert.ok(page.includes("N15 match reference"), "Master application must preserve the originating match reference");
 console.log("PASS: unified master application static contract checks");
