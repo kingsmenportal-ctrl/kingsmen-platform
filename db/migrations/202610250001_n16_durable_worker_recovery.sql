@@ -309,6 +309,19 @@ begin
 end;
 $$;
 
+-- Remove the legacy broad table grants as well as RPC access. The existing
+-- permissive RLS policies are not an authorization boundary by themselves.
+revoke all on table public.orchestrator_dispatch_queue,
+  public.orchestrator_worker_results,
+  public.orchestrator_execution_events,
+  public.orchestrator_manual_handoffs
+from public, anon, authenticated;
+grant all on table public.orchestrator_dispatch_queue,
+  public.orchestrator_worker_results,
+  public.orchestrator_execution_events,
+  public.orchestrator_manual_handoffs
+to service_role;
+
 -- RPCs are privileged worker operations only. Do not expose the queue to candidate JWTs.
 revoke all on function public.n16_claim_dispatches(text, integer, integer) from public, anon, authenticated;
 revoke all on function public.n16_record_dispatch_result(text, text, text, text, jsonb, text[], text, text, integer, integer) from public, anon, authenticated;
