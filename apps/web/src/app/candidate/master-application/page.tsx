@@ -1,6 +1,7 @@
 "use client";
 
-import { useEffect, useMemo, useState } from "react";\nimport type { FormEvent } from "react";
+import { useEffect, useMemo, useState } from "react";
+import type { FormEvent } from "react";
 
 const PATHWAYS = [
   ["HIGHER_EDUCATION", "Higher education / universities / UoTs"],
