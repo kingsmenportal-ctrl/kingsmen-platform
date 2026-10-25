@@ -79,10 +79,38 @@ Deno.serve(async (req: Request) => {
     return reply(503, { error: "The review queue could not be loaded." }, origin);
   }
 
+  const requests = data ?? [];
+  const requestIds = requests.map((item) => item.id);
+  let evidenceByRequest: Record<string, unknown[]> = {};
+  if (requestIds.length > 0) {
+    const { data: evidenceRows, error: evidenceError } = await service
+      .from("candidate_identity_review_evidence")
+      .select("id,request_id,original_filename,mime_type,size_bytes,sha256_hex,review_status,reviewed_at,reviewed_by,reviewer_note,uploaded_at")
+      .in("request_id", requestIds)
+      .order("uploaded_at", { ascending: true });
+    if (evidenceError) {
+      console.error("identity reviewer evidence list failed", evidenceError.code ?? "unknown");
+      return reply(503, { error: "Supporting evidence could not be loaded. No review decision should be made." }, origin);
+    }
+    for (const row of evidenceRows ?? []) {
+      (evidenceByRequest[row.request_id] ??= []).push({
+        id: row.id,
+        original_filename: row.original_filename,
+        mime_type: row.mime_type,
+        size_bytes: row.size_bytes,
+        sha256_hex: row.sha256_hex,
+        review_status: row.review_status,
+        reviewed_at: row.reviewed_at,
+        reviewed_by: row.reviewed_by,
+        reviewer_note: row.reviewer_note,
+        uploaded_at: row.uploaded_at
+      });
+    }
+  }
   return reply(200, {
-    requests: data ?? [],
-    count: data?.length ?? 0,
+    requests: requests.map((item) => ({ ...item, evidence: evidenceByRequest[item.id] ?? [] })),
+    count: requests.length,
     limit: 100,
-    evidence_boundary: "The current request stores a candidate-provided evidence description in claimant_message. It does not contain an attached or independently verified evidence document."
+    evidence_boundary: "Private evidence files are listed with integrity hashes and reviewer status. Open each file through the reviewer-only signed-read endpoint and record an evidence decision before approving identity."
   }, origin);
 });
