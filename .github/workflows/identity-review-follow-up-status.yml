@@ -28,5 +28,13 @@ jobs:
       - uses: actions/setup-node@v4
         with:
           node-version: '22'
+          cache: npm
+          cache-dependency-path: apps/web/package-lock.json
+      - name: Install frontend dependencies from committed lockfile
+        run: npm ci --prefix apps/web
+      - name: Build the actual Next.js frontend
+        run: npm --prefix apps/web run build
+        env:
+          NEXT_PUBLIC_SUPABASE_ANON_KEY: build-contract-placeholder-not-a-credential
       - name: Validate candidate ownership, follow-up, status and evidence contract
         run: node scripts/validators/validate-identity-review-follow-up-status.mjs
