@@ -75,10 +75,10 @@ const MAX_AGE_SECONDS: Record<FounderOperationalDomain, number> = {
 };
 
 const cleanSummary = (value: string): string => value
-  .replace(/[\\r\\n\\t]+/g, " ")
-  .replace(/[A-Z0-9._%+-]+@[A-Z0-9.-]+\\.[A-Z]{2,}/gi, "[redacted-email]")
-  .replace(/\\b\\d{13}\\b/g, "[redacted-id]")
-  .replace(/\\b(?:\\+?27|0)[1-8]\\d{8}\\b/g, "[redacted-phone]")
+  .replace(/[\r\n\t]+/g, " ")
+  .replace(/[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}/gi, "[redacted-email]")
+  .replace(/\b\d{13}\b/g, "[redacted-id]")
+  .replace(/\b(?:\+?27|0)[1-8]\d{8}\b/g, "[redacted-phone]")
   .trim()
   .slice(0, 500);
 
