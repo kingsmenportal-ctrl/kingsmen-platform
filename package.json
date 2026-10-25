@@ -8,7 +8,7 @@
     "doc": "docs"
   },
   "scripts": {
-    "test": "node scripts/validators/validate-jarvis-core.mjs && node scripts/validators/validate-jarvis-live-pass-02.mjs && node scripts/staging/test-kingsmen-operating-evidence-reconciliation.mjs && npm run n14:connectors:check && npm run n15:sources:check && npm run n15:ingestion:check && npm run n17:founder-brief:check",
+    "test": "node scripts/validators/validate-jarvis-core.mjs && node scripts/validators/validate-jarvis-live-pass-02.mjs && node scripts/staging/test-kingsmen-operating-evidence-reconciliation.mjs && npm run n14:connectors:check && npm run n15:sources:check && npm run n15:ingestion:check && npm run n17:founder-brief:check && npm run n17:founder-brief:integration:check",
     "jarvis:validate": "node scripts/validators/validate-jarvis-connected-live.mjs",
     "jarvis:validate:core": "node scripts/validators/validate-jarvis-core.mjs",
     "jarvis:validate:live-pass-02": "node scripts/validators/validate-jarvis-live-pass-02.mjs",
@@ -100,7 +100,8 @@
     "n15:sources:check": "npm run n15:sources:validate && npm run n15:sources:test",
     "n15:ingestion:test": "node scripts/staging/test-n15-live-ingestion-contract.mjs",
     "n15:ingestion:check": "npm run n15:ingestion:test",
-    "n17:founder-brief:check": "node scripts/staging/test-n17-founder-live-brief-contract.mjs"
+    "n17:founder-brief:check": "node scripts/staging/test-n17-founder-live-brief-contract.mjs",
+    "n17:founder-brief:integration:check": "node scripts/staging/test-n17-founder-live-brief-runtime-contract.mjs"
   },
   "repository": {
     "type": "git",
