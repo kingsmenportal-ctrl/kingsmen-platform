@@ -10,11 +10,11 @@ const paths = [
 ];
 const sql = paths.map((path) => fs.readFileSync(path, 'utf8')).join('\n').replace(/--[^\n]*/g, ' ').toLowerCase();
 const required = [
-  [/create\\s+or\\s+replace\\s+function\\s+public\\.submit_candidate_identity_review_for_user\\s*\\(/, 'restores the transactional candidate submission RPC migration'],
-  [/pg_catalog\\.pg_advisory_xact_lock/, 'serializes candidate submissions'],
-  [/request_status\\s+in\\s+\\('pending',\\s*'needs_information'\\)/, 'blocks duplicate open submissions'],
-  [/revoke\\s+all\\s+privileges\\s+on\\s+function\\s+public\\.submit_candidate_identity_review_for_user\\s*\\([^;]*\\)\\s+from\\s+public\\s*,\\s*anon\\s*,\\s*authenticated/, 'revokes direct client submission RPC execution'],
-  [/grant\\s+execute\\s+on\\s+function\\s+public\\.submit_candidate_identity_review_for_user\\s*\\([^;]*\\)\\s+to\\s+service_role/, 'limits submission RPC execution to service role'],
+  [/create\s+or\s+replace\s+function\s+public\.submit_candidate_identity_review_for_user\s*\(/, 'restores the transactional candidate submission RPC migration'],
+  [/pg_catalog\.pg_advisory_xact_lock/, 'serializes candidate submissions'],
+  [/request_status\s+in\s+\('pending',\s*'needs_information'\)/, 'blocks duplicate open submissions'],
+  [/revoke\s+all\s+privileges\s+on\s+function\s+public\.submit_candidate_identity_review_for_user\s*\([^;]*\)\s+from\s+public\s*,\s*anon\s*,\s*authenticated/, 'revokes direct client submission RPC execution'],
+  [/grant\s+execute\s+on\s+function\s+public\.submit_candidate_identity_review_for_user\s*\([^;]*\)\s+to\s+service_role/, 'limits submission RPC execution to service role'],
   [/alter\s+table\s+public\.platform_reviewers/, 'updates reviewer role registry constraint'],
   [/platform_reviewers_role_code_check/, 'replaces reviewer role-code constraint'],
   [/candidate_identity_review_audit_actor_role_check/, 'replaces audit actor-role constraint'],
