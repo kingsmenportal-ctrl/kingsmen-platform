@@ -75,7 +75,14 @@ export class TruthVaultRepository {
     const mode = process.env.KINGSMEN_TRUTH_VAULT_MODE ?? "memory";
     const databaseUrl = process.env.KINGSMEN_DATABASE_URL ?? process.env.DATABASE_URL;
 
-    if (mode !== "postgres") return new TruthVaultRepository(null);
+    if (mode !== "postgres") {
+      if (process.env.NODE_ENV === "production") {
+        throw new Error(
+          "Production startup blocked: KINGSMEN_TRUTH_VAULT_MODE=postgres and a database URL are required; memory-only storage is development-only."
+        );
+      }
+      return new TruthVaultRepository(null);
+    }
     if (!databaseUrl) throw new Error("KINGSMEN_TRUTH_VAULT_MODE=postgres requires KINGSMEN_DATABASE_URL or DATABASE_URL.");
 
     const pg = require("pg") as { Pool: PgPoolConstructor };
