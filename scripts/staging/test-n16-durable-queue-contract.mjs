@@ -4,9 +4,9 @@ import { readFile } from "node:fs/promises";
 const read = async (name) => (await readFile(new URL(`../../db/migrations/${name}`, import.meta.url), "utf8")).toLowerCase();
 const adapter = (await readFile(new URL("../../apps/api/src/orchestrator/durable-worker-queue.ts", import.meta.url), "utf8")).toLowerCase();
 const migrations = {
-  queue: await read("0015_n16_durable_worker_recovery.sql"),
-  send: await read("0016_n16_worker_send_boundary.sql"),
-  lease: await read("0017_n16_exhausted_lease_recovery.sql")
+  queue: await read("0018_n16_durable_worker_recovery.sql"),
+  send: await read("0019_n16_worker_send_boundary.sql"),
+  lease: await read("0020_n16_exhausted_lease_recovery.sql")
 };
 const required = [
   ["transaction-safe queue claim function", migrations.queue, "function public.n16_claim_dispatches"],
