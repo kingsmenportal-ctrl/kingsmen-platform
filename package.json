@@ -54,6 +54,7 @@
     "api:validate:truth-vault": "node scripts/validators/validate-api-truth-vault-persistence.mjs",
     "db:validate:fk-index-hardening": "node scripts/validators/validate-fk-index-hardening.mjs",
     "security:validate:review-tables": "node scripts/validators/validate-review-table-access-contract.mjs",
+    "security:validate:identity-review": "node scripts/validators/validate-identity-review-least-privilege.mjs",
     "repo:validate:branch-protection-capture": "node scripts/validators/validate-branch-protection-capture.mjs",
     "payments:prove:sandbox": "node scripts/proof/prove-payfast-sandbox-boundary.mjs",
     "payments:validate:sandbox": "node scripts/validators/validate-payfast-sandbox-proof.mjs",
