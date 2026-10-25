@@ -1,0 +1,52 @@
+name: Web Reproducible Build
+
+on:
+  pull_request:
+    branches: [main]
+    paths:
+      - "apps/web/package.json"
+      - "apps/web/package-lock.json"
+      - "apps/web/**"
+      - "scripts/validators/validate-web-lockfile-consistency.mjs"
+      - ".github/workflows/web-reproducible-build.yml"
+  push:
+    branches:
+      - "fix/web-lockfile-reproducibility-2026-10-25"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: web-reproducible-build-${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  clean-install-build:
+    name: npm ci + validator + production build
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    defaults:
+      run:
+        working-directory: apps/web
+    steps:
+      - name: Checkout exact release candidate
+        uses: actions/checkout@v4
+
+      - name: Set up Node.js 22 with npm cache
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+          cache-dependency-path: apps/web/package-lock.json
+
+      - name: Clean deterministic install
+        run: npm ci --no-audit --no-fund
+
+      - name: Validate exact manifest and lockfile parity
+        working-directory: .
+        run: npm run web:validate:lockfile
+
+      - name: Build Next.js production application
+        run: npm run build
+
