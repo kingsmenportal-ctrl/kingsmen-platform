@@ -66,6 +66,28 @@ export default function MasterApplicationPage() {
   const token = useMemo(() => typeof window === "undefined" ? null : accessToken(), []);
 
   useEffect(() => {
+    const params = new URLSearchParams(window.location.search);
+    if (params.get("plan") !== "1") return;
+    const matchRef = params.get("match_ref") || "";
+    const providerName = params.get("provider") || "";
+    const programmeOrRole = params.get("programme") || "";
+    const pathwayType = params.get("pathway") || "EMPLOYMENT";
+    const providerApplicationUrl = params.get("url") || "";
+    if (!matchRef || !providerName || !programmeOrRole || !PATHWAYS.some(([value]) => value === pathwayType)) return;
+    const targetKey = `verified:${matchRef}`;
+    setTargets(current => {
+      const planned = current.filter(target => target.providerName.trim() || target.programmeOrRole.trim());
+      if (planned.some(target => target.targetKey === targetKey)) return current;
+      return [...planned, {
+        targetKey, pathwayType, providerName, programmeOrRole,
+        providerApplicationUrl, sourceReference: `N15 match reference: ${matchRef}`
+      }];
+    });
+    setPathways(current => current.includes(pathwayType) ? current : [...current, pathwayType]);
+    setMessage("Selected opportunity copied from your N15 match. Review the details and save to your master application; this action does not submit to the provider.");
+  }, []);
+
+  useEffect(() => {
     async function load() {
       if (!token) return;
       setLoading(true);
@@ -82,12 +104,20 @@ export default function MasterApplicationPage() {
           setSavedAt(body.profile.updated_at || "");
         }
         if (Array.isArray(body.targets) && body.targets.length) {
-          setTargets(body.targets.map((item: any) => ({
+          const savedTargets = body.targets.map((item: any) => ({
             targetKey: item.target_key, pathwayType: item.pathway_type,
             providerName: item.provider_name, programmeOrRole: item.programme_or_role,
             providerApplicationUrl: item.provider_application_url || "",
             sourceReference: item.source_reference || ""
-          })));
+          }));
+          setTargets(current => {
+            const fromMatchFeed = current.filter(target => target.targetKey.startsWith("verified:"));
+            const merged = [...savedTargets];
+            for (const target of fromMatchFeed) {
+              if (!merged.some(saved => saved.targetKey === target.targetKey)) merged.push(target);
+            }
+            return merged.length ? merged : [emptyTarget()];
+          });
         }
       } catch (e) {
         setError(e instanceof Error ? e.message : "Could not load saved information.");
