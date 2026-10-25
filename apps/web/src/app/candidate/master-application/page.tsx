@@ -22,6 +22,7 @@ type Target = {
   programmeOrRole: string;
   providerApplicationUrl: string;
   sourceReference: string;
+  applicationId?: string;
 };
 
 const emptyTarget = (): Target => ({
@@ -57,6 +58,7 @@ export default function MasterApplicationPage() {
   });
   const [pathways, setPathways] = useState<string[]>([]);
   const [targets, setTargets] = useState<Target[]>([emptyTarget()]);
+  const [applications, setApplications] = useState<any[]>([]);
   const [consent, setConsent] = useState(false);
   const [loading, setLoading] = useState(false);
   const [saving, setSaving] = useState(false);
@@ -100,6 +102,7 @@ export default function MasterApplicationPage() {
         });
         const body = await response.json();
         if (!response.ok) throw new Error(body.error === "AUTHENTICATION_REQUIRED" ? "Your sign-in has expired. Sign in again, then reopen this form." : "Could not load your saved master application.");
+        setApplications(Array.isArray(body.applications) ? body.applications : []);
         if (body.profile?.profile_data) {
           const data = body.profile.profile_data;
           setProfile(current => ({ ...current, ...data }));
@@ -111,7 +114,7 @@ export default function MasterApplicationPage() {
             targetKey: item.target_key, pathwayType: item.pathway_type,
             providerName: item.provider_name, programmeOrRole: item.programme_or_role,
             providerApplicationUrl: item.provider_application_url || "",
-            sourceReference: item.source_reference || ""
+            sourceReference: item.source_reference || "", applicationId: item.application_id || ""
           }));
           setTargets(current => {
             const fromMatchFeed = current.filter(target => target.targetKey.startsWith("verified:"));
@@ -166,8 +169,25 @@ export default function MasterApplicationPage() {
       });
       const body = await response.json();
       if (!response.ok) throw new Error(body.message || body.detail?.message || body.error || "The master application could not be saved.");
+      const refreshed = await fetch("/api/candidate/master-application", {
+        headers: { Authorization: `Bearer ${token}` }, cache: "no-store"
+      });
+      const saved = await refreshed.json();
+      if (refreshed.ok) {
+        setApplications(Array.isArray(saved.applications) ? saved.applications : []);
+        if (Array.isArray(saved.targets)) {
+          setTargets(saved.targets.map((item: any) => ({
+            targetKey: item.target_key, pathwayType: item.pathway_type,
+            providerName: item.provider_name, programmeOrRole: item.programme_or_role,
+            providerApplicationUrl: item.provider_application_url || "",
+            sourceReference: item.source_reference || "", applicationId: item.application_id || ""
+          })).concat([emptyTarget()]));
+        }
+      }
       setSavedAt(new Date().toISOString());
-      setMessage(`Saved securely. ${body.result?.new_targets_saved ?? 0} new target record(s) created or updated. No provider application was submitted.`);
+      const prepared = Array.isArray(body.applicationPreparations) ? body.applicationPreparations.filter((item: any) => item.ok === true && item.application_id) : [];
+      const blocked = Array.isArray(body.applicationPreparations) ? body.applicationPreparations.filter((item: any) => item.ok !== true) : [];
+      setMessage(`Saved securely. ${body.result?.new_targets_saved ?? 0} target record(s) created or updated. ${prepared.length} draft application record(s) linked from fresh verified matches. ${blocked.length ? `${blocked.length} target(s) still need a current approved source match.` : ""} No provider application was submitted.`);
     } catch (e) {
       setError(e instanceof Error ? e.message : "Save failed. Please try again.");
     } finally { setSaving(false); }
