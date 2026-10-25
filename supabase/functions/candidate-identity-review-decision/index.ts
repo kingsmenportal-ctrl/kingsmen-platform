@@ -99,6 +99,14 @@ Deno.serve(async (req: Request) => {
   }
   if (!grant) return reply(403, { error: "This account is not authorised to make identity-review decisions." }, origin);
 
+  // Fail closed: the current schema stores a candidate-described evidence summary only.
+  // Do not create a verified identity link until private evidence attachments and an audited
+  // evidence-inspection workflow are available to this decision path.
+  if (decision === "APPROVED") return reply(409, {
+    code: "IDENTITY_EVIDENCE_WORKFLOW_REQUIRED",
+    error: "Approval is blocked until supporting evidence is privately attached and reviewed through the audited evidence workflow. You may request more information while that workflow is being completed."
+  }, origin);
+
   const { data, error } = await service.rpc("decide_candidate_identity_review", {
     p_request_id: requestId,
     p_reviewer_auth_user_id: authData.user.id,
