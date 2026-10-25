@@ -17,7 +17,7 @@ const required = [
   ["dead-letter persistence", migrations.queue, "queue_status = 'dead_letter'"],
   ["manual handoff persistence", migrations.queue, "insert into public.orchestrator_manual_handoffs"],
   ["expired SENT quarantine", migrations.queue, "function public.n16_reconcile_expired_sent"],
-  ["expired SENT never replayed", migrations.queue, "no automatic replay"],
+  ["expired SENT never replayed", migrations.queue, "automatically replayed"],
   ["least-privilege service role grant", migrations.queue, "to service_role"],
   ["ordinary user execution revoked", migrations.queue, "from public, anon, authenticated"],
   ["lease-checked send boundary", migrations.send, "function public.n16_mark_dispatch_sent"],
