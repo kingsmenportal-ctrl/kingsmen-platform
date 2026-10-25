@@ -205,7 +205,7 @@ export default function IdentityReviewQueuePage() {
 
         {evidenceBoundary ? (
           <section className="mt-5 rounded-2xl border border-amber-700 bg-amber-950/40 p-5">
-            <h2 className="font-bold text-amber-200">Evidence limitation — approval remains blocked</h2>
+            <h2 className="font-bold text-amber-200">Evidence inspection required</h2>
             <p className="mt-2 text-sm leading-6 text-amber-100">{evidenceBoundary}</p>
             <p className="mt-2 text-sm leading-6 text-amber-100">
               Do not approve a claim based only on the candidate's description. Open each attached file through its short-lived private link and record an evidence decision with a rationale. The backend requires accepted evidence before identity approval.
