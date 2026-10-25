@@ -74,7 +74,15 @@ const MAX_AGE_SECONDS: Record<FounderOperationalDomain, number> = {
   urgent_candidates: 300
 };
 
-const cleanSummary = (value: string): string => value.replace(/[\r\n\t]+/g, " ").trim().slice(0, 500);
+const cleanSummary = (value: string): string => value
+  .replace(/[\\r\\n\\t]+/g, " ")
+  .replace(/[A-Z0-9._%+-]+@[A-Z0-9.-]+\\.[A-Z]{2,}/gi, "[redacted-email]")
+  .replace(/\\b\\d{13}\\b/g, "[redacted-id]")
+  .replace(/\\b(?:\\+?27|0)[1-8]\\d{8}\\b/g, "[redacted-phone]")
+  .trim()
+  .slice(0, 500);
+
+const SENSITIVE_METRIC_KEY = /(?:name|email|phone|mobile|identity|id_number|address|document|cv|candidate_ref|application_ref|token|secret|password|birth|passport)/i;
 
 function sectionFor(domain: FounderOperationalDomain, observation: FounderOperationalObservation | undefined, nowMs: number): FounderLiveBriefSection {
   if (!observation) {
@@ -82,7 +90,7 @@ function sectionFor(domain: FounderOperationalDomain, observation: FounderOperat
   }
 
   const timestamp = Date.parse(observation.generatedAt);
-  if (!observation.sourceRef.trim() || !Number.isFinite(timestamp) || timestamp > nowMs + 30_000) {
+  if (typeof observation.sourceRef !== "string" || !observation.sourceRef.trim() ||\n      typeof observation.summary !== "string" ||\n      !["OK", "WATCH", "CRITICAL", "UNKNOWN"].includes(observation.state) ||\n      !Number.isFinite(timestamp) || timestamp > nowMs + 30_000) {
     return { domain, state: "DEGRADED", sourceRef: null, generatedAt: observation.generatedAt, ageSeconds: null, severity: "UNKNOWN", summary: "Evidence metadata is invalid; source result cannot be trusted.", metrics: {} };
   }
 
@@ -90,7 +98,7 @@ function sectionFor(domain: FounderOperationalDomain, observation: FounderOperat
   const stale = ageSeconds > MAX_AGE_SECONDS[domain];
   const summary = cleanSummary(observation.summary);
   const safeMetrics = Object.fromEntries(Object.entries(observation.metrics ?? {}).filter(([key, value]) =>
-    /^[a-zA-Z][a-zA-Z0-9_]{0,39}$/.test(key) &&
+    /^[a-zA-Z][a-zA-Z0-9_]{0,39}$/.test(key) && !SENSITIVE_METRIC_KEY.test(key) &&
     (value === null || typeof value === "boolean" || typeof value === "number" || typeof value === "string") &&
     !(typeof value === "string" && value.length > 160)
   ));
