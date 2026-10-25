@@ -99,6 +99,27 @@ Deno.serve(async (req: Request) => {
   }
   if (!grant) return reply(403, { error: "This account is not authorised to make identity-review decisions." }, origin);
 
+  // Approval is fail-closed unless at least one private evidence item has an
+  // explicit, audited acceptance by an authorized identity reviewer.
+  if (decision === "APPROVED") {
+    const { data: evidence, error: evidenceError } = await service
+      .from("candidate_identity_review_evidence")
+      .select("id")
+      .eq("request_id", requestId)
+      .eq("review_status", "ACCEPTED")
+      .not("reviewed_by", "is", null)
+      .not("reviewed_at", "is", null)
+      .limit(1);
+    if (evidenceError) {
+      console.error("identity evidence approval gate lookup failed", evidenceError.code ?? "unknown");
+      return reply(503, { error: "Evidence review could not be verified. No identity decision was made." }, origin);
+    }
+    if (!evidence || evidence.length === 0) return reply(409, {
+      code: "IDENTITY_EVIDENCE_WORKFLOW_REQUIRED",
+      error: "Approval requires at least one private evidence item that an authorized identity reviewer has inspected and accepted."
+    }, origin);
+  }
+
   const { data, error } = await service.rpc("decide_candidate_identity_review", {
     p_request_id: requestId,
     p_reviewer_auth_user_id: authData.user.id,

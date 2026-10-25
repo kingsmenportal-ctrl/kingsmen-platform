@@ -3,12 +3,18 @@ import fs from 'node:fs';
 import assert from 'node:assert/strict';
 
 const paths = [
+  'supabase/migrations/20261022042942_candidate_identity_review_submission_rpc.sql',
   'supabase/migrations/20261025120000_identity_review_least_privilege_role.sql',
   'supabase/migrations/20261025121500_identity_review_role_code_constraint.sql',
   'supabase/migrations/20261025123000_identity_review_audit_actor_role.sql'
 ];
 const sql = paths.map((path) => fs.readFileSync(path, 'utf8')).join('\n').replace(/--[^\n]*/g, ' ').toLowerCase();
 const required = [
+  [/create\s+or\s+replace\s+function\s+public\.submit_candidate_identity_review_for_user\s*\(/, 'restores the transactional candidate submission RPC migration'],
+  [/pg_catalog\.pg_advisory_xact_lock/, 'serializes candidate submissions'],
+  [/request_status\s+in\s+\('pending',\s*'needs_information'\)/, 'blocks duplicate open submissions'],
+  [/revoke\s+all\s+privileges\s+on\s+function\s+public\.submit_candidate_identity_review_for_user\s*\([^;]*\)\s+from\s+public\s*,\s*anon\s*,\s*authenticated/, 'revokes direct client submission RPC execution'],
+  [/grant\s+execute\s+on\s+function\s+public\.submit_candidate_identity_review_for_user\s*\([^;]*\)\s+to\s+service_role/, 'limits submission RPC execution to service role'],
   [/alter\s+table\s+public\.platform_reviewers/, 'updates reviewer role registry constraint'],
   [/platform_reviewers_role_code_check/, 'replaces reviewer role-code constraint'],
   [/candidate_identity_review_audit_actor_role_check/, 'replaces audit actor-role constraint'],
@@ -29,6 +35,15 @@ const required = [
   [/security\s+definer/, 'retains controlled transaction privilege'],
   [/set\s+search_path\s+to\s+''/, 'pins empty search path']
 ];
+
+const decisionFunction = fs.readFileSync('supabase/functions/candidate-identity-review-decision/index.ts', 'utf8').toLowerCase();
+assert.match(decisionFunction, /decision\s*===\s*"approved"/, 'approval path must be explicit');
+assert.match(decisionFunction, /candidate_identity_review_evidence/, 'approval must consult private identity evidence');
+assert.match(decisionFunction, /\.eq\("review_status",\s*"accepted"\)/, 'approval requires explicitly accepted evidence');
+assert.match(decisionFunction, /reviewed_by/, 'accepted evidence must identify its reviewer');
+assert.match(decisionFunction, /reviewed_at/, 'accepted evidence must have a review timestamp');
+assert.match(decisionFunction, /identity_evidence_workflow_required/, 'approval must fail closed when accepted evidence is missing');
+
 const failures = required.filter(([pattern]) => !pattern.test(sql)).map(([, label]) => label);
 assert.deepEqual(failures, [], failures.join('; '));
 assert.equal(/r\.role_code\s*=\s*'platform_admin'/.test(sql), false, 'identity decision authorization must not depend on PLATFORM_ADMIN');
@@ -37,6 +52,6 @@ console.log(JSON.stringify({
   module: 'Identity Review Least-Privilege Authorization',
   status: 'IDENTITY_REVIEW_AUTHORIZATION_SOURCE_VALIDATED',
   passed: true,
-  controlsChecked: required.length + 1,
+  controlsChecked: required.length + 7,
   liveDatabaseQueriedByThisValidator: false
 }, null, 2));
