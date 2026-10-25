@@ -5,6 +5,10 @@ on:
     branches: ['**']
     paths:
       - 'apps/web/src/app/candidate/identity-review/**'
+      - 'apps/web/src/app/auth/login/**'
+      - 'apps/web/src/app/reviewer/identity-reviews/**'
+      - 'supabase/functions/candidate-identity-review-decision/**'
+      - 'supabase/functions/candidate-identity-review-queue/**'
       - 'scripts/validators/validate-candidate-identity-review-page.mjs'
       - '.github/workflows/candidate-identity-review-ui.yml'
   push:
@@ -12,6 +16,10 @@ on:
       - 'feat/candidate-identity-review-journey-*'
     paths:
       - 'apps/web/src/app/candidate/identity-review/**'
+      - 'apps/web/src/app/auth/login/**'
+      - 'apps/web/src/app/reviewer/identity-reviews/**'
+      - 'supabase/functions/candidate-identity-review-decision/**'
+      - 'supabase/functions/candidate-identity-review-queue/**'
       - 'scripts/validators/validate-candidate-identity-review-page.mjs'
       - '.github/workflows/candidate-identity-review-ui.yml'
 
