@@ -226,6 +226,14 @@ begin
     raise exception using errcode='23514',message='Verified provider submission evidence is required before confirming an outcome.';
   end if;
 
+  if exists (
+    select 1 from public.candidate_outcomes co
+    where co.evidence_id=v_evidence.id and co.outcome_status='CONFIRMED'
+      and co.outcome_type<>p_outcome_type
+  ) then
+    raise exception using errcode='23514',message='This provider outcome evidence has already been used to confirm a different outcome type.';
+  end if;
+
   v_outcome_status := case p_outcome_type
     when 'PROVIDER_OFFER' then 'OFFERED'
     when 'PROVIDER_ACCEPTANCE' then 'ACCEPTED'
