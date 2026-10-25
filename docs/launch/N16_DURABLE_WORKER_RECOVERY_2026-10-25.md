@@ -2,7 +2,7 @@
 
 ## This batch
 
-Migration `0015_n16_durable_worker_recovery.sql` connects the recovery policy to the existing `orchestrator_dispatch_queue` and existing audit/handoff tables.
+Migration `0018_n16_durable_worker_recovery.sql` connects the recovery policy to the existing `orchestrator_dispatch_queue` and existing audit/handoff tables.
 
 - `n16_claim_dispatches` uses `FOR UPDATE SKIP LOCKED`, bounds claim count and lease duration, and atomically leases due work. Expired LOCKED leases may be reclaimed; SENT work is excluded.
 - `n16_record_dispatch_result` locks the dispatch row and atomically records the worker result, execution event and queue decision.
