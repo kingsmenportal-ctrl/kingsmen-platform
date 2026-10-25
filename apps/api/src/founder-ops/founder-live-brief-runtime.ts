@@ -51,7 +51,8 @@ async function authenticatedUserId(request: IncomingMessage): Promise<string | n
 const SOURCE_QUERIES: Record<FounderOperationalDomain, string> = {
   system_health: `select snapshot_ref as source_ref, captured_at as generated_at,
     case when upper(status) in ('CRITICAL','ERROR','UNHEALTHY') then 'CRITICAL'
-         when upper(status) in ('WARNING','DEGRADED','WATCH') then 'WATCH' else 'OK' end as state,
+         when upper(status) in ('WARNING','DEGRADED','WATCH') then 'WATCH'
+         when upper(status) in ('OK','HEALTHY','READY','GREEN') then 'OK' else 'UNKNOWN' end as state,
     coalesce(summary, 'Latest persisted system health snapshot.') as summary,
     jsonb_build_object('activeCandidates', active_candidates, 'activeCandidateCap', active_candidate_cap,
       'pendingWorkflows', pending_workflows, 'failedWorkflows', failed_workflows,
@@ -60,7 +61,8 @@ const SOURCE_QUERIES: Record<FounderOperationalDomain, string> = {
       'incidentOpenCount', incident_open_count) as metrics
     from public.system_health_snapshots order by captured_at desc limit 1`,
   queue: `select snapshot_ref as source_ref, generated_at,
-    case when coalesce(blocked_count,0)>0 then 'WATCH' else 'OK' end as state,
+    case when blocked_count is null then 'UNKNOWN'
+         when blocked_count>0 then 'WATCH' else 'OK' end as state,
     'Latest persisted control-plane queue snapshot.' as summary,
     jsonb_build_object('totalCount',total_count,'urgentCount',urgent_count,'blockedCount',blocked_count,
       'manualCount',manual_count,'oldestItemAgeMinutes',oldest_item_age_minutes,'capacityStatus',capacity_status) as metrics
@@ -90,8 +92,10 @@ const SOURCE_QUERIES: Record<FounderOperationalDomain, string> = {
       'sealedTargets',count(*) filter (where sealed_exact_target is true)) as metrics
     from public.candidate_opportunity_matches having count(*) > 0`,
   map_playwright: `select check_ref as source_ref, checked_at as generated_at,
-    case when map_fallback_required or captcha_detected or otp_detected or manual_only_detected then 'WATCH'
-         when upper(health_status) in ('FAILED','ERROR','UNHEALTHY') then 'CRITICAL' else 'OK' end as state,
+    case when map_fallback_required is null or captcha_detected is null or otp_detected is null or manual_only_detected is null or health_status is null then 'UNKNOWN'
+         when map_fallback_required or captcha_detected or otp_detected or manual_only_detected then 'WATCH'
+         when upper(health_status) in ('FAILED','ERROR','UNHEALTHY') then 'CRITICAL'
+         when upper(health_status) in ('OK','HEALTHY','READY','GREEN') then 'OK' else 'UNKNOWN' end as state,
     'Latest persisted portal probe status; no candidate payload is returned.' as summary,
     jsonb_build_object('httpStatus',http_status,'captchaDetected',captcha_detected,'otpDetected',otp_detected,
       'manualOnlyDetected',manual_only_detected,'mapFallbackRequired',map_fallback_required) as metrics
@@ -105,7 +109,8 @@ const SOURCE_QUERIES: Record<FounderOperationalDomain, string> = {
       'criticalOpen',count(*) filter (where upper(severity) in ('CRITICAL','SEV1','P0') and upper(status) not in ('RESOLVED','CLOSED'))) as metrics
     from public.incident_events having count(*) > 0`,
   capacity: `select snapshot_ref as source_ref, captured_at as generated_at,
-    case when active_candidates >= active_candidate_cap then 'WATCH' else 'OK' end as state,
+    case when active_candidates is null or active_candidate_cap is null then 'UNKNOWN'
+         when active_candidates >= active_candidate_cap then 'WATCH' else 'OK' end as state,
     'Capacity and national route availability are reported separately; candidate route access is not removed at cap.' as summary,
     jsonb_build_object('activeCandidates',active_candidates,'activeCandidateCap',active_candidate_cap,
       'pendingWorkflows',pending_workflows,'manualFallbackBacklog',manual_fallback_backlog) as metrics
