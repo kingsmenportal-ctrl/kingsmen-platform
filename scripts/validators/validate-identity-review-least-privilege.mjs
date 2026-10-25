@@ -7,9 +7,9 @@ const paths = [
   'supabase/migrations/20261025121500_identity_review_role_code_constraint.sql',
   'supabase/migrations/20261025123000_identity_review_audit_actor_role.sql'
 ];
-const sql = paths.map((path) => fs.readFileSync(path, 'utf8')).join('\\n').replace(/--[^\n]*/g, ' ').toLowerCase();
+const sql = paths.map((path) => fs.readFileSync(path, 'utf8')).join('\n').replace(/--[^\n]*/g, ' ').toLowerCase();
 const required = [
-  [/alter\\s+table\\s+public\\.platform_reviewers/, 'updates reviewer role registry constraint'],
+  [/alter\s+table\s+public\.platform_reviewers/, 'updates reviewer role registry constraint'],
   [/platform_reviewers_role_code_check/, 'replaces reviewer role-code constraint'],
   [/candidate_identity_review_audit_actor_role_check/, 'replaces audit actor-role constraint'],
   [/identity_reviewer'::text/, 'allows the dedicated role in schema constraints'],
