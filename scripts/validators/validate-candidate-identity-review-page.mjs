@@ -5,14 +5,15 @@ const page = readFileSync(
   "apps/web/src/app/candidate/identity-review/page.tsx",
   "utf8"
 );
+const normalized = page.replace(/\\s+/g, " ");
 const checks = [
   ["candidate-facing route exists", page.includes("Request an identity review")],
   ["submission requires exact candidate reference", page.includes('name="candidate_reference"') && page.includes("candidateReference.trim()")],
   ["submission requires claimant name", page.includes('name="claimant_name"')],
-  ["submission calls authenticated request function", page.includes("candidate-identity-review-request") && page.includes("Authorization: `Bearer ${accessToken}`")],
+  ["submission calls authenticated request function", normalized.includes("candidate-identity-review-request") && normalized.includes("Authorization: `Bearer ${accessToken}`")],
   ["request ID is displayed from server response", page.includes("result.request_id")],
   ["does not claim candidate evidence is verified", page.includes("not independently verified")],
-  ["does not falsely claim evidence uploads", page.includes("does not upload or verify a document")],
+  ["does not falsely claim evidence uploads", normalized.includes("does not upload or verify a document")],
   ["does not include credentials in request payload", !page.includes("password:") && !page.includes("service_role")]
 ];
 for (const [label, passed] of checks) {
