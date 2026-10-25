@@ -1,0 +1,38 @@
+name: Identity Review Authorization Contract
+
+on:
+  pull_request:
+    branches: ['**']
+    paths:
+      - 'supabase/migrations/*identity_review*'
+      - 'supabase/functions/candidate-identity-review-decision/**'
+      - 'scripts/validators/validate-identity-review-least-privilege.mjs'
+      - 'scripts/security/test-identity-review-*.sql'
+      - 'package.json'
+      - '.github/workflows/identity-review-authorization.yml'
+  push:
+    branches:
+      - 'fix/identity-review-least-privilege-*'
+    paths:
+      - 'supabase/migrations/*identity_review*'
+      - 'supabase/functions/candidate-identity-review-decision/**'
+      - 'scripts/validators/validate-identity-review-least-privilege.mjs'
+      - 'scripts/security/test-identity-review-*.sql'
+      - 'package.json'
+      - '.github/workflows/identity-review-authorization.yml'
+
+permissions:
+  contents: read
+
+jobs:
+  identity-review-contract:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Validate least-privilege identity review migration contract
+        run: npm run security:validate:identity-review
