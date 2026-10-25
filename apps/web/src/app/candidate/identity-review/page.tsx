@@ -72,6 +72,10 @@ export default function CandidateIdentityReviewPage() {
         ? `Supporting evidence described by candidate (not independently verified):\n${evidenceSummary.trim()}`
         : "Supporting evidence description: not supplied in this submission."
     ].join("\n\n");
+    if (message.length > 1200) {
+      setResult({ error: "Your explanation and evidence description together must be 1,200 characters or fewer. Shorten the text and try again." });
+      return;
+    }
 
     setBusy(true);
     try {
