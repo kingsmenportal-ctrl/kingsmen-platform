@@ -66,6 +66,7 @@ export default function MasterApplicationPage() {
   const [message, setMessage] = useState("");
   const [error, setError] = useState("");
   const [savedAt, setSavedAt] = useState("");
+  const [identityLinkMissing, setIdentityLinkMissing] = useState(false);
 
   const [token, setToken] = useState<string | null>(null);
 
@@ -104,7 +105,7 @@ export default function MasterApplicationPage() {
         const body = await response.json();
         if (!response.ok) throw new Error(body.error === "AUTHENTICATION_REQUIRED" ? "Your sign-in has expired. Sign in again, then reopen this form." : "Could not load your saved master application.");
         const outcomeResponse = await fetch("/api/candidate/outcomes", { headers: { Authorization: `Bearer ${token}` }, cache: "no-store" });
-        if (outcomeResponse.ok) { const outcomeBody = await outcomeResponse.json(); setApplications(Array.isArray(outcomeBody.applications) ? outcomeBody.applications : []); }
+        if (outcomeResponse.ok) { const outcomeBody = await outcomeResponse.json(); setApplications(Array.isArray(outcomeBody.applications) ? outcomeBody.applications : []); setIdentityLinkMissing(false); } else if (outcomeResponse.status === 403) { setIdentityLinkMissing(true); }
         if (body.profile?.profile_data) {
           const data = body.profile.profile_data;
           setProfile(current => ({ ...current, ...data }));
@@ -212,7 +213,9 @@ export default function MasterApplicationPage() {
       const blocked = Array.isArray(body.applicationPreparations) ? body.applicationPreparations.filter((item: any) => item.ok !== true) : [];
       setMessage(`Saved securely. ${body.result?.new_targets_saved ?? 0} target record(s) created or updated. ${prepared.length} draft application record(s) linked from fresh verified matches. ${blocked.length ? `${blocked.length} target(s) still need a current approved source match.` : ""} No provider application was submitted.`);
     } catch (e) {
-      setError(e instanceof Error ? e.message : "Save failed. Please try again.");
+      const errorMessage = e instanceof Error ? e.message : "Save failed. Please try again.";
+      if (/IDENTITY_REVIEW_OR_PERMISSION_REQUIRED|VERIFIED_CANDIDATE_IDENTITY_REQUIRED/i.test(errorMessage)) setIdentityLinkMissing(true);
+      setError(errorMessage);
     } finally { setSaving(false); }
   }
 
@@ -236,6 +239,7 @@ export default function MasterApplicationPage() {
         </header>
 
         {!token && <section role="alert" className="rounded-2xl border border-amber-300 bg-amber-50 p-5 text-sm text-amber-950">Sign in through your existing Kingsmen/Supabase Auth session to load or save your private profile. No information is stored in this browser-only form. <a className="font-bold underline" href="/candidate/login">Sign in here</a>.</section>}
+        {identityLinkMissing && <section role="alert" className="rounded-2xl border border-amber-300 bg-amber-50 p-5 text-sm leading-6 text-amber-950"><strong>Candidate identity review is required.</strong> This sign-in is not yet linked to an authorised Kingsmen candidate record. Submit an identity-review request and upload the supporting evidence requested by Kingsmen. A reviewer must inspect the evidence and approve the link before this private workspace can be saved or read. <a className="ml-1 font-bold underline" href="/candidate/identity-review">Open identity review</a></section>}
         {loading && <p role="status" className="rounded-xl bg-white p-4 text-sm">Loading your saved master application…</p>}
         {error && <section role="alert" className="rounded-2xl border border-rose-300 bg-rose-50 p-4 text-sm text-rose-900">{error}</section>}
         {message && <section role="status" className="rounded-2xl border border-emerald-300 bg-emerald-50 p-4 text-sm text-emerald-900">{message}</section>}
