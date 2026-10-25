@@ -59,6 +59,7 @@ export default function MasterApplicationPage() {
   const [pathways, setPathways] = useState<string[]>([]);
   const [targets, setTargets] = useState<Target[]>([emptyTarget()]);
   const [applications, setApplications] = useState<any[]>([]);
+  const [manualHandoffs, setManualHandoffs] = useState<Record<string, any>>({});
   const [consent, setConsent] = useState(false);
   const [loading, setLoading] = useState(false);
   const [saving, setSaving] = useState(false);
@@ -131,6 +132,27 @@ export default function MasterApplicationPage() {
     }
     void load();
   }, [token]);
+
+  async function prepareManualPortal(applicationId: string) {
+    if (!token) { setError("Sign in before preparing an external provider handoff."); return; }
+    setError(""); setMessage("");
+    try {
+      const response = await fetch("/api/candidate/applications/manual-portal", {
+        method: "POST",
+        headers: { Authorization: `Bearer ${token}`, "Content-Type": "application/json" },
+        body: JSON.stringify({ applicationId })
+      });
+      const body = await response.json();
+      if (!response.ok || body.ok !== true || !body.official_url) throw new Error(body.message || body.code || body.error || "External portal handoff could not be prepared.");
+      setManualHandoffs(current => ({ ...current, [applicationId]: body }));
+      setMessage("Manual provider handoff prepared. Kingsmen has not submitted the application. Complete the official provider steps, then upload the receipt linked to this application for review.");
+      const refreshed = await fetch("/api/candidate/master-application", { headers: { Authorization: `Bearer ${token}` }, cache: "no-store" });
+      const saved = await refreshed.json();
+      if (refreshed.ok && Array.isArray(saved.applications)) setApplications(saved.applications);
+    } catch (e) {
+      setError(e instanceof Error ? e.message : "External portal handoff failed.");
+    }
+  }
 
   function updateProfile(field: keyof typeof profile, value: string) {
     setProfile(current => ({ ...current, [field]: value }));
@@ -272,7 +294,7 @@ export default function MasterApplicationPage() {
               <div><h2 className="text-xl font-black">4. Application records and tracking</h2><p className="mt-1 text-sm text-slate-600">Only a current approved N15 match with fresh official evidence can be converted into a draft application record. Other targets remain plans until they are matched to an authoritative opportunity.</p></div>
               <a href="/candidate/applications/preparation" className="rounded-xl border border-slate-300 px-4 py-2 text-sm font-bold">Open preparation workbench</a>
             </div>
-            {!applications.length ? <p className="mt-4 text-sm text-slate-600">No application-specific records are linked yet. Saving a target does not create a fictional provider application.</p> : <div className="mt-4 space-y-3">{applications.map((app:any)=><article key={app.id} className="rounded-2xl border border-slate-200 p-4"><div className="flex flex-wrap items-start justify-between gap-3"><div><h3 className="font-bold">{app.application_ref}</h3><p className="mt-1 text-xs text-slate-600">{app.pathway_type.replaceAll("_"," ")} · {app.status.replaceAll("_"," ")}</p></div><span className="rounded-full bg-slate-100 px-3 py-1 text-xs font-semibold">{app.readiness_status.replaceAll("_"," ")}</span></div><p className="mt-2 text-xs text-slate-600">{app.provider_reference ? `Provider reference: ${app.provider_reference}` : "No provider reference recorded."} {app.submitted_at ? `· Submitted timestamp: ${new Date(app.submitted_at).toLocaleString()}` : "· Not submitted."}</p></article>)}</div>}
+            {!applications.length ? <p className="mt-4 text-sm text-slate-600">No application-specific records are linked yet. Saving a target does not create a fictional provider application.</p> : <div className="mt-4 space-y-3">{applications.map((app:any)=><article key={app.id} className="rounded-2xl border border-slate-200 p-4"><div className="flex flex-wrap items-start justify-between gap-3"><div><h3 className="font-bold">{app.application_ref}</h3><p className="mt-1 text-xs text-slate-600">{app.pathway_type.replaceAll("_"," ")} · {app.status.replaceAll("_"," ")}</p></div><span className="rounded-full bg-slate-100 px-3 py-1 text-xs font-semibold">{app.readiness_status.replaceAll("_"," ")}</span></div><p className="mt-2 text-xs text-slate-600">{app.provider_reference ? `Provider reference: ${app.provider_reference}` : "No provider reference recorded."} {app.submitted_at ? `· Submitted timestamp: ${new Date(app.submitted_at).toLocaleString()}` : "· Not submitted."}</p>{["DRAFT","READINESS_BLOCKED","READY_FOR_REVIEW","READY_TO_SUBMIT","MANUAL_ACTION_REQUIRED"].includes(app.status)&&<button type="button" onClick={()=>void prepareManualPortal(app.id)} className="mt-3 rounded-lg bg-slate-950 px-3 py-2 text-xs font-bold text-white">Prepare official portal handoff</button>}{manualHandoffs[app.id]&&<div className="mt-3 rounded-xl bg-amber-50 p-3 text-xs leading-5"><p className="font-bold">Manual action required · {manualHandoffs[app.id].submission_ref}</p><a className="mt-1 inline-block font-bold underline" href={manualHandoffs[app.id].official_url} target="_blank" rel="noopener noreferrer">Open official provider page ↗</a><p className="mt-1">After completing the provider portal, upload the receipt in the private document vault and select this application. Submission remains unverified until evidence is reviewed.</p><a className="mt-1 inline-block font-bold underline" href="/candidate/documents">Upload receipt / documents</a></div>}</article>)}</div>}
           </section>
 
           <section className="rounded-3xl border border-amber-200 bg-amber-50 p-5 sm:p-7">
