@@ -151,7 +151,7 @@ export default function IdentityReviewQueuePage() {
     }
   }
 
-  async function decide(request: ReviewRequest, decision: "REJECTED" | "NEEDS_INFORMATION") {
+  async function decide(request: ReviewRequest, decision: "APPROVED" | "REJECTED" | "NEEDS_INFORMATION") {
     setError("");
     setNotice("");
     const token = readAccessToken();
@@ -279,7 +279,7 @@ export default function IdentityReviewQueuePage() {
               <div className="mt-4 flex flex-wrap gap-3">
                 <button type="button" disabled={busy} onClick={() => void decide(request, "NEEDS_INFORMATION")} className="rounded-xl border border-amber-700 px-4 py-3 font-semibold text-amber-200 disabled:opacity-50">Request more information</button>
                 <button type="button" disabled={busy} onClick={() => void decide(request, "REJECTED")} className="rounded-xl border border-rose-800 px-4 py-3 font-semibold text-rose-200 disabled:opacity-50">Reject claim</button>
-                <button type="button" disabled title="Approval is intentionally unavailable until private evidence attachments and audited evidence review are implemented." className="cursor-not-allowed rounded-xl bg-slate-700 px-4 py-3 font-semibold text-slate-300">Approve — blocked pending evidence workflow</button>
+                <button type="button" disabled={busy || !(request.evidence ?? []).some((evidence) => evidence.review_status === "ACCEPTED")} onClick={() => void decide(request, "APPROVED")} title="Approval requires at least one evidence item accepted by an authorized reviewer; the backend enforces this too." className="rounded-xl bg-emerald-400 px-4 py-3 font-semibold text-slate-950 disabled:cursor-not-allowed disabled:opacity-40">Approve after evidence accepted</button>
               </div>
             </article>
           ))}
