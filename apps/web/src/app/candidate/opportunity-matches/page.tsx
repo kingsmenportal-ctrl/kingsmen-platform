@@ -142,7 +142,7 @@ export default function CandidateOpportunityMatchesPage() {
                   <div className="mt-5 flex flex-wrap gap-2">
                     <a href={item.official_link} target="_blank" rel="noopener noreferrer"
                       className="inline-flex rounded-xl bg-slate-950 px-4 py-3 text-sm font-bold text-white">Open official opportunity ↗</a>
-                    <a href={`/candidate/master-application?plan=1&match_ref=${encodeURIComponent(item.match_ref)}&pathway=${encodeURIComponent(item.pathways[0] || "EMPLOYMENT")}&provider=${encodeURIComponent(item.provider)}&programme=${encodeURIComponent(item.title)}&url=${encodeURIComponent(item.official_link)}`}
+                    <a href={`/candidate/master-application?plan=1&match_ref=${encodeURIComponent(item.match_ref)}&pathway=${encodeURIComponent(({ SETA_LEARNERSHIPS: "SETA_LEARNERSHIP", INTERNSHIPS: "INTERNSHIP", APPRENTICESHIPS: "APPRENTICESHIP" } as Record<string, string>)[item.pathways[0]] || item.pathways[0] || "EMPLOYMENT")}&provider=${encodeURIComponent(item.provider)}&programme=${encodeURIComponent(item.title)}&url=${encodeURIComponent(item.official_link)}`}
                       className="inline-flex rounded-xl border border-amber-400 px-4 py-3 text-sm font-bold text-slate-900">Add to my master application</a>
                   </div>
                 </article>
