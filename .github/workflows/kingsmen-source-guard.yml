@@ -58,6 +58,9 @@ jobs:
       - name: API Truth Vault persistence validator
         run: npm run api:validate:truth-vault
 
+      - name: N03 production storage fail-closed regression test
+        run: npm run api:test:production-storage-guard
+
       - name: Safe web/backend boundary validator
         run: npm run web:validate:backend-boundary
 
