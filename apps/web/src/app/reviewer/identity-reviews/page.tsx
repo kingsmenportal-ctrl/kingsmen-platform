@@ -208,7 +208,7 @@ export default function IdentityReviewQueuePage() {
             <h2 className="font-bold text-amber-200">Evidence limitation — approval remains blocked</h2>
             <p className="mt-2 text-sm leading-6 text-amber-100">{evidenceBoundary}</p>
             <p className="mt-2 text-sm leading-6 text-amber-100">
-              Do not approve a claim based only on a candidate's description. The private evidence attachment, reviewer read-access, and evidence-review audit path must be completed before approval can be safely enabled.
+              Do not approve a claim based only on the candidate's description. Open each attached file through its short-lived private link and record an evidence decision with a rationale. The backend requires accepted evidence before identity approval.
             </p>
           </section>
         ) : null}
