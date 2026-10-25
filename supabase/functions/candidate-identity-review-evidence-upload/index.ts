@@ -66,6 +66,15 @@ Deno.serve(async (req: Request) => {
   if (!["PENDING", "NEEDS_INFORMATION"].includes(request.request_status)) return reply(409, { error: "Evidence cannot be added to a closed identity-review request." }, origin);
 
   const bytes = new Uint8Array(await file.arrayBuffer());
+  const pdf = file.type === "application/pdf" && bytes.length >= 5 &&
+    String.fromCharCode(...bytes.slice(0, 5)) === "%PDF-";
+  const jpeg = file.type === "image/jpeg" && bytes.length >= 3 &&
+    bytes[0] === 0xff && bytes[1] === 0xd8 && bytes[2] === 0xff;
+  const png = file.type === "image/png" && bytes.length >= 8 &&
+    bytes[0] === 0x89 && bytes[1] === 0x50 && bytes[2] === 0x4e &&
+    bytes[3] === 0x47 && bytes[4] === 0x0d && bytes[5] === 0x0a &&
+    bytes[6] === 0x1a && bytes[7] === 0x0a;
+  if (!pdf && !jpeg && !png) return reply(415, { error: "The file contents do not match an allowed PDF, JPEG, or PNG type." }, origin);
   const digest = await sha256(bytes);
   const path = `${authData.user.id}/${requestId}/${crypto.randomUUID()}-${safeFilename(file.name)}`;
   const { error: uploadError } = await service.storage.from(BUCKET).upload(path, bytes, {
