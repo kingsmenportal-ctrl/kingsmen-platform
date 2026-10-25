@@ -37,6 +37,7 @@ A separate cleanup-only positive SQL integration probe is provided at `scripts/s
 
 - The new migration is applied to the Kingsmen staging database.
 - The supplied staging Auth account has one active `IDENTITY_REVIEWER` grant.
+- Because staging had no existing active reviewer/grantor, the owner-authorized staging bootstrap row has `granted_by_auth_user_id = NULL`. This is an explicitly limited staging bootstrap exception, not the production grant procedure; production provisioning must record an authenticated, independently authorized grantor.
 - The decision Edge Function is ACTIVE version 1 with gateway JWT verification enabled.
 - Negative authorization SQL probes passed for ungranted identities and for a temporary `PLATFORM_ADMIN`-only grant.
 - The cleanup-only approval/audit probe passed and left zero identity-review requests and zero identity links.
