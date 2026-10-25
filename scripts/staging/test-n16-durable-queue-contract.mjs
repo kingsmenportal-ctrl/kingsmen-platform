@@ -2,6 +2,7 @@ import assert from "node:assert/strict";
 import { readFile } from "node:fs/promises";
 
 const read = async (name) => (await readFile(new URL(`../../db/migrations/${name}`, import.meta.url), "utf8")).toLowerCase();
+const adapter = (await readFile(new URL("../../apps/api/src/orchestrator/durable-worker-queue.ts", import.meta.url), "utf8")).toLowerCase();
 const migrations = {
   queue: await read("0015_n16_durable_worker_recovery.sql"),
   send: await read("0016_n16_worker_send_boundary.sql"),
@@ -22,7 +23,10 @@ const required = [
   ["ordinary user execution revoked", migrations.queue, "from public, anon, authenticated"],
   ["lease-checked send boundary", migrations.send, "function public.n16_mark_dispatch_sent"],
   ["expired LOCKED budget exhaustion recovery", migrations.lease, "function public.n16_deadletter_exhausted_locked"],
-  ["expired lease dead-letter state", migrations.lease, "queue_status = 'dead_letter'"]
+  ["expired lease dead-letter state", migrations.lease, "queue_status = 'dead_letter'"],
+  ["API adapter calls durable claim RPC", adapter, "public.n16_claim_dispatches"],
+  ["API adapter records worker results through RPC", adapter, "public.n16_record_dispatch_result"],
+  ["API adapter fails closed outside PostgreSQL mode", adapter, "n16_durable_queue_requires_postgres_truth_vault_mode"]
 ];
 for (const [label, source, needle] of required) {
   assert.ok(source.includes(needle), `Missing ${label}: ${needle}`);
