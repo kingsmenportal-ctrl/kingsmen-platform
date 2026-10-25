@@ -190,7 +190,7 @@ export default function MasterApplicationPage() {
           </p>
         </header>
 
-        {!token && <section role="alert" className="rounded-2xl border border-amber-300 bg-amber-50 p-5 text-sm text-amber-950">Sign in through your existing Kingsmen/Supabase Auth session to load or save your private profile. No information is stored in this browser-only form.</section>}
+        {!token && <section role="alert" className="rounded-2xl border border-amber-300 bg-amber-50 p-5 text-sm text-amber-950">Sign in through your existing Kingsmen/Supabase Auth session to load or save your private profile. No information is stored in this browser-only form. <a className="font-bold underline" href="/candidate/login">Sign in here</a>.</section>}
         {loading && <p role="status" className="rounded-xl bg-white p-4 text-sm">Loading your saved master application…</p>}
         {error && <section role="alert" className="rounded-2xl border border-rose-300 bg-rose-50 p-4 text-sm text-rose-900">{error}</section>}
         {message && <section role="status" className="rounded-2xl border border-emerald-300 bg-emerald-50 p-4 text-sm text-emerald-900">{message}</section>}
