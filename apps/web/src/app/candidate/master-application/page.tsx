@@ -267,8 +267,16 @@ export default function MasterApplicationPage() {
             </div>
           </section>
 
+          <section className="rounded-3xl border border-slate-200 bg-white p-5 sm:p-7">
+            <div className="flex flex-wrap items-center justify-between gap-3">
+              <div><h2 className="text-xl font-black">4. Application records and tracking</h2><p className="mt-1 text-sm text-slate-600">Only a current approved N15 match with fresh official evidence can be converted into a draft application record. Other targets remain plans until they are matched to an authoritative opportunity.</p></div>
+              <a href="/candidate/applications/preparation" className="rounded-xl border border-slate-300 px-4 py-2 text-sm font-bold">Open preparation workbench</a>
+            </div>
+            {!applications.length ? <p className="mt-4 text-sm text-slate-600">No application-specific records are linked yet. Saving a target does not create a fictional provider application.</p> : <div className="mt-4 space-y-3">{applications.map((app:any)=><article key={app.id} className="rounded-2xl border border-slate-200 p-4"><div className="flex flex-wrap items-start justify-between gap-3"><div><h3 className="font-bold">{app.application_ref}</h3><p className="mt-1 text-xs text-slate-600">{app.pathway_type.replaceAll("_"," ")} · {app.status.replaceAll("_"," ")}</p></div><span className="rounded-full bg-slate-100 px-3 py-1 text-xs font-semibold">{app.readiness_status.replaceAll("_"," ")}</span></div><p className="mt-2 text-xs text-slate-600">{app.provider_reference ? `Provider reference: ${app.provider_reference}` : "No provider reference recorded."} {app.submitted_at ? `· Submitted timestamp: ${new Date(app.submitted_at).toLocaleString()}` : "· Not submitted."}</p></article>)}</div>}
+          </section>
+
           <section className="rounded-3xl border border-amber-200 bg-amber-50 p-5 sm:p-7">
-            <h2 className="text-lg font-black">4. Consent and save</h2>
+            <h2 className="text-lg font-black">5. Consent and save</h2>
             <label className="mt-3 flex items-start gap-3 text-sm leading-6 text-amber-950"><input type="checkbox" className="mt-1 h-4 w-4 accent-amber-700" checked={consent} onChange={e=>setConsent(e.target.checked)} /><span>I consent to Kingsmen storing this profile and the targets I choose so my information can be reused to prepare relevant applications. I understand I can request correction, that sensitive documents use the private document vault, and that saving this form is not a provider submission or a guarantee of eligibility, funding, admission, placement or employment.</span></label>
             {savedAt && <p className="mt-3 text-xs text-slate-600">Last saved: {new Date(savedAt).toLocaleString()}</p>}
             <button type="submit" disabled={saving || loading} className="mt-5 rounded-xl bg-slate-950 px-6 py-3.5 text-sm font-black text-white disabled:cursor-not-allowed disabled:opacity-50">{saving ? "Saving securely…" : "Save my one master application"}</button>
