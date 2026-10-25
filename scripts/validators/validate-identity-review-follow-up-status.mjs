@@ -4,6 +4,8 @@ const migration = fs.readFileSync("supabase/migrations/20261025112103_candidate_
 const followup = fs.readFileSync("supabase/functions/candidate-identity-review-followup/index.ts", "utf8");
 const status = fs.readFileSync("supabase/functions/candidate-identity-review-status/index.ts", "utf8");
 const page = fs.readFileSync("apps/web/src/app/candidate/identity-review/status/page.tsx", "utf8");
+const ownerTest = fs.readFileSync("scripts/security/test-identity-review-follow-up-cleanup.sql", "utf8").toLowerCase();
+const conflictTest = fs.readFileSync("scripts/security/test-identity-review-conflicting-link-cleanup.sql", "utf8").toLowerCase();
 const required = [
   [migration.includes("security definer") && migration.includes("set search_path to ''"), "safe definer boundary"],
   [migration.includes("supabase_user_id = p_candidate_auth_user_id"), "request owner enforced in transactional RPC"],
@@ -15,7 +17,9 @@ const required = [
   [/\.eq\("supabase_user_id", authData\.user\.id\)/.test(status), "status query is scoped to authenticated owner"],
   [status.includes("Cache-Control") && status.includes("no-store"), "status responses are non-cacheable"],
   [page.includes("candidate-identity-review-followup") && page.includes("candidate-identity-review-status"), "candidate page uses authenticated status and follow-up endpoints"],
-  [page.includes("candidate-identity-review-evidence-upload"), "candidate can add more private evidence to existing request"]
+  [page.includes("candidate-identity-review-evidence-upload"), "candidate can add more private evidence to existing request"],
+  [ownerTest.includes("non-owner candidate response was accepted") && ownerTest.includes("candidate_response"), "cleanup-only owner-isolation and audit integration test is present"],
+  [conflictTest.includes("conflicting candidate/account link was approved") && conflictTest.includes("expected 23505"), "cleanup-only conflicting-link denial integration test is present"]
 ];
 const failures = required.filter(([ok]) => !ok).map(([, label]) => label);
 assert.deepEqual(failures, [], failures.join("; "));
