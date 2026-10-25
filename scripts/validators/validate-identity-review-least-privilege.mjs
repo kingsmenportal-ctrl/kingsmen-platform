@@ -2,8 +2,12 @@
 import fs from 'node:fs';
 import assert from 'node:assert/strict';
 
-const path = 'supabase/migrations/20261025120000_identity_review_least_privilege_role.sql';
-const sql = fs.readFileSync(path, 'utf8').replace(/--[^\n]*/g, ' ').toLowerCase();
+const paths = [
+  'supabase/migrations/20261025120000_identity_review_least_privilege_role.sql',
+  'supabase/migrations/20261025121500_identity_review_role_code_constraint.sql',
+  'supabase/migrations/20261025123000_identity_review_audit_actor_role.sql'
+];
+const sql = paths.map((path) => fs.readFileSync(path, 'utf8')).join('\\n').replace(/--[^\n]*/g, ' ').toLowerCase();
 const required = [
   [/alter\\s+table\\s+public\\.platform_reviewers/, 'updates reviewer role registry constraint'],
   [/platform_reviewers_role_code_check/, 'replaces reviewer role-code constraint'],
