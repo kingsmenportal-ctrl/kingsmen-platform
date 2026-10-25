@@ -31,7 +31,7 @@ Run the read-only unauthorized decision probes after applying the migration:
 
 The probes assert that ungranted accounts cannot approve, reject, or request more information; that `PLATFORM_ADMIN` alone is not sufficient; and that only `service_role` can execute the decision RPC.
 
-A separate rollback-only positive SQL integration probe is provided at `scripts/security/test-identity-review-approval-rollback.sql`. It verifies approval, a verified link, and audit persistence inside a temporary transaction fixture, then cleans up the request, audit, and link. This is database integration evidence, not proof of an authenticated candidate submission or browser end-to-end flow.
+A separate cleanup-only positive SQL integration probe is provided at `scripts/security/test-identity-review-approval-cleanup.sql`. It verifies approval, a verified link, and audit persistence inside a temporary transaction fixture, then cleans up the request, audit, and link. This is database integration evidence, not proof of an authenticated candidate submission or browser end-to-end flow.
 
 ## Staging observation (2026-10-25)
 
@@ -39,9 +39,9 @@ A separate rollback-only positive SQL integration probe is provided at `scripts/
 - The supplied staging Auth account has one active `IDENTITY_REVIEWER` grant.
 - The decision Edge Function is ACTIVE version 1 with gateway JWT verification enabled.
 - Negative authorization SQL probes passed for ungranted identities and for a temporary `PLATFORM_ADMIN`-only grant.
-- The rollback-only approval/audit probe passed and left zero identity-review requests and zero identity links.
+- The cleanup-only approval/audit probe passed and left zero identity-review requests and zero identity links.
 - The RPC privilege check returned `anon=false`, `authenticated=false`, `service_role=true`.
 
 ## Remaining release gate
 
-No authenticated candidate bearer token was available to submit a genuine request through the candidate submission Edge Function, and the connected tools do not expose a direct Edge Function POST invocation. Therefore a real authenticated candidate submission followed by a reviewer HTTP decision, durable audit inspection, and candidate-owned access verification remain **unverified**. The rollback-only SQL fixture must not be described as that end-to-end proof.
+No authenticated candidate bearer token was available to submit a genuine request through the candidate submission Edge Function, and the connected tools do not expose a direct Edge Function POST invocation. Therefore a real authenticated candidate submission followed by a reviewer HTTP decision, durable audit inspection, and candidate-owned access verification remain **unverified**. The cleanup-only SQL fixture must not be described as that end-to-end proof.
