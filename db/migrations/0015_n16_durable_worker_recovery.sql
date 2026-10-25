@@ -68,8 +68,8 @@ begin
         when 'HIGH' then 2 when 'NORMAL' then 3 else 4
       end,
       q.dispatch_after, q.created_at
-    for update skip locked
     limit p_limit
+    for update skip locked
   )
   update public.orchestrator_dispatch_queue q
   set queue_status = 'LOCKED',
