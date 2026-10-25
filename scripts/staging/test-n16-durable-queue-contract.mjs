@@ -21,6 +21,7 @@ const required = [
   ["expired SENT never replayed", migrations.queue, "automatically replayed"],
   ["least-privilege service role grant", migrations.queue, "to service_role"],
   ["ordinary user execution revoked", migrations.queue, "from public, anon, authenticated"],
+  ["legacy broad table grants revoked", migrations.queue, "revoke all on table public.orchestrator_dispatch_queue"],
   ["lease-checked send boundary", migrations.send, "function public.n16_mark_dispatch_sent"],
   ["expired LOCKED budget exhaustion recovery", migrations.lease, "function public.n16_deadletter_exhausted_locked"],
   ["expired lease dead-letter state", migrations.lease, "queue_status = 'dead_letter'"],
@@ -33,4 +34,4 @@ for (const [label, source, needle] of required) {
   console.log("PASS", label);
 }
 assert.ok(!migrations.queue.includes(" to authenticated") && !migrations.queue.includes(" to anon"), "Queue RPCs must not be granted to authenticated or anonymous users");
-console.log(`N16 durable queue migration contract: ${required.length}/${required.length} checks passed (static contract only; PostgreSQL runtime not executed).`);
+console.log(`N16 durable queue migration contract: ${required.length}/${required.length} checks passed (static contract only; live staging evidence is tracked separately).`);
