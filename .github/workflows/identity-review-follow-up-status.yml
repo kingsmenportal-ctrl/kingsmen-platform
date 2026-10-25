@@ -7,6 +7,7 @@ on:
       - 'supabase/functions/candidate-identity-review-followup/**'
       - 'supabase/functions/candidate-identity-review-status/**'
       - 'apps/web/src/app/candidate/identity-review/status/**'
+      - 'apps/web/src/components/saved-opportunities-client.tsx'
       - 'scripts/validators/validate-identity-review-follow-up-status.mjs'
       - 'scripts/security/test-identity-review-follow-up-cleanup.sql'
       - 'scripts/security/test-identity-review-conflicting-link-cleanup.sql'
