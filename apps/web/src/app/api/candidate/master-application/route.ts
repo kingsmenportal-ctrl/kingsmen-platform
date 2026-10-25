@@ -69,17 +69,11 @@ export async function GET(request: Request) {
     "candidate_master_application_targets?select=id,target_key,pathway_type,provider_name,programme_or_role,provider_application_url,source_reference,source_confidence,planning_status,application_id,created_at,updated_at&order=created_at.desc"
   );
   if (targets instanceof Response) return targets;
-  const applications = await candidateRequest(
-    request,
-    "candidate_applications?select=id,application_ref,opportunity_id,pathway_type,status,readiness_status,provider_reference,submission_evidence_ref,submitted_at,created_at,updated_at&order=created_at.desc"
-  );
-  if (applications instanceof Response) return applications;
   return Response.json({
     ok: true,
     profile: Array.isArray(profile.data) ? profile.data[0] ?? null : null,
     targets: Array.isArray(targets.data) ? targets.data : [],
-    applications: Array.isArray(applications.data) ? applications.data : [],
-    boundary: "Candidate-owned persisted profile, targets and application records; provider submission/outcomes require separate evidence."
+    boundary: "Candidate-owned persisted profile and planning targets; application records and outcomes use the separate evidence-gated read model."
   });
 }
 
