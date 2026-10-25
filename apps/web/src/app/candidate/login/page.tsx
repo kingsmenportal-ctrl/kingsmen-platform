@@ -80,6 +80,7 @@ export default function CandidateLoginPage() {
         <button type="button" onClick={()=>{setRecovering(v=>!v);setError("");setMessage("");}} className="mt-4 text-sm font-semibold text-amber-800 underline underline-offset-4">
           {recovering ? "Return to sign in" : "Forgot your password?"}
         </button>
+        <p className="mt-4 text-sm leading-6 text-slate-700">Need to connect this sign-in to an existing Kingsmen candidate record? <a className="font-bold text-amber-800 underline" href="/candidate/identity-review">Submit an identity-review request</a>. Approval requires authorised evidence review.</p>
         <p className="mt-6 border-t border-slate-100 pt-4 text-xs leading-5 text-slate-500">
           Session tokens are stored using the existing Supabase Auth browser-session key so the authenticated candidate APIs can use them. Never share your password or access token. If your identity is not approved, the portal must keep candidate data locked until authorised review is complete.
         </p>
