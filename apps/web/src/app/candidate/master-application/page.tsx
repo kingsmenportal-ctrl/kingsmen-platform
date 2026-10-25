@@ -147,9 +147,8 @@ export default function MasterApplicationPage() {
       if (!response.ok || body.ok !== true || !body.official_url) throw new Error(body.message || body.code || body.error || "External portal handoff could not be prepared.");
       setManualHandoffs(current => ({ ...current, [applicationId]: body }));
       setMessage("Manual provider handoff prepared. Kingsmen has not submitted the application. Complete the official provider steps, then upload the receipt linked to this application for review.");
-      const refreshed = await fetch("/api/candidate/master-application", { headers: { Authorization: `Bearer ${token}` }, cache: "no-store" });
-      const saved = await refreshed.json();
-      if (refreshed.ok) { const outcomeResponse = await fetch("/api/candidate/outcomes", { headers: { Authorization: `Bearer ${token}` }, cache: "no-store" }); if (outcomeResponse.ok) { const outcomeBody = await outcomeResponse.json(); setApplications(Array.isArray(outcomeBody.applications) ? outcomeBody.applications : []); } }
+      const outcomeResponse = await fetch("/api/candidate/outcomes", { headers: { Authorization: `Bearer ${token}` }, cache: "no-store" });
+      if (outcomeResponse.ok) { const outcomeBody = await outcomeResponse.json(); setApplications(Array.isArray(outcomeBody.applications) ? outcomeBody.applications : []); }
     } catch (e) {
       setError(e instanceof Error ? e.message : "External portal handoff failed.");
     }
