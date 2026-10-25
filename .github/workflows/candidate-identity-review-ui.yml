@@ -9,6 +9,10 @@ on:
       - 'apps/web/src/app/reviewer/identity-reviews/**'
       - 'supabase/functions/candidate-identity-review-decision/**'
       - 'supabase/functions/candidate-identity-review-queue/**'
+      - 'supabase/functions/candidate-identity-review-evidence-upload/**'
+      - 'supabase/functions/candidate-identity-review-evidence-read/**'
+      - 'supabase/functions/candidate-identity-review-evidence-decision/**'
+      - 'supabase/migrations/*candidate_identity_review_private_evidence*'
       - 'scripts/validators/validate-candidate-identity-review-page.mjs'
       - '.github/workflows/candidate-identity-review-ui.yml'
   push:
