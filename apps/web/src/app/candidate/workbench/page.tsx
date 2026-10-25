@@ -11,7 +11,13 @@ export default function CandidateWorkbenchPage() {
   return (
     <main>
       <h1>Kingsmen Application Workbench</h1>
-      <p>Use one reusable master application to maintain your candidate profile and plan targets across all six pathways. Your package changes service intensity, not access.</p>\n\n      <section aria-label="Unified Master Application">\n        <h2>One master application · many provider targets</h2>\n        <p>Enter your details once, select every pathway you want to pursue, and maintain multiple target records from the same profile. Provider submissions and outcomes are tracked separately only when route-specific evidence exists.</p>\n        <a href="/candidate/master-application">Open my master application</a>\n      </section>
+      <p>Use one reusable master application to maintain your candidate profile and plan targets across all six pathways. Your package changes service intensity, not access.</p>
+
+      <section aria-label="Unified Master Application">
+        <h2>One master application · many provider targets</h2>
+        <p>Enter your details once, select every pathway you want to pursue, and maintain multiple target records from the same profile. Provider submissions and outcomes are tracked separately only when route-specific evidence exists.</p>
+        <a href="/candidate/master-application">Open my master application</a>
+      </section>
 
       <section aria-label="Six Gate Workbench">
         {gates.map(([code, label]) => (
