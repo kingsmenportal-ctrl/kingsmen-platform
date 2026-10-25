@@ -244,27 +244,39 @@ async function receiveItn(request: Request) {
   const amountCents = Math.round(Number(fields.amount_gross) * 100);
   const amountValid = Boolean(intent) && Number.isFinite(amountCents) && amountCents === Number(intent.amount_cents);
   const duplicateKey = `payfast-itn:${merchantReference}:${providerPaymentId}:${paymentStatus}`;
-  const prior = await rest(`payfast_itn_receipts?select=id& idempotency_key=eq.${encodeURIComponent(duplicateKey)}&limit=1`.replace("?select=id& ", "?select=id&"));
-  const duplicate = Array.isArray(prior) && prior.length > 0;
+  const prior = await rest(`payfast_itn_receipts?select=id,itn_ref,evidence_ref,accepted,merchant_reference,provider_payment_id,payment_status,amount_gross&idempotency_key=eq.${encodeURIComponent(duplicateKey)}&limit=1`);
+  const priorReceipt = Array.isArray(prior) && prior.length === 1 ? prior[0] : null;
+  const duplicate = Boolean(priorReceipt);
+  const priorMatches = Boolean(priorReceipt)
+    && priorReceipt.merchant_reference === merchantReference
+    && String(priorReceipt.provider_payment_id ?? "") === providerPaymentId
+    && String(priorReceipt.payment_status ?? "") === paymentStatus
+    && Math.round(Number(priorReceipt.amount_gross) * 100) === Math.round(Number(fields.amount_gross) * 100);
+  const priorAccepted = Boolean(priorReceipt?.accepted) && priorMatches;
   const merchantValid = fields.merchant_id === Deno.env.get("PAYFAST_MERCHANT_ID");
-  const accepted = Boolean(intent) && signatureValid && providerValid && amountValid && !duplicate && paymentStatus === "COMPLETE" && merchantValid;
-  const rejectionReason = accepted ? null : !intent ? "unknown_payment_reference" : !signatureValid ? "invalid_signature" : !providerValid ? "provider_validation_failed" : !amountValid ? "amount_mismatch" : duplicate ? "duplicate_itn" : paymentStatus !== "COMPLETE" ? "payment_not_complete" : !merchantValid ? "merchant_mismatch" : "rejected";
-  const receiptRef = ref("itn");
-  const receiptEvidenceRef = ref("pay_ev");
+  // A replay of a previously accepted receipt is allowed to reach idempotent settlement recovery.
+  // It must not create a second receipt or payment. A rejected/mismatched prior receipt stays rejected.
+  const accepted = Boolean(intent) && signatureValid && providerValid && amountValid
+    && (!duplicate || priorAccepted) && paymentStatus === "COMPLETE" && merchantValid;
+  const rejectionReason = accepted ? null : !intent ? "unknown_payment_reference" : !signatureValid ? "invalid_signature" : !providerValid ? "provider_validation_failed" : !amountValid ? "amount_mismatch" : duplicate && !priorAccepted ? "duplicate_itn" : paymentStatus !== "COMPLETE" ? "payment_not_complete" : !merchantValid ? "merchant_mismatch" : "rejected";
+  const receiptRef = priorReceipt?.itn_ref ?? ref("itn");
+  const receiptEvidenceRef = priorReceipt?.evidence_ref ?? ref("pay_ev");
   const safePayload = sanitize(fields);
-  await rest("payfast_itn_receipts", {
-    method: "POST",
-    headers: { prefer: "return=minimal" },
-    body: JSON.stringify({
-      itn_ref: receiptRef, merchant_reference: merchantReference, provider_payment_id: providerPaymentId || null,
-      payment_status: paymentStatus || null, amount_gross: fields.amount_gross ?? null,
-      amount_fee: fields.amount_fee ?? null, amount_net: fields.amount_net ?? null,
-      received_payload: safePayload, received_signature: fields.signature ?? null,
-      calculated_signature: expectedSignature, signature_valid: signatureValid, ip_valid: ipValid,
-      amount_valid: amountValid, duplicate, accepted, rejection_reason: rejectionReason,
-      idempotency_key: duplicateKey, evidence_ref: receiptEvidenceRef,
-    }),
-  });
+  if (!duplicate) {
+    await rest("payfast_itn_receipts", {
+      method: "POST",
+      headers: { prefer: "return=minimal" },
+      body: JSON.stringify({
+        itn_ref: receiptRef, merchant_reference: merchantReference, provider_payment_id: providerPaymentId || null,
+        payment_status: paymentStatus || null, amount_gross: fields.amount_gross ?? null,
+        amount_fee: fields.amount_fee ?? null, amount_net: fields.amount_net ?? null,
+        received_payload: safePayload, received_signature: fields.signature ?? null,
+        calculated_signature: expectedSignature, signature_valid: signatureValid, ip_valid: ipValid,
+        amount_valid: amountValid, duplicate, accepted, rejection_reason: rejectionReason,
+        idempotency_key: duplicateKey, evidence_ref: receiptEvidenceRef,
+      }),
+    });
+  }
   await rest("payfast_signature_audit", {
     method: "POST",
     headers: { prefer: "return=minimal" },
