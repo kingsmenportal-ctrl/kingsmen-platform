@@ -132,6 +132,25 @@ begin
       'message', 'No current approved human-reviewed N15 match with fresh official-source evidence is available. No application record was created.'
     );
   end if;
+
+  if not (
+    (v_match.sector in ('UNIVERSITY','CAO') and v_target.pathway_type = 'HIGHER_EDUCATION')
+    or (v_match.sector = 'TVET' and v_target.pathway_type = 'TVET')
+    or (v_match.sector = 'SETA' and v_target.pathway_type in ('SETA_LEARNERSHIP','APPRENTICESHIP'))
+    or (v_match.sector = 'LEARNERSHIP' and v_target.pathway_type = 'SETA_LEARNERSHIP')
+    or (v_match.sector = 'INTERNSHIP' and v_target.pathway_type = 'INTERNSHIP')
+    or (v_match.sector = 'APPRENTICESHIP' and v_target.pathway_type = 'APPRENTICESHIP')
+    or (v_match.sector = 'EMPLOYER' and v_target.pathway_type = 'EMPLOYMENT')
+    or (v_match.sector = 'BURSARY' and v_target.pathway_type in ('HIGHER_EDUCATION','TVET','SETA_LEARNERSHIP','INTERNSHIP','APPRENTICESHIP'))
+    or (v_match.sector = 'NSFAS' and v_target.pathway_type in ('HIGHER_EDUCATION','TVET'))
+    or (v_match.sector = 'QCTO' and v_target.pathway_type in ('SETA_LEARNERSHIP','APPRENTICESHIP'))
+    or (v_match.sector = 'ACCOMMODATION' and v_target.pathway_type in ('HIGHER_EDUCATION','TVET','SETA_LEARNERSHIP','INTERNSHIP','APPRENTICESHIP','EMPLOYMENT'))
+    or (v_match.sector = 'PRIVATE_COLLEGE' and v_target.pathway_type in ('HIGHER_EDUCATION','TVET','SETA_LEARNERSHIP'))
+  ) then
+    return jsonb_build_object('ok', false, 'code', 'MATCH_PATHWAY_MISMATCH',
+      'message', 'The selected application pathway does not match the approved opportunity classification. No application record was created.');
+  end if;
+
   if v_match.exact_link is null or v_match.exact_link !~ '^https://' then
     return jsonb_build_object('ok', false, 'code', 'OFFICIAL_HTTPS_SOURCE_REQUIRED');
   end if;
