@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import type { FormEvent } from "react";
 
 type DocumentRecord = {
   id: string; preparation_item_id?: string | null; application_id?: string | null;
@@ -42,7 +43,7 @@ export default function CandidateDocumentsPage() {
   }
   useEffect(()=>{if(token) void load(token).catch(e=>setError(e instanceof Error?e.message:"Could not load documents."));},[token]);
 
-  async function upload(event:React.FormEvent<HTMLFormElement>) {
+  async function upload(event:FormEvent<HTMLFormElement>) {
     event.preventDefault();setError("");setMessage("");
     if(!token){setError("Sign in to your Kingsmen candidate account first.");return;}
     if(!file){setError("Choose a PDF, JPEG or PNG document.");return;}
