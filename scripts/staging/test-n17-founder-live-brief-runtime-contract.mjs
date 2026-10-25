@@ -15,6 +15,10 @@ const required = [
   ["brief is persisted to history", "insert into public.founder_daily_briefs"],
   ["read is audited", "insert into public.founder_ops_audit_events"],
   ["response is non-cacheable", 'cache-control", "no-store"'],
+  ["unknown system health state fails closed", "then 'OK' else 'UNKNOWN' end as state"],
+  ["missing queue metrics do not imply healthy", "when blocked_count is null then 'UNKNOWN'"],
+  ["missing portal probe fields do not imply healthy", "or health_status is null then 'UNKNOWN'"],
+  ["missing capacity values do not imply healthy", "when active_candidates is null or active_candidate_cap is null then 'UNKNOWN'"],
   ["source errors fail visibly", "Source query unavailable"],
   ["launch readiness remains false", "productionReady: false"]
 ];
