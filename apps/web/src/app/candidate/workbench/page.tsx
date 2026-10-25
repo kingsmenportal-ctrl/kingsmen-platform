@@ -16,7 +16,13 @@ export default function CandidateWorkbenchPage() {
       <section aria-label="Unified Master Application">
         <h2>One master application · many provider targets</h2>
         <p>Enter your details once, select every pathway you want to pursue, and maintain multiple target records from the same profile. Provider submissions and outcomes are tracked separately only when route-specific evidence exists.</p>
-        <a href="/candidate/master-application">Open my master application</a>
+        <nav aria-label="Candidate journey links" className="flex flex-wrap gap-4">
+          <a href="/candidate/master-application">Open my master application</a>
+          <a href="/candidate/identity-review">Identity review / account linking</a>
+          <a href="/candidate/documents">Private document vault</a>
+          <a href="/candidate/applications/preparation">Preparation and submission tracking</a>
+          <a href="/candidate/outcomes">Evidence-backed outcomes</a>
+        </nav>
       </section>
 
       <section aria-label="Six Gate Workbench">
