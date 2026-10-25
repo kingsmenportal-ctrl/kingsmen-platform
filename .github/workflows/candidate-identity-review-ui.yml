@@ -1,0 +1,30 @@
+name: Candidate Identity Review Submission UI Contract
+
+on:
+  pull_request:
+    branches: ['**']
+    paths:
+      - 'apps/web/src/app/candidate/identity-review/**'
+      - 'scripts/validators/validate-candidate-identity-review-page.mjs'
+      - '.github/workflows/candidate-identity-review-ui.yml'
+  push:
+    branches:
+      - 'feat/candidate-identity-review-journey-*'
+    paths:
+      - 'apps/web/src/app/candidate/identity-review/**'
+      - 'scripts/validators/validate-candidate-identity-review-page.mjs'
+      - '.github/workflows/candidate-identity-review-ui.yml'
+
+permissions:
+  contents: read
+
+jobs:
+  candidate-page-contract:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Validate candidate identity-review submission page
+        run: node scripts/validators/validate-candidate-identity-review-page.mjs
