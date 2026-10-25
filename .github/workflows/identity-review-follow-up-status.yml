@@ -8,6 +8,8 @@ on:
       - 'supabase/functions/candidate-identity-review-status/**'
       - 'apps/web/src/app/candidate/identity-review/status/**'
       - 'scripts/validators/validate-identity-review-follow-up-status.mjs'
+      - 'scripts/security/test-identity-review-follow-up-cleanup.sql'
+      - 'scripts/security/test-identity-review-conflicting-link-cleanup.sql'
   push:
     branches: ['feat/identity-review-follow-up-status-*']
     paths:
