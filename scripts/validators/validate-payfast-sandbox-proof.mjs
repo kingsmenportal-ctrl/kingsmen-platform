@@ -59,7 +59,7 @@ checkFile('supabase/functions/payfast-sandbox/index.ts', [
   'const ipValid = providerValid',
   '&& ipValid && amountValid',
   'duplicate',
-  'payment_status === "COMPLETE"',
+  'paymentStatus === "COMPLETE"',
   'payfast_settle_sandbox_payment',
   'A checkout intent is not payment success',
   'SUPABASE_SERVICE_ROLE_KEY',
