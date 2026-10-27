@@ -6,7 +6,8 @@ const paths = [
   'supabase/migrations/20261022042942_candidate_identity_review_submission_rpc.sql',
   'supabase/migrations/20261025120000_identity_review_least_privilege_role.sql',
   'supabase/migrations/20261025121500_identity_review_role_code_constraint.sql',
-  'supabase/migrations/20261025123000_identity_review_audit_actor_role.sql'
+  'supabase/migrations/20261025123000_identity_review_audit_actor_role.sql',
+  'supabase/migrations/20261027103000_revoke_client_platform_reviewer_access.sql'
 ];
 const sql = paths.map((path) => fs.readFileSync(path, 'utf8')).join('\n').replace(/--[^\n]*/g, ' ').toLowerCase();
 const required = [
