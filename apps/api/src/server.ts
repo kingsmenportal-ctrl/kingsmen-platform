@@ -503,8 +503,21 @@ export function createKingsmenApiServer() {
         return;
       }
 
-      const isHealthRoute = method === "GET" && (pathname === "/" || pathname === "/health" || pathname === "/api/system/health");
-      if (!isHealthRoute && pathname !== "/favicon.ico") {
+      const isProtectedRoute =
+        (method === "POST" && (
+          pathname === "/api/jarvis/runtime-control" ||
+          pathname === "/api/commands" ||
+          pathname === "/api/workflow/result" ||
+          pathname === "/api/workflow-results"
+        )) ||
+        (method === "GET" && (
+          /^\\/api\\/candidates\\/[^/]+\\/status$/.test(pathname) ||
+          /^\\/api\\/applications\\/[^/]+\\/workbench$/.test(pathname)
+        ));
+
+      // Authenticate recognized protected endpoints only. Unknown paths must
+      // remain 404 even when service-to-service credentials are not configured.
+      if (isProtectedRoute) {
         const authFailure = serviceAuthorizationFailure(request);
         if (authFailure) {
           sendError(response, authFailure.status, authFailure.code, authFailure.message);
