@@ -95,6 +95,8 @@ checkFile('supabase/functions/payfast-sandbox/index.ts', [
   'entitlement: paid ? order.entitlement_snapshot : null',
   'candidate_auth_identity_links',
   'finance_plan_catalog',
+  'canonicalEntitlements',
+  'canonical_package_catalogue_not_reconciled',
   'amount_cents: plan.amount_cents',
   'signatureValid',
   'providerValid',
