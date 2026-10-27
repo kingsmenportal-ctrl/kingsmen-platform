@@ -43,7 +43,7 @@ export default function FreeDestinyMapPage() {
   const [answers, setAnswers] = useState<Answers>(initialAnswers);
   const [error, setError] = useState("");
 
-  const update = <K extends keyof Answers>(key: K, value: Answers[K]) => {
+  const update = <K extends keyof Answers,>(key: K, value: Answers[K]) => {
     setAnswers((current) => ({ ...current, [key]: value }));
     setError("");
   };
