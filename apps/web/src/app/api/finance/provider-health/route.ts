@@ -21,6 +21,8 @@ export async function GET() {
       environment: body?.environment ?? "unknown",
       configuration: body?.configuration ?? "unknown",
       missingKeys: Array.isArray(body?.missingKeys) ? body.missingKeys : [],
+      catalogueReady: body?.catalogueReady === true,
+      catalogueMismatches: Array.isArray(body?.catalogueMismatches) ? body.catalogueMismatches : [],
       livePaymentsEnabled: false,
       productionReady: false,
       realTransactionProven: false
