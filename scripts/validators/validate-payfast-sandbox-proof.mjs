@@ -51,6 +51,10 @@ for (const file of requiredFiles) checkFile(file);
 
 checkFile('supabase/functions/payfast-sandbox/index.ts', [
   'async function checkout(request: Request',
+  'async function candidateOrderStatus(request: Request',
+  'candidate_ref=eq.',
+  'returnedEntitlementsOnlyForVerifiedPaidOrders: true',
+  'entitlement: paid ? order.entitlement_snapshot : null',
   'candidate_auth_identity_links',
   'finance_plan_catalog',
   'amount_cents: plan.amount_cents',
