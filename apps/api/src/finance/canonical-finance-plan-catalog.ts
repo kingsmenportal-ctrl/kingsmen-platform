@@ -8,7 +8,7 @@ export const KINGSMEN_PRICING_CATALOG: readonly FinancePlan[] = [
   { planCode: "CHANCELLORS_WRIT_R399_99", planName: "Chancellor's Writ", description: "Strategic academic orchestration; fifteen managed applications.", amountCents: 39999, currency: "ZAR", managedApplicationCount: 15, accommodationRouteCount: 8, cvVersions: 0, motivationLetters: 0, doctrineNotes: "Suitability estimates are not guarantees." },
   { planCode: "REGENCY_MANDATE_R469_99", planName: "Regency Mandate", description: "Highest service intensity; fifteen managed applications.", amountCents: 46999, currency: "ZAR", managedApplicationCount: 15, accommodationRouteCount: 8, cvVersions: 0, motivationLetters: 0, doctrineNotes: "24-hour monitoring is subject to verified live coverage." },
   { planCode: "ARTISAN_CHARTER_R149_99", planName: "Artisan Charter", description: "Employment, internship, learnership, apprenticeship and artisan routes; five managed career applications.", amountCents: 14999, currency: "ZAR", managedApplicationCount: 5, accommodationRouteCount: 8, cvVersions: 0, motivationLetters: 0, doctrineNotes: "No guaranteed interview, offer or employment." },
-  { planCode: "GUILDMASTERS_CHARTER_R199_99", planName: "Guildmaster's Charter", description: "Advanced career positioning; eight managed career applications.", amountCents: 19999, currency: "ZAR", managedApplicationCount: 8, accommodationRouteCount: 8, cvVersions: 1, motivationLetters: 1, doctrineNotes: "CV and letters must remain truthful." },
+  { planCode: "GUILDMASTERS_CHARTER_R199_99", planName: "Guildmaster's Charter", description: "Advanced career positioning; eight managed career applications.", amountCents: 19999, currency: "ZAR", managedApplicationCount: 8, accommodationRouteCount: 8, cvVersions: 0, motivationLetters: 0, doctrineNotes: "CV and letters must remain truthful." },
   { planCode: "CV_REVAMP_R49_99", planName: "CV Revamp", description: "Fifteen personalised truthful CV versions and fifteen matching motivation letters.", amountCents: 4999, currency: "ZAR", managedApplicationCount: 0, accommodationRouteCount: 0, cvVersions: 15, motivationLetters: 15, doctrineNotes: "Never invent candidate experience, qualifications, references, certificates, skills or results; later paid package upgrade adds +2 managed routes once." },
   { planCode: "ACCOMMODATION_SUPPORT_R179", planName: "Accommodation Support Package", description: "Eight accommodation routes; standalone service.", amountCents: 17900, currency: "ZAR", managedApplicationCount: 0, accommodationRouteCount: 8, cvVersions: 0, motivationLetters: 0, doctrineNotes: "No rent/deposit handling or accommodation guarantee." }
 ] as const;
@@ -33,7 +33,7 @@ export function validateFinanceCatalogue(): true {
     ["CHANCELLORS_WRIT_R399_99", 39999, 15, 8, 0, 0],
     ["REGENCY_MANDATE_R469_99", 46999, 15, 8, 0, 0],
     ["ARTISAN_CHARTER_R149_99", 14999, 5, 8, 0, 0],
-    ["GUILDMASTERS_CHARTER_R199_99", 19999, 8, 8, 1, 1],
+    ["GUILDMASTERS_CHARTER_R199_99", 19999, 8, 8, 0, 0],
     ["CV_REVAMP_R49_99", 4999, 0, 0, 15, 15],
     ["ACCOMMODATION_SUPPORT_R179", 17900, 0, 8, 0, 0]
   ];
