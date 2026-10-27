@@ -46,6 +46,8 @@ for (const required of [
 ]) assert.ok(catalogue.toLowerCase().includes(required.toLowerCase()), `missing service/safety contract: ${required}`);
 assert.ok(types.includes('"FOUNDATIONAL_ACCORD"') && types.includes('"GUILDMASTERS_CHARTER"'));
 assert.ok(panel.includes("PUBLIC_PACKAGE_CARDS") && panel.includes("item.includedBenefits.map"));
+assert.ok(catalogue.includes("LIVE_SERVICE_AVAILABILITY_NOTICE"), "catalogue must declare unverified premium workflow limits");
+assert.ok(panel.includes("Service availability") && panel.includes("LIVE_SERVICE_AVAILABILITY_NOTICE"), "candidate pricing page must visibly identify unavailable/conditional premium workflows");
 assert.ok(catalogue.includes("PUBLIC_PACKAGE_CARDS.length !== 9"));
 assert.equal(manifest.entitlement_contract?.caO_counting_rule?.startsWith("One CAO parent application"), true);
 assert.equal(manifest.entitlement_contract?.accommodation_policy?.includes("8 accommodation routes"), true);
