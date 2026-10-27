@@ -249,11 +249,10 @@ async function validPayFastSourceIp(request: Request): Promise<boolean> {
       const addresses = await Deno.resolveDns(host, "A");
       for (const address of addresses) resolved.add(address);
     } catch {
-      // Fail closed if a PayFast host cannot be resolved.
-      return false;
+      // Continue to the next official host; fail closed if none resolve.
     }
   }
-  return resolved.has(sourceIp);
+  return resolved.size > 0 && resolved.has(sourceIp);
 }
 async function receiveItn(request: Request) {
   const textBody = await request.text();
@@ -368,8 +367,22 @@ Deno.serve(async (request: Request) => {
   if (request.method === "GET") {
     const missing = missingConfig();
     let catalogueReady = false;
+    let sourceValidationReady = false;
     const catalogueMismatches: string[] = [];
     if (missing.length === 0) {
+      const configuredSourceIps = (Deno.env.get("PAYFAST_ALLOWED_SOURCE_IPS") ?? "").split(",").map((value) => value.trim()).filter(Boolean);
+      if (configuredSourceIps.length > 0) {
+        sourceValidationReady = true;
+      } else {
+        for (const host of ["sandbox.payfast.co.za", "www.payfast.co.za", "w1w.payfast.co.za", "w2w.payfast.co.za"]) {
+          try {
+            const addresses = await Deno.resolveDns(host, "A");
+            if (addresses.length > 0) sourceValidationReady = true;
+          } catch {
+            // At least one official host must resolve for the DNS allowlist fallback.
+          }
+        }
+      }
       try {
         const plans = await rest("finance_plan_catalog?select=plan_code,amount_cents,managed_application_count,accommodation_route_count,cv_versions,motivation_letters&active=eq.true");
         const expected: Record<string, { amount_cents: number; managed_application_count: number; accommodation_route_count: number; cv_versions: number | null; motivation_letters: number | null }> = {
@@ -395,10 +408,10 @@ Deno.serve(async (request: Request) => {
         catalogueMismatches.push("catalogue_read_failed");
       }
     }
-    const configuration = missing.length ? "missing_required_secrets" : !catalogueReady ? "catalogue_not_reconciled" : "configured";
+    const configuration = missing.length ? "missing_required_secrets" : !sourceValidationReady ? "source_validation_unavailable" : !catalogueReady ? "catalogue_not_reconciled" : "configured";
     return json({
       module: "N10_PAYFAST_SANDBOX", environment: "sandbox", configuration, missingKeys: missing,
-      catalogueReady, catalogueMismatches, livePaymentsEnabled: false, productionReady: false, realTransactionProven: false
+      sourceValidationReady, catalogueReady, catalogueMismatches, livePaymentsEnabled: false, productionReady: false, realTransactionProven: false
     }, configuration === "configured" ? 200 : 503);
   }
   if (request.method !== "POST") return json({ error: "method_not_allowed" }, 405);
