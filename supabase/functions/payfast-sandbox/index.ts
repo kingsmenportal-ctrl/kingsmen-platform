@@ -236,6 +236,25 @@ async function candidateOrderStatus(request: Request, body: Record<string, unkno
   return json({ candidateId, orders: result, returnedEntitlementsOnlyForVerifiedPaidOrders: true });
 }
 
+async function validPayFastSourceIp(request: Request): Promise<boolean> {
+  const forwarded = request.headers.get("cf-connecting-ip") ?? request.headers.get("x-real-ip") ?? request.headers.get("x-forwarded-for")?.split(",")[0] ?? "";
+  const sourceIp = forwarded.trim();
+  if (!sourceIp) return false;
+  const configured = (Deno.env.get("PAYFAST_ALLOWED_SOURCE_IPS") ?? "").split(",").map((value) => value.trim()).filter(Boolean);
+  if (configured.length) return configured.includes(sourceIp);
+  const hosts = ["sandbox.payfast.co.za", "www.payfast.co.za", "w1w.payfast.co.za", "w2w.payfast.co.za"];
+  const resolved = new Set<string>();
+  for (const host of hosts) {
+    try {
+      const addresses = await Deno.resolveDns(host, "A");
+      for (const address of addresses) resolved.add(address);
+    } catch {
+      // Fail closed if a PayFast host cannot be resolved.
+      return false;
+    }
+  }
+  return resolved.has(sourceIp);
+}
 async function receiveItn(request: Request) {
   const textBody = await request.text();
   if (textBody.length > 32768) return json({ error: "payload_too_large" }, 413);
@@ -265,7 +284,7 @@ async function receiveItn(request: Request) {
   } catch {
     providerValid = false;
   }
-  const ipValid = providerValid;
+  const ipValid = await validPayFastSourceIp(request);
 
   const intents = merchantReference
     ? await rest(`payfast_payment_intents?select=*&merchant_reference=eq.${encodeURIComponent(merchantReference)}&limit=1`)
