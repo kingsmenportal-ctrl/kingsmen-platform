@@ -118,8 +118,8 @@
         "Acceptance likelihoods are estimates, not promises",
         "Monitoring and automated submissions require verified data and supported integrations"
       ],
-      "included_cv_versions": 0,
-      "included_motivation_letters": 1,
+      "included_cv_versions": null,
+      "included_motivation_letters": null,
       "route_visibility": "ACTIVATED",
       "summary": "Strategic academic orchestration across multiple viable pathways."
     },
@@ -150,8 +150,8 @@
         "No guarantee of provider response, seat, admission, or continuously available human operator",
         "Live monitoring and escalation must be operationally verified"
       ],
-      "included_cv_versions": 0,
-      "included_motivation_letters": 1,
+      "included_cv_versions": null,
+      "included_motivation_letters": null,
       "route_visibility": "ACTIVATED",
       "summary": "Highest package intensity for urgent, closely monitored placement campaigns."
     },
@@ -212,8 +212,8 @@
         "ATS compatibility does not guarantee selection or interview",
         "CV and letters must reflect candidate-provided evidence"
       ],
-      "included_cv_versions": 1,
-      "included_motivation_letters": 1,
+      "included_cv_versions": null,
+      "included_motivation_letters": null,
       "route_visibility": "ACTIVATED",
       "summary": "Advanced professional positioning and career-path support."
     },
