@@ -191,11 +191,12 @@ async function checkout(request: Request, body: Record<string, unknown>) {
     refund_policy_version: plan.refund_policy_version,
   };
 
-  await rest("finance_orders", {
+  if (!priorOrder) {
+    await rest("finance_orders", {
     method: "POST",
     headers: { prefer: "return=minimal" },
     body: JSON.stringify({
-      order_ref: orderRef, candidate_ref: candidateId, plan_code: plan.plan_code,
+      order_ref: orderRef, candidate_ref: candidateId, plan_code: plan.plan_code, idempotency_key: idem,
       order_status: "PENDING_PAYMENT", amount_cents: plan.amount_cents, currency: "ZAR",
       catalogue_version: plan.catalogue_version, service_term_days: plan.service_term_days,
       managed_application_count: plan.managed_application_count, accommodation_route_count: plan.accommodation_route_count,
@@ -206,15 +207,18 @@ async function checkout(request: Request, body: Record<string, unknown>) {
       refund_policy_version: plan.refund_policy_version, service_scope: plan.service_scope,
       entitlement_snapshot: entitlement,
     }),
-  });
-  await rest("finance_invoices", {
+    });
+  }
+  if (!priorInvoice) {
+    await rest("finance_invoices", {
     method: "POST",
     headers: { prefer: "return=minimal" },
     body: JSON.stringify({
       invoice_ref: invoiceRef, order_ref: orderRef, candidate_ref: candidateId,
       invoice_status: "OPEN", amount_cents: plan.amount_cents, currency: "ZAR",
     }),
-  });
+    });
+  }
   await rest("payfast_payment_intents", {
     method: "POST",
     headers: { prefer: "return=minimal" },
