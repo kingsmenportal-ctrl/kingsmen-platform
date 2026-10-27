@@ -144,8 +144,18 @@ async function checkout(request: Request, body: Record<string, unknown>) {
     });
   }
 
-  const orderRef = ref("ord");
-  const invoiceRef = ref("inv");
+  const priorOrders = await rest("finance_orders?select=order_ref,plan_code,amount_cents,order_status&candidate_ref=eq." + encodeURIComponent(candidateId) + "&idempotency_key=eq." + encodeURIComponent(idem) + "&limit=1");
+  if (!Array.isArray(priorOrders)) return json({ error: "finance_order_lookup_failed" }, 503);
+  const priorOrder = priorOrders[0] ?? null;
+  if (priorOrder && (priorOrder.plan_code !== planCode || priorOrder.amount_cents !== plan.amount_cents)) {
+    return json({ error: "idempotency_key_reused_for_different_package" }, 409);
+  }
+  if (priorOrder?.order_status === "PAID") return json({ error: "order_already_paid", orderRef: priorOrder.order_ref }, 409);
+  const orderRef = priorOrder ? String(priorOrder.order_ref) : ref("ord");
+  const priorInvoices = await rest("finance_invoices?select=invoice_ref&order_ref=eq." + encodeURIComponent(orderRef) + "&candidate_ref=eq." + encodeURIComponent(candidateId) + "&limit=1");
+  if (!Array.isArray(priorInvoices)) return json({ error: "finance_invoice_lookup_failed" }, 503);
+  const priorInvoice = priorInvoices[0] ?? null;
+  const invoiceRef = priorInvoice ? String(priorInvoice.invoice_ref) : ref("inv");
   const intentRef = ref("pf_intent");
   const merchantReference = orderRef;
   const amount = (Number(plan.amount_cents) / 100).toFixed(2);
