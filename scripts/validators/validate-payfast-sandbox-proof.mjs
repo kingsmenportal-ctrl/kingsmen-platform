@@ -49,6 +49,36 @@ const requiredFiles = [
 
 for (const file of requiredFiles) checkFile(file);
 
+checkFile('apps/web/src/app/api/finance/auth/route.ts', [
+  'auth/v1/otp',
+  'auth/v1/verify',
+  'create_user: false',
+  'HttpOnly; Secure; SameSite=Lax',
+  'cross_origin_request_rejected'
+]);
+
+checkFile('apps/web/src/app/api/finance/checkout/route.ts', [
+  'candidate_authentication_required',
+  'idempotency-key',
+  'planCode',
+  '/functions/v1/payfast-sandbox'
+]);
+
+checkFile('apps/web/src/app/api/finance/status/route.ts', [
+  'candidate_authentication_required',
+  'action=status',
+  'orderRef'
+]);
+
+checkFile('apps/web/src/app/candidate/finance/CandidateFinanceCheckout.tsx', [
+  'send_code',
+  'verify_code',
+  'startCheckout',
+  'paymentVerified',
+  'Continue to secure sandbox checkout',
+  'A browser return never activates'
+]);
+
 checkFile('supabase/functions/payfast-sandbox/index.ts', [
   'async function checkout(request: Request',
   'async function candidateOrderStatus(request: Request',
