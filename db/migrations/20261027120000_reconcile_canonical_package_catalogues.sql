@@ -59,7 +59,7 @@ values
 ('CHANCELLORS_WRIT','Chancellor''s Writ','ZAR',39999,true,jsonb_build_object('managed_applications',15,'accommodation_routes',8,'cv_versions',null,'motivation_letters',null,'route_visibility','ACTIVATED')),
 ('REGENCY_MANDATE','Regency Mandate','ZAR',46999,true,jsonb_build_object('managed_applications',15,'accommodation_routes',8,'cv_versions',null,'motivation_letters',null,'route_visibility','ACTIVATED','monitoring_24h','subject_to_verified_live_coverage')),
 ('ARTISAN_CHARTER','Artisan Charter','ZAR',14999,true,jsonb_build_object('managed_applications',5,'accommodation_routes',8,'cv_versions',null,'motivation_letters',null,'route_visibility','ACTIVATED')),
-('GUILDMASTERS_CHARTER','Guildmaster''s Charter','ZAR',19999,true,jsonb_build_object('managed_applications',8,'accommodation_routes',8,'cv_versions',1,'motivation_letters',1,'route_visibility','ACTIVATED')),
+('GUILDMASTERS_CHARTER','Guildmaster''s Charter','ZAR',19999,true,jsonb_build_object('managed_applications',8,'accommodation_routes',8,'cv_versions',null,'motivation_letters',null,'route_visibility','ACTIVATED')),
 ('CV_REVAMP','CV Revamp','ZAR',4999,true,jsonb_build_object('managed_applications',0,'accommodation_routes',0,'cv_versions',15,'motivation_letters',15,'route_visibility','SEALED','upgrade_bonus_active_routes',2)),
 ('ACCOMMODATION_SUPPORT','Accommodation Support Package','ZAR',17900,true,jsonb_build_object('managed_applications',0,'accommodation_routes',8,'cv_versions',0,'motivation_letters',0,'route_visibility','ACTIVATED','standalone',true))
 on conflict (package_code) do update set
