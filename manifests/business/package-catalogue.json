@@ -243,6 +243,36 @@
       "included_motivation_letters": 15,
       "route_visibility": "SEALED",
       "summary": "Standalone personalised CV and motivation-letter preparation."
+    },
+    {
+      "package_id": "accommodation_support",
+      "name": "Accommodation Support Package",
+      "price": 179,
+      "currency": "ZAR",
+      "status": "CANONICAL",
+      "controls": [
+        "standalone accommodation route support",
+        "8 accommodation routes",
+        "no rent or deposit handling"
+      ],
+      "managed_application_count": 0,
+      "included_accommodation_routes": 8,
+      "included_cv_versions": 0,
+      "included_motivation_letters": 0,
+      "route_visibility": "ACTIVATED",
+      "summary": "Standalone accommodation-route assistance; zero managed education/employment applications.",
+      "benefits": [
+        "8 accommodation applications/routes",
+        "Provider/source legitimacy checks where verifiable",
+        "Deposit and scam-risk warnings",
+        "Location/safety notes where available",
+        "Consent before sharing candidate details",
+        "Accommodation proof tracking and fallback options"
+      ],
+      "boundaries": [
+        "Kingsmen does not handle rent/deposits or guarantee accommodation",
+        "Routes depend on verification, availability, and consent"
+      ]
     }
   ],
   "cv_revamp_upgrade_rule": {
@@ -270,10 +300,11 @@
     ]
   },
   "entitlement_contract": {
-    "source_of_truth": "package-catalogue.json",
+    "source_of_truth": "package-catalogue.json plus canonical finance/service catalogue reconciliation migration",
     "policy": "Packages change managed quantity and service intensity, not dignity or core safety capabilities.",
     "caO_counting_rule": "One CAO parent application counts as one Kingsmen application; programme choices are children of that parent.",
-    "accommodation_policy": "Up to 8 ACC-01 routes included with each paid Kingsmen package where relevant, subject to verification, availability, and consent.",
-    "status_note": "Entitlements are product policy; production claims require working service paths and deployed runtime evidence."
+    "accommodation_policy": "Each paid core Kingsmen package includes up to 8 ACC-01 routes where relevant. Accommodation Support standalone is R179.00, includes 8 accommodation routes, and includes zero managed education/employment applications.",
+    "status_note": "Entitlements are product policy; production claims require working service paths and deployed runtime evidence.",
+    "runtime_status": "Canonical source contract only until reviewed migration application, sandbox checkout/ITN, candidate isolation, and deployed E2E evidence are recorded."
   }
 }
