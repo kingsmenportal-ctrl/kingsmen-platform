@@ -36,8 +36,8 @@ export interface PublicPackageCard {
   packageName: string;
   priceLabel: string;
   managedApplicationCount: number;
-  includedCvVersions: number;
-  includedMotivationLetters: number;
+  includedCvVersions: number | null;
+  includedMotivationLetters: number | null;
   includedAccommodationRoutes: number;
   routeVisibility: "PREVIEW_ONLY" | "SEALED" | "ACTIVATED";
   summary: string;
