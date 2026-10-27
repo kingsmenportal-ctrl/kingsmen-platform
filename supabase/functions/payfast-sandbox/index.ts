@@ -204,6 +204,38 @@ async function checkout(request: Request, body: Record<string, unknown>) {
   }, 201);
 }
 
+async function candidateOrderStatus(request: Request, body: Record<string, unknown>) {
+  const user = await authenticatedUser(request);
+  if (!user?.id) return json({ error: "authentication_required" }, 401);
+  const links = await rest("candidate_auth_identity_links?select=candidate_id,link_status&supabase_user_id=eq." + encodeURIComponent(user.id) + "&link_status=eq.VERIFIED&limit=2");
+  if (!Array.isArray(links) || links.length !== 1) return json({ error: "verified_candidate_identity_link_required" }, 403);
+  const candidateId = String(links[0].candidate_id);
+  const orderRef = String(body.orderRef ?? "");
+  const filter = orderRef ? "&order_ref=eq." + encodeURIComponent(orderRef) : "";
+  const orders = await rest("finance_orders?select=order_ref,plan_code,order_status,amount_cents,currency,created_at,updated_at,entitlement_snapshot&candidate_ref=eq." + encodeURIComponent(candidateId) + filter + "&order=created_at.desc&limit=50");
+  if (!Array.isArray(orders)) return json({ error: "finance_status_unavailable" }, 503);
+  if (orderRef && orders.length === 0) return json({ error: "order_not_found" }, 404);
+  const result = [];
+  for (const order of orders) {
+    const payments = await rest("finance_payments?select=payment_ref,payment_status,verified,verified_at,evidence_ref&candidate_ref=eq." + encodeURIComponent(candidateId) + "&order_ref=eq." + encodeURIComponent(order.order_ref) + "&provider=eq.PAYFAST&limit=2");
+    const verifiedPayment = Array.isArray(payments) ? payments.find((p) => p.verified === true && p.payment_status === "COMPLETE" && Boolean(p.evidence_ref)) : null;
+    const paid = order.order_status === "PAID" && Boolean(verifiedPayment);
+    result.push({
+      orderRef: order.order_ref,
+      planCode: order.plan_code,
+      status: paid ? "PAID" : order.order_status === "PAID" ? "PAYMENT_EVIDENCE_REVIEW" : order.order_status,
+      amountCents: order.amount_cents,
+      currency: order.currency,
+      createdAt: order.created_at,
+      updatedAt: order.updated_at,
+      paymentVerified: paid,
+      verifiedAt: paid ? verifiedPayment.verified_at : null,
+      entitlement: paid ? order.entitlement_snapshot : null
+    });
+  }
+  return json({ candidateId, orders: result, returnedEntitlementsOnlyForVerifiedPaidOrders: true });
+}
+
 async function receiveItn(request: Request) {
   const textBody = await request.text();
   if (textBody.length > 32768) return json({ error: "payload_too_large" }, 413);
@@ -333,5 +365,6 @@ Deno.serve(async (request: Request) => {
   if (path === "itn") return await receiveItn(request);
   const body = await request.json().catch(() => null);
   if (!body || typeof body !== "object" || Array.isArray(body)) return json({ error: "invalid_json_body" }, 400);
+  if (path === "status") return await candidateOrderStatus(request, body as Record<string, unknown>);
   return await checkout(request, body as Record<string, unknown>);
 });
