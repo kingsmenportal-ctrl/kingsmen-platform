@@ -37,5 +37,5 @@ assert.ok(migration.includes("'accommodation_routes',8"), "eight-route accommoda
 assert.ok(migration.includes("'upgrade_bonus_active_routes',2"), "CV Revamp upgrade bonus must be represented");
 assert.ok(manifest.checkout_guard.includes("real PayFast sandbox checkout"), "checkout must remain gated on real provider evidence");
 assert.ok(manifest.checkout_guard.includes("candidate-isolation"), "candidate isolation must remain a release gate");
-const result={schema:"kingsmen.finance-canonical-catalogue-contract.v2",passed:true,canonicalSellablePackageCount:business.packages.length,financePlanCount:expected.length,liveProviderProof:false,note:"Source contract only; staging migration and real provider checkout remain unproven."};
+const result={schema:"kingsmen.finance-canonical-catalogue-contract.v2",passed:true,canonicalSellablePackageCount:business.packages.length,financePlanCount:expected.length,liveProviderProof:false,failures:[],note:"Source contract only; staging migration and real provider checkout remain unproven."};
 console.log(JSON.stringify(result,null,2));
