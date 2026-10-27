@@ -76,7 +76,7 @@ checkFile('apps/web/src/app/candidate/finance/CandidateFinanceCheckout.tsx', [
   'startCheckout',
   'paymentVerified',
   'Continue to secure sandbox checkout',
-  'A browser return never activates'
+  'Return navigation is not payment confirmation'
 ]);
 
 checkFile('supabase/functions/payfast-sandbox/index.ts', [
