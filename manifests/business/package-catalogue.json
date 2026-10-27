@@ -218,32 +218,6 @@
       "summary": "Advanced professional positioning and career-path support."
     },
     {
-      "package_id": "free_destiny_map",
-      "name": "Free Destiny Map",
-      "price": 0,
-      "currency": "ZAR",
-      "status": "CANONICAL",
-      "controls": [
-        "all-sector preview",
-        "zero managed applications",
-        "exact targets sealed until activation"
-      ],
-      "managed_application_count": 0,
-      "included_accommodation_routes": 0,
-      "included_cv_versions": 0,
-      "included_motivation_letters": 0,
-      "route_visibility": "PREVIEW_ONLY",
-      "summary": "All-sector preview before a paid package is activated.",
-      "benefits": [
-        "All-sector pathway preview",
-        "No managed applications",
-        "Exact targets and manual route plans remain sealed until activation"
-      ],
-      "boundaries": [
-        "Preview only; no managed application entitlement"
-      ]
-    },
-    {
       "package_id": "cv_revamp",
       "name": "CV Revamp",
       "price": 49.99,
@@ -269,36 +243,6 @@
       "included_motivation_letters": 15,
       "route_visibility": "SEALED",
       "summary": "Standalone personalised CV and motivation-letter preparation."
-    },
-    {
-      "package_id": "accommodation_support",
-      "name": "Accommodation Support Package",
-      "price": 179,
-      "currency": "ZAR",
-      "status": "CANONICAL",
-      "controls": [
-        "standalone accommodation route support",
-        "8 accommodation routes",
-        "no rent or deposit handling"
-      ],
-      "managed_application_count": 8,
-      "included_accommodation_routes": 8,
-      "included_cv_versions": 0,
-      "included_motivation_letters": 0,
-      "route_visibility": "ACTIVATED",
-      "summary": "Standalone accommodation-route assistance.",
-      "benefits": [
-        "8 accommodation applications/routes",
-        "Provider/source legitimacy checks where verifiable",
-        "Deposit and scam-risk warnings",
-        "Location/safety notes where available",
-        "Consent before sharing candidate details",
-        "Accommodation proof tracking and fallback options"
-      ],
-      "boundaries": [
-        "Kingsmen does not handle rent/deposits or guarantee accommodation",
-        "Routes depend on verification, availability, and consent"
-      ]
     }
   ],
   "cv_revamp_upgrade_rule": {
