@@ -34,6 +34,7 @@ function checkFile(path, tokens = []) {
 
 const requiredFiles = [
   'apps/api/src/finance/payfast-signature.ts',
+  'supabase/functions/payfast-sandbox/index.ts',
   'apps/api/src/finance/payfast-itn.ts',
   'apps/api/src/finance/payfast-sandbox-proof.ts',
   'apps/api/src/finance/index.ts',
@@ -47,6 +48,23 @@ const requiredFiles = [
 ];
 
 for (const file of requiredFiles) checkFile(file);
+
+checkFile('supabase/functions/payfast-sandbox/index.ts', [
+  'async function checkout(request: Request',
+  'candidate_auth_identity_links',
+  'finance_plan_catalog',
+  'amount_cents: plan.amount_cents',
+  'signatureValid',
+  'providerValid',
+  'const ipValid = providerValid',
+  '&& ipValid && amountValid',
+  'duplicate',
+  'payment_status === "COMPLETE"',
+  'payfast_settle_sandbox_payment',
+  'A checkout intent is not payment success',
+  'SUPABASE_SERVICE_ROLE_KEY',
+  'PAYFAST_MERCHANT_KEY'
+]);
 
 checkFile('apps/api/src/finance/payfast-itn.ts', [
   'verifyPayFastSignature',
