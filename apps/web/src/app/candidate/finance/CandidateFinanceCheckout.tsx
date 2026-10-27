@@ -188,8 +188,8 @@ export function CandidateFinanceCheckout() {
             <p className="mt-1 text-xl font-black">{item.priceLabel}</p>
             <p className="mt-2 text-sm text-slate-600">{item.summary}</p>
             <p className="mt-2 text-xs text-slate-600">{item.managedApplicationCount} managed applications · {item.includedAccommodationRoutes} accommodation routes where relevant</p>
-            <button onClick={() => startCheckout(item.packageKey)} disabled={!signedIn || busy} className="mt-auto rounded-lg bg-amber-400 px-4 py-3 text-sm font-bold text-slate-950 disabled:cursor-not-allowed disabled:opacity-50">
-              {!signedIn ? "Sign in to continue" : busy ? "Please wait…" : "Continue to secure sandbox checkout"}
+            <button onClick={() => startCheckout(item.packageKey)} disabled={!signedIn || busy || !providerReady} className="mt-auto rounded-lg bg-amber-400 px-4 py-3 text-sm font-bold text-slate-950 disabled:cursor-not-allowed disabled:opacity-50">
+              {!signedIn ? "Sign in to continue" : !providerReady ? "Sandbox checkout unavailable" : busy ? "Please wait…" : "Continue to secure sandbox checkout"}
             </button>
             <p className="mt-2 text-xs text-slate-500">{item.boundary}</p>
           </article>
