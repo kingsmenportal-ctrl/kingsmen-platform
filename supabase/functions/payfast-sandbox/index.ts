@@ -367,15 +367,38 @@ Deno.serve(async (request: Request) => {
   if (request.method === "OPTIONS") return new Response(null, { status: 204, headers: cors });
   if (request.method === "GET") {
     const missing = missingConfig();
+    let catalogueReady = false;
+    const catalogueMismatches: string[] = [];
+    if (missing.length === 0) {
+      try {
+        const plans = await rest("finance_plan_catalog?select=plan_code,amount_cents,managed_application_count,accommodation_route_count,cv_versions,motivation_letters&active=eq.true");
+        const expected: Record<string, { amount_cents: number; managed_application_count: number; accommodation_route_count: number; cv_versions: number | null; motivation_letters: number | null }> = {
+          FREE_DESTINY_MAP_R0: { amount_cents: 0, managed_application_count: 0, accommodation_route_count: 0, cv_versions: 0, motivation_letters: 0 },
+          FOUNDATIONAL_ACCORD_R169_99: { amount_cents: 16999, managed_application_count: 5, accommodation_route_count: 8, cv_versions: null, motivation_letters: null },
+          COLLEGIATE_ORDINANCE_R299_99: { amount_cents: 29999, managed_application_count: 10, accommodation_route_count: 8, cv_versions: null, motivation_letters: null },
+          CHANCELLORS_WRIT_R399_99: { amount_cents: 39999, managed_application_count: 15, accommodation_route_count: 8, cv_versions: null, motivation_letters: null },
+          REGENCY_MANDATE_R469_99: { amount_cents: 46999, managed_application_count: 15, accommodation_route_count: 8, cv_versions: null, motivation_letters: null },
+          ARTISAN_CHARTER_R149_99: { amount_cents: 14999, managed_application_count: 5, accommodation_route_count: 8, cv_versions: null, motivation_letters: null },
+          GUILDMASTERS_CHARTER_R199_99: { amount_cents: 19999, managed_application_count: 8, accommodation_route_count: 8, cv_versions: null, motivation_letters: null },
+          CV_REVAMP_R49_99: { amount_cents: 4999, managed_application_count: 0, accommodation_route_count: 0, cv_versions: 15, motivation_letters: 15 },
+          ACCOMMODATION_SUPPORT_R179: { amount_cents: 17900, managed_application_count: 0, accommodation_route_count: 8, cv_versions: 0, motivation_letters: 0 }
+        };
+        const byCode = new Map(Array.isArray(plans) ? plans.map((plan) => [plan.plan_code, plan]) : []);
+        for (const [code, target] of Object.entries(expected)) {
+          const plan = byCode.get(code);
+          if (!plan || Object.entries(target).some(([key, value]) => plan[key] !== value)) catalogueMismatches.push(code);
+        }
+        catalogueReady = catalogueMismatches.length === 0;
+      } catch {
+        catalogueReady = false;
+        catalogueMismatches.push("catalogue_read_failed");
+      }
+    }
+    const configuration = missing.length ? "missing_required_secrets" : !catalogueReady ? "catalogue_not_reconciled" : "configured";
     return json({
-      module: "N10_PAYFAST_SANDBOX",
-      environment: "sandbox",
-      configuration: missing.length ? "missing_required_secrets" : "configured",
-      missingKeys: missing,
-      livePaymentsEnabled: false,
-      productionReady: false,
-      realTransactionProven: false,
-    }, missing.length ? 503 : 200);
+      module: "N10_PAYFAST_SANDBOX", environment: "sandbox", configuration, missingKeys: missing,
+      catalogueReady, catalogueMismatches, livePaymentsEnabled: false, productionReady: false, realTransactionProven: false
+    }, configuration === "configured" ? 200 : 503);
   }
   if (request.method !== "POST") return json({ error: "method_not_allowed" }, 405);
   const path = new URL(request.url).searchParams.get("action");
