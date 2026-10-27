@@ -36,9 +36,6 @@ const interests = ["Business & management", "Technology & digital", "Health & co
 const strengths = ["Organising and planning", "Helping people", "Solving problems", "Working with numbers", "Leading a team", "Making or fixing things", "Writing and communicating", "Learning new technology"];
 const constraints = ["Need funding or a stipend", "Need accommodation support", "Limited data / connectivity", "Need to work while studying", "Need an accessible route", "Need help with documents"];
 
-const gold = "#D4AF37";
-const navy = "#0B1A2A";
-const ink = "#14213A";
 
 export default function FreeDestinyMapPage() {
   const [step, setStep] = useState(1);
