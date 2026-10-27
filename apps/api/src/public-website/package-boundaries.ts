@@ -113,13 +113,13 @@ export const PUBLIC_PACKAGE_CARDS: PublicPackageCard[] = [
   {
     packageKey: "ACCOMMODATION_SUPPORT",
     packageName: "Accommodation Support Package",
-    priceLabel: "R179.00",
+    priceLabel: "Not sold standalone",
     managedApplicationCount: 8,
     includedCvVersions: 0,
     includedMotivationLetters: 0,
     includedAccommodationRoutes: 8,
     routeVisibility: "ACTIVATED",
-    summary: "Standalone accommodation-route assistance.",
+    summary: "Standalone accommodation checkout is retired; route assistance remains included with paid packages where relevant.",
     includedBenefits: ["8 accommodation applications/routes", "Provider/source legitimacy checks where verifiable", "Deposit and scam-risk warnings", "Location/safety notes where available", "Consent before sharing candidate details", "Accommodation proof tracking and fallback options"],
     boundary: "Kingsmen does not handle rent/deposits or guarantee accommodation. Every paid Kingsmen package includes up to 8 ACC-01 routes where relevant, subject to verification, availability, and consent."
   }
