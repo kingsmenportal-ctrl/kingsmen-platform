@@ -103,6 +103,7 @@ checkFile('supabase/functions/payfast-sandbox/index.ts', [
   'async function validPayFastSourceIp(request: Request)',
   'PAYFAST_ALLOWED_SOURCE_IPS',
   'sourceValidationReady',
+  'checkoutSchemaReady',
   'Deno.resolveDns(host, "A")',
   'const ipValid = await validPayFastSourceIp(request)',
   '&& ipValid && amountValid',
