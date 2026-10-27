@@ -181,7 +181,7 @@ async function checkout(request: Request, body: Record<string, unknown>) {
       merchant_reference: merchantReference, amount_cents: plan.amount_cents, currency: "ZAR",
       item_name: plan.plan_name, item_description: plan.description, return_url: returnUrl,
       cancel_url: cancelUrl, notify_url: notifyUrl, payfast_environment: environment,
-      payment_url: "https://sandbox.payfast.co.za/eng/process", signed_payload: signed,
+      payment_url: "https://sandbox.payfast.co.za/eng/process", signed_payload: sanitize(signed),
       signature: signed.signature, intent_status: "CREATED", idempotency_key: idem,
     }),
   });
