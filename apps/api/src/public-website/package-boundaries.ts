@@ -126,7 +126,7 @@ export const PUBLIC_PACKAGE_CARDS: PublicPackageCard[] = [
 ];
 
 export const LIVE_SERVICE_AVAILABILITY_NOTICE =
-  "Not currently verified as active: automatic provider submission, real-time opening/seat detection, continuous 24-hour monitoring, and institutional escalation. These benefits must remain unavailable/conditional until their live workflow and operational coverage are proven. All other routes depend on verified sources, eligibility, provider rules, consent, and a supported workflow.";
+  "Not currently verified as active: automatic provider submission, real-time opening/seat detection, continuous 24-hour monitoring, and institutional escalation. These benefits remain unavailable until their live workflow and operational coverage are proven. Any other advertised benefit whose authenticated workflow is not shown as enabled in the candidate workspace is also unavailable; payment does not activate a workflow that is not deployed. Routes depend on verified sources, eligibility, provider rules, and consent.";
 
 export function getPublicPackageCard(packageKey: PublicPackageCard["packageKey"]): PublicPackageCard {
   const found = PUBLIC_PACKAGE_CARDS.find((card) => card.packageKey === packageKey);
