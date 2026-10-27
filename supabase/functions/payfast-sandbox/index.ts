@@ -103,6 +103,20 @@ async function checkout(request: Request, body: Record<string, unknown>) {
   const plans = await rest(`finance_plan_catalog?select=*&plan_code=eq.${encodeURIComponent(planCode)}&active=eq.true&limit=1`);
   if (!Array.isArray(plans) || plans.length !== 1) return json({ error: "active_plan_not_found" }, 404);
   const plan = plans[0];
+  const canonicalEntitlements: Record<string, { amount_cents: number; managed_application_count: number; accommodation_route_count: number; cv_versions: number | null; motivation_letters: number | null }> = {
+    FOUNDATIONAL_ACCORD_R169_99: { amount_cents: 16999, managed_application_count: 5, accommodation_route_count: 8, cv_versions: null, motivation_letters: null },
+    COLLEGIATE_ORDINANCE_R299_99: { amount_cents: 29999, managed_application_count: 10, accommodation_route_count: 8, cv_versions: null, motivation_letters: null },
+    CHANCELLORS_WRIT_R399_99: { amount_cents: 39999, managed_application_count: 15, accommodation_route_count: 8, cv_versions: null, motivation_letters: null },
+    REGENCY_MANDATE_R469_99: { amount_cents: 46999, managed_application_count: 15, accommodation_route_count: 8, cv_versions: null, motivation_letters: null },
+    ARTISAN_CHARTER_R149_99: { amount_cents: 14999, managed_application_count: 5, accommodation_route_count: 8, cv_versions: null, motivation_letters: null },
+    GUILDMASTERS_CHARTER_R199_99: { amount_cents: 19999, managed_application_count: 8, accommodation_route_count: 8, cv_versions: null, motivation_letters: null },
+    CV_REVAMP_R49_99: { amount_cents: 4999, managed_application_count: 0, accommodation_route_count: 0, cv_versions: 15, motivation_letters: 15 },
+    ACCOMMODATION_SUPPORT_R179: { amount_cents: 17900, managed_application_count: 0, accommodation_route_count: 8, cv_versions: 0, motivation_letters: 0 }
+  };
+  const expected = canonicalEntitlements[planCode];
+  if (!expected || Object.entries(expected).some(([key, value]) => plan[key] !== value)) {
+    return json({ error: "canonical_package_catalogue_not_reconciled", retryable: true }, 503);
+  }
   if (!Number.isInteger(plan.amount_cents) || plan.amount_cents <= 0 || plan.currency !== "ZAR") {
     return json({ error: "plan_not_payable_through_payfast" }, 400);
   }
