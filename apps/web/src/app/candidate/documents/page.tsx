@@ -1,8 +1,9 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
+import { createClient, type SupabaseClient } from "@supabase/supabase-js";
 
-type LocalFile = { name: string; size: number; type: string };
+type StoredDocument = { id: string; original_filename: string; mime_type: string; size_bytes: number; status: string; sha256_hex?: string | null; uploaded_at?: string | null };
 
 const requiredDocuments = [
   { title: "Government-issued ID", detail: "Smart ID card, ID book or passport", status: "Not uploaded", tone: "neutral" },
@@ -18,21 +19,111 @@ function formatSize(bytes: number) {
 }
 
 export default function CandidateDocumentsPage() {
-  const [selectedFiles, setSelectedFiles] = useState<LocalFile[]>([]);
-  const [message, setMessage] = useState("");
+  const [selectedFiles, setSelectedFiles] = useState<File[]>([]);
+  const [documents, setDocuments] = useState<StoredDocument[]>([]);
+  const [message, setMessage] = useState("Sign in to load your private documents.");
+  const [busy, setBusy] = useState(false);
   const [dragging, setDragging] = useState(false);
+  const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL ?? "";
+  const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY ?? "";
+  const supabase: SupabaseClient | null = supabaseUrl && supabaseAnonKey
+    ? createClient(supabaseUrl, supabaseAnonKey, { auth: { persistSession: true, autoRefreshToken: true } })
+    : null;
+
+  async function api(token: string, payload: Record<string, unknown>) {
+    if (!supabase || !supabaseUrl || !supabaseAnonKey) throw new Error("Private Document Vault is not configured in this deployment.");
+    const response = await fetch(`${supabaseUrl}/functions/v1/candidate-private-documents`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json", apikey: supabaseAnonKey, Authorization: `Bearer ${token}` },
+      body: JSON.stringify(payload), cache: "no-store",
+    });
+    const body = await response.json().catch(() => ({}));
+    if (!response.ok) throw new Error(typeof body.error === "string" ? body.error : `Document service returned HTTP ${response.status}.`);
+    return body;
+  }
+
+  async function sessionToken() {
+    if (!supabase) throw new Error("Private Document Vault is not configured in this deployment.");
+    const { data, error } = await supabase.auth.getSession();
+    if (error) throw error;
+    if (!data.session?.access_token) throw new Error("Sign in to your Kingsmen candidate account before managing private documents.");
+    return data.session.access_token;
+  }
+
+  async function loadDocuments() {
+    if (!supabase) { setMessage("Private Document Vault is not configured in this deployment."); return; }
+    try {
+      const token = await sessionToken();
+      const result = await api(token, { action: "list" });
+      setDocuments(Array.isArray(result.documents) ? result.documents : []);
+      setMessage("");
+    } catch (error) {
+      setMessage(error instanceof Error ? error.message : "Could not load private documents.");
+    }
+  }
+
+  useEffect(() => { void loadDocuments(); }, []);
 
   const addFiles = (files: FileList | null) => {
     if (!files?.length) return;
     const next = Array.from(files);
-    const allowed = next.filter((file) => ["application/pdf", "image/jpeg", "image/png"].includes(file.type));
-    const tooLarge = allowed.filter((file) => file.size > 10 * 1024 * 1024);
-    const accepted = allowed.filter((file) => file.size <= 10 * 1024 * 1024);
-    setSelectedFiles((current) => [...current, ...accepted.map(({ name, size, type }) => ({ name, size, type }))]);
-    if (next.length !== allowed.length) setMessage("Some files were not listed: only PDF, JPEG and PNG are accepted by this interface.");
-    else if (tooLarge.length) setMessage("Files over 10 MiB were excluded. Select a smaller file.");
-    else setMessage("Files are selected in this browser only. They have not been uploaded or verified.");
+    const accepted = next.filter((file) =>
+      ["application/pdf", "image/jpeg", "image/png"].includes(file.type) &&
+      file.size > 0 && file.size <= 10 * 1024 * 1024
+    );
+    setSelectedFiles(current => [...current, ...accepted]);
+    if (accepted.length !== next.length) setMessage("Some files were excluded. Use non-empty PDF, JPEG or PNG files no larger than 10 MiB each.");
+    else setMessage("Files selected locally. They are not uploaded or verified until you choose secure upload.");
   };
+
+  async function uploadSelectedFiles() {
+    if (!selectedFiles.length) { setMessage("Select at least one valid file first."); return; }
+    setBusy(true);
+    try {
+      const token = await sessionToken();
+      let completed = 0;
+      for (const file of selectedFiles) {
+        setMessage(`Requesting a private upload ticket for ${file.name}…`);
+        const ticket = await api(token, {
+          action: "create_upload", filename: file.name, mime_type: file.type,
+          size_bytes: file.size, evidence_purpose: "CANDIDATE_DOCUMENT",
+        });
+        const document = ticket.document as { id?: string } | undefined;
+        const bucket = typeof ticket.bucket === "string" ? ticket.bucket : "";
+        const path = typeof ticket.path === "string" ? ticket.path : "";
+        const uploadToken = typeof ticket.upload_token === "string" ? ticket.upload_token : "";
+        if (!document?.id || !bucket || !path || !uploadToken || !supabase) {
+          throw new Error("The private vault did not return a complete signed upload ticket.");
+        }
+        const { error: uploadError } = await supabase.storage.from(bucket).uploadToSignedUrl(path, uploadToken, file, {
+          contentType: file.type, upsert: false,
+        });
+        if (uploadError) throw new Error(`Upload failed for ${file.name}: ${uploadError.message}`);
+        await api(token, { action: "finalize_upload", document_id: document.id });
+        completed++;
+      }
+      setSelectedFiles([]);
+      await loadDocuments();
+      setMessage(`${completed} file(s) uploaded and recorded. Upload is candidate-provided evidence; an authorized reviewer must verify it separately.`);
+    } catch (error) {
+      setMessage(error instanceof Error ? error.message : "Upload did not complete. Retry after checking your connection.");
+      await loadDocuments();
+    } finally { setBusy(false); }
+  }
+
+  async function downloadDocument(documentId: string) {
+    setBusy(true);
+    try {
+      const token = await sessionToken();
+      const result = await api(token, { action: "create_download_url", document_id: documentId });
+      if (typeof result.signed_download_url !== "string" || !result.signed_download_url) {
+        throw new Error("The vault did not return a temporary download link.");
+      }
+      window.location.assign(result.signed_download_url);
+    } catch (error) {
+      setMessage(error instanceof Error ? error.message : "Could not open this private document.");
+    } finally { setBusy(false); }
+  }
 
   return (
     <main className="vault-page">
@@ -70,11 +161,13 @@ export default function CandidateDocumentsPage() {
                 <label className="vault-btn" style={{display:"inline-flex",alignItems:"center",gap:8}}>▣ Browse files<input aria-label="Choose documents" type="file" multiple accept=".pdf,.jpg,.jpeg,.png,application/pdf,image/jpeg,image/png" style={{position:"absolute",width:1,height:1,overflow:"hidden",clipPath:"inset(50%)"}} onChange={(event)=>addFiles(event.target.files)}/></label>
                 <button className="vault-btn alt" type="button" onClick={()=>setMessage("Camera capture is not connected in this build. Use Browse files on your device.")}>◎ Camera capture</button>
               </div>
-              <div className="vault-security">♧ <strong>Private by design.</strong> This interface does not upload files. Real storage, server-computed SHA-256, signed-link expiry and reviewer verification must be provided by the connected backend.</div>
+              <div className="vault-security">♧ <strong>Private by design.</strong> Uploads use a signed private-storage ticket. The backend remains responsible for file validation, SHA-256 and reviewer decisions.</div>
             </div>
             {message && <p role="status" style={{fontSize:13,lineHeight:1.5,color:"#31435f",marginTop:14}}>{message}</p>}
-            {selectedFiles.length > 0 && <div className="vault-filelist" aria-label="Selected files">{selectedFiles.map((file,index)=><div className="vault-file" key={file.name+index}><span>▤ {file.name}<br/><small>{file.type || "Unknown type"} · {formatSize(file.size)}</small></span><button className="vault-btn alt" type="button" onClick={()=>setSelectedFiles((current)=>current.filter((_,i)=>i!==index))}>Remove</button></div>)}</div>}
-            <p className="vault-note">Selection checks: PDF, JPEG or PNG; maximum 10 MiB per file. These client-side checks are convenience only and are not a security boundary.</p>
+            {selectedFiles.length > 0 && <div className="vault-filelist" aria-label="Selected files">{selectedFiles.map((file,index)=><div className="vault-file" key={file.name+index}><span>▤ {file.name}<br/><small>{file.type || "Unknown type"} · {formatSize(file.size)}</small></span><button className="vault-btn alt" type="button" disabled={busy} onClick={()=>setSelectedFiles((current)=>current.filter((_,i)=>i!==index))}>Remove</button></div>)}</div>}
+            <button className="vault-btn" type="button" disabled={busy || selectedFiles.length===0} onClick={()=>void uploadSelectedFiles()}>{busy ? "Working…" : "Upload selected files securely"}</button>
+            <p className="vault-note">Selection checks: PDF, JPEG or PNG; maximum 10 MiB per file. Server-side validation is authoritative.</p>
+            {documents.length > 0 && <div className="vault-filelist" aria-label="Documents in your private vault">{documents.map(doc=><div className="vault-file" key={doc.id}><span>▤ {doc.original_filename}<br/><small>{doc.mime_type} · {formatSize(doc.size_bytes)} · {doc.status.replaceAll("_"," ")}</small>{doc.sha256_hex && <><br/><small>SHA-256: {doc.sha256_hex}</small></>}</span><button className="vault-btn alt" type="button" disabled={busy} onClick={()=>void downloadDocument(doc.id)}>View</button></div>)}</div>}
           </section>
           <section className="vault-panel" aria-label="Required document checklist">
             <h2 style={{margin:"0 0 6px",fontSize:21,color:"#12305f"}}>Document checklist</h2><p style={{margin:"0 0 17px",fontSize:13,color:"#657185",lineHeight:1.5}}>Statuses below are not connected to a live verification service.</p>
@@ -82,7 +175,7 @@ export default function CandidateDocumentsPage() {
           </section>
         </div>
         <div className="vault-summary"><div><strong>Verification summary: not yet available</strong><br/><span>Upload and review must be completed by the connected private Document Vault before progression.</span></div><button className="vault-btn" type="button" onClick={()=>setMessage("Assessment remains locked until required documents are uploaded and their verification status is returned by Kingsmen's backend.")}>Continue to assessment →</button></div>
-        <p className="vault-note">Security boundary: do not treat a selected file, client-side filename, local hash or browser message as upload proof, verified identity, or provider confirmation.</p>
+        <p role="status" aria-live="polite" className="vault-note">{message}</p><p className="vault-note">Security boundary: upload is candidate-reported evidence, not independent verification. The assessment stays locked until required documents receive authorized reviewer verification.</p>
       </div>
     </main>
   );
