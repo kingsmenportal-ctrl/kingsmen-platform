@@ -1,3 +1,4 @@
+// Canonical standalone prices: CV Revamp R49.99; Accommodation Support R179.00.
 import { PUBLIC_PACKAGE_CARDS } from "../../../api/src/public-website/package-boundaries";
 
 export function PricingBoundaryPanel() {
