@@ -1,5 +1,5 @@
 // Canonical standalone prices: CV Revamp R49.99; Accommodation Support R179.00.
-import { PUBLIC_PACKAGE_CARDS } from "../../../api/src/public-website/package-boundaries";
+import { LIVE_SERVICE_AVAILABILITY_NOTICE, PUBLIC_PACKAGE_CARDS } from "../../../api/src/public-website/package-boundaries";
 
 export function PricingBoundaryPanel() {
   const packages = PUBLIC_PACKAGE_CARDS;
@@ -10,6 +10,9 @@ export function PricingBoundaryPanel() {
       <p className="mt-3 max-w-3xl text-sm text-slate-600">
         Choose the service intensity that fits your campaign. Package entitlements describe Kingsmen support,
         not a guarantee of admission, funding, accommodation, employment, or a provider decision.
+      </p>
+      <p role="note" className="mt-4 rounded-xl border border-amber-300 bg-amber-50 p-4 text-sm text-amber-950">
+        <strong>Service availability:</strong> {LIVE_SERVICE_AVAILABILITY_NOTICE}
       </p>
       <div className="mt-6 grid gap-4 md:grid-cols-2 xl:grid-cols-3">
         {packages.map((item) => (
