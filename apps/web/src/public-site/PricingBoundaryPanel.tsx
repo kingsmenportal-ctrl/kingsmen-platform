@@ -18,7 +18,7 @@ export function PricingBoundaryPanel() {
         {packages.map((item) => (
           <article key={item.packageKey} className="rounded-2xl border border-slate-200 bg-slate-50 p-5">
             <p className="text-xs font-semibold uppercase tracking-wide text-slate-500">
-              {item.packageKey === "ACCOMMODATION_SUPPORT" ? "Retired — no new checkout" : item.routeVisibility === "PREVIEW_ONLY" ? "Preview" : item.routeVisibility === "SEALED" ? "Standalone service" : "Managed service"}
+              {item.packageKey === "ACCOMMODATION_SUPPORT" ? "Standalone accommodation service" : item.routeVisibility === "PREVIEW_ONLY" ? "Preview" : item.routeVisibility === "SEALED" ? "Standalone service" : "Managed service"}
             </p>
             <h3 className="mt-2 text-lg font-bold text-slate-950">{item.packageName}</h3>
             <p className="mt-2 text-2xl font-black text-slate-950">{item.priceLabel}</p>
@@ -31,6 +31,7 @@ export function PricingBoundaryPanel() {
               {item.includedBenefits.map((benefit) => <li key={benefit}>{benefit}</li>)}
             </ul>
             <p className="mt-4 border-t border-slate-200 pt-3 text-xs leading-5 text-slate-500">{item.boundary}</p>
+            <a href={item.packageKey === "FREE_DESTINY_MAP" ? "/free-destiny-map" : "/candidate/finance"} className="mt-4 inline-flex items-center justify-center rounded-lg bg-slate-900 px-4 py-3 text-sm font-semibold text-white">{item.packageKey === "FREE_DESTINY_MAP" ? "Explore free preview" : "Choose package"}</a>
           </article>
         ))}
       </div>
