@@ -6,6 +6,8 @@ const require = createRequire(new URL("../package.json", import.meta.url));
 const { Pool } = require("pg");
 const baseUrl = process.env.KINGSMEN_API_BASE_URL ?? "http://127.0.0.1:8080";
 const databaseUrl = process.env.KINGSMEN_DATABASE_URL ?? process.env.DATABASE_URL;
+const apiToken = process.env.KINGSMEN_API_SERVICE_TOKEN;
+if (!apiToken || apiToken.length < 32) throw new Error("A staging API token of at least 32 characters is required.");
 if (!databaseUrl) throw new Error("KINGSMEN_DATABASE_URL or DATABASE_URL is required; no database value is printed.");
 const pool = new Pool({
   connectionString: databaseUrl,
@@ -30,7 +32,7 @@ function check(name, passed, detail = "") {
 async function jsonRequest(path, body) {
   const response = await fetch(new URL(path, baseUrl), {
     method: body === undefined ? "GET" : "POST",
-    headers: body === undefined ? {} : { "content-type": "application/json" },
+    headers: { authorization: "Bearer " + apiToken, ...(body === undefined ? {} : { "content-type": "application/json" }) },
     body: body === undefined ? undefined : JSON.stringify(body)
   });
   const text = await response.text();
