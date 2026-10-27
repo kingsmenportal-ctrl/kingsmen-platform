@@ -414,6 +414,7 @@ Deno.serve(async (request: Request) => {
     const missing = missingConfig();
     let catalogueReady = false;
     let sourceValidationReady = false;
+    let checkoutSchemaReady = false;
     const catalogueMismatches: string[] = [];
     if (missing.length === 0) {
       const configuredSourceIps = (Deno.env.get("PAYFAST_ALLOWED_SOURCE_IPS") ?? "").split(",").map((value) => value.trim()).filter(Boolean);
@@ -428,6 +429,12 @@ Deno.serve(async (request: Request) => {
             // At least one official host must resolve for the DNS allowlist fallback.
           }
         }
+      }
+      try {
+        const schemaProbe = await rest("finance_orders?select=idempotency_key&limit=0");
+        checkoutSchemaReady = Array.isArray(schemaProbe);
+      } catch {
+        checkoutSchemaReady = false;
       }
       try {
         const plans = await rest("finance_plan_catalog?select=plan_code,amount_cents,managed_application_count,accommodation_route_count,cv_versions,motivation_letters&active=eq.true");
@@ -454,10 +461,10 @@ Deno.serve(async (request: Request) => {
         catalogueMismatches.push("catalogue_read_failed");
       }
     }
-    const configuration = missing.length ? "missing_required_secrets" : !sourceValidationReady ? "source_validation_unavailable" : !catalogueReady ? "catalogue_not_reconciled" : "configured";
+    const configuration = missing.length ? "missing_required_secrets" : !sourceValidationReady ? "source_validation_unavailable" : !checkoutSchemaReady ? "checkout_schema_not_reconciled" : !catalogueReady ? "catalogue_not_reconciled" : "configured";
     return json({
       module: "N10_PAYFAST_SANDBOX", environment: "sandbox", configuration, missingKeys: missing,
-      sourceValidationReady, catalogueReady, catalogueMismatches, livePaymentsEnabled: false, productionReady: false, realTransactionProven: false
+      sourceValidationReady, checkoutSchemaReady, catalogueReady, catalogueMismatches, livePaymentsEnabled: false, productionReady: false, realTransactionProven: false
     }, configuration === "configured" ? 200 : 503);
   }
   if (request.method !== "POST") return json({ error: "method_not_allowed" }, 405);
