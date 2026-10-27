@@ -7,6 +7,8 @@ alter table public.finance_plan_catalog alter column cv_versions drop not null;
 alter table public.finance_plan_catalog alter column motivation_letters drop not null;
 alter table public.finance_orders alter column cv_versions drop not null;
 alter table public.finance_orders alter column motivation_letters drop not null;
+alter table public.finance_orders add column if not exists idempotency_key text;
+create unique index if not exists finance_orders_candidate_idempotency_unique on public.finance_orders(candidate_ref, idempotency_key) where idempotency_key is not null;
 
 insert into public.finance_plan_catalog
 (plan_code, plan_name, description, amount_cents, currency, managed_application_count, accommodation_route_count, cv_versions, motivation_letters, doctrine_notes, active)
