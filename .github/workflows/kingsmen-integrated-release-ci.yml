@@ -1,0 +1,61 @@
+name: Kingsmen Integrated Release CI
+
+on:
+  pull_request:
+    branches: [main]
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: kingsmen-release-ci-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  source-guard:
+    name: source-guard
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - name: Checkout exact candidate commit
+        uses: actions/checkout@v4
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: npm
+      - name: Install locked repository dependencies
+        run: npm ci
+      - name: Run repository contract and module tests
+        run: npm test
+      - name: Build backend API
+        run: npm run api:build
+      - name: Validate web-to-backend security boundary
+        run: npm run web:validate:backend-boundary
+      - name: Validate canonical finance catalogue
+        run: npm run finance:validate:canonical-catalogue
+      - name: Validate migration integrity
+        run: npm run db:validate:migration-integrity
+
+  web-production-build:
+    name: web-production-build
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+    steps:
+      - name: Checkout exact candidate commit
+        uses: actions/checkout@v4
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: npm
+          cache-dependency-path: apps/web/package-lock.json
+      - name: Install locked web dependencies
+        run: npm ci
+        working-directory: apps/web
+      - name: Build Next.js production app
+        run: npm run build
+        working-directory: apps/web
