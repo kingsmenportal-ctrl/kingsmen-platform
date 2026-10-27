@@ -24,8 +24,8 @@ export interface FinancePlan {
   currency: CurrencyCode;
   managedApplicationCount: number;
   accommodationRouteCount: number;
-  cvVersions: number;
-  motivationLetters: number;
+  cvVersions: number | null;
+  motivationLetters: number | null;
   doctrineNotes: string;
 }
 
