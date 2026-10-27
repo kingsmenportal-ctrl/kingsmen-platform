@@ -20,7 +20,16 @@ export type PublicLeadStatus =
   | "DUPLICATE"
   | "CANCELLED";
 
-export type PublicPackageKey = "FREE_DESTINY_MAP" | "CV_REVAMP" | "ACCOMMODATION_SUPPORT";
+export type PublicPackageKey =
+  | "FOUNDATIONAL_ACCORD"
+  | "COLLEGIATE_ORDINANCE"
+  | "CHANCELLORS_WRIT"
+  | "REGENCY_MANDATE"
+  | "ARTISAN_CHARTER"
+  | "GUILDMASTERS_CHARTER"
+  | "FREE_DESTINY_MAP"
+  | "CV_REVAMP"
+  | "ACCOMMODATION_SUPPORT";
 
 export interface PublicPackageCard {
   packageKey: PublicPackageKey;
@@ -31,6 +40,8 @@ export interface PublicPackageCard {
   includedMotivationLetters: number;
   includedAccommodationRoutes: number;
   routeVisibility: "PREVIEW_ONLY" | "SEALED" | "ACTIVATED";
+  summary: string;
+  includedBenefits: string[];
   boundary: string;
 }
 
