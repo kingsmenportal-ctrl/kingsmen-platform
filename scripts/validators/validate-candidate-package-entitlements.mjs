@@ -25,8 +25,8 @@ for (const [key, name, price, count] of expected) {
 }
 for (const required of [
   "NSFAS", "CAO", "MAP fallback", "Phoenix fallback", "24-hour monitoring",
-  "ATS-aware CV preparation", "Skills-gap analysis", "up to 8 ACC-01 routes",
-  "No guarantee", "provider permits it"
+  "ATS-aware CV preparation", "Skills-gap analysis", "up to 8 accommodation routes",
+  "not a guarantee", "provider permits it"
 ]) {
   assert.ok(catalogue.toLowerCase().includes(required.toLowerCase()), `missing service/safety contract: ${required}`);
 }
