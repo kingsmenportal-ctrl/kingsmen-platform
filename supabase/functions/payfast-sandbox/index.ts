@@ -359,12 +359,20 @@ Deno.serve(async (request: Request) => {
     }, missing.length ? 503 : 200);
   }
   if (request.method !== "POST") return json({ error: "method_not_allowed" }, 405);
-  const missing = missingConfig();
-  if (missing.length) return json({ error: "payfast_sandbox_not_configured", missingKeys: missing }, 503);
   const path = new URL(request.url).searchParams.get("action");
-  if (path === "itn") return await receiveItn(request);
+  if (path === "itn") {
+    const missing = missingConfig();
+    if (missing.length) return json({ error: "payfast_sandbox_not_configured", missingKeys: missing }, 503);
+    return await receiveItn(request);
+  }
   const body = await request.json().catch(() => null);
   if (!body || typeof body !== "object" || Array.isArray(body)) return json({ error: "invalid_json_body" }, 400);
-  if (path === "status") return await candidateOrderStatus(request, body as Record<string, unknown>);
+  if (path === "status") {
+    const missingDatabaseConfig = ["SUPABASE_URL", "SUPABASE_SERVICE_ROLE_KEY"].filter((key) => !Deno.env.get(key)?.trim());
+    if (missingDatabaseConfig.length) return json({ error: "finance_status_not_configured" }, 503);
+    return await candidateOrderStatus(request, body as Record<string, unknown>);
+  }
+  const missing = missingConfig();
+  if (missing.length) return json({ error: "payfast_sandbox_not_configured", missingKeys: missing }, 503);
   return await checkout(request, body as Record<string, unknown>);
 });
