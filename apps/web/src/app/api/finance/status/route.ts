@@ -5,7 +5,9 @@ const noStore = { "cache-control": "no-store", "content-type": "application/json
 export async function POST(request: Request) {
   const supabaseUrl = process.env.SUPABASE_URL?.replace(/\/+$/, "");
   const anonKey = process.env.SUPABASE_ANON_KEY ?? process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
-  const authorization = request.headers.get("authorization") ?? "";
+  const cookieToken = (request.headers.get("cookie") ?? "").split(";").map((part) => part.trim()).find((part) => part.startsWith("km_candidate_access_token="))?.slice("km_candidate_access_token=".length) ?? "";
+  const authorizationHeader = request.headers.get("authorization") ?? "";
+  const authorization = authorizationHeader.startsWith("Bearer ") ? authorizationHeader : cookieToken ? "Bearer " + decodeURIComponent(cookieToken) : "";
   if (!authorization.startsWith("Bearer ") || authorization.length < 40) {
     return Response.json({ error: "candidate_authentication_required" }, { status: 401, headers: noStore });
   }
