@@ -83,6 +83,26 @@ try {
     status: missing.status,
     passed: true
   }));
+
+  const protectedWithoutConfig = await fetch(`${baseUrl}/api/candidates/release-smoke/status`, {
+    signal: AbortSignal.timeout(3000)
+  });
+  assert(
+    protectedWithoutConfig.status === 503,
+    `protected route without service-token configuration should return 503, received ${protectedWithoutConfig.status}`
+  );
+  const protectedBody = await protectedWithoutConfig.json();
+  assert(
+    protectedBody.code === "SERVICE_AUTH_NOT_CONFIGURED",
+    "protected route without service-token configuration returned an unexpected error code"
+  );
+
+  console.log(JSON.stringify({
+    check: "protected_route_fails_closed_without_service_token",
+    status: protectedWithoutConfig.status,
+    code: protectedBody.code,
+    passed: true
+  }));
 } catch (error) {
   console.error(error instanceof Error ? error.stack : String(error));
   process.exitCode = 1;
