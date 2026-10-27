@@ -22,6 +22,7 @@ export async function GET() {
       configuration: body?.configuration ?? "unknown",
       missingKeys: Array.isArray(body?.missingKeys) ? body.missingKeys : [],
       sourceValidationReady: body?.sourceValidationReady === true,
+      checkoutSchemaReady: body?.checkoutSchemaReady === true,
       catalogueReady: body?.catalogueReady === true,
       catalogueMismatches: Array.isArray(body?.catalogueMismatches) ? body.catalogueMismatches : [],
       livePaymentsEnabled: false,
