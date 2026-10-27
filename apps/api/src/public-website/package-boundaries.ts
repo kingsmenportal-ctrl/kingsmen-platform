@@ -114,7 +114,7 @@ export const PUBLIC_PACKAGE_CARDS: PublicPackageCard[] = [
     packageKey: "ACCOMMODATION_SUPPORT",
     packageName: "Accommodation Support Package",
     priceLabel: "R179.00",
-    managedApplicationCount: 8,
+    managedApplicationCount: 0,
     includedCvVersions: 0,
     includedMotivationLetters: 0,
     includedAccommodationRoutes: 8,
