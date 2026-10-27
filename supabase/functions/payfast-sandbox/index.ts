@@ -121,9 +121,27 @@ async function checkout(request: Request, body: Record<string, unknown>) {
     return json({ error: "plan_not_payable_through_payfast" }, 400);
   }
 
-  const existing = await rest(`payfast_payment_intents?select=intent_ref,merchant_reference,payment_url,signed_payload,intent_status,idempotency_key&candidate_ref=eq.${encodeURIComponent(candidateId)}&idempotency_key=eq.${encodeURIComponent(idem)}&limit=1`);
+  const existing = await rest("payfast_payment_intents?select=intent_ref,merchant_reference,order_ref,invoice_ref,payment_url,signed_payload,signature,intent_status,idempotency_key,amount_cents,currency&candidate_ref=eq." + encodeURIComponent(candidateId) + "&idempotency_key=eq." + encodeURIComponent(idem) + "&limit=1");
   if (Array.isArray(existing) && existing.length) {
-    return json({ intent: existing[0], reused: true });
+    const existingOrder = await rest("finance_orders?select=plan_code,amount_cents&order_ref=eq." + encodeURIComponent(existing[0].order_ref) + "&candidate_ref=eq." + encodeURIComponent(candidateId) + "&limit=1");
+    if (!Array.isArray(existingOrder) || existingOrder.length !== 1 ||
+        existingOrder[0].plan_code !== planCode || existingOrder[0].amount_cents !== plan.amount_cents) {
+      return json({ error: "idempotency_key_reused_for_different_package" }, 409);
+    }
+    const storedSignature = String(existing[0].signature ?? "");
+    if (!storedSignature) return json({ error: "existing_checkout_signature_unavailable" }, 409);
+    const fields = { ...sanitize(existing[0].signed_payload ?? {}), merchant_key: Deno.env.get("PAYFAST_MERCHANT_KEY")! };
+    return json({
+      intent: {
+        intentRef: existing[0].intent_ref,
+        orderRef: existing[0].merchant_reference,
+        invoiceRef: existing[0].invoice_ref,
+        paymentUrl: existing[0].payment_url,
+        fields: { ...fields, signature: storedSignature },
+        signature: storedSignature
+      },
+      reused: true
+    });
   }
 
   const orderRef = ref("ord");
