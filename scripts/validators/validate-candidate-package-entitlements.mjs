@@ -10,18 +10,17 @@ const catalogue = read("apps/api/src/public-website/package-boundaries.ts");
 const types = read("apps/api/src/public-website/public-website-types.ts");
 const panel = read("apps/web/src/public-site/PricingBoundaryPanel.tsx");
 const manifest = JSON.parse(read("manifests/business/package-catalogue.json"));
+const finance = JSON.parse(read("manifests/n10/finance-payfast-runtime.json"));
 const expected = [
   ["FOUNDATIONAL_ACCORD", "foundational_accord", "Foundational Accord", "R169.99", 169.99, 5],
-  ["COLLEGIATE_ORDINANCE", "collegiate_ordinance", "Collegiate Ordinance", "R299.99", 299.99, 10],
+  ["COLLEGIATE_ORDINANCE", "collegiate_ordinance", "Collegiate Ordinance", "R299.99", 299.99, 5],
   ["CHANCELLORS_WRIT", "chancellors_writ", "Chancellor's Writ", "R399.99", 399.99, 15],
   ["REGENCY_MANDATE", "regency_mandate", "Regency Mandate", "R469.99", 469.99, 15],
   ["ARTISAN_CHARTER", "artisan_charter", "Artisan Charter", "R149.99", 149.99, 5],
   ["GUILDMASTERS_CHARTER", "guildmasters_charter", "Guildmaster's Charter", "R199.99", 199.99, 8],
-  ["FREE_DESTINY_MAP", "free_destiny_map", "Free Destiny Map", "R0", 0, 0],
-  ["CV_REVAMP", "cv_revamp", "CV Revamp", "R49.99", 49.99, 0],
-  ["ACCOMMODATION_SUPPORT", "accommodation_support", "Accommodation Support Package", "R179.00", 179, 8]
+  ["CV_REVAMP", "cv_revamp", "CV Revamp", "R49.99", 49.99, 0]
 ];
-assert.equal(manifest.packages.length, expected.length, "manifest must be the canonical source for all nine public catalogue entries");
+assert.equal(manifest.packages.length, 7, "business manifest must retain exactly the seven canonical sellable package products");
 for (const [key, manifestKey, name, priceLabel, numericPrice, applications] of expected) {
   assert.ok(catalogue.includes(`packageKey: "${key}"`), `missing package key ${key}`);
   assert.ok(catalogue.includes(`packageName: "${name}"`), `missing package name ${name}`);
@@ -32,9 +31,13 @@ for (const [key, manifestKey, name, priceLabel, numericPrice, applications] of e
   assert.equal(entry.name, name, `manifest name mismatch for ${manifestKey}`);
   assert.equal(entry.price, numericPrice, `manifest price mismatch for ${manifestKey}`);
   assert.equal(entry.managed_application_count, applications, `manifest application entitlement mismatch for ${manifestKey}`);
-  assert.ok(Array.isArray(entry.benefits) && entry.benefits.length >= (key === "FREE_DESTINY_MAP" ? 3 : 3), `manifest benefits missing for ${manifestKey}`);
+  assert.ok(Array.isArray(entry.benefits) && entry.benefits.length >= 3, `manifest benefits missing for ${manifestKey}`);
   assert.equal(typeof entry.route_visibility, "string", `manifest route visibility missing for ${manifestKey}`);
 }
+assert.ok(catalogue.includes('packageKey: "FREE_DESTINY_MAP"') && catalogue.includes('priceLabel: "R0"') && catalogue.includes('managedApplicationCount: 0'));
+assert.ok(finance.pricing_locked?.includes("FREE_DESTINY_MAP_R0"), "Free Destiny Map must remain represented by the finance legacy code");
+assert.ok(catalogue.includes('packageKey: "ACCOMMODATION_SUPPORT"') && catalogue.includes('priceLabel: "Not sold standalone"'));
+assert.ok(finance.retired_legacy_plan_codes?.some((p) => p.plan_code === "ACCOMMODATION_SUPPORT_R179" && p.status === "retired_not_selectable"), "standalone accommodation plan must remain retired and not selectable");
 for (const required of [
   "NSFAS", "CAO", "MAP fallback", "Phoenix fallback", "24-hour monitoring",
   "ATS-aware CV preparation", "Skills-gap analysis", "up to 8 accommodation routes",
@@ -48,4 +51,4 @@ assert.ok(catalogue.includes("PUBLIC_PACKAGE_CARDS.length !== 9"));
 assert.equal(manifest.entitlement_contract?.caO_counting_rule?.startsWith("One CAO parent application"), true);
 assert.equal(manifest.entitlement_contract?.accommodation_policy?.includes("8 ACC-01 routes"), true);
 assert.equal(manifest.cv_revamp_upgrade_rule?.benefit?.includes("+2 active managed applications/routes"), true);
-console.log("PASS: all nine public Kingsmen catalogue entries match canonical prices, managed quantities, route visibility, benefits, and safety boundaries.");
+console.log("PASS: six paid Kingsmen packages and CV Revamp match the seven-product canonical manifest; free preview and retired accommodation checkout are explicitly bounded.");
