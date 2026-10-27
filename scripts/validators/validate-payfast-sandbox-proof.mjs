@@ -107,6 +107,8 @@ checkFile('supabase/functions/payfast-sandbox/index.ts', [
   'const ipValid = await validPayFastSourceIp(request)',
   '&& ipValid && amountValid',
   'duplicate',
+  'idempotency_key_reused_for_different_package',
+  'existing_checkout_signature_unavailable',
   'paymentStatus === "COMPLETE"',
   'payfast_settle_sandbox_payment',
   'A checkout intent is not payment success',
