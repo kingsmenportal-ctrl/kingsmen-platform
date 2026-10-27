@@ -1,7 +1,7 @@
 {
   "phase": "N10",
   "name": "Finance / PayFast Runtime",
-  "status": "foundation",
+  "status": "canonical_catalogue_reconciled_pending_staging_runtime_evidence",
   "laws": [
     "PostgreSQL finance ledger is truth.",
     "PayFast is the payment processor, not Kingsmen truth.",
@@ -17,7 +17,14 @@
   ],
   "pricing_locked": [
     "FREE_DESTINY_MAP_R0",
-    "CV_REVAMP_R49_99"
+    "FOUNDATIONAL_ACCORD_R169_99",
+    "COLLEGIATE_ORDINANCE_R299_99",
+    "CHANCELLORS_WRIT_R399_99",
+    "REGENCY_MANDATE_R469_99",
+    "ARTISAN_CHARTER_R149_99",
+    "GUILDMASTERS_CHARTER_R199_99",
+    "CV_REVAMP_R49_99",
+    "ACCOMMODATION_SUPPORT_R179"
   ],
   "runtime_surfaces": [
     "Plan Catalog",
@@ -32,12 +39,6 @@
     "Candidate Finance View"
   ],
   "next": "N11 - AI Decision / Matching Engine",
-  "retired_legacy_plan_codes": [
-    {
-      "plan_code": "ACCOMMODATION_SUPPORT_R179",
-      "status": "retired_not_selectable",
-      "reason": "Conflicts with canonical package catalogue and includes an unapproved invented route quantity; retain only for historical-order compatibility."
-    }
-  ],
-  "checkout_guard": "Only FREE_DESTINY_MAP_R0 and CV_REVAMP_R49_99 are currently represented by this legacy N10 finance catalogue. The seven canonical package prices in manifests/business/package-catalogue.json are not activated for checkout until founder-approved quantities, duration, service limits, refund terms, and provider sandbox evidence are reconciled."
+  "retired_legacy_plan_codes": [],
+  "checkout_guard": "Canonical package prices and quantities are represented in the finance and service catalogues. New paid checkout remains release-gated until the reviewed reconciliation migration is applied to staging and a real PayFast sandbox checkout, accepted ITN, duplicate replay, exact amount, paid-only activation and candidate-isolation evidence all pass. Live payments remain disabled."
 }
