@@ -9,6 +9,7 @@ const read = (path) => readFileSync(resolve(root, path), "utf8");
 const catalogue = read("apps/api/src/public-website/package-boundaries.ts");
 const types = read("apps/api/src/public-website/public-website-types.ts");
 const panel = read("apps/web/src/public-site/PricingBoundaryPanel.tsx");
+const manifest = JSON.parse(read("manifests/business/package-catalogue.json"));
 const expected = [
   ["FOUNDATIONAL_ACCORD", "Foundational Accord", "R169.99", "managedApplicationCount: 5"],
   ["COLLEGIATE_ORDINANCE", "Collegiate Ordinance", "R299.99", "managedApplicationCount: 10"],
@@ -22,6 +23,12 @@ for (const [key, name, price, count] of expected) {
   assert.ok(catalogue.includes(`packageName: "${name}"`), `missing package name ${name}`);
   assert.ok(catalogue.includes(`priceLabel: "${price}"`), `wrong or missing price ${price}`);
   assert.ok(catalogue.includes(count), `wrong or missing application entitlement for ${key}`);
+  const manifestKey = key.toLowerCase();
+  const entry = manifest.packages.find((item) => item.package_id === manifestKey);
+  assert.ok(entry, `manifest missing ${manifestKey}`);
+  assert.equal(entry.price, Number(price.replace("R", "")), `manifest price mismatch for ${manifestKey}`);
+  assert.equal(entry.managed_application_count, Number(count.match(/\d+/)[0]), `manifest application count mismatch for ${manifestKey}`);
+  assert.ok(Array.isArray(entry.benefits) && entry.benefits.length >= 5, `manifest benefits missing for ${manifestKey}`);
 }
 for (const required of [
   "NSFAS", "CAO", "MAP fallback", "Phoenix fallback", "24-hour monitoring",
@@ -33,4 +40,6 @@ for (const required of [
 assert.ok(types.includes('"FOUNDATIONAL_ACCORD"') && types.includes('"GUILDMASTERS_CHARTER"'));
 assert.ok(panel.includes("PUBLIC_PACKAGE_CARDS") && panel.includes("item.includedBenefits.map"));
 assert.ok(catalogue.includes('PUBLIC_PACKAGE_CARDS.length !== 9'));
+assert.equal(manifest.entitlement_contract?.caO_counting_rule?.startsWith("One CAO parent application"), true);
+assert.equal(manifest.entitlement_contract?.accommodation_policy?.includes("8 ACC-01 routes"), true);
 console.log("PASS: six paid Kingsmen packages, canonical prices, application entitlements, supporting services, and candidate-facing render contract are present.");
