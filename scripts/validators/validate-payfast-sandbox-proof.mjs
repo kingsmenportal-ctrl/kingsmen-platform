@@ -100,7 +100,8 @@ checkFile('supabase/functions/payfast-sandbox/index.ts', [
   'payfast_settle_sandbox_payment',
   'A checkout intent is not payment success',
   'SUPABASE_SERVICE_ROLE_KEY',
-  'PAYFAST_MERCHANT_KEY'
+  'PAYFAST_MERCHANT_KEY',
+  'signed_payload: sanitize(signed)'
 ]);
 
 checkFile('apps/api/src/finance/payfast-itn.ts', [
