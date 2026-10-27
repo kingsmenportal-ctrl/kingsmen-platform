@@ -511,8 +511,10 @@ export function createKingsmenApiServer() {
           pathname === "/api/workflow-results"
         )) ||
         (method === "GET" && (
-          /^\\/api\\/candidates\\/[^/]+\\/status$/.test(pathname) ||
-          /^\\/api\\/applications\\/[^/]+\\/workbench$/.test(pathname)
+          (pathname.startsWith("/api/candidates/") && pathname.endsWith("/status") &&
+            pathname.split("/").length === 5 && pathname.split("/")[3].length > 0) ||
+          (pathname.startsWith("/api/applications/") && pathname.endsWith("/workbench") &&
+            pathname.split("/").length === 5 && pathname.split("/")[3].length > 0)
         ));
 
       // Authenticate recognized protected endpoints only. Unknown paths must
