@@ -119,8 +119,8 @@ async function checkout(request: Request, body: Record<string, unknown>) {
   const amount = (Number(plan.amount_cents) / 100).toFixed(2);
   const environment = "sandbox";
   const notifyUrl = Deno.env.get("PAYFAST_NOTIFY_URL")!;
-  const returnUrl = Deno.env.get("PAYFAST_RETURN_URL") ?? "https://kingsmen-portal-staging.netlify.app/payment/return";
-  const cancelUrl = Deno.env.get("PAYFAST_CANCEL_URL") ?? "https://kingsmen-portal-staging.netlify.app/payment/cancel";
+  const returnUrl = Deno.env.get("PAYFAST_RETURN_URL") ?? "https://kingsmen-portal-staging.netlify.app/candidate/finance?payment=return";
+  const cancelUrl = Deno.env.get("PAYFAST_CANCEL_URL") ?? "https://kingsmen-portal-staging.netlify.app/candidate/finance?payment=cancel";
   const fields: Record<string, string> = {
     merchant_id: Deno.env.get("PAYFAST_MERCHANT_ID")!,
     merchant_key: Deno.env.get("PAYFAST_MERCHANT_KEY")!,
@@ -197,7 +197,7 @@ async function checkout(request: Request, body: Record<string, unknown>) {
     }),
   });
   return json({
-    intent: { intentRef, merchantReference, paymentUrl: "https://sandbox.payfast.co.za/eng/process", fields: sanitize(signed), signature: signed.signature },
+    intent: { intentRef, merchantReference, paymentUrl: "https://sandbox.payfast.co.za/eng/process", fields: signed, signature: signed.signature },
     orderStatus: "PENDING_PAYMENT",
     paymentStatus: "PENDING",
     note: "A checkout intent is not payment success. Only a verified provider ITN can confirm payment.",
