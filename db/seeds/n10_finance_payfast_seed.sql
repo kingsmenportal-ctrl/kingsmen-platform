@@ -25,5 +25,26 @@ on conflict (plan_code) do update set
   active=true,
   updated_at=now();
 
--- Keep the retired-plan compatibility record inactive only if it uses a distinct, obsolete code.
--- ACCOMMODATION_SUPPORT_R179 is canonical and intentionally active.
+update public.finance_plan_catalog
+set service_scope = case plan_code
+  when 'FREE_DESTINY_MAP_R0' then 'All-sector preview only; exact targets remain sealed; zero managed applications.'
+  when 'FOUNDATIONAL_ACCORD_R169_99' then 'Academic/opportunity profile review; readiness checklist; source/deadline/fee awareness; CAO/NSFAS/TVET/SETA support where relevant; five managed applications; proof tracking; MAP/Phoenix fallback.'
+  when 'COLLEGIATE_ORDINANCE_R299_99' then 'Ten managed applications; structured programme matching; document readiness; motivation-letter support; deadline-aware alternatives; priority queue where configured.'
+  when 'CHANCELLORS_WRIT_R399_99' then 'Fifteen managed applications; advanced evidence-backed matching; application sequencing; priority handling; consent-based document reuse; fallback planning.'
+  when 'REGENCY_MANDATE_R469_99' then 'Fifteen managed applications; highest configured queue intensity; recovery strategy; live monitoring and escalation unavailable until verified operational coverage is enabled.'
+  when 'ARTISAN_CHARTER_R149_99' then 'Five managed career applications; role matching; truthful CV/letter preparation; employment, internship, learnership, apprenticeship and artisan routes.'
+  when 'GUILDMASTERS_CHARTER_R199_99' then 'Eight managed career applications; advanced role matching; truthful ATS-aware CV and letters; interview preparation; skills-gap analysis.'
+  when 'CV_REVAMP_R49_99' then 'Fifteen personalised truthful CV versions and fifteen matching motivation letters; no managed applications; approved +2 managed-route upgrade credit is applied by later eligible core-package checkout.'
+  when 'ACCOMMODATION_SUPPORT_R179' then 'Eight accommodation routes; source checks where verifiable; scam/deposit warnings; consent-controlled sharing; safety notes and proof tracking where available; no rent/deposit handling.'
+  else service_scope end,
+  catalogue_version = '2026-10-27',
+  response_target_disclaimer = 'Availability depends on verified sources, eligibility, consent, provider rules and a deployed workflow. No guaranteed admission, funding, employment, accommodation, interview, provider response or outcome.',
+  upgrade_bonus_routes_when_cv_revamp_owned = case
+    when plan_code in ('FREE_DESTINY_MAP_R0','CV_REVAMP_R49_99','ACCOMMODATION_SUPPORT_R179') then 0
+    else 2 end,
+  updated_at = now()
+where plan_code in (
+  'FREE_DESTINY_MAP_R0','FOUNDATIONAL_ACCORD_R169_99','COLLEGIATE_ORDINANCE_R299_99',
+  'CHANCELLORS_WRIT_R399_99','REGENCY_MANDATE_R469_99','ARTISAN_CHARTER_R149_99',
+  'GUILDMASTERS_CHARTER_R199_99','CV_REVAMP_R49_99','ACCOMMODATION_SUPPORT_R179'
+);
