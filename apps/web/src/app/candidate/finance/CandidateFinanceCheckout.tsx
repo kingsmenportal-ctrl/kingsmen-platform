@@ -43,8 +43,17 @@ export function CandidateFinanceCheckout() {
     if (payment === "cancel") setMessage("Checkout was cancelled or left. No package is activated unless a verified PayFast ITN confirms payment.");
     fetch("/api/finance/provider-health", { cache: "no-store" })
       .then((response) => response.json())
-      .then((data) => setProviderReady(data.configuration === "configured" && data.environment === "sandbox" && data.catalogueReady === true))
+      .then((data) => setProviderReady(data.configuration === "configured" && data.environment === "sandbox" && data.sourceValidationReady === true && data.checkoutSchemaReady === true && data.catalogueReady === true))
       .catch(() => setProviderReady(false));
+    fetch("/api/finance/status", { method: "POST", headers: { "content-type": "application/json" }, body: "{}", cache: "no-store" })
+      .then(async (response) => response.ok ? response.json() : null)
+      .then((data) => {
+        if (data && Array.isArray(data.orders)) {
+          setSignedIn(true);
+          setOrders(data.orders as OrderStatus[]);
+        }
+      })
+      .catch(() => undefined);
   }, []);
 
   async function sendCode(event: FormEvent) {
