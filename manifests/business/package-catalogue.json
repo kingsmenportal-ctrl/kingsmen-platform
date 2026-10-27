@@ -54,7 +54,11 @@
       "boundaries": [
         "No guaranteed admission, funding, employment, or accommodation",
         "Routes depend on verified sources, eligibility, opening status, consent, and provider requirements"
-      ]
+      ],
+      "included_cv_versions": null,
+      "included_motivation_letters": null,
+      "route_visibility": "ACTIVATED",
+      "summary": "A controlled academic and opportunity campaign foundation."
     },
     {
       "package_id": "collegiate_ordinance",
@@ -81,7 +85,11 @@
       "boundaries": [
         "Matching is decision support, not an acceptance guarantee",
         "Automated submission only where provider rules and verified integrations permit"
-      ]
+      ],
+      "included_cv_versions": null,
+      "included_motivation_letters": null,
+      "route_visibility": "ACTIVATED",
+      "summary": "Guided academic alignment and informed application progression."
     },
     {
       "package_id": "chancellors_writ",
@@ -109,7 +117,11 @@
       "boundaries": [
         "Acceptance likelihoods are estimates, not promises",
         "Monitoring and automated submissions require verified data and supported integrations"
-      ]
+      ],
+      "included_cv_versions": 0,
+      "included_motivation_letters": 1,
+      "route_visibility": "ACTIVATED",
+      "summary": "Strategic academic orchestration across multiple viable pathways."
     },
     {
       "package_id": "regency_mandate",
@@ -137,7 +149,11 @@
       "boundaries": [
         "No guarantee of provider response, seat, admission, or continuously available human operator",
         "Live monitoring and escalation must be operationally verified"
-      ]
+      ],
+      "included_cv_versions": 0,
+      "included_motivation_letters": 1,
+      "route_visibility": "ACTIVATED",
+      "summary": "Highest package intensity for urgent, closely monitored placement campaigns."
     },
     {
       "package_id": "artisan_charter",
@@ -163,7 +179,11 @@
       "boundaries": [
         "No guarantee of interview, offer, employment, or provider acceptance",
         "CV and letter content must remain truthful"
-      ]
+      ],
+      "included_cv_versions": null,
+      "included_motivation_letters": null,
+      "route_visibility": "ACTIVATED",
+      "summary": "A practical entry into employment, internships, learnerships, apprenticeships, and artisan routes."
     },
     {
       "package_id": "guildmasters_charter",
@@ -191,6 +211,36 @@
       "boundaries": [
         "ATS compatibility does not guarantee selection or interview",
         "CV and letters must reflect candidate-provided evidence"
+      ],
+      "included_cv_versions": 1,
+      "included_motivation_letters": 1,
+      "route_visibility": "ACTIVATED",
+      "summary": "Advanced professional positioning and career-path support."
+    },
+    {
+      "package_id": "free_destiny_map",
+      "name": "Free Destiny Map",
+      "price": 0,
+      "currency": "ZAR",
+      "status": "CANONICAL",
+      "controls": [
+        "all-sector preview",
+        "zero managed applications",
+        "exact targets sealed until activation"
+      ],
+      "managed_application_count": 0,
+      "included_accommodation_routes": 0,
+      "included_cv_versions": 0,
+      "included_motivation_letters": 0,
+      "route_visibility": "PREVIEW_ONLY",
+      "summary": "All-sector preview before a paid package is activated.",
+      "benefits": [
+        "All-sector pathway preview",
+        "No managed applications",
+        "Exact targets and manual route plans remain sealed until activation"
+      ],
+      "boundaries": [
+        "Preview only; no managed application entitlement"
       ]
     },
     {
@@ -214,6 +264,40 @@
       "boundaries": [
         "No managed applications included",
         "Must not invent experience, qualifications, references, certificates, skills, or results"
+      ],
+      "included_cv_versions": 15,
+      "included_motivation_letters": 15,
+      "route_visibility": "SEALED",
+      "summary": "Standalone personalised CV and motivation-letter preparation."
+    },
+    {
+      "package_id": "accommodation_support",
+      "name": "Accommodation Support Package",
+      "price": 179,
+      "currency": "ZAR",
+      "status": "CANONICAL",
+      "controls": [
+        "standalone accommodation route support",
+        "8 accommodation routes",
+        "no rent or deposit handling"
+      ],
+      "managed_application_count": 8,
+      "included_accommodation_routes": 8,
+      "included_cv_versions": 0,
+      "included_motivation_letters": 0,
+      "route_visibility": "ACTIVATED",
+      "summary": "Standalone accommodation-route assistance.",
+      "benefits": [
+        "8 accommodation applications/routes",
+        "Provider/source legitimacy checks where verifiable",
+        "Deposit and scam-risk warnings",
+        "Location/safety notes where available",
+        "Consent before sharing candidate details",
+        "Accommodation proof tracking and fallback options"
+      ],
+      "boundaries": [
+        "Kingsmen does not handle rent/deposits or guarantee accommodation",
+        "Routes depend on verification, availability, and consent"
       ]
     }
   ],
