@@ -34,12 +34,17 @@ export function CandidateFinanceCheckout() {
   const [message, setMessage] = useState("");
   const [error, setError] = useState("");
   const [orders, setOrders] = useState<OrderStatus[]>([]);
+  const [providerReady, setProviderReady] = useState(false);
   const idempotencyKeys = useRef<Record<string, string>>({});
 
   useEffect(() => {
     const payment = new URLSearchParams(window.location.search).get("payment");
     if (payment === "return") setMessage("PayFast returned you to Kingsmen. Return navigation is not payment confirmation; sign in and refresh order status.");
     if (payment === "cancel") setMessage("Checkout was cancelled or left. No package is activated unless a verified PayFast ITN confirms payment.");
+    fetch("/api/finance/provider-health", { cache: "no-store" })
+      .then((response) => response.json())
+      .then((data) => setProviderReady(data.configuration === "configured" && data.environment === "sandbox"))
+      .catch(() => setProviderReady(false));
   }, []);
 
   async function sendCode(event: FormEvent) {
@@ -132,6 +137,9 @@ export function CandidateFinanceCheckout() {
 
   return (
     <section className="space-y-6 rounded-2xl border border-slate-200 bg-white p-5 text-slate-950">
+      <p role="status" className={providerReady ? "rounded-lg bg-emerald-50 p-3 text-sm text-emerald-900" : "rounded-lg bg-amber-50 p-3 text-sm text-amber-900"}>
+        {providerReady ? "PayFast sandbox configuration is present; no real sandbox transaction has yet been proven." : "PayFast sandbox checkout is not currently verified as configured. Package selection and payment activation remain gated until configuration and a real sandbox ITN are proven."}
+      </p>
       <div>
         <h2 className="text-xl font-bold">Candidate sign-in and checkout</h2>
         <p className="mt-1 text-sm text-slate-600">Email code sign-in only. Order prices are selected server-side; a browser return never activates a package.</p>
