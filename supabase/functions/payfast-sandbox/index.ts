@@ -383,7 +383,8 @@ Deno.serve(async (request: Request) => {
           CV_REVAMP_R49_99: { amount_cents: 4999, managed_application_count: 0, accommodation_route_count: 0, cv_versions: 15, motivation_letters: 15 },
           ACCOMMODATION_SUPPORT_R179: { amount_cents: 17900, managed_application_count: 0, accommodation_route_count: 8, cv_versions: 0, motivation_letters: 0 }
         };
-        const byCode = new Map(Array.isArray(plans) ? plans.map((plan) => [plan.plan_code, plan]) : []);
+        const byCode = new Map<string, Record<string, unknown>>();
+        if (Array.isArray(plans)) for (const plan of plans) byCode.set(String(plan.plan_code), plan as Record<string, unknown>);
         for (const [code, target] of Object.entries(expected)) {
           const plan = byCode.get(code);
           if (!plan || Object.entries(target).some(([key, value]) => plan[key] !== value)) catalogueMismatches.push(code);
