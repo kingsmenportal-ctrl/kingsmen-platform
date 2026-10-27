@@ -1,4 +1,5 @@
 import { createServer, type IncomingMessage, type ServerResponse } from "node:http";
+import { timingSafeEqual } from "node:crypto";
 import { URL } from "node:url";
 
 import {
@@ -178,6 +179,30 @@ function upsertReadModelsForWorkflowResult(result: WorkflowResultEnvelope): void
       lastUpdatedAt: nowIso()
     });
   }
+}
+
+function serviceAuthorizationFailure(request: IncomingMessage): { status: number; code: string; message: string } | null {
+  const expected = process.env.KINGSMEN_API_SERVICE_TOKEN;
+  if (!expected || expected.length < 32) {
+    return {
+      status: 503,
+      code: "SERVICE_AUTH_NOT_CONFIGURED",
+      message: "Protected API routes are disabled until a service token of at least 32 characters is configured."
+    };
+  }
+
+  const header = request.headers.authorization;
+  const supplied = typeof header === "string" && header.startsWith("Bearer ")
+    ? header.slice(7)
+    : "";
+  const expectedBuffer = Buffer.from(expected, "utf8");
+  const suppliedBuffer = Buffer.from(supplied, "utf8");
+  const valid = expectedBuffer.length === suppliedBuffer.length && timingSafeEqual(expectedBuffer, suppliedBuffer);
+  return valid ? null : {
+    status: 401,
+    code: "UNAUTHORIZED",
+    message: "A valid service bearer token is required for this protected API route."
+  };
 }
 
 function sendJson(response: ServerResponse, statusCode: number, body: unknown, correlationId?: string): void {
@@ -476,6 +501,15 @@ export function createKingsmenApiServer() {
       if (method === "GET" && (pathname === "/" || pathname === "/health" || pathname === "/api/system/health")) {
         await handleHealth(response);
         return;
+      }
+
+      const isHealthRoute = method === "GET" && (pathname === "/" || pathname === "/health" || pathname === "/api/system/health");
+      if (!isHealthRoute && pathname !== "/favicon.ico") {
+        const authFailure = serviceAuthorizationFailure(request);
+        if (authFailure) {
+          sendError(response, authFailure.status, authFailure.code, authFailure.message);
+          return;
+        }
       }
 
       if (method === "POST" && pathname === "/api/jarvis/runtime-control") {
