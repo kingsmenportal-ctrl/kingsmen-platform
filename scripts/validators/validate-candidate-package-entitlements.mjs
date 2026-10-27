@@ -13,7 +13,7 @@ const manifest = JSON.parse(read("manifests/business/package-catalogue.json"));
 const finance = JSON.parse(read("manifests/n10/finance-payfast-runtime.json"));
 const expected = [
   ["FOUNDATIONAL_ACCORD", "foundational_accord", "Foundational Accord", "R169.99", 169.99, 5],
-  ["COLLEGIATE_ORDINANCE", "collegiate_ordinance", "Collegiate Ordinance", "R299.99", 299.99, 5],
+  ["COLLEGIATE_ORDINANCE", "collegiate_ordinance", "Collegiate Ordinance", "R299.99", 299.99, 10],
   ["CHANCELLORS_WRIT", "chancellors_writ", "Chancellor's Writ", "R399.99", 399.99, 15],
   ["REGENCY_MANDATE", "regency_mandate", "Regency Mandate", "R469.99", 469.99, 15],
   ["ARTISAN_CHARTER", "artisan_charter", "Artisan Charter", "R149.99", 149.99, 5],
