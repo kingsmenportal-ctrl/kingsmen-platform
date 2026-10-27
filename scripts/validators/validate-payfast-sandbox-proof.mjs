@@ -83,6 +83,7 @@ checkFile('apps/web/src/app/candidate/finance/CandidateFinanceCheckout.tsx', [
   'startCheckout',
   'paymentVerified',
   'Continue to secure sandbox checkout',
+  'providerReady',
   'Return navigation is not payment confirmation'
 ]);
 
@@ -108,6 +109,8 @@ checkFile('supabase/functions/payfast-sandbox/index.ts', [
   'A checkout intent is not payment success',
   'SUPABASE_SERVICE_ROLE_KEY',
   'PAYFAST_MERCHANT_KEY',
+  'catalogueReady',
+  'catalogueMismatches',
   'signed_payload: sanitize(signed)'
 ]);
 
