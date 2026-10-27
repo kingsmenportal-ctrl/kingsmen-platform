@@ -61,14 +61,14 @@ try {
   check("candidate_state", candidateRead.data.candidate?.currentState === "INTAKE_PENDING", "candidate state persisted");
 
   const workflow = {
-    workflowRunId, workflow: "CI_TRUTH_VAULT_PROBE", candidateId, applicationId,
+    workflowRunId, workflow: "W01", candidateId, applicationId,
     idempotencyKey: workflowIdempotencyKey, correlationId: workflowCorrelationId,
     previousState: "INTAKE_PENDING", finalState: "EVALUATION_PENDING", status: "SUCCESS",
     evidenceRef: `ev-${suffix}`, message: "Synthetic Truth Vault integration proof.", createdAt: new Date().toISOString(),
     payload: { synthetic: true, purpose: "release-integration-proof" }
   };
   const firstWorkflow = await jsonRequest("/api/workflow/result", workflow);
-  check("workflow_result_accepted", firstWorkflow.status === 202 && firstWorkflow.data.ok === true, "workflow result accepted");
+  check("workflow_result_accepted", firstWorkflow.status === 202 && firstWorkflow.data.ok === true, "first workflow result accepted");
   const replayWorkflow = await jsonRequest("/api/workflow/result", workflow);
   check("workflow_idempotent_replay", replayWorkflow.status === 200 && replayWorkflow.data.status === "IDEMPOTENT_WORKFLOW_REPLAY", "duplicate workflow result was replayed");
 
@@ -83,13 +83,15 @@ try {
        (select count(*)::int from workflow_runs where workflow_run_id = $3) as workflows,
        (select count(*)::int from evidence_ledger where evidence_ref = $4) as evidence,
        (select count(*)::int from audit_events where correlation_id in ($5,$6)) as audit_events,
-       (select count(*)::int from applications where metadata->>'applicationRef' = $7) as applications`,
-    [commandId, idempotencyKey, workflowRunId, workflow.evidenceRef, correlationId, workflowCorrelationId, applicationId]
+       (select count(*)::int from applications where metadata->>'applicationRef' = $7) as applications,
+       (select count(*)::int from idempotency_keys where idempotency_key = $8 and status = 'COMPLETED') as workflow_idempotency`,
+    [commandId, idempotencyKey, workflowRunId, workflow.evidenceRef, correlationId, workflowCorrelationId, applicationId, workflowIdempotencyKey]
   );
   const row = persisted.rows[0];
   check("db_command_row", row.commands === 1, "exactly one command row");
-  check("db_idempotency_completed", row.command_idempotency === 1, "command idempotency key completed");
+  check("db_command_idempotency_completed", row.command_idempotency === 1, "command idempotency key completed");
   check("db_workflow_row", row.workflows === 1, "exactly one workflow row");
+  check("db_workflow_idempotency_completed", row.workflow_idempotency === 1, "workflow idempotency key completed");
   check("db_evidence_row", row.evidence === 1, "workflow evidence persisted");
   check("db_audit_rows", row.audit_events >= 2, "command and workflow audit events persisted");
   check("db_application_row", row.applications === 1, "application workbench row persisted");
