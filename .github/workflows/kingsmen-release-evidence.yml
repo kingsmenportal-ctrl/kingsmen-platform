@@ -52,6 +52,12 @@ jobs:
       - name: Validate unified candidate master application contract
         run: node scripts/validators/validate-unified-master-application.mjs
 
+      - name: Validate candidate identity-review submission and reviewer UI
+        run: node scripts/validators/validate-candidate-identity-review-page.mjs
+
+      - name: Validate candidate identity-review follow-up and persisted status
+        run: node scripts/validators/validate-identity-review-follow-up-status.mjs
+
       - name: Install web dependencies
         run: npm install --prefix apps/web --no-audit --no-fund
 

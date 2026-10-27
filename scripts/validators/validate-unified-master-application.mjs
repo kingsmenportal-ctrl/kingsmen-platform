@@ -81,8 +81,8 @@ assert.ok(reviewRpcGuard.includes("from public, anon, authenticated"), "Document
 assert.ok(outcomeReviewUi.includes("Confirm outcome with verified evidence"), "Authorised reviewer UI must confirm provider outcomes");
 assert.ok(outcomeReviewApi.includes("candidate-application-outcome-review"), "Outcome reviewer API must use reviewer-gated service");
 assert.ok(outcomeReviewFunction.includes("APPLICATION_REVIEWER"), "Outcome reviewer service must require dedicated reviewer permission");
-assert.ok(identityPage.includes("Submit for manual identity review"), "Candidate identity review journey must submit a real request");
-assert.ok(identityPage.includes("Upload privately for reviewer inspection"), "Candidate identity journey must support private evidence upload");
+assert.ok(identityPage.includes("Submit for manual review"), "Candidate identity review journey must submit a real request");
+assert.ok(identityPage.includes("Supporting evidence file (optional but strongly recommended)"), "Candidate identity journey must support private evidence upload");
 assert.ok(identityRequestApi.includes("candidate-identity-review-request"), "Candidate identity API must use the authenticated request service");
 assert.ok(identityQueuePage.includes("Accept evidence"), "Identity reviewer UI must require explicit evidence decisions");
 assert.ok(identityQueuePage.includes("Approve and link candidate"), "Identity reviewer UI must expose the authorised final decision");

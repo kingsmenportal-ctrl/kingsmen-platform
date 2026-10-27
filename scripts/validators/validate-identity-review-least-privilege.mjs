@@ -6,7 +6,8 @@ const paths = [
   'supabase/migrations/20261022042942_candidate_identity_review_submission_rpc.sql',
   'supabase/migrations/20261025120000_identity_review_least_privilege_role.sql',
   'supabase/migrations/20261025121500_identity_review_role_code_constraint.sql',
-  'supabase/migrations/20261025123000_identity_review_audit_actor_role.sql'
+  'supabase/migrations/20261025123000_identity_review_audit_actor_role.sql',
+  'supabase/migrations/20261027103000_revoke_client_platform_reviewer_access.sql'
 ];
 const sql = paths.map((path) => fs.readFileSync(path, 'utf8')).join('\n').replace(/--[^\n]*/g, ' ').toLowerCase();
 const required = [
@@ -16,6 +17,7 @@ const required = [
   [/revoke\s+all\s+privileges\s+on\s+function\s+public\.submit_candidate_identity_review_for_user\s*\([^;]*\)\s+from\s+public\s*,\s*anon\s*,\s*authenticated/, 'revokes direct client submission RPC execution'],
   [/grant\s+execute\s+on\s+function\s+public\.submit_candidate_identity_review_for_user\s*\([^;]*\)\s+to\s+service_role/, 'limits submission RPC execution to service role'],
   [/alter\s+table\s+public\.platform_reviewers/, 'updates reviewer role registry constraint'],
+  [/revoke\s+all\s+privileges\s+on\s+table\s+public\.platform_reviewers\s+from\s+public\s*,\s*anon\s*,\s*authenticated/, 'revokes direct client access to reviewer grants'],
   [/platform_reviewers_role_code_check/, 'replaces reviewer role-code constraint'],
   [/candidate_identity_review_audit_actor_role_check/, 'replaces audit actor-role constraint'],
   [/identity_reviewer'::text/, 'allows the dedicated role in schema constraints'],
