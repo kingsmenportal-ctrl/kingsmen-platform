@@ -1,6 +1,6 @@
 "use client";
 
-import { FormEvent, useEffect, useRef, useState } from "react";
+import { type FormEvent, useEffect, useRef, useState } from "react";
 import { PUBLIC_PACKAGE_CARDS } from "../../../../../api/src/public-website/package-boundaries";
 
 const PLAN_CODES: Record<string, string> = {
