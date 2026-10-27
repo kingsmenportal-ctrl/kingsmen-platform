@@ -57,6 +57,13 @@ checkFile('apps/web/src/app/api/finance/auth/route.ts', [
   'cross_origin_request_rejected'
 ]);
 
+checkFile('apps/web/src/app/api/finance/provider-health/route.ts', [
+  '/functions/v1/payfast-sandbox',
+  'missingKeys',
+  'realTransactionProven: false',
+  'productionReady: false'
+]);
+
 checkFile('apps/web/src/app/api/finance/checkout/route.ts', [
   'candidate_authentication_required',
   'idempotency-key',
