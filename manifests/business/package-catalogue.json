@@ -32,7 +32,33 @@
       "price": 169.99,
       "currency": "ZAR",
       "status": "CANONICAL",
-      "controls": ["entry package", "lower active managed quantity", "standard queue", "standard monitoring"]
+      "controls": [
+        "entry package",
+        "lower active managed quantity",
+        "standard queue",
+        "standard monitoring"
+      ],
+      "managed_application_count": 5,
+      "included_accommodation_routes": 8,
+      "benefits": [
+        "Academic and opportunity profile review",
+        "Document checklist and readiness warnings",
+        "Source, deadline, and application-fee awareness",
+        "CAO support where applicable; one CAO parent application is one Kingsmen application",
+        "NSFAS, TVET, and SETA support where relevant",
+        "CV and motivation-letter support where a route requires it",
+        "Application ordering, proof tracking, candidate status visibility",
+        "Duplicate-submission prevention and intelligent document reuse",
+        "Manual/MAP and Phoenix fallback planning"
+      ],
+      "boundaries": [
+        "No guaranteed admission, funding, employment, or accommodation",
+        "Routes depend on verified sources, eligibility, opening status, consent, and provider requirements"
+      ],
+      "included_cv_versions": null,
+      "included_motivation_letters": null,
+      "route_visibility": "ACTIVATED",
+      "summary": "A controlled academic and opportunity campaign foundation."
     },
     {
       "package_id": "collegiate_ordinance",
@@ -40,7 +66,30 @@
       "price": 299.99,
       "currency": "ZAR",
       "status": "CANONICAL",
-      "controls": ["higher active managed quantity", "stronger monitoring", "faster service intensity"]
+      "controls": [
+        "higher active managed quantity",
+        "stronger monitoring",
+        "faster service intensity"
+      ],
+      "managed_application_count": 10,
+      "included_accommodation_routes": 8,
+      "benefits": [
+        "NSFAS submission support where eligible",
+        "Structured education and programme matching",
+        "Context-aware motivation-letter support",
+        "Document enhancement and readiness checks",
+        "Queue management and supported automatic release",
+        "Programme-fit scoring and institutional compatibility filtering",
+        "Deadline-aware timing, alternative recommendations, and fallback routes"
+      ],
+      "boundaries": [
+        "Matching is decision support, not an acceptance guarantee",
+        "Automated submission only where provider rules and verified integrations permit"
+      ],
+      "included_cv_versions": null,
+      "included_motivation_letters": null,
+      "route_visibility": "ACTIVATED",
+      "summary": "Guided academic alignment and informed application progression."
     },
     {
       "package_id": "chancellors_writ",
@@ -48,7 +97,31 @@
       "price": 399.99,
       "currency": "ZAR",
       "status": "CANONICAL",
-      "controls": ["priority intensity", "deeper human review", "stronger fallback support"]
+      "controls": [
+        "priority intensity",
+        "deeper human review",
+        "stronger fallback support"
+      ],
+      "managed_application_count": 15,
+      "included_accommodation_routes": 8,
+      "benefits": [
+        "NSFAS and CAO execution support where applicable",
+        "Advanced profile-to-opportunity matching",
+        "Evidence-backed suitability and placement strategy",
+        "Supported auto-submit when eligible opportunities open",
+        "Priority queue acceleration",
+        "Application-fee and institutional-pattern awareness where reliable data exists",
+        "Consent-based document storage",
+        "Sequencing, timing, ranking, and multi-path fallback strategy"
+      ],
+      "boundaries": [
+        "Acceptance likelihoods are estimates, not promises",
+        "Monitoring and automated submissions require verified data and supported integrations"
+      ],
+      "included_cv_versions": 0,
+      "included_motivation_letters": 1,
+      "route_visibility": "ACTIVATED",
+      "summary": "Strategic academic orchestration across multiple viable pathways."
     },
     {
       "package_id": "regency_mandate",
@@ -56,7 +129,31 @@
       "price": 469.99,
       "currency": "ZAR",
       "status": "CANONICAL",
-      "controls": ["highest package intensity", "highest queue priority", "deepest monitoring and escalation"]
+      "controls": [
+        "highest package intensity",
+        "highest queue priority",
+        "deepest monitoring and escalation"
+      ],
+      "managed_application_count": 15,
+      "included_accommodation_routes": 8,
+      "benefits": [
+        "NSFAS and CAO support where applicable",
+        "Elite matching and intensive placement recovery strategy",
+        "Real-time opening/seat detection when reliable data supports it",
+        "Immediate supported execution when conditions are met",
+        "Institutional escalation routing where available",
+        "Fast-track queue handling",
+        "24-hour monitoring target subject to live coverage",
+        "Emergency fallback routes and institution-opening alerts"
+      ],
+      "boundaries": [
+        "No guarantee of provider response, seat, admission, or continuously available human operator",
+        "Live monitoring and escalation must be operationally verified"
+      ],
+      "included_cv_versions": 0,
+      "included_motivation_letters": 1,
+      "route_visibility": "ACTIVATED",
+      "summary": "Highest package intensity for urgent, closely monitored placement campaigns."
     },
     {
       "package_id": "artisan_charter",
@@ -64,7 +161,29 @@
       "price": 149.99,
       "currency": "ZAR",
       "status": "CANONICAL",
-      "controls": ["work/skills route package", "standard active managed quantity", "CV/work readiness focus"]
+      "controls": [
+        "work/skills route package",
+        "standard active managed quantity",
+        "CV/work readiness focus"
+      ],
+      "managed_application_count": 5,
+      "included_accommodation_routes": 8,
+      "benefits": [
+        "Basic role matching",
+        "CV structuring and presentation",
+        "Basic motivation-letter support",
+        "Streamlined submission for supported opportunities",
+        "Relevant opportunity alerts",
+        "Employment, internship, learnership, apprenticeship, and artisan route support"
+      ],
+      "boundaries": [
+        "No guarantee of interview, offer, employment, or provider acceptance",
+        "CV and letter content must remain truthful"
+      ],
+      "included_cv_versions": null,
+      "included_motivation_letters": null,
+      "route_visibility": "ACTIVATED",
+      "summary": "A practical entry into employment, internships, learnerships, apprenticeships, and artisan routes."
     },
     {
       "package_id": "guildmasters_charter",
@@ -72,7 +191,31 @@
       "price": 199.99,
       "currency": "ZAR",
       "status": "CANONICAL",
-      "controls": ["stronger work/skills route intensity", "learnership/employment support", "higher monitoring"]
+      "controls": [
+        "stronger work/skills route intensity",
+        "learnership/employment support",
+        "higher monitoring"
+      ],
+      "managed_application_count": 8,
+      "included_accommodation_routes": 8,
+      "benefits": [
+        "Advanced role matching",
+        "Truthful ATS-aware CV preparation",
+        "Professional role-specific motivation-letter support",
+        "Opportunity recommendations",
+        "Priority submission handling",
+        "Interview preparation tips",
+        "Skills-gap analysis",
+        "Career-path projection"
+      ],
+      "boundaries": [
+        "ATS compatibility does not guarantee selection or interview",
+        "CV and letters must reflect candidate-provided evidence"
+      ],
+      "included_cv_versions": 1,
+      "included_motivation_letters": 1,
+      "route_visibility": "ACTIVATED",
+      "summary": "Advanced professional positioning and career-path support."
     },
     {
       "package_id": "cv_revamp",
@@ -80,7 +223,26 @@
       "price": 49.99,
       "currency": "ZAR",
       "status": "CANONICAL",
-      "controls": ["standalone low-cost entry product", "CV improvement", "work/learnership/internship/apprenticeship/employment funnel"]
+      "controls": [
+        "standalone low-cost entry product",
+        "CV improvement",
+        "work/learnership/internship/apprenticeship/employment funnel"
+      ],
+      "managed_application_count": 0,
+      "included_accommodation_routes": 0,
+      "benefits": [
+        "15 personalised CV versions",
+        "15 matching motivation letters",
+        "Truthful personalisation based on candidate-provided evidence"
+      ],
+      "boundaries": [
+        "No managed applications included",
+        "Must not invent experience, qualifications, references, certificates, skills, or results"
+      ],
+      "included_cv_versions": 15,
+      "included_motivation_letters": 15,
+      "route_visibility": "SEALED",
+      "summary": "Standalone personalised CV and motivation-letter preparation."
     }
   ],
   "cv_revamp_upgrade_rule": {
@@ -101,6 +263,17 @@
   "growth_cap": {
     "starting_active_candidate_cap": 500,
     "cap_limits": "active managed volume, not core capability access",
-    "growth_modes": ["500_active_start", "1000_ready_design", "5000_ready_architecture_not_automatic"]
+    "growth_modes": [
+      "500_active_start",
+      "1000_ready_design",
+      "5000_ready_architecture_not_automatic"
+    ]
+  },
+  "entitlement_contract": {
+    "source_of_truth": "package-catalogue.json",
+    "policy": "Packages change managed quantity and service intensity, not dignity or core safety capabilities.",
+    "caO_counting_rule": "One CAO parent application counts as one Kingsmen application; programme choices are children of that parent.",
+    "accommodation_policy": "Up to 8 ACC-01 routes included with each paid Kingsmen package where relevant, subject to verification, availability, and consent.",
+    "status_note": "Entitlements are product policy; production claims require working service paths and deployed runtime evidence."
   }
 }
