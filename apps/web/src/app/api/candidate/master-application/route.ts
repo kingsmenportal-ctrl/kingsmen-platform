@@ -7,6 +7,63 @@ const PATHWAYS = new Set([
   "APPRENTICESHIP", "EMPLOYMENT", "FUNDING", "ACCOMMODATION", "WIL"
 ]);
 
+
+const MAX_REQUEST_BYTES = 128 * 1024;
+
+function privateJson(body: unknown, init: ResponseInit = {}) {
+  const headers = new Headers(init.headers);
+  headers.set("Cache-Control", "private, no-store, max-age=0");
+  headers.set("Pragma", "no-cache");
+  headers.set("Vary", "Authorization");
+  headers.set("X-Content-Type-Options", "nosniff");
+  headers.set("Referrer-Policy", "no-referrer");
+  return Response.json(body, { ...init, headers });
+}
+
+async function readJsonLimited(request: Request): Promise<
+  { ok: true; value: unknown } | { ok: false; reason: "TOO_LARGE" | "INVALID_JSON" }
+> {
+  const declaredHeader = request.headers.get("content-length");
+  if (declaredHeader !== null) {
+    const declaredLength = Number(declaredHeader);
+    if (!Number.isSafeInteger(declaredLength) || declaredLength < 0) {
+      return { ok: false, reason: "INVALID_JSON" };
+    }
+    if (declaredLength > MAX_REQUEST_BYTES) {
+      return { ok: false, reason: "TOO_LARGE" };
+    }
+  }
+  if (!request.body) return { ok: false, reason: "INVALID_JSON" };
+  const reader = request.body.getReader();
+  const chunks: Uint8Array[] = [];
+  let total = 0;
+  try {
+    while (true) {
+      const { done, value } = await reader.read();
+      if (done) break;
+      total += value.byteLength;
+      if (total > MAX_REQUEST_BYTES) {
+        await reader.cancel();
+        return { ok: false, reason: "TOO_LARGE" };
+      }
+      chunks.push(value);
+    }
+  } finally {
+    reader.releaseLock();
+  }
+  const bytes = new Uint8Array(total);
+  let offset = 0;
+  for (const chunk of chunks) {
+    bytes.set(chunk, offset);
+    offset += chunk.byteLength;
+  }
+  try {
+    return { ok: true, value: JSON.parse(new TextDecoder("utf-8", { fatal: true }).decode(bytes)) };
+  } catch {
+    return { ok: false, reason: "INVALID_JSON" };
+  }
+}
+
 function config() {
   const base = process.env.NEXT_PUBLIC_SUPABASE_URL?.replace(/\/$/, "");
   const key = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
@@ -17,19 +74,19 @@ function config() {
 async function candidateRequest(request: Request, path: string, init: RequestInit = {}) {
   const authorization = request.headers.get("authorization") || "";
   if (!/^Bearer\s+\S+$/i.test(authorization)) {
-    return Response.json({ ok: false, error: "AUTHENTICATION_REQUIRED" }, { status: 401 });
+    return privateJson({ ok: false, error: "AUTHENTICATION_REQUIRED" }, { status: 401 });
   }
   let cfg: ReturnType<typeof config>;
   try { cfg = config(); } catch {
-    return Response.json({ ok: false, error: "CANDIDATE_WORKSPACE_NOT_CONFIGURED" }, { status: 503 });
+    return privateJson({ ok: false, error: "CANDIDATE_WORKSPACE_NOT_CONFIGURED" }, { status: 503 });
   }
   const auth = await fetch(`${cfg.base}/auth/v1/user`, {
     headers: { apikey: cfg.key, Authorization: authorization },
     cache: "no-store"
   });
-  if (!auth.ok) return Response.json({ ok: false, error: "AUTHENTICATION_REQUIRED" }, { status: 401 });
+  if (!auth.ok) return privateJson({ ok: false, error: "AUTHENTICATION_REQUIRED" }, { status: 401 });
   const user = await auth.json() as { id?: string };
-  if (!user.id) return Response.json({ ok: false, error: "AUTHENTICATION_REQUIRED" }, { status: 401 });
+  if (!user.id) return privateJson({ ok: false, error: "AUTHENTICATION_REQUIRED" }, { status: 401 });
 
   const response = await fetch(`${cfg.base}/rest/v1/${path}`, {
     ...init,
@@ -47,13 +104,13 @@ async function candidateRequest(request: Request, path: string, init: RequestIni
   if (!response.ok) {
     const status = response.status === 401 ? 401 : response.status === 403 ? 403 : response.status >= 500 ? 502 : 400;
     if (status === 403) {
-      return Response.json({
+      return privateJson({
         ok: false,
         error: "IDENTITY_REVIEW_OR_PERMISSION_REQUIRED",
         message: "Your account is authenticated, but Kingsmen could not resolve an authorised candidate identity for this action. Complete the candidate identity-review process or contact Kingsmen support; do not create a second account or link by email alone."
       }, { status });
     }
-    return Response.json({ ok: false, error: "PERSISTENCE_REQUEST_FAILED", detail: status === 400 ? data : undefined }, { status });
+    return privateJson({ ok: false, error: "PERSISTENCE_REQUEST_FAILED", detail: status === 400 ? data : undefined }, { status });
   }
   return { user, data };
 }
@@ -69,7 +126,7 @@ export async function GET(request: Request) {
     "candidate_master_application_targets?select=id,target_key,pathway_type,provider_name,programme_or_role,provider_application_url,source_reference,source_confidence,planning_status,application_id,created_at,updated_at&order=created_at.desc"
   );
   if (targets instanceof Response) return targets;
-  return Response.json({
+  return privateJson({
     ok: true,
     profile: Array.isArray(profile.data) ? profile.data[0] ?? null : null,
     targets: Array.isArray(targets.data) ? targets.data : [],
@@ -78,19 +135,27 @@ export async function GET(request: Request) {
 }
 
 export async function POST(request: Request) {
-  let body: any;
-  try { body = await request.json(); } catch {
-    return Response.json({ ok: false, error: "INVALID_JSON" }, { status: 400 });
+  const contentType = request.headers.get("content-type") || "";
+  if (!/^application\/json(?:\s*;|$)/i.test(contentType)) {
+    return privateJson({ ok: false, error: "JSON_CONTENT_TYPE_REQUIRED" }, { status: 415 });
   }
+  const parsed = await readJsonLimited(request);
+  if (!parsed.ok) {
+    return privateJson(
+      { ok: false, error: parsed.reason === "TOO_LARGE" ? "REQUEST_TOO_LARGE" : "INVALID_JSON" },
+      { status: parsed.reason === "TOO_LARGE" ? 413 : 400 }
+    );
+  }
+  const body: any = parsed.value;
   if (!body || typeof body.profileData !== "object" || body.profileData === null || Array.isArray(body.profileData)) {
-    return Response.json({ ok: false, error: "PROFILE_DATA_REQUIRED" }, { status: 400 });
+    return privateJson({ ok: false, error: "PROFILE_DATA_REQUIRED" }, { status: 400 });
   }
   if (!Array.isArray(body.pathwayPreferences) || body.pathwayPreferences.some((x: unknown) => typeof x !== "string" || !PATHWAYS.has(x))) {
-    return Response.json({ ok: false, error: "INVALID_PATHWAY_PREFERENCES" }, { status: 400 });
+    return privateJson({ ok: false, error: "INVALID_PATHWAY_PREFERENCES" }, { status: 400 });
   }
-  if (body.consent !== true) return Response.json({ ok: false, error: "EXPLICIT_CONSENT_REQUIRED" }, { status: 400 });
+  if (body.consent !== true) return privateJson({ ok: false, error: "EXPLICIT_CONSENT_REQUIRED" }, { status: 400 });
   if (!Array.isArray(body.targets) || body.targets.length > 25) {
-    return Response.json({ ok: false, error: "TARGET_LIMIT_EXCEEDED" }, { status: 400 });
+    return privateJson({ ok: false, error: "TARGET_LIMIT_EXCEEDED" }, { status: 400 });
   }
   const targets = [];
   for (const target of body.targets) {
@@ -98,12 +163,17 @@ export async function POST(request: Request) {
         typeof target.providerName !== "string" || !target.providerName.trim() ||
         typeof target.programmeOrRole !== "string" || !target.programmeOrRole.trim() ||
         typeof target.pathwayType !== "string" || !PATHWAYS.has(target.pathwayType)) {
-      return Response.json({ ok: false, error: "INVALID_TARGET" }, { status: 400 });
+      return privateJson({ ok: false, error: "INVALID_TARGET" }, { status: 400 });
     }
     const url = typeof target.providerApplicationUrl === "string" && target.providerApplicationUrl.trim()
       ? target.providerApplicationUrl.trim() : null;
-    if (url && (!url.startsWith("https://") || url.length > 2048)) {
-      return Response.json({ ok: false, error: "TARGET_URL_MUST_BE_HTTPS" }, { status: 400 });
+    if (url) {
+      let parsedUrl: URL | null = null;
+      try { parsedUrl = new URL(url); } catch {}
+      if (!parsedUrl || parsedUrl.protocol !== "https:" || !parsedUrl.hostname ||
+          parsedUrl.username || parsedUrl.password || url.length > 2048) {
+        return privateJson({ ok: false, error: "TARGET_URL_MUST_BE_HTTPS" }, { status: 400 });
+      }
     }
     targets.push({
       target_key: typeof target.targetKey === "string" && target.targetKey.trim()
@@ -117,7 +187,7 @@ export async function POST(request: Request) {
   }
   const idempotencyKey = typeof body.idempotencyKey === "string" &&
     /^[a-zA-Z0-9._:-]{16,120}$/.test(body.idempotencyKey) ? body.idempotencyKey : null;
-  if (!idempotencyKey) return Response.json({ ok: false, error: "VALID_IDEMPOTENCY_KEY_REQUIRED" }, { status: 400 });
+  if (!idempotencyKey) return privateJson({ ok: false, error: "VALID_IDEMPOTENCY_KEY_REQUIRED" }, { status: 400 });
 
   const result = await candidateRequest(request, "rpc/save_candidate_master_application", {
     method: "POST",
@@ -145,7 +215,7 @@ export async function POST(request: Request) {
       applicationPreparations.push({ targetKey: target.target_key, ...(prepared.data as Record<string, unknown>) });
     }
   }
-  return Response.json({
+  return privateJson({
     ok: true,
     result: result.data,
     applicationPreparations,

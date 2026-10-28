@@ -8,6 +8,10 @@ on:
       - "apps/web/package-lock.json"
       - "apps/web/**"
       - "scripts/validators/validate-web-lockfile-consistency.mjs"
+      - "scripts/validators/validate-candidate-journey-security-boundary.mjs"
+      - "scripts/validators/validate-document-vault-edge-boundary.mjs"
+      - "package.json"
+      - "supabase/functions/candidate-private-documents/**"
       - ".github/workflows/web-reproducible-build.yml"
   push:
     branches:
@@ -50,4 +54,8 @@ jobs:
 
       - name: Build Next.js production application
         run: npm run build
+
+      - name: Validate candidate authentication, application, and Document Vault boundaries
+        working-directory: ${{ github.workspace }}
+        run: node scripts/validators/validate-candidate-journey-security-boundary.mjs && node scripts/validators/validate-document-vault-edge-boundary.mjs
 
