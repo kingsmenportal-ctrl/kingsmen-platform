@@ -10,7 +10,7 @@ const migration = fs.readFileSync(path.join(root, "supabase/migrations/202610281
 
 assert.match(edge, /finance_orders\?select=plan_code&order_ref=eq/, "checkout idempotency must resolve plan from the authoritative finance order");
 assert.doesNotMatch(edge, /payfast_payment_intents\?select=[^`]*plan_code/, "intent table must not be queried for a nonexistent plan_code column");
-assert.match(edge, /prior\.plan_code !== plan\.plan_code/, "edge handler must reject reuse across different plans");
+assert.match(edge, /priorPlanCode !== plan\.plan_code/, "edge handler must reject reuse across different plans using finance_orders");
 assert.match(edge, /idempotency_key_reused_for_different_plan/, "edge handler must expose a stable conflict code");
 assert.match(edge, /response\.ok && \(await response\.text\(\)\)\.trim\(\) === "VALID"/, "ITN must be validated by PayFast sandbox endpoint");
 assert.match(edge, /fields\.signature\.toLowerCase\(\), expectedSignature\.toLowerCase\(\)/, "ITN signature must be compared safely");
