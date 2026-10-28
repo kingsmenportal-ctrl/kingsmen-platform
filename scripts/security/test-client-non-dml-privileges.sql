@@ -20,17 +20,18 @@ begin
     end loop;
   end loop;
 
-  -- Default ACLs are independent of current table ACLs. Check each public-table creator context.
+  -- Default ACLs are independent of current table ACLs. PUBLIC also matters because
+  -- anon/authenticated inherit PUBLIC grants. Check both creator contexts and all grantees.
   for t in
     select d.defaclrole::regrole::text as creator_role,
-           r.rolname as grantee_role,
+           case when x.grantee = 0 then 'PUBLIC' else r.rolname end as grantee_role,
            x.privilege_type
     from pg_default_acl d
     cross join lateral aclexplode(d.defaclacl) x
-    join pg_roles r on r.oid = x.grantee
+    left join pg_roles r on r.oid = x.grantee
     where d.defaclnamespace = 'public'::regnamespace
       and d.defaclobjtype = 'r'
-      and r.rolname in ('anon', 'authenticated')
+      and (x.grantee = 0 or r.rolname in ('anon', 'authenticated'))
       and x.privilege_type in ('TRUNCATE', 'REFERENCES', 'TRIGGER', 'MAINTAIN')
   loop
     raise exception 'Creator role % still grants default % to % on public tables',
