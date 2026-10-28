@@ -22,7 +22,7 @@ if (origin.protocol !== 'https:' && !isLocalHost(origin.hostname)) {
   fail('BLOCKED_INSECURE_BASE_URL', 'HTTPS is required except for localhost.');
 }
 const approvedNetlifyHost = origin.hostname === 'kingsmen-portal-staging.netlify.app' ||
-  /^[a-z0-9-]+--kingsmen-portal-staging\\.netlify\\.app$/i.test(origin.hostname);
+  /^[a-z0-9-]+--kingsmen-portal-staging\.netlify\.app$/i.test(origin.hostname);
 if (!isLocalHost(origin.hostname) && !approvedNetlifyHost) {
   fail('BLOCKED_UNAPPROVED_APP_ORIGIN', 'The app origin must be the Kingsmen staging Netlify site or its branch deploy.');
 }
