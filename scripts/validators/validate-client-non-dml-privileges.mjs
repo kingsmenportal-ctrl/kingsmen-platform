@@ -13,7 +13,14 @@ for (const privilege of ["TRUNCATE", "REFERENCES", "TRIGGER", "MAINTAIN"]) {
   assert.match(runtimeTest, new RegExp(privilege, "i"), `runtime test must assert ${privilege} denial`);
 }
 assert.match(migration, /revoke[\s\S]*?from anon, authenticated/i, "current public tables must revoke client non-DML privileges");
-assert.match(migration, /alter default privileges for role postgres in schema public[\s\S]*?revoke[\s\S]*?from anon, authenticated/i, "future public tables must not inherit client non-DML privileges");
+for (const creatorRole of ["postgres", "supabase_admin"]) {
+  assert.match(
+    migration,
+    new RegExp(`alter default privileges for role ${creatorRole} in schema public[\\s\\S]*?revoke[\\s\\S]*?from anon, authenticated`, "i"),
+    `future public tables created by ${creatorRole} must not inherit client non-DML privileges`
+  );
+}
 assert.doesNotMatch(migration, /revoke all privileges|revoke all on table/i, "do not remove client DML grants without table-by-table review");
-assert.match(runtimeTest, /has_table_privilege[\s\S]*?raise exception/i, "runtime test must fail if any client privilege remains");
+assert.match(runtimeTest, /has_table_privilege[\s\S]*?raise exception/i, "runtime test must fail if any current client privilege remains");
+assert.match(runtimeTest, /pg_default_acl[\s\S]*?aclexplode[\s\S]*?raise exception/i, "runtime test must fail if creator default ACLs retain client non-DML privileges");
 console.log("Client non-DML privilege migration contract: PASS");
