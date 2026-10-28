@@ -76,7 +76,8 @@ These scripts inspect only. Do not put DDL application into the combined suite.
 npm run staging:e2e:validate
 export KINGSMEN_STAGING_BASE_URL='https://<verified-staging-origin>'
 export KINGSMEN_E2E_PLAN='manifests/staging/authenticated-e2e-plan-v1.json'
-# Inject three short-lived tokens from secret manager; do not paste literal values in history/logs.
+export KINGSMEN_E2E_SUPABASE_URL='https://euhubhhnumtibbyufghm.supabase.co'
+# Inject KINGSMEN_E2E_SUPABASE_ANON_KEY and three short-lived tokens through the secret manager; never paste literal secret values into history/logs.
 export KINGSMEN_E2E_CANDIDATE_A_TOKEN='<securely injected>'
 export KINGSMEN_E2E_CANDIDATE_B_TOKEN='<securely injected>'
 export KINGSMEN_E2E_REVIEWER_TOKEN='<securely injected>'
@@ -84,7 +85,7 @@ export KINGSMEN_E2E_ALLOW_MUTATIONS=true
 npm run staging:e2e
 ```
 
-Use mutations only with approved disposable fixtures, after the final route contract is confirmed. The generic runner does not provision identities or automatically carry response IDs between test cases; its checked-in template is a read-only auth preflight, not a completed full journey.
+Use mutations only with approved disposable fixtures, after the final route contract is confirmed. The runner supports two explicit targets: the verified Netlify app origin and the configured Supabase project origin restricted to `/functions/v1/`. Supabase-target cases must carry the anonymous public API key header; the key must be injected through `KINGSMEN_E2E_SUPABASE_ANON_KEY` and never printed. The generic runner does not provision identities or automatically carry response IDs between test cases; this plan is a read-only auth/authorization preflight, not a completed save/update/reload/reviewer decision journey.
 
 ## 6. Netlify commit binding
 
