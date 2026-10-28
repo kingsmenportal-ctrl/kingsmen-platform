@@ -33,6 +33,58 @@ function safeFilename(value: unknown): string {
   if (typeof value !== "string") return "";
   return value.normalize("NFKC").replace(/[\/\\\x00-\x1f\x7f]/g, "_").trim().slice(0,180);
 }
+type BoundedJsonResult =
+  | { ok: true; value: Record<string, unknown> }
+  | { ok: false; status: 400 | 413 | 415; error: string };
+
+async function readBoundedJson(req: Request, maxBytes = 16 * 1024): Promise<BoundedJsonResult> {
+  const contentType = req.headers.get("content-type") ?? "";
+  if (!/^application\/json(?:\s*;|$)/i.test(contentType)) {
+    return { ok: false, status: 415, error: "Content-Type must be application/json." };
+  }
+  const declaredLength = req.headers.get("content-length");
+  if (declaredLength !== null) {
+    const declared = Number(declaredLength);
+    if (!Number.isSafeInteger(declared) || declared < 0) {
+      return { ok: false, status: 400, error: "Content-Length is invalid." };
+    }
+    if (declared > maxBytes) {
+      return { ok: false, status: 413, error: "Request body exceeds the 16 KiB limit." };
+    }
+  }
+  if (!req.body) return { ok: false, status: 400, error: "Request body must be valid JSON." };
+  const reader = req.body.getReader();
+  const chunks: Uint8Array[] = [];
+  let total = 0;
+  try {
+    while (true) {
+      const { done, value } = await reader.read();
+      if (done) break;
+      total += value.byteLength;
+      if (total > maxBytes) {
+        await reader.cancel("Request body exceeds the 16 KiB limit.");
+        return { ok: false, status: 413, error: "Request body exceeds the 16 KiB limit." };
+      }
+      chunks.push(value);
+    }
+    const bytes = new Uint8Array(total);
+    let offset = 0;
+    for (const chunk of chunks) {
+      bytes.set(chunk, offset);
+      offset += chunk.byteLength;
+    }
+    const value: unknown = JSON.parse(new TextDecoder("utf-8", { fatal: true }).decode(bytes));
+    if (!value || typeof value !== "object" || Array.isArray(value)) {
+      return { ok: false, status: 400, error: "Request body must be a JSON object." };
+    }
+    return { ok: true, value: value as Record<string, unknown> };
+  } catch {
+    return { ok: false, status: 400, error: "Request body must be valid JSON." };
+  } finally {
+    try { reader.releaseLock(); } catch { /* stream may already be cancelled */ }
+  }
+}
+
 Deno.serve(async (req: Request) => {
   const origin = req.headers.get("Origin");
   if (origin && !isAllowedOrigin(origin)) return reply(403, { error: "Origin not allowed." }, null);
@@ -50,8 +102,9 @@ Deno.serve(async (req: Request) => {
   const auth = createClient(URL, ANON, { auth: { persistSession: false, autoRefreshToken: false } });
   const { data: authData, error: authError } = await auth.auth.getUser(token);
   if (authError || !authData.user) return reply(401, { error: "Your session is invalid or expired. Sign in again." }, origin);
-  let p: Record<string,unknown>;
-  try { p = await req.json(); } catch { return reply(400, { error: "Request body must be valid JSON." }, origin); }
+  const parsed = await readBoundedJson(req);
+  if (!parsed.ok) return reply(parsed.status, { error: parsed.error }, origin);
+  const p = parsed.value;
   const admin = createClient(URL, SERVICE, { auth: { persistSession: false, autoRefreshToken: false } });
 
   // Reviewer queue and read access are gated independently of candidate identity.
