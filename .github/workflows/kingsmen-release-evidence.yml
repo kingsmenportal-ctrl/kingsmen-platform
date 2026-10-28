@@ -2,7 +2,7 @@ name: Kingsmen Release Evidence
 
 on:
   pull_request:
-    branches: [main]
+    branches: [main, "release/**"]
   push:
     branches: [main]
   workflow_dispatch:
@@ -39,6 +39,18 @@ jobs:
 
       - name: Build backend API
         run: npm run api:build
+
+      - name: Prove production refuses memory-only Truth Vault
+        run: node scripts/ci/test-api-production-storage-guard.mjs
+
+      - name: Validate identity-review least-privilege contract
+        run: npm run security:validate:identity-review
+
+      - name: Validate private candidate identity helper boundary
+        run: node scripts/validators/validate-private-candidate-identity-helper.mjs
+
+      - name: Validate unified candidate master application contract
+        run: node scripts/validators/validate-unified-master-application.mjs
 
       - name: Install web dependencies
         run: npm install --prefix apps/web --no-audit --no-fund
