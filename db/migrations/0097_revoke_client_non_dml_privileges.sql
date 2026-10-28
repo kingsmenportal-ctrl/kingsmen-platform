@@ -14,7 +14,7 @@ begin
     order by tablename
   loop
     execute format(
-      'revoke truncate, references, trigger, maintain on table %I.%I from anon, authenticated',
+      'revoke truncate, references, trigger, maintain on table %I.%I from PUBLIC, anon, authenticated',
       t.schemaname, t.tablename
     );
   end loop;
@@ -24,8 +24,8 @@ $$;
 -- Both roles have public-table default ACLs in the live staging database.
 -- Harden both creator contexts so the result does not depend on which migration owner runs DDL.
 alter default privileges for role postgres in schema public
-  revoke truncate, references, trigger, maintain on tables from anon, authenticated;
+  revoke truncate, references, trigger, maintain on tables from PUBLIC, anon, authenticated;
 alter default privileges for role supabase_admin in schema public
-  revoke truncate, references, trigger, maintain on tables from anon, authenticated;
+  revoke truncate, references, trigger, maintain on tables from PUBLIC, anon, authenticated;
 
 commit;
