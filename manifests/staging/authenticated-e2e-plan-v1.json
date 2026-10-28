@@ -1,11 +1,13 @@
 {
   "schema": "kingsmen.staging-e2e-plan.v1",
-  "purpose": "Read-only auth/authorization preflight. This is not full candidate-to-reviewer E2E; no writes occur.",
+  "purpose": "Read-only auth/authorization preflight across the Netlify application origin and the separately allow-listed Supabase Edge Functions origin. No writes occur; not full candidate-to-reviewer E2E.",
   "requiresHumanPreflight": [
     "Confirm live published deployment commit matches the approved RC1 SHA.",
     "Confirm Candidate A and Candidate B are separate authorised synthetic accounts and candidate identities are verified through the reviewed workflow.",
     "Confirm reviewer has the dedicated least-privilege identity-review role under final integrated PR #190 contract; do not use PLATFORM_ADMIN merely to satisfy an older route.",
-    "Confirm all route paths and expected status values against the deployed build before execution."
+    "Confirm all route paths and expected status values against the deployed build before execution.",
+    "Inject KINGSMEN_E2E_SUPABASE_URL for the exact staging Supabase project and KINGSMEN_E2E_SUPABASE_ANON_KEY through the secret manager; never log either value.",
+    "Confirm the deployed candidate app routes exist after PR #120/#121/#190/#202 are integrated. This is a post-integration preflight, not proof those routes exist on today's RC1 base."
   ],
   "cases": [
     {
@@ -48,10 +50,9 @@
       "id": "anon-reviewer-queue-denied",
       "role": "anonymous",
       "method": "GET",
-      "path": "/api/reviewer/identity-review",
+      "path": "/functions/v1/candidate-identity-review-queue",
       "expectedStatus": 401,
-      "assertJsonPath": "ok",
-      "equals": false
+      "target": "supabase"
     },
     {
       "id": "candidate-a-workspace-own-scope",
@@ -111,28 +112,25 @@
       "id": "candidate-a-cannot-open-reviewer-queue",
       "role": "candidate_a",
       "method": "GET",
-      "path": "/api/reviewer/identity-review",
+      "path": "/functions/v1/candidate-identity-review-queue",
       "expectedStatus": 403,
-      "assertJsonPath": "ok",
-      "equals": false
+      "target": "supabase"
     },
     {
       "id": "candidate-b-cannot-open-reviewer-queue",
       "role": "candidate_b",
       "method": "GET",
-      "path": "/api/reviewer/identity-review",
+      "path": "/functions/v1/candidate-identity-review-queue",
       "expectedStatus": 403,
-      "assertJsonPath": "ok",
-      "equals": false
+      "target": "supabase"
     },
     {
       "id": "reviewer-can-open-authorized-queue",
       "role": "reviewer",
       "method": "GET",
-      "path": "/api/reviewer/identity-review",
+      "path": "/functions/v1/candidate-identity-review-queue",
       "expectedStatus": 200,
-      "assertJsonPath": "ok",
-      "equals": true
+      "target": "supabase"
     }
   ]
 }
