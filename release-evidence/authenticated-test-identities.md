@@ -49,7 +49,8 @@ Identity linking must use the authenticated Supabase user UUID / auth subject, n
 npm run staging:e2e:validate
 export KINGSMEN_STAGING_BASE_URL='https://<verified-staging-origin>'
 export KINGSMEN_E2E_PLAN='manifests/staging/authenticated-e2e-plan-v1.json'
-# Inject tokens from a secret manager; never paste their values into the terminal command.
+export KINGSMEN_E2E_SUPABASE_URL='https://euhubhhnumtibbyufghm.supabase.co'
+# Inject KINGSMEN_E2E_SUPABASE_ANON_KEY and role-specific tokens through the secret manager; never paste values in the shell command.
 npm run staging:e2e
 ```
 
