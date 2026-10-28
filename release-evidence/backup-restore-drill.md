@@ -26,8 +26,8 @@ $env:KINGSMEN_BACKUP_ROOT = 'D:\\KingsmenBackups'
 .\\scripts\\backup\\New-KingsmenTruthVaultBackup.ps1
 ```
 
-The script runs pg_dump custom format and writes a redacted manifest and SHA-256. Then:
-- confirm archive exists, is non-zero, manifest says `BACKUP_CREATED` and size matches;
+The script runs `pg_dump --format=custom --no-owner` and writes a redacted manifest and SHA-256. Database/object ACL statements are retained in the dump; object ownership is normalized on restore. The archive contains sensitive candidate data and the script does not encrypt it. Use only an encrypted, access-controlled storage target; never commit the archive to Git. Then:
+- confirm archive exists, is non-zero, manifest says `BACKUP_CREATED`, `databaseAndObjectACLsCaptured=true`, `archiveContainsSensitiveCandidateData=true`, `manifestContainsCandidateRows=false`, and size matches;
 - independently run `Get-FileHash -Algorithm SHA256 <archive>` and compare;
 - run `pg_restore --list <archive>`; retain non-sensitive exit result/TOC in restricted evidence;
 - make encrypted offsite copy, verify copied checksum, and record storage/retention location outside Git;
@@ -49,7 +49,7 @@ $backup = 'D:\\KingsmenBackups\\<timestamp>\\kingsmen-truth-vault-<timestamp>.du
 if ($LASTEXITCODE -ne 0) { throw 'Restore drill failed; preserve report and stop.' }
 ```
 
-Use `pg_restore --exit-on-error --single-transaction` so a failed restore does not leave a partially restored schema. The revised script must verify archive readability, target identity, core table presence and count query success; any failure means `passed=false` and exit non-zero.
+The revised restore script requires the sibling manifest, verifies manifest schema/status, checks archive SHA-256 and size, checks `pg_restore --list`, and fingerprints source/restore database identity before any write. It uses `pg_restore --clean --if-exists --exit-on-error --single-transaction --no-owner` and intentionally does not pass `--no-privileges`: grants and default ACL statements in the archive are replayed. Ownership is normalized and must be verified separately. The script verifies core table presence and count query success; any failure means `passed=false` and exit non-zero. It does not claim row-by-row equivalence.
 
 Core count-only table set: candidates, applications, idempotency_keys, command_log, workflow_runs, evidence_ledger, audit_events, dead_letter_queue, approval_requests. These are sanity checks, not a row-by-row data equivalence proof. Also compare schema/migration ledger and key catalog inventory.
 
