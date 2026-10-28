@@ -37,14 +37,16 @@ const checks = [
   [upload.includes("readLimitedJson(request, 16 * 1024)") && upload.includes("AUTHENTICATION_REQUIRED"), "upload-url API is bounded and authenticated"],
   [finalize.includes("readLimitedJson(request, 16 * 1024)") && finalize.includes("AUTHENTICATION_REQUIRED"), "finalize API is bounded and authenticated"],
   [download.includes("readLimitedJson(request, 16 * 1024)") && download.includes("AUTHENTICATION_REQUIRED"), "download-url API is bounded and authenticated"],
-  [upload.includes('"Cache-Control": "no-store"') && finalize.includes('"Cache-Control": "no-store"') && download.includes('"Cache-Control": "no-store"'), "document responses disable caching"],
+  [upload.includes('headers.set("Cache-Control", "private, no-store, max-age=0")') && finalize.includes('headers.set("Cache-Control", "private, no-store, max-age=0")') && download.includes('headers.set("Cache-Control", "private, no-store, max-age=0")'), "all document API success and error responses prohibit caching"],
+  [upload.includes('headers.set("Vary", "Authorization")') && finalize.includes('headers.set("Vary", "Authorization")') && download.includes('headers.set("Vary", "Authorization")'), "all document API responses vary by authorization"],
+  [upload.split("return Response.json(").length - 1 === 1 && finalize.split("return Response.json(").length - 1 === 1 && download.split("return Response.json(").length - 1 === 1, "all document API responses pass through privacy-header wrappers"],
   [vault.includes("actualSize !== Number(doc.size_bytes)") && vault.includes("signatureValid"), "vault checks actual file size and signature"],
   [vault.includes('event_type: "READ_LINK_ISSUED"') && vault.includes("if (auditError)"), "download link audit fails closed"],
   [vault.includes("createSignedUrl(doc.storage_path, 60"), "download link expires after 60 seconds"],
   [["HIGHER_EDUCATION", "TVET", "SETA_LEARNERSHIP", "INTERNSHIP", "APPRENTICESHIP", "EMPLOYMENT"].every(pathway => workbenchPage.includes(pathway)), "candidate workbench represents all six national pathways"],
   [workbenchPage.includes("provider-confirmed") && workbenchPage.includes("candidate-reported"), "workbench distinguishes candidate-reported from provider-confirmed state"],
   [workbenchPage.includes("programme choices") || workbenchPage.includes("programme choice"), "workbench communicates parent application and programme-choice model"],
-  [entry.includes("/candidate/workbench") && entry.includes("/candidate/login"), "candidate entry connects to the authenticated workbenchPage and login"]
+  [entry.includes("/candidate/workbench") && entry.includes("/candidate/login"), "candidate entry connects to the authenticated workbench and login"]
 ];
 for (const [passed, description] of checks) assert.ok(passed, description);
 console.log(`PASS candidate journey security contract (${checks.length} assertions)`);
