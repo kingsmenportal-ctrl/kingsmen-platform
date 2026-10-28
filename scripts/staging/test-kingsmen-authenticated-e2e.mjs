@@ -105,6 +105,22 @@ try {
   assert.ok(crossOrigin.stderr.includes('BLOCKED_CROSS_ORIGIN_CASE'));
   assert.equal(requests + supabaseRequests, beforeInvalid, 'cross-origin plan must fail before network I/O');
 
+  const unapprovedAppOrigin = await run([{ id: 'app-host-rejected', role: 'anonymous', path: '/x', expectedStatus: 200 }], {
+    KINGSMEN_STAGING_BASE_URL: 'https://example.invalid'
+  });
+  assert.equal(unapprovedAppOrigin.status, 2, 'app target must be pinned to Kingsmen staging');
+  assert.ok(unapprovedAppOrigin.stderr.includes('BLOCKED_UNAPPROVED_APP_ORIGIN'));
+  assert.equal(requests + supabaseRequests, beforeInvalid, 'unapproved app origin must fail before network I/O');
+
+  const unapprovedSupabaseOrigin = await run([
+    { id: 'supabase-host-rejected', target: 'supabase', role: 'anonymous', path: '/functions/v1/test', expectedStatus: 200 }
+  ], {
+    KINGSMEN_E2E_SUPABASE_URL: 'https://example.invalid'
+  });
+  assert.equal(unapprovedSupabaseOrigin.status, 2, 'Supabase target must be pinned to Kingsmen staging');
+  assert.ok(unapprovedSupabaseOrigin.stderr.includes('BLOCKED_UNAPPROVED_SUPABASE_ORIGIN'));
+  assert.equal(requests + supabaseRequests, beforeInvalid, 'unapproved Supabase origin must fail before network I/O');
+
   const invalidTimeout = await run([{ id: 'timeout', role: 'anonymous', path: '/x', expectedStatus: 200 }], { KINGSMEN_E2E_TIMEOUT_MS: '999999' });
   assert.equal(invalidTimeout.status, 2, 'timeout must be bounded');
   assert.ok(invalidTimeout.stderr.includes('BLOCKED_INVALID_TIMEOUT'));
@@ -113,8 +129,8 @@ try {
     schema: 'kingsmen.staging-e2e-unit-tests.v1',
     status: 'PASSED',
     passed: true,
-    assertions: 22,
-    scenarios: ['HTTP status + JSON assertion', 'response-body redaction', 'whole-plan preflight', 'mutation opt-in', 'reviewer session requirement', 'bounded timeout', 'separate Supabase function origin', 'Supabase apikey forwarding', 'Supabase path-prefix boundary', 'app origin boundary']
+    assertions: 28,
+    scenarios: ['HTTP status + JSON assertion', 'response-body redaction', 'whole-plan preflight', 'mutation opt-in', 'reviewer session requirement', 'bounded timeout', 'separate Supabase function origin', 'Supabase apikey forwarding', 'Supabase path-prefix boundary', 'app origin boundary', 'app host allowlist', 'Supabase host allowlist']
   }, null, 2));
 } catch (error) {
   console.error(error);
