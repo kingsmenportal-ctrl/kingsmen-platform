@@ -7,7 +7,7 @@ Status: **technically examined; independent approval absent; do not merge/apply 
 
 Candidate file: `db/migrations/0097_revoke_client_non_dml_privileges.sql`  
 PR: https://github.com/kingsmenportal-ctrl/kingsmen-platform/pull/206  
-Head at the last connected check: `9079794bc02990a7888ab14508b26c31d2aae1a9`. Re-fetch the latest head before independent review; any push changes the review target.
+Current head at last connected check: `9079794bc02990a7888ab14508b26c31d2aae1a9`. Re-fetch before review; any push changes the review target. Current-head checks passed: Identity Review Authorization Contract run 83 (`40732315531`), Jarvis Live Runtime run 1518 (`40732315650`), and Kingsmen Release Evidence run 730 (`40732315671`).
 
 The SQL transaction revokes only `TRUNCATE`, `REFERENCES`, `TRIGGER` and `MAINTAIN` from `PUBLIC`, `anon` and `authenticated` for public tables listed by `pg_tables`, then adjusts public table default ACLs for creator roles `postgres` and `supabase_admin`, also revoking from `PUBLIC`. It intentionally guards inherited grants as well as direct grants. It intends to preserve `SELECT/INSERT/UPDATE/DELETE` grants and existing RLS semantics.
 
@@ -127,7 +127,7 @@ The catalog assertion alone does not prove the DML baseline was preserved. Compa
 
 1. No independent approval for the exact latest PR #206 diff; the only submitted review at last inspection was a COMMENTED author review.
 2. No demonstrated backup/restore drill; Supabase branch inventory showed only `main` with `with_data=false`.
-3. Fresh exact-head checks must be confirmed after latest changes.
+3. The three current-head workflows above passed. If the PR head changes, rerun and re-verify the checks against the new exact SHA.
 4. No post-application evidence exists because 0097 remains unapplied.
 5. DML grant comparison and regression suites remain to be run after approved application.
 
