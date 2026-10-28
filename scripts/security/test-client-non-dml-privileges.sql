@@ -1,4 +1,4 @@
--- Run after migration 0097 in staging. Fails closed if a client role retains a non-DML privilege.
+-- Run after migration 0097 in staging. Fails closed if current grants or creator defaults retain client non-DML privileges.
 do $$
 declare
   t record;
@@ -18,6 +18,23 @@ begin
         end if;
       end loop;
     end loop;
+  end loop;
+
+  -- Default ACLs are independent of current table ACLs. Check each public-table creator context.
+  for t in
+    select d.defaclrole::regrole::text as creator_role,
+           r.rolname as grantee_role,
+           x.privilege_type
+    from pg_default_acl d
+    cross join lateral aclexplode(d.defaclacl) x
+    join pg_roles r on r.oid = x.grantee
+    where d.defaclnamespace = 'public'::regnamespace
+      and d.defaclobjtype = 'r'
+      and r.rolname in ('anon', 'authenticated')
+      and x.privilege_type in ('TRUNCATE', 'REFERENCES', 'TRIGGER', 'MAINTAIN')
+  loop
+    raise exception 'Creator role % still grants default % to % on public tables',
+      t.creator_role, t.privilege_type, t.grantee_role;
   end loop;
 end
 $$;
