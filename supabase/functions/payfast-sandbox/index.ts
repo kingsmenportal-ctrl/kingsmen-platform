@@ -107,9 +107,13 @@ async function checkout(request: Request, body: Record<string, unknown>) {
     return json({ error: "plan_not_payable_through_payfast" }, 400);
   }
 
-  const existing = await rest(`payfast_payment_intents?select=intent_ref,merchant_reference,payment_url,signed_payload,signature,intent_status,idempotency_key&candidate_ref=eq.${encodeURIComponent(candidateId)}&idempotency_key=eq.${encodeURIComponent(idem)}&limit=1`);
+  const existing = await rest(`payfast_payment_intents?select=intent_ref,merchant_reference,payment_url,signed_payload,signature,intent_status,idempotency_key,plan_code&candidate_ref=eq.${encodeURIComponent(candidateId)}&idempotency_key=eq.${encodeURIComponent(idem)}&limit=1`);
   if (Array.isArray(existing) && existing.length) {
     const prior = existing[0];
+    // An idempotency key is bound to one plan; never silently return a different purchase.
+    if (prior.plan_code !== plan.plan_code) {
+      return json({ error: "idempotency_key_reused_for_different_plan" }, 409);
+    }
     const priorFields = prior.signed_payload && typeof prior.signed_payload === "object"
       ? prior.signed_payload as Record<string, string> : {};
     return json({ intent: { intentRef: prior.intent_ref, merchantReference: prior.merchant_reference,
