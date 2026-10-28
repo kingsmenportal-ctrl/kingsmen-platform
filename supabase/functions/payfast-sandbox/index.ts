@@ -278,8 +278,8 @@ async function receiveItn(request: Request) {
   });
   if (!accepted || !intent) return new Response("INVALID", { status: 400, headers: { "content-type": "text/plain", "cache-control": "no-store" } });
 
-  const existing = await rest(`finance_payments?select=id&provider=eq.PAYFAST&provider_payment_id=eq.${encodeURIComponent(providerPaymentId)}&limit=1`);
-  if (Array.isArray(existing) && existing.length) return new Response("OK", { status: 200, headers: { "content-type": "text/plain" } });
+  // Always call the settlement RPC, including replays. Its idempotent branch repairs
+  // any interrupted legacy activation while guaranteeing no duplicate payment row.
 
   const paymentRef = ref("pay");
   const paymentEvidenceRef = ref("pay_ev");
