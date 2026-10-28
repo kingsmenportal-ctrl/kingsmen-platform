@@ -27,7 +27,7 @@ $env:KINGSMEN_BACKUP_ROOT = "D:\KingsmenBackups"
 .\scripts\backup\New-KingsmenTruthVaultBackup.ps1
 ```
 
-The backup script writes a local backup archive and a redacted local manifest. It uses `pg_dump` in custom format and computes a SHA-256 checksum.
+The backup script writes a local backup archive and a redacted manifest. It uses `pg_dump` in custom format, captures database/object ACL statements, and computes a SHA-256 checksum. The archive contains sensitive candidate data; the manifest does not contain candidate rows. The script does not encrypt the archive, so the operator must store it only on encrypted, access-controlled storage and transfer it through an approved secure channel. `--no-owner` normalizes ownership during restore; it does not mean object grants are omitted.
 
 ## Restore drill command
 
@@ -38,7 +38,7 @@ $env:KINGSMEN_RESTORE_DRILL_DATABASE_URL = "[restore-drill-database-url-set-outs
 .\scripts\backup\Test-KingsmenTruthVaultRestore.ps1 -BackupFile "D:\KingsmenBackups\kingsmen-truth-vault-....dump"
 ```
 
-The restore script uses `pg_restore` for the staging restore drill and refuses to run if the restore target equals the source database URL. It writes a counts-only restore drill report.
+The restore script requires and validates the companion backup manifest, checks archive SHA-256/size and `pg_restore --list`, checks source/restore DB fingerprints, then runs `pg_restore --exit-on-error --single-transaction --no-owner` so object ACL statements from the archive are not silently omitted. It fails closed on restore/table/count checks and writes a counts-only report. Ownership is normalized, so record that as a limitation and separately verify schema/object grants and RLS after the restore.
 
 ## Source-level proof commands
 
