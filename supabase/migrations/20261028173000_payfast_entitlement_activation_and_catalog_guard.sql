@@ -146,6 +146,7 @@ declare
   v_intent public.payfast_payment_intents%rowtype;
   v_existing public.finance_payments%rowtype;
   v_service_order public.candidate_service_orders%rowtype;
+  v_was_pending boolean := false;
   v_now timestamptz := now();
 begin
   if coalesce(p_merchant_reference,'') = '' or coalesce(p_provider_payment_id,'') = '' then
@@ -178,17 +179,19 @@ begin
        or v_existing.amount_gross_cents <> p_amount_gross_cents then
       raise exception 'provider_payment_id_conflict';
     end if;
-    if v_service_order.status <> 'PAID' then
+    v_was_pending := v_service_order.status = 'PENDING_PAYMENT';
+    if v_was_pending then
       update public.candidate_service_orders set status='PAID',paid_at=v_now,updated_at=v_now
        where id=v_service_order.id and status='PENDING_PAYMENT';
+      if not found then raise exception 'service_entitlement_activation_failed'; end if;
+      update public.candidates set active_package_code=v_service_order.package_code,updated_at=v_now
+       where id=v_service_order.candidate_id;
+      if not found then raise exception 'candidate_activation_target_missing'; end if;
     end if;
     update public.finance_orders set order_status='PAID',updated_at=v_now where order_ref=v_intent.order_ref;
     update public.finance_invoices set invoice_status='PAID',paid_at=coalesce(paid_at,v_now)
      where invoice_ref=v_intent.invoice_ref;
     update public.payfast_payment_intents set intent_status='PAID',updated_at=v_now where intent_ref=v_intent.intent_ref;
-    update public.candidates set active_package_code=v_service_order.package_code,updated_at=v_now
-     where id=v_service_order.candidate_id;
-    if not found then raise exception 'candidate_activation_target_missing'; end if;
     return jsonb_build_object('status','already_settled','payment_ref',v_existing.payment_ref,
       'entitlementActivated',true);
   end if;
