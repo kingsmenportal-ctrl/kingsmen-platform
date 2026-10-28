@@ -4,7 +4,6 @@ set -uo pipefail
 # Execute only in a clean detached checkout of the explicitly approved immutable RC1.
 # EXPECTED_RC1_SHA must come from the release decision record; RC1_SHA must equal it.
 # This script never creates identities, applies migrations, or deploys.
-# This script never creates identities, applies migrations, or deploys.
 
 fail() { printf 'FATAL: %s\n' "$*" >&2; exit 2; }
 [[ "${EXPECTED_RC1_SHA:-}" =~ ^[0-9a-f]{40}$ ]] || fail "Set EXPECTED_RC1_SHA from the approved release record."
