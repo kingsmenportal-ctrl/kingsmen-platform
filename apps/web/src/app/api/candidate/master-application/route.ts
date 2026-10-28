@@ -126,7 +126,7 @@ export async function GET(request: Request) {
 
 export async function POST(request: Request) {
   const contentType = request.headers.get("content-type") || "";
-  if (!/^application\\/json(?:\\s*;|$)/i.test(contentType)) {
+  if (!/^application\/json(?:\s*;|$)/i.test(contentType)) {
     return Response.json({ ok: false, error: "JSON_CONTENT_TYPE_REQUIRED" }, { status: 415 });
   }
   const parsed = await readJsonLimited(request);
