@@ -9,7 +9,7 @@ const [login, master, parser, upload, finalize, download, vault, workbenchPage, 
   read("../../apps/web/src/app/api/candidate/documents/finalize/route.ts"),
   read("../../apps/web/src/app/api/candidate/documents/read-url/route.ts"),
   read("../../supabase/functions/candidate-private-documents/index.ts"),
-  read("../../apps/web/src/app/candidate/workbenchPage/page.tsx"),
+  read("../../apps/web/src/app/candidate/workbench/page.tsx"),
   read("../../apps/web/src/app/candidate/page.tsx")
 ]);
 const checks = [
@@ -38,10 +38,10 @@ const checks = [
   [vault.includes("actualSize !== Number(doc.size_bytes)") && vault.includes("signatureValid"), "vault checks actual file size and signature"],
   [vault.includes('event_type: "READ_LINK_ISSUED"') && vault.includes("if (auditError)"), "download link audit fails closed"],
   [vault.includes("createSignedUrl(doc.storage_path, 60"), "download link expires after 60 seconds"],
-  ["HIGHER_EDUCATION", "TVET", "SETA_LEARNERSHIP", "INTERNSHIP", "APPRENTICESHIP", "EMPLOYMENT"].every(pathway => workbenchPage.includes(pathway)), "candidate workbenchPage represents all six national pathways"],
-  [workbenchPage.includes("provider-confirmed") && workbenchPage.includes("candidate-reported"), "workbenchPage distinguishes candidate-reported from provider-confirmed state"],
-  [workbenchPage.includes("programme choices") || workbenchPage.includes("programme choice"), "workbenchPage communicates parent application and programme-choice model"],
-  [entry.includes("/candidate/workbenchPage") && entry.includes("/candidate/login"), "candidate entry connects to the authenticated workbenchPage and login"]
+  [["HIGHER_EDUCATION", "TVET", "SETA_LEARNERSHIP", "INTERNSHIP", "APPRENTICESHIP", "EMPLOYMENT"].every(pathway => workbenchPage.includes(pathway)), "candidate workbench represents all six national pathways"],
+  [workbenchPage.includes("provider-confirmed") && workbenchPage.includes("candidate-reported"), "workbench distinguishes candidate-reported from provider-confirmed state"],
+  [workbenchPage.includes("programme choices") || workbenchPage.includes("programme choice"), "workbench communicates parent application and programme-choice model"],
+  [entry.includes("/candidate/workbench") && entry.includes("/candidate/login"), "candidate entry connects to the authenticated workbenchPage and login"]
 ];
 for (const [passed, description] of checks) assert.ok(passed, description);
 console.log(`PASS candidate journey security contract (${checks.length} assertions)`);
