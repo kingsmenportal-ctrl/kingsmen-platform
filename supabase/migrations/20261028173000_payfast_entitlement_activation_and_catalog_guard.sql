@@ -159,6 +159,9 @@ begin
   if v_intent.currency <> 'ZAR' or v_intent.amount_cents <> p_amount_gross_cents then
     raise exception 'payment_amount_or_currency_mismatch';
   end if;
+  if p_amount_fee_cents < 0 or p_amount_net_cents < 0 or p_amount_fee_cents + p_amount_net_cents <> p_amount_gross_cents then
+    raise exception 'payment_amount_breakdown_mismatch';
+  end if;
   select * into v_service_order from public.candidate_service_orders
    where order_ref=v_intent.order_ref and candidate_id=v_intent.candidate_ref::uuid for update;
   if not found then raise exception 'candidate_service_order_missing'; end if;
@@ -179,8 +182,13 @@ begin
       update public.candidate_service_orders set status='PAID',paid_at=v_now,updated_at=v_now
        where id=v_service_order.id and status='PENDING_PAYMENT';
     end if;
+    update public.finance_orders set order_status='PAID',updated_at=v_now where order_ref=v_intent.order_ref;
+    update public.finance_invoices set invoice_status='PAID',paid_at=coalesce(paid_at,v_now)
+     where invoice_ref=v_intent.invoice_ref;
+    update public.payfast_payment_intents set intent_status='PAID',updated_at=v_now where intent_ref=v_intent.intent_ref;
     update public.candidates set active_package_code=v_service_order.package_code,updated_at=v_now
      where id=v_service_order.candidate_id;
+    if not found then raise exception 'candidate_activation_target_missing'; end if;
     return jsonb_build_object('status','already_settled','payment_ref',v_existing.payment_ref,
       'entitlementActivated',true);
   end if;
