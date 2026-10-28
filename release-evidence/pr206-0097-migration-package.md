@@ -7,9 +7,9 @@ Status: **technically examined; independent approval absent; do not merge/apply 
 
 Candidate file: `db/migrations/0097_revoke_client_non_dml_privileges.sql`  
 PR: https://github.com/kingsmenportal-ctrl/kingsmen-platform/pull/206  
-Reported head at last inspection: `ea1a31e6c2fa4e68618785ad70581538a8f6e266`. Re-fetch the head before independent review; any push changes the review target.
+Head at the last connected check: `9079794bc02990a7888ab14508b26c31d2aae1a9`. Re-fetch the latest head before independent review; any push changes the review target.
 
-The SQL transaction revokes only `TRUNCATE`, `REFERENCES`, `TRIGGER` and `MAINTAIN` from `anon` and `authenticated` for public tables listed by `pg_tables`, then adjusts public table default ACLs for creator roles `postgres` and `supabase_admin`. It intends to preserve `SELECT/INSERT/UPDATE/DELETE` grants and existing RLS semantics.
+The SQL transaction revokes only `TRUNCATE`, `REFERENCES`, `TRIGGER` and `MAINTAIN` from `PUBLIC`, `anon` and `authenticated` for public tables listed by `pg_tables`, then adjusts public table default ACLs for creator roles `postgres` and `supabase_admin`, also revoking from `PUBLIC`. It intentionally guards inherited grants as well as direct grants. It intends to preserve `SELECT/INSERT/UPDATE/DELETE` grants and existing RLS semantics.
 
 This is a technical scope review, **not** the required independent reviewer approval.
 
@@ -22,7 +22,7 @@ Read-only query on staging project `euhubhhnumtibbyufghm`, PostgreSQL `17.11.0.0
 | `anon` | 230 | 171 | 171 | 171 | 172 |
 | `authenticated` | 230 | 181 | 181 | 181 | 182 |
 
-Read-only default-ACL inspection independently found all four non-DML privilege types granted to both client roles in public table defaults for both `postgres` and `supabase_admin`. This is a misconfiguration, not evidence of exploitation.
+Read-only default-ACL inspection independently found all four non-DML privilege types granted to both client roles in public table defaults for both `postgres` and `supabase_admin`. Direct `PUBLIC` ACL counts for these four privileges were zero on current public relations and zero in public table defaults; the migration now explicitly revokes from `PUBLIC` as a future-proof guard. This is a misconfiguration, not evidence of exploitation.
 
 ## Dry-run: no DDL against staging
 
