@@ -1,14 +1,16 @@
 import assert from "node:assert/strict";
 import { readFile } from "node:fs/promises";
 const read = (path) => readFile(new URL(path, import.meta.url), "utf8");
-const [login, master, parser, upload, finalize, download, vault] = await Promise.all([
+const [login, master, parser, upload, finalize, download, vault, workbench, entry] = await Promise.all([
   read("../../apps/web/src/app/candidate/login/page.tsx"),
   read("../../apps/web/src/app/api/candidate/master-application/route.ts"),
   read("../../apps/web/src/lib/read-limited-json.ts"),
   read("../../apps/web/src/app/api/candidate/documents/upload-url/route.ts"),
   read("../../apps/web/src/app/api/candidate/documents/finalize/route.ts"),
   read("../../apps/web/src/app/api/candidate/documents/read-url/route.ts"),
-  read("../../supabase/functions/candidate-private-documents/index.ts")
+  read("../../supabase/functions/candidate-private-documents/index.ts"),
+  read("../../apps/web/src/app/candidate/workbench/page.tsx"),
+  read("../../apps/web/src/app/candidate/page.tsx")
 ]);
 const checks = [
   [login.includes("/auth/v1/token?grant_type=password"), "password sign-in uses Supabase Auth"],
@@ -35,7 +37,11 @@ const checks = [
   [upload.includes('"Cache-Control": "no-store"') && finalize.includes('"Cache-Control": "no-store"') && download.includes('"Cache-Control": "no-store"'), "document responses disable caching"],
   [vault.includes("actualSize !== Number(doc.size_bytes)") && vault.includes("signatureValid"), "vault checks actual file size and signature"],
   [vault.includes('event_type: "READ_LINK_ISSUED"') && vault.includes("if (auditError)"), "download link audit fails closed"],
-  [vault.includes("createSignedUrl(doc.storage_path, 60"), "download link expires after 60 seconds"]
+  [vault.includes("createSignedUrl(doc.storage_path, 60"), "download link expires after 60 seconds"],
+  ["HIGHER_EDUCATION", "TVET", "SETA_LEARNERSHIP", "INTERNSHIP", "APPRENTICESHIP", "EMPLOYMENT"].every(pathway => workbench.includes(pathway)), "candidate workbench represents all six national pathways"],
+  [workbench.includes("provider-confirmed") && workbench.includes("candidate-reported"), "workbench distinguishes candidate-reported from provider-confirmed state"],
+  [workbench.includes("programme choices") || workbench.includes("programme choice"), "workbench communicates parent application and programme-choice model"],
+  [entry.includes("/candidate/workbench") && entry.includes("/candidate/login"), "candidate entry connects to the authenticated workbench and login"]
 ];
 for (const [passed, description] of checks) assert.ok(passed, description);
 console.log(`PASS candidate journey security contract (${checks.length} assertions)`);
