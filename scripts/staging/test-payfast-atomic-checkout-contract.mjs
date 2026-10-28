@@ -12,6 +12,14 @@ assert.match(edge, /finance_orders\?select=plan_code&order_ref=eq/, "checkout id
 assert.doesNotMatch(edge, /payfast_payment_intents\?select=[^`]*plan_code/, "intent table must not be queried for a nonexistent plan_code column");
 assert.match(edge, /prior\.plan_code !== plan\.plan_code/, "edge handler must reject reuse across different plans");
 assert.match(edge, /idempotency_key_reused_for_different_plan/, "edge handler must expose a stable conflict code");
+assert.match(edge, /response\.ok && \(await response\.text\(\)\)\.trim\(\) === "VALID"/, "ITN must be validated by PayFast sandbox endpoint");
+assert.match(edge, /fields\.signature\.toLowerCase\(\), expectedSignature\.toLowerCase\(\)/, "ITN signature must be compared safely");
+assert.match(edge, /paymentStatus === "COMPLETE"/, "only complete provider payments may settle");
+assert.match(edge, /fields\.merchant_id === Deno\.env\.get\("PAYFAST_MERCHANT_ID"\)/, "ITN merchant ID must match configured merchant");
+assert.match(edge, /amountCents === Number\(intent\.amount_cents\)/, "ITN gross amount must match stored intent");
+assert.match(edge, /if \(!duplicate\)[\s\S]*?payfast_itn_receipts/, "duplicate ITN must not create another receipt");
+assert.match(edge, /rpc\/payfast_settle_sandbox_payment/, "verified ITN must use the atomic settlement RPC");
+assert.match(edge, /if \(!accepted \|\| !intent\)/, "invalid ITNs must fail closed before settlement");
 assert.match(migration, /select fo\.plan_code into v_existing_plan_code[\s\S]*?fo\.order_ref=v_existing\.order_ref/, "database RPC must resolve existing plan from finance_orders");
 assert.match(migration, /pg_advisory_xact_lock\(hashtextextended\(v_candidate_ref \|\| ':' \|\| v_idempotency_key, 0\)\)/, "database RPC must serialize concurrent idempotency-key creation");
 assert.match(migration, /raise exception 'idempotency_key_reused_for_different_plan'/, "database RPC must fail closed on cross-plan reuse");
