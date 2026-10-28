@@ -36,7 +36,10 @@ try {
 }
 if ($backupManifest.schema -ne "kingsmen.truth-vault-backup-manifest.v1" -or
     $backupManifest.status -ne "BACKUP_CREATED" -or
-    $backupManifest.rawCandidateRowsIncluded -ne $false -or
+    $backupManifest.databaseAndObjectACLsCaptured -ne $true -or
+    $backupManifest.archiveContainsSensitiveCandidateData -ne $true -or
+    $backupManifest.manifestContainsCandidateRows -ne $false -or
+    $backupManifest.archiveEncryptionAppliedByScript -ne $false -or
     $backupManifest.committedToGit -ne $false) {
   throw "Backup manifest status or safety contract is invalid; restore is blocked."
 }
@@ -80,7 +83,7 @@ if (-not $DryRun) {
   $sourceAndRestoreTargetsDiffer = $true
 
   # Single transaction plus exit-on-error prevents a failed restore leaving partial schema/data.
-  $null = & pg_restore --clean --if-exists --exit-on-error --single-transaction --no-owner --no-privileges "--dbname=$RestoreDatabaseUrl" $BackupFile 2>$null
+  $null = & pg_restore --clean --if-exists --exit-on-error --single-transaction --no-owner "--dbname=$RestoreDatabaseUrl" $BackupFile 2>$null
   $restoreExit = $LASTEXITCODE
   if ($restoreExit -eq 0) {
     $restoreSucceeded = $true
@@ -163,7 +166,9 @@ $report = [ordered]@{
   targetIdentityChecked = $targetIdentityChecked
   sourceAndRestoreTargetsDiffer = $sourceAndRestoreTargetsDiffer
   restoreSucceeded = $restoreSucceeded
-  verificationMode = "public core table presence and count-only sanity; not row-by-row equivalence"
+  databaseAndObjectACLsRestoredFromArchive = $true
+  ownerOwnershipPreserved = $false
+  verificationMode = "public core table presence and count-only sanity; ACL restoration from dump enabled; not row-by-row equivalence"
   rawCandidateRowsReturned = $false
   serviceRoleReturned = $false
   rpoMinutes = "manual_capture_required"
