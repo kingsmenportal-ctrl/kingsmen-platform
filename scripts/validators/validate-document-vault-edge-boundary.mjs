@@ -12,4 +12,16 @@ assert.ok(source.includes("reader.cancel("), "oversized streams must be cancelle
 assert.ok(!source.includes("req.json()"), "unbounded JSON parser must not return");
 assert.ok(source.includes('.eq("id", id).eq("candidate_id", candidateId)'), "document finalization must be candidate scoped");
 assert.ok(source.includes("createSignedUrl(doc.storage_path, 60"), "signed download links must expire in 60 seconds");
-console.log("PASS Document Vault edge boundary contract (11 assertions)");
+
+assert.ok(source.includes("const MAX_BYTES = 10 * 1024 * 1024"), "uploaded files must be capped at 10 MiB");
+assert.ok(source.includes("image/png") && source.includes("application/pdf") && source.includes("image/jpeg"), "only approved PDF/JPEG/PNG types may be mapped");
+assert.ok(source.includes("fileBytes") || source.includes("bytes.subarray") || source.includes("signature"), "finalization must inspect file signature bytes");
+assert.ok(source.includes("size_bytes") && source.includes("MAX_BYTES"), "actual upload size must be bounded");
+assert.ok(source.includes("READ_LINK_ISSUED"), "download link issuance must be audited");
+assert.ok(source.includes("if (auditError)") && source.includes("A download link could not be issued because its audit record could not be saved"), "download must fail closed if audit persistence fails");
+assert.ok(source.includes("IDENTITY_NOT_VERIFIED"), "candidate document access must fail closed until identity is verified");
+assert.ok(source.includes("DOCUMENT_REVIEWER_REQUIRED"), "reviewer actions must require active reviewer permission");
+assert.ok(source.includes("Vary: Origin") || source.includes('"Vary": "Origin"') || source.includes('"Vary": "Origin"'), "responses must vary by origin");
+assert.ok(source.includes("if (req.method !== \"POST\")"), "non-POST actions must be rejected");
+
+console.log("PASS Document Vault edge boundary contract (21 assertions)");
