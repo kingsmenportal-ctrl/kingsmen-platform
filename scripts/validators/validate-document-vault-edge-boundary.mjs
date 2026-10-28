@@ -1,0 +1,11 @@
+import assert from "node:assert/strict";
+import { readFile } from "node:fs/promises";
+const source = await readFile(new URL("../../supabase/functions/candidate-private-documents/index.ts", import.meta.url), "utf8");
+assert.ok(source.includes("readBoundedJson(req)"), "bounded parser must be used");
+assert.ok(source.includes("maxBytes = 16 * 1024"), "16 KiB body cap must exist");
+assert.ok(source.includes("Content-Type must be application/json"), "JSON content type must be enforced");
+assert.ok(source.includes("total > maxBytes"), "streamed bytes must be capped");
+assert.ok(!source.includes("req.json()"), "unbounded JSON parser must not return");
+assert.ok(source.includes('.eq("id", id).eq("candidate_id", candidateId)'), "document finalization must be candidate scoped");
+assert.ok(source.includes("createSignedUrl(doc.storage_path, 60"), "signed download links must expire in 60 seconds");
+console.log("PASS Document Vault edge boundary contract (7 assertions)");
