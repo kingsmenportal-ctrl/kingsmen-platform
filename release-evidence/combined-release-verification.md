@@ -22,13 +22,14 @@ Require a full 40-character SHA. Verify the dependency order: **#204 â†’ #205 â†
 node --version
 npm --version
 npm ci
+npm --prefix apps/api ci
 npm --prefix apps/web ci
 npm run web:validate:lockfile
 npm run api:build
 npm --prefix apps/web run build
 ```
 
-Root and web package lockfiles are separate, so install both with lockfile enforcement.
+Root and web package lockfiles are separate, and the current RC1 tree does not contain `apps/api/package-lock.json` (the API package uses `pg` plus TypeScript). The combined runner therefore fails closed at preflight until the API lock is generated/reviewed/committed. On a controlled release workstation, generate it with `npm install --package-lock-only --prefix apps/api`, inspect that only the intended API lock is changed and dependency versions/integrities are pinned, commit it in the reviewable release stack, then use `npm --prefix apps/api ci`. Do not claim reproducible API dependency installation until that lock exists.
 
 ## 3. Exact core integration/security commands
 
