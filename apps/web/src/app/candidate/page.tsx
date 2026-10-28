@@ -10,6 +10,7 @@ const pathways = [
 const workspaces = [
   { title: "Free Destiny Map", detail: "Describe your current stage and explore a starting route.", href: "/free-destiny-map", action: "Start route discovery", tag: "FREE STARTING POINT" },
   { title: "Private Document Vault", detail: "Upload and manage documents linked to your candidate work. Sign-in and server checks are required.", href: "/candidate/documents", action: "Open document vault", tag: "PRIVATE WORKSPACE" },
+  { title: "Candidate workbench", detail: "Open your master application, identity review, preparation tracker and evidence-backed outcomes.", href: "/candidate/workbench", action: "Open my workbench", tag: "ONE APPLICATION JOURNEY" },
   { title: "Candidate support", detail: "Find the manual-assistance path for portal blockers, deadline risk and source uncertainty.", href: "/candidate/support", action: "Open support centre", tag: "EMAIL-FIRST" },
 ];
 
@@ -26,9 +27,11 @@ export default function CandidatePortalPage() {
             </span>
           </a>
           <nav className="flex flex-wrap items-center gap-4 text-sm font-semibold text-slate-200" aria-label="Main navigation">
+            <a className="hover:text-amber-300" href="/candidate/workbench">My workbench</a>
             <a className="hover:text-amber-300" href="/free-destiny-map">Destiny Map</a>
             <a className="hover:text-amber-300" href="/candidate/documents">Documents</a>
             <a className="hover:text-amber-300" href="/candidate/support">Support</a>
+            <a className="rounded-xl border border-slate-500/70 px-4 py-2 text-slate-100 hover:border-amber-300/60" href="/candidate/login?next=%2Fcandidate%2Fworkbench">Sign in</a>
             <a className="rounded-xl border border-amber-300/50 px-4 py-2 text-amber-200 hover:bg-amber-300/10" href="/jarvis">Jarvis</a>
           </nav>
         </header>
@@ -40,7 +43,7 @@ export default function CandidatePortalPage() {
             <p className="mt-6 max-w-2xl text-base leading-7 text-slate-300 sm:text-lg">Kingsmen brings education, skills development, funding guidance and employment pathways into one candidate workspace—so your preparation, documents and follow-up can be managed with clearer evidence and fewer disconnected steps.</p>
             <div className="mt-8 flex flex-wrap gap-3">
               <a href="/free-destiny-map" className="rounded-xl bg-amber-300 px-5 py-3 text-sm font-extrabold text-[#101b2a] shadow-lg shadow-amber-950/20 hover:bg-amber-200">Start Free Destiny Map <span aria-hidden="true">→</span></a>
-              <a href="/candidate/documents" className="rounded-xl border border-slate-500/70 px-5 py-3 text-sm font-bold text-white hover:border-amber-300/60">Open Document Vault</a>
+              <a href="/candidate/workbench" className="rounded-xl border border-slate-500/70 px-5 py-3 text-sm font-bold text-white hover:border-amber-300/60">Open candidate workbench</a>
             </div>
           </div>
           <aside className="rounded-3xl border border-amber-300/25 bg-gradient-to-br from-[#112b4d] to-[#0a192d] p-6 sm:p-7">
