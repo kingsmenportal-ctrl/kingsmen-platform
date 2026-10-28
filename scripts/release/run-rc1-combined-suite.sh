@@ -16,6 +16,7 @@ if git symbolic-ref --quiet --short HEAD >/dev/null 2>&1; then
 fi
 [[ -z "$(git status --porcelain)" ]] || fail "Working tree is not clean; certification must run against an immutable checkout."
 [[ -f package-lock.json ]] || fail "Root package-lock.json is missing; refusing non-reproducible install."
+[[ -f apps/api/package-lock.json ]] || fail "apps/api/package-lock.json is missing; create and review it before reproducible release verification."
 
 stamp="$(date -u +%Y%m%dT%H%M%SZ)"
 out_dir="${KINGSMEN_EVIDENCE_DIR:-artifacts/rc1-suite-$stamp}"
@@ -43,6 +44,7 @@ record "npm=$(npm --version 2>&1)"
 
 run_gate root_install npm ci
 if [[ "$overall" -eq 0 ]]; then
+  run_gate api_install npm --prefix apps/api ci
   run_gate web_install npm --prefix apps/web ci
   run_gate lockfile npm run web:validate:lockfile
   run_gate repository_test npm test
