@@ -23,8 +23,8 @@ const requiredTokens = new Map([
   ['.gitignore', ['.local/backups', 'backups/', '*.dump', '*.backup']],
   ['manifests/ops/backup-restore-proof-v1.json', ['backup-restore-proof-v1', 'foundation_built_pending_staging_drill', 'restoreTargetMustDifferFromSource', 'backupStorageAllowedInGit']],
   ['docs/ops/KINGSMEN_BACKUP_RESTORE_PROOF.md', ['pg_dump', 'pg_restore', 'RPO', 'RTO', 'Production ready: **false**']],
-  ['scripts/backup/New-KingsmenTruthVaultBackup.ps1', ['KINGSMEN_DATABASE_URL', 'pg_dump', 'Get-FileHash', 'databaseUrlRedacted', 'committedToGit = $false']],
-  ['scripts/backup/Test-KingsmenTruthVaultRestore.ps1', ['KINGSMEN_RESTORE_DRILL_DATABASE_URL', 'pg_restore', 'pg_restore --list', 'Restore target matches source database', 'targetIdentityChecked', 'DRY_RUN_NOT_EVIDENCE', 'RESTORE_DRILL_FAILED', 'passed = $passed', 'countOnly = $true', 'rtoSeconds']],
+  ['scripts/backup/New-KingsmenTruthVaultBackup.ps1', ['KINGSMEN_DATABASE_URL', 'pg_dump', 'Get-FileHash', 'databaseUrlRedacted', 'databaseAndObjectACLsCaptured = $true', 'archiveContainsSensitiveCandidateData = $true', 'manifestContainsCandidateRows = $false', 'archiveEncryptionAppliedByScript = $false', 'committedToGit = $false']],
+  ['scripts/backup/Test-KingsmenTruthVaultRestore.ps1', ['KINGSMEN_RESTORE_DRILL_DATABASE_URL', 'pg_restore', 'pg_restore --list', 'Restore target matches source database', 'targetIdentityChecked', 'DRY_RUN_NOT_EVIDENCE', 'RESTORE_DRILL_FAILED', 'passed = $passed', 'databaseAndObjectACLsRestoredFromArchive = $true', 'countOnly = $true', 'rtoSeconds']],
   ['scripts/proof/prove-backup-restore-boundary.mjs', ['BACKUP_RESTORE_SOURCE_PROOF_PASSED', 'stagingRestoreDrillCompleted: false']],
   ['manifests/launch/kingsmen-launch-readiness-v1.json', ['backup_restore', 'backup-restore-proof-v1', 'foundation_built_pending_staging_drill']],
   ['scripts/validators/validate-kingsmen-launch-readiness.mjs', ['backup:validate:restore', 'BACKUP_RESTORE_STAGING_DRILL_REQUIRED']]
@@ -62,6 +62,18 @@ for (const [path, tokens] of requiredTokens.entries()) {
   }
 }
 
+if (exists('scripts/backup/New-KingsmenTruthVaultBackup.ps1')) {
+  const backupScript = read('scripts/backup/New-KingsmenTruthVaultBackup.ps1');
+  check('backup_acl_capture_enabled', backupScript.includes('databaseAndObjectACLsCaptured = $true') && !backupScript.includes('--no-privileges'),
+    'archive must include object ACL statements; ownership is intentionally normalized', 'scripts/backup/New-KingsmenTruthVaultBackup.ps1');
+  check('backup_archive_sensitivity_explicit', backupScript.includes('archiveContainsSensitiveCandidateData = $true') && backupScript.includes('archiveEncryptionAppliedByScript = $false'),
+    'manifest must not imply the archive is non-sensitive or encrypted by the script', 'scripts/backup/New-KingsmenTruthVaultBackup.ps1');
+}
+if (exists('scripts/backup/Test-KingsmenTruthVaultRestore.ps1')) {
+  const restoreScript = read('scripts/backup/Test-KingsmenTruthVaultRestore.ps1');
+  check('restore_acl_restore_enabled', restoreScript.includes('databaseAndObjectACLsRestoredFromArchive = $true') && !restoreScript.includes('--no-privileges'),
+    'restore must not silently skip grants/default ACL statements', 'scripts/backup/Test-KingsmenTruthVaultRestore.ps1');
+}
 if (exists('manifests/ops/backup-restore-proof-v1.json')) {
   const manifest = JSON.parse(read('manifests/ops/backup-restore-proof-v1.json'));
   check('manifest_production_ready_false', manifest.productionReady === false, String(manifest.productionReady), 'manifests/ops/backup-restore-proof-v1.json');
