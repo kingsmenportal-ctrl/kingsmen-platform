@@ -5,7 +5,7 @@ This status is grounded in connected repository, Supabase and Netlify results. I
 ## Concrete changes created
 - PR #207: https://github.com/kingsmenportal-ctrl/kingsmen-platform/pull/207
 - Branch: `release/kingsmen-90-day-evidence-pack-2026-10-28`
-- Branch HEAD after four evidence commits: `32926cfd57618082e3486ca5589cf3bad1d27747`
+- Branch HEAD after four evidence commits: `284a81a4075bb56db7c26cbd043d1f4491f7fe6b` (updated after suite script correction)
 - New files: 90-day execution plan, read-only 0078 parity inventory SQL, read-only 0097 privilege audit SQL, RC1 gates/runbook.
 - Additional suite/deployment scripts are included in the follow-up commits on this branch; verify PR head SHA before relying on this file's earlier branch-head value.
 
