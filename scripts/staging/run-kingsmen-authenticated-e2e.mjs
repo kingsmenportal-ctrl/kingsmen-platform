@@ -17,8 +17,17 @@ const planPath = process.env.KINGSMEN_E2E_PLAN;
 if (!base || !planPath) fail('BLOCKED_CONFIGURATION_MISSING', 'Set KINGSMEN_STAGING_BASE_URL and KINGSMEN_E2E_PLAN.');
 let origin;
 try { origin = new URL(base); } catch { fail('BLOCKED_INVALID_BASE_URL', 'Staging base URL is invalid.'); }
-if (origin.protocol !== 'https:' && !['localhost', '127.0.0.1'].includes(origin.hostname)) {
+const isLocalHost = (hostname) => ['localhost', '127.0.0.1'].includes(hostname);
+if (origin.protocol !== 'https:' && !isLocalHost(origin.hostname)) {
   fail('BLOCKED_INSECURE_BASE_URL', 'HTTPS is required except for localhost.');
+}
+const approvedNetlifyHost = origin.hostname === 'kingsmen-portal-staging.netlify.app' ||
+  /^[a-z0-9-]+--kingsmen-portal-staging\.netlify\.app$/i.test(origin.hostname);
+if (!isLocalHost(origin.hostname) && !approvedNetlifyHost) {
+  fail('BLOCKED_UNAPPROVED_APP_ORIGIN', 'The app origin must be the Kingsmen staging Netlify site or its branch deploy.');
+}
+if (origin.username || origin.password || origin.hash) {
+  fail('BLOCKED_INVALID_BASE_URL', 'Staging base URL cannot include credentials or a fragment.');
 }
 let plan;
 try { plan = JSON.parse(readFileSync(resolve(planPath), 'utf8')); } catch {
@@ -26,6 +35,25 @@ try { plan = JSON.parse(readFileSync(resolve(planPath), 'utf8')); } catch {
 }
 if (plan.schema !== 'kingsmen.staging-e2e-plan.v1' || !Array.isArray(plan.cases) || plan.cases.length === 0) {
   fail('BLOCKED_INVALID_PLAN', 'Plan must use kingsmen.staging-e2e-plan.v1 and contain cases.');
+}
+let supabaseOrigin = null;
+if (process.env.KINGSMEN_E2E_SUPABASE_URL) {
+  try { supabaseOrigin = new URL(process.env.KINGSMEN_E2E_SUPABASE_URL); } catch {
+    fail('BLOCKED_SUPABASE_CONFIG', 'KINGSMEN_E2E_SUPABASE_URL is invalid.');
+  }
+  if (supabaseOrigin.protocol !== 'https:' && !isLocalHost(supabaseOrigin.hostname)) {
+    fail('BLOCKED_SUPABASE_CONFIG', 'HTTPS is required for the Supabase target outside localhost.');
+  }
+  if (!isLocalHost(supabaseOrigin.hostname) && supabaseOrigin.hostname !== 'euhubhhnumtibbyufghm.supabase.co') {
+    fail('BLOCKED_UNAPPROVED_SUPABASE_ORIGIN', 'Supabase-target cases are restricted to the configured Kingsmen staging project.');
+  }
+  if (supabaseOrigin.username || supabaseOrigin.password || supabaseOrigin.hash) {
+    fail('BLOCKED_SUPABASE_CONFIG', 'Supabase base URL cannot include credentials or a fragment.');
+  }
+}
+const needsSupabase = plan.cases.some((test) => test && test.target === 'supabase');
+if (needsSupabase && (!supabaseOrigin || !process.env.KINGSMEN_E2E_SUPABASE_ANON_KEY)) {
+  fail('BLOCKED_SUPABASE_CONFIG', 'Supabase-target cases require KINGSMEN_E2E_SUPABASE_URL and KINGSMEN_E2E_SUPABASE_ANON_KEY.');
 }
 const allowedRoles = new Set(['anonymous', 'candidate_a', 'candidate_b', 'reviewer']);
 const allowedMethods = new Set(['GET', 'HEAD', 'OPTIONS', 'POST', 'PUT', 'PATCH', 'DELETE']);
@@ -49,16 +77,21 @@ const prepared = plan.cases.map((test) => {
   if (test.assertJsonPath !== undefined && (typeof test.assertJsonPath !== 'string' || !/^[A-Za-z0-9_$.-]+$/.test(test.assertJsonPath))) {
     fail('BLOCKED_INVALID_ASSERTION', 'JSON assertion path must contain only safe property-path characters.');
   }
-  const target = new URL(test.path, origin);
-  if (target.origin !== origin.origin || target.username || target.password) fail('BLOCKED_CROSS_ORIGIN_CASE', 'Case path must remain on staging origin.');
-  return { test, method, target };
+  const targetKind = test.target ?? 'app';
+  if (!['app', 'supabase'].includes(targetKind)) fail('BLOCKED_INVALID_TARGET', 'Case target must be app or supabase.');
+  const targetOrigin = targetKind === 'supabase' ? supabaseOrigin : origin;
+  if (!targetOrigin) fail('BLOCKED_SUPABASE_CONFIG', 'Supabase target is not configured.');
+  const target = new URL(test.path, targetOrigin);
+  if (target.origin !== targetOrigin.origin || target.username || target.password || target.hash) fail('BLOCKED_CROSS_ORIGIN_CASE', 'Case path must remain on its configured allow-listed origin.');
+  if (targetKind === 'supabase' && !target.pathname.startsWith('/functions/v1/')) fail('BLOCKED_CROSS_ORIGIN_CASE', 'Supabase target is limited to the Edge Functions path prefix.');
+  return { test, method, target, targetKind };
 });
 const timeoutMs = Number(process.env.KINGSMEN_E2E_TIMEOUT_MS || 15000);
 if (!Number.isInteger(timeoutMs) || timeoutMs < 100 || timeoutMs > 120000) {
   fail('BLOCKED_INVALID_TIMEOUT', 'KINGSMEN_E2E_TIMEOUT_MS must be an integer between 100 and 120000.');
 }
 const results = [];
-for (const { test, method, target } of prepared) {
+for (const { test, method, target, targetKind } of prepared) {
   const tokenEnv = {
     candidate_a: 'KINGSMEN_E2E_CANDIDATE_A_TOKEN',
     candidate_b: 'KINGSMEN_E2E_CANDIDATE_B_TOKEN',
@@ -67,6 +100,7 @@ for (const { test, method, target } of prepared) {
   if (tokenEnv && !process.env[tokenEnv]) fail('BLOCKED_SESSION_MISSING', 'A required authorised staging session token is missing.');
   const headers = { accept: 'application/json', 'x-kingsmen-e2e-case': test.id };
   if (tokenEnv) headers.authorization = 'Bearer ' + process.env[tokenEnv];
+  if (targetKind === 'supabase') headers.apikey = process.env.KINGSMEN_E2E_SUPABASE_ANON_KEY;
   if (test.body !== undefined) headers['content-type'] = 'application/json';
   const started = Date.now();
   let response;
@@ -105,6 +139,7 @@ const report = {
   status: failed ? 'STAGING_E2E_FAILED' : 'STAGING_E2E_PASSED',
   passed: failed === 0,
   targetOrigin: origin.origin,
+  targetOrigins: [...new Set(prepared.map(({ target }) => target.origin))].sort(),
   planSha256: createHash('sha256').update(JSON.stringify(plan)).digest('hex'),
   caseCount: results.length, passedCases: results.length - failed, failedCases: failed,
   mutationCasesAllowed: process.env.KINGSMEN_E2E_ALLOW_MUTATIONS === 'true',

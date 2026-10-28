@@ -3,18 +3,18 @@ import { existsSync, readFileSync } from 'node:fs';
 const path = 'scripts/staging/run-kingsmen-authenticated-e2e.mjs';
 const source = existsSync(path) ? readFileSync(path, 'utf8') : '';
 const required = [
-  'KINGSMEN_STAGING_BASE_URL', 'KINGSMEN_E2E_PLAN', 'KINGSMEN_E2E_CANDIDATE_A_TOKEN',
+  'KINGSMEN_STAGING_BASE_URL', 'KINGSMEN_E2E_SUPABASE_URL', 'KINGSMEN_E2E_SUPABASE_ANON_KEY', 'KINGSMEN_E2E_PLAN', 'KINGSMEN_E2E_CANDIDATE_A_TOKEN',
   'KINGSMEN_E2E_CANDIDATE_B_TOKEN', 'KINGSMEN_E2E_REVIEWER_TOKEN',
   'BLOCKED_MUTATION_NOT_AUTHORISED', 'BLOCKED_CROSS_ORIGIN_CASE',
   "redirect: 'manual'", 'AbortSignal.timeout', 'planSha256',
   'STAGING_E2E_PASSED', 'STAGING_E2E_FAILED', 'results',
   'BLOCKED_INVALID_TIMEOUT', 'BLOCKED_INVALID_ASSERTION', 'caseIds',
-  'BLOCKED_INVALID_CASE_BODY', 'await response.body?.cancel()'
+  'BLOCKED_INVALID_CASE_BODY', 'BLOCKED_SUPABASE_CONFIG', 'BLOCKED_UNAPPROVED_APP_ORIGIN', 'BLOCKED_UNAPPROVED_SUPABASE_ORIGIN', 'targetKind === \'supabase\'', 'headers.apikey', 'targetOrigins', 'await response.body?.cancel()'
 ];
 const failures = required.filter((token) => !source.includes(token));
 const testPath = 'scripts/staging/test-kingsmen-authenticated-e2e.mjs';
 const testSource = existsSync(testPath) ? readFileSync(testPath, 'utf8') : '';
-const testContracts = ['BLOCKED_MUTATION_NOT_AUTHORISED', 'BLOCKED_SESSION_MISSING', 'response-body redaction', 'whole-plan preflight'];
+const testContracts = ['BLOCKED_MUTATION_NOT_AUTHORISED', 'BLOCKED_SESSION_MISSING', 'response-body redaction', 'whole-plan preflight', 'separate Supabase function origin', 'Supabase apikey forwarding', 'Supabase path-prefix boundary', 'app origin boundary', 'app host allowlist', 'Supabase host allowlist'];
 const missingTests = testContracts.filter((token) => !testSource.includes(token));
 const allFailures = [...failures, ...missingTests.map((token) => 'test:' + token)];
 const report = {

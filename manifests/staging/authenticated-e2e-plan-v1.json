@@ -1,0 +1,136 @@
+{
+  "schema": "kingsmen.staging-e2e-plan.v1",
+  "purpose": "Read-only auth/authorization preflight across the Netlify application origin and the separately allow-listed Supabase Edge Functions origin. No writes occur; not full candidate-to-reviewer E2E.",
+  "requiresHumanPreflight": [
+    "Confirm live published deployment commit matches the approved RC1 SHA.",
+    "Confirm Candidate A and Candidate B are separate authorised synthetic accounts and candidate identities are verified through the reviewed workflow.",
+    "Confirm reviewer has the dedicated least-privilege identity-review role under final integrated PR #190 contract; do not use PLATFORM_ADMIN merely to satisfy an older route.",
+    "Confirm all route paths and expected status values against the deployed build before execution.",
+    "Inject KINGSMEN_E2E_SUPABASE_URL for the exact staging Supabase project and KINGSMEN_E2E_SUPABASE_ANON_KEY through the secret manager; never log either value.",
+    "Confirm the deployed candidate app routes exist after PR #120/#121/#190/#202 are integrated. This is a post-integration preflight, not proof those routes exist on today's RC1 base."
+  ],
+  "cases": [
+    {
+      "id": "anon-candidate-workspace-denied",
+      "role": "anonymous",
+      "method": "GET",
+      "path": "/api/candidate/workspace",
+      "expectedStatus": 401,
+      "assertJsonPath": "ok",
+      "equals": false
+    },
+    {
+      "id": "anon-candidate-applications-denied",
+      "role": "anonymous",
+      "method": "GET",
+      "path": "/api/candidate/applications",
+      "expectedStatus": 401,
+      "assertJsonPath": "ok",
+      "equals": false
+    },
+    {
+      "id": "anon-preparation-denied",
+      "role": "anonymous",
+      "method": "GET",
+      "path": "/api/candidate/applications/preparation",
+      "expectedStatus": 401,
+      "assertJsonPath": "ok",
+      "equals": false
+    },
+    {
+      "id": "anon-private-documents-denied",
+      "role": "anonymous",
+      "method": "GET",
+      "path": "/api/candidate/documents/status",
+      "expectedStatus": 401,
+      "assertJsonPath": "ok",
+      "equals": false
+    },
+    {
+      "id": "anon-reviewer-queue-denied",
+      "role": "anonymous",
+      "method": "GET",
+      "path": "/functions/v1/candidate-identity-review-queue",
+      "expectedStatus": 401,
+      "target": "supabase"
+    },
+    {
+      "id": "candidate-a-workspace-own-scope",
+      "role": "candidate_a",
+      "method": "GET",
+      "path": "/api/candidate/workspace",
+      "expectedStatus": 200,
+      "assertJsonPath": "ok",
+      "equals": true
+    },
+    {
+      "id": "candidate-b-workspace-own-scope",
+      "role": "candidate_b",
+      "method": "GET",
+      "path": "/api/candidate/workspace",
+      "expectedStatus": 200,
+      "assertJsonPath": "ok",
+      "equals": true
+    },
+    {
+      "id": "candidate-a-applications-own-scope",
+      "role": "candidate_a",
+      "method": "GET",
+      "path": "/api/candidate/applications",
+      "expectedStatus": 200,
+      "assertJsonPath": "ok",
+      "equals": true
+    },
+    {
+      "id": "candidate-b-applications-own-scope",
+      "role": "candidate_b",
+      "method": "GET",
+      "path": "/api/candidate/applications",
+      "expectedStatus": 200,
+      "assertJsonPath": "ok",
+      "equals": true
+    },
+    {
+      "id": "candidate-a-documents-own-scope",
+      "role": "candidate_a",
+      "method": "GET",
+      "path": "/api/candidate/documents/status",
+      "expectedStatus": 200,
+      "assertJsonPath": "ok",
+      "equals": true
+    },
+    {
+      "id": "candidate-b-documents-own-scope",
+      "role": "candidate_b",
+      "method": "GET",
+      "path": "/api/candidate/documents/status",
+      "expectedStatus": 200,
+      "assertJsonPath": "ok",
+      "equals": true
+    },
+    {
+      "id": "candidate-a-cannot-open-reviewer-queue",
+      "role": "candidate_a",
+      "method": "GET",
+      "path": "/functions/v1/candidate-identity-review-queue",
+      "expectedStatus": 403,
+      "target": "supabase"
+    },
+    {
+      "id": "candidate-b-cannot-open-reviewer-queue",
+      "role": "candidate_b",
+      "method": "GET",
+      "path": "/functions/v1/candidate-identity-review-queue",
+      "expectedStatus": 403,
+      "target": "supabase"
+    },
+    {
+      "id": "reviewer-can-open-authorized-queue",
+      "role": "reviewer",
+      "method": "GET",
+      "path": "/functions/v1/candidate-identity-review-queue",
+      "expectedStatus": 200,
+      "target": "supabase"
+    }
+  ]
+}
