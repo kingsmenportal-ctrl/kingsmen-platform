@@ -48,7 +48,7 @@ export default function CandidateWorkbenchPage() {
             <h2 className="mt-3 text-2xl font-bold text-white">Secure by default.</h2>
             <ul className="mt-5 space-y-3 text-sm leading-6 text-slate-300">
               <li><span className="mr-2 text-amber-300">✓</span>Use your existing account; do not create duplicates to bypass identity review.</li>
-              <li><span className="mr-2 text-amber-300">✓</span>A saved plan is not a provider submission receipt.</li>
+              <li><span className="mr-2 text-amber-300">✓</span>A saved plan is not a provider submission receipt.</li><li><span className="mr-2 text-amber-300">✓</span>Candidate-reported submission is separate from provider-confirmed submission or outcome.</li>
               <li><span className="mr-2 text-amber-300">✓</span>Provider decisions remain with the provider.</li>
             </ul>
           </aside>
