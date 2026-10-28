@@ -107,8 +107,9 @@ async function checkout(request: Request, body: Record<string, unknown>) {
     return json({ error: "plan_not_payable_through_payfast" }, 400);
   }
 
-  const existing = await rest(`payfast_payment_intents?select=intent_ref,merchant_reference,payment_url,signed_payload,intent_status,idempotency_key&candidate_ref=eq.${encodeURIComponent(candidateId)}&idempotency_key=eq.${encodeURIComponent(idem)}&limit=1`);
+  const existing = await rest(`payfast_payment_intents?select=intent_ref,merchant_reference,payment_url,intent_status,idempotency_key&candidate_ref=eq.${encodeURIComponent(candidateId)}&idempotency_key=eq.${encodeURIComponent(idem)}&limit=1`);
   if (Array.isArray(existing) && existing.length) {
+    // Never return persisted provider fields wholesale: the database record is not an API response contract.
     return json({ intent: existing[0], reused: true });
   }
 
@@ -123,7 +124,8 @@ async function checkout(request: Request, body: Record<string, unknown>) {
   const cancelUrl = Deno.env.get("PAYFAST_CANCEL_URL") ?? "https://kingsmen-portal-staging.netlify.app/payment/cancel";
   const fields: Record<string, string> = {
     merchant_id: Deno.env.get("PAYFAST_MERCHANT_ID")!,
-    merchant_key: Deno.env.get("PAYFAST_MERCHANT_KEY")!,
+    // PAYFAST_MERCHANT_KEY is a server-side credential, not a checkout field.
+    // Never include it in the signed form fields, persisted signed_payload, or response.
     return_url: returnUrl,
     cancel_url: cancelUrl,
     notify_url: notifyUrl,
