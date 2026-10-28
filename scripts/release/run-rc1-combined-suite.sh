@@ -37,8 +37,9 @@ record "executed_at_utc=$(date -u +%FT%TZ)"
 record "node=$(node --version 2>&1)"
 record "npm=$(npm --version 2>&1)"
 
-run_gate install npm ci
+run_gate root_install npm ci
 if [[ "$overall" -eq 0 ]]; then
+  run_gate web_install npm --prefix apps/web ci
   run_gate lockfile npm run web:validate:lockfile
   run_gate repository_test npm test
   run_gate api_build npm run api:build
