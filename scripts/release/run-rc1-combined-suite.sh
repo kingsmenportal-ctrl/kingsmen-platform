@@ -1,15 +1,20 @@
 #!/usr/bin/env bash
 set -uo pipefail
 
-# Execute only from a clean checkout of the immutable RC1 SHA being certified.
-# Required: RC1_SHA=<full 40-character SHA>. For live E2E, supply staging tokens
-# through environment variables and KINGSMEN_STAGING_BASE_URL/KINGSMEN_E2E_PLAN.
+# Execute only in a clean detached checkout of the explicitly approved immutable RC1.
+# EXPECTED_RC1_SHA must come from the release decision record; RC1_SHA must equal it.
+# This script never creates identities, applies migrations, or deploys.
 # This script never creates identities, applies migrations, or deploys.
 
 fail() { printf 'FATAL: %s\n' "$*" >&2; exit 2; }
-[[ "${RC1_SHA:-}" =~ ^[0-9a-f]{40}$ ]] || fail "Set RC1_SHA to the full 40-character approved release commit."
+[[ "${EXPECTED_RC1_SHA:-}" =~ ^[0-9a-f]{40}$ ]] || fail "Set EXPECTED_RC1_SHA from the approved release record."
+[[ "${RC1_SHA:-}" =~ ^[0-9a-f]{40}$ ]] || fail "Set RC1_SHA to the full 40-character candidate commit."
+[[ "$RC1_SHA" == "$EXPECTED_RC1_SHA" ]] || fail "RC1_SHA differs from EXPECTED_RC1_SHA."
 actual_sha="$(git rev-parse HEAD 2>/dev/null)" || fail "Run inside the Kingsmen Git repository."
-[[ "$actual_sha" == "$RC1_SHA" ]] || fail "HEAD $actual_sha does not equal RC1_SHA $RC1_SHA."
+[[ "$actual_sha" == "$EXPECTED_RC1_SHA" ]] || fail "HEAD $actual_sha does not equal approved SHA $EXPECTED_RC1_SHA."
+if git symbolic-ref --quiet --short HEAD >/dev/null 2>&1; then
+  fail "Checkout must be detached at the approved immutable SHA, not a moving branch."
+fi
 [[ -z "$(git status --porcelain)" ]] || fail "Working tree is not clean; certification must run against an immutable checkout."
 [[ -f package-lock.json ]] || fail "Root package-lock.json is missing; refusing non-reproducible install."
 
@@ -45,6 +50,11 @@ if [[ "$overall" -eq 0 ]]; then
   run_gate api_build npm run api:build
   run_gate web_build npm --prefix apps/web run build
   run_gate api_persistence npm run api:validate
+  run_gate production_storage_guard npm run api:test:production-storage-guard
+  run_gate candidate_workspace_api_test node scripts/tests/test-candidate-workspace-api.mjs
+  run_gate candidate_identity_review_api_test node scripts/tests/test-candidate-identity-review-api.mjs
+  run_gate candidate_application_tracker_api_test node scripts/tests/test-candidate-application-tracker-api.mjs
+  run_gate authenticated_e2e_runner_regression npm run staging:e2e:test
   run_gate migration_integrity npm run db:validate:migration-integrity
   run_gate migration_integrity_test npm run db:validate:migration-integrity:test
   run_gate identity_review_security npm run security:validate:identity-review
@@ -58,6 +68,7 @@ if [[ "$overall" -eq 0 ]]; then
   run_gate staging_evidence_capture_validator npm run staging:validate:capture
   run_gate authenticated_e2e_runner_validator npm run staging:e2e:validate
   run_gate canonical_finance_catalogue npm run finance:validate:canonical-catalogue
+  run_gate canonical_finance_catalogue_tests npm run finance:test:canonical-catalogue
   run_gate source_intelligence npm run n15:sources:check
   run_gate opportunity_ingestion npm run n15:ingestion:check
   run_gate connector_reliability npm run n14:connectors:check
