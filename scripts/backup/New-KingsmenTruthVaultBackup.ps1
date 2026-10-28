@@ -41,7 +41,6 @@ if (-not $DryRun) {
   & pg_dump $DatabaseUrl `
     --format=custom `
     --no-owner `
-    --no-privileges `
     --file=$backupFile
 
   if ($LASTEXITCODE -ne 0) {
@@ -71,9 +70,12 @@ $manifest = [ordered]@{
   archiveBytes = $archiveBytes
   sha256 = $sha256
   format = "pg_dump_custom"
-  ownerPrivilegesRestored = $false
+  ownerOwnershipPreserved = $false
+  databaseAndObjectACLsCaptured = $true
   databaseUrlRedacted = $true
-  rawCandidateRowsIncluded = $false
+  archiveContainsSensitiveCandidateData = $true
+  manifestContainsCandidateRows = $false
+  archiveEncryptionAppliedByScript = $false
   committedToGit = $false
   restoreRequiredBeforeProductionData = $true
 }
