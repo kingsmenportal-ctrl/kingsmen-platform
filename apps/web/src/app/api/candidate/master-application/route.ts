@@ -13,9 +13,15 @@ const MAX_REQUEST_BYTES = 128 * 1024;
 async function readJsonLimited(request: Request): Promise<
   { ok: true; value: unknown } | { ok: false; reason: "TOO_LARGE" | "INVALID_JSON" }
 > {
-  const declaredLength = Number(request.headers.get("content-length") || 0);
-  if (Number.isFinite(declaredLength) && declaredLength > MAX_REQUEST_BYTES) {
-    return { ok: false, reason: "TOO_LARGE" };
+  const declaredHeader = request.headers.get("content-length");
+  if (declaredHeader !== null) {
+    const declaredLength = Number(declaredHeader);
+    if (!Number.isSafeInteger(declaredLength) || declaredLength < 0) {
+      return { ok: false, reason: "INVALID_JSON" };
+    }
+    if (declaredLength > MAX_REQUEST_BYTES) {
+      return { ok: false, reason: "TOO_LARGE" };
+    }
   }
   if (!request.body) return { ok: false, reason: "INVALID_JSON" };
   const reader = request.body.getReader();
@@ -42,7 +48,7 @@ async function readJsonLimited(request: Request): Promise<
     offset += chunk.byteLength;
   }
   try {
-    return { ok: true, value: JSON.parse(new TextDecoder().decode(bytes)) };
+    return { ok: true, value: JSON.parse(new TextDecoder("utf-8", { fatal: true }).decode(bytes)) };
   } catch {
     return { ok: false, reason: "INVALID_JSON" };
   }
