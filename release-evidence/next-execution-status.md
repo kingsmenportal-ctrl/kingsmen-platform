@@ -23,12 +23,13 @@ The current PR head SHA is the source of truth; it changes as commits are added.
 
 ### Deliverable 3 — combined verification
 - `release-evidence/combined-release-verification.md`
+- `release-evidence/api-lockfile-gap.md` — missing `apps/api/package-lock.json` is now an explicit reproducibility gate; the combined runner refuses to certify without a pinned API dependency tree.
 - `scripts/release/run-rc1-combined-suite.sh`
 - `scripts/staging/run-kingsmen-authenticated-e2e.mjs`
 - `scripts/staging/test-kingsmen-authenticated-e2e.mjs`
 - `scripts/validators/validate-staging-authenticated-e2e-runner.mjs`
 - The runner now supports the separate Netlify app origin and Supabase Edge Functions origin, limits Supabase requests to `/functions/v1/`, supplies the Supabase public `apikey` header, requires role tokens where needed, and records the tested origins without emitting response bodies or tokens.
-- The suite has not been executed in a real checkout/CI run in this session. Do not call this a passing test suite.
+- The combined suite wrapper itself has not been executed. The existing GitHub Release Evidence workflow run 743 succeeded on an immediately prior head and demonstrated root repository tests, API build, web build and release validators passed. Later commits updated documentation/runbook plus added an API-lockfile preflight gate; a fresh current-head run is required.
 
 ### Deliverable 4 — test identities
 - `release-evidence/authenticated-test-identities.md`
