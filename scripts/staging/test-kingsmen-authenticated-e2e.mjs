@@ -68,9 +68,11 @@ try {
   assert.equal(good.status, 0, `successful plan should pass: ${good.stderr} ${good.stdout}`);
   const goodReport = JSON.parse(good.report);
   assert.equal(goodReport.status, 'STAGING_E2E_PASSED');
-  assert.equal(goodReport.caseCount, 2);
-  assert.equal(goodReport.passedCases, 2);
+  assert.equal(goodReport.caseCount, 3);
+  assert.equal(goodReport.passedCases, 3);
   assert.ok(!good.report.includes('must-not-be-written-to-report'), 'response body must not enter report');
+  assert.equal(goodReport.targetOrigins.length, 2, 'app and Supabase function origins must be recorded');
+  assert.equal(supabaseRequests, 1, 'Supabase case must use its separately configured origin and forward apikey');
 
   const beforeInvalid = requests + supabaseRequests;
   const invalid = await run([
@@ -111,13 +113,16 @@ try {
     schema: 'kingsmen.staging-e2e-unit-tests.v1',
     status: 'PASSED',
     passed: true,
-    assertions: 14,
-    scenarios: ['HTTP status + JSON assertion', 'response-body redaction', 'whole-plan preflight', 'mutation opt-in', 'reviewer session requirement', 'bounded timeout']
+    assertions: 22,
+    scenarios: ['HTTP status + JSON assertion', 'response-body redaction', 'whole-plan preflight', 'mutation opt-in', 'reviewer session requirement', 'bounded timeout', 'separate Supabase function origin', 'Supabase apikey forwarding', 'Supabase path-prefix boundary', 'app origin boundary']
   }, null, 2));
 } catch (error) {
   console.error(error);
   process.exitCode = 1;
 } finally {
-  await new Promise((resolve) => server.close(resolve));
+  await Promise.all([
+    new Promise((resolve) => server.close(resolve)),
+    new Promise((resolve) => supabaseServer.close(resolve))
+  ]);
   rmSync(tmp, { recursive: true, force: true });
 }
