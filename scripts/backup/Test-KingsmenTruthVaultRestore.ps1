@@ -25,6 +25,21 @@ if ([string]::IsNullOrWhiteSpace($SourceDatabaseUrl)) {
 if (-not (Test-Path $BackupFile)) {
   throw "Backup file not found: $BackupFile"
 }
+$manifestPath = [System.IO.Path]::ChangeExtension($BackupFile, $null) + ".manifest.json"
+if (-not (Test-Path $manifestPath)) {
+  throw "Backup manifest not found beside archive; source provenance/checksum cannot be verified."
+}
+try {
+  $backupManifest = Get-Content -Raw -Path $manifestPath | ConvertFrom-Json
+} catch {
+  throw "Backup manifest is invalid JSON; restore is blocked."
+}
+if ($backupManifest.schema -ne "kingsmen.truth-vault-backup-manifest.v1" -or
+    $backupManifest.status -ne "BACKUP_CREATED" -or
+    $backupManifest.rawCandidateRowsIncluded -ne $false -or
+    $backupManifest.committedToGit -ne $false) {
+  throw "Backup manifest status or safety contract is invalid; restore is blocked."
+}
 if ($SourceDatabaseUrl -eq $RestoreDatabaseUrl) {
   throw "Restore target matches source database. Restore drill blocked."
 }
@@ -39,7 +54,11 @@ $null = & pg_restore --list $BackupFile 2>$null
 if ($LASTEXITCODE -ne 0) { throw "Backup archive failed pg_restore --list validation." }
 $sha256 = (Get-FileHash -Algorithm SHA256 -Path $BackupFile).Hash
 $archiveBytes = (Get-Item $BackupFile).Length
+$manifestSha256 = (Get-FileHash -Algorithm SHA256 -Path $manifestPath).Hash
 if ($archiveBytes -le 0) { throw "Backup archive is empty." }
+if ($backupManifest.sha256 -ne $sha256 -or [int64]$backupManifest.archiveBytes -ne [int64]$archiveBytes) {
+  throw "Backup archive does not match its recorded SHA-256/size in the manifest; restore is blocked."
+}
 
 function Get-DbIdentity {
   param([string]$ConnectionString, [string]$Label)
@@ -137,6 +156,7 @@ $report = [ordered]@{
   generatedAtIso = $endedAt.ToUniversalTime().ToString("o")
   backupFile = $BackupFile
   backupSha256 = $sha256
+  backupManifestSha256 = $manifestSha256
   archiveBytes = $archiveBytes
   archiveTocValidationPassed = $true
   databaseUrlRedacted = $true
