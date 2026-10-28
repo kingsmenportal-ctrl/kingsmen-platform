@@ -107,9 +107,22 @@ async function checkout(request: Request, body: Record<string, unknown>) {
     return json({ error: "plan_not_payable_through_payfast" }, 400);
   }
 
-  const existing = await rest(`payfast_payment_intents?select=intent_ref,merchant_reference,payment_url,signed_payload,intent_status,idempotency_key&candidate_ref=eq.${encodeURIComponent(candidateId)}&idempotency_key=eq.${encodeURIComponent(idem)}&limit=1`);
+  const existing = await rest(`payfast_payment_intents?select=intent_ref,order_ref,merchant_reference,payment_url,signed_payload,signature,intent_status,idempotency_key&candidate_ref=eq.${encodeURIComponent(candidateId)}&idempotency_key=eq.${encodeURIComponent(idem)}&limit=1`);
   if (Array.isArray(existing) && existing.length) {
-    return json({ intent: existing[0], reused: true });
+    const prior = existing[0];
+    // plan_code belongs to finance_orders, not payfast_payment_intents.
+    const priorOrders = await rest(`finance_orders?select=plan_code&order_ref=eq.${encodeURIComponent(prior.order_ref)}&candidate_ref=eq.${encodeURIComponent(candidateId)}&limit=1`);
+    const priorPlanCode = Array.isArray(priorOrders) ? priorOrders[0]?.plan_code : null;
+    // An idempotency key is bound to one plan; never silently return a different purchase.
+    if (!priorPlanCode || priorPlanCode !== plan.plan_code) {
+      return json({ error: "idempotency_key_reused_for_different_plan" }, 409);
+    }
+    const priorFields = prior.signed_payload && typeof prior.signed_payload === "object"
+      ? prior.signed_payload as Record<string, string> : {};
+    return json({ intent: { intentRef: prior.intent_ref, merchantReference: prior.merchant_reference,
+      paymentUrl: prior.payment_url, fields: sanitize(priorFields), signature: prior.signature },
+      reused: true, orderStatus: prior.intent_status === "PAID" ? "PAID" : "PENDING_PAYMENT",
+      paymentStatus: prior.intent_status === "PAID" ? "COMPLETE" : "PENDING" });
   }
 
   const orderRef = ref("ord");
@@ -123,12 +136,9 @@ async function checkout(request: Request, body: Record<string, unknown>) {
   const cancelUrl = Deno.env.get("PAYFAST_CANCEL_URL") ?? "https://kingsmen-portal-staging.netlify.app/payment/cancel";
   const fields: Record<string, string> = {
     merchant_id: Deno.env.get("PAYFAST_MERCHANT_ID")!,
-    merchant_key: Deno.env.get("PAYFAST_MERCHANT_KEY")!,
-    return_url: returnUrl,
-    cancel_url: cancelUrl,
-    notify_url: notifyUrl,
-    m_payment_id: merchantReference,
-    amount,
+    // Merchant key and passphrase are server-side credentials, never checkout fields.
+    return_url: returnUrl, cancel_url: cancelUrl, notify_url: notifyUrl,
+    m_payment_id: merchantReference, amount,
     item_name: String(plan.plan_name).slice(0, 100),
     item_description: String(plan.description ?? plan.plan_name).slice(0, 255),
     email_address: String(user.email ?? ""),
@@ -136,72 +146,59 @@ async function checkout(request: Request, body: Record<string, unknown>) {
   const passphrase = Deno.env.get("PAYFAST_PASSPHRASE") ?? "";
   const signed = { ...fields, signature: signature(fields, passphrase) };
   const entitlement = {
-    plan_code: plan.plan_code,
-    plan_name: plan.plan_name,
-    amount_cents: plan.amount_cents,
-    currency: "ZAR",
-    catalogue_version: plan.catalogue_version,
+    plan_code: plan.plan_code, plan_name: plan.plan_name, amount_cents: plan.amount_cents,
+    currency: "ZAR", catalogue_version: plan.catalogue_version,
     managed_application_count: plan.managed_application_count,
-    accommodation_route_count: plan.accommodation_route_count,
-    cv_versions: plan.cv_versions,
-    motivation_letters: plan.motivation_letters,
-    service_scope: plan.service_scope,
+    accommodation_route_count: plan.accommodation_route_count, cv_versions: plan.cv_versions,
+    motivation_letters: plan.motivation_letters, service_scope: plan.service_scope,
     refund_policy_version: plan.refund_policy_version,
   };
-
-  await rest("finance_orders", {
-    method: "POST",
-    headers: { prefer: "return=minimal" },
-    body: JSON.stringify({
-      order_ref: orderRef, candidate_ref: candidateId, plan_code: plan.plan_code,
-      order_status: "PENDING_PAYMENT", amount_cents: plan.amount_cents, currency: "ZAR",
-      catalogue_version: plan.catalogue_version, service_term_days: plan.service_term_days,
-      managed_application_count: plan.managed_application_count, accommodation_route_count: plan.accommodation_route_count,
-      cv_versions: plan.cv_versions, motivation_letters: plan.motivation_letters,
-      acknowledgement_target_business_hours: plan.acknowledgement_target_business_hours,
-      first_response_target_business_hours: plan.first_response_target_business_hours,
-      upgrade_bonus_routes: plan.upgrade_bonus_routes_when_cv_revamp_owned ?? 0,
-      refund_policy_version: plan.refund_policy_version, service_scope: plan.service_scope,
-      entitlement_snapshot: entitlement,
-    }),
-  });
-  await rest("finance_invoices", {
-    method: "POST",
-    headers: { prefer: "return=minimal" },
-    body: JSON.stringify({
-      invoice_ref: invoiceRef, order_ref: orderRef, candidate_ref: candidateId,
-      invoice_status: "OPEN", amount_cents: plan.amount_cents, currency: "ZAR",
-    }),
-  });
-  await rest("payfast_payment_intents", {
-    method: "POST",
-    headers: { prefer: "return=minimal" },
-    body: JSON.stringify({
-      intent_ref: intentRef, order_ref: orderRef, invoice_ref: invoiceRef, candidate_ref: candidateId,
-      merchant_reference: merchantReference, amount_cents: plan.amount_cents, currency: "ZAR",
-      item_name: plan.plan_name, item_description: plan.description, return_url: returnUrl,
-      cancel_url: cancelUrl, notify_url: notifyUrl, payfast_environment: environment,
-      payment_url: "https://sandbox.payfast.co.za/eng/process", signed_payload: signed,
-      signature: signed.signature, intent_status: "CREATED", idempotency_key: idem,
-    }),
-  });
   const evidenceRef = ref("pay_ev");
-  await rest("payment_evidence_ledger", {
-    method: "POST",
-    headers: { prefer: "return=minimal" },
+  const created = await rest("rpc/payfast_create_sandbox_checkout", {
+    method: "POST", headers: { prefer: "return=representation" },
     body: JSON.stringify({
-      evidence_ref: evidenceRef, source_type: "payfast_intent", source_ref: intentRef,
-      candidate_ref: candidateId, order_ref: orderRef, event_name: "PAYFAST_SANDBOX_INTENT_CREATED",
-      event_summary: "Sandbox checkout intent created; not proof of payment.",
-      proof_payload: { environment, amountCents: plan.amount_cents, currency: "ZAR", secretsReturned: false },
+      p_order: {
+        order_ref: orderRef, candidate_ref: candidateId, plan_code: plan.plan_code,
+        order_status: "PENDING_PAYMENT", amount_cents: plan.amount_cents, currency: "ZAR",
+        catalogue_version: plan.catalogue_version, service_term_days: plan.service_term_days,
+        managed_application_count: plan.managed_application_count,
+        accommodation_route_count: plan.accommodation_route_count, cv_versions: plan.cv_versions,
+        motivation_letters: plan.motivation_letters,
+        acknowledgement_target_business_hours: plan.acknowledgement_target_business_hours,
+        first_response_target_business_hours: plan.first_response_target_business_hours,
+        upgrade_bonus_routes: plan.upgrade_bonus_routes_when_cv_revamp_owned ?? 0,
+        refund_policy_version: plan.refund_policy_version, service_scope: plan.service_scope,
+        entitlement_snapshot: entitlement,
+      },
+      p_invoice: { invoice_ref: invoiceRef, order_ref: orderRef, candidate_ref: candidateId,
+        invoice_status: "OPEN", amount_cents: plan.amount_cents, currency: "ZAR" },
+      p_intent: { intent_ref: intentRef, order_ref: orderRef, invoice_ref: invoiceRef,
+        candidate_ref: candidateId, merchant_reference: merchantReference, amount_cents: plan.amount_cents,
+        currency: "ZAR", item_name: String(plan.plan_name),
+        item_description: String(plan.description ?? plan.plan_name), return_url: returnUrl,
+        cancel_url: cancelUrl, notify_url: notifyUrl, payfast_environment: environment,
+        payment_url: "https://sandbox.payfast.co.za/eng/process", signed_payload: signed,
+        signature: signed.signature, intent_status: "CREATED", idempotency_key: idem },
+      p_evidence: { evidence_ref: evidenceRef,
+        proof_payload: { environment, amountCents: plan.amount_cents, currency: "ZAR", secretsReturned: false } },
     }),
   });
-  return json({
-    intent: { intentRef, merchantReference, paymentUrl: "https://sandbox.payfast.co.za/eng/process", fields: sanitize(signed), signature: signed.signature },
-    orderStatus: "PENDING_PAYMENT",
+  const result = Array.isArray(created) ? created[0] : created;
+  if (!result || typeof result !== "object") return json({ error: "checkout_creation_failed" }, 500);
+  if (result.reused) {
+    const reused = await rest(`payfast_payment_intents?select=intent_ref,merchant_reference,payment_url,signed_payload,signature,intent_status&candidate_ref=eq.${encodeURIComponent(candidateId)}&idempotency_key=eq.${encodeURIComponent(idem)}&limit=1`);
+    const prior = Array.isArray(reused) ? reused[0] : null;
+    const priorFields = prior?.signed_payload && typeof prior.signed_payload === "object"
+      ? prior.signed_payload as Record<string, string> : {};
+    return json({ intent: { intentRef: result.intentRef, merchantReference: result.merchantReference,
+      paymentUrl: result.paymentUrl, fields: sanitize(priorFields), signature: prior?.signature },
+      reused: true, orderStatus: result.intentStatus === "PAID" ? "PAID" : "PENDING_PAYMENT",
+      paymentStatus: result.intentStatus === "PAID" ? "COMPLETE" : "PENDING" });
+  }
+  return json({ intent: { intentRef, merchantReference, paymentUrl: "https://sandbox.payfast.co.za/eng/process",
+    fields: sanitize(signed), signature: signed.signature }, orderStatus: "PENDING_PAYMENT",
     paymentStatus: "PENDING",
-    note: "A checkout intent is not payment success. Only a verified provider ITN can confirm payment.",
-  }, 201);
+    note: "A checkout intent is not payment success. Only a verified provider ITN can confirm payment." }, 201);
 }
 
 async function receiveItn(request: Request) {
@@ -288,8 +285,8 @@ async function receiveItn(request: Request) {
   });
   if (!accepted || !intent) return new Response("INVALID", { status: 400, headers: { "content-type": "text/plain", "cache-control": "no-store" } });
 
-  const existing = await rest(`finance_payments?select=id&provider=eq.PAYFAST&provider_payment_id=eq.${encodeURIComponent(providerPaymentId)}&limit=1`);
-  if (Array.isArray(existing) && existing.length) return new Response("OK", { status: 200, headers: { "content-type": "text/plain" } });
+  // Always call the settlement RPC, including replays. Its idempotent branch repairs
+  // any interrupted legacy activation while guaranteeing no duplicate payment row.
 
   const paymentRef = ref("pay");
   const paymentEvidenceRef = ref("pay_ev");
