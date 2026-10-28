@@ -4,12 +4,18 @@ export type LimitedJsonResult =
 
 export async function readLimitedJson(request: Request, maxBytes = 16 * 1024): Promise<LimitedJsonResult> {
   const contentType = request.headers.get("content-type") || "";
-  if (!contentType.toLowerCase().includes("application/json")) {
+  if (!/^application\\/json(?:\\s*;|$)/i.test(contentType)) {
     return { ok: false, status: 415, error: "JSON_CONTENT_TYPE_REQUIRED" };
   }
-  const declaredLength = Number(request.headers.get("content-length") || 0);
-  if (Number.isFinite(declaredLength) && declaredLength > maxBytes) {
-    return { ok: false, status: 413, error: "REQUEST_TOO_LARGE" };
+  const declaredHeader = request.headers.get("content-length");
+  if (declaredHeader !== null) {
+    const declaredLength = Number(declaredHeader);
+    if (!Number.isSafeInteger(declaredLength) || declaredLength < 0) {
+      return { ok: false, status: 400, error: "INVALID_JSON" };
+    }
+    if (declaredLength > maxBytes) {
+      return { ok: false, status: 413, error: "REQUEST_TOO_LARGE" };
+    }
   }
   if (!request.body) return { ok: false, status: 400, error: "INVALID_JSON" };
   const reader = request.body.getReader();
@@ -38,7 +44,7 @@ export async function readLimitedJson(request: Request, maxBytes = 16 * 1024): P
     offset += chunk.byteLength;
   }
   try {
-    return { ok: true, value: JSON.parse(new TextDecoder().decode(bytes)) };
+    return { ok: true, value: JSON.parse(new TextDecoder("utf-8", { fatal: true }).decode(bytes)) };
   } catch {
     return { ok: false, status: 400, error: "INVALID_JSON" };
   }
