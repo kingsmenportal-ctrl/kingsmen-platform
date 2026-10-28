@@ -4,7 +4,7 @@ export type LimitedJsonResult =
 
 export async function readLimitedJson(request: Request, maxBytes = 16 * 1024): Promise<LimitedJsonResult> {
   const contentType = request.headers.get("content-type") || "";
-  if (!/^application\\/json(?:\\s*;|$)/i.test(contentType)) {
+  if (!/^application\/json(?:\s*;|$)/i.test(contentType)) {
     return { ok: false, status: 415, error: "JSON_CONTENT_TYPE_REQUIRED" };
   }
   const declaredHeader = request.headers.get("content-length");
