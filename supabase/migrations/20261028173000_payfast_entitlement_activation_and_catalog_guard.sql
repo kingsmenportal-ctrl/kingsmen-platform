@@ -39,6 +39,9 @@ begin
   select * into v_existing from public.payfast_payment_intents
    where candidate_ref=v_candidate_ref and idempotency_key=v_idempotency_key for update;
   if found then
+    if v_existing.plan_code <> p_order->>'plan_code' then
+      raise exception 'idempotency_key_reused_for_different_plan';
+    end if;
     return jsonb_build_object('reused',true,'intentRef',v_existing.intent_ref,
       'merchantReference',v_existing.merchant_reference,'paymentUrl',v_existing.payment_url,
       'intentStatus',v_existing.intent_status);
