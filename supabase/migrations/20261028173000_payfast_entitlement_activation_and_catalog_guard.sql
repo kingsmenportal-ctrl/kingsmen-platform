@@ -165,6 +165,9 @@ begin
   if v_service_order.amount_minor <> v_intent.amount_cents or v_service_order.currency <> v_intent.currency then
     raise exception 'candidate_service_order_amount_mismatch';
   end if;
+  if v_service_order.status not in ('PENDING_PAYMENT','PAID') then
+    raise exception 'candidate_service_order_not_payable';
+  end if;
   select * into v_existing from public.finance_payments
    where provider='PAYFAST' and provider_payment_id=p_provider_payment_id limit 1;
   if found then
