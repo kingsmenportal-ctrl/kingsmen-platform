@@ -2,6 +2,12 @@ export type CurrencyCode = "ZAR";
 
 export type FinancePlanCode =
   | "FREE_DESTINY_MAP_R0"
+  | "FOUNDATIONAL_ACCORD_R169_99"
+  | "COLLEGIATE_ORDINANCE_R299_99"
+  | "CHANCELLORS_WRIT_R399_99"
+  | "REGENCY_MANDATE_R469_99"
+  | "ARTISAN_CHARTER_R149_99"
+  | "GUILDMASTERS_CHARTER_R199_99"
   | "CV_REVAMP_R49_99"
   | "ACCOMMODATION_SUPPORT_R179";
 
@@ -18,8 +24,8 @@ export interface FinancePlan {
   currency: CurrencyCode;
   managedApplicationCount: number;
   accommodationRouteCount: number;
-  cvVersions: number;
-  motivationLetters: number;
+  cvVersions: number | null;
+  motivationLetters: number | null;
   doctrineNotes: string;
 }
 

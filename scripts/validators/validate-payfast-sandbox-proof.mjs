@@ -34,6 +34,7 @@ function checkFile(path, tokens = []) {
 
 const requiredFiles = [
   'apps/api/src/finance/payfast-signature.ts',
+  'supabase/functions/payfast-sandbox/index.ts',
   'apps/api/src/finance/payfast-itn.ts',
   'apps/api/src/finance/payfast-sandbox-proof.ts',
   'apps/api/src/finance/index.ts',
@@ -47,6 +48,77 @@ const requiredFiles = [
 ];
 
 for (const file of requiredFiles) checkFile(file);
+
+checkFile('apps/web/src/app/api/finance/auth/route.ts', [
+  'auth/v1/otp',
+  'auth/v1/verify',
+  'create_user: false',
+  'HttpOnly; Secure; SameSite=Lax',
+  'cross_origin_request_rejected'
+]);
+
+checkFile('apps/web/src/app/api/finance/provider-health/route.ts', [
+  '/functions/v1/payfast-sandbox',
+  'missingKeys',
+  'realTransactionProven: false',
+  'productionReady: false'
+]);
+
+checkFile('apps/web/src/app/api/finance/checkout/route.ts', [
+  'candidate_authentication_required',
+  'idempotency-key',
+  'planCode',
+  '/functions/v1/payfast-sandbox'
+]);
+
+checkFile('apps/web/src/app/api/finance/status/route.ts', [
+  'candidate_authentication_required',
+  'action=status',
+  'orderRef'
+]);
+
+checkFile('apps/web/src/app/candidate/finance/CandidateFinanceCheckout.tsx', [
+  'send_code',
+  'verify_code',
+  'startCheckout',
+  'paymentVerified',
+  'Continue to secure sandbox checkout',
+  'providerReady',
+  'Return navigation is not payment confirmation'
+]);
+
+checkFile('supabase/functions/payfast-sandbox/index.ts', [
+  'async function checkout(request: Request',
+  'async function candidateOrderStatus(request: Request',
+  'candidate_ref=eq.',
+  'returnedEntitlementsOnlyForVerifiedPaidOrders: true',
+  'entitlement: paid ? order.entitlement_snapshot : null',
+  'candidate_auth_identity_links',
+  'finance_plan_catalog',
+  'canonicalEntitlements',
+  'canonical_package_catalogue_not_reconciled',
+  'amount_cents: plan.amount_cents',
+  'signatureValid',
+  'providerValid',
+  'async function validPayFastSourceIp(request: Request)',
+  'PAYFAST_ALLOWED_SOURCE_IPS',
+  'sourceValidationReady',
+  'checkoutSchemaReady',
+  'Deno.resolveDns(host, "A")',
+  'const ipValid = await validPayFastSourceIp(request)',
+  '&& ipValid && amountValid',
+  'duplicate',
+  'idempotency_key_reused_for_different_package',
+  'existing_checkout_signature_unavailable',
+  'paymentStatus === "COMPLETE"',
+  'payfast_settle_sandbox_payment',
+  'A checkout intent is not payment success',
+  'SUPABASE_SERVICE_ROLE_KEY',
+  'PAYFAST_MERCHANT_KEY',
+  'catalogueReady',
+  'catalogueMismatches',
+  'signed_payload: sanitize(signed)'
+]);
 
 checkFile('apps/api/src/finance/payfast-itn.ts', [
   'verifyPayFastSignature',

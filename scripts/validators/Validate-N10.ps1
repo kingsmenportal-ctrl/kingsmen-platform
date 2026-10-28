@@ -75,7 +75,8 @@ Require-Contains "apps\web\src\finance\RefundReviewPanel.tsx" "No AI refund appr
 Require-Contains "reports\n10\N10_FINANCE_PAYFAST_REPORT.md" "PayFast is the payment processor" "Report must state PayFast processor boundary."
 
 Require-Contains "db\migrations\0083_retire_legacy_accommodation_checkout.sql" "active = false" "Legacy accommodation checkout migration must deactivate the plan."
-Require-Contains "db\seeds\n10_finance_payfast_seed.sql" "active = false" "Finance seed must deactivate the legacy accommodation plan."
+Require-Contains "db\seeds\n10_finance_payfast_seed.sql" "active=true" "Canonical finance seed must activate Accommodation Support."
+Require-Contains "db\migrations\20261027120000_reconcile_canonical_package_catalogues.sql" "ACCOMMODATION_SUPPORT_R179" "Canonical reconciliation migration must restore Accommodation Support."
 
 $Result = [ordered]@{
   phase = "N10"
