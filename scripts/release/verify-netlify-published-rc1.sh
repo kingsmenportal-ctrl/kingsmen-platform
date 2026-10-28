@@ -34,13 +34,22 @@ printf 'deploy_url=%s\n' "$deploy_url"
 [[ "$state" == "ready" ]] || { echo "FAIL: published deploy state is not ready" >&2; exit 4; }
 [[ "$commit_ref" == "$RC1_SHA" ]] || { echo "FAIL: published deploy commit does not match RC1_SHA" >&2; exit 5; }
 
-# Smoke check only. Protected routes must still be tested with authenticated sessions.
-for route in / /login /candidate /candidate/applications /reviewer/login; do
+# Smoke check only. Route names are taken from the planned RC1 UI integration
+# (PR #190 auth/identity review, PR #202 candidate workspace, PR #120 tracker).
+# Protected routes must still be tested with authenticated sessions.
+for route in / /auth/login /candidate/login /candidate /candidate/workbench /candidate/identity-review /candidate/applications /reviewer/identity-reviews; do
   code="$(curl --silent --show-error --output /dev/null --write-out '%{http_code}' --max-time 20 "${site_url%/}$route")"
   printf 'route=%s http_status=%s\n' "$route" "$code"
-  case "$code" in
-    200|301|302|303|307|308|401|403) ;;
-    *) echo "FAIL: unexpected HTTP status for $route" >&2; exit 6 ;;
+  case "$route" in
+    /)
+      [[ "$code" == "200" ]] || { echo "FAIL: homepage must return HTTP 200" >&2; exit 6; }
+      ;;
+    /auth/login|/candidate/login)
+      case "$code" in 200|301|302|303|307|308) ;; *) echo "FAIL: login route unavailable: $route" >&2; exit 6 ;; esac
+      ;;
+    *)
+      case "$code" in 200|301|302|303|307|308|401|403) ;; *) echo "FAIL: unexpected HTTP status for $route" >&2; exit 6 ;; esac
+      ;;
   esac
 done
 echo "PASS: published deploy is ready and matches the immutable RC1 SHA."
