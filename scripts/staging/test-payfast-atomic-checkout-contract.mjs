@@ -8,10 +8,12 @@ const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "../..")
 const edge = fs.readFileSync(path.join(root, "supabase/functions/payfast-sandbox/index.ts"), "utf8");
 const migration = fs.readFileSync(path.join(root, "supabase/migrations/20261028173000_payfast_entitlement_activation_and_catalog_guard.sql"), "utf8");
 
-assert.match(edge, /idempotency_key,plan_code&candidate_ref=/, "checkout idempotency lookup must read the bound plan");
+assert.match(edge, /finance_orders\?select=plan_code&order_ref=eq/, "checkout idempotency must resolve plan from the authoritative finance order");
+assert.doesNotMatch(edge, /payfast_payment_intents\?select=[^`]*plan_code/, "intent table must not be queried for a nonexistent plan_code column");
 assert.match(edge, /prior\.plan_code !== plan\.plan_code/, "edge handler must reject reuse across different plans");
 assert.match(edge, /idempotency_key_reused_for_different_plan/, "edge handler must expose a stable conflict code");
-assert.match(migration, /v_existing\.plan_code <> p_order->>'plan_code'/, "database RPC must enforce plan binding independently");
+assert.match(migration, /select fo\.plan_code into v_existing_plan_code[\s\S]*?fo\.order_ref=v_existing\.order_ref/, "database RPC must resolve existing plan from finance_orders");
+assert.match(migration, /pg_advisory_xact_lock\(hashtextextended\(v_candidate_ref \|\| ':' \|\| v_idempotency_key, 0\)\)/, "database RPC must serialize concurrent idempotency-key creation");
 assert.match(migration, /raise exception 'idempotency_key_reused_for_different_plan'/, "database RPC must fail closed on cross-plan reuse");
 assert.match(migration, /revoke all on function public\.payfast_create_sandbox_checkout\(jsonb,jsonb,jsonb,jsonb\) from public,anon,authenticated/i, "checkout RPC must remain service-role-only");
 assert.match(migration, /grant execute on function public\.payfast_create_sandbox_checkout\(jsonb,jsonb,jsonb,jsonb\) to service_role/i, "checkout RPC must grant service role");
