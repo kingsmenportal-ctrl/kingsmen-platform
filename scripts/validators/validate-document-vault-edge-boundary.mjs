@@ -24,4 +24,11 @@ assert.ok(source.includes("DOCUMENT_REVIEWER_REQUIRED"), "reviewer actions must 
 assert.ok(source.includes("Vary: Origin") || source.includes('"Vary": "Origin"') || source.includes('"Vary": "Origin"'), "responses must vary by origin");
 assert.ok(source.includes("if (req.method !== \"POST\")"), "non-POST actions must be rejected");
 
-console.log("PASS Document Vault edge boundary contract (21 assertions)");
+
+assert.ok(source.includes("actualSize !== Number(doc.size_bytes)"), "finalization must compare actual and declared file sizes");
+assert.ok(source.includes("signatureValid"), "finalization must validate the file signature against its declared MIME type");
+assert.ok(source.includes("crypto.subtle.digest(\"SHA-256\", bytes)"), "finalized file bytes must be fingerprinted with SHA-256");
+assert.ok(source.includes("createSignedUploadUrl(path, { upsert: false })"), "uploads must not overwrite an existing object path");
+assert.ok(source.includes("event_type: \"UPLOAD_CONFIRMED\"") && source.includes("event_type: \"UPLOAD_FAILED\""), "upload success and failure transitions must be auditable");
+
+console.log("PASS Document Vault edge boundary contract (26 assertions)");
