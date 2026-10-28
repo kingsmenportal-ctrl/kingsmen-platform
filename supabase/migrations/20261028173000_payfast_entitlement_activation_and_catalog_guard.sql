@@ -12,6 +12,7 @@ declare
   v_candidate_id uuid;
   v_idempotency_key text := p_intent->>'idempotency_key';
   v_existing public.payfast_payment_intents%rowtype;
+  v_existing_plan_code text;
   v_plan public.finance_plan_catalog%rowtype;
   v_package public.service_packages%rowtype;
   v_package_code text;
@@ -36,10 +37,17 @@ begin
     raise exception 'live_payments_disabled';
   end if;
 
+  -- Serialize same-candidate/idempotency-key creation so concurrent requests cannot race
+  -- through the lookup and create duplicate finance/service-order rows.
+  perform pg_advisory_xact_lock(hashtextextended(v_candidate_ref || ':' || v_idempotency_key, 0));
   select * into v_existing from public.payfast_payment_intents
    where candidate_ref=v_candidate_ref and idempotency_key=v_idempotency_key for update;
   if found then
-    if v_existing.plan_code <> p_order->>'plan_code' then
+    select fo.plan_code into v_existing_plan_code
+      from public.finance_orders fo
+      where fo.order_ref=v_existing.order_ref and fo.candidate_ref=v_candidate_ref
+      limit 1;
+    if v_existing_plan_code is null or v_existing_plan_code <> p_order->>'plan_code' then
       raise exception 'idempotency_key_reused_for_different_plan';
     end if;
     return jsonb_build_object('reused',true,'intentRef',v_existing.intent_ref,
