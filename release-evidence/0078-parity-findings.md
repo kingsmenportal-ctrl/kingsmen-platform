@@ -40,6 +40,20 @@ Read-only staging queries returned:
 - insert/update event triggers exist on preparation items and call `public.record_candidate_application_preparation_event()`;
 - candidate-owned policies now call `private.current_verified_candidate_id()`, whereas the canonical 0078 body calls `public.current_verified_candidate_id()`.
 
+## Read-only parity snapshot executed against staging
+
+A compact catalog assertion query returned these results:
+- all three target tables exist;
+- live column counts: tracker 8, preparation items 13, preparation events 10;
+- expected 0078 indexes exist: tracker composite `(id, candidate_id)`, preparation-item composite `(id, candidate_id)`, preparation owner/tracker index and event owner/time index;
+- expected later-0081 indexes exist: preparation items tracker/owner, preparation events item, and preparation events tracker/owner;
+- RLS enabled on tracker/items/events; policy counts are 4/4/1 respectively;
+- both preparation-item event triggers exist;
+- event recorder is SECURITY DEFINER, has empty search_path, and does not grant EXECUTE to anon or authenticated;
+- `private.current_verified_candidate_id()` exists.
+
+These checks support **PASS for the listed structural invariants**. They are not a full byte-for-byte migration reconstruction and do not prove candidate A/B runtime isolation.
+
 ## Explained later-migration deltas
 
 The helper schema change is explained by a later migration present in the staging ledger:
