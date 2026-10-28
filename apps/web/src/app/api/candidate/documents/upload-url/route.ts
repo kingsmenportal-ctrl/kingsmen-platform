@@ -1,10 +1,13 @@
+import { readLimitedJson } from "../../../../../lib/read-limited-json";
+
 export const dynamic = "force-dynamic";
 
 export async function POST(request: Request) {
   const authorization = request.headers.get("authorization") || "";
   if (!/^Bearer\s+\S+$/i.test(authorization)) return Response.json({ ok: false, error: "AUTHENTICATION_REQUIRED" }, { status: 401 });
-  let body: any;
-  try { body = await request.json(); } catch { return Response.json({ ok: false, error: "INVALID_JSON" }, { status: 400 }); }
+  const parsed = await readLimitedJson(request, 16 * 1024);
+  if (!parsed.ok) return Response.json({ ok: false, error: parsed.error }, { status: parsed.status });
+  const body: any = parsed.value;
   const filename = typeof body?.filename === "string" ? body.filename.trim() : "";
   const mimeType = typeof body?.mimeType === "string" ? body.mimeType : "";
   const sizeBytes = Number(body?.sizeBytes);
