@@ -102,7 +102,8 @@
     "n15:ingestion:test": "node scripts/staging/test-n15-live-ingestion-contract.mjs",
     "n15:ingestion:check": "npm run n15:ingestion:test",
     "api:test:production-storage-guard": "npm run api:build && node scripts/tests/test-truth-vault-production-guard.mjs",
-    "web:validate:lockfile": "node scripts/validators/validate-web-lockfile-consistency.mjs"
+    "web:validate:lockfile": "node scripts/validators/validate-web-lockfile-consistency.mjs",
+    "documents:validate:edge-boundary": "node scripts/validators/validate-document-vault-edge-boundary.mjs"
   },
   "repository": {
     "type": "git",
