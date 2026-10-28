@@ -1,4 +1,4 @@
-"const gates = [
+const gates = [
   ["01", "Higher education", "Universities, universities of technology and CAO programme choices.", "HIGHER_EDUCATION"],
   ["02", "TVET & college", "NC(V), NATED, Report 191 and college progression.", "TVET"],
   ["03", "SETA & learnerships", "Skills programmes, learnerships and occupational training.", "SETA_LEARNERSHIP"],
