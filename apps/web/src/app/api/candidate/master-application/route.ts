@@ -7,6 +7,47 @@ const PATHWAYS = new Set([
   "APPRENTICESHIP", "EMPLOYMENT", "FUNDING", "ACCOMMODATION", "WIL"
 ]);
 
+
+const MAX_REQUEST_BYTES = 128 * 1024;
+
+async function readJsonLimited(request: Request): Promise<
+  { ok: true; value: unknown } | { ok: false; reason: "TOO_LARGE" | "INVALID_JSON" }
+> {
+  const declaredLength = Number(request.headers.get("content-length") || 0);
+  if (Number.isFinite(declaredLength) && declaredLength > MAX_REQUEST_BYTES) {
+    return { ok: false, reason: "TOO_LARGE" };
+  }
+  if (!request.body) return { ok: false, reason: "INVALID_JSON" };
+  const reader = request.body.getReader();
+  const chunks: Uint8Array[] = [];
+  let total = 0;
+  try {
+    while (true) {
+      const { done, value } = await reader.read();
+      if (done) break;
+      total += value.byteLength;
+      if (total > MAX_REQUEST_BYTES) {
+        await reader.cancel();
+        return { ok: false, reason: "TOO_LARGE" };
+      }
+      chunks.push(value);
+    }
+  } finally {
+    reader.releaseLock();
+  }
+  const bytes = new Uint8Array(total);
+  let offset = 0;
+  for (const chunk of chunks) {
+    bytes.set(chunk, offset);
+    offset += chunk.byteLength;
+  }
+  try {
+    return { ok: true, value: JSON.parse(new TextDecoder().decode(bytes)) };
+  } catch {
+    return { ok: false, reason: "INVALID_JSON" };
+  }
+}
+
 function config() {
   const base = process.env.NEXT_PUBLIC_SUPABASE_URL?.replace(/\/$/, "");
   const key = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
@@ -78,10 +119,18 @@ export async function GET(request: Request) {
 }
 
 export async function POST(request: Request) {
-  let body: any;
-  try { body = await request.json(); } catch {
-    return Response.json({ ok: false, error: "INVALID_JSON" }, { status: 400 });
+  const contentType = request.headers.get("content-type") || "";
+  if (!contentType.toLowerCase().includes("application/json")) {
+    return Response.json({ ok: false, error: "JSON_CONTENT_TYPE_REQUIRED" }, { status: 415 });
   }
+  const parsed = await readJsonLimited(request);
+  if (!parsed.ok) {
+    return Response.json(
+      { ok: false, error: parsed.reason === "TOO_LARGE" ? "REQUEST_TOO_LARGE" : "INVALID_JSON" },
+      { status: parsed.reason === "TOO_LARGE" ? 413 : 400 }
+    );
+  }
+  const body: any = parsed.value;
   if (!body || typeof body.profileData !== "object" || body.profileData === null || Array.isArray(body.profileData)) {
     return Response.json({ ok: false, error: "PROFILE_DATA_REQUIRED" }, { status: 400 });
   }
@@ -102,8 +151,13 @@ export async function POST(request: Request) {
     }
     const url = typeof target.providerApplicationUrl === "string" && target.providerApplicationUrl.trim()
       ? target.providerApplicationUrl.trim() : null;
-    if (url && (!url.startsWith("https://") || url.length > 2048)) {
-      return Response.json({ ok: false, error: "TARGET_URL_MUST_BE_HTTPS" }, { status: 400 });
+    if (url) {
+      let parsedUrl: URL | null = null;
+      try { parsedUrl = new URL(url); } catch {}
+      if (!parsedUrl || parsedUrl.protocol !== "https:" || !parsedUrl.hostname ||
+          parsedUrl.username || parsedUrl.password || url.length > 2048) {
+        return Response.json({ ok: false, error: "TARGET_URL_MUST_BE_HTTPS" }, { status: 400 });
+      }
     }
     targets.push({
       target_key: typeof target.targetKey === "string" && target.targetKey.trim()
