@@ -2,7 +2,7 @@
 
 Date: 2026-10-28  
 Environment inspected: Supabase staging `euhubhhnumtibbyufghm`, PostgreSQL 17.11  
-Status: **one canonical source body recovered; per-ledger executed-body identity remains unprovable from the migration ledger alone.**
+Status: **both exact historical bodies recovered from the live migration ledger and correlated with PostgreSQL logs; one index block differs.**
 
 ## Historical source recovery
 
@@ -17,7 +17,13 @@ The staging migration ledger contains two entries with the same name:
 - `20261019112452 / candidate_application_preparation_readiness_0078`
 - `20261019112511 / candidate_application_preparation_readiness_0078`
 
-The ledger records version/name, not the SQL body or a body hash. The source recovery therefore establishes one canonical repository body shared by both reviewed branch references; it does **not** cryptographically prove that the exact same body was executed for each ledger version. To close that provenance gap, obtain the migration runner/deployment artifacts or historical commit/blob reference for each execution timestamp. Do not invent a second body or infer exact execution from current schema.
+Unlike the initial ledger listing, the authoritative `statements` array was also queried. Both rows have `statement_count=1`; `length(statements[1])` is 6,648 for `20261019112452` and 6,983 for `20261019112511`. The first body has no preparation-item composite owner index; the second has it. The PostgreSQL log event timestamps are `2026-10-19T11:24:52.425000` and `2026-10-19T11:25:11.619000`. Exact bodies are preserved at `release-evidence/historical-migrations/`.
+
+## Historical body comparison
+
+- `20261019112452`: `release-evidence/historical-migrations/20261019112452_candidate_application_preparation_readiness_0078.sql`, Git blob SHA `6f3512d330b99206bad7859318dcaf9fdb461c59`, 6,648 chars. Ends at the preparation-item status/title/evidence audit update trigger. It **does not** create the composite unique index `(id,candidate_id)` on preparation items.
+- `20261019112511`: `release-evidence/historical-migrations/20261019112511_candidate_application_preparation_readiness_0078.sql`, Git blob SHA `9fdabdde36c981ae305e57df589c168471b7d974`, 6,983 chars. It contains the same body and adds the final composite unique index required by the private Document Vault.
+- The canonical source file on PR #120 and #122 is identical to the second body.
 
 ## Canonical 0078 semantics
 
@@ -67,12 +73,10 @@ That migration adds `candidate_application_preparation_items_tracker_owner_idx`,
 
 ## Remaining verification steps
 
-1. Recover execution artifacts for ledger version `20261019112452`.
-2. Recover execution artifacts for ledger version `20261019112511`.
-3. Compare each recovered body byte-for-byte or via cryptographic hash to the canonical blob above.
-4. Compare full live schema against the ordered migration sequence 0077 → 0078 → 0079/0080/0081 and later helper-schema migration; do not compare the current schema to 0078 in isolation.
-5. Preserve sanitized output from `0078-semantic-parity-audit.sql` with execution time, project ref, operator and RC1 SHA.
+1. Preserve sanitized output from `0078-semantic-parity-audit.sql` with execution time, project ref, operator and future immutable RC1 SHA.
+2. Continue the full ordered comparison across 0077 → 0078 → 0079/0080/0081 and later helper-schema migration; do not compare current schema to 0078 in isolation.
+3. Separate migration-exact grants from current effective/direct/default ACLs. The current live role-table-grant query shows `anon` has SELECT/INSERT/UPDATE/DELETE on all three tables and `authenticated` has DML grants on preparation events even though 0078 explicitly grants only SELECT there. These extra grants are RLS-gated but should receive a separate least-privilege review; they are not solved by 0097.
 
 ## Release decision
 
-The **semantic schema inventory is substantially reconciled**: observed differences identified so far map to later migrations 0081 and `20261022031206`. The **historical per-ledger body provenance remains BLOCKED** until the two deployment artifacts are recovered. This distinction must remain visible in RC1 evidence.
+The **historical body provenance is now resolved**: both actual SQL statements were retrieved from `supabase_migrations.schema_migrations.statements[1]`, correlated to PostgreSQL log timestamps, and preserved as separate files. The **semantic schema inventory is substantially reconciled**. The remaining work is to attach full catalog output to the exact RC1 SHA and independently review the extra DML grants.
