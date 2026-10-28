@@ -13,7 +13,7 @@ The current PR head SHA is the source of truth; it changes as commits are added.
 - Read-only ACL audit with exact target scope: `release-evidence/0097-privilege-audit.sql`.
 - Standalone fail-closed SQL post-assertion: `release-evidence/0097-post-assertion.sql`.
 - Candidate migration branch currently revokes non-DML privileges from PUBLIC/anon/authenticated on current public tables and public default ACLs for postgres and supabase_admin.
-- No independent approval or fresh exact-head CI has been established; migration is not applied.
+- Fresh exact-head workflows pass on PR #206 SHA `9079794bc02990a7888ab14508b26c31d2aae1a9`: Identity Review Authorization Contract #83 (`40732315531`), Jarvis Live Runtime #1518 (`40732315650`), and Kingsmen Release Evidence #730 (`40732315671`). Independent review/approval is absent; migration is not applied.
 
 ### Deliverable 2 — 0078 migration reconciliation
 - `release-evidence/0078-full-reconciliation.md`, `release-evidence/0078-parity-findings.md`, and `release-evidence/0078-historical-body-provenance.md`.
@@ -53,7 +53,7 @@ The current PR head SHA is the source of truth; it changes as commits are added.
 ## Fresh live environment evidence
 
 - Supabase project `euhubhhnumtibbyufghm`: ACTIVE_HEALTHY; PostgreSQL `17.11.0.003`.
-- Staging migration ledger contains versions `20261019112452` and `20261019112511`, both named candidate application preparation readiness 0078. Migration 0097 does not appear in the last queried migration list.
+- Staging migration ledger contains `20261019112452 / candidate_application_preparation_readiness_0078` and `20261019112511 / candidate_application_preparation_readiness_0078`, each with one persisted SQL statement. Their exact bodies have been exported and preserved. The first is 6,648 chars and lacks the preparation-item composite `(id,candidate_id)` index; the second is 6,983 chars and contains it. Migration 0097 does not appear in the last queried migration list.
 - The only Supabase branch returned was `main`, `with_data=false`; this is not backup/restore evidence.
 - Read-only aggregate using the exact `pg_tables` population targeted by 0097 checked 230 public tables. `anon`: TRUNCATE 171, REFERENCES 171, TRIGGER 171, MAINTAIN 172. `authenticated`: TRUNCATE 181, REFERENCES 181, TRIGGER 181, MAINTAIN 182. Public table default ACLs for both `postgres` and `supabase_admin` also grant these privilege types to anon/authenticated. Direct PUBLIC non-DML grant rows returned zero; explicit PUBLIC revocation in 0097 prevents future inherited grants.
 - Netlify `kingsmen-portal-staging`: site ID `fb27d0db-b116-4890-8f7f-14e654c27dbc`, Team ID `69467d1afdbcc37d0e708e37`, plan `nf_team_dev`, claimed `true`, password protection `false`, team SSO `false`, Forms not enabled. Metadata reported a primary URL and unstable branch preview hash, but no published deploy ID or commit ref. No deployment action occurred.
