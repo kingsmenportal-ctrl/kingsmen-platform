@@ -16,10 +16,11 @@ The current PR head SHA is the source of truth; it changes as commits are added.
 - No independent approval or fresh exact-head CI has been established; migration is not applied.
 
 ### Deliverable 2 — 0078 migration reconciliation
-- `release-evidence/0078-full-reconciliation.md` and `release-evidence/0078-parity-findings.md`.
-- Canonical body recovered from PR #120 and PR #122 references, identical blob SHA `9fdabdde36c981ae305e57df589c168471b7d974`.
-- Semantics reconciled substantially: current helper-schema move aligns with later migration `20261022031206`; additional indexes align with 0081 blob `5713c8821777223349b882e4e9e20af63fac3256`.
-- Exact executed SQL body for each ledger version remains unproven. The two rows store only version/name and no body hash, and no deployment execution artifact was surfaced. No second body has been invented.
+- `release-evidence/0078-full-reconciliation.md`, `release-evidence/0078-parity-findings.md`, and `release-evidence/0078-historical-body-provenance.md`.
+- Both actual SQL bodies were recovered directly from `supabase_migrations.schema_migrations.statements[1]`, and corroborated by PostgreSQL logs at `2026-10-19T11:24:52.425000` and `2026-10-19T11:25:11.619000`.
+- Preserved exact bodies: `release-evidence/historical-migrations/20261019112452_candidate_application_preparation_readiness_0078.sql` (6,648 chars, Git blob SHA `6f3512d330b99206bad7859318dcaf9fdb461c59`) and `release-evidence/historical-migrations/20261019112511_candidate_application_preparation_readiness_0078.sql` (6,983 chars, Git blob SHA `9fdabdde36c981ae305e57df589c168471b7d974`).
+- The first body omits the final unique index on preparation-item `(id,candidate_id)`; the second adds it and matches the canonical repository source. Live schema contains that index. Later helper-schema changes map to migration `20261022031206`; other support indexes map to 0081 blob `5713c8821777223349b882e4e9e20af63fac3256`.
+- Current grants are broader than 0078's explicit grants: `anon` has SELECT/INSERT/UPDATE/DELETE on the three target tables and `authenticated` has DML grants on the events table beyond the explicit 0078 SELECT-only grant. RLS is enabled, but this is a distinct least-privilege finding not fixed by 0097.
 
 ### Deliverable 3 — combined verification
 - `release-evidence/combined-release-verification.md`
