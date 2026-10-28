@@ -9,12 +9,12 @@ const required = [
   "redirect: 'manual'", 'AbortSignal.timeout', 'planSha256',
   'STAGING_E2E_PASSED', 'STAGING_E2E_FAILED', 'results',
   'BLOCKED_INVALID_TIMEOUT', 'BLOCKED_INVALID_ASSERTION', 'caseIds',
-  'BLOCKED_INVALID_CASE_BODY', 'BLOCKED_SUPABASE_CONFIG', 'targetKind === \'supabase\'', 'headers.apikey', 'targetOrigins', 'await response.body?.cancel()'
+  'BLOCKED_INVALID_CASE_BODY', 'BLOCKED_SUPABASE_CONFIG', 'BLOCKED_UNAPPROVED_APP_ORIGIN', 'BLOCKED_UNAPPROVED_SUPABASE_ORIGIN', 'targetKind === \'supabase\'', 'headers.apikey', 'targetOrigins', 'await response.body?.cancel()'
 ];
 const failures = required.filter((token) => !source.includes(token));
 const testPath = 'scripts/staging/test-kingsmen-authenticated-e2e.mjs';
 const testSource = existsSync(testPath) ? readFileSync(testPath, 'utf8') : '';
-const testContracts = ['BLOCKED_MUTATION_NOT_AUTHORISED', 'BLOCKED_SESSION_MISSING', 'response-body redaction', 'whole-plan preflight', 'separate Supabase function origin', 'Supabase apikey forwarding', 'Supabase path-prefix boundary', 'app origin boundary'];
+const testContracts = ['BLOCKED_MUTATION_NOT_AUTHORISED', 'BLOCKED_SESSION_MISSING', 'response-body redaction', 'whole-plan preflight', 'separate Supabase function origin', 'Supabase apikey forwarding', 'Supabase path-prefix boundary', 'app origin boundary', 'app host allowlist', 'Supabase host allowlist'];
 const missingTests = testContracts.filter((token) => !testSource.includes(token));
 const allFailures = [...failures, ...missingTests.map((token) => 'test:' + token)];
 const report = {
