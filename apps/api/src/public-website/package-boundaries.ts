@@ -4,7 +4,7 @@ import type { PublicPackageCard } from "./public-website-types";
 const freeCard: PublicPackageCard = {
   packageKey: KINGSMEN_FREE_PREVIEW.packageKey,
   packageName: KINGSMEN_FREE_PREVIEW.name,
-  priceLabel: formatZar(KINGSMEN_FREE_PREVIEW.priceCents),
+  priceLabel: "R0",
   managedApplicationCount: 0,
   priorityApplicationCount: 0,
   concurrentManagedRouteCapacity30d: 0,
@@ -49,7 +49,7 @@ export function packagesControlWeightNotDignity(): true {
 
 export function freeDestinyMapHasZeroManagedApplications(): true {
   const free = getPublicPackageCard("FREE_DESTINY_MAP");
-  if (free.priceLabel !== "R0.00" || free.managedApplicationCount !== 0 || free.routeVisibility !== "PREVIEW_ONLY") {
+  if (free.priceLabel !== "R0" || free.managedApplicationCount !== 0 || free.routeVisibility !== "PREVIEW_ONLY") {
     throw new Error("FREE_DESTINY_MAP_BOUNDARY_BROKEN");
   }
   return true;
