@@ -27,6 +27,8 @@ assert.ok(profileApi.includes("/functions/v1/candidate-master-profile"), "profil
 assert.ok(profileApi.includes("AUTHENTICATION_REQUIRED") && profileApi.includes("cache: \"no-store\""), "profile API must require bearer auth and avoid caching");
 assert.ok(profilePage.includes("Save profile") && profilePage.includes("Reload saved profile"), "profile UI must expose explicit save and reload");
 assert.ok(profilePage.includes("consentAccepted") && profilePage.includes("Withdraw consent"), "profile UI must show consent acceptance and withdrawal");
+assert.ok(profilePage.includes("correctionRequest?: Correction") && profilePage.includes("body.correctionRequest"), "profile correction-response contract must type the persisted correction request");
+assert.ok(profilePage.includes('useEffect(() => { void load(); }, [load]);') && profilePage.includes("Profile saved to Supabase"), "profile must load server state on mount and expose backend save confirmation");
 assert.ok(profilePage.includes("Profile completeness") && profilePage.includes("aria-valuenow"), "profile UI must expose accessible completeness state");
 assert.ok(profileFunction.includes("bootstrap_candidate_self_profile") && profileFunction.includes("No email-based link or duplicate profile was created"), "profile bootstrap must not link by email equality");
 assert.ok(profileFunction.includes("SUPABASE_BACKEND") && profileFunction.includes("candidate_master_profiles"), "profile persistence must use Supabase backend state");
@@ -34,6 +36,8 @@ assert.ok(profileFunction.includes("privacy_consent_records") && profileFunction
 assert.ok(profileFunction.includes("candidate_profile_change_requests") && profileFunction.includes("Correction request submitted"), "profile correction requests must be persisted and audited for review");
 
 assert.ok(opportunityPage.includes("PATHWAYS") && opportunityPage.includes("Opportunity details and evidence"), "opportunity view must have six-pathway filtering and a details/evidence view");
+assert.ok(opportunityPage.includes("loadSavedWorkbench") && opportunityPage.includes('fetch("/api/candidate/applications"') && opportunityPage.includes('target.target_key.startsWith("n15:")'), "opportunity view must restore saved N15 targets and parent drafts from the authenticated backend on reload");
+assert.ok(opportunityPage.includes("useEffect") && opportunityPage.includes("void loadMatches()"), "opportunity feed must load automatically for an authenticated candidate");
 assert.ok(opportunityPage.includes("Save & prepare application") && opportunityPage.includes("/api/candidate/opportunity-save"), "opportunity view must connect to save-to-workbench");
 assert.ok(opportunityApi.includes("/functions/v1/candidate-save-verified-opportunity") && opportunityApi.includes("AUTHENTICATION_REQUIRED"), "opportunity API must proxy an authenticated server-validated action");
 assert.ok(opportunityFunction.includes("candidate_auth_identity_links") && opportunityFunction.includes("IDENTITY_REVIEW_REQUIRED"), "save-to-application must require authorised candidate identity");
