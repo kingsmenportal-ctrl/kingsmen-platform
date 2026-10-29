@@ -11,7 +11,7 @@ const source = fs.readFileSync(sourcePath, "utf8");
 const compiled = ts.transpileModule(source, {
   compilerOptions: { module: ts.ModuleKind.CommonJS, target: ts.ScriptTarget.ES2022 }
 }).outputText;
-const loaded = new Module(sourcePath, module);
+const loaded = new Module(sourcePath);
 loaded.filename = sourcePath;
 loaded.paths = Module._nodeModulePaths(path.dirname(sourcePath));
 loaded._compile(compiled, sourcePath);
