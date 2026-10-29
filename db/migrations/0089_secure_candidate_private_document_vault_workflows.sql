@@ -29,7 +29,10 @@ create or replace function public.create_candidate_private_document_upload_reque
   p_storage_path text,
   p_original_filename text,
   p_mime_type text,
-  p_size_bytes bigint
+  p_size_bytes bigint,
+  p_application_id uuid default null,
+  p_preparation_item_id uuid default null,
+  p_evidence_purpose text default 'CANDIDATE_DOCUMENT'
 )
 returns jsonb
 language plpgsql
@@ -62,6 +65,30 @@ begin
      or position(chr(92) in p_original_filename) > 0 then
     raise exception 'DOCUMENT_FILENAME_INVALID' using errcode = '22023';
   end if;
+  if p_evidence_purpose not in (
+    'CANDIDATE_DOCUMENT','PRE_SUBMISSION_CHECKLIST','PROVIDER_SUBMISSION_RECEIPT',
+    'PROVIDER_REFERENCE','PROVIDER_STATUS_NOTICE','PROVIDER_OUTCOME_NOTICE'
+  ) then
+    raise exception 'DOCUMENT_EVIDENCE_PURPOSE_NOT_ALLOWED' using errcode = '22023';
+  end if;
+  if p_application_id is not null and not exists (
+    select 1 from public.candidate_applications a
+    where a.id = p_application_id and a.candidate_id = p_candidate_id
+  ) then
+    raise exception 'DOCUMENT_APPLICATION_OWNER_MISMATCH' using errcode = '42501';
+  end if;
+  if p_preparation_item_id is not null and not exists (
+    select 1 from public.candidate_application_preparation_items i
+    where i.id = p_preparation_item_id and i.candidate_id = p_candidate_id
+  ) then
+    raise exception 'DOCUMENT_PREPARATION_ITEM_OWNER_MISMATCH' using errcode = '42501';
+  end if;
+  if p_evidence_purpose in (
+    'PROVIDER_SUBMISSION_RECEIPT','PROVIDER_REFERENCE','PROVIDER_STATUS_NOTICE','PROVIDER_OUTCOME_NOTICE'
+  ) and p_application_id is null then
+    raise exception 'APPLICATION_LINK_REQUIRED_FOR_PROVIDER_EVIDENCE' using errcode = '22023';
+  end if;
+
   if p_storage_path is null
      or p_storage_path is distinct from (
        p_candidate_id::text || '/' || p_document_id::text || '/' ||
@@ -90,13 +117,14 @@ begin
   end if;
 
   insert into public.candidate_private_documents (
-    id, candidate_id, document_type, storage_bucket, storage_path, original_filename,
-    mime_type, size_bytes, status, evidence_purpose, created_by_auth_user_id
+    id, candidate_id, document_type, application_id, preparation_item_id,
+    evidence_purpose, storage_bucket, storage_path, original_filename,
+    mime_type, size_bytes, status, created_by_auth_user_id
   )
   values (
-    p_document_id, p_candidate_id, p_document_type, 'kingsmen-candidate-documents', p_storage_path,
-    btrim(p_original_filename), p_mime_type, p_size_bytes, 'UPLOAD_PENDING',
-    'CANDIDATE_DOCUMENT', p_supabase_user_id
+    p_document_id, p_candidate_id, p_document_type, p_application_id, p_preparation_item_id,
+    p_evidence_purpose, 'kingsmen-candidate-documents', p_storage_path,
+    btrim(p_original_filename), p_mime_type, p_size_bytes, 'UPLOAD_PENDING', p_supabase_user_id
   )
   returning * into v_doc;
 
@@ -282,14 +310,14 @@ begin
 end;
 $function$;
 
-revoke all on function public.create_candidate_private_document_upload_request(uuid,uuid,uuid,text,text,text,text,bigint) from public, anon, authenticated;
+revoke all on function public.create_candidate_private_document_upload_request(uuid,uuid,uuid,text,text,text,text,bigint,uuid,uuid,text) from public, anon, authenticated;
 revoke all on function public.finalize_candidate_private_document_upload(uuid,uuid,uuid,bigint,text,boolean) from public, anon, authenticated;
 revoke all on function public.record_candidate_private_document_read_link(uuid,uuid,uuid,integer) from public, anon, authenticated;
-grant execute on function public.create_candidate_private_document_upload_request(uuid,uuid,uuid,text,text,text,text,bigint) to service_role;
+grant execute on function public.create_candidate_private_document_upload_request(uuid,uuid,uuid,text,text,text,text,bigint,uuid,uuid,text) to service_role;
 grant execute on function public.finalize_candidate_private_document_upload(uuid,uuid,uuid,bigint,text,boolean) to service_role;
 grant execute on function public.record_candidate_private_document_read_link(uuid,uuid,uuid,integer) to service_role;
 
-comment on function public.create_candidate_private_document_upload_request(uuid,uuid,uuid,text,text,text,text,bigint) is
+comment on function public.create_candidate_private_document_upload_request(uuid,uuid,uuid,text,text,text,text,bigint,uuid,uuid,text) is
   'Atomically records a private candidate document upload intent and audit event after re-checking the trusted Auth UUID to candidate link. Service role only.';
 comment on function public.finalize_candidate_private_document_upload(uuid,uuid,uuid,bigint,text,boolean) is
   'Finalizes a candidate document only after the trusted server verifies bytes, size, hash and MIME signature. Idempotent for same checksum. Service role only.';
