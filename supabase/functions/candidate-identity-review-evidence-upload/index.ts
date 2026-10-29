@@ -34,6 +34,8 @@ Deno.serve(async (req: Request) => {
     "Access-Control-Allow-Methods": "POST, OPTIONS", "Access-Control-Max-Age": "600", "Vary": "Origin"
   }});
   if (req.method !== "POST") return reply(405, { error: "Method not allowed." }, origin);
+  const contentLength = Number(req.headers.get("Content-Length") ?? "0");
+  if (contentLength > MAX_BYTES + 64 * 1024) return reply(413, { error: "Evidence request exceeds the upload limit." }, origin);
   if (!URL || !ANON || !SERVICE) return reply(503, { error: "Evidence service is not configured." }, origin);
   const bearer = /^Bearer\s+(.+)$/i.exec(req.headers.get("Authorization") ?? "");
   if (!bearer) return reply(401, { error: "A signed-in candidate session is required." }, origin);
