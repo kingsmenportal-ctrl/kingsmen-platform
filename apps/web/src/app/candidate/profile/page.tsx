@@ -34,6 +34,8 @@ type ProfileResponse = {
   code?: string;
   correctionRequests?: CorrectionRequest[];
   correctionRequest?: CorrectionRequest;
+  candidateReference?: string | null;
+  identityStatus?: "VERIFIED" | "PENDING_REVIEW" | "NOT_PROVISIONED";
   message?: string;
   profilePreserved?: boolean;
 };
@@ -61,6 +63,8 @@ export default function CandidateProfilePage() {
   const [error, setError] = useState("");
   const [notice, setNotice] = useState("");
   const [savedAt, setSavedAt] = useState<string | null>(null);
+  const [candidateReference, setCandidateReference] = useState<string | null>(null);
+  const [identityStatus, setIdentityStatus] = useState<"VERIFIED" | "PENDING_REVIEW" | "NOT_PROVISIONED">("NOT_PROVISIONED");
   const [lastLoad, setLastLoad] = useState<string | null>(null);
   const [corrections, setCorrections] = useState<CorrectionRequest[]>([]);
   const [correctionField, setCorrectionField] = useState<keyof Profile>("displayName");
@@ -96,8 +100,10 @@ export default function CandidateProfilePage() {
       setConsent(body.consent ?? { status: "NOT_RECORDED" });
       setCorrections(Array.isArray(body.correctionRequests) ? body.correctionRequests : []);
       setSavedAt(typeof body.savedAt === "string" ? body.savedAt : null);
+      setCandidateReference(typeof body.candidateReference === "string" ? body.candidateReference : null);
+      setIdentityStatus(body.identityStatus === "VERIFIED" || body.identityStatus === "PENDING_REVIEW" ? body.identityStatus : "NOT_PROVISIONED");
       setLastLoad(new Date().toISOString());
-      setNotice(preserveDraft ? "Saved backend information reloaded. Unsaved edits were kept." : "Loaded current profile from the Kingsmen backend.");
+      setNotice(preserveDraft ? "Saved backend information reloaded. Unsaved edits were kept." : body.persistence === "NOT_PROVISIONED" ? "No backend profile exists yet. Complete consent, enter your name and save to create it." : body.identityStatus === "PENDING_REVIEW" ? "Loaded your saved profile. Identity review remains pending; sensitive records and personalised matching stay locked." : "Loaded current profile from the Kingsmen backend.");
     } catch (e) {
       setError(e instanceof Error ? e.message : "Profile could not be loaded.");
     } finally {
@@ -125,6 +131,8 @@ export default function CandidateProfilePage() {
       setConsent(body.consent ?? { status: "ACTIVE" });
       setConsentChecked(body.consent?.status === "ACTIVE");
       setSavedAt(typeof body.savedAt === "string" ? body.savedAt : null);
+      setCandidateReference(typeof body.candidateReference === "string" ? body.candidateReference : candidateReference);
+      setIdentityStatus(body.identityStatus === "VERIFIED" || body.identityStatus === "PENDING_REVIEW" ? body.identityStatus : "NOT_PROVISIONED");
       setIsDirty(false);
       setNotice(body.message || "Profile saved to the backend.");
     } catch (e) {
@@ -186,7 +194,7 @@ export default function CandidateProfilePage() {
           </nav>
         </header>
 
-        {error && <section role="alert" className="rounded-2xl border border-red-800 bg-red-950/50 p-4 text-sm leading-6 text-red-100">{error}{error.includes("AUTHENTICATION_REQUIRED") && <p className="mt-2"><a href="/candidate/login" className="underline">Sign in / create account</a></p>}{error.includes("IDENTITY_NOT_VERIFIED") && <p className="mt-2">Your data remains protected until an authorised identity reviewer verifies the candidate link. Do not create duplicate candidate records.</p>}</section>}
+        {error && <section role="alert" className="rounded-2xl border border-red-800 bg-red-950/50 p-4 text-sm leading-6 text-red-100">{error}{error.includes("AUTHENTICATION_REQUIRED") && <p className="mt-2"><a href="/candidate/login" className="underline">Sign in / create account</a></p>}{(error.includes("IDENTITY_NOT_VERIFIED") || error.includes("IDENTITY_REVIEW_REQUIRED")) && <p className="mt-2">Do not create duplicate candidate records or link accounts by email. <a href="/candidate/identity-review" className="underline">Open identity review</a> to continue with authorised human assistance.</p>}</section>}
         {notice && <p role="status" className="rounded-2xl border border-slate-700 bg-slate-900 p-4 text-sm leading-6 text-slate-200">{notice}</p>}
 
         <section className="rounded-2xl border border-slate-800 bg-slate-900 p-5 sm:p-6">
@@ -200,8 +208,12 @@ export default function CandidateProfilePage() {
           <p className="mt-2 text-xs text-slate-400">{completeness.completed} of {completeness.required} required profile checks complete. This measures completeness, not eligibility or verification.</p>
           <div className="mt-4 flex flex-wrap gap-3">
             <span className="rounded-full border border-slate-700 px-3 py-1 text-xs">Consent: {consent.status === "ACTIVE" ? "Granted" : consent.status === "REVOKED" ? "Withdrawn" : "Not recorded"}</span>
+            <span className="rounded-full border border-slate-700 px-3 py-1 text-xs">Identity: {identityStatus === "VERIFIED" ? "Reviewer verified" : identityStatus === "PENDING_REVIEW" ? "Pending human review" : "Not yet created"}</span>
             <span className="rounded-full border border-slate-700 px-3 py-1 text-xs">Backend save: {savedAt ? new Date(savedAt).toLocaleString() : "No saved profile timestamp"}</span>
             {isDirty && <span className="rounded-full border border-amber-700 px-3 py-1 text-xs text-amber-200">Unsaved changes</span>}
+          </div>
+          {candidateReference && <p className="mt-4 break-all rounded-xl border border-slate-700 bg-slate-950 p-3 text-sm">Your Kingsmen candidate reference: <strong>{candidateReference}</strong>. Keep it available for your identity-review request. A pending identity review does not unlock documents or confirm your identity.</p>}
+          {identityStatus === "PENDING_REVIEW" && <p className="mt-3 text-sm leading-6 text-amber-200">Your own newly created profile can be edited while the link is pending. Personal documents, personalised opportunity matches and access to any older candidate record remain locked until an authorised reviewer verifies the link.</p>}
           </div>
         </section>
 
