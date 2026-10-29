@@ -46,7 +46,16 @@ const checks = [
   [page.includes("/api/candidate/documents/upload-url") && page.includes("/api/candidate/documents/finalize") && page.includes("/api/candidate/documents/read-url"), "candidate page uses real upload, finalize and read APIs"],
   [page.includes("size > MAX_BYTES") && page.includes("application/pdf") && page.includes("image/jpeg") && page.includes("image/png"), "candidate UI advertises and checks the supported file types and size limit"],
   [signature.includes("export function isAllowedDocumentSignature") && signature.includes("export async function sha256Hex"), "binary validation is isolated for direct regression testing"],
-  [!page.includes("candidateId:") && !page.includes("service_role"), "browser does not supply candidate ownership or expose service-role credentials"]
+  [!page.includes("candidateId:") && !page.includes("service_role"), "browser does not supply candidate ownership or expose service-role credentials"],
+  [edge.includes('list_review_queue') && edge.includes('create_reviewer_download_url') && edge.includes('review_document'), "deployed v14 reviewer queue, download and decision actions remain supported"],
+  [edge.includes('create_upload: "upload-url"') && edge.includes('finalize_upload: "finalize-upload"') && edge.includes('create_download_url: "read-url"'), "legacy document action names remain compatible"],
+  [edge.includes("p_application_id: applicationId") && edge.includes("p_preparation_item_id: preparationItemId") && edge.includes("p_evidence_purpose: evidencePurpose"), "vault uploads retain application, preparation-item and evidence-purpose relationships"],
+  [edge.includes("active evidence-verifier permission") && edge.includes('role_code").eq("auth_user_id", authData.user.id'), "reviewer actions require an active reviewer registry entry"],
+  [edge.includes('event_type: "READ_LINK_ISSUED"') && edge.includes("record_candidate_private_document_read_link"), "candidate read-link issuance is audited transactionally"],
+  [page.includes('body: file') && page.includes('"Content-Type": file.type') && !page.includes('new FormData()'), "signed Storage upload sends raw file bytes rather than multipart data"],
+  [page.includes('"/api/candidate/documents/status"') && page.includes('"/api/candidate/documents/finalize"'), "candidate document list and finalize UI use live proxy routes"],
+  [migration.includes("p_application_id uuid default null") && migration.includes("APPLICATION_LINK_REQUIRED_FOR_PROVIDER_EVIDENCE"), "database upload record validates owner-bound application evidence links"],
+  [!migration.includes("and d.created_by_auth_user_id = p_supabase_user_id"), "candidate document reads are bound to the verified candidate, not only the original uploader"]
 ];
 for (const [passed, message] of checks) assert.ok(passed, message);
 console.log(`PASS private candidate Document Vault source-contract test (${checks.length} assertions).`);
