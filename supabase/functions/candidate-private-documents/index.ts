@@ -1,5 +1,6 @@
 import "jsr:@supabase/functions-js/edge-runtime.d.ts";
 import { createClient, type SupabaseClient } from "npm:@supabase/supabase-js@2";
+import { isAllowedDocumentSignature, sha256Hex } from "./document-signature.mjs";
 
 const DOCUMENT_BUCKET = "kingsmen-candidate-documents";
 const MAX_DOCUMENT_BYTES = 10 * 1024 * 1024;
@@ -155,26 +156,6 @@ async function verifyBucket(admin: SupabaseClient): Promise<boolean> {
     ["application/pdf", "image/jpeg", "image/png"].every((mime) => mimeTypes.includes(mime));
 }
 
-function isUploadSignatureValid(bytes: Uint8Array, mimeType: string): boolean {
-  if (mimeType === "application/pdf") {
-    return bytes.length >= 5 &&
-      bytes[0] === 0x25 && bytes[1] === 0x50 && bytes[2] === 0x44 && bytes[3] === 0x46 && bytes[4] === 0x2d;
-  }
-  if (mimeType === "image/jpeg") {
-    return bytes.length >= 3 && bytes[0] === 0xff && bytes[1] === 0xd8 && bytes[2] === 0xff;
-  }
-  if (mimeType === "image/png") {
-    const signature = [0x89, 0x50, 0x4e, 0x47, 0x0d, 0x0a, 0x1a, 0x0a];
-    return bytes.length >= signature.length && signature.every((byte, index) => bytes[index] === byte);
-  }
-  return false;
-}
-
-async function sha256(bytes: Uint8Array): Promise<string> {
-  const digest = await crypto.subtle.digest("SHA-256", bytes);
-  return [...new Uint8Array(digest)].map((byte) => byte.toString(16).padStart(2, "0")).join("");
-}
-
 async function uploadUrl(req: Request, body: Record<string, unknown>, ctx: CandidateContext): Promise<Response> {
   const documentType = typeof body.documentTypeCode === "string" ? body.documentTypeCode : "";
   const filename = typeof body.filename === "string" ? body.filename.normalize("NFKC").trim() : "";
@@ -268,8 +249,8 @@ async function finalizeUpload(req: Request, body: Record<string, unknown>, ctx: 
   let digest = "0".repeat(64);
   if (actualSize >= 1 && actualSize <= MAX_DOCUMENT_BYTES) {
     bytes = new Uint8Array(await file.arrayBuffer());
-    signatureValid = isUploadSignatureValid(bytes, doc.mime_type);
-    digest = await sha256(bytes);
+    signatureValid = isAllowedDocumentSignature(bytes, doc.mime_type);
+    digest = await sha256Hex(bytes);
   }
   const { data: result, error: finalizeError } = await ctx.admin.rpc(
     "finalize_candidate_private_document_upload",
