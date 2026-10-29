@@ -32,6 +32,119 @@ Deno.serve(async(req:Request)=>{
  if(linkError){console.error("application identity lookup failed",linkError.code??"unknown");return reply(503,{error:"Could not verify candidate access."},origin);}
  if(!link?.candidate_id)return reply(403,{code:"IDENTITY_NOT_VERIFIED",error:"Application records remain locked until an authorised reviewer verifies your candidate identity link."},origin);
  const candidateId=link.candidate_id as string;
+ if(p.action==="save_n15_match"){
+  const matchRef=typeof p.match_ref==="string"?p.match_ref.trim():"";
+  const pathwayType=typeof p.pathway_type==="string"?p.pathway_type:"";
+  const supportedPathways=new Set(["HIGHER_EDUCATION","TVET","SETA_LEARNERSHIP","INTERNSHIP","APPRENTICESHIP","EMPLOYMENT"]);
+  if(!matchRef||matchRef.length>100||/[\\u0000-\\u001f]/.test(matchRef)||!supportedPathways.has(pathwayType))return reply(400,{ready:false,code:"N15_INPUT_INVALID",error:"A valid N15 match and supported pathway are required."},origin);
+  const storedPathway=pathwayMap[pathwayType];
+  if(!storedPathway)return reply(400,{ready:false,code:"PATHWAY_NOT_SUPPORTED",error:"That application pathway is not supported."},origin);
+  const {data:match,error:matchError}=await admin.from("candidate_opportunity_matches")
+   .select("candidate_match_ref,candidate_ref,programme_ref,provider_ref,sector,match_status,source_confidence,human_review_required,sealed_exact_target,evidence_refs,recommendation_summary")
+   .eq("candidate_match_ref",matchRef).eq("candidate_ref",candidateId).eq("match_status","APPROVED")
+   .eq("source_confidence","OFFICIAL_VERIFIED").eq("human_review_required",false).eq("sealed_exact_target",false).maybeSingle();
+  if(matchError){console.error("N15 save match lookup failed",matchError.code??"unknown");return reply(503,{ready:false,error:"Could not verify the opportunity. Try again later."},origin);}
+  if(!match||!match.programme_ref||!match.provider_ref)return reply(409,{ready:false,code:"VERIFIED_MATCH_NOT_AVAILABLE",error:"This listing no longer satisfies the N15 publication gates."},origin);
+  const supportedBySector:Record<string,string[]> = {
+   UNIVERSITY:["HIGHER_EDUCATION"],CAO:["HIGHER_EDUCATION","TVET"],TVET:["TVET"],
+   SETA:["SETA_LEARNERSHIP","APPRENTICESHIP"],LEARNERSHIP:["SETA_LEARNERSHIP"],
+   INTERNSHIP:["INTERNSHIP"],APPRENTICESHIP:["APPRENTICESHIP"],EMPLOYER:["EMPLOYMENT"],
+   BURSARY:["HIGHER_EDUCATION","TVET","SETA_LEARNERSHIP","INTERNSHIP","APPRENTICESHIP"],
+   NSFAS:["HIGHER_EDUCATION","TVET"],QCTO:["SETA_LEARNERSHIP","APPRENTICESHIP"],
+   ACCOMMODATION:["HIGHER_EDUCATION","TVET","SETA_LEARNERSHIP","INTERNSHIP","APPRENTICESHIP","EMPLOYMENT"],
+   PRIVATE_COLLEGE:["HIGHER_EDUCATION","TVET","SETA_LEARNERSHIP"]
+  };
+  if(!(supportedBySector[match.sector]??[]).includes(pathwayType))return reply(409,{ready:false,code:"MATCH_PATHWAY_MISMATCH",error:"Choose one of this opportunity's supported pathways."},origin);
+  const {data:programme,error:programmeError}=await admin.from("opportunity_programmes")
+   .select("programme_ref,programme_name,provider_ref,exact_link,location_text,opening_status,candidate_facing_safe,source_confidence,evidence_refs")
+   .eq("programme_ref",match.programme_ref).maybeSingle();
+  const {data:provider,error:providerError}=await admin.from("opportunity_providers")
+   .select("provider_ref,provider_name,safe_to_recommend,source_confidence,accreditation_status,evidence_refs")
+   .eq("provider_ref",match.provider_ref).maybeSingle();
+  if(programmeError||providerError){console.error("N15 programme/provider lookup failed",programmeError?.code??providerError?.code??"unknown");return reply(503,{ready:false,error:"Opportunity source checks are unavailable."},origin);}
+  if(!programme||!provider||programme.opening_status!=="OPEN"||programme.candidate_facing_safe!==true||
+    programme.source_confidence!=="OFFICIAL_VERIFIED"||provider.source_confidence!=="OFFICIAL_VERIFIED"||
+    provider.safe_to_recommend!==true||provider.accreditation_status==="REJECTED"||
+    !Array.isArray(programme.evidence_refs)||programme.evidence_refs.length===0||
+    !Array.isArray(provider.evidence_refs)||provider.evidence_refs.length===0||
+    typeof programme.exact_link!=="string"||!programme.exact_link.startsWith("https://")) {
+    return reply(409,{ready:false,code:"SOURCE_NOT_VERIFIED",error:"The opportunity or provider is no longer verified and open. Nothing was saved."},origin);
+  }
+  const now=new Date();
+  const cutoff=new Date(now.getTime()-24*60*60*1000).toISOString();
+  const {data:observations,error:observationError}=await admin.from("external_source_observations")
+   .select("observation_ref,source_url,observed_at,last_checked_at,stale_after,evidence_refs")
+   .eq("observation_status","VERIFIED").eq("source_confidence","OFFICIAL_VERIFIED").eq("source_url",programme.exact_link)
+   .gte("last_checked_at",cutoff).lte("observed_at",now.toISOString()).lte("last_checked_at",now.toISOString())
+   .gt("stale_after",now.toISOString()).order("last_checked_at",{ascending:false}).limit(1);
+  if(observationError){console.error("N15 observation check failed",observationError.code??"unknown");return reply(503,{ready:false,error:"Source freshness could not be checked."},origin);}
+  const observation=observations?.[0];
+  const observedAt=Date.parse(observation?.observed_at??"");
+  const checkedAt=Date.parse(observation?.last_checked_at??"");
+  const staleAfter=Date.parse(observation?.stale_after??"");
+  if(!observation||!Number.isFinite(observedAt)||!Number.isFinite(checkedAt)||!Number.isFinite(staleAfter)||
+    observedAt>checkedAt||checkedAt>now.getTime()||staleAfter<=checkedAt||staleAfter<=now.getTime()||
+    !Array.isArray(observation.evidence_refs)||observation.evidence_refs.length===0) {
+    return reply(409,{ready:false,code:"SOURCE_STALE_OR_UNPROVEN",error:"The source evidence is missing, stale or inconsistent. Nothing was saved."},origin);
+  }
+  const {data:deadlineRows,error:deadlineError}=await admin.from("opportunity_deadlines")
+   .select("closes_at,deadline_status,source_confidence,evidence_refs")
+   .eq("programme_ref",programme.programme_ref).eq("provider_ref",provider.provider_ref)
+   .eq("deadline_status","CONFIRMED").eq("source_confidence","OFFICIAL_VERIFIED")
+   .gt("closes_at",now.toISOString()).order("closes_at",{ascending:true}).limit(1);
+  if(deadlineError){console.error("N15 deadline check failed",deadlineError.code??"unknown");return reply(503,{ready:false,error:"Deadline evidence could not be checked."},origin);}
+  const deadline=deadlineRows?.[0]??null;
+  if(deadline&&(!Array.isArray(deadline.evidence_refs)||deadline.evidence_refs.length===0))return reply(409,{ready:false,code:"DEADLINE_EVIDENCE_MISSING",error:"Deadline evidence is incomplete. Nothing was saved."},origin);
+  const targetKey="N15-"+matchRef;
+  if(targetKey.length>120)return reply(400,{ready:false,code:"TARGET_KEY_TOO_LONG",error:"The match reference is too long to save safely."},origin);
+  const officialPath=storedPathway;
+  const closingDate=deadline?.closes_at?String(deadline.closes_at).slice(0,10):null;
+  const {data:savedOpportunity,error:savedOpportunityError}=await admin.from("candidate_workspace_saved_opportunities")
+   .upsert({candidate_id:candidateId,title:String(programme.programme_name).trim().slice(0,180),
+    organisation:String(provider.provider_name).trim().slice(0,180),official_url:programme.exact_link,
+    pathway:officialPath,closing_date:closingDate,updated_at:now.toISOString()},
+    {onConflict:"candidate_id,official_url"}).select("id,title,organisation,official_url,pathway,closing_date").single();
+  if(savedOpportunityError||!savedOpportunity){console.error("N15 saved opportunity write failed",savedOpportunityError?.code??"unknown");return reply(503,{ready:false,error:"The verified opportunity could not be saved. Retry safely."},origin);}
+  let target:any=null;
+  const {data:existingTarget,error:existingTargetError}=await admin.from("candidate_master_application_targets")
+   .select("id,target_key,pathway_type,provider_name,programme_or_role,planning_status,application_id,created_at,updated_at")
+   .eq("candidate_id",candidateId).eq("target_key",targetKey).maybeSingle();
+  if(existingTargetError){console.error("N15 target lookup failed",existingTargetError.code??"unknown");return reply(503,{ready:false,error:"Could not reload the saved application target."},origin);}
+  if(existingTarget) target=existingTarget;
+  else {
+   const {data:createdTarget,error:targetError}=await admin.from("candidate_master_application_targets").insert({
+    candidate_id:candidateId,target_key:targetKey,pathway_type:pathwayType,
+    provider_name:String(provider.provider_name).trim().slice(0,240),
+    programme_or_role:String(programme.programme_name).trim().slice(0,240),
+    provider_application_url:programme.exact_link,
+    source_reference:"N15 match reference: "+matchRef,
+    source_confidence:"UNVERIFIED",planning_status:"PLANNING",
+    idempotency_key:crypto.randomUUID(),created_by_auth_user_id:authData.user.id
+   }).select("id,target_key,pathway_type,provider_name,programme_or_role,planning_status,application_id,created_at,updated_at").single();
+   if(targetError||!createdTarget){console.error("N15 master target create failed",targetError?.code??"unknown");return reply(503,{ready:false,error:"The saved listing exists, but its parent-application target could not be created. Retry to reconcile it."},origin);}
+   target=createdTarget;
+   const {error:auditError}=await admin.from("candidate_master_application_events").insert({
+    candidate_id:candidateId,actor_auth_user_id:authData.user.id,event_type:"N15_OPPORTUNITY_SAVED",
+    idempotency_key:crypto.randomUUID(),
+    details:{target_key:targetKey,n15_match_ref:matchRef,pathway_type:pathwayType,official_url:programme.exact_link,
+      source_checked_at:observation.last_checked_at,programme_evidence_refs:programme.evidence_refs,
+      provider_evidence_refs:provider.evidence_refs,observation_evidence_refs:observation.evidence_refs,
+      provider_submission_sent:false}
+   });
+   if(auditError){console.error("N15 save audit event failed",auditError.code??"unknown");return reply(503,{ready:false,error:"The opportunity was saved but the audit event could not be written. Retry or contact support."},origin);}
+  }
+  return reply(200,{ready:true,saved:true,opportunity:savedOpportunity,target, target_key:target.target_key,
+   message:"Saved from the current approved N15 match with fresh official-source evidence. No provider application was submitted."},origin);
+ }
+ if(p.action==="prepare_master_application"){
+  const targetKey=typeof p.target_key==="string"?p.target_key.trim():"";
+  if(!targetKey||targetKey.length>120)return reply(400,{ready:false,code:"TARGET_KEY_INVALID",error:"A valid saved application target is required."},origin);
+  const userClient=createClient(URL,ANON,{global:{headers:{Authorization:"Bearer "+token}},auth:{persistSession:false,autoRefreshToken:false}});
+  const {data:prepared,error:prepareError}=await userClient.rpc("prepare_candidate_application_from_master_target",{p_target_key:targetKey});
+  if(prepareError){console.error("master application prepare RPC failed",prepareError.code??"unknown");return reply(503,{ready:false,code:"MASTER_APPLICATION_PREPARATION_FAILED",error:"The parent application could not be prepared. Your saved opportunity remains available."},origin);}
+  if(!prepared||prepared.ok!==true)return reply(409,{ready:false,code:prepared?.code??"MASTER_APPLICATION_NOT_READY",error:prepared?.message??"The saved opportunity no longer meets application preparation gates. Your saved information remains available.",detail:prepared},origin);
+  return reply(200,{ready:true,application:prepared,message:"Application preparation record persisted. This does not submit anything to the provider."},origin);
+ }
  if(p.action==="load"){
   const {data:trackers,error}=await admin.from("candidate_application_tracker").select("id,candidate_id,saved_opportunity_id,status,candidate_note,evidence_reference,created_at,updated_at,candidate_workspace_saved_opportunities(id,title,organisation,official_url,pathway,closing_date)").eq("candidate_id",candidateId).order("updated_at",{ascending:false});
   if(error){console.error("application tracker load failed",error.code??"unknown");return reply(503,{error:"Could not load application preparation records."},origin);}
