@@ -208,3 +208,13 @@ The detailed step-by-step candidate journey, known route/implementation evidence
 - Live Supabase migration ledger for project `euhubhhnumtibbyufghm` — applied-version evidence, with limitations noted above.
 
 **Change control:** update this register only with evidence-bearing changes. Preserve previous values and explain why a status changed. No module is “complete” until its specified acceptance scenarios pass at the required environment and its evidence points to the exact deployed commit.
+
+
+## 11. Candidate website source-audit delta (2026-10-29)
+The canonical journey and operational acceptance register is `docs/product/KINGSMEN_CANDIDATE_WEBSITE_JOURNEY_AND_OPERATIONS_REGISTER.md`. Direct read-only inspection of the default branch found:
+- The candidate opportunity-match page exists and calls the N15 Supabase Edge Function, but live candidate feed/browser behavior has not been tested. In the inspected default-branch file, pathway filtering is present; search/deadline sorting described by PR #203 needs branch reconciliation.
+- The candidate documents page is currently an informational shell, not a demonstrated working upload/list/retrieval UI.
+- `apps/web/src/app/api/candidate/documents/upload-url/route.ts` is explicitly a non-production stub: it returns `productionReady: false` and `signedUploadUrl: "SIGNER_RUNTIME_REQUIRED"`. It lacks visible authenticated ownership/authorization and validation in that file. Treat as blocked; never use it for real candidate files.
+- `apps/web/src/app/candidate/login/page.tsx`, `apps/web/src/app/api/candidate/master-application/route.ts`, and `apps/web/src/app/api/candidate/documents/finalize/route.ts` returned NOT_FOUND on the inspected default branch, despite being referenced by a security-boundary validator. They may exist on an unmerged branch; reconcile current RC ancestry before recreating or retiring them.
+- Live Netlify site object exists as `kingsmen-portal-staging` (site ID `fb27d0db-b116-4890-8f7f-14e654c27dbc`), but its provider response did not expose a current deploy SHA/ID. Its 24-hour observability queries returned no usable request rows/series. The published candidate experience and live HTTP response remain unverified.
+These findings supersede any inference that N18/N19 are functionally complete merely because the module registry labels them validated. Keep public launch blocked and use the existing candidate journey register to track resolution.
