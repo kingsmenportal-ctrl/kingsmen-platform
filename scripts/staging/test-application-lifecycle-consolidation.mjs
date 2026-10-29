@@ -11,7 +11,7 @@ const providerEvidence = {
   evidenceRef: "provider-evidence-123",
   sourceKind: "PROVIDER_ORIGIN",
   verified: true,
-  verifiedByAuthUserId: "reviewer-auth-uuid",
+  verifiedByAuthUserId: "00000000-0000-4000-8000-000000000001",
   verifiedAt: "2026-10-29T10:10:00.000Z"
 };
 
@@ -47,6 +47,7 @@ const verifiedProviderClaim = normalizeLegacyApplicationStatus({
 });
 assert.equal(verifiedProviderClaim.status, "ACCEPTED");
 assert.equal(verifiedProviderClaim.statusAuthority, "provider_verified");
+assert.equal(normalizeLegacyApplicationStatus({ source: "candidate_route_applications", status: "ACCEPTED", providerEvidence: { ...providerEvidence, verifiedByAuthUserId: "not-an-auth-uuid" } }).status, "LEGACY_UNRESOLVED");
 
 const unknownWorkflow = normalizeLegacyApplicationStatus({
   source: "applications",
