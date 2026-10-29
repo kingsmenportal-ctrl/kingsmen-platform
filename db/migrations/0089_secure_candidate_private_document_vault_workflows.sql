@@ -290,7 +290,7 @@ begin
   from public.candidate_private_documents d
   where d.id = p_document_id
     and d.candidate_id = p_candidate_id
-    and d.status in ('UPLOADED_CANDIDATE_REPORTED','UNDER_REVIEW','VERIFIED')
+    and d.status in ('UPLOADED_CANDIDATE_REPORTED','UNDER_REVIEW','VERIFIED','REJECTED')
   for update;
   if not found then
     raise exception 'DOCUMENT_NOT_FOUND_OR_NOT_READABLE' using errcode = '42501';
