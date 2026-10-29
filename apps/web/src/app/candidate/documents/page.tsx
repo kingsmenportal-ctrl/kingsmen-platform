@@ -7,6 +7,9 @@ type VaultDocument = {
   id: string; documentType: string; filename: string; mimeType: string;
   sizeBytes: number; status: string; checksumRecorded: boolean;
   uploadedAt: string | null; createdAt: string; updatedAt: string;
+  latestReview?: { decision: string; reviewer_note: string; evidence_reference: string; created_at: string } | null;
+  reviewHistory?: Array<{ decision: string; reviewer_note: string; evidence_reference: string; created_at: string }>;
+  timeline?: Array<{ event_type: string; from_status: string | null; to_status: string | null; metadata: Record<string, unknown>; created_at: string }>;
 };
 const TYPES = [
   ["CV","CV / Résumé"],["ID_DOCUMENT","Identity document"],["MATRIC_CERTIFICATE","Matric certificate"],
@@ -128,7 +131,7 @@ export default function CandidateDocumentsPage() {
           <h1 className="mt-3 text-3xl font-bold sm:text-4xl">Private Document Vault</h1>
           <p className="mt-3 max-w-3xl text-sm leading-6 text-slate-300">Upload documents once and reuse them where appropriate. Files remain private. An upload receipt is not human verification or a provider-confirmed application outcome.</p>
         </div>
-        <a href="/candidate/dashboard" className="rounded-xl border border-slate-700 px-4 py-2 text-sm">Candidate dashboard</a>
+        <div className="flex flex-wrap gap-2"><a href="/candidate/dashboard" className="rounded-xl border border-slate-700 px-4 py-2 text-sm">Candidate dashboard</a><a href="/candidate/profile" className="rounded-xl border border-slate-700 px-4 py-2 text-sm">My profile</a><a href="/candidate/identity-review" className="rounded-xl border border-slate-700 px-4 py-2 text-sm">Identity review</a></div>
       </header>
 
       {notice && <div role="status" className="mt-6 rounded-2xl border border-slate-700 bg-slate-900 px-4 py-3 text-sm leading-6">{notice}
@@ -176,6 +179,19 @@ export default function CandidateDocumentsPage() {
         : docs.length === 0 ? <p className="mt-4 rounded-xl border border-slate-800 bg-slate-900 p-5 text-sm leading-6 text-slate-300">No documents available. Sign in and complete authorised identity linking to use the private vault.</p>
         : <div className="mt-4 grid gap-3">{docs.map((doc) => <article key={doc.id} className="rounded-2xl border border-slate-800 bg-slate-900 p-4 sm:p-5">
           <div className="flex flex-wrap items-start justify-between gap-4"><div className="min-w-0"><h3 className="break-words font-semibold">{doc.filename}</h3><p className="mt-1 text-xs text-slate-400">{doc.documentType} · {formatSize(doc.sizeBytes)} · {doc.mimeType}</p><p className="mt-2 text-xs text-slate-500">Received: {doc.uploadedAt ? new Date(doc.uploadedAt).toLocaleString() : "Not yet confirmed"} · SHA-256: {doc.checksumRecorded ? "recorded" : "pending"}</p></div><span className="rounded-full border border-slate-700 px-3 py-1 text-xs">{doc.status}</span></div>
+          {doc.latestReview && <section className="mt-4 rounded-xl border border-slate-700 bg-slate-950 p-4 text-sm leading-6">
+            <div className="flex flex-wrap items-center justify-between gap-2"><strong>Latest human review: {doc.latestReview.decision.replaceAll("_"," ")}</strong><span className="text-xs text-slate-400">{new Date(doc.latestReview.created_at).toLocaleString()}</span></div>
+            <p className="mt-2">{doc.latestReview.reviewer_note}</p>
+            <p className="mt-2 break-all text-xs text-slate-400">Evidence reference: {doc.latestReview.evidence_reference}</p>
+            {doc.latestReview.decision === "REJECTED" && <p className="mt-3 text-amber-200">A replacement or correction may be required. Use the reviewer note and upload a corrected document if appropriate; this status is not silently changed to verified.</p>}
+          </section>}
+          {doc.timeline && doc.timeline.length>0 && <details className="mt-4 rounded-xl border border-slate-700 p-4">
+            <summary className="cursor-pointer text-sm font-semibold">Document timeline ({doc.timeline.length} events)</summary>
+            <ol className="mt-3 space-y-3">{doc.timeline.map((event,index)=><li key={`${event.event_type}:${event.created_at}:${index}`} className="border-l-2 border-slate-700 pl-3 text-xs leading-5">
+              <p className="font-semibold">{event.event_type.replaceAll("_"," ")}</p>
+              <p className="text-slate-400">{new Date(event.created_at).toLocaleString()}{event.from_status? ` · ${event.from_status}`:""}{event.to_status? ` → ${event.to_status}`:""}</p>
+            </li>)}</ol>
+          </details>}
           {["UPLOADED_CANDIDATE_REPORTED","UNDER_REVIEW","VERIFIED"].includes(doc.status) && <button type="button" onClick={() => void getReadLink(doc.id)} className="mt-4 rounded-lg border border-slate-700 px-3 py-2 text-sm text-cyan-300 hover:border-cyan-300">Request private read link</button>}
         </article>)}</div>}
       </section>
