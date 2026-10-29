@@ -32,7 +32,7 @@ const checks = [
   [migration.includes("p_signed_payload - 'merchant_key'"), "merchant key is not persisted in checkout payload JSON"],
   [migration.includes("p_signed_payload ? 'passphrase'") && migration.includes("p_signed_payload ? 'SUPABASE_SERVICE_ROLE_KEY'"), "passphrase and service-role key are forbidden in stored checkout payload"],
   [migration.includes("revoke all on function public.create_payfast_sandbox_checkout_bundle") && migration.includes("to service_role;"), "atomic checkout RPC is service-role-only"],
-  [migration.includes("set search_path = public, pg_temp"), "security-definer search path is pinned"],
+  [migration.includes("set search_path = pg_catalog, public, pg_temp"), "security-definer search path is pinned"],
 ];
 
 for (const [passed, description] of checks) assert.ok(passed, description);
