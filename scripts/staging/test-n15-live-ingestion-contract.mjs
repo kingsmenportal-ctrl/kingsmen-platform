@@ -18,7 +18,7 @@ const checks = [
   ["ingestion uses deterministic idempotency key", /onConflict: "observation_ref"/.test(ingestion) && /SHA-256/.test(ingestion)],
   ["ingestion run ledger is auditable and service-role protected", /n15_ingestion_runs/.test(migration) && /to service_role using \(true\)/.test(migration)],
   ["candidate feed verifies bearer session with Supabase Auth", /auth\.getUser\(token\)/.test(candidate)],
-  ["candidate feed requires authorised identity link", /link_status !== "VERIFIED"/.test(candidate)],
+  ["candidate feed requires authorised identity link", /link\.link_status === "VERIFIED"/.test(candidate) && /verificationIsAuthorised/.test(candidate)],
   ["candidate feed requires reviewer Auth UUID and verified timestamp", /verified_at,verified_by/.test(candidate) && /AUTH_UUID\.test\(link\.verified_by\)/.test(candidate) && /verifiedAtMs <= Date\.now\(\)/.test(candidate)],
   ["candidate feed requires approved, official, human-reviewed matches", /eq\("match_status", "APPROVED"\)/.test(candidate) && /eq\("source_confidence", "OFFICIAL_VERIFIED"\)/.test(candidate) && /eq\("human_review_required", false\)/.test(candidate)],
   ["candidate feed withholds stale/unverified source observations", /eq\("observation_status", "VERIFIED"\)/.test(candidate) && /eq\("source_confidence", "OFFICIAL_VERIFIED"\)/.test(candidate) && /gt\("stale_after", now\.toISOString\(\)\)/.test(candidate)],
