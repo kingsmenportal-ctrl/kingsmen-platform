@@ -1,6 +1,6 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 
 const PATHWAYS = [
   ["HIGHER_EDUCATION", "Higher education"],
@@ -29,6 +29,9 @@ type Opportunity = {
 
 type Feed = { status: string; count?: number; opportunities?: Opportunity[]; message?: string; empty_reason?: string };
 
+type MasterTarget = { target_key: string; application_id: string | null; planning_status: string };
+type ParentApplication = { id: string; application_ref: string; status: string };
+
 function getAccessToken(): string | null {
   try {
     const base = process.env.NEXT_PUBLIC_SUPABASE_URL;
@@ -48,11 +51,13 @@ export default function CandidateOpportunityMatchesPage() {
   const [error, setError] = useState("");
   const [saveBusy, setSaveBusy] = useState("");
   const [saveNotice, setSaveNotice] = useState("");
+  const [savedTargets, setSavedTargets] = useState<Record<string, string>>({});
+  const [preparedApplications, setPreparedApplications] = useState<Record<string, string>>({});
+  const [workbenchStatus, setWorkbenchStatus] = useState("");
 
-  async function loadMatches() {
+  const loadMatches = useCallback(async () => {
     setLoading(true);
     setError("");
-    setFeed(null);
     try {
       const url = process.env.NEXT_PUBLIC_SUPABASE_URL;
       const anonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
@@ -78,7 +83,50 @@ export default function CandidateOpportunityMatchesPage() {
     } finally {
       setLoading(false);
     }
-  }
+  }, []);
+
+  const loadSavedWorkbench = useCallback(async () => {
+    const token = getAccessToken();
+    if (!token) return;
+    try {
+      const response = await fetch("/api/candidate/applications", {
+        method: "GET",
+        headers: { Authorization: `Bearer ${token}` },
+        cache: "no-store"
+      });
+      const body = await response.json();
+      if (!response.ok || body.ready !== true) {
+        setWorkbenchStatus(typeof body.error === "string" ? body.error : "Saved application state could not be reloaded. Open the application tracker to inspect the current server response.");
+        return;
+      }
+
+      const targets = Array.isArray(body.masterTargets) ? body.masterTargets as MasterTarget[] : [];
+      const applications = Array.isArray(body.parentApplications) ? body.parentApplications as ParentApplication[] : [];
+      const saved: Record<string, string> = {};
+      const prepared: Record<string, string> = {};
+      for (const target of targets) {
+        if (typeof target.target_key !== "string" || !target.target_key.startsWith("n15:")) continue;
+        const matchRef = target.target_key.slice(4);
+        if (!matchRef) continue;
+        saved[matchRef] = target.target_key;
+        if (target.application_id) {
+          const application = applications.find(item => item.id === target.application_id);
+          prepared[matchRef] = application?.application_ref || "Draft saved";
+        }
+      }
+      setSavedTargets(saved);
+      setPreparedApplications(prepared);
+      setWorkbenchStatus(`Reloaded saved Kingsmen records: ${Object.keys(saved).length} opportunity target(s), ${Object.keys(prepared).length} linked parent draft(s).`);
+    } catch {
+      setWorkbenchStatus("Saved workbench state could not be refreshed. The application tracker remains the authoritative view of saved records.");
+    }
+  }, []);
+
+  useEffect(() => {
+    if (!getAccessToken()) return;
+    void loadMatches();
+    void loadSavedWorkbench();
+  }, [loadMatches, loadSavedWorkbench]);
 
   const opportunities = useMemo(() => (feed?.opportunities ?? []).filter(item =>
     pathway === "ALL" || item.pathways.includes(pathway)
@@ -105,6 +153,7 @@ export default function CandidateOpportunityMatchesPage() {
       });
       const body = await response.json();
       if (!response.ok || body.ok !== true) throw new Error(body.message || body.error || body.code || `Save failed (${response.status})`);
+      await loadSavedWorkbench();
       setSaveNotice(body.message || "Opportunity saved and application draft prepared. No provider submission has occurred.");
     } catch (e) {
       setError(e instanceof Error ? e.message : "Could not save this opportunity.");
@@ -122,7 +171,7 @@ export default function CandidateOpportunityMatchesPage() {
         <div className="mt-5 flex flex-wrap gap-3">
           <button type="button" onClick={loadMatches} disabled={loading}
             className="rounded-xl bg-slate-950 px-5 py-3 text-sm font-bold text-white disabled:opacity-50">
-            {loading ? "Checking verified matches…" : "Load my verified matches"}
+            {loading ? "Checking verified matches…" : feed ? "Refresh my verified matches" : "Load my verified matches"}
           </button>
           <a href="/candidate/dashboard" className="rounded-xl border border-slate-300 px-5 py-3 text-sm font-semibold text-slate-800">Candidate dashboard</a>
         </div>
@@ -130,6 +179,7 @@ export default function CandidateOpportunityMatchesPage() {
 
       {error && <section role="alert" className="rounded-2xl border border-amber-300 bg-amber-50 p-4 text-sm text-amber-950">{error}</section>}
       {saveNotice && <section role="status" className="rounded-2xl border border-emerald-300 bg-emerald-50 p-4 text-sm text-emerald-950">{saveNotice}<div className="mt-3"><a href="/candidate/applications" className="font-bold underline">Open application tracker</a> · <a href="/candidate/workbench" className="font-bold underline">Open workbench</a></div></section>}
+      {workbenchStatus && <section role="status" aria-live="polite" className="rounded-2xl border border-slate-200 bg-slate-50 p-4 text-sm leading-6 text-slate-700">{workbenchStatus} <a href="/candidate/applications" className="ml-1 font-semibold underline">View saved records</a></section>}
       {feed?.status === "IDENTITY_REVIEW_REQUIRED" && (
         <section className="rounded-2xl border border-amber-300 bg-amber-50 p-5">
           <h2 className="font-bold text-amber-950">Identity review required</h2>
@@ -186,7 +236,7 @@ export default function CandidateOpportunityMatchesPage() {
                       className="inline-flex rounded-xl bg-slate-950 px-4 py-3 text-sm font-bold text-white">Open official opportunity ↗</a>
                     <button type="button" onClick={() => void saveToWorkbench(item)} disabled={Boolean(saveBusy)}
                       className="inline-flex rounded-xl border border-cyan-700 px-4 py-3 text-sm font-bold text-slate-900 disabled:opacity-50">
-                      {saveBusy === item.match_ref ? "Verifying and saving…" : "Save & prepare application"}
+                      {saveBusy === item.match_ref ? "Verifying and saving…" : preparedApplications[item.match_ref] ? `Saved · draft ${preparedApplications[item.match_ref]}` : savedTargets[item.match_ref] ? "Saved · retry preparation" : "Save & prepare application"}
                     </button>
                   </div>
                 </article>
