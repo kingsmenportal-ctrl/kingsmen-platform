@@ -123,16 +123,16 @@ Deno.serve(async(req:Request)=>{
    }).select("id,target_key,pathway_type,provider_name,programme_or_role,planning_status,application_id,created_at,updated_at").single();
    if(targetError||!createdTarget){console.error("N15 master target create failed",targetError?.code??"unknown");return reply(503,{ready:false,error:"The saved listing exists, but its parent-application target could not be created. Retry to reconcile it."},origin);}
    target=createdTarget;
-   const {error:auditError}=await admin.from("candidate_master_application_events").insert({
-    candidate_id:candidateId,actor_auth_user_id:authData.user.id,event_type:"N15_OPPORTUNITY_SAVED",
-    idempotency_key:crypto.randomUUID(),
-    details:{target_key:targetKey,n15_match_ref:matchRef,pathway_type:pathwayType,official_url:programme.exact_link,
-      source_checked_at:observation.last_checked_at,programme_evidence_refs:programme.evidence_refs,
-      provider_evidence_refs:provider.evidence_refs,observation_evidence_refs:observation.evidence_refs,
-      provider_submission_sent:false}
-   });
-   if(auditError){console.error("N15 save audit event failed",auditError.code??"unknown");return reply(503,{ready:false,error:"The opportunity was saved but the audit event could not be written. Retry or contact support."},origin);}
   }
+  const {error:auditError}=await admin.from("candidate_master_application_events").upsert({
+    candidate_id:candidateId,actor_auth_user_id:authData.user.id,event_type:"TARGETS_PLANNED",
+    idempotency_key:"N15-save:"+matchRef,
+    details:{action:"N15_OPPORTUNITY_SAVED",target_key:targetKey,n15_match_ref:matchRef,pathway_type:pathwayType,
+      official_url:programme.exact_link,source_checked_at:observation.last_checked_at,
+      programme_evidence_refs:programme.evidence_refs,provider_evidence_refs:provider.evidence_refs,
+      observation_evidence_refs:observation.evidence_refs,provider_submission_sent:false}
+   },{onConflict:"candidate_id,event_type,idempotency_key"});
+  if(auditError){console.error("N15 save audit event failed",auditError.code??"unknown");return reply(503,{ready:false,error:"The opportunity and target were saved but the audit event could not be reconciled. Retry or contact support."},origin);}
   return reply(200,{ready:true,saved:true,opportunity:savedOpportunity,target, target_key:target.target_key,
    message:"Saved from the current approved N15 match with fresh official-source evidence. No provider application was submitted."},origin);
  }
