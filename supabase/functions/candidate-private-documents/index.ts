@@ -244,13 +244,21 @@ async function uploadUrl(req: Request, body: Record<string, unknown>, ctx: Candi
     document: {
       id: documentId,
       documentType,
+      document_type: documentType,
       filename,
+      original_filename: filename,
       mimeType,
+      mime_type: mimeType,
       sizeBytes: Number(sizeBytes),
+      size_bytes: Number(sizeBytes),
       status: "UPLOAD_PENDING",
       applicationId,
+      application_id: applicationId,
       preparationItemId,
-      evidencePurpose
+      preparation_item_id: preparationItemId,
+      evidencePurpose,
+      evidence_purpose: evidencePurpose,
+      created_at: record.createdAt
     },
     signedUploadUrl: signedUpload.signedUrl,
     signedUploadToken: signedUpload.token,
@@ -338,7 +346,7 @@ async function readUrl(req: Request, body: Record<string, unknown>, ctx: Candida
   if (lookupError) return fail(req, 503, "DOCUMENT_LOOKUP_FAILED");
   if (!doc) return fail(req, 404, "DOCUMENT_NOT_FOUND");
   if (doc.storage_bucket !== DOCUMENT_BUCKET ||
-      !["UPLOADED_CANDIDATE_REPORTED", "UNDER_REVIEW", "VERIFIED"].includes(doc.status)) {
+      !["UPLOADED_CANDIDATE_REPORTED", "UNDER_REVIEW", "VERIFIED", "REJECTED"].includes(doc.status)) {
     return fail(req, 403, "DOCUMENT_NOT_READABLE");
   }
 
