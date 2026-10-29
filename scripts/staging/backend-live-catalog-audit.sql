@@ -135,6 +135,12 @@ from pg_sequences
 where schemaname in ('public','private','kingsmen_security','storage')
 order by schemaname, sequencename;
 
+select object_schema, object_name, object_type, grantee, privilege_type, is_grantable
+from information_schema.role_usage_grants
+where object_type='SEQUENCE'
+  and object_schema in ('public','private','kingsmen_security','storage')
+order by object_schema, object_name, grantee, privilege_type;
+
 select specific_schema as object_schema, specific_name as object_name,
        grantee, privilege_type, is_grantable
 from information_schema.role_routine_grants
