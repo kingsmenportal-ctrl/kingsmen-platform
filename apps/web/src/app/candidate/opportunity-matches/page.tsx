@@ -31,7 +31,10 @@ type Feed = { status: string; count?: number; opportunities?: Opportunity[]; mes
 
 function getAccessToken(): string | null {
   try {
-    const stored = window.localStorage.getItem("sb-euhubhhnumtibbyufghm-auth-token");
+    const base = process.env.NEXT_PUBLIC_SUPABASE_URL;
+    if (!base) return null;
+    const projectRef = new URL(base).hostname.split(".")[0];
+    const stored = window.localStorage.getItem(`sb-${projectRef}-auth-token`);
     if (!stored) return null;
     const parsed = JSON.parse(stored);
     return typeof parsed.access_token === "string" ? parsed.access_token : null;
@@ -43,6 +46,8 @@ export default function CandidateOpportunityMatchesPage() {
   const [pathway, setPathway] = useState("ALL");
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
+  const [saveBusy, setSaveBusy] = useState("");
+  const [saveNotice, setSaveNotice] = useState("");
 
   async function loadMatches() {
     setLoading(true);
@@ -79,6 +84,33 @@ export default function CandidateOpportunityMatchesPage() {
     pathway === "ALL" || item.pathways.includes(pathway)
   ), [feed, pathway]);
 
+  async function saveToWorkbench(item: Opportunity) {
+    setSaveBusy(item.match_ref);
+    setSaveNotice("");
+    setError("");
+    try {
+      const token = getAccessToken();
+      if (!token) throw new Error("Sign in before saving an opportunity.");
+      const selected = pathway !== "ALL" && item.pathways.includes(pathway) ? pathway : item.pathways[0];
+      const pathwayType = selected === "SETA_LEARNERSHIPS" ? "SETA_LEARNERSHIP"
+        : selected === "INTERNSHIPS" ? "INTERNSHIP"
+        : selected === "APPRENTICESHIPS" ? "APPRENTICESHIP"
+        : selected;
+      if (!pathwayType) throw new Error("This match has no supported pathway mapping yet.");
+      const response = await fetch("/api/candidate/opportunity-save", {
+        method: "POST",
+        headers: { Authorization: `Bearer ${token}`, "Content-Type": "application/json" },
+        body: JSON.stringify({ action: "save", match_ref: item.match_ref, pathway_type: pathwayType }),
+        cache: "no-store"
+      });
+      const body = await response.json();
+      if (!response.ok || body.ok !== true) throw new Error(body.message || body.error || body.code || `Save failed (${response.status})`);
+      setSaveNotice(body.message || "Opportunity saved and application draft prepared. No provider submission has occurred.");
+    } catch (e) {
+      setError(e instanceof Error ? e.message : "Could not save this opportunity.");
+    } finally { setSaveBusy(""); }
+  }
+
   return (
     <main className="mx-auto max-w-6xl space-y-6 px-4 py-8">
       <header className="rounded-3xl border border-slate-200 bg-white p-6">
@@ -97,6 +129,7 @@ export default function CandidateOpportunityMatchesPage() {
       </header>
 
       {error && <section role="alert" className="rounded-2xl border border-amber-300 bg-amber-50 p-4 text-sm text-amber-950">{error}</section>}
+      {saveNotice && <section role="status" className="rounded-2xl border border-emerald-300 bg-emerald-50 p-4 text-sm text-emerald-950">{saveNotice}<div className="mt-3"><a href="/candidate/applications" className="font-bold underline">Open application tracker</a> · <a href="/candidate/workbench" className="font-bold underline">Open workbench</a></div></section>}
       {feed?.status === "IDENTITY_REVIEW_REQUIRED" && (
         <section className="rounded-2xl border border-amber-300 bg-amber-50 p-5">
           <h2 className="font-bold text-amber-950">Identity review required</h2>
@@ -139,8 +172,23 @@ export default function CandidateOpportunityMatchesPage() {
                     <div><dt className="inline font-semibold text-slate-800">Deadline: </dt><dd className="inline text-slate-600">{item.deadline.closes_at ? new Date(item.deadline.closes_at).toLocaleString() : item.deadline.message || "Not verified — check the official page."}</dd></div>
                     <div><dt className="inline font-semibold text-slate-800">Eligibility: </dt><dd className="inline text-slate-600">Requires candidate-specific review; not guaranteed.</dd></div>
                   </dl>
-                  <a href={item.official_link} target="_blank" rel="noopener noreferrer"
-                    className="mt-5 inline-flex rounded-xl bg-slate-950 px-4 py-3 text-sm font-bold text-white">Open official opportunity ↗</a>
+                  <details className="mt-4 rounded-xl border border-slate-200 p-4">
+                    <summary className="cursor-pointer text-sm font-bold text-slate-900">Opportunity details and evidence</summary>
+                    <div className="mt-3 space-y-3 text-sm leading-6 text-slate-600">
+                      <p><strong className="text-slate-800">Publication state:</strong> Open listing only; individual eligibility still requires review.</p>
+                      <p><strong className="text-slate-800">Official-source evidence:</strong> {item.source_evidence.length ? item.source_evidence.join(", ") : "No source evidence returned."}</p>
+                      <p><strong className="text-slate-800">Deadline evidence:</strong> {item.deadline.evidence?.length ? item.deadline.evidence.join(", ") : "No confirmed deadline evidence returned."}</p>
+                      <p><strong className="text-slate-800">Eligibility:</strong> {item.eligibility.rules}</p>
+                    </div>
+                  </details>
+                  <div className="mt-5 flex flex-wrap gap-3">
+                    <a href={item.official_link} target="_blank" rel="noopener noreferrer"
+                      className="inline-flex rounded-xl bg-slate-950 px-4 py-3 text-sm font-bold text-white">Open official opportunity ↗</a>
+                    <button type="button" onClick={() => void saveToWorkbench(item)} disabled={Boolean(saveBusy)}
+                      className="inline-flex rounded-xl border border-cyan-700 px-4 py-3 text-sm font-bold text-slate-900 disabled:opacity-50">
+                      {saveBusy === item.match_ref ? "Verifying and saving…" : "Save & prepare application"}
+                    </button>
+                  </div>
                 </article>
               ))}
             </section>
