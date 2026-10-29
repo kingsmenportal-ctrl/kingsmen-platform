@@ -67,6 +67,9 @@ jobs:
       - name: Safe web/backend boundary validator
         run: npm run web:validate:backend-boundary
 
+      - name: Candidate Experience vertical-slice contract
+        run: npm run candidate:experience:check
+
       - name: PayFast sandbox source proof
         run: npm run payments:prove:sandbox
 
