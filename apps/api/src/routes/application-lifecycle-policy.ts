@@ -41,7 +41,7 @@ export interface NormalizedApplicationStatus {
   status: CanonicalApplicationStatus | "LEGACY_UNRESOLVED";
   source: LegacyApplicationSource;
   sourceStatus: string;
-  statusAuthority: "candidate_reported" | "provider_verified" | "legacy_unresolved";
+  statusAuthority: "tracker_recorded" | "candidate_reported" | "provider_verified" | "legacy_unresolved";
   requiresReview: boolean;
   reason: string;
 }
@@ -142,7 +142,7 @@ export function normalizeLegacyApplicationStatus(input: LegacyApplicationObserva
     status: canonical,
     source: input.source,
     sourceStatus: raw,
-    statusAuthority: "candidate_reported",
+    statusAuthority: "tracker_recorded",
     requiresReview: false,
     reason: "Status is carried forward from the route tracker; no provider outcome is implied."
   };
