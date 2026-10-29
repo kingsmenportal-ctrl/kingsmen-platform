@@ -4,7 +4,7 @@
   "status": "BUILT_PENDING_VALIDATION",
   "currency": "ZAR",
   "currency_symbol": "R",
-  "access_law": "Packages change active managed quantity, speed, monitoring intensity, human depth, SLA, escalation, manual fallback intensity, and reporting depth. Packages do not hide the core Kingsmen route brain or core safety capabilities.",
+  "access_law": "Every package grants full discovery access to all six pathways and accommodation support. Packages change managed-service quantity, priority, monitoring, human assistance, escalation and reporting; they never hide opportunity categories or core safety capabilities.",
   "core_gates_visible_to_all": [
     "Higher Education",
     "TVET",
@@ -23,7 +23,12 @@
     "Proof tracking",
     "MAP fallback",
     "Human-Step Handoff",
-    "Phoenix fallback"
+    "Phoenix fallback",
+    "Accommodation support on every package",
+    "One reusable candidate profile and primary application form",
+    "Universal access to all six opportunity pathways",
+    "CAO parent application counts once; programme choices are child choices",
+    "Source/deadline verification and truthful application-state distinctions"
   ],
   "packages": [
     {
@@ -32,7 +37,12 @@
       "price": 169.99,
       "currency": "ZAR",
       "status": "CANONICAL",
-      "controls": ["entry package", "lower active managed quantity", "standard queue", "standard monitoring"]
+      "controls": [
+        "entry package",
+        "lower active managed quantity",
+        "standard queue",
+        "standard monitoring"
+      ]
     },
     {
       "package_id": "collegiate_ordinance",
@@ -40,7 +50,11 @@
       "price": 299.99,
       "currency": "ZAR",
       "status": "CANONICAL",
-      "controls": ["higher active managed quantity", "stronger monitoring", "faster service intensity"]
+      "controls": [
+        "higher active managed quantity",
+        "stronger monitoring",
+        "faster service intensity"
+      ]
     },
     {
       "package_id": "chancellors_writ",
@@ -48,7 +62,11 @@
       "price": 399.99,
       "currency": "ZAR",
       "status": "CANONICAL",
-      "controls": ["priority intensity", "deeper human review", "stronger fallback support"]
+      "controls": [
+        "priority intensity",
+        "deeper human review",
+        "stronger fallback support"
+      ]
     },
     {
       "package_id": "regency_mandate",
@@ -56,7 +74,11 @@
       "price": 469.99,
       "currency": "ZAR",
       "status": "CANONICAL",
-      "controls": ["highest package intensity", "highest queue priority", "deepest monitoring and escalation"]
+      "controls": [
+        "highest package intensity",
+        "highest queue priority",
+        "deepest monitoring and escalation"
+      ]
     },
     {
       "package_id": "artisan_charter",
@@ -64,7 +86,11 @@
       "price": 149.99,
       "currency": "ZAR",
       "status": "CANONICAL",
-      "controls": ["work/skills route package", "standard active managed quantity", "CV/work readiness focus"]
+      "controls": [
+        "work/skills route package",
+        "standard active managed quantity",
+        "CV/work readiness focus"
+      ]
     },
     {
       "package_id": "guildmasters_charter",
@@ -72,7 +98,11 @@
       "price": 199.99,
       "currency": "ZAR",
       "status": "CANONICAL",
-      "controls": ["stronger work/skills route intensity", "learnership/employment support", "higher monitoring"]
+      "controls": [
+        "stronger work/skills route intensity",
+        "learnership/employment support",
+        "higher monitoring"
+      ]
     },
     {
       "package_id": "cv_revamp",
@@ -80,7 +110,11 @@
       "price": 49.99,
       "currency": "ZAR",
       "status": "CANONICAL",
-      "controls": ["standalone low-cost entry product", "CV improvement", "work/learnership/internship/apprenticeship/employment funnel"]
+      "controls": [
+        "standalone low-cost entry product",
+        "CV improvement",
+        "work/learnership/internship/apprenticeship/employment funnel"
+      ]
     }
   ],
   "cv_revamp_upgrade_rule": {
@@ -101,6 +135,146 @@
   "growth_cap": {
     "starting_active_candidate_cap": 500,
     "cap_limits": "active managed volume, not core capability access",
-    "growth_modes": ["500_active_start", "1000_ready_design", "5000_ready_architecture_not_automatic"]
+    "growth_modes": [
+      "500_active_start",
+      "1000_ready_design",
+      "5000_ready_architecture_not_automatic"
+    ]
+  },
+  "canonical_benefit_register": {
+    "version": "2026-10-29-v1",
+    "currency": "ZAR",
+    "prices_minor": {
+      "foundational_accord": 16999,
+      "collegiate_ordinance": 29999,
+      "chancellors_writ": 39999,
+      "regency_mandate": 46999,
+      "artisan_charter": 14999,
+      "guildmasters_charter": 19999,
+      "cv_revamp": 4999
+    },
+    "priority_applications": {
+      "foundational_accord": 5,
+      "collegiate_ordinance": 10,
+      "chancellors_writ": 15,
+      "regency_mandate": 15,
+      "artisan_charter": 5,
+      "guildmasters_charter": 8
+    },
+    "accommodation": {
+      "all_packages_support": true,
+      "foundational_accord_included_routes": 8,
+      "other_plans_support_without_price_gate": true,
+      "provider_approval_guaranteed": false
+    },
+    "pathways": [
+      "Higher Education",
+      "TVET",
+      "SETA programmes and learnerships",
+      "Internships",
+      "Apprenticeships",
+      "Employment"
+    ],
+    "package_benefits": {
+      "foundational_accord": [
+        "application preparation and form completion",
+        "document arrangement and validation",
+        "institutional requirement checks",
+        "document reuse and duplicate-submission prevention",
+        "source, deadline and fee awareness",
+        "profile review and readiness warnings",
+        "CAO/NSFAS/TVET/SETA support where relevant",
+        "application ordering, proof tracking, status visibility and alerts",
+        "CV/motivation-letter support where relevant",
+        "manual portal fallback and Phoenix fallback"
+      ],
+      "collegiate_ordinance": [
+        "NSFAS submission support",
+        "education matching",
+        "context-aware motivation letter",
+        "document enhancement",
+        "queue management and conditional automatic release",
+        "academic/profile interpretation",
+        "programme-fit scoring and institution compatibility",
+        "suitability-informed prioritisation",
+        "timing optimisation",
+        "weak-application prevention and alternative/fallback routes"
+      ],
+      "chancellors_writ": [
+        "NSFAS and CAO execution support",
+        "advanced matching and suitability-informed strategy",
+        "supported submission when an opportunity opens and conditions are satisfied",
+        "priority queue acceleration",
+        "application-fee intelligence",
+        "institutional behaviour tracking where reliable",
+        "consent-based document storage",
+        "coordinated sequencing, timing, ranking and alternative-route planning"
+      ],
+      "regency_mandate": [
+        "maximum override priority",
+        "NSFAS and CAO support",
+        "elite matching and intensive strategy",
+        "seat detection only with reliable data",
+        "supported immediate execution subject to conditions and permissions",
+        "appropriate escalation routing",
+        "dedicated fast-track handling",
+        "24-hour monitoring as intended design, not claimed live without evidence",
+        "emergency fallback and opening radar"
+      ],
+      "artisan_charter": [
+        "basic role matching",
+        "CV structuring",
+        "supported streamlined submission",
+        "basic motivation letter where relevant",
+        "opportunity alerts"
+      ],
+      "guildmasters_charter": [
+        "advanced role matching",
+        "ATS-optimised CV",
+        "professional motivation letter",
+        "opportunity recommendation",
+        "priority submission",
+        "interview preparation",
+        "skills-gap analysis",
+        "career-path projection"
+      ],
+      "cv_revamp": [
+        "15 personalised CV versions",
+        "15 matching motivation letters",
+        "3-business-day target after complete intake",
+        "eligible +2 managed-route upgrade bonus"
+      ]
+    },
+    "counting_rules": {
+      "cao_parent_counts_as_one": true,
+      "programme_choices_are_child_records": true,
+      "priority_application_allowance_distinct_from_concurrent_managed_route_capacity": true
+    },
+    "known_reconciliation": {
+      "notion_priority_counts": {
+        "foundational_accord": 5,
+        "collegiate_ordinance": 10,
+        "chancellors_writ": 15,
+        "regency_mandate": 15,
+        "artisan_charter": 5,
+        "guildmasters_charter": 8
+      },
+      "supabase_concurrent_routes": {
+        "foundational_accord": 4,
+        "collegiate_ordinance": 8,
+        "chancellors_writ": 10,
+        "regency_mandate": 12,
+        "artisan_charter": 3,
+        "guildmasters_charter": 5
+      },
+      "rule": "Do not conflate or silently overwrite these distinct measures; reconcile with approved commercial decision and preserve historical order snapshots."
+    },
+    "trust_and_safety": [
+      "No guaranteed admissions, jobs, funding or accommodation approvals",
+      "Do not claim unsupported monitoring, seat detection, escalation or auto-submission is live",
+      "Candidate-reported submission differs from provider-confirmed receipt and outcome",
+      "Activate paid entitlement only after verified payment",
+      "Preserve immutable historical purchase snapshots"
+    ]
   }
 }
