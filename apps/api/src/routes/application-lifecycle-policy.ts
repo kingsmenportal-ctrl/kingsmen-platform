@@ -46,6 +46,8 @@ export interface NormalizedApplicationStatus {
   reason: string;
 }
 
+const isUuid = (value: string): boolean => /^[0-9a-f]{8}-[0-9a-f]{4}-[1-8][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i.test(value.trim());
+
 const PROVIDER_CONFIRMED = new Set<CanonicalApplicationStatus>([
   "PROVIDER_ACKNOWLEDGED", "UNDER_REVIEW", "ACCEPTED", "REJECTED"
 ]);
@@ -215,7 +217,7 @@ export function validateApplicationTransition(input: {
   if (PROVIDER_CONFIRMED.has(input.to)) {
     const e = input.providerEvidence;
     if (!e || e.sourceKind !== "PROVIDER_ORIGIN" || e.verified !== true ||
-        !e.evidenceRef.trim() || !e.verifiedByAuthUserId.trim() ||
+        !e.evidenceRef.trim() || !isUuid(e.verifiedByAuthUserId) ||
         !Number.isFinite(Date.parse(e.verifiedAt))) {
       return { allowed: false, reasons: ["Provider-confirmed states require verified provider-origin evidence and reviewer identity."] };
     }
