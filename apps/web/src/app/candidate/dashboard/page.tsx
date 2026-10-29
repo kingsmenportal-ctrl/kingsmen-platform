@@ -10,6 +10,7 @@ const pathways = [
 const actions = [
   { href: "/candidate/profile", title: "My candidate profile", description: "Create, update and reload your saved profile, pathway preferences and consent state." },
   { href: "/candidate/identity-review", title: "Identity review & evidence", description: "Submit a manual identity-review request and follow its real evidence and correction states." },
+  { href: "/candidate/profile", title: "My reusable profile", description: "Create, update, reload and track consent for your saved candidate profile." },
   { href: "/candidate/workbench", title: "Application workbench", description: "Save preparation progress and select a priority pathway." },
   { href: "/candidate/applications", title: "My application tracker", description: "Track saved applications and candidate-reported preparation/submission events." },
   { href: "/candidate/documents", title: "Private Document Vault", description: "Upload, reuse and track your private candidate documents." },
@@ -27,6 +28,7 @@ export default function CandidateDashboardPage() {
         </p>
         <nav aria-label="Candidate navigation" className="mt-5 flex flex-wrap gap-3">
           <a href="/candidate/login" className="rounded-xl bg-cyan-300 px-4 py-3 text-sm font-bold text-slate-950">Sign in / create account</a>
+          <a href="/candidate/profile" className="rounded-xl border border-slate-700 px-4 py-3 text-sm font-semibold">My profile</a>
           <a href="/candidate/workbench" className="rounded-xl border border-slate-700 px-4 py-3 text-sm font-semibold">Open workbench</a>
           <a href="/candidate/profile" className="rounded-xl border border-slate-700 px-4 py-3 text-sm font-semibold">My profile</a>
           <a href="/candidate/documents" className="rounded-xl border border-slate-700 px-4 py-3 text-sm font-semibold">Document Vault</a>
