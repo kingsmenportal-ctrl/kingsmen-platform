@@ -63,24 +63,53 @@ drop policy service_role_all_evidence_ledger on public.evidence_ledger;
 drop policy service_role_all_route_sources on public.route_sources;
 drop policy service_role_all_workflow_runs on public.workflow_runs;
 
-do $$
+do $
 declare
+  canonical_oid oid;
+  duplicate_oid oid;
   canonical_def text;
   duplicate_def text;
 begin
-  select pg_get_indexdef(indexrelid) into canonical_def
-  from pg_index
-  where indexrelid = 'public.candidate_identity_review_one_open_request_per_user'::regclass;
+  canonical_oid := to_regclass('public.candidate_identity_review_one_open_request_per_user');
+  duplicate_oid := to_regclass('public.candidate_identity_review_one_open_request_per_user_idx');
 
-  select pg_get_indexdef(indexrelid) into duplicate_def
-  from pg_index
-  where indexrelid = 'public.candidate_identity_review_one_open_request_per_user_idx'::regclass;
-
-  if canonical_def is null or duplicate_def is null or canonical_def <> duplicate_def then
-    raise exception 'Refusing duplicate-index cleanup: index definitions do not match exactly';
+  if canonical_oid is null then
+    raise exception 'Refusing duplicate-index cleanup: canonical unique index is absent';
   end if;
-end $$;
 
-drop index public.candidate_identity_review_one_open_request_per_user_idx;
+  select regexp_replace(pg_get_indexdef(i.indexrelid),
+      '^CREATE UNIQUE INDEX [^ ]+ ON ', 'CREATE UNIQUE INDEX <name> ON ')
+    into canonical_def
+  from pg_index i
+  where i.indexrelid = canonical_oid
+    and i.indrelid = 'public.candidate_identity_review_requests'::regclass
+    and i.indisunique and i.indisvalid and i.indisready;
+
+  if canonical_def is null then
+    raise exception 'Refusing duplicate-index cleanup: canonical index is invalid or not unique';
+  end if;
+
+  -- Migration 0090 may have already removed the redundant index. If it still
+  -- exists, compare definitions after normalizing only their different names.
+  if duplicate_oid is not null then
+    select regexp_replace(pg_get_indexdef(i.indexrelid),
+        '^CREATE UNIQUE INDEX [^ ]+ ON ', 'CREATE UNIQUE INDEX <name> ON ')
+      into duplicate_def
+    from pg_index i
+    where i.indexrelid = duplicate_oid
+      and i.indrelid = 'public.candidate_identity_review_requests'::regclass
+      and i.indisunique and i.indisvalid and i.indisready;
+
+    if duplicate_def is null or canonical_def <> duplicate_def then
+      raise exception 'Refusing duplicate-index cleanup: index definitions differ or duplicate is invalid';
+    end if;
+
+    if exists (select 1 from pg_constraint where conindid in (canonical_oid, duplicate_oid)) then
+      raise exception 'Refusing duplicate-index cleanup: an audited index backs a constraint';
+    end if;
+  end if;
+end $;
+
+drop index if exists public.candidate_identity_review_one_open_request_per_user_idx;
 
 commit;
