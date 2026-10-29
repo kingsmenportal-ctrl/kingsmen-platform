@@ -48,6 +48,10 @@ export interface OpportunityProgramme {
   candidateFacingSafe: boolean;
   exactLink?: string;
   evidenceRefs: string[];
+  observedAt?: string;
+  lastCheckedAt?: string;
+  staleAfter?: string;
+  validUntil?: string;
 }
 
 export interface CandidateOpportunityMatch {
@@ -100,8 +104,13 @@ export function assertNoFakeOpportunityClaim(input: {
 }
 
 export function isStaleObservation(observation: SourceObservation, nowIso = new Date().toISOString()): boolean {
-  if (!observation.staleAfter) return false;
-  return new Date(nowIso).getTime() > new Date(observation.staleAfter).getTime();
+  const now = Date.parse(nowIso);
+  const observed = Date.parse(observation.observedAt ?? "");
+  const staleAfter = Date.parse(observation.staleAfter ?? "");
+  // Missing/invalid freshness metadata is not evidence of freshness.
+  if (!Number.isFinite(now) || !Number.isFinite(observed) || !Number.isFinite(staleAfter)) return true;
+  if (observed > now || staleAfter <= now) return true;
+  return false;
 }
 
 export function normalizeSourceObservation(input: {
@@ -159,13 +168,22 @@ export function verifyProviderSafety(provider: OpportunityProvider): Opportunity
   return { ...provider, safeToRecommend: safe };
 }
 
-export function verifyProgrammeCandidateFacingSafety(programme: OpportunityProgramme, provider: OpportunityProvider): OpportunityProgramme {
+export function verifyProgrammeCandidateFacingSafety(programme: OpportunityProgramme, provider: OpportunityProvider, nowIso = new Date().toISOString()): OpportunityProgramme {
   assertOpportunityEvidence(programme.evidenceRefs);
+  const now = Date.parse(nowIso);
+  const observed = Date.parse(programme.observedAt ?? "");
+  const checked = Date.parse(programme.lastCheckedAt ?? "");
+  const staleAfter = Date.parse(programme.staleAfter ?? "");
+  const validUntil = programme.validUntil ? Date.parse(programme.validUntil) : Number.POSITIVE_INFINITY;
+  const freshnessVerified = Number.isFinite(now) && Number.isFinite(observed) && Number.isFinite(checked) &&
+    Number.isFinite(staleAfter) && Number.isFinite(validUntil) && observed <= checked && checked <= now &&
+    observed <= now && staleAfter > now && staleAfter > checked && validUntil > now;
+  const httpsLink = typeof programme.exactLink === "string" && /^https:\/\//i.test(programme.exactLink);
   const safe =
     provider.safeToRecommend &&
-    programme.openingStatus !== "UNKNOWN" &&
-    programme.sourceConfidence !== "LOW" &&
-    Boolean(programme.exactLink);
+    programme.openingStatus === "OPEN" &&
+    sourceConfidenceMeetsMinimum(programme.sourceConfidence, "HIGH") &&
+    httpsLink && freshnessVerified;
 
   return {
     ...programme,
@@ -186,10 +204,8 @@ export function buildOpportunityMatch(input: {
     ? input.programme.sourceConfidence
     : input.provider.sourceConfidence;
 
-  const humanReviewRequired =
-    !input.provider.safeToRecommend ||
-    !input.programme.candidateFacingSafe ||
-    !sourceConfidenceMeetsMinimum(sourceConfidence, "MEDIUM");
+  // Matching is decision support only. This function can never approve a candidate-facing match.
+  const humanReviewRequired = true;
 
   const sealedExactTarget = Boolean(input.freePreview);
 
@@ -199,7 +215,7 @@ export function buildOpportunityMatch(input: {
     programmeRef: input.programme.programmeRef,
     providerRef: input.provider.providerRef,
     sector: input.programme.sector,
-    matchStatus: humanReviewRequired ? "READY_FOR_REVIEW" : "APPROVED",
+    matchStatus: "READY_FOR_REVIEW",
     matchScore: Math.max(0, Math.min(100, Math.round(input.fitScore * 100) / 100)),
     sourceConfidence,
     humanReviewRequired,
