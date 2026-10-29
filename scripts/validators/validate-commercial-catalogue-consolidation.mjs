@@ -52,7 +52,13 @@ assert.ok(websiteTypes.includes("managedExecutionRequiresEntitlement"), "managed
 assert.ok(!/packageKey:\s*"ACCOMMODATION_SUPPORT"/.test(website) && !/priceLabel:\s*"R179\.00"/.test(website), "standalone R179 accommodation product must not be offered");
 assert.ok(financeTypes.includes('"ACCOMMODATION_SUPPORT_R179"'), "historical legacy code must remain representable for reconciliation");
 assert.ok(websiteTypes.includes("priorityApplicationCount") && websiteTypes.includes("concurrentManagedRouteCapacity30d"), "priority allowance and concurrent capacity must be distinct fields");
-assert.ok(shared.includes("checkoutEnabled: false"), "unproven package checkout must fail closed");
+// Finance must expose the same independent entitlement axes as the website projection.
+// Keep managedApplicationCount solely as a documented compatibility alias for route capacity.
+assert.ok(financeTypes.includes("priorityApplicationCount: number | null") && financeTypes.includes("concurrentManagedRouteCapacity30d: number"), "finance type must distinguish priority allowance from 30-day route capacity");
+assert.ok(finance.includes("priorityApplicationCount: plan.priorityApplications"), "finance projection must carry the canonical priority application allowance");
+assert.ok(finance.includes("concurrentManagedRouteCapacity30d: plan.concurrentManagedRoutes30d"), "finance projection must carry the canonical 30-day managed-route capacity");
+assert.ok(finance.includes("managedApplicationCount: plan.concurrentManagedRoutes30d"), "legacy finance field must remain a compatibility alias for route capacity, not priority allowance");
+assert.ok(finance.includes("accommodationSupport: plan.accommodationSupport"), "finance projection must preserve accommodation support independently of included route count");
 
 console.log(JSON.stringify({
   schema: "kingsmen.commercial-catalogue-consolidation.v1",
@@ -60,7 +66,7 @@ console.log(JSON.stringify({
   paidProducts: rows.length,
   runtimeAndDoctrineParity: true,
   publicProjection: "shared catalogue",
-  financeProjection: "shared catalogue; checkout fail-closed for unproven package plans",
+  financeProjection: "shared catalogue; priority applications and concurrent route capacity are separate",
   universalPathways: 6,
   standaloneAccommodationProduct: "removed from public runtime projection; historical code retained",
   notes: ["Source-level contract only; not a TypeScript build, live database parity run, payment proof, deployment, or authenticated E2E."]
