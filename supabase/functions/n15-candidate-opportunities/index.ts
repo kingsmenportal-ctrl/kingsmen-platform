@@ -8,6 +8,7 @@ const cors = {
   "Content-Type": "application/json; charset=utf-8"
 };
 function json(body: unknown, status = 200) { return new Response(JSON.stringify(body), { status, headers: cors }); }
+const AUTH_UUID = /^[0-9a-f]{8}-[0-9a-f]{4}-[1-8][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i;
 Deno.serve(async (req: Request) => {
   if (req.method === "OPTIONS") return new Response("ok", { headers: cors });
   if (req.method !== "GET") return json({ status: "METHOD_NOT_ALLOWED" }, 405);
@@ -25,10 +26,14 @@ Deno.serve(async (req: Request) => {
 
   const admin = createClient(url, serviceKey, { auth: { persistSession: false, autoRefreshToken: false } });
   const { data: link, error: linkError } = await admin.from("candidate_auth_identity_links")
-    .select("candidate_id,link_status").eq("supabase_user_id", userData.user.id).maybeSingle();
+    .select("candidate_id,link_status,verified_at,verified_by").eq("supabase_user_id", userData.user.id).maybeSingle();
   if (linkError) return json({ status: "DATABASE_ERROR", reason: "IDENTITY_LINK_LOOKUP_FAILED" }, 500);
-  if (!link || link.link_status !== "VERIFIED") {
-    return json({ status: "IDENTITY_REVIEW_REQUIRED", message: "Your Kingsmen identity must be linked and authorised before personalised matching can be shown." }, 403);
+  const verifiedAtMs = Date.parse(link?.verified_at ?? "");
+  const verificationIsAuthorised = Boolean(link && link.link_status === "VERIFIED" &&
+    Number.isFinite(verifiedAtMs) && verifiedAtMs <= Date.now() &&
+    typeof link.verified_by === "string" && AUTH_UUID.test(link.verified_by));
+  if (!verificationIsAuthorised) {
+    return json({ status: "IDENTITY_REVIEW_REQUIRED", message: "Your Kingsmen identity must be linked and authorised by a verified reviewer before personalised matching can be shown." }, 403);
   }
 
   const candidateRef = String(link.candidate_id);
