@@ -36,6 +36,7 @@ type ProfileResponse = {
   correctionRequest?: CorrectionRequest;
   candidateReference?: string | null;
   identityStatus?: "VERIFIED" | "PENDING_REVIEW" | "NOT_PROVISIONED";
+  persistence?: "SUPABASE_BACKEND" | "NOT_PROVISIONED";
   message?: string;
   profilePreserved?: boolean;
 };
