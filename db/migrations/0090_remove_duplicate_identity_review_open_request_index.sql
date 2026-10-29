@@ -22,7 +22,9 @@ begin
     raise exception 'Refusing duplicate index cleanup: both audited indexes must exist';
   end if;
 
-  select pg_get_indexdef(i.indexrelid) into v_canonical_def
+  select regexp_replace(pg_get_indexdef(i.indexrelid),
+      '^CREATE UNIQUE INDEX [^ ]+ ON ', 'CREATE UNIQUE INDEX <name> ON ')
+    into v_canonical_def
   from pg_index i
   where i.indexrelid = v_canonical
     and i.indrelid = 'public.candidate_identity_review_requests'::regclass
@@ -30,7 +32,9 @@ begin
     and i.indisvalid
     and i.indisready;
 
-  select pg_get_indexdef(i.indexrelid) into v_duplicate_def
+  select regexp_replace(pg_get_indexdef(i.indexrelid),
+      '^CREATE UNIQUE INDEX [^ ]+ ON ', 'CREATE UNIQUE INDEX <name> ON ')
+    into v_duplicate_def
   from pg_index i
   where i.indexrelid = v_duplicate
     and i.indrelid = 'public.candidate_identity_review_requests'::regclass
