@@ -43,7 +43,10 @@ export async function POST(request: Request) {
     return reply({ ok: false, code, error: "The readiness request body is invalid." }, status);
   }
 
-  const action = payload.action === "save" ? "save" : payload.action === "load" ? "load" : "load";
+  if (payload.action !== "save" && payload.action !== "load") {
+    return reply({ ok: false, code: "READINESS_ACTION_INVALID", error: "Action must be load or save." }, 400);
+  }
+  const action = payload.action;
   if (action === "save") {
     const tasks = payload.completed_tasks;
     const pathway = payload.priority_pathway;
