@@ -233,8 +233,41 @@ function trustedPayFastSourceIp(request: Request): string | null {
 }
 
 async function receiveItn(request: Request) {
-  const textBody = await request.text();
-  if (textBody.length > 32768) return json({ error: "payload_too_large" }, 413);
+  const maxBodyBytes = 32768;
+  const declaredLength = request.headers.get("content-length");
+  if (declaredLength !== null) {
+    if (!/^\\d+$/.test(declaredLength)) return json({ error: "invalid_content_length" }, 400);
+    if (Number(declaredLength) > maxBodyBytes) return json({ error: "payload_too_large" }, 413);
+  }
+
+  // Bound the actual streamed bytes as well as Content-Length; webhook callers can omit it.
+  const reader = request.body?.getReader();
+  const chunks: Uint8Array[] = [];
+  let totalBytes = 0;
+  if (reader) {
+    while (true) {
+      const { done, value } = await reader.read();
+      if (done) break;
+      totalBytes += value.byteLength;
+      if (totalBytes > maxBodyBytes) {
+        await reader.cancel();
+        return json({ error: "payload_too_large" }, 413);
+      }
+      chunks.push(value);
+    }
+  }
+  const bodyBytes = new Uint8Array(totalBytes);
+  let offset = 0;
+  for (const chunk of chunks) {
+    bodyBytes.set(chunk, offset);
+    offset += chunk.byteLength;
+  }
+  let textBody: string;
+  try {
+    textBody = new TextDecoder("utf-8", { fatal: true }).decode(bodyBytes);
+  } catch {
+    return json({ error: "invalid_itn_encoding" }, 400);
+  }
   const params = new URLSearchParams(textBody);
   const fields: Record<string, string> = {};
   for (const [key, value] of params.entries()) {
