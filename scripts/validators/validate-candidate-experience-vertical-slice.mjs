@@ -33,7 +33,7 @@ const checks = [
   ["opportunity save and master-application actions are whitelisted", /save_n15_match/.test(applicationRoute) && /prepare_master_application/.test(applicationRoute) && /save_n15_match/.test(preparation) && /prepare_master_application/.test(preparation)],
   ["CAO remains governed by existing shared child-choice validator", /validateApplicationChildChoices/.test(read("apps/api/src/routes/application-lifecycle-policy.ts")) && /caoIsOneKingsmenApplication/.test(read("apps/api/src/routes/cao-boundary.ts"))],
   ["application status remains candidate-reported, not provider confirmation", /SUBMITTED_CANDIDATE_REPORTED/.test(preparation) && /provider_submission_sent:false/.test(preparation)],
-  ["dashboard links to the persistent profile", /\/candidate\/profile/.test(dashboard)]
+  ["dashboard links to the persistent profile", /\/candidate\/profile/.test(dashboard)],
   ["profile corrections persist as review requests and never overwrite profile data", /request_correction/.test(profileFunction) && /candidate_profile_change_requests/.test(profileFunction) && /official profile has not been changed/.test(profileFunction)],
   ["identity-review status/request and follow-up APIs are connected", /candidate-identity-review-request/.test(identityRoute) && /candidate-identity-review-status/.test(identityRoute) && /candidate-identity-review-followup/.test(followupRoute)],
   ["identity evidence upload is explicitly consented and securely proxied", /evidenceConsent/.test(identityPage) && /candidate-identity-review-evidence-upload/.test(evidenceRoute) && /sha256/.test(read("supabase/functions/candidate-identity-review-evidence-upload/index.ts"))],
