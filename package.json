@@ -101,7 +101,9 @@
     "n15:ingestion:test": "node scripts/staging/test-n15-live-ingestion-contract.mjs",
     "n15:ingestion:check": "npm run n15:ingestion:test",
     "api:test:production-storage-guard": "npm run api:build && node scripts/tests/test-truth-vault-production-guard.mjs",
-    "backend:simplification:check": "node scripts/staging/test-backend-simplification-migration-0087.mjs && node scripts/staging/test-backend-simplification-migration-0088.mjs && node scripts/staging/test-backend-migration-provenance-0078.mjs && node scripts/staging/test-backend-live-catalog-audit.mjs && node scripts/validators/validate-backend-simplification-contract.mjs && node scripts/validators/validate-commercial-catalogue-consolidation.mjs && node scripts/validators/test-commercial-catalogue-consolidation.mjs && node scripts/validators/validate-application-lifecycle-contract.mjs && npm run api:build && node scripts/staging/test-application-lifecycle-consolidation.mjs && node scripts/staging/test-opportunity-engine-safety-contract.mjs"
+    "backend:simplification:check": "node scripts/staging/test-backend-simplification-migration-0087.mjs && node scripts/staging/test-backend-simplification-migration-0088.mjs && node scripts/staging/test-backend-migration-provenance-0078.mjs && node scripts/staging/test-backend-live-catalog-audit.mjs && node scripts/validators/validate-backend-simplification-contract.mjs && node scripts/validators/validate-commercial-catalogue-consolidation.mjs && node scripts/validators/test-commercial-catalogue-consolidation.mjs && node scripts/validators/validate-application-lifecycle-contract.mjs && npm run api:build && node scripts/staging/test-application-lifecycle-consolidation.mjs && node scripts/staging/test-opportunity-engine-safety-contract.mjs && node scripts/validators/validate-candidate-private-document-vault.mjs && node scripts/staging/test-candidate-document-binary-signature.mjs",
+    "documents:vault:validate": "node scripts/validators/validate-candidate-private-document-vault.mjs",
+    "documents:vault:test": "node scripts/staging/test-candidate-document-binary-signature.mjs"
   },
   "repository": {
     "type": "git",
