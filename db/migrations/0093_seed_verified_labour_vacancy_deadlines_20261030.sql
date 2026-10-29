@@ -132,7 +132,7 @@ begin
   and d.source_confidence_band = 'A';
 
   if v_count <> 6 then
-    raise exception 'Closing-date evidence verification failed: expected six matching rows, got %', v_count;
+    raise exception 'closing-date evidence verification failed: expected six matching rows, got %', v_count;
   end if;
 end
 $verify$;
