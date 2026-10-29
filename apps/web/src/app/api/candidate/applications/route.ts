@@ -6,7 +6,7 @@ export const dynamic = "force-dynamic";
 const BODY_LIMIT = 16 * 1024;
 const TIMEOUT_MS = 20_000;
 const ALLOWED_ACTIONS = new Set([
-  "load", "start_from_saved_route", "update_tracker", "add_item", "update_item"
+  "load", "start_from_saved_route", "update_tracker", "add_item", "update_item", "save_n15_match", "prepare_master_application"
 ]);
 
 function respond(payload: unknown, status: number): Response {
@@ -68,6 +68,11 @@ async function dispatch(request: Request, incoming: Record<string, unknown>, met
     payload.status = incoming.status;
     payload.candidate_note = incoming.candidate_note;
     payload.evidence_reference = incoming.evidence_reference;
+  } else if (action === "save_n15_match") {
+    payload.match_ref = incoming.match_ref;
+    payload.pathway_type = incoming.pathway_type;
+  } else if (action === "prepare_master_application") {
+    payload.target_key = incoming.target_key;
   }
 
   let upstream: Response;
