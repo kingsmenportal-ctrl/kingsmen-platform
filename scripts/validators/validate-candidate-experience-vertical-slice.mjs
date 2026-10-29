@@ -34,6 +34,13 @@ const checks = [
   ["CAO remains governed by existing shared child-choice validator", /validateApplicationChildChoices/.test(read("apps/api/src/routes/application-lifecycle-policy.ts")) && /caoIsOneKingsmenApplication/.test(read("apps/api/src/routes/cao-boundary.ts"))],
   ["application status remains candidate-reported, not provider confirmation", /SUBMITTED_CANDIDATE_REPORTED/.test(preparation) && /provider_submission_sent:false/.test(preparation)],
   ["dashboard links to the persistent profile", /\/candidate\/profile/.test(dashboard)]
+  ["profile corrections persist as review requests and never overwrite profile data", /request_correction/.test(profileFunction) && /candidate_profile_change_requests/.test(profileFunction) && /official profile has not been changed/.test(profileFunction)],
+  ["identity-review status/request and follow-up APIs are connected", /candidate-identity-review-request/.test(identityRoute) && /candidate-identity-review-status/.test(identityRoute) && /candidate-identity-review-followup/.test(followupRoute)],
+  ["identity evidence upload is explicitly consented and securely proxied", /evidenceConsent/.test(identityPage) && /candidate-identity-review-evidence-upload/.test(evidenceRoute) && /sha256/.test(read("supabase/functions/candidate-identity-review-evidence-upload/index.ts"))],
+  ["document review states, correction notes and audit timeline are backend-fed", /candidate_private_document_reviews/.test(documentFunction) && /candidate_private_document_events/.test(documentFunction) && /reviewHistory/.test(documentPage) && /timeline/.test(documentPage)],
+  ["candidate profile and workbench use shared Supabase project session parsing", /getCandidateAccessToken/.test(profilePage) && /getCandidateAccessToken/.test(read("apps/web/src/app/candidate/workbench/page.tsx")) && /getCandidateAccessToken/.test(read("apps/web/src/app/candidate/applications/page.tsx"))],
+  ["active pathway filter determines the displayed and submitted pathway", /pathway !== "ALL" && item.pathways.includes\(pathway\) \? pathway/.test(opportunityPage)],
+  ["dashboard links to profile and identity review", /\/candidate\/profile/.test(dashboard) && /\/candidate\/identity-review/.test(dashboard)],
 ];
 let failed = 0;
 for (const [name, passed] of checks) {
