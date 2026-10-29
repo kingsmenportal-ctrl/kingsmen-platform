@@ -89,7 +89,9 @@ function sanitize(fields: Record<string, string>) {
 async function checkout(request: Request, body: Record<string, unknown>) {
   const user = await authenticatedUser(request);
   if (!user?.id) return json({ error: "authentication_required" }, 401);
-  if (typeof user.email !== "string" || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(user.email)) {
+  const emailConfirmedAt = typeof user.email_confirmed_at === "string" ? Date.parse(user.email_confirmed_at) : Number.NaN;
+  if (typeof user.email !== "string" || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(user.email) ||
+      !Number.isFinite(emailConfirmedAt) || emailConfirmedAt > Date.now()) {
     return json({ error: "verified_email_required_for_payfast_checkout" }, 400);
   }
 
