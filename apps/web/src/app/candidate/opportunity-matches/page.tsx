@@ -89,20 +89,20 @@ export default function CandidateOpportunityMatchesPage() {
     return toApplicationPathway(choice);
   }
   async function saveOpportunity(item: Opportunity) {
-    setSaving(\`save:\${item.match_ref}\`); setError(""); setNotice("");
+    setSaving(`save:${item.match_ref}`); setError(""); setNotice("");
     const token = getAccessToken();
     if (!token) { setError("Sign in before saving an opportunity."); setSaving(""); return; }
     const selected = pathwayFor(item);
     if (!selected) { setError("This listing does not have a supported pathway. Nothing was saved."); setSaving(""); return; }
     try {
       const response = await fetch("/api/candidate/opportunity-save", {
-        method: "POST", headers: { Authorization: \`Bearer \${token}\`, "Content-Type": "application/json" },
+        method: "POST", headers: { Authorization: `Bearer ${token}`, "Content-Type": "application/json" },
         body: JSON.stringify({ action: "save", match_ref: item.match_ref, pathway_type: selected }),
         cache: "no-store"
       });
       const body = await response.json();
       if (!response.ok || body.ok !== true || typeof body.targetKey !== "string") {
-        throw new Error(body.code && body.error ? \`\${body.code}: \${body.error}\` : body.error || body.message || "Opportunity could not be saved and prepared.");
+        throw new Error(body.code && body.error ? `${body.code}: ${body.error}` : body.error || body.message || "Opportunity could not be saved and prepared.");
       }
       const application = body.application as Record<string, unknown> | undefined;
       const reference = typeof application?.application_ref === "string" ? application.application_ref : String(application?.application_id ?? "Draft prepared");
@@ -113,7 +113,6 @@ export default function CandidateOpportunityMatchesPage() {
       setError(e instanceof Error ? e.message : "Opportunity could not be saved. Reload the feed and retry.");
     } finally { setSaving(""); }
   }
-
 
   return (
     <main className="mx-auto max-w-6xl space-y-6 px-4 py-8">
@@ -201,10 +200,7 @@ export default function CandidateOpportunityMatchesPage() {
                       className="rounded-xl bg-amber-300 px-4 py-3 text-sm font-bold text-slate-950 disabled:opacity-50">
                       {saving===`save:${item.match_ref}`?"Verifying and preparing…":preparedApplications[item.match_ref]?`Draft ${preparedApplications[item.match_ref]}`:savedTargets[item.match_ref]?"Saved to account":"Save & prepare application"}
                     </button>
-                    <button type="button" onClick={()=>void prepareApplication(item)} disabled={!savedTargets[item.match_ref] || saving===`prepare:${item.match_ref}`}
-                      className="rounded-xl border border-slate-300 px-4 py-3 text-sm font-semibold text-slate-800 disabled:opacity-50">
-                      {saving===`prepare:${item.match_ref}`?"Preparing…":preparedApplications[item.match_ref]? `Draft ${preparedApplications[item.match_ref]}`:"Prepare application"}
-                    </button>
+
                     <a href={item.official_link} target="_blank" rel="noopener noreferrer"
                       className="rounded-xl bg-slate-950 px-4 py-3 text-sm font-bold text-white">Open official opportunity ↗</a>
                   </div>
