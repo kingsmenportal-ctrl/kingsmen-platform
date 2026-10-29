@@ -33,7 +33,7 @@ const checks = [
   [edge.includes("create_candidate_private_document_upload_request") && edge.includes("finalize_candidate_private_document_upload") && edge.includes("record_candidate_private_document_read_link"), "Edge Function calls the audited database RPCs"],
   [edge.includes("getBucket(DOCUMENT_BUCKET)") && edge.includes("DOCUMENT_STORAGE_NOT_CONFIGURED"), "bucket privacy, size and MIME configuration are checked before issuing upload links"],
   [edge.includes("isAllowedDocumentSignature(bytes, doc.mime_type)") && edge.includes("sha256Hex(bytes)"), "finalization verifies actual file signature and SHA-256"],
-  [edge.includes('Cache-Control": "no-store') && edge.includes("SIGNED_LINK_LIFETIME_INVALID"), "responses are no-store and read-link TTL is range-checked in SQL"],
+  [edge.includes('Cache-Control": "no-store') && migration.includes("SIGNED_LINK_LIFETIME_INVALID"), "responses are no-store and read-link TTL is range-checked in SQL"],
   [proxy.includes("AUTHENTICATION_REQUIRED") && proxy.includes("readLimitedJson") && proxy.includes("cache: \"no-store\""), "web proxy requires bearer auth, bounds JSON and avoids caching"],
   [!proxy.includes("SUPABASE_SERVICE_ROLE_KEY"), "web proxy contains no service-role secret"],
   [parser.includes("await reader.cancel()") && parser.includes('new TextDecoder("utf-8", { fatal: true })'), "request parser cancels oversized bodies and rejects invalid UTF-8"],
