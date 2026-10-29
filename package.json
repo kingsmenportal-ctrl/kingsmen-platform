@@ -104,7 +104,8 @@
     "backend:simplification:check": "node scripts/staging/test-payfast-checkout-identity-locks-0094.mjs && node scripts/staging/test-verified-labour-vacancy-deadlines-0093.mjs && node scripts/staging/test-backend-simplification-migration-0090.mjs && node scripts/staging/test-candidate-private-document-vault-migration-0089.mjs && node scripts/staging/test-payfast-sandbox-edge-contract.mjs && node scripts/staging/test-backend-simplification-migration-0087.mjs && node scripts/staging/test-backend-simplification-migration-0088.mjs && node scripts/staging/test-backend-migration-provenance-0078.mjs && node scripts/staging/test-backend-live-catalog-audit.mjs && node scripts/validators/validate-backend-simplification-contract.mjs && node scripts/validators/validate-commercial-catalogue-consolidation.mjs && node scripts/validators/test-commercial-catalogue-consolidation.mjs && node scripts/validators/validate-application-lifecycle-contract.mjs && npm run api:build && node scripts/staging/test-application-lifecycle-consolidation.mjs && node scripts/staging/test-opportunity-engine-safety-contract.mjs && node scripts/validators/validate-candidate-private-document-vault.mjs && node scripts/staging/test-candidate-document-binary-signature.mjs && node scripts/validators/validate-candidate-experience-vertical-slice.mjs && node scripts/validators/validate-candidate-self-profile-bootstrap.mjs",
     "documents:vault:validate": "node scripts/validators/validate-candidate-private-document-vault.mjs",
     "documents:vault:test": "node scripts/staging/test-candidate-document-binary-signature.mjs",
-    "candidate:experience:check": "node scripts/validators/validate-candidate-experience-vertical-slice.mjs"
+    "candidate:experience:check": "node scripts/validators/validate-candidate-experience-vertical-slice.mjs",
+    "candidate:profile:e2e": "node scripts/staging/test-candidate-profile-persistence-e2e.mjs"
   },
   "repository": {
     "type": "git",
