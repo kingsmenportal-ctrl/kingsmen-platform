@@ -49,10 +49,10 @@ begin
   if p_size_bytes is null or p_size_bytes < 1 or p_size_bytes > 10485760 then
     raise exception 'DOCUMENT_SIZE_OUT_OF_RANGE' using errcode = '22023';
   end if;
-  if p_mime_type not in ('application/pdf', 'image/jpeg', 'image/png') then
+  if p_mime_type is null or p_mime_type not in ('application/pdf', 'image/jpeg', 'image/png') then
     raise exception 'DOCUMENT_MIME_NOT_ALLOWED' using errcode = '22023';
   end if;
-  if p_document_type not in (
+  if p_document_type is null or p_document_type not in (
     'CV','ID_DOCUMENT','MATRIC_CERTIFICATE','ACADEMIC_RECORD','PROOF_OF_ADDRESS',
     'BANK_LETTER','PARENT_GUARDIAN_ID','PAYSLIP','AFFIDAVIT','APPLICATION_PROOF',
     'NSFAS_DOCUMENT','OTHER'
@@ -65,7 +65,7 @@ begin
      or position(chr(92) in p_original_filename) > 0 then
     raise exception 'DOCUMENT_FILENAME_INVALID' using errcode = '22023';
   end if;
-  if p_evidence_purpose not in (
+  if p_evidence_purpose is null or p_evidence_purpose not in (
     'CANDIDATE_DOCUMENT','PRE_SUBMISSION_CHECKLIST','PROVIDER_SUBMISSION_RECEIPT',
     'PROVIDER_REFERENCE','PROVIDER_STATUS_NOTICE','PROVIDER_OUTCOME_NOTICE'
   ) then
