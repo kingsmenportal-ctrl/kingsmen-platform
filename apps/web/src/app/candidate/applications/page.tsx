@@ -1,5 +1,6 @@
 "use client";
 
+import { getCandidateAccessToken } from "../../../lib/candidate-session";
 import { FormEvent, useCallback, useEffect, useState } from "react";
 
 type SavedOpportunity = {
@@ -36,16 +37,6 @@ type PreparationItem = {
 type Draft = { status: Tracker["status"]; note: string; evidence: string };
 type ItemDraft = { status: PreparationItem["status"]; note: string; evidence: string };
 
-function tokenFromSession(): string | null {
-  const base = process.env.NEXT_PUBLIC_SUPABASE_URL;
-  if (!base || typeof window === "undefined") return null;
-  try {
-    const ref = new URL(base).hostname.split(".")[0];
-    const raw = window.localStorage.getItem(`sb-${ref}-auth-token`);
-    const session = raw ? JSON.parse(raw) as Record<string, unknown> : null;
-    return session && typeof session.access_token === "string" ? session.access_token : null;
-  } catch { return null; }
-}
 function explain(payload: unknown): string {
   if (payload && typeof payload === "object") {
     const p = payload as Record<string, unknown>;
@@ -83,7 +74,7 @@ export default function CandidateApplicationsPage() {
   const [notice,setNotice] = useState("");
 
   const request = useCallback(async (method:"GET"|"POST", payload?:Record<string,unknown>) => {
-    const token = tokenFromSession();
+    const token = getCandidateAccessToken();
     if (!token) throw new Error("AUTHENTICATION_REQUIRED: Sign in to access your application tracker.");
     const response = await fetch("/api/candidate/applications", {
       method,
