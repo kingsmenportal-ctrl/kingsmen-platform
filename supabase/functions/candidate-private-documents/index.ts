@@ -316,7 +316,16 @@ async function finalizeUpload(req: Request, body: Record<string, unknown>, ctx: 
     }
     return response(req, { ok: false, documentId, status: "UPLOAD_FAILED", reasonCode: result.reasonCode }, 422);
   }
-  return response(req, { ok: true, ...result });
+  return response(req, {
+    ok: true, ready: true, ...result,
+    document_id: result.documentId,
+    document: {
+      id: result.documentId,
+      status: result.status,
+      uploaded_at: result.uploadedAt,
+      sha256_hex: result.sha256Hex
+    }
+  });
 }
 
 async function readUrl(req: Request, body: Record<string, unknown>, ctx: CandidateContext): Promise<Response> {
@@ -353,8 +362,11 @@ async function readUrl(req: Request, body: Record<string, unknown>, ctx: Candida
     ok: true,
     documentId,
     signedReadUrl: signedRead.signedUrl,
+    signed_download_url: signedRead.signedUrl,
     expiresInSeconds: READ_URL_TTL_SECONDS,
-    rawPublicUrlAllowed: false
+    expires_in_seconds: READ_URL_TTL_SECONDS,
+    rawPublicUrlAllowed: false,
+    ready: true
   });
 }
 
@@ -365,20 +377,35 @@ async function listDocuments(req: Request, ctx: CandidateContext): Promise<Respo
     .eq("created_by_auth_user_id", ctx.userId)
     .order("created_at", { ascending: false }).limit(100);
   if (error) return fail(req, 503, "DOCUMENT_LIST_FAILED");
+  const { data: applications, error: applicationError } = await ctx.admin.from("candidate_applications")
+    .select("id,application_ref,pathway_type,status,created_at")
+    .eq("candidate_id", ctx.candidateId).order("created_at", { ascending: false }).limit(100);
+  if (applicationError) return fail(req, 503, "APPLICATION_LIST_FAILED");
   return response(req, {
     ok: true,
+    ready: true,
     documents: (data ?? []).map((doc) => ({
       id: doc.id,
       documentType: doc.document_type,
+      document_type: doc.document_type,
       filename: doc.original_filename,
+      original_filename: doc.original_filename,
       mimeType: doc.mime_type,
+      mime_type: doc.mime_type,
       sizeBytes: Number(doc.size_bytes),
+      size_bytes: Number(doc.size_bytes),
       status: doc.status,
       checksumRecorded: Boolean(doc.sha256_hex),
+      sha256_hex: doc.sha256_hex,
       uploadedAt: doc.uploaded_at,
+      uploaded_at: doc.uploaded_at,
       createdAt: doc.created_at,
-      updatedAt: doc.updated_at
+      created_at: doc.created_at,
+      updatedAt: doc.updated_at,
+      application_id: doc.application_id,
+      preparation_item_id: doc.preparation_item_id
     })),
+    applications: applications ?? [],
     candidateCanVerify: false,
     candidateCanReject: false,
     candidateCanDelete: false,
@@ -547,6 +574,7 @@ if (action === "review_document") {
       case "upload-url": return await uploadUrl(req, body, context);
       case "finalize-upload": return await finalizeUpload(req, body, context);
       case "read-url": return await readUrl(req, body, context);
+      case "list": return await listDocuments(req, context);
       default: return fail(req, 400, "ACTION_NOT_SUPPORTED");
     }
   } catch (error) {
