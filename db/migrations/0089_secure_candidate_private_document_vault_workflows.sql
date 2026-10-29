@@ -186,7 +186,6 @@ begin
   from public.candidate_private_documents d
   where d.id = p_document_id
     and d.candidate_id = p_candidate_id
-    and d.created_by_auth_user_id = p_supabase_user_id
   for update;
   if not found then
     raise exception 'DOCUMENT_NOT_FOUND' using errcode = 'P0002';
@@ -291,7 +290,6 @@ begin
   from public.candidate_private_documents d
   where d.id = p_document_id
     and d.candidate_id = p_candidate_id
-    and d.created_by_auth_user_id = p_supabase_user_id
     and d.status in ('UPLOADED_CANDIDATE_REPORTED','UNDER_REVIEW','VERIFIED')
   for update;
   if not found then
