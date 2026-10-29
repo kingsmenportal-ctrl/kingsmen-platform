@@ -9,6 +9,7 @@ const pathways = [
 
 const actions = [
   { href: "/candidate/profile", title: "My candidate profile", description: "Create, update and reload your saved profile, pathway preferences and consent state." },
+  { href: "/candidate/identity-review", title: "Identity review & evidence", description: "Submit a manual identity-review request and follow its real evidence and correction states." },
   { href: "/candidate/workbench", title: "Application workbench", description: "Save preparation progress and select a priority pathway." },
   { href: "/candidate/applications", title: "My application tracker", description: "Track saved applications and candidate-reported preparation/submission events." },
   { href: "/candidate/documents", title: "Private Document Vault", description: "Upload, reuse and track your private candidate documents." },
