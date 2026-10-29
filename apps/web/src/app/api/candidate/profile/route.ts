@@ -4,7 +4,7 @@ export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
 const BODY_LIMIT = 20 * 1024;
 const TIMEOUT_MS = 15_000;
-const ALLOWED_ACTIONS = new Set(["load", "save", "revoke_consent"]);
+const ALLOWED_ACTIONS = new Set(["load", "save", "revoke_consent", "request_correction"]);
 
 function respond(payload: unknown, status: number) {
   const safe = payload && typeof payload === "object" && !Array.isArray(payload)
@@ -32,6 +32,10 @@ export async function POST(request: Request) {
     outgoing.profile = payload.profile;
     outgoing.pathwayPreferences = payload.pathwayPreferences;
     outgoing.consentAccepted = true;
+  } else if (payload.action === "request_correction") {
+    outgoing.fieldName = payload.fieldName;
+    outgoing.requestedValue = payload.requestedValue;
+    outgoing.reason = payload.reason;
   }
   let upstream: Response;
   try {
