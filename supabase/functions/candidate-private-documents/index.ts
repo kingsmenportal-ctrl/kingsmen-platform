@@ -364,6 +364,122 @@ Deno.serve(async (req: Request) => {
   if (!body) return fail(req, 415, "JSON_CONTENT_TYPE_REQUIRED");
 
   const action = typeof body.action === "string" ? body.action : "";
+
+  // Preserve the deployed v14 reviewer actions when the upgraded function is published.
+  // Reviewers are authorized by platform_reviewers, not candidate identity links.
+  if (["list_review_queue", "create_reviewer_download_url", "review_document"].includes(action)) {
+    const authorization = req.headers.get("authorization") ?? "";
+    const token = /^Bearer\\s+(\\S+)$/i.exec(authorization)?.[1];
+    if (!token) return fail(req, 401, "AUTHENTICATION_REQUIRED");
+    const url = Deno.env.get("SUPABASE_URL");
+    const anonKey = Deno.env.get("SUPABASE_ANON_KEY");
+    const serviceKey = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY");
+    if (!url || !anonKey || !serviceKey) return fail(req, 503, "NOT_CONFIGURED");
+    const auth = createClient(url, anonKey, { auth: { persistSession: false, autoRefreshToken: false } });
+    const { data: authData, error: authError } = await auth.auth.getUser(token);
+    if (authError || !authData.user) return fail(req, 401, "AUTHENTICATION_REQUIRED");
+    const admin = createClient(url, serviceKey, { auth: { persistSession: false, autoRefreshToken: false } });
+    const origin = req.headers.get("origin");
+    const reply = (status: number, payload: Record<string, unknown>, _origin: string | null) => response(req, payload, status);
+
+// Reviewer queue and read access are gated independently of candidate identity.
+  // Never return storage paths or file bytes; downloads are short-lived and audited.
+  if (p.action === "list_review_queue" || p.action === "create_reviewer_download_url") {
+    const reviewerRoles = await admin.from("platform_reviewers")
+      .select("role_code").eq("auth_user_id", authData.user.id)
+      .eq("is_active", true).is("revoked_at", null)
+      .in("role_code", ["EVIDENCE_VERIFIER", "PLATFORM_ADMIN"]);
+    if (reviewerRoles.error) {
+      console.error("document reviewer permission lookup failed", reviewerRoles.error.code ?? "unknown");
+      return reply(503, { error: "Could not verify reviewer permissions." }, origin);
+    }
+    if (!(reviewerRoles.data ?? []).length) {
+      return reply(403, { code: "DOCUMENT_REVIEWER_REQUIRED", error: "An active evidence-verifier permission is required." }, origin);
+    }
+    if (p.action === "list_review_queue") {
+      const { data, error } = await admin.from("candidate_private_documents")
+        .select("id,candidate_id,preparation_item_id,original_filename,mime_type,size_bytes,status,uploaded_at,created_at,updated_at")
+        .in("status", ["UPLOADED_CANDIDATE_REPORTED", "UNDER_REVIEW"])
+        .order("created_at", { ascending: true }).limit(100);
+      if (error) {
+        console.error("private document review queue failed", error.code ?? "unknown");
+        return reply(503, { error: "Could not load the private document review queue." }, origin);
+      }
+      return reply(200, { ready: true, documents: data ?? [], limit: 100,
+        message: "Review queue metadata loaded; file contents and storage paths are not returned." }, origin);
+    }
+    const id = typeof p.document_id === "string" ? p.document_id : "";
+    if (!/^[0-9a-f-]{36}$/i.test(id)) return reply(400, { error: "A valid document identifier is required." }, origin);
+    const { data: doc, error } = await admin.from("candidate_private_documents")
+      .select("id,candidate_id,storage_bucket,storage_path,status")
+      .eq("id", id).maybeSingle();
+    if (error || !doc) return reply(404, { error: "Private document record not found." }, origin);
+    if (doc.storage_bucket !== BUCKET || !String(doc.storage_path).startsWith(String(doc.candidate_id) + "/") ||
+        !["UPLOADED_CANDIDATE_REPORTED", "UNDER_REVIEW", "VERIFIED", "REJECTED"].includes(doc.status)) {
+      return reply(409, { error: "This document is not available for reviewer download." }, origin);
+    }
+    const { data: signed, error: signError } = await admin.storage.from(BUCKET).createSignedUrl(doc.storage_path, 60, { download: true });
+    if (signError || !signed) return reply(503, { error: "Could not create a temporary reviewer download link." }, origin);
+    const { error: auditError } = await admin.from("candidate_private_document_events").insert({
+      document_id: id, candidate_id: doc.candidate_id, actor_type: "REVIEWER",
+      event_type: "READ_LINK_ISSUED", from_status: doc.status, to_status: doc.status,
+      metadata: { source: "authenticated_reviewer_endpoint", reviewer_auth_user_id: authData.user.id, expires_in_seconds: 60 },
+    });
+    if (auditError) {
+      console.error("reviewer document download audit failed", auditError.code ?? "unknown");
+      return reply(503, { error: "A download link could not be issued because its audit record could not be saved. Retry shortly." }, origin);
+    }
+    return reply(200, { ready: true, signed_download_url: signed.signedUrl, expires_in_seconds: 60 }, origin);
+  }
+
+if (p.action === "review_document") {
+    const reviewerRoles = await admin.from("platform_reviewers")
+      .select("role_code").eq("auth_user_id", authData.user.id)
+      .eq("is_active", true).is("revoked_at", null)
+      .in("role_code", ["EVIDENCE_VERIFIER", "PLATFORM_ADMIN"]);
+    if (reviewerRoles.error) {
+      console.error("document reviewer permission lookup failed", reviewerRoles.error.code ?? "unknown");
+      return reply(503, { error: "Could not verify reviewer permissions." }, origin);
+    }
+    if (!(reviewerRoles.data ?? []).length) {
+      return reply(403, { code: "DOCUMENT_REVIEWER_REQUIRED", error: "An active evidence-verifier permission is required." }, origin);
+    }
+    const documentId = typeof p.document_id === "string" ? p.document_id : "";
+    const decision = typeof p.decision === "string" ? p.decision : "";
+    const note = typeof p.reviewer_note === "string" ? p.reviewer_note.trim() : "";
+    const evidenceReference = typeof p.evidence_reference === "string" ? p.evidence_reference.trim() : "";
+    if (!/^[0-9a-f-]{36}$/i.test(documentId)) {
+      return reply(400, { error: "A valid document identifier is required." }, origin);
+    }
+    if (!["START_REVIEW", "VERIFIED", "CORRECTION_REQUIRED", "REJECTED"].includes(decision)) {
+      return reply(400, { error: "Decision must be START_REVIEW, VERIFIED, CORRECTION_REQUIRED or REJECTED." }, origin);
+    }
+    if (decision !== "START_REVIEW" &&
+        (note.length < 3 || note.length > 1200 || evidenceReference.length < 3 || evidenceReference.length > 500)) {
+      return reply(400, { error: "Final decisions require a reviewer note (3–1200 characters) and evidence reference (3–500 characters)." }, origin);
+    }
+    const { data: result, error: reviewError } = await admin.rpc("review_candidate_private_document", {
+      p_document_id: documentId,
+      p_reviewer_auth_user_id: authData.user.id,
+      p_decision: decision,
+      p_reviewer_note: note,
+      p_evidence_reference: evidenceReference,
+    });
+    if (reviewError) {
+      const code = reviewError.code ?? "";
+      const status = code === "42501" ? 403 : code === "P0002" ? 404 :
+        code === "22023" ? 400 : code === "40001" ? 409 : 503;
+      if (status === 503) console.error("document review transaction failed", code || "unknown");
+      return reply(status, { error: status === 403 ? "Reviewer permission is required." :
+        status === 404 ? "Private document record not found." :
+        status === 409 ? "The document is not in a state eligible for this decision." :
+        status === 400 ? "The reviewer decision or evidence fields are invalid." :
+        "Could not persist the review decision and audit history." }, origin);
+    }
+    return reply(200, { ready: true, review: result, message: "Reviewer decision and audit history were persisted transactionally." }, origin);
+  }
+  }
+
   const context = await resolveCandidate(req);
   if (context instanceof Response) return context;
 
