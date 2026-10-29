@@ -5,6 +5,8 @@ function reply(body: unknown, status: number) {
   return Response.json(payload, { status, headers: { "Cache-Control": "no-store, max-age=0", Pragma: "no-cache" } });
 }
 export async function POST(request: Request) {
+  const contentLength = Number(request.headers.get("content-length") ?? "0");
+  if (contentLength > 8 * 1024 * 1024 + 64 * 1024) return reply({ code: "EVIDENCE_REQUEST_TOO_LARGE", error: "Evidence request exceeds the upload limit." }, 413);
   const authorization = request.headers.get("authorization") ?? "";
   if (!/^Bearer\s+\S+$/i.test(authorization)) return reply({ code: "AUTHENTICATION_REQUIRED", error: "Sign in before uploading review evidence." }, 401);
   let incoming: FormData;
