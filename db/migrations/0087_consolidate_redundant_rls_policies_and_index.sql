@@ -9,19 +9,19 @@ declare
 begin
   for item in
     select * from (values
-      ('applications','service_role_all_applications'),
-      ('candidate_profiles','service_role_all_candidate_profiles'),
-      ('candidates','service_role_all_candidates'),
-      ('evidence_ledger','service_role_all_evidence_ledger'),
-      ('route_sources','service_role_all_route_sources'),
-      ('workflow_runs','service_role_all_workflow_runs')
-    ) as expected(tablename, policyname)
+      ('applications','service_role_all_applications','applications_service_role_backend_all'),
+      ('candidate_profiles','service_role_all_candidate_profiles','candidate_profiles_service_role_backend_all'),
+      ('candidates','service_role_all_candidates','candidates_service_role_backend_all'),
+      ('evidence_ledger','service_role_all_evidence_ledger','evidence_ledger_service_role_backend_all'),
+      ('route_sources','service_role_all_route_sources','route_sources_service_role_backend_all'),
+      ('workflow_runs','service_role_all_workflow_runs','workflow_runs_service_role_backend_all')
+    ) as expected(tablename, legacy_policy, guarded_policy)
   loop
     select count(*) into policy_count
     from pg_policies
     where schemaname='public'
       and tablename=item.tablename
-      and policyname=item.policyname
+      and policyname=item.legacy_policy
       and permissive='PERMISSIVE'
       and roles='{service_role}'
       and cmd='ALL'
@@ -30,7 +30,26 @@ begin
 
     if policy_count <> 1 then
       raise exception 'Refusing policy cleanup: %.% is absent or differs from audited definition',
-        item.tablename, item.policyname;
+        item.tablename, item.legacy_policy;
+    end if;
+
+    -- Fail closed unless the helper-guarded replacement is present with exact
+    -- role/command/check semantics. This prevents accidentally removing the
+    -- only policy enforcing the backend service-role guard.
+    select count(*) into policy_count
+    from pg_policies
+    where schemaname='public'
+      and tablename=item.tablename
+      and policyname=item.guarded_policy
+      and permissive='PERMISSIVE'
+      and roles='{service_role}'
+      and cmd='ALL'
+      and coalesce(qual,'')='kingsmen_security.is_backend_service_role()'
+      and coalesce(with_check,'')='kingsmen_security.is_backend_service_role()';
+
+    if policy_count <> 1 then
+      raise exception 'Refusing policy cleanup: guarded replacement %.% is absent or differs from expected definition',
+        item.tablename, item.guarded_policy;
     end if;
   end loop;
 end $$;
