@@ -1,4 +1,4 @@
-import { readLimitedJson } from "../../../../../lib/read-limited-json";
+import { readLimitedJson } from "../../../../lib/read-limited-json";
 
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
