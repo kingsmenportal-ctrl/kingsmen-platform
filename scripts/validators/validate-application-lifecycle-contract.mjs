@@ -17,7 +17,7 @@ check("route tracker has immutable candidate-owned source identity", integrity.i
 check("route tracker enforces exactly one source", initial.includes("candidate_route_application_exact_source") && initial.includes("route_programme_id is not null and organisation_listing_id is null"));
 check("route tracker enables RLS and authenticated owner checks", initial.includes("enable row level security") && initial.includes("user_id=(select auth.uid())"));
 check("candidate submission requires reference and timestamp", integrity.includes("candidate_reported_submitted_at is not null") && integrity.includes("length(trim(candidate_submission_reference))"));
-check("provider statuses are not accepted without verified provider-origin evidence in adapter", policy.includes('sourceKind !== "PROVIDER_ORIGIN"') && policy.includes("verifiedByAuthUserId"));
+check("provider statuses are not accepted without verified provider-origin evidence in adapter", policy.includes('sourceKind !== "PROVIDER_ORIGIN"') && policy.includes("verifiedByAuthUserId") && policy.includes("isUuid(e.verifiedByAuthUserId)"));
 check("candidate submission never implies provider confirmation", policy.includes("this is not provider-confirmed receipt"));
 check("legacy applications workflow statuses remain unresolved absent evidence-backed mapping", policy.includes('if (input.source !== "candidate_route_applications")') && policy.includes('status: "LEGACY_UNRESOLVED"'));
 check("CAO boundary delegates to one shared child-choice policy", cao.includes("validateApplicationChildChoices(choices)") && policy.includes("one parent Kingsmen application"));
