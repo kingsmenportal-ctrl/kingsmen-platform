@@ -238,7 +238,7 @@ async function receiveItn(request: Request) {
   const maxBodyBytes = 32768;
   const declaredLength = request.headers.get("content-length");
   if (declaredLength !== null) {
-    if (!/^\\d+$/.test(declaredLength)) return json({ error: "invalid_content_length" }, 400);
+    if (!/^\d+$/.test(declaredLength)) return json({ error: "invalid_content_length" }, 400);
     if (Number(declaredLength) > maxBodyBytes) return json({ error: "payload_too_large" }, 413);
   }
 
