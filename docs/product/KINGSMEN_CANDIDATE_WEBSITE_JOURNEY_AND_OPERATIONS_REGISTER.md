@@ -313,3 +313,47 @@ A live read-only query of the connected Netlify account returned:
 
 **Interpretation:** the Netlify site object exists, but the currently published code/commit and candidate-facing content remain UNKNOWN. WEB-001 stays UNKNOWN/NOT PROVEN. Next action: inspect the site's actual deploy/build record through Netlify, identify deploy ID + commit + published URL, then run a real HTTP/browser smoke test and compare its route/build contents with the intended repository SHA. Do not call the site working based only on the site object.
 
+
+
+## 13. Direct source inspection — current default branch (`main`)
+Read-only source inspection was performed after registering the journey. These are code facts on the repository's default branch, not assumptions about the Netlify deployment:
+
+### Candidate opportunity matches — present, but backend data/runtime still required
+File: `apps/web/src/app/candidate/opportunity-matches/page.tsx`
+- The page has six pathway labels, a button to load verified matches, an explicit sign-in/configuration error, identity-review-required handling, empty-feed state, source-check/deadline display and a link to the candidate dashboard.
+- It reads a Supabase access token from browser localStorage under the project-specific auth-token key and calls `/functions/v1/n15-candidate-opportunities` using `NEXT_PUBLIC_SUPABASE_URL` and `NEXT_PUBLIC_SUPABASE_ANON_KEY`.
+- It currently provides pathway filtering in the visible implementation. Search/sort behavior is claimed in PR #203, but the exact default-branch file read did not show keyword search or deadline sorting. Reconcile this difference before assuming the PR's full behavior is on `main`.
+- Source file exists; no browser runtime test or live feed was executed in this audit.
+
+### Document Vault page — currently informational shell on `main`
+File: `apps/web/src/app/candidate/documents/page.tsx`
+- The inspected file renders a heading and explanatory cards for private storage, OCR/review and evidence.
+- It does not implement a visible file picker, upload flow, document list, status refresh or download interaction in that file. Do not tell candidates that they can actually upload/retrieve documents through this page until the functional flow is connected and tested.
+
+### Document upload URL endpoint — explicit non-production stub on `main`
+File: `apps/web/src/app/api/candidate/documents/upload-url/route.ts`
+- The route parses JSON and checks for a few required fields.
+- It does not visibly validate a caller's authenticated session, ownership, MIME allowlist, size ceiling or reviewer role.
+- It returns `productionReady: false` and `signedUploadUrl: "SIGNER_RUNTIME_REQUIRED"`, despite `ok: true`.
+- This is a route shell, not a real signed-upload implementation. Treat this as a **security/release blocker**: never use it to upload real candidate documents; do not expose it as a working production endpoint. The implementation must fail closed until it verifies identity/ownership and creates a real short-lived signed upload through the trusted server-side storage authority. The service-role key must never reach the browser.
+
+### Expected candidate login and master-application API route absent from default branch
+The source validator `scripts/validators/validate-candidate-journey-security-boundary.mjs` explicitly reads:
+- `apps/web/src/app/candidate/login/page.tsx`
+- `apps/web/src/app/api/candidate/master-application/route.ts`
+- `apps/web/src/app/api/candidate/documents/upload-url/route.ts`
+- `apps/web/src/app/api/candidate/documents/finalize/route.ts`
+
+In the default-branch read on 2026-10-29, `candidate/login/page.tsx`, `api/candidate/master-application/route.ts`, and `api/candidate/documents/finalize/route.ts` returned GitHub 404/NOT_FOUND. They may exist on an unmerged feature/release branch, but they are **not present at those paths on the inspected default branch**. This must be reconciled against the actual release candidate and deployment before merging or duplicating anything. Do not re-create them blindly; inspect their existing PR/branch ancestry first.
+
+### Source and feed backend
+File: `docs/n15/N15_LIVE_INGESTION_AND_CANDIDATE_FEED.md`
+- Documents the deployed staging function contract: ingestion is restricted to registered HTTPS authority URLs and trusted roles; discoveries are `NEEDS_REVIEW`; ingestion does not declare programmes open or publish candidate opportunities automatically; the candidate feed requires an authorized candidate identity link and approved current evidence.
+- The same doc says a deployed function does not prove ingestion has run; an authenticated run record is required.
+- PR #209's read-only staging snapshot found zero candidate identity links and zero candidate opportunity/source rows. Therefore the safe candidate experience in that observed state is identity review required or no verified matches—not a fabricated opportunity list.
+
+### Build configuration
+File: `apps/web/package.json`
+- Declares Next.js build/start scripts and the Netlify Next.js plugin dependency. This does not prove the currently published Netlify deploy uses this package, this branch, or a current successful build.
+
+**Priority consequence:** first reconcile the candidate login/master-application/document flow across `main`, the RC branch, and Netlify's deployed SHA. The upload-url stub and absent default-branch routes must be treated as real findings. Finish the canonical existing flow before starting a replacement UI or a second API path.
