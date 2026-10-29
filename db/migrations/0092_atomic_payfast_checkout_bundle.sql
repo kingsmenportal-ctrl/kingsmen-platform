@@ -30,7 +30,7 @@ declare
   v_now timestamptz := clock_timestamp();
 begin
   if p_supabase_user_id is null
-     or coalesce(p_candidate_ref, '') !~* '^[0-9a-f]{8}-[0-9a-f]{4}-[1-8][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}
+     or coalesce(p_candidate_ref, '') !~* '^[0-9a-f]{8}-[0-9a-f]{4}-[1-8][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$'
      or coalesce(p_plan_code, '') = ''
      or coalesce(p_idempotency_key, '') !~ '^[A-Za-z0-9._:-]{8,160}$' then
     raise exception 'checkout_identity_plan_and_idempotency_required';
