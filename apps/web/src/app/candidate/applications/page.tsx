@@ -37,6 +37,36 @@ type PreparationItem = {
 type Draft = { status: Tracker["status"]; note: string; evidence: string };
 type ItemDraft = { status: PreparationItem["status"]; note: string; evidence: string };
 
+type MasterTarget = {
+  id: string;
+  target_key: string;
+  pathway_type: string;
+  provider_name: string;
+  programme_or_role: string;
+  provider_application_url: string | null;
+  source_reference: string | null;
+  source_confidence: string;
+  planning_status: string;
+  application_id: string | null;
+  created_at: string;
+  updated_at: string;
+};
+type ParentApplication = {
+  id: string;
+  application_ref: string;
+  pathway_type: string;
+  status: string;
+  readiness_status: string;
+  readiness_snapshot?: Record<string, unknown>;
+  created_at: string;
+  updated_at: string;
+};
+type MasterEvent = { event_type: string; details: Record<string, unknown> | null; created_at: string };
+type ApplicationEvent = {
+  application_id: string; event_type: string; from_status: string | null; to_status: string | null;
+  reason_code: string | null; evidence_ref: string | null; details: Record<string, unknown> | null; created_at: string
+};
+
 function explain(payload: unknown): string {
   if (payload && typeof payload === "object") {
     const p = payload as Record<string, unknown>;
@@ -65,6 +95,10 @@ function humanStatus(status: string): string {
 export default function CandidateApplicationsPage() {
   const [trackers,setTrackers] = useState<Tracker[]>([]);
   const [items,setItems] = useState<PreparationItem[]>([]);
+  const [masterTargets,setMasterTargets] = useState<MasterTarget[]>([]);
+  const [parentApplications,setParentApplications] = useState<ParentApplication[]>([]);
+  const [masterEvents,setMasterEvents] = useState<MasterEvent[]>([]);
+  const [applicationEvents,setApplicationEvents] = useState<ApplicationEvent[]>([]);
   const [drafts,setDrafts] = useState<Record<string,Draft>>({});
   const [itemDrafts,setItemDrafts] = useState<Record<string,ItemDraft>>({});
   const [newItems,setNewItems] = useState<Record<string,{title:string;type:"TASK"|"DOCUMENT";note:string;source:string}>>({});
@@ -94,6 +128,10 @@ export default function CandidateApplicationsPage() {
       const loadedTrackers = Array.isArray(body.trackers) ? body.trackers as Tracker[] : [];
       const loadedItems = Array.isArray(body.items) ? body.items as PreparationItem[] : [];
       setTrackers(loadedTrackers); setItems(loadedItems);
+      setMasterTargets(Array.isArray(body.masterTargets) ? body.masterTargets as MasterTarget[] : []);
+      setParentApplications(Array.isArray(body.parentApplications) ? body.parentApplications as ParentApplication[] : []);
+      setMasterEvents(Array.isArray(body.masterEvents) ? body.masterEvents as MasterEvent[] : []);
+      setApplicationEvents(Array.isArray(body.applicationEvents) ? body.applicationEvents as ApplicationEvent[] : []);
       setDrafts(Object.fromEntries(loadedTrackers.map(t=>[t.id,{status:t.status,note:t.candidate_note ?? "",evidence:t.evidence_reference ?? ""}])));
       setItemDrafts(Object.fromEntries(loadedItems.map(i=>[i.id,{status:i.status,note:i.candidate_note ?? "",evidence:i.evidence_reference ?? ""}])));
       setNotice("");
@@ -145,6 +183,7 @@ export default function CandidateApplicationsPage() {
         <p className="mt-3 max-w-3xl text-sm leading-6 text-slate-300">Track preparation steps and your own reported activity. The tracker never converts a candidate-reported submission into a provider-confirmed receipt, decision or outcome.</p>
         <nav className="mt-5 flex flex-wrap gap-3 text-sm">
           <a href="/candidate/dashboard" className="rounded-xl border border-slate-700 px-4 py-2">Dashboard</a>
+          <a href="/candidate/profile" className="rounded-xl border border-slate-700 px-4 py-2">My profile</a>
           <a href="/candidate/workbench" className="rounded-xl border border-slate-700 px-4 py-2">Workbench</a>
           <a href="/candidate/documents" className="rounded-xl border border-slate-700 px-4 py-2">Document Vault</a>
           <a href="/candidate/opportunity-matches" className="rounded-xl border border-slate-700 px-4 py-2">Verified opportunities</a>
@@ -154,6 +193,47 @@ export default function CandidateApplicationsPage() {
 
       {error && <section role="alert" className="rounded-2xl border border-amber-700 bg-amber-950/50 p-4 text-sm leading-6 text-amber-100">{error}{error.includes("AUTHENTICATION_REQUIRED")&&<p className="mt-2"><a className="underline text-cyan-300" href="/candidate/login">Sign in / create account</a></p>}</section>}
       {notice && <section role="status" className="rounded-2xl border border-emerald-800 bg-emerald-950/40 p-4 text-sm leading-6 text-emerald-100">{notice}</section>}
+
+      {masterTargets.length > 0 && <section className="rounded-3xl border border-cyan-900 bg-slate-900 p-5 sm:p-7">
+        <h2 className="text-2xl font-bold">Saved opportunities &amp; parent-application preparation</h2>
+        <p className="mt-2 max-w-3xl text-sm leading-6 text-slate-300">These records are reloaded from Supabase. A prepared draft is not an external submission. Open/stale source checks are repeated by the backend before preparation; provider confirmation and outcomes remain separate evidence-bound events.</p>
+        <div className="mt-5 space-y-4">
+          {masterTargets.map(target => {
+            const application = parentApplications.find(item => item.id === target.application_id);
+            const events = [
+              ...masterEvents.filter(event => event.details?.target_key === target.target_key).map(event => ({type:event.event_type,created_at:event.created_at,reason:"Saved application target",to_status:null as string|null,evidence_ref:null as string|null})),
+              ...applicationEvents.filter(event => event.application_id === target.application_id).map(event => ({type:event.event_type,created_at:event.created_at,reason:event.reason_code,to_status:event.to_status,evidence_ref:event.evidence_ref}))
+            ].sort((a,b)=>Date.parse(b.created_at)-Date.parse(a.created_at));
+            return <article key={target.id} className="rounded-2xl border border-slate-700 p-4 sm:p-5">
+              <div className="flex flex-wrap items-start justify-between gap-3">
+                <div className="min-w-0">
+                  <h3 className="text-lg font-bold">{target.programme_or_role}</h3>
+                  <p className="mt-1 text-sm text-slate-300">{target.provider_name} · {target.pathway_type.replaceAll("_"," ")}</p>
+                  <p className="mt-2 text-xs text-slate-400">Planning state: {target.planning_status} · Source confidence: {target.source_confidence}</p>
+                </div>
+                <span className="rounded-full border border-slate-600 px-3 py-1 text-xs">{application ? application.status : "Saved target"}</span>
+              </div>
+              {application && <div className="mt-4 rounded-xl bg-slate-950 p-4 text-sm">
+                <p><strong>Application reference:</strong> {application.application_ref}</p>
+                <p className="mt-1"><strong>Readiness:</strong> {application.readiness_status.replaceAll("_"," ")}</p>
+                <p className="mt-1"><strong>Provider submission:</strong> Not confirmed by this draft record.</p>
+                <p className="mt-1 text-xs text-slate-400">Last saved: {new Date(application.updated_at).toLocaleString()}</p>
+              </div>}
+              {target.provider_application_url && <a href={target.provider_application_url} target="_blank" rel="noopener noreferrer" className="mt-3 inline-block break-all text-sm text-cyan-300 underline">Open official provider page</a>}
+              <div className="mt-4 border-t border-slate-700 pt-4">
+                <h4 className="font-semibold">Application timeline</h4>
+                {events.length === 0 ? <p className="mt-2 text-sm text-slate-400">No timeline events have been returned for this target yet.</p> : <ol className="mt-3 space-y-3">
+                  {events.map((event,index)=><li key={`${event.type}:${event.created_at}:${index}`} className="border-l-2 border-cyan-800 pl-3 text-sm">
+                    <p className="font-semibold">{event.type.replaceAll("_"," ")}</p>
+                    <p className="mt-1 text-xs text-slate-400">{new Date(event.created_at).toLocaleString()}{event.to_status ? ` · ${event.to_status.replaceAll("_"," ")}` : ""}{event.reason ? ` · ${event.reason}` : ""}</p>
+                    {event.evidence_ref && <p className="mt-1 break-all text-xs text-slate-400">Evidence reference: {event.evidence_ref}</p>}
+                  </li>)}
+                </ol>}
+              </div>
+            </article>;
+          })}
+        </div>
+      </section>}
 
       {loading ? <section className="rounded-2xl border border-slate-800 bg-slate-900 p-6 text-sm text-slate-300">Loading records from your verified candidate workspace…</section>
       : trackers.length===0 ? <section className="rounded-2xl border border-slate-800 bg-slate-900 p-6">
