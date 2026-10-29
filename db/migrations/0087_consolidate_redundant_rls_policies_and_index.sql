@@ -89,7 +89,7 @@ begin
     raise exception 'Refusing duplicate-index cleanup: canonical index is invalid or not unique';
   end if;
 
-  -- Migration 0090 may have already removed the redundant index. If it still
+  -- Migration 0091 may have already removed the redundant index. If it still
   -- exists, compare definitions after normalizing only their different names.
   if duplicate_oid is not null then
     select regexp_replace(pg_get_indexdef(i.indexrelid),
