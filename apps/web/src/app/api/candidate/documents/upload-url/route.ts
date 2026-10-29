@@ -1,4 +1,4 @@
-import { proxyCandidateDocumentVault } from "../../../../lib/candidate-document-vault-proxy";
+import { proxyCandidateDocumentVault } from "../../../../../lib/candidate-document-vault-proxy";
 
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
