@@ -4,6 +4,7 @@ export * from "./portal-health";
 export * from "./route-readiness";
 export * from "./application-workbench";
 export * from "./cao-boundary";
+export * from "./application-lifecycle-policy";
 export * from "./nsfas-support";
 export * from "./map-fallback";
 export * from "./route-universe-repository";
