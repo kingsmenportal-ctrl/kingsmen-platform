@@ -391,6 +391,23 @@ async function listDocuments(req: Request, ctx: CandidateContext): Promise<Respo
     .select("id,application_ref,pathway_type,status,created_at")
     .eq("candidate_id", ctx.candidateId).order("created_at", { ascending: false }).limit(100);
   if (applicationError) return fail(req, 503, "APPLICATION_LIST_FAILED");
+  const documentIds = (data ?? []).map((doc) => doc.id);
+  const reviewsByDocument: Record<string, Array<Record<string, unknown>>> = {};
+  const eventsByDocument: Record<string, Array<Record<string, unknown>>> = {};
+  if (documentIds.length) {
+    const { data: reviews, error: reviewError } = await ctx.admin.from("candidate_private_document_reviews")
+      .select("document_id,decision,reviewer_note,evidence_reference,created_at")
+      .eq("candidate_id", ctx.candidateId).in("document_id", documentIds)
+      .order("created_at", { ascending: false }).limit(250);
+    if (reviewError) return fail(req, 503, "DOCUMENT_REVIEW_HISTORY_FAILED");
+    for (const review of reviews ?? []) (reviewsByDocument[review.document_id] ??= []).push(review as unknown as Record<string, unknown>);
+    const { data: events, error: eventError } = await ctx.admin.from("candidate_private_document_events")
+      .select("document_id,event_type,from_status,to_status,metadata,created_at")
+      .eq("candidate_id", ctx.candidateId).in("document_id", documentIds)
+      .order("created_at", { ascending: false }).limit(500);
+    if (eventError) return fail(req, 503, "DOCUMENT_TIMELINE_FAILED");
+    for (const event of events ?? []) (eventsByDocument[event.document_id] ??= []).push(event as unknown as Record<string, unknown>);
+  }
   return response(req, {
     ok: true,
     ready: true,
@@ -413,7 +430,10 @@ async function listDocuments(req: Request, ctx: CandidateContext): Promise<Respo
       created_at: doc.created_at,
       updatedAt: doc.updated_at,
       application_id: doc.application_id,
-      preparation_item_id: doc.preparation_item_id
+      preparation_item_id: doc.preparation_item_id,
+      latestReview: reviewsByDocument[doc.id]?.[0] ?? null,
+      reviewHistory: reviewsByDocument[doc.id] ?? [],
+      timeline: eventsByDocument[doc.id] ?? []
     })),
     applications: applications ?? [],
     candidateCanVerify: false,
