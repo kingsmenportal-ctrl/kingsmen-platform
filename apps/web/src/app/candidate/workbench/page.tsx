@@ -1,5 +1,6 @@
 "use client";
 
+import { getCandidateAccessToken } from "../../../lib/candidate-session";
 import { useCallback, useEffect, useState } from "react";
 
 const pathways = [
@@ -23,16 +24,6 @@ type Readiness = {
   revision: number;
   updated_at: string | null;
 };
-function sessionToken(): string | null {
-  const base = process.env.NEXT_PUBLIC_SUPABASE_URL;
-  if (!base || typeof window === "undefined") return null;
-  try {
-    const projectRef = new URL(base).hostname.split(".")[0];
-    const raw = window.localStorage.getItem(`sb-${projectRef}-auth-token`);
-    const parsed = raw ? JSON.parse(raw) as Record<string, unknown> : null;
-    return parsed && typeof parsed.access_token === "string" ? parsed.access_token : null;
-  } catch { return null; }
-}
 function errorMessage(body: unknown): string {
   if (body && typeof body === "object") {
     const p = body as Record<string, unknown>;
@@ -57,7 +48,7 @@ export default function CandidateWorkbenchPage() {
   const load = useCallback(async () => {
     setLoading(true);
     setError("");
-    const token = sessionToken();
+    const token = getCandidateAccessToken();
     if (!token) {
       setAccessGranted(false);
       setError("Sign in to load your saved preparation progress.");
@@ -107,7 +98,7 @@ export default function CandidateWorkbenchPage() {
   async function save() {
     setError("");
     setNotice("");
-    const token = sessionToken();
+    const token = getCandidateAccessToken();
     if (!token) {
       setError("Sign in before saving preparation progress.");
       setAccessGranted(false);
@@ -165,7 +156,7 @@ export default function CandidateWorkbenchPage() {
       {error && <section role="alert" className="rounded-2xl border border-amber-700 bg-amber-950/50 p-4 text-sm leading-6 text-amber-100">
         <h2 className="font-bold">{error.includes("IDENTITY_NOT_VERIFIED") || error.includes("Identity") ? "Authorised identity review required" : "Workspace access"}</h2>
         <p className="mt-1">{error}</p>
-        {(!sessionToken() || error.includes("expired") || error.includes("Sign in")) && <a href="/candidate/login" className="mt-3 inline-block text-cyan-300 underline">Sign in / create account</a>}
+        {(!getCandidateAccessToken() || error.includes("expired") || error.includes("Sign in")) && <a href="/candidate/login" className="mt-3 inline-block text-cyan-300 underline">Sign in / create account</a>}
       </section>}
       {notice && <p role="status" className="rounded-2xl border border-emerald-800 bg-emerald-950/40 p-4 text-sm text-emerald-100">{notice}</p>}
 
