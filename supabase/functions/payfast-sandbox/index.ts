@@ -155,7 +155,11 @@ async function checkout(request: Request, body: Record<string, unknown>) {
   if (!result?.intent?.signedPayload) return json({ error: "checkout_bundle_creation_failed" }, 502);
 
   // JSONB sorts keys, so reconstruct the documented order on retries before resigning.
-  const hostedFields = orderHostedCheckoutFields(result.intent.signedPayload);
+  const hostedFields = orderHostedCheckoutFields({
+    ...result.intent.signedPayload,
+    merchant_id: Deno.env.get("PAYFAST_MERCHANT_ID")!,
+    merchant_key: Deno.env.get("PAYFAST_MERCHANT_KEY")!,
+  });
   const hostedSignature = signature(hostedFields, passphrase);
   return json({
     intent: {
