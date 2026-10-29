@@ -67,7 +67,8 @@ export function cvRevampTruthBoundary(): true {
 export function accommodationSupportBoundary(): true {
   const paid = PUBLIC_PACKAGE_CARDS.filter((card) => card.packageKey !== "FREE_DESTINY_MAP");
   if (paid.some((card) => !card.accommodationSupport)) throw new Error("PACKAGE_ACCOMMODATION_SUPPORT_MISSING");
-  if (PUBLIC_PACKAGE_CARDS.some((card) => card.packageKey === "ACCOMMODATION_SUPPORT")) {
+  const historicalStandaloneKey: string = "ACCOMMODATION_SUPPORT";
+  if (PUBLIC_PACKAGE_CARDS.some((card) => String(card.packageKey) === historicalStandaloneKey)) {
     throw new Error("STANDALONE_ACCOMMODATION_PRODUCT_MUST_NOT_BE_OFFERED");
   }
   return true;
