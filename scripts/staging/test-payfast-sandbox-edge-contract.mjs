@@ -6,7 +6,7 @@ import { resolve } from "node:path";
 const root = process.cwd();
 const read = (path) => readFileSync(resolve(root, path), "utf8");
 const edge = read("supabase/functions/payfast-sandbox/index.ts");
-const migration = read("db/migrations/0090_atomic_payfast_checkout_bundle.sql");
+const migration = read("db/migrations/0092_atomic_payfast_checkout_bundle.sql");
 
 const checks = [
   [edge.includes('rest("rpc/create_payfast_sandbox_checkout_bundle"'), "checkout writes use one atomic RPC"],
