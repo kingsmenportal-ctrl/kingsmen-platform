@@ -297,3 +297,19 @@ For every implementation batch:
 The candidate website is “working” only when a real staging candidate can: open the correct deployed site; sign in; resolve to the correct candidate identity; save/reload/update profile; view honest six-pathway discovery; save a master application and child choices; upload and retrieve authorized private documents; submit and track identity review; see reviewer follow-up/decision; track application status supported by evidence; see payment/entitlement only after verified sandbox settlement; and remain isolated from candidate B. The same release must have role-negative tests, privacy/audit evidence, monitoring/incident/restore proof, a published URL tied to the exact SHA, and reviewed release gates.
 
 **Current conclusion:** this is the canonical candidate journey and acceptance register. It prevents duplicate rebuilds, but it does not itself make the website live. Live runtime evidence must now be collected against the existing implementation, one scenario at a time, in the dependency order above.
+
+
+## 12. Live Netlify provider inspection — 2026-10-29
+A live read-only query of the connected Netlify account returned:
+- Site name: `kingsmen-portal-staging`
+- Site ID: `fb27d0db-b116-4890-8f7f-14e654c27dbc`
+- Netlify project dashboard: `https://app.netlify.com/projects/kingsmen-portal-staging`
+- Primary URL returned by the provider: `http://kingsmen-portal-staging.netlify.app`
+- Branch URL returned at inspection: `http://6ae36f87f18d7b3668bcf238--kingsmen-portal-staging.netlify.app`
+- Provider reports the site is claimed, has no password or team-SSO gate, and Netlify Forms are not enabled.
+- The provider's project response did not expose a populated current deploy ID or commit SHA (`currentDeploy` was empty). This is insufficient to identify which code is live.
+- A 24-hour Netlify observability query for this site returned an empty status-code count list, an empty request-log list, and an empty edge-request series. This does **not** prove the site had zero requests or was down; it means this query supplied no usable request evidence. Do not invent traffic counts.
+- Independent browser/web fetch in this session could not fetch the site URL (tool returned a disabled fetch error), so no HTTP status or page content was verified by that method.
+
+**Interpretation:** the Netlify site object exists, but the currently published code/commit and candidate-facing content remain UNKNOWN. WEB-001 stays UNKNOWN/NOT PROVEN. Next action: inspect the site's actual deploy/build record through Netlify, identify deploy ID + commit + published URL, then run a real HTTP/browser smoke test and compare its route/build contents with the intended repository SHA. Do not call the site working based only on the site object.
+
