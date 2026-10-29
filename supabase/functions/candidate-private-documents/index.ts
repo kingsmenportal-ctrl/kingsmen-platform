@@ -26,9 +26,14 @@ type CandidateContext = {
 
 function allowedOrigins(): Set<string> {
   return new Set(
-    (Deno.env.get("KINGSMEN_ALLOWED_ORIGINS") ?? "https://kingsmen-portal-staging.netlify.app")
+    (Deno.env.get("KINGSMEN_ALLOWED_ORIGINS") ??
+      "https://kingsmen-portal-staging.netlify.app,http://localhost:8888,http://127.0.0.1:8888")
       .split(",").map((value) => value.trim()).filter(Boolean)
   );
+}
+function isAllowedOrigin(origin: string): boolean {
+  return allowedOrigins().has(origin) ||
+    /^https:\/\/[a-z0-9-]+--kingsmen-portal-staging\.netlify\.app$/i.test(origin);
 }
 
 function response(req: Request, body: unknown, status = 200): Response {
@@ -39,7 +44,7 @@ function response(req: Request, body: unknown, status = 200): Response {
     "Vary": "Origin"
   });
   const origin = req.headers.get("origin");
-  if (origin && allowedOrigins().has(origin)) {
+  if (origin && isAllowedOrigin(origin)) {
     headers.set("Access-Control-Allow-Origin", origin);
     headers.set("Access-Control-Allow-Headers", "authorization, apikey, content-type, x-client-info");
     headers.set("Access-Control-Allow-Methods", "GET, POST, OPTIONS");
