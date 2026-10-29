@@ -119,7 +119,7 @@ export function normalizeLegacyApplicationStatus(input: LegacyApplicationObserva
   if (PROVIDER_CONFIRMED.has(canonical)) {
     const evidence = input.providerEvidence;
     if (!evidence || evidence.sourceKind !== "PROVIDER_ORIGIN" || evidence.verified !== true ||
-        !evidence.evidenceRef.trim() || !evidence.verifiedByAuthUserId.trim() ||
+        !evidence.evidenceRef.trim() || !isUuid(evidence.verifiedByAuthUserId) ||
         !Number.isFinite(Date.parse(evidence.verifiedAt))) {
       return {
         status: "LEGACY_UNRESOLVED",
