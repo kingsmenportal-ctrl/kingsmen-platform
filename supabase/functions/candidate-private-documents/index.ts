@@ -101,6 +101,7 @@ function errorStatus(code: string): number {
   if (code === "IDENTITY_REVIEW_REQUIRED") return 403;
   if (code === "DOCUMENT_NOT_FOUND") return 404;
   if (code === "DOCUMENT_NOT_PENDING" || code === "DOCUMENT_ALREADY_FINALIZED") return 409;
+  if (code === "DOCUMENT_STORAGE_NOT_CONFIGURED") return 503;
   return 500;
 }
 
@@ -369,7 +370,7 @@ Deno.serve(async (req: Request) => {
   // Reviewers are authorized by platform_reviewers, not candidate identity links.
   if (["list_review_queue", "create_reviewer_download_url", "review_document"].includes(action)) {
     const authorization = req.headers.get("authorization") ?? "";
-    const token = /^Bearer\\s+(\\S+)$/i.exec(authorization)?.[1];
+    const token = /^Bearer\s+(\S+)$/i.exec(authorization)?.[1];
     if (!token) return fail(req, 401, "AUTHENTICATION_REQUIRED");
     const url = Deno.env.get("SUPABASE_URL");
     const anonKey = Deno.env.get("SUPABASE_ANON_KEY");
