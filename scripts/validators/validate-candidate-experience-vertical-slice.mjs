@@ -11,6 +11,12 @@ const opportunityPage = read("apps/web/src/app/candidate/opportunity-matches/pag
 const applicationRoute = read("apps/web/src/app/api/candidate/applications/route.ts");
 const preparation = read("supabase/functions/candidate-application-preparation/index.ts");
 const dashboard = read("apps/web/src/app/candidate/dashboard/page.tsx");
+const identityPage = read("apps/web/src/app/candidate/identity-review/page.tsx");
+const identityRoute = read("apps/web/src/app/api/candidate/identity-review/route.ts");
+const followupRoute = read("apps/web/src/app/api/candidate/identity-review/followup/route.ts");
+const evidenceRoute = read("apps/web/src/app/api/candidate/identity-review/evidence/route.ts");
+const documentPage = read("apps/web/src/app/candidate/documents/page.tsx");
+const documentFunction = read("supabase/functions/candidate-private-documents/index.ts");
 const session = read("apps/web/src/lib/candidate-session.ts");
 
 const checks = [
@@ -26,7 +32,7 @@ const checks = [
   ["N15 feed fails closed on missing/stale evidence", /n15-candidate-opportunities/.test(opportunityPage) && /stale|verified/i.test(opportunityPage)],
   ["opportunity save and master-application actions are whitelisted", /save_n15_match/.test(applicationRoute) && /prepare_master_application/.test(applicationRoute) && /save_n15_match/.test(preparation) && /prepare_master_application/.test(preparation)],
   ["CAO remains governed by existing shared child-choice validator", /validateApplicationChildChoices/.test(read("apps/api/src/routes/application-lifecycle-policy.ts")) && /caoIsOneKingsmenApplication/.test(read("apps/api/src/routes/cao-boundary.ts"))],
-  ["application status remains candidate-reported, not provider confirmation", /SUBMITTED_CANDIDATE_REPORTED/.test(preparation) && /provider_submission_sent:false/.test(preparation)),
+  ["application status remains candidate-reported, not provider confirmation", /SUBMITTED_CANDIDATE_REPORTED/.test(preparation) && /provider_submission_sent:false/.test(preparation)],
   ["dashboard links to the persistent profile", /\/candidate\/profile/.test(dashboard)]
 ];
 let failed = 0;
