@@ -2,7 +2,7 @@ name: Candidate Experience CI
 
 on:
   push:
-    branches: [feat/candidate-experience-vertical-slice-2026-10-29]
+    branches: [feat/candidate-experience-vertical-slice-2026-10-29, feat/candidate-experience-vertical-slice-rebased-2026-10-29]
   pull_request:
     branches: [main, feat/backend-simplification-baseline-2026-10-29]
   workflow_dispatch:
