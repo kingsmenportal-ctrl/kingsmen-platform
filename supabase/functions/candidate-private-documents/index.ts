@@ -175,6 +175,35 @@ async function uploadUrl(req: Request, body: Record<string, unknown>, ctx: Candi
   if (!Number.isSafeInteger(sizeBytes) || Number(sizeBytes) < 1 || Number(sizeBytes) > MAX_DOCUMENT_BYTES) {
     return fail(req, 413, "DOCUMENT_SIZE_OUT_OF_RANGE");
   }
+  const applicationId = typeof body.applicationId === "string" && body.applicationId ? body.applicationId : null;
+  const preparationItemId = typeof body.preparationItemId === "string" && body.preparationItemId ? body.preparationItemId : null;
+  const evidencePurpose = typeof body.evidencePurpose === "string" ? body.evidencePurpose : "CANDIDATE_DOCUMENT";
+  const evidencePurposes = new Set([
+    "CANDIDATE_DOCUMENT","PRE_SUBMISSION_CHECKLIST","PROVIDER_SUBMISSION_RECEIPT",
+    "PROVIDER_REFERENCE","PROVIDER_STATUS_NOTICE","PROVIDER_OUTCOME_NOTICE"
+  ]);
+  if (!evidencePurposes.has(evidencePurpose)) return fail(req, 400, "DOCUMENT_EVIDENCE_PURPOSE_NOT_ALLOWED");
+  if (applicationId !== null && !/^[0-9a-f]{8}-[0-9a-f]{4}-[1-8][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i.test(applicationId)) {
+    return fail(req, 400, "DOCUMENT_APPLICATION_ID_INVALID");
+  }
+  if (preparationItemId !== null && !/^[0-9a-f]{8}-[0-9a-f]{4}-[1-8][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i.test(preparationItemId)) {
+    return fail(req, 400, "DOCUMENT_PREPARATION_ITEM_ID_INVALID");
+  }
+  if (["PROVIDER_SUBMISSION_RECEIPT","PROVIDER_REFERENCE","PROVIDER_STATUS_NOTICE","PROVIDER_OUTCOME_NOTICE"].includes(evidencePurpose) && !applicationId) {
+    return fail(req, 400, "APPLICATION_LINK_REQUIRED_FOR_PROVIDER_EVIDENCE");
+  }
+  if (applicationId !== null) {
+    const { data: application, error } = await ctx.admin.from("candidate_applications")
+      .select("id").eq("id", applicationId).eq("candidate_id", ctx.candidateId).maybeSingle();
+    if (error) return fail(req, 503, "APPLICATION_OWNER_LOOKUP_FAILED");
+    if (!application) return fail(req, 404, "DOCUMENT_APPLICATION_NOT_FOUND");
+  }
+  if (preparationItemId !== null) {
+    const { data: item, error } = await ctx.admin.from("candidate_application_preparation_items")
+      .select("id").eq("id", preparationItemId).eq("candidate_id", ctx.candidateId).maybeSingle();
+    if (error) return fail(req, 503, "PREPARATION_ITEM_OWNER_LOOKUP_FAILED");
+    if (!item) return fail(req, 404, "DOCUMENT_PREPARATION_ITEM_NOT_FOUND");
+  }
   if (!(await verifyBucket(ctx.admin))) return fail(req, 503, "DOCUMENT_STORAGE_NOT_CONFIGURED");
 
   const documentId = crypto.randomUUID();
@@ -196,7 +225,10 @@ async function uploadUrl(req: Request, body: Record<string, unknown>, ctx: Candi
       p_storage_path: storagePath,
       p_original_filename: filename,
       p_mime_type: mimeType,
-      p_size_bytes: Number(sizeBytes)
+      p_size_bytes: Number(sizeBytes),
+      p_application_id: applicationId,
+      p_preparation_item_id: preparationItemId,
+      p_evidence_purpose: evidencePurpose
     }
   );
   if (recordError || !record) {
@@ -208,18 +240,26 @@ async function uploadUrl(req: Request, body: Record<string, unknown>, ctx: Candi
   return response(req, {
     ok: true,
     action: "upload-url-created",
+    ready: true,
     document: {
       id: documentId,
       documentType,
       filename,
       mimeType,
       sizeBytes: Number(sizeBytes),
-      status: "UPLOAD_PENDING"
+      status: "UPLOAD_PENDING",
+      applicationId,
+      preparationItemId,
+      evidencePurpose
     },
     signedUploadUrl: signedUpload.signedUrl,
     signedUploadToken: signedUpload.token,
     uploadPath: storagePath,
     uploadExpiresInSeconds: 7200,
+    signed_upload_url: signedUpload.signedUrl,
+    upload_token: signedUpload.token,
+    path: storagePath,
+    expires_in_seconds: 7200,
     rawPublicUrlAllowed: false,
     serviceRoleVisibleToBrowser: false
   }, 201);
@@ -364,7 +404,25 @@ Deno.serve(async (req: Request) => {
   }
   if (!body) return fail(req, 415, "JSON_CONTENT_TYPE_REQUIRED");
 
-  const action = typeof body.action === "string" ? body.action : "";
+  const requestedAction = typeof body.action === "string" ? body.action : "";
+  const action = ({
+    create_upload: "upload-url",
+    finalize_upload: "finalize-upload",
+    create_download_url: "read-url"
+  } as Record<string, string>)[requestedAction] ?? requestedAction;
+  if (requestedAction === "create_upload") {
+    body = {
+      ...body,
+      documentTypeCode: body.documentTypeCode ?? body.document_type_code ?? body.document_type ?? "OTHER",
+      mimeType: body.mimeType ?? body.mime_type,
+      sizeBytes: body.sizeBytes ?? body.size_bytes,
+      applicationId: body.applicationId ?? body.application_id ?? null,
+      preparationItemId: body.preparationItemId ?? body.preparation_item_id ?? null,
+      evidencePurpose: body.evidencePurpose ?? body.evidence_purpose ?? "CANDIDATE_DOCUMENT"
+    };
+  } else if (requestedAction === "finalize_upload" || requestedAction === "create_download_url") {
+    body = { ...body, documentId: body.documentId ?? body.document_id };
+  }
 
   // Preserve the deployed v14 reviewer actions when the upgraded function is published.
   // Reviewers are authorized by platform_reviewers, not candidate identity links.
