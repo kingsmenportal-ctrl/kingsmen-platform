@@ -60,18 +60,48 @@ function completion(profile: ProfileData, pathways: string[]) {
   const complete = checks.filter(([, ok]) => ok).length;
   return { completed: complete, required: checks.length, percent: Math.round((complete / checks.length) * 100), missing: checks.filter(([, ok]) => !ok).map(([key]) => key) };
 }
-async function getVerifiedCandidate(admin: ReturnType<typeof createClient>, userId: string) {
+type ProfileCandidate = { id: string; public_ref: string; display_name: string };
+type ProfileIdentityResolution = {
+  candidate: ProfileCandidate | null;
+  identityStatus: "VERIFIED" | "PENDING_REVIEW" | null;
+  hasLink: boolean;
+};
+async function resolveProfileCandidate(admin: ReturnType<typeof createClient>, userId: string): Promise<ProfileIdentityResolution> {
   const { data: link, error: linkError } = await admin.from("candidate_auth_identity_links")
     .select("candidate_id,link_status,verified_at,verified_by")
     .eq("supabase_user_id", userId).maybeSingle();
   if (linkError) throw new Error("IDENTITY_LOOKUP_FAILED");
-  const verifiedAt = Date.parse(link?.verified_at ?? "");
-  if (!link || link.link_status !== "VERIFIED" || !Number.isFinite(verifiedAt) || verifiedAt > Date.now() ||
-      typeof link.verified_by !== "string" || !AUTH_UUID.test(link.verified_by)) return null;
-  const { data: candidate, error } = await admin.from("candidates")
+  if (!link) return { candidate: null, identityStatus: null, hasLink: false };
+
+  let identityStatus: ProfileIdentityResolution["identityStatus"] = null;
+  if (link.link_status === "VERIFIED") {
+    const verifiedAt = Date.parse(link.verified_at ?? "");
+    if (!Number.isFinite(verifiedAt) || verifiedAt > Date.now() ||
+        typeof link.verified_by !== "string" || !AUTH_UUID.test(link.verified_by)) {
+      return { candidate: null, identityStatus: null, hasLink: true };
+    }
+    identityStatus = "VERIFIED";
+  } else if (link.link_status === "PENDING") {
+    // Pending legacy-link requests never grant access to the target candidate's profile.
+    // Only a profile row created atomically by this same Auth user can be self-managed while review is pending.
+    const { data: ownership, error: ownershipError } = await admin.from("candidate_master_application_events")
+      .select("id").eq("candidate_id", link.candidate_id).eq("actor_auth_user_id", userId)
+      .eq("event_type", "PROFILE_SAVED")
+      .eq("details->>self_service_bootstrap", "true")
+      .eq("details->>bootstrap_owner_user_id", userId)
+      .limit(1).maybeSingle();
+    if (ownershipError) throw new Error("SELF_SERVICE_OWNER_LOOKUP_FAILED");
+    if (!ownership) return { candidate: null, identityStatus: null, hasLink: true };
+    identityStatus = "PENDING_REVIEW";
+  } else {
+    return { candidate: null, identityStatus: null, hasLink: true };
+  }
+
+  const { data: candidate, error: candidateError } = await admin.from("candidates")
     .select("id,public_ref,display_name").eq("id", link.candidate_id).maybeSingle();
-  if (error) throw new Error("CANDIDATE_LOOKUP_FAILED");
-  return candidate ?? null;
+  if (candidateError) throw new Error("CANDIDATE_LOOKUP_FAILED");
+  if (!candidate) return { candidate: null, identityStatus: null, hasLink: true };
+  return { candidate, identityStatus, hasLink: true };
 }
 Deno.serve(async (req: Request) => {
   const origin = req.headers.get("Origin");
@@ -100,13 +130,90 @@ Deno.serve(async (req: Request) => {
   if (action !== "load" && action !== "save" && action !== "revoke_consent" && action !== "request_correction") return reply(400, { ok: false, code: "ACTION_NOT_SUPPORTED", error: "Choose load, save, revoke_consent or request_correction." }, origin);
   if (action === "save" && payload.consentAccepted !== true) return reply(400, { ok: false, code: "CONSENT_REQUIRED", error: "Consent is required before saving profile changes." }, origin);
   const admin = createClient(SUPABASE_URL, SUPABASE_SERVICE_ROLE_KEY, { auth: { persistSession: false, autoRefreshToken: false } });
-  let candidate: { id: string; public_ref: string; display_name: string } | null;
-  try { candidate = await getVerifiedCandidate(admin, authData.user.id); }
+  let identity: ProfileIdentityResolution;
+  try { identity = await resolveProfileCandidate(admin, authData.user.id); }
   catch (e) {
     console.error("candidate profile identity read failed", e instanceof Error ? e.message : "unknown");
     return reply(503, { ok: false, code: "PROFILE_SERVICE_UNAVAILABLE", error: "Candidate identity could not be verified. Try again later." }, origin);
   }
-  if (!candidate) return reply(403, { ok: false, code: "IDENTITY_NOT_VERIFIED", error: "Your saved profile is protected until an authorised identity reviewer verifies your candidate link." }, origin);
+
+  if (!identity.candidate) {
+    if (identity.hasLink) {
+      return reply(403, { ok: false, code: "IDENTITY_NOT_VERIFIED", error: "This account has a pending or revoked link to a candidate record. An authorised reviewer must resolve that link before its profile can be accessed." }, origin);
+    }
+    if (action === "load") {
+      return reply(200, {
+        ok: true, profile: {}, pathwayPreferences: [],
+        consent: { status: "NOT_RECORDED", version: null, grantedAt: null, text: CONSENT_TEXT },
+        completeness: completion({}, []), correctionRequests: [], savedAt: null,
+        candidateReference: null, identityStatus: "NOT_PROVISIONED",
+        persistence: "NOT_PROVISIONED",
+        message: "No profile has been saved yet. Complete the consent section and save to create your profile."
+      }, origin);
+    }
+    if (action !== "save") {
+      return reply(403, { ok: false, code: "PROFILE_BOOTSTRAP_REQUIRED", error: "Save a consented profile before requesting a correction or withdrawing consent." }, origin);
+    }
+    if (!authData.user.email || !authData.user.email_confirmed_at) {
+      return reply(403, { ok: false, code: "CONFIRMED_EMAIL_REQUIRED", error: "Confirm your email address before creating a new candidate profile." }, origin);
+    }
+    const newProfile = safeProfile(payload.profile);
+    const newPathways = safePathways(payload.pathwayPreferences);
+    if (!newPathways) return reply(400, { ok: false, code: "PATHWAYS_INVALID", error: "Select only the supported Kingsmen pathways." }, origin);
+    if (!newProfile.displayName || newProfile.displayName.length < 2) {
+      return reply(400, { ok: false, code: "PROFILE_NAME_INVALID", error: "Enter at least two characters for your name." }, origin);
+    }
+    if (newProfile.phone && !/^[+0-9 ()-]{7,40}$/.test(newProfile.phone)) {
+      return reply(400, { ok: false, code: "PHONE_INVALID", error: "Use a valid phone format or leave the number blank." }, origin);
+    }
+    const { data: bootstrapped, error: bootstrapError } = await admin.rpc("bootstrap_candidate_self_profile", {
+      p_supabase_user_id: authData.user.id,
+      p_email: authData.user.email,
+      p_profile: newProfile,
+      p_pathway_preferences: newPathways,
+      p_consent_version: CONSENT_VERSION,
+      p_consent_text: CONSENT_TEXT,
+      p_consent_accepted: payload.consentAccepted === true
+    });
+    if (bootstrapError) {
+      console.error("candidate profile bootstrap failed", bootstrapError.code ?? "unknown");
+      return reply(503, { ok: false, code: "PROFILE_BOOTSTRAP_FAILED", error: "A new profile could not be created safely. No email-based link or duplicate profile was created." }, origin);
+    }
+    if (!bootstrapped || bootstrapped.ok !== true) {
+      const code = typeof bootstrapped?.code === "string" ? bootstrapped.code : "PROFILE_BOOTSTRAP_FAILED";
+      const known = code === "CONSENT_REQUIRED" ? 400
+        : code === "PROFILE_FIELDS_INVALID" || code === "PATHWAYS_INVALID" ? 400
+        : code === "AUTH_IDENTITY_ALREADY_LINKED" ? 409
+        : code === "MANUAL_IDENTITY_REVIEW_REQUIRED" ? 409 : 503;
+      return reply(known, {
+        ok: false,
+        code: code === "MANUAL_IDENTITY_REVIEW_REQUIRED" ? "IDENTITY_REVIEW_REQUIRED" : code,
+        error: code === "MANUAL_IDENTITY_REVIEW_REQUIRED"
+          ? "Profile setup needs manual identity review to avoid creating a duplicate candidate. Kingsmen never links accounts by email equality. Use the identity-review module or contact support."
+          : code === "CONSENT_REQUIRED" ? "Consent is required before saving profile changes."
+          : code === "PROFILE_FIELDS_INVALID" ? "Enter a valid name and supported profile fields."
+          : code === "PATHWAYS_INVALID" ? "Select only supported Kingsmen pathways."
+          : "This account already has an identity link. Refresh the profile or use the identity-review process."
+      }, origin);
+    }
+    const persistedProfile = safeProfile(bootstrapped.profile_data);
+    const persistedPathways = safePathways(bootstrapped.pathway_preferences) ?? [];
+    return reply(201, {
+      ok: true,
+      profile: persistedProfile,
+      pathwayPreferences: persistedPathways,
+      consent: { status: "ACTIVE", version: bootstrapped.consent_version, grantedAt: bootstrapped.consent_at, text: CONSENT_TEXT },
+      completeness: completion(persistedProfile, persistedPathways),
+      candidateReference: bootstrapped.candidate_reference,
+      identityStatus: "PENDING_REVIEW",
+      savedAt: bootstrapped.saved_at,
+      persistence: "SUPABASE_BACKEND",
+      message: "Profile created and saved to Supabase. Your candidate reference is shown below. Identity verification remains pending; personal documents, opportunity matching and any legacy-record link still require authorised human review."
+    }, origin);
+  }
+
+  const candidate = identity.candidate;
+  const identityStatus = identity.identityStatus;
   const { data: current, error: profileReadError } = await admin.from("candidate_master_profiles")
     .select("profile_data,pathway_preferences,consent_version,consent_at,updated_at")
     .eq("candidate_id", candidate.id).maybeSingle();
@@ -148,6 +255,8 @@ Deno.serve(async (req: Request) => {
       completeness: completion(currentProfile, pathways),
       correctionRequests: correctionRequests ?? [],
       savedAt: current?.updated_at ?? null,
+      candidateReference: candidate.public_ref,
+      identityStatus,
       persistence: "SUPABASE_BACKEND"
     }, origin);
   }
