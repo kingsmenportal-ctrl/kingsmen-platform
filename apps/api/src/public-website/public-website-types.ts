@@ -21,6 +21,7 @@ export interface PublicPackageCard {
   includedMotivationLetters: number;
   includedAccommodationRoutes: number;
   routeVisibility: "PREVIEW_ONLY" | "SEALED" | "ACTIVATED";
+  managedExecutionRequiresEntitlement: boolean;
   boundary: string;
 }
 
