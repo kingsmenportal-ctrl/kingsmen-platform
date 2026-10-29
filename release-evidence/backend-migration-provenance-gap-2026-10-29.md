@@ -7,7 +7,9 @@
 - Applied Supabase migration ledger entries: **122**.
 - Checked-in files under `db/migrations/`: **36** (includes pending `0087`, so not all are applied).
 - SQL files anywhere in the repository tree: **62** (includes seeds, schema fragments and release-evidence queries; these are not automatically authoritative migration bodies).
-- Ledger entries without a matching checked-in migration body by canonical migration number/name: **89**.
+- Applied ledger entries without a matching canonical body in `db/migrations/`: **89**.
+- Historical bodies recovered from PR patches and archived outside runnable migration directories: **44**.
+- Applied ledger entries whose historical body remains unrecovered: **45** (including the second `0078` version).
 - A duplicate migration name exists: `candidate_application_preparation_readiness_0078` at ledger versions `20261019112452` and `20261019112511`. These are separate applied versions; they must not be collapsed based on the shared label.
 
 ## Missing authoritative bodies in the current repository
@@ -103,6 +105,10 @@ The following applied ledger entries have no matching canonical migration body i
 - `20261025114110` — `lock_document_review_rpc_to_service_role`
 - `20261029143144` — `canonical_package_benefits_universal_accommodation_20261029`
 - `20261029143414` — `seed_canonical_public_package_cards_20261029`
+
+## Recovery progress
+
+Recovered SQL bodies are archived under `release-evidence/recovered-applied-migrations/`, with the source PR, ledger mapping and archived Git blob SHA indexed in that directory's README. These are historical source artifacts, not runnable migrations. The archived blob SHA is not proof of the exact bytes originally executed in staging; timestamp/name mapping and semantic effects still need verification. This recovery covers identity review, private document review, application tracking/preparation, master application, application evidence/status bridge, source feed guards, durable outbox, founder brief, PayFast settlement, and reviewer least-privilege slices. The duplicate `0078` ledger versions remain a special unresolved ambiguity.
 
 ## Live schema inventory (read-only)
 
