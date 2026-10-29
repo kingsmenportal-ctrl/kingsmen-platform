@@ -22,6 +22,7 @@ type Profile = {
   preferredLocation: string;
 };
 type Consent = { status: "ACTIVE" | "REVOKED" | "NOT_RECORDED"; version?: string | null; grantedAt?: string | null; text?: string };
+type CorrectionRequest = { id: string; field_name: string; old_value: string | null; requested_value: string; reason: string; status: string; requested_at: string; decided_at?: string | null; decision_notes?: string | null };
 type ProfileResponse = {
   ok: boolean;
   profile?: Partial<Profile>;
@@ -31,6 +32,8 @@ type ProfileResponse = {
   savedAt?: string | null;
   error?: string;
   code?: string;
+  correctionRequests?: CorrectionRequest[];
+  correctionRequest?: CorrectionRequest;
   message?: string;
   profilePreserved?: boolean;
 };
@@ -59,6 +62,11 @@ export default function CandidateProfilePage() {
   const [notice, setNotice] = useState("");
   const [savedAt, setSavedAt] = useState<string | null>(null);
   const [lastLoad, setLastLoad] = useState<string | null>(null);
+  const [corrections, setCorrections] = useState<CorrectionRequest[]>([]);
+  const [correctionField, setCorrectionField] = useState<keyof Profile>("displayName");
+  const [correctionValue, setCorrectionValue] = useState("");
+  const [correctionReason, setCorrectionReason] = useState("");
+  const [submittingCorrection, setSubmittingCorrection] = useState(false);
   const [isDirty, setIsDirty] = useState(false);
 
   const request = useCallback(async (payload: Record<string, unknown>) => {
@@ -86,6 +94,7 @@ export default function CandidateProfilePage() {
         setIsDirty(false);
       }
       setConsent(body.consent ?? { status: "NOT_RECORDED" });
+      setCorrections(Array.isArray(body.correctionRequests) ? body.correctionRequests : []);
       setSavedAt(typeof body.savedAt === "string" ? body.savedAt : null);
       setLastLoad(new Date().toISOString());
       setNotice(preserveDraft ? "Saved backend information reloaded. Unsaved edits were kept." : "Loaded current profile from the Kingsmen backend.");
@@ -124,6 +133,18 @@ export default function CandidateProfilePage() {
       setSaving(false);
     }
   }
+  async function submitCorrection() {
+    setSubmittingCorrection(true); setError(""); setNotice("");
+    try {
+      const body = await request({ action: "request_correction", fieldName: correctionField, requestedValue: correctionValue, reason: correctionReason });
+      if (body.correctionRequest) setCorrections(old => [body.correctionRequest as CorrectionRequest, ...old]);
+      setCorrectionValue(""); setCorrectionReason("");
+      setNotice(body.message || "Correction request submitted for authorised review.");
+    } catch (e) {
+      setError(e instanceof Error ? e.message : "Correction request could not be saved.");
+    } finally { setSubmittingCorrection(false); }
+  }
+
   async function revokeConsent() {
     if (!window.confirm("Withdraw profile-processing consent? Your saved profile will be preserved, but consent-dependent processing may be restricted.")) return;
     setRevoking(true); setError(""); setNotice("");
@@ -237,6 +258,36 @@ export default function CandidateProfilePage() {
             </label>
             <p className="mt-3 text-xs leading-5 text-slate-400">Profile details are not used to automatically approve admission, funding, employment, identity or documents. Avoid entering sensitive details not needed for this profile.</p>
             {consent.status === "ACTIVE" && <button type="button" onClick={revokeConsent} disabled={revoking} className="mt-4 rounded-xl border border-red-800 px-4 py-2 text-sm text-red-200 disabled:opacity-50">{revoking ? "Withdrawing consent…" : "Withdraw profile-processing consent"}</button>}
+          </section>
+
+          <section className="rounded-3xl border border-slate-800 bg-slate-900 p-5 sm:p-7">
+            <h2 className="text-xl font-bold">Request a profile correction</h2>
+            <p className="mt-2 text-sm leading-6 text-slate-400">A correction request creates a review record; it does not overwrite your saved profile. An authorised reviewer must decide it. This is useful where a field needs a documented correction rather than a direct self-service edit.</p>
+            <div className="mt-4 grid gap-4 sm:grid-cols-2">
+              <label className="block text-sm font-semibold">Field to review
+                <select value={correctionField} onChange={e=>setCorrectionField(e.target.value as keyof Profile)} className="mt-2 w-full rounded-xl border border-slate-700 bg-slate-950 px-3 py-3 font-normal">
+                  <option value="displayName">Name</option><option value="phone">Phone</option><option value="province">Province</option>
+                  <option value="highestQualification">Highest qualification</option><option value="studyInterests">Study interests</option>
+                  <option value="employmentInterests">Employment interests</option><option value="preferredLocation">Preferred location</option>
+                </select>
+              </label>
+              <label className="block text-sm font-semibold">Requested value
+                <input required maxLength={600} value={correctionValue} onChange={e=>setCorrectionValue(e.target.value)} className="mt-2 w-full rounded-xl border border-slate-700 bg-slate-950 px-3 py-3 font-normal" />
+              </label>
+              <label className="block text-sm font-semibold sm:col-span-2">Reason for correction
+                <textarea required minLength={5} maxLength={800} rows={3} value={correctionReason} onChange={e=>setCorrectionReason(e.target.value)} className="mt-2 w-full rounded-xl border border-slate-700 bg-slate-950 px-3 py-3 font-normal" />
+              </label>
+            </div>
+            <button type="button" onClick={()=>void submitCorrection()} disabled={submittingCorrection || !correctionValue.trim() || correctionReason.trim().length<5} className="mt-4 rounded-xl border border-slate-700 px-4 py-3 text-sm font-semibold disabled:opacity-50">{submittingCorrection?"Submitting request…":"Submit correction request"}</button>
+            <div className="mt-6 border-t border-slate-700 pt-4">
+              <h3 className="font-semibold">Correction request history</h3>
+              {corrections.length === 0 ? <p className="mt-2 text-sm text-slate-400">No correction requests are currently recorded for this candidate profile.</p> : <ol className="mt-3 space-y-3">{corrections.map(item=><li key={item.id} className="rounded-xl border border-slate-700 p-4 text-sm">
+                <div className="flex flex-wrap justify-between gap-2"><strong>{item.field_name}</strong><span className="rounded-full border border-slate-600 px-2 py-1 text-xs">{item.status}</span></div>
+                <p className="mt-2"><strong>Requested:</strong> {item.requested_value}</p><p className="mt-1 text-slate-400">{item.reason}</p>
+                <p className="mt-2 text-xs text-slate-500">Created {new Date(item.requested_at).toLocaleString()}{item.decided_at ? ` · Decided ${new Date(item.decided_at).toLocaleString()}` : ""}</p>
+                {item.decision_notes && <p className="mt-2 text-slate-300"><strong>Reviewer note:</strong> {item.decision_notes}</p>}
+              </li>)}</ol>}
+            </div>
           </section>
 
           <div className="flex flex-wrap gap-3">
