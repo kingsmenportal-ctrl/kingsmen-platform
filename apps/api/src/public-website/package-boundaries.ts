@@ -13,7 +13,8 @@ const freeCard: PublicPackageCard = {
   includedMotivationLetters: 0,
   includedAccommodationRoutes: 0,
   routeVisibility: "PREVIEW_ONLY",
-  boundary: "All six pathways remain discoverable. Free Destiny Map is a preview with zero managed applications; exact targets and execution unlock only when applicable service entitlement is active."
+  managedExecutionRequiresEntitlement: true,
+  boundary: "All six pathways and the opportunity catalogue remain discoverable to every candidate. Free Destiny Map is a preview service with zero managed applications; paid service execution requires the applicable verified entitlement."
 };
 
 export const PUBLIC_PACKAGE_CARDS: PublicPackageCard[] = [
@@ -30,10 +31,11 @@ export const PUBLIC_PACKAGE_CARDS: PublicPackageCard[] = [
     includedCvVersions: plan.cvVersions,
     includedMotivationLetters: plan.motivationLetters,
     includedAccommodationRoutes: plan.includedAccommodationRoutes,
-    routeVisibility: "SEALED",
+    routeVisibility: "ACTIVATED",
+    managedExecutionRequiresEntitlement: true,
     boundary: plan.packageId === "cv_revamp"
-      ? "Standalone CV service: 15 personalised CV versions and 15 matching motivation letters, delivered truthfully after complete intake. No managed application allowance."
-      : `All six pathways remain discoverable. ${plan.priorityApplications} priority applications; capacity for ${plan.concurrentManagedRoutes30d} concurrent managed routes over 30 days. Accommodation support is included; ${plan.includedAccommodationRoutes} accommodation routes are included without extra charge. Checkout is not enabled until payment settlement and entitlement tests are approved.`
+      ? "Standalone CV service: 15 personalised CV versions and 15 matching motivation letters after complete intake. Full opportunity discovery remains available; this product has no managed application allowance."
+      : `All six pathways and the opportunity catalogue remain discoverable regardless of package. Entitlement controls ${plan.priorityApplications} priority applications and capacity for ${plan.concurrentManagedRoutes30d} concurrent managed routes over 30 days, not discovery access. Accommodation support is included; ${plan.includedAccommodationRoutes} accommodation routes are included without extra charge. Managed execution requires verified entitlement. Checkout is not enabled until payment settlement and entitlement tests are approved.`
   }))
 ];
 
