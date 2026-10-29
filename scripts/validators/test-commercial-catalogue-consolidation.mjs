@@ -10,5 +10,6 @@ assert.equal(result.passed, true);
 assert.equal(result.paidProducts, 7);
 assert.equal(result.runtimeAndDoctrineParity, true);
 assert.equal(result.universalPathways, 6);
+assert.equal(result.publicProjection, "shared catalogue");
 assert.equal(result.standaloneAccommodationProduct, "removed from public runtime projection; historical code retained");
 console.log("PASS: shared commercial catalogue, public/finance projections, package capacities, universal pathway access, and checkout fail-closed boundary.");
