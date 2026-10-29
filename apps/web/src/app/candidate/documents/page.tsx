@@ -90,7 +90,7 @@ export default function CandidateDocumentsPage() {
       }
       // Supabase signed-upload URLs accept the raw file body, not multipart FormData.
       const uploaded = await fetch(intent.signedUploadUrl, {
-        method: "PUT",
+        method: "POST",
         headers: { "x-upsert": "false", "Content-Type": file.type },
         body: file,
         cache: "no-store",
