@@ -23,7 +23,7 @@ assert.ok(sql.includes("coalesce(qual,'')='kingsmen_security.is_backend_service_
 assert.ok(sql.includes("coalesce(with_check,'')='kingsmen_security.is_backend_service_role()'"), "replacement WITH CHECK guard must be exact");
 assert.ok(sql.includes("regexp_replace(pg_get_indexdef(i.indexrelid)"), "index names are normalized before comparing definitions");
 assert.ok(sql.includes("canonical_def <> duplicate_def"), "normalized duplicate index definitions must match exactly");
-assert.ok(sql.includes("duplicate_oid is not null"), "cleanup accepts an index already removed by migration 0090");
+assert.ok(sql.includes("duplicate_oid is not null"), "cleanup accepts an index already removed by migration 0091");
 assert.ok(sql.includes("drop index if exists public.candidate_identity_review_one_open_request_per_user_idx"), "only the audited duplicate index is removed, idempotently");
 assert.ok(sql.includes("pg_constraint where conindid in (canonical_oid, duplicate_oid)"), "index-backed constraints are protected");
 assert.match(sql, /begin;/i, "transaction begins");
