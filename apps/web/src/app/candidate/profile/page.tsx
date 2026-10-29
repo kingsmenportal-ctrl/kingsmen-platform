@@ -29,6 +29,7 @@ type ProfileResponse = {
   consent?: Consent;
   completeness?: { completed: number; required: number; percent: number; missing: string[] };
   correctionRequests?: Correction[];
+  correctionRequest?: Correction;
   candidateReference?: string | null;
   identityStatus?: string;
   savedAt?: string | null;
