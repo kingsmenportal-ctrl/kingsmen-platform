@@ -214,7 +214,6 @@ export default function CandidateProfilePage() {
           </div>
           {candidateReference && <p className="mt-4 break-all rounded-xl border border-slate-700 bg-slate-950 p-3 text-sm">Your Kingsmen candidate reference: <strong>{candidateReference}</strong>. Keep it available for your identity-review request. A pending identity review does not unlock documents or confirm your identity.</p>}
           {identityStatus === "PENDING_REVIEW" && <p className="mt-3 text-sm leading-6 text-amber-200">Your own newly created profile can be edited while the link is pending. Personal documents, personalised opportunity matches and access to any older candidate record remain locked until an authorised reviewer verifies the link.</p>}
-          </div>
         </section>
 
         <form onSubmit={save} className="space-y-6">
