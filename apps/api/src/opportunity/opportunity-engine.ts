@@ -174,10 +174,11 @@ export function verifyProgrammeCandidateFacingSafety(programme: OpportunityProgr
   const observed = Date.parse(programme.observedAt ?? "");
   const checked = Date.parse(programme.lastCheckedAt ?? "");
   const staleAfter = Date.parse(programme.staleAfter ?? "");
-  const validUntil = programme.validUntil ? Date.parse(programme.validUntil) : Number.POSITIVE_INFINITY;
+  const validUntil = programme.validUntil ? Date.parse(programme.validUntil) : null;
+  const validityWindowVerified = validUntil === null || (Number.isFinite(validUntil) && validUntil > now);
   const freshnessVerified = Number.isFinite(now) && Number.isFinite(observed) && Number.isFinite(checked) &&
-    Number.isFinite(staleAfter) && Number.isFinite(validUntil) && observed <= checked && checked <= now &&
-    observed <= now && staleAfter > now && staleAfter > checked && validUntil > now;
+    Number.isFinite(staleAfter) && validityWindowVerified && observed <= checked && checked <= now &&
+    observed <= now && staleAfter > now && staleAfter > checked;
   const httpsLink = typeof programme.exactLink === "string" && /^https:\/\//i.test(programme.exactLink);
   const safe =
     provider.safeToRecommend &&
