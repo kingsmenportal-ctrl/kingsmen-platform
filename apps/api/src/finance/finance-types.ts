@@ -22,7 +22,14 @@ export interface FinancePlan {
   description: string;
   amountCents: number;
   currency: CurrencyCode;
+  /**
+   * Deprecated compatibility field. This retains the historical concurrent-route
+   * value for old readers. New entitlement logic must use the explicit fields below.
+   */
   managedApplicationCount: number;
+  priorityApplicationCount: number | null;
+  concurrentManagedRouteCapacity30d: number;
+  accommodationSupport: boolean;
   accommodationRouteCount: number;
   cvVersions: number;
   motivationLetters: number;
