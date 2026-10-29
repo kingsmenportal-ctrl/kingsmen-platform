@@ -151,7 +151,29 @@ Deno.serve(async(req:Request)=>{
   const ids=(trackers??[]).map((t:any)=>t.id);
   let items:any[]=[];
   if(ids.length){const result=await admin.from("candidate_application_preparation_items").select("id,tracker_id,item_type,title,candidate_note,official_source_url,evidence_reference,status,required_by_candidate,due_date,created_at,updated_at").eq("candidate_id",candidateId).in("tracker_id",ids).order("created_at",{ascending:true});if(result.error){console.error("preparation items load failed",result.error.code??"unknown");return reply(503,{error:"Could not load preparation checklist items."},origin);}items=result.data??[];}
-  return reply(200,{ready:true,trackers:trackers??[],items,message:"Saved application preparation records loaded. No provider submission is implied."},origin);
+  const {data:masterTargets,error:masterTargetError}=await admin.from("candidate_master_application_targets")
+   .select("id,target_key,pathway_type,provider_name,programme_or_role,provider_application_url,source_reference,source_confidence,planning_status,application_id,created_at,updated_at")
+   .eq("candidate_id",candidateId).order("updated_at",{ascending:false});
+  if(masterTargetError){console.error("master application targets load failed",masterTargetError.code??"unknown");return reply(503,{error:"Could not load parent-application targets."},origin);}
+  const applicationIds=(masterTargets??[]).map((t:any)=>t.application_id).filter((id:any)=>typeof id==="string");
+  let parentApplications:any[]=[];
+  if(applicationIds.length){
+   const result=await admin.from("candidate_applications")
+    .select("id,application_ref,pathway_type,status,readiness_status,readiness_snapshot,created_at,updated_at")
+    .eq("candidate_id",candidateId).in("id",applicationIds).order("updated_at",{ascending:false});
+   if(result.error){console.error("master applications load failed",result.error.code??"unknown");return reply(503,{error:"Could not load prepared application records."},origin);}
+   parentApplications=result.data??[];
+  }
+  const {data:masterEvents,error:masterEventError}=await admin.from("candidate_master_application_events")
+   .select("event_type,details,created_at").eq("candidate_id",candidateId).order("created_at",{ascending:false}).limit(100);
+  if(masterEventError){console.error("master application timeline load failed",masterEventError.code??"unknown");return reply(503,{error:"Could not load application timeline evidence."},origin);}
+  const {data:applicationEvents,error:applicationEventError}=await admin.from("candidate_application_events")
+   .select("application_id,event_type,from_status,to_status,reason_code,evidence_ref,details,created_at")
+   .eq("candidate_id",candidateId).order("created_at",{ascending:false}).limit(200);
+  if(applicationEventError){console.error("application timeline load failed",applicationEventError.code??"unknown");return reply(503,{error:"Could not load application timeline evidence."},origin);}
+  return reply(200,{ready:true,trackers:trackers??[],items,masterTargets:masterTargets??[],
+   parentApplications,masterEvents:masterEvents??[],applicationEvents:applicationEvents??[],
+   message:"Saved application and preparation records loaded. No provider submission is implied."},origin);
  }
  if(p.action==="start_from_saved_route"){
   const routeId=typeof p.route_programme_id==="string"?p.route_programme_id:"";
