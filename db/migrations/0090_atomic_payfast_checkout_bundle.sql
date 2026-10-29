@@ -113,7 +113,7 @@ begin
         'intentRef', v_intent.intent_ref,
         'merchantReference', v_intent.merchant_reference,
         'paymentUrl', v_intent.payment_url,
-        'signedPayload', v_intent.signed_payload
+        'signedPayload', v_intent.signed_payload - 'merchant_key'
       ),
       'orderStatus', v_order.order_status,
       'paymentStatus', case when v_order.order_status = 'PAID' or v_intent.intent_status = 'PAID' then 'COMPLETE' else 'PENDING' end,
@@ -185,7 +185,7 @@ begin
     p_intent_ref,p_order_ref,p_invoice_ref,p_candidate_ref,p_order_ref,v_plan.amount_cents,'ZAR',
     v_plan.plan_name,left(coalesce(v_plan.description,v_plan.plan_name),255),
     p_return_url,p_cancel_url,p_notify_url,'sandbox',
-    'https://sandbox.payfast.co.za/eng/process',p_signed_payload,
+    'https://sandbox.payfast.co.za/eng/process',p_signed_payload - 'merchant_key',
     p_signed_payload->>'signature','CREATED',p_idempotency_key,p_evidence_ref,v_now,v_now
   );
 
