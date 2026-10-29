@@ -98,7 +98,7 @@ assert.equal(validateCaoChoices(Array.from({ length: 7 }, (_, i) => ({
 
 console.log(JSON.stringify({
   passed: true,
-  checks: 23,
+  checks: 24,
   scope: "canonical application lifecycle compatibility policy + CAO child-choice adapter",
   guarantees: [
     "unknown legacy workflow statuses stay unresolved",
