@@ -1,5 +1,6 @@
 "use client";
 
+import { getCandidateAccessToken } from "../../../lib/candidate-session";
 import { FormEvent, useCallback, useEffect, useState } from "react";
 
 type VaultDocument = {
@@ -16,17 +17,6 @@ const TYPES = [
 const MAX_BYTES = 10 * 1024 * 1024;
 const ALLOWED_MIME = new Set(["application/pdf","image/jpeg","image/png"]);
 
-function tokenFromSession(): string | null {
-  const base = process.env.NEXT_PUBLIC_SUPABASE_URL;
-  if (!base || typeof window === "undefined") return null;
-  try {
-    const ref = new URL(base).hostname.split(".")[0];
-    const stored = window.localStorage.getItem(`sb-${ref}-auth-token`);
-    if (!stored) return null;
-    const session = JSON.parse(stored) as Record<string, unknown>;
-    return typeof session.access_token === "string" ? session.access_token : null;
-  } catch { return null; }
-}
 function apiMessage(payload: unknown): string {
   if (payload && typeof payload === "object") {
     const p = payload as Record<string, unknown>;
@@ -48,7 +38,7 @@ export default function CandidateDocumentsPage() {
   const [readLink,setReadLink] = useState<{id:string;url:string}|null>(null);
 
   const refresh = useCallback(async () => {
-    const token = tokenFromSession();
+    const token = getCandidateAccessToken();
     if (!token) {
       setDocs([]); setLoading(false); setNotice("Sign in to view your private documents.");
       return;
@@ -72,7 +62,7 @@ export default function CandidateDocumentsPage() {
 
   async function upload(event: FormEvent<HTMLFormElement>) {
     event.preventDefault(); setNotice(""); setReadLink(null);
-    const token = tokenFromSession();
+    const token = getCandidateAccessToken();
     if (!token) { setNotice("Sign in before uploading documents."); return; }
     if (!file) { setNotice("Choose a document first."); return; }
     if (!ALLOWED_MIME.has(file.type)) { setNotice("Only PDF, JPEG and PNG files are accepted."); return; }
@@ -117,7 +107,7 @@ export default function CandidateDocumentsPage() {
 
   async function getReadLink(id: string) {
     setNotice(""); setReadLink(null);
-    const token = tokenFromSession();
+    const token = getCandidateAccessToken();
     if (!token) { setNotice("Sign in before opening documents."); return; }
     try {
       const response = await fetch("/api/candidate/documents/read-url", {
@@ -142,7 +132,7 @@ export default function CandidateDocumentsPage() {
       </header>
 
       {notice && <div role="status" className="mt-6 rounded-2xl border border-slate-700 bg-slate-900 px-4 py-3 text-sm leading-6">{notice}
-        {!tokenFromSession() && <p className="mt-2"><a className="text-cyan-300 underline" href="/candidate/login">Sign in / create account</a></p>}
+        {!getCandidateAccessToken() && <p className="mt-2"><a className="text-cyan-300 underline" href="/candidate/login">Sign in / create account</a></p>}
         {notice.includes("IDENTITY_REVIEW_REQUIRED") && <p className="mt-2 text-slate-300">Your authenticated account needs a verified candidate link from the authorised identity-review workflow. Kingsmen does not link accounts by email equality.</p>}
       </div>}
 
