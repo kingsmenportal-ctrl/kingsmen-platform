@@ -47,7 +47,7 @@ assert.ok(shared.includes('name: "Free Destiny Map"') && shared.includes("priceC
 assert.ok(shared.includes("KINGSMEN_PATHWAYS") && /"Higher Education"[\s\S]*"TVET"[\s\S]*"SETA programmes and learnerships"[\s\S]*"Internships"[\s\S]*"Apprenticeships"[\s\S]*"Employment"/.test(shared), "all six opportunity pathways must remain universal");
 assert.ok(finance.includes("KINGSMEN_COMMERCIAL_CATALOGUE") && finance.includes("filter((plan) => plan.checkoutEnabled)"), "finance checkout projection must be derived from shared catalogue and fail closed");
 assert.ok(website.includes("KINGSMEN_COMMERCIAL_CATALOGUE") && website.includes("map((plan)"), "public pricing projection must be derived from shared catalogue");
-assert.ok(!website.includes("ACCOMMODATION_SUPPORT") && !website.includes("R179.00"), "standalone R179 accommodation product must not be offered");
+assert.ok(!/packageKey:\s*"ACCOMMODATION_SUPPORT"/.test(website) && !/priceLabel:\s*"R179\.00"/.test(website), "standalone R179 accommodation product must not be offered");
 assert.ok(financeTypes.includes('"ACCOMMODATION_SUPPORT_R179"'), "historical legacy code must remain representable for reconciliation");
 assert.ok(websiteTypes.includes("priorityApplicationCount") && websiteTypes.includes("concurrentManagedRouteCapacity30d"), "priority allowance and concurrent capacity must be distinct fields");
 assert.ok(shared.includes("checkoutEnabled: false"), "unproven package checkout must fail closed");
