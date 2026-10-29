@@ -21,7 +21,6 @@ check("provider statuses are not accepted without verified provider-origin evide
 check("candidate submission never implies provider confirmation", policy.includes("this is not provider-confirmed receipt"));
 check("legacy applications workflow statuses remain unresolved absent evidence-backed mapping", policy.includes('if (input.source !== "candidate_route_applications")') && policy.includes('status: "LEGACY_UNRESOLVED"'));
 check("CAO boundary delegates to one shared child-choice policy", cao.includes("validateApplicationChildChoices(choices)") && policy.includes("one parent Kingsmen application"));
-check("no applied migration is changed by this validator", true);
 
 console.log(JSON.stringify({
   schema: "kingsmen.application-lifecycle-contract.v1",
