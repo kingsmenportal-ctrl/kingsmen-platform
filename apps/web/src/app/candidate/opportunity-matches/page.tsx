@@ -211,7 +211,7 @@ export default function CandidateOpportunityMatchesPage() {
                     </section>}
                   </div>
                   <label className="mt-4 block text-sm font-semibold text-slate-800">Prepare under pathway
-                    <select aria-label={`Application pathway for ${item.title}`} value={selectedPathways[item.match_ref] ?? item.pathways[0] ?? ""} onChange={e=>setSelectedPathways(old=>({...old,[item.match_ref]:e.target.value}))}
+                    <select aria-label={`Application pathway for ${item.title}`} value={selectedPathways[item.match_ref] ?? (pathway !== "ALL" && item.pathways.includes(pathway) ? pathway : item.pathways[0] ?? "")} onChange={e=>setSelectedPathways(old=>({...old,[item.match_ref]:e.target.value}))}
                       className="mt-2 w-full rounded-xl border border-slate-300 bg-white px-3 py-3" disabled={!item.pathways.length}>
                       {item.pathways.map(p=><option key={p} value={p}>{PATHWAYS.find(x=>x[0]===p)?.[1]??p}</option>)}
                     </select>
