@@ -36,6 +36,7 @@ function sessionToken(): string | null {
 function errorMessage(body: unknown): string {
   if (body && typeof body === "object") {
     const p = body as Record<string, unknown>;
+    if (typeof p.code === "string" && typeof p.error === "string") return `${p.code}: ${p.error}`;
     if (typeof p.error === "string") return p.error;
     if (typeof p.message === "string") return p.message;
     if (typeof p.code === "string") return p.code;
@@ -214,7 +215,7 @@ export default function CandidateWorkbenchPage() {
           </div>
         </section>
       </div>
-      <footer className="text-xs leading-5 text-slate-500">Kingsmen may assist with preparation and matching, but does not guarantee admission, funding, placement, employment or any provider outcome. You cannot verify sources, mark a payment settled, claim submission receipt or assert an outcome from this browser checklist.</footer>
+      <footer className="text-xs leading-5 text-slate-500">No acceptance, funding, placement, employment, or success is guaranteed. Kingsmen may assist with preparation and matching, but the provider makes the decision. You cannot verify sources, mark a payment settled, claim submission receipt or assert an outcome from this browser checklist.</footer>
     </div>
   </main>;
 }
