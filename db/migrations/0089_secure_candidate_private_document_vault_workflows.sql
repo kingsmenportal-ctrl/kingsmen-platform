@@ -4,10 +4,28 @@
 -- re-check the reviewed identity link before touching a candidate's document records.
 begin;
 
+-- The private Vault's earlier metadata table omitted a normalized document type.
+-- Add it with a conservative OTHER default; no candidate uploads exist in staging.
+alter table public.candidate_private_documents
+  add column if not exists document_type text not null default 'OTHER';
+do $constraint$
+begin
+  alter table public.candidate_private_documents
+    add constraint candidate_private_documents_document_type_check
+    check (document_type in (
+      'CV','ID_DOCUMENT','MATRIC_CERTIFICATE','ACADEMIC_RECORD','PROOF_OF_ADDRESS',
+      'BANK_LETTER','PARENT_GUARDIAN_ID','PAYSLIP','AFFIDAVIT','APPLICATION_PROOF',
+      'NSFAS_DOCUMENT','OTHER'
+    ));
+exception when duplicate_object then null;
+end;
+$constraint$;
+
 create or replace function public.create_candidate_private_document_upload_request(
   p_supabase_user_id uuid,
   p_candidate_id uuid,
   p_document_id uuid,
+  p_document_type text,
   p_storage_path text,
   p_original_filename text,
   p_mime_type text,
@@ -31,6 +49,13 @@ begin
   if p_mime_type not in ('application/pdf', 'image/jpeg', 'image/png') then
     raise exception 'DOCUMENT_MIME_NOT_ALLOWED' using errcode = '22023';
   end if;
+  if p_document_type not in (
+    'CV','ID_DOCUMENT','MATRIC_CERTIFICATE','ACADEMIC_RECORD','PROOF_OF_ADDRESS',
+    'BANK_LETTER','PARENT_GUARDIAN_ID','PAYSLIP','AFFIDAVIT','APPLICATION_PROOF',
+    'NSFAS_DOCUMENT','OTHER'
+  ) then
+    raise exception 'DOCUMENT_TYPE_NOT_ALLOWED' using errcode = '22023';
+  end if;
   if p_original_filename is null
      or length(btrim(p_original_filename)) not between 1 and 180
      or position('/' in p_original_filename) > 0
@@ -38,8 +63,15 @@ begin
     raise exception 'DOCUMENT_FILENAME_INVALID' using errcode = '22023';
   end if;
   if p_storage_path is null
-     or p_storage_path <> p_candidate_id::text || '/' || p_document_id::text || '/' || p_original_filename
-     or length(p_storage_path) > 500 then
+     or p_storage_path is distinct from (
+       p_candidate_id::text || '/' || p_document_id::text || '/' ||
+       case p_mime_type
+         when 'application/pdf' then 'file.pdf'
+         when 'image/jpeg' then 'file.jpg'
+         when 'image/png' then 'file.png'
+       end
+     )
+     or length(p_storage_path) > 200 then
     raise exception 'DOCUMENT_STORAGE_PATH_INVALID' using errcode = '22023';
   end if;
 
@@ -58,11 +90,11 @@ begin
   end if;
 
   insert into public.candidate_private_documents (
-    id, candidate_id, storage_bucket, storage_path, original_filename,
+    id, candidate_id, document_type, storage_bucket, storage_path, original_filename,
     mime_type, size_bytes, status, evidence_purpose, created_by_auth_user_id
   )
   values (
-    p_document_id, p_candidate_id, 'kingsmen-candidate-documents', p_storage_path,
+    p_document_id, p_candidate_id, p_document_type, 'kingsmen-candidate-documents', p_storage_path,
     btrim(p_original_filename), p_mime_type, p_size_bytes, 'UPLOAD_PENDING',
     'CANDIDATE_DOCUMENT', p_supabase_user_id
   )
@@ -250,14 +282,14 @@ begin
 end;
 $function$;
 
-revoke all on function public.create_candidate_private_document_upload_request(uuid,uuid,uuid,text,text,text,bigint) from public, anon, authenticated;
+revoke all on function public.create_candidate_private_document_upload_request(uuid,uuid,uuid,text,text,text,text,bigint) from public, anon, authenticated;
 revoke all on function public.finalize_candidate_private_document_upload(uuid,uuid,uuid,bigint,text,boolean) from public, anon, authenticated;
 revoke all on function public.record_candidate_private_document_read_link(uuid,uuid,uuid,integer) from public, anon, authenticated;
-grant execute on function public.create_candidate_private_document_upload_request(uuid,uuid,uuid,text,text,text,bigint) to service_role;
+grant execute on function public.create_candidate_private_document_upload_request(uuid,uuid,uuid,text,text,text,text,bigint) to service_role;
 grant execute on function public.finalize_candidate_private_document_upload(uuid,uuid,uuid,bigint,text,boolean) to service_role;
 grant execute on function public.record_candidate_private_document_read_link(uuid,uuid,uuid,integer) to service_role;
 
-comment on function public.create_candidate_private_document_upload_request(uuid,uuid,uuid,text,text,text,bigint) is
+comment on function public.create_candidate_private_document_upload_request(uuid,uuid,uuid,text,text,text,text,bigint) is
   'Atomically records a private candidate document upload intent and audit event after re-checking the trusted Auth UUID to candidate link. Service role only.';
 comment on function public.finalize_candidate_private_document_upload(uuid,uuid,uuid,bigint,text,boolean) is
   'Finalizes a candidate document only after the trusted server verifies bytes, size, hash and MIME signature. Idempotent for same checksum. Service role only.';
