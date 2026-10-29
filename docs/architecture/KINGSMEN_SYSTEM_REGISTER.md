@@ -195,7 +195,10 @@ A build report is not a deployment report. A deployment report is not an E2E rep
 - **Public launch:** BLOCKED in the source manifest; keep it blocked until evidence says otherwise.
 - **Completion percentages:** intentionally NOT CLAIMED until each acceptance scenario is counted and its evidence state is current.
 
-## 9. Source anchors
+## 9. Candidate website journey and operations register
+The detailed step-by-step candidate journey, known route/implementation evidence, technical trust chain, daily operating model, monitoring/alert requirements, and stable WEB/AUTH/ID/PROF/OPP/APP/DOC/REV/PAY/OPS/REL acceptance scenario IDs are maintained in `docs/product/KINGSMEN_CANDIDATE_WEBSITE_JOURNEY_AND_OPERATIONS_REGISTER.md`. Update that register before creating or replacing candidate-facing routes, forms, document flows, or application workflows. Its current live Netlify inspection is included and explicitly records that a site object exists but the deployed SHA and working candidate experience remain unverified.
+
+## 10. Source anchors
 - `README.md` — declared runtime paths and memory-only API warning.
 - `package.json` — actual script catalogue.
 - `apps/api/package.json` — API build/runtime declaration.
