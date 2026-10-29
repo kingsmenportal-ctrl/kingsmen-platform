@@ -4,7 +4,7 @@ import path from "node:path";
 import { createRequire } from "node:module";
 import Module from "node:module";
 
-const require = createRequire(import.meta.url);
+const require = createRequire(path.resolve("apps/api/package.json"));
 const ts = require("typescript");
 const sourcePath = path.resolve("apps/api/src/opportunity/opportunity-engine.ts");
 const source = fs.readFileSync(sourcePath, "utf8");
