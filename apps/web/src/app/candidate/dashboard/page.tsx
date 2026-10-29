@@ -9,6 +9,7 @@ const pathways = [
 
 const actions = [
   { href: "/candidate/workbench", title: "Application workbench", description: "Save preparation progress and select a priority pathway." },
+  { href: "/candidate/applications", title: "My application tracker", description: "Track saved applications and candidate-reported preparation/submission events." },
   { href: "/candidate/documents", title: "Private Document Vault", description: "Upload, reuse and track your private candidate documents." },
   { href: "/candidate/opportunity-matches", title: "Verified opportunities", description: "Review listings only when their publication gates are satisfied." }
 ];
