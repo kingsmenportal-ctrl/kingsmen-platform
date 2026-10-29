@@ -384,7 +384,7 @@ Deno.serve(async (req: Request) => {
 
 // Reviewer queue and read access are gated independently of candidate identity.
   // Never return storage paths or file bytes; downloads are short-lived and audited.
-  if (p.action === "list_review_queue" || p.action === "create_reviewer_download_url") {
+  if (action === "list_review_queue" || action === "create_reviewer_download_url") {
     const reviewerRoles = await admin.from("platform_reviewers")
       .select("role_code").eq("auth_user_id", authData.user.id)
       .eq("is_active", true).is("revoked_at", null)
@@ -396,7 +396,7 @@ Deno.serve(async (req: Request) => {
     if (!(reviewerRoles.data ?? []).length) {
       return reply(403, { code: "DOCUMENT_REVIEWER_REQUIRED", error: "An active evidence-verifier permission is required." }, origin);
     }
-    if (p.action === "list_review_queue") {
+    if (action === "list_review_queue") {
       const { data, error } = await admin.from("candidate_private_documents")
         .select("id,candidate_id,preparation_item_id,original_filename,mime_type,size_bytes,status,uploaded_at,created_at,updated_at")
         .in("status", ["UPLOADED_CANDIDATE_REPORTED", "UNDER_REVIEW"])
@@ -408,7 +408,7 @@ Deno.serve(async (req: Request) => {
       return reply(200, { ready: true, documents: data ?? [], limit: 100,
         message: "Review queue metadata loaded; file contents and storage paths are not returned." }, origin);
     }
-    const id = typeof p.document_id === "string" ? p.document_id : "";
+    const id = typeof body.document_id === "string" ? body.document_id : "";
     if (!/^[0-9a-f-]{36}$/i.test(id)) return reply(400, { error: "A valid document identifier is required." }, origin);
     const { data: doc, error } = await admin.from("candidate_private_documents")
       .select("id,candidate_id,storage_bucket,storage_path,status")
@@ -432,7 +432,7 @@ Deno.serve(async (req: Request) => {
     return reply(200, { ready: true, signed_download_url: signed.signedUrl, expires_in_seconds: 60 }, origin);
   }
 
-if (p.action === "review_document") {
+if (action === "review_document") {
     const reviewerRoles = await admin.from("platform_reviewers")
       .select("role_code").eq("auth_user_id", authData.user.id)
       .eq("is_active", true).is("revoked_at", null)
@@ -444,10 +444,10 @@ if (p.action === "review_document") {
     if (!(reviewerRoles.data ?? []).length) {
       return reply(403, { code: "DOCUMENT_REVIEWER_REQUIRED", error: "An active evidence-verifier permission is required." }, origin);
     }
-    const documentId = typeof p.document_id === "string" ? p.document_id : "";
-    const decision = typeof p.decision === "string" ? p.decision : "";
-    const note = typeof p.reviewer_note === "string" ? p.reviewer_note.trim() : "";
-    const evidenceReference = typeof p.evidence_reference === "string" ? p.evidence_reference.trim() : "";
+    const documentId = typeof body.document_id === "string" ? body.document_id : "";
+    const decision = typeof body.decision === "string" ? body.decision : "";
+    const note = typeof body.reviewer_note === "string" ? body.reviewer_note.trim() : "";
+    const evidenceReference = typeof body.evidence_reference === "string" ? body.evidence_reference.trim() : "";
     if (!/^[0-9a-f-]{36}$/i.test(documentId)) {
       return reply(400, { error: "A valid document identifier is required." }, origin);
     }
