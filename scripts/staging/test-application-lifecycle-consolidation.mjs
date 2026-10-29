@@ -22,6 +22,7 @@ const reported = normalizeLegacyApplicationStatus({
 });
 assert.equal(reported.status, "CANDIDATE_REPORTED_SUBMITTED");
 assert.equal(reported.statusAuthority, "candidate_reported");
+assert.equal(normalizeLegacyApplicationStatus({ source: "candidate_route_applications", status: "PREPARING" }).statusAuthority, "tracker_recorded");
 assert.match(reported.reason, /not provider-confirmed/i);
 
 const invalidReported = normalizeLegacyApplicationStatus({
@@ -96,7 +97,7 @@ assert.equal(validateCaoChoices(Array.from({ length: 7 }, (_, i) => ({
 
 console.log(JSON.stringify({
   passed: true,
-  checks: 16,
+  checks: 23,
   scope: "canonical application lifecycle compatibility policy + CAO child-choice adapter",
   guarantees: [
     "unknown legacy workflow statuses stay unresolved",
