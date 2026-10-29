@@ -6,6 +6,18 @@ Important distinction: the listed Git blob SHA fingerprints the archived recover
 
 | Staging ledger version | Recovered body file | Source PR | Archived Git blob SHA |
 |---|---|---:|---|
+| `20261017062557` | [`20261017062557_n11_payfast_provider_idempotency.sql`](./20261017062557_n11_payfast_provider_idempotency.sql) | #86 | `1238aa0460b3a47c1fe73474897d1ce489a18194` |
+| `20261017062602` | [`20261017062602_n11_payfast_retryable_rejected_itn.sql`](./20261017062602_n11_payfast_retryable_rejected_itn.sql) | #86 | `e709698240152e5432be43fc31af3e8a10ad303b` |
+| `20261017062700` | [`20261017062700_candidate_sessions_legacy_compatible.sql`](./20261017062700_candidate_sessions_legacy_compatible.sql) | #86 | `9edac6561412a930313a2800680033e99c6838e0` |
+| `20261017062706` | [`20261017062706_candidate_credentials.sql`](./20261017062706_candidate_credentials.sql) | #86 | `4f045cb79be539cea9f053332c12ce26a6885997` |
+| `20261017062711` | [`20261017062711_candidate_auth_identity_link.sql`](./20261017062711_candidate_auth_identity_link.sql) | #86 | `3bc2c8cbefabf902c4a965a984730d1f94c42378` |
+| `20261017082458` | [`20261017082458_kingsmen_ecosystem_marketplace.sql`](./20261017082458_kingsmen_ecosystem_marketplace.sql) | #86 | `6aa85d0484e9c7ecb75391d749b7b0ac9b75e059` |
+| `20261017082554` | [`20261017082554_public_verified_opportunity_read.sql`](./20261017082554_public_verified_opportunity_read.sql) | #86 | `daf44b87b6e8cc6a3a3a07dec12db0a2c7344742` |
+| `20261017082751` | [`20261017082751_marketplace_rls_performance_hardening.sql`](./20261017082751_marketplace_rls_performance_hardening.sql) | #86 | `923e9819fbcfae48ad0796720c33a17e8a840711` |
+| `20261017083209` | [`20261017083209_candidate_saved_routes.sql`](./20261017083209_candidate_saved_routes.sql) | #86 | `8dcf29fd29d992e29f1163c46256fbe786d377f7` |
+| `20261017084704` | [`20261017084704_marketplace_review_event_audit.sql`](./20261017084704_marketplace_review_event_audit.sql) | #86 | `2f54b26fef29fe025f635482fee1263ce9431e2d` |
+| `20261017085001` | [`20261017085001_marketplace_https_url_constraints.sql`](./20261017085001_marketplace_https_url_constraints.sql) | #86 | `20846783d24983a54459e77a6f31702b986e2dbb` |
+| `20261017085438` | [`20261017085438_marketplace_public_dns_url_constraints.sql`](./20261017085438_marketplace_public_dns_url_constraints.sql) | #86 | `055814be6fe0e55f7db4d1701239b379b21c1889` |
 | `20261019095926` | [`20261019095926_candidate_workspace_persistence_v1.sql`](./20261019095926_candidate_workspace_persistence_v1.sql) | #120 | `29d2dcc4dc6f8774c37a32a9916091bf31f1dd33` |
 | `20261019101601` | [`20261019101601_candidate_identity_review_requests_v1.sql`](./20261019101601_candidate_identity_review_requests_v1.sql) | #120 | `b04e9ebe99a6b77ea4a33bcc56ea4c36a92c8d65` |
 | `20261019112437` | [`20261019112437_candidate_identity_review_decision_workflow_0076.sql`](./20261019112437_candidate_identity_review_decision_workflow_0076.sql) | #120 | `4b7aa23cf677146a50c79a911312df8039dc0e4a` |
