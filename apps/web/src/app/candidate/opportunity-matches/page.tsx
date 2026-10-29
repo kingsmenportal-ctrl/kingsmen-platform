@@ -89,51 +89,31 @@ export default function CandidateOpportunityMatchesPage() {
     return toApplicationPathway(choice);
   }
   async function saveOpportunity(item: Opportunity) {
-    setSaving(`save:${item.match_ref}`); setError(""); setNotice("");
+    setSaving(\`save:\${item.match_ref}\`); setError(""); setNotice("");
     const token = getAccessToken();
     if (!token) { setError("Sign in before saving an opportunity."); setSaving(""); return; }
     const selected = pathwayFor(item);
     if (!selected) { setError("This listing does not have a supported pathway. Nothing was saved."); setSaving(""); return; }
     try {
-      const response = await fetch("/api/candidate/applications", {
-        method: "POST", headers: { Authorization: `Bearer ${token}`, "Content-Type": "application/json" },
-        body: JSON.stringify({ action: "save_n15_match", match_ref: item.match_ref, pathway_type: selected }),
+      const response = await fetch("/api/candidate/opportunity-save", {
+        method: "POST", headers: { Authorization: \`Bearer \${token}\`, "Content-Type": "application/json" },
+        body: JSON.stringify({ action: "save", match_ref: item.match_ref, pathway_type: selected }),
         cache: "no-store"
       });
       const body = await response.json();
-      if (!response.ok || body.ready !== true || typeof body.target_key !== "string") {
-        throw new Error(body.code && body.error ? `${body.code}: ${body.error}` : body.error || "Opportunity could not be saved.");
+      if (!response.ok || body.ok !== true || typeof body.targetKey !== "string") {
+        throw new Error(body.code && body.error ? \`\${body.code}: \${body.error}\` : body.error || body.message || "Opportunity could not be saved and prepared.");
       }
-      setSavedTargets(old => ({ ...old, [item.match_ref]: body.target_key }));
-      setNotice("Opportunity saved to your Kingsmen account. Current official-source gates were rechecked by the backend; no external application was submitted.");
+      const application = body.application as Record<string, unknown> | undefined;
+      const reference = typeof application?.application_ref === "string" ? application.application_ref : String(application?.application_id ?? "Draft prepared");
+      setSavedTargets(old => ({ ...old, [item.match_ref]: body.targetKey as string }));
+      setPreparedApplications(old => ({ ...old, [item.match_ref]: reference }));
+      setNotice(body.message || "Opportunity saved and parent application draft prepared. No provider submission has occurred.");
     } catch (e) {
       setError(e instanceof Error ? e.message : "Opportunity could not be saved. Reload the feed and retry.");
     } finally { setSaving(""); }
   }
-  async function prepareApplication(item: Opportunity) {
-    const targetKey = savedTargets[item.match_ref];
-    if (!targetKey) { setError("Save the opportunity before preparing an application."); return; }
-    setSaving(`prepare:${item.match_ref}`); setError(""); setNotice("");
-    const token = getAccessToken();
-    if (!token) { setError("Sign in before preparing an application."); setSaving(""); return; }
-    try {
-      const response = await fetch("/api/candidate/applications", {
-        method: "POST", headers: { Authorization: `Bearer ${token}`, "Content-Type": "application/json" },
-        body: JSON.stringify({ action: "prepare_master_application", target_key: targetKey }),
-        cache: "no-store"
-      });
-      const body = await response.json();
-      const application = body.application as Record<string, unknown> | undefined;
-      if (!response.ok || body.ready !== true || application?.ok !== true) {
-        throw new Error(body.code && body.error ? `${body.code}: ${body.error}` : body.error || "Parent application could not be prepared.");
-      }
-      const reference = typeof application.application_ref === "string" ? application.application_ref : String(application.application_id ?? "Prepared");
-      setPreparedApplications(old => ({ ...old, [item.match_ref]: reference }));
-      setNotice(`Application preparation record ${reference} saved. This is a draft and has not been submitted to the provider.`);
-    } catch (e) {
-      setError(e instanceof Error ? e.message : "Application preparation failed. Your saved opportunity remains available.");
-    } finally { setSaving(""); }
-  }
+
 
   return (
     <main className="mx-auto max-w-6xl space-y-6 px-4 py-8">
@@ -219,7 +199,7 @@ export default function CandidateOpportunityMatchesPage() {
                   <div className="mt-4 flex flex-wrap gap-3">
                     <button type="button" onClick={()=>void saveOpportunity(item)} disabled={saving===`save:${item.match_ref}` || saving===`prepare:${item.match_ref}`}
                       className="rounded-xl bg-amber-300 px-4 py-3 text-sm font-bold text-slate-950 disabled:opacity-50">
-                      {saving===`save:${item.match_ref}`?"Saving…":savedTargets[item.match_ref]?"Saved to account":"Save opportunity"}
+                      {saving===`save:${item.match_ref}`?"Verifying and preparing…":preparedApplications[item.match_ref]?`Draft ${preparedApplications[item.match_ref]}`:savedTargets[item.match_ref]?"Saved to account":"Save & prepare application"}
                     </button>
                     <button type="button" onClick={()=>void prepareApplication(item)} disabled={!savedTargets[item.match_ref] || saving===`prepare:${item.match_ref}`}
                       className="rounded-xl border border-slate-300 px-4 py-3 text-sm font-semibold text-slate-800 disabled:opacity-50">
