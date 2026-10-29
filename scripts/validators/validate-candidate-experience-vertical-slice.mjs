@@ -39,7 +39,7 @@ assert.ok(opportunityApi.includes("/functions/v1/candidate-save-verified-opportu
 assert.ok(opportunityFunction.includes("candidate_auth_identity_links") && opportunityFunction.includes("IDENTITY_REVIEW_REQUIRED"), "save-to-application must require authorised candidate identity");
 assert.ok(opportunityFunction.includes("OFFICIAL_VERIFIED") && opportunityFunction.includes("external_source_observations") && opportunityFunction.includes("stale_after"), "save-to-application must revalidate fresh official-source evidence");
 assert.ok(opportunityFunction.includes("prepare_candidate_application_from_master_target") && opportunityFunction.includes("candidate_master_application_targets"), "save-to-application must create/reuse the parent application target and invoke the authoritative lifecycle");
-assert.ok(opportunityFunction.includes("candidate_application_tracker") && opportunityFunction.includes("provider submission has not occurred"), "save-to-application must link the tracker without claiming provider submission");
+assert.ok(opportunityFunction.includes("candidate_application_tracker") && opportunityFunction.includes("No provider submission has occurred"), "save-to-application must link the tracker without claiming provider submission");
 assert.ok(applicationsPage.includes("SUBMITTED_CANDIDATE_REPORTED") && applicationsPage.includes("provider receipt not confirmed"), "tracker must keep candidate-reported submission separate from provider receipt");
 assert.ok(documentsPage.includes("/api/candidate/documents/status") && documentsPage.includes("signedUploadUrl"), "Document Vault must retain authenticated private storage API path");
 assert.ok(dashboard.includes('href: "/candidate/profile"'), "candidate dashboard must link to the reusable profile");
