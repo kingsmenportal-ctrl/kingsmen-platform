@@ -68,8 +68,17 @@ Deno.serve(async (req: Request) => {
       .select("observation_ref,source_url,source_title,observed_at,last_checked_at,stale_after,evidence_refs")
       .eq("observation_status", "VERIFIED").eq("source_confidence", "OFFICIAL_VERIFIED")
       .eq("source_url", programme.exact_link).gte("last_checked_at", cutoff)
+      .lte("observed_at", now.toISOString()).lte("last_checked_at", now.toISOString())
       .gt("stale_after", now.toISOString()).limit(1);
     if (!observations?.length) continue;
+    const observation = observations[0];
+    const observedAtMs = Date.parse(observation.observed_at ?? "");
+    const checkedAtMs = Date.parse(observation.last_checked_at ?? "");
+    const staleAfterMs = Date.parse(observation.stale_after ?? "");
+    // Fail closed on future/missing/inconsistent timestamps or missing source evidence.
+    if (!Number.isFinite(observedAtMs) || !Number.isFinite(checkedAtMs) || !Number.isFinite(staleAfterMs) ||
+        observedAtMs > checkedAtMs || checkedAtMs > now.getTime() || staleAfterMs <= now.getTime() ||
+        staleAfterMs <= checkedAtMs || !Array.isArray(observation.evidence_refs) || !observation.evidence_refs.length) continue;
     const { data: deadlines } = await admin.from("opportunity_deadlines")
       .select("deadline_ref,opens_at,closes_at,deadline_status,evidence_refs,timezone")
       .eq("programme_ref", programme.programme_ref).eq("deadline_status", "CONFIRMED")
@@ -85,8 +94,8 @@ Deno.serve(async (req: Request) => {
       location: programme.location_text ?? null,
       official_link: programme.exact_link,
       match_score: match.match_score,
-      source_checked_at: observations[0].last_checked_at,
-      source_evidence: observations[0].evidence_refs,
+      source_checked_at: observation.last_checked_at,
+      source_evidence: observation.evidence_refs,
       deadline: deadline ? { closes_at: deadline.closes_at, timezone: deadline.timezone, evidence: deadline.evidence_refs } : { status: "NOT_VERIFIED", message: "No current confirmed deadline is available; check the official page." },
       eligibility: { status: "REQUIRES_CANDIDATE_REVIEW", rules: "Only separately evidenced and reviewed eligibility rules may be used." },
       recommendation_summary: match.recommendation_summary
