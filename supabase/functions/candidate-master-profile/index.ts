@@ -97,7 +97,7 @@ Deno.serve(async (req: Request) => {
     return reply(400, { ok: false, code: "INVALID_JSON", error: "The profile request must be valid JSON." }, origin);
   }
   const action = payload.action;
-  if (action !== "load" && action !== "save" && action !== "revoke_consent") return reply(400, { ok: false, code: "ACTION_NOT_SUPPORTED", error: "Choose load, save or revoke_consent." }, origin);
+  if (action !== "load" && action !== "save" && action !== "revoke_consent" && action !== "request_correction") return reply(400, { ok: false, code: "ACTION_NOT_SUPPORTED", error: "Choose load, save, revoke_consent or request_correction." }, origin);
   if (action === "save" && payload.consentAccepted !== true) return reply(400, { ok: false, code: "CONSENT_REQUIRED", error: "Consent is required before saving profile changes." }, origin);
   const admin = createClient(SUPABASE_URL, SUPABASE_SERVICE_ROLE_KEY, { auth: { persistSession: false, autoRefreshToken: false } });
   let candidate: { id: string; public_ref: string; display_name: string } | null;
@@ -126,6 +126,13 @@ Deno.serve(async (req: Request) => {
   const consentActive = Boolean(latestConsent?.consent_status === "ACTIVE" && !latestConsent?.revoked_at && latestConsent.consent_text_snapshot);
   const currentProfile = safeProfile(current?.profile_data);
   if (action === "load") {
+    const { data: correctionRequests, error: correctionError } = await admin.from("candidate_profile_change_requests")
+      .select("id,field_name,old_value,requested_value,reason,status,requested_at,decided_at,decision_notes")
+      .eq("candidate_id", candidate.id).order("requested_at", { ascending: false }).limit(50);
+    if (correctionError) {
+      console.error("candidate profile correction read failed", correctionError.code ?? "unknown");
+      return reply(503, { ok: false, code: "CORRECTION_READ_FAILED", error: "Profile correction status could not be loaded." }, origin);
+    }
     const pathways = safePathways(current?.pathway_preferences) ?? [];
     if (!currentProfile.displayName) currentProfile.displayName = candidate.display_name ?? "";
     return reply(200, {
@@ -139,9 +146,38 @@ Deno.serve(async (req: Request) => {
         text: consentActive ? latestConsent?.consent_text_snapshot : CONSENT_TEXT
       },
       completeness: completion(currentProfile, pathways),
+      correctionRequests: correctionRequests ?? [],
       savedAt: current?.updated_at ?? null,
       persistence: "SUPABASE_BACKEND"
     }, origin);
+  }
+  if (action === "request_correction") {
+    if (!current) return reply(409, { ok: false, code: "PROFILE_NOT_SAVED", error: "Save your profile before requesting a correction." }, origin);
+    const fieldName = typeof payload.fieldName === "string" ? payload.fieldName : "";
+    const requestedValue = typeof payload.requestedValue === "string" ? payload.requestedValue.trim() : "";
+    const reason = typeof payload.reason === "string" ? payload.reason.trim() : "";
+    const allowedFields = new Set(Object.keys(FIELD_LIMITS));
+    const maxValue = FIELD_LIMITS[fieldName] ?? 0;
+    if (!allowedFields.has(fieldName) || !requestedValue || requestedValue.length > maxValue || reason.length < 5 || reason.length > 800) {
+      return reply(400, { ok: false, code: "CORRECTION_INPUT_INVALID", error: "Select a supported profile field, enter the requested value and provide a reason (5–800 characters)." }, origin);
+    }
+    if ((currentProfile[fieldName] ?? "") === requestedValue) return reply(400, { ok: false, code: "CORRECTION_NOT_NEEDED", error: "The requested value already matches the saved profile field." }, origin);
+    const { data: existing, error: existingError } = await admin.from("candidate_profile_change_requests")
+      .select("id").eq("candidate_id", candidate.id).eq("field_name", fieldName).eq("status", "PENDING").limit(1).maybeSingle();
+    if (existingError) {
+      console.error("candidate correction duplicate check failed", existingError.code ?? "unknown");
+      return reply(503, { ok: false, code: "CORRECTION_CHECK_FAILED", error: "Could not check for a pending correction request." }, origin);
+    }
+    if (existing) return reply(409, { ok: false, code: "CORRECTION_ALREADY_PENDING", error: "A correction request for this field is already pending review." }, origin);
+    const { data: created, error: createError } = await admin.from("candidate_profile_change_requests").insert({
+      candidate_id: candidate.id, field_name: fieldName, old_value: currentProfile[fieldName] ?? null,
+      requested_value: requestedValue, reason, sensitivity: "NORMAL", status: "PENDING"
+    }).select("id,field_name,old_value,requested_value,reason,status,requested_at").single();
+    if (createError || !created) {
+      console.error("candidate correction create failed", createError?.code ?? "unknown");
+      return reply(503, { ok: false, code: "CORRECTION_SAVE_FAILED", error: "The correction request could not be saved." }, origin);
+    }
+    return reply(201, { ok: true, correctionRequest: created, message: "Correction request submitted. Your saved profile was not changed; an authorised reviewer must decide the request." }, origin);
   }
   if (action === "revoke_consent") {
     if (consentRows?.some((row: Record<string, unknown>) => row.consent_status === "ACTIVE")) {
