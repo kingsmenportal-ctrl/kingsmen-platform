@@ -75,7 +75,7 @@ begin
   -- Serialize idempotency before checking or creating any durable checkout rows.
   perform pg_advisory_xact_lock(hashtextextended('payfast-sandbox-checkout:' || p_idempotency_key, 0));
 
-  select count(*), min(l.candidate_id) into v_link_count, v_candidate_id
+  select count(*), (array_agg(l.candidate_id))[1] into v_link_count, v_candidate_id
   from public.candidate_auth_identity_links l
   where l.supabase_user_id = p_supabase_user_id
     and l.candidate_id::text = p_candidate_ref
