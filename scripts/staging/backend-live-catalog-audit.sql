@@ -135,10 +135,11 @@ from pg_sequences
 where schemaname in ('public','private','kingsmen_security','storage')
 order by schemaname, sequencename;
 
-select object_schema, object_name, grantee, privilege_type, is_grantable
+select specific_schema as object_schema, specific_name as object_name,
+       grantee, privilege_type, is_grantable
 from information_schema.role_routine_grants
-where object_schema in ('public','private','kingsmen_security','storage')
-order by object_schema, object_name, grantee, privilege_type;
+where specific_schema in ('public','private','kingsmen_security','storage')
+order by specific_schema, specific_name, grantee, privilege_type;
 
 -- 14. Default ACLs and role memberships can silently expand future privileges.
 select pg_get_userbyid(d.defaclrole) as owner_role,
