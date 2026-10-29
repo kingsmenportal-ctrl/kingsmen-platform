@@ -2,7 +2,7 @@ name: Kingsmen Source Guard
 
 on:
   pull_request:
-    branches: [main, feat/release-engineering-evidence-pipeline]
+    branches: [main, feat/release-engineering-evidence-pipeline, feat/backend-simplification-baseline-2026-10-29]
   push:
     branches: [main, feat/staging-authenticated-e2e-gate, feat/backend-simplification-baseline-2026-10-29]
   workflow_dispatch:
@@ -66,6 +66,9 @@ jobs:
 
       - name: Safe web/backend boundary validator
         run: npm run web:validate:backend-boundary
+
+      - name: Candidate Experience vertical-slice contract
+        run: npm run candidate:experience:check
 
       - name: PayFast sandbox source proof
         run: npm run payments:prove:sandbox
