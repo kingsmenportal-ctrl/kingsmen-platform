@@ -272,8 +272,7 @@ async function finalizeUpload(req: Request, body: Record<string, unknown>, ctx: 
   }
   const { data: doc, error: docError } = await ctx.admin.from("candidate_private_documents")
     .select("id,candidate_id,created_by_auth_user_id,storage_bucket,storage_path,mime_type,size_bytes,status,sha256_hex")
-    .eq("id", documentId).eq("candidate_id", ctx.candidateId)
-    .eq("created_by_auth_user_id", ctx.userId).maybeSingle();
+    .eq("id", documentId).eq("candidate_id", ctx.candidateId).maybeSingle();
   if (docError) return fail(req, 503, "DOCUMENT_LOOKUP_FAILED");
   if (!doc) return fail(req, 404, "DOCUMENT_NOT_FOUND");
   if (doc.storage_bucket !== DOCUMENT_BUCKET) return fail(req, 409, "DOCUMENT_STORAGE_BUCKET_MISMATCH");
@@ -335,8 +334,7 @@ async function readUrl(req: Request, body: Record<string, unknown>, ctx: Candida
   }
   const { data: doc, error: lookupError } = await ctx.admin.from("candidate_private_documents")
     .select("id,candidate_id,created_by_auth_user_id,storage_bucket,storage_path,original_filename,mime_type,size_bytes,status")
-    .eq("id", documentId).eq("candidate_id", ctx.candidateId)
-    .eq("created_by_auth_user_id", ctx.userId).maybeSingle();
+    .eq("id", documentId).eq("candidate_id", ctx.candidateId).maybeSingle();
   if (lookupError) return fail(req, 503, "DOCUMENT_LOOKUP_FAILED");
   if (!doc) return fail(req, 404, "DOCUMENT_NOT_FOUND");
   if (doc.storage_bucket !== DOCUMENT_BUCKET ||
@@ -372,9 +370,8 @@ async function readUrl(req: Request, body: Record<string, unknown>, ctx: Candida
 
 async function listDocuments(req: Request, ctx: CandidateContext): Promise<Response> {
   const { data, error } = await ctx.admin.from("candidate_private_documents")
-    .select("id,document_type,original_filename,mime_type,size_bytes,status,sha256_hex,uploaded_at,created_at,updated_at")
+    .select("id,document_type,application_id,preparation_item_id,original_filename,mime_type,size_bytes,status,sha256_hex,uploaded_at,created_at,updated_at")
     .eq("candidate_id", ctx.candidateId)
-    .eq("created_by_auth_user_id", ctx.userId)
     .order("created_at", { ascending: false }).limit(100);
   if (error) return fail(req, 503, "DOCUMENT_LIST_FAILED");
   const { data: applications, error: applicationError } = await ctx.admin.from("candidate_applications")
