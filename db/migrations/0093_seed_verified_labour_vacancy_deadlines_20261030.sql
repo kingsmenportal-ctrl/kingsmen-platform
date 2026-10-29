@@ -81,6 +81,7 @@ updated_programmes as (
   from verified_vacancies v
   where p.programme_key = v.programme_key
     and p.programme_name is not null
+    and p.metadata->>'closing_date' = '2026-10-30'
   returning p.id, p.programme_key
 )
 insert into public.route_deadlines (
