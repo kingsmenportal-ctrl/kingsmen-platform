@@ -7,8 +7,10 @@ const root = process.cwd();
 const read = (path) => readFileSync(resolve(root, path), "utf8");
 const edge = read("supabase/functions/payfast-sandbox/index.ts");
 const migration = read("db/migrations/0092_atomic_payfast_checkout_bundle.sql");
+const contentLengthPattern = edge.match(/if \(!\/(.*?)\/\.test\(declaredLength\)\)/);
 
 const checks = [
+  [Boolean(contentLengthPattern && new RegExp(contentLengthPattern[1]).test("123") && !new RegExp(contentLengthPattern[1]).test("12x")), "ITN Content-Length validation accepts decimal lengths and rejects malformed values"],
   [edge.includes('rest("rpc/create_payfast_sandbox_checkout_bundle"'), "checkout writes use one atomic RPC"],
   [!edge.includes('await rest("finance_orders"') && !edge.includes('await rest("finance_invoices"') && !edge.includes('await rest("payfast_payment_intents"'), "checkout no longer inserts bundle rows through separate REST writes"],
   [edge.includes("HOSTED_CHECKOUT_FIELD_ORDER"), "hosted form field order is explicit"],
