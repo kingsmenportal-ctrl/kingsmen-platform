@@ -88,10 +88,14 @@ export default function CandidateDocumentsPage() {
       if (!intentResponse.ok || intent.ok !== true || typeof intent.signedUploadUrl !== "string" || typeof intent.document?.id !== "string") {
         setNotice(apiMessage(intent)); return;
       }
-      const form = new FormData();
-      form.append("cacheControl", "3600");
-      form.append("", file);
-      const uploaded = await fetch(intent.signedUploadUrl, { method: "PUT", headers: { "x-upsert": "false" }, body: form, cache: "no-store", redirect: "error" });
+      // Supabase signed-upload URLs accept the raw file body, not multipart FormData.
+      const uploaded = await fetch(intent.signedUploadUrl, {
+        method: "PUT",
+        headers: { "x-upsert": "false", "Content-Type": file.type },
+        body: file,
+        cache: "no-store",
+        redirect: "error"
+      });
       if (!uploaded.ok) { setNotice("Private storage rejected the upload. It has not been marked as received."); await refresh(); return; }
 
       const finalizedResponse = await fetch("/api/candidate/documents/finalize", {
