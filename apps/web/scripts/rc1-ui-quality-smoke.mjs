@@ -126,6 +126,7 @@ try {
         report.checks.push(check);
         if (responseStatus === null || responseStatus >= 500) report.failures.push(`${label}: server response ${responseStatus}`);
         if (responseStatus === 404) report.failures.push(`${label}: route not found`);
+        if (snapshot.viewportWidth !== viewport.width) report.failures.push(`${label}: viewport mismatch; requested ${viewport.width}px but browser reports ${snapshot.viewportWidth}px`);
         if (!snapshot.bodyTextLength) report.failures.push(`${label}: blank page`);
         if (snapshot.lang !== "en-ZA") report.failures.push(`${label}: expected html lang=en-ZA, got ${snapshot.lang || "(missing)"}`);
         if (!snapshot.hasMain) report.failures.push(`${label}: missing main landmark`);
