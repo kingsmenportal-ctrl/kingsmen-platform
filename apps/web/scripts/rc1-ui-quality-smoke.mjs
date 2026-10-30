@@ -109,7 +109,7 @@ try {
             .map(el => ({ tag: el.tagName.toLowerCase(), type: el.getAttribute("type"), id: el.id, name: el.getAttribute("name") }));
           const imagesWithoutAlt = [...document.images].filter(img => !img.hasAttribute("alt")).map(img => img.src);
           const parseColor = (value) => {
-            const parts = value.match(/[\\d.]+/g);
+            const parts = value.match(/[0-9.]+/g);
             if (!parts || parts.length < 3) return null;
             return { r: Number(parts[0]), g: Number(parts[1]), b: Number(parts[2]), a: parts.length > 3 ? Number(parts[3]) : 1 };
           };
