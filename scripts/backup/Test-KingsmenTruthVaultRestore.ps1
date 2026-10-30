@@ -4,6 +4,8 @@ param(
   [Parameter(Mandatory=$true)][string]$BackupFile,
   [string]$RestoreDatabaseUrl = $env:KINGSMEN_RESTORE_DRILL_DATABASE_URL,
   [string]$SourceDatabaseUrl = $env:KINGSMEN_DATABASE_URL,
+  [string]$ExpectedRestoreHost = $env:KINGSMEN_RESTORE_DRILL_EXPECTED_HOST,
+  [string]$ExpectedRestoreDatabaseName = $env:KINGSMEN_RESTORE_DRILL_EXPECTED_DATABASE,
   [string]$ReportPath = "reports/ops/backup-restore-staging-drill-latest.json",
   [switch]$ConfirmDestructiveRestore,
   [switch]$DryRun
@@ -19,6 +21,28 @@ if ([string]::IsNullOrWhiteSpace($RestoreDatabaseUrl)) {
 }
 if (-not $DryRun -and -not $ConfirmDestructiveRestore) {
   throw "Destructive restore blocked. Re-run only against an approved disposable restore target with -ConfirmDestructiveRestore."
+}
+
+if (-not $DryRun) {
+  if ([string]::IsNullOrWhiteSpace($ExpectedRestoreHost) -or [string]::IsNullOrWhiteSpace($ExpectedRestoreDatabaseName)) {
+    throw "KINGSMEN_RESTORE_DRILL_EXPECTED_HOST and KINGSMEN_RESTORE_DRILL_EXPECTED_DATABASE are required for destructive restore."
+  }
+  try {
+    $sourceUri = [Uri]$SourceDatabaseUrl
+    $restoreUri = [Uri]$RestoreDatabaseUrl
+    if (-not $sourceUri.IsAbsoluteUri -or -not $restoreUri.IsAbsoluteUri -or
+        [string]::IsNullOrWhiteSpace($sourceUri.DnsSafeHost) -or [string]::IsNullOrWhiteSpace($restoreUri.DnsSafeHost)) {
+      throw "Database connection URL is invalid."
+    }
+  } catch {
+    throw "Source or restore database URL could not be parsed; no restore was attempted."
+  }
+  if ($restoreUri.DnsSafeHost -ine $ExpectedRestoreHost.Trim()) {
+    throw "Restore URL host does not match the explicitly approved disposable restore host."
+  }
+  if ($sourceUri.DnsSafeHost -ieq $restoreUri.DnsSafeHost) {
+    throw "Restore host must differ from the source host; destructive restore blocked."
+  }
 }
 if (-not (Test-Path $BackupFile)) {
   throw "Backup file not found: $BackupFile"
@@ -57,6 +81,13 @@ if ([string]::IsNullOrWhiteSpace($restoreIdentity) -or $restoreIdentity -notmatc
 }
 if ($sourceIdentity -eq $restoreIdentity) {
   throw "Restore target resolves to the source database. Restore drill blocked."
+}
+
+if (-not $DryRun) {
+  $actualRestoreDatabaseName = $restoreIdentity.Split('|')[0]
+  if ($actualRestoreDatabaseName -cne $ExpectedRestoreDatabaseName) {
+    throw "Restore database name does not match the explicitly approved disposable restore database."
+  }
 }
 
 $sha256 = (Get-FileHash -Algorithm SHA256 -Path $BackupFile).Hash
