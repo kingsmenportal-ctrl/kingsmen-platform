@@ -19,6 +19,9 @@ const candidateLinks: NavigationLink[] = [
   { href: "/candidate/documents", label: "Documents" },
   { href: "/pricing", label: "Packages" }
 ];
+const reviewerLinks: NavigationLink[] = [
+  { href: "/reviewer/identity-reviews", label: "Identity-review queue" }
+];
 const founderLinks: NavigationLink[] = [
   { href: "/founder/control-plane", label: "Control plane" },
   { href: "/founder-command", label: "Founder command" },
@@ -33,11 +36,12 @@ function isCurrent(pathname: string, href: string) {
 export default function ProductHeader() {
   const pathname = usePathname() || "/";
   const isCandidate = pathname.startsWith("/candidate");
+  const isReviewer = pathname.startsWith("/reviewer");
   const isFounder = pathname.startsWith("/founder") || pathname === "/founder-command" ||
     pathname === "/control-plane" || pathname === "/command" || pathname.startsWith("/admin");
-  const links = isCandidate ? candidateLinks : isFounder ? founderLinks : publicLinks;
-  const audience = isCandidate ? "Candidate workspace" : isFounder ? "Founder workspace" : "South Africa · Education · Skills · Work";
-  const navLabel = isCandidate ? "Candidate workspace navigation" : isFounder ? "Founder workspace navigation" : "Public website navigation";
+  const links = isCandidate ? candidateLinks : isReviewer ? reviewerLinks : isFounder ? founderLinks : publicLinks;
+  const audience = isCandidate ? "Candidate workspace" : isReviewer ? "Restricted reviewer workspace" : isFounder ? "Founder workspace" : "South Africa · Education · Skills · Work";
+  const navLabel = isCandidate ? "Candidate workspace navigation" : isReviewer ? "Restricted reviewer navigation" : isFounder ? "Founder workspace navigation" : "Public website navigation";
   return (
     <header className="km-site-header">
       <div className="km-site-header__inner">

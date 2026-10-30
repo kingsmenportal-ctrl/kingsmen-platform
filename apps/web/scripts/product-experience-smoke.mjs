@@ -15,7 +15,8 @@ const routes = [
   { route: "/pricing", label: "packages" },
   { route: "/candidate/dashboard", label: "candidate-dashboard" },
   { route: "/candidate/mobile", label: "candidate-mobile" },
-  { route: "/founder/control-plane", label: "founder-control-plane" }
+  { route: "/founder/control-plane", label: "founder-control-plane" },
+  { route: "/reviewer/identity-reviews", label: "reviewer-identity-queue" }
 ];
 const widths = [320, 360, 390, 768, 1024, 1440];
 const failures = [];
@@ -149,7 +150,7 @@ async function main() {
     limitations: [
       "Screenshots are CI review artifacts; pixel-diff comparison still requires an approved reference baseline.",
       "This browser suite does not replace screen-reader and manual assistive-technology testing.",
-      "Authenticated candidate/reviewer mutations are not run by this public surface smoke suite."
+      "Authenticated candidate/reviewer mutations are not run by this public surface smoke suite; reviewer UI access is a backend-grant-gated route."
     ],
     failures
   };

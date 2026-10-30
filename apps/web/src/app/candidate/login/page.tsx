@@ -25,7 +25,8 @@ function saveSession(session: Record<string, unknown>) {
 
 function candidateRedirect(): string {
   const requested = new URLSearchParams(window.location.search).get("next") ?? "/candidate/dashboard";
-  return requested.startsWith("/candidate/") && !requested.startsWith("//")
+  const safeWorkspacePath = requested.startsWith("/candidate/") || requested.startsWith("/reviewer/");
+  return safeWorkspacePath && !requested.startsWith("//") && !requested.includes("\\\\")
     ? requested
     : "/candidate/dashboard";
 }
