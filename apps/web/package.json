@@ -6,7 +6,8 @@
   "scripts": {
     "dev": "next dev -H 127.0.0.1 -p 3000",
     "build": "next build",
-    "start": "next start -H 127.0.0.1 -p 3000"
+    "start": "next start -H 127.0.0.1 -p 3000",
+    "ui:rc1:smoke": "node scripts/rc1-ui-quality-smoke.mjs"
   },
   "dependencies": {
     "mammoth": "^1.12.0",
