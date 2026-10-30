@@ -10,6 +10,8 @@ const profileFunction = read("supabase/functions/candidate-master-profile/index.
 const opportunityPage = read("apps/web/src/app/candidate/opportunity-matches/page.tsx");
 const applicationRoute = read("apps/web/src/app/api/candidate/applications/route.ts");
 const preparation = read("supabase/functions/candidate-application-preparation/index.ts");
+const opportunitySaveRoute = read("apps/web/src/app/api/candidate/opportunity-save/route.ts");
+const verifiedOpportunitySave = read("supabase/functions/candidate-save-verified-opportunity/index.ts");
 const dashboard = read("apps/web/src/app/candidate/dashboard/page.tsx");
 const identityPage = read("apps/web/src/app/candidate/identity-review/page.tsx");
 const identityRoute = read("apps/web/src/app/api/candidate/identity-review/route.ts");
@@ -30,6 +32,11 @@ const checks = [
   ["candidate session key derives from configured Supabase project ref", /new URL\(base\).hostname.split\("\."\)\[0\]/.test(session) && /sb-\$\{projectRef\}-auth-token/.test(session)],
   ["six pathway filters are present", ["HIGHER_EDUCATION","TVET","SETA_LEARNERSHIPS","INTERNSHIPS","APPRENTICESHIPS","EMPLOYMENT"].every(x => opportunityPage.includes(x))],
   ["N15 feed fails closed on missing/stale evidence", /n15-candidate-opportunities/.test(opportunityPage) && /stale|verified/i.test(opportunityPage)],
+  ["candidate opportunity save uses dedicated authenticated API proxy", /candidate-save-verified-opportunity/.test(opportunitySaveRoute) && /AUTHENTICATION_REQUIRED/.test(opportunitySaveRoute) && /cache: "no-store"/.test(opportunitySaveRoute)],
+  ["save action revalidates authorized identity and candidate-scoped match", /candidate_auth_identity_links/.test(verifiedOpportunitySave) && /link_status!=="VERIFIED"/.test(verifiedOpportunitySave) && /eq("candidate_ref",candidateId)/.test(verifiedOpportunitySave) && /eq("match_status","APPROVED")/.test(verifiedOpportunitySave)],
+  ["save action rechecks official provenance, freshness and open status", /OFFICIAL_VERIFIED/.test(verifiedOpportunitySave) && /stale_after/.test(verifiedOpportunitySave) && /opening_status!=="OPEN"/.test(verifiedOpportunitySave) && /human_review_required",false/.test(verifiedOpportunitySave)],
+  ["opportunity page automatically loads authenticated feed and persisted draft state", /useEffect/.test(opportunityPage) && /void loadMatches\(\)/.test(opportunityPage) && /loadSavedWorkbench/.test(opportunityPage) && /masterTargets/.test(opportunityPage) && /parentApplications/.test(opportunityPage)],
+  ["save UI uses the verified saver and keeps provider submission unclaimed", /\/api\/candidate\/opportunity-save/.test(opportunityPage) && /No provider submission has occurred/.test(verifiedOpportunitySave) && /prepareApplication\(item\)/.test(opportunityPage) === false],
   ["opportunity save and master-application actions are whitelisted", /save_n15_match/.test(applicationRoute) && /prepare_master_application/.test(applicationRoute) && /save_n15_match/.test(preparation) && /prepare_master_application/.test(preparation)],
   ["CAO remains governed by existing shared child-choice validator", /validateApplicationChildChoices/.test(read("apps/api/src/routes/application-lifecycle-policy.ts")) && /caoIsOneKingsmenApplication/.test(read("apps/api/src/routes/cao-boundary.ts"))],
   ["application status remains candidate-reported, not provider confirmation", /SUBMITTED_CANDIDATE_REPORTED/.test(preparation) && /provider_submission_sent:false/.test(preparation)],
