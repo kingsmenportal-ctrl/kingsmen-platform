@@ -49,6 +49,27 @@ Deno.serve(async(req:Request)=>{
   if(!link||link.link_status!=="VERIFIED"||!Number.isFinite(verifiedAt)||verifiedAt>Date.now()||typeof link.verified_by!=="string"||!UUID.test(link.verified_by))
     return reply(403,{ok:false,code:"IDENTITY_REVIEW_REQUIRED",error:"An authorised reviewer must verify your candidate identity before an opportunity can be saved to an application."},origin);
   const candidateId=String(link.candidate_id);
+
+  const {data:candidate,error:candidateError}=await admin.from("candidates")
+    .select("id,public_ref").eq("id",candidateId).maybeSingle();
+  if(candidateError||!candidate?.public_ref) {
+    console.error("candidate consent identity lookup failed",candidateError?.code??"missing_candidate");
+    return reply(503,{ok:false,code:"CONSENT_LOOKUP_FAILED",error:"The candidate consent state could not be verified."},origin);
+  }
+  const {data:consentRows,error:consentError}=await admin.from("privacy_consent_records")
+    .select("consent_status,revoked_at,consent_text_snapshot,granted_at")
+    .eq("candidate_ref",candidate.public_ref).eq("consent_type","PROFILE_PROCESSING")
+    .order("granted_at",{ascending:false}).limit(20);
+  if(consentError) {
+    console.error("candidate consent lookup failed",consentError.code??"unknown");
+    return reply(503,{ok:false,code:"CONSENT_LOOKUP_FAILED",error:"The candidate consent state could not be verified."},origin);
+  }
+  const consentActive=(consentRows??[]).some((row:any)=>row.consent_status==="ACTIVE"&&!row.revoked_at&&
+    typeof row.consent_text_snapshot==="string"&&row.consent_text_snapshot.trim().length>0&&
+    Number.isFinite(Date.parse(row.granted_at))&&Date.parse(row.granted_at)<=Date.now());
+  if(!consentActive) {
+    return reply(403,{ok:false,code:"CONSENT_REQUIRED",error:"Active profile-processing consent is required before saving an opportunity to the application workbench. Review consent in your profile and try again."},origin);
+  }
   const {data:match,error:matchError}=await admin.from("candidate_opportunity_matches")
     .select("candidate_match_ref,candidate_ref,programme_ref,provider_ref,sector,match_status,source_confidence,human_review_required,sealed_exact_target,recommendation_summary")
     .eq("candidate_match_ref",matchRef).eq("candidate_ref",candidateId).eq("match_status","APPROVED")
