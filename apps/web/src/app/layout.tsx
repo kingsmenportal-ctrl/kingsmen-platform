@@ -1,8 +1,8 @@
 import type { Metadata } from "next";
 
 export const metadata: Metadata = {
-  title: "Kingsmen Portal",
-  description: "Kingsmen Free Destiny Map local runtime shell"
+  title: "Kingsmen One | Kingsmen Portal",
+  description: "One Kingsmen account for verified education, training, internship, apprenticeship and employment pathways across South Africa."
 };
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
