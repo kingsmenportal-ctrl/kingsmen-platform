@@ -24,15 +24,15 @@ jobs:
           cache: 'npm'
       - name: Install repository dependencies
         run: npm ci
+      - name: Install API dependencies
+        run: npm install --prefix apps/api --no-audit --no-fund
+      - name: Install web dependencies
+        run: npm install --prefix apps/web --no-audit --no-fund
       - name: Full repository regression suite
         run: npm test
       - name: Candidate Experience source-contract regression
         run: npm run candidate:experience:check
-      - name: Install API dependencies
-        run: npm install --prefix apps/api --no-audit --no-fund
       - name: Build backend API
         run: npm run api:build
-      - name: Install web dependencies
-        run: npm install --prefix apps/web --no-audit --no-fund
       - name: Build Next.js web application
         run: npm --prefix apps/web run build
