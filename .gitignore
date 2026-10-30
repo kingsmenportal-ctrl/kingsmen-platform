@@ -207,3 +207,6 @@ backups/
 *.backup
 *.sql.gz
 *.restore.local.json
+
+# Browser test output uploaded as GitHub Actions artifacts
+apps/web/test-results/

@@ -2,9 +2,9 @@ name: Kingsmen Release Evidence
 
 on:
   pull_request:
-    branches: [main, feat/backend-simplification-baseline-2026-10-29]
-  push:
     branches: [main, feat/backend-simplification-baseline-2026-10-29, feat/candidate-experience-closeout-2026-10-30]
+  push:
+    branches: [main, feat/backend-simplification-baseline-2026-10-29, feat/candidate-experience-closeout-2026-10-30, feat/kingsmen-product-unification-rc1-2026-10-30]
   workflow_dispatch:
 
 permissions:
@@ -17,7 +17,7 @@ concurrency:
 jobs:
   build-validate-smoke:
     name: Build, validate, and smoke-test
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     timeout-minutes: 20
     steps:
       - name: Check out source
@@ -45,6 +45,12 @@ jobs:
 
       - name: Build Next.js web application
         run: npm run build --prefix apps/web
+
+      - name: Install Chromium for browser experience checks
+        run: npm exec --prefix apps/web -- playwright install --with-deps chromium
+
+      - name: Run mobile, accessibility and responsive-layout smoke checks
+        run: npm run test:experience --prefix apps/web
 
       - name: Validate Truth Vault persistence contract
         run: npm run api:validate

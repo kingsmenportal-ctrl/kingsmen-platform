@@ -64,10 +64,6 @@ export default function HomePage() {
         @media(max-width:560px){.km-wrap{width:min(100% - 28px,1180px)}.km-nav{height:auto;min-height:74px;flex-wrap:wrap;padding:14px 0}.km-navlinks{width:100%;justify-content:space-between;font-size:11px;padding-bottom:4px}.km-navlinks .km-nav-cta{display:none}.km-hero h1{letter-spacing:-1.8px}.km-cards,.km-steps,.km-trust{grid-template-columns:1fr}.km-section{padding:52px 0}.km-section-head{display:block}}
       `}</style>
       <div className="km-wrap">
-        <nav className="km-nav" aria-label="Main navigation">
-          <a className="km-brand" href="#top"><span className="km-mark">K</span><span><strong style={{display:"block",fontSize:13,letterSpacing:2.5}}>KINGSMEN</strong><small style={{display:"block",color:"#98a5b8",fontSize:10,marginTop:4}}>YOUR OPPORTUNITY, CONNECTED</small></span></a>
-          <div className="km-navlinks"><a href="#pathways">Pathways</a><a href="#how-it-works">How it works</a><a href="#principles">Our principles</a><a className="km-nav-cta km-btn km-primary" href="/free-destiny-map/">Start your journey ↗</a></div>
-        </nav>
         <section id="top" className="km-hero">
           <div className="km-hero-grid">
             <div><div className="km-eyebrow">South Africa · Education · Skills · Work</div><h1>Your future is bigger than <span className="km-gold">one application.</span></h1><p className="km-lead">One connected starting point for exploring study, skills development, work and funding pathways—with preparation and evidence at the centre of every step.</p><div className="km-cta"><a className="km-btn km-primary" href="/free-destiny-map/">Explore my pathways <span aria-hidden="true">↗</span></a><a className="km-btn km-secondary" href="#pathways">Discover the possibilities</a></div><p className="km-note">Built for the South African journey. Opportunity information must be checked against authoritative sources; no application outcome is promised.</p></div>

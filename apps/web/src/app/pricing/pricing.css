@@ -1,0 +1,20 @@
+.km-pricing-page{min-height:calc(100vh - 76px);padding:clamp(2rem,5vw,4.5rem) 0;background:#07101d;color:#f4f6fa}
+.km-pricing-wrap{width:min(1180px,calc(100% - 36px));margin:0 auto}.km-pricing-intro{max-width:830px;margin:0 auto 2.5rem;text-align:center}
+.km-pricing-eyebrow{color:#e8c77d;font-size:.72rem;font-weight:850;letter-spacing:.2em;text-transform:uppercase}
+.km-pricing-intro h1{margin:.8rem 0 1rem;font-size:clamp(2rem,5vw,3.5rem);line-height:1.05;letter-spacing:-.04em}
+.km-pricing-intro>p:not(.km-pricing-eyebrow){max-width:690px;margin:0 auto;color:#b4c1d2;line-height:1.8}
+.km-pricing-law{display:grid;gap:.4rem;margin:1.6rem auto 0;padding:1rem 1.2rem;max-width:700px;border:1px solid rgba(232,199,125,.38);border-radius:14px;background:rgba(232,199,125,.07)}
+.km-pricing-law strong{color:#f1d99d;font-size:.9rem}.km-pricing-law span{color:#c5d0dd;font-size:.86rem;line-height:1.55}
+.km-package-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:1rem;align-items:stretch}
+.km-package-card{display:flex;flex-direction:column;min-width:0;padding:clamp(1.1rem,2vw,1.5rem);border:1px solid #33445d;border-radius:18px;background:linear-gradient(155deg,#142238,#0d1828);box-shadow:0 16px 38px rgba(0,0,0,.18)}
+.km-package-kicker{margin:0;color:#83d9ed;font-size:.68rem;font-weight:800;letter-spacing:.12em;text-transform:uppercase}
+.km-package-card h2{margin:.8rem 0 .4rem;font-size:1.35rem;line-height:1.2}.km-package-description{min-height:3.3rem;margin:.25rem 0 .7rem;color:#b4c1d2;font-size:.88rem;line-height:1.6}
+.km-package-price{margin:.8rem 0 1rem}.km-package-price strong{font-size:clamp(2rem,3vw,2.65rem);letter-spacing:-.04em;color:#f4d994}.km-package-price span{color:#93a5ba;font-size:.75rem}
+.km-package-metrics{display:grid;gap:.5rem;margin:0}.km-package-metrics div{display:flex;align-items:flex-start;justify-content:space-between;gap:.8rem;padding:.65rem 0;border-top:1px solid rgba(131,156,187,.22)}
+.km-package-metrics dt{color:#aebdd0;font-size:.78rem;line-height:1.5}.km-package-metrics dd{margin:0;color:#f4f6fa;text-align:right;font-size:.82rem;font-weight:800}
+.km-package-boundary{margin:auto 0 1rem;padding-top:.9rem;color:#aebdd0;font-size:.76rem;line-height:1.6}
+.km-package-cta{min-height:46px;display:flex;align-items:center;justify-content:center;padding:.7rem 1rem;border:1px solid #d7b86d;border-radius:10px;background:linear-gradient(135deg,#f1d99d,#c69a4a);color:#151a21!important;text-decoration:none;font-size:.84rem;font-weight:850}
+.km-package-cta:hover{filter:brightness(1.06)}.km-pathway-access{margin-top:2rem;padding:clamp(1.25rem,3vw,2rem);border:1px solid #33445d;border-radius:18px;background:#101b2b}
+.km-pathway-access h2{margin:.4rem 0 1rem;font-size:clamp(1.4rem,3vw,2rem)}.km-pathway-access ul{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:.6rem 1.2rem;margin:1rem 0;padding-left:1.2rem;color:#d3dce7}
+.km-pathway-access li{padding:.2rem 0;line-height:1.55}.km-pathway-access>p:last-child,.km-pricing-note{color:#a8b7ca;font-size:.83rem;line-height:1.7}.km-pricing-note{margin:1.25rem 0 0;text-align:center}
+@media(max-width:980px){.km-package-grid{grid-template-columns:repeat(2,minmax(0,1fr))}}@media(max-width:640px){.km-package-grid{grid-template-columns:1fr}.km-package-description{min-height:0}.km-pathway-access ul{grid-template-columns:1fr}}
