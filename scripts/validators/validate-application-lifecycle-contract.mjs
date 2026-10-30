@@ -19,6 +19,8 @@ check("route tracker enables RLS and authenticated owner checks", initial.includ
 check("candidate submission requires reference and timestamp", integrity.includes("candidate_reported_submitted_at is not null") && integrity.includes("length(trim(candidate_submission_reference))"));
 check("provider statuses are not accepted without verified provider-origin evidence in adapter", policy.includes('sourceKind !== "PROVIDER_ORIGIN"') && policy.includes("verifiedByAuthUserId") && policy.includes("isUuid(e.verifiedByAuthUserId)") && policy.includes("isUuid(evidence.verifiedByAuthUserId)"));
 check("candidate submission never implies provider confirmation", policy.includes("this is not provider-confirmed receipt"));
+check("candidate-reported evidence rejects future timestamps", policy.includes("isCurrentOrPastTimestamp(evidence.reportedAt)") && policy.includes("isCurrentOrPastTimestamp(e.reportedAt)"));
+check("provider evidence rejects future verification timestamps", policy.includes("isCurrentOrPastTimestamp(evidence.verifiedAt)") && policy.includes("isCurrentOrPastTimestamp(e.verifiedAt)"));
 check("legacy applications workflow statuses remain unresolved absent evidence-backed mapping", policy.includes('if (input.source !== "candidate_route_applications")') && policy.includes('status: "LEGACY_UNRESOLVED"'));
 check("CAO boundary delegates to one shared child-choice policy", cao.includes("validateApplicationChildChoices(choices)") && policy.includes("one parent Kingsmen application"));
 
