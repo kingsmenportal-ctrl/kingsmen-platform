@@ -1,6 +1,6 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 import { getCandidateAccessToken, getCandidateSupabaseConfig } from "../../../lib/candidate-session";
 
 const PATHWAYS = [
@@ -30,6 +30,9 @@ type Opportunity = {
 
 type Feed = { status: string; count?: number; opportunities?: Opportunity[]; message?: string; empty_reason?: string };
 
+type MasterTarget = { target_key: string; application_id: string | null; planning_status: string };
+type ParentApplication = { id: string; application_ref?: string | null; status?: string };
+
 function getAccessToken(): string | null { return getCandidateAccessToken(); }
 
 export default function CandidateOpportunityMatchesPage() {
@@ -43,8 +46,9 @@ export default function CandidateOpportunityMatchesPage() {
   const [preparedApplications, setPreparedApplications] = useState<Record<string, string>>({});
   const [selectedPathways, setSelectedPathways] = useState<Record<string, string>>({});
   const [expanded, setExpanded] = useState<Record<string, boolean>>({});
+  const [workbenchStatus, setWorkbenchStatus] = useState("");
 
-  async function loadMatches() {
+  const loadMatches = useCallback(async () => {
     setLoading(true);
     setError("");
     setFeed(null);
@@ -72,7 +76,49 @@ export default function CandidateOpportunityMatchesPage() {
     } finally {
       setLoading(false);
     }
-  }
+  }, []);
+
+  const loadSavedWorkbench = useCallback(async () => {
+    const token = getAccessToken();
+    if (!token) return;
+    try {
+      const response = await fetch("/api/candidate/applications", {
+        method: "GET",
+        headers: { Authorization: `Bearer ${token}` },
+        cache: "no-store"
+      });
+      const body = await response.json();
+      if (!response.ok || body.ready !== true) {
+        setWorkbenchStatus(typeof body.error === "string" ? body.error : "Saved application state could not be reloaded. Open the tracker to inspect the current server response.");
+        return;
+      }
+      const targets = Array.isArray(body.masterTargets) ? body.masterTargets as MasterTarget[] : [];
+      const applications = Array.isArray(body.parentApplications) ? body.parentApplications as ParentApplication[] : [];
+      const saved: Record<string, string> = {};
+      const prepared: Record<string, string> = {};
+      for (const target of targets) {
+        if (typeof target.target_key !== "string" || !target.target_key.startsWith("n15:")) continue;
+        const matchRef = target.target_key.slice(4);
+        if (!matchRef) continue;
+        saved[matchRef] = target.target_key;
+        if (target.application_id) {
+          const app = applications.find(value => value.id === target.application_id);
+          prepared[matchRef] = app?.application_ref || "Draft saved";
+        }
+      }
+      setSavedTargets(saved);
+      setPreparedApplications(prepared);
+      setWorkbenchStatus(`Reloaded saved Kingsmen records: ${Object.keys(saved).length} opportunity target(s), ${Object.keys(prepared).length} linked parent draft(s).`);
+    } catch {
+      setWorkbenchStatus("Saved workbench state could not be refreshed. The application tracker remains the authoritative view of persisted records.");
+    }
+  }, []);
+
+  useEffect(() => {
+    if (!getAccessToken()) return;
+    void loadMatches();
+    void loadSavedWorkbench();
+  }, [loadMatches, loadSavedWorkbench]);
 
   const opportunities = useMemo(() => (feed?.opportunities ?? []).filter(item =>
     pathway === "ALL" || item.pathways.includes(pathway)
@@ -89,50 +135,47 @@ export default function CandidateOpportunityMatchesPage() {
     return toApplicationPathway(choice);
   }
   async function saveOpportunity(item: Opportunity) {
-    setSaving(`save:${item.match_ref}`); setError(""); setNotice("");
+    setSaving(`save:${item.match_ref}`);
+    setError("");
+    setNotice("");
     const token = getAccessToken();
-    if (!token) { setError("Sign in before saving an opportunity."); setSaving(""); return; }
+    if (!token) {
+      setError("Sign in before saving an opportunity.");
+      setSaving("");
+      return;
+    }
     const selected = pathwayFor(item);
-    if (!selected) { setError("This listing does not have a supported pathway. Nothing was saved."); setSaving(""); return; }
+    if (!selected) {
+      setError("This listing does not have a supported pathway. Nothing was saved.");
+      setSaving("");
+      return;
+    }
     try {
-      const response = await fetch("/api/candidate/applications", {
-        method: "POST", headers: { Authorization: `Bearer ${token}`, "Content-Type": "application/json" },
-        body: JSON.stringify({ action: "save_n15_match", match_ref: item.match_ref, pathway_type: selected }),
+      const response = await fetch("/api/candidate/opportunity-save", {
+        method: "POST",
+        headers: { Authorization: `Bearer ${token}`, "Content-Type": "application/json" },
+        body: JSON.stringify({ action: "save", match_ref: item.match_ref, pathway_type: selected }),
         cache: "no-store"
       });
       const body = await response.json();
-      if (!response.ok || body.ready !== true || typeof body.target_key !== "string") {
-        throw new Error(body.code && body.error ? `${body.code}: ${body.error}` : body.error || "Opportunity could not be saved.");
+      if (!response.ok || body.ok !== true || typeof body.targetKey !== "string") {
+        throw new Error(body.message || body.error || body.code || `Save failed (${response.status})`);
       }
-      setSavedTargets(old => ({ ...old, [item.match_ref]: body.target_key }));
-      setNotice("Opportunity saved to your Kingsmen account. Current official-source gates were rechecked by the backend; no external application was submitted.");
-    } catch (e) {
-      setError(e instanceof Error ? e.message : "Opportunity could not be saved. Reload the feed and retry.");
-    } finally { setSaving(""); }
-  }
-  async function prepareApplication(item: Opportunity) {
-    const targetKey = savedTargets[item.match_ref];
-    if (!targetKey) { setError("Save the opportunity before preparing an application."); return; }
-    setSaving(`prepare:${item.match_ref}`); setError(""); setNotice("");
-    const token = getAccessToken();
-    if (!token) { setError("Sign in before preparing an application."); setSaving(""); return; }
-    try {
-      const response = await fetch("/api/candidate/applications", {
-        method: "POST", headers: { Authorization: `Bearer ${token}`, "Content-Type": "application/json" },
-        body: JSON.stringify({ action: "prepare_master_application", target_key: targetKey }),
-        cache: "no-store"
-      });
-      const body = await response.json();
+      setSavedTargets(old => ({ ...old, [item.match_ref]: body.targetKey }));
       const application = body.application as Record<string, unknown> | undefined;
-      if (!response.ok || body.ready !== true || application?.ok !== true) {
-        throw new Error(body.code && body.error ? `${body.code}: ${body.error}` : body.error || "Parent application could not be prepared.");
+      if (application?.ok === true) {
+        const reference = typeof application.application_ref === "string"
+          ? application.application_ref
+          : typeof application.application_id === "string" ? application.application_id : "Draft saved";
+        setPreparedApplications(old => ({ ...old, [item.match_ref]: reference }));
       }
-      const reference = typeof application.application_ref === "string" ? application.application_ref : String(application.application_id ?? "Prepared");
-      setPreparedApplications(old => ({ ...old, [item.match_ref]: reference }));
-      setNotice(`Application preparation record ${reference} saved. This is a draft and has not been submitted to the provider.`);
+      await loadSavedWorkbench();
+      setNotice(body.message || "Opportunity saved and parent application draft prepared. No provider submission has occurred.");
     } catch (e) {
-      setError(e instanceof Error ? e.message : "Application preparation failed. Your saved opportunity remains available.");
-    } finally { setSaving(""); }
+      setError(e instanceof Error ? e.message : "Opportunity could not be saved. Reload the tracker before retrying.");
+    } finally {
+      setSaving("");
+    }
   }
 
   return (
@@ -146,7 +189,7 @@ export default function CandidateOpportunityMatchesPage() {
         <div className="mt-5 flex flex-wrap gap-3">
           <button type="button" onClick={loadMatches} disabled={loading}
             className="rounded-xl bg-slate-950 px-5 py-3 text-sm font-bold text-white disabled:opacity-50">
-            {loading ? "Checking verified matches…" : "Load my verified matches"}
+            {loading ? "Checking verified matches…" : feed ? "Refresh my verified matches" : "Load my verified matches"}
           </button>
           <a href="/candidate/dashboard" className="rounded-xl border border-slate-300 px-5 py-3 text-sm font-semibold text-slate-800">Candidate dashboard</a>
         </div>
@@ -154,6 +197,7 @@ export default function CandidateOpportunityMatchesPage() {
 
       {error && <section role="alert" className="rounded-2xl border border-amber-300 bg-amber-50 p-4 text-sm text-amber-950">{error}</section>}
       {notice && <section role="status" className="rounded-2xl border border-emerald-300 bg-emerald-50 p-4 text-sm leading-6 text-emerald-950">{notice} <a href="/candidate/applications" className="ml-1 font-semibold underline">Open application tracker</a></section>}
+      {workbenchStatus && <section role="status" aria-live="polite" className="rounded-2xl border border-slate-200 bg-slate-50 p-4 text-sm leading-6 text-slate-700">{workbenchStatus} <a href="/candidate/applications" className="ml-1 font-semibold underline">View saved records</a></section>}
       {feed?.status === "IDENTITY_REVIEW_REQUIRED" && (
         <section className="rounded-2xl border border-amber-300 bg-amber-50 p-5">
           <h2 className="font-bold text-amber-950">Identity review required</h2>
@@ -217,14 +261,11 @@ export default function CandidateOpportunityMatchesPage() {
                     </select>
                   </label>
                   <div className="mt-4 flex flex-wrap gap-3">
-                    <button type="button" onClick={()=>void saveOpportunity(item)} disabled={saving===`save:${item.match_ref}` || saving===`prepare:${item.match_ref}`}
+                    <button type="button" onClick={()=>void saveOpportunity(item)} disabled={Boolean(saving)}
                       className="rounded-xl bg-amber-300 px-4 py-3 text-sm font-bold text-slate-950 disabled:opacity-50">
-                      {saving===`save:${item.match_ref}`?"Saving…":savedTargets[item.match_ref]?"Saved to account":"Save opportunity"}
+                      {saving===`save:${item.match_ref}`?"Checking source and preparing draft…":preparedApplications[item.match_ref]? `Draft ${preparedApplications[item.match_ref]} saved`:savedTargets[item.match_ref]?"Saved · retry preparation":"Save & prepare application"}
                     </button>
-                    <button type="button" onClick={()=>void prepareApplication(item)} disabled={!savedTargets[item.match_ref] || saving===`prepare:${item.match_ref}`}
-                      className="rounded-xl border border-slate-300 px-4 py-3 text-sm font-semibold text-slate-800 disabled:opacity-50">
-                      {saving===`prepare:${item.match_ref}`?"Preparing…":preparedApplications[item.match_ref]? `Draft ${preparedApplications[item.match_ref]}`:"Prepare application"}
-                    </button>
+                    
                     <a href={item.official_link} target="_blank" rel="noopener noreferrer"
                       className="rounded-xl bg-slate-950 px-4 py-3 text-sm font-bold text-white">Open official opportunity ↗</a>
                   </div>

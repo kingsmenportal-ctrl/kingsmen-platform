@@ -1,6 +1,6 @@
 # Recovered applied-migration bodies — provenance index
 
-These SQL files are archival evidence only, stored outside the runnable migration directories. They were reconstructed from added-file patches in the listed historical pull requests and mapped to the staging migration ledger by migration name/version. They must **not** be applied or replayed from this directory.
+These SQL files are archival evidence only, stored outside the runnable migration directories. Depending on the row, they are reconstructed from historical PR patches or preserved from a historical feature-branch snapshot, then mapped to the staging migration ledger by migration name/version. The PR #64 snapshots below are strong source-history evidence, but still require row-by-row catalog/provenance reconciliation. They must **not** be applied or replayed from this directory.
 
 Important distinction: the listed Git blob SHA fingerprints the archived recovered file in this repository; it is **not** a checksum captured at the original staging execution time. The patch is a strong historical source, but original executed bytes are not independently proven unless a database/deployment artifact checksum is found.
 
@@ -63,6 +63,12 @@ Important distinction: the listed Git blob SHA fingerprints the archived recover
 | `20261025113726` | [`20261025113726_link_reviewed_documents_to_application_evidence.sql`](./20261025113726_link_reviewed_documents_to_application_evidence.sql) | #175 | `0aa1c1447818f6a4349d3f66a50898e495a2d95f` |
 | `20261025113938` | [`20261025113938_verified_submission_and_outcome_workflow.sql`](./20261025113938_verified_submission_and_outcome_workflow.sql) | #175 | `8da91c83290f8ca3ea745b587c8088ce9860dc1a` |
 | `20261025114110` | [`20261025114110_lock_document_review_rpc_to_service_role.sql`](./20261025114110_lock_document_review_rpc_to_service_role.sql) | #175 | `19a109662ed085f8c89fc9d7d03e89468aaaa08e` |
+
+| `20261012155326` | [`20261012155326_n03_truth_vault_0001.sql`](./20261012155326_n03_truth_vault_0001.sql) | PR #64 historical branch snapshot `303d692b60f36d6a5f26f6ba45e397d8500b1852` | `a46c8c0e4efda63bb483690767aeed370a429b21` |
+| `20261012155332` | [`20261012155332_n04_candidate_core_0002.sql`](./20261012155332_n04_candidate_core_0002.sql) | PR #64 historical branch snapshot `303d692b60f36d6a5f26f6ba45e397d8500b1852` | `b538d630eb47c4eb92a920b70aa6d8fd3366ac45` |
+| `20261012155338` | [`20261012155338_n05_document_vault_0003.sql`](./20261012155338_n05_document_vault_0003.sql) | PR #64 historical branch snapshot `303d692b60f36d6a5f26f6ba45e397d8500b1852` | `77bdf37db1edd1eb7a63ecefdfedd99776c516bc` |
+| `20261012155345` | [`20261012155345_n06_route_universe_0004.sql`](./20261012155345_n06_route_universe_0004.sql) | PR #64 historical branch snapshot `303d692b60f36d6a5f26f6ba45e397d8500b1852` | `e9ca35a0f54dfd09b932b95d20d16d24e5f12921` |
+| `20261012155355` | [`20261012155355_n07_airtable_sync_0005.sql`](./20261012155355_n07_airtable_sync_0005.sql) | PR #64 historical branch snapshot `303d692b60f36d6a5f26f6ba45e397d8500b1852` | `33b810e66f43935c2a82d28fc941432570f18e82` |
 
 ## Recovery constraints
 

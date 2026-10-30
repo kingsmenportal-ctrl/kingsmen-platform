@@ -1,6 +1,6 @@
 "use client";
 
-import { FormEvent, useState } from "react";
+import { FormEvent, useEffect, useState } from "react";
 
 type Mode = "signin" | "register" | "recover";
 
@@ -23,14 +23,93 @@ function saveSession(session: Record<string, unknown>) {
   window.localStorage.setItem(`sb-${ref}-auth-token`, JSON.stringify(session));
 }
 
-function candidateRedirect(): string {
-  const requested = new URLSearchParams(window.location.search).get("next") ?? "/candidate/dashboard";
+function candidateRedirect(fallback = "/candidate/dashboard"): string {
+  const requested = new URLSearchParams(window.location.search).get("next") ?? fallback;
   return requested.startsWith("/candidate/") && !requested.startsWith("//")
     ? requested
-    : "/candidate/dashboard";
+    : fallback;
 }
 
 export default function CandidateLoginPage() {
+  // Supabase email-confirmation links in the current REST signup flow return a
+  // short-lived session in the URL fragment. Consume it once, validate the access
+  // token against Auth, store the session, and remove tokens from browser history.
+  useEffect(() => {
+    const fragment = window.location.hash.startsWith("#")
+      ? new URLSearchParams(window.location.hash.slice(1))
+      : new URLSearchParams();
+    const accessToken = fragment.get("access_token");
+    const refreshToken = fragment.get("refresh_token");
+    const callbackError = fragment.get("error_description") ?? fragment.get("error");
+    const callbackType = fragment.get("type");
+    const clearFragment = () => window.history.replaceState(
+      null,
+      "",
+      window.location.pathname + window.location.search
+    );
+
+    if (callbackError) {
+      clearFragment();
+      setNotice("Email confirmation could not be completed. Sign in again or request a new confirmation email.");
+      return;
+    }
+    if (!accessToken && !refreshToken) {
+      if (new URLSearchParams(window.location.search).has("code")) {
+        setNotice("The confirmation link returned a code-based session this page cannot exchange. Please sign in to continue; your candidate record will not be linked automatically.");
+      }
+      return;
+    }
+    if (callbackType === "recovery") {
+      clearFragment();
+      setNotice("This is a password-recovery link. Use the recovery process to restore access; it does not complete candidate identity verification.");
+      return;
+    }
+    if (!accessToken || !refreshToken || !SUPABASE_URL || !SUPABASE_ANON_KEY) {
+      clearFragment();
+      setNotice("Email confirmation returned an incomplete session. Please sign in again.");
+      return;
+    }
+
+    let active = true;
+    const finishConfirmation = async () => {
+      try {
+        const response = await fetch(new URL("/auth/v1/user", SUPABASE_URL).toString(), {
+          headers: { apikey: SUPABASE_ANON_KEY, Authorization: `Bearer ${accessToken}` },
+          cache: "no-store",
+          redirect: "error"
+        });
+        const user = await response.json().catch(() => null);
+        if (!response.ok || !user || typeof user.id !== "string") {
+          clearFragment();
+          if (active) setNotice("Email confirmation could not establish a valid session. Please sign in again.");
+          return;
+        }
+        const expiresInValue = Number(fragment.get("expires_in") ?? 3600);
+        const expiresIn = Number.isFinite(expiresInValue) && expiresInValue > 0 ? expiresInValue : 3600;
+        const expiresAtValue = Number(fragment.get("expires_at"));
+        const expiresAt = Number.isFinite(expiresAtValue) && expiresAtValue > 0
+          ? expiresAtValue
+          : Math.floor(Date.now() / 1000) + expiresIn;
+        const next = candidateRedirect("/candidate/profile");
+        saveSession({
+          access_token: accessToken,
+          refresh_token: refreshToken,
+          expires_in: expiresIn,
+          expires_at: expiresAt,
+          token_type: fragment.get("token_type") ?? "bearer",
+          user
+        });
+        clearFragment();
+        if (active) window.location.assign(next);
+      } catch {
+        clearFragment();
+        if (active) setNotice("Email confirmation is temporarily unavailable. Please sign in again.");
+      }
+    };
+    void finishConfirmation();
+    return () => { active = false; };
+  }, []);
+
   const [mode, setMode] = useState<Mode>("signin");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -56,10 +135,11 @@ export default function CandidateLoginPage() {
     setBusy(true);
     try {
       const base = SUPABASE_URL.replace(/\/+$/, "");
+      const registrationReturn = `${window.location.origin}/candidate/login?next=%2Fcandidate%2Fprofile`;
       const endpoint = mode === "signin"
         ? `${base}/auth/v1/token?grant_type=password`
         : mode === "register"
-          ? `${base}/auth/v1/signup`
+          ? `${base}/auth/v1/signup?redirect_to=${encodeURIComponent(registrationReturn)}`
           : `${base}/auth/v1/recover?redirect_to=${encodeURIComponent(`${window.location.origin}/candidate/login`)}`;
       const payload: Record<string, unknown> = { email: email.trim() };
       if (mode !== "recover") payload.password = password;
@@ -88,7 +168,7 @@ export default function CandidateLoginPage() {
         if (session && typeof session.access_token === "string") {
           saveSession(session);
           setNotice("Account created. Kingsmen identity linking still requires an authorised identity review; registration does not automatically link you to a candidate record.");
-          window.location.assign(candidateRedirect());
+          window.location.assign(candidateRedirect("/candidate/profile"));
           return;
         }
         setNotice("Registration received. Check your email to complete authentication. Your account does not automatically link you to a candidate record; that requires authorised identity review.");

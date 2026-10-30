@@ -35,7 +35,7 @@ The counts are a dated snapshot and should be regenerated before any release dec
 
 The archive `release-evidence/recovered-applied-migrations/README.md` says its bodies were reconstructed from historical PR patches. Their Git blob SHAs identify the archived reconstructions, not the original bytes executed against staging. They are archival only and must not be replayed.
 
-The first 0078 version (`20261019112452`) has an archived PR #120 body. The second version (`20261019112511`) remains unresolved. Therefore all 122 ledger entries are not yet reconciled to authoritative original executed SQL bodies. Migration source-tree validation passing does not resolve that gap.
+At this 29 October checkpoint, the first and second 0078 bodies had not yet both been reconciled. Subsequent PR #120 history recovery documented in `release-evidence/0078-migration-provenance-recovery-2026-10-29.md` and refreshed on 30 October separately maps the 98-line pre-fix body to `20261019112452` and the 104-line corrected body to `20261019112511`. The original execution-time SQL checksums remain unavailable. The 122-entry count in this document is a dated 29 October snapshot; the current staging ledger now has 130 entries. Full version-by-version provenance and semantic catalog reconciliation remain open; migration source-tree validation alone does not resolve those gaps.
 
 ## Confirmed targeted RLS/index cleanup preconditions
 
@@ -85,3 +85,8 @@ The authenticated E2E runner intentionally requires `KINGSMEN_STAGING_BASE_URL`,
 5. Re-run all CI on the resulting immutable SHA, capture backup/restore proof, obtain independent review, deploy that exact SHA, and verify the deployed app's authenticated journey before RC1.
 
 **Release decision: BLOCKED.** The latest three CI workflows passed, but that is not equivalent to backend completion or production readiness.
+
+
+## Current ledger refresh — 30 October 2026
+
+The live Supabase migration ledger now has 130 entries and ends at migration 0095. This 29 October document's 122-entry counts are historical snapshots only. The duplicate 0093 label appears at versions `20261029180632` and `20261029180642`; preserve both ledger rows and reconcile the two original SQL submissions. PR #216's archive now has 62 ledger-to-file mapping rows, including five older PR #64 source snapshots. This mapping count does not establish exact SQL bytes at original execution. See the 30 October addendum in `backend-migration-provenance-gap-2026-10-29.md` for the current distinction and outstanding evidence.

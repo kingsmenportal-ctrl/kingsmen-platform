@@ -187,6 +187,7 @@ export default function CandidateApplicationsPage() {
           <a href="/candidate/workbench" className="rounded-xl border border-slate-700 px-4 py-2">Workbench</a>
           <a href="/candidate/documents" className="rounded-xl border border-slate-700 px-4 py-2">Document Vault</a>
           <a href="/candidate/opportunity-matches" className="rounded-xl border border-slate-700 px-4 py-2">Verified opportunities</a>
+          <a href="/candidate/cao-choices" className="rounded-xl border border-slate-700 px-4 py-2">CAO choices</a>
           <button type="button" disabled={loading} onClick={()=>void load()} className="rounded-xl bg-cyan-300 px-4 py-2 font-bold text-slate-950 disabled:opacity-50">{loading?"Refreshing…":"Refresh tracker"}</button>
         </nav>
       </header>
