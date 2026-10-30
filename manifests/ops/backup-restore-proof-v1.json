@@ -41,7 +41,10 @@
     "restore_requires_explicit_confirmation",
     "restore_compares_database_server_identity",
     "restore_uses_exit_on_error",
-    "restore_count_query_failure_blocks_pass"
+    "restore_count_query_failure_blocks_pass",
+    "full_database_archive_includes_candidate_rows",
+    "destructive_restore_requires_explicit_disposable_target_allowlist",
+    "archive_encryption_and_restricted_storage_required"
   ],
   "evidencePaths": [
     "scripts/backup/New-KingsmenTruthVaultBackup.ps1",
