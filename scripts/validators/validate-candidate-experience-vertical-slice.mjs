@@ -55,6 +55,23 @@ const checks = [
   ["candidate profile and workbench use shared Supabase project session parsing", /getCandidateAccessToken/.test(profilePage) && /getCandidateAccessToken/.test(read("apps/web/src/app/candidate/workbench/page.tsx")) && /getCandidateAccessToken/.test(read("apps/web/src/app/candidate/applications/page.tsx"))],
   ["active pathway filter determines the displayed and submitted pathway", /pathway !== "ALL" && item.pathways.includes\(pathway\) \? pathway/.test(opportunityPage)],
   ["dashboard links to profile and identity review", /\/candidate\/profile/.test(dashboard) && /\/candidate\/identity-review/.test(dashboard)],
+  ["CAO migration contains one complete consent-gated parent-draft function", (caoMigration.match(/CREATE OR REPLACE FUNCTION public\.prepare_candidate_application_from_master_target/g) || []).length === 1 && (caoMigration.match(/if v_match_ref is null then/g) || []).length === 1 && /v_match_ref := substring\(v_target\.source_reference from '\^N15 match reference: \(\.\+\)\ /candidate_application_id/.test(caoMigration) && /REFERENCES public\.candidate_applications \(id, candidate_id\)/.test(caoMigration) && /exactly_one_parent_check/.test(caoMigration) && /application_id DROP NOT NULL/.test(caoMigration) && !/ADD CONSTRAINT candidate_applications_id_candidate_id_key/.test(caoMigration)],
+  ["CAO choice reads and writes use authenticated owner-bound RPCs", /list_candidate_cao_parents/.test(caoMigration) && /get_candidate_cao_choices/.test(caoMigration) && /save_candidate_cao_choices/.test(caoMigration) && /VERIFIED_CANDIDATE_IDENTITY_REQUIRED/.test(caoMigration) && /GRANT EXECUTE ON FUNCTION public.save_candidate_cao_choices/.test(caoMigration)],
+  ["direct parent-draft RPC does not bypass withdrawn profile consent", /prepare_candidate_application_from_master_target/.test(caoMigration) && /PROFILE_PROCESSING_CONSENT_REQUIRED/.test(caoMigration) && /pc\.consent_status = 'ACTIVE'/.test(caoMigration)],
+  ["CAO child choices cap at six, keep order unique and remain unverified drafts", /jsonb_array_length\(p_choices\) > 6/.test(caoMigration) && /CAO_CHOICE_NUMBERS_MUST_BE_UNIQUE/.test(caoMigration) && /'D', 'DRAFT'/.test(caoMigration) && /provider_submission_sent', false/.test(caoMigration)],
+  ["CAO API rejects JSON null, primitives, and arrays before reading action", /!incoming \|\| typeof incoming !== "object" \|\| Array\.isArray\(incoming\)/.test(caoRoute)],
+  ["CAO API proxies bearer identity without browser service role", /AUTHENTICATION_REQUIRED/.test(caoRoute) && /Authorization: authorization/.test(caoRoute) && caoRoute.includes('/rest/v1/rpc/') && !/SUPABASE_SERVICE_ROLE_KEY/.test(caoRoute)],
+  ["CAO UI supports ordered choices, six-item limit and draft-only editing", /choices.length >= 6/.test(caoPage) && /reorderChoice/.test(caoPage) && /selectedParent.status !== "DRAFT"/.test(caoPage) && caoPage.includes("does not submit anything to CAO or a provider")],
+  ["CAO editor is reachable from dashboard and application tracker", /\/candidate\/cao-choices/.test(dashboard) && /\/candidate\/cao-choices/.test(read("apps/web/src/app/candidate/applications/page.tsx"))],
+];
+let failed = 0;
+for (const [name, passed] of checks) {
+  console.log(`${passed ? "PASS" : "FAIL"} ${name}`);
+  if (!passed) failed++;
+}
+console.log(`Candidate experience vertical-slice contract: ${checks.length - failed}/${checks.length} passed`);
+if (failed) process.exit(1);
+\);/.test(caoMigration) && caoMigration.endsWith("$function$;\n")],
   ["CAO children link to unified candidate_applications without rewriting legacy parents", /candidate_application_id/.test(caoMigration) && /REFERENCES public\.candidate_applications \(id, candidate_id\)/.test(caoMigration) && /exactly_one_parent_check/.test(caoMigration) && /application_id DROP NOT NULL/.test(caoMigration) && !/ADD CONSTRAINT candidate_applications_id_candidate_id_key/.test(caoMigration)],
   ["CAO choice reads and writes use authenticated owner-bound RPCs", /list_candidate_cao_parents/.test(caoMigration) && /get_candidate_cao_choices/.test(caoMigration) && /save_candidate_cao_choices/.test(caoMigration) && /VERIFIED_CANDIDATE_IDENTITY_REQUIRED/.test(caoMigration) && /GRANT EXECUTE ON FUNCTION public.save_candidate_cao_choices/.test(caoMigration)],
   ["direct parent-draft RPC does not bypass withdrawn profile consent", /prepare_candidate_application_from_master_target/.test(caoMigration) && /PROFILE_PROCESSING_CONSENT_REQUIRED/.test(caoMigration) && /pc\.consent_status = 'ACTIVE'/.test(caoMigration)],
