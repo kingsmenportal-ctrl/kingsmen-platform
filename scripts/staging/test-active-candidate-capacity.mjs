@@ -66,7 +66,7 @@ try {
   `);
 
   // Simulate the audited staging baseline: existing grants and both roles' default ACLs.
-  await pool.query("grant select, insert, update, delete, truncate, references, trigger, maintain to anon, authenticated on public.candidates, public.system_runtime_config");
+  await pool.query("grant select, insert, update, delete, truncate, references, trigger, maintain on public.candidates, public.system_runtime_config to anon, authenticated");
   await pool.query("alter default privileges for role postgres in schema public grant truncate, references, trigger, maintain on tables to anon, authenticated");
   await pool.query("alter default privileges for role supabase_admin in schema public grant truncate, references, trigger on tables to anon, authenticated");
 
