@@ -17,8 +17,7 @@ BEGIN
 END;
 $$;
 
-ALTER TABLE public.candidate_applications
-  ADD CONSTRAINT candidate_applications_id_candidate_id_key UNIQUE (id, candidate_id);
+-- Reuse existing UNIQUE (id, candidate_id) constraint from the unified application migration.
 
 ALTER TABLE public.cao_choice_items
   ALTER COLUMN application_id DROP NOT NULL;
