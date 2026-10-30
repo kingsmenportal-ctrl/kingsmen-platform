@@ -4,7 +4,7 @@ on:
   pull_request:
     branches: [main, feat/release-engineering-evidence-pipeline]
   push:
-    branches: [main, feat/staging-authenticated-e2e-gate]
+    branches: [main, feat/staging-authenticated-e2e-gate, feat/backend-simplification-baseline-2026-10-29]
   workflow_dispatch:
 
 jobs:

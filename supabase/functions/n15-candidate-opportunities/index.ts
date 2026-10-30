@@ -8,6 +8,7 @@ const cors = {
   "Content-Type": "application/json; charset=utf-8"
 };
 function json(body: unknown, status = 200) { return new Response(JSON.stringify(body), { status, headers: cors }); }
+const AUTH_UUID = /^[0-9a-f]{8}-[0-9a-f]{4}-[1-8][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i;
 Deno.serve(async (req: Request) => {
   if (req.method === "OPTIONS") return new Response("ok", { headers: cors });
   if (req.method !== "GET") return json({ status: "METHOD_NOT_ALLOWED" }, 405);
@@ -25,10 +26,14 @@ Deno.serve(async (req: Request) => {
 
   const admin = createClient(url, serviceKey, { auth: { persistSession: false, autoRefreshToken: false } });
   const { data: link, error: linkError } = await admin.from("candidate_auth_identity_links")
-    .select("candidate_id,link_status").eq("supabase_user_id", userData.user.id).maybeSingle();
+    .select("candidate_id,link_status,verified_at,verified_by").eq("supabase_user_id", userData.user.id).maybeSingle();
   if (linkError) return json({ status: "DATABASE_ERROR", reason: "IDENTITY_LINK_LOOKUP_FAILED" }, 500);
-  if (!link || link.link_status !== "VERIFIED") {
-    return json({ status: "IDENTITY_REVIEW_REQUIRED", message: "Your Kingsmen identity must be linked and authorised before personalised matching can be shown." }, 403);
+  const verifiedAtMs = Date.parse(link?.verified_at ?? "");
+  const verificationIsAuthorised = Boolean(link && link.link_status === "VERIFIED" &&
+    Number.isFinite(verifiedAtMs) && verifiedAtMs <= Date.now() &&
+    typeof link.verified_by === "string" && AUTH_UUID.test(link.verified_by));
+  if (!verificationIsAuthorised) {
+    return json({ status: "IDENTITY_REVIEW_REQUIRED", message: "Your Kingsmen identity must be linked and authorised by a verified reviewer before personalised matching can be shown." }, 403);
   }
 
   const candidateRef = String(link.candidate_id);
@@ -42,8 +47,8 @@ Deno.serve(async (req: Request) => {
 
   const now = new Date();
   const pathwayMap: Record<string, string[]> = {
-    UNIVERSITY: ["HIGHER_EDUCATION"], CAO: ["HIGHER_EDUCATION"], TVET: ["TVET"],
-    SETA: ["SETA_LEARNERSHIPS", "APPRENTICESHIPS"], LEARNERSHIP: ["SETA_LEARNERSHIPS"],
+    UNIVERSITY: ["HIGHER_EDUCATION"], CAO: ["HIGHER_EDUCATION", "TVET"], TVET: ["TVET"],
+    SETA: ["SETA_LEARNERSHIPS", "APPRENTICESHIPS"], LEARNERSHIP: ["SETA_LEARNERSHIPS", "APPRENTICESHIPS"],
     INTERNSHIP: ["INTERNSHIPS"], APPRENTICESHIP: ["APPRENTICESHIPS"], EMPLOYER: ["EMPLOYMENT"],
     BURSARY: ["HIGHER_EDUCATION", "TVET", "SETA_LEARNERSHIPS", "INTERNSHIPS", "APPRENTICESHIPS"],
     NSFAS: ["HIGHER_EDUCATION", "TVET"], QCTO: ["SETA_LEARNERSHIPS", "APPRENTICESHIPS"],
@@ -68,8 +73,17 @@ Deno.serve(async (req: Request) => {
       .select("observation_ref,source_url,source_title,observed_at,last_checked_at,stale_after,evidence_refs")
       .eq("observation_status", "VERIFIED").eq("source_confidence", "OFFICIAL_VERIFIED")
       .eq("source_url", programme.exact_link).gte("last_checked_at", cutoff)
+      .lte("observed_at", now.toISOString()).lte("last_checked_at", now.toISOString())
       .gt("stale_after", now.toISOString()).limit(1);
     if (!observations?.length) continue;
+    const observation = observations[0];
+    const observedAtMs = Date.parse(observation.observed_at ?? "");
+    const checkedAtMs = Date.parse(observation.last_checked_at ?? "");
+    const staleAfterMs = Date.parse(observation.stale_after ?? "");
+    // Fail closed on future/missing/inconsistent timestamps or missing source evidence.
+    if (!Number.isFinite(observedAtMs) || !Number.isFinite(checkedAtMs) || !Number.isFinite(staleAfterMs) ||
+        observedAtMs > checkedAtMs || checkedAtMs > now.getTime() || staleAfterMs <= now.getTime() ||
+        staleAfterMs <= checkedAtMs || !Array.isArray(observation.evidence_refs) || !observation.evidence_refs.length) continue;
     const { data: deadlines } = await admin.from("opportunity_deadlines")
       .select("deadline_ref,opens_at,closes_at,deadline_status,evidence_refs,timezone")
       .eq("programme_ref", programme.programme_ref).eq("deadline_status", "CONFIRMED")
@@ -85,8 +99,8 @@ Deno.serve(async (req: Request) => {
       location: programme.location_text ?? null,
       official_link: programme.exact_link,
       match_score: match.match_score,
-      source_checked_at: observations[0].last_checked_at,
-      source_evidence: observations[0].evidence_refs,
+      source_checked_at: observation.last_checked_at,
+      source_evidence: observation.evidence_refs,
       deadline: deadline ? { closes_at: deadline.closes_at, timezone: deadline.timezone, evidence: deadline.evidence_refs } : { status: "NOT_VERIFIED", message: "No current confirmed deadline is available; check the official page." },
       eligibility: { status: "REQUIRES_CANDIDATE_REVIEW", rules: "Only separately evidenced and reviewed eligibility rules may be used." },
       recommendation_summary: match.recommendation_summary

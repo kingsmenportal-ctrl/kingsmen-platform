@@ -1,0 +1,146 @@
+{
+  "schema": "kingsmen.backend-authority-matrix.v1",
+  "generated_at": "2026-10-29",
+  "repository": "kingsmenportal-ctrl/kingsmen-platform",
+  "branch": "feat/backend-simplification-baseline-2026-10-29",
+  "purpose": "Evidence-led consolidation register. This file is a working map, not authorization to delete, rename, repurpose, or dual-write database objects.",
+  "database_authority": {
+    "system": "Supabase",
+    "project_ref": "euhubhhnumtibbyufghm",
+    "role": "single operational source of truth",
+    "rule": "Website, Notion and Airtable are read projections/mirrors; they must not become competing write authorities."
+  },
+  "observed_inventory": {
+    "postgres_version": "17.11",
+    "public_base_tables": 230,
+    "public_policies": 287,
+    "storage_buckets": 3,
+    "limitations": [
+      "Counts are a point-in-time staging observation.",
+      "Table existence and non-empty rows do not prove a working user journey.",
+      "No destructive consolidation is approved by this inventory alone."
+    ]
+  },
+  "domains": [
+    {
+      "domain": "commercial_catalogue_entitlements",
+      "candidate_objects": ["finance_plan_catalog", "public_website_package_cards", "service_packages"],
+      "provisional_write_authority": "finance_plan_catalog (commercial values); entitlement activation/usage authority must be traced separately",
+      "projection_or_legacy": ["public_website_package_cards", "service_packages.entitlement_snapshot"],
+      "known_evidence": ["finance_plan_catalog and public_website_package_cards were observed aligned on prices and principal capacity measures", "service_packages.entitlement_snapshot is legacy/incomplete", "route_visibility=SEALED has unknown runtime semantics"],
+      "consumer_trace_required": ["SQL views/RPCs/triggers/policies", "frontend package rendering and checkout", "Edge Functions", "order/invoice/payment creation", "entitlement and usage checks", "Airtable mirrors", "Notion/public copy"],
+      "safe_first_change": "Add parity assertions and read-only consumer inventory; route new reads through a typed canonical contract only after all writers/readers are mapped.",
+      "validation": ["integer-cent exact prices", "priority allowance distinct from concurrent route capacity", "Foundational 8 accommodation routes separate", "CV Revamp 15 CVs and 15 letters", "bonus requires verified CV Revamp ownership plus eligible upgrade", "historical payment snapshots immutable"],
+      "rollback": "Keep existing schema and readers unchanged; revert adapter/feature flag and compare catalogue parity.",
+      "destructive_change_allowed": false,
+      "confidence": "medium for observed parity; low for runtime ownership"
+    },
+    {
+      "domain": "unified_applications",
+      "candidate_objects": ["applications", "candidate_applications", "candidate_route_applications", "candidate_application_tracker", "candidate_application_tracker_events", "candidate_master_application_targets", "candidate_master_application_events", "candidate_application_events", "candidate_application_evidence", "candidate_application_preparation_items", "candidate_application_preparation_events", "candidate_application_submission_jobs", "application_workbench_items"],
+      "provisional_write_authority": "UNRESOLVED pending FK, view, RPC, trigger, API and frontend writer trace",
+      "projection_or_legacy": [],
+      "known_evidence": ["overlapping application families are present", "CAO must be one parent Kingsmen application with programme choices as child records", "candidate-reported submission must not equal provider-confirmed receipt or decision"],
+      "consumer_trace_required": ["all FK relationships and row counts", "SQL routines/views/triggers/RLS", "web routes/components/hooks", "Edge Functions and workers", "status/event writers", "evidence references and retention", "candidate A/B isolation"],
+      "safe_first_change": "Build FK and consumer graph; add contract tests around current writes; select canonical parent and child model only after evidence.",
+      "validation": ["parent/child referential integrity", "duplicate prevention", "state transitions require evidence", "candidate-owned rows protected by RLS", "legacy IDs and audit history preserved"],
+      "rollback": "Compatibility adapter and old read path remain available until parity and consumer-zero observation are proven.",
+      "destructive_change_allowed": false,
+      "confidence": "low until consumer trace completes"
+    },
+    {
+      "domain": "opportunity_catalogue",
+      "candidate_objects": ["route_categories", "route_sources", "route_providers", "route_programmes", "route_deadlines", "route_fees", "route_requirements", "current_verified_route_opportunities", "opportunity_source_authorities", "opportunity_providers", "opportunity_programmes", "opportunity_deadlines", "opportunity_fee_records", "opportunity_eligibility_rules", "opportunity_verification_reviews", "candidate_opportunities", "candidate_saved_routes", "candidate_saved_opportunities", "candidate_workspace_saved_opportunities"],
+      "provisional_write_authority": "UNRESOLVED; route_* and opportunity_* writers and verification semantics must be traced",
+      "projection_or_legacy": [],
+      "known_evidence": ["both route_* and opportunity_* families exist", "only freshly verified-open opportunities may be labelled open", "all plans retain discovery access to all six pathways"],
+      "consumer_trace_required": ["source ingestion and freshness writers", "verified view definition", "matching and saved-opportunity readers", "application creation", "all pathway filters", "deadline/fee/eligibility references"],
+      "safe_first_change": "Compare schemas, keys, source provenance and freshness rules; add read-only parity/freshness tests before changing catalogue readers.",
+      "validation": ["source provenance", "deadline and eligibility freshness", "stale/closed/withdrawn suppression", "six pathways discoverable for all plans", "accommodation remains a service capability"],
+      "rollback": "Preserve both data sets; revert only the read adapter and keep source evidence intact.",
+      "destructive_change_allowed": false,
+      "confidence": "low until provenance and consumers are traced"
+    },
+    {
+      "domain": "identity_profile_consent",
+      "candidate_objects": ["candidates", "candidate_profiles", "consent records (exact table names to be inventoried)", "auth.users"],
+      "provisional_write_authority": "Supabase Auth immutable user UUID for identity; profile owner table and consent writer remain to be confirmed",
+      "projection_or_legacy": [],
+      "known_evidence": ["staging sample previously contained two candidates", "authorization must not use editable metadata or email-only identity linking"],
+      "consumer_trace_required": ["auth triggers", "profile upsert/load routes", "RLS policies and grants", "consent events and retention", "candidate UUID foreign keys"],
+      "safe_first_change": "Trace current profile table and auth binding; add isolated authenticated save/reload/update tests without creating duplicate users.",
+      "validation": ["same Auth UUID on reload", "candidate A cannot select/update candidate B", "consent and audit evidence persisted"],
+      "rollback": "No identity remapping; preserve current UUIDs and existing accounts.",
+      "destructive_change_allowed": false,
+      "confidence": "low until authenticated journey is executed"
+    },
+    {
+      "domain": "private_documents_identity_review",
+      "candidate_objects": ["candidate_private_documents", "candidate_private_document_events", "candidate_private_document_reviews", "candidate_identity_review_requests", "candidate_identity_review_evidence", "candidate_identity_review_audit", "document_files", "document_requests", "document_storage_events", "document_verifications"],
+      "provisional_write_authority": "UNRESOLVED between candidate-private-document and legacy document families",
+      "projection_or_legacy": [],
+      "known_evidence": ["candidate-private-documents Edge Function was previously reported deployed, but actual upload/retrieval/expiry and reviewer journey remain unproven"],
+      "consumer_trace_required": ["storage bucket/policies", "Edge Function auth and grants", "document metadata/hash writers", "signed URL creation and expiry", "reviewer role checks", "identity-link/audit transaction"],
+      "safe_first_change": "Map each storage object to metadata row and owner; run isolated non-destructive tests in staging before altering policies or storage.",
+      "validation": ["PDF/JPEG/PNG <=10 MiB", "MIME plus signature validation", "short-lived signed URL expires", "Candidate A cannot access B files", "reviewer least privilege", "identity approval links exact candidate and writes audit"],
+      "rollback": "Keep private bucket and existing metadata intact; disable only the new adapter/route if tests fail.",
+      "destructive_change_allowed": false,
+      "confidence": "low until live authenticated test"
+    },
+    {
+      "domain": "payments_orders_entitlements",
+      "candidate_objects": ["payfast_payment_intents", "finance_payments", "candidate_payment_events", "payment_evidence_ledger", "finance_plan_catalog", "service_packages", "order/invoice tables (exact names to be inventoried)"],
+      "provisional_write_authority": "UNRESOLVED; settlement transaction and entitlement writer must be traced",
+      "projection_or_legacy": [],
+      "known_evidence": ["PayFast sandbox merchant ID is available to the project owner; secret/passphrase must remain in secret storage", "catalogue snapshots must not rewrite historical finance records"],
+      "consumer_trace_required": ["checkout API", "ITN validation", "signature/merchant/amount/currency/reference/status checks", "transaction/RPC grants", "order/invoice/receipt/evidence writers", "entitlement and usage readers"],
+      "safe_first_change": "Trace transaction boundary and test harness first; no live settlement mutation until the reviewed transaction and secrets are verified.",
+      "validation": ["valid sandbox settlement", "bad signature/merchant/amount/reference/status denied", "incomplete payload denied", "duplicate ITN idempotent", "transient failure recovers", "no entitlement before verified settlement"],
+      "rollback": "Sandbox-only tests; retain immutable payment evidence and replay-safe intent IDs.",
+      "destructive_change_allowed": false,
+      "confidence": "low until ITN runtime proof"
+    },
+    {
+      "domain": "durable_orchestration_email",
+      "candidate_objects": ["integration_outbox", "integration_inbox", "integration_dead_letter_queue", "integration_connectors", "orchestrator_dispatch_queue", "orchestrator_runs", "orchestrator_steps", "orchestrator_execution_plans", "orchestrator_execution_events", "orchestrator_idempotency_claims", "orchestrator_manual_handoffs", "workflow_runs", "workflow_result_events", "workflow_run_observations", "n8n_workflow_dispatches", "phoenix_fallback_plans"],
+      "provisional_write_authority": "UNRESOLVED between integration_*, orchestrator_* and workflow_*; worker code and lease semantics decide",
+      "projection_or_legacy": [],
+      "known_evidence": ["multiple orchestration families exist", "MAP primary assisted/manual path; Phoenix fallback", "email primary; WhatsApp/SMS deferred"],
+      "consumer_trace_required": ["worker entrypoints/schedules", "claim/lease/heartbeat SQL", "retry/backoff and dead-letter writers", "idempotency constraints", "provider send boundary", "email delivery event writers"],
+      "safe_first_change": "Trace workers and queue state transitions; add deterministic tests around the currently active queue before selecting a canonical queue.",
+      "validation": ["lease expiry recovery", "bounded retries", "dead-letter and manual recovery", "worker termination before/after send boundary", "duplicate webhook idempotency", "unknown handler fails closed", "no WhatsApp/SMS paths enabled"],
+      "rollback": "Do not move live jobs between queues until claim/lease and in-flight job parity are proven.",
+      "destructive_change_allowed": false,
+      "confidence": "low until active worker is identified"
+    },
+    {
+      "domain": "founder_control_plane_jarvis",
+      "candidate_objects": ["founder_daily_briefs", "founder_reports", "founder_report_sections", "founder_ops_audit_events", "founder_decision_log", "founder_escalation_threads", "founder_operator_profiles", "founder_runtime_config", "control_plane_operator_profiles", "control_plane_operator_audit", "control_plane_queue_snapshots", "control_plane_worker_health", "control_plane_approval_queue", "control_plane_capacity_limits", "control_plane_command_requests", "orchestrator_worker_registry", "integration_health_snapshots"],
+      "provisional_write_authority": "UNRESOLVED; determine which API writes observations and which tables are projections/history",
+      "projection_or_legacy": [],
+      "known_evidence": ["founder/control_plane families overlap", "health must derive from persisted fresh evidence, not table existence/configuration alone"],
+      "consumer_trace_required": ["authenticated founder endpoints", "role grants and function ACLs", "health/queue/incident observation writers", "brief generation and history", "PII redaction", "audit trail"],
+      "safe_first_change": "Map endpoint-to-table writes and effective grants; add read-only evidence reconciliation before merging operational models.",
+      "validation": ["unauthenticated denied", "ordinary candidate denied", "founder allowed", "persisted health/queue/incident evidence", "staleness visible", "PII-safe response", "audited founder actions"],
+      "rollback": "Preserve separate history tables until event provenance and all readers are mapped.",
+      "destructive_change_allowed": false,
+      "confidence": "low until authenticated founder runtime proof"
+    }
+  ],
+  "cross_cutting_gates": [
+    "Recover and compare historical migration 0078 body/semantics; never rewrite an applied migration.",
+    "Review migration 0097 and PR #206 for effective grants, default ACLs and function execute privileges.",
+    "Capture backup and prove restore before any destructive contract phase.",
+    "Inventory all SQL FKs, views, routines, triggers, policies, grants and storage policies, plus application/API/worker/integration readers and writers.",
+    "Run repository validator and combined test command at exact current head; record run IDs and results.",
+    "Do not deploy or promote the rejected temporary Lovable project.",
+    "Do not bypass branch protection, SSO, required review, CI or founder approval."
+  ],
+  "next_batch": [
+    "Confirm current PR #209 head SHA and review/check state.",
+    "Trace actual application and catalogue consumers in source, SQL, Edge Functions and workers.",
+    "Turn provisional authorities into evidence-backed decisions with file/line or SQL object references.",
+    "Implement the first compatibility adapter and drift tests only after the owner/consumer map is complete.",
+    "Use expand/backfill/validate/switch/observe/contract; no destructive DDL in the inventory phase."
+  ]
+}
