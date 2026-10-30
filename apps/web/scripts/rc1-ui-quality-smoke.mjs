@@ -49,7 +49,8 @@ try {
   const context = await browser.newContext({ reducedMotion: "reduce" });
   for (const viewport of viewports) {
     for (const route of routes) {
-      const page = await context.newPage({ viewport: { width: viewport.width, height: viewport.height } });
+      const page = await context.newPage();
+      await page.setViewportSize({ width: viewport.width, height: viewport.height });
       const pageErrors = [];
       page.on("pageerror", error => pageErrors.push(error.message));
       let responseStatus = null;
