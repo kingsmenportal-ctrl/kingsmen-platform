@@ -1,0 +1,36 @@
+name: Candidate Experience CI
+
+on:
+  push:
+    branches: [feat/candidate-experience-closeout-2026-10-30]
+  pull_request:
+    branches: [main, feat/backend-simplification-baseline-2026-10-29]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  candidate-experience:
+    name: candidate-experience-build-and-contract
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: 'npm'
+      - name: Install repository dependencies
+        run: npm ci
+      - name: Candidate Experience source-contract regression
+        run: npm run candidate:experience:check
+      - name: Install API dependencies
+        run: npm install --prefix apps/api --no-audit --no-fund
+      - name: Build backend API
+        run: npm run api:build
+      - name: Install web dependencies
+        run: npm install --prefix apps/web --no-audit --no-fund
+      - name: Build Next.js web application
+        run: npm --prefix apps/web run build
