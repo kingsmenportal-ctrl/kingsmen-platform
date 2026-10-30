@@ -224,7 +224,7 @@ Deno.serve(async (req: Request) => {
   const { data: consentRows, error: consentReadError } = await admin.from("privacy_consent_records")
     .select("id,consent_ref,consent_status,granted_at,revoked_at,consent_text_snapshot")
     .eq("candidate_ref", candidate.public_ref).eq("consent_type", "PROFILE_PROCESSING")
-    .order("granted_at", { ascending: false }).limit(20);
+    .order("granted_at", { ascending: false }).order("id", { ascending: false }).limit(20);
   if (consentReadError) {
     console.error("candidate consent read failed", consentReadError.code ?? "unknown");
     return reply(503, { ok: false, code: "CONSENT_READ_FAILED", error: "Consent state could not be verified." }, origin);
