@@ -105,7 +105,7 @@ export async function POST(request: Request) {
     const status = code === "REQUEST_TOO_LARGE" ? 413 : code === "JSON_CONTENT_TYPE_REQUIRED" ? 415 : 400;
     return respond({ ready: false, code, error: "The CAO choice request is invalid." }, status);
   }
-  if (incoming.action !== "save" || typeof incoming.application_id !== "string" || !UUID.test(incoming.application_id)) {
+  if (!incoming || typeof incoming !== "object" || Array.isArray(incoming) || incoming.action !== "save" || typeof incoming.application_id !== "string" || !UUID.test(incoming.application_id)) {
     return respond({ ready: false, code: "CAO_PARENT_REQUIRED", error: "Select an eligible CAO parent application before saving its choices." }, 400);
   }
   if (!Array.isArray(incoming.choices) || incoming.choices.length > 6) {
