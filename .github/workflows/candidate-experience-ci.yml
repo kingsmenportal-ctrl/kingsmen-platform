@@ -24,6 +24,8 @@ jobs:
           cache: 'npm'
       - name: Install repository dependencies
         run: npm ci
+      - name: Full repository regression suite
+        run: npm test
       - name: Candidate Experience source-contract regression
         run: npm run candidate:experience:check
       - name: Install API dependencies
