@@ -41,7 +41,7 @@ const checks = [
   [routes.upload.includes("../../../../../lib/candidate-document-vault-proxy"), "upload route resolves its server-only proxy import"],
   [routes.finalize.includes("finalize-upload") && routes.read.includes("read-url") && routes.status.includes('"list"'), "upload finalize, read-link and status endpoints dispatch distinct actions"],
   [login.includes("/auth/v1/token?grant_type=password") && login.includes("/auth/v1/signup") && login.includes("/auth/v1/recover"), "candidate login provides sign-in, registration and recovery"],
-  [login.includes('requested.startsWith("/candidate/") && !requested.startsWith("//")'), "post-auth redirects are restricted to candidate routes"],
+  [login.includes('requested.startsWith("/candidate/") || requested.startsWith("/reviewer/")') && login.includes('!requested.startsWith("//")') && login.includes("!requested.includes"), "post-auth redirects allow only safe candidate or reviewer workspace routes"],
   [login.includes("does not automatically link you to a candidate record") && login.includes("authorised identity review"), "Auth does not auto-link candidate identity by email"],
   [page.includes("/api/candidate/documents/upload-url") && page.includes("/api/candidate/documents/finalize") && page.includes("/api/candidate/documents/read-url"), "candidate page uses real upload, finalize and read APIs"],
   [page.includes("size > MAX_BYTES") && page.includes("application/pdf") && page.includes("image/jpeg") && page.includes("image/png"), "candidate UI advertises and checks the supported file types and size limit"],
