@@ -19,6 +19,7 @@ const requiredPathways = [
 
 const checks = [
   ["registration confirmation returns to profile setup", login.includes("/candidate/login?next=%2Fcandidate%2Fprofile") && login.includes("redirect_to=") && login.includes('candidateRedirect("/candidate/profile")')],
+  ["email-confirmation callback validates Auth session and clears URL tokens", login.includes('useEffect(() => {') && login.includes('/auth/v1/user') && login.includes("refresh_token: refreshToken") && login.includes("clearFragment();") && login.includes('window.location.assign(next)')],
   ["profile screen explicitly saves consent before backend bootstrap", profile.includes('action: "save"') && profile.includes("consentAccepted: consentChecked") && profileRoute.includes("candidate-master-profile")],
   ["candidate landing page uses all six canonical pathways", requiredPathways.every((pathway) => portal.includes(pathway))],
   ["candidate landing page directs existing-record recovery to identity review", portal.includes("/candidate/identity-review") && portal.toLowerCase().includes("email equality is never used as proof")],
