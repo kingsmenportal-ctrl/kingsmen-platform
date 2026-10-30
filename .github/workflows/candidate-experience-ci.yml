@@ -2,9 +2,9 @@ name: Candidate Experience CI
 
 on:
   push:
-    branches: [feat/candidate-experience-closeout-2026-10-30]
+    branches: [feat/candidate-experience-closeout-2026-10-30, feat/kingsmen-product-unification-rc1-2026-10-30]
   pull_request:
-    branches: [main, feat/backend-simplification-baseline-2026-10-29]
+    branches: [main, feat/backend-simplification-baseline-2026-10-29, feat/candidate-experience-closeout-2026-10-30]
   workflow_dispatch:
 
 permissions:
@@ -36,3 +36,15 @@ jobs:
         run: npm run api:build
       - name: Build Next.js web application
         run: npm --prefix apps/web run build
+      - name: Install Chromium for browser experience checks
+        run: npm exec --prefix apps/web -- playwright install --with-deps chromium
+      - name: Run mobile, accessibility and responsive-layout smoke checks
+        run: npm run test:experience --prefix apps/web
+      - name: Upload product experience screenshots
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: kingsmen-product-experience-${{ github.run_id }}
+          path: apps/web/test-results/product-experience/
+          if-no-files-found: warn
+          retention-days: 14
