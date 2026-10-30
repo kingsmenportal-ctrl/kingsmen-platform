@@ -2,7 +2,7 @@ name: Kingsmen Source Guard
 
 on:
   pull_request:
-    branches: [main, feat/release-engineering-evidence-pipeline]
+    branches: [main, feat/release-engineering-evidence-pipeline, feat/backend-simplification-baseline-2026-10-29]
   push:
     branches: [main, feat/staging-authenticated-e2e-gate, feat/backend-simplification-baseline-2026-10-29, feat/candidate-experience-closeout-2026-10-30]
   workflow_dispatch:
