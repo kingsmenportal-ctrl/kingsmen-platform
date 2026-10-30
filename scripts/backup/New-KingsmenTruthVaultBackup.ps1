@@ -72,7 +72,14 @@ $manifest = [ordered]@{
   format = "pg_dump_custom"
   ownerPrivilegesRestored = $false
   databaseUrlRedacted = $true
-  rawCandidateRowsIncluded = $false
+  # The database archive is a full pg_dump and includes candidate/personal rows.
+  # The script does not encrypt it; secure encrypted storage and retention controls are mandatory.
+  rawCandidateRowsIncluded = $true
+  archiveContainsPersonalData = $true
+  archiveEncryptionProvidedByScript = $false
+  encryptedStorageRequired = $true
+  restrictedAccessStorageRequired = $true
+  retentionPolicyRequired = $true
   committedToGit = $false
   restoreRequiredBeforeProductionData = $true
 }
