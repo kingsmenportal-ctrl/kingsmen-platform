@@ -108,7 +108,7 @@ The following applied ledger entries have no matching canonical migration body i
 
 ## Recovery progress
 
-Recovered SQL bodies (56 of the 89 entries lacking a canonical body in `db/migrations/`) are archived under `release-evidence/recovered-applied-migrations/`, with the source PR, ledger mapping and archived Git blob SHA indexed in that directory's README. These are historical source artifacts, not runnable migrations. The archived blob SHA is not proof of the exact bytes originally executed in staging; timestamp/name mapping and semantic effects still need verification. This recovery covers identity review, private document review, application tracking/preparation, master application, application evidence/status bridge, source feed guards, durable outbox, founder brief, PayFast settlement, and reviewer least-privilege slices. The duplicate `0078` ledger versions remain a special unresolved ambiguity.
+At the original 29 October audit commit, the recorded count was 56 historical bodies recovered from 89 ledger entries lacking a canonical file in `db/migrations/`. That is a dated baseline, not a current completeness count. PR #216 subsequently adds five earlier PR #64 source snapshots, and the archive README now contains 62 version-to-file mapping rows. A mapping-row count is not equivalent to a count of exact original executed bodies. Recompute each of the current 130 live ledger versions against runnable migrations, this archive, original PR/commit/deployment artifacts and live catalog effects before reporting a new recovered/missing total. Archive Git blob SHAs identify the current archived files, not the bytes captured at original Supabase execution. The two `0078` source bodies are no longer unresolved: `20261019112452` maps to the separate 98-line pre-fix body and `20261019112511` maps to the separate 104-line corrected body, supported by PR #120 commit `f723fbe`. Their exact original execution-time SQL checksums remain unavailable.
 
 ## Live schema inventory (read-only)
 
@@ -144,10 +144,27 @@ This validates repository CI at this SHA. It does **not** prove the live databas
 
 ## Not yet proven
 
-- Original SQL bodies for the 89 missing ledger entries.
+- A complete current reconciliation of all 130 live ledger versions against canonical runnable bodies, archived historical source, original deployment/backup evidence and catalog effects. The older 89/56/33 totals are dated 29 October figures and must not be presented as current.
 - Full catalog-level semantic parity between repository and live staging.
 - Backup/restore drill against the current staging snapshot.
 - Authenticated candidate registration/profile persistence and Candidate A/B isolation.
 - Authenticated identity-review request/evidence/reviewer decision/audit.
 - Safe retirement of legacy application or identity paths.
 - Staging deployment of PR #209 or migration `0087`.
+
+
+## Live provenance refresh — 30 October 2026
+
+This addendum supersedes the 29 October counts above for current release decisions. The connected Supabase migration ledger now contains **130** entries and ends at `20261029193124 candidate_self_service_profile_bootstrap_0095`. The current archive README has **62** ledger-version mapping rows, including five baseline snapshots added by PR #216. These counts have different meanings and must not be divided or subtracted to infer completeness. Reconcile all 130 versions individually; classify each as exact canonical body, historical source recovered (execution bytes unproven), source reconstruction, or unrecovered.
+
+### 0078 status
+
+The two historically distinct 0078 source bodies are separately recovered and mapped. The earlier 98-line source maps to ledger version `20261019112452`; the corrected 104-line source maps to `20261019112511`. PR #120 commit `f723fbe7ac9eb3e3afe15e640d61da433bf1bdb4` adds the preparation-item composite owner index. Live read-only staging checks confirm the expected tracker and preparation-item composite indexes are present and valid/ready. The remaining gap is not locating the source bodies; it is the original execution-time checksums and full catalog-level semantic parity for the complete migration sequence.
+
+### 0093 duplicate label
+
+The live ledger contains two `seed_verified_labour_vacancy_deadlines_0093` rows, versions `20261029180632` and `20261029180642`. The current canonical repository file is `db/migrations/0093_seed_verified_labour_vacancy_deadlines_20261030.sql`, Git blob `7243c9d7456c64ba40fd0e8b379db8ecc4925bb5`. It guards against running after 30 October 2026 and uses an idempotent stable-key upsert. Read-only checks confirmed six legacy verified/open Department of Employment and Labour routes and six matching verified legacy deadlines. The new N15 opportunity tables still have zero rows. This does not prove the two historical submissions used identical SQL. Do not replay either ledger entry; obtain original deployment or database-side source evidence if available.
+
+### Release safety
+
+No applied migration body may be changed or replayed. Any actual schema repair must be a reviewed forward-only migration after backup/restore evidence and approved change control. A full catalog audit and disposable restore remain required before declaring provenance and schema parity complete.
