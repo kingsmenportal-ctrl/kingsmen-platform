@@ -4,7 +4,7 @@ import process from "node:process";
 import { chromium } from "playwright";
 
 const baseUrl = (process.env.KINGSMEN_UI_BASE_URL || "http://127.0.0.1:3000").replace(/\/$/, "");
-const outputDir = process.env.KINGSMEN_UI_ARTIFACT_DIR || path.resolve("artifacts/ui-rc1");
+const outputDir = process.env.KINGSMEN_UI_ARTIFACT_DIR || path.resolve("../../artifacts/ui-rc1");
 const baselineDir = process.env.KINGSMEN_UI_BASELINE_DIR
   ? path.resolve(process.env.KINGSMEN_UI_BASELINE_DIR)
   : null;
