@@ -231,6 +231,8 @@ DECLARE
   v_parent record;
   v_choice jsonb;
   v_choice_count integer := 0;
+  v_min_choice_number integer;
+  v_max_choice_number integer;
   v_previous jsonb;
   v_next jsonb;
   v_event_ref text;
@@ -283,6 +285,15 @@ BEGIN
     HAVING count(*) > 1
   ) THEN
     RAISE EXCEPTION 'CAO_CHOICE_NUMBERS_MUST_BE_UNIQUE' USING errcode = '22023';
+  END IF;
+
+  IF jsonb_array_length(p_choices) > 0 THEN
+    SELECT min((value->>'choice_number')::integer), max((value->>'choice_number')::integer)
+      INTO v_min_choice_number, v_max_choice_number
+    FROM jsonb_array_elements(p_choices) x(value);
+    IF v_min_choice_number <> 1 OR v_max_choice_number <> jsonb_array_length(p_choices) THEN
+      RAISE EXCEPTION 'CAO_CHOICE_NUMBERS_MUST_BE_CONTIGUOUS_FROM_ONE' USING errcode = '22023';
+    END IF;
   END IF;
 
   IF EXISTS (
