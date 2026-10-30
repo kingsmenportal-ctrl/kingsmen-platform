@@ -197,3 +197,9 @@
   .km-workspace [class~="flex"]{min-width:0}
   .km-workspace [class~="max-w-6xl"],.km-workspace [class~="max-w-5xl"],.km-workspace [class~="max-w-4xl"],.km-workspace [class~="max-w-3xl"]{width:100%}
 }
+
+/* Portal link hierarchy and keyboard usability */
+.km-workspace a:not([class~="underline"]){text-decoration:none}
+.km-workspace a:not([class~="underline"]):hover{text-decoration:underline}
+.km-workspace :is(a,button,input,select,textarea,summary){scroll-margin-top:6rem}
+.km-workspace :is(a,button,summary){touch-action:manipulation}
