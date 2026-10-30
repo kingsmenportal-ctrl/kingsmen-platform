@@ -66,7 +66,7 @@ export default function HomePage() {
       <div className="km-wrap">
         <nav className="km-nav" aria-label="Main navigation">
           <a className="km-brand" href="#top"><span className="km-mark">K</span><span><strong style={{display:"block",fontSize:13,letterSpacing:2.5}}>KINGSMEN</strong><small style={{display:"block",color:"#98a5b8",fontSize:10,marginTop:4}}>YOUR OPPORTUNITY, CONNECTED</small></span></a>
-          <div className="km-navlinks"><a href="#pathways">Pathways</a><a href="#how-it-works">How it works</a><a href="#principles">Our principles</a><a href="/candidate/login">Sign in</a><a className="km-nav-cta km-btn km-primary" href="/free-destiny-map/">Start your journey ↗</a></div>
+          <div className="km-navlinks"><a href="#pathways">Pathways</a><a href="/packages">Packages</a><a href="#how-it-works">How it works</a><a href="#principles">Our principles</a><a href="/candidate/login">Sign in</a><a className="km-nav-cta km-btn km-primary" href="/free-destiny-map/">Start your journey ↗</a></div>
         </nav>
         <section id="top" className="km-hero">
           <div className="km-hero-grid">
