@@ -47,6 +47,10 @@ export interface NormalizedApplicationStatus {
 }
 
 const isUuid = (value: string): boolean => /^[0-9a-f]{8}-[0-9a-f]{4}-[1-8][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i.test(value.trim());
+const isCurrentOrPastTimestamp = (value: string): boolean => {
+  const timestamp = Date.parse(value);
+  return Number.isFinite(timestamp) && timestamp <= Date.now();
+};
 
 const PROVIDER_CONFIRMED = new Set<CanonicalApplicationStatus>([
   "PROVIDER_ACKNOWLEDGED", "UNDER_REVIEW", "ACCEPTED", "REJECTED"
@@ -96,14 +100,14 @@ export function normalizeLegacyApplicationStatus(input: LegacyApplicationObserva
 
   if (canonical === "CANDIDATE_REPORTED_SUBMITTED") {
     const evidence = input.candidateSubmission;
-    if (!evidence || evidence.reference.trim().length < 3 || !Number.isFinite(Date.parse(evidence.reportedAt))) {
+    if (!evidence || evidence.reference.trim().length < 3 || !isCurrentOrPastTimestamp(evidence.reportedAt)) {
       return {
         status: "LEGACY_UNRESOLVED",
         source: input.source,
         sourceStatus: raw,
         statusAuthority: "legacy_unresolved",
         requiresReview: true,
-        reason: "Candidate-reported submission requires a non-empty reference and valid report timestamp."
+        reason: "Candidate-reported submission requires a non-empty reference and a valid report timestamp that is not in the future."
       };
     }
     return {
@@ -120,14 +124,14 @@ export function normalizeLegacyApplicationStatus(input: LegacyApplicationObserva
     const evidence = input.providerEvidence;
     if (!evidence || evidence.sourceKind !== "PROVIDER_ORIGIN" || evidence.verified !== true ||
         !evidence.evidenceRef.trim() || !isUuid(evidence.verifiedByAuthUserId) ||
-        !Number.isFinite(Date.parse(evidence.verifiedAt))) {
+        !isCurrentOrPastTimestamp(evidence.verifiedAt)) {
       return {
         status: "LEGACY_UNRESOLVED",
         source: input.source,
         sourceStatus: raw,
         statusAuthority: "legacy_unresolved",
         requiresReview: true,
-        reason: "Provider receipt, review, or outcome requires verified provider-origin evidence and reviewer identity."
+        reason: "Provider receipt, review, or outcome requires verified provider-origin evidence, reviewer identity, and a non-future verification timestamp."
       };
     }
     return {
@@ -210,7 +214,7 @@ export function validateApplicationTransition(input: {
   }
   if (input.to === "CANDIDATE_REPORTED_SUBMITTED") {
     const e = input.candidateSubmission;
-    if (!e || e.reference.trim().length < 3 || !Number.isFinite(Date.parse(e.reportedAt))) {
+    if (!e || e.reference.trim().length < 3 || !isCurrentOrPastTimestamp(e.reportedAt)) {
       return { allowed: false, reasons: ["Candidate-reported submission requires a reference and valid timestamp."] };
     }
   }
@@ -218,7 +222,7 @@ export function validateApplicationTransition(input: {
     const e = input.providerEvidence;
     if (!e || e.sourceKind !== "PROVIDER_ORIGIN" || e.verified !== true ||
         !e.evidenceRef.trim() || !isUuid(e.verifiedByAuthUserId) ||
-        !Number.isFinite(Date.parse(e.verifiedAt))) {
+        !isCurrentOrPastTimestamp(e.verifiedAt)) {
       return { allowed: false, reasons: ["Provider-confirmed states require verified provider-origin evidence and reviewer identity."] };
     }
   }

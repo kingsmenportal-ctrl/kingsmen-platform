@@ -25,6 +25,30 @@ assert.equal(reported.statusAuthority, "candidate_reported");
 assert.equal(normalizeLegacyApplicationStatus({ source: "candidate_route_applications", status: "PREPARING" }).statusAuthority, "tracker_recorded");
 assert.match(reported.reason, /not provider-confirmed/i);
 
+const futureCandidateEvidence = {
+  reference: "candidate-ref-future",
+  reportedAt: new Date(Date.now() + 60_000).toISOString()
+};
+const futureReported = normalizeLegacyApplicationStatus({
+  source: "candidate_route_applications",
+  status: "CANDIDATE_REPORTED_SUBMITTED",
+  candidateSubmission: futureCandidateEvidence
+});
+assert.equal(futureReported.status, "LEGACY_UNRESOLVED");
+assert.equal(futureReported.requiresReview, true);
+
+const futureProviderEvidence = {
+  ...providerEvidence,
+  verifiedAt: new Date(Date.now() + 60_000).toISOString()
+};
+const futureProviderClaim = normalizeLegacyApplicationStatus({
+  source: "candidate_route_applications",
+  status: "ACCEPTED",
+  providerEvidence: futureProviderEvidence
+});
+assert.equal(futureProviderClaim.status, "LEGACY_UNRESOLVED");
+assert.equal(futureProviderClaim.requiresReview, true);
+
 const invalidReported = normalizeLegacyApplicationStatus({
   source: "candidate_route_applications",
   status: "CANDIDATE_REPORTED_SUBMITTED"
@@ -63,6 +87,16 @@ assert.equal(validateApplicationTransition({
 }).allowed, true);
 assert.equal(validateApplicationTransition({
   from: "EXTERNAL_PORTAL_OPENED",
+  to: "CANDIDATE_REPORTED_SUBMITTED",
+  candidateSubmission: futureCandidateEvidence
+}).allowed, false);
+assert.equal(validateApplicationTransition({
+  from: "CANDIDATE_REPORTED_SUBMITTED",
+  to: "PROVIDER_ACKNOWLEDGED",
+  providerEvidence: futureProviderEvidence
+}).allowed, false);
+assert.equal(validateApplicationTransition({
+  from: "EXTERNAL_PORTAL_OPENED",
   to: "CANDIDATE_REPORTED_SUBMITTED"
 }).allowed, false);
 assert.equal(validateApplicationTransition({
@@ -98,7 +132,7 @@ assert.equal(validateCaoChoices(Array.from({ length: 7 }, (_, i) => ({
 
 console.log(JSON.stringify({
   passed: true,
-  checks: 24,
+  checks: 28,
   scope: "canonical application lifecycle compatibility policy + CAO child-choice adapter",
   guarantees: [
     "unknown legacy workflow statuses stay unresolved",
