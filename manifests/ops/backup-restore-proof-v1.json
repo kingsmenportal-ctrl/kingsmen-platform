@@ -10,7 +10,11 @@
   "databaseUrlAllowedInReports": false,
   "backupStrategy": {
     "authority": "PostgreSQL/Supabase Truth Vault",
-    "tooling": ["pg_dump", "pg_restore", "psql"],
+    "tooling": [
+      "pg_dump",
+      "pg_restore",
+      "psql"
+    ],
     "format": "custom",
     "ownerPrivilegesRestored": false,
     "restoreTargetMustDifferFromSource": true,
@@ -32,7 +36,15 @@
     "sha256_checksum_required",
     "rpo_rto_fields_required",
     "production_ready_false",
-    "staging_drill_still_required"
+    "staging_drill_still_required",
+    "backup_archive_catalog_validated",
+    "restore_requires_explicit_confirmation",
+    "restore_compares_database_server_identity",
+    "restore_uses_exit_on_error",
+    "restore_count_query_failure_blocks_pass",
+    "full_database_archive_includes_candidate_rows",
+    "destructive_restore_requires_explicit_disposable_target_allowlist",
+    "archive_encryption_and_restricted_storage_required"
   ],
   "evidencePaths": [
     "scripts/backup/New-KingsmenTruthVaultBackup.ps1",
@@ -43,5 +55,5 @@
     "reports/ops/backup-restore-proof-latest.json",
     "reports/ops/backup-restore-validation-latest.json"
   ],
-  "remainingConstraint": "Run a real staging backup and restore drill, store counts-only evidence, verify RPO/RTO, and keep backup archives outside Git before production data."
+  "remainingConstraint": "Run a real approved staging backup and restore drill against a separately verified disposable target, store counts-only evidence, verify RPO/RTO and Storage-object recovery, and keep backup archives outside Git before production data."
 }

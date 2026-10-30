@@ -21,10 +21,11 @@ function exists(path) {
 const requiredTokens = new Map([
   ['package.json', ['backup:prove:restore', 'backup:validate:restore']],
   ['.gitignore', ['.local/backups', 'backups/', '*.dump', '*.backup']],
-  ['manifests/ops/backup-restore-proof-v1.json', ['backup-restore-proof-v1', 'foundation_built_pending_staging_drill', 'restoreTargetMustDifferFromSource', 'backupStorageAllowedInGit']],
+  ['manifests/ops/backup-restore-proof-v1.json', ['backup-restore-proof-v1', 'foundation_built_pending_staging_drill', 'restoreTargetMustDifferFromSource', 'backupStorageAllowedInGit', 'full_database_archive_includes_candidate_rows', 'destructive_restore_requires_explicit_disposable_target_allowlist', 'archive_encryption_and_restricted_storage_required']],
   ['docs/ops/KINGSMEN_BACKUP_RESTORE_PROOF.md', ['pg_dump', 'pg_restore', 'RPO', 'RTO', 'Production ready: **false**']],
-  ['scripts/backup/New-KingsmenTruthVaultBackup.ps1', ['KINGSMEN_DATABASE_URL', 'pg_dump', 'Get-FileHash', 'databaseUrlRedacted', 'committedToGit = $false']],
-  ['scripts/backup/Test-KingsmenTruthVaultRestore.ps1', ['KINGSMEN_RESTORE_DRILL_DATABASE_URL', 'pg_restore', 'Restore target matches source database', 'countOnly = $true', 'rtoSeconds']],
+  ['scripts/backup/New-KingsmenTruthVaultBackup.ps1', ['KINGSMEN_DATABASE_URL', 'pg_dump', 'Get-FileHash', 'databaseUrlRedacted', 'committedToGit = $false', 'rawCandidateRowsIncluded = $true', 'archiveContainsPersonalData = $true', 'archiveEncryptionProvidedByScript = $false', 'encryptedStorageRequired = $true', 'restrictedAccessStorageRequired = $true', 'retentionPolicyRequired = $true']],
+  ['scripts/backup/Test-KingsmenTruthVaultRestore.ps1', ['KINGSMEN_RESTORE_DRILL_DATABASE_URL', 'KINGSMEN_DATABASE_URL', 'KINGSMEN_RESTORE_DRILL_EXPECTED_HOST', 'KINGSMEN_RESTORE_DRILL_EXPECTED_DATABASE', 'pg_restore', '--exit-on-error', 'ConfirmDestructiveRestore', 'explicitly approved disposable restore host', 'actualRestoreDatabaseName -cne $ExpectedRestoreDatabaseName', 'current_database()', 'inet_server_addr()', 'ON_ERROR_STOP=1', 'countOnly = $true', 'rtoSeconds']],
+  ['scripts/backup/test-backup-restore-safety.mjs', ['kingsmen.backup-restore-safety-tests.v1', 'liveDatabaseTouched: false', 'Count-only verification query failed']],
   ['scripts/proof/prove-backup-restore-boundary.mjs', ['BACKUP_RESTORE_SOURCE_PROOF_PASSED', 'stagingRestoreDrillCompleted: false']],
   ['manifests/launch/kingsmen-launch-readiness-v1.json', ['backup_restore', 'backup-restore-proof-v1', 'foundation_built_pending_staging_drill']],
   ['scripts/validators/validate-kingsmen-launch-readiness.mjs', ['backup:validate:restore', 'BACKUP_RESTORE_STAGING_DRILL_REQUIRED']]
@@ -62,6 +63,15 @@ for (const [path, tokens] of requiredTokens.entries()) {
   }
 }
 
+if (exists('scripts/backup/New-KingsmenTruthVaultBackup.ps1')) {
+  const backupScript = read('scripts/backup/New-KingsmenTruthVaultBackup.ps1');
+  check('archive_declares_candidate_rows_included', /rawCandidateRowsIncluded = \$true/.test(backupScript), 'Full database dumps include candidate/personal rows', 'scripts/backup/New-KingsmenTruthVaultBackup.ps1');
+  check('archive_requires_encrypted_storage', /archiveContainsPersonalData = \$true/.test(backupScript) && /archiveEncryptionProvidedByScript = \$false/.test(backupScript) && /encryptedStorageRequired = \$true/.test(backupScript), 'Archive content must be encrypted by its storage/operations layer', 'scripts/backup/New-KingsmenTruthVaultBackup.ps1');
+}
+if (exists('scripts/backup/Test-KingsmenTruthVaultRestore.ps1')) {
+  const restoreScript = read('scripts/backup/Test-KingsmenTruthVaultRestore.ps1');
+  check('restore_allowlists_disposable_target', /KINGSMEN_RESTORE_DRILL_EXPECTED_HOST/.test(restoreScript) && /KINGSMEN_RESTORE_DRILL_EXPECTED_DATABASE/.test(restoreScript) && /actualRestoreDatabaseName -cne \$ExpectedRestoreDatabaseName/.test(restoreScript), 'Destructive restore target must match explicit host/database approval', 'scripts/backup/Test-KingsmenTruthVaultRestore.ps1');
+}
 if (exists('manifests/ops/backup-restore-proof-v1.json')) {
   const manifest = JSON.parse(read('manifests/ops/backup-restore-proof-v1.json'));
   check('manifest_production_ready_false', manifest.productionReady === false, String(manifest.productionReady), 'manifests/ops/backup-restore-proof-v1.json');
@@ -69,6 +79,8 @@ if (exists('manifests/ops/backup-restore-proof-v1.json')) {
   check('manifest_production_data_false', manifest.productionDataAllowed === false, String(manifest.productionDataAllowed), 'manifests/ops/backup-restore-proof-v1.json');
   check('manifest_no_git_backups', manifest.backupStorageAllowedInGit === false, String(manifest.backupStorageAllowedInGit), 'manifests/ops/backup-restore-proof-v1.json');
   check('manifest_no_raw_rows', manifest.rawCandidateRowsAllowedInReports === false, String(manifest.rawCandidateRowsAllowedInReports), 'manifests/ops/backup-restore-proof-v1.json');
+  check('manifest_restore_confirmation_scenario', manifest.proofScenarios.includes('restore_requires_explicit_confirmation'), 'explicit destructive restore approval is required', 'manifests/ops/backup-restore-proof-v1.json');
+  check('manifest_archive_verification_scenario', manifest.proofScenarios.includes('backup_archive_catalog_validated'), 'backup archive catalog validation is required', 'manifests/ops/backup-restore-proof-v1.json');
 }
 
 if (exists('reports/ops/backup-restore-proof-latest.json')) {
