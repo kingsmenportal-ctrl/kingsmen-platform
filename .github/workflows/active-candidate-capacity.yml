@@ -2,9 +2,9 @@ name: Active Candidate Capacity
 
 on:
   pull_request:
-    branches: [security/0097-port-on-candidate-rc1-2026-10-30, capacity/0098-active-candidate-cap-2026-10-30]
+    branches: [security/0097-port-on-candidate-rc1-2026-10-30, capacity/0098-active-candidate-cap-2026-10-30, ops/backup-restore-safety-current-rc-2026-10-30]
   push:
-    branches: [capacity/0098-active-candidate-cap-2026-10-30, feat/rc1-ui-quality-current-security-2026-10-30]
+    branches: [capacity/0098-active-candidate-cap-2026-10-30, feat/rc1-ui-quality-current-security-2026-10-30, feat/rc1-visual-restoration-wcag-smoke-2026-10-30]
   workflow_dispatch:
 
 permissions:
