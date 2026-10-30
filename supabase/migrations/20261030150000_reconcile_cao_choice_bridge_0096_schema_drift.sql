@@ -160,6 +160,21 @@ BEGIN
     v_missing := array_append(v_missing, 'cao_choice_items RLS enabled');
   END IF;
 
+  -- RLS does not protect against TRUNCATE, which bypasses row-level policies.
+  -- Reconciliation must fail closed until the 0097 client privilege hardening
+  -- has removed all non-DML grants, including grants inherited through PUBLIC.
+  IF has_table_privilege('anon', 'public.cao_choice_items', 'TRUNCATE')
+    OR has_table_privilege('authenticated', 'public.cao_choice_items', 'TRUNCATE')
+    OR has_table_privilege('anon', 'public.cao_choice_items', 'REFERENCES')
+    OR has_table_privilege('authenticated', 'public.cao_choice_items', 'REFERENCES')
+    OR has_table_privilege('anon', 'public.cao_choice_items', 'TRIGGER')
+    OR has_table_privilege('authenticated', 'public.cao_choice_items', 'TRIGGER')
+    OR has_table_privilege('anon', 'public.cao_choice_items', 'MAINTAIN')
+    OR has_table_privilege('authenticated', 'public.cao_choice_items', 'MAINTAIN')
+  THEN
+    v_missing := array_append(v_missing, 'cao_choice_items client TRUNCATE/REFERENCES/TRIGGER/MAINTAIN grants revoked by 0097');
+  END IF;
+
   IF cardinality(v_missing) > 0 THEN
     RAISE EXCEPTION 'CAO_0096_PROVENANCE_RECONCILIATION_FAILED: %', array_to_string(v_missing, '; ');
   END IF;
