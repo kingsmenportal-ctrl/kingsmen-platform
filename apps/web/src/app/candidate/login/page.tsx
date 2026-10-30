@@ -23,11 +23,11 @@ function saveSession(session: Record<string, unknown>) {
   window.localStorage.setItem(`sb-${ref}-auth-token`, JSON.stringify(session));
 }
 
-function candidateRedirect(): string {
-  const requested = new URLSearchParams(window.location.search).get("next") ?? "/candidate/dashboard";
+function candidateRedirect(fallback = "/candidate/dashboard"): string {
+  const requested = new URLSearchParams(window.location.search).get("next") ?? fallback;
   return requested.startsWith("/candidate/") && !requested.startsWith("//")
     ? requested
-    : "/candidate/dashboard";
+    : fallback;
 }
 
 export default function CandidateLoginPage() {
@@ -56,10 +56,11 @@ export default function CandidateLoginPage() {
     setBusy(true);
     try {
       const base = SUPABASE_URL.replace(/\/+$/, "");
+      const registrationReturn = `${window.location.origin}/candidate/login?next=%2Fcandidate%2Fprofile`;
       const endpoint = mode === "signin"
         ? `${base}/auth/v1/token?grant_type=password`
         : mode === "register"
-          ? `${base}/auth/v1/signup`
+          ? `${base}/auth/v1/signup?redirect_to=${encodeURIComponent(registrationReturn)}`
           : `${base}/auth/v1/recover?redirect_to=${encodeURIComponent(`${window.location.origin}/candidate/login`)}`;
       const payload: Record<string, unknown> = { email: email.trim() };
       if (mode !== "recover") payload.password = password;
@@ -88,7 +89,7 @@ export default function CandidateLoginPage() {
         if (session && typeof session.access_token === "string") {
           saveSession(session);
           setNotice("Account created. Kingsmen identity linking still requires an authorised identity review; registration does not automatically link you to a candidate record.");
-          window.location.assign(candidateRedirect());
+          window.location.assign(candidateRedirect("/candidate/profile"));
           return;
         }
         setNotice("Registration received. Check your email to complete authentication. Your account does not automatically link you to a candidate record; that requires authorised identity review.");
