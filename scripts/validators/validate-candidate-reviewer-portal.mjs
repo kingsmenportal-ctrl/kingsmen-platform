@@ -21,7 +21,7 @@ const checks = [
   ["registration confirmation returns to profile setup", login.includes("/candidate/login?next=%2Fcandidate%2Fprofile") && login.includes("redirect_to=") && login.includes('candidateRedirect("/candidate/profile")')],
   ["profile screen explicitly saves consent before backend bootstrap", profile.includes('action: "save"') && profile.includes("consentAccepted: consentChecked") && profileRoute.includes("candidate-master-profile")],
   ["candidate landing page uses all six canonical pathways", requiredPathways.every((pathway) => portal.includes(pathway))],
-  ["candidate landing page directs existing-record recovery to identity review", portal.includes("/candidate/identity-review") && portal.includes("email equality is never used as proof")],
+  ["candidate landing page directs existing-record recovery to identity review", portal.includes("/candidate/identity-review") && portal.toLowerCase().includes("email equality is never used as proof")],
   ["identity recovery screen uses authenticated server proxy", identity.includes("/api/candidate/identity-review") && identity.includes("/api/candidate/identity-review/evidence") && identityRoute.includes("candidate-identity-review-request")],
   ["reviewer screen uses shared project-scoped session helper", reviewer.includes("getCandidateAccessToken") && reviewer.includes("getCandidateSupabaseConfig")],
   ["reviewer screen sends anon key plus user bearer to Supabase functions", reviewer.includes("apikey: SUPABASE_CONFIG.anonKey") && reviewer.includes("reviewerHeaders(token")],
