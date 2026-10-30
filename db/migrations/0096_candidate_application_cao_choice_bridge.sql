@@ -240,7 +240,10 @@ BEGIN
     RAISE EXCEPTION 'AUTHENTICATED_CANDIDATE_AND_PARENT_REQUIRED' USING errcode = '42501';
   END IF;
 
-  IF p_choices IS NULL OR jsonb_typeof(p_choices) IS DISTINCT FROM 'array' OR jsonb_array_length(p_choices) > 6 THEN
+  IF p_choices IS NULL OR jsonb_typeof(p_choices) IS DISTINCT FROM 'array' THEN
+    RAISE EXCEPTION 'CAO_CHOICES_MUST_BE_AN_ARRAY_OF_AT_MOST_SIX' USING errcode = '22023';
+  END IF;
+  IF jsonb_array_length(p_choices) > 6 THEN
     RAISE EXCEPTION 'CAO_CHOICES_MUST_BE_AN_ARRAY_OF_AT_MOST_SIX' USING errcode = '22023';
   END IF;
 
