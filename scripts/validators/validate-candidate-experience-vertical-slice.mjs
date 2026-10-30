@@ -20,6 +20,9 @@ const evidenceRoute = read("apps/web/src/app/api/candidate/identity-review/evide
 const documentPage = read("apps/web/src/app/candidate/documents/page.tsx");
 const documentFunction = read("supabase/functions/candidate-private-documents/index.ts");
 const session = read("apps/web/src/lib/candidate-session.ts");
+const caoPage = read("apps/web/src/app/candidate/cao-choices/page.tsx");
+const caoRoute = read("apps/web/src/app/api/candidate/cao-choices/route.ts");
+const caoMigration = read("db/migrations/0096_candidate_application_cao_choice_bridge.sql");
 
 const checks = [
   ["profile CRUD is a backend API contract", /action: "load"/.test(profilePage) && /action: "save"/.test(profilePage) && /candidate-master-profile/.test(profileRoute)],
@@ -48,6 +51,12 @@ const checks = [
   ["candidate profile and workbench use shared Supabase project session parsing", /getCandidateAccessToken/.test(profilePage) && /getCandidateAccessToken/.test(read("apps/web/src/app/candidate/workbench/page.tsx")) && /getCandidateAccessToken/.test(read("apps/web/src/app/candidate/applications/page.tsx"))],
   ["active pathway filter determines the displayed and submitted pathway", /pathway !== "ALL" && item.pathways.includes\(pathway\) \? pathway/.test(opportunityPage)],
   ["dashboard links to profile and identity review", /\/candidate\/profile/.test(dashboard) && /\/candidate\/identity-review/.test(dashboard)],
+  ["CAO children link to unified candidate_applications without rewriting legacy parents", /candidate_application_id/.test(caoMigration) && /applications_id_candidate_id_key/.test(caoMigration) && /exactly_one_parent_check/.test(caoMigration) && /application_id DROP NOT NULL/.test(caoMigration)],
+  ["CAO choice reads and writes use authenticated owner-bound RPCs", /list_candidate_cao_parents/.test(caoMigration) && /get_candidate_cao_choices/.test(caoMigration) && /save_candidate_cao_choices/.test(caoMigration) && /VERIFIED_CANDIDATE_IDENTITY_REQUIRED/.test(caoMigration) && /GRANT EXECUTE ON FUNCTION public.save_candidate_cao_choices/.test(caoMigration)],
+  ["CAO child choices cap at six, keep order unique and remain unverified drafts", /jsonb_array_length\(p_choices\) > 6/.test(caoMigration) && /CAO_CHOICE_NUMBERS_MUST_BE_UNIQUE/.test(caoMigration) && /'D', 'DRAFT'/.test(caoMigration) && /provider_submission_sent', false/.test(caoMigration)],
+  ["CAO API proxies bearer identity without browser service role", /AUTHENTICATION_REQUIRED/.test(caoRoute) && /Authorization: authorization/.test(caoRoute) && caoRoute.includes('/rest/v1/rpc/') && !/SUPABASE_SERVICE_ROLE_KEY/.test(caoRoute)],
+  ["CAO UI supports ordered choices, six-item limit and draft-only editing", /choices.length >= 6/.test(caoPage) && /reorderChoice/.test(caoPage) && /selectedParent.status !== "DRAFT"/.test(caoPage) && /No CAO\/provider submission occurred/.test(caoPage)],
+  ["CAO editor is reachable from dashboard and application tracker", /\/candidate\/cao-choices/.test(dashboard) && /\/candidate\/cao-choices/.test(read("apps/web/src/app/candidate/applications/page.tsx"))],
 ];
 let failed = 0;
 for (const [name, passed] of checks) {
