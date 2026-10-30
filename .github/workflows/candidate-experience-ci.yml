@@ -51,7 +51,7 @@ jobs:
         run: npm --prefix apps/web run ui:rc1:smoke
         env:
           KINGSMEN_UI_BASE_URL: http://127.0.0.1:3000
-          KINGSMEN_UI_ARTIFACT_DIR: artifacts/ui-rc1
+          KINGSMEN_UI_ARTIFACT_DIR: ../../artifacts/ui-rc1
       - name: Upload RC1 browser screenshots and report
         if: always()
         uses: actions/upload-artifact@v4
