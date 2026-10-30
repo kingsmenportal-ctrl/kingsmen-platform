@@ -2,7 +2,7 @@ name: Kingsmen Release Evidence
 
 on:
   pull_request:
-    branches: [main, feat/backend-simplification-baseline-2026-10-29, feat/candidate-experience-closeout-2026-10-30, security/0097-port-on-candidate-rc1-2026-10-30]
+    branches: [main, feat/backend-simplification-baseline-2026-10-29, feat/candidate-experience-closeout-2026-10-30, security/0097-port-on-candidate-rc1-2026-10-30, capacity/0098-active-candidate-cap-2026-10-30, feat/rc1-ui-quality-current-security-2026-10-30]
   push:
     branches: [main, feat/backend-simplification-baseline-2026-10-29, feat/candidate-experience-closeout-2026-10-30, capacity/0098-active-candidate-cap-2026-10-30]
   workflow_dispatch:
