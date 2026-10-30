@@ -13,10 +13,21 @@ const externalServer = Boolean(process.env.KINGSMEN_EXPERIENCE_BASE_URL);
 const routes = [
   { route: "/", label: "public-home" },
   { route: "/pricing", label: "packages" },
+  { route: "/free-destiny-map", label: "free-destiny-map" },
+  { route: "/candidate/login", label: "candidate-login" },
   { route: "/candidate/dashboard", label: "candidate-dashboard" },
+  { route: "/candidate/profile", label: "candidate-profile" },
+  { route: "/candidate/identity-review", label: "candidate-identity-review" },
+  { route: "/candidate/documents", label: "candidate-document-vault" },
+  { route: "/candidate/opportunity-matches", label: "candidate-opportunity-discovery" },
+  { route: "/candidate/workbench", label: "candidate-workbench" },
+  { route: "/candidate/applications", label: "candidate-applications" },
+  { route: "/candidate/cao-choices", label: "candidate-cao-choices" },
   { route: "/candidate/mobile", label: "candidate-mobile" },
+  { route: "/reviewer/identity-reviews", label: "reviewer-identity-queue" },
   { route: "/founder/control-plane", label: "founder-control-plane" },
-  { route: "/reviewer/identity-reviews", label: "reviewer-identity-queue" }
+  { route: "/founder/proof-centre", label: "founder-proof-centre" },
+  { route: "/founder/providers", label: "founder-provider-operations" }
 ];
 const widths = [320, 360, 390, 768, 1024, 1440];
 const failures = [];
@@ -65,6 +76,12 @@ async function main() {
       if (await page.locator(".km-skip-link").count() !== 1) failures.push(item.route + ": skip navigation link is missing");
       if (await page.locator("header.km-site-header").count() !== 1) failures.push(item.route + ": shared Kingsmen header is missing or duplicated");
       if (await page.locator("nav[aria-label]").count() < 1) failures.push(item.route + ": a labelled navigation landmark is missing");
+      const navContext = item.route.startsWith("/candidate/") ? "Candidate workspace navigation"
+        : item.route.startsWith("/reviewer/") ? "Restricted reviewer navigation"
+        : item.route.startsWith("/founder/") ? "Founder workspace navigation" : "Public website navigation";
+      if (await page.locator('nav[aria-label="' + navContext + '"]').count() !== 1) {
+        failures.push(item.route + ": the expected " + navContext + " context is missing");
+      }
 
       const unlabeledControls = await page.locator("input,select,textarea").evaluateAll(elements => elements.filter(element => {
         const aria = element.getAttribute("aria-label");
@@ -150,7 +167,7 @@ async function main() {
     limitations: [
       "Screenshots are CI review artifacts; pixel-diff comparison still requires an approved reference baseline.",
       "This browser suite does not replace screen-reader and manual assistive-technology testing.",
-      "Authenticated candidate/reviewer mutations are not run by this public surface smoke suite; reviewer UI access is a backend-grant-gated route."
+      "Authenticated candidate/reviewer mutations are not run by this route smoke suite; reviewer UI access is a backend-grant-gated route. Pixel-diff regression still requires approved committed baselines."
     ],
     failures
   };
