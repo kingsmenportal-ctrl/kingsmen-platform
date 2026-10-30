@@ -59,7 +59,7 @@ Deno.serve(async(req:Request)=>{
   const {data:consentRows,error:consentError}=await admin.from("privacy_consent_records")
     .select("consent_status,revoked_at,consent_text_snapshot,granted_at")
     .eq("candidate_ref",candidate.public_ref).eq("consent_type","PROFILE_PROCESSING")
-    .order("granted_at",{ascending:false}).limit(20);
+    .order("granted_at",{ascending:false}).order("id",{ascending:false}).limit(20);
   if(consentError) {
     console.error("candidate consent lookup failed",consentError.code??"unknown");
     return reply(503,{ok:false,code:"CONSENT_LOOKUP_FAILED",error:"The candidate consent state could not be verified."},origin);
