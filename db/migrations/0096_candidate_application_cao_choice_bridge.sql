@@ -228,6 +228,7 @@ DECLARE
   v_auth_user_id uuid := auth.uid();
   v_candidate_id uuid;
   v_link_candidate_id uuid;
+  v_has_active_consent boolean := false;
   v_parent record;
   v_choice jsonb;
   v_choice_count integer := 0;
@@ -260,6 +261,22 @@ BEGIN
 
   IF v_candidate_id IS NULL OR v_link_candidate_id IS DISTINCT FROM v_candidate_id THEN
     RAISE EXCEPTION 'VERIFIED_CANDIDATE_IDENTITY_REQUIRED' USING errcode = '42501';
+  END IF;
+
+  SELECT EXISTS (
+    SELECT 1
+    FROM public.candidates c
+    JOIN public.privacy_consent_records pc ON pc.candidate_ref = c.public_ref
+    WHERE c.id = v_candidate_id
+      AND pc.consent_type = 'PROFILE_PROCESSING'
+      AND pc.consent_status = 'ACTIVE'
+      AND pc.revoked_at IS NULL
+      AND nullif(trim(pc.consent_text_snapshot), '') IS NOT NULL
+      AND pc.granted_at <= now()
+  ) INTO v_has_active_consent;
+
+  IF NOT v_has_active_consent THEN
+    RAISE EXCEPTION 'CAO_PROFILE_PROCESSING_CONSENT_REQUIRED' USING errcode = '42501';
   END IF;
 
   FOR v_choice IN SELECT value FROM jsonb_array_elements(p_choices)
