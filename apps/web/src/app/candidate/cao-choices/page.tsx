@@ -106,9 +106,7 @@ export default function CandidateCaoChoicesPage() {
       }
       const nextParents = body.parents;
       setParents(nextParents);
-      const nextId = nextParents.some(parent => parent.application_id === selectedParentId)
-        ? selectedParentId
-        : nextParents[0]?.application_id ?? "";
+      const nextId = nextParents[0]?.application_id ?? "";
       setSelectedParentId(nextId);
       if (nextId) await loadChoices(nextId, token);
       else setChoices([]);
@@ -117,7 +115,7 @@ export default function CandidateCaoChoicesPage() {
     } finally {
       setLoading(false);
     }
-  }, [loadChoices, selectedParentId]);
+  }, [loadChoices]);
 
   useEffect(() => { void loadParents(); }, [loadParents]);
 
@@ -138,7 +136,7 @@ export default function CandidateCaoChoicesPage() {
     }
   }
 
-  function updateChoice(index: number, key: keyof CaoChoice, value: string) {
+  function updateChoice(index: number, key: "institution_name" | "programme_name" | "cao_programme_code" | "source_url", value: string) {
     setChoices(old => old.map((choice, i) => i === index ? { ...choice, [key]: value } : choice));
     setNotice("");
   }
