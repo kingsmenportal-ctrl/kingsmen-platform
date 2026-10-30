@@ -2,9 +2,9 @@ name: Candidate Experience CI
 
 on:
   push:
-    branches: [feat/candidate-experience-closeout-2026-10-30]
+    branches: [feat/candidate-experience-closeout-2026-10-30, feat/rc1-product-coherence-qa-2026-10-30-v2]
   pull_request:
-    branches: [main, feat/backend-simplification-baseline-2026-10-29]
+    branches: [main, feat/backend-simplification-baseline-2026-10-29, feat/candidate-experience-closeout-2026-10-30]
   workflow_dispatch:
 
 permissions:
@@ -36,3 +36,26 @@ jobs:
         run: npm run api:build
       - name: Build Next.js web application
         run: npm --prefix apps/web run build
+      - name: Install Chromium for RC1 browser smoke tests
+        run: npx --prefix apps/web playwright install --with-deps chromium
+      - name: Start the production Next.js server
+        run: |
+          npm --prefix apps/web run start -- --port 3000 > /tmp/kingsmen-next.log 2>&1 &
+          for attempt in $(seq 1 60); do
+            if curl --fail --silent http://127.0.0.1:3000/ >/dev/null; then exit 0; fi
+            sleep 2
+          done
+          cat /tmp/kingsmen-next.log
+          exit 1
+      - name: RC1 responsive, accessibility-smoke and screenshot capture
+        run: npm --prefix apps/web run ui:rc1:smoke
+        env:
+          KINGSMEN_UI_BASE_URL: http://127.0.0.1:3000
+          KINGSMEN_UI_ARTIFACT_DIR: artifacts/ui-rc1
+      - name: Upload RC1 browser screenshots and report
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: kingsmen-rc1-ui-smoke
+          path: artifacts/ui-rc1/
+          if-no-files-found: warn
