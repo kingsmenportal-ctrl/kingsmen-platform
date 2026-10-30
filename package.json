@@ -10,7 +10,7 @@
   "scripts": {
     "candidate:experience:check": "node scripts/validators/validate-candidate-experience-vertical-slice.mjs && node scripts/validators/validate-candidate-reviewer-portal.mjs",
     "candidate:profile:e2e": "node scripts/staging/test-candidate-profile-persistence-e2e.mjs",
-    "test": "node scripts/validators/validate-jarvis-core.mjs && node scripts/validators/validate-jarvis-live-pass-02.mjs && node scripts/staging/test-kingsmen-operating-evidence-reconciliation.mjs && npm run n14:connectors:check && npm run n15:sources:check && npm run n15:ingestion:check && npm run backend:simplification:check && npm run security:validate:client-non-dml && npm run capacity:validate",
+    "test": "node scripts/validators/validate-jarvis-core.mjs && node scripts/validators/validate-jarvis-live-pass-02.mjs && node scripts/staging/test-kingsmen-operating-evidence-reconciliation.mjs && npm run n14:connectors:check && npm run n15:sources:check && npm run n15:ingestion:check && npm run backend:simplification:check && npm run security:validate:client-non-dml && npm run capacity:validate && npm run security:validate:cao-0096-provenance",
     "jarvis:validate": "node scripts/validators/validate-jarvis-connected-live.mjs",
     "jarvis:validate:core": "node scripts/validators/validate-jarvis-core.mjs",
     "jarvis:validate:live-pass-02": "node scripts/validators/validate-jarvis-live-pass-02.mjs",
@@ -107,6 +107,7 @@
     "documents:vault:validate": "node scripts/validators/validate-candidate-private-document-vault.mjs",
     "documents:vault:test": "node scripts/staging/test-candidate-document-binary-signature.mjs",
     "candidate:security:e2e": "node scripts/staging/test-candidate-reviewer-isolation-e2e.mjs",
+    "security:validate:cao-0096-provenance": "node scripts/validators/validate-cao-0096-provenance-adoption.mjs",
     "security:validate:client-non-dml": "node scripts/validators/validate-client-non-dml-privileges.mjs",
     "capacity:validate": "node scripts/validators/validate-active-candidate-capacity.mjs",
     "capacity:test": "node scripts/staging/test-active-candidate-capacity.mjs",
