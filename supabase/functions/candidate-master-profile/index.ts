@@ -306,7 +306,10 @@ Deno.serve(async (req: Request) => {
   if (profile.displayName && profile.displayName.length < 2) return reply(400, { ok: false, code: "PROFILE_NAME_INVALID", error: "Enter at least two characters for your name." }, origin);
   if (profile.phone && !/^[+0-9 ()-]{7,40}$/.test(profile.phone)) return reply(400, { ok: false, code: "PHONE_INVALID", error: "Use a valid phone format or leave the number blank." }, origin);
   const now = new Date().toISOString();
-  const activeConsent = consentRows?.find((row: Record<string, unknown>) => row.consent_status === "ACTIVE" && !row.revoked_at && row.consent_text_snapshot);
+  const latestConsent = consentRows?.[0] ?? null;
+  const activeConsent = latestConsent?.consent_status === "ACTIVE" && !latestConsent.revoked_at &&
+    typeof latestConsent.consent_text_snapshot === "string" && latestConsent.consent_text_snapshot.trim().length > 0
+    ? latestConsent : null;
   if (!activeConsent) {
     const consentRef = `PROFILE-${candidate.public_ref}-${crypto.randomUUID()}`;
     const { error } = await admin.from("privacy_consent_records").insert({
