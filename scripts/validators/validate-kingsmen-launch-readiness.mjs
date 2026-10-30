@@ -99,7 +99,7 @@ const requiredFileChecks = [
 
   checkFile('manifests/ops/backup-restore-proof-v1.json', ['backup-restore-proof-v1', 'foundation_built_pending_staging_drill', 'restoreTargetMustDifferFromSource', 'backupStorageAllowedInGit']),
   checkFile('docs/ops/KINGSMEN_BACKUP_RESTORE_PROOF.md', ['pg_dump', 'pg_restore', 'RPO', 'RTO', 'Production ready: **false**']),
-  checkFile('docs/security/KINGSMEN_CAO_0096_MIGRATION_PROVENANCE.md', ['source proposal prepared; not applied', 'original structural migration application time', 'Production ready: **false**]),
+  checkFile('docs/security/KINGSMEN_CAO_0096_MIGRATION_PROVENANCE.md', ['source proposal prepared; not applied', 'original structural migration application time', 'Production ready: **false**']),
   checkFile('scripts/validators/validate-cao-0096-provenance-adoption.mjs', ['liveDatabaseTouched: false', 'no_schema_or_data_mutation']),
   checkFile('scripts/backup/New-KingsmenTruthVaultBackup.ps1', ['KINGSMEN_DATABASE_URL', 'pg_dump', 'Get-FileHash', 'databaseUrlRedacted', 'committedToGit = $false']),
   checkFile('scripts/backup/Test-KingsmenTruthVaultRestore.ps1', ['KINGSMEN_RESTORE_DRILL_DATABASE_URL', 'pg_restore', 'Restore target matches source database', 'countOnly = $true', 'rtoSeconds']),
