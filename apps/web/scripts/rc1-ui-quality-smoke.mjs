@@ -13,11 +13,16 @@ const routes = [
   "/candidate/login",
   "/candidate/dashboard",
   "/candidate/profile",
+  "/candidate/identity-review",
+  "/candidate/workbench",
   "/candidate/opportunity-matches",
   "/candidate/applications",
   "/candidate/documents",
   "/candidate/cao-choices",
-  "/reviewer/identity-reviews"
+  "/candidate/finance",
+  "/reviewer/identity-reviews",
+  "/founder/control-plane",
+  "/control-plane"
 ];
 const viewports = [
   { name: "mobile-360x800", width: 360, height: 800 },
