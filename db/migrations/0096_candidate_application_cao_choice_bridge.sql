@@ -266,9 +266,15 @@ BEGIN
   SELECT EXISTS (
     SELECT 1
     FROM public.candidates c
-    JOIN public.privacy_consent_records pc ON pc.candidate_ref = c.public_ref
+    JOIN LATERAL (
+      SELECT consent_status, revoked_at, consent_text_snapshot, granted_at
+      FROM public.privacy_consent_records pc
+      WHERE pc.candidate_ref = c.public_ref
+        AND pc.consent_type = 'PROFILE_PROCESSING'
+      ORDER BY pc.granted_at DESC, pc.id DESC
+      LIMIT 1
+    ) pc ON true
     WHERE c.id = v_candidate_id
-      AND pc.consent_type = 'PROFILE_PROCESSING'
       AND pc.consent_status = 'ACTIVE'
       AND pc.revoked_at IS NULL
       AND nullif(trim(pc.consent_text_snapshot), '') IS NOT NULL
@@ -506,9 +512,15 @@ begin
   SELECT EXISTS (
     SELECT 1
     FROM public.candidates c
-    JOIN public.privacy_consent_records pc ON pc.candidate_ref = c.public_ref
+    JOIN LATERAL (
+      SELECT consent_status, revoked_at, consent_text_snapshot, granted_at
+      FROM public.privacy_consent_records pc
+      WHERE pc.candidate_ref = c.public_ref
+        AND pc.consent_type = 'PROFILE_PROCESSING'
+      ORDER BY pc.granted_at DESC, pc.id DESC
+      LIMIT 1
+    ) pc ON true
     WHERE c.id = v_candidate_id
-      AND pc.consent_type = 'PROFILE_PROCESSING'
       AND pc.consent_status = 'ACTIVE'
       AND pc.revoked_at IS NULL
       AND nullif(trim(pc.consent_text_snapshot), '') IS NOT NULL
