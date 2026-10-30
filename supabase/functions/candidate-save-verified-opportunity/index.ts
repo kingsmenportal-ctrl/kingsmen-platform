@@ -64,9 +64,10 @@ Deno.serve(async(req:Request)=>{
     console.error("candidate consent lookup failed",consentError.code??"unknown");
     return reply(503,{ok:false,code:"CONSENT_LOOKUP_FAILED",error:"The candidate consent state could not be verified."},origin);
   }
-  const consentActive=(consentRows??[]).some((row:any)=>row.consent_status==="ACTIVE"&&!row.revoked_at&&
-    typeof row.consent_text_snapshot==="string"&&row.consent_text_snapshot.trim().length>0&&
-    Number.isFinite(Date.parse(row.granted_at))&&Date.parse(row.granted_at)<=Date.now());
+  const latestConsent=(consentRows??[])[0]??null;
+  const consentActive=Boolean(latestConsent?.consent_status==="ACTIVE"&&!latestConsent?.revoked_at&&
+    typeof latestConsent?.consent_text_snapshot==="string"&&latestConsent.consent_text_snapshot.trim().length>0&&
+    Number.isFinite(Date.parse(latestConsent?.granted_at??""))&&Date.parse(latestConsent.granted_at)<=Date.now());
   if(!consentActive) {
     return reply(403,{ok:false,code:"CONSENT_REQUIRED",error:"Active profile-processing consent is required before saving an opportunity to the application workbench. Review consent in your profile and try again."},origin);
   }
