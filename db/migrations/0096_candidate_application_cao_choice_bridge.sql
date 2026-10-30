@@ -691,5 +691,4 @@ begin
     'submission_boundary', 'EXTERNAL_PORTAL_OR_VERIFIED_ADAPTER_REQUIRED'
   );
 end;
-$function$
-;
+$function$;
