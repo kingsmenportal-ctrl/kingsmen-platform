@@ -14,7 +14,7 @@ const checks = [
   [login.includes("/auth/v1/token?grant_type=password"), "candidate login uses Supabase password-token endpoint"],
   [login.includes("/auth/v1/signup"), "registration uses Supabase Auth signup"],
   [login.includes("/auth/v1/recover"), "password recovery uses Supabase Auth recovery"],
-  [login.includes('requested.startsWith("/candidate/") && !requested.startsWith("//")'), "post-auth redirect is constrained to candidate routes"],
+  [login.includes('requested.startsWith("/candidate/") || requested.startsWith("/reviewer/")') && login.includes('!requested.startsWith("//")') && login.includes('!requested.includes("\\\\")'), "post-auth redirect is restricted to safe candidate or reviewer workspace routes"],
   [login.includes("sb-${ref}-auth-token"), "session uses the Supabase browser auth key"],
   [login.includes("does not automatically link you to a candidate record"), "authentication does not implicitly resolve candidate identity"],
   [login.includes("authorised identity review"), "identity linking is delegated to authorized review"],
