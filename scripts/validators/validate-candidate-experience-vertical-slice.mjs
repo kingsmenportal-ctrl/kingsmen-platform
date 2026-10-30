@@ -20,6 +20,7 @@ const evidenceRoute = read("apps/web/src/app/api/candidate/identity-review/evide
 const documentPage = read("apps/web/src/app/candidate/documents/page.tsx");
 const documentFunction = read("supabase/functions/candidate-private-documents/index.ts");
 const session = read("apps/web/src/lib/candidate-session.ts");
+const nextConfig = read("apps/web/next.config.mjs");
 const caoPage = read("apps/web/src/app/candidate/cao-choices/page.tsx");
 const caoRoute = read("apps/web/src/app/api/candidate/cao-choices/route.ts");
 const caoMigration = read("db/migrations/0096_candidate_application_cao_choice_bridge.sql");
@@ -33,6 +34,7 @@ const checks = [
   ["profile completeness is computed from required fields", /function completion\(/.test(profileFunction) && /pathwayPreferences/.test(profilePage) && /aria-valuenow/.test(profilePage)],
   ["profile reload fetches backend, not browser-stored profile", /action: "load"/.test(profilePage) && /cache: "no-store"/.test(profilePage) && !/localStorage.*profile/i.test(profilePage)],
   ["candidate session key derives from configured Supabase project ref", /new URL\(base\).hostname.split\("\."\)\[0\]/.test(session) && /sb-\$\{projectRef\}-auth-token/.test(session)],
+  ["Netlify SUPABASE_URL/anon aliases are exposed only as public Next.js build variables", nextConfig.includes("process.env.SUPABASE_URL") && nextConfig.includes("process.env.SUPABASE_ANON_KEY") && nextConfig.includes("publicBuildEnv.NEXT_PUBLIC_SUPABASE_URL = safeSupabaseUrl") && nextConfig.includes("publicBuildEnv.NEXT_PUBLIC_SUPABASE_ANON_KEY = publicSupabaseAnonKey") && !/publicBuildEnv\\.NEXT_PUBLIC_SUPABASE_SERVICE_ROLE_KEY\\s*=/.test(nextConfig)],
   ["six pathway filters are present", ["HIGHER_EDUCATION","TVET","SETA_LEARNERSHIPS","INTERNSHIPS","APPRENTICESHIPS","EMPLOYMENT"].every(x => opportunityPage.includes(x))],
   ["N15 feed fails closed on missing/stale evidence", /n15-candidate-opportunities/.test(opportunityPage) && /stale|verified/i.test(opportunityPage)],
   ["candidate opportunity save uses dedicated authenticated API proxy", /candidate-save-verified-opportunity/.test(opportunitySaveRoute) && /AUTHENTICATION_REQUIRED/.test(opportunitySaveRoute) && /cache: "no-store"/.test(opportunitySaveRoute)],
