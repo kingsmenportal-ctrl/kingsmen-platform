@@ -4,7 +4,7 @@ on:
   push:
     branches: [feat/candidate-experience-closeout-2026-10-30, feat/rc1-product-coherence-qa-2026-10-30-v2]
   pull_request:
-    branches: [main, feat/backend-simplification-baseline-2026-10-29, feat/candidate-experience-closeout-2026-10-30]
+    branches: [main, feat/backend-simplification-baseline-2026-10-29, feat/candidate-experience-closeout-2026-10-30, feat/rc1-product-coherence-qa-2026-10-30-v2]
   workflow_dispatch:
 
 permissions:
