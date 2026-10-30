@@ -43,16 +43,6 @@ const report = {
 };
 fs.mkdirSync(outputDir, { recursive: true });
 
-const accessibleName = (el) => {
-  const aria = el.getAttribute("aria-label") || el.getAttribute("aria-labelledby");
-  const title = el.getAttribute("title");
-  const text = (el.innerText || el.textContent || "").trim();
-  const type = (el.getAttribute("type") || "").toLowerCase();
-  const value = el.getAttribute("value") || "";
-  return Boolean((aria && aria.trim()) || (title && title.trim()) || text || value ||
-    (el.tagName === "INPUT" && ["hidden", "submit", "button", "reset"].includes(type)));
-};
-
 const browser = await chromium.launch({ headless: true });
 try {
   const context = await browser.newContext({ reducedMotion: "reduce" });
@@ -77,14 +67,44 @@ try {
           };
           const interactive = [...document.querySelectorAll("button, a[href], input:not([type=hidden]), select, textarea, [role=button], [role=link]")]
             .filter(visible);
-          const unlabeled = interactive.filter(el => {
-            const name = el.getAttribute("aria-label") || el.getAttribute("aria-labelledby") ||
-              el.getAttribute("title") || (el.innerText || el.textContent || "").trim() ||
-              el.getAttribute("value") || "";
-            if (name) return false;
-            if (el instanceof HTMLInputElement && ["submit", "button", "reset"].includes(el.type)) return false;
-            return true;
-          }).map(el => ({ tag: el.tagName.toLowerCase(), type: el.getAttribute("type"), id: el.id, name: el.getAttribute("name") }));
+          const accessibleNameOf = (el) => {
+            const normalise = (value) => (value || "").replace(/\\s+/g, " ").trim();
+            const ariaLabel = normalise(el.getAttribute("aria-label"));
+            if (ariaLabel) return ariaLabel;
+
+            const labelledBy = normalise(el.getAttribute("aria-labelledby"));
+            if (labelledBy) {
+              const referencedText = labelledBy.split(" ")
+                .map(id => document.getElementById(id))
+                .filter(Boolean)
+                .map(node => normalise(node.innerText || node.textContent))
+                .filter(Boolean)
+                .join(" ");
+              if (referencedText) return referencedText;
+            }
+
+            // HTML label association includes both <label for="id"> and an
+            // input/select/textarea/button wrapped by a <label>. Do not report
+            // those correctly labelled controls as inaccessible.
+            const associatedLabels = el.labels
+              ? Array.from(el.labels).map(label => normalise(label.innerText || label.textContent)).filter(Boolean).join(" ")
+              : "";
+            if (associatedLabels) return associatedLabels;
+
+            const title = normalise(el.getAttribute("title"));
+            if (title) return title;
+            const alt = normalise(el.getAttribute("alt"));
+            if (alt) return alt;
+            const ownText = normalise(el.innerText || el.textContent);
+            if (ownText) return ownText;
+
+            if (el instanceof HTMLInputElement && ["submit", "button", "reset"].includes(el.type)) {
+              return normalise(el.value);
+            }
+            return "";
+          };
+          const unlabeled = interactive.filter(el => !accessibleNameOf(el))
+            .map(el => ({ tag: el.tagName.toLowerCase(), type: el.getAttribute("type"), id: el.id, name: el.getAttribute("name") }));
           const imagesWithoutAlt = [...document.images].filter(img => !img.hasAttribute("alt")).map(img => img.src);
           return {
             title: document.title,
