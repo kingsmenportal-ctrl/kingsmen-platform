@@ -10,6 +10,7 @@ const baselineDir = process.env.KINGSMEN_UI_BASELINE_DIR
   : null;
 const routes = [
   "/",
+  "/free-destiny-map/",
   "/candidate/login",
   "/candidate/dashboard",
   "/candidate/profile",
