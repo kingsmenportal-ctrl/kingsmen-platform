@@ -2,9 +2,9 @@ name: Kingsmen Release Evidence
 
 on:
   pull_request:
-    branches: [main, feat/backend-simplification-baseline-2026-10-29]
+    branches: [main, feat/backend-simplification-baseline-2026-10-29, feat/rc1-product-coherence-qa-2026-10-30-v2]
   push:
-    branches: [main, feat/backend-simplification-baseline-2026-10-29, feat/candidate-experience-closeout-2026-10-30]
+    branches: [main, feat/backend-simplification-baseline-2026-10-29, feat/candidate-experience-closeout-2026-10-30, feat/rc1-product-coherence-qa-2026-10-30-v2, feat/rc1-operations-hardening-2026-10-30]
   workflow_dispatch:
 
 permissions:
