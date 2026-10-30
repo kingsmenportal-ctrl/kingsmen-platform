@@ -28,7 +28,7 @@ function safePublicSupabaseUrl(value) {
   try {
     const parsed = new URL(value);
     if (parsed.protocol === "https:" || parsed.hostname === "localhost" || parsed.hostname === "127.0.0.1") {
-      return parsed.toString().replace(/\\/+$/, "");
+      return parsed.toString().replace(/\/+$/, "");
     }
   } catch {}
   return undefined;
