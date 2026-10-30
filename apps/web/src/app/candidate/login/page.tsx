@@ -73,7 +73,7 @@ export default function CandidateLoginPage() {
     let active = true;
     const finishConfirmation = async () => {
       try {
-        const response = await fetch(`${SUPABASE_URL.replace(/\\/+$/, "")}/auth/v1/user`, {
+        const response = await fetch(`${SUPABASE_URL.replace(/\/+$/, "")}/auth/v1/user`, {
           headers: { apikey: SUPABASE_ANON_KEY, Authorization: `Bearer ${accessToken}` },
           cache: "no-store",
           redirect: "error"
