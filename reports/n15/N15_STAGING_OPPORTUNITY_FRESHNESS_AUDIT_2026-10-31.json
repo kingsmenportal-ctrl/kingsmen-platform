@@ -1,0 +1,38 @@
+{
+  "schema": "kingsmen.n15.opportunity-freshness-audit.v1",
+  "observed_on": "2026-10-31",
+  "environment": "kingsmen-portal-staging",
+  "method": "Supabase read-only SQL queries against the staging database",
+  "status": "BLOCKED_NO_N15_OPPORTUNITY_DATA",
+  "live_counts": {
+    "route_providers": 3,
+    "route_programmes": 8,
+    "route_programmes_open": 0,
+    "route_programmes_closed": 6,
+    "route_programmes_manual_check": 2,
+    "opportunity_providers": 0,
+    "opportunity_programmes": 0,
+    "verified_source_observations": 0,
+    "candidate_matches": 0,
+    "opportunity_deadlines": 0,
+    "confirmed_future_deadlines_with_evidence": 0
+  },
+  "confirmed_findings": [
+    "The N15 canonical opportunity providers table is empty.",
+    "The N15 opportunity programmes table is empty.",
+    "The external source observations table is empty.",
+    "The candidate opportunity matches table is empty.",
+    "The opportunity deadlines table is empty.",
+    "The legacy route universe has 8 route programmes: 6 are closed with 2026-10-30 closing dates and 2 are route anchors requiring a manual current-availability check.",
+    "There are no candidate-facing OPEN opportunities proven by the current N15 staging data."
+  ],
+  "safety_interpretation": "This does not prove that no opportunities exist nationally. It proves the current staging catalogue has no evidence-backed N15 opportunity records available for candidate delivery. Do not fabricate openings, reopen expired records, or promote source-directory anchors into open opportunities.",
+  "required_next_steps": [
+    "Run the read-only diagnostic query in db/diagnostics/n15_opportunity_freshness_audit.sql and retain the full finding output.",
+    "Individually verify official source routes and currently open programme pages.",
+    "Ingest observations as NEEDS_REVIEW with dated source evidence.",
+    "Review and approve specific programme/provider records before setting candidate-facing safe.",
+    "Prove the authenticated candidate feed returns only fresh official evidence and returns a truthful empty state when no item qualifies."
+  ],
+  "deployment_and_change_control": "No staging data was written. No migration was applied. Independent review, protected backup/restore, approved import and authenticated E2E verification remain separate gates."
+}

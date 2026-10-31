@@ -21,6 +21,8 @@ const checks = [
   ["candidate feed requires authorised identity link", /link\.link_status === "VERIFIED"/.test(candidate) && /verificationIsAuthorised/.test(candidate)],
   ["candidate feed requires reviewer Auth UUID and verified timestamp", /verified_at,verified_by/.test(candidate) && /AUTH_UUID\.test\(link\.verified_by\)/.test(candidate) && /verifiedAtMs <= Date\.now\(\)/.test(candidate)],
   ["candidate feed requires approved, official, human-reviewed matches", /eq\("match_status", "APPROVED"\)/.test(candidate) && /eq\("source_confidence", "OFFICIAL_VERIFIED"\)/.test(candidate) && /eq\("human_review_required", false\)/.test(candidate)],
+  ["candidate feed requires evidence on each approved match", /!Array\.isArray\(match\.evidence_refs\)/.test(candidate) && /match\.evidence_refs\.length === 0/.test(candidate)],
+  ["candidate feed rejects unsafe or non-HTTPS destination URLs", /new URL\(String\(programme\.exact_link/.test(candidate) && /officialUrl\.protocol !== "https:"/.test(candidate) && /officialUrl\.username \|\| officialUrl\.password/.test(candidate)],
   ["candidate feed withholds stale/unverified source observations", /eq\("observation_status", "VERIFIED"\)/.test(candidate) && /eq\("source_confidence", "OFFICIAL_VERIFIED"\)/.test(candidate) && /gt\("stale_after", now\.toISOString\(\)\)/.test(candidate)],
   ["candidate feed rejects future observation/check timestamps", /lte\("observed_at", now\.toISOString\(\)\)/.test(candidate) && /lte\("last_checked_at", now\.toISOString\(\)\)/.test(candidate)],
   ["candidate feed rejects inconsistent timestamps and missing evidence", /observedAtMs > checkedAtMs/.test(candidate) && /staleAfterMs <= checkedAtMs/.test(candidate) && /!Array\.isArray\(observation\.evidence_refs\)/.test(candidate)],
