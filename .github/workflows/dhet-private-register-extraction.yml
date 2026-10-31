@@ -7,6 +7,7 @@ on:
       - 'scripts/institutions/extract-dhet-private-registers.mjs'
       - 'scripts/validators/validate-dhet-private-register-extractor.mjs'
       - 'scripts/institutions/build-dhet-private-register-evidence-migration.mjs'
+      - 'scripts/institutions/prepare-dhet-private-register-import-manifest.mjs'
       - '.github/workflows/dhet-private-register-extraction.yml'
   workflow_dispatch:
 
@@ -49,6 +50,11 @@ jobs:
           node -e "const m=require('./artifacts/dhet-private-registers/candidates.json'); console.log(JSON.stringify({schema:m.schema,status:m.status,counts:m.counts},null,2));"
       - name: Validate extracted record integrity and safety
         run: node scripts/validators/validate-dhet-private-register-manifest.mjs artifacts/dhet-private-registers/candidates.json
+      - name: Prepare import subset only from validated manifest
+        run: |
+          node scripts/institutions/prepare-dhet-private-register-import-manifest.mjs artifacts/dhet-private-registers/candidates.json artifacts/dhet-private-registers/import-candidates.json
+          node scripts/institutions/build-dhet-private-register-evidence-migration.mjs --manifest artifacts/dhet-private-registers/import-candidates.json --out artifacts/dhet-private-registers/registry-evidence-import.sql
+          test -s artifacts/dhet-private-registers/registry-evidence-import.sql
       - name: Preserve extraction evidence
         if: always()
         uses: actions/upload-artifact@v4
