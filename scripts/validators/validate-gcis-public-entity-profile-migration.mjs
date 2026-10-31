@@ -22,7 +22,14 @@ check("the seed block contains every provider key from the manifest",profiles.ev
 check("new provider records default to confidence D, NEEDS_REVIEW and public_safe false",sql.includes("'D','NEEDS_REVIEW',false,false"));
 check("vacancy/programme/eligibility/application route and connector states stay unverified",["'vacancy_status','UNKNOWN'","'programme_status','UNKNOWN'","'intake_status','UNKNOWN'","'eligibility_status','UNKNOWN'","'application_route_status','NOT_VERIFIED'","'integration_status','NOT_CONNECTED'","'partnership_status','NOT_A_PARTNER'"].every(x=>sql.includes(x)));
 check("provider submission, receipt and automation remain disabled",["'provider_submission_supported_by_kingsmen',false","'provider_receipt_supported',false","'automation_authorized',false"].every(x=>sql.includes(x)));
-check("existing providers/reviewer decisions are not overwritten",sql.includes("ON CONFLICT (provider_key) DO NOTHING")&&!/UPDATE\s+public\.route_providers/i.test(sql));
+const conflictStart=sql.indexOf("ON CONFLICT (provider_key) DO UPDATE");
+const postflightStart=sql.indexOf("DO $postflight$",conflictStart);
+const conflictClause=conflictStart>=0&&postflightStart>conflictStart?sql.slice(conflictStart,postflightStart):"";
+check("canonical provider-key conflicts append distinct provider source evidence",conflictClause.includes("provider_source_evidence")&&conflictClause.includes("jsonb_array_elements")&&conflictClause.includes("UNION"));
+check("canonical provider-key conflicts merge institution classes deterministically",conflictClause.includes("'{institution_classes}'")&&conflictClause.includes("jsonb_array_elements_text")&&conflictClause.includes("SELECT DISTINCT"));
+check("existing provider identity, source authority, confidence and verification decisions are preserved",!/\b(?:provider_name|provider_type|province|base_url|source_authority_id|default_confidence_band|verification_status|public_safe|private_provider_requires_accreditation_check)\s*=/.test(conflictClause));
+check("inserted source evidence preserves source authority, profile URL, source ID and snapshot date",["'provider_source_evidence'","'source_authority_id'","'source_profile_url'","'source_id'","'source_snapshot_date'"].every(x=>sql.includes(x)));
+check("postflight proves all 123 source evidence rows and institution-class metadata",sql.includes("GCIS_PUBLIC_ENTITY_SOURCE_EVIDENCE_COUNT_MISMATCH")&&sql.includes("GCIS_PUBLIC_ENTITY_CLASS_METADATA_MISSING"));
 check("postflight checks all 123 unique provider records",sql.includes("expected_count integer := 123")&&sql.includes("GCIS_PUBLIC_ENTITY_PROVIDER_SEED_COUNT_MISMATCH")&&sql.includes("GCIS_PUBLIC_ENTITY_PROVIDER_DUPLICATE_KEYS"));
 
 if(errors.length){console.error("GCIS 123-profile import validator FAILED: "+errors.length+" checks");process.exit(1);}
