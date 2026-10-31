@@ -1,0 +1,77 @@
+name: N16 PostgreSQL 17 Worker Process Crash Recovery
+
+on:
+  push:
+    branches: [feat/n16-worker-recovery-rc1-2026-10-31]
+    paths:
+      - "apps/api/src/orchestrator/**"
+      - "db/migrations/20261025000*_n16_*.sql"
+      - "scripts/staging/test-n16-*.mjs"
+      - ".github/workflows/n16-worker-process-crash-integration.yml"
+      - "package.json"
+  pull_request:
+    branches: [ops/backup-restore-safety-current-rc-2026-10-30]
+    paths:
+      - "apps/api/src/orchestrator/**"
+      - "db/migrations/20261025000*_n16_*.sql"
+      - "scripts/staging/test-n16-*.mjs"
+      - ".github/workflows/n16-worker-process-crash-integration.yml"
+      - "package.json"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  postgres-17-worker-process-crash-recovery:
+    name: postgres-17-worker-kill-before-and-after-sent
+    runs-on: ubuntu-24.04
+    timeout-minutes: 15
+    services:
+      postgres:
+        image: postgres:17
+        env:
+          POSTGRES_USER: postgres
+          POSTGRES_PASSWORD: kingsmen-n16-ci-admin-password
+          POSTGRES_DB: kingsmen_n16_worker_test
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd "pg_isready -U postgres -d kingsmen_n16_worker_test"
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 10
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+          cache: "npm"
+
+      - name: Install API dependencies
+        run: npm install --prefix apps/api --no-audit --no-fund
+
+      - name: Build worker runtime
+        run: npm --prefix apps/api run build
+
+      - name: Generate and mask disposable database credentials
+        run: |
+          set -euo pipefail
+          worker_password="$(openssl rand -hex 32)"
+          echo "::add-mask::$worker_password"
+          echo "::add-mask::kingsmen-n16-ci-admin-password"
+          echo "KINGSMEN_N16_TEST_SERVICE_PASSWORD=$worker_password" >> "$GITHUB_ENV"
+          echo "PGPASSWORD=kingsmen-n16-ci-admin-password" >> "$GITHUB_ENV"
+          unset worker_password
+
+      - name: Apply orchestrator and N16 migrations in disposable PostgreSQL
+        run: npm run n16:worker:crash-integration
+        env:
+          KINGSMEN_N16_TEST_ALLOW_MUTATION: "true"
+          KINGSMEN_N16_TEST_HOST: "127.0.0.1"
+          KINGSMEN_N16_TEST_PORT: "5432"
+          KINGSMEN_N16_TEST_ADMIN_USER: "postgres"
+          KINGSMEN_N16_TEST_DATABASE: "kingsmen_n16_worker_test"
