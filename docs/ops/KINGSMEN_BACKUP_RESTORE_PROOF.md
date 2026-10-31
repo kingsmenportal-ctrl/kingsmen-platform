@@ -53,6 +53,12 @@ npm run backup:validate:restore
 
 These commands prove that the backup/restore boundary exists in the repo. They do not prove that a real restore drill has been executed.
 
+## Disposable PostgreSQL 17 integration test
+
+The CI workflow `.github/workflows/backup-postgres-restore-integration.yml` creates two allow-listed databases on an ephemeral loopback PostgreSQL 17 service. It runs a custom-format `pg_dump`, validates the catalog, encrypts to the authenticated `.kmbak` container, decrypts and verifies the original archive hash, restores into a separate disposable database, and compares count/value/binary payload parity. The workflow uses a randomly generated one-run test passphrase and a CI-only database password. It never connects to Kingsmen staging.
+
+Run the same test locally only against an explicitly disposable loopback PostgreSQL instance with the required `KINGSMEN_BACKUP_TEST_*` variables and test-only credentials. Passing this test is CI integration evidence, not the required different-host staging recovery drill, not RPO/RTO proof, and not founder sign-off.
+
 ## Evidence required before production data
 
 The archive builder must produce a non-empty AES-256-GCM authenticated `.kmbak` container, pass an authenticated decrypt-and-hash round trip, and validate the decrypted custom-format archive catalog with `pg_restore --list`. The CI encryption suite must pass round-trip, tamper-rejection, and wrong-passphrase tests. A real staging drill must produce:
