@@ -33,6 +33,11 @@ $backupFile = Join-Path $backupDir "kingsmen-truth-vault-$stamp.kmbak"
 $plainFile = Join-Path $backupDir "kingsmen-truth-vault-$stamp.dump.partial"
 $verifiedFile = Join-Path $backupDir "kingsmen-truth-vault-$stamp.verify.partial"
 $encryptionHelper = Join-Path (Get-Location) "scripts/backup/encrypt-backup.mjs"
+trap {
+  if (Test-Path $plainFile) { Remove-Item -LiteralPath $plainFile -Force -ErrorAction SilentlyContinue }
+  if (Test-Path $verifiedFile) { Remove-Item -LiteralPath $verifiedFile -Force -ErrorAction SilentlyContinue }
+  throw
+}
 $manifestFile = Join-Path $backupDir "kingsmen-truth-vault-$stamp.manifest.json"
 New-Item -ItemType Directory -Force -Path $backupDir | Out-Null
 
