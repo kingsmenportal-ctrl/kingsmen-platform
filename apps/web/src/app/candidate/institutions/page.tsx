@@ -181,7 +181,7 @@ const sourceItems: DirectoryItem[] = crossSector.sources.map((source: SourceAnch
     sourceUrl: source.url,
     providerWebsiteUrl: null,
     providerWebsiteStatus: "NOT_LISTED",
-    evidenceText: "Sector source anchor for discovery and verification. It is not an imported institution/provider record.",
+    evidenceText: source.url ? "Sector source anchor for discovery and verification. It is not an imported institution/provider record." : "Provider category placeholder. No authoritative source URL is configured yet; this is not a verified provider record.",
     supports: source.supports,
     doesNotProve: source.does_not_prove,
     verification: {
@@ -358,7 +358,7 @@ export default function CandidateInstitutionDirectoryPage() {
           <h2 className="font-bold text-white">Live verified provider/source records</h2>
           {routeStatus === "READY" && <p className="mt-2 text-sm text-slate-300">{verifiedRoutes.length} public-safe, high-confidence records returned by the authenticated, read-only Supabase route.</p>}
           {routeStatus === "LOADING" && <p className="mt-2 text-sm text-slate-400">Loading authorised directory records…</p>}
-          {routeStatus === "SIGN_IN_REQUIRED" && <p className="mt-2 text-sm text-slate-400">Sign in to load current verified provider/source records. The source manifest and DHET seed remain available as discovery evidence. <Link href="/candidate/login" className="font-bold text-amber-200 underline">Sign in</Link></p>}
+          {routeStatus === "SIGN_IN_REQUIRED" && <div className="mt-2 flex flex-wrap items-center gap-3"><p className="text-sm text-slate-400">Sign in to load current verified provider/source records. The source manifest and DHET seed remain available as discovery evidence.</p><Link href="/candidate/login" className="font-bold text-amber-200 underline">Sign in</Link><button type="button" onClick={() => setRetryKey(value => value + 1)} className="rounded-xl border border-slate-600 px-3 py-2 text-xs font-bold text-white">Reload after sign-in</button></div>}
           {routeStatus === "UNAVAILABLE" && <div className="mt-2 flex flex-wrap items-center gap-3"><p className="text-sm text-yellow-100">Live records could not be loaded. Unverified data will not be substituted.</p><button type="button" onClick={() => setRetryKey(value => value + 1)} className="rounded-xl border border-slate-600 px-3 py-2 text-xs font-bold text-white">Retry live directory</button></div>}
         </section>
 
@@ -440,7 +440,7 @@ export default function CandidateInstitutionDirectoryPage() {
               <div className="flex flex-wrap items-start justify-between gap-3">
                 <div className="min-w-0">
                   <p className="text-xs font-extrabold uppercase tracking-wider text-amber-300">
-                    {item.kind === "INSTITUTION" ? label(item.providerType) : item.kind === "VERIFIED_ROUTE" ? "Kingsmen verified source/provider route" : "Official sector source / registry"}
+                    {item.kind === "INSTITUTION" ? label(item.providerType) : item.kind === "VERIFIED_ROUTE" ? "Kingsmen verified source/provider route" : item.sourceUrl ? "Official sector source / registry" : "Provider category — source not verified"}
                   </p>
                   <h2 className="mt-2 text-xl font-bold text-white">{item.name}</h2>
                   <p className="mt-2 text-xs text-slate-400">
