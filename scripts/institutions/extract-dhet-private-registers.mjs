@@ -11,14 +11,16 @@ export const canonicalSlug=s=>normalizeName(s).normalize("NFD").replace(/[\u0300
 function status(section,block,kind){
  const h=section.toLowerCase(),s=(section+"\\n"+block).toLowerCase();
  const hasLapsed=/\\blapsed\\b|\\blapsing\\b/.test(s);
- const hasCancelled=/reasons for cancellation|date when cancellation comes into effect|registration has been cancelled|registration was cancelled|cancelled with effect|\\bcancelled\\b|\\bcanceled\\b/.test(s);
- // If the same entry explicitly signals both states, retain it for adjudication.
- if(hasLapsed&&hasCancelled)return "STATUS_UNRESOLVED";
+ const hasExplicitCancellation=/reasons for cancellation|date when cancellation comes into effect|registration has been cancelled|registration was cancelled|cancelled with effect/.test(s);
+ const sectionCancelled=/\\bcancelled\\b|\\bcanceled\\b/.test(h);
+ if(hasLapsed&&(hasExplicitCancellation||sectionCancelled))return "STATUS_UNRESOLVED";
  if(hasLapsed)return "LAPSED";
- if(hasCancelled)return "CANCELLED";
- if(/withdrawn|deregistered/.test(h))return "WITHDRAWN_OR_DEREGISTERED_REVIEW";
  if(kind==="private_colleges"&&/section\\s+a/.test(h))return "CANCELLED";
- if(kind==="private_colleges"&&/section\\s+b/.test(h))return "REGISTERED";
+ if(kind==="private_colleges"&&/section\\s+b/.test(h)){
+  return hasExplicitCancellation?"STATUS_UNRESOLVED":"REGISTERED";
+ }
+ if(hasExplicitCancellation||sectionCancelled)return "CANCELLED";
+ if(/withdrawn|deregistered/.test(h))return "WITHDRAWN_OR_DEREGISTERED_REVIEW";
  if(/provisionally registered|provisional registration/.test(h))return "PROVISIONAL";
  if(/registered institutions/.test(h))return "REGISTERED";
  if(/withdrawn|deregistered/.test(s))return "WITHDRAWN_OR_DEREGISTERED_REVIEW";
