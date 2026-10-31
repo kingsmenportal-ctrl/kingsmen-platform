@@ -6,7 +6,7 @@ export const dynamic = "force-dynamic";
 const BODY_LIMIT = 16 * 1024;
 const TIMEOUT_MS = 20_000;
 const ALLOWED_ACTIONS = new Set([
-  "load", "start_from_saved_route", "update_tracker", "add_item", "update_item", "save_n15_match", "prepare_master_application"
+  "load", "start_from_saved_route", "update_tracker", "add_item", "update_item", "save_n15_match", "plan_directory_target", "prepare_application_packet", "prepare_master_application"
 ]);
 
 function respond(payload: unknown, status: number): Response {
@@ -71,6 +71,14 @@ async function dispatch(request: Request, incoming: Record<string, unknown>, met
   } else if (action === "save_n15_match") {
     payload.match_ref = incoming.match_ref;
     payload.pathway_type = incoming.pathway_type;
+  } else if (action === "plan_directory_target") {
+    payload.provider_key = incoming.provider_key;
+    payload.pathway_type = incoming.pathway_type;
+    payload.programme_or_role = incoming.programme_or_role;
+  } else if (action === "prepare_application_packet") {
+    payload.target_key = incoming.target_key;
+    payload.application_answers = incoming.application_answers;
+    payload.selected_document_ids = incoming.selected_document_ids;
   } else if (action === "prepare_master_application") {
     payload.target_key = incoming.target_key;
   }
