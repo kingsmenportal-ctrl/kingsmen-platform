@@ -75,20 +75,27 @@ const capabilityLabels: Record<string, string> = {
 const capabilityBySource: Record<string, string[]> = {
   gcis_national_institution_directory: ["PUBLIC_SERVICE"],
   gcis_public_entities_and_soe_directory: ["PUBLIC_SERVICE", "EMPLOYMENT"],
+  gcis_provincial_local_municipal_directory: ["PUBLIC_SERVICE", "EMPLOYMENT"],
+  national_treasury_municipal_finance_data: ["PUBLIC_SERVICE", "FINANCIAL_SERVICES"],
   govza_national_departments: ["PUBLIC_SERVICE"],
   govza_local_government: ["PUBLIC_SERVICE"],
   dpsa_vacancies: ["EMPLOYMENT"],
   dbe_school_emis: ["BASIC_EDUCATION"],
+  lurits_registered_school_masterlist: ["BASIC_EDUCATION"],
   cipc_company_registry: ["BUSINESS_REGISTRATION"],
   dhet_skills_seta_qcto_saqa: ["HIGHER_EDUCATION", "TVET", "SETA_LEARNERSHIPS", "APPRENTICESHIPS"],
   dhet_private_colleges_register_2026: ["TVET"],
   dhet_private_higher_education_register_2026: ["HIGHER_EDUCATION"],
   dhet_cet_colleges_directory: ["BASIC_EDUCATION"],
   dhet_registered_pset_masterlist: ["HIGHER_EDUCATION", "TVET", "SETA_LEARNERSHIPS"],
+  dhet_pset_landscape_2026_27: ["HIGHER_EDUCATION", "TVET", "SETA_LEARNERSHIPS", "APPRENTICESHIPS"],
   nsfas_institution_directory: ["FUNDING", "HIGHER_EDUCATION", "TVET"],
   dhet_national_skills_fund: ["FUNDING"],
   funza_lushaka_bursary: ["FUNDING", "HIGHER_EDUCATION"],
   nsfas_official: ["FUNDING", "SOCIAL_SUPPORT"],
+  nsfas_accommodation_directory: ["ACCOMMODATION", "FUNDING"],
+  govza_bursary_funding_guide: ["FUNDING"],
+  bursaries_africa_provider_index_leads: ["FUNDING"],
   gcis_soe_acsa_employer: ["EMPLOYMENT", "TRANSPORT"],
   gcis_soe_denel_employer: ["EMPLOYMENT"],
   gcis_soe_prasa_employer: ["EMPLOYMENT", "TRANSPORT"],
@@ -98,6 +105,7 @@ const capabilityBySource: Record<string, string[]> = {
   gcis_soe_sapo_employer: ["EMPLOYMENT", "TRANSPORT"],
   gcis_soe_telkom_employer: ["EMPLOYMENT"],
   gcis_soe_transnet_employer: ["EMPLOYMENT", "TRANSPORT"],
+  national_health_facility_master_list: ["HEALTH_AND_CARE"],
   health_department_directory: ["HEALTH_AND_CARE"],
   hpcsa_professional_register: ["HEALTH_AND_CARE"],
   sassa_official: ["SOCIAL_SUPPORT"],
@@ -122,10 +130,12 @@ const pathwayBySource: Record<string, string[]> = {
   dhet_private_colleges_register_2026: ["TVET"],
   dhet_private_higher_education_register_2026: ["HIGHER_EDUCATION"],
   dhet_registered_pset_masterlist: ["HIGHER_EDUCATION", "TVET", "SETA_LEARNERSHIPS"],
+  dhet_pset_landscape_2026_27: ["HIGHER_EDUCATION", "TVET", "SETA_LEARNERSHIPS", "APPRENTICESHIPS"],
   nsfas_institution_directory: ["HIGHER_EDUCATION", "TVET"],
   dhet_national_skills_fund: ["HIGHER_EDUCATION", "TVET", "SETA_LEARNERSHIPS", "APPRENTICESHIPS"],
   funza_lushaka_bursary: ["HIGHER_EDUCATION"],
   nsfas_official: ["HIGHER_EDUCATION", "TVET"],
+  nsfas_accommodation_directory: ["HIGHER_EDUCATION", "TVET"],
   gcis_soe_acsa_employer: ["EMPLOYMENT"],
   gcis_soe_denel_employer: ["EMPLOYMENT"],
   gcis_soe_prasa_employer: ["EMPLOYMENT"],
@@ -223,6 +233,7 @@ const sourceItems: DirectoryItem[] = crossSector.sources.map((source: SourceAnch
     providerType: source.provider_key?.startsWith("seta_") ? "SETA_PROVIDER"
       : (source.provider_key === "funder_nsf" || source.provider_key === "funder_funza_lushaka" || source.provider_key === "nsfas_official") ? "FUNDING_PROVIDER"
       : source.provider_key?.startsWith("soe_") ? "EMPLOYER_PROVIDER"
+      : source.provider_key === "nsfas_accommodation_portal" ? "ACCOMMODATION_PROVIDER"
       : "SOURCE_REGISTRY",
     sectorKeys: sourceClasses,
     province: null,
@@ -565,7 +576,7 @@ export default function CandidateInstitutionDirectoryPage() {
                     Institution website URL unresolved. Kingsmen will not guess the URL.
                   </span>
                 )}
-                {item.registryKey && (item.kind !== "OFFICIAL_SOURCE" || item.providerType === "SETA_PROVIDER" || item.providerType === "FUNDING_PROVIDER" || item.providerType === "EMPLOYER_PROVIDER") && (
+                {item.registryKey && (item.kind !== "OFFICIAL_SOURCE" || item.providerType === "SETA_PROVIDER" || item.providerType === "FUNDING_PROVIDER" || item.providerType === "EMPLOYER_PROVIDER" || item.providerType === "ACCOMMODATION_PROVIDER") && (
                   <Link
                     href={`/candidate/applications?directory_provider_key=${encodeURIComponent(item.registryKey)}&directory_provider_name=${encodeURIComponent(item.name)}&directory_pathway=${encodeURIComponent(item.pathways.find(value => pathways.includes(value)) ?? (item.providerType === "TVET" ? "TVET" : "HIGHER_EDUCATION"))}`}
                     className="inline-flex rounded-xl bg-amber-300 px-4 py-3 text-sm font-extrabold text-[#101b2a] hover:bg-amber-200"
