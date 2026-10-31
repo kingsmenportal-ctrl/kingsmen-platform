@@ -25,7 +25,7 @@ export function buildMobileExperienceSummary(): MobileExperienceSummary {
   };
 }
 
-export function assertChannelAllowed(channel: MobileChannel, urgency: "routine" | "urgent" | "backup"): void {
+export function assertChannelAllowed(channel: MobileChannel, _urgency: "routine" | "urgent" | "backup"): void {
   if (channel === "whatsapp_urgent") {
     throw new Error("WHATSAPP_DISABLED_BY_CURRENT_CHANNEL_POLICY");
   }
