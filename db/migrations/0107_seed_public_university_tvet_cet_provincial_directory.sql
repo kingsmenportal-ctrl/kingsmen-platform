@@ -39,6 +39,118 @@ BEGIN
 END
 $source_preflight$;
 
+DO $provider_identity_preflight$
+DECLARE conflict_count integer;
+BEGIN
+  WITH expected(provider_key,provider_name,provider_type,province) AS (
+    VALUES
+      ('dhet_university_cput', 'Cape Peninsula University of Technology', 'UNIVERSITY', 'Western Cape'),
+      ('dhet_university_cut', 'Central University of Technology, Free State', 'UNIVERSITY', 'Free State'),
+      ('dhet_university_dut', 'Durban University of Technology', 'UNIVERSITY', 'KwaZulu-Natal'),
+      ('dhet_university_mut', 'Mangosuthu University of Technology', 'UNIVERSITY', 'KwaZulu-Natal'),
+      ('dhet_university_mandela', 'Nelson Mandela University', 'UNIVERSITY', 'Eastern Cape'),
+      ('dhet_university_nwu', 'North-West University', 'UNIVERSITY', 'North West'),
+      ('dhet_university_rhodes', 'Rhodes University', 'UNIVERSITY', 'Eastern Cape'),
+      ('dhet_university_smu', 'Sefako Makgatho Health Sciences University', 'UNIVERSITY', 'Gauteng'),
+      ('dhet_university_spu', 'Sol Plaatje University', 'UNIVERSITY', 'Northern Cape'),
+      ('dhet_university_stellenbosch', 'Stellenbosch University', 'UNIVERSITY', 'Western Cape'),
+      ('dhet_university_tut', 'Tshwane University of Technology', 'UNIVERSITY', 'Gauteng'),
+      ('dhet_university_uct', 'University of Cape Town', 'UNIVERSITY', 'Western Cape'),
+      ('dhet_university_ufh', 'University of Fort Hare', 'UNIVERSITY', 'Eastern Cape'),
+      ('dhet_university_uj', 'University of Johannesburg', 'UNIVERSITY', 'Gauteng'),
+      ('dhet_university_ukzn', 'University of KwaZulu-Natal', 'UNIVERSITY', 'KwaZulu-Natal'),
+      ('dhet_university_ul', 'University of Limpopo', 'UNIVERSITY', 'Limpopo'),
+      ('dhet_university_ump', 'University of Mpumalanga', 'UNIVERSITY', 'Mpumalanga'),
+      ('dhet_university_up', 'University of Pretoria', 'UNIVERSITY', 'Gauteng'),
+      ('dhet_university_unisa', 'University of South Africa', 'UNIVERSITY', 'Gauteng'),
+      ('dhet_university_ufs', 'University of the Free State', 'UNIVERSITY', 'Free State'),
+      ('dhet_university_uwc', 'University of the Western Cape', 'UNIVERSITY', 'Western Cape'),
+      ('dhet_university_wits', 'University of the Witwatersrand', 'UNIVERSITY', 'Gauteng'),
+      ('dhet_university_vut', 'Vaal University of Technology', 'UNIVERSITY', 'Gauteng'),
+      ('dhet_university_unizulu', 'University of Zululand', 'UNIVERSITY', 'KwaZulu-Natal'),
+      ('dhet_university_wsu', 'Walter Sisulu University', 'UNIVERSITY', 'Eastern Cape'),
+      ('dhet_university_univen', 'University of Venda', 'UNIVERSITY', 'Limpopo'),
+      ('dhet_tvet_buffalo-city', 'Buffalo City TVET College', 'TVET', 'Eastern Cape'),
+      ('dhet_tvet_eastcape-midlands', 'Eastcape Midlands TVET College', 'TVET', 'Eastern Cape'),
+      ('dhet_tvet_ikhala', 'Ikhala TVET College', 'TVET', 'Eastern Cape'),
+      ('dhet_tvet_ingwe', 'Ingwe TVET College', 'TVET', 'Eastern Cape'),
+      ('dhet_tvet_king-hintsa', 'King Hintsa TVET College', 'TVET', 'Eastern Cape'),
+      ('dhet_tvet_king-sabata-dalindyebo', 'King Sabata Dalindyebo TVET College', 'TVET', 'Eastern Cape'),
+      ('dhet_tvet_lovedale', 'Lovedale TVET College', 'TVET', 'Eastern Cape'),
+      ('dhet_tvet_port-elizabeth', 'Port Elizabeth TVET College', 'TVET', 'Eastern Cape'),
+      ('dhet_tvet_flavius-mareka', 'Flavius Mareka TVET College', 'TVET', 'Free State'),
+      ('dhet_tvet_goldfields', 'Goldfields TVET College', 'TVET', 'Free State'),
+      ('dhet_tvet_maluti', 'Maluti TVET College', 'TVET', 'Free State'),
+      ('dhet_tvet_motheo', 'Motheo TVET College', 'TVET', 'Free State'),
+      ('dhet_tvet_central-johannesburg', 'Central Johannesburg TVET College', 'TVET', 'Gauteng'),
+      ('dhet_tvet_ekurhuleni-east', 'Ekurhuleni East TVET College', 'TVET', 'Gauteng'),
+      ('dhet_tvet_ekurhuleni-west', 'Ekurhuleni West TVET College', 'TVET', 'Gauteng'),
+      ('dhet_tvet_sedibeng', 'Sedibeng TVET College', 'TVET', 'Gauteng'),
+      ('dhet_tvet_south-west-gauteng', 'South West Gauteng TVET College', 'TVET', 'Gauteng'),
+      ('dhet_tvet_tshwane-north', 'Tshwane North TVET College', 'TVET', 'Gauteng'),
+      ('dhet_tvet_tshwane-south', 'Tshwane South TVET College', 'TVET', 'Gauteng'),
+      ('dhet_tvet_western', 'Western TVET College', 'TVET', 'Gauteng'),
+      ('dhet_tvet_coastal-kzn', 'Coastal TVET College', 'TVET', 'KwaZulu-Natal'),
+      ('dhet_tvet_elangeni', 'Elangeni TVET College', 'TVET', 'KwaZulu-Natal'),
+      ('dhet_tvet_esayidi', 'Esayidi TVET College', 'TVET', 'KwaZulu-Natal'),
+      ('dhet_tvet_majuba', 'Majuba TVET College', 'TVET', 'KwaZulu-Natal'),
+      ('dhet_tvet_mnambithi', 'Mnambithi TVET College', 'TVET', 'KwaZulu-Natal'),
+      ('dhet_tvet_mthashana', 'Mthashana TVET College', 'TVET', 'KwaZulu-Natal'),
+      ('dhet_tvet_thekwini', 'Thekwini TVET College', 'TVET', 'KwaZulu-Natal'),
+      ('dhet_tvet_umfolozi', 'Umfolozi TVET College', 'TVET', 'KwaZulu-Natal'),
+      ('dhet_tvet_umgungundlovu', 'Umgungundlovu TVET College', 'TVET', 'KwaZulu-Natal'),
+      ('dhet_tvet_capricorn', 'Capricorn TVET College', 'TVET', 'Limpopo'),
+      ('dhet_tvet_lephalale', 'Lephalale TVET College', 'TVET', 'Limpopo'),
+      ('dhet_tvet_letaba', 'Letaba TVET College', 'TVET', 'Limpopo'),
+      ('dhet_tvet_mopani-south-east', 'Mopani South East TVET College', 'TVET', 'Limpopo'),
+      ('dhet_tvet_sekhukhune', 'Sekhukhune TVET College', 'TVET', 'Limpopo'),
+      ('dhet_tvet_vhembe', 'Vhembe TVET College', 'TVET', 'Limpopo'),
+      ('dhet_tvet_waterberg', 'Waterberg TVET College', 'TVET', 'Limpopo'),
+      ('dhet_tvet_ehlanzeni', 'Ehlanzeni TVET College', 'TVET', 'Mpumalanga'),
+      ('dhet_tvet_gert-sibande', 'Gert Sibande TVET College', 'TVET', 'Mpumalanga'),
+      ('dhet_tvet_nkangala', 'Nkangala TVET College', 'TVET', 'Mpumalanga'),
+      ('dhet_tvet_northern-cape-rural', 'Northern Cape Rural TVET College', 'TVET', 'Northern Cape'),
+      ('dhet_tvet_northern-cape-urban', 'Northern Cape Urban TVET College', 'TVET', 'Northern Cape'),
+      ('dhet_tvet_orbit', 'ORBIT TVET College', 'TVET', 'North West'),
+      ('dhet_tvet_taletso', 'Taletso TVET College', 'TVET', 'North West'),
+      ('dhet_tvet_vuselela', 'Vuselela TVET College', 'TVET', 'North West'),
+      ('dhet_tvet_boland', 'Boland TVET College', 'TVET', 'Western Cape'),
+      ('dhet_tvet_college-of-cape-town', 'College of Cape Town for TVET', 'TVET', 'Western Cape'),
+      ('dhet_tvet_false-bay', 'False Bay TVET College', 'TVET', 'Western Cape'),
+      ('dhet_tvet_northlink', 'Northlink TVET College', 'TVET', 'Western Cape'),
+      ('dhet_tvet_south-cape', 'South Cape TVET College', 'TVET', 'Western Cape'),
+      ('dhet_tvet_west-coast', 'West Coast TVET College', 'TVET', 'Western Cape'),
+      ('dhet_cet_eastern-cape', 'Eastern Cape Community Education and Training College', 'CET_COLLEGE', 'Eastern Cape'),
+      ('dhet_cet_free-state', 'Free State Community Education and Training College', 'CET_COLLEGE', 'Free State'),
+      ('dhet_cet_gauteng', 'Gauteng Community Education and Training College', 'CET_COLLEGE', 'Gauteng'),
+      ('dhet_cet_kwazulu-natal', 'KwaZulu-Natal Community Education and Training College', 'CET_COLLEGE', 'KwaZulu-Natal'),
+      ('dhet_cet_limpopo', 'Limpopo Community Education and Training College', 'CET_COLLEGE', 'Limpopo'),
+      ('dhet_cet_mpumalanga', 'Mpumalanga Community Education and Training College', 'CET_COLLEGE', 'Mpumalanga'),
+      ('dhet_cet_north-west', 'North West Community Education and Training College', 'CET_COLLEGE', 'North West'),
+      ('dhet_cet_northern-cape', 'Northern Cape Community Education and Training College', 'CET_COLLEGE', 'Northern Cape'),
+      ('dhet_cet_western-cape', 'Western Cape Community Education and Training College', 'CET_COLLEGE', 'Western Cape'),
+      ('prov_education_eastern_cape', 'Eastern Cape Department of Education', 'GOVERNMENT_AUTHORITY', 'Eastern Cape'),
+      ('prov_education_free_state', 'Free State Department of Education', 'GOVERNMENT_AUTHORITY', 'Free State'),
+      ('prov_education_gauteng', 'Gauteng Department of Education', 'GOVERNMENT_AUTHORITY', 'Gauteng'),
+      ('prov_education_kwazulu_natal', 'KwaZulu-Natal Department of Education', 'GOVERNMENT_AUTHORITY', 'KwaZulu-Natal'),
+      ('prov_education_limpopo', 'Limpopo Department of Education', 'GOVERNMENT_AUTHORITY', 'Limpopo'),
+      ('prov_education_mpumalanga', 'Mpumalanga Department of Education', 'GOVERNMENT_AUTHORITY', 'Mpumalanga'),
+      ('prov_education_north_west', 'North West Department of Education', 'GOVERNMENT_AUTHORITY', 'North West'),
+      ('prov_education_northern_cape', 'Northern Cape Department of Education', 'GOVERNMENT_AUTHORITY', 'Northern Cape'),
+      ('prov_education_western_cape', 'Western Cape Education Department', 'GOVERNMENT_AUTHORITY', 'Western Cape')
+  )
+  SELECT count(*) INTO conflict_count
+  FROM expected e
+  JOIN public.route_providers p USING (provider_key)
+  WHERE p.provider_name IS DISTINCT FROM e.provider_name
+     OR p.provider_type IS DISTINCT FROM e.provider_type
+     OR (p.province IS NOT NULL AND e.province IS NOT NULL AND p.province IS DISTINCT FROM e.province);
+  IF conflict_count > 0 THEN
+    RAISE EXCEPTION 'PUBLIC_INSTITUTION_DIRECTORY_PROVIDER_CONFLICT %', conflict_count;
+  END IF;
+END
+$provider_identity_preflight$;
+
 WITH provider_seed(provider_key,provider_name,provider_type,province,base_url,source_key,source_profile_url,provider_homepage_url,source_id,institution_classes) AS (
   VALUES
     ('dhet_university_cput', 'Cape Peninsula University of Technology', 'UNIVERSITY', 'Western Cape', 'https://www.cput.ac.za/', 'dhet_public_universities', 'https://www.dhet.gov.za/SitePages/UniversitiesinSA.aspx', 'https://www.cput.ac.za/', 'university-cput', 'EDUCATION_AND_SKILLS'),
@@ -216,10 +328,115 @@ DECLARE
   actual_count integer;
   invalid_count integer;
   missing_evidence integer;
+  identity_conflict_count integer;
 BEGIN
   SELECT count(*) INTO actual_count FROM public.route_providers WHERE provider_key = ANY(ARRAY['dhet_university_cput','dhet_university_cut','dhet_university_dut','dhet_university_mut','dhet_university_mandela','dhet_university_nwu','dhet_university_rhodes','dhet_university_smu','dhet_university_spu','dhet_university_stellenbosch','dhet_university_tut','dhet_university_uct','dhet_university_ufh','dhet_university_uj','dhet_university_ukzn','dhet_university_ul','dhet_university_ump','dhet_university_up','dhet_university_unisa','dhet_university_ufs','dhet_university_uwc','dhet_university_wits','dhet_university_vut','dhet_university_unizulu','dhet_university_wsu','dhet_university_univen','dhet_tvet_buffalo-city','dhet_tvet_eastcape-midlands','dhet_tvet_ikhala','dhet_tvet_ingwe','dhet_tvet_king-hintsa','dhet_tvet_king-sabata-dalindyebo','dhet_tvet_lovedale','dhet_tvet_port-elizabeth','dhet_tvet_flavius-mareka','dhet_tvet_goldfields','dhet_tvet_maluti','dhet_tvet_motheo','dhet_tvet_central-johannesburg','dhet_tvet_ekurhuleni-east','dhet_tvet_ekurhuleni-west','dhet_tvet_sedibeng','dhet_tvet_south-west-gauteng','dhet_tvet_tshwane-north','dhet_tvet_tshwane-south','dhet_tvet_western','dhet_tvet_coastal-kzn','dhet_tvet_elangeni','dhet_tvet_esayidi','dhet_tvet_majuba','dhet_tvet_mnambithi','dhet_tvet_mthashana','dhet_tvet_thekwini','dhet_tvet_umfolozi','dhet_tvet_umgungundlovu','dhet_tvet_capricorn','dhet_tvet_lephalale','dhet_tvet_letaba','dhet_tvet_mopani-south-east','dhet_tvet_sekhukhune','dhet_tvet_vhembe','dhet_tvet_waterberg','dhet_tvet_ehlanzeni','dhet_tvet_gert-sibande','dhet_tvet_nkangala','dhet_tvet_northern-cape-rural','dhet_tvet_northern-cape-urban','dhet_tvet_orbit','dhet_tvet_taletso','dhet_tvet_vuselela','dhet_tvet_boland','dhet_tvet_college-of-cape-town','dhet_tvet_false-bay','dhet_tvet_northlink','dhet_tvet_south-cape','dhet_tvet_west-coast','dhet_cet_eastern-cape','dhet_cet_free-state','dhet_cet_gauteng','dhet_cet_kwazulu-natal','dhet_cet_limpopo','dhet_cet_mpumalanga','dhet_cet_north-west','dhet_cet_northern-cape','dhet_cet_western-cape','prov_education_eastern_cape','prov_education_free_state','prov_education_gauteng','prov_education_kwazulu_natal','prov_education_limpopo','prov_education_mpumalanga','prov_education_north_west','prov_education_northern_cape','prov_education_western_cape']::text[]);
   IF actual_count <> expected_count THEN RAISE EXCEPTION 'PUBLIC_INSTITUTION_DIRECTORY_COUNT_MISMATCH expected %, got %',expected_count,actual_count; END IF;
   
+  WITH expected(provider_key,provider_name,provider_type,province) AS (
+    VALUES
+      ('dhet_university_cput', 'Cape Peninsula University of Technology', 'UNIVERSITY', 'Western Cape'),
+      ('dhet_university_cut', 'Central University of Technology, Free State', 'UNIVERSITY', 'Free State'),
+      ('dhet_university_dut', 'Durban University of Technology', 'UNIVERSITY', 'KwaZulu-Natal'),
+      ('dhet_university_mut', 'Mangosuthu University of Technology', 'UNIVERSITY', 'KwaZulu-Natal'),
+      ('dhet_university_mandela', 'Nelson Mandela University', 'UNIVERSITY', 'Eastern Cape'),
+      ('dhet_university_nwu', 'North-West University', 'UNIVERSITY', 'North West'),
+      ('dhet_university_rhodes', 'Rhodes University', 'UNIVERSITY', 'Eastern Cape'),
+      ('dhet_university_smu', 'Sefako Makgatho Health Sciences University', 'UNIVERSITY', 'Gauteng'),
+      ('dhet_university_spu', 'Sol Plaatje University', 'UNIVERSITY', 'Northern Cape'),
+      ('dhet_university_stellenbosch', 'Stellenbosch University', 'UNIVERSITY', 'Western Cape'),
+      ('dhet_university_tut', 'Tshwane University of Technology', 'UNIVERSITY', 'Gauteng'),
+      ('dhet_university_uct', 'University of Cape Town', 'UNIVERSITY', 'Western Cape'),
+      ('dhet_university_ufh', 'University of Fort Hare', 'UNIVERSITY', 'Eastern Cape'),
+      ('dhet_university_uj', 'University of Johannesburg', 'UNIVERSITY', 'Gauteng'),
+      ('dhet_university_ukzn', 'University of KwaZulu-Natal', 'UNIVERSITY', 'KwaZulu-Natal'),
+      ('dhet_university_ul', 'University of Limpopo', 'UNIVERSITY', 'Limpopo'),
+      ('dhet_university_ump', 'University of Mpumalanga', 'UNIVERSITY', 'Mpumalanga'),
+      ('dhet_university_up', 'University of Pretoria', 'UNIVERSITY', 'Gauteng'),
+      ('dhet_university_unisa', 'University of South Africa', 'UNIVERSITY', 'Gauteng'),
+      ('dhet_university_ufs', 'University of the Free State', 'UNIVERSITY', 'Free State'),
+      ('dhet_university_uwc', 'University of the Western Cape', 'UNIVERSITY', 'Western Cape'),
+      ('dhet_university_wits', 'University of the Witwatersrand', 'UNIVERSITY', 'Gauteng'),
+      ('dhet_university_vut', 'Vaal University of Technology', 'UNIVERSITY', 'Gauteng'),
+      ('dhet_university_unizulu', 'University of Zululand', 'UNIVERSITY', 'KwaZulu-Natal'),
+      ('dhet_university_wsu', 'Walter Sisulu University', 'UNIVERSITY', 'Eastern Cape'),
+      ('dhet_university_univen', 'University of Venda', 'UNIVERSITY', 'Limpopo'),
+      ('dhet_tvet_buffalo-city', 'Buffalo City TVET College', 'TVET', 'Eastern Cape'),
+      ('dhet_tvet_eastcape-midlands', 'Eastcape Midlands TVET College', 'TVET', 'Eastern Cape'),
+      ('dhet_tvet_ikhala', 'Ikhala TVET College', 'TVET', 'Eastern Cape'),
+      ('dhet_tvet_ingwe', 'Ingwe TVET College', 'TVET', 'Eastern Cape'),
+      ('dhet_tvet_king-hintsa', 'King Hintsa TVET College', 'TVET', 'Eastern Cape'),
+      ('dhet_tvet_king-sabata-dalindyebo', 'King Sabata Dalindyebo TVET College', 'TVET', 'Eastern Cape'),
+      ('dhet_tvet_lovedale', 'Lovedale TVET College', 'TVET', 'Eastern Cape'),
+      ('dhet_tvet_port-elizabeth', 'Port Elizabeth TVET College', 'TVET', 'Eastern Cape'),
+      ('dhet_tvet_flavius-mareka', 'Flavius Mareka TVET College', 'TVET', 'Free State'),
+      ('dhet_tvet_goldfields', 'Goldfields TVET College', 'TVET', 'Free State'),
+      ('dhet_tvet_maluti', 'Maluti TVET College', 'TVET', 'Free State'),
+      ('dhet_tvet_motheo', 'Motheo TVET College', 'TVET', 'Free State'),
+      ('dhet_tvet_central-johannesburg', 'Central Johannesburg TVET College', 'TVET', 'Gauteng'),
+      ('dhet_tvet_ekurhuleni-east', 'Ekurhuleni East TVET College', 'TVET', 'Gauteng'),
+      ('dhet_tvet_ekurhuleni-west', 'Ekurhuleni West TVET College', 'TVET', 'Gauteng'),
+      ('dhet_tvet_sedibeng', 'Sedibeng TVET College', 'TVET', 'Gauteng'),
+      ('dhet_tvet_south-west-gauteng', 'South West Gauteng TVET College', 'TVET', 'Gauteng'),
+      ('dhet_tvet_tshwane-north', 'Tshwane North TVET College', 'TVET', 'Gauteng'),
+      ('dhet_tvet_tshwane-south', 'Tshwane South TVET College', 'TVET', 'Gauteng'),
+      ('dhet_tvet_western', 'Western TVET College', 'TVET', 'Gauteng'),
+      ('dhet_tvet_coastal-kzn', 'Coastal TVET College', 'TVET', 'KwaZulu-Natal'),
+      ('dhet_tvet_elangeni', 'Elangeni TVET College', 'TVET', 'KwaZulu-Natal'),
+      ('dhet_tvet_esayidi', 'Esayidi TVET College', 'TVET', 'KwaZulu-Natal'),
+      ('dhet_tvet_majuba', 'Majuba TVET College', 'TVET', 'KwaZulu-Natal'),
+      ('dhet_tvet_mnambithi', 'Mnambithi TVET College', 'TVET', 'KwaZulu-Natal'),
+      ('dhet_tvet_mthashana', 'Mthashana TVET College', 'TVET', 'KwaZulu-Natal'),
+      ('dhet_tvet_thekwini', 'Thekwini TVET College', 'TVET', 'KwaZulu-Natal'),
+      ('dhet_tvet_umfolozi', 'Umfolozi TVET College', 'TVET', 'KwaZulu-Natal'),
+      ('dhet_tvet_umgungundlovu', 'Umgungundlovu TVET College', 'TVET', 'KwaZulu-Natal'),
+      ('dhet_tvet_capricorn', 'Capricorn TVET College', 'TVET', 'Limpopo'),
+      ('dhet_tvet_lephalale', 'Lephalale TVET College', 'TVET', 'Limpopo'),
+      ('dhet_tvet_letaba', 'Letaba TVET College', 'TVET', 'Limpopo'),
+      ('dhet_tvet_mopani-south-east', 'Mopani South East TVET College', 'TVET', 'Limpopo'),
+      ('dhet_tvet_sekhukhune', 'Sekhukhune TVET College', 'TVET', 'Limpopo'),
+      ('dhet_tvet_vhembe', 'Vhembe TVET College', 'TVET', 'Limpopo'),
+      ('dhet_tvet_waterberg', 'Waterberg TVET College', 'TVET', 'Limpopo'),
+      ('dhet_tvet_ehlanzeni', 'Ehlanzeni TVET College', 'TVET', 'Mpumalanga'),
+      ('dhet_tvet_gert-sibande', 'Gert Sibande TVET College', 'TVET', 'Mpumalanga'),
+      ('dhet_tvet_nkangala', 'Nkangala TVET College', 'TVET', 'Mpumalanga'),
+      ('dhet_tvet_northern-cape-rural', 'Northern Cape Rural TVET College', 'TVET', 'Northern Cape'),
+      ('dhet_tvet_northern-cape-urban', 'Northern Cape Urban TVET College', 'TVET', 'Northern Cape'),
+      ('dhet_tvet_orbit', 'ORBIT TVET College', 'TVET', 'North West'),
+      ('dhet_tvet_taletso', 'Taletso TVET College', 'TVET', 'North West'),
+      ('dhet_tvet_vuselela', 'Vuselela TVET College', 'TVET', 'North West'),
+      ('dhet_tvet_boland', 'Boland TVET College', 'TVET', 'Western Cape'),
+      ('dhet_tvet_college-of-cape-town', 'College of Cape Town for TVET', 'TVET', 'Western Cape'),
+      ('dhet_tvet_false-bay', 'False Bay TVET College', 'TVET', 'Western Cape'),
+      ('dhet_tvet_northlink', 'Northlink TVET College', 'TVET', 'Western Cape'),
+      ('dhet_tvet_south-cape', 'South Cape TVET College', 'TVET', 'Western Cape'),
+      ('dhet_tvet_west-coast', 'West Coast TVET College', 'TVET', 'Western Cape'),
+      ('dhet_cet_eastern-cape', 'Eastern Cape Community Education and Training College', 'CET_COLLEGE', 'Eastern Cape'),
+      ('dhet_cet_free-state', 'Free State Community Education and Training College', 'CET_COLLEGE', 'Free State'),
+      ('dhet_cet_gauteng', 'Gauteng Community Education and Training College', 'CET_COLLEGE', 'Gauteng'),
+      ('dhet_cet_kwazulu-natal', 'KwaZulu-Natal Community Education and Training College', 'CET_COLLEGE', 'KwaZulu-Natal'),
+      ('dhet_cet_limpopo', 'Limpopo Community Education and Training College', 'CET_COLLEGE', 'Limpopo'),
+      ('dhet_cet_mpumalanga', 'Mpumalanga Community Education and Training College', 'CET_COLLEGE', 'Mpumalanga'),
+      ('dhet_cet_north-west', 'North West Community Education and Training College', 'CET_COLLEGE', 'North West'),
+      ('dhet_cet_northern-cape', 'Northern Cape Community Education and Training College', 'CET_COLLEGE', 'Northern Cape'),
+      ('dhet_cet_western-cape', 'Western Cape Community Education and Training College', 'CET_COLLEGE', 'Western Cape'),
+      ('prov_education_eastern_cape', 'Eastern Cape Department of Education', 'GOVERNMENT_AUTHORITY', 'Eastern Cape'),
+      ('prov_education_free_state', 'Free State Department of Education', 'GOVERNMENT_AUTHORITY', 'Free State'),
+      ('prov_education_gauteng', 'Gauteng Department of Education', 'GOVERNMENT_AUTHORITY', 'Gauteng'),
+      ('prov_education_kwazulu_natal', 'KwaZulu-Natal Department of Education', 'GOVERNMENT_AUTHORITY', 'KwaZulu-Natal'),
+      ('prov_education_limpopo', 'Limpopo Department of Education', 'GOVERNMENT_AUTHORITY', 'Limpopo'),
+      ('prov_education_mpumalanga', 'Mpumalanga Department of Education', 'GOVERNMENT_AUTHORITY', 'Mpumalanga'),
+      ('prov_education_north_west', 'North West Department of Education', 'GOVERNMENT_AUTHORITY', 'North West'),
+      ('prov_education_northern_cape', 'Northern Cape Department of Education', 'GOVERNMENT_AUTHORITY', 'Northern Cape'),
+      ('prov_education_western_cape', 'Western Cape Education Department', 'GOVERNMENT_AUTHORITY', 'Western Cape')
+  )
+  SELECT count(*) INTO identity_conflict_count
+  FROM expected e JOIN public.route_providers p USING (provider_key)
+  WHERE p.provider_name IS DISTINCT FROM e.provider_name
+     OR p.provider_type IS DISTINCT FROM e.provider_type
+     OR (e.province IS NOT NULL AND p.province IS DISTINCT FROM e.province);
+  IF identity_conflict_count>0 THEN RAISE EXCEPTION 'PUBLIC_INSTITUTION_DIRECTORY_POSTFLIGHT_IDENTITY_MISMATCH %',identity_conflict_count; END IF;
+
   SELECT count(*) INTO invalid_count
   FROM public.route_providers
   WHERE provider_key=ANY(ARRAY['dhet_university_cput','dhet_university_cut','dhet_university_dut','dhet_university_mut','dhet_university_mandela','dhet_university_nwu','dhet_university_rhodes','dhet_university_smu','dhet_university_spu','dhet_university_stellenbosch','dhet_university_tut','dhet_university_uct','dhet_university_ufh','dhet_university_uj','dhet_university_ukzn','dhet_university_ul','dhet_university_ump','dhet_university_up','dhet_university_unisa','dhet_university_ufs','dhet_university_uwc','dhet_university_wits','dhet_university_vut','dhet_university_unizulu','dhet_university_wsu','dhet_university_univen','dhet_tvet_buffalo-city','dhet_tvet_eastcape-midlands','dhet_tvet_ikhala','dhet_tvet_ingwe','dhet_tvet_king-hintsa','dhet_tvet_king-sabata-dalindyebo','dhet_tvet_lovedale','dhet_tvet_port-elizabeth','dhet_tvet_flavius-mareka','dhet_tvet_goldfields','dhet_tvet_maluti','dhet_tvet_motheo','dhet_tvet_central-johannesburg','dhet_tvet_ekurhuleni-east','dhet_tvet_ekurhuleni-west','dhet_tvet_sedibeng','dhet_tvet_south-west-gauteng','dhet_tvet_tshwane-north','dhet_tvet_tshwane-south','dhet_tvet_western','dhet_tvet_coastal-kzn','dhet_tvet_elangeni','dhet_tvet_esayidi','dhet_tvet_majuba','dhet_tvet_mnambithi','dhet_tvet_mthashana','dhet_tvet_thekwini','dhet_tvet_umfolozi','dhet_tvet_umgungundlovu','dhet_tvet_capricorn','dhet_tvet_lephalale','dhet_tvet_letaba','dhet_tvet_mopani-south-east','dhet_tvet_sekhukhune','dhet_tvet_vhembe','dhet_tvet_waterberg','dhet_tvet_ehlanzeni','dhet_tvet_gert-sibande','dhet_tvet_nkangala','dhet_tvet_northern-cape-rural','dhet_tvet_northern-cape-urban','dhet_tvet_orbit','dhet_tvet_taletso','dhet_tvet_vuselela','dhet_tvet_boland','dhet_tvet_college-of-cape-town','dhet_tvet_false-bay','dhet_tvet_northlink','dhet_tvet_south-cape','dhet_tvet_west-coast','dhet_cet_eastern-cape','dhet_cet_free-state','dhet_cet_gauteng','dhet_cet_kwazulu-natal','dhet_cet_limpopo','dhet_cet_mpumalanga','dhet_cet_north-west','dhet_cet_northern-cape','dhet_cet_western-cape','prov_education_eastern_cape','prov_education_free_state','prov_education_gauteng','prov_education_kwazulu_natal','prov_education_limpopo','prov_education_mpumalanga','prov_education_north_west','prov_education_northern_cape','prov_education_western_cape']::text[])
@@ -234,6 +451,7 @@ BEGIN
       SELECT 1 FROM jsonb_array_elements(CASE WHEN jsonb_typeof(p.metadata->'provider_source_evidence')='array'
         THEN p.metadata->'provider_source_evidence' ELSE '[]'::jsonb END) e(value)
       WHERE e.value->>'source_profile_url' IS NOT NULL AND e.value->>'source_key' IS NOT NULL
+        AND e.value->>'source_authority_id' IS NOT NULL
     );
   IF missing_evidence>0 THEN RAISE EXCEPTION 'PUBLIC_INSTITUTION_DIRECTORY_SOURCE_EVIDENCE_MISSING %',missing_evidence; END IF;
 END
