@@ -600,6 +600,673 @@
       "refresh_after_days": 30,
       "review_required": true,
       "connector_state": "NOT_CONNECTED"
+    },
+    {
+      "source_id": "seta_agriseta_official",
+      "provider_key": "seta_agriseta",
+      "name": "AgriSETA",
+      "authority": "Department of Higher Education and Training SETA Directory",
+      "url": "https://www.agriseta.co.za/",
+      "classes": [
+        "EDUCATION_AND_SKILLS",
+        "EMPLOYER_AND_RECRUITMENT",
+        "FUNDING_AND_SOCIAL_SUPPORT"
+      ],
+      "supports": [
+        "official SETA identity and website as listed by DHET",
+        "published sector skills plans, learnerships, apprenticeship, bursary, discretionary-grant or funded-learning information when an exact current notice is independently checked"
+      ],
+      "does_not_prove": [
+        "an open learnership, apprenticeship, internship or bursary intake",
+        "current programme delivery or provider accreditation",
+        "candidate eligibility, stipend, grant amount or deadline",
+        "a Kingsmen partnership, live API/portal connector, submission receipt or provider outcome"
+      ],
+      "refresh_after_days": 30,
+      "review_required": true,
+      "connector_state": "NOT_CONNECTED"
+    },
+    {
+      "source_id": "seta_bankseta_official",
+      "provider_key": "seta_bankseta",
+      "name": "BANKSETA",
+      "authority": "Department of Higher Education and Training SETA Directory",
+      "url": "https://www.bankseta.org.za/",
+      "classes": [
+        "EDUCATION_AND_SKILLS",
+        "EMPLOYER_AND_RECRUITMENT",
+        "FUNDING_AND_SOCIAL_SUPPORT"
+      ],
+      "supports": [
+        "official SETA identity and website as listed by DHET",
+        "published sector skills plans, learnerships, apprenticeship, bursary, discretionary-grant or funded-learning information when an exact current notice is independently checked"
+      ],
+      "does_not_prove": [
+        "an open learnership, apprenticeship, internship or bursary intake",
+        "current programme delivery or provider accreditation",
+        "candidate eligibility, stipend, grant amount or deadline",
+        "a Kingsmen partnership, live API/portal connector, submission receipt or provider outcome"
+      ],
+      "refresh_after_days": 30,
+      "review_required": true,
+      "connector_state": "NOT_CONNECTED"
+    },
+    {
+      "source_id": "seta_cathsseta_official",
+      "provider_key": "seta_cathsseta",
+      "name": "CATHSSETA",
+      "authority": "Department of Higher Education and Training SETA Directory",
+      "url": "https://www.cathsseta.org.za/",
+      "classes": [
+        "EDUCATION_AND_SKILLS",
+        "EMPLOYER_AND_RECRUITMENT",
+        "FUNDING_AND_SOCIAL_SUPPORT"
+      ],
+      "supports": [
+        "official SETA identity and website as listed by DHET",
+        "published sector skills plans, learnerships, apprenticeship, bursary, discretionary-grant or funded-learning information when an exact current notice is independently checked"
+      ],
+      "does_not_prove": [
+        "an open learnership, apprenticeship, internship or bursary intake",
+        "current programme delivery or provider accreditation",
+        "candidate eligibility, stipend, grant amount or deadline",
+        "a Kingsmen partnership, live API/portal connector, submission receipt or provider outcome"
+      ],
+      "refresh_after_days": 30,
+      "review_required": true,
+      "connector_state": "NOT_CONNECTED"
+    },
+    {
+      "source_id": "seta_ceta_official",
+      "provider_key": "seta_ceta",
+      "name": "Construction Education and Training Authority (CETA)",
+      "authority": "Department of Higher Education and Training SETA Directory",
+      "url": "https://www.ceta.org.za/",
+      "classes": [
+        "EDUCATION_AND_SKILLS",
+        "EMPLOYER_AND_RECRUITMENT",
+        "FUNDING_AND_SOCIAL_SUPPORT"
+      ],
+      "supports": [
+        "official SETA identity and website as listed by DHET",
+        "published sector skills plans, learnerships, apprenticeship, bursary, discretionary-grant or funded-learning information when an exact current notice is independently checked"
+      ],
+      "does_not_prove": [
+        "an open learnership, apprenticeship, internship or bursary intake",
+        "current programme delivery or provider accreditation",
+        "candidate eligibility, stipend, grant amount or deadline",
+        "a Kingsmen partnership, live API/portal connector, submission receipt or provider outcome"
+      ],
+      "refresh_after_days": 30,
+      "review_required": true,
+      "connector_state": "NOT_CONNECTED"
+    },
+    {
+      "source_id": "seta_chieta_official",
+      "provider_key": "seta_chieta",
+      "name": "Chemical Industries Education and Training Authority (CHIETA)",
+      "authority": "Department of Higher Education and Training SETA Directory",
+      "url": "https://www.chieta.org.za/",
+      "classes": [
+        "EDUCATION_AND_SKILLS",
+        "EMPLOYER_AND_RECRUITMENT",
+        "FUNDING_AND_SOCIAL_SUPPORT"
+      ],
+      "supports": [
+        "official SETA identity and website as listed by DHET",
+        "published sector skills plans, learnerships, apprenticeship, bursary, discretionary-grant or funded-learning information when an exact current notice is independently checked"
+      ],
+      "does_not_prove": [
+        "an open learnership, apprenticeship, internship or bursary intake",
+        "current programme delivery or provider accreditation",
+        "candidate eligibility, stipend, grant amount or deadline",
+        "a Kingsmen partnership, live API/portal connector, submission receipt or provider outcome"
+      ],
+      "refresh_after_days": 30,
+      "review_required": true,
+      "connector_state": "NOT_CONNECTED"
+    },
+    {
+      "source_id": "seta_etdpseta_official",
+      "provider_key": "seta_etdpseta",
+      "name": "Education, Training and Development Practices SETA",
+      "authority": "Department of Higher Education and Training SETA Directory",
+      "url": "https://www.etdpseta.org.za/",
+      "classes": [
+        "EDUCATION_AND_SKILLS",
+        "EMPLOYER_AND_RECRUITMENT",
+        "FUNDING_AND_SOCIAL_SUPPORT"
+      ],
+      "supports": [
+        "official SETA identity and website as listed by DHET",
+        "published sector skills plans, learnerships, apprenticeship, bursary, discretionary-grant or funded-learning information when an exact current notice is independently checked"
+      ],
+      "does_not_prove": [
+        "an open learnership, apprenticeship, internship or bursary intake",
+        "current programme delivery or provider accreditation",
+        "candidate eligibility, stipend, grant amount or deadline",
+        "a Kingsmen partnership, live API/portal connector, submission receipt or provider outcome"
+      ],
+      "refresh_after_days": 30,
+      "review_required": true,
+      "connector_state": "NOT_CONNECTED"
+    },
+    {
+      "source_id": "seta_ewseta_official",
+      "provider_key": "seta_ewseta",
+      "name": "Energy and Water Sector Education and Training Authority",
+      "authority": "Department of Higher Education and Training SETA Directory",
+      "url": "https://ewseta.org.za/",
+      "classes": [
+        "EDUCATION_AND_SKILLS",
+        "EMPLOYER_AND_RECRUITMENT",
+        "FUNDING_AND_SOCIAL_SUPPORT"
+      ],
+      "supports": [
+        "official SETA identity and website as listed by DHET",
+        "published sector skills plans, learnerships, apprenticeship, bursary, discretionary-grant or funded-learning information when an exact current notice is independently checked"
+      ],
+      "does_not_prove": [
+        "an open learnership, apprenticeship, internship or bursary intake",
+        "current programme delivery or provider accreditation",
+        "candidate eligibility, stipend, grant amount or deadline",
+        "a Kingsmen partnership, live API/portal connector, submission receipt or provider outcome"
+      ],
+      "refresh_after_days": 30,
+      "review_required": true,
+      "connector_state": "NOT_CONNECTED"
+    },
+    {
+      "source_id": "seta_fasset_official",
+      "provider_key": "seta_fasset",
+      "name": "Financial and Accounting Services SETA (FASSET)",
+      "authority": "Department of Higher Education and Training SETA Directory",
+      "url": "https://www.fasset.org.za/",
+      "classes": [
+        "EDUCATION_AND_SKILLS",
+        "EMPLOYER_AND_RECRUITMENT",
+        "FUNDING_AND_SOCIAL_SUPPORT"
+      ],
+      "supports": [
+        "official SETA identity and website as listed by DHET",
+        "published sector skills plans, learnerships, apprenticeship, bursary, discretionary-grant or funded-learning information when an exact current notice is independently checked"
+      ],
+      "does_not_prove": [
+        "an open learnership, apprenticeship, internship or bursary intake",
+        "current programme delivery or provider accreditation",
+        "candidate eligibility, stipend, grant amount or deadline",
+        "a Kingsmen partnership, live API/portal connector, submission receipt or provider outcome"
+      ],
+      "refresh_after_days": 30,
+      "review_required": true,
+      "connector_state": "NOT_CONNECTED"
+    },
+    {
+      "source_id": "seta_foodbev_official",
+      "provider_key": "seta_foodbev",
+      "name": "FoodBev Manufacturing SETA",
+      "authority": "Department of Higher Education and Training SETA Directory",
+      "url": "https://www.foodbev.co.za/",
+      "classes": [
+        "EDUCATION_AND_SKILLS",
+        "EMPLOYER_AND_RECRUITMENT",
+        "FUNDING_AND_SOCIAL_SUPPORT"
+      ],
+      "supports": [
+        "official SETA identity and website as listed by DHET",
+        "published sector skills plans, learnerships, apprenticeship, bursary, discretionary-grant or funded-learning information when an exact current notice is independently checked"
+      ],
+      "does_not_prove": [
+        "an open learnership, apprenticeship, internship or bursary intake",
+        "current programme delivery or provider accreditation",
+        "candidate eligibility, stipend, grant amount or deadline",
+        "a Kingsmen partnership, live API/portal connector, submission receipt or provider outcome"
+      ],
+      "refresh_after_days": 30,
+      "review_required": true,
+      "connector_state": "NOT_CONNECTED"
+    },
+    {
+      "source_id": "seta_fpm_official",
+      "provider_key": "seta_fpm",
+      "name": "Fibre Processing and Manufacturing SETA (FP&M)",
+      "authority": "Department of Higher Education and Training SETA Directory",
+      "url": "https://www.fpmseta.org.za/",
+      "classes": [
+        "EDUCATION_AND_SKILLS",
+        "EMPLOYER_AND_RECRUITMENT",
+        "FUNDING_AND_SOCIAL_SUPPORT"
+      ],
+      "supports": [
+        "official SETA identity and website as listed by DHET",
+        "published sector skills plans, learnerships, apprenticeship, bursary, discretionary-grant or funded-learning information when an exact current notice is independently checked"
+      ],
+      "does_not_prove": [
+        "an open learnership, apprenticeship, internship or bursary intake",
+        "current programme delivery or provider accreditation",
+        "candidate eligibility, stipend, grant amount or deadline",
+        "a Kingsmen partnership, live API/portal connector, submission receipt or provider outcome"
+      ],
+      "refresh_after_days": 30,
+      "review_required": true,
+      "connector_state": "NOT_CONNECTED"
+    },
+    {
+      "source_id": "seta_hwseta_official",
+      "provider_key": "seta_hwseta",
+      "name": "Health and Welfare Sector Education and Training Authority",
+      "authority": "Department of Higher Education and Training SETA Directory",
+      "url": "https://www.hwseta.org.za/",
+      "classes": [
+        "EDUCATION_AND_SKILLS",
+        "EMPLOYER_AND_RECRUITMENT",
+        "FUNDING_AND_SOCIAL_SUPPORT"
+      ],
+      "supports": [
+        "official SETA identity and website as listed by DHET",
+        "published sector skills plans, learnerships, apprenticeship, bursary, discretionary-grant or funded-learning information when an exact current notice is independently checked"
+      ],
+      "does_not_prove": [
+        "an open learnership, apprenticeship, internship or bursary intake",
+        "current programme delivery or provider accreditation",
+        "candidate eligibility, stipend, grant amount or deadline",
+        "a Kingsmen partnership, live API/portal connector, submission receipt or provider outcome"
+      ],
+      "refresh_after_days": 30,
+      "review_required": true,
+      "connector_state": "NOT_CONNECTED"
+    },
+    {
+      "source_id": "seta_inseta_official",
+      "provider_key": "seta_inseta",
+      "name": "Insurance Sector Education and Training Authority (INSETA)",
+      "authority": "Department of Higher Education and Training SETA Directory",
+      "url": "https://www.inseta.org.za/",
+      "classes": [
+        "EDUCATION_AND_SKILLS",
+        "EMPLOYER_AND_RECRUITMENT",
+        "FUNDING_AND_SOCIAL_SUPPORT"
+      ],
+      "supports": [
+        "official SETA identity and website as listed by DHET",
+        "published sector skills plans, learnerships, apprenticeship, bursary, discretionary-grant or funded-learning information when an exact current notice is independently checked"
+      ],
+      "does_not_prove": [
+        "an open learnership, apprenticeship, internship or bursary intake",
+        "current programme delivery or provider accreditation",
+        "candidate eligibility, stipend, grant amount or deadline",
+        "a Kingsmen partnership, live API/portal connector, submission receipt or provider outcome"
+      ],
+      "refresh_after_days": 30,
+      "review_required": true,
+      "connector_state": "NOT_CONNECTED"
+    },
+    {
+      "source_id": "seta_lgseta_official",
+      "provider_key": "seta_lgseta",
+      "name": "Local Government Sector Education and Training Authority (LGSETA)",
+      "authority": "Department of Higher Education and Training SETA Directory",
+      "url": "https://lgseta.org.za/",
+      "classes": [
+        "EDUCATION_AND_SKILLS",
+        "EMPLOYER_AND_RECRUITMENT",
+        "FUNDING_AND_SOCIAL_SUPPORT"
+      ],
+      "supports": [
+        "official SETA identity and website as listed by DHET",
+        "published sector skills plans, learnerships, apprenticeship, bursary, discretionary-grant or funded-learning information when an exact current notice is independently checked"
+      ],
+      "does_not_prove": [
+        "an open learnership, apprenticeship, internship or bursary intake",
+        "current programme delivery or provider accreditation",
+        "candidate eligibility, stipend, grant amount or deadline",
+        "a Kingsmen partnership, live API/portal connector, submission receipt or provider outcome"
+      ],
+      "refresh_after_days": 30,
+      "review_required": true,
+      "connector_state": "NOT_CONNECTED"
+    },
+    {
+      "source_id": "seta_merseta_official",
+      "provider_key": "seta_merseta",
+      "name": "Manufacturing, Engineering and Related Services SETA (merSETA)",
+      "authority": "Department of Higher Education and Training SETA Directory",
+      "url": "https://www.merseta.org.za/",
+      "classes": [
+        "EDUCATION_AND_SKILLS",
+        "EMPLOYER_AND_RECRUITMENT",
+        "FUNDING_AND_SOCIAL_SUPPORT"
+      ],
+      "supports": [
+        "official SETA identity and website as listed by DHET",
+        "published sector skills plans, learnerships, apprenticeship, bursary, discretionary-grant or funded-learning information when an exact current notice is independently checked"
+      ],
+      "does_not_prove": [
+        "an open learnership, apprenticeship, internship or bursary intake",
+        "current programme delivery or provider accreditation",
+        "candidate eligibility, stipend, grant amount or deadline",
+        "a Kingsmen partnership, live API/portal connector, submission receipt or provider outcome"
+      ],
+      "refresh_after_days": 30,
+      "review_required": true,
+      "connector_state": "NOT_CONNECTED"
+    },
+    {
+      "source_id": "seta_mict_official",
+      "provider_key": "seta_mict",
+      "name": "Media, Information and Communication Technologies SETA (MICT SETA)",
+      "authority": "Department of Higher Education and Training SETA Directory",
+      "url": "https://www.mict.org.za/",
+      "classes": [
+        "EDUCATION_AND_SKILLS",
+        "EMPLOYER_AND_RECRUITMENT",
+        "FUNDING_AND_SOCIAL_SUPPORT"
+      ],
+      "supports": [
+        "official SETA identity and website as listed by DHET",
+        "published sector skills plans, learnerships, apprenticeship, bursary, discretionary-grant or funded-learning information when an exact current notice is independently checked"
+      ],
+      "does_not_prove": [
+        "an open learnership, apprenticeship, internship or bursary intake",
+        "current programme delivery or provider accreditation",
+        "candidate eligibility, stipend, grant amount or deadline",
+        "a Kingsmen partnership, live API/portal connector, submission receipt or provider outcome"
+      ],
+      "refresh_after_days": 30,
+      "review_required": true,
+      "connector_state": "NOT_CONNECTED"
+    },
+    {
+      "source_id": "seta_mqa_official",
+      "provider_key": "seta_mqa",
+      "name": "Mining Qualifications Authority (MQA)",
+      "authority": "Department of Higher Education and Training SETA Directory",
+      "url": "https://www.mqa.org.za/",
+      "classes": [
+        "EDUCATION_AND_SKILLS",
+        "EMPLOYER_AND_RECRUITMENT",
+        "FUNDING_AND_SOCIAL_SUPPORT"
+      ],
+      "supports": [
+        "official SETA identity and website as listed by DHET",
+        "published sector skills plans, learnerships, apprenticeship, bursary, discretionary-grant or funded-learning information when an exact current notice is independently checked"
+      ],
+      "does_not_prove": [
+        "an open learnership, apprenticeship, internship or bursary intake",
+        "current programme delivery or provider accreditation",
+        "candidate eligibility, stipend, grant amount or deadline",
+        "a Kingsmen partnership, live API/portal connector, submission receipt or provider outcome"
+      ],
+      "refresh_after_days": 30,
+      "review_required": true,
+      "connector_state": "NOT_CONNECTED"
+    },
+    {
+      "source_id": "seta_pseta_official",
+      "provider_key": "seta_pseta",
+      "name": "Public Service Sector Education and Training Authority (PSETA)",
+      "authority": "Department of Higher Education and Training SETA Directory",
+      "url": "https://www.pseta.org.za/",
+      "classes": [
+        "EDUCATION_AND_SKILLS",
+        "EMPLOYER_AND_RECRUITMENT",
+        "FUNDING_AND_SOCIAL_SUPPORT"
+      ],
+      "supports": [
+        "official SETA identity and website as listed by DHET",
+        "published sector skills plans, learnerships, apprenticeship, bursary, discretionary-grant or funded-learning information when an exact current notice is independently checked"
+      ],
+      "does_not_prove": [
+        "an open learnership, apprenticeship, internship or bursary intake",
+        "current programme delivery or provider accreditation",
+        "candidate eligibility, stipend, grant amount or deadline",
+        "a Kingsmen partnership, live API/portal connector, submission receipt or provider outcome"
+      ],
+      "refresh_after_days": 30,
+      "review_required": true,
+      "connector_state": "NOT_CONNECTED"
+    },
+    {
+      "source_id": "seta_sasseta_official",
+      "provider_key": "seta_sasseta",
+      "name": "Safety and Security Sector Education and Training Authority (SASSETA)",
+      "authority": "Department of Higher Education and Training SETA Directory",
+      "url": "https://www.sasseta.org.za/",
+      "classes": [
+        "EDUCATION_AND_SKILLS",
+        "EMPLOYER_AND_RECRUITMENT",
+        "FUNDING_AND_SOCIAL_SUPPORT"
+      ],
+      "supports": [
+        "official SETA identity and website as listed by DHET",
+        "published sector skills plans, learnerships, apprenticeship, bursary, discretionary-grant or funded-learning information when an exact current notice is independently checked"
+      ],
+      "does_not_prove": [
+        "an open learnership, apprenticeship, internship or bursary intake",
+        "current programme delivery or provider accreditation",
+        "candidate eligibility, stipend, grant amount or deadline",
+        "a Kingsmen partnership, live API/portal connector, submission receipt or provider outcome"
+      ],
+      "refresh_after_days": 30,
+      "review_required": true,
+      "connector_state": "NOT_CONNECTED"
+    },
+    {
+      "source_id": "seta_services_official",
+      "provider_key": "seta_services",
+      "name": "Services Sector Education and Training Authority (Services SETA)",
+      "authority": "Department of Higher Education and Training SETA Directory",
+      "url": "https://www.serviceseta.org.za/",
+      "classes": [
+        "EDUCATION_AND_SKILLS",
+        "EMPLOYER_AND_RECRUITMENT",
+        "FUNDING_AND_SOCIAL_SUPPORT"
+      ],
+      "supports": [
+        "official SETA identity and website as listed by DHET",
+        "published sector skills plans, learnerships, apprenticeship, bursary, discretionary-grant or funded-learning information when an exact current notice is independently checked"
+      ],
+      "does_not_prove": [
+        "an open learnership, apprenticeship, internship or bursary intake",
+        "current programme delivery or provider accreditation",
+        "candidate eligibility, stipend, grant amount or deadline",
+        "a Kingsmen partnership, live API/portal connector, submission receipt or provider outcome"
+      ],
+      "refresh_after_days": 30,
+      "review_required": true,
+      "connector_state": "NOT_CONNECTED"
+    },
+    {
+      "source_id": "seta_teta_official",
+      "provider_key": "seta_teta",
+      "name": "Transport Education and Training Authority (TETA)",
+      "authority": "Department of Higher Education and Training SETA Directory",
+      "url": "https://www.teta.org.za/",
+      "classes": [
+        "EDUCATION_AND_SKILLS",
+        "EMPLOYER_AND_RECRUITMENT",
+        "FUNDING_AND_SOCIAL_SUPPORT"
+      ],
+      "supports": [
+        "official SETA identity and website as listed by DHET",
+        "published sector skills plans, learnerships, apprenticeship, bursary, discretionary-grant or funded-learning information when an exact current notice is independently checked"
+      ],
+      "does_not_prove": [
+        "an open learnership, apprenticeship, internship or bursary intake",
+        "current programme delivery or provider accreditation",
+        "candidate eligibility, stipend, grant amount or deadline",
+        "a Kingsmen partnership, live API/portal connector, submission receipt or provider outcome"
+      ],
+      "refresh_after_days": 30,
+      "review_required": true,
+      "connector_state": "NOT_CONNECTED"
+    },
+    {
+      "source_id": "seta_wrseta_official",
+      "provider_key": "seta_wrseta",
+      "name": "Wholesale and Retail SETA (W&RSETA)",
+      "authority": "Department of Higher Education and Training SETA Directory",
+      "url": "https://www.wrseta.org.za/",
+      "classes": [
+        "EDUCATION_AND_SKILLS",
+        "EMPLOYER_AND_RECRUITMENT",
+        "FUNDING_AND_SOCIAL_SUPPORT"
+      ],
+      "supports": [
+        "official SETA identity and website as listed by DHET",
+        "published sector skills plans, learnerships, apprenticeship, bursary, discretionary-grant or funded-learning information when an exact current notice is independently checked"
+      ],
+      "does_not_prove": [
+        "an open learnership, apprenticeship, internship or bursary intake",
+        "current programme delivery or provider accreditation",
+        "candidate eligibility, stipend, grant amount or deadline",
+        "a Kingsmen partnership, live API/portal connector, submission receipt or provider outcome"
+      ],
+      "refresh_after_days": 30,
+      "review_required": true,
+      "connector_state": "NOT_CONNECTED"
+    },
+    {
+      "source_id": "dhet_private_colleges_register_2026",
+      "name": "DHET Register of Private Colleges — 15 July 2026",
+      "authority": "Department of Higher Education and Training",
+      "url": "https://www.dhet.gov.za/Registers_DocLib/Register%20of%20Private%20Colleges%20%2015%20July%202026.pdf",
+      "classes": [
+        "EDUCATION_AND_SKILLS",
+        "REGULATOR_AND_PROFESSIONAL_COUNCIL"
+      ],
+      "supports": [
+        "private college registration-list entries and published registration/site/qualification fields within the register"
+      ],
+      "does_not_prove": [
+        "current programme intake, delivery at a particular campus or application route",
+        "candidate eligibility, accreditation beyond listed registration scope, partnership, connector, submission or outcome"
+      ],
+      "refresh_after_days": 30,
+      "review_required": true,
+      "connector_state": "NOT_CONNECTED"
+    },
+    {
+      "source_id": "dhet_private_higher_education_register_2026",
+      "name": "DHET Register of Private Higher Education Institutions — 6 July 2026",
+      "authority": "Department of Higher Education and Training",
+      "url": "https://www.dhet.gov.za/Registers_DocLib/Annexure%20A%20Register%20%20Private%20Higher%20Education%20Institutions%2006%20July%202026.pdf",
+      "classes": [
+        "EDUCATION_AND_SKILLS",
+        "REGULATOR_AND_PROFESSIONAL_COUNCIL"
+      ],
+      "supports": [
+        "private higher-education institution and published registration/site evidence within the register"
+      ],
+      "does_not_prove": [
+        "current programme/intake, site of delivery availability or application route",
+        "candidate eligibility, partnership, connector, submission or outcome"
+      ],
+      "refresh_after_days": 30,
+      "review_required": true,
+      "connector_state": "NOT_CONNECTED"
+    },
+    {
+      "source_id": "dhet_cet_colleges_directory",
+      "name": "DHET Full List of Community Education and Training (CET) Colleges",
+      "authority": "Department of Higher Education and Training",
+      "url": "https://www.dhet.gov.za/SiteAssets/Community%20College/Full%20list%20of%20CET%20Colleges.pdf",
+      "classes": [
+        "EDUCATION_AND_SKILLS",
+        "PUBLIC_ADMINISTRATION"
+      ],
+      "supports": [
+        "CET college and community learning-centre directory discovery"
+      ],
+      "does_not_prove": [
+        "current course availability, intake, delivery site, deadline or eligibility",
+        "partnership, connector, submission or provider outcome"
+      ],
+      "refresh_after_days": 30,
+      "review_required": true,
+      "connector_state": "NOT_CONNECTED"
+    },
+    {
+      "source_id": "dhet_registered_pset_masterlist",
+      "name": "DHET Masterlist of Registered and Established PSET Institutions",
+      "authority": "Department of Higher Education and Training",
+      "url": "https://www.dhet.gov.za/SitePages/MasterLists.aspx",
+      "classes": [
+        "EDUCATION_AND_SKILLS",
+        "REGULATOR_AND_PROFESSIONAL_COUNCIL"
+      ],
+      "supports": [
+        "cross-sector post-school education and training institution masterlist discovery"
+      ],
+      "does_not_prove": [
+        "current intake, qualification delivery, application route or candidate eligibility",
+        "partnership, connector, submission or outcome"
+      ],
+      "refresh_after_days": 30,
+      "review_required": true,
+      "connector_state": "NOT_CONNECTED"
+    },
+    {
+      "source_id": "nsfas_institution_directory",
+      "name": "NSFAS Higher Education Institution Directory",
+      "authority": "National Student Financial Aid Scheme",
+      "url": "https://www.nsfas.org.za/content/institutions.html",
+      "classes": [
+        "EDUCATION_AND_SKILLS",
+        "FUNDING_AND_SOCIAL_SUPPORT"
+      ],
+      "supports": [
+        "published higher-education institution contact directory and the institutions listed within NSFAS scope"
+      ],
+      "does_not_prove": [
+        "an open NSFAS funding cycle, a candidate's eligibility or approval",
+        "institution accreditation beyond official source scope, application submission or payment"
+      ],
+      "refresh_after_days": 30,
+      "review_required": true,
+      "connector_state": "NOT_CONNECTED"
+    },
+    {
+      "source_id": "dhet_national_skills_fund",
+      "provider_key": "funder_nsf",
+      "name": "National Skills Fund (NSF)",
+      "authority": "Department of Higher Education and Training",
+      "url": "https://www.dhet.gov.za/SitePages/NSF.aspx",
+      "classes": [
+        "FUNDING_AND_SOCIAL_SUPPORT",
+        "EDUCATION_AND_SKILLS"
+      ],
+      "supports": [
+        "official National Skills Fund programme and funding information"
+      ],
+      "does_not_prove": [
+        "a current open call, individual candidate eligibility, award or payment",
+        "a Kingsmen funding agreement, API connector, submission receipt or outcome"
+      ],
+      "refresh_after_days": 30,
+      "review_required": true,
+      "connector_state": "NOT_CONNECTED"
+    },
+    {
+      "source_id": "funza_lushaka_bursary",
+      "provider_key": "funder_funza_lushaka",
+      "name": "Funza Lushaka Bursary Programme",
+      "authority": "Department of Basic Education",
+      "url": "https://www.funzalushaka.doe.gov.za/",
+      "classes": [
+        "FUNDING_AND_SOCIAL_SUPPORT",
+        "EDUCATION_AND_SKILLS"
+      ],
+      "supports": [
+        "official bursary programme portal and published application information"
+      ],
+      "does_not_prove": [
+        "a current open application window, eligibility, award or continued funding",
+        "a Kingsmen funding agreement, API connector, submission receipt or outcome"
+      ],
+      "refresh_after_days": 30,
+      "review_required": true,
+      "connector_state": "NOT_CONNECTED"
     }
   ],
   "completion_gates": [
