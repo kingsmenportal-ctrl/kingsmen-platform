@@ -162,6 +162,23 @@ BEGIN
     'n15_delabour_office_aid_2026_10_31','n15_delabour_registry_clerk_uif_2026_10_31',
     'n15_delabour_inspector_ies_2026_10_31'))<>7
   THEN RAISE EXCEPTION 'N15_OFFICIAL_EVIDENCE_OBSERVATION_POSTFLIGHT_FAILED'; END IF;
+  IF (SELECT count(*) FROM public.opportunity_deadlines WHERE deadline_ref IN (
+    'ndoh_forensic_mental_health_deadline_2026_11_09','ndoh_secretary_facilities_deadline_2026_11_09',
+    'dbe_public_examinations_deadline_2026_11_06','dbe_whole_school_evaluation_deadline_2026_11_06',
+    'dbe_health_promotion_deadline_2026_11_06','dbe_bids_contract_admin_deadline_2026_11_06',
+    'dbe_senior_secretary_deadline_2026_11_06','dbe_senior_admin_clerk_deadline_2026_11_06',
+    'nwpg_victor_thebe_sifora_bursary_deadline_2026_11_13',
+    'delabour_office_aid_phalaborwa_deadline_2026_11_06','delabour_office_aid_lebowakgomo_deadline_2026_11_06',
+    'delabour_office_aid_carletonville_deadline_2026_11_06','delabour_registry_clerk_uif_deadline_2026_11_06',
+    'delabour_inspector_ies_deadline_2026_11_06'))<>14
+  THEN RAISE EXCEPTION 'N15_OFFICIAL_EVIDENCE_DEADLINE_POSTFLIGHT_FAILED'; END IF;
+  IF EXISTS (SELECT 1 FROM public.external_source_observations WHERE observation_ref IN (
+    'n15_ndoh_forensic_mental_health_2026_10_31','n15_ndoh_secretary_facilities_2026_10_31',
+    'n15_dbe_vacancy_bulletin_2026_10_31','n15_nwpg_bursary_2027_2026_10_31',
+    'n15_delabour_office_aid_2026_10_31','n15_delabour_registry_clerk_uif_2026_10_31',
+    'n15_delabour_inspector_ies_2026_10_31')
+    AND (observation_status<>'VERIFIED' OR last_checked_at < now()-interval '24 hours' OR stale_after<=now()))
+  THEN RAISE EXCEPTION 'N15_OFFICIAL_EVIDENCE_OBSERVATION_STALE_AT_APPLY'; END IF;
   IF EXISTS (SELECT 1 FROM public.opportunity_programmes WHERE programme_ref IN (
     'ndoh_forensic_mental_health_ndoh_82_2026','ndoh_secretary_hospital_facilities_ndoh_87_2026',
     'dbe_public_examinations_dbe_74_2026','dbe_whole_school_evaluation_dbe_75_2026',
