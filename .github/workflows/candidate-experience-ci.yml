@@ -59,3 +59,42 @@ jobs:
           name: kingsmen-rc1-ui-smoke
           path: artifacts/ui-rc1/
           if-no-files-found: warn
+
+  dhet-private-registers:
+    name: dhet-private-register-extraction
+    runs-on: ubuntu-24.04
+    timeout-minutes: 20
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Install PDF text extractor
+        run: |
+          sudo apt-get update
+          sudo apt-get install --yes poppler-utils
+      - name: Download official DHET register snapshots
+        run: |
+          set -euo pipefail
+          curl --fail --location --retry 3 --max-time 180 'https://www.dhet.gov.za/Registers_DocLib/Annexure%20A%20Register%20%20Private%20Higher%20Education%20Institutions%2006%20July%202026.pdf' --output /tmp/dhet-hei.pdf
+          curl --fail --location --retry 3 --max-time 180 'https://www.dhet.gov.za/Registers_DocLib/Register%20of%20Private%20Colleges%20%2015%20July%202026.pdf' --output /tmp/dhet-colleges.pdf
+          pdfinfo /tmp/dhet-hei.pdf | grep -E 'Pages: *210'
+          pdfinfo /tmp/dhet-colleges.pdf | grep -E 'Pages: *92'
+          pdftotext -layout /tmp/dhet-hei.pdf /tmp/dhet-hei.txt
+          pdftotext -layout /tmp/dhet-colleges.pdf /tmp/dhet-colleges.txt
+      - name: Extract registry candidates
+        run: |
+          mkdir -p artifacts/dhet-private-registers
+          node scripts/institutions/extract-dhet-private-registers.mjs --higher-education-text /tmp/dhet-hei.txt --private-colleges-text /tmp/dhet-colleges.txt --out artifacts/dhet-private-registers/candidates.json
+          node -e "const m=require('./artifacts/dhet-private-registers/candidates.json'); console.log(JSON.stringify({schema:m.schema,status:m.status,counts:m.counts},null,2));"
+      - name: Validate extracted records and route safety
+        run: node scripts/validators/validate-dhet-private-register-manifest.mjs artifacts/dhet-private-registers/candidates.json
+      - name: Upload full-register candidate artifact
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: dhet-private-register-candidates
+          path: artifacts/dhet-private-registers/
+          if-no-files-found: warn

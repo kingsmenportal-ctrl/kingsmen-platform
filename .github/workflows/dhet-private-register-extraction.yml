@@ -1,0 +1,71 @@
+name: DHET Private Register Extraction
+
+on:
+  pull_request:
+    branches: [feat/national-institution-usability-2026-10-31, main]
+    paths:
+      - 'scripts/institutions/extract-dhet-private-registers.mjs'
+      - 'scripts/validators/validate-dhet-private-register-extractor.mjs'
+      - 'scripts/institutions/build-dhet-private-register-evidence-migration.mjs'
+      - 'scripts/institutions/prepare-dhet-private-register-import-manifest.mjs'
+      - '.github/workflows/dhet-private-register-extraction.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  extract-official-registers:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Install PDF text extractor
+        run: |
+          sudo apt-get update
+          sudo apt-get install --yes poppler-utils
+      - name: Download exact official DHET register snapshots
+        run: |
+          set -euo pipefail
+          curl --fail --location --retry 3 --retry-delay 2 --max-time 180 \
+            'https://www.dhet.gov.za/Registers_DocLib/Annexure%20A%20Register%20%20Private%20Higher%20Education%20Institutions%2006%20July%202026.pdf' \
+            --output /tmp/dhet-private-hei-2026-07-06.pdf
+          curl --fail --location --retry 3 --retry-delay 2 --max-time 180 \
+            'https://www.dhet.gov.za/Registers_DocLib/Register%20of%20Private%20Colleges%20%2015%20July%202026.pdf' \
+            --output /tmp/dhet-private-colleges-2026-07-15.pdf
+          pdfinfo /tmp/dhet-private-hei-2026-07-06.pdf | grep -E 'Pages: *210'
+          pdfinfo /tmp/dhet-private-colleges-2026-07-15.pdf | grep -E 'Pages: *92'
+          pdftotext -layout /tmp/dhet-private-hei-2026-07-06.pdf /tmp/dhet-private-hei-2026-07-06.txt
+          pdftotext -layout /tmp/dhet-private-colleges-2026-07-15.pdf /tmp/dhet-private-colleges-2026-07-15.txt
+      - name: Extract registry candidates
+        run: |
+          mkdir -p artifacts/dhet-private-registers
+          node scripts/institutions/extract-dhet-private-registers.mjs \
+            --higher-education-text /tmp/dhet-private-hei-2026-07-06.txt \
+            --private-colleges-text /tmp/dhet-private-colleges-2026-07-15.txt \
+            --out artifacts/dhet-private-registers/candidates.json
+          node -e "const m=require('./artifacts/dhet-private-registers/candidates.json'); console.log(JSON.stringify({schema:m.schema,status:m.status,counts:m.counts},null,2));"
+      - name: Validate extracted record integrity and safety
+        run: node scripts/validators/validate-dhet-private-register-manifest.mjs artifacts/dhet-private-registers/candidates.json
+      - name: Prepare reviewed import subset; skip SQL when none approved
+        run: |
+          set -euo pipefail
+          node scripts/institutions/prepare-dhet-private-register-import-manifest.mjs artifacts/dhet-private-registers/candidates.json artifacts/dhet-private-registers/import-candidates.json
+          IMPORT_COUNT="$(node -e 'const m=require("./artifacts/dhet-private-registers/import-candidates.json"); console.log(m.records.length)')"
+          if [ "$IMPORT_COUNT" -eq 0 ]; then
+            echo "No explicitly reviewed import records; migration SQL intentionally not generated."
+            test ! -f artifacts/dhet-private-registers/registry-evidence-import.sql
+          else
+            node scripts/institutions/build-dhet-private-register-evidence-migration.mjs --manifest artifacts/dhet-private-registers/import-candidates.json --out artifacts/dhet-private-registers/registry-evidence-import.sql
+            test -s artifacts/dhet-private-registers/registry-evidence-import.sql
+          fi
+      - name: Preserve extraction evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: dhet-private-register-candidates-${{ github.run_id }}
+          path: artifacts/dhet-private-registers/
+          if-no-files-found: warn
