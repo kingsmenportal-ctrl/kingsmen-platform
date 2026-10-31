@@ -35,7 +35,7 @@ function deadlineState(value, now) {
   if (value == null) return { valid: true, current: true, sameDayWithoutTime: false };
   const cutoff = now instanceof Date ? now : new Date(now);
   if (Number.isNaN(cutoff.getTime())) return { valid: false, current: false, sameDayWithoutTime: false };
-  if (typeof value === "string" && /^\\d{4}-\\d{2}-\\d{2}$/.test(value)) {
+  if (typeof value === "string" && /^\d{4}-\d{2}-\d{2}$/.test(value)) {
     const day = new Date(`${value}T00:00:00.000Z`);
     if (Number.isNaN(day.getTime()) || day.toISOString().slice(0, 10) !== value) {
       return { valid: false, current: false, sameDayWithoutTime: false };
