@@ -248,7 +248,7 @@ const sourceItems: DirectoryItem[] = crossSector.sources.map((source: SourceAnch
         : capabilityBySource[source.source_id] ?? [];
   const sourcePathways = isSetaProvider
     ? ["SETA_LEARNERSHIPS", "APPRENTICESHIPS"]
-    : isPublicEntityEmployer || isPrivateEmployer || isDpsaVacancySource
+    : isPublicEntityEmployer || isPrivateEmployer || isDpsaVacancySource || isProvincialEducationDepartment
       ? ["EMPLOYMENT"]
       : source.source_id === "funza_lushaka_bursary"
       ? ["HIGHER_EDUCATION"]
