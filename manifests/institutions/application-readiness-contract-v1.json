@@ -28,11 +28,13 @@
   },
   "evidence_rules": {
     "provider_identity_separate_from_route": true,
+    "official_domain_required_for_source_and_route_urls": true,
     "route_separate_from_connector_configuration": true,
     "directory_does_not_prove_current_opportunity": true,
     "candidate_reported_submission_is_not_provider_receipt": true,
     "provider_confirmed_outcome_requires_authoritative_evidence": true,
     "candidate_consent_required_for_candidate_ready": true,
+    "candidate_readiness_is_not_an_admission_or_employment_decision": true,
     "no_parallel_provider_registry": true,
     "default_connector_state": "NOT_CONNECTED"
   }
