@@ -9,20 +9,20 @@ const PROVINCES=["Eastern Cape","Free State","Gauteng","KwaZulu-Natal","Limpopo"
 export const normalizeName=s=>String(s??"").normalize("NFKC").replace(/[’‘]/g,"'").replace(/[–—]/g,"-").replace(/\s+/g," ").replace(/^[\d. )-]+/,"").trim().replace(/[.,;:]+$/,"");
 export const canonicalSlug=s=>normalizeName(s).normalize("NFD").replace(/[\u0300-\u036f]/g,"").toLowerCase().replace(/&/g," and ").replace(/[^a-z0-9]+/g,"-").replace(/^-|-$/g,"");
 function status(section,block,kind){
- const h=section.toLowerCase(),s=(section+"\n"+block).toLowerCase();
- if(/reasons for cancellation|date when cancellation comes into effect|registration has been cancelled|registration was cancelled|cancelled with effect/.test(s))return "CANCELLED";
- if(/lapsed provisional registration|registration has lapsed/.test(s))return "LAPSED";
+ const h=section.toLowerCase(),s=(section+"\\n"+block).toLowerCase();
+ const hasLapsed=/\\blapsed\\b|\\blapsing\\b/.test(s);
+ const hasCancelled=/reasons for cancellation|date when cancellation comes into effect|registration has been cancelled|registration was cancelled|cancelled with effect|\\bcancelled\\b|\\bcanceled\\b/.test(s);
+ // If the same entry explicitly signals both states, retain it for adjudication.
+ if(hasLapsed&&hasCancelled)return "STATUS_UNRESOLVED";
+ if(hasLapsed)return "LAPSED";
+ if(hasCancelled)return "CANCELLED";
  if(/withdrawn|deregistered/.test(h))return "WITHDRAWN_OR_DEREGISTERED_REVIEW";
- if(kind==="private_colleges"&&/section\s+a/.test(h))return "CANCELLED";
- if(kind==="private_colleges"&&/section\s+b/.test(h))return "REGISTERED";
- if(/lapsed|lapsing/.test(h))return "LAPSED";
- if(/cancelled|canceled/.test(h))return "CANCELLED";
+ if(kind==="private_colleges"&&/section\\s+a/.test(h))return "CANCELLED";
+ if(kind==="private_colleges"&&/section\\s+b/.test(h))return "REGISTERED";
  if(/provisionally registered|provisional registration/.test(h))return "PROVISIONAL";
- if(/lapsed|lapsing of provisional registration|provisional registration.*lapsed|lapsed.*provisional registration/.test(s))return "LAPSED";
- if(/cancelled|canceled|registration cancelled/.test(s))return "CANCELLED";
- if(/provisionally registered|provisional registration/.test(h))return "PROVISIONAL";
- if(/provisionally registered|provisional registration/.test(s))return "PROVISIONAL";
  if(/registered institutions/.test(h))return "REGISTERED";
+ if(/withdrawn|deregistered/.test(s))return "WITHDRAWN_OR_DEREGISTERED_REVIEW";
+ if(/provisionally registered|provisional registration/.test(s))return "PROVISIONAL";
  if(/registered institutions/.test(s))return "REGISTERED";
  return "STATUS_UNRESOLVED";
 }
