@@ -68,6 +68,12 @@ function freshTimestamp(value, windowDays, now) {
   return age >= 0 && age <= windowDays * DAY_MS;
 }
 
+function validHistoricalTimestamp(value, now) {
+  const parsed = asDate(value);
+  const cutoff = now instanceof Date ? now : new Date(now);
+  return Boolean(parsed) && !Number.isNaN(cutoff.getTime()) && parsed.getTime() <= cutoff.getTime();
+}
+
 function secureOfficialUrl(value, officialDomain) {
   if (!nonEmpty(value)) return false;
   let parsed;
@@ -218,14 +224,14 @@ export function evaluateOpportunityReadiness(opportunity = {}, options = {}) {
     submission.status === "PROVIDER_RECEIPT_VERIFIED" &&
     nonEmpty(submission.receipt_reference) &&
     nonEmpty(submission.evidence_record_id) &&
-    freshTimestamp(submission.submitted_at, submission.freshness_window_days, now);
+    validHistoricalTimestamp(submission.submitted_at, now);
 
   const outcomePass =
     receiptPass &&
     outcome.status === "PROVIDER_CONFIRMED" &&
     nonEmpty(outcome.outcome_type) &&
     nonEmpty(outcome.evidence_record_id) &&
-    freshTimestamp(outcome.confirmed_at, outcome.freshness_window_days, now);
+    validHistoricalTimestamp(outcome.confirmed_at, now);
 
   const reportedSubmission = submission.reported_by_candidate === true && !receiptPass;
   const checks = [
