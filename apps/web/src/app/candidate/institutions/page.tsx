@@ -74,6 +74,7 @@ const capabilityLabels: Record<string, string> = {
 
 const capabilityBySource: Record<string, string[]> = {
   gcis_national_institution_directory: ["PUBLIC_SERVICE"],
+  gcis_public_entities_and_soe_directory: ["PUBLIC_SERVICE", "EMPLOYMENT"],
   govza_national_departments: ["PUBLIC_SERVICE"],
   govza_local_government: ["PUBLIC_SERVICE"],
   dpsa_vacancies: ["EMPLOYMENT"],
@@ -88,6 +89,15 @@ const capabilityBySource: Record<string, string[]> = {
   dhet_national_skills_fund: ["FUNDING"],
   funza_lushaka_bursary: ["FUNDING", "HIGHER_EDUCATION"],
   nsfas_official: ["FUNDING", "SOCIAL_SUPPORT"],
+  gcis_soe_acsa_employer: ["EMPLOYMENT", "TRANSPORT"],
+  gcis_soe_denel_employer: ["EMPLOYMENT"],
+  gcis_soe_prasa_employer: ["EMPLOYMENT", "TRANSPORT"],
+  gcis_soe_saa_employer: ["EMPLOYMENT", "TRANSPORT"],
+  gcis_soe_sabc_employer: ["EMPLOYMENT"],
+  gcis_soe_sanral_employer: ["EMPLOYMENT", "TRANSPORT"],
+  gcis_soe_sapo_employer: ["EMPLOYMENT", "TRANSPORT"],
+  gcis_soe_telkom_employer: ["EMPLOYMENT"],
+  gcis_soe_transnet_employer: ["EMPLOYMENT", "TRANSPORT"],
   health_department_directory: ["HEALTH_AND_CARE"],
   hpcsa_professional_register: ["HEALTH_AND_CARE"],
   sassa_official: ["SOCIAL_SUPPORT"],
@@ -116,6 +126,15 @@ const pathwayBySource: Record<string, string[]> = {
   dhet_national_skills_fund: ["HIGHER_EDUCATION", "TVET", "SETA_LEARNERSHIPS", "APPRENTICESHIPS"],
   funza_lushaka_bursary: ["HIGHER_EDUCATION"],
   nsfas_official: ["HIGHER_EDUCATION", "TVET"],
+  gcis_soe_acsa_employer: ["EMPLOYMENT"],
+  gcis_soe_denel_employer: ["EMPLOYMENT"],
+  gcis_soe_prasa_employer: ["EMPLOYMENT"],
+  gcis_soe_saa_employer: ["EMPLOYMENT"],
+  gcis_soe_sabc_employer: ["EMPLOYMENT"],
+  gcis_soe_sanral_employer: ["EMPLOYMENT"],
+  gcis_soe_sapo_employer: ["EMPLOYMENT"],
+  gcis_soe_telkom_employer: ["EMPLOYMENT"],
+  gcis_soe_transnet_employer: ["EMPLOYMENT"],
   job_portal_provider_authorized: ["EMPLOYMENT", "INTERNSHIPS", "APPRENTICESHIPS", "SETA_LEARNERSHIPS"],
   eskom_official: ["EMPLOYMENT"],
   sars_official: ["EMPLOYMENT"]
@@ -188,7 +207,7 @@ const sourceItems: DirectoryItem[] = crossSector.sources.map((source: SourceAnch
   const isSetaProvider = Boolean(source.provider_key?.startsWith("seta_"));
   const sourceCapabilities = isSetaProvider
     ? ["SETA_LEARNERSHIPS", "APPRENTICESHIPS", "FUNDING"]
-    : capabilityBySource[source.source_id] ?? (source.provider_key ? ["FUNDING"] : []);
+    : capabilityBySource[source.source_id] ?? [];
   const sourcePathways = isSetaProvider
     ? ["SETA_LEARNERSHIPS", "APPRENTICESHIPS"]
     : source.source_id === "funza_lushaka_bursary"
@@ -201,7 +220,10 @@ const sourceItems: DirectoryItem[] = crossSector.sources.map((source: SourceAnch
     registryKey: source.provider_key ?? null,
     name: source.name,
     kind: "OFFICIAL_SOURCE",
-    providerType: source.provider_key?.startsWith("seta_") ? "SETA_PROVIDER" : source.provider_key ? "FUNDING_PROVIDER" : "SOURCE_REGISTRY",
+    providerType: source.provider_key?.startsWith("seta_") ? "SETA_PROVIDER"
+      : (source.provider_key === "funder_nsf" || source.provider_key === "funder_funza_lushaka" || source.provider_key === "nsfas_official") ? "FUNDING_PROVIDER"
+      : source.provider_key?.startsWith("soe_") ? "EMPLOYER_PROVIDER"
+      : "SOURCE_REGISTRY",
     sectorKeys: sourceClasses,
     province: null,
     serviceCapabilities: sourceCapabilities,
@@ -543,7 +565,7 @@ export default function CandidateInstitutionDirectoryPage() {
                     Institution website URL unresolved. Kingsmen will not guess the URL.
                   </span>
                 )}
-                {item.registryKey && (item.kind !== "OFFICIAL_SOURCE" || item.providerType === "SETA_PROVIDER" || item.providerType === "FUNDING_PROVIDER") && (
+                {item.registryKey && (item.kind !== "OFFICIAL_SOURCE" || item.providerType === "SETA_PROVIDER" || item.providerType === "FUNDING_PROVIDER" || item.providerType === "EMPLOYER_PROVIDER") && (
                   <Link
                     href={`/candidate/applications?directory_provider_key=${encodeURIComponent(item.registryKey)}&directory_provider_name=${encodeURIComponent(item.name)}&directory_pathway=${encodeURIComponent(item.pathways.find(value => pathways.includes(value)) ?? (item.providerType === "TVET" ? "TVET" : "HIGHER_EDUCATION"))}`}
                     className="inline-flex rounded-xl bg-amber-300 px-4 py-3 text-sm font-extrabold text-[#101b2a] hover:bg-amber-200"
