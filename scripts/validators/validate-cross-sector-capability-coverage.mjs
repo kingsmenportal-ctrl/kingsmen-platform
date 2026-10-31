@@ -10,6 +10,12 @@ const data = JSON.parse(fs.readFileSync(matrixPath, "utf8"));
 const errors = [];
 const expected = sourceData.service_capabilities ?? [];
 const sourceIds = new Set((sourceData.sources ?? []).map(source => source.source_id));
+const allowedClasses = new Set(sourceData.institution_classes ?? []);
+for (const source of sourceData.sources ?? []) {
+  for (const cls of source.classes ?? []) {
+    if (!allowedClasses.has(cls)) errors.push(`Unknown institution class ${cls} used by source ${source.source_id}`);
+  }
+}
 if (data.schema !== "kingsmen.institutions.cross-sector-capability-coverage.v1") errors.push("Unexpected capability coverage schema");
 if (data.country !== "ZA") errors.push("Country must remain ZA");
 if (data.defaults?.coverage_state !== "DISCOVERY_ONLY") errors.push("Coverage must default to discovery only");
