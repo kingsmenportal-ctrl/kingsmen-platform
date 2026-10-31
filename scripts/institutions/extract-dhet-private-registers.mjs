@@ -9,14 +9,17 @@ const PROVINCES=["Eastern Cape","Free State","Gauteng","KwaZulu-Natal","Limpopo"
 export const normalizeName=s=>String(s??"").normalize("NFKC").replace(/[’‘]/g,"'").replace(/[–—]/g,"-").replace(/\s+/g," ").replace(/^[\d. )-]+/,"").trim().replace(/[.,;:]+$/,"");
 export const canonicalSlug=s=>normalizeName(s).normalize("NFD").replace(/[\u0300-\u036f]/g,"").toLowerCase().replace(/&/g," and ").replace(/[^a-z0-9]+/g,"-").replace(/^-|-$/g,"");
 function status(section,block,kind){
- const s=(section+"\n"+block.slice(0,500)).toLowerCase();
- if(kind==="private_colleges"&&/section\s+a/.test(section.toLowerCase()))return "CANCELLED";
- if(kind==="private_colleges"&&/section\s+b/.test(section.toLowerCase()))return "REGISTERED";
+ const h=section.toLowerCase(),s=(section+"\n"+block.slice(0,500)).toLowerCase();
+ if(kind==="private_colleges"&&/section\s+a/.test(h))return "CANCELLED";
+ if(kind==="private_colleges"&&/section\s+b/.test(h))return "REGISTERED";
+ if(/lapsed|lapsing/.test(h))return "LAPSED";
+ if(/cancelled|canceled|withdrawn|deregistered/.test(h))return "CANCELLED";
+ if(/provisionally registered|provisional registration/.test(h))return "PROVISIONAL";
+ if(/registered institutions/.test(h))return "REGISTERED";
  if(/lapsed|lapsing of provisional registration/.test(s))return "LAPSED";
  if(/cancelled|canceled|registration cancelled/.test(s))return "CANCELLED";
  if(/withdrawn|deregistered/.test(s))return "WITHDRAWN_OR_DEREGISTERED_REVIEW";
  if(/provisionally registered|provisional registration/.test(s))return "PROVISIONAL";
- if(/registered institutions/.test(section.toLowerCase()))return "REGISTERED";
  return "STATUS_UNRESOLVED";
 }
 function splitEntries(text){
