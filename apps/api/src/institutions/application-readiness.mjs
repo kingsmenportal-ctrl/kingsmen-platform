@@ -49,7 +49,7 @@ function secureOfficialUrl(value, officialDomain) {
     return false;
   }
   if (parsed.protocol !== "https:" || !parsed.hostname || parsed.username || parsed.password) return false;
-  if (!officialDomain) return true;
+  if (!nonEmpty(officialDomain)) return false;
   const domain = String(officialDomain).trim().toLowerCase().replace(/^\./, "");
   const hostname = parsed.hostname.toLowerCase();
   return Boolean(domain) && (hostname === domain || hostname.endsWith(`.${domain}`));
@@ -175,7 +175,7 @@ export function evaluateOpportunityReadiness(opportunity = {}, options = {}) {
   const candidatePass =
     requirementsPass &&
     providerReadiness.rank >= 2 &&
-    candidate.eligibility_status === "ELIGIBLE" &&
+    candidate.eligibility_status === "REQUIREMENTS_MATCHED" &&
     candidate.eligibility_review_status === "VERIFIED" &&
     candidate.preflight_status === "PASS" &&
     candidate.required_documents_present === true &&
