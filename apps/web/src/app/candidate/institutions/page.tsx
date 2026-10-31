@@ -7,7 +7,7 @@ import directorySeed from "../../../../../../manifests/institutions/seed/public-
 import crossSector from "../../../../../../manifests/institutions/cross-sector-institution-source-extension.json";
 
 type Institution = (typeof directorySeed.records)[number];
-type SourceAnchor = (typeof crossSector.sources)[number];
+type SourceAnchor = (typeof crossSector.sources)[number] & { provider_key?: string };
 type VerifiedProviderRoute = {
   provider_key: string; provider_name: string; provider_type: string; province: string | null;
   base_url: string | null; verification_status: string; public_safe: boolean;
@@ -170,14 +170,23 @@ const institutionItems: DirectoryItem[] = directorySeed.records.map((record: Ins
 
 const sourceItems: DirectoryItem[] = crossSector.sources.map((source: SourceAnchor) => {
   const sourceClasses = source.classes as string[];
-  const sourceCapabilities = capabilityBySource[source.source_id] ?? [];
-  const sourcePathways = pathwayBySource[source.source_id] ?? [];
+  const isSetaProvider = Boolean(source.provider_key?.startsWith("seta_"));
+  const sourceCapabilities = isSetaProvider
+    ? ["SETA_LEARNERSHIPS", "APPRENTICESHIPS", "FUNDING"]
+    : capabilityBySource[source.source_id] ?? (source.provider_key ? ["FUNDING"] : []);
+  const sourcePathways = isSetaProvider
+    ? ["SETA_LEARNERSHIPS", "APPRENTICESHIPS"]
+    : source.source_id === "funza_lushaka_bursary"
+      ? ["HIGHER_EDUCATION"]
+      : source.source_id === "dhet_national_skills_fund"
+        ? ["HIGHER_EDUCATION", "TVET", "SETA_LEARNERSHIPS", "APPRENTICESHIPS"]
+        : pathwayBySource[source.source_id] ?? [];
   return {
     id: source.source_id,
-    registryKey: null,
+    registryKey: source.provider_key ?? null,
     name: source.name,
     kind: "OFFICIAL_SOURCE",
-    providerType: "SOURCE_REGISTRY",
+    providerType: source.provider_key?.startsWith("seta_") ? "SETA_PROVIDER" : source.provider_key ? "FUNDING_PROVIDER" : "SOURCE_REGISTRY",
     sectorKeys: sourceClasses,
     province: null,
     serviceCapabilities: sourceCapabilities,
@@ -519,7 +528,7 @@ export default function CandidateInstitutionDirectoryPage() {
                     Institution website URL unresolved. Kingsmen will not guess the URL.
                   </span>
                 )}
-                {item.registryKey && item.kind !== "OFFICIAL_SOURCE" && (
+                {item.registryKey && (item.kind !== "OFFICIAL_SOURCE" || item.providerType === "SETA_PROVIDER" || item.providerType === "FUNDING_PROVIDER") && (
                   <Link
                     href={`/candidate/applications?directory_provider_key=${encodeURIComponent(item.registryKey)}&directory_provider_name=${encodeURIComponent(item.name)}&directory_pathway=${encodeURIComponent(item.pathways.find(value => pathways.includes(value)) ?? (item.providerType === "TVET" ? "TVET" : "HIGHER_EDUCATION"))}`}
                     className="inline-flex rounded-xl bg-amber-300 px-4 py-3 text-sm font-extrabold text-[#101b2a] hover:bg-amber-200"
