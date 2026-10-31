@@ -19,8 +19,10 @@ export type KingsmenConstitution = {
   submittedRequiresProof: true;
   outcomeRequiresProof: true;
   emailFirst: true;
-  whatsappUrgentOnly: true;
-  smsBackupOnly: true;
+  whatsappUrgentOnly: false;
+  smsBackupOnly: false;
+  whatsappDisabled: true;
+  smsDisabled: true;
   playwrightProbeOnly: true;
   captchaOtpBypassAllowed: false;
   mapFallbackRequiredOnPortalBlocker: true;
