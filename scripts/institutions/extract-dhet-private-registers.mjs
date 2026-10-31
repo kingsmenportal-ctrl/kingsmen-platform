@@ -18,10 +18,12 @@ function status(section,block,kind){
  if(/lapsed|lapsing/.test(h))return "LAPSED";
  if(/cancelled|canceled/.test(h))return "CANCELLED";
  if(/provisionally registered|provisional registration/.test(h))return "PROVISIONAL";
- if(/registered institutions/.test(h))return "REGISTERED";
- if(/lapsed|lapsing of provisional registration/.test(s))return "LAPSED";
+ if(/lapsed|lapsing of provisional registration|provisional registration.*lapsed|lapsed.*provisional registration/.test(s))return "LAPSED";
  if(/cancelled|canceled|registration cancelled/.test(s))return "CANCELLED";
+ if(/provisionally registered|provisional registration/.test(h))return "PROVISIONAL";
  if(/provisionally registered|provisional registration/.test(s))return "PROVISIONAL";
+ if(/registered institutions/.test(h))return "REGISTERED";
+ if(/registered institutions/.test(s))return "REGISTERED";
  return "STATUS_UNRESOLVED";
 }
 function redactSourceExcerpt(block){
@@ -43,8 +45,8 @@ function splitEntries(text){
   if(/^(SECTION\s+[AB]\b.*|\d+\.\s+.*\b(?:REGISTERED INSTITUTIONS|PROVISIONALLY REGISTERED|CANCELLED|LAPSED|WITHDRAWN|DEREGISTERED)\b.*)$/i.test(t)){flush();section=t;continue;}
   const m=line.match(/^\s{0,8}(\d{1,3})\.\s+([A-ZÀ-ÖØ-Þ][^\n]{2,})\s*$/);
   const isEntry=m&&!/^(?:NQF|N\d|CONTACT PERSON|SECTION|REGISTER|PROGRAMME|QUALIFICATION|EXAM CENTRE)/i.test(m[2].trim());
-  if(isEntry){flush();current={number:Number(m[1]),first:m[2].trim(),section,lines:[t]};}
-  else if(current)current.lines.push(t);
+  if(isEntry){flush();current={number:Number(m[1]),first:m[2].trim(),section,lines:[line.replace(/\r$/,"")]};}
+  else if(current)current.lines.push(line.replace(/\r$/,""));
  }
  flush();return entries;
 }
@@ -57,15 +59,19 @@ function cleanHeadingName(value,source){
 export function extractRecords(text,kind){
  const source=SOURCES[kind];if(!source)throw Error("Unknown DHET register kind");
  const seen=new Set();
- const nameWidth=58;
- const siteWidth=52;
+ const nameWidth=kind==="private_colleges"?56:36;
+ const siteWidth=kind==="private_colleges"?54:42;
  const records=splitEntries(text).filter(e=>(e.lines.join("\n").match(source.pattern)||[]).length>0).map(e=>{
   const block=e.lines.join("\n"),ids=[...new Set(block.match(source.pattern)||[])];
   const nameParts=[];
-  // pdftotext -layout separates table columns with multi-space gaps. Read the
-  // first column instead of fixed-width slicing, which truncates legal names.
-  const firstColumn=(e.first.split(/\s{2,}/)[0]??"").replace(/^\d{1,3}\.\s*/,"").trim();
-  if(firstColumn)nameParts.push(firstColumn);
+  // Preserve leading layout spaces: the first column may wrap long legal names
+  // over several lines. Stop at this entry's registration-ID line, before programmes.
+  for(const line of e.lines){
+   const left=line.slice(0,nameWidth).trim().replace(/^\d{1,3}\.\s*/,"");
+   if(left&&!/^(CONTACT PERSON|CONTACT DETAILS|CONTACT NUMBER|TEL\.?|TELEPHONE|MOBILE|CELL|FAX|EMAIL|E-MAIL|WEBSITE|WEB SITE|QUALIFICATION|PROGRAMME|PROGRAM|NQF LEVEL|BACHELOR|HIGHER CERTIFICATE|DIPLOMA|DOCTOR|MASTER|EXAM CENTRE)\b/i.test(left))nameParts.push(left);
+   source.pattern.lastIndex=0;
+   if(source.pattern.test(line))break;
+  }
   const name=normalizeName(nameParts.join(" "));
   const sectionKey=canonicalSlug(e.section||"unsectioned")||"unsectioned";
   const key=kind+":"+sectionKey+":"+String(e.number).padStart(3,"0")+":"+(ids.length===1?ids[0].toLowerCase():canonicalSlug(name));
@@ -79,10 +85,8 @@ export function extractRecords(text,kind){
   const regStatus=status(e.section,block,kind);
   const idKey=ids.length===1?ids[0].toLowerCase():canonicalSlug(name);
   const duplicate=seen.has(idKey);seen.add(idKey);
-  const campusCandidates=[...new Set(e.lines.flatMap((line,index)=>{
-    const cols=line.split(/\s{2,}/).map(x=>x.trim()).filter(Boolean);
-    return (index===0?cols.slice(1):cols).map(x=>redactSourceExcerpt(x));
-  }).filter(x=>x&&/[A-Za-z]{3,}/.test(x)&&(/[0-9]/.test(x)||/\b(?:campus|street|road|avenue|drive|building|office park|pretoria|johannesburg|cape town|durban|bellville|centurion|randburg|polokwane|bloemfontein|gqeberha|east london|rustenburg|midrand|bryanston|waterkloof)\b/i.test(x))
+  const campusCandidates=[...new Set(e.lines.map(line=>redactSourceExcerpt(line.slice(nameWidth,nameWidth+siteWidth).trim()))
+    .filter(x=>x&&/[A-Za-z]{3,}/.test(x)&&(/[0-9]/.test(x)||/\b(?:campus|street|road|avenue|drive|building|office park|pretoria|johannesburg|cape town|durban|bellville|centurion|randburg|polokwane|bloemfontein|gqeberha|east london|rustenburg|midrand|bryanston|waterkloof)\b/i.test(x))
       && !/(CONTACT PERSON|CONTACT DETAILS|TEL\.?|TELEPHONE|MOBILE|CELL|FAX|EMAIL|E-MAIL|WEBSITE|QUALIFICATION|NQF LEVEL|BACHELOR|CERTIFICATE|DIPLOMA|DOCTOR|MASTER|EXAM CENTRE|PROGRAMME|PROGRAM)/i.test(x)))].slice(0,30);
   return {source_record_ref:key,source_register:kind,source_snapshot_date:source.date,source_url:source.url,source_section:e.section||"UNSECTIONED",register_entry_number:e.number,
    source_heading_candidate:redactSourceExcerpt(e.first.slice(0,nameWidth)),canonical_name_candidate:name||null,normalized_name_key:canonicalSlug(name),
