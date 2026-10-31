@@ -50,11 +50,18 @@ jobs:
           node -e "const m=require('./artifacts/dhet-private-registers/candidates.json'); console.log(JSON.stringify({schema:m.schema,status:m.status,counts:m.counts},null,2));"
       - name: Validate extracted record integrity and safety
         run: node scripts/validators/validate-dhet-private-register-manifest.mjs artifacts/dhet-private-registers/candidates.json
-      - name: Prepare import subset only from validated manifest
+      - name: Prepare reviewed import subset; skip SQL when none approved
         run: |
+          set -euo pipefail
           node scripts/institutions/prepare-dhet-private-register-import-manifest.mjs artifacts/dhet-private-registers/candidates.json artifacts/dhet-private-registers/import-candidates.json
-          node scripts/institutions/build-dhet-private-register-evidence-migration.mjs --manifest artifacts/dhet-private-registers/import-candidates.json --out artifacts/dhet-private-registers/registry-evidence-import.sql
-          test -s artifacts/dhet-private-registers/registry-evidence-import.sql
+          IMPORT_COUNT="$(node -e 'const m=require("./artifacts/dhet-private-registers/import-candidates.json"); console.log(m.records.length)')"
+          if [ "$IMPORT_COUNT" -eq 0 ]; then
+            echo "No explicitly reviewed import records; migration SQL intentionally not generated."
+            test ! -f artifacts/dhet-private-registers/registry-evidence-import.sql
+          else
+            node scripts/institutions/build-dhet-private-register-evidence-migration.mjs --manifest artifacts/dhet-private-registers/import-candidates.json --out artifacts/dhet-private-registers/registry-evidence-import.sql
+            test -s artifacts/dhet-private-registers/registry-evidence-import.sql
+          fi
       - name: Preserve extraction evidence
         if: always()
         uses: actions/upload-artifact@v4
