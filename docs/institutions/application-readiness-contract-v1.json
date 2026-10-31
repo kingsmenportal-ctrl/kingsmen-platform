@@ -1,0 +1,8 @@
+{
+  "schema": "kingsmen.institutions.application-readiness.v1",
+  "country": "ZA",
+  "provider_states": ["P0_DISCOVERED", "P1_IDENTITY_VERIFIED", "P2_ROUTE_VERIFIED", "P3_CONNECTOR_CONFIGURED", "P4_ROUTE_TESTED", "P5_MONITORED"],
+  "opportunity_states": ["O0_FOUND", "O1_SOURCE_VERIFIED", "O2_CURRENT_OPEN", "O3_REQUIREMENTS_MAPPED", "O4_CANDIDATE_READY", "O5_SUBMISSION_EVIDENCED", "O6_OUTCOME_VERIFIED"],
+  "freshness_policy": {"require_positive_integer_window_days": true, "require_timezone_qualified_evidence_timestamps": true, "future_or_stale_evidence_fails_closed": true, "expired_deadline_prevents_current_open": true, "today_date_only_deadline_requires_cutoff_time": true},
+  "evidence_rules": {"provider_identity_separate_from_route": true, "official_domain_required_for_source_and_route_urls": true, "directory_does_not_prove_current_opportunity": true, "candidate_reported_submission_is_not_provider_receipt": true, "provider_confirmed_outcome_requires_authoritative_evidence": true, "candidate_consent_required_for_candidate_ready": true, "no_parallel_provider_registry": true, "default_connector_state": "NOT_CONNECTED"}
+}
