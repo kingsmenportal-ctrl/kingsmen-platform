@@ -129,7 +129,7 @@ export function extractRecords(text,kind){
  return records;
 }
 function selfTest(){
- const c=extractRecords("SECTION A:\n1. Former College Example (Pty) Ltd\nCONTACT PERSON\nMr A I Makungo\nTel: 015 663 1921\nEmail: contact@example.org\nMakotse Road, Zebediela\n2010/FE07/117 Limpopo\nSECTION B: REGISTERED PRIVATE COLLEGES\n1. Example Business College (Pty) Ltd\nCONTACT PERSON\nMain Road, Pretoria\n2021/FE07/006 Gauteng","private_colleges");
+ const c=extractRecords("SECTION A:\\n1.   Former College Example (Pty) Ltd                     Makotse Road, Zebediela\\n"+ " ".repeat(56)+"CONTACT PERSON\\n"+ " ".repeat(56)+"Mr A I Makungo\\n"+ " ".repeat(56)+"Tel: 015 663 1921\\n"+ " ".repeat(56)+"Email: contact@example.org\\n"+ " ".repeat(56)+"Makotse Road, Zebediela\\n"+ " ".repeat(56)+"2010/FE07/117 Limpopo\\nSECTION B: REGISTERED PRIVATE COLLEGES\\n1.   Example Business College (Pty) Ltd                  Main Road, Pretoria\\n"+ " ".repeat(56)+"CONTACT PERSON\\n"+ " ".repeat(56)+"Main Road, Pretoria\\n"+ " ".repeat(56)+"2021/FE07/006 Gauteng","private_colleges");
  if(normalizeName("  2. Café—College  ")!=="Café-College"||canonicalSlug("Café College")!=="cafe-college")throw Error("normalization");
  if(c.length!==2||c[0].registration_status!=="CANCELLED"||c[1].registration_status!=="REGISTERED")throw Error("cancelled/registered separation");
  if(c[0].canonical_name_candidate!=="Former College Example (Pty) Ltd"||c[1].canonical_name_candidate!=="Example Business College (Pty) Ltd")throw Error("private-college canonical name extraction");
