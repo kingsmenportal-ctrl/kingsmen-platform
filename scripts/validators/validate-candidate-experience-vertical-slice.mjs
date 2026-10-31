@@ -5,6 +5,7 @@ import path from "node:path";
 const root = process.cwd();
 const read = (file) => fs.readFileSync(path.join(root, file), "utf8");
 const profilePage = read("apps/web/src/app/candidate/profile/page.tsx");
+const loginPage = read("apps/web/src/app/candidate/login/page.tsx");
 const profileRoute = read("apps/web/src/app/api/candidate/profile/route.ts");
 const profileFunction = read("supabase/functions/candidate-master-profile/index.ts");
 const opportunityPage = read("apps/web/src/app/candidate/opportunity-matches/page.tsx");
@@ -31,6 +32,7 @@ const parentPreparationFunction = caoMigration.slice(caoMigration.indexOf("CREAT
 
 const checks = [
   ["profile CRUD is a backend API contract", /action: "load"/.test(profilePage) && /action: "save"/.test(profilePage) && /candidate-master-profile/.test(profileRoute)],
+  ["new-user registration returns to the consented profile bootstrap flow", /auth\/v1\/signup\?redirect_to=/.test(loginPage) && /registrationReturn = .*candidate\/login\?next=%2Fcandidate%2Fprofile/.test(loginPage) && /candidateRedirect\("\/candidate\/profile"\)/.test(loginPage) && /auth\/v1\/user/.test(loginPage) && /candidate-master-profile/.test(profileRoute) && /bootstrap_candidate_self_profile/.test(profileFunction) && /payload\.consentAccepted !== true/.test(profileFunction) && /action !== "save"/.test(profileFunction)],
   ["profile persistence E2E is opt-in, token-gated and restores existing test profile", packageJson.scripts["candidate:profile:e2e"] === "node scripts/staging/test-candidate-profile-persistence-e2e.mjs" && /KINGSMEN_E2E_CANDIDATE_A_TOKEN/.test(profileE2E) && /KINGSMEN_PROFILE_E2E_ALLOW_MUTATIONS === "true"/.test(profileE2E) && /restore original test profile/.test(profileE2E) && /profileValuesAndTokensLogged:\s*false/.test(profileE2E)],
   ["profile load/save are restricted to verified identity links", /candidate_auth_identity_links/.test(profileFunction) && /link_status,verified_at,verified_by/.test(profileFunction.replace(/\s/g, "")) && /IDENTITY_NOT_VERIFIED/.test(profileFunction)],
   ["profile writes use canonical Supabase master profile table", /candidate_master_profiles/.test(profileFunction) && /onConflict: "candidate_id"/.test(profileFunction)],
