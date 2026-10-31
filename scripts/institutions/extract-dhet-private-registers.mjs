@@ -76,7 +76,20 @@ export function extractRecords(text,kind){
   // candidate. Wrapped suffixes remain reviewable instead of absorbing contact,
   // address or qualification columns into the legal name.
   const firstColumn=(e.first.split(/\s{2,}/)[0]??"").replace(/^\d{1,3}\.\s*/,"").trim();
-  const name=normalizeName(firstColumn);
+  const nameParts=[firstColumn].filter(Boolean);
+  for(const line of e.lines.slice(1)){
+   const trimmed=line.trim();
+   if(/^(CONTACT PERSON|CONTACT DETAILS|CONTACT NUMBER|TEL\.?|TELEPHONE|MOBILE|CELL|FAX|EMAIL|E-MAIL|WEBSITE|WEB SITE|PHYSICAL ADDRESS|POSTAL ADDRESS|DIRECTOR|MANAGER|MANAGING PRINCIPAL|PRINCIPAL|REGISTRAR|ACADEMIC REGISTRAR|ACADEMIC ADMINISTRATOR|CEO|CHAIRPERSON)\b/i.test(trimmed))break;
+   source.pattern.lastIndex=0;
+   if(source.pattern.test(line))break;
+   const firstSegment=(trimmed.split(/\s{2,}/)[0]??"").trim();
+   if(!firstSegment)continue;
+   if(/^(?:[A-Z]\)\s|\d+[.)]\s|\d{4}\/|\(\d{3}\)|\+?\d[\d ()/-]{6,})/i.test(firstSegment))continue;
+   if(/(?:@|www\.|http|street|road|avenue|drive|office park|building|po box|private bag|postnet|postal|pretoria|johannesburg|cape town|durban|bellville|centurion|randburg|polokwane|bloemfontein|gqeberha|east london|rustenburg|midrand|waterkloof|zebediela|motatantanye|village|nqf|heqsf|higher certificate|bachelor|diploma|qualification|contact mode|distance mode|salary|requirements|duties|applications|closing date)/i.test(firstSegment))continue;
+   if(firstSegment.length>80)continue;
+   nameParts.push(firstSegment);
+  }
+  const name=normalizeName(nameParts.join(" "));
   const nameExtractionStatus="REVIEW_REQUIRED";
   const sectionKey=canonicalSlug(e.section||"unsectioned")||"unsectioned";
   const key=kind+":"+sectionKey+":"+String(e.number).padStart(3,"0")+":"+(ids.length===1?ids[0].toLowerCase():canonicalSlug(name));
@@ -91,7 +104,8 @@ export function extractRecords(text,kind){
   const idKey=ids.length===1?ids[0].toLowerCase():canonicalSlug(name);
   const duplicate=seen.has(idKey);seen.add(idKey);
   const campusCandidates=[...new Set(e.lines.flatMap((line,index)=>{
-    const cols=line.trim().split(/\s{2,}/).map(x=>x.trim()).filter(Boolean);
+    const cleanedLine=index===0?line.trim().replace(/^\d{1,3}\.\s*/,""):line.trim();
+    const cols=cleanedLine.split(/\s{2,}/).map(x=>x.trim()).filter(Boolean);
     return (index===0?cols.slice(1):cols).map(value=>{
       let candidate=value.replace(source.pattern," ");
       source.pattern.lastIndex=0;
@@ -130,8 +144,12 @@ export function extractRecords(text,kind){
   if(distinctNames.size>1||distinctStatuses.size>1){
    for(const record of group){
     record.identity_conflict_status="CONFLICT_REVIEW_REQUIRED";
-    if(distinctNames.size>1)record.conflict_flags.push("REGISTRATION_IDENTIFIER_REUSED_WITH_DIFFERENT_NAME");
-    if(distinctStatuses.size>1)record.conflict_flags.push("REGISTRATION_STATUS_CONFLICT");
+    if(distinctNames.size>1&&!record.conflict_flags.includes("REGISTRATION_IDENTIFIER_REUSED_WITH_DIFFERENT_NAME"))record.conflict_flags.push("REGISTRATION_IDENTIFIER_REUSED_WITH_DIFFERENT_NAME");
+    if(distinctStatuses.size>1){
+     if(!record.conflict_flags.includes("REGISTRATION_STATUS_CONFLICT"))record.conflict_flags.push("REGISTRATION_STATUS_CONFLICT");
+     record.registration_status="STATUS_UNRESOLVED";
+     record.registration_status_review_required=true;
+    }
     record.identity_review_status="CONFLICT_REVIEW_REQUIRED";
    }
   }else if(group.length>1){
@@ -148,7 +166,7 @@ export function extractRecords(text,kind){
   if(group.length<2)continue;
   for(const record of group){
    record.possible_duplicate_within_source=true;
-   record.identity_conflict_status="DUPLICATE_SOURCE_ENTRY_REVIEW";
+   if(record.identity_conflict_status==="NO_CONFLICT_DETECTED_REVIEW_STILL_REQUIRED")record.identity_conflict_status="DUPLICATE_SOURCE_ENTRY_REVIEW";
    record.identity_review_status="CONFLICT_REVIEW_REQUIRED";
    if(!record.conflict_flags.includes("DUPLICATE_NORMALIZED_NAME_REVIEW"))record.conflict_flags.push("DUPLICATE_NORMALIZED_NAME_REVIEW");
   }
