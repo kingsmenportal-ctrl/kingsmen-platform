@@ -86,7 +86,8 @@ export function extractRecords(text,kind){
   const idKey=ids.length===1?ids[0].toLowerCase():canonicalSlug(name);
   const duplicate=seen.has(idKey);seen.add(idKey);
   const campusCandidates=[...new Set(e.lines.map(line=>redactSourceExcerpt(line.slice(nameWidth,nameWidth+siteWidth).trim()))
-    .filter(x=>x&&/[A-Za-z]{3,}/.test(x)&&!/(CONTACT PERSON|CONTACT DETAILS|TEL\.?|TELEPHONE|MOBILE|CELL|FAX|EMAIL|E-MAIL|WEBSITE|QUALIFICATION|NQF LEVEL|BACHELOR|CERTIFICATE|DIPLOMA|DOCTOR|MASTER|EXAM CENTRE)/i.test(x)))].slice(0,30);
+    .filter(x=>x&&/[A-Za-z]{3,}/.test(x)&&(/[0-9]/.test(x)||/\b(?:campus|street|road|avenue|drive|building|office park|pretoria|johannesburg|cape town|durban|bellville|centurion|randburg|polokwane|bloemfontein|gqeberha|east london|rustenburg|midrand)\b/i.test(x))
+      && !/(CONTACT PERSON|CONTACT DETAILS|TEL\.?|TELEPHONE|MOBILE|CELL|FAX|EMAIL|E-MAIL|WEBSITE|QUALIFICATION|NQF LEVEL|BACHELOR|CERTIFICATE|DIPLOMA|DOCTOR|MASTER|EXAM CENTRE)/i.test(x)))].slice(0,30);
   return {source_record_ref:key,source_register:kind,source_snapshot_date:source.date,source_url:source.url,register_entry_number:e.number,
    source_heading_candidate:redactSourceExcerpt(e.first.slice(0,nameWidth)),canonical_name_candidate:name||null,normalized_name_key:canonicalSlug(name),
    registration_identifier:ids.length===1?ids[0]:null,registration_identifiers_observed:ids,registration_status:regStatus,
