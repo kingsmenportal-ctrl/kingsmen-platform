@@ -1,10 +1,10 @@
 #!/usr/bin/env node
 import { createReadStream, createWriteStream } from 'node:fs';
-import { open, readFile, rename, rm, stat } from 'node:fs/promises';
-import { createCipheriv, createDecipheriv, createHash, randomBytes, scrypt as scryptCallback, timingSafeEqual } from 'node:crypto';
+import { open, rename, rm, stat } from 'node:fs/promises';
+import { createCipheriv, createDecipheriv, createHash, randomBytes, scrypt as scryptCallback } from 'node:crypto';
 import { promisify } from 'node:util';
 import { pipeline } from 'node:stream/promises';
-import { dirname, basename, join } from 'node:path';
+import { once } from 'node:events';
 
 const scrypt = promisify(scryptCallback);
 const MAGIC = Buffer.from('KMBACK01');
@@ -42,12 +42,11 @@ async function encrypt(input, output) {
     const header = Buffer.concat([MAGIC, salt, nonce]);
     const writer = createWriteStream(outputTmp, { flags: 'wx', mode: 0o600 });
     writer.write(header);
-    await pipeline(createReadStream(ciphertextTmp), writer, { end: false });
+    for await (const chunk of createReadStream(ciphertextTmp)) {
+      if (!writer.write(chunk)) await once(writer, 'drain');
+    }
     writer.end(cipher.getAuthTag());
-    await new Promise((resolve, reject) => {
-      writer.once('finish', resolve);
-      writer.once('error', reject);
-    });
+    await once(writer, 'finish');
     await rename(outputTmp, output);
     process.stdout.write(JSON.stringify({ status: 'ENCRYPTED', sha256: await digest(output), bytes: (await stat(output)).size }) + '\n');
   } catch (error) {
