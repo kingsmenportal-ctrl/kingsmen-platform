@@ -29,7 +29,7 @@ check("read-only API filters to verified, public-safe A/B records and never uses
 check("read-only API fails closed on upstream errors, redirects, timeout and oversized response", api.includes('redirect: "error"') && api.includes("AbortSignal.timeout") && api.includes("RESPONSE_LIMIT") && api.includes("cache: \"no-store\""));
 check("one page imports both canonical institution seed and cross-sector source manifest",
   page.includes("public-universities-and-tvet-2026-10-31.json") && page.includes("cross-sector-institution-source-extension.json"));
-check("provider seed remains intact and review-only", records.length === 76 &&
+check("provider seed remains intact and review-only", records.length === 85 &&
   records.every(row => row.identity_verification_status === "DIRECTORY_EVIDENCE_ONLY" &&
     row.accreditation_or_delivery_scope_status === "NOT_VERIFIED" &&
     row.intake_status === "UNKNOWN" && row.eligibility_status === "UNKNOWN" &&
@@ -37,9 +37,13 @@ check("provider seed remains intact and review-only", records.length === 76 &&
     row.partnership_status === "NOT_A_PARTNER" && row.provider_receipt_supported === false));
 check("service categories are mapped per source rather than inferred generically from institution class", page.includes("capabilityBySource") && page.includes("capabilityBySource[source.source_id] ?? []") && !page.includes("capabilityByClass"));
 check("source pathway tags require an explicit source mapping rather than generic class inference", page.includes("pathwayBySource[source.source_id] ?? []"));
+check("public institution seed has province coverage for universities and all 9 CET colleges", records.filter(row => row.provider_type === "PUBLIC_UNIVERSITY").every(row => typeof row.province === "string" && row.province.length > 0) && records.filter(row => row.provider_type === "CET_COLLEGE").length === 9 && records.filter(row => row.provider_type === "CET_COLLEGE").every(row => typeof row.province === "string" && row.directory_source_id === "dhet_community_colleges"));
+check("national directory includes all nine provincial education department targets with individual canonical keys", ["prov_education_eastern_cape","prov_education_free_state","prov_education_gauteng","prov_education_kwazulu_natal","prov_education_limpopo","prov_education_mpumalanga","prov_education_north_west","prov_education_northern_cape","prov_education_western_cape"].every(key => sources.some(row => row.provider_key === key)));
+check("CET and provincial authority targets are usable in the Kingsmen workbench", page.includes("dhet_cet_") && page.includes("PROVINCIAL_AUTHORITY_PROVIDER") && page.includes("COMMUNITY_EDUCATION_AND_TRAINING"));
 const setaSources = sources.filter(row => /^seta_[a-z0-9]+_official$/.test(row.source_id) && row.provider_key?.startsWith("seta_"));
 const privateRegisterSources = ["dhet_private_colleges_register_2026","dhet_private_higher_education_register_2026","dhet_cet_colleges_directory","dhet_registered_pset_masterlist","nsfas_institution_directory"].every(id => sources.some(row => row.source_id === id));
 const providerKeys = sources.map(row => row.provider_key).filter(Boolean);
+check("cross-sector anchor inventory includes the 9 CET institutions and all 9 provincial education departments", sources.some(row => row.source_id === "dhet_community_colleges") && sources.filter(row => row.provider_key?.startsWith("prov_education_")).length === 9);
 check("cross-sector anchor inventory includes all 21 SETAs as individual discovery/provider records", setaSources.length === 21 && new Set(setaSources.map(row => row.provider_key)).size === 21);
 check("official private-college, private-HEI, CET, PSET and NSFAS institution directories are present", privateRegisterSources);
 const publicEmployerKeys = ["soe_acsa","soe_denel","soe_prasa","soe_saa","soe_sabc","soe_sanral","soe_sapo","soe_telkom","soe_transnet"];
