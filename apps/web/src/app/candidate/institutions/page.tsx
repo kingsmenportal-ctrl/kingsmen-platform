@@ -160,6 +160,14 @@ const pathwaysByVerifiedRoute: Record<string, string[]> = {
   cao_official: ["HIGHER_EDUCATION"], labour_department_vacancies: ["EMPLOYMENT"], nsfas_official: ["HIGHER_EDUCATION", "TVET"]
 };
 const pathways = Object.keys(pathwayLabels);
+const toApplicationPathway: Record<string,string> = {
+  HIGHER_EDUCATION: "HIGHER_EDUCATION",
+  TVET: "TVET",
+  SETA_LEARNERSHIPS: "SETA_LEARNERSHIP",
+  INTERNSHIPS: "INTERNSHIP",
+  APPRENTICESHIPS: "APPRENTICESHIP",
+  EMPLOYMENT: "EMPLOYMENT"
+};
 const capabilities = crossSector.service_capabilities as string[];
 const sectors = crossSector.institution_classes as string[];
 
@@ -578,7 +586,7 @@ export default function CandidateInstitutionDirectoryPage() {
                 )}
                 {item.registryKey && (item.kind !== "OFFICIAL_SOURCE" || item.providerType === "SETA_PROVIDER" || item.providerType === "FUNDING_PROVIDER" || item.providerType === "EMPLOYER_PROVIDER" || item.providerType === "ACCOMMODATION_PROVIDER") && (
                   <Link
-                    href={`/candidate/applications?directory_provider_key=${encodeURIComponent(item.registryKey)}&directory_provider_name=${encodeURIComponent(item.name)}&directory_pathway=${encodeURIComponent(item.pathways.find(value => pathways.includes(value)) ?? (item.providerType === "TVET" ? "TVET" : "HIGHER_EDUCATION"))}`}
+                    href={`/candidate/applications?directory_provider_key=${encodeURIComponent(item.registryKey)}&directory_provider_name=${encodeURIComponent(item.name)}&directory_pathway=${encodeURIComponent(toApplicationPathway[item.pathways.find(value => pathways.includes(value)) ?? (item.providerType === "TVET" ? "TVET" : "HIGHER_EDUCATION")] ?? "HIGHER_EDUCATION")}`}
                     className="inline-flex rounded-xl bg-amber-300 px-4 py-3 text-sm font-extrabold text-[#101b2a] hover:bg-amber-200"
                   >
                     Prepare with Kingsmen
