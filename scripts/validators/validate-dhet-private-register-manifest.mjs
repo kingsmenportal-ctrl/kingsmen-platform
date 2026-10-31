@@ -11,7 +11,7 @@ for(const [i,r] of (m.records??[]).entries()){
  if(!Object.hasOwn(perKind,r.source_register))failures.push("unknown source register at "+i);else perKind[r.source_register]++;
  if(!r.canonical_name_candidate||!r.normalized_name_key)failures.push("missing normalized institution name at "+i);
  if(r.name_extraction_status!=="REVIEW_REQUIRED")failures.push("name candidate is not explicitly marked for manual review at "+i);
- if(/@[A-Z0-9.-]+|\bwww\.|CONTACT PERSON|CONTACT DETAILS|\b(?:TEL\.?|TELEPHONE|MOBILE|CELL|FAX|EMAIL|E-MAIL|REGISTRAR|MANAGER|PRINCIPAL|PO BOX|PRIVATE BAG|POSTNET)\b|\b(?:Bachelor|Higher Certificate|FET Certificate|Diploma|NQF Level|HEQSF)\b/i.test(r.canonical_name_candidate??""))failures.push("name candidate contains contact, address or qualification-column contamination at "+i);
+ if(/@[A-Z0-9.-]+|\bwww\.|CONTACT PERSON|CONTACT DETAILS|\b(?:TEL\.?|TELEPHONE|MOBILE|CELL|FAX|EMAIL|E-MAIL|REGISTRAR|MANAGER|PRINCIPAL|PO BOX|PRIVATE BAG|POSTNET)\b|\b(?:Bachelor|Higher Certificate|FET Certificate|Diploma|NQF Level|HEQSF)\b/i.test(r.canonical_name_candidate??""))failures.push("name candidate contains contact, address or qualification-column contamination at "+i+": "+String(r.canonical_name_candidate??"").slice(0,180));
  if(/\b(Bachelor|Higher Certificate|FET Certificate|General Education and Training|National Certificate|Diploma|NQF Level)\b/i.test(r.canonical_name_candidate??""))failures.push("programme/qualification text leaked into institution name at "+i+": "+String(r.canonical_name_candidate??"").slice(0,160));
  if(!r.source_url?.startsWith("https://www.dhet.gov.za/"))failures.push("missing official provenance at "+i);
  if(!r.source_snapshot_date||!r.source_record_ref)failures.push("missing snapshot key at "+i);
@@ -45,7 +45,7 @@ for(const [key,group] of ids){
   }
  }else{
   duplicateGroups++;
-  for(const r of group)if(r.identity_conflict_status!=="DUPLICATE_SOURCE_ENTRY_REVIEW"||r.import_eligible!==false)failures.push("duplicate source entry not marked for review "+key);
+  for(const r of group)if(!["DUPLICATE_SOURCE_ENTRY_REVIEW","CONFLICT_REVIEW_REQUIRED"].includes(r.identity_conflict_status)||r.import_eligible!==false||!(r.conflict_flags??[]).includes("DUPLICATE_REGISTRATION_ENTRY"))failures.push("duplicate source entry not marked for review "+key);
  }
 }
 if(perKind.private_higher_education<50)failures.push("private higher-education extraction count unexpectedly low: "+perKind.private_higher_education);
