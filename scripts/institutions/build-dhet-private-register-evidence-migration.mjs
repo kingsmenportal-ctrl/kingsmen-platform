@@ -21,7 +21,7 @@ export function validateManifest(m){
 }
 export function buildMigration(m){
  const errors=validateManifest(m);if(errors.length)throw Error(errors.join("\n"));
- const rows=m.records.map(r=>"  ("+[r.source_register,r.source_snapshot_date,r.source_record_ref,r.canonical_name_candidate,r.normalized_name_key,r.registration_identifier,r.registration_status,json(r.province_candidates),json(r.alias_candidates),r.source_url,r.source_excerpt].join(", ")+")").join(",\n");
+ const rows=m.records.map(r=>"  ("+[quote(r.source_register),quote(r.source_snapshot_date)+"::date",quote(r.source_record_ref),quote(r.canonical_name_candidate),quote(r.normalized_name_key),quote(r.registration_identifier),quote(r.registration_status),json(r.province_candidates),json(r.alias_candidates),quote(r.source_url),quote(r.source_excerpt)].join(", ")+")").join(",\n");
  return `-- Generated from a reviewed DHET register candidate manifest. Do not apply without independent review and approved change control.
 -- Registry evidence only; this migration does not create application routes or mark providers connected.
 BEGIN;
