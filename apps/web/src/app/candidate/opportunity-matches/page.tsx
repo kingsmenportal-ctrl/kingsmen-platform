@@ -36,7 +36,7 @@ type ParentApplication = { id: string; application_ref?: string | null; status?:
 function getAccessToken(): string | null { return getCandidateAccessToken(); }
 
 function formatDateOnly(value: string): string {
-  const match = /^(\\d{4})-(\\d{2})-(\\d{2})$/.exec(value);
+  const match = /^(\d{4})-(\d{2})-(\d{2})$/.exec(value);
   if (!match) return value;
   return `${match[3]}/${match[2]}/${match[1]}`;
 }
