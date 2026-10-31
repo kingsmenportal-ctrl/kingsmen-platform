@@ -639,11 +639,17 @@ export default function CandidateInstitutionDirectoryPage() {
         <section aria-label="National coverage still to import" className="rounded-2xl border border-slate-700 bg-[#0b1d33] p-5 sm:p-6">
           <h2 className="text-xl font-bold text-white">Coverage still to import and verify</h2>
           <p className="mt-2 text-sm leading-6 text-slate-400">
-            The institution-record dataset currently includes 26 public universities, 50 TVET colleges and 9 CET colleges. The cross-sector
-            entries above are official discovery anchors, not 24 additional verified providers. Private higher education,
-            private colleges, CET colleges, individual employers, health facilities, accommodation operators, local service
-            organisations and other provider records must be sourced and verified in separate controlled batches.
+            The institution-record dataset currently includes 26 public universities, 50 TVET colleges and 9 province-level CET college records.
+            The cross-sector entries above are official discovery anchors, not 24 additional verified providers. Individual private higher-education
+            institutions, registered private colleges, employers, health facilities, accommodation operators and local service organisations still
+            need individual canonical records, alias reconciliation and official-route verification. CET province-level records do not claim to list
+            every Community Learning Centre or campus.
           </p>
+          <div className="mt-4 flex flex-wrap gap-x-4 gap-y-2 text-sm">
+            <a href="https://www.dhet.gov.za/Registers_DocLib/Annexure%20A%20Register%20%20Private%20Higher%20Education%20Institutions%2006%20July%202026.pdf" target="_blank" rel="noreferrer" className="font-semibold text-amber-200 underline">Official DHET private higher-education register (6 July 2026)</a>
+            <a href="https://www.dhet.gov.za/Registers_DocLib/Register%20of%20Private%20Colleges%20%2015%20July%202026.pdf" target="_blank" rel="noreferrer" className="font-semibold text-amber-200 underline">Official DHET private-college register (15 July 2026)</a>
+            <a href="https://www.dhet.gov.za/SitePages/MasterLists.aspx" target="_blank" rel="noreferrer" className="font-semibold text-amber-200 underline">DHET PSET masterlists</a>
+          </div>
           <p className="mt-3 text-sm leading-6 text-slate-300">
             For currently verified opportunities, use <Link href="/candidate/opportunity-matches" className="font-bold text-amber-200 underline">verified opportunity discovery</Link>.
             Kingsmen only presents an opportunity as open when its source and intake evidence pass the relevant verification checks.
