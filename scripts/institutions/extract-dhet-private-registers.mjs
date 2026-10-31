@@ -212,7 +212,7 @@ export function extractRecords(text,kind){
  });
  records.push(...extractNameOnlyHistoricalStatusRecords(text,kind));
  for(const record of records){
-  if(record.registration_identifiers_observed.length!==1){
+  if(record.registration_identifiers_observed.length>1){
    record.identity_conflict_status="CONFLICT_REVIEW_REQUIRED";
    record.identity_review_status="CONFLICT_REVIEW_REQUIRED";
    record.conflict_flags.push("MULTIPLE_REGISTRATION_IDENTIFIERS_IN_ENTRY");
