@@ -95,9 +95,16 @@ export function extractRecords(text,kind){
    campus_sites:[],campus_site_candidates:campusCandidates,campus_extraction_status:campusCandidates.length?"REVIEW_REQUIRED":"NOT_EXTRACTED",
    alias_candidates:aliases,possible_duplicate_within_source:duplicate,
    source_excerpt:redactSourceExcerpt(e.lines.slice(0,1).join("\\n")),source_evidence_scope:"DHET register entry only; not a live application route or current opportunity",
-   identity_review_status:"NEEDS_CANONICAL_IDENTITY_REVIEW",identity_conflict_status:"NOT_YET_RECONCILED",conflict_flags:[],
+   identity_review_status:"NEEDS_CANONICAL_IDENTITY_REVIEW",identity_conflict_status:"NO_CONFLICT_DETECTED_REVIEW_STILL_REQUIRED",conflict_flags:[],
    official_route_status:"NOT_VERIFIED",integration_status:"NOT_CONNECTED",automation_authorized:false,import_eligible:false};
  });
+ for(const record of records){
+  if(record.registration_identifiers_observed.length!==1){
+   record.identity_conflict_status="CONFLICT_REVIEW_REQUIRED";
+   record.identity_review_status="CONFLICT_REVIEW_REQUIRED";
+   record.conflict_flags.push("MULTIPLE_REGISTRATION_IDENTIFIERS_IN_ENTRY");
+  }
+ }
  const byId=new Map();
  for(const record of records)for(const id of record.registration_identifiers_observed){
   const key=record.source_register+"|"+record.source_snapshot_date+"|"+id.toLowerCase();
@@ -115,7 +122,7 @@ export function extractRecords(text,kind){
     record.identity_review_status="CONFLICT_REVIEW_REQUIRED";
    }
   }else if(group.length>1){
-   for(const record of group){record.identity_conflict_status="DUPLICATE_SOURCE_ENTRY_REVIEW";record.conflict_flags.push("DUPLICATE_REGISTRATION_ENTRY");}
+   for(const record of group){record.possible_duplicate_within_source=true;record.identity_conflict_status="DUPLICATE_SOURCE_ENTRY_REVIEW";record.conflict_flags.push("DUPLICATE_REGISTRATION_ENTRY");}
   }
  }
  return records;
