@@ -35,6 +35,8 @@ check("provider seed remains intact and review-only", records.length === 76 &&
     row.intake_status === "UNKNOWN" && row.eligibility_status === "UNKNOWN" &&
     row.application_route_status === "NOT_VERIFIED" && row.integration_status === "NOT_CONNECTED" &&
     row.partnership_status === "NOT_A_PARTNER" && row.provider_receipt_supported === false));
+check("service categories are mapped per source rather than inferred generically from institution class", page.includes("capabilityBySource") && page.includes("capabilityBySource[source.source_id] ?? []") && !page.includes("capabilityByClass"));
+check("source pathway tags require an explicit source mapping rather than generic class inference", page.includes("pathwayBySource[source.source_id] ?? []"));
 check("cross-sector anchor inventory retains at least 24 records and 15 classes",
   sources.length >= 24 && extension.institution_classes.length === 15);
 check("every source anchor remains review-required and disconnected",
