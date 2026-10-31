@@ -37,8 +37,14 @@ check("provider seed remains intact and review-only", records.length === 76 &&
     row.partnership_status === "NOT_A_PARTNER" && row.provider_receipt_supported === false));
 check("service categories are mapped per source rather than inferred generically from institution class", page.includes("capabilityBySource") && page.includes("capabilityBySource[source.source_id] ?? []") && !page.includes("capabilityByClass"));
 check("source pathway tags require an explicit source mapping rather than generic class inference", page.includes("pathwayBySource[source.source_id] ?? []"));
-check("cross-sector anchor inventory retains at least 24 records and 15 classes",
-  sources.length >= 24 && extension.institution_classes.length === 15);
+const setaSources = sources.filter(row => /^seta_[a-z0-9]+_official$/.test(row.source_id) && row.provider_key?.startsWith("seta_"));
+const privateRegisterSources = ["dhet_private_colleges_register_2026","dhet_private_higher_education_register_2026","dhet_cet_colleges_directory","dhet_registered_pset_masterlist","nsfas_institution_directory"].every(id => sources.some(row => row.source_id === id));
+const providerKeys = sources.map(row => row.provider_key).filter(Boolean);
+check("cross-sector anchor inventory includes all 21 SETAs as individual discovery/provider records", setaSources.length === 21 && new Set(setaSources.map(row => row.provider_key)).size === 21);
+check("official private-college, private-HEI, CET, PSET and NSFAS institution directories are present", privateRegisterSources);
+check("named SETA and funder provider records link to canonical provider keys for planning", providerKeys.includes("funder_nsf") && providerKeys.includes("funder_funza_lushaka") && page.includes("source.provider_key ?? null"));
+check("cross-sector anchor inventory retains 50 or more records and 15 classes",
+  sources.length >= 50 && extension.institution_classes.length === 15);
 check("every source anchor remains review-required and disconnected",
   sources.every(row => row.review_required === true && row.connector_state === "NOT_CONNECTED" &&
     Array.isArray(row.supports) && Array.isArray(row.does_not_prove)));
@@ -58,8 +64,10 @@ check("verification states remain separate and explicit",
 check("source URLs only render as HTTPS links and external links use safe rel attributes",
   page.includes('item.sourceUrl.startsWith("https://")') && page.includes('rel="noopener noreferrer"'));
 check("directory has a private Kingsmen planning action for canonical institution/provider keys", page.includes("registryKey") && page.includes("Prepare with Kingsmen") && page.includes("directory_provider_key"));
+check("SETA and funder provider records are explicitly mapped to application pathways", page.includes("isSetaProvider") && page.includes("SETA_LEARNERSHIPS") && page.includes("FUNDING_PROVIDER"));
 check("candidate application UI sends a planning-only provider target action", (() => { const applicationPage = fs.readFileSync(path.join(root, "apps/web/src/app/candidate/applications/page.tsx"), "utf8"); const apiRoute = fs.readFileSync(path.join(root, "apps/web/src/app/api/candidate/applications/route.ts"), "utf8"); const edgePath = path.join(root, "supabase/functions/candidate-application-preparation/index.ts"); const edge = fs.readFileSync(edgePath, "utf8"); return applicationPage.includes("plan_directory_target") && applicationPage.includes("Save planning target") && apiRoute.includes("plan_directory_target") && edge.includes('if(p.action==="plan_directory_target")') && edge.includes("PROVIDER_NOT_IMPORTED") && edge.includes("provider_submission_sent:false") && edge.includes("source_confidence:\"UNVERIFIED\"") && edge.includes("planning_status:\"PLANNING\""); })());
 check("provider planning requires verified candidate identity and server-derived candidate ownership", (() => { const edge = fs.readFileSync(path.join(root, "supabase/functions/candidate-application-preparation/index.ts"), "utf8"); return edge.includes("candidate_auth_identity_links") && edge.includes('.eq("link_status","VERIFIED")') && edge.includes("const candidateId=link.candidate_id") && edge.includes("created_by_auth_user_id:authData.user.id"); })());
+check("review-only SETA/funder seed migration exists and cannot publish providers or connectors", (() => { const migrationPath = path.join(root, "db/migrations/0101_seed_seta_and_funding_provider_directory.sql"); if (!fs.existsSync(migrationPath)) return false; const sql = fs.readFileSync(migrationPath, "utf8"); return (sql.match(/\(\x27seta_[a-z0-9]+\x27,/g) ?? []).length === 21 && sql.includes("NEEDS_REVIEW") && sql.includes("public_safe") && sql.includes("NOT_CONNECTED") && sql.includes("ON CONFLICT (provider_key) DO NOTHING") && !/UPDATE\s+public\.route_providers/i.test(sql); })());
 check("candidate workbench and verified opportunity feed remain linked",
   page.includes('href="/candidate/applications"') && page.includes('href="/candidate/opportunity-matches"'));
 check("live records are loaded without changing database state or claiming a provider integration", page.includes("NOT_CONNECTED") && page.includes("does not verify every programme or intake") && api.includes("export async function GET") && !api.includes("POST("));
