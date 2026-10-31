@@ -13,6 +13,10 @@ for(const reason of ["EXPIRED_DEADLINE_NOT_CLOSED","OPEN_WITHOUT_EVIDENCE","VERI
 // The handler fetches each programme row and performs a fail-closed property guard;
 // it does not filter opening_status in the PostgREST query.
 assert.match(candidate,/programme\.opening_status\s*!==\s*"OPEN"\s*\|\|\s*programme\.candidate_facing_safe\s*!==\s*true/);
+assert.match(candidate,/Array\.isArray\(match\.evidence_refs\)\s*\|\|\s*match\.evidence_refs\.length\s*===\s*0/);
+assert.match(candidate,/new URL\(String\(programme\.exact_link\s*\?\?\s*""\)\)/);
+assert.match(candidate,/officialUrl\.protocol\s*!==\s*"https:"/);
+assert.match(candidate,/officialUrl\.username\s*\|\|\s*officialUrl\.password/);
 assert.match(candidate,/programme\.source_confidence\s*!==\s*"OFFICIAL_VERIFIED"/);
 assert.match(candidate,/new URL\(String\(programme\.exact_link\s*\?\?\s*""\)\)/);
 assert.match(candidate,/eq\("observation_status", "VERIFIED"\)/);
