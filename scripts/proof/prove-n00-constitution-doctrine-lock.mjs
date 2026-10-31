@@ -44,6 +44,8 @@ const report = {
   emailFirst: manifest.emailFirst === true,
   whatsappUrgentOnly: manifest.whatsappUrgentOnly === true,
   whatsappDisabled: manifest.whatsappDisabled === true,
+  smsBackupOnly: manifest.smsBackupOnly === false,
+  smsDisabled: manifest.smsDisabled === true,
   smsDisabled: manifest.smsDisabled === true,
   playwrightProbeOnly: manifest.playwrightProbeOnly === true,
   captchaOtpBypassAllowed: manifest.captchaOtpBypassAllowed === true,
