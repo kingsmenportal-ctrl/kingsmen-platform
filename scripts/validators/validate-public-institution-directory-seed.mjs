@@ -20,7 +20,7 @@ check("entries do not claim partner or connected",records.every(x=>x.partnership
 check("no intake/deadline/eligibility assumption",records.every(x=>x.intake_status==="UNKNOWN"&&x.deadline_status==="UNKNOWN"&&x.eligibility_status==="UNKNOWN"));
 check("no programme/accreditation assumption",records.every(x=>x.programme_existence_status==="NOT_VERIFIED"&&x.accreditation_or_delivery_scope_status==="NOT_VERIFIED"));
 check("all records preserve source evidence",records.every(x=>x.source_observations.length>0&&x.source_observations.every(o=>o.evidence_scope==="directory entry only"&&o.checked_at==="2026-10-31")));
-check("every missing site remains a review item",records.filter(x=>!x.official_website_url).every(x=>x.official_website_status==="MISSING_OR_CONFLICTING_URL_REQUIRES_REVIEW"));
+check("every missing site remains a review item",records.filter(x=>!x.official_website_url).every(x=>x.provider_type==="CET_COLLEGE" ? x.official_website_status==="NO_INDIVIDUAL_COLLEGE_DOMAIN_PUBLISHED_IN_SOURCE" : x.official_website_status==="MISSING_OR_CONFLICTING_URL_REQUIRES_REVIEW"));
 check("non-null website URLs are HTTPS",records.filter(x=>x.official_website_url).every(x=>x.official_website_url.startsWith("https://")));
 check("UNISA link conflict surfaced",records.find(x=>x.institution_ref==="university-unisa")?.official_website_url===null);
 check("Flavius Mareka truncated URL is not guessed",records.find(x=>x.institution_ref==="tvet-flavius-mareka")?.official_website_url===null);
