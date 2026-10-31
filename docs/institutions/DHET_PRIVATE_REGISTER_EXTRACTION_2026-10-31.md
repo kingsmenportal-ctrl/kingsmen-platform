@@ -4,7 +4,7 @@
 - Private higher education register, updated **6 July 2026**: https://www.dhet.gov.za/Registers_DocLib/Annexure%20A%20Register%20%20Private%20Higher%20Education%20Institutions%2006%20July%202026.pdf
 - Private college register, updated **15 July 2026**: https://www.dhet.gov.za/Registers_DocLib/Register%20of%20Private%20Colleges%20%2015%20July%202026.pdf
 
-The private-college register separates Section A cancelled registrations from Section B registered NC(V)/AET colleges. It does not cover all occupational/N4–N6 or SETA skills providers; those require the relevant QCTO/delegated accreditation checks. The private higher-education register distinguishes registered, provisional, cancelled and lapsed status. Never collapse those categories into one active flag.
+The private-college register separates Section A cancelled registrations from Section B registered NC(V)/AET colleges. The private higher-education register also includes a name-only section 4 de-registration index (described by DHET as cancelled under section 62(1)) and a separate section 5 list of institutions that requested discontinuation. Those records have no registration identifiers in those index sections: extract them as historical review evidence only, do not infer identifiers, and do not import them. A discontinuation request is not a confirmed effective cancellation. It does not cover all occupational/N4–N6 or SETA skills providers; those require the relevant QCTO/delegated accreditation checks. The private higher-education register distinguishes registered, provisional, cancelled and lapsed status. Never collapse those categories into one active flag.
 
 ## Reproducible extraction
 Download the two exact official PDFs, then run Poppler's layout-preserving text conversion:
