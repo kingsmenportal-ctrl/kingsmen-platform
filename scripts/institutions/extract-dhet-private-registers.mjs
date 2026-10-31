@@ -73,6 +73,22 @@ else{
  const args=Object.fromEntries(process.argv.slice(2).map((x,i,a)=>x.startsWith("--")?[x.slice(2),a[i+1]]:null).filter(Boolean));
  for(const k of ["higher-education-text","private-colleges-text"])if(!args[k]||!fs.existsSync(args[k]))throw Error("Provide existing --"+k+" converted from official PDF using pdftotext -layout");
  const records=[...extractRecords(fs.readFileSync(args["higher-education-text"],"utf8"),"private_higher_education"),...extractRecords(fs.readFileSync(args["private-colleges-text"],"utf8"),"private_colleges")];
+ const lookups=[];
+ for(const rel of ["manifests/institutions/coverage-gap-register-2026-10-31.json","manifests/institutions/cross-sector-institution-source-extension.json","manifests/institutions/seed/public-universities-and-tvet-2026-10-31.json"]){
+  try{
+   const doc=JSON.parse(fs.readFileSync(rel,"utf8"));
+   for(const x of [...(doc.provider_targets??[]),...(doc.sources??[]),...(doc.records??[])]){
+    const key=x.provider_key??x.institution_ref??x.source_id;
+    const name=x.canonical_name??x.provider_name??x.name??x.source_name;
+    if(key&&name)lookups.push({provider_key:key,canonical_name:name,normalized_name_key:canonicalSlug(name),source_url:x.official_directory_url??x.directory_source_url??x.source_url??null});
+   }
+  }catch{}
+ }
+ for(const row of records){
+  const names=[row.canonical_name_candidate,...row.alias_candidates].filter(Boolean).map(canonicalSlug);
+  row.possible_existing_provider_matches=lookups.filter(x=>names.includes(x.normalized_name_key));
+  row.alias_reconciliation_status=row.possible_existing_provider_matches.length?"POSSIBLE_CANONICAL_MATCH_REVIEW_REQUIRED":"NO_EXACT_MATCH_FOUND_STILL_REQUIRES_MANUAL_REVIEW";
+ }
  const errors=records.flatMap((x,i)=>[!x.canonical_name_candidate?"record "+i+" missing name":null,!x.normalized_name_key?"record "+i+" missing normalized key":null,!x.source_url.startsWith("https://www.dhet.gov.za/")?"record "+i+" missing official provenance":null].filter(Boolean));
  if(errors.length){console.error(errors.join("\n"));process.exit(1);}
  const out=args.out||"manifests/institutions/seed/dhet-private-register-candidates-2026-10-31.json";fs.mkdirSync(path.dirname(out),{recursive:true});
