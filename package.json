@@ -10,7 +10,7 @@
   "scripts": {
     "candidate:experience:check": "node scripts/validators/validate-candidate-experience-vertical-slice.mjs && node scripts/validators/validate-candidate-reviewer-portal.mjs",
     "candidate:profile:e2e": "node scripts/staging/test-candidate-profile-persistence-e2e.mjs",
-    "test": "node scripts/validators/validate-jarvis-core.mjs && node scripts/validators/validate-jarvis-live-pass-02.mjs && node scripts/staging/test-kingsmen-operating-evidence-reconciliation.mjs && npm run n14:connectors:check && npm run n15:sources:check && npm run n15:ingestion:check && npm run backend:simplification:check && npm run security:validate:client-non-dml && npm run capacity:validate && npm run security:validate:cao-cap-0108",
+    "test": "node scripts/validators/validate-jarvis-core.mjs && node scripts/validators/validate-jarvis-live-pass-02.mjs && node scripts/staging/test-kingsmen-operating-evidence-reconciliation.mjs && npm run n14:connectors:check && npm run n15:sources:check && npm run n15:ingestion:check && npm run backend:simplification:check && npm run security:validate:client-non-dml && npm run capacity:validate && npm run security:validate:cao-cap-0108 && npm run security:validate:cao-0096-provenance",
     "jarvis:validate": "node scripts/validators/validate-jarvis-connected-live.mjs",
     "jarvis:validate:core": "node scripts/validators/validate-jarvis-core.mjs",
     "jarvis:validate:live-pass-02": "node scripts/validators/validate-jarvis-live-pass-02.mjs",
@@ -112,7 +112,8 @@
     "capacity:test": "node scripts/staging/test-active-candidate-capacity.mjs",
     "ui:rc1:smoke": "npm --prefix apps/web run ui:rc1:smoke",
     "security:validate:cao-cap-0108": "node scripts/validators/validate-cao-privileges-active-cap-migration.mjs",
-    "security:test:cao-cap-integration": "node scripts/staging/test-cao-active-cap-migration.mjs"
+    "security:test:cao-cap-integration": "node scripts/staging/test-cao-active-cap-migration.mjs",
+    "security:validate:cao-0096-provenance": "node scripts/validators/validate-cao-0096-provenance-adoption.mjs"
   },
   "repository": {
     "type": "git",
