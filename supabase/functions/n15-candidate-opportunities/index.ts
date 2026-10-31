@@ -59,12 +59,26 @@ Deno.serve(async (req: Request) => {
   const results = [];
   for (const match of matches ?? []) {
     if (!match.programme_ref || !match.provider_ref) continue;
+    // Approved status alone is not evidence. Require a non-empty evidence set on
+    // the human-reviewed match before it can reach a candidate response.
+    if (!Array.isArray(match.evidence_refs) || match.evidence_refs.length === 0) continue;
+    if (!/^https:\/\//i.test(String(match.programme_ref))) {
+      // programme_ref is an internal key, never a navigable destination; exact_link
+      // is checked after the programme row is fetched below.
+    }
     const { data: programme } = await admin.from("opportunity_programmes").select("*")
       .eq("programme_ref", match.programme_ref).maybeSingle();
     const { data: provider } = await admin.from("opportunity_providers").select("*")
       .eq("provider_ref", match.provider_ref).maybeSingle();
     if (!programme || !provider) continue;
     if (programme.opening_status !== "OPEN" || programme.candidate_facing_safe !== true) continue;
+    // Fail closed if the record cannot point to a concrete HTTPS official page.
+    try {
+      const officialUrl = new URL(String(programme.exact_link ?? ""));
+      if (officialUrl.protocol !== "https:" || !officialUrl.hostname || officialUrl.username || officialUrl.password) continue;
+    } catch {
+      continue;
+    }
     if (programme.source_confidence !== "OFFICIAL_VERIFIED" || provider.source_confidence !== "OFFICIAL_VERIFIED") continue;
     if (provider.safe_to_recommend !== true || provider.accreditation_status === "REJECTED") continue;
     if (!Array.isArray(programme.evidence_refs) || !programme.evidence_refs.length ||
