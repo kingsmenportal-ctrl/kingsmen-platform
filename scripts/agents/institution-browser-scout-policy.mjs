@@ -121,7 +121,7 @@ export function classifyPortal({ httpStatus = null, url = "", bodyText = "", fie
 
   if (httpStatus === 429 || /too many requests|rate.?limit|request limit exceeded/.test(signals)) return SCOUT_STATUSES.RATE_LIMITED;
   if (/captcha|recaptcha|hcaptcha|turnstile|verify you are human|robot check/.test(signals)) return SCOUT_STATUSES.CAPTCHA_REQUIRED;
-  if (/one.time code|one time password|\botp\b|verification code|authenticator code|multi.factor|mfa/.test(signals)) return SCOUT_STATUSES.OTP_OR_MFA_REQUIRED;
+  if (/one[- ]time[- ]code|one.time code|one time password|\botp\b|verification code|authenticator code|multi.factor|mfa/.test(signals)) return SCOUT_STATUSES.OTP_OR_MFA_REQUIRED;
   if (fields.some((field) => String(field.inputType).toLowerCase() === "password") ||
       /sign in|log in|login required|authentication required/.test(signals)) return SCOUT_STATUSES.AUTHENTICATION_REQUIRED;
   if (/\/payment|\/checkout|payment gateway/.test(route) || /pay now|secure payment|make payment/.test(body)) return SCOUT_STATUSES.PAYMENT_STEP_DETECTED;
