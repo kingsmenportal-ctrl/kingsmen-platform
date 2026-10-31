@@ -59,12 +59,21 @@ Deno.serve(async (req: Request) => {
   const results = [];
   for (const match of matches ?? []) {
     if (!match.programme_ref || !match.provider_ref) continue;
+    // An approved match must carry its own review evidence before delivery.
+    if (!Array.isArray(match.evidence_refs) || match.evidence_refs.length === 0) continue;
     const { data: programme } = await admin.from("opportunity_programmes").select("*")
       .eq("programme_ref", match.programme_ref).maybeSingle();
     const { data: provider } = await admin.from("opportunity_providers").select("*")
       .eq("provider_ref", match.provider_ref).maybeSingle();
     if (!programme || !provider) continue;
     if (programme.opening_status !== "OPEN" || programme.candidate_facing_safe !== true) continue;
+    // Only a concrete credential-free HTTPS official page may be delivered.
+    try {
+      const officialUrl = new URL(String(programme.exact_link ?? ""));
+      if (officialUrl.protocol !== "https:" || !officialUrl.hostname || officialUrl.username || officialUrl.password) continue;
+    } catch {
+      continue;
+    }
     if (programme.source_confidence !== "OFFICIAL_VERIFIED" || provider.source_confidence !== "OFFICIAL_VERIFIED") continue;
     if (provider.safe_to_recommend !== true || provider.accreditation_status === "REJECTED") continue;
     if (!Array.isArray(programme.evidence_refs) || !programme.evidence_refs.length ||
