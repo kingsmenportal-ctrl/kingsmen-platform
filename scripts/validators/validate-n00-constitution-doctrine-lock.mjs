@@ -59,7 +59,7 @@ for (const phrase of [
   "All candidates can see",
   "CAO is one Kingsmen parent application",
   "Submitted requires proof",
-  "Email is the primary",
+  "Email and secure portal are the only enabled candidate communication channels",
   "WhatsApp is disabled",
   "SMS is disabled",
   "Playwright is probe/scout only",
