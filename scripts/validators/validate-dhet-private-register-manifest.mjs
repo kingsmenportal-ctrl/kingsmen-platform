@@ -39,7 +39,7 @@ for(const [key,group] of ids){
  if(differentNames||differentStatuses){
   conflictGroups++;
   for(const r of group){
-   if(r.identity_conflict_status!=="CONFLICT_REVIEW_REQUIRED"||r.import_eligible!==false)failures.push("unflagged registration identity/status conflict "+key);
+   if(r.identity_conflict_status!=="CONFLICT_REVIEW_REQUIRED"||r.import_eligible!==false)failures.push("unflagged registration identity/status conflict "+key+" status="+r.identity_conflict_status+" flags="+(r.conflict_flags??[]).join(","));
    if(differentNames&&!r.conflict_flags.includes("REGISTRATION_IDENTIFIER_REUSED_WITH_DIFFERENT_NAME"))failures.push("name conflict flag missing "+key);
    if(differentStatuses&&!r.conflict_flags.includes("REGISTRATION_STATUS_CONFLICT"))failures.push("status conflict flag missing "+key);
   }
