@@ -110,7 +110,8 @@
     "security:validate:client-non-dml": "node scripts/validators/validate-client-non-dml-privileges.mjs",
     "capacity:validate": "node scripts/validators/validate-active-candidate-capacity.mjs",
     "capacity:test": "node scripts/staging/test-active-candidate-capacity.mjs",
-    "ui:rc1:smoke": "npm --prefix apps/web run ui:rc1:smoke"
+    "ui:rc1:smoke": "npm --prefix apps/web run ui:rc1:smoke",
+    "backup:test:postgres-restore": "node scripts/backup/test-backup-postgres-restore-integration.mjs"
   },
   "repository": {
     "type": "git",
