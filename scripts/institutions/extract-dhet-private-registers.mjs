@@ -65,6 +65,90 @@ function cleanHeadingName(value,source){
  candidate=candidate.replace(/\b(?:registration|reg)\s*(?:no\.?|number)?\s*[:#-]?\s*/gi," ");
  return normalizeName(candidate);
 }
+
+function extractNameOnlyHistoricalStatusRecords(text,kind){
+ if(kind!=="private_higher_education")return [];
+ const lines=text.replace(/\r/g,"").split("\n");
+ const sections=[
+  {
+   heading:/^\s*4\.\s+INSTITUTIONS FOR WHICH CANCELLATION OR LAPSE OF REGISTRATION HAS COME INTO EFFECT\b/i,
+   label:"4. INSTITUTIONS FOR WHICH CANCELLATION OR LAPSE OF REGISTRATION HAS COME INTO EFFECT",
+   status:"CANCELLED",
+   statusReview:false,
+   basis:"DHET section 4 defines de-registered institutions as registrations cancelled under section 62(1); this name-only index does not provide the original registration identifiers."
+  },
+  {
+   heading:/^\s*5\.\s+INSTITUTIONS WHICH HAVE REQUESTED THAT THE REGISTRAR DISCONTINUE THEIR REGISTRATION\b/i,
+   label:"5. INSTITUTIONS WHICH HAVE REQUESTED THAT THE REGISTRAR DISCONTINUE THEIR REGISTRATION",
+   status:"DISCONTINUATION_REQUESTED_REVIEW",
+   statusReview:true,
+   basis:"DHET lists a request to discontinue registration; the request is not treated as proof that cancellation has taken effect."
+  }
+ ];
+ const output=[];
+ for(const section of sections){
+  const start=lines.findIndex(line=>section.heading.test(line.trim()));
+  if(start<0)continue;
+  let current=null;
+  const flush=()=>{
+   if(!current)return;
+   const name=normalizeName(current.parts.join(" ").replace(/-\s*\d{3}\s*-/g," "));
+   if(name.length>=4){
+    const slug=canonicalSlug(name);
+    output.push({
+     source_record_ref:kind+":"+canonicalSlug(section.label)+":"+String(current.number).padStart(3,"0")+":"+slug,
+     source_register:kind,
+     source_snapshot_date:SOURCES[kind].date,
+     source_url:SOURCES[kind].url,
+     source_section:section.label,
+     register_entry_number:current.number,
+     source_heading_candidate:name,
+     canonical_name_candidate:name,
+     normalized_name_key:slug,
+     name_extraction_status:"REVIEW_REQUIRED",
+     registration_identifier:null,
+     registration_identifiers_observed:[],
+     registration_status:section.status,
+     registration_status_review_required:section.statusReview,
+     registration_status_basis:section.basis,
+     province_candidates:[],
+     province_status:"NOT_EXTRACTED",
+     campus_sites:[],
+     campus_site_candidates:[],
+     campus_extraction_status:"NOT_EXTRACTED",
+     alias_candidates:[],
+     possible_existing_provider_matches:[],
+     alias_reconciliation_status:"NOT_RECONCILED",
+     possible_duplicate_within_source:false,
+     source_excerpt:redactSourceExcerpt(current.parts.join(" ")),
+     source_evidence_scope:"DHET historical deregistration/request index only; no registration identifier or live route is supplied by this section",
+     identity_review_status:"NEEDS_CANONICAL_IDENTITY_REVIEW",
+     identity_conflict_status:"NO_CONFLICT_DETECTED_REVIEW_STILL_REQUIRED",
+     conflict_flags:["NAME_ONLY_HISTORICAL_STATUS_ENTRY","REGISTRATION_IDENTIFIER_NOT_PUBLISHED_IN_SECTION"],
+     official_route_status:"NOT_VERIFIED",
+     integration_status:"NOT_CONNECTED",
+     automation_authorized:false,
+     import_eligible:false
+    });
+   }
+   current=null;
+  };
+  for(let i=start+1;i<lines.length;i++){
+   const raw=lines[i],t=raw.trim();
+   if(!t)continue;
+   if(/^\d+\.\s+(?:INSTITUTIONS|WARNING:)/i.test(t) && !/^\d+\)\s/.test(t)){flush();break;}
+   if(/^[-–]\s*\d{1,3}\s*[-–]$/.test(t))continue;
+   const item=t.match(/^(\d{1,3})\)\s+(.+?)\s*$/);
+   if(item){flush();current={number:Number(item[1]),parts:[item[2]]};continue;}
+   if(current && !/^(?:CONTACT PERSON|CONTACT DETAILS|SECTION\s+[A-Z]|NAME\s+SITES|REGISTER OF|THE REGISTER)/i.test(t)){
+    if(!/^\d{1,3}[.)]\s+/.test(t))current.parts.push(t);
+   }
+  }
+  flush();
+ }
+ return output;
+}
+
 export function extractRecords(text,kind){
  const source=SOURCES[kind];if(!source)throw Error("Unknown DHET register kind");
  const seen=new Set();
@@ -126,6 +210,7 @@ export function extractRecords(text,kind){
    identity_review_status:"NEEDS_CANONICAL_IDENTITY_REVIEW",identity_conflict_status:"NO_CONFLICT_DETECTED_REVIEW_STILL_REQUIRED",conflict_flags:[],
    official_route_status:"NOT_VERIFIED",integration_status:"NOT_CONNECTED",automation_authorized:false,import_eligible:false};
  });
+ records.push(...extractNameOnlyHistoricalStatusRecords(text,kind));
  for(const record of records){
   if(record.registration_identifiers_observed.length!==1){
    record.identity_conflict_status="CONFLICT_REVIEW_REQUIRED";
@@ -182,6 +267,11 @@ function selfTest(){
  const h=extractRecords("1. REGISTERED INSTITUTIONS\n1. Example Higher Institute\n"+ " ".repeat(36)+"2020/HE07/001 Gauteng\n"+ " ".repeat(36)+"1) Bachelor of Arts\n2. PROVISIONALLY REGISTERED INSTITUTIONS\n2. Provisional Higher Institute\n"+ " ".repeat(36)+"2024/HE08/002 Western Cape\n"+ " ".repeat(36)+"2) Bachelor of Business\n3. LAPSED PROVISIONAL REGISTRATIONS\n3. Lapsed Higher Institute\n"+ " ".repeat(36)+"2018/HE07/008 Gauteng","private_higher_education");
  if(h.find(x=>x.registration_status==="REGISTERED")?.canonical_name_candidate!=="Example Higher Institute")throw Error("higher-ed canonical name extraction");
  if(!h.some(x=>x.registration_status==="REGISTERED")||!h.some(x=>x.registration_status==="PROVISIONAL")||!h.some(x=>x.registration_status==="LAPSED"))throw Error("higher-ed status separation");
+ const historical=extractRecords("4. INSTITUTIONS FOR WHICH CANCELLATION OR LAPSE OF REGISTRATION HAS COME INTO EFFECT\nA de-registered institution is an institution whose registration has been cancelled in terms of section 62(1) of the Higher Education Act. The following institutions fall into this category:\n1) Deregistered Example College\n2) Wrapped Historical College\n(Pty) Ltd\n5. INSTITUTIONS WHICH HAVE REQUESTED THAT THE REGISTRAR DISCONTINUE THEIR REGISTRATION\nInstitutions may request that the Registrar discontinue their registration.\n1) Requested Discontinuation College\n6. WARNING: ILLEGAL COLLEGES","private_higher_education");
+ if(historical.length!==3)throw Error("name-only historical status index extraction");
+ if(historical.filter(x=>x.registration_status==="CANCELLED").length!==2||historical.filter(x=>x.registration_status==="DISCONTINUATION_REQUESTED_REVIEW").length!==1)throw Error("de-registered and requested-discontinuation states collapsed");
+ if(historical.some(x=>x.registration_identifier!==null||x.registration_identifiers_observed.length!==0||x.import_eligible!==false||x.official_route_status!=="NOT_VERIFIED"))throw Error("name-only historical entries must remain non-importable and route-unverified");
+ if(historical.find(x=>x.registration_status==="DISCONTINUATION_REQUESTED_REVIEW")?.registration_status_review_required!==true)throw Error("requested discontinuation was not marked for review");
  if([...c,...h].some(x=>x.import_eligible||x.official_route_status!=="NOT_VERIFIED"||x.integration_status!=="NOT_CONNECTED"||x.automation_authorized))throw Error("fail-closed route defaults");
  if(/Makungo|015 663 1921|contact@example.org|CONTACT PERSON|Tel:/i.test(c[0].source_excerpt))throw Error("contact detail redaction failed");
  console.log("PASS DHET register extractor self-test");
@@ -212,6 +302,6 @@ else{
  const errors=records.flatMap((x,i)=>[!x.source_url.startsWith("https://www.dhet.gov.za/")?"record "+i+" missing official provenance":null].filter(Boolean));
  if(errors.length){console.error(errors.join("\n"));process.exit(1);}
  const out=args.out||"manifests/institutions/seed/dhet-private-register-candidates-2026-10-31.json";fs.mkdirSync(path.dirname(out),{recursive:true});
- fs.writeFileSync(out,JSON.stringify({schema:"kingsmen.institutions.dhet-private-register-candidates.v1",status:"EXTRACTION_CANDIDATES_NOT_IMPORT_AUTHORIZED",extracted_at:new Date().toISOString(),sources:Object.entries(SOURCES).map(([register,s])=>({register,snapshot_date:s.date,url:s.url})),counts:{total:records.length,heading_candidates:records.length+rejectedRecords.length,section_counts:Object.fromEntries([...new Set(records.map(r=>r.source_section))].sort().map(s=>[s,records.filter(r=>r.source_section===s).length])),status_counts_by_register:{private_higher_education:Object.fromEntries(["REGISTERED","PROVISIONAL","CANCELLED","LAPSED","STATUS_UNRESOLVED","WITHDRAWN_OR_DEREGISTERED_REVIEW"].map(s=>[s,records.filter(r=>r.source_register==="private_higher_education"&&r.registration_status===s).length])),private_colleges:Object.fromEntries(["REGISTERED","PROVISIONAL","CANCELLED","LAPSED","STATUS_UNRESOLVED","WITHDRAWN_OR_DEREGISTERED_REVIEW"].map(s=>[s,records.filter(r=>r.source_register==="private_colleges"&&r.registration_status===s).length]))},rejected_missing_name:rejectedRecords.length,rejected_missing_name_by_register:{private_higher_education:rejectedRecords.filter(x=>x.source_register==="private_higher_education").length,private_colleges:rejectedRecords.filter(x=>x.source_register==="private_colleges").length},private_higher_education:records.filter(x=>x.source_register==="private_higher_education").length,private_colleges:records.filter(x=>x.source_register==="private_colleges").length,registered:records.filter(x=>x.registration_status==="REGISTERED").length,provisional:records.filter(x=>x.registration_status==="PROVISIONAL").length,cancelled:records.filter(x=>x.registration_status==="CANCELLED").length,lapsed:records.filter(x=>x.registration_status==="LAPSED").length,unresolved:records.filter(x=>x.registration_status==="STATUS_UNRESOLVED"||x.registration_status==="WITHDRAWN_OR_DEREGISTERED_REVIEW").length,registration_identifier_conflict_records:records.filter(x=>x.identity_conflict_status==="CONFLICT_REVIEW_REQUIRED").length,duplicate_source_entry_records:records.filter(x=>x.identity_conflict_status==="DUPLICATE_SOURCE_ENTRY_REVIEW").length,records_with_campus_candidates:records.filter(x=>x.campus_site_candidates.length>0).length,name_review_required:records.filter(x=>x.name_extraction_status==="REVIEW_REQUIRED").length,province_review_required:records.filter(x=>x.province_status!=="SOURCE_LISTED_CANDIDATE").length,campus_review_required:records.filter(x=>x.campus_extraction_status==="REVIEW_REQUIRED"||x.campus_extraction_status==="NOT_EXTRACTED").length,records_with_province_candidates:records.filter(x=>x.province_candidates.length>0).length,records_with_registration_identifier:records.filter(x=>x.registration_identifiers_observed.length===1).length,records_with_status_review_required:records.filter(x=>x.registration_status_review_required).length,duplicate_normalized_name_records:records.filter(x=>x.conflict_flags.includes("DUPLICATE_NORMALIZED_NAME_REVIEW")).length,unique_registration_identifiers:new Set(records.flatMap(x=>x.registration_identifiers_observed.map(id=>x.source_register+"|"+id.toLowerCase()))).size,unique_normalized_names:new Set(records.map(x=>x.source_register+"|"+x.normalized_name_key).filter(Boolean)).size},extraction_diagnostics:{rejected_missing_name_samples:rejectedRecords.slice(0,20).map(x=>({source_register:x.source_register,register_entry_number:x.register_entry_number,source_heading_candidate:x.source_heading_candidate}))},import_rules:{import_eligible:false,required:["canonical identity and alias reconciliation","manual campus/site review","status review","provider-key collision preflight","independent review","approved idempotent SQL migration"],route_default:"NOT_VERIFIED",integration_default:"NOT_CONNECTED",no_current_opportunity_claim:true},records},null,2)+"\n");
+ fs.writeFileSync(out,JSON.stringify({schema:"kingsmen.institutions.dhet-private-register-candidates.v1",status:"EXTRACTION_CANDIDATES_NOT_IMPORT_AUTHORIZED",extracted_at:new Date().toISOString(),sources:Object.entries(SOURCES).map(([register,s])=>({register,snapshot_date:s.date,url:s.url})),counts:{total:records.length,heading_candidates:records.length+rejectedRecords.length,section_counts:Object.fromEntries([...new Set(records.map(r=>r.source_section))].sort().map(s=>[s,records.filter(r=>r.source_section===s).length])),status_counts_by_register:{private_higher_education:Object.fromEntries(["REGISTERED","PROVISIONAL","CANCELLED","LAPSED","WITHDRAWN_OR_DEREGISTERED_REVIEW","DISCONTINUATION_REQUESTED_REVIEW","STATUS_UNRESOLVED"].map(s=>[s,records.filter(r=>r.source_register==="private_higher_education"&&r.registration_status===s).length])),private_colleges:Object.fromEntries(["REGISTERED","PROVISIONAL","CANCELLED","LAPSED","STATUS_UNRESOLVED","WITHDRAWN_OR_DEREGISTERED_REVIEW"].map(s=>[s,records.filter(r=>r.source_register==="private_colleges"&&r.registration_status===s).length]))},rejected_missing_name:rejectedRecords.length,rejected_missing_name_by_register:{private_higher_education:rejectedRecords.filter(x=>x.source_register==="private_higher_education").length,private_colleges:rejectedRecords.filter(x=>x.source_register==="private_colleges").length},private_higher_education:records.filter(x=>x.source_register==="private_higher_education").length,private_colleges:records.filter(x=>x.source_register==="private_colleges").length,registered:records.filter(x=>x.registration_status==="REGISTERED").length,provisional:records.filter(x=>x.registration_status==="PROVISIONAL").length,cancelled:records.filter(x=>x.registration_status==="CANCELLED").length,lapsed:records.filter(x=>x.registration_status==="LAPSED").length,unresolved:records.filter(x=>x.registration_status==="STATUS_UNRESOLVED"||x.registration_status==="WITHDRAWN_OR_DEREGISTERED_REVIEW").length,registration_identifier_conflict_records:records.filter(x=>x.identity_conflict_status==="CONFLICT_REVIEW_REQUIRED").length,duplicate_source_entry_records:records.filter(x=>x.identity_conflict_status==="DUPLICATE_SOURCE_ENTRY_REVIEW").length,records_with_campus_candidates:records.filter(x=>x.campus_site_candidates.length>0).length,name_review_required:records.filter(x=>x.name_extraction_status==="REVIEW_REQUIRED").length,province_review_required:records.filter(x=>x.province_status!=="SOURCE_LISTED_CANDIDATE").length,campus_review_required:records.filter(x=>x.campus_extraction_status==="REVIEW_REQUIRED"||x.campus_extraction_status==="NOT_EXTRACTED").length,records_with_province_candidates:records.filter(x=>x.province_candidates.length>0).length,records_with_registration_identifier:records.filter(x=>x.registration_identifiers_observed.length===1).length,records_with_status_review_required:records.filter(x=>x.registration_status_review_required).length,duplicate_normalized_name_records:records.filter(x=>x.conflict_flags.includes("DUPLICATE_NORMALIZED_NAME_REVIEW")).length,unique_registration_identifiers:new Set(records.flatMap(x=>x.registration_identifiers_observed.map(id=>x.source_register+"|"+id.toLowerCase()))).size,unique_normalized_names:new Set(records.map(x=>x.source_register+"|"+x.normalized_name_key).filter(Boolean)).size},extraction_diagnostics:{rejected_missing_name_samples:rejectedRecords.slice(0,20).map(x=>({source_register:x.source_register,register_entry_number:x.register_entry_number,source_heading_candidate:x.source_heading_candidate}))},import_rules:{import_eligible:false,required:["canonical identity and alias reconciliation","manual campus/site review","status review","provider-key collision preflight","independent review","approved idempotent SQL migration"],route_default:"NOT_VERIFIED",integration_default:"NOT_CONNECTED",no_current_opportunity_claim:true},records},null,2)+"\n");
  console.log("Wrote "+records.length+" named fail-closed review candidates; rejected "+rejectedRecords.length+" headings without a normalized institution name to "+out+"; no SQL applied.");
 }
