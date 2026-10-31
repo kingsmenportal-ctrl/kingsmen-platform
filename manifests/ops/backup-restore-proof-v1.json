@@ -1,36 +1,57 @@
 {
   "manifestKey": "backup-restore-proof-v1",
   "module": "Kingsmen Backup and Restore Proof",
-  "status": "foundation_built_pending_staging_drill",
+  "status": "encrypted_database_restore_foundation_pending_staging_and_storage_drill",
   "productionReady": false,
   "publicLaunchAllowed": false,
   "productionDataAllowed": false,
   "backupStorageAllowedInGit": false,
   "rawCandidateRowsAllowedInReports": false,
-  "databaseUrlAllowedInReports": false,
   "backupStrategy": {
     "authority": "PostgreSQL/Supabase Truth Vault",
-    "tooling": ["pg_dump", "pg_restore", "psql"],
+    "tooling": [
+      "pg_dump",
+      "pg_restore",
+      "psql",
+      "age"
+    ],
     "format": "custom",
+    "encryption": "age",
+    "encryptedAtRestRequired": true,
+    "plaintextIntermediateMustBeRemoved": true,
     "ownerPrivilegesRestored": false,
     "restoreTargetMustDifferFromSource": true,
+    "restoreTargetMustBeEmpty": true,
     "reportsMayContainCountsOnly": true,
-    "reportsMayContainSha256Only": true
+    "reportsMayContainSha256Only": true,
+    "privateStorageObjectsIncluded": false,
+    "storageParityRequired": true
   },
   "requiredEnvironment": {
     "sourceDatabaseUrl": "KINGSMEN_DATABASE_URL or DATABASE_URL",
     "restoreDrillDatabaseUrl": "KINGSMEN_RESTORE_DRILL_DATABASE_URL",
+    "agePublicRecipient": "KINGSMEN_BACKUP_AGE_RECIPIENT",
+    "agePrivateIdentityFile": "KINGSMEN_BACKUP_AGE_IDENTITY_FILE",
     "backupRoot": "KINGSMEN_BACKUP_ROOT optional local/offsite path"
   },
   "proofScenarios": [
     "backup_script_exists_and_uses_pg_dump",
-    "restore_script_exists_and_uses_pg_restore",
-    "restore_script_blocks_same_source_and_target",
+    "encrypted_archive_created_with_age",
+    "unencrypted_intermediate_removed",
+    "encrypted_archive_sha256_required",
     "backup_manifest_redacts_database_url",
     "backup_files_are_gitignored",
+    "restore_script_requires_source_and_target_urls",
+    "restore_target_identity_is_normalized_and_must_differ",
+    "restore_requires_explicit_target_database_name_confirmation",
+    "restore_target_must_be_empty",
+    "restore_decrypts_age_archive_to_temporary_file",
+    "restore_temporary_plaintext_removed",
+    "restore_count_query_failure_fails_the_drill",
     "restore_report_counts_only_no_raw_candidate_rows",
-    "sha256_checksum_required",
     "rpo_rto_fields_required",
+    "private_storage_bytes_not_included",
+    "private_storage_parity_remains_required",
     "production_ready_false",
     "staging_drill_still_required"
   ],
@@ -43,5 +64,5 @@
     "reports/ops/backup-restore-proof-latest.json",
     "reports/ops/backup-restore-validation-latest.json"
   ],
-  "remainingConstraint": "Run a real staging backup and restore drill, store counts-only evidence, verify RPO/RTO, and keep backup archives outside Git before production data."
+  "remainingConstraint": "Run an approved encrypted staging database backup and isolated restore, then complete a separately encrypted private Storage object backup/restore with count/size/hash parity, RPO/RTO evidence and independent sign-off."
 }
