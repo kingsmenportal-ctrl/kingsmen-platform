@@ -293,7 +293,15 @@
       ],
       "refresh_after_days": 30,
       "review_required": true,
-      "connector_state": "NOT_CONNECTED"
+      "connector_state": "NOT_CONNECTED",
+      "provider_key": "soe_hpcsa",
+      "metadata": {
+        "gcis_profile_url": "https://www.gov.za/about-government/contact-directory/soe/health-professions-council-south-africa-hpcsa",
+        "provider_key": "soe_hpcsa",
+        "provider_homepage_url": "https://www.hpcsa.co.za/",
+        "source_record_status": "NEEDS_REVIEW",
+        "external_application_route_status": "NOT_VERIFIED"
+      }
     },
     {
       "source_id": "sassa_official",
@@ -315,7 +323,15 @@
       ],
       "refresh_after_days": 14,
       "review_required": true,
-      "connector_state": "NOT_CONNECTED"
+      "connector_state": "NOT_CONNECTED",
+      "provider_key": "soe_sassa",
+      "metadata": {
+        "gcis_profile_url": "https://www.gov.za/about-government/contact-directory/soe/south-african-social-security-agency-sassa",
+        "provider_key": "soe_sassa",
+        "provider_homepage_url": "https://www.sassa.gov.za/",
+        "source_record_status": "NEEDS_REVIEW",
+        "external_application_route_status": "NOT_VERIFIED"
+      }
     },
     {
       "source_id": "nyda_official",
@@ -338,7 +354,15 @@
       ],
       "refresh_after_days": 14,
       "review_required": true,
-      "connector_state": "NOT_CONNECTED"
+      "connector_state": "NOT_CONNECTED",
+      "provider_key": "soe_nyda",
+      "metadata": {
+        "gcis_profile_url": "https://www.gov.za/about-government/contact-directory/soe/national-youth-development-agency-nyda",
+        "provider_key": "soe_nyda",
+        "provider_homepage_url": "https://www.nyda.gov.za/",
+        "source_record_status": "NEEDS_REVIEW",
+        "external_application_route_status": "NOT_VERIFIED"
+      }
     },
     {
       "source_id": "dsd_npo_register",
@@ -502,7 +526,8 @@
       "classes": [
         "STATE_OWNED_ENTERPRISE",
         "TRANSPORT_AND_ESSENTIAL_SERVICES",
-        "EMPLOYER_AND_RECRUITMENT"
+        "EMPLOYER_AND_RECRUITMENT",
+        "ENERGY_AND_UTILITIES"
       ],
       "supports": [
         "official utility service and careers source leads"
@@ -514,7 +539,15 @@
       ],
       "refresh_after_days": 14,
       "review_required": true,
-      "connector_state": "NOT_CONNECTED"
+      "connector_state": "NOT_CONNECTED",
+      "provider_key": "soe_eskom",
+      "metadata": {
+        "gcis_profile_url": "https://www.gov.za/about-government/contact-directory/soe/eskom",
+        "provider_key": "soe_eskom",
+        "provider_homepage_url": "https://www.eskom.co.za/",
+        "source_record_status": "NEEDS_REVIEW",
+        "external_application_route_status": "NOT_VERIFIED"
+      }
     },
     {
       "source_id": "sars_official",
@@ -4469,6 +4502,754 @@
         "provider_key": "soe_umalusi",
         "source_record_status": "NEEDS_REVIEW",
         "provider_homepage_url": null,
+        "external_application_route_status": "NOT_VERIFIED"
+      }
+    },
+    {
+      "source_id": "gcis_public_entity_dbsa",
+      "provider_key": "soe_dbsa",
+      "name": "Development Bank of Southern Africa (DBSA)",
+      "authority": "Government Communication and Information System / National Government Directory",
+      "url": "https://www.gov.za/about-government/contact-directory/soe/development-bank-southern-africa-dbsa",
+      "classes": [
+        "PUBLIC_ENTITY",
+        "PUBLIC_ADMINISTRATION",
+        "EMPLOYER_AND_RECRUITMENT",
+        "FUNDING_AND_SOCIAL_SUPPORT",
+        "FINANCE_AND_INSURANCE"
+      ],
+      "supports": [
+        "GCIS government profile confirms this organisation is listed in the National Government Directory",
+        "Published official website and public contacts shown on the government profile are source evidence; employment, bursary and service opportunities require the organisation's current notice"
+      ],
+      "does_not_prove": [
+        "current vacancy, grant, bursary, internship or programme intake",
+        "candidate eligibility, deadline or exact application channel",
+        "provider partnership, authorised connector, submission receipt or employer/funder outcome"
+      ],
+      "refresh_after_days": 30,
+      "review_required": true,
+      "connector_state": "NOT_CONNECTED",
+      "metadata": {
+        "gcis_profile_url": "https://www.gov.za/about-government/contact-directory/soe/development-bank-southern-africa-dbsa",
+        "provider_key": "soe_dbsa",
+        "provider_homepage_url": "https://www.dbsa.org/",
+        "source_record_status": "NEEDS_REVIEW",
+        "external_application_route_status": "NOT_VERIFIED"
+      }
+    },
+    {
+      "source_id": "gcis_public_entity_ithala",
+      "provider_key": "soe_ithala",
+      "name": "Ithala Development Finance Corporation (Ltd)",
+      "authority": "Government Communication and Information System / National Government Directory",
+      "url": "https://www.gov.za/about-government/contact-directory/soe/ithala-development-finance-corporation-ltd",
+      "classes": [
+        "PUBLIC_ENTITY",
+        "PUBLIC_ADMINISTRATION",
+        "EMPLOYER_AND_RECRUITMENT",
+        "FINANCE_AND_INSURANCE",
+        "FUNDING_AND_SOCIAL_SUPPORT"
+      ],
+      "supports": [
+        "GCIS government profile confirms this organisation is listed in the National Government Directory",
+        "Published official website and public contacts shown on the government profile are source evidence; employment, bursary and service opportunities require the organisation's current notice"
+      ],
+      "does_not_prove": [
+        "current vacancy, grant, bursary, internship or programme intake",
+        "candidate eligibility, deadline or exact application channel",
+        "provider partnership, authorised connector, submission receipt or employer/funder outcome"
+      ],
+      "refresh_after_days": 30,
+      "review_required": true,
+      "connector_state": "NOT_CONNECTED",
+      "metadata": {
+        "gcis_profile_url": "https://www.gov.za/about-government/contact-directory/soe/ithala-development-finance-corporation-ltd",
+        "provider_key": "soe_ithala",
+        "provider_homepage_url": "https://www.ithala.co.za/",
+        "source_record_status": "NEEDS_REVIEW",
+        "external_application_route_status": "NOT_VERIFIED"
+      }
+    },
+    {
+      "source_id": "gcis_public_entity_mintek",
+      "provider_key": "soe_mintek",
+      "name": "Mintek (Council for Mineral Technology)",
+      "authority": "Government Communication and Information System / National Government Directory",
+      "url": "https://www.gov.za/about-government/contact-directory/soe/mintek-council-mineral-technology",
+      "classes": [
+        "PUBLIC_ENTITY",
+        "PUBLIC_ADMINISTRATION",
+        "EMPLOYER_AND_RECRUITMENT",
+        "EDUCATION_AND_SKILLS"
+      ],
+      "supports": [
+        "GCIS government profile confirms this organisation is listed in the National Government Directory",
+        "Published official website and public contacts shown on the government profile are source evidence; employment, bursary and service opportunities require the organisation's current notice"
+      ],
+      "does_not_prove": [
+        "current vacancy, grant, bursary, internship or programme intake",
+        "candidate eligibility, deadline or exact application channel",
+        "provider partnership, authorised connector, submission receipt or employer/funder outcome"
+      ],
+      "refresh_after_days": 30,
+      "review_required": true,
+      "connector_state": "NOT_CONNECTED",
+      "metadata": {
+        "gcis_profile_url": "https://www.gov.za/about-government/contact-directory/soe/mintek-council-mineral-technology",
+        "provider_key": "soe_mintek",
+        "provider_homepage_url": "https://www.mintek.co.za/",
+        "source_record_status": "NEEDS_REVIEW",
+        "external_application_route_status": "NOT_VERIFIED"
+      }
+    },
+    {
+      "source_id": "gcis_public_entity_naci",
+      "provider_key": "soe_naci",
+      "name": "National Advisory Council on Innovation (NACI)",
+      "authority": "Government Communication and Information System / National Government Directory",
+      "url": "https://www.gov.za/about-government/contact-directory/soe/national-advisory-council-innovation-naci",
+      "classes": [
+        "PUBLIC_ENTITY",
+        "PUBLIC_ADMINISTRATION",
+        "EMPLOYER_AND_RECRUITMENT",
+        "EDUCATION_AND_SKILLS"
+      ],
+      "supports": [
+        "GCIS government profile confirms this organisation is listed in the National Government Directory",
+        "Published official website and public contacts shown on the government profile are source evidence; employment, bursary and service opportunities require the organisation's current notice"
+      ],
+      "does_not_prove": [
+        "current vacancy, grant, bursary, internship or programme intake",
+        "candidate eligibility, deadline or exact application channel",
+        "provider partnership, authorised connector, submission receipt or employer/funder outcome"
+      ],
+      "refresh_after_days": 30,
+      "review_required": true,
+      "connector_state": "NOT_CONNECTED",
+      "metadata": {
+        "gcis_profile_url": "https://www.gov.za/about-government/contact-directory/soe/national-advisory-council-innovation-naci",
+        "provider_key": "soe_naci",
+        "provider_homepage_url": "https://www.naci.org.za/",
+        "source_record_status": "NEEDS_REVIEW",
+        "external_application_route_status": "NOT_VERIFIED"
+      }
+    },
+    {
+      "source_id": "gcis_public_entity_namc",
+      "provider_key": "soe_namc",
+      "name": "National Agricultural Marketing Council",
+      "authority": "Government Communication and Information System / National Government Directory",
+      "url": "https://www.gov.za/about-government/contact-directory/soe/national-agricultural-marketing-council",
+      "classes": [
+        "PUBLIC_ENTITY",
+        "PUBLIC_ADMINISTRATION",
+        "EMPLOYER_AND_RECRUITMENT"
+      ],
+      "supports": [
+        "GCIS government profile confirms this organisation is listed in the National Government Directory",
+        "Published official website and public contacts shown on the government profile are source evidence; employment, bursary and service opportunities require the organisation's current notice"
+      ],
+      "does_not_prove": [
+        "current vacancy, grant, bursary, internship or programme intake",
+        "candidate eligibility, deadline or exact application channel",
+        "provider partnership, authorised connector, submission receipt or employer/funder outcome"
+      ],
+      "refresh_after_days": 30,
+      "review_required": true,
+      "connector_state": "NOT_CONNECTED",
+      "metadata": {
+        "gcis_profile_url": "https://www.gov.za/about-government/contact-directory/soe/national-agricultural-marketing-council",
+        "provider_key": "soe_namc",
+        "provider_homepage_url": "https://www.namc.co.za/",
+        "source_record_status": "NEEDS_REVIEW",
+        "external_application_route_status": "NOT_VERIFIED"
+      }
+    },
+    {
+      "source_id": "gcis_public_entity_national_archives",
+      "provider_key": "soe_national_archives",
+      "name": "National Archives and Records Service of South Africa",
+      "authority": "Government Communication and Information System / National Government Directory",
+      "url": "https://www.gov.za/about-government/contact-directory/soe/national-archives-and-records-service-south-africa",
+      "classes": [
+        "PUBLIC_ENTITY",
+        "PUBLIC_ADMINISTRATION",
+        "EMPLOYER_AND_RECRUITMENT"
+      ],
+      "supports": [
+        "GCIS government profile confirms this organisation is listed in the National Government Directory",
+        "Published official website and public contacts shown on the government profile are source evidence; employment, bursary and service opportunities require the organisation's current notice"
+      ],
+      "does_not_prove": [
+        "current vacancy, grant, bursary, internship or programme intake",
+        "candidate eligibility, deadline or exact application channel",
+        "provider partnership, authorised connector, submission receipt or employer/funder outcome"
+      ],
+      "refresh_after_days": 30,
+      "review_required": true,
+      "connector_state": "NOT_CONNECTED",
+      "metadata": {
+        "gcis_profile_url": "https://www.gov.za/about-government/contact-directory/soe/national-archives-and-records-service-south-africa",
+        "provider_key": "soe_national_archives",
+        "provider_homepage_url": null,
+        "source_record_status": "NEEDS_REVIEW",
+        "external_application_route_status": "NOT_VERIFIED"
+      }
+    },
+    {
+      "source_id": "gcis_public_entity_nacsa",
+      "provider_key": "soe_nacsa",
+      "name": "National Arts Council of South Africa (NACSA)",
+      "authority": "Government Communication and Information System / National Government Directory",
+      "url": "https://www.gov.za/about-government/contact-directory/soe/national-arts-council-south-africa-nacsa",
+      "classes": [
+        "PUBLIC_ENTITY",
+        "PUBLIC_ADMINISTRATION",
+        "EMPLOYER_AND_RECRUITMENT",
+        "FUNDING_AND_SOCIAL_SUPPORT",
+        "NGO_NPO_AND_FOUNDATION"
+      ],
+      "supports": [
+        "GCIS government profile confirms this organisation is listed in the National Government Directory",
+        "Published official website and public contacts shown on the government profile are source evidence; employment, bursary and service opportunities require the organisation's current notice"
+      ],
+      "does_not_prove": [
+        "current vacancy, grant, bursary, internship or programme intake",
+        "candidate eligibility, deadline or exact application channel",
+        "provider partnership, authorised connector, submission receipt or employer/funder outcome"
+      ],
+      "refresh_after_days": 30,
+      "review_required": true,
+      "connector_state": "NOT_CONNECTED",
+      "metadata": {
+        "gcis_profile_url": "https://www.gov.za/about-government/contact-directory/soe/national-arts-council-south-africa-nacsa",
+        "provider_key": "soe_nacsa",
+        "provider_homepage_url": "https://www.nac.org.za/",
+        "source_record_status": "NEEDS_REVIEW",
+        "external_application_route_status": "NOT_VERIFIED"
+      }
+    },
+    {
+      "source_id": "gcis_public_entity_ncc",
+      "provider_key": "soe_ncc",
+      "name": "National Consumer Commission (NCC)",
+      "authority": "Government Communication and Information System / National Government Directory",
+      "url": "https://www.gov.za/about-government/contact-directory/soe/national-consumer-commission-ncc",
+      "classes": [
+        "PUBLIC_ENTITY",
+        "PUBLIC_ADMINISTRATION",
+        "EMPLOYER_AND_RECRUITMENT",
+        "REGULATOR_AND_PROFESSIONAL_COUNCIL"
+      ],
+      "supports": [
+        "GCIS government profile confirms this organisation is listed in the National Government Directory",
+        "Published official website and public contacts shown on the government profile are source evidence; employment, bursary and service opportunities require the organisation's current notice"
+      ],
+      "does_not_prove": [
+        "current vacancy, grant, bursary, internship or programme intake",
+        "candidate eligibility, deadline or exact application channel",
+        "provider partnership, authorised connector, submission receipt or employer/funder outcome"
+      ],
+      "refresh_after_days": 30,
+      "review_required": true,
+      "connector_state": "NOT_CONNECTED",
+      "metadata": {
+        "gcis_profile_url": "https://www.gov.za/about-government/contact-directory/soe/national-consumer-commission-ncc",
+        "provider_key": "soe_ncc",
+        "provider_homepage_url": "https://www.thencc.gov.za/",
+        "source_record_status": "NEEDS_REVIEW",
+        "external_application_route_status": "NOT_VERIFIED"
+      }
+    },
+    {
+      "source_id": "gcis_public_entity_ncr",
+      "provider_key": "soe_ncr",
+      "name": "National Credit Regulator (NCR)",
+      "authority": "Government Communication and Information System / National Government Directory",
+      "url": "https://www.gov.za/about-government/contact-directory/soe/national-credit-regulator-ncr",
+      "classes": [
+        "PUBLIC_ENTITY",
+        "PUBLIC_ADMINISTRATION",
+        "EMPLOYER_AND_RECRUITMENT",
+        "FINANCE_AND_INSURANCE",
+        "REGULATOR_AND_PROFESSIONAL_COUNCIL"
+      ],
+      "supports": [
+        "GCIS government profile confirms this organisation is listed in the National Government Directory",
+        "Published official website and public contacts shown on the government profile are source evidence; employment, bursary and service opportunities require the organisation's current notice"
+      ],
+      "does_not_prove": [
+        "current vacancy, grant, bursary, internship or programme intake",
+        "candidate eligibility, deadline or exact application channel",
+        "provider partnership, authorised connector, submission receipt or employer/funder outcome"
+      ],
+      "refresh_after_days": 30,
+      "review_required": true,
+      "connector_state": "NOT_CONNECTED",
+      "metadata": {
+        "gcis_profile_url": "https://www.gov.za/about-government/contact-directory/soe/national-credit-regulator-ncr",
+        "provider_key": "soe_ncr",
+        "provider_homepage_url": "https://www.ncr.org.za/",
+        "source_record_status": "NEEDS_REVIEW",
+        "external_application_route_status": "NOT_VERIFIED"
+      }
+    },
+    {
+      "source_id": "gcis_public_entity_nda",
+      "provider_key": "soe_nda",
+      "name": "National Development Agency (NDA)",
+      "authority": "Government Communication and Information System / National Government Directory",
+      "url": "https://www.gov.za/about-government/contact-directory/soe/national-development-agency-nda",
+      "classes": [
+        "PUBLIC_ENTITY",
+        "PUBLIC_ADMINISTRATION",
+        "EMPLOYER_AND_RECRUITMENT",
+        "FUNDING_AND_SOCIAL_SUPPORT",
+        "NGO_NPO_AND_FOUNDATION"
+      ],
+      "supports": [
+        "GCIS government profile confirms this organisation is listed in the National Government Directory",
+        "Published official website and public contacts shown on the government profile are source evidence; employment, bursary and service opportunities require the organisation's current notice"
+      ],
+      "does_not_prove": [
+        "current vacancy, grant, bursary, internship or programme intake",
+        "candidate eligibility, deadline or exact application channel",
+        "provider partnership, authorised connector, submission receipt or employer/funder outcome"
+      ],
+      "refresh_after_days": 30,
+      "review_required": true,
+      "connector_state": "NOT_CONNECTED",
+      "metadata": {
+        "gcis_profile_url": "https://www.gov.za/about-government/contact-directory/soe/national-development-agency-nda",
+        "provider_key": "soe_nda",
+        "provider_homepage_url": "https://www.nda.org.za/",
+        "source_record_status": "NEEDS_REVIEW",
+        "external_application_route_status": "NOT_VERIFIED"
+      }
+    },
+    {
+      "source_id": "gcis_public_entity_nedlac",
+      "provider_key": "soe_nedlac",
+      "name": "National Economic Development and Labour Council (NEDLAC)",
+      "authority": "Government Communication and Information System / National Government Directory",
+      "url": "https://www.gov.za/about-government/contact-directory/soe/national-economic-development-and-labour-council-nedlac",
+      "classes": [
+        "PUBLIC_ENTITY",
+        "PUBLIC_ADMINISTRATION",
+        "EMPLOYER_AND_RECRUITMENT"
+      ],
+      "supports": [
+        "GCIS government profile confirms this organisation is listed in the National Government Directory",
+        "Published official website and public contacts shown on the government profile are source evidence; employment, bursary and service opportunities require the organisation's current notice"
+      ],
+      "does_not_prove": [
+        "current vacancy, grant, bursary, internship or programme intake",
+        "candidate eligibility, deadline or exact application channel",
+        "provider partnership, authorised connector, submission receipt or employer/funder outcome"
+      ],
+      "refresh_after_days": 30,
+      "review_required": true,
+      "connector_state": "NOT_CONNECTED",
+      "metadata": {
+        "gcis_profile_url": "https://www.gov.za/about-government/contact-directory/soe/national-economic-development-and-labour-council-nedlac",
+        "provider_key": "soe_nedlac",
+        "provider_homepage_url": "https://nedlac.org.za/",
+        "source_record_status": "NEEDS_REVIEW",
+        "external_application_route_status": "NOT_VERIFIED"
+      }
+    },
+    {
+      "source_id": "gcis_public_entity_nemisa",
+      "provider_key": "soe_nemisa",
+      "name": "National Electronic Media of South Africa (NEMISA)",
+      "authority": "Government Communication and Information System / National Government Directory",
+      "url": "https://www.gov.za/about-government/contact-directory/soe/national-electronic-media-south-africa-nemisa",
+      "classes": [
+        "PUBLIC_ENTITY",
+        "PUBLIC_ADMINISTRATION",
+        "EMPLOYER_AND_RECRUITMENT",
+        "EDUCATION_AND_SKILLS",
+        "TECHNOLOGY_AND_DELIVERY_VENDOR"
+      ],
+      "supports": [
+        "GCIS government profile confirms this organisation is listed in the National Government Directory",
+        "Published official website and public contacts shown on the government profile are source evidence; employment, bursary and service opportunities require the organisation's current notice"
+      ],
+      "does_not_prove": [
+        "current vacancy, grant, bursary, internship or programme intake",
+        "candidate eligibility, deadline or exact application channel",
+        "provider partnership, authorised connector, submission receipt or employer/funder outcome"
+      ],
+      "refresh_after_days": 30,
+      "review_required": true,
+      "connector_state": "NOT_CONNECTED",
+      "metadata": {
+        "gcis_profile_url": "https://www.gov.za/about-government/contact-directory/soe/national-electronic-media-south-africa-nemisa",
+        "provider_key": "soe_nemisa",
+        "provider_homepage_url": "https://www.nemisa.co.za/",
+        "source_record_status": "NEEDS_REVIEW",
+        "external_application_route_status": "NOT_VERIFIED"
+      }
+    },
+    {
+      "source_id": "gcis_public_entity_nef",
+      "provider_key": "soe_nef",
+      "name": "National Empowerment Fund (NEF)",
+      "authority": "Government Communication and Information System / National Government Directory",
+      "url": "https://www.gov.za/about-government/contact-directory/soe/national-empowerment-fund",
+      "classes": [
+        "PUBLIC_ENTITY",
+        "PUBLIC_ADMINISTRATION",
+        "EMPLOYER_AND_RECRUITMENT",
+        "FUNDING_AND_SOCIAL_SUPPORT",
+        "FINANCE_AND_INSURANCE"
+      ],
+      "supports": [
+        "GCIS government profile confirms this organisation is listed in the National Government Directory",
+        "Published official website and public contacts shown on the government profile are source evidence; employment, bursary and service opportunities require the organisation's current notice"
+      ],
+      "does_not_prove": [
+        "current vacancy, grant, bursary, internship or programme intake",
+        "candidate eligibility, deadline or exact application channel",
+        "provider partnership, authorised connector, submission receipt or employer/funder outcome"
+      ],
+      "refresh_after_days": 30,
+      "review_required": true,
+      "connector_state": "NOT_CONNECTED",
+      "metadata": {
+        "gcis_profile_url": "https://www.gov.za/about-government/contact-directory/soe/national-empowerment-fund",
+        "provider_key": "soe_nef",
+        "provider_homepage_url": "https://www.nefcorp.co.za/",
+        "source_record_status": "NEEDS_REVIEW",
+        "external_application_route_status": "NOT_VERIFIED"
+      }
+    },
+    {
+      "source_id": "gcis_public_entity_nersa",
+      "provider_key": "soe_nersa",
+      "name": "National Energy Regulator of South Africa (NERSA)",
+      "authority": "Government Communication and Information System / National Government Directory",
+      "url": "https://www.gov.za/about-government/contact-directory/soe/national-energy-regulator-nersa",
+      "classes": [
+        "PUBLIC_ENTITY",
+        "PUBLIC_ADMINISTRATION",
+        "EMPLOYER_AND_RECRUITMENT",
+        "ENERGY_AND_UTILITIES",
+        "REGULATOR_AND_PROFESSIONAL_COUNCIL"
+      ],
+      "supports": [
+        "GCIS government profile confirms this organisation is listed in the National Government Directory",
+        "Published official website and public contacts shown on the government profile are source evidence; employment, bursary and service opportunities require the organisation's current notice"
+      ],
+      "does_not_prove": [
+        "current vacancy, grant, bursary, internship or programme intake",
+        "candidate eligibility, deadline or exact application channel",
+        "provider partnership, authorised connector, submission receipt or employer/funder outcome"
+      ],
+      "refresh_after_days": 30,
+      "review_required": true,
+      "connector_state": "NOT_CONNECTED",
+      "metadata": {
+        "gcis_profile_url": "https://www.gov.za/about-government/contact-directory/soe/national-energy-regulator-nersa",
+        "provider_key": "soe_nersa",
+        "provider_homepage_url": "https://www.nersa.org.za/",
+        "source_record_status": "NEEDS_REVIEW",
+        "external_application_route_status": "NOT_VERIFIED"
+      }
+    },
+    {
+      "source_id": "gcis_public_entity_nfvf",
+      "provider_key": "soe_nfvf",
+      "name": "National Film and Video Foundation (NFVF)",
+      "authority": "Government Communication and Information System / National Government Directory",
+      "url": "https://www.gov.za/about-government/contact-directory/soe/national-film-and-video-foundation",
+      "classes": [
+        "PUBLIC_ENTITY",
+        "PUBLIC_ADMINISTRATION",
+        "EMPLOYER_AND_RECRUITMENT",
+        "FUNDING_AND_SOCIAL_SUPPORT",
+        "NGO_NPO_AND_FOUNDATION"
+      ],
+      "supports": [
+        "GCIS government profile confirms this organisation is listed in the National Government Directory",
+        "Published official website and public contacts shown on the government profile are source evidence; employment, bursary and service opportunities require the organisation's current notice"
+      ],
+      "does_not_prove": [
+        "current vacancy, grant, bursary, internship or programme intake",
+        "candidate eligibility, deadline or exact application channel",
+        "provider partnership, authorised connector, submission receipt or employer/funder outcome"
+      ],
+      "refresh_after_days": 30,
+      "review_required": true,
+      "connector_state": "NOT_CONNECTED",
+      "metadata": {
+        "gcis_profile_url": "https://www.gov.za/about-government/contact-directory/soe/national-film-and-video-foundation",
+        "provider_key": "soe_nfvf",
+        "provider_homepage_url": "https://www.nfvf.co.za/",
+        "source_record_status": "NEEDS_REVIEW",
+        "external_application_route_status": "NOT_VERIFIED"
+      }
+    },
+    {
+      "source_id": "gcis_public_entity_ngb",
+      "provider_key": "soe_ngb",
+      "name": "National Gambling Board of South Africa",
+      "authority": "Government Communication and Information System / National Government Directory",
+      "url": "https://www.gov.za/about-government/contact-directory/soe/national-gambling-board-south-africa",
+      "classes": [
+        "PUBLIC_ENTITY",
+        "PUBLIC_ADMINISTRATION",
+        "EMPLOYER_AND_RECRUITMENT",
+        "REGULATOR_AND_PROFESSIONAL_COUNCIL"
+      ],
+      "supports": [
+        "GCIS government profile confirms this organisation is listed in the National Government Directory",
+        "Published official website and public contacts shown on the government profile are source evidence; employment, bursary and service opportunities require the organisation's current notice"
+      ],
+      "does_not_prove": [
+        "current vacancy, grant, bursary, internship or programme intake",
+        "candidate eligibility, deadline or exact application channel",
+        "provider partnership, authorised connector, submission receipt or employer/funder outcome"
+      ],
+      "refresh_after_days": 30,
+      "review_required": true,
+      "connector_state": "NOT_CONNECTED",
+      "metadata": {
+        "gcis_profile_url": "https://www.gov.za/about-government/contact-directory/soe/national-gambling-board-south-africa",
+        "provider_key": "soe_ngb",
+        "provider_homepage_url": "https://www.ngb.org.za/",
+        "source_record_status": "NEEDS_REVIEW",
+        "external_application_route_status": "NOT_VERIFIED"
+      }
+    },
+    {
+      "source_id": "gcis_public_entity_nhbrc",
+      "provider_key": "soe_nhbrc",
+      "name": "National Home Builders Registration Council (NHBRC)",
+      "authority": "Government Communication and Information System / National Government Directory",
+      "url": "https://www.gov.za/about-government/contact-directory/soe/national-home-builders-registration-council-nhbrc",
+      "classes": [
+        "PUBLIC_ENTITY",
+        "PUBLIC_ADMINISTRATION",
+        "EMPLOYER_AND_RECRUITMENT",
+        "HOUSING_AND_ACCOMMODATION",
+        "REGULATOR_AND_PROFESSIONAL_COUNCIL"
+      ],
+      "supports": [
+        "GCIS government profile confirms this organisation is listed in the National Government Directory",
+        "Published official website and public contacts shown on the government profile are source evidence; employment, bursary and service opportunities require the organisation's current notice"
+      ],
+      "does_not_prove": [
+        "current vacancy, grant, bursary, internship or programme intake",
+        "candidate eligibility, deadline or exact application channel",
+        "provider partnership, authorised connector, submission receipt or employer/funder outcome"
+      ],
+      "refresh_after_days": 30,
+      "review_required": true,
+      "connector_state": "NOT_CONNECTED",
+      "metadata": {
+        "gcis_profile_url": "https://www.gov.za/about-government/contact-directory/soe/national-home-builders-registration-council-nhbrc",
+        "provider_key": "soe_nhbrc",
+        "provider_homepage_url": "https://www.nhbrc.org.za/",
+        "source_record_status": "NEEDS_REVIEW",
+        "external_application_route_status": "NOT_VERIFIED"
+      }
+    },
+    {
+      "source_id": "gcis_public_entity_nhfc",
+      "provider_key": "soe_nhfc",
+      "name": "National Housing Finance Corporation (NHFC)",
+      "authority": "Government Communication and Information System / National Government Directory",
+      "url": "https://www.gov.za/about-government/contact-directory/soe/national-housing-finance-corporation-nhfc",
+      "classes": [
+        "PUBLIC_ENTITY",
+        "PUBLIC_ADMINISTRATION",
+        "EMPLOYER_AND_RECRUITMENT",
+        "HOUSING_AND_ACCOMMODATION",
+        "FINANCE_AND_INSURANCE"
+      ],
+      "supports": [
+        "GCIS government profile confirms this organisation is listed in the National Government Directory",
+        "Published official website and public contacts shown on the government profile are source evidence; employment, bursary and service opportunities require the organisation's current notice"
+      ],
+      "does_not_prove": [
+        "current vacancy, grant, bursary, internship or programme intake",
+        "candidate eligibility, deadline or exact application channel",
+        "provider partnership, authorised connector, submission receipt or employer/funder outcome"
+      ],
+      "refresh_after_days": 30,
+      "review_required": true,
+      "connector_state": "NOT_CONNECTED",
+      "metadata": {
+        "gcis_profile_url": "https://www.gov.za/about-government/contact-directory/soe/national-housing-finance-corporation-nhfc",
+        "provider_key": "soe_nhfc",
+        "provider_homepage_url": "https://www.nhfc.co.za/",
+        "source_record_status": "NEEDS_REVIEW",
+        "external_application_route_status": "NOT_VERIFIED"
+      }
+    },
+    {
+      "source_id": "gcis_public_entity_nlc",
+      "provider_key": "soe_nlc",
+      "name": "National Lotteries Commission (NLC)",
+      "authority": "Government Communication and Information System / National Government Directory",
+      "url": "https://www.gov.za/about-government/contact-directory/soe/national-lotteries-commission",
+      "classes": [
+        "PUBLIC_ENTITY",
+        "PUBLIC_ADMINISTRATION",
+        "EMPLOYER_AND_RECRUITMENT",
+        "FUNDING_AND_SOCIAL_SUPPORT"
+      ],
+      "supports": [
+        "GCIS government profile confirms this organisation is listed in the National Government Directory",
+        "Published official website and public contacts shown on the government profile are source evidence; employment, bursary and service opportunities require the organisation's current notice"
+      ],
+      "does_not_prove": [
+        "current vacancy, grant, bursary, internship or programme intake",
+        "candidate eligibility, deadline or exact application channel",
+        "provider partnership, authorised connector, submission receipt or employer/funder outcome"
+      ],
+      "refresh_after_days": 30,
+      "review_required": true,
+      "connector_state": "NOT_CONNECTED",
+      "metadata": {
+        "gcis_profile_url": "https://www.gov.za/about-government/contact-directory/soe/national-lotteries-commission",
+        "provider_key": "soe_nlc",
+        "provider_homepage_url": "https://www.nlcsa.org.za/",
+        "source_record_status": "NEEDS_REVIEW",
+        "external_application_route_status": "NOT_VERIFIED"
+      }
+    },
+    {
+      "source_id": "gcis_public_entity_nnr",
+      "provider_key": "soe_nnr",
+      "name": "National Nuclear Regulator (NNR)",
+      "authority": "Government Communication and Information System / National Government Directory",
+      "url": "https://www.gov.za/about-government/contact-directory/soe/national-nuclear-regulator-nnr",
+      "classes": [
+        "PUBLIC_ENTITY",
+        "PUBLIC_ADMINISTRATION",
+        "EMPLOYER_AND_RECRUITMENT",
+        "ENERGY_AND_UTILITIES",
+        "REGULATOR_AND_PROFESSIONAL_COUNCIL"
+      ],
+      "supports": [
+        "GCIS government profile confirms this organisation is listed in the National Government Directory",
+        "Published official website and public contacts shown on the government profile are source evidence; employment, bursary and service opportunities require the organisation's current notice"
+      ],
+      "does_not_prove": [
+        "current vacancy, grant, bursary, internship or programme intake",
+        "candidate eligibility, deadline or exact application channel",
+        "provider partnership, authorised connector, submission receipt or employer/funder outcome"
+      ],
+      "refresh_after_days": 30,
+      "review_required": true,
+      "connector_state": "NOT_CONNECTED",
+      "metadata": {
+        "gcis_profile_url": "https://www.gov.za/about-government/contact-directory/soe/national-nuclear-regulator-nnr",
+        "provider_key": "soe_nnr",
+        "provider_homepage_url": "https://www.nnr.co.za/",
+        "source_record_status": "NEEDS_REVIEW",
+        "external_application_route_status": "NOT_VERIFIED"
+      }
+    },
+    {
+      "source_id": "gcis_public_entity_nsfas",
+      "provider_key": "nsfas_official",
+      "name": "National Student Financial Aid Scheme (NSFAS)",
+      "authority": "Government Communication and Information System / National Government Directory",
+      "url": "https://www.gov.za/about-government/contact-directory/soe/national-student-financial-aid-scheme-nsfas",
+      "classes": [
+        "PUBLIC_ENTITY",
+        "PUBLIC_ADMINISTRATION",
+        "EMPLOYER_AND_RECRUITMENT",
+        "FUNDING_AND_SOCIAL_SUPPORT",
+        "EDUCATION_AND_SKILLS"
+      ],
+      "supports": [
+        "GCIS government profile confirms this organisation is listed in the National Government Directory",
+        "Published official website and public contacts shown on the government profile are source evidence; employment, bursary and service opportunities require the organisation's current notice"
+      ],
+      "does_not_prove": [
+        "current vacancy, grant, bursary, internship or programme intake",
+        "candidate eligibility, deadline or exact application channel",
+        "provider partnership, authorised connector, submission receipt or employer/funder outcome"
+      ],
+      "refresh_after_days": 30,
+      "review_required": true,
+      "connector_state": "NOT_CONNECTED",
+      "metadata": {
+        "gcis_profile_url": "https://www.gov.za/about-government/contact-directory/soe/national-student-financial-aid-scheme-nsfas",
+        "provider_key": "nsfas_official",
+        "provider_homepage_url": "https://www.nsfas.org.za/",
+        "source_record_status": "NEEDS_REVIEW",
+        "external_application_route_status": "NOT_VERIFIED"
+      }
+    },
+    {
+      "source_id": "gcis_public_entity_sanas",
+      "provider_key": "soe_sanas",
+      "name": "South African National Accreditation System (SANAS)",
+      "authority": "Government Communication and Information System / National Government Directory",
+      "url": "https://www.gov.za/about-government/contact-directory/soe/south-african-national-accreditation-system",
+      "classes": [
+        "PUBLIC_ENTITY",
+        "PUBLIC_ADMINISTRATION",
+        "EMPLOYER_AND_RECRUITMENT",
+        "REGULATOR_AND_PROFESSIONAL_COUNCIL",
+        "EDUCATION_AND_SKILLS"
+      ],
+      "supports": [
+        "GCIS government profile confirms this organisation is listed in the National Government Directory",
+        "Published official website and public contacts shown on the government profile are source evidence; employment, bursary and service opportunities require the organisation's current notice"
+      ],
+      "does_not_prove": [
+        "current vacancy, grant, bursary, internship or programme intake",
+        "candidate eligibility, deadline or exact application channel",
+        "provider partnership, authorised connector, submission receipt or employer/funder outcome"
+      ],
+      "refresh_after_days": 30,
+      "review_required": true,
+      "connector_state": "NOT_CONNECTED",
+      "metadata": {
+        "gcis_profile_url": "https://www.gov.za/about-government/contact-directory/soe/south-african-national-accreditation-system",
+        "provider_key": "soe_sanas",
+        "provider_homepage_url": "https://www.sanas.co.za/",
+        "source_record_status": "NEEDS_REVIEW",
+        "external_application_route_status": "NOT_VERIFIED"
+      }
+    },
+    {
+      "source_id": "gcis_public_entity_saqa",
+      "provider_key": "soe_saqa",
+      "name": "South African Qualifications Authority (SAQA)",
+      "authority": "Government Communication and Information System / National Government Directory",
+      "url": "https://www.gov.za/about-government/contact-directory/soe/south-african-qualifications-authority-saqa",
+      "classes": [
+        "PUBLIC_ENTITY",
+        "PUBLIC_ADMINISTRATION",
+        "EMPLOYER_AND_RECRUITMENT",
+        "EDUCATION_AND_SKILLS",
+        "REGULATOR_AND_PROFESSIONAL_COUNCIL"
+      ],
+      "supports": [
+        "GCIS government profile confirms this organisation is listed in the National Government Directory",
+        "Published official website and public contacts shown on the government profile are source evidence; employment, bursary and service opportunities require the organisation's current notice"
+      ],
+      "does_not_prove": [
+        "current vacancy, grant, bursary, internship or programme intake",
+        "candidate eligibility, deadline or exact application channel",
+        "provider partnership, authorised connector, submission receipt or employer/funder outcome"
+      ],
+      "refresh_after_days": 30,
+      "review_required": true,
+      "connector_state": "NOT_CONNECTED",
+      "metadata": {
+        "gcis_profile_url": "https://www.gov.za/about-government/contact-directory/soe/south-african-qualifications-authority-saqa",
+        "provider_key": "soe_saqa",
+        "provider_homepage_url": "https://www.saqa.org.za/",
+        "source_record_status": "NEEDS_REVIEW",
         "external_application_route_status": "NOT_VERIFIED"
       }
     }
