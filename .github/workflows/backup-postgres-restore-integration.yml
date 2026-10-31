@@ -49,7 +49,7 @@ jobs:
           node-version: "22"
           cache: "npm"
 
-      - name: Install PostgreSQL 17 client tools
+      - name: Install postgres-client-17 tools
         run: |
           set -euo pipefail
           sudo install -d /usr/share/keyrings
