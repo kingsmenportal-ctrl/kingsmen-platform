@@ -31,6 +31,34 @@ function asDate(value) {
   return Number.isNaN(parsed.getTime()) ? null : parsed;
 }
 
+function deadlineState(value, now) {
+  if (value == null) return { valid: true, current: true, sameDayWithoutTime: false };
+  const cutoff = now instanceof Date ? now : new Date(now);
+  if (Number.isNaN(cutoff.getTime())) return { valid: false, current: false, sameDayWithoutTime: false };
+  if (typeof value === "string" && /^\\d{4}-\\d{2}-\\d{2}$/.test(value)) {
+    const day = new Date(`${value}T00:00:00.000Z`);
+    if (Number.isNaN(day.getTime()) || day.toISOString().slice(0, 10) !== value) {
+      return { valid: false, current: false, sameDayWithoutTime: false };
+    }
+    const parts = new Intl.DateTimeFormat("en-CA", {
+      timeZone: "Africa/Johannesburg",
+      year: "numeric",
+      month: "2-digit",
+      day: "2-digit"
+    }).formatToParts(cutoff);
+    const part = (type) => parts.find((item) => item.type === type)?.value ?? "";
+    const localToday = `${part("year")}-${part("month")}-${part("day")}`;
+    return {
+      valid: true,
+      current: value > localToday,
+      sameDayWithoutTime: value === localToday
+    };
+  }
+  const parsed = asDate(value);
+  if (!parsed) return { valid: false, current: false, sameDayWithoutTime: false };
+  return { valid: true, current: parsed.getTime() > cutoff.getTime(), sameDayWithoutTime: false };
+}
+
 function freshTimestamp(value, windowDays, now) {
   const parsed = asDate(value);
   const cutoff = now instanceof Date ? now : new Date(now);
@@ -155,15 +183,20 @@ export function evaluateOpportunityReadiness(opportunity = {}, options = {}) {
     secureOfficialUrl(source.url, source.official_domain) &&
     freshTimestamp(source.observed_at, source.freshness_window_days, now);
 
-  const deadlineDate = opportunity.deadline == null ? null : asDate(opportunity.deadline);
-  const deadlineValid = opportunity.deadline == null || Boolean(deadlineDate);
-  const notExpired = opportunity.deadline == null || (deadlineDate && deadlineDate.getTime() > new Date(now).getTime());
+  const deadlineCheck = deadlineState(opportunity.deadline, now);
   const openPass =
     sourcePass &&
     opportunity.status === "OPEN" &&
     freshTimestamp(opportunity.last_checked_at, opportunity.freshness_window_days, now) &&
-    deadlineValid &&
-    notExpired;
+    deadlineCheck.valid &&
+    deadlineCheck.current;
+  const deadlineFailure = !deadlineCheck.valid
+    ? "The deadline must be a valid date or timezone-qualified timestamp."
+    : deadlineCheck.sameDayWithoutTime
+      ? "The deadline is today but the official cutoff time is unknown; re-verify before claiming open."
+      : !deadlineCheck.current && opportunity.deadline != null
+        ? "The published deadline has passed."
+        : "The opportunity must be explicitly OPEN and checked within its stated freshness window.";
 
   const requirementsPass =
     openPass &&
@@ -198,7 +231,7 @@ export function evaluateOpportunityReadiness(opportunity = {}, options = {}) {
   const checks = [
     gate("FOUND", true, null),
     gate("SOURCE_VERIFIED", sourcePass, "A current source observation for this specific opportunity is required."),
-    gate("CURRENT_OPEN", openPass, "The opportunity must be explicitly OPEN, checked within its stated freshness window and not past its deadline."),
+    gate("CURRENT_OPEN", openPass, deadlineFailure),
     gate("REQUIREMENTS_MAPPED", requirementsPass, "Verified eligibility and required-document mappings with fresh review evidence are required."),
     gate("CANDIDATE_READY", candidatePass, "Verified route, candidate eligibility review, passing preflight, required documents and consent are required."),
     gate("SUBMISSION_EVIDENCED", receiptPass, "Candidate-reported submission is insufficient; an authoritative provider receipt record is required."),
