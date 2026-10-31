@@ -58,5 +58,15 @@ for(const [register,counts] of Object.entries(m.counts?.status_counts_by_registe
 }
 if(!m.counts?.section_counts||Object.keys(m.counts.section_counts).some(s=>s==="UNSECTIONED"))failures.push("status-section extraction is incomplete");
 if(m.counts?.name_review_required!==(m.records??[]).length)failures.push("every name candidate must remain explicitly review-required until manually reconciled");
+const provinceCount=(m.records??[]).filter(r=>(r.province_candidates??[]).length>0).length;
+const campusCount=(m.records??[]).filter(r=>(r.campus_site_candidates??[]).length>0).length;
+const idCount=(m.records??[]).filter(r=>(r.registration_identifiers_observed??[]).length===1).length;
+const nameDuplicateCount=(m.records??[]).filter(r=>(r.conflict_flags??[]).includes("DUPLICATE_NORMALIZED_NAME_REVIEW")).length;
+for(const [field,actual] of [["records_with_province_candidates",provinceCount],["records_with_campus_candidates",campusCount],["records_with_registration_identifier",idCount],["duplicate_normalized_name_records",nameDuplicateCount]])if(m.counts?.[field]!==actual)failures.push(field+" does not reconcile to extracted records");
+if(provinceCount===0)failures.push("no province candidates were extracted from either complete register");
+if(campusCount===0)failures.push("no campus/site candidates were extracted from either complete register");
+const names=new Map();
+for(const r of m.records??[]){if(!r.normalized_name_key)continue;const k=r.source_register+"|"+r.source_snapshot_date+"|"+r.normalized_name_key;const g=names.get(k)||[];g.push(r);names.set(k,g);}
+for(const [key,group] of names){if(group.length<2)continue;for(const r of group)if(r.identity_conflict_status!=="DUPLICATE_SOURCE_ENTRY_REVIEW"||r.possible_duplicate_within_source!==true||!(r.conflict_flags??[]).includes("DUPLICATE_NORMALIZED_NAME_REVIEW"))failures.push("duplicate normalized institution identity not flagged for review: "+key);}
 if(failures.length){console.error("DHET manifest validation failed:\n"+failures.slice(0,100).join("\n"));process.exit(1);}
 console.log("PASS DHET full-register candidate validation",JSON.stringify({total:m.records.length,perKind,counts:m.counts,registrationIdentifierConflictGroups:conflictGroups,duplicateGroups,routeSafety:"all candidates remain disconnected"}));
