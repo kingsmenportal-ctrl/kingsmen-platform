@@ -10,7 +10,7 @@
   "scripts": {
     "candidate:experience:check": "node scripts/validators/validate-candidate-experience-vertical-slice.mjs && node scripts/validators/validate-candidate-reviewer-portal.mjs",
     "candidate:profile:e2e": "node scripts/staging/test-candidate-profile-persistence-e2e.mjs",
-    "test": "node scripts/validators/validate-jarvis-core.mjs && node scripts/validators/validate-jarvis-live-pass-02.mjs && node scripts/staging/test-kingsmen-operating-evidence-reconciliation.mjs && npm run n14:connectors:check && npm run n15:sources:check && npm run n15:ingestion:check && npm run backend:simplification:check && npm run security:validate:client-non-dml && npm run capacity:validate && npm run security:validate:cao-0096-provenance && npm run institutions:network:check && npm run institutions:routes:check && npm run institutions:seed:check && npm run institutions:migration:check",
+    "test": "node scripts/validators/validate-jarvis-core.mjs && node scripts/validators/validate-jarvis-live-pass-02.mjs && node scripts/staging/test-kingsmen-operating-evidence-reconciliation.mjs && npm run n14:connectors:check && npm run n15:sources:check && npm run n15:ingestion:check && npm run backend:simplification:check && npm run security:validate:client-non-dml && npm run capacity:validate && npm run security:validate:cao-0096-provenance && npm run institutions:network:check && npm run institutions:routes:check && npm run institutions:seed:check && npm run institutions:migration:check && npm run institutions:occupational:check",
     "jarvis:validate": "node scripts/validators/validate-jarvis-connected-live.mjs",
     "jarvis:validate:core": "node scripts/validators/validate-jarvis-core.mjs",
     "jarvis:validate:live-pass-02": "node scripts/validators/validate-jarvis-live-pass-02.mjs",
@@ -115,7 +115,8 @@
     "institutions:network:check": "node scripts/validators/validate-national-institution-network-source-register.mjs",
     "institutions:routes:check": "node scripts/validators/validate-institution-application-route-capabilities.mjs",
     "institutions:seed:check": "node scripts/validators/validate-public-institution-directory-seed.mjs",
-    "institutions:migration:check": "node scripts/validators/validate-public-institution-directory-migration.mjs"
+    "institutions:migration:check": "node scripts/validators/validate-public-institution-directory-migration.mjs",
+    "institutions:occupational:check": "node scripts/validators/validate-dhet-tvet-occupational-programmes-seed.mjs"
   },
   "repository": {
     "type": "git",
