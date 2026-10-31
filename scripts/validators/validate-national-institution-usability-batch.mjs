@@ -1,0 +1,42 @@
+import fs from "node:fs";
+import path from "node:path";
+
+const root = process.cwd();
+const read = relative => fs.readFileSync(path.join(root, relative), "utf8");
+const seed = JSON.parse(read("manifests/institutions/seed/public-universities-and-tvet-2026-10-31.json"));
+const extension = JSON.parse(read("manifests/institutions/cross-sector-institution-source-extension.json"));
+const page = read("apps/web/src/app/candidate/institutions/page.tsx");
+const preparation = read("supabase/functions/candidate-application-preparation/index.ts");
+const migration = read("db/migrations/0107_seed_public_university_tvet_cet_provincial_directory.sql");
+const failures = [];
+const check = (name, condition) => {
+  const pass = Boolean(condition);
+  console.log((pass ? "PASS " : "FAIL ") + name);
+  if (!pass) failures.push(name);
+};
+const records = seed.records ?? [];
+const universities = records.filter(row => row.provider_type === "PUBLIC_UNIVERSITY");
+const tvet = records.filter(row => row.provider_type === "TVET_COLLEGE");
+const cet = records.filter(row => row.provider_type === "CET_COLLEGE");
+const provincial = extension.sources.filter(row => row.provider_key?.startsWith("prov_education_"));
+const sourceById = new Map(extension.sources.map(row => [row.source_id, row]));
+
+check("national public institution seed covers 26 universities, 50 TVET and 9 CET colleges", universities.length === 26 && tvet.length === 50 && cet.length === 9 && records.length === 85);
+check("university and TVET refs remain unique and province-filterable", new Set(records.map(row => row.institution_ref)).size === 85 && universities.every(row => Boolean(row.province)) && tvet.every(row => Boolean(row.province)));
+check("one CET college is represented per province without inventing individual CLCs", new Set(cet.map(row => row.province)).size === 9 && cet.every(row => row.provider_website_url == null && row.official_website_url == null && row.integration_status === "NOT_CONNECTED"));
+check("nine provincial education departments are individually represented", provincial.length === 9 && new Set(provincial.map(row => row.provider_key)).size === 9 && new Set(provincial.map(row => row.metadata?.province)).size === 9);
+check("existing 21 SETA records and 123 GCIS individual profiles remain intact", extension.sources.filter(row => row.provider_key?.startsWith("seta_")).length >= 21 && extension.sources.filter(row => row.metadata?.gcis_profile_url || row.metadata?.official_gcis_profile_url).length === 123);
+check("CET and provincial source anchors remain discovery-only", sourceById.has("dhet_community_colleges") && provincial.every(row => row.connector_state === "NOT_CONNECTED" && row.review_required === true));
+check("candidate directory renders CET as a separate category and uses its workbench key", page.includes("isCET") && page.includes("dhet_cet_") && page.includes("COMMUNITY_EDUCATION_AND_TRAINING"));
+check("directory copy no longer marks included CET province records as missing", !page.includes("private colleges, CET colleges") && page.includes("province-level CET college records"));
+check("candidate directory links current official DHET private registers and PSET masterlist", page.includes("Annexure%20A%20Register%20%20Private%20Higher%20Education%20Institutions%2006%20July%202026.pdf") && page.includes("Register%20of%20Private%20Colleges%20%2015%20July%202026.pdf") && page.includes("SitePages/MasterLists.aspx"));
+check("provincial authority filters, public-service/basic-education capabilities and employment pathway are wired", page.includes("source.metadata?.province") && /isProvincialEducationDepartment\s*\?\s*\["PUBLIC_SERVICE", "BASIC_EDUCATION", "EMPLOYMENT"\]/.test(page) && /isPublicEntityEmployer \|\| isPrivateEmployer \|\| isDpsaVacancySource \|\| isProvincialEducationDepartment\s*\?\s*\["EMPLOYMENT"\]/.test(page));
+check("candidate workbench can plan for CET providers using the TVET pathway", preparation.includes('CET_COLLEGE:["TVET"]') && preparation.includes('action==="plan_directory_target"'));
+check("import migration is transactional and extends the allowed provider enum", /^--[\s\S]*?BEGIN;/.test(migration) && /COMMIT;\s*$/.test(migration) && /CET_COLLEGE/.test(migration));
+check("migration rejects provider identity and province conflicts before upsert", migration.includes("PUBLIC_INSTITUTION_DIRECTORY_PROVIDER_CONFLICT"));
+check("migration preserves provenance idempotently on canonical-key conflicts", /ON CONFLICT \(provider_key\) DO UPDATE/.test(migration) && /provider_source_evidence/.test(migration) && /institution_classes/.test(migration));
+check("all 94 intended provider keys are in the import", migration.includes("expected_count integer := 94") && records.every(row => migration.includes(row.provider_type === "PUBLIC_UNIVERSITY" ? "dhet_university_" + row.institution_ref.replace(/^university-/,"") : row.provider_type === "CET_COLLEGE" ? "dhet_cet_" + row.institution_ref.replace(/^cet-/,"") : "dhet_tvet_" + row.institution_ref.replace(/^tvet-/,""))) && provincial.every(row => migration.includes(row.provider_key)));
+check("new providers are private review records and do not create opportunities or submissions", /'D','NEEDS_REVIEW',false,false/.test(migration) && /NOT_CONNECTED/.test(migration) && !/INSERT INTO public\.route_programmes/i.test(migration));
+check("postflight checks cover canonical identity, uniqueness and source evidence", migration.includes("PUBLIC_INSTITUTION_DIRECTORY_POSTFLIGHT_IDENTITY_MISMATCH") && migration.includes("PUBLIC_INSTITUTION_DIRECTORY_SOURCE_EVIDENCE_MISSING"));
+console.log("National institution usability batch: " + (failures.length ? "FAILED" : "PASS") + " (" + failures.length + " failures)");
+if (failures.length) process.exit(1);

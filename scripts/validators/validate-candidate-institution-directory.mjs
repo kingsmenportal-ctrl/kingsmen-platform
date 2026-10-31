@@ -19,14 +19,16 @@ const check = (name, condition) => {
 const records = seed.records ?? [];
 const universities = records.filter(row => row.provider_type === "PUBLIC_UNIVERSITY");
 const tvet = records.filter(row => row.provider_type === "TVET_COLLEGE");
+const cet = records.filter(row => row.provider_type === "CET_COLLEGE");
 
-check("directory seed has 26 public universities and 50 TVET colleges", universities.length === 26 && tvet.length === 50 && records.length === 76);
+check("directory seed has 26 public universities, 50 TVET colleges and 9 CET colleges", universities.length === 26 && tvet.length === 50 && cet.length === 9 && records.length === 85);
+check("university and CET province metadata is complete", universities.every(row => Boolean(row.province)) && cet.length === 9 && new Set(cet.map(row => row.province)).size === 9);
 check("record references are unique and stable", new Set(records.map(row => row.institution_ref)).size === records.length);
-check("every row is directory evidence only", records.every(row => row.identity_verification_status === "DIRECTORY_EVIDENCE_ONLY" && row.directory_record_status === "LISTED_BY_DHET_OFFICIAL_DIRECTORY"));
+check("every row is directory evidence only", records.every(row => row.identity_verification_status === "DIRECTORY_EVIDENCE_ONLY" && ["LISTED_BY_DHET_OFFICIAL_DIRECTORY","LISTED_BY_DHET_OFFICIAL_SECTOR_PAGE"].includes(row.directory_record_status)));
 check("no institution row invents intake, deadline, eligibility or route", records.every(row => row.intake_status === "UNKNOWN" && row.deadline_status === "UNKNOWN" && row.eligibility_status === "UNKNOWN" && row.application_route_status === "NOT_VERIFIED"));
 check("no row implies partnership or live integration", records.every(row => row.partnership_status === "NOT_A_PARTNER" && row.integration_status === "NOT_CONNECTED" && row.automation_authorized === false && row.provider_receipt_supported === false));
 check("all directory source links are HTTPS DHET URLs", records.every(row => typeof row.directory_source_url === "string" && row.directory_source_url.startsWith("https://www.dhet.gov.za/")));
-check("unresolved institution websites remain unset", records.filter(row => !row.official_website_url).every(row => row.official_website_status === "MISSING_OR_CONFLICTING_URL_REQUIRES_REVIEW"));
+check("unresolved institution websites remain unset", records.filter(row => !row.official_website_url).every(row => row.provider_type === "CET_COLLEGE" ? row.official_website_status === "NO_INDIVIDUAL_COLLEGE_DOMAIN_PUBLISHED_IN_SOURCE" : row.official_website_status === "MISSING_OR_CONFLICTING_URL_REQUIRES_REVIEW"));
 check("directory page imports canonical seed rather than duplicated data", page.includes("manifests/institutions/seed/public-universities-and-tvet-2026-10-31.json"));
 check("search supports institution name", /type="search"/.test(page) && /setQuery/.test(page) && /canonical_name/.test(page));
 check("cross-sector filters support sector and institution location", /setSector/.test(page) && /setLocation/.test(page) && /item.sectorKeys.includes\(sector\)/.test(page) && /item.province === location/.test(page));
@@ -34,7 +36,9 @@ check("page separates directory discovery from open-intake verification", /Disco
 check("external website links open safely", /target="_blank"/.test(page) && /rel="noopener noreferrer"/.test(page));
 check("unresolved institution website URLs remain unset and are never guessed", /Institution website URL unresolved/i.test(page) && /will not guess the URL/i.test(page) && /providerWebsiteStatus/.test(page));
 check("opportunity and application workbench links are present", /candidate\/opportunity-matches/.test(page) && /candidate\/applications/.test(page));
-check("remaining private and CET registers remain explicitly outstanding", /Private higher education/i.test(page) && /private colleges/i.test(page) && /CET colleges/i.test(page));
+check("private registers are linked and individual provider imports remain outstanding", /Individual private higher-education/i.test(page) && /registered private colleges/i.test(page) && page.includes("Annexure%20A%20Register%20%20Private%20Higher%20Education%20Institutions%2006%20July%202026.pdf") && page.includes("Register%20of%20Private%20Colleges%20%2015%20July%202026.pdf"));
+check("CET and provincial education records link to Kingsmen workbench", /dhet_cet_/.test(page) && /PROVINCIAL_AUTHORITY_PROVIDER/.test(page) && /COMMUNITY_EDUCATION_AND_TRAINING/.test(page));
+check("provincial authorities receive public-service and basic-education capabilities rather than employment-only", /: isProvincialEducationDepartment\s*\? \[\"PUBLIC_SERVICE\", \"BASIC_EDUCATION\", \"EMPLOYMENT\"\]/.test(page) && (page.match(/isProvincialEducationDepartment/g)||[]).length === 4);
 check("candidate landing page links to institution directory", /href: "\/candidate\/institutions"/.test(landing));
 check("candidate dashboard links to institution directory", /href: "\/candidate\/institutions"/.test(dashboard));
 
