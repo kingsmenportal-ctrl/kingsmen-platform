@@ -42,9 +42,13 @@ const privateRegisterSources = ["dhet_private_colleges_register_2026","dhet_priv
 const providerKeys = sources.map(row => row.provider_key).filter(Boolean);
 check("cross-sector anchor inventory includes all 21 SETAs as individual discovery/provider records", setaSources.length === 21 && new Set(setaSources.map(row => row.provider_key)).size === 21);
 check("official private-college, private-HEI, CET, PSET and NSFAS institution directories are present", privateRegisterSources);
+const publicEmployerKeys = ["soe_acsa","soe_denel","soe_prasa","soe_saa","soe_sabc","soe_sanral","soe_sapo","soe_telkom","soe_transnet"];
+check("GCIS official list of 123 SOEs/public institutions is linked", sources.some(row => row.source_id === "gcis_public_entities_and_soe_directory" && row.url === "https://www.gov.za/about-government/contact-directory/soe-s"));
+check("nine nationally listed public employers have individual official website/profile anchors", publicEmployerKeys.every(key => sources.some(row => row.provider_key === key && row.url?.startsWith("https://"))));
+check("candidate directory maps and exposes public-employer planning records", page.includes("EMPLOYER_PROVIDER") && page.includes("EMPLOYMENT") && page.includes("Prepare with Kingsmen"));
 check("named SETA and funder provider records link to canonical provider keys for planning", providerKeys.includes("funder_nsf") && providerKeys.includes("funder_funza_lushaka") && page.includes("source.provider_key ?? null"));
-check("cross-sector anchor inventory retains 50 or more records and 15 classes",
-  sources.length >= 50 && extension.institution_classes.length === 15);
+check("cross-sector anchor inventory retains 60 or more records and 15 classes",
+  sources.length >= 60 && extension.institution_classes.length === 15);
 check("every source anchor remains review-required and disconnected",
   sources.every(row => row.review_required === true && row.connector_state === "NOT_CONNECTED" &&
     Array.isArray(row.supports) && Array.isArray(row.does_not_prove)));
