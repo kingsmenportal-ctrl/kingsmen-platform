@@ -51,12 +51,13 @@ check("public-entity provider profiles are mapped to Employment planning", page.
 check("nine nationally listed public employers have individual official website/profile anchors", publicEmployerKeys.every(key => sources.some(row => row.provider_key === key && row.url?.startsWith("https://"))));
 check("candidate directory maps and exposes public-employer planning records", page.includes("EMPLOYER_PROVIDER") && page.includes("EMPLOYMENT") && page.includes("Prepare with Kingsmen"));
 const employmentProviderKeys = ["dpsa_public_service_vacancies","private_employer_pepkor","private_employer_sasol","private_employer_woolworths","private_employer_mr_price","private_employer_vodafone","private_employer_pepsico_sa","private_employer_nedbank","private_employer_clicks_group","private_employer_tfg","private_employer_standard_bank"];
-check("DPSA and ten official private employer portals map to one employment workbench", employmentProviderKeys.every(key => page.includes(key)) && page.includes("isPrivateEmployer") && page.includes("isDpsaVacancySource"));
+const edgeSource = fs.readFileSync(path.join(root, "supabase/functions/candidate-application-preparation/index.ts"), "utf8");
+check("DPSA and ten official private employer portals map to one employment workbench", employmentProviderKeys.every(key => sources.some(source => source.provider_key === key)) && page.includes("isPrivateEmployer") && page.includes("isDpsaVacancySource") && employmentProviderKeys.every(key => edgeSource.includes(key + ":[\\"EMPLOYMENT\\"]")));
 check("candidate directory maps municipal, school, health, PSET and bursary discovery sources", ["gcis_provincial_local_municipal_directory","dhet_pset_landscape_2026_27","lurits_registered_school_masterlist","national_health_facility_master_list","govza_bursary_funding_guide"].every(id => page.includes(id)));
 check("candidate directory links NSFAS accommodation portal to accommodation discovery and planning", page.includes("nsfas_accommodation_directory") && page.includes("ACCOMMODATION_PROVIDER") && page.includes("nsfas_accommodation_portal"));
 check("named SETA and funder provider records link to canonical provider keys for planning", providerKeys.includes("funder_nsf") && providerKeys.includes("funder_funza_lushaka") && page.includes("source.provider_key ?? null"));
-check("cross-sector anchor inventory retains 177 or more records and 15 classes",
-  sources.length >= 177 && extension.institution_classes.length === 15);
+check("cross-sector anchor inventory retains 188 or more records and 15 classes",
+  sources.length >= 188 && extension.institution_classes.length === 15);
 check("every source anchor remains review-required and disconnected",
   sources.every(row => row.review_required === true && row.connector_state === "NOT_CONNECTED" &&
     Array.isArray(row.supports) && Array.isArray(row.does_not_prove)));
