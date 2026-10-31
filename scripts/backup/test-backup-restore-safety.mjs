@@ -18,6 +18,7 @@ const checks = [
   ['full database archive declares candidate rows are included', /rawCandidateRowsIncluded = \$true/.test(backup)],
   ['manifest claims script encryption only after archive exists', /archiveEncryptionProvidedByScript = \$true/.test(backup) && /encryptionAuthenticated = \$archiveExists/.test(backup)],
   ['restore decrypts and authenticates encrypted archive before catalog check', /decrypt \$BackupFile/.test(restore) && /encryptedArchiveAuthenticatedBeforeRestore/.test(restore)],
+  ['restore rejects plaintext and unknown extensions before database access', /Unsupported backup format/.test(restore) && /GetExtension\(\$BackupFile\) -ine "\.kmbak"/.test(restore) && restore.indexOf("Unsupported backup format") < restore.indexOf("$sourceIdentityOutput = & psql")],
   ['restore cleanup trap removes decrypted temporary archive', /trap \{/.test(restore) && /Remove-Item -LiteralPath \$decryptedTempFile/.test(restore)],
   ['restore requires source database URL', /SourceDatabaseUrl = \$env:KINGSMEN_DATABASE_URL/.test(restore) && /KINGSMEN_DATABASE_URL is required/.test(restore)],
   ['destructive restore requires explicit confirmation', /ConfirmDestructiveRestore/.test(restore) && /Destructive restore blocked/.test(restore)],
