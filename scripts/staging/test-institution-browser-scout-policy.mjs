@@ -57,7 +57,7 @@ assert.equal(proposeAccessibleLocator({}).strategy, "manual_review");
 console.log(JSON.stringify({
   schema: "kingsmen.institution-browser-scout-policy-tests.v1",
   status: "PASSED",
-  passedChecks: 25,
+  passedChecks: 26,
   failedChecks: 0,
   liveNetworkUsed: false,
   liveDatabaseTouched: false,

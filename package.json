@@ -119,7 +119,7 @@
     "institutions:occupational:check": "node scripts/validators/validate-dhet-tvet-occupational-programmes-seed.mjs",
     "institutions:occupational-migration:check": "node scripts/validators/validate-dhet-occupational-source-observation-migration.mjs",
     "institutions:directory:check": "node scripts/validators/validate-candidate-institution-directory.mjs",
-    "institutions:browser-scout:check": "node scripts/validators/validate-institution-browser-scout.mjs && node scripts/staging/test-institution-browser-scout-policy.mjs",
+    "institutions:browser-scout:check": "node --check scripts/agents/institution-browser-scout-policy.mjs && node --check apps/web/scripts/institution-browser-scout.mjs && node --check scripts/validators/validate-institution-browser-scout.mjs && node --check scripts/staging/test-institution-browser-scout-policy.mjs && node scripts/validators/validate-institution-browser-scout.mjs && node scripts/staging/test-institution-browser-scout-policy.mjs && node apps/web/scripts/institution-browser-scout.mjs --targets manifests/institutions/browser-scout-targets.example.json --out artifacts/institution-browser-scout/ci-no-enabled-targets.json",
     "institutions:browser-scout:probe": "node apps/web/scripts/institution-browser-scout.mjs"
   },
   "repository": {
