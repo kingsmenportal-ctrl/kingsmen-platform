@@ -137,12 +137,12 @@ try {
   log("inactive records do not consume capacity; reactivation is guarded; active-to-active updates remain admissible");
 
   await pool.query("insert into public.candidates(public_ref,email,display_name,is_active) values ('CAP-INVALID','invalid@example.invalid','Capacity Fixture',false)");
-  await pool.query("update public.system_runtime_config set value='{"value":999}'::jsonb where key='KINGSMEN_CAP_ACTIVE_CANDIDATES'");
+  await pool.query("update public.system_runtime_config set value=jsonb_build_object('value', 999) where key='KINGSMEN_CAP_ACTIVE_CANDIDATES'");
   await assert.rejects(
     pool.query("update public.candidates set is_active=true where public_ref='CAP-INVALID'"),
     (error) => error.message.includes("ACTIVE_CANDIDATE_CAP_STAGE_NOT_REGISTERED")
   );
-  await pool.query("update public.system_runtime_config set value='{"value":500}'::jsonb where key='KINGSMEN_CAP_ACTIVE_CANDIDATES'");
+  await pool.query("update public.system_runtime_config set value=jsonb_build_object('value', 500) where key='KINGSMEN_CAP_ACTIVE_CANDIDATES'");
   log("unregistered cap stages fail closed");
 
   await pool.query("truncate public.candidates");
