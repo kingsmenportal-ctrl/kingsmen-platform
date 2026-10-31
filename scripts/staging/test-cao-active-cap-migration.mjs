@@ -136,9 +136,10 @@ try {
   assert.equal(await activeCount(), 500);
   log("inactive records do not consume capacity; reactivation is guarded; active-to-active updates remain admissible");
 
+  await pool.query("insert into public.candidates(public_ref,email,display_name,is_active) values ('CAP-INVALID','invalid@example.invalid','Capacity Fixture',false)");
   await pool.query("update public.system_runtime_config set value='{"value":999}'::jsonb where key='KINGSMEN_CAP_ACTIVE_CANDIDATES'");
   await assert.rejects(
-    pool.query("update public.candidates set is_active=true where public_ref='CAP-501'"),
+    pool.query("update public.candidates set is_active=true where public_ref='CAP-INVALID'"),
     (error) => error.message.includes("ACTIVE_CANDIDATE_CAP_STAGE_NOT_REGISTERED")
   );
   await pool.query("update public.system_runtime_config set value='{"value":500}'::jsonb where key='KINGSMEN_CAP_ACTIVE_CANDIDATES'");
