@@ -47,7 +47,7 @@ function splitEntries(text){
 function cleanHeadingName(value,source){
  let candidate=String(value??"").replace(source.pattern," ");
  for(const province of PROVINCES)candidate=candidate.replace(new RegExp(province,"gi")," ");
- candidate=candidate.replace(/\\b(?:registration|reg)\\s*(?:no\\.?|number)?\\s*[:#-]?\\s*/gi," ");
+ candidate=candidate.replace(/\b(?:registration|reg)\s*(?:no\.?|number)?\s*[:#-]?\s*/gi," ");
  return normalizeName(candidate);
 }
 export function extractRecords(text,kind){
