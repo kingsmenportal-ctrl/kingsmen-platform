@@ -5,7 +5,7 @@ export function defaultMobileNotificationPreference(candidateId: string): Mobile
   return {
     candidateId,
     emailEnabled: true,
-    whatsappUrgentOnly: true,
+    whatsappUrgentOnly: false,
     smsBackupEnabled: false,
     quietHoursStart: "20:00",
     quietHoursEnd: "07:00",
@@ -17,20 +17,8 @@ export function chooseMobileChannel(
   preference: MobileNotificationPreference,
   urgency: "routine" | "urgent" | "backup"
 ): "email" | "whatsapp_urgent" | "sms_backup" | "portal" {
-  if (urgency === "urgent" && preference.whatsappUrgentOnly) {
-    assertChannelAllowed("whatsapp_urgent", "urgent");
-    return "whatsapp_urgent";
-  }
-
-  if (urgency === "backup" && preference.smsBackupEnabled) {
-    assertChannelAllowed("sms_backup", "backup");
-    return "sms_backup";
-  }
-
-  if (preference.emailEnabled) {
-    assertChannelAllowed("email", "routine");
-    return "email";
-  }
-
+  // Persisted legacy flags remain readable, but the retired channels cannot be activated.
+  assertChannelAllowed("email", urgency);
+  if (preference.emailEnabled) return "email";
   return "portal";
 }
