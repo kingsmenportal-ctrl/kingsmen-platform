@@ -10,7 +10,7 @@ const sourceRefs=new Set(),ids=new Map();
 for(const [i,r] of (m.records??[]).entries()){
  if(!Object.hasOwn(perKind,r.source_register))failures.push("unknown source register at "+i);else perKind[r.source_register]++;
  if(!r.canonical_name_candidate||!r.normalized_name_key)failures.push("missing normalized institution name at "+i);
- if(/\b(Bachelor|Higher Certificate|FET Certificate|General Education and Training|National Certificate|Diploma|NQF Level)\b/i.test(r.canonical_name_candidate??""))failures.push("programme/qualification text leaked into institution name at "+i);
+ if(/\b(Bachelor|Higher Certificate|FET Certificate|General Education and Training|National Certificate|Diploma|NQF Level)\b/i.test(r.canonical_name_candidate??""))failures.push("programme/qualification text leaked into institution name at "+i+": "+String(r.canonical_name_candidate??"").slice(0,160));
  if(!r.source_url?.startsWith("https://www.dhet.gov.za/"))failures.push("missing official provenance at "+i);
  if(!r.source_snapshot_date||!r.source_record_ref)failures.push("missing snapshot key at "+i);
  if(!r.source_section||r.source_section==="UNSECTIONED")failures.push("entry has no recognized source status section at "+i);
