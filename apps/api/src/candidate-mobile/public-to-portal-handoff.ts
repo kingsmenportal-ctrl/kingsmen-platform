@@ -5,7 +5,7 @@ export interface CreateClaimInput {
   tokenHash: string;
   now: Date;
   minutesToLive?: number;
-  channel?: "email" | "sms_backup" | "operator";
+  channel?: "email" | "operator";
   candidateId?: string;
   accountId?: string;
 }
