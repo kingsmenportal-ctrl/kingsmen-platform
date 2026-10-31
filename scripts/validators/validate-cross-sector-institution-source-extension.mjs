@@ -21,7 +21,7 @@ if (data.integration_contract?.default_record_state !== "NEEDS_REVIEW") errors.p
 if (data.integration_contract?.default_public_safe !== false) errors.push("Records must default to not public safe");
 if (data.integration_contract?.default_connector_state !== "NOT_CONNECTED") errors.push("Connectors must default to NOT_CONNECTED");
 for (const cls of requiredClasses) if (!data.institution_classes.includes(cls)) errors.push(`Missing institution class: ${cls}`);
-if (!Array.isArray(data.sources) || data.sources.length < 177) errors.push("Expected at least 177 cross-sector source anchors after the GCIS profile reconciliation");
+if (!Array.isArray(data.sources) || data.sources.length < 188) errors.push("Expected at least 177 cross-sector source anchors after the GCIS profile reconciliation");
 const setaProviderKeys = (data.sources ?? []).filter(source => /^seta_[a-z0-9]+_official$/.test(source.source_id)).map(source => source.provider_key);
 if (setaProviderKeys.length !== 21 || new Set(setaProviderKeys).size !== 21 || setaProviderKeys.some(key => !key)) errors.push("Expected 21 distinct individual SETA provider keys");
 const employerKeys = (data.sources ?? []).filter(source => /^gcis_soe_.*_employer$/.test(source.source_id)).map(source => source.provider_key);
@@ -40,7 +40,18 @@ const requiredBulkSources = [
   "national_health_facility_master_list",
   "govza_bursary_funding_guide",
   "bursaries_africa_provider_index_leads",
-  "nsfas_accommodation_directory"
+  "nsfas_accommodation_directory",
+  "dpsa_public_service_vacancies",
+  "private_employer_pepkor_careers",
+  "private_employer_sasol_careers",
+  "private_employer_woolworths_careers",
+  "private_employer_mr_price_careers",
+  "private_employer_vodafone_careers",
+  "private_employer_pepsico_south_africa",
+  "private_employer_nedbank_careers",
+  "private_employer_clicks_group_careers",
+  "private_employer_tfg_careers",
+  "private_employer_standard_bank_careers"
 ];
 for (const id of requiredBulkSources) {
   if (!(data.sources ?? []).some(source => source.source_id === id)) errors.push("Missing authoritative discovery/lead source: " + id);
