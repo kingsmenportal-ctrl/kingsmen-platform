@@ -15,13 +15,15 @@
     "airtableMirrorOnly": true,
     "n8nThinWrapperOnly": true,
     "emailPrimary": true,
-    "whatsappUrgentOnly": true,
-    "smsBackupOnly": true,
+    "whatsappUrgentOnly": false,
+    "smsBackupOnly": false,
     "playwrightScoutOnly": true,
     "manualMapFallbackRequired": true,
     "noHardcodedSecrets": true,
     "missingOptionalProvidersDegradeGracefully": true,
-    "productionReadyMustRemainFalse": true
+    "productionReadyMustRemainFalse": true,
+    "whatsappDisabled": true,
+    "smsDisabled": true
   },
   "globalRules": {
     "secretsInGitAllowed": false,
@@ -200,7 +202,7 @@
       ]
     },
     "whatsapp": {
-      "authority": "urgent_only",
+      "authority": "disabled",
       "requiredForLaunch": false,
       "blockedUses": [
         "bulk_reminders",
@@ -213,21 +215,21 @@
         {
           "key": "whatsapp_disabled",
           "kind": "whatsapp",
-          "mode": "disabled",
-          "enabledByDefault": true,
+          "mode": "disabled_by_current_policy",
+          "enabledByDefault": false,
           "envRequired": [
             "WHATSAPP_PROVIDER",
             "WHATSAPP_URGENT_TEMPLATE_ONLY"
           ],
           "secretEnvNames": [],
           "candidateDataRisk": "low",
-          "failurePolicy": "use_email_primary_and_portal_status",
-          "safeFallback": "Do not send WhatsApp. Use email and portal status unless emergency templates are configured."
+          "failurePolicy": "deny_all_candidate_use",
+          "safeFallback": "Do not send WhatsApp. Use email and secure portal only."
         },
         {
           "key": "whatsapp_business_urgent",
           "kind": "whatsapp",
-          "mode": "disabled_until_approved_urgent_templates",
+          "mode": "disabled_by_current_policy",
           "enabledByDefault": false,
           "envRequired": [
             "WHATSAPP_PROVIDER",
@@ -242,13 +244,14 @@
             "WHATSAPP_TOKEN"
           ],
           "candidateDataRisk": "medium",
-          "failurePolicy": "block_routine_whatsapp_and_alert_founder",
-          "safeFallback": "Use email-primary communication and portal status."
+          "failurePolicy": "deny_all_candidate_use",
+          "safeFallback": "Do not send WhatsApp. Use email and secure portal only."
         }
-      ]
+      ],
+      "enabledByDefault": false
     },
     "sms": {
-      "authority": "backup_only",
+      "authority": "disabled",
       "requiredForLaunch": false,
       "blockedUses": [
         "bulk_messaging",
@@ -260,21 +263,21 @@
         {
           "key": "sms_disabled",
           "kind": "sms",
-          "mode": "disabled",
-          "enabledByDefault": true,
+          "mode": "disabled_by_current_policy",
+          "enabledByDefault": false,
           "envRequired": [
             "SMS_PROVIDER",
             "SMS_BACKUP_ONLY"
           ],
           "secretEnvNames": [],
           "candidateDataRisk": "low",
-          "failurePolicy": "use_email_primary_and_portal_status",
-          "safeFallback": "Do not send SMS unless backup provider is configured and policy allows it."
+          "failurePolicy": "deny_all_candidate_use",
+          "safeFallback": "Do not send SMS. Use email and secure portal only."
         },
         {
           "key": "sms_backup_provider",
           "kind": "sms",
-          "mode": "disabled_until_configured",
+          "mode": "disabled_by_current_policy",
           "enabledByDefault": false,
           "envRequired": [
             "SMS_PROVIDER",
@@ -288,10 +291,11 @@
             "SMS_API_KEY"
           ],
           "candidateDataRisk": "medium",
-          "failurePolicy": "use_email_primary_and_portal_status",
-          "safeFallback": "Use email and portal status."
+          "failurePolicy": "deny_all_candidate_use",
+          "safeFallback": "Do not send SMS. Use email and secure portal only."
         }
-      ]
+      ],
+      "enabledByDefault": false
     },
     "payments": {
       "authority": "hosted_or_manual_proof_only",
