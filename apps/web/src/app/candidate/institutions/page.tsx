@@ -7,7 +7,14 @@ import directorySeed from "../../../../../../manifests/institutions/seed/public-
 import crossSector from "../../../../../../manifests/institutions/cross-sector-institution-source-extension.json";
 
 type Institution = (typeof directorySeed.records)[number];
-type SourceAnchor = (typeof crossSector.sources)[number] & { provider_key?: string };
+type SourceAnchor = (typeof crossSector.sources)[number] & {
+  provider_key?: string;
+  metadata?: {
+    provider_homepage_url?: string | null;
+    gcis_profile_url?: string;
+    official_gcis_profile_url?: string;
+  };
+};
 type VerifiedProviderRoute = {
   provider_key: string; provider_name: string; provider_type: string; province: string | null;
   base_url: string | null; verification_status: string; public_safe: boolean;
@@ -223,12 +230,17 @@ const institutionItems: DirectoryItem[] = directorySeed.records.map((record: Ins
 const sourceItems: DirectoryItem[] = crossSector.sources.map((source: SourceAnchor) => {
   const sourceClasses = source.classes as string[];
   const isSetaProvider = Boolean(source.provider_key?.startsWith("seta_"));
+  const isPublicEntityEmployer = Boolean(source.provider_key?.startsWith("soe_"));
   const sourceCapabilities = isSetaProvider
     ? ["SETA_LEARNERSHIPS", "APPRENTICESHIPS", "FUNDING"]
-    : capabilityBySource[source.source_id] ?? [];
+    : isPublicEntityEmployer
+      ? ["EMPLOYMENT"]
+      : capabilityBySource[source.source_id] ?? [];
   const sourcePathways = isSetaProvider
     ? ["SETA_LEARNERSHIPS", "APPRENTICESHIPS"]
-    : source.source_id === "funza_lushaka_bursary"
+    : isPublicEntityEmployer
+      ? ["EMPLOYMENT"]
+      : source.source_id === "funza_lushaka_bursary"
       ? ["HIGHER_EDUCATION"]
       : source.source_id === "dhet_national_skills_fund"
         ? ["HIGHER_EDUCATION", "TVET", "SETA_LEARNERSHIPS", "APPRENTICESHIPS"]
@@ -249,9 +261,9 @@ const sourceItems: DirectoryItem[] = crossSector.sources.map((source: SourceAnch
     pathways: sourcePathways,
     sourceName: source.authority,
     sourceUrl: source.url,
-    providerWebsiteUrl: null,
-    providerWebsiteStatus: "NOT_LISTED",
-    evidenceText: source.url ? "Sector source anchor for discovery and verification. It is not an imported institution/provider record." : "Provider category placeholder. No authoritative source URL is configured yet; this is not a verified provider record.",
+    providerWebsiteUrl: source.metadata?.provider_homepage_url ?? null,
+    providerWebsiteStatus: source.metadata?.provider_homepage_url ? "OFFICIAL_PROFILE_LISTED" : "NOT_LISTED",
+    evidenceText: source.metadata?.gcis_profile_url ? "Listed on an individual GCIS public-entity profile. This confirms the directory profile, not an open vacancy or Kingsmen application integration." : source.url ? "Sector source anchor for discovery and verification. It is not an imported institution/provider record." : "Provider category placeholder. No authoritative source URL is configured yet; this is not a verified provider record.",
     supports: source.supports,
     doesNotProve: source.does_not_prove,
     verification: {
