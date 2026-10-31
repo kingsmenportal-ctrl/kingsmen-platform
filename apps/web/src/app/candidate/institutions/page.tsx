@@ -13,6 +13,7 @@ type SourceAnchor = (typeof crossSector.sources)[number] & {
     provider_homepage_url?: string | null;
     gcis_profile_url?: string;
     official_gcis_profile_url?: string;
+    province?: string;
   };
 };
 type VerifiedProviderRoute = {
