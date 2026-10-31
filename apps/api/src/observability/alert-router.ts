@@ -14,7 +14,6 @@ export interface SystemAlert {
 
 export function createIncidentAlert(incident: IncidentEvent): SystemAlert {
   const urgent = incident.severity === "SEV1" || incident.severity === "SEV2";
-
   return {
     alertRef: `alert_${Date.now()}_${Math.random().toString(36).slice(2, 10)}`,
     alertType: "INCIDENT",
@@ -22,14 +21,14 @@ export function createIncidentAlert(incident: IncidentEvent): SystemAlert {
     status: "OPEN",
     title: incident.title,
     message: `${incident.reason} Fix path: ${incident.fixPath}`,
-    targetChannel: urgent ? "WHATSAPP_URGENT" : "EMAIL",
-    escalationAllowed: urgent,
+    targetChannel: urgent ? "CONTROL_PLANE" : "EMAIL",
+    escalationAllowed: false,
     evidenceRefs: incident.evidenceRefs
   };
 }
 
 export function assertWhatsAppUrgentOnly(alert: SystemAlert): void {
-  if (alert.targetChannel === "WHATSAPP_URGENT" && !alert.escalationAllowed) {
-    throw new Error("WHATSAPP_URGENT_ONLY_BOUNDARY");
+  if (alert.targetChannel === "WHATSAPP_URGENT") {
+    throw new Error("WHATSAPP_DISABLED_BY_CURRENT_CHANNEL_POLICY");
   }
 }
