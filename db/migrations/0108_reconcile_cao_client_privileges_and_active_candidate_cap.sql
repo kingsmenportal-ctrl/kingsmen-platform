@@ -55,7 +55,7 @@ BEGIN
   WHERE is_active IS TRUE;
 
   IF active_candidates >= 500 THEN
-    RAISE EXCEPTION 'KINGS MEN_ACTIVE_CANDIDATE_CAP_REACHED: limit=500 active=%', active_candidates
+    RAISE EXCEPTION 'KINGSMEN_ACTIVE_CANDIDATE_CAP_REACHED: limit=500 active=%', active_candidates
       USING ERRCODE = 'check_violation';
   END IF;
   RETURN NEW;
