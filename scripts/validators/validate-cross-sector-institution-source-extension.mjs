@@ -21,9 +21,13 @@ if (data.integration_contract?.default_record_state !== "NEEDS_REVIEW") errors.p
 if (data.integration_contract?.default_public_safe !== false) errors.push("Records must default to not public safe");
 if (data.integration_contract?.default_connector_state !== "NOT_CONNECTED") errors.push("Connectors must default to NOT_CONNECTED");
 for (const cls of requiredClasses) if (!data.institution_classes.includes(cls)) errors.push(`Missing institution class: ${cls}`);
-if (!Array.isArray(data.sources) || data.sources.length < 50) errors.push("Expected at least 50 cross-sector source anchors after the SETA and funding extension");
+if (!Array.isArray(data.sources) || data.sources.length < 60) errors.push("Expected at least 60 cross-sector source anchors after the SETA, funder and public-employer extensions");
 const setaProviderKeys = (data.sources ?? []).filter(source => /^seta_[a-z0-9]+_official$/.test(source.source_id)).map(source => source.provider_key);
 if (setaProviderKeys.length !== 21 || new Set(setaProviderKeys).size !== 21 || setaProviderKeys.some(key => !key)) errors.push("Expected 21 distinct individual SETA provider keys");
+const employerKeys = (data.sources ?? []).filter(source => /^gcis_soe_.*_employer$/.test(source.source_id)).map(source => source.provider_key);
+if (employerKeys.length !== 9 || new Set(employerKeys).size !== 9 || employerKeys.some(key => !key)) errors.push("Expected nine unique, individually keyed GCIS public-employer anchors");
+if (!(data.sources ?? []).some(source => source.source_id === "gcis_public_entities_and_soe_directory")) errors.push("Missing GCIS directory anchor for 123 public institutions and SOEs");
+
 const ids = new Set();
 for (const source of data.sources ?? []) {
   if (!source.source_id || ids.has(source.source_id)) errors.push(`Missing or duplicate source_id: ${source.source_id}`);
