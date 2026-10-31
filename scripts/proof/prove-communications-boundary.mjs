@@ -63,7 +63,7 @@ const scenarios = [
   { name: "sms_any_purpose_denied", passed: boundary.includes('request.channel === "sms"') && boundary.includes('reason: "smsDisabled"') },
   { name: "bulk_message_denied", passed: boundary.includes("request.recipientCount > 1") && boundary.includes("bulkMarketingDenied") },
   { name: "marketing_email_without_consent_denied", passed: boundary.includes("marketingRequiresExplicitConsent") },
-  { name: "portal_message_allowed", passed: boundary.includes('channel === "email"') && !boundary.includes("PORTAL_CHANNEL_DISABLED") },
+  { name: "email_channel_remains_queueable", passed: boundary.includes("return { allowed: true, queuedOnly: true") && !boundary.includes("EMAIL_CHANNEL_DISABLED") },
   { name: "provider_send_requires_staging_proof", passed: boundary.includes("providerStagingProofPresent") && boundary.includes("providerSendRequiresStagingProof") },
   { name: "recipient_data_redacted", passed: boundary.includes("[redacted-recipient]") && boundary.includes("rawRecipientDataRedacted") },
   { name: "live_send_never_executed_by_source_proof", passed: boundary.includes("liveSendExecuted: false") && manifest.liveMessagesSent === false }
