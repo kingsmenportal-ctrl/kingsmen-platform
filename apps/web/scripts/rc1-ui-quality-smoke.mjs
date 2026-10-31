@@ -108,10 +108,25 @@ try {
           const unlabeled = interactive.filter(el => !accessibleNameOf(el))
             .map(el => ({ tag: el.tagName.toLowerCase(), type: el.getAttribute("type"), id: el.id, name: el.getAttribute("name") }));
           const imagesWithoutAlt = [...document.images].filter(img => !img.hasAttribute("alt")).map(img => img.src);
+          // Chromium exposes modern CSS colors (including Tailwind's OKLCH tokens)
+          // through getComputedStyle. Rasterize them to sRGB rather than interpreting
+          // OKLCH channel values as RGB numbers.
+          const colorCanvas = document.createElement("canvas");
+          colorCanvas.width = 1;
+          colorCanvas.height = 1;
+          const colorContext = colorCanvas.getContext("2d", { willReadFrequently: true });
+          const colorCache = new Map();
           const parseColor = (value) => {
-            const parts = value.match(/[0-9.]+/g);
-            if (!parts || parts.length < 3) return null;
-            return { r: Number(parts[0]), g: Number(parts[1]), b: Number(parts[2]), a: parts.length > 3 ? Number(parts[3]) : 1 };
+            if (!colorContext || typeof value !== "string" || !CSS.supports("color", value)) return null;
+            if (colorCache.has(value)) return colorCache.get(value);
+            colorContext.clearRect(0, 0, 1, 1);
+            colorContext.fillStyle = "rgba(0, 0, 0, 0)";
+            colorContext.fillStyle = value;
+            colorContext.fillRect(0, 0, 1, 1);
+            const pixels = colorContext.getImageData(0, 0, 1, 1).data;
+            const parsed = { r: pixels[0], g: pixels[1], b: pixels[2], a: pixels[3] / 255 };
+            colorCache.set(value, parsed);
+            return parsed;
           };
           const luminance = (color) => {
             const channel = value => {
