@@ -41,8 +41,10 @@ export interface ReleaseDoctrineSnapshot {
   backendControlsState: boolean;
   n8nStatelessThinWorkers: boolean;
   emailPrimary: boolean;
-  whatsappUrgentOnly: boolean;
-  smsBackupOnly: boolean;
+  whatsappUrgentOnly: false;
+  smsBackupOnly: false;
+  whatsappDisabled: true;
+  smsDisabled: true;
   payfastProviderBoundary: boolean;
   allSectorsOpen: boolean;
   capsLimitVolumeNotScope: boolean;
