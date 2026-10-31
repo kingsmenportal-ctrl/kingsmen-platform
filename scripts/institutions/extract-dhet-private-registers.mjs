@@ -73,17 +73,17 @@ export function extractRecords(text,kind){
   // the entire block can pull in provinces from other campuses or qualifications.
   const idLine=e.lines.find(line=>{source.pattern.lastIndex=0;return source.pattern.test(line);});
   source.pattern.lastIndex=0;
-  const idLineText=(idLine??"").toLowerCase().replace(/kwazulu\\s+natal/g,"kwazulu-natal").replace(/north\\s*west/g,"north west").replace(/northwest/g,"north west");
+  const idLineText=(idLine??"").toLowerCase().replace(/kwazulu\s+natal/g,"kwazulu-natal").replace(/north\s*west/g,"north west").replace(/northwest/g,"north west");
   const provinceSet=PROVINCES.filter(p=>idLineText.includes(p.toLowerCase()));
   const aliases=[...block.matchAll(/(?:previous name\s*:?|previously known as|formerly known as|t\/a)\s+([^\n.;]+)/gi)].map(m=>normalizeName(m[1])).filter(Boolean);
   const regStatus=status(e.section,block,kind);
   const idKey=ids.length===1?ids[0].toLowerCase():canonicalSlug(name);
   const duplicate=seen.has(idKey);seen.add(idKey);
   const campusCandidates=[...new Set(e.lines.flatMap((line,index)=>{
-    const cols=line.split(/\\s{2,}/).map(x=>x.trim()).filter(Boolean);
+    const cols=line.split(/\s{2,}/).map(x=>x.trim()).filter(Boolean);
     return (index===0?cols.slice(1):cols).map(x=>redactSourceExcerpt(x));
-  }).filter(x=>x&&/[A-Za-z]{3,}/.test(x)&&(/[0-9]/.test(x)||/\\b(?:campus|street|road|avenue|drive|building|office park|pretoria|johannesburg|cape town|durban|bellville|centurion|randburg|polokwane|bloemfontein|gqeberha|east london|rustenburg|midrand|bryanston|waterkloof)\\b/i.test(x))
-      && !/(CONTACT PERSON|CONTACT DETAILS|TEL\\.?|TELEPHONE|MOBILE|CELL|FAX|EMAIL|E-MAIL|WEBSITE|QUALIFICATION|NQF LEVEL|BACHELOR|CERTIFICATE|DIPLOMA|DOCTOR|MASTER|EXAM CENTRE|PROGRAMME|PROGRAM)/i.test(x)))].slice(0,30);
+  }).filter(x=>x&&/[A-Za-z]{3,}/.test(x)&&(/[0-9]/.test(x)||/\b(?:campus|street|road|avenue|drive|building|office park|pretoria|johannesburg|cape town|durban|bellville|centurion|randburg|polokwane|bloemfontein|gqeberha|east london|rustenburg|midrand|bryanston|waterkloof)\b/i.test(x))
+      && !/(CONTACT PERSON|CONTACT DETAILS|TEL\.?|TELEPHONE|MOBILE|CELL|FAX|EMAIL|E-MAIL|WEBSITE|QUALIFICATION|NQF LEVEL|BACHELOR|CERTIFICATE|DIPLOMA|DOCTOR|MASTER|EXAM CENTRE|PROGRAMME|PROGRAM)/i.test(x)))].slice(0,30);
   return {source_record_ref:key,source_register:kind,source_snapshot_date:source.date,source_url:source.url,register_entry_number:e.number,
    source_heading_candidate:redactSourceExcerpt(e.first.slice(0,nameWidth)),canonical_name_candidate:name||null,normalized_name_key:canonicalSlug(name),
    registration_identifier:ids.length===1?ids[0]:null,registration_identifiers_observed:ids,registration_status:regStatus,
