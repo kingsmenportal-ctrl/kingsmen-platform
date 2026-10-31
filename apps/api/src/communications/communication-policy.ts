@@ -1,11 +1,11 @@
 import type { CommunicationChannel, CommunicationUrgency, NotificationDraft } from "./communication-types";
 
 export const COMMUNICATION_DOCTRINE = {
-  EMAIL_PRIMARY: "Email is primary.",
-  WHATSAPP_URGENT_ONLY: "WhatsApp is urgent-only.",
-  SMS_BACKUP_ONLY: "SMS is backup-only.",
+  EMAIL_PRIMARY: "Email is the only enabled external candidate communication channel.",
+  WHATSAPP_DISABLED: "WhatsApp is disabled.",
+  SMS_DISABLED: "SMS is disabled.",
   PORTAL_INBOX: "Candidate portal carries visible status and message history.",
-  NO_BULK_WHATSAPP: "No bulk WhatsApp reminders.",
+  NO_BULK_MESSAGES: "Bulk candidate messaging is disabled.",
   EVIDENCE_REQUIRED: "Every message must have evidence.",
   NO_STATE_MUTATION: "Notifications may inform but must not silently change application state."
 } as const;
@@ -21,44 +21,18 @@ export function isUrgent(urgency: CommunicationUrgency): boolean {
 }
 
 export function assertValidChannelUse(draft: NotificationDraft): CommunicationPolicyDecision {
+  if (draft.channel === "WHATSAPP_URGENT_ONLY") {
+    return { allowed: false, requiresHumanReview: false, reason: COMMUNICATION_DOCTRINE.WHATSAPP_DISABLED };
+  }
+  if (draft.channel === "SMS_BACKUP_ONLY") {
+    return { allowed: false, requiresHumanReview: false, reason: COMMUNICATION_DOCTRINE.SMS_DISABLED };
+  }
   if (draft.channel === "EMAIL_PRIMARY") {
     return { allowed: true, requiresHumanReview: false, reason: COMMUNICATION_DOCTRINE.EMAIL_PRIMARY };
   }
-
   if (draft.channel === "PORTAL_INBOX") {
     return { allowed: true, requiresHumanReview: false, reason: COMMUNICATION_DOCTRINE.PORTAL_INBOX };
   }
-
-  if (draft.channel === "WHATSAPP_URGENT_ONLY") {
-    if (!isUrgent(draft.urgency)) {
-      return {
-        allowed: false,
-        requiresHumanReview: true,
-        reason: "WHATSAPP_URGENT_ONLY blocked because urgency is not URGENT or EMERGENCY. No bulk WhatsApp reminders."
-      };
-    }
-    return {
-      allowed: true,
-      requiresHumanReview: true,
-      reason: "WHATSAPP_URGENT_ONLY allowed only after urgent human-approved escalation."
-    };
-  }
-
-  if (draft.channel === "SMS_BACKUP_ONLY") {
-    if (draft.purpose !== "BACKUP_NOTICE" && !isUrgent(draft.urgency)) {
-      return {
-        allowed: false,
-        requiresHumanReview: true,
-        reason: "SMS_BACKUP_ONLY blocked because SMS is backup-only."
-      };
-    }
-    return {
-      allowed: true,
-      requiresHumanReview: true,
-      reason: "SMS_BACKUP_ONLY allowed as backup or urgent fallback."
-    };
-  }
-
   return { allowed: false, requiresHumanReview: true, reason: `Unknown channel ${(draft.channel as CommunicationChannel)}` };
 }
 
@@ -77,7 +51,6 @@ export function assertNotificationDoesNotMutateState(payload: Record<string, unk
 
 export function chooseDefaultChannel(input: { urgent?: boolean; email?: string; portalOnly?: boolean }): CommunicationChannel {
   if (input.portalOnly) return "PORTAL_INBOX";
-  if (input.urgent) return "EMAIL_PRIMARY";
   if (input.email) return "EMAIL_PRIMARY";
   return "PORTAL_INBOX";
 }
