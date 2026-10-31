@@ -365,10 +365,19 @@ export default function CandidateApplicationsPage() {
                   const draft = packetDrafts[target.id] ?? { answers: packet?.application_answers ?? {}, selectedDocumentIds: packetDocuments.filter(item => item.packet_id === packet?.id).map(item => item.private_document_id) };
                   return <div className="mt-4 space-y-4">
                     {packet && <div className="rounded-xl border border-slate-700 bg-slate-900 p-3 text-xs leading-5 text-slate-300">
-                      **Packet {packet.packet_ref}** · {packet.packet_status.replaceAll("_"," ")}
+                      <strong>Packet {packet.packet_ref}</strong> · {packet.packet_status.replaceAll("_"," ")}
                       <p className="mt-1">Provider template: {packet.template_status.replaceAll("_"," ")} · Requirements: {packet.provider_requirements_status} · Integration: {packet.provider_integration_state}</p>
                       <p className="mt-1">Missing saved profile fields: {packet.missing_profile_fields.length ? packet.missing_profile_fields.join(", ") : "None detected"}</p>
                       <p className="mt-1">Selected Document Vault files: {packet.selected_document_count}</p>
+                      <details className="mt-2 rounded-lg border border-slate-700 p-2">
+                        <summary className="cursor-pointer font-semibold text-slate-200">Review saved profile fields being reused</summary>
+                        <dl className="mt-2 grid gap-2 sm:grid-cols-2">
+                          {Object.entries(packet.candidate_profile_snapshot).map(([field,value])=><div key={field}>
+                            <dt className="text-[10px] uppercase tracking-wider text-slate-500">{field.replaceAll(/([A-Z])/g," $1").replaceAll("_"," ")}</dt>
+                            <dd className="break-words text-xs text-slate-200">{value || "Not saved"}</dd>
+                          </div>)}
+                        </dl>
+                      </details>
                     </div>}
                     <p className="text-xs leading-5 text-slate-400">Kingsmen will reuse your consented profile fields and attach references to files already in your private Document Vault. This is a generic preparation packet, not a completed provider form. Add only information that is appropriate for this application.</p>
                     <div className="grid gap-3 md:grid-cols-2">
