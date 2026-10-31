@@ -298,7 +298,7 @@
       "metadata": {
         "gcis_profile_url": "https://www.gov.za/about-government/contact-directory/soe/health-professions-council-south-africa-hpcsa",
         "provider_key": "soe_hpcsa",
-        "provider_homepage_url": "https://www.hpcsa.co.za/",
+        "provider_homepage_url": null,
         "source_record_status": "NEEDS_REVIEW",
         "external_application_route_status": "NOT_VERIFIED"
       }
@@ -328,7 +328,7 @@
       "metadata": {
         "gcis_profile_url": "https://www.gov.za/about-government/contact-directory/soe/south-african-social-security-agency-sassa",
         "provider_key": "soe_sassa",
-        "provider_homepage_url": "https://www.sassa.gov.za/",
+        "provider_homepage_url": null,
         "source_record_status": "NEEDS_REVIEW",
         "external_application_route_status": "NOT_VERIFIED"
       }
@@ -359,7 +359,7 @@
       "metadata": {
         "gcis_profile_url": "https://www.gov.za/about-government/contact-directory/soe/national-youth-development-agency-nyda",
         "provider_key": "soe_nyda",
-        "provider_homepage_url": "https://www.nyda.gov.za/",
+        "provider_homepage_url": null,
         "source_record_status": "NEEDS_REVIEW",
         "external_application_route_status": "NOT_VERIFIED"
       }
@@ -4566,7 +4566,7 @@
       "metadata": {
         "gcis_profile_url": "https://www.gov.za/about-government/contact-directory/soe/ithala-development-finance-corporation-ltd",
         "provider_key": "soe_ithala",
-        "provider_homepage_url": "https://www.ithala.co.za/",
+        "provider_homepage_url": null,
         "source_record_status": "NEEDS_REVIEW",
         "external_application_route_status": "NOT_VERIFIED"
       }
@@ -4598,7 +4598,7 @@
       "metadata": {
         "gcis_profile_url": "https://www.gov.za/about-government/contact-directory/soe/mintek-council-mineral-technology",
         "provider_key": "soe_mintek",
-        "provider_homepage_url": "https://www.mintek.co.za/",
+        "provider_homepage_url": null,
         "source_record_status": "NEEDS_REVIEW",
         "external_application_route_status": "NOT_VERIFIED"
       }
@@ -4630,7 +4630,7 @@
       "metadata": {
         "gcis_profile_url": "https://www.gov.za/about-government/contact-directory/soe/national-advisory-council-innovation-naci",
         "provider_key": "soe_naci",
-        "provider_homepage_url": "https://www.naci.org.za/",
+        "provider_homepage_url": null,
         "source_record_status": "NEEDS_REVIEW",
         "external_application_route_status": "NOT_VERIFIED"
       }
@@ -4661,7 +4661,7 @@
       "metadata": {
         "gcis_profile_url": "https://www.gov.za/about-government/contact-directory/soe/national-agricultural-marketing-council",
         "provider_key": "soe_namc",
-        "provider_homepage_url": "https://www.namc.co.za/",
+        "provider_homepage_url": null,
         "source_record_status": "NEEDS_REVIEW",
         "external_application_route_status": "NOT_VERIFIED"
       }
@@ -4725,7 +4725,7 @@
       "metadata": {
         "gcis_profile_url": "https://www.gov.za/about-government/contact-directory/soe/national-arts-council-south-africa-nacsa",
         "provider_key": "soe_nacsa",
-        "provider_homepage_url": "https://www.nac.org.za/",
+        "provider_homepage_url": null,
         "source_record_status": "NEEDS_REVIEW",
         "external_application_route_status": "NOT_VERIFIED"
       }
@@ -4757,7 +4757,7 @@
       "metadata": {
         "gcis_profile_url": "https://www.gov.za/about-government/contact-directory/soe/national-consumer-commission-ncc",
         "provider_key": "soe_ncc",
-        "provider_homepage_url": "https://www.thencc.gov.za/",
+        "provider_homepage_url": null,
         "source_record_status": "NEEDS_REVIEW",
         "external_application_route_status": "NOT_VERIFIED"
       }
@@ -4790,7 +4790,7 @@
       "metadata": {
         "gcis_profile_url": "https://www.gov.za/about-government/contact-directory/soe/national-credit-regulator-ncr",
         "provider_key": "soe_ncr",
-        "provider_homepage_url": "https://www.ncr.org.za/",
+        "provider_homepage_url": null,
         "source_record_status": "NEEDS_REVIEW",
         "external_application_route_status": "NOT_VERIFIED"
       }
@@ -4823,7 +4823,7 @@
       "metadata": {
         "gcis_profile_url": "https://www.gov.za/about-government/contact-directory/soe/national-development-agency-nda",
         "provider_key": "soe_nda",
-        "provider_homepage_url": "https://www.nda.org.za/",
+        "provider_homepage_url": null,
         "source_record_status": "NEEDS_REVIEW",
         "external_application_route_status": "NOT_VERIFIED"
       }
@@ -4854,7 +4854,7 @@
       "metadata": {
         "gcis_profile_url": "https://www.gov.za/about-government/contact-directory/soe/national-economic-development-and-labour-council-nedlac",
         "provider_key": "soe_nedlac",
-        "provider_homepage_url": "https://nedlac.org.za/",
+        "provider_homepage_url": null,
         "source_record_status": "NEEDS_REVIEW",
         "external_application_route_status": "NOT_VERIFIED"
       }
@@ -4887,7 +4887,7 @@
       "metadata": {
         "gcis_profile_url": "https://www.gov.za/about-government/contact-directory/soe/national-electronic-media-south-africa-nemisa",
         "provider_key": "soe_nemisa",
-        "provider_homepage_url": "https://www.nemisa.co.za/",
+        "provider_homepage_url": null,
         "source_record_status": "NEEDS_REVIEW",
         "external_application_route_status": "NOT_VERIFIED"
       }
@@ -4920,7 +4920,7 @@
       "metadata": {
         "gcis_profile_url": "https://www.gov.za/about-government/contact-directory/soe/national-empowerment-fund",
         "provider_key": "soe_nef",
-        "provider_homepage_url": "https://www.nefcorp.co.za/",
+        "provider_homepage_url": null,
         "source_record_status": "NEEDS_REVIEW",
         "external_application_route_status": "NOT_VERIFIED"
       }
@@ -4953,7 +4953,7 @@
       "metadata": {
         "gcis_profile_url": "https://www.gov.za/about-government/contact-directory/soe/national-energy-regulator-nersa",
         "provider_key": "soe_nersa",
-        "provider_homepage_url": "https://www.nersa.org.za/",
+        "provider_homepage_url": null,
         "source_record_status": "NEEDS_REVIEW",
         "external_application_route_status": "NOT_VERIFIED"
       }
@@ -4986,7 +4986,7 @@
       "metadata": {
         "gcis_profile_url": "https://www.gov.za/about-government/contact-directory/soe/national-film-and-video-foundation",
         "provider_key": "soe_nfvf",
-        "provider_homepage_url": "https://www.nfvf.co.za/",
+        "provider_homepage_url": null,
         "source_record_status": "NEEDS_REVIEW",
         "external_application_route_status": "NOT_VERIFIED"
       }
@@ -5018,7 +5018,7 @@
       "metadata": {
         "gcis_profile_url": "https://www.gov.za/about-government/contact-directory/soe/national-gambling-board-south-africa",
         "provider_key": "soe_ngb",
-        "provider_homepage_url": "https://www.ngb.org.za/",
+        "provider_homepage_url": null,
         "source_record_status": "NEEDS_REVIEW",
         "external_application_route_status": "NOT_VERIFIED"
       }
@@ -5051,7 +5051,7 @@
       "metadata": {
         "gcis_profile_url": "https://www.gov.za/about-government/contact-directory/soe/national-home-builders-registration-council-nhbrc",
         "provider_key": "soe_nhbrc",
-        "provider_homepage_url": "https://www.nhbrc.org.za/",
+        "provider_homepage_url": null,
         "source_record_status": "NEEDS_REVIEW",
         "external_application_route_status": "NOT_VERIFIED"
       }
@@ -5084,7 +5084,7 @@
       "metadata": {
         "gcis_profile_url": "https://www.gov.za/about-government/contact-directory/soe/national-housing-finance-corporation-nhfc",
         "provider_key": "soe_nhfc",
-        "provider_homepage_url": "https://www.nhfc.co.za/",
+        "provider_homepage_url": null,
         "source_record_status": "NEEDS_REVIEW",
         "external_application_route_status": "NOT_VERIFIED"
       }
@@ -5116,7 +5116,7 @@
       "metadata": {
         "gcis_profile_url": "https://www.gov.za/about-government/contact-directory/soe/national-lotteries-commission",
         "provider_key": "soe_nlc",
-        "provider_homepage_url": "https://www.nlcsa.org.za/",
+        "provider_homepage_url": null,
         "source_record_status": "NEEDS_REVIEW",
         "external_application_route_status": "NOT_VERIFIED"
       }
@@ -5149,7 +5149,7 @@
       "metadata": {
         "gcis_profile_url": "https://www.gov.za/about-government/contact-directory/soe/national-nuclear-regulator-nnr",
         "provider_key": "soe_nnr",
-        "provider_homepage_url": "https://www.nnr.co.za/",
+        "provider_homepage_url": null,
         "source_record_status": "NEEDS_REVIEW",
         "external_application_route_status": "NOT_VERIFIED"
       }
@@ -5182,7 +5182,7 @@
       "metadata": {
         "gcis_profile_url": "https://www.gov.za/about-government/contact-directory/soe/national-student-financial-aid-scheme-nsfas",
         "provider_key": "nsfas_official",
-        "provider_homepage_url": "https://www.nsfas.org.za/",
+        "provider_homepage_url": null,
         "source_record_status": "NEEDS_REVIEW",
         "external_application_route_status": "NOT_VERIFIED"
       }
@@ -5215,7 +5215,7 @@
       "metadata": {
         "gcis_profile_url": "https://www.gov.za/about-government/contact-directory/soe/south-african-national-accreditation-system",
         "provider_key": "soe_sanas",
-        "provider_homepage_url": "https://www.sanas.co.za/",
+        "provider_homepage_url": null,
         "source_record_status": "NEEDS_REVIEW",
         "external_application_route_status": "NOT_VERIFIED"
       }
@@ -5248,7 +5248,7 @@
       "metadata": {
         "gcis_profile_url": "https://www.gov.za/about-government/contact-directory/soe/south-african-qualifications-authority-saqa",
         "provider_key": "soe_saqa",
-        "provider_homepage_url": "https://www.saqa.org.za/",
+        "provider_homepage_url": null,
         "source_record_status": "NEEDS_REVIEW",
         "external_application_route_status": "NOT_VERIFIED"
       }
