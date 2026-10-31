@@ -19,7 +19,8 @@ check("route provider import is idempotent",/ON CONFLICT \(provider_key\) DO UPD
 check("no programme records are invented",!/INSERT INTO public\.route_programmes/i.test(sql));
 check("no deadlines, requirements or fees are invented",!/INSERT INTO public\.(route_deadlines|route_requirements|route_fees)/i.test(sql));
 check("default confidence remains review-grade",/'C',[\s\r\n]*'NEEDS_REVIEW',[\s\r\n]*false,[\s\r\n]*false/i.test(sql));
-check("no public-safe promotion in initial inserts",/INSERT INTO public\.route_providers\s*\([\s\S]*?public_safe[\s\S]*?\)\s*SELECT[\s\S]*?'C',\s*'NEEDS_REVIEW',\s*false,\s*false,/i.test(sql));
+const routeProviderInsert=sql.match(/INSERT INTO public\.route_providers\s*\([\s\S]*?\)\s*SELECT([\s\S]*?)FROM source_rows d/i);
+check("new provider records are not public-safe",/sa\.id,\s*'C',\s*'NEEDS_REVIEW',\s*false,\s*false,/i.test(routeProviderInsert?.[1] ?? ""));
 check("seed metadata maintains unverified route",/application_route_status[\s\S]{0,100}NOT_VERIFIED/i.test(sql));
 check("seed metadata maintains unknown intake",/intake_status[\s\S]{0,80}UNKNOWN/i.test(sql));
 check("seed metadata denies partner claim",/partnership_status[\s\S]{0,80}NOT_A_PARTNER/i.test(sql));
