@@ -29,8 +29,20 @@ pass("all six Kingsmen pathways included", requiredPathways.every(x => manifest.
 pass("official source categories represented", requiredSourceTypes.every(x => manifest.sources.some(s => s.source_type === x)));
 pass("source list has meaningful coverage", manifest.sources.length >= 12);
 pass("source identifiers unique", new Set(manifest.sources.map(s => s.source_id)).size === manifest.sources.length);
+const anchorSnapshot = manifest.existing_anchor_snapshot;
+const knownAnchorKeys = new Set(anchorSnapshot?.source_keys ?? []);
+pass("existing anchor snapshot captured", anchorSnapshot?.observed_on === "2026-10-31");
+pass("source-authority row counts recorded", anchorSnapshot?.source_authorities_count === 21 && anchorSnapshot?.opportunity_source_authorities_count === 21);
+pass("source keys match across authority tables", anchorSnapshot?.exact_key_matches === 21 && knownAnchorKeys.size === 21);
+pass("stale verification gap is not hidden", anchorSnapshot?.source_authorities_last_verified_at_non_null_count === 1);
+pass("duplicate-avoidance policy recorded", Array.isArray(anchorSnapshot?.reconciliation_policy) && anchorSnapshot.reconciliation_policy.length >= 3);
 
 for (const source of manifest.sources) {
+  const anchorMapping = source.existing_anchor_mapping;
+  pass("anchor mapping present: " + source.source_id, Boolean(anchorMapping) && Array.isArray(anchorMapping.existing_source_keys) && typeof anchorMapping.status === "string");
+  pass("anchor references are known: " + source.source_id, Boolean(anchorMapping) && anchorMapping.existing_source_keys.every(key => knownAnchorKeys.has(key)));
+  pass("anchor mismatch status explicit: " + source.source_id, Boolean(anchorMapping) && typeof anchorMapping.relationship === "string" && typeof anchorMapping.url_match === "boolean");
+  pass("exact URL map has one matching anchor: " + source.source_id, anchorMapping?.url_match !== true || anchorMapping.existing_source_keys.length === 1);
   let parsed;
   try {
     parsed = new URL(source.url);
