@@ -18,6 +18,7 @@ const routes = [
   "/candidate/identity-review",
   "/candidate/workbench",
   "/candidate/opportunity-matches",
+  "/candidate/institutions",
   "/candidate/applications",
   "/candidate/documents",
   "/candidate/cao-choices",
