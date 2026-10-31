@@ -42,7 +42,7 @@ function splitEntries(text){
  const flush=()=>{if(current)entries.push(current);current=null;};
  for(const line of text.replace(/\r/g,"").split("\n")){
   const t=line.trim();
-  if(/^(SECTION\s+[AB]\b.*|\d+\.\s+.*\b(?:REGISTERED INSTITUTIONS|PROVISIONALLY REGISTERED|CANCELLED|LAPSED|WITHDRAWN|DEREGISTERED)\b.*)$/i.test(t)){flush();section=t;continue;}
+  if(/^(SECTION\s+[AB]\b.*|\d+\.\s+.*(?:REGISTERED INSTITUTIONS|PROVISIONALLY REGISTERED|LAPSED PROVISIONAL REGISTRATIONS|REGISTRATION[^\n]*(?:CANCELLED|LAPSED)|INSTITUTIONS[^\n]*(?:CANCELLED|LAPSED)|WITHDRAWN INSTITUTIONS|DEREGISTERED INSTITUTIONS).*?)$/i.test(t)){flush();section=t;continue;}
   const m=line.match(/^\s{0,8}(\d{1,3})\.\s+([A-ZÀ-ÖØ-Þ][^\n]{2,})\s*$/);
   const isEntry=m&&!/^(?:NQF|N\d|CONTACT PERSON|SECTION|REGISTER|PROGRAMME|QUALIFICATION|EXAM CENTRE)/i.test(m[2].trim());
   if(isEntry){flush();current={number:Number(m[1]),first:m[2].trim(),section,lines:[line.replace(/\r$/,"")]};}
