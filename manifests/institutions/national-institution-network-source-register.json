@@ -468,8 +468,8 @@
       "source_id": "nsfas_institutions",
       "name": "NSFAS institutions directory",
       "authority": "National Student Financial Aid Scheme",
-      "authority_host": "nsfas.org.za",
-      "url": "https://nsfas.org.za/content/institutions.html",
+      "authority_host": "www.nsfas.org.za",
+      "url": "https://www.nsfas.org.za/content/institutions.html",
       "source_type": "STUDENT_FINANCIAL_AID_DIRECTORY",
       "provider_types": [
         "UNIVERSITY",
@@ -501,7 +501,7 @@
         "url_match": false,
         "status": "REUSE_EXISTING_AUTHORITY_ANCHOR"
       },
-      "host_reconciliation_note": "Official page currently indexed under the apex nsfas.org.za host. Validate redirects on each source check; do not assume www/non-www aliases without an observed redirect."
+      "host_reconciliation_note": "Official NSFAS institution directory is indexed at the www.nsfas.org.za host. Keep the URL and authority host identical; recheck redirect/canonical behaviour during scheduled source refresh."
     },
     {
       "source_id": "dpsa_public_service_vacancies",
