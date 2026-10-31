@@ -27,10 +27,7 @@ const browserName = arg("--browser", "chromium");
 const profile = arg("--profile", "desktop");
 const maxTargets = Math.min(12, Math.max(1, Number(arg("--limit", "8")) || 8));
 const timeoutMs = Math.min(30000, Math.max(5000, Number(arg("--timeout", "15000")) || 15000));
-const browserTypes = { chromium, firefox, webkit };
-const browserType = browserTypes[browserName];
-
-if (!browserType) {
+if (!["chromium", "firefox", "webkit"].includes(browserName)) {
   process.stderr.write("Unsupported browser. Use chromium, firefox or webkit.\n");
   process.exit(2);
 }
