@@ -40,5 +40,8 @@ jobs:
       - name: Validate Jarvis runtime controller
         run: node scripts/validators/validate-jarvis-runtime-controller.mjs
 
+      - name: Validate authenticated backup encryption
+        run: npm run backup:validate:restore
+
       - name: Validate Jarvis live batch
         run: node scripts/validators/validate-jarvis-complete-live-batch.mjs

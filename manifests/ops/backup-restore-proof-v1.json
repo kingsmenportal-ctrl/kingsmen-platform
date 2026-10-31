@@ -15,7 +15,11 @@
       "pg_restore",
       "psql"
     ],
-    "format": "custom",
+    "format": "custom payload in authenticated AES-256-GCM .kmbak envelope",
+    "encryption": "AES-256-GCM",
+    "keyDerivation": "scrypt",
+    "passphraseEnvironment": "KINGSMEN_BACKUP_PASSPHRASE",
+    "plaintextArchiveAccepted": false,
     "ownerPrivilegesRestored": false,
     "restoreTargetMustDifferFromSource": true,
     "reportsMayContainCountsOnly": true,
@@ -24,7 +28,8 @@
   "requiredEnvironment": {
     "sourceDatabaseUrl": "KINGSMEN_DATABASE_URL or DATABASE_URL",
     "restoreDrillDatabaseUrl": "KINGSMEN_RESTORE_DRILL_DATABASE_URL",
-    "backupRoot": "KINGSMEN_BACKUP_ROOT optional local/offsite path"
+    "backupRoot": "KINGSMEN_BACKUP_ROOT optional local/offsite path",
+    "backupPassphrase": "KINGSMEN_BACKUP_PASSPHRASE from approved secret manager"
   },
   "proofScenarios": [
     "backup_script_exists_and_uses_pg_dump",
@@ -44,10 +49,17 @@
     "restore_count_query_failure_blocks_pass",
     "full_database_archive_includes_candidate_rows",
     "destructive_restore_requires_explicit_disposable_target_allowlist",
-    "archive_encryption_and_restricted_storage_required"
+    "archive_encryption_and_restricted_storage_required",
+    "aes_256_gcm_authenticated_envelope",
+    "encrypted_archive_round_trip_hash_verified",
+    "plaintext_archive_removed_after_success",
+    "tampered_archive_rejected",
+    "wrong_passphrase_rejected"
   ],
   "evidencePaths": [
     "scripts/backup/New-KingsmenTruthVaultBackup.ps1",
+    "scripts/backup/encrypt-backup.mjs",
+    "scripts/backup/test-backup-encryption.mjs",
     "scripts/backup/Test-KingsmenTruthVaultRestore.ps1",
     "scripts/proof/prove-backup-restore-boundary.mjs",
     "scripts/validators/validate-backup-restore-proof.mjs",
