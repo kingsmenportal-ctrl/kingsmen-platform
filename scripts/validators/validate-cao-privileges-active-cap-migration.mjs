@@ -2,14 +2,14 @@ import fs from "node:fs";
 import path from "node:path";
 
 const root = process.cwd();
-const migration = fs.readFileSync(path.join(root, "db/migrations/0108_reconcile_cao_client_privileges_and_active_candidate_cap.sql"), "utf8");
+const migration = fs.readFileSync(path.join(root, "supabase/migrations/20261029194500_reconcile_cao_client_privileges_and_active_candidate_cap.sql"), "utf8");
 const failures = [];
 const check = (name, condition) => {
   console.log((condition ? "PASS " : "FAIL ") + name);
   if (!condition) failures.push(name);
 };
 
-check("migration is transactional", migration.startsWith("-- 0108:") && migration.includes("BEGIN;") && migration.trimEnd().endsWith("COMMIT;"));
+check("migration is transactional", migration.startsWith("-- Corrective migration between the last recorded 0095 migration") && migration.includes("BEGIN;") && migration.trimEnd().endsWith("COMMIT;"));
 check("preflight refuses schema drift and existing active-cap overflow", migration.includes("ACTIVE_CANDIDATE_CAP_SCHEMA_MISMATCH") && migration.includes("CAO_BRIDGE_SCHEMA_MISMATCH") && migration.includes("ACTIVE_CANDIDATE_CAP_PREEXISTING_OVERFLOW"));
 check("CAO client table grants are revoked and backend CRUD is explicit", migration.includes("REVOKE ALL PRIVILEGES ON TABLE public.cao_choice_items FROM PUBLIC, anon, authenticated") && migration.includes("GRANT SELECT, INSERT, UPDATE, DELETE ON TABLE public.cao_choice_items TO service_role"));
 check("active-candidate cap is concurrency-safe", migration.includes("pg_advisory_xact_lock(741028, 500)") && migration.includes("active_candidates >= 500") && migration.includes("candidates_active_cap_500_guard"));
