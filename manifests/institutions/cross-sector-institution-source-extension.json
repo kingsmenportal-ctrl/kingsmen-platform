@@ -1267,6 +1267,307 @@
       "refresh_after_days": 30,
       "review_required": true,
       "connector_state": "NOT_CONNECTED"
+    },
+    {
+      "source_id": "gcis_public_entities_and_soe_directory",
+      "name": "GCIS National Government Directory — 123 state-owned enterprises and other public institutions",
+      "authority": "Government Communication and Information System",
+      "url": "https://www.gov.za/about-government/contact-directory/soe-s",
+      "classes": [
+        "STATE_OWNED_ENTERPRISE",
+        "PUBLIC_ENTITY",
+        "PUBLIC_ADMINISTRATION",
+        "REGULATOR_AND_PROFESSIONAL_COUNCIL"
+      ],
+      "supports": [
+        "discovery of 123 state-owned enterprises and other public institutions as listed in the National Government Directory on 31 October 2026",
+        "official entity profile and published contact evidence when the exact entity profile is opened"
+      ],
+      "does_not_prove": [
+        "a current vacancy or programme",
+        "individual candidate eligibility",
+        "the entity's current recruitment portal, application requirements or deadline",
+        "an API connection, partnership, submission receipt or provider-confirmed outcome"
+      ],
+      "refresh_after_days": 30,
+      "review_required": true,
+      "connector_state": "NOT_CONNECTED"
+    },
+    {
+      "source_id": "gcis_soe_acsa_employer",
+      "provider_key": "soe_acsa",
+      "name": "Airports Company South Africa (ACSA)",
+      "authority": "Government Communication and Information System / National Government Directory",
+      "url": "https://www.airports.co.za/",
+      "classes": [
+        "STATE_OWNED_ENTERPRISE",
+        "PUBLIC_ENTITY",
+        "EMPLOYER_AND_RECRUITMENT",
+        "TRANSPORT_AND_ESSENTIAL_SERVICES"
+      ],
+      "supports": [
+        "official GCIS entity profile verifies that the public entity is listed and supplies the organisation website URL",
+        "employment and career opportunities only after an exact employer vacancy notice and current recruitment route are independently checked"
+      ],
+      "does_not_prove": [
+        "a current job vacancy, internship, apprenticeship or learnership",
+        "candidate eligibility, application window, deadline or recruitment requirements",
+        "a Kingsmen partnership, authorised API/portal connector, submission receipt or employer decision"
+      ],
+      "refresh_after_days": 30,
+      "review_required": true,
+      "connector_state": "NOT_CONNECTED",
+      "metadata": {
+        "official_gcis_profile_url": "https://www.gov.za/about-government/contact-directory/soe/airports-company-south-africa-acsa",
+        "official_website_as_listed_by_gcis": "https://www.airports.co.za/",
+        "provider_key": "soe_acsa",
+        "record_status": "NEEDS_REVIEW"
+      }
+    },
+    {
+      "source_id": "gcis_soe_denel_employer",
+      "provider_key": "soe_denel",
+      "name": "Denel (Pty) Ltd",
+      "authority": "Government Communication and Information System / National Government Directory",
+      "url": "https://www.denel.co.za/",
+      "classes": [
+        "STATE_OWNED_ENTERPRISE",
+        "PUBLIC_ENTITY",
+        "EMPLOYER_AND_RECRUITMENT"
+      ],
+      "supports": [
+        "official GCIS entity profile verifies that the public entity is listed and supplies the organisation website URL",
+        "employment and career opportunities only after an exact employer vacancy notice and current recruitment route are independently checked"
+      ],
+      "does_not_prove": [
+        "a current job vacancy, internship, apprenticeship or learnership",
+        "candidate eligibility, application window, deadline or recruitment requirements",
+        "a Kingsmen partnership, authorised API/portal connector, submission receipt or employer decision"
+      ],
+      "refresh_after_days": 30,
+      "review_required": true,
+      "connector_state": "NOT_CONNECTED",
+      "metadata": {
+        "official_gcis_profile_url": "https://www.gov.za/about-government/contact-directory/soe/denel-pty-ltd",
+        "official_website_as_listed_by_gcis": "https://www.denel.co.za/",
+        "provider_key": "soe_denel",
+        "record_status": "NEEDS_REVIEW"
+      }
+    },
+    {
+      "source_id": "gcis_soe_prasa_employer",
+      "provider_key": "soe_prasa",
+      "name": "Passenger Rail Agency of South Africa (PRASA)",
+      "authority": "Government Communication and Information System / National Government Directory",
+      "url": "https://www.prasa.com/",
+      "classes": [
+        "STATE_OWNED_ENTERPRISE",
+        "PUBLIC_ENTITY",
+        "EMPLOYER_AND_RECRUITMENT",
+        "TRANSPORT_AND_ESSENTIAL_SERVICES"
+      ],
+      "supports": [
+        "official GCIS entity profile verifies that the public entity is listed and supplies the organisation website URL",
+        "employment and career opportunities only after an exact employer vacancy notice and current recruitment route are independently checked"
+      ],
+      "does_not_prove": [
+        "a current job vacancy, internship, apprenticeship or learnership",
+        "candidate eligibility, application window, deadline or recruitment requirements",
+        "a Kingsmen partnership, authorised API/portal connector, submission receipt or employer decision"
+      ],
+      "refresh_after_days": 30,
+      "review_required": true,
+      "connector_state": "NOT_CONNECTED",
+      "metadata": {
+        "official_gcis_profile_url": "https://www.gov.za/about-government/contact-directory/soe/passenger-rail-agency-south-african-prasa",
+        "official_website_as_listed_by_gcis": "https://www.prasa.com/",
+        "provider_key": "soe_prasa",
+        "record_status": "NEEDS_REVIEW"
+      }
+    },
+    {
+      "source_id": "gcis_soe_saa_employer",
+      "provider_key": "soe_saa",
+      "name": "South African Airways (SAA)",
+      "authority": "Government Communication and Information System / National Government Directory",
+      "url": "https://www.flysaa.com/",
+      "classes": [
+        "STATE_OWNED_ENTERPRISE",
+        "PUBLIC_ENTITY",
+        "EMPLOYER_AND_RECRUITMENT",
+        "TRANSPORT_AND_ESSENTIAL_SERVICES"
+      ],
+      "supports": [
+        "official GCIS entity profile verifies that the public entity is listed and supplies the organisation website URL",
+        "employment and career opportunities only after an exact employer vacancy notice and current recruitment route are independently checked"
+      ],
+      "does_not_prove": [
+        "a current job vacancy, internship, apprenticeship or learnership",
+        "candidate eligibility, application window, deadline or recruitment requirements",
+        "a Kingsmen partnership, authorised API/portal connector, submission receipt or employer decision"
+      ],
+      "refresh_after_days": 30,
+      "review_required": true,
+      "connector_state": "NOT_CONNECTED",
+      "metadata": {
+        "official_gcis_profile_url": "https://www.gov.za/about-government/contact-directory/soe/south-african-airways-saa",
+        "official_website_as_listed_by_gcis": "https://www.flysaa.com/",
+        "provider_key": "soe_saa",
+        "record_status": "NEEDS_REVIEW"
+      }
+    },
+    {
+      "source_id": "gcis_soe_sabc_employer",
+      "provider_key": "soe_sabc",
+      "name": "South African Broadcasting Corporation (SABC)",
+      "authority": "Government Communication and Information System / National Government Directory",
+      "url": "https://www.sabc.co.za/",
+      "classes": [
+        "STATE_OWNED_ENTERPRISE",
+        "PUBLIC_ENTITY",
+        "EMPLOYER_AND_RECRUITMENT"
+      ],
+      "supports": [
+        "official GCIS entity profile verifies that the public entity is listed and supplies the organisation website URL",
+        "employment and career opportunities only after an exact employer vacancy notice and current recruitment route are independently checked"
+      ],
+      "does_not_prove": [
+        "a current job vacancy, internship, apprenticeship or learnership",
+        "candidate eligibility, application window, deadline or recruitment requirements",
+        "a Kingsmen partnership, authorised API/portal connector, submission receipt or employer decision"
+      ],
+      "refresh_after_days": 30,
+      "review_required": true,
+      "connector_state": "NOT_CONNECTED",
+      "metadata": {
+        "official_gcis_profile_url": "https://www.gov.za/about-government/contact-directory/soe/south-african-broadcasting-corporation-sabc",
+        "official_website_as_listed_by_gcis": "https://www.sabc.co.za/",
+        "provider_key": "soe_sabc",
+        "record_status": "NEEDS_REVIEW"
+      }
+    },
+    {
+      "source_id": "gcis_soe_sanral_employer",
+      "provider_key": "soe_sanral",
+      "name": "South African National Road Agency (SANRAL)",
+      "authority": "Government Communication and Information System / National Government Directory",
+      "url": "https://www.nra.co.za/",
+      "classes": [
+        "STATE_OWNED_ENTERPRISE",
+        "PUBLIC_ENTITY",
+        "EMPLOYER_AND_RECRUITMENT",
+        "TRANSPORT_AND_ESSENTIAL_SERVICES"
+      ],
+      "supports": [
+        "official GCIS entity profile verifies that the public entity is listed and supplies the organisation website URL",
+        "employment and career opportunities only after an exact employer vacancy notice and current recruitment route are independently checked"
+      ],
+      "does_not_prove": [
+        "a current job vacancy, internship, apprenticeship or learnership",
+        "candidate eligibility, application window, deadline or recruitment requirements",
+        "a Kingsmen partnership, authorised API/portal connector, submission receipt or employer decision"
+      ],
+      "refresh_after_days": 30,
+      "review_required": true,
+      "connector_state": "NOT_CONNECTED",
+      "metadata": {
+        "official_gcis_profile_url": "https://www.gov.za/about-government/contact-directory/soe/south-african-national-road-agency",
+        "official_website_as_listed_by_gcis": "https://www.nra.co.za/",
+        "provider_key": "soe_sanral",
+        "record_status": "NEEDS_REVIEW"
+      }
+    },
+    {
+      "source_id": "gcis_soe_sapo_employer",
+      "provider_key": "soe_sapo",
+      "name": "South African Post Office (SAPO)",
+      "authority": "Government Communication and Information System / National Government Directory",
+      "url": "https://www.postoffice.co.za/",
+      "classes": [
+        "STATE_OWNED_ENTERPRISE",
+        "PUBLIC_ENTITY",
+        "EMPLOYER_AND_RECRUITMENT",
+        "TRANSPORT_AND_ESSENTIAL_SERVICES"
+      ],
+      "supports": [
+        "official GCIS entity profile verifies that the public entity is listed and supplies the organisation website URL",
+        "employment and career opportunities only after an exact employer vacancy notice and current recruitment route are independently checked"
+      ],
+      "does_not_prove": [
+        "a current job vacancy, internship, apprenticeship or learnership",
+        "candidate eligibility, application window, deadline or recruitment requirements",
+        "a Kingsmen partnership, authorised API/portal connector, submission receipt or employer decision"
+      ],
+      "refresh_after_days": 30,
+      "review_required": true,
+      "connector_state": "NOT_CONNECTED",
+      "metadata": {
+        "official_gcis_profile_url": "https://www.gov.za/about-government/contact-directory/soe/south-african-post-office-sapo",
+        "official_website_as_listed_by_gcis": "https://www.postoffice.co.za/",
+        "provider_key": "soe_sapo",
+        "record_status": "NEEDS_REVIEW"
+      }
+    },
+    {
+      "source_id": "gcis_soe_telkom_employer",
+      "provider_key": "soe_telkom",
+      "name": "Telkom SA (Ltd)",
+      "authority": "Government Communication and Information System / National Government Directory",
+      "url": "https://www.telkom.co.za/",
+      "classes": [
+        "STATE_OWNED_ENTERPRISE",
+        "PUBLIC_ENTITY",
+        "EMPLOYER_AND_RECRUITMENT"
+      ],
+      "supports": [
+        "official GCIS entity profile verifies that the public entity is listed and supplies the organisation website URL",
+        "employment and career opportunities only after an exact employer vacancy notice and current recruitment route are independently checked"
+      ],
+      "does_not_prove": [
+        "a current job vacancy, internship, apprenticeship or learnership",
+        "candidate eligibility, application window, deadline or recruitment requirements",
+        "a Kingsmen partnership, authorised API/portal connector, submission receipt or employer decision"
+      ],
+      "refresh_after_days": 30,
+      "review_required": true,
+      "connector_state": "NOT_CONNECTED",
+      "metadata": {
+        "official_gcis_profile_url": "https://www.gov.za/about-government/contact-directory/soe/telkom-sa-ltd",
+        "official_website_as_listed_by_gcis": "https://www.telkom.co.za/",
+        "provider_key": "soe_telkom",
+        "record_status": "NEEDS_REVIEW"
+      }
+    },
+    {
+      "source_id": "gcis_soe_transnet_employer",
+      "provider_key": "soe_transnet",
+      "name": "Transnet (Ltd)",
+      "authority": "Government Communication and Information System / National Government Directory",
+      "url": "https://www.transnet.net/",
+      "classes": [
+        "STATE_OWNED_ENTERPRISE",
+        "PUBLIC_ENTITY",
+        "EMPLOYER_AND_RECRUITMENT",
+        "TRANSPORT_AND_ESSENTIAL_SERVICES"
+      ],
+      "supports": [
+        "official GCIS entity profile verifies that the public entity is listed and supplies the organisation website URL",
+        "employment and career opportunities only after an exact employer vacancy notice and current recruitment route are independently checked"
+      ],
+      "does_not_prove": [
+        "a current job vacancy, internship, apprenticeship or learnership",
+        "candidate eligibility, application window, deadline or recruitment requirements",
+        "a Kingsmen partnership, authorised API/portal connector, submission receipt or employer decision"
+      ],
+      "refresh_after_days": 30,
+      "review_required": true,
+      "connector_state": "NOT_CONNECTED",
+      "metadata": {
+        "official_gcis_profile_url": "https://www.gov.za/about-government/contact-directory/soe/transnet-ltd",
+        "official_website_as_listed_by_gcis": "https://www.transnet.net/",
+        "provider_key": "soe_transnet",
+        "record_status": "NEEDS_REVIEW"
+      }
     }
   ],
   "completion_gates": [
