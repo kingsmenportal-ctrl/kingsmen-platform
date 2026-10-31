@@ -60,6 +60,13 @@ CREATE TABLE IF NOT EXISTS public.private_institution_registry_entries (
  imported_at timestamptz NOT NULL DEFAULT now(),
  UNIQUE(source_register,source_snapshot_date,source_record_ref)
 );
+ALTER TABLE public.private_institution_registry_entries ADD COLUMN IF NOT EXISTS registration_identifiers_observed jsonb NOT NULL DEFAULT '[]'::jsonb;
+ALTER TABLE public.private_institution_registry_entries ADD COLUMN IF NOT EXISTS registration_status_review_required boolean NOT NULL DEFAULT true;
+ALTER TABLE public.private_institution_registry_entries ADD COLUMN IF NOT EXISTS province_status text NOT NULL DEFAULT 'NOT_EXTRACTED';
+ALTER TABLE public.private_institution_registry_entries ADD COLUMN IF NOT EXISTS campus_site_candidates jsonb NOT NULL DEFAULT '[]'::jsonb;
+ALTER TABLE public.private_institution_registry_entries ADD COLUMN IF NOT EXISTS campus_extraction_status text NOT NULL DEFAULT 'MANUAL_REVIEW_REQUIRED';
+ALTER TABLE public.private_institution_registry_entries ADD COLUMN IF NOT EXISTS identity_conflict_status text NOT NULL DEFAULT 'NEEDS_CANONICAL_IDENTITY_REVIEW';
+ALTER TABLE public.private_institution_registry_entries ADD COLUMN IF NOT EXISTS conflict_flags jsonb NOT NULL DEFAULT '[]'::jsonb;
 CREATE INDEX IF NOT EXISTS idx_private_registry_registration_id ON public.private_institution_registry_entries(source_register,registration_identifier) WHERE registration_identifier IS NOT NULL;
 CREATE INDEX IF NOT EXISTS idx_private_registry_normalized_name ON public.private_institution_registry_entries(normalized_name_key);
 CREATE TEMP TABLE _dhet_private_registry_stage ON COMMIT DROP AS
@@ -73,6 +80,12 @@ BEGIN
  END IF;
  IF EXISTS (SELECT 1 FROM _dhet_private_registry_stage WHERE registration_identifier IS NOT NULL GROUP BY source_register,source_snapshot_date,registration_identifier HAVING count(DISTINCT normalized_name_key)>1) THEN
   RAISE EXCEPTION 'DHET_REGISTER_REGISTRATION_IDENTITY_CONFLICT';
+ END IF;
+ IF EXISTS (SELECT 1 FROM _dhet_private_registry_stage WHERE registration_identifier IS NOT NULL GROUP BY source_register,source_snapshot_date,registration_identifier HAVING count(DISTINCT registration_status)>1) THEN
+  RAISE EXCEPTION 'DHET_REGISTER_REGISTRATION_STATUS_CONFLICT';
+ END IF;
+ IF EXISTS (SELECT 1 FROM _dhet_private_registry_stage WHERE jsonb_array_length(registration_identifiers_observed)<>1 OR registration_status_review_required IS TRUE OR identity_conflict_status='CONFLICT_REVIEW_REQUIRED' OR jsonb_array_length(conflict_flags)>0) THEN
+  RAISE EXCEPTION 'DHET_REGISTER_UNRESOLVED_RECORD_CONFLICT';
  END IF;
  IF EXISTS (
   SELECT 1 FROM _dhet_private_registry_stage s JOIN public.private_institution_registry_entries t
@@ -105,6 +118,13 @@ WHERE public.private_institution_registry_entries.registration_identifier IS NOT
  AND public.private_institution_registry_entries.normalized_name_key=EXCLUDED.normalized_name_key;
 DO $postflight$
 BEGIN
+ IF EXISTS (
+  SELECT required.column_name FROM (VALUES
+   ('registration_identifiers_observed'),('registration_status_review_required'),('province_status'),
+   ('campus_site_candidates'),('campus_extraction_status'),('identity_conflict_status'),('conflict_flags')
+  ) required(column_name)
+  WHERE NOT EXISTS (SELECT 1 FROM information_schema.columns c WHERE c.table_schema='public' AND c.table_name='private_institution_registry_entries' AND c.column_name=required.column_name)
+ ) THEN RAISE EXCEPTION 'DHET_REGISTER_SCHEMA_POSTFLIGHT_FAILED'; END IF;
  IF EXISTS (SELECT 1 FROM public.private_institution_registry_entries WHERE official_route_status<>'NOT_VERIFIED' OR integration_status<>'NOT_CONNECTED' OR automation_authorized IS TRUE) THEN
   RAISE EXCEPTION 'DHET_REGISTER_ROUTE_SAFETY_POSTFLIGHT_FAILED';
  END IF;
