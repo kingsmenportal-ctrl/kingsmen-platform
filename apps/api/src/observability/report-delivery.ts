@@ -17,9 +17,8 @@ export function buildReportDeliveryIntent(input: {
   evidenceRefs: string[];
 }): ReportDeliveryIntent {
   const channel = input.channel ?? "EMAIL";
-  if (channel === "WHATSAPP_URGENT" && input.report.reportType !== "INCIDENT") {
-    throw new Error("REPORT_DELIVERY_WHATSAPP_BLOCKED_FOR_NON_INCIDENT");
-  }
+  if (channel === "WHATSAPP_URGENT") throw new Error("REPORT_DELIVERY_WHATSAPP_DISABLED");
+  if (channel === "SMS_BACKUP") throw new Error("REPORT_DELIVERY_SMS_DISABLED");
   if (input.evidenceRefs.length === 0) throw new Error("REPORT_DELIVERY_EVIDENCE_REQUIRED");
 
   return {
