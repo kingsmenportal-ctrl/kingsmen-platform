@@ -9,14 +9,14 @@ const PROVINCES=["Eastern Cape","Free State","Gauteng","KwaZulu-Natal","Limpopo"
 export const normalizeName=s=>String(s??"").normalize("NFKC").replace(/[’‘]/g,"'").replace(/[–—]/g,"-").replace(/\s+/g," ").replace(/^[\d. )-]+/,"").trim().replace(/[.,;:]+$/,"");
 export const canonicalSlug=s=>normalizeName(s).normalize("NFD").replace(/[\u0300-\u036f]/g,"").toLowerCase().replace(/&/g," and ").replace(/[^a-z0-9]+/g,"-").replace(/^-|-$/g,"");
 function status(section,block,kind){
- const h=section.toLowerCase(),s=(section+"\\n"+block).toLowerCase();
- const hasLapsed=/\\blapsed\\b|\\blapsing\\b/.test(s);
+ const h=section.toLowerCase(),s=(section+"\n"+block).toLowerCase();
+ const hasLapsed=/\blapsed\b|\blapsing\b/.test(s);
  const hasExplicitCancellation=/reasons for cancellation|date when cancellation comes into effect|registration has been cancelled|registration was cancelled|cancelled with effect/.test(s);
- const sectionCancelled=/\\bcancelled\\b|\\bcanceled\\b/.test(h);
+ const sectionCancelled=/\bcancelled\b|\bcanceled\b/.test(h);
  if(hasLapsed&&(hasExplicitCancellation||sectionCancelled))return "STATUS_UNRESOLVED";
  if(hasLapsed)return "LAPSED";
- if(kind==="private_colleges"&&/section\\s+a/.test(h))return "CANCELLED";
- if(kind==="private_colleges"&&/section\\s+b/.test(h)){
+ if(kind==="private_colleges"&&/section\s+a/.test(h))return "CANCELLED";
+ if(kind==="private_colleges"&&/section\s+b/.test(h)){
   return hasExplicitCancellation?"STATUS_UNRESOLVED":"REGISTERED";
  }
  if(hasExplicitCancellation||sectionCancelled)return "CANCELLED";
