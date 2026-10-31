@@ -9,26 +9,30 @@ const PROVINCES=["Eastern Cape","Free State","Gauteng","KwaZulu-Natal","Limpopo"
 export const normalizeName=s=>String(s??"").normalize("NFKC").replace(/[’‘]/g,"'").replace(/[–—]/g,"-").replace(/\s+/g," ").replace(/^[\d. )-]+/,"").trim().replace(/[.,;:]+$/,"");
 export const canonicalSlug=s=>normalizeName(s).normalize("NFD").replace(/[\u0300-\u036f]/g,"").toLowerCase().replace(/&/g," and ").replace(/[^a-z0-9]+/g,"-").replace(/^-|-$/g,"");
 function status(section,block,kind){
- const h=section.toLowerCase(),s=(section+"\n"+block.slice(0,500)).toLowerCase();
+ const h=section.toLowerCase(),s=(section+"\n"+block).toLowerCase();
+ if(/reasons for cancellation|date when cancellation comes into effect|registration has been cancelled|registration was cancelled|cancelled with effect/.test(s))return "CANCELLED";
+ if(/lapsed provisional registration|registration has lapsed/.test(s))return "LAPSED";
+ if(/withdrawn|deregistered/.test(h))return "WITHDRAWN_OR_DEREGISTERED_REVIEW";
  if(kind==="private_colleges"&&/section\s+a/.test(h))return "CANCELLED";
  if(kind==="private_colleges"&&/section\s+b/.test(h))return "REGISTERED";
  if(/lapsed|lapsing/.test(h))return "LAPSED";
- if(/cancelled|canceled|withdrawn|deregistered/.test(h))return "CANCELLED";
+ if(/cancelled|canceled/.test(h))return "CANCELLED";
  if(/provisionally registered|provisional registration/.test(h))return "PROVISIONAL";
  if(/registered institutions/.test(h))return "REGISTERED";
  if(/lapsed|lapsing of provisional registration/.test(s))return "LAPSED";
  if(/cancelled|canceled|registration cancelled/.test(s))return "CANCELLED";
- if(/withdrawn|deregistered/.test(s))return "WITHDRAWN_OR_DEREGISTERED_REVIEW";
  if(/provisionally registered|provisional registration/.test(s))return "PROVISIONAL";
  return "STATUS_UNRESOLVED";
 }
 function redactSourceExcerpt(block){
  return block.split("\n").filter(line=>{
   const t=line.trim();
-  return !/^(CONTACT PERSON|CONTACT DETAILS|TEL\.?|TELEPHONE|MOBILE|FAX|EMAIL|E-MAIL|E MAIL|E-MAIL ADDRESS|EMAIL ADDRESS|CONTACT NUMBER|PRINCIPAL|REGISTRAR)\b/i.test(t)
-   && !/^(MR|MRS|MS|MISS|DR|PROF|PROFESSOR|MX)\.?\s+/i.test(t)
-   && !/[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}/i.test(t)
-   && !/(?:\+?\d[\d ()/-]{7,}\d)/.test(t);
+  if(!t)return false;
+  if(/CONTACT PERSON|CONTACT DETAILS|CONTACT NUMBER|\bTEL\.?\b|\bTELEPHONE\b|\bMOBILE\b|\bCELL\b|\bFAX\b|\bEMAIL\b|\bE-MAIL\b|\bE MAIL\b/i.test(t))return false;
+  if(/\b(?:MR|MRS|MS|MISS|DR|PROF|PROFESSOR|MX)\.?\s+[A-Z]/i.test(t))return false;
+  if(/[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}/i.test(t))return false;
+  if(/(?:\+?\d[\d ()/-]{7,}\d)/.test(t))return false;
+  return true;
  }).join("\n").slice(0,12000);
 }
 function splitEntries(text){
@@ -53,26 +57,68 @@ function cleanHeadingName(value,source){
 export function extractRecords(text,kind){
  const source=SOURCES[kind];if(!source)throw Error("Unknown DHET register kind");
  const seen=new Set();
- return splitEntries(text).filter(e=>(e.lines.join("\n").match(source.pattern)||[]).length>0).map(e=>{
+ const nameWidth=kind==="private_colleges"?42:32;
+ const siteWidth=kind==="private_colleges"?38:34;
+ const records=splitEntries(text).filter(e=>(e.lines.join("\n").match(source.pattern)||[]).length>0).map(e=>{
   const block=e.lines.join("\n"),ids=[...new Set(block.match(source.pattern)||[])];
-  const nameLines=[];
+  const nameParts=[];
   for(const line of e.lines){
-   if(/^(CONTACT PERSON|CONTACT DETAILS|TEL\.?|TELEPHONE|EMAIL|E-MAIL|FAX|WEBSITE|WEB SITE|PHYSICAL ADDRESS|POSTAL ADDRESS|SITE OF DELIVERY)/i.test(line)||line.match(source.pattern))break;
-   if(line&&!/^[-–—]?\s*\d+\s*[-–—]?$/.test(line))nameLines.push(line);
+   const left=line.slice(0,nameWidth).trim();
+   if(!left)continue;
+   if(/^(CONTACT PERSON|CONTACT DETAILS|CONTACT NUMBER|TEL\.?|TELEPHONE|MOBILE|CELL|FAX|EMAIL|E-MAIL|WEBSITE|WEB SITE|PHYSICAL ADDRESS|POSTAL ADDRESS|SITE OF DELIVERY|DIRECTOR|MANAGER|MANAGING PRINCIPAL|PRINCIPAL|REGISTRAR|CEO|CHAIRPERSON)\b/i.test(left))break;
+   if(/^(REGISTER OF PRIVATE COLLEGES|REGISTER OF PRIVATE HIGHER EDUCATION INSTITUTIONS|NAME OF COLLEGE|NAME OF INSTITUTION|SECTION\s+[AB])/i.test(left))continue;
+   if(/^[-–—]?\s*\d+\s*[-–—]?$/.test(left))continue;
+   let part=left.replace(/^\d{1,3}\.\s*/," ").replace(source.pattern," ");
+   part=normalizeName(part);
+   if(!part||/^(NQF|NATIONAL CERTIFICATE|FET CERTIFICATE|GENERAL EDUCATION AND TRAINING|BACHELOR|HIGHER CERTIFICATE|DIPLOMA|MASTER|DOCTOR|PROGRAMME|PROGRAM|QUALIFICATION|QUALIFICATIONS|EXAM CENTRE|WEBSITE|CONTACT PERSON)/i.test(part))continue;
+   if(nameParts.length>0&&part.split(/\s+/).length===1&&!/^(PTY|LTD|NPC|CC|INC|LIMITED|PROPRIETARY)$/i.test(part))break;
+   nameParts.push(part);
+   if(nameParts.length>=3)break;
   }
-  const name=normalizeName(nameLines.slice(0,4).join(" "))||cleanHeadingName(e.first,source);
-  const key=ids.length===1?kind+":"+ids[0].toLowerCase():kind+":name:"+canonicalSlug(name);
-  const provinces=PROVINCES.filter(p=>block.toLowerCase().includes(p.toLowerCase()));
+  const name=normalizeName(nameParts.join(" "));
+  const sectionKey=canonicalSlug(e.section||"unsectioned")||"unsectioned";
+  const key=kind+":"+sectionKey+":"+String(e.number).padStart(3,"0")+":"+(ids.length===1?ids[0].toLowerCase():canonicalSlug(name));
+  const provinceSet=PROVINCES.filter(p=>block.toLowerCase().includes(p.toLowerCase()));
   const aliases=[...block.matchAll(/(?:previously known as|previously|formerly known as)\s+([^\n.;]+)/gi)].map(m=>normalizeName(m[1])).filter(Boolean);
-  const regStatus=status(e.section,block,kind),duplicate=seen.has(key);seen.add(key);
-  return {source_record_ref:key,source_register:kind,source_snapshot_date:source.date,source_url:source.url,register_entry_number:e.number,source_heading_candidate:redactSourceExcerpt(e.first),
-   canonical_name_candidate:name||null,normalized_name_key:canonicalSlug(name),registration_identifier:ids.length===1?ids[0]:null,
-   registration_identifiers_observed:ids,registration_status:regStatus,registration_status_review_required:["STATUS_UNRESOLVED","WITHDRAWN_OR_DEREGISTERED_REVIEW"].includes(regStatus),
-   province_candidates:provinces,province_status:provinces.length===1?"SOURCE_LISTED_CANDIDATE":provinces.length?"MULTI_PROVINCE_REVIEW":"NOT_EXTRACTED",
-   campus_sites:[],campus_extraction_status:"MANUAL_REVIEW_REQUIRED",alias_candidates:aliases,possible_duplicate_within_source:duplicate,
+  const regStatus=status(e.section,block,kind);
+  const idKey=ids.length===1?ids[0].toLowerCase():canonicalSlug(name);
+  const duplicate=seen.has(idKey);seen.add(idKey);
+  const campusCandidates=[...new Set(e.lines.map(line=>line.slice(nameWidth,nameWidth+siteWidth).trim())
+    .filter(x=>x&&/[A-Za-z]{3,}/.test(x)&&!/(CONTACT PERSON|CONTACT DETAILS|TEL\.?|TELEPHONE|MOBILE|CELL|FAX|EMAIL|E-MAIL|WEBSITE|QUALIFICATION|NQF LEVEL|BACHELOR|CERTIFICATE|DIPLOMA|DOCTOR|MASTER|EXAM CENTRE)/i.test(x)
+      && !/[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}/i.test(x)
+      && !/(?:\+?\d[\d ()/-]{7,}\d)/.test(x)))].slice(0,30);
+  return {source_record_ref:key,source_register:kind,source_snapshot_date:source.date,source_url:source.url,register_entry_number:e.number,
+   source_heading_candidate:redactSourceExcerpt(e.first.slice(0,nameWidth)),canonical_name_candidate:name||null,normalized_name_key:canonicalSlug(name),
+   registration_identifier:ids.length===1?ids[0]:null,registration_identifiers_observed:ids,registration_status:regStatus,
+   registration_status_review_required:["STATUS_UNRESOLVED","WITHDRAWN_OR_DEREGISTERED_REVIEW"].includes(regStatus),
+   province_candidates:provinceSet,province_status:provinceSet.length===1?"SOURCE_LISTED_CANDIDATE":provinceSet.length?"MULTI_PROVINCE_REVIEW":"NOT_EXTRACTED",
+   campus_sites:[],campus_site_candidates:campusCandidates,campus_extraction_status:campusCandidates.length?"REVIEW_REQUIRED":"NOT_EXTRACTED",
+   alias_candidates:aliases,possible_duplicate_within_source:duplicate,
    source_excerpt:redactSourceExcerpt(block),source_evidence_scope:"DHET register entry only; not a live application route or current opportunity",
-   identity_review_status:"NEEDS_CANONICAL_IDENTITY_REVIEW",official_route_status:"NOT_VERIFIED",integration_status:"NOT_CONNECTED",automation_authorized:false,import_eligible:false};
+   identity_review_status:"NEEDS_CANONICAL_IDENTITY_REVIEW",identity_conflict_status:"NOT_YET_RECONCILED",conflict_flags:[],
+   official_route_status:"NOT_VERIFIED",integration_status:"NOT_CONNECTED",automation_authorized:false,import_eligible:false};
  });
+ const byId=new Map();
+ for(const record of records)for(const id of record.registration_identifiers_observed){
+  const key=record.source_register+"|"+record.source_snapshot_date+"|"+id.toLowerCase();
+  const group=byId.get(key)||[];group.push(record);byId.set(key,group);
+ }
+ for(const group of byId.values()){
+  if(group.length<2)continue;
+  const distinctNames=new Set(group.map(x=>x.normalized_name_key).filter(Boolean));
+  const distinctStatuses=new Set(group.map(x=>x.registration_status));
+  if(distinctNames.size>1||distinctStatuses.size>1){
+   for(const record of group){
+    record.identity_conflict_status="CONFLICT_REVIEW_REQUIRED";
+    if(distinctNames.size>1)record.conflict_flags.push("REGISTRATION_IDENTIFIER_REUSED_WITH_DIFFERENT_NAME");
+    if(distinctStatuses.size>1)record.conflict_flags.push("REGISTRATION_STATUS_CONFLICT");
+    record.identity_review_status="CONFLICT_REVIEW_REQUIRED";
+   }
+  }else if(group.length>1){
+   for(const record of group){record.identity_conflict_status="DUPLICATE_SOURCE_ENTRY_REVIEW";record.conflict_flags.push("DUPLICATE_REGISTRATION_ENTRY");}
+  }
+ }
+ return records;
 }
 function selfTest(){
  const c=extractRecords("SECTION A:\n1. Former College Example (Pty) Ltd\nCONTACT PERSON\nMr A I Makungo\nTel: 015 663 1921\nEmail: contact@example.org\nMakotse Road, Zebediela\n2010/FE07/117 Limpopo\nSECTION B: REGISTERED PRIVATE COLLEGES\n1. Example Business College (Pty) Ltd\nCONTACT PERSON\nMain Road, Pretoria\n2021/FE07/006 Gauteng","private_colleges");
