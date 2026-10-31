@@ -874,7 +874,10 @@
       ],
       "refresh_after_days": 30,
       "review_required": true,
-      "connector_state": "NOT_CONNECTED"
+      "connector_state": "NOT_CONNECTED",
+      "metadata": {
+        "gcis_profile_url": "https://www.gov.za/about-government/contact-directory/soe/health_and_welfare_sector_education_and_training_authority_hwseta"
+      }
     },
     {
       "source_id": "seta_inseta_official",
@@ -999,7 +1002,10 @@
       ],
       "refresh_after_days": 30,
       "review_required": true,
-      "connector_state": "NOT_CONNECTED"
+      "connector_state": "NOT_CONNECTED",
+      "metadata": {
+        "gcis_profile_url": "https://www.gov.za/about-government/contact-directory/soe/mining_qualification_authority"
+      }
     },
     {
       "source_id": "seta_pseta_official",
@@ -1049,7 +1055,10 @@
       ],
       "refresh_after_days": 30,
       "review_required": true,
-      "connector_state": "NOT_CONNECTED"
+      "connector_state": "NOT_CONNECTED",
+      "metadata": {
+        "gcis_profile_url": "https://www.gov.za/about-government/contact-directory/soe/safety_and_security_sector_education_training_authority"
+      }
     },
     {
       "source_id": "seta_services_official",
@@ -1321,7 +1330,8 @@
         "official_gcis_profile_url": "https://www.gov.za/about-government/contact-directory/soe/airports-company-south-africa-acsa",
         "official_website_as_listed_by_gcis": "https://www.airports.co.za/",
         "provider_key": "soe_acsa",
-        "record_status": "NEEDS_REVIEW"
+        "record_status": "NEEDS_REVIEW",
+        "gcis_profile_url": "https://www.gov.za/about-government/contact-directory/soe/airports_company_south_africa_acsa"
       }
     },
     {
@@ -1351,7 +1361,8 @@
         "official_gcis_profile_url": "https://www.gov.za/about-government/contact-directory/soe/denel-pty-ltd",
         "official_website_as_listed_by_gcis": "https://www.denel.co.za/",
         "provider_key": "soe_denel",
-        "record_status": "NEEDS_REVIEW"
+        "record_status": "NEEDS_REVIEW",
+        "gcis_profile_url": "https://www.gov.za/about-government/contact-directory/soe/denel_pty_ltd"
       }
     },
     {
@@ -1382,7 +1393,8 @@
         "official_gcis_profile_url": "https://www.gov.za/about-government/contact-directory/soe/passenger-rail-agency-south-african-prasa",
         "official_website_as_listed_by_gcis": "https://www.prasa.com/",
         "provider_key": "soe_prasa",
-        "record_status": "NEEDS_REVIEW"
+        "record_status": "NEEDS_REVIEW",
+        "gcis_profile_url": "https://www.gov.za/about-government/contact-directory/soe/passenger_rail_agency_south_african_prasa"
       }
     },
     {
@@ -1413,7 +1425,8 @@
         "official_gcis_profile_url": "https://www.gov.za/about-government/contact-directory/soe/south-african-airways-saa",
         "official_website_as_listed_by_gcis": "https://www.flysaa.com/",
         "provider_key": "soe_saa",
-        "record_status": "NEEDS_REVIEW"
+        "record_status": "NEEDS_REVIEW",
+        "gcis_profile_url": "https://www.gov.za/about-government/contact-directory/soe/south_african_airways_saa"
       }
     },
     {
@@ -1443,7 +1456,8 @@
         "official_gcis_profile_url": "https://www.gov.za/about-government/contact-directory/soe/south-african-broadcasting-corporation-sabc",
         "official_website_as_listed_by_gcis": "https://www.sabc.co.za/",
         "provider_key": "soe_sabc",
-        "record_status": "NEEDS_REVIEW"
+        "record_status": "NEEDS_REVIEW",
+        "gcis_profile_url": "https://www.gov.za/about-government/contact-directory/soe/south_african_broadcasting_corporation_sabc"
       }
     },
     {
@@ -1474,7 +1488,8 @@
         "official_gcis_profile_url": "https://www.gov.za/about-government/contact-directory/soe/south-african-national-road-agency",
         "official_website_as_listed_by_gcis": "https://www.nra.co.za/",
         "provider_key": "soe_sanral",
-        "record_status": "NEEDS_REVIEW"
+        "record_status": "NEEDS_REVIEW",
+        "gcis_profile_url": "https://www.gov.za/about-government/contact-directory/soe/south_african_national_road_agency"
       }
     },
     {
@@ -1505,7 +1520,8 @@
         "official_gcis_profile_url": "https://www.gov.za/about-government/contact-directory/soe/south-african-post-office-sapo",
         "official_website_as_listed_by_gcis": "https://www.postoffice.co.za/",
         "provider_key": "soe_sapo",
-        "record_status": "NEEDS_REVIEW"
+        "record_status": "NEEDS_REVIEW",
+        "gcis_profile_url": "https://www.gov.za/about-government/contact-directory/soe/south_african_post_office_sapo"
       }
     },
     {
@@ -1535,7 +1551,8 @@
         "official_gcis_profile_url": "https://www.gov.za/about-government/contact-directory/soe/telkom-sa-ltd",
         "official_website_as_listed_by_gcis": "https://www.telkom.co.za/",
         "provider_key": "soe_telkom",
-        "record_status": "NEEDS_REVIEW"
+        "record_status": "NEEDS_REVIEW",
+        "gcis_profile_url": "https://www.gov.za/about-government/contact-directory/soe/telkom_sa_ltd"
       }
     },
     {
@@ -1566,7 +1583,8 @@
         "official_gcis_profile_url": "https://www.gov.za/about-government/contact-directory/soe/transnet-ltd",
         "official_website_as_listed_by_gcis": "https://www.transnet.net/",
         "provider_key": "soe_transnet",
-        "record_status": "NEEDS_REVIEW"
+        "record_status": "NEEDS_REVIEW",
+        "gcis_profile_url": "https://www.gov.za/about-government/contact-directory/soe/transnet_ltd"
       }
     },
     {
@@ -1749,6 +1767,2709 @@
         "official_portal_url": "https://profprod.nsfas.org.za/",
         "candidate_can_apply_directly_on_provider_platform": true,
         "kingsmen_submission_authority": "NOT_GRANTED"
+      }
+    },
+    {
+      "source_id": "gcis_public_entity_national_house_traditional_and_khoisan_leaders",
+      "provider_key": "soe_national_house_traditional_and_khoisan_leaders",
+      "name": "National House of Traditional and Khoisan Leaders",
+      "authority": "Government Communication and Information System / National Government Directory",
+      "url": "https://www.gov.za/about-government/contact-directory/soe/national-house-traditional-and-khoisan-leaders",
+      "classes": [
+        "PUBLIC_ENTITY",
+        "EMPLOYER_AND_RECRUITMENT",
+        "PUBLIC_ADMINISTRATION"
+      ],
+      "supports": [
+        "GCIS individual public-entity profile and official-directory listing",
+        "employment, internship and workplace-opportunity discovery only after checking the exact current employer notice and application route"
+      ],
+      "does_not_prove": [
+        "current vacancy, internship, apprenticeship or learnership",
+        "candidate eligibility, current deadline or exact application portal",
+        "a Kingsmen partnership, authorised connector, submission receipt or employer decision"
+      ],
+      "refresh_after_days": 30,
+      "review_required": true,
+      "connector_state": "NOT_CONNECTED",
+      "metadata": {
+        "gcis_profile_url": "https://www.gov.za/about-government/contact-directory/soe/national-house-traditional-and-khoisan-leaders",
+        "provider_key": "soe_national_house_traditional_and_khoisan_leaders",
+        "source_record_status": "NEEDS_REVIEW",
+        "provider_homepage_url": null,
+        "external_application_route_status": "NOT_VERIFIED"
+      }
+    },
+    {
+      "source_id": "gcis_public_entity_accounting_standards_board",
+      "provider_key": "soe_accounting_standards_board",
+      "name": "Accounting Standards Board",
+      "authority": "Government Communication and Information System / National Government Directory",
+      "url": "https://www.gov.za/about-government/contact-directory/soe/accounting-standards-board",
+      "classes": [
+        "PUBLIC_ENTITY",
+        "EMPLOYER_AND_RECRUITMENT",
+        "PUBLIC_ADMINISTRATION",
+        "FINANCE_AND_INSURANCE"
+      ],
+      "supports": [
+        "GCIS individual public-entity profile and official-directory listing",
+        "employment, internship and workplace-opportunity discovery only after checking the exact current employer notice and application route"
+      ],
+      "does_not_prove": [
+        "current vacancy, internship, apprenticeship or learnership",
+        "candidate eligibility, current deadline or exact application portal",
+        "a Kingsmen partnership, authorised connector, submission receipt or employer decision"
+      ],
+      "refresh_after_days": 30,
+      "review_required": true,
+      "connector_state": "NOT_CONNECTED",
+      "metadata": {
+        "gcis_profile_url": "https://www.gov.za/about-government/contact-directory/soe/accounting-standards-board",
+        "provider_key": "soe_accounting_standards_board",
+        "source_record_status": "NEEDS_REVIEW",
+        "provider_homepage_url": null,
+        "external_application_route_status": "NOT_VERIFIED"
+      }
+    },
+    {
+      "source_id": "gcis_public_entity_agricultural_research_council_arc",
+      "provider_key": "soe_agricultural_research_council_arc",
+      "name": "Agricultural Research Council (ARC)",
+      "authority": "Government Communication and Information System / National Government Directory",
+      "url": "https://www.gov.za/about-government/contact-directory/soe/agricultural-research-council-arc",
+      "classes": [
+        "PUBLIC_ENTITY",
+        "EMPLOYER_AND_RECRUITMENT",
+        "PUBLIC_ADMINISTRATION",
+        "EDUCATION_AND_SKILLS"
+      ],
+      "supports": [
+        "GCIS individual public-entity profile and official-directory listing",
+        "employment, internship and workplace-opportunity discovery only after checking the exact current employer notice and application route"
+      ],
+      "does_not_prove": [
+        "current vacancy, internship, apprenticeship or learnership",
+        "candidate eligibility, current deadline or exact application portal",
+        "a Kingsmen partnership, authorised connector, submission receipt or employer decision"
+      ],
+      "refresh_after_days": 30,
+      "review_required": true,
+      "connector_state": "NOT_CONNECTED",
+      "metadata": {
+        "gcis_profile_url": "https://www.gov.za/about-government/contact-directory/soe/agricultural-research-council-arc",
+        "provider_key": "soe_agricultural_research_council_arc",
+        "source_record_status": "NEEDS_REVIEW",
+        "provider_homepage_url": null,
+        "external_application_route_status": "NOT_VERIFIED"
+      }
+    },
+    {
+      "source_id": "gcis_public_entity_air_traffic_and_navigation_services_company",
+      "provider_key": "soe_air_traffic_and_navigation_services_company",
+      "name": "Air Traffic and Navigation Services Company",
+      "authority": "Government Communication and Information System / National Government Directory",
+      "url": "https://www.gov.za/about-government/contact-directory/soe/air-traffic-and-navigation-services-company",
+      "classes": [
+        "PUBLIC_ENTITY",
+        "EMPLOYER_AND_RECRUITMENT",
+        "PUBLIC_ADMINISTRATION",
+        "TRANSPORT_AND_ESSENTIAL_SERVICES"
+      ],
+      "supports": [
+        "GCIS individual public-entity profile and official-directory listing",
+        "employment, internship and workplace-opportunity discovery only after checking the exact current employer notice and application route"
+      ],
+      "does_not_prove": [
+        "current vacancy, internship, apprenticeship or learnership",
+        "candidate eligibility, current deadline or exact application portal",
+        "a Kingsmen partnership, authorised connector, submission receipt or employer decision"
+      ],
+      "refresh_after_days": 30,
+      "review_required": true,
+      "connector_state": "NOT_CONNECTED",
+      "metadata": {
+        "gcis_profile_url": "https://www.gov.za/about-government/contact-directory/soe/air-traffic-and-navigation-services-company",
+        "provider_key": "soe_air_traffic_and_navigation_services_company",
+        "source_record_status": "NEEDS_REVIEW",
+        "provider_homepage_url": null,
+        "external_application_route_status": "NOT_VERIFIED"
+      }
+    },
+    {
+      "source_id": "gcis_public_entity_alexkor_limited",
+      "provider_key": "soe_alexkor_limited",
+      "name": "Alexkor Limited",
+      "authority": "Government Communication and Information System / National Government Directory",
+      "url": "https://www.gov.za/about-government/contact-directory/soe/alexkor-limited",
+      "classes": [
+        "PUBLIC_ENTITY",
+        "EMPLOYER_AND_RECRUITMENT",
+        "PUBLIC_ADMINISTRATION"
+      ],
+      "supports": [
+        "GCIS individual public-entity profile and official-directory listing",
+        "employment, internship and workplace-opportunity discovery only after checking the exact current employer notice and application route"
+      ],
+      "does_not_prove": [
+        "current vacancy, internship, apprenticeship or learnership",
+        "candidate eligibility, current deadline or exact application portal",
+        "a Kingsmen partnership, authorised connector, submission receipt or employer decision"
+      ],
+      "refresh_after_days": 30,
+      "review_required": true,
+      "connector_state": "NOT_CONNECTED",
+      "metadata": {
+        "gcis_profile_url": "https://www.gov.za/about-government/contact-directory/soe/alexkor-limited",
+        "provider_key": "soe_alexkor_limited",
+        "source_record_status": "NEEDS_REVIEW",
+        "provider_homepage_url": null,
+        "external_application_route_status": "NOT_VERIFIED"
+      }
+    },
+    {
+      "source_id": "gcis_public_entity_armscor",
+      "provider_key": "soe_armscor",
+      "name": "Armaments Corporation of South Africa (ARMSCOR)",
+      "authority": "Government Communication and Information System / National Government Directory",
+      "url": "https://www.gov.za/about-government/contact-directory/soe/armaments-corporation-south-africa-armscor",
+      "classes": [
+        "PUBLIC_ENTITY",
+        "EMPLOYER_AND_RECRUITMENT",
+        "PUBLIC_ADMINISTRATION"
+      ],
+      "supports": [
+        "GCIS individual public-entity profile and official-directory listing",
+        "employment, internship and workplace-opportunity discovery only after checking the exact current employer notice and application route"
+      ],
+      "does_not_prove": [
+        "current vacancy, internship, apprenticeship or learnership",
+        "candidate eligibility, current deadline or exact application portal",
+        "a Kingsmen partnership, authorised connector, submission receipt or employer decision"
+      ],
+      "refresh_after_days": 30,
+      "review_required": true,
+      "connector_state": "NOT_CONNECTED",
+      "metadata": {
+        "gcis_profile_url": "https://www.gov.za/about-government/contact-directory/soe/armaments-corporation-south-africa-armscor",
+        "provider_key": "soe_armscor",
+        "source_record_status": "NEEDS_REVIEW",
+        "provider_homepage_url": null,
+        "external_application_route_status": "NOT_VERIFIED"
+      }
+    },
+    {
+      "source_id": "gcis_public_entity_blind_sa",
+      "provider_key": "soe_blind_sa",
+      "name": "Blind SA",
+      "authority": "Government Communication and Information System / National Government Directory",
+      "url": "https://www.gov.za/about-government/contact-directory/soe/blind-sa",
+      "classes": [
+        "PUBLIC_ENTITY",
+        "EMPLOYER_AND_RECRUITMENT",
+        "PUBLIC_ADMINISTRATION",
+        "NGO_NPO_AND_FOUNDATION",
+        "LEGAL_AID_AND_COMMUNITY_SERVICES"
+      ],
+      "supports": [
+        "GCIS individual public-entity profile and official-directory listing",
+        "employment, internship and workplace-opportunity discovery only after checking the exact current employer notice and application route"
+      ],
+      "does_not_prove": [
+        "current vacancy, internship, apprenticeship or learnership",
+        "candidate eligibility, current deadline or exact application portal",
+        "a Kingsmen partnership, authorised connector, submission receipt or employer decision"
+      ],
+      "refresh_after_days": 30,
+      "review_required": true,
+      "connector_state": "NOT_CONNECTED",
+      "metadata": {
+        "gcis_profile_url": "https://www.gov.za/about-government/contact-directory/soe/blind-sa",
+        "provider_key": "soe_blind_sa",
+        "source_record_status": "NEEDS_REVIEW",
+        "provider_homepage_url": null,
+        "external_application_route_status": "NOT_VERIFIED"
+      }
+    },
+    {
+      "source_id": "gcis_public_entity_border_management_authority_bma",
+      "provider_key": "soe_border_management_authority_bma",
+      "name": "Border Management Authority (BMA)",
+      "authority": "Government Communication and Information System / National Government Directory",
+      "url": "https://www.gov.za/about-government/contact-directory/soe/border-management-authority-bma",
+      "classes": [
+        "PUBLIC_ENTITY",
+        "EMPLOYER_AND_RECRUITMENT",
+        "PUBLIC_ADMINISTRATION",
+        "PUBLIC_ADMINISTRATION"
+      ],
+      "supports": [
+        "GCIS individual public-entity profile and official-directory listing",
+        "employment, internship and workplace-opportunity discovery only after checking the exact current employer notice and application route"
+      ],
+      "does_not_prove": [
+        "current vacancy, internship, apprenticeship or learnership",
+        "candidate eligibility, current deadline or exact application portal",
+        "a Kingsmen partnership, authorised connector, submission receipt or employer decision"
+      ],
+      "refresh_after_days": 30,
+      "review_required": true,
+      "connector_state": "NOT_CONNECTED",
+      "metadata": {
+        "gcis_profile_url": "https://www.gov.za/about-government/contact-directory/soe/border-management-authority-bma",
+        "provider_key": "soe_border_management_authority_bma",
+        "source_record_status": "NEEDS_REVIEW",
+        "provider_homepage_url": null,
+        "external_application_route_status": "NOT_VERIFIED"
+      }
+    },
+    {
+      "source_id": "gcis_public_entity_brand_south_africa",
+      "provider_key": "soe_brand_south_africa",
+      "name": "Brand South Africa",
+      "authority": "Government Communication and Information System / National Government Directory",
+      "url": "https://www.gov.za/about-government/contact-directory/soe/brand-south-africa",
+      "classes": [
+        "PUBLIC_ENTITY",
+        "EMPLOYER_AND_RECRUITMENT",
+        "PUBLIC_ADMINISTRATION"
+      ],
+      "supports": [
+        "GCIS individual public-entity profile and official-directory listing",
+        "employment, internship and workplace-opportunity discovery only after checking the exact current employer notice and application route"
+      ],
+      "does_not_prove": [
+        "current vacancy, internship, apprenticeship or learnership",
+        "candidate eligibility, current deadline or exact application portal",
+        "a Kingsmen partnership, authorised connector, submission receipt or employer decision"
+      ],
+      "refresh_after_days": 30,
+      "review_required": true,
+      "connector_state": "NOT_CONNECTED",
+      "metadata": {
+        "gcis_profile_url": "https://www.gov.za/about-government/contact-directory/soe/brand-south-africa",
+        "provider_key": "soe_brand_south_africa",
+        "source_record_status": "NEEDS_REVIEW",
+        "provider_homepage_url": null,
+        "external_application_route_status": "NOT_VERIFIED"
+      }
+    },
+    {
+      "source_id": "gcis_public_entity_breede_gouritz_cma",
+      "provider_key": "soe_breede_gouritz_cma",
+      "name": "Breede-Gouritz CMA",
+      "authority": "Government Communication and Information System / National Government Directory",
+      "url": "https://www.gov.za/about-government/contact-directory/soe/breede-gouritz-cma",
+      "classes": [
+        "PUBLIC_ENTITY",
+        "EMPLOYER_AND_RECRUITMENT",
+        "PUBLIC_ADMINISTRATION",
+        "TRANSPORT_AND_ESSENTIAL_SERVICES"
+      ],
+      "supports": [
+        "GCIS individual public-entity profile and official-directory listing",
+        "employment, internship and workplace-opportunity discovery only after checking the exact current employer notice and application route"
+      ],
+      "does_not_prove": [
+        "current vacancy, internship, apprenticeship or learnership",
+        "candidate eligibility, current deadline or exact application portal",
+        "a Kingsmen partnership, authorised connector, submission receipt or employer decision"
+      ],
+      "refresh_after_days": 30,
+      "review_required": true,
+      "connector_state": "NOT_CONNECTED",
+      "metadata": {
+        "gcis_profile_url": "https://www.gov.za/about-government/contact-directory/soe/breede-gouritz-cma",
+        "provider_key": "soe_breede_gouritz_cma",
+        "source_record_status": "NEEDS_REVIEW",
+        "provider_homepage_url": null,
+        "external_application_route_status": "NOT_VERIFIED"
+      }
+    },
+    {
+      "source_id": "gcis_public_entity_broadband_infraco",
+      "provider_key": "soe_broadband_infraco",
+      "name": "Broadband Infraco",
+      "authority": "Government Communication and Information System / National Government Directory",
+      "url": "https://www.gov.za/about-government/contact-directory/soe/broadband-infraco",
+      "classes": [
+        "PUBLIC_ENTITY",
+        "EMPLOYER_AND_RECRUITMENT",
+        "PUBLIC_ADMINISTRATION",
+        "TRANSPORT_AND_ESSENTIAL_SERVICES"
+      ],
+      "supports": [
+        "GCIS individual public-entity profile and official-directory listing",
+        "employment, internship and workplace-opportunity discovery only after checking the exact current employer notice and application route"
+      ],
+      "does_not_prove": [
+        "current vacancy, internship, apprenticeship or learnership",
+        "candidate eligibility, current deadline or exact application portal",
+        "a Kingsmen partnership, authorised connector, submission receipt or employer decision"
+      ],
+      "refresh_after_days": 30,
+      "review_required": true,
+      "connector_state": "NOT_CONNECTED",
+      "metadata": {
+        "gcis_profile_url": "https://www.gov.za/about-government/contact-directory/soe/broadband-infraco",
+        "provider_key": "soe_broadband_infraco",
+        "source_record_status": "NEEDS_REVIEW",
+        "provider_homepage_url": null,
+        "external_application_route_status": "NOT_VERIFIED"
+      }
+    },
+    {
+      "source_id": "gcis_public_entity_broadcasting_complaints_commission_south_africa_bccsa",
+      "provider_key": "soe_broadcasting_complaints_commission_south_africa_bccsa",
+      "name": "Broadcasting Complaints Commission of South Africa (BCCSA)",
+      "authority": "Government Communication and Information System / National Government Directory",
+      "url": "https://www.gov.za/about-government/contact-directory/soe/broadcasting-complaints-commission-south-africa-bccsa",
+      "classes": [
+        "PUBLIC_ENTITY",
+        "EMPLOYER_AND_RECRUITMENT",
+        "PUBLIC_ADMINISTRATION",
+        "REGULATOR_AND_PROFESSIONAL_COUNCIL"
+      ],
+      "supports": [
+        "GCIS individual public-entity profile and official-directory listing",
+        "employment, internship and workplace-opportunity discovery only after checking the exact current employer notice and application route"
+      ],
+      "does_not_prove": [
+        "current vacancy, internship, apprenticeship or learnership",
+        "candidate eligibility, current deadline or exact application portal",
+        "a Kingsmen partnership, authorised connector, submission receipt or employer decision"
+      ],
+      "refresh_after_days": 30,
+      "review_required": true,
+      "connector_state": "NOT_CONNECTED",
+      "metadata": {
+        "gcis_profile_url": "https://www.gov.za/about-government/contact-directory/soe/broadcasting-complaints-commission-south-africa-bccsa",
+        "provider_key": "soe_broadcasting_complaints_commission_south_africa_bccsa",
+        "source_record_status": "NEEDS_REVIEW",
+        "provider_homepage_url": null,
+        "external_application_route_status": "NOT_VERIFIED"
+      }
+    },
+    {
+      "source_id": "gcis_public_entity_cape_town_international_airport",
+      "provider_key": "soe_cape_town_international_airport",
+      "name": "Cape Town International Airport",
+      "authority": "Government Communication and Information System / National Government Directory",
+      "url": "https://www.gov.za/about-government/contact-directory/soe/cape-town-international-airport",
+      "classes": [
+        "PUBLIC_ENTITY",
+        "EMPLOYER_AND_RECRUITMENT",
+        "PUBLIC_ADMINISTRATION",
+        "TRANSPORT_AND_ESSENTIAL_SERVICES"
+      ],
+      "supports": [
+        "GCIS individual public-entity profile and official-directory listing",
+        "employment, internship and workplace-opportunity discovery only after checking the exact current employer notice and application route"
+      ],
+      "does_not_prove": [
+        "current vacancy, internship, apprenticeship or learnership",
+        "candidate eligibility, current deadline or exact application portal",
+        "a Kingsmen partnership, authorised connector, submission receipt or employer decision"
+      ],
+      "refresh_after_days": 30,
+      "review_required": true,
+      "connector_state": "NOT_CONNECTED",
+      "metadata": {
+        "gcis_profile_url": "https://www.gov.za/about-government/contact-directory/soe/cape-town-international-airport",
+        "provider_key": "soe_cape_town_international_airport",
+        "source_record_status": "NEEDS_REVIEW",
+        "provider_homepage_url": null,
+        "external_application_route_status": "NOT_VERIFIED"
+      }
+    },
+    {
+      "source_id": "gcis_public_entity_central_energy_fund_cef",
+      "provider_key": "soe_central_energy_fund_cef",
+      "name": "Central Energy Fund (CEF)",
+      "authority": "Government Communication and Information System / National Government Directory",
+      "url": "https://www.gov.za/about-government/contact-directory/soe/central-energy-fund-cef",
+      "classes": [
+        "PUBLIC_ENTITY",
+        "EMPLOYER_AND_RECRUITMENT",
+        "PUBLIC_ADMINISTRATION",
+        "ENERGY_AND_UTILITIES",
+        "FINANCE_AND_INSURANCE"
+      ],
+      "supports": [
+        "GCIS individual public-entity profile and official-directory listing",
+        "employment, internship and workplace-opportunity discovery only after checking the exact current employer notice and application route"
+      ],
+      "does_not_prove": [
+        "current vacancy, internship, apprenticeship or learnership",
+        "candidate eligibility, current deadline or exact application portal",
+        "a Kingsmen partnership, authorised connector, submission receipt or employer decision"
+      ],
+      "refresh_after_days": 30,
+      "review_required": true,
+      "connector_state": "NOT_CONNECTED",
+      "metadata": {
+        "gcis_profile_url": "https://www.gov.za/about-government/contact-directory/soe/central-energy-fund-cef",
+        "provider_key": "soe_central_energy_fund_cef",
+        "source_record_status": "NEEDS_REVIEW",
+        "provider_homepage_url": null,
+        "external_application_route_status": "NOT_VERIFIED"
+      }
+    },
+    {
+      "source_id": "gcis_public_entity_ccma",
+      "provider_key": "soe_ccma",
+      "name": "Commission for Conciliation, Mediation and Arbitration",
+      "authority": "Government Communication and Information System / National Government Directory",
+      "url": "https://www.gov.za/about-government/contact-directory/soe/commission-conciliation-mediation-and-arbitration",
+      "classes": [
+        "PUBLIC_ENTITY",
+        "EMPLOYER_AND_RECRUITMENT",
+        "PUBLIC_ADMINISTRATION",
+        "LEGAL_AID_AND_COMMUNITY_SERVICES",
+        "PUBLIC_ADMINISTRATION"
+      ],
+      "supports": [
+        "GCIS individual public-entity profile and official-directory listing",
+        "employment, internship and workplace-opportunity discovery only after checking the exact current employer notice and application route"
+      ],
+      "does_not_prove": [
+        "current vacancy, internship, apprenticeship or learnership",
+        "candidate eligibility, current deadline or exact application portal",
+        "a Kingsmen partnership, authorised connector, submission receipt or employer decision"
+      ],
+      "refresh_after_days": 30,
+      "review_required": true,
+      "connector_state": "NOT_CONNECTED",
+      "metadata": {
+        "gcis_profile_url": "https://www.gov.za/about-government/contact-directory/soe/commission-conciliation-mediation-and-arbitration",
+        "provider_key": "soe_ccma",
+        "source_record_status": "NEEDS_REVIEW",
+        "provider_homepage_url": null,
+        "external_application_route_status": "NOT_VERIFIED"
+      }
+    },
+    {
+      "source_id": "gcis_public_entity_cipc",
+      "provider_key": "soe_cipc",
+      "name": "Companies and Intellectual Property Commission (CIPC)",
+      "authority": "Government Communication and Information System / National Government Directory",
+      "url": "https://www.gov.za/about-government/contact-directory/soe/companies-and-intellectual-property-commission-cipc",
+      "classes": [
+        "PUBLIC_ENTITY",
+        "EMPLOYER_AND_RECRUITMENT",
+        "PUBLIC_ADMINISTRATION",
+        "REGULATOR_AND_PROFESSIONAL_COUNCIL"
+      ],
+      "supports": [
+        "GCIS individual public-entity profile and official-directory listing",
+        "employment, internship and workplace-opportunity discovery only after checking the exact current employer notice and application route"
+      ],
+      "does_not_prove": [
+        "current vacancy, internship, apprenticeship or learnership",
+        "candidate eligibility, current deadline or exact application portal",
+        "a Kingsmen partnership, authorised connector, submission receipt or employer decision"
+      ],
+      "refresh_after_days": 30,
+      "review_required": true,
+      "connector_state": "NOT_CONNECTED",
+      "metadata": {
+        "gcis_profile_url": "https://www.gov.za/about-government/contact-directory/soe/companies-and-intellectual-property-commission-cipc",
+        "provider_key": "soe_cipc",
+        "source_record_status": "NEEDS_REVIEW",
+        "provider_homepage_url": null,
+        "external_application_route_status": "NOT_VERIFIED"
+      }
+    },
+    {
+      "source_id": "gcis_public_entity_competition_commission",
+      "provider_key": "soe_competition_commission",
+      "name": "Competition Commission",
+      "authority": "Government Communication and Information System / National Government Directory",
+      "url": "https://www.gov.za/about-government/contact-directory/soe/competition-commission",
+      "classes": [
+        "PUBLIC_ENTITY",
+        "EMPLOYER_AND_RECRUITMENT",
+        "PUBLIC_ADMINISTRATION",
+        "REGULATOR_AND_PROFESSIONAL_COUNCIL"
+      ],
+      "supports": [
+        "GCIS individual public-entity profile and official-directory listing",
+        "employment, internship and workplace-opportunity discovery only after checking the exact current employer notice and application route"
+      ],
+      "does_not_prove": [
+        "current vacancy, internship, apprenticeship or learnership",
+        "candidate eligibility, current deadline or exact application portal",
+        "a Kingsmen partnership, authorised connector, submission receipt or employer decision"
+      ],
+      "refresh_after_days": 30,
+      "review_required": true,
+      "connector_state": "NOT_CONNECTED",
+      "metadata": {
+        "gcis_profile_url": "https://www.gov.za/about-government/contact-directory/soe/competition-commission",
+        "provider_key": "soe_competition_commission",
+        "source_record_status": "NEEDS_REVIEW",
+        "provider_homepage_url": null,
+        "external_application_route_status": "NOT_VERIFIED"
+      }
+    },
+    {
+      "source_id": "gcis_public_entity_competition_tribunal",
+      "provider_key": "soe_competition_tribunal",
+      "name": "Competition Tribunal",
+      "authority": "Government Communication and Information System / National Government Directory",
+      "url": "https://www.gov.za/about-government/contact-directory/soe/competition-tribunal",
+      "classes": [
+        "PUBLIC_ENTITY",
+        "EMPLOYER_AND_RECRUITMENT",
+        "PUBLIC_ADMINISTRATION",
+        "REGULATOR_AND_PROFESSIONAL_COUNCIL"
+      ],
+      "supports": [
+        "GCIS individual public-entity profile and official-directory listing",
+        "employment, internship and workplace-opportunity discovery only after checking the exact current employer notice and application route"
+      ],
+      "does_not_prove": [
+        "current vacancy, internship, apprenticeship or learnership",
+        "candidate eligibility, current deadline or exact application portal",
+        "a Kingsmen partnership, authorised connector, submission receipt or employer decision"
+      ],
+      "refresh_after_days": 30,
+      "review_required": true,
+      "connector_state": "NOT_CONNECTED",
+      "metadata": {
+        "gcis_profile_url": "https://www.gov.za/about-government/contact-directory/soe/competition-tribunal",
+        "provider_key": "soe_competition_tribunal",
+        "source_record_status": "NEEDS_REVIEW",
+        "provider_homepage_url": null,
+        "external_application_route_status": "NOT_VERIFIED"
+      }
+    },
+    {
+      "source_id": "gcis_public_entity_council_geoscience",
+      "provider_key": "soe_council_geoscience",
+      "name": "Council for Geoscience",
+      "authority": "Government Communication and Information System / National Government Directory",
+      "url": "https://www.gov.za/about-government/contact-directory/soe/council-geoscience",
+      "classes": [
+        "PUBLIC_ENTITY",
+        "EMPLOYER_AND_RECRUITMENT",
+        "PUBLIC_ADMINISTRATION",
+        "EDUCATION_AND_SKILLS"
+      ],
+      "supports": [
+        "GCIS individual public-entity profile and official-directory listing",
+        "employment, internship and workplace-opportunity discovery only after checking the exact current employer notice and application route"
+      ],
+      "does_not_prove": [
+        "current vacancy, internship, apprenticeship or learnership",
+        "candidate eligibility, current deadline or exact application portal",
+        "a Kingsmen partnership, authorised connector, submission receipt or employer decision"
+      ],
+      "refresh_after_days": 30,
+      "review_required": true,
+      "connector_state": "NOT_CONNECTED",
+      "metadata": {
+        "gcis_profile_url": "https://www.gov.za/about-government/contact-directory/soe/council-geoscience",
+        "provider_key": "soe_council_geoscience",
+        "source_record_status": "NEEDS_REVIEW",
+        "provider_homepage_url": null,
+        "external_application_route_status": "NOT_VERIFIED"
+      }
+    },
+    {
+      "source_id": "gcis_public_entity_council_medical_schemes",
+      "provider_key": "soe_council_medical_schemes",
+      "name": "Council for Medical Schemes",
+      "authority": "Government Communication and Information System / National Government Directory",
+      "url": "https://www.gov.za/about-government/contact-directory/soe/council-medical-schemes",
+      "classes": [
+        "PUBLIC_ENTITY",
+        "EMPLOYER_AND_RECRUITMENT",
+        "PUBLIC_ADMINISTRATION",
+        "HEALTH_AND_CARE",
+        "REGULATOR_AND_PROFESSIONAL_COUNCIL"
+      ],
+      "supports": [
+        "GCIS individual public-entity profile and official-directory listing",
+        "employment, internship and workplace-opportunity discovery only after checking the exact current employer notice and application route"
+      ],
+      "does_not_prove": [
+        "current vacancy, internship, apprenticeship or learnership",
+        "candidate eligibility, current deadline or exact application portal",
+        "a Kingsmen partnership, authorised connector, submission receipt or employer decision"
+      ],
+      "refresh_after_days": 30,
+      "review_required": true,
+      "connector_state": "NOT_CONNECTED",
+      "metadata": {
+        "gcis_profile_url": "https://www.gov.za/about-government/contact-directory/soe/council-medical-schemes",
+        "provider_key": "soe_council_medical_schemes",
+        "source_record_status": "NEEDS_REVIEW",
+        "provider_homepage_url": null,
+        "external_application_route_status": "NOT_VERIFIED"
+      }
+    },
+    {
+      "source_id": "gcis_public_entity_council_higher_education",
+      "provider_key": "soe_council_higher_education",
+      "name": "Council on Higher Education",
+      "authority": "Government Communication and Information System / National Government Directory",
+      "url": "https://www.gov.za/about-government/contact-directory/soe/council-higher-education",
+      "classes": [
+        "PUBLIC_ENTITY",
+        "EMPLOYER_AND_RECRUITMENT",
+        "PUBLIC_ADMINISTRATION",
+        "EDUCATION_AND_SKILLS",
+        "REGULATOR_AND_PROFESSIONAL_COUNCIL"
+      ],
+      "supports": [
+        "GCIS individual public-entity profile and official-directory listing",
+        "employment, internship and workplace-opportunity discovery only after checking the exact current employer notice and application route"
+      ],
+      "does_not_prove": [
+        "current vacancy, internship, apprenticeship or learnership",
+        "candidate eligibility, current deadline or exact application portal",
+        "a Kingsmen partnership, authorised connector, submission receipt or employer decision"
+      ],
+      "refresh_after_days": 30,
+      "review_required": true,
+      "connector_state": "NOT_CONNECTED",
+      "metadata": {
+        "gcis_profile_url": "https://www.gov.za/about-government/contact-directory/soe/council-higher-education",
+        "provider_key": "soe_council_higher_education",
+        "source_record_status": "NEEDS_REVIEW",
+        "provider_homepage_url": null,
+        "external_application_route_status": "NOT_VERIFIED"
+      }
+    },
+    {
+      "source_id": "gcis_public_entity_export_credit_insurance_corporation",
+      "provider_key": "soe_export_credit_insurance_corporation",
+      "name": "Export Credit Insurance Corporation of South Africa SOC Ltd",
+      "authority": "Government Communication and Information System / National Government Directory",
+      "url": "https://www.gov.za/about-government/contact-directory/soe/export-credit-insurance-corporation-south-africa-soc-ltd",
+      "classes": [
+        "PUBLIC_ENTITY",
+        "EMPLOYER_AND_RECRUITMENT",
+        "PUBLIC_ADMINISTRATION",
+        "FINANCE_AND_INSURANCE"
+      ],
+      "supports": [
+        "GCIS individual public-entity profile and official-directory listing",
+        "employment, internship and workplace-opportunity discovery only after checking the exact current employer notice and application route"
+      ],
+      "does_not_prove": [
+        "current vacancy, internship, apprenticeship or learnership",
+        "candidate eligibility, current deadline or exact application portal",
+        "a Kingsmen partnership, authorised connector, submission receipt or employer decision"
+      ],
+      "refresh_after_days": 30,
+      "review_required": true,
+      "connector_state": "NOT_CONNECTED",
+      "metadata": {
+        "gcis_profile_url": "https://www.gov.za/about-government/contact-directory/soe/export-credit-insurance-corporation-south-africa-soc-ltd",
+        "provider_key": "soe_export_credit_insurance_corporation",
+        "source_record_status": "NEEDS_REVIEW",
+        "provider_homepage_url": null,
+        "external_application_route_status": "NOT_VERIFIED"
+      }
+    },
+    {
+      "source_id": "gcis_public_entity_film_and_publication_board_fpb",
+      "provider_key": "soe_film_and_publication_board_fpb",
+      "name": "Film and Publication Board (FPB)",
+      "authority": "Government Communication and Information System / National Government Directory",
+      "url": "https://www.gov.za/about-government/contact-directory/soe/film-and-publication-board-fpb",
+      "classes": [
+        "PUBLIC_ENTITY",
+        "EMPLOYER_AND_RECRUITMENT",
+        "PUBLIC_ADMINISTRATION",
+        "REGULATOR_AND_PROFESSIONAL_COUNCIL"
+      ],
+      "supports": [
+        "GCIS individual public-entity profile and official-directory listing",
+        "employment, internship and workplace-opportunity discovery only after checking the exact current employer notice and application route"
+      ],
+      "does_not_prove": [
+        "current vacancy, internship, apprenticeship or learnership",
+        "candidate eligibility, current deadline or exact application portal",
+        "a Kingsmen partnership, authorised connector, submission receipt or employer decision"
+      ],
+      "refresh_after_days": 30,
+      "review_required": true,
+      "connector_state": "NOT_CONNECTED",
+      "metadata": {
+        "gcis_profile_url": "https://www.gov.za/about-government/contact-directory/soe/film-and-publication-board-fpb",
+        "provider_key": "soe_film_and_publication_board_fpb",
+        "source_record_status": "NEEDS_REVIEW",
+        "provider_homepage_url": null,
+        "external_application_route_status": "NOT_VERIFIED"
+      }
+    },
+    {
+      "source_id": "gcis_public_entity_fsca",
+      "provider_key": "soe_fsca",
+      "name": "Financial Sector Conduct Authority (FSCA)",
+      "authority": "Government Communication and Information System / National Government Directory",
+      "url": "https://www.gov.za/about-government/contact-directory/soe/financial-sector-conduct-authority-fsca",
+      "classes": [
+        "PUBLIC_ENTITY",
+        "EMPLOYER_AND_RECRUITMENT",
+        "PUBLIC_ADMINISTRATION",
+        "FINANCE_AND_INSURANCE",
+        "REGULATOR_AND_PROFESSIONAL_COUNCIL"
+      ],
+      "supports": [
+        "GCIS individual public-entity profile and official-directory listing",
+        "employment, internship and workplace-opportunity discovery only after checking the exact current employer notice and application route"
+      ],
+      "does_not_prove": [
+        "current vacancy, internship, apprenticeship or learnership",
+        "candidate eligibility, current deadline or exact application portal",
+        "a Kingsmen partnership, authorised connector, submission receipt or employer decision"
+      ],
+      "refresh_after_days": 30,
+      "review_required": true,
+      "connector_state": "NOT_CONNECTED",
+      "metadata": {
+        "gcis_profile_url": "https://www.gov.za/about-government/contact-directory/soe/financial-sector-conduct-authority-fsca",
+        "provider_key": "soe_fsca",
+        "source_record_status": "NEEDS_REVIEW",
+        "provider_homepage_url": null,
+        "external_application_route_status": "NOT_VERIFIED"
+      }
+    },
+    {
+      "source_id": "gcis_public_entity_free_state_development_corporation",
+      "provider_key": "soe_free_state_development_corporation",
+      "name": "Free State Development Corporation",
+      "authority": "Government Communication and Information System / National Government Directory",
+      "url": "https://www.gov.za/about-government/contact-directory/soe/free-state-development-corporation",
+      "classes": [
+        "PUBLIC_ENTITY",
+        "EMPLOYER_AND_RECRUITMENT",
+        "PUBLIC_ADMINISTRATION",
+        "FUNDING_AND_SOCIAL_SUPPORT"
+      ],
+      "supports": [
+        "GCIS individual public-entity profile and official-directory listing",
+        "employment, internship and workplace-opportunity discovery only after checking the exact current employer notice and application route"
+      ],
+      "does_not_prove": [
+        "current vacancy, internship, apprenticeship or learnership",
+        "candidate eligibility, current deadline or exact application portal",
+        "a Kingsmen partnership, authorised connector, submission receipt or employer decision"
+      ],
+      "refresh_after_days": 30,
+      "review_required": true,
+      "connector_state": "NOT_CONNECTED",
+      "metadata": {
+        "gcis_profile_url": "https://www.gov.za/about-government/contact-directory/soe/free-state-development-corporation",
+        "provider_key": "soe_free_state_development_corporation",
+        "source_record_status": "NEEDS_REVIEW",
+        "provider_homepage_url": null,
+        "external_application_route_status": "NOT_VERIFIED"
+      }
+    },
+    {
+      "source_id": "gcis_public_entity_freedom_park",
+      "provider_key": "soe_freedom_park",
+      "name": "Freedom Park",
+      "authority": "Government Communication and Information System / National Government Directory",
+      "url": "https://www.gov.za/about-government/contact-directory/soe/freedom-park",
+      "classes": [
+        "PUBLIC_ENTITY",
+        "EMPLOYER_AND_RECRUITMENT",
+        "PUBLIC_ADMINISTRATION"
+      ],
+      "supports": [
+        "GCIS individual public-entity profile and official-directory listing",
+        "employment, internship and workplace-opportunity discovery only after checking the exact current employer notice and application route"
+      ],
+      "does_not_prove": [
+        "current vacancy, internship, apprenticeship or learnership",
+        "candidate eligibility, current deadline or exact application portal",
+        "a Kingsmen partnership, authorised connector, submission receipt or employer decision"
+      ],
+      "refresh_after_days": 30,
+      "review_required": true,
+      "connector_state": "NOT_CONNECTED",
+      "metadata": {
+        "gcis_profile_url": "https://www.gov.za/about-government/contact-directory/soe/freedom-park",
+        "provider_key": "soe_freedom_park",
+        "source_record_status": "NEEDS_REVIEW",
+        "provider_homepage_url": null,
+        "external_application_route_status": "NOT_VERIFIED"
+      }
+    },
+    {
+      "source_id": "gcis_public_entity_gems",
+      "provider_key": "soe_gems",
+      "name": "Government Employees Medical Scheme (GEMS)",
+      "authority": "Government Communication and Information System / National Government Directory",
+      "url": "https://www.gov.za/about-government/contact-directory/soe/government-employees-medical-scheme-gems",
+      "classes": [
+        "PUBLIC_ENTITY",
+        "EMPLOYER_AND_RECRUITMENT",
+        "PUBLIC_ADMINISTRATION",
+        "HEALTH_AND_CARE",
+        "FINANCE_AND_INSURANCE"
+      ],
+      "supports": [
+        "GCIS individual public-entity profile and official-directory listing",
+        "employment, internship and workplace-opportunity discovery only after checking the exact current employer notice and application route"
+      ],
+      "does_not_prove": [
+        "current vacancy, internship, apprenticeship or learnership",
+        "candidate eligibility, current deadline or exact application portal",
+        "a Kingsmen partnership, authorised connector, submission receipt or employer decision"
+      ],
+      "refresh_after_days": 30,
+      "review_required": true,
+      "connector_state": "NOT_CONNECTED",
+      "metadata": {
+        "gcis_profile_url": "https://www.gov.za/about-government/contact-directory/soe/government-employees-medical-scheme-gems",
+        "provider_key": "soe_gems",
+        "source_record_status": "NEEDS_REVIEW",
+        "provider_homepage_url": null,
+        "external_application_route_status": "NOT_VERIFIED"
+      }
+    },
+    {
+      "source_id": "gcis_public_entity_gepf",
+      "provider_key": "soe_gepf",
+      "name": "Government Employees Pension Fund (GEPF)",
+      "authority": "Government Communication and Information System / National Government Directory",
+      "url": "https://www.gov.za/about-government/contact-directory/soe/government-employees-pension-fund-gepf",
+      "classes": [
+        "PUBLIC_ENTITY",
+        "EMPLOYER_AND_RECRUITMENT",
+        "PUBLIC_ADMINISTRATION",
+        "FINANCE_AND_INSURANCE"
+      ],
+      "supports": [
+        "GCIS individual public-entity profile and official-directory listing",
+        "employment, internship and workplace-opportunity discovery only after checking the exact current employer notice and application route"
+      ],
+      "does_not_prove": [
+        "current vacancy, internship, apprenticeship or learnership",
+        "candidate eligibility, current deadline or exact application portal",
+        "a Kingsmen partnership, authorised connector, submission receipt or employer decision"
+      ],
+      "refresh_after_days": 30,
+      "review_required": true,
+      "connector_state": "NOT_CONNECTED",
+      "metadata": {
+        "gcis_profile_url": "https://www.gov.za/about-government/contact-directory/soe/government-employees-pension-fund-gepf",
+        "provider_key": "soe_gepf",
+        "source_record_status": "NEEDS_REVIEW",
+        "provider_homepage_url": null,
+        "external_application_route_status": "NOT_VERIFIED"
+      }
+    },
+    {
+      "source_id": "gcis_public_entity_housing_development_agency_hda",
+      "provider_key": "soe_housing_development_agency_hda",
+      "name": "Housing Development Agency (HDA)",
+      "authority": "Government Communication and Information System / National Government Directory",
+      "url": "https://www.gov.za/about-government/contact-directory/soe/housing-development-agency-hda",
+      "classes": [
+        "PUBLIC_ENTITY",
+        "EMPLOYER_AND_RECRUITMENT",
+        "PUBLIC_ADMINISTRATION",
+        "HOUSING_AND_ACCOMMODATION"
+      ],
+      "supports": [
+        "GCIS individual public-entity profile and official-directory listing",
+        "employment, internship and workplace-opportunity discovery only after checking the exact current employer notice and application route"
+      ],
+      "does_not_prove": [
+        "current vacancy, internship, apprenticeship or learnership",
+        "candidate eligibility, current deadline or exact application portal",
+        "a Kingsmen partnership, authorised connector, submission receipt or employer decision"
+      ],
+      "refresh_after_days": 30,
+      "review_required": true,
+      "connector_state": "NOT_CONNECTED",
+      "metadata": {
+        "gcis_profile_url": "https://www.gov.za/about-government/contact-directory/soe/housing-development-agency-hda",
+        "provider_key": "soe_housing_development_agency_hda",
+        "source_record_status": "NEEDS_REVIEW",
+        "provider_homepage_url": null,
+        "external_application_route_status": "NOT_VERIFIED"
+      }
+    },
+    {
+      "source_id": "gcis_public_entity_hsrc",
+      "provider_key": "soe_hsrc",
+      "name": "Human Sciences Research Council (HSRC)",
+      "authority": "Government Communication and Information System / National Government Directory",
+      "url": "https://www.gov.za/about-government/contact-directory/soe/human-sciences-research-council-hsrc",
+      "classes": [
+        "PUBLIC_ENTITY",
+        "EMPLOYER_AND_RECRUITMENT",
+        "PUBLIC_ADMINISTRATION",
+        "EDUCATION_AND_SKILLS"
+      ],
+      "supports": [
+        "GCIS individual public-entity profile and official-directory listing",
+        "employment, internship and workplace-opportunity discovery only after checking the exact current employer notice and application route"
+      ],
+      "does_not_prove": [
+        "current vacancy, internship, apprenticeship or learnership",
+        "candidate eligibility, current deadline or exact application portal",
+        "a Kingsmen partnership, authorised connector, submission receipt or employer decision"
+      ],
+      "refresh_after_days": 30,
+      "review_required": true,
+      "connector_state": "NOT_CONNECTED",
+      "metadata": {
+        "gcis_profile_url": "https://www.gov.za/about-government/contact-directory/soe/human-sciences-research-council-hsrc",
+        "provider_key": "soe_hsrc",
+        "source_record_status": "NEEDS_REVIEW",
+        "provider_homepage_url": null,
+        "external_application_route_status": "NOT_VERIFIED"
+      }
+    },
+    {
+      "source_id": "gcis_public_entity_independent_development_trust",
+      "provider_key": "soe_independent_development_trust",
+      "name": "Independent Development Trust",
+      "authority": "Government Communication and Information System / National Government Directory",
+      "url": "https://www.gov.za/about-government/contact-directory/soe/independent-development-trust",
+      "classes": [
+        "PUBLIC_ENTITY",
+        "EMPLOYER_AND_RECRUITMENT",
+        "PUBLIC_ADMINISTRATION",
+        "FUNDING_AND_SOCIAL_SUPPORT"
+      ],
+      "supports": [
+        "GCIS individual public-entity profile and official-directory listing",
+        "employment, internship and workplace-opportunity discovery only after checking the exact current employer notice and application route"
+      ],
+      "does_not_prove": [
+        "current vacancy, internship, apprenticeship or learnership",
+        "candidate eligibility, current deadline or exact application portal",
+        "a Kingsmen partnership, authorised connector, submission receipt or employer decision"
+      ],
+      "refresh_after_days": 30,
+      "review_required": true,
+      "connector_state": "NOT_CONNECTED",
+      "metadata": {
+        "gcis_profile_url": "https://www.gov.za/about-government/contact-directory/soe/independent-development-trust",
+        "provider_key": "soe_independent_development_trust",
+        "source_record_status": "NEEDS_REVIEW",
+        "provider_homepage_url": null,
+        "external_application_route_status": "NOT_VERIFIED"
+      }
+    },
+    {
+      "source_id": "gcis_public_entity_idc",
+      "provider_key": "soe_idc",
+      "name": "Industrial Development Corporation (IDC)",
+      "authority": "Government Communication and Information System / National Government Directory",
+      "url": "https://www.gov.za/about-government/contact-directory/soe/industrial-development-corporation-ltd-idc",
+      "classes": [
+        "PUBLIC_ENTITY",
+        "EMPLOYER_AND_RECRUITMENT",
+        "PUBLIC_ADMINISTRATION",
+        "FUNDING_AND_SOCIAL_SUPPORT",
+        "FINANCE_AND_INSURANCE"
+      ],
+      "supports": [
+        "GCIS individual public-entity profile and official-directory listing",
+        "employment, internship and workplace-opportunity discovery only after checking the exact current employer notice and application route"
+      ],
+      "does_not_prove": [
+        "current vacancy, internship, apprenticeship or learnership",
+        "candidate eligibility, current deadline or exact application portal",
+        "a Kingsmen partnership, authorised connector, submission receipt or employer decision"
+      ],
+      "refresh_after_days": 30,
+      "review_required": true,
+      "connector_state": "NOT_CONNECTED",
+      "metadata": {
+        "gcis_profile_url": "https://www.gov.za/about-government/contact-directory/soe/industrial-development-corporation-ltd-idc",
+        "provider_key": "soe_idc",
+        "source_record_status": "NEEDS_REVIEW",
+        "provider_homepage_url": null,
+        "external_application_route_status": "NOT_VERIFIED"
+      }
+    },
+    {
+      "source_id": "gcis_public_entity_ingonyama_trust_board",
+      "provider_key": "soe_ingonyama_trust_board",
+      "name": "Ingonyama Trust Board",
+      "authority": "Government Communication and Information System / National Government Directory",
+      "url": "https://www.gov.za/about-government/contact-directory/soe/ingonyama-trust-board",
+      "classes": [
+        "PUBLIC_ENTITY",
+        "EMPLOYER_AND_RECRUITMENT",
+        "PUBLIC_ADMINISTRATION",
+        "PUBLIC_ADMINISTRATION"
+      ],
+      "supports": [
+        "GCIS individual public-entity profile and official-directory listing",
+        "employment, internship and workplace-opportunity discovery only after checking the exact current employer notice and application route"
+      ],
+      "does_not_prove": [
+        "current vacancy, internship, apprenticeship or learnership",
+        "candidate eligibility, current deadline or exact application portal",
+        "a Kingsmen partnership, authorised connector, submission receipt or employer decision"
+      ],
+      "refresh_after_days": 30,
+      "review_required": true,
+      "connector_state": "NOT_CONNECTED",
+      "metadata": {
+        "gcis_profile_url": "https://www.gov.za/about-government/contact-directory/soe/ingonyama-trust-board",
+        "provider_key": "soe_ingonyama_trust_board",
+        "source_record_status": "NEEDS_REVIEW",
+        "provider_homepage_url": null,
+        "external_application_route_status": "NOT_VERIFIED"
+      }
+    },
+    {
+      "source_id": "gcis_public_entity_institute_people_management_ipm",
+      "provider_key": "soe_institute_people_management_ipm",
+      "name": "Institute of People Management (IPM)",
+      "authority": "Government Communication and Information System / National Government Directory",
+      "url": "https://www.gov.za/about-government/contact-directory/soe/institute-people-management-ipm",
+      "classes": [
+        "PUBLIC_ENTITY",
+        "EMPLOYER_AND_RECRUITMENT",
+        "PUBLIC_ADMINISTRATION",
+        "REGULATOR_AND_PROFESSIONAL_COUNCIL"
+      ],
+      "supports": [
+        "GCIS individual public-entity profile and official-directory listing",
+        "employment, internship and workplace-opportunity discovery only after checking the exact current employer notice and application route"
+      ],
+      "does_not_prove": [
+        "current vacancy, internship, apprenticeship or learnership",
+        "candidate eligibility, current deadline or exact application portal",
+        "a Kingsmen partnership, authorised connector, submission receipt or employer decision"
+      ],
+      "refresh_after_days": 30,
+      "review_required": true,
+      "connector_state": "NOT_CONNECTED",
+      "metadata": {
+        "gcis_profile_url": "https://www.gov.za/about-government/contact-directory/soe/institute-people-management-ipm",
+        "provider_key": "soe_institute_people_management_ipm",
+        "source_record_status": "NEEDS_REVIEW",
+        "provider_homepage_url": null,
+        "external_application_route_status": "NOT_VERIFIED"
+      }
+    },
+    {
+      "source_id": "gcis_public_entity_king_shaka_international_airport",
+      "provider_key": "soe_king_shaka_international_airport",
+      "name": "King Shaka International Airport",
+      "authority": "Government Communication and Information System / National Government Directory",
+      "url": "https://www.gov.za/about-government/contact-directory/soe/king-shaka-international-airport",
+      "classes": [
+        "PUBLIC_ENTITY",
+        "EMPLOYER_AND_RECRUITMENT",
+        "PUBLIC_ADMINISTRATION",
+        "TRANSPORT_AND_ESSENTIAL_SERVICES"
+      ],
+      "supports": [
+        "GCIS individual public-entity profile and official-directory listing",
+        "employment, internship and workplace-opportunity discovery only after checking the exact current employer notice and application route"
+      ],
+      "does_not_prove": [
+        "current vacancy, internship, apprenticeship or learnership",
+        "candidate eligibility, current deadline or exact application portal",
+        "a Kingsmen partnership, authorised connector, submission receipt or employer decision"
+      ],
+      "refresh_after_days": 30,
+      "review_required": true,
+      "connector_state": "NOT_CONNECTED",
+      "metadata": {
+        "gcis_profile_url": "https://www.gov.za/about-government/contact-directory/soe/king-shaka-international-airport",
+        "provider_key": "soe_king_shaka_international_airport",
+        "source_record_status": "NEEDS_REVIEW",
+        "provider_homepage_url": null,
+        "external_application_route_status": "NOT_VERIFIED"
+      }
+    },
+    {
+      "source_id": "gcis_public_entity_land_bank",
+      "provider_key": "soe_land_bank",
+      "name": "Land Bank and Agriculture Bank of South Africa (Land Bank)",
+      "authority": "Government Communication and Information System / National Government Directory",
+      "url": "https://www.gov.za/about-government/contact-directory/soe/land-bank-and-agriculture-bank-south-africa-land-bank",
+      "classes": [
+        "PUBLIC_ENTITY",
+        "EMPLOYER_AND_RECRUITMENT",
+        "PUBLIC_ADMINISTRATION",
+        "FINANCE_AND_INSURANCE",
+        "FUNDING_AND_SOCIAL_SUPPORT"
+      ],
+      "supports": [
+        "GCIS individual public-entity profile and official-directory listing",
+        "employment, internship and workplace-opportunity discovery only after checking the exact current employer notice and application route"
+      ],
+      "does_not_prove": [
+        "current vacancy, internship, apprenticeship or learnership",
+        "candidate eligibility, current deadline or exact application portal",
+        "a Kingsmen partnership, authorised connector, submission receipt or employer decision"
+      ],
+      "refresh_after_days": 30,
+      "review_required": true,
+      "connector_state": "NOT_CONNECTED",
+      "metadata": {
+        "gcis_profile_url": "https://www.gov.za/about-government/contact-directory/soe/land-bank-and-agriculture-bank-south-africa-land-bank",
+        "provider_key": "soe_land_bank",
+        "source_record_status": "NEEDS_REVIEW",
+        "provider_homepage_url": null,
+        "external_application_route_status": "NOT_VERIFIED"
+      }
+    },
+    {
+      "source_id": "gcis_public_entity_legal_aid_south_africa",
+      "provider_key": "soe_legal_aid_south_africa",
+      "name": "Legal Aid South Africa",
+      "authority": "Government Communication and Information System / National Government Directory",
+      "url": "https://www.gov.za/about-government/contact-directory/soe/legal-aid-south-africa",
+      "classes": [
+        "PUBLIC_ENTITY",
+        "EMPLOYER_AND_RECRUITMENT",
+        "PUBLIC_ADMINISTRATION",
+        "LEGAL_AID_AND_COMMUNITY_SERVICES"
+      ],
+      "supports": [
+        "GCIS individual public-entity profile and official-directory listing",
+        "employment, internship and workplace-opportunity discovery only after checking the exact current employer notice and application route"
+      ],
+      "does_not_prove": [
+        "current vacancy, internship, apprenticeship or learnership",
+        "candidate eligibility, current deadline or exact application portal",
+        "a Kingsmen partnership, authorised connector, submission receipt or employer decision"
+      ],
+      "refresh_after_days": 30,
+      "review_required": true,
+      "connector_state": "NOT_CONNECTED",
+      "metadata": {
+        "gcis_profile_url": "https://www.gov.za/about-government/contact-directory/soe/legal-aid-south-africa",
+        "provider_key": "soe_legal_aid_south_africa",
+        "source_record_status": "NEEDS_REVIEW",
+        "provider_homepage_url": null,
+        "external_application_route_status": "NOT_VERIFIED"
+      }
+    },
+    {
+      "source_id": "gcis_public_entity_limpopo_economic_development_enterprise",
+      "provider_key": "soe_limpopo_economic_development_enterprise",
+      "name": "Limpopo Economic Development Enterprise",
+      "authority": "Government Communication and Information System / National Government Directory",
+      "url": "https://www.gov.za/about-government/contact-directory/soe/limpopo-economic-development-enterprise",
+      "classes": [
+        "PUBLIC_ENTITY",
+        "EMPLOYER_AND_RECRUITMENT",
+        "PUBLIC_ADMINISTRATION",
+        "FUNDING_AND_SOCIAL_SUPPORT"
+      ],
+      "supports": [
+        "GCIS individual public-entity profile and official-directory listing",
+        "employment, internship and workplace-opportunity discovery only after checking the exact current employer notice and application route"
+      ],
+      "does_not_prove": [
+        "current vacancy, internship, apprenticeship or learnership",
+        "candidate eligibility, current deadline or exact application portal",
+        "a Kingsmen partnership, authorised connector, submission receipt or employer decision"
+      ],
+      "refresh_after_days": 30,
+      "review_required": true,
+      "connector_state": "NOT_CONNECTED",
+      "metadata": {
+        "gcis_profile_url": "https://www.gov.za/about-government/contact-directory/soe/limpopo-economic-development-enterprise",
+        "provider_key": "soe_limpopo_economic_development_enterprise",
+        "source_record_status": "NEEDS_REVIEW",
+        "provider_homepage_url": null,
+        "external_application_route_status": "NOT_VERIFIED"
+      }
+    },
+    {
+      "source_id": "gcis_public_entity_mdda",
+      "provider_key": "soe_mdda",
+      "name": "Media Development and Diversity Agency (MDDA)",
+      "authority": "Government Communication and Information System / National Government Directory",
+      "url": "https://www.gov.za/about-government/contact-directory/soe/media-development-and-diversity-agency-mdda",
+      "classes": [
+        "PUBLIC_ENTITY",
+        "EMPLOYER_AND_RECRUITMENT",
+        "PUBLIC_ADMINISTRATION",
+        "FUNDING_AND_SOCIAL_SUPPORT"
+      ],
+      "supports": [
+        "GCIS individual public-entity profile and official-directory listing",
+        "employment, internship and workplace-opportunity discovery only after checking the exact current employer notice and application route"
+      ],
+      "does_not_prove": [
+        "current vacancy, internship, apprenticeship or learnership",
+        "candidate eligibility, current deadline or exact application portal",
+        "a Kingsmen partnership, authorised connector, submission receipt or employer decision"
+      ],
+      "refresh_after_days": 30,
+      "review_required": true,
+      "connector_state": "NOT_CONNECTED",
+      "metadata": {
+        "gcis_profile_url": "https://www.gov.za/about-government/contact-directory/soe/media-development-and-diversity-agency-mdda",
+        "provider_key": "soe_mdda",
+        "source_record_status": "NEEDS_REVIEW",
+        "provider_homepage_url": null,
+        "external_application_route_status": "NOT_VERIFIED"
+      }
+    },
+    {
+      "source_id": "gcis_public_entity_nelson_mandela_museum",
+      "provider_key": "soe_nelson_mandela_museum",
+      "name": "Nelson Mandela Museum",
+      "authority": "Government Communication and Information System / National Government Directory",
+      "url": "https://www.gov.za/about-government/contact-directory/soe/nelson-mandela-museum",
+      "classes": [
+        "PUBLIC_ENTITY",
+        "EMPLOYER_AND_RECRUITMENT",
+        "PUBLIC_ADMINISTRATION"
+      ],
+      "supports": [
+        "GCIS individual public-entity profile and official-directory listing",
+        "employment, internship and workplace-opportunity discovery only after checking the exact current employer notice and application route"
+      ],
+      "does_not_prove": [
+        "current vacancy, internship, apprenticeship or learnership",
+        "candidate eligibility, current deadline or exact application portal",
+        "a Kingsmen partnership, authorised connector, submission receipt or employer decision"
+      ],
+      "refresh_after_days": 30,
+      "review_required": true,
+      "connector_state": "NOT_CONNECTED",
+      "metadata": {
+        "gcis_profile_url": "https://www.gov.za/about-government/contact-directory/soe/nelson-mandela-museum",
+        "provider_key": "soe_nelson_mandela_museum",
+        "source_record_status": "NEEDS_REVIEW",
+        "provider_homepage_url": null,
+        "external_application_route_status": "NOT_VERIFIED"
+      }
+    },
+    {
+      "source_id": "gcis_public_entity_north_west_development_corporation",
+      "provider_key": "soe_north_west_development_corporation",
+      "name": "North West Development Corporation",
+      "authority": "Government Communication and Information System / National Government Directory",
+      "url": "https://www.gov.za/about-government/contact-directory/soe/north-west-development-corporation",
+      "classes": [
+        "PUBLIC_ENTITY",
+        "EMPLOYER_AND_RECRUITMENT",
+        "PUBLIC_ADMINISTRATION",
+        "FUNDING_AND_SOCIAL_SUPPORT"
+      ],
+      "supports": [
+        "GCIS individual public-entity profile and official-directory listing",
+        "employment, internship and workplace-opportunity discovery only after checking the exact current employer notice and application route"
+      ],
+      "does_not_prove": [
+        "current vacancy, internship, apprenticeship or learnership",
+        "candidate eligibility, current deadline or exact application portal",
+        "a Kingsmen partnership, authorised connector, submission receipt or employer decision"
+      ],
+      "refresh_after_days": 30,
+      "review_required": true,
+      "connector_state": "NOT_CONNECTED",
+      "metadata": {
+        "gcis_profile_url": "https://www.gov.za/about-government/contact-directory/soe/north-west-development-corporation",
+        "provider_key": "soe_north_west_development_corporation",
+        "source_record_status": "NEEDS_REVIEW",
+        "provider_homepage_url": null,
+        "external_application_route_status": "NOT_VERIFIED"
+      }
+    },
+    {
+      "source_id": "gcis_public_entity_or_tambo_international_airport",
+      "provider_key": "soe_or_tambo_international_airport",
+      "name": "OR Tambo International Airport",
+      "authority": "Government Communication and Information System / National Government Directory",
+      "url": "https://www.gov.za/about-government/contact-directory/soe/or-tambo-international-airport",
+      "classes": [
+        "PUBLIC_ENTITY",
+        "EMPLOYER_AND_RECRUITMENT",
+        "PUBLIC_ADMINISTRATION",
+        "TRANSPORT_AND_ESSENTIAL_SERVICES"
+      ],
+      "supports": [
+        "GCIS individual public-entity profile and official-directory listing",
+        "employment, internship and workplace-opportunity discovery only after checking the exact current employer notice and application route"
+      ],
+      "does_not_prove": [
+        "current vacancy, internship, apprenticeship or learnership",
+        "candidate eligibility, current deadline or exact application portal",
+        "a Kingsmen partnership, authorised connector, submission receipt or employer decision"
+      ],
+      "refresh_after_days": 30,
+      "review_required": true,
+      "connector_state": "NOT_CONNECTED",
+      "metadata": {
+        "gcis_profile_url": "https://www.gov.za/about-government/contact-directory/soe/or-tambo-international-airport",
+        "provider_key": "soe_or_tambo_international_airport",
+        "source_record_status": "NEEDS_REVIEW",
+        "provider_homepage_url": null,
+        "external_application_route_status": "NOT_VERIFIED"
+      }
+    },
+    {
+      "source_id": "gcis_public_entity_perishable_products_export_control_board",
+      "provider_key": "soe_perishable_products_export_control_board",
+      "name": "Perishable Products Export Control Board",
+      "authority": "Government Communication and Information System / National Government Directory",
+      "url": "https://www.gov.za/about-government/contact-directory/soe/perishable-products-export-control-board",
+      "classes": [
+        "PUBLIC_ENTITY",
+        "EMPLOYER_AND_RECRUITMENT",
+        "PUBLIC_ADMINISTRATION",
+        "REGULATOR_AND_PROFESSIONAL_COUNCIL"
+      ],
+      "supports": [
+        "GCIS individual public-entity profile and official-directory listing",
+        "employment, internship and workplace-opportunity discovery only after checking the exact current employer notice and application route"
+      ],
+      "does_not_prove": [
+        "current vacancy, internship, apprenticeship or learnership",
+        "candidate eligibility, current deadline or exact application portal",
+        "a Kingsmen partnership, authorised connector, submission receipt or employer decision"
+      ],
+      "refresh_after_days": 30,
+      "review_required": true,
+      "connector_state": "NOT_CONNECTED",
+      "metadata": {
+        "gcis_profile_url": "https://www.gov.za/about-government/contact-directory/soe/perishable-products-export-control-board",
+        "provider_key": "soe_perishable_products_export_control_board",
+        "source_record_status": "NEEDS_REVIEW",
+        "provider_homepage_url": null,
+        "external_application_route_status": "NOT_VERIFIED"
+      }
+    },
+    {
+      "source_id": "gcis_public_entity_petrosa",
+      "provider_key": "soe_petrosa",
+      "name": "PetroSA (Pty) Ltd",
+      "authority": "Government Communication and Information System / National Government Directory",
+      "url": "https://www.gov.za/about-government/contact-directory/soe/petrosa-pty-ltd",
+      "classes": [
+        "PUBLIC_ENTITY",
+        "EMPLOYER_AND_RECRUITMENT",
+        "PUBLIC_ADMINISTRATION",
+        "ENERGY_AND_UTILITIES"
+      ],
+      "supports": [
+        "GCIS individual public-entity profile and official-directory listing",
+        "employment, internship and workplace-opportunity discovery only after checking the exact current employer notice and application route"
+      ],
+      "does_not_prove": [
+        "current vacancy, internship, apprenticeship or learnership",
+        "candidate eligibility, current deadline or exact application portal",
+        "a Kingsmen partnership, authorised connector, submission receipt or employer decision"
+      ],
+      "refresh_after_days": 30,
+      "review_required": true,
+      "connector_state": "NOT_CONNECTED",
+      "metadata": {
+        "gcis_profile_url": "https://www.gov.za/about-government/contact-directory/soe/petrosa-pty-ltd",
+        "provider_key": "soe_petrosa",
+        "source_record_status": "NEEDS_REVIEW",
+        "provider_homepage_url": null,
+        "external_application_route_status": "NOT_VERIFIED"
+      }
+    },
+    {
+      "source_id": "gcis_public_entity_psira",
+      "provider_key": "soe_psira",
+      "name": "Private Security Industry Regulatory Authority (PSIRA)",
+      "authority": "Government Communication and Information System / National Government Directory",
+      "url": "https://www.gov.za/about-government/contact-directory/soe/private-security-industry-regulatory-authority-psira",
+      "classes": [
+        "PUBLIC_ENTITY",
+        "EMPLOYER_AND_RECRUITMENT",
+        "PUBLIC_ADMINISTRATION",
+        "REGULATOR_AND_PROFESSIONAL_COUNCIL"
+      ],
+      "supports": [
+        "GCIS individual public-entity profile and official-directory listing",
+        "employment, internship and workplace-opportunity discovery only after checking the exact current employer notice and application route"
+      ],
+      "does_not_prove": [
+        "current vacancy, internship, apprenticeship or learnership",
+        "candidate eligibility, current deadline or exact application portal",
+        "a Kingsmen partnership, authorised connector, submission receipt or employer decision"
+      ],
+      "refresh_after_days": 30,
+      "review_required": true,
+      "connector_state": "NOT_CONNECTED",
+      "metadata": {
+        "gcis_profile_url": "https://www.gov.za/about-government/contact-directory/soe/private-security-industry-regulatory-authority-psira",
+        "provider_key": "soe_psira",
+        "source_record_status": "NEEDS_REVIEW",
+        "provider_homepage_url": null,
+        "external_application_route_status": "NOT_VERIFIED"
+      }
+    },
+    {
+      "source_id": "gcis_public_entity_property_practitioners_regulatory_authority",
+      "provider_key": "soe_property_practitioners_regulatory_authority",
+      "name": "Property Practitioners Regulatory Authority",
+      "authority": "Government Communication and Information System / National Government Directory",
+      "url": "https://www.gov.za/about-government/contact-directory/soe/property-practitioners-regulatory-authority",
+      "classes": [
+        "PUBLIC_ENTITY",
+        "EMPLOYER_AND_RECRUITMENT",
+        "PUBLIC_ADMINISTRATION",
+        "REGULATOR_AND_PROFESSIONAL_COUNCIL",
+        "HOUSING_AND_ACCOMMODATION"
+      ],
+      "supports": [
+        "GCIS individual public-entity profile and official-directory listing",
+        "employment, internship and workplace-opportunity discovery only after checking the exact current employer notice and application route"
+      ],
+      "does_not_prove": [
+        "current vacancy, internship, apprenticeship or learnership",
+        "candidate eligibility, current deadline or exact application portal",
+        "a Kingsmen partnership, authorised connector, submission receipt or employer decision"
+      ],
+      "refresh_after_days": 30,
+      "review_required": true,
+      "connector_state": "NOT_CONNECTED",
+      "metadata": {
+        "gcis_profile_url": "https://www.gov.za/about-government/contact-directory/soe/property-practitioners-regulatory-authority",
+        "provider_key": "soe_property_practitioners_regulatory_authority",
+        "source_record_status": "NEEDS_REVIEW",
+        "provider_homepage_url": null,
+        "external_application_route_status": "NOT_VERIFIED"
+      }
+    },
+    {
+      "source_id": "gcis_public_entity_pic",
+      "provider_key": "soe_pic",
+      "name": "Public Investment Corporation (PIC)",
+      "authority": "Government Communication and Information System / National Government Directory",
+      "url": "https://www.gov.za/about-government/contact-directory/soe/public-investment-corporation-pic",
+      "classes": [
+        "PUBLIC_ENTITY",
+        "EMPLOYER_AND_RECRUITMENT",
+        "PUBLIC_ADMINISTRATION",
+        "FINANCE_AND_INSURANCE"
+      ],
+      "supports": [
+        "GCIS individual public-entity profile and official-directory listing",
+        "employment, internship and workplace-opportunity discovery only after checking the exact current employer notice and application route"
+      ],
+      "does_not_prove": [
+        "current vacancy, internship, apprenticeship or learnership",
+        "candidate eligibility, current deadline or exact application portal",
+        "a Kingsmen partnership, authorised connector, submission receipt or employer decision"
+      ],
+      "refresh_after_days": 30,
+      "review_required": true,
+      "connector_state": "NOT_CONNECTED",
+      "metadata": {
+        "gcis_profile_url": "https://www.gov.za/about-government/contact-directory/soe/public-investment-corporation-pic",
+        "provider_key": "soe_pic",
+        "source_record_status": "NEEDS_REVIEW",
+        "provider_homepage_url": null,
+        "external_application_route_status": "NOT_VERIFIED"
+      }
+    },
+    {
+      "source_id": "gcis_public_entity_rand_water",
+      "provider_key": "soe_rand_water",
+      "name": "Rand Water",
+      "authority": "Government Communication and Information System / National Government Directory",
+      "url": "https://www.gov.za/about-government/contact-directory/soe/rand-water",
+      "classes": [
+        "PUBLIC_ENTITY",
+        "EMPLOYER_AND_RECRUITMENT",
+        "PUBLIC_ADMINISTRATION",
+        "ENERGY_AND_UTILITIES",
+        "TRANSPORT_AND_ESSENTIAL_SERVICES"
+      ],
+      "supports": [
+        "GCIS individual public-entity profile and official-directory listing",
+        "employment, internship and workplace-opportunity discovery only after checking the exact current employer notice and application route"
+      ],
+      "does_not_prove": [
+        "current vacancy, internship, apprenticeship or learnership",
+        "candidate eligibility, current deadline or exact application portal",
+        "a Kingsmen partnership, authorised connector, submission receipt or employer decision"
+      ],
+      "refresh_after_days": 30,
+      "review_required": true,
+      "connector_state": "NOT_CONNECTED",
+      "metadata": {
+        "gcis_profile_url": "https://www.gov.za/about-government/contact-directory/soe/rand-water",
+        "provider_key": "soe_rand_water",
+        "source_record_status": "NEEDS_REVIEW",
+        "provider_homepage_url": null,
+        "external_application_route_status": "NOT_VERIFIED"
+      }
+    },
+    {
+      "source_id": "gcis_public_entity_raf",
+      "provider_key": "soe_raf",
+      "name": "Road Accident Fund (RAF)",
+      "authority": "Government Communication and Information System / National Government Directory",
+      "url": "https://www.gov.za/about-government/contact-directory/soe/road-accident-fund-raf",
+      "classes": [
+        "PUBLIC_ENTITY",
+        "EMPLOYER_AND_RECRUITMENT",
+        "PUBLIC_ADMINISTRATION",
+        "FINANCE_AND_INSURANCE",
+        "TRANSPORT_AND_ESSENTIAL_SERVICES"
+      ],
+      "supports": [
+        "GCIS individual public-entity profile and official-directory listing",
+        "employment, internship and workplace-opportunity discovery only after checking the exact current employer notice and application route"
+      ],
+      "does_not_prove": [
+        "current vacancy, internship, apprenticeship or learnership",
+        "candidate eligibility, current deadline or exact application portal",
+        "a Kingsmen partnership, authorised connector, submission receipt or employer decision"
+      ],
+      "refresh_after_days": 30,
+      "review_required": true,
+      "connector_state": "NOT_CONNECTED",
+      "metadata": {
+        "gcis_profile_url": "https://www.gov.za/about-government/contact-directory/soe/road-accident-fund-raf",
+        "provider_key": "soe_raf",
+        "source_record_status": "NEEDS_REVIEW",
+        "provider_homepage_url": null,
+        "external_application_route_status": "NOT_VERIFIED"
+      }
+    },
+    {
+      "source_id": "gcis_public_entity_rtia",
+      "provider_key": "soe_rtia",
+      "name": "Road Traffic Infringement Agency (RTIA)",
+      "authority": "Government Communication and Information System / National Government Directory",
+      "url": "https://www.gov.za/about-government/contact-directory/soe/road-traffic-infringement-agency-rtia",
+      "classes": [
+        "PUBLIC_ENTITY",
+        "EMPLOYER_AND_RECRUITMENT",
+        "PUBLIC_ADMINISTRATION",
+        "TRANSPORT_AND_ESSENTIAL_SERVICES",
+        "PUBLIC_ADMINISTRATION"
+      ],
+      "supports": [
+        "GCIS individual public-entity profile and official-directory listing",
+        "employment, internship and workplace-opportunity discovery only after checking the exact current employer notice and application route"
+      ],
+      "does_not_prove": [
+        "current vacancy, internship, apprenticeship or learnership",
+        "candidate eligibility, current deadline or exact application portal",
+        "a Kingsmen partnership, authorised connector, submission receipt or employer decision"
+      ],
+      "refresh_after_days": 30,
+      "review_required": true,
+      "connector_state": "NOT_CONNECTED",
+      "metadata": {
+        "gcis_profile_url": "https://www.gov.za/about-government/contact-directory/soe/road-traffic-infringement-agency-rtia",
+        "provider_key": "soe_rtia",
+        "source_record_status": "NEEDS_REVIEW",
+        "provider_homepage_url": null,
+        "external_application_route_status": "NOT_VERIFIED"
+      }
+    },
+    {
+      "source_id": "gcis_public_entity_rtmc",
+      "provider_key": "soe_rtmc",
+      "name": "Road Traffic Management Corporation (RTMC)",
+      "authority": "Government Communication and Information System / National Government Directory",
+      "url": "https://www.gov.za/about-government/contact-directory/soe/road-traffic-management-corporation-rtmc",
+      "classes": [
+        "PUBLIC_ENTITY",
+        "EMPLOYER_AND_RECRUITMENT",
+        "PUBLIC_ADMINISTRATION",
+        "TRANSPORT_AND_ESSENTIAL_SERVICES",
+        "PUBLIC_ADMINISTRATION"
+      ],
+      "supports": [
+        "GCIS individual public-entity profile and official-directory listing",
+        "employment, internship and workplace-opportunity discovery only after checking the exact current employer notice and application route"
+      ],
+      "does_not_prove": [
+        "current vacancy, internship, apprenticeship or learnership",
+        "candidate eligibility, current deadline or exact application portal",
+        "a Kingsmen partnership, authorised connector, submission receipt or employer decision"
+      ],
+      "refresh_after_days": 30,
+      "review_required": true,
+      "connector_state": "NOT_CONNECTED",
+      "metadata": {
+        "gcis_profile_url": "https://www.gov.za/about-government/contact-directory/soe/road-traffic-management-corporation-rtmc",
+        "provider_key": "soe_rtmc",
+        "source_record_status": "NEEDS_REVIEW",
+        "provider_homepage_url": null,
+        "external_application_route_status": "NOT_VERIFIED"
+      }
+    },
+    {
+      "source_id": "gcis_public_entity_robben_island_museum",
+      "provider_key": "soe_robben_island_museum",
+      "name": "Robben Island Museum",
+      "authority": "Government Communication and Information System / National Government Directory",
+      "url": "https://www.gov.za/about-government/contact-directory/soe/robben-island-museum",
+      "classes": [
+        "PUBLIC_ENTITY",
+        "EMPLOYER_AND_RECRUITMENT",
+        "PUBLIC_ADMINISTRATION"
+      ],
+      "supports": [
+        "GCIS individual public-entity profile and official-directory listing",
+        "employment, internship and workplace-opportunity discovery only after checking the exact current employer notice and application route"
+      ],
+      "does_not_prove": [
+        "current vacancy, internship, apprenticeship or learnership",
+        "candidate eligibility, current deadline or exact application portal",
+        "a Kingsmen partnership, authorised connector, submission receipt or employer decision"
+      ],
+      "refresh_after_days": 30,
+      "review_required": true,
+      "connector_state": "NOT_CONNECTED",
+      "metadata": {
+        "gcis_profile_url": "https://www.gov.za/about-government/contact-directory/soe/robben-island-museum",
+        "provider_key": "soe_robben_island_museum",
+        "source_record_status": "NEEDS_REVIEW",
+        "provider_homepage_url": null,
+        "external_application_route_status": "NOT_VERIFIED"
+      }
+    },
+    {
+      "source_id": "gcis_public_entity_sentech",
+      "provider_key": "soe_sentech",
+      "name": "SENTECH",
+      "authority": "Government Communication and Information System / National Government Directory",
+      "url": "https://www.gov.za/about-government/contact-directory/soe/sentech",
+      "classes": [
+        "PUBLIC_ENTITY",
+        "EMPLOYER_AND_RECRUITMENT",
+        "PUBLIC_ADMINISTRATION",
+        "TECHNOLOGY_AND_DELIVERY_VENDOR"
+      ],
+      "supports": [
+        "GCIS individual public-entity profile and official-directory listing",
+        "employment, internship and workplace-opportunity discovery only after checking the exact current employer notice and application route"
+      ],
+      "does_not_prove": [
+        "current vacancy, internship, apprenticeship or learnership",
+        "candidate eligibility, current deadline or exact application portal",
+        "a Kingsmen partnership, authorised connector, submission receipt or employer decision"
+      ],
+      "refresh_after_days": 30,
+      "review_required": true,
+      "connector_state": "NOT_CONNECTED",
+      "metadata": {
+        "gcis_profile_url": "https://www.gov.za/about-government/contact-directory/soe/sentech",
+        "provider_key": "soe_sentech",
+        "source_record_status": "NEEDS_REVIEW",
+        "provider_homepage_url": null,
+        "external_application_route_status": "NOT_VERIFIED"
+      }
+    },
+    {
+      "source_id": "gcis_public_entity_sefa",
+      "provider_key": "soe_sefa",
+      "name": "Small Enterprise Finance Agency (SEFA)",
+      "authority": "Government Communication and Information System / National Government Directory",
+      "url": "https://www.gov.za/about-government/contact-directory/soe/small-enterprise-finance-agency-sefa",
+      "classes": [
+        "PUBLIC_ENTITY",
+        "EMPLOYER_AND_RECRUITMENT",
+        "PUBLIC_ADMINISTRATION",
+        "FUNDING_AND_SOCIAL_SUPPORT",
+        "FINANCE_AND_INSURANCE"
+      ],
+      "supports": [
+        "GCIS individual public-entity profile and official-directory listing",
+        "employment, internship and workplace-opportunity discovery only after checking the exact current employer notice and application route"
+      ],
+      "does_not_prove": [
+        "current vacancy, internship, apprenticeship or learnership",
+        "candidate eligibility, current deadline or exact application portal",
+        "a Kingsmen partnership, authorised connector, submission receipt or employer decision"
+      ],
+      "refresh_after_days": 30,
+      "review_required": true,
+      "connector_state": "NOT_CONNECTED",
+      "metadata": {
+        "gcis_profile_url": "https://www.gov.za/about-government/contact-directory/soe/small-enterprise-finance-agency-sefa",
+        "provider_key": "soe_sefa",
+        "source_record_status": "NEEDS_REVIEW",
+        "provider_homepage_url": null,
+        "external_application_route_status": "NOT_VERIFIED"
+      }
+    },
+    {
+      "source_id": "gcis_public_entity_saasta",
+      "provider_key": "soe_saasta",
+      "name": "South African Agency for Science and Technology Advancement (SAASTA)",
+      "authority": "Government Communication and Information System / National Government Directory",
+      "url": "https://www.gov.za/about-government/contact-directory/soe/south-african-agency-science-and-technology-advancement",
+      "classes": [
+        "PUBLIC_ENTITY",
+        "EMPLOYER_AND_RECRUITMENT",
+        "PUBLIC_ADMINISTRATION",
+        "EDUCATION_AND_SKILLS"
+      ],
+      "supports": [
+        "GCIS individual public-entity profile and official-directory listing",
+        "employment, internship and workplace-opportunity discovery only after checking the exact current employer notice and application route"
+      ],
+      "does_not_prove": [
+        "current vacancy, internship, apprenticeship or learnership",
+        "candidate eligibility, current deadline or exact application portal",
+        "a Kingsmen partnership, authorised connector, submission receipt or employer decision"
+      ],
+      "refresh_after_days": 30,
+      "review_required": true,
+      "connector_state": "NOT_CONNECTED",
+      "metadata": {
+        "gcis_profile_url": "https://www.gov.za/about-government/contact-directory/soe/south-african-agency-science-and-technology-advancement",
+        "provider_key": "soe_saasta",
+        "source_record_status": "NEEDS_REVIEW",
+        "provider_homepage_url": null,
+        "external_application_route_status": "NOT_VERIFIED"
+      }
+    },
+    {
+      "source_id": "gcis_public_entity_sabs",
+      "provider_key": "soe_sabs",
+      "name": "South African Bureau of Standards (SABS)",
+      "authority": "Government Communication and Information System / National Government Directory",
+      "url": "https://www.gov.za/about-government/contact-directory/soe/south-african-bureau-standards-sabs",
+      "classes": [
+        "PUBLIC_ENTITY",
+        "EMPLOYER_AND_RECRUITMENT",
+        "PUBLIC_ADMINISTRATION",
+        "REGULATOR_AND_PROFESSIONAL_COUNCIL"
+      ],
+      "supports": [
+        "GCIS individual public-entity profile and official-directory listing",
+        "employment, internship and workplace-opportunity discovery only after checking the exact current employer notice and application route"
+      ],
+      "does_not_prove": [
+        "current vacancy, internship, apprenticeship or learnership",
+        "candidate eligibility, current deadline or exact application portal",
+        "a Kingsmen partnership, authorised connector, submission receipt or employer decision"
+      ],
+      "refresh_after_days": 30,
+      "review_required": true,
+      "connector_state": "NOT_CONNECTED",
+      "metadata": {
+        "gcis_profile_url": "https://www.gov.za/about-government/contact-directory/soe/south-african-bureau-standards-sabs",
+        "provider_key": "soe_sabs",
+        "source_record_status": "NEEDS_REVIEW",
+        "provider_homepage_url": null,
+        "external_application_route_status": "NOT_VERIFIED"
+      }
+    },
+    {
+      "source_id": "gcis_public_entity_sacaa",
+      "provider_key": "soe_sacaa",
+      "name": "South African Civil Aviation Authority (SACAA)",
+      "authority": "Government Communication and Information System / National Government Directory",
+      "url": "https://www.gov.za/about-government/contact-directory/soe/south-african-civil-aviation-authority-sacaa",
+      "classes": [
+        "PUBLIC_ENTITY",
+        "EMPLOYER_AND_RECRUITMENT",
+        "PUBLIC_ADMINISTRATION",
+        "TRANSPORT_AND_ESSENTIAL_SERVICES",
+        "REGULATOR_AND_PROFESSIONAL_COUNCIL"
+      ],
+      "supports": [
+        "GCIS individual public-entity profile and official-directory listing",
+        "employment, internship and workplace-opportunity discovery only after checking the exact current employer notice and application route"
+      ],
+      "does_not_prove": [
+        "current vacancy, internship, apprenticeship or learnership",
+        "candidate eligibility, current deadline or exact application portal",
+        "a Kingsmen partnership, authorised connector, submission receipt or employer decision"
+      ],
+      "refresh_after_days": 30,
+      "review_required": true,
+      "connector_state": "NOT_CONNECTED",
+      "metadata": {
+        "gcis_profile_url": "https://www.gov.za/about-government/contact-directory/soe/south-african-civil-aviation-authority-sacaa",
+        "provider_key": "soe_sacaa",
+        "source_record_status": "NEEDS_REVIEW",
+        "provider_homepage_url": null,
+        "external_application_route_status": "NOT_VERIFIED"
+      }
+    },
+    {
+      "source_id": "gcis_public_entity_sace",
+      "provider_key": "soe_sace",
+      "name": "South African Council for Educators (SACE)",
+      "authority": "Government Communication and Information System / National Government Directory",
+      "url": "https://www.gov.za/about-government/contact-directory/soe/south-african-council-educators-sace",
+      "classes": [
+        "PUBLIC_ENTITY",
+        "EMPLOYER_AND_RECRUITMENT",
+        "PUBLIC_ADMINISTRATION",
+        "EDUCATION_AND_SKILLS",
+        "REGULATOR_AND_PROFESSIONAL_COUNCIL"
+      ],
+      "supports": [
+        "GCIS individual public-entity profile and official-directory listing",
+        "employment, internship and workplace-opportunity discovery only after checking the exact current employer notice and application route"
+      ],
+      "does_not_prove": [
+        "current vacancy, internship, apprenticeship or learnership",
+        "candidate eligibility, current deadline or exact application portal",
+        "a Kingsmen partnership, authorised connector, submission receipt or employer decision"
+      ],
+      "refresh_after_days": 30,
+      "review_required": true,
+      "connector_state": "NOT_CONNECTED",
+      "metadata": {
+        "gcis_profile_url": "https://www.gov.za/about-government/contact-directory/soe/south-african-council-educators-sace",
+        "provider_key": "soe_sace",
+        "source_record_status": "NEEDS_REVIEW",
+        "provider_homepage_url": null,
+        "external_application_route_status": "NOT_VERIFIED"
+      }
+    },
+    {
+      "source_id": "gcis_public_entity_sacssp",
+      "provider_key": "soe_sacssp",
+      "name": "South African Council for Social Service Professions (SACSSP)",
+      "authority": "Government Communication and Information System / National Government Directory",
+      "url": "https://www.gov.za/about-government/contact-directory/soe/south-african-council-social-service-professions-sacssp",
+      "classes": [
+        "PUBLIC_ENTITY",
+        "EMPLOYER_AND_RECRUITMENT",
+        "PUBLIC_ADMINISTRATION",
+        "REGULATOR_AND_PROFESSIONAL_COUNCIL",
+        "HEALTH_AND_CARE"
+      ],
+      "supports": [
+        "GCIS individual public-entity profile and official-directory listing",
+        "employment, internship and workplace-opportunity discovery only after checking the exact current employer notice and application route"
+      ],
+      "does_not_prove": [
+        "current vacancy, internship, apprenticeship or learnership",
+        "candidate eligibility, current deadline or exact application portal",
+        "a Kingsmen partnership, authorised connector, submission receipt or employer decision"
+      ],
+      "refresh_after_days": 30,
+      "review_required": true,
+      "connector_state": "NOT_CONNECTED",
+      "metadata": {
+        "gcis_profile_url": "https://www.gov.za/about-government/contact-directory/soe/south-african-council-social-service-professions-sacssp",
+        "provider_key": "soe_sacssp",
+        "source_record_status": "NEEDS_REVIEW",
+        "provider_homepage_url": null,
+        "external_application_route_status": "NOT_VERIFIED"
+      }
+    },
+    {
+      "source_id": "gcis_public_entity_diamond_precious_metals_regulator",
+      "provider_key": "soe_diamond_precious_metals_regulator",
+      "name": "South African Diamond and Precious Metals Regulator",
+      "authority": "Government Communication and Information System / National Government Directory",
+      "url": "https://www.gov.za/about-government/contact-directory/soe/south-african-diamond-and-precious-metals-regulator",
+      "classes": [
+        "PUBLIC_ENTITY",
+        "EMPLOYER_AND_RECRUITMENT",
+        "PUBLIC_ADMINISTRATION",
+        "REGULATOR_AND_PROFESSIONAL_COUNCIL"
+      ],
+      "supports": [
+        "GCIS individual public-entity profile and official-directory listing",
+        "employment, internship and workplace-opportunity discovery only after checking the exact current employer notice and application route"
+      ],
+      "does_not_prove": [
+        "current vacancy, internship, apprenticeship or learnership",
+        "candidate eligibility, current deadline or exact application portal",
+        "a Kingsmen partnership, authorised connector, submission receipt or employer decision"
+      ],
+      "refresh_after_days": 30,
+      "review_required": true,
+      "connector_state": "NOT_CONNECTED",
+      "metadata": {
+        "gcis_profile_url": "https://www.gov.za/about-government/contact-directory/soe/south-african-diamond-and-precious-metals-regulator",
+        "provider_key": "soe_diamond_precious_metals_regulator",
+        "source_record_status": "NEEDS_REVIEW",
+        "provider_homepage_url": null,
+        "external_application_route_status": "NOT_VERIFIED"
+      }
+    },
+    {
+      "source_id": "gcis_public_entity_safcol",
+      "provider_key": "soe_safcol",
+      "name": "South African Forestry Company (SAFCOL)",
+      "authority": "Government Communication and Information System / National Government Directory",
+      "url": "https://www.gov.za/about-government/contact-directory/soe/south-african-forestry-company-ltd-safcol",
+      "classes": [
+        "PUBLIC_ENTITY",
+        "EMPLOYER_AND_RECRUITMENT",
+        "PUBLIC_ADMINISTRATION"
+      ],
+      "supports": [
+        "GCIS individual public-entity profile and official-directory listing",
+        "employment, internship and workplace-opportunity discovery only after checking the exact current employer notice and application route"
+      ],
+      "does_not_prove": [
+        "current vacancy, internship, apprenticeship or learnership",
+        "candidate eligibility, current deadline or exact application portal",
+        "a Kingsmen partnership, authorised connector, submission receipt or employer decision"
+      ],
+      "refresh_after_days": 30,
+      "review_required": true,
+      "connector_state": "NOT_CONNECTED",
+      "metadata": {
+        "gcis_profile_url": "https://www.gov.za/about-government/contact-directory/soe/south-african-forestry-company-ltd-safcol",
+        "provider_key": "soe_safcol",
+        "source_record_status": "NEEDS_REVIEW",
+        "provider_homepage_url": null,
+        "external_application_route_status": "NOT_VERIFIED"
+      }
+    },
+    {
+      "source_id": "gcis_public_entity_sahra",
+      "provider_key": "soe_sahra",
+      "name": "South African Heritage Resources Agency",
+      "authority": "Government Communication and Information System / National Government Directory",
+      "url": "https://www.gov.za/about-government/contact-directory/soe/south-african-heritage-resources-agency",
+      "classes": [
+        "PUBLIC_ENTITY",
+        "EMPLOYER_AND_RECRUITMENT",
+        "PUBLIC_ADMINISTRATION"
+      ],
+      "supports": [
+        "GCIS individual public-entity profile and official-directory listing",
+        "employment, internship and workplace-opportunity discovery only after checking the exact current employer notice and application route"
+      ],
+      "does_not_prove": [
+        "current vacancy, internship, apprenticeship or learnership",
+        "candidate eligibility, current deadline or exact application portal",
+        "a Kingsmen partnership, authorised connector, submission receipt or employer decision"
+      ],
+      "refresh_after_days": 30,
+      "review_required": true,
+      "connector_state": "NOT_CONNECTED",
+      "metadata": {
+        "gcis_profile_url": "https://www.gov.za/about-government/contact-directory/soe/south-african-heritage-resources-agency",
+        "provider_key": "soe_sahra",
+        "source_record_status": "NEEDS_REVIEW",
+        "provider_homepage_url": null,
+        "external_application_route_status": "NOT_VERIFIED"
+      }
+    },
+    {
+      "source_id": "gcis_public_entity_saids",
+      "provider_key": "soe_saids",
+      "name": "South African Institute for Drug-Free Sport",
+      "authority": "Government Communication and Information System / National Government Directory",
+      "url": "https://www.gov.za/about-government/contact-directory/soe/south-african-institute-drug-free-sport",
+      "classes": [
+        "PUBLIC_ENTITY",
+        "EMPLOYER_AND_RECRUITMENT",
+        "PUBLIC_ADMINISTRATION",
+        "HEALTH_AND_CARE"
+      ],
+      "supports": [
+        "GCIS individual public-entity profile and official-directory listing",
+        "employment, internship and workplace-opportunity discovery only after checking the exact current employer notice and application route"
+      ],
+      "does_not_prove": [
+        "current vacancy, internship, apprenticeship or learnership",
+        "candidate eligibility, current deadline or exact application portal",
+        "a Kingsmen partnership, authorised connector, submission receipt or employer decision"
+      ],
+      "refresh_after_days": 30,
+      "review_required": true,
+      "connector_state": "NOT_CONNECTED",
+      "metadata": {
+        "gcis_profile_url": "https://www.gov.za/about-government/contact-directory/soe/south-african-institute-drug-free-sport",
+        "provider_key": "soe_saids",
+        "source_record_status": "NEEDS_REVIEW",
+        "provider_homepage_url": null,
+        "external_application_route_status": "NOT_VERIFIED"
+      }
+    },
+    {
+      "source_id": "gcis_public_entity_library_for_blind",
+      "provider_key": "soe_library_for_blind",
+      "name": "South African Library for the Blind",
+      "authority": "Government Communication and Information System / National Government Directory",
+      "url": "https://www.gov.za/about-government/contact-directory/soe/south-african-library-blind",
+      "classes": [
+        "PUBLIC_ENTITY",
+        "EMPLOYER_AND_RECRUITMENT",
+        "PUBLIC_ADMINISTRATION",
+        "NGO_NPO_AND_FOUNDATION",
+        "LEGAL_AID_AND_COMMUNITY_SERVICES"
+      ],
+      "supports": [
+        "GCIS individual public-entity profile and official-directory listing",
+        "employment, internship and workplace-opportunity discovery only after checking the exact current employer notice and application route"
+      ],
+      "does_not_prove": [
+        "current vacancy, internship, apprenticeship or learnership",
+        "candidate eligibility, current deadline or exact application portal",
+        "a Kingsmen partnership, authorised connector, submission receipt or employer decision"
+      ],
+      "refresh_after_days": 30,
+      "review_required": true,
+      "connector_state": "NOT_CONNECTED",
+      "metadata": {
+        "gcis_profile_url": "https://www.gov.za/about-government/contact-directory/soe/south-african-library-blind",
+        "provider_key": "soe_library_for_blind",
+        "source_record_status": "NEEDS_REVIEW",
+        "provider_homepage_url": null,
+        "external_application_route_status": "NOT_VERIFIED"
+      }
+    },
+    {
+      "source_id": "gcis_public_entity_salga",
+      "provider_key": "soe_salga",
+      "name": "South African Local Government Association (SALGA)",
+      "authority": "Government Communication and Information System / National Government Directory",
+      "url": "https://www.gov.za/about-government/contact-directory/soe/south-african-local-government-association-salga",
+      "classes": [
+        "PUBLIC_ENTITY",
+        "EMPLOYER_AND_RECRUITMENT",
+        "PUBLIC_ADMINISTRATION",
+        "PUBLIC_ADMINISTRATION"
+      ],
+      "supports": [
+        "GCIS individual public-entity profile and official-directory listing",
+        "employment, internship and workplace-opportunity discovery only after checking the exact current employer notice and application route"
+      ],
+      "does_not_prove": [
+        "current vacancy, internship, apprenticeship or learnership",
+        "candidate eligibility, current deadline or exact application portal",
+        "a Kingsmen partnership, authorised connector, submission receipt or employer decision"
+      ],
+      "refresh_after_days": 30,
+      "review_required": true,
+      "connector_state": "NOT_CONNECTED",
+      "metadata": {
+        "gcis_profile_url": "https://www.gov.za/about-government/contact-directory/soe/south-african-local-government-association-salga",
+        "provider_key": "soe_salga",
+        "source_record_status": "NEEDS_REVIEW",
+        "provider_homepage_url": null,
+        "external_application_route_status": "NOT_VERIFIED"
+      }
+    },
+    {
+      "source_id": "gcis_public_entity_sancb",
+      "provider_key": "soe_sancb",
+      "name": "South African National Council for the Blind",
+      "authority": "Government Communication and Information System / National Government Directory",
+      "url": "https://www.gov.za/about-government/contact-directory/soe/south-african-national-council-blind",
+      "classes": [
+        "PUBLIC_ENTITY",
+        "EMPLOYER_AND_RECRUITMENT",
+        "PUBLIC_ADMINISTRATION",
+        "NGO_NPO_AND_FOUNDATION",
+        "LEGAL_AID_AND_COMMUNITY_SERVICES"
+      ],
+      "supports": [
+        "GCIS individual public-entity profile and official-directory listing",
+        "employment, internship and workplace-opportunity discovery only after checking the exact current employer notice and application route"
+      ],
+      "does_not_prove": [
+        "current vacancy, internship, apprenticeship or learnership",
+        "candidate eligibility, current deadline or exact application portal",
+        "a Kingsmen partnership, authorised connector, submission receipt or employer decision"
+      ],
+      "refresh_after_days": 30,
+      "review_required": true,
+      "connector_state": "NOT_CONNECTED",
+      "metadata": {
+        "gcis_profile_url": "https://www.gov.za/about-government/contact-directory/soe/south-african-national-council-blind",
+        "provider_key": "soe_sancb",
+        "source_record_status": "NEEDS_REVIEW",
+        "provider_homepage_url": null,
+        "external_application_route_status": "NOT_VERIFIED"
+      }
+    },
+    {
+      "source_id": "gcis_public_entity_sanparks",
+      "provider_key": "soe_sanparks",
+      "name": "South African National Parks (SANParks)",
+      "authority": "Government Communication and Information System / National Government Directory",
+      "url": "https://www.gov.za/about-government/contact-directory/soe/south-african-national-parks-sanparks",
+      "classes": [
+        "PUBLIC_ENTITY",
+        "EMPLOYER_AND_RECRUITMENT",
+        "PUBLIC_ADMINISTRATION"
+      ],
+      "supports": [
+        "GCIS individual public-entity profile and official-directory listing",
+        "employment, internship and workplace-opportunity discovery only after checking the exact current employer notice and application route"
+      ],
+      "does_not_prove": [
+        "current vacancy, internship, apprenticeship or learnership",
+        "candidate eligibility, current deadline or exact application portal",
+        "a Kingsmen partnership, authorised connector, submission receipt or employer decision"
+      ],
+      "refresh_after_days": 30,
+      "review_required": true,
+      "connector_state": "NOT_CONNECTED",
+      "metadata": {
+        "gcis_profile_url": "https://www.gov.za/about-government/contact-directory/soe/south-african-national-parks-sanparks",
+        "provider_key": "soe_sanparks",
+        "source_record_status": "NEEDS_REVIEW",
+        "provider_homepage_url": null,
+        "external_application_route_status": "NOT_VERIFIED"
+      }
+    },
+    {
+      "source_id": "gcis_public_entity_necsa",
+      "provider_key": "soe_necsa",
+      "name": "South African Nuclear Energy Corporation SOC Ltd (NECSA)",
+      "authority": "Government Communication and Information System / National Government Directory",
+      "url": "https://www.gov.za/about-government/contact-directory/soe/south-african-nuclear-energy-corporation-soc-ltd-necsa",
+      "classes": [
+        "PUBLIC_ENTITY",
+        "EMPLOYER_AND_RECRUITMENT",
+        "PUBLIC_ADMINISTRATION",
+        "ENERGY_AND_UTILITIES"
+      ],
+      "supports": [
+        "GCIS individual public-entity profile and official-directory listing",
+        "employment, internship and workplace-opportunity discovery only after checking the exact current employer notice and application route"
+      ],
+      "does_not_prove": [
+        "current vacancy, internship, apprenticeship or learnership",
+        "candidate eligibility, current deadline or exact application portal",
+        "a Kingsmen partnership, authorised connector, submission receipt or employer decision"
+      ],
+      "refresh_after_days": 30,
+      "review_required": true,
+      "connector_state": "NOT_CONNECTED",
+      "metadata": {
+        "gcis_profile_url": "https://www.gov.za/about-government/contact-directory/soe/south-african-nuclear-energy-corporation-soc-ltd-necsa",
+        "provider_key": "soe_necsa",
+        "source_record_status": "NEEDS_REVIEW",
+        "provider_homepage_url": null,
+        "external_application_route_status": "NOT_VERIFIED"
+      }
+    },
+    {
+      "source_id": "gcis_public_entity_sarb",
+      "provider_key": "soe_sarb",
+      "name": "South African Reserve Bank (SARB)",
+      "authority": "Government Communication and Information System / National Government Directory",
+      "url": "https://www.gov.za/about-government/contact-directory/soe/south-african-reserve-bank-sarb",
+      "classes": [
+        "PUBLIC_ENTITY",
+        "EMPLOYER_AND_RECRUITMENT",
+        "PUBLIC_ADMINISTRATION",
+        "FINANCE_AND_INSURANCE",
+        "REGULATOR_AND_PROFESSIONAL_COUNCIL"
+      ],
+      "supports": [
+        "GCIS individual public-entity profile and official-directory listing",
+        "employment, internship and workplace-opportunity discovery only after checking the exact current employer notice and application route"
+      ],
+      "does_not_prove": [
+        "current vacancy, internship, apprenticeship or learnership",
+        "candidate eligibility, current deadline or exact application portal",
+        "a Kingsmen partnership, authorised connector, submission receipt or employer decision"
+      ],
+      "refresh_after_days": 30,
+      "review_required": true,
+      "connector_state": "NOT_CONNECTED",
+      "metadata": {
+        "gcis_profile_url": "https://www.gov.za/about-government/contact-directory/soe/south-african-reserve-bank-sarb",
+        "provider_key": "soe_sarb",
+        "source_record_status": "NEEDS_REVIEW",
+        "provider_homepage_url": null,
+        "external_application_route_status": "NOT_VERIFIED"
+      }
+    },
+    {
+      "source_id": "gcis_public_entity_sasria",
+      "provider_key": "soe_sasria",
+      "name": "South African Special Risk Insurance Association (SASRIA)",
+      "authority": "Government Communication and Information System / National Government Directory",
+      "url": "https://www.gov.za/about-government/contact-directory/soe/south-african-special-risk-insurance-association-sasria",
+      "classes": [
+        "PUBLIC_ENTITY",
+        "EMPLOYER_AND_RECRUITMENT",
+        "PUBLIC_ADMINISTRATION",
+        "FINANCE_AND_INSURANCE"
+      ],
+      "supports": [
+        "GCIS individual public-entity profile and official-directory listing",
+        "employment, internship and workplace-opportunity discovery only after checking the exact current employer notice and application route"
+      ],
+      "does_not_prove": [
+        "current vacancy, internship, apprenticeship or learnership",
+        "candidate eligibility, current deadline or exact application portal",
+        "a Kingsmen partnership, authorised connector, submission receipt or employer decision"
+      ],
+      "refresh_after_days": 30,
+      "review_required": true,
+      "connector_state": "NOT_CONNECTED",
+      "metadata": {
+        "gcis_profile_url": "https://www.gov.za/about-government/contact-directory/soe/south-african-special-risk-insurance-association-sasria",
+        "provider_key": "soe_sasria",
+        "source_record_status": "NEEDS_REVIEW",
+        "provider_homepage_url": null,
+        "external_application_route_status": "NOT_VERIFIED"
+      }
+    },
+    {
+      "source_id": "gcis_public_entity_state_theatre",
+      "provider_key": "soe_state_theatre",
+      "name": "South African State Theatre — Pretoria",
+      "authority": "Government Communication and Information System / National Government Directory",
+      "url": "https://www.gov.za/about-government/contact-directory/soe/south-african-state-theatre-pretoria",
+      "classes": [
+        "PUBLIC_ENTITY",
+        "EMPLOYER_AND_RECRUITMENT",
+        "PUBLIC_ADMINISTRATION"
+      ],
+      "supports": [
+        "GCIS individual public-entity profile and official-directory listing",
+        "employment, internship and workplace-opportunity discovery only after checking the exact current employer notice and application route"
+      ],
+      "does_not_prove": [
+        "current vacancy, internship, apprenticeship or learnership",
+        "candidate eligibility, current deadline or exact application portal",
+        "a Kingsmen partnership, authorised connector, submission receipt or employer decision"
+      ],
+      "refresh_after_days": 30,
+      "review_required": true,
+      "connector_state": "NOT_CONNECTED",
+      "metadata": {
+        "gcis_profile_url": "https://www.gov.za/about-government/contact-directory/soe/south-african-state-theatre-pretoria",
+        "provider_key": "soe_state_theatre",
+        "source_record_status": "NEEDS_REVIEW",
+        "provider_homepage_url": null,
+        "external_application_route_status": "NOT_VERIFIED"
+      }
+    },
+    {
+      "source_id": "gcis_public_entity_tourism",
+      "provider_key": "soe_tourism",
+      "name": "South African Tourism",
+      "authority": "Government Communication and Information System / National Government Directory",
+      "url": "https://www.gov.za/about-government/contact-directory/soe/south-african-tourism",
+      "classes": [
+        "PUBLIC_ENTITY",
+        "EMPLOYER_AND_RECRUITMENT",
+        "PUBLIC_ADMINISTRATION"
+      ],
+      "supports": [
+        "GCIS individual public-entity profile and official-directory listing",
+        "employment, internship and workplace-opportunity discovery only after checking the exact current employer notice and application route"
+      ],
+      "does_not_prove": [
+        "current vacancy, internship, apprenticeship or learnership",
+        "candidate eligibility, current deadline or exact application portal",
+        "a Kingsmen partnership, authorised connector, submission receipt or employer decision"
+      ],
+      "refresh_after_days": 30,
+      "review_required": true,
+      "connector_state": "NOT_CONNECTED",
+      "metadata": {
+        "gcis_profile_url": "https://www.gov.za/about-government/contact-directory/soe/south-african-tourism",
+        "provider_key": "soe_tourism",
+        "source_record_status": "NEEDS_REVIEW",
+        "provider_homepage_url": null,
+        "external_application_route_status": "NOT_VERIFIED"
+      }
+    },
+    {
+      "source_id": "gcis_public_entity_veterinary_council",
+      "provider_key": "soe_veterinary_council",
+      "name": "South African Veterinary Council",
+      "authority": "Government Communication and Information System / National Government Directory",
+      "url": "https://www.gov.za/about-government/contact-directory/soe/south-african-veterinary-council",
+      "classes": [
+        "PUBLIC_ENTITY",
+        "EMPLOYER_AND_RECRUITMENT",
+        "PUBLIC_ADMINISTRATION",
+        "HEALTH_AND_CARE",
+        "REGULATOR_AND_PROFESSIONAL_COUNCIL"
+      ],
+      "supports": [
+        "GCIS individual public-entity profile and official-directory listing",
+        "employment, internship and workplace-opportunity discovery only after checking the exact current employer notice and application route"
+      ],
+      "does_not_prove": [
+        "current vacancy, internship, apprenticeship or learnership",
+        "candidate eligibility, current deadline or exact application portal",
+        "a Kingsmen partnership, authorised connector, submission receipt or employer decision"
+      ],
+      "refresh_after_days": 30,
+      "review_required": true,
+      "connector_state": "NOT_CONNECTED",
+      "metadata": {
+        "gcis_profile_url": "https://www.gov.za/about-government/contact-directory/soe/south-african-veterinary-council",
+        "provider_key": "soe_veterinary_council",
+        "source_record_status": "NEEDS_REVIEW",
+        "provider_homepage_url": null,
+        "external_application_route_status": "NOT_VERIFIED"
+      }
+    },
+    {
+      "source_id": "gcis_public_entity_saws",
+      "provider_key": "soe_saws",
+      "name": "South African Weather Service (SAWS)",
+      "authority": "Government Communication and Information System / National Government Directory",
+      "url": "https://www.gov.za/about-government/contact-directory/soe/south-african-weather-service-saws",
+      "classes": [
+        "PUBLIC_ENTITY",
+        "EMPLOYER_AND_RECRUITMENT",
+        "PUBLIC_ADMINISTRATION"
+      ],
+      "supports": [
+        "GCIS individual public-entity profile and official-directory listing",
+        "employment, internship and workplace-opportunity discovery only after checking the exact current employer notice and application route"
+      ],
+      "does_not_prove": [
+        "current vacancy, internship, apprenticeship or learnership",
+        "candidate eligibility, current deadline or exact application portal",
+        "a Kingsmen partnership, authorised connector, submission receipt or employer decision"
+      ],
+      "refresh_after_days": 30,
+      "review_required": true,
+      "connector_state": "NOT_CONNECTED",
+      "metadata": {
+        "gcis_profile_url": "https://www.gov.za/about-government/contact-directory/soe/south-african-weather-service-saws",
+        "provider_key": "soe_saws",
+        "source_record_status": "NEEDS_REVIEW",
+        "provider_homepage_url": null,
+        "external_application_route_status": "NOT_VERIFIED"
+      }
+    },
+    {
+      "source_id": "gcis_public_entity_siu",
+      "provider_key": "soe_siu",
+      "name": "Special Investigating Unit (SIU)",
+      "authority": "Government Communication and Information System / National Government Directory",
+      "url": "https://www.gov.za/about-government/contact-directory/soe/special-investigating-unit-siu",
+      "classes": [
+        "PUBLIC_ENTITY",
+        "EMPLOYER_AND_RECRUITMENT",
+        "PUBLIC_ADMINISTRATION",
+        "PUBLIC_ADMINISTRATION"
+      ],
+      "supports": [
+        "GCIS individual public-entity profile and official-directory listing",
+        "employment, internship and workplace-opportunity discovery only after checking the exact current employer notice and application route"
+      ],
+      "does_not_prove": [
+        "current vacancy, internship, apprenticeship or learnership",
+        "candidate eligibility, current deadline or exact application portal",
+        "a Kingsmen partnership, authorised connector, submission receipt or employer decision"
+      ],
+      "refresh_after_days": 30,
+      "review_required": true,
+      "connector_state": "NOT_CONNECTED",
+      "metadata": {
+        "gcis_profile_url": "https://www.gov.za/about-government/contact-directory/soe/special-investigating-unit-siu",
+        "provider_key": "soe_siu",
+        "source_record_status": "NEEDS_REVIEW",
+        "provider_homepage_url": null,
+        "external_application_route_status": "NOT_VERIFIED"
+      }
+    },
+    {
+      "source_id": "gcis_public_entity_sita",
+      "provider_key": "soe_sita",
+      "name": "State Information Technology Agency (SITA)",
+      "authority": "Government Communication and Information System / National Government Directory",
+      "url": "https://www.gov.za/about-government/contact-directory/soe/state-information-technology-agency-sita",
+      "classes": [
+        "PUBLIC_ENTITY",
+        "EMPLOYER_AND_RECRUITMENT",
+        "PUBLIC_ADMINISTRATION",
+        "TECHNOLOGY_AND_DELIVERY_VENDOR"
+      ],
+      "supports": [
+        "GCIS individual public-entity profile and official-directory listing",
+        "employment, internship and workplace-opportunity discovery only after checking the exact current employer notice and application route"
+      ],
+      "does_not_prove": [
+        "current vacancy, internship, apprenticeship or learnership",
+        "candidate eligibility, current deadline or exact application portal",
+        "a Kingsmen partnership, authorised connector, submission receipt or employer decision"
+      ],
+      "refresh_after_days": 30,
+      "review_required": true,
+      "connector_state": "NOT_CONNECTED",
+      "metadata": {
+        "gcis_profile_url": "https://www.gov.za/about-government/contact-directory/soe/state-information-technology-agency-sita",
+        "provider_key": "soe_sita",
+        "source_record_status": "NEEDS_REVIEW",
+        "provider_homepage_url": null,
+        "external_application_route_status": "NOT_VERIFIED"
+      }
+    },
+    {
+      "source_id": "gcis_public_entity_tax_ombud",
+      "provider_key": "soe_tax_ombud",
+      "name": "Tax Ombud: South Africa",
+      "authority": "Government Communication and Information System / National Government Directory",
+      "url": "https://www.gov.za/about-government/contact-directory/soe/tax-ombud-south-africa",
+      "classes": [
+        "PUBLIC_ENTITY",
+        "EMPLOYER_AND_RECRUITMENT",
+        "PUBLIC_ADMINISTRATION",
+        "PUBLIC_ADMINISTRATION"
+      ],
+      "supports": [
+        "GCIS individual public-entity profile and official-directory listing",
+        "employment, internship and workplace-opportunity discovery only after checking the exact current employer notice and application route"
+      ],
+      "does_not_prove": [
+        "current vacancy, internship, apprenticeship or learnership",
+        "candidate eligibility, current deadline or exact application portal",
+        "a Kingsmen partnership, authorised connector, submission receipt or employer decision"
+      ],
+      "refresh_after_days": 30,
+      "review_required": true,
+      "connector_state": "NOT_CONNECTED",
+      "metadata": {
+        "gcis_profile_url": "https://www.gov.za/about-government/contact-directory/soe/tax-ombud-south-africa",
+        "provider_key": "soe_tax_ombud",
+        "source_record_status": "NEEDS_REVIEW",
+        "provider_homepage_url": null,
+        "external_application_route_status": "NOT_VERIFIED"
+      }
+    },
+    {
+      "source_id": "gcis_public_entity_technology_innovation_agency",
+      "provider_key": "soe_technology_innovation_agency",
+      "name": "Technology Innovation Agency",
+      "authority": "Government Communication and Information System / National Government Directory",
+      "url": "https://www.gov.za/about-government/contact-directory/soe/technology-innovation-agency",
+      "classes": [
+        "PUBLIC_ENTITY",
+        "EMPLOYER_AND_RECRUITMENT",
+        "PUBLIC_ADMINISTRATION",
+        "FUNDING_AND_SOCIAL_SUPPORT",
+        "TECHNOLOGY_AND_DELIVERY_VENDOR"
+      ],
+      "supports": [
+        "GCIS individual public-entity profile and official-directory listing",
+        "employment, internship and workplace-opportunity discovery only after checking the exact current employer notice and application route"
+      ],
+      "does_not_prove": [
+        "current vacancy, internship, apprenticeship or learnership",
+        "candidate eligibility, current deadline or exact application portal",
+        "a Kingsmen partnership, authorised connector, submission receipt or employer decision"
+      ],
+      "refresh_after_days": 30,
+      "review_required": true,
+      "connector_state": "NOT_CONNECTED",
+      "metadata": {
+        "gcis_profile_url": "https://www.gov.za/about-government/contact-directory/soe/technology-innovation-agency",
+        "provider_key": "soe_technology_innovation_agency",
+        "source_record_status": "NEEDS_REVIEW",
+        "provider_homepage_url": null,
+        "external_application_route_status": "NOT_VERIFIED"
+      }
+    },
+    {
+      "source_id": "gcis_public_entity_tcta",
+      "provider_key": "soe_tcta",
+      "name": "Trans-Caledon Tunnel Authority (TCTA)",
+      "authority": "Government Communication and Information System / National Government Directory",
+      "url": "https://www.gov.za/about-government/contact-directory/soe/trans-caledon-tunnel-authority-tcta",
+      "classes": [
+        "PUBLIC_ENTITY",
+        "EMPLOYER_AND_RECRUITMENT",
+        "PUBLIC_ADMINISTRATION",
+        "ENERGY_AND_UTILITIES",
+        "TRANSPORT_AND_ESSENTIAL_SERVICES"
+      ],
+      "supports": [
+        "GCIS individual public-entity profile and official-directory listing",
+        "employment, internship and workplace-opportunity discovery only after checking the exact current employer notice and application route"
+      ],
+      "does_not_prove": [
+        "current vacancy, internship, apprenticeship or learnership",
+        "candidate eligibility, current deadline or exact application portal",
+        "a Kingsmen partnership, authorised connector, submission receipt or employer decision"
+      ],
+      "refresh_after_days": 30,
+      "review_required": true,
+      "connector_state": "NOT_CONNECTED",
+      "metadata": {
+        "gcis_profile_url": "https://www.gov.za/about-government/contact-directory/soe/trans-caledon-tunnel-authority-tcta",
+        "provider_key": "soe_tcta",
+        "source_record_status": "NEEDS_REVIEW",
+        "provider_homepage_url": null,
+        "external_application_route_status": "NOT_VERIFIED"
+      }
+    },
+    {
+      "source_id": "gcis_public_entity_transnet_national_ports_authority",
+      "provider_key": "soe_transnet_national_ports_authority",
+      "name": "Transnet National Ports Authority",
+      "authority": "Government Communication and Information System / National Government Directory",
+      "url": "https://www.gov.za/about-government/contact-directory/soe/transnet-national-ports-authority",
+      "classes": [
+        "PUBLIC_ENTITY",
+        "EMPLOYER_AND_RECRUITMENT",
+        "PUBLIC_ADMINISTRATION",
+        "TRANSPORT_AND_ESSENTIAL_SERVICES"
+      ],
+      "supports": [
+        "GCIS individual public-entity profile and official-directory listing",
+        "employment, internship and workplace-opportunity discovery only after checking the exact current employer notice and application route"
+      ],
+      "does_not_prove": [
+        "current vacancy, internship, apprenticeship or learnership",
+        "candidate eligibility, current deadline or exact application portal",
+        "a Kingsmen partnership, authorised connector, submission receipt or employer decision"
+      ],
+      "refresh_after_days": 30,
+      "review_required": true,
+      "connector_state": "NOT_CONNECTED",
+      "metadata": {
+        "gcis_profile_url": "https://www.gov.za/about-government/contact-directory/soe/transnet-national-ports-authority",
+        "provider_key": "soe_transnet_national_ports_authority",
+        "source_record_status": "NEEDS_REVIEW",
+        "provider_homepage_url": null,
+        "external_application_route_status": "NOT_VERIFIED"
+      }
+    },
+    {
+      "source_id": "gcis_public_entity_umngeni_uthukela_water",
+      "provider_key": "soe_umngeni_uthukela_water",
+      "name": "uMngeni-uThukela Water",
+      "authority": "Government Communication and Information System / National Government Directory",
+      "url": "https://www.gov.za/about-government/contact-directory/soe/umngeni-uthukela-water",
+      "classes": [
+        "PUBLIC_ENTITY",
+        "EMPLOYER_AND_RECRUITMENT",
+        "PUBLIC_ADMINISTRATION",
+        "ENERGY_AND_UTILITIES",
+        "TRANSPORT_AND_ESSENTIAL_SERVICES"
+      ],
+      "supports": [
+        "GCIS individual public-entity profile and official-directory listing",
+        "employment, internship and workplace-opportunity discovery only after checking the exact current employer notice and application route"
+      ],
+      "does_not_prove": [
+        "current vacancy, internship, apprenticeship or learnership",
+        "candidate eligibility, current deadline or exact application portal",
+        "a Kingsmen partnership, authorised connector, submission receipt or employer decision"
+      ],
+      "refresh_after_days": 30,
+      "review_required": true,
+      "connector_state": "NOT_CONNECTED",
+      "metadata": {
+        "gcis_profile_url": "https://www.gov.za/about-government/contact-directory/soe/umngeni-uthukela-water",
+        "provider_key": "soe_umngeni_uthukela_water",
+        "source_record_status": "NEEDS_REVIEW",
+        "provider_homepage_url": null,
+        "external_application_route_status": "NOT_VERIFIED"
+      }
+    },
+    {
+      "source_id": "gcis_public_entity_universal_service_agency",
+      "provider_key": "soe_universal_service_agency",
+      "name": "Universal Service Agency and Access of South Africa",
+      "authority": "Government Communication and Information System / National Government Directory",
+      "url": "https://www.gov.za/about-government/contact-directory/soe/universal-service-agency-and-access-south-africa",
+      "classes": [
+        "PUBLIC_ENTITY",
+        "EMPLOYER_AND_RECRUITMENT",
+        "PUBLIC_ADMINISTRATION",
+        "PUBLIC_ADMINISTRATION",
+        "TECHNOLOGY_AND_DELIVERY_VENDOR"
+      ],
+      "supports": [
+        "GCIS individual public-entity profile and official-directory listing",
+        "employment, internship and workplace-opportunity discovery only after checking the exact current employer notice and application route"
+      ],
+      "does_not_prove": [
+        "current vacancy, internship, apprenticeship or learnership",
+        "candidate eligibility, current deadline or exact application portal",
+        "a Kingsmen partnership, authorised connector, submission receipt or employer decision"
+      ],
+      "refresh_after_days": 30,
+      "review_required": true,
+      "connector_state": "NOT_CONNECTED",
+      "metadata": {
+        "gcis_profile_url": "https://www.gov.za/about-government/contact-directory/soe/universal-service-agency-and-access-south-africa",
+        "provider_key": "soe_universal_service_agency",
+        "source_record_status": "NEEDS_REVIEW",
+        "provider_homepage_url": null,
+        "external_application_route_status": "NOT_VERIFIED"
+      }
+    },
+    {
+      "source_id": "gcis_public_entity_water_research_commission",
+      "provider_key": "soe_water_research_commission",
+      "name": "Water Research Commission (WRC)",
+      "authority": "Government Communication and Information System / National Government Directory",
+      "url": "https://www.gov.za/about-government/contact-directory/soe/water-research-commission-wrc",
+      "classes": [
+        "PUBLIC_ENTITY",
+        "EMPLOYER_AND_RECRUITMENT",
+        "PUBLIC_ADMINISTRATION",
+        "EDUCATION_AND_SKILLS",
+        "ENERGY_AND_UTILITIES"
+      ],
+      "supports": [
+        "GCIS individual public-entity profile and official-directory listing",
+        "employment, internship and workplace-opportunity discovery only after checking the exact current employer notice and application route"
+      ],
+      "does_not_prove": [
+        "current vacancy, internship, apprenticeship or learnership",
+        "candidate eligibility, current deadline or exact application portal",
+        "a Kingsmen partnership, authorised connector, submission receipt or employer decision"
+      ],
+      "refresh_after_days": 30,
+      "review_required": true,
+      "connector_state": "NOT_CONNECTED",
+      "metadata": {
+        "gcis_profile_url": "https://www.gov.za/about-government/contact-directory/soe/water-research-commission-wrc",
+        "provider_key": "soe_water_research_commission",
+        "source_record_status": "NEEDS_REVIEW",
+        "provider_homepage_url": null,
+        "external_application_route_status": "NOT_VERIFIED"
+      }
+    },
+    {
+      "source_id": "gcis_public_entity_umalusi",
+      "provider_key": "soe_umalusi",
+      "name": "Umalusi — Council for Quality Assurance in General and Further Education and Training",
+      "authority": "Government Communication and Information System / National Government Directory",
+      "url": "https://www.gov.za/about-government/contact-directory/soe/umalusi-%E2%80%93-council-quality-assurance-general-and-further",
+      "classes": [
+        "PUBLIC_ENTITY",
+        "EMPLOYER_AND_RECRUITMENT",
+        "PUBLIC_ADMINISTRATION",
+        "EDUCATION_AND_SKILLS",
+        "REGULATOR_AND_PROFESSIONAL_COUNCIL"
+      ],
+      "supports": [
+        "GCIS individual public-entity profile and official-directory listing",
+        "employment, internship and workplace-opportunity discovery only after checking the exact current employer notice and application route"
+      ],
+      "does_not_prove": [
+        "current vacancy, internship, apprenticeship or learnership",
+        "candidate eligibility, current deadline or exact application portal",
+        "a Kingsmen partnership, authorised connector, submission receipt or employer decision"
+      ],
+      "refresh_after_days": 30,
+      "review_required": true,
+      "connector_state": "NOT_CONNECTED",
+      "metadata": {
+        "gcis_profile_url": "https://www.gov.za/about-government/contact-directory/soe/umalusi-%E2%80%93-council-quality-assurance-general-and-further",
+        "provider_key": "soe_umalusi",
+        "source_record_status": "NEEDS_REVIEW",
+        "provider_homepage_url": null,
+        "external_application_route_status": "NOT_VERIFIED"
       }
     }
   ],
