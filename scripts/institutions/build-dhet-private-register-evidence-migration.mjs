@@ -9,7 +9,7 @@ export function validateManifest(m){
  if(!Array.isArray(m.records)||!m.records.length)errors.push("records must be non-empty");
  const seen=new Set(),regIds=new Map();
  for(const [i,r] of (m.records??[]).entries()){
-  for(const k of ["source_record_ref","source_register","source_snapshot_date","canonical_name_candidate","normalized_name_key","source_url","registration_status"])if(!r[k])errors.push("record "+i+" missing "+k);
+  for(const k of ["source_record_ref","source_register","source_snapshot_date","canonical_name_candidate","normalized_name_key","source_url","source_excerpt","registration_status"])if(!r[k])errors.push("record "+i+" missing "+k);
   if(!allowedStatuses.has(r.registration_status))errors.push("record "+i+" has unsupported registration status");
   if(!/^https:\/\/www\.dhet\.gov\.za\//.test(r.source_url??""))errors.push("record "+i+" lacks official DHET source URL");
   if(r.official_route_status!=="NOT_VERIFIED"||r.integration_status!=="NOT_CONNECTED"||r.automation_authorized!==false)errors.push("record "+i+" has unsafe route/integration state");
@@ -21,7 +21,7 @@ export function validateManifest(m){
 }
 export function buildMigration(m){
  const errors=validateManifest(m);if(errors.length)throw Error(errors.join("\n"));
- const rows=m.records.map(r=>"  ("+[quote(r.source_register),quote(r.source_snapshot_date)+"::date",quote(r.source_record_ref),quote(r.canonical_name_candidate),quote(r.normalized_name_key),quote(r.registration_identifier),quote(r.registration_status),json(r.province_candidates),json(r.alias_candidates),quote(r.source_url),quote(r.source_excerpt)].join(", ")+")").join(",\n");
+ const rows=m.records.map(r=>"  ("+[quote(r.source_register),quote(r.source_snapshot_date)+"::date",quote(r.source_record_ref),quote(r.canonical_name_candidate),quote(r.normalized_name_key),quote(r.registration_identifier),quote(r.registration_status),json(r.province_candidates),json(r.alias_candidates),json(r.possible_existing_provider_matches),quote(r.alias_reconciliation_status??"MANUAL_REVIEW_REQUIRED"),quote(r.source_url),quote(r.source_excerpt)].join(", ")+")").join(",\n");
  return `-- Generated from a reviewed DHET register candidate manifest. Do not apply without independent review and approved change control.
 -- Registry evidence only; this migration does not create application routes or mark providers connected.
 BEGIN;
@@ -36,6 +36,8 @@ CREATE TABLE IF NOT EXISTS public.private_institution_registry_entries (
  registration_status text NOT NULL CHECK (registration_status IN ('REGISTERED','PROVISIONAL','CANCELLED','LAPSED','WITHDRAWN_OR_DEREGISTERED_REVIEW','STATUS_UNRESOLVED')),
  province_candidates jsonb NOT NULL DEFAULT '[]'::jsonb CHECK (jsonb_typeof(province_candidates)='array'),
  alias_candidates jsonb NOT NULL DEFAULT '[]'::jsonb CHECK (jsonb_typeof(alias_candidates)='array'),
+ possible_existing_provider_matches jsonb NOT NULL DEFAULT '[]'::jsonb CHECK (jsonb_typeof(possible_existing_provider_matches)='array'),
+ alias_reconciliation_status text NOT NULL DEFAULT 'MANUAL_REVIEW_REQUIRED',
  source_url text NOT NULL CHECK (source_url LIKE 'https://www.dhet.gov.za/%'),
  source_excerpt text NOT NULL,
  canonical_provider_key text,
@@ -51,7 +53,7 @@ CREATE INDEX IF NOT EXISTS idx_private_registry_normalized_name ON public.privat
 CREATE TEMP TABLE _dhet_private_registry_stage ON COMMIT DROP AS
 SELECT * FROM (VALUES
 ${rows}
-) AS v(source_register,source_snapshot_date,source_record_ref,canonical_name_candidate,normalized_name_key,registration_identifier,registration_status,province_candidates,alias_candidates,source_url,source_excerpt);
+) AS v(source_register,source_snapshot_date,source_record_ref,canonical_name_candidate,normalized_name_key,registration_identifier,registration_status,province_candidates,alias_candidates,possible_existing_provider_matches,alias_reconciliation_status,source_url,source_excerpt);
 DO $preflight$
 BEGIN
  IF EXISTS (SELECT 1 FROM _dhet_private_registry_stage GROUP BY source_register,source_snapshot_date,source_record_ref HAVING count(*)>1) THEN
@@ -69,12 +71,14 @@ BEGIN
 END
 $preflight$;
 INSERT INTO public.private_institution_registry_entries
- (source_register,source_snapshot_date,source_record_ref,canonical_name_candidate,normalized_name_key,registration_identifier,registration_status,province_candidates,alias_candidates,source_url,source_excerpt,identity_review_status,official_route_status,integration_status,automation_authorized)
-SELECT source_register,source_snapshot_date,source_record_ref,canonical_name_candidate,normalized_name_key,registration_identifier,registration_status,province_candidates,alias_candidates,source_url,source_excerpt,'NEEDS_CANONICAL_IDENTITY_REVIEW','NOT_VERIFIED','NOT_CONNECTED',false
+ (source_register,source_snapshot_date,source_record_ref,canonical_name_candidate,normalized_name_key,registration_identifier,registration_status,province_candidates,alias_candidates,possible_existing_provider_matches,alias_reconciliation_status,source_url,source_excerpt,identity_review_status,official_route_status,integration_status,automation_authorized)
+SELECT source_register,source_snapshot_date,source_record_ref,canonical_name_candidate,normalized_name_key,registration_identifier,registration_status,province_candidates,alias_candidates,possible_existing_provider_matches,alias_reconciliation_status,source_url,source_excerpt,'NEEDS_CANONICAL_IDENTITY_REVIEW','NOT_VERIFIED','NOT_CONNECTED',false
 FROM _dhet_private_registry_stage
 ON CONFLICT(source_register,source_snapshot_date,source_record_ref) DO UPDATE SET
  province_candidates=EXCLUDED.province_candidates,
  alias_candidates=EXCLUDED.alias_candidates,
+ possible_existing_provider_matches=EXCLUDED.possible_existing_provider_matches,
+ alias_reconciliation_status=EXCLUDED.alias_reconciliation_status,
  source_excerpt=EXCLUDED.source_excerpt,
  registration_status=EXCLUDED.registration_status,
  source_url=EXCLUDED.source_url
