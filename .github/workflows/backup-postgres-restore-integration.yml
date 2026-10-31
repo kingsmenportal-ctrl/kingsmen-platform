@@ -61,8 +61,14 @@ jobs:
       - name: Install API PostgreSQL test dependency
         run: npm install --prefix apps/api --no-audit --no-fund
 
-      - name: Generate one-run encryption passphrase
-        run: echo "KINGSMEN_BACKUP_PASSPHRASE=$(openssl rand -hex 32)" >> "$GITHUB_ENV"
+      - name: Generate and mask one-run test credentials
+        run: |
+          set -euo pipefail
+          test_passphrase="$(openssl rand -hex 32)"
+          echo "::add-mask::$test_passphrase"
+          echo "::add-mask::kingsmen-ci-only-password"
+          echo "KINGSMEN_BACKUP_PASSPHRASE=$test_passphrase" >> "$GITHUB_ENV"
+          unset test_passphrase
 
       - name: Run encrypted pg_dump and isolated pg_restore parity test
         run: npm run backup:test:postgres-restore
@@ -73,4 +79,6 @@ jobs:
           KINGSMEN_BACKUP_TEST_USER: "postgres"
           KINGSMEN_BACKUP_TEST_SOURCE_DATABASE: "kingsmen_backup_source"
           KINGSMEN_BACKUP_TEST_RESTORE_DATABASE: "kingsmen_backup_restore"
+          KINGSMEN_BACKUP_TEST_PG_DUMP_BIN: "/usr/lib/postgresql/17/bin/pg_dump"
+          KINGSMEN_BACKUP_TEST_PG_RESTORE_BIN: "/usr/lib/postgresql/17/bin/pg_restore"
           PGPASSWORD: "kingsmen-ci-only-password"
