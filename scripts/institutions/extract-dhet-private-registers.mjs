@@ -82,8 +82,9 @@ export function extractRecords(text,kind){
   const name=normalizeName(nameParts.join(" "));
   const sectionKey=canonicalSlug(e.section||"unsectioned")||"unsectioned";
   const key=kind+":"+sectionKey+":"+String(e.number).padStart(3,"0")+":"+(ids.length===1?ids[0].toLowerCase():canonicalSlug(name));
-  const normalizedProvinceText=block.toLowerCase().replace(/kwazulu\\s+natal/g,"kwazulu-natal").replace(/north\\s*west/g,"north west").replace(/northwest/g,"north west");\n  const provinceSet=PROVINCES.filter(p=>normalizedProvinceText.includes(p.toLowerCase()));
-  const aliases=[...block.matchAll(/(?:previously known as|previously|formerly known as)\s+([^\n.;]+)/gi)].map(m=>normalizeName(m[1])).filter(Boolean);
+  const normalizedProvinceText=block.toLowerCase().replace(/kwazulu\s+natal/g,"kwazulu-natal").replace(/north\s*west/g,"north west").replace(/northwest/g,"north west");
+  const provinceSet=PROVINCES.filter(p=>normalizedProvinceText.includes(p.toLowerCase()));
+  const aliases=[...block.matchAll(/(?:previous name\s*:?|previously known as|formerly known as|t\/a)\s+([^\n.;]+)/gi)].map(m=>normalizeName(m[1])).filter(Boolean);
   const regStatus=status(e.section,block,kind);
   const idKey=ids.length===1?ids[0].toLowerCase():canonicalSlug(name);
   const duplicate=seen.has(idKey);seen.add(idKey);
