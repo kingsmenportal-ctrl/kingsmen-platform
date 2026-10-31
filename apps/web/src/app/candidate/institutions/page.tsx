@@ -252,7 +252,7 @@ const sourceItems: DirectoryItem[] = crossSector.sources.map((source: SourceAnch
     kind: "OFFICIAL_SOURCE",
     providerType: source.provider_key?.startsWith("seta_") ? "SETA_PROVIDER"
       : (source.provider_key === "funder_nsf" || source.provider_key === "funder_funza_lushaka" || source.provider_key === "nsfas_official") ? "FUNDING_PROVIDER"
-      : source.provider_key?.startsWith("soe_") ? "EMPLOYER_PROVIDER"
+      : source.provider_key?.startsWith("soe_") || source.provider_key?.startsWith("private_employer_") || source.provider_key === "dpsa_public_service_vacancies" ? "EMPLOYER_PROVIDER"
       : source.provider_key === "nsfas_accommodation_portal" ? "ACCOMMODATION_PROVIDER"
       : "SOURCE_REGISTRY",
     sectorKeys: sourceClasses,
@@ -586,9 +586,9 @@ export default function CandidateInstitutionDirectoryPage() {
                 {item.kind === "INSTITUTION" && item.providerWebsiteUrl && item.providerWebsiteUrl.startsWith("https://") && (
                   <div className="flex flex-col gap-1">
                     <a href={item.providerWebsiteUrl} target="_blank" rel="noopener noreferrer" className="inline-flex rounded-xl border border-amber-300/40 px-4 py-3 text-sm font-bold text-amber-100 hover:border-amber-300">
-                      Open institution website listed by DHET ↗
+  Open official organisation or career website ↗
                     </a>
-                    <span className="text-[11px] text-slate-500">DHET-listed website; current live destination has not been reverified.</span>
+                    <span className="text-[11px] text-slate-500">Official-source website or careers portal; check the exact advert for current availability and application requirements.</span>
                   </div>
                 )}
                 {item.kind === "INSTITUTION" && !item.providerWebsiteUrl && (
