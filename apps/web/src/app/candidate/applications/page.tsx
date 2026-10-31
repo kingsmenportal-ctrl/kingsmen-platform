@@ -66,6 +66,8 @@ type ApplicationEvent = {
   application_id: string; event_type: string; from_status: string | null; to_status: string | null;
   reason_code: string | null; evidence_ref: string | null; details: Record<string, unknown> | null; created_at: string
 };
+type DirectoryPlanDraft = { providerKey: string; providerName: string; pathway: string; programmeOrRole: string };
+const CORE_PATHWAYS = ["HIGHER_EDUCATION", "TVET", "SETA_LEARNERSHIP", "INTERNSHIP", "APPRENTICESHIP", "EMPLOYMENT"];
 
 function explain(payload: unknown): string {
   if (payload && typeof payload === "object") {
@@ -106,6 +108,7 @@ export default function CandidateApplicationsPage() {
   const [busy,setBusy] = useState("");
   const [error,setError] = useState("");
   const [notice,setNotice] = useState("");
+  const [directoryPlan,setDirectoryPlan] = useState<DirectoryPlanDraft>({ providerKey:"", providerName:"", pathway:"HIGHER_EDUCATION", programmeOrRole:"" });
 
   const request = useCallback(async (method:"GET"|"POST", payload?:Record<string,unknown>) => {
     const token = getCandidateAccessToken();
@@ -140,6 +143,41 @@ export default function CandidateApplicationsPage() {
   },[request]);
 
   useEffect(()=>{void load();},[load]);
+
+  useEffect(() => {
+    const params = new URLSearchParams(window.location.search);
+    const providerKey = params.get("directory_provider_key") ?? "";
+    const providerName = params.get("directory_provider_name") ?? "";
+    const requestedPathway = params.get("directory_pathway") ?? "HIGHER_EDUCATION";
+    if (!providerKey || !providerName) return;
+    setDirectoryPlan({
+      providerKey,
+      providerName,
+      pathway: CORE_PATHWAYS.includes(requestedPathway) ? requestedPathway : "HIGHER_EDUCATION",
+      programmeOrRole: ""
+    });
+  }, []);
+
+  async function saveDirectoryPlan(event:FormEvent<HTMLFormElement>) {
+    event.preventDefault();
+    if (!directoryPlan.providerKey || directoryPlan.programmeOrRole.trim().length < 2) return;
+    setBusy("directory-plan"); setError(""); setNotice("");
+    try {
+      const body = await request("POST", {
+        action: "plan_directory_target",
+        provider_key: directoryPlan.providerKey,
+        pathway_type: directoryPlan.pathway,
+        programme_or_role: directoryPlan.programmeOrRole.trim()
+      });
+      await load();
+      setNotice(typeof body.message === "string" ? body.message : "Planning target saved. Programme and application verification are still required.");
+      setDirectoryPlan(old => ({ ...old, programmeOrRole: "" }));
+    } catch (e) {
+      setError(e instanceof Error ? e.message : "Could not save the provider application plan.");
+    } finally {
+      setBusy("");
+    }
+  }
 
   async function saveTracker(event:FormEvent<HTMLFormElement>, tracker:Tracker) {
     event.preventDefault(); const d=drafts[tracker.id]; if(!d)return;
@@ -194,6 +232,24 @@ export default function CandidateApplicationsPage() {
 
       {error && <section role="alert" className="rounded-2xl border border-amber-700 bg-amber-950/50 p-4 text-sm leading-6 text-amber-100">{error}{error.includes("AUTHENTICATION_REQUIRED")&&<p className="mt-2"><a className="underline text-cyan-300" href="/candidate/login">Sign in / create account</a></p>}</section>}
       {notice && <section role="status" className="rounded-2xl border border-emerald-800 bg-emerald-950/40 p-4 text-sm leading-6 text-emerald-100">{notice}</section>}
+
+      {directoryPlan.providerKey && <section className="rounded-3xl border border-amber-300/30 bg-slate-900 p-5 sm:p-7">
+        <p className="text-xs font-extrabold uppercase tracking-wider text-amber-300">One Kingsmen workbench · provider planning</p>
+        <h2 className="mt-2 text-2xl font-bold text-white">Prepare an application with {directoryPlan.providerName}</h2>
+        <p className="mt-2 max-w-3xl text-sm leading-6 text-slate-300">This creates a private planning target under your verified candidate identity. It does not assert that a programme is open, confirm eligibility or accreditation, submit to the provider, or create a submitted application. The provider must already exist in Kingsmen’s canonical registry; if it has not been imported, the save fails closed.</p>
+        <form onSubmit={event=>void saveDirectoryPlan(event)} className="mt-5 grid gap-4 md:grid-cols-[1fr_1fr_auto]">
+          <label className="block text-sm font-semibold">Kingsmen pathway
+            <select value={directoryPlan.pathway} onChange={event=>setDirectoryPlan(old=>({...old,pathway:event.target.value}))} className="mt-2 w-full rounded-xl border border-slate-700 bg-slate-950 px-3 py-3 text-white">
+              {CORE_PATHWAYS.map(value=><option key={value} value={value}>{value.replaceAll("_"," ")}</option>)}
+            </select>
+          </label>
+          <label className="block text-sm font-semibold">Programme or role you are interested in
+            <input required minLength={2} maxLength={240} value={directoryPlan.programmeOrRole} onChange={event=>setDirectoryPlan(old=>({...old,programmeOrRole:event.target.value}))} placeholder="Enter the exact programme or role you want to pursue" className="mt-2 w-full rounded-xl border border-slate-700 bg-slate-950 px-3 py-3 font-normal text-white" />
+          </label>
+          <button type="submit" disabled={busy==="directory-plan"||directoryPlan.programmeOrRole.trim().length<2} className="self-end rounded-xl bg-amber-300 px-5 py-3 text-sm font-extrabold text-slate-950 disabled:opacity-50">{busy==="directory-plan"?"Saving…":"Save planning target"}</button>
+        </form>
+        <p className="mt-3 text-xs text-slate-500">No applicant details or documents are sent to the institution at this stage. This is a private Kingsmen planning target, not a provider application.</p>
+      </section>}
 
       {masterTargets.length > 0 && <section className="rounded-3xl border border-cyan-900 bg-slate-900 p-5 sm:p-7">
         <h2 className="text-2xl font-bold">Saved opportunities &amp; parent-application preparation</h2>
