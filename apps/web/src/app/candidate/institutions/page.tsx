@@ -1,16 +1,22 @@
 "use client";
 
 import Link from "next/link";
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
+import { getCandidateAccessToken } from "../../../lib/candidate-session";
 import directorySeed from "../../../../../../manifests/institutions/seed/public-universities-and-tvet-2026-10-31.json";
 import crossSector from "../../../../../../manifests/institutions/cross-sector-institution-source-extension.json";
 
 type Institution = (typeof directorySeed.records)[number];
 type SourceAnchor = (typeof crossSector.sources)[number];
+type VerifiedProviderRoute = {
+  provider_key: string; provider_name: string; provider_type: string; province: string | null;
+  base_url: string | null; verification_status: string; public_safe: boolean;
+  default_confidence_band: string; notes: string;
+};
 type DirectoryItem = {
   id: string;
   name: string;
-  kind: "INSTITUTION" | "OFFICIAL_SOURCE";
+  kind: "INSTITUTION" | "OFFICIAL_SOURCE" | "VERIFIED_ROUTE";
   providerType: string;
   sectorKeys: string[];
   province: string | null;
@@ -87,6 +93,15 @@ const pathwayBySource: Record<string, string[]> = {
   sars_official: ["EMPLOYMENT"]
 };
 
+const sectorsByVerifiedRoute: Record<string, string[]> = {
+  cao_official: ["EDUCATION_AND_SKILLS"], labour_department_vacancies: ["PUBLIC_ADMINISTRATION"], nsfas_official: ["FUNDING_AND_SOCIAL_SUPPORT"]
+};
+const capabilitiesByVerifiedRoute: Record<string, string[]> = {
+  cao_official: ["HIGHER_EDUCATION"], labour_department_vacancies: ["EMPLOYMENT"], nsfas_official: ["FUNDING"]
+};
+const pathwaysByVerifiedRoute: Record<string, string[]> = {
+  cao_official: ["HIGHER_EDUCATION"], labour_department_vacancies: ["EMPLOYMENT"], nsfas_official: []
+};
 const pathways = Object.keys(pathwayLabels);
 const capabilities = crossSector.service_capabilities as string[];
 const sectors = crossSector.institution_classes as string[];
@@ -196,6 +211,8 @@ function VerificationGrid({ item }: { item: DirectoryItem }) {
 }
 
 export default function CandidateInstitutionDirectoryPage() {
+  const [verifiedRoutes, setVerifiedRoutes] = useState<VerifiedProviderRoute[]>([]);
+  const [routeStatus, setRouteStatus] = useState<"LOADING" | "READY" | "SIGN_IN_REQUIRED" | "UNAVAILABLE">("LOADING");
   const [query, setQuery] = useState("");
   const [kind, setKind] = useState("ALL");
   const [sector, setSector] = useState("ALL");
@@ -203,13 +220,57 @@ export default function CandidateInstitutionDirectoryPage() {
   const [capability, setCapability] = useState("ALL");
   const [pathway, setPathway] = useState("ALL");
 
+  useEffect(() => {
+    let active = true;
+    const controller = new AbortController();
+    const token = getCandidateAccessToken();
+    if (!token) {
+      setRouteStatus("SIGN_IN_REQUIRED");
+      return () => { active = false; controller.abort(); };
+    }
+    async function loadVerifiedRoutes() {
+      try {
+        const response = await fetch("/api/candidate/institutions", {
+          headers: { Authorization: `Bearer ${token}` }, cache: "no-store", signal: controller.signal
+        });
+        const body = await response.json();
+        if (!response.ok || body.ok !== true || !Array.isArray(body.records)) throw new Error("Verified directory records are unavailable.");
+        if (active) { setVerifiedRoutes(body.records as VerifiedProviderRoute[]); setRouteStatus("READY"); }
+      } catch {
+        if (active && !controller.signal.aborted) setRouteStatus("UNAVAILABLE");
+      }
+    }
+    void loadVerifiedRoutes();
+    return () => { active = false; controller.abort(); };
+  }, []);
+
   const provinces = useMemo(() => unique(
     directorySeed.records.map(record => record.province).filter((value): value is string => Boolean(value))
   ).sort((a, b) => a.localeCompare(b)), []);
 
+  const verifiedRouteItems = useMemo<DirectoryItem[]>(() => verifiedRoutes.map(route => ({
+    id: route.provider_key, name: route.provider_name, kind: "VERIFIED_ROUTE", providerType: route.provider_type,
+    sectorKeys: sectorsByVerifiedRoute[route.provider_key] ?? [], province: route.province,
+    serviceCapabilities: capabilitiesByVerifiedRoute[route.provider_key] ?? [], pathways: pathwaysByVerifiedRoute[route.provider_key] ?? [],
+    sourceName: "Kingsmen canonical source-authority register", sourceUrl: route.base_url,
+    evidenceText: "Read from the existing provider register because the record is VERIFIED, public-safe and confidence A/B. This does not verify every programme or intake.",
+    supports: [`Registry record is VERIFIED and public_safe=true (confidence ${route.default_confidence_band}).`, route.notes],
+    doesNotProve: [
+      "legal standing or accreditation for every service without an exact register check",
+      "current programme, vacancy or service availability", "candidate-specific eligibility or an open intake",
+      "a provider-authorized Kingsmen integration or partnership", "submission, provider receipt, admission, appointment or other outcome"
+    ],
+    verification: {
+      identity: "VERIFIED_REGISTRY_ENTRY_SCOPE_ONLY", accreditation: "NOT_VERIFIED_BY_THIS_PROVIDER_ROW",
+      availability: "RECHECK_EACH_CURRENT_NOTICE_OR_SERVICE", eligibility: "UNKNOWN", intake: "NOT_PROVED_BY_PROVIDER_ROW",
+      route: "OFFICIAL_SOURCE_URL_LISTED; ROUTE RULES REQUIRE RECHECK", integration: "NOT_CONNECTED", partnership: "NOT_ESTABLISHED"
+    }
+  })), [verifiedRoutes]);
+  const searchableItems = useMemo(() => [...allItems, ...verifiedRouteItems], [verifiedRouteItems]);
+
   const visibleItems = useMemo(() => {
     const needle = query.trim().toLocaleLowerCase();
-    return allItems
+    return searchableItems
       .filter(item => kind === "ALL" || item.kind === kind)
       .filter(item => sector === "ALL" || item.sectorKeys.includes(sector))
       .filter(item => location === "ALL"
@@ -224,7 +285,7 @@ export default function CandidateInstitutionDirectoryPage() {
         item.pathways.join(" "), item.supports.join(" "), item.doesNotProve.join(" ")
       ].join(" ").toLocaleLowerCase().includes(needle))
       .sort((a, b) => a.name.localeCompare(b.name));
-  }, [query, kind, sector, location, capability, pathway]);
+  }, [query, kind, sector, location, capability, pathway, searchableItems]);
 
   const clearFilters = () => {
     setQuery("");
@@ -279,6 +340,14 @@ export default function CandidateInstitutionDirectoryPage() {
           </article>
         </section>
 
+        <section role="status" aria-label="Live verified provider sources" className="rounded-2xl border border-slate-700 bg-[#0b1d33] p-5">
+          <h2 className="font-bold text-white">Live verified provider/source records</h2>
+          {routeStatus === "READY" && <p className="mt-2 text-sm text-slate-300">{verifiedRoutes.length} public-safe, high-confidence records returned by the authenticated, read-only Supabase route.</p>}
+          {routeStatus === "LOADING" && <p className="mt-2 text-sm text-slate-400">Loading authorised directory records…</p>}
+          {routeStatus === "SIGN_IN_REQUIRED" && <p className="mt-2 text-sm text-slate-400">Sign in to load current verified provider/source records. The source manifest and DHET seed remain available as discovery evidence.</p>}
+          {routeStatus === "UNAVAILABLE" && <p className="mt-2 text-sm text-yellow-100">Live records could not be loaded. Unverified data will not be substituted.</p>}
+        </section>
+
         <section role="note" aria-label="Verification boundary" className="rounded-2xl border border-yellow-500/40 bg-yellow-950/30 p-5">
           <h2 className="font-bold text-yellow-100">Discovery is not verification</h2>
           <p className="mt-2 text-sm leading-6 text-yellow-50/90">
@@ -305,7 +374,8 @@ export default function CandidateInstitutionDirectoryPage() {
               Result type
               <select value={kind} onChange={event => setKind(event.target.value)} className="mt-2 w-full rounded-xl border border-slate-600 bg-slate-950 px-3 py-3 font-normal text-white">
                 <option value="ALL">Institutions and official source directories</option>
-                <option value="INSTITUTION">Institution records</option>
+                <option value="INSTITUTION">Source-listed institution records</option>
+                <option value="VERIFIED_ROUTE">Verified provider/source route records</option>
                 <option value="OFFICIAL_SOURCE">Official sector source directories</option>
               </select>
             </label>
@@ -342,7 +412,7 @@ export default function CandidateInstitutionDirectoryPage() {
           </div>
           <div className="mt-4 flex flex-wrap items-center justify-between gap-3">
             <p aria-live="polite" className="text-sm text-slate-400">
-              Showing <span className="font-bold text-white">{visibleItems.length}</span> of {allItems.length} current searchable entries.
+              Showing <span className="font-bold text-white">{visibleItems.length}</span> of {searchableItems.length} current searchable entries.
             </p>
             <button type="button" onClick={clearFilters} className="rounded-xl border border-slate-600 px-4 py-2 text-sm font-bold text-white hover:border-amber-300">
               Clear filters
@@ -356,7 +426,7 @@ export default function CandidateInstitutionDirectoryPage() {
               <div className="flex flex-wrap items-start justify-between gap-3">
                 <div className="min-w-0">
                   <p className="text-xs font-extrabold uppercase tracking-wider text-amber-300">
-                    {item.kind === "INSTITUTION" ? label(item.providerType) : "Official sector source / registry"}
+                    {item.kind === "INSTITUTION" ? label(item.providerType) : item.kind === "VERIFIED_ROUTE" ? "Kingsmen verified source/provider route" : "Official sector source / registry"}
                   </p>
                   <h2 className="mt-2 text-xl font-bold text-white">{item.name}</h2>
                   <p className="mt-2 text-xs text-slate-400">
@@ -365,7 +435,7 @@ export default function CandidateInstitutionDirectoryPage() {
                   </p>
                 </div>
                 <span className="rounded-full border border-slate-600 px-3 py-1 text-xs font-bold text-slate-300">
-                  {item.kind === "INSTITUTION" ? "Directory evidence only" : "Discovery source only"}
+                  {item.kind === "INSTITUTION" ? "Directory evidence only" : item.kind === "VERIFIED_ROUTE" ? "Verified source record" : "Discovery source only"}
                 </span>
               </div>
 
@@ -453,8 +523,8 @@ export default function CandidateInstitutionDirectoryPage() {
         </section>
 
         <footer className="border-t border-slate-700 pt-5 text-xs leading-5 text-slate-500">
-          This directory combines the DHET public-university/TVET source snapshot dated {directorySeed.researched_at} with cross-sector
-          discovery anchors dated {crossSector.researched_at}. Provider data and source-anchor data are different record types.
+          This directory combines the DHET public-university/TVET source snapshot dated {directorySeed.researched_at}, cross-sector
+          discovery anchors dated {crossSector.researched_at}, and authenticated public-safe registry rows where available. These record types have different evidence scopes.
           The authenticated Kingsmen profile, private documents and saved application records remain in the candidate workbench.
         </footer>
       </div>
