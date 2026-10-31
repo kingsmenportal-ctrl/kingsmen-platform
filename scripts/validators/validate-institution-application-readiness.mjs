@@ -64,6 +64,10 @@ assert.equal(evaluateProviderReadiness({
   ...verifiedProvider,
   application_route: { ...verifiedProvider.application_route, url: "https://unrelated.example/apply", official_domain: "example.gov.za" },
 }, { asOf }).state, "P1_IDENTITY_VERIFIED", "Wrong-domain routes must not pass verification");
+assert.equal(evaluateProviderReadiness({
+  ...verifiedProvider,
+  source_evidence: { ...verifiedProvider.source_evidence, official_domain: undefined },
+}, { asOf }).state, "P0_DISCOVERED", "Official domain evidence must be explicit");
 
 const verifiedOpportunity = {
   opportunity_key: "example-opportunity",
@@ -75,7 +79,7 @@ const verifiedOpportunity = {
   requirements: { review_status: "VERIFIED", reviewed_at: yesterday, freshness_window_days: 30, eligibility_criteria: [], required_documents: [] },
 };
 const candidate = {
-  eligibility_status: "ELIGIBLE", eligibility_review_status: "VERIFIED", preflight_status: "PASS",
+  eligibility_status: "REQUIREMENTS_MATCHED", eligibility_review_status: "VERIFIED", preflight_status: "PASS",
   required_documents_present: true, consent_status: "CONFIRMED",
 };
 const routeProvider = { rank: 2 };
