@@ -3,7 +3,7 @@
     <main
       style={{
         minHeight: "100vh",
-        padding: "32px",
+        padding: "clamp(16px, 5vw, 32px)",
         background:
           "radial-gradient(circle at top left, rgba(214,178,94,0.2), transparent 34%), #080a12",
         color: "#f8f3e7",
@@ -13,7 +13,7 @@
     >
       <section
         data-kingsmen-free-destiny-map-identity="true"
-        style={{ maxWidth: "980px", margin: "0 auto", display: "grid", gap: "18px" }}
+        style={{ width: "100%", minWidth: 0, maxWidth: "980px", margin: "0 auto", display: "grid", gap: "18px" }}
       >
         <p
           style={{
@@ -42,6 +42,8 @@
           data-kingsmen-free-destiny-map-intake="true"
           style={{
             display: "grid",
+            width: "100%",
+            minWidth: 0,
             gap: "14px",
             padding: "22px",
             borderRadius: "28px",
