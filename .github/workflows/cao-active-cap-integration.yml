@@ -49,7 +49,7 @@ jobs:
           cache: "npm"
       - name: Install isolated test dependency
         run: npm install --prefix apps/api --no-audit --no-fund
-      - name: Test migration against disposable PostgreSQL 17
+      - name: Validate read-only CAO 0096 provenance attestation\n        run: npm run security:validate:cao-0096-provenance\n      - name: Validate CAO privilege and capacity migration contract\n        run: npm run security:validate:cao-cap-0108\n      - name: Test migration against disposable PostgreSQL 17
         run: node scripts/staging/test-cao-active-cap-migration.mjs
         env:
           KINGSMEN_CAO_CAP_TEST_ALLOW_MUTATION: "true"
