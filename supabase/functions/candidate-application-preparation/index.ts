@@ -169,6 +169,7 @@ Deno.serve(async(req:Request)=>{
    nsfas_official:["HIGHER_EDUCATION","TVET"],
    funder_nsf:["HIGHER_EDUCATION","TVET","SETA_LEARNERSHIP","APPRENTICESHIP"],
    funder_funza_lushaka:["HIGHER_EDUCATION"],
+   nsfas_accommodation_portal:["HIGHER_EDUCATION","TVET"],
    labour_department_vacancies:["EMPLOYMENT"],
    cao_official:["HIGHER_EDUCATION","TVET"]
   };
