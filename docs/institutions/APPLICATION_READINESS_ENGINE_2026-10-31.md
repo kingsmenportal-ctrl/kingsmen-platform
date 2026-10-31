@@ -34,7 +34,7 @@ Candidate-reported submission is carried as a separate flag and does not advance
 
 The evaluator is a pure domain helper in `apps/api/src/institutions/application-readiness.mjs`. It takes structured evidence inputs and an optional evaluation timestamp; it does not query Supabase, mutate records, scrape portals or submit applications. The runtime/API integration must map canonical provider/opportunity rows into this contract after the dependent schema is reviewed and approved.
 
-The caller must provide explicit per-evidence freshness windows; no arbitrary universal freshness interval is invented. Timestamps must include a timezone. Missing, invalid, future-dated, stale or inconsistent evidence fails closed.
+The caller must provide explicit per-evidence freshness windows; no arbitrary universal freshness interval is invented. Timestamps must include a timezone. Missing, invalid, future-dated, stale or inconsistent evidence fails closed. Date-only closing dates are evaluated in `Africa/Johannesburg`; a date before the local date is expired, while a date equal to today is not advertised as open unless the official cutoff time is known and represented explicitly. The status flag `OPEN` alone never overrides a deadline.
 
 ## Security and operational boundaries
 
