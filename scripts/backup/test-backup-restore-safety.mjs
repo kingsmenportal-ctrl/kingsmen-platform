@@ -3,10 +3,10 @@ import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
 
 const backup = readFileSync('scripts/backup/New-KingsmenTruthVaultBackup.ps1', 'utf8');
-const restore = readFileSync('scripts/backup/Test-KingsmenTruthVaultRestore.ps1', 'utf8');
+const restore = readFileSync('scripts/backup/Test-KingsmenTruthVaultRestore.ps1', 'utf8');\nconst crypto = readFileSync('scripts/backup/encrypt-backup.mjs', 'utf8');
 
 const checks = [
-  ['backup rejects pg_dump failure', /pg_dump failed/.test(backup) && /\$LASTEXITCODE -ne 0/.test(backup)],
+  ['authenticated encryption helper uses AES-256-GCM and scrypt', /aes-256-gcm/.test(crypto) && /scrypt/.test(crypto) && /setAuthTag/.test(crypto)],\n  ['restore decrypts authenticated archive before pg_restore', /decrypt \\$BackupFile/.test(restore) && /authenticated backup/.test(restore) && /encryptedArchiveAuthenticatedBeforeRestore/.test(restore)],\n  ['backup rejects pg_dump failure', /pg_dump failed/.test(backup) && /\$LASTEXITCODE -ne 0/.test(backup)],
   ['backup requires a non-empty archive', /createdArchiveBytes = \(Get-Item \$backupFile\)\.Length/.test(backup) && /createdArchiveBytes -lt 1/.test(backup)],
   ['backup verifies the archive catalog with pg_restore', /pg_restore --list \$backupFile/.test(backup) && /archive catalog/.test(backup)],
   ['backup dry-run is explicitly not a successful backup', /passed = \(-not \$DryRun\)/.test(backup) && /DRY RUN ONLY/.test(backup)],
