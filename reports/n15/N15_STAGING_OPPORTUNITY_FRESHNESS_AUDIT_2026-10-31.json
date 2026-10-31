@@ -1,0 +1,62 @@
+{
+  "schema": "kingsmen.n15.opportunity-freshness-audit.v1",
+  "observed_on": "2026-10-31",
+  "observation_time": "NOT_CAPTURED_BY_READ_ONLY_QUERY",
+  "environment": "kingsmen-portal-staging",
+  "method": "Executed db/diagnostics/n15_opportunity_freshness_audit.sql through a read-only Supabase SQL request; returned summary row and finding rows.",
+  "status": "BLOCKED_NO_N15_OPPORTUNITY_DATA",
+  "live_counts": {
+    "route_providers": 3,
+    "route_programmes": 8,
+    "route_programmes_open": 0,
+    "route_programmes_closed": 6,
+    "route_programmes_manual_check": 2,
+    "opportunity_providers": 0,
+    "opportunity_programmes": 0,
+    "verified_source_observations": 0,
+    "candidate_matches": 0,
+    "opportunity_deadlines": 0,
+    "confirmed_future_deadlines_with_evidence": 0
+  },
+  "confirmed_findings": [
+    "N15 canonical opportunity providers table is empty.",
+    "N15 opportunity programmes table is empty.",
+    "External source observations table has zero verified rows.",
+    "Candidate opportunity matches table is empty.",
+    "Opportunity deadlines table is empty.",
+    "Legacy route universe has 8 route programmes: 6 are closed and 2 are manual-check route anchors.",
+    "The two manual-check route anchors are CAO Application Route Anchor and NSFAS Support Route Anchor; neither is a verified OPEN opportunity.",
+    "No candidate-facing OPEN opportunity is proven by current N15 staging data."
+  ],
+  "route_anchor_findings": [
+    {
+      "entity_type": "route_programme",
+      "entity_ref": "cao_route_anchor",
+      "programme_name": "CAO Application Route Anchor",
+      "availability_status": "MANUAL_CHECK_REQUIRED",
+      "route_status": "VERIFIED",
+      "source_confidence_band": "A",
+      "source_url": "https://www.cao.ac.za/",
+      "finding_code": "ROUTE_ANCHOR_NOT_CURRENT_OPPORTUNITY"
+    },
+    {
+      "entity_type": "route_programme",
+      "entity_ref": "nsfas_support_anchor",
+      "programme_name": "NSFAS Support Route Anchor",
+      "availability_status": "MANUAL_CHECK_REQUIRED",
+      "route_status": "VERIFIED",
+      "source_confidence_band": "A",
+      "source_url": "https://www.nsfas.org.za/content/how-to-apply.html",
+      "finding_code": "ROUTE_ANCHOR_NOT_CURRENT_OPPORTUNITY"
+    }
+  ],
+  "safety_interpretation": "This does not prove no opportunities exist nationally. It proves current staging has no evidence-backed N15 opportunity records available for candidate delivery. Do not fabricate openings, reopen expired records, or promote route anchors into OPEN opportunities.",
+  "required_next_steps": [
+    "Individually retrieve and verify current official opportunity notices across all six pathways.",
+    "Record official source observations as NEEDS_REVIEW until reviewed; ingestion does not auto-open listings.",
+    "Import approved providers/programmes/deadlines only after independent review, with idempotent provenance checks.",
+    "Prove authenticated Candidate A/B isolation and feed behaviour using live verified identities.",
+    "Verify exact deployed Netlify commit and the authenticated end-to-end candidate feed."
+  ],
+  "deployment_and_change_control": "Read-only audit only. No staging data was written; no migration was applied. Backup/restore, independent review, approved import and authenticated E2E remain separate release gates."
+}
