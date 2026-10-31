@@ -90,7 +90,7 @@ export function extractRecords(text,kind){
    if(firstSegment.length>80)continue;
    nameParts.push(firstSegment);
   }
-  const name=normalizeName(nameParts.join(" "));
+  const name=cleanHeadingName(nameParts.join(" "),source);
   const nameExtractionStatus="REVIEW_REQUIRED";
   const sectionKey=canonicalSlug(e.section||"unsectioned")||"unsectioned";
   const key=kind+":"+sectionKey+":"+String(e.number).padStart(3,"0")+":"+(ids.length===1?ids[0].toLowerCase():canonicalSlug(name));
