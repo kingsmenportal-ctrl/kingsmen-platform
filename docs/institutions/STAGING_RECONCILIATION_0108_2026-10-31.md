@@ -11,7 +11,7 @@
 - No active-candidate-cap trigger/function was found in the live public trigger scan.
 - The duplicate ledger names remain: `candidate_application_preparation_readiness_0078` (two versions) and `seed_verified_labour_vacancy_deadlines_0093` (two versions). Do not delete or rewrite ledger rows to make names look unique.
 
-## Corrective migration 0108
+## Corrective migration `20261029194500_reconcile_cao_client_privileges_and_active_candidate_cap.sql`
 
 The proposed corrective migration revokes anon/authenticated grants from the CAO bridge, grants only backend CRUD to service_role, and adds a transaction-advisory-lock protected trigger that refuses active candidate 501 while allowing deactivation. Preflight rejects schema drift and pre-existing cap overflow; postflight checks grants, trigger presence, and active count. It does not assert that an unverified CAO application is submitted, and does not create fake migration history.
 
