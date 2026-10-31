@@ -21,7 +21,9 @@ if (data.integration_contract?.default_record_state !== "NEEDS_REVIEW") errors.p
 if (data.integration_contract?.default_public_safe !== false) errors.push("Records must default to not public safe");
 if (data.integration_contract?.default_connector_state !== "NOT_CONNECTED") errors.push("Connectors must default to NOT_CONNECTED");
 for (const cls of requiredClasses) if (!data.institution_classes.includes(cls)) errors.push(`Missing institution class: ${cls}`);
-if (!Array.isArray(data.sources) || data.sources.length < 20) errors.push("Expected at least 20 cross-sector source anchors");
+if (!Array.isArray(data.sources) || data.sources.length < 50) errors.push("Expected at least 50 cross-sector source anchors after the SETA and funding extension");
+const setaProviderKeys = (data.sources ?? []).filter(source => /^seta_[a-z0-9]+_official$/.test(source.source_id)).map(source => source.provider_key);
+if (setaProviderKeys.length !== 21 || new Set(setaProviderKeys).size !== 21 || setaProviderKeys.some(key => !key)) errors.push("Expected 21 distinct individual SETA provider keys");
 const ids = new Set();
 for (const source of data.sources ?? []) {
   if (!source.source_id || ids.has(source.source_id)) errors.push(`Missing or duplicate source_id: ${source.source_id}`);
