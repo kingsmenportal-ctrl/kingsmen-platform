@@ -225,8 +225,7 @@ export default function CandidateApplicationsPage() {
     }
   }
 
-  async function saveApplicationPacket(event:FormEvent<HTMLFormElement>, target:MasterTarget) {
-    event.preventDefault();
+  async function saveApplicationPacket(target:MasterTarget) {
     const draft = packetDrafts[target.id] ?? { answers: {}, selectedDocumentIds: [] };
     setBusy("packet:" + target.id); setError(""); setNotice("");
     try {
@@ -396,7 +395,7 @@ export default function CandidateApplicationsPage() {
                         </div>}
                       <p className="mt-2 text-xs text-slate-500">{draft.selectedDocumentIds.length} selected · up to 20 documents. Only file references are attached; the binary files stay in your private vault.</p>
                     </div>
-                    <button type="button" onClick={event=>void saveApplicationPacket(event as any,target)} disabled={busy==="packet:"+target.id}
+                    <button type="button" onClick={()=>void saveApplicationPacket(target)} disabled={busy==="packet:"+target.id}
                       className="rounded-xl bg-amber-300 px-4 py-3 text-sm font-extrabold text-slate-950 disabled:opacity-50">
                       {busy==="packet:"+target.id?"Saving packet…":"Save reusable application packet"}
                     </button>
