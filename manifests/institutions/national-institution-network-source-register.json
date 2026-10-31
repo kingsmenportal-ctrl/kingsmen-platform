@@ -73,7 +73,13 @@
         "candidate eligibility",
         "institutional partnership",
         "submission receipt"
-      ]
+      ],
+      "existing_anchor_mapping": {
+        "existing_source_keys": [],
+        "relationship": "new official registry index",
+        "url_match": false,
+        "status": "NEW_AUTHORITY_ENTRY_REQUIRES_REVIEWED_IMPORT"
+      }
     },
     {
       "source_id": "dhet_public_universities",
@@ -101,7 +107,15 @@
         "eligibility",
         "partnership",
         "application received"
-      ]
+      ],
+      "existing_anchor_mapping": {
+        "existing_source_keys": [
+          "dhet_universities"
+        ],
+        "relationship": "same authority; different source URL path",
+        "url_match": false,
+        "status": "RECONCILE_LEGACY_URL_BEFORE_UPDATE"
+      }
     },
     {
       "source_id": "dhet_private_he_register",
@@ -128,7 +142,13 @@
         "eligibility",
         "partnership",
         "application receipt"
-      ]
+      ],
+      "existing_anchor_mapping": {
+        "existing_source_keys": [],
+        "relationship": "new official register path",
+        "url_match": false,
+        "status": "NEW_AUTHORITY_ENTRY_REQUIRES_REVIEWED_IMPORT"
+      }
     },
     {
       "source_id": "dhet_private_colleges_register",
@@ -157,7 +177,13 @@
         "specific current deadline",
         "partnership",
         "application receipt"
-      ]
+      ],
+      "existing_anchor_mapping": {
+        "existing_source_keys": [],
+        "relationship": "new official register path",
+        "url_match": false,
+        "status": "NEW_AUTHORITY_ENTRY_REQUIRES_REVIEWED_IMPORT"
+      }
     },
     {
       "source_id": "dhet_tvet_directory",
@@ -186,7 +212,13 @@
         "eligibility",
         "partner status",
         "submission receipt"
-      ]
+      ],
+      "existing_anchor_mapping": {
+        "existing_source_keys": [],
+        "relationship": "official TVET source path not presently represented by a dedicated anchor",
+        "url_match": false,
+        "status": "NEW_AUTHORITY_ENTRY_REQUIRES_REVIEWED_IMPORT"
+      }
     },
     {
       "source_id": "dhet_cet_list",
@@ -214,7 +246,13 @@
         "eligibility",
         "partnership",
         "submission receipt"
-      ]
+      ],
+      "existing_anchor_mapping": {
+        "existing_source_keys": [],
+        "relationship": "official source candidate; URL requires live revalidation",
+        "url_match": false,
+        "status": "REVALIDATE_URL_BEFORE_IMPORT"
+      }
     },
     {
       "source_id": "dhet_seta_directory",
@@ -246,7 +284,25 @@
         "provider accreditation",
         "partnership",
         "application receipt"
-      ]
+      ],
+      "existing_anchor_mapping": {
+        "existing_source_keys": [
+          "agriseta_official",
+          "bankseta_official",
+          "ceta_official",
+          "etdp_seta_official",
+          "ewseta_official",
+          "fasset_official",
+          "foodbev_seta_official",
+          "merseta_official",
+          "mict_seta_official",
+          "services_seta_official",
+          "teta_official"
+        ],
+        "relationship": "directory is a parent listing for existing individual SETA authority anchors",
+        "url_match": false,
+        "status": "RECONCILE_DIRECTORY_AND_SETAS_WITHOUT_DUPLICATING_ANCHORS"
+      }
     },
     {
       "source_id": "qcto_sdp_directory",
@@ -278,7 +334,15 @@
         "employment",
         "partnership",
         "application receipt"
-      ]
+      ],
+      "existing_anchor_mapping": {
+        "existing_source_keys": [
+          "qcto_official"
+        ],
+        "relationship": "same authority; directory page differs from root anchor",
+        "url_match": false,
+        "status": "REUSE_EXISTING_AUTHORITY_ANCHOR"
+      }
     },
     {
       "source_id": "qcto_occupational_qualifications",
@@ -310,7 +374,15 @@
         "candidate eligibility",
         "partnership",
         "submission receipt"
-      ]
+      ],
+      "existing_anchor_mapping": {
+        "existing_source_keys": [
+          "qcto_official"
+        ],
+        "relationship": "same authority; root anchor for specific qualification registers",
+        "url_match": false,
+        "status": "REUSE_EXISTING_AUTHORITY_ANCHOR"
+      }
     },
     {
       "source_id": "saqa_qualifications_register",
@@ -346,7 +418,15 @@
         "eligibility",
         "partnership",
         "application receipt"
-      ]
+      ],
+      "existing_anchor_mapping": {
+        "existing_source_keys": [
+          "saqa_official"
+        ],
+        "relationship": "same authority; specific qualifications search path",
+        "url_match": false,
+        "status": "REUSE_EXISTING_AUTHORITY_ANCHOR"
+      }
     },
     {
       "source_id": "cao_application_terms",
@@ -374,7 +454,15 @@
         "admission guarantee",
         "provider partnership",
         "application receipt without a provider receipt"
-      ]
+      ],
+      "existing_anchor_mapping": {
+        "existing_source_keys": [
+          "cao_official"
+        ],
+        "relationship": "same authority; terms page differs from root anchor",
+        "url_match": false,
+        "status": "REUSE_EXISTING_AUTHORITY_ANCHOR"
+      }
     },
     {
       "source_id": "nsfas_institutions",
@@ -404,7 +492,15 @@
         "funding award",
         "partnership",
         "application receipt"
-      ]
+      ],
+      "existing_anchor_mapping": {
+        "existing_source_keys": [
+          "nsfas_apply"
+        ],
+        "relationship": "same authority; institution listing differs from application-guidance page",
+        "url_match": false,
+        "status": "REUSE_EXISTING_AUTHORITY_ANCHOR"
+      }
     },
     {
       "source_id": "dpsa_public_service_vacancies",
@@ -433,7 +529,13 @@
         "candidate eligibility without advert-specific rules",
         "submission received",
         "job offer"
-      ]
+      ],
+      "existing_anchor_mapping": {
+        "existing_source_keys": [],
+        "relationship": "separate public service authority not presently represented as a source anchor",
+        "url_match": false,
+        "status": "NEW_AUTHORITY_ENTRY_REQUIRES_REVIEWED_IMPORT"
+      }
     },
     {
       "source_id": "labour_department_vacancies",
@@ -462,7 +564,51 @@
         "eligibility without advert-specific rules",
         "submission receipt",
         "job offer"
-      ]
+      ],
+      "existing_anchor_mapping": {
+        "existing_source_keys": [
+          "labour_vacancies"
+        ],
+        "relationship": "exact same official vacancy URL",
+        "url_match": true,
+        "status": "REUSE_EXISTING_EXACT_SOURCE_ANCHOR"
+      }
     }
-  ]
+  ],
+  "existing_anchor_snapshot": {
+    "observed_on": "2026-10-31",
+    "source_authorities_count": 21,
+    "opportunity_source_authorities_count": 21,
+    "exact_key_matches": 21,
+    "source_authorities_last_verified_at_non_null_count": 1,
+    "source_keys": [
+      "cao_official",
+      "dhet_career_advice",
+      "labour_vacancies",
+      "nsfas_apply",
+      "dhet_universities",
+      "govza_government_jobs",
+      "govza_education",
+      "saqa_official",
+      "che_official",
+      "qcto_official",
+      "agriseta_official",
+      "bankseta_official",
+      "ceta_official",
+      "etdp_seta_official",
+      "ewseta_official",
+      "fasset_official",
+      "foodbev_seta_official",
+      "merseta_official",
+      "mict_seta_official",
+      "services_seta_official",
+      "teta_official"
+    ],
+    "reconciliation_policy": [
+      "Reuse an existing authority key when identity matches; do not insert a duplicate just because the URL path is different.",
+      "Treat exact-URL matches differently from same-authority/different-page relations.",
+      "Do not update last_verified_at merely because an anchor exists; record it only after an actual source check.",
+      "Do not turn authority anchors into institution, programme, intake or partnership records."
+    ]
+  }
 }
