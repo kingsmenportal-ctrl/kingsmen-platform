@@ -68,7 +68,7 @@ for (const [path, tokens] of requiredTokens.entries()) {
 if (exists('scripts/backup/New-KingsmenTruthVaultBackup.ps1')) {
   const backupScript = read('scripts/backup/New-KingsmenTruthVaultBackup.ps1');
   check('archive_declares_candidate_rows_included', /rawCandidateRowsIncluded = \$true/.test(backupScript), 'Full database dumps include candidate/personal rows', 'scripts/backup/New-KingsmenTruthVaultBackup.ps1');
-  check('archive_encryption_is_enforced', /archiveContainsPersonalData = \\$true/.test(backupScript) && /archiveEncryptionProvidedByScript = \\$true/.test(backupScript) && /encryptionAuthenticated = \\$archiveExists/.test(backupScript) && /encryptedStorageRequired = \\$true/.test(backupScript), 'Archive must be encrypted and authenticated before acceptance', 'scripts/backup/New-KingsmenTruthVaultBackup.ps1');
+  check('archive_encryption_is_enforced', /archiveContainsPersonalData = \$true/.test(backupScript) && /archiveEncryptionProvidedByScript = \$true/.test(backupScript) && /encryptionAuthenticated = \$archiveExists/.test(backupScript) && /encryptedStorageRequired = \$true/.test(backupScript), 'Archive must be encrypted and authenticated before acceptance', 'scripts/backup/New-KingsmenTruthVaultBackup.ps1');
 }
 if (exists('scripts/backup/Test-KingsmenTruthVaultRestore.ps1')) {
   const restoreScript = read('scripts/backup/Test-KingsmenTruthVaultRestore.ps1');
