@@ -30,10 +30,12 @@ check("packet submission and provider receipt remain false by schema guard",
 check("packet target ownership is checked by a trigger and trigger function is not SECURITY DEFINER",
   migration.includes("APPLICATION_PACKET_TARGET_OWNER_MISMATCH") &&
   migration.includes("candidate_application_packets_owner_guard") &&
+  migration.includes("GRANT EXECUTE ON FUNCTION private.guard_candidate_application_packet_owner() TO service_role") &&
   !/SECURITY\s+DEFINER/i.test(migration));
 check("packet document ownership and allowed Document Vault statuses are checked by a trigger",
   migration.includes("APPLICATION_PACKET_DOCUMENT_OWNER_MISMATCH") &&
   migration.includes("candidate_application_packet_documents_owner_guard") &&
+  migration.includes("GRANT EXECUTE ON FUNCTION private.guard_candidate_application_packet_document() TO service_role") &&
   ["UPLOADED_CANDIDATE_REPORTED","UNDER_REVIEW","VERIFIED"].every(value => migration.includes(value)));
 check("RLS permits candidate-owned SELECT only and service-role writes",
   migration.includes("ALTER TABLE public.candidate_application_packets ENABLE ROW LEVEL SECURITY") &&
@@ -84,8 +86,8 @@ check("Candidate application workbench renders packet answers and Document Vault
   page.includes("PACKET_ANSWER_FIELDS"));
 check("Candidate UI labels reusable data as preparation, not a completed provider form or submission",
   page.includes("generic preparation packet") &&
-  page.includes("NO_VERIFIED_PROVIDER_TEMPLATE") &&
-  page.includes("nothing was sent to this provider") &&
+  page.includes("template_status") &&
+  page.includes("has not sent anything to this provider") &&
   page.includes("There is no submission or receipt claim"));
 check("Packet UI links to the one candidate Document Vault and never renders storage paths",
   page.includes('href="/candidate/documents"') &&
