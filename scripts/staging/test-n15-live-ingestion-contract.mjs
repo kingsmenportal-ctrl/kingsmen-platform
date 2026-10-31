@@ -6,7 +6,7 @@ const root = process.cwd();
 const ingestion = fs.readFileSync(path.join(root, "supabase/functions/n15-source-ingestion/index.ts"), "utf8");
 const candidate = fs.readFileSync(path.join(root, "supabase/functions/n15-candidate-opportunities/index.ts"), "utf8");
 const migration = fs.readFileSync(path.join(root, "db/migrations/0086_n15_live_ingestion_candidate_feed.sql"), "utf8");
-const dbeMigration = fs.readFileSync(path.join(root, "db/migrations/0088_n15_date_only_deadlines_dbe_official_vacancies.sql"), "utf8");
+const dbeMigration = fs.readFileSync(path.join(root, "db/migrations/0089_n15_date_only_deadlines_dbe_official_vacancies.sql"), "utf8");
 const page = fs.readFileSync(path.join(root, "apps/web/src/app/candidate/opportunity-matches/page.tsx"), "utf8");
 
 const checks = [
