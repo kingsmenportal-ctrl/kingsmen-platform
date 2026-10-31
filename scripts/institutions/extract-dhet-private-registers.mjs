@@ -44,6 +44,12 @@ function splitEntries(text){
  }
  flush();return entries;
 }
+function cleanHeadingName(value,source){
+ let candidate=String(value??"").replace(source.pattern," ");
+ for(const province of PROVINCES)candidate=candidate.replace(new RegExp(province,"gi")," ");
+ candidate=candidate.replace(/\\b(?:registration|reg)\\s*(?:no\\.?|number)?\\s*[:#-]?\\s*/gi," ");
+ return normalizeName(candidate);
+}
 export function extractRecords(text,kind){
  const source=SOURCES[kind];if(!source)throw Error("Unknown DHET register kind");
  const seen=new Set();
@@ -54,12 +60,12 @@ export function extractRecords(text,kind){
    if(/^(CONTACT PERSON|CONTACT DETAILS|TEL\.?|TELEPHONE|EMAIL|E-MAIL|FAX|WEBSITE|WEB SITE|PHYSICAL ADDRESS|POSTAL ADDRESS|SITE OF DELIVERY)/i.test(line)||line.match(source.pattern))break;
    if(line&&!/^[-–—]?\s*\d+\s*[-–—]?$/.test(line))nameLines.push(line);
   }
-  const name=normalizeName(nameLines.slice(0,4).join(" "));
+  const name=normalizeName(nameLines.slice(0,4).join(" "))||cleanHeadingName(e.first,source);
   const key=ids.length===1?kind+":"+ids[0].toLowerCase():kind+":name:"+canonicalSlug(name);
   const provinces=PROVINCES.filter(p=>block.toLowerCase().includes(p.toLowerCase()));
   const aliases=[...block.matchAll(/(?:previously known as|previously|formerly known as)\s+([^\n.;]+)/gi)].map(m=>normalizeName(m[1])).filter(Boolean);
   const regStatus=status(e.section,block,kind),duplicate=seen.has(key);seen.add(key);
-  return {source_record_ref:key,source_register:kind,source_snapshot_date:source.date,source_url:source.url,register_entry_number:e.number,
+  return {source_record_ref:key,source_register:kind,source_snapshot_date:source.date,source_url:source.url,register_entry_number:e.number,source_heading_candidate:redactSourceExcerpt(e.first),
    canonical_name_candidate:name||null,normalized_name_key:canonicalSlug(name),registration_identifier:ids.length===1?ids[0]:null,
    registration_identifiers_observed:ids,registration_status:regStatus,registration_status_review_required:["STATUS_UNRESOLVED","WITHDRAWN_OR_DEREGISTERED_REVIEW"].includes(regStatus),
    province_candidates:provinces,province_status:provinces.length===1?"SOURCE_LISTED_CANDIDATE":provinces.length?"MULTI_PROVINCE_REVIEW":"NOT_EXTRACTED",
@@ -72,7 +78,7 @@ function selfTest(){
  const c=extractRecords("SECTION A:\n1. Former College Example (Pty) Ltd\nCONTACT PERSON\nMr A I Makungo\nTel: 015 663 1921\nEmail: contact@example.org\nMakotse Road, Zebediela\n2010/FE07/117 Limpopo\nSECTION B: REGISTERED PRIVATE COLLEGES\n1. Example Business College (Pty) Ltd\nCONTACT PERSON\nMain Road, Pretoria\n2021/FE07/006 Gauteng","private_colleges");
  if(normalizeName("  2. Café—College  ")!=="Café-College"||canonicalSlug("Café College")!=="cafe-college")throw Error("normalization");
  if(c.length!==2||c[0].registration_status!=="CANCELLED"||c[1].registration_status!=="REGISTERED")throw Error("cancelled/registered separation");
- const h=extractRecords("1. REGISTERED INSTITUTIONS\n1. Example Higher Institute\n2020/HE07/001 Gauteng\n1. Bachelor of Arts\n2. PROVISIONALLY REGISTERED INSTITUTIONS\n2. Provisional Higher Institute\n2024/HE08/002 Western Cape\n2. Bachelor of Business\n3. LAPSED PROVISIONAL REGISTRATIONS\n3. Lapsed Higher Institute\n2018/HE07/008 Gauteng","private_higher_education");
+ const h=extractRecords("1. REGISTERED INSTITUTIONS\n1. Example Higher Institute 2020/HE07/001 Gauteng\n1. Bachelor of Arts\n2. PROVISIONALLY REGISTERED INSTITUTIONS\n2. Provisional Higher Institute\n2024/HE08/002 Western Cape\n2. Bachelor of Business\n3. LAPSED PROVISIONAL REGISTRATIONS\n3. Lapsed Higher Institute\n2018/HE07/008 Gauteng","private_higher_education");
  if(!h.some(x=>x.registration_status==="REGISTERED")||!h.some(x=>x.registration_status==="PROVISIONAL")||!h.some(x=>x.registration_status==="LAPSED"))throw Error("higher-ed status separation");
  if([...c,...h].some(x=>x.import_eligible||x.official_route_status!=="NOT_VERIFIED"||x.integration_status!=="NOT_CONNECTED"||x.automation_authorized))throw Error("fail-closed route defaults");
  if(/Makungo|015 663 1921|contact@example.org/.test(c[0].source_excerpt))throw Error("contact detail redaction failed");
@@ -104,6 +110,6 @@ else{
  const errors=records.flatMap((x,i)=>[!x.source_url.startsWith("https://www.dhet.gov.za/")?"record "+i+" missing official provenance":null].filter(Boolean));
  if(errors.length){console.error(errors.join("\n"));process.exit(1);}
  const out=args.out||"manifests/institutions/seed/dhet-private-register-candidates-2026-10-31.json";fs.mkdirSync(path.dirname(out),{recursive:true});
- fs.writeFileSync(out,JSON.stringify({schema:"kingsmen.institutions.dhet-private-register-candidates.v1",status:"EXTRACTION_CANDIDATES_NOT_IMPORT_AUTHORIZED",extracted_at:new Date().toISOString(),sources:Object.entries(SOURCES).map(([register,s])=>({register,snapshot_date:s.date,url:s.url})),counts:{total:records.length,heading_candidates:records.length+rejectedRecords.length,rejected_missing_name:rejectedRecords.length,rejected_missing_name_by_register:{private_higher_education:rejectedRecords.filter(x=>x.source_register==="private_higher_education").length,private_colleges:rejectedRecords.filter(x=>x.source_register==="private_colleges").length},private_higher_education:records.filter(x=>x.source_register==="private_higher_education").length,private_colleges:records.filter(x=>x.source_register==="private_colleges").length,registered:records.filter(x=>x.registration_status==="REGISTERED").length,provisional:records.filter(x=>x.registration_status==="PROVISIONAL").length,cancelled:records.filter(x=>x.registration_status==="CANCELLED").length,lapsed:records.filter(x=>x.registration_status==="LAPSED").length,unresolved:records.filter(x=>x.registration_status==="STATUS_UNRESOLVED"||x.registration_status==="WITHDRAWN_OR_DEREGISTERED_REVIEW").length},import_rules:{import_eligible:false,required:["canonical identity and alias reconciliation","manual campus/site review","status review","provider-key collision preflight","independent review","approved idempotent SQL migration"],route_default:"NOT_VERIFIED",integration_default:"NOT_CONNECTED",no_current_opportunity_claim:true},records},null,2)+"\n");
+ fs.writeFileSync(out,JSON.stringify({schema:"kingsmen.institutions.dhet-private-register-candidates.v1",status:"EXTRACTION_CANDIDATES_NOT_IMPORT_AUTHORIZED",extracted_at:new Date().toISOString(),sources:Object.entries(SOURCES).map(([register,s])=>({register,snapshot_date:s.date,url:s.url})),counts:{total:records.length,heading_candidates:records.length+rejectedRecords.length,rejected_missing_name:rejectedRecords.length,rejected_missing_name_by_register:{private_higher_education:rejectedRecords.filter(x=>x.source_register==="private_higher_education").length,private_colleges:rejectedRecords.filter(x=>x.source_register==="private_colleges").length},private_higher_education:records.filter(x=>x.source_register==="private_higher_education").length,private_colleges:records.filter(x=>x.source_register==="private_colleges").length,registered:records.filter(x=>x.registration_status==="REGISTERED").length,provisional:records.filter(x=>x.registration_status==="PROVISIONAL").length,cancelled:records.filter(x=>x.registration_status==="CANCELLED").length,lapsed:records.filter(x=>x.registration_status==="LAPSED").length,unresolved:records.filter(x=>x.registration_status==="STATUS_UNRESOLVED"||x.registration_status==="WITHDRAWN_OR_DEREGISTERED_REVIEW").length},extraction_diagnostics:{rejected_missing_name_samples:rejectedRecords.slice(0,20).map(x=>({source_register:x.source_register,register_entry_number:x.register_entry_number,source_heading_candidate:x.source_heading_candidate}))},import_rules:{import_eligible:false,required:["canonical identity and alias reconciliation","manual campus/site review","status review","provider-key collision preflight","independent review","approved idempotent SQL migration"],route_default:"NOT_VERIFIED",integration_default:"NOT_CONNECTED",no_current_opportunity_claim:true},records},null,2)+"\n");
  console.log("Wrote "+records.length+" named fail-closed review candidates; rejected "+rejectedRecords.length+" headings without a normalized institution name to "+out+"; no SQL applied.");
 }
