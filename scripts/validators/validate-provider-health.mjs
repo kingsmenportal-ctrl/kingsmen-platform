@@ -38,8 +38,8 @@ const requiredEnvTokens = [
   "KINGSMEN_EMAIL_PRIMARY=true",
   "KINGSMEN_WHATSAPP_URGENT_ONLY=false",
   "KINGSMEN_SMS_BACKUP_ONLY=false",
-  "KINGSMEN_WHATSAPP_URGENT_ONLY=false",
-  "KINGSMEN_SMS_BACKUP_ONLY=false",
+  "WHATSAPP_DISABLED=true",
+  "SMS_DISABLED=true",
   "KINGSMEN_BULK_WHATSAPP_ALLOWED=false",
   "KINGSMEN_BULK_SMS_ALLOWED=false",
   "KINGSMEN_ROUTINE_WHATSAPP_ALLOWED=false",
@@ -214,8 +214,7 @@ function checkProviderRegistry(checks) {
     "airtableMirrorOnly",
     "n8nThinWrapperOnly",
     "emailPrimary",
-    "whatsappUrgentOnly",
-    "smsBackupOnly",
+
     "playwrightScoutOnly",
     "manualMapFallbackRequired",
     "noHardcodedSecrets",
@@ -226,8 +225,17 @@ function checkProviderRegistry(checks) {
   for (const key of doctrineChecks) {
     addCheck(checks, `provider-registry:doctrine:${key}`, doctrine[key] === true, String(doctrine[key]), file);
   }
+  addCheck(checks, "provider-registry:doctrine:whatsappDisabled", doctrine.whatsappUrgentOnly === false && doctrine.whatsappDisabled === true, "WhatsApp disabled", file);
+  addCheck(checks, "provider-registry:doctrine:smsDisabled", doctrine.smsBackupOnly === false && doctrine.smsDisabled === true, "SMS disabled", file);
 
   const globalRules = registry.globalRules ?? {};
+  for (const channel of ["whatsapp", "sms"]) {
+    const group = registry.providerGroups?.[channel];
+    addCheck(checks, `provider-registry:${channel}:disabled`, group?.authority === "disabled" && group?.enabledByDefault === false, "channel disabled", file);
+    for (const provider of Array.isArray(group?.providers) ? group.providers : []) {
+      addCheck(checks, `provider-registry:${channel}:${provider.key}:deny`, provider.enabledByDefault === false && provider.mode === "disabled_by_current_policy" && provider.failurePolicy === "deny_all_candidate_use", "provider denied", file);
+    }
+  }
   const globalRuleChecks = [
     "secretsInGitAllowed:false",
     "serviceRoleInBrowserAllowed:false",
