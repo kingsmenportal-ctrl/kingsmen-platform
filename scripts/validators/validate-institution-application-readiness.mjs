@@ -132,15 +132,22 @@ const withReceipt = {
   ...selfReportedOnly,
   submission_evidence: {
     status: "PROVIDER_RECEIPT_VERIFIED", receipt_reference: "EX-RECEIPT-123",
-    evidence_record_id: "private-evidence-001", submitted_at: fresh, freshness_window_days: 90,
+    evidence_record_id: "private-evidence-001", submitted_at: "2026-07-01T08:00:00Z", freshness_window_days: 1,
   },
 };
 assert.equal(evaluateOpportunityReadiness(withReceipt, { asOf, candidate, providerReadiness: routeProvider }).state, "O5_SUBMISSION_EVIDENCED");
 assert.equal(evaluateOpportunityReadiness({
   ...withReceipt,
+  submission_evidence: {
+    ...withReceipt.submission_evidence,
+    submitted_at: "2026-11-01T08:00:00Z",
+  },
+}, { asOf, candidate, providerReadiness: routeProvider }).state, "O4_CANDIDATE_READY", "Future submission event timestamps must fail closed");
+assert.equal(evaluateOpportunityReadiness({
+  ...withReceipt,
   outcome_evidence: {
     status: "PROVIDER_CONFIRMED", outcome_type: "OFFER", evidence_record_id: "private-outcome-001",
-    confirmed_at: fresh, freshness_window_days: 90,
+    confirmed_at: "2026-07-02T08:00:00Z", freshness_window_days: 1,
   },
 }, { asOf, candidate, providerReadiness: routeProvider }).state, "O6_OUTCOME_VERIFIED");
 assert.equal(evaluateOpportunityReadiness({
@@ -148,4 +155,4 @@ assert.equal(evaluateOpportunityReadiness({
   source_evidence: { ...verifiedOpportunity.source_evidence, url: "javascript:alert(1)" },
 }, { asOf }).state, "O0_FOUND", "Unsafe source URL must fail closed");
 
-console.log("Institution application readiness validation PASSED: 6 provider states, 7 opportunity states, stale evidence, wrong-domain routes, expired deadlines, self-reported submission and provider receipt/outcome boundaries.");
+console.log("Institution application readiness validation PASSED: 6 provider states, 7 opportunity states, stale evidence, wrong-domain routes, expired deadlines, self-reported submission and provider receipt/outcome boundaries, and durable historical evidence.");
