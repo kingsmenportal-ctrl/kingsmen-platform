@@ -3,46 +3,237 @@
 import Link from "next/link";
 import { useMemo, useState } from "react";
 import directorySeed from "../../../../../../manifests/institutions/seed/public-universities-and-tvet-2026-10-31.json";
+import crossSector from "../../../../../../manifests/institutions/cross-sector-institution-source-extension.json";
 
 type Institution = (typeof directorySeed.records)[number];
-type ProviderFilter = "ALL" | "PUBLIC_UNIVERSITY" | "TVET_COLLEGE";
-
-const providerLabels: Record<string, string> = {
-  PUBLIC_UNIVERSITY: "Public university",
-  TVET_COLLEGE: "TVET college"
+type SourceAnchor = (typeof crossSector.sources)[number];
+type DirectoryItem = {
+  id: string;
+  name: string;
+  kind: "INSTITUTION" | "OFFICIAL_SOURCE";
+  providerType: string;
+  sectorKeys: string[];
+  province: string | null;
+  serviceCapabilities: string[];
+  pathways: string[];
+  sourceName: string;
+  sourceUrl: string | null;
+  evidenceText: string;
+  supports: string[];
+  doesNotProve: string[];
+  verification: {
+    identity: string;
+    accreditation: string;
+    availability: string;
+    eligibility: string;
+    intake: string;
+    route: string;
+    integration: string;
+    partnership: string;
+  };
 };
 
-function officialSiteLabel(institution: Institution): string {
-  if (!institution.official_website_url) return "Website link requires review";
-  return institution.official_website_status === "PUBLISHED_BY_DHET_NEEDS_CURRENT_LIVE_CHECK"
-    ? "Website listed by DHET · live check pending"
-    : "Website source requires review";
+const pathwayLabels: Record<string, string> = {
+  HIGHER_EDUCATION: "Higher education",
+  TVET: "TVET",
+  SETA_LEARNERSHIPS: "SETA learnerships",
+  INTERNSHIPS: "Internships",
+  APPRENTICESHIPS: "Apprenticeships",
+  EMPLOYMENT: "Employment"
+};
+
+const capabilityLabels: Record<string, string> = {
+  HIGHER_EDUCATION: "Higher education",
+  TVET: "TVET",
+  SETA_LEARNERSHIPS: "SETA learnerships",
+  INTERNSHIPS: "Internships",
+  APPRENTICESHIPS: "Apprenticeships",
+  EMPLOYMENT: "Employment",
+  FUNDING: "Funding",
+  ACCOMMODATION: "Accommodation",
+  HEALTH_AND_CARE: "Health and care",
+  SOCIAL_SUPPORT: "Social support",
+  TRANSPORT: "Transport",
+  LEGAL_SUPPORT: "Legal support",
+  PUBLIC_SERVICE: "Public services",
+  BUSINESS_REGISTRATION: "Business registration",
+  FINANCIAL_SERVICES: "Financial services",
+  TECHNOLOGY_INTEGRATION: "Technology integration"
+};
+
+const capabilityByClass: Record<string, string[]> = {
+  PUBLIC_ADMINISTRATION: ["PUBLIC_SERVICE"],
+  MUNICIPALITY: ["PUBLIC_SERVICE", "TRANSPORT"],
+  STATE_OWNED_ENTERPRISE: ["PUBLIC_SERVICE", "TRANSPORT"],
+  PUBLIC_ENTITY: ["PUBLIC_SERVICE"],
+  EDUCATION_AND_SKILLS: ["HIGHER_EDUCATION", "TVET"],
+  HEALTH_AND_CARE: ["HEALTH_AND_CARE"],
+  EMPLOYER_AND_RECRUITMENT: ["EMPLOYMENT"],
+  FUNDING_AND_SOCIAL_SUPPORT: ["FUNDING", "SOCIAL_SUPPORT"],
+  FINANCE_AND_INSURANCE: ["FINANCIAL_SERVICES"],
+  HOUSING_AND_ACCOMMODATION: ["ACCOMMODATION"],
+  TRANSPORT_AND_ESSENTIAL_SERVICES: ["TRANSPORT"],
+  LEGAL_AID_AND_COMMUNITY_SERVICES: ["LEGAL_SUPPORT", "SOCIAL_SUPPORT"],
+  NGO_NPO_AND_FOUNDATION: ["SOCIAL_SUPPORT"],
+  REGULATOR_AND_PROFESSIONAL_COUNCIL: ["PUBLIC_SERVICE"],
+  TECHNOLOGY_AND_DELIVERY_VENDOR: ["TECHNOLOGY_INTEGRATION"]
+};
+
+const pathwayBySource: Record<string, string[]> = {
+  dhet_skills_seta_qcto_saqa: ["HIGHER_EDUCATION", "TVET", "SETA_LEARNERSHIPS", "APPRENTICESHIPS"],
+  dpsa_vacancies: ["EMPLOYMENT"],
+  job_portal_provider_authorized: ["EMPLOYMENT", "INTERNSHIPS", "APPRENTICESHIPS", "SETA_LEARNERSHIPS"],
+  eskom_official: ["EMPLOYMENT"],
+  sars_official: ["EMPLOYMENT"]
+};
+
+const pathways = Object.keys(pathwayLabels);
+const capabilities = crossSector.service_capabilities as string[];
+const sectors = crossSector.institution_classes as string[];
+
+function label(value: string): string {
+  return value.replaceAll("_", " ").toLocaleLowerCase().replace(/\b\w/g, letter => letter.toUpperCase());
+}
+
+function unique(values: string[]): string[] {
+  return Array.from(new Set(values));
+}
+
+const institutionItems: DirectoryItem[] = directorySeed.records.map((record: Institution) => {
+  const isUniversity = record.provider_type === "PUBLIC_UNIVERSITY";
+  const pathway = isUniversity ? "HIGHER_EDUCATION" : "TVET";
+  return {
+    id: record.institution_ref,
+    name: record.canonical_name,
+    kind: "INSTITUTION",
+    providerType: record.provider_type,
+    sectorKeys: ["EDUCATION_AND_SKILLS"],
+    province: record.province,
+    serviceCapabilities: [pathway],
+    pathways: [pathway],
+    sourceName: "Department of Higher Education and Training",
+    sourceUrl: record.directory_source_url,
+    evidenceText: "Listed in the DHET source snapshot. This is directory evidence only.",
+    supports: ["Institution identity as published in the cited DHET directory"],
+    doesNotProve: [
+      "current legal standing or provider identity beyond the directory entry",
+      "accreditation or delivery scope for a particular programme",
+      "current service or programme availability",
+      "candidate eligibility or an open intake",
+      "a Kingsmen partnership, live integration, submission or provider outcome"
+    ],
+    verification: {
+      identity: "DIRECTORY_EVIDENCE_ONLY",
+      accreditation: record.accreditation_or_delivery_scope_status,
+      availability: "NOT_VERIFIED",
+      eligibility: record.eligibility_status,
+      intake: record.intake_status,
+      route: record.application_route_status,
+      integration: record.integration_status,
+      partnership: record.partnership_status
+    }
+  };
+});
+
+const sourceItems: DirectoryItem[] = crossSector.sources.map((source: SourceAnchor) => {
+  const sourceClasses = source.classes as string[];
+  const sourceCapabilities = unique(sourceClasses.flatMap(key => capabilityByClass[key] ?? []));
+  const sourcePathways = pathwayBySource[source.source_id] ?? unique(sourceClasses.flatMap(key => {
+    if (key === "EDUCATION_AND_SKILLS") return ["HIGHER_EDUCATION", "TVET"];
+    if (key === "EMPLOYER_AND_RECRUITMENT" || key === "PUBLIC_ADMINISTRATION" || key === "STATE_OWNED_ENTERPRISE" || key === "PUBLIC_ENTITY") return ["EMPLOYMENT"];
+    return [];
+  }));
+  return {
+    id: source.source_id,
+    name: source.name,
+    kind: "OFFICIAL_SOURCE",
+    providerType: "SOURCE_REGISTRY",
+    sectorKeys: sourceClasses,
+    province: null,
+    serviceCapabilities: sourceCapabilities,
+    pathways: sourcePathways,
+    sourceName: source.authority,
+    sourceUrl: source.url,
+    evidenceText: "Sector source anchor for discovery and verification. It is not an imported institution/provider record.",
+    supports: source.supports,
+    doesNotProve: source.does_not_prove,
+    verification: {
+      identity: "SOURCE_ANCHOR_ONLY",
+      accreditation: "NOT_PROVED_BY_SOURCE_ANCHOR",
+      availability: "NOT_PROVED_BY_SOURCE_ANCHOR",
+      eligibility: "NOT_PROVED_BY_SOURCE_ANCHOR",
+      intake: "NOT_PROVED_BY_SOURCE_ANCHOR",
+      route: "NOT_PROVED_BY_SOURCE_ANCHOR",
+      integration: source.connector_state,
+      partnership: "NOT_ESTABLISHED"
+    }
+  };
+});
+
+const allItems = [...institutionItems, ...sourceItems];
+
+function VerificationGrid({ item }: { item: DirectoryItem }) {
+  const rows = [
+    ["Identity / legal status", item.verification.identity],
+    ["Accreditation / delivery scope", item.verification.accreditation],
+    ["Current service availability", item.verification.availability],
+    ["Candidate eligibility", item.verification.eligibility],
+    ["Open programme / intake", item.verification.intake],
+    ["Application / service route", item.verification.route],
+    ["Technical integration", item.verification.integration],
+    ["Partnership", item.verification.partnership]
+  ];
+  return (
+    <dl className="mt-4 grid gap-2 sm:grid-cols-2">
+      {rows.map(([name, value]) => (
+        <div key={name} className="rounded-xl bg-slate-950/70 p-3">
+          <dt className="text-[11px] uppercase tracking-wider text-slate-500">{name}</dt>
+          <dd className="mt-1 break-words text-xs font-semibold text-slate-200">{value}</dd>
+        </div>
+      ))}
+    </dl>
+  );
 }
 
 export default function CandidateInstitutionDirectoryPage() {
   const [query, setQuery] = useState("");
-  const [providerType, setProviderType] = useState<ProviderFilter>("ALL");
-  const [province, setProvince] = useState("ALL");
+  const [kind, setKind] = useState("ALL");
+  const [sector, setSector] = useState("ALL");
+  const [location, setLocation] = useState("ALL");
+  const [capability, setCapability] = useState("ALL");
+  const [pathway, setPathway] = useState("ALL");
 
-  const provinces = useMemo(() => Array.from(new Set(
+  const provinces = useMemo(() => unique(
     directorySeed.records.map(record => record.province).filter((value): value is string => Boolean(value))
-  )).sort((a, b) => a.localeCompare(b)), []);
+  ).sort((a, b) => a.localeCompare(b)), []);
 
-  const visibleInstitutions = useMemo(() => {
+  const visibleItems = useMemo(() => {
     const needle = query.trim().toLocaleLowerCase();
-    return directorySeed.records
-      .filter(record => providerType === "ALL" || record.provider_type === providerType)
-      .filter(record => province === "ALL" || record.province === province)
-      .filter(record => !needle || [
-        record.canonical_name,
-        record.province ?? "",
-        providerLabels[record.provider_type] ?? record.provider_type
-      ].some(value => value.toLocaleLowerCase().includes(needle)))
-      .sort((a, b) => a.canonical_name.localeCompare(b.canonical_name));
-  }, [query, providerType, province]);
+    return allItems
+      .filter(item => kind === "ALL" || item.kind === kind)
+      .filter(item => sector === "ALL" || item.sectorKeys.includes(sector))
+      .filter(item => location === "ALL"
+        || (location === "NATIONAL_SOURCE" && item.kind === "OFFICIAL_SOURCE")
+        || (location === "LOCATION_NOT_RECORDED" && item.kind === "INSTITUTION" && !item.province)
+        || item.province === location)
+      .filter(item => capability === "ALL" || item.serviceCapabilities.includes(capability))
+      .filter(item => pathway === "ALL" || item.pathways.includes(pathway))
+      .filter(item => !needle || [
+        item.name, item.providerType, item.province ?? "", item.sourceName,
+        item.sectorKeys.join(" "), item.serviceCapabilities.join(" "),
+        item.pathways.join(" "), item.supports.join(" "), item.doesNotProve.join(" ")
+      ].join(" ").toLocaleLowerCase().includes(needle))
+      .sort((a, b) => a.name.localeCompare(b.name));
+  }, [query, kind, sector, location, capability, pathway]);
 
-  const universityCount = directorySeed.records.filter(record => record.provider_type === "PUBLIC_UNIVERSITY").length;
-  const tvetCount = directorySeed.records.filter(record => record.provider_type === "TVET_COLLEGE").length;
+  const clearFilters = () => {
+    setQuery("");
+    setKind("ALL");
+    setSector("ALL");
+    setLocation("ALL");
+    setCapability("ALL");
+    setPathway("ALL");
+  };
 
   return (
     <main className="min-h-screen bg-[#071426] px-4 py-8 text-[#f4f0e6] sm:px-6">
@@ -54,11 +245,11 @@ export default function CandidateInstitutionDirectoryPage() {
             <Link href="/candidate/applications" className="text-amber-200 hover:text-amber-100">My applications</Link>
           </nav>
           <p className="text-xs font-extrabold uppercase tracking-[0.22em] text-amber-300">Kingsmen One · National directory</p>
-          <h1 className="mt-3 text-3xl font-black tracking-tight text-white sm:text-4xl">Find an institution through Kingsmen</h1>
+          <h1 className="mt-3 text-3xl font-black tracking-tight text-white sm:text-4xl">One national institution and services directory</h1>
           <p className="mt-4 max-w-4xl text-sm leading-6 text-slate-300 sm:text-base">
-            Search the first official-source directory batch of South African public universities and TVET colleges.
-            Your Kingsmen account and profile remain the same across all six pathways; each institution still has its
-            own application rules and submission route.
+            Search institution records and authoritative sector source directories from one place. Filter by sector,
+            province/location, service capability and any of Kingsmen's six core pathways. A pathway or service tag is
+            a discovery aid, not proof that an intake or service is currently available.
           </p>
           <div className="mt-6 flex flex-wrap gap-3">
             <Link href="/candidate/opportunity-matches" className="rounded-xl bg-amber-300 px-4 py-3 text-sm font-extrabold text-[#101b2a]">
@@ -72,157 +263,199 @@ export default function CandidateInstitutionDirectoryPage() {
 
         <section aria-label="Current directory coverage" className="grid gap-3 sm:grid-cols-3">
           <article className="rounded-2xl border border-slate-700 bg-[#0b1d33] p-5">
-            <p className="text-xs font-extrabold uppercase tracking-wider text-amber-300">Initial public directory batch</p>
-            <p className="mt-2 text-3xl font-black text-white">{directorySeed.counts.total}</p>
-            <p className="mt-1 text-sm text-slate-400">Source-listed records · snapshot {directorySeed.researched_at}</p>
+            <p className="text-xs font-extrabold uppercase tracking-wider text-amber-300">Source-listed institution records</p>
+            <p className="mt-2 text-3xl font-black text-white">{institutionItems.length}</p>
+            <p className="mt-1 text-sm text-slate-400">Current data batch: public universities and TVET colleges only.</p>
           </article>
           <article className="rounded-2xl border border-slate-700 bg-[#0b1d33] p-5">
-            <p className="text-xs font-extrabold uppercase tracking-wider text-amber-300">Public universities</p>
-            <p className="mt-2 text-3xl font-black text-white">{universityCount}</p>
-            <p className="mt-1 text-sm text-slate-400">Directory entry only; programmes and admissions routes are not yet verified.</p>
+            <p className="text-xs font-extrabold uppercase tracking-wider text-amber-300">Official sector source anchors</p>
+            <p className="mt-2 text-3xl font-black text-white">{sourceItems.length}</p>
+            <p className="mt-1 text-sm text-slate-400">Discovery directories and authorities; not imported provider profiles.</p>
           </article>
           <article className="rounded-2xl border border-slate-700 bg-[#0b1d33] p-5">
-            <p className="text-xs font-extrabold uppercase tracking-wider text-amber-300">TVET colleges</p>
-            <p className="mt-2 text-3xl font-black text-white">{tvetCount}</p>
-            <p className="mt-1 text-sm text-slate-400">Directory entry only; each programme and intake requires separate evidence.</p>
+            <p className="text-xs font-extrabold uppercase tracking-wider text-amber-300">Core opportunity pathways</p>
+            <p className="mt-2 text-3xl font-black text-white">6</p>
+            <p className="mt-1 text-sm text-slate-400">Education, TVET, learnerships, internships, apprenticeships and employment.</p>
           </article>
         </section>
 
-        <section role="note" aria-label="Directory evidence limitation" className="rounded-2xl border border-yellow-500/40 bg-yellow-950/30 p-5">
-          <h2 className="font-bold text-yellow-100">Important: a directory listing is not an open intake</h2>
+        <section role="note" aria-label="Verification boundary" className="rounded-2xl border border-yellow-500/40 bg-yellow-950/30 p-5">
+          <h2 className="font-bold text-yellow-100">Discovery is not verification</h2>
           <p className="mt-2 text-sm leading-6 text-yellow-50/90">
-            The records below preserve evidence that an institution appeared in a DHET directory snapshot. Kingsmen has
-            not yet independently rechecked every institution website, programme, closing date, eligibility rule or
-            application route. No listing here means a partnership, live integration, application submission or admission.
+            Kingsmen keeps these claims separate: directory listing, legal identity, accreditation or programme-delivery
+            scope, current service availability, candidate eligibility, open intake, application route, technical
+            connection, partnership, submission receipt and provider-confirmed outcome. Unknown or stale claims stay
+            unverified and must not be presented as available to candidates.
           </p>
         </section>
 
-        <section aria-label="Institution search and filters" className="rounded-2xl border border-slate-700 bg-[#0b1d33] p-5 sm:p-6">
-          <div className="grid gap-4 md:grid-cols-[minmax(0,1.5fr)_minmax(0,1fr)_minmax(0,1fr)]">
+        <section aria-label="Directory filters" className="rounded-2xl border border-slate-700 bg-[#0b1d33] p-5 sm:p-6">
+          <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-3">
             <label className="block text-sm font-bold text-white">
-              Search institution
+              Search names, sectors, services or source evidence
               <input
                 type="search"
                 value={query}
                 onChange={event => setQuery(event.target.value)}
-                placeholder="Type an institution name"
+                placeholder="Institution, authority, service or pathway"
                 className="mt-2 w-full rounded-xl border border-slate-600 bg-slate-950 px-3 py-3 font-normal text-white placeholder:text-slate-500 focus:border-amber-300 focus:outline-none"
               />
             </label>
             <label className="block text-sm font-bold text-white">
-              Institution type
-              <select
-                value={providerType}
-                onChange={event => setProviderType(event.target.value as ProviderFilter)}
-                className="mt-2 w-full rounded-xl border border-slate-600 bg-slate-950 px-3 py-3 font-normal text-white focus:border-amber-300 focus:outline-none"
-              >
-                <option value="ALL">All in this batch</option>
-                <option value="PUBLIC_UNIVERSITY">Public universities</option>
-                <option value="TVET_COLLEGE">TVET colleges</option>
+              Result type
+              <select value={kind} onChange={event => setKind(event.target.value)} className="mt-2 w-full rounded-xl border border-slate-600 bg-slate-950 px-3 py-3 font-normal text-white">
+                <option value="ALL">Institutions and official source directories</option>
+                <option value="INSTITUTION">Institution records</option>
+                <option value="OFFICIAL_SOURCE">Official sector source directories</option>
               </select>
             </label>
             <label className="block text-sm font-bold text-white">
-              Province
-              <select
-                value={province}
-                onChange={event => setProvince(event.target.value)}
-                className="mt-2 w-full rounded-xl border border-slate-600 bg-slate-950 px-3 py-3 font-normal text-white focus:border-amber-300 focus:outline-none"
-              >
-                <option value="ALL">All provinces / not recorded</option>
+              Institution sector
+              <select value={sector} onChange={event => setSector(event.target.value)} className="mt-2 w-full rounded-xl border border-slate-600 bg-slate-950 px-3 py-3 font-normal text-white">
+                <option value="ALL">All sectors</option>
+                {sectors.map(value => <option value={value} key={value}>{label(value)}</option>)}
+              </select>
+            </label>
+            <label className="block text-sm font-bold text-white">
+              Province / location
+              <select value={location} onChange={event => setLocation(event.target.value)} className="mt-2 w-full rounded-xl border border-slate-600 bg-slate-950 px-3 py-3 font-normal text-white">
+                <option value="ALL">All locations</option>
+                <option value="NATIONAL_SOURCE">National source directories</option>
+                <option value="LOCATION_NOT_RECORDED">Institution location not recorded</option>
                 {provinces.map(value => <option value={value} key={value}>{value}</option>)}
               </select>
             </label>
+            <label className="block text-sm font-bold text-white">
+              Service capability
+              <select value={capability} onChange={event => setCapability(event.target.value)} className="mt-2 w-full rounded-xl border border-slate-600 bg-slate-950 px-3 py-3 font-normal text-white">
+                <option value="ALL">All service categories</option>
+                {capabilities.map(value => <option value={value} key={value}>{capabilityLabels[value] ?? label(value)}</option>)}
+              </select>
+            </label>
+            <label className="block text-sm font-bold text-white">
+              Kingsmen pathway
+              <select value={pathway} onChange={event => setPathway(event.target.value)} className="mt-2 w-full rounded-xl border border-slate-600 bg-slate-950 px-3 py-3 font-normal text-white">
+                <option value="ALL">All six pathways</option>
+                {pathways.map(value => <option value={value} key={value}>{pathwayLabels[value]}</option>)}
+              </select>
+            </label>
           </div>
-          <p aria-live="polite" className="mt-4 text-sm text-slate-400">
-            Showing <span className="font-bold text-white">{visibleInstitutions.length}</span> of {directorySeed.records.length} initial directory records.
-          </p>
+          <div className="mt-4 flex flex-wrap items-center justify-between gap-3">
+            <p aria-live="polite" className="text-sm text-slate-400">
+              Showing <span className="font-bold text-white">{visibleItems.length}</span> of {allItems.length} current searchable entries.
+            </p>
+            <button type="button" onClick={clearFilters} className="rounded-xl border border-slate-600 px-4 py-2 text-sm font-bold text-white hover:border-amber-300">
+              Clear filters
+            </button>
+          </div>
         </section>
 
-        <section aria-label="Institution results" className="grid gap-4 lg:grid-cols-2">
-          {visibleInstitutions.map(institution => (
-            <article key={institution.institution_ref} className="flex h-full flex-col rounded-2xl border border-slate-700 bg-[#0b1d33] p-5 sm:p-6">
+        <section aria-label="Directory results" className="grid gap-4 xl:grid-cols-2">
+          {visibleItems.map(item => (
+            <article key={item.id} className="flex h-full flex-col rounded-2xl border border-slate-700 bg-[#0b1d33] p-5 sm:p-6">
               <div className="flex flex-wrap items-start justify-between gap-3">
-                <div>
+                <div className="min-w-0">
                   <p className="text-xs font-extrabold uppercase tracking-wider text-amber-300">
-                    {providerLabels[institution.provider_type] ?? institution.provider_type}
+                    {item.kind === "INSTITUTION" ? label(item.providerType) : "Official sector source / registry"}
                   </p>
-                  <h2 className="mt-2 text-xl font-bold text-white">{institution.canonical_name}</h2>
+                  <h2 className="mt-2 text-xl font-bold text-white">{item.name}</h2>
                   <p className="mt-2 text-xs text-slate-400">
-                    {institution.province ?? "Province not confirmed in this record"} · source snapshot {institution.source_snapshot_date}
+                    {item.province ?? (item.kind === "OFFICIAL_SOURCE" ? "National or provider-specific source" : "Location not recorded")}
+                    {" · "}Source: {item.sourceName}
                   </p>
                 </div>
                 <span className="rounded-full border border-slate-600 px-3 py-1 text-xs font-bold text-slate-300">
-                  Directory only
+                  {item.kind === "INSTITUTION" ? "Directory evidence only" : "Discovery source only"}
                 </span>
               </div>
 
-              <dl className="mt-5 grid gap-3 text-sm sm:grid-cols-2">
-                <div className="rounded-xl bg-slate-950/70 p-3">
-                  <dt className="text-xs uppercase tracking-wider text-slate-500">Programme availability</dt>
-                  <dd className="mt-1 font-semibold text-slate-200">Not verified</dd>
-                </div>
-                <div className="rounded-xl bg-slate-950/70 p-3">
-                  <dt className="text-xs uppercase tracking-wider text-slate-500">Closing date / eligibility</dt>
-                  <dd className="mt-1 font-semibold text-slate-200">Unknown</dd>
-                </div>
-                <div className="rounded-xl bg-slate-950/70 p-3 sm:col-span-2">
-                  <dt className="text-xs uppercase tracking-wider text-slate-500">Application route</dt>
-                  <dd className="mt-1 font-semibold text-slate-200">Not verified by Kingsmen</dd>
-                </div>
-              </dl>
+              <p className="mt-4 text-sm leading-6 text-slate-300">{item.evidenceText}</p>
 
-              <div className="mt-auto pt-5">
-                {institution.official_website_url ? (
-                  <a
-                    href={institution.official_website_url}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="inline-flex rounded-xl border border-amber-300/40 px-4 py-3 text-sm font-bold text-amber-100 hover:border-amber-300"
-                  >
-                    Open website listed by DHET ↗
+              <div className="mt-4 flex flex-wrap gap-2">
+                {item.sectorKeys.map(value => <span key={value} className="rounded-full bg-slate-800 px-3 py-1 text-xs text-slate-200">{label(value)}</span>)}
+              </div>
+              <div className="mt-3">
+                <p className="text-[11px] font-bold uppercase tracking-wider text-slate-500">Service discovery categories</p>
+                <div className="mt-2 flex flex-wrap gap-2">
+                  {item.serviceCapabilities.length
+                    ? item.serviceCapabilities.map(value => <span key={value} className="rounded-full border border-slate-700 px-3 py-1 text-xs text-slate-300">{capabilityLabels[value] ?? label(value)}</span>)
+                    : <span className="text-xs text-slate-500">No service category mapped for this source.</span>}
+                </div>
+              </div>
+              <div className="mt-3">
+                <p className="text-[11px] font-bold uppercase tracking-wider text-slate-500">Pathway source relevance — not an open opportunity</p>
+                <div className="mt-2 flex flex-wrap gap-2">
+                  {item.pathways.length
+                    ? item.pathways.map(value => <span key={value} className="rounded-full border border-amber-300/30 px-3 py-1 text-xs text-amber-100">{pathwayLabels[value] ?? label(value)}</span>)
+                    : <span className="text-xs text-slate-500">No core-pathway mapping established.</span>}
+                </div>
+              </div>
+
+              <VerificationGrid item={item} />
+
+              <details className="mt-4 rounded-xl border border-slate-700 bg-slate-950/50 p-3">
+                <summary className="cursor-pointer text-sm font-bold text-slate-200">Evidence scope and limitations</summary>
+                <div className="mt-3 space-y-3 text-xs leading-5 text-slate-400">
+                  <div>
+                    <p className="font-bold text-slate-300">What the source supports</p>
+                    <ul className="mt-1 list-disc space-y-1 pl-5">{item.supports.map(value => <li key={value}>{value}</li>)}</ul>
+                  </div>
+                  <div>
+                    <p className="font-bold text-slate-300">What it does not prove</p>
+                    <ul className="mt-1 list-disc space-y-1 pl-5">{item.doesNotProve.map(value => <li key={value}>{value}</li>)}</ul>
+                  </div>
+                </div>
+              </details>
+
+              <div className="mt-auto flex flex-wrap items-center gap-3 pt-5">
+                {item.sourceUrl && item.sourceUrl.startsWith("https://") ? (
+                  <a href={item.sourceUrl} target="_blank" rel="noopener noreferrer" className="inline-flex rounded-xl border border-amber-300/40 px-4 py-3 text-sm font-bold text-amber-100 hover:border-amber-300">
+                    Open source website ↗
                   </a>
                 ) : (
-                  <p className="rounded-xl border border-yellow-500/30 bg-yellow-950/20 px-4 py-3 text-sm font-semibold text-yellow-100">
-                    {officialSiteLabel(institution)} — Kingsmen will not guess the link.
-                  </p>
+                  <span className="rounded-xl border border-yellow-500/30 bg-yellow-950/20 px-4 py-3 text-xs font-semibold text-yellow-100">
+                    Authoritative provider-specific source link still requires verification.
+                  </span>
                 )}
-                {institution.official_website_url && (
-                  <p className="mt-2 text-xs text-slate-500">{officialSiteLabel(institution)}</p>
-                )}
+                <Link href="/candidate/applications" className="inline-flex rounded-xl border border-slate-600 px-4 py-3 text-sm font-bold text-white hover:border-amber-300">
+                  Open Kingsmen workbench
+                </Link>
               </div>
+              <p className="mt-3 text-[11px] leading-5 text-slate-500">
+                The workbench can prepare a destination-specific request where a verified route exists. This directory does not submit to the institution, confirm a receipt or record a provider outcome.
+              </p>
             </article>
           ))}
         </section>
 
-        {visibleInstitutions.length === 0 && (
+        {visibleItems.length === 0 && (
           <div className="rounded-2xl border border-slate-700 bg-[#0b1d33] p-8 text-center">
-            <h2 className="text-lg font-bold text-white">No institution matches those filters</h2>
-            <p className="mt-2 text-sm text-slate-400">Try another name, institution type or province.</p>
-            <button
-              type="button"
-              onClick={() => { setQuery(""); setProviderType("ALL"); setProvince("ALL"); }}
-              className="mt-4 rounded-xl bg-amber-300 px-4 py-3 text-sm font-extrabold text-[#101b2a]"
-            >
+            <h2 className="text-lg font-bold text-white">No results match those filters</h2>
+            <p className="mt-2 text-sm text-slate-400">Try another sector, location, service capability or pathway.</p>
+            <button type="button" onClick={clearFilters} className="mt-4 rounded-xl bg-amber-300 px-4 py-3 text-sm font-extrabold text-[#101b2a]">
               Clear filters
             </button>
           </div>
         )}
 
-        <section aria-label="Remaining national coverage" className="rounded-2xl border border-slate-700 bg-[#0b1d33] p-5 sm:p-6">
-          <h2 className="text-xl font-bold text-white">Remaining national register batches</h2>
+        <section aria-label="National coverage still to import" className="rounded-2xl border border-slate-700 bg-[#0b1d33] p-5 sm:p-6">
+          <h2 className="text-xl font-bold text-white">Coverage still to import and verify</h2>
           <p className="mt-2 text-sm leading-6 text-slate-400">
-            The current seed is only the public-university and TVET directory slice. DHET's cited 2026/27 baseline separately
-            lists {directorySeed.counts.cet_colleges_to_import_from_registry} CET colleges, {directorySeed.counts.private_higher_education_institutions_to_import_from_registry}
-            {" "}private higher-education institutions and {directorySeed.counts.other_private_colleges_to_import_from_registry} other private colleges. Those records, individual SETAs, QCTO/SAQA qualification-provider relationships, training providers and employer adverts need separate source-controlled batches.
+            The institution-record dataset remains limited to 26 public universities and 50 TVET colleges. The cross-sector
+            entries above are official discovery anchors, not 24 additional verified providers. Private higher education,
+            private colleges, CET colleges, individual employers, health facilities, accommodation operators, local service
+            organisations and other provider records must be sourced and verified in separate controlled batches.
           </p>
           <p className="mt-3 text-sm leading-6 text-slate-300">
-            For current opportunities, use <Link href="/candidate/opportunity-matches" className="font-bold text-amber-200 underline">verified opportunity discovery</Link>.
-            Kingsmen will show a programme as open only after the source, intake and deadline checks support that claim.
+            For currently verified opportunities, use <Link href="/candidate/opportunity-matches" className="font-bold text-amber-200 underline">verified opportunity discovery</Link>.
+            Kingsmen only presents an opportunity as open when its source and intake evidence pass the relevant verification checks.
           </p>
         </section>
 
         <footer className="border-t border-slate-700 pt-5 text-xs leading-5 text-slate-500">
-          Directory data is part of the public DHET listing snapshot dated {directorySeed.researched_at}. This page is a discovery aid, not an admissions decision or a provider-authorized submission channel. Candidate profile and saved application records remain in the authenticated Kingsmen workbench.
+          This directory combines the DHET public-university/TVET source snapshot dated {directorySeed.researched_at} with cross-sector
+          discovery anchors dated {crossSector.researched_at}. Provider data and source-anchor data are different record types.
+          The authenticated Kingsmen profile, private documents and saved application records remain in the candidate workbench.
         </footer>
       </div>
     </main>
