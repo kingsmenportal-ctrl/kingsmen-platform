@@ -12,7 +12,8 @@
     ],
     "section_b_policy": "The separate Dual System Pilot Project (DSPP) / Centres of Specialisation table at the end is not included in this batch; import it separately to avoid mixing the two lists.",
     "rendered_pdf_screenshot_status": "UNAVAILABLE_CACHE_MISS_IN_WEB_SCREENSHOT_TOOL",
-    "extraction_method": "Official PDF text extraction; each qualification/provider relationship remains provisional until row-by-row source layout verification."
+    "extraction_method": "Official PDF text extraction; each qualification/provider relationship remains provisional until row-by-row source layout verification.",
+    "column_heading_note": "The extracted PDF's first numeric field is labelled SAQA ID; the adjacent numeric field appears under the column heading NUMBER. It is stored as published_number without inferring a separate identifier system."
   },
   "policy": {
     "provider_listing_implies_open_intake": false,
@@ -139,7 +140,6 @@
   "programmes": [
     {
       "saqa_id": "93627",
-      "qualification_code": "60420001",
       "name": "Occupational Certificate: Bricklayer",
       "nqf_level": null,
       "nsfas_allowance": "NO",
@@ -178,11 +178,11 @@
       "partnership_status": "NOT_A_PARTNER",
       "integration_status": "NOT_CONNECTED",
       "automation_authorized": false,
-      "provider_receipt_supported": false
+      "provider_receipt_supported": false,
+      "published_number": "60420001"
     },
     {
       "saqa_id": "91761",
-      "qualification_code": "60420002",
       "name": "Occupational Certificate: Electrician",
       "nqf_level": null,
       "nsfas_allowance": "NO",
@@ -237,11 +237,11 @@
       "partnership_status": "NOT_A_PARTNER",
       "integration_status": "NOT_CONNECTED",
       "automation_authorized": false,
-      "provider_receipt_supported": false
+      "provider_receipt_supported": false,
+      "published_number": "60420002"
     },
     {
       "saqa_id": "97585",
-      "qualification_code": "60420003",
       "name": "Occupational Certificate: Millwright",
       "nqf_level": null,
       "nsfas_allowance": "NO",
@@ -269,11 +269,11 @@
       "partnership_status": "NOT_A_PARTNER",
       "integration_status": "NOT_CONNECTED",
       "automation_authorized": false,
-      "provider_receipt_supported": false
+      "provider_receipt_supported": false,
+      "published_number": "60420003"
     },
     {
       "saqa_id": "93626",
-      "qualification_code": "60420004",
       "name": "Occupational Certificate: Boilermaker",
       "nqf_level": null,
       "nsfas_allowance": "NO",
@@ -315,11 +315,11 @@
       "partnership_status": "NOT_A_PARTNER",
       "integration_status": "NOT_CONNECTED",
       "automation_authorized": false,
-      "provider_receipt_supported": false
+      "provider_receipt_supported": false,
+      "published_number": "60420004"
     },
     {
       "saqa_id": "102856",
-      "qualification_code": "60420005",
       "name": "Occupational Certificate: Rigger",
       "nqf_level": null,
       "nsfas_allowance": "NO",
@@ -340,11 +340,11 @@
       "partnership_status": "NOT_A_PARTNER",
       "integration_status": "NOT_CONNECTED",
       "automation_authorized": false,
-      "provider_receipt_supported": false
+      "provider_receipt_supported": false,
+      "published_number": "60420005"
     },
     {
       "saqa_id": "99255",
-      "qualification_code": "60420006",
       "name": "Occupational Certificate: Pipe Fitter",
       "nqf_level": null,
       "nsfas_allowance": "NO",
@@ -365,11 +365,11 @@
       "partnership_status": "NOT_A_PARTNER",
       "integration_status": "NOT_CONNECTED",
       "automation_authorized": false,
-      "provider_receipt_supported": false
+      "provider_receipt_supported": false,
+      "published_number": "60420006"
     },
     {
       "saqa_id": "91782",
-      "qualification_code": "60420007",
       "name": "Occupational Certificate: Plumber",
       "nqf_level": null,
       "nsfas_allowance": "NO",
@@ -409,11 +409,11 @@
       "partnership_status": "NOT_A_PARTNER",
       "integration_status": "NOT_CONNECTED",
       "automation_authorized": false,
-      "provider_receipt_supported": false
+      "provider_receipt_supported": false,
+      "published_number": "60420007"
     },
     {
       "saqa_id": "97592",
-      "qualification_code": "60420008",
       "name": "Occupational Certificate: Diesel Mechanic",
       "nqf_level": null,
       "nsfas_allowance": "NO",
@@ -449,11 +449,11 @@
       "partnership_status": "NOT_A_PARTNER",
       "integration_status": "NOT_CONNECTED",
       "automation_authorized": false,
-      "provider_receipt_supported": false
+      "provider_receipt_supported": false,
+      "published_number": "60420008"
     },
     {
       "saqa_id": "94100",
-      "qualification_code": "60420009",
       "name": "Occupational Certificate: Welder",
       "nqf_level": null,
       "nsfas_allowance": "NO",
@@ -503,11 +503,11 @@
       "partnership_status": "NOT_A_PARTNER",
       "integration_status": "NOT_CONNECTED",
       "automation_authorized": false,
-      "provider_receipt_supported": false
+      "provider_receipt_supported": false,
+      "published_number": "60420009"
     },
     {
       "saqa_id": "94021",
-      "qualification_code": "60420010",
       "name": "Occupational Certificate: Mechanical Fitter",
       "nqf_level": null,
       "nsfas_allowance": "NO",
@@ -538,11 +538,11 @@
       "partnership_status": "NOT_A_PARTNER",
       "integration_status": "NOT_CONNECTED",
       "automation_authorized": false,
-      "provider_receipt_supported": false
+      "provider_receipt_supported": false,
+      "published_number": "60420010"
     },
     {
       "saqa_id": "97990",
-      "qualification_code": "60420011",
       "name": "Occupational Certificate: Automotive Motor Mechanic",
       "nqf_level": null,
       "nsfas_allowance": "NO",
@@ -578,11 +578,11 @@
       "partnership_status": "NOT_A_PARTNER",
       "integration_status": "NOT_CONNECTED",
       "automation_authorized": false,
-      "provider_receipt_supported": false
+      "provider_receipt_supported": false,
+      "published_number": "60420011"
     },
     {
       "saqa_id": "96236",
-      "qualification_code": "60420012",
       "name": "Occupational Certificate: Carpenter",
       "nqf_level": null,
       "nsfas_allowance": "NO",
@@ -618,11 +618,11 @@
       "partnership_status": "NOT_A_PARTNER",
       "integration_status": "NOT_CONNECTED",
       "automation_authorized": false,
-      "provider_receipt_supported": false
+      "provider_receipt_supported": false,
+      "published_number": "60420012"
     },
     {
       "saqa_id": "94020",
-      "qualification_code": "60420013",
       "name": "Occupational Certificate: Fitter and Turner",
       "nqf_level": null,
       "nsfas_allowance": "NO",
@@ -660,11 +660,11 @@
       "partnership_status": "NOT_A_PARTNER",
       "integration_status": "NOT_CONNECTED",
       "automation_authorized": false,
-      "provider_receipt_supported": false
+      "provider_receipt_supported": false,
+      "published_number": "60420013"
     },
     {
       "saqa_id": "102497",
-      "qualification_code": "60420014",
       "name": "Occupational Certificate: Hairdressing",
       "nqf_level": null,
       "nsfas_allowance": "YES",
@@ -710,11 +710,11 @@
       "partnership_status": "NOT_A_PARTNER",
       "integration_status": "NOT_CONNECTED",
       "automation_authorized": false,
-      "provider_receipt_supported": false
+      "provider_receipt_supported": false,
+      "published_number": "60420014"
     },
     {
       "saqa_id": "97542",
-      "qualification_code": "234201000",
       "name": "Occupational Certificate: Early Childhood",
       "nqf_level": null,
       "nsfas_allowance": "YES",
@@ -755,11 +755,11 @@
       "partnership_status": "NOT_A_PARTNER",
       "integration_status": "NOT_CONNECTED",
       "automation_authorized": false,
-      "provider_receipt_supported": false
+      "provider_receipt_supported": false,
+      "published_number": "234201000"
     },
     {
       "saqa_id": "101697",
-      "qualification_code": "343401100",
       "name": "Occupational Certificate: Chef",
       "nqf_level": null,
       "nsfas_allowance": "YES",
@@ -798,11 +798,11 @@
       "partnership_status": "NOT_A_PARTNER",
       "integration_status": "NOT_CONNECTED",
       "automation_authorized": false,
-      "provider_receipt_supported": false
+      "provider_receipt_supported": false,
+      "published_number": "343401100"
     },
     {
       "saqa_id": "101408",
-      "qualification_code": "351201000",
       "name": "Occupational Certificate: Computer Technician",
       "nqf_level": null,
       "nsfas_allowance": "YES",
@@ -833,11 +833,11 @@
       "partnership_status": "NOT_A_PARTNER",
       "integration_status": "NOT_CONNECTED",
       "automation_authorized": false,
-      "provider_receipt_supported": false
+      "provider_receipt_supported": false,
+      "published_number": "351201000"
     },
     {
       "saqa_id": "99447",
-      "qualification_code": "313109000",
       "name": "Occupational Certificate: Solar Photovoltaic Service Technician",
       "nqf_level": null,
       "nsfas_allowance": "YES",
@@ -866,11 +866,11 @@
       "partnership_status": "NOT_A_PARTNER",
       "integration_status": "NOT_CONNECTED",
       "automation_authorized": false,
-      "provider_receipt_supported": false
+      "provider_receipt_supported": false,
+      "published_number": "313109000"
     },
     {
       "saqa_id": "121607",
-      "qualification_code": "514201001",
       "name": "National Occupational Certificate: Beauty Therapist",
       "nqf_level": "4",
       "nsfas_allowance": "YES",
@@ -892,11 +892,11 @@
       "partnership_status": "NOT_A_PARTNER",
       "integration_status": "NOT_CONNECTED",
       "automation_authorized": false,
-      "provider_receipt_supported": false
+      "provider_receipt_supported": false,
+      "published_number": "514201001"
     },
     {
       "saqa_id": "102296",
-      "qualification_code": "512101000",
       "name": "Occupational Certificate: Cook",
       "nqf_level": "4",
       "nsfas_allowance": "YES",
@@ -919,11 +919,11 @@
       "partnership_status": "NOT_A_PARTNER",
       "integration_status": "NOT_CONNECTED",
       "automation_authorized": false,
-      "provider_receipt_supported": false
+      "provider_receipt_supported": false,
+      "published_number": "512101000"
     },
     {
       "saqa_id": "98959",
-      "qualification_code": "331301000",
       "name": "Occupational Certificate: Bookkeeper (Year 1)",
       "nqf_level": "5",
       "nsfas_allowance": "YES",
@@ -947,11 +947,11 @@
       "partnership_status": "NOT_A_PARTNER",
       "integration_status": "NOT_CONNECTED",
       "automation_authorized": false,
-      "provider_receipt_supported": false
+      "provider_receipt_supported": false,
+      "published_number": "331301000"
     },
     {
       "saqa_id": "102161",
-      "qualification_code": "334102002",
       "name": "Occupational Certificate: Office Administrator",
       "nqf_level": "5",
       "nsfas_allowance": "YES",
@@ -972,11 +972,11 @@
       "partnership_status": "NOT_A_PARTNER",
       "integration_status": "NOT_CONNECTED",
       "automation_authorized": false,
-      "provider_receipt_supported": false
+      "provider_receipt_supported": false,
+      "published_number": "334102002"
     },
     {
       "saqa_id": "103219",
-      "qualification_code": "653201000",
       "name": "Occupational Certificate: Aircraft Maintenance Mechanic",
       "nqf_level": "5",
       "nsfas_allowance": "NO",
@@ -996,11 +996,11 @@
       "partnership_status": "NOT_A_PARTNER",
       "integration_status": "NOT_CONNECTED",
       "automation_authorized": false,
-      "provider_receipt_supported": false
+      "provider_receipt_supported": false,
+      "published_number": "653201000"
     },
     {
       "saqa_id": "102996",
-      "qualification_code": "652201100",
       "name": "Occupational Certificate: CNC Milling Machinist (Toolmaker)",
       "nqf_level": "4",
       "nsfas_allowance": "YES",
@@ -1020,11 +1020,11 @@
       "partnership_status": "NOT_A_PARTNER",
       "integration_status": "NOT_CONNECTED",
       "automation_authorized": false,
-      "provider_receipt_supported": false
+      "provider_receipt_supported": false,
+      "published_number": "652201100"
     },
     {
       "saqa_id": "103099",
-      "qualification_code": "652201100",
       "name": "Occupational Certificate: CNC Turning Machinist (Toolmaker)",
       "nqf_level": "4",
       "nsfas_allowance": "YES",
@@ -1047,11 +1047,11 @@
       "partnership_status": "NOT_A_PARTNER",
       "integration_status": "NOT_CONNECTED",
       "automation_authorized": false,
-      "provider_receipt_supported": false
+      "provider_receipt_supported": false,
+      "published_number": "652201100"
     },
     {
       "saqa_id": "94182",
-      "qualification_code": "643202001",
       "name": "Occupational Certificate: Vehicle Painter (Automobile and Marine Paint)",
       "nqf_level": "4",
       "nsfas_allowance": "NO",
@@ -1071,11 +1071,11 @@
       "partnership_status": "NOT_A_PARTNER",
       "integration_status": "NOT_CONNECTED",
       "automation_authorized": false,
-      "provider_receipt_supported": false
+      "provider_receipt_supported": false,
+      "published_number": "643202001"
     },
     {
       "saqa_id": "96364",
-      "qualification_code": "684904000",
       "name": "Occupational Certificate: Panel Beater",
       "nqf_level": "4",
       "nsfas_allowance": "NO",
@@ -1095,11 +1095,11 @@
       "partnership_status": "NOT_A_PARTNER",
       "integration_status": "NOT_CONNECTED",
       "automation_authorized": false,
-      "provider_receipt_supported": false
+      "provider_receipt_supported": false,
+      "published_number": "684904000"
     },
     {
       "saqa_id": "101876",
-      "qualification_code": "334302001",
       "name": "Occupational Certificate: Management Assistant",
       "nqf_level": "5",
       "nsfas_allowance": "YES",
@@ -1123,11 +1123,11 @@
       "partnership_status": "NOT_A_PARTNER",
       "integration_status": "NOT_CONNECTED",
       "automation_authorized": false,
-      "provider_receipt_supported": false
+      "provider_receipt_supported": false,
+      "published_number": "334302001"
     },
     {
       "saqa_id": "119262",
-      "qualification_code": "251201003",
       "name": "Occupational Certificate: Internet of Things Developer",
       "nqf_level": "4",
       "nsfas_allowance": "YES",
@@ -1148,11 +1148,11 @@
       "partnership_status": "NOT_A_PARTNER",
       "integration_status": "NOT_CONNECTED",
       "automation_authorized": false,
-      "provider_receipt_supported": false
+      "provider_receipt_supported": false,
+      "published_number": "251201003"
     },
     {
       "saqa_id": "118792",
-      "qualification_code": "251201002",
       "name": "Occupational Certificate: Artificial Intelligence Software Developer",
       "nqf_level": "5",
       "nsfas_allowance": "YES",
@@ -1173,11 +1173,11 @@
       "partnership_status": "NOT_A_PARTNER",
       "integration_status": "NOT_CONNECTED",
       "automation_authorized": false,
-      "provider_receipt_supported": false
+      "provider_receipt_supported": false,
+      "published_number": "251201002"
     },
     {
       "saqa_id": "118699",
-      "qualification_code": "252301001",
       "name": "Occupational Certificate: Cloud Administration",
       "nqf_level": "4",
       "nsfas_allowance": "YES",
@@ -1197,11 +1197,11 @@
       "partnership_status": "NOT_A_PARTNER",
       "integration_status": "NOT_CONNECTED",
       "automation_authorized": false,
-      "provider_receipt_supported": false
+      "provider_receipt_supported": false,
+      "published_number": "252301001"
     },
     {
       "saqa_id": "118986",
-      "qualification_code": "252901001",
       "name": "Occupational Certificate: Cybersecurity Analyst",
       "nqf_level": "5",
       "nsfas_allowance": "YES",
@@ -1222,11 +1222,11 @@
       "partnership_status": "NOT_A_PARTNER",
       "integration_status": "NOT_CONNECTED",
       "automation_authorized": false,
-      "provider_receipt_supported": false
+      "provider_receipt_supported": false,
+      "published_number": "252901001"
     },
     {
       "saqa_id": "118706",
-      "qualification_code": "333908001",
       "name": "Occupational Certificate: Marketing Coordinator",
       "nqf_level": "5",
       "nsfas_allowance": "YES",
@@ -1248,11 +1248,11 @@
       "partnership_status": "NOT_A_PARTNER",
       "integration_status": "NOT_CONNECTED",
       "automation_authorized": false,
-      "provider_receipt_supported": false
+      "provider_receipt_supported": false,
+      "published_number": "333908001"
     },
     {
       "saqa_id": "118689",
-      "qualification_code": "342301000",
       "name": "National Occupational Certificate: Fitness Instructor",
       "nqf_level": "4",
       "nsfas_allowance": "YES",
@@ -1272,11 +1272,11 @@
       "partnership_status": "NOT_A_PARTNER",
       "integration_status": "NOT_CONNECTED",
       "automation_authorized": false,
-      "provider_receipt_supported": false
+      "provider_receipt_supported": false,
+      "published_number": "342301000"
     },
     {
       "saqa_id": "96368",
-      "qualification_code": "333101000",
       "name": "Occupational Certificate: Clearing and Forwarding Agent",
       "nqf_level": "5",
       "nsfas_allowance": "YES",
@@ -1297,11 +1297,11 @@
       "partnership_status": "NOT_A_PARTNER",
       "integration_status": "NOT_CONNECTED",
       "automation_authorized": false,
-      "provider_receipt_supported": false
+      "provider_receipt_supported": false,
+      "published_number": "333101000"
     },
     {
       "saqa_id": "96396",
-      "qualification_code": "833301000",
       "name": "Occupational Certificate: Freight Handler",
       "nqf_level": "3",
       "nsfas_allowance": "YES",
@@ -1321,11 +1321,11 @@
       "partnership_status": "NOT_A_PARTNER",
       "integration_status": "NOT_CONNECTED",
       "automation_authorized": false,
-      "provider_receipt_supported": false
+      "provider_receipt_supported": false,
+      "published_number": "833301000"
     },
     {
       "saqa_id": "94025",
-      "qualification_code": "432301000",
       "name": "Occupational Certificate: Transport Clerk",
       "nqf_level": "4",
       "nsfas_allowance": "YES",
@@ -1345,11 +1345,11 @@
       "partnership_status": "NOT_A_PARTNER",
       "integration_status": "NOT_CONNECTED",
       "automation_authorized": false,
-      "provider_receipt_supported": false
+      "provider_receipt_supported": false,
+      "published_number": "432301000"
     },
     {
       "saqa_id": "103145",
-      "qualification_code": "332301000",
       "name": "Occupational Certificate: Retail Buyer",
       "nqf_level": "5",
       "nsfas_allowance": "YES",
@@ -1370,7 +1370,8 @@
       "partnership_status": "NOT_A_PARTNER",
       "integration_status": "NOT_CONNECTED",
       "automation_authorized": false,
-      "provider_receipt_supported": false
+      "provider_receipt_supported": false,
+      "published_number": "332301000"
     }
   ]
 }
