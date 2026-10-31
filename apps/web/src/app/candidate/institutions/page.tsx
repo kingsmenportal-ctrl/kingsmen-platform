@@ -213,6 +213,7 @@ function VerificationGrid({ item }: { item: DirectoryItem }) {
 export default function CandidateInstitutionDirectoryPage() {
   const [verifiedRoutes, setVerifiedRoutes] = useState<VerifiedProviderRoute[]>([]);
   const [routeStatus, setRouteStatus] = useState<"LOADING" | "READY" | "SIGN_IN_REQUIRED" | "UNAVAILABLE">("LOADING");
+  const [retryKey, setRetryKey] = useState(0);
   const [query, setQuery] = useState("");
   const [kind, setKind] = useState("ALL");
   const [sector, setSector] = useState("ALL");
@@ -242,7 +243,7 @@ export default function CandidateInstitutionDirectoryPage() {
     }
     void loadVerifiedRoutes();
     return () => { active = false; controller.abort(); };
-  }, []);
+  }, [retryKey]);
 
   const provinces = useMemo(() => unique(
     directorySeed.records.map(record => record.province).filter((value): value is string => Boolean(value))
@@ -261,7 +262,7 @@ export default function CandidateInstitutionDirectoryPage() {
       "a provider-authorized Kingsmen integration or partnership", "submission, provider receipt, admission, appointment or other outcome"
     ],
     verification: {
-      identity: "VERIFIED_REGISTRY_ENTRY_SCOPE_ONLY", accreditation: "NOT_VERIFIED_BY_THIS_PROVIDER_ROW",
+      identity: "SOURCE/ROUTE ENTRY VERIFIED; LEGAL STATUS NOT VERIFIED", accreditation: "NOT_VERIFIED_BY_THIS_PROVIDER_ROW",
       availability: "RECHECK_EACH_CURRENT_NOTICE_OR_SERVICE", eligibility: "UNKNOWN", intake: "NOT_PROVED_BY_PROVIDER_ROW",
       route: "OFFICIAL_SOURCE_URL_LISTED; ROUTE RULES REQUIRE RECHECK", integration: "NOT_CONNECTED", partnership: "NOT_ESTABLISHED"
     }
@@ -274,7 +275,7 @@ export default function CandidateInstitutionDirectoryPage() {
       .filter(item => kind === "ALL" || item.kind === kind)
       .filter(item => sector === "ALL" || item.sectorKeys.includes(sector))
       .filter(item => location === "ALL"
-        || (location === "NATIONAL_SOURCE" && item.kind === "OFFICIAL_SOURCE")
+        || (location === "NATIONAL_SOURCE" && item.kind !== "INSTITUTION" && !item.province)
         || (location === "LOCATION_NOT_RECORDED" && item.kind === "INSTITUTION" && !item.province)
         || item.province === location)
       .filter(item => capability === "ALL" || item.serviceCapabilities.includes(capability))
@@ -344,8 +345,8 @@ export default function CandidateInstitutionDirectoryPage() {
           <h2 className="font-bold text-white">Live verified provider/source records</h2>
           {routeStatus === "READY" && <p className="mt-2 text-sm text-slate-300">{verifiedRoutes.length} public-safe, high-confidence records returned by the authenticated, read-only Supabase route.</p>}
           {routeStatus === "LOADING" && <p className="mt-2 text-sm text-slate-400">Loading authorised directory records…</p>}
-          {routeStatus === "SIGN_IN_REQUIRED" && <p className="mt-2 text-sm text-slate-400">Sign in to load current verified provider/source records. The source manifest and DHET seed remain available as discovery evidence.</p>}
-          {routeStatus === "UNAVAILABLE" && <p className="mt-2 text-sm text-yellow-100">Live records could not be loaded. Unverified data will not be substituted.</p>}
+          {routeStatus === "SIGN_IN_REQUIRED" && <p className="mt-2 text-sm text-slate-400">Sign in to load current verified provider/source records. The source manifest and DHET seed remain available as discovery evidence. <Link href="/candidate/login" className="font-bold text-amber-200 underline">Sign in</Link></p>}
+          {routeStatus === "UNAVAILABLE" && <div className="mt-2 flex flex-wrap items-center gap-3"><p className="text-sm text-yellow-100">Live records could not be loaded. Unverified data will not be substituted.</p><button type="button" onClick={() => setRetryKey(value => value + 1)} className="rounded-xl border border-slate-600 px-3 py-2 text-xs font-bold text-white">Retry live directory</button></div>}
         </section>
 
         <section role="note" aria-label="Verification boundary" className="rounded-2xl border border-yellow-500/40 bg-yellow-950/30 p-5">
