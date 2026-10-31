@@ -77,13 +77,6 @@ const capabilityBySource: Record<string, string[]> = {
   govza_national_departments: ["PUBLIC_SERVICE"],
   govza_local_government: ["PUBLIC_SERVICE"],
   dpsa_vacancies: ["EMPLOYMENT"],
-  dhet_private_colleges_register_2026: ["TVET"],
-  dhet_private_higher_education_register_2026: ["HIGHER_EDUCATION"],
-  dhet_registered_pset_masterlist: ["HIGHER_EDUCATION", "TVET", "SETA_LEARNERSHIPS"],
-  nsfas_institution_directory: ["HIGHER_EDUCATION", "TVET"],
-  dhet_national_skills_fund: ["HIGHER_EDUCATION", "TVET", "SETA_LEARNERSHIPS", "APPRENTICESHIPS"],
-  funza_lushaka_bursary: ["HIGHER_EDUCATION"],
-  nsfas_official: ["HIGHER_EDUCATION", "TVET"]
   dbe_school_emis: ["BASIC_EDUCATION"],
   cipc_company_registry: ["BUSINESS_REGISTRATION"],
   dhet_skills_seta_qcto_saqa: ["HIGHER_EDUCATION", "TVET", "SETA_LEARNERSHIPS", "APPRENTICESHIPS"],
@@ -94,7 +87,7 @@ const capabilityBySource: Record<string, string[]> = {
   nsfas_institution_directory: ["FUNDING", "HIGHER_EDUCATION", "TVET"],
   dhet_national_skills_fund: ["FUNDING"],
   funza_lushaka_bursary: ["FUNDING", "HIGHER_EDUCATION"],
-  nsfas_official: ["FUNDING", "SOCIAL_SUPPORT"]
+  nsfas_official: ["FUNDING", "SOCIAL_SUPPORT"],
   health_department_directory: ["HEALTH_AND_CARE"],
   hpcsa_professional_register: ["HEALTH_AND_CARE"],
   sassa_official: ["SOCIAL_SUPPORT"],
@@ -116,6 +109,13 @@ const capabilityBySource: Record<string, string[]> = {
 const pathwayBySource: Record<string, string[]> = {
   dhet_skills_seta_qcto_saqa: ["HIGHER_EDUCATION", "TVET", "SETA_LEARNERSHIPS", "APPRENTICESHIPS"],
   dpsa_vacancies: ["EMPLOYMENT"],
+  dhet_private_colleges_register_2026: ["TVET"],
+  dhet_private_higher_education_register_2026: ["HIGHER_EDUCATION"],
+  dhet_registered_pset_masterlist: ["HIGHER_EDUCATION", "TVET", "SETA_LEARNERSHIPS"],
+  nsfas_institution_directory: ["HIGHER_EDUCATION", "TVET"],
+  dhet_national_skills_fund: ["HIGHER_EDUCATION", "TVET", "SETA_LEARNERSHIPS", "APPRENTICESHIPS"],
+  funza_lushaka_bursary: ["HIGHER_EDUCATION"],
+  nsfas_official: ["HIGHER_EDUCATION", "TVET"],
   job_portal_provider_authorized: ["EMPLOYMENT", "INTERNSHIPS", "APPRENTICESHIPS", "SETA_LEARNERSHIPS"],
   eskom_official: ["EMPLOYMENT"],
   sars_official: ["EMPLOYMENT"]
