@@ -44,7 +44,8 @@ function splitEntries(text){
  const flush=()=>{if(current)entries.push(current);current=null;};
  for(const line of text.replace(/\r/g,"").split("\n")){
   const t=line.trim();
-  const isStatusSection = t === t.toUpperCase() && /^(SECTION\s+[AB]\b.*|\d+\.\s+.*\b(?:REGISTERED INSTITUTIONS|PROVISIONALLY REGISTERED|CANCELLED|LAPSED|WITHDRAWN|DEREGISTERED)\b.*)$/i.test(t);\n  if(isStatusSection){flush();section=t;continue;}
+  const isStatusSection = t === t.toUpperCase() && /^(SECTION\s+[AB]\b.*|\d+\.\s+.*\b(?:REGISTERED INSTITUTIONS|PROVISIONALLY REGISTERED|CANCELLED|LAPSED|WITHDRAWN|DEREGISTERED)\b.*)$/i.test(t);
+  if(isStatusSection){flush();section=t;continue;}
   const m=line.match(/^\s{0,8}(\d{1,3})\.\s+([A-ZÀ-ÖØ-Þ][^\n]{2,})\s*$/);
   const isEntry=m&&!/^(?:NQF|N\d|CONTACT PERSON|SECTION|REGISTER|PROGRAMME|QUALIFICATION|EXAM CENTRE)/i.test(m[2].trim());
   if(isEntry){flush();current={number:Number(m[1]),first:m[2].trim(),section,lines:[line.replace(/\r$/,"")]};}
