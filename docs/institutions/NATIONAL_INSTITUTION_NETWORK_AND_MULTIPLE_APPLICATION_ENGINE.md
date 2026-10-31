@@ -100,3 +100,10 @@ This branch adds an official-source coverage contract and design plan only. It d
 - Per route: prepared, candidate approved, submit attempts, confirmed provider receipts, rejected/unknown/failed, ambiguous-after-timeout, duplicate prevention and median time to receipt.
 - Candidate A/B isolation, least-privilege negative tests, consent checks, document-access proof, audit completeness and retention/deletion outcomes.
 - Partner status only after a written agreement/pilot and recorded scope; directory presence never counts as partnership.
+
+
+## Executable route contract
+
+The companion manifest `manifests/institutions/institution-application-route-capabilities.json` records the current route strategy without implying a live integration. It distinguishes CAO's parent-with-choice-children flow from one destination-specific child for each direct TVET, non-CAO university, private provider, SETA/employer advert or public-service vacancy. Current integration status remains `NOT_CONNECTED`, automated submission remains disabled, and provider approval/test-environment evidence is absent. The root test suite checks these boundaries via `npm run institutions:routes:check`.
+
+For public service vacancies, DPSA is a discovery source; the official circular says candidates must forward the application to the department in which the vacancy exists and include the reference number. Kingsmen must therefore resolve the exact employer/department channel from each advert rather than “submit to DPSA.” For CAO, the current public application page says only one application is accepted for a specific entry year and term. Kingsmen's existing six-choice draft editor must be reconciled against the current route terms before a live adapter is enabled.
