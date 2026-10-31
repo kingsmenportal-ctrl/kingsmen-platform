@@ -22,6 +22,15 @@ function status(section,block,kind){
  if(/provisionally registered|provisional registration/.test(s))return "PROVISIONAL";
  return "STATUS_UNRESOLVED";
 }
+function redactSourceExcerpt(block){
+ return block.split("\n").filter(line=>{
+  const t=line.trim();
+  return !/^(CONTACT PERSON|CONTACT DETAILS|TEL\\.?|TELEPHONE|MOBILE|FAX|EMAIL|E-MAIL|E MAIL|E-MAIL ADDRESS|EMAIL ADDRESS|CONTACT NUMBER|PRINCIPAL|REGISTRAR)\\b/i.test(t)
+   && !/^(MR|MRS|MS|MISS|DR|PROF|PROFESSOR|MX)\\.?\\s+/i.test(t)
+   && !/[A-Z0-9._%+-]+@[A-Z0-9.-]+\\.[A-Z]{2,}/i.test(t)
+   && !/(?:\\+?\\d[\\d ()/-]{7,}\\d)/.test(t);
+ }).join("\n").slice(0,12000);
+}
 function splitEntries(text){
  const entries=[];let section="",current=null;
  const flush=()=>{if(current)entries.push(current);current=null;};
@@ -55,7 +64,7 @@ export function extractRecords(text,kind){
    registration_identifiers_observed:ids,registration_status:regStatus,registration_status_review_required:["STATUS_UNRESOLVED","WITHDRAWN_OR_DEREGISTERED_REVIEW"].includes(regStatus),
    province_candidates:provinces,province_status:provinces.length===1?"SOURCE_LISTED_CANDIDATE":provinces.length?"MULTI_PROVINCE_REVIEW":"NOT_EXTRACTED",
    campus_sites:[],campus_extraction_status:"MANUAL_REVIEW_REQUIRED",alias_candidates:aliases,possible_duplicate_within_source:duplicate,
-   source_excerpt:block.slice(0,12000),source_evidence_scope:"DHET register entry only; not a live application route or current opportunity",
+   source_excerpt:redactSourceExcerpt(block),source_evidence_scope:"DHET register entry only; not a live application route or current opportunity",
    identity_review_status:"NEEDS_CANONICAL_IDENTITY_REVIEW",official_route_status:"NOT_VERIFIED",integration_status:"NOT_CONNECTED",automation_authorized:false,import_eligible:false};
  });
 }
