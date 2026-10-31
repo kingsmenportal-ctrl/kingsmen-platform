@@ -16,6 +16,9 @@ const yesterday = "2026-10-30T11:00:00Z";
 
 assert.deepEqual(applicationReadinessStates.provider, contract.provider_states.map((x) => x.state));
 assert.deepEqual(applicationReadinessStates.opportunity, contract.opportunity_states.map((x) => x.state));
+assert.equal(contract.freshness_policy.missing_invalid_future_or_stale_timestamp_fails_closed, true);
+assert.equal(contract.evidence_rules.official_domain_required_for_source_and_route_urls, true);
+assert.equal(contract.evidence_rules.candidate_readiness_is_not_an_admission_or_employment_decision, true);
 
 const verifiedProvider = {
   provider_key: "example-provider",
@@ -98,6 +101,18 @@ assert.equal(evaluateOpportunityReadiness({
   ...verifiedOpportunity,
   deadline: "2026-10-30T23:59:00+02:00",
 }, { asOf }).state, "O1_SOURCE_VERIFIED", "Past deadline must prevent current-open status");
+assert.equal(evaluateOpportunityReadiness({
+  ...verifiedOpportunity,
+  deadline: "2026-10-30",
+}, { asOf }).state, "O1_SOURCE_VERIFIED", "Date-only deadline before South African local date must expire");
+assert.equal(evaluateOpportunityReadiness({
+  ...verifiedOpportunity,
+  deadline: "2026-10-31",
+}, { asOf }).state, "O1_SOURCE_VERIFIED", "Today's date-only deadline without published cutoff time must fail closed");
+assert.equal(evaluateOpportunityReadiness({
+  ...verifiedOpportunity,
+  deadline: "2026-11-06",
+}, { asOf }).state, "O3_REQUIREMENTS_MAPPED", "Future South African date-only deadline must not be prematurely expired");
 assert.equal(evaluateOpportunityReadiness({
   ...verifiedOpportunity,
   requirements: { ...verifiedOpportunity.requirements, review_status: "NEEDS_REVIEW" },
