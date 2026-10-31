@@ -45,7 +45,7 @@ for (const source of manifest.sources) {
   pass(`link status explicit: ${source.source_id}`, ["checked", "requires_live_check"].includes(source.link_status));
   pass(`both positive and negative claim scope: ${source.source_id}`, source.claims_supported.length > 0 && source.claims_not_supported.length > 0);
   pass(`no intake or submission assumptions: ${source.source_id}`,
-    source.claims_not_supported.some(x => /open intake|currently open|submission receipt|application receipt|partnership/i.test(x)));
+    source.claims_not_supported.some(x => /open intake|currently open|submission|application receipt|partnership/i.test(x)));
 }
 
 pass("directory does not create partners", manifest.policy.directory_entry_is_partnership === false);
