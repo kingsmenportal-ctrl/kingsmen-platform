@@ -13,6 +13,10 @@ for(const [i,r] of (m.records??[]).entries()){
  if(/\b(Bachelor|Higher Certificate|FET Certificate|General Education and Training|National Certificate|Diploma|NQF Level)\b/i.test(r.canonical_name_candidate??""))failures.push("programme/qualification text leaked into institution name at "+i);
  if(!r.source_url?.startsWith("https://www.dhet.gov.za/"))failures.push("missing official provenance at "+i);
  if(!r.source_snapshot_date||!r.source_record_ref)failures.push("missing snapshot key at "+i);
+ if(!r.source_section||r.source_section==="UNSECTIONED")failures.push("entry has no recognized source status section at "+i);
+ if((r.province_candidates??[]).length>1)failures.push("province candidates are not scoped to one registration-ID line at "+i);
+ if(r.registration_identifier&&!new RegExp(r.source_register==="private_higher_education"?"^\\d{4}\\/HE\\d{2}\\/\\d{3}$":"^\\d{4}\\/(?:S?FE)\\d{2}\\/\\d{3}$","i").test(r.registration_identifier))failures.push("malformed registration identifier at "+i);
+ if((r.canonical_name_candidate??"").length<4)failures.push("institution name candidate too short at "+i);
  if(r.import_eligible!==false||r.official_route_status!=="NOT_VERIFIED"||r.integration_status!=="NOT_CONNECTED"||r.automation_authorized!==false)failures.push("unsafe activation state at "+i);
  if(!Array.isArray(r.province_candidates)||!Array.isArray(r.alias_candidates)||!Array.isArray(r.registration_identifiers_observed)||!Array.isArray(r.campus_site_candidates)||!Array.isArray(r.conflict_flags))failures.push("candidate arrays missing at "+i);
  const ref=r.source_register+"|"+r.source_snapshot_date+"|"+r.source_record_ref;if(sourceRefs.has(ref))failures.push("duplicate source key "+ref);sourceRefs.add(ref);
@@ -44,5 +48,12 @@ for(const [key,group] of ids){
 }
 if(perKind.private_higher_education<50)failures.push("private higher-education extraction count unexpectedly low: "+perKind.private_higher_education);
 if(perKind.private_colleges<30)failures.push("private-college extraction count unexpectedly low: "+perKind.private_colleges);
+const observedSections=Object.fromEntries([...new Set((m.records??[]).map(r=>r.source_section))].sort().map(s=>[s,(m.records??[]).filter(r=>r.source_section===s).length]));
+if(JSON.stringify(observedSections)!==JSON.stringify(m.counts?.section_counts))failures.push("section counts do not reconcile to source records");
+for(const [register,counts] of Object.entries(m.counts?.status_counts_by_register??{})){
+ const actual=Object.fromEntries(["REGISTERED","PROVISIONAL","CANCELLED","LAPSED","STATUS_UNRESOLVED","WITHDRAWN_OR_DEREGISTERED_REVIEW"].map(s=>[s,(m.records??[]).filter(r=>r.source_register===register&&r.registration_status===s).length]));
+ if(JSON.stringify(actual)!==JSON.stringify(counts))failures.push("per-register status counts do not reconcile for "+register);
+}
+if(!m.counts?.section_counts||Object.keys(m.counts.section_counts).some(s=>s==="UNSECTIONED"))failures.push("status-section extraction is incomplete");
 if(failures.length){console.error("DHET manifest validation failed:\n"+failures.slice(0,100).join("\n"));process.exit(1);}
 console.log("PASS DHET full-register candidate validation",JSON.stringify({total:m.records.length,perKind,counts:m.counts,registrationIdentifierConflictGroups:conflictGroups,duplicateGroups,routeSafety:"all candidates remain disconnected"}));
