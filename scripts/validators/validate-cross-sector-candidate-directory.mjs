@@ -71,7 +71,22 @@ check("directory has a private Kingsmen planning action for canonical institutio
 check("SETA and funder provider records are explicitly mapped to application pathways", page.includes("isSetaProvider") && page.includes("SETA_LEARNERSHIPS") && page.includes("FUNDING_PROVIDER"));
 check("candidate application UI sends a planning-only provider target action", (() => { const applicationPage = fs.readFileSync(path.join(root, "apps/web/src/app/candidate/applications/page.tsx"), "utf8"); const apiRoute = fs.readFileSync(path.join(root, "apps/web/src/app/api/candidate/applications/route.ts"), "utf8"); const edgePath = path.join(root, "supabase/functions/candidate-application-preparation/index.ts"); const edge = fs.readFileSync(edgePath, "utf8"); return applicationPage.includes("plan_directory_target") && applicationPage.includes("Save planning target") && apiRoute.includes("plan_directory_target") && edge.includes('if(p.action==="plan_directory_target")') && edge.includes("PROVIDER_NOT_IMPORTED") && edge.includes("provider_submission_sent:false") && edge.includes("source_confidence:\"UNVERIFIED\"") && edge.includes("planning_status:\"PLANNING\""); })());
 check("provider planning requires verified candidate identity and server-derived candidate ownership", (() => { const edge = fs.readFileSync(path.join(root, "supabase/functions/candidate-application-preparation/index.ts"), "utf8"); return edge.includes("candidate_auth_identity_links") && edge.includes('.eq("link_status","VERIFIED")') && edge.includes("const candidateId=link.candidate_id") && edge.includes("created_by_auth_user_id:authData.user.id"); })());
-check("review-only SETA/funder seed migration exists and cannot publish providers or connectors", (() => { const migrationPath = path.join(root, "db/migrations/0101_seed_seta_and_funding_provider_directory.sql"); if (!fs.existsSync(migrationPath)) return false; const sql = fs.readFileSync(migrationPath, "utf8"); return (sql.match(/\(\x27seta_[a-z0-9]+\x27,/g) ?? []).length === 21 && sql.includes("NEEDS_REVIEW") && sql.includes("public_safe") && sql.includes("NOT_CONNECTED") && sql.includes("ON CONFLICT (provider_key) DO NOTHING") && !/UPDATE\s+public\.route_providers/i.test(sql); })());
+check("review-only SETA/funder seed migration exists and cannot publish providers or connectors", (() => {
+  const migrationPath = path.join(root, "db/migrations/0101_seed_seta_and_funding_provider_directory.sql");
+  if (!fs.existsSync(migrationPath)) return false;
+  const sql = fs.readFileSync(migrationPath, "utf8");
+  const start = sql.indexOf("WITH provider_seed(");
+  const end = sql.indexOf("),\nsource_linked AS", start);
+  if (start < 0 || end < 0) return false;
+  const seedValues = sql.slice(start, end);
+  const setaRows = sources.filter(row => /^seta_[a-z0-9]+_official$/.test(row.source_id));
+  const keys = [...setaRows.map(row => row.provider_key), "funder_nsf", "funder_funza_lushaka"];
+  return setaRows.length === 21
+    && keys.length === 23 && keys.every(key => key && seedValues.includes("('" + key + "',"))
+    && sql.includes("NEEDS_REVIEW") && sql.includes("public_safe") && sql.includes("NOT_CONNECTED")
+    && sql.includes("ON CONFLICT (provider_key) DO NOTHING")
+    && !/UPDATE\s+public\.route_providers/i.test(sql);
+})());
 check("candidate workbench and verified opportunity feed remain linked",
   page.includes('href="/candidate/applications"') && page.includes('href="/candidate/opportunity-matches"'));
 check("live records are loaded without changing database state or claiming a provider integration", page.includes("NOT_CONNECTED") && page.includes("does not verify every programme or intake") && api.includes("export async function GET") && !api.includes("POST("));
