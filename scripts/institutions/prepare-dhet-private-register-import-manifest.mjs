@@ -30,9 +30,9 @@ for(const r of source.records){
 const candidate={...source,status:"IMPORT_CANDIDATE_SUBSET_NOT_AUTHORIZED",counts:{...(source.counts??{}),full_candidate_records:source.records.length,import_candidate_records:eligible.length,excluded_records:excluded.length},records:eligible,excluded_record_refs:excluded};
 if(eligible.length){
  const errors=validateManifest(candidate);
- if(errors.length)throw Error("filtered import candidate subset failed migration-generator validation:\\n"+errors.slice(0,50).join("\\n"));
+ if(errors.length)throw Error("filtered import candidate subset failed migration-generator validation:\n"+errors.slice(0,50).join("\n"));
 }else{
  candidate.status="NO_REVIEWED_IMPORT_RECORDS_BLOCKED";
 }
-fs.writeFileSync(output,JSON.stringify(candidate,null,2)+"\\n");
+fs.writeFileSync(output,JSON.stringify(candidate,null,2)+"\n");
 console.log(JSON.stringify({status:candidate.status,full_candidate_records:source.records.length,import_candidate_records:eligible.length,excluded_records:excluded.length,exclusion_reasons:Object.fromEntries([...new Set(excluded.flatMap(x=>x.reasons))].map(k=>[k,excluded.filter(x=>x.reasons.includes(k)).length])),import_authorized:false,staging_changed:false,sql_generation:eligible.length?"eligible subset only":"intentionally skipped: no reviewed rows"},null,2));
