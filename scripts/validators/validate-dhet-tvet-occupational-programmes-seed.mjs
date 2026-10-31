@@ -62,7 +62,7 @@ for (const name of rawProviderNames) {
 }
 check("every source provider name either matches a directory label or has an explicit alias candidate", unmapped.length === 0, unmapped.join("; "));
 check("every alias points to an existing TVET seed entry and remains review-only", aliasIssues.length === 0, aliasIssues.join("; "));
-check("source extraction limitations are explicit", data.source.rendered_pdf_screenshot_status === "UNAVAILABLE_CACHE_MISS_IN_WEB_SCREENSHOT_TOOL" && data.source.extraction_method.includes("human visual verification"));
+check("source extraction limitations are explicit", data.source.rendered_pdf_screenshot_status === "UNAVAILABLE_CACHE_MISS_IN_WEB_SCREENSHOT_TOOL" && data.source.extraction_method.includes("human visual verification") && data.programmes.every(item => item.transcription_status === "NEEDS_HUMAN_SOURCE_LAYOUT_REVIEW"));
 check("duplicate provider mentions have transcription notes", programmes.every(item => new Set(item.colleges).size === item.colleges.length || (item.transcription_notes?.length ?? 0) > 0));
 
 const result = {
