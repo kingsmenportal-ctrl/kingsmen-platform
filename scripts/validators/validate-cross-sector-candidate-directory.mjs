@@ -44,13 +44,17 @@ check("cross-sector anchor inventory includes all 21 SETAs as individual discove
 check("official private-college, private-HEI, CET, PSET and NSFAS institution directories are present", privateRegisterSources);
 const publicEmployerKeys = ["soe_acsa","soe_denel","soe_prasa","soe_saa","soe_sabc","soe_sanral","soe_sapo","soe_telkom","soe_transnet"];
 check("GCIS official list of 123 SOEs/public institutions is linked", sources.some(row => row.source_id === "gcis_public_entities_and_soe_directory" && row.url === "https://www.gov.za/about-government/contact-directory/soe-s"));
+const gcisProfileSources = sources.filter(row => row.metadata?.gcis_profile_url || row.metadata?.official_gcis_profile_url);
+check("all 123 individual GCIS government profiles are represented exactly once", gcisProfileSources.length === 123 && new Set(gcisProfileSources.map(row => row.metadata.gcis_profile_url ?? row.metadata.official_gcis_profile_url)).size === 123 && new Set(gcisProfileSources.map(row => row.provider_key)).size === 123);
+check("each GCIS profile has a canonical provider planning key", gcisProfileSources.every(row => typeof row.provider_key === "string" && row.provider_key.length >= 3));
+check("public-entity provider profiles are mapped to Employment planning", page.includes("isPublicEntityEmployer") && page.includes('["EMPLOYMENT"]'));
 check("nine nationally listed public employers have individual official website/profile anchors", publicEmployerKeys.every(key => sources.some(row => row.provider_key === key && row.url?.startsWith("https://"))));
 check("candidate directory maps and exposes public-employer planning records", page.includes("EMPLOYER_PROVIDER") && page.includes("EMPLOYMENT") && page.includes("Prepare with Kingsmen"));
 check("candidate directory maps municipal, school, health, PSET and bursary discovery sources", ["gcis_provincial_local_municipal_directory","dhet_pset_landscape_2026_27","lurits_registered_school_masterlist","national_health_facility_master_list","govza_bursary_funding_guide"].every(id => page.includes(id)));
 check("candidate directory links NSFAS accommodation portal to accommodation discovery and planning", page.includes("nsfas_accommodation_directory") && page.includes("ACCOMMODATION_PROVIDER") && page.includes("nsfas_accommodation_portal"));
 check("named SETA and funder provider records link to canonical provider keys for planning", providerKeys.includes("funder_nsf") && providerKeys.includes("funder_funza_lushaka") && page.includes("source.provider_key ?? null"));
-check("cross-sector anchor inventory retains 70 or more records and 15 classes",
-  sources.length >= 70 && extension.institution_classes.length === 15);
+check("cross-sector anchor inventory retains 177 or more records and 15 classes",
+  sources.length >= 177 && extension.institution_classes.length === 15);
 check("every source anchor remains review-required and disconnected",
   sources.every(row => row.review_required === true && row.connector_state === "NOT_CONNECTED" &&
     Array.isArray(row.supports) && Array.isArray(row.does_not_prove)));
