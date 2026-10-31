@@ -1,0 +1,56 @@
+name: CAO Privileges and Active Candidate Cap Integration
+
+on:
+  push:
+    branches: [fix/cao-privileges-active-cap-2026-10-31]
+    paths:
+      - "supabase/migrations/20261029194500_reconcile_cao_client_privileges_and_active_candidate_cap.sql"
+      - "scripts/staging/test-cao-active-cap-migration.mjs"
+      - ".github/workflows/cao-active-cap-integration.yml"
+      - "package.json"
+  pull_request:
+    branches: [feat/national-institution-usability-2026-10-31, ops/backup-restore-safety-current-rc-2026-10-30]
+    paths:
+      - "supabase/migrations/20261029194500_reconcile_cao_client_privileges_and_active_candidate_cap.sql"
+      - "scripts/staging/test-cao-active-cap-migration.mjs"
+      - ".github/workflows/cao-active-cap-integration.yml"
+      - "package.json"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  postgres-integration:
+    name: postgres-17-cao-privilege-and-cap-tests
+    runs-on: ubuntu-24.04
+    timeout-minutes: 10
+    services:
+      postgres:
+        image: postgres:17
+        env:
+          POSTGRES_USER: postgres
+          POSTGRES_PASSWORD: postgres
+          POSTGRES_DB: kingsmen_cao_capacity_test
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd "pg_isready -U postgres -d kingsmen_cao_capacity_test"
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 10
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+          cache: "npm"
+      - name: Install isolated test dependency
+        run: npm install --prefix apps/api --no-audit --no-fund
+      - name: Test migration against disposable PostgreSQL 17
+        run: node scripts/staging/test-cao-active-cap-migration.mjs
+        env:
+          KINGSMEN_CAO_CAP_TEST_ALLOW_MUTATION: "true"
+          KINGSMEN_CAO_CAP_TEST_DATABASE_URL: postgres://postgres:postgres@127.0.0.1:5432/kingsmen_cao_capacity_test
