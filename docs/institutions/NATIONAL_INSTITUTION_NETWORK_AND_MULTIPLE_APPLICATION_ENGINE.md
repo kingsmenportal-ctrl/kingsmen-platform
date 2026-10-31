@@ -74,6 +74,8 @@ Playwright proves browser interaction happened, not institutional acceptance. Th
 
 Read-only inspection of staging (31 October 2026) found:
 - `route_providers`: 3 rows — CAO, Department of Employment and Labour vacancies, and NSFAS route;
+- `source_authorities`: 21 rows; `opportunity_source_authorities`: 21 rows. These are source-authority anchors, not a populated directory of individual institutions/programmes. Only one `source_authorities.last_verified_at` value was non-null at this read. Do not treat the remaining anchors as freshly rechecked merely because `verification_required=true`.
+- Source URL reconciliation item: the existing `dhet_universities` source anchor points to `https://www.dhet.gov.za/SitePages/Universities.aspx`, while the official DHET public-universities page found in this research is `https://www.dhet.gov.za/SitePages/UniversitiesinSA.aspx`. Validate the redirect/current owner page before changing the anchor; preserve the former URL as history/evidence rather than silently overwriting it.
 - `opportunity_providers`, `opportunity_programmes`, `external_source_observations`, `opportunity_deadlines`, `opportunity_eligibility_rules`, `opportunity_verification_reviews`, and `route_sources`: 0 rows each.
 - Existing schema, source-intelligence rules, N15 source ingestion, candidate-feed restrictions, opportunity save and six pathway UI exist in code, but they are not evidence of nationwide populated coverage or current intakes.
 - PR #216 is open/unmerged. Its source/build checks passed historically on exact heads, but there is no authenticated candidate journey proof and no Netlify published commit/route verification.
