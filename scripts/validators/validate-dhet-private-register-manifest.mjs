@@ -11,7 +11,7 @@ for(const [i,r] of (m.records??[]).entries()){
  if(!Object.hasOwn(perKind,r.source_register))failures.push("unknown source register at "+i);else perKind[r.source_register]++;
  if(!r.canonical_name_candidate||!r.normalized_name_key)failures.push("missing normalized institution name at "+i);
  if(r.name_extraction_status!=="REVIEW_REQUIRED")failures.push("name candidate is not explicitly marked for manual review at "+i);
- if(/@[A-Z0-9.-]+|\\bwww\\.|CONTACT PERSON|CONTACT DETAILS|\\b(?:TEL\\.?|TELEPHONE|MOBILE|CELL|FAX|EMAIL|E-MAIL|REGISTRAR|MANAGER|PRINCIPAL|PO BOX|PRIVATE BAG|POSTNET)\\b|\\b(?:Bachelor|Higher Certificate|FET Certificate|Diploma|NQF Level|HEQSF)\\b/i.test(r.canonical_name_candidate??""))failures.push("name candidate contains contact, address or qualification-column contamination at "+i);
+ if(/@[A-Z0-9.-]+|\bwww\.|CONTACT PERSON|CONTACT DETAILS|\b(?:TEL\.?|TELEPHONE|MOBILE|CELL|FAX|EMAIL|E-MAIL|REGISTRAR|MANAGER|PRINCIPAL|PO BOX|PRIVATE BAG|POSTNET)\b|\b(?:Bachelor|Higher Certificate|FET Certificate|Diploma|NQF Level|HEQSF)\b/i.test(r.canonical_name_candidate??""))failures.push("name candidate contains contact, address or qualification-column contamination at "+i);
  if(/\b(Bachelor|Higher Certificate|FET Certificate|General Education and Training|National Certificate|Diploma|NQF Level)\b/i.test(r.canonical_name_candidate??""))failures.push("programme/qualification text leaked into institution name at "+i+": "+String(r.canonical_name_candidate??"").slice(0,160));
  if(!r.source_url?.startsWith("https://www.dhet.gov.za/"))failures.push("missing official provenance at "+i);
  if(!r.source_snapshot_date||!r.source_record_ref)failures.push("missing snapshot key at "+i);
