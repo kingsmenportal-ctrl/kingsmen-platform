@@ -136,6 +136,86 @@ Deno.serve(async(req:Request)=>{
   return reply(200,{ready:true,saved:true,opportunity:savedOpportunity,target, target_key:target.target_key,
    message:"Saved from the current approved N15 match with fresh official-source evidence. No provider application was submitted."},origin);
  }
+ if(p.action==="plan_directory_target"){
+  const providerKey=typeof p.provider_key==="string"?p.provider_key.trim():"";
+  const pathwayType=typeof p.pathway_type==="string"?p.pathway_type.trim():"";
+  const programmeOrRole=typeof p.programme_or_role==="string"?p.programme_or_role.trim():"";
+  const allowedPathways=new Set(["HIGHER_EDUCATION","TVET","SETA_LEARNERSHIP","INTERNSHIP","APPRENTICESHIP","EMPLOYMENT"]);
+  if(!/^[a-z0-9_:-]{3,100}$/i.test(providerKey))return reply(400,{ready:false,code:"PROVIDER_KEY_INVALID",error:"Choose an institution/provider from the Kingsmen directory."},origin);
+  if(!allowedPathways.has(pathwayType))return reply(400,{ready:false,code:"PATHWAY_NOT_SUPPORTED",error:"Choose one of Kingsmen's six supported pathways."},origin);
+  if(programmeOrRole.length<2||programmeOrRole.length>240||/[\\u0000-\\u001f]/.test(programmeOrRole))return reply(400,{ready:false,code:"PROGRAMME_OR_ROLE_INVALID",error:"Enter a programme, service or role between 2 and 240 characters."},origin);
+
+  const {data:provider,error:providerError}=await admin.from("route_providers")
+   .select("provider_key,provider_name,provider_type,base_url,verification_status,public_safe,default_confidence_band,source_authority_id,notes")
+   .eq("provider_key",providerKey).maybeSingle();
+  if(providerError){console.error("directory planning provider lookup failed",providerError.code??"unknown");return reply(503,{ready:false,code:"PROVIDER_REGISTRY_UNAVAILABLE",error:"The provider registry could not be checked. No planning target was saved."},origin);}
+  if(!provider)return reply(404,{ready:false,code:"PROVIDER_NOT_IMPORTED",error:"This directory entry has not yet been imported into Kingsmen's canonical provider registry. You can still view its official source, but a saved application plan is not available yet."},origin);
+  if(["BLOCKED","RISK","STALE"].includes(String(provider.verification_status)))return reply(409,{ready:false,code:"PROVIDER_NOT_SAFE_TO_PLAN",error:"This provider record is blocked, risky or stale. Kingsmen has not created a plan."},origin);
+
+  const allowedByProviderType:Record<string,string[]> = {
+   UNIVERSITY:["HIGHER_EDUCATION"],
+   TVET:["TVET"],
+   SETA:["SETA_LEARNERSHIP","APPRENTICESHIP"],
+   LEARNERSHIP_PROVIDER:["SETA_LEARNERSHIP","APPRENTICESHIP"],
+   BURSARY_PROVIDER:["HIGHER_EDUCATION","TVET","SETA_LEARNERSHIP","INTERNSHIP","APPRENTICESHIP"],
+   ACCOMMODATION_PROVIDER:["HIGHER_EDUCATION","TVET","SETA_LEARNERSHIP","INTERNSHIP","APPRENTICESHIP","EMPLOYMENT"],
+   EMPLOYER:["EMPLOYMENT","INTERNSHIP","APPRENTICESHIP","SETA_LEARNERSHIP"],
+   PRIVATE_COLLEGE:["HIGHER_EDUCATION","TVET","SETA_LEARNERSHIP"],
+   APPLICATION_PORTAL:["HIGHER_EDUCATION","TVET"],
+   GOVERNMENT_AUTHORITY:["HIGHER_EDUCATION","TVET","EMPLOYMENT"],
+   QUALITY_AUTHORITY:["SETA_LEARNERSHIP","APPRENTICESHIP"]
+  };
+  const specialProviderPathways:Record<string,string[]> = {
+   nsfas_official:["HIGHER_EDUCATION","TVET"],
+   labour_department_vacancies:["EMPLOYMENT"],
+   cao_official:["HIGHER_EDUCATION","TVET"]
+  };
+  const permitted=(specialProviderPathways[providerKey]??allowedByProviderType[String(provider.provider_type)]??[]);
+  if(!permitted.includes(pathwayType))return reply(409,{ready:false,code:"PROVIDER_PATHWAY_MISMATCH",error:"This pathway does not match the provider's registered service type. No plan was saved."},origin);
+
+  const digest=await crypto.subtle.digest("SHA-256",new TextEncoder().encode(providerKey+"|"+pathwayType+"|"+programmeOrRole.toLocaleLowerCase()));
+  const digestHex=Array.from(new Uint8Array(digest)).map(byte=>byte.toString(16).padStart(2,"0")).join("").slice(0,32);
+  const targetKey=("DIR-"+providerKey+"-"+digestHex).slice(0,120);
+  const idempotencyKey="DIR-PLAN-"+digestHex;
+
+  const {data:existing,error:existingError}=await admin.from("candidate_master_application_targets")
+   .select("id,target_key,pathway_type,provider_name,programme_or_role,provider_application_url,source_reference,source_confidence,planning_status,application_id,created_at,updated_at")
+   .eq("candidate_id",candidateId).eq("target_key",targetKey).maybeSingle();
+  if(existingError){console.error("directory planning duplicate lookup failed",existingError.code??"unknown");return reply(503,{ready:false,code:"PLANNING_LOOKUP_FAILED",error:"Could not check for an existing planning target."},origin);}
+
+  let target=existing;
+  if(!target){
+   const sourceReference="Kingsmen provider registry: "+provider.provider_key+"; directory planning only; registry state="+provider.verification_status+"; source authority id="+String(provider.source_authority_id??"not linked");
+   const {data:created,error:createError}=await admin.from("candidate_master_application_targets").insert({
+    candidate_id:candidateId,target_key:targetKey,pathway_type:pathwayType,
+    provider_name:String(provider.provider_name).trim().slice(0,180),
+    programme_or_role:programmeOrRole,
+    provider_application_url:null,
+    source_reference:sourceReference,
+    source_confidence:"UNVERIFIED",
+    planning_status:"PLANNING",
+    idempotency_key:idempotencyKey,
+    created_by_auth_user_id:authData.user.id,
+    application_id:null
+   }).select("id,target_key,pathway_type,provider_name,programme_or_role,provider_application_url,source_reference,source_confidence,planning_status,application_id,created_at,updated_at").single();
+   if(createError||!created){console.error("directory planning target insert failed",createError?.code??"unknown");return reply(503,{ready:false,code:"PLANNING_TARGET_SAVE_FAILED",error:"The provider plan could not be saved. No provider application was sent."},origin);}
+   target=created;
+  }
+
+  const {error:auditError}=await admin.from("candidate_master_application_events").upsert({
+   candidate_id:candidateId,actor_auth_user_id:authData.user.id,event_type:"TARGETS_PLANNED",idempotency_key:idempotencyKey,
+   details:{action:"DIRECTORY_PROVIDER_PLAN_CREATED",target_key:targetKey,provider_key:provider.provider_key,
+    provider_type:provider.provider_type,provider_verification_status:provider.verification_status,
+    provider_public_safe:provider.public_safe,source_confidence:"UNVERIFIED",planning_status:"PLANNING",
+    pathway_type:pathwayType,programme_or_role:programmeOrRole,provider_submission_sent:false,
+    provider_receipt_confirmed:false,provider_integration:"NOT_CONNECTED"}
+  },{onConflict:"candidate_id,event_type,idempotency_key"});
+  if(auditError){console.error("directory planning audit write failed",auditError.code??"unknown");return reply(503,{ready:false,code:"PLANNING_AUDIT_FAILED",error:"The target was saved but its audit event could not be reconciled. Refresh the tracker before retrying."},origin);}
+
+  return reply(200,{ready:true,saved:true,target,created:!existing,
+   provider_submission_sent:false,provider_integration:"NOT_CONNECTED",
+   message:"Private Kingsmen planning target saved. This is not a provider application, open programme, verified intake or submission. Kingsmen will require current programme, eligibility and route evidence before preparing a provider-specific application."},origin);
+ }
  if(p.action==="prepare_master_application"){
   const targetKey=typeof p.target_key==="string"?p.target_key.trim():"";
   if(!targetKey||targetKey.length>120)return reply(400,{ready:false,code:"TARGET_KEY_INVALID",error:"A valid saved application target is required."},origin);
