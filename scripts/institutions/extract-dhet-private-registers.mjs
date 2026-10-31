@@ -94,7 +94,7 @@ export function extractRecords(text,kind){
    province_candidates:provinceSet,province_status:provinceSet.length===1?"SOURCE_LISTED_CANDIDATE":provinceSet.length?"MULTI_PROVINCE_REVIEW":"NOT_EXTRACTED",
    campus_sites:[],campus_site_candidates:campusCandidates,campus_extraction_status:campusCandidates.length?"REVIEW_REQUIRED":"NOT_EXTRACTED",
    alias_candidates:aliases,possible_duplicate_within_source:duplicate,
-   source_excerpt:redactSourceExcerpt(block),source_evidence_scope:"DHET register entry only; not a live application route or current opportunity",
+   source_excerpt:redactSourceExcerpt(e.lines.slice(0,1).join("\\n")),source_evidence_scope:"DHET register entry only; not a live application route or current opportunity",
    identity_review_status:"NEEDS_CANONICAL_IDENTITY_REVIEW",identity_conflict_status:"NOT_YET_RECONCILED",conflict_flags:[],
    official_route_status:"NOT_VERIFIED",integration_status:"NOT_CONNECTED",automation_authorized:false,import_eligible:false};
  });
