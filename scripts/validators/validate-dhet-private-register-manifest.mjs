@@ -20,6 +20,7 @@ for(const [i,r] of (m.records??[]).entries()){
  if(r.registration_identifier&&!new RegExp(r.source_register==="private_higher_education"?"^\\d{4}\\/HE\\d{2}\\/\\d{3}$":"^\\d{4}\\/(?:S?FE)\\d{2}\\/\\d{3}$","i").test(r.registration_identifier))failures.push("malformed registration identifier at "+i);
  if((r.canonical_name_candidate??"").length<4)failures.push("institution name candidate too short at "+i);
  if(r.import_eligible!==false||r.official_route_status!=="NOT_VERIFIED"||r.integration_status!=="NOT_CONNECTED"||r.automation_authorized!==false)failures.push("unsafe activation state at "+i);
+ if(r.registration_status==="DISCONTINUATION_REQUESTED_REVIEW"&&(r.registration_status_review_required!==true||r.registration_identifier!==null||(r.registration_identifiers_observed??[]).length!==0))failures.push("requested discontinuation must remain unresolved and identifier-free at "+i);
  if(!Array.isArray(r.province_candidates)||!Array.isArray(r.alias_candidates)||!Array.isArray(r.registration_identifiers_observed)||!Array.isArray(r.campus_site_candidates)||!Array.isArray(r.conflict_flags))failures.push("candidate arrays missing at "+i);
  const ref=r.source_register+"|"+r.source_snapshot_date+"|"+r.source_record_ref;if(sourceRefs.has(ref))failures.push("duplicate source key "+ref);sourceRefs.add(ref);
  for(const id of r.registration_identifiers_observed??[]){const k=r.source_register+"|"+r.source_snapshot_date+"|"+id.toLowerCase();const group=ids.get(k)||[];group.push(r);ids.set(k,group);}
@@ -53,7 +54,7 @@ if(perKind.private_colleges<30)failures.push("private-college extraction count u
 const observedSections=Object.fromEntries([...new Set((m.records??[]).map(r=>r.source_section))].sort().map(s=>[s,(m.records??[]).filter(r=>r.source_section===s).length]));
 if(JSON.stringify(observedSections)!==JSON.stringify(m.counts?.section_counts))failures.push("section counts do not reconcile to source records");
 for(const [register,counts] of Object.entries(m.counts?.status_counts_by_register??{})){
- const actual=Object.fromEntries(["REGISTERED","PROVISIONAL","CANCELLED","LAPSED","STATUS_UNRESOLVED","WITHDRAWN_OR_DEREGISTERED_REVIEW"].map(s=>[s,(m.records??[]).filter(r=>r.source_register===register&&r.registration_status===s).length]));
+ const actual=Object.fromEntries(["REGISTERED","PROVISIONAL","CANCELLED","LAPSED","WITHDRAWN_OR_DEREGISTERED_REVIEW","DISCONTINUATION_REQUESTED_REVIEW","STATUS_UNRESOLVED"].map(s=>[s,(m.records??[]).filter(r=>r.source_register===register&&r.registration_status===s).length]));
  if(JSON.stringify(actual)!==JSON.stringify(counts))failures.push("per-register status counts do not reconcile for "+register);
 }
 if(!m.counts?.section_counts||Object.keys(m.counts.section_counts).some(s=>s==="UNSECTIONED"))failures.push("status-section extraction is incomplete");
