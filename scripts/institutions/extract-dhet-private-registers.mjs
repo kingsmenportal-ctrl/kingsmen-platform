@@ -86,6 +86,7 @@ export function extractRecords(text,kind){
    if(!firstSegment)continue;
    if(/^(?:[A-Z]\)\s|\d+[.)]\s|\d{4}\/|\(\d{3}\)|\+?\d[\d ()/-]{6,})/i.test(firstSegment)||/\d/.test(firstSegment))continue;
    if(/(?:@|www\.|http|street|road|avenue|drive|office park|building|po box|private bag|postnet|postal|pretoria|johannesburg|cape town|durban|bellville|centurion|randburg|polokwane|bloemfontein|gqeberha|east london|rustenburg|midrand|waterkloof|zebediela|motatantanye|village|nqf|heqsf|higher certificate|bachelor|diploma|qualification|contact mode|distance mode|salary|requirements|duties|applications|closing date)/i.test(firstSegment))continue;
+   if(!/(?:\bPty\b|\bLtd\b|\bNPC\b|\bCC\b|\bLimited\b|\bGroup\b|\bCollege\b|\bSchool\b|\bAcademy\b|\bInstitute\b|\bUniversity\b|\bTechnology\b|\bManagement\b|\bTraining\b|\bServices\b|\bHoldings\b|\bEducation\b|\bBusiness\b|\bCentre\b|\bCenter\b|\bDevelopers\b|\bCompany\b|\bCorporation\b|\bTrust\b|\bFoundation\b|\bSeminary\b|\bTheological\b|\bStudies\b|\bOpleiding\b|\bNPC\b|\(Die\)|\(The\))/i.test(firstSegment))continue;
    if(firstSegment.length>80)continue;
    nameParts.push(firstSegment);
   }
