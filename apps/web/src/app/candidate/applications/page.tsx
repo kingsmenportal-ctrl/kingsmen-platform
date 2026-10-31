@@ -67,6 +67,36 @@ type ApplicationEvent = {
   reason_code: string | null; evidence_ref: string | null; details: Record<string, unknown> | null; created_at: string
 };
 type DirectoryPlanDraft = { providerKey: string; providerName: string; pathway: string; programmeOrRole: string };
+type VaultDocument = {
+  id: string; document_type: string; original_filename: string; mime_type: string;
+  size_bytes: number; status: string; uploaded_at: string | null;
+};
+type ApplicationPacket = {
+  id: string; packet_ref: string; target_id: string; pathway_type: string;
+  provider_key: string; provider_name: string; programme_or_role: string;
+  packet_status: string; template_status: string;
+  candidate_profile_snapshot: Record<string,string>;
+  application_answers: Record<string,string>;
+  missing_profile_fields: string[];
+  selected_document_count: number;
+  provider_requirements_status: string;
+  provider_submission_sent: boolean; provider_receipt_confirmed: boolean;
+  provider_integration_state: string; created_at: string; updated_at: string;
+};
+type PacketDocument = {
+  id: string; packet_id: string; private_document_id: string;
+  document_type_snapshot: string; original_filename_snapshot: string; selected_at: string;
+};
+type PacketDraft = { answers: Record<string,string>; selectedDocumentIds: string[] };
+const PACKET_ANSWER_FIELDS = [
+  ["motivation_statement", "Motivation statement", 3000],
+  ["experience_summary", "Experience summary", 3000],
+  ["skills_summary", "Skills and strengths", 1800],
+  ["qualification_summary", "Qualification summary", 1800],
+  ["availability", "Availability", 500],
+  ["preferred_location", "Preferred location", 180],
+  ["additional_information", "Additional information", 1800]
+] as const;
 const CORE_PATHWAYS = ["HIGHER_EDUCATION", "TVET", "SETA_LEARNERSHIP", "INTERNSHIP", "APPRENTICESHIP", "EMPLOYMENT"];
 
 function explain(payload: unknown): string {
@@ -109,6 +139,10 @@ export default function CandidateApplicationsPage() {
   const [error,setError] = useState("");
   const [notice,setNotice] = useState("");
   const [directoryPlan,setDirectoryPlan] = useState<DirectoryPlanDraft>({ providerKey:"", providerName:"", pathway:"HIGHER_EDUCATION", programmeOrRole:"" });
+  const [applicationPackets,setApplicationPackets] = useState<ApplicationPacket[]>([]);
+  const [packetDocuments,setPacketDocuments] = useState<PacketDocument[]>([]);
+  const [availableDocuments,setAvailableDocuments] = useState<VaultDocument[]>([]);
+  const [packetDrafts,setPacketDrafts] = useState<Record<string,PacketDraft>>({});
 
   const request = useCallback(async (method:"GET"|"POST", payload?:Record<string,unknown>) => {
     const token = getCandidateAccessToken();
@@ -135,6 +169,18 @@ export default function CandidateApplicationsPage() {
       setParentApplications(Array.isArray(body.parentApplications) ? body.parentApplications as ParentApplication[] : []);
       setMasterEvents(Array.isArray(body.masterEvents) ? body.masterEvents as MasterEvent[] : []);
       setApplicationEvents(Array.isArray(body.applicationEvents) ? body.applicationEvents as ApplicationEvent[] : []);
+      const loadedPackets = Array.isArray(body.applicationPackets) ? body.applicationPackets as ApplicationPacket[] : [];
+      const loadedPacketDocuments = Array.isArray(body.packetDocuments) ? body.packetDocuments as PacketDocument[] : [];
+      setApplicationPackets(loadedPackets);
+      setPacketDocuments(loadedPacketDocuments);
+      setAvailableDocuments(Array.isArray(body.availableDocuments) ? body.availableDocuments as VaultDocument[] : []);
+      setPacketDrafts(Object.fromEntries(loadedPackets.map(packet => [
+        packet.target_id,
+        {
+          answers: packet.application_answers ?? {},
+          selectedDocumentIds: loadedPacketDocuments.filter(document => document.packet_id === packet.id).map(document => document.private_document_id)
+        }
+      ])));
       setDrafts(Object.fromEntries(loadedTrackers.map(t=>[t.id,{status:t.status,note:t.candidate_note ?? "",evidence:t.evidence_reference ?? ""}])));
       setItemDrafts(Object.fromEntries(loadedItems.map(i=>[i.id,{status:i.status,note:i.candidate_note ?? "",evidence:i.evidence_reference ?? ""}])));
       setNotice("");
@@ -177,6 +223,42 @@ export default function CandidateApplicationsPage() {
     } finally {
       setBusy("");
     }
+  }
+
+  async function saveApplicationPacket(event:FormEvent<HTMLFormElement>, target:MasterTarget) {
+    event.preventDefault();
+    const draft = packetDrafts[target.id] ?? { answers: {}, selectedDocumentIds: [] };
+    setBusy("packet:" + target.id); setError(""); setNotice("");
+    try {
+      const body = await request("POST", {
+        action: "prepare_application_packet",
+        target_key: target.target_key,
+        application_answers: draft.answers,
+        selected_document_ids: draft.selectedDocumentIds
+      });
+      await load();
+      setNotice(typeof body.message === "string" ? body.message : "Reusable application preparation packet saved. Provider requirements remain unverified.");
+    } catch (e) {
+      setError(e instanceof Error ? e.message : "Could not save the reusable application packet.");
+    } finally {
+      setBusy("");
+    }
+  }
+
+  function updatePacketAnswer(targetId:string, field:string, value:string) {
+    setPacketDrafts(old => {
+      const current = old[targetId] ?? { answers: {}, selectedDocumentIds: [] };
+      return { ...old, [targetId]: { ...current, answers: { ...current.answers, [field]: value } } };
+    });
+  }
+
+  function togglePacketDocument(targetId:string, documentId:string, checked:boolean) {
+    setPacketDrafts(old => {
+      const current = old[targetId] ?? { answers: {}, selectedDocumentIds: [] };
+      const selected = new Set(current.selectedDocumentIds);
+      if (checked) selected.add(documentId); else selected.delete(documentId);
+      return { ...old, [targetId]: { ...current, selectedDocumentIds: Array.from(selected) } };
+    });
   }
 
   async function saveTracker(event:FormEvent<HTMLFormElement>, tracker:Tracker) {
@@ -277,6 +359,51 @@ export default function CandidateApplicationsPage() {
                 <p className="mt-1 text-xs text-slate-400">Last saved: {new Date(application.updated_at).toLocaleString()}</p>
               </div>}
               {target.provider_application_url && <a href={target.provider_application_url} target="_blank" rel="noopener noreferrer" className="mt-3 inline-block break-all text-sm text-cyan-300 underline">Open official provider page</a>}
+              {target.source_reference?.startsWith("Kingsmen provider registry:") && <details className="mt-4 rounded-2xl border border-amber-300/25 bg-slate-950/50 p-4">
+                <summary className="cursor-pointer text-sm font-bold text-amber-100">Prepare reusable application information and documents</summary>
+                {(() => {
+                  const packet = applicationPackets.find(item => item.target_id === target.id);
+                  const draft = packetDrafts[target.id] ?? { answers: packet?.application_answers ?? {}, selectedDocumentIds: packetDocuments.filter(item => item.packet_id === packet?.id).map(item => item.private_document_id) };
+                  return <div className="mt-4 space-y-4">
+                    {packet && <div className="rounded-xl border border-slate-700 bg-slate-900 p-3 text-xs leading-5 text-slate-300">
+                      **Packet {packet.packet_ref}** · {packet.packet_status.replaceAll("_"," ")}
+                      <p className="mt-1">Provider template: {packet.template_status.replaceAll("_"," ")} · Requirements: {packet.provider_requirements_status} · Integration: {packet.provider_integration_state}</p>
+                      <p className="mt-1">Missing saved profile fields: {packet.missing_profile_fields.length ? packet.missing_profile_fields.join(", ") : "None detected"}</p>
+                      <p className="mt-1">Selected Document Vault files: {packet.selected_document_count}</p>
+                    </div>}
+                    <p className="text-xs leading-5 text-slate-400">Kingsmen will reuse your consented profile fields and attach references to files already in your private Document Vault. This is a generic preparation packet, not a completed provider form. Add only information that is appropriate for this application.</p>
+                    <div className="grid gap-3 md:grid-cols-2">
+                      {PACKET_ANSWER_FIELDS.map(([field,label,max]) => <label key={field} className="block text-xs font-semibold text-slate-300">
+                        {label} <span className="font-normal text-slate-500">(max {max} characters)</span>
+                        <textarea maxLength={max} rows={field==="motivation_statement"||field==="experience_summary"||field==="additional_information"?4:2}
+                          value={draft.answers[field] ?? ""}
+                          onChange={event=>updatePacketAnswer(target.id,field,event.target.value)}
+                          className="mt-2 w-full rounded-xl border border-slate-700 bg-slate-900 px-3 py-3 text-sm font-normal text-white" />
+                      </label>)}
+                    </div>
+                    <div className="rounded-xl border border-slate-700 p-3">
+                      <div className="flex flex-wrap items-center justify-between gap-2">
+                        <h4 className="text-sm font-bold text-white">Choose documents from your Document Vault</h4>
+                        <a href="/candidate/documents" className="text-xs font-semibold text-cyan-300 underline">Open Document Vault</a>
+                      </div>
+                      {availableDocuments.length===0
+                        ? <p className="mt-2 text-xs leading-5 text-slate-400">No uploaded, under-review or verified files are available. Upload documents to your private Document Vault first.</p>
+                        : <div className="mt-3 grid gap-2 sm:grid-cols-2">
+                          {availableDocuments.map(document=><label key={document.id} className="flex items-start gap-2 rounded-lg border border-slate-800 p-3 text-xs text-slate-300">
+                            <input type="checkbox" checked={draft.selectedDocumentIds.includes(document.id)} onChange={event=>togglePacketDocument(target.id,document.id,event.target.checked)} className="mt-0.5" />
+                            <span className="min-w-0"><span className="block break-words font-semibold text-white">{document.original_filename}</span><span className="mt-1 block text-slate-400">{document.document_type.replaceAll("_"," ")} · {document.status.replaceAll("_"," ")} · {Math.ceil(document.size_bytes/1024)} KB</span></span>
+                          </label>)}
+                        </div>}
+                      <p className="mt-2 text-xs text-slate-500">{draft.selectedDocumentIds.length} selected · up to 20 documents. Only file references are attached; the binary files stay in your private vault.</p>
+                    </div>
+                    <button type="button" onClick={event=>void saveApplicationPacket(event as any,target)} disabled={busy==="packet:"+target.id}
+                      className="rounded-xl bg-amber-300 px-4 py-3 text-sm font-extrabold text-slate-950 disabled:opacity-50">
+                      {busy==="packet:"+target.id?"Saving packet…":"Save reusable application packet"}
+                    </button>
+                    <p className="text-xs leading-5 text-slate-500">Provider-specific requirements, forms, eligibility, application routes and deadlines remain NOT VERIFIED until source evidence and a provider-specific review are recorded. Kingsmen has not sent anything to this provider. There is no submission or receipt claim.</p>
+                  </div>;
+                })()}
+              </details>}
               <div className="mt-4 border-t border-slate-700 pt-4">
                 <h4 className="font-semibold">Application timeline</h4>
                 {events.length === 0 ? <p className="mt-2 text-sm text-slate-400">No timeline events have been returned for this target yet.</p> : <ol className="mt-3 space-y-3">
