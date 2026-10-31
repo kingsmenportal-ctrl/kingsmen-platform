@@ -85,10 +85,24 @@ Deno.serve(async (req: Request) => {
         observedAtMs > checkedAtMs || checkedAtMs > now.getTime() || staleAfterMs <= now.getTime() ||
         staleAfterMs <= checkedAtMs || !Array.isArray(observation.evidence_refs) || !observation.evidence_refs.length) continue;
     const { data: deadlines } = await admin.from("opportunity_deadlines")
-      .select("deadline_ref,opens_at,closes_at,deadline_status,evidence_refs,timezone")
+      .select("deadline_ref,opens_at,closes_at,closes_on,deadline_status,evidence_refs,timezone")
       .eq("programme_ref", programme.programme_ref).eq("deadline_status", "CONFIRMED")
-      .gt("closes_at", now.toISOString()).order("closes_at", { ascending: true }).limit(1);
-    const deadline = deadlines?.[0] ?? null;
+      .limit(10);
+    const localDateParts = new Intl.DateTimeFormat("en-CA", {
+      timeZone: "Africa/Johannesburg", year: "numeric", month: "2-digit", day: "2-digit"
+    }).formatToParts(now);
+    const part = (type: string) => localDateParts.find(item => item.type === type)?.value ?? "";
+    const localToday = `${part("year")}-${part("month")}-${part("day")}`;
+    const deadline = (deadlines ?? []).find(item => {
+      if (item.closes_at) {
+        const closeMs = Date.parse(item.closes_at);
+        if (Number.isFinite(closeMs) && closeMs > now.getTime()) return true;
+      }
+      // Official adverts often publish a date but no closing time. Preserve
+      // date-only semantics instead of inventing a timestamp.
+      return typeof item.closes_on === "string" && /^\d{4}-\d{2}-\d{2}$/.test(item.closes_on) &&
+        item.closes_on >= localToday;
+    }) ?? null;
     if (deadline && (!Array.isArray(deadline.evidence_refs) || !deadline.evidence_refs.length)) continue;
     results.push({
       match_ref: match.candidate_match_ref,
@@ -101,7 +115,7 @@ Deno.serve(async (req: Request) => {
       match_score: match.match_score,
       source_checked_at: observation.last_checked_at,
       source_evidence: observation.evidence_refs,
-      deadline: deadline ? { closes_at: deadline.closes_at, timezone: deadline.timezone, evidence: deadline.evidence_refs } : { status: "NOT_VERIFIED", message: "No current confirmed deadline is available; check the official page." },
+      deadline: deadline ? { closes_at: deadline.closes_at, closes_on: deadline.closes_on, timezone: deadline.timezone, evidence: deadline.evidence_refs } : { status: "NOT_VERIFIED", message: "No current confirmed deadline is available; check the official page." },
       eligibility: { status: "REQUIRES_CANDIDATE_REVIEW", rules: "Only separately evidenced and reviewed eligibility rules may be used." },
       recommendation_summary: match.recommendation_summary
     });
