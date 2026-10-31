@@ -10,7 +10,7 @@
   "scripts": {
     "candidate:experience:check": "node scripts/validators/validate-candidate-experience-vertical-slice.mjs && node scripts/validators/validate-candidate-reviewer-portal.mjs",
     "candidate:profile:e2e": "node scripts/staging/test-candidate-profile-persistence-e2e.mjs",
-    "test": "node scripts/validators/validate-jarvis-core.mjs && node scripts/validators/validate-jarvis-live-pass-02.mjs && node scripts/staging/test-kingsmen-operating-evidence-reconciliation.mjs && npm run n14:connectors:check && npm run n15:sources:check && npm run n15:ingestion:check && npm run backend:simplification:check && npm run security:validate:client-non-dml && npm run capacity:validate && npm run security:validate:cao-0096-provenance && npm run institutions:network:check && npm run institutions:routes:check && npm run institutions:seed:check && npm run institutions:migration:check && npm run institutions:occupational:check && npm run institutions:occupational-migration:check && npm run institutions:directory:check && npm run institutions:cross-sector:check && npm run institutions:cross-sector-directory:check && npm run institutions:seta-funder:check && npm run institutions:public-employers:check && npm run candidate:application-packet:check && npm run institutions:nsfas-accommodation:check && npm run institutions:gcis-123:check",
+    "test": "node scripts/validators/validate-jarvis-core.mjs && node scripts/validators/validate-jarvis-live-pass-02.mjs && node scripts/staging/test-kingsmen-operating-evidence-reconciliation.mjs && npm run n14:connectors:check && npm run n15:sources:check && npm run n15:ingestion:check && npm run backend:simplification:check && npm run security:validate:client-non-dml && npm run capacity:validate && npm run security:validate:cao-0096-provenance && npm run institutions:network:check && npm run institutions:routes:check && npm run institutions:seed:check && npm run institutions:migration:check && npm run institutions:occupational:check && npm run institutions:occupational-migration:check && npm run institutions:directory:check && npm run institutions:cross-sector:check && npm run institutions:cross-sector-directory:check && npm run institutions:seta-funder:check && npm run institutions:public-employers:check && npm run candidate:application-packet:check && npm run institutions:nsfas-accommodation:check && npm run institutions:gcis-123:check && npm run institutions:employer-portals:check",
     "jarvis:validate": "node scripts/validators/validate-jarvis-connected-live.mjs",
     "jarvis:validate:core": "node scripts/validators/validate-jarvis-core.mjs",
     "jarvis:validate:live-pass-02": "node scripts/validators/validate-jarvis-live-pass-02.mjs",
@@ -125,7 +125,8 @@
     "institutions:public-employers:check": "node scripts/validators/validate-gcis-public-employer-provider-migration.mjs",
     "candidate:application-packet:check": "node scripts/validators/validate-candidate-application-packet-contract.mjs",
     "institutions:nsfas-accommodation:check": "node scripts/validators/validate-nsfas-accommodation-portal-migration.mjs",
-    "institutions:gcis-123:check": "node scripts/validators/validate-gcis-public-entity-profile-migration.mjs"
+    "institutions:gcis-123:check": "node scripts/validators/validate-gcis-public-entity-profile-migration.mjs",
+    "institutions:employer-portals:check": "node scripts/validators/validate-dpsa-private-employer-provider-migration.mjs"
   },
   "repository": {
     "type": "git",
