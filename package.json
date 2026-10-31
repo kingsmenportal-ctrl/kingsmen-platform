@@ -130,7 +130,8 @@
     "institutions:readiness:check": "node scripts/validators/validate-institution-application-readiness.mjs",
     "institutions:usability:check": "node scripts/validators/validate-national-institution-usability-batch.mjs",
     "institutions:coverage-gap:check": "node scripts/validators/validate-institution-coverage-gap-register.mjs",
-    "security:validate:cao-cap-0108": "node scripts/validators/validate-cao-privileges-active-cap-migration.mjs"
+    "security:validate:cao-cap-0108": "node scripts/validators/validate-cao-privileges-active-cap-migration.mjs",
+    "security:test:cao-cap-integration": "node scripts/staging/test-cao-active-cap-migration.mjs"
   },
   "repository": {
     "type": "git",
