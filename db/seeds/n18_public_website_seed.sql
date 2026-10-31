@@ -10,7 +10,10 @@ insert into public.public_website_runtime_config (config_key, config_value, conf
 ('ACCOMMODATION_SUPPORT_PRICE_ZAR','179.00'::jsonb,'PRICING',true),
 ('ACCOMMODATION_SUPPORT_INCLUDED_ROUTES','8'::jsonb,'PRICING',true),
 ('PAID_PACKAGES_INCLUDE_ACC01_ROUTES','8'::jsonb,'PRICING',true),
-('PUBLIC_SITE_EMAIL_FIRST_WHATSAPP_URGENT_ONLY','true'::jsonb,'COMMS',true),
+('PUBLIC_SITE_EMAIL_FIRST_WHATSAPP_URGENT_ONLY','false'::jsonb,'COMMS',true),
+('PUBLIC_SITE_EMAIL_PORTAL_ONLY','true'::jsonb,'COMMS',true),
+('PUBLIC_SITE_WHATSAPP_DISABLED','true'::jsonb,'COMMS',true),
+('PUBLIC_SITE_SMS_DISABLED','true'::jsonb,'COMMS',true),
 ('SMART_FORM_DOCUMENT_AWARE_PREFILL','true'::jsonb,'INTAKE',true),
 ('PUBLIC_SITE_ORACLE_LITE_STATIC_FIRST','true'::jsonb,'RUNTIME',true)
 on conflict (config_key) do update set config_value = excluded.config_value, updated_at = now();
