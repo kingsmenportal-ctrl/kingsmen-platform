@@ -55,6 +55,12 @@ function splitEntries(text){
 }
 function cleanHeadingName(value,source){
  let candidate=String(value??"").replace(source.pattern," ");
+ // Some DHET HEI rows concatenate programme cells into the numbered heading.
+ candidate=candidate.replace(/\s+\d{1,2}\s*\)\s*(?=(?:higher certificate|bachelor|diploma|national certificate|postgraduate|honours|master|doctor|phd|occupational certificate|nqf level)\b).*$/i,"");
+ // Preserve long legal names by ending at a legal-entity suffix before table spill.
+ const legalSuffix=candidate.match(/\s+(?:\(Pty\)\s*Ltd|Proprietary Limited|Limited|Ltd\.?|Inc\.?|NPC|NPO)\b/i);
+ if(legalSuffix)candidate=candidate.slice(0,legalSuffix.index+legalSuffix[0].length);
+ else candidate=candidate.replace(/\s+(?=(?:higher certificate|bachelor(?: of)?|diploma(?: in| of)?|national certificate|postgraduate|honours|master(?: of)?|doctor(?: of)?|phd|occupational certificate|nqf level)\b).*$/i,"");
  for(const province of PROVINCES)candidate=candidate.replace(new RegExp(province,"gi")," ");
  candidate=candidate.replace(/\b(?:registration|reg)\s*(?:no\.?|number)?\s*[:#-]?\s*/gi," ");
  return normalizeName(candidate);
@@ -79,7 +85,7 @@ export function extractRecords(text,kind){
    if(left&&!right&&!hasId&&!/^(CONTACT PERSON|CONTACT DETAILS|CONTACT NUMBER|TEL\.?|TELEPHONE|MOBILE|CELL|FAX|EMAIL|E-MAIL|WEBSITE|WEB SITE|QUALIFICATION|PROGRAMME|PROGRAM|NQF LEVEL|BACHELOR|HIGHER CERTIFICATE|DIPLOMA|DOCTOR|MASTER|EXAM CENTRE)\b/i.test(left))nameParts.push(left);
    if(hasId)break;
   }
-  const name=normalizeName(nameParts.join(" "));
+  const name=cleanHeadingName(nameParts.join(" "),source);
   const sectionKey=canonicalSlug(e.section||"unsectioned")||"unsectioned";
   const key=kind+":"+sectionKey+":"+String(e.number).padStart(3,"0")+":"+(ids.length===1?ids[0].toLowerCase():canonicalSlug(name));
   // Province must be attached to this entry's registration-ID line; scanning
