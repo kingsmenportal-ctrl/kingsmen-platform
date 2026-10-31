@@ -41,6 +41,7 @@ assert.equal(safeEvidenceUrl("https://apply.example.ac.za/users/123456789/profil
 
 assert.equal(classifyPortal({ httpStatus: 200, bodyText: "Please verify you are human" }), SCOUT_STATUSES.CAPTCHA_REQUIRED);
 assert.equal(classifyPortal({ httpStatus: 200, fields: [{ inputType: "text", autoComplete: "one-time-code" }] }), SCOUT_STATUSES.OTP_OR_MFA_REQUIRED);
+assert.equal(classifyPortal({ httpStatus: 200, fields: [{ inputType: "text", autoComplete: "one-time-code" }], bodyText: "Enter your verification" }), SCOUT_STATUSES.OTP_OR_MFA_REQUIRED);
 assert.equal(classifyPortal({ httpStatus: 200, fields: [{ inputType: "password" }] }), SCOUT_STATUSES.AUTHENTICATION_REQUIRED);
 assert.equal(classifyPortal({ httpStatus: 429 }), SCOUT_STATUSES.RATE_LIMITED);
 assert.equal(classifyPortal({ httpStatus: 503 }), SCOUT_STATUSES.PORTAL_UNAVAILABLE);
