@@ -29,12 +29,12 @@ check("all directory source links are HTTPS DHET URLs", records.every(row => typ
 check("unresolved institution websites remain unset", records.filter(row => !row.official_website_url).every(row => row.official_website_status === "MISSING_OR_CONFLICTING_URL_REQUIRES_REVIEW"));
 check("directory page imports canonical seed rather than duplicated data", page.includes("manifests/institutions/seed/public-universities-and-tvet-2026-10-31.json"));
 check("search supports institution name", /type="search"/.test(page) && /setQuery/.test(page) && /canonical_name/.test(page));
-check("filters support institution type and province", /PUBLIC_UNIVERSITY/.test(page) && /TVET_COLLEGE/.test(page) && /setProvince/.test(page));
-check("page labels directory as not proof of an open intake", /directory listing is not an open intake/i.test(page) && /Not verified/.test(page) && /Unknown/.test(page));
+check("cross-sector filters support sector and institution location", /setSector/.test(page) && /setLocation/.test(page) && /item.sectorKeys.includes\(sector\)/.test(page) && /item.province === location/.test(page));
+check("page separates directory discovery from open-intake verification", /Discovery is not verification/i.test(page) && /Open programme \/ intake/.test(page) && /UNKNOWN/.test(page));
 check("external website links open safely", /target="_blank"/.test(page) && /rel="noopener noreferrer"/.test(page));
-check("unresolved website URLs are not guessed", /will not guess the link/i.test(page) && /Website link requires review/.test(page));
+check("unresolved institution website URLs remain unset and are never guessed", /Institution website URL unresolved/i.test(page) && /will not guess the URL/i.test(page) && /PUBLISHED_BY_DHET_NEEDS_CURRENT_LIVE_CHECK/.test(page));
 check("opportunity and application workbench links are present", /candidate\/opportunity-matches/.test(page) && /candidate\/applications/.test(page));
-check("remaining private and CET registers remain explicitly outstanding", /cet_colleges_to_import_from_registry/.test(page) && /private_higher_education_institutions_to_import_from_registry/.test(page) && /other_private_colleges_to_import_from_registry/.test(page));
+check("remaining private and CET registers remain explicitly outstanding", /Private higher education/i.test(page) && /private colleges/i.test(page) && /CET colleges/i.test(page));
 check("candidate landing page links to institution directory", /href: "\/candidate\/institutions"/.test(landing));
 check("candidate dashboard links to institution directory", /href: "\/candidate\/institutions"/.test(dashboard));
 
