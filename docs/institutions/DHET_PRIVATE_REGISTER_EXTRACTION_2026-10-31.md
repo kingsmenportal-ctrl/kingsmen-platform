@@ -17,7 +17,7 @@ node scripts/institutions/extract-dhet-private-registers.mjs \
   --out manifests/institutions/seed/dhet-private-register-candidates-2026-10-31.json
 ```
 
-The extractor creates review candidates with normalized names, registration IDs, status-section evidence, province candidates, alias candidates and bounded source excerpts. It retains raw entry text. Campus locations are explicitly marked for manual review because the PDF's multi-line address layout can otherwise incorrectly associate campuses and provinces.
+The extractor creates review candidates with normalized names, registration IDs, status-section evidence, province candidates, alias candidates and bounded redacted source excerpts. Numbered headings without an observed DHET registration identifier are excluded to avoid mistaking qualification headings for institutions. Campus locations are explicitly marked for manual review because the PDF's multi-line address layout can otherwise incorrectly associate campuses and provinces.
 
 ## Import controls
 The output is not an import authorization. Every row is `import_eligible=false`, `official_route_status=NOT_VERIFIED`, `integration_status=NOT_CONNECTED`, and `automation_authorized=false`. No SQL is generated or applied. The next migration must reconcile registration identifiers and aliases against existing canonical `route_providers.provider_key` identities, reject conflicting status/identity, merge provenance idempotently, and retain cancelled/lapsed entries as non-active historical evidence. A directory entry never proves a current intake, deadline, eligibility, live application route, partnership, submission receipt, or outcome.
