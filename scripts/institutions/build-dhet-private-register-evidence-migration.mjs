@@ -1,6 +1,6 @@
 #!/usr/bin/env node
 import fs from "node:fs";
-const allowedStatuses=new Set(["REGISTERED","PROVISIONAL","CANCELLED","LAPSED","WITHDRAWN_OR_DEREGISTERED_REVIEW","STATUS_UNRESOLVED"]);
+const allowedStatuses=new Set(["REGISTERED","PROVISIONAL","CANCELLED","LAPSED","WITHDRAWN_OR_DEREGISTERED_REVIEW","DISCONTINUATION_REQUESTED_REVIEW","STATUS_UNRESOLVED"]);
 const quote=v=>v==null?"NULL":"'"+String(v).replace(/'/g,"''")+"'";
 const json=v=>quote(JSON.stringify(v??[]))+"::jsonb";
 export function validateManifest(m){
@@ -15,6 +15,7 @@ export function validateManifest(m){
   if(r.registration_identifier!==r.registration_identifiers_observed?.[0])errors.push("record "+i+" has inconsistent registration identifier fields");
   if(r.identity_conflict_status==="CONFLICT_REVIEW_REQUIRED"||r.identity_conflict_status==="DUPLICATE_SOURCE_ENTRY_REVIEW"||(r.conflict_flags??[]).length)errors.push("record "+i+" has unresolved registration identity/status conflict");
   if(r.registration_status_review_required===true)errors.push("record "+i+" has unresolved registration status requiring manual adjudication");
+  if(r.registration_status==="DISCONTINUATION_REQUESTED_REVIEW")errors.push("record "+i+" is only a discontinuation request and cannot be imported as cancelled or registered");
   if(r.import_eligible!==true)errors.push("record "+i+" is not explicitly import-authorized by review");
   if(r.identity_review_status!=="VERIFIED_CANONICAL_IDENTITY")errors.push("record "+i+" lacks verified canonical identity review");
   if(r.alias_reconciliation_status!=="RECONCILED")errors.push("record "+i+" lacks completed alias/provider-key reconciliation");
@@ -44,7 +45,7 @@ CREATE TABLE IF NOT EXISTS public.private_institution_registry_entries (
  canonical_name_candidate text NOT NULL,
  normalized_name_key text NOT NULL,
  registration_identifier text,
- registration_status text NOT NULL CHECK (registration_status IN ('REGISTERED','PROVISIONAL','CANCELLED','LAPSED','WITHDRAWN_OR_DEREGISTERED_REVIEW','STATUS_UNRESOLVED')),
+ registration_status text NOT NULL CHECK (registration_status IN ('REGISTERED','PROVISIONAL','CANCELLED','LAPSED','WITHDRAWN_OR_DEREGISTERED_REVIEW','DISCONTINUATION_REQUESTED_REVIEW','STATUS_UNRESOLVED')),
  registration_identifiers_observed jsonb NOT NULL DEFAULT '[]'::jsonb CHECK (jsonb_typeof(registration_identifiers_observed)='array'),
  registration_status_review_required boolean NOT NULL DEFAULT true,
  province_candidates jsonb NOT NULL DEFAULT '[]'::jsonb CHECK (jsonb_typeof(province_candidates)='array'),
