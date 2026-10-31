@@ -72,6 +72,16 @@ DO $postflight$
 BEGIN
  IF (SELECT count(*) FROM public.opportunity_programmes WHERE programme_ref IN ('dbe-74-2026','dbe-75-2026','dbe-76-2026','dbe-77-2026','dbe-78-2026','dbe-79-2026'))<>6
  THEN RAISE EXCEPTION 'N15_DBE_PROGRAMME_POSTFLIGHT_FAILED'; END IF;
+ IF NOT EXISTS (SELECT 1 FROM public.opportunity_providers WHERE provider_ref='dbe-basic-education'
+   AND official_url='https://www.education.gov.za/Vacancies.aspx'
+   AND source_confidence='OFFICIAL_VERIFIED' AND safe_to_recommend IS TRUE)
+ THEN RAISE EXCEPTION 'N15_DBE_PROVIDER_POSTFLIGHT_FAILED'; END IF;
+ IF (SELECT count(*) FROM public.opportunity_programmes WHERE programme_ref IN ('dbe-74-2026','dbe-75-2026','dbe-76-2026','dbe-77-2026','dbe-78-2026','dbe-79-2026')
+   AND provider_ref='dbe-basic-education' AND opening_status='OPEN' AND candidate_facing_safe IS TRUE
+   AND source_confidence='OFFICIAL_VERIFIED'
+   AND exact_link='https://www.education.gov.za/LinkClick.aspx?fileticket=orD2gVikBik%3D&mid=14680&portalid=0&tabid=241'
+   AND cardinality(evidence_refs)>0)<>6
+ THEN RAISE EXCEPTION 'N15_DBE_PROGRAMME_EVIDENCE_POSTFLIGHT_FAILED'; END IF;
  IF (SELECT count(*) FROM public.opportunity_deadlines WHERE deadline_ref IN ('dbe-74-2026-close','dbe-75-2026-close','dbe-76-2026-close','dbe-77-2026-close','dbe-78-2026-close','dbe-79-2026-close') AND closes_on=DATE '2026-11-06' AND closes_at IS NULL AND deadline_status='CONFIRMED')<>6
  THEN RAISE EXCEPTION 'N15_DBE_DATE_ONLY_DEADLINE_POSTFLIGHT_FAILED'; END IF;
  IF NOT EXISTS (SELECT 1 FROM public.external_source_observations WHERE observation_ref='dbe-vacancies-2026-11-06' AND observation_status='VERIFIED' AND source_confidence='OFFICIAL_VERIFIED')
