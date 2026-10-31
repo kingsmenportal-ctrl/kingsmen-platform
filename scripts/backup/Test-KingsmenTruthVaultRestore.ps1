@@ -54,6 +54,12 @@ if (-not (Test-Path $BackupFile)) {
   throw "Backup file not found: $BackupFile"
 }
 
+# The standard restore drill accepts authenticated encrypted envelopes only.
+# Reject plaintext/unknown formats before opening either database connection.
+if ([IO.Path]::GetExtension($BackupFile) -ine ".kmbak") {
+  throw "Unsupported backup format. Restore drills require an authenticated .kmbak archive; plaintext/legacy archives are rejected before database access."
+}
+
 $pgRestore = Get-Command "pg_restore" -ErrorAction SilentlyContinue
 if (-not $pgRestore) {
   throw "pg_restore is required for restore drill. Install PostgreSQL client tools."
