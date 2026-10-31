@@ -144,7 +144,8 @@ $postflight$;
 COMMIT;
 `;
 }
-if(process.argv.includes("--self-test")){
+const invokedDirectly=/build-dhet-private-register-evidence-migration\.mjs$/.test(process.argv[1]??"");
+if(invokedDirectly&&process.argv.includes("--self-test")){
  const base={source_register:"private_colleges",source_section:"SECTION A",source_snapshot_date:"2026-07-15",source_record_ref:"private_colleges:section-a:001:2020/fe07/117",canonical_name_candidate:"Example College",normalized_name_key:"example-college",registration_identifier:"2020/FE07/117",registration_identifiers_observed:["2020/FE07/117"],registration_status:"CANCELLED",registration_status_review_required:false,province_candidates:["Limpopo"],province_status:"SOURCE_LISTED_CANDIDATE",campus_site_candidates:["Makotse Road, Zebediela"],campus_extraction_status:"REVIEWED",alias_candidates:[],possible_existing_provider_matches:[],alias_reconciliation_status:"RECONCILED",identity_conflict_status:"NO_CONFLICT_DETECTED_REVIEW_STILL_REQUIRED",identity_review_status:"VERIFIED_CANONICAL_IDENTITY",import_eligible:true,conflict_flags:[],source_url:"https://www.dhet.gov.za/Registers_DocLib/example.pdf",source_excerpt:"Example College, 2020/FE07/117",official_route_status:"NOT_VERIFIED",integration_status:"NOT_CONNECTED",automation_authorized:false};
  const m={schema:"kingsmen.institutions.dhet-private-register-candidates.v1",records:[base]};
  if(validateManifest(m).length)throw Error("valid fixture rejected");
@@ -157,7 +158,7 @@ if(process.argv.includes("--self-test")){
  const multi={...m,records:[{...base,registration_identifiers_observed:["2020/FE07/117","2021/FE07/118"]}]};
  if(!validateManifest(multi).some(x=>x.includes("exactly one registration identifier")))throw Error("multiple registration identifiers were not blocked");
  console.log("PASS DHET idempotent evidence-migration generator self-test");
-}else{
+}else if(invokedDirectly){
  const args=Object.fromEntries(process.argv.slice(2).map((x,i,a)=>x.startsWith("--")?[x.slice(2),a[i+1]]:null).filter(Boolean));
  if(!args.manifest||!args.out)throw Error("Usage: node scripts/institutions/build-dhet-private-register-evidence-migration.mjs --manifest reviewed.json --out migration.sql");
  const manifest=JSON.parse(fs.readFileSync(args.manifest,"utf8"));fs.writeFileSync(args.out,buildMigration(manifest));console.log("Wrote idempotent registry-evidence migration; no database changes were made.");
