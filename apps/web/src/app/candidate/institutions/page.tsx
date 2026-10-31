@@ -76,6 +76,7 @@ const capabilityLabels: Record<string, string> = {
   FINANCIAL_SERVICES: "Financial services",
   TECHNOLOGY_INTEGRATION: "Technology integration",
   BASIC_EDUCATION: "Basic education",
+  COMMUNITY_EDUCATION_AND_TRAINING: "Community education and training",
   ENERGY_AND_UTILITIES: "Energy and utilities"
 };
 
@@ -188,18 +189,21 @@ function unique(values: string[]): string[] {
 
 const institutionItems: DirectoryItem[] = directorySeed.records.map((record: Institution) => {
   const isUniversity = record.provider_type === "PUBLIC_UNIVERSITY";
+  const isCET = record.provider_type === "CET_COLLEGE";
   const pathway = isUniversity ? "HIGHER_EDUCATION" : "TVET";
   return {
     id: record.institution_ref,
     registryKey: isUniversity
       ? "dhet_university_" + record.institution_ref.replace(/^university-/, "")
-      : "dhet_tvet_" + record.institution_ref.replace(/^tvet-/, ""),
+      : isCET
+        ? "dhet_cet_" + record.institution_ref.replace(/^cet-/, "")
+        : "dhet_tvet_" + record.institution_ref.replace(/^tvet-/, ""),
     name: record.canonical_name,
     kind: "INSTITUTION",
     providerType: record.provider_type,
     sectorKeys: ["EDUCATION_AND_SKILLS"],
     province: record.province,
-    serviceCapabilities: [pathway],
+    serviceCapabilities: isCET ? ["COMMUNITY_EDUCATION_AND_TRAINING"] : [pathway],
     pathways: [pathway],
     sourceName: "Department of Higher Education and Training",
     sourceUrl: record.directory_source_url,
@@ -232,11 +236,14 @@ const sourceItems: DirectoryItem[] = crossSector.sources.map((source: SourceAnch
   const isSetaProvider = Boolean(source.provider_key?.startsWith("seta_"));
   const isPublicEntityEmployer = Boolean(source.provider_key?.startsWith("soe_"));
   const isPrivateEmployer = Boolean(source.provider_key?.startsWith("private_employer_"));
+  const isProvincialEducationDepartment = Boolean(source.provider_key?.startsWith("prov_education_"));
   const isDpsaVacancySource = source.provider_key === "dpsa_public_service_vacancies";
   const sourceCapabilities = isSetaProvider
     ? ["SETA_LEARNERSHIPS", "APPRENTICESHIPS", "FUNDING"]
     : isPublicEntityEmployer || isPrivateEmployer || isDpsaVacancySource
       ? ["EMPLOYMENT"]
+      : isProvincialEducationDepartment ? ["EMPLOYMENT"]
+      : isProvincialEducationDepartment ? ["PUBLIC_SERVICE", "BASIC_EDUCATION", "EMPLOYMENT"]
       : capabilityBySource[source.source_id] ?? [];
   const sourcePathways = isSetaProvider
     ? ["SETA_LEARNERSHIPS", "APPRENTICESHIPS"]
@@ -255,10 +262,11 @@ const sourceItems: DirectoryItem[] = crossSector.sources.map((source: SourceAnch
     providerType: source.provider_key?.startsWith("seta_") ? "SETA_PROVIDER"
       : (source.provider_key === "funder_nsf" || source.provider_key === "funder_funza_lushaka" || source.provider_key === "nsfas_official") ? "FUNDING_PROVIDER"
       : source.provider_key?.startsWith("soe_") || source.provider_key?.startsWith("private_employer_") || source.provider_key === "dpsa_public_service_vacancies" ? "EMPLOYER_PROVIDER"
+      : isProvincialEducationDepartment ? "PROVINCIAL_AUTHORITY_PROVIDER"
       : source.provider_key === "nsfas_accommodation_portal" ? "ACCOMMODATION_PROVIDER"
       : "SOURCE_REGISTRY",
     sectorKeys: sourceClasses,
-    province: null,
+    province: source.metadata?.province ?? null,
     serviceCapabilities: sourceCapabilities,
     pathways: sourcePathways,
     sourceName: source.authority,
@@ -424,7 +432,7 @@ export default function CandidateInstitutionDirectoryPage() {
           <article className="rounded-2xl border border-slate-700 bg-[#0b1d33] p-5">
             <p className="text-xs font-extrabold uppercase tracking-wider text-amber-300">Source-listed institution records</p>
             <p className="mt-2 text-3xl font-black text-white">{institutionItems.length}</p>
-            <p className="mt-1 text-sm text-slate-400">Current data batch: public universities and TVET colleges only.</p>
+            <p className="mt-1 text-sm text-slate-400">Current data batch: 26 public universities, 50 TVET colleges and 9 CET colleges.</p>
           </article>
           <article className="rounded-2xl border border-slate-700 bg-[#0b1d33] p-5">
             <p className="text-xs font-extrabold uppercase tracking-wider text-amber-300">Official sector source anchors</p>
@@ -598,7 +606,7 @@ export default function CandidateInstitutionDirectoryPage() {
                     Institution website URL unresolved. Kingsmen will not guess the URL.
                   </span>
                 )}
-                {item.registryKey && (item.kind !== "OFFICIAL_SOURCE" || item.providerType === "SETA_PROVIDER" || item.providerType === "FUNDING_PROVIDER" || item.providerType === "EMPLOYER_PROVIDER" || item.providerType === "ACCOMMODATION_PROVIDER") && (
+                {item.registryKey && (item.kind !== "OFFICIAL_SOURCE" || item.providerType === "SETA_PROVIDER" || item.providerType === "FUNDING_PROVIDER" || item.providerType === "EMPLOYER_PROVIDER" || item.providerType === "ACCOMMODATION_PROVIDER" || item.providerType === "PROVINCIAL_AUTHORITY_PROVIDER") && (
                   <Link
                     href={`/candidate/applications?directory_provider_key=${encodeURIComponent(item.registryKey)}&directory_provider_name=${encodeURIComponent(item.name)}&directory_pathway=${encodeURIComponent(toApplicationPathway[item.pathways.find(value => pathways.includes(value)) ?? (item.providerType === "TVET" ? "TVET" : "HIGHER_EDUCATION")] ?? "HIGHER_EDUCATION")}`}
                     className="inline-flex rounded-xl bg-amber-300 px-4 py-3 text-sm font-extrabold text-[#101b2a] hover:bg-amber-200"
@@ -630,7 +638,7 @@ export default function CandidateInstitutionDirectoryPage() {
         <section aria-label="National coverage still to import" className="rounded-2xl border border-slate-700 bg-[#0b1d33] p-5 sm:p-6">
           <h2 className="text-xl font-bold text-white">Coverage still to import and verify</h2>
           <p className="mt-2 text-sm leading-6 text-slate-400">
-            The institution-record dataset remains limited to 26 public universities and 50 TVET colleges. The cross-sector
+            The institution-record dataset currently includes 26 public universities, 50 TVET colleges and 9 CET colleges. The cross-sector
             entries above are official discovery anchors, not 24 additional verified providers. Private higher education,
             private colleges, CET colleges, individual employers, health facilities, accommodation operators, local service
             organisations and other provider records must be sourced and verified in separate controlled batches.
@@ -642,7 +650,7 @@ export default function CandidateInstitutionDirectoryPage() {
         </section>
 
         <footer className="border-t border-slate-700 pt-5 text-xs leading-5 text-slate-500">
-          This directory combines the DHET public-university/TVET source snapshot dated {directorySeed.researched_at}, cross-sector
+          This directory combines the DHET public-university/TVET/CET source snapshot dated {directorySeed.researched_at}, cross-sector
           discovery anchors dated {crossSector.researched_at}, and authenticated public-safe registry rows where available. These record types have different evidence scopes.
           The authenticated Kingsmen profile, private documents and saved application records remain in the candidate workbench.
         </footer>
