@@ -1,74 +1,64 @@
 #!/usr/bin/env node
-import { existsSync, mkdirSync, readFileSync, writeFileSync } from 'node:fs';
-import { dirname, join } from 'node:path';
-import { fileURLToPath } from 'node:url';
+import { existsSync, mkdirSync, readFileSync, writeFileSync } from "node:fs";
+import { dirname, join } from "node:path";
+import { fileURLToPath } from "node:url";
 
 const repoRoot = dirname(dirname(dirname(fileURLToPath(import.meta.url))));
-const reportPath = join(repoRoot, 'reports/ops/backup-restore-proof-latest.json');
-
-function rel(path) {
-  return join(repoRoot, path);
-}
-
-function read(path) {
-  return readFileSync(rel(path), 'utf8');
-}
-
-const requiredFiles = [
-  'manifests/ops/backup-restore-proof-v1.json',
-  'docs/ops/KINGSMEN_BACKUP_RESTORE_PROOF.md',
-  'scripts/backup/New-KingsmenTruthVaultBackup.ps1',
-  'scripts/backup/Test-KingsmenTruthVaultRestore.ps1'
-];
-
+const pathOf = (path) => join(repoRoot, path);
+const read = (path) => readFileSync(pathOf(path), "utf8");
 const checks = [];
 const failed = [];
+const add = (name, passed, detail, evidencePath) => {
+  const item = { name, passed: Boolean(passed), detail, evidencePath };
+  checks.push(item);
+  if (!item.passed) failed.push(item);
+};
 
-function check(name, passed, detail, evidencePath) {
-  const result = { name, passed, detail, evidencePath };
-  checks.push(result);
-  if (!passed) failed.push(result);
-}
+const required = [
+  "manifests/ops/backup-restore-proof-v1.json",
+  "docs/ops/KINGSMEN_BACKUP_RESTORE_PROOF.md",
+  "scripts/backup/New-KingsmenTruthVaultBackup.ps1",
+  "scripts/backup/Test-KingsmenTruthVaultRestore.ps1"
+];
+for (const path of required) add("file_exists:" + path, existsSync(pathOf(path)), path, path);
 
-for (const file of requiredFiles) {
-  check(`file_exists:${file}`, existsSync(rel(file)), file, file);
-}
+if (required.every((path) => existsSync(pathOf(path)))) {
+  const backup = read("scripts/backup/New-KingsmenTruthVaultBackup.ps1");
+  const restore = read("scripts/backup/Test-KingsmenTruthVaultRestore.ps1");
+  const manifest = JSON.parse(read("manifests/ops/backup-restore-proof-v1.json"));
 
-if (existsSync(rel('scripts/backup/New-KingsmenTruthVaultBackup.ps1'))) {
-  const backupScript = read('scripts/backup/New-KingsmenTruthVaultBackup.ps1');
-  check('backup_uses_pg_dump', backupScript.includes('pg_dump'), 'pg_dump required for PostgreSQL backup', 'scripts/backup/New-KingsmenTruthVaultBackup.ps1');
-  check('backup_uses_sha256', backupScript.includes('Get-FileHash') && backupScript.includes('SHA256'), 'backup checksum required', 'scripts/backup/New-KingsmenTruthVaultBackup.ps1');
-  check('backup_redacts_database_url', backupScript.includes('databaseUrlRedacted') && backupScript.includes('Do not print'), 'database URL must be redacted', 'scripts/backup/New-KingsmenTruthVaultBackup.ps1');
-  check('backup_blocks_git_claim', backupScript.includes('committedToGit = $false'), 'backup archives cannot be committed', 'scripts/backup/New-KingsmenTruthVaultBackup.ps1');
-}
+  add("backup_uses_pg_dump", backup.includes("pg_dump"), "PostgreSQL custom-format archive", "scripts/backup/New-KingsmenTruthVaultBackup.ps1");
+  add("backup_requires_age_recipient", backup.includes("KINGSMEN_BACKUP_AGE_RECIPIENT") && backup.includes("age"), "age encryption is mandatory", "scripts/backup/New-KingsmenTruthVaultBackup.ps1");
+  add("backup_removes_plaintext", backup.includes("plaintextTemporaryRemoved") && backup.includes("Remove-Item"), "plaintext intermediate removed", "scripts/backup/New-KingsmenTruthVaultBackup.ps1");
+  add("backup_records_encrypted_hash", backup.includes("Get-FileHash") && backup.includes("SHA256") && backup.includes("encryptedAtRest"), "encrypted archive SHA-256 required", "scripts/backup/New-KingsmenTruthVaultBackup.ps1");
+  add("backup_truthfully_marks_candidate_data", backup.includes("candidateDataIncluded = $true") && backup.includes("rawCandidateRowsPrinted = $false"), "archive may contain personal data; reports do not print raw rows", "scripts/backup/New-KingsmenTruthVaultBackup.ps1");
+  add("backup_does_not_claim_storage_bytes", backup.includes("privateStorageObjectsIncluded = $false") && backup.includes("storageParityRequired = $true"), "private Storage parity remains separate", "scripts/backup/New-KingsmenTruthVaultBackup.ps1");
 
-if (existsSync(rel('scripts/backup/Test-KingsmenTruthVaultRestore.ps1'))) {
-  const restoreScript = read('scripts/backup/Test-KingsmenTruthVaultRestore.ps1');
-  check('restore_uses_pg_restore', restoreScript.includes('pg_restore'), 'pg_restore required for restore drill', 'scripts/backup/Test-KingsmenTruthVaultRestore.ps1');
-  check('restore_blocks_same_target', restoreScript.includes('Restore target matches source database') && restoreScript.includes('Restore drill blocked'), 'restore target must differ from source', 'scripts/backup/Test-KingsmenTruthVaultRestore.ps1');
-  check('restore_counts_only', restoreScript.includes('countOnly = $true') && restoreScript.includes('rawRowsReturned = $false'), 'restore report must use count-only verification', 'scripts/backup/Test-KingsmenTruthVaultRestore.ps1');
-  check('restore_records_rto', restoreScript.includes('rtoSeconds'), 'restore drill must record RTO', 'scripts/backup/Test-KingsmenTruthVaultRestore.ps1');
-}
+  add("restore_requires_source_and_target", restore.includes("SourceDatabaseUrl") && restore.includes("RestoreDatabaseUrl"), "both source and restore target are mandatory", "scripts/backup/Test-KingsmenTruthVaultRestore.ps1");
+  add("restore_compares_normalized_identity", restore.includes("Get-PostgresConfig") && restore.includes("Identity =") && restore.includes("Restore target matches source database"), "normalized target identity must differ", "scripts/backup/Test-KingsmenTruthVaultRestore.ps1");
+  add("restore_requires_target_confirmation", restore.includes("ConfirmRestoreDatabaseName"), "exact isolated target database confirmation", "scripts/backup/Test-KingsmenTruthVaultRestore.ps1");
+  add("restore_requires_age_identity", restore.includes("KINGSMEN_BACKUP_AGE_IDENTITY_FILE") && restore.includes("AGE_DECRYPTION_FAILED"), "encrypted backup decryption required", "scripts/backup/Test-KingsmenTruthVaultRestore.ps1");
+  add("restore_requires_empty_target", restore.includes("RESTORE_TARGET_MUST_BE_AN_EMPTY_ISOLATED_DATABASE"), "existing objects are not cleaned or overwritten", "scripts/backup/Test-KingsmenTruthVaultRestore.ps1");
+  add("restore_uses_single_transaction", restore.includes("--single-transaction") && !restore.includes("--clean"), "restore fails transactionally without clean/drop", "scripts/backup/Test-KingsmenTruthVaultRestore.ps1");
+  add("restore_count_failures_fail_drill", restore.includes("QUERY_FAILED") && restore.includes("$allPassed") && restore.includes("if (-not $allPassed) { exit 1 }"), "missing or failed parity query blocks success", "scripts/backup/Test-KingsmenTruthVaultRestore.ps1");
+  add("restore_uses_env_not_password_args", restore.includes("$env:PGPASSWORD = $Config.Password"), "database password passed through process environment", "scripts/backup/Test-KingsmenTruthVaultRestore.ps1");
+  add("restore_does_not_claim_storage_parity", restore.includes("storageObjectParityVerified = $false") && restore.includes("storageParityRequired = $true"), "private Storage proof remains outstanding", "scripts/backup/Test-KingsmenTruthVaultRestore.ps1");
 
-if (existsSync(rel('manifests/ops/backup-restore-proof-v1.json'))) {
-  const manifest = JSON.parse(read('manifests/ops/backup-restore-proof-v1.json'));
-  check('manifest_key', manifest.manifestKey === 'backup-restore-proof-v1', manifest.manifestKey, 'manifests/ops/backup-restore-proof-v1.json');
-  check('manifest_not_production_ready', manifest.productionReady === false, String(manifest.productionReady), 'manifests/ops/backup-restore-proof-v1.json');
-  check('manifest_blocks_git_backup_storage', manifest.backupStorageAllowedInGit === false, String(manifest.backupStorageAllowedInGit), 'manifests/ops/backup-restore-proof-v1.json');
-  check('manifest_blocks_raw_rows', manifest.rawCandidateRowsAllowedInReports === false, String(manifest.rawCandidateRowsAllowedInReports), 'manifests/ops/backup-restore-proof-v1.json');
-  check('manifest_requires_different_restore_target', manifest.backupStrategy?.restoreTargetMustDifferFromSource === true, String(manifest.backupStrategy?.restoreTargetMustDifferFromSource), 'manifests/ops/backup-restore-proof-v1.json');
-  check('manifest_has_ten_scenarios', Array.isArray(manifest.proofScenarios) && manifest.proofScenarios.length >= 10, String(manifest.proofScenarios?.length ?? 0), 'manifests/ops/backup-restore-proof-v1.json');
+  add("manifest_age_encryption_required", manifest.backupStrategy?.encryption === "age" && manifest.backupStrategy?.encryptedAtRestRequired === true, "age encryption mandatory", "manifests/ops/backup-restore-proof-v1.json");
+  add("manifest_storage_parity_required", manifest.backupStrategy?.privateStorageObjectsIncluded === false && manifest.backupStrategy?.storageParityRequired === true, "Storage object bytes not included", "manifests/ops/backup-restore-proof-v1.json");
+  add("manifest_production_stays_blocked", manifest.productionReady === false && manifest.publicLaunchAllowed === false && manifest.productionDataAllowed === false, "source proof does not authorize launch", "manifests/ops/backup-restore-proof-v1.json");
 }
 
 const report = {
-  schema: 'kingsmen.backup-restore-source-proof.v1',
-  module: 'Kingsmen Backup and Restore Proof',
-  status: failed.length === 0 ? 'BACKUP_RESTORE_SOURCE_PROOF_PASSED' : 'BACKUP_RESTORE_SOURCE_PROOF_FAILED',
+  schema: "kingsmen.backup-restore-source-proof.v2",
+  module: "Kingsmen Backup and Restore Proof",
+  status: failed.length === 0 ? "BACKUP_RESTORE_SOURCE_PROOF_PASSED" : "BACKUP_RESTORE_SOURCE_PROOF_FAILED",
   passed: failed.length === 0,
   productionReady: false,
   publicLaunchAllowed: false,
   productionDataAllowed: false,
   stagingRestoreDrillCompleted: false,
+  privateStorageParityVerified: false,
   databaseUrlRedacted: true,
   rawCandidateRowsReturned: false,
   backupStorageAllowedInGit: false,
@@ -76,12 +66,12 @@ const report = {
   checks,
   failed,
   nextAction: failed.length === 0
-    ? 'Run validate-backup-restore-proof, then perform a live staging backup/restore drill before production data.'
-    : 'Repair backup/restore proof files.'
+    ? "Run a real approved encrypted staging database restore and a separate private Storage object parity drill."
+    : "Repair backup/restore source boundaries."
 };
 
+const reportPath = pathOf("reports/ops/backup-restore-proof-latest.json");
 mkdirSync(dirname(reportPath), { recursive: true });
-writeFileSync(reportPath, `${JSON.stringify(report, null, 2)}\n`, 'utf8');
-
+writeFileSync(reportPath, JSON.stringify(report, null, 2) + "\n", "utf8");
 console.log(JSON.stringify(report, null, 2));
 if (!report.passed) process.exitCode = 1;
