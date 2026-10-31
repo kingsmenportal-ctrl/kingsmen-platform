@@ -85,10 +85,8 @@ export function extractRecords(text,kind){
   const regStatus=status(e.section,block,kind);
   const idKey=ids.length===1?ids[0].toLowerCase():canonicalSlug(name);
   const duplicate=seen.has(idKey);seen.add(idKey);
-  const campusCandidates=[...new Set(e.lines.map(line=>line.slice(nameWidth,nameWidth+siteWidth).trim())
-    .filter(x=>x&&/[A-Za-z]{3,}/.test(x)&&!/(CONTACT PERSON|CONTACT DETAILS|TEL\.?|TELEPHONE|MOBILE|CELL|FAX|EMAIL|E-MAIL|WEBSITE|QUALIFICATION|NQF LEVEL|BACHELOR|CERTIFICATE|DIPLOMA|DOCTOR|MASTER|EXAM CENTRE)/i.test(x)
-      && !/[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}/i.test(x)
-      && !/(?:\+?\d[\d ()/-]{7,}\d)/.test(x)))].slice(0,30);
+  const campusCandidates=[...new Set(e.lines.map(line=>redactSourceExcerpt(line.slice(nameWidth,nameWidth+siteWidth).trim()))
+    .filter(x=>x&&/[A-Za-z]{3,}/.test(x)&&!/(CONTACT PERSON|CONTACT DETAILS|TEL\.?|TELEPHONE|MOBILE|CELL|FAX|EMAIL|E-MAIL|WEBSITE|QUALIFICATION|NQF LEVEL|BACHELOR|CERTIFICATE|DIPLOMA|DOCTOR|MASTER|EXAM CENTRE)/i.test(x)))].slice(0,30);
   return {source_record_ref:key,source_register:kind,source_snapshot_date:source.date,source_url:source.url,register_entry_number:e.number,
    source_heading_candidate:redactSourceExcerpt(e.first.slice(0,nameWidth)),canonical_name_candidate:name||null,normalized_name_key:canonicalSlug(name),
    registration_identifier:ids.length===1?ids[0]:null,registration_identifiers_observed:ids,registration_status:regStatus,
@@ -127,7 +125,7 @@ function selfTest(){
  if(normalizeName("  2. Café—College  ")!=="Café-College"||canonicalSlug("Café College")!=="cafe-college")throw Error("normalization");
  if(c.length!==2||c[0].registration_status!=="CANCELLED"||c[1].registration_status!=="REGISTERED")throw Error("cancelled/registered separation");
  const h=extractRecords("1. REGISTERED INSTITUTIONS\n1. Example Higher Institute 2020/HE07/001 Gauteng\n1. Bachelor of Arts\n2. PROVISIONALLY REGISTERED INSTITUTIONS\n2. Provisional Higher Institute\n2024/HE08/002 Western Cape\n2. Bachelor of Business\n3. LAPSED PROVISIONAL REGISTRATIONS\n3. Lapsed Higher Institute\n2018/HE07/008 Gauteng","private_higher_education");
- if(!h.some(x=>x.registration_status==="REGISTERED")||!h.some(x=>x.registration_status==="PROVISIONAL")||!h.some(x=>x.registration_status==="LAPSED"))throw Error("higher-ed status separation");
+ if(h.find(x=>x.registration_status==="REGISTERED")?.canonical_name_candidate!=="Example Higher Institute")throw Error("institution name extraction");\n if(!h.some(x=>x.registration_status==="REGISTERED")||!h.some(x=>x.registration_status==="PROVISIONAL")||!h.some(x=>x.registration_status==="LAPSED"))throw Error("higher-ed status separation");
  if([...c,...h].some(x=>x.import_eligible||x.official_route_status!=="NOT_VERIFIED"||x.integration_status!=="NOT_CONNECTED"||x.automation_authorized))throw Error("fail-closed route defaults");
  if(/Makungo|015 663 1921|contact@example.org/.test(c[0].source_excerpt))throw Error("contact detail redaction failed");
  console.log("PASS DHET register extractor self-test");
