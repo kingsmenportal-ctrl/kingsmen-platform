@@ -12,7 +12,7 @@
     ],
     "section_b_policy": "The separate Dual System Pilot Project (DSPP) / Centres of Specialisation table at the end is not included in this batch; import it separately to avoid mixing the two lists.",
     "rendered_pdf_screenshot_status": "UNAVAILABLE_CACHE_MISS_IN_WEB_SCREENSHOT_TOOL",
-    "extraction_method": "Official PDF text extraction; each qualification/provider relationship remains provisional until row-by-row source layout verification.",
+    "extraction_method": "Official PDF text extraction; row-by-row source layout and provider matching still require human visual verification. PDF screenshot rendering through the available verification route returned a cache-miss error, so extracted labels are explicitly kept in review-only state.",
     "column_heading_note": "The extracted PDF's first numeric field is labelled SAQA ID; the adjacent numeric field appears under the column heading NUMBER. It is stored as published_number without inferring a separate identifier system."
   },
   "policy": {
@@ -179,7 +179,10 @@
       "integration_status": "NOT_CONNECTED",
       "automation_authorized": false,
       "provider_receipt_supported": false,
-      "published_number": "60420001"
+      "published_number": "60420001",
+      "availability_status": "UNKNOWN",
+      "application_method": "UNKNOWN",
+      "source_confidence_band": "C"
     },
     {
       "saqa_id": "91761",
@@ -238,7 +241,10 @@
       "integration_status": "NOT_CONNECTED",
       "automation_authorized": false,
       "provider_receipt_supported": false,
-      "published_number": "60420002"
+      "published_number": "60420002",
+      "availability_status": "UNKNOWN",
+      "application_method": "UNKNOWN",
+      "source_confidence_band": "C"
     },
     {
       "saqa_id": "97585",
@@ -270,7 +276,10 @@
       "integration_status": "NOT_CONNECTED",
       "automation_authorized": false,
       "provider_receipt_supported": false,
-      "published_number": "60420003"
+      "published_number": "60420003",
+      "availability_status": "UNKNOWN",
+      "application_method": "UNKNOWN",
+      "source_confidence_band": "C"
     },
     {
       "saqa_id": "93626",
@@ -316,7 +325,10 @@
       "integration_status": "NOT_CONNECTED",
       "automation_authorized": false,
       "provider_receipt_supported": false,
-      "published_number": "60420004"
+      "published_number": "60420004",
+      "availability_status": "UNKNOWN",
+      "application_method": "UNKNOWN",
+      "source_confidence_band": "C"
     },
     {
       "saqa_id": "102856",
@@ -341,7 +353,10 @@
       "integration_status": "NOT_CONNECTED",
       "automation_authorized": false,
       "provider_receipt_supported": false,
-      "published_number": "60420005"
+      "published_number": "60420005",
+      "availability_status": "UNKNOWN",
+      "application_method": "UNKNOWN",
+      "source_confidence_band": "C"
     },
     {
       "saqa_id": "99255",
@@ -366,7 +381,10 @@
       "integration_status": "NOT_CONNECTED",
       "automation_authorized": false,
       "provider_receipt_supported": false,
-      "published_number": "60420006"
+      "published_number": "60420006",
+      "availability_status": "UNKNOWN",
+      "application_method": "UNKNOWN",
+      "source_confidence_band": "C"
     },
     {
       "saqa_id": "91782",
@@ -410,7 +428,10 @@
       "integration_status": "NOT_CONNECTED",
       "automation_authorized": false,
       "provider_receipt_supported": false,
-      "published_number": "60420007"
+      "published_number": "60420007",
+      "availability_status": "UNKNOWN",
+      "application_method": "UNKNOWN",
+      "source_confidence_band": "C"
     },
     {
       "saqa_id": "97592",
@@ -450,7 +471,10 @@
       "integration_status": "NOT_CONNECTED",
       "automation_authorized": false,
       "provider_receipt_supported": false,
-      "published_number": "60420008"
+      "published_number": "60420008",
+      "availability_status": "UNKNOWN",
+      "application_method": "UNKNOWN",
+      "source_confidence_band": "C"
     },
     {
       "saqa_id": "94100",
@@ -504,7 +528,10 @@
       "integration_status": "NOT_CONNECTED",
       "automation_authorized": false,
       "provider_receipt_supported": false,
-      "published_number": "60420009"
+      "published_number": "60420009",
+      "availability_status": "UNKNOWN",
+      "application_method": "UNKNOWN",
+      "source_confidence_band": "C"
     },
     {
       "saqa_id": "94021",
@@ -539,7 +566,10 @@
       "integration_status": "NOT_CONNECTED",
       "automation_authorized": false,
       "provider_receipt_supported": false,
-      "published_number": "60420010"
+      "published_number": "60420010",
+      "availability_status": "UNKNOWN",
+      "application_method": "UNKNOWN",
+      "source_confidence_band": "C"
     },
     {
       "saqa_id": "97990",
@@ -579,7 +609,10 @@
       "integration_status": "NOT_CONNECTED",
       "automation_authorized": false,
       "provider_receipt_supported": false,
-      "published_number": "60420011"
+      "published_number": "60420011",
+      "availability_status": "UNKNOWN",
+      "application_method": "UNKNOWN",
+      "source_confidence_band": "C"
     },
     {
       "saqa_id": "96236",
@@ -619,7 +652,10 @@
       "integration_status": "NOT_CONNECTED",
       "automation_authorized": false,
       "provider_receipt_supported": false,
-      "published_number": "60420012"
+      "published_number": "60420012",
+      "availability_status": "UNKNOWN",
+      "application_method": "UNKNOWN",
+      "source_confidence_band": "C"
     },
     {
       "saqa_id": "94020",
@@ -661,7 +697,10 @@
       "integration_status": "NOT_CONNECTED",
       "automation_authorized": false,
       "provider_receipt_supported": false,
-      "published_number": "60420013"
+      "published_number": "60420013",
+      "availability_status": "UNKNOWN",
+      "application_method": "UNKNOWN",
+      "source_confidence_band": "C"
     },
     {
       "saqa_id": "102497",
@@ -711,7 +750,10 @@
       "integration_status": "NOT_CONNECTED",
       "automation_authorized": false,
       "provider_receipt_supported": false,
-      "published_number": "60420014"
+      "published_number": "60420014",
+      "availability_status": "UNKNOWN",
+      "application_method": "UNKNOWN",
+      "source_confidence_band": "C"
     },
     {
       "saqa_id": "97542",
@@ -756,7 +798,10 @@
       "integration_status": "NOT_CONNECTED",
       "automation_authorized": false,
       "provider_receipt_supported": false,
-      "published_number": "234201000"
+      "published_number": "234201000",
+      "availability_status": "UNKNOWN",
+      "application_method": "UNKNOWN",
+      "source_confidence_band": "C"
     },
     {
       "saqa_id": "101697",
@@ -799,7 +844,10 @@
       "integration_status": "NOT_CONNECTED",
       "automation_authorized": false,
       "provider_receipt_supported": false,
-      "published_number": "343401100"
+      "published_number": "343401100",
+      "availability_status": "UNKNOWN",
+      "application_method": "UNKNOWN",
+      "source_confidence_band": "C"
     },
     {
       "saqa_id": "101408",
@@ -834,7 +882,10 @@
       "integration_status": "NOT_CONNECTED",
       "automation_authorized": false,
       "provider_receipt_supported": false,
-      "published_number": "351201000"
+      "published_number": "351201000",
+      "availability_status": "UNKNOWN",
+      "application_method": "UNKNOWN",
+      "source_confidence_band": "C"
     },
     {
       "saqa_id": "99447",
@@ -867,7 +918,10 @@
       "integration_status": "NOT_CONNECTED",
       "automation_authorized": false,
       "provider_receipt_supported": false,
-      "published_number": "313109000"
+      "published_number": "313109000",
+      "availability_status": "UNKNOWN",
+      "application_method": "UNKNOWN",
+      "source_confidence_band": "C"
     },
     {
       "saqa_id": "121607",
@@ -893,7 +947,10 @@
       "integration_status": "NOT_CONNECTED",
       "automation_authorized": false,
       "provider_receipt_supported": false,
-      "published_number": "514201001"
+      "published_number": "514201001",
+      "availability_status": "UNKNOWN",
+      "application_method": "UNKNOWN",
+      "source_confidence_band": "C"
     },
     {
       "saqa_id": "102296",
@@ -920,7 +977,10 @@
       "integration_status": "NOT_CONNECTED",
       "automation_authorized": false,
       "provider_receipt_supported": false,
-      "published_number": "512101000"
+      "published_number": "512101000",
+      "availability_status": "UNKNOWN",
+      "application_method": "UNKNOWN",
+      "source_confidence_band": "C"
     },
     {
       "saqa_id": "98959",
@@ -948,7 +1008,10 @@
       "integration_status": "NOT_CONNECTED",
       "automation_authorized": false,
       "provider_receipt_supported": false,
-      "published_number": "331301000"
+      "published_number": "331301000",
+      "availability_status": "UNKNOWN",
+      "application_method": "UNKNOWN",
+      "source_confidence_band": "C"
     },
     {
       "saqa_id": "102161",
@@ -973,7 +1036,10 @@
       "integration_status": "NOT_CONNECTED",
       "automation_authorized": false,
       "provider_receipt_supported": false,
-      "published_number": "334102002"
+      "published_number": "334102002",
+      "availability_status": "UNKNOWN",
+      "application_method": "UNKNOWN",
+      "source_confidence_band": "C"
     },
     {
       "saqa_id": "103219",
@@ -997,7 +1063,10 @@
       "integration_status": "NOT_CONNECTED",
       "automation_authorized": false,
       "provider_receipt_supported": false,
-      "published_number": "653201000"
+      "published_number": "653201000",
+      "availability_status": "UNKNOWN",
+      "application_method": "UNKNOWN",
+      "source_confidence_band": "C"
     },
     {
       "saqa_id": "102996",
@@ -1021,7 +1090,10 @@
       "integration_status": "NOT_CONNECTED",
       "automation_authorized": false,
       "provider_receipt_supported": false,
-      "published_number": "652201100"
+      "published_number": "652201100",
+      "availability_status": "UNKNOWN",
+      "application_method": "UNKNOWN",
+      "source_confidence_band": "C"
     },
     {
       "saqa_id": "103099",
@@ -1048,7 +1120,10 @@
       "integration_status": "NOT_CONNECTED",
       "automation_authorized": false,
       "provider_receipt_supported": false,
-      "published_number": "652201100"
+      "published_number": "652201100",
+      "availability_status": "UNKNOWN",
+      "application_method": "UNKNOWN",
+      "source_confidence_band": "C"
     },
     {
       "saqa_id": "94182",
@@ -1072,7 +1147,10 @@
       "integration_status": "NOT_CONNECTED",
       "automation_authorized": false,
       "provider_receipt_supported": false,
-      "published_number": "643202001"
+      "published_number": "643202001",
+      "availability_status": "UNKNOWN",
+      "application_method": "UNKNOWN",
+      "source_confidence_band": "C"
     },
     {
       "saqa_id": "96364",
@@ -1096,7 +1174,10 @@
       "integration_status": "NOT_CONNECTED",
       "automation_authorized": false,
       "provider_receipt_supported": false,
-      "published_number": "684904000"
+      "published_number": "684904000",
+      "availability_status": "UNKNOWN",
+      "application_method": "UNKNOWN",
+      "source_confidence_band": "C"
     },
     {
       "saqa_id": "101876",
@@ -1124,7 +1205,10 @@
       "integration_status": "NOT_CONNECTED",
       "automation_authorized": false,
       "provider_receipt_supported": false,
-      "published_number": "334302001"
+      "published_number": "334302001",
+      "availability_status": "UNKNOWN",
+      "application_method": "UNKNOWN",
+      "source_confidence_band": "C"
     },
     {
       "saqa_id": "119262",
@@ -1149,7 +1233,10 @@
       "integration_status": "NOT_CONNECTED",
       "automation_authorized": false,
       "provider_receipt_supported": false,
-      "published_number": "251201003"
+      "published_number": "251201003",
+      "availability_status": "UNKNOWN",
+      "application_method": "UNKNOWN",
+      "source_confidence_band": "C"
     },
     {
       "saqa_id": "118792",
@@ -1174,7 +1261,10 @@
       "integration_status": "NOT_CONNECTED",
       "automation_authorized": false,
       "provider_receipt_supported": false,
-      "published_number": "251201002"
+      "published_number": "251201002",
+      "availability_status": "UNKNOWN",
+      "application_method": "UNKNOWN",
+      "source_confidence_band": "C"
     },
     {
       "saqa_id": "118699",
@@ -1198,7 +1288,10 @@
       "integration_status": "NOT_CONNECTED",
       "automation_authorized": false,
       "provider_receipt_supported": false,
-      "published_number": "252301001"
+      "published_number": "252301001",
+      "availability_status": "UNKNOWN",
+      "application_method": "UNKNOWN",
+      "source_confidence_band": "C"
     },
     {
       "saqa_id": "118986",
@@ -1223,7 +1316,10 @@
       "integration_status": "NOT_CONNECTED",
       "automation_authorized": false,
       "provider_receipt_supported": false,
-      "published_number": "252901001"
+      "published_number": "252901001",
+      "availability_status": "UNKNOWN",
+      "application_method": "UNKNOWN",
+      "source_confidence_band": "C"
     },
     {
       "saqa_id": "118706",
@@ -1249,7 +1345,10 @@
       "integration_status": "NOT_CONNECTED",
       "automation_authorized": false,
       "provider_receipt_supported": false,
-      "published_number": "333908001"
+      "published_number": "333908001",
+      "availability_status": "UNKNOWN",
+      "application_method": "UNKNOWN",
+      "source_confidence_band": "C"
     },
     {
       "saqa_id": "118689",
@@ -1273,7 +1372,10 @@
       "integration_status": "NOT_CONNECTED",
       "automation_authorized": false,
       "provider_receipt_supported": false,
-      "published_number": "342301000"
+      "published_number": "342301000",
+      "availability_status": "UNKNOWN",
+      "application_method": "UNKNOWN",
+      "source_confidence_band": "C"
     },
     {
       "saqa_id": "96368",
@@ -1298,7 +1400,10 @@
       "integration_status": "NOT_CONNECTED",
       "automation_authorized": false,
       "provider_receipt_supported": false,
-      "published_number": "333101000"
+      "published_number": "333101000",
+      "availability_status": "UNKNOWN",
+      "application_method": "UNKNOWN",
+      "source_confidence_band": "C"
     },
     {
       "saqa_id": "96396",
@@ -1322,7 +1427,10 @@
       "integration_status": "NOT_CONNECTED",
       "automation_authorized": false,
       "provider_receipt_supported": false,
-      "published_number": "833301000"
+      "published_number": "833301000",
+      "availability_status": "UNKNOWN",
+      "application_method": "UNKNOWN",
+      "source_confidence_band": "C"
     },
     {
       "saqa_id": "94025",
@@ -1346,7 +1454,10 @@
       "integration_status": "NOT_CONNECTED",
       "automation_authorized": false,
       "provider_receipt_supported": false,
-      "published_number": "432301000"
+      "published_number": "432301000",
+      "availability_status": "UNKNOWN",
+      "application_method": "UNKNOWN",
+      "source_confidence_band": "C"
     },
     {
       "saqa_id": "103145",
@@ -1371,7 +1482,10 @@
       "integration_status": "NOT_CONNECTED",
       "automation_authorized": false,
       "provider_receipt_supported": false,
-      "published_number": "332301000"
+      "published_number": "332301000",
+      "availability_status": "UNKNOWN",
+      "application_method": "UNKNOWN",
+      "source_confidence_band": "C"
     }
   ]
 }
