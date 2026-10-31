@@ -31,6 +31,8 @@ const require = createRequire(import.meta.url);
 const pgPath = require.resolve("pg", { paths: [path.join(root, "apps/api")] });
 const { Client } = require(pgPath);
 const helper = path.join(root, "scripts/backup/encrypt-backup.mjs");
+const pgDumpBin = process.env.KINGSMEN_BACKUP_TEST_PG_DUMP_BIN ?? "pg_dump";
+const pgRestoreBin = process.env.KINGSMEN_BACKUP_TEST_PG_RESTORE_BIN ?? "pg_restore";
 const scratch = mkdtempSync(path.join(tmpdir(), "kingsmen-postgres-backup-restore-"));
 const plain = path.join(scratch, "truth-vault.dump");
 const encrypted = path.join(scratch, "truth-vault.kmbak");
@@ -53,8 +55,8 @@ let restored;
 let sourceCreated = false;
 let restoreCreated = false;
 try {
-  const pgDumpVersion = run("pg_dump", ["--version"]);
-  const pgRestoreVersion = run("pg_restore", ["--version"]);
+  const pgDumpVersion = run(pgDumpBin, ["--version"]);
+  const pgRestoreVersion = run(pgRestoreBin, ["--version"]);
   assert.match(pgDumpVersion, /17\./, "pg_dump 17 is required for the PostgreSQL 17 fixture");
   assert.match(pgRestoreVersion, /17\./, "pg_restore 17 is required for the PostgreSQL 17 fixture");
 
@@ -88,12 +90,12 @@ try {
     );
   }
 
-  run("pg_dump", [
+  run(pgDumpBin, [
     "--no-password", "--format=custom", "--no-owner", "--no-privileges",
     "--file=" + plain, "--host=" + host, "--port=" + port, "--username=" + user, "--dbname=" + sourceDb
   ]);
   assert.ok(statSync(plain).size > 0, "pg_dump must create a non-empty custom-format archive.");
-  run("pg_restore", ["--list", plain]);
+  run(pgRestoreBin, ["--list", plain]);
   const plainHash = digest(readFileSync(plain));
 
   run(process.execPath, [helper, "encrypt", plain, encrypted], {
@@ -109,9 +111,9 @@ try {
     KINGSMEN_BACKUP_PASSPHRASE: passphrase
   });
   assert.equal(digest(readFileSync(decrypted)), plainHash, "authenticated decrypt must restore the exact archive bytes.");
-  run("pg_restore", ["--list", decrypted]);
+  run(pgRestoreBin, ["--list", decrypted]);
 
-  run("pg_restore", [
+  run(pgRestoreBin, [
     "--no-password", "--exit-on-error", "--no-owner", "--no-privileges",
     "--host=" + host, "--port=" + port, "--username=" + user, "--dbname=" + restoreDb, decrypted
   ]);
