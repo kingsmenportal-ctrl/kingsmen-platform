@@ -150,20 +150,77 @@ source_linked AS (
 INSERT INTO public.route_providers (provider_key,provider_name,provider_type,province,base_url,source_authority_id,default_confidence_band,verification_status,public_safe,private_provider_requires_accreditation_check,notes,metadata)
 SELECT provider_key,provider_name,provider_type,NULL,base_url,source_authority_id,'D','NEEDS_REVIEW',false,false,
   'GCIS-listed public entity identity/contact discovery record only. Current vacancies, programmes, candidate eligibility, application route and deadline are not verified. No Kingsmen partnership or integration is implied.',
-  jsonb_build_object('directory_seed',jsonb_build_object(
-    'source_key','gcis_public_entities_and_soe_directory','source_profile_url',source_profile_url,'provider_homepage_url',base_url,
-    'source_id',source_id,'institution_classes',string_to_array(institution_classes,','),'source_snapshot_date','2026-10-31',
-    'record_status','NEEDS_REVIEW','source_confidence','D','public_safe',false,'provider_identity_status','GCIS_DIRECTORY_LISTED_NEEDS_REVIEW',
-    'vacancy_status','UNKNOWN','programme_status','UNKNOWN','intake_status','UNKNOWN','eligibility_status','UNKNOWN',
-    'application_route_status','NOT_VERIFIED','integration_status','NOT_CONNECTED','partnership_status','NOT_A_PARTNER',
-    'automation_authorized',false,'provider_submission_supported_by_kingsmen',false,'provider_receipt_supported',false,
-    'evidence_scope','GCIS public-entity directory profile and listed website only. No vacancy, programme, bursary, deadline, eligibility, application route, integration, partnership, submission or outcome is proven.'
-  ))
+  jsonb_build_object(
+    'directory_seed',jsonb_build_object(
+      'source_key','gcis_public_entities_and_soe_directory','source_profile_url',source_profile_url,'provider_homepage_url',base_url,
+      'source_id',source_id,'institution_classes',string_to_array(institution_classes,','),'source_snapshot_date','2026-10-31',
+      'record_status','NEEDS_REVIEW','source_confidence','D','public_safe',false,'provider_identity_status','GCIS_DIRECTORY_LISTED_NEEDS_REVIEW',
+      'vacancy_status','UNKNOWN','programme_status','UNKNOWN','intake_status','UNKNOWN','eligibility_status','UNKNOWN',
+      'application_route_status','NOT_VERIFIED','integration_status','NOT_CONNECTED','partnership_status','NOT_A_PARTNER',
+      'automation_authorized',false,'provider_submission_supported_by_kingsmen',false,'provider_receipt_supported',false,
+      'evidence_scope','GCIS public-entity directory profile and listed website only. No vacancy, programme, bursary, deadline, eligibility, application route, integration, partnership, submission or outcome is proven.'
+    ),
+    'institution_classes',to_jsonb(string_to_array(institution_classes,',')),
+    'provider_source_evidence',jsonb_build_array(jsonb_build_object(
+      'source_key','gcis_public_entities_and_soe_directory',
+      'source_authority_id',source_authority_id,
+      'source_profile_url',source_profile_url,
+      'source_id',source_id,
+      'institution_classes',string_to_array(institution_classes,','),
+      'source_snapshot_date','2026-10-31',
+      'evidence_scope','Official GCIS profile listing only; no current vacancy, application route, partnership, integration or outcome is implied.'
+    ))
+  )
 FROM source_linked
-ON CONFLICT (provider_key) DO NOTHING;
+ON CONFLICT (provider_key) DO UPDATE
+SET metadata = jsonb_set(
+  jsonb_set(
+    COALESCE(public.route_providers.metadata, '{}'::jsonb),
+    '{provider_source_evidence}',
+    (
+      SELECT COALESCE(
+        jsonb_agg(merged.evidence ORDER BY merged.evidence->>'source_key', merged.evidence->>'source_profile_url', merged.evidence->>'source_id'),
+        '[]'::jsonb
+      )
+      FROM (
+        SELECT DISTINCT prior.value AS evidence
+        FROM jsonb_array_elements(
+          CASE
+            WHEN jsonb_typeof(public.route_providers.metadata->'provider_source_evidence') = 'array'
+              THEN public.route_providers.metadata->'provider_source_evidence'
+            ELSE '[]'::jsonb
+          END
+        ) AS prior(value)
+        UNION
+        SELECT incoming.value AS evidence
+        FROM jsonb_array_elements(EXCLUDED.metadata->'provider_source_evidence') AS incoming(value)
+      ) AS merged
+    ),
+    true
+  ),
+  '{institution_classes}',
+  (
+    SELECT COALESCE(jsonb_agg(to_jsonb(classes.class_name) ORDER BY classes.class_name), '[]'::jsonb)
+    FROM (
+      SELECT DISTINCT existing.value AS class_name
+      FROM jsonb_array_elements_text(
+        CASE
+          WHEN jsonb_typeof(public.route_providers.metadata->'institution_classes') = 'array'
+            THEN public.route_providers.metadata->'institution_classes'
+          ELSE '[]'::jsonb
+        END
+      ) AS existing(value)
+      UNION
+      SELECT incoming.value AS class_name
+      FROM jsonb_array_elements_text(EXCLUDED.metadata->'institution_classes') AS incoming(value)
+    ) AS classes
+  ),
+  true
+),
+updated_at = now();
 
 DO $postflight$
-DECLARE expected_count integer := 123; actual_count integer; duplicate_count integer;
+DECLARE expected_count integer := 123; actual_count integer; duplicate_count integer; evidence_count integer; missing_class_count integer;
 BEGIN
   SELECT count(*) INTO actual_count FROM public.route_providers WHERE provider_key IN (
     'soe_hpcsa',
@@ -415,6 +472,49 @@ BEGIN
         'soe_sanas',
         'soe_saqa') GROUP BY provider_key HAVING count(*)>1) d;
   IF duplicate_count>0 THEN RAISE EXCEPTION 'GCIS_PUBLIC_ENTITY_PROVIDER_DUPLICATE_KEYS %',duplicate_count; END IF;
+
+  -- Every one of the 123 GCIS profiles must be retained as source evidence,
+  -- including keys already seeded by 0101/0102 or present as a verified provider.
+  SELECT count(*) INTO evidence_count
+  FROM public.route_providers p
+  WHERE EXISTS (
+    SELECT 1
+    FROM jsonb_array_elements(
+      CASE
+        WHEN jsonb_typeof(p.metadata->'provider_source_evidence') = 'array'
+          THEN p.metadata->'provider_source_evidence'
+        ELSE '[]'::jsonb
+      END
+    ) evidence(value)
+    WHERE evidence.value->>'source_key' = 'gcis_public_entities_and_soe_directory'
+      AND evidence.value->>'source_profile_url' IS NOT NULL
+      AND evidence.value->>'source_id' IS NOT NULL
+      AND evidence.value->>'source_authority_id' IS NOT NULL
+  );
+  IF evidence_count <> expected_count THEN
+    RAISE EXCEPTION 'GCIS_PUBLIC_ENTITY_SOURCE_EVIDENCE_COUNT_MISMATCH expected %, got %',expected_count,evidence_count;
+  END IF;
+
+  SELECT count(*) INTO missing_class_count
+  FROM public.route_providers p
+  WHERE EXISTS (
+    SELECT 1
+    FROM jsonb_array_elements(
+      CASE
+        WHEN jsonb_typeof(p.metadata->'provider_source_evidence') = 'array'
+          THEN p.metadata->'provider_source_evidence'
+        ELSE '[]'::jsonb
+      END
+    ) evidence(value)
+    WHERE evidence.value->>'source_key' = 'gcis_public_entities_and_soe_directory'
+  )
+  AND (
+    jsonb_typeof(p.metadata->'institution_classes') IS DISTINCT FROM 'array'
+    OR jsonb_array_length(p.metadata->'institution_classes') = 0
+  );
+  IF missing_class_count > 0 THEN
+    RAISE EXCEPTION 'GCIS_PUBLIC_ENTITY_CLASS_METADATA_MISSING %',missing_class_count;
+  END IF;
 END
 $postflight$;
 
