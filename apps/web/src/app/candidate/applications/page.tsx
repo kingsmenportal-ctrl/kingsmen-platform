@@ -174,13 +174,18 @@ export default function CandidateApplicationsPage() {
       setApplicationPackets(loadedPackets);
       setPacketDocuments(loadedPacketDocuments);
       setAvailableDocuments(Array.isArray(body.availableDocuments) ? body.availableDocuments as VaultDocument[] : []);
-      setPacketDrafts(Object.fromEntries(loadedPackets.map(packet => [
-        packet.target_id,
-        {
-          answers: packet.application_answers ?? {},
-          selectedDocumentIds: loadedPacketDocuments.filter(document => document.packet_id === packet.id).map(document => document.private_document_id)
+      setPacketDrafts(old => {
+        const next = { ...old };
+        for (const packet of loadedPackets) {
+          if (!next[packet.target_id]) {
+            next[packet.target_id] = {
+              answers: packet.application_answers ?? {},
+              selectedDocumentIds: loadedPacketDocuments.filter(document => document.packet_id === packet.id).map(document => document.private_document_id)
+            };
+          }
         }
-      ])));
+        return next;
+      });
       setDrafts(Object.fromEntries(loadedTrackers.map(t=>[t.id,{status:t.status,note:t.candidate_note ?? "",evidence:t.evidence_reference ?? ""}])));
       setItemDrafts(Object.fromEntries(loadedItems.map(i=>[i.id,{status:i.status,note:i.candidate_note ?? "",evidence:i.evidence_reference ?? ""}])));
       setNotice("");
