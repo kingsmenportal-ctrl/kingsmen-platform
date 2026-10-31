@@ -1568,6 +1568,188 @@
         "provider_key": "soe_transnet",
         "record_status": "NEEDS_REVIEW"
       }
+    },
+    {
+      "source_id": "gcis_provincial_local_municipal_directory",
+      "name": "GCIS Provincial and Local Government Directory — municipal profiles",
+      "authority": "Government Communication and Information System",
+      "url": "https://www.gov.za/about-government/contact-directory/provincial-local-government",
+      "classes": [
+        "MUNICIPALITY",
+        "PUBLIC_ENTITY",
+        "PUBLIC_ADMINISTRATION"
+      ],
+      "supports": [
+        "official municipal profile/contact discovery by province",
+        "South African Government separately reports 257 current municipalities: eight metropolitan, 44 district and 205 local municipalities"
+      ],
+      "does_not_prove": [
+        "the GCIS profile collection is an exhaustive or current complete extract of all 257 municipalities without count reconciliation",
+        "a live municipal vacancy, bursary, service availability, candidate eligibility or application window",
+        "a municipality-specific integration, partnership, submission receipt or outcome"
+      ],
+      "refresh_after_days": 30,
+      "review_required": true,
+      "connector_state": "NOT_CONNECTED"
+    },
+    {
+      "source_id": "national_treasury_municipal_finance_data",
+      "name": "National Treasury Municipal Finance Data Portal",
+      "authority": "National Treasury",
+      "url": "https://municipaldata.treasury.gov.za/",
+      "classes": [
+        "MUNICIPALITY",
+        "PUBLIC_ENTITY",
+        "FINANCE_AND_INSURANCE"
+      ],
+      "supports": [
+        "municipal identity and published budget/financial-performance information",
+        "the portal currently states that its 292-municipality dataset includes disestablished municipalities and is subject to data-completeness verification"
+      ],
+      "does_not_prove": [
+        "current legal status of a municipality or provider service availability",
+        "an employment, bursary, grant or programme intake",
+        "individual candidate eligibility, partnership, integration or application submission"
+      ],
+      "refresh_after_days": 30,
+      "review_required": true,
+      "connector_state": "NOT_CONNECTED"
+    },
+    {
+      "source_id": "dhet_pset_landscape_2026_27",
+      "name": "DHET Annual Performance Plan 2026/27 — PSET institutional landscape",
+      "authority": "Department of Higher Education and Training",
+      "url": "https://www.dhet.gov.za/Strategic%20Plans/Annual%20Perfomance%20Plans/DEPARTMENT%20OF%20HIGHER%20EDUCATION%20AND%20TRAINING%20APP%20FOR%202026-27.pdf",
+      "classes": [
+        "EDUCATION_AND_SKILLS",
+        "REGULATOR_AND_PROFESSIONAL_COUNCIL"
+      ],
+      "supports": [
+        "DHET reports 369 registered/established PSET institutions in the 2026/27 plan: 85 public establishments, 138 private higher-education institutions and 146 other private colleges"
+      ],
+      "does_not_prove": [
+        "individual current institution registration or programme-delivery scope without checking the current official register",
+        "current programme intake, deadlines, candidate eligibility or a Kingsmen submission route"
+      ],
+      "refresh_after_days": 90,
+      "review_required": true,
+      "connector_state": "NOT_CONNECTED"
+    },
+    {
+      "source_id": "lurits_registered_school_masterlist",
+      "name": "DBE LURITS registered-school Masterlist Portal",
+      "authority": "Department of Basic Education",
+      "url": "https://www.lurits2.doe.gov.za/HomeLinks/Masterlist",
+      "classes": [
+        "EDUCATION_AND_SKILLS",
+        "PUBLIC_ADMINISTRATION"
+      ],
+      "supports": [
+        "school search by name, EMIS number, province and district",
+        "official downloadable school masterlist for future school-directory ingestion after data-use and freshness review"
+      ],
+      "does_not_prove": [
+        "a school's current admissions intake, available learner placement, bursary or employment opportunity",
+        "candidate eligibility, application route, partnership, connector, submission or outcome"
+      ],
+      "refresh_after_days": 30,
+      "review_required": true,
+      "connector_state": "NOT_CONNECTED"
+    },
+    {
+      "source_id": "national_health_facility_master_list",
+      "name": "National Department of Health Master Health Facility List (MHFL)",
+      "authority": "National Department of Health",
+      "url": "https://www.health.gov.za/wp-content/uploads/2025/11/NDoH-2024-25-Annual-Report-_-19-September-2025.pdf",
+      "classes": [
+        "HEALTH_AND_CARE",
+        "PUBLIC_ADMINISTRATION",
+        "REGULATOR_AND_PROFESSIONAL_COUNCIL"
+      ],
+      "supports": [
+        "Department of Health describes the MHFL as the authoritative registry for public and private health establishments; an official annual-report source states more than 55,000 facilities are recorded"
+      ],
+      "does_not_prove": [
+        "current operational status, services, clinician registration, vacancy or appointment availability at a specific facility",
+        "insurance/funding coverage, candidate eligibility, a referral outcome or Kingsmen partnership/integration"
+      ],
+      "refresh_after_days": 30,
+      "review_required": true,
+      "connector_state": "NOT_CONNECTED"
+    },
+    {
+      "source_id": "govza_bursary_funding_guide",
+      "name": "South African Government — Where to find bursaries and study funding",
+      "authority": "South African Government",
+      "url": "https://www.gov.za/faq/education/where-can-i-get-bursaryfunds-further-my-studies",
+      "classes": [
+        "FUNDING_AND_SOCIAL_SUPPORT",
+        "EDUCATION_AND_SKILLS"
+      ],
+      "supports": [
+        "official government guidance to government departments, NSFAS, universities, banks and other potential funding channels"
+      ],
+      "does_not_prove": [
+        "a current open bursary cycle or funding call",
+        "candidate eligibility, award, payment, application route or provider agreement"
+      ],
+      "refresh_after_days": 30,
+      "review_required": true,
+      "connector_state": "NOT_CONNECTED"
+    },
+    {
+      "source_id": "bursaries_africa_provider_index_leads",
+      "name": "Bursaries Africa — third-party bursary and provider index (discovery leads only)",
+      "authority": "Bursaries Africa (independent third-party publisher)",
+      "url": "https://www.bursariesafrica.co.za/providers/",
+      "classes": [
+        "FUNDING_AND_SOCIAL_SUPPORT",
+        "EMPLOYER_AND_RECRUITMENT",
+        "EDUCATION_AND_SKILLS",
+        "NGO_NPO_AND_FOUNDATION"
+      ],
+      "supports": [
+        "non-authoritative provider discovery leads across companies, public entities, SETAs, universities, foundations and professional bodies"
+      ],
+      "does_not_prove": [
+        "legal identity, public registration, accreditation, current vacancy/bursary status, intake, deadline or candidate eligibility",
+        "an official provider relationship, integration, partner agreement, submission receipt or outcome"
+      ],
+      "refresh_after_days": 14,
+      "review_required": true,
+      "connector_state": "NOT_CONNECTED",
+      "metadata": {
+        "source_trust": "THIRD_PARTY_DISCOVERY_LEADS_ONLY",
+        "must_reverify_each_entity_against_its_official_source": true
+      }
+    },
+    {
+      "source_id": "nsfas_accommodation_directory",
+      "provider_key": "nsfas_accommodation_portal",
+      "name": "NSFAS Student Housing Management App — accommodation listings and application portal",
+      "authority": "National Student Financial Aid Scheme",
+      "url": "https://profprod.nsfas.org.za/accommodations",
+      "classes": [
+        "HOUSING_AND_ACCOMMODATION",
+        "FUNDING_AND_SOCIAL_SUPPORT",
+        "EDUCATION_AND_SKILLS"
+      ],
+      "supports": [
+        "official NSFAS Student Housing Management App listing of accommodation properties and institutions",
+        "portal instructions describe applying to a selected accommodation provider and completing a lease workflow for eligible students"
+      ],
+      "does_not_prove": [
+        "a specific property's current bed availability, suitability, campus approval or eligibility for a given candidate without rechecking the live listing",
+        "an application or reservation submitted by Kingsmen, a provider receipt, signed lease, payment or move-in outcome"
+      ],
+      "refresh_after_days": 7,
+      "review_required": true,
+      "connector_state": "NOT_CONNECTED",
+      "metadata": {
+        "official_portal_url": "https://profprod.nsfas.org.za/",
+        "candidate_can_apply_directly_on_provider_platform": true,
+        "kingsmen_submission_authority": "NOT_GRANTED"
+      }
     }
   ],
   "completion_gates": [
