@@ -77,9 +77,24 @@ const capabilityBySource: Record<string, string[]> = {
   govza_national_departments: ["PUBLIC_SERVICE"],
   govza_local_government: ["PUBLIC_SERVICE"],
   dpsa_vacancies: ["EMPLOYMENT"],
+  dhet_private_colleges_register_2026: ["TVET"],
+  dhet_private_higher_education_register_2026: ["HIGHER_EDUCATION"],
+  dhet_registered_pset_masterlist: ["HIGHER_EDUCATION", "TVET", "SETA_LEARNERSHIPS"],
+  nsfas_institution_directory: ["HIGHER_EDUCATION", "TVET"],
+  dhet_national_skills_fund: ["HIGHER_EDUCATION", "TVET", "SETA_LEARNERSHIPS", "APPRENTICESHIPS"],
+  funza_lushaka_bursary: ["HIGHER_EDUCATION"],
+  nsfas_official: ["HIGHER_EDUCATION", "TVET"]
   dbe_school_emis: ["BASIC_EDUCATION"],
   cipc_company_registry: ["BUSINESS_REGISTRATION"],
   dhet_skills_seta_qcto_saqa: ["HIGHER_EDUCATION", "TVET", "SETA_LEARNERSHIPS", "APPRENTICESHIPS"],
+  dhet_private_colleges_register_2026: ["TVET"],
+  dhet_private_higher_education_register_2026: ["HIGHER_EDUCATION"],
+  dhet_cet_colleges_directory: ["BASIC_EDUCATION"],
+  dhet_registered_pset_masterlist: ["HIGHER_EDUCATION", "TVET", "SETA_LEARNERSHIPS"],
+  nsfas_institution_directory: ["FUNDING", "HIGHER_EDUCATION", "TVET"],
+  dhet_national_skills_fund: ["FUNDING"],
+  funza_lushaka_bursary: ["FUNDING", "HIGHER_EDUCATION"],
+  nsfas_official: ["FUNDING", "SOCIAL_SUPPORT"]
   health_department_directory: ["HEALTH_AND_CARE"],
   hpcsa_professional_register: ["HEALTH_AND_CARE"],
   sassa_official: ["SOCIAL_SUPPORT"],
@@ -113,7 +128,7 @@ const capabilitiesByVerifiedRoute: Record<string, string[]> = {
   cao_official: ["HIGHER_EDUCATION"], labour_department_vacancies: ["EMPLOYMENT"], nsfas_official: ["FUNDING"]
 };
 const pathwaysByVerifiedRoute: Record<string, string[]> = {
-  cao_official: ["HIGHER_EDUCATION"], labour_department_vacancies: ["EMPLOYMENT"], nsfas_official: []
+  cao_official: ["HIGHER_EDUCATION"], labour_department_vacancies: ["EMPLOYMENT"], nsfas_official: ["HIGHER_EDUCATION", "TVET"]
 };
 const pathways = Object.keys(pathwayLabels);
 const capabilities = crossSector.service_capabilities as string[];
