@@ -154,16 +154,12 @@ BEGIN
   FROM public.route_providers
   WHERE provider_key LIKE 'dhet_university_%'
     AND provider_type = 'UNIVERSITY'
-    AND verification_status = 'NEEDS_REVIEW'
-    AND public_safe = false
     AND metadata ? 'dhet_directory_seed';
 
   SELECT count(*) INTO v_tvet
   FROM public.route_providers
   WHERE provider_key LIKE 'dhet_tvet_%'
     AND provider_type = 'TVET'
-    AND verification_status = 'NEEDS_REVIEW'
-    AND public_safe = false
     AND metadata ? 'dhet_directory_seed';
 
   IF v_universities <> 26 THEN
