@@ -38,7 +38,7 @@ const tokens = [
   ["apps/api/src/communications/communications-proof-boundary.ts", ["COMMUNICATIONS_BOUNDARY_SOURCE_ONLY", "emailPrimary", "whatsappDisabled", "smsDisabled", "bulkMarketingDenied", "providerSendRequiresStagingProof", "rawRecipientDataRedacted", "liveSendExecuted: false"]],
   ["apps/api/src/communications/index.ts", ["communications-proof-boundary"]],
   ["manifests/communications/communications-proof-v1.json", ["kingsmen.communications-proof.v1", "email_portal_only_pending_email_provider_staging_proof", "transactional_email_queued_primary", "whatsapp_any_purpose_denied", "sms_any_purpose_denied", "live_send_never_executed_by_source_proof"]],
-  ["docs/communications/KINGSMEN_COMMUNICATIONS_PROOF.md", ["Email is the only enabled external candidate communication channel", "WhatsApp is disabled", "SMS is disabled", "npm run communications:validate"]],
+  ["docs/communications/KINGSMEN_COMMUNICATIONS_PROOF.md", ["**Email** is the only enabled external candidate communication channel", "WhatsApp is disabled", "SMS is disabled", "npm run communications:validate"]],
   ["scripts/proof/prove-communications-boundary.mjs", ["COMMUNICATIONS_SOURCE_PROOF_PASSED", "whatsapp_any_purpose_denied", "sms_any_purpose_denied"]],
   ["package.json", ["communications:prove", "communications:validate"]],
   [".github/workflows/kingsmen-source-guard.yml", ["npm run communications:prove", "npm run communications:validate"]],
