@@ -5,6 +5,8 @@ const root = process.cwd();
 const seed = JSON.parse(fs.readFileSync(path.join(root, "manifests/institutions/seed/public-universities-and-tvet-2026-10-31.json"), "utf8"));
 const extension = JSON.parse(fs.readFileSync(path.join(root, "manifests/institutions/cross-sector-institution-source-extension.json"), "utf8"));
 const page = fs.readFileSync(path.join(root, "apps/web/src/app/candidate/institutions/page.tsx"), "utf8");
+const apiPath = path.join(root, "apps/web/src/app/api/candidate/institutions/route.ts");
+const api = fs.existsSync(apiPath) ? fs.readFileSync(apiPath, "utf8") : "";
 const packageJson = JSON.parse(fs.readFileSync(path.join(root, "package.json"), "utf8"));
 const failures = [];
 const check = (name, condition) => {
@@ -21,6 +23,10 @@ const requiredFilters = [
   "item.sectorKeys.includes(sector)", "item.serviceCapabilities.includes(capability)", "item.pathways.includes(pathway)"
 ];
 
+check("candidate page calls authenticated live directory endpoint and supports failure recovery", page.includes("/api/candidate/institutions") && page.includes("getCandidateAccessToken") && page.includes("Authorization:") && page.includes("UNAVAILABLE") && page.includes("setRetryKey"));
+check("read-only API requires bearer authentication and passes it to Supabase", api.includes("AUTHENTICATION_REQUIRED") && api.includes("Authorization: authorization") && api.includes("method: \"GET\""));
+check("read-only API filters to verified, public-safe A/B records and never uses service role", api.includes('endpoint.searchParams.set("public_safe", "eq.true")') && api.includes('endpoint.searchParams.set("verification_status", "eq.VERIFIED")') && api.includes('endpoint.searchParams.set("default_confidence_band", "in.(A,B)")') && !/SERVICE_ROLE|service_role/i.test(api));
+check("read-only API fails closed on upstream errors, redirects, timeout and oversized response", api.includes('redirect: "error"') && api.includes("AbortSignal.timeout") && api.includes("RESPONSE_LIMIT") && api.includes("cache: \"no-store\""));
 check("one page imports both canonical institution seed and cross-sector source manifest",
   page.includes("public-universities-and-tvet-2026-10-31.json") && page.includes("cross-sector-institution-source-extension.json"));
 check("provider seed remains intact and review-only", records.length === 76 &&
@@ -39,6 +45,7 @@ check("all six Kingsmen pathways are exposed as selectable filters",
 check("sector, location, capability and pathway filters are wired to result matching",
   requiredFilters.every(fragment => page.includes(fragment)) &&
   page.includes('value="NATIONAL_SOURCE"') && page.includes("item.province === location"));
+check("database-backed route records remain distinct from institution and source-anchor records", page.includes('kind: "VERIFIED_ROUTE"') && page.includes("VERIFIED_REGISTRY_ENTRY_SCOPE_ONLY") && page.includes('value="VERIFIED_ROUTE"'));
 check("provider records and source anchors are separate typed result kinds",
   page.includes('kind: "INSTITUTION"') && page.includes('kind: "OFFICIAL_SOURCE"') &&
   page.includes("Official sector source / registry") && page.includes("Discovery source only"));
@@ -50,6 +57,7 @@ check("source URLs only render as HTTPS links and external links use safe rel at
   page.includes('item.sourceUrl.startsWith("https://")') && page.includes('rel="noopener noreferrer"'));
 check("candidate workbench and verified opportunity feed remain linked",
   page.includes('href="/candidate/applications"') && page.includes('href="/candidate/opportunity-matches"'));
+check("live records are loaded without changing database state or claiming a provider integration", page.includes("NOT_CONNECTED") && page.includes("does not verify every programme or intake") && api.includes("export async function GET") && !api.includes("POST("));
 check("directory clearly disclaims submission, receipt and outcome claims",
   /does not submit to the institution/i.test(page) && /confirm a receipt/i.test(page) && /provider outcome/i.test(page));
 check("new directory contract is wired into npm test",
