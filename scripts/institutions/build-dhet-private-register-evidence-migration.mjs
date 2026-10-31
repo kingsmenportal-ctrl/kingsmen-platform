@@ -9,7 +9,7 @@ export function validateManifest(m){
  if(!Array.isArray(m.records)||!m.records.length)errors.push("records must be non-empty");
  const seen=new Set(),regIds=new Map();
  for(const [i,r] of (m.records??[]).entries()){
-  for(const k of ["source_record_ref","source_register","source_snapshot_date","canonical_name_candidate","normalized_name_key","source_url","source_excerpt","registration_status","registration_identifier"])if(!r[k])errors.push("record "+i+" missing "+k);
+  for(const k of ["source_record_ref","source_register","source_section","source_snapshot_date","canonical_name_candidate","normalized_name_key","source_url","source_excerpt","registration_status","registration_identifier"])if(!r[k])errors.push("record "+i+" missing "+k);
   if(!allowedStatuses.has(r.registration_status))errors.push("record "+i+" has unsupported registration status");
   if(!Array.isArray(r.registration_identifiers_observed)||r.registration_identifiers_observed.length!==1)errors.push("record "+i+" must have exactly one registration identifier");
   if(r.registration_identifier!==r.registration_identifiers_observed?.[0])errors.push("record "+i+" has inconsistent registration identifier fields");
@@ -26,13 +26,14 @@ export function validateManifest(m){
 }
 export function buildMigration(m){
  const errors=validateManifest(m);if(errors.length)throw Error(errors.join("\n"));
- const rows=m.records.map(r=>"  ("+[quote(r.source_register),quote(r.source_snapshot_date)+"::date",quote(r.source_record_ref),quote(r.canonical_name_candidate),quote(r.normalized_name_key),quote(r.registration_identifier),quote(r.registration_status),json(r.registration_identifiers_observed),quote(r.registration_status_review_required===true?"true":"false"),json(r.province_candidates),quote(r.province_status??"NOT_EXTRACTED"),json(r.campus_site_candidates),quote(r.campus_extraction_status??"MANUAL_REVIEW_REQUIRED"),json(r.alias_candidates),json(r.possible_existing_provider_matches),quote(r.alias_reconciliation_status??"MANUAL_REVIEW_REQUIRED"),quote(r.identity_conflict_status??"NO_CONFLICT_DETECTED_REVIEW_STILL_REQUIRED"),json(r.conflict_flags),quote(r.source_url),quote(r.source_excerpt)].join(", ")+")").join(",\n");
+ const rows=m.records.map(r=>"  ("+[quote(r.source_register),quote(r.source_section),quote(r.source_snapshot_date)+"::date",quote(r.source_record_ref),quote(r.canonical_name_candidate),quote(r.normalized_name_key),quote(r.registration_identifier),quote(r.registration_status),json(r.registration_identifiers_observed),quote(r.registration_status_review_required===true?"true":"false"),json(r.province_candidates),quote(r.province_status??"NOT_EXTRACTED"),json(r.campus_site_candidates),quote(r.campus_extraction_status??"MANUAL_REVIEW_REQUIRED"),json(r.alias_candidates),json(r.possible_existing_provider_matches),quote(r.alias_reconciliation_status??"MANUAL_REVIEW_REQUIRED"),quote(r.identity_conflict_status??"NO_CONFLICT_DETECTED_REVIEW_STILL_REQUIRED"),json(r.conflict_flags),quote(r.source_url),quote(r.source_excerpt)].join(", ")+")").join(",\n");
  return `-- Generated from a reviewed DHET register candidate manifest. Do not apply without independent review and approved change control.
 -- Registry evidence only; this migration does not create application routes or mark providers connected.
 BEGIN;
 CREATE TABLE IF NOT EXISTS public.private_institution_registry_entries (
  id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
  source_register text NOT NULL CHECK (source_register IN ('private_higher_education','private_colleges')),
+ source_section text NOT NULL,
  source_snapshot_date date NOT NULL,
  source_record_ref text NOT NULL,
  canonical_name_candidate text NOT NULL,
@@ -60,6 +61,7 @@ CREATE TABLE IF NOT EXISTS public.private_institution_registry_entries (
  imported_at timestamptz NOT NULL DEFAULT now(),
  UNIQUE(source_register,source_snapshot_date,source_record_ref)
 );
+ALTER TABLE public.private_institution_registry_entries ADD COLUMN IF NOT EXISTS source_section text NOT NULL DEFAULT 'LEGACY_SECTION_UNKNOWN';
 ALTER TABLE public.private_institution_registry_entries ADD COLUMN IF NOT EXISTS registration_identifiers_observed jsonb NOT NULL DEFAULT '[]'::jsonb;
 ALTER TABLE public.private_institution_registry_entries ADD COLUMN IF NOT EXISTS registration_status_review_required boolean NOT NULL DEFAULT true;
 ALTER TABLE public.private_institution_registry_entries ADD COLUMN IF NOT EXISTS province_status text NOT NULL DEFAULT 'NOT_EXTRACTED';
@@ -72,7 +74,7 @@ CREATE INDEX IF NOT EXISTS idx_private_registry_normalized_name ON public.privat
 CREATE TEMP TABLE _dhet_private_registry_stage ON COMMIT DROP AS
 SELECT * FROM (VALUES
 ${rows}
-) AS v(source_register,source_snapshot_date,source_record_ref,canonical_name_candidate,normalized_name_key,registration_identifier,registration_status,registration_identifiers_observed,registration_status_review_required,province_candidates,province_status,campus_site_candidates,campus_extraction_status,alias_candidates,possible_existing_provider_matches,alias_reconciliation_status,identity_conflict_status,conflict_flags,source_url,source_excerpt);
+) AS v(source_register,source_section,source_snapshot_date,source_record_ref,canonical_name_candidate,normalized_name_key,registration_identifier,registration_status,registration_identifiers_observed,registration_status_review_required,province_candidates,province_status,campus_site_candidates,campus_extraction_status,alias_candidates,possible_existing_provider_matches,alias_reconciliation_status,identity_conflict_status,conflict_flags,source_url,source_excerpt);
 DO $preflight$
 BEGIN
  IF EXISTS (SELECT 1 FROM _dhet_private_registry_stage GROUP BY source_register,source_snapshot_date,source_record_ref HAVING count(*)>1) THEN
@@ -96,10 +98,11 @@ BEGIN
 END
 $preflight$;
 INSERT INTO public.private_institution_registry_entries
- (source_register,source_snapshot_date,source_record_ref,canonical_name_candidate,normalized_name_key,registration_identifier,registration_status,registration_identifiers_observed,registration_status_review_required,province_candidates,province_status,campus_site_candidates,campus_extraction_status,alias_candidates,possible_existing_provider_matches,alias_reconciliation_status,identity_conflict_status,conflict_flags,source_url,source_excerpt,identity_review_status,official_route_status,integration_status,automation_authorized)
-SELECT source_register,source_snapshot_date,source_record_ref,canonical_name_candidate,normalized_name_key,registration_identifier,registration_status,registration_identifiers_observed,registration_status_review_required,province_candidates,province_status,campus_site_candidates,campus_extraction_status,alias_candidates,possible_existing_provider_matches,alias_reconciliation_status,identity_conflict_status,conflict_flags,source_url,source_excerpt,'NEEDS_CANONICAL_IDENTITY_REVIEW','NOT_VERIFIED','NOT_CONNECTED',false
+ (source_register,source_section,source_snapshot_date,source_record_ref,canonical_name_candidate,normalized_name_key,registration_identifier,registration_status,registration_identifiers_observed,registration_status_review_required,province_candidates,province_status,campus_site_candidates,campus_extraction_status,alias_candidates,possible_existing_provider_matches,alias_reconciliation_status,identity_conflict_status,conflict_flags,source_url,source_excerpt,identity_review_status,official_route_status,integration_status,automation_authorized)
+SELECT source_register,source_section,source_snapshot_date,source_record_ref,canonical_name_candidate,normalized_name_key,registration_identifier,registration_status,registration_identifiers_observed,registration_status_review_required,province_candidates,province_status,campus_site_candidates,campus_extraction_status,alias_candidates,possible_existing_provider_matches,alias_reconciliation_status,identity_conflict_status,conflict_flags,source_url,source_excerpt,'NEEDS_CANONICAL_IDENTITY_REVIEW','NOT_VERIFIED','NOT_CONNECTED',false
 FROM _dhet_private_registry_stage
 ON CONFLICT(source_register,source_snapshot_date,source_record_ref) DO UPDATE SET
+ source_section=EXCLUDED.source_section,
  registration_identifiers_observed=EXCLUDED.registration_identifiers_observed,
  registration_status_review_required=EXCLUDED.registration_status_review_required,
  province_candidates=EXCLUDED.province_candidates,
@@ -137,7 +140,7 @@ COMMIT;
 `;
 }
 if(process.argv.includes("--self-test")){
- const base={source_register:"private_colleges",source_snapshot_date:"2026-07-15",source_record_ref:"private_colleges:section-a:001:2020/fe07/117",canonical_name_candidate:"Example College",normalized_name_key:"example-college",registration_identifier:"2020/FE07/117",registration_identifiers_observed:["2020/FE07/117"],registration_status:"CANCELLED",registration_status_review_required:false,province_candidates:["Limpopo"],province_status:"SOURCE_LISTED_CANDIDATE",campus_site_candidates:["Makotse Road, Zebediela"],campus_extraction_status:"REVIEW_REQUIRED",alias_candidates:[],possible_existing_provider_matches:[],alias_reconciliation_status:"NO_EXACT_MATCH_FOUND_STILL_REQUIRES_MANUAL_REVIEW",identity_conflict_status:"NO_CONFLICT_DETECTED_REVIEW_STILL_REQUIRED",conflict_flags:[],source_url:"https://www.dhet.gov.za/Registers_DocLib/example.pdf",source_excerpt:"Example College, 2020/FE07/117",official_route_status:"NOT_VERIFIED",integration_status:"NOT_CONNECTED",automation_authorized:false};
+ const base={source_register:"private_colleges",source_section:"SECTION A",source_snapshot_date:"2026-07-15",source_record_ref:"private_colleges:section-a:001:2020/fe07/117",canonical_name_candidate:"Example College",normalized_name_key:"example-college",registration_identifier:"2020/FE07/117",registration_identifiers_observed:["2020/FE07/117"],registration_status:"CANCELLED",registration_status_review_required:false,province_candidates:["Limpopo"],province_status:"SOURCE_LISTED_CANDIDATE",campus_site_candidates:["Makotse Road, Zebediela"],campus_extraction_status:"REVIEW_REQUIRED",alias_candidates:[],possible_existing_provider_matches:[],alias_reconciliation_status:"NO_EXACT_MATCH_FOUND_STILL_REQUIRES_MANUAL_REVIEW",identity_conflict_status:"NO_CONFLICT_DETECTED_REVIEW_STILL_REQUIRED",conflict_flags:[],source_url:"https://www.dhet.gov.za/Registers_DocLib/example.pdf",source_excerpt:"Example College, 2020/FE07/117",official_route_status:"NOT_VERIFIED",integration_status:"NOT_CONNECTED",automation_authorized:false};
  const m={schema:"kingsmen.institutions.dhet-private-register-candidates.v1",records:[base]};
  if(validateManifest(m).length)throw Error("valid fixture rejected");
  const sql=buildMigration(m);
