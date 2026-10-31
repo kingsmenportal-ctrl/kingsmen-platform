@@ -26,3 +26,8 @@ Do not apply this migration or institution seed imports to staging until all are
 5. The preflight is rerun against the current staging schema immediately before the approved change window.
 
 After approval, apply through the approved migration mechanism, then verify that anon/authenticated have zero CAO table grants, active candidate 501 is rejected in a rollback-safe test, deactivation remains possible, and normal backend candidate creation remains functional. Never insert synthetic migration ledger rows.
+
+
+## CI wiring
+
+Candidate Experience CI, Release Evidence, and Source Guard are configured to run on this corrective branch. CI verifies the source-contract validator and builds; it does not replace live migration runtime tests or the mandatory independent approval gates.
