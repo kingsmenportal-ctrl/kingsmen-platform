@@ -15,6 +15,7 @@ type VerifiedProviderRoute = {
 };
 type DirectoryItem = {
   id: string;
+  registryKey: string | null;
   name: string;
   kind: "INSTITUTION" | "OFFICIAL_SOURCE" | "VERIFIED_ROUTE";
   providerType: string;
@@ -131,6 +132,9 @@ const institutionItems: DirectoryItem[] = directorySeed.records.map((record: Ins
   const pathway = isUniversity ? "HIGHER_EDUCATION" : "TVET";
   return {
     id: record.institution_ref,
+    registryKey: isUniversity
+      ? "dhet_university_" + record.institution_ref.replace(/^university-/, "")
+      : "dhet_tvet_" + record.institution_ref.replace(/^tvet-/, ""),
     name: record.canonical_name,
     kind: "INSTITUTION",
     providerType: record.provider_type,
@@ -170,6 +174,7 @@ const sourceItems: DirectoryItem[] = crossSector.sources.map((source: SourceAnch
   const sourcePathways = pathwayBySource[source.source_id] ?? [];
   return {
     id: source.source_id,
+    registryKey: null,
     name: source.name,
     kind: "OFFICIAL_SOURCE",
     providerType: "SOURCE_REGISTRY",
@@ -262,7 +267,7 @@ export default function CandidateInstitutionDirectoryPage() {
   ).sort((a, b) => a.localeCompare(b)), []);
 
   const verifiedRouteItems = useMemo<DirectoryItem[]>(() => verifiedRoutes.map(route => ({
-    id: route.provider_key, name: route.provider_name, kind: "VERIFIED_ROUTE", providerType: route.provider_type,
+    id: route.provider_key, registryKey: route.provider_key, name: route.provider_name, kind: "VERIFIED_ROUTE", providerType: route.provider_type,
     sectorKeys: sectorsByVerifiedRoute[route.provider_key] ?? [], province: route.province,
     serviceCapabilities: capabilitiesByVerifiedRoute[route.provider_key] ?? [], pathways: pathwaysByVerifiedRoute[route.provider_key] ?? [],
     sourceName: "Kingsmen canonical source-authority register", sourceUrl: route.base_url,
@@ -513,6 +518,14 @@ export default function CandidateInstitutionDirectoryPage() {
                   <span className="rounded-xl border border-yellow-500/30 bg-yellow-950/20 px-4 py-3 text-xs font-semibold text-yellow-100">
                     Institution website URL unresolved. Kingsmen will not guess the URL.
                   </span>
+                )}
+                {item.registryKey && item.kind !== "OFFICIAL_SOURCE" && (
+                  <Link
+                    href={`/candidate/applications?directory_provider_key=${encodeURIComponent(item.registryKey)}&directory_provider_name=${encodeURIComponent(item.name)}&directory_pathway=${encodeURIComponent(item.pathways.find(value => pathways.includes(value)) ?? (item.providerType === "TVET" ? "TVET" : "HIGHER_EDUCATION"))}`}
+                    className="inline-flex rounded-xl bg-amber-300 px-4 py-3 text-sm font-extrabold text-[#101b2a] hover:bg-amber-200"
+                  >
+                    Prepare with Kingsmen
+                  </Link>
                 )}
                 <Link href="/candidate/applications" className="inline-flex rounded-xl border border-slate-600 px-4 py-3 text-sm font-bold text-white hover:border-amber-300">
                   Open Kingsmen workbench
