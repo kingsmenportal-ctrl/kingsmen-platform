@@ -57,7 +57,7 @@ WITH provider_seed(provider_key, provider_name, provider_type, base_url, source_
     ('seta_ceta', 'Construction Education and Training Authority (CETA)', 'SETA', 'https://www.ceta.org.za/', 'dhet_seta_directory', 'SETA', 'https://www.dhet.gov.za/SitePages/SETAlinks.aspx'),
     ('seta_chieta', 'Chemical Industries Education and Training Authority (CHIETA)', 'SETA', 'https://www.chieta.org.za/', 'dhet_seta_directory', 'SETA', 'https://www.dhet.gov.za/SitePages/SETAlinks.aspx'),
     ('seta_etdpseta', 'Education, Training and Development Practices SETA', 'SETA', 'https://www.etdpseta.org.za/', 'dhet_seta_directory', 'SETA', 'https://www.dhet.gov.za/SitePages/SETAlinks.aspx'),
-    ('seta_ewseta', 'Energy and Water Sector Education and Training Authority', 'SETA', 'https://ewseta.org.za/', 'dhet_seta_directory', 'SETA', 'https://www.dhet.gov.za/SitePages/SETAlinks.aspx'),
+    ('seta_ewseta', 'Energy and Water Sector Education and Training Authority', 'SETA', 'https://www.eseta.org.za/', 'dhet_seta_directory', 'SETA', 'https://www.dhet.gov.za/SitePages/SETAlinks.aspx'),
     ('seta_fasset', 'Financial and Accounting Services SETA (FASSET)', 'SETA', 'https://www.fasset.org.za/', 'dhet_seta_directory', 'SETA', 'https://www.dhet.gov.za/SitePages/SETAlinks.aspx'),
     ('seta_foodbev', 'FoodBev Manufacturing SETA', 'SETA', 'https://www.foodbev.co.za/', 'dhet_seta_directory', 'SETA', 'https://www.dhet.gov.za/SitePages/SETAlinks.aspx'),
     ('seta_fpm', 'Fibre Processing and Manufacturing SETA (FP&M)', 'SETA', 'https://www.fpmseta.org.za/', 'dhet_seta_directory', 'SETA', 'https://www.dhet.gov.za/SitePages/SETAlinks.aspx'),
