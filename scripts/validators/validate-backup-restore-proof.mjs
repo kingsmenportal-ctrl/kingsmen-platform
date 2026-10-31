@@ -28,6 +28,8 @@ const requiredTokens = new Map([
   ['scripts/backup/test-backup-restore-safety.mjs', ['kingsmen.backup-restore-safety-tests.v1', 'liveDatabaseTouched: false', 'encryption helper uses AES-256-GCM']],
   ['scripts/backup/encrypt-backup.mjs', ['aes-256-gcm', 'scrypt', 'setAuthTag', 'KINGSMEN_BACKUP_PASSPHRASE']],
   ['scripts/backup/test-backup-encryption.mjs', ['kingsmen.backup-encryption-tests.v1', 'tamper rejection', 'wrong-passphrase rejection']],
+  ['scripts/backup/test-backup-postgres-restore-integration.mjs', ['kingsmen.backup-postgresql-restore-integration.v1', 'KMBACK01', 'sourceAndRestoreRowParity', 'productionRestoreProven: false']],
+  ['.github/workflows/backup-postgres-restore-integration.yml', ['postgres:17', 'pg_dump', 'postgres-client-17', 'backup:test:postgres-restore']],
   ['scripts/proof/prove-backup-restore-boundary.mjs', ['BACKUP_RESTORE_SOURCE_PROOF_PASSED', 'stagingRestoreDrillCompleted: false']],
   ['manifests/launch/kingsmen-launch-readiness-v1.json', ['backup_restore', 'backup-restore-proof-v1', 'foundation_built_pending_staging_drill']],
   ['scripts/validators/validate-kingsmen-launch-readiness.mjs', ['backup:validate:restore', 'BACKUP_RESTORE_STAGING_DRILL_REQUIRED']]
