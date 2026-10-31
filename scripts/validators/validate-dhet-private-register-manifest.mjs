@@ -35,7 +35,7 @@ for(const [key,group] of ids){
  if(group.length<2)continue;
  const names=new Set(group.map(x=>x.normalized_name_key));
  const statuses=new Set(group.map(x=>x.registration_status));
- const differentNames=names.size>1,differentStatuses=statuses.size>1;
+ const differentNames=names.size>1,differentStatuses=statuses.size>1||group.some(x=>(x.conflict_flags??[]).includes("REGISTRATION_STATUS_CONFLICT"));
  if(differentNames||differentStatuses){
   conflictGroups++;
   for(const r of group){
@@ -67,6 +67,6 @@ if(provinceCount===0)failures.push("no province candidates were extracted from e
 if(campusCount===0)failures.push("no campus/site candidates were extracted from either complete register");
 const names=new Map();
 for(const r of m.records??[]){if(!r.normalized_name_key)continue;const k=r.source_register+"|"+r.source_snapshot_date+"|"+r.normalized_name_key;const g=names.get(k)||[];g.push(r);names.set(k,g);}
-for(const [key,group] of names){if(group.length<2)continue;for(const r of group)if(r.identity_conflict_status!=="DUPLICATE_SOURCE_ENTRY_REVIEW"||r.possible_duplicate_within_source!==true||!(r.conflict_flags??[]).includes("DUPLICATE_NORMALIZED_NAME_REVIEW"))failures.push("duplicate normalized institution identity not flagged for review: "+key);}
+for(const [key,group] of names){if(group.length<2)continue;for(const r of group)if(!["DUPLICATE_SOURCE_ENTRY_REVIEW","CONFLICT_REVIEW_REQUIRED"].includes(r.identity_conflict_status)||r.possible_duplicate_within_source!==true||!(r.conflict_flags??[]).includes("DUPLICATE_NORMALIZED_NAME_REVIEW"))failures.push("duplicate normalized institution identity not flagged for review: "+key);}
 if(failures.length){console.error("DHET manifest validation failed:\n"+failures.slice(0,100).join("\n"));process.exit(1);}
 console.log("PASS DHET full-register candidate validation",JSON.stringify({total:m.records.length,perKind,counts:m.counts,registrationIdentifierConflictGroups:conflictGroups,duplicateGroups,routeSafety:"all candidates remain disconnected"}));
