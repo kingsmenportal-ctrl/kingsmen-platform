@@ -126,8 +126,23 @@ BEGIN
   WHERE table_schema='public' AND table_name='cao_choice_items'
     AND grantee IN ('anon','authenticated')
     AND privilege_type IN ('SELECT','INSERT','UPDATE','DELETE','TRUNCATE','REFERENCES','TRIGGER','MAINTAIN');
-  IF client_grants <> 0 THEN
-    RAISE EXCEPTION 'CAO_CLIENT_PRIVILEGE_POSTFLIGHT_FAILED: % grants remain', client_grants;
+  IF client_grants <> 0
+     OR has_table_privilege('anon','public.cao_choice_items','SELECT')
+     OR has_table_privilege('anon','public.cao_choice_items','INSERT')
+     OR has_table_privilege('anon','public.cao_choice_items','UPDATE')
+     OR has_table_privilege('anon','public.cao_choice_items','DELETE')
+     OR has_table_privilege('anon','public.cao_choice_items','TRUNCATE')
+     OR has_table_privilege('anon','public.cao_choice_items','REFERENCES')
+     OR has_table_privilege('anon','public.cao_choice_items','TRIGGER')
+     OR has_table_privilege('authenticated','public.cao_choice_items','SELECT')
+     OR has_table_privilege('authenticated','public.cao_choice_items','INSERT')
+     OR has_table_privilege('authenticated','public.cao_choice_items','UPDATE')
+     OR has_table_privilege('authenticated','public.cao_choice_items','DELETE')
+     OR has_table_privilege('authenticated','public.cao_choice_items','TRUNCATE')
+     OR has_table_privilege('authenticated','public.cao_choice_items','REFERENCES')
+     OR has_table_privilege('authenticated','public.cao_choice_items','TRIGGER')
+     OR has_table_privilege('authenticated','public.cao_choice_items','MAINTAIN') THEN
+    RAISE EXCEPTION 'CAO_CLIENT_PRIVILEGE_POSTFLIGHT_FAILED: % explicit grants remain or inherited privileges survive', client_grants;
   END IF;
 
   SELECT count(*) INTO trigger_count
