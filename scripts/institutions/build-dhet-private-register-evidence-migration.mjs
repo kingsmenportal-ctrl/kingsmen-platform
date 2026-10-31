@@ -117,13 +117,17 @@ COMMIT;
 `;
 }
 if(process.argv.includes("--self-test")){
- const base={source_register:"private_colleges",source_snapshot_date:"2026-07-15",source_record_ref:"private_colleges:2020/FE07/117",canonical_name_candidate:"Example College",normalized_name_key:"example-college",registration_identifier:"2020/FE07/117",registration_status:"CANCELLED",province_candidates:["Limpopo"],alias_candidates:[],source_url:"https://www.dhet.gov.za/Registers_DocLib/example.pdf",source_excerpt:"Example College, 2020/FE07/117",official_route_status:"NOT_VERIFIED",integration_status:"NOT_CONNECTED",automation_authorized:false};
+ const base={source_register:"private_colleges",source_snapshot_date:"2026-07-15",source_record_ref:"private_colleges:section-a:001:2020/fe07/117",canonical_name_candidate:"Example College",normalized_name_key:"example-college",registration_identifier:"2020/FE07/117",registration_identifiers_observed:["2020/FE07/117"],registration_status:"CANCELLED",registration_status_review_required:false,province_candidates:["Limpopo"],province_status:"SOURCE_LISTED_CANDIDATE",campus_site_candidates:["Makotse Road, Zebediela"],campus_extraction_status:"REVIEW_REQUIRED",alias_candidates:[],possible_existing_provider_matches:[],alias_reconciliation_status:"NO_EXACT_MATCH_FOUND_STILL_REQUIRES_MANUAL_REVIEW",identity_conflict_status:"NO_CONFLICT_DETECTED_REVIEW_STILL_REQUIRED",conflict_flags:[],source_url:"https://www.dhet.gov.za/Registers_DocLib/example.pdf",source_excerpt:"Example College, 2020/FE07/117",official_route_status:"NOT_VERIFIED",integration_status:"NOT_CONNECTED",automation_authorized:false};
  const m={schema:"kingsmen.institutions.dhet-private-register-candidates.v1",records:[base]};
  if(validateManifest(m).length)throw Error("valid fixture rejected");
  const sql=buildMigration(m);
  for(const x of ["BEGIN;","ON CONFLICT(source_register,source_snapshot_date,source_record_ref) DO UPDATE","DHET_REGISTER_REGISTRATION_IDENTITY_CONFLICT","NOT_VERIFIED","NOT_CONNECTED","DHET_REGISTER_ROUTE_SAFETY_POSTFLIGHT_FAILED"])if(!sql.includes(x))throw Error("migration missing "+x);
  const bad={...m,records:[base,{...base,source_record_ref:"different-ref",canonical_name_candidate:"Other Name",normalized_name_key:"other-name"}]};
  if(!validateManifest(bad).some(x=>x.includes("conflicting normalized names")))throw Error("conflict check failed");
+ const unresolved={...m,records:[{...base,identity_conflict_status:"CONFLICT_REVIEW_REQUIRED",conflict_flags:["REGISTRATION_IDENTIFIER_REUSED_WITH_DIFFERENT_NAME"]}]};
+ if(!validateManifest(unresolved).some(x=>x.includes("unresolved registration identity/status conflict")))throw Error("unresolved identity conflict was not blocked");
+ const multi={...m,records:[{...base,registration_identifiers_observed:["2020/FE07/117","2021/FE07/118"]}]};
+ if(!validateManifest(multi).some(x=>x.includes("exactly one registration identifier")))throw Error("multiple registration identifiers were not blocked");
  console.log("PASS DHET idempotent evidence-migration generator self-test");
 }else{
  const args=Object.fromEntries(process.argv.slice(2).map((x,i,a)=>x.startsWith("--")?[x.slice(2),a[i+1]]:null).filter(Boolean));
