@@ -23,7 +23,7 @@ type Opportunity = {
   match_score: number;
   source_checked_at: string;
   source_evidence: string[];
-  deadline: { closes_at?: string; timezone?: string; evidence?: string[]; status?: string; message?: string };
+  deadline: { closes_at?: string; closes_on?: string; timezone?: string; evidence?: string[]; status?: string; message?: string };
   eligibility: { status: string; rules: string };
   recommendation_summary: string;
 };
@@ -237,7 +237,7 @@ export default function CandidateOpportunityMatchesPage() {
                   <p className="mt-3 text-sm text-slate-700">{item.recommendation_summary}</p>
                   <dl className="mt-4 space-y-2 border-t border-slate-100 pt-4 text-sm">
                     <div><dt className="inline font-semibold text-slate-800">Source checked: </dt><dd className="inline text-slate-600">{new Date(item.source_checked_at).toLocaleString()}</dd></div>
-                    <div><dt className="inline font-semibold text-slate-800">Deadline: </dt><dd className="inline text-slate-600">{item.deadline.closes_at ? new Date(item.deadline.closes_at).toLocaleString() : item.deadline.message || "Not verified — check the official page."}</dd></div>
+                    <div><dt className="inline font-semibold text-slate-800">Deadline: </dt><dd className="inline text-slate-600">{item.deadline.closes_at ? new Date(item.deadline.closes_at).toLocaleString() : item.deadline.closes_on ? `${new Date(`${item.deadline.closes_on}T12:00:00Z`).toLocaleDateString("en-ZA", { timeZone: "Africa/Johannesburg" })} (date only; closing time not stated — verify the official advert)` : item.deadline.message || "Not verified — check the official page."}</dd></div>
                     <div><dt className="inline font-semibold text-slate-800">Eligibility: </dt><dd className="inline text-slate-600">Requires candidate-specific review; not guaranteed.</dd></div>
                   </dl>
                   <div className="mt-4">
