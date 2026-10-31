@@ -25,10 +25,10 @@ function status(section,block,kind){
 function redactSourceExcerpt(block){
  return block.split("\n").filter(line=>{
   const t=line.trim();
-  return !/^(CONTACT PERSON|CONTACT DETAILS|TEL\\.?|TELEPHONE|MOBILE|FAX|EMAIL|E-MAIL|E MAIL|E-MAIL ADDRESS|EMAIL ADDRESS|CONTACT NUMBER|PRINCIPAL|REGISTRAR)\\b/i.test(t)
-   && !/^(MR|MRS|MS|MISS|DR|PROF|PROFESSOR|MX)\\.?\\s+/i.test(t)
-   && !/[A-Z0-9._%+-]+@[A-Z0-9.-]+\\.[A-Z]{2,}/i.test(t)
-   && !/(?:\\+?\\d[\\d ()/-]{7,}\\d)/.test(t);
+  return !/^(CONTACT PERSON|CONTACT DETAILS|TEL\.?|TELEPHONE|MOBILE|FAX|EMAIL|E-MAIL|E MAIL|E-MAIL ADDRESS|EMAIL ADDRESS|CONTACT NUMBER|PRINCIPAL|REGISTRAR)\b/i.test(t)
+   && !/^(MR|MRS|MS|MISS|DR|PROF|PROFESSOR|MX)\.?\s+/i.test(t)
+   && !/[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}/i.test(t)
+   && !/(?:\+?\d[\d ()/-]{7,}\d)/.test(t);
  }).join("\n").slice(0,12000);
 }
 function splitEntries(text){
