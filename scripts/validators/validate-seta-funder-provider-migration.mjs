@@ -30,7 +30,7 @@ check("all SETAs use provider type SETA and funders use BURSARY_PROVIDER", sql.i
 check("new provider records are review-only, D confidence and not public-safe", sql.includes("'D'") && sql.includes("'NEEDS_REVIEW'") && /public_safe,/.test(sql) && /\n\s*false,\n\s*false,/.test(sql));
 check("directory metadata preserves not verified / not connected / not partner boundaries", ["'UNKNOWN'","'NOT_VERIFIED'","'NOT_CONNECTED'","'NOT_A_PARTNER'","'provider_receipt_supported', false","'automation_authorized', false"].every(fragment => sql.includes(fragment)));
 check("provider-key conflicts are non-destructive and reviewer states are not overwritten", sql.includes("ON CONFLICT (provider_key) DO NOTHING") && !/UPDATE\s+public\.route_providers/i.test(sql));
-check("migration contains a 23-record postflight count assertion", sql.includes("expected_count integer := 23") && sql.includes("SETA_FUNDER_PROVIDER_SEED_COUNT_MISMATCH"));
+check("migration postflight validates exact key/name/type/URL and review-only state without overwrites", sql.includes("expected_count integer := 23") && sql.includes("SETA_FUNDER_PROVIDER_SEED_COUNT_MISMATCH") && sql.includes("provider_name IS DISTINCT FROM e.provider_name") && sql.includes("verification_status IS DISTINCT FROM 'NEEDS_REVIEW'") && sql.includes("default_confidence_band IS DISTINCT FROM 'D'") && sql.includes("public_safe IS DISTINCT FROM false"));
 check("no opportunity, programme or deadline rows are created", !/INSERT\s+INTO\s+public\.(route_programmes|opportunity_programmes|opportunity_deadlines)/i.test(sql));
 
 if (errors.length) {
