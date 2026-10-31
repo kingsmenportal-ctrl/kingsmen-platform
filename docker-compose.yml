@@ -72,8 +72,10 @@ services:
       REDIS_PORT: 6379
       EMAIL_PROVIDER_MODE: ${EMAIL_PROVIDER_MODE:-disabled}
       EMAIL_NO_SEND_MODE: "true"
-      WHATSAPP_URGENT_ONLY: "true"
-      SMS_BACKUP_ONLY: "true"
+      WHATSAPP_DISABLED: "true"
+      SMS_DISABLED: "true"
+      WHATSAPP_URGENT_ONLY: "false"
+      SMS_BACKUP_ONLY: "false"
       PLAYWRIGHT_BLOCK_ON_CAPTCHA: "true"
       PLAYWRIGHT_BLOCK_ON_OTP: "true"
     volumes:
