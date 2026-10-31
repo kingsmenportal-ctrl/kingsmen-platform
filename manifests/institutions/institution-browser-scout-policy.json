@@ -1,0 +1,75 @@
+{
+  "schema": "kingsmen.institution-browser-scout-policy.v1",
+  "version": "1.0.0",
+  "status": "PROPOSED_FOR_INDEPENDENT_REVIEW",
+  "jarvisToolRef": "jarvis.browser.scout",
+  "trustLevel": "TRUST_2_DRY_RUN",
+  "defaultMode": "PROBE_READ_ONLY",
+  "authorityCeiling": "LEVEL_3_TEST_VALIDATE",
+  "candidateFacingSafeByDefault": false,
+  "humanReviewRequired": true,
+  "limits": {
+    "maxTargetsPerRun": 12,
+    "maxConcurrentOrigins": 2,
+    "maxConcurrentProbesPerOrigin": 1,
+    "maxNavigationTimeoutMs": 30000,
+    "maxFieldsPerForm": 80,
+    "maxFormsPerPage": 16,
+    "maxNetworkMetadataEvents": 40
+  },
+  "allowedOperations": [
+    "public_https_get",
+    "fresh_browser_context",
+    "read_visible_page_title_and_headings",
+    "inspect_form_labels_and_validation_attributes_without_values",
+    "capture_redacted_screenshot",
+    "hash_accessibility_and_structure_snapshots",
+    "record_redacted_request_metadata",
+    "propose_accessible_locator_mappings",
+    "detect_portal_health_and_human_blockers"
+  ],
+  "forbiddenOperations": [
+    "submit_application",
+    "click_form_controls",
+    "fill_candidate_fields",
+    "upload_candidate_documents",
+    "read_candidate_input_values",
+    "login_as_candidate",
+    "persist_cookies_or_storage_state",
+    "capture_auth_headers_or_network_bodies",
+    "captcha_or_otp_bypass",
+    "rate_limit_bypass_or_retry_storm",
+    "payment_or_fee_transaction",
+    "accept_legal_declaration",
+    "change_external_portal_state",
+    "publish_opportunity_or_mark_deadline_open",
+    "write_to_truth_vault_from_browser_worker"
+  ],
+  "evidence": {
+    "required": true,
+    "localArtifactOnlyUntilHumanImport": true,
+    "storeScreenshotReference": true,
+    "storeAccessibilitySha256": true,
+    "storeStructureSha256": true,
+    "stripQueryAndFragmentFromUrls": true,
+    "redactLikelyIdentifiersInPath": true,
+    "neverStoreFieldValues": true,
+    "neverStoreRequestOrResponseBodies": true,
+    "neverStoreCookiesOrTokens": true
+  },
+  "mappingLifecycle": [
+    "DISCOVERED",
+    "PROBE_CAPTURED",
+    "MAPPING_PROPOSED",
+    "HUMAN_REVIEW",
+    "APPROVED_MAPPING_VERSION",
+    "STAGING_PROOF",
+    "CANDIDATE_READY"
+  ],
+  "candidateExecutionModes": [
+    "CANDIDATE_CONTROLLED_HANDOFF",
+    "GUIDED_COMPLETION",
+    "MANUAL_APPLICATION_PACKET"
+  ],
+  "publicationRule": "A Browser Scout result is never a verified programme, open deadline, eligibility decision, provider partnership or institutional receipt. Candidate visibility requires independent source verification, fresh deadline evidence, approved provider/source state, candidate-safe match evidence and a human decision."
+}
