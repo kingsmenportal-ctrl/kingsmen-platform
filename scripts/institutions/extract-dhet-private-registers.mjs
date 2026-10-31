@@ -65,22 +65,24 @@ export function extractRecords(text,kind){
   for(const line of e.lines){
    const left=line.slice(0,nameWidth).trim();
    if(!left)continue;
-   const leftId=left.match(source.pattern);
-   if(leftId){const prefix=normalizeName(left.slice(0,leftId.index));if(prefix)nameParts.push(prefix);break;}
-   if(/^(CONTACT PERSON|CONTACT DETAILS|CONTACT NUMBER|TEL\.?|TELEPHONE|MOBILE|CELL|FAX|EMAIL|E-MAIL|WEBSITE|WEB SITE|PHYSICAL ADDRESS|POSTAL ADDRESS|SITE OF DELIVERY|DIRECTOR|MANAGER|MANAGING PRINCIPAL|PRINCIPAL|REGISTRAR|CEO|CHAIRPERSON)\b/i.test(left))break;
+   if(/^(CONTACT PERSON|CONTACT DETAILS|CONTACT NUMBER|TEL\.?|TELEPHONE|MOBILE|CELL|FAX|EMAIL|E-MAIL|WEBSITE|WEB SITE|PHYSICAL ADDRESS|POSTAL ADDRESS|SITE OF DELIVERY|DIRECTOR|MANAGER|MANAGING PRINCIPAL|PRINCIPAL|REGISTRAR|CEO|CHAIRPERSON|ACADEMIC REGISTRAR|ACADEMIC ADMINISTRATOR|PREVIOUS NAME|PREVIOUSLY KNOWN AS)\b/i.test(left))break;
+   if(/^[A-D]\)\s+/.test(left))break;
    if(/^(REGISTER OF PRIVATE COLLEGES|REGISTER OF PRIVATE HIGHER EDUCATION INSTITUTIONS|NAME OF COLLEGE|NAME OF INSTITUTION|SECTION\s+[AB])/i.test(left))continue;
    if(/^[-–—]?\s*\d+\s*[-–—]?$/.test(left))continue;
+   const leftId=left.match(source.pattern);
+   if(leftId){const prefix=normalizeName(left.slice(0,leftId.index));if(prefix)nameParts.push(prefix);break;}
    let part=left.replace(/^\d{1,3}\.\s*/," ").replace(source.pattern," ");
    part=normalizeName(part);
    if(!part||/^(NQF|NATIONAL CERTIFICATE|FET CERTIFICATE|GENERAL EDUCATION AND TRAINING|BACHELOR|HIGHER CERTIFICATE|DIPLOMA|MASTER|DOCTOR|PROGRAMME|PROGRAM|QUALIFICATION|QUALIFICATIONS|EXAM CENTRE|WEBSITE|CONTACT PERSON)/i.test(part))continue;
    if(nameParts.length>0&&part.split(/\s+/).length===1&&!/^(PTY|LTD|NPC|CC|INC|LIMITED|PROPRIETARY)$/i.test(part))break;
    nameParts.push(part);
-   if(nameParts.length>=3)break;
+   if(/\b(?:\(pty\)\s*ltd|pty\s+ltd|ltd|limited|npc|cc|incorporated|university|college|academy|school|institute|centre|center|hospital|church|seminary|council|association|society|foundation|group|services|organisation|organization)\b/i.test(part))break;
+   if(nameParts.length>=4)break;
   }
   const name=normalizeName(nameParts.join(" "));
   const sectionKey=canonicalSlug(e.section||"unsectioned")||"unsectioned";
   const key=kind+":"+sectionKey+":"+String(e.number).padStart(3,"0")+":"+(ids.length===1?ids[0].toLowerCase():canonicalSlug(name));
-  const provinceSet=PROVINCES.filter(p=>block.toLowerCase().includes(p.toLowerCase()));
+  const normalizedProvinceText=block.toLowerCase().replace(/kwazulu\\s+natal/g,"kwazulu-natal").replace(/north\\s*west/g,"north west").replace(/northwest/g,"north west");\n  const provinceSet=PROVINCES.filter(p=>normalizedProvinceText.includes(p.toLowerCase()));
   const aliases=[...block.matchAll(/(?:previously known as|previously|formerly known as)\s+([^\n.;]+)/gi)].map(m=>normalizeName(m[1])).filter(Boolean);
   const regStatus=status(e.section,block,kind);
   const idKey=ids.length===1?ids[0].toLowerCase():canonicalSlug(name);
