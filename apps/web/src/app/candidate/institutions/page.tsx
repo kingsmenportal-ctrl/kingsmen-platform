@@ -24,6 +24,8 @@ type DirectoryItem = {
   pathways: string[];
   sourceName: string;
   sourceUrl: string | null;
+  providerWebsiteUrl: string | null;
+  providerWebsiteStatus: string;
   evidenceText: string;
   supports: string[];
   doesNotProve: string[];
@@ -64,25 +66,35 @@ const capabilityLabels: Record<string, string> = {
   PUBLIC_SERVICE: "Public services",
   BUSINESS_REGISTRATION: "Business registration",
   FINANCIAL_SERVICES: "Financial services",
-  TECHNOLOGY_INTEGRATION: "Technology integration"
+  TECHNOLOGY_INTEGRATION: "Technology integration",
+  BASIC_EDUCATION: "Basic education",
+  ENERGY_AND_UTILITIES: "Energy and utilities"
 };
 
-const capabilityByClass: Record<string, string[]> = {
-  PUBLIC_ADMINISTRATION: ["PUBLIC_SERVICE"],
-  MUNICIPALITY: ["PUBLIC_SERVICE", "TRANSPORT"],
-  STATE_OWNED_ENTERPRISE: ["PUBLIC_SERVICE", "TRANSPORT"],
-  PUBLIC_ENTITY: ["PUBLIC_SERVICE"],
-  EDUCATION_AND_SKILLS: ["HIGHER_EDUCATION", "TVET"],
-  HEALTH_AND_CARE: ["HEALTH_AND_CARE"],
-  EMPLOYER_AND_RECRUITMENT: ["EMPLOYMENT"],
-  FUNDING_AND_SOCIAL_SUPPORT: ["FUNDING", "SOCIAL_SUPPORT"],
-  FINANCE_AND_INSURANCE: ["FINANCIAL_SERVICES"],
-  HOUSING_AND_ACCOMMODATION: ["ACCOMMODATION"],
-  TRANSPORT_AND_ESSENTIAL_SERVICES: ["TRANSPORT"],
-  LEGAL_AID_AND_COMMUNITY_SERVICES: ["LEGAL_SUPPORT", "SOCIAL_SUPPORT"],
-  NGO_NPO_AND_FOUNDATION: ["SOCIAL_SUPPORT"],
-  REGULATOR_AND_PROFESSIONAL_COUNCIL: ["PUBLIC_SERVICE"],
-  TECHNOLOGY_AND_DELIVERY_VENDOR: ["TECHNOLOGY_INTEGRATION"]
+const capabilityBySource: Record<string, string[]> = {
+  gcis_national_institution_directory: ["PUBLIC_SERVICE"],
+  govza_national_departments: ["PUBLIC_SERVICE"],
+  govza_local_government: ["PUBLIC_SERVICE"],
+  dpsa_vacancies: ["EMPLOYMENT"],
+  dbe_school_emis: ["BASIC_EDUCATION"],
+  cipc_company_registry: ["BUSINESS_REGISTRATION"],
+  dhet_skills_seta_qcto_saqa: ["HIGHER_EDUCATION", "TVET", "SETA_LEARNERSHIPS", "APPRENTICESHIPS"],
+  health_department_directory: ["HEALTH_AND_CARE"],
+  hpcsa_professional_register: ["HEALTH_AND_CARE"],
+  sassa_official: ["SOCIAL_SUPPORT"],
+  nyda_official: ["FUNDING", "SOCIAL_SUPPORT"],
+  dsd_npo_register: ["SOCIAL_SUPPORT"],
+  fsca_financial_registers: ["FINANCIAL_SERVICES"],
+  sarbs_regulated_entities: ["FINANCIAL_SERVICES"],
+  housing_human_settlements: ["ACCOMMODATION"],
+  legal_aid_south_africa: ["LEGAL_SUPPORT"],
+  govza_thusong_centres: ["PUBLIC_SERVICE"],
+  transport_department: ["TRANSPORT"],
+  eskom_official: ["ENERGY_AND_UTILITIES"],
+  sars_official: ["PUBLIC_SERVICE"],
+  job_portal_provider_authorized: ["EMPLOYMENT", "INTERNSHIPS", "APPRENTICESHIPS", "SETA_LEARNERSHIPS"],
+  accommodation_provider_direct: ["ACCOMMODATION"],
+  technology_vendor_contract: ["TECHNOLOGY_INTEGRATION"]
 };
 
 const pathwayBySource: Record<string, string[]> = {
@@ -128,6 +140,8 @@ const institutionItems: DirectoryItem[] = directorySeed.records.map((record: Ins
     pathways: [pathway],
     sourceName: "Department of Higher Education and Training",
     sourceUrl: record.directory_source_url,
+    providerWebsiteUrl: record.official_website_url,
+    providerWebsiteStatus: record.official_website_status,
     evidenceText: "Listed in the DHET source snapshot. This is directory evidence only.",
     supports: ["Institution identity as published in the cited DHET directory"],
     doesNotProve: [
@@ -152,12 +166,8 @@ const institutionItems: DirectoryItem[] = directorySeed.records.map((record: Ins
 
 const sourceItems: DirectoryItem[] = crossSector.sources.map((source: SourceAnchor) => {
   const sourceClasses = source.classes as string[];
-  const sourceCapabilities = unique(sourceClasses.flatMap(key => capabilityByClass[key] ?? []));
-  const sourcePathways = pathwayBySource[source.source_id] ?? unique(sourceClasses.flatMap(key => {
-    if (key === "EDUCATION_AND_SKILLS") return ["HIGHER_EDUCATION", "TVET"];
-    if (key === "EMPLOYER_AND_RECRUITMENT" || key === "PUBLIC_ADMINISTRATION" || key === "STATE_OWNED_ENTERPRISE" || key === "PUBLIC_ENTITY") return ["EMPLOYMENT"];
-    return [];
-  }));
+  const sourceCapabilities = capabilityBySource[source.source_id] ?? [];
+  const sourcePathways = pathwayBySource[source.source_id] ?? [];
   return {
     id: source.source_id,
     name: source.name,
@@ -169,6 +179,8 @@ const sourceItems: DirectoryItem[] = crossSector.sources.map((source: SourceAnch
     pathways: sourcePathways,
     sourceName: source.authority,
     sourceUrl: source.url,
+    providerWebsiteUrl: null,
+    providerWebsiteStatus: "NOT_LISTED",
     evidenceText: "Sector source anchor for discovery and verification. It is not an imported institution/provider record.",
     supports: source.supports,
     doesNotProve: source.does_not_prove,
@@ -254,6 +266,7 @@ export default function CandidateInstitutionDirectoryPage() {
     sectorKeys: sectorsByVerifiedRoute[route.provider_key] ?? [], province: route.province,
     serviceCapabilities: capabilitiesByVerifiedRoute[route.provider_key] ?? [], pathways: pathwaysByVerifiedRoute[route.provider_key] ?? [],
     sourceName: "Kingsmen canonical source-authority register", sourceUrl: route.base_url,
+    providerWebsiteUrl: null, providerWebsiteStatus: "NOT_LISTED",
     evidenceText: "Read from the existing provider register because the record is VERIFIED, public-safe and confidence A/B. This does not verify every programme or intake.",
     supports: [`Registry record is VERIFIED and public_safe=true (confidence ${route.default_confidence_band}).`, route.notes],
     doesNotProve: [
@@ -486,6 +499,19 @@ export default function CandidateInstitutionDirectoryPage() {
                 ) : (
                   <span className="rounded-xl border border-yellow-500/30 bg-yellow-950/20 px-4 py-3 text-xs font-semibold text-yellow-100">
                     Authoritative provider-specific source link still requires verification.
+                  </span>
+                )}
+                {item.kind === "INSTITUTION" && item.providerWebsiteUrl && item.providerWebsiteUrl.startsWith("https://") && (
+                  <div className="flex flex-col gap-1">
+                    <a href={item.providerWebsiteUrl} target="_blank" rel="noopener noreferrer" className="inline-flex rounded-xl border border-amber-300/40 px-4 py-3 text-sm font-bold text-amber-100 hover:border-amber-300">
+                      Open institution website listed by DHET ↗
+                    </a>
+                    <span className="text-[11px] text-slate-500">DHET-listed website; current live destination has not been reverified.</span>
+                  </div>
+                )}
+                {item.kind === "INSTITUTION" && !item.providerWebsiteUrl && (
+                  <span className="rounded-xl border border-yellow-500/30 bg-yellow-950/20 px-4 py-3 text-xs font-semibold text-yellow-100">
+                    Institution website URL unresolved. Kingsmen will not guess the URL.
                   </span>
                 )}
                 <Link href="/candidate/applications" className="inline-flex rounded-xl border border-slate-600 px-4 py-3 text-sm font-bold text-white hover:border-amber-300">
