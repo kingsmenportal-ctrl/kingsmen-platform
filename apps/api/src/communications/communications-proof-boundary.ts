@@ -72,16 +72,19 @@ export function decideCommunicationBoundary(request: CommunicationBoundaryReques
   if (request.channel === "sms") {
     return { allowed: false, queuedOnly: false, reason: "smsDisabled", channel: request.channel, evidence };
   }
-  if (request.recipientCount > 1 || request.purpose === "bulk") {
-    return { allowed: false, queuedOnly: true, reason: "bulkMarketingDenied", channel: request.channel, evidence };
+  if (request.channel === "email") {
+    if (request.recipientCount > 1 || request.purpose === "bulk") {
+      return { allowed: false, queuedOnly: true, reason: "bulkMarketingDenied", channel: request.channel, evidence };
+    }
+    if (request.purpose === "marketing" && !request.hasConsent) {
+      return { allowed: false, queuedOnly: true, reason: "marketingRequiresExplicitConsent", channel: request.channel, evidence };
+    }
+    if (!request.providerStagingProofPresent) {
+      return { allowed: true, queuedOnly: true, reason: "providerSendRequiresStagingProof", channel: request.channel, evidence };
+    }
+    return { allowed: true, queuedOnly: true, reason: "sourceProofNeverExecutesLiveSend", channel: request.channel, evidence };
   }
-  if (request.purpose === "marketing" && !request.hasConsent) {
-    return { allowed: false, queuedOnly: true, reason: "marketingRequiresExplicitConsent", channel: request.channel, evidence };
-  }
-  if (!request.providerStagingProofPresent) {
-    return { allowed: true, queuedOnly: true, reason: "providerSendRequiresStagingProof", channel: request.channel, evidence };
-  }
-  return { allowed: true, queuedOnly: true, reason: "sourceProofNeverExecutesLiveSend", channel: request.channel, evidence };
+  return { allowed: false, queuedOnly: false, reason: "unsupportedChannel", channel: request.channel, evidence };
 }
 
 export function redactCommunicationEvidence(input: { recipient?: string; subject?: string; bodyPreview?: string }) {
