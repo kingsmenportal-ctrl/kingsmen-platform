@@ -28,7 +28,7 @@ A P2 verified handoff can still be useful for candidate preparation without bein
 - **O5 — Submission evidenced:** a provider receipt record, reference and evidence ID are present.
 - **O6 — Outcome verified:** a provider-confirmed outcome and evidence ID are present.
 
-Candidate-reported submission is carried as a separate flag and does not advance O4 to O5. A provider receipt does not imply admission, employment or another outcome. Outcomes remain separately confirmed.
+Candidate-reported submission is carried as a separate flag and does not advance O4 to O5. A provider receipt does not imply admission, employment or another outcome. Outcomes remain separately confirmed. Historical receipt and outcome timestamps must be valid and non-future, but are not invalidated by an opportunity's current-source freshness window; that window governs availability/route claims, not whether a recorded past event occurred.
 
 ## Integration contract
 
