@@ -36,8 +36,9 @@ check("page separates directory discovery from open-intake verification", /Disco
 check("external website links open safely", /target="_blank"/.test(page) && /rel="noopener noreferrer"/.test(page));
 check("unresolved institution website URLs remain unset and are never guessed", /Institution website URL unresolved/i.test(page) && /will not guess the URL/i.test(page) && /providerWebsiteStatus/.test(page));
 check("opportunity and application workbench links are present", /candidate\/opportunity-matches/.test(page) && /candidate\/applications/.test(page));
-check("private higher-education and private-college registers remain outstanding", /Private higher education/i.test(page) && /private colleges/i.test(page));
+check("private registers are linked and individual provider imports remain outstanding", /Individual private higher-education/i.test(page) && /registered private colleges/i.test(page) && page.includes("Annexure%20A%20Register%20%20Private%20Higher%20Education%20Institutions%2006%20July%202026.pdf") && page.includes("Register%20of%20Private%20Colleges%20%2015%20July%202026.pdf"));
 check("CET and provincial education records link to Kingsmen workbench", /dhet_cet_/.test(page) && /PROVINCIAL_AUTHORITY_PROVIDER/.test(page) && /COMMUNITY_EDUCATION_AND_TRAINING/.test(page));
+check("provincial authorities receive public-service and basic-education capabilities rather than employment-only", /: isProvincialEducationDepartment\s*\? \[\"PUBLIC_SERVICE\", \"BASIC_EDUCATION\", \"EMPLOYMENT\"\]/.test(page) && (page.match(/isProvincialEducationDepartment/g)||[]).length === 3);
 check("candidate landing page links to institution directory", /href: "\/candidate\/institutions"/.test(landing));
 check("candidate dashboard links to institution directory", /href: "\/candidate\/institutions"/.test(dashboard));
 
