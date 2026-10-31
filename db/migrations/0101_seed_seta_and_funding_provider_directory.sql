@@ -137,21 +137,45 @@ BEGIN
     RAISE EXCEPTION 'SETA_FUNDER_PROVIDER_SEED_COUNT_MISMATCH expected %, got %', expected_count, actual_count;
   END IF;
 
+  WITH expected(provider_key, provider_name, provider_type, base_url) AS (
+    VALUES
+    ('seta_agriseta', 'AgriSETA', 'SETA', 'https://www.agriseta.co.za/'),
+    ('seta_bankseta', 'BANKSETA', 'SETA', 'https://www.bankseta.org.za/'),
+    ('seta_cathsseta', 'CATHSSETA', 'SETA', 'https://www.cathsseta.org.za/'),
+    ('seta_ceta', 'Construction Education and Training Authority (CETA)', 'SETA', 'https://www.ceta.org.za/'),
+    ('seta_chieta', 'Chemical Industries Education and Training Authority (CHIETA)', 'SETA', 'https://www.chieta.org.za/'),
+    ('seta_etdpseta', 'Education, Training and Development Practices SETA', 'SETA', 'https://www.etdpseta.org.za/'),
+    ('seta_ewseta', 'Energy and Water Sector Education and Training Authority', 'SETA', 'https://www.eseta.org.za/'),
+    ('seta_fasset', 'Financial and Accounting Services SETA (FASSET)', 'SETA', 'https://www.fasset.org.za/'),
+    ('seta_foodbev', 'FoodBev Manufacturing SETA', 'SETA', 'https://www.foodbev.co.za/'),
+    ('seta_fpm', 'Fibre Processing and Manufacturing SETA (FP&M)', 'SETA', 'https://www.fpmseta.org.za/'),
+    ('seta_hwseta', 'Health and Welfare Sector Education and Training Authority', 'SETA', 'https://www.hwseta.org.za/'),
+    ('seta_inseta', 'Insurance Sector Education and Training Authority (INSETA)', 'SETA', 'https://www.inseta.org.za/'),
+    ('seta_lgseta', 'Local Government Sector Education and Training Authority (LGSETA)', 'SETA', 'https://lgseta.org.za/'),
+    ('seta_merseta', 'Manufacturing, Engineering and Related Services SETA (merSETA)', 'SETA', 'https://www.merseta.org.za/'),
+    ('seta_mict', 'Media, Information and Communication Technologies SETA (MICT SETA)', 'SETA', 'https://www.mict.org.za/'),
+    ('seta_mqa', 'Mining Qualifications Authority (MQA)', 'SETA', 'https://www.mqa.org.za/'),
+    ('seta_pseta', 'Public Service Sector Education and Training Authority (PSETA)', 'SETA', 'https://www.pseta.org.za/'),
+    ('seta_sasseta', 'Safety and Security Sector Education and Training Authority (SASSETA)', 'SETA', 'https://www.sasseta.org.za/'),
+    ('seta_services', 'Services Sector Education and Training Authority (Services SETA)', 'SETA', 'https://www.serviceseta.org.za/'),
+    ('seta_teta', 'Transport Education and Training Authority (TETA)', 'SETA', 'https://www.teta.org.za/'),
+    ('seta_wrseta', 'Wholesale and Retail SETA (W&RSETA)', 'SETA', 'https://www.wrseta.org.za/'),
+    ('funder_nsf', 'National Skills Fund (NSF)', 'BURSARY_PROVIDER', 'https://www.dhet.gov.za/SitePages/NSF.aspx'),
+    ('funder_funza_lushaka', 'Funza Lushaka Bursary Programme', 'BURSARY_PROVIDER', 'https://www.funzalushaka.doe.gov.za/')
+  )
   SELECT count(*) INTO bad_count
-  FROM public.route_providers
-  WHERE provider_key IN ('seta_agriseta', 'seta_bankseta', 'seta_cathsseta', 'seta_ceta', 'seta_chieta', 'seta_etdpseta', 'seta_ewseta', 'seta_fasset', 'seta_foodbev', 'seta_fpm', 'seta_hwseta', 'seta_inseta', 'seta_lgseta', 'seta_merseta', 'seta_mict', 'seta_mqa', 'seta_pseta', 'seta_sasseta', 'seta_services', 'seta_teta', 'seta_wrseta', 'funder_nsf', 'funder_funza_lushaka')
-    AND (
-      provider_name NOT IN ('AgriSETA', 'BANKSETA', 'CATHSSETA', 'Construction Education and Training Authority (CETA)', 'Chemical Industries Education and Training Authority (CHIETA)', 'Education, Training and Development Practices SETA', 'Energy and Water Sector Education and Training Authority', 'Financial and Accounting Services SETA (FASSET)', 'FoodBev Manufacturing SETA', 'Fibre Processing and Manufacturing SETA (FP&M)', 'Health and Welfare Sector Education and Training Authority', 'Insurance Sector Education and Training Authority (INSETA)', 'Local Government Sector Education and Training Authority (LGSETA)', 'Manufacturing, Engineering and Related Services SETA (merSETA)', 'Media, Information and Communication Technologies SETA (MICT SETA)', 'Mining Qualifications Authority (MQA)', 'Public Service Sector Education and Training Authority (PSETA)', 'Safety and Security Sector Education and Training Authority (SASSETA)', 'Services Sector Education and Training Authority (Services SETA)', 'Transport Education and Training Authority (TETA)', 'Wholesale and Retail SETA (W&RSETA)', 'National Skills Fund (NSF)', 'Funza Lushaka Bursary Programme')
-      OR provider_type NOT IN ('SETA','BURSARY_PROVIDER')
-      OR base_url IS NULL
-      OR base_url !~* '^https://'
-    );
+  FROM expected e
+  LEFT JOIN public.route_providers p ON p.provider_key = e.provider_key
+  WHERE p.id IS NULL
+     OR p.provider_name IS DISTINCT FROM e.provider_name
+     OR p.provider_type IS DISTINCT FROM e.provider_type
+     OR p.base_url IS DISTINCT FROM e.base_url
+     OR p.verification_status IS DISTINCT FROM 'NEEDS_REVIEW'
+     OR p.default_confidence_band IS DISTINCT FROM 'D'
+     OR p.public_safe IS DISTINCT FROM false;
   IF bad_count > 0 THEN
-    RAISE EXCEPTION 'SETA_FUNDER_PROVIDER_SEED_CONFLICT % rows', bad_count;
+    RAISE EXCEPTION 'SETA_FUNDER_PROVIDER_SEED_CONFLICT % rows; inspect existing canonical provider records before rerunning', bad_count;
   END IF;
-
-  -- No existing reviewer decision is overwritten by ON CONFLICT DO NOTHING.
-  -- Newly inserted records default to NEEDS_REVIEW, confidence D and public_safe=false.
 END
 $postflight$;
 
