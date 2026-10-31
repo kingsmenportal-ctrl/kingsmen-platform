@@ -1,0 +1,39 @@
+{
+  "schema": "kingsmen.institutions.application-readiness.v1",
+  "country": "ZA",
+  "purpose": "Evidence-based readiness states for institution routes and specific opportunities.",
+  "provider_states": [
+    {"state":"P0_DISCOVERED","rank":0},
+    {"state":"P1_IDENTITY_VERIFIED","rank":1},
+    {"state":"P2_ROUTE_VERIFIED","rank":2},
+    {"state":"P3_CONNECTOR_CONFIGURED","rank":3},
+    {"state":"P4_ROUTE_TESTED","rank":4},
+    {"state":"P5_MONITORED","rank":5}
+  ],
+  "opportunity_states": [
+    {"state":"O0_FOUND","rank":0},
+    {"state":"O1_SOURCE_VERIFIED","rank":1},
+    {"state":"O2_CURRENT_OPEN","rank":2},
+    {"state":"O3_REQUIREMENTS_MAPPED","rank":3},
+    {"state":"O4_CANDIDATE_READY","rank":4},
+    {"state":"O5_SUBMISSION_EVIDENCED","rank":5},
+    {"state":"O6_OUTCOME_VERIFIED","rank":6}
+  ],
+  "freshness_policy": {
+    "rule": "Every evidence-bearing record must supply a positive integer freshness_window_days.",
+    "timestamp_rule": "ISO-8601 timestamp with explicit timezone",
+    "missing_invalid_future_or_stale_timestamp_fails_closed": true,
+    "expired_deadline_prevents_current_open": true,
+    "no_invented_default_window": true
+  },
+  "evidence_rules": {
+    "provider_identity_separate_from_route": true,
+    "route_separate_from_connector_configuration": true,
+    "directory_does_not_prove_current_opportunity": true,
+    "candidate_reported_submission_is_not_provider_receipt": true,
+    "provider_confirmed_outcome_requires_authoritative_evidence": true,
+    "candidate_consent_required_for_candidate_ready": true,
+    "no_parallel_provider_registry": true,
+    "default_connector_state": "NOT_CONNECTED"
+  }
+}
