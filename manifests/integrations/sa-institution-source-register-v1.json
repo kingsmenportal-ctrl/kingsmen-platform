@@ -1,0 +1,574 @@
+{
+  "schema": "kingsmen.sa-institution-source-register.v1",
+  "as_of": "2026-10-31",
+  "jurisdiction": "ZA",
+  "purpose": "Register official source families for discovering, verifying and connecting South African institutions and opportunities across the six Kingsmen pathways.",
+  "coverage_model": {
+    "registry_completeness_target": "Every currently registered or established post-school institution in the latest official DHET masterlist, reconciled by source record and snapshot.",
+    "opportunity_completeness_target": "Candidate-facing listings lawfully discoverable from authoritative public sources or authorized partner feeds, each with item-level evidence.",
+    "application_connectivity_target": "One Kingsmen candidate profile/workbench with controlled portal handoff; direct API submission and status synchronization only when the institution authorizes it.",
+    "not_a_claim": "A source URL does not prove that a particular institution, programme, deadline, accreditation, eligibility or outcome is current."
+  },
+  "canonical_pathways": [
+    "HIGHER_EDUCATION",
+    "TVET",
+    "SETA_LEARNERSHIPS",
+    "INTERNSHIPS",
+    "APPRENTICESHIPS",
+    "EMPLOYMENT"
+  ],
+  "current_live_baseline": {
+    "observed_at": "2026-10-31",
+    "public_source_authorities": 21,
+    "legacy_route_sources": 0,
+    "legacy_route_providers": 3,
+    "legacy_route_programmes": 8,
+    "verified_pipeline_providers": 0,
+    "verified_pipeline_programmes": 0,
+    "external_source_observations": 0,
+    "confirmed_opportunity_deadlines": 0,
+    "candidate_opportunity_matches": 0,
+    "interpretation": "Official-source anchors and a small legacy route catalogue exist, but the canonical verified opportunity pipeline has no live provider/programme/observation/deadline/match rows. Institutional coverage must not be advertised as complete."
+  },
+  "publication_invariants": [
+    "An institution-directory row never implies an open programme or vacancy.",
+    "Only authoritative exact-source evidence can establish a candidate-facing listing.",
+    "Every published opportunity must have evidence references, observed_at, last_checked_at and stale_after; stale rows fail closed.",
+    "Unknown eligibility remains unknown and is not converted to a match guarantee.",
+    "A candidate-reported submission is distinct from provider-confirmed receipt or outcome.",
+    "Candidate credentials are never shared with institutions or stored by source adapters.",
+    "Do not automate third-party login, CAPTCHA, payment or submission unless an institution explicitly authorizes a supported integration and security review passes.",
+    "API availability is UNVERIFIED until an official specification, written authorization and tested sandbox or approved test environment exist."
+  ],
+  "sources": [
+    {
+      "source_id": "dhet_pset_masterlist",
+      "name": "DHET Masterlist of Registered and Established PSET Institutions",
+      "authority": "Department of Higher Education and Training",
+      "source_class": "institution_registry",
+      "url": "https://www.dhet.gov.za/SitePages/MasterLists.aspx",
+      "access_mode": "official_download_or_authorized_page_capture",
+      "integration_status": "ANCHOR_ONLY",
+      "api_status": "UNVERIFIED",
+      "refresh_target_hours": 720,
+      "covers": [
+        "UNIVERSITY",
+        "UNIVERSITY_OF_TECHNOLOGY",
+        "PUBLIC_TVET",
+        "CET",
+        "REGISTERED_PRIVATE_COLLEGE",
+        "REGISTERED_PRIVATE_HIGHER_EDUCATION"
+      ],
+      "requires_partner_authorization": false,
+      "evidence_required": [
+        "source record or downloaded register version",
+        "retrieval timestamp",
+        "source-file hash or stable official page reference",
+        "reconciliation report with imported/updated/retired counts"
+      ],
+      "notes": "Primary national roster seed. Preserve DHET entity type/status and source snapshot; never invent a record to fill gaps."
+    },
+    {
+      "source_id": "dhet_university_directory",
+      "name": "DHET university directory",
+      "authority": "Department of Higher Education and Training",
+      "source_class": "institution_registry_crosscheck",
+      "url": "https://www.dhet.gov.za/SitePages/InstUniversities.aspx",
+      "access_mode": "official_list_page",
+      "integration_status": "ANCHOR_ONLY",
+      "api_status": "UNVERIFIED",
+      "refresh_target_hours": 720,
+      "covers": [
+        "HIGHER_EDUCATION"
+      ],
+      "requires_partner_authorization": false,
+      "evidence_required": [
+        "retrieval timestamp",
+        "entity name/URL reconciliation against current masterlist"
+      ],
+      "notes": "Cross-check only. The current masterlist remains canonical if names or institution types differ."
+    },
+    {
+      "source_id": "dhet_tvet_directory",
+      "name": "DHET TVET Colleges directory and occupational-programme resources",
+      "authority": "Department of Higher Education and Training",
+      "source_class": "institution_registry_and_programme_directory",
+      "url": "https://www.dhet.gov.za/sitepages/TVETColleges.aspx",
+      "access_mode": "official_list_page",
+      "integration_status": "ANCHOR_ONLY",
+      "api_status": "UNVERIFIED",
+      "refresh_target_hours": 720,
+      "covers": [
+        "TVET",
+        "APPRENTICESHIPS",
+        "SETA_LEARNERSHIPS"
+      ],
+      "requires_partner_authorization": false,
+      "evidence_required": [
+        "official college record",
+        "official college/programme URL",
+        "retrieval timestamp",
+        "current intake evidence before publication"
+      ],
+      "notes": "A national directory establishes college identity, not an active intake. Check programmes and deadlines at the college or specified official source."
+    },
+    {
+      "source_id": "dhet_seta_directory",
+      "name": "DHET Sector Education and Training Authorities directory",
+      "authority": "Department of Higher Education and Training",
+      "source_class": "skills_authority_registry",
+      "url": "https://www.dhet.gov.za/SitePages/SETAlinks.aspx",
+      "access_mode": "official_list_page",
+      "integration_status": "ANCHOR_ONLY",
+      "api_status": "UNVERIFIED",
+      "refresh_target_hours": 720,
+      "covers": [
+        "SETA_LEARNERSHIPS",
+        "APPRENTICESHIPS",
+        "INTERNSHIPS"
+      ],
+      "requires_partner_authorization": false,
+      "evidence_required": [
+        "current official SETA roster snapshot",
+        "verified official site per authority",
+        "retrieval timestamp"
+      ],
+      "notes": "Discovery roster only. Individual SETA programme availability must be separately verified."
+    },
+    {
+      "source_id": "dhet_private_college_register",
+      "name": "DHET registered private college and private higher education institution registers",
+      "authority": "Department of Higher Education and Training",
+      "source_class": "institution_registry",
+      "url": "https://www.dhet.gov.za/SitePages/Resources.aspx",
+      "access_mode": "official_register_download_or_page_capture",
+      "integration_status": "ANCHOR_ONLY",
+      "api_status": "UNVERIFIED",
+      "refresh_target_hours": 720,
+      "covers": [
+        "REGISTERED_PRIVATE_COLLEGE",
+        "REGISTERED_PRIVATE_HIGHER_EDUCATION"
+      ],
+      "requires_partner_authorization": false,
+      "evidence_required": [
+        "register title/version/date",
+        "registration status",
+        "institution record identifier",
+        "retrieval timestamp"
+      ],
+      "notes": "Do not mark providers registered or accredited from their marketing site alone."
+    },
+    {
+      "source_id": "che_quality_register",
+      "name": "Council on Higher Education",
+      "authority": "Council on Higher Education",
+      "source_class": "higher_education_quality_register",
+      "url": "https://www.che.ac.za/",
+      "access_mode": "official_register_lookup",
+      "integration_status": "ANCHOR_ONLY",
+      "api_status": "UNVERIFIED",
+      "refresh_target_hours": 720,
+      "covers": [
+        "HIGHER_EDUCATION",
+        "REGISTERED_PRIVATE_HIGHER_EDUCATION"
+      ],
+      "requires_partner_authorization": false,
+      "evidence_required": [
+        "official register result or decision",
+        "retrieval timestamp",
+        "institution/programme scope"
+      ],
+      "notes": "Quality/registration cross-check; not evidence of a live application window."
+    },
+    {
+      "source_id": "qcto_sdp_register",
+      "name": "QCTO skills development provider database",
+      "authority": "Quality Council for Trades and Occupations",
+      "source_class": "provider_accreditation_register",
+      "url": "https://www.qcto.org.za/databases-of-sdps.html",
+      "access_mode": "official_register_lookup",
+      "integration_status": "ANCHOR_ONLY",
+      "api_status": "UNVERIFIED",
+      "refresh_target_hours": 720,
+      "covers": [
+        "SETA_LEARNERSHIPS",
+        "APPRENTICESHIPS",
+        "TVET"
+      ],
+      "requires_partner_authorization": false,
+      "evidence_required": [
+        "provider identity",
+        "accreditation scope/status",
+        "validity or decision date where available",
+        "retrieval timestamp"
+      ],
+      "notes": "Accreditation must be checked for the relevant scope; provider registration does not prove every advertised programme is accredited."
+    },
+    {
+      "source_id": "qcto_occupational_qualifications",
+      "name": "QCTO registered occupational qualifications and part-qualifications",
+      "authority": "Quality Council for Trades and Occupations",
+      "source_class": "qualification_register",
+      "url": "https://www.qcto.org.za/RegisteredOccupationalQualificationsandPartQualifications.html",
+      "access_mode": "official_register_lookup",
+      "integration_status": "ANCHOR_ONLY",
+      "api_status": "UNVERIFIED",
+      "refresh_target_hours": 720,
+      "covers": [
+        "TVET",
+        "SETA_LEARNERSHIPS",
+        "APPRENTICESHIPS"
+      ],
+      "requires_partner_authorization": false,
+      "evidence_required": [
+        "qualification record/status",
+        "registration end date where published",
+        "retrieval timestamp"
+      ],
+      "notes": "Qualification registration and a current learner intake are separate facts."
+    },
+    {
+      "source_id": "saqa_qualification_register",
+      "name": "SAQA qualifications and unit standards register",
+      "authority": "South African Qualifications Authority",
+      "source_class": "qualification_register",
+      "url": "https://saqa.org.za/services/registration-of-qualifications/",
+      "access_mode": "official_register_lookup",
+      "integration_status": "ANCHOR_ONLY",
+      "api_status": "UNVERIFIED",
+      "refresh_target_hours": 720,
+      "covers": [
+        "HIGHER_EDUCATION",
+        "TVET",
+        "SETA_LEARNERSHIPS",
+        "APPRENTICESHIPS"
+      ],
+      "requires_partner_authorization": false,
+      "evidence_required": [
+        "qualification identifier/status",
+        "registration dates",
+        "retrieval timestamp"
+      ],
+      "notes": "Validate qualification claims; do not infer enrolment availability or candidate eligibility."
+    },
+    {
+      "source_id": "cao_admissions",
+      "name": "Central Applications Office",
+      "authority": "Central Applications Office",
+      "source_class": "admissions_handoff",
+      "url": "https://www.cao.ac.za/Apply.aspx?content=Terms",
+      "access_mode": "candidate_portal_handoff",
+      "integration_status": "HANDOFF_REQUIRES_RUNTIME_VERIFICATION",
+      "api_status": "UNVERIFIED",
+      "refresh_target_hours": 24,
+      "covers": [
+        "HIGHER_EDUCATION",
+        "TVET"
+      ],
+      "requires_partner_authorization": true,
+      "evidence_required": [
+        "current entry-year/term rules",
+        "member institution/choice list",
+        "deadline/fee evidence",
+        "authorized sandbox or signed integration agreement before API submission"
+      ],
+      "notes": "Keep one Kingsmen parent application with CAO choices as children. CAO terms give institutions final admission-selection responsibility; never claim Kingsmen submitted or received an offer without evidence."
+    },
+    {
+      "source_id": "nsfas_funding",
+      "name": "National Student Financial Aid Scheme",
+      "authority": "NSFAS",
+      "source_class": "funding_application_handoff",
+      "url": "https://www.nsfas.org.za/content/how-to-apply.html",
+      "access_mode": "candidate_portal_handoff",
+      "integration_status": "HANDOFF_REQUIRES_RUNTIME_VERIFICATION",
+      "api_status": "UNVERIFIED",
+      "refresh_target_hours": 24,
+      "covers": [
+        "HIGHER_EDUCATION",
+        "TVET"
+      ],
+      "requires_partner_authorization": true,
+      "evidence_required": [
+        "current funding window",
+        "official eligibility and document rules",
+        "candidate reference or provider-confirmed status only after authorized handoff"
+      ],
+      "notes": "Funding is separate from admission. Never present a public funding window as institution acceptance or guaranteed eligibility."
+    },
+    {
+      "source_id": "govza_public_service_vacancies",
+      "name": "South African Government public-service vacancy circular",
+      "authority": "South African Government",
+      "source_class": "employment_and_internship_feed",
+      "url": "https://www.gov.za/government-jobs-week",
+      "access_mode": "public_official_page_and_circular",
+      "integration_status": "ANCHOR_ONLY",
+      "api_status": "UNVERIFIED",
+      "refresh_target_hours": 168,
+      "covers": [
+        "EMPLOYMENT",
+        "INTERNSHIPS",
+        "APPRENTICESHIPS",
+        "SETA_LEARNERSHIPS"
+      ],
+      "requires_partner_authorization": false,
+      "evidence_required": [
+        "exact advert",
+        "issuing department",
+        "closing date and timezone if stated",
+        "documents/application method",
+        "retrieval timestamp"
+      ],
+      "notes": "Check each circular/advert individually. Historical circulars are not active vacancy evidence."
+    },
+    {
+      "source_id": "labour_department_vacancies",
+      "name": "Department of Employment and Labour vacancies",
+      "authority": "Department of Employment and Labour",
+      "source_class": "employment_feed",
+      "url": "https://www.labour.gov.za/vacancies/Pages/Vacancies-List.aspx",
+      "access_mode": "public_official_page",
+      "integration_status": "ANCHOR_ONLY",
+      "api_status": "UNVERIFIED",
+      "refresh_target_hours": 168,
+      "covers": [
+        "EMPLOYMENT",
+        "INTERNSHIPS",
+        "APPRENTICESHIPS",
+        "SETA_LEARNERSHIPS"
+      ],
+      "requires_partner_authorization": false,
+      "evidence_required": [
+        "exact advert and source URL",
+        "closing date/status",
+        "retrieval timestamp"
+      ],
+      "notes": "The directory itself is not a live application receipt."
+    },
+    {
+      "source_id": "npmn_partner_discovery",
+      "name": "National Pathway Management Network partner directory",
+      "authority": "The Presidency / Department of Employment and Labour",
+      "source_class": "employment_network_directory",
+      "url": "https://stateofthenation.gov.za/presidential-youth-employment-intervention/linking-young-people-to-opportunities",
+      "access_mode": "official_partner_discovery",
+      "integration_status": "PARTNER_ACCESS_UNVERIFIED",
+      "api_status": "UNVERIFIED",
+      "refresh_target_hours": 720,
+      "covers": [
+        "EMPLOYMENT",
+        "INTERNSHIPS",
+        "APPRENTICESHIPS",
+        "SETA_LEARNERSHIPS",
+        "TVET"
+      ],
+      "requires_partner_authorization": true,
+      "evidence_required": [
+        "current partner identity",
+        "official endpoint/data-sharing terms",
+        "written access approval before protected-data ingestion"
+      ],
+      "notes": "NPMN is a partner network; it does not imply that all partner systems expose a public API."
+    },
+    {
+      "source_id": "essa_portal",
+      "name": "Employment Services of South Africa",
+      "authority": "Department of Employment and Labour",
+      "source_class": "employment_platform",
+      "url": "https://essa.labour.gov.za/EssaOnline/WebBeans/",
+      "access_mode": "candidate_portal_handoff_or_authorized_partner_feed",
+      "integration_status": "PARTNER_ACCESS_UNVERIFIED",
+      "api_status": "UNVERIFIED",
+      "refresh_target_hours": 24,
+      "covers": [
+        "EMPLOYMENT",
+        "INTERNSHIPS",
+        "APPRENTICESHIPS",
+        "SETA_LEARNERSHIPS"
+      ],
+      "requires_partner_authorization": true,
+      "evidence_required": [
+        "official integration specification",
+        "written permission and least-privilege credential scope",
+        "sandbox tests and data-sharing assessment"
+      ],
+      "notes": "Do not scrape authenticated screens or claim a candidate registered through a Kingsmen profile."
+    },
+    {
+      "source_id": "sayouth_portal",
+      "name": "SA Youth",
+      "authority": "Harambee Youth Employment Accelerator / NPMN",
+      "source_class": "employment_and_learning_platform",
+      "url": "https://www.sayouth.org.za/",
+      "access_mode": "candidate_portal_handoff_or_authorized_partner_feed",
+      "integration_status": "PARTNER_ACCESS_UNVERIFIED",
+      "api_status": "UNVERIFIED",
+      "refresh_target_hours": 24,
+      "covers": [
+        "EMPLOYMENT",
+        "INTERNSHIPS",
+        "APPRENTICESHIPS",
+        "SETA_LEARNERSHIPS",
+        "TVET"
+      ],
+      "requires_partner_authorization": true,
+      "evidence_required": [
+        "written aggregator permission",
+        "API/feed contract",
+        "sandbox proof",
+        "data-sharing and retention review"
+      ],
+      "notes": "Public partner status does not grant Kingsmen access to protected records."
+    },
+    {
+      "source_id": "yes4youth_portal",
+      "name": "Youth Employment Service",
+      "authority": "YES4Youth",
+      "source_class": "workplace_experience_platform",
+      "url": "https://yes4youth.co.za/",
+      "access_mode": "public_opportunity_page_or_authorized_partner_feed",
+      "integration_status": "PARTNER_ACCESS_UNVERIFIED",
+      "api_status": "UNVERIFIED",
+      "refresh_target_hours": 24,
+      "covers": [
+        "INTERNSHIPS",
+        "EMPLOYMENT",
+        "APPRENTICESHIPS"
+      ],
+      "requires_partner_authorization": true,
+      "evidence_required": [
+        "specific opportunity source",
+        "current eligibility and deadline",
+        "written permission for feeds/APIs where applicable"
+      ],
+      "notes": "Reliable machine-readable listing and outcome sync may require a partner agreement."
+    },
+    {
+      "source_id": "tshepo_portal",
+      "name": "Tshepo 1 Million",
+      "authority": "Gauteng Provincial Government",
+      "source_class": "provincial_youth_opportunity_platform",
+      "url": "https://www.tshepo.mobi/",
+      "access_mode": "candidate_portal_handoff_or_authorized_partner_feed",
+      "integration_status": "PARTNER_ACCESS_UNVERIFIED",
+      "api_status": "UNVERIFIED",
+      "refresh_target_hours": 24,
+      "covers": [
+        "EMPLOYMENT",
+        "INTERNSHIPS",
+        "SETA_LEARNERSHIPS",
+        "APPRENTICESHIPS"
+      ],
+      "requires_partner_authorization": true,
+      "evidence_required": [
+        "current platform owner",
+        "approved feed/API specification",
+        "sandbox and access contract"
+      ],
+      "notes": "Treat as a partner platform until a public feed or approved interface is verified."
+    },
+    {
+      "source_id": "khetha_career_advice",
+      "name": "Khetha / National Career Advice Portal",
+      "authority": "DHET Career Development Services",
+      "source_class": "career_guidance",
+      "url": "https://ncap.careerhelp.org.za/",
+      "access_mode": "public_guidance_link",
+      "integration_status": "ANCHOR_ONLY",
+      "api_status": "UNVERIFIED",
+      "refresh_target_hours": 720,
+      "covers": [
+        "HIGHER_EDUCATION",
+        "TVET",
+        "SETA_LEARNERSHIPS",
+        "INTERNSHIPS",
+        "APPRENTICESHIPS",
+        "EMPLOYMENT"
+      ],
+      "requires_partner_authorization": false,
+      "evidence_required": [
+        "current advice source URL and retrieval timestamp"
+      ],
+      "notes": "Guidance only; not proof of an open opportunity or eligibility."
+    },
+    {
+      "source_id": "institution_owned_portals",
+      "name": "Institution-owned admissions, programme, residence and student-support portals",
+      "authority": "The specific institution in the current DHET register",
+      "source_class": "per_institution_portal",
+      "url": "https://www.dhet.gov.za/SitePages/MasterLists.aspx",
+      "access_mode": "institutional_site_discovery_then_candidate_handoff_or_approved_connector",
+      "integration_status": "DISCOVERY_REQUIRED",
+      "api_status": "UNVERIFIED",
+      "refresh_target_hours": 24,
+      "covers": [
+        "HIGHER_EDUCATION",
+        "TVET"
+      ],
+      "requires_partner_authorization": true,
+      "evidence_required": [
+        "current institution register identity",
+        "official institution domain verified independently",
+        "programme/closing-date evidence at exact page",
+        "written authorization before private API/transaction integration"
+      ],
+      "notes": "Institutions use different portals, calendars, document rules and workflows. Residence portals are institution-specific."
+    },
+    {
+      "source_id": "seta_owned_portals",
+      "name": "Individual SETA official programme and employer-provider portals",
+      "authority": "The specific SETA in the current DHET directory",
+      "source_class": "per_authority_portal",
+      "url": "https://www.dhet.gov.za/SitePages/SETAlinks.aspx",
+      "access_mode": "official_site_discovery_then_public_evidence_or_authorized_feed",
+      "integration_status": "DISCOVERY_REQUIRED",
+      "api_status": "UNVERIFIED",
+      "refresh_target_hours": 24,
+      "covers": [
+        "SETA_LEARNERSHIPS",
+        "APPRENTICESHIPS",
+        "INTERNSHIPS"
+      ],
+      "requires_partner_authorization": true,
+      "evidence_required": [
+        "official SETA domain",
+        "current advert/programme record",
+        "employer/provider identity",
+        "valid accreditation scope",
+        "closing date and evidence"
+      ],
+      "notes": "SETA presence does not prove a programme, funded learner slot or intake is open."
+    },
+    {
+      "source_id": "institution_accommodation_portals",
+      "name": "Institution residences and independently verified accommodation providers",
+      "authority": "The specific institution or verified accommodation operator",
+      "source_class": "accommodation_and_student_support",
+      "url": "https://www.dhet.gov.za/SitePages/MasterLists.aspx",
+      "access_mode": "institutional_site_discovery_then_verified_provider_handoff",
+      "integration_status": "DISCOVERY_REQUIRED",
+      "api_status": "UNVERIFIED",
+      "refresh_target_hours": 24,
+      "covers": [
+        "CROSS_PATHWAY_ACCOMMODATION"
+      ],
+      "requires_partner_authorization": true,
+      "evidence_required": [
+        "institution/provider identity",
+        "property/operator legitimacy and official source",
+        "current availability/price evidence",
+        "location and written terms"
+      ],
+      "notes": "Accommodation is cross-pathway support, not a seventh opportunity pathway. No live bed availability or price should be invented."
+    }
+  ],
+  "rollout_targets": {
+    "phase_0": "2026-10-31 to 2026-11-07: reconcile RC/release evidence; freeze connector contract and source register; keep stale data unpublished.",
+    "phase_1": "Target by 2026-11-14, conditional on release gates and reliable DHET register access: import the complete official PSET masterlist and publish reconciliation counts.",
+    "phase_2": "Target by 2026-11-21: first verified listing cohort spanning higher education/CAO, TVET, skills providers/SETA and public employment; each listing has source, freshness, application mode and evidence checks.",
+    "phase_3": "2026-11 to 2026-12: expand per-institution adapters, residence/accommodation discovery, monitoring, expiry and correction workflows; prioritize by coverage and candidate value.",
+    "phase_4": "Partner-dependent: direct submission/status APIs only after each institution authorizes endpoints, supplies a test environment, and approves data sharing and acceptance tests.",
+    "date_semantics": "These are internal target windows, not achieved milestones or guaranteed dates. Phase 1 depends on retrieving a current official register; Phase 2 depends on live evidence and review; Phase 4 depends on independent institutions."
+  }
+}
