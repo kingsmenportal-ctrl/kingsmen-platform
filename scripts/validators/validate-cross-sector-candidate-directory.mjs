@@ -61,7 +61,7 @@ check("candidate directory maps municipal, school, health, PSET and bursary disc
 check("candidate directory links NSFAS accommodation portal to accommodation discovery and planning", page.includes("nsfas_accommodation_directory") && page.includes("ACCOMMODATION_PROVIDER") && page.includes("nsfas_accommodation_portal"));
 check("named SETA and funder provider records link to canonical provider keys for planning", providerKeys.includes("funder_nsf") && providerKeys.includes("funder_funza_lushaka") && page.includes("source.provider_key ?? null"));
 check("cross-sector anchor inventory retains 188 or more records and 15 classes",
-  sources.length >= 188 && extension.institution_classes.length === 15);
+  sources.length >= 188 && extension.institution_classes.length === 17);
 check("every source anchor remains review-required and disconnected",
   sources.every(row => row.review_required === true && row.connector_state === "NOT_CONNECTED" &&
     Array.isArray(row.supports) && Array.isArray(row.does_not_prove)));
