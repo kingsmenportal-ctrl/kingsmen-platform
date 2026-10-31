@@ -1,0 +1,35 @@
+{
+  "schema":"kingsmen.institutions.cross-sector-source-network.v1",
+  "country":"ZA",
+  "researched_at":"2026-10-31",
+  "sectors":[
+    {"code":"GOVERNMENT_PUBLIC_SERVICE","label":"Government and public administration"},
+    {"code":"PUBLIC_ENTITIES","label":"Public entities and state-owned enterprises"},
+    {"code":"EDUCATION_SKILLS","label":"Education and skills"},
+    {"code":"HEALTH_CARE","label":"Health and care"},
+    {"code":"EMPLOYMENT_ENTERPRISE","label":"Employment and enterprise"},
+    {"code":"FUNDING_SOCIAL_SUPPORT","label":"Funding and social support"},
+    {"code":"FINANCE_INSURANCE","label":"Finance and insurance"},
+    {"code":"HOUSING_ACCOMMODATION","label":"Housing and accommodation"},
+    {"code":"COMMUNITY_ESSENTIAL_SERVICES","label":"Community and essential services"},
+    {"code":"TECHNOLOGY_DELIVERY","label":"Technology and delivery partners"},
+    {"code":"OTHER_SERVICES","label":"Other services"}
+  ],
+  "connection_levels":["SOURCE_DISCOVERED","DIRECTORY_LISTED","IDENTITY_VERIFIED","SERVICE_VERIFIED","AUTHORIZED_INTEGRATION_TESTED","SUBMISSION_RECEIPT_CONFIRMED","PROVIDER_OUTCOME_CONFIRMED"],
+  "policy":{"directory_is_partnership":false,"directory_proves_open_service":false,"public_safe_requires_review":true,"stale_or_unknown_fails_closed":true,"provider_authorization_required_for_automation":true,"candidate_confirmation_per_destination":true,"provider_receipt_required_for_confirmed_submission":true},
+  "sources":[
+    {"id":"govza_contact_directory","name":"GCIS Government Contact Directory","authority_host":"www.gov.za","url":"https://www.gov.za/about-government/contact-directory","sector_codes":["GOVERNMENT_PUBLIC_SERVICE","PUBLIC_ENTITIES"],"use":"DIRECTORY_DISCOVERY","refresh_days":30,"human_review":true,"claims":["Government, public body and contact directory discovery only; no open service, partnership or integration." ]},
+    {"id":"govza_public_entities","name":"GCIS State-Owned Enterprises and Public Institutions","authority_host":"www.gov.za","url":"https://www.gov.za/about-government/contact-directory/soe-s","sector_codes":["PUBLIC_ENTITIES"],"use":"DIRECTORY_DISCOVERY","refresh_days":30,"human_review":true,"claims":["Public entity directory only; verify each institution independently."]},
+    {"id":"govza_municipalities","name":"GCIS Provincial and Local Government Directory","authority_host":"www.gov.za","url":"https://www.gov.za/about-government/contact-directory/provincial-local-government","sector_codes":["GOVERNMENT_PUBLIC_SERVICE","COMMUNITY_ESSENTIAL_SERVICES"],"use":"DIRECTORY_DISCOVERY","refresh_days":30,"human_review":true,"claims":["Municipal identity and contact discovery only; check current legal status and municipal tier."]},
+    {"id":"ndoh_public_entities","name":"National Department of Health","authority_host":"www.health.gov.za","url":"https://www.health.gov.za/","sector_codes":["HEALTH_CARE"],"use":"DIRECTORY_DISCOVERY","refresh_days":30,"human_review":true,"claims":["Official health authority entry point; not a complete facility directory or a live facility status assertion."]},
+    {"id":"nhie_mhfl_api","name":"NHIE Master Health Facility List API guide","authority_host":"covid19-mfl.csir.co.za","url":"https://covid19-mfl.csir.co.za/docs/guides/mhfl/","sector_codes":["HEALTH_CARE"],"use":"AUTHORIZED_API_CANDIDATE","refresh_days":30,"human_review":true,"partner_authorization":true,"claims":["Facility identity, type, ownership, status and address metadata within the registry scope. Kingsmen access requires partner-issued credentials, sandbox conformance and production approval. Never reuse public documentation example credentials."]},
+    {"id":"cipc_enterprise_search","name":"CIPC Enterprise Search and Enquiry","authority_host":"eservices.cipc.co.za","url":"https://eservices.cipc.co.za/EntEnquiry.aspx","sector_codes":["EMPLOYMENT_ENTERPRISE","PUBLIC_ENTITIES"],"use":"MANUAL_OR_AUTHORIZED_IDENTITY_LOOKUP","refresh_days":30,"human_review":true,"partner_authorization":true,"claims":["Enterprise name or number lookup; no bulk extraction permission or Kingsmen API access is asserted."]},
+    {"id":"fsca_authorised_provider_search","name":"FSCA Authorised Financial Service Provider Search","authority_host":"www.fsca.co.za","url":"https://www.fsca.co.za/FSB-Search/","sector_codes":["FINANCE_INSURANCE"],"use":"REGULATORY_STATUS_LOOKUP","refresh_days":30,"human_review":true,"claims":["FSP search entry point; exact permissions and current status need individual review."]},
+    {"id":"shra_shi_register_2026","name":"SHRA Social Housing Institution Register 2026","authority_host":"www.shra.org.za","url":"https://www.shra.org.za/wp-content/uploads/2026/02/SHI-Register-2026.pdf","sector_codes":["HOUSING_ACCOMMODATION"],"use":"DATED_REGISTER_REQUIRES_ROW_REVIEW","refresh_days":30,"human_review":true,"claims":["Named social housing institution and accreditation as dated in the register; check expiry per row and current accommodation availability separately."]},
+    {"id":"govza_sassa_profile","name":"Government directory SASSA profile","authority_host":"www.gov.za","url":"https://www.gov.za/about-government/contact-directory/soe/south-african-social-security-agency-sassa","sector_codes":["FUNDING_SOCIAL_SUPPORT","GOVERNMENT_PUBLIC_SERVICE"],"use":"DIRECTORY_DISCOVERY","refresh_days":30,"human_review":true,"claims":["SASSA identity and contact route only; no candidate eligibility, grant approval or payment status."]},
+    {"id":"govza_npo_registration_guidance","name":"Government NPO Registration Guidance","authority_host":"www.gov.za","url":"https://www.gov.za/services/register-nonprofit-organisation","sector_codes":["FUNDING_SOCIAL_SUPPORT","COMMUNITY_ESSENTIAL_SERVICES"],"use":"GUIDANCE_ONLY_NOT_A_LIVE_REGISTER","refresh_days":90,"human_review":true,"claims":["Official registration process guidance only; do not import NPO identities from this page."]},
+    {"id":"national_treasury_municipal_data","name":"National Treasury Municipal Finance Data","authority_host":"municipaldata.treasury.gov.za","url":"https://municipaldata.treasury.gov.za/","sector_codes":["GOVERNMENT_PUBLIC_SERVICE"],"use":"SUPPLEMENTAL_ONLY_NOT_LEGAL_IDENTITY_SOURCE","refresh_days":90,"human_review":true,"claims":["Municipal finance context only; not the primary active legal municipality register."]}
+  ],
+  "seed_file":"manifests/institutions/seed/cross-sector-institutions-2026-10-31.json",
+  "limitations":["This is a set of source anchors, not the full national entity population.","The NPO source is guidance, not a live register.","The MHFL API is not connected until partner onboarding and assigned credentials are secured."]
+}
