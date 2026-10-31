@@ -10,7 +10,11 @@ assert.match(sql,/^\s*-- READ-ONLY/m);
 assert.doesNotMatch(sql,/(?:^|\n)\s*(?:INSERT|UPDATE|DELETE|ALTER|DROP|CREATE|TRUNCATE|GRANT|REVOKE)\b/i);
 for(const table of ["route_programmes","route_providers","opportunity_providers","opportunity_programmes","external_source_observations","candidate_opportunity_matches","opportunity_deadlines"])assert.ok(sql.includes("public."+table),"missing "+table+" from SQL audit");
 for(const reason of ["EXPIRED_DEADLINE_NOT_CLOSED","OPEN_WITHOUT_EVIDENCE","VERIFIED_BUT_STALE","VERIFIED_BUT_EXPIRED","VERIFIED_WITH_FUTURE_TIMESTAMP","APPROVED_MATCH_WITHOUT_EVIDENCE"])assert.ok(sql.includes(reason),"missing finding code "+reason);
-assert.match(candidate,/eq\("opening_status", "OPEN"\)/);
+// The handler fetches each programme row and performs a fail-closed property guard;
+// it does not filter opening_status in the PostgREST query.
+assert.match(candidate,/programme\.opening_status\s*!==\s*"OPEN"\s*\|\|\s*programme\.candidate_facing_safe\s*!==\s*true/);
+assert.match(candidate,/programme\.source_confidence\s*!==\s*"OFFICIAL_VERIFIED"/);
+assert.match(candidate,/new URL\(String\(programme\.exact_link\s*\?\?\s*""\)\)/);
 assert.match(candidate,/eq\("observation_status", "VERIFIED"\)/);
 assert.match(candidate,/eq\("source_confidence", "OFFICIAL_VERIFIED"\)/);
 assert.match(candidate,/gt\("stale_after", now\.toISOString\(\)\)/);
