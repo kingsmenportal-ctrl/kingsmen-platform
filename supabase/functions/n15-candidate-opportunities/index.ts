@@ -62,10 +62,6 @@ Deno.serve(async (req: Request) => {
     // Approved status alone is not evidence. Require a non-empty evidence set on
     // the human-reviewed match before it can reach a candidate response.
     if (!Array.isArray(match.evidence_refs) || match.evidence_refs.length === 0) continue;
-    if (!/^https:\/\//i.test(String(match.programme_ref))) {
-      // programme_ref is an internal key, never a navigable destination; exact_link
-      // is checked after the programme row is fetched below.
-    }
     const { data: programme } = await admin.from("opportunity_programmes").select("*")
       .eq("programme_ref", match.programme_ref).maybeSingle();
     const { data: provider } = await admin.from("opportunity_providers").select("*")
