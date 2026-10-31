@@ -25,7 +25,7 @@ const checks = [
   ["Jarvis Browser Scout remains dry-run without candidate or secret capability", /toolRef: 'jarvis\.browser\.scout'/.test(registry) && /trustLevel: 'TRUST_2_DRY_RUN'/.test(registry) && /candidateDataCapable: false/.test(registry) && /secretsCapable: false/.test(registry)],
   ["Every sample target is disabled by default", targets.targets.every((target) => target.enabled === false)],
   ["Policy manifest explicitly forbids write and bypass operations", manifest.forbiddenOperations.includes("submit_application") && manifest.forbiddenOperations.includes("captcha_or_otp_bypass")],
-  ["Root test chain invokes Browser Scout source and unit checks", packageJson.scripts.test.includes("npm run institutions:browser-scout:check") && packageJson.scripts["institutions:browser-scout:check"])
+  ["Root test chain invokes Browser Scout source and unit checks", packageJson.scripts.test.includes("npm run institutions:browser-scout:check") && Boolean(packageJson.scripts["institutions:browser-scout:check"])]
 ];
 
 const failures = checks.filter(([, passed]) => !passed).map(([name]) => name);
