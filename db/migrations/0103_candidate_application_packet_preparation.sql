@@ -84,6 +84,7 @@ END
 $function$;
 
 REVOKE ALL ON FUNCTION private.guard_candidate_application_packet_owner() FROM PUBLIC, anon, authenticated;
+GRANT EXECUTE ON FUNCTION private.guard_candidate_application_packet_owner() TO service_role;
 
 DROP TRIGGER IF EXISTS candidate_application_packets_owner_guard ON public.candidate_application_packets;
 CREATE TRIGGER candidate_application_packets_owner_guard
@@ -127,6 +128,7 @@ END
 $function$;
 
 REVOKE ALL ON FUNCTION private.guard_candidate_application_packet_document() FROM PUBLIC, anon, authenticated;
+GRANT EXECUTE ON FUNCTION private.guard_candidate_application_packet_document() TO service_role;
 
 DROP TRIGGER IF EXISTS candidate_application_packet_documents_owner_guard ON public.candidate_application_packet_documents;
 CREATE TRIGGER candidate_application_packet_documents_owner_guard
