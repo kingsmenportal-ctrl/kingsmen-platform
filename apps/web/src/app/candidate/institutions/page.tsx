@@ -243,9 +243,9 @@ const sourceItems: DirectoryItem[] = crossSector.sources.map((source: SourceAnch
     ? ["SETA_LEARNERSHIPS", "APPRENTICESHIPS", "FUNDING"]
     : isPublicEntityEmployer || isPrivateEmployer || isDpsaVacancySource
       ? ["EMPLOYMENT"]
-      : isProvincialEducationDepartment ? ["EMPLOYMENT"]
-      : isProvincialEducationDepartment ? ["PUBLIC_SERVICE", "BASIC_EDUCATION", "EMPLOYMENT"]
-      : capabilityBySource[source.source_id] ?? [];
+      : isProvincialEducationDepartment
+        ? ["PUBLIC_SERVICE", "BASIC_EDUCATION", "EMPLOYMENT"]
+        : capabilityBySource[source.source_id] ?? [];
   const sourcePathways = isSetaProvider
     ? ["SETA_LEARNERSHIPS", "APPRENTICESHIPS"]
     : isPublicEntityEmployer || isPrivateEmployer || isDpsaVacancySource
