@@ -10,7 +10,7 @@ const manifest = JSON.parse(read("manifests/institutions/institution-browser-sco
 const packageJson = JSON.parse(read("package.json"));
 
 const checks = [
-  ["Playwright browser engines are used", /from "playwright"/.test(scout)],
+  ["Playwright browser engines are loaded on approved probe runs", /await import\("playwright"\)/.test(scout) && /engines\s*=\s*\{ chromium, firefox, webkit \}/.test(scout)],
   ["Fresh isolated contexts are created per target", /browser\.newContext/.test(scout)],
   ["Only allowlisted HTTPS GET requests are permitted", /validateProbeRequest/.test(scout) && /NON_GET_REQUEST_BLOCKED/.test(policy) && /HTTPS_ONLY/.test(policy)],
   ["Private and local host targets are rejected", /PRIVATE_OR_LOCAL_HOST_FORBIDDEN/.test(policy)],
