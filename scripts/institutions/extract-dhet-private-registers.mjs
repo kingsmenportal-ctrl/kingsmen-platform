@@ -74,7 +74,8 @@ function selfTest(){
  if(c.length!==2||c[0].registration_status!=="CANCELLED"||c[1].registration_status!=="REGISTERED")throw Error("cancelled/registered separation");
  const h=extractRecords("1. REGISTERED INSTITUTIONS\n1. Example Higher Institute\n2020/HE07/001 Gauteng\n2. PROVISIONALLY REGISTERED INSTITUTIONS\n2. Provisional Higher Institute\n2024/HE08/002 Western Cape\n3. LAPSED PROVISIONAL REGISTRATIONS\n3. Lapsed Higher Institute\n2018/HE07/008 Gauteng","private_higher_education");
  if(!h.some(x=>x.registration_status==="REGISTERED")||!h.some(x=>x.registration_status==="PROVISIONAL")||!h.some(x=>x.registration_status==="LAPSED"))throw Error("higher-ed status separation");
- if([...c,...h].some(x=>x.import_eligible||x.official_route_status!=="NOT_VERIFIED"||x.integration_status!=="NOT_CONNECTED"||x.automation_authorized))throw Error("fail-closed route defaults");\n if(/Makungo|015 663 1921|contact@example.org/.test(c[0].source_excerpt))throw Error("contact detail redaction failed");
+ if([...c,...h].some(x=>x.import_eligible||x.official_route_status!=="NOT_VERIFIED"||x.integration_status!=="NOT_CONNECTED"||x.automation_authorized))throw Error("fail-closed route defaults");
+ if(/Makungo|015 663 1921|contact@example.org/.test(c[0].source_excerpt))throw Error("contact detail redaction failed");
  console.log("PASS DHET register extractor self-test");
 }
 if(process.argv.includes("--self-test"))selfTest();
