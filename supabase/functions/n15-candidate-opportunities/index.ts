@@ -100,7 +100,7 @@ Deno.serve(async (req: Request) => {
       }
       // Official adverts often publish a date but no closing time. Preserve
       // date-only semantics instead of inventing a timestamp.
-      return typeof item.closes_on === "string" && /^\\d{4}-\\d{2}-\\d{2}$/.test(item.closes_on) &&
+      return typeof item.closes_on === "string" && /^\d{4}-\d{2}-\d{2}$/.test(item.closes_on) &&
         item.closes_on >= localToday;
     }) ?? null;
     if (deadline && (!Array.isArray(deadline.evidence_refs) || !deadline.evidence_refs.length)) continue;
