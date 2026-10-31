@@ -30,7 +30,7 @@ const checks = [
   ["candidate UI opens only the official opportunity link", /href=\{item\.official_link\}/.test(page) && /rel="noopener noreferrer"/.test(page)],
   ["official DBE batch seeds six specifically referenced employment opportunities", ["DBE/74/2026","DBE/75/2026","DBE/76/2026","DBE/77/2026","DBE/78/2026","DBE/79/2026"].every(x => dbeMigration.includes(x)) && /OFFICIAL_VERIFIED/.test(dbeMigration)],
   ["date-only deadline migration preserves a date without inventing a close timestamp", /ADD COLUMN IF NOT EXISTS closes_on date/.test(dbeMigration) && /closes_at IS NULL/.test(dbeMigration) && /DATE '2026-11-06'/.test(dbeMigration)],
-  ["candidate feed accepts a confirmed date-only deadline in South African local date", /closes_on/.test(candidate) && /Africa\\/Johannesburg/.test(candidate) && /item\\.closes_on >= localToday/.test(candidate)],
+  ["candidate feed accepts a confirmed date-only deadline in South African local date", candidate.includes("closes_on") && candidate.includes("Africa/Johannesburg") && candidate.includes("item.closes_on >= localToday")],
   ["candidate UI states that date-only deadline has no specified closing time", /date only; closing time not stated/.test(page)],
   ["operator ingestion UI exposes controlled manual run", /Run source ingestion/.test(fs.readFileSync(path.join(root, "apps/web/src/app/operator/opportunities/ingestion/page.tsx"), "utf8")) && /authorised platform reviewer/.test(fs.readFileSync(path.join(root, "apps/web/src/app/operator/opportunities/ingestion/page.tsx"), "utf8"))],
 ];
