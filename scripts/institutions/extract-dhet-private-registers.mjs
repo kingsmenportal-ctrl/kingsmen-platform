@@ -79,12 +79,12 @@ export function extractRecords(text,kind){
   const nameParts=[firstColumn].filter(Boolean);
   for(const line of e.lines.slice(1)){
    const trimmed=line.trim();
-   if(/^(CONTACT PERSON|CONTACT DETAILS|CONTACT NUMBER|TEL\.?|TELEPHONE|MOBILE|CELL|FAX|EMAIL|E-MAIL|WEBSITE|WEB SITE|PHYSICAL ADDRESS|POSTAL ADDRESS|DIRECTOR|MANAGER|MANAGING PRINCIPAL|PRINCIPAL|REGISTRAR|ACADEMIC REGISTRAR|ACADEMIC ADMINISTRATOR|CEO|CHAIRPERSON)\b/i.test(trimmed))break;
+   if(/^(?:CON.?ACT PERSONS?|CONTACT DETAILS|CONTACT NUMBER|TEL\.?|TELEPHONE|MOBILE|CELL|FAX|EMAIL|E-MAIL|WEBSITE|WEB SITE|PHYSICAL ADDRESS|POSTAL ADDRESS|PREVIOUS NAME|PREVIOUSLY KNOWN AS|DIRECTOR|MANAGER|MANAGING PRINCIPAL|PRINCIPAL|REGISTRAR|ACADEMIC REGISTRAR|ACADEMIC ADMINISTRATOR|CEO|CHAIRPERSON)\b/i.test(trimmed))break;
    source.pattern.lastIndex=0;
    if(source.pattern.test(line))break;
    const firstSegment=(trimmed.split(/\s{2,}/)[0]??"").trim();
    if(!firstSegment)continue;
-   if(/^(?:[A-Z]\)\s|\d+[.)]\s|\d{4}\/|\(\d{3}\)|\+?\d[\d ()/-]{6,})/i.test(firstSegment))continue;
+   if(/^(?:[A-Z]\)\s|\d+[.)]\s|\d{4}\/|\(\d{3}\)|\+?\d[\d ()/-]{6,})/i.test(firstSegment)||/\d/.test(firstSegment))continue;
    if(/(?:@|www\.|http|street|road|avenue|drive|office park|building|po box|private bag|postnet|postal|pretoria|johannesburg|cape town|durban|bellville|centurion|randburg|polokwane|bloemfontein|gqeberha|east london|rustenburg|midrand|waterkloof|zebediela|motatantanye|village|nqf|heqsf|higher certificate|bachelor|diploma|qualification|contact mode|distance mode|salary|requirements|duties|applications|closing date)/i.test(firstSegment))continue;
    if(firstSegment.length>80)continue;
    nameParts.push(firstSegment);
