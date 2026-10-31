@@ -5252,6 +5252,326 @@
         "source_record_status": "NEEDS_REVIEW",
         "external_application_route_status": "NOT_VERIFIED"
       }
+    },
+    {
+      "source_id": "dpsa_public_service_vacancies",
+      "provider_key": "dpsa_public_service_vacancies",
+      "name": "Department of Public Service and Administration — Public Service Vacancy Circular",
+      "authority": "Department of Public Service and Administration — Public Service Vacancy Circular",
+      "url": "https://www.dpsa.gov.za/newsroom/psvc/",
+      "classes": [
+        "PUBLIC_ADMINISTRATION",
+        "EMPLOYER_AND_RECRUITMENT",
+        "PUBLIC_ENTITY"
+      ],
+      "supports": [
+        "official public-service vacancy circular and current advertised roles when each circular notice is checked",
+        "Z83, vacancy reference and department-specific submission requirements published for each post"
+      ],
+      "does_not_prove": [
+        "all government vacancies outside circular scope",
+        "a candidate's eligibility or a live role after its closing date",
+        "a Kingsmen submission, provider receipt, appointment or partnership",
+        "Kingsmen partnership or provider-authorised API/portal integration"
+      ],
+      "refresh_after_days": 7,
+      "review_required": true,
+      "connector_state": "NOT_CONNECTED",
+      "metadata": {
+        "provider_homepage_url": "https://www.dpsa.gov.za/newsroom/psvc/",
+        "official_application_portal_url": "https://www.dpsa.gov.za/newsroom/psvc/",
+        "provider_type": "GOVERNMENT_AUTHORITY",
+        "source_record_status": "NEEDS_REVIEW",
+        "external_application_route_status": "OFFICIAL_EXTERNAL_PORTAL_NOT_CONNECTED"
+      }
+    },
+    {
+      "source_id": "private_employer_pepkor_careers",
+      "provider_key": "private_employer_pepkor",
+      "name": "Pepkor Group Careers (PEP, Ackermans and group businesses)",
+      "authority": "Pepkor Group Careers (PEP, Ackermans and group businesses)",
+      "url": "https://pepkor.co.za/careers/",
+      "classes": [
+        "EMPLOYER_AND_RECRUITMENT"
+      ],
+      "supports": [
+        "official Pepkor group vacancy listings, careers and published training/bursary opportunities",
+        "group-level recruitment information spanning PEP, Ackermans, Pepkor Speciality, PEP Africa, Avenida and Pepkor Lifestyle"
+      ],
+      "does_not_prove": [
+        "a current vacancy or programme remaining open after the exact advert's closing date",
+        "eligibility or a submitted application/receipt",
+        "authorisation for Kingsmen to log into Pepkor's internal or candidate portal",
+        "Kingsmen partnership or provider-authorised API/portal integration"
+      ],
+      "refresh_after_days": 7,
+      "review_required": true,
+      "connector_state": "NOT_CONNECTED",
+      "metadata": {
+        "provider_homepage_url": "https://pepkor.co.za/careers/",
+        "official_application_portal_url": "https://pepkor.co.za/vacancies/",
+        "provider_type": "EMPLOYER",
+        "source_record_status": "NEEDS_REVIEW",
+        "external_application_route_status": "OFFICIAL_EXTERNAL_PORTAL_NOT_CONNECTED"
+      }
+    },
+    {
+      "source_id": "private_employer_sasol_careers",
+      "provider_key": "private_employer_sasol",
+      "name": "Sasol Careers",
+      "authority": "Sasol Careers",
+      "url": "https://www.sasol.com/careers/",
+      "classes": [
+        "EMPLOYER_AND_RECRUITMENT"
+      ],
+      "supports": [
+        "Sasol career routes for learnerships, students, graduates and experienced hires",
+        "the official Sasol job site and recruitment safety guidance"
+      ],
+      "does_not_prove": [
+        "a current vacancy or candidate eligibility without checking the exact job advertisement",
+        "any fee, offer, submission receipt or appointment; Sasol warns it does not ask applicants for advance payment",
+        "Kingsmen partnership or provider-authorised API/portal integration"
+      ],
+      "refresh_after_days": 7,
+      "review_required": true,
+      "connector_state": "NOT_CONNECTED",
+      "metadata": {
+        "provider_homepage_url": "https://www.sasol.com/careers/",
+        "official_application_portal_url": "https://jobs.sasol.com/",
+        "provider_type": "EMPLOYER",
+        "source_record_status": "NEEDS_REVIEW",
+        "external_application_route_status": "OFFICIAL_EXTERNAL_PORTAL_NOT_CONNECTED"
+      }
+    },
+    {
+      "source_id": "private_employer_woolworths_careers",
+      "provider_key": "private_employer_woolworths",
+      "name": "Woolworths South Africa Careers",
+      "authority": "Woolworths South Africa Careers",
+      "url": "https://careers.woolworths.co.za/applicant/index.php?controller=Page&name=jobsearch",
+      "classes": [
+        "EMPLOYER_AND_RECRUITMENT"
+      ],
+      "supports": [
+        "official jobs search, applicant registration and role-specific application pages"
+      ],
+      "does_not_prove": [
+        "a particular vacancy's current availability, closing date or eligibility unless the live listing is rechecked",
+        "Kingsmen submission or provider receipt",
+        "Kingsmen partnership or provider-authorised API/portal integration"
+      ],
+      "refresh_after_days": 7,
+      "review_required": true,
+      "connector_state": "NOT_CONNECTED",
+      "metadata": {
+        "provider_homepage_url": "https://careers.woolworths.co.za/applicant/index.php?controller=Page&name=jobsearch",
+        "official_application_portal_url": "https://careers.woolworths.co.za/applicant/index.php?controller=Page&name=jobsearch",
+        "provider_type": "EMPLOYER",
+        "source_record_status": "NEEDS_REVIEW",
+        "external_application_route_status": "OFFICIAL_EXTERNAL_PORTAL_NOT_CONNECTED"
+      }
+    },
+    {
+      "source_id": "private_employer_mr_price_careers",
+      "provider_key": "private_employer_mr_price",
+      "name": "Mr Price Group Careers",
+      "authority": "Mr Price Group Careers",
+      "url": "https://mrpricegroup.com/careers/",
+      "classes": [
+        "EMPLOYER_AND_RECRUITMENT"
+      ],
+      "supports": [
+        "official recruitment information, retail opportunities, summer vacation programme, workplace experience and graduate programmes"
+      ],
+      "does_not_prove": [
+        "a current intake, available placement or candidate eligibility without checking the exact programme notice",
+        "Kingsmen submission, receipt or partnership",
+        "Kingsmen partnership or provider-authorised API/portal integration"
+      ],
+      "refresh_after_days": 7,
+      "review_required": true,
+      "connector_state": "NOT_CONNECTED",
+      "metadata": {
+        "provider_homepage_url": "https://mrpricegroup.com/careers/",
+        "official_application_portal_url": "https://mrpricegroup.com/careers/",
+        "provider_type": "EMPLOYER",
+        "source_record_status": "NEEDS_REVIEW",
+        "external_application_route_status": "OFFICIAL_EXTERNAL_PORTAL_NOT_CONNECTED"
+      }
+    },
+    {
+      "source_id": "private_employer_vodafone_careers",
+      "provider_key": "private_employer_vodafone",
+      "name": "Vodafone / Vodacom Careers",
+      "authority": "Vodafone / Vodacom Careers",
+      "url": "https://careers.vodafone.com/",
+      "classes": [
+        "EMPLOYER_AND_RECRUITMENT"
+      ],
+      "supports": [
+        "official group careers search including opportunities listed for South Africa and Johannesburg"
+      ],
+      "does_not_prove": [
+        "that every global role is available to South African applicants",
+        "current eligibility, hiring outcome, Kingsmen submission or partnership",
+        "Kingsmen partnership or provider-authorised API/portal integration"
+      ],
+      "refresh_after_days": 7,
+      "review_required": true,
+      "connector_state": "NOT_CONNECTED",
+      "metadata": {
+        "provider_homepage_url": "https://careers.vodafone.com/",
+        "official_application_portal_url": "https://careers.vodafone.com/",
+        "provider_type": "EMPLOYER",
+        "source_record_status": "NEEDS_REVIEW",
+        "external_application_route_status": "OFFICIAL_EXTERNAL_PORTAL_NOT_CONNECTED"
+      }
+    },
+    {
+      "source_id": "private_employer_pepsico_south_africa",
+      "provider_key": "private_employer_pepsico_sa",
+      "name": "PepsiCo South Africa Careers",
+      "authority": "PepsiCo South Africa Careers",
+      "url": "https://www.pepsicojobs.com/southafrica/",
+      "classes": [
+        "EMPLOYER_AND_RECRUITMENT"
+      ],
+      "supports": [
+        "official South Africa job search across corporate, production, distribution and other business areas"
+      ],
+      "does_not_prove": [
+        "a specific vacancy being open or suitable without checking the live listing",
+        "eligibility, Kingsmen integration, submission receipt or appointment",
+        "Kingsmen partnership or provider-authorised API/portal integration"
+      ],
+      "refresh_after_days": 7,
+      "review_required": true,
+      "connector_state": "NOT_CONNECTED",
+      "metadata": {
+        "provider_homepage_url": "https://www.pepsicojobs.com/southafrica/",
+        "official_application_portal_url": "https://www.pepsicojobs.com/southafrica/",
+        "provider_type": "EMPLOYER",
+        "source_record_status": "NEEDS_REVIEW",
+        "external_application_route_status": "OFFICIAL_EXTERNAL_PORTAL_NOT_CONNECTED"
+      }
+    },
+    {
+      "source_id": "private_employer_nedbank_careers",
+      "provider_key": "private_employer_nedbank",
+      "name": "Nedbank Careers",
+      "authority": "Nedbank Careers",
+      "url": "https://jobs.nedbank.co.za/",
+      "classes": [
+        "EMPLOYER_AND_RECRUITMENT",
+        "FINANCE_AND_INSURANCE"
+      ],
+      "supports": [
+        "official job search and candidate account/profile creation",
+        "published recruitment steps and graduate/young-professional/bursary job categories"
+      ],
+      "does_not_prove": [
+        "a current intake, candidate qualification or eligibility without the exact live notice",
+        "Kingsmen submission or bank confirmation",
+        "Kingsmen partnership or provider-authorised API/portal integration"
+      ],
+      "refresh_after_days": 7,
+      "review_required": true,
+      "connector_state": "NOT_CONNECTED",
+      "metadata": {
+        "provider_homepage_url": "https://jobs.nedbank.co.za/",
+        "official_application_portal_url": "https://jobs.nedbank.co.za/",
+        "provider_type": "EMPLOYER",
+        "source_record_status": "NEEDS_REVIEW",
+        "external_application_route_status": "OFFICIAL_EXTERNAL_PORTAL_NOT_CONNECTED"
+      }
+    },
+    {
+      "source_id": "private_employer_clicks_group_careers",
+      "provider_key": "private_employer_clicks_group",
+      "name": "Clicks Group Careers",
+      "authority": "Clicks Group Careers",
+      "url": "https://careers.clicksgroup.co.za/",
+      "classes": [
+        "EMPLOYER_AND_RECRUITMENT",
+        "HEALTH_AND_CARE"
+      ],
+      "supports": [
+        "official careers and job search across Clicks Group, Clicks stores, distribution, retail pharmacy, contact centre, finance, logistics and support areas"
+      ],
+      "does_not_prove": [
+        "a role's live availability or candidate eligibility unless the current job listing is checked",
+        "Kingsmen submission, receipt or appointment",
+        "Kingsmen partnership or provider-authorised API/portal integration"
+      ],
+      "refresh_after_days": 7,
+      "review_required": true,
+      "connector_state": "NOT_CONNECTED",
+      "metadata": {
+        "provider_homepage_url": "https://careers.clicksgroup.co.za/",
+        "official_application_portal_url": "https://careers.clicksgroup.co.za/?controller=Page&name=jobsearch",
+        "provider_type": "EMPLOYER",
+        "source_record_status": "NEEDS_REVIEW",
+        "external_application_route_status": "OFFICIAL_EXTERNAL_PORTAL_NOT_CONNECTED"
+      }
+    },
+    {
+      "source_id": "private_employer_tfg_careers",
+      "provider_key": "private_employer_tfg",
+      "name": "TFG Careers",
+      "authority": "TFG Careers",
+      "url": "https://tfglimited.co.za/careers/",
+      "classes": [
+        "EMPLOYER_AND_RECRUITMENT"
+      ],
+      "supports": [
+        "official careers overview and job search across retail, manufacturing, technology, specialist and support services",
+        "published youth workplace and learning/development opportunities"
+      ],
+      "does_not_prove": [
+        "a specific job being available to this candidate without checking the current listing and conditions",
+        "Kingsmen submission, receipt or partnership",
+        "Kingsmen partnership or provider-authorised API/portal integration"
+      ],
+      "refresh_after_days": 7,
+      "review_required": true,
+      "connector_state": "NOT_CONNECTED",
+      "metadata": {
+        "provider_homepage_url": "https://tfglimited.co.za/careers/",
+        "official_application_portal_url": "https://fa-expc-saasfaprod1.fa.ocs.oraclecloud.com/hcmUI/CandidateExperience/en/sites/CX_1/jobs",
+        "provider_type": "EMPLOYER",
+        "source_record_status": "NEEDS_REVIEW",
+        "external_application_route_status": "OFFICIAL_EXTERNAL_PORTAL_NOT_CONNECTED"
+      }
+    },
+    {
+      "source_id": "private_employer_standard_bank_careers",
+      "provider_key": "private_employer_standard_bank",
+      "name": "Standard Bank Group Careers",
+      "authority": "Standard Bank Group Careers",
+      "url": "https://www.standardbank.com/careers/",
+      "classes": [
+        "EMPLOYER_AND_RECRUITMENT",
+        "FINANCE_AND_INSURANCE"
+      ],
+      "supports": [
+        "official jobs search and SmartRecruiters candidate profile route for applications"
+      ],
+      "does_not_prove": [
+        "candidate eligibility or current availability without exact job verification",
+        "Kingsmen submission, receipt or partnership",
+        "Kingsmen partnership or provider-authorised API/portal integration"
+      ],
+      "refresh_after_days": 7,
+      "review_required": true,
+      "connector_state": "NOT_CONNECTED",
+      "metadata": {
+        "provider_homepage_url": "https://www.standardbank.com/careers/",
+        "official_application_portal_url": "https://www.standardbank.com/sbg/standard-bank-group/careers/apply/jobs",
+        "provider_type": "EMPLOYER",
+        "source_record_status": "NEEDS_REVIEW",
+        "external_application_route_status": "OFFICIAL_EXTERNAL_PORTAL_NOT_CONNECTED"
+      }
     }
   ],
   "completion_gates": [
