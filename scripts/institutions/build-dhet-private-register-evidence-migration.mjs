@@ -15,6 +15,11 @@ export function validateManifest(m){
   if(r.registration_identifier!==r.registration_identifiers_observed?.[0])errors.push("record "+i+" has inconsistent registration identifier fields");
   if(r.identity_conflict_status==="CONFLICT_REVIEW_REQUIRED"||r.identity_conflict_status==="DUPLICATE_SOURCE_ENTRY_REVIEW"||(r.conflict_flags??[]).length)errors.push("record "+i+" has unresolved registration identity/status conflict");
   if(r.registration_status_review_required===true)errors.push("record "+i+" has unresolved registration status requiring manual adjudication");
+  if(r.import_eligible!==true)errors.push("record "+i+" is not explicitly import-authorized by review");
+  if(r.identity_review_status!=="VERIFIED_CANONICAL_IDENTITY")errors.push("record "+i+" lacks verified canonical identity review");
+  if(r.alias_reconciliation_status!=="RECONCILED")errors.push("record "+i+" lacks completed alias/provider-key reconciliation");
+  if(r.campus_extraction_status!=="REVIEWED")errors.push("record "+i+" lacks completed campus/site review");
+  if(!r.source_section||r.source_section==="UNSECTIONED")errors.push("record "+i+" lacks a recognized source status section");
 
   if(!/^https:\/\/www\.dhet\.gov\.za\//.test(r.source_url??""))errors.push("record "+i+" lacks official DHET source URL");
   if(r.official_route_status!=="NOT_VERIFIED"||r.integration_status!=="NOT_CONNECTED"||r.automation_authorized!==false)errors.push("record "+i+" has unsafe route/integration state");
@@ -140,7 +145,7 @@ COMMIT;
 `;
 }
 if(process.argv.includes("--self-test")){
- const base={source_register:"private_colleges",source_section:"SECTION A",source_snapshot_date:"2026-07-15",source_record_ref:"private_colleges:section-a:001:2020/fe07/117",canonical_name_candidate:"Example College",normalized_name_key:"example-college",registration_identifier:"2020/FE07/117",registration_identifiers_observed:["2020/FE07/117"],registration_status:"CANCELLED",registration_status_review_required:false,province_candidates:["Limpopo"],province_status:"SOURCE_LISTED_CANDIDATE",campus_site_candidates:["Makotse Road, Zebediela"],campus_extraction_status:"REVIEW_REQUIRED",alias_candidates:[],possible_existing_provider_matches:[],alias_reconciliation_status:"NO_EXACT_MATCH_FOUND_STILL_REQUIRES_MANUAL_REVIEW",identity_conflict_status:"NO_CONFLICT_DETECTED_REVIEW_STILL_REQUIRED",conflict_flags:[],source_url:"https://www.dhet.gov.za/Registers_DocLib/example.pdf",source_excerpt:"Example College, 2020/FE07/117",official_route_status:"NOT_VERIFIED",integration_status:"NOT_CONNECTED",automation_authorized:false};
+ const base={source_register:"private_colleges",source_section:"SECTION A",source_snapshot_date:"2026-07-15",source_record_ref:"private_colleges:section-a:001:2020/fe07/117",canonical_name_candidate:"Example College",normalized_name_key:"example-college",registration_identifier:"2020/FE07/117",registration_identifiers_observed:["2020/FE07/117"],registration_status:"CANCELLED",registration_status_review_required:false,province_candidates:["Limpopo"],province_status:"SOURCE_LISTED_CANDIDATE",campus_site_candidates:["Makotse Road, Zebediela"],campus_extraction_status:"REVIEWED",alias_candidates:[],possible_existing_provider_matches:[],alias_reconciliation_status:"RECONCILED",identity_conflict_status:"NO_CONFLICT_DETECTED_REVIEW_STILL_REQUIRED",identity_review_status:"VERIFIED_CANONICAL_IDENTITY",import_eligible:true,conflict_flags:[],source_url:"https://www.dhet.gov.za/Registers_DocLib/example.pdf",source_excerpt:"Example College, 2020/FE07/117",official_route_status:"NOT_VERIFIED",integration_status:"NOT_CONNECTED",automation_authorized:false};
  const m={schema:"kingsmen.institutions.dhet-private-register-candidates.v1",records:[base]};
  if(validateManifest(m).length)throw Error("valid fixture rejected");
  const sql=buildMigration(m);
