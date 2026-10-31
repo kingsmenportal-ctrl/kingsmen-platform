@@ -45,7 +45,7 @@ check("all six Kingsmen pathways are exposed as selectable filters",
 check("sector, location, capability and pathway filters are wired to result matching",
   requiredFilters.every(fragment => page.includes(fragment)) &&
   page.includes('value="NATIONAL_SOURCE"') && page.includes("item.province === location"));
-check("database-backed route records remain distinct from institution and source-anchor records", page.includes('kind: "VERIFIED_ROUTE"') && page.includes("VERIFIED_REGISTRY_ENTRY_SCOPE_ONLY") && page.includes('value="VERIFIED_ROUTE"'));
+check("database-backed route records remain distinct from institution and source-anchor records", page.includes('kind: "VERIFIED_ROUTE"') && page.includes("SOURCE/ROUTE ENTRY VERIFIED; LEGAL STATUS NOT VERIFIED") && page.includes('value="VERIFIED_ROUTE"'));
 check("provider records and source anchors are separate typed result kinds",
   page.includes('kind: "INSTITUTION"') && page.includes('kind: "OFFICIAL_SOURCE"') &&
   page.includes("Official sector source / registry") && page.includes("Discovery source only"));
