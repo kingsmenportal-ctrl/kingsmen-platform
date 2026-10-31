@@ -1,0 +1,653 @@
+{
+  "schema": "kingsmen.institutions.national-source-register.v1",
+  "country": "ZA",
+  "scope": "National, official-source-first discovery for South African post-school education, training, public sector vacancies, and opportunity providers.",
+  "researched_at": "2026-10-31",
+  "policy": {
+    "official_source_required_for_registry_import": true,
+    "directory_entry_is_partnership": false,
+    "provider_listing_proves_open_intake": false,
+    "programme_listing_proves_current_deadline": false,
+    "provider_identity_proves_accreditation": false,
+    "portal_visit_proves_submission": false,
+    "provider_receipt_required_for_provider_confirmed_submission": true,
+    "automated_submission_requires_provider_specific_approval_or_authorization": true,
+    "candidate_final_confirmation_required_per_destination": true,
+    "stop_automation_on_captcha_mfa_or_unknown_legal_declaration": true
+  },
+  "pathways": [
+    "HIGHER_EDUCATION",
+    "TVET",
+    "SETA_LEARNERSHIPS",
+    "INTERNSHIPS",
+    "APPRENTICESHIPS",
+    "EMPLOYMENT"
+  ],
+  "source_types": [
+    "NATIONAL_REGISTRY_INDEX",
+    "PUBLIC_UNIVERSITY_DIRECTORY",
+    "PRIVATE_HIGHER_EDUCATION_REGISTER",
+    "PRIVATE_COLLEGE_REGISTER",
+    "TVET_DIRECTORY",
+    "CET_DIRECTORY",
+    "SETA_DIRECTORY",
+    "OCCUPATIONAL_PROVIDER_REGISTER",
+    "QUALIFICATION_REGISTER",
+    "CENTRAL_APPLICATIONS_PORTAL",
+    "STUDENT_FINANCIAL_AID_DIRECTORY",
+    "PUBLIC_SERVICE_VACANCIES",
+    "GOVERNMENT_EMPLOYMENT_VACANCIES"
+  ],
+  "sources": [
+    {
+      "source_id": "dhet_masterlist_pset",
+      "name": "DHET Masterlist of Registered and Established PSET Institutions",
+      "authority": "Department of Higher Education and Training",
+      "authority_host": "www.dhet.gov.za",
+      "url": "https://www.dhet.gov.za/SitePages/MasterLists.aspx",
+      "source_type": "NATIONAL_REGISTRY_INDEX",
+      "provider_types": [
+        "UNIVERSITY",
+        "TVET",
+        "CET",
+        "PRIVATE_HIGHER_EDUCATION",
+        "PRIVATE_COLLEGE"
+      ],
+      "pathways": [
+        "HIGHER_EDUCATION",
+        "TVET",
+        "SETA_LEARNERSHIPS",
+        "APPRENTICESHIPS"
+      ],
+      "refresh_after_days": 30,
+      "requires_human_review": true,
+      "link_status": "checked",
+      "claims_supported": [
+        "official register landing page",
+        "register discovery and provider-listing evidence"
+      ],
+      "claims_not_supported": [
+        "open intake",
+        "specific programme availability",
+        "deadline",
+        "candidate eligibility",
+        "institutional partnership",
+        "submission receipt"
+      ],
+      "existing_anchor_mapping": {
+        "existing_source_keys": [],
+        "relationship": "new official registry index",
+        "url_match": false,
+        "status": "NEW_AUTHORITY_ENTRY_REQUIRES_REVIEWED_IMPORT"
+      }
+    },
+    {
+      "source_id": "dhet_public_universities",
+      "name": "DHET Public Universities in South Africa",
+      "authority": "Department of Higher Education and Training",
+      "authority_host": "www.dhet.gov.za",
+      "url": "https://www.dhet.gov.za/SitePages/UniversitiesinSA.aspx",
+      "source_type": "PUBLIC_UNIVERSITY_DIRECTORY",
+      "provider_types": [
+        "UNIVERSITY"
+      ],
+      "pathways": [
+        "HIGHER_EDUCATION"
+      ],
+      "refresh_after_days": 90,
+      "requires_human_review": true,
+      "link_status": "checked",
+      "claims_supported": [
+        "public university identity and official website discovery"
+      ],
+      "claims_not_supported": [
+        "specific programme intake",
+        "admissions open",
+        "deadline",
+        "eligibility",
+        "partnership",
+        "application received"
+      ],
+      "existing_anchor_mapping": {
+        "existing_source_keys": [
+          "dhet_universities"
+        ],
+        "relationship": "same authority; different source URL path",
+        "url_match": false,
+        "status": "RECONCILE_LEGACY_URL_BEFORE_UPDATE"
+      }
+    },
+    {
+      "source_id": "dhet_private_he_register",
+      "name": "DHET Register of Private Higher Education Institutions",
+      "authority": "Department of Higher Education and Training",
+      "authority_host": "www.dhet.gov.za",
+      "url": "https://www.dhet.gov.za/Registers_DocLib/Annexure%20A%20Register%20%20Private%20Higher%20Education%20Institutions%2006%20July%202026.pdf",
+      "source_type": "PRIVATE_HIGHER_EDUCATION_REGISTER",
+      "provider_types": [
+        "PRIVATE_HIGHER_EDUCATION"
+      ],
+      "pathways": [
+        "HIGHER_EDUCATION"
+      ],
+      "refresh_after_days": 30,
+      "requires_human_review": true,
+      "link_status": "checked",
+      "claims_supported": [
+        "registered private HEI status and qualifications listed in that dated register"
+      ],
+      "claims_not_supported": [
+        "latest status beyond register date",
+        "open intake",
+        "eligibility",
+        "partnership",
+        "application receipt"
+      ],
+      "existing_anchor_mapping": {
+        "existing_source_keys": [],
+        "relationship": "new official register path",
+        "url_match": false,
+        "status": "NEW_AUTHORITY_ENTRY_REQUIRES_REVIEWED_IMPORT"
+      }
+    },
+    {
+      "source_id": "dhet_private_colleges_register",
+      "name": "DHET Register of Private Colleges",
+      "authority": "Department of Higher Education and Training",
+      "authority_host": "www.dhet.gov.za",
+      "url": "https://www.dhet.gov.za/Registers_DocLib/Register%20of%20Private%20Colleges%20%2015%20July%202026.pdf",
+      "source_type": "PRIVATE_COLLEGE_REGISTER",
+      "provider_types": [
+        "PRIVATE_COLLEGE"
+      ],
+      "pathways": [
+        "TVET",
+        "SETA_LEARNERSHIPS",
+        "APPRENTICESHIPS"
+      ],
+      "refresh_after_days": 30,
+      "requires_human_review": true,
+      "link_status": "checked",
+      "claims_supported": [
+        "registered private-college listing and qualifications within the register's scope"
+      ],
+      "claims_not_supported": [
+        "all occupational providers",
+        "open intake",
+        "specific current deadline",
+        "partnership",
+        "application receipt"
+      ],
+      "existing_anchor_mapping": {
+        "existing_source_keys": [],
+        "relationship": "new official register path",
+        "url_match": false,
+        "status": "NEW_AUTHORITY_ENTRY_REQUIRES_REVIEWED_IMPORT"
+      }
+    },
+    {
+      "source_id": "dhet_tvet_directory",
+      "name": "DHET TVET Colleges information/map",
+      "authority": "Department of Higher Education and Training",
+      "authority_host": "www.dhet.gov.za",
+      "url": "https://www.dhet.gov.za/SitePages/Map.aspx",
+      "source_type": "TVET_DIRECTORY",
+      "provider_types": [
+        "TVET"
+      ],
+      "pathways": [
+        "TVET",
+        "SETA_LEARNERSHIPS",
+        "APPRENTICESHIPS"
+      ],
+      "refresh_after_days": 30,
+      "requires_human_review": true,
+      "link_status": "checked",
+      "claims_supported": [
+        "official TVET directory/map entry point"
+      ],
+      "claims_not_supported": [
+        "current programme intake",
+        "deadline",
+        "eligibility",
+        "partner status",
+        "submission receipt"
+      ],
+      "existing_anchor_mapping": {
+        "existing_source_keys": [],
+        "relationship": "official TVET source path not presently represented by a dedicated anchor",
+        "url_match": false,
+        "status": "NEW_AUTHORITY_ENTRY_REQUIRES_REVIEWED_IMPORT"
+      }
+    },
+    {
+      "source_id": "dhet_cet_list",
+      "name": "DHET Community Education and Training Colleges list",
+      "authority": "Department of Higher Education and Training",
+      "authority_host": "www.dhet.gov.za",
+      "url": "https://www.dhet.gov.za/SiteAssets/Community%20College/Full%20list%20of%20CET%20Colleges.pdf",
+      "source_type": "CET_DIRECTORY",
+      "provider_types": [
+        "CET"
+      ],
+      "pathways": [
+        "TVET"
+      ],
+      "refresh_after_days": 90,
+      "requires_human_review": true,
+      "link_status": "requires_live_check",
+      "claims_supported": [
+        "candidate source lead for official CET-college listing after successful live revalidation"
+      ],
+      "claims_not_supported": [
+        "currently accessible source",
+        "open intake",
+        "deadline",
+        "eligibility",
+        "partnership",
+        "submission receipt"
+      ],
+      "existing_anchor_mapping": {
+        "existing_source_keys": [],
+        "relationship": "official source candidate; URL requires live revalidation",
+        "url_match": false,
+        "status": "REVALIDATE_URL_BEFORE_IMPORT"
+      }
+    },
+    {
+      "source_id": "dhet_seta_directory",
+      "name": "DHET SETA links directory",
+      "authority": "Department of Higher Education and Training",
+      "authority_host": "www.dhet.gov.za",
+      "url": "https://www.dhet.gov.za/SitePages/SETAlinks.aspx",
+      "source_type": "SETA_DIRECTORY",
+      "provider_types": [
+        "SETA",
+        "LEARNERSHIP_PROVIDER"
+      ],
+      "pathways": [
+        "SETA_LEARNERSHIPS",
+        "APPRENTICESHIPS",
+        "INTERNSHIPS",
+        "EMPLOYMENT"
+      ],
+      "refresh_after_days": 30,
+      "requires_human_review": true,
+      "link_status": "checked",
+      "claims_supported": [
+        "SETA names and linked official websites on the directory"
+      ],
+      "claims_not_supported": [
+        "a SETA is hiring",
+        "funding eligibility",
+        "open learnership",
+        "provider accreditation",
+        "partnership",
+        "application receipt"
+      ],
+      "existing_anchor_mapping": {
+        "existing_source_keys": [
+          "agriseta_official",
+          "bankseta_official",
+          "ceta_official",
+          "etdp_seta_official",
+          "ewseta_official",
+          "fasset_official",
+          "foodbev_seta_official",
+          "merseta_official",
+          "mict_seta_official",
+          "services_seta_official",
+          "teta_official"
+        ],
+        "relationship": "directory is a parent listing for existing individual SETA authority anchors",
+        "url_match": false,
+        "status": "RECONCILE_DIRECTORY_AND_SETAS_WITHOUT_DUPLICATING_ANCHORS"
+      }
+    },
+    {
+      "source_id": "qcto_sdp_directory",
+      "name": "QCTO Skills Development Provider and Assessment Centre databases",
+      "authority": "Quality Council for Trades and Occupations",
+      "authority_host": "www.qcto.org.za",
+      "url": "https://www.qcto.org.za/databases-of-sdps.html",
+      "source_type": "OCCUPATIONAL_PROVIDER_REGISTER",
+      "provider_types": [
+        "LEARNERSHIP_PROVIDER",
+        "PRIVATE_COLLEGE",
+        "EMPLOYER"
+      ],
+      "pathways": [
+        "SETA_LEARNERSHIPS",
+        "APPRENTICESHIPS",
+        "TVET"
+      ],
+      "refresh_after_days": 30,
+      "requires_human_review": true,
+      "link_status": "checked",
+      "claims_supported": [
+        "provider/assessment-centre listing within the QCTO database scope"
+      ],
+      "claims_not_supported": [
+        "all private education registrations",
+        "current intake",
+        "current accreditation after register update",
+        "employment",
+        "partnership",
+        "application receipt"
+      ],
+      "existing_anchor_mapping": {
+        "existing_source_keys": [
+          "qcto_official"
+        ],
+        "relationship": "same authority; directory page differs from root anchor",
+        "url_match": false,
+        "status": "REUSE_EXISTING_AUTHORITY_ANCHOR"
+      }
+    },
+    {
+      "source_id": "qcto_occupational_qualifications",
+      "name": "QCTO occupational qualifications and qualifications open for delivery",
+      "authority": "Quality Council for Trades and Occupations",
+      "authority_host": "www.qcto.org.za",
+      "url": "https://www.qcto.org.za/",
+      "source_type": "QUALIFICATION_REGISTER",
+      "provider_types": [
+        "LEARNERSHIP_PROVIDER",
+        "PRIVATE_COLLEGE",
+        "EMPLOYER"
+      ],
+      "pathways": [
+        "SETA_LEARNERSHIPS",
+        "APPRENTICESHIPS",
+        "TVET"
+      ],
+      "refresh_after_days": 30,
+      "requires_human_review": true,
+      "link_status": "checked",
+      "claims_supported": [
+        "QCTO official source entry point; qualification-level evidence only after locating the precise register record"
+      ],
+      "claims_not_supported": [
+        "a particular provider offers the qualification",
+        "current student intake",
+        "deadline",
+        "candidate eligibility",
+        "partnership",
+        "submission receipt"
+      ],
+      "existing_anchor_mapping": {
+        "existing_source_keys": [
+          "qcto_official"
+        ],
+        "relationship": "same authority; root anchor for specific qualification registers",
+        "url_match": false,
+        "status": "REUSE_EXISTING_AUTHORITY_ANCHOR"
+      }
+    },
+    {
+      "source_id": "saqa_qualifications_register",
+      "name": "SAQA registered qualifications search",
+      "authority": "South African Qualifications Authority",
+      "authority_host": "regqs.saqa.org.za",
+      "url": "https://regqs.saqa.org.za/finds",
+      "source_type": "QUALIFICATION_REGISTER",
+      "provider_types": [
+        "UNIVERSITY",
+        "TVET",
+        "PRIVATE_HIGHER_EDUCATION",
+        "PRIVATE_COLLEGE",
+        "LEARNERSHIP_PROVIDER"
+      ],
+      "pathways": [
+        "HIGHER_EDUCATION",
+        "TVET",
+        "SETA_LEARNERSHIPS",
+        "APPRENTICESHIPS"
+      ],
+      "refresh_after_days": 30,
+      "requires_human_review": true,
+      "link_status": "checked",
+      "claims_supported": [
+        "qualification-registration evidence for the exact matching qualification record"
+      ],
+      "claims_not_supported": [
+        "provider delivery authority",
+        "open intake",
+        "programme availability",
+        "deadline",
+        "eligibility",
+        "partnership",
+        "application receipt"
+      ],
+      "existing_anchor_mapping": {
+        "existing_source_keys": [
+          "saqa_official"
+        ],
+        "relationship": "same authority; specific qualifications search path",
+        "url_match": false,
+        "status": "REUSE_EXISTING_AUTHORITY_ANCHOR"
+      }
+    },
+    {
+      "source_id": "cao_application_terms",
+      "name": "Central Applications Office application and terms",
+      "authority": "Central Applications Office",
+      "authority_host": "www.cao.ac.za",
+      "url": "https://www.cao.ac.za/Apply.aspx?content=Terms",
+      "source_type": "CENTRAL_APPLICATIONS_PORTAL",
+      "provider_types": [
+        "APPLICATION_PORTAL"
+      ],
+      "pathways": [
+        "HIGHER_EDUCATION",
+        "TVET"
+      ],
+      "refresh_after_days": 7,
+      "requires_human_review": true,
+      "link_status": "checked",
+      "claims_supported": [
+        "CAO's published submission route, rules, fees and constraints when read from current terms"
+      ],
+      "claims_not_supported": [
+        "all South African institution applications use CAO",
+        "every listed programme currently open",
+        "admission guarantee",
+        "provider partnership",
+        "application receipt without a provider receipt"
+      ],
+      "existing_anchor_mapping": {
+        "existing_source_keys": [
+          "cao_official"
+        ],
+        "relationship": "same authority; terms page differs from root anchor",
+        "url_match": false,
+        "status": "REUSE_EXISTING_AUTHORITY_ANCHOR"
+      }
+    },
+    {
+      "source_id": "nsfas_institutions",
+      "name": "NSFAS institutions directory",
+      "authority": "National Student Financial Aid Scheme",
+      "authority_host": "www.nsfas.org.za",
+      "url": "https://www.nsfas.org.za/content/institutions.html",
+      "source_type": "STUDENT_FINANCIAL_AID_DIRECTORY",
+      "provider_types": [
+        "UNIVERSITY",
+        "TVET"
+      ],
+      "pathways": [
+        "HIGHER_EDUCATION",
+        "TVET"
+      ],
+      "refresh_after_days": 30,
+      "requires_human_review": true,
+      "link_status": "checked",
+      "claims_supported": [
+        "institution listing within NSFAS scope"
+      ],
+      "claims_not_supported": [
+        "admission intake",
+        "institution application route",
+        "funding eligibility",
+        "funding award",
+        "partnership",
+        "application receipt"
+      ],
+      "existing_anchor_mapping": {
+        "existing_source_keys": [
+          "nsfas_apply"
+        ],
+        "relationship": "same authority; institution listing differs from application-guidance page",
+        "url_match": false,
+        "status": "REUSE_EXISTING_AUTHORITY_ANCHOR"
+      },
+      "host_reconciliation_note": "Official NSFAS institution directory is indexed at the www.nsfas.org.za host. Keep the URL and authority host identical; recheck redirect/canonical behaviour during scheduled source refresh."
+    },
+    {
+      "source_id": "dpsa_public_service_vacancies",
+      "name": "DPSA Public Service Vacancy Circulars",
+      "authority": "Department of Public Service and Administration",
+      "authority_host": "www.dpsa.gov.za",
+      "url": "https://www.dpsa.gov.za/newsroom/psvc/",
+      "source_type": "PUBLIC_SERVICE_VACANCIES",
+      "provider_types": [
+        "GOVERNMENT_AUTHORITY",
+        "EMPLOYER"
+      ],
+      "pathways": [
+        "EMPLOYMENT",
+        "INTERNSHIPS"
+      ],
+      "refresh_after_days": 1,
+      "requires_human_review": true,
+      "link_status": "checked",
+      "claims_supported": [
+        "specific vacancy details only from the exact circular/advert"
+      ],
+      "claims_not_supported": [
+        "generic DPSA portal is submission destination",
+        "every vacancy accepts a Kingsmen submission",
+        "candidate eligibility without advert-specific rules",
+        "submission received",
+        "job offer"
+      ],
+      "existing_anchor_mapping": {
+        "existing_source_keys": [],
+        "relationship": "separate public service authority not presently represented as a source anchor",
+        "url_match": false,
+        "status": "NEW_AUTHORITY_ENTRY_REQUIRES_REVIEWED_IMPORT"
+      }
+    },
+    {
+      "source_id": "labour_department_vacancies",
+      "name": "Department of Employment and Labour official vacancies",
+      "authority": "Department of Employment and Labour",
+      "authority_host": "www.labour.gov.za",
+      "url": "https://www.labour.gov.za/vacancies/Pages/Vacancies-List.aspx",
+      "source_type": "GOVERNMENT_EMPLOYMENT_VACANCIES",
+      "provider_types": [
+        "GOVERNMENT_AUTHORITY",
+        "EMPLOYER"
+      ],
+      "pathways": [
+        "EMPLOYMENT",
+        "INTERNSHIPS"
+      ],
+      "refresh_after_days": 1,
+      "requires_human_review": true,
+      "link_status": "checked",
+      "claims_supported": [
+        "vacancy listing and advert evidence"
+      ],
+      "claims_not_supported": [
+        "generic list is application destination",
+        "open vacancy without advert evidence",
+        "eligibility without advert-specific rules",
+        "submission receipt",
+        "job offer"
+      ],
+      "existing_anchor_mapping": {
+        "existing_source_keys": [
+          "labour_vacancies"
+        ],
+        "relationship": "exact same official vacancy URL",
+        "url_match": true,
+        "status": "REUSE_EXISTING_EXACT_SOURCE_ANCHOR"
+      }
+    },
+    {
+      "source_id": "dhet_tvet_occupational_programmes_2026",
+      "name": "DHET List of TVET Colleges Offering Occupational Programmes (2026)",
+      "authority": "Department of Higher Education and Training",
+      "authority_host": "www.dhet.gov.za",
+      "url": "https://www.dhet.gov.za/Technical%20and%20Vocational%20Education%20and%20Training%20Co/List%20of%20Occupational%20Programmes%20updated%20for%202026%20for%20website.pdf",
+      "source_type": "OCCUPATIONAL_PROVIDER_REGISTER",
+      "provider_types": [
+        "TVET",
+        "LEARNERSHIP_PROVIDER"
+      ],
+      "pathways": [
+        "TVET",
+        "SETA_LEARNERSHIPS",
+        "APPRENTICESHIPS"
+      ],
+      "refresh_after_days": 30,
+      "requires_human_review": true,
+      "link_status": "checked",
+      "claims_supported": [
+        "source-listed TVET college and occupational-programme names within the published 2026 document; programme-level facts only after row-level extraction and review"
+      ],
+      "claims_not_supported": [
+        "provider-wide QCTO/SETA accreditation outside the row scope",
+        "currently open learner intake",
+        "current deadline",
+        "individual eligibility",
+        "partner status",
+        "Kingsmen submission ability",
+        "provider-confirmed application receipt"
+      ],
+      "existing_anchor_mapping": {
+        "existing_source_keys": [],
+        "relationship": "2026 dated occupational-programme list complements the general TVET source page and requires separate source evidence",
+        "url_match": false,
+        "status": "NEW_SOURCE_ANCHOR_REQUIRES_REVIEWED_IMPORT"
+      }
+    }
+  ],
+  "existing_anchor_snapshot": {
+    "observed_on": "2026-10-31",
+    "source_authorities_count": 21,
+    "opportunity_source_authorities_count": 21,
+    "exact_key_matches": 21,
+    "source_authorities_last_verified_at_non_null_count": 1,
+    "source_keys": [
+      "cao_official",
+      "dhet_career_advice",
+      "labour_vacancies",
+      "nsfas_apply",
+      "dhet_universities",
+      "govza_government_jobs",
+      "govza_education",
+      "saqa_official",
+      "che_official",
+      "qcto_official",
+      "agriseta_official",
+      "bankseta_official",
+      "ceta_official",
+      "etdp_seta_official",
+      "ewseta_official",
+      "fasset_official",
+      "foodbev_seta_official",
+      "merseta_official",
+      "mict_seta_official",
+      "services_seta_official",
+      "teta_official"
+    ],
+    "reconciliation_policy": [
+      "Reuse an existing authority key when identity matches; do not insert a duplicate just because the URL path is different.",
+      "Treat exact-URL matches differently from same-authority/different-page relations.",
+      "Do not update last_verified_at merely because an anchor exists; record it only after an actual source check.",
+      "Do not turn authority anchors into institution, programme, intake or partnership records."
+    ]
+  }
+}
