@@ -47,7 +47,7 @@ Deno.serve(async(req:Request)=>{
   if(!match||!match.programme_ref||!match.provider_ref)return reply(409,{ready:false,code:"VERIFIED_MATCH_NOT_AVAILABLE",error:"This listing no longer satisfies the N15 publication gates."},origin);
   const supportedBySector:Record<string,string[]> = {
    UNIVERSITY:["HIGHER_EDUCATION"],CAO:["HIGHER_EDUCATION","TVET"],TVET:["TVET"],
-   SETA:["SETA_LEARNERSHIP","APPRENTICESHIP"],LEARNERSHIP:["SETA_LEARNERSHIP"],
+   SETA:["SETA_LEARNERSHIP","APPRENTICESHIP","INTERNSHIP"],LEARNERSHIP:["SETA_LEARNERSHIP"],
    INTERNSHIP:["INTERNSHIP"],APPRENTICESHIP:["APPRENTICESHIP"],EMPLOYER:["EMPLOYMENT"],
    BURSARY:["HIGHER_EDUCATION","TVET","SETA_LEARNERSHIP","INTERNSHIP","APPRENTICESHIP"],
    NSFAS:["HIGHER_EDUCATION","TVET"],QCTO:["SETA_LEARNERSHIP","APPRENTICESHIP"],
@@ -167,6 +167,8 @@ Deno.serve(async(req:Request)=>{
   };
   const specialProviderPathways:Record<string,string[]> = {
    nsfas_official:["HIGHER_EDUCATION","TVET"],
+   funder_nsf:["HIGHER_EDUCATION","TVET","SETA_LEARNERSHIP","APPRENTICESHIP"],
+   funder_funza_lushaka:["HIGHER_EDUCATION"],
    labour_department_vacancies:["EMPLOYMENT"],
    cao_official:["HIGHER_EDUCATION","TVET"]
   };
