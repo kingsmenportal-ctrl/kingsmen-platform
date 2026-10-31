@@ -12,6 +12,8 @@ const input = join(root, 'source.dump');
 const encrypted = join(root, 'source.kmbak');
 const output = join(root, 'restored.dump');
 const tampered = join(root, 'tampered.kmbak');
+const preservedBackup = join(root, 'preserved-existing.kmbak');
+const preservedRestore = join(root, 'preserved-existing.dump');
 const secret = 'unit-test-only-passphrase-long-enough-2026';
 const hash = (value) => createHash('sha256').update(value).digest('hex');
 function run(args, password = secret) {
@@ -31,6 +33,18 @@ try {
   assert.equal(dec.status, 0, dec.stderr);
   assert.equal(hash(readFileSync(output)), hash(sample), 'authenticated round-trip must preserve bytes');
 
+  const sentinelBackup = Buffer.from('preserve-existing-backup');
+  writeFileSync(preservedBackup, sentinelBackup);
+  const overwriteBackup = run(['encrypt', input, preservedBackup]);
+  assert.notEqual(overwriteBackup.status, 0, 'encryption must refuse to overwrite an existing backup');
+  assert.deepEqual(readFileSync(preservedBackup), sentinelBackup, 'existing backup must remain unchanged after refused overwrite');
+
+  const sentinelRestore = Buffer.from('preserve-existing-restore-target');
+  writeFileSync(preservedRestore, sentinelRestore);
+  const overwriteRestore = run(['decrypt', encrypted, preservedRestore]);
+  assert.notEqual(overwriteRestore.status, 0, 'decryption must refuse to overwrite an existing restore output');
+  assert.deepEqual(readFileSync(preservedRestore), sentinelRestore, 'existing restore output must remain unchanged after refused overwrite');
+
   const bytes = readFileSync(encrypted);
   bytes[Math.floor(bytes.length / 2)] ^= 0x01;
   writeFileSync(tampered, bytes);
@@ -43,7 +57,14 @@ try {
     schema: 'kingsmen.backup-encryption-tests.v1',
     status: 'PASSED',
     passed: true,
-    checks: ['AES-256-GCM round-trip', 'ciphertext differs from plaintext', 'tamper rejection', 'wrong-passphrase rejection'],
+    checks: [
+      'AES-256-GCM round-trip',
+      'ciphertext differs from plaintext',
+      'tamper rejection',
+      'wrong-passphrase rejection',
+      'existing backup overwrite denied and content preserved',
+      'existing restore output overwrite denied and content preserved'
+    ],
     liveDatabaseTouched: false
   }, null, 2));
 } finally {
