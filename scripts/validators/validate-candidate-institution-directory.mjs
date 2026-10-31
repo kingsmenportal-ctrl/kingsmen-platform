@@ -19,10 +19,12 @@ const check = (name, condition) => {
 const records = seed.records ?? [];
 const universities = records.filter(row => row.provider_type === "PUBLIC_UNIVERSITY");
 const tvet = records.filter(row => row.provider_type === "TVET_COLLEGE");
+const cet = records.filter(row => row.provider_type === "CET_COLLEGE");
 
-check("directory seed has 26 public universities and 50 TVET colleges", universities.length === 26 && tvet.length === 50 && records.length === 76);
+check("directory seed has 26 public universities, 50 TVET colleges and 9 CET colleges", universities.length === 26 && tvet.length === 50 && cet.length === 9 && records.length === 85);
+check("university and CET province metadata is complete", universities.every(row => Boolean(row.province)) && cet.length === 9 && new Set(cet.map(row => row.province)).size === 9);
 check("record references are unique and stable", new Set(records.map(row => row.institution_ref)).size === records.length);
-check("every row is directory evidence only", records.every(row => row.identity_verification_status === "DIRECTORY_EVIDENCE_ONLY" && row.directory_record_status === "LISTED_BY_DHET_OFFICIAL_DIRECTORY"));
+check("every row is directory evidence only", records.every(row => row.identity_verification_status === "DIRECTORY_EVIDENCE_ONLY" && ["LISTED_BY_DHET_OFFICIAL_DIRECTORY","LISTED_BY_DHET_OFFICIAL_SECTOR_PAGE"].includes(row.directory_record_status)));
 check("no institution row invents intake, deadline, eligibility or route", records.every(row => row.intake_status === "UNKNOWN" && row.deadline_status === "UNKNOWN" && row.eligibility_status === "UNKNOWN" && row.application_route_status === "NOT_VERIFIED"));
 check("no row implies partnership or live integration", records.every(row => row.partnership_status === "NOT_A_PARTNER" && row.integration_status === "NOT_CONNECTED" && row.automation_authorized === false && row.provider_receipt_supported === false));
 check("all directory source links are HTTPS DHET URLs", records.every(row => typeof row.directory_source_url === "string" && row.directory_source_url.startsWith("https://www.dhet.gov.za/")));
@@ -34,7 +36,8 @@ check("page separates directory discovery from open-intake verification", /Disco
 check("external website links open safely", /target="_blank"/.test(page) && /rel="noopener noreferrer"/.test(page));
 check("unresolved institution website URLs remain unset and are never guessed", /Institution website URL unresolved/i.test(page) && /will not guess the URL/i.test(page) && /providerWebsiteStatus/.test(page));
 check("opportunity and application workbench links are present", /candidate\/opportunity-matches/.test(page) && /candidate\/applications/.test(page));
-check("remaining private and CET registers remain explicitly outstanding", /Private higher education/i.test(page) && /private colleges/i.test(page) && /CET colleges/i.test(page));
+check("private higher-education and private-college registers remain outstanding", /Private higher education/i.test(page) && /private colleges/i.test(page));
+check("CET and provincial education records link to Kingsmen workbench", /dhet_cet_/.test(page) && /PROVINCIAL_AUTHORITY_PROVIDER/.test(page) && /COMMUNITY_EDUCATION_AND_TRAINING/.test(page));
 check("candidate landing page links to institution directory", /href: "\/candidate\/institutions"/.test(landing));
 check("candidate dashboard links to institution directory", /href: "\/candidate\/institutions"/.test(dashboard));
 
