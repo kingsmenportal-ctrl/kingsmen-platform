@@ -108,6 +108,45 @@ try {
           const unlabeled = interactive.filter(el => !accessibleNameOf(el))
             .map(el => ({ tag: el.tagName.toLowerCase(), type: el.getAttribute("type"), id: el.id, name: el.getAttribute("name") }));
           const imagesWithoutAlt = [...document.images].filter(img => !img.hasAttribute("alt")).map(img => img.src);
+          const parseColor = (value) => {
+            const parts = value.match(/[0-9.]+/g);
+            if (!parts || parts.length < 3) return null;
+            return { r: Number(parts[0]), g: Number(parts[1]), b: Number(parts[2]), a: parts.length > 3 ? Number(parts[3]) : 1 };
+          };
+          const luminance = (color) => {
+            const channel = value => {
+              const v = value / 255;
+              return v <= 0.04045 ? v / 12.92 : ((v + 0.055) / 1.055) ** 2.4;
+            };
+            return 0.2126 * channel(color.r) + 0.7152 * channel(color.g) + 0.0722 * channel(color.b);
+          };
+          const contrast = (foreground, background) => {
+            if (!foreground || !background || background.a < 0.95 || foreground.a < 0.95) return 0;
+            const values = [luminance(foreground), luminance(background)].sort((a, b) => b - a);
+            return (values[0] + 0.05) / (values[1] + 0.05);
+          };
+          const opaqueBackground = (element) => {
+            let current = element;
+            while (current) {
+              const background = parseColor(getComputedStyle(current).backgroundColor);
+              if (background && background.a >= 0.95) return background;
+              current = current.parentElement;
+            }
+            return null;
+          };
+          const bodyStyle = getComputedStyle(document.body);
+          const bodyContrastRatio = contrast(parseColor(bodyStyle.color), opaqueBackground(document.body));
+          const heading = document.querySelector("main h1") || document.querySelector("h1");
+          const headingStyle = heading ? getComputedStyle(heading) : null;
+          const headingContrastRatio = headingStyle
+            ? contrast(parseColor(headingStyle.color), opaqueBackground(heading))
+            : 0;
+          const main = document.querySelector("main");
+          const expectsSlateBackground = Boolean(main && main.classList.contains("bg-slate-950"));
+          const mainBackground = main ? parseColor(getComputedStyle(main).backgroundColor) : null;
+          const mainPaddingLeft = main ? Number.parseFloat(getComputedStyle(main).paddingLeft) : 0;
+          const expectedUtilityStylesApplied = !expectsSlateBackground ||
+            Boolean(mainBackground && mainBackground.a >= 0.95 && mainPaddingLeft > 0);
           return {
             title: document.title,
             lang: document.documentElement.lang,
@@ -117,7 +156,14 @@ try {
             viewportWidth: window.innerWidth,
             documentWidth: document.documentElement.scrollWidth,
             unlabeled,
-            imagesWithoutAlt
+            imagesWithoutAlt,
+            bodyColor: bodyStyle.color,
+            bodyBackground: bodyStyle.backgroundColor,
+            bodyContrastRatio: Number(bodyContrastRatio.toFixed(2)),
+            headingColor: headingStyle?.color ?? null,
+            headingContrastRatio: Number(headingContrastRatio.toFixed(2)),
+            expectsSlateBackground,
+            expectedUtilityStylesApplied
           };
         });
 
@@ -133,6 +179,9 @@ try {
         if (snapshot.documentWidth > snapshot.viewportWidth + 1) report.failures.push(`${label}: horizontal overflow ${snapshot.documentWidth}px > ${snapshot.viewportWidth}px`);
         if (snapshot.unlabeled.length) report.failures.push(`${label}: ${snapshot.unlabeled.length} interactive controls without an accessible name`);
         if (snapshot.imagesWithoutAlt.length) report.failures.push(`${label}: ${snapshot.imagesWithoutAlt.length} images missing alt attributes`);
+        if (snapshot.bodyContrastRatio < 4.5) report.failures.push(`${label}: body text contrast ${snapshot.bodyContrastRatio}:1 is below WCAG AA 4.5:1`);
+        if (snapshot.headingContrastRatio < 3) report.failures.push(`${label}: primary heading contrast ${snapshot.headingContrastRatio}:1 is below WCAG large-text 3:1`);
+        if (!snapshot.expectedUtilityStylesApplied) report.failures.push(`${label}: expected Tailwind utility styles are not being applied`);
         if (pageErrors.length) report.failures.push(`${label}: browser runtime errors: ${pageErrors.join("; ")}`);
         if (snapshot.h1Count !== 1) report.warnings.push(`${label}: expected one h1, found ${snapshot.h1Count}`);
 
