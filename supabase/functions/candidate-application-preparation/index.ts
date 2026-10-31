@@ -255,7 +255,7 @@ Deno.serve(async(req:Request)=>{
   if(targetError){console.error("application packet target lookup failed",targetError.code??"unknown");return reply(503,{ready:false,code:"APPLICATION_TARGET_LOOKUP_FAILED",error:"Could not load this saved application target."},origin);}
   if(!target)return reply(404,{ready:false,code:"APPLICATION_TARGET_NOT_FOUND",error:"This saved application target could not be found for your verified candidate account."},origin);
 
-  const providerKeyMatch=/^Kingsmen provider registry:\\s*([a-z0-9_:-]{3,100})\\s*;/i.exec(String(target.source_reference??""));
+  const providerKeyMatch=/^Kingsmen provider registry:\s*([a-z0-9_:-]{3,100})\s*;/i.exec(String(target.source_reference??""));
   if(!providerKeyMatch)return reply(409,{ready:false,code:"PROVIDER_REGISTRY_LINK_REQUIRED",error:"This target is not yet linked to a canonical provider record. A reusable application packet cannot be assembled until that provider link is verified."},origin);
   const providerKey=providerKeyMatch[1];
   const {data:provider,error:providerError}=await admin.from("route_providers")
@@ -382,6 +382,25 @@ Deno.serve(async(req:Request)=>{
    if(result.error){console.error("master applications load failed",result.error.code??"unknown");return reply(503,{error:"Could not load prepared application records."},origin);}
    parentApplications=result.data??[];
   }
+  const {data:applicationPackets,error:packetLoadError}=await admin.from("candidate_application_packets")
+   .select("id,packet_ref,target_id,pathway_type,provider_key,provider_name,programme_or_role,packet_status,template_status,candidate_profile_snapshot,application_answers,missing_profile_fields,selected_document_count,provider_requirements_status,provider_submission_sent,provider_receipt_confirmed,provider_integration_state,created_at,updated_at")
+   .eq("candidate_id",candidateId).order("updated_at",{ascending:false});
+  if(packetLoadError){console.error("candidate application packet load failed",packetLoadError.code??"unknown");return reply(503,{error:"Could not load reusable application preparation packets."},origin);}
+  const packetIds=(applicationPackets??[]).map((packet:any)=>packet.id);
+  let packetDocuments:any[]=[];
+  if(packetIds.length){
+    const result=await admin.from("candidate_application_packet_documents")
+     .select("id,packet_id,private_document_id,document_type_snapshot,original_filename_snapshot,selected_at")
+     .eq("candidate_id",candidateId).in("packet_id",packetIds).order("selected_at",{ascending:true});
+    if(result.error){console.error("candidate packet document load failed",result.error.code??"unknown");return reply(503,{error:"Could not load selected Document Vault references."},origin);}
+    packetDocuments=result.data??[];
+  }
+  const {data:availableDocuments,error:availableDocumentError}=await admin.from("candidate_private_documents")
+   .select("id,document_type,original_filename,mime_type,size_bytes,status,uploaded_at")
+   .eq("candidate_id",candidateId)
+   .in("status",["UPLOADED_CANDIDATE_REPORTED","UNDER_REVIEW","VERIFIED"])
+   .order("uploaded_at",{ascending:false});
+  if(availableDocumentError){console.error("candidate application packet vault selection load failed",availableDocumentError.code??"unknown");return reply(503,{error:"Could not load your available Document Vault files."},origin);}
   const {data:masterEvents,error:masterEventError}=await admin.from("candidate_master_application_events")
    .select("event_type,details,created_at").eq("candidate_id",candidateId).order("created_at",{ascending:false}).limit(100);
   if(masterEventError){console.error("master application timeline load failed",masterEventError.code??"unknown");return reply(503,{error:"Could not load application timeline evidence."},origin);}
@@ -390,8 +409,9 @@ Deno.serve(async(req:Request)=>{
    .eq("candidate_id",candidateId).order("created_at",{ascending:false}).limit(200);
   if(applicationEventError){console.error("application timeline load failed",applicationEventError.code??"unknown");return reply(503,{error:"Could not load application timeline evidence."},origin);}
   return reply(200,{ready:true,trackers:trackers??[],items,masterTargets:masterTargets??[],
-   parentApplications,masterEvents:masterEvents??[],applicationEvents:applicationEvents??[],
-   message:"Saved application and preparation records loaded. No provider submission is implied."},origin);
+   parentApplications,applicationPackets:applicationPackets??[],packetDocuments,availableDocuments:availableDocuments??[],
+   masterEvents:masterEvents??[],applicationEvents:applicationEvents??[],
+   message:"Saved application and preparation records loaded. Application packets and Document Vault references are private preparation data; no provider submission is implied."},origin);
  }
  if(p.action==="start_from_saved_route"){
   const routeId=typeof p.route_programme_id==="string"?p.route_programme_id:"";
