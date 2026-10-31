@@ -83,7 +83,9 @@ Read-only inspection of staging (31 October 2026) found:
 - Supabase staging is active/healthy, but prior read-only counts showed 3 Auth users, 2 candidate rows, and zero verified auth-to-candidate links, master profiles, consent, candidate identity-review/evidence, private document reviews, candidate opportunity matches, candidate master targets or CAO choices. Thus profile-to-provider flow is not yet demonstrated with real authenticated test candidates.
 - A fresh security advisory shows 17 RLS-enabled tables without policies, six authenticated-callable SECURITY DEFINER RPCs, and leaked-password protection disabled; client non-DML privilege findings are still gate-level. The institution network must not be put ahead of the security release gate for candidate PII or automated submission.
 
-This branch adds an official-source coverage contract and design plan only. It does not create fake provider records, mark an intake open, insert candidate data, apply migrations, change live staging, or claim a production deploy.
+This branch now includes an official-source coverage contract, destination-route capability register, and a source-listed seed catalogue of 26 public universities and 50 TVET colleges referenced by the DHET official directory pages. The seed dataset treats the published university/college website as a source lead only; it flags the conflicting UNISA hyperlink and truncated Flavius Mareka URL for review. No programme or intake rows are included.
+  
+The companion migration `db/migrations/0099_seed_dhet_public_institution_directory.sql` is proposed code only. If independently reviewed and later applied under approved migration change control, it will add the 76 directory entries to the existing `route_providers` table with `NEEDS_REVIEW`, `public_safe=false`, unknown programme/intake/deadline/eligibility, no partnership, and no automation authorization. It will not create programmes, set open deadlines, grant public visibility, or claim submission support. The migration has not been applied to Supabase staging or production. No candidate data or external applications were created, and no production deployment is claimed.
 
 ## Rollout
 
@@ -109,3 +111,13 @@ This branch adds an official-source coverage contract and design plan only. It d
 The companion manifest `manifests/institutions/institution-application-route-capabilities.json` records the current route strategy without implying a live integration. It distinguishes CAO's parent-with-choice-children flow from one destination-specific child for each direct TVET, non-CAO university, private provider, SETA/employer advert or public-service vacancy. Current integration status remains `NOT_CONNECTED`, automated submission remains disabled, and provider approval/test-environment evidence is absent. The root test suite checks these boundaries via `npm run institutions:routes:check`.
 
 For public service vacancies, DPSA is a discovery source; the official circular says candidates must forward the application to the department in which the vacancy exists and include the reference number. Kingsmen must therefore resolve the exact employer/department channel from each advert rather than “submit to DPSA.” For CAO, the current public application page says only one application is accepted for a specific entry year and term. Kingsmen's existing six-choice draft editor must be reconciled against the current route terms before a live adapter is enabled.
+
+
+## First registry import batch — proposed, not applied
+
+- Snapshot manifest: `manifests/institutions/seed/public-universities-and-tvet-2026-10-31.json`.
+- Coverage in this source-led batch: **26 public universities + 50 TVET colleges = 76 entries**.
+- The national DHET 2026/27 landscape baseline lists 369 PSET institutions overall (26 universities, 50 TVET, 9 CET, 138 private HEIs, 146 other private colleges). Therefore 76 entries are not "all institutions"; private HEI, private college, CET and QCTO/SETA-linked provider imports are still required.
+- Proposed migration: `db/migrations/0099_seed_dhet_public_institution_directory.sql`. It writes to the existing `route_providers` table only, sets new entries to internal/review-only defaults, and preserves previously verified/manual fields on conflict.
+- Validation scripts are wired into `npm test`: `institutions:network:check`, `institutions:routes:check`, `institutions:seed:check`, and `institutions:migration:check`.
+- Required before apply: independent source/domain review; current DHET register URL/contents recheck; ordered migration/provenance reconciliation; approved backup/restore and change control; post-migration privilege/RLS checks. The migration is not a substitute for the open security and release gates.
