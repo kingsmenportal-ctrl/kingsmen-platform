@@ -72,20 +72,11 @@ export function extractRecords(text,kind){
  const siteWidth=kind==="private_colleges"?54:42;
  const records=splitEntries(text).filter(e=>(e.lines.join("\n").match(source.pattern)||[]).length>0).map(e=>{
   const block=e.lines.join("\n"),ids=[...new Set(block.match(source.pattern)||[])];
-  const nameParts=[];
-  // The first numbered line uses multi-space separators between layout columns.
-  // Parse the whole institution-name cell, not a fixed-width slice that clips suffixes.
+  // The first column on the numbered source line is the only automatic name
+  // candidate. Wrapped suffixes remain reviewable instead of absorbing contact,
+  // address or qualification columns into the legal name.
   const firstColumn=(e.first.split(/\s{2,}/)[0]??"").replace(/^\d{1,3}\.\s*/,"").trim();
-  if(firstColumn)nameParts.push(firstColumn);
-  for(const line of e.lines.slice(1)){
-   const left=line.slice(0,nameWidth).trim().replace(/^\d{1,3}\.\s*/,"");
-   const right=line.slice(nameWidth).trim();
-   source.pattern.lastIndex=0;
-   const hasId=source.pattern.test(line);
-   if(left&&!right&&!hasId&&!/^(CONTACT PERSON|CONTACT DETAILS|CONTACT NUMBER|TEL\.?|TELEPHONE|MOBILE|CELL|FAX|EMAIL|E-MAIL|WEBSITE|WEB SITE|QUALIFICATION|PROGRAMME|PROGRAM|NQF LEVEL|BACHELOR|HIGHER CERTIFICATE|DIPLOMA|DOCTOR|MASTER|EXAM CENTRE)\b/i.test(left))nameParts.push(left);
-   if(hasId)break;
-  }
-  const name=cleanHeadingName(nameParts.join(" "),source);
+  const name=normalizeName(firstColumn);
   const sectionKey=canonicalSlug(e.section||"unsectioned")||"unsectioned";
   const key=kind+":"+sectionKey+":"+String(e.number).padStart(3,"0")+":"+(ids.length===1?ids[0].toLowerCase():canonicalSlug(name));
   // Province must be attached to this entry's registration-ID line; scanning
@@ -100,9 +91,14 @@ export function extractRecords(text,kind){
   const duplicate=seen.has(idKey);seen.add(idKey);
   const campusCandidates=[...new Set(e.lines.flatMap((line,index)=>{
     const cols=line.trim().split(/\s{2,}/).map(x=>x.trim()).filter(Boolean);
-    return (index===0?cols.slice(1):cols).map(x=>redactSourceExcerpt(x));
-  }).filter(x=>x&&/[A-Za-z]{3,}/.test(x)&&(/[0-9]/.test(x)||/\b(?:campus|street|road|avenue|drive|building|office park|pretoria|johannesburg|cape town|durban|bellville|centurion|randburg|polokwane|bloemfontein|gqeberha|east london|rustenburg|midrand|bryanston|waterkloof|zebediela|motatantanye)\b/i.test(x))
-      && !/(CONTACT PERSON|CONTACT DETAILS|TEL\.?|TELEPHONE|MOBILE|CELL|FAX|EMAIL|E-MAIL|WEBSITE|QUALIFICATION|NQF LEVEL|BACHELOR|CERTIFICATE|DIPLOMA|DOCTOR|MASTER|EXAM CENTRE|PROGRAMME|PROGRAM)/i.test(x)))].slice(0,30);
+    return (index===0?cols.slice(1):cols).map(value=>{
+      let candidate=value.replace(source.pattern," ");
+      source.pattern.lastIndex=0;
+      for(const province of PROVINCES)candidate=candidate.replace(new RegExp(province,"gi")," ");
+      return redactSourceExcerpt(candidate.replace(/^\d{1,3}[.)]?\s*/,"").replace(/\s+/g," ").trim());
+    });
+  }).filter(x=>x&&/[A-Za-z]{3,}/.test(x)&&(/[0-9]/.test(x)||/\b(?:campus|street|road|avenue|drive|building|office park|pretoria|johannesburg|cape town|durban|bellville|centurion|randburg|polokwane|bloemfontein|gqeberha|east london|rustenburg|midrand|bryanston|waterkloof|zebediela|motatantanye|village|suburb)\b/i.test(x))
+      && !/(CONTACT PERSON|CONTACT DETAILS|CONTACT NUMBER|TEL\.?|TELEPHONE|MOBILE|CELL|FAX|EMAIL|E-MAIL|WEBSITE|WEB SITE|QUALIFICATION|NQF LEVEL|BACHELOR|CERTIFICATE|DIPLOMA|DOCTOR|MASTER|EXAM CENTRE|PROGRAMME|PROGRAM|HEQSF|CONTACT MODE|DISTANCE MODE|BLENDED|REGISTRAR|MANAGER|PRINCIPAL|DIRECTOR|PO BOX|PRIVATE BAG|POSTNET|@|WWW\.)/i.test(x)))].slice(0,30);
   return {source_record_ref:key,source_register:kind,source_snapshot_date:source.date,source_url:source.url,source_section:e.section||"UNSECTIONED",register_entry_number:e.number,
    source_heading_candidate:redactSourceExcerpt(e.first.slice(0,nameWidth)),canonical_name_candidate:name||null,normalized_name_key:canonicalSlug(name),
    registration_identifier:ids.length===1?ids[0]:null,registration_identifiers_observed:ids,registration_status:regStatus,
