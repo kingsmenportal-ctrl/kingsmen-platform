@@ -231,14 +231,16 @@ const sourceItems: DirectoryItem[] = crossSector.sources.map((source: SourceAnch
   const sourceClasses = source.classes as string[];
   const isSetaProvider = Boolean(source.provider_key?.startsWith("seta_"));
   const isPublicEntityEmployer = Boolean(source.provider_key?.startsWith("soe_"));
+  const isPrivateEmployer = Boolean(source.provider_key?.startsWith("private_employer_"));
+  const isDpsaVacancySource = source.provider_key === "dpsa_public_service_vacancies";
   const sourceCapabilities = isSetaProvider
     ? ["SETA_LEARNERSHIPS", "APPRENTICESHIPS", "FUNDING"]
-    : isPublicEntityEmployer
+    : isPublicEntityEmployer || isPrivateEmployer || isDpsaVacancySource
       ? ["EMPLOYMENT"]
       : capabilityBySource[source.source_id] ?? [];
   const sourcePathways = isSetaProvider
     ? ["SETA_LEARNERSHIPS", "APPRENTICESHIPS"]
-    : isPublicEntityEmployer
+    : isPublicEntityEmployer || isPrivateEmployer || isDpsaVacancySource
       ? ["EMPLOYMENT"]
       : source.source_id === "funza_lushaka_bursary"
       ? ["HIGHER_EDUCATION"]
