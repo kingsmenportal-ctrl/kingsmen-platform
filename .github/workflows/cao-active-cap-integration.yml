@@ -56,7 +56,8 @@ jobs:
       - name: Validate read-only CAO 0096 provenance attestation
         run: npm run security:validate:cao-0096-provenance
       - name: Validate CAO privilege and capacity migration contract
-        run: npm run security:validate:cao-cap-0108\n      - name: Test migration against disposable PostgreSQL 17
+        run: npm run security:validate:cao-cap-0108
+      - name: Test migration against disposable PostgreSQL 17
         run: node scripts/staging/test-cao-active-cap-migration.mjs
         env:
           KINGSMEN_CAO_CAP_TEST_ALLOW_MUTATION: "true"
