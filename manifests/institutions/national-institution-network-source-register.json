@@ -574,6 +574,44 @@
         "url_match": true,
         "status": "REUSE_EXISTING_EXACT_SOURCE_ANCHOR"
       }
+    },
+    {
+      "source_id": "dhet_tvet_occupational_programmes_2026",
+      "name": "DHET List of TVET Colleges Offering Occupational Programmes (2026)",
+      "authority": "Department of Higher Education and Training",
+      "authority_host": "www.dhet.gov.za",
+      "url": "https://www.dhet.gov.za/Technical%20and%20Vocational%20Education%20and%20Training%20Co/List%20of%20Occupational%20Programmes%20updated%20for%202026%20for%20website.pdf",
+      "source_type": "OCCUPATIONAL_PROVIDER_REGISTER",
+      "provider_types": [
+        "TVET",
+        "LEARNERSHIP_PROVIDER"
+      ],
+      "pathways": [
+        "TVET",
+        "SETA_LEARNERSHIPS",
+        "APPRENTICESHIPS"
+      ],
+      "refresh_after_days": 30,
+      "requires_human_review": true,
+      "link_status": "checked",
+      "claims_supported": [
+        "source-listed TVET college and occupational-programme names within the published 2026 document; programme-level facts only after row-level extraction and review"
+      ],
+      "claims_not_supported": [
+        "provider-wide QCTO/SETA accreditation outside the row scope",
+        "currently open learner intake",
+        "current deadline",
+        "individual eligibility",
+        "partner status",
+        "Kingsmen submission ability",
+        "provider-confirmed application receipt"
+      ],
+      "existing_anchor_mapping": {
+        "existing_source_keys": [],
+        "relationship": "2026 dated occupational-programme list complements the general TVET source page and requires separate source evidence",
+        "url_match": false,
+        "status": "NEW_SOURCE_ANCHOR_REQUIRES_REVIEWED_IMPORT"
+      }
     }
   ],
   "existing_anchor_snapshot": {
