@@ -170,6 +170,17 @@ Deno.serve(async(req:Request)=>{
    funder_nsf:["HIGHER_EDUCATION","TVET","SETA_LEARNERSHIP","APPRENTICESHIP"],
    funder_funza_lushaka:["HIGHER_EDUCATION"],
    nsfas_accommodation_portal:["HIGHER_EDUCATION","TVET"],
+   dpsa_public_service_vacancies:["EMPLOYMENT"],
+   private_employer_pepkor:["EMPLOYMENT"],
+   private_employer_sasol:["EMPLOYMENT"],
+   private_employer_woolworths:["EMPLOYMENT"],
+   private_employer_mr_price:["EMPLOYMENT"],
+   private_employer_vodafone:["EMPLOYMENT"],
+   private_employer_pepsico_sa:["EMPLOYMENT"],
+   private_employer_nedbank:["EMPLOYMENT"],
+   private_employer_clicks_group:["EMPLOYMENT"],
+   private_employer_tfg:["EMPLOYMENT"],
+   private_employer_standard_bank:["EMPLOYMENT"],
    labour_department_vacancies:["EMPLOYMENT"],
    cao_official:["HIGHER_EDUCATION","TVET"]
   };
