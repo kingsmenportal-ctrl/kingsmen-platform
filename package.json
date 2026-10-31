@@ -116,7 +116,8 @@
     "n16:queue:contract": "node scripts/staging/test-n16-durable-queue-contract.mjs",
     "n16:queue:check": "npm run n16:queue:contract",
     "n16:worker:contract": "node scripts/staging/test-n16-worker-runner-contract.mjs",
-    "n16:worker:start": "npm --prefix apps/api run build && node apps/api/dist/orchestrator/worker-main.js"
+    "n16:worker:start": "npm --prefix apps/api run build && node apps/api/dist/orchestrator/worker-main.js",
+    "n16:worker:crash-integration": "node scripts/staging/test-n16-worker-process-crash-integration.mjs"
   },
   "repository": {
     "type": "git",
