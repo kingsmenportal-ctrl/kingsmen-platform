@@ -3,7 +3,6 @@ import path from "node:path";
 import process from "node:process";
 import { createHash, randomUUID } from "node:crypto";
 import { fileURLToPath } from "node:url";
-import { chromium, firefox, webkit } from "playwright";
 import {
   validateScoutTarget,
   validateProbeRequest,
@@ -422,7 +421,11 @@ async function main() {
     return;
   }
 
-  const browser = await browserType.launch({ headless: true });
+  const { chromium, firefox, webkit } = await import("playwright");
+  const engines = { chromium, firefox, webkit };
+  const selectedBrowserType = engines[browserName];
+  if (!selectedBrowserType) throw new Error("PLAYWRIGHT_ENGINE_UNAVAILABLE");
+  const browser = await selectedBrowserType.launch({ headless: true });
   let results = [];
   try {
     const groups = new Map();
