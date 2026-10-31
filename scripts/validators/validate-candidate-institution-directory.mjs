@@ -32,7 +32,7 @@ check("search supports institution name", /type="search"/.test(page) && /setQuer
 check("cross-sector filters support sector and institution location", /setSector/.test(page) && /setLocation/.test(page) && /item.sectorKeys.includes\(sector\)/.test(page) && /item.province === location/.test(page));
 check("page separates directory discovery from open-intake verification", /Discovery is not verification/i.test(page) && /Open programme \/ intake/.test(page) && /UNKNOWN/.test(page));
 check("external website links open safely", /target="_blank"/.test(page) && /rel="noopener noreferrer"/.test(page));
-check("unresolved institution website URLs remain unset and are never guessed", /Institution website URL unresolved/i.test(page) && /will not guess the URL/i.test(page) && /PUBLISHED_BY_DHET_NEEDS_CURRENT_LIVE_CHECK/.test(page));
+check("unresolved institution website URLs remain unset and are never guessed", /Institution website URL unresolved/i.test(page) && /will not guess the URL/i.test(page) && /providerWebsiteStatus/.test(page));
 check("opportunity and application workbench links are present", /candidate\/opportunity-matches/.test(page) && /candidate\/applications/.test(page));
 check("remaining private and CET registers remain explicitly outstanding", /Private higher education/i.test(page) && /private colleges/i.test(page) && /CET colleges/i.test(page));
 check("candidate landing page links to institution directory", /href: "\/candidate\/institutions"/.test(landing));
