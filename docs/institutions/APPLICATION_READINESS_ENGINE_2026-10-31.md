@@ -24,7 +24,7 @@ A P2 verified handoff can still be useful for candidate preparation without bein
 - **O1 — Source verified:** authoritative evidence is specific to this opportunity.
 - **O2 — Current and open:** current status check is fresh, the source says `OPEN`, and any published deadline is still in the future.
 - **O3 — Requirements mapped:** required fields and eligibility/document rules have current human-verified review evidence.
-- **O4 — Candidate ready:** route is verified, the candidate eligibility review is verified, preflight passes, required documents are present and consent is confirmed.
+- **O4 — Candidate ready:** route is verified, the candidate requirements-match review is verified, preflight passes, required documents are present and consent is confirmed.
 - **O5 — Submission evidenced:** a provider receipt record, reference and evidence ID are present.
 - **O6 — Outcome verified:** a provider-confirmed outcome and evidence ID are present.
 
