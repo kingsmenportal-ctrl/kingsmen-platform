@@ -90,3 +90,52 @@ noRequestId.clientRequestId = "1";
 assert.ok(validateFreeDestinyMapIntake(noRequestId).issues.some(x => x.code === "VALID_REQUEST_ID_REQUIRED"));
 
 console.log("Free Destiny Map intake validation: PASS (16 security and schema assertions).");
+
+const bodySourcePath = join(root, "apps/web/src/lib/free-destiny-map-intake-body.ts");
+const bodySource = readFileSync(bodySourcePath, "utf8");
+const bodyCompiled = ts.transpileModule(bodySource, {
+  compilerOptions: { module: ts.ModuleKind.CommonJS, target: ts.ScriptTarget.ES2022 }
+}).outputText;
+const bodyModule = { exports: {} };
+new Function("module", "exports", bodyCompiled)(bodyModule, bodyModule.exports);
+const { readBoundedRequestBody } = bodyModule.exports;
+
+const exactLimit = await readBoundedRequestBody(
+  new Request("https://kingsmen.test/intake", { method: "POST", body: "12345" }),
+  5
+);
+assert.deepEqual(exactLimit, { ok: true, body: "12345" }, "a body exactly at the byte limit must pass");
+
+const overLimit = await readBoundedRequestBody(
+  new Request("https://kingsmen.test/intake", { method: "POST", body: "123456" }),
+  5
+);
+assert.equal(overLimit.ok, false, "an over-limit body must be rejected");
+assert.equal(overLimit.code, "REQUEST_TOO_LARGE");
+
+const multibyteOverLimit = await readBoundedRequestBody(
+  new Request("https://kingsmen.test/intake", { method: "POST", body: "é" }),
+  1
+);
+assert.equal(multibyteOverLimit.code, "REQUEST_TOO_LARGE", "the limit must count UTF-8 bytes, not characters");
+
+const multibyteAtLimit = await readBoundedRequestBody(
+  new Request("https://kingsmen.test/intake", { method: "POST", body: "é" }),
+  2
+);
+assert.deepEqual(multibyteAtLimit, { ok: true, body: "é" });
+
+const invalidUtf8 = await readBoundedRequestBody(
+  new Request("https://kingsmen.test/intake", { method: "POST", body: new Uint8Array([0xff]) }),
+  4
+);
+assert.equal(invalidUtf8.code, "INVALID_REQUEST_BODY", "malformed UTF-8 must be rejected");
+
+const missingBody = await readBoundedRequestBody(
+  new Request("https://kingsmen.test/intake", { method: "POST" }),
+  4
+);
+assert.equal(missingBody.code, "INVALID_REQUEST_BODY", "a missing request body must be rejected");
+
+console.log("Free Destiny Map bounded request-body tests: PASS (6 edge-case assertions).");
+
