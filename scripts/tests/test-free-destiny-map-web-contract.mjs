@@ -4,6 +4,7 @@ import { readFileSync } from "node:fs";
 const form = readFileSync("apps/web/src/components/candidate/FreeDestinyMapIntakeForm.tsx", "utf8");
 const page = readFileSync("apps/web/src/app/free-destiny-map/page.tsx", "utf8");
 const api = readFileSync("apps/web/src/app/api/public/free-destiny-map/intake/local/route.ts", "utf8");
+const bodyReader = readFileSync("apps/web/src/lib/free-destiny-map-intake-body.ts", "utf8");
 
 const requiredRoutes = [
   "higher_education",
@@ -35,6 +36,11 @@ assert.ok(form.includes("does not confirm durable database storage"), "Receipt m
 assert.ok(!/SUPABASE_SERVICE_ROLE_KEY|service_role|documentBase64/i.test(form) && !/name=["\'](?:idNumber|passportNumber|bankAccount|password)["\']/i.test(form), "Public form must not expose credentials or request sensitive identifiers");
 assert.ok(page.includes("FreeDestinyMapIntakeForm"), "Free Destiny Map page must mount the live form");
 assert.ok(api.includes("postKingsmenCommand"), "Public route must use the backend command boundary");
+assert.ok(api.includes("readBoundedRequestBody(request, MAX_BODY_BYTES)"), "Public route must enforce a streaming byte limit");
+assert.ok(api.includes('mediaType !== "application/json"'), "Public route must reject non-JSON content types");
+assert.ok(!api.includes("request.text()"), "Public route must not buffer an unbounded request body");
+assert.ok(bodyReader.includes("request.body.getReader()"), "Body reader must consume the stream incrementally");
+assert.ok(bodyReader.includes('new TextDecoder("utf-8", { fatal: true })'), "Body reader must reject malformed UTF-8");
 
 console.log("Free Destiny Map web contract: PASS");
 console.log("Verified: all six pathways plus support routes, consent gates, POST wiring, retry identifier, sensitive-field boundary, and honest receipt semantics.");
