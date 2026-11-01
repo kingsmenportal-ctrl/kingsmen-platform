@@ -151,6 +151,10 @@ assert.equal(evaluateProviderConnectionLifecycle({
 }, { asOf }).state, "C2_TERMS_APPROVED", "Raw credential material must never pass configuration validation");
 assert.equal(evaluateProviderConnectionLifecycle({
   ...verified,
+  connector: { ...verified.connector, private_config: { access_token: "nested-plaintext-secret" } }
+}, { asOf }).state, "C2_TERMS_APPROVED", "Nested raw credential material must also fail closed");
+assert.equal(evaluateProviderConnectionLifecycle({
+  ...verified,
   connector: { ...verified.connector, method: "UNKNOWN" }
 }, { asOf }).state, "C2_TERMS_APPROVED", "Unknown connector methods must fail closed");
 
@@ -193,6 +197,7 @@ automated.connector.credential_ref = "vault://provider/example-api";
 automated.connector.configured_scopes.push("SUBMIT");
 automated.connector.submission_mode = "AUTOMATED_APPROVED";
 automated.connector.candidate_authorization_required = true;
+automated.connector.candidate_authorization_policy_ref = "candidate-auth-policy-v1";
 automated.connector.last_test.tested_scopes.push("SUBMIT");
 
 const automatedResult = evaluateProviderConnectionLifecycle(automated, { asOf });
@@ -203,6 +208,10 @@ assert.equal(evaluateProviderConnectionLifecycle({
   ...automated,
   connector: { ...automated.connector, candidate_authorization_required: false }
 }, { asOf }).automated_submission_capability, false, "Provider permission never removes the candidate authorisation gate");
+assert.equal(evaluateProviderConnectionLifecycle({
+  ...automated,
+  connector: { ...automated.connector, candidate_authorization_policy_ref: "" }
+}, { asOf }).automated_submission_capability, false, "Automated submission requires a versioned candidate authorisation policy reference");
 assert.throws(() => evaluateProviderConnectionLifecycle(verified, { asOf: "not-a-date" }), /asOf must be a valid/);
 
 console.log("Provider connection lifecycle validation PASSED: authority expiry/revocation, official-domain evidence, scope intersections, terms/privacy review, credential isolation, human handoff, synthetic no-side-effect tests, monitoring and candidate-authorised submission gating.");
