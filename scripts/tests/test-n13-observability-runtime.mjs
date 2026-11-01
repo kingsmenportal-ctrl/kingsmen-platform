@@ -110,6 +110,10 @@ for (const required of [
 assert.ok(migrationSource.includes("security definer"), "Atomic capture must run in a database transaction under a constrained function.");
 assert.ok(migrationSource.includes("set search_path = pg_catalog"), "The privileged capture function must pin a safe search_path.");
 assert.ok(migrationSource.includes("pg_advisory_xact_lock"), "Capture cooldown must be serialized at the database boundary.");
+assert.ok(
+  migrationSource.indexOf("pg_advisory_xact_lock") < migrationSource.indexOf("v_now := pg_catalog.clock_timestamp()"),
+  "The cooldown timestamp must be taken after the advisory lock is acquired."
+);
 assert.ok(migrationSource.includes("n13_capture_rate_limited"), "The database function must return rate-limit evidence without partial writes.");
 assert.ok(migrationSource.includes("jsonb_to_record") && migrationSource.includes("jsonb_to_recordset"), "All capture records must be decoded and inserted by the same RPC transaction.");
 assert.ok(migrationSource.includes("system_health_snapshots") && migrationSource.includes("service_health_checks") && migrationSource.includes("metric_samples"), "The atomic operation must persist all three evidence classes.");
