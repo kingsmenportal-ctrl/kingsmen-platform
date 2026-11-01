@@ -1,8 +1,0 @@
-{
-  "schema": "kingsmen.n04-candidate-07-validation.v1",
-  "module": "N04-CANDIDATE-07",
-  "passed": true,
-  "productionReady": false,
-  "failures": [],
-  "checkedAt": "2026-06-04T10:19:51.938Z"
-}

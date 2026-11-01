@@ -1,8 +1,0 @@
-{
-  "schema": "kingsmen.n06-route-02-validation.v1",
-  "module": "N06-ROUTE-02",
-  "passed": true,
-  "productionReady": false,
-  "failures": [],
-  "checkedAt": "2026-06-04T19:40:41.789Z"
-}

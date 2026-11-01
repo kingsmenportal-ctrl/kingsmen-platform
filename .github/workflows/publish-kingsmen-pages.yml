@@ -1,4 +1,5 @@
 name: Publish Kingsmen public information site
+# This dedicated branch contains public HTML/CSS only; application source stays on the product branches.
 
 on:
   push:
