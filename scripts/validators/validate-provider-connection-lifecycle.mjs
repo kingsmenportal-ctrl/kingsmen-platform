@@ -153,6 +153,32 @@ assert.equal(evaluateProviderConnectionLifecycle({
   ...verified,
   connector: { ...verified.connector, private_config: { access_token: "nested-plaintext-secret" } }
 }, { asOf }).state, "C2_TERMS_APPROVED", "Nested raw credential material must also fail closed");
+
+for (const alias of [
+  "apiKey",
+  "APIKey",
+  "accessToken",
+  "refreshToken",
+  "client_secret",
+  "private_key",
+  "bearer_token",
+  "authToken",
+  "sharedSecret",
+  "serviceAccountKey",
+  "jwt"
+]) {
+  assert.equal(evaluateProviderConnectionLifecycle({
+    ...verified,
+    connector: { ...verified.connector, nested_config: { [alias]: "plaintext-credential" } }
+  }, { asOf }).state, "C2_TERMS_APPROVED",
+  `Credential alias ${alias} must fail closed, including in nested connector configuration`);
+}
+
+assert.equal(evaluateProviderConnectionLifecycle({
+  ...verified,
+  provider_metadata: { auth: { clientSecret: "plaintext-provider-secret" } }
+}, { asOf }).state, "C0_NOT_CONNECTED", "Raw credential aliases anywhere in the provider record must fail closed");
+
 assert.equal(evaluateProviderConnectionLifecycle({
   ...verified,
   connector: { ...verified.connector, method: "UNKNOWN" }

@@ -75,12 +75,23 @@ function gate(id, passed, reason) {
   return { id, passed: Boolean(passed), reason: passed ? null : reason };
 }
 
+const SENSITIVE_CREDENTIAL_KEY = /(?:^|_)(?:api_?(?:key|secret|token)|access_?token|refresh_?token|id_?token|bearer_?token|auth(?:entication)?_?(?:token|key|secret|header)|client_?(?:secret|token)|private_?key|signing_?(?:key|secret)|shared_?secret|service_?account_?key|password|passwd|secret|credential_?value|jwt|token)(?:_|$)/i;
+
+function canonicalCredentialKey(key) {
+  return String(key)
+    .replace(/([A-Z]+)([A-Z][a-z])/g, "$1_$2")
+    .replace(/([a-z0-9])([A-Z])/g, "$1_$2")
+    .replace(/[^A-Za-z0-9]+/g, "_")
+    .replace(/^_+|_+$/g, "")
+    .toLowerCase();
+}
+
 function hasRawCredentialMaterial(value, seen = new WeakSet()) {
   if (!value || typeof value !== "object" || seen.has(value)) return false;
   seen.add(value);
-  const forbidden = new Set(["api_key", "access_token", "refresh_token", "password", "secret", "credential_value"]);
   return Object.entries(value).some(([key, entry]) => {
-    if (forbidden.has(key.toLowerCase()) && entry != null && entry !== "") return true;
+    const canonicalKey = canonicalCredentialKey(key);
+    if (SENSITIVE_CREDENTIAL_KEY.test(canonicalKey) && entry != null && entry !== "") return true;
     return hasRawCredentialMaterial(entry, seen);
   });
 }
@@ -200,7 +211,7 @@ export function evaluateProviderConnectionLifecycle(provider = {}, options = {})
     && scopesStayWithinGrant
     && methodTargetPass
     && credentialReferencePass
-    && !hasRawCredentialMaterial(connector)
+    && !hasRawCredentialMaterial(provider)
     && connector.privacy_review_status === "APPROVED"
     && nonEmpty(connector.privacy_review_evidence_ref)
     && connector.candidate_consent_enforced === true
