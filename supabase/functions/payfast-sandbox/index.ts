@@ -292,7 +292,7 @@ async function receiveItn(request: Request) {
   const paymentEvidenceRef = ref("pay_ev");
   const gross = Math.round(Number(fields.amount_gross) * 100);
   const fee = Math.round(Number(fields.amount_fee ?? "0") * 100);
-  const net = Math.round(Number(fields.amount_net ?? (gross - fee) / 100) * 100);
+  const net = Math.round(Number(fields.amount_net ?? (gross + fee) / 100) * 100);
   await rest("rpc/payfast_settle_sandbox_payment", {
     method: "POST",
     headers: { prefer: "return=representation" },
