@@ -1,0 +1,97 @@
+<!doctype html>
+<html lang="en-ZA">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="description" content="Plan application fees and practical costs across South African study, training, funding and employment pathways.">
+<title>Application Cost & Logistics Planner | Kingsmen</title>
+<link rel="stylesheet" href="site.css">
+</head>
+<body>
+<header class="site-header"><div class="topline"><a class="brand" href="./index.html">KINGSMEN<small>OPPORTUNITY PLATFORM</small></a><nav class="nav" aria-label="Main navigation"><a href="./index.html">Home</a><a href="./opportunities.html">Opportunities</a><a href="./funding.html">Funding</a><a href="./funding-readiness.html">Funding readiness</a><a href="./opportunity-comparison.html">Compare options</a><a href="./help.html">Help</a></nav></div></header>
+<main class="wrap">
+<div class="breadcrumb"><a href="./index.html">Home</a> / Application cost & logistics planner</div>
+<section class="page-hero"><p class="eyebrow">Plan the practical costs before you commit</p><h1>Application cost & logistics planner</h1><p class="lead">Itemise application fees and practical costs for a study, training, funding or employment opportunity. Separate your own estimates from amounts stated or confirmed by an official provider.</p></section>
+<div class="notice"><strong>Payment safety:</strong> Verify every fee and payment instruction directly with the official institution, funder or employer. Do not pay an intermediary for guaranteed admission, funding, an interview or a job. This planner does not process payments or verify that a cost is payable.</div>
+<section class="section"><div class="two-col">
+<article class="card"><h2>Add a cost item</h2>
+<form id="cost-form">
+<div class="field"><label for="plan">Opportunity / programme / role</label><input id="plan" maxlength="100" required placeholder="Short, non-sensitive label"></div>
+<div class="field"><label for="pathway">Kingsmen pathway</label><select id="pathway" required><option value="">Choose pathway</option><option>Higher education</option><option>TVET</option><option>SETA / learnership</option><option>Internship</option><option>Apprenticeship</option><option>Employment</option><option>Funding</option><option>Accommodation</option></select></div>
+<div class="field"><label for="source">Official source for provider costs (HTTPS, optional for personal estimates)</label><input id="source" type="url" maxlength="500" placeholder="https://official-provider.example"></div>
+<div class="field"><label for="category">Cost category</label><select id="category" required><option>Application / administration fee</option><option>Assessment / test fee</option><option>Certification / document copies</option><option>Printing / scanning</option><option>Data / connectivity</option><option>Travel / transport</option><option>Accommodation / deposit</option><option>Equipment / tools / uniform</option><option>Registration / tuition</option><option>Other practical cost</option></select></div>
+<div class="field"><label for="description">Cost item description</label><input id="description" maxlength="120" required placeholder="e.g. provider application fee"></div>
+<div class="field"><label for="amount">Amount (ZAR)</label><input id="amount" type="number" min="0" max="9999999.99" step="0.01" required placeholder="0.00"></div>
+<div class="field"><label for="basis">Amount basis</label><select id="basis" required><option value="estimate">Candidate estimate — not provider-confirmed</option><option value="official">Amount published by official provider</option><option value="confirmed">Provider-confirmed amount / written quote</option></select></div>
+<div class="field"><label for="due">Expected payment / spend date (optional)</label><input id="due" type="date"></div>
+<div class="field"><label for="note">Non-sensitive note (optional)</label><textarea id="note" maxlength="180" rows="2" placeholder="e.g. confirm whether the fee is refundable"></textarea></div>
+<p class="small muted">Do not enter card numbers, account numbers, payment credentials, bank details or personal financial records.</p>
+<div class="btn-row"><button class="btn btn-primary" type="submit">Save cost item on this device</button><button class="btn btn-outline" type="reset">Reset form</button></div>
+<p id="form-status" role="status" aria-live="polite">No information is sent to Kingsmen.</p>
+</form></article>
+<article class="card"><h2>Cost summary</h2><p class="muted">Totals are calculated from items you add in this browser. They are planning figures, not invoices, payment requests or proof of affordability.</p>
+<div class="card"><p class="small muted">All recorded items</p><h2 id="grand-total">R0.00</h2><p id="item-count" class="small muted">0 cost items</p></div>
+<div class="card"><p class="small muted">Officially published / provider-confirmed</p><h3 id="official-total">R0.00</h3><p class="small muted">Amounts recorded as official or provider-confirmed</p></div>
+<div class="card"><p class="small muted">Candidate estimates</p><h3 id="estimate-total">R0.00</h3><p class="small muted">Estimates that still need checking</p></div>
+<p class="small muted">Check whether amounts are once-off, recurring, refundable, optional or payable only after selection. A listed cost may be excluded from a bursary, allowance or funding package.</p></article>
+</div></section>
+<section class="section"><div class="section-head"><div><p class="eyebrow">Stored locally</p><h2>Cost items by opportunity</h2><p class="muted">Only the labels and amounts you enter are stored in this browser on this device.</p></div><button class="btn btn-outline" type="button" id="clear-all">Clear all cost items</button></div><div id="plans" class="resource-list"></div><p id="empty" class="empty" style="display:block">No cost items saved on this device yet.</p><p id="list-status" class="small" role="status" aria-live="polite"></p></section>
+<section class="section"><div class="two-col">
+<article class="card"><h2>Before paying</h2><ul><li>Confirm the amount, currency, payee and deadline on the official provider channel.</li><li>Check whether a fee is compulsory, optional, refundable or payable only after an offer.</li><li>Use only payment instructions published by the responsible organisation.</li><li>Keep official receipts and references securely outside this public planner.</li></ul></article>
+<article class="card"><h2>Estimate the full journey</h2><ul><li>Include transport, data, printing, certification and required equipment where relevant.</li><li>Check whether accommodation or travel costs are covered and what exclusions apply.</li><li>Separate recurring costs from once-off costs before comparing options.</li><li>Ask the provider about hardship support or fee waivers through official channels.</li></ul></article>
+</div></section>
+<div class="notice"><strong>Platform boundary:</strong> This is a public, browser-local budgeting aid. It is not Kingsmen Finance, PayFast checkout, an invoice, a bank connection, a funding award or a payment ledger. It does not collect money, verify payment, calculate creditworthiness or guarantee affordability.</div>
+</main>
+<footer class="footer"><div class="wrap footer-grid"><div><a class="brand" href="./index.html">KINGSMEN</a><p>One organised starting point for South African education, training, funding and work pathways.</p></div><div><h3>Plan</h3><div class="footer-links"><a href="./opportunity-comparison.html">Compare opportunities</a><a href="./funding-readiness.html">Funding readiness</a><a href="./accommodation.html">Accommodation readiness</a><a href="./requirements-evidence.html">Requirements & evidence planner</a></div></div><div><h3>Stay safe</h3><div class="footer-links"><a href="./verification-safety.html">Verification & scam safety</a><a href="./opportunity-source-register.html">Opportunity source register</a><a href="./help.html">Help & privacy</a></div></div></div></footer>
+<script>
+(function(){
+'use strict';
+const KEY='kingsmen.application-cost-logistics.v1';
+const form=document.getElementById('cost-form');
+const plans=document.getElementById('plans');
+const empty=document.getElementById('empty');
+const money=new Intl.NumberFormat('en-ZA',{style:'currency',currency:'ZAR'});
+const load=()=>{try{const v=JSON.parse(localStorage.getItem(KEY)||'[]');return Array.isArray(v)?v:[]}catch(_){return[]}};
+const save=v=>localStorage.setItem(KEY,JSON.stringify(v));
+const el=(tag,cls,value)=>{const e=document.createElement(tag);if(cls)e.className=cls;if(value!==undefined)e.textContent=value;return e};
+const basisName={estimate:'Candidate estimate — not provider-confirmed',official:'Amount published by official provider',confirmed:'Provider-confirmed amount / written quote'};
+function render(){
+const data=load();plans.replaceChildren();empty.style.display=data.length?'none':'block';
+let official=0,estimates=0,all=0;
+data.forEach((p,pi)=>{
+const card=el('article','card resource-card');card.append(el('span','pill',p.pathway));card.append(el('h3','',p.plan));
+if(p.source){const a=el('a','',p.source);a.href=p.source;a.target='_blank';a.rel='noopener noreferrer';a.textContent='Open official provider source ↗';card.append(a)}
+let subtotal=0;
+p.items.forEach((item,ii)=>{
+const row=el('div','card');row.append(el('strong','',item.description));row.append(el('p','small',item.category+' · '+basisName[item.basis]));
+row.append(el('p','',money.format(item.amount)+(item.due?' · Expected date: '+item.due:'')));
+if(item.note)row.append(el('p','small',item.note));
+const del=el('button','btn btn-outline','Delete cost item');del.type='button';del.addEventListener('click',()=>{const d=load();d[pi].items.splice(ii,1);if(!d[pi].items.length)d.splice(pi,1);save(d);render();document.getElementById('list-status').textContent='Cost item deleted from this device.'});
+row.append(del);card.append(row);subtotal+=item.amount;all+=item.amount;if(item.basis==='estimate')estimates+=item.amount;else official+=item.amount;
+});
+card.append(el('p','small','Opportunity subtotal: '+money.format(subtotal)));plans.append(card);
+});
+document.getElementById('grand-total').textContent=money.format(all);
+document.getElementById('official-total').textContent=money.format(official);
+document.getElementById('estimate-total').textContent=money.format(estimates);
+document.getElementById('item-count').textContent=data.reduce((n,p)=>n+p.items.length,0)+' cost items across '+data.length+' opportunity plan'+(data.length===1?'':'s');
+document.getElementById('list-status').textContent='Totals are local planning figures. No payment was made and no information was sent to Kingsmen.';
+}
+form.addEventListener('submit',e=>{
+e.preventDefault();
+const raw=document.getElementById('source').value.trim();let source='';
+if(raw){try{const u=new URL(raw);if(u.protocol!=='https:')throw new Error('HTTPS required');source=u.href}catch(_){document.getElementById('form-status').textContent='Use a valid HTTPS provider source, or leave it blank for a personal estimate.';return}}
+const amount=Number(document.getElementById('amount').value);
+if(!Number.isFinite(amount)||amount<0||amount>9999999.99){document.getElementById('form-status').textContent='Enter a valid non-negative ZAR amount.';return}
+const plan=document.getElementById('plan').value.trim(),pathway=document.getElementById('pathway').value,basis=document.getElementById('basis').value;
+if(basis!=='estimate'&&!source){document.getElementById('form-status').textContent='Add the official HTTPS source for a published or provider-confirmed amount.';return}
+const item={category:document.getElementById('category').value,description:document.getElementById('description').value.trim(),amount,basis,due:document.getElementById('due').value,note:document.getElementById('note').value.trim()};
+try{const data=load();let record=data.find(p=>p.plan.toLowerCase()===plan.toLowerCase()&&p.pathway===pathway&&p.source===source);if(!record){record={plan,pathway,source,items:[]};data.unshift(record)}record.items.push(item);save(data);render();form.reset();document.getElementById('form-status').textContent='Cost item saved on this device. No payment was made or information sent to Kingsmen.'}
+catch(_){document.getElementById('form-status').textContent='Could not save locally. Check browser storage settings.'}
+});
+document.getElementById('clear-all').addEventListener('click',()=>{if(confirm('Clear all cost items stored by this tool on this device?')){localStorage.removeItem(KEY);render();document.getElementById('form-status').textContent='All local cost items cleared. Nothing was sent to Kingsmen.'}});
+render();
+})();
+</script>
+</body>
+</html>
