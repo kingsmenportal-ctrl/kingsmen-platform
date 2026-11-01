@@ -18,6 +18,11 @@ declare
   v_application_id uuid;
   v_application_ref text;
   v_match_ref text;
+  v_status text;
+  v_readiness_status text;
+  v_submission_sent boolean := false;
+  v_downstream_activity boolean := false;
+  v_created boolean := false;
   v_has_active_consent boolean := false;
 begin
   if v_auth_user_id is null then
@@ -41,13 +46,32 @@ begin
     return jsonb_build_object('ok', false, 'code', 'TARGET_NOT_FOUND');
   end if;
   if v_target.application_id is not null then
-    select application_ref into v_application_ref
-      from public.candidate_applications
-      where id = v_target.application_id and candidate_id = v_candidate_id;
+    select ca.application_ref, ca.status, ca.readiness_status
+      into v_application_ref, v_status, v_readiness_status
+    from public.candidate_applications ca
+    where ca.id = v_target.application_id and ca.candidate_id = v_candidate_id
+    for update;
+
+    if not found then
+      return jsonb_build_object(
+        'ok', false, 'created', false, 'code', 'TARGET_APPLICATION_LINK_INCONSISTENT',
+        'message', 'The saved target points to an application that is not owned by this candidate. No application state was changed.'
+      );
+    end if;
+
+    select exists (
+      select 1 from public.candidate_application_events ae
+      where ae.application_id = v_target.application_id
+        and ae.candidate_id = v_candidate_id
+        and ae.event_type in ('SUBMISSION_DISPATCHED','PROVIDER_ACKNOWLEDGED',
+          'PROVIDER_STATUS_RECORDED','PROVIDER_OUTCOME_RECORDED')
+    ) into v_submission_sent;
+
     return jsonb_build_object(
       'ok', true, 'created', false, 'application_id', v_target.application_id,
-      'application_ref', v_application_ref, 'status', 'DRAFT',
-      'provider_submission_sent', false, 'code', 'APPLICATION_ALREADY_LINKED'
+      'application_ref', v_application_ref, 'status', v_status,
+      'readiness_status', v_readiness_status,
+      'provider_submission_sent', v_submission_sent, 'code', 'APPLICATION_ALREADY_LINKED'
     );
   end if;
 
@@ -266,31 +290,86 @@ begin
     ),
     'Draft created from a current approved N15 match. Provider submission has not occurred.'
   )
-  on conflict (candidate_id, opportunity_id) do nothing;
+  on conflict (candidate_id, opportunity_id) do nothing
+  returning id, application_ref, status, readiness_status
+    into v_application_id, v_application_ref, v_status, v_readiness_status;
 
-  select id, application_ref into v_application_id, v_application_ref
-  from public.candidate_applications
-  where candidate_id = v_candidate_id and opportunity_id = v_opportunity_id;
+  if found then
+    v_created := true;
+    v_submission_sent := false;
+    v_downstream_activity := false;
+  else
+    -- A different saved target may already resolve to the same candidate/opportunity.
+    -- Reuse only an untouched editable DRAFT. Never rewrite a progressed parent as DRAFT.
+    select ca.id, ca.application_ref, ca.status, ca.readiness_status
+      into v_application_id, v_application_ref, v_status, v_readiness_status
+    from public.candidate_applications ca
+    where ca.candidate_id = v_candidate_id and ca.opportunity_id = v_opportunity_id
+    for update;
 
-  insert into public.candidate_application_events (
-    event_ref, application_id, candidate_id, actor_auth_user_id, event_type,
-    to_status, reason_code, details
-  ) values (
-    'master-target-application-created:' || v_target.id::text,
-    v_application_id, v_candidate_id, v_auth_user_id, 'APPLICATION_CREATED',
-    'DRAFT', 'UNIFIED_MASTER_APPLICATION',
-    jsonb_build_object('target_key', v_target.target_key, 'n15_match_ref', v_match_ref,
-      'source_checked_at', v_match.last_checked_at, 'provider_submission_sent', false)
-  ) on conflict (event_ref) do nothing;
+    if not found then
+      return jsonb_build_object(
+        'ok', false, 'created', false, 'code', 'EXISTING_APPLICATION_NOT_FOUND',
+        'message', 'A concurrent application conflict was detected, but the existing parent could not be safely loaded. No target link was changed.'
+      );
+    end if;
+
+    select
+      exists (
+        select 1 from public.candidate_application_submission_jobs sj
+        where sj.application_id = v_application_id and sj.candidate_id = v_candidate_id
+      )
+      or exists (
+        select 1 from public.candidate_application_events ae
+        where ae.application_id = v_application_id and ae.candidate_id = v_candidate_id
+          and ae.event_type in (
+            'SUBMISSION_AUTHORIZED','SUBMISSION_ATTEMPT_CREATED','SUBMISSION_DISPATCHED',
+            'PROVIDER_ACKNOWLEDGED','PROVIDER_STATUS_RECORDED','PROVIDER_OUTCOME_RECORDED',
+            'REVIEW_DECISION_RECORDED','OUTCOME_RECORDED','OUTCOME_DISPUTED',
+            'OUTCOME_CORRECTION_DECIDED','OUTCOME_SUPERSEDED'
+          )
+      )
+    into v_downstream_activity;
+
+    select exists (
+      select 1 from public.candidate_application_events ae
+      where ae.application_id = v_application_id and ae.candidate_id = v_candidate_id
+        and ae.event_type in ('SUBMISSION_DISPATCHED','PROVIDER_ACKNOWLEDGED',
+          'PROVIDER_STATUS_RECORDED','PROVIDER_OUTCOME_RECORDED')
+    ) into v_submission_sent;
+
+    if v_status is distinct from 'DRAFT' or v_downstream_activity then
+      return jsonb_build_object(
+        'ok', false, 'created', false, 'code', 'EXISTING_APPLICATION_NOT_REUSABLE',
+        'application_id', v_application_id, 'application_ref', v_application_ref,
+        'status', v_status, 'readiness_status', v_readiness_status,
+        'provider_submission_sent', v_submission_sent,
+        'message', 'A parent application already exists for this candidate and opportunity and is not an untouched DRAFT. Its state was preserved; no duplicate created event or target link was written.'
+      );
+    end if;
+  end if;
+
+  if v_created then
+    insert into public.candidate_application_events (
+      event_ref, application_id, candidate_id, actor_auth_user_id, event_type,
+      to_status, reason_code, details
+    ) values (
+      'master-target-application-created:' || v_target.id::text,
+      v_application_id, v_candidate_id, v_auth_user_id, 'APPLICATION_CREATED',
+      'DRAFT', 'UNIFIED_MASTER_APPLICATION',
+      jsonb_build_object('target_key', v_target.target_key, 'n15_match_ref', v_match_ref,
+        'source_checked_at', v_match.last_checked_at, 'provider_submission_sent', false)
+    ) on conflict (event_ref) do nothing;
+  end if;
 
   update public.candidate_master_application_targets
   set application_id = v_application_id, planning_status = 'PREPARING', updated_at = now()
   where id = v_target.id and candidate_id = v_candidate_id;
 
   return jsonb_build_object(
-    'ok', true, 'created', true, 'application_id', v_application_id,
-    'application_ref', v_application_ref, 'status', 'DRAFT',
-    'readiness_status', 'NOT_CHECKED', 'provider_submission_sent', false,
+    'ok', true, 'created', v_created, 'application_id', v_application_id,
+    'application_ref', v_application_ref, 'status', v_status,
+    'readiness_status', v_readiness_status, 'provider_submission_sent', v_submission_sent,
     'submission_boundary', 'EXTERNAL_PORTAL_OR_VERIFIED_ADAPTER_REQUIRED'
   );
 end;
