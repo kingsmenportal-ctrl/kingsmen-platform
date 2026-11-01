@@ -143,12 +143,17 @@ $report | ConvertTo-Json -Depth 20
 
 $endedAt = Get-Date
 $rtoSeconds = [int]($endedAt - $startedAt).TotalSeconds
+$archiveBytes = (Get-Item $BackupFile).Length
+if ($archiveBytes -le 0) { $failedChecks += "backup_archive_empty" }
+$passed = (-not $DryRun) -and ($failedChecks.Count -eq 0)
 
 $report = [ordered]@{
   schema = "kingsmen.backup-restore-staging-drill.v1"
   module = "Kingsmen Backup Restore Drill"
-  status = $(if ($DryRun) { "DRY_RUN" } else { "RESTORE_DRILL_COMPLETED" })
-  passed = $true
+  status = $(if ($DryRun) { "DRY_RUN" } elseif ($passed) { "RESTORE_DRILL_PASSED" } else { "RESTORE_DRILL_FAILED" })
+  passed = $passed
+  failedChecks = $failedChecks
+  backupArchiveBytes = $archiveBytes
   productionReady = $false
   publicLaunchAllowed = $false
   productionDataAllowed = $false
