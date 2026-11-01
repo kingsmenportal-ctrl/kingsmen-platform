@@ -41,19 +41,20 @@ export async function resolveCandidateIdentity(
       return { ok: false, status: 401, code: "INVALID_AUTHENTICATION" };
     }
 
-    const query = new URLSearchParams({
-      select: "candidate_id,link_status",
-      supabase_user_id: `eq.${user.id}`
-    });
+    // The table is intentionally not directly readable by anon/authenticated.
+    // This no-argument RPC returns only the current auth.uid()'s verified link,
+    // and only when exactly one link row exists for that identity.
     const linkResponse = await fetcher(
-      `${url}/rest/v1/candidate_auth_identity_links?${query.toString()}`,
+      `${url}/rest/v1/rpc/resolve_my_candidate_identity`,
       {
-        method: "GET",
+        method: "POST",
         headers: {
           apikey: anonKey,
           Authorization: `Bearer ${token}`,
-          Accept: "application/json"
-        }
+          Accept: "application/json",
+          "Content-Type": "application/json"
+        },
+        body: "{}"
       }
     );
     if (!linkResponse.ok) {
