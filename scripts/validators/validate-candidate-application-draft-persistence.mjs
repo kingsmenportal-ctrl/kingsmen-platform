@@ -18,6 +18,7 @@ const checks = [
   ["draft-answer table is RLS protected and inaccessible directly to client roles", /ENABLE ROW LEVEL SECURITY/.test(migration) && /FROM PUBLIC, anon, authenticated/.test(migration) && /TO service_role USING \(true\) WITH CHECK \(true\)/.test(migration)],
   ["candidate identity is derived from exactly one verified Auth link", /auth\.uid\(\)/.test(migration) && /link_status = 'VERIFIED'/.test(migration) && /verified_by IS NOT NULL/.test(migration) && /v_link_count <> 1/.test(migration)],
   ["draft load is restricted to the owned parent application", /WHERE a\.id = p_application_id[\s\S]*AND a\.candidate_id = v_candidate_id/.test(migration)],
+  ["draft read and write hold verified Auth identity-link share locks", (migration.match(/FOR SHARE;/g) ?? []).length >= 3 && /candidate_auth_identity_links/.test(migration)],
   ["draft save holds a row lock on the candidate-owned parent application", /WHERE a\.id = p_application_id[\s\S]*AND a\.candidate_id = v_candidate_id[\s\S]*FOR UPDATE/.test(migration)],
   ["draft save requires the latest active profile-processing consent", /PROFILE_PROCESSING_CONSENT_REQUIRED/.test(migration) && /ORDER BY pc\.granted_at DESC, pc\.id DESC/.test(migration) === false && /newer\.granted_at, newer\.id/.test(migration) && /pc\.revoked_at IS NULL/.test(migration)],
   ["draft save is limited to pre-submission editable states", /'DRAFT', 'READINESS_BLOCKED', 'READY_FOR_REVIEW', 'READY_TO_SUBMIT'/.test(migration) && /APPLICATION_DRAFT_IS_LOCKED/.test(migration)],
