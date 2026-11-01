@@ -12,11 +12,11 @@ const candidateBlock = source.slice(candidateRoute, source.indexOf("const applic
 const applicationBlock = source.slice(applicationRoute, source.indexOf('sendError(response, 404, "ROUTE_NOT_FOUND"', applicationRoute));
 
 assert.match(candidateBlock, /resolveCandidateIdentity/);
-assert.match(candidateBlock, /identity\.candidateId !== candidateId/);
+assert.match(candidateBlock, /candidateOwnsResource\(identity, candidateId\)/);
 assert.match(candidateBlock, /CANDIDATE_OWNERSHIP_MISMATCH/);
 assert.match(candidateBlock, /handleCandidateStatus\(response, candidateId\)/);
 assert.match(applicationBlock, /resolveCandidateIdentity/);
-assert.match(applicationBlock, /application\.candidateId !== identity\.candidateId/);
+assert.match(applicationBlock, /candidateOwnsResource\(identity, application\.candidateId\)/);
 assert.match(applicationBlock, /APPLICATION_OWNERSHIP_MISMATCH/);
 assert.match(applicationBlock, /handleApplicationWorkbench\(response, applicationId\)/);
 
