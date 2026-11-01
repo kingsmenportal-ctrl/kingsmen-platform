@@ -43,7 +43,7 @@ export async function resolveCandidateIdentity(
 ): Promise<CandidateIdentityResolution> {
   const url = safeSupabaseOrigin(env.SUPABASE_URL);
   const anonKey = env.SUPABASE_ANON_KEY?.trim();
-  const match = authorization?.match(/^Bearer\\s+(\\S+)$/i);
+  const match = authorization?.match(/^Bearer\s+(\S+)$/i);
   if (!match || match[1].length > MAX_BEARER_TOKEN_LENGTH) {
     return { ok: false, status: 401, code: "AUTHENTICATION_REQUIRED" };
   }
