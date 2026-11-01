@@ -1,0 +1,90 @@
+name: Publish Kingsmen public information site
+
+on:
+  push:
+    branches:
+      - pages-temp-static
+    paths:
+      - "index.html"
+      - "opportunities.html"
+      - "funding.html"
+      - "application-guide.html"
+      - "about.html"
+      - "help.html"
+      - "404.html"
+      - "site.css"
+      - ".github/workflows/publish-kingsmen-pages.yml"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: kingsmen-public-pages
+  cancel-in-progress: false
+
+jobs:
+  deploy:
+    runs-on: ubuntu-24.04
+    permissions:
+      contents: read
+      pages: write
+      id-token: write
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - name: Check out public information source
+        uses: actions/checkout@v4
+
+      - name: Assemble an isolated public-only site
+        shell: bash
+        run: |
+          set -euo pipefail
+          mkdir -p site-dist
+          cp index.html opportunities.html funding.html application-guide.html about.html help.html 404.html site.css site-dist/
+          sed -i 's/Not on this temporary public website\./Not on this public information website./g' site-dist/help.html
+          sed -i 's/This temporary Kingsmen website only contains published static pages\./This Kingsmen public website contains published information pages./g' site-dist/404.html
+          python3 - <<'PY'
+          from pathlib import Path
+          base = "https://kingsmenportal-ctrl.github.io/kingsmen-platform/"
+          for page in ("index.html", "opportunities.html", "funding.html", "application-guide.html", "about.html", "help.html"):
+              path = Path("site-dist") / page
+              html = path.read_text(encoding="utf-8")
+              canonical = base + ("" if page == "index.html" else page)
+              html = html.replace("</head>", f'<link rel="canonical" href="{canonical}"></head>', 1)
+              path.write_text(html, encoding="utf-8")
+          PY
+          cat > site-dist/robots.txt <<'EOF'
+          User-agent: *
+          Allow: /
+          Sitemap: https://kingsmenportal-ctrl.github.io/kingsmen-platform/sitemap.xml
+          EOF
+          cat > site-dist/sitemap.xml <<'EOF'
+          <?xml version="1.0" encoding="UTF-8"?>
+          <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
+            <url><loc>https://kingsmenportal-ctrl.github.io/kingsmen-platform/</loc></url>
+            <url><loc>https://kingsmenportal-ctrl.github.io/kingsmen-platform/opportunities.html</loc></url>
+            <url><loc>https://kingsmenportal-ctrl.github.io/kingsmen-platform/funding.html</loc></url>
+            <url><loc>https://kingsmenportal-ctrl.github.io/kingsmen-platform/application-guide.html</loc></url>
+            <url><loc>https://kingsmenportal-ctrl.github.io/kingsmen-platform/about.html</loc></url>
+            <url><loc>https://kingsmenportal-ctrl.github.io/kingsmen-platform/help.html</loc></url>
+          </urlset>
+          EOF
+          touch site-dist/.nojekyll
+          test -s site-dist/index.html
+          test -s site-dist/site.css
+          for page in opportunities.html funding.html application-guide.html about.html help.html 404.html; do test -s "site-dist/$page"; done
+          echo "Public artifact contains only the approved public pages and supporting files."
+
+      - name: Configure GitHub Pages
+        uses: actions/configure-pages@v5
+
+      - name: Upload isolated public artifact
+        uses: actions/upload-pages-artifact@v3
+        with:
+          path: site-dist
+
+      - name: Deploy public website
+        id: deployment
+        uses: actions/deploy-pages@v4
