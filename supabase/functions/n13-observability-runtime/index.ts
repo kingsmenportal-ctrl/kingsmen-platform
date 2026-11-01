@@ -8,7 +8,6 @@ const ALLOWED_ORIGINS = new Set([
   "https://kingsmen-portal-staging.netlify.app"
 ]);
 const ACTIVE_CANDIDATE_CAP = 500;
-const MAX_CAPTURE_AGE_SECONDS = 60;
 
 function responseHeaders(req: Request): Record<string, string> {
   const origin = req.headers.get("origin") ?? "";
@@ -45,7 +44,7 @@ async function authorizeFounder(req: Request, url: string, anonKey: string, admi
 
   const { data: reviewer, error: reviewerError } = await admin
     .from("platform_reviewers")
-    .select("role_code")
+    .select("id, role_code")
     .eq("auth_user_id", userData.user.id)
     .eq("is_active", true)
     .is("revoked_at", null)
@@ -60,7 +59,7 @@ async function authorizeFounder(req: Request, url: string, anonKey: string, admi
     return { ok: false, status: 403, reason: "FOUNDER_ADMIN_GRANT_REQUIRED" };
   }
 
-  return { ok: true, actorRef: "FOUNDER_ADMIN" };
+  return { ok: true, actorRef: "FOUNDER_REVIEWER:" + reviewer.id };
 }
 
 async function countRows(
@@ -140,28 +139,6 @@ async function readLatest(admin: any, req: Request): Promise<Response> {
 async function capture(admin: any, req: Request, actorRef: string): Promise<Response> {
   const startedAt = performance.now();
   const observedAt = new Date().toISOString();
-  const { data: recentCapture, error: recentCaptureError } = await admin
-    .from("system_health_snapshots")
-    .select("snapshot_ref,captured_at,status")
-    .order("captured_at", { ascending: false })
-    .limit(1)
-    .maybeSingle();
-
-  if (recentCaptureError) {
-    return json(req, { status: "OBSERVABILITY_RATE_LIMIT_LOOKUP_FAILED", productionReady: false }, 500);
-  }
-  if (recentCapture?.captured_at) {
-    const ageMs = Date.now() - Date.parse(recentCapture.captured_at);
-    if (ageMs >= 0 && ageMs < MAX_CAPTURE_AGE_SECONDS * 1000) {
-      return json(req, {
-        status: "CAPTURE_RATE_LIMITED",
-        retryAfterSeconds: Math.ceil((MAX_CAPTURE_AGE_SECONDS * 1000 - ageMs) / 1000),
-        latestSnapshotRef: recentCapture.snapshot_ref,
-        latestStatus: recentCapture.status
-      }, 429);
-    }
-  }
-
   const activeCandidates = await countRows(admin, "candidates", [
     { column: "is_active", value: true }
   ]);
@@ -282,62 +259,22 @@ async function capture(admin: any, req: Request, actorRef: string): Promise<Resp
     captured_at: observedAt
   };
 
-  const { error: snapshotInsertError } = await admin.from("system_health_snapshots").insert(snapshot);
-  if (snapshotInsertError) {
-    return json(req, { status: "OBSERVABILITY_CAPTURE_FAILED", productionReady: false }, 500);
+  // A single SECURITY DEFINER RPC commits the snapshot, service checks and metric samples
+  // in one PostgreSQL transaction. The database also serializes the capture cooldown.
+  const { data: commitResult, error: commitError } = await admin.rpc("n13_commit_observability_capture", {
+    p_snapshot: snapshot,
+    p_service_checks: checks,
+    p_metric_samples: metricRows
+  });
+  if (commitError) {
+    return json(req, { status: "OBSERVABILITY_CAPTURE_COMMIT_FAILED", productionReady: false }, 500);
   }
-
-  const checks = [
-    {
-      check_ref: "n13_service_" + crypto.randomUUID(),
-      service_name: "Supabase PostgreSQL",
-      service_domain: "POSTGRES",
-      status: dataComplete ? "UP" : "UNKNOWN",
-      latency_ms: elapsedMs,
-      error_rate: dataComplete ? 0 : null,
-      last_success_at: dataComplete ? observedAt : null,
-      last_failure_at: dataComplete ? null : observedAt,
-      reason: dataComplete ? "Aggregate read-only checks completed." : "One or more aggregate health queries failed.",
-      fix_path: dataComplete ? "Continue monitoring; external services still require dedicated probes." : "Inspect database schema, privileges and aggregate query errors.",
-      evidence_refs: evidenceRefs,
-      checked_at: observedAt
-    },
-    {
-      check_ref: "n13_service_" + crypto.randomUUID(),
-      service_name: "Supabase Auth",
-      service_domain: "SUPABASE",
-      status: "UP",
-      latency_ms: null,
-      error_rate: 0,
-      last_success_at: observedAt,
-      last_failure_at: null,
-      reason: "Founder JWT was resolved by Supabase Auth and the active Founder grant was checked.",
-      fix_path: "Continue monitoring authentication and reviewer grants.",
-      evidence_refs: ["supabase-auth:getUser", "founder-role:PLATFORM_ADMIN"],
-      checked_at: observedAt
-    }
-  ];
-  const { error: checksInsertError } = await admin.from("service_health_checks").insert(checks);
-  if (checksInsertError) {
-    return json(req, { status: "OBSERVABILITY_SERVICE_CHECK_WRITE_FAILED", productionReady: false }, 500);
-  }
-
-  const metricRows = [
-    metric("active_candidates", "CAPACITY", active, 400, ACTIVE_CANDIDATE_CAP, { cap: ACTIVE_CANDIDATE_CAP }, activeCandidates.available),
-    metric("failed_workflows", "WORKFLOW", failedWorkflows.count, 1, 10, {}, failedWorkflows.available),
-    metric("pending_documents", "DOCUMENT", pendingDocuments.count, 10, 50, {}, pendingDocuments.available),
-    metric("manual_fallback_backlog", "QUEUE", manualFallbackBacklog.count, 10, 50, {}, manualFallbackBacklog.available),
-    metric("pending_payments", "FINANCE", paymentPending.count, 10, 50, {}, paymentPending.available),
-    metric("source_review_backlog", "QUEUE", sourceReviewBacklog.count, 100, 500, {}, sourceReviewBacklog.available),
-    metric("open_incidents", "RISK", openIncidents.count, 1, 5, {}, openIncidents.available),
-    metric("integration_dead_letters", "QUEUE", deadLetters.count + airtableDeadLettered.count, 1, 10, {}, deadLetters.available && airtableDeadLettered.available),
-    metric("airtable_outbox_pending", "QUEUE", airtablePending.count, 100, 500, {}, airtablePending.available),
-    metric("airtable_outbox_failed", "QUEUE", airtableFailed.count, 1, 50, {}, airtableFailed.available)
-  ].map((row) => ({ ...row, tags: { ...row.tags, coverage: dataComplete ? "OBSERVED" : "PARTIAL" } }));
-
-  const { error: metricsInsertError } = await admin.from("metric_samples").insert(metricRows);
-  if (metricsInsertError) {
-    return json(req, { status: "OBSERVABILITY_METRIC_WRITE_FAILED", productionReady: false }, 500);
+  if (commitResult?.rateLimited === true) {
+    return json(req, {
+      status: "CAPTURE_RATE_LIMITED",
+      retryAfterSeconds: commitResult.retryAfterSeconds,
+      latestSnapshotRef: commitResult.latestSnapshotRef
+    }, 429);
   }
 
   return json(req, {
