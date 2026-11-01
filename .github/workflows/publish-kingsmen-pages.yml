@@ -83,7 +83,7 @@ jobs:
           touch site-dist/.nojekyll
           test -s site-dist/index.html
           test -s site-dist/site.css
-          for page in opportunities.html funding.html application-guide.html employment-cv.html accommodation.html verification-safety.html about.html help.html 404.html; do test -s "site-dist/$page"; done
+          for page in opportunities.html funding.html application-guide.html employment-cv.html accommodation.html verification-safety.html application-follow-up.html about.html help.html 404.html; do test -s "site-dist/$page"; done
           python3 - <<'PY'
           from pathlib import Path
           html = (Path("site-dist") / "application-guide.html").read_text(encoding="utf-8")
