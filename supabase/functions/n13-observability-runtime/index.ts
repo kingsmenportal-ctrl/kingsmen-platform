@@ -8,13 +8,14 @@ const ALLOWED_ORIGINS = new Set([
   "https://kingsmen-portal-staging.netlify.app"
 ]);
 const ACTIVE_CANDIDATE_CAP = 500;
+const MAX_CAPTURE_AGE_SECONDS = 60;
 
 function responseHeaders(req: Request): Record<string, string> {
   const origin = req.headers.get("origin") ?? "";
   const allowedOrigin = ALLOWED_ORIGINS.has(origin) ? origin : "https://kingsmen-portal-staging.netlify.app";
   return {
     "Access-Control-Allow-Origin": allowedOrigin,
-    "Access-Control-Allow-Headers": "authorization, apikey, content-type",
+    "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type",
     "Access-Control-Allow-Methods": "GET, POST, OPTIONS",
     "Access-Control-Max-Age": "86400",
     "Vary": "Origin",
@@ -152,6 +153,28 @@ async function readLatest(admin: any, req: Request): Promise<Response> {
 async function capture(admin: any, req: Request, actorRef: string): Promise<Response> {
   const startedAt = performance.now();
   const observedAt = new Date().toISOString();
+  const { data: recentCapture, error: recentCaptureError } = await admin
+    .from("system_health_snapshots")
+    .select("snapshot_ref,captured_at,status")
+    .order("captured_at", { ascending: false })
+    .limit(1)
+    .maybeSingle();
+
+  if (recentCaptureError) {
+    return json(req, { status: "OBSERVABILITY_RATE_LIMIT_LOOKUP_FAILED", productionReady: false }, 500);
+  }
+  if (recentCapture?.captured_at) {
+    const ageMs = Date.now() - Date.parse(recentCapture.captured_at);
+    if (ageMs >= 0 && ageMs < MAX_CAPTURE_AGE_SECONDS * 1000) {
+      return json(req, {
+        status: "CAPTURE_RATE_LIMITED",
+        retryAfterSeconds: Math.ceil((MAX_CAPTURE_AGE_SECONDS * 1000 - ageMs) / 1000),
+        latestSnapshotRef: recentCapture.snapshot_ref,
+        latestStatus: recentCapture.status
+      }, 429);
+    }
+  }
+
   const activeCandidates = await countRows(admin, "candidates", [
     { column: "is_active", value: true }
   ]);
