@@ -156,7 +156,7 @@ jobs:
           python3 - <<'PY'
           from pathlib import Path
           html = (Path("site-dist") / "application-follow-up.html").read_text(encoding="utf-8")
-          required = ("kingsmen.application-follow-up-planner.v1", "localStorage.setItem", "localStorage.removeItem", 'aria-live="polite"', "not sent to Kingsmen", "Candidate-reported submission — not provider-confirmed", "Provider-confirmed receipt", "Provider decision received", "full platform must persist records server-side")
+          required = ("kingsmen.application-follow-up-planner.v1", "localStorage.setItem", "localStorage.removeItem", 'aria-live="polite"', "not sent to Kingsmen", "Candidate-reported submission — not provider-confirmed", "provider-confirmed receipt", "Provider decision received", "full platform must persist records server-side")
           missing = [item for item in required if item not in html]
           if missing:
               raise SystemExit(f"Application Follow-up Planner contract failed; missing: {missing}")
