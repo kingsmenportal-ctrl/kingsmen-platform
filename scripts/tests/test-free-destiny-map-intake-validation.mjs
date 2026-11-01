@@ -1,5 +1,6 @@
 import assert from "node:assert/strict";
 import { createRequire } from "node:module";
+import { readFileSync } from "node:fs";
 import { dirname, join } from "node:path";
 import { fileURLToPath } from "node:url";
 
@@ -7,7 +8,7 @@ const root = dirname(dirname(dirname(fileURLToPath(import.meta.url))));
 const apiRequire = createRequire(join(root, "apps/api/package.json"));
 const ts = apiRequire("typescript");
 const sourcePath = join(root, "apps/web/src/lib/free-destiny-map-intake-validation.ts");
-const source = await import("node:fs").then(({ readFile }) => readFile(sourcePath, "utf8"));
+const source = readFileSync(sourcePath, "utf8");
 const compiled = ts.transpileModule(source, {
   compilerOptions: { module: ts.ModuleKind.CommonJS, target: ts.ScriptTarget.ES2022 }
 }).outputText;
