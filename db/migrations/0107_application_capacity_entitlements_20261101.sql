@@ -177,7 +177,7 @@ BEGIN
   FROM public.finance_orders fo
   JOIN LATERAL (
     SELECT p.payment_ref,p.verified_at,p.payment_status,p.verified,p.amount_gross_cents,p.currency
-    FROM public.finance_payments p WHERE p.order_ref=fo.order_ref AND p.candidate_ref=fo.candidate_ref
+    FROM public.finance_payments p WHERE p.order_ref=fo.order_ref AND p.candidate_ref=fo.candidate_ref AND p.provider='PAYFAST'
     ORDER BY p.created_at DESC,p.payment_ref DESC LIMIT 1
   ) fp ON true
   WHERE fo.candidate_ref=v_public_ref AND fo.order_status='PAID' AND fo.currency='ZAR'
@@ -210,7 +210,7 @@ BEGIN
     SELECT 1 FROM public.finance_orders cv
     JOIN LATERAL (
       SELECT p.payment_status,p.verified,p.amount_gross_cents,p.currency,p.verified_at
-      FROM public.finance_payments p WHERE p.order_ref=cv.order_ref AND p.candidate_ref=cv.candidate_ref
+      FROM public.finance_payments p WHERE p.order_ref=cv.order_ref AND p.candidate_ref=cv.candidate_ref AND p.provider='PAYFAST'
       ORDER BY p.created_at DESC,p.payment_ref DESC LIMIT 1
     ) cvp ON true
     WHERE cv.candidate_ref=v_public_ref AND cv.plan_code='CV_REVAMP_R49_99'
@@ -277,6 +277,12 @@ BEGIN
 
   v_candidate:=kingsmen_security.current_verified_capacity_candidate_id();
   IF v_candidate IS NULL THEN RAISE EXCEPTION 'VERIFIED_CANDIDATE_IDENTITY_REQUIRED' USING ERRCODE='42501'; END IF;
+  PERFORM l.id FROM public.candidate_auth_identity_links l
+   WHERE l.supabase_user_id=v_uid AND l.candidate_id=v_candidate
+     AND l.link_status='VERIFIED' AND l.verified_at IS NOT NULL
+     AND l.verified_at<=v_now AND l.verified_by IS NOT NULL
+   FOR SHARE;
+  IF NOT FOUND THEN RAISE EXCEPTION 'VERIFIED_CANDIDATE_IDENTITY_REQUIRED' USING ERRCODE='42501'; END IF;
   PERFORM pg_advisory_xact_lock(hashtextextended('candidate-application-capacity:'||v_candidate::text,0));
 
   SELECT c.public_ref::text INTO v_public_ref FROM public.candidates c
@@ -384,6 +390,12 @@ BEGIN
   END IF;
   v_candidate:=kingsmen_security.current_verified_capacity_candidate_id();
   IF v_candidate IS NULL THEN RAISE EXCEPTION 'VERIFIED_CANDIDATE_IDENTITY_REQUIRED' USING ERRCODE='42501'; END IF;
+  PERFORM l.id FROM public.candidate_auth_identity_links l
+   WHERE l.supabase_user_id=v_uid AND l.candidate_id=v_candidate
+     AND l.link_status='VERIFIED' AND l.verified_at IS NOT NULL
+     AND l.verified_at<=v_now AND l.verified_by IS NOT NULL
+   FOR SHARE;
+  IF NOT FOUND THEN RAISE EXCEPTION 'VERIFIED_CANDIDATE_IDENTITY_REQUIRED' USING ERRCODE='42501'; END IF;
   PERFORM pg_advisory_xact_lock(hashtextextended('candidate-application-capacity:'||v_candidate::text,0));
 
   SELECT * INTO v_reservation FROM public.candidate_application_capacity_reservations r
