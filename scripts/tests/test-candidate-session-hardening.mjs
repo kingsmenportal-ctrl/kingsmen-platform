@@ -3,9 +3,9 @@ import { readFileSync } from "node:fs";
 import { createRequire } from "node:module";
 import { dirname, join } from "node:path";
 import { fileURLToPath } from "node:url";
-import ts from "typescript";
-
 const root = dirname(dirname(dirname(fileURLToPath(import.meta.url))));
+const apiRequire = createRequire(join(root, "apps/api/package.json"));
+const ts = apiRequire("typescript");
 const sourcePath = join(root, "apps/api/src/candidate/candidate-auth.ts");
 const source = readFileSync(sourcePath, "utf8");
 const compiled = ts.transpileModule(source, {
