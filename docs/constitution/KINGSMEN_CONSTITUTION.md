@@ -18,9 +18,9 @@
 8. Submitted requires proof.
 9. Outcome/success requires proof.
 10. Public success story requires proof and consent.
-11. Email is the primary communication nervous system.
-12. WhatsApp is urgent-only.
-13. SMS is backup-only.
+11. Email and secure portal are the only enabled candidate communication channels.
+12. WhatsApp is disabled for all candidate messaging purposes.
+13. SMS is disabled for all candidate messaging purposes.
 14. Playwright is probe/scout only.
 15. CAPTCHA/OTP bypass is forbidden.
 16. Portal blockers create MAP/manual fallback.

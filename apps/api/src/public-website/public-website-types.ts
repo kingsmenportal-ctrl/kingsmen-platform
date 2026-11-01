@@ -1,24 +1,10 @@
 export type PublicPageType =
-  | "HOME"
-  | "DESTINY_MAP"
-  | "PRICING"
-  | "SECTORS"
-  | "CV_REVAMP"
-  | "ACCOMMODATION"
-  | "HOW_IT_WORKS"
-  | "TRUST_SAFETY"
-  | "FAQ"
-  | "CONTACT"
-  | "LEGAL";
+  | "HOME" | "DESTINY_MAP" | "PRICING" | "SECTORS" | "CV_REVAMP"
+  | "ACCOMMODATION" | "HOW_IT_WORKS" | "TRUST_SAFETY" | "FAQ" | "CONTACT" | "LEGAL";
 
 export type PublicLeadStatus =
-  | "NEW"
-  | "CONTACTABLE"
-  | "WAITING_DOCUMENTS"
-  | "HANDED_TO_CANDIDATE_CORE"
-  | "UNQUALIFIED"
-  | "DUPLICATE"
-  | "CANCELLED";
+  | "NEW" | "CONTACTABLE" | "WAITING_DOCUMENTS" | "HANDED_TO_CANDIDATE_CORE"
+  | "UNQUALIFIED" | "DUPLICATE" | "CANCELLED";
 
 export type PublicPackageKey = "FREE_DESTINY_MAP" | "CV_REVAMP" | "ACCOMMODATION_SUPPORT";
 
@@ -37,7 +23,11 @@ export interface PublicPackageCard {
 export interface PublicSectorCard {
   sectorKey: string;
   sectorName: string;
-  sectorGroup: "EDUCATION" | "FUNDING" | "WORK" | "ACCOMMODATION" | "SKILLS" | "PRIVATE_PROVIDER" | "CENTRAL_ROUTE";
+  sectorGroup:
+    | "EDUCATION" | "FUNDING" | "WORK" | "ACCOMMODATION" | "SKILLS"
+    | "PRIVATE_PROVIDER" | "CENTRAL_ROUTE" | "ENTERPRISE"
+    | "CREATIVE_PROFESSIONAL" | "TRANSPORT" | "HEALTHCARE"
+    | "LEGAL_SOCIAL" | "PUBLIC_SERVICES";
   publicDescription: string;
   previewAllowed: boolean;
   exactTargetsSealed: boolean;
@@ -55,7 +45,6 @@ export interface PublicLeadInput {
   urgency?: "LOW" | "NORMAL" | "HIGH" | "URGENT";
   consentPopia: boolean;
   consentContactEmail: boolean;
-  consentWhatsappUrgentOnly: boolean;
   cvUploaded?: boolean;
   documentsUploaded?: boolean;
 }

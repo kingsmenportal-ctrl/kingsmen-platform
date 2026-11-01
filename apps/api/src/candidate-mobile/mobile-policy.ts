@@ -3,9 +3,9 @@ import type { CandidateMobileLaw, MobileChannel, MobileExperienceSummary } from 
 export const CANDIDATE_MOBILE_LAWS: CandidateMobileLaw[] = [
   { key: "MOBILE_WEB_FIRST", rule: "Kingsmen uses a mobile-first responsive portal before any native app layer." },
   { key: "PUBLIC_TO_PORTAL_HANDOFF", rule: "Public website leads must be claimed into secure portal sessions with expiring tokens." },
-  { key: "EMAIL_PRIMARY", rule: "Routine candidate communication remains email-first and auditable." },
-  { key: "WHATSAPP_URGENT_ONLY", rule: "WhatsApp is only for urgent escalation, never routine bulk reminders." },
-  { key: "SMS_BACKUP_ONLY", rule: "SMS is a backup channel only." },
+  { key: "EMAIL_PRIMARY", rule: "Email and the secure candidate portal are the only enabled candidate communication channels." },
+  { key: "WHATSAPP_DISABLED", rule: "WhatsApp is disabled; do not send, enqueue, or request channel consent." },
+  { key: "SMS_DISABLED", rule: "SMS is disabled; do not send, enqueue, or request channel consent." },
   { key: "NO_FAKE_STATUS", rule: "Candidate mobile must never invent official results, admissions decisions, funding decisions, deadlines, or employer outcomes." },
   { key: "SMART_FORM_DOES_NOT_RETYPE_DOCUMENT_DATA", rule: "The mobile smart form reuses trusted extraction from CV/documents and only asks for missing or uncertain fields." },
   { key: "DEVICE_TRUST_REQUIRED", rule: "Sensitive actions require a trusted device/session boundary." },
@@ -17,32 +17,27 @@ export function buildMobileExperienceSummary(): MobileExperienceSummary {
     mobileWebFirst: true,
     nativeAppDeferred: true,
     emailPrimary: true,
-    whatsappUrgentOnly: true,
-    smsBackupOnly: true,
+    whatsappUrgentOnly: false,
+    smsBackupOnly: false,
     publicToPortalHandoff: true,
     smartFormDoesNotRetypeDocumentData: true,
     noFakeStatus: true
   };
 }
 
-export function assertChannelAllowed(channel: MobileChannel, urgency: "routine" | "urgent" | "backup"): void {
-  if (channel === "whatsapp_urgent" && urgency !== "urgent") {
-    throw new Error("WHATSAPP_URGENT_ONLY: WhatsApp cannot be used for routine candidate mobile communication.");
+export function assertChannelAllowed(channel: MobileChannel, __urgency: "routine" | "urgent" | "backup"): void {
+  if (channel === "whatsapp_urgent") {
+    throw new Error("WHATSAPP_DISABLED_BY_CURRENT_CHANNEL_POLICY");
   }
-  if (channel === "sms_backup" && urgency !== "backup" && urgency !== "urgent") {
-    throw new Error("SMS_BACKUP_ONLY: SMS cannot replace email-first communication.");
+  if (channel === "sms_backup") {
+    throw new Error("SMS_DISABLED_BY_CURRENT_CHANNEL_POLICY");
   }
 }
 
 export function assertCandidateStatusIsSafe(statusText: string): void {
   const unsafe = [
-    "accepted",
-    "approved by nsfas",
-    "guaranteed",
-    "admitted",
-    "funded",
-    "hired",
-    "official deadline confirmed"
+    "accepted", "approved by nsfas", "guaranteed", "admitted",
+    "funded", "hired", "official deadline confirmed"
   ];
   const normalized = statusText.toLowerCase();
   for (const phrase of unsafe) {

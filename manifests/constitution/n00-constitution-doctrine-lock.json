@@ -12,8 +12,8 @@
   "submittedRequiresProof": true,
   "outcomeRequiresProof": true,
   "emailFirst": true,
-  "whatsappUrgentOnly": true,
-  "smsBackupOnly": true,
+  "whatsappUrgentOnly": false,
+  "smsBackupOnly": false,
   "playwrightProbeOnly": true,
   "captchaOtpBypassAllowed": false,
   "mapFallbackRequiredOnPortalBlocker": true,
@@ -22,5 +22,7 @@
   "aiMaySuggestNotGovern": true,
   "activeCandidateStartingCap": 500,
   "capLimitsVolumeNotCapability": true,
-  "founderApprovalRequiredForHighRiskActions": true
+  "founderApprovalRequiredForHighRiskActions": true,
+  "whatsappDisabled": true,
+  "smsDisabled": true
 }

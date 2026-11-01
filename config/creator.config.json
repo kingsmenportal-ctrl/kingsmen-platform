@@ -68,27 +68,61 @@
     {
       "phase": 1,
       "phaseName": "Close_Open_Wound",
-      "modules": ["N09.3.1", "N09.3.2", "N09.3.3"],
+      "modules": [
+        "N09.3.1",
+        "N09.3.2",
+        "N09.3.3"
+      ],
       "status": "validated",
       "reportPath": "reports/n09/n09-3-validation-report.json"
     },
     {
       "phase": 2,
       "phaseName": "Build_Materializer",
-      "modules": ["CREATOR.1", "CREATOR.2", "CREATOR.3", "CREATOR.4", "CREATOR.5"],
+      "modules": [
+        "CREATOR.1",
+        "CREATOR.2",
+        "CREATOR.3",
+        "CREATOR.4",
+        "CREATOR.5"
+      ],
       "status": "in_progress",
       "reportPath": "reports/creator/creator-validation-report.json"
     },
     {
       "phase": 3,
       "phaseName": "Infrastructure_Gate",
-      "modules": ["N01.5", "N01.5.1", "N01.5.2", "N01.6", "N01.6.1", "N01.7", "N01.7.1", "N01.8", "N01.8.1", "N01.9"],
+      "modules": [
+        "N01.5",
+        "N01.5.1",
+        "N01.5.2",
+        "N01.6",
+        "N01.6.1",
+        "N01.7",
+        "N01.7.1",
+        "N01.8",
+        "N01.8.1",
+        "N01.9"
+      ],
       "status": "not_started"
     },
     {
       "phase": 4,
       "phaseName": "First_Clickable_Surface",
-      "modules": ["UI.1", "UI.1.1", "UI.1.2", "UI.1.3", "UI.2", "UI.2.1", "UI.2.2", "UI.2.3", "UI.3", "UI.3.1", "UI.3.2", "UI.3.3"],
+      "modules": [
+        "UI.1",
+        "UI.1.1",
+        "UI.1.2",
+        "UI.1.3",
+        "UI.2",
+        "UI.2.1",
+        "UI.2.2",
+        "UI.2.3",
+        "UI.3",
+        "UI.3.1",
+        "UI.3.2",
+        "UI.3.3"
+      ],
       "status": "not_started"
     }
   ],
@@ -120,8 +154,10 @@
     "postgresTruth": true,
     "airtableMirrorOnly": true,
     "emailPrimary": true,
-    "whatsappUrgentOnly": true,
-    "smsBackupOnly": true
+    "whatsappUrgentOnly": false,
+    "smsBackupOnly": false,
+    "whatsappDisabled": true,
+    "smsDisabled": true
   },
   "trackerUpdateRules": {
     "notStartedMeans": "File is not yet materialized in repo.",

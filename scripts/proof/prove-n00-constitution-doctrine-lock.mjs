@@ -15,6 +15,10 @@ const manifest = fs.existsSync(manifestPath)
   ? JSON.parse(fs.readFileSync(manifestPath, "utf8"))
   : {};
 
+if (manifest.whatsappUrgentOnly !== false) failures.push("whatsappUrgentOnly must be false");
+if (manifest.smsBackupOnly !== false) failures.push("smsBackupOnly must be false");
+if (manifest.whatsappDisabled !== true) failures.push("whatsappDisabled must be true");
+if (manifest.smsDisabled !== true) failures.push("smsDisabled must be true");
 if (manifest.productionReady !== false) failures.push("productionReady must be false");
 if (manifest.oracleLiteDefault !== true) failures.push("oracleLiteDefault must be true");
 if (manifest.allSixGatesVisibleToAllUsers !== true) failures.push("allSixGatesVisibleToAllUsers must be true");
@@ -39,6 +43,10 @@ const report = {
   noProofNoSubmitted: manifest.submittedRequiresProof === true,
   emailFirst: manifest.emailFirst === true,
   whatsappUrgentOnly: manifest.whatsappUrgentOnly === true,
+  whatsappDisabled: manifest.whatsappDisabled === true,
+  smsBackupOnly: manifest.smsBackupOnly === false,
+  smsDisabled: manifest.smsDisabled === true,
+  smsDisabled: manifest.smsDisabled === true,
   playwrightProbeOnly: manifest.playwrightProbeOnly === true,
   captchaOtpBypassAllowed: manifest.captchaOtpBypassAllowed === true,
   sourceConfidenceRequired: manifest.sourceConfidenceRequiredForOfficialInstructions === true,

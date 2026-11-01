@@ -16,8 +16,6 @@
   ],
   "channels": [
     "EMAIL_PRIMARY",
-    "WHATSAPP_URGENT_ONLY",
-    "SMS_BACKUP_ONLY",
     "PORTAL_INBOX"
   ],
   "runtime_surfaces": [
@@ -32,5 +30,10 @@
     "Rate Limits",
     "Message Evidence Ledger"
   ],
-  "next": "N10 - Finance / PayFast Runtime"
+  "next": "N10 - Finance / PayFast Runtime",
+  "disabledChannels": [
+    "WHATSAPP_URGENT_ONLY",
+    "SMS_BACKUP_ONLY"
+  ],
+  "channelPolicy": "EMAIL_AND_PORTAL_ONLY"
 }

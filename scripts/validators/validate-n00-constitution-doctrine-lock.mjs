@@ -17,8 +17,6 @@ const requiredTrue = [
   "submittedRequiresProof",
   "outcomeRequiresProof",
   "emailFirst",
-  "whatsappUrgentOnly",
-  "smsBackupOnly",
   "playwrightProbeOnly",
   "mapFallbackRequiredOnPortalBlocker",
   "sourceConfidenceRequiredForOfficialInstructions",
@@ -43,6 +41,11 @@ for (const key of requiredTrue) {
   if (manifest[key] !== true) failures.push(`${key} must be true`);
 }
 
+if (manifest.whatsappUrgentOnly !== false) failures.push("whatsappUrgentOnly must be false");
+if (manifest.smsBackupOnly !== false) failures.push("smsBackupOnly must be false");
+if (manifest.whatsappDisabled !== true) failures.push("whatsappDisabled must be true");
+if (manifest.smsDisabled !== true) failures.push("smsDisabled must be true");
+
 if (manifest.productionReady !== false) failures.push("productionReady must be false");
 if (manifest.captchaOtpBypassAllowed !== false) failures.push("captchaOtpBypassAllowed must be false");
 if (manifest.activeCandidateStartingCap !== 500) failures.push("activeCandidateStartingCap must be 500");
@@ -56,8 +59,9 @@ for (const phrase of [
   "All candidates can see",
   "CAO is one Kingsmen parent application",
   "Submitted requires proof",
-  "Email is the primary",
-  "WhatsApp is urgent-only",
+  "Email and secure portal are the only enabled candidate communication channels",
+  "WhatsApp is disabled",
+  "SMS is disabled",
   "Playwright is probe/scout only",
   "AI may suggest",
   "Growth cap starts at 500"

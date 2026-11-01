@@ -10,7 +10,7 @@ values
   ('KINGSMEN_AIRTABLE_MIRROR_ONLY', '"true"', 'Airtable remains a mirror and operational view, not the source of truth.'),
   ('KINGSMEN_N8N_THIN_WORKERS', '"true"', 'n8n workers remain stateless thin workers with one Airtable write and one backend result POST.'),
   ('KINGSMEN_EMAIL_PRIMARY', '"true"', 'Email remains the primary communication nervous system.'),
-  ('KINGSMEN_WHATSAPP_URGENT_ONLY', '"true"', 'WhatsApp remains urgent-only and cannot become routine bulk communication.'),
+  ('KINGSMEN_WHATSAPP_URGENT_ONLY', '"false"', 'WhatsApp is disabled by current Kingsmen channel policy.'),
   ('KINGSMEN_NO_FAKE_CLAIMS', '"true"', 'No fake status, deadlines, acceptance, funding, payment, refund, or AI governance claims.'),
   ('KINGSMEN_FOUNDER_FINAL_AUTHORITY', '"true"', 'Founder/operator authority remains required for hard governance decisions.')
 on conflict (key) do update set
@@ -66,7 +66,10 @@ values
       "postgres_truth": true,
       "airtable_mirror_only": true,
       "email_primary": true,
-      "whatsapp_urgent_only": true,
+      "whatsapp_urgent_only": false,
+      "sms_backup_only": false,
+      "whatsapp_disabled": true,
+      "sms_disabled": true,
       "payfast_provider_boundary": true,
       "all_sectors_open": true,
       "caps_limit_volume_not_scope": true,
@@ -89,7 +92,7 @@ values
   ('secrets_not_committed', 'security', 'Secrets not committed', 'No live API keys, PayFast passphrases, database URLs, or Airtable keys may be committed.', 'required', 'pending', 'Run secret scan before production deployment and use environment variables only.'),
   ('database_backup_drill', 'backup', 'Database backup drill', 'Production database backup and restore drill must be proven before launch.', 'required', 'pending', 'Run backup export and restore test using staging database evidence.'),
   ('email_channel_ready', 'communications', 'Email channel ready', 'Email must be configured before routine candidate operations.', 'required', 'pending', 'Configure email provider credentials and send test messages to founder address.'),
-  ('whatsapp_urgent_boundary', 'communications', 'WhatsApp urgent-only boundary', 'WhatsApp may only handle urgent cases and must not run routine bulk reminders.', 'required', 'passed', 'Keep N09/N19 policy checks and Control Plane approvals active.'),
+  ('whatsapp_sms_disabled', 'communications', 'WhatsApp and SMS disabled', 'WhatsApp and SMS must remain disabled for all candidate communication purposes.', 'required', 'passed', 'Keep N09/N19 deny rules active; candidate communications use email and secure portal only.'),
   ('payfast_sandbox_tested', 'finance', 'PayFast sandbox tested', 'Finance must not mark payments successful without provider evidence.', 'required', 'pending', 'Complete sandbox checkout, cancel, return, and ITN receipt test before live activation.'),
   ('rls_review_required', 'security', 'RLS review required', 'RLS policies must be reviewed before production public access.', 'required', 'pending', 'Run database advisor/security review and tighten service-only policies before public launch.'),
   ('playwright_manual_fallback', 'automation', 'Playwright manual fallback ready', 'CAPTCHA, OTP, down portals, and manual-only routes must create MAP handoffs.', 'required', 'passed', 'Keep MAP fallback and manual handoff gates enabled.'),
@@ -157,7 +160,7 @@ values
     'A portal is blocked by CAPTCHA, OTP, outage, maintenance, or manual-only process.',
     'operator',
     'urgent',
-    '["Stop automation attempt","Record portal health evidence","Generate MAP package","Notify candidate by email","Escalate WhatsApp only if deadline urgent","Keep backend state controlled"]'::jsonb,
+    '["Stop automation attempt","Record portal health evidence","Generate MAP package","Notify candidate by email","Escalate internally through the founder control plane; candidate communication remains email and secure portal only","Keep backend state controlled"]'::jsonb,
     true,
     true
   ),
@@ -208,7 +211,7 @@ values
     'oracle_lite_founder_release',
     500,
     'Universities, universities of technology, comprehensive universities, TVET, SETA/QCTO/skills, learnerships, employers/internships, bursaries/scholarships, accommodation, and verified private colleges remain open from day 1.',
-    'Kingsmen is a private route house / private route command house. PostgreSQL is truth. Airtable is mirror-only. Backend controls state. n8n workers are thin. Email is primary. WhatsApp urgent-only. PayFast handles payments. AI advises but does not govern hard outcomes.',
+    'Kingsmen is a private route house / private route command house. PostgreSQL is truth. Airtable is mirror-only. Backend controls state. n8n workers are thin. Email and secure portal only. WhatsApp and SMS are disabled. PayFast handles payments. AI advises but does not govern hard outcomes.',
     21,
     '{"N00_N20":"repo_materialized","validators":"present","release_lock":"locked","production_gate":"manual_review_before_live"}'::jsonb
   )

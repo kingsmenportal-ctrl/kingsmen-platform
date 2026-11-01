@@ -25,13 +25,13 @@ export const DEFAULT_COMMUNICATION_TEMPLATES: CommunicationTemplate[] = [
   },
   {
     templateKey: "candidate.urgent.whatsapp",
-    templateName: "Urgent WhatsApp Escalation",
+    templateName: "Retired WhatsApp template — disabled",
     channel: "WHATSAPP_URGENT_ONLY",
-    bodyTemplate: "Urgent Kingsmen update: {{urgent_reason}}. Please check your email/portal for full details.",
-    purpose: "URGENT_ESCALATION",
-    allowedWhen: ["URGENT_ONLY"],
+    bodyTemplate: "Disabled by current channel policy.",
+    purpose: "RETIRED_CHANNEL",
+    allowedWhen: [],
     requiresHumanReview: true,
-    isActive: true
+    isActive: false
   }
 ];
 
@@ -40,11 +40,7 @@ export function renderTemplate(template: CommunicationTemplate, values: Record<s
     if (!input) return undefined;
     return Object.entries(values).reduce((text, [key, value]) => text.replaceAll(`{{${key}}}`, value), input);
   };
-
-  return {
-    subject: render(template.subjectTemplate),
-    body: render(template.bodyTemplate)
-  };
+  return { subject: render(template.subjectTemplate), body: render(template.bodyTemplate) };
 }
 
 export function findTemplate(templateKey: string, templates = DEFAULT_COMMUNICATION_TEMPLATES) {

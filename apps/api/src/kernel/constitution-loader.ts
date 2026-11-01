@@ -32,8 +32,10 @@ export type KingsmenConstitution = {
     postgresqlTruth: true;
     airtableMirrorOnly: true;
     emailPrimary: true;
-    whatsappUrgentOnly: true;
-    smsBackupOnly: true;
+    whatsappUrgentOnly: false;
+    smsBackupOnly: false;
+    whatsappDisabled: true;
+    smsDisabled: true;
     playwrightScoutOnly: true;
     allSixGatesVisibleToAllUsers: true;
     pricingControlsServiceIntensityNotCoreAccess: true;
@@ -225,8 +227,8 @@ export function loadKingsmenConstitution(options: LoadKingsmenConstitutionOption
   assertEnvValue(checks, env, "KINGSMEN_READY_CAP_TARGET", "1000", SOURCE_FILES.environmentTemplate);
   assertEnvValue(checks, env, "KINGSMEN_PREPARE_CAP_TARGET", "5000", SOURCE_FILES.environmentTemplate);
   assertEnvValue(checks, env, "KINGSMEN_EMAIL_PRIMARY", "true", SOURCE_FILES.environmentTemplate);
-  assertEnvValue(checks, env, "KINGSMEN_WHATSAPP_URGENT_ONLY", "true", SOURCE_FILES.environmentTemplate);
-  assertEnvValue(checks, env, "KINGSMEN_SMS_BACKUP_ONLY", "true", SOURCE_FILES.environmentTemplate);
+  assertEnvValue(checks, env, "KINGSMEN_WHATSAPP_URGENT_ONLY", "false", SOURCE_FILES.environmentTemplate);
+  assertEnvValue(checks, env, "KINGSMEN_SMS_BACKUP_ONLY", "false", SOURCE_FILES.environmentTemplate);
   assertEnvValue(checks, env, "KINGSMEN_AIRTABLE_MIRROR_ONLY", "true", SOURCE_FILES.environmentTemplate);
   assertEnvValue(checks, env, "KINGSMEN_PLAYWRIGHT_SCOUT_ONLY", "true", SOURCE_FILES.environmentTemplate);
   assertEnvValue(checks, env, "FOUNDER_MFA_REQUIRED", "true", SOURCE_FILES.environmentTemplate);
@@ -239,8 +241,10 @@ export function loadKingsmenConstitution(options: LoadKingsmenConstitutionOption
   assertJsonBooleanLock(checks, { object: providerRegistry, dottedPath: "doctrine.postgresqlTruth", expected: true, source: "provider_registry", file: SOURCE_FILES.providerRegistry, name: "provider:postgresql-truth" });
   assertJsonBooleanLock(checks, { object: providerRegistry, dottedPath: "doctrine.airtableMirrorOnly", expected: true, source: "provider_registry", file: SOURCE_FILES.providerRegistry, name: "provider:airtable-mirror-only" });
   assertJsonBooleanLock(checks, { object: providerRegistry, dottedPath: "doctrine.emailPrimary", expected: true, source: "provider_registry", file: SOURCE_FILES.providerRegistry, name: "provider:email-primary" });
-  assertJsonBooleanLock(checks, { object: providerRegistry, dottedPath: "doctrine.whatsappUrgentOnly", expected: true, source: "provider_registry", file: SOURCE_FILES.providerRegistry, name: "provider:whatsapp-urgent-only" });
-  assertJsonBooleanLock(checks, { object: providerRegistry, dottedPath: "doctrine.smsBackupOnly", expected: true, source: "provider_registry", file: SOURCE_FILES.providerRegistry, name: "provider:sms-backup-only" });
+  assertJsonBooleanLock(checks, { object: providerRegistry, dottedPath: "doctrine.whatsappUrgentOnly", expected: false, source: "provider_registry", file: SOURCE_FILES.providerRegistry, name: "provider:whatsapp-disabled" });
+  assertJsonBooleanLock(checks, { object: providerRegistry, dottedPath: "doctrine.whatsappDisabled", expected: true, source: "provider_registry", file: SOURCE_FILES.providerRegistry, name: "provider:whatsapp-disabled-guard" });
+  assertJsonBooleanLock(checks, { object: providerRegistry, dottedPath: "doctrine.smsBackupOnly", expected: false, source: "provider_registry", file: SOURCE_FILES.providerRegistry, name: "provider:sms-disabled" });
+  assertJsonBooleanLock(checks, { object: providerRegistry, dottedPath: "doctrine.smsDisabled", expected: true, source: "provider_registry", file: SOURCE_FILES.providerRegistry, name: "provider:sms-disabled-guard" });
   assertJsonBooleanLock(checks, { object: providerRegistry, dottedPath: "doctrine.playwrightScoutOnly", expected: true, source: "provider_registry", file: SOURCE_FILES.providerRegistry, name: "provider:playwright-scout-only" });
   assertJsonBooleanLock(checks, { object: providerRegistry, dottedPath: "providerHealthRules.candidateCoreMustNotSilentlyFail", expected: true, source: "provider_registry", file: SOURCE_FILES.providerRegistry, name: "provider:core-must-not-silently-fail" });
   assertJsonBooleanLock(checks, { object: providerRegistry, dottedPath: "providerHealthRules.founderActionPacketOnProviderFailure", expected: true, source: "provider_registry", file: SOURCE_FILES.providerRegistry, name: "provider:founder-action-packet-on-failure" });
@@ -255,8 +259,10 @@ export function loadKingsmenConstitution(options: LoadKingsmenConstitutionOption
   assertJsonBooleanLock(checks, { object: masterBuildIndex, dottedPath: "globalLocks.postgresqlTruth", expected: true, source: "master_build_index", file: SOURCE_FILES.masterBuildIndex, name: "master:postgresql-truth" });
   assertJsonBooleanLock(checks, { object: masterBuildIndex, dottedPath: "globalLocks.airtableMirrorOnly", expected: true, source: "master_build_index", file: SOURCE_FILES.masterBuildIndex, name: "master:airtable-mirror-only" });
   assertJsonBooleanLock(checks, { object: masterBuildIndex, dottedPath: "globalLocks.emailPrimary", expected: true, source: "master_build_index", file: SOURCE_FILES.masterBuildIndex, name: "master:email-primary" });
-  assertJsonBooleanLock(checks, { object: masterBuildIndex, dottedPath: "globalLocks.whatsappUrgentOnly", expected: true, source: "master_build_index", file: SOURCE_FILES.masterBuildIndex, name: "master:whatsapp-urgent-only" });
-  assertJsonBooleanLock(checks, { object: masterBuildIndex, dottedPath: "globalLocks.smsBackupOnly", expected: true, source: "master_build_index", file: SOURCE_FILES.masterBuildIndex, name: "master:sms-backup-only" });
+  assertJsonBooleanLock(checks, { object: masterBuildIndex, dottedPath: "globalLocks.whatsappUrgentOnly", expected: false, source: "master_build_index", file: SOURCE_FILES.masterBuildIndex, name: "master:whatsapp-disabled" });
+  assertJsonBooleanLock(checks, { object: masterBuildIndex, dottedPath: "globalLocks.whatsappDisabled", expected: true, source: "master_build_index", file: SOURCE_FILES.masterBuildIndex, name: "master:whatsapp-disabled-guard" });
+  assertJsonBooleanLock(checks, { object: masterBuildIndex, dottedPath: "globalLocks.smsBackupOnly", expected: false, source: "master_build_index", file: SOURCE_FILES.masterBuildIndex, name: "master:sms-disabled" });
+  assertJsonBooleanLock(checks, { object: masterBuildIndex, dottedPath: "globalLocks.smsDisabled", expected: true, source: "master_build_index", file: SOURCE_FILES.masterBuildIndex, name: "master:sms-disabled-guard" });
   assertJsonBooleanLock(checks, { object: masterBuildIndex, dottedPath: "globalLocks.playwrightScoutOnly", expected: true, source: "master_build_index", file: SOURCE_FILES.masterBuildIndex, name: "master:playwright-scout-only" });
   assertJsonBooleanLock(checks, { object: masterBuildIndex, dottedPath: "globalLocks.allSixGatesVisibleToAllUsers", expected: true, source: "master_build_index", file: SOURCE_FILES.masterBuildIndex, name: "master:all-six-gates-visible" });
   assertJsonBooleanLock(checks, { object: masterBuildIndex, dottedPath: "globalLocks.pricingControlsServiceIntensityNotCoreAccess", expected: true, source: "master_build_index", file: SOURCE_FILES.masterBuildIndex, name: "master:pricing-intensity-not-core-access" });
@@ -280,8 +286,10 @@ export function loadKingsmenConstitution(options: LoadKingsmenConstitutionOption
       postgresqlTruth: true,
       airtableMirrorOnly: true,
       emailPrimary: true,
-      whatsappUrgentOnly: true,
-      smsBackupOnly: true,
+      whatsappUrgentOnly: false,
+      smsBackupOnly: false,
+      whatsappDisabled: true,
+      smsDisabled: true,
       playwrightScoutOnly: true,
       allSixGatesVisibleToAllUsers: true,
       pricingControlsServiceIntensityNotCoreAccess: true,

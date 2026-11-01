@@ -2,20 +2,16 @@ export function assertN04CandidateChannelAllowed(input: {
   channel: "email" | "whatsapp" | "sms" | "portal";
   purpose: "routine" | "urgent" | "backup" | "ceremonial" | "bulk_reminder";
 }) {
-  if (input.purpose === "routine" && input.channel !== "email" && input.channel !== "portal") {
-    throw new Error("Routine candidate communication must be email-first or portal-safe");
+  if (input.channel === "whatsapp") {
+    throw new Error("WHATSAPP_DISABLED_BY_CURRENT_CHANNEL_POLICY");
   }
 
-  if (input.channel === "whatsapp" && input.purpose !== "urgent" && input.purpose !== "ceremonial") {
-    throw new Error("WhatsApp is urgent-only or ceremonial only; bulk/routine WhatsApp is blocked");
+  if (input.channel === "sms") {
+    throw new Error("SMS_DISABLED_BY_CURRENT_CHANNEL_POLICY");
   }
 
-  if (input.channel === "sms" && input.purpose !== "backup") {
-    throw new Error("SMS is backup-only");
-  }
-
-  if (input.purpose === "bulk_reminder" && input.channel === "whatsapp") {
-    throw new Error("Bulk WhatsApp reminders are blocked");
+  if (input.channel !== "email" && input.channel !== "portal") {
+    throw new Error("UNSUPPORTED_CANDIDATE_COMMUNICATION_CHANNEL");
   }
 
   return true;

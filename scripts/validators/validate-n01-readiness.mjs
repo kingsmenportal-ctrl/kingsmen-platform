@@ -41,8 +41,8 @@ const requiredEnvTokens = [
   "KINGSMEN_READY_CAP_TARGET=1000",
   "KINGSMEN_PREPARE_CAP_TARGET=5000",
   "KINGSMEN_EMAIL_PRIMARY=true",
-  "KINGSMEN_WHATSAPP_URGENT_ONLY=true",
-  "KINGSMEN_SMS_BACKUP_ONLY=true",
+  "KINGSMEN_WHATSAPP_URGENT_ONLY=false",
+  "KINGSMEN_SMS_BACKUP_ONLY=false",
   "KINGSMEN_AIRTABLE_MIRROR_ONLY=true",
   "KINGSMEN_PLAYWRIGHT_SCOUT_ONLY=true",
   "FOUNDER_MFA_REQUIRED=true",
@@ -187,7 +187,10 @@ function checkProviderRegistry(checks) {
   }
 
   const doctrine = registry.doctrine ?? {};
-  const locks = ["oracleLiteFirst", "postgresqlTruth", "airtableMirrorOnly", "emailPrimary", "whatsappUrgentOnly", "smsBackupOnly", "playwrightScoutOnly", "noHardcodedSecrets"];
+  const locks = ["oracleLiteFirst", "postgresqlTruth", "airtableMirrorOnly", "emailPrimary", "playwrightScoutOnly", "noHardcodedSecrets"];
+  for (const [lock, expected] of [["whatsappUrgentOnly", false], ["smsBackupOnly", false], ["whatsappDisabled", true], ["smsDisabled", true]]) {
+    addCheck(checks, `provider-registry:doctrine:${lock}`, doctrine[lock] === expected, String(doctrine[lock]), file);
+  }
   for (const lock of locks) {
     addCheck(checks, `provider-registry:doctrine:${lock}`, doctrine[lock] === true, String(doctrine[lock]), file);
   }
@@ -215,6 +218,8 @@ function checkMasterBuildIndex(checks) {
   addCheck(checks, "master-index:oracleLiteFirst", index.globalLocks?.oracleLiteFirst === true, String(index.globalLocks?.oracleLiteFirst), file);
   addCheck(checks, "master-index:postgresTruth", index.globalLocks?.postgresqlTruth === true, String(index.globalLocks?.postgresqlTruth), file);
   addCheck(checks, "master-index:allSixGates", index.globalLocks?.allSixGatesVisibleToAllUsers === true, String(index.globalLocks?.allSixGatesVisibleToAllUsers), file);
+  addCheck(checks, "master-index:whatsappDisabled", index.globalLocks?.whatsappUrgentOnly === false && index.globalLocks?.whatsappDisabled === true, "WhatsApp disabled", file);
+  addCheck(checks, "master-index:smsDisabled", index.globalLocks?.smsBackupOnly === false && index.globalLocks?.smsDisabled === true, "SMS disabled", file);
   addCheck(checks, "master-index:nextTrackerRow", typeof index.nextTrackerRow === "string" && index.nextTrackerRow.length > 0, String(index.nextTrackerRow ?? ""), file);
 
   const evidence = Array.isArray(index.validatedEvidence) ? index.validatedEvidence : [];

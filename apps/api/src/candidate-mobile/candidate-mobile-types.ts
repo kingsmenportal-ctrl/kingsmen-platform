@@ -3,11 +3,7 @@ export type DeviceTrustLevel = "new" | "trusted" | "restricted" | "revoked";
 export type PublicPortalClaimStatus = "created" | "sent" | "claimed" | "expired" | "revoked";
 export type MobileCardSeverity = "info" | "warning" | "urgent" | "success";
 
-export interface CandidateMobileLaw {
-  key: string;
-  rule: string;
-}
-
+export interface CandidateMobileLaw { key: string; rule: string; }
 export interface CandidateMobileDevice {
   candidateId?: string;
   accountId?: string;
@@ -16,16 +12,14 @@ export interface CandidateMobileDevice {
   trustLevel: DeviceTrustLevel;
   metadata?: Record<string, unknown>;
 }
-
 export interface PublicToPortalClaim {
   leadReference: string;
   candidateId?: string;
   accountId?: string;
   claimStatus: PublicPortalClaimStatus;
-  claimChannel: "email" | "sms_backup" | "operator";
+  claimChannel: "email" | "operator";
   expiresAt: string;
 }
-
 export interface MobileQuickAction {
   actionKey: string;
   label: string;
@@ -34,7 +28,6 @@ export interface MobileQuickAction {
   actionBoundary: string;
   enabled: boolean;
 }
-
 export interface MobileStatusCard {
   candidateId: string;
   cardKey: string;
@@ -44,7 +37,6 @@ export interface MobileStatusCard {
   severity: MobileCardSeverity;
   confidenceBand: "official" | "system" | "manual_review" | "candidate_supplied";
 }
-
 export interface MobileNotificationPreference {
   candidateId: string;
   emailEnabled: boolean;
@@ -54,7 +46,6 @@ export interface MobileNotificationPreference {
   quietHoursEnd: string;
   timezone: string;
 }
-
 export interface MobileExperienceSummary {
   mobileWebFirst: boolean;
   nativeAppDeferred: boolean;

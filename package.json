@@ -8,7 +8,7 @@
     "doc": "docs"
   },
   "scripts": {
-    "test": "node scripts/validators/validate-jarvis-core.mjs && node scripts/validators/validate-jarvis-live-pass-02.mjs && node scripts/staging/test-kingsmen-operating-evidence-reconciliation.mjs && npm run n14:connectors:check && npm run n15:sources:check && npm run n15:ingestion:check",
+    "test": "node scripts/validators/validate-jarvis-core.mjs && node scripts/validators/validate-jarvis-live-pass-02.mjs && node scripts/staging/test-kingsmen-operating-evidence-reconciliation.mjs && npm run n14:connectors:check && npm run n15:sources:check && npm run n15:ingestion:check && npm run public:sectors:check && npm run communications:prove && npm run communications:validate && node scripts/proof/prove-n04-candidate-05.mjs && node scripts/validators/validate-n04-candidate-05.mjs && npm run communications:channels:test",
     "jarvis:validate": "node scripts/validators/validate-jarvis-connected-live.mjs",
     "jarvis:validate:core": "node scripts/validators/validate-jarvis-core.mjs",
     "jarvis:validate:live-pass-02": "node scripts/validators/validate-jarvis-live-pass-02.mjs",
@@ -24,7 +24,7 @@
     "jarvis:validate:v5:number-22": "node scripts/validators/validate-jarvis-v5-number-22-calendar.mjs",
     "jarvis:validate:v5:number-23": "node scripts/validators/validate-jarvis-v5-number-23-documents.mjs",
     "jarvis:validate:v5:number-24": "node scripts/validators/validate-jarvis-v5-number-24-reports.mjs",
-    "jarvis:validate:v5:number-25": "node scripts/validators/validate-jarvis-v5-number-25-strategy.mjs",
+    "jarvis:validate:v5:number-25": "node scripts/validators/validate-jarvis-v5-number-25.mjs",
     "jarvis:validate:v5:number-26": "node scripts/validators/validate-jarvis-v5-number-26.mjs",
     "jarvis:validate:v5:number-27": "node scripts/validators/validate-jarvis-v5-number-27-inspection.mjs",
     "jarvis:validate:v5:number-28": "node scripts/validators/validate-jarvis-v5-number-28-deployment.mjs",
@@ -65,6 +65,7 @@
     "secrets:validate:wiring": "node scripts/validators/validate-secrets-wiring-proof.mjs",
     "communications:prove": "node scripts/proof/prove-communications-boundary.mjs",
     "communications:validate": "node scripts/validators/validate-communications-proof.mjs",
+    "communications:channels:test": "node scripts/staging/test-disabled-candidate-channels.mjs",
     "observability:prove": "node scripts/proof/prove-observability-incident-boundary.mjs",
     "observability:validate": "node scripts/validators/validate-observability-incident-proof.mjs",
     "legal:prove": "node scripts/proof/prove-legal-privacy-boundary.mjs",
@@ -100,6 +101,7 @@
     "n15:sources:check": "npm run n15:sources:validate && npm run n15:sources:test",
     "n15:ingestion:test": "node scripts/staging/test-n15-live-ingestion-contract.mjs",
     "n15:ingestion:check": "npm run n15:ingestion:test",
+    "public:sectors:check": "node scripts/staging/test-public-sector-universe.mjs",
     "api:test:production-storage-guard": "npm run api:build && node scripts/tests/test-truth-vault-production-guard.mjs"
   },
   "repository": {

@@ -6,7 +6,7 @@ insert into public.founder_runtime_config (config_key, config_value, config_scop
 ('NO_DIRECT_REFUND_OR_FRAUD_FINALITY_FROM_FOUNDER_PANEL','true'::jsonb,'FOUNDER_OPS',true),
 ('PHONE_COCKPIT_ENABLED','true'::jsonb,'FOUNDER_OPS',true),
 ('DAILY_BRIEF_TYPES','["MORNING","MIDDAY","EVENING","INCIDENT","WEEKLY","MONTHLY"]'::jsonb,'FOUNDER_OPS',true),
-('CANDIDATE_COMMS_EMAIL_FIRST_WHATSAPP_URGENT_ONLY','true'::jsonb,'FOUNDER_OPS',true),
+('CANDIDATE_COMMS_EMAIL_PORTAL_ONLY_WHATSAPP_SMS_DISABLED','true'::jsonb,'FOUNDER_OPS',true),
 ('ORACLE_LITE_ACTIVE_CANDIDATE_CAP','500'::jsonb,'CAPACITY',true)
 on conflict (config_key) do update set config_value = excluded.config_value, updated_at = now();
 
@@ -38,7 +38,7 @@ values
 ('ESCALATE_INCIDENT','Escalate Incident','INCIDENT','Escalate incident with cause, current risk, and fix path.','N12_GOVERNANCE_AND_N16_ORCHESTRATOR',false,true,true,false,'Creates visible escalation.'),
 ('REQUEST_DOCUMENT_REVIEW','Request Document Review','DOCUMENTS','Send document issue to human/operator review.','N12_GOVERNANCE_AND_N16_ORCHESTRATOR',false,true,true,false,'Fraud flags are not final decisions.'),
 ('REQUEST_SOURCE_REVIEW','Request Source Review','SOURCE_REVIEW','Send uncertain source/deadline/fee/requirement to source confidence review.','N12_GOVERNANCE_AND_N16_ORCHESTRATOR',false,true,true,false,'No fake source claims.'),
-('REQUEST_COMMS_ESCALATION','Request Comms Escalation','COMMS','Request communication escalation while preserving email-first doctrine.','N12_GOVERNANCE_AND_N16_ORCHESTRATOR',true,true,true,true,'WhatsApp urgent-only.'),
+('REQUEST_COMMS_ESCALATION','Request Comms Escalation','COMMS','Request communication escalation while preserving email-first doctrine.','N12_GOVERNANCE_AND_N16_ORCHESTRATOR',true,true,true,true,'WhatsApp and SMS are disabled; email and secure portal only.'),
 ('REQUEST_REFUND_REVIEW','Request Refund Review','FINANCE','Create refund review request; founder panel cannot process final refund directly.','N12_GOVERNANCE_AND_N16_ORCHESTRATOR',true,true,true,true,'Finance finality boundary applies.'),
 ('BUILD_MORNING_BRIEF','Build Morning Brief','REPORT','Build founder morning brief.','N13_OBSERVABILITY_ONLY',false,true,true,false,'Read/report command.'),
 ('BUILD_MIDDAY_BRIEF','Build Midday Brief','REPORT','Build founder midday brief.','N13_OBSERVABILITY_ONLY',false,true,true,false,'Read/report command.'),
