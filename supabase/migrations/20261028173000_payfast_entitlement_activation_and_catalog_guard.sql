@@ -1,4 +1,22 @@
 -- Harden PayFast checkout/settlement: catalog-authoritative checkout records and
+-- Idempotency must be enforced by PostgreSQL as well as by the serialized RPC.
+-- Existing staging has no PAYFAST provider-payment uniqueness constraint; abort rather
+-- than hide conflicting historical provider IDs.
+DO $payfast_duplicate_guard$
+BEGIN
+  IF EXISTS (
+    SELECT 1 FROM public.finance_payments
+    WHERE provider = 'PAYFAST' AND provider_payment_id IS NOT NULL
+    GROUP BY provider, provider_payment_id HAVING count(*) > 1
+  ) THEN
+    RAISE EXCEPTION 'PAYFAST_DUPLICATE_PROVIDER_PAYMENT_IDS_REQUIRE_RECONCILIATION';
+  END IF;
+END;
+$payfast_duplicate_guard$;
+CREATE UNIQUE INDEX IF NOT EXISTS finance_payments_payfast_provider_payment_id_uidx
+  ON public.finance_payments (provider, provider_payment_id)
+  WHERE provider = 'PAYFAST' AND provider_payment_id IS NOT NULL;
+
 -- activate the purchased candidate service order only after verified ITN settlement.
 -- This migration intentionally does not enable live PayFast payments.
 
@@ -171,7 +189,10 @@ begin
   if v_intent.currency <> 'ZAR' or v_intent.amount_cents <> p_amount_gross_cents then
     raise exception 'payment_amount_or_currency_mismatch';
   end if;
-  if p_amount_fee_cents < 0 or p_amount_net_cents < 0 or p_amount_fee_cents + p_amount_net_cents <> p_amount_gross_cents then
+  -- PayFast ITN amount_fee is a deduction and may be negative. amount_net = gross + fee.
+  -- Accept zero fee, negative fee, or (provider contract permitting) positive adjustments,
+  -- but require the exact signed reconciliation and non-negative net settlement.
+  if p_amount_net_cents < 0 or p_amount_fee_cents + p_amount_gross_cents <> p_amount_net_cents then
     raise exception 'payment_amount_breakdown_mismatch';
   end if;
   select * into v_service_order from public.candidate_service_orders
