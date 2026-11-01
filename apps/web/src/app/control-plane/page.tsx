@@ -1,6 +1,7 @@
 "use client";
 
 import Link from "next/link";
+import { LiveObservabilityPanel } from "../../observability/LiveObservabilityPanel";
 import { useEffect, useState } from "react";
 
 type Health = {
@@ -24,6 +25,7 @@ const workspaces = [
   { id: "approvals", code: "N08 / N12", name: "Approval Queue", detail: "Human approval requests, policy gates and auditable decisions.", state: "BACKEND AUTHORITY REQUIRED" },
   { id: "capacity", code: "N01 / N16", name: "Capacity Guard", detail: "Candidate caps, dispatch limits, concurrency and stop-selling signals.", state: "LIVE DATA NOT CONNECTED" },
   { id: "workers", code: "N13 / N16", name: "Worker Health", detail: "Heartbeats, retries, dead-letter recovery and execution status.", state: "LIVE DATA NOT CONNECTED" },
+  { id: "observability", code: "N13", name: "Live Observability", detail: "Authenticated health snapshots, aggregate metrics and persisted service checks.", state: "AUTHENTICATED RUNTIME" },
   { id: "fallback", code: "N06 / N16", name: "Manual Fallback Center", detail: "MAP and Phoenix fallback when automation is blocked.", state: "LIVE DATA NOT CONNECTED" },
   { id: "kill", code: "N08", name: "Kill Switches", detail: "Audited stop controls for unsafe or degraded workflows.", state: "BACKEND AUTHORITY REQUIRED" },
   { id: "reports", code: "N13", name: "Reports & Evidence", detail: "Release gates, evidence references, incident records and timestamps.", state: "EVIDENCE REGISTRY REQUIRED" },
@@ -31,7 +33,7 @@ const workspaces = [
 ];
 
 const nav = [
-  ["Overview", "overview"], ["Action packets", "command"], ["Candidate queue", "candidate"],
+  ["Overview", "overview"], ["Action packets", "command"], ["Live observability", "observability"], ["Candidate queue", "candidate"],
   ["Applications", "application"], ["Documents", "documents"], ["Routes & sources", "routes"],
   ["Approvals", "approvals"], ["Capacity guard", "capacity"], ["Worker health", "workers"],
   ["Fallback & recovery", "fallback"], ["Kill switches", "kill"], ["Reports & evidence", "reports"], ["Providers", "providers"]
@@ -100,13 +102,13 @@ export default function ControlPlanePage() {
           <section className="cp-stats" aria-label="Operational summary">
             {[["Active candidates","Not connected","No invented count"],["Action packets","Not connected","Persisted read model required"],["Open incidents","Not connected","Incident feed required"],["Production readiness",health?.productionReady ? "Reported ready" : "BLOCKED","Health boundary: "+(health?.ok ? "responded" : healthError ? "error" : "pending")]].map(x=><article className="cp-stat" key={x[0]}><span>{x[0]}</span><strong style={{fontSize:x[0]==="Production readiness"?16:18,color:x[0]==="Production readiness"?"#e6c579":"#e9edf5"}}>{x[1]}</strong><small>{x[2]}</small></article>)}
           </section>
-          <div className="cp-section-head"><div><h2>Operations workspaces</h2><p>Select a control surface to inspect its scope and current integration gate.</p></div><span className="cp-kicker">12 REGISTERED SURFACES</span></div>
+          <div className="cp-section-head"><div><h2>Operations workspaces</h2><p>Select a control surface to inspect its scope and current integration gate.</p></div><span className="cp-kicker">13 REGISTERED SURFACES</span></div>
           <section className="cp-grid">{workspaces.map(w=><a className="cp-card" href={"#"+w.id} key={w.id}><div className="cp-card-top"><span className="cp-code">{w.code}</span><span className="cp-state">{w.state}</span></div><h3>{w.name} ↗</h3><p>{w.detail}</p></a>)}</section>
           <section className="cp-bottom">
             <article className="cp-panel"><h3>Non-negotiable control boundaries</h3><ul><li>PostgreSQL is the source of truth; Airtable is a mirror only.</li><li>No direct candidate status or document decision changes from this UI.</li><li>Dangerous actions require explicit human approval and an audit record.</li><li>Missing or stale evidence must remain visible and fail closed.</li><li>AI may advise; it cannot decide money, refunds, official outcomes, fraud or privacy.</li></ul></article>
             <article className="cp-panel"><h3>Runtime boundary</h3><p>Health endpoint: <code>/api/founder/control-plane/health</code></p><p>Endpoint response: <strong style={{color:health?.ok?"#8bd8ae":"#e3bf70"}}>{healthError ? "ERROR" : health ? "RESPONDED" : "CHECKING"}</strong></p><p>Service role exposed to browser: <strong style={{color:health?.serviceRoleVisibleToBrowser?"#ff9c8d":"#9ba9bc"}}>{health?.serviceRoleVisibleToBrowser === false ? "NO (reported)" : "NOT VERIFIED"}</strong></p><p>Queue counts, candidate records and action execution are intentionally not fabricated.</p></article>
           </section>
-          {workspaces.map(w=><section id={w.id} key={w.id} style={{scrollMarginTop:20,marginTop:14,border:"1px solid #29354a",borderRadius:12,padding:18,background:"#0e1623"}}><div className="cp-card-top"><span className="cp-code">{w.code}</span><span className="cp-state">{w.state}</span></div><h2 style={{fontSize:17,margin:"12px 0 7px"}}>{w.name}</h2><p style={{fontSize:12,color:"#9eacc0",lineHeight:1.7,margin:0}}>{w.detail}</p><p style={{fontSize:10,color:"#78889f",marginBottom:0}}>Integration gate: connect authenticated, timestamped backend read model before showing operational records or enabling actions.</p></section>)}
+          {workspaces.map(w=><section id={w.id} key={w.id} style={{scrollMarginTop:20,marginTop:14,border:"1px solid #29354a",borderRadius:12,padding:18,background:"#0e1623"}}>{w.id === "observability" ? <LiveObservabilityPanel /> : <><div className="cp-card-top"><span className="cp-code">{w.code}</span><span className="cp-state">{w.state}</span></div><h2 style={{fontSize:17,margin:"12px 0 7px"}}>{w.name}</h2><p style={{fontSize:12,color:"#9eacc0",lineHeight:1.7,margin:0}}>{w.detail}</p><p style={{fontSize:10,color:"#78889f",marginBottom:0}}>Integration gate: connect authenticated, timestamped backend read model before showing operational records or enabling actions.</p></>}</section>)}
           <footer className="cp-foot">KINGSMEN FOUNDER CONTROL PLANE · UI AND HEALTH BOUNDARY ONLY · PRODUCTION READINESS IS NOT CLAIMED · Last health check: {checkedAt || "not yet completed"}.</footer>
         </div>
       </div>
