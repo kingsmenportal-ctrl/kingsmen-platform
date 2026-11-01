@@ -117,7 +117,7 @@ BEGIN
   END IF;
 
   SELECT
-    a.id, a.application_ref, a.pathway_type,
+    a.id, a.application_ref, a.pathway_type, a.status,
     a.readiness_status, a.readiness_snapshot, a.created_at, a.updated_at,
     o.title, o.provider_name, o.source_url, o.closes_at
   INTO v_application
