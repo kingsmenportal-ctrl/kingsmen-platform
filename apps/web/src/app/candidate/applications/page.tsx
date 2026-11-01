@@ -247,6 +247,19 @@ export default function CandidateApplicationsPage() {
                 <p className="mt-1"><strong>Provider submission:</strong> Not confirmed by this draft record.</p>
                 <p className="mt-1 text-xs text-slate-400">Last saved: {new Date(application.updated_at).toLocaleString()}</p>
               </div>}
+              {application && <section className="mt-3 rounded-xl border border-slate-700 bg-slate-950 p-4" aria-label="Opportunity eligibility and deadline checks">
+                <h4 className="font-semibold">Opportunity eligibility &amp; deadline checks</h4>
+                {application.readiness_snapshot?.opportunity_eligibility_gate === "CANDIDATE_SPECIFIC_MATCH_APPROVED" ? <>
+                  <p className="mt-2 text-sm text-emerald-200">Candidate-specific N15 match approved with supporting evidence.</p>
+                  <p className="mt-1 text-xs leading-5 text-slate-400">This confirms the saved opportunity's candidate-specific match gate only. It is not a provider decision or a guarantee that every final application requirement is satisfied.</p>
+                </> : <p className="mt-2 text-sm text-amber-200">Candidate-specific eligibility gate has not been recorded for this application.</p>}
+                {application.readiness_snapshot?.deadline_gate_status === "CONFIRMED_OPEN_WINDOW" ? <>
+                  <p className="mt-3 text-sm text-emerald-200">Official application window confirmed and open.</p>
+                  <p className="mt-1 text-sm text-slate-300"><strong>Closes:</strong> {typeof application.readiness_snapshot.deadline_closes_at === "string" ? new Date(application.readiness_snapshot.deadline_closes_at).toLocaleString() : "Not recorded"}</p>
+                  <p className="mt-1 text-xs text-slate-400">Deadline evidence reference: {typeof application.readiness_snapshot.deadline_ref === "string" ? application.readiness_snapshot.deadline_ref : "Not recorded"}</p>
+                </> : <p className="mt-3 text-sm text-amber-200">A current confirmed application deadline has not been recorded. A new application draft cannot be prepared until it is verified.</p>}
+                <p className="mt-3 text-xs text-slate-500">Source last checked: {typeof application.readiness_snapshot?.source_checked_at === "string" ? new Date(application.readiness_snapshot.source_checked_at).toLocaleString() : "Not recorded"}</p>
+              </section>}
               {application && <section className="mt-4 rounded-xl border border-slate-700 bg-slate-950 p-4" aria-label="Provider receipt evidence">
                 <div className="flex flex-wrap items-center justify-between gap-2">
                   <h4 className="font-semibold">Provider receipt &amp; evidence</h4>
