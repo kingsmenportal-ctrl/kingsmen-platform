@@ -25,7 +25,11 @@ assert.match(migration, /pg_advisory_xact_lock\(hashtextextended\(v_candidate_re
 assert.match(migration, /raise exception 'idempotency_key_reused_for_different_plan'/, "database RPC must fail closed on cross-plan reuse");
 assert.match(migration, /revoke all on function public\.payfast_create_sandbox_checkout\(jsonb,jsonb,jsonb,jsonb\) from public,anon,authenticated/i, "checkout RPC must remain service-role-only");
 assert.match(migration, /grant execute on function public\.payfast_create_sandbox_checkout\(jsonb,jsonb,jsonb,jsonb\) to service_role/i, "checkout RPC must grant service role");
-assert.match(migration, /p_amount_fee_cents \+ p_amount_net_cents <> p_amount_gross_cents/, "settlement must reconcile fee + net to gross");
+assert.match(migration, /p_amount_fee_cents \+ p_amount_gross_cents <> p_amount_net_cents/, "settlement must reconcile signed PayFast fee plus gross to net");
+assert.match(migration, /amount_fee is a deduction and may be negative/i, "PayFast fee semantics must be explicit");
+assert.match(migration, /finance_payments_payfast_provider_payment_id_uidx/, "provider payment ID must be unique at database level");
+assert.match(migration, /PAYFAST_DUPLICATE_PROVIDER_PAYMENT_IDS_REQUIRE_RECONCILIATION/, "existing duplicate provider IDs must fail migration rather than be silently ignored");
+assert.doesNotMatch(migration, /p_amount_fee_cents < 0/, "negative PayFast amount_fee must be accepted");
 assert.match(migration, /candidate_service_orders[\s\S]*?'PENDING_PAYMENT'[\s\S]*?payfast_settle_sandbox_payment/, "checkout and settlement must include candidate service orders");
 assert.match(migration, /revoke all on function public\.payfast_settle_sandbox_payment\([\s\S]*?from public,anon,authenticated/i, "settlement RPC must remain service-role-only");
 console.log("PASS: PayFast atomic checkout contract regression checks (plan-bound idempotency, least privilege, reconciliation, entitlement path).");
