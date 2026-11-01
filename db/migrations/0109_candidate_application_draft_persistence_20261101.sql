@@ -96,6 +96,20 @@ BEGIN
       USING ERRCODE = '42501';
   END IF;
 
+  PERFORM l.id
+  FROM public.candidate_auth_identity_links l
+  WHERE l.supabase_user_id = v_auth_user_id
+    AND l.candidate_id = v_candidate_id
+    AND l.link_status = 'VERIFIED'
+    AND l.verified_at IS NOT NULL
+    AND l.verified_at <= clock_timestamp()
+    AND l.verified_by IS NOT NULL
+  FOR SHARE;
+  IF NOT FOUND THEN
+    RAISE EXCEPTION 'VERIFIED_CANDIDATE_IDENTITY_REQUIRED'
+      USING ERRCODE = '42501';
+  END IF;
+
   SELECT EXISTS (SELECT 1 FROM public.candidates c WHERE c.id = v_candidate_id AND c.is_active IS TRUE)
     INTO v_candidate_is_active;
   IF NOT v_candidate_is_active THEN
@@ -195,6 +209,20 @@ BEGIN
 
   v_candidate_id := kingsmen_security.current_verified_application_candidate_id();
   IF v_candidate_id IS NULL THEN
+    RAISE EXCEPTION 'VERIFIED_CANDIDATE_IDENTITY_REQUIRED'
+      USING ERRCODE = '42501';
+  END IF;
+
+  PERFORM l.id
+  FROM public.candidate_auth_identity_links l
+  WHERE l.supabase_user_id = v_auth_user_id
+    AND l.candidate_id = v_candidate_id
+    AND l.link_status = 'VERIFIED'
+    AND l.verified_at IS NOT NULL
+    AND l.verified_at <= clock_timestamp()
+    AND l.verified_by IS NOT NULL
+  FOR SHARE;
+  IF NOT FOUND THEN
     RAISE EXCEPTION 'VERIFIED_CANDIDATE_IDENTITY_REQUIRED'
       USING ERRCODE = '42501';
   END IF;
