@@ -66,6 +66,17 @@ type ApplicationEvent = {
   application_id: string; event_type: string; from_status: string | null; to_status: string | null;
   reason_code: string | null; evidence_ref: string | null; details: Record<string, unknown> | null; created_at: string
 };
+type ApplicationEvidence = {
+  application_id: string;
+  evidence_ref: string;
+  evidence_type: string;
+  source_label: string;
+  captured_at: string | null;
+  verification_status: string;
+  verified_by_auth_user_id: string | null;
+  verified_at: string | null;
+  created_at: string;
+};
 
 function explain(payload: unknown): string {
   if (payload && typeof payload === "object") {
@@ -99,6 +110,7 @@ export default function CandidateApplicationsPage() {
   const [parentApplications,setParentApplications] = useState<ParentApplication[]>([]);
   const [masterEvents,setMasterEvents] = useState<MasterEvent[]>([]);
   const [applicationEvents,setApplicationEvents] = useState<ApplicationEvent[]>([]);
+  const [applicationEvidence,setApplicationEvidence] = useState<ApplicationEvidence[]>([]);
   const [drafts,setDrafts] = useState<Record<string,Draft>>({});
   const [itemDrafts,setItemDrafts] = useState<Record<string,ItemDraft>>({});
   const [newItems,setNewItems] = useState<Record<string,{title:string;type:"TASK"|"DOCUMENT";note:string;source:string}>>({});
@@ -132,6 +144,7 @@ export default function CandidateApplicationsPage() {
       setParentApplications(Array.isArray(body.parentApplications) ? body.parentApplications as ParentApplication[] : []);
       setMasterEvents(Array.isArray(body.masterEvents) ? body.masterEvents as MasterEvent[] : []);
       setApplicationEvents(Array.isArray(body.applicationEvents) ? body.applicationEvents as ApplicationEvent[] : []);
+      setApplicationEvidence(Array.isArray(body.applicationEvidence) ? body.applicationEvidence as ApplicationEvidence[] : []);
       setDrafts(Object.fromEntries(loadedTrackers.map(t=>[t.id,{status:t.status,note:t.candidate_note ?? "",evidence:t.evidence_reference ?? ""}])));
       setItemDrafts(Object.fromEntries(loadedItems.map(i=>[i.id,{status:i.status,note:i.candidate_note ?? "",evidence:i.evidence_reference ?? ""}])));
       setNotice("");
@@ -206,6 +219,19 @@ export default function CandidateApplicationsPage() {
               ...masterEvents.filter(event => event.details?.target_key === target.target_key).map(event => ({type:event.event_type,created_at:event.created_at,reason:"Saved application target",to_status:null as string|null,evidence_ref:null as string|null})),
               ...applicationEvents.filter(event => event.application_id === target.application_id).map(event => ({type:event.event_type,created_at:event.created_at,reason:event.reason_code,to_status:event.to_status,evidence_ref:event.evidence_ref}))
             ].sort((a,b)=>Date.parse(b.created_at)-Date.parse(a.created_at));
+            const receiptEvidence = applicationEvidence.filter(item =>
+              item.application_id === target.application_id &&
+              ["PROVIDER_SUBMISSION_RECEIPT", "PROVIDER_REFERENCE"].includes(item.evidence_type)
+            );
+            const verifiedReceipt = receiptEvidence.find(item =>
+              item.verification_status === "VERIFIED" &&
+              Boolean(item.verified_by_auth_user_id) &&
+              Boolean(item.verified_at)
+            );
+            const submissionAttemptRecorded = applicationEvents.some(event =>
+              event.application_id === target.application_id &&
+              ["SUBMISSION_ATTEMPT_CREATED", "SUBMISSION_DISPATCHED"].includes(event.event_type)
+            );
             return <article key={target.id} className="rounded-2xl border border-slate-700 p-4 sm:p-5">
               <div className="flex flex-wrap items-start justify-between gap-3">
                 <div className="min-w-0">
@@ -221,6 +247,32 @@ export default function CandidateApplicationsPage() {
                 <p className="mt-1"><strong>Provider submission:</strong> Not confirmed by this draft record.</p>
                 <p className="mt-1 text-xs text-slate-400">Last saved: {new Date(application.updated_at).toLocaleString()}</p>
               </div>}
+              {application && <section className="mt-4 rounded-xl border border-slate-700 bg-slate-950 p-4" aria-label="Provider receipt evidence">
+                <div className="flex flex-wrap items-center justify-between gap-2">
+                  <h4 className="font-semibold">Provider receipt &amp; evidence</h4>
+                  <span className={verifiedReceipt ? "rounded-full border border-emerald-800 px-3 py-1 text-xs text-emerald-200" : "rounded-full border border-amber-800 px-3 py-1 text-xs text-amber-200"}>
+                    {verifiedReceipt ? "Receipt verified" : receiptEvidence.length > 0 ? "Evidence needs review" : "Not confirmed"}
+                  </span>
+                </div>
+                {verifiedReceipt ? <div className="mt-3 text-sm leading-6 text-slate-300">
+                  <p>A reviewer-verified provider receipt or provider reference is recorded for this exact application.</p>
+                  <p className="mt-1"><strong>Evidence reference:</strong> <span className="break-all">{verifiedReceipt.evidence_ref}</span></p>
+                  <p className="mt-1"><strong>Evidence label:</strong> {verifiedReceipt.source_label}</p>
+                  <p className="mt-1"><strong>Verified at:</strong> {new Date(verifiedReceipt.verified_at as string).toLocaleString()}</p>
+                </div> : receiptEvidence.length > 0 ? <div className="mt-3 space-y-3 text-sm leading-6 text-slate-300">
+                  <p>Receipt-related evidence exists, but it is not yet reviewer-verified. Kingsmen is not treating it as proof of provider receipt.</p>
+                  {receiptEvidence.map(item => <div key={item.evidence_ref} className="rounded-lg border border-slate-800 p-3">
+                    <p className="font-semibold">{item.source_label || item.evidence_type.replaceAll("_", " ")}</p>
+                    <p className="mt-1 text-xs text-slate-400">State: {item.verification_status.replaceAll("_", " ")} · Added {new Date(item.created_at).toLocaleString()}</p>
+                    <p className="mt-1 break-all text-xs text-slate-400">Evidence reference: {item.evidence_ref}</p>
+                  </div>)}
+                </div> : <p className="mt-3 text-sm leading-6 text-slate-300">
+                  {submissionAttemptRecorded
+                    ? "A submission attempt is recorded, but a provider-confirmed receipt has not been verified."
+                    : "No reviewer-verified provider receipt is available for this application. Candidate-reported activity and submission attempts do not confirm provider receipt."}
+                </p>}
+                <p className="mt-3 text-xs leading-5 text-slate-500">Private storage paths and download locators are not exposed in this timeline. Receipt verification is performed by an authorised human reviewer.</p>
+              </section>}
               {target.provider_application_url && <a href={target.provider_application_url} target="_blank" rel="noopener noreferrer" className="mt-3 inline-block break-all text-sm text-cyan-300 underline">Open official provider page</a>}
               <div className="mt-4 border-t border-slate-700 pt-4">
                 <h4 className="font-semibold">Application timeline</h4>
