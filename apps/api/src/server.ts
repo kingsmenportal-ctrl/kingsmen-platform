@@ -16,7 +16,7 @@ import type {
 } from "./read-models/candidate-read-model";
 import type { KingsmenState } from "./state/state-machine";
 import { TruthVaultRepository } from "./db/truth-vault-repository";
-import { resolveCandidateIdentity } from "./security/candidate-identity-authorization";
+import { candidateOwnsResource, resolveCandidateIdentity } from "./security/candidate-identity-authorization";
 import {
   handleJarvisRuntimeControlWithAdapter,
   type JarvisRuntimeServerStore
@@ -505,7 +505,7 @@ export function createKingsmenApiServer() {
           sendError(response, identity.status, identity.code, "Candidate identity could not be authorised.");
           return;
         }
-        if (identity.candidateId !== candidateId) {
+        if (!candidateOwnsResource(identity, candidateId)) {
           sendError(response, 403, "CANDIDATE_OWNERSHIP_MISMATCH", "The authenticated identity does not own this candidate.");
           return;
         }
@@ -532,7 +532,7 @@ export function createKingsmenApiServer() {
           sendError(response, 404, "APPLICATION_WORKBENCH_NOT_FOUND", "No application workbench found.");
           return;
         }
-        if (application.candidateId !== identity.candidateId) {
+        if (!candidateOwnsResource(identity, application.candidateId)) {
           sendError(response, 403, "APPLICATION_OWNERSHIP_MISMATCH", "The authenticated identity does not own this application.");
           return;
         }
