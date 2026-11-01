@@ -179,9 +179,20 @@ Deno.serve(async(req:Request)=>{
    const result=await admin.from("candidate_application_evidence")
     .select("application_id,evidence_ref,evidence_type,source_label,captured_at,verification_status,verified_by_auth_user_id,verified_at,created_at")
     .eq("candidate_id",candidateId).in("application_id",applicationIds)
+    .in("evidence_type",["PROVIDER_SUBMISSION_RECEIPT","PROVIDER_REFERENCE"])
     .order("created_at",{ascending:false}).limit(200);
    if(result.error){console.error("application evidence metadata lookup failed",result.error.code??"unknown");return reply(503,{error:"Could not load provider-receipt evidence metadata."},origin);}
-   applicationEvidence=result.data??[];
+   applicationEvidence=(result.data??[]).map((item:any)=>({
+    application_id:item.application_id,
+    evidence_ref:item.evidence_ref,
+    evidence_type:item.evidence_type,
+    source_label:item.source_label,
+    captured_at:item.captured_at,
+    verification_status:item.verification_status,
+    reviewer_attributed:Boolean(item.verified_by_auth_user_id),
+    verified_at:item.verified_at,
+    created_at:item.created_at
+   }));
   }
   return reply(200,{ready:true,trackers:trackers??[],items,masterTargets:masterTargets??[],
    parentApplications,masterEvents:masterEvents??[],applicationEvents:applicationEvents??[],applicationEvidence,
