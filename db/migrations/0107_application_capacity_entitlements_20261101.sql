@@ -157,7 +157,7 @@ RETURNS jsonb LANGUAGE plpgsql SECURITY DEFINER
 SET search_path TO 'pg_catalog','public','kingsmen_security','auth'
 AS $function$
 DECLARE
-  v_uid uuid:=auth.uid(); v_candidate uuid; v_public_ref text; v_now timestamptz:=clock_timestamp();
+  v_uid uuid:=auth.uid(); v_candidate uuid; v_public_ref text; v_candidate_ref text; v_now timestamptz:=clock_timestamp();
   v_order record; v_priority_used integer:=0; v_managed_used integer:=0;
   v_priority_limit integer:=0; v_managed_limit integer:=0; v_cv_owned boolean:=false;
   v_reservations jsonb:='[]'::jsonb;
@@ -165,6 +165,7 @@ BEGIN
   IF v_uid IS NULL THEN RAISE EXCEPTION 'AUTHENTICATED_CANDIDATE_REQUIRED' USING ERRCODE='42501'; END IF;
   v_candidate:=kingsmen_security.current_verified_capacity_candidate_id();
   IF v_candidate IS NULL THEN RAISE EXCEPTION 'VERIFIED_CANDIDATE_IDENTITY_REQUIRED' USING ERRCODE='42501'; END IF;
+  v_candidate_ref:=v_candidate::text;
   SELECT c.public_ref::text INTO v_public_ref FROM public.candidates c
     WHERE c.id=v_candidate AND c.is_active IS TRUE;
   IF v_public_ref IS NULL THEN RAISE EXCEPTION 'ACTIVE_CANDIDATE_REQUIRED' USING ERRCODE='42501'; END IF;
@@ -180,7 +181,7 @@ BEGIN
     FROM public.finance_payments p WHERE p.order_ref=fo.order_ref AND p.candidate_ref=fo.candidate_ref AND p.provider='PAYFAST'
     ORDER BY p.created_at DESC,p.payment_ref DESC LIMIT 1
   ) fp ON true
-  WHERE fo.candidate_ref=v_public_ref AND fo.order_status='PAID' AND fo.currency='ZAR'
+  WHERE fo.candidate_ref=v_candidate_ref AND fo.order_status='PAID' AND fo.currency='ZAR'
     AND fo.priority_application_count IS NOT NULL
     AND fo.entitlement_policy_version='KINGSMEN_CAPACITY_2026_11_01_V1'
     AND fo.service_term_days>0 AND fp.payment_status='COMPLETE' AND fp.verified IS TRUE
@@ -213,7 +214,7 @@ BEGIN
       FROM public.finance_payments p WHERE p.order_ref=cv.order_ref AND p.candidate_ref=cv.candidate_ref AND p.provider='PAYFAST'
       ORDER BY p.created_at DESC,p.payment_ref DESC LIMIT 1
     ) cvp ON true
-    WHERE cv.candidate_ref=v_public_ref AND cv.plan_code='CV_REVAMP_R49_99'
+    WHERE cv.candidate_ref=v_candidate_ref AND cv.plan_code='CV_REVAMP_R49_99'
       AND cv.order_status='PAID' AND cvp.payment_status='COMPLETE' AND cvp.verified IS TRUE
       AND cvp.amount_gross_cents=cv.amount_cents AND cvp.currency='ZAR'
       AND cvp.verified_at IS NOT NULL AND cvp.verified_at<=v_order.verified_at
@@ -340,7 +341,7 @@ BEGIN
   -- Hold the verified order and latest PayFast payment state stable until this
   -- reservation commits. A concurrent refund/dispute cannot race capacity allocation.
   PERFORM fo.order_ref FROM public.finance_orders fo
-   WHERE fo.order_ref=v_order_ref AND fo.candidate_ref=v_public_ref
+   WHERE fo.order_ref=v_order_ref AND fo.candidate_ref=v_candidate::text
      AND fo.order_status='PAID' AND fo.entitlement_policy_version='KINGSMEN_CAPACITY_2026_11_01_V1'
    FOR SHARE;
   IF NOT FOUND THEN
@@ -348,7 +349,7 @@ BEGIN
   END IF;
   PERFORM fp.payment_ref FROM public.finance_payments fp
    WHERE fp.payment_ref=v_payment_ref AND fp.order_ref=v_order_ref
-     AND fp.candidate_ref=v_public_ref AND fp.provider='PAYFAST'
+     AND fp.candidate_ref=v_candidate::text AND fp.provider='PAYFAST'
      AND fp.payment_status='COMPLETE' AND fp.verified IS TRUE
      AND fp.currency='ZAR'
      AND fp.amount_gross_cents=(
