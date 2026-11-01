@@ -1,6 +1,6 @@
 import "jsr:@supabase/functions-js/edge-runtime.d.ts";
 import { createClient } from "npm:@supabase/supabase-js@2";
-import { deriveN13RuntimeHealthStatus } from "./policy.mjs";
+import { deriveN13RuntimeHealthStatus, projectN13FounderSnapshot } from "./policy.mjs";
 
 // Deployment contract: this founder-only function must be published with verify_jwt=true.
 
@@ -118,7 +118,7 @@ function metric(
     warning_threshold: warningThreshold,
     critical_threshold: criticalThreshold,
     status,
-    tags,
+    tags: { ...tags, data_available: available },
     sampled_at: new Date().toISOString()
   };
 }
@@ -142,7 +142,7 @@ async function readLatest(admin: any, req: Request): Promise<Response> {
     status: snapshots?.[0]?.status ?? "UNKNOWN",
     coverage: "PARTIAL",
     productionReady: false,
-    latestSnapshot: snapshots?.[0] ?? null,
+    latestSnapshot: projectN13FounderSnapshot(snapshots?.[0] ?? null),
     serviceChecks: services ?? [],
     sourceOfTruth: "Supabase PostgreSQL",
     note: "Only Supabase Auth and PostgreSQL are verified by this capture. External provider and delivery health is not inferred."
@@ -259,9 +259,14 @@ async function capture(admin: any, req: Request, actorRef: string): Promise<Resp
     "aggregate-count-queries:" + observedAt,
     "founder-actor:" + actorRef
   ];
+  const unavailableMetrics = Object.entries(metrics)
+    .filter(([, item]) => !item.available)
+    .map(([name]) => name)
+    .sort();
   const summary = dataComplete
     ? "PARTIAL OBSERVATION: Supabase Auth and PostgreSQL responded. External provider, email, Netlify, worker and backup health are not probed; GREEN is withheld until coverage is complete."
-    : "OBSERVATION INCOMPLETE: one or more aggregate database queries failed. Health remains UNKNOWN; failed query values are not treated as zero.";
+    : "OBSERVATION INCOMPLETE: unavailable aggregate reads: " + unavailableMetrics.join(", ") +
+      ". Health remains UNKNOWN. The legacy snapshot table requires non-null integer counters; stored zero placeholders are not measured zeroes and are suppressed in the Founder read model.";
 
   const snapshot = {
     snapshot_ref: snapshotRef,
@@ -356,24 +361,27 @@ async function capture(admin: any, req: Request, actorRef: string): Promise<Resp
     capturedAt: observedAt,
     captureDurationMs: elapsedMs,
     aggregateMetrics: {
-      activeCandidates: active,
+      activeCandidates: activeCandidates.available ? active : null,
       activeCandidateCap: ACTIVE_CANDIDATE_CAP,
-      pendingWorkflows: pendingWorkflows.count,
-      failedWorkflows: failedWorkflows.count,
-      pendingDocuments: pendingDocuments.count,
-      manualFallbackBacklog: manualFallbackBacklog.count,
-      paymentPending: paymentPending.count,
-      sourceReviewBacklog: sourceReviewBacklog.count,
-      openIncidents: openIncidents.count,
-      deadLetters: deadLetters.count + airtableDeadLettered.count,
+      pendingWorkflows: pendingWorkflows.available ? pendingWorkflows.count : null,
+      failedWorkflows: failedWorkflows.available ? failedWorkflows.count : null,
+      pendingDocuments: pendingDocuments.available ? pendingDocuments.count : null,
+      manualFallbackBacklog: manualFallbackBacklog.available ? manualFallbackBacklog.count : null,
+      paymentPending: paymentPending.available ? paymentPending.count : null,
+      sourceReviewBacklog: sourceReviewBacklog.available ? sourceReviewBacklog.count : null,
+      openIncidents: openIncidents.available ? openIncidents.count : null,
+      deadLetters: deadLetters.available && airtableDeadLettered.available
+        ? deadLetters.count + airtableDeadLettered.count
+        : null,
       airtableOutbox: {
-        pending: airtablePending.count,
-        locked: airtableLocked.count,
-        failed: airtableFailed.count,
-        deadLettered: airtableDeadLettered.count
+        pending: airtablePending.available ? airtablePending.count : null,
+        locked: airtableLocked.available ? airtableLocked.count : null,
+        failed: airtableFailed.available ? airtableFailed.count : null,
+        deadLettered: airtableDeadLettered.available ? airtableDeadLettered.count : null
       }
     },
     dataErrors,
+    unavailableMetrics,
     note: summary
   });
 }
