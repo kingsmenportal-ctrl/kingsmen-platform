@@ -28,18 +28,6 @@ function json(req: Request, body: unknown, status = 200): Response {
   return new Response(JSON.stringify(body), { status, headers: responseHeaders(req) });
 }
 
-function tokenRole(req: Request): string {
-  const token = (req.headers.get("authorization") ?? "").replace(/^Bearer\s+/i, "");
-  try {
-    const payload = token.split(".")[1];
-    if (!payload) return "";
-    const normalized = payload.replace(/-/g, "+").replace(/_/g, "/");
-    return JSON.parse(atob(normalized)).role ?? "";
-  } catch {
-    return "";
-  }
-}
-
 async function authorizeFounder(req: Request, url: string, anonKey: string, admin: any) {
   const bearer = (req.headers.get("authorization") ?? "").replace(/^Bearer\s+/i, "");
   if (!bearer) return { ok: false, status: 401, reason: "UNAUTHENTICATED" };
