@@ -434,11 +434,35 @@ BEGIN
       'reservation_status','RELEASED','message','This capacity reservation was already released.');
   END IF;
 
+  -- Take an exclusive parent-row lock. Submission jobs reference the application
+  -- through a foreign key (KEY SHARE), so this serializes release against new job creation.
   SELECT ca.status INTO v_status FROM public.candidate_applications ca
-   WHERE ca.id=v_reservation.application_id AND ca.candidate_id=v_candidate FOR SHARE;
+   WHERE ca.id=v_reservation.application_id AND ca.candidate_id=v_candidate FOR UPDATE;
   IF NOT FOUND OR v_status NOT IN ('DRAFT','READINESS_BLOCKED','READY_FOR_REVIEW','READY_TO_SUBMIT') THEN
     RETURN jsonb_build_object('ok',false,'code','CAPACITY_RELEASE_NOT_ALLOWED',
       'message','Capacity cannot be released after provider submission or outcome processing has started.');
+  END IF;
+
+  -- Parent status alone is insufficient: a submission job/event can exist while the
+  -- parent still has an editable status. Once downstream submission work is recorded,
+  -- keep the capacity reserved for auditability and to prevent an unmetered dispatch.
+  IF EXISTS (
+    SELECT 1 FROM public.candidate_application_submission_jobs sj
+    WHERE sj.application_id=v_reservation.application_id
+      AND sj.candidate_id=v_candidate
+  ) OR EXISTS (
+    SELECT 1 FROM public.candidate_application_events ae
+    WHERE ae.application_id=v_reservation.application_id
+      AND ae.candidate_id=v_candidate
+      AND ae.event_type IN (
+        'SUBMISSION_AUTHORIZED','SUBMISSION_ATTEMPT_CREATED','SUBMISSION_DISPATCHED',
+        'PROVIDER_ACKNOWLEDGED','PROVIDER_STATUS_RECORDED','PROVIDER_OUTCOME_RECORDED',
+        'REVIEW_DECISION_RECORDED','OUTCOME_RECORDED','OUTCOME_DISPUTED',
+        'OUTCOME_CORRECTION_DECIDED','OUTCOME_SUPERSEDED'
+      )
+  ) THEN
+    RETURN jsonb_build_object('ok',false,'code','CAPACITY_RELEASE_NOT_ALLOWED',
+      'message','Capacity cannot be released while a submission job or submission/outcome event exists. Contact Kingsmen support for a reviewed correction.');
   END IF;
 
   UPDATE public.candidate_application_capacity_reservations
