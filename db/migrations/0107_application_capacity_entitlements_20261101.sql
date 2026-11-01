@@ -227,7 +227,7 @@ BEGIN
          count(*) FILTER (WHERE r.usage_type='MANAGED_ROUTE')::integer
     INTO v_priority_used,v_managed_used
   FROM public.candidate_application_capacity_reservations r
-  WHERE r.candidate_id=v_candidate AND r.entitlement_order_ref=v_order.order_ref
+  WHERE r.candidate_id=v_candidate
     AND r.reservation_status='RESERVED' AND r.period_expires_at>v_now;
 
   SELECT coalesce(jsonb_agg(jsonb_build_object(
