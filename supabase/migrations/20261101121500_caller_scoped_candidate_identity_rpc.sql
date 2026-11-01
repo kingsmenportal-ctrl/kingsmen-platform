@@ -105,3 +105,5 @@ $function$;
 REVOKE ALL ON FUNCTION public.resolve_my_candidate_identity() FROM PUBLIC;
 REVOKE ALL ON FUNCTION public.resolve_my_candidate_identity() FROM anon;
 GRANT EXECUTE ON FUNCTION public.resolve_my_candidate_identity() TO authenticated;
+
+-- Contract coverage was extended to assert both RLS ownership helpers use this verified link.
