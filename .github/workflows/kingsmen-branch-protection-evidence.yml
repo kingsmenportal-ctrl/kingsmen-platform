@@ -27,16 +27,16 @@ jobs:
 
       - name: Verify protection using dedicated read-only GitHub token
         env:
-          GITHUB_REPOSITORY: ${ github.repository }}
-          GITHUB_TOKEN: ${ secrets.KINGSMEN_BRANCH_PROTECTION_READ_TOKEN }}
-          GITHUB_API_URL: ${ github.api_url }}
+          GITHUB_REPOSITORY: ${{ github.repository }}
+          GITHUB_TOKEN: ${{ secrets.KINGSMEN_BRANCH_PROTECTION_READ_TOKEN }}
+          GITHUB_API_URL: ${{ github.api_url }}
         run: node scripts/ci/capture-main-branch-protection.mjs
 
       - name: Upload redacted protection evidence
         if: always()
         uses: actions/upload-artifact@v4
         with:
-          name: kingsmen-main-branch-protection-${ github.run_id }}
+          name: kingsmen-main-branch-protection-${{ github.run_id }}
           path: reports/repo/main-branch-protection-apply-latest.json
           if-no-files-found: error
           retention-days: 14
