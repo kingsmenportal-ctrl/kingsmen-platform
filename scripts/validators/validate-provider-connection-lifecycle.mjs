@@ -177,7 +177,7 @@ for (const alias of [
 assert.equal(evaluateProviderConnectionLifecycle({
   ...verified,
   provider_metadata: { auth: { clientSecret: "plaintext-provider-secret" } }
-}, { asOf }).state, "C0_NOT_CONNECTED", "Raw credential aliases anywhere in the provider record must fail closed");
+}, { asOf }).state, "C2_TERMS_APPROVED", "Raw credential aliases anywhere in the provider record must block connector configuration");
 
 assert.equal(evaluateProviderConnectionLifecycle({
   ...verified,
