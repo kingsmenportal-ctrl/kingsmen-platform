@@ -45,7 +45,7 @@ function parseStrictIsoDateTime(value: string): number {
   }
 
   const timestamp = Date.parse(value);
-  if (!Number.isFinite(timestamp)) throw new Error("expiresAt must be a valid date-time.");
+  if (!Number.isFinite(timestamp)) throw new Error("expiresAt must be a valid ISO 8601 calendar date-time.");
   return timestamp;
 }
 
