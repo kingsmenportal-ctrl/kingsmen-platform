@@ -1,0 +1,330 @@
+{
+  "schema": "kingsmen.institutions.cross-sector-capability-coverage.v1",
+  "country": "ZA",
+  "researched_at": "2026-10-31",
+  "purpose": "Explicit mapping between Kingsmen service-capability vocabulary and source anchors. This is a discovery/coverage control, not proof of a live service, open opportunity, eligibility, partnership, integration or outcome.",
+  "defaults": {
+    "coverage_state": "DISCOVERY_ONLY",
+    "route_state": "NOT_CONNECTED",
+    "public_safe": false,
+    "review_required": true
+  },
+  "evidence_states": [
+    "DISCOVERY_ONLY",
+    "AUTHORISED_PROVIDER_REQUIRED",
+    "SOURCE_GAP"
+  ],
+  "capabilities": [
+    {
+      "capability": "HIGHER_EDUCATION",
+      "source_ids": [
+        "dhet_skills_seta_qcto_saqa"
+      ],
+      "coverage_state": "DISCOVERY_ONLY",
+      "route_state": "NOT_CONNECTED",
+      "public_safe": false,
+      "review_required": true,
+      "evidence_required": [
+        "exact source observation",
+        "retrieved_at timestamp",
+        "source publication/update date where available",
+        "scope and freshness check",
+        "human review"
+      ],
+      "limitations": "DHET/skills authority anchor; exact institution and current programme status require register-level evidence."
+    },
+    {
+      "capability": "TVET",
+      "source_ids": [
+        "dhet_skills_seta_qcto_saqa"
+      ],
+      "coverage_state": "DISCOVERY_ONLY",
+      "route_state": "NOT_CONNECTED",
+      "public_safe": false,
+      "review_required": true,
+      "evidence_required": [
+        "exact source observation",
+        "retrieved_at timestamp",
+        "source publication/update date where available",
+        "scope and freshness check",
+        "human review"
+      ],
+      "limitations": "Use the exact official TVET register/list; do not infer current intake."
+    },
+    {
+      "capability": "SETA_LEARNERSHIPS",
+      "source_ids": [
+        "dhet_skills_seta_qcto_saqa"
+      ],
+      "coverage_state": "DISCOVERY_ONLY",
+      "route_state": "NOT_CONNECTED",
+      "public_safe": false,
+      "review_required": true,
+      "evidence_required": [
+        "exact source observation",
+        "retrieved_at timestamp",
+        "source publication/update date where available",
+        "scope and freshness check",
+        "human review"
+      ],
+      "limitations": "SETA/occupational source discovery only; provider delivery and intake need separate proof."
+    },
+    {
+      "capability": "INTERNSHIPS",
+      "source_ids": [
+        "dpsa_vacancies",
+        "job_portal_provider_authorized"
+      ],
+      "coverage_state": "DISCOVERY_ONLY",
+      "route_state": "NOT_CONNECTED",
+      "public_safe": false,
+      "review_required": true,
+      "evidence_required": [
+        "exact source observation",
+        "retrieved_at timestamp",
+        "source publication/update date where available",
+        "scope and freshness check",
+        "human review"
+      ],
+      "limitations": "Exact employer notice or authorised feed required; aggregator alone is insufficient."
+    },
+    {
+      "capability": "APPRENTICESHIPS",
+      "source_ids": [
+        "dhet_skills_seta_qcto_saqa",
+        "job_portal_provider_authorized"
+      ],
+      "coverage_state": "DISCOVERY_ONLY",
+      "route_state": "NOT_CONNECTED",
+      "public_safe": false,
+      "review_required": true,
+      "evidence_required": [
+        "exact source observation",
+        "retrieved_at timestamp",
+        "source publication/update date where available",
+        "scope and freshness check",
+        "human review"
+      ],
+      "limitations": "Qualification/provider pairing and live intake require independent evidence."
+    },
+    {
+      "capability": "EMPLOYMENT",
+      "source_ids": [
+        "dpsa_vacancies",
+        "sars_official",
+        "eskom_official",
+        "job_portal_provider_authorized"
+      ],
+      "coverage_state": "DISCOVERY_ONLY",
+      "route_state": "NOT_CONNECTED",
+      "public_safe": false,
+      "review_required": true,
+      "evidence_required": [
+        "exact source observation",
+        "retrieved_at timestamp",
+        "source publication/update date where available",
+        "scope and freshness check",
+        "human review"
+      ],
+      "limitations": "Current employer notice, deadline, eligibility and official application route must be verified per vacancy."
+    },
+    {
+      "capability": "FUNDING",
+      "source_ids": [
+        "sassa_official",
+        "nyda_official",
+        "fsca_financial_registers"
+      ],
+      "coverage_state": "DISCOVERY_ONLY",
+      "route_state": "NOT_CONNECTED",
+      "public_safe": false,
+      "review_required": true,
+      "evidence_required": [
+        "exact source observation",
+        "retrieved_at timestamp",
+        "source publication/update date where available",
+        "scope and freshness check",
+        "human review"
+      ],
+      "limitations": "These anchors have different scopes; no grant/bursary or personal eligibility is implied."
+    },
+    {
+      "capability": "ACCOMMODATION",
+      "source_ids": [
+        "housing_human_settlements",
+        "accommodation_provider_direct"
+      ],
+      "coverage_state": "DISCOVERY_ONLY",
+      "route_state": "NOT_CONNECTED",
+      "public_safe": false,
+      "review_required": true,
+      "evidence_required": [
+        "exact source observation",
+        "retrieved_at timestamp",
+        "source publication/update date where available",
+        "scope and freshness check",
+        "human review"
+      ],
+      "limitations": "Specific provider, current availability, location and terms need direct evidence."
+    },
+    {
+      "capability": "HEALTH_AND_CARE",
+      "source_ids": [
+        "health_department_directory",
+        "hpcsa_professional_register"
+      ],
+      "coverage_state": "DISCOVERY_ONLY",
+      "route_state": "NOT_CONNECTED",
+      "public_safe": false,
+      "review_required": true,
+      "evidence_required": [
+        "exact source observation",
+        "retrieved_at timestamp",
+        "source publication/update date where available",
+        "scope and freshness check",
+        "human review"
+      ],
+      "limitations": "Directory/professional register evidence does not establish facility licensing or appointment availability."
+    },
+    {
+      "capability": "SOCIAL_SUPPORT",
+      "source_ids": [
+        "sassa_official",
+        "dsd_npo_register",
+        "govza_thusong_centres"
+      ],
+      "coverage_state": "DISCOVERY_ONLY",
+      "route_state": "NOT_CONNECTED",
+      "public_safe": false,
+      "review_required": true,
+      "evidence_required": [
+        "exact source observation",
+        "retrieved_at timestamp",
+        "source publication/update date where available",
+        "scope and freshness check",
+        "human review"
+      ],
+      "limitations": "Service presence and case eligibility/outcome require service-specific verification."
+    },
+    {
+      "capability": "TRANSPORT",
+      "source_ids": [
+        "transport_department"
+      ],
+      "coverage_state": "DISCOVERY_ONLY",
+      "route_state": "NOT_CONNECTED",
+      "public_safe": false,
+      "review_required": true,
+      "evidence_required": [
+        "exact source observation",
+        "retrieved_at timestamp",
+        "source publication/update date where available",
+        "scope and freshness check",
+        "human review"
+      ],
+      "limitations": "Sector discovery only; routes, schedules, fares and personal entitlement need current evidence."
+    },
+    {
+      "capability": "LEGAL_SUPPORT",
+      "source_ids": [
+        "legal_aid_south_africa",
+        "govza_thusong_centres"
+      ],
+      "coverage_state": "DISCOVERY_ONLY",
+      "route_state": "NOT_CONNECTED",
+      "public_safe": false,
+      "review_required": true,
+      "evidence_required": [
+        "exact source observation",
+        "retrieved_at timestamp",
+        "source publication/update date where available",
+        "scope and freshness check",
+        "human review"
+      ],
+      "limitations": "Service information only; case acceptance, eligibility and legal outcome are not implied."
+    },
+    {
+      "capability": "PUBLIC_SERVICE",
+      "source_ids": [
+        "govza_national_departments",
+        "dpsa_vacancies",
+        "gcis_national_institution_directory"
+      ],
+      "coverage_state": "DISCOVERY_ONLY",
+      "route_state": "NOT_CONNECTED",
+      "public_safe": false,
+      "review_required": true,
+      "evidence_required": [
+        "exact source observation",
+        "retrieved_at timestamp",
+        "source publication/update date where available",
+        "scope and freshness check",
+        "human review"
+      ],
+      "limitations": "Entity listing and vacancy notices are distinct evidence types."
+    },
+    {
+      "capability": "BUSINESS_REGISTRATION",
+      "source_ids": [
+        "cipc_company_registry"
+      ],
+      "coverage_state": "DISCOVERY_ONLY",
+      "route_state": "NOT_CONNECTED",
+      "public_safe": false,
+      "review_required": true,
+      "evidence_required": [
+        "exact source observation",
+        "retrieved_at timestamp",
+        "source publication/update date where available",
+        "scope and freshness check",
+        "human review"
+      ],
+      "limitations": "Exact CIPC record required; homepage alone does not verify a business."
+    },
+    {
+      "capability": "FINANCIAL_SERVICES",
+      "source_ids": [
+        "fsca_financial_registers",
+        "sarbs_regulated_entities"
+      ],
+      "coverage_state": "DISCOVERY_ONLY",
+      "route_state": "NOT_CONNECTED",
+      "public_safe": false,
+      "review_required": true,
+      "evidence_required": [
+        "exact source observation",
+        "retrieved_at timestamp",
+        "source publication/update date where available",
+        "scope and freshness check",
+        "human review"
+      ],
+      "limitations": "Use the exact relevant register and entity record; no endorsement or personal financial eligibility implied."
+    },
+    {
+      "capability": "TECHNOLOGY_INTEGRATION",
+      "source_ids": [
+        "technology_vendor_contract"
+      ],
+      "coverage_state": "AUTHORISED_PROVIDER_REQUIRED",
+      "route_state": "NOT_CONNECTED",
+      "public_safe": false,
+      "review_required": true,
+      "evidence_required": [
+        "exact source observation",
+        "retrieved_at timestamp",
+        "source publication/update date where available",
+        "scope and freshness check",
+        "human review"
+      ],
+      "limitations": "Provider-specific official source, contract/terms, credential scope, security review and runtime test are prerequisites."
+    }
+  ],
+  "promotion_rules": [
+    "A source anchor is not a provider row, service record, programme, open intake or connected route.",
+    "Never promote a capability to public-safe solely because source_ids is non-empty.",
+    "A live opportunity requires an exact official notice, current status, timezone-aware deadline where applicable, eligibility evidence, official application URL and freshness review.",
+    "A provider connection requires explicit authorization, terms/access review, least-privilege credentials, runtime contract tests and monitoring.",
+    "Candidate-reported submission, provider-confirmed receipt and confirmed outcome are distinct states.",
+    "If source identity, scope, freshness or eligibility evidence conflicts or is missing, fail closed and queue human review."
+  ]
+}
