@@ -41,6 +41,7 @@ function blockedChecks(reason) {
   return {
     requiredStatusChecksEnabled: false,
     sourceGuardRequired: false,
+    releaseEvidenceRequired: false,
     strictStatusChecksEnabled: false,
     pullRequestReviewRequired: false,
     staleReviewsDismissed: false,
