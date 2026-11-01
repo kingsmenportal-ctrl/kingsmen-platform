@@ -1,0 +1,611 @@
+{
+  "schema": "kingsmen.institutions.cross-sector-source-extension.v1",
+  "country": "ZA",
+  "researched_at": "2026-10-31",
+  "purpose": "Extend the canonical national institution source registry beyond education. This file defines discovery anchors only; it does not create provider rows, claim partnerships, publish opportunities, or activate connectors.",
+  "integration_contract": {
+    "registry_strategy": "EXTEND_EXISTING_CANONICAL_INSTITUTION_REGISTRY",
+    "create_parallel_registry": false,
+    "default_record_state": "NEEDS_REVIEW",
+    "default_public_safe": false,
+    "default_connector_state": "NOT_CONNECTED",
+    "official_source_required": true,
+    "source_observation_timestamp_required": true,
+    "provider_identity_verification_required": true,
+    "live_service_verification_required": true,
+    "partner_claim_requires_explicit_agreement": true,
+    "submission_claim_requires_provider_receipt": true,
+    "stale_or_conflicting_evidence": "SUPPRESS_PUBLIC_CLAIM_AND_QUEUE_HUMAN_REVIEW",
+    "candidate_application_model": "ONE_KINGSMEN_PROFILE_WITH_DESTINATION_SPECIFIC_CHILD_REQUESTS",
+    "privacy_controls": [
+      "POPIA purpose limitation and minimisation",
+      "least privilege and RLS",
+      "candidate A/B isolation",
+      "audit trail",
+      "retention controls",
+      "fail closed"
+    ]
+  },
+  "institution_classes": [
+    "PUBLIC_ADMINISTRATION",
+    "MUNICIPALITY",
+    "STATE_OWNED_ENTERPRISE",
+    "PUBLIC_ENTITY",
+    "EDUCATION_AND_SKILLS",
+    "HEALTH_AND_CARE",
+    "EMPLOYER_AND_RECRUITMENT",
+    "FUNDING_AND_SOCIAL_SUPPORT",
+    "FINANCE_AND_INSURANCE",
+    "HOUSING_AND_ACCOMMODATION",
+    "TRANSPORT_AND_ESSENTIAL_SERVICES",
+    "LEGAL_AID_AND_COMMUNITY_SERVICES",
+    "NGO_NPO_AND_FOUNDATION",
+    "REGULATOR_AND_PROFESSIONAL_COUNCIL",
+    "TECHNOLOGY_AND_DELIVERY_VENDOR"
+  ],
+  "service_capabilities": [
+    "HIGHER_EDUCATION",
+    "TVET",
+    "SETA_LEARNERSHIPS",
+    "INTERNSHIPS",
+    "APPRENTICESHIPS",
+    "EMPLOYMENT",
+    "FUNDING",
+    "ACCOMMODATION",
+    "HEALTH_AND_CARE",
+    "SOCIAL_SUPPORT",
+    "TRANSPORT",
+    "LEGAL_SUPPORT",
+    "PUBLIC_SERVICE",
+    "BUSINESS_REGISTRATION",
+    "FINANCIAL_SERVICES",
+    "TECHNOLOGY_INTEGRATION"
+  ],
+  "sources": [
+    {
+      "source_id": "gcis_national_institution_directory",
+      "name": "South African Government / GCIS Contact Directory",
+      "authority": "Government Communication and Information System",
+      "url": "https://www.gov.za/about-government/contact-directory",
+      "classes": [
+        "PUBLIC_ADMINISTRATION",
+        "MUNICIPALITY",
+        "STATE_OWNED_ENTERPRISE",
+        "PUBLIC_ENTITY",
+        "REGULATOR_AND_PROFESSIONAL_COUNCIL",
+        "NGO_NPO_AND_FOUNDATION"
+      ],
+      "supports": [
+        "official directory discovery and published contact-profile evidence for entries in scope"
+      ],
+      "does_not_prove": [
+        "current service availability",
+        "programme or job intake",
+        "eligibility",
+        "contract or partnership",
+        "integration",
+        "submission or outcome"
+      ],
+      "refresh_after_days": 30,
+      "review_required": true,
+      "connector_state": "NOT_CONNECTED"
+    },
+    {
+      "source_id": "govza_national_departments",
+      "name": "South African Government National Government Directory",
+      "authority": "Government Communication and Information System",
+      "url": "https://www.gov.za/about-government/contact-directory/national-government",
+      "classes": [
+        "PUBLIC_ADMINISTRATION",
+        "PUBLIC_ENTITY",
+        "REGULATOR_AND_PROFESSIONAL_COUNCIL"
+      ],
+      "supports": [
+        "government body identity and directory listing"
+      ],
+      "does_not_prove": [
+        "individual service eligibility",
+        "current vacancies",
+        "case status",
+        "integration",
+        "partnership"
+      ],
+      "refresh_after_days": 30,
+      "review_required": true,
+      "connector_state": "NOT_CONNECTED"
+    },
+    {
+      "source_id": "govza_local_government",
+      "name": "South African Government Local Government information",
+      "authority": "Department of Cooperative Governance / South African Government",
+      "url": "https://www.gov.za/about-government/government-system/local-government",
+      "classes": [
+        "MUNICIPALITY",
+        "PUBLIC_ENTITY"
+      ],
+      "supports": [
+        "local-government structure and municipality category context"
+      ],
+      "does_not_prove": [
+        "current municipal contact details",
+        "service availability in a ward",
+        "open jobs",
+        "application receipt"
+      ],
+      "refresh_after_days": 90,
+      "review_required": true,
+      "connector_state": "NOT_CONNECTED"
+    },
+    {
+      "source_id": "treasury_municipal_money",
+      "name": "National Treasury Municipal Money",
+      "authority": "National Treasury",
+      "url": "https://municipalmoney.gov.za/",
+      "classes": [
+        "MUNICIPALITY",
+        "PUBLIC_ENTITY"
+      ],
+      "supports": [
+        "municipal identity and published municipal finance/service context where available"
+      ],
+      "does_not_prove": [
+        "live service request",
+        "current vacancies",
+        "provider agreement",
+        "case outcome"
+      ],
+      "refresh_after_days": 90,
+      "review_required": true,
+      "connector_state": "NOT_CONNECTED"
+    },
+    {
+      "source_id": "dpsa_vacancies",
+      "name": "Department of Public Service and Administration vacancies",
+      "authority": "Department of Public Service and Administration",
+      "url": "https://www.dpsa.gov.za/newsroom/psvc/",
+      "classes": [
+        "PUBLIC_ADMINISTRATION",
+        "PUBLIC_ENTITY"
+      ],
+      "supports": [
+        "vacancy source leads within the publication's scope after each notice is checked"
+      ],
+      "does_not_prove": [
+        "current open vacancy without notice-level validation",
+        "candidate eligibility",
+        "application receipt",
+        "appointment"
+      ],
+      "refresh_after_days": 7,
+      "review_required": true,
+      "connector_state": "NOT_CONNECTED"
+    },
+    {
+      "source_id": "dbe_school_emis",
+      "name": "Department of Basic Education school/EMIS information",
+      "authority": "Department of Basic Education",
+      "url": "https://www.education.gov.za/Programmes/EMIS.aspx",
+      "classes": [
+        "EDUCATION_AND_SKILLS"
+      ],
+      "supports": [
+        "school-directory discovery and source-listed identity"
+      ],
+      "does_not_prove": [
+        "current admission availability",
+        "accreditation beyond register scope",
+        "open employment",
+        "partnership"
+      ],
+      "refresh_after_days": 90,
+      "review_required": true,
+      "connector_state": "NOT_CONNECTED"
+    },
+    {
+      "source_id": "cipc_company_registry",
+      "name": "Companies and Intellectual Property Commission",
+      "authority": "Companies and Intellectual Property Commission",
+      "url": "https://www.cipc.co.za/",
+      "classes": [
+        "EMPLOYER_AND_RECRUITMENT",
+        "NGO_NPO_AND_FOUNDATION",
+        "HOUSING_AND_ACCOMMODATION",
+        "TECHNOLOGY_AND_DELIVERY_VENDOR"
+      ],
+      "supports": [
+        "company-registration lookup route and company identity evidence when exact record is checked"
+      ],
+      "does_not_prove": [
+        "good standing beyond returned evidence",
+        "active hiring",
+        "solvency",
+        "service quality",
+        "partnership"
+      ],
+      "refresh_after_days": 30,
+      "review_required": true,
+      "connector_state": "NOT_CONNECTED"
+    },
+    {
+      "source_id": "dhet_skills_seta_qcto_saqa",
+      "name": "DHET, SETA, QCTO and SAQA official registries",
+      "authority": "Relevant education and occupational-skills authorities",
+      "url": "https://www.dhet.gov.za/",
+      "classes": [
+        "EDUCATION_AND_SKILLS",
+        "EMPLOYER_AND_RECRUITMENT",
+        "REGULATOR_AND_PROFESSIONAL_COUNCIL"
+      ],
+      "supports": [
+        "source discovery for registered institutions, qualifications and occupational-provider registers"
+      ],
+      "does_not_prove": [
+        "a particular provider currently delivers a qualification",
+        "current intake",
+        "candidate eligibility",
+        "partnership"
+      ],
+      "refresh_after_days": 30,
+      "review_required": true,
+      "connector_state": "NOT_CONNECTED"
+    },
+    {
+      "source_id": "health_department_directory",
+      "name": "National Department of Health",
+      "authority": "National Department of Health",
+      "url": "https://www.health.gov.za/",
+      "classes": [
+        "HEALTH_AND_CARE",
+        "PUBLIC_ADMINISTRATION"
+      ],
+      "supports": [
+        "official health-sector directory/source discovery"
+      ],
+      "does_not_prove": [
+        "facility licensing status without exact register evidence",
+        "live appointment availability",
+        "individual medical eligibility",
+        "integration"
+      ],
+      "refresh_after_days": 30,
+      "review_required": true,
+      "connector_state": "NOT_CONNECTED"
+    },
+    {
+      "source_id": "hpcsa_professional_register",
+      "name": "Health Professions Council of South Africa",
+      "authority": "HPCSA",
+      "url": "https://www.hpcsa.co.za/",
+      "classes": [
+        "HEALTH_AND_CARE",
+        "REGULATOR_AND_PROFESSIONAL_COUNCIL"
+      ],
+      "supports": [
+        "professional registration verification where an exact official register result is available"
+      ],
+      "does_not_prove": [
+        "facility registration",
+        "current employment",
+        "service availability",
+        "endorsement"
+      ],
+      "refresh_after_days": 30,
+      "review_required": true,
+      "connector_state": "NOT_CONNECTED"
+    },
+    {
+      "source_id": "sassa_official",
+      "name": "South African Social Security Agency",
+      "authority": "SASSA",
+      "url": "https://www.sassa.gov.za/",
+      "classes": [
+        "FUNDING_AND_SOCIAL_SUPPORT",
+        "PUBLIC_ADMINISTRATION"
+      ],
+      "supports": [
+        "official social-support service information and application channel discovery"
+      ],
+      "does_not_prove": [
+        "individual eligibility",
+        "grant approval",
+        "payment",
+        "case status"
+      ],
+      "refresh_after_days": 14,
+      "review_required": true,
+      "connector_state": "NOT_CONNECTED"
+    },
+    {
+      "source_id": "nyda_official",
+      "name": "National Youth Development Agency",
+      "authority": "NYDA",
+      "url": "https://www.nyda.gov.za/",
+      "classes": [
+        "FUNDING_AND_SOCIAL_SUPPORT",
+        "EMPLOYER_AND_RECRUITMENT"
+      ],
+      "supports": [
+        "published youth-development programme and service leads after notice-level review"
+      ],
+      "does_not_prove": [
+        "current funding window",
+        "eligibility",
+        "award",
+        "cash received",
+        "partnership"
+      ],
+      "refresh_after_days": 14,
+      "review_required": true,
+      "connector_state": "NOT_CONNECTED"
+    },
+    {
+      "source_id": "dsd_npo_register",
+      "name": "Department of Social Development NPO services",
+      "authority": "Department of Social Development",
+      "url": "https://www.dsd.gov.za/",
+      "classes": [
+        "NGO_NPO_AND_FOUNDATION",
+        "FUNDING_AND_SOCIAL_SUPPORT"
+      ],
+      "supports": [
+        "official NPO registration lookup route where the current register is accessible and exact record is checked"
+      ],
+      "does_not_prove": [
+        "operational quality",
+        "current funding",
+        "active services",
+        "endorsement"
+      ],
+      "refresh_after_days": 30,
+      "review_required": true,
+      "connector_state": "NOT_CONNECTED"
+    },
+    {
+      "source_id": "fsca_financial_registers",
+      "name": "Financial Sector Conduct Authority",
+      "authority": "FSCA",
+      "url": "https://www.fsca.co.za/",
+      "classes": [
+        "FINANCE_AND_INSURANCE",
+        "REGULATOR_AND_PROFESSIONAL_COUNCIL"
+      ],
+      "supports": [
+        "regulated-entity register and licence verification when the exact official record is checked"
+      ],
+      "does_not_prove": [
+        "product suitability",
+        "credit approval",
+        "current offer",
+        "financial advice endorsement"
+      ],
+      "refresh_after_days": 30,
+      "review_required": true,
+      "connector_state": "NOT_CONNECTED"
+    },
+    {
+      "source_id": "sarbs_regulated_entities",
+      "name": "South African Reserve Bank",
+      "authority": "South African Reserve Bank",
+      "url": "https://www.resbank.co.za/",
+      "classes": [
+        "FINANCE_AND_INSURANCE",
+        "REGULATOR_AND_PROFESSIONAL_COUNCIL"
+      ],
+      "supports": [
+        "official banking and financial-system regulatory source discovery"
+      ],
+      "does_not_prove": [
+        "individual loan approval",
+        "product availability",
+        "service quality",
+        "partnership"
+      ],
+      "refresh_after_days": 30,
+      "review_required": true,
+      "connector_state": "NOT_CONNECTED"
+    },
+    {
+      "source_id": "housing_human_settlements",
+      "name": "Department of Human Settlements",
+      "authority": "Department of Human Settlements",
+      "url": "https://www.dhs.gov.za/",
+      "classes": [
+        "HOUSING_AND_ACCOMMODATION",
+        "PUBLIC_ADMINISTRATION"
+      ],
+      "supports": [
+        "official housing programme and public-service source leads"
+      ],
+      "does_not_prove": [
+        "available accommodation",
+        "individual housing eligibility",
+        "allocation",
+        "application outcome"
+      ],
+      "refresh_after_days": 30,
+      "review_required": true,
+      "connector_state": "NOT_CONNECTED"
+    },
+    {
+      "source_id": "legal_aid_south_africa",
+      "name": "Legal Aid South Africa",
+      "authority": "Legal Aid South Africa",
+      "url": "https://legal-aid.co.za/",
+      "classes": [
+        "LEGAL_AID_AND_COMMUNITY_SERVICES",
+        "PUBLIC_ENTITY"
+      ],
+      "supports": [
+        "official legal-aid service information and contact-route discovery"
+      ],
+      "does_not_prove": [
+        "acceptance of a particular case",
+        "legal eligibility",
+        "legal outcome",
+        "partnership"
+      ],
+      "refresh_after_days": 30,
+      "review_required": true,
+      "connector_state": "NOT_CONNECTED"
+    },
+    {
+      "source_id": "govza_thusong_centres",
+      "name": "Thusong Service Centres Directory",
+      "authority": "Government Communication and Information System",
+      "url": "https://www.gov.za/about-government/contact-directory",
+      "classes": [
+        "LEGAL_AID_AND_COMMUNITY_SERVICES",
+        "PUBLIC_ADMINISTRATION",
+        "SOCIAL_SUPPORT"
+      ],
+      "supports": [
+        "service-centre discovery where a specific centre entry is present"
+      ],
+      "does_not_prove": [
+        "all listed services available at every centre",
+        "opening hours without current verification",
+        "case resolution"
+      ],
+      "refresh_after_days": 30,
+      "review_required": true,
+      "connector_state": "NOT_CONNECTED"
+    },
+    {
+      "source_id": "transport_department",
+      "name": "Department of Transport",
+      "authority": "Department of Transport",
+      "url": "https://www.transport.gov.za/",
+      "classes": [
+        "TRANSPORT_AND_ESSENTIAL_SERVICES",
+        "PUBLIC_ADMINISTRATION"
+      ],
+      "supports": [
+        "official transport-sector service and entity discovery"
+      ],
+      "does_not_prove": [
+        "live route availability",
+        "fare or schedule without current source",
+        "candidate entitlement",
+        "integration"
+      ],
+      "refresh_after_days": 30,
+      "review_required": true,
+      "connector_state": "NOT_CONNECTED"
+    },
+    {
+      "source_id": "eskom_official",
+      "name": "Eskom",
+      "authority": "Eskom",
+      "url": "https://www.eskom.co.za/",
+      "classes": [
+        "STATE_OWNED_ENTERPRISE",
+        "TRANSPORT_AND_ESSENTIAL_SERVICES",
+        "EMPLOYER_AND_RECRUITMENT"
+      ],
+      "supports": [
+        "official utility service and careers source leads"
+      ],
+      "does_not_prove": [
+        "current vacancy or service interruption without current notice",
+        "application receipt",
+        "partnership"
+      ],
+      "refresh_after_days": 14,
+      "review_required": true,
+      "connector_state": "NOT_CONNECTED"
+    },
+    {
+      "source_id": "sars_official",
+      "name": "South African Revenue Service",
+      "authority": "SARS",
+      "url": "https://www.sars.gov.za/",
+      "classes": [
+        "PUBLIC_ADMINISTRATION",
+        "EMPLOYER_AND_RECRUITMENT"
+      ],
+      "supports": [
+        "official tax-service and careers information"
+      ],
+      "does_not_prove": [
+        "individual tax status",
+        "case outcome",
+        "employment eligibility",
+        "application receipt"
+      ],
+      "refresh_after_days": 30,
+      "review_required": true,
+      "connector_state": "NOT_CONNECTED"
+    },
+    {
+      "source_id": "job_portal_provider_authorized",
+      "name": "Employer career pages and recruitment channels",
+      "authority": "Individual employer or recruitment provider",
+      "url": null,
+      "classes": [
+        "EMPLOYER_AND_RECRUITMENT"
+      ],
+      "supports": [
+        "job-specific evidence only when linked to an exact official employer notice or provider-authorized feed"
+      ],
+      "does_not_prove": [
+        "employer identity based on an aggregator alone",
+        "active vacancy",
+        "candidate eligibility",
+        "application receipt"
+      ],
+      "refresh_after_days": 7,
+      "review_required": true,
+      "connector_state": "NOT_CONNECTED"
+    },
+    {
+      "source_id": "accommodation_provider_direct",
+      "name": "Institution residences and accommodation providers",
+      "authority": "Individual institution or accommodation provider",
+      "url": null,
+      "classes": [
+        "HOUSING_AND_ACCOMMODATION"
+      ],
+      "supports": [
+        "property/residence and availability evidence only from the specific provider's current official source"
+      ],
+      "does_not_prove": [
+        "vacancy without current confirmation",
+        "safety or licensing beyond verified evidence",
+        "booking",
+        "partnership"
+      ],
+      "refresh_after_days": 7,
+      "review_required": true,
+      "connector_state": "NOT_CONNECTED"
+    },
+    {
+      "source_id": "technology_vendor_contract",
+      "name": "Approved technology and delivery vendors",
+      "authority": "Individual vendor and Kingsmen contract owner",
+      "url": null,
+      "classes": [
+        "TECHNOLOGY_AND_DELIVERY_VENDOR"
+      ],
+      "supports": [
+        "technical integration only after authorized credentials, terms, security review and runtime test"
+      ],
+      "does_not_prove": [
+        "integration from documentation alone",
+        "production readiness",
+        "data-sharing permission",
+        "partnership without signed approval"
+      ],
+      "refresh_after_days": 30,
+      "review_required": true,
+      "connector_state": "NOT_CONNECTED"
+    }
+  ],
+  "completion_gates": [
+    "Reconcile source anchors with public.source_authorities before adding or updating rows; do not duplicate authority anchors.",
+    "Review each URL and scope; entries with url=null are provider-specific and must be discovered from an authoritative source, never guessed.",
+    "Import source observations idempotently with retrieved_at, verifier, evidence URL, confidence, expiry and NEEDS_REVIEW defaults.",
+    "Do not activate candidate-facing claims or connectors until the relevant exact record has passed its own verification gate.",
+    "Test sector search, source freshness, duplicate and alias handling, Candidate A/B isolation, RLS, audit, retries and human-review queues.",
+    "Apply migrations only after independent review, approved change control, backup/restore evidence and post-migration security checks."
+  ]
+}

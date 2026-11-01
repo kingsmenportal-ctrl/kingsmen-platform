@@ -2,9 +2,9 @@ name: Kingsmen Release Evidence
 
 on:
   pull_request:
-    branches: [main, feat/backend-simplification-baseline-2026-10-29, feat/candidate-experience-closeout-2026-10-30, security/0097-port-on-candidate-rc1-2026-10-30, capacity/0098-active-candidate-cap-2026-10-30, feat/rc1-ui-quality-current-security-2026-10-30, ops/backup-restore-safety-current-rc-2026-10-30]
+    branches: [main, feat/backend-simplification-baseline-2026-10-29, feat/candidate-experience-closeout-2026-10-30, security/0097-port-on-candidate-rc1-2026-10-30, capacity/0098-active-candidate-cap-2026-10-30, feat/rc1-ui-quality-current-security-2026-10-30, ops/backup-restore-safety-current-rc-2026-10-30, feat/cross-sector-institution-source-coverage-2026-10-31, feat/national-institution-network-source-coverage-2026-10-31]
   push:
-    branches: [main, feat/backend-simplification-baseline-2026-10-29, feat/candidate-experience-closeout-2026-10-30, capacity/0098-active-candidate-cap-2026-10-30, ops/backup-restore-safety-current-rc-2026-10-30, fix/0096-cao-provenance-adoption-rc1-reconciled-2026-10-31]
+    branches: [main, feat/backend-simplification-baseline-2026-10-29, feat/candidate-experience-closeout-2026-10-30, capacity/0098-active-candidate-cap-2026-10-30, ops/backup-restore-safety-current-rc-2026-10-30, fix/0096-cao-provenance-adoption-rc1-reconciled-2026-10-31, feat/cross-sector-institution-source-coverage-2026-10-31]
   workflow_dispatch:
 
 permissions:
