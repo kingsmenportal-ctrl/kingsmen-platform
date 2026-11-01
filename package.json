@@ -101,7 +101,7 @@
     "n15:ingestion:test": "node scripts/staging/test-n15-live-ingestion-contract.mjs",
     "n15:ingestion:check": "npm run n15:ingestion:test",
     "api:test:production-storage-guard": "npm run api:build && node scripts/tests/test-truth-vault-production-guard.mjs",
-    "api:test:candidate-read-guard": "node scripts/tests/test-candidate-read-api-fail-closed.mjs"
+    "api:test:candidate-read-guard": "npm run api:build && node scripts/tests/test-candidate-identity-authorization-runtime.mjs && node scripts/tests/test-candidate-read-api-fail-closed.mjs"
   },
   "repository": {
     "type": "git",
