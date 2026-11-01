@@ -1,3 +1,5 @@
+import { evaluateProviderConnectionLifecycle } from "./provider-connection-lifecycle.mjs";
+
 const PROVIDER_STATES = [
   "P0_DISCOVERED",
   "P1_IDENTITY_VERIFIED",
@@ -116,9 +118,7 @@ export function evaluateProviderReadiness(provider = {}, options = {}) {
   const source = provider.source_evidence ?? {};
   const route = provider.application_route ?? {};
   const connector = provider.connector ?? {};
-  const test = connector.last_test ?? {};
-  const monitoring = provider.monitoring ?? {};
-  const health = monitoring.last_health ?? {};
+  const connectionLifecycle = evaluateProviderConnectionLifecycle(provider, { asOf: now });
 
   const identityPass =
     nonEmpty(provider.provider_key) &&
@@ -136,23 +136,9 @@ export function evaluateProviderReadiness(provider = {}, options = {}) {
     route.verification_status === "VERIFIED" &&
     freshTimestamp(route.verified_at, route.freshness_window_days, now);
 
-  const connectorPass =
-    ["API", "OFFICIAL_FEED", "AUTHORISED_BROWSER", "VERIFIED_HANDOFF"].includes(connector.method) &&
-    connector.state === "CONFIGURED" &&
-    connector.access_review_status === "APPROVED" &&
-    connector.terms_review_status === "APPROVED" &&
-    connector.human_handoff_configured === true;
-
-  const testPass =
-    test.status === "PASS" &&
-    nonEmpty(test.test_id) &&
-    freshTimestamp(test.tested_at, test.freshness_window_days, now);
-
-  const monitorPass =
-    monitoring.enabled === true &&
-    health.status === "HEALTHY" &&
-    freshTimestamp(health.checked_at, health.freshness_window_days, now) &&
-    monitoring.failure_handoff_configured === true;
+  const connectorPass = connectionLifecycle.rank >= 3;
+  const testPass = connectionLifecycle.rank >= 4;
+  const monitorPass = connectionLifecycle.rank >= 5;
 
   const checks = [
     gate("DISCOVERED", true, null),
@@ -163,11 +149,9 @@ export function evaluateProviderReadiness(provider = {}, options = {}) {
     gate("MONITORED", monitorPass, "Fresh healthy monitoring and failure-handoff controls are required."),
   ];
   const result = buildResult(PROVIDER_STATES, checks);
+  result.connection_lifecycle = connectionLifecycle;
   result.candidate_handoff_available = result.rank >= 2;
-  result.automated_submission_capability = result.rank >= 4 &&
-    connector.submission_mode === "AUTOMATED_APPROVED" &&
-    Array.isArray(connector.approved_scopes) &&
-    connector.approved_scopes.includes("SUBMIT");
+  result.automated_submission_capability = connectionLifecycle.automated_submission_capability;
   result.candidate_authorisation_still_required = result.automated_submission_capability;
   return result;
 }

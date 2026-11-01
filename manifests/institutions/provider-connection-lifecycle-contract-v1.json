@@ -1,0 +1,47 @@
+{
+  "schema": "kingsmen.institutions.provider-connection-lifecycle.v1",
+  "country": "ZA",
+  "purpose": "Fail-closed evidence contract for configuring, testing and monitoring provider integrations without implying that any provider is connected.",
+  "states": [
+    { "state": "C0_NOT_CONNECTED", "rank": 0 },
+    { "state": "C1_AUTHORIZATION_VERIFIED", "rank": 1 },
+    { "state": "C2_TERMS_APPROVED", "rank": 2 },
+    { "state": "C3_CONNECTOR_CONFIGURED", "rank": 3 },
+    { "state": "C4_ROUTE_TESTED", "rank": 4 },
+    { "state": "C5_MONITORED", "rank": 5 }
+  ],
+  "methods": ["API", "OFFICIAL_FEED", "AUTHORISED_BROWSER", "VERIFIED_HANDOFF"],
+  "scopes": [
+    "READ_PUBLIC_DATA",
+    "READ_PROVIDER_STATUS",
+    "PREPARE_APPLICATION",
+    "SUBMIT",
+    "READ_RECEIPT",
+    "READ_OUTCOME"
+  ],
+  "required_evidence": {
+    "authorization": ["provider_issued_authority", "authority_name_and_role", "approver_identity", "official_domain_evidence_url", "approved_scope_allowlist", "approved_at", "expires_at", "reviewed_at", "evidence_reference"],
+    "terms": ["current_terms_url", "reviewer_identity", "reviewed_at", "freshness_window_days", "approved_scope_allowlist", "evidence_reference"],
+    "connector": ["approved_privacy_review", "candidate_consent_enforcement", "candidate_authorisation_policy_reference", "data_minimisation_enforcement", "configured_scope_subset", "configuration_evidence_reference", "secure_official_target", "opaque_vault_credential_reference_for_credentialed_methods", "human_handoff_fallback"],
+    "test": ["passing_test_id_and_evidence_reference", "SANDBOX_or_STAGING_environment", "synthetic_data_only", "no_external_side_effects", "fresh_timestamp", "all_configured_scopes_tested"],
+    "monitoring": ["fresh_healthy_check", "failure_handoff_owner", "failure_handoff_evidence_reference"]
+  },
+  "invariants": {
+    "expired_or_revoked_authority_fails_closed": true,
+    "terms_must_cover_every_approved_scope": true,
+    "configured_scopes_must_be_subset_of_authority_and_terms": true,
+    "raw_credentials_must_not_be_persisted_in_application_data": true,
+    "credentialed_methods_require_opaque_vault_reference": true,
+    "candidate_consent_and_data_minimisation_are_required": true,
+    "every_connector_keeps_human_handoff": true,
+    "tests_use_synthetic_data_in_sandbox_or_staging_only": true,
+    "tests_must_have_no_external_side_effects": true,
+    "automation_never_implies_candidate_authorisation": true,
+    "automated_submission_requires_explicit_provider_submit_scope_and_candidate_authorisation_gate": true,
+    "no_connector_is_enabled_by_a_directory_or_source_record": true
+  },
+  "default_state": "C0_NOT_CONNECTED",
+  "default_connector_state": "NOT_CONNECTED",
+  "database_mutation_included": false,
+  "provider_connector_activation_included": false
+}
