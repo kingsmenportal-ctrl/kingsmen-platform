@@ -1,0 +1,46 @@
+<!doctype html>
+<html lang="en-ZA">
+<head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="description" content="Check South African opportunity listings carefully: official sources, deadlines, eligibility, fees and scam warning signs.">
+<title>Opportunity Verification & Scam Safety | Kingsmen</title><link rel="stylesheet" href="site.css">
+</head>
+<body>
+<header class="site-header"><div class="topline"><a class="brand" href="./index.html">KINGSMEN<small>OPPORTUNITY PLATFORM</small></a><nav class="nav" aria-label="Main navigation"><a href="./index.html">Home</a><a href="./opportunities.html">Opportunities</a><a href="./funding.html">Funding</a><a href="./application-guide.html">Application guide</a><a href="./help.html">Help</a></nav></div></header>
+<main>
+<section class="wrap hero"><div class="hero-grid"><div><p class="eyebrow">Verify before you act</p><h1>Opportunity verification & scam safety</h1><p class="lead">A directory entry is a starting point, not proof that a programme is open, that you qualify, or that an application was received. Verify each material claim at its source.</p></div><aside class="hero-panel"><span class="pill">Candidate safety</span><h2>Stop. Check. Confirm.</h2><p>Never pay an individual to “secure” a place or share passwords, one-time pins, or banking credentials.</p></aside></div></section>
+<section class="wrap section"><div class="section-head"><div><p class="eyebrow">Verification standard</p><h2>What must be checked?</h2></div></div><div class="grid">
+<article class="card"><h3>1. Source authenticity</h3><p>Reach the institution, employer, SETA, funder or government body through its independently located official website. Check the domain and contact details; do not trust a forwarded link alone.</p></article>
+<article class="card"><h3>2. Open status & deadline</h3><p>Confirm the specific intake or vacancy is currently open, its closing date and time, and any late-application rules. An old advert or active website does not prove an opportunity is open.</p></article>
+<article class="card"><h3>3. Eligibility & evidence</h3><p>Read the exact age, citizenship/residency, qualification, subject, location and supporting-document criteria. If unclear, ask the provider through an official contact channel.</p></article>
+<article class="card"><h3>4. Costs & payment</h3><p>Confirm fees, deposits, refund terms and the payee using official published details. Do not send money to a personal account, buy a guaranteed placement, or pay for an interview.</p></article>
+<article class="card"><h3>5. Submission proof</h3><p>Keep the confirmation email, reference number, receipt or dated screenshot. A candidate's report that they submitted is not the same as provider-confirmed receipt or an outcome.</p></article>
+<article class="card"><h3>6. Privacy & impersonation</h3><p>Share only required documents through a verified channel. Never disclose passwords or OTPs. Be suspicious of urgency, guaranteed selection, spelling-heavy messages and requests to move to private messaging.</p></article>
+</div></section>
+<section class="wrap section"><div class="two-col"><div class="card"><p class="eyebrow">Personal checklist</p><h2>Before you apply</h2><p>Tick each check on this device as you verify it. This checklist is saved only in this browser and is not sent to Kingsmen.</p>
+<form id="verification-checklist">
+<label class="check-row"><input type="checkbox" data-check="source"> I independently found the official provider source.</label>
+<label class="check-row"><input type="checkbox" data-check="open"> I confirmed the current open status and deadline.</label>
+<label class="check-row"><input type="checkbox" data-check="eligible"> I checked eligibility and required evidence.</label>
+<label class="check-row"><input type="checkbox" data-check="cost"> I verified fees and payment instructions, if any.</label>
+<label class="check-row"><input type="checkbox" data-check="privacy"> I checked the submission channel and privacy terms.</label>
+<label class="check-row"><input type="checkbox" data-check="proof"> I know what confirmation proof to retain.</label>
+<div class="btn-row"><button class="btn btn-primary" type="button" id="reset-checklist">Reset checklist</button></div><p id="checklist-status" aria-live="polite">Checklist progress is stored locally on this device.</p>
+</form></div><div class="card"><p class="eyebrow">Report a concern</p><h2>If something looks wrong</h2><ol><li>Stop the payment or document transfer.</li><li>Preserve messages, URLs, receipts and reference numbers.</li><li>Contact the genuine provider using contact details found independently.</li><li>If money or identity information was exposed, contact your bank and the relevant authorities promptly.</li></ol><p><a class="btn btn-outline" href="./help.html">Read Kingsmen help & safety guidance</a></p><p class="small">This public page does not accept scam reports or verify individual listings. No opportunity is labelled verified by this checklist.</p></div></div></section>
+<section class="wrap section"><div class="notice"><strong>Truth boundary:</strong> Kingsmen's public directory may link to sources, but a source link alone is not proof of current availability, eligibility, a successful submission, or a provider decision. Confirm these facts with the responsible organisation.</div></section>
+</main>
+<footer class="footer"><div class="wrap footer-grid"><div><a class="brand" href="./index.html">KINGSMEN</a><p>One organised starting point for South African education, training, funding and work pathways.</p></div><div><h3>Explore</h3><div class="footer-links"><a href="./opportunities.html">Opportunity directory</a><a href="./funding.html">Funding resources</a><a href="./employment-cv.html">Employment & CV readiness</a><a href="./accommodation.html">Accommodation readiness</a></div></div><div><h3>Information</h3><div class="footer-links"><a href="./about.html">About Kingsmen</a><a href="./help.html">Help & safety</a></div></div></div></footer>
+<script>
+(function(){
+ const key='kingsmen.verification-safety.checklist.v1';
+ const form=document.getElementById('verification-checklist');
+ const status=document.getElementById('checklist-status');
+ const boxes=Array.from(form.querySelectorAll('[data-check]'));
+ function read(){try{return JSON.parse(localStorage.getItem(key)||'{}')}catch(_){return {}}}
+ function render(){const saved=read();boxes.forEach(b=>b.checked===Boolean(saved[b.dataset.check])?null:b.checked=Boolean(saved[b.dataset.check]));const done=boxes.filter(b=>b.checked).length;status.textContent=done+' of '+boxes.length+' checks completed. Saved locally on this device; not sent to Kingsmen.'}
+ boxes.forEach(b=>b.addEventListener('change',()=>{const saved=read();saved[b.dataset.check]=b.checked;localStorage.setItem(key,JSON.stringify(saved));render()}));
+ document.getElementById('reset-checklist').addEventListener('click',()=>{localStorage.removeItem(key);boxes.forEach(b=>b.checked=false);status.textContent='Checklist reset on this device. Nothing was sent to Kingsmen.'});
+ render();
+})();
+</script>
+</body></html>
