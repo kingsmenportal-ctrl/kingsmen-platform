@@ -98,6 +98,7 @@ export default function CandidateApplicationDraftPage() {
   const [draftUpdatedAt, setDraftUpdatedAt] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
+  const [saveIdempotencyKey, setSaveIdempotencyKey] = useState("");
   const [error, setError] = useState("");
   const [notice, setNotice] = useState("");
 
@@ -130,6 +131,7 @@ export default function CandidateApplicationDraftPage() {
       setProfileAvailable(body.shared_profile_available === true);
       setProfileUpdatedAt(body.shared_profile_updated_at ?? null);
       setDraftUpdatedAt(body.draft_updated_at ?? null);
+      setSaveIdempotencyKey("");
       setNotice("");
     } catch (e) {
       setError(e instanceof Error ? e.message : "Could not reload the application draft.");
@@ -192,6 +194,8 @@ export default function CandidateApplicationDraftPage() {
       return;
     }
 
+    const requestKey = saveIdempotencyKey || "application-draft-" + crypto.randomUUID();
+    setSaveIdempotencyKey(requestKey);
     setSaving(true);
     setError("");
     setNotice("");
@@ -203,7 +207,7 @@ export default function CandidateApplicationDraftPage() {
           application_id: applicationId,
           answer_data: cleanedAnswers,
           expected_version: version,
-          idempotency_key: "application-draft-" + crypto.randomUUID()
+          idempotency_key: requestKey
         }),
         cache: "no-store"
       });
@@ -219,6 +223,7 @@ export default function CandidateApplicationDraftPage() {
       setAnswers(cleanedAnswers);
       setVersion(Number.isInteger(body.draft_version) ? body.draft_version as number : version + 1);
       setDraftUpdatedAt(body.updated_at ?? new Date().toISOString());
+      setSaveIdempotencyKey("");
       setApplication(old => old ? {
         ...old,
         status: "DRAFT",
