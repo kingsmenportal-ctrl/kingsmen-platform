@@ -1,0 +1,68 @@
+<!doctype html>
+<html lang="en-ZA">
+<head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="theme-color" content="#10243a"><meta name="description" content="Compare up to four South African study, training, funding and work opportunities side by side."><title>Opportunity Comparison Planner | Kingsmen</title><link rel="stylesheet" href="site.css"></head>
+<body>
+<header class="site-header"><div class="topline"><a class="brand" href="./index.html">KINGSMEN<small>OPPORTUNITY PLATFORM</small></a><nav class="nav" aria-label="Main navigation"><a href="./index.html">Home</a><a href="./opportunities.html">Opportunities</a><a href="./funding.html">Funding</a><a href="./application-guide.html">Application guide</a><a href="./opportunity-source-register.html">Source register</a><a href="./help.html">Help</a></nav></div></header>
+<main class="wrap">
+<p class="breadcrumb"><a href="./index.html">Home</a> / Opportunity Comparison Planner</p>
+<section class="page-hero"><p class="eyebrow">Candidate decision support · side-by-side view</p><h1>Opportunity Comparison Planner</h1><p class="lead">Compare up to four education, training, funding, accommodation or employment options using facts you have checked with the relevant provider.</p></section>
+<div class="notice"><strong>Decision boundary:</strong> Kingsmen does not rank providers or decide which option you should choose. A lower cost, an open-status label or a saved link is not proof of suitability. Verify each material fact with the official provider and consider your own circumstances.</div>
+<section class="section"><div class="card">
+<h2>Add an option to compare</h2>
+<form id="option-form">
+<div class="toolbar">
+<div class="field"><label for="label">Opportunity / programme</label><input id="label" maxlength="100" required placeholder="e.g. Diploma programme or job role"></div>
+<div class="field"><label for="provider">Provider / employer</label><input id="provider" maxlength="100" required placeholder="Official institution or organisation"></div>
+<div class="field"><label for="pathway">Pathway</label><select id="pathway" required><option value="">Choose pathway</option><option>Higher education</option><option>TVET</option><option>SETA / learnership</option><option>Internship</option><option>Apprenticeship</option><option>Employment</option><option>Funding</option><option>Accommodation</option></select></div>
+<div class="field"><label for="url">Official provider URL</label><input id="url" type="url" maxlength="500" required placeholder="https://…"></div>
+<div class="field"><label for="checked">Date official source checked</label><input id="checked" type="date" required></div>
+<div class="field"><label for="open">Application status</label><select id="open" required><option value="Not verified">Not verified</option><option value="Officially open — checked">Officially open — checked</option><option value="Closed — checked">Closed — checked</option><option value="Unknown / unclear">Unknown / unclear</option></select></div>
+<div class="field"><label for="deadline">Official deadline</label><input id="deadline" type="date"><small class="muted">Leave blank unless the official source states one.</small></div>
+<div class="field"><label for="eligibility">Eligibility</label><select id="eligibility" required><option value="Not checked">Not checked</option><option value="Official criteria reviewed">Official criteria reviewed</option><option value="Unclear">Unclear</option><option value="Provider confirmed applicant eligibility">Provider confirmed applicant eligibility</option></select></div>
+<div class="field"><label for="cost">Estimated cost (ZAR)</label><input id="cost" type="number" min="0" step="0.01" inputmode="decimal" placeholder="Optional"></div>
+<div class="field"><label for="costPeriod">Cost period</label><select id="costPeriod"><option value="Not stated">Not stated</option><option>Once-off</option><option>Per year</option><option>Per month</option><option>Per term</option></select></div>
+<div class="field"><label for="funding">Funding coverage</label><select id="funding" required><option value="Not checked">Not checked</option><option value="Full funding confirmed by provider">Full funding confirmed by provider</option><option value="Partial funding confirmed by provider">Partial funding confirmed by provider</option><option value="No funding confirmed">No funding confirmed</option><option value="Unclear">Unclear</option></select></div>
+<div class="field"><label for="mode">Location / delivery mode</label><input id="mode" maxlength="120" placeholder="e.g. Johannesburg · on campus / hybrid"></div>
+<div class="field"><label for="duration">Duration / schedule</label><input id="duration" maxlength="120" placeholder="e.g. 3 years · full time"></div>
+<div class="field"><label for="notes">Non-sensitive comparison notes</label><input id="notes" maxlength="240" placeholder="Requirements, transport, conditions to verify"></div>
+</div>
+<p class="small muted">Do not save ID numbers, passwords, bank details, private documents, health information or sensitive candidate data. Only use non-sensitive comparison facts.</p>
+<div class="btn-row"><button id="save-option" class="btn btn-primary" type="submit">Save option on this device</button><button class="btn btn-outline" type="reset">Reset form</button></div><p id="status" role="status" aria-live="polite"></p>
+</form></div></section>
+<section class="section"><div class="section-head"><div><p class="eyebrow">Side-by-side evidence</p><h2>Options in your comparison</h2><p class="muted">Add up to four options. Review each field separately; missing information is not a positive result.</p></div><button id="clear" class="btn btn-outline" type="button">Clear comparison</button></div>
+<div id="comparison" class="resource-list"></div><p id="empty" class="card">No options added yet. Add at least two options to begin comparing them.</p></section>
+<section class="section"><div class="card"><h2>Use a consistent decision process</h2><div class="steps">
+<div class="step"><div><h3>Confirm the source</h3><p>Use the official provider or employer source. Record the date reviewed and re-check time-sensitive information.</p></div></div>
+<div class="step"><div><h3>Check eligibility and deadlines separately</h3><p>Programme availability does not establish that you qualify. Confirm requirements and application dates directly with the provider.</p></div></div>
+<div class="step"><div><h3>Compare the full cost and support</h3><p>Include fees, travel, accommodation, equipment and living costs. Confirm funding coverage and exclusions in writing.</p></div></div>
+<div class="step"><div><h3>Consider practical fit and conditions</h3><p>Assess location, schedule, duration, work conditions, progression, safety and any conditions attached to an offer.</p></div></div>
+<div class="step"><div><h3>Keep evidence distinct</h3><p>A candidate-reported submission is not a provider-confirmed receipt. A receipt is not an admission, job offer or funding award.</p></div></div>
+</div></div></section>
+<div class="notice"><strong>Storage boundary:</strong> This planner saves data in this browser on this device only. It is not synchronised with Kingsmen, does not fetch live listings, verify providers, submit applications or create a recommendation. The authenticated Kingsmen platform must retain candidate decisions server-side with appropriate access controls and audit evidence.</div>
+</main>
+<footer class="footer"><div class="wrap"><a class="brand" href="./index.html">KINGSMEN</a><p class="small">Public decision-support utility · no sensitive personal records or documents should be stored here.</p></div></footer>
+<script>
+(function(){
+'use strict';
+const KEY='kingsmen.opportunity-comparison-planner.v1';
+const form=document.getElementById('option-form'), area=document.getElementById('comparison'), empty=document.getElementById('empty'), status=document.getElementById('status'), submit=document.getElementById('save-option');
+const get=()=>{try{const v=JSON.parse(localStorage.getItem(KEY)||'[]');return Array.isArray(v)?v:[]}catch(_){return[]}};
+const save=v=>localStorage.setItem(KEY,JSON.stringify(v));
+const node=(tag,cls,txt)=>{const n=document.createElement(tag);if(cls)n.className=cls;if(txt!==undefined)n.textContent=txt;return n};
+function render(){const data=get();area.replaceChildren();empty.style.display=data.length?'none':'block';empty.textContent=data.length<2?'Add one more option to compare two or more.':'No options added yet.';
+data.forEach((r,i)=>{const c=node('article','card resource-card');c.append(node('h3','',r.label));c.append(node('p','small',r.provider+' · '+r.pathway));const a=node('a','',r.url);a.href=r.url;a.target='_blank';a.rel='noopener noreferrer';a.textContent='Open official source ↗';c.append(a);
+const facts=[['Source checked',r.checked],['Application status',r.open],['Deadline',r.deadline||'Not recorded'],['Eligibility',r.eligibility],['Estimated cost',r.cost?('R'+Number(r.cost).toFixed(2)+' · '+r.costPeriod):'Not recorded'],['Funding',r.funding],['Location / mode',r.mode||'Not recorded'],['Duration / schedule',r.duration||'Not recorded']];
+const dl=node('dl','');facts.forEach(([k,v])=>{dl.append(node('dt','small',k));dl.append(node('dd','',v))});c.append(dl);if(r.notes)c.append(node('p','small',r.notes));
+const b=node('button','btn btn-outline','Remove option');b.type='button';b.addEventListener('click',()=>{const d=get();d.splice(i,1);save(d);render();status.textContent='Option removed from this device.'});c.append(b);area.append(c)});
+submit.disabled=data.length>=4;submit.textContent=data.length>=4?'Comparison limit reached':'Save option on this device';
+}
+form.addEventListener('submit',e=>{e.preventDefault();const data=get();if(data.length>=4){status.textContent='You can compare up to four options. Remove one before adding another.';return}
+const raw=document.getElementById('url').value.trim();try{const u=new URL(raw);if(u.protocol!=='https:'){status.textContent='Use an HTTPS official provider URL.';return}}catch(_){status.textContent='Enter a valid official provider URL.';return}
+const cost=document.getElementById('cost').value;if(cost!==''&&(!Number.isFinite(Number(cost))||Number(cost)<0)){status.textContent='Enter a valid non-negative cost.';return}
+const r={label:document.getElementById('label').value.trim(),provider:document.getElementById('provider').value.trim(),pathway:document.getElementById('pathway').value,url:raw,checked:document.getElementById('checked').value,open:document.getElementById('open').value,deadline:document.getElementById('deadline').value,eligibility:document.getElementById('eligibility').value,cost,costPeriod:document.getElementById('costPeriod').value,funding:document.getElementById('funding').value,mode:document.getElementById('mode').value.trim(),duration:document.getElementById('duration').value.trim(),notes:document.getElementById('notes').value.trim()};
+try{data.push(r);save(data);render();form.reset();status.textContent='Option saved locally. No information was sent to Kingsmen.'}catch(_){status.textContent='Could not save locally. Check browser storage settings and available space.'}});
+document.getElementById('clear').addEventListener('click',()=>{if(confirm('Delete all options in this device-local comparison?')){localStorage.removeItem(KEY);render();status.textContent='All comparison options were cleared from this device.'}});
+render();
+})();
+</script>
+</body></html>
