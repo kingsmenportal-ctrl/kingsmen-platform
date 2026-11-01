@@ -16,8 +16,32 @@ if ([string]::IsNullOrWhiteSpace($RestoreDatabaseUrl)) {
 if (-not (Test-Path -LiteralPath $BackupFile -PathType Leaf)) {
   throw "Backup file not found. Database URL remains redacted."
 }
-if (-not [string]::IsNullOrWhiteSpace($SourceDatabaseUrl) -and $SourceDatabaseUrl -eq $RestoreDatabaseUrl) {
-  throw "Restore target matches source database. Restore drill blocked."
+if ([string]::IsNullOrWhiteSpace($SourceDatabaseUrl)) {
+  throw "KINGSMEN_DATABASE_URL is required to prove restore isolation. Database URLs remain redacted."
+}
+
+function Get-KingsmenDatabaseTargetIdentity([string]$ConnectionUrl) {
+  $parsed = $null
+  if (-not [System.Uri]::TryCreate($ConnectionUrl, [System.UriKind]::Absolute, [ref]$parsed)) {
+    throw "Database target URL is invalid. Credentials remain redacted."
+  }
+  if ($parsed.Scheme -notin @("postgres", "postgresql") -or [string]::IsNullOrWhiteSpace($parsed.DnsSafeHost)) {
+    throw "Database target must be a PostgreSQL URL. Credentials remain redacted."
+  }
+
+  $port = if ($parsed.IsDefaultPort -or $parsed.Port -lt 0) { 5432 } else { $parsed.Port }
+  $databaseName = [System.Uri]::UnescapeDataString($parsed.AbsolutePath.TrimStart("/"))
+  if ([string]::IsNullOrWhiteSpace($databaseName)) {
+    throw "Database target URL must identify a database. Credentials remain redacted."
+  }
+
+  return "$($parsed.DnsSafeHost.ToLowerInvariant()):$port/$databaseName"
+}
+
+$sourceTargetIdentity = Get-KingsmenDatabaseTargetIdentity $SourceDatabaseUrl
+$restoreTargetIdentity = Get-KingsmenDatabaseTargetIdentity $RestoreDatabaseUrl
+if ([System.StringComparer]::Ordinal.Equals($sourceTargetIdentity, $restoreTargetIdentity)) {
+  throw "Restore target matches source database host, port and database. Restore drill blocked."
 }
 $archive = Get-Item -LiteralPath $BackupFile
 if ($archive.Length -le 0) {
