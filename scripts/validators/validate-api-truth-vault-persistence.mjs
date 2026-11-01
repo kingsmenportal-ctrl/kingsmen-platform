@@ -8,6 +8,7 @@ const reportPath = join(root, "reports/api/api-truth-vault-persistence-latest.js
 const requiredFiles = [
   "apps/api/src/db/truth-vault-repository.ts",
   "apps/api/src/server.ts",
+  "apps/api/src/security/candidate-identity-authorization.ts",
   "apps/api/package.json",
   "db/migrations/0001_n03_truth_vault.sql",
   "docs/api/KINGSMEN_TRUTH_VAULT_PERSISTENCE.md"
@@ -45,8 +46,14 @@ const requiredTokens = {
     "truthVault.readApplicationWorkbench",
     "truthVault.healthCheck",
     "resolveCandidateIdentity",
-    "CANDIDATE_OWNERSHIP_MISMATCH",
-    "IDENTITY_AUTHORIZATION_NOT_CONFIGURED"
+    "CANDIDATE_OWNERSHIP_MISMATCH"
+  ],
+  "apps/api/src/security/candidate-identity-authorization.ts": [
+    "resolveCandidateIdentity",
+    "IDENTITY_AUTHORIZATION_NOT_CONFIGURED",
+    "VERIFIED_IDENTITY_LINK_REQUIRED",
+    "IDENTITY_LINK_LOOKUP_FAILED",
+    "candidateOwnsResource"
   ],
   "apps/api/package.json": [
     "\"pg\"",
