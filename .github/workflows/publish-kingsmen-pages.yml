@@ -9,6 +9,7 @@ on:
       - "index.html"
       - "opportunities.html"
       - "funding.html"
+      - "funding-readiness.html"
       - "application-guide.html"
       - "employment-cv.html"
       - "accommodation.html"
@@ -49,13 +50,13 @@ jobs:
         run: |
           set -euo pipefail
           mkdir -p site-dist
-          cp index.html opportunities.html funding.html application-guide.html employment-cv.html accommodation.html verification-safety.html application-follow-up.html opportunity-source-register.html opportunity-comparison.html about.html help.html 404.html site.css site-dist/
+          cp index.html opportunities.html funding.html funding-readiness.html application-guide.html employment-cv.html accommodation.html verification-safety.html application-follow-up.html opportunity-source-register.html opportunity-comparison.html about.html help.html 404.html site.css site-dist/
           sed -i 's/Not on this temporary public website\./Not on this public information website./g' site-dist/help.html
           sed -i 's/This temporary Kingsmen website only contains published static pages\./This Kingsmen public website contains published information pages./g' site-dist/404.html
           python3 - <<'PY'
           from pathlib import Path
           base = "https://kingsmenportal-ctrl.github.io/kingsmen-platform/"
-          for page in ("index.html", "opportunities.html", "funding.html", "application-guide.html", "employment-cv.html", "accommodation.html", "verification-safety.html", "application-follow-up.html", "opportunity-source-register.html", "opportunity-comparison.html", "about.html", "help.html"):
+          for page in ("index.html", "opportunities.html", "funding.html", "funding-readiness.html", "application-guide.html", "employment-cv.html", "accommodation.html", "verification-safety.html", "application-follow-up.html", "opportunity-source-register.html", "opportunity-comparison.html", "about.html", "help.html"):
               path = Path("site-dist") / page
               html = path.read_text(encoding="utf-8")
               canonical = base + ("" if page == "index.html" else page)
@@ -73,6 +74,7 @@ jobs:
             <url><loc>https://kingsmenportal-ctrl.github.io/kingsmen-platform/</loc></url>
             <url><loc>https://kingsmenportal-ctrl.github.io/kingsmen-platform/opportunities.html</loc></url>
             <url><loc>https://kingsmenportal-ctrl.github.io/kingsmen-platform/funding.html</loc></url>
+            <url><loc>https://kingsmenportal-ctrl.github.io/kingsmen-platform/funding-readiness.html</loc></url>
             <url><loc>https://kingsmenportal-ctrl.github.io/kingsmen-platform/application-guide.html</loc></url>
             <url><loc>https://kingsmenportal-ctrl.github.io/kingsmen-platform/employment-cv.html</loc></url>
             <url><loc>https://kingsmenportal-ctrl.github.io/kingsmen-platform/accommodation.html</loc></url>
@@ -87,7 +89,7 @@ jobs:
           touch site-dist/.nojekyll
           test -s site-dist/index.html
           test -s site-dist/site.css
-          for page in opportunities.html funding.html application-guide.html employment-cv.html accommodation.html verification-safety.html application-follow-up.html opportunity-source-register.html opportunity-comparison.html about.html help.html 404.html; do test -s "site-dist/$page"; done
+          for page in opportunities.html funding.html funding-readiness.html application-guide.html employment-cv.html accommodation.html verification-safety.html application-follow-up.html opportunity-source-register.html opportunity-comparison.html about.html help.html 404.html; do test -s "site-dist/$page"; done
           python3 - <<'PY'
           from pathlib import Path
           html = (Path("site-dist") / "application-guide.html").read_text(encoding="utf-8")
@@ -164,6 +166,17 @@ jobs:
           if "fetch(" in html or "XMLHttpRequest" in html:
               raise SystemExit("Comparison planner must not transmit local entries to a server")
           print("Opportunity Comparison Planner contract passed: local-only persistence, four-option limit, evidence distinctions and no server submission.")
+          PY
+          python3 - <<'PY'
+          from pathlib import Path
+          html = (Path("site-dist") / "funding-readiness.html").read_text(encoding="utf-8")
+          required = ("kingsmen.funding-application-readiness.v1", "localStorage.setItem", "localStorage.removeItem", 'aria-live="polite"', "No information was sent to Kingsmen", "candidate-reported submission", "not Kingsmen's authenticated funding workflow")
+          missing = [item for item in required if item not in html]
+          if missing:
+              raise SystemExit(f"Funding Application Readiness contract failed; missing: {missing}")
+          if "fetch(" in html or "XMLHttpRequest" in html:
+              raise SystemExit("Funding readiness checklist must not transmit local records to a server")
+          print("Funding Application Readiness contract passed: device-local persistence, evidence-state distinctions and no server submission.")
           PY
           echo "Public artifact contains only the approved public pages and supporting files."
 
