@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 
 type RunResult = {
   status: string;
@@ -14,6 +14,18 @@ type RunResult = {
   reason?: string;
 };
 
+type RunHistoryItem = {
+  run_ref: string;
+  status: "RUNNING" | "COMPLETED" | "PARTIAL" | "FAILED" | string;
+  sources_checked: number;
+  sources_succeeded: number;
+  observations_created: number;
+  observations_updated: number;
+  observations_skipped: number;
+  started_at: string;
+  finished_at: string | null;
+};
+
 function getAccessToken(): string | null {
   try {
     const stored = window.localStorage.getItem("sb-euhubhhnumtibbyufghm-auth-token");
@@ -23,28 +35,111 @@ function getAccessToken(): string | null {
   } catch { return null; }
 }
 
+function getApiConfig() {
+  const url = process.env.NEXT_PUBLIC_SUPABASE_URL;
+  const anonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
+  if (!url || !anonKey) throw new Error("N15 is not configured for this web deployment.");
+  return {
+    endpoint: `${url.replace(/\/$/, "")}/functions/v1/n15-source-ingestion`,
+    anonKey
+  };
+}
+
+async function fetchRunHistory(token: string): Promise<RunHistoryItem[]> {
+  const { endpoint, anonKey } = getApiConfig();
+  const response = await fetch(endpoint, {
+    method: "GET",
+    headers: { apikey: anonKey, Authorization: `Bearer ${token}` },
+    cache: "no-store"
+  });
+  const body = await response.json().catch(() => ({}));
+  if (!response.ok) {
+    if (body.reason === "ACTIVE_OPPORTUNITY_REVIEWER_REQUIRED") {
+      throw new Error("This account does not have an active authorised reviewer role. Run history remains restricted.");
+    }
+    throw new Error(body.reason || body.status || `Run history unavailable (${response.status})`);
+  }
+  return Array.isArray(body.runs) ? body.runs as RunHistoryItem[] : [];
+}
+
+function formatDate(value: string | null | undefined) {
+  if (!value) return "—";
+  const date = new Date(value);
+  if (Number.isNaN(date.getTime())) return "—";
+  return new Intl.DateTimeFormat("en-ZA", {
+    dateStyle: "medium",
+    timeStyle: "short",
+    timeZone: "Africa/Johannesburg"
+  }).format(date);
+}
+
+function statusClasses(status: string) {
+  if (status === "COMPLETED") return "bg-emerald-50 text-emerald-800";
+  if (status === "PARTIAL") return "bg-amber-50 text-amber-800";
+  if (status === "FAILED") return "bg-rose-50 text-rose-800";
+  return "bg-slate-100 text-slate-700";
+}
+
 export default function N15IngestionOperatorPage() {
   const [result, setResult] = useState<RunResult | null>(null);
   const [error, setError] = useState("");
   const [busy, setBusy] = useState(false);
+  const [history, setHistory] = useState<RunHistoryItem[]>([]);
+  const [historyError, setHistoryError] = useState("");
+  const [historyLoading, setHistoryLoading] = useState(false);
+
+  useEffect(() => {
+    let active = true;
+    async function loadInitialHistory() {
+      const token = getAccessToken();
+      if (!token) {
+        setHistoryError("Sign in with an authorised Kingsmen reviewer account to view run history.");
+        return;
+      }
+      setHistoryLoading(true);
+      setHistoryError("");
+      try {
+        const records = await fetchRunHistory(token);
+        if (active) setHistory(records);
+      } catch (e) {
+        if (active) setHistoryError(e instanceof Error ? e.message : "Run history could not be loaded.");
+      } finally {
+        if (active) setHistoryLoading(false);
+      }
+    }
+    void loadInitialHistory();
+    return () => { active = false; };
+  }, []);
+
+  async function refreshHistory() {
+    setHistoryLoading(true);
+    setHistoryError("");
+    try {
+      const token = getAccessToken();
+      if (!token) throw new Error("Sign in with an authorised Kingsmen reviewer account first.");
+      setHistory(await fetchRunHistory(token));
+    } catch (e) {
+      setHistoryError(e instanceof Error ? e.message : "Run history could not be loaded.");
+    } finally {
+      setHistoryLoading(false);
+    }
+  }
 
   async function runIngestion() {
     setBusy(true);
     setError("");
     setResult(null);
     try {
-      const url = process.env.NEXT_PUBLIC_SUPABASE_URL;
-      const anonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
+      const { endpoint, anonKey } = getApiConfig();
       const token = getAccessToken();
-      if (!url || !anonKey) throw new Error("N15 is not configured for this web deployment.");
       if (!token) throw new Error("Sign in with an authorised Kingsmen reviewer account first.");
-      const response = await fetch(`${url.replace(/\/$/, "")}/functions/v1/n15-source-ingestion`, {
+      const response = await fetch(endpoint, {
         method: "POST",
         headers: { apikey: anonKey, Authorization: `Bearer ${token}`, "Content-Type": "application/json" },
         body: "{}",
         cache: "no-store"
       });
-      const body = await response.json();
+      const body = await response.json().catch(() => ({}));
       if (!response.ok) {
         if (body.reason === "ACTIVE_OPPORTUNITY_REVIEWER_REQUIRED") {
           throw new Error("No active authorised platform reviewer was found for this account. Ask an authorised administrator to grant a permitted reviewer role; the ingestion endpoint remains fail-closed.");
@@ -52,6 +147,12 @@ export default function N15IngestionOperatorPage() {
         throw new Error(body.reason || body.status || `Ingestion failed (${response.status})`);
       }
       setResult(body);
+      try {
+        setHistory(await fetchRunHistory(token));
+        setHistoryError("");
+      } catch (historyFailure) {
+        setHistoryError(historyFailure instanceof Error ? historyFailure.message : "The run completed, but history could not be refreshed.");
+      }
     } catch (e) {
       setError(e instanceof Error ? e.message : "Ingestion could not be started.");
     } finally {
@@ -97,8 +198,51 @@ export default function N15IngestionOperatorPage() {
         </>
       )}
 
+      <section className="rounded-2xl border border-slate-200 bg-white p-5" aria-labelledby="n15-run-history-heading">
+        <div className="flex flex-wrap items-center justify-between gap-3">
+          <div>
+            <h2 id="n15-run-history-heading" className="text-lg font-bold text-slate-950">Recent ingestion runs</h2>
+            <p className="mt-1 text-sm text-slate-600">Read-only ledger · latest 50 runs · South African time</p>
+          </div>
+          <button type="button" onClick={refreshHistory} disabled={historyLoading} className="rounded-xl border border-slate-300 px-4 py-2 text-sm font-semibold text-slate-800 disabled:opacity-50">
+            {historyLoading ? "Refreshing…" : "Refresh history"}
+          </button>
+        </div>
+        {historyError && <p role="alert" className="mt-4 rounded-xl bg-amber-50 p-3 text-sm text-amber-900">{historyError}</p>}
+        {historyLoading && <p className="mt-4 text-sm text-slate-600" role="status">Loading run history…</p>}
+        {!historyLoading && !historyError && history.length === 0 && <p className="mt-4 rounded-xl bg-slate-50 p-4 text-sm text-slate-600">No ingestion runs have been recorded yet.</p>}
+        {history.length > 0 && (
+          <div className="mt-4 overflow-x-auto">
+            <table className="w-full min-w-[760px] text-left text-sm">
+              <thead className="border-b border-slate-200 text-xs uppercase tracking-wide text-slate-500">
+                <tr>
+                  <th scope="col" className="px-3 py-3">Run reference</th>
+                  <th scope="col" className="px-3 py-3">Status</th>
+                  <th scope="col" className="px-3 py-3">Sources</th>
+                  <th scope="col" className="px-3 py-3">Observations</th>
+                  <th scope="col" className="px-3 py-3">Started</th>
+                  <th scope="col" className="px-3 py-3">Finished</th>
+                </tr>
+              </thead>
+              <tbody className="divide-y divide-slate-100">
+                {history.map(run => (
+                  <tr key={run.run_ref}>
+                    <td className="px-3 py-3 font-mono text-xs text-slate-700">{run.run_ref}</td>
+                    <td className="px-3 py-3"><span className={`rounded-full px-2.5 py-1 text-xs font-bold ${statusClasses(run.status)}`}>{run.status}</span></td>
+                    <td className="px-3 py-3 tabular-nums">{run.sources_succeeded}/{run.sources_checked}</td>
+                    <td className="px-3 py-3 tabular-nums">{run.observations_created} new · {run.observations_updated} refreshed · {run.observations_skipped} skipped</td>
+                    <td className="px-3 py-3 whitespace-nowrap">{formatDate(run.started_at)}</td>
+                    <td className="px-3 py-3 whitespace-nowrap">{formatDate(run.finished_at)}</td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        )}
+      </section>
+
       <aside className="rounded-2xl bg-slate-50 p-4 text-xs leading-5 text-slate-600">
-        This operation requires a valid session and an active platform reviewer role. If your account has not been authorised, the request is rejected. Source ingestion and opportunity verification are separate operations; all discovered records require human review before candidate matching.
+        This operation requires a valid session and an active platform reviewer role. The run-history endpoint exposes aggregate run metadata only and never returns raw summary JSON, candidate data, private document paths or source evidence locators. Refreshing history is read-only; source ingestion requires a separate explicit action. Discovered records still require human verification before candidate matching.
       </aside>
     </main>
   );
