@@ -24,7 +24,7 @@ const requiredTokens = new Map([
   ['manifests/ops/backup-restore-proof-v1.json', ['backup-restore-proof-v1', 'foundation_built_pending_staging_drill', 'restoreTargetMustDifferFromSource', 'backupStorageAllowedInGit']],
   ['docs/ops/KINGSMEN_BACKUP_RESTORE_PROOF.md', ['pg_dump', 'pg_restore', 'RPO', 'RTO', 'Production ready: **false**']],
   ['scripts/backup/New-KingsmenTruthVaultBackup.ps1', ['KINGSMEN_DATABASE_URL', 'pg_dump', 'Get-FileHash', 'databaseUrlRedacted', 'committedToGit = $false']],
-  ['scripts/backup/Test-KingsmenTruthVaultRestore.ps1', ['KINGSMEN_RESTORE_DRILL_DATABASE_URL', 'pg_restore', 'Restore target matches source database', 'countOnly = $true', 'rtoSeconds']],
+  ['scripts/backup/Test-KingsmenTruthVaultRestore.ps1', ['KINGSMEN_RESTORE_DRILL_DATABASE_URL', 'pg_restore', 'Restore target matches source database', 'countOnly = $true', 'rtoSeconds', '$failedChecks += "count_query:$table"', 'status = $(if ($DryRun) { "DRY_RUN" } elseif ($passed) { "RESTORE_DRILL_PASSED" } else { "RESTORE_DRILL_FAILED" })', 'passed = $passed', 'if (-not $passed)']],
   ['scripts/proof/prove-backup-restore-boundary.mjs', ['BACKUP_RESTORE_SOURCE_PROOF_PASSED', 'stagingRestoreDrillCompleted: false']],
   ['manifests/launch/kingsmen-launch-readiness-v1.json', ['backup_restore', 'backup-restore-proof-v1', 'foundation_built_pending_staging_drill']],
   ['scripts/validators/validate-kingsmen-launch-readiness.mjs', ['backup:validate:restore', 'BACKUP_RESTORE_STAGING_DRILL_REQUIRED']]
@@ -60,6 +60,14 @@ for (const [path, tokens] of requiredTokens.entries()) {
   for (const pattern of forbiddenSecretPatterns) {
     check(`secret_scan:${path}:${pattern}`, !pattern.test(text), 'no forbidden secret-like value', path);
   }
+}
+
+if (exists('scripts/backup/Test-KingsmenTruthVaultRestore.ps1')) {
+  const restoreScript = read('scripts/backup/Test-KingsmenTruthVaultRestore.ps1');
+  check('restore_fails_closed_on_count_errors', restoreScript.includes('$failedChecks += "count_query:$table"'), 'failed or invalid table counts must fail the drill', 'scripts/backup/Test-KingsmenTruthVaultRestore.ps1');
+  check('restore_dry_run_never_passes', restoreScript.includes('$passed = (-not $DryRun) -and ($failedChecks.Count -eq 0)'), 'dry run cannot be reported as a successful restore', 'scripts/backup/Test-KingsmenTruthVaultRestore.ps1');
+  check('restore_failed_status_is_explicit', restoreScript.includes('RESTORE_DRILL_FAILED'), 'failed verification must produce a failed status', 'scripts/backup/Test-KingsmenTruthVaultRestore.ps1');
+  check('restore_does_not_hardcode_pass', !/passed\s*=\s*\$true/.test(restoreScript), 'restore pass must be evidence-derived', 'scripts/backup/Test-KingsmenTruthVaultRestore.ps1');
 }
 
 if (exists('manifests/ops/backup-restore-proof-v1.json')) {
