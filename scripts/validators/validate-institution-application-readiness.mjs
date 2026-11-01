@@ -22,15 +22,42 @@ assert.equal(contract.evidence_rules.candidate_readiness_is_not_an_admission_or_
 
 const verifiedProvider = {
   provider_key: "example-provider",
+  official_domain: "example.gov.za",
   identity: { legal_or_recognised_name: "Example Public Provider", status: "VERIFIED", verified_at: yesterday, freshness_window_days: 365 },
   source_evidence: { status: "VERIFIED", authority: "Example public authority", url: "https://example.gov.za/directory/provider", official_domain: "example.gov.za", observed_at: yesterday, freshness_window_days: 30 },
   application_route: { url: "https://example.gov.za/apply", official_domain: "example.gov.za", scope: "general applications", verification_status: "VERIFIED", verified_at: yesterday, freshness_window_days: 7 },
-  connector: {
-    method: "VERIFIED_HANDOFF", state: "CONFIGURED", access_review_status: "APPROVED", terms_review_status: "APPROVED",
-    human_handoff_configured: true, submission_mode: "NONE",
-    last_test: { status: "PASS", test_id: "route-smoke-001", tested_at: fresh, freshness_window_days: 1 },
+  authorization: {
+    status: "APPROVED", authority_name: "Example Public Provider", authority_role: "Provider integration authority",
+    approved_by: "provider-authority-001", evidence_ref: "provider-authority-evidence-001",
+    evidence_url: "https://example.gov.za/legal/integration-authority", approved_at: fresh,
+    expires_at: "2027-12-31T23:59:59+02:00", revoked_at: null,
+    approved_scopes: ["READ_PUBLIC_DATA"], reviewed_by: "kingsmen-reviewer-001",
+    reviewed_at: fresh, freshness_window_days: 30
   },
-  monitoring: { enabled: true, failure_handoff_configured: true, last_health: { status: "HEALTHY", checked_at: fresh, freshness_window_days: 1 } },
+  terms: {
+    status: "APPROVED", evidence_ref: "provider-terms-evidence-001",
+    terms_url: "https://example.gov.za/legal/provider-terms", reviewed_by: "kingsmen-legal-reviewer-001",
+    reviewed_at: fresh, freshness_window_days: 30, approved_scopes: ["READ_PUBLIC_DATA"]
+  },
+  connector: {
+    method: "VERIFIED_HANDOFF", state: "CONFIGURED",
+    handoff_url: "https://example.gov.za/apply", config_evidence_ref: "connector-config-evidence-001",
+    configured_at: fresh, configured_scopes: ["READ_PUBLIC_DATA"],
+    privacy_review_status: "APPROVED", privacy_review_evidence_ref: "privacy-review-evidence-001",
+    candidate_consent_enforced: true, data_minimization_enforced: true, human_handoff_configured: true,
+    submission_mode: "HUMAN_HANDOFF",
+    last_test: {
+      status: "PASS", test_id: "route-smoke-001", evidence_ref: "route-test-evidence-001",
+      tested_at: fresh, freshness_window_days: 1, environment: "STAGING",
+      synthetic_data_only: true, side_effects: false, tested_scopes: ["READ_PUBLIC_DATA"]
+    }
+  },
+  monitoring: {
+    enabled: true, failure_handoff_configured: true,
+    failure_handoff_owner: "Kingsmen Provider Operations", failure_handoff_ref: "provider-failure-handoff-001",
+    last_health: { status: "HEALTHY", evidence_ref: "provider-health-evidence-001", checked_at: fresh, freshness_window_days: 1 }
+  }
+
 };
 
 assert.equal(evaluateProviderReadiness({}, { asOf }).state, "P0_DISCOVERED");
@@ -55,6 +82,11 @@ assert.equal(evaluateProviderReadiness({
   monitoring: {},
 }, { asOf }).state, "P4_ROUTE_TESTED");
 assert.equal(evaluateProviderReadiness(verifiedProvider, { asOf }).state, "P5_MONITORED");
+assert.equal(evaluateProviderReadiness({
+  ...verifiedProvider,
+  authorization: undefined,
+}, { asOf }).state, "P2_ROUTE_VERIFIED", "Legacy approved flags without a provider-issued grant must not enable a connector");
+
 assert.equal(evaluateProviderReadiness({
   ...verifiedProvider,
   source_evidence: { ...verifiedProvider.source_evidence, observed_at: "2026-10-01T00:00:00Z", freshness_window_days: 1 },
