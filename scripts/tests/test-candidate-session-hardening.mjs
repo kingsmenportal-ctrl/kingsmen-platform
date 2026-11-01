@@ -32,8 +32,25 @@ assert.throws(() => createCandidateSession({ candidateId: " ", expiresAt: expiry
 assert.throws(() => createCandidateSession({ candidateId: "candidate-a", expiresAt: "not-a-date" }), /ISO 8601/);
 assert.throws(() => createCandidateSession({ candidateId: "candidate-a", expiresAt: "1" }), /ISO 8601/);
 assert.throws(() => createCandidateSession({ candidateId: "candidate-a", expiresAt: new Date(Date.now() - 1000).toISOString() }), /future/);
+
+for (const invalidDateTime of [
+  "2026-02-30T12:00:00Z",
+  "2026-04-31T12:00:00Z",
+  "2026-13-01T12:00:00Z",
+  "2026-01-01T24:00:00Z",
+  "2026-01-01T00:60:00Z",
+  "2026-01-01T00:00:60Z",
+  "2026-01-01T00:00:00+24:00",
+  "2026-01-01T00:00:00+01:60"
+]) {
+  assert.throws(
+    () => createCandidateSession({ candidateId: "candidate-a", expiresAt: invalidDateTime }),
+    /valid ISO 8601 calendar date-time/,
+    `must reject impossible date-time: ${invalidDateTime}`
+  );
+}
 assert.throws(() => assertCandidateCanLogin("PENDING"), /cannot login/);
 assert.doesNotThrow(() => assertCandidateCanLogin("ACTIVE"));
 assert.equal(shouldRequireAccountRecovery("LOCKED"), true);
 assert.equal(shouldRequireAccountRecovery("ACTIVE"), false);
-console.log("Candidate session hardening tests passed (10 assertions).");
+console.log("Candidate session hardening tests passed (18 assertions plus 8 strict timestamp rejection cases).");
