@@ -6,10 +6,10 @@ const { resolveCandidateIdentity, candidateOwnsResource } = require("../../apps/
 
 const URL = "https://project.example";
 const ANON = "public-anon-key";
-const USER_A = "user-a";
-const USER_B = "user-b";
-const CANDIDATE_A = "candidate-a";
-const CANDIDATE_B = "candidate-b";
+const USER_A = "123e4567-e89b-42d3-a456-426614174001";
+const USER_B = "123e4567-e89b-42d3-a456-426614174002";
+const CANDIDATE_A = "123e4567-e89b-42d3-a456-426614174011";
+const CANDIDATE_B = "123e4567-e89b-42d3-a456-426614174012";
 const env = { SUPABASE_URL: URL, SUPABASE_ANON_KEY: ANON };
 
 function response(status, payload) {
@@ -39,7 +39,9 @@ const linkOK = (candidateId, status = "VERIFIED") => response(200, [{ candidate_
   assert.equal(fetcher.calls[0].url, `${URL}/auth/v1/user`);
   assert.equal(fetcher.calls[0].init.headers.Authorization, "Bearer signed-user-token");
   assert.equal(fetcher.calls[0].init.headers.apikey, ANON);
+  assert.ok(fetcher.calls[0].init.signal instanceof AbortSignal, "Auth lookup must be bounded by a timeout signal");
   assert.equal(fetcher.calls[1].url, `${URL}/rest/v1/rpc/resolve_my_candidate_identity`);
+  assert.ok(fetcher.calls[1].init.signal instanceof AbortSignal, "Identity RPC must be bounded by a timeout signal");
   assert.equal(fetcher.calls[1].init.method, "POST");
   assert.equal(fetcher.calls[1].init.body, "{}");
   assert.equal(fetcher.calls[1].init.headers.Authorization, "Bearer signed-user-token");
@@ -56,9 +58,28 @@ const linkOK = (candidateId, status = "VERIFIED") => response(200, [{ candidate_
   const result = await resolveCandidateIdentity("Bearer token", { SUPABASE_URL: URL }, async () => { throw new Error("must not fetch"); });
   assert.deepEqual(result, { ok: false, status: 503, code: "IDENTITY_AUTHORIZATION_NOT_CONFIGURED" });
 }
+for (const unsafeUrl of [
+  "http://project.example",
+  "https://user:secret@project.example",
+  "https://project.example/custom-path",
+  "https://project.example/?override=1"
+]) {
+  const result = await resolveCandidateIdentity("Bearer valid-token", { SUPABASE_URL: unsafeUrl, SUPABASE_ANON_KEY: ANON }, async () => { throw new Error("must not fetch"); });
+  assert.deepEqual(result, { ok: false, status: 503, code: "IDENTITY_AUTHORIZATION_NOT_CONFIGURED" });
+}
+{
+  const result = await resolveCandidateIdentity("Bearer " + "x".repeat(8193), env, async () => { throw new Error("must not fetch"); });
+  assert.deepEqual(result, { ok: false, status: 401, code: "AUTHENTICATION_REQUIRED" });
+}
+{
+  const localEnv = { SUPABASE_URL: "http://127.0.0.1:54321", SUPABASE_ANON_KEY: ANON };
+  const fetcher = fetchSequence(authOK(USER_A), linkOK(CANDIDATE_A));
+  const result = await resolveCandidateIdentity("Bearer local-token", localEnv, fetcher);
+  assert.equal(result.ok, true, "localhost HTTP must remain available for local development");
+}
 
 // Supabase Auth rejects the token or returns malformed identity: no link query follows.
-for (const authResponse of [response(401, { message: "invalid" }), response(200, {}), response(200, { id: " " })]) {
+for (const authResponse of [response(401, { message: "invalid" }), response(200, {}), response(200, { id: " " }), response(200, { id: "not-a-uuid" })]) {
   const fetcher = fetchSequence(authResponse);
   const result = await resolveCandidateIdentity("Bearer bad-token", env, fetcher);
   assert.equal(result.ok, false);
@@ -75,6 +96,7 @@ for (const links of [
   ]),
   linkOK(CANDIDATE_A, "PENDING"),
   response(200, [{ candidate_id: "", link_status: "VERIFIED" }]),
+  response(200, [{ candidate_id: "not-a-uuid", link_status: "VERIFIED" }]),
   response(200, { candidate_id: CANDIDATE_A, link_status: "VERIFIED" })
 ]) {
   const fetcher = fetchSequence(authOK(USER_A), links);
