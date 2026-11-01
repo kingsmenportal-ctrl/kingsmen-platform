@@ -1,0 +1,39 @@
+{
+  "schema": "kingsmen.institution-browser-scout-targets.v1",
+  "description": "Illustrative, inactive public-source targets. Each target must be independently source-reviewed and explicitly enabled before a network probe.",
+  "targets": [
+    {
+      "id": "dhet-public-source-register",
+      "name": "Department of Higher Education and Training public source register",
+      "institutionType": "REGULATOR",
+      "url": "https://www.dhet.gov.za/",
+      "approvedHosts": ["dhet.gov.za", "www.dhet.gov.za"],
+      "tier": "TIER_1",
+      "pathways": [
+        "HIGHER_EDUCATION",
+        "TVET",
+        "SETA_LEARNERSHIPS",
+        "INTERNSHIPS",
+        "APPRENTICESHIPS",
+        "EMPLOYMENT"
+      ],
+      "enabled": false,
+      "mappingVersion": null,
+      "expectedStructureFingerprint": null,
+      "sourceNote": "Directory authority only. It does not prove a live programme, institution partnership, intake, deadline or candidate eligibility."
+    },
+    {
+      "id": "university-of-johannesburg-public",
+      "name": "University of Johannesburg public website",
+      "institutionType": "PUBLIC_UNIVERSITY",
+      "url": "https://www.uj.ac.za/",
+      "approvedHosts": ["uj.ac.za", "www.uj.ac.za"],
+      "tier": "TIER_1",
+      "pathways": ["HIGHER_EDUCATION"],
+      "enabled": false,
+      "mappingVersion": null,
+      "expectedStructureFingerprint": null,
+      "sourceNote": "Illustrative target only. Public website probing is not a university portal integration or permission to submit an application."
+    }
+  ]
+}
