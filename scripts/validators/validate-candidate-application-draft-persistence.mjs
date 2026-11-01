@@ -12,12 +12,16 @@ const packageJson = JSON.parse(read("package.json"));
 const auditStart = migration.indexOf("INSERT INTO public.candidate_application_events");
 const auditEnd = migration.indexOf("ON CONFLICT (event_ref) DO NOTHING", auditStart);
 const auditInsert = auditStart >= 0 && auditEnd > auditStart ? migration.slice(auditStart, auditEnd) : "";
+const getStart = migration.indexOf("CREATE OR REPLACE FUNCTION public.get_candidate_application_draft");
+const saveStart = migration.indexOf("CREATE OR REPLACE FUNCTION public.save_candidate_application_draft");
+const getFunction = getStart >= 0 && saveStart > getStart ? migration.slice(getStart, saveStart) : "";
 
 const checks = [
   ["one draft-answer row is bound to one parent application and its candidate", /application_id uuid PRIMARY KEY/.test(migration) && /FOREIGN KEY \(application_id, candidate_id\)/.test(migration) && /REFERENCES public\.candidate_applications\(id, candidate_id\)/.test(migration)],
   ["draft-answer table is RLS protected and inaccessible directly to client roles", /ENABLE ROW LEVEL SECURITY/.test(migration) && /FROM PUBLIC, anon, authenticated/.test(migration) && /TO service_role USING \(true\) WITH CHECK \(true\)/.test(migration)],
   ["candidate identity is derived from exactly one verified Auth link", /auth\.uid\(\)/.test(migration) && /link_status = 'VERIFIED'/.test(migration) && /verified_by IS NOT NULL/.test(migration) && /v_link_count <> 1/.test(migration)],
   ["draft load is restricted to the owned parent application", /WHERE a\.id = p_application_id[\s\S]*AND a\.candidate_id = v_candidate_id/.test(migration)],
+  ["draft read selects the application status it returns", getFunction.includes("a.status") && getFunction.includes("'status', v_application.status")],
   ["draft read and write hold verified Auth identity-link share locks", (migration.match(/FOR SHARE;/g) ?? []).length >= 3 && /candidate_auth_identity_links/.test(migration)],
   ["draft save holds a row lock on the candidate-owned parent application", /WHERE a\.id = p_application_id[\s\S]*AND a\.candidate_id = v_candidate_id[\s\S]*FOR UPDATE/.test(migration)],
   ["draft answer save requires a saved reusable candidate profile", migration.includes("CANDIDATE_REUSABLE_PROFILE_REQUIRED") && migration.includes("candidate_master_profiles mp")],
