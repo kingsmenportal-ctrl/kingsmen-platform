@@ -21,7 +21,42 @@ if (data.integration_contract?.default_record_state !== "NEEDS_REVIEW") errors.p
 if (data.integration_contract?.default_public_safe !== false) errors.push("Records must default to not public safe");
 if (data.integration_contract?.default_connector_state !== "NOT_CONNECTED") errors.push("Connectors must default to NOT_CONNECTED");
 for (const cls of requiredClasses) if (!data.institution_classes.includes(cls)) errors.push(`Missing institution class: ${cls}`);
-if (!Array.isArray(data.sources) || data.sources.length < 20) errors.push("Expected at least 20 cross-sector source anchors");
+if (!Array.isArray(data.sources) || data.sources.length < 188) errors.push("Expected at least 177 cross-sector source anchors after the GCIS profile reconciliation");
+const setaProviderKeys = (data.sources ?? []).filter(source => /^seta_[a-z0-9]+_official$/.test(source.source_id)).map(source => source.provider_key);
+if (setaProviderKeys.length !== 21 || new Set(setaProviderKeys).size !== 21 || setaProviderKeys.some(key => !key)) errors.push("Expected 21 distinct individual SETA provider keys");
+const employerKeys = (data.sources ?? []).filter(source => /^gcis_soe_.*_employer$/.test(source.source_id)).map(source => source.provider_key);
+if (employerKeys.length !== 9 || new Set(employerKeys).size !== 9 || employerKeys.some(key => !key)) errors.push("Expected nine unique, individually keyed GCIS public-employer anchors");
+if (!(data.sources ?? []).some(source => source.source_id === "gcis_public_entities_and_soe_directory")) errors.push("Missing GCIS directory anchor for 123 public institutions and SOEs");
+const gcisProfileSources = (data.sources ?? []).filter(source => source.metadata?.gcis_profile_url || source.metadata?.official_gcis_profile_url);
+const gcisProfileUrls = gcisProfileSources.map(source => source.metadata.gcis_profile_url ?? source.metadata.official_gcis_profile_url);
+const gcisProviderKeys = gcisProfileSources.map(source => source.provider_key);
+if (gcisProfileSources.length !== 123 || new Set(gcisProfileUrls).size !== 123 || new Set(gcisProviderKeys).size !== 123 || gcisProviderKeys.some(key => !key)) errors.push("Expected all 123 unique GCIS public-entity profiles with unique canonical provider keys");
+
+const requiredBulkSources = [
+  "gcis_provincial_local_municipal_directory",
+  "national_treasury_municipal_finance_data",
+  "dhet_pset_landscape_2026_27",
+  "lurits_registered_school_masterlist",
+  "national_health_facility_master_list",
+  "govza_bursary_funding_guide",
+  "bursaries_africa_provider_index_leads",
+  "nsfas_accommodation_directory",
+  "dpsa_public_service_vacancies",
+  "private_employer_pepkor_careers",
+  "private_employer_sasol_careers",
+  "private_employer_woolworths_careers",
+  "private_employer_mr_price_careers",
+  "private_employer_vodafone_careers",
+  "private_employer_pepsico_south_africa",
+  "private_employer_nedbank_careers",
+  "private_employer_clicks_group_careers",
+  "private_employer_tfg_careers",
+  "private_employer_standard_bank_careers"
+];
+for (const id of requiredBulkSources) {
+  if (!(data.sources ?? []).some(source => source.source_id === id)) errors.push("Missing authoritative discovery/lead source: " + id);
+}
+
 const ids = new Set();
 for (const source of data.sources ?? []) {
   if (!source.source_id || ids.has(source.source_id)) errors.push(`Missing or duplicate source_id: ${source.source_id}`);

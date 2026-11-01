@@ -1,0 +1,521 @@
+-- 0105: import all 123 individual profiles from the official GCIS public-entity directory
+-- into Kingsmen's existing canonical route_providers registry.
+-- Existing providers seeded by 0101/0102 or already present (e.g. NSFAS) are preserved.
+-- No vacancies, programmes, open intakes, application URLs, partnerships, connectors,
+-- provider submissions or receipts are created by this import.
+BEGIN;
+
+INSERT INTO public.source_authorities (source_key,source_name,source_type,base_url,default_confidence_band,verification_required,last_verified_at,verification_notes)
+VALUES ('gcis_public_entities_and_soe_directory','GCIS National Government Directory — State-Owned Enterprises and Other Public Institutions','government_institution_list','https://www.gov.za/about-government/contact-directory/soe-s','C',true,NULL,'GCIS lists 123 state-owned enterprises and other public institutions. Individual directory profiles are discovery/contact-source evidence only. Current legal identity, recruitment notices, roles, eligibility, application method and deadline must be checked separately.')
+ON CONFLICT (source_key) DO NOTHING;
+
+DO $preflight$
+BEGIN
+  IF NOT EXISTS (SELECT 1 FROM public.source_authorities WHERE source_key='gcis_public_entities_and_soe_directory' AND base_url='https://www.gov.za/about-government/contact-directory/soe-s' AND verification_required=true) THEN
+    RAISE EXCEPTION 'GCIS_PUBLIC_ENTITY_SOURCE_AUTHORITY_MISSING_OR_CONFLICTING';
+  END IF;
+END
+$preflight$;
+
+WITH provider_seed(provider_key,provider_name,provider_type,base_url,source_profile_url,source_id,institution_classes) AS (
+  VALUES
+    ('soe_hpcsa', 'Health Professions Council of South Africa', 'EMPLOYER', 'https://www.hpcsa.co.za/', 'https://www.gov.za/about-government/contact-directory/soe/health-professions-council-south-africa-hpcsa', 'hpcsa_professional_register', 'HEALTH_AND_CARE,REGULATOR_AND_PROFESSIONAL_COUNCIL'),
+    ('soe_sassa', 'South African Social Security Agency', 'EMPLOYER', 'https://www.sassa.gov.za/', 'https://www.gov.za/about-government/contact-directory/soe/south-african-social-security-agency-sassa', 'sassa_official', 'FUNDING_AND_SOCIAL_SUPPORT,PUBLIC_ADMINISTRATION'),
+    ('soe_nyda', 'National Youth Development Agency', 'EMPLOYER', 'https://www.nyda.gov.za/', 'https://www.gov.za/about-government/contact-directory/soe/national-youth-development-agency-nyda', 'nyda_official', 'FUNDING_AND_SOCIAL_SUPPORT,EMPLOYER_AND_RECRUITMENT'),
+    ('soe_eskom', 'Eskom', 'EMPLOYER', 'https://www.eskom.co.za/', 'https://www.gov.za/about-government/contact-directory/soe/eskom', 'eskom_official', 'STATE_OWNED_ENTERPRISE,TRANSPORT_AND_ESSENTIAL_SERVICES,EMPLOYER_AND_RECRUITMENT,ENERGY_AND_UTILITIES'),
+    ('seta_hwseta', 'Health and Welfare Sector Education and Training Authority', 'SETA', NULL, 'https://www.gov.za/about-government/contact-directory/soe/health_and_welfare_sector_education_and_training_authority_hwseta', 'seta_hwseta_official', 'EDUCATION_AND_SKILLS,EMPLOYER_AND_RECRUITMENT,FUNDING_AND_SOCIAL_SUPPORT'),
+    ('seta_mqa', 'Mining Qualifications Authority (MQA)', 'SETA', NULL, 'https://www.gov.za/about-government/contact-directory/soe/mining_qualification_authority', 'seta_mqa_official', 'EDUCATION_AND_SKILLS,EMPLOYER_AND_RECRUITMENT,FUNDING_AND_SOCIAL_SUPPORT'),
+    ('seta_sasseta', 'Safety and Security Sector Education and Training Authority (SASSETA)', 'SETA', NULL, 'https://www.gov.za/about-government/contact-directory/soe/safety_and_security_sector_education_training_authority', 'seta_sasseta_official', 'EDUCATION_AND_SKILLS,EMPLOYER_AND_RECRUITMENT,FUNDING_AND_SOCIAL_SUPPORT'),
+    ('soe_acsa', 'Airports Company South Africa (ACSA)', 'EMPLOYER', NULL, 'https://www.gov.za/about-government/contact-directory/soe/airports_company_south_africa_acsa', 'gcis_soe_acsa_employer', 'STATE_OWNED_ENTERPRISE,PUBLIC_ENTITY,EMPLOYER_AND_RECRUITMENT,TRANSPORT_AND_ESSENTIAL_SERVICES'),
+    ('soe_denel', 'Denel (Pty) Ltd', 'EMPLOYER', NULL, 'https://www.gov.za/about-government/contact-directory/soe/denel_pty_ltd', 'gcis_soe_denel_employer', 'STATE_OWNED_ENTERPRISE,PUBLIC_ENTITY,EMPLOYER_AND_RECRUITMENT'),
+    ('soe_prasa', 'Passenger Rail Agency of South Africa (PRASA)', 'EMPLOYER', NULL, 'https://www.gov.za/about-government/contact-directory/soe/passenger_rail_agency_south_african_prasa', 'gcis_soe_prasa_employer', 'STATE_OWNED_ENTERPRISE,PUBLIC_ENTITY,EMPLOYER_AND_RECRUITMENT,TRANSPORT_AND_ESSENTIAL_SERVICES'),
+    ('soe_saa', 'South African Airways (SAA)', 'EMPLOYER', NULL, 'https://www.gov.za/about-government/contact-directory/soe/south_african_airways_saa', 'gcis_soe_saa_employer', 'STATE_OWNED_ENTERPRISE,PUBLIC_ENTITY,EMPLOYER_AND_RECRUITMENT,TRANSPORT_AND_ESSENTIAL_SERVICES'),
+    ('soe_sabc', 'South African Broadcasting Corporation (SABC)', 'EMPLOYER', NULL, 'https://www.gov.za/about-government/contact-directory/soe/south_african_broadcasting_corporation_sabc', 'gcis_soe_sabc_employer', 'STATE_OWNED_ENTERPRISE,PUBLIC_ENTITY,EMPLOYER_AND_RECRUITMENT'),
+    ('soe_sanral', 'South African National Road Agency (SANRAL)', 'EMPLOYER', NULL, 'https://www.gov.za/about-government/contact-directory/soe/south_african_national_road_agency', 'gcis_soe_sanral_employer', 'STATE_OWNED_ENTERPRISE,PUBLIC_ENTITY,EMPLOYER_AND_RECRUITMENT,TRANSPORT_AND_ESSENTIAL_SERVICES'),
+    ('soe_sapo', 'South African Post Office (SAPO)', 'EMPLOYER', NULL, 'https://www.gov.za/about-government/contact-directory/soe/south_african_post_office_sapo', 'gcis_soe_sapo_employer', 'STATE_OWNED_ENTERPRISE,PUBLIC_ENTITY,EMPLOYER_AND_RECRUITMENT,TRANSPORT_AND_ESSENTIAL_SERVICES'),
+    ('soe_telkom', 'Telkom SA (Ltd)', 'EMPLOYER', NULL, 'https://www.gov.za/about-government/contact-directory/soe/telkom_sa_ltd', 'gcis_soe_telkom_employer', 'STATE_OWNED_ENTERPRISE,PUBLIC_ENTITY,EMPLOYER_AND_RECRUITMENT'),
+    ('soe_transnet', 'Transnet (Ltd)', 'EMPLOYER', NULL, 'https://www.gov.za/about-government/contact-directory/soe/transnet_ltd', 'gcis_soe_transnet_employer', 'STATE_OWNED_ENTERPRISE,PUBLIC_ENTITY,EMPLOYER_AND_RECRUITMENT,TRANSPORT_AND_ESSENTIAL_SERVICES'),
+    ('soe_national_house_traditional_and_khoisan_leaders', 'National House of Traditional and Khoisan Leaders', 'EMPLOYER', NULL, 'https://www.gov.za/about-government/contact-directory/soe/national-house-traditional-and-khoisan-leaders', 'gcis_public_entity_national_house_traditional_and_khoisan_leaders', 'PUBLIC_ENTITY,EMPLOYER_AND_RECRUITMENT,PUBLIC_ADMINISTRATION'),
+    ('soe_accounting_standards_board', 'Accounting Standards Board', 'EMPLOYER', NULL, 'https://www.gov.za/about-government/contact-directory/soe/accounting-standards-board', 'gcis_public_entity_accounting_standards_board', 'PUBLIC_ENTITY,EMPLOYER_AND_RECRUITMENT,PUBLIC_ADMINISTRATION,FINANCE_AND_INSURANCE'),
+    ('soe_agricultural_research_council_arc', 'Agricultural Research Council (ARC)', 'EMPLOYER', NULL, 'https://www.gov.za/about-government/contact-directory/soe/agricultural-research-council-arc', 'gcis_public_entity_agricultural_research_council_arc', 'PUBLIC_ENTITY,EMPLOYER_AND_RECRUITMENT,PUBLIC_ADMINISTRATION,EDUCATION_AND_SKILLS'),
+    ('soe_air_traffic_and_navigation_services_company', 'Air Traffic and Navigation Services Company', 'EMPLOYER', NULL, 'https://www.gov.za/about-government/contact-directory/soe/air-traffic-and-navigation-services-company', 'gcis_public_entity_air_traffic_and_navigation_services_company', 'PUBLIC_ENTITY,EMPLOYER_AND_RECRUITMENT,PUBLIC_ADMINISTRATION,TRANSPORT_AND_ESSENTIAL_SERVICES'),
+    ('soe_alexkor_limited', 'Alexkor Limited', 'EMPLOYER', NULL, 'https://www.gov.za/about-government/contact-directory/soe/alexkor-limited', 'gcis_public_entity_alexkor_limited', 'PUBLIC_ENTITY,EMPLOYER_AND_RECRUITMENT,PUBLIC_ADMINISTRATION'),
+    ('soe_armscor', 'Armaments Corporation of South Africa (ARMSCOR)', 'EMPLOYER', NULL, 'https://www.gov.za/about-government/contact-directory/soe/armaments-corporation-south-africa-armscor', 'gcis_public_entity_armscor', 'PUBLIC_ENTITY,EMPLOYER_AND_RECRUITMENT,PUBLIC_ADMINISTRATION'),
+    ('soe_blind_sa', 'Blind SA', 'EMPLOYER', NULL, 'https://www.gov.za/about-government/contact-directory/soe/blind-sa', 'gcis_public_entity_blind_sa', 'PUBLIC_ENTITY,EMPLOYER_AND_RECRUITMENT,PUBLIC_ADMINISTRATION,NGO_NPO_AND_FOUNDATION,LEGAL_AID_AND_COMMUNITY_SERVICES'),
+    ('soe_border_management_authority_bma', 'Border Management Authority (BMA)', 'EMPLOYER', NULL, 'https://www.gov.za/about-government/contact-directory/soe/border-management-authority-bma', 'gcis_public_entity_border_management_authority_bma', 'PUBLIC_ENTITY,EMPLOYER_AND_RECRUITMENT,PUBLIC_ADMINISTRATION,PUBLIC_ADMINISTRATION'),
+    ('soe_brand_south_africa', 'Brand South Africa', 'EMPLOYER', NULL, 'https://www.gov.za/about-government/contact-directory/soe/brand-south-africa', 'gcis_public_entity_brand_south_africa', 'PUBLIC_ENTITY,EMPLOYER_AND_RECRUITMENT,PUBLIC_ADMINISTRATION'),
+    ('soe_breede_gouritz_cma', 'Breede-Gouritz CMA', 'EMPLOYER', NULL, 'https://www.gov.za/about-government/contact-directory/soe/breede-gouritz-cma', 'gcis_public_entity_breede_gouritz_cma', 'PUBLIC_ENTITY,EMPLOYER_AND_RECRUITMENT,PUBLIC_ADMINISTRATION,TRANSPORT_AND_ESSENTIAL_SERVICES'),
+    ('soe_broadband_infraco', 'Broadband Infraco', 'EMPLOYER', NULL, 'https://www.gov.za/about-government/contact-directory/soe/broadband-infraco', 'gcis_public_entity_broadband_infraco', 'PUBLIC_ENTITY,EMPLOYER_AND_RECRUITMENT,PUBLIC_ADMINISTRATION,TRANSPORT_AND_ESSENTIAL_SERVICES'),
+    ('soe_broadcasting_complaints_commission_south_africa_bccsa', 'Broadcasting Complaints Commission of South Africa (BCCSA)', 'EMPLOYER', NULL, 'https://www.gov.za/about-government/contact-directory/soe/broadcasting-complaints-commission-south-africa-bccsa', 'gcis_public_entity_broadcasting_complaints_commission_south_africa_bccsa', 'PUBLIC_ENTITY,EMPLOYER_AND_RECRUITMENT,PUBLIC_ADMINISTRATION,REGULATOR_AND_PROFESSIONAL_COUNCIL'),
+    ('soe_cape_town_international_airport', 'Cape Town International Airport', 'EMPLOYER', NULL, 'https://www.gov.za/about-government/contact-directory/soe/cape-town-international-airport', 'gcis_public_entity_cape_town_international_airport', 'PUBLIC_ENTITY,EMPLOYER_AND_RECRUITMENT,PUBLIC_ADMINISTRATION,TRANSPORT_AND_ESSENTIAL_SERVICES'),
+    ('soe_central_energy_fund_cef', 'Central Energy Fund (CEF)', 'EMPLOYER', NULL, 'https://www.gov.za/about-government/contact-directory/soe/central-energy-fund-cef', 'gcis_public_entity_central_energy_fund_cef', 'PUBLIC_ENTITY,EMPLOYER_AND_RECRUITMENT,PUBLIC_ADMINISTRATION,ENERGY_AND_UTILITIES,FINANCE_AND_INSURANCE'),
+    ('soe_ccma', 'Commission for Conciliation, Mediation and Arbitration', 'EMPLOYER', NULL, 'https://www.gov.za/about-government/contact-directory/soe/commission-conciliation-mediation-and-arbitration', 'gcis_public_entity_ccma', 'PUBLIC_ENTITY,EMPLOYER_AND_RECRUITMENT,PUBLIC_ADMINISTRATION,LEGAL_AID_AND_COMMUNITY_SERVICES,PUBLIC_ADMINISTRATION'),
+    ('soe_cipc', 'Companies and Intellectual Property Commission (CIPC)', 'EMPLOYER', NULL, 'https://www.gov.za/about-government/contact-directory/soe/companies-and-intellectual-property-commission-cipc', 'gcis_public_entity_cipc', 'PUBLIC_ENTITY,EMPLOYER_AND_RECRUITMENT,PUBLIC_ADMINISTRATION,REGULATOR_AND_PROFESSIONAL_COUNCIL'),
+    ('soe_competition_commission', 'Competition Commission', 'EMPLOYER', NULL, 'https://www.gov.za/about-government/contact-directory/soe/competition-commission', 'gcis_public_entity_competition_commission', 'PUBLIC_ENTITY,EMPLOYER_AND_RECRUITMENT,PUBLIC_ADMINISTRATION,REGULATOR_AND_PROFESSIONAL_COUNCIL'),
+    ('soe_competition_tribunal', 'Competition Tribunal', 'EMPLOYER', NULL, 'https://www.gov.za/about-government/contact-directory/soe/competition-tribunal', 'gcis_public_entity_competition_tribunal', 'PUBLIC_ENTITY,EMPLOYER_AND_RECRUITMENT,PUBLIC_ADMINISTRATION,REGULATOR_AND_PROFESSIONAL_COUNCIL'),
+    ('soe_council_geoscience', 'Council for Geoscience', 'EMPLOYER', NULL, 'https://www.gov.za/about-government/contact-directory/soe/council-geoscience', 'gcis_public_entity_council_geoscience', 'PUBLIC_ENTITY,EMPLOYER_AND_RECRUITMENT,PUBLIC_ADMINISTRATION,EDUCATION_AND_SKILLS'),
+    ('soe_council_medical_schemes', 'Council for Medical Schemes', 'EMPLOYER', NULL, 'https://www.gov.za/about-government/contact-directory/soe/council-medical-schemes', 'gcis_public_entity_council_medical_schemes', 'PUBLIC_ENTITY,EMPLOYER_AND_RECRUITMENT,PUBLIC_ADMINISTRATION,HEALTH_AND_CARE,REGULATOR_AND_PROFESSIONAL_COUNCIL'),
+    ('soe_council_higher_education', 'Council on Higher Education', 'EMPLOYER', NULL, 'https://www.gov.za/about-government/contact-directory/soe/council-higher-education', 'gcis_public_entity_council_higher_education', 'PUBLIC_ENTITY,EMPLOYER_AND_RECRUITMENT,PUBLIC_ADMINISTRATION,EDUCATION_AND_SKILLS,REGULATOR_AND_PROFESSIONAL_COUNCIL'),
+    ('soe_export_credit_insurance_corporation', 'Export Credit Insurance Corporation of South Africa SOC Ltd', 'EMPLOYER', NULL, 'https://www.gov.za/about-government/contact-directory/soe/export-credit-insurance-corporation-south-africa-soc-ltd', 'gcis_public_entity_export_credit_insurance_corporation', 'PUBLIC_ENTITY,EMPLOYER_AND_RECRUITMENT,PUBLIC_ADMINISTRATION,FINANCE_AND_INSURANCE'),
+    ('soe_film_and_publication_board_fpb', 'Film and Publication Board (FPB)', 'EMPLOYER', NULL, 'https://www.gov.za/about-government/contact-directory/soe/film-and-publication-board-fpb', 'gcis_public_entity_film_and_publication_board_fpb', 'PUBLIC_ENTITY,EMPLOYER_AND_RECRUITMENT,PUBLIC_ADMINISTRATION,REGULATOR_AND_PROFESSIONAL_COUNCIL'),
+    ('soe_fsca', 'Financial Sector Conduct Authority (FSCA)', 'EMPLOYER', NULL, 'https://www.gov.za/about-government/contact-directory/soe/financial-sector-conduct-authority-fsca', 'gcis_public_entity_fsca', 'PUBLIC_ENTITY,EMPLOYER_AND_RECRUITMENT,PUBLIC_ADMINISTRATION,FINANCE_AND_INSURANCE,REGULATOR_AND_PROFESSIONAL_COUNCIL'),
+    ('soe_free_state_development_corporation', 'Free State Development Corporation', 'EMPLOYER', NULL, 'https://www.gov.za/about-government/contact-directory/soe/free-state-development-corporation', 'gcis_public_entity_free_state_development_corporation', 'PUBLIC_ENTITY,EMPLOYER_AND_RECRUITMENT,PUBLIC_ADMINISTRATION,FUNDING_AND_SOCIAL_SUPPORT'),
+    ('soe_freedom_park', 'Freedom Park', 'EMPLOYER', NULL, 'https://www.gov.za/about-government/contact-directory/soe/freedom-park', 'gcis_public_entity_freedom_park', 'PUBLIC_ENTITY,EMPLOYER_AND_RECRUITMENT,PUBLIC_ADMINISTRATION'),
+    ('soe_gems', 'Government Employees Medical Scheme (GEMS)', 'EMPLOYER', NULL, 'https://www.gov.za/about-government/contact-directory/soe/government-employees-medical-scheme-gems', 'gcis_public_entity_gems', 'PUBLIC_ENTITY,EMPLOYER_AND_RECRUITMENT,PUBLIC_ADMINISTRATION,HEALTH_AND_CARE,FINANCE_AND_INSURANCE'),
+    ('soe_gepf', 'Government Employees Pension Fund (GEPF)', 'EMPLOYER', NULL, 'https://www.gov.za/about-government/contact-directory/soe/government-employees-pension-fund-gepf', 'gcis_public_entity_gepf', 'PUBLIC_ENTITY,EMPLOYER_AND_RECRUITMENT,PUBLIC_ADMINISTRATION,FINANCE_AND_INSURANCE'),
+    ('soe_housing_development_agency_hda', 'Housing Development Agency (HDA)', 'EMPLOYER', NULL, 'https://www.gov.za/about-government/contact-directory/soe/housing-development-agency-hda', 'gcis_public_entity_housing_development_agency_hda', 'PUBLIC_ENTITY,EMPLOYER_AND_RECRUITMENT,PUBLIC_ADMINISTRATION,HOUSING_AND_ACCOMMODATION'),
+    ('soe_hsrc', 'Human Sciences Research Council (HSRC)', 'EMPLOYER', NULL, 'https://www.gov.za/about-government/contact-directory/soe/human-sciences-research-council-hsrc', 'gcis_public_entity_hsrc', 'PUBLIC_ENTITY,EMPLOYER_AND_RECRUITMENT,PUBLIC_ADMINISTRATION,EDUCATION_AND_SKILLS'),
+    ('soe_independent_development_trust', 'Independent Development Trust', 'EMPLOYER', NULL, 'https://www.gov.za/about-government/contact-directory/soe/independent-development-trust', 'gcis_public_entity_independent_development_trust', 'PUBLIC_ENTITY,EMPLOYER_AND_RECRUITMENT,PUBLIC_ADMINISTRATION,FUNDING_AND_SOCIAL_SUPPORT'),
+    ('soe_idc', 'Industrial Development Corporation (IDC)', 'EMPLOYER', NULL, 'https://www.gov.za/about-government/contact-directory/soe/industrial-development-corporation-ltd-idc', 'gcis_public_entity_idc', 'PUBLIC_ENTITY,EMPLOYER_AND_RECRUITMENT,PUBLIC_ADMINISTRATION,FUNDING_AND_SOCIAL_SUPPORT,FINANCE_AND_INSURANCE'),
+    ('soe_ingonyama_trust_board', 'Ingonyama Trust Board', 'EMPLOYER', NULL, 'https://www.gov.za/about-government/contact-directory/soe/ingonyama-trust-board', 'gcis_public_entity_ingonyama_trust_board', 'PUBLIC_ENTITY,EMPLOYER_AND_RECRUITMENT,PUBLIC_ADMINISTRATION,PUBLIC_ADMINISTRATION'),
+    ('soe_institute_people_management_ipm', 'Institute of People Management (IPM)', 'EMPLOYER', NULL, 'https://www.gov.za/about-government/contact-directory/soe/institute-people-management-ipm', 'gcis_public_entity_institute_people_management_ipm', 'PUBLIC_ENTITY,EMPLOYER_AND_RECRUITMENT,PUBLIC_ADMINISTRATION,REGULATOR_AND_PROFESSIONAL_COUNCIL'),
+    ('soe_king_shaka_international_airport', 'King Shaka International Airport', 'EMPLOYER', NULL, 'https://www.gov.za/about-government/contact-directory/soe/king-shaka-international-airport', 'gcis_public_entity_king_shaka_international_airport', 'PUBLIC_ENTITY,EMPLOYER_AND_RECRUITMENT,PUBLIC_ADMINISTRATION,TRANSPORT_AND_ESSENTIAL_SERVICES'),
+    ('soe_land_bank', 'Land Bank and Agriculture Bank of South Africa (Land Bank)', 'EMPLOYER', NULL, 'https://www.gov.za/about-government/contact-directory/soe/land-bank-and-agriculture-bank-south-africa-land-bank', 'gcis_public_entity_land_bank', 'PUBLIC_ENTITY,EMPLOYER_AND_RECRUITMENT,PUBLIC_ADMINISTRATION,FINANCE_AND_INSURANCE,FUNDING_AND_SOCIAL_SUPPORT'),
+    ('soe_legal_aid_south_africa', 'Legal Aid South Africa', 'EMPLOYER', NULL, 'https://www.gov.za/about-government/contact-directory/soe/legal-aid-south-africa', 'gcis_public_entity_legal_aid_south_africa', 'PUBLIC_ENTITY,EMPLOYER_AND_RECRUITMENT,PUBLIC_ADMINISTRATION,LEGAL_AID_AND_COMMUNITY_SERVICES'),
+    ('soe_limpopo_economic_development_enterprise', 'Limpopo Economic Development Enterprise', 'EMPLOYER', NULL, 'https://www.gov.za/about-government/contact-directory/soe/limpopo-economic-development-enterprise', 'gcis_public_entity_limpopo_economic_development_enterprise', 'PUBLIC_ENTITY,EMPLOYER_AND_RECRUITMENT,PUBLIC_ADMINISTRATION,FUNDING_AND_SOCIAL_SUPPORT'),
+    ('soe_mdda', 'Media Development and Diversity Agency (MDDA)', 'EMPLOYER', NULL, 'https://www.gov.za/about-government/contact-directory/soe/media-development-and-diversity-agency-mdda', 'gcis_public_entity_mdda', 'PUBLIC_ENTITY,EMPLOYER_AND_RECRUITMENT,PUBLIC_ADMINISTRATION,FUNDING_AND_SOCIAL_SUPPORT'),
+    ('soe_nelson_mandela_museum', 'Nelson Mandela Museum', 'EMPLOYER', NULL, 'https://www.gov.za/about-government/contact-directory/soe/nelson-mandela-museum', 'gcis_public_entity_nelson_mandela_museum', 'PUBLIC_ENTITY,EMPLOYER_AND_RECRUITMENT,PUBLIC_ADMINISTRATION'),
+    ('soe_north_west_development_corporation', 'North West Development Corporation', 'EMPLOYER', NULL, 'https://www.gov.za/about-government/contact-directory/soe/north-west-development-corporation', 'gcis_public_entity_north_west_development_corporation', 'PUBLIC_ENTITY,EMPLOYER_AND_RECRUITMENT,PUBLIC_ADMINISTRATION,FUNDING_AND_SOCIAL_SUPPORT'),
+    ('soe_or_tambo_international_airport', 'OR Tambo International Airport', 'EMPLOYER', NULL, 'https://www.gov.za/about-government/contact-directory/soe/or-tambo-international-airport', 'gcis_public_entity_or_tambo_international_airport', 'PUBLIC_ENTITY,EMPLOYER_AND_RECRUITMENT,PUBLIC_ADMINISTRATION,TRANSPORT_AND_ESSENTIAL_SERVICES'),
+    ('soe_perishable_products_export_control_board', 'Perishable Products Export Control Board', 'EMPLOYER', NULL, 'https://www.gov.za/about-government/contact-directory/soe/perishable-products-export-control-board', 'gcis_public_entity_perishable_products_export_control_board', 'PUBLIC_ENTITY,EMPLOYER_AND_RECRUITMENT,PUBLIC_ADMINISTRATION,REGULATOR_AND_PROFESSIONAL_COUNCIL'),
+    ('soe_petrosa', 'PetroSA (Pty) Ltd', 'EMPLOYER', NULL, 'https://www.gov.za/about-government/contact-directory/soe/petrosa-pty-ltd', 'gcis_public_entity_petrosa', 'PUBLIC_ENTITY,EMPLOYER_AND_RECRUITMENT,PUBLIC_ADMINISTRATION,ENERGY_AND_UTILITIES'),
+    ('soe_psira', 'Private Security Industry Regulatory Authority (PSIRA)', 'EMPLOYER', NULL, 'https://www.gov.za/about-government/contact-directory/soe/private-security-industry-regulatory-authority-psira', 'gcis_public_entity_psira', 'PUBLIC_ENTITY,EMPLOYER_AND_RECRUITMENT,PUBLIC_ADMINISTRATION,REGULATOR_AND_PROFESSIONAL_COUNCIL'),
+    ('soe_property_practitioners_regulatory_authority', 'Property Practitioners Regulatory Authority', 'EMPLOYER', NULL, 'https://www.gov.za/about-government/contact-directory/soe/property-practitioners-regulatory-authority', 'gcis_public_entity_property_practitioners_regulatory_authority', 'PUBLIC_ENTITY,EMPLOYER_AND_RECRUITMENT,PUBLIC_ADMINISTRATION,REGULATOR_AND_PROFESSIONAL_COUNCIL,HOUSING_AND_ACCOMMODATION'),
+    ('soe_pic', 'Public Investment Corporation (PIC)', 'EMPLOYER', NULL, 'https://www.gov.za/about-government/contact-directory/soe/public-investment-corporation-pic', 'gcis_public_entity_pic', 'PUBLIC_ENTITY,EMPLOYER_AND_RECRUITMENT,PUBLIC_ADMINISTRATION,FINANCE_AND_INSURANCE'),
+    ('soe_rand_water', 'Rand Water', 'EMPLOYER', NULL, 'https://www.gov.za/about-government/contact-directory/soe/rand-water', 'gcis_public_entity_rand_water', 'PUBLIC_ENTITY,EMPLOYER_AND_RECRUITMENT,PUBLIC_ADMINISTRATION,ENERGY_AND_UTILITIES,TRANSPORT_AND_ESSENTIAL_SERVICES'),
+    ('soe_raf', 'Road Accident Fund (RAF)', 'EMPLOYER', NULL, 'https://www.gov.za/about-government/contact-directory/soe/road-accident-fund-raf', 'gcis_public_entity_raf', 'PUBLIC_ENTITY,EMPLOYER_AND_RECRUITMENT,PUBLIC_ADMINISTRATION,FINANCE_AND_INSURANCE,TRANSPORT_AND_ESSENTIAL_SERVICES'),
+    ('soe_rtia', 'Road Traffic Infringement Agency (RTIA)', 'EMPLOYER', NULL, 'https://www.gov.za/about-government/contact-directory/soe/road-traffic-infringement-agency-rtia', 'gcis_public_entity_rtia', 'PUBLIC_ENTITY,EMPLOYER_AND_RECRUITMENT,PUBLIC_ADMINISTRATION,TRANSPORT_AND_ESSENTIAL_SERVICES,PUBLIC_ADMINISTRATION'),
+    ('soe_rtmc', 'Road Traffic Management Corporation (RTMC)', 'EMPLOYER', NULL, 'https://www.gov.za/about-government/contact-directory/soe/road-traffic-management-corporation-rtmc', 'gcis_public_entity_rtmc', 'PUBLIC_ENTITY,EMPLOYER_AND_RECRUITMENT,PUBLIC_ADMINISTRATION,TRANSPORT_AND_ESSENTIAL_SERVICES,PUBLIC_ADMINISTRATION'),
+    ('soe_robben_island_museum', 'Robben Island Museum', 'EMPLOYER', NULL, 'https://www.gov.za/about-government/contact-directory/soe/robben-island-museum', 'gcis_public_entity_robben_island_museum', 'PUBLIC_ENTITY,EMPLOYER_AND_RECRUITMENT,PUBLIC_ADMINISTRATION'),
+    ('soe_sentech', 'SENTECH', 'EMPLOYER', NULL, 'https://www.gov.za/about-government/contact-directory/soe/sentech', 'gcis_public_entity_sentech', 'PUBLIC_ENTITY,EMPLOYER_AND_RECRUITMENT,PUBLIC_ADMINISTRATION,TECHNOLOGY_AND_DELIVERY_VENDOR'),
+    ('soe_sefa', 'Small Enterprise Finance Agency (SEFA)', 'EMPLOYER', NULL, 'https://www.gov.za/about-government/contact-directory/soe/small-enterprise-finance-agency-sefa', 'gcis_public_entity_sefa', 'PUBLIC_ENTITY,EMPLOYER_AND_RECRUITMENT,PUBLIC_ADMINISTRATION,FUNDING_AND_SOCIAL_SUPPORT,FINANCE_AND_INSURANCE'),
+    ('soe_saasta', 'South African Agency for Science and Technology Advancement (SAASTA)', 'EMPLOYER', NULL, 'https://www.gov.za/about-government/contact-directory/soe/south-african-agency-science-and-technology-advancement', 'gcis_public_entity_saasta', 'PUBLIC_ENTITY,EMPLOYER_AND_RECRUITMENT,PUBLIC_ADMINISTRATION,EDUCATION_AND_SKILLS'),
+    ('soe_sabs', 'South African Bureau of Standards (SABS)', 'EMPLOYER', NULL, 'https://www.gov.za/about-government/contact-directory/soe/south-african-bureau-standards-sabs', 'gcis_public_entity_sabs', 'PUBLIC_ENTITY,EMPLOYER_AND_RECRUITMENT,PUBLIC_ADMINISTRATION,REGULATOR_AND_PROFESSIONAL_COUNCIL'),
+    ('soe_sacaa', 'South African Civil Aviation Authority (SACAA)', 'EMPLOYER', NULL, 'https://www.gov.za/about-government/contact-directory/soe/south-african-civil-aviation-authority-sacaa', 'gcis_public_entity_sacaa', 'PUBLIC_ENTITY,EMPLOYER_AND_RECRUITMENT,PUBLIC_ADMINISTRATION,TRANSPORT_AND_ESSENTIAL_SERVICES,REGULATOR_AND_PROFESSIONAL_COUNCIL'),
+    ('soe_sace', 'South African Council for Educators (SACE)', 'EMPLOYER', NULL, 'https://www.gov.za/about-government/contact-directory/soe/south-african-council-educators-sace', 'gcis_public_entity_sace', 'PUBLIC_ENTITY,EMPLOYER_AND_RECRUITMENT,PUBLIC_ADMINISTRATION,EDUCATION_AND_SKILLS,REGULATOR_AND_PROFESSIONAL_COUNCIL'),
+    ('soe_sacssp', 'South African Council for Social Service Professions (SACSSP)', 'EMPLOYER', NULL, 'https://www.gov.za/about-government/contact-directory/soe/south-african-council-social-service-professions-sacssp', 'gcis_public_entity_sacssp', 'PUBLIC_ENTITY,EMPLOYER_AND_RECRUITMENT,PUBLIC_ADMINISTRATION,REGULATOR_AND_PROFESSIONAL_COUNCIL,HEALTH_AND_CARE'),
+    ('soe_diamond_precious_metals_regulator', 'South African Diamond and Precious Metals Regulator', 'EMPLOYER', NULL, 'https://www.gov.za/about-government/contact-directory/soe/south-african-diamond-and-precious-metals-regulator', 'gcis_public_entity_diamond_precious_metals_regulator', 'PUBLIC_ENTITY,EMPLOYER_AND_RECRUITMENT,PUBLIC_ADMINISTRATION,REGULATOR_AND_PROFESSIONAL_COUNCIL'),
+    ('soe_safcol', 'South African Forestry Company (SAFCOL)', 'EMPLOYER', NULL, 'https://www.gov.za/about-government/contact-directory/soe/south-african-forestry-company-ltd-safcol', 'gcis_public_entity_safcol', 'PUBLIC_ENTITY,EMPLOYER_AND_RECRUITMENT,PUBLIC_ADMINISTRATION'),
+    ('soe_sahra', 'South African Heritage Resources Agency', 'EMPLOYER', NULL, 'https://www.gov.za/about-government/contact-directory/soe/south-african-heritage-resources-agency', 'gcis_public_entity_sahra', 'PUBLIC_ENTITY,EMPLOYER_AND_RECRUITMENT,PUBLIC_ADMINISTRATION'),
+    ('soe_saids', 'South African Institute for Drug-Free Sport', 'EMPLOYER', NULL, 'https://www.gov.za/about-government/contact-directory/soe/south-african-institute-drug-free-sport', 'gcis_public_entity_saids', 'PUBLIC_ENTITY,EMPLOYER_AND_RECRUITMENT,PUBLIC_ADMINISTRATION,HEALTH_AND_CARE'),
+    ('soe_library_for_blind', 'South African Library for the Blind', 'EMPLOYER', NULL, 'https://www.gov.za/about-government/contact-directory/soe/south-african-library-blind', 'gcis_public_entity_library_for_blind', 'PUBLIC_ENTITY,EMPLOYER_AND_RECRUITMENT,PUBLIC_ADMINISTRATION,NGO_NPO_AND_FOUNDATION,LEGAL_AID_AND_COMMUNITY_SERVICES'),
+    ('soe_salga', 'South African Local Government Association (SALGA)', 'EMPLOYER', NULL, 'https://www.gov.za/about-government/contact-directory/soe/south-african-local-government-association-salga', 'gcis_public_entity_salga', 'PUBLIC_ENTITY,EMPLOYER_AND_RECRUITMENT,PUBLIC_ADMINISTRATION,PUBLIC_ADMINISTRATION'),
+    ('soe_sancb', 'South African National Council for the Blind', 'EMPLOYER', NULL, 'https://www.gov.za/about-government/contact-directory/soe/south-african-national-council-blind', 'gcis_public_entity_sancb', 'PUBLIC_ENTITY,EMPLOYER_AND_RECRUITMENT,PUBLIC_ADMINISTRATION,NGO_NPO_AND_FOUNDATION,LEGAL_AID_AND_COMMUNITY_SERVICES'),
+    ('soe_sanparks', 'South African National Parks (SANParks)', 'EMPLOYER', NULL, 'https://www.gov.za/about-government/contact-directory/soe/south-african-national-parks-sanparks', 'gcis_public_entity_sanparks', 'PUBLIC_ENTITY,EMPLOYER_AND_RECRUITMENT,PUBLIC_ADMINISTRATION'),
+    ('soe_necsa', 'South African Nuclear Energy Corporation SOC Ltd (NECSA)', 'EMPLOYER', NULL, 'https://www.gov.za/about-government/contact-directory/soe/south-african-nuclear-energy-corporation-soc-ltd-necsa', 'gcis_public_entity_necsa', 'PUBLIC_ENTITY,EMPLOYER_AND_RECRUITMENT,PUBLIC_ADMINISTRATION,ENERGY_AND_UTILITIES'),
+    ('soe_sarb', 'South African Reserve Bank (SARB)', 'EMPLOYER', NULL, 'https://www.gov.za/about-government/contact-directory/soe/south-african-reserve-bank-sarb', 'gcis_public_entity_sarb', 'PUBLIC_ENTITY,EMPLOYER_AND_RECRUITMENT,PUBLIC_ADMINISTRATION,FINANCE_AND_INSURANCE,REGULATOR_AND_PROFESSIONAL_COUNCIL'),
+    ('soe_sasria', 'South African Special Risk Insurance Association (SASRIA)', 'EMPLOYER', NULL, 'https://www.gov.za/about-government/contact-directory/soe/south-african-special-risk-insurance-association-sasria', 'gcis_public_entity_sasria', 'PUBLIC_ENTITY,EMPLOYER_AND_RECRUITMENT,PUBLIC_ADMINISTRATION,FINANCE_AND_INSURANCE'),
+    ('soe_state_theatre', 'South African State Theatre — Pretoria', 'EMPLOYER', NULL, 'https://www.gov.za/about-government/contact-directory/soe/south-african-state-theatre-pretoria', 'gcis_public_entity_state_theatre', 'PUBLIC_ENTITY,EMPLOYER_AND_RECRUITMENT,PUBLIC_ADMINISTRATION'),
+    ('soe_tourism', 'South African Tourism', 'EMPLOYER', NULL, 'https://www.gov.za/about-government/contact-directory/soe/south-african-tourism', 'gcis_public_entity_tourism', 'PUBLIC_ENTITY,EMPLOYER_AND_RECRUITMENT,PUBLIC_ADMINISTRATION'),
+    ('soe_veterinary_council', 'South African Veterinary Council', 'EMPLOYER', NULL, 'https://www.gov.za/about-government/contact-directory/soe/south-african-veterinary-council', 'gcis_public_entity_veterinary_council', 'PUBLIC_ENTITY,EMPLOYER_AND_RECRUITMENT,PUBLIC_ADMINISTRATION,HEALTH_AND_CARE,REGULATOR_AND_PROFESSIONAL_COUNCIL'),
+    ('soe_saws', 'South African Weather Service (SAWS)', 'EMPLOYER', NULL, 'https://www.gov.za/about-government/contact-directory/soe/south-african-weather-service-saws', 'gcis_public_entity_saws', 'PUBLIC_ENTITY,EMPLOYER_AND_RECRUITMENT,PUBLIC_ADMINISTRATION'),
+    ('soe_siu', 'Special Investigating Unit (SIU)', 'EMPLOYER', NULL, 'https://www.gov.za/about-government/contact-directory/soe/special-investigating-unit-siu', 'gcis_public_entity_siu', 'PUBLIC_ENTITY,EMPLOYER_AND_RECRUITMENT,PUBLIC_ADMINISTRATION,PUBLIC_ADMINISTRATION'),
+    ('soe_sita', 'State Information Technology Agency (SITA)', 'EMPLOYER', NULL, 'https://www.gov.za/about-government/contact-directory/soe/state-information-technology-agency-sita', 'gcis_public_entity_sita', 'PUBLIC_ENTITY,EMPLOYER_AND_RECRUITMENT,PUBLIC_ADMINISTRATION,TECHNOLOGY_AND_DELIVERY_VENDOR'),
+    ('soe_tax_ombud', 'Tax Ombud: South Africa', 'EMPLOYER', NULL, 'https://www.gov.za/about-government/contact-directory/soe/tax-ombud-south-africa', 'gcis_public_entity_tax_ombud', 'PUBLIC_ENTITY,EMPLOYER_AND_RECRUITMENT,PUBLIC_ADMINISTRATION,PUBLIC_ADMINISTRATION'),
+    ('soe_technology_innovation_agency', 'Technology Innovation Agency', 'EMPLOYER', NULL, 'https://www.gov.za/about-government/contact-directory/soe/technology-innovation-agency', 'gcis_public_entity_technology_innovation_agency', 'PUBLIC_ENTITY,EMPLOYER_AND_RECRUITMENT,PUBLIC_ADMINISTRATION,FUNDING_AND_SOCIAL_SUPPORT,TECHNOLOGY_AND_DELIVERY_VENDOR'),
+    ('soe_tcta', 'Trans-Caledon Tunnel Authority (TCTA)', 'EMPLOYER', NULL, 'https://www.gov.za/about-government/contact-directory/soe/trans-caledon-tunnel-authority-tcta', 'gcis_public_entity_tcta', 'PUBLIC_ENTITY,EMPLOYER_AND_RECRUITMENT,PUBLIC_ADMINISTRATION,ENERGY_AND_UTILITIES,TRANSPORT_AND_ESSENTIAL_SERVICES'),
+    ('soe_transnet_national_ports_authority', 'Transnet National Ports Authority', 'EMPLOYER', NULL, 'https://www.gov.za/about-government/contact-directory/soe/transnet-national-ports-authority', 'gcis_public_entity_transnet_national_ports_authority', 'PUBLIC_ENTITY,EMPLOYER_AND_RECRUITMENT,PUBLIC_ADMINISTRATION,TRANSPORT_AND_ESSENTIAL_SERVICES'),
+    ('soe_umngeni_uthukela_water', 'uMngeni-uThukela Water', 'EMPLOYER', NULL, 'https://www.gov.za/about-government/contact-directory/soe/umngeni-uthukela-water', 'gcis_public_entity_umngeni_uthukela_water', 'PUBLIC_ENTITY,EMPLOYER_AND_RECRUITMENT,PUBLIC_ADMINISTRATION,ENERGY_AND_UTILITIES,TRANSPORT_AND_ESSENTIAL_SERVICES'),
+    ('soe_universal_service_agency', 'Universal Service Agency and Access of South Africa', 'EMPLOYER', NULL, 'https://www.gov.za/about-government/contact-directory/soe/universal-service-agency-and-access-south-africa', 'gcis_public_entity_universal_service_agency', 'PUBLIC_ENTITY,EMPLOYER_AND_RECRUITMENT,PUBLIC_ADMINISTRATION,PUBLIC_ADMINISTRATION,TECHNOLOGY_AND_DELIVERY_VENDOR'),
+    ('soe_water_research_commission', 'Water Research Commission (WRC)', 'EMPLOYER', NULL, 'https://www.gov.za/about-government/contact-directory/soe/water-research-commission-wrc', 'gcis_public_entity_water_research_commission', 'PUBLIC_ENTITY,EMPLOYER_AND_RECRUITMENT,PUBLIC_ADMINISTRATION,EDUCATION_AND_SKILLS,ENERGY_AND_UTILITIES'),
+    ('soe_umalusi', 'Umalusi — Council for Quality Assurance in General and Further Education and Training', 'EMPLOYER', NULL, 'https://www.gov.za/about-government/contact-directory/soe/umalusi-%E2%80%93-council-quality-assurance-general-and-further', 'gcis_public_entity_umalusi', 'PUBLIC_ENTITY,EMPLOYER_AND_RECRUITMENT,PUBLIC_ADMINISTRATION,EDUCATION_AND_SKILLS,REGULATOR_AND_PROFESSIONAL_COUNCIL'),
+    ('soe_dbsa', 'Development Bank of Southern Africa (DBSA)', 'EMPLOYER', 'https://www.dbsa.org/', 'https://www.gov.za/about-government/contact-directory/soe/development-bank-southern-africa-dbsa', 'gcis_public_entity_dbsa', 'PUBLIC_ENTITY,PUBLIC_ADMINISTRATION,EMPLOYER_AND_RECRUITMENT,FUNDING_AND_SOCIAL_SUPPORT,FINANCE_AND_INSURANCE'),
+    ('soe_ithala', 'Ithala Development Finance Corporation (Ltd)', 'EMPLOYER', 'https://www.ithala.co.za/', 'https://www.gov.za/about-government/contact-directory/soe/ithala-development-finance-corporation-ltd', 'gcis_public_entity_ithala', 'PUBLIC_ENTITY,PUBLIC_ADMINISTRATION,EMPLOYER_AND_RECRUITMENT,FINANCE_AND_INSURANCE,FUNDING_AND_SOCIAL_SUPPORT'),
+    ('soe_mintek', 'Mintek (Council for Mineral Technology)', 'EMPLOYER', 'https://www.mintek.co.za/', 'https://www.gov.za/about-government/contact-directory/soe/mintek-council-mineral-technology', 'gcis_public_entity_mintek', 'PUBLIC_ENTITY,PUBLIC_ADMINISTRATION,EMPLOYER_AND_RECRUITMENT,EDUCATION_AND_SKILLS'),
+    ('soe_naci', 'National Advisory Council on Innovation (NACI)', 'EMPLOYER', 'https://www.naci.org.za/', 'https://www.gov.za/about-government/contact-directory/soe/national-advisory-council-innovation-naci', 'gcis_public_entity_naci', 'PUBLIC_ENTITY,PUBLIC_ADMINISTRATION,EMPLOYER_AND_RECRUITMENT,EDUCATION_AND_SKILLS'),
+    ('soe_namc', 'National Agricultural Marketing Council', 'EMPLOYER', 'https://www.namc.co.za/', 'https://www.gov.za/about-government/contact-directory/soe/national-agricultural-marketing-council', 'gcis_public_entity_namc', 'PUBLIC_ENTITY,PUBLIC_ADMINISTRATION,EMPLOYER_AND_RECRUITMENT'),
+    ('soe_national_archives', 'National Archives and Records Service of South Africa', 'EMPLOYER', NULL, 'https://www.gov.za/about-government/contact-directory/soe/national-archives-and-records-service-south-africa', 'gcis_public_entity_national_archives', 'PUBLIC_ENTITY,PUBLIC_ADMINISTRATION,EMPLOYER_AND_RECRUITMENT'),
+    ('soe_nacsa', 'National Arts Council of South Africa (NACSA)', 'EMPLOYER', 'https://www.nac.org.za/', 'https://www.gov.za/about-government/contact-directory/soe/national-arts-council-south-africa-nacsa', 'gcis_public_entity_nacsa', 'PUBLIC_ENTITY,PUBLIC_ADMINISTRATION,EMPLOYER_AND_RECRUITMENT,FUNDING_AND_SOCIAL_SUPPORT,NGO_NPO_AND_FOUNDATION'),
+    ('soe_ncc', 'National Consumer Commission (NCC)', 'EMPLOYER', 'https://www.thencc.gov.za/', 'https://www.gov.za/about-government/contact-directory/soe/national-consumer-commission-ncc', 'gcis_public_entity_ncc', 'PUBLIC_ENTITY,PUBLIC_ADMINISTRATION,EMPLOYER_AND_RECRUITMENT,REGULATOR_AND_PROFESSIONAL_COUNCIL'),
+    ('soe_ncr', 'National Credit Regulator (NCR)', 'EMPLOYER', 'https://www.ncr.org.za/', 'https://www.gov.za/about-government/contact-directory/soe/national-credit-regulator-ncr', 'gcis_public_entity_ncr', 'PUBLIC_ENTITY,PUBLIC_ADMINISTRATION,EMPLOYER_AND_RECRUITMENT,FINANCE_AND_INSURANCE,REGULATOR_AND_PROFESSIONAL_COUNCIL'),
+    ('soe_nda', 'National Development Agency (NDA)', 'EMPLOYER', 'https://www.nda.org.za/', 'https://www.gov.za/about-government/contact-directory/soe/national-development-agency-nda', 'gcis_public_entity_nda', 'PUBLIC_ENTITY,PUBLIC_ADMINISTRATION,EMPLOYER_AND_RECRUITMENT,FUNDING_AND_SOCIAL_SUPPORT,NGO_NPO_AND_FOUNDATION'),
+    ('soe_nedlac', 'National Economic Development and Labour Council (NEDLAC)', 'EMPLOYER', 'https://nedlac.org.za/', 'https://www.gov.za/about-government/contact-directory/soe/national-economic-development-and-labour-council-nedlac', 'gcis_public_entity_nedlac', 'PUBLIC_ENTITY,PUBLIC_ADMINISTRATION,EMPLOYER_AND_RECRUITMENT'),
+    ('soe_nemisa', 'National Electronic Media of South Africa (NEMISA)', 'EMPLOYER', 'https://www.nemisa.co.za/', 'https://www.gov.za/about-government/contact-directory/soe/national-electronic-media-south-africa-nemisa', 'gcis_public_entity_nemisa', 'PUBLIC_ENTITY,PUBLIC_ADMINISTRATION,EMPLOYER_AND_RECRUITMENT,EDUCATION_AND_SKILLS,TECHNOLOGY_AND_DELIVERY_VENDOR'),
+    ('soe_nef', 'National Empowerment Fund (NEF)', 'EMPLOYER', 'https://www.nefcorp.co.za/', 'https://www.gov.za/about-government/contact-directory/soe/national-empowerment-fund', 'gcis_public_entity_nef', 'PUBLIC_ENTITY,PUBLIC_ADMINISTRATION,EMPLOYER_AND_RECRUITMENT,FUNDING_AND_SOCIAL_SUPPORT,FINANCE_AND_INSURANCE'),
+    ('soe_nersa', 'National Energy Regulator of South Africa (NERSA)', 'EMPLOYER', 'https://www.nersa.org.za/', 'https://www.gov.za/about-government/contact-directory/soe/national-energy-regulator-nersa', 'gcis_public_entity_nersa', 'PUBLIC_ENTITY,PUBLIC_ADMINISTRATION,EMPLOYER_AND_RECRUITMENT,ENERGY_AND_UTILITIES,REGULATOR_AND_PROFESSIONAL_COUNCIL'),
+    ('soe_nfvf', 'National Film and Video Foundation (NFVF)', 'EMPLOYER', 'https://www.nfvf.co.za/', 'https://www.gov.za/about-government/contact-directory/soe/national-film-and-video-foundation', 'gcis_public_entity_nfvf', 'PUBLIC_ENTITY,PUBLIC_ADMINISTRATION,EMPLOYER_AND_RECRUITMENT,FUNDING_AND_SOCIAL_SUPPORT,NGO_NPO_AND_FOUNDATION'),
+    ('soe_ngb', 'National Gambling Board of South Africa', 'EMPLOYER', 'https://www.ngb.org.za/', 'https://www.gov.za/about-government/contact-directory/soe/national-gambling-board-south-africa', 'gcis_public_entity_ngb', 'PUBLIC_ENTITY,PUBLIC_ADMINISTRATION,EMPLOYER_AND_RECRUITMENT,REGULATOR_AND_PROFESSIONAL_COUNCIL'),
+    ('soe_nhbrc', 'National Home Builders Registration Council (NHBRC)', 'EMPLOYER', 'https://www.nhbrc.org.za/', 'https://www.gov.za/about-government/contact-directory/soe/national-home-builders-registration-council-nhbrc', 'gcis_public_entity_nhbrc', 'PUBLIC_ENTITY,PUBLIC_ADMINISTRATION,EMPLOYER_AND_RECRUITMENT,HOUSING_AND_ACCOMMODATION,REGULATOR_AND_PROFESSIONAL_COUNCIL'),
+    ('soe_nhfc', 'National Housing Finance Corporation (NHFC)', 'EMPLOYER', 'https://www.nhfc.co.za/', 'https://www.gov.za/about-government/contact-directory/soe/national-housing-finance-corporation-nhfc', 'gcis_public_entity_nhfc', 'PUBLIC_ENTITY,PUBLIC_ADMINISTRATION,EMPLOYER_AND_RECRUITMENT,HOUSING_AND_ACCOMMODATION,FINANCE_AND_INSURANCE'),
+    ('soe_nlc', 'National Lotteries Commission (NLC)', 'EMPLOYER', 'https://www.nlcsa.org.za/', 'https://www.gov.za/about-government/contact-directory/soe/national-lotteries-commission', 'gcis_public_entity_nlc', 'PUBLIC_ENTITY,PUBLIC_ADMINISTRATION,EMPLOYER_AND_RECRUITMENT,FUNDING_AND_SOCIAL_SUPPORT'),
+    ('soe_nnr', 'National Nuclear Regulator (NNR)', 'EMPLOYER', 'https://www.nnr.co.za/', 'https://www.gov.za/about-government/contact-directory/soe/national-nuclear-regulator-nnr', 'gcis_public_entity_nnr', 'PUBLIC_ENTITY,PUBLIC_ADMINISTRATION,EMPLOYER_AND_RECRUITMENT,ENERGY_AND_UTILITIES,REGULATOR_AND_PROFESSIONAL_COUNCIL'),
+    ('nsfas_official', 'National Student Financial Aid Scheme (NSFAS)', 'GOVERNMENT_AUTHORITY', 'https://www.nsfas.org.za/', 'https://www.gov.za/about-government/contact-directory/soe/national-student-financial-aid-scheme-nsfas', 'gcis_public_entity_nsfas', 'PUBLIC_ENTITY,PUBLIC_ADMINISTRATION,EMPLOYER_AND_RECRUITMENT,FUNDING_AND_SOCIAL_SUPPORT,EDUCATION_AND_SKILLS'),
+    ('soe_sanas', 'South African National Accreditation System (SANAS)', 'EMPLOYER', 'https://www.sanas.co.za/', 'https://www.gov.za/about-government/contact-directory/soe/south-african-national-accreditation-system', 'gcis_public_entity_sanas', 'PUBLIC_ENTITY,PUBLIC_ADMINISTRATION,EMPLOYER_AND_RECRUITMENT,REGULATOR_AND_PROFESSIONAL_COUNCIL,EDUCATION_AND_SKILLS'),
+    ('soe_saqa', 'South African Qualifications Authority (SAQA)', 'EMPLOYER', 'https://www.saqa.org.za/', 'https://www.gov.za/about-government/contact-directory/soe/south-african-qualifications-authority-saqa', 'gcis_public_entity_saqa', 'PUBLIC_ENTITY,PUBLIC_ADMINISTRATION,EMPLOYER_AND_RECRUITMENT,EDUCATION_AND_SKILLS,REGULATOR_AND_PROFESSIONAL_COUNCIL')
+),
+source_linked AS (
+  SELECT p.*, a.id AS source_authority_id FROM provider_seed p
+  CROSS JOIN public.source_authorities a WHERE a.source_key='gcis_public_entities_and_soe_directory'
+)
+INSERT INTO public.route_providers (provider_key,provider_name,provider_type,province,base_url,source_authority_id,default_confidence_band,verification_status,public_safe,private_provider_requires_accreditation_check,notes,metadata)
+SELECT provider_key,provider_name,provider_type,NULL,base_url,source_authority_id,'D','NEEDS_REVIEW',false,false,
+  'GCIS-listed public entity identity/contact discovery record only. Current vacancies, programmes, candidate eligibility, application route and deadline are not verified. No Kingsmen partnership or integration is implied.',
+  jsonb_build_object(
+    'directory_seed',jsonb_build_object(
+      'source_key','gcis_public_entities_and_soe_directory','source_profile_url',source_profile_url,'provider_homepage_url',base_url,
+      'source_id',source_id,'institution_classes',string_to_array(institution_classes,','),'source_snapshot_date','2026-10-31',
+      'record_status','NEEDS_REVIEW','source_confidence','D','public_safe',false,'provider_identity_status','GCIS_DIRECTORY_LISTED_NEEDS_REVIEW',
+      'vacancy_status','UNKNOWN','programme_status','UNKNOWN','intake_status','UNKNOWN','eligibility_status','UNKNOWN',
+      'application_route_status','NOT_VERIFIED','integration_status','NOT_CONNECTED','partnership_status','NOT_A_PARTNER',
+      'automation_authorized',false,'provider_submission_supported_by_kingsmen',false,'provider_receipt_supported',false,
+      'evidence_scope','GCIS public-entity directory profile and listed website only. No vacancy, programme, bursary, deadline, eligibility, application route, integration, partnership, submission or outcome is proven.'
+    ),
+    'institution_classes',to_jsonb(string_to_array(institution_classes,',')),
+    'provider_source_evidence',jsonb_build_array(jsonb_build_object(
+      'source_key','gcis_public_entities_and_soe_directory',
+      'source_authority_id',source_authority_id,
+      'source_profile_url',source_profile_url,
+      'source_id',source_id,
+      'institution_classes',string_to_array(institution_classes,','),
+      'source_snapshot_date','2026-10-31',
+      'evidence_scope','Official GCIS profile listing only; no current vacancy, application route, partnership, integration or outcome is implied.'
+    ))
+  )
+FROM source_linked
+ON CONFLICT (provider_key) DO UPDATE
+SET metadata = jsonb_set(
+  jsonb_set(
+    COALESCE(public.route_providers.metadata, '{}'::jsonb),
+    '{provider_source_evidence}',
+    (
+      SELECT COALESCE(
+        jsonb_agg(merged.evidence ORDER BY merged.evidence->>'source_key', merged.evidence->>'source_profile_url', merged.evidence->>'source_id'),
+        '[]'::jsonb
+      )
+      FROM (
+        SELECT DISTINCT prior.value AS evidence
+        FROM jsonb_array_elements(
+          CASE
+            WHEN jsonb_typeof(public.route_providers.metadata->'provider_source_evidence') = 'array'
+              THEN public.route_providers.metadata->'provider_source_evidence'
+            ELSE '[]'::jsonb
+          END
+        ) AS prior(value)
+        UNION
+        SELECT incoming.value AS evidence
+        FROM jsonb_array_elements(EXCLUDED.metadata->'provider_source_evidence') AS incoming(value)
+      ) AS merged
+    ),
+    true
+  ),
+  '{institution_classes}',
+  (
+    SELECT COALESCE(jsonb_agg(to_jsonb(classes.class_name) ORDER BY classes.class_name), '[]'::jsonb)
+    FROM (
+      SELECT DISTINCT existing.value AS class_name
+      FROM jsonb_array_elements_text(
+        CASE
+          WHEN jsonb_typeof(public.route_providers.metadata->'institution_classes') = 'array'
+            THEN public.route_providers.metadata->'institution_classes'
+          ELSE '[]'::jsonb
+        END
+      ) AS existing(value)
+      UNION
+      SELECT incoming.value AS class_name
+      FROM jsonb_array_elements_text(EXCLUDED.metadata->'institution_classes') AS incoming(value)
+    ) AS classes
+  ),
+  true
+),
+updated_at = now();
+
+DO $postflight$
+DECLARE expected_count integer := 123; actual_count integer; duplicate_count integer; evidence_count integer; missing_class_count integer;
+BEGIN
+  SELECT count(*) INTO actual_count FROM public.route_providers WHERE provider_key IN (
+    'soe_hpcsa',
+        'soe_sassa',
+        'soe_nyda',
+        'soe_eskom',
+        'seta_hwseta',
+        'seta_mqa',
+        'seta_sasseta',
+        'soe_acsa',
+        'soe_denel',
+        'soe_prasa',
+        'soe_saa',
+        'soe_sabc',
+        'soe_sanral',
+        'soe_sapo',
+        'soe_telkom',
+        'soe_transnet',
+        'soe_national_house_traditional_and_khoisan_leaders',
+        'soe_accounting_standards_board',
+        'soe_agricultural_research_council_arc',
+        'soe_air_traffic_and_navigation_services_company',
+        'soe_alexkor_limited',
+        'soe_armscor',
+        'soe_blind_sa',
+        'soe_border_management_authority_bma',
+        'soe_brand_south_africa',
+        'soe_breede_gouritz_cma',
+        'soe_broadband_infraco',
+        'soe_broadcasting_complaints_commission_south_africa_bccsa',
+        'soe_cape_town_international_airport',
+        'soe_central_energy_fund_cef',
+        'soe_ccma',
+        'soe_cipc',
+        'soe_competition_commission',
+        'soe_competition_tribunal',
+        'soe_council_geoscience',
+        'soe_council_medical_schemes',
+        'soe_council_higher_education',
+        'soe_export_credit_insurance_corporation',
+        'soe_film_and_publication_board_fpb',
+        'soe_fsca',
+        'soe_free_state_development_corporation',
+        'soe_freedom_park',
+        'soe_gems',
+        'soe_gepf',
+        'soe_housing_development_agency_hda',
+        'soe_hsrc',
+        'soe_independent_development_trust',
+        'soe_idc',
+        'soe_ingonyama_trust_board',
+        'soe_institute_people_management_ipm',
+        'soe_king_shaka_international_airport',
+        'soe_land_bank',
+        'soe_legal_aid_south_africa',
+        'soe_limpopo_economic_development_enterprise',
+        'soe_mdda',
+        'soe_nelson_mandela_museum',
+        'soe_north_west_development_corporation',
+        'soe_or_tambo_international_airport',
+        'soe_perishable_products_export_control_board',
+        'soe_petrosa',
+        'soe_psira',
+        'soe_property_practitioners_regulatory_authority',
+        'soe_pic',
+        'soe_rand_water',
+        'soe_raf',
+        'soe_rtia',
+        'soe_rtmc',
+        'soe_robben_island_museum',
+        'soe_sentech',
+        'soe_sefa',
+        'soe_saasta',
+        'soe_sabs',
+        'soe_sacaa',
+        'soe_sace',
+        'soe_sacssp',
+        'soe_diamond_precious_metals_regulator',
+        'soe_safcol',
+        'soe_sahra',
+        'soe_saids',
+        'soe_library_for_blind',
+        'soe_salga',
+        'soe_sancb',
+        'soe_sanparks',
+        'soe_necsa',
+        'soe_sarb',
+        'soe_sasria',
+        'soe_state_theatre',
+        'soe_tourism',
+        'soe_veterinary_council',
+        'soe_saws',
+        'soe_siu',
+        'soe_sita',
+        'soe_tax_ombud',
+        'soe_technology_innovation_agency',
+        'soe_tcta',
+        'soe_transnet_national_ports_authority',
+        'soe_umngeni_uthukela_water',
+        'soe_universal_service_agency',
+        'soe_water_research_commission',
+        'soe_umalusi',
+        'soe_dbsa',
+        'soe_ithala',
+        'soe_mintek',
+        'soe_naci',
+        'soe_namc',
+        'soe_national_archives',
+        'soe_nacsa',
+        'soe_ncc',
+        'soe_ncr',
+        'soe_nda',
+        'soe_nedlac',
+        'soe_nemisa',
+        'soe_nef',
+        'soe_nersa',
+        'soe_nfvf',
+        'soe_ngb',
+        'soe_nhbrc',
+        'soe_nhfc',
+        'soe_nlc',
+        'soe_nnr',
+        'nsfas_official',
+        'soe_sanas',
+        'soe_saqa'
+  );
+  IF actual_count <> expected_count THEN RAISE EXCEPTION 'GCIS_PUBLIC_ENTITY_PROVIDER_SEED_COUNT_MISMATCH expected %, got %',expected_count,actual_count; END IF;
+  SELECT count(*) INTO duplicate_count FROM (SELECT provider_key FROM public.route_providers WHERE provider_key IN ('soe_hpcsa',
+        'soe_sassa',
+        'soe_nyda',
+        'soe_eskom',
+        'seta_hwseta',
+        'seta_mqa',
+        'seta_sasseta',
+        'soe_acsa',
+        'soe_denel',
+        'soe_prasa',
+        'soe_saa',
+        'soe_sabc',
+        'soe_sanral',
+        'soe_sapo',
+        'soe_telkom',
+        'soe_transnet',
+        'soe_national_house_traditional_and_khoisan_leaders',
+        'soe_accounting_standards_board',
+        'soe_agricultural_research_council_arc',
+        'soe_air_traffic_and_navigation_services_company',
+        'soe_alexkor_limited',
+        'soe_armscor',
+        'soe_blind_sa',
+        'soe_border_management_authority_bma',
+        'soe_brand_south_africa',
+        'soe_breede_gouritz_cma',
+        'soe_broadband_infraco',
+        'soe_broadcasting_complaints_commission_south_africa_bccsa',
+        'soe_cape_town_international_airport',
+        'soe_central_energy_fund_cef',
+        'soe_ccma',
+        'soe_cipc',
+        'soe_competition_commission',
+        'soe_competition_tribunal',
+        'soe_council_geoscience',
+        'soe_council_medical_schemes',
+        'soe_council_higher_education',
+        'soe_export_credit_insurance_corporation',
+        'soe_film_and_publication_board_fpb',
+        'soe_fsca',
+        'soe_free_state_development_corporation',
+        'soe_freedom_park',
+        'soe_gems',
+        'soe_gepf',
+        'soe_housing_development_agency_hda',
+        'soe_hsrc',
+        'soe_independent_development_trust',
+        'soe_idc',
+        'soe_ingonyama_trust_board',
+        'soe_institute_people_management_ipm',
+        'soe_king_shaka_international_airport',
+        'soe_land_bank',
+        'soe_legal_aid_south_africa',
+        'soe_limpopo_economic_development_enterprise',
+        'soe_mdda',
+        'soe_nelson_mandela_museum',
+        'soe_north_west_development_corporation',
+        'soe_or_tambo_international_airport',
+        'soe_perishable_products_export_control_board',
+        'soe_petrosa',
+        'soe_psira',
+        'soe_property_practitioners_regulatory_authority',
+        'soe_pic',
+        'soe_rand_water',
+        'soe_raf',
+        'soe_rtia',
+        'soe_rtmc',
+        'soe_robben_island_museum',
+        'soe_sentech',
+        'soe_sefa',
+        'soe_saasta',
+        'soe_sabs',
+        'soe_sacaa',
+        'soe_sace',
+        'soe_sacssp',
+        'soe_diamond_precious_metals_regulator',
+        'soe_safcol',
+        'soe_sahra',
+        'soe_saids',
+        'soe_library_for_blind',
+        'soe_salga',
+        'soe_sancb',
+        'soe_sanparks',
+        'soe_necsa',
+        'soe_sarb',
+        'soe_sasria',
+        'soe_state_theatre',
+        'soe_tourism',
+        'soe_veterinary_council',
+        'soe_saws',
+        'soe_siu',
+        'soe_sita',
+        'soe_tax_ombud',
+        'soe_technology_innovation_agency',
+        'soe_tcta',
+        'soe_transnet_national_ports_authority',
+        'soe_umngeni_uthukela_water',
+        'soe_universal_service_agency',
+        'soe_water_research_commission',
+        'soe_umalusi',
+        'soe_dbsa',
+        'soe_ithala',
+        'soe_mintek',
+        'soe_naci',
+        'soe_namc',
+        'soe_national_archives',
+        'soe_nacsa',
+        'soe_ncc',
+        'soe_ncr',
+        'soe_nda',
+        'soe_nedlac',
+        'soe_nemisa',
+        'soe_nef',
+        'soe_nersa',
+        'soe_nfvf',
+        'soe_ngb',
+        'soe_nhbrc',
+        'soe_nhfc',
+        'soe_nlc',
+        'soe_nnr',
+        'nsfas_official',
+        'soe_sanas',
+        'soe_saqa') GROUP BY provider_key HAVING count(*)>1) d;
+  IF duplicate_count>0 THEN RAISE EXCEPTION 'GCIS_PUBLIC_ENTITY_PROVIDER_DUPLICATE_KEYS %',duplicate_count; END IF;
+
+  -- Every one of the 123 GCIS profiles must be retained as source evidence,
+  -- including keys already seeded by 0101/0102 or present as a verified provider.
+  SELECT count(*) INTO evidence_count
+  FROM public.route_providers p
+  WHERE EXISTS (
+    SELECT 1
+    FROM jsonb_array_elements(
+      CASE
+        WHEN jsonb_typeof(p.metadata->'provider_source_evidence') = 'array'
+          THEN p.metadata->'provider_source_evidence'
+        ELSE '[]'::jsonb
+      END
+    ) evidence(value)
+    WHERE evidence.value->>'source_key' = 'gcis_public_entities_and_soe_directory'
+      AND evidence.value->>'source_profile_url' IS NOT NULL
+      AND evidence.value->>'source_id' IS NOT NULL
+      AND evidence.value->>'source_authority_id' IS NOT NULL
+  );
+  IF evidence_count <> expected_count THEN
+    RAISE EXCEPTION 'GCIS_PUBLIC_ENTITY_SOURCE_EVIDENCE_COUNT_MISMATCH expected %, got %',expected_count,evidence_count;
+  END IF;
+
+  SELECT count(*) INTO missing_class_count
+  FROM public.route_providers p
+  WHERE EXISTS (
+    SELECT 1
+    FROM jsonb_array_elements(
+      CASE
+        WHEN jsonb_typeof(p.metadata->'provider_source_evidence') = 'array'
+          THEN p.metadata->'provider_source_evidence'
+        ELSE '[]'::jsonb
+      END
+    ) evidence(value)
+    WHERE evidence.value->>'source_key' = 'gcis_public_entities_and_soe_directory'
+  )
+  AND (
+    jsonb_typeof(p.metadata->'institution_classes') IS DISTINCT FROM 'array'
+    OR jsonb_array_length(p.metadata->'institution_classes') = 0
+  );
+  IF missing_class_count > 0 THEN
+    RAISE EXCEPTION 'GCIS_PUBLIC_ENTITY_CLASS_METADATA_MISSING %',missing_class_count;
+  END IF;
+END
+$postflight$;
+
+COMMIT;

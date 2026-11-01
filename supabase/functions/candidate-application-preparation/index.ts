@@ -47,7 +47,7 @@ Deno.serve(async(req:Request)=>{
   if(!match||!match.programme_ref||!match.provider_ref)return reply(409,{ready:false,code:"VERIFIED_MATCH_NOT_AVAILABLE",error:"This listing no longer satisfies the N15 publication gates."},origin);
   const supportedBySector:Record<string,string[]> = {
    UNIVERSITY:["HIGHER_EDUCATION"],CAO:["HIGHER_EDUCATION","TVET"],TVET:["TVET"],
-   SETA:["SETA_LEARNERSHIP","APPRENTICESHIP"],LEARNERSHIP:["SETA_LEARNERSHIP"],
+   SETA:["SETA_LEARNERSHIP","APPRENTICESHIP","INTERNSHIP"],LEARNERSHIP:["SETA_LEARNERSHIP"],
    INTERNSHIP:["INTERNSHIP"],APPRENTICESHIP:["APPRENTICESHIP"],EMPLOYER:["EMPLOYMENT"],
    BURSARY:["HIGHER_EDUCATION","TVET","SETA_LEARNERSHIP","INTERNSHIP","APPRENTICESHIP"],
    NSFAS:["HIGHER_EDUCATION","TVET"],QCTO:["SETA_LEARNERSHIP","APPRENTICESHIP"],
@@ -136,6 +136,236 @@ Deno.serve(async(req:Request)=>{
   return reply(200,{ready:true,saved:true,opportunity:savedOpportunity,target, target_key:target.target_key,
    message:"Saved from the current approved N15 match with fresh official-source evidence. No provider application was submitted."},origin);
  }
+ if(p.action==="plan_directory_target"){
+  const providerKey=typeof p.provider_key==="string"?p.provider_key.trim():"";
+  const pathwayType=typeof p.pathway_type==="string"?p.pathway_type.trim():"";
+  const programmeOrRole=typeof p.programme_or_role==="string"?p.programme_or_role.trim():"";
+  const allowedPathways=new Set(["HIGHER_EDUCATION","TVET","SETA_LEARNERSHIP","INTERNSHIP","APPRENTICESHIP","EMPLOYMENT"]);
+  if(!/^[a-z0-9_:-]{3,100}$/i.test(providerKey))return reply(400,{ready:false,code:"PROVIDER_KEY_INVALID",error:"Choose an institution/provider from the Kingsmen directory."},origin);
+  if(!allowedPathways.has(pathwayType))return reply(400,{ready:false,code:"PATHWAY_NOT_SUPPORTED",error:"Choose one of Kingsmen's six supported pathways."},origin);
+  if(programmeOrRole.length<2||programmeOrRole.length>240||/[\\u0000-\\u001f]/.test(programmeOrRole))return reply(400,{ready:false,code:"PROGRAMME_OR_ROLE_INVALID",error:"Enter a programme, service or role between 2 and 240 characters."},origin);
+
+  const {data:provider,error:providerError}=await admin.from("route_providers")
+   .select("provider_key,provider_name,provider_type,base_url,verification_status,public_safe,default_confidence_band,source_authority_id,notes")
+   .eq("provider_key",providerKey).maybeSingle();
+  if(providerError){console.error("directory planning provider lookup failed",providerError.code??"unknown");return reply(503,{ready:false,code:"PROVIDER_REGISTRY_UNAVAILABLE",error:"The provider registry could not be checked. No planning target was saved."},origin);}
+  if(!provider)return reply(404,{ready:false,code:"PROVIDER_NOT_IMPORTED",error:"This directory entry has not yet been imported into Kingsmen's canonical provider registry. You can still view its official source, but a saved application plan is not available yet."},origin);
+  if(["BLOCKED","RISK","STALE"].includes(String(provider.verification_status)))return reply(409,{ready:false,code:"PROVIDER_NOT_SAFE_TO_PLAN",error:"This provider record is blocked, risky or stale. Kingsmen has not created a plan."},origin);
+
+  const allowedByProviderType:Record<string,string[]> = {
+   UNIVERSITY:["HIGHER_EDUCATION"],
+   TVET:["TVET"],
+   SETA:["SETA_LEARNERSHIP","APPRENTICESHIP"],
+   LEARNERSHIP_PROVIDER:["SETA_LEARNERSHIP","APPRENTICESHIP"],
+   BURSARY_PROVIDER:["HIGHER_EDUCATION","TVET","SETA_LEARNERSHIP","INTERNSHIP","APPRENTICESHIP"],
+   ACCOMMODATION_PROVIDER:["HIGHER_EDUCATION","TVET","SETA_LEARNERSHIP","INTERNSHIP","APPRENTICESHIP","EMPLOYMENT"],
+   EMPLOYER:["EMPLOYMENT","INTERNSHIP","APPRENTICESHIP","SETA_LEARNERSHIP"],
+   PRIVATE_COLLEGE:["HIGHER_EDUCATION","TVET","SETA_LEARNERSHIP"],
+   APPLICATION_PORTAL:["HIGHER_EDUCATION","TVET"],
+   GOVERNMENT_AUTHORITY:["HIGHER_EDUCATION","TVET","EMPLOYMENT"],
+   QUALITY_AUTHORITY:["SETA_LEARNERSHIP","APPRENTICESHIP"]
+  };
+  const specialProviderPathways:Record<string,string[]> = {
+   nsfas_official:["HIGHER_EDUCATION","TVET"],
+   funder_nsf:["HIGHER_EDUCATION","TVET","SETA_LEARNERSHIP","APPRENTICESHIP"],
+   funder_funza_lushaka:["HIGHER_EDUCATION"],
+   nsfas_accommodation_portal:["HIGHER_EDUCATION","TVET"],
+   dpsa_public_service_vacancies:["EMPLOYMENT"],
+   private_employer_pepkor:["EMPLOYMENT"],
+   private_employer_sasol:["EMPLOYMENT"],
+   private_employer_woolworths:["EMPLOYMENT"],
+   private_employer_mr_price:["EMPLOYMENT"],
+   private_employer_vodafone:["EMPLOYMENT"],
+   private_employer_pepsico_sa:["EMPLOYMENT"],
+   private_employer_nedbank:["EMPLOYMENT"],
+   private_employer_clicks_group:["EMPLOYMENT"],
+   private_employer_tfg:["EMPLOYMENT"],
+   private_employer_standard_bank:["EMPLOYMENT"],
+   labour_department_vacancies:["EMPLOYMENT"],
+   cao_official:["HIGHER_EDUCATION","TVET"]
+  };
+  const permitted=(specialProviderPathways[providerKey]??allowedByProviderType[String(provider.provider_type)]??[]);
+  if(!permitted.includes(pathwayType))return reply(409,{ready:false,code:"PROVIDER_PATHWAY_MISMATCH",error:"This pathway does not match the provider's registered service type. No plan was saved."},origin);
+
+  const digest=await crypto.subtle.digest("SHA-256",new TextEncoder().encode(providerKey+"|"+pathwayType+"|"+programmeOrRole.toLocaleLowerCase()));
+  const digestHex=Array.from(new Uint8Array(digest)).map(byte=>byte.toString(16).padStart(2,"0")).join("").slice(0,32);
+  const targetKey=("DIR-"+providerKey+"-"+digestHex).slice(0,120);
+  const idempotencyKey="DIR-PLAN-"+digestHex;
+
+  const {data:existing,error:existingError}=await admin.from("candidate_master_application_targets")
+   .select("id,target_key,pathway_type,provider_name,programme_or_role,provider_application_url,source_reference,source_confidence,planning_status,application_id,created_at,updated_at")
+   .eq("candidate_id",candidateId).eq("target_key",targetKey).maybeSingle();
+  if(existingError){console.error("directory planning duplicate lookup failed",existingError.code??"unknown");return reply(503,{ready:false,code:"PLANNING_LOOKUP_FAILED",error:"Could not check for an existing planning target."},origin);}
+
+  let target=existing;
+  if(!target){
+   const sourceReference="Kingsmen provider registry: "+provider.provider_key+"; directory planning only; registry state="+provider.verification_status+"; source authority id="+String(provider.source_authority_id??"not linked");
+   const {data:created,error:createError}=await admin.from("candidate_master_application_targets").insert({
+    candidate_id:candidateId,target_key:targetKey,pathway_type:pathwayType,
+    provider_name:String(provider.provider_name).trim().slice(0,180),
+    programme_or_role:programmeOrRole,
+    provider_application_url:null,
+    source_reference:sourceReference,
+    source_confidence:"UNVERIFIED",
+    planning_status:"PLANNING",
+    idempotency_key:idempotencyKey,
+    created_by_auth_user_id:authData.user.id,
+    application_id:null
+   }).select("id,target_key,pathway_type,provider_name,programme_or_role,provider_application_url,source_reference,source_confidence,planning_status,application_id,created_at,updated_at").single();
+   if(createError||!created){console.error("directory planning target insert failed",createError?.code??"unknown");return reply(503,{ready:false,code:"PLANNING_TARGET_SAVE_FAILED",error:"The provider plan could not be saved. No provider application was sent."},origin);}
+   target=created;
+  }
+
+  const {error:auditError}=await admin.from("candidate_master_application_events").upsert({
+   candidate_id:candidateId,actor_auth_user_id:authData.user.id,event_type:"TARGETS_PLANNED",idempotency_key:idempotencyKey,
+   details:{action:"DIRECTORY_PROVIDER_PLAN_CREATED",target_key:targetKey,provider_key:provider.provider_key,
+    provider_type:provider.provider_type,provider_verification_status:provider.verification_status,
+    provider_public_safe:provider.public_safe,source_confidence:"UNVERIFIED",planning_status:"PLANNING",
+    pathway_type:pathwayType,programme_or_role:programmeOrRole,provider_submission_sent:false,
+    provider_receipt_confirmed:false,provider_integration:"NOT_CONNECTED"}
+  },{onConflict:"candidate_id,event_type,idempotency_key"});
+  if(auditError){console.error("directory planning audit write failed",auditError.code??"unknown");return reply(503,{ready:false,code:"PLANNING_AUDIT_FAILED",error:"The target was saved but its audit event could not be reconciled. Refresh the tracker before retrying."},origin);}
+
+  return reply(200,{ready:true,saved:true,target,created:!existing,
+   provider_submission_sent:false,provider_integration:"NOT_CONNECTED",
+   message:"Private Kingsmen planning target saved. This is not a provider application, open programme, verified intake or submission. Kingsmen will require current programme, eligibility and route evidence before preparing a provider-specific application."},origin);
+ }
+ if(p.action==="prepare_application_packet"){
+  const targetKey=typeof p.target_key==="string"?p.target_key.trim():"";
+  if(!targetKey||targetKey.length>120)return reply(400,{ready:false,code:"TARGET_KEY_INVALID",error:"Choose a saved provider target before preparing an application packet."},origin);
+
+  const rawAnswers=p.application_answers&&typeof p.application_answers==="object"&&!Array.isArray(p.application_answers)
+    ? p.application_answers as Record<string,unknown> : {};
+  const answerLimits:Record<string,number> = {
+    motivation_statement:3000,
+    experience_summary:3000,
+    skills_summary:1800,
+    qualification_summary:1800,
+    availability:500,
+    preferred_location:180,
+    additional_information:1800
+  };
+  const answers:Record<string,string>={};
+  for(const [field,limit] of Object.entries(answerLimits)){
+    const value=rawAnswers[field];
+    if(value===undefined||value===null||value==="")continue;
+    if(typeof value!=="string"||value.length>limit||/[\\u0000-\\u0008\\u000b\\u000c\\u000e-\\u001f]/.test(value))
+      return reply(400,{ready:false,code:"APPLICATION_ANSWER_INVALID",error:"One of the application preparation fields is invalid or exceeds its size limit."},origin);
+    answers[field]=value.trim();
+  }
+
+  const rawDocumentIds=p.selected_document_ids===undefined?[]:p.selected_document_ids;
+  if(!Array.isArray(rawDocumentIds)||rawDocumentIds.length>20||rawDocumentIds.some((value:any)=>typeof value!=="string"||!/^[0-9a-f]{8}-[0-9a-f]{4}-[1-8][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i.test(value)))
+    return reply(400,{ready:false,code:"APPLICATION_DOCUMENT_SELECTION_INVALID",error:"Select up to 20 valid documents from your own Document Vault."},origin);
+  const selectedDocumentIds=[...new Set(rawDocumentIds as string[])];
+  if(selectedDocumentIds.length!==rawDocumentIds.length)
+    return reply(400,{ready:false,code:"APPLICATION_DOCUMENT_DUPLICATE",error:"A document can only be selected once."},origin);
+
+  const {data:target,error:targetError}=await admin.from("candidate_master_application_targets")
+   .select("id,target_key,candidate_id,pathway_type,provider_name,programme_or_role,source_reference,planning_status,application_id")
+   .eq("candidate_id",candidateId).eq("target_key",targetKey).maybeSingle();
+  if(targetError){console.error("application packet target lookup failed",targetError.code??"unknown");return reply(503,{ready:false,code:"APPLICATION_TARGET_LOOKUP_FAILED",error:"Could not load this saved application target."},origin);}
+  if(!target)return reply(404,{ready:false,code:"APPLICATION_TARGET_NOT_FOUND",error:"This saved application target could not be found for your verified candidate account."},origin);
+
+  const providerKeyMatch=/^Kingsmen provider registry:\s*([a-z0-9_:-]{3,100})\s*;/i.exec(String(target.source_reference??""));
+  if(!providerKeyMatch)return reply(409,{ready:false,code:"PROVIDER_REGISTRY_LINK_REQUIRED",error:"This target is not yet linked to a canonical provider record. A reusable application packet cannot be assembled until that provider link is verified."},origin);
+  const providerKey=providerKeyMatch[1];
+  const {data:provider,error:providerError}=await admin.from("route_providers")
+   .select("provider_key,provider_name,provider_type,verification_status,base_url,public_safe,default_confidence_band")
+   .eq("provider_key",providerKey).maybeSingle();
+  if(providerError){console.error("application packet provider lookup failed",providerError.code??"unknown");return reply(503,{ready:false,code:"PROVIDER_LOOKUP_FAILED",error:"The provider registry is temporarily unavailable."},origin);}
+  if(!provider||["BLOCKED","RISK","STALE"].includes(String(provider.verification_status)))
+    return reply(409,{ready:false,code:"PROVIDER_NOT_AVAILABLE_FOR_PREPARATION",error:"This provider record is missing, blocked, risky or stale. No application packet was created."},origin);
+  if(provider.provider_name!==target.provider_name)
+    return reply(409,{ready:false,code:"PROVIDER_TARGET_MISMATCH",error:"The saved target does not match its canonical provider record. Contact support before continuing."},origin);
+
+  const {data:candidate,error:candidateError}=await admin.from("candidates").select("public_ref").eq("id",candidateId).maybeSingle();
+  if(candidateError||!candidate?.public_ref){console.error("application packet candidate reference lookup failed",candidateError?.code??"unknown");return reply(503,{ready:false,code:"CANDIDATE_REFERENCE_UNAVAILABLE",error:"Could not verify your candidate profile reference."},origin);}
+  const {data:consents,error:consentError}=await admin.from("privacy_consent_records")
+   .select("consent_status,revoked_at,consent_text_snapshot,granted_at")
+   .eq("candidate_ref",candidate.public_ref).eq("consent_type","PROFILE_PROCESSING")
+   .order("granted_at",{ascending:false}).order("id",{ascending:false}).limit(1);
+  if(consentError){console.error("application packet consent lookup failed",consentError.code??"unknown");return reply(503,{ready:false,code:"CONSENT_LOOKUP_FAILED",error:"Could not check the current profile-processing consent state."},origin);}
+  const consent=consents?.[0];
+  if(!consent||consent.consent_status!=="ACTIVE"||consent.revoked_at!==null||
+    typeof consent.consent_text_snapshot!=="string"||!consent.consent_text_snapshot.trim()||
+    !consent.granted_at||Date.parse(consent.granted_at)>Date.now())
+    return reply(403,{ready:false,code:"ACTIVE_PROFILE_CONSENT_REQUIRED",error:"Active profile-processing consent is required before a reusable application packet can be prepared."},origin);
+
+  const {data:profile,error:profileError}=await admin.from("candidate_master_profiles")
+   .select("profile_data,pathway_preferences,consent_version,consent_at")
+   .eq("candidate_id",candidateId).maybeSingle();
+  if(profileError){console.error("application packet profile lookup failed",profileError.code??"unknown");return reply(503,{ready:false,code:"CANDIDATE_PROFILE_UNAVAILABLE",error:"Could not load your saved candidate profile."},origin);}
+  if(!profile)return reply(409,{ready:false,code:"CANDIDATE_PROFILE_REQUIRED",error:"Save your candidate profile before preparing provider application information."},origin);
+  const rawProfile=profile.profile_data&&typeof profile.profile_data==="object"&&!Array.isArray(profile.profile_data)
+    ? profile.profile_data as Record<string,unknown> : {};
+  const profileFields=["displayName","phone","province","highestQualification","studyInterests","employmentInterests","preferredLocation"];
+  const profileSnapshot:Record<string,string>={};
+  for(const key of profileFields){if(typeof rawProfile[key]==="string")profileSnapshot[key]=(rawProfile[key] as string).trim().slice(0,600);}
+
+  let documents:any[]=[];
+  if(selectedDocumentIds.length){
+    const result=await admin.from("candidate_private_documents")
+     .select("id,document_type,original_filename,mime_type,size_bytes,status")
+     .eq("candidate_id",candidateId).in("id",selectedDocumentIds)
+     .in("status",["UPLOADED_CANDIDATE_REPORTED","UNDER_REVIEW","VERIFIED"]);
+    if(result.error){console.error("application packet document lookup failed",result.error.code??"unknown");return reply(503,{ready:false,code:"DOCUMENT_LOOKUP_FAILED",error:"Could not verify the selected Document Vault files."},origin);}
+    documents=result.data??[];
+    if(documents.length!==selectedDocumentIds.length)
+      return reply(409,{ready:false,code:"DOCUMENT_NOT_OWNED_OR_AVAILABLE",error:"One or more selected files are not available in your own Document Vault. Refresh and select your own uploaded files."},origin);
+  }
+
+  const missingProfileFields=profileFields.filter(key=>typeof profileSnapshot[key]!=="string"||!profileSnapshot[key].trim());
+  const {data:existingPacket,error:existingPacketError}=await admin.from("candidate_application_packets")
+   .select("id,packet_ref").eq("candidate_id",candidateId).eq("target_id",target.id).maybeSingle();
+  if(existingPacketError){console.error("application packet reload failed",existingPacketError.code??"unknown");return reply(503,{ready:false,code:"APPLICATION_PACKET_LOOKUP_FAILED",error:"Could not check for an existing preparation packet."},origin);}
+  const packetRef=existingPacket?.packet_ref??("KMAP-"+crypto.randomUUID().replace(/-/g,"").slice(0,16).toUpperCase());
+  const now=new Date().toISOString();
+
+  const {data:packet,error:packetError}=await admin.from("candidate_application_packets").upsert({
+    packet_ref:packetRef,candidate_id:candidateId,target_id:target.id,
+    pathway_type:target.pathway_type,provider_key:providerKey,provider_name:target.provider_name,
+    programme_or_role:target.programme_or_role,packet_status:"PROVIDER_REQUIREMENTS_PENDING",
+    template_status:"NO_VERIFIED_PROVIDER_TEMPLATE",candidate_profile_snapshot:profileSnapshot,
+    application_answers:answers,missing_profile_fields:missingProfileFields,
+    selected_document_count:documents.length,provider_requirements_status:"NOT_VERIFIED",
+    provider_submission_sent:false,provider_receipt_confirmed:false,provider_integration_state:"NOT_CONNECTED",
+    created_by_auth_user_id:authData.user.id,updated_by_auth_user_id:authData.user.id,updated_at:now
+  },{onConflict:"candidate_id,target_id"})
+   .select("id,packet_ref,target_id,pathway_type,provider_key,provider_name,programme_or_role,packet_status,template_status,candidate_profile_snapshot,application_answers,missing_profile_fields,selected_document_count,provider_requirements_status,provider_submission_sent,provider_receipt_confirmed,provider_integration_state,created_at,updated_at")
+   .single();
+  if(packetError||!packet){console.error("application packet save failed",packetError?.code??"unknown");return reply(503,{ready:false,code:"APPLICATION_PACKET_SAVE_FAILED",error:"The reusable application information could not be saved. No provider application was sent."},origin);}
+
+  const {error:clearDocumentsError}=await admin.from("candidate_application_packet_documents")
+   .delete().eq("packet_id",packet.id).eq("candidate_id",candidateId);
+  if(clearDocumentsError){console.error("application packet document reconciliation failed",clearDocumentsError.code??"unknown");return reply(503,{ready:false,code:"APPLICATION_PACKET_DOCUMENT_RECONCILIATION_FAILED",error:"The packet was saved but document selections could not be reconciled. Refresh and retry."},origin);}
+  if(documents.length){
+    const documentRows=documents.map(document=>({
+      packet_id:packet.id,candidate_id:candidateId,private_document_id:document.id,
+      document_type_snapshot:document.document_type,original_filename_snapshot:document.original_filename,
+      selected_by_auth_user_id:authData.user.id
+    }));
+    const {error:documentInsertError}=await admin.from("candidate_application_packet_documents").insert(documentRows);
+    if(documentInsertError){console.error("application packet document selection save failed",documentInsertError.code??"unknown");return reply(503,{ready:false,code:"APPLICATION_PACKET_DOCUMENT_SAVE_FAILED",error:"The packet is saved but selected documents could not be attached. Refresh and retry."},origin);}
+  }
+
+  const {error:auditError}=await admin.from("candidate_master_application_events").upsert({
+    candidate_id:candidateId,actor_auth_user_id:authData.user.id,event_type:"TARGETS_PLANNED",
+    idempotency_key:"APPLICATION-PACKET:"+targetKey,
+    details:{action:"REUSABLE_APPLICATION_PACKET_PREPARED",packet_ref:packetRef,target_key:targetKey,
+      provider_key:providerKey,pathway_type:target.pathway_type,packet_status:"PROVIDER_REQUIREMENTS_PENDING",
+      template_status:"NO_VERIFIED_PROVIDER_TEMPLATE",provider_requirements_status:"NOT_VERIFIED",
+      profile_field_count:Object.keys(profileSnapshot).length,missing_profile_fields:missingProfileFields,
+      selected_document_count:documents.length,selected_document_types:documents.map(document=>document.document_type),
+      provider_submission_sent:false,provider_receipt_confirmed:false,provider_integration_state:"NOT_CONNECTED"}
+  },{onConflict:"candidate_id,event_type,idempotency_key"});
+  if(auditError){console.error("application packet audit write failed",auditError.code??"unknown");return reply(503,{ready:false,code:"APPLICATION_PACKET_AUDIT_FAILED",error:"The preparation packet was saved but its audit event could not be reconciled. Refresh the tracker before retrying."},origin);}
+
+  return reply(200,{ready:true,packet,documents:documents.map(document=>({
+    id:document.id,document_type:document.document_type,original_filename:document.original_filename,
+    mime_type:document.mime_type,size_bytes:document.size_bytes,status:document.status
+  })),message:"Reusable Kingsmen application profile and selected Document Vault references saved. Provider-specific form requirements, eligibility and submission route remain unverified; nothing was sent to the institution."},origin);
+ }
  if(p.action==="prepare_master_application"){
   const targetKey=typeof p.target_key==="string"?p.target_key.trim():"";
   if(!targetKey||targetKey.length>120)return reply(400,{ready:false,code:"TARGET_KEY_INVALID",error:"A valid saved application target is required."},origin);
@@ -164,6 +394,25 @@ Deno.serve(async(req:Request)=>{
    if(result.error){console.error("master applications load failed",result.error.code??"unknown");return reply(503,{error:"Could not load prepared application records."},origin);}
    parentApplications=result.data??[];
   }
+  const {data:applicationPackets,error:packetLoadError}=await admin.from("candidate_application_packets")
+   .select("id,packet_ref,target_id,pathway_type,provider_key,provider_name,programme_or_role,packet_status,template_status,candidate_profile_snapshot,application_answers,missing_profile_fields,selected_document_count,provider_requirements_status,provider_submission_sent,provider_receipt_confirmed,provider_integration_state,created_at,updated_at")
+   .eq("candidate_id",candidateId).order("updated_at",{ascending:false});
+  if(packetLoadError){console.error("candidate application packet load failed",packetLoadError.code??"unknown");return reply(503,{error:"Could not load reusable application preparation packets."},origin);}
+  const packetIds=(applicationPackets??[]).map((packet:any)=>packet.id);
+  let packetDocuments:any[]=[];
+  if(packetIds.length){
+    const result=await admin.from("candidate_application_packet_documents")
+     .select("id,packet_id,private_document_id,document_type_snapshot,original_filename_snapshot,selected_at")
+     .eq("candidate_id",candidateId).in("packet_id",packetIds).order("selected_at",{ascending:true});
+    if(result.error){console.error("candidate packet document load failed",result.error.code??"unknown");return reply(503,{error:"Could not load selected Document Vault references."},origin);}
+    packetDocuments=result.data??[];
+  }
+  const {data:availableDocuments,error:availableDocumentError}=await admin.from("candidate_private_documents")
+   .select("id,document_type,original_filename,mime_type,size_bytes,status,uploaded_at")
+   .eq("candidate_id",candidateId)
+   .in("status",["UPLOADED_CANDIDATE_REPORTED","UNDER_REVIEW","VERIFIED"])
+   .order("uploaded_at",{ascending:false});
+  if(availableDocumentError){console.error("candidate application packet vault selection load failed",availableDocumentError.code??"unknown");return reply(503,{error:"Could not load your available Document Vault files."},origin);}
   const {data:masterEvents,error:masterEventError}=await admin.from("candidate_master_application_events")
    .select("event_type,details,created_at").eq("candidate_id",candidateId).order("created_at",{ascending:false}).limit(100);
   if(masterEventError){console.error("master application timeline load failed",masterEventError.code??"unknown");return reply(503,{error:"Could not load application timeline evidence."},origin);}
@@ -172,8 +421,9 @@ Deno.serve(async(req:Request)=>{
    .eq("candidate_id",candidateId).order("created_at",{ascending:false}).limit(200);
   if(applicationEventError){console.error("application timeline load failed",applicationEventError.code??"unknown");return reply(503,{error:"Could not load application timeline evidence."},origin);}
   return reply(200,{ready:true,trackers:trackers??[],items,masterTargets:masterTargets??[],
-   parentApplications,masterEvents:masterEvents??[],applicationEvents:applicationEvents??[],
-   message:"Saved application and preparation records loaded. No provider submission is implied."},origin);
+   parentApplications,applicationPackets:applicationPackets??[],packetDocuments,availableDocuments:availableDocuments??[],
+   masterEvents:masterEvents??[],applicationEvents:applicationEvents??[],
+   message:"Saved application and preparation records loaded. Application packets and Document Vault references are private preparation data; no provider submission is implied."},origin);
  }
  if(p.action==="start_from_saved_route"){
   const routeId=typeof p.route_programme_id==="string"?p.route_programme_id:"";
