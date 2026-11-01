@@ -49,7 +49,7 @@ type RuntimeResponse = {
   note?: string;
 };
 
-type RuntimeError = Error & { status?: number; runtimeStatus?: string };
+type RuntimeError = Error & { status?: number; runtimeStatus?: string; retryAfterSeconds?: number };
 
 function readFounderAccessToken(): string | null {
   try {
