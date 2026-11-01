@@ -37,7 +37,7 @@ export interface PublicPackageCard {
 export interface PublicSectorCard {
   sectorKey: string;
   sectorName: string;
-  sectorGroup: "EDUCATION" | "FUNDING" | "WORK" | "ACCOMMODATION" | "SKILLS" | "PRIVATE_PROVIDER" | "CENTRAL_ROUTE";
+  sectorGroup: "EDUCATION" | "FUNDING" | "WORK" | "ACCOMMODATION" | "SKILLS" | "PRIVATE_PROVIDER" | "CENTRAL_ROUTE" | "ENTERPRISE" | "CREATIVE_PROFESSIONAL" | "TRANSPORT" | "HEALTHCARE" | "LEGAL_SOCIAL" | "PUBLIC_SERVICES";
   publicDescription: string;
   previewAllowed: boolean;
   exactTargetsSealed: boolean;
