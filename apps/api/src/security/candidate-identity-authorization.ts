@@ -41,10 +41,12 @@ export async function resolveCandidateIdentity(
   env: Record<string, string | undefined> = process.env,
   fetcher: typeof fetch = fetch
 ): Promise<CandidateIdentityResolution> {
-  const url = env.SUPABASE_URL?.replace(/\/$/, "");
-  const anonKey = env.SUPABASE_ANON_KEY;
-  const match = authorization?.match(/^Bearer\s+(\S+)$/i);
-  if (!match) return { ok: false, status: 401, code: "AUTHENTICATION_REQUIRED" };
+  const url = safeSupabaseOrigin(env.SUPABASE_URL);
+  const anonKey = env.SUPABASE_ANON_KEY?.trim();
+  const match = authorization?.match(/^Bearer\\s+(\\S+)$/i);
+  if (!match || match[1].length > MAX_BEARER_TOKEN_LENGTH) {
+    return { ok: false, status: 401, code: "AUTHENTICATION_REQUIRED" };
+  }
   if (!url || !anonKey) {
     return { ok: false, status: 503, code: "IDENTITY_AUTHORIZATION_NOT_CONFIGURED" };
   }
