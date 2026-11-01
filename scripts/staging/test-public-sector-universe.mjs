@@ -20,6 +20,14 @@ const cards = rows.map((line) => {
 });
 const keys = cards.map((x) => x.key);
 assert.equal(new Set(keys).size, keys.length, "sector keys must be unique");
+assert.ok(
+  sectorSource.includes('sectorName: "Private Colleges (verification required)"'),
+  "private-college category must not imply the catalogue is already verified"
+);
+assert.ok(
+  !sectorSource.includes('sectorName: "Verified Private Colleges"'),
+  "do not label the entire private-college category as verified"
+);
 const required = [
   "UNIVERSITY", "TVET", "CAO", "PRIVATE_COLLEGE", "SETA_QCTO", "LEARNERSHIP",
   "APPRENTICESHIP", "INTERNSHIP", "EMPLOYMENT", "EMPLOYER_INTERNSHIP",
