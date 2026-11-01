@@ -105,7 +105,7 @@ async function requestRuntime(method: "GET" | "POST"): Promise<RuntimeResponse> 
   const projectRef = endpoint.hostname.split(".")[0];
   const token = readFounderAccessToken(projectRef);
   if (!token) throw new Error("Sign in first. No authenticated Supabase session was found in this browser.");
-  endpoint.pathname = endpoint.pathname.replace(/\\/+$/, "") + "/functions/v1/n13-observability-runtime";
+  endpoint.pathname = endpoint.pathname.replace(/\/+$/, "") + "/functions/v1/n13-observability-runtime";
 
   const response = await fetch(endpoint.toString(), {
     method,
