@@ -28,7 +28,7 @@ export function createCandidateSession(input: CandidateSessionRequest): Candidat
   if (!candidateId) throw new Error("candidateId is required.");
 
   const expiryText = typeof input.expiresAt === "string" ? input.expiresAt.trim() : "";
-  const isoDateTime = /^\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}(?::\\d{2}(?:\\.\\d{1,9})?)?(?:Z|[+-]\\d{2}:\\d{2})$/i;
+  const isoDateTime = /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}(?::\d{2}(?:\\.\d{1,9})?)?(?:Z|[+-]\d{2}:\d{2})$/i;
   if (!isoDateTime.test(expiryText)) throw new Error("expiresAt must be an ISO 8601 date-time with an explicit timezone.");
   const expiry = Date.parse(expiryText);
   if (!Number.isFinite(expiry)) throw new Error("expiresAt must be a valid date-time.");
