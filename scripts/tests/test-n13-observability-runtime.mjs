@@ -45,6 +45,9 @@ assert.equal(
 
 for (const required of [
   "auth.getUser(bearer)",
+  '"Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type"',
+  "CAPTURE_RATE_LIMITED",
+  "MAX_CAPTURE_AGE_SECONDS = 60",
   'eq("role_code", "PLATFORM_ADMIN")',
   '.is("revoked_at", null)',
   'Deno.serve(async (req: Request)',
