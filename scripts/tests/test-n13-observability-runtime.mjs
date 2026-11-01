@@ -113,7 +113,7 @@ assert.ok(migrationSource.includes("pg_advisory_xact_lock"), "Capture cooldown m
 assert.ok(migrationSource.includes("n13_capture_rate_limited"), "The database function must return rate-limit evidence without partial writes.");
 assert.ok(migrationSource.includes("jsonb_to_record") && migrationSource.includes("jsonb_to_recordset"), "All capture records must be decoded and inserted by the same RPC transaction.");
 assert.ok(migrationSource.includes("system_health_snapshots") && migrationSource.includes("service_health_checks") && migrationSource.includes("metric_samples"), "The atomic operation must persist all three evidence classes.");
-assert.ok(migrationSource.includes("REVOKE ALL ON FUNCTION") && migrationSource.includes("GRANT EXECUTE ON FUNCTION") && migrationSource.includes("TO service_role"), "Only service_role may invoke the capture RPC.");
+assert.ok(migrationSource.includes("revoke all on function") && migrationSource.includes("grant execute on function") && migrationSource.includes("TO service_role"), "Only service_role may invoke the capture RPC.");
 assert.ok(policySource.includes("metricCountsAvailable"), "The founder read-model projection must explicitly mark counter availability.");
 assert.ok(policySource.includes("SNAPSHOT_COUNT_FIELDS") && policySource.includes("projected[field] = null"),
   "Unknown counter placeholders must be suppressed from the Founder read model.");
