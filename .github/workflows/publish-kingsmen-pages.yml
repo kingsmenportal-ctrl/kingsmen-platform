@@ -130,6 +130,10 @@ jobs:
               raise SystemExit(f"SETA Workplace Learning Watch contract failed; missing: {missing}")
           if "fetch(" in html or "XMLHttpRequest" in html:
               raise SystemExit("SETA watch must not transmit data or claim to be a live feed")
+          if "dgportal.servicesseta.org.za/dg" in html:
+              raise SystemExit("SETA watch must not link to an unconfirmed 2026/27 application portal")
+          if "mailto:dgwindow2627@serviceseta.org.za" not in html:
+              raise SystemExit("SETA DG contact must use the official enquiries address")
           if html.count('class="card resource-card"') != 3:
               raise SystemExit("Expected three separately identified official Services SETA windows")
           print("SETA Workplace Learning Watch contract passed: 3 official windows, applicant-group filters, deadlines, source links, process caveats and no fabricated live connection.")
