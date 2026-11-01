@@ -410,7 +410,7 @@ SET search_path TO 'pg_catalog','public','kingsmen_security','auth'
 AS $function$
 DECLARE
   v_uid uuid:=auth.uid(); v_candidate uuid; v_reservation public.candidate_application_capacity_reservations%ROWTYPE;
-  v_status text; v_reason text:=trim(coalesce(p_reason,''));
+  v_status text; v_reason text:=trim(coalesce(p_reason,'')); v_now timestamptz:=clock_timestamp();
 BEGIN
   IF v_uid IS NULL THEN RAISE EXCEPTION 'AUTHENTICATED_CANDIDATE_REQUIRED' USING ERRCODE='42501'; END IF;
   IF p_reservation_id IS NULL OR length(v_reason) NOT BETWEEN 5 AND 500 THEN
