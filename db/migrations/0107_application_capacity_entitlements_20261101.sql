@@ -237,7 +237,7 @@ BEGIN
   ) ORDER BY r.reserved_at DESC),'[]'::jsonb)
   INTO v_reservations
   FROM public.candidate_application_capacity_reservations r
-  WHERE r.candidate_id=v_candidate AND r.entitlement_order_ref=v_order.order_ref
+  WHERE r.candidate_id=v_candidate
     AND r.reservation_status='RESERVED' AND r.period_expires_at>v_now;
 
   RETURN jsonb_build_object(
