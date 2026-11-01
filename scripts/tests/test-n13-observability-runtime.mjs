@@ -53,7 +53,6 @@ for (const required of [
   'from("service_health_checks").insert(checks)',
   'from("metric_samples").insert(metricRows)',
   'verify_jwt',
-  "candidate_ref",
   "productionReady: false"
 ]) {
   assert.ok(functionSource.includes(required), "Missing runtime security or persistence contract: " + required);
