@@ -1,0 +1,115 @@
+<!doctype html>
+<html lang="en-ZA">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="description" content="Prepare for interviews, assessments and selection stages across South African study, training and employment pathways.">
+<title>Selection & Assessment Readiness | Kingsmen</title>
+<link rel="stylesheet" href="site.css">
+</head>
+<body>
+<header class="site-header"><div class="topline"><a class="brand" href="./index.html">KINGSMEN<small>OPPORTUNITY PLATFORM</small></a><nav class="nav" aria-label="Main navigation"><a href="./index.html">Home</a><a href="./opportunities.html">Opportunities</a><a href="./application-guide.html">Application guide</a><a href="./employment-cv.html">Employment & CV</a><a href="./application-follow-up.html">Follow-up planner</a><a href="./help.html">Help</a></nav></div></header>
+<main class="wrap">
+<div class="breadcrumb"><a href="./index.html">Home</a> / Selection & assessment readiness</div>
+<section class="page-hero"><p class="eyebrow">Across all six Kingsmen pathways</p><h1>Selection & assessment readiness</h1><p class="lead">Organise preparation for interviews, entrance assessments, practical demonstrations, portfolio reviews and other selection stages. Use one plan per opportunity and keep provider-confirmed events separate from your own reports.</p></section>
+<div class="notice"><strong>Safety and privacy:</strong> Confirm every invitation and venue through the institution, funder or employer's official channel. Never pay for a guaranteed interview, selection result or job. Do not store identity numbers, passwords, OTPs, bank details, private documents or sensitive personal information in this public tool.</div>
+<section class="section"><div class="two-col">
+<article class="card"><h2>Create a preparation plan</h2>
+<form id="selection-form">
+<div class="field"><label for="opportunity">Opportunity / role / programme label</label><input id="opportunity" maxlength="100" required placeholder="Use a short, non-sensitive label"></div>
+<div class="field"><label for="pathway">Kingsmen pathway</label><select id="pathway" required><option value="">Choose a pathway</option><option>Higher education</option><option>TVET</option><option>SETA / learnership</option><option>Internship</option><option>Apprenticeship</option><option>Employment</option><option>Funding</option></select></div>
+<div class="field"><label for="stage">Selection stage</label><select id="stage" required><option value="">Choose a stage</option><option>Interview</option><option>Entrance / aptitude assessment</option><option>Technical or practical assessment</option><option>Portfolio / work sample review</option><option>Group assessment</option><option>Medical or occupational assessment</option><option>Other selection stage</option></select></div>
+<div class="field"><label for="status">Evidence status</label><select id="status" required><option value="preparing">Preparing — no invitation recorded</option><option value="candidate-invite">Candidate-reported invitation — not provider-confirmed</option><option value="provider-invite">Provider-confirmed invitation</option><option value="candidate-complete">Candidate-reported attendance / completion</option><option value="provider-outcome">Official provider outcome received</option></select></div>
+<div class="field"><label for="date">Event date (optional)</label><input id="date" type="date"></div>
+<div class="field"><label for="time">Event time (optional)</label><input id="time" type="time"></div>
+<div class="field"><label for="mode">Format</label><select id="mode"><option>Not yet confirmed</option><option>In person</option><option>Online / video call</option><option>Telephone</option><option>Practical venue / workshop</option><option>Other</option></select></div>
+<div class="field"><label for="source">Official provider page or invitation link (HTTPS)</label><input id="source" type="url" maxlength="500" placeholder="https://…"></div>
+<h3>Preparation checklist</h3><div class="checklist">
+<label class="check-item"><input type="checkbox" name="prep" value="Invitation and event details checked with the official provider"><span>Invitation, date, time and event details checked with the official provider</span></label>
+<label class="check-item"><input type="checkbox" name="prep" value="Programme, employer or role researched from official information"><span>Programme, employer or role researched from official information</span></label>
+<label class="check-item"><input type="checkbox" name="prep" value="Selection criteria and assessment format reviewed"><span>Selection criteria and assessment format reviewed</span></label>
+<label class="check-item"><input type="checkbox" name="prep" value="Relevant examples and truthful experience prepared"><span>Relevant examples, skills and truthful experience prepared</span></label>
+<label class="check-item"><input type="checkbox" name="prep" value="Practice completed for the required test or practical task"><span>Practice completed for the required test or practical task</span></label>
+<label class="check-item"><input type="checkbox" name="prep" value="Permitted documents, portfolio or work sample prepared privately"><span>Permitted documents, portfolio or work sample prepared privately</span></label>
+<label class="check-item"><input type="checkbox" name="prep" value="Travel, data, equipment and accessibility arrangements checked"><span>Travel, data, equipment and accessibility arrangements checked</span></label>
+<label class="check-item"><input type="checkbox" name="prep" value="Official contact channel and next step recorded"><span>Official contact channel and next step recorded</span></label>
+</div>
+<div class="field"><label for="notes">Non-sensitive preparation notes / next step</label><textarea id="notes" maxlength="350" rows="3" placeholder="e.g. practise two examples of problem-solving"></textarea></div>
+<p class="small muted">Your plans are stored only in this browser on this device. This is not a calendar, reminder service, application tracker or private document vault.</p>
+<div class="btn-row"><button class="btn btn-primary" type="submit">Save plan on this device</button><button class="btn btn-outline" type="reset">Reset form</button></div>
+<p id="form-status" role="status" aria-live="polite">No information is sent to Kingsmen.</p>
+</form></article>
+<article class="card"><h2>Prepare for the stage, not just the appointment</h2>
+<div class="steps">
+<article class="step"><div><h3>Understand the criteria</h3><p>Use the official programme or job advert to identify what will be assessed. Do not rely on rumours or paid intermediaries.</p></div></article>
+<article class="step"><div><h3>Prepare evidence-based examples</h3><p>Practise explaining what you did, the skills used and the result. Keep claims accurate and consistent with your actual experience.</p></div></article>
+<article class="step"><div><h3>Check practical arrangements</h3><p>Confirm venue, link, time zone, permitted materials, equipment, travel and accessibility needs with the official contact.</p></div></article>
+<article class="step"><div><h3>Record the outcome carefully</h3><p>Your attendance report is not a provider result. Record selection or rejection only when the responsible organisation communicates it.</p></div></article>
+</div>
+</article>
+</div></section>
+<section class="section"><div class="section-head"><div><p class="eyebrow">Saved in this browser</p><h2>Your selection plans</h2><p class="muted">Plans are not synchronised across devices or sent to an institution, employer, funder or Kingsmen.</p></div><button class="btn btn-outline" id="clear-all" type="button">Clear all plans</button></div><div id="plans" class="resource-list"></div><p id="empty" class="empty" style="display:block">No selection plans saved on this device yet.</p><p id="list-status" class="small" role="status" aria-live="polite"></p></section>
+<div class="notice"><strong>Platform boundary:</strong> This is a public, device-local preparation utility. It does not issue invitations, verify attendance, assess candidates, make selection decisions, contact providers, or update Kingsmen's authenticated candidate tracker. Human institutions and employers remain responsible for selection decisions.</div>
+</main>
+<footer class="footer"><div class="wrap footer-grid"><div><a class="brand" href="./index.html">KINGSMEN</a><p>One organised starting point for South African education, training, funding and work pathways.</p></div><div><h3>Prepare</h3><div class="footer-links"><a href="./application-guide.html">Application guide</a><a href="./employment-cv.html">Employment & CV readiness</a><a href="./funding-readiness.html">Funding readiness</a><a href="./application-follow-up.html">Application follow-up planner</a></div></div><div><h3>Information</h3><div class="footer-links"><a href="./verification-safety.html">Opportunity verification & safety</a><a href="./about.html">About Kingsmen</a><a href="./help.html">Help & privacy</a></div></div></div></footer>
+<script>
+(function(){
+'use strict';
+const KEY='kingsmen.selection-assessment-readiness.v1';
+const form=document.getElementById('selection-form');
+const plans=document.getElementById('plans');
+const empty=document.getElementById('empty');
+const statusNames={
+preparing:'Preparing — no invitation recorded',
+'candidate-invite':'Candidate-reported invitation — not provider-confirmed',
+'provider-invite':'Provider-confirmed invitation',
+'candidate-complete':'Candidate-reported attendance / completion',
+'provider-outcome':'Official provider outcome received'
+};
+const load=()=>{try{const v=JSON.parse(localStorage.getItem(KEY)||'[]');return Array.isArray(v)?v:[]}catch(_){return[]}};
+const save=v=>localStorage.setItem(KEY,JSON.stringify(v));
+const node=(tag,cls,value)=>{const e=document.createElement(tag);if(cls)e.className=cls;if(value!==undefined)e.textContent=value;return e};
+function render(){
+const data=load();plans.replaceChildren();empty.style.display=data.length?'none':'block';
+data.forEach((r,i)=>{
+const card=node('article','card resource-card');
+card.append(node('span','pill',r.pathway));
+card.append(node('h3','',r.opportunity));
+card.append(node('p','',r.stage+' · '+statusNames[r.status]));
+card.append(node('p','small','Event: '+(r.date||'Not recorded')+(r.time?' at '+r.time:'')+' · Format: '+r.mode));
+if(r.source){const a=node('a','',r.source);a.href=r.source;a.target='_blank';a.rel='noopener noreferrer';a.textContent='Open official provider source ↗';card.append(a)}
+const ul=node('ul','');r.preparation.forEach(x=>ul.append(node('li','',x)));card.append(ul);
+if(r.notes)card.append(node('p','',r.notes));
+const del=node('button','btn btn-outline','Delete plan');del.type='button';del.addEventListener('click',()=>{const latest=load();latest.splice(i,1);save(latest);render();document.getElementById('list-status').textContent='Plan deleted from this device.'});
+card.append(del);plans.append(card);
+});
+document.getElementById('list-status').textContent=data.length+' local plan'+(data.length===1?'':'s')+'. No information was sent to Kingsmen.';
+}
+form.addEventListener('submit',e=>{
+e.preventDefault();
+let source='';
+const raw=document.getElementById('source').value.trim();
+if(raw){try{const u=new URL(raw);if(u.protocol!=='https:')throw new Error('HTTPS required');source=u.href}catch(_){document.getElementById('form-status').textContent='Use a valid HTTPS official provider link, or leave the link blank.';return}}
+const record={
+opportunity:document.getElementById('opportunity').value.trim(),
+pathway:document.getElementById('pathway').value,
+stage:document.getElementById('stage').value,
+status:document.getElementById('status').value,
+date:document.getElementById('date').value,
+time:document.getElementById('time').value,
+mode:document.getElementById('mode').value,
+source:source,
+preparation:Array.from(form.querySelectorAll('input[name="prep"]:checked')).map(x=>x.value),
+notes:document.getElementById('notes').value.trim()
+};
+try{const data=load();data.unshift(record);save(data);render();form.reset();document.getElementById('form-status').textContent='Selection plan saved on this device. No information was sent to Kingsmen.'}
+catch(_){document.getElementById('form-status').textContent='Could not save locally. Check browser storage settings.'}
+});
+document.getElementById('clear-all').addEventListener('click',()=>{
+if(confirm('Clear all selection plans stored by this tool on this device?')){localStorage.removeItem(KEY);render();document.getElementById('form-status').textContent='All local selection plans cleared. Nothing was sent to Kingsmen.'}
+});
+render();
+})();
+</script>
+</body>
+</html>
