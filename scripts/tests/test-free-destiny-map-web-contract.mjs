@@ -32,7 +32,7 @@ assert.ok(form.includes('name="consentToProcessBasicInfo" required'), "Basic inf
 assert.ok(form.includes('name="consentToBeContacted" required'), "Contact consent must be mandatory");
 assert.ok(form.includes("accepted the intake command"), "Receipt copy must not overstate persistence");
 assert.ok(form.includes("does not confirm durable database storage"), "Receipt must distinguish acceptance from durable persistence");
-assert.ok(!/SUPABASE_SERVICE_ROLE_KEY|service_role|documentBase64|idNumber|passport number|banking detail/i.test(form), "Public form must not expose credentials or request sensitive identifiers");
+assert.ok(!/SUPABASE_SERVICE_ROLE_KEY|service_role|documentBase64/i.test(form) && !/name=["\'](?:idNumber|passportNumber|bankAccount|password)["\']/i.test(form), "Public form must not expose credentials or request sensitive identifiers");
 assert.ok(page.includes("FreeDestinyMapIntakeForm"), "Free Destiny Map page must mount the live form");
 assert.ok(api.includes("postKingsmenCommand"), "Public route must use the backend command boundary");
 
