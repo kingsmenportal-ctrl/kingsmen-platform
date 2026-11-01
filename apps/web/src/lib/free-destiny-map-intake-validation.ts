@@ -147,7 +147,7 @@ export function validateFreeDestinyMapIntake(value: unknown): FreeDestinyMapVali
   }
 
   const knownRoute = typeof payload.knownRoute === "string" ? payload.knownRoute.trim() : "";
-  if (!boundedString(knownRoute, 280)) {
+  if (payload.knownRoute !== undefined && (typeof payload.knownRoute !== "string" || !boundedString(knownRoute, 280))) {
     issues.push({ field: "knownRoute", code: "KNOWN_ROUTE_TOO_LONG", message: "Known route details must be 280 characters or fewer." });
   }
 
@@ -175,7 +175,7 @@ export function validateFreeDestinyMapIntake(value: unknown): FreeDestinyMapVali
   }
 
   const accommodationArea = typeof payload.accommodationArea === "string" ? payload.accommodationArea.trim() : "";
-  if (payload.accommodationArea !== undefined && !boundedString(accommodationArea, 180)) {
+  if (payload.accommodationArea !== undefined && (typeof payload.accommodationArea !== "string" || !boundedString(accommodationArea, 180))) {
     issues.push({ field: "accommodationArea", code: "ACCOMMODATION_AREA_TOO_LONG", message: "Accommodation area must be 180 characters or fewer." });
   }
   if (payload.needsAccommodation === true && !accommodationArea) {
