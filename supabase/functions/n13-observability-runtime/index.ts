@@ -7,7 +7,6 @@ import { deriveN13RuntimeHealthStatus } from "./policy.mjs";
 const ALLOWED_ORIGINS = new Set([
   "https://kingsmen-portal-staging.netlify.app"
 ]);
-const MAX_CAPTURE_AGE_SECONDS = 60;
 const ACTIVE_CANDIDATE_CAP = 500;
 
 function responseHeaders(req: Request): Record<string, string> {
@@ -73,7 +72,7 @@ async function authorizeFounder(req: Request, url: string, anonKey: string, admi
     return { ok: false, status: 403, reason: "FOUNDER_ADMIN_GRANT_REQUIRED" };
   }
 
-  return { ok: true, actorRef: "founder:" + userData.user.id };
+  return { ok: true, actorRef: "FOUNDER_ADMIN" };
 }
 
 async function countRows(
@@ -100,13 +99,16 @@ function metric(
   value: number,
   warningThreshold: number | null,
   criticalThreshold: number | null,
-  tags: Record<string, unknown> = {}
+  tags: Record<string, unknown> = {},
+  available = true
 ) {
-  const status = criticalThreshold !== null && value >= criticalThreshold
-    ? "CRITICAL"
-    : warningThreshold !== null && value >= warningThreshold
-      ? "WARN"
-      : "OK";
+  const status = !available
+    ? "UNKNOWN"
+    : criticalThreshold !== null && value >= criticalThreshold
+      ? "CRITICAL"
+      : warningThreshold !== null && value >= warningThreshold
+        ? "WARN"
+        : "OK";
   return {
     metric_ref: "n13_metric_" + crypto.randomUUID(),
     metric_name: name,
@@ -251,7 +253,15 @@ async function capture(admin: any, req: Request, actorRef: string): Promise<Resp
     payment_pending_count: paymentPending.count,
     source_review_backlog: sourceReviewBacklog.count,
     incident_open_count: openIncidents.count,
-    oracle_lite_pressure: active > ACTIVE_CANDIDATE_CAP ? "CRITICAL" : "LOW",
+    oracle_lite_pressure: !activeCandidates.available
+      ? "HIGH"
+      : active > ACTIVE_CANDIDATE_CAP
+        ? "CRITICAL"
+        : active >= ACTIVE_CANDIDATE_CAP * 0.85
+          ? "HIGH"
+          : active >= ACTIVE_CANDIDATE_CAP * 0.7
+            ? "MEDIUM"
+            : "LOW",
     summary,
     evidence_refs: evidenceRefs,
     captured_at: observedAt
@@ -298,16 +308,16 @@ async function capture(admin: any, req: Request, actorRef: string): Promise<Resp
   }
 
   const metricRows = [
-    metric("active_candidates", "CAPACITY", active, 400, ACTIVE_CANDIDATE_CAP, { cap: ACTIVE_CANDIDATE_CAP }),
-    metric("failed_workflows", "WORKFLOW", failedWorkflows.count, 1, 10),
-    metric("pending_documents", "DOCUMENT", pendingDocuments.count, 10, 50),
-    metric("manual_fallback_backlog", "QUEUE", manualFallbackBacklog.count, 10, 50),
-    metric("pending_payments", "FINANCE", paymentPending.count, 10, 50),
-    metric("source_review_backlog", "QUEUE", sourceReviewBacklog.count, 100, 500),
-    metric("open_incidents", "RISK", openIncidents.count, 1, 5),
-    metric("integration_dead_letters", "QUEUE", deadLetters.count + airtableDeadLettered.count, 1, 10),
-    metric("airtable_outbox_pending", "QUEUE", airtablePending.count, 100, 500),
-    metric("airtable_outbox_failed", "QUEUE", airtableFailed.count, 1, 50)
+    metric("active_candidates", "CAPACITY", active, 400, ACTIVE_CANDIDATE_CAP, { cap: ACTIVE_CANDIDATE_CAP }, activeCandidates.available),
+    metric("failed_workflows", "WORKFLOW", failedWorkflows.count, 1, 10, {}, failedWorkflows.available),
+    metric("pending_documents", "DOCUMENT", pendingDocuments.count, 10, 50, {}, pendingDocuments.available),
+    metric("manual_fallback_backlog", "QUEUE", manualFallbackBacklog.count, 10, 50, {}, manualFallbackBacklog.available),
+    metric("pending_payments", "FINANCE", paymentPending.count, 10, 50, {}, paymentPending.available),
+    metric("source_review_backlog", "QUEUE", sourceReviewBacklog.count, 100, 500, {}, sourceReviewBacklog.available),
+    metric("open_incidents", "RISK", openIncidents.count, 1, 5, {}, openIncidents.available),
+    metric("integration_dead_letters", "QUEUE", deadLetters.count + airtableDeadLettered.count, 1, 10, {}, deadLetters.available && airtableDeadLettered.available),
+    metric("airtable_outbox_pending", "QUEUE", airtablePending.count, 100, 500, {}, airtablePending.available),
+    metric("airtable_outbox_failed", "QUEUE", airtableFailed.count, 1, 50, {}, airtableFailed.available)
   ].map((row) => ({ ...row, tags: { ...row.tags, coverage: dataComplete ? "OBSERVED" : "PARTIAL" } }));
 
   const { error: metricsInsertError } = await admin.from("metric_samples").insert(metricRows);
