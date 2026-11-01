@@ -351,6 +351,11 @@ BEGIN
      AND fp.candidate_ref=v_public_ref AND fp.provider='PAYFAST'
      AND fp.payment_status='COMPLETE' AND fp.verified IS TRUE
      AND fp.currency='ZAR'
+     AND fp.amount_gross_cents=(
+       SELECT fo.amount_cents FROM public.finance_orders fo
+       WHERE fo.order_ref=v_order_ref AND fo.candidate_ref=v_public_ref
+     )
+     AND fp.verified_at=v_period_start AND fp.verified_at<=clock_timestamp()
    FOR SHARE;
   IF NOT FOUND OR v_period_end<=clock_timestamp() THEN
     RAISE EXCEPTION 'VERIFIED_PAID_PLAN_EXPIRED_OR_REVOKED' USING ERRCODE='42501';
