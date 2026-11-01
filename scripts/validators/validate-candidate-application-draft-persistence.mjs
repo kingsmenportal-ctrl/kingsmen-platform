@@ -20,6 +20,7 @@ const checks = [
   ["draft load is restricted to the owned parent application", /WHERE a\.id = p_application_id[\s\S]*AND a\.candidate_id = v_candidate_id/.test(migration)],
   ["draft read and write hold verified Auth identity-link share locks", (migration.match(/FOR SHARE;/g) ?? []).length >= 3 && /candidate_auth_identity_links/.test(migration)],
   ["draft save holds a row lock on the candidate-owned parent application", /WHERE a\.id = p_application_id[\s\S]*AND a\.candidate_id = v_candidate_id[\s\S]*FOR UPDATE/.test(migration)],
+  ["draft answer save requires a saved reusable candidate profile", migration.includes("CANDIDATE_REUSABLE_PROFILE_REQUIRED") && migration.includes("candidate_master_profiles mp")],
   ["draft save requires the latest active profile-processing consent", /PROFILE_PROCESSING_CONSENT_REQUIRED/.test(migration) && /ORDER BY pc\.granted_at DESC, pc\.id DESC/.test(migration) === false && /newer\.granted_at, newer\.id/.test(migration) && /pc\.revoked_at IS NULL/.test(migration)],
   ["draft save is limited to pre-submission editable states", /'DRAFT', 'READINESS_BLOCKED', 'READY_FOR_REVIEW', 'READY_TO_SUBMIT'/.test(migration) && /APPLICATION_DRAFT_IS_LOCKED/.test(migration)],
   ["answer JSON is object-only, bounded and rejects unknown keys", /jsonb_typeof\(p_answer_data\) IS DISTINCT FROM 'object'/.test(migration) && /pg_column_size\(p_answer_data\) > 65536/.test(migration) && /p_answer_data - v_allowed_keys/.test(migration)],
