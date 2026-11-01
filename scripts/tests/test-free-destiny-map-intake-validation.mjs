@@ -131,11 +131,35 @@ const invalidUtf8 = await readBoundedRequestBody(
 );
 assert.equal(invalidUtf8.code, "INVALID_REQUEST_BODY", "malformed UTF-8 must be rejected");
 
+let streamPulls = 0;
+let streamCancelled = false;
+const oversizedStream = new ReadableStream({
+  pull(controller) {
+    streamPulls += 1;
+    if (streamPulls === 1) controller.enqueue(new TextEncoder().encode("123456"));
+    else controller.enqueue(new TextEncoder().encode("this chunk must not be read"));
+  },
+  cancel() {
+    streamCancelled = true;
+  }
+});
+const streamedOverLimit = await readBoundedRequestBody(
+  new Request("https://kingsmen.test/intake", {
+    method: "POST",
+    body: oversizedStream,
+    duplex: "half"
+  }),
+  5
+);
+assert.equal(streamedOverLimit.code, "REQUEST_TOO_LARGE");
+assert.equal(streamPulls, 1, "the reader must stop immediately after the first over-limit chunk");
+assert.equal(streamCancelled, true, "the reader must cancel an over-limit request stream");
+
 const missingBody = await readBoundedRequestBody(
   new Request("https://kingsmen.test/intake", { method: "POST" }),
   4
 );
 assert.equal(missingBody.code, "INVALID_REQUEST_BODY", "a missing request body must be rejected");
 
-console.log("Free Destiny Map bounded request-body tests: PASS (6 edge-case assertions).");
+console.log("Free Destiny Map bounded request-body tests: PASS (9 edge-case assertions).");
 
