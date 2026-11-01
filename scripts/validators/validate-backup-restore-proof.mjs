@@ -66,9 +66,9 @@ if (exists('scripts/backup/Test-KingsmenTruthVaultRestore.ps1')) {
   const restoreScript = read('scripts/backup/Test-KingsmenTruthVaultRestore.ps1');
   check('restore_fails_closed_on_count_errors', restoreScript.includes('$failedChecks += "count_query:$table"'), 'failed or invalid table counts must fail the drill', 'scripts/backup/Test-KingsmenTruthVaultRestore.ps1');
   check('restore_dry_run_never_passes', restoreScript.includes('$passed = (-not $DryRun)'), 'dry run cannot be reported as a successful restore', 'scripts/backup/Test-KingsmenTruthVaultRestore.ps1');
-  check('restore_count_regex_complete', restoreScript.includes(String.raw\`$countText -match '^\\d+$'\`), 'count verification regex must be complete', 'scripts/backup/Test-KingsmenTruthVaultRestore.ps1');
-  check('restore_no_truncated_count_block', !/\\$countText\\s+-match\\s+'\\^\\\\d+\\s*\\n\\s*\\}/.test(restoreScript), 'restore count block must not be truncated', 'scripts/backup/Test-KingsmenTruthVaultRestore.ps1');
-  check('restore_no_duplicate_tail', !/\\n\\)\\s*\\{\\s*\\$count\\s*=\\s*\\$countText/.test(restoreScript), 'restore script must not contain duplicated partial code', 'scripts/backup/Test-KingsmenTruthVaultRestore.ps1');
+  check('restore_count_regex_complete', /\$countText -match '\^\\d\+\$'/.test(restoreScript), 'count verification regex must be complete', 'scripts/backup/Test-KingsmenTruthVaultRestore.ps1');
+  check('restore_no_truncated_count_block', !/\$countText\s+-match\s+'\^\\d+\s*\n\s*\}/.test(restoreScript), 'restore count block must not be truncated', 'scripts/backup/Test-KingsmenTruthVaultRestore.ps1');
+  check('restore_no_duplicate_tail', !/\n\)\s*\{\s*\$count\s*=\s*\$countText/.test(restoreScript), 'restore script must not contain duplicated partial code', 'scripts/backup/Test-KingsmenTruthVaultRestore.ps1');
   check('restore_failed_run_exits_nonzero', restoreScript.includes('throw "RESTORE_DRILL_FAILED:'), 'failed or dry-run verification must exit nonzero', 'scripts/backup/Test-KingsmenTruthVaultRestore.ps1');
   check('restore_failed_status_is_explicit', restoreScript.includes('RESTORE_DRILL_FAILED'), 'failed verification must produce a failed status', 'scripts/backup/Test-KingsmenTruthVaultRestore.ps1');
   check('restore_does_not_hardcode_pass', !/passed\s*=\s*\$true/.test(restoreScript), 'restore pass must be evidence-derived', 'scripts/backup/Test-KingsmenTruthVaultRestore.ps1');
