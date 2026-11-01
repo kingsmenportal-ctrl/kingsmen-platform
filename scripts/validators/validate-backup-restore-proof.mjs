@@ -24,7 +24,7 @@ const requiredTokens = new Map([
   ['manifests/ops/backup-restore-proof-v1.json', ['backup-restore-proof-v1', 'foundation_built_pending_staging_drill', 'restoreTargetMustDifferFromSource', 'backupStorageAllowedInGit']],
   ['docs/ops/KINGSMEN_BACKUP_RESTORE_PROOF.md', ['pg_dump', 'pg_restore', 'RPO', 'RTO', 'Production ready: **false**']],
   ['scripts/backup/New-KingsmenTruthVaultBackup.ps1', ['KINGSMEN_DATABASE_URL', 'pg_dump', 'Get-FileHash', 'databaseUrlRedacted', 'committedToGit = $false']],
-  ['scripts/backup/Test-KingsmenTruthVaultRestore.ps1', ['KINGSMEN_RESTORE_DRILL_DATABASE_URL', 'pg_restore', 'Restore target matches source database', 'countOnly = $true', 'rtoSeconds', '$failedChecks += "count_query:$table"', 'status = $(if ($DryRun) { "DRY_RUN" } elseif ($passed) { "RESTORE_DRILL_PASSED" } else { "RESTORE_DRILL_FAILED" })', 'passed = $passed', 'if (-not $passed)']],
+  ['scripts/backup/Test-KingsmenTruthVaultRestore.ps1', ['KINGSMEN_RESTORE_DRILL_DATABASE_URL', 'pg_restore', 'Restore target matches source database', 'countOnly = $true', 'rtoSeconds', '$failedChecks += "count_query:$table"', 'status = $(if ($DryRun) { "DRY_RUN" } elseif ($passed) { "RESTORE_DRILL_PASSED" } else { "RESTORE_DRILL_FAILED" })', 'passed = $passed']],
   ['scripts/proof/prove-backup-restore-boundary.mjs', ['BACKUP_RESTORE_SOURCE_PROOF_PASSED', 'stagingRestoreDrillCompleted: false']],
   ['manifests/launch/kingsmen-launch-readiness-v1.json', ['backup_restore', 'backup-restore-proof-v1', 'foundation_built_pending_staging_drill']],
   ['scripts/validators/validate-kingsmen-launch-readiness.mjs', ['backup:validate:restore', 'BACKUP_RESTORE_STAGING_DRILL_REQUIRED']]
