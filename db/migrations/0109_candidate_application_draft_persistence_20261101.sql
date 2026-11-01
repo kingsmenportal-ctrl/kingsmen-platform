@@ -81,6 +81,7 @@ DECLARE
   v_candidate_id uuid;
   v_application record;
   v_draft record;
+  v_candidate_is_active boolean := false;
   v_profile_updated_at timestamptz;
   v_now timestamptz := clock_timestamp();
 BEGIN
@@ -95,8 +96,14 @@ BEGIN
       USING ERRCODE = '42501';
   END IF;
 
+  SELECT EXISTS (SELECT 1 FROM public.candidates c WHERE c.id = v_candidate_id AND c.is_active IS TRUE)
+    INTO v_candidate_is_active;
+  IF NOT v_candidate_is_active THEN
+    RAISE EXCEPTION 'ACTIVE_CANDIDATE_REQUIRED' USING ERRCODE = '42501';
+  END IF;
+
   SELECT
-    a.id, a.application_ref, a.pathway_type, a.status,
+    a.id, a.application_ref, a.pathway_type,
     a.readiness_status, a.readiness_snapshot, a.created_at, a.updated_at,
     o.title, o.provider_name, o.source_url, o.closes_at
   INTO v_application
@@ -166,6 +173,7 @@ AS $function$
 DECLARE
   v_auth_user_id uuid := auth.uid();
   v_candidate_id uuid;
+  v_public_ref text;
   v_application record;
   v_existing public.candidate_application_draft_answers%ROWTYPE;
   v_answer jsonb;
@@ -188,6 +196,34 @@ BEGIN
   v_candidate_id := kingsmen_security.current_verified_application_candidate_id();
   IF v_candidate_id IS NULL THEN
     RAISE EXCEPTION 'VERIFIED_CANDIDATE_IDENTITY_REQUIRED'
+      USING ERRCODE = '42501';
+  END IF;
+
+  SELECT c.public_ref::text INTO v_public_ref
+  FROM public.candidates c
+  WHERE c.id = v_candidate_id AND c.is_active IS TRUE
+  FOR SHARE;
+  IF v_public_ref IS NULL THEN
+    RAISE EXCEPTION 'ACTIVE_CANDIDATE_REQUIRED' USING ERRCODE = '42501';
+  END IF;
+
+  IF NOT EXISTS (
+    SELECT 1
+    FROM public.privacy_consent_records pc
+    WHERE pc.candidate_ref = v_public_ref
+      AND pc.consent_type = 'PROFILE_PROCESSING'
+      AND pc.consent_status = 'ACTIVE'
+      AND pc.revoked_at IS NULL
+      AND nullif(trim(pc.consent_text_snapshot), '') IS NOT NULL
+      AND pc.granted_at <= v_now
+      AND NOT EXISTS (
+        SELECT 1 FROM public.privacy_consent_records newer
+        WHERE newer.candidate_ref = pc.candidate_ref
+          AND newer.consent_type = pc.consent_type
+          AND (newer.granted_at, newer.id) > (pc.granted_at, pc.id)
+      )
+  ) THEN
+    RAISE EXCEPTION 'PROFILE_PROCESSING_CONSENT_REQUIRED'
       USING ERRCODE = '42501';
   END IF;
 
