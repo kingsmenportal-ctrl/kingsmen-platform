@@ -1,35 +1,52 @@
 import type { FinancePlan, FinancePlanCode } from "./finance-types";
+import { KINGSMEN_COMMERCIAL_CATALOGUE, KINGSMEN_FREE_PREVIEW } from "../commercial/commercial-catalogue";
 
+/**
+ * This is the checkout-eligible projection of the shared commercial catalogue.
+ * The five non-CV paid package checkout paths stay disabled until reviewed PayFast
+ * settlement and entitlement evidence exists; they are still visible in public pricing.
+ */
 export const KINGSMEN_PRICING_CATALOG: readonly FinancePlan[] = [
   {
     planCode: "FREE_DESTINY_MAP_R0",
-    planName: "Free Destiny Map",
+    planName: KINGSMEN_FREE_PREVIEW.name,
     description: "All-sector preview only. Exact targets, application links, and manual route plans stay sealed until package activation.",
-    amountCents: 0,
+    amountCents: KINGSMEN_FREE_PREVIEW.priceCents,
     currency: "ZAR",
-    managedApplicationCount: 0,
+    managedApplicationCount: KINGSMEN_FREE_PREVIEW.concurrentManagedRoutes30d,
+    priorityApplicationCount: KINGSMEN_FREE_PREVIEW.priorityApplications,
+    concurrentManagedRouteCapacity30d: KINGSMEN_FREE_PREVIEW.concurrentManagedRoutes30d,
+    accommodationSupport: KINGSMEN_FREE_PREVIEW.accommodationSupport,
     accommodationRouteCount: 0,
     cvVersions: 0,
     motivationLetters: 0,
     doctrineNotes: "Free route preview only; no managed applications."
   },
-  {
-    planCode: "CV_REVAMP_R49_99",
-    planName: "CV Revamp",
-    description: "15 personalised truthful CV versions and 15 matching motivation letters.",
-    amountCents: 4999,
+  ...KINGSMEN_COMMERCIAL_CATALOGUE.filter((plan) => plan.checkoutEnabled).map((plan): FinancePlan => ({
+    planCode: plan.planCode as FinancePlanCode,
+    planName: plan.name,
+    description: plan.packageId === "cv_revamp"
+      ? "15 personalised truthful CV versions and 15 matching motivation letters."
+      : "Kingsmen commercial package.",
+    amountCents: plan.priceCents,
     currency: "ZAR",
-    managedApplicationCount: 0,
-    accommodationRouteCount: 0,
-    cvVersions: 15,
-    motivationLetters: 15,
-    doctrineNotes: "Never invent fake experience, qualifications, references, certificates, skills, or results."
-  }
+    // Legacy name retained for old readers; explicit fields separate both measures.
+    managedApplicationCount: plan.concurrentManagedRoutes30d,
+    priorityApplicationCount: plan.priorityApplications,
+    concurrentManagedRouteCapacity30d: plan.concurrentManagedRoutes30d,
+    accommodationSupport: plan.accommodationSupport,
+    accommodationRouteCount: plan.includedAccommodationRoutes,
+    cvVersions: plan.cvVersions,
+    motivationLetters: plan.motivationLetters,
+    doctrineNotes: plan.packageId === "cv_revamp"
+      ? "Never invent fake experience, qualifications, references, certificates, skills, or results."
+      : "Checkout must remain disabled until verified settlement and entitlement tests pass."
+  }))
 ] as const;
 
 export function getFinancePlan(planCode: FinancePlanCode): FinancePlan {
   const plan = KINGSMEN_PRICING_CATALOG.find((item) => item.planCode === planCode);
-  if (!plan) throw new Error(`Unknown finance plan: ${planCode}`);
+  if (!plan) throw new Error(`Unknown or checkout-disabled finance plan: ${planCode}`);
   return plan;
 }
 

@@ -18,7 +18,8 @@ const requiredFiles = [
   'manifests/ops/backup-restore-proof-v1.json',
   'docs/ops/KINGSMEN_BACKUP_RESTORE_PROOF.md',
   'scripts/backup/New-KingsmenTruthVaultBackup.ps1',
-  'scripts/backup/Test-KingsmenTruthVaultRestore.ps1'
+  'scripts/backup/Test-KingsmenTruthVaultRestore.ps1',
+  'scripts/backup/test-backup-restore-safety.mjs'
 ];
 
 const checks = [];
@@ -38,6 +39,8 @@ if (existsSync(rel('scripts/backup/New-KingsmenTruthVaultBackup.ps1'))) {
   const backupScript = read('scripts/backup/New-KingsmenTruthVaultBackup.ps1');
   check('backup_uses_pg_dump', backupScript.includes('pg_dump'), 'pg_dump required for PostgreSQL backup', 'scripts/backup/New-KingsmenTruthVaultBackup.ps1');
   check('backup_uses_sha256', backupScript.includes('Get-FileHash') && backupScript.includes('SHA256'), 'backup checksum required', 'scripts/backup/New-KingsmenTruthVaultBackup.ps1');
+  check('backup_archive_nonempty', backupScript.includes('createdArchiveBytes -lt 1'), 'empty archives must not be accepted', 'scripts/backup/New-KingsmenTruthVaultBackup.ps1');
+  check('backup_archive_catalog_verified', backupScript.includes('pg_restore --list'), 'backup archive catalog must be readable', 'scripts/backup/New-KingsmenTruthVaultBackup.ps1');
   check('backup_redacts_database_url', backupScript.includes('databaseUrlRedacted') && backupScript.includes('Do not print'), 'database URL must be redacted', 'scripts/backup/New-KingsmenTruthVaultBackup.ps1');
   check('backup_blocks_git_claim', backupScript.includes('committedToGit = $false'), 'backup archives cannot be committed', 'scripts/backup/New-KingsmenTruthVaultBackup.ps1');
 }
@@ -45,7 +48,11 @@ if (existsSync(rel('scripts/backup/New-KingsmenTruthVaultBackup.ps1'))) {
 if (existsSync(rel('scripts/backup/Test-KingsmenTruthVaultRestore.ps1'))) {
   const restoreScript = read('scripts/backup/Test-KingsmenTruthVaultRestore.ps1');
   check('restore_uses_pg_restore', restoreScript.includes('pg_restore'), 'pg_restore required for restore drill', 'scripts/backup/Test-KingsmenTruthVaultRestore.ps1');
-  check('restore_blocks_same_target', restoreScript.includes('Restore target matches source database') && restoreScript.includes('Restore drill blocked'), 'restore target must differ from source', 'scripts/backup/Test-KingsmenTruthVaultRestore.ps1');
+  check('restore_uses_exit_on_error', restoreScript.includes('--exit-on-error'), 'partial restore errors must fail the drill', 'scripts/backup/Test-KingsmenTruthVaultRestore.ps1');
+  check('restore_requires_explicit_confirmation', restoreScript.includes('ConfirmDestructiveRestore'), 'destructive restore requires an explicit operator confirmation', 'scripts/backup/Test-KingsmenTruthVaultRestore.ps1');
+  check('restore_checks_database_identity', restoreScript.includes('current_database()') && restoreScript.includes('inet_server_addr()'), 'source and target identity must be compared at the database', 'scripts/backup/Test-KingsmenTruthVaultRestore.ps1');
+  check('restore_count_query_fails_closed', restoreScript.includes('ON_ERROR_STOP=1') && restoreScript.includes('Count-only verification query failed') && !restoreScript.includes('QUERY_FAILED'), 'count query failure cannot be recorded as a passing restore', 'scripts/backup/Test-KingsmenTruthVaultRestore.ps1');
+  check('restore_blocks_same_target', restoreScript.includes('Restore target resolves to the source database') && restoreScript.includes('sourceIdentity -eq $restoreIdentity'), 'restore target must differ from source based on live PostgreSQL identity', 'scripts/backup/Test-KingsmenTruthVaultRestore.ps1');
   check('restore_counts_only', restoreScript.includes('countOnly = $true') && restoreScript.includes('rawRowsReturned = $false'), 'restore report must use count-only verification', 'scripts/backup/Test-KingsmenTruthVaultRestore.ps1');
   check('restore_records_rto', restoreScript.includes('rtoSeconds'), 'restore drill must record RTO', 'scripts/backup/Test-KingsmenTruthVaultRestore.ps1');
 }

@@ -1,13 +1,8 @@
-export async function GET() {
-  return Response.json({
-    ok: true,
-    productionReady: false,
-    boundary: "N05 candidate-safe document status route shell",
-    candidateSafeReadModelOnly: true,
-    serviceRoleVisibleToBrowser: false,
-    candidateCanVerify: false,
-    candidateCanReject: false,
-    candidateCanDelete: false,
-    rawPublicUrlAllowed: false
-  });
+import { proxyCandidateDocumentVault } from "../../../../../lib/candidate-document-vault-proxy";
+
+export const runtime = "nodejs";
+export const dynamic = "force-dynamic";
+
+export async function GET(request: Request) {
+  return proxyCandidateDocumentVault(request, "list", "GET");
 }

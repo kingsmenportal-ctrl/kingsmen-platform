@@ -1,0 +1,203 @@
+{
+  "schema": "kingsmen.institutions.application-route-registry.v1",
+  "researched_at": "2026-10-31",
+  "policy": {
+    "shared_kingsmen_profile": true,
+    "distinct_destination_application_child": true,
+    "candidate_confirmation_required_per_destination": true,
+    "provider_receipt_required_before_provider_confirmed_status": true,
+    "default_automated_submission": false,
+    "automation_requires_provider_specific_authorization": true,
+    "captcha_or_mfa_bypass_allowed": false,
+    "legal_attestation_or_signature_without_candidate": false,
+    "retry_ambiguous_submission_without_reconciliation": false,
+    "provider_auth_state_committed_to_git": false,
+    "unknown_route_fallback": "USER_ACTION_REQUIRED"
+  },
+  "routes": [
+    {
+      "route_id": "cao",
+      "label": "Central Applications Office",
+      "source_register_id": "cao_application_terms",
+      "pathways": [
+        "HIGHER_EDUCATION",
+        "TVET"
+      ],
+      "destination_scope": "Only CAO member institutions/programmes shown as applicable by the official CAO catalogue for the selected entry year and term.",
+      "official_submission_url": "https://cao.ac.za/Apply.aspx?content=Apply",
+      "route_discovery_status": "OFFICIAL_ROUTE_KNOWN",
+      "integration_status": "NOT_CONNECTED",
+      "integration_tier": "D_ASSISTED_UNTIL_PROVIDER_APPROVAL",
+      "submission_model": "ONE_CAO_PARENT_WITH_PROGRAMME_CHOICE_CHILDREN",
+      "automation_authorized": false,
+      "provider_approval_evidence_ref": null,
+      "test_environment_verified": false,
+      "receipt_confirmation_required": true,
+      "candidate_confirmation_required": true,
+      "important_constraints": [
+        "CAO currently publishes one application per individual for a specific entry year and term.",
+        "Choice limits, fees, documents and amendments must be re-read from current official terms before each intake.",
+        "The active Kingsmen draft-choice model allows up to six choices; this is not by itself proof of current CAO rules.",
+        "Do not create one CAO parent application per member institution."
+      ],
+      "fallback": "Prepare one Kingsmen CAO parent and ordered choices; the candidate completes or confirms submission through the official CAO route unless documented approved integration is established."
+    },
+    {
+      "route_id": "tvet_direct",
+      "label": "TVET college direct applications",
+      "source_register_id": "dhet_tvet_directory",
+      "pathways": [
+        "TVET",
+        "SETA_LEARNERSHIPS",
+        "APPRENTICESHIPS"
+      ],
+      "destination_scope": "A selected college and programme with a verified current official application route.",
+      "official_submission_url": null,
+      "route_discovery_status": "PROVIDER_SPECIFIC_ROUTE_REQUIRED",
+      "integration_status": "NOT_CONNECTED",
+      "integration_tier": "D_ASSISTED_UNTIL_PROVIDER_APPROVAL",
+      "submission_model": "ONE_DESTINATION_CHILD_PER_COLLEGE_PROGRAMME",
+      "automation_authorized": false,
+      "provider_approval_evidence_ref": null,
+      "test_environment_verified": false,
+      "receipt_confirmation_required": true,
+      "candidate_confirmation_required": true,
+      "important_constraints": [
+        "Resolve the selected college from official DHET/provider records first.",
+        "Verify that the exact intake/programme is open and the deadline is current.",
+        "Do not assume a central portal application applies to TVET colleges."
+      ],
+      "fallback": "Prepare the target-specific packet and open the selected college's official route; return to Kingsmen for receipt/evidence tracking."
+    },
+    {
+      "route_id": "university_admissions",
+      "label": "Universities outside the selected CAO route",
+      "source_register_id": "dhet_public_universities",
+      "pathways": [
+        "HIGHER_EDUCATION"
+      ],
+      "destination_scope": "An institution-specific intake not routed through CAO, confirmed from the institution's official admissions instructions.",
+      "official_submission_url": null,
+      "route_discovery_status": "PROVIDER_SPECIFIC_ROUTE_REQUIRED",
+      "integration_status": "NOT_CONNECTED",
+      "integration_tier": "D_ASSISTED_UNTIL_PROVIDER_APPROVAL",
+      "submission_model": "ONE_DESTINATION_CHILD_PER_INSTITUTION_INTAKE",
+      "automation_authorized": false,
+      "provider_approval_evidence_ref": null,
+      "test_environment_verified": false,
+      "receipt_confirmation_required": true,
+      "candidate_confirmation_required": true,
+      "important_constraints": [
+        "Do not infer that all public universities use CAO or share an application API.",
+        "Verify institution, programme, entry year, fees, documents and closing date independently."
+      ],
+      "fallback": "Generate a destination-specific packet; candidate submits through the verified official route unless an approved integration is recorded."
+    },
+    {
+      "route_id": "private_institution_admissions",
+      "label": "Private higher-education institutions and private colleges",
+      "source_register_id": "dhet_private_he_register",
+      "pathways": [
+        "HIGHER_EDUCATION",
+        "TVET"
+      ],
+      "destination_scope": "A private provider and the exact qualification/accreditation scope confirmed with the relevant official regulator or delegated authority.",
+      "official_submission_url": null,
+      "route_discovery_status": "PROVIDER_SPECIFIC_ROUTE_REQUIRED",
+      "integration_status": "NOT_CONNECTED",
+      "integration_tier": "D_ASSISTED_UNTIL_PROVIDER_APPROVAL",
+      "submission_model": "ONE_DESTINATION_CHILD_PER_PROVIDER_INTAKE",
+      "automation_authorized": false,
+      "provider_approval_evidence_ref": null,
+      "test_environment_verified": false,
+      "receipt_confirmation_required": true,
+      "candidate_confirmation_required": true,
+      "important_constraints": [
+        "DHET private-college register scope does not capture every occupational training provider.",
+        "Verify registration/accreditation with the relevant regulator before presenting a quality/accreditation claim.",
+        "Do not reuse accreditation evidence outside its scope or date."
+      ],
+      "fallback": "Prepare the packet and candidate-controlled submission until provider-approved machine integration exists."
+    },
+    {
+      "route_id": "seta_training_provider",
+      "label": "SETA, learnership and apprenticeship adverts",
+      "source_register_id": "dhet_seta_directory",
+      "pathways": [
+        "SETA_LEARNERSHIPS",
+        "APPRENTICESHIPS",
+        "INTERNSHIPS"
+      ],
+      "destination_scope": "The actual recruiting employer/training provider and intake named by the official advert; a SETA directory entry alone is not the application destination.",
+      "official_submission_url": null,
+      "route_discovery_status": "OFFICIAL_ADVERT_DESTINATION_REQUIRED",
+      "integration_status": "NOT_CONNECTED",
+      "integration_tier": "D_ASSISTED_UNTIL_PROVIDER_APPROVAL",
+      "submission_model": "ONE_DESTINATION_CHILD_PER_ADVERT",
+      "automation_authorized": false,
+      "provider_approval_evidence_ref": null,
+      "test_environment_verified": false,
+      "receipt_confirmation_required": true,
+      "candidate_confirmation_required": true,
+      "important_constraints": [
+        "Keep the SETA body, accredited training provider and recruiting employer as separate entities.",
+        "Use the advert's own eligibility, documents, closing date and application channel.",
+        "A registered provider is not necessarily recruiting for an active intake."
+      ],
+      "fallback": "Prepare the advert-specific application, open the official recruiting provider route and collect a receipt or candidate-reported status separately."
+    },
+    {
+      "route_id": "public_service_vacancies",
+      "label": "Public service vacancies",
+      "source_register_id": "dpsa_public_service_vacancies",
+      "pathways": [
+        "EMPLOYMENT",
+        "INTERNSHIPS"
+      ],
+      "destination_scope": "The department or employing public body named in the exact vacancy circular.",
+      "official_submission_url": "https://www.dpsa.gov.za/newsroom/psvc/",
+      "route_discovery_status": "OFFICIAL_ADVERT_DESTINATION_REQUIRED",
+      "integration_status": "NOT_CONNECTED",
+      "integration_tier": "D_ASSISTED_UNTIL_PROVIDER_APPROVAL",
+      "submission_model": "ONE_DESTINATION_CHILD_PER_VACANCY_REFERENCE",
+      "automation_authorized": false,
+      "provider_approval_evidence_ref": null,
+      "test_environment_verified": false,
+      "receipt_confirmation_required": true,
+      "candidate_confirmation_required": true,
+      "important_constraints": [
+        "The DPSA circular is an advert discovery source, not necessarily the submission destination.",
+        "Follow the employing department's address/channel, vacancy reference and advert-specific Z83/document instructions.",
+        "Verify closing date and receipt requirements from the exact circular."
+      ],
+      "fallback": "Prepare a vacancy-specific packet and route it to the named department by its official instructions; record submission evidence separately."
+    },
+    {
+      "route_id": "employer_careers",
+      "label": "Private and other employer career portals",
+      "source_register_id": null,
+      "pathways": [
+        "EMPLOYMENT",
+        "INTERNSHIPS",
+        "APPRENTICESHIPS"
+      ],
+      "destination_scope": "Only the recruiting employer's verified official careers page or a provider-authorized recruiting integration.",
+      "official_submission_url": null,
+      "route_discovery_status": "EMPLOYER_DOMAIN_AND_ADVERT_REQUIRED",
+      "integration_status": "NOT_CONNECTED",
+      "integration_tier": "D_ASSISTED_UNTIL_PROVIDER_APPROVAL",
+      "submission_model": "ONE_DESTINATION_CHILD_PER_JOB_OR_ADVERT",
+      "automation_authorized": false,
+      "provider_approval_evidence_ref": null,
+      "test_environment_verified": false,
+      "receipt_confirmation_required": true,
+      "candidate_confirmation_required": true,
+      "important_constraints": [
+        "Do not assume a job-board listing is the employer's own application endpoint.",
+        "Do not invent employer contact routes or imply outreach/partnership.",
+        "Stop at CAPTCHA, MFA, required attestations or unknown fields."
+      ],
+      "fallback": "Prepare and navigate to the verified official career route; candidate completes any step that cannot safely be automated."
+    }
+  ]
+}

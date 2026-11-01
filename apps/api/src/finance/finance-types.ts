@@ -3,6 +3,12 @@ export type CurrencyCode = "ZAR";
 export type FinancePlanCode =
   | "FREE_DESTINY_MAP_R0"
   | "CV_REVAMP_R49_99"
+  | "FOUNDATIONAL_ACCORD_R169_99"
+  | "COLLEGIATE_ORDINANCE_R299_99"
+  | "CHANCELLORS_WRIT_R399_99"
+  | "REGENCY_MANDATE_R469_99"
+  | "ARTISAN_CHARTER_R149_99"
+  | "GUILDMASTERS_CHARTER_R199_99"
   | "ACCOMMODATION_SUPPORT_R179";
 
 export type OrderStatus = "DRAFT" | "PENDING_PAYMENT" | "PAID" | "CANCELLED" | "EXPIRED" | "REFUNDED" | "FAILED";
@@ -16,7 +22,14 @@ export interface FinancePlan {
   description: string;
   amountCents: number;
   currency: CurrencyCode;
+  /**
+   * Deprecated compatibility field. This retains the historical concurrent-route
+   * value for old readers. New entitlement logic must use the explicit fields below.
+   */
   managedApplicationCount: number;
+  priorityApplicationCount: number | null;
+  concurrentManagedRouteCapacity30d: number;
+  accommodationSupport: boolean;
   accommodationRouteCount: number;
   cvVersions: number;
   motivationLetters: number;

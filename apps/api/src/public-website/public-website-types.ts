@@ -1,36 +1,27 @@
 export type PublicPageType =
-  | "HOME"
-  | "DESTINY_MAP"
-  | "PRICING"
-  | "SECTORS"
-  | "CV_REVAMP"
-  | "ACCOMMODATION"
-  | "HOW_IT_WORKS"
-  | "TRUST_SAFETY"
-  | "FAQ"
-  | "CONTACT"
-  | "LEGAL";
+  | "HOME" | "DESTINY_MAP" | "PRICING" | "SECTORS" | "CV_REVAMP"
+  | "ACCOMMODATION" | "HOW_IT_WORKS" | "TRUST_SAFETY" | "FAQ" | "CONTACT" | "LEGAL";
 
-export type PublicLeadStatus =
-  | "NEW"
-  | "CONTACTABLE"
-  | "WAITING_DOCUMENTS"
-  | "HANDED_TO_CANDIDATE_CORE"
-  | "UNQUALIFIED"
-  | "DUPLICATE"
-  | "CANCELLED";
+export type PublicLeadStatus = "NEW" | "CONTACTABLE" | "WAITING_DOCUMENTS" | "HANDED_TO_CANDIDATE_CORE" | "UNQUALIFIED" | "DUPLICATE" | "CANCELLED";
 
-export type PublicPackageKey = "FREE_DESTINY_MAP" | "CV_REVAMP" | "ACCOMMODATION_SUPPORT";
+export type PublicPackageKey =
+  | "FREE_DESTINY_MAP" | "CV_REVAMP" | "FOUNDATIONAL_ACCORD" | "COLLEGIATE_ORDINANCE"
+  | "CHANCELLORS_WRIT" | "REGENCY_MANDATE" | "ARTISAN_CHARTER" | "GUILDMASTERS_CHARTER";
 
 export interface PublicPackageCard {
   packageKey: PublicPackageKey;
   packageName: string;
   priceLabel: string;
+  /** Deprecated compatibility field; use concurrentManagedRouteCapacity30d instead. */
   managedApplicationCount: number;
+  priorityApplicationCount: number | null;
+  concurrentManagedRouteCapacity30d: number;
+  accommodationSupport: boolean;
   includedCvVersions: number;
   includedMotivationLetters: number;
   includedAccommodationRoutes: number;
   routeVisibility: "PREVIEW_ONLY" | "SEALED" | "ACTIVATED";
+  managedExecutionRequiresEntitlement: boolean;
   boundary: string;
 }
 

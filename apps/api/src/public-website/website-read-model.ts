@@ -15,7 +15,7 @@ export function buildPublicWebsiteReadModel(): PublicWebsiteReadModel {
       "Free Destiny Map is R0 with 0 managed applications.",
       "Exact targets and links remain sealed until package activation.",
       "CV Revamp must remain truthful and cannot invent experience or qualifications.",
-      "Email is primary; WhatsApp is urgent-only.",
+      "Email is the only enabled outbound channel; WhatsApp and SMS are deferred.",
       "Lead handoff requires POPIA consent and candidate confirmation."
     ],
     leadCaptureEnabled: true
