@@ -42,7 +42,8 @@ const checks = [
   ["run history uses an explicit aggregate-only field allowlist capped at 50", ingestion.includes('if (req.method === "GET")') && ingestion.includes('.select("run_ref,status,sources_checked,sources_succeeded,observations_created,observations_updated,observations_skipped,started_at,finished_at")') && ingestion.includes(".limit(50)") && !ingestion.includes('.select("summary')],
   ["run history is returned only after the exact service-key or verified-reviewer gate", ingestion.indexOf('if (req.method === "GET")') > ingestion.indexOf("if (bearer !== key)") && ingestion.includes("authClient.auth.getUser(bearer)")],
   ["operator page reads history with GET and starts ingestion only through the explicit POST action", operatorPage.includes('method: "GET"') && operatorPage.includes('method: "POST"') && operatorPage.includes("onClick={runIngestion}") && !operatorPage.includes("SUPABASE_SERVICE_ROLE_KEY")],
-  ["operator history UI shows timestamps, source counts and observation totals", operatorPage.includes("Recent ingestion runs") && operatorPage.includes("formatDate(run.started_at)") && operatorPage.includes("run.observations_skipped")];
+  ["operator history UI shows timestamps, source counts and observation totals", operatorPage.includes("Recent ingestion runs") && operatorPage.includes("formatDate(run.started_at)") && operatorPage.includes("run.observations_skipped")]
+];
 
 let failed = 0;
 for (const [label, ok] of checks) {
