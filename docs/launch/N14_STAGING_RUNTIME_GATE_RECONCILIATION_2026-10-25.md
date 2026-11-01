@@ -28,3 +28,29 @@ Project: `euhubhhnumtibbyufghm`. Inspection was read-only.
 4. Submit unauthorized and authorized workflow-result requests; prove invalid state transitions cannot mutate business state.
 5. Run two-candidate isolation checks through real JWT-authenticated requests across profile, application, document and review endpoints.
 6. Reconcile generated runtime evidence into the release inventory; only then update N13/N08/N14 release gates.
+
+
+## Read-only staging recheck — 1 November 2026
+
+A fresh read-only SQL inspection confirmed all 11 backend-only N14 operational tables exist and have RLS enabled. Their policies target `service_role` only:
+- `integration_connectors`
+- `workflow_connector_registry`
+- `integration_outbox`
+- `integration_inbox`
+- `workflow_result_events`
+- `webhook_security_events`
+- `n8n_workflow_dispatches`
+- `airtable_mirror_events`
+- `playwright_probe_events`
+- `integration_dead_letter_queue`
+- `integration_health_snapshots`
+
+The same inspection found table-level grants to `anon` and `authenticated` remain on these tables; `service_role` grants are also present. This demonstrates why the migration still needs approved application and post-apply role-privilege verification. The `0087_n14_connector_table_grant_hardening.sql` migration has **not** been applied by this workstream.
+
+All 11 tables currently contain zero rows. No connector, webhook delivery, workflow result, outbox retry/dead-letter cycle, or provider transaction is evidenced. Providers remain `NOT_CONFIGURED`.
+
+### Migration contract gate
+
+Added `scripts/validators/validate-n14-connector-table-grant-migration.mjs`, wired into the root `npm test` chain. It enforces the explicit list of 11 tables, transactional DDL, revocation from `anon`, `authenticated`, and `PUBLIC`, no new grants, and no destructive `DROP` statements.
+
+The N14 migration and runtime remain on HOLD pending complete exact-head CI, independent review, an approved migration application with post-apply ACL assertions, and isolated synthetic connector/webhook lifecycle tests. This addendum records observations only; it performs no database writes.
