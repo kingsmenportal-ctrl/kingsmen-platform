@@ -5,7 +5,7 @@ function completeProtection() {
   return {
     required_status_checks: {
       strict: true,
-      contexts: ['source-guard']
+      contexts: ['source-guard', 'Build, validate, and smoke-test']
     },
     required_pull_request_reviews: {
       required_approving_review_count: 1,
@@ -26,6 +26,7 @@ assert.equal(complete.checks.requiredApprovingReviewCount, 1);
 const failures = [
   ['required_status_checks', (value) => { value.required_status_checks = null; }],
   ['source_guard', (value) => { value.required_status_checks.contexts = ['build']; }],
+  ['release_evidence_check', (value) => { value.required_status_checks.contexts = ['source-guard']; }],
   ['strict_status_checks', (value) => { value.required_status_checks.strict = false; }],
   ['pull_request_review', (value) => { value.required_pull_request_reviews.required_approving_review_count = 0; }],
   ['stale_review_dismissal', (value) => { value.required_pull_request_reviews.dismiss_stale_reviews = false; }],
