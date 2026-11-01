@@ -1,0 +1,51 @@
+name: N13 PostgreSQL 17 Integration
+
+on:
+  push:
+    branches: [feat/n13-live-founder-observability-2026-11-01]
+  pull_request:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  n13-postgres-integration:
+    name: n13-postgres-atomic-capture
+    runs-on: ubuntu-latest
+    services:
+      postgres:
+        image: postgres:17
+        env:
+          POSTGRES_USER: postgres
+          POSTGRES_PASSWORD: postgres
+          POSTGRES_DB: postgres
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd "pg_isready -U postgres -d postgres"
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+    env:
+      PGHOST: localhost
+      PGPORT: 5432
+      PGUSER: postgres
+      PGPASSWORD: postgres
+      PGDATABASE: postgres
+    steps:
+      - name: Check out source
+        uses: actions/checkout@v4
+      - name: Install PostgreSQL client
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y postgresql-client
+      - name: Bootstrap isolated observability schema
+        run: psql -X -v ON_ERROR_STOP=1 -f scripts/staging/fixtures/n13-observability-postgres-bootstrap.sql
+      - name: Apply N13 atomic capture migration to disposable PostgreSQL 17
+        run: psql -X -v ON_ERROR_STOP=1 -f supabase/migrations/20261101170000_n13_atomic_observability_capture.sql
+      - name: Verify RPC grants, atomic persistence, cooldown and failure rollback
+        run: psql -X -v ON_ERROR_STOP=1 -f scripts/staging/test-n13-observability-postgres.sql
+      - name: Verify concurrent capture serialization
+        run: bash scripts/staging/test-n13-concurrent-cooldown.sh
