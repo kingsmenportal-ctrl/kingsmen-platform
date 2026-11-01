@@ -10,6 +10,10 @@ const policySource = readFileSync(
   new URL("../../supabase/functions/n13-observability-runtime/policy.mjs", import.meta.url),
   "utf8"
 );
+const migrationSource = readFileSync(
+  new URL("../../supabase/migrations/20261101170000_n13_atomic_observability_capture.sql", import.meta.url),
+  "utf8"
+);
 
 assert.equal(
   deriveN13RuntimeHealthStatus({ dataComplete: false, dataErrors: 1 }),
@@ -86,14 +90,13 @@ for (const required of [
   "auth.getUser(bearer)",
   '"Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type"',
   "CAPTURE_RATE_LIMITED",
-  "MAX_CAPTURE_AGE_SECONDS = 60",
+  '.select("id, role_code")',
+  'actorRef: "FOUNDER_REVIEWER:" + reviewer.id',
+  'admin.rpc("n13_commit_observability_capture"',
   'eq("role_code", "PLATFORM_ADMIN")',
   '.is("revoked_at", null)',
   'Deno.serve(async (req: Request)',
   'req.method !== "GET" && req.method !== "POST"',
-  'from("system_health_snapshots").insert(snapshot)',
-  'from("service_health_checks").insert(checks)',
-  'from("metric_samples").insert(metricRows)',
   'verify_jwt',
   "productionReady: false",
   "projectN13FounderSnapshot",
@@ -102,6 +105,13 @@ for (const required of [
 ]) {
   assert.ok(functionSource.includes(required), "Missing runtime security or persistence contract: " + required);
 }
+assert.ok(migrationSource.includes("SECURITY DEFINER"), "Atomic capture must run in a database transaction under a constrained function.");
+assert.ok(migrationSource.includes("SET search_path = pg_catalog"), "The privileged capture function must pin a safe search_path.");
+assert.ok(migrationSource.includes("pg_advisory_xact_lock"), "Capture cooldown must be serialized at the database boundary.");
+assert.ok(migrationSource.includes("n13_capture_rate_limited"), "The database function must return rate-limit evidence without partial writes.");
+assert.ok(migrationSource.includes("jsonb_to_record") && migrationSource.includes("jsonb_to_recordset"), "All capture records must be decoded and inserted by the same RPC transaction.");
+assert.ok(migrationSource.includes("system_health_snapshots") && migrationSource.includes("service_health_checks") && migrationSource.includes("metric_samples"), "The atomic operation must persist all three evidence classes.");
+assert.ok(migrationSource.includes("REVOKE ALL ON FUNCTION") && migrationSource.includes("GRANT EXECUTE ON FUNCTION") && migrationSource.includes("TO service_role"), "Only service_role may invoke the capture RPC.");
 assert.ok(policySource.includes("metricCountsAvailable"), "The founder read-model projection must explicitly mark counter availability.");
 assert.ok(policySource.includes("SNAPSHOT_COUNT_FIELDS") && policySource.includes("projected[field] = null"),
   "Unknown counter placeholders must be suppressed from the Founder read model.");
