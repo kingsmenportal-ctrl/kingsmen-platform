@@ -3,6 +3,7 @@ name: Jarvis Live Runtime
 on:
   pull_request:
     paths:
+      - '.github/workflows/jarvis-live-runtime.yml'
       - 'packages/jarvis-core/**'
       - 'apps/api/src/jarvis/**'
       - 'apps/web/src/app/api/jarvis/**'
