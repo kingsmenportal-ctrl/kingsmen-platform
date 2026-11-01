@@ -6,6 +6,9 @@ on:
     paths:
       - "scripts/backup/encrypt-backup.mjs"
       - "scripts/backup/test-backup-postgres-restore-integration.mjs"
+      - "scripts/backup/Test-KingsmenTruthVaultRestore.ps1"
+      - "scripts/backup/test-backup-restore-input-guard.ps1"
+      - "scripts/backup/test-backup-restore-safety.mjs"
       - ".github/workflows/backup-postgres-restore-integration.yml"
       - "package.json"
   pull_request:
@@ -13,6 +16,9 @@ on:
     paths:
       - "scripts/backup/encrypt-backup.mjs"
       - "scripts/backup/test-backup-postgres-restore-integration.mjs"
+      - "scripts/backup/Test-KingsmenTruthVaultRestore.ps1"
+      - "scripts/backup/test-backup-restore-input-guard.ps1"
+      - "scripts/backup/test-backup-restore-safety.mjs"
       - ".github/workflows/backup-postgres-restore-integration.yml"
       - "package.json"
   workflow_dispatch:
