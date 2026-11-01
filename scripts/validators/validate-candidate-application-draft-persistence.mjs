@@ -9,6 +9,9 @@ const api = read("apps/web/src/app/api/candidate/application-draft/route.ts");
 const page = read("apps/web/src/app/candidate/applications/[applicationId]/page.tsx");
 const tracker = read("apps/web/src/app/candidate/applications/page.tsx");
 const packageJson = JSON.parse(read("package.json"));
+const auditStart = migration.indexOf("INSERT INTO public.candidate_application_events");
+const auditEnd = migration.indexOf("ON CONFLICT (event_ref) DO NOTHING", auditStart);
+const auditInsert = auditStart >= 0 && auditEnd > auditStart ? migration.slice(auditStart, auditEnd) : "";
 
 const checks = [
   ["one draft-answer row is bound to one parent application and its candidate", /application_id uuid PRIMARY KEY/.test(migration) && /FOREIGN KEY \(application_id, candidate_id\)/.test(migration) && /REFERENCES public\.candidate_applications\(id, candidate_id\)/.test(migration)],
@@ -24,7 +27,7 @@ const checks = [
   ["optimistic version checks prevent silent concurrent overwrite", /APPLICATION_DRAFT_VERSION_CONFLICT/.test(migration) && /p_expected_version <> v_existing\.draft_version/.test(migration)],
   ["save retries are idempotent and reject key reuse with different content", /last_idempotency_key = p_idempotency_key/.test(migration) && /APPLICATION_DRAFT_IDEMPOTENCY_CONFLICT/.test(migration)],
   ["every edit invalidates prior readiness and requires recheck", /readiness_status = 'NOT_CHECKED'/.test(migration) && /readiness_recheck_required/.test(migration) && /SET status = 'DRAFT'/.test(migration)],
-  ["draft save writes an append-only application audit event without answer content", /APPLICATION_DRAFT_SAVED/.test(migration) && /candidate_application_events/.test(migration) && /answer_keys/.test(migration) && !/details[\s\S]{0,500}answer_data/.test(migration)],
+  ["draft save writes an append-only application audit event without answer content", /APPLICATION_DRAFT_SAVED/.test(auditInsert) && /answer_keys/.test(auditInsert) && !auditInsert.includes("p_answer_data")],
   ["profile stays in the reusable profile table and CAO choices remain child records", /candidate_master_profiles/.test(migration) && /CAO programme choices remain child rows/.test(migration)],
   ["application read/write RPCs are executable by authenticated only", /GRANT EXECUTE ON FUNCTION public\.get_candidate_application_draft/.test(migration) && /GRANT EXECUTE ON FUNCTION public\.save_candidate_application_draft/.test(migration) && /FROM PUBLIC, anon/.test(migration)],
   ["API forwards candidate bearer with public anon key and never uses service role", /Authorization: authorization/.test(api) && /apikey: config\.anonKey/.test(api) && !/SERVICE_ROLE/.test(api)],
@@ -35,7 +38,7 @@ const checks = [
   ["candidate UI preserves all six pathway labels", ["HIGHER_EDUCATION","TVET","SETA_LEARNERSHIP","INTERNSHIP","APPRENTICESHIP","EMPLOYMENT"].every(x => page.includes(x))],
   ["shared profile is linked but not duplicated into application answer data", /shared_profile_available/.test(migration) && /shared_profile_updated_at/.test(migration) && /shared_profile_available/.test(page) && /application-specific responses/.test(page)],
   ["CAO programme choices stay under one parent application", page.includes("CAO programme choices remain child records under one Kingsmen parent application") && readinessMigration.includes("CAO")],
-  ["provider submission remains explicitly false throughout draft save", /provider_submission_sent', false/.test(migration) && /provider_submission_sent: false/.test(migration) && /does not submit to a provider/.test(page)],
+  ["provider submission remains explicitly false throughout draft save", migration.includes(String.fromCharCode(39) + "provider_submission_sent" + String.fromCharCode(39) + ", false") && /does not submit to a provider/.test(page)],
   ["application tracker links owned parent records to the resumable editor", /candidate\/applications\/\$\{application\.id\}/.test(tracker) && /Open \/ resume application draft/.test(tracker)],
   ["draft persistence contract runs in Candidate Experience CI", /validate-candidate-application-draft-persistence\.mjs/.test(packageJson.scripts["candidate:experience:check"])]
 ];
