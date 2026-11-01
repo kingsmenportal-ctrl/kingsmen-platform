@@ -6,6 +6,7 @@ const typeSource = readFileSync("apps/api/src/public-website/public-website-type
 const readModelSource = readFileSync("apps/api/src/public-website/website-read-model.ts", "utf8");
 const block = sectorSource.match(/export const PUBLIC_SECTOR_CARDS[\s\S]*?= \[([\s\S]*?)\n\];/);
 assert.ok(block, "public sector catalogue must exist");
+const sectorGroupUnion = typeSource.match(/sectorGroup:\s*([^;]+);/)?.[1] ?? "";
 const rows = block[1].split("\n").filter((line) => /sectorKey:/.test(line));
 const cards = rows.map((line) => {
   const key = line.match(/sectorKey: "([^"]+)"/)?.[1];
@@ -14,7 +15,7 @@ const cards = rows.map((line) => {
   for (const flag of ["previewAllowed: true", "exactTargetsSealed: true", "officialSourceRequired: true"]) {
     assert.ok(line.includes(flag), key + " must stay preview-only, sealed and source-verified");
   }
-  assert.ok(typeSource.includes('| "' + group + '"'), "type missing group " + group);
+  assert.ok(sectorGroupUnion.includes('"' + group + '"'), "type missing group " + group);
   return { key, group };
 });
 const keys = cards.map((x) => x.key);
