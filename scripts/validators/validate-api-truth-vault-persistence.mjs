@@ -46,7 +46,7 @@ const requiredTokens = {
     "truthVault.healthCheck",
     "resolveCandidateIdentity",
     "CANDIDATE_OWNERSHIP_MISMATCH",
-    "APPLICATION_AUTHORIZATION_NOT_CONFIGURED"
+    "IDENTITY_AUTHORIZATION_NOT_CONFIGURED"
   ],
   "apps/api/package.json": [
     "\"pg\"",
