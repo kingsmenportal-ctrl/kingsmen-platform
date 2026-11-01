@@ -46,7 +46,7 @@ const checks = [
   ["UI preserves all six pathways regardless of plan", ["HIGHER_EDUCATION","TVET","SETA_LEARNERSHIP","INTERNSHIP","APPRENTICESHIP","EMPLOYMENT"].every(x => page.includes(x))],
   ["candidate dashboard and application tracker link to capacity", /candidate\/application-capacity/.test(dashboard) && /candidate\/application-capacity/.test(tracker)],
   ["capacity contract runs in Candidate Experience CI", /validate-application-capacity-entitlements\.mjs/.test(packageJson.scripts["candidate:experience:check"])],
-  ["Candidate Experience CI provisions an isolated PostgreSQL 17 service", /image:\\s*postgres:17/.test(postgresWorkflow) && /PGHOST:\\s*localhost/.test(postgresWorkflow)],
+  ["Candidate Experience CI provisions an isolated PostgreSQL 17 service", /image:\s*postgres:17/.test(postgresWorkflow) && /PGHOST:\s*localhost/.test(postgresWorkflow)],
   ["CI bootstraps, applies migration 0107 and executes the PostgreSQL integration suite in order", postgresWorkflow.indexOf("application-capacity-postgres-bootstrap.sql")>=0 && postgresWorkflow.indexOf("0107_application_capacity_entitlements_20261101.sql")>postgresWorkflow.indexOf("application-capacity-postgres-bootstrap.sql") && postgresWorkflow.indexOf("test-application-capacity-postgres.sql")>postgresWorkflow.indexOf("0107_application_capacity_entitlements_20261101.sql")],
   ["PostgreSQL fixture defines isolated test roles and a test Auth uid without provider or staging credentials", postgresBootstrap.includes("CREATE ROLE authenticated NOLOGIN") && postgresBootstrap.includes("CREATE ROLE service_role NOLOGIN BYPASSRLS") && postgresBootstrap.includes("CREATE OR REPLACE FUNCTION auth.uid()") && !/SUPABASE_SERVICE_ROLE_KEY|PAYFAST_MERCHANT_KEY|DATABASE_URL/.test(postgresBootstrap)],
   ["PostgreSQL integration covers order-time entitlement snapshots and immutable finance order terms", postgresTest.includes("order-time catalogue snapshot is incorrect") && postgresTest.includes("immutable order terms unexpectedly changed")],
@@ -54,7 +54,7 @@ const checks = [
   ["PostgreSQL integration tests idempotency and independent priority/managed capacity exhaustion", postgresTest.includes("idempotent retry did not reuse original reservation") && postgresTest.includes("priority capacity over-allocation was not rejected") && postgresTest.includes("managed-route over-allocation was not rejected")],
   ["PostgreSQL integration tests candidate isolation, ambiguous identity and least-privilege role grants", postgresTest.includes("candidate B released candidate A reservation") && postgresTest.includes("ambiguous Auth identity did not fail closed") && postgresTest.includes("authenticated role has direct capacity-table access")],
   ["PostgreSQL integration verifies downstream submission work blocks release and unused drafts can release", postgresTest.includes("release should be blocked when a submission job exists") && postgresTest.includes("release should be blocked when provider receipt event exists") && postgresTest.includes("unused editable draft reservation should release")],
-  ["PostgreSQL integration verifies the capacity audit ledger is append-only", postgresTest.includes("capacity event update unexpectedly succeeded") && postgresTest.includes("candidate_application_capacity_events"))
+  ["PostgreSQL integration verifies the capacity audit ledger is append-only", postgresTest.includes("capacity event update unexpectedly succeeded") && postgresTest.includes("candidate_application_capacity_events")]
 ];
 
 let failed = 0;
