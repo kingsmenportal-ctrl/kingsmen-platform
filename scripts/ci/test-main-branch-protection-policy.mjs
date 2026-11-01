@@ -21,6 +21,8 @@ function completeProtection() {
 
 const complete = evaluateMainBranchProtection(completeProtection());
 assert.equal(complete.passed, true, 'complete protection configuration should pass');
+assert.equal(complete.checks.sourceGuardRequired, true);
+assert.equal(complete.checks.releaseEvidenceRequired, true, 'the full release evidence check must be required');
 assert.equal(complete.checks.requiredApprovingReviewCount, 1);
 
 const failures = [
