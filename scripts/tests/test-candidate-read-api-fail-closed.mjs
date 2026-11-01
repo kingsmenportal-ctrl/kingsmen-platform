@@ -15,9 +15,10 @@ assert.match(candidateBlock, /resolveCandidateIdentity/);
 assert.match(candidateBlock, /identity\.candidateId !== candidateId/);
 assert.match(candidateBlock, /CANDIDATE_OWNERSHIP_MISMATCH/);
 assert.match(candidateBlock, /handleCandidateStatus\(response, candidateId\)/);
-assert.match(applicationBlock, /APPLICATION_AUTHORIZATION_NOT_CONFIGURED/);
-assert.match(applicationBlock, /sendError\(response, 503/);
-assert.doesNotMatch(applicationBlock, /handleApplicationWorkbench\(response, applicationId\)/);
+assert.match(applicationBlock, /resolveCandidateIdentity/);
+assert.match(applicationBlock, /application\.candidateId !== identity\.candidateId/);
+assert.match(applicationBlock, /APPLICATION_OWNERSHIP_MISMATCH/);
+assert.match(applicationBlock, /handleApplicationWorkbench\(response, applicationId\)/);
 
 assert.match(auth, /\/auth\/v1\/user/);
 assert.match(auth, /candidate_auth_identity_links/);
