@@ -39,7 +39,7 @@ const linkOK = (candidateId, status = "VERIFIED") => response(200, [{ candidate_
   assert.equal(fetcher.calls[0].url, `${URL}/auth/v1/user`);
   assert.equal(fetcher.calls[0].init.headers.Authorization, "Bearer signed-user-token");
   assert.equal(fetcher.calls[0].init.headers.apikey, ANON);
-  assert.match(fetcher.calls[1].url, /candidate_auth_identity_links/);
+  assert.equal(fetcher.calls[1].url, `${URL}/rest/v1/rpc/resolve_my_candidate_identity`);
   assert.match(fetcher.calls[1].url, /supabase_user_id=eq.user-a/);
   assert.equal(fetcher.calls[1].init.headers.Authorization, "Bearer signed-user-token");
   assert.equal(fetcher.calls[1].init.headers.apikey, ANON);
