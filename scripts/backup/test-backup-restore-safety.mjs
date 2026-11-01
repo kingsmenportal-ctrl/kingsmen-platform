@@ -5,6 +5,8 @@ import { readFileSync } from 'node:fs';
 const backup = readFileSync('scripts/backup/New-KingsmenTruthVaultBackup.ps1', 'utf8');
 const restore = readFileSync('scripts/backup/Test-KingsmenTruthVaultRestore.ps1', 'utf8');
 const crypto = readFileSync('scripts/backup/encrypt-backup.mjs', 'utf8');
+const inputGuard = readFileSync('scripts/backup/test-backup-restore-input-guard.ps1', 'utf8');
+const restoreWorkflow = readFileSync('.github/workflows/backup-postgres-restore-integration.yml', 'utf8');
 
 const checks = [
   ['encryption helper uses AES-256-GCM, scrypt and authentication tag', /aes-256-gcm/.test(crypto) && /scrypt/.test(crypto) && /setAuthTag/.test(crypto)],
@@ -29,6 +31,21 @@ const checks = [
   ['restore report keeps raw candidate rows out and records parity limits', /rawCandidateRowsReturned = \$false/.test(restore) && /row parity and Storage-object parity/.test(restore)]
 ];
 
+checks.push([
+  'restore format guard runs before PostgreSQL tool resolution',
+  restore.indexOf('Unsupported backup format.') >= 0 &&
+    restore.indexOf('Unsupported backup format.') < restore.indexOf('$pgRestore = Get-Command') &&
+    restore.indexOf('Unsupported backup format.') < restore.indexOf('$sourceIdentityOutput = & psql')
+]);
+checks.push([
+  'PowerShell functional test rejects plaintext files without invoking mocked database commands',
+  inputGuard.includes('function global:psql') && inputGuard.includes('function global:pg_restore') &&
+    inputGuard.includes('database command was invoked') && inputGuard.includes('.dump') && inputGuard.includes('.legacy')
+]);
+checks.push([
+  'Windows CI runs the PowerShell restore-input functional test',
+  restoreWorkflow.includes('runs-on: windows-latest') && restoreWorkflow.includes('test-backup-restore-input-guard.ps1')
+]);
 const failures = checks.filter(([, passed]) => !passed);
 for (const [name, passed] of checks) console.log((passed ? 'PASS ' : 'FAIL ') + name);
 console.log(JSON.stringify({
