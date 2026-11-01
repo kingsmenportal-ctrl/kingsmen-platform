@@ -11,7 +11,7 @@ const sectionStart = edge.indexOf("let applicationEvidence:any[]=[];");
 const sectionEnd = edge.indexOf("return reply(200,{ready:true,trackers:trackers??[],items", sectionStart);
 const evidenceRead = sectionStart >= 0 && sectionEnd > sectionStart ? edge.slice(sectionStart, sectionEnd) : "";
 const checks = [
-  ["evidence read occurs only after bearer-authenticated verified candidate lookup", edge.indexOf("const candidateId = link.candidate_id as string") >= 0 && sectionStart > edge.indexOf("const candidateId = link.candidate_id as string")],
+  ["evidence read occurs only after bearer-authenticated verified candidate lookup", edge.indexOf("const candidateId=link.candidate_id as string") >= 0 && sectionStart > edge.indexOf("const candidateId=link.candidate_id as string")],
   ["evidence reads are limited to the verified candidate's linked application IDs", evidenceRead.includes('.eq("candidate_id",candidateId)') && evidenceRead.includes('.in("application_id",applicationIds)')],
   ["returned evidence metadata is allow-listed and excludes private storage locators", evidenceRead.includes('select("application_id,evidence_ref,evidence_type,source_label,captured_at,verification_status,verified_by_auth_user_id,verified_at,created_at")') && !evidenceRead.includes("evidence_locator") && !evidenceRead.includes("storage_path") && !evidenceRead.includes("signed_url")],
   ["database errors fail closed rather than silently hiding evidence lookup failure", evidenceRead.includes("if(result.error)") && evidenceRead.includes("return reply(503")],
