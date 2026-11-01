@@ -279,7 +279,7 @@ jobs:
           python3 - <<'PY'
           from pathlib import Path
           html = (Path("site-dist") / "provider-connection-readiness.html").read_text(encoding="utf-8")
-          required = ("kingsmen.provider-connection-readiness.v1", "localStorage.setItem", "localStorage.removeItem", 'aria-live="polite"', "not sent to Kingsmen", "Directory reference identified", "Legal entity verified", "Provider-authorised route", "Integration connection tested", "Provider-confirmed receipt", "Current opportunity status is separate", "founder approval")
+          required = ("kingsmen.provider-connection-readiness.v1", "localStorage.setItem", "localStorage.removeItem", 'aria-live="polite"', "not sent to Kingsmen", "Directory reference identified", "Legal entity verified", "Provider-authorised route", "Integration connection tested", "provider-confirmed receipt", "Current opportunity status is separate", "founder approval")
           missing = [item for item in required if item not in html]
           if missing:
               raise SystemExit(f"Provider Connection Readiness contract failed; missing: {missing}")
