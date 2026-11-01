@@ -22,7 +22,7 @@
   "required_evidence": {
     "authorization": ["provider_issued_authority", "authority_name_and_role", "approver_identity", "official_domain_evidence_url", "approved_scope_allowlist", "approved_at", "expires_at", "reviewed_at", "evidence_reference"],
     "terms": ["current_terms_url", "reviewer_identity", "reviewed_at", "freshness_window_days", "approved_scope_allowlist", "evidence_reference"],
-    "connector": ["approved_privacy_review", "candidate_consent_enforcement", "data_minimisation_enforcement", "configured_scope_subset", "configuration_evidence_reference", "secure_official_target", "opaque_vault_credential_reference_for_credentialed_methods", "human_handoff_fallback"],
+    "connector": ["approved_privacy_review", "candidate_consent_enforcement", "candidate_authorisation_policy_reference", "data_minimisation_enforcement", "configured_scope_subset", "configuration_evidence_reference", "secure_official_target", "opaque_vault_credential_reference_for_credentialed_methods", "human_handoff_fallback"],
     "test": ["passing_test_id_and_evidence_reference", "SANDBOX_or_STAGING_environment", "synthetic_data_only", "no_external_side_effects", "fresh_timestamp", "all_configured_scopes_tested"],
     "monitoring": ["fresh_healthy_check", "failure_handoff_owner", "failure_handoff_evidence_reference"]
   },
