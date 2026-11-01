@@ -28,7 +28,7 @@ function json(req: Request, body: unknown, status = 200): Response {
 }
 
 function tokenRole(req: Request): string {
-  const token = (req.headers.get("authorization") ?? "").replace(/^Bearer\\s+/i, "");
+  const token = (req.headers.get("authorization") ?? "").replace(/^Bearer\s+/i, "");
   try {
     const payload = token.split(".")[1];
     if (!payload) return "";
@@ -40,7 +40,7 @@ function tokenRole(req: Request): string {
 }
 
 async function authorizeFounder(req: Request, url: string, anonKey: string, admin: any) {
-  const bearer = (req.headers.get("authorization") ?? "").replace(/^Bearer\\s+/i, "");
+  const bearer = (req.headers.get("authorization") ?? "").replace(/^Bearer\s+/i, "");
   if (!bearer) return { ok: false, status: 401, reason: "UNAUTHENTICATED" };
 
   // Supabase's verify_jwt gateway check is enabled for this function. The
