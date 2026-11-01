@@ -39,7 +39,7 @@ checks.push([
 ]);
 checks.push([
   'PowerShell functional test rejects plaintext files without invoking mocked database commands',
-  inputGuard.includes('function global:psql') && inputGuard.includes('function global:pg_restore') &&
+  inputGuard.includes('psql.cmd') && inputGuard.includes('pg_restore.cmd') &&
     inputGuard.includes('database command was invoked') && inputGuard.includes('.dump') && inputGuard.includes('.legacy')
 ]);
 checks.push([
