@@ -16,6 +16,7 @@ import type {
 } from "./read-models/candidate-read-model";
 import type { KingsmenState } from "./state/state-machine";
 import { TruthVaultRepository } from "./db/truth-vault-repository";
+import { resolveCandidateIdentity } from "./security/candidate-identity-authorization";
 import {
   handleJarvisRuntimeControlWithAdapter,
   type JarvisRuntimeServerStore
@@ -493,22 +494,31 @@ export function createKingsmenApiServer() {
         return;
       }
 
-      // Fail closed: this API runtime has no verified Supabase-token-to-candidate
-      // authorization middleware. Never expose candidate or application read models
-      // until the request identity is cryptographically verified and linked to the
-      // requested candidate/application owner. A caller-supplied ID or Authorization
-      // header alone is not proof of ownership.
+      // Candidate status is released only after Supabase validates the bearer token
+      // and the caller's RLS-scoped identity link proves ownership of this candidate.
       const candidateId = getPathParam(/^\/api\/candidates\/([^/]+)\/status$/, pathname);
       if (method === "GET" && candidateId) {
-        sendError(response, 503, "CANDIDATE_AUTHORIZATION_NOT_CONFIGURED",
-          "Candidate status reads are temporarily disabled until verified identity-to-candidate authorization is configured.");
+        const identity = await resolveCandidateIdentity(
+          typeof request.headers.authorization === "string" ? request.headers.authorization : undefined
+        );
+        if (!identity.ok) {
+          sendError(response, identity.status, identity.code, "Candidate identity could not be authorised.");
+          return;
+        }
+        if (identity.candidateId !== candidateId) {
+          sendError(response, 403, "CANDIDATE_OWNERSHIP_MISMATCH", "The authenticated identity does not own this candidate.");
+          return;
+        }
+        await handleCandidateStatus(response, candidateId);
         return;
       }
 
+      // Application workbench remains fail-closed until its read model is loaded
+      // and its candidate owner can be compared to the verified identity.
       const applicationId = getPathParam(/^\/api\/applications\/([^/]+)\/workbench$/, pathname);
       if (method === "GET" && applicationId) {
         sendError(response, 503, "APPLICATION_AUTHORIZATION_NOT_CONFIGURED",
-          "Application workbench reads are temporarily disabled until verified identity-to-application ownership authorization is configured.");
+          "Application workbench reads remain disabled until verified identity-to-application ownership is enforced.");
         return;
       }
 
