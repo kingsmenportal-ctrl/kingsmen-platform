@@ -237,6 +237,15 @@ BEGIN
 
   IF NOT EXISTS (
     SELECT 1
+    FROM public.candidate_master_profiles mp
+    WHERE mp.candidate_id = v_candidate_id
+  ) THEN
+    RAISE EXCEPTION 'CANDIDATE_REUSABLE_PROFILE_REQUIRED'
+      USING ERRCODE = '42501';
+  END IF;
+
+  IF NOT EXISTS (
+    SELECT 1
     FROM public.privacy_consent_records pc
     WHERE pc.candidate_ref = v_public_ref
       AND pc.consent_type = 'PROFILE_PROCESSING'
