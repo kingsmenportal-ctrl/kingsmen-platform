@@ -11,7 +11,9 @@ const controlPlane = readFileSync(
 );
 
 const required = [
-  'sb-euhubhhnumtibbyufghm-auth-token',
+  'const storageKey = "sb-" + projectRef + "-auth-token";',
+  "readFounderAccessToken(projectRef)",
+  "endpoint.hostname.split",
   "NEXT_PUBLIC_SUPABASE_URL",
   "NEXT_PUBLIC_SUPABASE_ANON_KEY",
   "functions/v1/n13-observability-runtime",
@@ -43,6 +45,8 @@ assert.ok(component.includes("setConfirmCapture(false)"),
   "Capture confirmation must be cancellable and reset.");
 assert.ok(component.includes('method,') && component.includes('method: "GET" | "POST"'),
   "Runtime calls must remain restricted to GET and explicit POST.");
+assert.ok(!component.includes("sb-euhubhhnumtibbyufghm-auth-token"),
+  "The browser component must not hardcode a single Supabase project's Auth storage key.");
 assert.ok(!/SUPABASE_SERVICE_ROLE_KEY|service_role/i.test(component),
   "The browser component must never reference a service-role credential.");
 assert.ok(!/\.from\(["'](candidates|applications|candidate_private_documents)["']\)/.test(component),
