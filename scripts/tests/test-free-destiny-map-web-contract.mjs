@@ -30,7 +30,7 @@ assert.ok(form.includes('method: "POST"'), "Form must POST its intake payload");
 assert.ok(form.includes("clientRequestId: requestId.current"), "Form must send a stable retry/idempotency input");
 assert.ok(form.includes('name="consentToProcessBasicInfo" required'), "Basic information consent must be mandatory");
 assert.ok(form.includes('name="consentToBeContacted" required'), "Contact consent must be mandatory");
-assert.ok(form.includes("backend command boundary accepted"), "Receipt copy must not overstate persistence");
+assert.ok(form.includes("accepted the intake command"), "Receipt copy must not overstate persistence");
 assert.ok(form.includes("does not confirm durable database storage"), "Receipt must distinguish acceptance from durable persistence");
 assert.ok(!/SUPABASE_SERVICE_ROLE_KEY|service_role|documentBase64|idNumber|passport number|banking detail/i.test(form), "Public form must not expose credentials or request sensitive identifiers");
 assert.ok(page.includes("FreeDestinyMapIntakeForm"), "Free Destiny Map page must mount the live form");
