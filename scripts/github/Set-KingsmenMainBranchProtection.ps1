@@ -47,10 +47,15 @@ if ($DryRun) {
     productionReady = $false
     protectionWouldBeApplied = $true
     requiredStatusCheckContexts = @("source-guard")
+    strictStatusChecksRequired = $true
+    requiredApprovingReviewCount = 1
+    staleReviewsMustBeDismissed = $true
+    conversationResolutionRequired = $true
+    linearHistoryRequired = $true
+    enforceAdmins = $true
     allowForcePushes = $false
     allowDeletions = $false
     requiresPullRequest = $true
-    enforceAdmins = $true
     payloadPreview = ($payloadJson | ConvertFrom-Json)
   }
 
@@ -63,24 +68,37 @@ if ($DryRun) {
 $temp = New-TemporaryFile
 try {
   $payloadJson | Set-Content -Encoding utf8 $temp.FullName
-
-  gh api `
-    --method PUT `
-    -H "Accept: application/vnd.github+json" `
-    -H "X-GitHub-Api-Version: 2022-11-28" `
-    "/repos/$owner/$repo/branches/$Branch/protection" `
-    --input $temp.FullName | Out-Null
-
-  $verify = gh api `
-    -H "Accept: application/vnd.github+json" `
-    -H "X-GitHub-Api-Version: 2022-11-28" `
-    "/repos/$owner/$repo/branches/$Branch/protection" | ConvertFrom-Json
+  gh api --method PUT -H "Accept: application/vnd.github+json" -H "X-GitHub-Api-Version: 2022-11-28" "/repos/$owner/$repo/branches/$Branch/protection" --input $temp.FullName | Out-Null
+  $verify = gh api -H "Accept: application/vnd.github+json" -H "X-GitHub-Api-Version: 2022-11-28" "/repos/$owner/$repo/branches/$Branch/protection" | ConvertFrom-Json
 
   $contexts = @($verify.required_status_checks.contexts)
+  $reviewPolicy = $verify.required_pull_request_reviews
+  $reviewCount = if ($null -ne $reviewPolicy -and $null -ne $reviewPolicy.required_approving_review_count) {
+    [int]$reviewPolicy.required_approving_review_count
+  } else {
+    0
+  }
+  $strictStatusChecksEnabled = $verify.required_status_checks.strict -eq $true
+  $sourceGuardRequired = $contexts -contains "source-guard"
+  $pullRequestReviewRequired = $reviewCount -ge 1
+  $staleReviewsDismissed = $reviewPolicy.dismiss_stale_reviews -eq $true
+  $conversationResolutionRequired = $verify.required_conversation_resolution.enabled -eq $true
+  $linearHistoryRequired = $verify.required_linear_history.enabled -eq $true
+  $adminEnforcementEnabled = $verify.enforce_admins.enabled -eq $true
+  $forcePushDisabled = $verify.allow_force_pushes.enabled -eq $false
+  $branchDeletionDisabled = $verify.allow_deletions.enabled -eq $false
 
-  $passed = $contexts -contains "source-guard" -and `
-    $verify.allow_force_pushes.enabled -eq $false -and `
-    $verify.allow_deletions.enabled -eq $false
+  $passed = (
+    $strictStatusChecksEnabled -and
+    $sourceGuardRequired -and
+    $pullRequestReviewRequired -and
+    $staleReviewsDismissed -and
+    $conversationResolutionRequired -and
+    $linearHistoryRequired -and
+    $adminEnforcementEnabled -and
+    $forcePushDisabled -and
+    $branchDeletionDisabled
+  )
 
   $report = [ordered]@{
     schema = "kingsmen.main-branch-protection-apply.v1"
@@ -91,10 +109,14 @@ try {
     productionReady = $false
     publicLaunchAllowed = $false
     requiredStatusCheckContexts = $contexts
-    allowForcePushes = $verify.allow_force_pushes.enabled
-    allowDeletions = $verify.allow_deletions.enabled
-    enforceAdminsUrlPresent = -not [string]::IsNullOrWhiteSpace($verify.enforce_admins.url)
-    requiresPullRequestReviews = $null -ne $verify.required_pull_request_reviews
+    strictStatusChecksEnabled = $strictStatusChecksEnabled
+    requiredApprovingReviewCount = $reviewCount
+    staleReviewsDismissed = $staleReviewsDismissed
+    conversationResolutionRequired = $conversationResolutionRequired
+    linearHistoryRequired = $linearHistoryRequired
+    adminEnforcementEnabled = $adminEnforcementEnabled
+    forcePushDisabled = $forcePushDisabled
+    branchDeletionDisabled = $branchDeletionDisabled
     generatedAtIso = (Get-Date).ToUniversalTime().ToString("o")
   }
 
