@@ -137,6 +137,7 @@ DECLARE
   v_summary jsonb;
   v_result jsonb;
   v_first_reservation uuid;
+  v_event_reservation uuid;
   v_replay uuid;
   v_release_blocked jsonb;
   v_release_event_blocked jsonb;
@@ -163,6 +164,7 @@ BEGIN
       RAISE EXCEPTION 'priority reservation % failed: %',i,v_result;
     END IF;
     IF i=1 THEN v_first_reservation:=(v_result->>'reservation_id')::uuid; END IF;
+    IF i=2 THEN v_event_reservation:=(v_result->>'reservation_id')::uuid; END IF;
     IF i=3 THEN v_reservation:=(v_result->>'reservation_id')::uuid; END IF;
   END LOOP;
 
@@ -204,6 +206,7 @@ BEGIN
   END IF;
 
   PERFORM set_config('capacity.test_first_reservation',v_first_reservation::text,false);
+  PERFORM set_config('capacity.test_event_reservation',v_event_reservation::text,false);
   PERFORM set_config('capacity.test_release_reservation',v_reservation::text,false);
 END
 $candidate_a_capacity$;
