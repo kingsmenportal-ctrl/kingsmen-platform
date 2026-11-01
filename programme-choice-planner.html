@@ -1,0 +1,109 @@
+<!doctype html>
+<html lang="en-ZA">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="description" content="Plan one application with up to six ranked programme choices across study and training pathways.">
+<title>Programme Choice Planner | Kingsmen</title>
+<link rel="stylesheet" href="site.css">
+</head>
+<body>
+<header class="site-header"><div class="topline"><a class="brand" href="./index.html">KINGSMEN<small>OPPORTUNITY PLATFORM</small></a><nav class="nav" aria-label="Main navigation"><a href="./index.html">Home</a><a href="./opportunities.html">Opportunities</a><a href="./application-guide.html">Application guide</a><a href="./opportunity-comparison.html">Compare options</a><a href="./requirements-evidence.html">Requirements & evidence</a><a href="./help.html">Help</a></nav></div></header>
+<main class="wrap">
+<div class="breadcrumb"><a href="./index.html">Home</a> / Programme choice planner</div>
+<section class="page-hero"><p class="eyebrow">One application plan · multiple programme choices</p><h1>Programme choice planner</h1><p class="lead">Organise a single application plan and attach up to six ranked programme choices beneath it. This reflects the Kingsmen parent-application / child-choice structure for planning; it does not create or submit a real CAO or provider application.</p></section>
+<div class="notice"><strong>Important:</strong> Confirm each programme, campus, entry rule, choice limit and deadline on the relevant official provider or admissions service. Ranking an option does not establish eligibility, availability or admission. Never enter an ID number, password, payment credential or private document here.</div>
+<section class="section"><div class="two-col">
+<article class="card"><h2>Create one application plan</h2><form id="master-form">
+<div class="field"><label for="provider">Application authority / provider</label><input id="provider" maxlength="100" required placeholder="e.g. central admissions service or institution"></div>
+<div class="field"><label for="title">Application plan label</label><input id="title" maxlength="100" required placeholder="e.g. 2027 study application"></div>
+<div class="field"><label for="pathway">Pathway</label><select id="pathway" required><option value="">Choose pathway</option><option>Higher education</option><option>TVET</option><option>SETA / learnership</option><option>Internship</option><option>Apprenticeship</option></select></div>
+<div class="field"><label for="source">Official application source (HTTPS)</label><input id="source" type="url" maxlength="500" required placeholder="https://official-provider.example"></div>
+<div class="field"><label for="checked">Date source checked</label><input id="checked" type="date" required></div>
+<div class="field"><label for="deadline">Official deadline (optional)</label><input id="deadline" type="date"></div>
+<div class="field"><label for="status">Application evidence status</label><select id="status" required><option value="planning">Planning — not submitted</option><option value="candidate-submitted">Candidate-reported submission — not provider-confirmed</option><option value="provider-received">Provider-confirmed receipt</option><option value="decision">Provider decision received</option></select></div>
+<div class="btn-row"><button class="btn btn-primary" type="submit">Create application plan</button></div>
+<p id="master-status" role="status" aria-live="polite">One parent plan can hold up to six programme choices.</p>
+</form></article>
+<article class="card"><h2>Add a programme choice</h2><form id="choice-form">
+<div class="field"><label for="plan-id">Parent application plan</label><select id="plan-id" required><option value="">Create or select a plan</option></select></div>
+<div class="field"><label for="rank">Choice priority</label><select id="rank" required><option value="">Choose rank</option><option value="1">1 — First choice</option><option value="2">2 — Second choice</option><option value="3">3 — Third choice</option><option value="4">4 — Fourth choice</option><option value="5">5 — Fifth choice</option><option value="6">6 — Sixth choice</option></select></div>
+<div class="field"><label for="institution">Institution / provider</label><input id="institution" maxlength="100" required placeholder="Official institution name"></div>
+<div class="field"><label for="programme">Programme / qualification</label><input id="programme" maxlength="120" required placeholder="Programme title"></div>
+<div class="field"><label for="campus">Campus / location (optional)</label><input id="campus" maxlength="80" placeholder="Campus or delivery location"></div>
+<div class="field"><label for="programme-source">Official programme source (HTTPS)</label><input id="programme-source" type="url" maxlength="500" required placeholder="https://official-programme-page.example"></div>
+<div class="field"><label for="eligibility">Entry-criteria evidence</label><select id="eligibility" required><option value="not-checked">Not checked</option><option value="official-recorded">Official entry criteria recorded</option><option value="candidate-review">Candidate self-assessment — not provider-confirmed</option><option value="provider-confirmed">Provider-confirmed eligibility</option></select></div>
+<div class="field"><label for="choice-note">Non-sensitive note (optional)</label><input id="choice-note" maxlength="160" placeholder="e.g. confirm subject prerequisites"></div>
+<div class="btn-row"><button class="btn btn-primary" type="submit">Add child programme choice</button><button class="btn btn-outline" type="reset">Reset choice form</button></div>
+<p id="choice-status" role="status" aria-live="polite">Choices are stored inside the selected parent plan on this device.</p>
+</form></article>
+</div></section>
+<section class="section"><div class="section-head"><div><p class="eyebrow">Parent applications and child choices</p><h2>Your application plans</h2><p class="muted">Each parent plan holds its own ranked programme choices.</p></div><button class="btn btn-outline" type="button" id="clear-all">Clear all plans</button></div><div id="plans" class="resource-list"></div><p id="empty" class="empty" style="display:block">No application plans saved on this device yet.</p><p id="list-status" class="small" role="status" aria-live="polite"></p></section>
+<section class="section"><div class="two-col"><article class="card"><h2>Evidence rules</h2><ul><li>Planning is not submission.</li><li>A candidate-reported submission is not provider-confirmed receipt.</li><li>Provider receipt is not admission or a funding award.</li><li>Eligibility must be confirmed by the institution or responsible admissions service where required.</li></ul></article><article class="card"><h2>How the structure works</h2><p><strong>One parent:</strong> the application authority, cycle, pathway and overall application status.</p><p><strong>Child choices:</strong> up to six ranked institutions and programmes, each with its own official source and entry-criteria evidence.</p><p class="muted">The production Kingsmen application service must enforce this structure in the database, authenticate the candidate, preserve immutable audit events and persist provider-confirmed status.</p></article></div></section>
+<div class="notice"><strong>Platform boundary:</strong> This is a public browser-local planner, not the authenticated Kingsmen master application or CAO integration. It does not send data to CAO or providers, submit applications, confirm eligibility, reserve places or persist choices on the Kingsmen server.</div>
+</main>
+<footer class="footer"><div class="wrap footer-grid"><div><a class="brand" href="./index.html">KINGSMEN</a><p>One organised starting point for South African education, training, funding and work pathways.</p></div><div><h3>Prepare</h3><div class="footer-links"><a href="./application-guide.html">Application guide</a><a href="./requirements-evidence.html">Requirements & evidence planner</a><a href="./selection-readiness.html">Selection & assessment readiness</a><a href="./application-follow-up.html">Application follow-up planner</a></div></div><div><h3>Compare & verify</h3><div class="footer-links"><a href="./opportunity-comparison.html">Opportunity comparison</a><a href="./opportunity-source-register.html">Opportunity source register</a><a href="./verification-safety.html">Verification & scam safety</a></div></div></div></footer>
+<script>
+(function(){
+'use strict';
+const KEY='kingsmen.programme-choice-planner.v1';
+const masterForm=document.getElementById('master-form');
+const choiceForm=document.getElementById('choice-form');
+const plansEl=document.getElementById('plans');
+const empty=document.getElementById('empty');
+const appStatuses={planning:'Planning — not submitted','candidate-submitted':'Candidate-reported submission — not provider-confirmed','provider-received':'Provider-confirmed receipt',decision:'Provider decision received'};
+const entryStatuses={'not-checked':'Not checked','official-recorded':'Official entry criteria recorded','candidate-review':'Candidate self-assessment — not provider-confirmed','provider-confirmed':'Provider-confirmed eligibility'};
+const load=()=>{try{const v=JSON.parse(localStorage.getItem(KEY)||'[]');return Array.isArray(v)?v:[]}catch(_){return[]}};
+const save=v=>localStorage.setItem(KEY,JSON.stringify(v));
+const el=(tag,cls,value)=>{const e=document.createElement(tag);if(cls)e.className=cls;if(value!==undefined)e.textContent=value;return e};
+function setPlanOptions(data,selected){
+const select=document.getElementById('plan-id');select.replaceChildren();
+const first=el('option','',data.length?'Choose a parent application':'Create an application plan first');first.value='';select.append(first);
+data.forEach(p=>{const o=el('option','',p.title+' · '+p.provider);o.value=p.id;select.append(o)});
+if(selected)select.value=selected;
+}
+function render(){
+const data=load();plansEl.replaceChildren();empty.style.display=data.length?'none':'block';setPlanOptions(data,document.getElementById('plan-id').value);
+data.forEach((p,pi)=>{
+const card=el('article','card resource-card');card.append(el('span','pill',p.pathway));card.append(el('h3','',p.title));card.append(el('p','',p.provider+' · Source checked: '+p.checked+' · Deadline: '+(p.deadline||'Not recorded')));
+const source=el('a','',p.source);source.href=p.source;source.target='_blank';source.rel='noopener noreferrer';source.textContent='Open official application source ↗';card.append(source);
+const statusLabel=el('label','small','Application evidence status');const status=el('select','');
+Object.entries(appStatuses).forEach(([v,label])=>{const o=el('option','',label);o.value=v;status.append(o)});status.value=p.status;
+status.addEventListener('change',()=>{const d=load();d[pi].status=status.value;save(d);render();document.getElementById('list-status').textContent='Application status updated locally. No provider was contacted.'});
+statusLabel.append(status);card.append(statusLabel);
+const heading=el('h4','', 'Programme choices ('+p.choices.length+'/6)');card.append(heading);
+p.choices.slice().sort((a,b)=>a.rank-b.rank).forEach(choice=>{
+const child=el('div','card');child.append(el('span','pill','Choice '+choice.rank));child.append(el('h4','',choice.programme));child.append(el('p','',choice.institution+(choice.campus?' · '+choice.campus:'')));child.append(el('p','small',entryStatuses[choice.eligibility]));
+const link=el('a','',choice.source);link.href=choice.source;link.target='_blank';link.rel='noopener noreferrer';link.textContent='Open official programme source ↗';child.append(link);if(choice.note)child.append(el('p','small',choice.note));
+const del=el('button','btn btn-outline','Remove choice');del.type='button';del.addEventListener('click',()=>{const d=load();d[pi].choices=d[pi].choices.filter(x=>x.rank!==choice.rank);save(d);render();document.getElementById('list-status').textContent='Programme choice removed locally.'});child.append(del);card.append(child);
+});
+const remove=el('button','btn btn-outline','Delete parent application plan');remove.type='button';remove.addEventListener('click',()=>{const d=load();d.splice(pi,1);save(d);render();document.getElementById('list-status').textContent='Parent application and its child choices deleted locally.'});card.append(remove);
+plansEl.append(card);
+});
+const count=data.reduce((n,p)=>n+p.choices.length,0);
+document.getElementById('list-status').textContent=data.length+' parent plan'+(data.length===1?'':'s')+' with '+count+' child programme choice'+(count===1?'':'s')+'. No information was sent to Kingsmen.';
+}
+function httpsUrl(raw,label){try{const u=new URL(raw.trim());if(u.protocol!=='https:')throw new Error('HTTPS required');return u.href}catch(_){throw new Error(label+' must be a valid HTTPS official URL.')}}
+masterForm.addEventListener('submit',e=>{
+e.preventDefault();let source;try{source=httpsUrl(document.getElementById('source').value,'Application source')}catch(err){document.getElementById('master-status').textContent=err.message;return}
+try{const data=load();let id=String(Date.now());while(data.some(p=>p.id===id))id=String(Number(id)+1);
+const record={id,provider:document.getElementById('provider').value.trim(),title:document.getElementById('title').value.trim(),pathway:document.getElementById('pathway').value,source,checked:document.getElementById('checked').value,deadline:document.getElementById('deadline').value,status:document.getElementById('status').value,choices:[]};
+data.unshift(record);save(data);masterForm.reset();render();document.getElementById('plan-id').value=id;document.getElementById('master-status').textContent='Parent application plan created locally. Add up to six child programme choices.'}
+catch(_){document.getElementById('master-status').textContent='Could not save locally. Check browser storage settings.'}
+});
+choiceForm.addEventListener('submit',e=>{
+e.preventDefault();const data=load();const id=document.getElementById('plan-id').value;const pi=data.findIndex(p=>p.id===id);
+if(pi<0){document.getElementById('choice-status').textContent='Create or select a parent application plan first.';return}
+const parent=data[pi];if(parent.choices.length>=6){document.getElementById('choice-status').textContent='This plan already has six choices. Remove one before adding another.';return}
+let source;try{source=httpsUrl(document.getElementById('programme-source').value,'Programme source')}catch(err){document.getElementById('choice-status').textContent=err.message;return}
+const rank=Number(document.getElementById('rank').value);if(parent.choices.some(x=>x.rank===rank)){document.getElementById('choice-status').textContent='That rank is already used. Choose a different priority.';return}
+const choice={rank,institution:document.getElementById('institution').value.trim(),programme:document.getElementById('programme').value.trim(),campus:document.getElementById('campus').value.trim(),source,eligibility:document.getElementById('eligibility').value,note:document.getElementById('choice-note').value.trim()};
+try{parent.choices.push(choice);parent.choices.sort((a,b)=>a.rank-b.rank);save(data);choiceForm.reset();render();document.getElementById('plan-id').value=id;document.getElementById('choice-status').textContent='Child programme choice added to its parent application plan.'}
+catch(_){document.getElementById('choice-status').textContent='Could not save the programme choice locally.'}
+});
+document.getElementById('clear-all').addEventListener('click',()=>{if(confirm('Clear all parent application plans and programme choices stored by this tool?')){localStorage.removeItem(KEY);render();document.getElementById('master-status').textContent='All local plans cleared. Nothing was sent to Kingsmen.'}});
+render();
+})();
+</script>
+</body>
+</html>
