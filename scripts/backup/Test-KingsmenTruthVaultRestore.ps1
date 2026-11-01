@@ -62,6 +62,7 @@ $coreTables = @(
 )
 
 $tableChecks = @()
+$failedChecks = @()
 
 foreach ($table in $coreTables) {
   $count = "DRY_RUN"
@@ -70,9 +71,65 @@ foreach ($table in $coreTables) {
     $query = "select count(*)::text from $table;"
     $result = & psql $RestoreDatabaseUrl -t -A -c $query 2>$null
     if ($LASTEXITCODE -eq 0) {
-      $count = ($result | Select-Object -First 1).Trim()
+      $countText = ($result | Select-Object -First 1)
+      if ($null -ne $countText) { $countText = $countText.Trim() }
+      if ($countText -match '^\d+
+  }
+
+  $tableChecks += [ordered]@{
+    table = $table
+    countOnly = $true
+    count = $count
+    rawRowsReturned = $false
+  }
+}
+
+$endedAt = Get-Date
+$rtoSeconds = [int]($endedAt - $startedAt).TotalSeconds
+$archiveBytes = (Get-Item $BackupFile).Length
+if ($archiveBytes -le 0) { $failedChecks += "backup_archive_empty" }
+$passed = (-not $DryRun) -and ($failedChecks.Count -eq 0)
+
+$report = [ordered]@{
+  schema = "kingsmen.backup-restore-staging-drill.v1"
+  module = "Kingsmen Backup Restore Drill"
+  status = $(if ($DryRun) { "DRY_RUN" } elseif ($passed) { "RESTORE_DRILL_PASSED" } else { "RESTORE_DRILL_FAILED" })
+  passed = $passed
+  failedChecks = $failedChecks
+  backupArchiveBytes = $archiveBytes
+  productionReady = $false
+  publicLaunchAllowed = $false
+  productionDataAllowed = $false
+  generatedAtIso = $endedAt.ToUniversalTime().ToString("o")
+  backupFile = $BackupFile
+  backupSha256 = $sha256
+  databaseUrlRedacted = $true
+  sourceAndRestoreTargetsDiffer = $true
+  rawCandidateRowsReturned = $false
+  serviceRoleReturned = $false
+  rpoMinutes = "manual_capture_required"
+  rtoSeconds = $rtoSeconds
+  tableChecks = $tableChecks
+  founderReviewRequired = $true
+  nextAction = "Review counts-only report, confirm RPO/RTO, and store offsite backup evidence before production data."
+}
+
+New-Item -ItemType Directory -Force -Path (Split-Path -Parent $ReportPath) | Out-Null
+$report | ConvertTo-Json -Depth 20 | Set-Content -Encoding utf8 $ReportPath
+
+Write-Host "Restore drill report written. Database URLs redacted."
+Write-Host $ReportPath
+
+$report | ConvertTo-Json -Depth 20
+) {
+        $count = $countText
+      } else {
+        $count = "INVALID_COUNT_RESULT"
+        $failedChecks += "count_query:$table"
+      }
     } else {
       $count = "QUERY_FAILED"
+      $failedChecks += "count_query:$table"
     }
   }
 
