@@ -93,6 +93,8 @@ for (const required of [
   '.select("id, role_code")',
   'actorRef: "FOUNDER_REVIEWER:" + reviewer.id',
   'admin.rpc("n13_commit_observability_capture"',
+  "capture_ref: snapshotRef",
+  "ACTIVE_CANDIDATE_CAP + 1",
   'eq("role_code", "PLATFORM_ADMIN")',
   '.is("revoked_at", null)',
   'Deno.serve(async (req: Request)',
