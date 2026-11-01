@@ -51,9 +51,11 @@ type RuntimeResponse = {
 
 type RuntimeError = Error & { status?: number; runtimeStatus?: string; retryAfterSeconds?: number };
 
-function readFounderAccessToken(): string | null {
+function readFounderAccessToken(projectRef: string): string | null {
   try {
-    const stored = window.localStorage.getItem("sb-euhubhhnumtibbyufghm-auth-token");
+    if (!projectRef || !/^[a-z0-9-]+$/i.test(projectRef)) return null;
+    const storageKey = "sb-" + projectRef + "-auth-token";
+    const stored = window.localStorage.getItem(storageKey);
     if (!stored) return null;
     const parsed: unknown = JSON.parse(stored);
     if (!parsed || typeof parsed !== "object") return null;
@@ -89,9 +91,7 @@ function describeFailure(error: unknown): string {
 async function requestRuntime(method: "GET" | "POST"): Promise<RuntimeResponse> {
   const baseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
   const anonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
-  const token = readFounderAccessToken();
   if (!baseUrl || !anonKey) throw new Error("Supabase public runtime configuration is missing from this deployment.");
-  if (!token) throw new Error("Sign in first. No authenticated Supabase session was found in this browser.");
 
   let endpoint: URL;
   try {
@@ -102,7 +102,10 @@ async function requestRuntime(method: "GET" | "POST"): Promise<RuntimeResponse> 
   if (endpoint.protocol !== "https:" && endpoint.hostname !== "localhost" && endpoint.hostname !== "127.0.0.1") {
     throw new Error("The Supabase runtime URL must use HTTPS.");
   }
-  endpoint.pathname = endpoint.pathname.replace(/\/+$/, "") + "/functions/v1/n13-observability-runtime";
+  const projectRef = endpoint.hostname.split(".")[0];
+  const token = readFounderAccessToken(projectRef);
+  if (!token) throw new Error("Sign in first. No authenticated Supabase session was found in this browser.");
+  endpoint.pathname = endpoint.pathname.replace(/\\/+$/, "") + "/functions/v1/n13-observability-runtime";
 
   const response = await fetch(endpoint.toString(), {
     method,
