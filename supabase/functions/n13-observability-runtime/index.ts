@@ -260,6 +260,57 @@ async function capture(admin: any, req: Request, actorRef: string): Promise<Resp
     captured_at: observedAt
   };
 
+  const checks = [
+    {
+      check_ref: "n13_service_" + crypto.randomUUID(),
+      service_name: "Supabase PostgreSQL",
+      service_domain: "POSTGRES",
+      status: dataComplete ? "UP" : "UNKNOWN",
+      latency_ms: elapsedMs,
+      error_rate: dataComplete ? 0 : null,
+      last_success_at: dataComplete ? observedAt : null,
+      last_failure_at: dataComplete ? null : observedAt,
+      reason: dataComplete ? "Aggregate read-only checks completed." : "One or more aggregate health queries failed.",
+      fix_path: dataComplete ? "Continue monitoring; external services still require dedicated probes." : "Inspect database schema, privileges and aggregate query errors.",
+      evidence_refs: evidenceRefs,
+      checked_at: observedAt
+    },
+    {
+      check_ref: "n13_service_" + crypto.randomUUID(),
+      service_name: "Supabase Auth",
+      service_domain: "SUPABASE",
+      status: "UP",
+      latency_ms: null,
+      error_rate: 0,
+      last_success_at: observedAt,
+      last_failure_at: null,
+      reason: "Founder JWT was resolved by Supabase Auth and the active Founder grant was checked.",
+      fix_path: "Continue monitoring authentication and reviewer grants.",
+      evidence_refs: ["supabase-auth:getUser", "founder-role:PLATFORM_ADMIN", "founder-reviewer:" + actorRef],
+      checked_at: observedAt
+    }
+  ];
+
+  const metricRows = [
+    metric("active_candidates", "CAPACITY", active, 400, ACTIVE_CANDIDATE_CAP + 1, { cap: ACTIVE_CANDIDATE_CAP }, activeCandidates.available),
+    metric("failed_workflows", "WORKFLOW", failedWorkflows.count, 1, 10, {}, failedWorkflows.available),
+    metric("pending_documents", "DOCUMENT", pendingDocuments.count, 10, 50, {}, pendingDocuments.available),
+    metric("manual_fallback_backlog", "QUEUE", manualFallbackBacklog.count, 10, 50, {}, manualFallbackBacklog.available),
+    metric("pending_payments", "FINANCE", paymentPending.count, 10, 50, {}, paymentPending.available),
+    metric("source_review_backlog", "QUEUE", sourceReviewBacklog.count, 100, 500, {}, sourceReviewBacklog.available),
+    metric("open_incidents", "RISK", openIncidents.count, 1, 5, {}, openIncidents.available),
+    metric("integration_dead_letters", "QUEUE", deadLetters.count + airtableDeadLettered.count, 1, 10, {}, deadLetters.available && airtableDeadLettered.available),
+    metric("airtable_outbox_pending", "QUEUE", airtablePending.count, 100, 500, {}, airtablePending.available),
+    metric("airtable_outbox_failed", "QUEUE", airtableFailed.count, 1, 50, {}, airtableFailed.available)
+  ].map((row) => ({
+    ...row,
+    tags: {
+      ...row.tags,
+      capture_ref: snapshotRef,
+      coverage: dataComplete ? "OBSERVED" : "PARTIAL"
+    }
+  }));
+
   // A single SECURITY DEFINER RPC commits the snapshot, service checks and metric samples
   // in one PostgreSQL transaction. The database also serializes the capture cooldown.
   const { data: commitResult, error: commitError } = await admin.rpc("n13_commit_observability_capture", {
