@@ -9,7 +9,11 @@ on:
       - 'apps/web/src/app/admin/jarvis-*/**'
       - 'scripts/jarvis/**'
       - 'scripts/validators/validate-jarvis-*.mjs'
+      - 'supabase/functions/payfast-sandbox/**'
+      - 'supabase/migrations/*payfast*.sql'
+      - 'scripts/staging/test-payfast-atomic-checkout-contract.mjs'
       - 'package.json'
+      - 'package-lock.json'
   push:
     branches:
       - main
@@ -42,3 +46,11 @@ jobs:
 
       - name: Validate Jarvis live batch
         run: node scripts/validators/validate-jarvis-complete-live-batch.mjs
+
+      - name: Install locked dependencies for PayFast contract test
+        if: contains(join(github.event.pull_request.changed_files, ','), 'scripts/staging/test-payfast-atomic-checkout-contract.mjs') || contains(join(github.event.pull_request.changed_files, ','), 'supabase/functions/payfast-sandbox/index.ts') || contains(join(github.event.pull_request.changed_files, ','), 'supabase/migrations/20261028173000_payfast_entitlement_activation_and_catalog_guard.sql')
+        run: npm ci
+
+      - name: Validate PayFast checkout and settlement contract
+        if: contains(join(github.event.pull_request.changed_files, ','), 'scripts/staging/test-payfast-atomic-checkout-contract.mjs') || contains(join(github.event.pull_request.changed_files, ','), 'supabase/functions/payfast-sandbox/index.ts') || contains(join(github.event.pull_request.changed_files, ','), 'supabase/migrations/20261028173000_payfast_entitlement_activation_and_catalog_guard.sql')
+        run: npm run payments:test:atomic-checkout
