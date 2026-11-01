@@ -25,10 +25,10 @@ const initialAnswers: Answers = {
 const pathways = [
   ["higher-education", "Higher education"],
   ["tvet", "TVET / college"],
-  ["seta", "SETA / learnership"],
-  ["internship", "Internship / apprenticeship"],
-  ["employment", "Employment / CV"],
-  ["funding", "Bursary / funding support"],
+  ["seta", "SETA programmes & learnerships"],
+  ["internship", "Internships"],
+  ["apprenticeship", "Apprenticeships"],
+  ["employment", "Employment"],
   ["unsure", "Help me explore my options"],
 ];
 
