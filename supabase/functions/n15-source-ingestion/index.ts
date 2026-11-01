@@ -4,7 +4,8 @@ import { createClient } from "npm:@supabase/supabase-js@2";
 const cors = {
   "Access-Control-Allow-Origin": "https://kingsmen-portal-staging.netlify.app",
   "Access-Control-Allow-Headers": "authorization, apikey, content-type",
-  "Access-Control-Allow-Methods": "POST, OPTIONS",
+  "Access-Control-Allow-Methods": "GET, POST, OPTIONS",
+  "Cache-Control": "no-store",
   "Content-Type": "application/json; charset=utf-8"
 };
 const MAX_HTML_BYTES = 512_000;
@@ -155,7 +156,7 @@ async function inspectAuthority(authority: any, supabase: any) {
 }
 Deno.serve(async (req: Request) => {
   if (req.method === "OPTIONS") return new Response("ok", { headers: cors });
-  if (req.method !== "POST") return json({ status: "METHOD_NOT_ALLOWED" }, 405);
+  if (req.method !== "GET" && req.method !== "POST") return json({ status: "METHOD_NOT_ALLOWED" }, 405);
   const url = Deno.env.get("SUPABASE_URL");
   const key = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY");
   const anonKey = Deno.env.get("SUPABASE_ANON_KEY");
@@ -179,6 +180,18 @@ Deno.serve(async (req: Request) => {
     if (!reviewer) return json({ status: "FORBIDDEN", reason: "ACTIVE_OPPORTUNITY_REVIEWER_REQUIRED" }, 403);
   }
   const supabase = createClient(url, key, { auth: { persistSession: false, autoRefreshToken: false } });
+
+  // Read-only operator history. Return a strict aggregate allowlist; never expose
+  // the raw summary JSON, source URLs, candidate records or evidence locators.
+  if (req.method === "GET") {
+    const { data: runs, error: historyError } = await supabase.from("n15_ingestion_runs")
+      .select("run_ref,status,sources_checked,sources_succeeded,observations_created,observations_updated,observations_skipped,started_at,finished_at")
+      .order("started_at", { ascending: false })
+      .limit(50);
+    if (historyError) return json({ status: "DATABASE_ERROR", reason: "INGESTION_HISTORY_LOOKUP_FAILED" }, 500);
+    return json({ status: "OK", runs: runs ?? [], limit: 50 });
+  }
+
   const runRef = "n15_run_" + crypto.randomUUID();
   const startedAt = new Date().toISOString();
   const { error: runError } = await supabase.from("n15_ingestion_runs").insert({
