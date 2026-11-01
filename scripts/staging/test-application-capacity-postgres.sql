@@ -227,14 +227,9 @@ SELECT set_config('request.jwt.claim.sub','bbbbbbbb-bbbb-4bbb-8bbb-bbbbbbbbbbbb'
 DO $candidate_a_release$
 DECLARE v_result jsonb; v_job_reservation uuid; v_event_reservation uuid; v_plain_reservation uuid;
 BEGIN
-  SELECT id INTO v_job_reservation FROM public.candidate_application_capacity_reservations
-   WHERE candidate_id='aaaaaaaa-aaaa-4aaa-8aaa-aaaaaaaaaaaa'
-     AND application_id='a0000000-0000-4000-8000-000000000001'
-     AND usage_type='PRIORITY_APPLICATION';
-  SELECT id INTO v_event_reservation FROM public.candidate_application_capacity_reservations
-   WHERE candidate_id='aaaaaaaa-aaaa-4aaa-8aaa-aaaaaaaaaaaa'
-     AND application_id='a0000000-0000-4000-8000-000000000002'
-     AND usage_type='PRIORITY_APPLICATION';
+  v_job_reservation:=current_setting('capacity.test_first_reservation')::uuid;
+  v_event_reservation:=current_setting('capacity.test_event_reservation')::uuid;
+  v_plain_reservation:=current_setting('capacity.test_release_reservation')::uuid;
   v_result:=public.release_candidate_application_capacity(v_job_reservation,'test release');
   IF (v_result->>'ok')::boolean IS NOT FALSE OR v_result->>'code'<>'CAPACITY_RELEASE_NOT_ALLOWED' THEN
     RAISE EXCEPTION 'release should be blocked when a submission job exists: %',v_result;
@@ -244,10 +239,6 @@ BEGIN
     RAISE EXCEPTION 'release should be blocked when provider receipt event exists: %',v_result;
   END IF;
 
-  SELECT id INTO v_plain_reservation FROM public.candidate_application_capacity_reservations
-   WHERE candidate_id='aaaaaaaa-aaaa-4aaa-8aaa-aaaaaaaaaaaa'
-     AND application_id='a0000000-0000-4000-8000-000000000003'
-     AND usage_type='PRIORITY_APPLICATION';
   v_result:=public.release_candidate_application_capacity(v_plain_reservation,'unused draft route');
   IF (v_result->>'ok')::boolean IS NOT TRUE OR v_result->>'reservation_status'<>'RELEASED' THEN
     RAISE EXCEPTION 'unused editable draft reservation should release: %',v_result;
