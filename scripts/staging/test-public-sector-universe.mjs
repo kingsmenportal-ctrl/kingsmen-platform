@@ -33,5 +33,9 @@ for (const group of ["ENTERPRISE", "CREATIVE_PROFESSIONAL", "TRANSPORT", "HEALTH
   assert.ok(cards.some((x) => x.group === group), "no category mapped to " + group);
 }
 assert.ok(readModelSource.includes("WhatsApp and SMS are disabled pending approval."));
+const leadIntakeSource = readFileSync("apps/api/src/public-website/lead-intake.ts", "utf8");
+assert.ok(!leadIntakeSource.includes("WHATSAPP_URGENT_ONLY_CONSENT_REQUIRED"), "lead capture must not require disabled WhatsApp consent");
+assert.ok(leadIntakeSource.includes('whatsappBoundary: "DISABLED"'), "lead handoff must explicitly disable WhatsApp");
+assert.ok(leadIntakeSource.includes("whatsappUrgentOnly: false"), "lead consent record must record WhatsApp as disabled");
 assert.ok(readModelSource.includes("A sector preview is not proof of a connected provider, live opening, or currently available service."));
 console.log("Public sector taxonomy checks passed: " + cards.length + " categories.");
