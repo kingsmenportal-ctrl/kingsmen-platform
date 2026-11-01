@@ -20,6 +20,7 @@ export function evaluateMainBranchProtection(protection) {
     sourceGuardRequired: allRequiredCheckNames.some(
       (name) => name === 'source-guard' || name.endsWith('/source-guard')
     ),
+    releaseEvidenceRequired: allRequiredCheckNames.includes('Build, validate, and smoke-test'),
     strictStatusChecksEnabled: requiredStatusChecks?.strict === true,
     pullRequestReviewRequired: reviewCount >= 1,
     staleReviewsDismissed: reviewPolicy?.dismiss_stale_reviews === true,
@@ -34,6 +35,7 @@ export function evaluateMainBranchProtection(protection) {
   const requiredBooleanChecks = [
     'requiredStatusChecksEnabled',
     'sourceGuardRequired',
+    'releaseEvidenceRequired',
     'strictStatusChecksEnabled',
     'pullRequestReviewRequired',
     'staleReviewsDismissed',
