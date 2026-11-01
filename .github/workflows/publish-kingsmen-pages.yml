@@ -83,8 +83,8 @@ jobs:
           <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
             <url><loc>https://kingsmenportal-ctrl.github.io/kingsmen-platform/</loc></url>
             <url><loc>https://kingsmenportal-ctrl.github.io/kingsmen-platform/opportunities.html</loc></url>
-            <url><loc>https://kingsmenportal-ctrl.github.io/kingsmen-platform/funding.html</loc>
-    <url><loc>https://kingsmenportal-ctrl.github.io/kingsmen-platform/service-sectors.html</loc></url></url>
+            <url><loc>https://kingsmenportal-ctrl.github.io/kingsmen-platform/funding.html</loc></url>
+    <url><loc>https://kingsmenportal-ctrl.github.io/kingsmen-platform/service-sectors.html</loc></url>
             <url><loc>https://kingsmenportal-ctrl.github.io/kingsmen-platform/funding-readiness.html</loc></url>
             <url><loc>https://kingsmenportal-ctrl.github.io/kingsmen-platform/selection-readiness.html</loc></url>
             <url><loc>https://kingsmenportal-ctrl.github.io/kingsmen-platform/requirements-evidence.html</loc></url>
