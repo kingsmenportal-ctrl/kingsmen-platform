@@ -1,0 +1,45 @@
+<!doctype html>
+<html lang="en-ZA">
+<head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="description" content="Prepare safely for Kingsmen service payments, verify payment status and organise receipt evidence without sharing financial secrets."><title>Payment Safety & Receipt Readiness | Kingsmen</title><link rel="stylesheet" href="site.css"></head>
+<body>
+<header class="site-header"><div class="topline"><a class="brand" href="./index.html">KINGSMEN<small>OPPORTUNITY PLATFORM</small></a><nav class="nav" aria-label="Main navigation"><a href="./index.html">Home</a><a href="./funding.html">Funding</a><a href="./verification-safety.html">Verification & safety</a><a href="./payment-readiness.html" aria-current="page">Payment readiness</a><a href="./help.html">Help</a></nav></div></header>
+<main class="wrap">
+<p class="breadcrumb"><a href="./index.html">Home</a> / Payment Safety & Receipt Readiness</p>
+<section class="page-hero"><p class="eyebrow">Payments · fraud prevention · evidence</p><h1>Payment Safety & Receipt Readiness</h1><p class="lead">Use this checklist to prepare for a legitimate Kingsmen service payment, recognise the difference between a payment attempt and confirmed settlement, and keep the evidence needed to resolve a problem.</p></section>
+<div class="notice"><strong>Important platform boundary:</strong> This public page does not take payments, look up transactions, confirm settlement, issue invoices or activate a service plan. Never submit card details, banking credentials, passwords, PINs or one-time passwords into this checklist.</div>
+<section class="section"><div class="grid">
+<article class="card"><h3>1. Confirm the purchase</h3><p>Check the exact plan name, amount in ZAR, inclusions, exclusions, service term, cancellation and refund terms before authorising payment. If the checkout amount differs from the published offer, stop and contact Kingsmen through a verified channel.</p></article>
+<article class="card"><h3>2. Use the intended checkout</h3><p>Start from the official Kingsmen site or an authenticated Kingsmen account when that service is available. Check the domain carefully. Do not follow payment links sent by an unknown person or pay an individual account to secure a placement.</p></article>
+<article class="card"><h3>3. Keep proof securely</h3><p>Retain the official receipt, order reference, amount, currency, date and provider confirmation in a secure location. Redact account numbers and unrelated personal details before sharing evidence with support.</p></article>
+<article class="card"><h3>4. Do not assume activation</h3><p>A checkout page, bank notification or candidate-reported payment is not, by itself, proof that Kingsmen verified settlement. Service entitlements should activate only after the authorised payment confirmation has been validated and recorded.</p></article>
+<article class="card"><h3>5. Handle delays safely</h3><p>Do not pay a second time merely because a page timed out. Save the order reference and receipt, check the official account status when available, and ask support to reconcile the original transaction first.</p></article>
+<article class="card"><h3>6. Protect against fraud</h3><p>Kingsmen will not need your bank password, card PIN or OTP to investigate a receipt. Do not share a full card number or authentication secret. Contact your bank promptly if you suspect unauthorised activity.</p></article>
+</div></section>
+<section class="section"><div class="two-col"><div class="card"><p class="eyebrow">Local checklist</p><h2>Before you authorise payment</h2><p>Tick each item once you have independently checked it. Your progress is saved only in this browser on this device and is not sent to Kingsmen.</p>
+<form id="payment-checklist">
+<label class="check-item"><input type="checkbox" data-check="plan"> I checked the plan, price and service terms.</label>
+<label class="check-item"><input type="checkbox" data-check="domain"> I verified the official checkout domain.</label>
+<label class="check-item"><input type="checkbox" data-check="amount"> The checkout amount and currency match the intended purchase.</label>
+<label class="check-item"><input type="checkbox" data-check="refund"> I reviewed cancellation and refund terms.</label>
+<label class="check-item"><input type="checkbox" data-check="receipt"> I know where I will securely retain the receipt and order reference.</label>
+<label class="check-item"><input type="checkbox" data-check="secrets"> I will not share passwords, PINs, OTPs or banking secrets.</label>
+<div class="btn-row"><button class="btn btn-primary" type="button" id="reset-checklist">Reset checklist</button></div><p id="checklist-status" aria-live="polite">Progress is stored locally on this device.</p>
+</form></div>
+<div class="card"><p class="eyebrow">If payment is unclear</p><h2>Resolve before retrying</h2><ol><li>Keep the order reference and receipt in a secure place.</li><li>Record the date, amount and provider status; do not include card or bank secrets.</li><li>Check the official account status when the authenticated service is available.</li><li>Contact support through independently verified Kingsmen contact details.</li><li>Do not submit a duplicate payment unless the original transaction has been reconciled.</li></ol><p><a class="btn btn-outline" href="./help.html">Open help & safety guidance</a></p></div></div></section>
+<section class="section"><div class="card"><h2>Payment evidence states are different</h2><div class="steps">
+<div class="step"><div><h3>Checkout started</h3><p>A payment intent or checkout page exists. It is not evidence that money was received.</p></div></div>
+<div class="step"><div><h3>Candidate reports payment</h3><p>A bank alert or candidate statement can help investigation but is not provider-verified settlement.</p></div></div>
+<div class="step"><div><h3>Provider confirmation validated</h3><p>The payment provider's server notification, signature, merchant and amount checks have been validated and recorded.</p></div></div>
+<div class="step"><div><h3>Service entitlement activated</h3><p>The matching order and entitlement are updated after verified settlement. A payment receipt alone should not promise an outcome or guaranteed placement.</p></div></div>
+</div></div></section>
+<div class="notice"><strong>Truth boundary:</strong> This is a public, device-local readiness tool. It does not access your Kingsmen account, store transaction evidence on a server, contact PayFast, issue receipts or confirm that a payment is complete. Use only official support channels for real transactions.</div>
+</main>
+<footer class="footer"><div class="wrap footer-grid"><div><a class="brand" href="./index.html">KINGSMEN</a><p class="small">Public payment-safety information. No financial secrets are collected.</p></div><div><h3>Explore</h3><div class="footer-links"><a href="./funding.html">Funding resources</a><a href="./verification-safety.html">Verification & scam safety</a><a href="./payment-readiness.html">Payment readiness</a></div></div><div><h3>Information</h3><div class="footer-links"><a href="./help.html">Help & safety</a><a href="./about.html">About Kingsmen</a></div></div></div></footer>
+<script>
+(function(){'use strict';const KEY='kingsmen.payment-safety-readiness.v1',form=document.getElementById('payment-checklist'),status=document.getElementById('checklist-status'),boxes=Array.from(form.querySelectorAll('[data-check]'));
+function read(){try{const v=JSON.parse(localStorage.getItem(KEY)||'{}');return v&&typeof v==='object'?v:{}}catch(_){return{}}}
+function render(){const saved=read();boxes.forEach(b=>b.checked=Boolean(saved[b.dataset.check]));status.textContent=boxes.filter(b=>b.checked).length+' of '+boxes.length+' checks completed. Saved locally on this device; not sent to Kingsmen.'}
+boxes.forEach(b=>b.addEventListener('change',()=>{const saved=read();saved[b.dataset.check]=b.checked;localStorage.setItem(KEY,JSON.stringify(saved));render()}));
+document.getElementById('reset-checklist').addEventListener('click',()=>{localStorage.removeItem(KEY);boxes.forEach(b=>b.checked=false);status.textContent='Checklist reset on this device. Nothing was sent to Kingsmen.'});render()})();
+</script>
+</body></html>
