@@ -5,6 +5,7 @@ import path from "node:path";
 const root = process.cwd();
 const read = file => fs.readFileSync(path.join(root, file), "utf8");
 const migration = read("db/migrations/0107_application_capacity_entitlements_20261101.sql");
+const releaseCapacityFunction = migration.split("CREATE OR REPLACE FUNCTION public.release_candidate_application_capacity(")[1]?.split("$function$;")[0] ?? "";
 const api = read("apps/web/src/app/api/candidate/application-capacity/route.ts");
 const page = read("apps/web/src/app/candidate/application-capacity/page.tsx");
 const dashboard = read("apps/web/src/app/candidate/dashboard/page.tsx");
@@ -18,7 +19,7 @@ const checks = [
   ["order-time entitlement fields cannot be altered after creation", /FINANCE_ORDER_CAPACITY_TERMS_ARE_IMMUTABLE/.test(migration)],
   ["capacity requires a PAID order and a matching COMPLETE verified payment", /fo\.order_status='PAID'/.test(migration) && /fp\.payment_status='COMPLETE'/.test(migration) && /fp\.verified IS TRUE/.test(migration) && /fp\.amount_gross_cents=fo\.amount_cents/.test(migration)],
   ["only active ZAR service terms grant priority or managed capacity", /fo\.currency='ZAR'/.test(migration) && /fo\.service_term_days>0/.test(migration) && /period_expires_at/.test(migration)],
-  ["capacity release declares its own transaction timestamp for identity-link freshness", /release_candidate_application_capacity\\([\\s\\S]*v_now timestamptz:=clock_timestamp\\(\\)/.test(migration)],
+  ["capacity release declares its own transaction timestamp for identity-link freshness", releaseCapacityFunction.includes("v_now timestamptz:=clock_timestamp()")],
   ["finance orders match the Auth-bound candidate UUID while consent uses public_ref", /v_candidate_ref:=v_candidate::text/.test(migration) && /fo\.candidate_ref=v_candidate_ref/.test(migration) && /cv\.candidate_ref=v_candidate_ref/.test(migration) && /pc\.candidate_ref=v_public_ref/.test(migration)],
   ["candidate identity is derived from exactly one verified auth link", /auth\.uid\(\)/.test(migration) && /link_status='VERIFIED'/.test(migration) && /v_count<>1/.test(migration) && /verified_by IS NOT NULL/.test(migration)],
   ["reservations are candidate/application bound and idempotent", /FOREIGN KEY \(application_id,candidate_id\)/.test(migration) && /UNIQUE \(candidate_id,idempotency_key\)/.test(migration) && /candidate_capacity_one_active_use_per_application_uq/.test(migration)],
