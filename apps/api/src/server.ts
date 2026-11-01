@@ -513,12 +513,30 @@ export function createKingsmenApiServer() {
         return;
       }
 
-      // Application workbench remains fail-closed until its read model is loaded
-      // and its candidate owner can be compared to the verified identity.
+      // Application workbench reads require the same verified identity link as
+      // candidate reads, followed by an owner check against the persisted read model.
       const applicationId = getPathParam(/^\/api\/applications\/([^/]+)\/workbench$/, pathname);
       if (method === "GET" && applicationId) {
-        sendError(response, 503, "APPLICATION_AUTHORIZATION_NOT_CONFIGURED",
-          "Application workbench reads remain disabled until verified identity-to-application ownership is enforced.");
+        const identity = await resolveCandidateIdentity(
+          typeof request.headers.authorization === "string" ? request.headers.authorization : undefined
+        );
+        if (!identity.ok) {
+          sendError(response, identity.status, identity.code, "Application identity could not be authorised.");
+          return;
+        }
+
+        const application = truthVault.enabled
+          ? await truthVault.readApplicationWorkbench(applicationId)
+          : store.applications.get(applicationId);
+        if (!application) {
+          sendError(response, 404, "APPLICATION_WORKBENCH_NOT_FOUND", "No application workbench found.");
+          return;
+        }
+        if (application.candidateId !== identity.candidateId) {
+          sendError(response, 403, "APPLICATION_OWNERSHIP_MISMATCH", "The authenticated identity does not own this application.");
+          return;
+        }
+        await handleApplicationWorkbench(response, applicationId);
         return;
       }
 
