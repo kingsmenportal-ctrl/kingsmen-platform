@@ -44,10 +44,9 @@ async function authorizeFounder(req: Request, url: string, anonKey: string, admi
   const bearer = (req.headers.get("authorization") ?? "").replace(/^Bearer\s+/i, "");
   if (!bearer) return { ok: false, status: 401, reason: "UNAUTHENTICATED" };
 
-  // Supabase's verify_jwt gateway check is enabled for this function. The
-  // service-role path is intended only for trusted server-to-server callers.
-  if (tokenRole(req) === "service_role") return { ok: true, actorRef: "service_role" };
-
+  // Do not trust an unverified JWT payload role or allow service-role tokens
+  // to bypass Founder authorization. Every caller must resolve to a real user
+  // through Supabase Auth and hold an active, non-revoked PLATFORM_ADMIN grant.
   const authClient = createClient(url, anonKey, {
     auth: { persistSession: false, autoRefreshToken: false }
   });
