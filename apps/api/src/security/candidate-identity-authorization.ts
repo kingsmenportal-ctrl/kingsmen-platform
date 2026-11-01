@@ -3,7 +3,7 @@
  *
  * This deliberately uses only the public Supabase anon key plus the caller's
  * bearer token. The user's JWT must validate with Supabase Auth, and the
- * identity-link lookup must be visible under the caller's own RLS permissions.
+ * caller-scoped identity RPC must derive the link only from auth.uid().
  * Missing configuration, network errors, duplicate links, or unverified links
  * fail closed; never fall back to a service-role lookup or a caller-supplied ID.
  */
