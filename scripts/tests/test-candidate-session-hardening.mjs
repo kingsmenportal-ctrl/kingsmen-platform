@@ -22,8 +22,15 @@ const b = createCandidateSession({ candidateId: "candidate-a", expiresAt: expiry
 assert.equal(a.candidateId, "candidate-a");
 assert.notEqual(a.sessionId, b.sessionId, "session identifiers must be independently random");
 assert.match(a.sessionId, /^sess_[0-9a-f-]{36}$/i);
+const fingerprintOnly = createCandidateSession({
+  candidateId: "candidate-a",
+  expiresAt: expiry,
+  deviceFingerprintHash: "client-supplied-fingerprint"
+});
+assert.equal(fingerprintOnly.trustStatus, "UNTRUSTED", "a presented fingerprint must not self-assert device trust");
 assert.throws(() => createCandidateSession({ candidateId: " ", expiresAt: expiry }), /candidateId is required/);
-assert.throws(() => createCandidateSession({ candidateId: "candidate-a", expiresAt: "not-a-date" }), /valid date-time/);
+assert.throws(() => createCandidateSession({ candidateId: "candidate-a", expiresAt: "not-a-date" }), /ISO 8601/);
+assert.throws(() => createCandidateSession({ candidateId: "candidate-a", expiresAt: "1" }), /ISO 8601/);
 assert.throws(() => createCandidateSession({ candidateId: "candidate-a", expiresAt: new Date(Date.now() - 1000).toISOString() }), /future/);
 assert.throws(() => assertCandidateCanLogin("PENDING"), /cannot login/);
 assert.doesNotThrow(() => assertCandidateCanLogin("ACTIVE"));
