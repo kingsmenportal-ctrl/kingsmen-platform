@@ -243,7 +243,7 @@ jobs:
           python3 - <<'PY'
           from pathlib import Path
           html = (Path("site-dist") / "payment-readiness.html").read_text(encoding="utf-8")
-          required = ("kingsmen.payment-safety-readiness.v1", "localStorage.setItem", "localStorage.removeItem", 'aria-live="polite"', "not sent to Kingsmen", "candidate-reported payment", "provider confirmation validated", "does not take payments", "banking secrets")
+          required = ("kingsmen.payment-safety-readiness.v1", "localStorage.setItem", "localStorage.removeItem", 'aria-live="polite"', "not sent to Kingsmen", "candidate-reported payment", "Provider confirmation validated", "does not take payments", "banking secrets")
           missing = [item for item in required if item not in html]
           if missing:
               raise SystemExit(f"Payment Safety & Receipt Readiness contract failed; missing: {missing}")
