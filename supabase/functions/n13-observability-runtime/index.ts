@@ -2,6 +2,8 @@ import "jsr:@supabase/functions-js/edge-runtime.d.ts";
 import { createClient } from "npm:@supabase/supabase-js@2";
 import { deriveN13RuntimeHealthStatus } from "./policy.mjs";
 
+// Deployment contract: this founder-only function must be published with verify_jwt=true.
+
 const ALLOWED_ORIGINS = new Set([
   "https://kingsmen-portal-staging.netlify.app"
 ]);
