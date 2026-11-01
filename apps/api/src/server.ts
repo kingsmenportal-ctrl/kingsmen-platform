@@ -16,6 +16,7 @@ import type {
 } from "./read-models/candidate-read-model";
 import type { KingsmenState } from "./state/state-machine";
 import { TruthVaultRepository } from "./db/truth-vault-repository";
+import { candidateOwnsResource, resolveCandidateIdentity } from "./security/candidate-identity-authorization";
 import {
   handleJarvisRuntimeControlWithAdapter,
   type JarvisRuntimeServerStore
@@ -493,14 +494,48 @@ export function createKingsmenApiServer() {
         return;
       }
 
+      // Candidate status is released only after Supabase validates the bearer token
+      // and the caller's RLS-scoped identity link proves ownership of this candidate.
       const candidateId = getPathParam(/^\/api\/candidates\/([^/]+)\/status$/, pathname);
       if (method === "GET" && candidateId) {
+        const identity = await resolveCandidateIdentity(
+          typeof request.headers.authorization === "string" ? request.headers.authorization : undefined
+        );
+        if (!identity.ok) {
+          sendError(response, identity.status, identity.code, "Candidate identity could not be authorised.");
+          return;
+        }
+        if (!candidateOwnsResource(identity, candidateId)) {
+          sendError(response, 403, "CANDIDATE_OWNERSHIP_MISMATCH", "The authenticated identity does not own this candidate.");
+          return;
+        }
         await handleCandidateStatus(response, candidateId);
         return;
       }
 
+      // Application workbench reads require the same verified identity link as
+      // candidate reads, followed by an owner check against the persisted read model.
       const applicationId = getPathParam(/^\/api\/applications\/([^/]+)\/workbench$/, pathname);
       if (method === "GET" && applicationId) {
+        const identity = await resolveCandidateIdentity(
+          typeof request.headers.authorization === "string" ? request.headers.authorization : undefined
+        );
+        if (!identity.ok) {
+          sendError(response, identity.status, identity.code, "Application identity could not be authorised.");
+          return;
+        }
+
+        const application = truthVault.enabled
+          ? await truthVault.readApplicationWorkbench(applicationId)
+          : store.applications.get(applicationId);
+        if (!application) {
+          sendError(response, 404, "APPLICATION_WORKBENCH_NOT_FOUND", "No application workbench found.");
+          return;
+        }
+        if (!candidateOwnsResource(identity, application.candidateId)) {
+          sendError(response, 403, "APPLICATION_OWNERSHIP_MISMATCH", "The authenticated identity does not own this application.");
+          return;
+        }
         await handleApplicationWorkbench(response, applicationId);
         return;
       }
