@@ -19,7 +19,8 @@ const requiredFiles = [
   'docs/ops/KINGSMEN_BACKUP_RESTORE_PROOF.md',
   'scripts/backup/New-KingsmenTruthVaultBackup.ps1',
   'scripts/backup/Test-KingsmenTruthVaultRestore.ps1',
-  'scripts/backup/test-backup-restore-safety.mjs'
+  'scripts/backup/test-backup-restore-safety.mjs',
+  'scripts/backup/test-backup-restore-input-guard.ps1'
 ];
 
 const checks = [];
@@ -48,6 +49,7 @@ if (existsSync(rel('scripts/backup/New-KingsmenTruthVaultBackup.ps1'))) {
 if (existsSync(rel('scripts/backup/Test-KingsmenTruthVaultRestore.ps1'))) {
   const restoreScript = read('scripts/backup/Test-KingsmenTruthVaultRestore.ps1');
   check('restore_uses_pg_restore', restoreScript.includes('pg_restore'), 'pg_restore required for restore drill', 'scripts/backup/Test-KingsmenTruthVaultRestore.ps1');
+  check('restore_rejects_plaintext_before_database_access', restoreScript.indexOf('Unsupported backup format.') >= 0 && restoreScript.indexOf('Unsupported backup format.') < restoreScript.indexOf('$pgRestore = Get-Command') && restoreScript.indexOf('Unsupported backup format.') < restoreScript.indexOf('$sourceIdentityOutput = & psql'), 'Plaintext/unknown formats are rejected before database tool resolution or connection', 'scripts/backup/Test-KingsmenTruthVaultRestore.ps1');
   check('restore_uses_exit_on_error', restoreScript.includes('--exit-on-error'), 'partial restore errors must fail the drill', 'scripts/backup/Test-KingsmenTruthVaultRestore.ps1');
   check('restore_requires_explicit_confirmation', restoreScript.includes('ConfirmDestructiveRestore'), 'destructive restore requires an explicit operator confirmation', 'scripts/backup/Test-KingsmenTruthVaultRestore.ps1');
   check('restore_checks_database_identity', restoreScript.includes('current_database()') && restoreScript.includes('inet_server_addr()'), 'source and target identity must be compared at the database', 'scripts/backup/Test-KingsmenTruthVaultRestore.ps1');

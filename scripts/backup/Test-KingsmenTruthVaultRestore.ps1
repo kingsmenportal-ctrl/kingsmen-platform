@@ -12,6 +12,17 @@ param(
 )
 
 $ErrorActionPreference = "Stop"
+$restoreArchiveFile = $BackupFile
+$decryptedTempFile = $null
+trap {
+  $failureMessage = if ($_.Exception -and -not [string]::IsNullOrWhiteSpace($_.Exception.Message)) {
+    $_.Exception.Message
+  } else {
+    "Restore drill failed; no successful restore is claimed."
+  }
+  if ($decryptedTempFile -and (Test-Path $decryptedTempFile)) { Remove-Item -LiteralPath $decryptedTempFile -Force -ErrorAction SilentlyContinue }
+  throw $failureMessage
+}
 
 if ([string]::IsNullOrWhiteSpace($SourceDatabaseUrl)) {
   throw "KINGSMEN_DATABASE_URL is required so the source and restore targets can be compared. Do not print or commit the value."
@@ -46,6 +57,12 @@ if (-not $DryRun) {
 }
 if (-not (Test-Path $BackupFile)) {
   throw "Backup file not found: $BackupFile"
+}
+
+# The standard restore drill accepts authenticated encrypted envelopes only.
+# Reject plaintext/unknown formats before opening either database connection.
+if ([IO.Path]::GetExtension($BackupFile) -ine ".kmbak") {
+  throw "Unsupported backup format. Restore drills require an authenticated .kmbak archive; plaintext/legacy archives are rejected before database access."
 }
 
 $pgRestore = Get-Command "pg_restore" -ErrorAction SilentlyContinue
@@ -91,7 +108,18 @@ if (-not $DryRun) {
 }
 
 $sha256 = (Get-FileHash -Algorithm SHA256 -Path $BackupFile).Hash
-& pg_restore --list $BackupFile > $null 2>&1
+if ([IO.Path]::GetExtension($BackupFile) -ieq ".kmbak") {
+  if ([string]::IsNullOrWhiteSpace($env:KINGSMEN_BACKUP_PASSPHRASE) -or $env:KINGSMEN_BACKUP_PASSPHRASE.Length -lt 20) { throw "KINGSMEN_BACKUP_PASSPHRASE is required to decrypt the authenticated backup. Secret value is never printed." }
+  $encryptionHelper = Join-Path (Get-Location) "scripts/backup/encrypt-backup.mjs"
+  if (-not (Test-Path $encryptionHelper)) { throw "Authenticated backup encryption helper is missing." }
+  $node = Get-Command "node" -ErrorAction SilentlyContinue
+  if (-not $node) { throw "Node.js is required to decrypt the authenticated backup." }
+  $decryptedTempFile = Join-Path ([IO.Path]::GetTempPath()) ("kingsmen-restore-" + [guid]::NewGuid().ToString("N") + ".dump.partial")
+  & node $encryptionHelper decrypt $BackupFile $decryptedTempFile
+  if ($LASTEXITCODE -ne 0 -or -not (Test-Path $decryptedTempFile)) { throw "Backup decryption/authentication failed. Restore was not attempted." }
+  $restoreArchiveFile = $decryptedTempFile
+}
+& pg_restore --list $restoreArchiveFile > $null 2>&1
 if ($LASTEXITCODE -ne 0) {
   throw "Backup archive catalog verification failed. Restore was not attempted."
 }
@@ -108,7 +136,7 @@ $restoreExecuted = $false
 if (-not $DryRun) {
   # --exit-on-error prevents a partial restore from being treated as success.
   # This command is destructive to the target; an explicit switch is required.
-  & pg_restore --exit-on-error --clean --if-exists --no-owner --no-privileges --dbname=$RestoreDatabaseUrl $BackupFile > $null 2>&1
+  & pg_restore --exit-on-error --clean --if-exists --no-owner --no-privileges --dbname=$RestoreDatabaseUrl $restoreArchiveFile > $null 2>&1
   if ($LASTEXITCODE -ne 0) {
     throw "pg_restore reported an error. The restore drill is failed; database URLs remain redacted."
   }
@@ -166,6 +194,8 @@ $report = [ordered]@{
   sourceDatabaseIdentitySha256 = $sourceIdentityHash
   restoreDatabaseIdentitySha256 = $restoreIdentityHash
   backupArchiveCatalogVerified = $true
+  encryptedArchiveInput = ([IO.Path]::GetExtension($BackupFile) -ieq ".kmbak")
+  encryptedArchiveAuthenticatedBeforeRestore = ([IO.Path]::GetExtension($BackupFile) -ieq ".kmbak")
   generatedAtIso = $endedAt.ToUniversalTime().ToString("o")
   backupFile = $BackupFile
   backupSha256 = $sha256
@@ -187,6 +217,7 @@ Write-Host "Restore drill report written. Database URLs redacted."
 Write-Host $ReportPath
 $report | ConvertTo-Json -Depth 20
 
+if ($decryptedTempFile -and (Test-Path $decryptedTempFile)) { Remove-Item -LiteralPath $decryptedTempFile -Force; $decryptedTempFile = $null }
 if (-not $drillPassed) {
   if ($DryRun) { exit 0 }
   throw "Restore drill did not complete all required steps. Do not mark the backup/restore gate complete."

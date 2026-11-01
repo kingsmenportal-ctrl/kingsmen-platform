@@ -1,0 +1,101 @@
+name: Backup PostgreSQL 17 Encrypted Restore Integration
+
+on:
+  push:
+    branches: [fix/backup-archive-encryption-2026-10-31]
+    paths:
+      - "scripts/backup/encrypt-backup.mjs"
+      - "scripts/backup/test-backup-postgres-restore-integration.mjs"
+      - "scripts/backup/Test-KingsmenTruthVaultRestore.ps1"
+      - "scripts/backup/test-backup-restore-input-guard.ps1"
+      - "scripts/backup/test-backup-restore-safety.mjs"
+      - ".github/workflows/backup-postgres-restore-integration.yml"
+      - "package.json"
+  pull_request:
+    branches: [ops/backup-restore-safety-current-rc-2026-10-30]
+    paths:
+      - "scripts/backup/encrypt-backup.mjs"
+      - "scripts/backup/test-backup-postgres-restore-integration.mjs"
+      - "scripts/backup/Test-KingsmenTruthVaultRestore.ps1"
+      - "scripts/backup/test-backup-restore-input-guard.ps1"
+      - "scripts/backup/test-backup-restore-safety.mjs"
+      - ".github/workflows/backup-postgres-restore-integration.yml"
+      - "package.json"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  encrypted-input-guard:
+    name: plaintext-archive-rejection-before-database-access
+    runs-on: windows-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Reject plaintext and unknown archive formats before any database command
+        shell: pwsh
+        run: ./scripts/backup/test-backup-restore-input-guard.ps1
+
+  postgres-17-encrypted-restore:
+    name: postgres-17-encrypted-backup-restore-row-parity
+    runs-on: ubuntu-24.04
+    timeout-minutes: 15
+    services:
+      postgres:
+        image: postgres:17
+        env:
+          POSTGRES_USER: postgres
+          POSTGRES_PASSWORD: kingsmen-ci-only-password
+          POSTGRES_DB: postgres
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd "pg_isready -U postgres -d postgres"
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 10
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+          cache: "npm"
+
+      - name: Install postgres-client-17 tools
+        run: |
+          set -euo pipefail
+          sudo install -d /usr/share/keyrings
+          curl --fail --location https://www.postgresql.org/media/keys/ACCC4CF8.asc | sudo gpg --dearmor --yes -o /usr/share/keyrings/postgresql.gpg
+          echo "deb [signed-by=/usr/share/keyrings/postgresql.gpg] https://apt.postgresql.org/pub/repos/apt $(. /etc/os-release && echo "$VERSION_CODENAME")-pgdg main" | sudo tee /etc/apt/sources.list.d/pgdg.list
+          sudo apt-get update
+          sudo apt-get install --yes postgresql-client-17
+
+      - name: Install API PostgreSQL test dependency
+        run: npm install --prefix apps/api --no-audit --no-fund
+
+      - name: Generate and mask one-run test credentials
+        run: |
+          set -euo pipefail
+          test_passphrase="$(openssl rand -hex 32)"
+          echo "::add-mask::$test_passphrase"
+          echo "::add-mask::kingsmen-ci-only-password"
+          echo "KINGSMEN_BACKUP_PASSPHRASE=$test_passphrase" >> "$GITHUB_ENV"
+          unset test_passphrase
+
+      - name: Run encrypted pg_dump and isolated pg_restore parity test
+        run: npm run backup:test:postgres-restore
+        env:
+          KINGSMEN_BACKUP_TEST_ALLOW_MUTATION: "true"
+          KINGSMEN_BACKUP_TEST_HOST: "127.0.0.1"
+          KINGSMEN_BACKUP_TEST_PORT: "5432"
+          KINGSMEN_BACKUP_TEST_USER: "postgres"
+          KINGSMEN_BACKUP_TEST_SOURCE_DATABASE: "kingsmen_backup_source"
+          KINGSMEN_BACKUP_TEST_RESTORE_DATABASE: "kingsmen_backup_restore"
+          KINGSMEN_BACKUP_TEST_PG_DUMP_BIN: "/usr/lib/postgresql/17/bin/pg_dump"
+          KINGSMEN_BACKUP_TEST_PG_RESTORE_BIN: "/usr/lib/postgresql/17/bin/pg_restore"
+          PGPASSWORD: "kingsmen-ci-only-password"
