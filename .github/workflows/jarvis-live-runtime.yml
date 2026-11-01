@@ -3,13 +3,18 @@ name: Jarvis Live Runtime
 on:
   pull_request:
     paths:
+      - '.github/workflows/jarvis-live-runtime.yml'
       - 'packages/jarvis-core/**'
       - 'apps/api/src/jarvis/**'
       - 'apps/web/src/app/api/jarvis/**'
       - 'apps/web/src/app/admin/jarvis-*/**'
       - 'scripts/jarvis/**'
       - 'scripts/validators/validate-jarvis-*.mjs'
+      - 'supabase/functions/payfast-sandbox/**'
+      - 'supabase/migrations/*payfast*.sql'
+      - 'scripts/staging/test-payfast-atomic-checkout-contract.mjs'
       - 'package.json'
+      - 'package-lock.json'
   push:
     branches:
       - main
@@ -42,3 +47,9 @@ jobs:
 
       - name: Validate Jarvis live batch
         run: node scripts/validators/validate-jarvis-complete-live-batch.mjs
+
+      - name: Install locked dependencies for PayFast contract test
+        run: npm ci
+
+      - name: Validate PayFast checkout and settlement contract
+        run: npm run payments:test:atomic-checkout
