@@ -1,6 +1,6 @@
 import assert from "node:assert/strict";
 import { readFileSync } from "node:fs";
-import { deriveN13RuntimeHealthStatus } from "../../supabase/functions/n13-observability-runtime/policy.mjs";
+import { deriveN13RuntimeHealthStatus, projectN13FounderSnapshot } from "../../supabase/functions/n13-observability-runtime/policy.mjs";
 
 const functionSource = readFileSync(
   new URL("../../supabase/functions/n13-observability-runtime/index.ts", import.meta.url),
@@ -43,6 +43,41 @@ assert.equal(
   "green is allowed only after complete telemetry and service coverage"
 );
 
+const incompleteProjection = projectN13FounderSnapshot({
+  status: "UNKNOWN",
+  active_candidates: 0,
+  pending_workflows: 0,
+  failed_workflows: 0,
+  document_backlog: 0,
+  manual_fallback_backlog: 0,
+  payment_pending_count: 0,
+  source_review_backlog: 0,
+  incident_open_count: 0,
+  active_candidate_cap: 500
+});
+assert.equal(incompleteProjection.metricCountsAvailable, false);
+for (const field of [
+  "active_candidates",
+  "pending_workflows",
+  "failed_workflows",
+  "document_backlog",
+  "manual_fallback_backlog",
+  "payment_pending_count",
+  "source_review_backlog",
+  "incident_open_count"
+]) {
+  assert.equal(incompleteProjection[field], null, "unavailable " + field + " must not be presented as zero");
+}
+const completeProjection = projectN13FounderSnapshot({
+  status: "AMBER",
+  active_candidates: 12,
+  pending_workflows: 2,
+  active_candidate_cap: 500
+});
+assert.equal(completeProjection.metricCountsAvailable, true);
+assert.equal(completeProjection.active_candidates, 12, "complete aggregate values must remain visible");
+assert.equal(projectN13FounderSnapshot(null), null);
+
 for (const required of [
   "auth.getUser(bearer)",
   '"Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type"',
@@ -56,7 +91,11 @@ for (const required of [
   'from("service_health_checks").insert(checks)',
   'from("metric_samples").insert(metricRows)',
   'verify_jwt',
-  "productionReady: false"
+  "productionReady: false",
+  "projectN13FounderSnapshot",
+  "metricCountsAvailable",
+  "unavailableMetrics",
+  "data_available: available"
 ]) {
   assert.ok(functionSource.includes(required), "Missing runtime security or persistence contract: " + required);
 }
