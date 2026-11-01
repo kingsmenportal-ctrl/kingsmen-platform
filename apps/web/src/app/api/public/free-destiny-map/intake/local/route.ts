@@ -68,7 +68,7 @@ export async function POST(request: NextRequest) {
   const contentLengthHeader = request.headers.get("content-length");
   if (contentLengthHeader !== null) {
     const contentLength = Number(contentLengthHeader);
-    if (!/^\\d+$/.test(contentLengthHeader) || !Number.isSafeInteger(contentLength)) {
+    if (!/^[0-9]+$/.test(contentLengthHeader) || !Number.isSafeInteger(contentLength)) {
       return blockedResponse(backendBoundary, [{
         field: "contentLength",
         code: "INVALID_CONTENT_LENGTH",
