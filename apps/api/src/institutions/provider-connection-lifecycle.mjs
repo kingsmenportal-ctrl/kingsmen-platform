@@ -82,15 +82,15 @@ function hasRawCredentialMaterial(connector) {
 
 function buildResult(checks, now, provider, connector) {
   let rank = 0;
-  for (let index = 1; index < checks.length; index += 1) {
+  for (let index = 0; index < checks.length; index += 1) {
     if (!checks[index].passed) break;
-    rank = index;
+    rank = index + 1;
   }
   const approvedScopes = provider.authorization?.approved_scopes ?? [];
   const configuredScopes = connector.configured_scopes ?? [];
   const testedScopes = connector.last_test?.tested_scopes ?? [];
   const method = connector.method;
-  const automatedSubmission = rank >= 4
+  const automatedSubmission = rank >= 5
     && ["API", "AUTHORISED_BROWSER"].includes(method)
     && connector.submission_mode === "AUTOMATED_APPROVED"
     && approvedScopes.includes("SUBMIT")
