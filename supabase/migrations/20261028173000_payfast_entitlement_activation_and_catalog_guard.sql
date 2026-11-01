@@ -17,6 +17,21 @@ CREATE UNIQUE INDEX IF NOT EXISTS finance_payments_payfast_provider_payment_id_u
   ON public.finance_payments (provider, provider_payment_id)
   WHERE provider = 'PAYFAST' AND provider_payment_id IS NOT NULL;
 
+DO $payfast_itn_duplicate_guard$
+BEGIN
+  IF EXISTS (
+    SELECT 1 FROM public.payfast_itn_receipts
+    WHERE idempotency_key IS NOT NULL
+    GROUP BY idempotency_key HAVING count(*) > 1
+  ) THEN
+    RAISE EXCEPTION 'PAYFAST_DUPLICATE_ITN_KEYS_REQUIRE_RECONCILIATION';
+  END IF;
+END;
+$payfast_itn_duplicate_guard$;
+CREATE UNIQUE INDEX IF NOT EXISTS payfast_itn_receipts_idempotency_key_uidx
+  ON public.payfast_itn_receipts (idempotency_key)
+  WHERE idempotency_key IS NOT NULL;
+
 -- activate the purchased candidate service order only after verified ITN settlement.
 -- This migration intentionally does not enable live PayFast payments.
 
