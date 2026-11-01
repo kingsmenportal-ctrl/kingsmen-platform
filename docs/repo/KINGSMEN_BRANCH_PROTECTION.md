@@ -20,6 +20,7 @@ Kingsmen may not launch from an unprotected `main` branch.
 - required status checks enabled;
 - strict status checks enabled;
 - `source-guard` required;
+- `Build, validate, and smoke-test` required (repository tests, API/web builds, launch audit and runtime smoke tests);
 - admins included;
 - linear history required where available.
 
@@ -78,4 +79,4 @@ These commands prove that the branch-protection source boundary exists. They do 
 
 ## Launch status
 
-Public launch remains blocked until GitHub confirms branch protection is active and required source guard checks are passing.
+Public launch remains blocked until GitHub confirms branch protection is active and both `source-guard` and `Build, validate, and smoke-test` are passing.
