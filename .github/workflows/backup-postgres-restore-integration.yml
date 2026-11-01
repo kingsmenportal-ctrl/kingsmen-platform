@@ -21,6 +21,17 @@ permissions:
   contents: read
 
 jobs:
+  encrypted-input-guard:
+    name: plaintext-archive-rejection-before-database-access
+    runs-on: windows-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Reject plaintext and unknown archive formats before any database command
+        shell: pwsh
+        run: ./scripts/backup/test-backup-restore-input-guard.ps1
+
   postgres-17-encrypted-restore:
     name: postgres-17-encrypted-backup-restore-row-parity
     runs-on: ubuntu-24.04
