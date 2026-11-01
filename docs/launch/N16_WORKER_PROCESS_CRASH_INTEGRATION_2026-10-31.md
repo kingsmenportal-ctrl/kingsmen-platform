@@ -32,3 +32,32 @@ The test uses a test-only LOGIN/BYPASSRLS service_role credential inside CI. The
 ## What this proves and what it does not prove
 
 A passing CI run proves the worker process can be killed and recovered correctly around the N16 send boundary against PostgreSQL 17. It does not prove a deployed server runtime, production credentials, production workload, provider submission, monitoring/alert delivery, or a real staging process-kill drill. Those remain separately authorised release gates.
+
+## Staging migration and privilege reconciliation — 1 November 2026
+
+A fresh, read-only inspection of the connected Kingsmen staging Supabase project (euhubhhnumtibbyufghm) was performed on 1 November 2026.
+
+### Live database facts
+
+- PostgreSQL server version: **17.11**.
+- The migration ledger contains the three N16 recovery migrations:
+  - `20261025004936 n16_durable_worker_recovery_202610250001`
+  - `20261025004943 n16_worker_send_boundary_202610250002`
+  - `20261025004952 n16_exhausted_lease_recovery_202610250003`
+- The five N16 RPCs exist: `n16_claim_dispatches`, `n16_record_dispatch_result`, `n16_mark_dispatch_sent`, `n16_reconcile_expired_sent`, and `n16_deadletter_exhausted_locked`.
+- Privilege checks across all five RPCs returned `anon=false`, `authenticated=false`, and `service_role=true` for EXECUTE.
+- Privilege checks across `orchestrator_dispatch_queue`, `orchestrator_worker_results`, `orchestrator_execution_events`, and `orchestrator_manual_handoffs` returned no SELECT for `anon` or `authenticated`, and SELECT for `service_role`.
+
+These were read-only metadata, migration-ledger and privilege queries. No N16 migration was applied, no queue row was inserted or changed, and no staging worker was started or killed by this inspection.
+
+### Current deployment boundary
+
+The Netlify `kingsmen-portal-staging` configuration readback currently lists the public Supabase URL and client/publishable keys. It does not list a server-only `KINGSMEN_DATABASE_URL` or `DATABASE_URL` for a worker process. Its current published-deploy metadata also does not provide a usable deploy ID or commit SHA.
+
+The N16 process-kill workflow passed against a disposable PostgreSQL 17 test database in GitHub Actions. It is not a staging-process kill drill. The currently registered runtime handlers are the read-only `evidence.verify` handler and a synthetic-only staging probe; unknown worker codes are handed off. No provider-submission handler is registered.
+
+### Approval-authority hardening required before side-effect handlers
+
+The current runner checks `dispatch.payload.approvalGranted === true` and that `approvalEvidenceRef` is included in the dispatch's evidence-reference array. It does not yet resolve that reference to an authoritative, immutable approval record or verify the approving actor's authority, approved target/action, and approval validity window. That payload check is not sufficient evidence of founder/reviewer approval for a real external side effect.
+
+Accordingly, keep provider-side-effect handlers absent and the worker disabled until approval is validated against the governed approval record and actor authority, an independent security review approves that control, a dedicated runtime host and server-only database credential are configured, and a synthetic-only process-kill drill is completed on staging with redacted evidence.
