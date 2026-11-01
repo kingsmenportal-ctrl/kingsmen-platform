@@ -40,6 +40,6 @@ for (const group of ["ENTERPRISE", "CREATIVE_PROFESSIONAL", "TRANSPORT", "HEALTH
   assert.ok(typeSource.includes('| "' + group + '"'), "PublicSectorCard must permit group " + group);
   assert.ok(cards.some((card) => card.group === group), "at least one sector must map to " + group);
 }
-assert.match(readModelSource, /Email is the only enabled candidate communication channel; WhatsApp and SMS are disabled pending approval\./);
+assert.match(readModelSource, /Email is the only enabled external candidate communication channel\. WhatsApp is disabled\. SMS is disabled\./);
 assert.match(readModelSource, /A sector preview is not proof of a connected provider, live opening, or currently available service\./);
 console.log("Public service taxonomy regression checks passed: " + cards.length + " categories; " + requiredKeys.length + " required categories.");
