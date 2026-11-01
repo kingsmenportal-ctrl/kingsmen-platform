@@ -54,6 +54,16 @@ const linkOK = (candidateId, status = "VERIFIED") => response(200, [{ candidate_
   const result = await resolveCandidateIdentity(undefined, env, async () => { throw new Error("must not fetch"); });
   assert.deepEqual(result, { ok: false, status: 401, code: "AUTHENTICATION_REQUIRED" });
 }
+
+for (const authorization of ["", "Bearer", "Basic signed-user-token", "Bearer token extra", "Bearer  token with spaces"]) {
+  const result = await resolveCandidateIdentity(authorization, env, async () => { throw new Error("malformed authorization must not reach Supabase"); });
+  assert.deepEqual(result, { ok: false, status: 401, code: "AUTHENTICATION_REQUIRED" });
+}
+{
+  const fetcher = fetchSequence(authOK(USER_A), linkOK(CANDIDATE_A));
+  const result = await resolveCandidateIdentity("bearer signed-user-token", env, fetcher);
+  assert.equal(result.ok, true, "Bearer scheme matching must be case-insensitive");
+}
 {
   const result = await resolveCandidateIdentity("Bearer token", { SUPABASE_URL: URL }, async () => { throw new Error("must not fetch"); });
   assert.deepEqual(result, { ok: false, status: 503, code: "IDENTITY_AUTHORIZATION_NOT_CONFIGURED" });
