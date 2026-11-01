@@ -55,7 +55,6 @@ export interface PublicLeadInput {
   urgency?: "LOW" | "NORMAL" | "HIGH" | "URGENT";
   consentPopia: boolean;
   consentContactEmail: boolean;
-  consentWhatsappUrgentOnly: boolean;
   cvUploaded?: boolean;
   documentsUploaded?: boolean;
 }
