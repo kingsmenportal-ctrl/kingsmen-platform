@@ -222,6 +222,7 @@ async function capture(admin: any, req: Request, actorRef: string): Promise<Resp
   const evidenceRefs = [
     "supabase-edge:n13-observability-runtime",
     "aggregate-count-queries:" + observedAt,
+    "snapshot:" + snapshotRef,
     "founder-actor:" + actorRef
   ];
   const unavailableMetrics = Object.entries(metrics)
