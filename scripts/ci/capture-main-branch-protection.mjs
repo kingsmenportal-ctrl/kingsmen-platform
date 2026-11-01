@@ -55,8 +55,20 @@ function blockedChecks(reason) {
   };
 }
 
-if (!repository || !token) {
-  const report = await finish('BLOCKED_MISSING_GITHUB_CONTEXT', blockedChecks('Missing repository or token context.'));
+if (!repository) {
+  const report = await finish(
+    'BLOCKED_MISSING_GITHUB_CONTEXT',
+    blockedChecks('Missing GITHUB_REPOSITORY context.')
+  );
+  console.log(JSON.stringify(report, null, 2));
+  process.exit(1);
+}
+
+if (!token) {
+  const report = await finish(
+    'BLOCKED_MISSING_READ_TOKEN',
+    blockedChecks('Missing repository secret KINGSMEN_BRANCH_PROTECTION_READ_TOKEN. Configure a fine-grained token with repository Administration: read permission.')
+  );
   console.log(JSON.stringify(report, null, 2));
   process.exit(1);
 }
