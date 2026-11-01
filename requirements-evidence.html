@@ -1,0 +1,121 @@
+<!doctype html>
+<html lang="en-ZA">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="description" content="Map official provider requirements to candidate preparation and evidence states across South African education, training, funding and employment pathways.">
+<title>Requirements & Evidence Planner | Kingsmen</title>
+<link rel="stylesheet" href="site.css">
+</head>
+<body>
+<header class="site-header"><div class="topline"><a class="brand" href="./index.html">KINGSMEN<small>OPPORTUNITY PLATFORM</small></a><nav class="nav" aria-label="Main navigation"><a href="./index.html">Home</a><a href="./opportunities.html">Opportunities</a><a href="./application-guide.html">Application guide</a><a href="./opportunity-source-register.html">Source register</a><a href="./application-follow-up.html">Follow-up planner</a><a href="./help.html">Help</a></nav></div></header>
+<main class="wrap">
+<div class="breadcrumb"><a href="./index.html">Home</a> / Requirements & evidence planner</div>
+<section class="page-hero"><p class="eyebrow">Evidence-first application preparation</p><h1>Requirements & evidence planner</h1><p class="lead">Record each requirement from an official institution, training provider, funder or employer source. Track what you have checked and prepared while keeping your own report distinct from provider-confirmed receipt or acceptance.</p></section>
+<div class="notice"><strong>Accuracy and privacy:</strong> Confirm every requirement, deadline, fee and accepted document format using the official provider source. A checklist entry is not proof of eligibility or acceptance. Do not enter identity numbers, passwords, bank details, medical information or private document contents. This planner does not upload files.</div>
+<section class="section"><div class="card">
+<h2>Add a provider requirement</h2>
+<form id="requirement-form">
+<div class="toolbar">
+<div class="field"><label for="label">Opportunity / programme / role</label><input id="label" maxlength="100" required placeholder="Short, non-sensitive label"></div>
+<div class="field"><label for="pathway">Kingsmen pathway</label><select id="pathway" required><option value="">Choose pathway</option><option>Higher education</option><option>TVET</option><option>SETA / learnership</option><option>Internship</option><option>Apprenticeship</option><option>Employment</option><option>Funding</option></select></div>
+<div class="field"><label for="source">Official provider source (HTTPS)</label><input id="source" type="url" maxlength="500" required placeholder="https://official-provider.example"></div>
+<div class="field"><label for="checked">Date official source checked</label><input id="checked" type="date" required></div>
+<div class="field"><label for="deadline">Official deadline (optional)</label><input id="deadline" type="date"><small class="muted">Enter only a deadline confirmed by the provider.</small></div>
+<div class="field"><label for="category">Requirement type</label><select id="category" required><option>Eligibility / entry criteria</option><option>Qualification / academic record</option><option>Document / certificate</option><option>Work experience / skills</option><option>Application fee / cost</option><option>Assessment / selection</option><option>Reference / recommendation</option><option>Other provider requirement</option></select></div>
+</div>
+<div class="field"><label for="requirement">Requirement from the official source</label><input id="requirement" maxlength="180" required placeholder="Describe the requirement without entering personal data"></div>
+<div class="field"><label for="status">Evidence status</label><select id="status" required>
+<option value="not-checked">Not checked</option>
+<option value="official-confirmed">Requirement confirmed on the official source</option>
+<option value="candidate-ready">Candidate-reported ready — not provider-verified</option>
+<option value="prepared-private">Evidence prepared privately outside this tool</option>
+<option value="candidate-submitted">Candidate-reported submitted — not provider-confirmed</option>
+<option value="provider-received">Provider-confirmed received / accepted</option>
+<option value="provider-waived">Provider-confirmed not required / waived</option>
+</select></div>
+<div class="field"><label for="note">Non-sensitive next step / note</label><textarea id="note" maxlength="240" rows="2" placeholder="e.g. confirm accepted certificate format with admissions office"></textarea></div>
+<p class="small muted">The tool stores only the short requirement description, planning status and non-sensitive note. Keep actual certificates and private evidence in a secure location under your control.</p>
+<div class="btn-row"><button class="btn btn-primary" type="submit">Save requirement on this device</button><button class="btn btn-outline" type="reset">Reset form</button></div>
+<p id="form-status" role="status" aria-live="polite">No information is sent to Kingsmen.</p>
+</form></div></section>
+<section class="section"><div class="section-head"><div><p class="eyebrow">Local requirement register</p><h2>Your provider requirements</h2><p class="muted">Stored only in this browser. The provider's own records remain authoritative.</p></div><button class="btn btn-outline" type="button" id="clear-all">Clear all requirements</button></div><div id="plans" class="resource-list"></div><p id="empty" class="empty" style="display:block">No requirements saved on this device yet.</p><p id="list-status" class="small" role="status" aria-live="polite"></p></section>
+<section class="section"><div class="two-col">
+<article class="card"><h2>Evidence states mean different things</h2><div class="steps">
+<article class="step"><div><h3>Official requirement confirmed</h3><p>The requirement appears on an official source checked on the recorded date. It does not confirm that you meet it.</p></div></article>
+<article class="step"><div><h3>Candidate-reported ready or submitted</h3><p>This is your own report. It is not provider verification, receipt or acceptance.</p></div></article>
+<article class="step"><div><h3>Provider-confirmed received or waived</h3><p>Use only when official communication or the provider portal supports that exact state.</p></div></article>
+</div></article>
+<article class="card"><h2>Use the right authority</h2><ul><li>Eligibility and entry criteria come from the responsible institution or programme rules.</li><li>Application fees and payment instructions must be checked on the official provider channel.</li><li>Document formats, certification rules and validity periods can differ by provider.</li><li>Only the provider can confirm receipt, acceptance, waiver or a final outcome.</li></ul></article>
+</div></section>
+<div class="notice"><strong>Platform boundary:</strong> This is a public, browser-local planning utility. It is not Kingsmen's authenticated application workflow or Document Vault. It does not assess eligibility, validate certificates, submit applications, receive provider data or update a candidate profile.</div>
+</main>
+<footer class="footer"><div class="wrap footer-grid"><div><a class="brand" href="./index.html">KINGSMEN</a><p>One organised starting point for South African education, training, funding and work pathways.</p></div><div><h3>Prepare</h3><div class="footer-links"><a href="./application-guide.html">Application guide</a><a href="./funding-readiness.html">Funding readiness</a><a href="./selection-readiness.html">Selection & assessment readiness</a><a href="./application-follow-up.html">Application follow-up planner</a></div></div><div><h3>Verify</h3><div class="footer-links"><a href="./opportunity-source-register.html">Opportunity source register</a><a href="./verification-safety.html">Verification & scam safety</a><a href="./help.html">Help & privacy</a></div></div></div></footer>
+<script>
+(function(){
+'use strict';
+const KEY='kingsmen.requirements-evidence-planner.v1';
+const form=document.getElementById('requirement-form');
+const plans=document.getElementById('plans');
+const empty=document.getElementById('empty');
+const statuses={
+'not-checked':'Not checked',
+'official-confirmed':'Requirement confirmed on the official source',
+'candidate-ready':'Candidate-reported ready — not provider-verified',
+'prepared-private':'Evidence prepared privately outside this tool',
+'candidate-submitted':'Candidate-reported submitted — not provider-confirmed',
+'provider-received':'Provider-confirmed received / accepted',
+'provider-waived':'Provider-confirmed not required / waived'
+};
+const load=()=>{try{const v=JSON.parse(localStorage.getItem(KEY)||'[]');return Array.isArray(v)?v:[]}catch(_){return[]}};
+const save=v=>localStorage.setItem(KEY,JSON.stringify(v));
+const el=(tag,cls,value)=>{const e=document.createElement(tag);if(cls)e.className=cls;if(value!==undefined)e.textContent=value;return e};
+function render(){
+const data=load();plans.replaceChildren();empty.style.display=data.length?'none':'block';
+data.forEach((p,pi)=>{
+const card=el('article','card resource-card');
+card.append(el('span','pill',p.pathway));
+card.append(el('h3','',p.label));
+const link=el('a','',p.source);link.href=p.source;link.target='_blank';link.rel='noopener noreferrer';link.textContent='Open official provider source ↗';card.append(link);
+card.append(el('p','small','Source checked: '+p.checked+' · Official deadline: '+(p.deadline||'Not recorded')));
+p.requirements.forEach((q,qi)=>{
+const item=el('div','card');
+item.append(el('h4','',q.text));
+item.append(el('p','small',q.category+' · '+statuses[q.status]));
+if(q.note)item.append(el('p','',q.note));
+const del=el('button','btn btn-outline','Delete requirement');del.type='button';del.addEventListener('click',()=>{const d=load();d[pi].requirements.splice(qi,1);if(!d[pi].requirements.length)d.splice(pi,1);save(d);render();document.getElementById('list-status').textContent='Requirement deleted from this device.'});
+item.append(del);card.append(item);
+});
+plans.append(card);
+});
+const count=data.reduce((n,p)=>n+p.requirements.length,0);
+document.getElementById('list-status').textContent=count+' requirement'+(count===1?'':'s')+' across '+data.length+' local plan'+(data.length===1?'':'s')+'. Not sent to Kingsmen.';
+}
+form.addEventListener('submit',e=>{
+e.preventDefault();
+let source;
+try{const u=new URL(document.getElementById('source').value.trim());if(u.protocol!=='https:')throw new Error('HTTPS required');source=u.href}
+catch(_){document.getElementById('form-status').textContent='Enter a valid HTTPS official provider source.';return}
+const label=document.getElementById('label').value.trim();
+const pathway=document.getElementById('pathway').value;
+const checked=document.getElementById('checked').value;
+const deadline=document.getElementById('deadline').value;
+const requirement={text:document.getElementById('requirement').value.trim(),category:document.getElementById('category').value,status:document.getElementById('status').value,note:document.getElementById('note').value.trim()};
+try{
+const data=load();
+let plan=data.find(p=>p.label.toLowerCase()===label.toLowerCase()&&p.pathway===pathway&&p.source===source);
+if(!plan){plan={label,pathway,source,checked,deadline,requirements:[]};data.unshift(plan)}
+else{plan.checked=checked;plan.deadline=deadline}
+plan.requirements.push(requirement);
+save(data);render();form.reset();
+document.getElementById('form-status').textContent='Requirement saved on this device. No information was sent to Kingsmen.'
+}catch(_){document.getElementById('form-status').textContent='Could not save locally. Check browser storage settings.'}
+});
+document.getElementById('clear-all').addEventListener('click',()=>{
+if(confirm('Clear all provider requirements stored by this tool on this device?')){localStorage.removeItem(KEY);render();document.getElementById('form-status').textContent='All local requirements cleared. Nothing was sent to Kingsmen.'}
+});
+render();
+})();
+</script>
+</body>
+</html>
