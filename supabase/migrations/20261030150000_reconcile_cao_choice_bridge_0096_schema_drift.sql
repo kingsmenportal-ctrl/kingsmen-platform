@@ -39,8 +39,14 @@ BEGIN
   IF NOT EXISTS (
     SELECT 1 FROM pg_constraint
     WHERE conrelid = 'public.cao_choice_items'::regclass
-      AND conname = 'cao_choice_items_exactly_one_parent_check' AND contype = 'c'
-  ) THEN v_missing := array_append(v_missing, 'exactly-one-parent constraint'); END IF;
+      AND conname = 'cao_choice_items_exactly_one_parent_check'
+      AND contype = 'c'
+      AND convalidated
+      AND regexp_replace(lower(pg_get_constraintdef(oid)), '[[:space:]"]', '', 'g') =
+        'check(((application_idisnotnull)and(candidate_application_idisnull))or((application_idisnull)and(candidate_application_idisnotnull)))'
+  ) THEN
+    v_missing := array_append(v_missing, 'exact, validated exactly-one-parent CHECK predicate');
+  END IF;
 
   IF NOT EXISTS (
     SELECT 1 FROM pg_index i
@@ -158,6 +164,25 @@ BEGIN
 
   IF coalesce((SELECT relrowsecurity FROM pg_class WHERE oid = 'public.cao_choice_items'::regclass), false) = false THEN
     v_missing := array_append(v_missing, 'cao_choice_items RLS enabled');
+  END IF;
+
+  -- Fail closed unless the sole policy is the intended backend-only service_role policy.
+  -- Unexpected permissive policies can widen access even when RLS is enabled.
+  IF (
+    SELECT count(*) FROM pg_policies
+    WHERE schemaname = 'public' AND tablename = 'cao_choice_items'
+  ) <> 1 OR NOT EXISTS (
+    SELECT 1 FROM pg_policies
+    WHERE schemaname = 'public'
+      AND tablename = 'cao_choice_items'
+      AND policyname = 'service_role_all_cao_choice_items'
+      AND permissive = 'PERMISSIVE'
+      AND cmd = 'ALL'
+      AND roles = ARRAY['service_role']::name[]
+      AND coalesce(qual, '') = 'true'
+      AND coalesce(with_check, '') = 'true'
+  ) THEN
+    v_missing := array_append(v_missing, 'exact service_role-only RLS policy allowlist');
   END IF;
 
   -- RLS does not protect against TRUNCATE, which bypasses row-level policies.
