@@ -41,34 +41,34 @@ assert.doesNotMatch(migration, /grant select on public\.candidate_auth_identity_
 // RLS policies and application RPCs must use the same verified identity source
 // as the HTTP API. Do not leave candidate_accounts or JWT app_metadata as a
 // second candidate-ownership authority.
-assert.match(migration, /create or replace function kingsmen_security\\.current_authenticated_candidate_id\\(\\)/i);
-assert.match(migration, /from public\\.candidate_auth_identity_links as link/i);
-assert.match(migration, /link\\.supabase_user_id = \\(select auth\\.uid\\(\\)\\)/i);
-assert.match(migration, /link\\.link_status = 'VERIFIED'/i);
-assert.match(migration, /link\\.verified_at is not null/i);
-assert.match(migration, /link\\.verified_at <= now\\(\\)/i);
-assert.match(migration, /nullif\\(btrim\\(link\\.verified_by\\), ''\\) is not null/i);
+assert.match(migration, /create or replace function kingsmen_security\.current_authenticated_candidate_id\(\)/i);
+assert.match(migration, /from public\.candidate_auth_identity_links as link/i);
+assert.match(migration, /link\.supabase_user_id = \(select auth\.uid\(\)\)/i);
+assert.match(migration, /link\.link_status = 'VERIFIED'/i);
+assert.match(migration, /link\.verified_at is not null/i);
+assert.match(migration, /link\.verified_at <= now\(\)/i);
+assert.match(migration, /nullif\(btrim\(link\.verified_by\), ''\) is not null/i);
 const authenticatedHelperStart = migration.indexOf("create or replace function kingsmen_security.current_authenticated_candidate_id()");
 const authenticatedHelperEnd = migration.indexOf("revoke all on function kingsmen_security.current_authenticated_candidate_id()");
 assert.ok(authenticatedHelperStart >= 0 && authenticatedHelperEnd > authenticatedHelperStart);
 const authenticatedHelper = migration.slice(authenticatedHelperStart, authenticatedHelperEnd);
 assert.doesNotMatch(authenticatedHelper, /candidate_accounts|current_candidate_public_ref|app_metadata/i);
 
-assert.match(migration, /create or replace function kingsmen_security\\.current_candidate_id\\(\\)/i);
+assert.match(migration, /create or replace function kingsmen_security\.current_candidate_id\(\)/i);
 const legacyHelperStart = migration.indexOf("create or replace function kingsmen_security.current_candidate_id()");
 const legacyHelperEnd = migration.indexOf("revoke all on function kingsmen_security.current_candidate_id()");
 assert.ok(legacyHelperStart >= 0 && legacyHelperEnd > legacyHelperStart);
 const legacyHelper = migration.slice(legacyHelperStart, legacyHelperEnd);
-assert.match(legacyHelper, /select kingsmen_security\\.current_authenticated_candidate_id\\(\\)/i);
+assert.match(legacyHelper, /select kingsmen_security\.current_authenticated_candidate_id\(\)/i);
 assert.doesNotMatch(legacyHelper, /candidate_public_ref|app_metadata/i);
 
 assert.match(migration, /CANDIDATE_IDENTITY_ONE_CANDIDATE_UNIQUE_CONSTRAINT_REQUIRED/);
 assert.match(migration, /CANDIDATE_IDENTITY_ONE_USER_UNIQUE_CONSTRAINT_REQUIRED/);
-assert.match(migration, /link\\.verified_at is not null[\\s\\S]*link\\.verified_at <= now\\(\\)[\\s\\S]*nullif\\(btrim\\(link\\.verified_by\\), ''\\) is not null/i);
-assert.match(migration, /revoke all on function kingsmen_security\\.current_authenticated_candidate_id\\(\\) from public/i);
-assert.match(migration, /revoke all on function kingsmen_security\\.current_authenticated_candidate_id\\(\\) from anon/i);
-assert.match(migration, /revoke all on function kingsmen_security\\.current_candidate_id\\(\\) from public/i);
-assert.match(migration, /grant execute on function kingsmen_security\\.current_candidate_id\\(\\) to authenticated, service_role/i);
+assert.match(migration, /link\.verified_at is not null[\s\S]*link\.verified_at <= now\(\)[\s\S]*nullif\(btrim\(link\.verified_by\), ''\) is not null/i);
+assert.match(migration, /revoke all on function kingsmen_security\.current_authenticated_candidate_id\(\) from public/i);
+assert.match(migration, /revoke all on function kingsmen_security\.current_authenticated_candidate_id\(\) from anon/i);
+assert.match(migration, /revoke all on function kingsmen_security\.current_candidate_id\(\) from public/i);
+assert.match(migration, /grant execute on function kingsmen_security\.current_candidate_id\(\) to authenticated, service_role/i);
 
 
 console.log("PASS candidate status/application ownership routes and caller-scoped identity RPC security contract.");
