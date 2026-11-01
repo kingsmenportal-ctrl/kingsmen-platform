@@ -1,0 +1,60 @@
+<!doctype html>
+<html lang="en-ZA">
+<head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="theme-color" content="#10243a"><meta name="description" content="Organise official opportunity sources and track what has and has not been verified."><title>Opportunity Source Register | Kingsmen</title><link rel="stylesheet" href="site.css"></head>
+<body>
+<header class="site-header"><div class="topline"><a class="brand" href="./index.html">KINGSMEN<small>OPPORTUNITY PLATFORM</small></a><nav class="nav" aria-label="Main navigation"><a href="./index.html">Home</a><a href="./opportunities.html">Opportunities</a><a href="./funding.html">Funding</a><a href="./verification-safety.html">Verification safety</a><a href="./help.html">Help</a></nav></div></header>
+<main class="wrap">
+<p class="breadcrumb"><a href="./index.html">Home</a> / Opportunity Source Register</p>
+<section class="page-hero"><p class="eyebrow">Provider intelligence · evidence discipline</p><h1>Opportunity Source Register</h1><p class="lead">Keep a structured record of where an opportunity came from, when the source was checked, and which facts are actually evidenced. This register does not fetch, validate or publish live opportunities.</p></section>
+<div class="notice"><strong>Evidence rule:</strong> A source directory or saved link is not proof that a programme is open. Never label eligibility, a deadline, submission receipt or an outcome as confirmed unless the corresponding official evidence has been checked.</div>
+<section class="section">
+<div class="card">
+<h2>Add a source record</h2>
+<form id="source-form">
+<div class="toolbar">
+<div class="field"><label for="name">Provider / opportunity label</label><input id="name" maxlength="100" required placeholder="e.g. Provider name — programme name"></div>
+<div class="field"><label for="pathway">Pathway</label><select id="pathway" required><option value="">Choose pathway</option><option>Higher education</option><option>TVET</option><option>SETA / learnership</option><option>Internship</option><option>Apprenticeship</option><option>Employment</option><option>Funding</option><option>Accommodation</option><option>Other</option></select></div>
+<div class="field"><label for="sourceType">Source type</label><select id="sourceType" required><option value="">Choose type</option><option>Official provider page</option><option>Official government page</option><option>Official application portal</option><option>Other / unverified</option></select></div>
+<div class="field"><label for="url">Official source URL</label><input id="url" type="url" maxlength="500" required placeholder="https://…"></div>
+<div class="field"><label for="checked">Date source checked</label><input id="checked" type="date" required></div>
+<div class="field"><label for="freshness">Source freshness</label><select id="freshness" required><option value="Not checked">Not checked</option><option value="Current page reviewed">Current page reviewed</option><option value="Possibly stale">Possibly stale</option></select></div>
+<div class="field"><label for="openStatus">Open status</label><select id="openStatus" required><option value="Not verified">Not verified</option><option value="Officially open">Officially open — evidence checked</option><option value="Closed">Closed — evidence checked</option><option value="Unknown">Unknown / unclear</option></select></div>
+<div class="field"><label for="deadline">Deadline</label><input id="deadline" type="date"><small class="muted">Leave blank if not officially confirmed.</small></div>
+<div class="field"><label for="eligibility">Eligibility evidence</label><select id="eligibility" required><option value="Not checked">Not checked</option><option value="Official criteria reviewed">Official criteria reviewed</option><option value="Unclear">Unclear</option></select></div>
+<div class="field"><label for="notes">Non-sensitive evidence note</label><input id="notes" maxlength="240" placeholder="Page title, evidence date, next check"></div>
+</div>
+<p class="small muted">Only save non-sensitive notes. Do not enter ID numbers, login details, banking data, private documents or personal candidate records.</p>
+<div class="btn-row"><button class="btn btn-primary" type="submit">Save source record on this device</button><button class="btn btn-outline" type="reset">Reset form</button></div>
+<p id="status" aria-live="polite" role="status"></p>
+</form></div>
+</section>
+<section class="section"><div class="section-head"><div><p class="eyebrow">Your local register</p><h2>Saved source records</h2><p class="muted">Records stay in this browser on this device. They are not sent to Kingsmen or shared across devices.</p></div><button id="clear" class="btn btn-outline" type="button">Clear all records</button></div>
+<div id="records" class="resource-list"></div><p id="empty" class="card">No source records saved on this device yet.</p></section>
+<section class="section"><div class="card"><h2>Evidence states that must remain separate</h2><div class="steps">
+<div class="step"><div><h3>Source located</h3><p>A URL or directory entry exists. No claim about current availability is implied.</p></div></div>
+<div class="step"><div><h3>Current page reviewed</h3><p>The official page was reviewed on a recorded date. Re-check freshness before acting.</p></div></div>
+<div class="step"><div><h3>Open status / deadline / eligibility checked</h3><p>Each field needs its own official evidence. A verified deadline does not verify eligibility or availability.</p></div></div>
+<div class="step"><div><h3>Candidate submission reported</h3><p>Candidate-reported submission remains distinct from provider-confirmed receipt.</p></div></div>
+<div class="step"><div><h3>Provider receipt or decision confirmed</h3><p>Record confirmation only when supported by provider evidence. A receipt is not an offer or final outcome.</p></div></div>
+</div></div></section>
+<div class="notice"><strong>Current platform boundary:</strong> This is a browser-local planning utility, not the live Kingsmen provider database. It does not verify URLs, ingest listings, submit applications, send alerts, or synchronise records to the authenticated platform.</div>
+</main>
+<footer class="footer"><div class="wrap"><a class="brand" href="./index.html">KINGSMEN</a><p class="small">Public information utility · no candidate documents or sensitive identifiers should be stored here.</p></div></footer>
+<script>
+(function(){
+'use strict';
+const KEY='kingsmen.opportunity-source-register.v1';
+const form=document.getElementById('source-form'), records=document.getElementById('records'), empty=document.getElementById('empty'), status=document.getElementById('status');
+const get=()=>{try{const v=JSON.parse(localStorage.getItem(KEY)||'[]');return Array.isArray(v)?v:[]}catch(_){return[]}};
+const save=(v)=>localStorage.setItem(KEY,JSON.stringify(v));
+const el=(tag,cls,txt)=>{const n=document.createElement(tag);if(cls)n.className=cls;if(txt!==undefined)n.textContent=txt;return n};
+function render(){const data=get();records.replaceChildren();empty.style.display=data.length?'none':'block';data.forEach((r,i)=>{const c=el('article','card resource-card');c.append(el('h3','',r.name));c.append(el('p','small',r.pathway+' · '+r.sourceType));const link=el('a','',r.url);link.href=r.url;link.target='_blank';link.rel='noopener noreferrer';link.textContent='Open saved source ↗';c.append(link);c.append(el('p','small','Checked: '+r.checked+' · Freshness: '+r.freshness));c.append(el('p','small','Open status: '+r.openStatus+' · Deadline: '+(r.deadline||'Not recorded')));c.append(el('p','small','Eligibility: '+r.eligibility));if(r.notes)c.append(el('p','',r.notes));const b=el('button','btn btn-outline','Delete record');b.type='button';b.addEventListener('click',()=>{const d=get();d.splice(i,1);save(d);render();status.textContent='Source record deleted from this device.'});c.append(b);records.append(c)})}
+form.addEventListener('submit',e=>{e.preventDefault();const url=document.getElementById('url').value.trim();try{const u=new URL(url);if(u.protocol!=='https:'){status.textContent='Use an HTTPS source URL. Check that it belongs to the official provider.';return}}catch(_){status.textContent='Enter a valid source URL.';return}
+const r={name:document.getElementById('name').value.trim(),pathway:document.getElementById('pathway').value,sourceType:document.getElementById('sourceType').value,url,checked:document.getElementById('checked').value,freshness:document.getElementById('freshness').value,openStatus:document.getElementById('openStatus').value,deadline:document.getElementById('deadline').value,eligibility:document.getElementById('eligibility').value,notes:document.getElementById('notes').value.trim()};
+if(r.openStatus==='Officially open'&&!r.checked){status.textContent='Record the date you checked the official source before marking open status.';return}
+try{const d=get();d.unshift(r);save(d);render();form.reset();status.textContent='Saved on this device only. Kingsmen has not received this record.'}catch(_){status.textContent='Could not save locally. Check browser storage settings and available space.'}});
+document.getElementById('clear').addEventListener('click',()=>{if(confirm('Delete every source record stored by this register on this device?')){localStorage.removeItem(KEY);render();status.textContent='All local source records cleared.'}});
+render();
+})();
+</script>
+</body></html>
