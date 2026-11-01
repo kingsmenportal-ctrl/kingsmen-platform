@@ -1,0 +1,96 @@
+<!doctype html>
+<html lang="en-ZA">
+<head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="theme-color" content="#10243a">
+<meta name="description" content="Kingsmen Document Vault and identity review readiness: document limits, private storage, candidate isolation, reviewer decisions and audit controls.">
+<title>Document Vault & Identity Review Readiness | Kingsmen</title><link rel="stylesheet" href="site.css">
+</head>
+<body>
+<header class="site-header"><div class="topline"><a class="brand" href="./index.html">KINGSMEN<small>OPPORTUNITY PLATFORM</small></a><nav class="nav" aria-label="Main navigation"><a href="./index.html">Home</a><a href="./application-guide.html">Application guide</a><a href="./requirements-evidence.html">Requirements & evidence</a><a href="./provider-connection-readiness.html">Provider connections</a><a href="./help.html">Help</a></nav></div></header>
+<main class="wrap"><div class="breadcrumb"><a href="./index.html">Home</a> / Document Vault & identity review</div>
+<section class="page-hero"><p class="eyebrow">Candidate evidence, identity assurance and reviewer accountability</p><h1>Document Vault & identity review readiness</h1><p class="lead">Documents and identity evidence must be handled as protected candidate records. Kingsmen's intended Document Vault requires private storage, candidate-scoped access, integrity checks, human review and a complete audit trail. A file upload alone never proves identity or eligibility.</p></section>
+<section class="section"><div class="notice"><strong>Public-site boundary:</strong> This page is a readiness standard, not the authenticated Document Vault. This public site does not accept file uploads, store identity documents, verify identity or create reviewer decisions. Checklist flags are stored only in this browser and are <strong>not sent to Kingsmen</strong>. Do not upload or paste ID documents, passports, certificates, results, CVs or private evidence here.</div></section>
+<section class="section"><h2>Document acceptance and protection standard</h2><div class="grid">
+<article class="card"><span class="pill">Accepted formats</span><h3>Allow-listed file types</h3><p>PDF, JPEG and PNG only: <code>application/pdf</code>, <code>image/jpeg</code> and <code>image/png</code>. Validate actual file content and signatures server-side; never trust a filename or browser-supplied MIME type. Reject executable, archive, macro-enabled and unrecognised formats.</p></article>
+<article class="card"><span class="pill">Maximum size</span><h3>10 MiB per file</h3><p>Enforce the limit at the application boundary and storage layer. Return clear rejection reasons without exposing internal storage paths or implementation details.</p></article>
+<article class="card"><span class="pill">Integrity</span><h3>SHA-256 fingerprint</h3><p>Calculate SHA-256 server-side after upload and retain the digest with document metadata so stored objects can be checked for accidental change or mismatch.</p></article>
+<article class="card"><span class="pill">Storage</span><h3>Private object storage</h3><p>Store files in non-public private object storage under opaque keys. No public bucket, predictable object path or permanent public document URL.</p></article>
+<article class="card"><span class="pill">Access</span><h3>Expiring signed URLs</h3><p>Issue short-lived, purpose-limited expiring signed URLs only after authorisation. Re-check candidate ownership or reviewer assignment before every view and download.</p></article>
+<article class="card"><span class="pill">Inspection</span><h3>Safe review pipeline</h3><p>Validate file signatures, enforce size and format, malware-scan before reviewer access, quarantine unsafe files and avoid rendering untrusted content in privileged contexts.</p></article>
+</div></section>
+<section class="section"><h2>Candidate document journey</h2><div class="steps">
+<div class="step"><div><h3>Explain purpose and obtain consent</h3><p>Explain why a document is needed, who may review it, retention, correction and deletion. Collect only information necessary for the stated purpose.</p></div></div>
+<div class="step"><div><h3>Upload through the authenticated portal</h3><p>Verify the signed-in candidate. Enforce PDF/JPEG/PNG and 10 MiB limits on the server. Public information pages must never handle private uploads.</p></div></div>
+<div class="step"><div><h3>Validate, scan and fingerprint</h3><p>Check actual file type, size, integrity and malware result. Calculate a SHA-256 digest. Keep document contents out of ordinary application logs.</p></div></div>
+<div class="step"><div><h3>Store privately and confirm receipt</h3><p>Store under a non-public key and show a receipt/status. An upload receipt is not identity verification, eligibility approval or a provider outcome.</p></div></div>
+<div class="step"><div><h3>Review and allow correction</h3><p>An authorised human reviewer records a decision or requests a replacement with a specific reason. The candidate can see the request and submit corrected evidence.</p></div></div>
+<div class="step"><div><h3>Retain or delete under policy</h3><p>Use a documented retention schedule, justified legal hold where required, secure deletion and an auditable record. Do not retain files indefinitely by default.</p></div></div>
+</div></section>
+<section class="section"><h2>Identity review state model</h2><div class="two-col">
+<article class="card"><h3>Candidate-visible states</h3><div class="steps">
+<div class="step"><div><h3>Not provided</h3><p>No identity evidence submitted.</p></div></div>
+<div class="step"><div><h3>Uploaded — awaiting review</h3><p>The system received a file. Identity is not yet verified.</p></div></div>
+<div class="step"><div><h3>In review</h3><p>An authorised reviewer is assessing evidence.</p></div></div>
+<div class="step"><div><h3>Correction requested</h3><p>The candidate receives a reason and may submit corrected evidence.</p></div></div>
+<div class="step"><div><h3>Verified or not verified</h3><p>A human reviewer records the decision, reason, evidence reference and timestamp.</p></div></div>
+</div></article>
+<article class="card"><h3>Reviewer controls</h3><ul>
+<li>Require authenticated reviewer identity and an explicit reviewer role.</li>
+<li>Scope access to assigned cases and the minimum documents needed.</li>
+<li>Record evidence checked, decision, reason, reviewer ID and timestamp.</li>
+<li>Prevent reviewers from approving their own identity or bypassing policy.</li>
+<li>Provide a documented correction and appeal path.</li>
+<li>Keep candidate-level identity verification distinct from approval of an individual file.</li>
+</ul><p class="small muted">Reviewer approval is human-controlled. AI/Jarvis may assist with classification, completeness checks or anomaly flags, but must not autonomously approve identity, alter permissions or decide eligibility. Founder approval is required for privileged policy changes and release gates.</p></article>
+</div></section>
+<section class="section"><h2>Security, privacy and audit acceptance criteria</h2><div class="resource-list">
+<article class="card resource-card"><h3>Isolation and authorisation</h3><ul>
+<li>Candidate A must not read Candidate B's document metadata, files, signed links or review history.</li>
+<li>Test reciprocal Candidate A/B access denial with authenticated sessions.</li>
+<li>Reviewers access only cases within their authorised assignment.</li>
+<li>Enforce access in backend and storage policies, not merely client-side visibility.</li>
+<li>Keep service-role credentials server-side and out of browser bundles.</li>
+</ul></article>
+<article class="card resource-card"><h3>Audit and lifecycle</h3><ul>
+<li>Audit upload, validation, scan, view, download, correction, decision, replacement and deletion.</li>
+<li>Protect audit entries from ordinary candidate or reviewer modification.</li>
+<li>Minimise sensitive content in logs; record event metadata and references instead.</li>
+<li>Apply expiry, deletion and legal-hold rules to metadata and private objects consistently.</li>
+<li>Test encrypted backup and isolated restore parity for files, metadata and audit history.</li>
+</ul></article>
+</div></section>
+<section class="section"><div class="card">
+<div class="section-head"><div><p class="eyebrow">Device-local release checklist</p><h2>Vault and identity review gates</h2><p class="muted">This checklist stores only checked/not-checked flags in this browser. It does not prove backend controls have passed.</p></div><button class="btn btn-outline" type="button" id="clear-checklist">Clear checklist</button></div>
+<div class="steps" id="vault-checklist" aria-label="Document Vault release checklist">
+<label class="step"><input type="checkbox" data-check="consent"><span><strong>Purpose, consent and retention notice implemented</strong><br><span class="small muted">Candidate understands use, access, retention, correction and deletion.</span></span></label>
+<label class="step"><input type="checkbox" data-check="files"><span><strong>PDF/JPEG/PNG and 10 MiB server-side limits tested</strong><br><span class="small muted">Wrong signatures, misleading MIME types and oversized files rejected.</span></span></label>
+<label class="step"><input type="checkbox" data-check="hash"><span><strong>SHA-256 integrity evidence tested</strong><br><span class="small muted">Digest calculated and checked on stored-object retrieval.</span></span></label>
+<label class="step"><input type="checkbox" data-check="private"><span><strong>Private object storage and expiring signed URLs tested</strong><br><span class="small muted">No public bucket or permanent public document URL.</span></span></label>
+<label class="step"><input type="checkbox" data-check="scan"><span><strong>Malware scanning and unsafe-content rejection tested</strong><br><span class="small muted">Quarantine and fail-safe behavior verified.</span></span></label>
+<label class="step"><input type="checkbox" data-check="isolation"><span><strong>Candidate A/B and reviewer-scope isolation tested</strong><br><span class="small muted">Reciprocal access denial has authenticated proof.</span></span></label>
+<label class="step"><input type="checkbox" data-check="review"><span><strong>Human review and correction workflow tested</strong><br><span class="small muted">Decisions, reasons, reassessment and permission changes controlled.</span></span></label>
+<label class="step"><input type="checkbox" data-check="audit"><span><strong>Audit and retention/deletion lifecycle tested</strong><br><span class="small muted">Metadata, private objects and audit evidence remain consistent.</span></span></label>
+<label class="step"><input type="checkbox" data-check="restore"><span><strong>Encrypted backup and isolated restore validated</strong><br><span class="small muted">Files, metadata and audit history restore together.</span></span></label>
+<label class="step"><input type="checkbox" data-check="approval"><span><strong>Independent review and founder approval recorded</strong><br><span class="small muted">No production go-live based on checklist completion alone.</span></span></label>
+</div><p id="checklist-status" class="small muted" role="status" aria-live="polite">Checklist not yet saved.</p>
+</div></section>
+<section class="section"><div class="notice"><strong>Fail-closed release rule:</strong> Missing consent, private storage, candidate isolation, reviewer authorisation, scan evidence, audit integrity or restore proof blocks production release. Do not substitute a public page, browser checklist, successful build or AI recommendation for authenticated runtime evidence.</div><div class="btn-row"><a class="btn btn-primary" href="./requirements-evidence.html">Requirements & evidence planner</a><a class="btn btn-outline" href="./application-guide.html">Application preparation</a><a class="btn btn-outline" href="./provider-connection-readiness.html">Provider connection readiness</a></div></section>
+</main>
+<footer class="footer"><div class="wrap footer-grid"><div><a class="brand" href="./index.html">KINGSMEN</a><p>One organised starting point for South African education, training, funding and work pathways.</p><p class="small">This page defines intended Vault controls. The authenticated Document Vault is not enabled on this public website.</p></div><div><h3>Candidate preparation</h3><div class="footer-links"><a href="./application-guide.html">Application guide</a><a href="./requirements-evidence.html">Requirements & evidence</a><a href="./document-vault-readiness.html">Document Vault readiness</a></div></div><div><h3>Information</h3><div class="footer-links"><a href="./about.html">About Kingsmen</a><a href="./help.html">Help & safety</a><a href="./help.html#privacy">Privacy guidance</a></div></div></div></footer>
+<script>
+(function(){
+"use strict";
+var KEY="kingsmen.document-vault-readiness.v1";
+var checks=Array.prototype.slice.call(document.querySelectorAll("[data-check]"));
+var status=document.getElementById("checklist-status");
+var clear=document.getElementById("clear-checklist");
+function announce(){var n=checks.filter(function(x){return x.checked;}).length;status.textContent=n+" of "+checks.length+" release gates ticked on this device. No document or personal data is stored by this checklist; not sent to Kingsmen.";}
+function save(){try{localStorage.setItem(KEY,JSON.stringify(checks.map(function(x){return {id:x.dataset.check,done:x.checked};})));announce();}catch(e){status.textContent="Browser storage unavailable; checklist changes may not persist."}}
+function load(){try{var saved=JSON.parse(localStorage.getItem(KEY)||"[]");if(Array.isArray(saved)){saved.forEach(function(row){var item=checks.find(function(x){return x.dataset.check===row.id;});if(item)item.checked=row.done===true;});}}catch(e){status.textContent="Could not read browser-local checklist state.";}announce();}
+checks.forEach(function(x){x.addEventListener("change",save);});
+clear.addEventListener("click",function(){try{localStorage.removeItem(KEY);}catch(e){}checks.forEach(function(x){x.checked=false;});status.textContent="Checklist flags cleared from this device. No documents were affected; not sent to Kingsmen.";});
+load();
+})();
+</script>
+</body></html>
