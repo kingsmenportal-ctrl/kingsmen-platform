@@ -27,7 +27,10 @@ export function createCandidateSession(input: CandidateSessionRequest): Candidat
   const candidateId = typeof input.candidateId === "string" ? input.candidateId.trim() : "";
   if (!candidateId) throw new Error("candidateId is required.");
 
-  const expiry = Date.parse(input.expiresAt);
+  const expiryText = typeof input.expiresAt === "string" ? input.expiresAt.trim() : "";
+  const isoDateTime = /^\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}(?::\\d{2}(?:\\.\\d{1,9})?)?(?:Z|[+-]\\d{2}:\\d{2})$/i;
+  if (!isoDateTime.test(expiryText)) throw new Error("expiresAt must be an ISO 8601 date-time with an explicit timezone.");
+  const expiry = Date.parse(expiryText);
   if (!Number.isFinite(expiry)) throw new Error("expiresAt must be a valid date-time.");
   if (expiry <= Date.now()) throw new Error("expiresAt must be in the future.");
 
@@ -36,7 +39,11 @@ export function createCandidateSession(input: CandidateSessionRequest): Candidat
     candidateId,
     sessionId: `sess_${randomUUID()}`,
     deviceLabel: input.deviceLabel?.trim() || "Unknown device",
-    trustStatus: input.deviceFingerprintHash ? "TRUSTED" : "UNTRUSTED",
+    // A supplied fingerprint is client-provided evidence, not proof that this
+    // device was previously enrolled or cryptographically verified. New
+    // sessions therefore start UNTRUSTED; a separate server-side device
+    // verification workflow must promote trust.
+    trustStatus: "UNTRUSTED",
     createdAt: new Date().toISOString()
   };
 }
