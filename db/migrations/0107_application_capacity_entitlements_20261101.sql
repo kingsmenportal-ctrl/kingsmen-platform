@@ -354,7 +354,7 @@ BEGIN
      AND fp.currency='ZAR'
      AND fp.amount_gross_cents=(
        SELECT fo.amount_cents FROM public.finance_orders fo
-       WHERE fo.order_ref=v_order_ref AND fo.candidate_ref=v_public_ref
+       WHERE fo.order_ref=v_order_ref AND fo.candidate_ref=v_candidate::text
      )
      AND fp.verified_at=v_period_start AND fp.verified_at<=clock_timestamp()
    FOR SHARE;
