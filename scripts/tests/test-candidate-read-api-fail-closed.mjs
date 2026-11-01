@@ -27,4 +27,15 @@ assert.match(auth, /links\.length !== 1/);
 assert.match(auth, /IDENTITY_AUTHORIZATION_UNAVAILABLE/);
 assert.match(auth, /apikey: anonKey/);
 
-console.log("PASS candidate status reads require a verified Supabase identity link and exact candidate ownership; application reads remain fail-closed.");
+
+const migration = readFileSync(new URL("../../supabase/migrations/20261101121500_caller_scoped_candidate_identity_rpc.sql", import.meta.url), "utf8");
+assert.match(migration, /security definer/i);
+assert.match(migration, /set search_path = ''/i);
+assert.match(migration, /auth\.uid\(\)/);
+assert.match(migration, /count\(\*\)[\s\S]*= 1/);
+assert.match(migration, /revoke all on function public\.resolve_my_candidate_identity\(\) from public/i);
+assert.match(migration, /revoke all on function public\.resolve_my_candidate_identity\(\) from anon/i);
+assert.match(migration, /grant execute on function public\.resolve_my_candidate_identity\(\) to authenticated/i);
+assert.doesNotMatch(migration, /grant select on public\.candidate_auth_identity_links/i);
+
+console.log("PASS candidate status/application ownership routes and caller-scoped identity RPC security contract.");
