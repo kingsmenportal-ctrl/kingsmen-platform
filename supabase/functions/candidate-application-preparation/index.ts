@@ -171,9 +171,21 @@ Deno.serve(async(req:Request)=>{
    .select("application_id,event_type,from_status,to_status,reason_code,evidence_ref,details,created_at")
    .eq("candidate_id",candidateId).order("created_at",{ascending:false}).limit(200);
   if(applicationEventError){console.error("application timeline load failed",applicationEventError.code??"unknown");return reply(503,{error:"Could not load application timeline evidence."},origin);}
+  // Evidence rows are service-role-only. This read is permitted only after the bearer
+  // was verified above and candidateId was derived from the single verified Auth link.
+  // Return review metadata only: never expose private object locators or storage paths.
+  let applicationEvidence:any[]=[];
+  if(applicationIds.length){
+   const result=await admin.from("candidate_application_evidence")
+    .select("application_id,evidence_ref,evidence_type,source_label,captured_at,verification_status,verified_by_auth_user_id,verified_at,created_at")
+    .eq("candidate_id",candidateId).in("application_id",applicationIds)
+    .order("created_at",{ascending:false}).limit(200);
+   if(result.error){console.error("application evidence metadata lookup failed",result.error.code??"unknown");return reply(503,{error:"Could not load provider-receipt evidence metadata."},origin);}
+   applicationEvidence=result.data??[];
+  }
   return reply(200,{ready:true,trackers:trackers??[],items,masterTargets:masterTargets??[],
-   parentApplications,masterEvents:masterEvents??[],applicationEvents:applicationEvents??[],
-   message:"Saved application and preparation records loaded. No provider submission is implied."},origin);
+   parentApplications,masterEvents:masterEvents??[],applicationEvents:applicationEvents??[],applicationEvidence,
+   message:"Saved application records and candidate-owned evidence metadata loaded. Provider receipt remains unconfirmed unless matching reviewer-verified receipt evidence exists."},origin);
  }
  if(p.action==="start_from_saved_route"){
   const routeId=typeof p.route_programme_id==="string"?p.route_programme_id:"";
