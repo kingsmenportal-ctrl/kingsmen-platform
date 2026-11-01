@@ -246,6 +246,9 @@ export default function CandidateApplicationsPage() {
                 <p className="mt-1"><strong>Readiness:</strong> {application.readiness_status.replaceAll("_"," ")}</p>
                 <p className="mt-1"><strong>Provider submission:</strong> Not confirmed by this draft record.</p>
                 <p className="mt-1 text-xs text-slate-400">Last saved: {new Date(application.updated_at).toLocaleString()}</p>
+                <a href={`/candidate/applications/${application.id}`} className="mt-4 inline-flex rounded-xl bg-cyan-300 px-4 py-2 text-sm font-bold text-slate-950">
+                  {["DRAFT", "READINESS_BLOCKED", "READY_FOR_REVIEW", "READY_TO_SUBMIT"].includes(application.status) ? "Open / resume application draft" : "View application record"}
+                </a>
               </div>}
               {application && <section className="mt-3 rounded-xl border border-slate-700 bg-slate-950 p-4" aria-label="Opportunity eligibility and deadline checks">
                 <h4 className="font-semibold">Opportunity eligibility &amp; deadline checks</h4>
