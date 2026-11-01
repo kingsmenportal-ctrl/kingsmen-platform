@@ -31,6 +31,8 @@ assert.match(migration, /finance_payments_payfast_provider_payment_id_uidx/, "pr
 assert.match(migration, /payfast_itn_receipts_idempotency_key_uidx/, "ITN receipt idempotency key must be unique at database level");
 assert.match(migration, /PAYFAST_DUPLICATE_ITN_KEYS_REQUIRE_RECONCILIATION/, "existing duplicate ITN keys must fail migration rather than be silently ignored");
 assert.match(edge, /fields\.amount_net \?\? \(gross \+ fee\) \/ 100/, "missing net amount must use signed fee reconciliation");
+assert.match(edge, /Math\.round\(Number\(fields\.amount_fee \?\? "0"\) \* 100\)/, "ITN fee must be preserved as a signed integer-cent amount");
+assert.match(edge, /p_amount_fee_cents: fee[\s\S]*?p_amount_net_cents: net/, "settlement RPC must receive the signed fee and reconciled net amounts");
 assert.match(migration, /PAYFAST_DUPLICATE_PROVIDER_PAYMENT_IDS_REQUIRE_RECONCILIATION/, "existing duplicate provider IDs must fail migration rather than be silently ignored");
 assert.doesNotMatch(migration, /p_amount_fee_cents < 0/, "negative PayFast amount_fee must be accepted");
 assert.match(migration, /candidate_service_orders[\s\S]*?'PENDING_PAYMENT'[\s\S]*?payfast_settle_sandbox_payment/, "checkout and settlement must include candidate service orders");
