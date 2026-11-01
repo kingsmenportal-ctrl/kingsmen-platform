@@ -267,6 +267,7 @@ DECLARE
   v_uid uuid:=auth.uid(); v_candidate uuid; v_public_ref text; v_now timestamptz:=clock_timestamp();
   v_status text; v_summary jsonb; v_order_ref text; v_period_start timestamptz; v_period_end timestamptz;
   v_limit integer; v_used integer; v_existing public.candidate_application_capacity_reservations%ROWTYPE;
+  v_payment_ref text;
 BEGIN
   IF v_uid IS NULL THEN RAISE EXCEPTION 'AUTHENTICATED_CANDIDATE_REQUIRED' USING ERRCODE='42501'; END IF;
   IF p_application_id IS NULL OR p_usage_type IS NULL
@@ -332,8 +333,29 @@ BEGIN
       'message','A verified active paid plan is required for priority or managed-route capacity. The catalogue remains available.');
   END IF;
   v_order_ref:=v_summary->>'order_ref';
+  v_payment_ref:=v_summary->>'verified_payment_ref';
   v_period_start:=(v_summary->>'verified_at')::timestamptz;
   v_period_end:=(v_summary->>'expires_at')::timestamptz;
+
+  -- Hold the verified order and latest PayFast payment state stable until this
+  -- reservation commits. A concurrent refund/dispute cannot race capacity allocation.
+  PERFORM fo.order_ref FROM public.finance_orders fo
+   WHERE fo.order_ref=v_order_ref AND fo.candidate_ref=v_public_ref
+     AND fo.order_status='PAID' AND fo.entitlement_policy_version='KINGSMEN_CAPACITY_2026_11_01_V1'
+   FOR SHARE;
+  IF NOT FOUND THEN
+    RAISE EXCEPTION 'VERIFIED_PAID_PLAN_REQUIRED' USING ERRCODE='42501';
+  END IF;
+  PERFORM fp.payment_ref FROM public.finance_payments fp
+   WHERE fp.payment_ref=v_payment_ref AND fp.order_ref=v_order_ref
+     AND fp.candidate_ref=v_public_ref AND fp.provider='PAYFAST'
+     AND fp.payment_status='COMPLETE' AND fp.verified IS TRUE
+     AND fp.currency='ZAR'
+   FOR SHARE;
+  IF NOT FOUND OR v_period_end<=clock_timestamp() THEN
+    RAISE EXCEPTION 'VERIFIED_PAID_PLAN_EXPIRED_OR_REVOKED' USING ERRCODE='42501';
+  END IF;
+
   IF p_usage_type='PRIORITY_APPLICATION' THEN
     v_limit:=coalesce((v_summary->>'priority_application_limit')::integer,0);
     v_used:=coalesce((v_summary->>'priority_application_used')::integer,0);
