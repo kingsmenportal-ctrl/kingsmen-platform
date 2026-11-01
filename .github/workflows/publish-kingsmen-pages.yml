@@ -128,7 +128,7 @@ jobs:
               raise SystemExit(f"2027 Funding & Bursary Watch contract failed; missing: {missing}")
           if "fetch(" in html or "XMLHttpRequest" in html:
               raise SystemExit("Funding watch must not transmit candidate data or claim a live feed")
-          if "applications closed" not in html.lower() or 'data-status="closed"' not in html:
+          if "applications are closed" not in html.lower() or 'data-status="closed"' not in html:
               raise SystemExit("Closed NSFAS cycle must remain clearly closed")
           print("2027 Funding & Bursary Watch contract passed: official sources, dated status, deadlines, filters, and closed-cycle separation.")
           PY
