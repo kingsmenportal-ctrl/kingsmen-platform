@@ -25,7 +25,7 @@ const checks = [
   ["application status remains DRAFT and provider submission is explicitly false", migration.includes("'DRAFT'") && migration.includes("'provider_submission_sent', false") && migration.includes("'NOT_SUBMITTED'")],
   ["candidate UI distinguishes candidate-specific match from final provider eligibility", tracker.includes("Candidate-specific N15 match approved with supporting evidence") && tracker.includes("not a provider decision or a guarantee")],
   ["candidate UI presents the evidenced application window and checked timestamp", tracker.includes("CONFIRMED_OPEN_WINDOW") && tracker.includes("deadline_closes_at") && tracker.includes("deadline_ref") && tracker.includes("source_checked_at")],
-  ["candidate-facing function remains called through authenticated preparation RPC", preparation.includes("prepare_candidate_application_from_master_target") && preparation.includes("candidate-specific") || preparation.includes("prepare_candidate_application_from_master_target")],
+  ["candidate-facing API forwards the candidate bearer to the authenticated preparation RPC", preparation.includes('Authorization:"Bearer "+token') && preparation.includes('userClient.rpc("prepare_candidate_application_from_master_target"')],
   ["readiness validation runs in Candidate Experience CI", packageJson.scripts["candidate:experience:check"].includes("validate-application-readiness-eligibility-deadline.mjs")]
 ];
 let failed = 0;
