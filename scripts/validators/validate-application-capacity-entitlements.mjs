@@ -24,6 +24,7 @@ const checks = [
   ["candidate identity is derived from exactly one verified auth link", /auth\.uid\(\)/.test(migration) && /link_status='VERIFIED'/.test(migration) && /v_count<>1/.test(migration) && /verified_by IS NOT NULL/.test(migration)],
   ["reservations are candidate/application bound and idempotent", /FOREIGN KEY \(application_id,candidate_id\)/.test(migration) && /UNIQUE \(candidate_id,idempotency_key\)/.test(migration) && /candidate_capacity_one_active_use_per_application_uq/.test(migration)],
   ["allocation uses a transaction advisory lock before checking usage", /pg_advisory_xact_lock/.test(migration) && /candidate-application-capacity:/.test(migration)],
+  ["active reservations remain counted across overlapping plan upgrades", !migration.includes("r.entitlement_order_ref=v_order.order_ref") && /r.period_expires_at>v_now/.test(migration)],
   ["priority and managed-route usage are accounted independently", /PRIORITY_APPLICATION/.test(migration) && /MANAGED_ROUTE/.test(migration) && /priority_application_limit/.test(migration) && /managed_route_limit/.test(migration)],
   ["CV Revamp bonus requires prior verified CV Revamp ownership", /cv\.plan_code='CV_REVAMP_R49_99'/.test(migration) && /cvp\.verified IS TRUE/.test(migration) && /cvp\.verified_at<=v_order\.verified_at/.test(migration)],
   ["catalogue access is explicitly independent of paid capacity", /ALL_SIX_PATHWAYS/.test(migration)],
