@@ -40,3 +40,10 @@ The current N13 backend intentionally reports `coverage: PARTIAL` and `productio
 This UI is integrated into the N13 workstream branch and requires the N13 Edge Function to be deployed with JWT verification enabled. It is not deployed to staging or production by this source change.
 
 At the 1 November 2026 inspection, the staging Supabase Edge Function inventory did not contain `n13-observability-runtime`; the staging migration ledger ended at 0095. The function must not be deployed from an unmerged draft. Independent review, approved merge, deployment with `verify_jwt=true`, authenticated founder runtime tests and redacted evidence capture remain release gates.
+
+
+## Atomic capture hardening — 1 November 2026
+
+The N13 capture path uses the migration `20261101170000_n13_atomic_observability_capture.sql` to commit the health snapshot, service checks and metric samples in one PostgreSQL transaction. A transaction-level advisory lock enforces the 60-second capture cooldown so concurrent requests cannot race past the limit. The RPC validates JSON object/array types and batch bounds, uses a pinned `pg_catalog` search path, and is executable only by `service_role`.
+
+The Edge Function still authenticates every caller with Supabase Auth and checks the active, non-revoked `PLATFORM_ADMIN` grant. The persisted evidence references the opaque `platform_reviewers.id` rather than a generic Founder actor marker. The SQL migration must be independently reviewed and applied only after migration provenance and protected backup/restore gates pass. This source change does not deploy or apply the migration.
