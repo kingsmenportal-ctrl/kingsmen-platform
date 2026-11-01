@@ -47,6 +47,12 @@ npm run kingsmen:launch:audit
 
 It does **not** run `npm run kingsmen:launch:gate` because the public launch gate is intentionally blocked until real staging evidence exists. The source guard protects merges; the launch gate protects public release.
 
+## Continuous evidence capture
+
+The read-only evidence workflow at `.github/workflows/kingsmen-branch-protection-evidence.yml` runs for pull requests targeting `main`, pushes to `main`, and manual dispatch. It queries the real GitHub branch-protection endpoint, records a redacted report, and uploads that report even when the protection check blocks.
+
+A missing or inaccessible protection endpoint must remain a failed/blocked result. This workflow does not apply protection and cannot replace the one-time administrator action below. A green source-level check proves only that the verifier is implemented; it does not prove that GitHub settings are active.
+
 ## Apply command
 
 Run from repo root after authenticating `gh` with admin access:
