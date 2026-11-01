@@ -99,6 +99,7 @@ for (const required of [
 ]) {
   assert.ok(functionSource.includes(required), "Missing runtime security or persistence contract: " + required);
 }
+assert.ok(!functionSource.includes("function tokenRole("), "No unverified JWT role decoder may remain in the Founder runtime.");
 assert.ok(!/select\(["']\*["']\)/.test(functionSource), "The founder runtime must not select entire database rows.");
 for (const sensitiveField of ['select("email', 'select("phone', 'select("candidate_id', 'select("document_url', 'select("id_number']) {
   assert.ok(!functionSource.includes(sensitiveField), "The founder runtime must not select candidate PII or ownership identifiers: " + sensitiveField);
