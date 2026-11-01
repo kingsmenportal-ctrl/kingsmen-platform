@@ -35,7 +35,15 @@ const checks = [
   ["candidate UI covers all six pathways and explicit unknown deadline state", ["HIGHER_EDUCATION","TVET","SETA_LEARNERSHIPS","INTERNSHIPS","APPRENTICESHIPS","EMPLOYMENT"].every(x => page.includes(x)) && /Not verified/.test(page)],
   ["candidate UI opens only the official opportunity link", /href=\{item\.official_link\}/.test(page) && /rel="noopener noreferrer"/.test(page)],
   ["operator ingestion UI exposes controlled manual run", /Run source ingestion/.test(fs.readFileSync(path.join(root, "apps/web/src/app/operator/opportunities/ingestion/page.tsx"), "utf8")) && /authorised platform reviewer/.test(fs.readFileSync(path.join(root, "apps/web/src/app/operator/opportunities/ingestion/page.tsx"), "utf8"))],
+
+  ["run history GET is included in the narrow endpoint method allowlist", /Access-Control-Allow-Methods": "GET, POST, OPTIONS"/.test(ingestion) && /req\\.method !== "GET" && req\\.method !== "POST"/.test(ingestion)],
+  ["run history uses an explicit aggregate-only field allowlist capped at 50", /if \\(req\\.method === "GET"\\)[\\s\\S]*?\\.select\\("run_ref,status,sources_checked,sources_succeeded,observations_created,observations_updated,observations_skipped,started_at,finished_at"\\)[\\s\\S]*?\\.limit\\(50\\)/.test(ingestion) && !/\\.select\\(".*summary/.test(ingestion)],
+  ["run history is returned only after the exact service-key or verified-reviewer gate", /if \\(bearer !== key\\)[\\s\\S]*?authClient\\.auth\\.getUser\\(bearer\\)[\\s\\S]*?if \\(req\\.method === "GET"\\)/.test(ingestion)],
+  ["operator page reads history with GET and starts ingestion only through the explicit POST action", /method: "GET"/.test(operatorPage) && /method: "POST"/.test(operatorPage) && /onClick=\\{runIngestion\\}/.test(operatorPage) && !/SUPABASE_SERVICE_ROLE_KEY/.test(operatorPage)],
+  ["operator history UI shows timestamps, source counts and observation totals", /Recent ingestion runs/.test(operatorPage) && /formatDate\\(run\\.started_at\\)/.test(operatorPage) && /run\\.observations_skipped/.test(operatorPage)]
 ];
+
+const operatorPage = fs.readFileSync(path.join(root, "apps/web/src/app/operator/opportunities/ingestion/page.tsx"), "utf8");
 
 let failed = 0;
 for (const [label, ok] of checks) {
