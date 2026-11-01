@@ -73,3 +73,12 @@ export async function resolveCandidateIdentity(
     return { ok: false, status: 503, code: "IDENTITY_AUTHORIZATION_UNAVAILABLE" };
   }
 }
+
+/** Ownership predicate shared by candidate and application read routes. */
+export function candidateOwnsResource(
+  identity: CandidateIdentityResolution,
+  resourceCandidateId: string | null | undefined
+): boolean {
+  return identity.ok && typeof resourceCandidateId === "string" &&
+    resourceCandidateId.length > 0 && identity.candidateId === resourceCandidateId;
+}
