@@ -43,7 +43,9 @@ const requiredTokens = {
     "truthVault.recordWorkflowResult",
     "truthVault.readCandidateStatus",
     "truthVault.readApplicationWorkbench",
-    "truthVault.healthCheck"
+    "truthVault.healthCheck",
+    "CANDIDATE_AUTHORIZATION_NOT_CONFIGURED",
+    "APPLICATION_AUTHORIZATION_NOT_CONFIGURED"
   ],
   "apps/api/package.json": [
     "\"pg\"",
