@@ -25,6 +25,7 @@ on:
       - "case-resolution-planner.html"
       - "provider-connection-readiness.html"
       - "document-vault-readiness.html"
+      - "candidate-account-security.html"
       - "about.html"
       - "help.html"
       - "404.html"
@@ -58,13 +59,13 @@ jobs:
         run: |
           set -euo pipefail
           mkdir -p site-dist
-          cp index.html opportunities.html funding.html funding-readiness.html selection-readiness.html requirements-evidence.html application-cost-planner.html programme-choice-planner.html application-guide.html employment-cv.html accommodation.html verification-safety.html application-follow-up.html opportunity-source-register.html opportunity-comparison.html payment-readiness.html case-resolution-planner.html provider-connection-readiness.html document-vault-readiness.html about.html help.html 404.html site.css site-dist/
+          cp index.html opportunities.html funding.html funding-readiness.html selection-readiness.html requirements-evidence.html application-cost-planner.html programme-choice-planner.html application-guide.html employment-cv.html accommodation.html verification-safety.html application-follow-up.html opportunity-source-register.html opportunity-comparison.html payment-readiness.html case-resolution-planner.html provider-connection-readiness.html document-vault-readiness.html candidate-account-security.html about.html help.html 404.html site.css site-dist/
           sed -i 's/Not on this temporary public website\./Not on this public information website./g' site-dist/help.html
           sed -i 's/This temporary Kingsmen website only contains published static pages\./This Kingsmen public website contains published information pages./g' site-dist/404.html
           python3 - <<'PY'
           from pathlib import Path
           base = "https://kingsmenportal-ctrl.github.io/kingsmen-platform/"
-          for page in ("index.html", "opportunities.html", "funding.html", "funding-readiness.html", "selection-readiness.html", "requirements-evidence.html", "application-cost-planner.html", "programme-choice-planner.html", "application-guide.html", "employment-cv.html", "accommodation.html", "verification-safety.html", "application-follow-up.html", "opportunity-source-register.html", "opportunity-comparison.html", "payment-readiness.html", "case-resolution-planner.html", "provider-connection-readiness.html", "document-vault-readiness.html", "about.html", "help.html"):
+          for page in ("index.html", "opportunities.html", "funding.html", "funding-readiness.html", "selection-readiness.html", "requirements-evidence.html", "application-cost-planner.html", "programme-choice-planner.html", "application-guide.html", "employment-cv.html", "accommodation.html", "verification-safety.html", "application-follow-up.html", "opportunity-source-register.html", "opportunity-comparison.html", "payment-readiness.html", "case-resolution-planner.html", "provider-connection-readiness.html", "document-vault-readiness.html", "candidate-account-security.html", "about.html", "help.html"):
               path = Path("site-dist") / page
               html = path.read_text(encoding="utf-8")
               canonical = base + ("" if page == "index.html" else page)
@@ -98,6 +99,7 @@ jobs:
             <url><loc>https://kingsmenportal-ctrl.github.io/kingsmen-platform/case-resolution-planner.html</loc></url>
             <url><loc>https://kingsmenportal-ctrl.github.io/kingsmen-platform/provider-connection-readiness.html</loc></url>
             <url><loc>https://kingsmenportal-ctrl.github.io/kingsmen-platform/document-vault-readiness.html</loc></url>
+            <url><loc>https://kingsmenportal-ctrl.github.io/kingsmen-platform/candidate-account-security.html</loc></url>
             <url><loc>https://kingsmenportal-ctrl.github.io/kingsmen-platform/about.html</loc></url>
             <url><loc>https://kingsmenportal-ctrl.github.io/kingsmen-platform/help.html</loc></url>
           </urlset>
@@ -110,7 +112,7 @@ jobs:
           touch site-dist/.nojekyll
           test -s site-dist/index.html
           test -s site-dist/site.css
-          for page in opportunities.html funding.html funding-readiness.html selection-readiness.html requirements-evidence.html application-cost-planner.html programme-choice-planner.html application-guide.html employment-cv.html accommodation.html verification-safety.html application-follow-up.html opportunity-source-register.html opportunity-comparison.html payment-readiness.html case-resolution-planner.html provider-connection-readiness.html document-vault-readiness.html about.html help.html 404.html; do test -s "site-dist/$page"; done
+          for page in opportunities.html funding.html funding-readiness.html selection-readiness.html requirements-evidence.html application-cost-planner.html programme-choice-planner.html application-guide.html employment-cv.html accommodation.html verification-safety.html application-follow-up.html opportunity-source-register.html opportunity-comparison.html payment-readiness.html case-resolution-planner.html provider-connection-readiness.html document-vault-readiness.html candidate-account-security.html about.html help.html 404.html; do test -s "site-dist/$page"; done
           python3 - <<'PY'
           from pathlib import Path
           html = (Path("site-dist") / "application-guide.html").read_text(encoding="utf-8")
@@ -303,6 +305,18 @@ jobs:
               if forbidden in html:
                   raise SystemExit(f"Public document readiness page must not collect/upload files or render unsafe HTML: {forbidden}")
           print("Document Vault & Identity Review Readiness contract passed: file policy, private-storage controls, human-review gates, A/B isolation, local-only checklist and no file upload/network submission.")
+          PY
+          python3 - <<'PY'
+          from pathlib import Path
+          html = (Path("site-dist") / "candidate-account-security.html").read_text(encoding="utf-8")
+          required = ("kingsmen.candidate-account-security.v1", "localStorage.setItem", "localStorage.removeItem", 'aria-live="polite"', "not sent to Kingsmen", "auth.uid()", "candidate_auth_identity_links", "VERIFIED", "exactly one", "Candidate A must be denied Candidate B", "service-role fallback", "ACTIVE", "RECOVERY_REQUIRED", "UNTRUSTED", "human/founder approval", "AI/Jarvis may assist")
+          missing = [item for item in required if item not in html]
+          if missing:
+              raise SystemExit(f"Candidate Identity & Account Security contract failed; missing: {missing}")
+          for forbidden in ("fetch(", "XMLHttpRequest", "innerHTML", '<input type="password"'):
+              if forbidden in html:
+                  raise SystemExit(f"Public identity readiness page must not collect credentials or send local data: {forbidden}")
+          print("Candidate Identity & Account Security contract passed: verified identity binding, fail-closed authorization, account-state controls, local-only checklist and no credential collection/network submission.")
           PY
           echo "Public artifact contains only the approved public pages and supporting files."
 
