@@ -1,0 +1,93 @@
+<!doctype html>
+<html lang="en-ZA">
+<head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="theme-color" content="#10243a">
+<meta name="description" content="Provider connection and partnership readiness standards for Kingsmen: entity identity, authority, routes, privacy, integrations and evidence.">
+<title>Provider Connection & Partnership Readiness | Kingsmen</title>
+<link rel="stylesheet" href="site.css">
+</head>
+<body>
+<header class="site-header"><div class="topline"><a class="brand" href="./index.html">KINGSMEN<small>OPPORTUNITY PLATFORM</small></a><nav class="nav" aria-label="Main navigation"><a href="./index.html">Home</a><a href="./opportunities.html">Opportunities</a><a href="./funding.html">Funding</a><a href="./opportunity-source-register.html">Source register</a><a href="./verification-safety.html">Verification & safety</a><a href="./help.html">Help</a></nav></div></header>
+<main class="wrap">
+<div class="breadcrumb"><a href="./index.html">Home</a> / Provider connection readiness</div>
+<section class="page-hero"><p class="eyebrow">Institution, employer, funder and service-provider operations</p><h1>Provider connection & partnership readiness</h1><p class="lead">A reliable provider connection starts with verified identity, documented authority, an approved application route and tested controls. A directory listing, technical connection, partnership and live opportunity are different states. None should be inferred from another.</p></section>
+<section class="section"><div class="notice"><strong>Current public-site boundary:</strong> This page is a readiness standard and a device-local checklist. It is not a partner registration form, provider API, integration console or live provider database. Checklist entries are stored in this browser only and are <strong>not sent to Kingsmen</strong>. Do not enter credentials, API keys, identity numbers, banking details or private candidate information.</div></section>
+<section class="section"><h2>What must be established before a provider is connected?</h2><div class="grid">
+<article class="card"><span class="pill">01 · Identity</span><h3>Legal entity and relationships</h3><p>Record the registered or legally recognised entity, trading names, aliases, registration or provider identifiers, parent organisation, campuses, branches and delivery locations. Do not collapse separate legal entities into one record.</p></article>
+<article class="card"><span class="pill">02 · Authority</span><h3>Accreditation and scope</h3><p>Capture the responsible regulator or authority, evidence reference, approved programme or service scope, applicable locations, effective dates, expiry or renewal date and the official source used to verify the claim.</p></article>
+<article class="card"><span class="pill">03 · Route</span><h3>Official application destination</h3><p>Confirm the provider-controlled application portal, published contact route or documented human-assisted hand-off. An organisation website alone does not prove an application route is operational.</p></article>
+<article class="card"><span class="pill">04 · Privacy</span><h3>Consent and data handling</h3><p>Agree the lawful purpose, roles, data categories, candidate consent, minimisation, retention, deletion, access controls, incident handling and any required POPIA/data-processing terms before personal information is exchanged.</p></article>
+<article class="card"><span class="pill">05 · Integration</span><h3>Authorised technical access</h3><p>Use only provider-authorised APIs or access methods. Apply least privilege, secure credential storage, environment separation, audit logs, rate limits, timeouts, idempotency and a tested failure path.</p></article>
+<article class="card"><span class="pill">06 · Operations</span><h3>Evidence and accountability</h3><p>Define how a route is monitored, who owns exceptions, how stale or withdrawn routes are disabled and what evidence proves a submission was received or a provider made a decision.</p></article>
+</div></section>
+<section class="section"><h2>Keep provider and opportunity states separate</h2><div class="two-col">
+<article class="card"><h3>Provider lifecycle</h3><div class="steps">
+<div class="step"><div><h3>Directory reference identified</h3><p>A source or contact record exists. Legal identity is not yet verified.</p></div></div>
+<div class="step"><div><h3>Legal entity verified</h3><p>The entity and its aliases/relationships are reconciled against authoritative evidence.</p></div></div>
+<div class="step"><div><h3>Authority and scope verified</h3><p>Accreditation, licence or delegated authority is current and covers the recorded service and location.</p></div></div>
+<div class="step"><div><h3>Provider-authorised route</h3><p>The official portal, API or human-assisted route has been confirmed with the provider.</p></div></div>
+<div class="step"><div><h3>Integration connection tested</h3><p>Permitted test cases, failure handling and audit evidence pass in an approved environment.</p></div></div>
+<div class="step"><div><h3>Partnership approved</h3><p>Terms, privacy, operational ownership and required founder approval are recorded.</p></div></div></div></article>
+<article class="card"><h3>Opportunity and application evidence</h3><div class="steps">
+<div class="step"><div><h3>Opportunity recorded</h3><p>A programme, vacancy or service is linked to a source. It is not automatically open.</p></div></div>
+<div class="step"><div><h3>Current status checked</h3><p>Open/closed status, deadline, eligibility, location, costs and source freshness are verified separately.</p></div></div>
+<div class="step"><div><h3>Candidate authorises assistance</h3><p>The purpose, information and destination are explained and the necessary consent is captured.</p></div></div>
+<div class="step"><div><h3>Submission evidence retained</h3><p>A candidate report is distinct from a provider-confirmed receipt or acknowledgement.</p></div></div>
+<div class="step"><div><h3>Provider decision recorded</h3><p>Acceptance, rejection, wait-list or another decision requires provider-origin evidence.</p></div></div></div>
+<p class="small muted">Current opportunity status is separate from provider verification, integration status and partnership approval.</p></article>
+</div></section>
+<section class="section"><h2>Connection controls that must pass</h2><div class="resource-list">
+<article class="card resource-card"><h3>Security and privacy</h3><ul><li>Documented authority to access the provider system.</li><li>Separate development, test and production credentials.</li><li>Secrets held in an approved secret manager, never in browser storage or public code.</li><li>Minimum necessary candidate data and purpose-limited access.</li><li>Audit trail for reads, writes, retries, manual interventions and approvals.</li></ul></article>
+<article class="card resource-card"><h3>Reliability and evidence</h3><ul><li>Test valid and invalid requests, duplicates, timeouts and provider outages.</li><li>Idempotent handling so retries do not create duplicate applications.</li><li>Explicit recovery and human hand-off where automation is unavailable.</li><li>Provider acknowledgement captured separately from a final outcome.</li><li>Route freshness, ownership and withdrawal procedures documented.</li></ul></article>
+</div></section>
+<section class="section"><div class="card">
+<div class="section-head"><div><p class="eyebrow">Device-local checklist</p><h2>Provider readiness review</h2><p class="muted">Tick only items supported by evidence you have reviewed. This checklist does not verify the provider or approve a connection.</p></div><button id="clear-checklist" class="btn btn-outline" type="button">Clear checklist</button></div>
+<div id="provider-checklist" class="steps" aria-label="Provider connection readiness checklist">
+<label class="step"><input type="checkbox" data-check="identity"><span><strong>Legal entity and aliases reconciled</strong><br><span class="muted small">Legal name, registration/provider identifiers and parent/branch relationships.</span></span></label>
+<label class="step"><input type="checkbox" data-check="authority"><span><strong>Authority, accreditation and service scope checked</strong><br><span class="muted small">Official evidence, locations, dates and current validity.</span></span></label>
+<label class="step"><input type="checkbox" data-check="source"><span><strong>Official source and application route confirmed</strong><br><span class="muted small">Provider-controlled portal, API or named human-assisted hand-off.</span></span></label>
+<label class="step"><input type="checkbox" data-check="terms"><span><strong>Partnership, privacy and data-processing terms reviewed</strong><br><span class="muted small">Purpose, consent, retention, deletion, access and incident responsibilities.</span></span></label>
+<label class="step"><input type="checkbox" data-check="security"><span><strong>Authorised access and security controls approved</strong><br><span class="muted small">Least privilege, secret management, audit, environment separation and rate limits.</span></span></label>
+<label class="step"><input type="checkbox" data-check="testing"><span><strong>Integration and failure scenarios tested</strong><br><span class="muted small">Invalid, duplicate, timeout, retry, outage and manual fallback paths.</span></span></label>
+<label class="step"><input type="checkbox" data-check="evidence"><span><strong>Receipt and provider-outcome evidence defined</strong><br><span class="muted small">Candidate report, provider acknowledgement and provider decision remain distinct.</span></span></label>
+<label class="step"><input type="checkbox" data-check="approval"><span><strong>Operational owner and founder approval recorded</strong><br><span class="muted small">Named accountability, freshness review, exceptions and approved go-live scope.</span></span></label>
+</div>
+<p id="checklist-status" class="small muted" role="status" aria-live="polite">Checklist not yet saved.</p>
+</div></section>
+<section class="section"><div class="notice"><strong>Fail-closed rule:</strong> If legal identity, authority, route permission, privacy terms or runtime tests are missing, do not mark the provider connected or route candidates automatically. Use the provider's public official destination or a controlled human-assisted hand-off until the required approval gates pass.</div><div class="btn-row"><a class="btn btn-primary" href="./opportunity-source-register.html">Review source evidence</a><a class="btn btn-outline" href="./verification-safety.html">Opportunity verification</a><a class="btn btn-outline" href="./case-resolution-planner.html">Case resolution planner</a></div></section>
+</main>
+<footer class="footer"><div class="wrap footer-grid"><div><a class="brand" href="./index.html">KINGSMEN</a><p>One organised starting point for South African education, training, funding and work pathways.</p><p class="small">This public guide does not register providers, authorise integrations or process candidate data.</p></div><div><h3>Explore</h3><div class="footer-links"><a href="./opportunities.html">Opportunity directory</a><a href="./opportunity-source-register.html">Opportunity source register</a><a href="./provider-connection-readiness.html">Provider connection readiness</a><a href="./verification-safety.html">Verification & scam safety</a></div></div><div><h3>Information</h3><div class="footer-links"><a href="./about.html">About Kingsmen</a><a href="./help.html">Help & safety</a><a href="./help.html#privacy">Privacy guidance</a></div></div></div></footer>
+<script>
+(function(){
+  "use strict";
+  var KEY="kingsmen.provider-connection-readiness.v1";
+  var checks=Array.prototype.slice.call(document.querySelectorAll("[data-check]"));
+  var status=document.getElementById("checklist-status");
+  var clear=document.getElementById("clear-checklist");
+  function announce(){
+    var done=checks.filter(function(item){return item.checked;}).length;
+    status.textContent=done+" of "+checks.length+" readiness items checked on this device. Checklist not sent to Kingsmen.";
+  }
+  function save(){
+    try{localStorage.setItem(KEY,JSON.stringify(checks.map(function(item){return {id:item.dataset.check,done:item.checked};})));announce();}
+    catch(error){status.textContent="Browser storage unavailable; checklist changes may not persist.";}
+  }
+  function load(){
+    try{
+      var saved=JSON.parse(localStorage.getItem(KEY)||"[]");
+      if(Array.isArray(saved)){saved.forEach(function(row){var item=checks.find(function(check){return check.dataset.check===row.id;});if(item)item.checked=row.done===true;});}
+      announce();
+    }catch(error){status.textContent="Could not read local browser storage.";}
+  }
+  checks.forEach(function(item){item.addEventListener("change",save);});
+  clear.addEventListener("click",function(){
+    try{localStorage.removeItem(KEY);}catch(error){}
+    checks.forEach(function(item){item.checked=false;});
+    status.textContent="Checklist cleared from this device. Nothing was sent to Kingsmen.";
+  });
+  load();
+})();
+</script>
+</body>
+</html>

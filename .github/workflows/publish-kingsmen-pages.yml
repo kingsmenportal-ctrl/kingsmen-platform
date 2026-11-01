@@ -23,6 +23,7 @@ on:
       - "opportunity-comparison.html"
       - "payment-readiness.html"
       - "case-resolution-planner.html"
+      - "provider-connection-readiness.html"
       - "about.html"
       - "help.html"
       - "404.html"
@@ -56,13 +57,13 @@ jobs:
         run: |
           set -euo pipefail
           mkdir -p site-dist
-          cp index.html opportunities.html funding.html funding-readiness.html selection-readiness.html requirements-evidence.html application-cost-planner.html programme-choice-planner.html application-guide.html employment-cv.html accommodation.html verification-safety.html application-follow-up.html opportunity-source-register.html opportunity-comparison.html payment-readiness.html case-resolution-planner.html about.html help.html 404.html site.css site-dist/
+          cp index.html opportunities.html funding.html funding-readiness.html selection-readiness.html requirements-evidence.html application-cost-planner.html programme-choice-planner.html application-guide.html employment-cv.html accommodation.html verification-safety.html application-follow-up.html opportunity-source-register.html opportunity-comparison.html payment-readiness.html case-resolution-planner.html provider-connection-readiness.html about.html help.html 404.html site.css site-dist/
           sed -i 's/Not on this temporary public website\./Not on this public information website./g' site-dist/help.html
           sed -i 's/This temporary Kingsmen website only contains published static pages\./This Kingsmen public website contains published information pages./g' site-dist/404.html
           python3 - <<'PY'
           from pathlib import Path
           base = "https://kingsmenportal-ctrl.github.io/kingsmen-platform/"
-          for page in ("index.html", "opportunities.html", "funding.html", "funding-readiness.html", "selection-readiness.html", "requirements-evidence.html", "application-cost-planner.html", "programme-choice-planner.html", "application-guide.html", "employment-cv.html", "accommodation.html", "verification-safety.html", "application-follow-up.html", "opportunity-source-register.html", "opportunity-comparison.html", "payment-readiness.html", "case-resolution-planner.html", "about.html", "help.html"):
+          for page in ("index.html", "opportunities.html", "funding.html", "funding-readiness.html", "selection-readiness.html", "requirements-evidence.html", "application-cost-planner.html", "programme-choice-planner.html", "application-guide.html", "employment-cv.html", "accommodation.html", "verification-safety.html", "application-follow-up.html", "opportunity-source-register.html", "opportunity-comparison.html", "payment-readiness.html", "case-resolution-planner.html", "provider-connection-readiness.html", "about.html", "help.html"):
               path = Path("site-dist") / page
               html = path.read_text(encoding="utf-8")
               canonical = base + ("" if page == "index.html" else page)
@@ -92,16 +93,22 @@ jobs:
             <url><loc>https://kingsmenportal-ctrl.github.io/kingsmen-platform/application-follow-up.html</loc></url>
             <url><loc>https://kingsmenportal-ctrl.github.io/kingsmen-platform/opportunity-source-register.html</loc></url>
             <url><loc>https://kingsmenportal-ctrl.github.io/kingsmen-platform/opportunity-comparison.html</loc></url>
-            <url><loc>https://kingsmenportal-ctrl.github.io/kingsmen-platform/payment-readiness.html</loc>
-    <url><loc>https://kingsmenportal-ctrl.github.io/kingsmen-platform/case-resolution-planner.html</loc></url></url>
+            <url><loc>https://kingsmenportal-ctrl.github.io/kingsmen-platform/payment-readiness.html</loc></url>
+            <url><loc>https://kingsmenportal-ctrl.github.io/kingsmen-platform/case-resolution-planner.html</loc></url>
+            <url><loc>https://kingsmenportal-ctrl.github.io/kingsmen-platform/provider-connection-readiness.html</loc></url>
             <url><loc>https://kingsmenportal-ctrl.github.io/kingsmen-platform/about.html</loc></url>
             <url><loc>https://kingsmenportal-ctrl.github.io/kingsmen-platform/help.html</loc></url>
           </urlset>
           EOF
+          python3 - <<'PY'
+          import xml.etree.ElementTree as ET
+          ET.parse("site-dist/sitemap.xml")
+          print("Sitemap XML is well-formed.")
+          PY
           touch site-dist/.nojekyll
           test -s site-dist/index.html
           test -s site-dist/site.css
-          for page in opportunities.html funding.html funding-readiness.html selection-readiness.html requirements-evidence.html application-cost-planner.html programme-choice-planner.html application-guide.html employment-cv.html accommodation.html verification-safety.html application-follow-up.html opportunity-source-register.html opportunity-comparison.html payment-readiness.html case-resolution-planner.html about.html help.html 404.html; do test -s "site-dist/$page"; done
+          for page in opportunities.html funding.html funding-readiness.html selection-readiness.html requirements-evidence.html application-cost-planner.html programme-choice-planner.html application-guide.html employment-cv.html accommodation.html verification-safety.html application-follow-up.html opportunity-source-register.html opportunity-comparison.html payment-readiness.html case-resolution-planner.html provider-connection-readiness.html about.html help.html 404.html; do test -s "site-dist/$page"; done
           python3 - <<'PY'
           from pathlib import Path
           html = (Path("site-dist") / "application-guide.html").read_text(encoding="utf-8")
@@ -268,6 +275,20 @@ jobs:
           if "textContent" not in html or "replaceChildren" not in html:
               raise SystemExit("Case planner must render user content as text, not HTML")
           print("Case Resolution & Escalation Planner contract passed: local-only persistence/deletion, HTTPS-only URLs, candidate/provider evidence distinction, safe text rendering and no network submission.")
+          PY
+          python3 - <<'PY'
+          from pathlib import Path
+          html = (Path("site-dist") / "provider-connection-readiness.html").read_text(encoding="utf-8")
+          required = ("kingsmen.provider-connection-readiness.v1", "localStorage.setItem", "localStorage.removeItem", 'aria-live="polite"', "not sent to Kingsmen", "Directory reference identified", "Legal entity verified", "Provider-authorised route", "Integration connection tested", "Provider-confirmed receipt", "Current opportunity status is separate", "founder approval")
+          missing = [item for item in required if item not in html]
+          if missing:
+              raise SystemExit(f"Provider Connection Readiness contract failed; missing: {missing}")
+          for forbidden in ("fetch(", "XMLHttpRequest", "innerHTML"):
+              if forbidden in html:
+                  raise SystemExit(f"Provider readiness checklist must not use {forbidden}")
+          if "textContent" not in html:
+              raise SystemExit("Provider readiness checklist must render user content as text")
+          print("Provider Connection Readiness contract passed: local-only checklist, safe text rendering, independent provider evidence states and no network submission.")
           PY
           echo "Public artifact contains only the approved public pages and supporting files."
 
