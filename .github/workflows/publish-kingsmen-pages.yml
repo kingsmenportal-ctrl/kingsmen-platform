@@ -120,11 +120,11 @@ jobs:
           touch site-dist/.nojekyll
           test -s site-dist/index.html
           test -s site-dist/site.css
-          for page in opportunities.html funding.html funding-opportunities.html service-sectors.html funding-readiness.html selection-readiness.html requirements-evidence.html application-cost-planner.html programme-choice-planner.html application-guide.html employment-cv.html accommodation.html verification-safety.html application-follow-up.html opportunity-source-register.html opportunity-comparison.html payment-readiness.html case-resolution-planner.html provider-connection-readiness.html document-vault-readiness.html candidate-account-security.html communication-safety.html about.html help.html 404.html; do test -s "site-dist/$page"; done
+          for page in opportunities.html funding.html funding-opportunities.html seta-workplace-learning.html service-sectors.html funding-readiness.html selection-readiness.html requirements-evidence.html application-cost-planner.html programme-choice-planner.html application-guide.html employment-cv.html accommodation.html verification-safety.html application-follow-up.html opportunity-source-register.html opportunity-comparison.html payment-readiness.html case-resolution-planner.html provider-connection-readiness.html document-vault-readiness.html candidate-account-security.html communication-safety.html about.html help.html 404.html; do test -s "site-dist/$page"; done
           python3 - <<'PY'
           from pathlib import Path
           html = (Path("site-dist") / "seta-workplace-learning.html").read_text(encoding="utf-8")
-          required = ("Discretionary Grant Funding Window 2026/27", "2026/27-DG-03", "Strategic Projects Funding Window 2026/27", "SP2026/27-04", "Strategic Partnership Funding Window 2026/27", "6 November 2026", "1 November 2026", "data-audience", "servicesseta.org.za", "specialprojects2627@serviceseta.org.za", "strategicpartnership2627@serviceseta.org.za", "not personal bursaries", "does not submit proposals", "submission-process details will be published")
+          required = ("Discretionary Grant Funding Window 2026/27", "2026/27-DG-03", "Strategic Projects Funding Window 2026/27", "SP2026/27-04", "Strategic Partnership Funding Window 2026/27", "6 November 2026", "1 November 2026", "data-audience", "servicesseta.org.za", "specialprojects2627@serviceseta.org.za", "strategicpartnership2627@serviceseta.org.za", "not personal bursaries", "does not submit proposals", "submission process will be published")
           missing = [item for item in required if item.lower() not in html.lower()]
           if missing:
               raise SystemExit(f"SETA Workplace Learning Watch contract failed; missing: {missing}")
