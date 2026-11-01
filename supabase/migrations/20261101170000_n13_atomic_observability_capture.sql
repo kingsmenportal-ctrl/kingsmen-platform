@@ -15,7 +15,7 @@ as $function$
 declare
   v_latest_snapshot_ref text;
   v_latest_captured_at timestamptz;
-  v_now timestamptz := pg_catalog.clock_timestamp();
+  v_now timestamptz;
   v_retry_after integer;
 begin
   if pg_catalog.jsonb_typeof(p_snapshot) is distinct from 'object' then
@@ -39,6 +39,8 @@ begin
   perform pg_catalog.pg_advisory_xact_lock(
     pg_catalog.hashtextextended('kingsmen:n13:observability-capture', 0)
   );
+
+  v_now := pg_catalog.clock_timestamp();
 
   select s.snapshot_ref, s.captured_at
     into v_latest_snapshot_ref, v_latest_captured_at
