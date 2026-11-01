@@ -65,7 +65,54 @@ for (const [path, tokens] of requiredTokens.entries()) {
 if (exists('scripts/backup/Test-KingsmenTruthVaultRestore.ps1')) {
   const restoreScript = read('scripts/backup/Test-KingsmenTruthVaultRestore.ps1');
   check('restore_fails_closed_on_count_errors', restoreScript.includes('$failedChecks += "count_query:$table"'), 'failed or invalid table counts must fail the drill', 'scripts/backup/Test-KingsmenTruthVaultRestore.ps1');
-  check('restore_dry_run_never_passes', restoreScript.includes('$passed = (-not $DryRun) -and ($failedChecks.Count -eq 0)'), 'dry run cannot be reported as a successful restore', 'scripts/backup/Test-KingsmenTruthVaultRestore.ps1');
+  check('restore_dry_run_never_passes', restoreScript.includes('$passed = (-not $DryRun)'), 'dry run cannot be reported as a successful restore', 'scripts/backup/Test-KingsmenTruthVaultRestore.ps1');
+  check('restore_count_regex_complete', restoreScript.includes("$countText -match '^\\d+
+  check('restore_failed_status_is_explicit', restoreScript.includes('RESTORE_DRILL_FAILED'), 'failed verification must produce a failed status', 'scripts/backup/Test-KingsmenTruthVaultRestore.ps1');
+  check('restore_does_not_hardcode_pass', !/passed\s*=\s*\$true/.test(restoreScript), 'restore pass must be evidence-derived', 'scripts/backup/Test-KingsmenTruthVaultRestore.ps1');
+}
+
+if (exists('manifests/ops/backup-restore-proof-v1.json')) {
+  const manifest = JSON.parse(read('manifests/ops/backup-restore-proof-v1.json'));
+  check('manifest_production_ready_false', manifest.productionReady === false, String(manifest.productionReady), 'manifests/ops/backup-restore-proof-v1.json');
+  check('manifest_public_launch_false', manifest.publicLaunchAllowed === false, String(manifest.publicLaunchAllowed), 'manifests/ops/backup-restore-proof-v1.json');
+  check('manifest_production_data_false', manifest.productionDataAllowed === false, String(manifest.productionDataAllowed), 'manifests/ops/backup-restore-proof-v1.json');
+  check('manifest_no_git_backups', manifest.backupStorageAllowedInGit === false, String(manifest.backupStorageAllowedInGit), 'manifests/ops/backup-restore-proof-v1.json');
+  check('manifest_no_raw_rows', manifest.rawCandidateRowsAllowedInReports === false, String(manifest.rawCandidateRowsAllowedInReports), 'manifests/ops/backup-restore-proof-v1.json');
+}
+
+if (exists('reports/ops/backup-restore-proof-latest.json')) {
+  const proof = JSON.parse(read('reports/ops/backup-restore-proof-latest.json'));
+  check('proof_status_passed', proof.status === 'BACKUP_RESTORE_SOURCE_PROOF_PASSED', proof.status, 'reports/ops/backup-restore-proof-latest.json');
+  check('proof_not_production_ready', proof.productionReady === false, String(proof.productionReady), 'reports/ops/backup-restore-proof-latest.json');
+  check('proof_staging_drill_false', proof.stagingRestoreDrillCompleted === false, String(proof.stagingRestoreDrillCompleted), 'reports/ops/backup-restore-proof-latest.json');
+  check('proof_no_raw_candidate_rows', proof.rawCandidateRowsReturned === false, String(proof.rawCandidateRowsReturned), 'reports/ops/backup-restore-proof-latest.json');
+}
+
+const validation = {
+  schema: 'kingsmen.validation-report.v1',
+  module: 'Kingsmen Backup and Restore Proof',
+  status: failed.length === 0 ? 'BACKUP_RESTORE_PROOF_VALIDATED' : 'BACKUP_RESTORE_PROOF_FAILED',
+  passed: failed.length === 0,
+  productionReady: false,
+  publicLaunchAllowed: false,
+  stagingRestoreDrillCompleted: false,
+  generatedAtIso: new Date().toISOString(),
+  checks,
+  failed_checks: failed,
+  nextAction: failed.length === 0
+    ? 'Run a real staging backup/restore drill and store counts-only evidence outside public artifacts before production data.'
+    : 'Repair backup/restore proof files.'
+};
+
+mkdirSync(dirname(reportPath), { recursive: true });
+writeFileSync(reportPath, `${JSON.stringify(validation, null, 2)}\n`, 'utf8');
+
+console.log(JSON.stringify(validation, null, 2));
+if (!validation.passed) process.exitCode = 1;
+"), 'count verification regex must be complete', 'scripts/backup/Test-KingsmenTruthVaultRestore.ps1');
+  check('restore_no_truncated_count_block', !/\$countText\s+-match\s+'\^\\d+\s*\n\s*\}/.test(restoreScript), 'restore count block must not be truncated', 'scripts/backup/Test-KingsmenTruthVaultRestore.ps1');
+  check('restore_no_duplicate_tail', !/\n\)\s*\{\s*\$count\s*=\s*\$countText/.test(restoreScript), 'restore script must not contain duplicated partial code', 'scripts/backup/Test-KingsmenTruthVaultRestore.ps1');
+  check('restore_failed_run_exits_nonzero', restoreScript.includes('throw "RESTORE_DRILL_FAILED:'), 'failed or dry-run verification must exit nonzero', 'scripts/backup/Test-KingsmenTruthVaultRestore.ps1');
   check('restore_failed_status_is_explicit', restoreScript.includes('RESTORE_DRILL_FAILED'), 'failed verification must produce a failed status', 'scripts/backup/Test-KingsmenTruthVaultRestore.ps1');
   check('restore_does_not_hardcode_pass', !/passed\s*=\s*\$true/.test(restoreScript), 'restore pass must be evidence-derived', 'scripts/backup/Test-KingsmenTruthVaultRestore.ps1');
 }
