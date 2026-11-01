@@ -41,7 +41,9 @@
     "LEGAL_AID_AND_COMMUNITY_SERVICES",
     "NGO_NPO_AND_FOUNDATION",
     "REGULATOR_AND_PROFESSIONAL_COUNCIL",
-    "TECHNOLOGY_AND_DELIVERY_VENDOR"
+    "TECHNOLOGY_AND_DELIVERY_VENDOR",
+    "PROVINCIAL_DEPARTMENT",
+    "CET_COLLEGE"
   ],
   "service_capabilities": [
     "HIGHER_EDUCATION",
@@ -61,7 +63,8 @@
     "FINANCIAL_SERVICES",
     "TECHNOLOGY_INTEGRATION",
     "BASIC_EDUCATION",
-    "ENERGY_AND_UTILITIES"
+    "ENERGY_AND_UTILITIES",
+    "COMMUNITY_EDUCATION_AND_TRAINING"
   ],
   "sources": [
     {
@@ -5571,6 +5574,326 @@
         "provider_type": "EMPLOYER",
         "source_record_status": "NEEDS_REVIEW",
         "external_application_route_status": "OFFICIAL_EXTERNAL_PORTAL_NOT_CONNECTED"
+      }
+    },
+    {
+      "source_id": "dhet_community_colleges",
+      "name": "DHET Community Education and Training Colleges",
+      "authority": "Department of Higher Education and Training",
+      "url": "https://www.dhet.gov.za/SitePages/CommunityCollege.aspx",
+      "classes": [
+        "EDUCATION_AND_SKILLS",
+        "CET_COLLEGE"
+      ],
+      "supports": [
+        "DHET states that nine community colleges have been established, one in each province.",
+        "Community Learning Centres are substructures/delivery sites under the CET colleges."
+      ],
+      "does_not_prove": [
+        "individual current courses or occupational qualifications",
+        "open registration/intake or deadline",
+        "candidate eligibility",
+        "a provider-specific application portal, integration, partnership, submission or receipt"
+      ],
+      "refresh_after_days": 90,
+      "review_required": true,
+      "connector_state": "NOT_CONNECTED"
+    },
+    {
+      "source_id": "prov_education_eastern_cape",
+      "name": "Eastern Cape Department of Education",
+      "authority": "Department of Basic Education — official Provincial Departments directory",
+      "url": "https://www.ecdoe.gov.za/",
+      "classes": [
+        "PUBLIC_ADMINISTRATION",
+        "EDUCATION_AND_SKILLS",
+        "EMPLOYER_AND_RECRUITMENT"
+      ],
+      "supports": [
+        "Official provincial education department identity and contact-source discovery for Eastern Cape.",
+        "Provincial school administration and education-service authority."
+      ],
+      "does_not_prove": [
+        "current vacancy or internship without a specific active notice",
+        "candidate eligibility or appointment",
+        "school placement or admission availability",
+        "application submission or provider receipt",
+        "a Kingsmen integration, partnership or permission to automate"
+      ],
+      "refresh_after_days": 30,
+      "review_required": true,
+      "connector_state": "NOT_CONNECTED",
+      "provider_key": "prov_education_eastern_cape",
+      "metadata": {
+        "province": "Eastern Cape",
+        "provider_homepage_url": "https://www.ecdoe.gov.za/",
+        "source_profile_url": "https://www.education.gov.za/ProvincialDepartments.aspx",
+        "source_record_status": "NEEDS_REVIEW",
+        "external_application_route_status": "NOT_VERIFIED"
+      }
+    },
+    {
+      "source_id": "prov_education_free_state",
+      "name": "Free State Department of Education",
+      "authority": "Department of Basic Education — official Provincial Departments directory",
+      "url": "https://www.education.gov.za/ProvincialDepartments.aspx",
+      "classes": [
+        "PUBLIC_ADMINISTRATION",
+        "EDUCATION_AND_SKILLS",
+        "EMPLOYER_AND_RECRUITMENT"
+      ],
+      "supports": [
+        "Official provincial education department identity and contact-source discovery for Free State.",
+        "Provincial school administration and education-service authority."
+      ],
+      "does_not_prove": [
+        "current vacancy or internship without a specific active notice",
+        "candidate eligibility or appointment",
+        "school placement or admission availability",
+        "application submission or provider receipt",
+        "a Kingsmen integration, partnership or permission to automate"
+      ],
+      "refresh_after_days": 30,
+      "review_required": true,
+      "connector_state": "NOT_CONNECTED",
+      "provider_key": "prov_education_free_state",
+      "metadata": {
+        "province": "Free State",
+        "provider_homepage_url": null,
+        "source_profile_url": "https://www.education.gov.za/ProvincialDepartments.aspx",
+        "source_record_status": "NEEDS_REVIEW",
+        "external_application_route_status": "NOT_VERIFIED"
+      }
+    },
+    {
+      "source_id": "prov_education_gauteng",
+      "name": "Gauteng Department of Education",
+      "authority": "Department of Basic Education — official Provincial Departments directory",
+      "url": "https://www.education.gov.za/ProvincialDepartments.aspx",
+      "classes": [
+        "PUBLIC_ADMINISTRATION",
+        "EDUCATION_AND_SKILLS",
+        "EMPLOYER_AND_RECRUITMENT"
+      ],
+      "supports": [
+        "Official provincial education department identity and contact-source discovery for Gauteng.",
+        "Provincial school administration and education-service authority."
+      ],
+      "does_not_prove": [
+        "current vacancy or internship without a specific active notice",
+        "candidate eligibility or appointment",
+        "school placement or admission availability",
+        "application submission or provider receipt",
+        "a Kingsmen integration, partnership or permission to automate"
+      ],
+      "refresh_after_days": 30,
+      "review_required": true,
+      "connector_state": "NOT_CONNECTED",
+      "provider_key": "prov_education_gauteng",
+      "metadata": {
+        "province": "Gauteng",
+        "provider_homepage_url": null,
+        "source_profile_url": "https://www.education.gov.za/ProvincialDepartments.aspx",
+        "source_record_status": "NEEDS_REVIEW",
+        "external_application_route_status": "NOT_VERIFIED"
+      }
+    },
+    {
+      "source_id": "prov_education_kwazulu_natal",
+      "name": "KwaZulu-Natal Department of Education",
+      "authority": "Department of Basic Education — official Provincial Departments directory",
+      "url": "https://www.kzneducation.gov.za/",
+      "classes": [
+        "PUBLIC_ADMINISTRATION",
+        "EDUCATION_AND_SKILLS",
+        "EMPLOYER_AND_RECRUITMENT"
+      ],
+      "supports": [
+        "Official provincial education department identity and contact-source discovery for KwaZulu-Natal.",
+        "Provincial school administration and education-service authority."
+      ],
+      "does_not_prove": [
+        "current vacancy or internship without a specific active notice",
+        "candidate eligibility or appointment",
+        "school placement or admission availability",
+        "application submission or provider receipt",
+        "a Kingsmen integration, partnership or permission to automate"
+      ],
+      "refresh_after_days": 30,
+      "review_required": true,
+      "connector_state": "NOT_CONNECTED",
+      "provider_key": "prov_education_kwazulu_natal",
+      "metadata": {
+        "province": "KwaZulu-Natal",
+        "provider_homepage_url": "https://www.kzneducation.gov.za/",
+        "source_profile_url": "https://www.education.gov.za/ProvincialDepartments.aspx",
+        "source_record_status": "NEEDS_REVIEW",
+        "external_application_route_status": "NOT_VERIFIED"
+      }
+    },
+    {
+      "source_id": "prov_education_limpopo",
+      "name": "Limpopo Department of Education",
+      "authority": "Department of Basic Education — official Provincial Departments directory",
+      "url": "https://www.edu.limpopo.gov.za/",
+      "classes": [
+        "PUBLIC_ADMINISTRATION",
+        "EDUCATION_AND_SKILLS",
+        "EMPLOYER_AND_RECRUITMENT"
+      ],
+      "supports": [
+        "Official provincial education department identity and contact-source discovery for Limpopo.",
+        "Provincial school administration and education-service authority."
+      ],
+      "does_not_prove": [
+        "current vacancy or internship without a specific active notice",
+        "candidate eligibility or appointment",
+        "school placement or admission availability",
+        "application submission or provider receipt",
+        "a Kingsmen integration, partnership or permission to automate"
+      ],
+      "refresh_after_days": 30,
+      "review_required": true,
+      "connector_state": "NOT_CONNECTED",
+      "provider_key": "prov_education_limpopo",
+      "metadata": {
+        "province": "Limpopo",
+        "provider_homepage_url": "https://www.edu.limpopo.gov.za/",
+        "source_profile_url": "https://www.education.gov.za/ProvincialDepartments.aspx",
+        "source_record_status": "NEEDS_REVIEW",
+        "external_application_route_status": "NOT_VERIFIED"
+      }
+    },
+    {
+      "source_id": "prov_education_mpumalanga",
+      "name": "Mpumalanga Department of Education",
+      "authority": "Department of Basic Education — official Provincial Departments directory",
+      "url": "https://mpeducation.mpg.gov.za/",
+      "classes": [
+        "PUBLIC_ADMINISTRATION",
+        "EDUCATION_AND_SKILLS",
+        "EMPLOYER_AND_RECRUITMENT"
+      ],
+      "supports": [
+        "Official provincial education department identity and contact-source discovery for Mpumalanga.",
+        "Provincial school administration and education-service authority."
+      ],
+      "does_not_prove": [
+        "current vacancy or internship without a specific active notice",
+        "candidate eligibility or appointment",
+        "school placement or admission availability",
+        "application submission or provider receipt",
+        "a Kingsmen integration, partnership or permission to automate"
+      ],
+      "refresh_after_days": 30,
+      "review_required": true,
+      "connector_state": "NOT_CONNECTED",
+      "provider_key": "prov_education_mpumalanga",
+      "metadata": {
+        "province": "Mpumalanga",
+        "provider_homepage_url": "https://mpeducation.mpg.gov.za/",
+        "source_profile_url": "https://www.education.gov.za/ProvincialDepartments.aspx",
+        "source_record_status": "NEEDS_REVIEW",
+        "external_application_route_status": "NOT_VERIFIED"
+      }
+    },
+    {
+      "source_id": "prov_education_north_west",
+      "name": "North West Department of Education",
+      "authority": "Department of Basic Education — official Provincial Departments directory",
+      "url": "https://education.nwpg.gov.za/",
+      "classes": [
+        "PUBLIC_ADMINISTRATION",
+        "EDUCATION_AND_SKILLS",
+        "EMPLOYER_AND_RECRUITMENT"
+      ],
+      "supports": [
+        "Official provincial education department identity and contact-source discovery for North West.",
+        "Provincial school administration and education-service authority."
+      ],
+      "does_not_prove": [
+        "current vacancy or internship without a specific active notice",
+        "candidate eligibility or appointment",
+        "school placement or admission availability",
+        "application submission or provider receipt",
+        "a Kingsmen integration, partnership or permission to automate"
+      ],
+      "refresh_after_days": 30,
+      "review_required": true,
+      "connector_state": "NOT_CONNECTED",
+      "provider_key": "prov_education_north_west",
+      "metadata": {
+        "province": "North West",
+        "provider_homepage_url": "https://education.nwpg.gov.za/",
+        "source_profile_url": "https://www.education.gov.za/ProvincialDepartments.aspx",
+        "source_record_status": "NEEDS_REVIEW",
+        "external_application_route_status": "NOT_VERIFIED"
+      }
+    },
+    {
+      "source_id": "prov_education_northern_cape",
+      "name": "Northern Cape Department of Education",
+      "authority": "Department of Basic Education — official Provincial Departments directory",
+      "url": "https://ncdoe.ncpg.gov.za/",
+      "classes": [
+        "PUBLIC_ADMINISTRATION",
+        "EDUCATION_AND_SKILLS",
+        "EMPLOYER_AND_RECRUITMENT"
+      ],
+      "supports": [
+        "Official provincial education department identity and contact-source discovery for Northern Cape.",
+        "Provincial school administration and education-service authority."
+      ],
+      "does_not_prove": [
+        "current vacancy or internship without a specific active notice",
+        "candidate eligibility or appointment",
+        "school placement or admission availability",
+        "application submission or provider receipt",
+        "a Kingsmen integration, partnership or permission to automate"
+      ],
+      "refresh_after_days": 30,
+      "review_required": true,
+      "connector_state": "NOT_CONNECTED",
+      "provider_key": "prov_education_northern_cape",
+      "metadata": {
+        "province": "Northern Cape",
+        "provider_homepage_url": "https://ncdoe.ncpg.gov.za/",
+        "source_profile_url": "https://www.education.gov.za/ProvincialDepartments.aspx",
+        "source_record_status": "NEEDS_REVIEW",
+        "external_application_route_status": "NOT_VERIFIED"
+      }
+    },
+    {
+      "source_id": "prov_education_western_cape",
+      "name": "Western Cape Education Department",
+      "authority": "Department of Basic Education — official Provincial Departments directory",
+      "url": "https://wcedonline.westerncape.gov.za/",
+      "classes": [
+        "PUBLIC_ADMINISTRATION",
+        "EDUCATION_AND_SKILLS",
+        "EMPLOYER_AND_RECRUITMENT"
+      ],
+      "supports": [
+        "Official provincial education department identity and contact-source discovery for Western Cape.",
+        "Provincial school administration and education-service authority."
+      ],
+      "does_not_prove": [
+        "current vacancy or internship without a specific active notice",
+        "candidate eligibility or appointment",
+        "school placement or admission availability",
+        "application submission or provider receipt",
+        "a Kingsmen integration, partnership or permission to automate"
+      ],
+      "refresh_after_days": 30,
+      "review_required": true,
+      "connector_state": "NOT_CONNECTED",
+      "provider_key": "prov_education_western_cape",
+      "metadata": {
+        "province": "Western Cape",
+        "provider_homepage_url": "https://wcedonline.westerncape.gov.za/",
+        "source_profile_url": "https://www.education.gov.za/ProvincialDepartments.aspx",
+        "source_record_status": "NEEDS_REVIEW",
+        "external_application_route_status": "NOT_VERIFIED"
       }
     }
   ],
