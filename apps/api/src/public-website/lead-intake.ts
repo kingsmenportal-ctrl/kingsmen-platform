@@ -4,7 +4,6 @@ export function validatePublicLeadInput(input: PublicLeadInput): void {
   if (!input.email || !input.email.includes("@")) throw new Error("VALID_EMAIL_REQUIRED");
   if (!input.consentPopia) throw new Error("POPIA_CONSENT_REQUIRED");
   if (!input.consentContactEmail) throw new Error("EMAIL_CONTACT_CONSENT_REQUIRED");
-  if (!input.consentWhatsappUrgentOnly) throw new Error("WHATSAPP_URGENT_ONLY_CONSENT_REQUIRED");
 }
 
 export function buildPublicLeadRef(): string {
@@ -21,7 +20,7 @@ export function prepareLeadForCandidateCore(input: PublicLeadInput) {
     smartFormPrefillRequested: true,
     candidateMustConfirmExtractedFields: true,
     communicationPrimary: "EMAIL",
-    whatsappBoundary: "URGENT_ONLY",
+    whatsappBoundary: "DISABLED",
     profileSeed: {
       firstName: input.firstName,
       lastName: input.lastName,
@@ -35,7 +34,7 @@ export function prepareLeadForCandidateCore(input: PublicLeadInput) {
     consent: {
       popia: input.consentPopia,
       contactEmail: input.consentContactEmail,
-      whatsappUrgentOnly: input.consentWhatsappUrgentOnly
+      whatsappUrgentOnly: false
     }
   };
 }
