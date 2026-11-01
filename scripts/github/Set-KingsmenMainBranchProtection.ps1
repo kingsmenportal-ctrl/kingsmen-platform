@@ -21,7 +21,7 @@ if ([string]::IsNullOrWhiteSpace($owner) -or [string]::IsNullOrWhiteSpace($repo)
 $payload = [ordered]@{
   required_status_checks = [ordered]@{
     strict = $true
-    contexts = @("source-guard")
+    contexts = @("source-guard", "Build, validate, and smoke-test")
   }
   enforce_admins = $true
   required_pull_request_reviews = [ordered]@{
@@ -46,7 +46,7 @@ if ($DryRun) {
     branch = $Branch
     productionReady = $false
     protectionWouldBeApplied = $true
-    requiredStatusCheckContexts = @("source-guard")
+    requiredStatusCheckContexts = @("source-guard", "Build, validate, and smoke-test")
     strictStatusChecksRequired = $true
     requiredApprovingReviewCount = 1
     staleReviewsMustBeDismissed = $true
@@ -80,6 +80,7 @@ try {
   }
   $strictStatusChecksEnabled = $verify.required_status_checks.strict -eq $true
   $sourceGuardRequired = $contexts -contains "source-guard"
+  $releaseEvidenceRequired = $contexts -contains "Build, validate, and smoke-test"
   $pullRequestReviewRequired = $reviewCount -ge 1
   $staleReviewsDismissed = $reviewPolicy.dismiss_stale_reviews -eq $true
   $conversationResolutionRequired = $verify.required_conversation_resolution.enabled -eq $true
@@ -91,6 +92,7 @@ try {
   $passed = (
     $strictStatusChecksEnabled -and
     $sourceGuardRequired -and
+    $releaseEvidenceRequired -and
     $pullRequestReviewRequired -and
     $staleReviewsDismissed -and
     $conversationResolutionRequired -and
@@ -109,6 +111,7 @@ try {
     productionReady = $false
     publicLaunchAllowed = $false
     requiredStatusCheckContexts = $contexts
+    releaseEvidenceRequired = $releaseEvidenceRequired
     strictStatusChecksEnabled = $strictStatusChecksEnabled
     requiredApprovingReviewCount = $reviewCount
     staleReviewsDismissed = $staleReviewsDismissed
