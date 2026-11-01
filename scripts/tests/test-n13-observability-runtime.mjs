@@ -107,8 +107,8 @@ for (const required of [
 ]) {
   assert.ok(functionSource.includes(required), "Missing runtime security or persistence contract: " + required);
 }
-assert.ok(migrationSource.includes("SECURITY DEFINER"), "Atomic capture must run in a database transaction under a constrained function.");
-assert.ok(migrationSource.includes("SET search_path = pg_catalog"), "The privileged capture function must pin a safe search_path.");
+assert.ok(migrationSource.includes("security definer"), "Atomic capture must run in a database transaction under a constrained function.");
+assert.ok(migrationSource.includes("set search_path = pg_catalog"), "The privileged capture function must pin a safe search_path.");
 assert.ok(migrationSource.includes("pg_advisory_xact_lock"), "Capture cooldown must be serialized at the database boundary.");
 assert.ok(migrationSource.includes("n13_capture_rate_limited"), "The database function must return rate-limit evidence without partial writes.");
 assert.ok(migrationSource.includes("jsonb_to_record") && migrationSource.includes("jsonb_to_recordset"), "All capture records must be decoded and inserted by the same RPC transaction.");
