@@ -1,7 +1,7 @@
 export function evaluateMainBranchProtection(protection) {
   const requiredStatusChecks = protection?.required_status_checks ?? null;
   const requiredContexts = Array.isArray(requiredStatusChecks?.contexts)
-    ? requiredStatusChecks.contexts
+    ? requiredStatusChecks.contexts.filter((name) => typeof name === 'string' && name.length > 0)
     : [];
   const requiredCheckObjects = Array.isArray(requiredStatusChecks?.checks)
     ? requiredStatusChecks.checks
