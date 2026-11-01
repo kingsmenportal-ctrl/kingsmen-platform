@@ -1,0 +1,71 @@
+name: N15 Opportunity Watch PR Validation
+on:
+  pull_request:
+    branches: [pages-temp-static]
+    paths:
+      - "index.html"
+      - "n15-opportunity-watch.html"
+      - ".github/workflows/publish-kingsmen-pages.yml"
+      - ".github/workflows/validate-n15-opportunity-watch.yml"
+permissions:
+  contents: read
+jobs:
+  validate:
+    runs-on: ubuntu-24.04
+    steps:
+      - name: Check out pull request
+        uses: actions/checkout@v4
+      - name: Validate N15 public source watch and publisher wiring
+        shell: bash
+        run: |
+          set -euo pipefail
+          python3 - <<'PY'
+          from pathlib import Path
+          from html.parser import HTMLParser
+          html = Path("n15-opportunity-watch.html").read_text(encoding="utf-8")
+          home = Path("index.html").read_text(encoding="utf-8")
+          publisher = Path(".github/workflows/publish-kingsmen-pages.yml").read_text(encoding="utf-8")
+          required = (
+              "kingsmen.n15-opportunity-watch.v1",
+              "Source check: 1 November 2026",
+              "https://bursaries.nwpg.gov.za/",
+              "https://admin.labour.gov.za/vacancies/Pages/Vacancies-List.aspx",
+              "HR4/4/6/47", "HR4/4/9/28", "HR4/4/4/08/03",
+              "not the live authenticated Kingsmen N15 candidate feed",
+              'aria-live="polite"', "Candidate-reported submission", "provider-confirmed receipt"
+          )
+          missing = [item for item in required if item.lower() not in html.lower()]
+          if missing:
+              raise SystemExit(f"N15 source-watch contract missing: {missing}")
+          for forbidden in ("fetch(", "XMLHttpRequest", "innerHTML", "localStorage"):
+              if forbidden in html:
+                  raise SystemExit(f"Static N15 page must not use {forbidden}")
+          if html.count('target="_blank" rel="noopener noreferrer"') < 4:
+              raise SystemExit("Expected safe external-link attributes on all four source cards")
+          if "n15-opportunity-watch.html" not in home:
+              raise SystemExit("Homepage must link the N15 source watch")
+          for expected in (
+              '"n15-opportunity-watch.html"',
+              "cp index.html opportunities.html n15-opportunity-watch.html",
+              "https://kingsmenportal-ctrl.github.io/kingsmen-platform/n15-opportunity-watch.html",
+              "N15 Opportunity Watch contract passed"
+          ):
+              if expected not in publisher:
+                  raise SystemExit(f"Public publisher missing N15 wiring: {expected}")
+          class Anchors(HTMLParser):
+              def __init__(self):
+                  super().__init__()
+                  self.links = []
+              def handle_starttag(self, tag, attrs):
+                  if tag == "a":
+                      self.links.append(dict(attrs))
+          parser = Anchors()
+          parser.feed(html)
+          external = [a for a in parser.links if (a.get("href") or "").startswith("https://")]
+          if len(external) < 4:
+              raise SystemExit("Expected at least four HTTPS source links")
+          for link in external:
+              if link.get("target") == "_blank" and "noopener" not in (link.get("rel") or "").split():
+                  raise SystemExit("External links opened in a new tab must use rel=noopener")
+          print("N15 Opportunity Watch PR validation passed: dated source evidence, clear non-live boundary, safe official links, accessible filters and publish/sitemap wiring.")
+          PY
