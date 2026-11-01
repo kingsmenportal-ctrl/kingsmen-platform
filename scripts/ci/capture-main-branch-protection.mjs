@@ -76,7 +76,7 @@ try {
 }
 
 if (!response.ok) {
-  const status = response.status === 403 ? 'UNVERIFIED_PERMISSION_DENIED'
+  const status = response.status === 401 || response.status === 403 ? 'UNVERIFIED_PERMISSION_DENIED'
     : response.status === 404 ? 'BLOCKED_PROTECTION_NOT_FOUND_OR_NOT_VISIBLE'
     : 'BLOCKED_GITHUB_API_ERROR';
   const report = await finish(status, blockedChecks('Branch protection could not be verified; inspect workflow permissions and repository settings.'), response.status);
