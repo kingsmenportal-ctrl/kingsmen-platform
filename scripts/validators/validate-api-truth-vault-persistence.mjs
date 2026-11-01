@@ -44,7 +44,8 @@ const requiredTokens = {
     "truthVault.readCandidateStatus",
     "truthVault.readApplicationWorkbench",
     "truthVault.healthCheck",
-    "CANDIDATE_AUTHORIZATION_NOT_CONFIGURED",
+    "resolveCandidateIdentity",
+    "CANDIDATE_OWNERSHIP_MISMATCH",
     "APPLICATION_AUTHORIZATION_NOT_CONFIGURED"
   ],
   "apps/api/package.json": [
