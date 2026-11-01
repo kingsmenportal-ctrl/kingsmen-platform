@@ -41,3 +41,33 @@ export function deriveN13RuntimeHealthStatus(input = {}) {
 
   return "GREEN";
 }
+
+
+const SNAPSHOT_COUNT_FIELDS = [
+  "active_candidates",
+  "pending_workflows",
+  "failed_workflows",
+  "document_backlog",
+  "manual_fallback_backlog",
+  "payment_pending_count",
+  "source_review_backlog",
+  "incident_open_count"
+];
+
+/**
+ * Founder read-model projection. The staging schema stores integer counters as
+ * NOT NULL, so incomplete captures persist placeholder zeroes alongside UNKNOWN.
+ * Never expose those placeholders as measured zeroes to the founder UI.
+ */
+export function projectN13FounderSnapshot(snapshot) {
+  if (!snapshot || typeof snapshot !== "object") return null;
+  const available = snapshot.status !== "UNKNOWN";
+  const projected = {
+    ...snapshot,
+    metricCountsAvailable: available
+  };
+  if (!available) {
+    for (const field of SNAPSHOT_COUNT_FIELDS) projected[field] = null;
+  }
+  return projected;
+}
