@@ -105,7 +105,7 @@ begin
            o.last_checked_at, o.stale_after, o.valid_until, o.evidence_refs
     from public.external_source_observations o
     where o.source_url = p.exact_link
-    order by coalesce(o.last_checked_at, o.observed_at) desc, o.id desc
+    order by o.observed_at desc, o.id desc
     limit 1
   ) obs on true
   left join lateral (
@@ -294,8 +294,7 @@ begin
     'submission_boundary', 'EXTERNAL_PORTAL_OR_VERIFIED_ADAPTER_REQUIRED'
   );
 end;
-$function$
-
+$function$;
 
 revoke all on function public.prepare_candidate_application_from_master_target(text) from public, anon;
 grant execute on function public.prepare_candidate_application_from_master_target(text) to authenticated;
