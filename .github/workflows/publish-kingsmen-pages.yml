@@ -89,6 +89,8 @@ jobs:
               raise SystemExit("Application Preparation must not transmit checklist data to a server")
           print("Application Preparation contract passed: device-local persistence, reset and no network submission.")
           PY
+          python3 - <<'PY'
+          from pathlib import Path
           html = (Path("site-dist") / "employment-cv.html").read_text(encoding="utf-8")
           required = ("kingsmen.employment-cv.checklist.v1", "localStorage.setItem", "localStorage.removeItem", 'aria-live="polite"', "not sent to Kingsmen")
           missing = [item for item in required if item not in html]
@@ -97,6 +99,7 @@ jobs:
           if "fetch(" in html or "XMLHttpRequest" in html:
               raise SystemExit("Employment & CV checklist must not transmit checklist data to a server")
           print("Employment & CV Readiness contract passed: device-local checklist, reset and no network submission.")
+          PY
           echo "Public artifact contains only the approved public pages and supporting files."
 
       - name: Configure GitHub Pages
