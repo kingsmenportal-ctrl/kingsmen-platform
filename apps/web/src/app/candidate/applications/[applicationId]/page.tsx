@@ -282,7 +282,7 @@ export default function CandidateApplicationDraftPage() {
           <div className="mt-5 grid gap-3 md:grid-cols-2">
             <div className="rounded-2xl border border-slate-800 bg-slate-950 p-4">
               <p className="font-semibold">Reusable candidate profile</p>
-              <p className="mt-2 text-sm text-slate-300">{profileAvailable ? "Your verified-workspace profile is available and remains separate from this answer form." : "No saved reusable profile was found. Complete your profile before relying on shared candidate details."}</p>
+              <p className="mt-2 text-sm text-slate-300">{profileAvailable ? "Your saved reusable profile is available and remains separate from this answer form." : "No saved reusable profile was found. Complete your profile before relying on shared candidate details."}</p>
               {profileUpdatedAt && <p className="mt-2 text-xs text-slate-500">Profile last saved: {formatDate(profileUpdatedAt)}</p>}
               <a href="/candidate/profile" className="mt-3 inline-flex text-sm text-cyan-300 underline">Review reusable profile</a>
             </div>
@@ -349,7 +349,7 @@ export default function CandidateApplicationDraftPage() {
           </div>
 
           <div className="mt-7 flex flex-wrap items-center gap-3 border-t border-slate-800 pt-5">
-            <button type="submit" disabled={!isEditable || saving || loading} className="rounded-xl bg-cyan-300 px-5 py-3 text-sm font-bold text-slate-950 disabled:cursor-not-allowed disabled:opacity-40">{saving ? "Saving draft…" : "Save application draft"}</button>
+            <button type="submit" disabled={!isEditable || !profileAvailable || saving || loading} className="rounded-xl bg-cyan-300 px-5 py-3 text-sm font-bold text-slate-950 disabled:cursor-not-allowed disabled:opacity-40">{saving ? "Saving draft…" : "Save application draft"}</button>
             <span className="text-xs text-slate-500">Optimistic version control prevents a newer saved draft being silently overwritten.</span>
           </div>
         </form>
