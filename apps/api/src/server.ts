@@ -493,15 +493,22 @@ export function createKingsmenApiServer() {
         return;
       }
 
+      // Fail closed: this API runtime has no verified Supabase-token-to-candidate
+      // authorization middleware. Never expose candidate or application read models
+      // until the request identity is cryptographically verified and linked to the
+      // requested candidate/application owner. A caller-supplied ID or Authorization
+      // header alone is not proof of ownership.
       const candidateId = getPathParam(/^\/api\/candidates\/([^/]+)\/status$/, pathname);
       if (method === "GET" && candidateId) {
-        await handleCandidateStatus(response, candidateId);
+        sendError(response, 503, "CANDIDATE_AUTHORIZATION_NOT_CONFIGURED",
+          "Candidate status reads are temporarily disabled until verified identity-to-candidate authorization is configured.");
         return;
       }
 
       const applicationId = getPathParam(/^\/api\/applications\/([^/]+)\/workbench$/, pathname);
       if (method === "GET" && applicationId) {
-        await handleApplicationWorkbench(response, applicationId);
+        sendError(response, 503, "APPLICATION_AUTHORIZATION_NOT_CONFIGURED",
+          "Application workbench reads are temporarily disabled until verified identity-to-application ownership authorization is configured.");
         return;
       }
 
