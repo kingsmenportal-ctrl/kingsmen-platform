@@ -54,13 +54,15 @@
     "encrypted_archive_round_trip_hash_verified",
     "plaintext_archive_removed_after_success",
     "tampered_archive_rejected",
-    "wrong_passphrase_rejected"
+    "wrong_passphrase_rejected",
+    "plaintext_and_unknown_extensions_rejected_before_database_access"
   ],
   "evidencePaths": [
     "scripts/backup/New-KingsmenTruthVaultBackup.ps1",
     "scripts/backup/encrypt-backup.mjs",
     "scripts/backup/test-backup-encryption.mjs",
     "scripts/backup/Test-KingsmenTruthVaultRestore.ps1",
+    "scripts/backup/test-backup-restore-input-guard.ps1",
     "scripts/proof/prove-backup-restore-boundary.mjs",
     "scripts/validators/validate-backup-restore-proof.mjs",
     "docs/ops/KINGSMEN_BACKUP_RESTORE_PROOF.md",
