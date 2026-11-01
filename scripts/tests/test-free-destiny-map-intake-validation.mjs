@@ -89,7 +89,7 @@ const noRequestId = validPayload();
 noRequestId.clientRequestId = "1";
 assert.ok(validateFreeDestinyMapIntake(noRequestId).issues.some(x => x.code === "VALID_REQUEST_ID_REQUIRED"));
 
-console.log("Free Destiny Map intake validation: PASS (16 security and schema assertions).");
+console.log("Free Destiny Map intake validation: PASS (17 security and schema assertions).");
 
 const bodySourcePath = join(root, "apps/web/src/lib/free-destiny-map-intake-body.ts");
 const bodySource = readFileSync(bodySourcePath, "utf8");
