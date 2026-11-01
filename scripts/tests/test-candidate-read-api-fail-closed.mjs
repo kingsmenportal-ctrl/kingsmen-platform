@@ -21,8 +21,8 @@ assert.match(applicationBlock, /APPLICATION_OWNERSHIP_MISMATCH/);
 assert.match(applicationBlock, /handleApplicationWorkbench\(response, applicationId\)/);
 
 assert.match(auth, /\/auth\/v1\/user/);
-assert.match(auth, /candidate_auth_identity_links/);
-assert.match(auth, /link_status !== "VERIFIED"/);
+assert.match(auth, /rpc\/resolve_my_candidate_identity/);
+assert.match(auth, /VERIFIED_IDENTITY_LINK_REQUIRED/);
 assert.match(auth, /links\.length !== 1/);
 assert.match(auth, /IDENTITY_AUTHORIZATION_UNAVAILABLE/);
 assert.match(auth, /apikey: anonKey/);
