@@ -29,7 +29,7 @@ const workflowRequirements = [
   ['workflow uses read-only administration permission', workflow.includes('  administration: read')],
   ['workflow invokes the read-only evidence capture script', workflow.includes('run: node scripts/ci/capture-main-branch-protection.mjs')],
   ['evidence artifact is attempted even when the verifier blocks release', workflow.includes('        if: always()')],
-  ['evidence capture script does not issue branch-protection write requests', !/method:\\s*['"](PUT|POST|PATCH|DELETE)['"]/i.test(source)]
+  ['evidence capture script does not issue branch-protection write requests', !/method:\s*['"](PUT|POST|PATCH|DELETE)['"]/i.test(source)]
 ];
 
 const failures = [
