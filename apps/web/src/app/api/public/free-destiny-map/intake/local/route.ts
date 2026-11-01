@@ -6,6 +6,7 @@ import {
   postKingsmenCommand
 } from "@/lib/kingsmen-backend-client";
 import { validateFreeDestinyMapIntake } from "@/lib/free-destiny-map-intake-validation";
+import { readBoundedRequestBody } from "@/lib/free-destiny-map-intake-body";
 
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
@@ -45,7 +46,7 @@ function blockedResponse(
       paymentInstructionSent: false,
       documentUploadAccepted: false,
       emailSent: false,
-      safeNotice: "Payload validation failed before the backend API boundary. No command was sent and no local file write, shell command, payment, email, document upload, or official application submission occurred.",
+      safeNotice: "The request was rejected before the backend API boundary. No command was sent and no local file write, shell command, payment, email, document upload, or official application submission occurred.",
       nextAction: "Correct the highlighted Free Destiny Map intake fields.",
       issues
     },
@@ -55,33 +56,43 @@ function blockedResponse(
 
 export async function POST(request: NextRequest) {
   const backendBoundary = getKingsmenBackendBoundary();
-  const contentLength = Number(request.headers.get("content-length") ?? "0");
-  if (Number.isFinite(contentLength) && contentLength > MAX_BODY_BYTES) {
+  const mediaType = request.headers.get("content-type")?.split(";")[0].trim().toLowerCase();
+  if (mediaType !== "application/json") {
     return blockedResponse(backendBoundary, [{
-      field: "payload",
-      code: "REQUEST_TOO_LARGE",
-      message: "The intake request exceeds the maximum allowed size."
-    }], 413);
+      field: "contentType",
+      code: "JSON_CONTENT_TYPE_REQUIRED",
+      message: "The intake endpoint accepts application/json requests only."
+    }], 415);
   }
 
-  let rawBody: string;
-  try {
-    rawBody = await request.text();
-  } catch {
-    return blockedResponse(backendBoundary, [{
-      field: "payload",
-      code: "INVALID_REQUEST_BODY",
-      message: "The intake request body could not be read."
-    }], 400);
+  const contentLengthHeader = request.headers.get("content-length");
+  if (contentLengthHeader !== null) {
+    const contentLength = Number(contentLengthHeader);
+    if (!/^\\d+$/.test(contentLengthHeader) || !Number.isSafeInteger(contentLength)) {
+      return blockedResponse(backendBoundary, [{
+        field: "contentLength",
+        code: "INVALID_CONTENT_LENGTH",
+        message: "The intake request has an invalid content length."
+      }], 400);
+    }
+    if (contentLength > MAX_BODY_BYTES) {
+      return blockedResponse(backendBoundary, [{
+        field: "payload",
+        code: "REQUEST_TOO_LARGE",
+        message: "The intake request exceeds the maximum allowed size."
+      }], 413);
+    }
   }
 
-  if (new TextEncoder().encode(rawBody).byteLength > MAX_BODY_BYTES) {
+  const bodyResult = await readBoundedRequestBody(request, MAX_BODY_BYTES);
+  if (!bodyResult.ok) {
     return blockedResponse(backendBoundary, [{
       field: "payload",
-      code: "REQUEST_TOO_LARGE",
-      message: "The intake request exceeds the maximum allowed size."
-    }], 413);
+      code: bodyResult.code,
+      message: bodyResult.message
+    }], bodyResult.code === "REQUEST_TOO_LARGE" ? 413 : 400);
   }
+  const rawBody = bodyResult.body;
 
   let parsed: unknown;
   try {
