@@ -73,7 +73,7 @@ type ApplicationEvidence = {
   source_label: string;
   captured_at: string | null;
   verification_status: string;
-  verified_by_auth_user_id: string | null;
+  reviewer_attributed: boolean;
   verified_at: string | null;
   created_at: string;
 };
@@ -225,7 +225,7 @@ export default function CandidateApplicationsPage() {
             );
             const verifiedReceipt = receiptEvidence.find(item =>
               item.verification_status === "VERIFIED" &&
-              Boolean(item.verified_by_auth_user_id) &&
+              item.reviewer_attributed === true &&
               Boolean(item.verified_at)
             );
             const submissionAttemptRecorded = applicationEvents.some(event =>
