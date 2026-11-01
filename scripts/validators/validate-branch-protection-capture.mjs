@@ -12,7 +12,7 @@ const workflow = existsSync(workflowPath) ? readFileSync(workflowPath, 'utf8') :
 
 const required = [
   'read_only_branch_protection_verification',
-  '/branches/\\u0024{branch}/protection',
+  '/branches/${branch}/protection',
   'evaluateMainBranchProtection',
   'requiredStatusChecksEnabled',
   'sourceGuardRequired',
@@ -47,7 +47,7 @@ const policyRequirements = [
 ];
 const testRequirements = [
   'complete protection configuration should pass',
-  'strict status checks',
+  'strict_status_checks',
   'stale_review_dismissal',
   'conversation_resolution',
   'linear_history',
@@ -58,13 +58,13 @@ const testRequirements = [
 ];
 
 const workflowRequirements = [
-  ['workflow runs on pull requests targeting main', workflow.includes('  pull_request:\\n    branches: [main]')],
-  ['workflow runs on pushes to main', workflow.includes('  push:\\n    branches: [main]')],
-  ['manual workflow dispatch remains available', workflow.includes('  workflow_dispatch:')],
-  ['workflow uses read-only administration permission', workflow.includes('  administration: read')],
+  ['workflow runs on pull requests targeting main', workflow.includes('pull_request:') && workflow.includes('branches: [main]')],
+  ['workflow runs on pushes to main', workflow.includes('push:') && workflow.includes('branches: [main]')],
+  ['manual workflow dispatch remains available', workflow.includes('workflow_dispatch:')],
+  ['workflow uses read-only administration permission', workflow.includes('administration: read')],
   ['workflow invokes the read-only evidence capture script', workflow.includes('run: node scripts/ci/capture-main-branch-protection.mjs')],
-  ['evidence artifact is attempted even when the verifier blocks release', workflow.includes('        if: always()')],
-  ['evidence capture script does not issue branch-protection write requests', !/method:\\s*['"](PUT|POST|PATCH|DELETE)['"]/i.test(source)]
+  ['evidence artifact is attempted even when the verifier blocks release', workflow.includes('if: always()')],
+  ['evidence capture script does not issue branch-protection write requests', !['PUT', 'POST', 'PATCH', 'DELETE'].some((method) => source.includes(`method: '${method}'`) || source.includes(`method: "${method}"`))]
 ];
 
 const failures = [
