@@ -61,7 +61,7 @@ const workflowRequirements = [
   ['workflow runs on pull requests targeting main', workflow.includes('pull_request:') && workflow.includes('branches: [main]')],
   ['workflow runs on pushes to main', workflow.includes('push:') && workflow.includes('branches: [main]')],
   ['manual workflow dispatch remains available', workflow.includes('workflow_dispatch:')],
-  ['workflow uses read-only administration permission', workflow.includes('administration: read')],
+  ['workflow uses dedicated read-only administration token secret', workflow.includes('KINGSMEN_BRANCH_PROTECTION_READ_TOKEN') && !workflow.includes('administration: read')],
   ['workflow invokes the read-only evidence capture script', workflow.includes('run: node scripts/ci/capture-main-branch-protection.mjs')],
   ['evidence artifact is attempted even when the verifier blocks release', workflow.includes('if: always()')],
   ['evidence capture script does not issue branch-protection write requests', !['PUT', 'POST', 'PATCH', 'DELETE'].some((method) => source.includes(`method: '${method}'`) || source.includes(`method: "${method}"`))]
