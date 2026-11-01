@@ -15,8 +15,13 @@ $ErrorActionPreference = "Stop"
 $restoreArchiveFile = $BackupFile
 $decryptedTempFile = $null
 trap {
+  $failureMessage = if ($_.Exception -and -not [string]::IsNullOrWhiteSpace($_.Exception.Message)) {
+    $_.Exception.Message
+  } else {
+    "Restore drill failed; no successful restore is claimed."
+  }
   if ($decryptedTempFile -and (Test-Path $decryptedTempFile)) { Remove-Item -LiteralPath $decryptedTempFile -Force -ErrorAction SilentlyContinue }
-  throw
+  throw $failureMessage
 }
 
 if ([string]::IsNullOrWhiteSpace($SourceDatabaseUrl)) {
