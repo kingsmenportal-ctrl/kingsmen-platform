@@ -75,9 +75,14 @@ function gate(id, passed, reason) {
   return { id, passed: Boolean(passed), reason: passed ? null : reason };
 }
 
-function hasRawCredentialMaterial(connector) {
-  const forbidden = ["api_key", "access_token", "refresh_token", "password", "secret", "credential_value"];
-  return forbidden.some((key) => nonEmpty(connector[key]));
+function hasRawCredentialMaterial(value, seen = new WeakSet()) {
+  if (!value || typeof value !== "object" || seen.has(value)) return false;
+  seen.add(value);
+  const forbidden = new Set(["api_key", "access_token", "refresh_token", "password", "secret", "credential_value"]);
+  return Object.entries(value).some(([key, entry]) => {
+    if (forbidden.has(key.toLowerCase()) && entry != null && entry !== "") return true;
+    return hasRawCredentialMaterial(entry, seen);
+  });
 }
 
 function buildResult(checks, now, provider, connector) {
@@ -97,6 +102,7 @@ function buildResult(checks, now, provider, connector) {
     && configuredScopes.includes("SUBMIT")
     && testedScopes.includes("SUBMIT")
     && connector.candidate_authorization_required === true
+    && nonEmpty(connector.candidate_authorization_policy_ref)
     && connector.candidate_consent_enforced === true;
 
   return {
