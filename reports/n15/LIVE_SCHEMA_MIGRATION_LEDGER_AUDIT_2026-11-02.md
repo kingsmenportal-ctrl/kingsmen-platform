@@ -73,16 +73,34 @@ Programme rows must remain distinct from time-sensitive opportunities. An opport
 **Production promotion:** blocked pending all gates above.
 
 
-## Follow-up ledger-body comparison — 2026-11-02
+## Follow-up repository-to-ledger exact-body comparison — 2026-11-02
 
-A direct read-only comparison of the two pairs' ledger arrays produced these results:
+The two repeated-name pairs were compared directly against the staging ledger's stored `statements[1]` text and the candidate repository files. All four tested comparisons were byte-for-byte exact matches:
 
-| Repeated migration name | Version A | Version B | `statements` arrays identical? | Finding |
-|---|---|---|---|---|
-| `candidate_application_preparation_readiness_0078` | `20261019112452` | `20261019112511` | No | Distinct recorded statement bodies under the same migration name. Must diff both bodies against every candidate migration file and inspect live schema effects before classifying either. |
-| `seed_verified_labour_vacancy_deadlines_0093` | `20261029180632` | `20261029180642` | Yes | Exact statement arrays repeat under different version values. This is a confirmed duplicate-body signal, not yet a safe basis to delete or rewrite ledger history. Determine whether it is an intentional idempotent re-run or provenance error. |
+| Ledger version | Ledger name | Repository file | Ledger/file body length | Result |
+|---|---|---|---:|---|
+| `20261019112452` | `candidate_application_preparation_readiness_0078` | `release-evidence/recovered-applied-migrations/20261019112452_candidate_application_preparation_readiness_0078.sql` | 6,648 | Exact match |
+| `20261019112511` | `candidate_application_preparation_readiness_0078` | `release-evidence/recovered-applied-migrations/20261019112511_candidate_application_preparation_readiness_0078_corrected.sql` | 6,983 | Exact match |
+| `20261029180632` | `seed_verified_labour_vacancy_deadlines_0093` | `db/migrations/0093_seed_verified_labour_vacancy_deadlines_20261030.sql` | 6,455 | Exact match |
+| `20261029180642` | `seed_verified_labour_vacancy_deadlines_0093` | `db/migrations/0093_seed_verified_labour_vacancy_deadlines_20261030.sql` | 6,455 | Exact match |
 
-Both pairs show `created_by=ndabenhlemvelo@gmail.com`, null `idempotency_key`, one statement per row and null rollback arrays. This increases the need for a forward-only, independently reviewed reconciliation decision. It does not prove which migration file produced each ledger row. The repo-file comparison remains incomplete because the complete ordered migration-file inventory and all bodies have not yet been matched to the live ledger.
+### Reconciliation interpretation
+
+- The two `0078` records are not duplicate bodies: each ledger version matches its own distinct repository file. The second file is the corrected variant and adds a composite unique index needed by the later private document-vault relationship.
+- The two `0093` records have the same 6,455-character body, and that same body exactly matches one repository file. The evidence therefore establishes that the same migration body was recorded under two distinct ledger version values. It does not establish the operator intent, whether the second record represents an intentional idempotent re-run, or whether there were any unintended side effects. Keep both ledger records immutable pending independent review.
+- Both repeated-name pairs have `created_by=ndabenhlemvelo@gmail.com`, null `idempotency_key`, one stored statement each, and null rollback arrays.
+
+### Repository migration-file inventory
+
+The branch tree at commit `738b12c3442b9bb42b133b30228bdabc8479756c` contains 102 SQL migration-candidate files in four locations: 43 under `db/migrations`, 57 under `release-evidence/recovered-applied-migrations`, one under `database/migrations`, and one under `supabase/migrations`. The separate read-only diagnostic SQL under `scripts/audits` is not counted as a migration.
+
+There are 58 timestamp-prefixed files in the repository inventory (57 recovered-applied files plus one Supabase migration). One timestamp-prefixed file, `supabase/migrations/20261016151400_payfast_finance_tx.sql`, has no live ledger row with that exact version. Conversely, 73 live ledger versions have no file with the same 14-digit timestamp prefix. These are filename-level observations only: older numbered files and differently named recovered files may still map to those ledger rows. They are not yet a valid count of ledger-only or file-only migrations.
+
+**Full reconciliation remains incomplete.** The remaining ledger rows and candidate files still require body-level matching, semantic/name reconciliation, and confirmation of the applicable release commit. Do not infer that a missing timestamp prefix means a missing migration or that a numbered file was applied based on its filename alone.
+
+## Branch-protection evidence workflow — 2026-11-02
+
+The workflow run `41379703456` for commit `738b12c3442b9bb42b133b30228bdabc8479756c` completed with conclusion `failure`. The run's jobs and artifacts endpoints returned empty collections through the available GitHub connection, so the failing step could not be established from the accessible run evidence. The workflow's verifier reads `/branches/main/protection`; direct read attempts through both connected GitHub integrations returned HTTP 403, `Resource not accessible by integration`. The verifier is therefore not evidence that branch protection is active. Main-branch protection remains unverified, and CI must not be described as green.
 
 ## Expanded live table-name discovery
 
