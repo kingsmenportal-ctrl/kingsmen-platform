@@ -41,7 +41,7 @@ concurrency:
 jobs:
   contract:
     if: github.event_name == 'pull_request'
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     timeout-minutes: 20
     steps:
       - uses: actions/checkout@v4
@@ -63,7 +63,7 @@ jobs:
 
   staging-smoke:
     if: github.event_name == 'workflow_dispatch'
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     timeout-minutes: 10
     environment: staging
     steps:
@@ -84,7 +84,7 @@ jobs:
 
   authenticated-isolation:
     if: github.event_name == 'workflow_dispatch' && inputs.run_authenticated_isolation
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     timeout-minutes: 10
     environment: staging
     steps:
