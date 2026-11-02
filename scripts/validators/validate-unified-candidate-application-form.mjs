@@ -6,6 +6,7 @@ const root = process.cwd();
 const read = (file) => fs.readFileSync(path.join(root, file), "utf8");
 const page = read("apps/web/src/app/candidate/apply/page.tsx");
 const editor = read("apps/web/src/app/candidate/applications/[applicationId]/page.tsx");
+const caoPage = read("apps/web/src/app/candidate/cao-choices/page.tsx");
 const dashboard = read("apps/web/src/app/candidate/dashboard/page.tsx");
 const tracker = read("apps/web/src/app/candidate/applications/page.tsx");
 const draftRoute = read("apps/web/src/app/api/candidate/application-draft/route.ts");
@@ -25,7 +26,7 @@ const checks = [
   ["answer fields match the allow-listed database contract", ["motivation_statement","relevant_experience","qualifications_summary","availability_date","preferred_campus","additional_answers"].every((value) => editor.includes(value))],
   ["canonical editor handles locked parent states and version conflicts", editor.includes("isEditable") && editor.includes("APPLICATION_DRAFT_VERSION_CONFLICT")],
   ["canonical editor requires the reusable profile record and links back to profile editing", editor.includes("shared_profile_available") && editor.includes("!profileAvailable") && editor.includes('href="/candidate/profile"')],
-  ["CAO choices remain child records under the same parent", editor.includes("CAO programme choices remain child records under one Kingsmen parent application")],
+  ["higher-education editor deep-links CAO choices to the same parent and CAO page selects that authorised parent", editor.includes('"/candidate/cao-choices?application_id=" + encodeURIComponent(applicationId)') && caoPage.includes("requestedParentId") && caoPage.includes("nextParents.find(parent => parent.application_id === requestedParentId)")],
   ["candidate can navigate from dashboard, tracker and opportunity discovery into the unified selector", dashboard.includes('href: "/candidate/apply"') && tracker.includes('href="/candidate/apply"') && opportunityPage.includes('href="/candidate/apply"')],
   ["candidate selector hides internal source-confidence values and does not link external providers", !page.includes("source status:") && !page.includes("provider_application_url") && !page.includes("target=\"_blank\"") && page.includes("Current official-source, eligibility and deadline checks are repeated")],
   ["canonical editor explicitly distinguishes drafts from provider submission and outcomes", editor.includes("not an external provider submission") && editor.includes("provider-confirmed receipt")],
