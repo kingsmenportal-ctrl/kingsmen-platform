@@ -2,7 +2,7 @@ name: Kingsmen Source Guard
 
 on:
   pull_request:
-    branches: [main, feat/release-engineering-evidence-pipeline]
+    branches: [main, feat/release-engineering-evidence-pipeline, feat/backend-simplification-baseline-2026-10-29]
   push:
     branches: [main, feat/staging-authenticated-e2e-gate, feat/backend-simplification-baseline-2026-10-29]
   workflow_dispatch:
@@ -33,6 +33,9 @@ jobs:
 
       - name: Canonical finance checkout catalogue regression tests
         run: npm run finance:test:canonical-catalogue
+
+      - name: N15 institution catalogue seed contract
+        run: node scripts/validators/validate-institution-catalogue-seed.mjs
 
       - name: Supabase migration integrity gate
         run: npm run db:validate:migration-integrity
