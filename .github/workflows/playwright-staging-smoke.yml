@@ -118,7 +118,7 @@ jobs:
       - run: npx playwright install --with-deps chromium
       - name: Run read-only browser smoke checks
         env:
-          KINGSMEN_STAGING_BASE_URL: ${{ secrets.KINGSMEN_STAGING_BASE_URL }}
+          KINGSMEN_STAGING_BASE_URL: "https://kingsmen-portal-staging.netlify.app"
           KINGSMEN_SMOKE_PATHS: ${{ inputs.smoke_paths || '["/"]' }}
           KINGSMEN_SMOKE_PROTECTED_PATHS: ${{ inputs.protected_paths || '[]' }}
           KINGSMEN_SMOKE_TIMEOUT_MS: "15000"
