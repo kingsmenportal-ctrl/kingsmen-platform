@@ -12,6 +12,7 @@ const tracker = read("apps/web/src/app/candidate/applications/page.tsx");
 const draftRoute = read("apps/web/src/app/api/candidate/application-draft/route.ts");
 const preparationRoute = read("apps/web/src/app/api/candidate/applications/route.ts");
 const opportunityPage = read("apps/web/src/app/candidate/opportunity-matches/page.tsx");
+const browserJourney = read("scripts/staging/test-candidate-application-form-playwright.mjs");
 
 const pathways = [
   "HIGHER_EDUCATION", "TVET", "SETA_LEARNERSHIP",
@@ -25,6 +26,7 @@ const checks = [
   ["canonical editor uses optimistic versioning and retry-stable idempotency", editor.includes("expected_version: version") && editor.includes("idempotency_key: requestKey") && editor.includes("saveIdempotencyKey")],
   ["answer fields match the allow-listed database contract", ["motivation_statement","relevant_experience","qualifications_summary","availability_date","preferred_campus","additional_answers"].every((value) => editor.includes(value))],
   ["all six pathways expose distinct application-specific preparation prompts in the same canonical editor", pathways.every(value => editor.includes(`  ${value}:`)) && editor.includes("PATHWAY_QUESTIONS") && editor.includes("updatePathwayAnswer") && editor.includes("question_key: questionKey")],
+  ["browser regression opens all six pathway parents and asserts each pathway-specific editor prompt", pathways.every(value => browserJourney.includes(value)) && browserJourney.includes("pathwayPromptLabels[target.pathway_type]") && browserJourney.includes("assert.equal(prepareCount, 6)")],
   ["pathway prompts are explicitly described as candidate notes rather than provider requirements", editor.includes("They are candidate-provided notes, not a declaration that an institution or employer requires these answers.")],
   ["pathway and custom answers share the allow-listed additional_answers payload and twenty-answer cap", editor.includes("answers.additional_answers.length >= 20") && editor.includes("additional_answers: cleanedAnswers") && editor.includes("candidate_pathway_notice_period") && editor.includes("candidate_pathway_trade")],
   ["canonical editor handles locked parent states and version conflicts", editor.includes("isEditable") && editor.includes("APPLICATION_DRAFT_VERSION_CONFLICT")],
