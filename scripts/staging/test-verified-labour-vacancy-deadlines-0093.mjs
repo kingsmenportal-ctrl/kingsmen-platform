@@ -5,6 +5,8 @@ import path from "node:path";
 
 const migration = readFileSync(path.join(process.cwd(), "db/migrations/0093_seed_verified_labour_vacancy_deadlines_20261030.sql"), "utf8");
 const lower = migration.toLowerCase();
+const postWriteStart = lower.indexOf("-- assert all six current routes");
+const postWriteVerifier = postWriteStart >= 0 ? lower.slice(postWriteStart) : "";
 
 const checks = [
   [lower.startsWith("-- 0093:"), "migration version is explicit"],
@@ -27,8 +29,18 @@ const checks = [
   [migration.includes("'2026-10-29T18:00:00Z'"), "source-check timestamp and review date are explicit"],
   [migration.includes("on conflict (programme_id, deadline_key) do update"), "migration is idempotent by stable programme/deadline key"],
   [migration.includes("verification_scope") && migration.includes("candidate eligibility"), "source verification is not misrepresented as candidate eligibility"],
-  [migration.includes("where p.programme_key = v.programme_key") && migration.includes("p.metadata->>'closing_date' = '2026-10-30'"), "writes match existing keyed data and expected close-date snapshot"],
-  [migration.includes("closing-date evidence verification failed"), "post-write row count is asserted"],
+  [migration.includes("where p.programme_key = v.programme_key") && migration.includes("metadata->>'closing_date' = '2026-10-30'"), "writes match existing keyed data and expected close-date snapshot"],
+  [migration.includes("closing-date evidence verification failed"), "post-write verifier has a clear failure signal"],
+  [
+    postWriteVerifier.includes("from public.route_programmes p") &&
+      postWriteVerifier.includes("join public.route_deadlines d on d.programme_id = p.id") &&
+      postWriteVerifier.includes("d.deadline_key = 'official_closing_20261030'") &&
+      postWriteVerifier.includes("d.deadline_date = date '2026-10-30'") &&
+      postWriteVerifier.includes("d.verification_status = 'verified'") &&
+      postWriteVerifier.includes("d.source_confidence_band = 'a'") &&
+      postWriteVerifier.includes("if v_count <> 6 then"),
+    "post-write row count verifies six official deadlines against six stable programme keys",
+  ],
   [!lower.includes("delete from public.route_programmes") && !lower.includes("drop table"), "migration contains no destructive route/table operation"],
 ];
 

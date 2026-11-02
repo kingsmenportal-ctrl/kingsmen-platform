@@ -276,5 +276,95 @@
       "Activate paid entitlement only after verified payment",
       "Preserve immutable historical purchase snapshots"
     ]
+  },
+  "commercial_entitlements": {
+    "source_of_truth_target": "finance_plan_catalog after all consumers are reconciled; this manifest is a version-controlled contract and drift detector, not permission to mutate production rows",
+    "currency": "ZAR",
+    "amount_unit": "integer_cents",
+    "all_packages_discover_all_six_pathways": true,
+    "priority_applications_and_concurrent_routes_are_distinct": true,
+    "plans": [
+      {
+        "package_id": "foundational_accord",
+        "plan_code": "FOUNDATIONAL_ACCORD_R169_99",
+        "price_cents": 16999,
+        "priority_application_count": 5,
+        "concurrent_managed_route_capacity_30d": 4,
+        "accommodation_support": true,
+        "included_accommodation_routes": 8,
+        "cv_revamp_upgrade_bonus_routes": 2
+      },
+      {
+        "package_id": "collegiate_ordinance",
+        "plan_code": "COLLEGIATE_ORDINANCE_R299_99",
+        "price_cents": 29999,
+        "priority_application_count": 10,
+        "concurrent_managed_route_capacity_30d": 8,
+        "accommodation_support": true,
+        "included_accommodation_routes": 0,
+        "cv_revamp_upgrade_bonus_routes": 2
+      },
+      {
+        "package_id": "chancellors_writ",
+        "plan_code": "CHANCELLORS_WRIT_R399_99",
+        "price_cents": 39999,
+        "priority_application_count": 15,
+        "concurrent_managed_route_capacity_30d": 10,
+        "accommodation_support": true,
+        "included_accommodation_routes": 0,
+        "cv_revamp_upgrade_bonus_routes": 2
+      },
+      {
+        "package_id": "regency_mandate",
+        "plan_code": "REGENCY_MANDATE_R469_99",
+        "price_cents": 46999,
+        "priority_application_count": 15,
+        "concurrent_managed_route_capacity_30d": 12,
+        "accommodation_support": true,
+        "included_accommodation_routes": 0,
+        "cv_revamp_upgrade_bonus_routes": 2
+      },
+      {
+        "package_id": "artisan_charter",
+        "plan_code": "ARTISAN_CHARTER_R149_99",
+        "price_cents": 14999,
+        "priority_application_count": 5,
+        "concurrent_managed_route_capacity_30d": 3,
+        "accommodation_support": true,
+        "included_accommodation_routes": 0,
+        "cv_revamp_upgrade_bonus_routes": 2
+      },
+      {
+        "package_id": "guildmasters_charter",
+        "plan_code": "GUILDMASTERS_CHARTER_R199_99",
+        "price_cents": 19999,
+        "priority_application_count": 8,
+        "concurrent_managed_route_capacity_30d": 5,
+        "accommodation_support": true,
+        "included_accommodation_routes": 0,
+        "cv_revamp_upgrade_bonus_routes": 2
+      },
+      {
+        "package_id": "cv_revamp",
+        "plan_code": "CV_REVAMP_R49_99",
+        "price_cents": 4999,
+        "priority_application_count": null,
+        "concurrent_managed_route_capacity_30d": 0,
+        "accommodation_support": true,
+        "included_accommodation_routes": 0,
+        "cv_revamp_upgrade_bonus_routes": 0,
+        "standalone_cv_versions": 15,
+        "standalone_motivation_letters": 15,
+        "target_business_days_after_complete_intake": 3
+      }
+    ],
+    "bonus_eligibility": "The +2 managed-route bonus applies only after verified CV Revamp ownership plus an eligible package upgrade. Do not apply it merely because a plan row declares eligibility.",
+    "historical_snapshots": "Never rewrite historical order/payment entitlement snapshots."
+  },
+  "live_database_findings": {
+    "finance_plan_catalog_and_public_website_package_cards": "Prices, priority application counts, concurrent managed route capacity, accommodation support and included accommodation routes match the seven paid products.",
+    "service_packages": "Active entitlement_snapshot values are legacy/incomplete. Trace all readers/writers and add explicit compatibility mapping before changing any data.",
+    "route_visibility": "Website rows currently use SEALED. Trace consumers to confirm it seals execution pending entitlement without hiding opportunity discovery. Do not change until proven.",
+    "free_destiny_map": "finance_plan_catalog has an additional R0 Free Destiny Map row; it is outside the seven paid products."
   }
 }
