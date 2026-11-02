@@ -2,9 +2,9 @@ name: Candidate Experience CI
 
 on:
   push:
-    branches: [feat/candidate-experience-closeout-2026-10-30]
+    branches: [feat/candidate-experience-closeout-2026-10-30, feat/application-capacity-entitlements-2026-11-01]
   pull_request:
-    branches: [main, feat/backend-simplification-baseline-2026-10-29]
+    branches: [main, feat/backend-simplification-baseline-2026-10-29, feat/candidate-experience-closeout-2026-10-30]
   workflow_dispatch:
 
 permissions:
@@ -14,6 +14,26 @@ jobs:
   candidate-experience:
     name: candidate-experience-build-and-contract
     runs-on: ubuntu-latest
+    services:
+      postgres:
+        image: postgres:17
+        env:
+          POSTGRES_USER: postgres
+          POSTGRES_PASSWORD: postgres
+          POSTGRES_DB: postgres
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd "pg_isready -U postgres -d postgres"
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+    env:
+      PGHOST: localhost
+      PGPORT: 5432
+      PGUSER: postgres
+      PGPASSWORD: postgres
+      PGDATABASE: postgres
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -32,6 +52,16 @@ jobs:
         run: npm test
       - name: Candidate Experience source-contract regression
         run: npm run candidate:experience:check
+      - name: Install PostgreSQL client
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y postgresql-client
+      - name: Bootstrap isolated capacity integration database
+        run: psql -v ON_ERROR_STOP=1 -f scripts/staging/fixtures/application-capacity-postgres-bootstrap.sql
+      - name: Apply application capacity migration to disposable PostgreSQL 17
+        run: psql -v ON_ERROR_STOP=1 -f db/migrations/0107_application_capacity_entitlements_20261101.sql
+      - name: Exercise paid entitlements, reservations, isolation and release guards
+        run: psql -v ON_ERROR_STOP=1 -f scripts/staging/test-application-capacity-postgres.sql
       - name: Build backend API
         run: npm run api:build
       - name: Build Next.js web application
