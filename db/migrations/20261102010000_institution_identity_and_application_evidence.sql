@@ -2,6 +2,94 @@
 -- This migration is a proposal only until reviewed backup/restore and change-control gates pass.
 begin;
 
+-- Add an explicit provider type for the nine provincially based CET colleges.
+alter table public.route_providers drop constraint route_providers_type_check;
+alter table public.route_providers add constraint route_providers_type_check
+  check (provider_type = any (array[
+    'UNIVERSITY','TVET','CET','COMMUNITY_COLLEGE','SETA','LEARNERSHIP_PROVIDER',
+    'BURSARY_PROVIDER','ACCOMMODATION_PROVIDER','EMPLOYER','PRIVATE_COLLEGE',
+    'APPLICATION_PORTAL','GOVERNMENT_AUTHORITY','QUALITY_AUTHORITY'
+  ]));
+
+with cet(source_key,provider_key,provider_name,province) as (values
+ ('dhet_cet_eastern_cape','cet_eastern_cape','Eastern Cape Community Education and Training College','Eastern Cape'),
+ ('dhet_cet_free_state','cet_free_state','Free State Community Education and Training College','Free State'),
+ ('dhet_cet_gauteng','cet_gauteng','Gauteng Community Education and Training College','Gauteng'),
+ ('dhet_cet_kwazulu_natal','cet_kwazulu_natal','KwaZulu-Natal Community Education and Training College','KwaZulu-Natal'),
+ ('dhet_cet_limpopo','cet_limpopo','Limpopo Community Education and Training College','Limpopo'),
+ ('dhet_cet_mpumalanga','cet_mpumalanga','Mpumalanga Community Education and Training College','Mpumalanga'),
+ ('dhet_cet_northern_cape','cet_northern_cape','Northern Cape Community Education and Training College','Northern Cape'),
+ ('dhet_cet_north_west','cet_north_west','North West Community Education and Training College','North West'),
+ ('dhet_cet_western_cape','cet_western_cape','Western Cape Community Education and Training College','Western Cape')
+)
+insert into public.source_authorities(
+  source_key,source_name,source_type,base_url,default_confidence_band,
+  verification_required,last_verified_at,verification_notes,created_at,updated_at
+)
+select source_key,provider_name || ' — DHET institutional anchor','dhet_register',
+  'https://www.dhet.gov.za/Commissions%20Reports/DHET%20Annual%20Report%202024_2025%20Print%20Ready.pdf',
+  'B',true,now(),
+  'DHET Annual Report 2024/25 system-level anchor. This does not establish the current institution domain, campus list, current status or programme availability.',
+  now(),now()
+from cet
+on conflict(source_key) do update set
+  base_url=excluded.base_url,verification_required=true,
+  verification_notes=excluded.verification_notes,updated_at=now();
+
+with cet(source_key,provider_key,provider_name,province) as (values
+ ('dhet_cet_eastern_cape','cet_eastern_cape','Eastern Cape Community Education and Training College','Eastern Cape'),
+ ('dhet_cet_free_state','cet_free_state','Free State Community Education and Training College','Free State'),
+ ('dhet_cet_gauteng','cet_gauteng','Gauteng Community Education and Training College','Gauteng'),
+ ('dhet_cet_kwazulu_natal','cet_kwazulu_natal','KwaZulu-Natal Community Education and Training College','KwaZulu-Natal'),
+ ('dhet_cet_limpopo','cet_limpopo','Limpopo Community Education and Training College','Limpopo'),
+ ('dhet_cet_mpumalanga','cet_mpumalanga','Mpumalanga Community Education and Training College','Mpumalanga'),
+ ('dhet_cet_northern_cape','cet_northern_cape','Northern Cape Community Education and Training College','Northern Cape'),
+ ('dhet_cet_north_west','cet_north_west','North West Community Education and Training College','North West'),
+ ('dhet_cet_western_cape','cet_western_cape','Western Cape Community Education and Training College','Western Cape')
+)
+insert into public.opportunity_source_authorities(
+  authority_ref,authority_name,authority_type,base_url,sector_scope,
+  confidence_band,active,notes,created_at,updated_at
+)
+select source_key,provider_name || ' — DHET institutional anchor','DHET_REGISTER',
+  'https://www.dhet.gov.za/Commissions%20Reports/DHET%20Annual%20Report%202024_2025%20Print%20Ready.pdf',
+  array['CET','education','training'],'MEDIUM',true,
+  'System-level official source only. Current institution-level status, domain, campuses, aliases and programme scope must be independently reconciled.',
+  now(),now()
+from cet
+on conflict(authority_ref) do update set
+  base_url=excluded.base_url,confidence_band='MEDIUM',active=true,
+  notes=excluded.notes,updated_at=now();
+
+with cet(source_key,provider_key,provider_name,province) as (values
+ ('dhet_cet_eastern_cape','cet_eastern_cape','Eastern Cape Community Education and Training College','Eastern Cape'),
+ ('dhet_cet_free_state','cet_free_state','Free State Community Education and Training College','Free State'),
+ ('dhet_cet_gauteng','cet_gauteng','Gauteng Community Education and Training College','Gauteng'),
+ ('dhet_cet_kwazulu_natal','cet_kwazulu_natal','KwaZulu-Natal Community Education and Training College','KwaZulu-Natal'),
+ ('dhet_cet_limpopo','cet_limpopo','Limpopo Community Education and Training College','Limpopo'),
+ ('dhet_cet_mpumalanga','cet_mpumalanga','Mpumalanga Community Education and Training College','Mpumalanga'),
+ ('dhet_cet_northern_cape','cet_northern_cape','Northern Cape Community Education and Training College','Northern Cape'),
+ ('dhet_cet_north_west','cet_north_west','North West Community Education and Training College','North West'),
+ ('dhet_cet_western_cape','cet_western_cape','Western Cape Community Education and Training College','Western Cape')
+)
+insert into public.route_providers(
+  provider_key,provider_name,provider_type,province,base_url,source_authority_id,
+  default_confidence_band,verification_status,public_safe,
+  private_provider_requires_accreditation_check,notes,metadata,created_at,updated_at
+)
+select c.provider_key,c.provider_name,'CET',c.province,null,s.id,'B','NEEDS_REVIEW',false,false,
+  'Official CET institutional anchor only. Do not recommend until official domain, current status, campus/CLC list, programme scope and current intake are verified.',
+  jsonb_build_object('source_checked_at',now(),'source_snapshot_date',null,
+    'evidence_status','SYSTEM_LEVEL_SOURCE_ONLY','official_domain_verified',false,
+    'campus_and_clc_list_verified',false,'candidate_recommendation_allowed',false,
+    'partner_status','NOT_CONFIRMED','integration_status','NOT_CONFIGURED'),
+  now(),now()
+from cet c join public.source_authorities s on s.source_key=c.source_key
+on conflict(provider_key) do update set
+  provider_name=excluded.provider_name,provider_type='CET',province=excluded.province,
+  source_authority_id=excluded.source_authority_id,verification_status='NEEDS_REVIEW',
+  public_safe=false,notes=excluded.notes,metadata=excluded.metadata,updated_at=now();
+
 create table public.route_provider_aliases (
   id uuid primary key default gen_random_uuid(),
   provider_id uuid not null references public.route_providers(id) on delete restrict,
