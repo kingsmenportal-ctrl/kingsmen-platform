@@ -272,12 +272,22 @@ try {
   claimClientB = new Client({ host, port, user: "service_role", password: rolePassword, database, connectionTimeoutMillis: 5000 });
   await Promise.all([claimClientA.connect(), claimClientB.connect()]);
   const claimSql = "select dispatch_ref from public.n16_claim_dispatches($1,1,60)";
-  const claims = await Promise.all([
-    claimClientA.query(claimSql, ["claim-worker-a"]),
-    claimClientB.query(claimSql, ["claim-worker-b"])
-  ]);
-  assert.equal(claims[0].rowCount + claims[1].rowCount, 1, "concurrent claim must have one winner");
-  const winner = claims[0].rows[0] ?? claims[1].rows[0];
+  await claimClientA.query("begin");
+  let claimA;
+  let claimB;
+  try {
+    // Keep A's row lock open while B executes in a separate session.
+    claimA = await claimClientA.query(claimSql, ["claim-worker-a"]);
+    claimB = await claimClientB.query(claimSql, ["claim-worker-b"]);
+    assert.equal(claimA.rowCount, 1, "session A must claim the single ready fixture row");
+    assert.equal(claimB.rowCount, 0, "session B must skip the row locked by session A");
+    assert.equal(claimA.rows[0].dispatch_ref, "n16-concurrent-claim");
+    await claimClientA.query("commit");
+  } catch (error) {
+    await claimClientA.query("rollback").catch(() => {});
+    throw error;
+  }
+  const winner = claimA.rows[0];
   await admin.query(
     "select public.n16_record_dispatch_result($1,$2,'SUCCEEDED','SAME','{}'::jsonb,$3::text[])",
     [winner.dispatch_ref, "n16-concurrent-result", ["ev:n16-concurrent-claim"]]
