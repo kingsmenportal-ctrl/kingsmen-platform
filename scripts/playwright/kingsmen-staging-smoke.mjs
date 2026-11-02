@@ -22,7 +22,9 @@ const parsePaths = (name, fallback) => {
     !v.startsWith("/") ||
     v.startsWith("//") ||
     v.includes("\\") ||
-    v.includes("?") ||\n    v.includes("#") ||\n    [...v].some((character) => character.charCodeAt(0) < 32) ||
+    v.includes("?") ||
+    v.includes("#") ||
+    [...v].some((character) => character.charCodeAt(0) < 32) ||
     v.split("/").some((part) => part === "." || part === "..")
   )) {
     fail("BLOCKED_INVALID_PATH_CONFIGURATION", name + " must be an array of normalized absolute paths without query strings or fragments.");
