@@ -190,14 +190,23 @@ export function createPlaywrightReadOnlyScoutHandler(env: NodeJS.ProcessEnv = pr
           }
         };
       } catch (error) {
+        const errorName = error instanceof Error ? error.name : "UNKNOWN";
+        const errorDetail = error instanceof Error
+          ? error.message
+            .replace(/https?:\/\/[^\\s]+/gi, "[URL]")
+            .replace(/[\\r\\n\\t\\u0000-\\u001f]/g, " ")
+            .slice(0, 160)
+          : "Unknown browser execution error";
         return {
           workerStatus: "FAILED",
           proposedState: "SAME",
           failureClass: "TRANSIENT",
-          failureCode: error instanceof Error && /Timeout/i.test(error.name) ? "BROWSER_NAVIGATION_TIMEOUT" : "BROWSER_NAVIGATION_FAILED",
+          failureCode: /Timeout/i.test(errorName) ? "BROWSER_NAVIGATION_TIMEOUT" : "BROWSER_NAVIGATION_FAILED",
           payload: {
             handler: "browser.readonly_scout",
             elapsedMs: Math.max(0, Date.now() - startedAt),
+            errorName,
+            errorDetail,
             blockedRequestCount,
             pageErrorCount,
             readOnly: true
