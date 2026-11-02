@@ -28,7 +28,7 @@ const pgPath = require.resolve("pg", { paths: [path.join(root, "apps/api")] });
 const { Client } = require(pgPath);
 const admin = new Client({ host, port, user: adminUser, password: adminPassword, database, connectionTimeoutMillis: 5000 });
 const passwordLiteral = "'" + rolePassword.replace(/'/g, "''") + "'";
-const workerUrl = "postgres://" + encodeURIComponent("service_role") + ":" +
+const workerUrl = "postgres://" + encodeURIComponent("kingsmen_n16_worker_login") + ":+"
   encodeURIComponent(rolePassword) + "@" + host + ":" + port + "/" + database;
 
 function startWorker(workerId, preSentDelayMs, postSentDelayMs) {
@@ -122,34 +122,55 @@ try {
     "db/migrations/0014_n16_orchestrator_execution.sql",
     "db/migrations/202610250001_n16_durable_worker_recovery.sql",
     "db/migrations/202610250002_n16_worker_send_boundary.sql",
-    "db/migrations/202610250003_n16_exhausted_lease_recovery.sql"
+    "db/migrations/202610250003_n16_exhausted_lease_recovery.sql",
+    "db/migrations/202611020001_n16_worker_least_privilege_role.sql"
   ];
   for (const migrationPath of migrationPaths) {
     const sql = await readFile(path.join(root, migrationPath), "utf8");
     await admin.query(sql);
   }
   await admin.query("grant usage on schema public to service_role");
+  await admin.query("drop role if exists kingsmen_n16_worker_login");
+  await admin.query("create role kingsmen_n16_worker_login login password " + passwordLiteral);
+  await admin.query("grant kingsmen_n16_worker to kingsmen_n16_worker_login");
+  await admin.query("grant connect on database " + database + " to kingsmen_n16_worker_login");
 
   const access = await admin.query([
     "select",
     "has_function_privilege('anon','public.n16_claim_dispatches(text,integer,integer)','EXECUTE') as anon_claim,",
     "has_function_privilege('authenticated','public.n16_claim_dispatches(text,integer,integer)','EXECUTE') as auth_claim,",
     "has_function_privilege('service_role','public.n16_claim_dispatches(text,integer,integer)','EXECUTE') as service_claim,",
+    "has_function_privilege('kingsmen_n16_worker_login','public.n16_mark_dispatch_sent(text,text,integer)','EXECUTE') as worker_mark_sent,",
+    "has_function_privilege('kingsmen_n16_worker_login','public.n16_record_dispatch_result(text,text,text,text,jsonb,text[],text,text,integer,integer)','EXECUTE') as worker_result,",
+    "has_function_privilege('kingsmen_n16_worker_login','public.n16_reconcile_expired_sent(integer)','EXECUTE') as worker_recovery,",
+    "has_function_privilege('kingsmen_n16_worker_login','public.n16_deadletter_exhausted_locked(integer)','EXECUTE') as worker_deadletter,",
     "has_table_privilege('anon','public.orchestrator_dispatch_queue','SELECT') as anon_select,",
     "has_table_privilege('authenticated','public.orchestrator_dispatch_queue','SELECT') as auth_select,",
-    "has_table_privilege('service_role','public.orchestrator_dispatch_queue','SELECT') as service_select"
+    "has_table_privilege('service_role','public.orchestrator_dispatch_queue','SELECT') as service_select,",
+    "has_table_privilege('kingsmen_n16_worker_login','public.orchestrator_dispatch_queue','SELECT') as worker_select,",
+    "has_table_privilege('kingsmen_n16_worker_login','public.orchestrator_dispatch_queue','INSERT') as worker_insert,",
+    "has_table_privilege('kingsmen_n16_worker_login','public.orchestrator_dispatch_queue','UPDATE') as worker_update,",
+    "has_table_privilege('kingsmen_n16_worker_login','public.orchestrator_dispatch_queue','DELETE') as worker_delete"
   ].join(" "));
   assert.equal(access.rows[0].anon_claim, false);
   assert.equal(access.rows[0].auth_claim, false);
   assert.equal(access.rows[0].service_claim, true);
+  assert.equal(access.rows[0].worker_mark_sent, true);
+  assert.equal(access.rows[0].worker_result, true);
+  assert.equal(access.rows[0].worker_recovery, true);
+  assert.equal(access.rows[0].worker_deadletter, true);
   assert.equal(access.rows[0].anon_select, false);
   assert.equal(access.rows[0].auth_select, false);
   assert.equal(access.rows[0].service_select, true);
+  assert.equal(access.rows[0].worker_select, false);
+  assert.equal(access.rows[0].worker_insert, false);
+  assert.equal(access.rows[0].worker_update, false);
+  assert.equal(access.rows[0].worker_delete, false);
 
   // Independent database sessions verify concurrent claim single-winner.
   await insertSynthetic("n16-concurrent-claim");
-  claimClientA = new Client({ host, port, user: "service_role", password: rolePassword, database, connectionTimeoutMillis: 5000 });
-  claimClientB = new Client({ host, port, user: "service_role", password: rolePassword, database, connectionTimeoutMillis: 5000 });
+  claimClientA = new Client({ host, port, user: "kingsmen_n16_worker_login", password: rolePassword, database, connectionTimeoutMillis: 5000 });
+  claimClientB = new Client({ host, port, user: "kingsmen_n16_worker_login", password: rolePassword, database, connectionTimeoutMillis: 5000 });
   await Promise.all([claimClientA.connect(), claimClientB.connect()]);
   const claimSql = "select dispatch_ref from public.n16_claim_dispatches($1,1,60)";
   const claims = await Promise.all([
@@ -249,7 +270,8 @@ try {
     manualHandoffCreated: true,
     postSentAutoReplay: false,
     anonAuthenticatedAccessDenied: true,
-    serviceRoleOnlyAccess: true,
+    workerHasOnlyApprovedRpcAccess: true,
+    workerDirectQueueTableAccess: false,
     stagingDatabaseTouched: false,
     externalProviderAction: false,
     productionWorkerProven: false
