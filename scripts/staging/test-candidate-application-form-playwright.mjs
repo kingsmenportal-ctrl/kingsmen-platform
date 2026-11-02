@@ -136,7 +136,10 @@ async function main() {
     assert.match(headers.authorization || "", /^Bearer\s+kingsmen-playwright-test-access-token/);
     if (request.method() === "GET") {
       const url = new URL(request.url());
-      assert.equal(url.searchParams.get("application_id"), applicationId);
+      const requestedApplicationId = url.searchParams.get("application_id") || "";
+      const target = pathwayTargets.find(item => applicationIdsByPathway[item.pathway_type] === requestedApplicationId);
+      assert.ok(target, "application draft reads must refer to a candidate-owned parent from the six-pathway fixture");
+      const isEmployment = target.pathway_type === "EMPLOYMENT";
       return route.fulfill({
         status: 200,
         contentType: "application/json",
@@ -144,22 +147,22 @@ async function main() {
           ready: true,
           ok: true,
           application: {
-            id: applicationId,
-            application_ref: "KM-PLAYWRIGHT-001",
-            pathway_type: "EMPLOYMENT",
+            id: requestedApplicationId,
+            application_ref: "KM-PLAYWRIGHT-" + target.pathway_type,
+            pathway_type: target.pathway_type,
             status: "DRAFT",
             readiness_status: "NOT_CHECKED",
             readiness_snapshot: {},
-            title: "Operations role",
-            provider_name: "N15 Employer",
+            title: target.programme_or_role,
+            provider_name: target.provider_name,
             source_url: "https://example.test/employer",
             closes_at: null,
             created_at: "2026-11-02T11:00:00.000Z",
             updated_at: "2026-11-02T11:00:00.000Z"
           },
-          draft: storedDraft,
-          draft_version: version,
-          draft_updated_at: version ? "2026-11-02T12:00:00.000Z" : null,
+          draft: isEmployment ? storedDraft : {},
+          draft_version: isEmployment ? version : 0,
+          draft_updated_at: isEmployment && version ? "2026-11-02T12:00:00.000Z" : null,
           shared_profile_available: profileAvailable,
           is_editable: true,
           provider_submission_sent: false
@@ -167,7 +170,7 @@ async function main() {
       });
     }
     const body = request.postDataJSON();
-    assert.equal(body.application_id, applicationId);
+    assert.equal(body.application_id, applicationIdsByPathway.EMPLOYMENT);
     assert.equal(body.expected_version, version);
     assert.match(body.idempotency_key, /^application-draft-[a-f0-9-]{36}$/);
     saveKeys.push(body.idempotency_key);
