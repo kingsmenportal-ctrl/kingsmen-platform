@@ -279,6 +279,11 @@ export default function CandidateApplicationDraftPage() {
               <p className="mt-1 text-xs text-slate-400">Draft version {version}</p>
             </div>
           </div>
+          {application.pathway_type === "HIGHER_EDUCATION" && <section className="mt-5 rounded-2xl border border-cyan-900 bg-slate-950 p-4">
+            <h3 className="font-semibold">CAO programme choices</h3>
+            <p className="mt-2 text-sm leading-6 text-slate-300">Keep up to six ordered programme choices as child records beneath this Kingsmen parent application. They remain draft preparation until separately authorised and confirmed.</p>
+            <a href={"/candidate/cao-choices?application_id=" + encodeURIComponent(applicationId)} className="mt-3 inline-flex rounded-xl border border-cyan-800 px-4 py-2 text-sm font-semibold text-cyan-200">Manage choices for this parent application</a>
+          </section>}
           <div className="mt-5 grid gap-3 md:grid-cols-2">
             <div className="rounded-2xl border border-slate-800 bg-slate-950 p-4">
               <p className="font-semibold">Reusable candidate profile</p>
