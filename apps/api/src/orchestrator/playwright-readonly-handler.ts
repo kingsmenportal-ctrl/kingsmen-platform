@@ -1,5 +1,5 @@
 import { createHash } from "node:crypto";
-import { chromium } from "playwright";
+import { chromium, type Browser, type BrowserContext } from "playwright";
 import type { WorkerHandler } from "./worker-runner";
 
 type BrowserPayload = { url: string };
@@ -84,8 +84,8 @@ export function createPlaywrightReadOnlyScoutHandler(env: NodeJS.ProcessEnv = pr
         };
       }
 
-      let browser: Awaited<ReturnType<typeof chromium.launch>> | undefined;
-      let context: Awaited<ReturnType<Awaited<ReturnType<typeof chromium.launch>>["newContext"]>> | undefined;
+      let browser: Browser | undefined;
+      let context: BrowserContext | undefined;
       let blockedRequestCount = 0;
       let pageErrorCount = 0;
       const startedAt = Date.now();
