@@ -19,6 +19,8 @@ const checks = [
     !/Optional official HTTPS source URL|Official source URL for checklist item/.test(applications)],
   ["opportunity discovery does not expose or link the official provider URL",
     !/href=\{item\.official_link\}|Canonical official URL|Open official opportunity/.test(opportunities)],
+  ["candidate UI does not render raw provider URLs in visible application content",
+    !/\{target\.provider_application_url\}|\{item\.official_link\}|\{opportunity\?\.official_url\}|\{item\.official_source_url\}/.test(applications + opportunities)],
   ["opportunity deadline exceptions are explained and handled within Kingsmen",
     opportunities.includes("Kingsmen is checking the current provider window") &&
     opportunities.includes("Kingsmen must verify the deadline before preparation can proceed")],
