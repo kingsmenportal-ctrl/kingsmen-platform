@@ -198,6 +198,7 @@ export default function CandidateApplicationsPage() {
           <a href="/candidate/dashboard" className="rounded-xl border border-slate-700 px-4 py-2">Dashboard</a>
           <a href="/candidate/profile" className="rounded-xl border border-slate-700 px-4 py-2">My profile</a>
           <a href="/candidate/workbench" className="rounded-xl border border-slate-700 px-4 py-2">Workbench</a>
+          <a href="/candidate/apply" className="rounded-xl border border-cyan-700 px-4 py-2 text-cyan-200">Unified application form</a>
           <a href="/candidate/documents" className="rounded-xl border border-slate-700 px-4 py-2">Document Vault</a>
           <a href="/candidate/opportunity-matches" className="rounded-xl border border-slate-700 px-4 py-2">Verified opportunities</a>
           <a href="/candidate/cao-choices" className="rounded-xl border border-slate-700 px-4 py-2">CAO choices</a>
