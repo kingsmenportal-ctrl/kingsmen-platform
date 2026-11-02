@@ -13,7 +13,7 @@ const checks = [
   ["form accessibility", source, "unlabeledControlCount"],
   ["anonymous auth boundary", source, "anonymous-boundary:"],
   ["query string redaction", source, "pathname"],
-  ["existing N16 queue reuse", plan, "existing N16 durable queue"],
+  ["existing N16 queue reuse", plan, "N16 durable PostgreSQL queue"],
   ["unapproved provider actions blocked", plan, "human-assisted handoff"],
   ["deployment evidence", plan, "exact commit/image digest"]
 ];
