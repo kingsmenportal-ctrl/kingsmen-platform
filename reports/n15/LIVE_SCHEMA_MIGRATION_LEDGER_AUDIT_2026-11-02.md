@@ -71,3 +71,19 @@ Programme rows must remain distinct from time-sensitive opportunities. An opport
 **CI:** not proven green for this branch head at audit time.  
 **Authenticated isolation/reviewer tests:** not run/proven by this audit.  
 **Production promotion:** blocked pending all gates above.
+
+
+## Follow-up ledger-body comparison — 2026-11-02
+
+A direct read-only comparison of the two pairs' ledger arrays produced these results:
+
+| Repeated migration name | Version A | Version B | `statements` arrays identical? | Finding |
+|---|---|---|---|---|
+| `candidate_application_preparation_readiness_0078` | `20261019112452` | `20261019112511` | No | Distinct recorded statement bodies under the same migration name. Must diff both bodies against every candidate migration file and inspect live schema effects before classifying either. |
+| `seed_verified_labour_vacancy_deadlines_0093` | `20261029180632` | `20261029180642` | Yes | Exact statement arrays repeat under different version values. This is a confirmed duplicate-body signal, not yet a safe basis to delete or rewrite ledger history. Determine whether it is an intentional idempotent re-run or provenance error. |
+
+Both pairs show `created_by=ndabenhlemvelo@gmail.com`, null `idempotency_key`, one statement per row and null rollback arrays. This increases the need for a forward-only, independently reviewed reconciliation decision. It does not prove which migration file produced each ledger row. The repo-file comparison remains incomplete because the complete ordered migration-file inventory and all bodies have not yet been matched to the live ledger.
+
+## Expanded live table-name discovery
+
+A broader `information_schema.tables` query found related existing tables including `candidate_application_evidence`, `candidate_identity_review_evidence`, `evidence_ledger`, `opportunity_deadlines`, `opportunity_eligibility_rules`, `opportunity_verification_reviews`, `route_programmes`, and `route_providers`, as well as the N15 catalogue tables. This discovery is not a complete policy/constraint audit. Existing tables are not assumed to satisfy the canonical model without column, constraint, index, trigger, grant, RLS and application-code review.
