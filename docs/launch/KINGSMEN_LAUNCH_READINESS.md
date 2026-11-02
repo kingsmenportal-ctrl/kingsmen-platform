@@ -19,7 +19,7 @@ The repo has source-level proof for backend API, PostgreSQL/Supabase Truth Vault
 5. **Prove PayFast sandbox + ITN against provider sandbox.** No real payments until sandbox success/cancel/return/failure/duplicate/invalid-signature/replay/amount-mismatch/refund-review evidence exists from staging.
 6. **Prove backup and restore.** No production personal data until a real staging restore drill proves backup archive checksum, target/source separation, counts-only verification, RPO/RTO, and redaction.
 7. **Wire secrets outside git.** Launch requires masked runtime health evidence proving required environment variables are configured outside Git without printing values.
-8. **Prove communications provider boundary.** Candidate notifications require provider staging send/receive, bounce, opt-out, WhatsApp urgent-only, SMS fallback-only, and redacted evidence proof.
+8. **Prove communications provider boundary.** Candidate email notifications require provider staging send/receive, bounce, opt-out, and redacted evidence proof. WhatsApp and SMS remain disabled pending a separate Founder-approved release decision.
 9. **Prove observability and incident handling.** Public users require staging health, logs, queue/DLQ, alerts, redaction, and SEV runbook evidence.
 10. **Publish privacy, consent, terms, and refund policy.** Launch requires published/versioned surfaces, founder/legal review, consent capture proof, refund/payment display proof, and data-subject request proof.
 11. **Capture the staging runtime proof pack.** Final assembly must not open until the staging runtime proof pack contains reviewed redacted runtime evidence for all P0 gates.
@@ -167,7 +167,7 @@ npm run communications:prove
 npm run communications:validate
 ```
 
-Provider staging proof still required: email send/receive, bounce handling, opt-out path, WhatsApp urgent-only approval evidence, SMS fallback-only evidence, and redacted evidence report.
+Provider staging proof still required: email send/receive, bounce handling, opt-out path, and a redacted evidence report. WhatsApp and SMS remain disabled and must not be enabled by this proof.
 
 ## observability + incident proof command
 
