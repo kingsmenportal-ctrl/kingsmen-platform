@@ -6,6 +6,7 @@ on:
       - "scripts/playwright/**"
       - "scripts/staging/test-playwright-staging-smoke.mjs"
       - "scripts/staging/test-n16-*contract.mjs"
+      - "scripts/staging/test-n16-playwright-*.mjs"
       - "scripts/validators/validate-playwright-worker-contract.mjs"
       - "apps/api/src/orchestrator/**"
       - "apps/api/package.json"
