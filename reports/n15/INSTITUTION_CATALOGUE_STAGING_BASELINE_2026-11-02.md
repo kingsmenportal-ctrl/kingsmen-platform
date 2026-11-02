@@ -24,7 +24,7 @@ Counts were queried from the live staging database; they are not inferred from r
 2. The older route domain already has 3 provider rows and 8 programme rows. They must be reconciled before bulk import to avoid duplicate institutional identities or broken provider/programme links.
 3. `organisations` is not a safe bulk-import target in its current shape: it requires `contact_email` and `created_by`, and its workflow is reviewer-oriented. Do not invent contact emails or impersonate an authenticated creator to make the import pass.
 4. The existing N15 provider record has identity, provider type, sector, province, official website, accreditation review state, source confidence, evidence refs, and a fail-closed recommendation flag. It does not model campuses/branches, aliases, registry effective dates, integration state, partnership state, or provider receipt state as first-class fields.
-5. Therefore the first public-university seed is an N15 directory-anchor batch, not the final canonical institution master. Before full production catalogue rollout, reconcile `route_providers`, `opportunity_providers`, and institution identity/campus needs against the simplified backend contract.
+5. Therefore the 26 public-university and 50 public-TVET seeds are N15 directory-anchor batches (76 records total), not the final canonical institution master. Before full production catalogue rollout, reconcile `route_providers`, `opportunity_providers`, and institution identity/campus needs against the simplified backend contract.
 
 ## Safety contract
 
@@ -33,6 +33,15 @@ Counts were queried from the live staging database; they are not inferred from r
 - The import does not create programme rows, deadlines, eligibility claims, fees, application submissions, provider integrations, partnerships, or outcome claims.
 - Seeded public-university anchors stay `accreditation_status='NEEDS_REVIEW'` and `safe_to_recommend=false`.
 - No live rows were inserted, updated, or deleted as part of this census or this PR.
+
+## Repository data batches now authored
+
+- `db/seeds/n15_public_university_provider_seed.sql`: 26 public-university anchors.
+- `db/seeds/n15_public_tvet_provider_seed.sql`: 50 public-TVET anchors based on the NSFAS institution directory and DHET entry point; institution-specific official URLs remain null until individually verified.
+- `scripts/validators/validate-institution-catalogue-seed.mjs`: validates both batches, unique stable references, idempotency, and fail-closed publication defaults.
+- `manifests/n15/institution-catalogue-import-v1.json`: source/coverage contract and next batches.
+
+A read of the repository files detected 26 university rows and 50 TVET rows (76 unique provider refs); this is static seed validation, not evidence that the records exist in Supabase.
 
 ## Migration blockers that remain
 
