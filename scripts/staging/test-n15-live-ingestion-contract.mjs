@@ -26,7 +26,7 @@ const checks = [
   ["candidate feed rejects inconsistent timestamps and missing evidence", /observedAtMs > checkedAtMs/.test(candidate) && /staleAfterMs <= checkedAtMs/.test(candidate) && /!Array\.isArray\(observation\.evidence_refs\)/.test(candidate)],
   ["candidate feed keeps CAO and learnership pathway coverage consistent", /CAO: \["HIGHER_EDUCATION", "TVET"\]/.test(candidate) && /LEARNERSHIP: \["SETA_LEARNERSHIPS", "APPRENTICESHIPS"\]/.test(candidate)],
   ["candidate UI covers all six pathways and explicit unknown deadline state", ["HIGHER_EDUCATION","TVET","SETA_LEARNERSHIPS","INTERNSHIPS","APPRENTICESHIPS","EMPLOYMENT"].every(x => page.includes(x)) && /Not verified/.test(page)],
-  ["candidate UI opens only the official opportunity link", /href=\{item\.official_link\}/.test(page) && /rel="noopener noreferrer"/.test(page)],
+  ["candidate UI retains official source provenance internally without sending candidates to provider websites", !/href=\{item\.official_link\}/.test(page) && !/target="_blank"/.test(page) && page.includes("Source handling") && page.includes("Candidates complete application tasks inside this workspace.")],
   ["operator ingestion UI exposes controlled manual run", /Run source ingestion/.test(fs.readFileSync(path.join(root, "apps/web/src/app/operator/opportunities/ingestion/page.tsx"), "utf8")) && /authorised platform reviewer/.test(fs.readFileSync(path.join(root, "apps/web/src/app/operator/opportunities/ingestion/page.tsx"), "utf8"))],
 ];
 
