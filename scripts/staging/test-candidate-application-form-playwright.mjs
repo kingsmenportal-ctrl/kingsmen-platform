@@ -230,7 +230,7 @@ async function main() {
     assert.equal(failures.length, 0, failures.join("; "));
     const unauthenticated = await browser.newPage();
     await unauthenticated.goto(`${baseUrl}/candidate/apply`, { waitUntil: "networkidle", timeout: 30000 });
-    const authError = await unauthenticated.getByRole("alert").innerText();
+    const authError = await unauthenticated.locator('section[role="alert"]').innerText();
     assert.match(authError, /AUTHENTICATION_REQUIRED/);
     assert.equal(await unauthenticated.getByRole("link", { name: "Sign in \/ identity review" }).count(), 1);
     await unauthenticated.close();
