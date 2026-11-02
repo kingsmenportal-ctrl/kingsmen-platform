@@ -2,18 +2,24 @@ name: N16 PostgreSQL 17 Worker Process Crash Recovery
 
 on:
   push:
-    branches: [feat/n16-worker-recovery-rc1-2026-10-31]
+    branches: [feat/n16-worker-recovery-rc1-2026-10-31, feat/kingsmen-playwright-qa-scout-2026-11-02]
     paths:
       - "apps/api/src/orchestrator/**"
       - "db/migrations/20261025000*_n16_*.sql"
+      - "db/migrations/202611020001_n16_playwright_scout_worker_scope.sql"
+      - "apps/workers/src/playwright-operations-worker.mjs"
+      - "apps/workers/src/providers/provider-adapter-policy.mjs"
       - "scripts/staging/test-n16-*.mjs"
       - ".github/workflows/n16-worker-process-crash-integration.yml"
       - "package.json"
   pull_request:
-    branches: [ops/backup-restore-safety-current-rc-2026-10-30]
+    branches: [ops/backup-restore-safety-current-rc-2026-10-30, feat/n16-worker-recovery-rc1-2026-10-31]
     paths:
       - "apps/api/src/orchestrator/**"
       - "db/migrations/20261025000*_n16_*.sql"
+      - "db/migrations/202611020001_n16_playwright_scout_worker_scope.sql"
+      - "apps/workers/src/playwright-operations-worker.mjs"
+      - "apps/workers/src/providers/provider-adapter-policy.mjs"
       - "scripts/staging/test-n16-*.mjs"
       - ".github/workflows/n16-worker-process-crash-integration.yml"
       - "package.json"
@@ -61,11 +67,14 @@ jobs:
         run: |
           set -euo pipefail
           worker_password="$(openssl rand -hex 32)"
+          playwright_password="$(openssl rand -hex 32)"
           echo "::add-mask::$worker_password"
+          echo "::add-mask::$playwright_password"
           echo "::add-mask::kingsmen-n16-ci-admin-password"
           echo "KINGSMEN_N16_TEST_SERVICE_PASSWORD=$worker_password" >> "$GITHUB_ENV"
+          echo "KINGSMEN_N16_TEST_PLAYWRIGHT_PASSWORD=$playwright_password" >> "$GITHUB_ENV"
           echo "PGPASSWORD=kingsmen-n16-ci-admin-password" >> "$GITHUB_ENV"
-          unset worker_password
+          unset worker_password playwright_password
 
       - name: Apply orchestrator and N16 migrations in disposable PostgreSQL
         run: npm run n16:worker:crash-integration

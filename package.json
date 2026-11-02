@@ -121,7 +121,8 @@
     "playwright:qa": "node scripts/playwright/run-kingsmen-browser-qa.mjs",
     "playwright:source-scout": "node apps/workers/src/provider-source-scout.mjs",
     "playwright:policy:test": "node scripts/playwright/test-provider-scout-policy.mjs",
-    "playwright:policy:validate": "node scripts/playwright/validate-playwright-implementation.mjs"
+    "playwright:policy:validate": "node scripts/playwright/validate-playwright-implementation.mjs",
+    "n16:playwright:scout:contract": "node scripts/staging/test-n16-playwright-scout-claim-contract.mjs"
   },
   "repository": {
     "type": "git",
