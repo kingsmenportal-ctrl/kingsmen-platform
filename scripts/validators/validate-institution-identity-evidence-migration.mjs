@@ -14,6 +14,8 @@ const check = (name, condition) => {
 
 check("all nine CET colleges have explicit provider types and review-gated seeds",
   migration.includes("'UNIVERSITY','TVET','CET','COMMUNITY_COLLEGE'") &&
+  migration.includes("'PRIVATE_HIGHER_EDUCATION'") &&
+  migration.includes("set provider_type='PRIVATE_HIGHER_EDUCATION'") &&
   migration.includes("insert into public.route_providers") &&
   migration.includes("'cet_eastern_cape'") &&
   migration.includes("'cet_free_state'") &&
