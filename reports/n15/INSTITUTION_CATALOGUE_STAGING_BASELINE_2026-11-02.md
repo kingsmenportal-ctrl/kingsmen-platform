@@ -42,7 +42,7 @@ Counts were queried from the live staging database; they are not inferred from r
 - `scripts/validators/validate-institution-catalogue-seed.mjs`: validates all three batches, unique stable references, idempotency, and fail-closed publication defaults.
 - `manifests/n15/institution-catalogue-import-v1.json`: source/coverage contract and next batches.
 
-A read of the repository files detected 26 university rows, 50 TVET rows, and 21 SETA rows (97 unique provider refs); this is static seed validation, not evidence that the records exist in Supabase.
+A read of the repository files detected 26 university rows, 50 TVET rows, and 21 SETA rows (97 unique provider refs); this is static seed validation, not evidence that the records exist in Supabase. Separate non-writing PostgreSQL `EXPLAIN` checks for all three INSERT shapes passed against the live staging schema; these checks did not execute the inserts.
 
 ## Migration blockers that remain
 
