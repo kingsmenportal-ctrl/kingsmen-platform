@@ -36,6 +36,8 @@ const pathwayTargets = [
 let storedDraft = {};
 let version = 0;
 let saveCount = 0;
+let transientSaveFailure = true;
+const saveKeys = [];
 let lastSaveBody = null;
 let prepareCount = 0;
 let profileAvailable = true;
@@ -147,12 +149,21 @@ async function main() {
     assert.equal(body.application_id, applicationId);
     assert.equal(body.expected_version, version);
     assert.match(body.idempotency_key, /^application-draft-[a-f0-9-]{36}$/);
+    saveKeys.push(body.idempotency_key);
     assert.equal(body.answer_data.motivation_statement, "I am ready to contribute.");
     assert.equal(body.answer_data.relevant_experience, "Two years of operations experience.");
     assert.equal(body.answer_data.preferred_campus, "Johannesburg");
     assert.equal(body.answer_data.additional_answers[0].question_key, "additional_context");
     assert.equal(Object.hasOwn(body.answer_data, "candidate_id"), false);
     lastSaveBody = body;
+    if (transientSaveFailure) {
+      transientSaveFailure = false;
+      return route.fulfill({
+        status: 503,
+        contentType: "application/json",
+        body: JSON.stringify({ ready: false, ok: false, code: "APPLICATION_DRAFT_UNAVAILABLE", error: "Temporary test outage." })
+      });
+    }
     storedDraft = body.answer_data;
     version += 1;
     saveCount += 1;
@@ -197,8 +208,14 @@ async function main() {
     await page.getByLabel("Question key").fill("additional_context");
     await page.getByLabel("Answer").fill("Available for all shifts.");
     await page.getByRole("button", { name: "Save application draft" }).click();
+    await page.locator('section[role="alert"]').getByText(/APPLICATION_DRAFT_UNAVAILABLE/).waitFor();
+    assert.equal(saveCount, 0, "a failed request must not be counted as a saved draft");
+    const firstAttemptKey = saveKeys[0];
+    await page.getByRole("button", { name: "Save application draft" }).click();
     await page.getByText(/Application draft saved\. It has not been submitted to the provider/).waitFor();
     assert.equal(saveCount, 1);
+    assert.equal(saveKeys.length, 2);
+    assert.equal(saveKeys[1], firstAttemptKey, "retry must reuse the same idempotency key after a transport failure");
     assert.equal(lastSaveBody.expected_version, 0);
 
     await page.getByRole("button", { name: "Reload saved draft" }).click();
@@ -239,11 +256,12 @@ async function main() {
     process.stdout.write("PASS all six pathway filters and saved targets render correctly\n");
     process.stdout.write("PASS verified opportunity opens the one canonical parent application editor\n");
     process.stdout.write("PASS application-specific answers save through authenticated Kingsmen API\n");
+    process.stdout.write("PASS failed save retries reuse the original idempotency key\n");
     process.stdout.write("PASS explicit reload and page refresh preserve the canonical candidate draft\n");
     process.stdout.write("PASS candidate form does not expose external provider URLs\n");
     process.stdout.write("PASS unauthenticated access is rejected before candidate API calls\n");
     process.stdout.write("PASS reusable profile absence keeps application answers read-only\n");
-    process.stdout.write("Unified candidate application browser journey: 8/8 passed\n");
+    process.stdout.write("Unified candidate application browser journey: 9/9 passed\n");
   } finally {
     await browser.close();
     server.kill("SIGTERM");
