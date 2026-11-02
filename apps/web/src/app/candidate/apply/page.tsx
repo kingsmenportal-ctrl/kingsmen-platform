@@ -57,6 +57,7 @@ type ApiBody = {
   draft_updated_at?: string | null;
   is_editable?: boolean;
   provider_submission_sent?: boolean;
+  shared_profile_available?: boolean;
 };
 
 const EMPTY_ANSWERS: AnswerState = {
@@ -123,6 +124,8 @@ export default function CandidateApplyPage() {
   const [error, setError] = useState("");
   const [notice, setNotice] = useState("");
   const [lastSavedAt, setLastSavedAt] = useState<string | null>(null);
+  const [sharedProfileAvailable, setSharedProfileAvailable] = useState(false);
+  const [pendingSave, setPendingSave] = useState<{ fingerprint: string; key: string } | null>(null);
 
   const filteredTargets = useMemo(
     () => targets.filter((target) => pathwayFilter === "ALL" || target.pathway_type === pathwayFilter),
@@ -166,6 +169,8 @@ export default function CandidateApplyPage() {
     setDraftVersion(typeof body.draft_version === "number" ? body.draft_version : 0);
     setEditable(body.is_editable === true);
     setLastSavedAt(typeof body.draft_updated_at === "string" ? body.draft_updated_at : null);
+    setSharedProfileAvailable(body.shared_profile_available === true);
+    setPendingSave(null);
     setNotice("Your Kingsmen application draft was loaded from the backend. No provider submission has occurred.");
   }, []);
 
@@ -178,6 +183,7 @@ export default function CandidateApplyPage() {
     setError("");
     setNotice("");
     setApplication(null);
+    setPendingSave(null);
     try {
       let applicationId = selectedTarget.application_id;
       if (!applicationId) {
@@ -217,6 +223,10 @@ export default function CandidateApplyPage() {
       setError("This application is read-only because its current status does not permit candidate edits.");
       return;
     }
+    if (!sharedProfileAvailable) {
+      setError("Save your reusable candidate profile first. The profile is shared across pathways; application answers are saved separately.");
+      return;
+    }
     const token = getCandidateAccessToken();
     if (!token) {
       setError("AUTHENTICATION_REQUIRED: Sign in before saving this application.");
@@ -235,15 +245,21 @@ export default function CandidateApplyPage() {
         : []
     };
     if (answers.availability_date) answerData.availability_date = answers.availability_date;
+    const fingerprint = JSON.stringify(answerData);
+    const idempotencyKey = pendingSave?.fingerprint === fingerprint
+      ? pendingSave.key
+      : "kma-" + crypto.randomUUID().replaceAll("-", "");
+    setPendingSave({ fingerprint, key: idempotencyKey });
     try {
       const body = await requestJson("/api/candidate/application-draft", "POST", {
         application_id: application.id,
         expected_version: draftVersion,
-        idempotency_key: "kma-" + crypto.randomUUID().replaceAll("-", ""),
+        idempotency_key: idempotencyKey,
         answer_data: answerData
       });
       setDraftVersion(typeof body.draft_version === "number" ? body.draft_version : draftVersion + 1);
       setLastSavedAt(typeof body.updated_at === "string" ? body.updated_at : new Date().toISOString());
+      setPendingSave(null);
       setNotice("Application draft saved to your authenticated Kingsmen account. It remains a draft; no provider submission occurred.");
     } catch (e) {
       const message = e instanceof Error ? e.message : "The application draft could not be saved.";
@@ -357,7 +373,9 @@ export default function CandidateApplyPage() {
           </p>}
           <form onSubmit={saveDraft} className="mt-6 space-y-5">
             <div className="rounded-xl border border-slate-800 bg-slate-950 p-4 text-sm text-slate-300">
-              Your reusable candidate profile and Document Vault remain separate shared records. These fields store application-specific answers only. Required eligibility, source freshness and document checks are handled by the relevant Kingsmen readiness workflow.
+              <p><strong>Reusable profile record:</strong> {sharedProfileAvailable ? "Available and linked to this candidate account." : "Not available yet. Save your reusable profile before saving application answers."}</p>
+              <a href="/candidate/profile" className="mt-2 inline-block font-semibold text-cyan-300 underline">Review or complete my reusable profile</a>
+              <p className="mt-3">These fields store application-specific answers only; your reusable profile and Document Vault remain shared records. Required eligibility, source freshness and document checks are handled by the relevant Kingsmen readiness workflow.</p>
             </div>
             <fieldset disabled={!editable || saving} className="space-y-5 disabled:opacity-70">
               <label className="block">
@@ -404,7 +422,7 @@ export default function CandidateApplyPage() {
             </fieldset>
             {!editable && <p className="rounded-xl border border-amber-800 bg-amber-950/40 p-3 text-sm text-amber-100">This parent application is not currently editable. The saved draft remains available for review.</p>}
             <div className="flex flex-wrap items-center gap-3">
-              <button type="submit" disabled={!editable || saving}
+              <button type="submit" disabled={!editable || !sharedProfileAvailable || saving}
                 className="rounded-xl bg-cyan-300 px-5 py-3 text-sm font-black text-slate-950 disabled:opacity-50">
                 {saving ? "Saving securely…" : "Save application draft"}
               </button>
