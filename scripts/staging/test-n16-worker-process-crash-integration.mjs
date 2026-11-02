@@ -266,6 +266,11 @@ try {
   assert.equal(access.rows[0].auth_select, false);
   assert.equal(access.rows[0].service_select, true);
 
+  // This isolated database is disposable; remove migration-created rows before the concurrency fixture.
+  await admin.query("delete from public.orchestrator_dispatch_queue");
+  const emptyQueue = await admin.query("select count(*)::int as n from public.orchestrator_dispatch_queue");
+  assert.equal(emptyQueue.rows[0].n, 0, "disposable N16 queue must be empty before concurrency fixture");
+
   // Independent database sessions verify concurrent claim single-winner.
   await insertSynthetic("n16-concurrent-claim");
   claimClientA = new Client({ host, port, user: "service_role", password: rolePassword, database, connectionTimeoutMillis: 5000 });
@@ -280,7 +285,7 @@ try {
     claimA = await claimClientA.query(claimSql, ["claim-worker-a"]);
     claimB = await claimClientB.query(claimSql, ["claim-worker-b"]);
     assert.equal(claimA.rowCount, 1, "session A must claim the single ready fixture row");
-    assert.equal(claimB.rowCount, 0, "session B must skip the row locked by session A");
+    assert.equal(claimB.rowCount, 0, "session B must skip the row locked by session A; A=" + JSON.stringify(claimA.rows.map(row => row.dispatch_ref)) + "; B=" + JSON.stringify(claimB.rows.map(row => row.dispatch_ref)));
     assert.equal(claimA.rows[0].dispatch_ref, "n16-concurrent-claim");
     await claimClientA.query("commit");
   } catch (error) {
