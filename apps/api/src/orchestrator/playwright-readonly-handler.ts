@@ -4,14 +4,20 @@ import type { WorkerHandler } from "./worker-runner";
 
 type BrowserPayload = { url: string };
 
-function parseAllowedOrigins(raw: string | undefined): Set<string> {
+function isLoopback(hostname: string): boolean {
+  return ["localhost", "127.0.0.1", "::1"].includes(hostname);
+}
+
+function parseAllowedOrigins(raw: string | undefined, allowHttpLocalTests: boolean): Set<string> {
   if (!raw?.trim()) throw new Error("N16_BROWSER_ALLOWED_ORIGINS_REQUIRED");
   const entries = raw.split(",").map((value) => value.trim()).filter(Boolean);
   const origins = new Set<string>();
   for (const entry of entries) {
     let parsed: URL;
     try { parsed = new URL(entry); } catch { throw new Error("N16_BROWSER_ALLOWED_ORIGIN_INVALID"); }
-    if (parsed.protocol !== "https:" || parsed.username || parsed.password ||
+    const secure = parsed.protocol === "https:";
+    const localTestOnly = allowHttpLocalTests && parsed.protocol === "http:" && isLoopback(parsed.hostname);
+    if ((!secure && !localTestOnly) || parsed.username || parsed.password ||
         parsed.pathname !== "/" || parsed.search || parsed.hash || parsed.origin !== entry) {
       throw new Error("N16_BROWSER_ALLOWED_ORIGIN_MUST_BE_HTTPS_ORIGIN");
     }
@@ -47,14 +53,16 @@ function parseTimeout(raw: string | undefined): number {
   return value;
 }
 
-function parsePayload(payload: Record<string, unknown>, allowedOrigins: Set<string>, allowedPaths: Set<string>): URL | null {
+function parsePayload(payload: Record<string, unknown>, allowedOrigins: Set<string>, allowedPaths: Set<string>, allowHttpLocalTests: boolean): URL | null {
   const keys = Object.keys(payload);
   if (keys.length !== 1 || keys[0] !== "url" || typeof payload.url !== "string" || payload.url.length > 2048) {
     return null;
   }
   let target: URL;
   try { target = new URL(payload.url); } catch { return null; }
-  if (target.protocol !== "https:" || target.username || target.password || target.search || target.hash ||
+  const secure = target.protocol === "https:";
+  const localTestOnly = allowHttpLocalTests && target.protocol === "http:" && isLoopback(target.hostname);
+  if ((!secure && !localTestOnly) || target.username || target.password || target.search || target.hash ||
       !allowedOrigins.has(target.origin) || !allowedPaths.has(target.pathname)) return null;
   return target;
 }
@@ -65,7 +73,8 @@ function parsePayload(payload: Record<string, unknown>, allowedOrigins: Set<stri
  * The only executable task is a GET-based health/navigation observation.
  */
 export function createPlaywrightReadOnlyScoutHandler(env: NodeJS.ProcessEnv = process.env): WorkerHandler {
-  const allowedOrigins = parseAllowedOrigins(env.KINGSMEN_BROWSER_ALLOWED_ORIGINS);
+  const allowHttpLocalTests = env.NODE_ENV === "test" && env.KINGSMEN_BROWSER_ALLOW_HTTP_LOCAL_TESTS === "true";
+  const allowedOrigins = parseAllowedOrigins(env.KINGSMEN_BROWSER_ALLOWED_ORIGINS, allowHttpLocalTests);
   const allowedPaths = parseAllowedPaths(env.KINGSMEN_BROWSER_ALLOWED_PATHS);
   const timeoutMs = parseTimeout(env.KINGSMEN_BROWSER_TASK_TIMEOUT_MS);
 
@@ -73,7 +82,7 @@ export function createPlaywrightReadOnlyScoutHandler(env: NodeJS.ProcessEnv = pr
     sideEffect: false,
     requiresHumanApproval: false,
     async execute({ dispatch, now }) {
-      const target = parsePayload(dispatch.payload, allowedOrigins, allowedPaths);
+      const target = parsePayload(dispatch.payload, allowedOrigins, allowedPaths, allowHttpLocalTests);
       if (!target) {
         return {
           workerStatus: "BLOCKED",
@@ -116,7 +125,9 @@ export function createPlaywrightReadOnlyScoutHandler(env: NodeJS.ProcessEnv = pr
             return;
           }
           const methodAllowed = request.method() === "GET" || request.method() === "HEAD";
-          const sameOrigin = requestUrl.origin === target.origin && requestUrl.protocol === "https:";
+          const requestSchemeAllowed = requestUrl.protocol === "https:" ||
+            (allowHttpLocalTests && requestUrl.protocol === "http:" && isLoopback(requestUrl.hostname));
+          const sameOrigin = requestUrl.origin === target.origin && requestSchemeAllowed;
           const navigationPathAllowed = !request.isNavigationRequest() || allowedPaths.has(requestUrl.pathname);
           if (!methodAllowed || !sameOrigin || !navigationPathAllowed) {
             blockedRequestCount += 1;
