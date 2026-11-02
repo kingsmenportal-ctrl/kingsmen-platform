@@ -1,10 +1,8 @@
-name: Kingsmen Release Evidence
+name: Kingsmen Release Evidence (manual)
 
+# Deep release evidence is retained for deliberate release reviews, not every PR.
+# Routine PR validation and build/deploy feedback live in Kingsmen CI.
 on:
-  pull_request:
-    branches: [main]
-  push:
-    branches: [main]
   workflow_dispatch:
 
 permissions:
@@ -16,9 +14,9 @@ concurrency:
 
 jobs:
   build-validate-smoke:
-    name: Build, validate, and smoke-test
+    name: Extended release evidence
     runs-on: ubuntu-latest
-    timeout-minutes: 20
+    timeout-minutes: 30
     steps:
       - name: Check out source
         uses: actions/checkout@v4
