@@ -12,7 +12,7 @@ INSERT INTO public.candidate_auth_identity_links
  (supabase_user_id,candidate_id,link_status,verified_at,verified_by)
 VALUES
  ('bbbbbbbb-bbbb-4bbb-8bbb-bbbbbbbbbbbb','aaaaaaaa-aaaa-4aaa-8aaa-aaaaaaaaaaaa','VERIFIED',now(),'reviewer-fixture'),
- ('dddddddd-dddd-4ddd-8ddd-dddddddddddd','cccccccc-cccc-4ccc-8ccc-dddddddddddd','VERIFIED',now(),'reviewer-fixture'),
+ ('dddddddd-dddd-4ddd-8ddd-dddddddddddd','cccccccc-cccc-4ccc-8ccc-cccccccccccc','VERIFIED',now(),'reviewer-fixture'),
  ('66666666-6666-4666-8666-666666666666','55555555-5555-4555-8555-555555555555','VERIFIED',now(),'reviewer-fixture'),
  ('88888888-8888-4888-8888-888888888888','77777777-7777-4777-8777-777777777777','VERIFIED',now(),'reviewer-fixture'),
  ('aaaaaaaa-aaaa-4aaa-8aaa-aaaaaaaaaaab','99999999-9999-4999-8999-999999999999','VERIFIED',now(),'reviewer-fixture');
