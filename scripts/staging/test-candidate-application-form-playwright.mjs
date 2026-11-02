@@ -250,7 +250,7 @@ async function main() {
     let caoChoicesLoadedFor = "";
     await page.route("**/api/candidate/cao-choices**", async route => {
       const request = route.request();
-      assert.match(request.headers().authorization || "", /^Bearer\\s+kingsmen-playwright-test-access-token/);
+      assert.match(request.headers().authorization || "", /^Bearer\s+kingsmen-playwright-test-access-token/);
       const url = new URL(request.url());
       if (request.method() === "GET" && !url.searchParams.has("application_id")) {
         return route.fulfill({
