@@ -29,7 +29,7 @@ const pathwayTargets = [
   programme_or_role,
   planning_status: "SAVED",
   application_id: null,
-  source_confidence: "HUMAN_VERIFIED",
+  source_confidence: "UNVERIFIED",
   updated_at: "2026-11-02T00:00:00.000Z"
 }));
 
@@ -187,6 +187,7 @@ async function main() {
     await page.getByRole("heading", { name: "Operations role" }).waitFor();
     assert.equal(prepareCount, 1, "only one Kingsmen parent application should be prepared");
     assert.equal(await page.locator('a[href^="http"]').count(), 0, "candidate form must not expose provider URLs");
+    assert.doesNotMatch(await page.locator("body").innerText(), /source status:\s*unverified/i, "internal source-confidence codes must not be presented as candidate status");
 
     await page.getByLabel("Motivation statement").fill("I am ready to contribute.");
     await page.getByLabel("Relevant experience").fill("Two years of operations experience.");
