@@ -100,7 +100,8 @@ async function main() {
       body: JSON.stringify({
         ready: true,
         application: { application_id: applicationId },
-        provider_submission_sent: false
+        provider_submission_sent: false,
+        message: "Application draft saved. It has not been submitted to the provider."
       })
     });
   });
@@ -124,9 +125,13 @@ async function main() {
             pathway_type: "EMPLOYMENT",
             status: "DRAFT",
             readiness_status: "NOT_CHECKED",
+            readiness_snapshot: {},
             title: "Operations role",
             provider_name: "N15 Employer",
-            closes_at: null
+            source_url: "https://example.test/employer",
+            closes_at: null,
+            created_at: "2026-11-02T11:00:00.000Z",
+            updated_at: "2026-11-02T11:00:00.000Z"
           },
           draft: storedDraft,
           draft_version: version,
@@ -140,7 +145,7 @@ async function main() {
     const body = request.postDataJSON();
     assert.equal(body.application_id, applicationId);
     assert.equal(body.expected_version, version);
-    assert.match(body.idempotency_key, /^kma-[a-f0-9]{32}$/);
+    assert.match(body.idempotency_key, /^application-draft-[a-f0-9-]{36}$/);
     assert.equal(body.answer_data.motivation_statement, "I am ready to contribute.");
     assert.equal(body.answer_data.relevant_experience, "Two years of operations experience.");
     assert.equal(body.answer_data.preferred_campus, "Johannesburg");
@@ -177,7 +182,8 @@ async function main() {
 
     const employmentCard = page.locator("article").filter({ hasText: "Operations role" });
     await employmentCard.getByRole("button", { name: "Select this opportunity" }).click();
-    await page.getByRole("button", { name: "Prepare Kingsmen application draft" }).click();
+    await page.getByRole("button", { name: "Prepare Kingsmen application" }).click();
+    await page.waitForURL("**/candidate/applications/" + applicationId);
     await page.getByRole("heading", { name: "Operations role" }).waitFor();
     assert.equal(prepareCount, 1, "only one Kingsmen parent application should be prepared");
     assert.equal(await page.locator('a[href^="http"]').count(), 0, "candidate form must not expose provider URLs");
@@ -185,9 +191,11 @@ async function main() {
     await page.getByLabel("Motivation statement").fill("I am ready to contribute.");
     await page.getByLabel("Relevant experience").fill("Two years of operations experience.");
     await page.getByLabel("Preferred campus / location").fill("Johannesburg");
-    await page.getByLabel("Additional information").fill("Available for all shifts.");
+    await page.getByRole("button", { name: "Add answer" }).click();
+    await page.getByLabel("Question key").fill("additional_context");
+    await page.getByLabel("Answer").fill("Available for all shifts.");
     await page.getByRole("button", { name: "Save application draft" }).click();
-    await page.getByText(/Application draft saved to your authenticated Kingsmen account/).waitFor();
+    await page.getByText(/Application draft saved\. It has not been submitted to the provider/).waitFor();
     assert.equal(saveCount, 1);
     assert.equal(lastSaveBody.expected_version, 0);
 
@@ -195,22 +203,23 @@ async function main() {
     await page.getByLabel("Motivation statement").waitFor();
     assert.equal(await page.getByLabel("Motivation statement").inputValue(), "I am ready to contribute.");
     assert.equal(await page.getByLabel("Relevant experience").inputValue(), "Two years of operations experience.");
-    assert.equal(await page.locator("text=Draft version 1").count(), 1);
+    assert.equal(await page.getByLabel("Question key").inputValue(), "additional_context");
+    assert.equal(await page.getByLabel("Answer").inputValue(), "Available for all shifts.");
+    assert.equal(await page.getByText("Draft version 1", { exact: true }).count(), 1);
 
     await page.reload({ waitUntil: "networkidle" });
-    await page.getByRole("button", { name: "All pathways" }).waitFor();
-    assert.equal(await page.locator("article h3").count(), 6);
-    await page.getByRole("button", { name: "Open saved application" }).click();
     await page.getByRole("heading", { name: "Operations role" }).waitFor();
     assert.equal(await page.getByLabel("Motivation statement").inputValue(), "I am ready to contribute.");
     assert.equal(await page.getByLabel("Relevant experience").inputValue(), "Two years of operations experience.");
-    assert.equal(await page.locator("text=Draft version 1").count(), 1);
+    assert.equal(await page.getByLabel("Question key").inputValue(), "additional_context");
+    assert.equal(await page.getByLabel("Answer").inputValue(), "Available for all shifts.");
+    assert.equal(await page.getByText("Draft version 1", { exact: true }).count(), 1);
     assert.equal(failures.length, 0, failures.join("; "));
     process.stdout.write("PASS browser route loads with authenticated candidate session\n");
     process.stdout.write("PASS all six pathway filters and saved targets render correctly\n");
-    process.stdout.write("PASS verified opportunity opens exactly one Kingsmen parent draft\n");
+    process.stdout.write("PASS verified opportunity opens the one canonical parent application editor\n");
     process.stdout.write("PASS application-specific answers save through authenticated Kingsmen API\n");
-    process.stdout.write("PASS explicit reload and page refresh preserve the candidate draft\n");
+    process.stdout.write("PASS explicit reload and page refresh preserve the canonical candidate draft\n");
     process.stdout.write("PASS candidate form does not expose external provider URLs\n");
     process.stdout.write("Unified candidate application browser journey: 6/6 passed\n");
   } finally {
