@@ -75,3 +75,12 @@ jobs:
         run: npm run api:build
       - name: Build Next.js web application
         run: npm --prefix apps/web run build
+
+      - name: Install Chromium for candidate browser regression
+        run: apps/web/node_modules/.bin/playwright install --with-deps chromium
+      - name: Run built candidate application browser journey
+        env:
+          NEXT_PUBLIC_SUPABASE_URL: http://127.0.0.1:54321
+          NEXT_PUBLIC_SUPABASE_ANON_KEY: kingsmen-test-anon-key
+          KINGSMEN_TEST_PORT: "4388"
+        run: node scripts/staging/test-candidate-application-form-playwright.mjs
