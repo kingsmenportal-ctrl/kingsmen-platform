@@ -138,7 +138,7 @@ jobs:
       - run: npm ci
       - name: Verify Candidate A/B and reviewer access boundaries
         env:
-          KINGSMEN_STAGING_BASE_URL: ${{ secrets.KINGSMEN_STAGING_BASE_URL }}
+          KINGSMEN_STAGING_BASE_URL: "https://kingsmen-portal-staging.netlify.app"
           KINGSMEN_SUPABASE_URL: ${{ secrets.KINGSMEN_SUPABASE_URL }}
           KINGSMEN_SUPABASE_ANON_KEY: ${{ secrets.KINGSMEN_SUPABASE_ANON_KEY }}
           KINGSMEN_E2E_CANDIDATE_A_TOKEN: ${{ secrets.KINGSMEN_E2E_CANDIDATE_A_TOKEN }}
