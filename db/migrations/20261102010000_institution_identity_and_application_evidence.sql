@@ -133,7 +133,7 @@ grant select, insert on public.candidate_application_handoff_events to service_r
 
 comment on table public.route_provider_aliases is 'Evidence-backed provider aliases; a name match alone never establishes legal identity or accreditation.';
 comment on table public.route_provider_campuses is 'Structured campus/delivery-site records with independent source and verification status.';
-comment on table public.institution_register_observations is 'Immutable-snapshot observations from dated official registers; registered/provisional/cancelled/lapsed are distinct states.';
+comment on table public.institution_register_observations is 'Dated source-snapshot observations from official registers; registered/provisional/cancelled/lapsed are distinct states.';
 comment on table public.candidate_application_eligibility_decisions is 'Persisted, versioned eligibility decisions; REVIEW_REQUIRED and INSUFFICIENT_EVIDENCE fail closed.';
 comment on table public.candidate_application_handoff_events is 'External handoff events kept distinct from provider-confirmed receipt and provider decisions.';
 
