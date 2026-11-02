@@ -12,6 +12,19 @@ const check = (name, condition) => {
   assert.ok(condition, name);
 };
 
+check("all nine CET colleges have explicit provider types and review-gated seeds",
+  migration.includes("'UNIVERSITY','TVET','CET','COMMUNITY_COLLEGE'") &&
+  migration.includes("insert into public.route_providers") &&
+  migration.includes("'cet_eastern_cape'") &&
+  migration.includes("'cet_free_state'") &&
+  migration.includes("'cet_gauteng'") &&
+  migration.includes("'cet_kwazulu_natal'") &&
+  migration.includes("'cet_limpopo'") &&
+  migration.includes("'cet_mpumalanga'") &&
+  migration.includes("'cet_northern_cape'") &&
+  migration.includes("'cet_north_west'") &&
+  migration.includes("'cet_western_cape'") &&
+  migration.includes("'NEEDS_REVIEW',false,false"));
 check("provider aliases retain provider FK and normalized uniqueness",
   migration.includes("references public.route_providers(id) on delete restrict") &&
   migration.includes("normalized_alias") && migration.includes("unique(provider_id, normalized_alias)"));
