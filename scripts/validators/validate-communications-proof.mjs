@@ -49,10 +49,10 @@ checks.push(check('proof_no_live_messages', proof?.liveMessagesSent === false, S
 checks.push(check('proof_provider_pending', proof?.providerStagingProofPending === true, String(proof?.providerStagingProofPending)));
 
 const tokenChecks = [
-  ['apps/api/src/communications/communications-proof-boundary.ts', ['COMMUNICATIONS_BOUNDARY_SOURCE_ONLY', 'emailPrimary', 'whatsappUrgentOnly', 'smsBackupOnly', 'bulkMarketingDenied', 'providerSendRequiresStagingProof', 'rawRecipientDataRedacted', 'liveSendExecuted: false']],
+  ['apps/api/src/communications/communications-proof-boundary.ts', ['COMMUNICATIONS_BOUNDARY_SOURCE_ONLY', 'emailPrimary', 'whatsappDisabled', 'smsDisabled', 'bulkMarketingDenied', 'providerSendRequiresStagingProof', 'rawRecipientDataRedacted', 'liveSendExecuted: false']],
   ['apps/api/src/communications/index.ts', ['communications-proof-boundary']],
-  ['manifests/communications/communications-proof-v1.json', ['kingsmen.communications-proof.v1', 'foundation_built_pending_provider_staging_proof', 'transactional_email_queued_primary', 'whatsapp_non_urgent_denied', 'live_send_never_executed_by_source_proof']],
-  ['docs/communications/KINGSMEN_COMMUNICATIONS_PROOF.md', ['Email is primary', 'WhatsApp is urgent-only', 'SMS is backup-only', 'npm run communications:validate']],
+  ['manifests/communications/communications-proof-v1.json', ['kingsmen.communications-proof.v1', 'email_and_portal_only_pending_provider_staging_proof', 'transactional_email_queued_primary', 'whatsapp_disabled', 'sms_disabled', 'live_send_never_executed_by_source_proof']],
+  ['docs/communications/KINGSMEN_COMMUNICATIONS_PROOF.md', ['Email is primary', 'WhatsApp and SMS are disabled', 'npm run communications:validate']],
   ['scripts/proof/prove-communications-boundary.mjs', ['COMMUNICATIONS_SOURCE_PROOF_PASSED', 'providerStagingProofPending: true']],
   ['package.json', ['communications:prove', 'communications:validate']],
   ['.github/workflows/kingsmen-source-guard.yml', ['npm run communications:prove', 'npm run communications:validate']],
@@ -75,8 +75,10 @@ for (const [field, expected] of [
   ['liveMessagesSent', false],
   ['bulkSendingAllowed', false],
   ['emailPrimary', true],
-  ['whatsappUrgentOnly', true],
-  ['smsBackupOnly', true],
+  ['whatsappUrgentOnly', false],
+  ['smsBackupOnly', false],
+  ['whatsappDisabled', true],
+  ['smsDisabled', true],
   ['providerSecretsMayBeLogged', false],
   ['rawRecipientDataInReportsAllowed', false]
 ]) {
