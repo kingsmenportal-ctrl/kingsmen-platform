@@ -16,6 +16,7 @@ import type {
 } from "./read-models/candidate-read-model";
 import type { KingsmenState } from "./state/state-machine";
 import { TruthVaultRepository } from "./db/truth-vault-repository";
+import { authenticateSupabaseBearer } from "./auth/supabase-auth";
 import {
   handleJarvisRuntimeControlWithAdapter,
   type JarvisRuntimeServerStore
@@ -183,6 +184,8 @@ function upsertReadModelsForWorkflowResult(result: WorkflowResultEnvelope): void
 function sendJson(response: ServerResponse, statusCode: number, body: unknown, correlationId?: string): void {
   response.statusCode = statusCode;
   response.setHeader("content-type", "application/json; charset=utf-8");
+  response.setHeader("cache-control", "no-store, max-age=0");
+  response.setHeader("pragma", "no-cache");
   response.setHeader("x-kingsmen-service", SERVICE_NAME);
   if (correlationId) response.setHeader("x-correlation-id", correlationId);
   response.end(`${JSON.stringify(body, null, 2)}\n`);
@@ -403,56 +406,62 @@ async function handleHealth(response: ServerResponse): Promise<void> {
   });
 }
 
-async function handleCandidateStatus(response: ServerResponse, candidateId: string): Promise<void> {
-  if (truthVault.enabled) {
-    const candidate = await truthVault.readCandidateStatus(candidateId);
-    if (!candidate) {
-      sendError(response, 404, "CANDIDATE_READ_MODEL_NOT_FOUND", `No candidate read model found for ${candidateId}.`);
-      return;
-    }
-
-    sendJson(response, 200, { ok: true, candidate, storageMode: truthVault.storageMode, generatedAtIso: nowIso() });
-    return;
+async function requireVerifiedCandidate(
+  request: IncomingMessage,
+  response: ServerResponse
+): Promise<{ candidateId: string; candidateRef: string } | null> {
+  const authentication = await authenticateSupabaseBearer(
+    typeof request.headers.authorization === "string" ? request.headers.authorization : undefined
+  );
+  if (!authentication.ok) {
+    sendError(response, authentication.status, authentication.code, authentication.message);
+    return null;
   }
-
-  const candidate = store.candidates.get(candidateId);
-  if (!candidate) {
-    sendError(response, 404, "CANDIDATE_READ_MODEL_NOT_FOUND", `No candidate read model found for ${candidateId}.`);
-    return;
+  if (!truthVault.enabled) {
+    sendError(response, 503, "DURABLE_CANDIDATE_READS_REQUIRED", "Candidate read routes require durable PostgreSQL persistence.");
+    return null;
   }
-
-  sendJson(response, 200, {
-    ok: true,
-    candidate,
-    storageMode: truthVault.storageMode,
-    generatedAtIso: nowIso()
-  });
+  const identity = await truthVault.resolveVerifiedCandidateIdentity(authentication.userId);
+  if (!identity) {
+    sendError(response, 403, "CANDIDATE_IDENTITY_NOT_VERIFIED", "A verified candidate identity link is required.");
+    return null;
+  }
+  return identity;
 }
 
-async function handleApplicationWorkbench(response: ServerResponse, applicationId: string): Promise<void> {
-  if (truthVault.enabled) {
-    const application = await truthVault.readApplicationWorkbench(applicationId);
-    if (!application) {
-      sendError(response, 404, "APPLICATION_WORKBENCH_NOT_FOUND", `No application workbench found for ${applicationId}.`);
-      return;
-    }
-
-    sendJson(response, 200, { ok: true, application, storageMode: truthVault.storageMode, generatedAtIso: nowIso() });
+async function handleCandidateStatus(
+  request: IncomingMessage,
+  response: ServerResponse,
+  candidateReference: string
+): Promise<void> {
+  const identity = await requireVerifiedCandidate(request, response);
+  if (!identity) return;
+  if (candidateReference !== identity.candidateId && candidateReference !== identity.candidateRef) {
+    sendError(response, 403, "CANDIDATE_OWNERSHIP_DENIED", "The requested candidate record does not belong to this account.");
     return;
   }
+  const candidate = await truthVault.readCandidateStatus(candidateReference, identity.candidateId);
+  if (!candidate) {
+    sendError(response, 404, "CANDIDATE_READ_MODEL_NOT_FOUND", "The verified candidate read model is not available.");
+    return;
+  }
+  sendJson(response, 200, { ok: true, candidate, storageMode: truthVault.storageMode, generatedAtIso: nowIso() });
+}
 
-  const application = store.applications.get(applicationId);
+async function handleApplicationWorkbench(
+  request: IncomingMessage,
+  response: ServerResponse,
+  applicationId: string
+): Promise<void> {
+  const identity = await requireVerifiedCandidate(request, response);
+  if (!identity) return;
+  const application = await truthVault.readApplicationWorkbench(applicationId, identity.candidateId);
   if (!application) {
-    sendError(response, 404, "APPLICATION_WORKBENCH_NOT_FOUND", `No application workbench found for ${applicationId}.`);
+    // A foreign application and an unknown application are deliberately indistinguishable.
+    sendError(response, 404, "APPLICATION_WORKBENCH_NOT_FOUND", "The requested application workbench is not available.");
     return;
   }
-
-  sendJson(response, 200, {
-    ok: true,
-    application,
-    storageMode: truthVault.storageMode,
-    generatedAtIso: nowIso()
-  });
+  sendJson(response, 200, { ok: true, application, storageMode: truthVault.storageMode, generatedAtIso: nowIso() });
 }
 
 export function createKingsmenApiServer() {
@@ -495,13 +504,13 @@ export function createKingsmenApiServer() {
 
       const candidateId = getPathParam(/^\/api\/candidates\/([^/]+)\/status$/, pathname);
       if (method === "GET" && candidateId) {
-        await handleCandidateStatus(response, candidateId);
+        await handleCandidateStatus(request, response, candidateId);
         return;
       }
 
       const applicationId = getPathParam(/^\/api\/applications\/([^/]+)\/workbench$/, pathname);
       if (method === "GET" && applicationId) {
-        await handleApplicationWorkbench(response, applicationId);
+        await handleApplicationWorkbench(request, response, applicationId);
         return;
       }
 

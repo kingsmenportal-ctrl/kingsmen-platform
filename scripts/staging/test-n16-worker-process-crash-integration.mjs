@@ -14,13 +14,14 @@ const port = Number(process.env.KINGSMEN_N16_TEST_PORT ?? "5432");
 const adminUser = process.env.KINGSMEN_N16_TEST_ADMIN_USER ?? "postgres";
 const adminPassword = process.env.PGPASSWORD ?? "";
 const rolePassword = process.env.KINGSMEN_N16_TEST_SERVICE_PASSWORD ?? "";
+const playwrightPassword = process.env.KINGSMEN_N16_TEST_PLAYWRIGHT_PASSWORD ?? "";
 const database = process.env.KINGSMEN_N16_TEST_DATABASE ?? "";
 const workerEntry = path.join(root, "apps/api/dist/orchestrator/worker-main.js");
 
 if (!allow) throw new Error("KINGSMEN_N16_TEST_ALLOW_MUTATION=true is required.");
 if (!["127.0.0.1", "localhost", "::1"].includes(host)) throw new Error("N16 integration test refuses non-loopback hosts.");
 if (!Number.isInteger(port) || port < 1 || port > 65535) throw new Error("Invalid N16 test database port.");
-if (!adminPassword || rolePassword.length < 20) throw new Error("Disposable PostgreSQL admin and service role credentials are required.");
+if (!adminPassword || rolePassword.length < 20 || playwrightPassword.length < 20) throw new Error("Disposable PostgreSQL admin, service-role and Playwright-worker credentials are required.");
 if (database !== "kingsmen_n16_worker_test") throw new Error("N16 integration test requires the exact disposable database name.");
 
 const require = createRequire(import.meta.url);
@@ -28,6 +29,7 @@ const pgPath = require.resolve("pg", { paths: [path.join(root, "apps/api")] });
 const { Client } = require(pgPath);
 const admin = new Client({ host, port, user: adminUser, password: adminPassword, database, connectionTimeoutMillis: 5000 });
 const passwordLiteral = "'" + rolePassword.replace(/'/g, "''") + "'";
+const playwrightPasswordLiteral = "'" + playwrightPassword.replace(/'/g, "''") + "'";
 const workerUrl = "postgres://" + encodeURIComponent("service_role") + ":" +
   encodeURIComponent(rolePassword) + "@" + host + ":" + port + "/" + database;
 
@@ -78,6 +80,15 @@ async function waitForStatus(dispatchRef, expected, timeoutMs = 20000) {
   );
   throw new Error("Timed out waiting for " + dispatchRef + " => " + expected + "; actual=" + JSON.stringify(result.rows[0]));
 }
+async function insertScopedDispatch(dispatchRef, workerCode) {
+  const evidenceRef = "ev:" + dispatchRef;
+  await admin.query(
+    `insert into public.orchestrator_dispatch_queue
+      (dispatch_ref,run_ref,step_ref,worker_code,queue_status,priority_lane,dispatch_after,attempt_count,max_attempts,payload,evidence_refs)
+     values ($1,$2,$3,$4,'READY','NORMAL',clock_timestamp(),0,3,'{}'::jsonb,$5::text[])`,
+    [dispatchRef, "run:" + dispatchRef, "step:" + dispatchRef, workerCode, [evidenceRef]]
+  );
+}
 async function insertSynthetic(dispatchRef) {
   const evidenceRef = "ev:" + dispatchRef;
   const insertSql = [
@@ -122,13 +133,122 @@ try {
     "db/migrations/0014_n16_orchestrator_execution.sql",
     "db/migrations/202610250001_n16_durable_worker_recovery.sql",
     "db/migrations/202610250002_n16_worker_send_boundary.sql",
-    "db/migrations/202610250003_n16_exhausted_lease_recovery.sql"
+    "db/migrations/202610250003_n16_exhausted_lease_recovery.sql",
+    "db/migrations/202611020001_n16_playwright_scout_worker_scope.sql"
   ];
   for (const migrationPath of migrationPaths) {
     const sql = await readFile(path.join(root, migrationPath), "utf8");
     await admin.query(sql);
   }
   await admin.query("grant usage on schema public to service_role");
+  await admin.query(
+    "create role kingsmen_playwright_scout_ci_login login noinherit password " + playwrightPasswordLiteral
+  );
+  await admin.query("grant connect on database " + database + " to kingsmen_playwright_scout_ci_login");
+  await admin.query("grant kingsmen_playwright_scout_worker to kingsmen_playwright_scout_ci_login");
+  const playwrightClient = new Client({
+    host, port, user: "kingsmen_playwright_scout_ci_login", password: playwrightPassword, database,
+    connectionTimeoutMillis: 5000
+  });
+  await playwrightClient.connect();
+  try {
+    await playwrightClient.query("set role kingsmen_playwright_scout_worker");
+    const identity = await playwrightClient.query(
+      "select current_user as current_role, session_user as login_role, pg_has_role(session_user,'kingsmen_playwright_scout_worker','MEMBER') as member"
+    );
+    assert.equal(identity.rows[0].current_role, "kingsmen_playwright_scout_worker");
+    assert.equal(identity.rows[0].login_role, "kingsmen_playwright_scout_ci_login");
+    assert.equal(identity.rows[0].member, true);
+
+    const privileges = await playwrightClient.query(`
+      select
+        has_function_privilege(current_user,'public.n16_claim_playwright_scout_dispatches(text,integer,integer)','EXECUTE') as scoped_claim,
+        has_function_privilege(current_user,'public.n16_claim_dispatches(text,integer,integer)','EXECUTE') as generic_claim,
+        has_function_privilege(current_user,'public.n16_mark_dispatch_sent(text,text,integer)','EXECUTE') as mark_sent,
+        has_function_privilege(current_user,'public.n16_record_dispatch_result(text,text,text,text,jsonb,text[],text,text,integer,integer)','EXECUTE') as generic_result,
+        has_table_privilege(current_user,'public.orchestrator_dispatch_queue','SELECT') as queue_select,
+        has_table_privilege(current_user,'public.orchestrator_worker_results','SELECT') as results_select
+    `);
+    assert.equal(privileges.rows[0].scoped_claim, true);
+    assert.equal(privileges.rows[0].generic_claim, false);
+    assert.equal(privileges.rows[0].mark_sent, false);
+    assert.equal(privileges.rows[0].generic_result, false);
+    assert.equal(privileges.rows[0].queue_select, false);
+    assert.equal(privileges.rows[0].results_select, false);
+
+    await assert.rejects(
+      playwrightClient.query("select * from public.orchestrator_dispatch_queue"),
+      /permission denied/i
+    );
+    await assert.rejects(
+      playwrightClient.query("select * from public.n16_claim_dispatches('playwright-scout:wrong-queue',1,60)"),
+      /permission denied/i
+    );
+    await assert.rejects(
+      playwrightClient.query("select public.n16_mark_dispatch_sent('not-owned','playwright-scout:ci-scope-test',90)"),
+      /permission denied/i
+    );
+    await assert.rejects(
+      playwrightClient.query("select public.n16_record_dispatch_result('not-owned','not-owned','SUCCEEDED','SAME','{}'::jsonb,ARRAY['ev:not-owned'])"),
+      /permission denied/i
+    );
+
+    const scoutDispatch = "n16-playwright-scoped-claim";
+    const unrelatedDispatch = "n16-playwright-unrelated-evidence";
+    const workerId = "playwright-scout:ci-scope-test";
+    await insertScopedDispatch(scoutDispatch, "playwright.public_source.scout");
+    await insertScopedDispatch(unrelatedDispatch, "evidence.verify");
+
+    const claimed = await playwrightClient.query(
+      "select dispatch_ref,worker_code,queue_status,locked_by,evidence_refs from public.n16_claim_playwright_scout_dispatches($1,1,90)",
+      [workerId]
+    );
+    assert.equal(claimed.rowCount, 1, "scout worker must claim one scoped dispatch");
+    assert.equal(claimed.rows[0].dispatch_ref, scoutDispatch);
+    assert.equal(claimed.rows[0].worker_code, "playwright.public_source.scout");
+    assert.equal(claimed.rows[0].queue_status, "LOCKED");
+    assert.equal(claimed.rows[0].locked_by, workerId);
+
+    const unrelatedState = await admin.query(
+      "select queue_status,locked_by from public.orchestrator_dispatch_queue where dispatch_ref=$1",
+      [unrelatedDispatch]
+    );
+    assert.equal(unrelatedState.rows[0].queue_status, "READY");
+    assert.equal(unrelatedState.rows[0].locked_by, null);
+
+    await assert.rejects(
+      playwrightClient.query(
+        "select public.n16_record_playwright_scout_result($1,$2,$3,'SUCCEEDED','{}'::jsonb,$4::text[])",
+        [scoutDispatch, "playwright-scout:another-worker", "playwright-scout:wrong-owner-result", claimed.rows[0].evidence_refs]
+      ),
+      /N16_PLAYWRIGHT_SCOUT_DISPATCH_NOT_OWNED/
+    );
+    await assert.rejects(
+      playwrightClient.query(
+        "select public.n16_record_playwright_scout_result($1,$2,$3,'SUCCEEDED','{}'::jsonb,$4::text[])",
+        [scoutDispatch, workerId, "playwright-scout:wrong-evidence-result", ["ev:wrong-evidence"]]
+      ),
+      /N16_PLAYWRIGHT_SCOUT_EVIDENCE_REFERENCE_MISMATCH/
+    );
+
+    const recorded = await playwrightClient.query(
+      "select public.n16_record_playwright_scout_result($1,$2,$3,'SUCCEEDED',$4::jsonb,$5::text[]) as outcome",
+      [
+        scoutDispatch, workerId, "playwright-scout:scope-test-result",
+        JSON.stringify({ readOnly: true, applicationsSubmitted: false, providerReceiptClaimed: false }),
+        claimed.rows[0].evidence_refs
+      ]
+    );
+    assert.ok(recorded.rows[0].outcome);
+    assert.equal((await waitForStatus(scoutDispatch, "ACKED")).queue_status, "ACKED");
+    const unrelatedStillReady = await admin.query(
+      "select queue_status from public.orchestrator_dispatch_queue where dispatch_ref=$1",
+      [unrelatedDispatch]
+    );
+    assert.equal(unrelatedStillReady.rows[0].queue_status, "READY");
+  } finally {
+    await playwrightClient.end().catch(() => {});
+  }
 
   const access = await admin.query([
     "select",
@@ -146,18 +266,33 @@ try {
   assert.equal(access.rows[0].auth_select, false);
   assert.equal(access.rows[0].service_select, true);
 
+  // This isolated database is disposable; remove migration-created rows before the concurrency fixture.
+  await admin.query("delete from public.orchestrator_dispatch_queue");
+  const emptyQueue = await admin.query("select count(*)::int as n from public.orchestrator_dispatch_queue");
+  assert.equal(emptyQueue.rows[0].n, 0, "disposable N16 queue must be empty before concurrency fixture");
+
   // Independent database sessions verify concurrent claim single-winner.
   await insertSynthetic("n16-concurrent-claim");
   claimClientA = new Client({ host, port, user: "service_role", password: rolePassword, database, connectionTimeoutMillis: 5000 });
   claimClientB = new Client({ host, port, user: "service_role", password: rolePassword, database, connectionTimeoutMillis: 5000 });
   await Promise.all([claimClientA.connect(), claimClientB.connect()]);
   const claimSql = "select dispatch_ref from public.n16_claim_dispatches($1,1,60)";
-  const claims = await Promise.all([
-    claimClientA.query(claimSql, ["claim-worker-a"]),
-    claimClientB.query(claimSql, ["claim-worker-b"])
-  ]);
-  assert.equal(claims[0].rowCount + claims[1].rowCount, 1, "concurrent claim must have one winner");
-  const winner = claims[0].rows[0] ?? claims[1].rows[0];
+  await claimClientA.query("begin");
+  let claimA;
+  let claimB;
+  try {
+    // Keep A's row lock open while B executes in a separate session.
+    claimA = await claimClientA.query(claimSql, ["claim-worker-a"]);
+    claimB = await claimClientB.query(claimSql, ["claim-worker-b"]);
+    assert.equal(claimA.rowCount, 1, "session A must claim the single ready fixture row");
+    assert.equal(claimB.rowCount, 0, "session B must skip the row locked by session A; A=" + JSON.stringify(claimA.rows.map(row => row.dispatch_ref)) + "; B=" + JSON.stringify(claimB.rows.map(row => row.dispatch_ref)));
+    assert.equal(claimA.rows[0].dispatch_ref, "n16-concurrent-claim");
+    await claimClientA.query("commit");
+  } catch (error) {
+    await claimClientA.query("rollback").catch(() => {});
+    throw error;
+  }
+  const winner = claimA.rows[0];
   await admin.query(
     "select public.n16_record_dispatch_result($1,$2,'SUCCEEDED','SAME','{}'::jsonb,$3::text[])",
     [winner.dispatch_ref, "n16-concurrent-result", ["ev:n16-concurrent-claim"]]
@@ -252,7 +387,13 @@ try {
     serviceRoleOnlyAccess: true,
     stagingDatabaseTouched: false,
     externalProviderAction: false,
-    productionWorkerProven: false
+    productionWorkerProven: false,
+    playwrightClaimRoleScoped: true,
+    playwrightWorkerTableAccessDenied: true,
+    playwrightGenericClaimAndSentDenied: true,
+    playwrightClaimsOnlyItsRegisteredWorkerCode: true,
+    playwrightSameStateResultOnly: true,
+    unrelatedDispatchRemainsReady: true
   }, null, 2) + "\n");
 } finally {
   if (preSentWorker) await killWorker(preSentWorker).catch(() => {});

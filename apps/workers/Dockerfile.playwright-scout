@@ -1,0 +1,18 @@
+FROM mcr.microsoft.com/playwright:v1.60.0-noble
+
+WORKDIR /app
+RUN npm install --prefix /app --no-audit --no-fund --save-exact playwright@1.60.0 \
+    && mkdir -p /work \
+    && chown pwuser:pwuser /work
+
+COPY scripts/playwright/provider-scout-policy.mjs /app/scripts/playwright/provider-scout-policy.mjs
+COPY apps/workers/src/provider-source-scout.mjs /app/apps/workers/src/provider-source-scout.mjs
+
+ENV NODE_ENV=production
+ENV KINGSMEN_PROVIDER_SCOUT_PLAN=/work/plan.json
+ENV KINGSMEN_PROVIDER_SCOUT_REPORT=/work/report.json
+WORKDIR /app
+USER pwuser
+
+VOLUME ["/work"]
+ENTRYPOINT ["node", "apps/workers/src/provider-source-scout.mjs"]

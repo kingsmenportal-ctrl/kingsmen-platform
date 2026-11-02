@@ -1,40 +1,34 @@
-# Authenticated staging E2E runner
+# Kingsmen authenticated staging verification
 
-This runner executes operator-authored HTTP cases against a controlled Kingsmen staging deployment. It does not create users, candidate records, uploads, or reviewer decisions.
+This workflow separates read-only Candidate A/B isolation proof from profile mutations. It runs only through manual GitHub Actions dispatch and protected GitHub Environments.
 
-## Required environment
+Workflow: \`.github/workflows/kingsmen-authenticated-staging-e2e.yml\`
 
-- `KINGSMEN_STAGING_BASE_URL`: exact staging origin (HTTPS required outside localhost).
-- `KINGSMEN_E2E_PLAN`: path to an authorised case-plan JSON file.
-- `KINGSMEN_E2E_CANDIDATE_A_TOKEN`, `KINGSMEN_E2E_CANDIDATE_B_TOKEN`, `KINGSMEN_E2E_REVIEWER_TOKEN`: short-lived authorised staging sessions for roles used by the plan.
-- Optional `KINGSMEN_E2E_ALLOW_MUTATIONS=true`: explicitly permits POST/PUT/PATCH/DELETE cases. Leave unset for read-only checks.
-- Optional `KINGSMEN_E2E_REPORT`: report destination.
+## Protected environment: \`kingsmen-staging-verification\`
 
-Tokens are read only from environment variables; never place tokens in the plan. Redirects are not followed. Paths cannot escape the configured origin. Reports contain case IDs, HTTP status, duration, plan digest and redacted failure categories—not response bodies, request bodies, or tokens.
+Configure the environment with required reviewers and the following secrets:
 
-## Plan format
+- \`KINGSMEN_STAGING_BASE_URL\` — HTTPS candidate portal staging origin.
+- \`KINGSMEN_STAGING_API_BASE_URL\` — HTTPS origin of the authenticated backend API.
+- \`KINGSMEN_SUPABASE_URL\`, \`KINGSMEN_SUPABASE_ANON_KEY\`.
+- \`KINGSMEN_E2E_CANDIDATE_A_TOKEN\`, \`KINGSMEN_E2E_CANDIDATE_B_TOKEN\`, \`KINGSMEN_E2E_REVIEWER_TOKEN\`.
+- \`KINGSMEN_E2E_CANDIDATE_A_DOCUMENT_ID\`, \`KINGSMEN_E2E_CANDIDATE_B_DOCUMENT_ID\`.
+- \`KINGSMEN_E2E_CANDIDATE_A_APPLICATION_ID\`, \`KINGSMEN_E2E_CANDIDATE_B_APPLICATION_ID\`.
 
-```json
-{
-  "schema": "kingsmen.staging-e2e-plan.v1",
-  "cases": [
-    { "id": "anonymous-review-queue-denied", "role": "anonymous", "method": "GET", "path": "/replace-with-confirmed-reviewer-route", "expectedStatus": 401 }
-  ]
-}
-```
+The fixtures must be dedicated staging records with verified Auth identity links and candidate-owned private documents. The workflow checks each candidate's own profile identity, own and foreign candidate-status reads, own and foreign application workbench reads, own and foreign private-document reads, and reviewer-positive/candidate-negative queue access. It does not write staging data.
 
-Replace example paths and expected statuses only after checking the deployed route contract. Add controlled fixture-specific assertions using `assertJsonPath`, `equals`, or `notEquals`. Use candidate A and B cases to assert owner isolation, and candidate A against reviewer-only routes to prove denial. A successful HTTP status alone is not proof of identity or document authenticity.
+## Protected environment: \`kingsmen-staging-profile-mutations\`
 
-## Run
+Configure separate required reviewers. Because GitHub Environment secrets are scoped to their environment, also configure `KINGSMEN_STAGING_BASE_URL`, `KINGSMEN_SUPABASE_URL`, `KINGSMEN_SUPABASE_ANON_KEY`, and `KINGSMEN_E2E_CANDIDATE_A_TOKEN` in this second environment. Then add the variable \`KINGSMEN_PROFILE_E2E_MUTATION_APPROVED=true\` only when the environment owners authorise the mutating test. Configure these additional secrets:
 
-```sh
-npm run staging:e2e:validate
-KINGSMEN_STAGING_BASE_URL=https://your-authorized-staging-origin.example \
-KINGSMEN_E2E_PLAN=./staging-e2e-plan.json \
-KINGSMEN_E2E_CANDIDATE_A_TOKEN=... \
-KINGSMEN_E2E_CANDIDATE_B_TOKEN=... \
-KINGSMEN_E2E_REVIEWER_TOKEN=... \
-npm run staging:e2e
-```
+- \`KINGSMEN_E2E_CANDIDATE_A_EMAIL\`
+- \`KINGSMEN_E2E_CANDIDATE_A_PASSWORD\`
+- \`KINGSMEN_PROFILE_E2E_EXPECTED_CANDIDATE_REFERENCE\`
 
-The command fails closed when required configuration is absent or invalid. A source-contract pass is not a live E2E pass. Preserve the generated report as release evidence and review all cases before closing the release gate.
+This job runs only when the workflow input \`run_profile_persistence\` is true and the read-only isolation job has passed. It requires both the initial access token and password login for the same dedicated test candidate. It checks the exact candidate reference before mutation, saves and updates a synthetic profile, signs out, performs a fresh password sign-in, reloads persisted values, and restores the original profile. The test fails closed if the initial authenticated session resolves to another candidate.
+
+No password, bearer token, profile content or document bytes are written to the report. Never use a real candidate account or real candidate document as a fixture. A failed restoration is an incident requiring manual test-account review.
+
+## Evidence and limits
+
+Artifacts contain only redacted test summaries and are retained for 14 days. A successful workflow proves the specific staging revision and fixtures tested; it does not prove production deployment or provider integration. The workflow must be dispatched against the intended staging deployment after the protected environments and secrets have been configured.

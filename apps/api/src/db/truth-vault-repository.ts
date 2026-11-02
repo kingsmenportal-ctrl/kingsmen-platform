@@ -274,17 +274,46 @@ export class TruthVaultRepository {
     return { replay: false, workflowRunId: input.result.workflowRunId, responseBody: input.responseBody };
   }
 
-  async readCandidateStatus(candidateRef: string): Promise<CandidateReadModel | null> {
+  async resolveVerifiedCandidateIdentity(
+    supabaseUserId: string
+  ): Promise<{ candidateId: string; candidateRef: string } | null> {
     this.assertEnabled();
+    const result = await this.pool!.query<{ candidate_id: string; candidate_ref: string }>(
+      `select c.id::text as candidate_id, c.public_ref as candidate_ref
+       from public.candidate_auth_identity_links l
+       join public.candidates c on c.id = l.candidate_id
+       where l.supabase_user_id = $1
+         and l.link_status = 'VERIFIED'
+         and l.verified_at is not null
+         and l.verified_at <= now()
+         and l.verified_by is not null
+         and c.is_active = true
+       limit 2`,
+      [supabaseUserId]
+    );
+    // A missing or ambiguous binding is never repaired by email matching.
+    if (result.rows.length !== 1) return null;
+    return { candidateId: result.rows[0].candidate_id, candidateRef: result.rows[0].candidate_ref };
+  }
+
+  async readCandidateStatus(
+    candidateReference: string,
+    verifiedCandidateId: string
+  ): Promise<CandidateReadModel | null> {
+    this.assertEnabled();
+    if (!verifiedCandidateId) throw new Error("VERIFIED_CANDIDATE_ID_REQUIRED");
     const result = await this.pool!.query<CandidateRow>(
       `select id::text, public_ref, email, display_name, current_state, active_package_code, updated_at::text
-       from candidates where public_ref = $1 or id::text = $1 limit 1`,
-      [candidateRef]
+       from public.candidates
+       where id = $2
+         and is_active = true
+         and (public_ref = $1 or id::text = $1)
+       limit 1`,
+      [candidateReference, verifiedCandidateId]
     );
 
     const row = result.rows[0];
     if (!row) return null;
-
     return {
       candidateId: row.public_ref,
       displayName: row.display_name,
@@ -298,8 +327,12 @@ export class TruthVaultRepository {
     };
   }
 
-  async readApplicationWorkbench(applicationRef: string): Promise<ApplicationWorkbenchReadModel | null> {
+  async readApplicationWorkbench(
+    applicationReference: string,
+    verifiedCandidateId: string
+  ): Promise<ApplicationWorkbenchReadModel | null> {
     this.assertEnabled();
+    if (!verifiedCandidateId) throw new Error("VERIFIED_CANDIDATE_ID_REQUIRED");
     const result = await this.pool!.query<ApplicationRow>(
       `select
          a.id::text,
@@ -312,16 +345,16 @@ export class TruthVaultRepository {
          a.map_fallback_required,
          a.last_evidence_ref,
          a.updated_at::text
-       from applications a
-       join candidates c on c.id = a.candidate_id
-       where a.id::text = $1 or a.metadata->>'applicationRef' = $1
+       from public.applications a
+       join public.candidates c on c.id = a.candidate_id
+       where a.candidate_id = $2
+         and (a.id::text = $1 or a.metadata->>'applicationRef' = $1)
        limit 1`,
-      [applicationRef]
+      [applicationReference, verifiedCandidateId]
     );
 
     const row = result.rows[0];
     if (!row) return null;
-
     return {
       applicationId: row.application_ref,
       candidateId: row.candidate_ref,

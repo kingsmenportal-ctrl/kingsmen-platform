@@ -10,7 +10,7 @@
   "scripts": {
     "candidate:experience:check": "node scripts/validators/validate-candidate-experience-vertical-slice.mjs && node scripts/validators/validate-candidate-reviewer-portal.mjs",
     "candidate:profile:e2e": "node scripts/staging/test-candidate-profile-persistence-e2e.mjs",
-    "test": "node scripts/validators/validate-jarvis-core.mjs && node scripts/validators/validate-jarvis-live-pass-02.mjs && node scripts/staging/test-kingsmen-operating-evidence-reconciliation.mjs && npm run n14:connectors:check && npm run n15:sources:check && npm run n15:ingestion:check && npm run backend:simplification:check && npm run security:validate:client-non-dml && npm run capacity:validate && npm run n16:recovery:check && npm run n16:queue:check && npm run n16:worker:contract",
+    "test": "node scripts/validators/validate-jarvis-core.mjs && node scripts/validators/validate-jarvis-live-pass-02.mjs && node scripts/staging/test-kingsmen-operating-evidence-reconciliation.mjs && npm run n14:connectors:check && npm run n15:sources:check && npm run n15:ingestion:check && npm run backend:simplification:check && npm run security:validate:client-non-dml && npm run capacity:validate && npm run n16:recovery:check && npm run n16:queue:check && npm run n16:worker:contract && npm run playwright:policy:test && npm run playwright:policy:validate && npm run candidate:api:auth:validate && npm run candidate:api:auth:test && npm run n16:playwright:scout:contract && npm run playwright:operations:policy:test && npm run playwright:operations:policy:validate",
     "jarvis:validate": "node scripts/validators/validate-jarvis-connected-live.mjs",
     "jarvis:validate:core": "node scripts/validators/validate-jarvis-core.mjs",
     "jarvis:validate:live-pass-02": "node scripts/validators/validate-jarvis-live-pass-02.mjs",
@@ -117,7 +117,16 @@
     "n16:queue:check": "npm run n16:queue:contract",
     "n16:worker:contract": "node scripts/staging/test-n16-worker-runner-contract.mjs",
     "n16:worker:start": "npm --prefix apps/api run build && node apps/api/dist/orchestrator/worker-main.js",
-    "n16:worker:crash-integration": "node scripts/staging/test-n16-worker-process-crash-integration.mjs"
+    "n16:worker:crash-integration": "node scripts/staging/test-n16-worker-process-crash-integration.mjs",
+    "playwright:qa": "node scripts/playwright/run-kingsmen-browser-qa.mjs",
+    "playwright:source-scout": "node apps/workers/src/provider-source-scout.mjs",
+    "playwright:policy:test": "node scripts/playwright/test-provider-scout-policy.mjs",
+    "playwright:policy:validate": "node scripts/playwright/validate-playwright-implementation.mjs",
+    "n16:playwright:scout:contract": "node scripts/staging/test-n16-playwright-scout-claim-contract.mjs",
+    "candidate:api:auth:validate": "node scripts/validators/validate-candidate-api-auth-boundary.mjs",
+    "candidate:api:auth:test": "npm run api:build && node scripts/staging/test-supabase-auth-boundary.mjs",
+    "playwright:operations:policy:test": "node scripts/playwright/test-operations-worker-policy.mjs",
+    "playwright:operations:policy:validate": "node scripts/playwright/validate-playwright-operations.mjs"
   },
   "repository": {
     "type": "git",
