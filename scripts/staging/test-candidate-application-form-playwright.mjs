@@ -15,6 +15,22 @@ const projectRef = new URL(process.env.NEXT_PUBLIC_SUPABASE_URL || "http://127.0
 const applicationId = "30000000-0000-4000-8000-000000000001";
 const caoParentId = "60000000-0000-4000-8000-000000000006";
 const otherCaoParentId = "70000000-0000-4000-8000-000000000007";
+const applicationIdsByPathway = {
+  HIGHER_EDUCATION: "30000000-0000-4000-8000-000000000002",
+  TVET: "30000000-0000-4000-8000-000000000003",
+  SETA_LEARNERSHIP: "30000000-0000-4000-8000-000000000004",
+  INTERNSHIP: "30000000-0000-4000-8000-000000000005",
+  APPRENTICESHIP: "30000000-0000-4000-8000-000000000006",
+  EMPLOYMENT: applicationId
+};
+const pathwayPromptLabels = {
+  HIGHER_EDUCATION: "Intended qualification",
+  TVET: "Qualification level / NQF level",
+  SETA_LEARNERSHIP: "Preferred sector",
+  INTERNSHIP: "Field of study",
+  APPRENTICESHIP: "Trade of interest",
+  EMPLOYMENT: "Notice period"
+};
 const nextBinary = path.join(root, "apps/web/node_modules/next/dist/bin/next");
 const pathwayTargets = [
   ["HIGHER_EDUCATION", "University programme", "N15 University"],
@@ -42,6 +58,7 @@ let transientSaveFailure = true;
 const saveKeys = [];
 let lastSaveBody = null;
 let prepareCount = 0;
+const preparedTargetKeys = new Set(["n15:playwright-test-6"]);
 let profileAvailable = true;
 
 async function main() {
@@ -88,7 +105,7 @@ async function main() {
           ready: true,
           masterTargets: pathwayTargets.map(target => ({
             ...target,
-            application_id: target.target_key === "n15:playwright-test-6" && version > 0 ? applicationId : target.application_id
+            application_id: preparedTargetKeys.has(target.target_key) ? applicationIdsByPathway[target.pathway_type] : target.application_id
           })),
           parentApplications: []
         })
@@ -96,15 +113,17 @@ async function main() {
     }
     const body = request.postDataJSON();
     assert.equal(body.action, "prepare_master_application");
-    assert.equal(body.target_key, "n15:playwright-test-6");
+    const target = pathwayTargets.find(item => item.target_key === body.target_key);
+    assert.ok(target, "preparation may only use one of the authenticated candidate's saved targets");
     assert.equal(Object.hasOwn(body, "candidate_id"), false);
     prepareCount += 1;
+    preparedTargetKeys.add(target.target_key);
     return route.fulfill({
       status: 200,
       contentType: "application/json",
       body: JSON.stringify({
         ready: true,
-        application: { application_id: applicationId },
+        application: { application_id: applicationIdsByPathway[target.pathway_type] },
         provider_submission_sent: false,
         message: "Application draft saved. It has not been submitted to the provider."
       })
