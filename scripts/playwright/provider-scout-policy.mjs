@@ -29,7 +29,7 @@ function validateHttpsUrl(value, allowedHosts) {
   } catch {
     return { valid: false, code: "SOURCE_URL_INVALID" };
   }
-  if (url.protocol !== "https:" || url.username || url.password) {
+  if (url.protocol !== "https:" || url.port !== "" || url.username || url.password) {
     return { valid: false, code: "SOURCE_URL_MUST_BE_PUBLIC_HTTPS" };
   }
   if (!isPublicHost(url.hostname) || !allowedHosts.includes(url.hostname.toLowerCase())) {
@@ -90,7 +90,7 @@ export function validateProviderScoutPlan(plan, nowMs = Date.now()) {
     } else if (Date.parse(source.approvedAt) > nowMs + 60_000) {
       add("APPROVAL_TIMESTAMP_IN_FUTURE");
     }
-    if (source.expiresAt !== undefined && (!Number.isFinite(Date.parse(source.expiresAt)) || Date.parse(source.expiresAt) <= nowMs)) {
+    if (typeof source.expiresAt !== "string" || !Number.isFinite(Date.parse(source.expiresAt)) || Date.parse(source.expiresAt) <= nowMs) {
       add("APPROVAL_EXPIRED_OR_INVALID");
     }
     if (!Array.isArray(source.allowedHosts) || source.allowedHosts.length < 1 || source.allowedHosts.length > 10) {
