@@ -64,6 +64,40 @@ const PATHWAYS: Record<string, string> = {
   EMPLOYMENT: "Employment"
 };
 
+type PathwayQuestion = { key: string; label: string; placeholder: string };
+const PATHWAY_QUESTIONS: Record<string, PathwayQuestion[]> = {
+  HIGHER_EDUCATION: [
+    { key: "candidate_pathway_intended_qualification", label: "Intended qualification", placeholder: "Qualification or field of study you are pursuing" },
+    { key: "candidate_pathway_study_mode", label: "Preferred study mode", placeholder: "Full-time, part-time, distance or other preference" },
+    { key: "candidate_pathway_funding_plan", label: "Funding plan", placeholder: "Self-funded, bursary sought, NSFAS assessment or other plan" }
+  ],
+  TVET: [
+    { key: "candidate_pathway_qualification_level", label: "Qualification level / NQF level", placeholder: "Your current or intended qualification level" },
+    { key: "candidate_pathway_trade_or_course", label: "Trade or course preference", placeholder: "Name the programme or occupational field" },
+    { key: "candidate_pathway_practical_experience", label: "Practical experience", placeholder: "Summarise workshop, workplace or practical exposure" }
+  ],
+  SETA_LEARNERSHIP: [
+    { key: "candidate_pathway_sector", label: "Preferred sector", placeholder: "Sector or SETA area of interest" },
+    { key: "candidate_pathway_nqf_level", label: "Current NQF level", placeholder: "State your current verified or reported level" },
+    { key: "candidate_pathway_workplace_experience", label: "Workplace experience", placeholder: "Summarise relevant workplace exposure" }
+  ],
+  INTERNSHIP: [
+    { key: "candidate_pathway_field_of_study", label: "Field of study", placeholder: "Your field, qualification or study area" },
+    { key: "candidate_pathway_internship_duration", label: "Preferred internship duration", placeholder: "Your availability period or preference" },
+    { key: "candidate_pathway_portfolio", label: "Projects or portfolio", placeholder: "Summarise relevant projects, samples or portfolio work" }
+  ],
+  APPRENTICESHIP: [
+    { key: "candidate_pathway_trade", label: "Trade of interest", placeholder: "Electrical, fitting, welding, plumbing or other trade" },
+    { key: "candidate_pathway_trade_experience", label: "Practical trade experience", placeholder: "Workshop, job-shadowing or supervised experience" },
+    { key: "candidate_pathway_trade_test_status", label: "Trade-test status", placeholder: "Not yet assessed, preparing, or current verified status" }
+  ],
+  EMPLOYMENT: [
+    { key: "candidate_pathway_notice_period", label: "Notice period", placeholder: "Immediate, one week, one month or other" },
+    { key: "candidate_pathway_shift_availability", label: "Shift availability", placeholder: "Day, night, rotating, weekend or other availability" },
+    { key: "candidate_pathway_licences", label: "Relevant licences or certifications", placeholder: "List relevant licences and certification held" }
+  ]
+};
+
 function message(body: ApiResponse) {
   return [body.code, body.error ?? body.message].filter(Boolean).join(": ")
     || "The application draft request could not be completed.";
@@ -163,6 +197,21 @@ export default function CandidateApplicationDraftPage() {
   function removeAdditional(index: number) {
     update("additional_answers", answers.additional_answers.filter((_, i) => i !== index));
   }
+
+  function updatePathwayAnswer(questionKey: string, answer: string) {
+    const existing = answers.additional_answers.findIndex(item => item.question_key === questionKey);
+    if (existing >= 0) {
+      updateAdditional(existing, "answer", answer);
+      return;
+    }
+    if (!answer.trim() || answers.additional_answers.length >= 20) return;
+    update("additional_answers", [
+      ...answers.additional_answers,
+      { question_key: questionKey, answer }
+    ]);
+  }
+
+  const pathwayQuestions = application ? PATHWAY_QUESTIONS[application.pathway_type] ?? [] : [];
 
   async function save(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
@@ -331,6 +380,31 @@ export default function CandidateApplicationDraftPage() {
               </label>
             </div>
 
+
+            {pathwayQuestions.length > 0 && <section className="rounded-2xl border border-cyan-900 bg-slate-950 p-4">
+              <div>
+                <h3 className="font-semibold">{PATHWAYS[application.pathway_type]} preparation details</h3>
+                <p className="mt-1 text-xs leading-5 text-slate-400">These prompts help organise your information for this pathway. They are candidate-provided notes, not a declaration that an institution or employer requires these answers. Check the current official opportunity criteria before relying on them.</p>
+              </div>
+              <div className="mt-4 grid gap-4 md:grid-cols-2">
+                {pathwayQuestions.map(question => {
+                  const saved = answers.additional_answers.find(item => item.question_key === question.key)?.answer ?? "";
+                  return <label key={question.key} className="block text-sm font-semibold">
+                    {question.label}
+                    <textarea
+                      maxLength={2000}
+                      value={saved}
+                      onChange={event => updatePathwayAnswer(question.key, event.target.value)}
+                      disabled={!isEditable || saving || answers.additional_answers.length >= 20 && !saved}
+                      rows={2}
+                      className="mt-2 w-full rounded-xl border border-slate-700 bg-slate-900 p-3 text-sm font-normal disabled:opacity-50"
+                      placeholder={question.placeholder}
+                    />
+                    <span className="mt-1 block text-xs font-normal text-slate-500">Saved as an application-specific answer.</span>
+                  </label>;
+                })}
+              </div>
+            </section>}
             <section className="rounded-2xl border border-slate-800 p-4">
               <div className="flex flex-wrap items-center justify-between gap-3">
                 <div>
