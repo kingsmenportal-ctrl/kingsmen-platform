@@ -21,7 +21,7 @@ const dockerfile = readFileSync("apps/workers/Dockerfile.playwright-scout", "utf
 
 for (const marker of [
   "validateProviderScoutPlan",
-  "public_read_only",
+  "route.request().method() !== \"GET\"",
   "BLOCKED_UNAPPROVED_REDIRECT",
   "formsInteractedWith: false",
   "applicationsSubmitted: false",
@@ -30,6 +30,8 @@ for (const marker of [
 ]) assert.ok(scout.includes(marker), `Provider scout is missing policy marker: ${marker}`);
 
 for (const marker of [
+  "PUBLIC_READ_ONLY_REQUIRED",
+  "APPROVAL_EXPIRED_OR_INVALID",
   "FOUNDER_APPROVAL_REQUIRED",
   "CONCURRENCY_MUST_EQUAL_ONE",
   "SOURCE_HOST_NOT_ALLOWLISTED",
