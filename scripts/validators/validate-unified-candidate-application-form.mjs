@@ -9,6 +9,7 @@ const dashboard = read("apps/web/src/app/candidate/dashboard/page.tsx");
 const tracker = read("apps/web/src/app/candidate/applications/page.tsx");
 const draftRoute = read("apps/web/src/app/api/candidate/application-draft/route.ts");
 const preparationRoute = read("apps/web/src/app/api/candidate/applications/route.ts");
+const opportunityPage = read("apps/web/src/app/candidate/opportunity-matches/page.tsx");
 
 const pathways = [
   "HIGHER_EDUCATION", "TVET", "SETA_LEARNERSHIP",
@@ -23,10 +24,10 @@ const checks = [
   ["answer fields match the allow-listed database contract", ["motivation_statement","relevant_experience","qualifications_summary","availability_date","preferred_campus","additional_answers"].every((value) => page.includes(value))],
   ["form handles locked parent state and version conflicts", page.includes("is_editable") && page.includes("VERSION_CONFLICT")],
   ["CAO choices are described as children under the existing parent", page.includes("ordered child records under one Kingsmen parent application") && page.includes('href="/candidate/cao-choices"')],
-  ["candidate can navigate to the form from dashboard and tracker", dashboard.includes('href: "/candidate/apply"') && tracker.includes('href="/candidate/apply"')],
+  ["candidate can navigate to the form from dashboard, tracker and opportunity discovery", dashboard.includes('href: "/candidate/apply"') && tracker.includes('href="/candidate/apply"') && opportunityPage.includes('href="/candidate/apply"')],
   ["candidate browser does not receive service-role or provider URL handling", !page.includes("SUPABASE_SERVICE_ROLE_KEY") && !page.includes("provider_application_url") && !page.includes("target=\"_blank\"")],
   ["form never marks provider submission or outcome", page.includes("No provider submission has occurred") && page.includes("no provider receipt or outcome is inferred")],
-  ["API routes require bearer authentication and preserve no-store behaviour", draftRoute.includes("AUTHENTICATION_REQUIRED") && draftRoute.includes("Cache-Control") && preparationRoute.includes("Bearer")),
+  ["API routes require bearer authentication and preserve no-store behaviour", draftRoute.includes("AUTHENTICATION_REQUIRED") && draftRoute.includes("Cache-Control") && preparationRoute.includes("Bearer")],
   ["application-preparation API forwards only the target key, not browser candidate IDs", preparationRoute.includes("payload.target_key = incoming.target_key") && preparationRoute.includes("Browser-supplied candidate IDs are deliberately not forwarded")]
 ];
 
