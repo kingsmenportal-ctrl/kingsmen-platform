@@ -252,6 +252,27 @@ async function main() {
       const request = route.request();
       assert.match(request.headers().authorization || "", /^Bearer\s+kingsmen-playwright-test-access-token/);
       const url = new URL(request.url());
+      if (request.method() === "POST") {
+        const payload = request.postDataJSON();
+        assert.equal(payload.action, "save");
+        assert.equal(payload.application_id, caoParentId, "CAO children must be written beneath the deep-linked parent");
+        assert.equal(payload.choices.length, 1);
+        assert.equal(payload.choices[0].choice_number, 1);
+        assert.equal(payload.choices[0].institution_name, "Selected University");
+        assert.equal(payload.choices[0].programme_name, "BSc Applied Mathematics");
+        return route.fulfill({
+          status: 200,
+          contentType: "application/json",
+          body: JSON.stringify({
+            ready: true,
+            ok: true,
+            application_id: caoParentId,
+            choices_saved: 1,
+            choices: [{ choice_number: 1, institution_name: "Selected University", programme_name: "BSc Applied Mathematics", cao_programme_code: "TEST-001", source_url: "", choice_status: "DRAFT" }],
+            message: "Saved one ordered CAO child choice to the selected Kingsmen parent draft. No external submission occurred."
+          })
+        });
+      }
       if (request.method() === "GET" && !url.searchParams.has("application_id")) {
         return route.fulfill({
           status: 200,
@@ -278,6 +299,13 @@ async function main() {
     assert.equal(await page.getByLabel("Kingsmen parent application").inputValue(), caoParentId,
       "CAO deep link must select its own parent, not the first parent in the list");
     assert.equal(caoChoicesLoadedFor, caoParentId, "CAO choices must be loaded for the requested parent id");
+    await page.getByRole("button", { name: "Add choice" }).click();
+    await page.getByLabel("Institution name").fill("Selected University");
+    await page.getByLabel("Programme name").fill("BSc Applied Mathematics");
+    await page.getByLabel("CAO programme code (optional)").fill("TEST-001");
+    await page.getByRole("button", { name: "Save ordered choices" }).click();
+    await page.getByText(/Saved one ordered CAO child choice to the selected Kingsmen parent draft/).waitFor();
+    assert.equal(await page.getByLabel("Institution name").inputValue(), "Selected University");
     assert.equal(failures.length, 0, failures.join("; "));
     const unauthenticated = await browser.newPage();
     await unauthenticated.goto(`${baseUrl}/candidate/apply`, { waitUntil: "networkidle", timeout: 30000 });
@@ -296,7 +324,8 @@ async function main() {
     process.stdout.write("PASS unauthenticated access is rejected before candidate API calls\n");
     process.stdout.write("PASS reusable profile absence keeps application answers read-only\n");
     process.stdout.write("PASS CAO deep link selects the same authorised higher-education parent\n");
-    process.stdout.write("Unified candidate application browser journey: 10/10 passed\n");
+    process.stdout.write("PASS ordered CAO child choice saves against that same parent\n");
+    process.stdout.write("Unified candidate application browser journey: 11/11 passed\n");
   } finally {
     await browser.close();
     server.kill("SIGTERM");
