@@ -12,9 +12,9 @@ Kingsmen communications follow this order:
 
 1. **Email is primary** for ordinary candidate notifications, receipts, document requests, status updates, and support trails.
 2. **WhatsApp and SMS are disabled** for candidate communications until a separate Founder-approved release decision.
-4. Candidate application status and action reminders remain visible in the Kingsmen portal inbox; email is the enabled external channel.
-5. Marketing requires explicit consent and opt-out handling. Bulk sending remains denied by the source proof.
-6. Provider secrets, recipient addresses, and raw message bodies must never be printed in reports.
+3. Candidate application status and action reminders remain visible in the Kingsmen portal inbox; email is the enabled external channel.
+4. Marketing requires explicit consent and opt-out handling. Bulk sending remains denied by the source proof.
+5. Provider secrets, recipient addresses, and raw message bodies must never be printed in reports.
 
 ## Source proof
 
@@ -59,8 +59,7 @@ redacted evidence report with no recipient address or raw message body
 ## Non-negotiables
 
 - No bulk messages from public routes.
-- No WhatsApp normal-status spam.
-- No SMS normal-status spam.
+- WhatsApp and SMS candidate-send paths remain blocked.
 - No live send from source proof.
 - No provider secret in logs, reports, screenshots, or frontend code.
 - No raw candidate recipient data in proof reports.
