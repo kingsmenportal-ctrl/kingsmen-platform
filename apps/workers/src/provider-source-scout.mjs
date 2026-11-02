@@ -103,6 +103,7 @@ async function main() {
         const resourceType = route.request().resourceType();
         if (
           requestUrl.protocol !== "https:" ||
+          route.request().method() !== "GET" ||
           !allowedHosts.has(requestUrl.hostname.toLowerCase()) ||
           isSensitiveUrl(requestUrl.href) ||
           ["image", "media", "font"].includes(resourceType)
