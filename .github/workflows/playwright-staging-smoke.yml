@@ -1,0 +1,61 @@
+name: Kingsmen Playwright Staging Smoke
+
+on:
+  pull_request:
+    paths:
+      - "scripts/playwright/**"
+      - "scripts/validators/validate-playwright-worker-contract.mjs"
+      - "docs/architecture/PLAYWRIGHT_WORKERS_RELEASE_PLAN.md"
+      - ".github/workflows/playwright-staging-smoke.yml"
+  workflow_dispatch:
+    inputs:
+      smoke_paths:
+        description: 'JSON array of same-origin routes (example: ["/","/pricing"])'
+        required: false
+        default: '["/"]'
+      protected_paths:
+        description: 'JSON array of protected routes to probe anonymously (example: ["/portal"])'
+        required: false
+        default: '[]'
+
+permissions:
+  contents: read
+
+concurrency:
+  group: playwright-staging-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  contract:
+    if: github.event_name == 'pull_request'
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+      - run: npm ci
+      - run: node scripts/validators/validate-playwright-worker-contract.mjs
+
+  staging-smoke:
+    if: github.event_name == 'workflow_dispatch'
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    environment: staging
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+      - run: npm ci
+      - run: npx playwright install --with-deps chromium
+      - name: Run read-only browser smoke checks
+        env:
+          KINGSMEN_STAGING_BASE_URL: ${{ secrets.KINGSMEN_STAGING_BASE_URL }}
+          KINGSMEN_SMOKE_PATHS: ${{ inputs.smoke_paths }}
+          KINGSMEN_SMOKE_PROTECTED_PATHS: ${{ inputs.protected_paths }}
+          KINGSMEN_SMOKE_TIMEOUT_MS: "15000"
+        run: node scripts/playwright/kingsmen-staging-smoke.mjs
