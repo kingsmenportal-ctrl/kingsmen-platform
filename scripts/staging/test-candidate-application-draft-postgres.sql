@@ -3,35 +3,52 @@
 
 INSERT INTO public.candidates (id, public_ref, is_active) VALUES
  ('aaaaaaaa-aaaa-4aaa-8aaa-aaaaaaaaaaaa','KNG-TEST-A',true),
- ('cccccccc-cccc-4ccc-8ccc-cccccccccccc','KNG-TEST-B',true);
+ ('cccccccc-cccc-4ccc-8ccc-cccccccccccc','KNG-TEST-B',true),
+ ('55555555-5555-4555-8555-555555555555','KNG-TEST-C',true),
+ ('77777777-7777-4777-8777-777777777777','KNG-TEST-D',true),
+ ('99999999-9999-4999-8999-999999999999','KNG-TEST-E',false);
 
 INSERT INTO public.candidate_auth_identity_links
  (supabase_user_id,candidate_id,link_status,verified_at,verified_by)
 VALUES
  ('bbbbbbbb-bbbb-4bbb-8bbb-bbbbbbbbbbbb','aaaaaaaa-aaaa-4aaa-8aaa-aaaaaaaaaaaa','VERIFIED',now(),'reviewer-fixture'),
- ('dddddddd-dddd-4ddd-8ddd-dddddddddddd','cccccccc-cccc-4ccc-8ccc-cccccccccccc','VERIFIED',now(),'reviewer-fixture');
+ ('dddddddd-dddd-4ddd-8ddd-dddddddddddd','cccccccc-cccc-4ccc-8ccc-dddddddddddd','VERIFIED',now(),'reviewer-fixture'),
+ ('66666666-6666-4666-8666-666666666666','55555555-5555-4555-8555-555555555555','VERIFIED',now(),'reviewer-fixture'),
+ ('88888888-8888-4888-8888-888888888888','77777777-7777-4777-8777-777777777777','VERIFIED',now(),'reviewer-fixture'),
+ ('aaaaaaaa-aaaa-4aaa-8aaa-aaaaaaaaaaab','99999999-9999-4999-8999-999999999999','VERIFIED',now(),'reviewer-fixture');
 
 INSERT INTO public.candidate_master_profiles (candidate_id,profile_data)
 VALUES
  ('aaaaaaaa-aaaa-4aaa-8aaa-aaaaaaaaaaaa','{"first_name":"Candidate A"}'),
- ('cccccccc-cccc-4ccc-8ccc-cccccccccccc','{"first_name":"Candidate B"}');
+ ('cccccccc-cccc-4ccc-8ccc-cccccccccccc','{"first_name":"Candidate B"}'),
+ ('77777777-7777-4777-8777-777777777777','{"first_name":"Candidate D"}'),
+ ('99999999-9999-4999-8999-999999999999','{"first_name":"Candidate E"}');
 
 INSERT INTO public.privacy_consent_records
  (candidate_ref,consent_type,consent_status,consent_text_snapshot,granted_at)
 VALUES
  ('KNG-TEST-A','PROFILE_PROCESSING','ACTIVE','Disposable test consent A',now()),
- ('KNG-TEST-B','PROFILE_PROCESSING','ACTIVE','Disposable test consent B',now());
+ ('KNG-TEST-B','PROFILE_PROCESSING','ACTIVE','Disposable test consent B',now()),
+ ('KNG-TEST-C','PROFILE_PROCESSING','ACTIVE','Disposable test consent C',now()),
+ ('KNG-TEST-D','PROFILE_PROCESSING','ACTIVE','Older active test consent D',now()-interval '2 days'),
+ ('KNG-TEST-D','PROFILE_PROCESSING','REVOKED','Newer revoked test consent D',now()-interval '1 day');
 
 INSERT INTO public.candidate_opportunities (id,title,provider_name,source_url,closes_at) VALUES
  ('10000000-0000-4000-8000-000000000001','A opportunity','A provider','https://example.test/a',now()+interval '30 days'),
- ('20000000-0000-4000-8000-000000000002','B opportunity','B provider','https://example.test/b',now()+interval '30 days');
+ ('20000000-0000-4000-8000-000000000002','B opportunity','B provider','https://example.test/b',now()+interval '30 days'),
+ ('50000000-0000-4000-8000-000000000005','C opportunity','C provider','https://example.test/c',now()+interval '30 days'),
+ ('60000000-0000-4000-8000-000000000006','D opportunity','D provider','https://example.test/d',now()+interval '30 days'),
+ ('70000000-0000-4000-8000-000000000007','E opportunity','E provider','https://example.test/e',now()+interval '30 days');
 
 INSERT INTO public.candidate_applications
  (id,application_ref,candidate_id,opportunity_id,pathway_type,status,readiness_status)
 VALUES
  ('30000000-0000-4000-8000-000000000001','KM-TEST-A1','aaaaaaaa-aaaa-4aaa-8aaa-aaaaaaaaaaaa','10000000-0000-4000-8000-000000000001','HIGHER_EDUCATION','DRAFT','NOT_CHECKED'),
  ('30000000-0000-4000-8000-000000000002','KM-TEST-A2','aaaaaaaa-aaaa-4aaa-8aaa-aaaaaaaaaaaa','10000000-0000-4000-8000-000000000001','HIGHER_EDUCATION','SUBMITTED','NOT_CHECKED'),
- ('40000000-0000-4000-8000-000000000001','KM-TEST-B1','cccccccc-cccc-4ccc-8ccc-cccccccccccc','20000000-0000-4000-8000-000000000002','TVET','DRAFT','NOT_CHECKED');
+ ('40000000-0000-4000-8000-000000000001','KM-TEST-B1','cccccccc-cccc-4ccc-8ccc-cccccccccccc','20000000-0000-4000-8000-000000000002','TVET','DRAFT','NOT_CHECKED'),
+ ('50000000-0000-4000-8000-000000000005','KM-TEST-C1','55555555-5555-4555-8555-555555555555','50000000-0000-4000-8000-000000000005','TVET','DRAFT','NOT_CHECKED'),
+ ('60000000-0000-4000-8000-000000000006','KM-TEST-D1','77777777-7777-4777-8777-777777777777','60000000-0000-4000-8000-000000000006','INTERNSHIP','DRAFT','NOT_CHECKED'),
+ ('70000000-0000-4000-8000-000000000007','KM-TEST-E1','99999999-9999-4999-8999-999999999999','70000000-0000-4000-8000-000000000007','EMPLOYMENT','DRAFT','NOT_CHECKED');
 
 BEGIN;
 SET LOCAL ROLE authenticated;
@@ -173,6 +190,55 @@ BEGIN
 END
 $isolation$;
 
+-- Missing profile, most-recent revoked consent and inactive candidates fail closed.
+SELECT set_config('request.jwt.claim.sub','66666666-6666-4666-8666-666666666666',true);
+DO $profile_gate$
+BEGIN
+  BEGIN
+    PERFORM public.save_candidate_application_draft(
+      '50000000-0000-4000-8000-000000000005',
+      jsonb_build_object('motivation_statement','Profile missing'),
+      0,'draft-test-no-profile'
+    );
+    RAISE EXCEPTION 'TEST_MISSING_PROFILE_WAS_NOT_BLOCKED';
+  EXCEPTION WHEN SQLSTATE '42501' THEN
+    IF SQLERRM <> 'CANDIDATE_REUSABLE_PROFILE_REQUIRED' THEN RAISE; END IF;
+  END;
+END
+$profile_gate$;
+
+SELECT set_config('request.jwt.claim.sub','88888888-8888-4888-8888-888888888888',true);
+DO $consent_gate$
+BEGIN
+  BEGIN
+    PERFORM public.save_candidate_application_draft(
+      '60000000-0000-4000-8000-000000000006',
+      jsonb_build_object('motivation_statement','Consent revoked'),
+      0,'draft-test-revoked-consent'
+    );
+    RAISE EXCEPTION 'TEST_REVOKED_CONSENT_WAS_NOT_BLOCKED';
+  EXCEPTION WHEN SQLSTATE '42501' THEN
+    IF SQLERRM <> 'PROFILE_PROCESSING_CONSENT_REQUIRED' THEN RAISE; END IF;
+  END;
+END
+$consent_gate$;
+
+SELECT set_config('request.jwt.claim.sub','aaaaaaaa-aaaa-4aaa-8aaa-aaaaaaaaaaab',true);
+DO $active_candidate_gate$
+BEGIN
+  BEGIN
+    PERFORM public.save_candidate_application_draft(
+      '70000000-0000-4000-8000-000000000007',
+      jsonb_build_object('motivation_statement','Candidate inactive'),
+      0,'draft-test-inactive-candidate'
+    );
+    RAISE EXCEPTION 'TEST_INACTIVE_CANDIDATE_WAS_NOT_BLOCKED';
+  EXCEPTION WHEN SQLSTATE '42501' THEN
+    IF SQLERRM <> 'ACTIVE_CANDIDATE_REQUIRED' THEN RAISE; END IF;
+  END;
+END
+$active_candidate_gate$;
+
 -- Table privileges stay revoked from client roles; narrowly scoped RPCs remain executable.
 DO $privileges$
 BEGIN
@@ -190,4 +256,4 @@ $privileges$;
 
 COMMIT;
 
-SELECT 'PASS: application draft read/write, version conflict, idempotency, input validation, parent lock, A/B isolation and RPC privileges' AS result;
+SELECT 'PASS: application draft read/write, version conflict, idempotency, input validation, parent lock, A/B isolation, profile/consent/active-candidate gates and RPC privileges' AS result;
