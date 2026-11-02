@@ -28,7 +28,7 @@ const checks = [
   ["CAO choices remain child records under the same parent", editor.includes("CAO programme choices remain child records under one Kingsmen parent application")],
   ["candidate can navigate from dashboard, tracker and opportunity discovery into the unified selector", dashboard.includes('href: "/candidate/apply"') && tracker.includes('href="/candidate/apply"') && opportunityPage.includes('href="/candidate/apply"')],
   ["candidate selector does not render or link external provider URLs", !page.includes("provider_application_url") && !page.includes("target=\"_blank\"")],
-  ["canonical editor explicitly distinguishes drafts from provider submission and outcomes", editor.includes("does not submit to a provider") && editor.includes("provider-confirmed receipt")],
+  ["canonical editor explicitly distinguishes drafts from provider submission and outcomes", editor.includes("not an external provider submission") && editor.includes("provider-confirmed receipt")],
   ["API routes require bearer authentication and preserve no-store behaviour", draftRoute.includes("AUTHENTICATION_REQUIRED") && draftRoute.includes("Cache-Control") && preparationRoute.includes("Bearer")],
   ["application-preparation API forwards only the target key, not browser candidate IDs", preparationRoute.includes("payload.target_key = incoming.target_key") && preparationRoute.includes("Browser-supplied candidate IDs are deliberately not forwarded")]
 ];
