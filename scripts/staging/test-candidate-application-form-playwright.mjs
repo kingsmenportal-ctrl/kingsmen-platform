@@ -9,7 +9,7 @@ const root = process.cwd();
 const webRequire = createRequire(path.join(root, "apps/web/package.json"));
 const { chromium } = webRequire("playwright");
 const port = Number(process.env.KINGSMEN_TEST_PORT || 4388);
-const baseUrl = process.env.KINGSMEN_TEST_BASE_URL || \`http://127.0.0.1:\${port}\`;
+const baseUrl = process.env.KINGSMEN_TEST_BASE_URL || `http://127.0.0.1:${port}`;
 const token = "kingsmen-playwright-test-access-token-1234567890";
 const projectRef = new URL(process.env.NEXT_PUBLIC_SUPABASE_URL || "http://127.0.0.1:54321").hostname.split(".")[0];
 const applicationId = "30000000-0000-4000-8000-000000000001";
@@ -22,8 +22,8 @@ const pathwayTargets = [
   ["APPRENTICESHIP", "Electrical apprenticeship", "N15 Employer"],
   ["EMPLOYMENT", "Operations role", "N15 Employer"]
 ].map(([pathway_type, programme_or_role, provider_name], index) => ({
-  id: \`target-\${index + 1}\`,
-  target_key: \`n15:playwright-test-\${index + 1}\`,
+  id: `target-${index + 1}`,
+  target_key: `n15:playwright-test-${index + 1}`,
   pathway_type,
   provider_name,
   programme_or_role,
@@ -69,7 +69,7 @@ async function main() {
   page.on("pageerror", error => failures.push(error.message));
   await page.addInitScript(({ key, accessToken }) => {
     localStorage.setItem(key, JSON.stringify({ access_token: accessToken, token_type: "bearer" }));
-  }, { key: \`sb-\${projectRef}-auth-token\`, accessToken: token });
+  }, { key: `sb-${projectRef}-auth-token`, accessToken: token });
 
   await page.route("**/api/candidate/applications", async route => {
     const request = route.request();
@@ -169,7 +169,7 @@ async function main() {
   });
 
   try {
-    const response = await page.goto(\`\${baseUrl}/candidate/apply\`, { waitUntil: "networkidle", timeout: 30000 });
+    const response = await page.goto(`${baseUrl}/candidate/apply`, { waitUntil: "networkidle", timeout: 30000 });
     assert.equal(response?.status(), 200, "candidate application form route must load");
     assert.match(await page.locator("h1").innerText(), /One application engine\. Six pathways\./);
 
