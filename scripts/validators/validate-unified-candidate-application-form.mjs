@@ -22,7 +22,7 @@ const checks = [
   ["unlinked saved targets use the verified master-target preparation action", page.includes('"prepare_master_application"') && page.includes("target_key: selectedTarget.target_key")],
   ["target selector opens the single canonical parent-application editor", page.includes('router.push("/candidate/applications/"') && editor.includes('"/api/candidate/application-draft?application_id="') && editor.includes('"/api/candidate/application-draft",')],
   ["canonical editor uses optimistic versioning and retry-stable idempotency", editor.includes("expected_version: version") && editor.includes("idempotency_key: requestKey") && editor.includes("saveIdempotencyKey")],
-  ["answer fields match the allow-listed database contract", ["motivation_statement","relevant_experience","qualifications_summary","availability_date","preferred_campus","additional_answers"].every((value) => page.includes(value))],
+  ["answer fields match the allow-listed database contract", ["motivation_statement","relevant_experience","qualifications_summary","availability_date","preferred_campus","additional_answers"].every((value) => editor.includes(value))],
   ["canonical editor handles locked parent states and version conflicts", editor.includes("isEditable") && editor.includes("APPLICATION_DRAFT_VERSION_CONFLICT")],
   ["canonical editor requires the reusable profile record and links back to profile editing", editor.includes("shared_profile_available") && editor.includes("!profileAvailable") && editor.includes('href="/candidate/profile"')],
   ["CAO choices remain child records under the same parent", editor.includes("CAO programme choices remain child records under one Kingsmen parent application")],
