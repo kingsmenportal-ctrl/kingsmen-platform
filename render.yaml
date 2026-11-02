@@ -1,0 +1,47 @@
+# Render Blueprint — Kingsmen N16 Playwright staging worker
+# Intentionally pinned to the reviewed feature branch with auto-deploy disabled.
+# Do not create/deploy until the backup/restore gate and N16 migration change control pass.
+services:
+  - type: worker
+    name: kingsmen-playwright-staging-worker
+    runtime: docker
+    plan: 1c-2g
+    region: frankfurt
+    branch: feat/playwright-workers-controlled-release-2026-11-02
+    dockerfilePath: ./apps/api/Dockerfile.playwright-worker
+    dockerContext: .
+    autoDeployTrigger: off
+    maxShutdownDelaySeconds: 120
+    envVars:
+      - key: NODE_ENV
+        value: production
+      - key: KINGSMEN_WORKER_ENABLED
+        value: "true"
+      - key: KINGSMEN_WORKER_ENV
+        value: staging
+      - key: KINGSMEN_TRUTH_VAULT_MODE
+        value: postgres
+      - key: KINGSMEN_DATABASE_SSL
+        value: "true"
+      - key: KINGSMEN_DATABASE_URL
+        sync: false
+      - key: KINGSMEN_WORKER_ID
+        value: kingsmen-playwright-staging-worker
+      - key: KINGSMEN_WORKER_POLL_MS
+        value: "5000"
+      - key: KINGSMEN_WORKER_BATCH_SIZE
+        value: "1"
+      - key: KINGSMEN_WORKER_DATABASE_POOL_MAX
+        value: "2"
+      - key: KINGSMEN_WORKER_HEALTH_PORT
+        value: "8081"
+      - key: KINGSMEN_BROWSER_AUTOMATION_ENABLED
+        value: "false"
+      - key: KINGSMEN_BROWSER_ALLOWED_ORIGINS
+        sync: false
+      - key: KINGSMEN_BROWSER_ALLOWED_PATHS
+        sync: false
+      - key: KINGSMEN_BROWSER_TASK_TIMEOUT_MS
+        value: "12000"
+      - key: KINGSMEN_N16_ENABLE_SYNTHETIC_PROBE
+        value: "false"
