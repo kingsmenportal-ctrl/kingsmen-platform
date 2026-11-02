@@ -1,0 +1,14 @@
+{
+  "schema": "kingsmen.provider-scout-plan.v1",
+  "concurrency": 1,
+  "maxSources": 25,
+  "pathwayCoverage": [
+    "higher_education",
+    "tvet",
+    "seta_learnership",
+    "internship",
+    "apprenticeship",
+    "employment"
+  ],
+  "sources": []
+}
