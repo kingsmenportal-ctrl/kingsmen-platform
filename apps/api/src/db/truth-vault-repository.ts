@@ -279,7 +279,7 @@ export class TruthVaultRepository {
   ): Promise<{ candidateId: string; candidateRef: string } | null> {
     this.assertEnabled();
     const result = await this.pool!.query<{ candidate_id: string; candidate_ref: string }>(
-      \`select c.id::text as candidate_id, c.public_ref as candidate_ref
+      `select c.id::text as candidate_id, c.public_ref as candidate_ref
        from public.candidate_auth_identity_links l
        join public.candidates c on c.id = l.candidate_id
        where l.supabase_user_id = $1
@@ -288,7 +288,7 @@ export class TruthVaultRepository {
          and l.verified_at <= now()
          and l.verified_by is not null
          and c.is_active = true
-       limit 2\`,
+       limit 2`,
       [supabaseUserId]
     );
     // A missing or ambiguous binding is never repaired by email matching.
@@ -303,12 +303,12 @@ export class TruthVaultRepository {
     this.assertEnabled();
     if (!verifiedCandidateId) throw new Error("VERIFIED_CANDIDATE_ID_REQUIRED");
     const result = await this.pool!.query<CandidateRow>(
-      \`select id::text, public_ref, email, display_name, current_state, active_package_code, updated_at::text
+      `select id::text, public_ref, email, display_name, current_state, active_package_code, updated_at::text
        from public.candidates
        where id = $2
          and is_active = true
          and (public_ref = $1 or id::text = $1)
-       limit 1\`,
+       limit 1`,
       [candidateReference, verifiedCandidateId]
     );
 
@@ -334,7 +334,7 @@ export class TruthVaultRepository {
     this.assertEnabled();
     if (!verifiedCandidateId) throw new Error("VERIFIED_CANDIDATE_ID_REQUIRED");
     const result = await this.pool!.query<ApplicationRow>(
-      \`select
+      `select
          a.id::text,
          coalesce(a.metadata->>'applicationRef', a.id::text) as application_ref,
          c.public_ref as candidate_ref,
@@ -349,7 +349,7 @@ export class TruthVaultRepository {
        join public.candidates c on c.id = a.candidate_id
        where a.candidate_id = $2
          and (a.id::text = $1 or a.metadata->>'applicationRef' = $1)
-       limit 1\`,
+       limit 1`,
       [applicationReference, verifiedCandidateId]
     );
 
