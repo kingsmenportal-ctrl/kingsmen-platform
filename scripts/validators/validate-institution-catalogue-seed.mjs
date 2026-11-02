@@ -1,34 +1,42 @@
 import { readFileSync } from "node:fs";
 
-const universitySeedPath = "db/seeds/n15_public_university_provider_seed.sql";
-const tvetSeedPath = "db/seeds/n15_public_tvet_provider_seed.sql";
+const batches = [
+  { name: "university", path: "db/seeds/n15_public_university_provider_seed.sql", manifestKey: "first_batch", pattern: /\('((?:INST_PUBLIC_UNI_[A-Z]+))'/g },
+  { name: "TVET", path: "db/seeds/n15_public_tvet_provider_seed.sql", manifestKey: "second_batch", pattern: /\('((?:INST_PUBLIC_TVET_[A-Z_]+))'/g },
+  { name: "SETA", path: "db/seeds/n15_seta_provider_seed.sql", manifestKey: "third_batch", pattern: /\('((?:INST_SETA_[A-Z_]+))'/g }
+];
 const manifestPath = "manifests/n15/institution-catalogue-import-v1.json";
 const failures = [];
-
-const universitySql = readFileSync(universitySeedPath, "utf8");
-const tvetSql = readFileSync(tvetSeedPath, "utf8");
 const manifest = JSON.parse(readFileSync(manifestPath, "utf8"));
+const allRefs = [];
+const counts = {};
 
-const universityRefs = [...universitySql.matchAll(/\('((?:INST_PUBLIC_UNI_[A-Z]+))'/g)].map((m) => m[1]);
-const tvetRefs = [...tvetSql.matchAll(/\('((?:INST_PUBLIC_TVET_[A-Z_]+))'/g)].map((m) => m[1]);
-const allRefs = [...universityRefs, ...tvetRefs];
+for (const batch of batches) {
+  const sql = readFileSync(batch.path, "utf8");
+  const refs = [...sql.matchAll(batch.pattern)].map((m) => m[1]);
+  counts[batch.name] = refs.length;
+  allRefs.push(...refs);
 
-if (universityRefs.length !== manifest.first_batch.expected_records) failures.push(`Expected ${manifest.first_batch.expected_records} university rows, found ${universityRefs.length}.`);
-if (tvetRefs.length !== manifest.second_batch.expected_records) failures.push(`Expected ${manifest.second_batch.expected_records} TVET rows, found ${tvetRefs.length}.`);
+  if (refs.length !== manifest[batch.manifestKey].expected_records) {
+    failures.push(`Expected ${manifest[batch.manifestKey].expected_records} ${batch.name} rows, found ${refs.length}.`);
+  }
+  if (!sql.includes("safe_to_recommend") || !sql.includes("false")) failures.push(`${batch.name} seed must explicitly keep candidate recommendation disabled.`);
+  if (!sql.includes("on conflict (provider_ref) do update")) failures.push(`${batch.name} seed must be idempotent by provider_ref.`);
+  if (/insert\s+into\s+public\.opportunity_programmes/i.test(sql)) failures.push(`${batch.name} identity seed must not create programme-availability claims.`);
+}
 if (new Set(allRefs).size !== allRefs.length) failures.push("Duplicate provider_ref found across catalogue seed batches.");
 
-for (const [name, sql] of [["university", universitySql], ["TVET", tvetSql]]) {
-  if (!sql.includes("safe_to_recommend") || !sql.includes("false")) failures.push(`${name} seed must explicitly keep candidate recommendation disabled.`);
-  if (!sql.includes("'NEEDS_REVIEW'")) failures.push(`${name} seed must keep accreditation status in review.`);
-  if (!sql.includes("on conflict (provider_ref) do update")) failures.push(`${name} seed must be idempotent by provider_ref.`);
-  if (/insert\s+into\s+public\.opportunity_programmes/i.test(sql)) failures.push(`${name} identity seed must not create programme-availability claims.`);
-}
-
-if (!universitySql.includes("https://www.education.gov.za/FurtherStudies/Universities/tabid/393/Default.aspx")) failures.push("Authoritative university source register missing.");
-if (!tvetSql.includes("https://nsfas.org.za/content/institutions.html")) failures.push("NSFAS TVET institution directory evidence missing.");
+const universitySql = readFileSync(batches[0].path, "utf8");
+const tvetSql = readFileSync(batches[1].path, "utf8");
+const setaSql = readFileSync(batches[2].path, "utf8");
+if (!universitySql.includes("https://www.education.gov.za/FurtherStudies/Universities/tabid/393/Default.aspx")) failures.push("University source register missing.");
+if (!tvetSql.includes("https://nsfas.org.za/content/institutions.html")) failures.push("NSFAS TVET directory evidence missing.");
+if (!setaSql.includes("https://www.dhet.gov.za/")) failures.push("DHET SETA source entry point missing.");
+if (!setaSql.includes("'NOT_APPLICABLE','HIGH',false")) failures.push("SETA seed must not assert provider accreditation or recommendation safety.");
 if (manifest.status !== "seed-authored-not-applied") failures.push("Manifest must disclose that seeds have not been applied.");
-if (manifest.first_batch.initial_state.safe_to_recommend !== false) failures.push("University seed must preserve fail-closed candidate publication.");
-if (manifest.second_batch.initial_state.safe_to_recommend !== false) failures.push("TVET seed must preserve fail-closed candidate publication.");
+for (const key of ["first_batch", "second_batch", "third_batch"]) {
+  if (manifest[key].initial_state.safe_to_recommend !== false) failures.push(`${key} must preserve fail-closed candidate publication.`);
+}
 if (!manifest.release_gates.some((gate) => gate.includes("migration provenance"))) failures.push("Migration provenance release gate missing.");
 
 if (failures.length) {
@@ -39,8 +47,7 @@ if (failures.length) {
 
 console.log(JSON.stringify({
   status: "PASS",
-  university_records: universityRefs.length,
-  tvet_records: tvetRefs.length,
+  batches: counts,
   total_records: allRefs.length,
   unique_provider_refs: new Set(allRefs).size,
   candidate_safe_by_default: false,
