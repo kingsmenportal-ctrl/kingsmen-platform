@@ -56,30 +56,30 @@ npm start
 
 Current API storage mode is `memory_development_only`. The next launch build must replace this with real PostgreSQL/Supabase Truth Vault persistence.
 
-## Kingsmen launch readiness gate
+## Simplified risk-based release policy
 
-The repo now has a strict launch-readiness gate. It does not fake production readiness; it reports the exact blockers that must be repaired before public candidates, payments, or production data.
+Kingsmen uses three release levels and four shared stages: build, safety checks, release, and runtime verification. Do not make the public-launch gate a universal blocker for unrelated work.
 
-Run an audit report without failing the shell:
+- **Routine changes** (copy, layout, documentation, isolated UI fixes): relevant tests, normal CI, deploy to the intended non-production or approved environment, and smoke-test.
+- **Feature changes** (candidate journeys, catalogue, Founder dashboard): relevant automated tests, applicable permissions checks, staging verification, and deployment confirmation.
+- **Critical changes** (authentication, candidate isolation, RLS, payments, private documents, production migrations, worker authority): focused security tests, required recovery/change-control safeguards, explicit approval, and post-release verification.
+
+The launch-readiness audit remains available as a diagnostic report:
 
 ```powershell
 npm run kingsmen:launch:audit
 ```
 
-Run the release boot-blocker:
+Run `npm run kingsmen:launch:gate` as a blocker only for the public launch or release class it explicitly governs—not for independent routine changes. Do not bypass branch protection, required CI, or critical safeguards.
 
-```powershell
-npm run kingsmen:launch:gate
-```
-
-Launch evidence lives in:
+Release evidence lives in:
 
 - `manifests/launch/kingsmen-launch-readiness-v1.json`
 - `docs/launch/KINGSMEN_LAUNCH_READINESS.md`
 - `scripts/validators/validate-kingsmen-launch-readiness.mjs`
 - `reports/launch/kingsmen-launch-readiness-latest.json` generated locally by the validator
 
-Public launch remains blocked until the gate opens.
+A change is not considered deployed or verified solely because a commit exists or a validator passes. Confirm the actual deployment and the relevant runtime journey.
 
 ## Locked Jarvis rules
 
