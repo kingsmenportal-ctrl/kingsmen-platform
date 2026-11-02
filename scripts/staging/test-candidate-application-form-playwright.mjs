@@ -334,6 +334,23 @@ async function main() {
     await page.getByRole("button", { name: "Save ordered choices" }).click();
     await page.getByText(/Saved one ordered CAO child choice to the selected Kingsmen parent draft/).waitFor();
     assert.equal(await page.getByLabel("Institution name").inputValue(), "Selected University");
+
+    // Open each pathway through the same selector and canonical parent editor.
+    // This checks that no pathway falls back to a generic or missing editor section.
+    for (const target of pathwayTargets) {
+      await page.goto(`${baseUrl}/candidate/apply`, { waitUntil: "networkidle", timeout: 30000 });
+      await page.locator("article").filter({ hasText: target.programme_or_role })
+        .getByRole("button", { name: "Select this opportunity" }).click();
+      const action = preparedTargetKeys.has(target.target_key)
+        ? page.getByRole("button", { name: "Open saved application" })
+        : page.getByRole("button", { name: "Prepare Kingsmen application" });
+      await action.click();
+      const expectedId = applicationIdsByPathway[target.pathway_type];
+      await page.waitForURL("**/candidate/applications/" + expectedId);
+      await page.getByRole("heading", { name: target.programme_or_role }).waitFor();
+      await page.getByLabel(pathwayPromptLabels[target.pathway_type]).waitFor();
+    }
+    assert.equal(prepareCount, 6, "each pathway must resolve to one Kingsmen parent application");
     assert.equal(failures.length, 0, failures.join("; "));
     const unauthenticated = await browser.newPage();
     await unauthenticated.goto(`${baseUrl}/candidate/apply`, { waitUntil: "networkidle", timeout: 30000 });
@@ -353,7 +370,8 @@ async function main() {
     process.stdout.write("PASS reusable profile absence keeps application answers read-only\n");
     process.stdout.write("PASS CAO deep link selects the same authorised higher-education parent\n");
     process.stdout.write("PASS ordered CAO child choice saves against that same parent\n");
-    process.stdout.write("Unified candidate application browser journey: 11/11 passed\n");
+    process.stdout.write("PASS all six pathways open their own parent and pathway-specific editor prompts\n");
+    process.stdout.write("Unified candidate application browser journey: 12/12 passed\n");
   } finally {
     await browser.close();
     server.kill("SIGTERM");
