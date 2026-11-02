@@ -74,6 +74,9 @@ jobs:
       - name: Build backend API
         run: npm run api:build
       - name: Build Next.js web application
+        env:
+          NEXT_PUBLIC_SUPABASE_URL: http://127.0.0.1:54321
+          NEXT_PUBLIC_SUPABASE_ANON_KEY: kingsmen-test-anon-key
         run: npm --prefix apps/web run build
 
       - name: Install Chromium for candidate browser regression
