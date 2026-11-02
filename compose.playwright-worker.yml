@@ -1,0 +1,51 @@
+services:
+  kingsmen-playwright-worker:
+    build:
+      context: .
+      dockerfile: apps/api/Dockerfile.playwright-worker
+    image: kingsmen/playwright-worker:local
+    init: true
+    restart: unless-stopped
+    read_only: true
+    tmpfs:
+      - /tmp:rw,nosuid,nodev,size=512m
+    shm_size: "1gb"
+    pids_limit: 128
+    security_opt:
+      - no-new-privileges:true
+    cap_drop:
+      - ALL
+    environment:
+      NODE_ENV: production
+      KINGSMEN_WORKER_ENABLED: "true"
+      KINGSMEN_WORKER_ENV: ${KINGSMEN_WORKER_ENV:-staging}
+      KINGSMEN_TRUTH_VAULT_MODE: postgres
+      KINGSMEN_DATABASE_URL: ${KINGSMEN_DATABASE_URL:?Set a dedicated N16 worker-login connection string}
+      KINGSMEN_DATABASE_SSL: "true"
+      KINGSMEN_WORKER_ID: kingsmen-playwright-worker
+      KINGSMEN_WORKER_POLL_MS: "5000"
+      KINGSMEN_WORKER_BATCH_SIZE: "1"
+      KINGSMEN_WORKER_DATABASE_POOL_MAX: "2"
+      KINGSMEN_WORKER_HEALTH_PORT: "8081"
+      KINGSMEN_BROWSER_AUTOMATION_ENABLED: ${KINGSMEN_BROWSER_AUTOMATION_ENABLED:-false}
+      KINGSMEN_BROWSER_ALLOWED_ORIGINS: ${KINGSMEN_BROWSER_ALLOWED_ORIGINS:-}
+      KINGSMEN_BROWSER_ALLOWED_PATHS: ${KINGSMEN_BROWSER_ALLOWED_PATHS:-}
+      KINGSMEN_BROWSER_TASK_TIMEOUT_MS: "12000"
+      KINGSMEN_N16_ENABLE_SYNTHETIC_PROBE: "false"
+    healthcheck:
+      test:
+        - CMD
+        - node
+        - -e
+        - "fetch('http://127.0.0.1:8081/healthz').then(r=>process.exit(r.ok?0:1)).catch(()=>process.exit(1))"
+      interval: 30s
+      timeout: 5s
+      start_period: 30s
+      retries: 3
+    logging:
+      driver: json-file
+      options:
+        max-size: "10m"
+        max-file: "5"
+    # Deliberately no public ports: /healthz binds to loopback inside the container.
+    # Configure private egress and the database allowlist in the target host.

@@ -1,5 +1,6 @@
 import { randomUUID } from "node:crypto";
 import { DurableWorkerQueue, type DurableDispatch, type DurableWorkerResult } from "./durable-worker-queue";
+import { createPlaywrightReadOnlyScoutHandler } from "./playwright-readonly-handler";
 
 export type HandlerContext = {
   workerId: string;
@@ -50,6 +51,10 @@ export function createWorkerHandlerRegistry(env: NodeJS.ProcessEnv = process.env
       };
     }
   });
+
+  if (env.KINGSMEN_BROWSER_AUTOMATION_ENABLED === "true") {
+    handlers.set("browser.readonly_scout", createPlaywrightReadOnlyScoutHandler(env));
+  }
 
   if (env.KINGSMEN_WORKER_ENV === "staging" && env.KINGSMEN_N16_ENABLE_SYNTHETIC_PROBE === "true") {
     handlers.set("n16.staging-recovery-probe", {
@@ -160,6 +165,10 @@ export class AuthenticatedWorkerRunner {
     return summary;
   }
 
+  async health(): Promise<void> {
+    await this.queue.health();
+  }
+
   async recover(): Promise<{ expiredSent: number; exhaustedLocked: number }> {
     const expiredSent = await this.queue.recoverExpiredSent(50);
     const exhaustedLocked = await this.queue.deadLetterExhaustedLocked(50);
@@ -175,7 +184,7 @@ export class AuthenticatedWorkerRunner {
 export function createWorkerRunnerFromEnvironment(): AuthenticatedWorkerRunner {
   if (process.env.KINGSMEN_WORKER_ENABLED !== "true") throw new Error("N16_WORKER_NOT_ENABLED");
   if (process.env.KINGSMEN_TRUTH_VAULT_MODE !== "postgres") throw new Error("N16_POSTGRES_TRUTH_VAULT_MODE_REQUIRED");
-  if (!process.env.KINGSMEN_DATABASE_URL && !process.env.DATABASE_URL) throw new Error("N16_SERVER_ONLY_DATABASE_SECRET_REQUIRED");
+  if (!process.env.KINGSMEN_DATABASE_URL) throw new Error("N16_WORKER_DATABASE_SECRET_REQUIRED");
   return new AuthenticatedWorkerRunner(
     DurableWorkerQueue.fromEnvironment(),
     process.env.KINGSMEN_WORKER_ID ?? `kingsmen-worker-${process.pid}`

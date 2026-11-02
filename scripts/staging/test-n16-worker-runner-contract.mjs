@@ -15,12 +15,15 @@ const checks = [
   ["staging probe requires staging environment", runner, 'env.KINGSMEN_WORKER_ENV === "staging"'],
   ["staging probe must be explicitly enabled", runner, "KINGSMEN_N16_ENABLE_SYNTHETIC_PROBE"],
   ["staging probe is synthetic-only", runner, "dispatch.payload.syntheticOnly !== true"],
-  ["server-only DB secret is mandatory", runner, "N16_SERVER_ONLY_DATABASE_SECRET_REQUIRED"],
+  ["server-only worker DB secret is mandatory", runner, "N16_WORKER_DATABASE_SECRET_REQUIRED"],
+  ["browser scout is opt-in", runner, 'env.KINGSMEN_BROWSER_AUTOMATION_ENABLED === "true"'],
+  ["worker health endpoint checks DB connectivity", main, "healthz"],
   ["durable PostgreSQL mode is mandatory", runner, "N16_POSTGRES_TRUTH_VAULT_MODE_REQUIRED"],
   ["worker can recover expired SENT and exhausted LOCKED", runner, "this.queue.recoverExpiredSent(50)"],
   ["long-running process has graceful shutdown", main, 'process.once("SIGTERM", stop)'],
   ["polling loop has controlled batch size", main, "KINGSMEN_WORKER_BATCH_SIZE"],
-  ["queue uses server-side database connection", queue, "process.env.KINGSMEN_DATABASE_URL ?? process.env.DATABASE_URL"],
+  ["queue uses dedicated server-side worker database secret", queue, "process.env.KINGSMEN_DATABASE_URL"],
+  ["remote DB TLS is mandatory", queue, "N16_WORKER_DATABASE_TLS_REQUIRED"],
   ["server-side PostgreSQL TLS certificate verification is enabled", queue, "rejectUnauthorized: true"]
 ];
 for (const [label, source, needle] of checks) {

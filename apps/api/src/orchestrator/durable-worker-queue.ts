@@ -52,19 +52,32 @@ export class DurableWorkerQueue {
 
   static fromEnvironment(): DurableWorkerQueue {
     const mode = process.env.KINGSMEN_TRUTH_VAULT_MODE ?? "memory";
-    const databaseUrl = process.env.KINGSMEN_DATABASE_URL ?? process.env.DATABASE_URL;
+    const databaseUrl = process.env.KINGSMEN_DATABASE_URL;
     if (mode !== "postgres") {
       throw new Error("N16_DURABLE_QUEUE_REQUIRES_POSTGRES_TRUTH_VAULT_MODE");
     }
-    if (!databaseUrl) throw new Error("N16_DURABLE_QUEUE_DATABASE_URL_REQUIRED");
+    if (!databaseUrl) throw new Error("N16_WORKER_DATABASE_SECRET_REQUIRED");
+    let parsed: URL;
+    try { parsed = new URL(databaseUrl); } catch { throw new Error("N16_WORKER_DATABASE_URL_INVALID"); }
+    if (!["postgres:", "postgresql:"].includes(parsed.protocol)) throw new Error("N16_WORKER_DATABASE_URL_INVALID");
+    const localHost = ["localhost", "127.0.0.1", "::1"].includes(parsed.hostname);
+    if (!localHost && process.env.KINGSMEN_DATABASE_SSL !== "true") {
+      throw new Error("N16_WORKER_DATABASE_TLS_REQUIRED");
+    }
+    const poolMax = Number(process.env.KINGSMEN_WORKER_DATABASE_POOL_MAX ?? 2);
+    if (!Number.isInteger(poolMax) || poolMax < 1 || poolMax > 4) throw new Error("N16_WORKER_DATABASE_POOL_MAX_INVALID");
     const pg = require("pg") as { Pool: PgPoolConstructor };
     return new DurableWorkerQueue(new pg.Pool({
       connectionString: databaseUrl,
-      max: Number(process.env.KINGSMEN_WORKER_DATABASE_POOL_MAX ?? 4),
+      max: poolMax,
       idleTimeoutMillis: 30_000,
       connectionTimeoutMillis: 10_000,
-      ssl: process.env.KINGSMEN_DATABASE_SSL === "true" ? { rejectUnauthorized: true } : undefined
+      ssl: localHost ? undefined : { rejectUnauthorized: true }
     }));
+  }
+
+  async health(): Promise<void> {
+    await this.pool.query("select 1 as worker_health");
   }
 
   async claim(workerId: string, limit = 1, leaseSeconds = 60): Promise<DurableDispatch[]> {

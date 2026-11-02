@@ -1,0 +1,23 @@
+# Browser and OS dependencies are pinned to the same Playwright release as package-lock.json.
+FROM mcr.microsoft.com/playwright:v1.60.0-noble
+
+WORKDIR /app
+ENV NODE_ENV=production
+ENV PLAYWRIGHT_BROWSERS_PATH=/ms-playwright
+ENV KINGSMEN_WORKER_HEALTH_PORT=8081
+
+COPY package.json package-lock.json ./
+RUN npm ci --include=dev
+
+COPY apps/api/package.json ./apps/api/package.json
+RUN npm --prefix apps/api install --include=dev --no-package-lock
+
+COPY . .
+RUN npm --prefix apps/api run build
+
+USER pwuser
+EXPOSE 8081
+HEALTHCHECK --interval=30s --timeout=5s --start-period=30s --retries=3 \
+  CMD node -e "fetch('http://127.0.0.1:8081/healthz').then(r=>process.exit(r.ok?0:1)).catch(()=>process.exit(1))"
+
+CMD ["node", "apps/api/dist/orchestrator/worker-main.js"]
