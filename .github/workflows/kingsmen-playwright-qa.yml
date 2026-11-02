@@ -3,7 +3,7 @@ name: Kingsmen Playwright QA
 on:
   pull_request:
   push:
-    branches: [main]
+    branches: [main, feat/kingsmen-playwright-qa-scout-2026-11-02]
   workflow_dispatch:
 
 permissions:
@@ -31,8 +31,14 @@ jobs:
       - name: Install root dependencies
         run: npm ci
 
+      - name: Install backend API dependencies
+        run: npm install --prefix apps/api --no-audit --no-fund
+
       - name: Install web dependencies
         run: npm ci --prefix apps/web
+
+      - name: Run repository regression suite
+        run: npm test
 
       - name: Install Chromium
         run: npx playwright install --with-deps chromium
