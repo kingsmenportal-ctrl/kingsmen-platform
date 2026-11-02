@@ -15,6 +15,19 @@ on:
       - "db/migrations/202611020001_n16_worker_least_privilege_role.sql"
       - "package.json"
       - "docs/architecture/PLAYWRIGHT_WORKERS_RELEASE_PLAN.md"
+      - "render.yaml"
+      - ".github/workflows/playwright-staging-smoke.yml"
+  push:
+    branches:
+      - "feat/playwright-workers-controlled-release-2026-11-02"
+    paths:
+      - "scripts/playwright/**"
+      - "scripts/staging/test-playwright-staging-smoke.mjs"
+      - "apps/api/src/orchestrator/**"
+      - "apps/api/Dockerfile.playwright-worker"
+      - "compose.playwright-worker.yml"
+      - "render.yaml"
+      - "package.json"
       - ".github/workflows/playwright-staging-smoke.yml"
   workflow_dispatch:
     inputs:
@@ -41,7 +54,7 @@ concurrency:
 
 jobs:
   contract:
-    if: github.event_name == 'pull_request'
+    if: github.event_name == 'pull_request' || github.event_name == 'push'
     runs-on: ubuntu-24.04
     timeout-minutes: 30
     services:
@@ -91,7 +104,7 @@ jobs:
         run: test "$(docker image inspect --format '{{.Config.User}}' kingsmen/playwright-worker:ci)" = "pwuser"
 
   staging-smoke:
-    if: github.event_name == 'workflow_dispatch'
+    if: github.event_name == 'workflow_dispatch' || github.event_name == 'push'
     runs-on: ubuntu-24.04
     timeout-minutes: 10
     environment: staging
@@ -106,8 +119,8 @@ jobs:
       - name: Run read-only browser smoke checks
         env:
           KINGSMEN_STAGING_BASE_URL: ${{ secrets.KINGSMEN_STAGING_BASE_URL }}
-          KINGSMEN_SMOKE_PATHS: ${{ inputs.smoke_paths }}
-          KINGSMEN_SMOKE_PROTECTED_PATHS: ${{ inputs.protected_paths }}
+          KINGSMEN_SMOKE_PATHS: ${{ inputs.smoke_paths || '["/"]' }}
+          KINGSMEN_SMOKE_PROTECTED_PATHS: ${{ inputs.protected_paths || '[]' }}
           KINGSMEN_SMOKE_TIMEOUT_MS: "15000"
         run: node scripts/playwright/kingsmen-staging-smoke.mjs
 
