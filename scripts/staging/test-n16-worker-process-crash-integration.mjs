@@ -20,7 +20,7 @@ const workerEntry = path.join(root, "apps/api/dist/orchestrator/worker-main.js")
 if (!allow) throw new Error("KINGSMEN_N16_TEST_ALLOW_MUTATION=true is required.");
 if (!["127.0.0.1", "localhost", "::1"].includes(host)) throw new Error("N16 integration test refuses non-loopback hosts.");
 if (!Number.isInteger(port) || port < 1 || port > 65535) throw new Error("Invalid N16 test database port.");
-if (!adminPassword || rolePassword.length < 20) throw new Error("Disposable PostgreSQL admin and service role credentials are required.");
+if (!adminPassword || rolePassword.length < 20) throw new Error("Disposable PostgreSQL admin and dedicated worker-login credentials are required.");
 if (database !== "kingsmen_n16_worker_test") throw new Error("N16 integration test requires the exact disposable database name.");
 
 const require = createRequire(import.meta.url);
@@ -28,7 +28,7 @@ const pgPath = require.resolve("pg", { paths: [path.join(root, "apps/api")] });
 const { Client } = require(pgPath);
 const admin = new Client({ host, port, user: adminUser, password: adminPassword, database, connectionTimeoutMillis: 5000 });
 const passwordLiteral = "'" + rolePassword.replace(/'/g, "''") + "'";
-const workerUrl = "postgres://" + encodeURIComponent("kingsmen_n16_worker_login") + ":+"
+const workerUrl = "postgres://" + encodeURIComponent("kingsmen_n16_worker_login") + ":" +
   encodeURIComponent(rolePassword) + "@" + host + ":" + port + "/" + database;
 
 function startWorker(workerId, preSentDelayMs, postSentDelayMs) {
