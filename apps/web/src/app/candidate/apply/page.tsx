@@ -196,7 +196,8 @@ export default function CandidateApplyPage() {
               </div>
               <h3 className="mt-3 text-lg font-bold">{target.programme_or_role}</h3>
               <p className="mt-1 text-sm text-slate-300">{target.provider_name}</p>
-              <p className="mt-2 text-xs text-slate-500">Kingsmen source status: {target.source_confidence} · {target.planning_status}</p>
+              <p className="mt-2 text-xs text-slate-500">Workspace state: {target.planning_status.replaceAll("_", " ")}</p>
+              <p className="mt-1 text-xs text-slate-500">Current official-source, eligibility and deadline checks are repeated before the parent application is prepared.</p>
               <button type="button" onClick={() => setSelectedTargetKey(target.target_key)}
                 aria-pressed={selectedTargetKey === target.target_key}
                 className="mt-4 rounded-xl border border-slate-700 px-4 py-2 text-sm font-semibold">Select this opportunity</button>
