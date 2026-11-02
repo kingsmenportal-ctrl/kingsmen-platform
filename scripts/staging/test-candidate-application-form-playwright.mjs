@@ -38,6 +38,7 @@ let version = 0;
 let saveCount = 0;
 let lastSaveBody = null;
 let prepareCount = 0;
+let profileAvailable = true;
 
 async function main() {
   const server = spawn(process.execPath, [nextBinary, "start", "-H", "127.0.0.1", "-p", String(port)], {
@@ -136,7 +137,7 @@ async function main() {
           draft: storedDraft,
           draft_version: version,
           draft_updated_at: version ? "2026-11-02T12:00:00.000Z" : null,
-          shared_profile_available: true,
+          shared_profile_available: profileAvailable,
           is_editable: true,
           provider_submission_sent: false
         })
@@ -208,6 +209,17 @@ async function main() {
     assert.equal(await page.getByLabel("Answer").inputValue(), "Available for all shifts.");
     assert.equal(await page.getByText("Draft version 1", { exact: true }).count(), 1);
 
+    profileAvailable = false;
+    await page.getByRole("button", { name: "Reload saved draft" }).click();
+    await page.getByText(/No saved reusable profile was found/).waitFor();
+    assert.equal(await page.getByRole("button", { name: "Save application draft" }).isDisabled(), true,
+      "application answers must remain read-only until the reusable profile is available");
+
+    profileAvailable = true;
+    await page.getByRole("button", { name: "Reload saved draft" }).click();
+    await page.getByText(/Your saved reusable profile is available/).waitFor();
+    assert.equal(await page.getByRole("button", { name: "Save application draft" }).isDisabled(), false);
+
     await page.reload({ waitUntil: "networkidle" });
     await page.getByRole("heading", { name: "Operations role" }).waitFor();
     assert.equal(await page.getByLabel("Motivation statement").inputValue(), "I am ready to contribute.");
@@ -230,7 +242,8 @@ async function main() {
     process.stdout.write("PASS explicit reload and page refresh preserve the canonical candidate draft\n");
     process.stdout.write("PASS candidate form does not expose external provider URLs\n");
     process.stdout.write("PASS unauthenticated access is rejected before candidate API calls\n");
-    process.stdout.write("Unified candidate application browser journey: 7/7 passed\n");
+    process.stdout.write("PASS reusable profile absence keeps application answers read-only\n");
+    process.stdout.write("Unified candidate application browser journey: 8/8 passed\n");
   } finally {
     await browser.close();
     server.kill("SIGTERM");
