@@ -1,0 +1,110 @@
+name: Kingsmen Playwright QA
+
+on:
+  pull_request:
+  push:
+    branches: [main, feat/kingsmen-playwright-qa-scout-2026-11-02]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: kingsmen-playwright-${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  browser-qa:
+    name: Browser QA and provider-scout policy
+    runs-on: ubuntu-24.04
+    timeout-minutes: 30
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+
+      - name: Install root dependencies
+        run: npm ci
+
+      - name: Install backend API dependencies
+        run: npm install --prefix apps/api --no-audit --no-fund
+
+      - name: Install web dependencies
+        run: npm install --prefix apps/web --no-audit --no-fund
+
+      - name: Run repository regression suite
+        run: npm test
+
+      - name: Install Chromium
+        run: npx playwright install --with-deps chromium
+
+      - name: Validate provider-scout policy
+        run: npm run playwright:policy:test
+
+      - name: Validate Playwright implementation contracts
+        run: npm run playwright:policy:validate
+
+      - name: Test operations adapter approval policy
+        run: npm run playwright:operations:policy:test
+
+      - name: Validate isolated operations worker implementation
+        run: npm run playwright:operations:policy:validate
+
+      - name: Build Kingsmen web application
+        run: npm run build --prefix apps/web
+
+      - name: Start local production web server
+        env:
+          PORT: 3000
+        run: |
+          npm run start --prefix apps/web > /tmp/kingsmen-web.log 2>&1 &
+          echo $! > /tmp/kingsmen-web.pid
+          for attempt in {1..60}; do
+            if curl --silent --fail http://127.0.0.1:3000/ > /dev/null; then
+              exit 0
+            fi
+            sleep 2
+          done
+          cat /tmp/kingsmen-web.log
+          exit 1
+
+      - name: Run Chromium browser QA
+        env:
+          KINGSMEN_QA_BASE_URL: http://127.0.0.1:3000
+          KINGSMEN_QA_REPORT: reports/playwright/qa-latest.json
+        run: npm run playwright:qa
+
+      - name: Stop local web server
+        if: always()
+        run: |
+          if [ -f /tmp/kingsmen-web.pid ]; then
+            kill "$(cat /tmp/kingsmen-web.pid)" || true
+          fi
+
+      - name: Upload redacted QA report
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: kingsmen-playwright-qa-${{ github.run_id }}
+          path: reports/playwright/qa-latest.json
+          if-no-files-found: warn
+          retention-days: 14
+
+  scout-container:
+    name: Build isolated public-source scout image
+    runs-on: ubuntu-24.04
+    timeout-minutes: 20
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+
+      - name: Build Playwright scout container
+        run: docker build -f apps/workers/Dockerfile.playwright-scout -t kingsmen-playwright-scout:ci .
+
+      - name: Build isolated Playwright operations container
+        run: docker build -f apps/workers/Dockerfile.playwright-operations -t kingsmen-playwright-operations:ci .

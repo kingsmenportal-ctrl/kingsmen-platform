@@ -1,0 +1,21 @@
+FROM mcr.microsoft.com/playwright:v1.60.0-noble
+
+WORKDIR /app
+
+RUN npm install --prefix /app --no-audit --no-fund --save-exact pg@8.12.0 playwright@1.60.0 \
+    && mkdir -p /etc/kingsmen \
+    && chown -R pwuser:pwuser /app /etc/kingsmen
+
+COPY apps/workers/src/playwright-operations-worker.mjs /app/apps/workers/src/playwright-operations-worker.mjs
+COPY apps/workers/src/providers/provider-adapter-policy.mjs /app/apps/workers/src/providers/provider-adapter-policy.mjs
+COPY data/providers/playwright-operations-adapters.example.json /app/data/providers/playwright-operations-adapters.example.json
+
+RUN cp /app/data/providers/playwright-operations-adapters.example.json /etc/kingsmen/provider-adapters.json \
+    && chown pwuser:pwuser /etc/kingsmen/provider-adapters.json
+
+ENV NODE_ENV=production
+ENV KINGSMEN_PROVIDER_ADAPTER_REGISTRY=/etc/kingsmen/provider-adapters.json
+ENV KINGSMEN_PLAYWRIGHT_WORKER_ID=playwright-scout:operations-01
+USER pwuser
+
+ENTRYPOINT ["node", "/app/apps/workers/src/playwright-operations-worker.mjs"]

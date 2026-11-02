@@ -7,6 +7,9 @@
 import assert from "node:assert/strict";
 
 const siteRaw = process.env.KINGSMEN_STAGING_BASE_URL;
+const apiRaw = process.env.KINGSMEN_STAGING_API_BASE_URL;
+const aApplicationId = process.env.KINGSMEN_E2E_CANDIDATE_A_APPLICATION_ID;
+const bApplicationId = process.env.KINGSMEN_E2E_CANDIDATE_B_APPLICATION_ID;
 const supabaseRaw = process.env.KINGSMEN_SUPABASE_URL;
 const anonKey = process.env.KINGSMEN_SUPABASE_ANON_KEY;
 const aToken = process.env.KINGSMEN_E2E_CANDIDATE_A_TOKEN;
@@ -19,14 +22,15 @@ function blocked(code, message) {
   console.error(JSON.stringify({ schema: "kingsmen.candidate-reviewer-isolation-e2e.v1", status: code, message }));
   process.exit(2);
 }
-if (![siteRaw, supabaseRaw, anonKey, aToken, bToken, reviewerToken, aDocumentId, bDocumentId].every(Boolean)) {
-  blocked("BLOCKED_CONFIGURATION_MISSING", "Provide the staging URLs, public anon key, two authorised candidate tokens, reviewer token and two private test document IDs.");
+if (![siteRaw, apiRaw, supabaseRaw, anonKey, aToken, bToken, reviewerToken, aDocumentId, bDocumentId, aApplicationId, bApplicationId].every(Boolean)) {
+  blocked("BLOCKED_CONFIGURATION_MISSING", "Provide staging/API/Supabase URLs, the public anon key, Candidate A/B and reviewer sessions, candidate-owned document IDs, and one application fixture per candidate.");
 }
 let site;
+let api;
 let supabase;
-try { site = new URL(siteRaw); supabase = new URL(supabaseRaw); }
+try { site = new URL(siteRaw); api = new URL(apiRaw); supabase = new URL(supabaseRaw); }
 catch { blocked("BLOCKED_INVALID_URL", "Staging or Supabase URL is invalid."); }
-if (site.protocol !== "https:" || supabase.protocol !== "https:") blocked("BLOCKED_INSECURE_URL", "HTTPS is required for staging and Supabase.");
+if (site.protocol !== "https:" || api.protocol !== "https:" || supabase.protocol !== "https:") blocked("BLOCKED_INSECURE_URL", "HTTPS is required for staging, the backend API and Supabase.");
 if (aToken === bToken || aToken === reviewerToken || bToken === reviewerToken) blocked("BLOCKED_IDENTITIES_NOT_DISTINCT", "Candidate A, Candidate B and reviewer must use three distinct access tokens.");
 
 const results = [];
@@ -59,6 +63,45 @@ const refA = await loadProfile(aToken, "Candidate A");
 const refB = await loadProfile(bToken, "Candidate B");
 assert.notEqual(refA, refB, "Candidate A and B must resolve to different candidate references");
 results.push("candidate_profiles_are_distinct");
+
+async function ownCandidateStatus(token, candidateReference, label) {
+  const target = new URL("/api/candidates/" + encodeURIComponent(candidateReference) + "/status", api);
+  const result = await jsonRequest(target, token, undefined, "GET");
+  assert.equal(result.status, 200, label + " own candidate status read did not return HTTP 200");
+  assert.equal(result.body.ok, true, label + " own candidate status read did not return ok=true");
+  assert.equal(result.body.candidate?.candidateId, candidateReference, label + " own status returned a different candidate reference");
+}
+async function foreignCandidateStatusDenied(token, candidateReference, label) {
+  const target = new URL("/api/candidates/" + encodeURIComponent(candidateReference) + "/status", api);
+  const result = await jsonRequest(target, token, undefined, "GET");
+  assert.equal(result.status, 403, label + " unexpectedly read a foreign candidate status");
+  assert.equal(result.body.code, "CANDIDATE_OWNERSHIP_DENIED", label + " foreign status denial code was not explicit");
+  assert.equal(typeof result.body.candidate, "undefined", label + " received foreign candidate data");
+}
+await ownCandidateStatus(aToken, refA, "Candidate A");
+await ownCandidateStatus(bToken, refB, "Candidate B");
+await foreignCandidateStatusDenied(aToken, refB, "Candidate A");
+await foreignCandidateStatusDenied(bToken, refA, "Candidate B");
+results.push("candidate_status_ownership_and_foreign_denial");
+
+async function ownApplicationWorkbench(token, applicationId, candidateReference, label) {
+  const target = new URL("/api/applications/" + encodeURIComponent(applicationId) + "/workbench", api);
+  const result = await jsonRequest(target, token, undefined, "GET");
+  assert.equal(result.status, 200, label + " own application workbench did not return HTTP 200");
+  assert.equal(result.body.ok, true, label + " own application workbench did not return ok=true");
+  assert.equal(result.body.application?.candidateId, candidateReference, label + " own workbench returned a different owner");
+}
+async function foreignApplicationWorkbenchHidden(token, applicationId, label) {
+  const target = new URL("/api/applications/" + encodeURIComponent(applicationId) + "/workbench", api);
+  const result = await jsonRequest(target, token, undefined, "GET");
+  assert.equal(result.status, 404, label + " unexpectedly read a foreign application workbench");
+  assert.equal(typeof result.body.application, "undefined", label + " received foreign application data");
+}
+await ownApplicationWorkbench(aToken, aApplicationId, refA, "Candidate A");
+await ownApplicationWorkbench(bToken, bApplicationId, refB, "Candidate B");
+await foreignApplicationWorkbenchHidden(aToken, bApplicationId, "Candidate A");
+await foreignApplicationWorkbenchHidden(bToken, aApplicationId, "Candidate B");
+results.push("application_workbench_ownership_and_foreign_denial");
 
 async function ownDocumentRead(token, documentId, label) {
   const result = await jsonRequest(new URL("/api/candidate/documents/read-url", site), token, { documentId });
@@ -95,5 +138,5 @@ console.log(JSON.stringify({
   identityValuesLogged: false,
   tokensLogged: false,
   databaseMutations: false,
-  note: "Read-only tests used pre-provisioned candidate-owned files and an existing least-privilege reviewer grant."
+  note: "Read-only tests used pre-provisioned candidate-owned application/document fixtures, verified Auth identity links, and an existing least-privilege reviewer grant."
 }, null, 2));

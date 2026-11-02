@@ -1,0 +1,153 @@
+name: Kingsmen Authenticated Staging Verification
+
+on:
+  workflow_dispatch:
+    inputs:
+      run_profile_persistence:
+        description: "Run the mutating profile save / sign-out / fresh sign-in / restore test on the approved dedicated test candidate."
+        type: boolean
+        required: false
+        default: false
+
+permissions:
+  contents: read
+
+concurrency:
+  group: kingsmen-authenticated-staging-${{ github.ref }}
+  cancel-in-progress: false
+
+jobs:
+  candidate-isolation:
+    name: Candidate A/B and reviewer isolation
+    runs-on: ubuntu-24.04
+    environment: kingsmen-staging-verification
+    timeout-minutes: 10
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+
+      - name: Validate protected staging configuration
+        env:
+          KINGSMEN_STAGING_BASE_URL: ${{ secrets.KINGSMEN_STAGING_BASE_URL }}
+          KINGSMEN_STAGING_API_BASE_URL: ${{ secrets.KINGSMEN_STAGING_API_BASE_URL }}
+          KINGSMEN_SUPABASE_URL: ${{ secrets.KINGSMEN_SUPABASE_URL }}
+          KINGSMEN_SUPABASE_ANON_KEY: ${{ secrets.KINGSMEN_SUPABASE_ANON_KEY }}
+          KINGSMEN_E2E_CANDIDATE_A_TOKEN: ${{ secrets.KINGSMEN_E2E_CANDIDATE_A_TOKEN }}
+          KINGSMEN_E2E_CANDIDATE_B_TOKEN: ${{ secrets.KINGSMEN_E2E_CANDIDATE_B_TOKEN }}
+          KINGSMEN_E2E_REVIEWER_TOKEN: ${{ secrets.KINGSMEN_E2E_REVIEWER_TOKEN }}
+          KINGSMEN_E2E_CANDIDATE_A_DOCUMENT_ID: ${{ secrets.KINGSMEN_E2E_CANDIDATE_A_DOCUMENT_ID }}
+          KINGSMEN_E2E_CANDIDATE_B_DOCUMENT_ID: ${{ secrets.KINGSMEN_E2E_CANDIDATE_B_DOCUMENT_ID }}
+          KINGSMEN_E2E_CANDIDATE_A_APPLICATION_ID: ${{ secrets.KINGSMEN_E2E_CANDIDATE_A_APPLICATION_ID }}
+          KINGSMEN_E2E_CANDIDATE_B_APPLICATION_ID: ${{ secrets.KINGSMEN_E2E_CANDIDATE_B_APPLICATION_ID }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          required=(
+            KINGSMEN_STAGING_BASE_URL KINGSMEN_STAGING_API_BASE_URL
+            KINGSMEN_SUPABASE_URL KINGSMEN_SUPABASE_ANON_KEY
+            KINGSMEN_E2E_CANDIDATE_A_TOKEN KINGSMEN_E2E_CANDIDATE_B_TOKEN
+            KINGSMEN_E2E_REVIEWER_TOKEN KINGSMEN_E2E_CANDIDATE_A_DOCUMENT_ID
+            KINGSMEN_E2E_CANDIDATE_B_DOCUMENT_ID KINGSMEN_E2E_CANDIDATE_A_APPLICATION_ID
+            KINGSMEN_E2E_CANDIDATE_B_APPLICATION_ID
+          )
+          for name in "${required[@]}"; do
+            if [[ -z "${!name:-}" ]]; then
+              echo "Missing required protected environment value: $name"
+              exit 1
+            fi
+          done
+
+      - name: Run Candidate A/B and reviewer isolation tests
+        env:
+          KINGSMEN_STAGING_BASE_URL: ${{ secrets.KINGSMEN_STAGING_BASE_URL }}
+          KINGSMEN_STAGING_API_BASE_URL: ${{ secrets.KINGSMEN_STAGING_API_BASE_URL }}
+          KINGSMEN_SUPABASE_URL: ${{ secrets.KINGSMEN_SUPABASE_URL }}
+          KINGSMEN_SUPABASE_ANON_KEY: ${{ secrets.KINGSMEN_SUPABASE_ANON_KEY }}
+          KINGSMEN_E2E_CANDIDATE_A_TOKEN: ${{ secrets.KINGSMEN_E2E_CANDIDATE_A_TOKEN }}
+          KINGSMEN_E2E_CANDIDATE_B_TOKEN: ${{ secrets.KINGSMEN_E2E_CANDIDATE_B_TOKEN }}
+          KINGSMEN_E2E_REVIEWER_TOKEN: ${{ secrets.KINGSMEN_E2E_REVIEWER_TOKEN }}
+          KINGSMEN_E2E_CANDIDATE_A_DOCUMENT_ID: ${{ secrets.KINGSMEN_E2E_CANDIDATE_A_DOCUMENT_ID }}
+          KINGSMEN_E2E_CANDIDATE_B_DOCUMENT_ID: ${{ secrets.KINGSMEN_E2E_CANDIDATE_B_DOCUMENT_ID }}
+          KINGSMEN_E2E_CANDIDATE_A_APPLICATION_ID: ${{ secrets.KINGSMEN_E2E_CANDIDATE_A_APPLICATION_ID }}
+          KINGSMEN_E2E_CANDIDATE_B_APPLICATION_ID: ${{ secrets.KINGSMEN_E2E_CANDIDATE_B_APPLICATION_ID }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          mkdir -p reports/staging
+          node scripts/staging/test-candidate-reviewer-isolation-e2e.mjs | tee reports/staging/candidate-reviewer-isolation.json
+
+      - name: Upload redacted isolation evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: kingsmen-candidate-isolation-${{ github.run_id }}
+          path: reports/staging/candidate-reviewer-isolation.json
+          if-no-files-found: warn
+          retention-days: 14
+
+  profile-persistence:
+    name: Profile save / sign-out / fresh sign-in / restore
+    if: ${{ inputs.run_profile_persistence == true && needs.candidate-isolation.result == 'success' }}
+    needs: [candidate-isolation]
+    runs-on: ubuntu-24.04
+    environment: kingsmen-staging-profile-mutations
+    timeout-minutes: 10
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+
+      - name: Validate explicit mutation approval and dedicated account
+        env:
+          KINGSMEN_PROFILE_E2E_MUTATION_APPROVED: ${{ vars.KINGSMEN_PROFILE_E2E_MUTATION_APPROVED }}
+          KINGSMEN_PROFILE_E2E_EXPECTED_CANDIDATE_REFERENCE: ${{ secrets.KINGSMEN_PROFILE_E2E_EXPECTED_CANDIDATE_REFERENCE }}
+          KINGSMEN_E2E_CANDIDATE_A_EMAIL: ${{ secrets.KINGSMEN_E2E_CANDIDATE_A_EMAIL }}
+          KINGSMEN_E2E_CANDIDATE_A_PASSWORD: ${{ secrets.KINGSMEN_E2E_CANDIDATE_A_PASSWORD }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          test "$KINGSMEN_PROFILE_E2E_MUTATION_APPROVED" = "true" || {
+            echo "Profile mutation approval is not enabled in the protected environment."
+            exit 1
+          }
+          for name in KINGSMEN_PROFILE_E2E_EXPECTED_CANDIDATE_REFERENCE KINGSMEN_E2E_CANDIDATE_A_EMAIL KINGSMEN_E2E_CANDIDATE_A_PASSWORD; do
+            if [[ -z "${!name:-}" ]]; then
+              echo "Missing required protected environment value: $name"
+              exit 1
+            fi
+          done
+
+      - name: Run explicit profile persistence and restoration test
+        env:
+          KINGSMEN_STAGING_BASE_URL: ${{ secrets.KINGSMEN_STAGING_BASE_URL }}
+          KINGSMEN_SUPABASE_URL: ${{ secrets.KINGSMEN_SUPABASE_URL }}
+          KINGSMEN_SUPABASE_ANON_KEY: ${{ secrets.KINGSMEN_SUPABASE_ANON_KEY }}
+          KINGSMEN_E2E_CANDIDATE_A_TOKEN: ${{ secrets.KINGSMEN_E2E_CANDIDATE_A_TOKEN }}
+          KINGSMEN_E2E_CANDIDATE_A_EMAIL: ${{ secrets.KINGSMEN_E2E_CANDIDATE_A_EMAIL }}
+          KINGSMEN_E2E_CANDIDATE_A_PASSWORD: ${{ secrets.KINGSMEN_E2E_CANDIDATE_A_PASSWORD }}
+          KINGSMEN_PROFILE_E2E_EXPECTED_CANDIDATE_REFERENCE: ${{ secrets.KINGSMEN_PROFILE_E2E_EXPECTED_CANDIDATE_REFERENCE }}
+          KINGSMEN_PROFILE_E2E_ALLOW_MUTATIONS: "true"
+          KINGSMEN_PROFILE_E2E_ALLOW_NEW_TEST_PROFILE: "false"
+        shell: bash
+        run: |
+          set -euo pipefail
+          mkdir -p reports/staging
+          node scripts/staging/test-candidate-profile-persistence-e2e.mjs | tee reports/staging/candidate-profile-persistence.json
+
+      - name: Upload redacted profile evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: kingsmen-profile-persistence-${{ github.run_id }}
+          path: reports/staging/candidate-profile-persistence.json
+          if-no-files-found: warn
+          retention-days: 14
