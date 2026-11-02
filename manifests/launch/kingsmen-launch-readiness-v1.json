@@ -7,8 +7,8 @@
   "workerAuthority": "n8n thin workers only",
   "communicationDoctrine": {
     "emailPrimary": true,
-    "whatsappUrgentOnly": true,
-    "smsBackupOnly": true
+    "whatsappDisabled": true,
+    "smsDisabled": true
   },
   "nonNegotiableLaunchRules": [
     "No public users until launch gate is open.",
@@ -85,10 +85,10 @@
     },
     {
       "gateKey": "communications",
-      "title": "Email primary and urgent WhatsApp-only boundary",
+      "title": "Email primary; WhatsApp and SMS disabled",
       "status": "foundation_built_pending_provider_staging_proof",
       "evidencePaths": ["manifests/communications/communications-proof-v1.json", "docs/communications/KINGSMEN_COMMUNICATIONS_PROOF.md", "reports/staging/communications-provider-staging-latest.json"],
-      "remainingConstraint": "Run communications provider staging proof."
+      "remainingConstraint": "Run email-provider staging send/receive, bounce, opt-out, and redacted-evidence proof; keep WhatsApp and SMS disabled pending separate Founder approval."
     },
     {
       "gateKey": "observability_incident",
