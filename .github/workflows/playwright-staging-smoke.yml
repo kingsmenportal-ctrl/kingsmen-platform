@@ -104,7 +104,7 @@ jobs:
         run: test "$(docker image inspect --format '{{.Config.User}}' kingsmen/playwright-worker:ci)" = "pwuser"
 
   staging-smoke:
-    if: github.event_name == 'workflow_dispatch'
+    if: github.event_name == 'pull_request' || github.event_name == 'workflow_dispatch' || github.event_name == 'push'
     runs-on: ubuntu-24.04
     timeout-minutes: 10
     environment: staging
