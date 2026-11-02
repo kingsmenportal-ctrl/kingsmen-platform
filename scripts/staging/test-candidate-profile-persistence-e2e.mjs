@@ -142,6 +142,8 @@ try {
 } finally {
   if (restorationRequired && baseline && baselineConsentActive) {
     try {
+      // Sign-out may have invalidated the original bearer. Re-authenticate before restoration.
+      await signInFreshSession();
       const restored = await request({
         action: "save",
         profile: baseline.profile ?? {},
