@@ -166,7 +166,7 @@ BEGIN
   EXCEPTION WHEN SQLSTATE '42501' THEN
     NULL;
   END;
-  IF (public.get_candidate_application_draft('40000000-0000-4000-8000-000000000001')->>'application_ref')
+  IF (public.get_candidate_application_draft('40000000-0000-4000-8000-000000000001')->'application'->>'application_ref')
      IS DISTINCT FROM 'KM-TEST-B1' THEN
     RAISE EXCEPTION 'TEST_CANDIDATE_B_OWN_READ_FAILED';
   END IF;
