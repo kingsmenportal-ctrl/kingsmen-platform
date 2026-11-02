@@ -5,7 +5,7 @@ services:
   - type: worker
     name: kingsmen-playwright-staging-worker
     runtime: docker
-    plan: 1c-2g
+    plan: standard
     region: frankfurt
     branch: feat/playwright-workers-controlled-release-2026-11-02
     dockerfilePath: ./apps/api/Dockerfile.playwright-worker
