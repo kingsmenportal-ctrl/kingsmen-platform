@@ -1,5 +1,6 @@
 import assert from "node:assert/strict";
 import { createRequire } from "node:module";
+import { spawn } from "node:child_process";
 import path from "node:path";
 import process from "node:process";
 import { setTimeout as delay } from "node:timers/promises";
@@ -12,6 +13,7 @@ const baseUrl = process.env.KINGSMEN_TEST_BASE_URL || \`http://127.0.0.1:\${port
 const token = "kingsmen-playwright-test-access-token-1234567890";
 const projectRef = new URL(process.env.NEXT_PUBLIC_SUPABASE_URL || "http://127.0.0.1:54321").hostname.split(".")[0];
 const applicationId = "30000000-0000-4000-8000-000000000001";
+const nextBinary = path.join(root, "apps/web/node_modules/next/dist/bin/next");
 const pathwayTargets = [
   ["HIGHER_EDUCATION", "University programme", "N15 University"],
   ["TVET", "TVET engineering course", "N15 TVET College"],
@@ -38,6 +40,29 @@ let lastSaveBody = null;
 let prepareCount = 0;
 
 async function main() {
+  const server = spawn(process.execPath, [nextBinary, "start", "-H", "127.0.0.1", "-p", String(port)], {
+    cwd: path.join(root, "apps/web"),
+    env: {
+      ...process.env,
+      NEXT_PUBLIC_SUPABASE_URL: process.env.NEXT_PUBLIC_SUPABASE_URL || "http://127.0.0.1:54321",
+      NEXT_PUBLIC_SUPABASE_ANON_KEY: process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY || "kingsmen-test-anon-key",
+      PORT: String(port)
+    },
+    stdio: "ignore"
+  });
+  let serverReady = false;
+  for (let attempt = 0; attempt < 60; attempt += 1) {
+    if (server.exitCode !== null) throw new Error("Next.js server exited before the browser test started.");
+    try {
+      const response = await fetch(baseUrl + "/candidate/apply");
+      if (response.ok) { serverReady = true; break; }
+    } catch { /* server is still starting */ }
+    await delay(500);
+  }
+  if (!serverReady) {
+    server.kill("SIGTERM");
+    throw new Error("Next.js production server did not become ready within 30 seconds.");
+  }
   const browser = await chromium.launch({ headless: true });
   const failures = [];
   const page = await browser.newPage({ viewport: { width: 390, height: 844 } });
@@ -175,6 +200,11 @@ async function main() {
     await page.reload({ waitUntil: "networkidle" });
     await page.getByRole("button", { name: "All pathways" }).waitFor();
     assert.equal(await page.locator("article h3").count(), 6);
+    await page.getByRole("button", { name: "Open saved application" }).click();
+    await page.getByRole("heading", { name: "Operations role" }).waitFor();
+    assert.equal(await page.getByLabel("Motivation statement").inputValue(), "I am ready to contribute.");
+    assert.equal(await page.getByLabel("Relevant experience").inputValue(), "Two years of operations experience.");
+    assert.equal(await page.locator("text=Draft version 1").count(), 1);
     assert.equal(failures.length, 0, failures.join("; "));
     process.stdout.write("PASS browser route loads with authenticated candidate session\n");
     process.stdout.write("PASS all six pathway filters and saved targets render correctly\n");
@@ -185,6 +215,7 @@ async function main() {
     process.stdout.write("Unified candidate application browser journey: 6/6 passed\n");
   } finally {
     await browser.close();
+    server.kill("SIGTERM");
   }
 }
 
