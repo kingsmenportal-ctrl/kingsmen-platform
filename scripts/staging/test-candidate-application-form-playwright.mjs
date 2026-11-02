@@ -155,7 +155,9 @@ async function main() {
     assert.equal(body.answer_data.motivation_statement, "I am ready to contribute.");
     assert.equal(body.answer_data.relevant_experience, "Two years of operations experience.");
     assert.equal(body.answer_data.preferred_campus, "Johannesburg");
-    assert.equal(body.answer_data.additional_answers[0].question_key, "additional_context");
+    assert.equal(body.answer_data.additional_answers.find(item => item.question_key === "additional_context")?.answer, "Available for all shifts.");
+    assert.equal(body.answer_data.additional_answers.find(item => item.question_key === "candidate_pathway_notice_period")?.answer, "Immediate");
+    assert.equal(body.answer_data.additional_answers.find(item => item.question_key === "candidate_pathway_shift_availability")?.answer, "All shifts");
     assert.equal(Object.hasOwn(body.answer_data, "candidate_id"), false);
     lastSaveBody = body;
     if (transientSaveFailure) {
@@ -206,6 +208,8 @@ async function main() {
     await page.getByLabel("Motivation statement").fill("I am ready to contribute.");
     await page.getByLabel("Relevant experience").fill("Two years of operations experience.");
     await page.getByLabel("Preferred campus / location").fill("Johannesburg");
+    await page.getByLabel("Notice period").fill("Immediate");
+    await page.getByLabel("Shift availability").fill("All shifts");
     await page.getByRole("button", { name: "Add answer" }).click();
     await page.getByLabel("Question key").fill("additional_context");
     await page.getByLabel("Answer").fill("Available for all shifts.");
@@ -224,7 +228,9 @@ async function main() {
     await page.getByLabel("Motivation statement").waitFor();
     assert.equal(await page.getByLabel("Motivation statement").inputValue(), "I am ready to contribute.");
     assert.equal(await page.getByLabel("Relevant experience").inputValue(), "Two years of operations experience.");
-    assert.equal(await page.getByLabel("Question key").inputValue(), "additional_context");
+    assert.equal(await page.locator('input[placeholder="e.g. qualification_code"]').inputValue(), "additional_context");
+    assert.equal(await page.getByLabel("Notice period").inputValue(), "Immediate");
+    assert.equal(await page.getByLabel("Shift availability").inputValue(), "All shifts");
     assert.equal(await page.getByLabel("Answer").inputValue(), "Available for all shifts.");
     assert.equal(await page.getByText("Draft version 1", { exact: true }).count(), 1);
 
