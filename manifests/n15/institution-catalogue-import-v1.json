@@ -64,7 +64,7 @@
       "publication_state": "not candidate-safe until applicable registration/accreditation evidence is reconciled"
     },
     {
-      "name": "SETAs, QCTO, public agencies, provincial departments, employers, funders, accommodation providers",
+      "name": "Government departments, public agencies, employers, funders, accommodation providers",
       "publication_state": "provider directory separate from programme/opening records and integration status"
     },
     {
@@ -114,6 +114,23 @@
       "official_url": "null until individually verified",
       "programme_availability": "not asserted",
       "campus_relationships": "not asserted"
+    }
+  },
+  "third_batch": {
+    "provider_type": "SECTOR_EDUCATION_AND_TRAINING_AUTHORITY",
+    "sector": "SETA",
+    "expected_records": 21,
+    "source_registers": [
+      "https://www.dhet.gov.za/",
+      "https://pseta.org.za/wp-content/uploads/2020/07/Final-PSETA-OFO-Mapping-Updated-Report-Feb-2021.pdf"
+    ],
+    "source_observed_on": "2026-11-02",
+    "initial_state": {
+      "accreditation_status": "NOT_APPLICABLE",
+      "source_confidence": "HIGH",
+      "safe_to_recommend": false,
+      "programme_availability": "not asserted",
+      "official_url": "homepage candidate only; verify ownership and redirects before use as authoritative source"
     }
   }
 }
