@@ -105,3 +105,51 @@ The workflow run `41379703456` for commit `738b12c3442b9bb42b133b30228bdabc84797
 ## Expanded live table-name discovery
 
 A broader `information_schema.tables` query found related existing tables including `candidate_application_evidence`, `candidate_identity_review_evidence`, `evidence_ledger`, `opportunity_deadlines`, `opportunity_eligibility_rules`, `opportunity_verification_reviews`, `route_programmes`, and `route_providers`, as well as the N15 catalogue tables. This discovery is not a complete policy/constraint audit. Existing tables are not assumed to satisfy the canonical model without column, constraint, index, trigger, grant, RLS and application-code review.
+
+
+## Live catalogue schema, access-control and security-advisor snapshot — 2026-11-02
+
+The following read-only inspection was performed against the active staging project after the migration-file comparison. It inspected selected catalogue, organisation, application-evidence and identity-review tables for columns, constraints, RLS flags, policies and effective table privileges. This is a targeted schema audit, not a complete review of every public table or every function.
+
+### Current model footprint
+
+The following distinct structures already exist and must be reconciled rather than blindly replaced:
+
+- `opportunity_providers`: stable `provider_ref`, provider type/name, sector, province, official URL, accreditation status, confidence, recommendation flag and evidence refs. It does not contain normalized campus or alias relationships.
+- `route_providers` and `route_programmes`: a separate provider/route catalogue with source authority links, verification/public-safety flags, route type, qualification, delivery/method, source confidence, availability and eligibility summary.
+- `organisations` and `organisation_listings`: employer/provider organisation identity, verification review and dated listing records with publication evidence and a separate application destination.
+- `opportunity_programmes`, `opportunity_deadlines`, `opportunity_eligibility_rules`, `opportunity_source_authorities`, and `opportunity_verification_reviews`: separate programme, deadline, eligibility, source and reviewer structures.
+- `candidate_opportunities` and `candidate_opportunity_matches`: candidate-facing opportunity and match records.
+- `source_authorities` and `evidence_ledger` / `candidate_application_evidence`: existing source/evidence structures.
+
+The all-schema table-name search for names containing campus, alias, institution, source assertion, or provider domain returned no matches. This establishes that no separately named relational table was found by those patterns; it does not prove that equivalent information is absent from JSON, arrays or differently named structures.
+
+The live provider/programme catalogue tables remain empty in the latest observed counts: `opportunity_providers=0`, `opportunity_programmes=0`, and `organisations=0`. Both source-authority registries returned 38 rows. The earlier `route_providers=3` and `route_programmes=8` counts should be treated as a separate legacy catalogue baseline, not as equivalent canonical imports.
+
+### RLS, policies and table privileges
+
+RLS was enabled on every selected table inspected; `FORCE ROW LEVEL SECURITY` was false on those tables. Effective ACL checks showed that anon/authenticated roles still hold table-level privileges on several N15 and evidence tables even where the only row policy is service-role-only. Examples include `opportunity_providers`, `opportunity_programmes`, `opportunity_source_authorities`, `opportunity_deadlines`, `opportunity_eligibility_rules`, `opportunity_verification_reviews`, `candidate_application_evidence`, and `evidence_ledger`.
+
+For the reviewed service-only catalogue tables, the active RLS policies restrict client row operations to the service role. The grants therefore do not by themselves prove data disclosure or unauthorised writes; RLS still applies to client roles. However, the excess table-level grants are unnecessary privilege and create avoidable risk if a policy is later broadened or removed. A separate reviewed forward-only hardening migration should revoke unused anon/authenticated privileges while preserving explicitly approved public-read routes and the application's intended RPC paths.
+
+The identity-review request/evidence tables inspected have RLS enabled, no client-facing policies, and no effective anon/authenticated table privileges in the checked ACL. These appear to be backend-only access boundaries and should remain so unless a reviewed server-side access design requires otherwise.
+
+### Supabase security advisor findings
+
+Security advisor snapshot observed at `2026-11-02T03:00:22.954Z`:
+
+1. **17 tables** flagged as `rls_enabled_no_policy` (INFO): `candidate_identity_review_audit`, `candidate_identity_review_evidence`, `candidate_identity_review_requests`, `candidate_private_document_reviews`, `founder_command_catalog`, `founder_command_requests`, `founder_command_results`, `founder_daily_briefs`, `founder_decision_log`, `founder_escalation_threads`, `founder_mobile_cards`, `founder_operator_profiles`, `founder_ops_audit_events`, `founder_report_sections`, `founder_reports`, `founder_runtime_config`, and `founder_watchlist_items`. No-policy RLS is fail-closed for roles without RLS bypass; confirm intended service-role-only grants and do not add client policies as a linter-only response.
+2. **Six SECURITY DEFINER functions** are executable by `authenticated` and not by `anon`: `get_candidate_cao_choices(uuid)`, `list_candidate_cao_parents()`, `prepare_candidate_application_from_master_target(text)`, `prepare_candidate_manual_portal_submission(uuid)`, `record_candidate_application_outcome(uuid,text,text,text,text,text)`, and `save_candidate_cao_choices(uuid,jsonb)`. Their live definitions were inspected. Each contains authentication/ownership or reviewer-role checks and uses a pinned search path; the five candidate workflow functions bind activity to the authenticated candidate and/or verified identity link, consent and approved match. The outcome function requires an active application reviewer, a verified same-application provider outcome notice, and verified submission evidence. These appear to be intentionally callable application RPCs, but require independent security review and authenticated positive/negative tests before release.
+3. **Leaked-password protection is disabled** in Supabase Auth. This remains an open security hardening item and must be enabled and verified through approved project settings.
+
+### Required next schema/security work
+
+- Complete function-by-function review of the six authenticated SECURITY DEFINER RPCs, including their helper functions and execution ACLs.
+- Run authenticated Candidate A/B tests against every candidate-scoped RPC and table; prove own-record success and cross-candidate denial.
+- Run reviewer-role positive and negative tests, including non-reviewer denial for outcome recording and no ability to mutate candidate-owned records outside reviewed workflows.
+- Revoke unnecessary anon/authenticated table grants from service-only catalogue/evidence tables through a reviewed migration; preserve the explicitly approved verified public-read policies on route tables and published listings.
+- Keep the 17 no-policy tables backend-only; verify service-role access and ensure no authenticated client code relies on direct reads.
+- Enable leaked-password protection after approved configuration change and capture resulting Auth settings evidence.
+- Reconcile the overlapping provider, route, organisation, programme and evidence structures into the canonical institution/alias/campus/source-assertion design before drafting schema migrations. Do not write a new parallel institution table set until the existing foreign keys, callers, policies and data contracts have been mapped.
+
+No schema changes, grants, policies, function ACLs, Auth settings, or seed records were modified by this inspection.
