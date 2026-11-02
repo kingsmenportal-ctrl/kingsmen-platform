@@ -15,9 +15,9 @@ N09 creates the communication runtime for Kingsmen:
 - control-plane/founder communication summary
 
 Locked doctrine:
-- Email is primary.
-- WhatsApp is urgent-only.
-- SMS is backup-only.
+- Email is the enabled external candidate notification channel.
+- The Kingsmen portal inbox carries candidate-visible status and required actions.
+- WhatsApp and SMS are disabled for candidate communications pending a separate Founder-approved release decision.
 - No bulk WhatsApp reminders.
 - Every message must have evidence.
 - Notifications may inform but must not silently change application state.
