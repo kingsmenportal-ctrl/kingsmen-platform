@@ -7,9 +7,14 @@ alter table public.route_providers drop constraint route_providers_type_check;
 alter table public.route_providers add constraint route_providers_type_check
   check (provider_type = any (array[
     'UNIVERSITY','TVET','CET','COMMUNITY_COLLEGE','SETA','LEARNERSHIP_PROVIDER',
-    'BURSARY_PROVIDER','ACCOMMODATION_PROVIDER','EMPLOYER','PRIVATE_COLLEGE',
+    'BURSARY_PROVIDER','ACCOMMODATION_PROVIDER','EMPLOYER','PRIVATE_COLLEGE','PRIVATE_HIGHER_EDUCATION',
     'APPLICATION_PORTAL','GOVERNMENT_AUTHORITY','QUALITY_AUTHORITY'
   ]));
+
+-- Correct earlier private higher-education seeds that were stored in the generic private-college bucket.
+update public.route_providers
+set provider_type='PRIVATE_HIGHER_EDUCATION', updated_at=now()
+where provider_key in ('phe_afda','phe_boston_city_campus','phe_academic_institute_excellence','phe_camelot_international','phe_stellenbosch_graduate_institute');
 
 with cet(source_key,provider_key,provider_name,province) as (values
  ('dhet_cet_eastern_cape','cet_eastern_cape','Eastern Cape Community Education and Training College','Eastern Cape'),
