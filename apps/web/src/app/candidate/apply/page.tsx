@@ -55,6 +55,7 @@ type ApiBody = {
   draft?: Record<string, unknown>;
   draft_version?: number;
   draft_updated_at?: string | null;
+  updated_at?: string;
   is_editable?: boolean;
   provider_submission_sent?: boolean;
   shared_profile_available?: boolean;
