@@ -192,6 +192,8 @@ export default function CandidateOpportunityMatchesPage() {
             {loading ? "Checking verified matches…" : feed ? "Refresh my verified matches" : "Load my verified matches"}
           </button>
           <a href="/candidate/dashboard" className="rounded-xl border border-slate-300 px-5 py-3 text-sm font-semibold text-slate-800">Candidate dashboard</a>
+          <a href="/candidate/apply" className="rounded-xl border border-cyan-700 bg-cyan-50 px-5 py-3 text-sm font-semibold text-cyan-900">Unified application form</a>
+          <a href="/candidate/applications" className="rounded-xl border border-slate-300 px-5 py-3 text-sm font-semibold text-slate-800">My application tracker</a>
         </div>
       </header>
 
