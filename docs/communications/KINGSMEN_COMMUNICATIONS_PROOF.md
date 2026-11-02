@@ -12,7 +12,6 @@ Kingsmen communications follow this order:
 
 1. **Email is primary** for ordinary candidate notifications, receipts, document requests, status updates, and support trails.
 2. **WhatsApp and SMS are disabled** for candidate communications until a separate Founder-approved release decision.
-3. **SMS is disabled** for candidate communications until a separate Founder-approved release decision.
 4. Candidate application status and action reminders remain visible in the Kingsmen portal inbox; email is the enabled external channel.
 5. Marketing requires explicit consent and opt-out handling. Bulk sending remains denied by the source proof.
 6. Provider secrets, recipient addresses, and raw message bodies must never be printed in reports.
