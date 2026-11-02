@@ -44,6 +44,20 @@ jobs:
     if: github.event_name == 'pull_request'
     runs-on: ubuntu-24.04
     timeout-minutes: 30
+    services:
+      postgres:
+        image: postgres:17
+        env:
+          POSTGRES_USER: postgres
+          POSTGRES_PASSWORD: n16-ci-disposable-only-2026
+          POSTGRES_DB: kingsmen_n16_worker_test
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd "pg_isready -U postgres -d kingsmen_n16_worker_test"
+          --health-interval 5s
+          --health-timeout 5s
+          --health-retries 15
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
@@ -61,6 +75,16 @@ jobs:
         run: npx playwright install --with-deps chromium
       - name: Run local browser regression fixture
         run: node scripts/staging/test-playwright-staging-smoke.mjs
+      - name: Prove N16 PostgreSQL claim and process-crash recovery in disposable database
+        env:
+          KINGSMEN_N16_TEST_ALLOW_MUTATION: "true"
+          KINGSMEN_N16_TEST_HOST: 127.0.0.1
+          KINGSMEN_N16_TEST_PORT: "5432"
+          KINGSMEN_N16_TEST_ADMIN_USER: postgres
+          KINGSMEN_N16_TEST_DATABASE: kingsmen_n16_worker_test
+          PGPASSWORD: n16-ci-disposable-only-2026
+          KINGSMEN_N16_TEST_SERVICE_PASSWORD: n16-worker-test-${{ github.run_id }}-${{ github.run_attempt }}-ephemeral
+        run: node scripts/staging/test-n16-worker-process-crash-integration.mjs
       - name: Build isolated N16 Playwright worker container
         run: docker build -f apps/api/Dockerfile.playwright-worker -t kingsmen/playwright-worker:ci .
       - name: Verify worker image runs as non-root
