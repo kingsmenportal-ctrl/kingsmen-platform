@@ -34,6 +34,15 @@ check("handoff and provider receipt are separate event types",
   migration.includes("'HANDOFF_PREPARED','EXTERNAL_PORTAL_OPENED','CANDIDATE_REPORTED_SUBMITTED','PROVIDER_RECEIPT_CONFIRMED'") &&
   migration.includes("event_type <> 'PROVIDER_RECEIPT_CONFIRMED'") &&
   migration.includes("evidence_origin in ('PROVIDER_ORIGIN','REVIEWER_VERIFIED')"));
+check("decision and handoff writes are idempotent, server-only and fail closed",
+  migration.includes("unique(candidate_id, opportunity_id, idempotency_key)") &&
+  migration.includes("unique(submission_job_id, idempotency_key)") &&
+  migration.includes("record_candidate_application_eligibility_decision") &&
+  migration.includes("append_candidate_application_handoff_event") &&
+  migration.includes("ELIGIBILITY_REQUIRES_CURRENT_VERIFIED_OPENING") &&
+  migration.includes("PROVIDER_EVIDENCE_REQUIRED") &&
+  migration.includes("revoke all on function public.record_candidate_application_eligibility_decision") &&
+  migration.includes("revoke all on function public.append_candidate_application_handoff_event"));
 check("all new tables enable RLS and deny browser-role grants",
   (migration.match(/enable row level security/g) ?? []).length === 5 &&
   (migration.match(/revoke all on public\./g) ?? []).length === 5 &&
