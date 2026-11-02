@@ -106,7 +106,15 @@ export default function CandidateCaoChoicesPage() {
       }
       const nextParents = body.parents;
       setParents(nextParents);
-      const nextId = nextParents[0]?.application_id ?? "";
+      // Deep links from a higher-education parent must select that exact candidate-owned
+      // parent after the API has returned the candidate's authorised parent list.
+      const requestedParentId = typeof window !== "undefined"
+        ? new URLSearchParams(window.location.search).get("application_id")
+        : null;
+      const requestedParent = requestedParentId
+        ? nextParents.find(parent => parent.application_id === requestedParentId)
+        : undefined;
+      const nextId = requestedParent?.application_id ?? nextParents[0]?.application_id ?? "";
       setSelectedParentId(nextId);
       if (nextId) await loadChoices(nextId, token);
       else setChoices([]);
