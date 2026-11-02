@@ -4,7 +4,15 @@ on:
   pull_request:
     paths:
       - "scripts/playwright/**"
+      - "scripts/staging/test-playwright-staging-smoke.mjs"
+      - "scripts/staging/test-n16-*contract.mjs"
       - "scripts/validators/validate-playwright-worker-contract.mjs"
+      - "apps/api/src/orchestrator/**"
+      - "apps/api/package.json"
+      - "apps/api/Dockerfile.playwright-worker"
+      - "config/environment/.env.template"
+      - "db/migrations/202611020001_n16_worker_least_privilege_role.sql"
+      - "package.json"
       - "docs/architecture/PLAYWRIGHT_WORKERS_RELEASE_PLAN.md"
       - ".github/workflows/playwright-staging-smoke.yml"
   workflow_dispatch:
@@ -17,6 +25,11 @@ on:
         description: 'JSON array of protected routes to probe anonymously (example: ["/portal"])'
         required: false
         default: '[]'
+      run_authenticated_isolation:
+        description: "Run the read-only Candidate A/B and reviewer access checks using configured staging test identities"
+        type: boolean
+        required: false
+        default: false
 
 permissions:
   contents: read
@@ -29,7 +42,7 @@ jobs:
   contract:
     if: github.event_name == 'pull_request'
     runs-on: ubuntu-latest
-    timeout-minutes: 5
+    timeout-minutes: 20
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
@@ -37,7 +50,16 @@ jobs:
           node-version: 22
           cache: npm
       - run: npm ci
-      - run: node scripts/validators/validate-playwright-worker-contract.mjs
+      - name: Install API runtime and type dependencies
+        run: npm --prefix apps/api install --include=dev --no-package-lock
+      - name: Compile the N16 worker
+        run: npm --prefix apps/api run build
+      - name: Validate queue, browser and least-privilege contracts
+        run: npm run n16:worker:contract && npm run playwright:contract
+      - name: Install Playwright Chromium
+        run: npx playwright install --with-deps chromium
+      - name: Run local browser regression fixture
+        run: node scripts/staging/test-playwright-staging-smoke.mjs
 
   staging-smoke:
     if: github.event_name == 'workflow_dispatch'
@@ -59,3 +81,27 @@ jobs:
           KINGSMEN_SMOKE_PROTECTED_PATHS: ${{ inputs.protected_paths }}
           KINGSMEN_SMOKE_TIMEOUT_MS: "15000"
         run: node scripts/playwright/kingsmen-staging-smoke.mjs
+
+  authenticated-isolation:
+    if: github.event_name == 'workflow_dispatch' && inputs.run_authenticated_isolation
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    environment: staging
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+      - run: npm ci
+      - name: Verify Candidate A/B and reviewer access boundaries
+        env:
+          KINGSMEN_STAGING_BASE_URL: ${{ secrets.KINGSMEN_STAGING_BASE_URL }}
+          KINGSMEN_SUPABASE_URL: ${{ secrets.KINGSMEN_SUPABASE_URL }}
+          KINGSMEN_SUPABASE_ANON_KEY: ${{ secrets.KINGSMEN_SUPABASE_ANON_KEY }}
+          KINGSMEN_E2E_CANDIDATE_A_TOKEN: ${{ secrets.KINGSMEN_E2E_CANDIDATE_A_TOKEN }}
+          KINGSMEN_E2E_CANDIDATE_B_TOKEN: ${{ secrets.KINGSMEN_E2E_CANDIDATE_B_TOKEN }}
+          KINGSMEN_E2E_REVIEWER_TOKEN: ${{ secrets.KINGSMEN_E2E_REVIEWER_TOKEN }}
+          KINGSMEN_E2E_CANDIDATE_A_DOCUMENT_ID: ${{ secrets.KINGSMEN_E2E_CANDIDATE_A_DOCUMENT_ID }}
+          KINGSMEN_E2E_CANDIDATE_B_DOCUMENT_ID: ${{ secrets.KINGSMEN_E2E_CANDIDATE_B_DOCUMENT_ID }}
+        run: node scripts/staging/test-candidate-reviewer-isolation-e2e.mjs
