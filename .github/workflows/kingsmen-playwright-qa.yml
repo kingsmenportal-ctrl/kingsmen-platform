@@ -48,12 +48,12 @@ jobs:
 
       - name: Start local production web server
         env:
-          PORT: 4387
+          PORT: 3000
         run: |
           npm run start --prefix apps/web > /tmp/kingsmen-web.log 2>&1 &
           echo $! > /tmp/kingsmen-web.pid
           for attempt in {1..60}; do
-            if curl --silent --fail http://127.0.0.1:4387/ > /dev/null; then
+            if curl --silent --fail http://127.0.0.1:3000/ > /dev/null; then
               exit 0
             fi
             sleep 2
@@ -63,7 +63,7 @@ jobs:
 
       - name: Run Chromium browser QA
         env:
-          KINGSMEN_QA_BASE_URL: http://127.0.0.1:4387
+          KINGSMEN_QA_BASE_URL: http://127.0.0.1:3000
           KINGSMEN_QA_REPORT: reports/playwright/qa-latest.json
         run: npm run playwright:qa
 
