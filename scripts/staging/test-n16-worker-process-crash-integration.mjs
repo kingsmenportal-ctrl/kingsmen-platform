@@ -83,9 +83,9 @@ async function waitForStatus(dispatchRef, expected, timeoutMs = 20000) {
 async function insertScopedDispatch(dispatchRef, workerCode) {
   const evidenceRef = "ev:" + dispatchRef;
   await admin.query(
-    \`insert into public.orchestrator_dispatch_queue
+    `insert into public.orchestrator_dispatch_queue
       (dispatch_ref,run_ref,step_ref,worker_code,queue_status,priority_lane,dispatch_after,attempt_count,max_attempts,payload,evidence_refs)
-     values ($1,$2,$3,$4,'READY','NORMAL',clock_timestamp(),0,3,'{}'::jsonb,$5::text[])\`,
+     values ($1,$2,$3,$4,'READY','NORMAL',clock_timestamp(),0,3,'{}'::jsonb,$5::text[])`,
     [dispatchRef, "run:" + dispatchRef, "step:" + dispatchRef, workerCode, [evidenceRef]]
   );
 }
@@ -160,7 +160,7 @@ try {
     assert.equal(identity.rows[0].login_role, "kingsmen_playwright_scout_ci_login");
     assert.equal(identity.rows[0].member, true);
 
-    const privileges = await playwrightClient.query(\`
+    const privileges = await playwrightClient.query(`
       select
         has_function_privilege(current_user,'public.n16_claim_playwright_scout_dispatches(text,integer,integer)','EXECUTE') as scoped_claim,
         has_function_privilege(current_user,'public.n16_claim_dispatches(text,integer,integer)','EXECUTE') as generic_claim,
@@ -168,7 +168,7 @@ try {
         has_function_privilege(current_user,'public.n16_record_dispatch_result(text,text,text,text,jsonb,text[],text,text,integer,integer)','EXECUTE') as generic_result,
         has_table_privilege(current_user,'public.orchestrator_dispatch_queue','SELECT') as queue_select,
         has_table_privilege(current_user,'public.orchestrator_worker_results','SELECT') as results_select
-    \`);
+    `);
     assert.equal(privileges.rows[0].scoped_claim, true);
     assert.equal(privileges.rows[0].generic_claim, false);
     assert.equal(privileges.rows[0].mark_sent, false);
