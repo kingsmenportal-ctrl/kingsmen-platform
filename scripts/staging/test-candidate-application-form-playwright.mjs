@@ -171,7 +171,7 @@ async function main() {
   try {
     const response = await page.goto(\`\${baseUrl}/candidate/apply\`, { waitUntil: "networkidle", timeout: 30000 });
     assert.equal(response?.status(), 200, "candidate application form route must load");
-    assert.match(await page.locator("h1").innerText(), /One application form\. Six pathways\./);
+    assert.match(await page.locator("h1").innerText(), /One application engine\. Six pathways\./);
 
     const filter = page.getByRole("button", { name: "Internships", exact: true });
     await filter.click();
