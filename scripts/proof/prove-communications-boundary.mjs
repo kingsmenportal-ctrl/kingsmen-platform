@@ -47,7 +47,7 @@ for (const token of [
 }
 
 for (const token of [
-  'foundation_built_pending_provider_staging_proof',
+  'email_and_portal_only_pending_provider_staging_proof',
   'transactional_email_queued_primary',
   'whatsapp_disabled',
   'sms_disabled',
