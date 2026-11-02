@@ -37,6 +37,9 @@ jobs:
       - name: N15 institution catalogue seed contract
         run: node scripts/validators/validate-institution-catalogue-seed.mjs
 
+      - name: Proposed canonical provider identity/evidence contract
+        run: npm run provider:validate:canonical-identity
+
       - name: Supabase migration integrity gate
         run: npm run db:validate:migration-integrity
 
