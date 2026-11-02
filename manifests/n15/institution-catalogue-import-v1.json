@@ -34,25 +34,33 @@
   ],
   "next_batches": [
     {
-      "name": "Public TVET colleges and campuses",
-      "source": "https://www.dhet.gov.za/",
-      "required_fields": ["canonical name", "official register evidence", "province", "parent/campus relation", "institution website if verified", "freshness timestamp"],
-      "publication_state": "directory-only until reviewed"
-    },
-    {
       "name": "Community Education and Training colleges",
       "source": "https://www.dhet.gov.za/",
-      "publication_state": "directory-only until reviewed"
+      "publication_state": "directory-only until official list and campus records are reconciled"
     },
     {
       "name": "Private higher education institutions",
-      "sources": ["https://www.dhet.gov.za/Registers_DocLib/Register%20%20Private%20Higher%20Education%20Institutions.pdf", "https://www.che.ac.za/", "https://www.saqa.org.za/"],
-      "required_state_distinctions": ["registered", "provisional", "cancelled", "lapsed", "unresolved"],
+      "sources": [
+        "https://www.dhet.gov.za/Registers_DocLib/Register%20%20Private%20Higher%20Education%20Institutions.pdf",
+        "https://www.che.ac.za/",
+        "https://www.saqa.org.za/"
+      ],
+      "required_state_distinctions": [
+        "registered",
+        "provisional",
+        "cancelled",
+        "lapsed",
+        "unresolved"
+      ],
       "publication_state": "not candidate-safe until register status and programme scope are reconciled"
     },
     {
       "name": "Private colleges and occupational training providers",
-      "sources": ["https://www.dhet.gov.za/", "https://www.qcto.org.za/", "https://www.saqa.org.za/"],
+      "sources": [
+        "https://www.dhet.gov.za/",
+        "https://www.qcto.org.za/",
+        "https://www.saqa.org.za/"
+      ],
       "publication_state": "not candidate-safe until applicable registration/accreditation evidence is reconciled"
     },
     {
@@ -60,8 +68,26 @@
       "publication_state": "provider directory separate from programme/opening records and integration status"
     },
     {
+      "name": "Campus and alias reconciliation for universities and TVET colleges",
+      "required_fields": [
+        "canonical parent institution",
+        "campus/branch names",
+        "province/municipality",
+        "official URL evidence",
+        "source retrieval timestamp"
+      ],
+      "publication_state": "no campus-level application routing until confirmed"
+    },
+    {
       "name": "Programme/opportunity imports",
-      "required_evidence": ["official source URL", "retrieved/checked timestamp", "deadline when applicable", "eligibility evidence", "freshness boundary", "human review state"],
+      "required_evidence": [
+        "official source URL",
+        "retrieved/checked timestamp",
+        "deadline when applicable",
+        "eligibility evidence",
+        "freshness boundary",
+        "human review state"
+      ],
       "publication_state": "OPEN only when all required evidence passes"
     }
   ],
@@ -71,5 +97,23 @@
     "Run the catalogue validator and CI on the immutable implementation commit.",
     "Verify idempotent import, duplicate handling, RLS/service-role boundaries, and candidate-safe filters in staging.",
     "Founder review before promotion or publication."
-  ]
+  ],
+  "second_batch": {
+    "provider_type": "PUBLIC_TVET_COLLEGE",
+    "sector": "TVET",
+    "expected_records": 50,
+    "source_registers": [
+      "https://nsfas.org.za/content/institutions.html",
+      "https://www.dhet.gov.za/"
+    ],
+    "source_observed_on": "2026-11-02",
+    "initial_state": {
+      "accreditation_status": "NEEDS_REVIEW",
+      "source_confidence": "HIGH",
+      "safe_to_recommend": false,
+      "official_url": "null until individually verified",
+      "programme_availability": "not asserted",
+      "campus_relationships": "not asserted"
+    }
+  }
 }
