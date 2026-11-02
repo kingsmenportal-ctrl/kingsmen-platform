@@ -4,11 +4,13 @@ import { spawn } from "node:child_process";
 const port = Number(process.env.PORT ?? 4387);
 const host = process.env.KINGSMEN_API_HOST ?? "127.0.0.1";
 const baseUrl = `http://${host}:${port}`;
+const smokeServiceToken = "kingsmen-release-smoke-test-token-32-characters";
 const child = spawn(process.execPath, ["apps/api/dist/server.js"], {
   env: {
     ...process.env,
     PORT: String(port),
     KINGSMEN_API_HOST: host,
+    KINGSMEN_API_SERVICE_TOKEN: smokeServiceToken,
     KINGSMEN_TRUTH_VAULT_MODE: "memory_development_only"
   },
   stdio: ["ignore", "pipe", "pipe"]
@@ -74,6 +76,7 @@ try {
   await checkHealth("/api/system/health");
 
   const missing = await fetch(`${baseUrl}/__release_smoke_unknown_route__`, {
+    headers: { authorization: `Bearer ${smokeServiceToken}` },
     signal: AbortSignal.timeout(3000)
   });
   assert(missing.status === 404, `unknown route should return 404, received ${missing.status}`);
