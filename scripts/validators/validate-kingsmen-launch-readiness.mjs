@@ -118,7 +118,7 @@ const requiredFileChecks = [
   checkFile('scripts/validators/validate-secrets-wiring-proof.mjs', ['SECRETS_WIRING_PROOF_VALIDATED', 'secrets:validate:wiring', 'SECRETS_RUNTIME_HEALTH_PROOF_REQUIRED']),
 
   checkFile('apps/api/src/communications/communications-proof-boundary.ts', ['COMMUNICATIONS_BOUNDARY_SOURCE_ONLY', 'emailPrimary', 'whatsappDisabled', 'smsDisabled', 'bulkMarketingDenied', 'providerSendRequiresStagingProof', 'liveSendExecuted: false']),
-  checkFile('manifests/communications/communications-proof-v1.json', ['kingsmen.communications-proof.v1', 'foundation_built_pending_provider_staging_proof', 'emailPrimary', 'whatsappUrgentOnly', 'smsBackupOnly']),
+  checkFile('manifests/communications/communications-proof-v1.json', ['kingsmen.communications-proof.v1', 'foundation_built_pending_provider_staging_proof', 'emailPrimary', 'whatsappDisabled', 'smsDisabled']),
   checkFile('docs/communications/KINGSMEN_COMMUNICATIONS_PROOF.md', ['Email is primary', 'WhatsApp and SMS are disabled', 'npm run communications:validate']),
   checkFile('scripts/proof/prove-communications-boundary.mjs', ['COMMUNICATIONS_SOURCE_PROOF_PASSED', 'providerStagingProofPending: true']),
   checkFile('scripts/validators/validate-communications-proof.mjs', ['COMMUNICATIONS_PROOF_VALIDATED', 'communications:validate', 'COMMUNICATIONS_PROVIDER_STAGING_PROOF_REQUIRED']),
