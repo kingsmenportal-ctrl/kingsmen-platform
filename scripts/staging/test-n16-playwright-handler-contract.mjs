@@ -11,7 +11,7 @@ const checks = [
   ["handler never requests human approval for read-only reads", handler, "requiresHumanApproval: false"],
   ["exact origin allowlist is required", handler, "KINGSMEN_BROWSER_ALLOWED_ORIGINS"],
   ["exact path allowlist is required", handler, "KINGSMEN_BROWSER_ALLOWED_PATHS"],
-  ["HTTPS only", handler, 'target.protocol !== "https:"'],
+  ["HTTPS required except explicit test-mode loopback", handler, 'const secure = target.protocol === "https:"'],
   ["task accepts URL only", handler, 'keys[0] !== "url"'],
   ["only GET/HEAD network requests", handler, 'request.method() === "GET" || request.method() === "HEAD"'],
   ["all requests stay on origin", handler, "requestUrl.origin === target.origin"],
