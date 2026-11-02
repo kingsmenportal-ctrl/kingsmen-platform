@@ -13,6 +13,8 @@ const baseUrl = process.env.KINGSMEN_TEST_BASE_URL || `http://127.0.0.1:${port}`
 const token = "kingsmen-playwright-test-access-token-1234567890";
 const projectRef = new URL(process.env.NEXT_PUBLIC_SUPABASE_URL || "http://127.0.0.1:54321").hostname.split(".")[0];
 const applicationId = "30000000-0000-4000-8000-000000000001";
+const caoParentId = "60000000-0000-4000-8000-000000000006";
+const otherCaoParentId = "70000000-0000-4000-8000-000000000007";
 const nextBinary = path.join(root, "apps/web/node_modules/next/dist/bin/next");
 const pathwayTargets = [
   ["HIGHER_EDUCATION", "University programme", "N15 University"],
@@ -244,6 +246,38 @@ async function main() {
     assert.equal(await page.getByLabel("Question key").inputValue(), "additional_context");
     assert.equal(await page.getByLabel("Answer").inputValue(), "Available for all shifts.");
     assert.equal(await page.getByText("Draft version 1", { exact: true }).count(), 1);
+
+    let caoChoicesLoadedFor = "";
+    await page.route("**/api/candidate/cao-choices**", async route => {
+      const request = route.request();
+      assert.match(request.headers().authorization || "", /^Bearer\\s+kingsmen-playwright-test-access-token/);
+      const url = new URL(request.url());
+      if (request.method() === "GET" && !url.searchParams.has("application_id")) {
+        return route.fulfill({
+          status: 200,
+          contentType: "application/json",
+          body: JSON.stringify({
+            ready: true,
+            ok: true,
+            parents: [
+              { application_id: otherCaoParentId, application_ref: "KM-CAO-OTHER", status: "DRAFT", pathway_type: "HIGHER_EDUCATION", opportunity_title: "Other university route", provider_name: "Other university", updated_at: "2026-11-02T10:00:00.000Z" },
+              { application_id: caoParentId, application_ref: "KM-CAO-SELECTED", status: "DRAFT", pathway_type: "HIGHER_EDUCATION", opportunity_title: "Selected university route", provider_name: "Selected university", updated_at: "2026-11-02T11:00:00.000Z" }
+            ]
+          })
+        });
+      }
+      caoChoicesLoadedFor = url.searchParams.get("application_id") || "";
+      return route.fulfill({
+        status: 200,
+        contentType: "application/json",
+        body: JSON.stringify({ ready: true, ok: true, application_id: caoParentId, choices: [] })
+      });
+    });
+    await page.goto(`${baseUrl}/candidate/cao-choices?application_id=${caoParentId}`, { waitUntil: "networkidle", timeout: 30000 });
+    await page.getByRole("heading", { name: "CAO programme choices" }).waitFor();
+    assert.equal(await page.getByLabel("Kingsmen parent application").inputValue(), caoParentId,
+      "CAO deep link must select its own parent, not the first parent in the list");
+    assert.equal(caoChoicesLoadedFor, caoParentId, "CAO choices must be loaded for the requested parent id");
     assert.equal(failures.length, 0, failures.join("; "));
     const unauthenticated = await browser.newPage();
     await unauthenticated.goto(`${baseUrl}/candidate/apply`, { waitUntil: "networkidle", timeout: 30000 });
@@ -261,7 +295,8 @@ async function main() {
     process.stdout.write("PASS candidate form does not expose external provider URLs\n");
     process.stdout.write("PASS unauthenticated access is rejected before candidate API calls\n");
     process.stdout.write("PASS reusable profile absence keeps application answers read-only\n");
-    process.stdout.write("Unified candidate application browser journey: 9/9 passed\n");
+    process.stdout.write("PASS CAO deep link selects the same authorised higher-education parent\n");
+    process.stdout.write("Unified candidate application browser journey: 10/10 passed\n");
   } finally {
     await browser.close();
     server.kill("SIGTERM");
