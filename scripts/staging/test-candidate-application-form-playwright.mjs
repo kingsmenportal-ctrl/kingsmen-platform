@@ -216,13 +216,21 @@ async function main() {
     assert.equal(await page.getByLabel("Answer").inputValue(), "Available for all shifts.");
     assert.equal(await page.getByText("Draft version 1", { exact: true }).count(), 1);
     assert.equal(failures.length, 0, failures.join("; "));
+    const unauthenticated = await browser.newPage();
+    await unauthenticated.goto(`${baseUrl}/candidate/apply`, { waitUntil: "networkidle", timeout: 30000 });
+    const authError = await unauthenticated.getByRole("alert").innerText();
+    assert.match(authError, /AUTHENTICATION_REQUIRED/);
+    assert.equal(await unauthenticated.getByRole("link", { name: "Sign in \/ identity review" }).count(), 1);
+    await unauthenticated.close();
+
     process.stdout.write("PASS browser route loads with authenticated candidate session\n");
     process.stdout.write("PASS all six pathway filters and saved targets render correctly\n");
     process.stdout.write("PASS verified opportunity opens the one canonical parent application editor\n");
     process.stdout.write("PASS application-specific answers save through authenticated Kingsmen API\n");
     process.stdout.write("PASS explicit reload and page refresh preserve the canonical candidate draft\n");
     process.stdout.write("PASS candidate form does not expose external provider URLs\n");
-    process.stdout.write("Unified candidate application browser journey: 6/6 passed\n");
+    process.stdout.write("PASS unauthenticated access is rejected before candidate API calls\n");
+    process.stdout.write("Unified candidate application browser journey: 7/7 passed\n");
   } finally {
     await browser.close();
     server.kill("SIGTERM");
