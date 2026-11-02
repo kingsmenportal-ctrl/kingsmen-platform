@@ -17,12 +17,28 @@ const parsePaths = (name, fallback) => {
   let values;
   try { values = process.env[name] ? JSON.parse(process.env[name]) : fallback; }
   catch { fail("BLOCKED_INVALID_PATH_CONFIGURATION", name + " must be a JSON array."); }
-  if (!Array.isArray(values) || values.some((v) => typeof v !== "string" || !v.startsWith("/") || v.startsWith("//") || v.includes("\\") || v.includes("\n"))) {
-    fail("BLOCKED_INVALID_PATH_CONFIGURATION", name + " must be an array of safe absolute paths.");
+  if (!Array.isArray(values) || values.some((v) =>
+    typeof v !== "string" ||
+    !v.startsWith("/") ||
+    v.startsWith("//") ||
+    v.includes("\\") ||
+    /[?#\\u0000-\\u001f]/.test(v) ||
+    v.split("/").some((part) => part === "." || part === "..")
+  )) {
+    fail("BLOCKED_INVALID_PATH_CONFIGURATION", name + " must be an array of normalized absolute paths without query strings or fragments.");
   }
   for (const value of values) {
     const target = new URL(value, origin);
-    if (target.origin !== origin.origin || target.username || target.password) fail("BLOCKED_CROSS_ORIGIN_PATH", "Every path must remain on the configured origin.");
+    if (
+      target.origin !== origin.origin ||
+      target.username ||
+      target.password ||
+      target.search ||
+      target.hash ||
+      target.pathname !== value
+    ) {
+      fail("BLOCKED_CROSS_ORIGIN_PATH", "Every path must be a normalized same-origin pathname without query strings or fragments.");
+    }
   }
   return [...new Set(values)];
 };
@@ -36,6 +52,18 @@ const safePath = (value) => new URL(value, origin).pathname;
 const browser = await chromium.launch({ headless: true });
 try {
   const context = await browser.newContext({ viewport: { width: 1365, height: 900 }, reducedMotion: "reduce" });
+  // The smoke worker only reads the configured origin. This also blocks external
+  // redirects, third-party trackers, mutation methods and off-origin resources.
+  await context.route("**/*", async (route) => {
+    let target;
+    try { target = new URL(route.request().url()); }
+    catch { await route.abort("blockedbyclient"); return; }
+    if (target.origin !== origin.origin || !["GET", "HEAD"].includes(route.request().method())) {
+      await route.abort("blockedbyclient");
+      return;
+    }
+    await route.continue();
+  });
   for (const path of paths) {
     const page = await context.newPage();
     page.setDefaultTimeout(timeoutMs);
@@ -43,7 +71,9 @@ try {
     page.on("pageerror", () => { pageErrors += 1; });
     try {
       const response = await page.goto(new URL(path, origin).href, { waitUntil: "domcontentloaded", timeout: timeoutMs });
+      const finalUrl = new URL(page.url());
       const httpStatus = response?.status() ?? 0;
+      const sameOrigin = finalUrl.origin === origin.origin;
       const titlePresent = Boolean((await page.title()).trim());
       const navigationLinkCount = await page.locator("a[href]").count();
       const formCount = await page.locator("form").count();
@@ -57,13 +87,13 @@ try {
         }).length
       );
       const desktopHorizontalOverflow = await page.evaluate(() => document.documentElement.scrollWidth > window.innerWidth + 2);
-      results.push({ id: "route:" + safePath(path), status: httpStatus >= 200 && httpStatus < 400 && titlePresent ? "PASS" : "FAIL", httpStatus, titlePresent, navigationLinkCount, formCount, unlabeledControlCount, desktopHorizontalOverflow, pageErrorCount: pageErrors });
+      results.push({ id: "route:" + safePath(path), status: sameOrigin && httpStatus >= 200 && httpStatus < 400 && titlePresent ? "PASS" : "FAIL", httpStatus, sameOrigin, titlePresent, navigationLinkCount, formCount, unlabeledControlCount, desktopHorizontalOverflow, pageErrorCount: pageErrors });
       await page.setViewportSize({ width: 390, height: 844 });
       await page.waitForTimeout(100);
       const mobileHorizontalOverflow = await page.evaluate(() => document.documentElement.scrollWidth > window.innerWidth + 2);
       results.push({ id: "responsive:" + safePath(path), status: mobileHorizontalOverflow ? "FAIL" : "PASS", mobileHorizontalOverflow });
       if (unlabeledControlCount) results.push({ id: "accessibility:" + safePath(path), status: "FAIL", unlabeledControlCount });
-      if (desktopHorizontalOverflow || pageErrors) results.push({ id: "runtime-layout:" + safePath(path), status: "FAIL", desktopHorizontalOverflow, pageErrorCount: pageErrors });
+      if (desktopHorizontalOverflow || pageErrors || !sameOrigin) results.push({ id: "runtime-layout:" + safePath(path), status: "FAIL", desktopHorizontalOverflow, pageErrorCount: pageErrors, sameOrigin });
     } catch (error) {
       results.push({ id: "route:" + safePath(path), status: "FAIL", failureCode: error instanceof Error ? error.name : "UNKNOWN" });
     } finally { await page.close(); }
@@ -75,10 +105,11 @@ try {
     try {
       const response = await page.goto(new URL(path, origin).href, { waitUntil: "domcontentloaded", timeout: timeoutMs });
       const httpStatus = response?.status() ?? 0;
+      const finalUrl = new URL(page.url());
       const expectedPath = new URL(path, origin).pathname;
-      const landedPath = new URL(page.url()).pathname;
-      const blocked = [401, 403].includes(httpStatus) || landedPath !== expectedPath;
-      results.push({ id: "anonymous-boundary:" + safePath(path), status: blocked ? "PASS" : "FAIL", httpStatus, redirected: landedPath !== expectedPath });
+      const landedPath = finalUrl.pathname;
+      const blocked = finalUrl.origin === origin.origin && ([401, 403, 404].includes(httpStatus) || landedPath !== expectedPath);
+      results.push({ id: "anonymous-boundary:" + safePath(path), status: blocked ? "PASS" : "FAIL", httpStatus, redirected: landedPath !== expectedPath, sameOrigin: finalUrl.origin === origin.origin });
     } catch (error) {
       results.push({ id: "anonymous-boundary:" + safePath(path), status: "FAIL", failureCode: error instanceof Error ? error.name : "UNKNOWN" });
     } finally { await page.close(); }
