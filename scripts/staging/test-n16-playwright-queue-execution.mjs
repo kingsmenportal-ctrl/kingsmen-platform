@@ -70,6 +70,13 @@ const queue = {
 try {
   const runner = new AuthenticatedWorkerRunner(queue, "ci-playwright-worker", registry);
   const summary = await runner.runOnce(1);
+  if (summary.failed !== 0 || summary.succeeded !== 1) {
+    console.error(JSON.stringify({
+      schema: "kingsmen.n16.playwright-queue-execution.debug.v1",
+      summary,
+      recordedResults: recorded.map(({ workerStatus, failureClass, failureCode, payload }) => ({ workerStatus, failureClass, failureCode, payload }))
+    }, null, 2));
+  }
   assert.deepEqual(summary, {
     workerId: "ci-playwright-worker",
     claimed: 1,
