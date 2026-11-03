@@ -54,6 +54,7 @@ function blockedChecks(reason) {
     matchingRulesetCount: 0,
     bypassActorsVisible: false,
     unrestrictedBypassActorCount: null,
+    currentUserCanAlwaysBypass: null,
     requiredDeploymentEnvironments: [],
     failure: reason
   };
@@ -171,12 +172,14 @@ for (const ruleset of matchingRulesets) {
   }
 }
 
+const currentUserCanAlwaysBypass = detailedRulesets.some((set) => set.current_user_can_bypass === 'always');
 const evaluation = evaluateMainBranchProtection(branchRules, detailedRulesets);
+const checks = { ...evaluation.checks, currentUserCanAlwaysBypass };
 const status = evaluation.passed
   ? 'VERIFIED_REQUIRED_PROTECTION_ACTIVE'
   : evaluation.checks.activeProtectionPresent
     ? 'BLOCKED_PROTECTION_INCOMPLETE'
     : 'BLOCKED_PROTECTION_NOT_ACTIVE';
-const report = await finish(status, evaluation.checks, branchRulesResponse.status);
+const report = await finish(status, checks, branchRulesResponse.status);
 console.log(JSON.stringify(report, null, 2));
 if (!evaluation.passed) process.exitCode = 1;
