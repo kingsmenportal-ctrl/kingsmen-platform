@@ -11,10 +11,12 @@ const actions = [
   { href: "/candidate/profile", title: "My candidate profile", description: "Create, update and reload your saved profile, pathway preferences and consent state." },
   { href: "/candidate/identity-review", title: "Identity review & evidence", description: "Submit a manual identity-review request and follow its real evidence and correction states." },
   { href: "/candidate/workbench", title: "Application workbench", description: "Save preparation progress and select a priority pathway." },
+  { href: "/candidate/apply", title: "Unified application form", description: "Prepare and save an application draft for a verified opportunity across all six pathways." },
   { href: "/candidate/applications", title: "My application tracker", description: "Track saved applications and candidate-reported preparation/submission events." },
   { href: "/candidate/documents", title: "Private Document Vault", description: "Upload, reuse and track your private candidate documents." },
   { href: "/candidate/opportunity-matches", title: "Verified opportunities", description: "Review listings only when their publication gates are satisfied." },
-  { href: "/candidate/cao-choices", title: "CAO programme choices", description: "Prepare up to six ordered choices under one Kingsmen parent application. Draft only; no provider submission." }
+  { href: "/candidate/cao-choices", title: "CAO programme choices", description: "Prepare up to six ordered choices under one Kingsmen parent application. Draft only; no provider submission." },
+  { href: "/candidate/application-capacity", title: "Application plan capacity", description: "View payment-verified priority and managed-route capacity, reserve usage against your own application and release unused slots." }
 ];
 
 export default function CandidateDashboardPage() {

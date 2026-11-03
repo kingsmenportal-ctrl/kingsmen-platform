@@ -66,6 +66,17 @@ type ApplicationEvent = {
   application_id: string; event_type: string; from_status: string | null; to_status: string | null;
   reason_code: string | null; evidence_ref: string | null; details: Record<string, unknown> | null; created_at: string
 };
+type ApplicationEvidence = {
+  application_id: string;
+  evidence_ref: string;
+  evidence_type: string;
+  source_label: string;
+  captured_at: string | null;
+  verification_status: string;
+  reviewer_attributed: boolean;
+  verified_at: string | null;
+  created_at: string;
+};
 
 function explain(payload: unknown): string {
   if (payload && typeof payload === "object") {
@@ -99,9 +110,10 @@ export default function CandidateApplicationsPage() {
   const [parentApplications,setParentApplications] = useState<ParentApplication[]>([]);
   const [masterEvents,setMasterEvents] = useState<MasterEvent[]>([]);
   const [applicationEvents,setApplicationEvents] = useState<ApplicationEvent[]>([]);
+  const [applicationEvidence,setApplicationEvidence] = useState<ApplicationEvidence[]>([]);
   const [drafts,setDrafts] = useState<Record<string,Draft>>({});
   const [itemDrafts,setItemDrafts] = useState<Record<string,ItemDraft>>({});
-  const [newItems,setNewItems] = useState<Record<string,{title:string;type:"TASK"|"DOCUMENT";note:string;source:string}>>({});
+  const [newItems,setNewItems] = useState<Record<string,{title:string;type:"TASK"|"DOCUMENT";note:string}>>({});
   const [loading,setLoading] = useState(true);
   const [busy,setBusy] = useState("");
   const [error,setError] = useState("");
@@ -132,6 +144,7 @@ export default function CandidateApplicationsPage() {
       setParentApplications(Array.isArray(body.parentApplications) ? body.parentApplications as ParentApplication[] : []);
       setMasterEvents(Array.isArray(body.masterEvents) ? body.masterEvents as MasterEvent[] : []);
       setApplicationEvents(Array.isArray(body.applicationEvents) ? body.applicationEvents as ApplicationEvent[] : []);
+      setApplicationEvidence(Array.isArray(body.applicationEvidence) ? body.applicationEvidence as ApplicationEvidence[] : []);
       setDrafts(Object.fromEntries(loadedTrackers.map(t=>[t.id,{status:t.status,note:t.candidate_note ?? "",evidence:t.evidence_reference ?? ""}])));
       setItemDrafts(Object.fromEntries(loadedItems.map(i=>[i.id,{status:i.status,note:i.candidate_note ?? "",evidence:i.evidence_reference ?? ""}])));
       setNotice("");
@@ -156,8 +169,8 @@ export default function CandidateApplicationsPage() {
     event.preventDefault(); const d=newItems[trackerId]; if(!d?.title.trim())return;
     setBusy(`add:${trackerId}`);setError("");setNotice("");
     try{
-      await request("POST",{action:"add_item",tracker_id:trackerId,title:d.title,item_type:d.type,candidate_note:d.note,official_source_url:d.source});
-      setNewItems(old=>({...old,[trackerId]:{title:"",type:"TASK",note:"",source:""}}));
+      await request("POST",{action:"add_item",tracker_id:trackerId,title:d.title,item_type:d.type,candidate_note:d.note,official_source_url:null});
+      setNewItems(old=>({...old,[trackerId]:{title:"",type:"TASK",note:""}}));
       setNotice("Checklist item added to the saved tracker.");
       await load();
     }catch(e){setError(e instanceof Error?e.message:"Could not add checklist item.");}
@@ -185,9 +198,11 @@ export default function CandidateApplicationsPage() {
           <a href="/candidate/dashboard" className="rounded-xl border border-slate-700 px-4 py-2">Dashboard</a>
           <a href="/candidate/profile" className="rounded-xl border border-slate-700 px-4 py-2">My profile</a>
           <a href="/candidate/workbench" className="rounded-xl border border-slate-700 px-4 py-2">Workbench</a>
+          <a href="/candidate/apply" className="rounded-xl border border-cyan-700 px-4 py-2 text-cyan-200">Unified application form</a>
           <a href="/candidate/documents" className="rounded-xl border border-slate-700 px-4 py-2">Document Vault</a>
           <a href="/candidate/opportunity-matches" className="rounded-xl border border-slate-700 px-4 py-2">Verified opportunities</a>
           <a href="/candidate/cao-choices" className="rounded-xl border border-slate-700 px-4 py-2">CAO choices</a>
+          <a href="/candidate/application-capacity" className="rounded-xl border border-slate-700 px-4 py-2">Plan capacity</a>
           <button type="button" disabled={loading} onClick={()=>void load()} className="rounded-xl bg-cyan-300 px-4 py-2 font-bold text-slate-950 disabled:opacity-50">{loading?"Refreshing…":"Refresh tracker"}</button>
         </nav>
       </header>
@@ -205,6 +220,19 @@ export default function CandidateApplicationsPage() {
               ...masterEvents.filter(event => event.details?.target_key === target.target_key).map(event => ({type:event.event_type,created_at:event.created_at,reason:"Saved application target",to_status:null as string|null,evidence_ref:null as string|null})),
               ...applicationEvents.filter(event => event.application_id === target.application_id).map(event => ({type:event.event_type,created_at:event.created_at,reason:event.reason_code,to_status:event.to_status,evidence_ref:event.evidence_ref}))
             ].sort((a,b)=>Date.parse(b.created_at)-Date.parse(a.created_at));
+            const receiptEvidence = applicationEvidence.filter(item =>
+              item.application_id === target.application_id &&
+              ["PROVIDER_SUBMISSION_RECEIPT", "PROVIDER_REFERENCE"].includes(item.evidence_type)
+            );
+            const verifiedReceipt = receiptEvidence.find(item =>
+              item.verification_status === "VERIFIED" &&
+              item.reviewer_attributed === true &&
+              Boolean(item.verified_at)
+            );
+            const submissionAttemptRecorded = applicationEvents.some(event =>
+              event.application_id === target.application_id &&
+              ["SUBMISSION_ATTEMPT_CREATED", "SUBMISSION_DISPATCHED"].includes(event.event_type)
+            );
             return <article key={target.id} className="rounded-2xl border border-slate-700 p-4 sm:p-5">
               <div className="flex flex-wrap items-start justify-between gap-3">
                 <div className="min-w-0">
@@ -219,8 +247,50 @@ export default function CandidateApplicationsPage() {
                 <p className="mt-1"><strong>Readiness:</strong> {application.readiness_status.replaceAll("_"," ")}</p>
                 <p className="mt-1"><strong>Provider submission:</strong> Not confirmed by this draft record.</p>
                 <p className="mt-1 text-xs text-slate-400">Last saved: {new Date(application.updated_at).toLocaleString()}</p>
+                <a href={`/candidate/applications/${application.id}`} className="mt-4 inline-flex rounded-xl bg-cyan-300 px-4 py-2 text-sm font-bold text-slate-950">
+                  {["DRAFT", "READINESS_BLOCKED", "READY_FOR_REVIEW", "READY_TO_SUBMIT"].includes(application.status) ? "Open / resume application draft" : "View application record"}
+                </a>
               </div>}
-              {target.provider_application_url && <a href={target.provider_application_url} target="_blank" rel="noopener noreferrer" className="mt-3 inline-block break-all text-sm text-cyan-300 underline">Open official provider page</a>}
+              {application && <section className="mt-3 rounded-xl border border-slate-700 bg-slate-950 p-4" aria-label="Opportunity eligibility and deadline checks">
+                <h4 className="font-semibold">Opportunity eligibility &amp; deadline checks</h4>
+                {application.readiness_snapshot?.opportunity_eligibility_gate === "CANDIDATE_SPECIFIC_MATCH_APPROVED" ? <>
+                  <p className="mt-2 text-sm text-emerald-200">Candidate-specific N15 match approved with supporting evidence.</p>
+                  <p className="mt-1 text-xs leading-5 text-slate-400">This confirms the saved opportunity's candidate-specific match gate only. It is not a provider decision or a guarantee that every final application requirement is satisfied.</p>
+                </> : <p className="mt-2 text-sm text-amber-200">Candidate-specific eligibility gate has not been recorded for this application.</p>}
+                {application.readiness_snapshot?.deadline_gate_status === "CONFIRMED_OPEN_WINDOW" ? <>
+                  <p className="mt-3 text-sm text-emerald-200">Official application window confirmed and open.</p>
+                  <p className="mt-1 text-sm text-slate-300"><strong>Closes:</strong> {typeof application.readiness_snapshot.deadline_closes_at === "string" ? new Date(application.readiness_snapshot.deadline_closes_at).toLocaleString() : "Not recorded"}</p>
+                  <p className="mt-1 text-xs text-slate-400">Deadline evidence reference: {typeof application.readiness_snapshot.deadline_ref === "string" ? application.readiness_snapshot.deadline_ref : "Not recorded"}</p>
+                </> : <p className="mt-3 text-sm text-amber-200">A current confirmed application deadline has not been recorded. A new application draft cannot be prepared until it is verified.</p>}
+                <p className="mt-3 text-xs text-slate-500">Source last checked: {typeof application.readiness_snapshot?.source_checked_at === "string" ? new Date(application.readiness_snapshot.source_checked_at).toLocaleString() : "Not recorded"}</p>
+              </section>}
+              {application && <section className="mt-4 rounded-xl border border-slate-700 bg-slate-950 p-4" aria-label="Provider receipt evidence">
+                <div className="flex flex-wrap items-center justify-between gap-2">
+                  <h4 className="font-semibold">Provider receipt &amp; evidence</h4>
+                  <span className={verifiedReceipt ? "rounded-full border border-emerald-800 px-3 py-1 text-xs text-emerald-200" : "rounded-full border border-amber-800 px-3 py-1 text-xs text-amber-200"}>
+                    {verifiedReceipt ? "Receipt verified" : receiptEvidence.length > 0 ? "Evidence needs review" : "Not confirmed"}
+                  </span>
+                </div>
+                {verifiedReceipt ? <div className="mt-3 text-sm leading-6 text-slate-300">
+                  <p>A reviewer-verified provider receipt or provider reference is recorded for this exact application.</p>
+                  <p className="mt-1"><strong>Evidence reference:</strong> <span className="break-all">{verifiedReceipt.evidence_ref}</span></p>
+                  <p className="mt-1"><strong>Evidence label:</strong> {verifiedReceipt.source_label}</p>
+                  <p className="mt-1"><strong>Verified at:</strong> {new Date(verifiedReceipt.verified_at as string).toLocaleString()}</p>
+                </div> : receiptEvidence.length > 0 ? <div className="mt-3 space-y-3 text-sm leading-6 text-slate-300">
+                  <p>Receipt-related evidence exists, but it is not yet reviewer-verified. Kingsmen is not treating it as proof of provider receipt.</p>
+                  {receiptEvidence.map(item => <div key={item.evidence_ref} className="rounded-lg border border-slate-800 p-3">
+                    <p className="font-semibold">{item.source_label || item.evidence_type.replaceAll("_", " ")}</p>
+                    <p className="mt-1 text-xs text-slate-400">State: {item.verification_status.replaceAll("_", " ")} · Added {new Date(item.created_at).toLocaleString()}</p>
+                    <p className="mt-1 break-all text-xs text-slate-400">Evidence reference: {item.evidence_ref}</p>
+                  </div>)}
+                </div> : <p className="mt-3 text-sm leading-6 text-slate-300">
+                  {submissionAttemptRecorded
+                    ? "A submission attempt is recorded, but a provider-confirmed receipt has not been verified."
+                    : "No reviewer-verified provider receipt is available for this application. Candidate-reported activity and submission attempts do not confirm provider receipt."}
+                </p>}
+                <p className="mt-3 text-xs leading-5 text-slate-500">Private storage paths and download locators are not exposed in this timeline. Receipt verification is performed by an authorised human reviewer.</p>
+              </section>}
+              <p className="mt-3 text-xs text-slate-400">Provider routing details are retained internally by Kingsmen. Candidate actions and updates stay in this workspace.</p>
               <div className="mt-4 border-t border-slate-700 pt-4">
                 <h4 className="font-semibold">Application timeline</h4>
                 {events.length === 0 ? <p className="mt-2 text-sm text-slate-400">No timeline events have been returned for this target yet.</p> : <ol className="mt-3 space-y-3">
@@ -246,7 +316,7 @@ export default function CandidateApplicationsPage() {
         const opportunity=opportunityFor(tracker);
         const draft=drafts[tracker.id]??{status:tracker.status,note:tracker.candidate_note,evidence:tracker.evidence_reference};
         const trackerItems=items.filter(item=>item.tracker_id===tracker.id);
-        const newItem=newItems[tracker.id]??{title:"",type:"TASK" as const,note:"",source:""};
+        const newItem=newItems[tracker.id]??{title:"",type:"TASK" as const,note:""};
         return <article key={tracker.id} className="rounded-3xl border border-slate-800 bg-slate-900 p-5 sm:p-7">
           <div className="flex flex-wrap items-start justify-between gap-4">
             <div className="min-w-0">
@@ -254,7 +324,7 @@ export default function CandidateApplicationsPage() {
               <h2 className="mt-2 break-words text-xl font-bold">{opportunity?.title??"Tracked application"}</h2>
               <p className="mt-1 text-sm text-slate-400">{opportunity?.organisation??"Provider not available"}{opportunity?.pathway? ` · ${opportunity.pathway}`:""}</p>
               {opportunity?.closing_date&&<p className="mt-2 text-xs text-slate-400">Recorded closing date: {opportunity.closing_date}</p>}
-              {opportunity?.official_url&&<a href={opportunity.official_url} target="_blank" rel="noopener noreferrer" className="mt-3 inline-block break-all text-sm text-cyan-300 underline">Open provider source</a>}
+              {opportunity?.official_url&&<p className="mt-3 text-xs text-slate-400">Source provenance is retained in Kingsmen for verification; application tasks stay in this workspace.</p>}
             </div>
             <span className="rounded-full border border-slate-700 px-3 py-1 text-xs">{humanStatus(tracker.status)}</span>
           </div>
@@ -267,8 +337,8 @@ export default function CandidateApplicationsPage() {
             <label className="block text-sm font-semibold">Candidate note
               <textarea maxLength={1200} value={draft.note} onChange={e=>setDrafts(old=>({...old,[tracker.id]:{...draft,note:e.target.value}}))} className="mt-2 min-h-24 w-full rounded-xl border border-slate-700 bg-slate-950 px-3 py-3 font-normal" />
             </label>
-            <label className="block text-sm font-semibold md:col-span-2">Submission evidence reference (required for candidate-reported submission)
-              <input maxLength={500} value={draft.evidence} onChange={e=>setDrafts(old=>({...old,[tracker.id]:{...draft,evidence:e.target.value}}))} placeholder="Receipt reference or official confirmation URL" className="mt-2 w-full rounded-xl border border-slate-700 bg-slate-950 px-3 py-3 font-normal" />
+            <label className="block text-sm font-semibold md:col-span-2">Kingsmen evidence reference (required for candidate-reported submission)
+              <input maxLength={500} value={draft.evidence} onChange={e=>setDrafts(old=>({...old,[tracker.id]:{...draft,evidence:e.target.value}}))} placeholder="Receipt number or evidence reference recorded in Kingsmen" className="mt-2 w-full rounded-xl border border-slate-700 bg-slate-950 px-3 py-3 font-normal" />
             </label>
             <button type="submit" disabled={busy===tracker.id||!draft.evidence.trim()&&draft.status==="SUBMITTED_CANDIDATE_REPORTED"} className="rounded-xl bg-cyan-300 px-4 py-3 text-sm font-bold text-slate-950 disabled:opacity-50">{busy===tracker.id?"Saving…":"Save tracker update"}</button>
           </form>
@@ -278,7 +348,7 @@ export default function CandidateApplicationsPage() {
             {trackerItems.map(item=>{
               const idraft=itemDrafts[item.id]??{status:item.status,note:item.candidate_note,evidence:item.evidence_reference};
               return <form key={item.id} onSubmit={event=>void saveItem(event,item)} className="mt-3 grid gap-3 rounded-2xl border border-slate-800 p-4 md:grid-cols-[1.2fr_0.7fr_1fr_auto]">
-                <div><p className="text-xs uppercase text-slate-500">{item.item_type==="DOCUMENT"?"Document":"Task"}</p><p className="mt-1 text-sm font-semibold">{item.title}</p>{item.official_source_url&&<a href={item.official_source_url} target="_blank" rel="noopener noreferrer" className="mt-1 block break-all text-xs text-cyan-300 underline">Official source</a>}</div>
+                <div><p className="text-xs uppercase text-slate-500">{item.item_type==="DOCUMENT"?"Document":"Task"}</p><p className="mt-1 text-sm font-semibold">{item.title}</p>{item.official_source_url&&<p className="mt-1 text-xs text-slate-500">Requirement source is maintained internally by Kingsmen.</p>}</div>
                 <label className="text-xs font-semibold text-slate-300">Progress<select value={idraft.status} onChange={e=>setItemDrafts(old=>({...old,[item.id]:{...idraft,status:e.target.value as ItemDraft["status"]}}))} className="mt-2 w-full rounded-lg border border-slate-700 bg-slate-950 p-2 text-xs"><option value="NOT_STARTED">Not started</option><option value="IN_PROGRESS">In progress</option><option value="READY_CANDIDATE_REPORTED">Ready (reported)</option></select></label>
                 <label className="text-xs font-semibold text-slate-300">Evidence reference<input maxLength={1000} value={idraft.evidence} onChange={e=>setItemDrafts(old=>({...old,[item.id]:{...idraft,evidence:e.target.value}}))} className="mt-2 w-full rounded-lg border border-slate-700 bg-slate-950 p-2 text-xs" /></label>
                 <button type="submit" disabled={busy===item.id||idraft.status==="READY_CANDIDATE_REPORTED"&&!idraft.evidence.trim()} className="rounded-lg border border-slate-700 px-3 py-2 text-xs font-semibold disabled:opacity-40">{busy===item.id?"Saving…":"Save"}</button>
@@ -286,10 +356,9 @@ export default function CandidateApplicationsPage() {
               </form>
             })}
 
-            <form onSubmit={event=>void addItem(event,tracker.id)} className="mt-4 grid gap-3 rounded-2xl border border-dashed border-slate-700 p-4 md:grid-cols-[0.5fr_1fr_1.1fr_auto]">
+            <form onSubmit={event=>void addItem(event,tracker.id)} className="mt-4 grid gap-3 rounded-2xl border border-dashed border-slate-700 p-4 md:grid-cols-[0.5fr_1fr_auto]">
               <select aria-label="New checklist item type" value={newItem.type} onChange={e=>setNewItems(old=>({...old,[tracker.id]:{...newItem,type:e.target.value as "TASK"|"DOCUMENT"}}))} className="rounded-xl border border-slate-700 bg-slate-950 px-3 py-2 text-sm"><option value="TASK">Task</option><option value="DOCUMENT">Document</option></select>
               <input required minLength={2} maxLength={160} aria-label="New checklist item title" placeholder="Checklist item title" value={newItem.title} onChange={e=>setNewItems(old=>({...old,[tracker.id]:{...newItem,title:e.target.value}}))} className="rounded-xl border border-slate-700 bg-slate-950 px-3 py-2 text-sm" />
-              <input maxLength={1000} aria-label="Official source URL for checklist item" placeholder="Optional official HTTPS source URL" value={newItem.source} onChange={e=>setNewItems(old=>({...old,[tracker.id]:{...newItem,source:e.target.value}}))} className="rounded-xl border border-slate-700 bg-slate-950 px-3 py-2 text-sm" />
               <button type="submit" disabled={busy===`add:${tracker.id}`} className="rounded-xl border border-slate-700 px-4 py-2 text-sm font-semibold disabled:opacity-50">{busy===`add:${tracker.id}`?"Adding…":"Add checklist item"}</button>
               <label className="text-xs text-slate-400 md:col-span-4">Note<textarea maxLength={1200} value={newItem.note} onChange={e=>setNewItems(old=>({...old,[tracker.id]:{...newItem,note:e.target.value}}))} className="mt-2 min-h-16 w-full rounded-lg border border-slate-700 bg-slate-950 p-2 text-xs" /></label>
             </form>
