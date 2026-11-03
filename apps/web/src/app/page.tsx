@@ -19,7 +19,7 @@ const steps = [
 export default function HomePage() {
   return (
     <main className="public-site">
-      <div className="public-notice"><span aria-hidden="true" /> PREVIEW BUILD · Candidate account creation, real uploads, provider submissions and checkout are not enabled</div>
+      <div className="public-notice"><span aria-hidden="true" /> PREVIEW BUILD · Auth UI added; profile persistence, real uploads, provider submissions and checkout remain gated</div>
       <header className="public-header">
         <div className="public-container public-header-inner">
           <Link className="public-brand" href="/" aria-label="Kingsmen Portal home">
@@ -30,6 +30,7 @@ export default function HomePage() {
             <Link href="#pathways">Pathways</Link>
             <Link href="/packages/">Packages</Link>
             <Link href="#how-it-works">How it works</Link>
+            <Link href="/candidate/login/">Sign in</Link>
             <Link className="public-nav-portal" href="/candidate/dashboard/">Candidate portal ↗</Link>
           </nav>
         </div>
