@@ -15,7 +15,7 @@
   if (grid) {
     grid.innerHTML = packages.map(p => {
       const features = p.cv
-        ? ["15 CV versions + 15 motivation letters","Target turnaround: 3 business days","No managed-route capacity included","+2 route bonus only after verified ownership and eligible upgrade"]
+        ? ["15 CV versions + 15 motivation letters","Target turnaround: 3 business days","No managed-route capacity included","Accommodation support available; routes verified separately","+2 route bonus only after verified ownership and eligible upgrade"]
         : p.free
           ? ["Explore the six pathways","Public preview only","No live applications or payments"]
           : [p.applications + " priority applications",p.capacity + " concurrent managed routes / 30-day capacity",p.accommodation ? p.accommodation + " accommodation routes included" : "Accommodation support included"];
