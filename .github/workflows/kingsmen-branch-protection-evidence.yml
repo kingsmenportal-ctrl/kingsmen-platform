@@ -7,6 +7,8 @@ on:
     branches: [main]
   workflow_dispatch:
 
+# GITHUB_TOKEN has repository metadata read by default. The effective-rules
+# endpoint uses that permission and supports repository rulesets.
 permissions:
   contents: read
 
@@ -25,10 +27,13 @@ jobs:
           node-version: '22'
           cache: npm
 
-      - name: Verify protection using dedicated read-only GitHub token
+      - name: Test the stream-level protection policy
+        run: node scripts/ci/test-main-branch-protection-policy.mjs
+
+      - name: Verify effective rules for main using GITHUB_TOKEN
         env:
           GITHUB_REPOSITORY: ${{ github.repository }}
-          GITHUB_TOKEN: ${{ secrets.KINGSMEN_BRANCH_PROTECTION_READ_TOKEN }}
+          GITHUB_TOKEN: ${{ github.token }}
           GITHUB_API_URL: ${{ github.api_url }}
         run: node scripts/ci/capture-main-branch-protection.mjs
 
