@@ -2,9 +2,9 @@ name: Candidate Experience CI
 
 on:
   push:
-    branches: [feat/candidate-experience-closeout-2026-10-30, feat/application-capacity-entitlements-2026-11-01]
+    branches: [feat/candidate-experience-closeout-2026-10-30, feat/application-capacity-entitlements-2026-11-01, feat/provider-receipt-evidence-tracking-2026-11-01]
   pull_request:
-    branches: [main, feat/backend-simplification-baseline-2026-10-29, feat/candidate-experience-closeout-2026-10-30]
+    branches: [main, feat/backend-simplification-baseline-2026-10-29, feat/candidate-experience-closeout-2026-10-30, feat/application-capacity-entitlements-2026-11-01]
   workflow_dispatch:
 
 permissions:
