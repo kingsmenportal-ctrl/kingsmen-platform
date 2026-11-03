@@ -5,6 +5,14 @@ const home = readFileSync(new URL("../../apps/web/src/app/page.tsx", import.meta
 const packages = readFileSync(new URL("../../apps/web/src/app/packages/page.tsx", import.meta.url), "utf8");
 const dashboard = readFileSync(new URL("../../apps/web/src/app/candidate/dashboard/page.tsx", import.meta.url), "utf8");
 const dashboardStyles = readFileSync(new URL("../../apps/web/src/app/candidate/dashboard/candidate-dashboard.module.css", import.meta.url), "utf8");
+const workbench = readFileSync(new URL("../../apps/web/src/app/candidate/workbench/page.tsx", import.meta.url), "utf8");
+const workbenchStyles = readFileSync(new URL("../../apps/web/src/app/candidate/workbench/workbench.module.css", import.meta.url), "utf8");
+const opportunities = readFileSync(new URL("../../apps/web/src/app/candidate/opportunity-matches/page.tsx", import.meta.url), "utf8");
+const opportunitiesStyles = readFileSync(new URL("../../apps/web/src/app/candidate/opportunity-matches/opportunity-matches.module.css", import.meta.url), "utf8");
+const documents = readFileSync(new URL("../../apps/web/src/app/candidate/documents/page.tsx", import.meta.url), "utf8");
+const documentsStyles = readFileSync(new URL("../../apps/web/src/app/candidate/documents/documents.module.css", import.meta.url), "utf8");
+const savedOpportunities = readFileSync(new URL("../../apps/web/src/components/saved-opportunities-client.tsx", import.meta.url), "utf8");
+const savedOpportunitiesStyles = readFileSync(new URL("../../apps/web/src/components/saved-opportunities.module.css", import.meta.url), "utf8");
 
 const canonicalPathways = [
   "Higher Education",
@@ -66,4 +74,36 @@ assert.match(profilePage, /Do not enter a South African ID number/, "Profile for
 assert.ok(!profilePage.includes("SUPABASE_SERVICE_ROLE_KEY"), "A privileged Supabase service-role key must not enter browser code.");
 
 
-console.log("Public web contract passed: six canonical pathways, responsive candidate workspace, canonical prices, and guarded CV Revamp entitlements.");
+
+assert.ok(workbench.includes('functions/v1/candidate-application-preparation'), "Workbench must use the authenticated application preparation service.");
+assert.ok(workbench.includes('action: "load"'), "Workbench must load persisted records from the service.");
+assert.ok(workbench.includes('action: "prepare_master_application"'), "Workbench must use the service for parent-application preparation.");
+assert.ok(workbench.includes("No provider submission is inferred") || workbench.includes("Provider submission is not inferred"), "Workbench must distinguish preparation from provider submission.");
+assert.ok(workbench.includes("CAO") && workbench.includes("child"), "Workbench must describe the CAO parent/child application model.");
+assert.ok(workbenchStyles.includes("@media(max-width:560px)") && workbenchStyles.includes(":focus-visible"), "Workbench must have responsive styles and keyboard focus.");
+assert.ok(opportunities.includes('functions/v1/n15-candidate-opportunities'), "Opportunity feed must use the existing verified feed endpoint.");
+assert.ok(opportunities.includes('functions/v1/candidate-save-verified-opportunity'), "Opportunity save must call the server-side save endpoint.");
+for (const pathway of ["SETA_LEARNERSHIPS", "INTERNSHIPS", "APPRENTICESHIPS", "HIGHER_EDUCATION", "TVET", "EMPLOYMENT"]) {
+  assert.ok(opportunities.includes(pathway), `Opportunity feed is missing the deployed API enum: ${pathway}`);
+}
+assert.ok(opportunities.includes("No provider submission has occurred"), "Saving a match must not imply provider submission.");
+assert.ok(opportunitiesStyles.includes("@media(max-width:560px)") && opportunitiesStyles.includes(":focus-visible"), "Opportunity feed must have responsive styles and keyboard focus.");
+assert.ok(savedOpportunities.includes('functions/v1/candidate-application-preparation'), "Saved opportunity list must load persisted application records.");
+assert.ok(savedOpportunities.includes('action: "load"'), "Saved opportunity list must use the service load action.");
+assert.ok(savedOpportunitiesStyles.includes("@media(max-width:560px)"), "Saved opportunity list must have mobile styling.");
+assert.ok(documents.includes('functions/v1/candidate-private-documents'), "Document vault must use the private document API.");
+for (const action of ["upload-url", "finalize-upload", "read-url"]) {
+  assert.ok(documents.includes(`action: "${action}"`), `Document vault action not wired: ${action}`);
+}
+assert.ok(documents.includes("10 * 1024 * 1024"), "Document vault must cap files at 10 MiB.");
+for (const mime of ["application/pdf", "image/jpeg", "image/png"]) {
+  assert.ok(documents.includes(mime), `Document vault must support ${mime}`);
+}
+assert.ok(documents.includes("pendingFinalizeId") && documents.includes("Retry upload finalization"), "Vault must expose safe recovery if finalization needs retry.");
+assert.ok(documents.includes("signedReadUrl") && documents.includes("expiresInSeconds"), "Vault must show expiring server-signed read links.");
+assert.ok(documents.includes("SHA-256") && documents.includes("sha256_hex"), "Vault must surface server-recorded checksum status.");
+assert.ok(documents.includes("Candidate actions cannot approve, reject or delete files"), "Candidate UI must not expose reviewer-only decisions.");
+assert.ok(!documents.includes("SUPABASE_SERVICE_ROLE_KEY"), "Privileged service-role credentials must not be present in browser code.");
+assert.ok(documentsStyles.includes("@media(max-width:560px)") && documentsStyles.includes(":focus-visible"), "Document vault must have responsive styles and keyboard focus.");
+
+console.log("Public web contract passed: six pathways, persisted workspace APIs, private document workflow, pricing and entitlement guards.");
