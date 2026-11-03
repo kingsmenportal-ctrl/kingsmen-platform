@@ -1,10 +1,10 @@
 const pathways = [
-  { n: "01", title: "Higher education", detail: "Universities, Universities of Technology, CAO programme choices and application preparation.", tags: "UNIVERSITIES · UoTs · CAO" },
-  { n: "02", title: "TVET & college routes", detail: "TVET colleges, NC(V), NATED / Report 191 and accredited private-college pathways.", tags: "TVET · NC(V) · NATED" },
-  { n: "03", title: "Learnerships & SETAs", detail: "Skills programmes, learnerships and training opportunities with source and deadline checks.", tags: "SETA · QCTO · SKILLS" },
-  { n: "04", title: "Internships & apprenticeships", detail: "Work exposure, workplace learning, apprenticeships and WIL opportunities.", tags: "WIL · EXPERIENCE" },
-  { n: "05", title: "Employment", detail: "Vacancy discovery and application preparation for entry-level and experienced candidates.", tags: "CAREERS · VACANCIES" },
-  { n: "06", title: "Funding & support", detail: "Bursaries, sponsorships, NSFAS guidance and related accommodation or transport needs.", tags: "NSFAS · BURSARIES · SUPPORT" },
+  { n: "01", title: "Higher Education", detail: "Universities, Universities of Technology, CAO programme choices and application preparation.", tags: "UNIVERSITIES · UoTs · CAO" },
+  { n: "02", title: "TVET", detail: "TVET colleges, NC(V), NATED / Report 191 and accredited private-college pathways.", tags: "TVET · NC(V) · NATED" },
+  { n: "03", title: "SETA programmes & learnerships", detail: "Skills programmes, learnerships and training opportunities with source and deadline checks.", tags: "SETA · QCTO · SKILLS" },
+  { n: "04", title: "Internships", detail: "Work exposure, workplace learning and structured early-career experience.", tags: "WIL · EXPERIENCE" },
+  { n: "05", title: "Apprenticeships", detail: "Trade training, artisan development and practical occupational pathways.", tags: "TRADES · ARTISAN" },
+  { n: "06", title: "Employment", detail: "Vacancy discovery and application preparation for entry-level and experienced candidates.", tags: "CAREERS · VACANCIES" },
 ];
 
 const steps = [
@@ -49,7 +49,7 @@ export default function HomePage() {
         .km-section h2{font-size:clamp(29px,4vw,43px);letter-spacing:-1.3px;margin:12px 0}
         .km-muted{color:#a6b2c4;line-height:1.75;max-width:640px;font-size:14px}
         .km-cards{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:15px}
-        .km-card{border:1px solid #2b374b;border-radius:15px;padding:23px;background:linear-gradient(150deg,#111a29,#0c121d);min-height:225px}
+        .km-card{border:1px solid #2b374b;border-radius:15px;padding:23px;background:linear-gradient(150deg,#111a29,#0c121d);min-height:225px;cursor:pointer}.km-card:hover{border-color:#c9a227;box-shadow:0 18px 48px #0004}
         .km-card .km-num{color:#d9b568;font-size:11px;font-weight:900;letter-spacing:1px}
         .km-card h3{font-size:19px;margin:16px 0 10px}.km-card p{font-size:13px;color:#a8b5c7;line-height:1.75;min-height:68px}
         .km-tags{font-size:9px;letter-spacing:1.4px;color:#d9b568;font-weight:800}
@@ -74,7 +74,7 @@ export default function HomePage() {
             <aside className="km-feature" aria-label="Opportunity pathways overview"><div className="km-feature-top"><div><div className="km-mini-label">THE KINGSMEN ROUTE MAP</div><strong style={{display:"block",fontSize:20,marginTop:8}}>Six pathways. One journey.</strong></div><span className="km-status">CANDIDATE FIRST</span></div>{pathways.map(p=><div className="km-route" key={p.n}><span className="km-route-num">{p.n}</span><div><strong>{p.title}</strong><p>{p.tags}</p></div></div>)}</aside>
           </div>
         </section>
-        <section id="pathways" className="km-section"><div className="km-section-head"><div><div className="km-eyebrow">Find your direction</div><h2>More than a list of opportunities.</h2></div><p className="km-muted">Your route can cross education, training, funding and work. Kingsmen is designed to help bring the steps together—not leave you to manage every portal alone.</p></div><div className="km-cards">{pathways.map(p=><article className="km-card" key={p.n}><div className="km-num">{p.n} / PATHWAY</div><h3>{p.title}</h3><p>{p.detail}</p><div className="km-tags">{p.tags}</div></article>)}</div></section>
+        <section id="pathways" className="km-section"><div className="km-section-head"><div><div className="km-eyebrow">Find your direction</div><h2>More than a list of opportunities.</h2></div><p className="km-muted">Your route can cross education, training, funding and work. Kingsmen is designed to help bring the steps together—not leave you to manage every portal alone.</p></div><div className="km-cards">{pathways.map(p=><a href="/free-destiny-map/" className="km-card" key={p.n} style={{textDecoration:"none",display:"block"}} aria-label={`Explore ${p.title} through the Free Destiny Map`}><div className="km-num">{p.n} / PATHWAY</div><h3>{p.title}</h3><p>{p.detail}</p><div className="km-tags">{p.tags}</div></a>)}</div></section>
         <section id="how-it-works" className="km-section"><div className="km-eyebrow">From intention to evidence</div><h2>A clearer journey, step by step.</h2><p className="km-muted" style={{marginBottom:32}}>The goal is not simply to find a link. It is to help you understand what comes next, prepare properly and keep a reliable record of your journey.</p><div className="km-steps">{steps.map(s=><article className="km-step" key={s[0]}><b>{s[0]} — THE JOURNEY</b><h3>{s[1]}</h3><p>{s[2]}</p></article>)}</div><div style={{marginTop:32}}><a className="km-btn km-primary" href="/free-destiny-map/">Start with the Free Destiny Map ↗</a></div></section>
         <section id="principles" className="km-section"><div className="km-eyebrow">Trust is part of the product</div><h2>Clear evidence. Protected information. Honest status.</h2><div className="km-trust" style={{marginTop:25}}><article><strong>Verified sources matter</strong><p>A source directory does not prove that a programme is open, that a deadline is current, or that a candidate is eligible.</p></article><article><strong>Your documents are private</strong><p>Personal information and supporting documents belong behind appropriate access controls—not in public pages or shared links.</p></article><article><strong>Status must mean something</strong><p>A candidate-reported submission is not presented as a provider-confirmed submission or final outcome.</p></article></div></section>
         <section className="km-section" style={{textAlign:"center"}}><div className="km-eyebrow">Take the first step</div><h2>Build a route that fits your future.</h2><p className="km-muted" style={{margin:"0 auto 25px"}}>Start by exploring the pathways available to you. You can plan before committing to an application.</p><a className="km-btn km-primary" href="/free-destiny-map/">Open the Free Destiny Map ↗</a></section>
