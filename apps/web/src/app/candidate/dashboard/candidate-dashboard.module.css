@@ -1,0 +1,74 @@
+/* Candidate dashboard presentation; scoped so public and candidate routes do not leak styles. */
+.page {
+  min-height: 100vh;
+  background:
+    radial-gradient(circle at 86% 0%, rgba(201, 162, 39, .11), transparent 27rem),
+    linear-gradient(180deg, #0b1626 0%, #07101c 55%, #060c15 100%);
+  color: #f3f0e7;
+  font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+}
+.page * { box-sizing: border-box; }
+.page a { color: inherit; }
+.shell { width: min(1120px, calc(100% - 36px)); margin: 0 auto; padding-bottom: 38px; }
+.skipLink { position: absolute; left: -9999px; top: 8px; z-index: 10; padding: 10px 14px; background: #f2d48a; color: #101827 !important; border-radius: 8px; font-weight: 800; }
+.skipLink:focus { left: 12px; }
+.topNav { min-height: 78px; display: flex; align-items: center; justify-content: space-between; gap: 16px; border-bottom: 1px solid #263347; }
+.brand { display: inline-flex; align-items: center; gap: 11px; text-decoration: none; min-width: 0; }
+.brandMark { display: grid; width: 42px; height: 42px; place-items: center; border-radius: 12px; background: linear-gradient(145deg, #f2d48a, #b58a3b); color: #111827; font-size: 21px; font-weight: 950; }
+.brandTitle { display: block; font-size: 13px; font-weight: 900; letter-spacing: 2.2px; }
+.brandSub { display: block; margin-top: 4px; color: #9cabc0; font-size: 10px; letter-spacing: .5px; }
+.navLinks { display: flex; align-items: center; gap: 18px; color: #c5cedc; font-size: 12px; }
+.navLinks a { text-decoration: none; }
+.navLinks a:hover { color: #f2d48a; }
+.hero { position: relative; overflow: hidden; margin-top: 34px; padding: clamp(24px, 5vw, 48px); border: 1px solid #34435a; border-radius: 24px; background: linear-gradient(130deg, rgba(21, 34, 53, .98), rgba(9, 18, 31, .98)); box-shadow: 0 24px 64px rgba(0,0,0,.22); }
+.hero::after { content: ""; position: absolute; width: 270px; height: 270px; right: -95px; top: -125px; border: 1px solid rgba(201, 162, 39, .25); border-radius: 50%; box-shadow: 0 0 0 34px rgba(201, 162, 39, .035), 0 0 0 70px rgba(201, 162, 39, .025); pointer-events: none; }
+.eyebrow { position: relative; z-index: 1; margin: 0; color: #e4c477; font-size: 10px; font-weight: 900; letter-spacing: 2.4px; text-transform: uppercase; }
+.hero h1 { position: relative; z-index: 1; max-width: 760px; margin: 15px 0 13px; font-size: clamp(34px, 5vw, 56px); font-weight: 850; line-height: 1.04; letter-spacing: -1.8px; }
+.gold { color: #f2d48a; }
+.lead { position: relative; z-index: 1; max-width: 740px; margin: 0; color: #bdc7d6; font-size: 15px; line-height: 1.8; }
+.actions { position: relative; z-index: 1; display: flex; flex-wrap: wrap; gap: 10px; margin-top: 24px; }
+.primaryButton, .secondaryButton { display: inline-flex; min-height: 44px; align-items: center; justify-content: center; gap: 8px; border-radius: 10px; padding: 11px 15px; font-size: 12px; font-weight: 850; text-decoration: none; transition: transform .15s ease, border-color .15s ease, background .15s ease; }
+.primaryButton { border: 1px solid #f2d48a; background: linear-gradient(135deg, #f2d48a, #c49a4a); color: #101827 !important; }
+.secondaryButton { border: 1px solid #56657b; background: #101a2b; color: #f4f1e8 !important; }
+.primaryButton:hover, .secondaryButton:hover { transform: translateY(-1px); }
+.primaryButton:focus-visible, .secondaryButton:focus-visible, .navLinks a:focus-visible, .workspaceAction:focus-visible { outline: 2px solid #f2d48a; outline-offset: 3px; }
+.disclosure { position: relative; z-index: 1; max-width: 760px; margin: 18px 0 0; color: #97a6bb; font-size: 11px; line-height: 1.7; }
+.section { margin-top: 40px; }
+.sectionHead { margin-bottom: 18px; }
+.sectionEyebrow { margin: 0 0 8px; color: #d8b867; font-size: 10px; font-weight: 850; letter-spacing: 2px; text-transform: uppercase; }
+.section h2 { margin: 0; color: #f3f0e7; font-size: clamp(22px, 3vw, 30px); letter-spacing: -.6px; }
+.sectionIntro { max-width: 750px; margin: 9px 0 0; color: #a9b6c8; font-size: 13px; line-height: 1.7; }
+.pathwayGrid, .workspaceGrid { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 13px; }
+.pathwayCard, .workspaceCard { min-width: 0; border: 1px solid #2b394e; border-radius: 15px; background: linear-gradient(155deg, #111d2e, #0b1421); padding: 19px; }
+.pathwayCard { min-height: 180px; }
+.cardTop { display: flex; align-items: center; justify-content: space-between; gap: 8px; }
+.pathwayNumber { color: #e3c06c; font-size: 10px; font-weight: 900; letter-spacing: 1.5px; }
+.available { border: 1px solid #385046; border-radius: 99px; padding: 5px 8px; color: #bfe0c9; font-size: 9px; font-weight: 800; }
+.pathwayCard h3, .workspaceCard h3 { margin: 15px 0 7px; color: #f4f1e8; font-size: 16px; line-height: 1.35; }
+.pathwayCard p, .workspaceCard p { margin: 0; color: #a9b6c8; font-size: 12px; line-height: 1.7; }
+.workspaceCard { display: flex; min-height: 205px; flex-direction: column; }
+.workspaceCard h3 { margin-top: 0; font-size: 15px; }
+.workspaceAction { display: inline-flex; align-self: flex-start; align-items: center; gap: 8px; min-height: 40px; margin-top: auto; padding: 9px 12px; border: 1px solid #4b5a70; border-radius: 9px; color: #f0d18a !important; font-size: 11px; font-weight: 850; text-decoration: none; }
+.workspaceAction:hover { border-color: #c9a227; background: rgba(201, 162, 39, .08); }
+.notice { margin-top: 34px; padding: 20px; border: 1px solid #61502b; border-radius: 14px; background: rgba(38, 31, 16, .58); }
+.notice h2 { margin: 0; color: #f2d48a; font-size: 14px; }
+.notice p { margin: 9px 0 0; color: #c8c2b2; font-size: 12px; line-height: 1.8; }
+.footer { display: flex; flex-wrap: wrap; justify-content: space-between; gap: 12px; margin-top: 32px; padding-top: 19px; border-top: 1px solid #263347; color: #8190a5; font-size: 10px; line-height: 1.7; }
+@media (max-width: 840px) {
+  .pathwayGrid, .workspaceGrid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .navLinks { gap: 12px; }
+}
+@media (max-width: 560px) {
+  .shell { width: calc(100% - 26px); }
+  .topNav { align-items: flex-start; flex-direction: column; padding: 13px 0; }
+  .navLinks { width: 100%; justify-content: space-between; gap: 8px; flex-wrap: wrap; font-size: 11px; }
+  .hero { margin-top: 20px; border-radius: 17px; }
+  .hero h1 { letter-spacing: -1px; }
+  .pathwayGrid, .workspaceGrid { grid-template-columns: 1fr; }
+  .pathwayCard { min-height: 0; }
+  .workspaceCard { min-height: 0; }
+  .workspaceAction { margin-top: 18px; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .primaryButton, .secondaryButton { transition: none; }
+}
