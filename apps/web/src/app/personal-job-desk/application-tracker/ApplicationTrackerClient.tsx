@@ -70,6 +70,7 @@ type AuditEvent = {
 };
 type TrackerFeed = {
   ready?: boolean;
+  tracker?: Tracker;
   status?: string;
   message?: string;
   error?: string;
@@ -121,6 +122,10 @@ export default function ApplicationTrackerClient() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
   const [message, setMessage] = useState("");
+  const [editStatus, setEditStatus] = useState("SAVED");
+  const [editNote, setEditNote] = useState("");
+  const [editEvidence, setEditEvidence] = useState("");
+  const [saving, setSaving] = useState(false);
 
   const trackers = useMemo(() => feed?.trackers ?? [], [feed]);
   const targets = useMemo(() => feed?.masterTargets ?? [], [feed]);
@@ -193,6 +198,56 @@ export default function ApplicationTrackerClient() {
   }, []);
 
   useEffect(() => { void loadTracker(); }, [loadTracker]);
+
+  useEffect(() => {
+    setEditStatus(selected?.status || "SAVED");
+    setEditNote(selected?.candidate_note || "");
+    setEditEvidence(selected?.evidence_reference || "");
+  }, [selected?.id, selected?.status, selected?.candidate_note, selected?.evidence_reference]);
+
+  async function saveTrackerUpdate() {
+    if (!selected) return;
+    setError("");
+    setMessage("");
+    if (editStatus === "SUBMITTED_CANDIDATE_REPORTED" && !editEvidence.trim()) {
+      setError("Add a reference to your own submission evidence before recording candidate-reported submission.");
+      return;
+    }
+    if (editNote.length > 1200 || editEvidence.length > 500) {
+      setError("The note must be 1,200 characters or fewer and the evidence reference must be 500 characters or fewer.");
+      return;
+    }
+    setSaving(true);
+    try {
+      const url = process.env.NEXT_PUBLIC_SUPABASE_URL;
+      const anonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
+      const token = getAccessToken();
+      if (!url || !anonKey) throw new Error("The application tracker is not configured for this deployment.");
+      if (!token) throw new Error("Sign in first. Your authenticated session was not found in this browser.");
+      const response = await fetch(url.replace(/\/$/, "") + "/functions/v1/candidate-application-preparation", {
+        method: "POST",
+        headers: { apikey: anonKey, Authorization: "Bearer " + token, "Content-Type": "application/json" },
+        body: JSON.stringify({
+          action: "update_tracker",
+          tracker_id: selected.id,
+          status: editStatus,
+          candidate_note: editNote,
+          evidence_reference: editEvidence
+        }),
+        cache: "no-store"
+      });
+      const result = await response.json() as TrackerFeed;
+      if (!response.ok || result.ready !== true) {
+        throw new Error(result.error || result.message || result.code || ("Tracker update failed (" + response.status + ")."));
+      }
+      await loadTracker();
+      setMessage(result.message || "Candidate-reported tracker changes were saved by Kingsmen.");
+    } catch (e) {
+      setError(e instanceof Error ? e.message : "The candidate tracker update was not confirmed.");
+    } finally {
+      setSaving(false);
+    }
+  }
 
   return (
     <main className={styles.page}>
@@ -303,12 +358,32 @@ export default function ApplicationTrackerClient() {
                         <div className={styles.fact}><dt>Evidence reference</dt><dd>{selected.evidence_reference || selectedTarget?.source_reference || "No reference recorded"}</dd></div>
                       </dl>
 
-                      {selected.candidate_note && (
-                        <>
-                          <h3 className={styles.sectionTitle}>Recorded note</h3>
-                          <div className={styles.status}>{selected.candidate_note}</div>
-                        </>
-                      )}
+                      <h3 className={styles.sectionTitle}>Update your tracker</h3>
+                      <p className={styles.muted}>These changes are recorded as candidate-reported tracker data. Kingsmen cannot set provider receipt or provider outcome from this control.</p>
+                      <div className={styles.editor}>
+                        <label className={styles.editorField}>
+                          Candidate-reported status
+                          <select className={styles.select} value={editStatus} onChange={event => setEditStatus(event.target.value)} disabled={saving}>
+                            <option value="SAVED">Saved</option>
+                            <option value="PREPARING">Preparing</option>
+                            <option value="READY_TO_APPLY">Ready to apply</option>
+                            <option value="SUBMITTED_CANDIDATE_REPORTED">I report that I submitted</option>
+                          </select>
+                        </label>
+                        <label className={styles.editorField}>
+                          Candidate note
+                          <textarea className={styles.textarea} value={editNote} onChange={event => setEditNote(event.target.value)} maxLength={1200} placeholder="Add a note or a question for your Kingsmen support record." disabled={saving} />
+                          <span className={styles.hint}>{editNote.length}/1,200 characters</span>
+                        </label>
+                        <label className={styles.editorField}>
+                          Submission evidence reference
+                          <input className={styles.textInput} value={editEvidence} onChange={event => setEditEvidence(event.target.value)} maxLength={500} placeholder="Reference to your own confirmation or submission evidence" disabled={saving} />
+                          <span className={styles.hint}>Required when you select “I report that I submitted”. It is still candidate-reported until independently verified.</span>
+                        </label>
+                        <button type="button" className={styles.primary} onClick={() => void saveTrackerUpdate()} disabled={saving || loading}>
+                          {saving ? "Saving tracker update…" : "Save candidate tracker update"}
+                        </button>
+                      </div>
 
                       <h3 className={styles.sectionTitle}>Application events</h3>
                       {relatedApplicationEvents.length === 0 ? (
@@ -354,7 +429,7 @@ export default function ApplicationTrackerClient() {
             </section>
 
             <section className={styles.notice}>
-              The unified tracker is read-only for candidate status mutations. The current service exposes authenticated record loading and preparation; this screen does not use the legacy local-file note writer. Candidate-reported submission, provider-confirmed receipt and provider-issued outcome remain separate events. No admission, funding, placement, employment or success is guaranteed.
+              Candidate-reported status and notes are written only through the authenticated, candidate-scoped update_tracker action. The screen does not use the legacy local-file note writer. Candidate-reported submission, provider-confirmed receipt and provider-issued outcome remain separate events. No admission, funding, placement, employment or success is guaranteed.
             </section>
           </>
         )}
