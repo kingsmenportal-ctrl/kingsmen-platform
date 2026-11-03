@@ -82,3 +82,16 @@ The Netlify tools available to this session provide project inspection and deplo
 - [ ] Live profile/saved-item persistence, private uploads, PayFast ITN settlement and provider-specific receipt evidence are verified before these functions are represented as operational.
 
 **Release status:** Frontend implementation consolidated for review; deployment commit and authenticated end-to-end runtime verification are pending explicit evidence.
+
+
+## Verification update — 2026-11-03 17:45 UTC
+
+The consolidated frontend branch was built and tested at commit `3687c2ca8426e55d70a291761ed81e88c6b23b6d`.
+
+- [Kingsmen CI run 41686895818](https://github.com/kingsmenportal-ctrl/kingsmen-platform/actions/runs/41686895818) **passed**. The focused repository test suite and prototype smoke checks passed; the API build and Next.js production build passed.
+- [Jarvis Live Runtime run 41686895792](https://github.com/kingsmenportal-ctrl/kingsmen-platform/actions/runs/41686895792) **passed**.
+- [Main branch-protection evidence run 41686895894](https://github.com/kingsmenportal-ctrl/kingsmen-platform/actions/runs/41686895894) **failed** with the protection endpoint returning HTTP 404. Protection configuration remains unverified.
+- PR #316 is now closed as superseded without merging. PR #317 remains open and requests independent review from `ndabenhlemvelo-arch`.
+- Netlify inspection after the build still returned only a branch-version/permalink-shaped URL without a source SHA or deploy ID. The connected deploy-detail operation returned 404 for that surfaced short identifier, and independent HTTP verification was blocked by the current environment's DNS/network resolution. No current-head deployment or authenticated runtime is asserted.
+
+The latest known **build status is green; deployed status is unverified**. To finish release verification, Netlify must expose the Deploy Preview status/link or a successful deploy detail that names the exact PR #317 commit. The expected standard preview URL format is `https://deploy-preview-317--kingsmen-portal-staging.netlify.app`, but that URL remains a hypothesis until Netlify confirms the deploy is ready.
