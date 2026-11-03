@@ -132,7 +132,45 @@ try {
   process.exit(1);
 }
 
-const evaluation = evaluateMainBranchProtection(branchRules, rulesets);
+const branchRulesetIds = [...new Set(
+  (Array.isArray(branchRules) ? branchRules : [])
+    .map((rule) => rule?.ruleset_id)
+    .filter((id) => Number.isInteger(id))
+)];
+const matchingRulesets = (Array.isArray(rulesets) ? rulesets : []).filter((ruleset) =>
+  ruleset?.enforcement === 'active' && branchRulesetIds.includes(ruleset.id)
+);
+const detailedRulesets = [];
+for (const ruleset of matchingRulesets) {
+  let detailResponse;
+  try {
+    detailResponse = await fetch(
+      `${apiUrl}/repos/${repository}/rulesets/${ruleset.id}`,
+      { headers }
+    );
+  } catch {
+    const report = await finish('BLOCKED_GITHUB_API_UNREACHABLE', blockedChecks('GitHub ruleset detail request failed.'));
+    console.log(JSON.stringify(report, null, 2));
+    process.exit(1);
+  }
+  if (!detailResponse.ok) {
+    const status = detailResponse.status === 401 || detailResponse.status === 403
+      ? 'UNVERIFIED_PERMISSION_DENIED'
+      : 'BLOCKED_RULESET_DETAIL_UNAVAILABLE';
+    const report = await finish(status, blockedChecks(`Ruleset ${ruleset.id} was matched to main, but its bypass configuration could not be read.`), detailResponse.status);
+    console.log(JSON.stringify(report, null, 2));
+    process.exit(1);
+  }
+  try {
+    detailedRulesets.push(await detailResponse.json());
+  } catch {
+    const report = await finish('BLOCKED_INVALID_GITHUB_RESPONSE', blockedChecks(`GitHub returned invalid JSON for ruleset ${ruleset.id}.`), detailResponse.status);
+    console.log(JSON.stringify(report, null, 2));
+    process.exit(1);
+  }
+}
+
+const evaluation = evaluateMainBranchProtection(branchRules, detailedRulesets);
 const status = evaluation.passed
   ? 'VERIFIED_REQUIRED_PROTECTION_ACTIVE'
   : evaluation.checks.activeProtectionPresent
