@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import "./public-home.css";
 
 export const metadata: Metadata = {
   title: "Kingsmen Portal | Your opportunity, connected",
