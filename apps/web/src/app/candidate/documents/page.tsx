@@ -110,6 +110,7 @@ async function vaultPost(payload: Record<string, unknown>): Promise<UploadRespon
   });
   const result = await response.json() as UploadResponse;
   if (!response.ok || result.ok === false) {
+    if (payload.action === "finalize-upload" && result.status === "UPLOAD_FAILED") return result;
     throw new Error(result.error || result.code || result.reasonCode || result.message || ("Document request failed (" + response.status + ")."));
   }
   return result;
@@ -172,7 +173,9 @@ export default function CandidateDocumentsPage() {
       setMessage("Upload finalized by the document service. Its recorded checksum and review status are shown below; final verification is performed by an authorised reviewer.");
       await loadVault();
     } catch (e) {
-      setError(e instanceof Error ? e.message : "The upload finalization was not confirmed.");
+      const failure = e instanceof Error ? e.message : "The upload finalization was not confirmed.";
+      if (/SIGNATURE|SIZE|MIME|UPLOAD_FAILED|CONTENT_INVALID/i.test(failure)) setPendingFinalizeId(null);
+      setError(failure);
     } finally {
       setWorking("");
     }
