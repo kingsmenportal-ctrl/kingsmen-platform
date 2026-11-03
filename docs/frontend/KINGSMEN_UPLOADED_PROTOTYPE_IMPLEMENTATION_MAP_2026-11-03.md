@@ -42,3 +42,10 @@ The associated frontend PR integrates the reference journeys into the existing N
 - A PR Deploy Preview should be checked in Netlify/GitHub before describing this commit as deployed. A production publish requires the approved merge and the resulting Netlify deploy to be confirmed against the exact commit.
 
 This document records the source mapping and current boundaries; it is not itself runtime or deployment evidence.
+
+
+## Latest visual integration update
+
+The responsive public homepage markup and scoped navy/gold styles from the companion preview branch have now been integrated into this product branch. The integrated candidate workbench, plan catalogue, authentication entry points, intake API boundary and document preflight remain the source of functional route behavior. This update does not turn the payment receipt or staff-review mockup into production features.
+
+Netlify Deploy Preview entry path: `/` (requested via the pull request description). The preview must still be checked against the exact current PR head before any deployment claim.
