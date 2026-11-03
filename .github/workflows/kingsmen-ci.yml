@@ -116,7 +116,7 @@ jobs:
             ["/candidate/profile/", "Your profile"],
             ["/candidate/saved-opportunities/", "Saved opportunities"],
             ["/candidate/opportunity-matches/", "Opportunity matches"],
-            ["/auth/callback/", "Confirming your account."],
+            ["/auth/callback/", "Confirming your Kingsmen sign-in"],
             ["/free-destiny-map/", "Free first map"],
             ["/candidate/finance/", "Foundational Accord"],
             ["/preview/payment-confirmed/", "No payment has been made"],
