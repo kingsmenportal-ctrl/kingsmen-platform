@@ -5,7 +5,7 @@ on:
   pull_request:
     branches: [main]
   push:
-    branches: [main]
+    branches: [main, feat/kingsmen-frontend-implementation-2026-11-03]
   workflow_dispatch:
 
 permissions:
@@ -47,3 +47,52 @@ jobs:
 
       - name: Build web application
         run: npm run build --prefix apps/web
+
+  # Staging-only draft deploy from the consolidated frontend branch after CI passes.
+  # Deliberately uses netlify deploy without --prod, so it cannot publish the primary site URL.
+  deploy-staging-draft:
+    name: staging-draft-deploy
+    needs: build-test
+    if: github.event_name == 'push' && github.ref == 'refs/heads/feat/kingsmen-frontend-implementation-2026-11-03'
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    env:
+      NETLIFY_AUTH_TOKEN: ${{ secrets.NETLIFY_AUTH_TOKEN }}
+      NETLIFY_SITE_ID: fb27d0db-b116-4890-8f7f-14e654c27dbc
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+      - name: Check deploy credential exists (without printing it)
+        shell: bash
+        run: |
+          if [[ -z "$NETLIFY_AUTH_TOKEN" ]]; then
+            echo "::error::GitHub Actions secret NETLIFY_AUTH_TOKEN is missing. No Netlify deployment was attempted."
+            exit 1
+          fi
+      - name: Install build dependencies
+        run: |
+          npm ci
+          npm install --prefix apps/web --no-audit --no-fund
+      - name: Build using Netlify deploy-preview context
+        run: npx --yes netlify-cli@latest build --context deploy-preview
+      - name: Upload a draft staging deploy (never production)
+        run: npx --yes netlify-cli@latest deploy --message="Kingsmen frontend PR #317 staging draft $GITHUB_SHA" --json > "$RUNNER_TEMP/netlify-deploy.json"
+      - name: Record draft URL and deployment identifier
+        shell: bash
+        run: |
+          node -e '
+            const fs = require("node:fs");
+            const raw = JSON.parse(fs.readFileSync(process.env.RUNNER_TEMP + "/netlify-deploy.json", "utf8"));
+            const url = raw.deploy_ssl_url || raw.deploy_url || raw.url || raw.permalink;
+            const id = raw.deploy_id || raw.id || "not returned";
+            if (!url || !String(url).startsWith("http")) { console.error("Netlify CLI returned no preview URL. Response keys:", Object.keys(raw || {})); process.exit(1); }
+            const lines = ["## Kingsmen staging draft deployment", "", "- Context: draft deploy; `--prod` was not used.", "- Source commit: `" + process.env.GITHUB_SHA + "`", "- Preview URL: " + url, "- Deploy ID: `" + id + "`", "- Profile persistence, secure uploads, PayFast settlement and provider submissions remain separate verification work."];
+            fs.appendFileSync(process.env.GITHUB_STEP_SUMMARY, lines.join("\n") + "\n");
+            console.log("Netlify draft URL: " + url);
+            console.log("Netlify deploy ID: " + id);
+          '
