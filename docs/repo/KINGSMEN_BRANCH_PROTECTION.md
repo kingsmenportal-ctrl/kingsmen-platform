@@ -20,6 +20,7 @@ Kingsmen may not launch from an unprotected `main` branch.
 - required status checks enabled;
 - strict status checks enabled;
 - `source-guard` required;
+- `Build, validate, and smoke-test` required (repository tests, API/web builds, launch audit and runtime smoke tests);
 - admins included;
 - linear history required where available.
 
@@ -47,6 +48,12 @@ npm run kingsmen:launch:audit
 
 It does **not** run `npm run kingsmen:launch:gate` because the public launch gate is intentionally blocked until real staging evidence exists. The source guard protects merges; the launch gate protects public release.
 
+## Continuous evidence capture
+
+The read-only evidence workflow at `.github/workflows/kingsmen-branch-protection-evidence.yml` runs for pull requests targeting `main`, pushes to `main`, and manual dispatch. It queries the real GitHub branch-protection endpoint, records a redacted report, and uploads that report even when the protection check blocks.
+
+A missing or inaccessible protection endpoint must remain a failed/blocked result. The workflow uses a dedicated repository secret named `KINGSMEN_BRANCH_PROTECTION_READ_TOKEN`, not `GITHUB_TOKEN`, because GitHub's Get branch protection endpoint requires the repository Administration read permission for fine-grained tokens. Configure that secret with repository-only access and Administration: read; do not grant write. If the secret is absent, the workflow records a blocked result. This workflow does not apply protection and cannot replace the one-time administrator action below. A green source-level check proves only that the verifier is implemented; it does not prove that GitHub settings are active.
+
 ## Apply command
 
 Run from repo root after authenticating `gh` with admin access:
@@ -72,4 +79,4 @@ These commands prove that the branch-protection source boundary exists. They do 
 
 ## Launch status
 
-Public launch remains blocked until GitHub confirms branch protection is active and required source guard checks are passing.
+Public launch remains blocked until GitHub confirms branch protection is active and both `source-guard` and `Build, validate, and smoke-test` are passing.

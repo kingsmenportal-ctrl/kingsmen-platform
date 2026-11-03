@@ -20,10 +20,13 @@ function exists(path) {
 
 const requiredTokens = new Map([
   ['package.json', ['repo:prove:branch-protection', 'repo:validate:branch-protection']],
-  ['manifests/repo/main-branch-protection-v1.json', ['main-branch-protection-v1', 'foundation_built_pending_github_apply', 'source-guard', 'preventForcePush']],
+  ['manifests/repo/main-branch-protection-v1.json', ['main-branch-protection-v1', 'foundation_built_pending_github_apply', 'source-guard', 'Build, validate, and smoke-test', 'preventForcePush']],
   ['docs/repo/KINGSMEN_BRANCH_PROTECTION.md', ['source-guard', 'force push blocked', 'npm run repo:validate:branch-protection']],
   ['.github/workflows/kingsmen-source-guard.yml', ['name: Kingsmen Source Guard', 'source-guard', 'npm run backup:validate:restore', 'npm run kingsmen:launch:audit']],
-  ['scripts/github/Set-KingsmenMainBranchProtection.ps1', ['gh api', 'allow_force_pushes = $false', 'allow_deletions = $false', 'MAIN_BRANCH_PROTECTION_APPLIED']],
+  ['scripts/github/Set-KingsmenMainBranchProtection.ps1', ['gh api', 'allow_force_pushes = $false', 'allow_deletions = $false', 'MAIN_BRANCH_PROTECTION_APPLIED', 'required_status_checks.strict', 'dismiss_stale_reviews', 'required_conversation_resolution.enabled', 'required_linear_history.enabled', 'enforce_admins.enabled', 'required_approving_review_count', 'Build, validate, and smoke-test']],
+  ['scripts/ci/main-branch-protection-policy.mjs', ['sourceGuardRequired', 'releaseEvidenceRequired', 'strictStatusChecksEnabled']],
+  ['scripts/ci/test-main-branch-protection-policy.mjs', ['release_evidence_check', 'MAIN_BRANCH_PROTECTION_POLICY_TESTS_PASSED']],
+  ['.github/workflows/kingsmen-release-evidence.yml', ['name: Kingsmen Release Evidence', 'name: Build, validate, and smoke-test']],
   ['scripts/proof/prove-main-branch-protection-boundary.mjs', ['MAIN_BRANCH_PROTECTION_SOURCE_PROOF_PASSED', 'githubProtectionApplied: false']],
   ['manifests/launch/kingsmen-launch-readiness-v1.json', ['repo_protection', 'main-branch-protection-v1', 'foundation_built_pending_github_apply']],
   ['scripts/validators/validate-kingsmen-launch-readiness.mjs', ['repo:validate:branch-protection', 'MAIN_BRANCH_PROTECTION_APPLY_REQUIRED']]
@@ -54,7 +57,7 @@ if (exists('manifests/repo/main-branch-protection-v1.json')) {
   check('manifest_production_ready_false', manifest.productionReady === false, String(manifest.productionReady), 'manifests/repo/main-branch-protection-v1.json');
   check('manifest_public_launch_false', manifest.publicLaunchAllowed === false, String(manifest.publicLaunchAllowed), 'manifests/repo/main-branch-protection-v1.json');
   check('manifest_requires_status_checks', manifest.requiredProtections?.requiresStatusChecks === true, String(manifest.requiredProtections?.requiresStatusChecks), 'manifests/repo/main-branch-protection-v1.json');
-  check('manifest_requires_source_guard', manifest.requiredProtections?.requiredStatusCheckContexts?.includes('source-guard') === true, JSON.stringify(manifest.requiredProtections?.requiredStatusCheckContexts), 'manifests/repo/main-branch-protection-v1.json');
+  check('manifest_requires_source_guard_and_release_evidence', manifest.requiredProtections?.requiredStatusCheckContexts?.includes('source-guard') === true && manifest.requiredProtections?.requiredStatusCheckContexts?.includes('Build, validate, and smoke-test') === true, JSON.stringify(manifest.requiredProtections?.requiredStatusCheckContexts), 'manifests/repo/main-branch-protection-v1.json');
   check('manifest_prevents_force_push', manifest.requiredProtections?.preventForcePush === true, String(manifest.requiredProtections?.preventForcePush), 'manifests/repo/main-branch-protection-v1.json');
   check('manifest_prevents_delete', manifest.requiredProtections?.preventDeletion === true, String(manifest.requiredProtections?.preventDeletion), 'manifests/repo/main-branch-protection-v1.json');
 }

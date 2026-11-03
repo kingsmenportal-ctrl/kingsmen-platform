@@ -2,6 +2,7 @@
 import { createHash } from 'node:crypto';
 import { mkdir, writeFile } from 'node:fs/promises';
 import { dirname } from 'node:path';
+import { evaluateMainBranchProtection } from './main-branch-protection-policy.mjs';
 
 const repository = process.env.GITHUB_REPOSITORY;
 const token = process.env.GITHUB_TOKEN;
@@ -30,23 +31,44 @@ async function finish(status, checks, httpStatus = null) {
   await awaitWrite(report);
   return report;
 }
+
 async function awaitWrite(report) {
   await mkdir(dirname(outputPath), { recursive: true });
   await writeFile(outputPath, JSON.stringify(report, null, 2) + '\n', 'utf8');
 }
+
 function blockedChecks(reason) {
   return {
+    requiredStatusChecksEnabled: false,
     sourceGuardRequired: false,
+    releaseEvidenceRequired: false,
+    strictStatusChecksEnabled: false,
     pullRequestReviewRequired: false,
+    staleReviewsDismissed: false,
+    conversationResolutionRequired: false,
+    linearHistoryRequired: false,
     adminEnforcementEnabled: false,
     forcePushDisabled: false,
     branchDeletionDisabled: false,
+    requiredApprovingReviewCount: 0,
     failure: reason
   };
 }
 
-if (!repository || !token) {
-  const report = await finish('BLOCKED_MISSING_GITHUB_CONTEXT', blockedChecks('Missing repository or token context.'));
+if (!repository) {
+  const report = await finish(
+    'BLOCKED_MISSING_GITHUB_CONTEXT',
+    blockedChecks('Missing GITHUB_REPOSITORY context.')
+  );
+  console.log(JSON.stringify(report, null, 2));
+  process.exit(1);
+}
+
+if (!token) {
+  const report = await finish(
+    'BLOCKED_MISSING_READ_TOKEN',
+    blockedChecks('Missing repository secret KINGSMEN_BRANCH_PROTECTION_READ_TOKEN. Configure a fine-grained token with repository Administration: read permission.')
+  );
   console.log(JSON.stringify(report, null, 2));
   process.exit(1);
 }
@@ -67,7 +89,7 @@ try {
 }
 
 if (!response.ok) {
-  const status = response.status === 403 ? 'UNVERIFIED_PERMISSION_DENIED'
+  const status = response.status === 401 || response.status === 403 ? 'UNVERIFIED_PERMISSION_DENIED'
     : response.status === 404 ? 'BLOCKED_PROTECTION_NOT_FOUND_OR_NOT_VISIBLE'
     : 'BLOCKED_GITHUB_API_ERROR';
   const report = await finish(status, blockedChecks('Branch protection could not be verified; inspect workflow permissions and repository settings.'), response.status);
@@ -76,23 +98,11 @@ if (!response.ok) {
 }
 
 const protection = await response.json();
-const requiredChecks = protection.required_status_checks?.contexts ?? [];
-const requiredCheckNames = protection.required_status_checks?.checks?.map((check) => check.context) ?? [];
-const sourceGuardRequired = [...new Set([...requiredChecks, ...requiredCheckNames])].some((name) => name === 'source-guard' || name.endsWith('/source-guard'));
-const reviewCount = protection.required_pull_request_reviews?.required_approving_review_count ?? 0;
-const pullRequestReviewRequired = reviewCount >= 1;
-const adminEnforcementEnabled = protection.enforce_admins?.enabled === true;
-const forcePushDisabled = protection.allow_force_pushes?.enabled === false;
-const branchDeletionDisabled = protection.allow_deletions?.enabled === false;
-const checks = {
-  sourceGuardRequired,
-  pullRequestReviewRequired,
-  requiredApprovingReviewCount: reviewCount,
-  adminEnforcementEnabled,
-  forcePushDisabled,
-  branchDeletionDisabled
-};
-const passed = Object.values(checks).every((value) => typeof value === 'boolean' ? value : true);
-const report = await finish(passed ? 'VERIFIED_REQUIRED_PROTECTION_ACTIVE' : 'BLOCKED_PROTECTION_INCOMPLETE', checks, response.status);
+const evaluation = evaluateMainBranchProtection(protection);
+const report = await finish(
+  evaluation.passed ? 'VERIFIED_REQUIRED_PROTECTION_ACTIVE' : 'BLOCKED_PROTECTION_INCOMPLETE',
+  evaluation.checks,
+  response.status
+);
 console.log(JSON.stringify(report, null, 2));
-if (!passed) process.exitCode = 1;
+if (!evaluation.passed) process.exitCode = 1;
