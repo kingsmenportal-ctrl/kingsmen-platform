@@ -3,9 +3,13 @@
 A responsive, dependency-free static frontend built from the Kingsmen Frontend Prototype design overview.
 
 ## Included
-- Public landing page and six pathway cards.
-- Package overview using the current Kingsmen pricing/capacity contract.
-- Destiny Map preview intake with client-side-only feedback.
+- Public homepage and six pathway cards.
+- Dedicated package comparison and Destiny Map pages.
+- Candidate dashboard with example application timeline and next steps.
+- Document verification screen with local-only file selection validation and explicit upload boundary.
+- Payment receipt layout clearly labelled as a non-transaction example.
+- Staff document-review queue with filter and demo-only state changes; no real approvals.
+- Shared responsive candidate/staff layouts and local-only preview interactions.
 - Responsive mobile navigation, accessible labels, focus states and reduced-motion support.
 - Navy/gold visual tokens and South African context.
 
