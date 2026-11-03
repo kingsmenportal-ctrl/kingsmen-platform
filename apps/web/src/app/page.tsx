@@ -1,10 +1,10 @@
 const pathways = [
-  { n: "01", title: "Higher education", detail: "Universities, Universities of Technology, CAO programme choices and application preparation.", tags: "UNIVERSITIES · UoTs · CAO" },
-  { n: "02", title: "TVET & college routes", detail: "TVET colleges, NC(V), NATED / Report 191 and accredited private-college pathways.", tags: "TVET · NC(V) · NATED" },
-  { n: "03", title: "Learnerships & SETAs", detail: "Skills programmes, learnerships and training opportunities with source and deadline checks.", tags: "SETA · QCTO · SKILLS" },
-  { n: "04", title: "Internships & apprenticeships", detail: "Work exposure, workplace learning, apprenticeships and WIL opportunities.", tags: "WIL · EXPERIENCE" },
-  { n: "05", title: "Employment", detail: "Vacancy discovery and application preparation for entry-level and experienced candidates.", tags: "CAREERS · VACANCIES" },
-  { n: "06", title: "Funding & support", detail: "Bursaries, sponsorships, NSFAS guidance and related accommodation or transport needs.", tags: "NSFAS · BURSARIES · SUPPORT" },
+  { n: "01", title: "Higher Education", detail: "Universities, Universities of Technology, CAO programme choices and application preparation.", tags: "UNIVERSITIES · UoTs · CAO" },
+  { n: "02", title: "TVET", detail: "TVET college routes, NC(V), NATED / Report 191 and eligible accredited college programmes.", tags: "TVET · NC(V) · NATED" },
+  { n: "03", title: "SETA programmes & learnerships", detail: "Skills programmes and learnership opportunities with source, eligibility and deadline checks.", tags: "SETA · QCTO · SKILLS" },
+  { n: "04", title: "Internships", detail: "Work-integrated learning, internships and structured workplace experience opportunities.", tags: "WIL · EXPERIENCE" },
+  { n: "05", title: "Apprenticeships", detail: "Trade training and artisan pathways, with requirements checked against official provider sources.", tags: "TRADES · ARTISAN · TRAINING" },
+  { n: "06", title: "Employment", detail: "Vacancy discovery and application preparation for entry-level and experienced candidates.", tags: "CAREERS · VACANCIES" },
 ];
 
 const steps = [
@@ -70,7 +70,7 @@ export default function HomePage() {
         </nav>
         <section id="top" className="km-hero">
           <div className="km-hero-grid">
-            <div><div className="km-eyebrow">South Africa · Education · Skills · Work</div><h1>Your future is bigger than <span className="km-gold">one application.</span></h1><p className="km-lead">One connected starting point for exploring study, skills development, work and funding pathways—with preparation and evidence at the centre of every step.</p><div className="km-cta"><a className="km-btn km-primary" href="/free-destiny-map/">Explore my pathways <span aria-hidden="true">↗</span></a><a className="km-btn km-secondary" href="#pathways">Discover the possibilities</a></div><p className="km-note">Built for the South African journey. Opportunity information must be checked against authoritative sources; no application outcome is promised.</p></div>
+            <div><div className="km-eyebrow">South Africa · Education · Skills · Work</div><h1>Your future is bigger than <span className="km-gold">one application.</span></h1><p className="km-lead">One connected starting point for exploring study, skills development, work and funding pathways—with preparation and evidence at the centre of every step.</p><div className="km-cta"><a className="km-btn km-primary" href="/free-destiny-map/">Explore my pathways <span aria-hidden="true">↗</span></a><a className="km-btn km-secondary" href="/candidate/dashboard">Open candidate portal ↗</a></div><p className="km-note">Built for the South African journey. Opportunity information must be checked against authoritative sources; no application outcome is promised.</p></div>
             <aside className="km-feature" aria-label="Opportunity pathways overview"><div className="km-feature-top"><div><div className="km-mini-label">THE KINGSMEN ROUTE MAP</div><strong style={{display:"block",fontSize:20,marginTop:8}}>Six pathways. One journey.</strong></div><span className="km-status">CANDIDATE FIRST</span></div>{pathways.map(p=><div className="km-route" key={p.n}><span className="km-route-num">{p.n}</span><div><strong>{p.title}</strong><p>{p.tags}</p></div></div>)}</aside>
           </div>
         </section>
