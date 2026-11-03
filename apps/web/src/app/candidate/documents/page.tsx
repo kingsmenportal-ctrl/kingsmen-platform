@@ -1,5 +1,6 @@
 import Link from "next/link";
 import CandidateDocumentSelectionDemo from "@/components/preview/candidate-document-selection-demo";
+import { DocumentPreflightPanel } from "@/components/candidate/DocumentPreflightPanel";
 
 const requirements = [
   { title: "Identity document", description: "Prepare a clear, readable document when the route requires it." },
@@ -21,7 +22,8 @@ export default function CandidateDocumentsPage() {
         <div className="candidate-doc-layout"><section className="candidate-doc-panel"><div className="candidate-subheading"><h2>Documents to prepare</h2><p>Production file policy target: PDF, JPEG or PNG, up to 10 MiB per file.</p></div>
           {requirements.map((doc, index) => <article className="candidate-doc-row" key={doc.title}><span className="candidate-doc-file">{index === 2 ? "IMG" : "PDF"}</span><div><h3>{doc.title}</h3><p>{doc.description}</p></div><span className="candidate-doc-status">Not submitted</span></article>)}
           <CandidateDocumentSelectionDemo />
-          <p className="candidate-doc-callout">Production upload, SHA-256 integrity checks, private storage, expiring access links and reviewer audit events are not connected to this screen.</p>
+          <div className="mt-6"><DocumentPreflightPanel /></div>
+          <p className="candidate-doc-callout">The SHA-256 digest above is computed locally in the browser. Production upload, private storage, expiring access links and reviewer audit events remain disconnected.</p>
         </section>
         <aside className="candidate-doc-panel candidate-doc-sidebar"><span className="candidate-doc-shield" aria-hidden="true">✓</span><h2>Privacy and review boundaries</h2><p>Documents must remain private. OCR can assist review but does not make final decisions; a human reviewer must handle decisions that need verification or correction.</p><div className="candidate-doc-rule"><span>Storage</span><strong>Private only</strong></div><div className="candidate-doc-rule"><span>Review</span><strong>Human-controlled</strong></div><div className="candidate-doc-rule"><span>Evidence</span><strong>Required</strong></div><Link className="public-button public-button-outline" href="/candidate/dashboard/">Back to candidate dashboard</Link></aside></div>
       </div>
