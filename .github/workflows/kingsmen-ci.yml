@@ -12,7 +12,7 @@ permissions:
   contents: read
 
 concurrency:
-  group: kingsmen-ci-${{ github.workflow }}-${{ github.ref }}
+  group: ${{ contains(github.event.head_commit.message || '', '[staging-deploy]') && format('kingsmen-stage-{0}', github.run_id) || format('kingsmen-ci-{0}-{1}', github.workflow, github.ref) }}
   cancel-in-progress: true
 
 jobs:
@@ -53,7 +53,7 @@ jobs:
   deploy-staging-draft:
     name: staging-draft-deploy
     needs: build-test
-    if: github.event_name == 'push' && github.ref == 'refs/heads/feat/kingsmen-frontend-implementation-2026-11-03'
+    if: github.event_name == 'push' && github.ref == 'refs/heads/feat/kingsmen-frontend-implementation-2026-11-03' && contains(github.event.head_commit.message, '[staging-deploy]')
     runs-on: ubuntu-latest
     timeout-minutes: 20
     env:
@@ -82,17 +82,66 @@ jobs:
         run: npx --yes netlify-cli@latest build --context deploy-preview
       - name: Upload a draft staging deploy (never production)
         run: npx --yes netlify-cli@latest deploy --message="Kingsmen frontend PR #317 staging draft $GITHUB_SHA" --json > "$RUNNER_TEMP/netlify-deploy.json"
-      - name: Record draft URL and deployment identifier
+      - name: Record draft URL and smoke-test the deployed routes
         shell: bash
         run: |
-          node -e '
-            const fs = require("node:fs");
-            const raw = JSON.parse(fs.readFileSync(process.env.RUNNER_TEMP + "/netlify-deploy.json", "utf8"));
-            const url = raw.deploy_ssl_url || raw.deploy_url || raw.url || raw.permalink;
-            const id = raw.deploy_id || raw.id || "not returned";
-            if (!url || !String(url).startsWith("http")) { console.error("Netlify CLI returned no preview URL. Response keys:", Object.keys(raw || {})); process.exit(1); }
-            const lines = ["## Kingsmen staging draft deployment", "", "- Context: draft deploy; `--prod` was not used.", "- Source commit: `" + process.env.GITHUB_SHA + "`", "- Preview URL: " + url, "- Deploy ID: `" + id + "`", "- Profile persistence, secure uploads, PayFast settlement and provider submissions remain separate verification work."];
-            fs.appendFileSync(process.env.GITHUB_STEP_SUMMARY, lines.join("\n") + "\n");
+          node <<'NODE'
+          const fs = require("node:fs");
+          const raw = JSON.parse(fs.readFileSync(process.env.RUNNER_TEMP + "/netlify-deploy.json", "utf8"));
+          let url = raw.deploy_ssl_url || raw.deploy_url || raw.url || raw.permalink || "";
+          if (!url) {
+            const queue = [raw];
+            const seen = new Set();
+            while (queue.length && !url) {
+              const item = queue.shift();
+              if (!item || typeof item !== "object" || seen.has(item)) continue;
+              seen.add(item);
+              for (const key of ["deploy_ssl_url", "deploy_url", "url", "permalink"]) {
+                if (typeof item[key] === "string" && item[key].startsWith("http")) { url = item[key]; break; }
+              }
+              for (const value of Object.values(item)) if (value && typeof value === "object") queue.push(value);
+            }
+          }
+          if (!url || !url.startsWith("http")) { console.error("No HTTP preview URL returned by Netlify CLI. Response keys:", Object.keys(raw || {})); process.exit(1); }
+          const deployId = raw.deploy_id || raw.id || "not returned";
+          const base = url.replace(/\\/+$/, "");
+          const routes = [
+            ["/", "Kingsmen Portal"],
+            ["/packages/", "Foundational Accord"],
+            ["/candidate/dashboard/", "All six pathways"],
+            ["/candidate/login/", "Welcome back"],
+            ["/auth/register/", "Create account"],
+            ["/candidate/workbench/?plan=foundational_accord", "Foundational Accord"],
+            ["/candidate/documents/", "Document Vault"],
+            ["/free-destiny-map/", "Free first map"],
+            ["/candidate/finance/", "Foundational Accord"],
+            ["/preview/payment-confirmed/", "No payment has been made"],
+            ["/preview/staff-review/", "Synthetic examples only"]
+          ];
+          (async () => {
+            const failures = [];
+            for (const [path, expected] of routes) {
+              try {
+                const response = await fetch(base + path, { redirect: "follow", signal: AbortSignal.timeout(20000) });
+                const html = await response.text();
+                if (!response.ok) throw new Error("HTTP " + response.status);
+                if (!html.toLowerCase().includes(expected.toLowerCase())) throw new Error("Expected page marker missing: " + expected);
+                console.log("PASS " + path + " (HTTP " + response.status + ")");
+              } catch (error) { failures.push(path + ": " + (error instanceof Error ? error.message : String(error))); console.error("FAIL " + path + ": " + (error instanceof Error ? error.message : String(error))); }
+            }
+            const lines = [
+              "## Kingsmen staging draft deployment and runtime smoke test",
+              "",
+              "- Context: draft deploy; `--prod` was not used.",
+              "- Source commit: `" + process.env.GITHUB_SHA + "`",
+              "- Preview URL: " + url,
+              "- Deploy ID: `" + deployId + "`",
+              "- Public route smoke tests: " + (routes.length - failures.length) + "/" + routes.length + " passed.",
+              "- Authenticated data persistence, private file upload, payment settlement and provider receipt remain separate backend verification items."
+            ];
+            fs.appendFileSync(process.env.GITHUB_STEP_SUMMARY, lines.join("\\n") + "\\n");
             console.log("Netlify draft URL: " + url);
-            console.log("Netlify deploy ID: " + id);
-          '
+            console.log("Netlify deploy ID: " + deployId);
+            if (failures.length) process.exit(1);
+          })().catch((error) => { console.error(error); process.exit(1); });
+          NODE
