@@ -14,6 +14,8 @@ const required = [
   'read_only_effective_branch_rules_verification',
   '/rules/branches/',
   '/rulesets?includes_parents=true',
+  '/rulesets/${ruleset.id}',
+  'BLOCKED_RULESET_DETAIL_UNAVAILABLE',
   'evaluateMainBranchProtection',
   'activeRulesPresent',
   'activeRulesetPresent',
