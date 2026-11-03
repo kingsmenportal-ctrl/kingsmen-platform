@@ -11,6 +11,16 @@ const PATHWAYS = [
   ["EMPLOYMENT", "Employment"]
 ] as const;
 
+const AMBIGUOUS_SECTORS = new Set(["BURSARY", "NSFAS", "ACCOMMODATION", "PRIVATE_COLLEGE"]);
+const PATHWAY_API_CODES: Record<string, string> = {
+  HIGHER_EDUCATION: "HIGHER_EDUCATION",
+  TVET: "TVET",
+  SETA_LEARNERSHIPS: "SETA_LEARNERSHIP",
+  INTERNSHIPS: "INTERNSHIP",
+  APPRENTICESHIPS: "APPRENTICESHIP",
+  EMPLOYMENT: "EMPLOYMENT"
+};
+
 type Opportunity = {
   match_ref: string;
   title: string;
@@ -52,6 +62,7 @@ export default function CandidateOpportunityMatchesPage() {
   const [error, setError] = useState("");
   const [savingMatchRef, setSavingMatchRef] = useState<string | null>(null);
   const [saveResults, setSaveResults] = useState<Record<string, { ok: boolean; message: string }>>({});
+  const [selectedPathways, setSelectedPathways] = useState<Record<string, string>>({});
 
   async function loadMatches() {
     setLoading(true);
@@ -91,13 +102,23 @@ export default function CandidateOpportunityMatchesPage() {
       setSaveResults((current) => ({ ...current, [item.match_ref]: { ok: false, message: "Sign in again before saving an opportunity." } }));
       return;
     }
+    const requiresPathwayChoice = AMBIGUOUS_SECTORS.has(item.sector);
+    const selectedPathway = selectedPathways[item.match_ref] || (item.pathways.length === 1 ? item.pathways[0] : "");
+    if (requiresPathwayChoice && (!selectedPathway || !item.pathways.includes(selectedPathway) || !PATHWAY_API_CODES[selectedPathway])) {
+      setSaveResults((current) => ({ ...current, [item.match_ref]: { ok: false, message: "Choose the pathway this bursary, accommodation or college route should support before saving." } }));
+      return;
+    }
     setSavingMatchRef(item.match_ref);
     setSaveResults((current) => { const next = { ...current }; delete next[item.match_ref]; return next; });
     try {
       const response = await fetch(`${auth.url}/functions/v1/candidate-save-verified-opportunity`, {
         method: "POST",
         headers: { apikey: auth.anonKey, Authorization: `Bearer ${auth.token}`, "Content-Type": "application/json" },
-        body: JSON.stringify({ action: "save", match_ref: item.match_ref }),
+        body: JSON.stringify({
+          action: "save",
+          match_ref: item.match_ref,
+          ...(requiresPathwayChoice ? { pathway_type: PATHWAY_API_CODES[selectedPathway] } : {})
+        }),
         cache: "no-store"
       });
       let body: { ok?: boolean; code?: string; error?: string; message?: string; trackerLinked?: boolean; application?: unknown } = {};
@@ -175,6 +196,24 @@ export default function CandidateOpportunityMatchesPage() {
                     <div><dt className="inline font-semibold text-slate-800">Deadline: </dt><dd className="inline text-slate-600">{item.deadline.closes_at ? new Date(item.deadline.closes_at).toLocaleString() : item.deadline.message || "Not verified — check the official page."}</dd></div>
                     <div><dt className="inline font-semibold text-slate-800">Eligibility review: </dt><dd className="inline text-slate-600">{item.eligibility.status} — {item.eligibility.rules}</dd></div>
                   </dl>
+                  {AMBIGUOUS_SECTORS.has(item.sector) ? (
+                    <label className="mt-4 block text-sm font-semibold text-slate-800">
+                      Choose the pathway this support should be linked to
+                      <select
+                        value={selectedPathways[item.match_ref] ?? (item.pathways.length === 1 ? item.pathways[0] : "")}
+                        onChange={(event) => {
+                          setSelectedPathways((current) => ({ ...current, [item.match_ref]: event.target.value }));
+                          setSaveResults((current) => { const next = { ...current }; delete next[item.match_ref]; return next; });
+                        }}
+                        className="mt-2 w-full rounded-xl border border-slate-300 bg-white px-3 py-2.5 text-sm"
+                      >
+                        <option value="">Choose a pathway</option>
+                        {item.pathways.map((value) => (
+                          <option key={value} value={value}>{PATHWAYS.find((entry) => entry[0] === value)?.[1] ?? value}</option>
+                        ))}
+                      </select>
+                    </label>
+                  ) : null}
                   <div className="mt-5 flex flex-wrap gap-3">
                     <a href={item.official_link} target="_blank" rel="noopener noreferrer"
                       className="inline-flex rounded-xl bg-slate-950 px-4 py-3 text-sm font-bold text-white">Open official opportunity ↗</a>
