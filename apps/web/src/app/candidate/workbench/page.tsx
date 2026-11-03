@@ -1,7 +1,7 @@
 const gates = [
   ["higher_education", "Higher Education"],
   ["tvet", "TVET"],
-  ["seta_learnership", "SETA / Learnership"],
+  ["seta_learnership", "SETA programmes & learnerships"],
   ["internship", "Internship"],
   ["apprenticeship", "Apprenticeship"],
   ["employment", "Employment"]
