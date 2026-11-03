@@ -125,7 +125,7 @@ export default function CandidateDashboardPage() {
         <aside className="mt-9 rounded-2xl border border-amber-200 bg-amber-50 p-5 sm:p-6" aria-labelledby="status-boundary-heading">
           <p className="text-xs font-extrabold uppercase tracking-[0.16em] text-amber-800">Status integrity</p>
           <h2 id="status-boundary-heading" className="mt-2 text-lg font-bold text-slate-950">Your progress should be based on evidence.</h2>
-          <p className="mt-2 text-sm leading-6 text-slate-700">This dashboard is a navigation workspace. It does not itself prove that a profile has been saved, a programme is open, a provider has received an application, a payment has settled, or a document has been verified. Those states require authenticated backend records and appropriate provider or payment evidence. No admission, funding, placement or employment outcome is guaranteed.</p>
+          <p className="mt-2 text-sm leading-6 text-slate-700">This dashboard is a navigation workspace. It does not itself prove that a profile has been saved, a programme is open, a provider has received an application, a payment has settled, or a document has been verified. Those states require authenticated backend records and appropriate provider or payment evidence. The dashboard does not claim that a profile has been saved. No admission, funding, placement, employment, or success is guaranteed.</p>
         </aside>
 
         <footer className="mt-8 flex flex-col gap-2 border-t border-slate-200 py-5 text-xs leading-5 text-slate-500 sm:flex-row sm:justify-between"><span>© Kingsmen Portal · South Africa</span><span>Private candidate information should only be handled through authenticated routes.</span></footer>
