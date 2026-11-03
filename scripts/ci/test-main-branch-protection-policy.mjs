@@ -86,6 +86,7 @@ const completeEffective = evaluateMainBranchProtection(completeRules, completeRu
 assert.equal(completeEffective.passed, true, 'complete effective ruleset configuration should pass');
 assert.equal(completeEffective.checks.requiredDeploymentEnvironments.length, 4);
 assert.equal(completeEffective.checks.unrestrictedBypassActorCount, 0);
+assert.equal(completeEffective.checks.bypassActorsVisible, true);
 
 const currentMainRules = [
   'deletion', 'creation', 'update', 'required_deployments', 'pull_request', 'required_status_checks'
@@ -114,6 +115,11 @@ assert.equal(current.checks.requiredDeploymentEnvironments.length, 4, 'current r
 assert.equal(current.checks.requiredStatusChecksEnabled, false, 'empty required status checks must be reported accurately');
 assert.equal(current.checks.pullRequestReviewRequired, false, 'zero required approvals must be reported accurately');
 assert.equal(current.checks.adminEnforcementEnabled, false, 'always-bypass actors must be reported accurately');
+assert.equal(current.checks.unrestrictedBypassActorCount, 1);
+const hiddenBypass = evaluateMainBranchProtection(completeRules, [{ id: 26323884, enforcement: 'active' }]);
+assert.equal(hiddenBypass.checks.bypassActorsVisible, false, 'redacted bypass metadata must be reported as unknown');
+assert.equal(hiddenBypass.checks.unrestrictedBypassActorCount, null, 'unknown bypass count must never be represented as zero');
+assert.equal(hiddenBypass.checks.adminEnforcementEnabled, false, 'hidden bypass metadata must fail closed');
 assert.equal(current.passed, false, 'active but incomplete ruleset must not be reported as fully protected');
 
 const unavailable = evaluateMainBranchProtection(null);
@@ -124,5 +130,6 @@ console.log(JSON.stringify({
   classicNegativeCases: classicFailures.length,
   effectiveRuleset: completeEffective.passed,
   activeButIncompleteRulesetDetected: !current.passed,
+  hiddenBypassMetadataFailsClosed: !hiddenBypass.passed,
   unavailableResponseBlocked: true
 }, null, 2));
