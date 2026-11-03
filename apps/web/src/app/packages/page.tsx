@@ -7,7 +7,7 @@ const packages = [
   { slug: "regency-mandate", name: "Regency Mandate", tier: "Premium support", priceCents: 46999, applications: 15, capacity: 12, accommodation: "Accommodation support included", description: "High managed-route capacity for a broad application plan.", featured: false },
   { slug: "artisan-charter", name: "Artisan Charter", tier: "Skills & trades", priceCents: 14999, applications: 5, capacity: 3, accommodation: "Accommodation support included", description: "Focused support for technical, vocational and trade routes.", featured: false },
   { slug: "guildmasters-charter", name: "Guildmasters Charter", tier: "Skills & career", priceCents: 19999, applications: 8, capacity: 5, accommodation: "Accommodation support included", description: "Additional priority volume for skills and career routes.", featured: false },
-  { slug: "cv-revamp", name: "CV Revamp", tier: "Standalone service", priceCents: 4999, applications: 0, capacity: 0, accommodation: "No accommodation-route entitlement", description: "A CV and motivation-letter preparation service.", featured: false, cv: true },
+  { slug: "cv-revamp", name: "CV Revamp", tier: "Standalone service", priceCents: 4999, applications: 0, capacity: 0, accommodation: "Accommodation support available; routes verified separately", description: "A CV and motivation-letter preparation service.", featured: false, cv: true },
   { slug: "free-destiny-map", name: "Free Destiny Map", tier: "Free starting point", priceCents: 0, applications: 0, capacity: 0, accommodation: "Explore a route before buying support", description: "Describe your goals and start planning your next move.", featured: false, free: true },
 ] as const;
 
@@ -28,7 +28,7 @@ export default function PackagesPage() {
         <section className="public-package-grid" aria-label="Kingsmen packages">
           {packages.map((item) => {
             const features = "cv" in item && item.cv
-              ? ["15 CV versions + 15 motivation letters", "Target turnaround: 3 business days", "Standalone capacity: 0 managed routes", "+2 route bonus only after verified ownership and eligible upgrade"]
+              ? ["15 CV versions + 15 motivation letters", "Target turnaround: 3 business days", "Standalone capacity: 0 managed routes", "Accommodation support available; routes verified separately", "+2 route bonus only after verified ownership and eligible upgrade"]
               : "free" in item && item.free
                 ? ["Explore all six pathways", "No paid plan required to start planning", "No live application or payment implied"]
                 : [item.applications + " priority applications", item.capacity + " concurrent managed routes / 30-day capacity", item.accommodation];
