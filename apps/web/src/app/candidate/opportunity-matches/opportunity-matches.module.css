@@ -48,3 +48,8 @@
 @media(max-width:720px) { .matchGrid { grid-template-columns:1fr; } .fact { grid-template-columns:92px minmax(0,1fr); } }
 @media(max-width:560px) { .nav { align-items:flex-start; flex-direction:column; } .navLinks { gap:12px; } .shell { width:calc(100% - 24px); } .hero { border-radius:15px; } .summary { align-items:flex-start; flex-direction:column; } .select { display:block; margin:8px 0 0; width:100%; } .cardActions>* { width:100%; } }
 @media (prefers-reduced-motion: reduce) { .page { scroll-behavior: auto !important; } }
+
+
+.savePathwayLabel { display:grid; gap:7px; margin-top:16px; color:#d8c37f; font-size:11px; font-weight:850; line-height:1.5; }
+.savePathwaySelect { width:100%; min-height:40px; border:1px solid #46566c; border-radius:8px; padding:8px 10px; background:#080f1b; color:#f2f0e8; font:inherit; font-size:12px; }
+.savePathwaySelect:focus-visible { outline:2px solid #f2d48a; outline-offset:3px; }
