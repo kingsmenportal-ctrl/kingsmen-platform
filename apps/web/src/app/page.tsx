@@ -19,7 +19,7 @@ const steps = [
 export default function HomePage() {
   return (
     <main className="public-site">
-      <div className="public-notice"><span aria-hidden="true" /> PREVIEW BUILD · Auth UI added; profile persistence, real uploads, provider submissions and checkout remain gated</div>
+      <div className="public-notice"><span aria-hidden="true" /> PREVIEW BUILD · Candidate account creation, real uploads, provider submissions and checkout are not enabled end-to-end; sign-in UI exists, but profile linkage remains unverified</div>
       <header className="public-header">
         <div className="public-container public-header-inner">
           <Link className="public-brand" href="/" aria-label="Kingsmen Portal home">
