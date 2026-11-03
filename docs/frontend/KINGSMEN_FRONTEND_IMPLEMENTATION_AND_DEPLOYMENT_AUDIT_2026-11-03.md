@@ -120,3 +120,26 @@ The latest known **build status is green; deployed status is unverified**. To fi
 An authorised repository administrator must add a **repository Actions secret** named `NETLIFY_AUTH_TOKEN` at https://github.com/kingsmenportal-ctrl/kingsmen-platform/settings/secrets/actions. Its value must be a Netlify personal access token permitted to deploy the existing `kingsmen-portal-staging` site. Do not paste the token into source, the PR body or conversation text. Once configured, re-run the failed staging-draft job in [run 41689074200](https://github.com/kingsmenportal-ctrl/kingsmen-platform/actions/runs/41689074200); that will retry the same tagged source commit, build the deploy-preview context, upload a **draft** (not production), and record the URL/deploy ID only after public-route smoke tests pass.
 
 **Current status:** exact-head tests and production build passed; a staging deploy was attempted as a guarded workflow but stopped at the missing secret before any deploy command ran. Actual deployment and live-route runtime verification remain pending that secret.
+
+
+## Verification update — 2026-11-03 (current PR head)
+
+**Commit reviewed:** `880880f4bfaacbcf2ab416bf9ea4ca20e4697d05`
+
+- [Kingsmen CI — PR run 41689085141](https://github.com/kingsmenportal-ctrl/kingsmen-platform/actions/runs/41689085141) passed. The focused repository tests, API build and Next.js production build completed successfully.
+- [Kingsmen CI — push run 41689074200](https://github.com/kingsmenportal-ctrl/kingsmen-platform/actions/runs/41689074200) passed its test-and-build job.
+- [Jarvis Live Runtime — run 41689084517](https://github.com/kingsmenportal-ctrl/kingsmen-platform/actions/runs/41689084517) passed.
+- The staging draft-deploy job in push run 41689074200 failed at **Check deploy credential exists** because `NETLIFY_AUTH_TOKEN` was empty. Dependency installation, Netlify build and Netlify deploy steps were skipped. No deploy ID or URL was created by this run.
+- The active repository ruleset [main-branch-protection](https://github.com/kingsmenportal-ctrl/kingsmen-platform/rules/26323884) targets only `refs/heads/Main` (uppercase M). GitHub's branch endpoint reports lowercase `main` as `protected: false`. The ruleset therefore does not protect the PR's actual base branch. Correct the target to `refs/heads/main` or apply the intended protection to that branch; this audit did not change settings or bypass controls.
+- PR #317 is still open. The reviewer request for `ndabenhlemvelo-arch` remains pending; no submitted review was returned when this update was prepared.
+- The Netlify project identity is confirmed, but no Netlify commit check, Deploy Preview status, deployment detail or runtime response currently proves a preview for commit `880880f4...`.
+
+### Alternate Deploy Preview attempt
+
+The pull request description contains the Netlify entry-path marker `@netlify /`. Netlify's documentation states that a connected repository with Deploy Previews enabled automatically builds PR previews, and that pushing a new commit refreshes the entry-path preview. This evidence update is being committed as a new PR-branch commit without the custom `[staging-deploy]` marker, so it will not invoke the separate token-gated CLI job. The next check is whether the connected Netlify Git integration creates a Deploy Preview for PR #317. If no Netlify status or deployment record appears, the Git integration / Deploy Previews configuration needs attention in Netlify.
+
+Netlify references:
+- https://docs.netlify.com/deploy/deploy-types/deploy-previews/
+- https://docs.netlify.com/deploy/deploy-overview/
+
+**Release status at this checkpoint:** source build green; Netlify deployment still unverified; PR review pending; lowercase `main` protection misconfigured.
