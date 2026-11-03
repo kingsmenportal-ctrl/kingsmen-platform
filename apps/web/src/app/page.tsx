@@ -2,8 +2,8 @@ import Link from "next/link";
 
 const pathways = [
   { n: "01", title: "Higher Education", detail: "Universities, universities of technology, programme choices and admission routes.", tag: "UNIVERSITIES · UoTs · CAO" },
-  { n: "02", title: "TVET", detail: "Technical, vocational and occupational learning routes for practical skills.", tag: "TVET · NC(V) · NATED" },
-  { n: "03", title: "SETA programmes & learnerships", detail: "Skills programmes, learnerships and workplace-linked training opportunities.", tag: "SETA · QCTO · SKILLS" },
+  { n: "02", title: "TVET", detail: "TVET Colleges and accredited vocational or occupational learning routes for practical skills.", tag: "TVET · NC(V) · NATED" },
+  { n: "03", title: "SETA programmes & learnerships", detail: "SETA programmes, SETAs & Learnerships, skills programmes and workplace-linked training opportunities.", tag: "SETA · QCTO · SKILLS" },
   { n: "04", title: "Internships", detail: "Build workplace experience and strengthen your next career step.", tag: "EXPERIENCE · WIL" },
   { n: "05", title: "Apprenticeships", detail: "Explore trade training and practical pathways towards artisan careers.", tag: "TRADES · ARTISAN" },
   { n: "06", title: "Employment", detail: "Organise job discovery, application preparation and career readiness.", tag: "JOBS · CAREERS" },
