@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, type FormEvent } from "react";
 import {
   buildFreeDestinyMapClientPayload,
   submitFreeDestinyMapClientPayload
@@ -11,167 +11,187 @@ import {
 } from "../../../../../packages/contracts/src/free-destiny-map-api-wiring";
 
 const routeOptions = [
-  ["higher_education", "University"],
+  ["higher_education", "Higher Education"],
   ["tvet", "TVET"],
-  ["seta_learnership", "SETA / learnership"],
-  ["internship", "Internship"],
-  ["apprenticeship", "Apprenticeship"],
+  ["seta_learnership", "SETA programmes & learnerships"],
+  ["internship", "Internships"],
+  ["apprenticeship", "Apprenticeships"],
   ["employment", "Employment"],
-  ["nsfas_bursary", "NSFAS / bursary"],
-  ["accommodation", "Accommodation"],
+  ["nsfas_bursary", "NSFAS / bursary support"],
+  ["accommodation", "Accommodation support"],
   ["cv_revamp", "CV Revamp"],
-  ["documents", "Documents"],
-  ["source_check", "Source check"],
-  ["phoenix_fallback", "Phoenix fallback"],
-  ["confused_full_map", "I need the full map"]
+  ["documents", "Document readiness"],
+  ["source_check", "Check an institution or opportunity"],
+  ["confused_full_map", "I need help choosing a route"]
+] as const;
+
+const provinces = [
+  "Eastern Cape", "Free State", "Gauteng", "KwaZulu-Natal", "Limpopo",
+  "Mpumalanga", "Northern Cape", "North West", "Western Cape"
 ];
+
+const fieldClass = "mt-2 w-full rounded-xl border border-slate-300 bg-white px-3.5 py-3 text-sm text-slate-950 outline-none transition placeholder:text-slate-400 focus:border-amber-500 focus:ring-2 focus:ring-amber-200";
+const labelClass = "block text-sm font-semibold text-slate-800";
 
 export function FreeDestinyMapApiForm() {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [result, setResult] = useState<FreeDestinyMapClientResponse | null>(null);
   const [error, setError] = useState<string | null>(null);
 
-  async function onSubmit(event: React.FormEvent<HTMLFormElement>) {
+  async function onSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
-    setIsSubmitting(true);
     setError(null);
     setResult(null);
 
+    const payload = buildFreeDestinyMapClientPayload(new FormData(event.currentTarget));
+    const hasRouteIntent = Boolean(
+      payload.routeInterests?.length ||
+      payload.currentSituation?.trim() ||
+      payload.knownRoute?.trim() ||
+      payload.randomSourceName?.trim()
+    );
+
+    if (!payload.consentToProcessBasicInfo || !payload.consentToBeContacted) {
+      setError("Please select both consent options before submitting this intake request.");
+      return;
+    }
+    if (!hasRouteIntent) {
+      setError("Choose at least one route interest or describe the route you want help with.");
+      return;
+    }
+
+    setIsSubmitting(true);
     try {
-      const payload = buildFreeDestinyMapClientPayload(new FormData(event.currentTarget));
       const response = await submitFreeDestinyMapClientPayload(payload);
       setResult(response);
     } catch {
-      setError("The local intake shell could not be reached. This is still a runtime wiring stage, not production.");
+      setError("The intake API could not be reached. Your request has not been confirmed. Please try again later.");
     } finally {
       setIsSubmitting(false);
     }
   }
 
-  const fieldStyle = {
-    width: "100%",
-    padding: "12px 14px",
-    borderRadius: 12,
-    border: "1px solid rgba(212,175,55,0.35)",
-    background: "#020617",
-    color: "#f8fafc"
-  };
-
-  const labelStyle = {
-    display: "block",
-    marginBottom: 6,
-    color: "#f8fafc",
-    fontSize: 13
-  };
-
   return (
-    <section style={{ border: "1px solid rgba(212,175,55,0.35)", borderRadius: 22, padding: 22, background: "rgba(2,6,23,0.92)", color: "#f8fafc" }}>
-      <p style={{ margin: 0, color: "#d4af37", letterSpacing: "0.12em", textTransform: "uppercase", fontSize: 12 }}>Free first map</p>
-      <h2 style={{ marginTop: 8 }}>Start your Free Destiny Map</h2>
-      <p style={{ color: "#cbd5e1", lineHeight: 1.7 }}>
-        This form is wired toward the local intake API shell. Production storage, email, payment, documents and official submissions are still blocked.
-      </p>
-      <p style={{ color: "#fde68a", lineHeight: 1.7 }}>{FREE_DESTINY_MAP_API_WIRING_NOTICE}</p>
+    <section id="intake" className="overflow-hidden rounded-3xl border border-slate-200 bg-white shadow-[0_25px_75px_rgba(8,17,33,0.12)]">
+      <div className="bg-slate-950 px-5 py-6 text-white sm:px-8 sm:py-8">
+        <p className="text-xs font-extrabold uppercase tracking-[0.2em] text-amber-300">Free first map</p>
+        <h2 className="mt-3 text-2xl font-extrabold tracking-tight sm:text-3xl">Tell us where you want to go.</h2>
+        <p className="mt-3 max-w-3xl text-sm leading-6 text-slate-300">
+          Select your pathways and support needs. Do not enter an ID number, passport number, password, banking details or attach documents in this public form.
+        </p>
+      </div>
 
-      <form onSubmit={onSubmit} style={{ display: "grid", gap: 14 }}>
-        <label>
-          <span style={labelStyle}>Your name</span>
-          <input name="fullName" style={fieldStyle} placeholder="Full name" />
-        </label>
+      <form onSubmit={onSubmit} className="grid gap-6 p-5 sm:p-8">
+        <div className="grid gap-5 sm:grid-cols-2">
+          <label className={labelClass}>
+            Name (optional)
+            <input name="fullName" autoComplete="name" maxLength={100} className={fieldClass} placeholder="How should we address you?" />
+          </label>
+          <label className={labelClass}>
+            Province
+            <select name="province" defaultValue="" className={fieldClass}>
+              <option value="">Choose province</option>
+              {provinces.map((province) => <option key={province} value={province}>{province}</option>)}
+            </select>
+          </label>
+          <label className={`${labelClass} sm:col-span-2`}>
+            Current situation
+            <select name="currentSituation" defaultValue="" className={fieldClass}>
+              <option value="">Choose your current stage</option>
+              <option value="grade_9_11">Grade 9–11</option>
+              <option value="grade_12_matric">Grade 12 / Matric</option>
+              <option value="matric_completed">Matric completed</option>
+              <option value="tvet_college_student">TVET / college student</option>
+              <option value="unemployed_seeking_opportunity">Unemployed and seeking opportunity</option>
+              <option value="working_seeking_upgrade">Working and seeking an upgrade</option>
+              <option value="other_or_unsure">Other / not sure yet</option>
+            </select>
+          </label>
+          <label className={`${labelClass} sm:col-span-2`}>
+            Known route, institution or goal (optional)
+            <input name="knownRoute" maxLength={200} className={fieldClass} placeholder="Example: a university, a TVET qualification, a learnership or a job" />
+          </label>
+        </div>
 
-        <label>
-          <span style={labelStyle}>Province / area</span>
-          <input name="province" style={fieldStyle} placeholder="Example: KwaZulu-Natal, Gauteng, Eastern Cape" />
-        </label>
-
-        <label>
-          <span style={labelStyle}>Known route</span>
-          <input name="knownRoute" style={fieldStyle} placeholder="Example: UJ, TVET, NSFAS, CV, accommodation, learnership..." />
-        </label>
-
-        <label>
-          <span style={labelStyle}>Current situation</span>
-          <textarea name="currentSituation" style={{ ...fieldStyle, minHeight: 96 }} placeholder="Tell Kingsmen what you are trying to do." />
-        </label>
-
-        <fieldset style={{ border: "1px solid rgba(212,175,55,0.25)", borderRadius: 14, padding: 14 }}>
-          <legend style={{ color: "#d4af37" }}>Route interests</legend>
-          <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(160px, 1fr))", gap: 10 }}>
+        <fieldset className="rounded-2xl border border-slate-200 p-4 sm:p-5">
+          <legend className="px-2 text-sm font-bold text-slate-900">What would you like help with?</legend>
+          <p className="mb-4 text-sm leading-6 text-slate-600">Select every relevant route. Discovery across the six core pathways is available regardless of service plan.</p>
+          <div className="grid gap-3 sm:grid-cols-2">
             {routeOptions.map(([value, label]) => (
-              <label key={value} style={{ display: "flex", gap: 8, alignItems: "center", color: "#e2e8f0" }}>
-                <input name="routeInterests" value={value} type="checkbox" />
-                {label}
+              <label key={value} className="flex min-h-11 cursor-pointer items-start gap-3 rounded-xl border border-slate-200 p-3 text-sm leading-5 text-slate-700 transition hover:border-amber-400 hover:bg-amber-50">
+                <input name="routeInterests" value={value} type="checkbox" className="mt-1 h-4 w-4 accent-amber-600" />
+                <span>{label}</span>
               </label>
             ))}
           </div>
         </fieldset>
 
-        <label style={{ display: "flex", gap: 8, alignItems: "center" }}>
-          <input name="needsAccommodation" type="checkbox" />
-          I may need accommodation near study, work, training, learnership, internship or apprenticeship.
-        </label>
+        <div className="grid gap-5 sm:grid-cols-2">
+          <label className="flex cursor-pointer items-start gap-3 rounded-xl border border-slate-200 p-4 text-sm leading-6 text-slate-700">
+            <input name="needsAccommodation" type="checkbox" className="mt-1 h-4 w-4 accent-amber-600" />
+            <span><strong className="block text-slate-900">Accommodation support</strong>I may need accommodation information near a campus, workplace or training location.</span>
+          </label>
+          <label className="flex cursor-pointer items-start gap-3 rounded-xl border border-slate-200 p-4 text-sm leading-6 text-slate-700">
+            <input name="needsFundingHelp" type="checkbox" className="mt-1 h-4 w-4 accent-amber-600" />
+            <span><strong className="block text-slate-900">Funding readiness</strong>I may need NSFAS, bursary or funding preparation guidance.</span>
+          </label>
+          <label className="flex cursor-pointer items-start gap-3 rounded-xl border border-slate-200 p-4 text-sm leading-6 text-slate-700">
+            <input name="needsCvHelp" type="checkbox" className="mt-1 h-4 w-4 accent-amber-600" />
+            <span><strong className="block text-slate-900">CV support</strong>I may need help preparing or improving a CV.</span>
+          </label>
+          <label className="flex cursor-pointer items-start gap-3 rounded-xl border border-slate-200 p-4 text-sm leading-6 text-slate-700">
+            <input name="hasDocumentsReady" type="checkbox" className="mt-1 h-4 w-4 accent-amber-600" />
+            <span><strong className="block text-slate-900">Documents ready</strong>I have some application documents ready (do not upload them here).</span>
+          </label>
+        </div>
 
-        <label>
-          <span style={labelStyle}>Accommodation area, campus, workplace or training location</span>
-          <input name="accommodationArea" style={fieldStyle} placeholder="Example: Durban, Johannesburg, Cape Town, campus/workplace area..." />
-        </label>
+        <div className="grid gap-5 sm:grid-cols-2">
+          <label className={labelClass}>
+            Area of interest for accommodation (optional)
+            <input name="accommodationArea" maxLength={120} className={fieldClass} placeholder="City, campus or work area" />
+          </label>
+          <label className={labelClass}>
+            Opportunity or provider to check (optional)
+            <input name="randomSourceName" maxLength={200} className={fieldClass} placeholder="Organisation name or public website link" />
+          </label>
+        </div>
 
-        <label style={{ display: "flex", gap: 8, alignItems: "center" }}>
-          <input name="needsFundingHelp" type="checkbox" />
-          I may need NSFAS, bursary or funding readiness support.
-        </label>
+        <div className="space-y-3 rounded-2xl border border-amber-200 bg-amber-50 p-4 sm:p-5">
+          <p className="text-sm font-bold text-slate-900">Consent and privacy</p>
+          <label className="flex cursor-pointer items-start gap-3 text-sm leading-6 text-slate-700">
+            <input name="consentToProcessBasicInfo" type="checkbox" required className="mt-1 h-4 w-4 accent-amber-600" />
+            <span>I consent to Kingsmen processing the basic route-mapping information I submit for this request.</span>
+          </label>
+          <label className="flex cursor-pointer items-start gap-3 text-sm leading-6 text-slate-700">
+            <input name="consentToBeContacted" type="checkbox" required className="mt-1 h-4 w-4 accent-amber-600" />
+            <span>I agree Kingsmen may contact me about this request if contact details are provided through an appropriate Kingsmen channel later.</span>
+          </label>
+          <p className="text-xs leading-5 text-slate-600">This form does not collect contact details or official identifiers. Consent does not mean a message will be sent, and the request is not an application submission.</p>
+        </div>
 
-        <label style={{ display: "flex", gap: 8, alignItems: "center" }}>
-          <input name="needsCvHelp" type="checkbox" />
-          I may need CV help.
-        </label>
-
-        <label style={{ display: "flex", gap: 8, alignItems: "center" }}>
-          <input name="hasDocumentsReady" type="checkbox" />
-          I already have some documents ready.
-        </label>
-
-        <label>
-          <span style={labelStyle}>Random opportunity, college, bursary, job, landlord, learnership or training provider to check</span>
-          <input name="randomSourceName" style={fieldStyle} placeholder="Name or link to check later" />
-        </label>
-
-        <label style={{ display: "flex", gap: 8, alignItems: "center" }}>
-          <input name="consentToBeContacted" type="checkbox" />
-          I agree Kingsmen may contact me about this Free Destiny Map.
-        </label>
-
-        <label style={{ display: "flex", gap: 8, alignItems: "center" }}>
-          <input name="consentToProcessBasicInfo" type="checkbox" />
-          I agree Kingsmen may process this basic route-mapping information.
-        </label>
-
-        <button type="submit" disabled={isSubmitting} style={{ border: 0, borderRadius: 999, padding: "13px 18px", background: "#d4af37", color: "#020617", fontWeight: 800 }}>
-          {isSubmitting ? "Sending to local shell..." : "Send to local intake shell"}
+        <button type="submit" disabled={isSubmitting} className="inline-flex min-h-12 w-full items-center justify-center rounded-xl bg-gradient-to-r from-amber-300 to-amber-500 px-5 py-3 text-sm font-extrabold text-slate-950 shadow-sm transition hover:brightness-105 focus:outline-none focus:ring-2 focus:ring-amber-500 focus:ring-offset-2 disabled:cursor-wait disabled:opacity-60 sm:w-fit">
+          {isSubmitting ? "Sending intake request…" : "Submit Free Destiny Map request"} <span aria-hidden="true" className="ml-2">→</span>
         </button>
       </form>
 
-      {error ? (
-        <div style={{ marginTop: 16, padding: 14, borderRadius: 14, background: "rgba(239,68,68,0.12)", color: "#fecaca" }}>
-          {error}
-        </div>
-      ) : null}
-
-      {result ? (
-        <div style={{ marginTop: 16, padding: 14, borderRadius: 14, background: "rgba(34,197,94,0.12)", color: "#bbf7d0" }}>
-          <p><strong>Reference:</strong> {result.reference}</p>
-          <p><strong>Accepted:</strong> {String(result.accepted)}</p>
-          <p><strong>Production ready:</strong> {String(result.productionReady)}</p>
-          <p><strong>Next:</strong> {result.nextAction}</p>
-          {result.issues.length > 0 ? (
-            <ul>
-              {result.issues.map((issue) => (
-                <li key={`${issue.field}-${issue.code}`}>{issue.message}</li>
-              ))}
-            </ul>
-          ) : null}
-        </div>
-      ) : null}
+      <div className="border-t border-slate-200 bg-slate-50 p-5 sm:p-8">
+        <p className="text-xs font-bold uppercase tracking-[0.15em] text-slate-500">Current integration status</p>
+        <p className="mt-2 text-sm leading-6 text-slate-700">{FREE_DESTINY_MAP_API_WIRING_NOTICE}</p>
+        {error ? (
+          <div role="alert" className="mt-4 rounded-xl border border-red-200 bg-red-50 p-4 text-sm leading-6 text-red-900">{error}</div>
+        ) : null}
+        {result ? (
+          <div role={result.accepted ? "status" : "alert"} aria-live="polite" className={`mt-4 rounded-xl border p-4 text-sm leading-6 ${result.accepted ? "border-amber-200 bg-amber-50 text-slate-900" : "border-red-200 bg-red-50 text-red-900"}`}>
+            <p className="font-bold">{result.accepted ? "Intake boundary response received" : "Intake was not accepted"}</p>
+            <p className="mt-2"><strong>Reference:</strong> {result.reference}</p>
+            <p><strong>Backend accepted:</strong> {result.accepted ? "Yes" : "No"}</p>
+            <p><strong>Production storage:</strong> Not confirmed / not enabled by this form.</p>
+            <p className="mt-2">{result.safeNotice}</p>
+            <p className="mt-2"><strong>Next step:</strong> {result.nextAction}</p>
+            {result.issues.length > 0 ? <ul className="mt-3 list-disc space-y-1 pl-5">{result.issues.map((issue) => <li key={`${issue.field}-${issue.code}`}>{issue.message}</li>)}</ul> : null}
+          </div>
+        ) : null}
+      </div>
     </section>
   );
 }
