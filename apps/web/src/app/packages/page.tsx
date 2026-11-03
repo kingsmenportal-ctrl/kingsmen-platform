@@ -1,0 +1,50 @@
+import Link from "next/link";
+
+const packages = [
+  { slug: "foundational-accord", name: "Foundational Accord", tier: "All six pathways", price: 169.99, applications: 5, capacity: 4, accommodation: "8 accommodation routes included", description: "A practical starting point for managed application support.", featured: false },
+  { slug: "collegiate-ordinance", name: "Collegiate Ordinance", tier: "Education support", price: 299.99, applications: 10, capacity: 8, accommodation: "Accommodation support included", description: "More priority applications and managed-route capacity.", featured: false },
+  { slug: "chancellors-writ", name: "Chancellor’s Writ", tier: "Education support", price: 399.99, applications: 15, capacity: 10, accommodation: "Accommodation support included", description: "Expanded support capacity for an ambitious application plan.", featured: true },
+  { slug: "regency-mandate", name: "Regency Mandate", tier: "Premium support", price: 469.99, applications: 15, capacity: 12, accommodation: "Accommodation support included", description: "High managed-route capacity for a broad application plan.", featured: false },
+  { slug: "artisan-charter", name: "Artisan Charter", tier: "Skills & trades", price: 149.99, applications: 5, capacity: 3, accommodation: "Accommodation support included", description: "Focused support for technical, vocational and trade routes.", featured: false },
+  { slug: "guildmasters-charter", name: "Guildmasters Charter", tier: "Skills & career", price: 199.99, applications: 8, capacity: 5, accommodation: "Accommodation support included", description: "Additional priority volume for skills and career routes.", featured: false },
+  { slug: "cv-revamp", name: "CV Revamp", tier: "Standalone service", price: 49.99, applications: 0, capacity: 0, accommodation: "No accommodation-route entitlement", description: "A CV and motivation-letter preparation service.", featured: false, cv: true },
+  { slug: "free-destiny-map", name: "Free Destiny Map", tier: "Free starting point", price: 0, applications: 0, capacity: 0, accommodation: "Explore a route before buying support", description: "Describe your goals and start planning your next move.", featured: false, free: true },
+] as const;
+
+function money(value: number) {
+  return new Intl.NumberFormat("en-ZA", { style: "currency", currency: "ZAR" }).format(value);
+}
+
+export default function PackagesPage() {
+  return (
+    <main className="public-site">
+      <div className="public-notice"><span aria-hidden="true" /> Kingsmen Portal · Package reference</div>
+      <header className="public-header"><div className="public-container public-header-inner">
+        <Link className="public-brand" href="/" aria-label="Kingsmen Portal home"><span className="public-crest" aria-hidden="true">K</span><span className="public-wordmark"><strong>KINGSMEN</strong><small>PORTAL</small></span></Link>
+        <nav className="public-nav" aria-label="Main navigation"><Link href="/">Home</Link><Link href="/#pathways">Pathways</Link><Link href="/candidate/dashboard/">Candidate portal</Link><Link className="public-nav-portal" href="/free-destiny-map/">Destiny Map ↗</Link></nav>
+      </div></header>
+      <div className="public-container">
+        <section className="packages-hero"><div className="public-eyebrow"><span /> Transparent support options</div><h1>Choose your level<br /><em>of support.</em></h1><p>Every pathway remains discoverable. These packages define priority application volume and managed-route capacity, not access to the opportunity catalogue. Review the terms before selecting a service.</p></section>
+        <section className="public-package-grid" aria-label="Kingsmen packages">
+          {packages.map((item) => {
+            const features = "cv" in item && item.cv
+              ? ["15 CV versions + 15 motivation letters", "Target turnaround: 3 business days", "Standalone capacity: 0 managed routes", "+2 route bonus only after verified ownership and eligible upgrade"]
+              : "free" in item && item.free
+                ? ["Explore all six pathways", "No paid plan required to start planning", "No live application or payment implied"]
+                : [item.applications + " priority applications", item.capacity + " concurrent managed routes / 30-day capacity", item.accommodation];
+            return <article className={"public-package-card" + (item.featured ? " featured" : "")} key={item.slug}>
+              {item.featured && <span className="public-package-badge">FEATURED PACKAGE</span>}
+              <span className="public-package-tier">{item.tier}</span><h2>{item.name}</h2>
+              <div className="public-package-price">{money(item.price)}{item.price > 0 && !("cv" in item && item.cv) && <small> / package</small>}</div>
+              <p className="public-package-description">{item.description}</p>
+              <ul className="public-package-features">{features.map((feature) => <li key={feature}>{feature}</li>)}</ul>
+              <Link className={"public-button " + (item.featured ? "public-button-gold" : "public-button-outline")} href="/free-destiny-map/">Review this option <span aria-hidden="true">→</span></Link>
+            </article>;
+          })}
+        </section>
+        <p className="public-packages-disclaimer">Reference information only. Checkout and PayFast settlement are not connected to this page. Package entitlement must never be granted until payment and order records are verified. Prices are shown in South African rand; confirm the current terms at the live checkout before paying.</p>
+      </div>
+      <footer className="public-footer public-container"><Link className="public-brand public-brand-footer" href="/"><span className="public-crest" aria-hidden="true">K</span><span className="public-wordmark"><strong>KINGSMEN</strong><small>PORTAL</small></span></Link><span>© {new Date().getFullYear()} Kingsmen Portal</span><span>Support is not a guarantee of provider outcomes.</span></footer>
+    </main>
+  );
+}
