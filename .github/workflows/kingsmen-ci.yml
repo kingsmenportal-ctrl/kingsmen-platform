@@ -119,6 +119,8 @@ jobs:
             ["/auth/callback/", "Confirming your Kingsmen sign-in"],
             ["/free-destiny-map/", "Free first map"],
             ["/candidate/finance/", "Foundational Accord"],
+            ["/payment/return/", "Your payment status is being verified"],
+            ["/payment/cancel/", "No payment success is recorded here"],
             ["/preview/payment-confirmed/", "No payment has been made"],
             ["/preview/staff-review/", "Synthetic examples only"]
           ];
