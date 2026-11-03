@@ -1,106 +1,152 @@
+import type { Metadata } from "next";
+import styles from "./candidate-dashboard.module.css";
+
+export const metadata: Metadata = {
+  title: "Candidate dashboard | Kingsmen Portal",
+  description: "Your Kingsmen workspace across six South African education, skills and employment pathways."
+};
+
 const pathways = [
-  ["higher_education", "Higher Education", "Universities and degree programmes"],
-  ["tvet", "TVET", "Technical and vocational college routes"],
-  ["seta_learnership", "SETA programmes & learnerships", "Skills programmes and learnership opportunities"],
-  ["internship", "Internships", "Workplace experience opportunities"],
-  ["apprenticeship", "Apprenticeships", "Trade training and artisan pathways"],
-  ["employment", "Employment", "Jobs and employer application routes"]
+  ["higher_education", "Higher Education", "Universities, universities of technology, CAO programme choices and application preparation."],
+  ["tvet", "TVET", "Technical and vocational college routes, including NC(V) and NATED programmes."],
+  ["seta_learnership", "SETA programmes & learnerships", "Skills programmes and learnerships checked against official source, eligibility and deadline evidence."],
+  ["internship", "Internships", "Work-integrated learning and workplace experience opportunities."],
+  ["apprenticeship", "Apprenticeships", "Trade training and artisan pathways with provider-specific requirements."],
+  ["employment", "Employment", "Vacancy discovery and preparation for employer application routes."]
 ] as const;
 
 const workspaceLinks = [
   {
     href: "/candidate/workbench",
     title: "Application workbench",
-    description: "Review pathway readiness and manage your application journey.",
+    description: "Review readiness and organise your application journey across all six pathways.",
     action: "Open workbench"
   },
   {
     href: "/candidate/opportunity-matches",
-    title: "Opportunity matches",
-    description: "Explore matching routes. An item is not an open opportunity until its source and current opening evidence are verified.",
-    action: "View matches"
+    title: "Verified opportunity matches",
+    description: "Load matches that pass current source and publication gates. Unverified or stale listings are withheld.",
+    action: "Explore matches"
   },
   {
     href: "/candidate/saved-opportunities",
     title: "Saved opportunities",
-    description: "Return to opportunities you have saved.",
+    description: "Return to opportunities you have saved in the candidate workspace.",
     action: "View saved"
   },
   {
     href: "/candidate/documents",
     title: "Document vault",
-    description: "Access the document area for application supporting files.",
+    description: "Open the document area. Review status and document verification remain controlled by evidence and review rules.",
     action: "Open documents"
   },
   {
     href: "/personal-job-desk/application-tracker",
     title: "Application tracker",
-    description: "Review application tracking information and reported progress.",
+    description: "Review reported application progress. Provider-confirmed receipt and outcomes require provider-origin evidence.",
     action: "Track applications"
+  },
+  {
+    href: "/packages/",
+    title: "Packages and service capacity",
+    description: "Compare service packages. Package selection does not expand pathway access or itself prove that payment has settled.",
+    action: "View packages"
   }
 ] as const;
 
 export default function CandidateDashboardPage() {
   return (
-    <main className="mx-auto w-full max-w-6xl px-4 py-8 sm:px-6 lg:px-8">
-      <header className="rounded-2xl border border-slate-200 bg-slate-950 p-6 text-white shadow-sm sm:p-8">
-        <p className="text-xs font-semibold uppercase tracking-[0.22em] text-amber-300">KINGSMEN PORTAL</p>
-        <h1 className="mt-3 text-3xl font-bold tracking-tight sm:text-4xl">Your opportunity command centre</h1>
-        <p className="mt-3 max-w-3xl text-sm leading-6 text-slate-200 sm:text-base">
-          One profile and one application workbench across all six pathways. Your package affects managed service capacity, not which pathways you can discover.
-        </p>
-        <div className="mt-5 flex flex-wrap gap-3">
-          <a className="inline-flex min-h-11 items-center justify-center rounded-lg bg-amber-300 px-4 py-2 text-sm font-semibold text-slate-950 hover:bg-amber-200 focus:outline-none focus:ring-2 focus:ring-amber-300 focus:ring-offset-2 focus:ring-offset-slate-950" href="/candidate/workbench">
-            Open application workbench
+    <main className={styles.page} id="candidate-main">
+      <a className={styles.skipLink} href="#dashboard-content">Skip to candidate dashboard content</a>
+      <div className={styles.shell}>
+        <nav className={styles.topNav} aria-label="Candidate portal navigation">
+          <a className={styles.brand} href="/" aria-label="Kingsmen Portal home">
+            <span className={styles.brandMark} aria-hidden="true">K</span>
+            <span>
+              <strong className={styles.brandTitle}>KINGSMEN</strong>
+              <small className={styles.brandSub}>YOUR OPPORTUNITY, CONNECTED</small>
+            </span>
           </a>
-          <a className="inline-flex min-h-11 items-center justify-center rounded-lg border border-slate-500 px-4 py-2 text-sm font-semibold text-white hover:bg-slate-800 focus:outline-none focus:ring-2 focus:ring-white" href="/candidate/opportunity-matches">
-            Explore opportunities
-          </a>
-        </div>
-      </header>
+          <div className={styles.navLinks}>
+            <a href="/">Home</a>
+            <a href="/packages/">Packages</a>
+            <a href="/free-destiny-map/">Free Destiny Map</a>
+          </div>
+        </nav>
 
-      <section className="mt-8" aria-labelledby="pathways-heading">
-        <div className="mb-4">
-          <h2 id="pathways-heading" className="text-xl font-bold text-slate-900">All six pathways</h2>
-          <p className="mt-1 text-sm text-slate-600">Pathway access is universal. Current openings and eligibility still require evidence-based verification.</p>
-        </div>
-        <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
-          {pathways.map(([code, label, description]) => (
-            <article key={code} data-gate={code} className="rounded-xl border border-slate-200 bg-white p-5 shadow-sm">
-              <div className="flex items-start gap-3">
-                <span aria-hidden="true" className="mt-1 h-2.5 w-2.5 shrink-0 rounded-full bg-amber-500" />
-                <div>
-                  <h3 className="font-semibold text-slate-900">{label}</h3>
-                  <p className="mt-2 text-sm leading-5 text-slate-600">{description}</p>
-                  <p className="mt-3 text-xs font-medium text-slate-500">Available for discovery</p>
+        <section className={styles.hero} id="dashboard-content" aria-labelledby="dashboard-heading">
+          <p className={styles.eyebrow}>Candidate workspace · South Africa</p>
+          <h1 id="dashboard-heading">Your opportunity <span className={styles.gold}>command centre.</span></h1>
+          <p className={styles.lead}>
+            One candidate journey across education, skills development, internships, apprenticeships and employment.
+            Your package affects priority application volume and managed-route service capacity—not which pathways you can explore.
+          </p>
+          <div className={styles.actions}>
+            <a className={styles.primaryButton} href="/candidate/workbench">Open application workbench <span aria-hidden="true">↗</span></a>
+            <a className={styles.secondaryButton} href="/candidate/opportunity-matches">Explore opportunity matches <span aria-hidden="true">↗</span></a>
+          </div>
+          <p className={styles.disclosure}>
+            This is the candidate navigation and guidance surface. A page visit does not create a profile, save changes,
+            submit an application or activate a paid package.
+          </p>
+        </section>
+
+        <section className={styles.section} aria-labelledby="pathways-heading">
+          <div className={styles.sectionHead}>
+            <p className={styles.sectionEyebrow}>One profile · Six pathways</p>
+            <h2 id="pathways-heading">Explore every route.</h2>
+            <p className={styles.sectionIntro}>
+              Pathway access is universal. Individual opportunities still require current source, deadline, eligibility
+              and provider-route checks before Kingsmen presents them as open.
+            </p>
+          </div>
+          <div className={styles.pathwayGrid}>
+            {pathways.map(([code, label, description], index) => (
+              <article className={styles.pathwayCard} key={code} data-gate={code}>
+                <div className={styles.cardTop}>
+                  <span className={styles.pathwayNumber}>{String(index + 1).padStart(2, "0")} / PATHWAY</span>
+                  <span className={styles.available}>Discovery</span>
                 </div>
-              </div>
-            </article>
-          ))}
-        </div>
-      </section>
+                <h3>{label}</h3>
+                <p>{description}</p>
+              </article>
+            ))}
+          </div>
+        </section>
 
-      <section className="mt-9" aria-labelledby="workspace-heading">
-        <h2 id="workspace-heading" className="text-xl font-bold text-slate-900">Your workspace</h2>
-        <div className="mt-4 grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
-          {workspaceLinks.map((item) => (
-            <article key={item.href} className="flex flex-col rounded-xl border border-slate-200 bg-white p-5 shadow-sm">
-              <h3 className="font-semibold text-slate-900">{item.title}</h3>
-              <p className="mt-2 flex-1 text-sm leading-5 text-slate-600">{item.description}</p>
-              <a className="mt-4 inline-flex min-h-10 items-center self-start rounded-lg border border-slate-300 px-3 py-2 text-sm font-semibold text-slate-800 hover:border-slate-500 hover:bg-slate-50 focus:outline-none focus:ring-2 focus:ring-slate-500" href={item.href}>
-                {item.action} <span aria-hidden="true" className="ml-2">→</span>
-              </a>
-            </article>
-          ))}
-        </div>
-      </section>
+        <section className={styles.section} aria-labelledby="workspace-heading">
+          <div className={styles.sectionHead}>
+            <p className={styles.sectionEyebrow}>Your workspace</p>
+            <h2 id="workspace-heading">Pick up where you need to.</h2>
+          </div>
+          <div className={styles.workspaceGrid}>
+            {workspaceLinks.map((item) => (
+              <article className={styles.workspaceCard} key={item.href}>
+                <h3>{item.title}</h3>
+                <p>{item.description}</p>
+                <a className={styles.workspaceAction} href={item.href}>
+                  {item.action} <span aria-hidden="true">→</span>
+                </a>
+              </article>
+            ))}
+          </div>
+        </section>
 
-      <aside className="mt-8 rounded-xl border border-amber-200 bg-amber-50 p-5" aria-labelledby="status-boundary-heading">
-        <h2 id="status-boundary-heading" className="font-semibold text-slate-900">Application status and safety</h2>
-        <p className="mt-2 text-sm leading-6 text-slate-700">
-          This dashboard is navigation and guidance; it does not claim that a profile has been saved, an opportunity is currently open, a provider has received an application, or a payment has settled. Provider receipt and outcomes require provider-origin evidence. No admission, funding, placement, employment, or success is guaranteed.
-        </p>
-      </aside>
+        <aside className={styles.notice} aria-labelledby="status-boundary-heading">
+          <h2 id="status-boundary-heading">Application status and safety</h2>
+          <p>
+            This dashboard is navigation and guidance; it does not claim that a profile has been saved, an opportunity is currently open,
+            a provider has received an application, or a payment has settled. Provider receipt and outcomes require provider-origin evidence.
+            Candidate-reported submission, provider-confirmed receipt and provider-issued outcomes remain separate events.
+            No admission, funding, placement, employment, or success is guaranteed.
+          </p>
+        </aside>
+
+        <footer className={styles.footer}>
+          <span>© Kingsmen Portal · South Africa</span>
+          <span>Private information belongs behind authenticated access controls. Source freshness and provider evidence determine what Kingsmen can state.</span>
+        </footer>
+      </div>
     </main>
   );
 }
