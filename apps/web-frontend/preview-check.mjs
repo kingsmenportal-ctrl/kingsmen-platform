@@ -5,6 +5,14 @@ const html = readFileSync(new URL("./index.html", import.meta.url), "utf8");
 const css = readFileSync(new URL("./styles.css", import.meta.url), "utf8");
 const js = readFileSync(new URL("./app.js", import.meta.url), "utf8");
 const readme = readFileSync(new URL("./README.md", import.meta.url), "utf8");
+const flowsCss = readFileSync(new URL("./flows.css", import.meta.url), "utf8");
+const flowsJs = readFileSync(new URL("./flows.js", import.meta.url), "utf8");
+for (const page of ["candidate-dashboard.html", "documents.html", "payment-confirmed.html", "staff-review.html", "packages.html", "destiny-map.html"]) {
+  assert.ok(readFileSync(new URL("./" + page, import.meta.url), "utf8").includes("<html"), `missing page: ${page}`);
+}
+assert.ok(flowsJs.includes("No file was uploaded"), "document upload boundary missing");
+assert.ok(flowsJs.includes("No candidate record"), "staff action boundary missing");
+assert.ok(flowsCss.includes(".review-table"), "staff review styling missing");
 
 for (const pathway of ["Higher Education", "TVET Colleges", "Learnerships & SETAs", "Internships", "Apprenticeships", "Employment"]) {
   assert.ok(html.includes(pathway), `missing pathway: ${pathway}`);
