@@ -12,6 +12,7 @@ function evaluateClassicProtection(protection) {
     ? reviewPolicy.required_approving_review_count
     : 0;
   const checks = {
+    activeProtectionPresent: true,
     activeRulesPresent: true,
     activeRulesetPresent: false,
     requiredStatusChecksEnabled: allRequiredCheckNames.length > 0,
@@ -36,6 +37,7 @@ function evaluateClassicProtection(protection) {
 
 function finalize(checks) {
   const requiredBooleanChecks = [
+    'activeProtectionPresent',
     'activeRulesPresent',
     'activeRulesetPresent',
     'requiredStatusChecksEnabled',
@@ -87,6 +89,7 @@ function evaluateRulesetProtection(branchRules, rulesets) {
     return count + actors.filter((actor) => actor?.bypass_mode === 'always').length;
   }, 0);
   const checks = {
+    activeProtectionPresent: rules.length > 0 && applicableRulesets.length > 0,
     activeRulesPresent: rules.length > 0,
     activeRulesetPresent: applicableRulesets.length > 0,
     requiredStatusChecksEnabled: checkNames.length > 0,
@@ -113,6 +116,7 @@ export function evaluateMainBranchProtection(protection, rulesets = []) {
   if (Array.isArray(protection)) return evaluateRulesetProtection(protection, rulesets);
   if (protection && typeof protection === 'object') return evaluateClassicProtection(protection);
   return finalize({
+    activeProtectionPresent: false,
     activeRulesPresent: false,
     activeRulesetPresent: false,
     requiredStatusChecksEnabled: false,
