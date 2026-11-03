@@ -87,6 +87,13 @@ for (const pathway of ["SETA_LEARNERSHIPS", "INTERNSHIPS", "APPRENTICESHIPS", "H
   assert.ok(opportunities.includes(pathway), `Opportunity feed is missing the deployed API enum: ${pathway}`);
 }
 assert.ok(opportunities.includes("Saving does not submit anything to the provider."), "Saving a match must not imply provider submission.");
+
+assert.ok(opportunities.includes("Save under pathway"), "Multi-pathway opportunities must require an explicit application-pathway choice.");
+assert.ok(opportunities.includes("pathway_type: pathwayType"), "Opportunity saves must send the chosen canonical pathway to the backend.");
+for (const mapping of ['SETA_LEARNERSHIPS: "SETA_LEARNERSHIP"', 'INTERNSHIPS: "INTERNSHIP"', 'APPRENTICESHIPS: "APPRENTICESHIP"']) {
+  assert.ok(opportunities.includes(mapping), `Feed enum mapping missing: ${mapping}`);
+}
+
 assert.ok(opportunitiesStyles.includes("@media(max-width:560px)") && opportunitiesStyles.includes(":focus-visible"), "Opportunity feed must have responsive styles and keyboard focus.");
 assert.ok(savedOpportunities.includes('functions/v1/candidate-application-preparation'), "Saved opportunity list must load persisted application records.");
 assert.ok(savedOpportunities.includes('action: "load"'), "Saved opportunity list must use the service load action.");
