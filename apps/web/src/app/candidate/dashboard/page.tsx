@@ -1,3 +1,5 @@
+import { CandidateSessionControl } from "../../../components/candidate/CandidateSessionControl";
+
 const pathways = [
   ["higher_education", "Higher Education", "Universities, Universities of Technology and CAO programme choices."],
   ["tvet", "TVET", "Technical and vocational routes, college programmes and occupational learning."],
@@ -70,6 +72,7 @@ export default function CandidateDashboardPage() {
             <a className="hover:text-amber-200" href="/free-destiny-map/">Free Destiny Map</a>
             <a className="hover:text-amber-200" href="/packages/">Packages</a>
             <a className="rounded-lg border border-slate-600 px-3 py-2 font-semibold hover:border-amber-300 hover:text-amber-200" href="/candidate/workbench">Application workbench</a>
+            <CandidateSessionControl />
           </nav>
         </div>
       </header>
