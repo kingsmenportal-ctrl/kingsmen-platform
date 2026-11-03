@@ -11,9 +11,12 @@ const workflowPath = '.github/workflows/kingsmen-branch-protection-evidence.yml'
 const workflow = existsSync(workflowPath) ? readFileSync(workflowPath, 'utf8') : '';
 
 const required = [
-  'read_only_branch_protection_verification',
-  '/branches/${branch}/protection',
+  'read_only_effective_branch_rules_verification',
+  '/rules/branches/',
+  '/rulesets?includes_parents=true',
   'evaluateMainBranchProtection',
+  'activeRulesPresent',
+  'activeRulesetPresent',
   'requiredStatusChecksEnabled',
   'sourceGuardRequired',
   'strictStatusChecksEnabled',
@@ -24,11 +27,10 @@ const required = [
   'adminEnforcementEnabled',
   'forcePushDisabled',
   'branchDeletionDisabled',
+  'unrestrictedBypassActorCount',
   'UNVERIFIED_PERMISSION_DENIED',
-  'BLOCKED_MISSING_READ_TOKEN',
-  'KINGSMEN_BRANCH_PROTECTION_READ_TOKEN',
-  'Administration: read',
-  'BLOCKED_PROTECTION_NOT_FOUND_OR_NOT_VISIBLE',
+  'BLOCKED_RULES_NOT_FOUND_OR_NOT_VISIBLE',
+  'BLOCKED_RULESET_METADATA_UNAVAILABLE',
   'reviewed: false',
   'redacted: true',
   'sha256',
@@ -36,6 +38,9 @@ const required = [
 ];
 
 const policyRequirements = [
+  'activeProtectionPresent',
+  'activeRulesPresent',
+  'activeRulesetPresent',
   'requiredStatusChecksEnabled',
   'sourceGuardRequired',
   'strictStatusChecksEnabled',
@@ -46,28 +51,23 @@ const policyRequirements = [
   'adminEnforcementEnabled',
   'forcePushDisabled',
   'branchDeletionDisabled',
-  'requiredApprovingReviewCount'
+  'requiredApprovingReviewCount',
+  'requiredDeploymentEnvironments'
 ];
 const testRequirements = [
-  'complete protection configuration should pass',
-  'strict_status_checks',
-  'stale_review_dismissal',
-  'conversation_resolution',
-  'linear_history',
-  'admin_enforcement',
-  'force_push_block',
-  'deletion_block',
-  'missing protection response must block'
+  'complete classic protection configuration should pass',
+  'complete effective ruleset configuration should pass',
+  'active but incomplete ruleset must not be reported as fully protected',
+  'always-bypass actors must be reported accurately',
+  'unavailableResponseBlocked'
 ];
 
 const workflowRequirements = [
   ['workflow runs on pull requests targeting main', workflow.includes('pull_request:') && workflow.includes('branches: [main]')],
   ['workflow runs on pushes to main', workflow.includes('push:') && workflow.includes('branches: [main]')],
   ['manual workflow dispatch remains available', workflow.includes('workflow_dispatch:')],
-  ['workflow uses dedicated read-only administration token secret', workflow.includes('KINGSMEN_BRANCH_PROTECTION_READ_TOKEN') && !workflow.includes('administration: read')],
-  ['workflow interpolation expressions are not escaped', !workflow.includes('\\${{')],
-  ['workflow supplies the actual GitHub run id to the artifact name', workflow.includes('name: kingsmen-main-branch-protection-${{ github.run_id }}')],
-  ['workflow invokes the read-only evidence capture script', workflow.includes('run: node scripts/ci/capture-main-branch-protection.mjs')],
+  ['workflow uses the built-in GitHub token rather than a bespoke PAT secret', workflow.includes('GITHUB_TOKEN: ${{ github.token }}') && !workflow.includes('KINGSMEN_BRANCH_PROTECTION_READ_TOKEN')],
+  ['workflow invokes the effective-rules evidence capture script', workflow.includes('run: node scripts/ci/capture-main-branch-protection.mjs')],
   ['evidence artifact is attempted even when the verifier blocks release', workflow.includes('if: always()')],
   ['evidence capture script does not issue branch-protection write requests', !['PUT', 'POST', 'PATCH', 'DELETE'].some((method) => source.includes(`method: '${method}'`) || source.includes(`method: "${method}"`))]
 ];
@@ -81,7 +81,7 @@ const failures = [
 
 const report = {
   schema: 'kingsmen.validation-report.v1',
-  module: 'Main Branch Protection Evidence Capture',
+  module: 'Effective Main Branch Rules Evidence Capture',
   status: failures.length ? 'BRANCH_PROTECTION_CAPTURE_SOURCE_FAILED' : 'BRANCH_PROTECTION_CAPTURE_SOURCE_VALIDATED',
   passed: failures.length === 0,
   assertions: required.length + policyRequirements.length + testRequirements.length + workflowRequirements.length,
