@@ -45,7 +45,7 @@ assert.ok(dashboard.includes('import styles from "./candidate-dashboard.module.c
 assert.ok(dashboardStyles.includes("@media (max-width: 560px)"), "Candidate dashboard must include a mobile layout.");
 assert.ok(dashboardStyles.includes(":focus-visible"), "Candidate dashboard controls must have visible keyboard focus.");
 assert.ok(dashboardStyles.includes("prefers-reduced-motion"), "Candidate dashboard must respect reduced-motion preferences.");
-for (const route of ["/candidate/workbench", "/candidate/opportunity-matches", "/candidate/saved-opportunities", "/candidate/documents", "/personal-job-desk/application-tracker"]) {
+for (const route of ["/candidate/profile", "/candidate/workbench", "/candidate/opportunity-matches", "/candidate/saved-opportunities", "/candidate/documents", "/personal-job-desk/application-tracker"]) {
   assert.ok(dashboard.includes(route), `Candidate dashboard is missing workspace route: ${route}`);
 }
 for (const key of ["higher_education", "tvet", "seta_learnership", "internship", "apprenticeship", "employment"]) {
@@ -54,5 +54,16 @@ for (const key of ["higher_education", "tvet", "seta_learnership", "internship",
 assert.match(dashboard, /does not claim that a profile has been saved/, "Dashboard must not imply persistence that has not been proven.");
 assert.match(dashboard, /Provider receipt and outcomes require provider-origin evidence/, "Dashboard must distinguish provider receipt from candidate report.");
 assert.match(dashboard, /No admission, funding, placement, employment, or success is guaranteed/, "Dashboard must disclose outcome limits.");
+
+const profilePage = readFileSync(new URL("../../apps/web/src/app/candidate/profile/page.tsx", import.meta.url), "utf8");
+assert.ok(profilePage.includes('functions/v1/candidate-master-profile'), "Candidate profile must call the existing Supabase profile persistence function.");
+for (const action of ["load", "save", "request_correction", "revoke_consent"]) {
+  assert.ok(profilePage.includes(`action: "${action}"`) || profilePage.includes(`action !== "${action}"`), `Candidate profile action is not wired: ${action}`);
+}
+assert.ok(profilePage.includes("consentAccepted: true"), "Profile save must submit the explicit consent acceptance flag.");
+assert.ok(profilePage.includes("PROFILE_BOOTSTRAP_REQUIRED") || profilePage.includes("identityStatus"), "Profile UI must display service-returned identity status rather than imply verified access.");
+assert.match(profilePage, /Do not enter a South African ID number/, "Profile form must not request sensitive identity numbers.");
+assert.ok(!profilePage.includes("SUPABASE_SERVICE_ROLE_KEY"), "A privileged Supabase service-role key must not enter browser code.");
+
 
 console.log("Public web contract passed: six canonical pathways, responsive candidate workspace, canonical prices, and guarded CV Revamp entitlements.");
