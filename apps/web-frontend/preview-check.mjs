@@ -47,7 +47,7 @@ assert.ok(liveCss.includes("--km-navy:#0a1348") && liveCss.includes("--km-gold:#
 for (const plan of ["Foundational Accord", "Collegiate Ordinance", "Chancellor’s Writ", "Regency Mandate", "Artisan Charter", "Guildmasters Charter", "CV Revamp", "Free Destiny Map"]) {
   assert.ok(livePackages.includes(plan), `live package route missing: ${plan}`);
 }
-for (const contract of ["price: 169.99", "applications: 5", "capacity: 4", "price: 299.99", "applications: 10", "capacity: 8", "price: 399.99", "capacity: 10", "price: 469.99", "capacity: 12", "price: 149.99", "capacity: 3", "price: 199.99", "capacity: 5", "price: 49.99"]) {
+for (const contract of ["priceCents: 16999", "applications: 5", "capacity: 4", "priceCents: 29999", "applications: 10", "capacity: 8", "priceCents: 39999", "capacity: 10", "priceCents: 46999", "capacity: 12", "priceCents: 14999", "capacity: 3", "priceCents: 19999", "capacity: 5", "priceCents: 4999"]) {
   assert.ok(livePackages.includes(contract), `live package contract missing: ${contract}`);
 }
 assert.ok(liveDashboard.includes("All six pathways") && liveDashboard.includes("provider-origin evidence"), "candidate dashboard scope/safety copy missing");
