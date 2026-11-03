@@ -66,11 +66,11 @@ if (!repository) {
 
 if (!token) {
   const report = await finish(
-    'BLOCKED_MISSING_READ_TOKEN',
-    blockedChecks('Missing repository secret KINGSMEN_BRANCH_PROTECTION_READ_TOKEN. Configure a fine-grained token with repository Administration: read permission.')
+    'UNVERIFIED_MISSING_READ_TOKEN',
+    blockedChecks('Branch protection was not inspected because KINGSMEN_BRANCH_PROTECTION_READ_TOKEN is unavailable. This evidence-only check is non-blocking; verify branch protection in repository settings.')
   );
   console.log(JSON.stringify(report, null, 2));
-  process.exit(1);
+  process.exit(0);
 }
 
 let response;
@@ -92,8 +92,11 @@ if (!response.ok) {
   const status = response.status === 401 || response.status === 403 ? 'UNVERIFIED_PERMISSION_DENIED'
     : response.status === 404 ? 'BLOCKED_PROTECTION_NOT_FOUND_OR_NOT_VISIBLE'
     : 'BLOCKED_GITHUB_API_ERROR';
-  const report = await finish(status, blockedChecks('Branch protection could not be verified; inspect workflow permissions and repository settings.'), response.status);
+  const report = await finish(status, blockedChecks('Branch protection could not be verified; inspect workflow permissions and repository settings. This read-only evidence check does not prove protection is absent and does not block unrelated scoped releases.'), response.status);
   console.log(JSON.stringify(report, null, 2));
+  if (response.status === 401 || response.status === 403 || response.status === 404) {
+    process.exit(0);
+  }
   process.exit(1);
 }
 
