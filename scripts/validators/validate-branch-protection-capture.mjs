@@ -1,3 +1,15 @@
+#!/usr/bin/env node
+import { existsSync, readFileSync } from 'node:fs';
+
+const path = 'scripts/ci/capture-main-branch-protection.mjs';
+const source = existsSync(path) ? readFileSync(path, 'utf8') : '';
+const policyPath = 'scripts/ci/main-branch-protection-policy.mjs';
+const policy = existsSync(policyPath) ? readFileSync(policyPath, 'utf8') : '';
+const testPath = 'scripts/ci/test-main-branch-protection-policy.mjs';
+const test = existsSync(testPath) ? readFileSync(testPath, 'utf8') : '';
+const workflowPath = '.github/workflows/kingsmen-branch-protection-evidence.yml';
+const workflow = existsSync(workflowPath) ? readFileSync(workflowPath, 'utf8') : '';
+
 const required = [
   'read_only_effective_branch_rules_verification',
   '/rules/branches/',
