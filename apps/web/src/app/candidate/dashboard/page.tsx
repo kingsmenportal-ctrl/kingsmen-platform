@@ -1,3 +1,4 @@
+import { CandidateSessionControl } from "@/components/candidate/CandidateSessionControl";
 import Link from "next/link";
 
 const pathways = [
@@ -15,6 +16,7 @@ const workspaceLinks = [
   { href: "/candidate/saved-opportunities", title: "Saved opportunities", description: "Return to opportunity routes you have saved.", action: "View saved" },
   { href: "/candidate/documents", title: "Document vault", description: "Review requirements and the private-document handling boundary.", action: "Open documents" },
   { href: "/personal-job-desk/application-tracker", title: "Application tracker", description: "Review candidate-reported progress and any available receipt evidence.", action: "Track applications" },
+  { href: "/candidate/finance/", title: "Plans & finance", description: "Compare canonical products, allowances and payment-evidence rules.", action: "View plans" },
 ] as const;
 
 export default function CandidateDashboardPage() {
@@ -23,7 +25,7 @@ export default function CandidateDashboardPage() {
       <div className="public-notice"><span aria-hidden="true" /> CANDIDATE SPACE · Guidance and navigation</div>
       <header className="public-header"><div className="public-container public-header-inner">
         <Link className="public-brand" href="/" aria-label="Kingsmen Portal home"><span className="public-crest" aria-hidden="true">K</span><span className="public-wordmark"><strong>KINGSMEN</strong><small>PORTAL</small></span></Link>
-        <nav className="public-nav" aria-label="Candidate navigation"><Link href="/">Home</Link><Link href="/packages/">Packages</Link><Link href="/candidate/documents/">Documents</Link><Link className="public-nav-portal" href="/free-destiny-map/">Destiny Map ↗</Link></nav>
+        <nav className="public-nav" aria-label="Candidate navigation"><Link href="/">Home</Link><Link href="/packages/">Packages</Link><Link href="/candidate/documents/">Documents</Link><Link className="public-nav-portal" href="/free-destiny-map/">Destiny Map ↗</Link><CandidateSessionControl /></nav>
       </div></header>
       <div className="public-container candidate-page-body">
         <header className="candidate-page-heading"><div><div className="public-eyebrow"><span /> CANDIDATE OVERVIEW</div><h1>Your opportunity <em>command centre.</em></h1><p>One place to explore the six pathways, prepare requirements and navigate the next step.</p></div><span className="candidate-preview-chip">READINESS VIEW</span></header>
