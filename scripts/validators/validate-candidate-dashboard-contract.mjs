@@ -124,7 +124,7 @@ assert.ok(opportunityMatches.includes("pathway_type: item.pathways[0]"));
 assert.ok(payfastCheckout.includes("functions/v1/payfast-sandbox"));
 assert.match(payfastCheckout, /idempotency-key/);
 assert.match(payfastCheckout, /sandbox.payfast.co.za/);
-assert.match(payfastCheckout, /verified ITN/);
+assert.match(payfastCheckout, /verified PayFast ITN/i);
 assert.match(paymentReturn, /browser return is not proof of payment/i);
 assert.match(paymentCancel, /No payment success is recorded here/);
 assert.match(profilePage, /CandidateMasterProfileForm/);
