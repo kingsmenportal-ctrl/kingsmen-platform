@@ -67,7 +67,7 @@ export function CandidateAuthForm({ mode }: { mode: Mode }) {
     setBusy(true);
     try {
       const endpoint = isRegister
-        ? `${config.url}/auth/v1/signup`
+        ? `${config.url}/auth/v1/signup?redirect_to=${encodeURIComponent(window.location.origin + "/auth/callback")}`
         : `${config.url}/auth/v1/token?grant_type=password`;
       const payload = isRegister
         ? { email, password, data: fullName ? { full_name: fullName } : {} }
@@ -109,7 +109,7 @@ export function CandidateAuthForm({ mode }: { mode: Mode }) {
       }
 
       if (isRegister && body.user) {
-        setNotice("Your account request was received. If email confirmation is enabled for this project, verify your email before signing in. No candidate profile or application is claimed as saved by this screen.");
+        setNotice("Your account request was received. Check your inbox and use the confirmation link to return to Kingsmen. If confirmation is enabled, the configured callback redirect must be allowed in Supabase Auth. A candidate profile is not created until you complete profile setup.");
         return;
       }
 
