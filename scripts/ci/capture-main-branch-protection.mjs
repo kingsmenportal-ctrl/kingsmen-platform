@@ -14,31 +14,30 @@ const checkedAt = new Date().toISOString();
 async function finish(status, checks, httpStatus = null) {
   const base = {
     schema: 'kingsmen.branch-protection-evidence.v1',
-    evidenceType: 'read_only_branch_protection_verification',
+    evidenceType: 'read_only_effective_branch_rules_verification',
     status,
     repository: repository ?? null,
     branch,
     checkedAt,
-    protectionActive: httpStatus === 200,
+    protectionActive: checks?.activeProtectionPresent === true,
     httpStatus,
     checks,
     reviewed: false,
     redacted: true,
-    note: 'Read-only observation only. This report does not apply or change branch protection. Founder/reviewer sign-off remains separate.'
+    note: 'Read-only observation of effective branch rules and their ruleset bypass configuration. This report does not apply or change branch protection. Founder/reviewer sign-off remains separate.'
   };
   const canonical = JSON.stringify(base);
   const report = { ...base, sha256: createHash('sha256').update(canonical).digest('hex') };
-  await awaitWrite(report);
-  return report;
-}
-
-async function awaitWrite(report) {
   await mkdir(dirname(outputPath), { recursive: true });
   await writeFile(outputPath, JSON.stringify(report, null, 2) + '\n', 'utf8');
+  return report;
 }
 
 function blockedChecks(reason) {
   return {
+    activeProtectionPresent: false,
+    activeRulesPresent: false,
+    activeRulesetPresent: false,
     requiredStatusChecksEnabled: false,
     sourceGuardRequired: false,
     releaseEvidenceRequired: false,
@@ -51,58 +50,94 @@ function blockedChecks(reason) {
     forcePushDisabled: false,
     branchDeletionDisabled: false,
     requiredApprovingReviewCount: 0,
+    activeRuleCount: 0,
+    matchingRulesetCount: 0,
+    unrestrictedBypassActorCount: 0,
+    requiredDeploymentEnvironments: [],
     failure: reason
   };
 }
 
 if (!repository) {
-  const report = await finish(
-    'BLOCKED_MISSING_GITHUB_CONTEXT',
-    blockedChecks('Missing GITHUB_REPOSITORY context.')
-  );
+  const report = await finish('BLOCKED_MISSING_GITHUB_CONTEXT', blockedChecks('Missing GITHUB_REPOSITORY context.'));
   console.log(JSON.stringify(report, null, 2));
   process.exit(1);
 }
 
-if (!token) {
-  const report = await finish(
-    'BLOCKED_MISSING_READ_TOKEN',
-    blockedChecks('Missing repository secret KINGSMEN_BRANCH_PROTECTION_READ_TOKEN. Configure a fine-grained token with repository Administration: read permission.')
-  );
-  console.log(JSON.stringify(report, null, 2));
-  process.exit(1);
-}
+const headers = {
+  accept: 'application/vnd.github+json',
+  'x-github-api-version': '2022-11-28'
+};
+if (token) headers.authorization = `Bearer ${token}`;
 
-let response;
+let branchRulesResponse;
 try {
-  response = await fetch(`${apiUrl}/repos/${repository}/branches/${branch}/protection`, {
-    headers: {
-      accept: 'application/vnd.github+json',
-      authorization: `Bearer ${token}`,
-      'x-github-api-version': '2022-11-28'
-    }
-  });
+  branchRulesResponse = await fetch(
+    `${apiUrl}/repos/${repository}/rules/branches/${encodeURIComponent(branch)}?per_page=100`,
+    { headers }
+  );
 } catch {
-  const report = await finish('BLOCKED_GITHUB_API_UNREACHABLE', blockedChecks('GitHub API request failed.'));
+  const report = await finish('BLOCKED_GITHUB_API_UNREACHABLE', blockedChecks('GitHub effective branch-rules request failed.'));
   console.log(JSON.stringify(report, null, 2));
   process.exit(1);
 }
 
-if (!response.ok) {
-  const status = response.status === 401 || response.status === 403 ? 'UNVERIFIED_PERMISSION_DENIED'
-    : response.status === 404 ? 'BLOCKED_PROTECTION_NOT_FOUND_OR_NOT_VISIBLE'
-    : 'BLOCKED_GITHUB_API_ERROR';
-  const report = await finish(status, blockedChecks('Branch protection could not be verified; inspect workflow permissions and repository settings.'), response.status);
+if (!branchRulesResponse.ok) {
+  const status = branchRulesResponse.status === 401 || branchRulesResponse.status === 403
+    ? 'UNVERIFIED_PERMISSION_DENIED'
+    : branchRulesResponse.status === 404
+      ? 'BLOCKED_RULES_NOT_FOUND_OR_NOT_VISIBLE'
+      : 'BLOCKED_GITHUB_API_ERROR';
+  const report = await finish(status, blockedChecks('Effective branch rules could not be read; inspect repository visibility and Metadata read permissions.'), branchRulesResponse.status);
   console.log(JSON.stringify(report, null, 2));
   process.exit(1);
 }
 
-const protection = await response.json();
-const evaluation = evaluateMainBranchProtection(protection);
-const report = await finish(
-  evaluation.passed ? 'VERIFIED_REQUIRED_PROTECTION_ACTIVE' : 'BLOCKED_PROTECTION_INCOMPLETE',
-  evaluation.checks,
-  response.status
-);
+let branchRules;
+try {
+  branchRules = await branchRulesResponse.json();
+} catch {
+  const report = await finish('BLOCKED_INVALID_GITHUB_RESPONSE', blockedChecks('GitHub returned invalid JSON for effective branch rules.'), branchRulesResponse.status);
+  console.log(JSON.stringify(report, null, 2));
+  process.exit(1);
+}
+
+let rulesetsResponse;
+try {
+  rulesetsResponse = await fetch(
+    `${apiUrl}/repos/${repository}/rulesets?includes_parents=true&per_page=100`,
+    { headers }
+  );
+} catch {
+  const report = await finish('BLOCKED_GITHUB_API_UNREACHABLE', blockedChecks('GitHub ruleset metadata request failed.'));
+  console.log(JSON.stringify(report, null, 2));
+  process.exit(1);
+}
+
+if (!rulesetsResponse.ok) {
+  const status = rulesetsResponse.status === 401 || rulesetsResponse.status === 403
+    ? 'UNVERIFIED_PERMISSION_DENIED'
+    : 'BLOCKED_RULESET_METADATA_UNAVAILABLE';
+  const report = await finish(status, blockedChecks('Effective branch rules were read, but the ruleset bypass metadata could not be verified.'), rulesetsResponse.status);
+  console.log(JSON.stringify(report, null, 2));
+  process.exit(1);
+}
+
+let rulesets;
+try {
+  rulesets = await rulesetsResponse.json();
+} catch {
+  const report = await finish('BLOCKED_INVALID_GITHUB_RESPONSE', blockedChecks('GitHub returned invalid JSON for repository rulesets.'), rulesetsResponse.status);
+  console.log(JSON.stringify(report, null, 2));
+  process.exit(1);
+}
+
+const evaluation = evaluateMainBranchProtection(branchRules, rulesets);
+const status = evaluation.passed
+  ? 'VERIFIED_REQUIRED_PROTECTION_ACTIVE'
+  : evaluation.checks.activeProtectionPresent
+    ? 'BLOCKED_PROTECTION_INCOMPLETE'
+    : 'BLOCKED_PROTECTION_NOT_ACTIVE';
+const report = await finish(status, evaluation.checks, branchRulesResponse.status);
 console.log(JSON.stringify(report, null, 2));
 if (!evaluation.passed) process.exitCode = 1;
