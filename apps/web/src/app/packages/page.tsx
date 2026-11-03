@@ -21,7 +21,7 @@ export default function PackagesPage() {
       <div className="public-notice"><span aria-hidden="true" /> Kingsmen Portal · Package reference</div>
       <header className="public-header"><div className="public-container public-header-inner">
         <Link className="public-brand" href="/" aria-label="Kingsmen Portal home"><span className="public-crest" aria-hidden="true">K</span><span className="public-wordmark"><strong>KINGSMEN</strong><small>PORTAL</small></span></Link>
-        <nav className="public-nav" aria-label="Main navigation"><Link href="/">Home</Link><Link href="/#pathways">Pathways</Link><Link href="/candidate/dashboard/">Candidate portal</Link><Link className="public-nav-portal" href="/free-destiny-map/">Destiny Map ↗</Link></nav>
+        <nav className="public-nav" aria-label="Main navigation"><Link href="/">Home</Link><Link href="/#pathways">Pathways</Link><Link href="/candidate/dashboard/">Candidate portal</Link><Link href="/candidate/login/">Sign in</Link><Link className="public-nav-portal" href="/free-destiny-map/">Destiny Map ↗</Link></nav>
       </div></header>
       <div className="public-container">
         <section className="packages-hero"><div className="public-eyebrow"><span /> Transparent support options</div><h1>Choose your level<br /><em>of support.</em></h1><p>Every pathway remains discoverable. These packages define priority application volume and managed-route capacity, not access to the opportunity catalogue. Review the terms before selecting a service.</p></section>
