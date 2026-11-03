@@ -194,10 +194,11 @@ begin
   if v_match.deadline_ref is null
      or v_match.deadline_status is distinct from 'CONFIRMED'
      or v_match.deadline_source_confidence is distinct from 'OFFICIAL_VERIFIED'
+     or v_match.opens_at is null
+     or v_match.opens_at > now()
      or v_match.closes_at is null
      or v_match.closes_at <= now()
-     or (v_match.opens_at is not null and v_match.opens_at > now())
-     or (v_match.opens_at is not null and v_match.closes_at <= v_match.opens_at)
+     or v_match.closes_at <= v_match.opens_at
      or cardinality(coalesce(v_match.deadline_evidence, array[]::text[])) = 0 then
     return jsonb_build_object('ok', false, 'code', 'CONFIRMED_OPEN_DEADLINE_REQUIRED',
       'message', 'A current official application window with a confirmed opening/closing period and evidence is required. The opportunity remains saved, but no application draft was created.');
