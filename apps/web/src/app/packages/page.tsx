@@ -13,7 +13,7 @@ const packages = [
 ] as const;
 
 function money(priceCents: number) {
-  return new Intl.NumberFormat("en-ZA", { style: "currency", currency: "ZAR" }).format(priceCents / 100);
+  return "R" + (priceCents / 100).toFixed(2);
 }
 
 export default function PackagesPage() {
