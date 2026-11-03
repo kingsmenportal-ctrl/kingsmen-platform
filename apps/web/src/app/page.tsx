@@ -19,7 +19,7 @@ const steps = [
 export default function HomePage() {
   return (
     <main className="public-site">
-      <div className="public-notice"><span aria-hidden="true" /> Kingsmen Portal · South African opportunity pathways</div>
+      <div className="public-notice"><span aria-hidden="true" /> PREVIEW BUILD · Candidate account creation, real uploads, provider submissions and checkout are not enabled</div>
       <header className="public-header">
         <div className="public-container public-header-inner">
           <Link className="public-brand" href="/" aria-label="Kingsmen Portal home">
