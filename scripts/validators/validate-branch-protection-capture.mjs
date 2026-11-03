@@ -31,6 +31,8 @@ const required = [
   'branchDeletionDisabled',
   'bypassActorsVisible',
   'unrestrictedBypassActorCount',
+  'currentUserCanAlwaysBypass',
+  "set.current_user_can_bypass === 'always'",
   'UNVERIFIED_PERMISSION_DENIED',
   'BLOCKED_RULES_NOT_FOUND_OR_NOT_VISIBLE',
   'BLOCKED_RULESET_METADATA_UNAVAILABLE',
@@ -55,6 +57,7 @@ const policyRequirements = [
   'forcePushDisabled',
   'branchDeletionDisabled',
   'requiredApprovingReviewCount',
+  'currentUserCanAlwaysBypass',
   'requiredDeploymentEnvironments'
 ];
 const testRequirements = [
@@ -62,6 +65,7 @@ const testRequirements = [
   'complete effective ruleset configuration should pass',
   'active but incomplete ruleset must not be reported as fully protected',
   'always-bypass actors must be reported accurately',
+  'the GitHub API current_user_can_bypass field must be evaluated',
   'unavailableResponseBlocked'
 ];
 

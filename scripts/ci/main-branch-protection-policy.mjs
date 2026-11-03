@@ -30,6 +30,7 @@ function evaluateClassicProtection(protection) {
     activeRuleCount: 0,
     matchingRulesetCount: 0,
     unrestrictedBypassActorCount: 0,
+    currentUserCanAlwaysBypass: false,
     requiredDeploymentEnvironments: []
   };
   return finalize(checks);
@@ -90,6 +91,7 @@ function evaluateRulesetProtection(branchRules, rulesets) {
     ? applicableRulesets.reduce((count, set) =>
         count + set.bypass_actors.filter((actor) => actor?.bypass_mode === 'always').length, 0)
     : null;
+  const currentUserCanAlwaysBypass = applicableRulesets.some((set) => set.current_user_can_bypass === 'always');
   const checks = {
     activeProtectionPresent: rules.length > 0 && applicableRulesets.length > 0,
     activeRulesPresent: rules.length > 0,
@@ -103,7 +105,8 @@ function evaluateRulesetProtection(branchRules, rulesets) {
     conversationResolutionRequired: pullRequestParameters.required_review_thread_resolution === true,
     linearHistoryRequired: Boolean(rule('required_linear_history')),
     bypassActorsVisible,
-    adminEnforcementEnabled: bypassActorsVisible && unrestrictedBypassActorCount === 0,
+    currentUserCanAlwaysBypass,
+    adminEnforcementEnabled: bypassActorsVisible && unrestrictedBypassActorCount === 0 && !currentUserCanAlwaysBypass,
     forcePushDisabled: Boolean(rule('non_fast_forward')),
     branchDeletionDisabled: Boolean(rule('deletion')),
     requiredApprovingReviewCount: reviewCount,
@@ -137,6 +140,7 @@ export function evaluateMainBranchProtection(protection, rulesets = []) {
     activeRuleCount: 0,
     matchingRulesetCount: 0,
     unrestrictedBypassActorCount: 0,
+    currentUserCanAlwaysBypass: false,
     requiredDeploymentEnvironments: []
   });
 }

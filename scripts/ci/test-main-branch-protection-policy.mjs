@@ -76,7 +76,8 @@ function completeRuleset() {
     id: rulesetId,
     enforcement: 'active',
     conditions: { ref_name: { include: ['refs/heads/main'], exclude: [] } },
-    bypass_actors: []
+    bypass_actors: [],
+    current_user_can_bypass: 'never'
   }];
   return { rules, rulesets };
 }
@@ -87,6 +88,8 @@ assert.equal(completeEffective.passed, true, 'complete effective ruleset configu
 assert.equal(completeEffective.checks.requiredDeploymentEnvironments.length, 4);
 assert.equal(completeEffective.checks.unrestrictedBypassActorCount, 0);
 assert.equal(completeEffective.checks.bypassActorsVisible, true);
+assert.equal(completeEffective.checks.currentUserCanAlwaysBypass, false);
+assert.equal(completeEffective.checks.adminEnforcementEnabled, true);
 
 const currentMainRules = [
   'deletion', 'creation', 'update', 'required_deployments', 'pull_request', 'required_status_checks'
@@ -107,7 +110,8 @@ const currentMainRulesets = [{
   id: 26323884,
   enforcement: 'active',
   conditions: { ref_name: { include: ['refs/heads/main'], exclude: [] } },
-  bypass_actors: [{ actor_type: 'RepositoryRole', bypass_mode: 'always' }]
+  bypass_actors: [{ actor_type: 'RepositoryRole', bypass_mode: 'always' }],
+  current_user_can_bypass: 'always'
 }];
 const current = evaluateMainBranchProtection(currentMainRules, currentMainRulesets);
 assert.equal(current.checks.activeProtectionPresent, true, 'current branch has an active ruleset');
@@ -116,10 +120,12 @@ assert.equal(current.checks.requiredStatusChecksEnabled, false, 'empty required 
 assert.equal(current.checks.pullRequestReviewRequired, false, 'zero required approvals must be reported accurately');
 assert.equal(current.checks.adminEnforcementEnabled, false, 'always-bypass actors must be reported accurately');
 assert.equal(current.checks.unrestrictedBypassActorCount, 1);
-const hiddenBypass = evaluateMainBranchProtection(completeRules, [{ id: 26323884, enforcement: 'active' }]);
+assert.equal(current.checks.currentUserCanAlwaysBypass, true, 'the GitHub API current_user_can_bypass field must be evaluated');
+const hiddenBypass = evaluateMainBranchProtection(completeRules, [{ id: 26323884, enforcement: 'active', current_user_can_bypass: 'always' }]);
 assert.equal(hiddenBypass.checks.bypassActorsVisible, false, 'redacted bypass metadata must be reported as unknown');
 assert.equal(hiddenBypass.checks.unrestrictedBypassActorCount, null, 'unknown bypass count must never be represented as zero');
 assert.equal(hiddenBypass.checks.adminEnforcementEnabled, false, 'hidden bypass metadata must fail closed');
+assert.equal(hiddenBypass.checks.currentUserCanAlwaysBypass, true, 'current-user bypass must remain visible even when actor details are redacted');
 assert.equal(current.passed, false, 'active but incomplete ruleset must not be reported as fully protected');
 
 const unavailable = evaluateMainBranchProtection(null);
@@ -131,5 +137,6 @@ console.log(JSON.stringify({
   effectiveRuleset: completeEffective.passed,
   activeButIncompleteRulesetDetected: !current.passed,
   hiddenBypassMetadataFailsClosed: !hiddenBypass.passed,
+  currentUserAlwaysBypassDetected: current.checks.currentUserCanAlwaysBypass && hiddenBypass.checks.currentUserCanAlwaysBypass,
   unavailableResponseBlocked: true
 }, null, 2));
