@@ -16,6 +16,14 @@ const liveDocuments = readFileSync(new URL("../web/src/app/candidate/documents/p
 const liveDestiny = readFileSync(new URL("../web/src/app/free-destiny-map/page.tsx", import.meta.url), "utf8");
 const liveReceipt = readFileSync(new URL("../web/src/app/preview/payment-confirmed/page.tsx", import.meta.url), "utf8");
 const liveStaff = readFileSync(new URL("../web/src/app/preview/staff-review/page.tsx", import.meta.url), "utf8");
+const liveProfileRoute = readFileSync(new URL("../web/src/app/candidate/profile/page.tsx", import.meta.url), "utf8");
+const liveProfileForm = readFileSync(new URL("../web/src/components/candidate/CandidateMasterProfileForm.tsx", import.meta.url), "utf8");
+const liveSavedRoute = readFileSync(new URL("../web/src/app/candidate/saved-opportunities/page.tsx", import.meta.url), "utf8");
+const liveSavedClient = readFileSync(new URL("../web/src/components/candidate/CandidateSavedOpportunitiesClient.tsx", import.meta.url), "utf8");
+const liveMatches = readFileSync(new URL("../web/src/app/candidate/opportunity-matches/page.tsx", import.meta.url), "utf8");
+const liveAuthForm = readFileSync(new URL("../web/src/components/candidate/CandidateAuthForm.tsx", import.meta.url), "utf8");
+const liveAuthCallback = readFileSync(new URL("../web/src/app/auth/callback/page.tsx", import.meta.url), "utf8");
+const liveAuthCallbackClient = readFileSync(new URL("../web/src/components/candidate/AuthCallbackClient.tsx", import.meta.url), "utf8");
 
 for (const page of ["candidate-dashboard.html", "documents.html", "payment-confirmed.html", "staff-review.html", "packages.html", "destiny-map.html"]) {
   assert.ok(readFileSync(new URL("./" + page, import.meta.url), "utf8").includes("<html"), `missing page: ${page}`);
@@ -62,5 +70,17 @@ assert.ok(liveDestinyForm.includes("FREE_DESTINY_MAP_API_WIRING_NOTICE"), "Desti
 assert.ok(liveDestinyForm.includes("consentToProcessBasicInfo") && liveDestinyForm.includes("consentToBeContacted"), "Destiny Map must require explicit consent");
 assert.ok(liveReceipt.includes("No payment has been made") && liveReceipt.includes("Settlement status: not verified"), "payment receipt must stay an example until settlement verification");
 assert.ok(liveStaff.includes("Synthetic examples only") && liveStaff.includes("do not affect real candidate data"), "staff-review controls must stay demo-only");
+assert.ok(liveProfileRoute.includes("CandidateMasterProfileForm"), "candidate profile route must use the profile form");
+assert.ok(liveProfileForm.includes("/functions/v1/candidate-master-profile"), "candidate profile must use the verified Supabase profile service");
+assert.ok(liveProfileForm.includes('action: "load"') && liveProfileForm.includes('action: "save"'), "candidate profile must support backend load and save");
+assert.ok(liveProfileForm.includes("consentAccepted: true") && liveProfileForm.includes("pathwayPreferences"), "candidate profile must send consent and pathway preferences");
+assert.ok(liveProfileForm.includes('action: "revoke_consent"') && liveProfileForm.includes('action: "request_correction"'), "profile consent withdrawal and correction requests must use backend workflows");
+assert.ok(liveSavedRoute.includes("CandidateSavedOpportunitiesClient"), "saved-opportunities route must use the connected backend client");
+assert.ok(liveSavedClient.includes("candidate-master-profile") && liveSavedClient.includes("candidate_workspace_saved_opportunities"), "saved records must be identity-gated and loaded from the backend");
+assert.ok(liveSavedClient.includes('identityStatus !== "VERIFIED"'), "saved opportunity rows must be withheld until candidate identity is verified");
+assert.ok(liveMatches.includes("candidate-save-verified-opportunity") && liveMatches.includes('action: "save", match_ref: item.match_ref'), "verified opportunity save must use the guarded backend workflow");
+assert.ok(liveMatches.includes("Save & prepare draft") && liveMatches.includes("no provider submission occurred"), "candidate UI must distinguish saved draft from provider submission");
+assert.ok(liveAuthForm.includes("/auth/v1/signup") && liveAuthForm.includes('"/auth/callback"'), "registration must send confirmation links through the callback route");
+assert.ok(liveAuthCallback.includes("AuthCallbackClient") && liveAuthCallbackClient.includes("/auth/v1/user"), "auth callback must verify and store the returned Supabase session");
 
 console.log("Kingsmen frontend preview smoke checks passed.");
