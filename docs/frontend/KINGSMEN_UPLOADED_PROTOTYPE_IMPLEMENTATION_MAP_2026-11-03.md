@@ -2,50 +2,70 @@
 
 Date: 2026-11-03
 Source reviewed: `kingsmen-frontend-prototype.zip` (7 HTML screens + shared CSS)
+Product branch: `feat/kingsmen-frontend-product-slice-2026-11-03`
+Review pull request: [#316](https://github.com/kingsmenportal-ctrl/kingsmen-platform/pull/316)
 
 ## Integration decision
 
-Use the ZIP as a visual and journey reference, not as a replacement application. The real Netlify site builds the Next.js application under `apps/web`; standalone HTML under the repository root would not become the deployed product and would risk splitting candidate state across two frontends.
+The uploaded ZIP is a visual and journey reference, not a replacement application. Kingsmen remains the existing Next.js application under `apps/web`, backed by the existing Supabase project and Netlify staging site. The standalone static HTML screens are not published as a second frontend.
 
 ## Screen mapping
 
-| Prototype file | Intended product route | Integration boundary |
+| Prototype file | Kingsmen route | Implementation boundary |
 |---|---|---|
-| `index.html` | `/` | Public homepage; links into the six core pathways, Destiny Map and plans. |
-| `packages.html` | `/packages/` | Canonical plan catalogue. Prices are ZAR and must match the product contract; payment selection is not payment settlement. |
-| `destiny-map.html` | `/free-destiny-map/` | Free intake may call the existing public API boundary. A response from that boundary is not proof that answers were persisted or an official application submitted. |
-| `candidate-dashboard.html` | `/candidate/dashboard` | Authenticated candidate workspace; all six pathways remain discoverable regardless of plan. |
-| `documents.html` | `/candidate/documents` | PDF/JPEG/PNG preflight and 10 MiB per-file limit. Local hashing is not upload, private storage, verification, or reviewer approval. |
-| `payment-confirmed.html` | No live-success route from the ZIP alone | A confirmation page must only display verified PayFast ITN/settlement-backed status and a matching order. A static page must never activate entitlements. |
-| `staff-review.html` | Authenticated, role-authorised staff surface only | Never publish the standalone review queue as a public route. Demo controls and synthetic rows are not real review actions; decisions require server-side authorisation and audit evidence. |
-| `styles.css` | Existing shared Next.js styling/tokens and responsive components | Preserve navy/gold visual identity, mobile layout, keyboard focus and reduced-motion support while using the actual app router. |
+| `index.html` | `/` | Responsive navy/gold public homepage and six pathway navigation. |
+| `packages.html` | `/packages/` | Seven paid products, exact ZAR-cent plan codes, priorities and concurrent 30-day managed-route capacity; sandbox checkout is explicit. |
+| `destiny-map.html` | `/free-destiny-map/` | Consent-gated intake API boundary. Public intake does not claim that a candidate profile or official provider application was saved. |
+| `candidate-dashboard.html` | `/candidate/dashboard` | Candidate overview, six pathways, reusable profile, workbench, verified matches, saved opportunities, documents, tracker and finance navigation. |
+| `documents.html` | `/candidate/documents` | Authenticated private storage upload, server-side finalisation, candidate-reported receipt, audited private reads and human-review state. |
+| `payment-confirmed.html` | `/payment/return` | Safe return page. A browser redirect is not payment proof and cannot activate entitlements. |
+| Payment cancellation state | `/payment/cancel` | Safe cancellation page; it does not mark payment paid or change order state. |
+| `staff-review.html` | Not published as a public candidate route | Staff/reviewer decisions remain authenticated, role-authorised backend operations. Synthetic demo controls are not treated as operational actions. |
+| `styles.css` | `apps/web/src/app/public-home.css` and route components | Scoped responsive styles, navy/gold identity, keyboard focus and reduced-motion behavior. |
 
-## Product invariants to preserve
+## Integrated candidate journeys
 
-- One candidate account and reusable profile; one unified application workbench across Higher Education, TVET, SETA programmes/learnerships, Internships, Apprenticeships and Employment.
-- Plans affect priority application volume and managed-route capacity, not access to the six pathways.
-- Opportunity discovery must not label an item open without official source, deadline, eligibility and freshness evidence.
-- Candidate-reported submission, provider-confirmed receipt and provider decision/outcome remain distinct.
-- A plan selection is not an order, payment, settlement or entitlement. Entitlements require verified payment handling.
-- File selection/preflight is not a private upload. Private signed access, ownership checks and reviewer events must be enforced by the backend.
-- No guarantee of admission, funding, placement, employment or provider outcome.
+- **Identity and profile:** Supabase Auth sign-in/registration plus an auth callback; reusable profile editing, explicit processing/contact consent, consent revocation and correction requests. New Auth accounts are not automatically linked to an existing candidate by email equality. Identity linking may remain pending until authorised review.
+- **Six-pathway discovery:** Higher Education, TVET, SETA programmes/learnerships, Internships, Apprenticeships and Employment remain discoverable across all plans. Current opportunity publication is still constrained by official-source, eligibility, deadline and freshness evidence.
+- **Save and prepare:** A verified match can be saved through the candidate-save-verified-opportunity Edge Function. The backend prepares a parent application draft and saved-opportunity record. This is not provider submission or provider receipt.
+- **Document Vault:** PDF/JPEG/PNG only, maximum 10 MiB. The authenticated candidate obtains a short-lived upload capability, uploads to the private bucket, and calls server finalisation. The backend re-reads and validates the file signature/type/size and SHA-256 before recording `UPLOADED_CANDIDATE_REPORTED`. Audited signed-read links expire after 60 seconds. Candidate upload is not human verification.
+- **Plans and payment:** Seven paid plan codes are wired to the finance catalogue. Checkout calls the PayFast sandbox endpoint with an idempotency key and only accepts the approved HTTPS sandbox checkout host. The Edge Function requires a confirmed email and exactly one verified candidate identity link. The browser return/cancel pages do not settle an order. Entitlements depend on the server accepting a verified PayFast ITN.
+- **Public intake:** Free Destiny Map sends a minimum, consent-bound request to the existing intake API. Do not describe this as persistent candidate-profile creation or official provider application submission.
 
-## Current integration state
+## Deployed backend dependencies inspected
 
-The associated frontend PR integrates the reference journeys into the existing Next.js application rather than serving the standalone HTML as the product. Authentication screens call the configured Supabase Auth REST boundary. The free intake is wired to the existing public intake boundary. Document preflight computes a local SHA-256 and validates format/size, but document upload/read signer endpoints remain incomplete. Paid checkout/PayFast settlement and candidate profile persistence are not claimed complete.
+Supabase staging project: `euhubhhnumtibbyufghm`.
 
-## Verification and deployment status
+The following active Edge Functions were inspected in staging and their UI request/response contracts were matched:
 
-- The latest observed Kingsmen CI run for PR #316, run `41685131453`, completed successfully at the time of review (focused repository tests, API build and Next.js web build).
-- The separate branch-protection evidence run `41685131620` failed because the protection query returned HTTP 404 / protection was not visible. This does not prove that a deployment succeeded and must not be bypassed.
-- Netlify site metadata identifies `kingsmen-portal-staging` (site ID `fb27d0db-b116-4890-8f7f-14e654c27dbc`) and a Next.js build based at `apps/web`. The available Netlify connector cannot trigger or enumerate deployments, and no exact published commit/deploy ID has been verified here.
-- A PR Deploy Preview should be checked in Netlify/GitHub before describing this commit as deployed. A production publish requires the approved merge and the resulting Netlify deploy to be confirmed against the exact commit.
+| Function | Observed version | Purpose |
+|---|---:|---|
+| `candidate-master-profile` | 3 | Identity gate, reusable profile, consent and correction requests |
+| `candidate-save-verified-opportunity` | 3 | Verified opportunity save and parent application draft preparation |
+| `n15-candidate-opportunities` | 2 | Candidate-specific verified opportunity feed |
+| `candidate-private-documents` | 16 | Candidate-owned private upload/list/finalise/read workflow |
+| `candidate-application-preparation` | 16 | Application preparation boundary |
+| `payfast-sandbox` | 9 | Sandbox checkout intent and verified ITN handling |
 
-This document records the source mapping and current boundaries; it is not itself runtime or deployment evidence.
+The PayFast v9 deployment changed only the CORS allow-list: the configured staging origin and this Netlify site's preview subdomains are accepted. The function's existing manual Supabase user validation, confirmed-email/candidate-identity requirements, signed checkout fields and ITN verification/settlement logic were retained. Its `verify_jwt=false` setting pre-existed because the function validates the bearer token itself; no secret is sent to the browser.
 
+## Product invariants
 
-## Latest visual integration update
+- One candidate account and reusable profile; one unified application workbench across all six pathways.
+- Plans control priority application volume and managed-route capacity, not pathway discovery.
+- A directory/source anchor is not an open opportunity without source, deadline, eligibility and freshness evidence.
+- Candidate-reported submission, provider-confirmed receipt and provider decision/outcome are different events.
+- A package selection or browser return is not an order settlement or entitlement.
+- Candidate documents remain private; candidates cannot approve, reject or delete their own evidence records.
+- Jarvis/AI support does not autonomously approve identity, documents, applications, provider outcomes or payments.
+- No admission, funding, placement, employment or provider outcome is guaranteed.
 
-The responsive public homepage markup and scoped navy/gold styles from the companion preview branch have now been integrated into this product branch. The integrated candidate workbench, plan catalogue, authentication entry points, intake API boundary and document preflight remain the source of functional route behavior. This update does not turn the payment receipt or staff-review mockup into production features.
+## Validation and deployment evidence
 
-Netlify Deploy Preview entry path: `/` (requested via the pull request description). The preview must still be checked against the exact current PR head before any deployment claim.
+- **Latest successful code CI:** [run 41691385004](https://github.com/kingsmenportal-ctrl/kingsmen-platform/actions/runs/41691385004), commit `262fb790ed2927b4d7925c43995cdbf0a50feb9a`. The `test-and-build` job completed focused repository tests, API build and the Next.js production build successfully.
+- **Branch protection evidence:** [run 41691384976](https://github.com/kingsmenportal-ctrl/kingsmen-platform/actions/runs/41691384976) failed at the read-only GitHub protection query with HTTP 404 and status `BLOCKED_PROTECTION_NOT_FOUND_OR_NOT_VISIBLE`. This is a visibility/verification failure, not proof that branch protection is absent. No protection bypass was performed.
+- **Netlify target:** `kingsmen-portal-staging`, site ID `fb27d0db-b116-4890-8f7f-14e654c27dbc`; configured build base `apps/web`, command `npm run build`, publish `.next`.
+- **Deploy Preview:** Netlify's documented PR preview URL pattern for PR #316 is `https://deploy-preview-316--kingsmen-portal-staging.netlify.app`. The PR description requests the root entry path using `@netlify /`. The connected Netlify API returned a changing branch-version hostname but did not expose a deploy ID/details for the current commit. The exact published SHA, deploy result and runtime page were therefore **not verified** in this session.
+- **Release boundary:** PR #316 remains open and unmerged. No direct `main` commit, production deployment, live payment or entitlement activation was performed. Authenticated Candidate A/B runtime isolation and a full browser upload/checkout/ITN test remain separate runtime verification tasks.
+
+This document is an implementation map and evidence summary. It does not substitute for a successful staging Deploy Preview tied to the exact PR head or authenticated end-to-end browser verification.
