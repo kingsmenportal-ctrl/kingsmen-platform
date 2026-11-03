@@ -51,7 +51,7 @@ export function DocumentPreflightPanel() {
     try {
       const digest = await crypto.subtle.digest("SHA-256", await file.arrayBuffer());
       const sha256 = Array.from(new Uint8Array(digest), (byte) => byte.toString(16).padStart(2, "0")).join("");
-      setPreflight({ name: file.name, size: file.size, mime: file.type || ALLOWED_TYPES["application/pdf"], sha256 });
+      setPreflight({ name: file.name, size: file.size, mime: file.type || (extension === ".pdf" ? "application/pdf" : extension === ".png" ? "image/png" : "image/jpeg"), sha256 });
     } catch {
       setError("The file was not uploaded. This browser could not compute a SHA-256 preflight digest.");
     } finally {
