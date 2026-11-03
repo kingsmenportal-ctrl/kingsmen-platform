@@ -43,6 +43,7 @@ for (const pathway of ["Higher Education", "TVET Colleges", "SETAs & Learnership
   assert.ok(liveHome.includes(pathway), `live homepage missing pathway: ${pathway}`);
 }
 assert.ok(liveLayout.includes('import "./public-home.css"'), "Next.js layout must load the Kingsmen design system");
+assert.ok(liveHome.includes("Candidate account creation, real uploads, provider submissions and checkout are not enabled"), "public homepage must disclose preview limitations");
 assert.ok(liveCss.includes("--km-navy:#0a1348") && liveCss.includes("--km-gold:#c9a227"), "live frontend design tokens missing");
 for (const plan of ["Foundational Accord", "Collegiate Ordinance", "Chancellor’s Writ", "Regency Mandate", "Artisan Charter", "Guildmasters Charter", "CV Revamp", "Free Destiny Map"]) {
   assert.ok(livePackages.includes(plan), `live package route missing: ${plan}`);
