@@ -1,242 +1,77 @@
-﻿export default function FreeDestinyMapPage() {
+"use client";
+
+import Link from "next/link";
+import { useState } from "react";
+
+type IntakeValues = {
+  currentStage: string;
+  province: string;
+  routeInterest: string;
+  biggestBlocker: string;
+  readinessGoal: string;
+  confirmed: boolean;
+};
+
+const initialValues: IntakeValues = {
+  currentStage: "",
+  province: "",
+  routeInterest: "",
+  biggestBlocker: "",
+  readinessGoal: "",
+  confirmed: false,
+};
+
+export default function FreeDestinyMapPage() {
+  const [values, setValues] = useState<IntakeValues>(initialValues);
+  const [preview, setPreview] = useState("");
+  function update<K extends keyof IntakeValues>(key: K, value: IntakeValues[K]) {
+    setValues((current) => ({ ...current, [key]: value }));
+    setPreview("");
+  }
+  function handleSubmit(event: React.FormEvent<HTMLFormElement>) {
+    event.preventDefault();
+    if (!values.confirmed) {
+      setPreview("Please confirm that you understand this is a local preview only.");
+      return;
+    }
+    const route = values.routeInterest === "I am not sure yet" ? "a guided pathway review" : values.routeInterest;
+    setPreview(
+      "Local route preview: start by checking source-backed options for " + route + " in " + values.province +
+      ". Your current stage is " + values.currentStage + " and your main blocker is " + values.biggestBlocker +
+      ". Your answers have not been sent or saved. This is not an application and does not guarantee an outcome."
+    );
+  }
+
   return (
-    <main
-      style={{
-        minHeight: "100vh",
-        padding: "32px",
-        background:
-          "radial-gradient(circle at top left, rgba(214,178,94,0.2), transparent 34%), #080a12",
-        color: "#f8f3e7",
-        fontFamily:
-          "Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, Segoe UI, sans-serif"
-      }}
-    >
-      <section
-        data-kingsmen-free-destiny-map-identity="true"
-        style={{ maxWidth: "980px", margin: "0 auto", display: "grid", gap: "18px" }}
-      >
-        <p
-          style={{
-            margin: 0,
-            color: "#d6b25e",
-            fontSize: "13px",
-            letterSpacing: "0.16em",
-            textTransform: "uppercase",
-            fontWeight: 900
-          }}
-        >
-          Free Destiny Map
-        </p>
-
-        <h1 style={{ margin: 0, fontSize: "44px", lineHeight: 1.05, color: "#fff7d6" }}>
-          Start your Kingsmen route discovery.
-        </h1>
-
-        <p style={{ maxWidth: "760px", color: "#d5d9e2", fontSize: "16px", lineHeight: 1.7 }}>
-          This safe public intake surface helps you describe your current stage, province, route
-          interest, biggest blocker, and readiness goal before any managed package. No payment is
-          required for this Free Destiny Map starting point.
-        </p>
-
-        <form
-          data-kingsmen-free-destiny-map-intake="true"
-          style={{
-            display: "grid",
-            gap: "14px",
-            padding: "22px",
-            borderRadius: "28px",
-            border: "1px solid rgba(214, 178, 94, 0.28)",
-            background: "rgba(255, 255, 255, 0.045)",
-            boxShadow: "0 22px 70px rgba(0,0,0,0.28)"
-          }}
-        >
-          <div style={{ display: "grid", gap: "7px" }}>
-            <label htmlFor="current-stage" style={{ color: "#fff7d6", fontWeight: 800 }}>
-              Current stage
-            </label>
-            <select
-              id="current-stage"
-              data-kingsmen-intake-field="current-stage"
-              defaultValue=""
-              style={{
-                padding: "12px",
-                borderRadius: "14px",
-                border: "1px solid rgba(214, 178, 94, 0.22)",
-                background: "#101522",
-                color: "#f8f3e7"
-              }}
-            >
-              <option value="" disabled>
-                Choose your current stage
-              </option>
-              <option>Grade 9 - 11</option>
-              <option>Grade 12 / Matric</option>
-              <option>Matric completed</option>
-              <option>TVET / college student</option>
-              <option>Unemployed and seeking opportunity</option>
-              <option>Working and seeking upgrade</option>
-            </select>
-          </div>
-
-          <div style={{ display: "grid", gap: "7px" }}>
-            <label htmlFor="province" style={{ color: "#fff7d6", fontWeight: 800 }}>
-              Province
-            </label>
-            <select
-              id="province"
-              data-kingsmen-intake-field="province"
-              defaultValue=""
-              style={{
-                padding: "12px",
-                borderRadius: "14px",
-                border: "1px solid rgba(214, 178, 94, 0.22)",
-                background: "#101522",
-                color: "#f8f3e7"
-              }}
-            >
-              <option value="" disabled>
-                Choose province
-              </option>
-              <option>Eastern Cape</option>
-              <option>Free State</option>
-              <option>Gauteng</option>
-              <option>KwaZulu-Natal</option>
-              <option>Limpopo</option>
-              <option>Mpumalanga</option>
-              <option>Northern Cape</option>
-              <option>North West</option>
-              <option>Western Cape</option>
-            </select>
-          </div>
-
-          <div style={{ display: "grid", gap: "7px" }}>
-            <label htmlFor="route-interest" style={{ color: "#fff7d6", fontWeight: 800 }}>
-              Route interest
-            </label>
-            <select
-              id="route-interest"
-              data-kingsmen-intake-field="route-interest"
-              defaultValue=""
-              style={{
-                padding: "12px",
-                borderRadius: "14px",
-                border: "1px solid rgba(214, 178, 94, 0.22)",
-                background: "#101522",
-                color: "#f8f3e7"
-              }}
-            >
-              <option value="" disabled>
-                Choose route
-              </option>
-              <option>University</option>
-              <option>TVET college</option>
-              <option>SETA / learnership</option>
-              <option>Internship / apprenticeship</option>
-              <option>Employment / CV path</option>
-              <option>Bursary / funding support</option>
-              <option>I am not sure yet</option>
-            </select>
-          </div>
-
-          <div style={{ display: "grid", gap: "7px" }}>
-            <label htmlFor="biggest-blocker" style={{ color: "#fff7d6", fontWeight: 800 }}>
-              Biggest blocker
-            </label>
-            <select
-              id="biggest-blocker"
-              data-kingsmen-intake-field="biggest-blocker"
-              defaultValue=""
-              style={{
-                padding: "12px",
-                borderRadius: "14px",
-                border: "1px solid rgba(214, 178, 94, 0.22)",
-                background: "#101522",
-                color: "#f8f3e7"
-              }}
-            >
-              <option value="" disabled>
-                Choose blocker
-              </option>
-              <option>I do not know what to apply for</option>
-              <option>I am missing documents</option>
-              <option>I need funding guidance</option>
-              <option>I need a better CV</option>
-              <option>I am worried about deadlines</option>
-              <option>I need backup options</option>
-            </select>
-          </div>
-
-          <div style={{ display: "grid", gap: "7px" }}>
-            <label htmlFor="readiness-goal" style={{ color: "#fff7d6", fontWeight: 800 }}>
-              Readiness goal
-            </label>
-            <textarea
-              id="readiness-goal"
-              data-kingsmen-intake-field="readiness-goal"
-              placeholder="Example: I want to know the safest route and what documents I need."
-              rows={4}
-              style={{
-                padding: "12px",
-                borderRadius: "14px",
-                border: "1px solid rgba(214, 178, 94, 0.22)",
-                background: "#101522",
-                color: "#f8f3e7",
-                resize: "vertical"
-              }}
-            />
-          </div>
-
-          <label
-            style={{
-              display: "flex",
-              gap: "10px",
-              alignItems: "flex-start",
-              color: "#d5d9e2",
-              fontSize: "13px",
-              lineHeight: 1.6
-            }}
-          >
-            <input
-              id="intake-boundary-confirmation"
-              data-kingsmen-intake-field="boundary-confirmation"
-              type="checkbox"
-              style={{ marginTop: "4px" }}
-            />
-            I understand this is a safe Free Destiny Map starting surface only. It does not submit
-            my information yet, does not create an application, and does not guarantee acceptance,
-            funding, placement, or employment.
-          </label>
-
-          <button
-            data-kingsmen-intake-button="preview-path"
-            type="button"
-            style={{
-              display: "inline-flex",
-              width: "fit-content",
-              alignItems: "center",
-              justifyContent: "center",
-              marginTop: "8px",
-              padding: "13px 18px",
-              borderRadius: "999px",
-              border: "1px solid rgba(214, 178, 94, 0.62)",
-              background: "linear-gradient(135deg, rgba(214,178,94,0.22), rgba(214,178,94,0.08))",
-              color: "#f8d77a",
-              fontWeight: 900,
-              textDecoration: "none",
-              boxShadow: "0 16px 48px rgba(0,0,0,0.24)"
-            }}
-          >
-            Preview my readiness path
-          </button>
+    <main className="public-site destiny-map-page">
+      <div className="public-notice"><span aria-hidden="true" /> FREE DESTINY MAP · LOCAL PREVIEW ONLY</div>
+      <header className="public-header"><div className="public-container public-header-inner">
+        <Link className="public-brand" href="/" aria-label="Kingsmen Portal home"><span className="public-crest" aria-hidden="true">K</span><span className="public-wordmark"><strong>KINGSMEN</strong><small>PORTAL</small></span></Link>
+        <nav className="public-nav" aria-label="Main navigation"><Link href="/">Home</Link><Link href="/packages/">Packages</Link><Link href="/candidate/dashboard/">Candidate portal</Link></nav>
+      </div></header>
+      <div className="public-container destiny-map-layout">
+        <section className="destiny-map-intro" data-kingsmen-free-destiny-map-identity="true">
+          <div className="public-eyebrow"><span /> YOUR NEXT MOVE STARTS HERE</div>
+          <h1>Build your <em>Destiny Map.</em></h1>
+          <p>Describe where you are, the route you are considering and what is getting in your way. This local preview gives you a starting direction before any provider application.</p>
+          <div className="destiny-map-benefits"><span>✓ Six core pathways</span><span>✓ South African context</span><span>✓ Clear next-step guidance</span></div>
+          <div className="destiny-map-boundary"><strong>Privacy boundary</strong><p>Do not enter identity numbers, banking details, contact details or other sensitive personal information. Your answers stay in this page session and are not sent to a backend.</p></div>
+          <Link className="destiny-map-back-link" href="/">← Back to Kingsmen Portal</Link>
+        </section>
+        <form className="destiny-map-form" data-kingsmen-free-destiny-map-intake="true" onSubmit={handleSubmit}>
+          <div className="destiny-map-form-heading"><span>STEP 01 <i>OF 03</i></span><h2>Tell us about your next move</h2><p>Free starting point · Nothing is submitted or saved</p></div>
+          <div className="destiny-map-field"><label htmlFor="current-stage">Current stage</label><select id="current-stage" name="current-stage" data-kingsmen-intake-field="current-stage" value={values.currentStage} onChange={(e) => update("currentStage", e.target.value)} required><option value="">Choose your current stage</option><option>Grade 9–11</option><option>Grade 12 / Matric</option><option>Matric completed</option><option>TVET / college student</option><option>Unemployed and seeking opportunity</option><option>Working and seeking upgrade</option></select></div>
+          <div className="destiny-map-field"><label htmlFor="province">Province</label><select id="province" name="province" data-kingsmen-intake-field="province" value={values.province} onChange={(e) => update("province", e.target.value)} required><option value="">Choose province</option><option>Eastern Cape</option><option>Free State</option><option>Gauteng</option><option>KwaZulu-Natal</option><option>Limpopo</option><option>Mpumalanga</option><option>Northern Cape</option><option>North West</option><option>Western Cape</option></select></div>
+          <div className="destiny-map-field"><label htmlFor="route-interest">Route interest</label><select id="route-interest" name="route-interest" data-kingsmen-intake-field="route-interest" value={values.routeInterest} onChange={(e) => update("routeInterest", e.target.value)} required><option value="">Choose a route</option><option>Higher Education</option><option>TVET College</option><option>SETA / learnership</option><option>Internship</option><option>Apprenticeship</option><option>Employment / CV support</option><option>Bursary / funding support</option><option>I am not sure yet</option></select></div>
+          <div className="destiny-map-field"><label htmlFor="biggest-blocker">Biggest blocker</label><select id="biggest-blocker" name="biggest-blocker" data-kingsmen-intake-field="biggest-blocker" value={values.biggestBlocker} onChange={(e) => update("biggestBlocker", e.target.value)} required><option value="">Choose the biggest blocker</option><option>I do not know what to apply for</option><option>I am missing documents</option><option>I need funding guidance</option><option>I need a better CV</option><option>I am worried about deadlines</option><option>I need backup options</option></select></div>
+          <div className="destiny-map-field"><label htmlFor="readiness-goal">Readiness goal <span>(optional)</span></label><textarea id="readiness-goal" name="readiness-goal" data-kingsmen-intake-field="readiness-goal" value={values.readinessGoal} onChange={(e) => update("readinessGoal", e.target.value)} placeholder="In general terms, what would you like to clarify next?" rows={3} /></div>
+          <label className="destiny-map-consent"><input id="intake-boundary-confirmation" data-kingsmen-intake-field="boundary-confirmation" type="checkbox" checked={values.confirmed} onChange={(e) => update("confirmed", e.target.checked)} /><span>I understand this is a local preview only. It does not submit my information, create an application or guarantee acceptance, funding, placement or employment.</span></label>
+          <button className="public-button public-button-gold destiny-map-submit" data-kingsmen-intake-button="preview-path" type="submit">Preview my readiness path <span aria-hidden="true">→</span></button>
+          {preview && <div className="destiny-map-result" role="status" aria-live="polite">{preview}</div>}
+          <p className="destiny-map-form-footnote">No data is sent, no account is created and no application is submitted by this form.</p>
         </form>
-
-        <p style={{ color: "#aeb7c5", fontSize: "13px", lineHeight: 1.6 }}>
-          Boundary: this page is a public intake surface only. It does not collect personal contact channels,
-          official personal identifiers, documents, payments, outbound messages, urgent channel messages, production
-          credentials, or Oracle deployment proof.
-        </p>
-      </section>
+      </div>
+      <footer className="public-footer public-container"><Link className="public-brand public-brand-footer" href="/"><span className="public-crest" aria-hidden="true">K</span><span className="public-wordmark"><strong>KINGSMEN</strong><small>PORTAL</small></span></Link><span>Free Destiny Map · Preview only</span><span>Verify source, deadline and eligibility before applying.</span></footer>
     </main>
   );
 }
-
