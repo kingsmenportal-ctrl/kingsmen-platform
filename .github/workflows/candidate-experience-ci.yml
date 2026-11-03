@@ -2,9 +2,9 @@ name: Candidate Experience CI
 
 on:
   push:
-    branches: [feat/candidate-experience-closeout-2026-10-30, feat/application-capacity-entitlements-2026-11-01]
+    branches: [feat/candidate-experience-closeout-2026-10-30, feat/application-capacity-entitlements-2026-11-01, feat/provider-receipt-evidence-tracking-2026-11-01, feat/candidate-application-draft-persistence-2026-11-01]
   pull_request:
-    branches: [main, feat/backend-simplification-baseline-2026-10-29, feat/candidate-experience-closeout-2026-10-30]
+    branches: [main, feat/backend-simplification-baseline-2026-10-29, feat/candidate-experience-closeout-2026-10-30, feat/application-capacity-entitlements-2026-11-01, feat/provider-receipt-evidence-tracking-2026-11-01]
   workflow_dispatch:
 
 permissions:
@@ -13,7 +13,7 @@ permissions:
 jobs:
   candidate-experience:
     name: candidate-experience-build-and-contract
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     services:
       postgres:
         image: postgres:17
@@ -62,7 +62,28 @@ jobs:
         run: psql -v ON_ERROR_STOP=1 -f db/migrations/0107_application_capacity_entitlements_20261101.sql
       - name: Exercise paid entitlements, reservations, isolation and release guards
         run: psql -v ON_ERROR_STOP=1 -f scripts/staging/test-application-capacity-postgres.sql
+
+      - name: Create isolated candidate application draft test database
+        run: createdb -h localhost -p "$PGPORT" -U "$PGUSER" kingsmen_application_draft_test
+      - name: Bootstrap isolated candidate application draft schema
+        run: psql -d kingsmen_application_draft_test -v ON_ERROR_STOP=1 -f scripts/staging/fixtures/application-draft-postgres-bootstrap.sql
+      - name: Apply application draft migration to disposable PostgreSQL 17
+        run: psql -d kingsmen_application_draft_test -v ON_ERROR_STOP=1 -f db/migrations/0109_candidate_application_draft_persistence_20261101.sql
+      - name: Exercise draft persistence, idempotency, optimistic locking, input validation and A/B isolation
+        run: psql -d kingsmen_application_draft_test -v ON_ERROR_STOP=1 -f scripts/staging/test-candidate-application-draft-postgres.sql
       - name: Build backend API
         run: npm run api:build
       - name: Build Next.js web application
+        env:
+          NEXT_PUBLIC_SUPABASE_URL: http://127.0.0.1:54321
+          NEXT_PUBLIC_SUPABASE_ANON_KEY: kingsmen-test-anon-key
         run: npm --prefix apps/web run build
+
+      - name: Install Chromium for candidate browser regression
+        run: apps/web/node_modules/.bin/playwright install --with-deps chromium
+      - name: Run built candidate application browser journey
+        env:
+          NEXT_PUBLIC_SUPABASE_URL: http://127.0.0.1:54321
+          NEXT_PUBLIC_SUPABASE_ANON_KEY: kingsmen-test-anon-key
+          KINGSMEN_TEST_PORT: "4388"
+        run: node scripts/staging/test-candidate-application-form-playwright.mjs
