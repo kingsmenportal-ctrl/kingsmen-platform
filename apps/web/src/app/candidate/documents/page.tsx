@@ -208,13 +208,14 @@ export default function CandidateDocumentsPage() {
       if (!documentId || !signedUrl) throw new Error("The private document service did not return a signed upload capability.");
 
       // The signed URL is one-time and short-lived. The raw file is uploaded directly to private Storage.
-      const uploadBody = new FormData();
-      uploadBody.append("cacheControl", "3600");
-      uploadBody.append("", file, file.name);
       const storageResponse = await fetch(signedUrl, {
         method: "PUT",
-        headers: { "x-upsert": "false" },
-        body: uploadBody
+        headers: {
+          "Content-Type": mimeType,
+          "x-upsert": "false"
+        },
+        body: file,
+        cache: "no-store"
       });
       if (!storageResponse.ok) {
         let detail = "";
