@@ -81,7 +81,7 @@ jobs:
       - name: Build using Netlify deploy-preview context
         run: npx --yes netlify-cli@latest build --context deploy-preview
       - name: Upload a draft staging deploy (never production)
-        run: npx --yes netlify-cli@latest deploy --message="Kingsmen frontend PR #317 staging draft $GITHUB_SHA" --json > "$RUNNER_TEMP/netlify-deploy.json"
+        run: npx --yes netlify-cli@latest deploy --no-build --message="Kingsmen frontend PR #317 staging draft $GITHUB_SHA" --json > "$RUNNER_TEMP/netlify-deploy.json"
       - name: Record draft URL and smoke-test the deployed routes
         shell: bash
         run: |
@@ -104,7 +104,7 @@ jobs:
           }
           if (!url || !url.startsWith("http")) { console.error("No HTTP preview URL returned by Netlify CLI. Response keys:", Object.keys(raw || {})); process.exit(1); }
           const deployId = raw.deploy_id || raw.id || "not returned";
-          const base = url.replace(/\\/+$/, "");
+          const base = url.endsWith("/") ? url.slice(0, -1) : url;
           const routes = [
             ["/", "Kingsmen Portal"],
             ["/packages/", "Foundational Accord"],
@@ -145,7 +145,7 @@ jobs:
               "- Public route smoke tests: " + (routes.length - failures.length) + "/" + routes.length + " passed.",
               "- Authenticated data persistence, private file upload, payment settlement and provider receipt remain separate backend verification items."
             ];
-            fs.appendFileSync(process.env.GITHUB_STEP_SUMMARY, lines.join("\\n") + "\\n");
+            fs.appendFileSync(process.env.GITHUB_STEP_SUMMARY, lines.join("\n") + "\n");
             console.log("Netlify draft URL: " + url);
             console.log("Netlify deploy ID: " + deployId);
             if (failures.length) process.exit(1);
