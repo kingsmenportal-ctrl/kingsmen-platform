@@ -29,12 +29,19 @@ type Opportunity = {
 
 type Feed = { status: string; count?: number; opportunities?: Opportunity[]; message?: string; empty_reason?: string };
 
-function getAccessToken(): string | null {
+function getAuthContext(): { url: string; anonKey: string; token: string } | null {
   try {
-    const stored = window.localStorage.getItem("sb-euhubhhnumtibbyufghm-auth-token");
+    const url = process.env.NEXT_PUBLIC_SUPABASE_URL?.replace(/\/$/, "");
+    const anonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
+    if (!url || !anonKey) return null;
+    const projectRef = new URL(url).hostname.split(".")[0];
+    const storageKey = projectRef ? `sb-${projectRef}-auth-token` : "sb-euhubhhnumtibbyufghm-auth-token";
+    const stored = window.localStorage.getItem(storageKey);
     if (!stored) return null;
-    const parsed = JSON.parse(stored);
-    return typeof parsed.access_token === "string" ? parsed.access_token : null;
+    const parsed = JSON.parse(stored) as { access_token?: string; expires_at?: number };
+    if (typeof parsed.access_token !== "string") return null;
+    if (typeof parsed.expires_at === "number" && parsed.expires_at <= Math.floor(Date.now() / 1000)) return null;
+    return { url, anonKey, token: parsed.access_token };
   } catch { return null; }
 }
 
@@ -43,20 +50,19 @@ export default function CandidateOpportunityMatchesPage() {
   const [pathway, setPathway] = useState("ALL");
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
+  const [savingMatchRef, setSavingMatchRef] = useState<string | null>(null);
+  const [saveResults, setSaveResults] = useState<Record<string, { ok: boolean; message: string }>>({});
 
   async function loadMatches() {
     setLoading(true);
     setError("");
     setFeed(null);
     try {
-      const url = process.env.NEXT_PUBLIC_SUPABASE_URL;
-      const anonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
-      const token = getAccessToken();
-      if (!url || !anonKey) throw new Error("Candidate matching is not configured for this deployment.");
-      if (!token) throw new Error("Please sign in first. Your authenticated session was not found in this browser.");
-      const response = await fetch(`${url.replace(/\/$/, "")}/functions/v1/n15-candidate-opportunities`, {
+      const auth = getAuthContext();
+      if (!auth) throw new Error("Sign in with an active session. Candidate matching is not configured or your session may have expired.");
+      const response = await fetch(`${auth.url}/functions/v1/n15-candidate-opportunities`, {
         method: "GET",
-        headers: { apikey: anonKey, Authorization: `Bearer ${token}` },
+        headers: { apikey: auth.anonKey, Authorization: `Bearer ${auth.token}` },
         cache: "no-store"
       });
       const body = await response.json();
@@ -78,6 +84,34 @@ export default function CandidateOpportunityMatchesPage() {
   const opportunities = useMemo(() => (feed?.opportunities ?? []).filter(item =>
     pathway === "ALL" || item.pathways.includes(pathway)
   ), [feed, pathway]);
+
+  async function saveOpportunity(item: Opportunity) {
+    const auth = getAuthContext();
+    if (!auth) {
+      setSaveResults((current) => ({ ...current, [item.match_ref]: { ok: false, message: "Sign in again before saving an opportunity." } }));
+      return;
+    }
+    setSavingMatchRef(item.match_ref);
+    setSaveResults((current) => { const next = { ...current }; delete next[item.match_ref]; return next; });
+    try {
+      const response = await fetch(`${auth.url}/functions/v1/candidate-save-verified-opportunity`, {
+        method: "POST",
+        headers: { apikey: auth.anonKey, Authorization: `Bearer ${auth.token}`, "Content-Type": "application/json" },
+        body: JSON.stringify({ action: "save", match_ref: item.match_ref, pathway_type: item.pathways[0] ?? "" }),
+        cache: "no-store"
+      });
+      let body: { ok?: boolean; code?: string; error?: string; message?: string; trackerLinked?: boolean; application?: unknown } = {};
+      try { body = await response.json(); } catch {}
+      if (!response.ok || body.ok !== true) {
+        throw new Error(body.error || body.message || body.code || `Save request failed (${response.status}).`);
+      }
+      setSaveResults((current) => ({ ...current, [item.match_ref]: { ok: true, message: body.message || "Saved to your candidate workspace. The application remains a draft; no provider submission occurred." } }));
+    } catch (caught) {
+      setSaveResults((current) => ({ ...current, [item.match_ref]: { ok: false, message: caught instanceof Error ? caught.message : "The opportunity was not confirmed as saved." } }));
+    } finally {
+      setSavingMatchRef(null);
+    }
+  }
 
   return (
     <main className="mx-auto max-w-6xl space-y-6 px-4 py-8">
@@ -141,8 +175,15 @@ export default function CandidateOpportunityMatchesPage() {
                     <div><dt className="inline font-semibold text-slate-800">Deadline: </dt><dd className="inline text-slate-600">{item.deadline.closes_at ? new Date(item.deadline.closes_at).toLocaleString() : item.deadline.message || "Not verified — check the official page."}</dd></div>
                     <div><dt className="inline font-semibold text-slate-800">Eligibility review: </dt><dd className="inline text-slate-600">{item.eligibility.status} — {item.eligibility.rules}</dd></div>
                   </dl>
-                  <a href={item.official_link} target="_blank" rel="noopener noreferrer"
-                    className="mt-5 inline-flex rounded-xl bg-slate-950 px-4 py-3 text-sm font-bold text-white">Open official opportunity ↗</a>
+                  <div className="mt-5 flex flex-wrap gap-3">
+                    <a href={item.official_link} target="_blank" rel="noopener noreferrer"
+                      className="inline-flex rounded-xl bg-slate-950 px-4 py-3 text-sm font-bold text-white">Open official opportunity ↗</a>
+                    <button type="button" onClick={() => void saveOpportunity(item)} disabled={savingMatchRef === item.match_ref}
+                      className="inline-flex rounded-xl border border-slate-300 bg-white px-4 py-3 text-sm font-bold text-slate-900 disabled:cursor-wait disabled:opacity-60">
+                      {savingMatchRef === item.match_ref ? "Saving…" : "Save & prepare draft"}
+                    </button>
+                  </div>
+                  {saveResults[item.match_ref] ? <p role={saveResults[item.match_ref].ok ? "status" : "alert"} aria-live="polite" className={`mt-3 rounded-xl border p-3 text-sm leading-6 ${saveResults[item.match_ref].ok ? "border-emerald-200 bg-emerald-50 text-emerald-950" : "border-amber-200 bg-amber-50 text-amber-950"}`}>{saveResults[item.match_ref].message}</p> : null}
                 </article>
               ))}
             </section>
