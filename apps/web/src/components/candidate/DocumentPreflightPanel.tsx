@@ -241,7 +241,7 @@ export function DocumentPreflightPanel() {
         (serverHash && serverHash !== localSha256 ? " The server checksum differs from the local preflight checksum; contact support." : "")
       );
       setFile(null);
-      const input = document.getElementById("kingsmen-private-document-file") as HTMLInputElement | null;
+      const input = window.document.getElementById("kingsmen-private-document-file") as HTMLInputElement | null;
       if (input) input.value = "";
       await loadDocuments(context);
     } catch (caught) {
