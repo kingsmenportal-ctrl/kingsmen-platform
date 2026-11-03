@@ -1,3 +1,10 @@
+import type { Metadata } from "next";
+
+export const metadata: Metadata = {
+  title: "Kingsmen packages and pricing | Kingsmen Portal",
+  description: "Compare Kingsmen Portal service packages and managed-route capacity in South African rand."
+};
+
 const packages = [
   { name: "Foundational Accord", price: "169.99", applications: 5, capacity: 4, accommodation: "8 accommodation routes included", detail: "A focused starting point for candidates who want guided application preparation." },
   { name: "Collegiate Ordinance", price: "299.99", applications: 10, capacity: 8, accommodation: "Accommodation support included", detail: "More priority application capacity for candidates managing several education routes." },
@@ -17,7 +24,7 @@ export default function PackagesPage() {
       <div className="wrap">
         <nav className="nav" aria-label="Main navigation">
           <a className="brand" href="/"><span className="mark">K</span><span><strong style={{display:"block",fontSize:13,letterSpacing:2.3}}>KINGSMEN</strong><small style={{display:"block",color:"#98a5b8",fontSize:10,marginTop:4}}>YOUR OPPORTUNITY, CONNECTED</small></span></a>
-          <div className="links"><a href="/">Home</a><a href="/free-destiny-map/">Free Destiny Map</a><a href="#packages">Packages</a></div>
+          <div className="links"><a href="/">Home</a><a href="/candidate/dashboard">Candidate portal</a><a href="/free-destiny-map/">Free Destiny Map</a><a href="#packages">Packages</a></div>
         </nav>
         <section className="hero">
           <div className="eyebrow">Clear pricing · South Africa · ZAR</div>
@@ -44,7 +51,7 @@ export default function PackagesPage() {
             <h2>CV Revamp</h2>
             <div className="price">R49.99<small> / service</small></div>
             <p className="detail">A focused CV and motivation-letter preparation service.</p>
-            <div className="stats"><span><b>15</b> CV versions target</span><span><b>15</b> motivation letters target</span><span>Target turnaround: 3 business days</span><span>Managed-route capacity: 0 unless an eligible upgrade is verified</span></div>
+            <div className="stats"><span><b>15</b> CV versions target</span><span><b>15</b> motivation letters target</span><span>Target turnaround: 3 business days</span><span><b>+2 route bonus</b> only after verified CV Revamp ownership and an eligible upgrade</span><span>Standalone managed-route capacity: 0</span></div>
             <div className="actions"><a className="secondary" href="/free-destiny-map/">Start with the Free Destiny Map ↗</a></div>
           </article>
           <article className="card">
