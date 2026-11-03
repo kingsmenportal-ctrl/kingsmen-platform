@@ -40,7 +40,6 @@ function finalize(checks) {
   const requiredBooleanChecks = [
     'activeProtectionPresent',
     'activeRulesPresent',
-    'activeRulesetPresent',
     'requiredStatusChecksEnabled',
     'sourceGuardRequired',
     'releaseEvidenceRequired',

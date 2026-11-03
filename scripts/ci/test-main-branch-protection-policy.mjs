@@ -24,6 +24,7 @@ assert.equal(completeClassic.passed, true, 'complete classic protection configur
 assert.equal(completeClassic.checks.sourceGuardRequired, true);
 assert.equal(completeClassic.checks.releaseEvidenceRequired, true);
 assert.equal(completeClassic.checks.requiredApprovingReviewCount, 1);
+assert.equal(completeClassic.checks.activeRulesetPresent, false, 'classic protection must not be mislabeled as a ruleset');
 
 const classicFailures = [
   ['required_status_checks', (value) => { value.required_status_checks = null; }],
