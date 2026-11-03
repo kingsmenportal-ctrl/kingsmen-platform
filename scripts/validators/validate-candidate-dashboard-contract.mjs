@@ -117,7 +117,7 @@ assert.match(candidateProfile, /candidate-master-profile/);
 assert.match(candidateProfile, /revoke_consent/);
 assert.match(candidateProfile, /request_correction/);
 assert.match(savedOpportunities, /candidate_workspace_saved_opportunities/);
-assert.match(savedOpportunities, /IDENTITY_REVIEW_REQUIRED/);
+assert.ok(savedOpportunities.includes('gate.identityStatus !== "VERIFIED"'), "Saved opportunities must remain unavailable until candidate identity is verified.");
 assert.ok(authCallback.includes("auth/v1/user"));
 assert.match(opportunityMatches, /candidate-save-verified-opportunity/);
 assert.ok(opportunityMatches.includes("pathway_type: item.pathways[0]"));
