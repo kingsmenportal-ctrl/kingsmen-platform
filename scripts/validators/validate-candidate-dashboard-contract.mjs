@@ -104,7 +104,7 @@ assert.match(destinyClient, /application\/json/);
 
 assert.match(documentsPage, /DocumentPreflightPanel/);
 assert.match(documentsPage, /UPLOADED_CANDIDATE_REPORTED/);
-assert.match(documentPreflight, /10 \\* 1024 \\* 1024/);
+assert.ok(documentPreflight.includes("10 * 1024 * 1024"));
 assert.match(documentPreflight, /SHA-256/);
 assert.match(documentPreflight, /candidate-private-documents/);
 assert.match(documentPreflight, /upload-url/);
