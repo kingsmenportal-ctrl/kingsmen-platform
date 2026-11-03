@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { useState } from "react";
+import { useState, type FormEvent } from "react";
 
 type IntakeValues = {
   currentStage: string;
@@ -28,7 +28,7 @@ export default function FreeDestinyMapPage() {
     setValues((current) => ({ ...current, [key]: value }));
     setPreview("");
   }
-  function handleSubmit(event: React.FormEvent<HTMLFormElement>) {
+  function handleSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
     if (!values.confirmed) {
       setPreview("Please confirm that you understand this is a local preview only.");
