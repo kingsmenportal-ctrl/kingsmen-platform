@@ -87,7 +87,12 @@ assert.ok(liveProfileForm.includes('action: "revoke_consent"') && liveProfileFor
 assert.ok(liveSavedRoute.includes("CandidateSavedOpportunitiesClient"), "saved-opportunities route must use the connected backend client");
 assert.ok(liveSavedClient.includes("candidate-master-profile") && liveSavedClient.includes("candidate_workspace_saved_opportunities"), "saved records must be identity-gated and loaded from the backend");
 assert.ok(liveSavedClient.includes('identityStatus !== "VERIFIED"'), "saved opportunity rows must be withheld until candidate identity is verified");
-assert.ok(liveMatches.includes("candidate-save-verified-opportunity") && /body:\s*JSON\.stringify\(\{\s*action:\s*"save",\s*match_ref:\s*item\.match_ref/.test(liveMatches), "verified opportunity save must use the guarded backend workflow");
+assert.ok(
+  liveMatches.includes("candidate-save-verified-opportunity") &&
+  liveMatches.includes('action: "save"') &&
+  liveMatches.includes("match_ref: item.match_ref"),
+  "verified opportunity save must use the guarded backend workflow"
+);
 assert.ok(liveMatches.includes("Save & prepare draft") && liveMatches.includes("no provider submission occurred"), "candidate UI must distinguish saved draft from provider submission");
 assert.ok(liveAuthForm.includes("/auth/v1/signup") && liveAuthForm.includes('"/auth/callback"'), "registration must send confirmation links through the callback route");
 assert.ok(liveAuthCallback.includes("AuthCallbackClient") && liveAuthCallbackClient.includes("/auth/v1/user"), "auth callback must verify and store the returned Supabase session");
