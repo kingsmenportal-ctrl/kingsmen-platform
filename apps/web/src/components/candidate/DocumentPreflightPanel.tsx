@@ -100,7 +100,9 @@ function readSession(): SessionConfig {
 function serverError(status: number, body: ApiResponse) {
   const code = body.status || body.error || body.detail || body.message || `Request failed (HTTP ${status}).`;
   if (status === 401 || code === "AUTHENTICATION_REQUIRED") return "Sign in to access your private documents.";
-  if (status === 403 || code === "IDENTITY_REVIEW_REQUIRED") return "An authorised Kingsmen reviewer must verify your candidate identity before private document upload or download can be enabled.";
+  if (code === "IDENTITY_REVIEW_REQUIRED") return "An authorised Kingsmen reviewer must verify your candidate identity before private document upload or download can be enabled.";
+  if (code === "CONSENT_REQUIRED") return "Active profile-processing consent is required before this document action can continue.";
+  if (status === 403) return "This private document action is not authorised for the current account.";
   if (code === "DOCUMENT_STORAGE_NOT_CONFIGURED" || code === "NOT_CONFIGURED") return "Private document storage is not correctly configured. No document was marked as received.";
   if (code === "UPLOAD_NOT_AVAILABLE") return "Private storage did not return the uploaded object. The document has not been finalised as received.";
   return `${code}. The server did not confirm this document operation.`;
