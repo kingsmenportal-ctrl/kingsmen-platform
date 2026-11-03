@@ -1,6 +1,6 @@
 "use client";
 
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useEffect, useState, type FormEvent } from "react";
 import styles from "./candidate-profile.module.css";
 
 const PATHWAYS = [
@@ -155,7 +155,7 @@ export default function CandidateProfilePage() {
       : current.filter(item => item !== code));
   }
 
-  async function saveProfile(event: React.FormEvent<HTMLFormElement>) {
+  async function saveProfile(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
     setError("");
     setMessage("");
@@ -210,7 +210,7 @@ export default function CandidateProfilePage() {
     }
   }
 
-  async function requestCorrection(event: React.FormEvent<HTMLFormElement>) {
+  async function requestCorrection(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
     setError("");
     setMessage("");
@@ -223,10 +223,11 @@ export default function CandidateProfilePage() {
         reason: correctionReason.trim()
       });
       if (result.ok) {
-        setMessage(result.message ?? "Correction request recorded.");
+        const confirmation = result.message ?? "Correction request recorded.";
         setCorrectionValue("");
         setCorrectionReason("");
         await loadProfile();
+        setMessage(confirmation);
       }
     } catch (e) {
       setError(e instanceof Error ? e.message : "Correction request was not confirmed.");
