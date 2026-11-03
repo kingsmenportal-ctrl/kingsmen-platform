@@ -1,4 +1,7 @@
 import Link from "next/link";
+import type { Metadata } from "next";
+
+export const metadata: Metadata = { title: "Staff review preview", robots: { index: false, follow: false } };
 import StaffReviewQueueDemo from "@/components/preview/staff-review-queue";
 
 export default function StaffReviewPreviewPage() {
