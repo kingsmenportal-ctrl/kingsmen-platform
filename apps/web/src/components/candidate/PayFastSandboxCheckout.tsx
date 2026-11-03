@@ -70,9 +70,11 @@ export default function PayFastSandboxCheckout({ planCode }: { planCode: string 
 
   async function startCheckout() {
     setError("");
-    const approvedStagingOrigin = "https://kingsmen-portal-staging.netlify.app";
-    if (window.location.origin !== approvedStagingOrigin) {
-      setError("PayFast sandbox checkout is restricted to the approved Kingsmen staging origin. This preview origin is not on the payment service CORS allowlist; no order was created.");
+    const origin = window.location.origin;
+    const approvedStagingOrigin = origin === "https://kingsmen-portal-staging.netlify.app";
+    const approvedPreviewOrigin = /^https:\/\/[a-z0-9-]+--kingsmen-portal-staging\.netlify\.app$/i.test(origin);
+    if (!approvedStagingOrigin && !approvedPreviewOrigin) {
+      setError("PayFast sandbox checkout is restricted to the Kingsmen staging origin and its Netlify preview hosts. This origin is not approved; no order was created.");
       return;
     }
     if (!ALLOWED_PLAN_CODES.has(planCode)) {
