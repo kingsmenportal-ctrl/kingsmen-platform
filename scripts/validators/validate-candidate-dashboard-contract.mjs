@@ -17,6 +17,11 @@ const candidateProfile = read("../../apps/web/src/components/candidate/Candidate
 const savedOpportunities = read("../../apps/web/src/components/candidate/CandidateSavedOpportunitiesClient.tsx");
 const authCallback = read("../../apps/web/src/components/candidate/AuthCallbackClient.tsx");
 const opportunityMatches = read("../../apps/web/src/app/candidate/opportunity-matches/page.tsx");
+const payfastCheckout = read("../../apps/web/src/components/candidate/PayFastSandboxCheckout.tsx");
+const paymentReturn = read("../../apps/web/src/app/payment/return/page.tsx");
+const paymentCancel = read("../../apps/web/src/app/payment/cancel/page.tsx");
+const profilePage = read("../../apps/web/src/app/candidate/profile/page.tsx");
+const callbackPage = read("../../apps/web/src/app/auth/callback/page.tsx");
 const authForm = read("../../apps/web/src/components/candidate/CandidateAuthForm.tsx");
 const signInPage = read("../../apps/web/src/app/candidate/login/page.tsx");
 const registerPage = read("../../apps/web/src/app/auth/register/page.tsx");
@@ -37,6 +42,7 @@ for (const [key, label] of expectedPathways) {
 }
 
 const expectedRoutes = [
+  "/candidate/profile",
   "/candidate/workbench",
   "/candidate/opportunity-matches",
   "/candidate/saved-opportunities",
@@ -56,7 +62,7 @@ assert.match(homepage, /title: "Internships"/);
 assert.match(homepage, /title: "Apprenticeships"/);
 assert.match(homepage, /title: "Employment"/);
 
-assert.match(dashboard, /does not claim that a profile has been saved/);
+assert.match(dashboard, /does not claim an opportunity is open/);
 assert.match(dashboard, /No admission, funding, placement, employment, or success is guaranteed/);
 assert.match(dashboard, /Provider receipt and outcomes require provider-origin evidence/);
 
@@ -77,7 +83,16 @@ for (const [name, price] of [
 
 assert.match(packages, /accommodation routes included/i);
 assert.match(packages, /15 CV versions and 15 motivation letters/);
-assert.match(packages, /does not charge you or activate entitlements/);
+assert.match(packages, /does not activate entitlements/);
+assert.match(packages, /PayFast sandbox only/);
+assert.match(packages, /ARTISAN_CHARTER_R149_99/);
+assert.match(packages, /FOUNDATIONAL_ACCORD_R169_99/);
+assert.match(packages, /GUILDMASTERS_CHARTER_R199_99/);
+assert.match(packages, /COLLEGIATE_ORDINANCE_R299_99/);
+assert.match(packages, /CHANCELLORS_WRIT_R399_99/);
+assert.match(packages, /REGENCY_MANDATE_R469_99/);
+assert.match(packages, /CV_REVAMP_R49_99/);
+assert.match(packages, /PayFastSandboxCheckout/);
 assert.match(finance, /A return page is not payment proof/);
 
 assert.match(destinyPage, /FreeDestinyMapApiForm/);
@@ -88,14 +103,36 @@ assert.match(destinyClient, /FREE_DESTINY_MAP_LOCAL_INTAKE_ENDPOINT/);
 assert.match(destinyClient, /application\/json/);
 
 assert.match(documentsPage, /DocumentPreflightPanel/);
-assert.match(documentsPage, /private upload signing is not yet confirmed/i);
-assert.match(documentPreflight, /10 \* 1024 \* 1024/);
+assert.match(documentsPage, /UPLOADED_CANDIDATE_REPORTED/);
+assert.match(documentPreflight, /10 \\* 1024 \\* 1024/);
 assert.match(documentPreflight, /SHA-256/);
-assert.match(documentPreflight, /Not uploaded or saved/);
+assert.match(documentPreflight, /candidate-private-documents/);
+assert.match(documentPreflight, /upload-url/);
+assert.match(documentPreflight, /finalize-upload/);
+assert.match(documentPreflight, /read-url/);
+assert.match(documentPreflight, /signedUploadUrl/);
+assert.match(documentPreflight, /60 seconds/);
 
+assert.match(candidateProfile, /candidate-master-profile/);
+assert.match(candidateProfile, /revoke_consent/);
+assert.match(candidateProfile, /request_correction/);
+assert.match(savedOpportunities, /candidate_workspace_saved_opportunities/);
+assert.match(savedOpportunities, /IDENTITY_REVIEW_REQUIRED/);
+assert.match(authCallback, /auth\\/v1\\/user/);
+assert.match(opportunityMatches, /candidate-save-verified-opportunity/);
+assert.match(opportunityMatches, /pathway_type: item.pathways\\[0\\]/);
+assert.match(payfastCheckout, /functions\\/v1\\/payfast-sandbox/);
+assert.match(payfastCheckout, /idempotency-key/);
+assert.match(payfastCheckout, /sandbox.payfast.co.za/);
+assert.match(payfastCheckout, /verified ITN/);
+assert.match(paymentReturn, /browser return is not proof of payment/i);
+assert.match(paymentCancel, /No payment success is recorded here/);
+assert.match(profilePage, /CandidateMasterProfileForm/);
+assert.match(callbackPage, /AuthCallbackClient/);
 assert.match(authForm, /\/auth\/v1\/signup/);
 assert.match(authForm, /grant_type=password/);
 assert.match(authForm, /sb-.*-auth-token/);
+assert.match(authForm, /redirect_to=/);
 assert.match(signInPage, /CandidateAuthForm mode="login"/);
 assert.match(registerPage, /CandidateAuthForm mode="register"/);
 
