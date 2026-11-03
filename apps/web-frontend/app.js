@@ -1,16 +1,16 @@
 (function () {
   "use strict";
   const packages = [
-    {name:"Foundational Accord",tier:"All pathways",price:169.99,applications:5,capacity:4,accommodation:8,description:"A practical starting point for organised application support."},
-    {name:"Collegiate Ordinance",tier:"Higher education",price:299.99,applications:10,capacity:8,description:"More priority application volume for study routes."},
-    {name:"Chancellor’s Writ",tier:"Education support",price:399.99,applications:15,capacity:10,description:"Expanded managed-route capacity for ambitious plans.",featured:true},
-    {name:"Regency Mandate",tier:"Premium support",price:469.99,applications:15,capacity:12,description:"Higher managed capacity for a broader application plan."},
-    {name:"Artisan Charter",tier:"Skills & trades",price:149.99,applications:5,capacity:3,description:"Focused support for technical and trade pathways."},
-    {name:"Guildmasters Charter",tier:"Skills & career",price:199.99,applications:8,capacity:5,description:"Additional priority applications and managed capacity."},
-    {name:"CV Revamp",tier:"Standalone service",price:49.99,applications:0,capacity:0,description:"A CV and motivation-letter preparation service.",cv:true},
-    {name:"Free Destiny Map",tier:"Free preview",price:0,applications:0,capacity:0,description:"Explore a starting route before choosing paid support.",free:true}
+    {name:"Foundational Accord",tier:"All pathways",priceCents:16999,applications:5,capacity:4,accommodation:8,description:"A practical starting point for organised application support."},
+    {name:"Collegiate Ordinance",tier:"Higher education",priceCents:29999,applications:10,capacity:8,description:"More priority application volume for study routes."},
+    {name:"Chancellor’s Writ",tier:"Education support",priceCents:39999,applications:15,capacity:10,description:"Expanded managed-route capacity for ambitious plans.",featured:true},
+    {name:"Regency Mandate",tier:"Premium support",priceCents:46999,applications:15,capacity:12,description:"Higher managed capacity for a broader application plan."},
+    {name:"Artisan Charter",tier:"Skills & trades",priceCents:14999,applications:5,capacity:3,description:"Focused support for technical and trade pathways."},
+    {name:"Guildmasters Charter",tier:"Skills & career",priceCents:19999,applications:8,capacity:5,description:"Additional priority applications and managed capacity."},
+    {name:"CV Revamp",tier:"Standalone service",priceCents:4999,applications:0,capacity:0,description:"A CV and motivation-letter preparation service.",cv:true},
+    {name:"Free Destiny Map",tier:"Free preview",priceCents:0,applications:0,capacity:0,description:"Explore a starting route before choosing paid support.",free:true}
   ];
-  const money = value => new Intl.NumberFormat("en-ZA", {style:"currency",currency:"ZAR"}).format(value);
+  const money = priceCents => new Intl.NumberFormat("en-ZA", {style:"currency",currency:"ZAR"}).format(priceCents / 100);
   const grid = document.getElementById("package-grid");
   if (grid) {
     grid.innerHTML = packages.map(p => {
@@ -22,7 +22,7 @@
       return '<article class="package-card' + (p.featured ? ' featured' : '') + '">' +
         (p.featured ? '<span class="package-badge">FEATURED</span>' : '') +
         '<span class="package-tier">' + p.tier + '</span><h3>' + p.name + '</h3>' +
-        '<div class="package-price">' + money(p.price) + (p.price > 0 && !p.cv ? '<small> / package</small>' : '') + '</div>' +
+        '<div class="package-price">' + money(p.priceCents) + (p.priceCents > 0 && !p.cv ? '<small> / package</small>' : '') + '</div>' +
         '<p class="package-description">' + p.description + '</p><ul class="package-features">' +
         features.map(f => '<li>' + f + '</li>').join('') +
         '</ul><a class="button ' + (p.featured ? 'button-gold' : 'button-ghost') + '" href="#destiny-map" data-package="' + p.name + '">' +
