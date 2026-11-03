@@ -56,7 +56,10 @@ assert.ok(js.includes("Accommodation support available; routes verified separate
 }
 assert.ok(liveDashboard.includes("All six pathways") && liveDashboard.includes("provider-origin evidence"), "candidate dashboard scope/safety copy missing");
 assert.ok(liveDocuments.includes("Nothing was uploaded") || liveDocuments.includes("not connected"), "document preview boundary missing");
-assert.ok(liveDestiny.includes('data-kingsmen-intake-button="preview-path"') && liveDestiny.includes("have not been sent or saved"), "Destiny Map preview interaction/boundary missing");
+assert.ok(liveDestiny.includes("FreeDestinyMapApiForm"), "live Destiny Map must use the intake API-boundary form");
+const liveDestinyForm = readFileSync(new URL("../web/src/components/kingsmen/FreeDestinyMapApiForm.tsx", import.meta.url), "utf8");
+assert.ok(liveDestinyForm.includes("FREE_DESTINY_MAP_API_WIRING_NOTICE"), "Destiny Map must disclose the API boundary");
+assert.ok(liveDestinyForm.includes("consentToProcessBasicInfo") && liveDestinyForm.includes("consentToBeContacted"), "Destiny Map must require explicit consent");
 assert.ok(liveReceipt.includes("No payment has been made") && liveReceipt.includes("Settlement status: not verified"), "payment receipt must stay an example until settlement verification");
 assert.ok(liveStaff.includes("Synthetic examples only") && liveStaff.includes("do not affect real candidate data"), "staff-review controls must stay demo-only");
 
