@@ -20,6 +20,8 @@
 .lead { max-width: 760px; margin: 13px 0 0; color: #b7c2d1; font-size: 13px; line-height: 1.8; }
 .status { margin-top: 18px; padding: 12px 14px; border: 1px solid #33465c; border-radius: 10px; background: #101b2c; color: #c5d0de; font-size: 12px; line-height: 1.7; }
 .error { margin-top: 14px; padding: 12px 14px; border: 1px solid #90524c; border-radius: 10px; background: #281816; color: #ffd5ce; font-size: 12px; line-height: 1.6; }
+.section { margin-top: 24px; }
+.section h2 { margin: 0; color: #f2f0e8; font-size: 20px; }
 .formPanel { border: 1px solid #2e3c51; border-radius: 16px; background: #0c1625; padding: clamp(16px,3vw,25px); }
 .formPanel h2 { margin: 0; color: #f2f0e8; font-size: 20px; }
 .intro { margin: 8px 0 21px; color: #9eacc0; font-size: 12px; line-height: 1.7; }
