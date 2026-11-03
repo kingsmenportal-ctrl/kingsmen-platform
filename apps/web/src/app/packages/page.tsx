@@ -1,18 +1,18 @@
 import Link from "next/link";
 
 const packages = [
-  { slug: "foundational-accord", name: "Foundational Accord", tier: "All six pathways", price: 169.99, applications: 5, capacity: 4, accommodation: "8 accommodation routes included", description: "A practical starting point for managed application support.", featured: false },
-  { slug: "collegiate-ordinance", name: "Collegiate Ordinance", tier: "Education support", price: 299.99, applications: 10, capacity: 8, accommodation: "Accommodation support included", description: "More priority applications and managed-route capacity.", featured: false },
-  { slug: "chancellors-writ", name: "Chancellor’s Writ", tier: "Education support", price: 399.99, applications: 15, capacity: 10, accommodation: "Accommodation support included", description: "Expanded support capacity for an ambitious application plan.", featured: true },
-  { slug: "regency-mandate", name: "Regency Mandate", tier: "Premium support", price: 469.99, applications: 15, capacity: 12, accommodation: "Accommodation support included", description: "High managed-route capacity for a broad application plan.", featured: false },
-  { slug: "artisan-charter", name: "Artisan Charter", tier: "Skills & trades", price: 149.99, applications: 5, capacity: 3, accommodation: "Accommodation support included", description: "Focused support for technical, vocational and trade routes.", featured: false },
-  { slug: "guildmasters-charter", name: "Guildmasters Charter", tier: "Skills & career", price: 199.99, applications: 8, capacity: 5, accommodation: "Accommodation support included", description: "Additional priority volume for skills and career routes.", featured: false },
-  { slug: "cv-revamp", name: "CV Revamp", tier: "Standalone service", price: 49.99, applications: 0, capacity: 0, accommodation: "No accommodation-route entitlement", description: "A CV and motivation-letter preparation service.", featured: false, cv: true },
-  { slug: "free-destiny-map", name: "Free Destiny Map", tier: "Free starting point", price: 0, applications: 0, capacity: 0, accommodation: "Explore a route before buying support", description: "Describe your goals and start planning your next move.", featured: false, free: true },
+  { slug: "foundational-accord", name: "Foundational Accord", tier: "All six pathways", priceCents: 16999, applications: 5, capacity: 4, accommodation: "8 accommodation routes included", description: "A practical starting point for managed application support.", featured: false },
+  { slug: "collegiate-ordinance", name: "Collegiate Ordinance", tier: "Education support", priceCents: 29999, applications: 10, capacity: 8, accommodation: "Accommodation support included", description: "More priority applications and managed-route capacity.", featured: false },
+  { slug: "chancellors-writ", name: "Chancellor’s Writ", tier: "Education support", priceCents: 39999, applications: 15, capacity: 10, accommodation: "Accommodation support included", description: "Expanded support capacity for an ambitious application plan.", featured: true },
+  { slug: "regency-mandate", name: "Regency Mandate", tier: "Premium support", priceCents: 46999, applications: 15, capacity: 12, accommodation: "Accommodation support included", description: "High managed-route capacity for a broad application plan.", featured: false },
+  { slug: "artisan-charter", name: "Artisan Charter", tier: "Skills & trades", priceCents: 14999, applications: 5, capacity: 3, accommodation: "Accommodation support included", description: "Focused support for technical, vocational and trade routes.", featured: false },
+  { slug: "guildmasters-charter", name: "Guildmasters Charter", tier: "Skills & career", priceCents: 19999, applications: 8, capacity: 5, accommodation: "Accommodation support included", description: "Additional priority volume for skills and career routes.", featured: false },
+  { slug: "cv-revamp", name: "CV Revamp", tier: "Standalone service", priceCents: 4999, applications: 0, capacity: 0, accommodation: "No accommodation-route entitlement", description: "A CV and motivation-letter preparation service.", featured: false, cv: true },
+  { slug: "free-destiny-map", name: "Free Destiny Map", tier: "Free starting point", priceCents: 0, applications: 0, capacity: 0, accommodation: "Explore a route before buying support", description: "Describe your goals and start planning your next move.", featured: false, free: true },
 ] as const;
 
-function money(value: number) {
-  return new Intl.NumberFormat("en-ZA", { style: "currency", currency: "ZAR" }).format(value);
+function money(priceCents: number) {
+  return new Intl.NumberFormat("en-ZA", { style: "currency", currency: "ZAR" }).format(priceCents / 100);
 }
 
 export default function PackagesPage() {
@@ -32,10 +32,10 @@ export default function PackagesPage() {
               : "free" in item && item.free
                 ? ["Explore all six pathways", "No paid plan required to start planning", "No live application or payment implied"]
                 : [item.applications + " priority applications", item.capacity + " concurrent managed routes / 30-day capacity", item.accommodation];
-            return <article className={"public-package-card" + (item.featured ? " featured" : "")} key={item.slug}>
+            return <article className={"public-package-card" + (item.featured ? " featured" : "")} data-price-cents={item.priceCents} key={item.slug}>
               {item.featured && <span className="public-package-badge">FEATURED PACKAGE</span>}
               <span className="public-package-tier">{item.tier}</span><h2>{item.name}</h2>
-              <div className="public-package-price">{money(item.price)}{item.price > 0 && !("cv" in item && item.cv) && <small> / package</small>}</div>
+              <div className="public-package-price">{money(item.priceCents)}{item.priceCents > 0 && !("cv" in item && item.cv) && <small> / package</small>}</div>
               <p className="public-package-description">{item.description}</p>
               <ul className="public-package-features">{features.map((feature) => <li key={feature}>{feature}</li>)}</ul>
               <Link className={"public-button " + (item.featured ? "public-button-gold" : "public-button-outline")} href="/free-destiny-map/">Review this option <span aria-hidden="true">→</span></Link>
