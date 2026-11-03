@@ -15,10 +15,10 @@
   if (grid) {
     grid.innerHTML = packages.map(p => {
       const features = p.cv
-        ? ["15 CV versions + 15 motivation letters","Target turnaround: 3 business days","No managed-route capacity included"]
+        ? ["15 CV versions + 15 motivation letters","Target turnaround: 3 business days","No managed-route capacity included","+2 route bonus only after verified ownership and eligible upgrade"]
         : p.free
           ? ["Explore the six pathways","Public preview only","No live applications or payments"]
-          : [p.applications + " priority applications",p.capacity + " concurrent managed routes / 30-day capacity",p.accommodation + " accommodation routes included"];
+          : [p.applications + " priority applications",p.capacity + " concurrent managed routes / 30-day capacity",p.accommodation ? p.accommodation + " accommodation routes included" : "Accommodation support included"];
       return '<article class="package-card' + (p.featured ? ' featured' : '') + '">' +
         (p.featured ? '<span class="package-badge">FEATURED</span>' : '') +
         '<span class="package-tier">' + p.tier + '</span><h3>' + p.name + '</h3>' +
