@@ -120,6 +120,12 @@ assert.ok(documentsStyles.includes("@media(max-width:560px)") && documentsStyles
 
 assert.ok(applicationTracker.includes('functions/v1/candidate-application-preparation'), "Application tracker must use the authenticated unified application service.");
 assert.ok(applicationTracker.includes('action: "load"'), "Application tracker must load persisted candidate-scoped records.");
+
+assert.ok(applicationTracker.includes('action: "update_tracker"'), "Candidate tracker mutations must use the authenticated update_tracker action.");
+assert.ok(applicationTracker.includes('status: editStatus') && applicationTracker.includes('candidate_note: editNote'), "Candidate tracker status and note fields must be written through the server action.");
+assert.ok(applicationTracker.includes('editStatus === "SUBMITTED_CANDIDATE_REPORTED" && !editEvidence.trim()'), "Candidate-reported submission must require an evidence reference.");
+assert.ok(applicationTracker.includes("candidate-reported tracker data"), "Tracker UI must label candidate updates as candidate-reported only.");
+
 assert.ok(!applicationTracker.includes("/api/personal-jobs/application-tracker"), "Candidate application tracker must not use the legacy local-file note endpoint.");
 assert.ok(applicationTracker.includes("applicationEvents") && applicationTracker.includes("masterEvents"), "Application tracker must expose server-returned audit event collections.");
 assert.match(applicationTracker, /Candidate-reported submission, provider-confirmed receipt and provider-issued outcome remain separate events/, "Application tracker must keep candidate claims separate from provider evidence.");
