@@ -25,6 +25,9 @@ const liveMatches = readFileSync(new URL("../web/src/app/candidate/opportunity-m
 const liveAuthForm = readFileSync(new URL("../web/src/components/candidate/CandidateAuthForm.tsx", import.meta.url), "utf8");
 const liveAuthCallback = readFileSync(new URL("../web/src/app/auth/callback/page.tsx", import.meta.url), "utf8");
 const liveAuthCallbackClient = readFileSync(new URL("../web/src/components/candidate/AuthCallbackClient.tsx", import.meta.url), "utf8");
+const liveCheckout = readFileSync(new URL("../web/src/components/candidate/PayFastSandboxCheckout.tsx", import.meta.url), "utf8");
+const livePaymentReturn = readFileSync(new URL("../web/src/app/payment/return/page.tsx", import.meta.url), "utf8");
+const livePaymentCancel = readFileSync(new URL("../web/src/app/payment/cancel/page.tsx", import.meta.url), "utf8");
 
 for (const page of ["candidate-dashboard.html", "documents.html", "payment-confirmed.html", "staff-review.html", "packages.html", "destiny-map.html"]) {
   assert.ok(readFileSync(new URL("./" + page, import.meta.url), "utf8").includes("<html"), `missing page: ${page}`);
@@ -88,5 +91,12 @@ assert.ok(liveMatches.includes("candidate-save-verified-opportunity") && liveMat
 assert.ok(liveMatches.includes("Save & prepare draft") && liveMatches.includes("no provider submission occurred"), "candidate UI must distinguish saved draft from provider submission");
 assert.ok(liveAuthForm.includes("/auth/v1/signup") && liveAuthForm.includes('"/auth/callback"'), "registration must send confirmation links through the callback route");
 assert.ok(liveAuthCallback.includes("AuthCallbackClient") && liveAuthCallbackClient.includes("/auth/v1/user"), "auth callback must verify and store the returned Supabase session");
+
+assert.ok(livePackages.includes("PayFastSandboxCheckout") && livePackages.includes("FOUNDATIONAL_ACCORD_R169_99"), "paid packages must expose the canonical sandbox checkout integration");
+assert.ok(liveCheckout.includes("/functions/v1/payfast-sandbox") && liveCheckout.includes("idempotency-key"), "checkout must call the authenticated, idempotent PayFast sandbox endpoint");
+assert.ok(liveCheckout.includes("sandbox.payfast.co.za") && liveCheckout.includes("window.location.origin"), "checkout must validate sandbox destination and restrict origin");
+assert.ok(liveCheckout.includes("verified PayFast ITN") && liveCheckout.includes("no order was created"), "checkout must preserve payment and preview-origin boundaries");
+assert.ok(livePaymentReturn.includes("This browser return is not proof of payment") && livePaymentReturn.includes("ITN"), "payment return page must not mark an order paid");
+assert.ok(livePaymentCancel.includes("No payment success is recorded here") && livePaymentCancel.includes("does not change an order"), "payment cancellation must not mutate payment status");
 
 console.log("Kingsmen frontend preview smoke checks passed.");
