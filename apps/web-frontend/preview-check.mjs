@@ -13,6 +13,7 @@ const liveCss = readFileSync(new URL("../web/src/app/public-home.css", import.me
 const livePackages = readFileSync(new URL("../web/src/app/packages/page.tsx", import.meta.url), "utf8");
 const liveDashboard = readFileSync(new URL("../web/src/app/candidate/dashboard/page.tsx", import.meta.url), "utf8");
 const liveDocuments = readFileSync(new URL("../web/src/app/candidate/documents/page.tsx", import.meta.url), "utf8");
+const liveDocumentPreflight = readFileSync(new URL("../web/src/components/candidate/DocumentPreflightPanel.tsx", import.meta.url), "utf8");
 const liveDestiny = readFileSync(new URL("../web/src/app/free-destiny-map/page.tsx", import.meta.url), "utf8");
 const liveReceipt = readFileSync(new URL("../web/src/app/preview/payment-confirmed/page.tsx", import.meta.url), "utf8");
 const liveStaff = readFileSync(new URL("../web/src/app/preview/staff-review/page.tsx", import.meta.url), "utf8");
@@ -63,7 +64,12 @@ assert.ok(livePackages.includes("Accommodation support available; routes verifie
 assert.ok(js.includes("Accommodation support available; routes verified separately"), "static CV Revamp accommodation wording missing");
 }
 assert.ok(liveDashboard.includes("All six pathways") && liveDashboard.includes("provider-origin evidence"), "candidate dashboard scope/safety copy missing");
-assert.ok(liveDocuments.includes("Nothing was uploaded") || liveDocuments.includes("not connected"), "document preview boundary missing");
+assert.ok(liveDocuments.includes("Private upload requires verified candidate identity"), "Document Vault must disclose its identity gate");
+assert.ok(liveDocuments.includes("Payment checkout and provider submission are not connected"), "document and provider/payment status boundaries must remain separate");
+assert.ok(liveDocumentPreflight.includes("candidate-private-documents") && liveDocumentPreflight.includes('action: "create_upload"'), "Document Vault must request a signed private upload");
+assert.ok(liveDocumentPreflight.includes('action: "finalize_upload"') && liveDocumentPreflight.includes("sha256_hex"), "Document Vault must finalise and show server-recorded integrity");
+assert.ok(liveDocumentPreflight.includes('action: "create_download_url"') && liveDocumentPreflight.includes("expiresInSeconds"), "private read links must be short-lived and requested from the backend");
+assert.ok(liveDocumentPreflight.includes("IDENTITY_REVIEW_REQUIRED") && liveDocumentPreflight.includes("VERIFIED"), "document upload must be gated by verified candidate identity");
 assert.ok(liveDestiny.includes("FreeDestinyMapApiForm"), "live Destiny Map must use the intake API-boundary form");
 const liveDestinyForm = readFileSync(new URL("../web/src/components/kingsmen/FreeDestinyMapApiForm.tsx", import.meta.url), "utf8");
 assert.ok(liveDestinyForm.includes("FREE_DESTINY_MAP_API_WIRING_NOTICE"), "Destiny Map must disclose the API boundary");
