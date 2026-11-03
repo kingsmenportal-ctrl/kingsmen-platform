@@ -46,7 +46,7 @@ Foundational Accord includes 8 accommodation routes. Accommodation support is av
 
 - Source inspected: uploaded eight-file prototype and relevant existing Next.js routes, auth/client helpers, document API shells, N15 matching UI, contracts and validators.
 - Pull request: feature branch proposal; not merged by these changes.
-- Required validation: current CI run and web build must finish successfully for the latest branch head.
-- Deployment: staging Deploy Preview / branch deploy must be confirmed against the final commit.
+- CI evidence: focused repository tests, API build, dependency installation and Next.js web build passed on commit `81b4b06adf426fa1489c395b752810b07f88cf0c` (GitHub Actions run `41683989228`). Any later commit requires fresh CI evidence.
+- Deployment: Netlify staging site identity is known, but deployment of this PR head is not confirmed. Check the PR's Netlify Deploy Preview/branch deploy against the final commit before calling it deployed.
 - Runtime: public homepage, package page, Free Destiny Map form submission response, auth UI routes, document preflight and candidate navigation must be checked at the deployed URL. Auth credentials must not be recorded in logs or evidence.
 - This change does not claim production readiness, verified payment settlement, private file upload, successful saved-profile persistence or provider-confirmed application outcomes.
