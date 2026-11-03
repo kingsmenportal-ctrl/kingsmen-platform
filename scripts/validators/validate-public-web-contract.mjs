@@ -100,6 +100,8 @@ for (const mime of ["application/pdf", "image/jpeg", "image/png"]) {
   assert.ok(documents.includes(mime), `Document vault must support ${mime}`);
 }
 assert.ok(documents.includes("pendingFinalizeId") && documents.includes("Retry upload finalization"), "Vault must expose safe recovery if finalization needs retry.");
+assert.ok(documents.includes("body: file") && !documents.includes("new FormData()"), "Private signed upload must send raw file bytes, not multipart form data.");
+assert.ok(documents.includes('"Content-Type": mimeType'), "Private signed upload must send the validated MIME type.");
 assert.ok(documents.includes("signedReadUrl") && documents.includes("expiresInSeconds"), "Vault must show expiring server-signed read links.");
 assert.ok(documents.includes("SHA-256") && documents.includes("sha256_hex"), "Vault must surface server-recorded checksum status.");
 assert.ok(documents.includes("Candidate actions cannot approve, reject or delete files"), "Candidate UI must not expose reviewer-only decisions.");
