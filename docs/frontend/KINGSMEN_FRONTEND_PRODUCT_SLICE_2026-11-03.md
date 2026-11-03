@@ -1,20 +1,23 @@
-# Kingsmen frontend product slice — 2026-11-03
+# Kingsmen frontend implementation — 2026-11-03
 
 ## Scope
 
-This change brings the uploaded static frontend prototype's package-selection concept into the existing Next.js application rather than publishing a disconnected HTML microsite.
+This change integrates the uploaded static HTML/CSS prototype into the existing Next.js Kingsmen application. It does not publish a separate microsite and does not claim a production-connected platform.
 
-Implemented:
-- Added `/packages/` as a native Next.js route under `apps/web/src/app/packages/page.tsx`.
-- Linked the homepage navigation to the package catalogue.
-- Replaced the prototype's legacy and inconsistent prices/products with the canonical seven paid-product contract.
-- Kept Free Destiny Map separate from paid products.
-- Displayed priority application volume separately from concurrent managed-route capacity.
-- Made all six pathway discovery access explicit across service plans.
-- Added the CV Revamp standalone service terms and the conditional +2 route bonus rule.
-- Added copy that distinguishes plan selection from payment settlement and entitlement activation.
+## Implemented in this branch
 
-## Canonical product data represented
+- Refined the homepage and made the six canonical pathways exact: Higher Education, TVET, SETA programmes & learnerships, Internships, Apprenticeships and Employment.
+- Added a native `/packages/` route with the canonical seven paid products, correct ZAR cent-level prices, priority application limits and separate concurrent 30-day managed-route capacity.
+- Linked package selections to the candidate workbench using an allowlisted plan ID. The query value is display-only and is not authority for pricing, checkout or entitlements.
+- Connected the Free Destiny Map page to the existing `FreeDestinyMapApiForm` and public intake API-boundary contract. The form checks route intent and consent, presents response failures as failures, and explicitly distinguishes API acceptance from production storage.
+- Added candidate sign-in and registration screens using the configured Supabase Auth REST endpoints. Session values are stored in the same project-scoped browser storage convention expected by the existing opportunity-match UI. This is not a substitute for server-side authorisation, RLS or verified account-to-candidate identity linkage.
+- Added a candidate session control with sign-out and route entry points.
+- Added local document preflight: PDF/JPEG/PNG, 10 MiB maximum, and browser SHA-256 digest. The selected file bytes are not uploaded or saved by the preflight component.
+- Refined the candidate dashboard, plans/finance and document views, including evidence-bound application and payment language.
+- Improved opportunity-match eligibility detail and sign-in navigation.
+- Updated shared site metadata.
+
+## Canonical product contract represented
 
 | Product | Price (ZAR) | Priority applications | Concurrent managed-route capacity |
 |---|---:|---:|---:|
@@ -26,16 +29,24 @@ Implemented:
 | Guildmasters Charter | R199.99 | 8 | 5 |
 | CV Revamp | R49.99 | Standalone service | 0 |
 
-Foundational Accord includes 8 accommodation routes. Accommodation support is presented as included with paid plans. CV Revamp represents 15 CV versions and 15 motivation letters with a target turnaround of 3 business days; its +2 route bonus is conditional on verified ownership and an eligible upgrade. The Free Destiny Map remains a separate R0 product.
+Foundational Accord includes 8 accommodation routes. Accommodation support is available with paid plans. CV Revamp includes 15 CV versions and 15 motivation letters, with a target turnaround of 3 business days. Its +2 route bonus applies only after verified service ownership and an eligible upgrade. The Free Destiny Map remains separate from paid products.
 
-## Deliberate integration boundaries
+## Integration and security boundaries
 
-This page does not create an order, initiate a PayFast transaction, grant entitlements, or claim a payment has settled. Its plan-selection links pass the selected plan ID to the existing candidate workbench route; the server must validate the plan and enforce entitlements. Do not treat query-string values as trusted pricing or authority.
-
-No credentials, candidate data, document content, or payment secrets are stored in the page. Document upload, provider-confirmed application receipt, and staff review must remain on authenticated routes with server-side authorization.
+- Plan selection does not create an order, initiate PayFast, mark payment settled or grant entitlements.
+- Paid checkout for the seven canonical plans remains gated by the existing finance contract until service terms and PayFast sandbox/ITN evidence are approved.
+- The current document upload-url/read-url routes are signer shells. No file upload or persisted document record is represented as live by this UI.
+- Candidate matching continues to use the existing authenticated N15 feed. No unverified opportunity rows are invented to fill empty states.
+- Saved-opportunity persistence is not connected to a server-backed account store yet; the UI does not claim cross-session persistence.
+- Candidate profile persistence and candidate-to-auth identity linkage require the existing backend and RLS contract to be completed and runtime-tested.
+- Browser storage is used for the current Supabase Auth session convention; server-side access control and database RLS remain required.
+- No credentials, private candidate records, document content, payment secrets or provider passwords are added to this branch.
 
 ## Verification status
 
-- Source inspection: complete for the uploaded eight-file HTML/CSS prototype and the existing Next.js homepage and candidate dashboard.
-- Repository change: committed on a feature branch; not merged into `main`.
-- Build, CI, staging deployment, and authenticated runtime verification: pending; must be reported only from actual build/deploy/runtime evidence.
+- Source inspected: uploaded eight-file prototype and relevant existing Next.js routes, auth/client helpers, document API shells, N15 matching UI, contracts and validators.
+- Pull request: feature branch proposal; not merged by these changes.
+- Required validation: current CI run and web build must finish successfully for the latest branch head.
+- Deployment: staging Deploy Preview / branch deploy must be confirmed against the final commit.
+- Runtime: public homepage, package page, Free Destiny Map form submission response, auth UI routes, document preflight and candidate navigation must be checked at the deployed URL. Auth credentials must not be recorded in logs or evidence.
+- This change does not claim production readiness, verified payment settlement, private file upload, successful saved-profile persistence or provider-confirmed application outcomes.
