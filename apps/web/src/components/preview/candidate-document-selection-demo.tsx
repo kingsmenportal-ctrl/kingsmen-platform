@@ -1,12 +1,12 @@
 "use client";
 
-import { useState } from "react";
+import { useState, type ChangeEvent } from "react";
 
 export default function CandidateDocumentSelectionDemo() {
   const [selection, setSelection] = useState("No file selected");
   const [error, setError] = useState("");
 
-  function onChange(event: React.ChangeEvent<HTMLInputElement>) {
+  function onChange(event: ChangeEvent<HTMLInputElement>) {
     const file = event.currentTarget.files?.[0];
     setError("");
     if (!file) { setSelection("No file selected"); return; }
