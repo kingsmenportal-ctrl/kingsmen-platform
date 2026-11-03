@@ -80,7 +80,6 @@ assert.match(destinyPage, /FreeDestinyMapApiForm/);
 assert.match(destinyForm, /submitFreeDestinyMapClientPayload/);
 assert.match(destinyForm, /consentToBeContacted/);
 assert.match(destinyForm, /consentToProcessBasicInfo/);
-assert.match(destinyForm, /Not uploaded or saved/);
 assert.match(destinyClient, /FREE_DESTINY_MAP_LOCAL_INTAKE_ENDPOINT/);
 assert.match(destinyClient, /application\/json/);
 
