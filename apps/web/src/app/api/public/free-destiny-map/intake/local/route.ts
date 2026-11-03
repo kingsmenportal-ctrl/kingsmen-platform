@@ -5,17 +5,14 @@ import {
   getKingsmenBackendBoundary,
   postKingsmenCommand
 } from "@/lib/kingsmen-backend-client";
+import { validateFreeDestinyMapIntake } from "@/lib/free-destiny-map-intake-validation";
+import { readBoundedRequestBody } from "@/lib/free-destiny-map-intake-body";
 
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
 
 const endpoint = "/api/public/free-destiny-map/intake/local";
-
-type LocalIssue = {
-  field: string;
-  code: string;
-  message: string;
-};
+const MAX_BODY_BYTES = 16_384;
 
 type BackendCommandResponse = {
   ok?: boolean;
@@ -27,119 +24,114 @@ type BackendCommandResponse = {
   generatedAtIso?: string;
 };
 
-function hasSafeConsent(payload: Record<string, unknown>): boolean {
-  return payload.consentToBeContacted === true && payload.consentToProcessBasicInfo === true;
-}
-
-function hasRouteIntent(payload: Record<string, unknown>): boolean {
-  return (
-    (Array.isArray(payload.routeInterests) && payload.routeInterests.length > 0) ||
-    Boolean(payload.currentSituation) ||
-    Boolean(payload.knownRoute) ||
-    Boolean(payload.randomSourceName)
+function blockedResponse(
+  backendBoundary: ReturnType<typeof getKingsmenBackendBoundary>,
+  issues: Array<{ field: string; code: string; message: string }>,
+  status: number
+) {
+  return NextResponse.json(
+    {
+      accepted: false,
+      reference: "KM-FDM-WEB-BLOCKED",
+      productionReady: false,
+      canClaimProduction: false,
+      deployedToOracle: false,
+      backendBoundaryMode: backendBoundary.mode,
+      backendConfigured: backendBoundary.configured,
+      backendBoundaryReached: false,
+      localWriteAttempted: false,
+      localWriteSucceeded: false,
+      storageMode: "validation_blocked_backend_boundary",
+      officialApplicationSubmitted: false,
+      paymentInstructionSent: false,
+      documentUploadAccepted: false,
+      emailSent: false,
+      safeNotice: "The request was rejected before the backend API boundary. No command was sent and no local file write, shell command, payment, email, document upload, or official application submission occurred.",
+      nextAction: "Correct the highlighted Free Destiny Map intake fields.",
+      issues
+    },
+    { status }
   );
-}
-
-function sensitiveKeys(payload: Record<string, unknown>): string[] {
-  return Object.keys(payload).filter((key) =>
-    /identity|idNumber|passport|password|card|cvv|documentBase64/i.test(key)
-  );
-}
-
-function buildLocalValidationIssues(payload: Record<string, unknown>): LocalIssue[] {
-  const issues: LocalIssue[] = [];
-
-  if (!hasSafeConsent(payload)) {
-    issues.push({
-      field: "consent",
-      code: "CONSENT_REQUIRED",
-      message: "Contact and basic-info processing consent are required for the Free Destiny Map intake boundary."
-    });
-  }
-
-  if (!hasRouteIntent(payload)) {
-    issues.push({
-      field: "intent",
-      code: "INTENT_REQUIRED",
-      message: "At least one route interest, current situation, known route, or source-check item is required."
-    });
-  }
-
-  const blockedSensitiveKeys = sensitiveKeys(payload);
-
-  if (blockedSensitiveKeys.length > 0) {
-    issues.push({
-      field: "payload",
-      code: "SENSITIVE_FIELDS_BLOCKED",
-      message: "Sensitive fields are blocked in the Free Destiny Map intake boundary."
-    });
-  }
-
-  return issues;
-}
-
-function optionalString(value: unknown): string | undefined {
-  return typeof value === "string" && value.trim().length > 0 ? value.trim() : undefined;
 }
 
 export async function POST(request: NextRequest) {
-  let payload: Record<string, unknown> = {};
-
-  try {
-    payload = await request.json();
-  } catch {
-    payload = {};
-  }
-
-  const issues = buildLocalValidationIssues(payload);
   const backendBoundary = getKingsmenBackendBoundary();
-
-  if (issues.length > 0) {
-    return NextResponse.json(
-      {
-        accepted: false,
-        reference: "KM-FDM-WEB-BLOCKED",
-        productionReady: false,
-        canClaimProduction: false,
-        deployedToOracle: false,
-        backendBoundaryMode: backendBoundary.mode,
-        backendConfigured: backendBoundary.configured,
-        backendBoundaryReached: false,
-        localWriteAttempted: false,
-        localWriteSucceeded: false,
-        storageMode: "validation_blocked_backend_boundary",
-        officialApplicationSubmitted: false,
-        paymentInstructionSent: false,
-        documentUploadAccepted: false,
-        emailSent: false,
-        safeNotice: "Payload validation failed before the backend API boundary. No local file write, shell command, payment, email, document upload, or official application submission occurred.",
-        nextAction: "Fix Free Destiny Map intake payload issues.",
-        issues
-      },
-      { status: 400 }
-    );
+  const mediaType = request.headers.get("content-type")?.split(";")[0].trim().toLowerCase();
+  if (mediaType !== "application/json") {
+    return blockedResponse(backendBoundary, [{
+      field: "contentType",
+      code: "JSON_CONTENT_TYPE_REQUIRED",
+      message: "The intake endpoint accepts application/json requests only."
+    }], 415);
   }
 
+  const contentLengthHeader = request.headers.get("content-length");
+  if (contentLengthHeader !== null) {
+    const contentLength = Number(contentLengthHeader);
+    if (!/^[0-9]+$/.test(contentLengthHeader) || !Number.isSafeInteger(contentLength)) {
+      return blockedResponse(backendBoundary, [{
+        field: "contentLength",
+        code: "INVALID_CONTENT_LENGTH",
+        message: "The intake request has an invalid content length."
+      }], 400);
+    }
+    if (contentLength > MAX_BODY_BYTES) {
+      return blockedResponse(backendBoundary, [{
+        field: "payload",
+        code: "REQUEST_TOO_LARGE",
+        message: "The intake request exceeds the maximum allowed size."
+      }], 413);
+    }
+  }
+
+  const bodyResult = await readBoundedRequestBody(request, MAX_BODY_BYTES);
+  if (!bodyResult.ok) {
+    return blockedResponse(backendBoundary, [{
+      field: "payload",
+      code: bodyResult.code,
+      message: bodyResult.message
+    }], bodyResult.code === "REQUEST_TOO_LARGE" ? 413 : 400);
+  }
+  const rawBody = bodyResult.body;
+
+  let parsed: unknown;
+  try {
+    parsed = JSON.parse(rawBody);
+  } catch {
+    return blockedResponse(backendBoundary, [{
+      field: "payload",
+      code: "INVALID_JSON",
+      message: "The intake request must contain valid JSON."
+    }], 400);
+  }
+
+  const validation = validateFreeDestinyMapIntake(parsed);
+  if (!validation.ok) {
+    return blockedResponse(backendBoundary, validation.issues, 400);
+  }
+
+  const safePayload = validation.payload;
+  // This public route never accepts candidate IDs or attaches a lead to an
+  // existing account. Identity binding is handled by authenticated candidate
+  // workflows, not by caller-supplied public form fields.
   const command = createKingsmenWebCommandEnvelope({
     commandType: "candidate.intake.received",
     commandIdPrefix: "web_fdm_intake",
     idempotencyKeyPrefix: "web_fdm_intake",
     idempotencyInput: {
-      clientRequestId: payload.clientRequestId,
-      email: payload.email,
-      currentSituation: payload.currentSituation,
-      routeInterests: payload.routeInterests
+      clientRequestId: safePayload.clientRequestId,
+      email: safePayload.email,
+      currentSituation: safePayload.currentSituation,
+      routeInterests: safePayload.routeInterests
     },
-    correlationId: request.headers.get("x-correlation-id") ?? undefined,
     actor: {
       type: "candidate",
-      id: optionalString(payload.candidatePublicRef) ?? "free_destiny_map_public_candidate",
-      displayName: optionalString(payload.fullName) ?? optionalString(payload.name)
+      id: "free_destiny_map_public_candidate",
+      displayName: safePayload.fullName
     },
-    candidateId: optionalString(payload.candidatePublicRef),
     source: "portal",
     payload: {
-      ...payload,
+      ...safePayload,
       webBoundaryEndpoint: endpoint,
       submittedThrough: "free_destiny_map_web_boundary",
       localFileWriteDisabled: true,
