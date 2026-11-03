@@ -3,7 +3,7 @@ import Link from "next/link";
 
 const pathways = [
   { code: "higher_education", label: "Higher Education", detail: "Universities, universities of technology and degree programmes." },
-  { code: "tvet", label: "TVET Colleges", detail: "Technical and vocational college routes." },
+  { code: "tvet", label: "TVET", detail: "Technical and vocational college routes." },
   { code: "seta_learnership", label: "SETA programmes & learnerships", detail: "Skills programmes and structured workplace learning." },
   { code: "internship", label: "Internships", detail: "Workplace exposure and early career experience." },
   { code: "apprenticeship", label: "Apprenticeships", detail: "Trade training and artisan pathways." },
