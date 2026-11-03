@@ -39,7 +39,7 @@ assert.ok(readme.includes("does not authenticate users"), "backend boundary docu
 assert.ok(css.includes("@media(max-width:680px)"), "mobile layout breakpoint missing");
 assert.ok(css.includes("prefers-reduced-motion"), "reduced-motion support missing");
 
-for (const pathway of ["Higher Education", "TVET Colleges", "SETAs & Learnerships", "Internships", "Apprenticeships", "Employment"]) {
+for (const pathway of ["Higher Education", "TVET", "SETA programmes & learnerships", "Internships", "Apprenticeships", "Employment"]) {
   assert.ok(liveHome.includes(pathway), `live homepage missing pathway: ${pathway}`);
 }
 assert.ok(liveLayout.includes('import "./public-home.css"'), "Next.js layout must load the Kingsmen design system");
