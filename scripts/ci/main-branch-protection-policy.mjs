@@ -1,51 +1,80 @@
-export function evaluateMainBranchProtection(protection) {
-  const requiredStatusChecks = protection?.required_status_checks ?? null;
-  const requiredContexts = Array.isArray(requiredStatusChecks?.contexts)
-    ? requiredStatusChecks.contexts.filter((name) => typeof name === 'string' && name.length > 0)
-    : [];
-  const requiredCheckObjects = Array.isArray(requiredStatusChecks?.checks)
-    ? requiredStatusChecks.checks
-    : [];
-  const requiredCheckNames = requiredCheckObjects
-    .map((item) => item?.context)
-    .filter((name) => typeof name === 'string' && name.length > 0);
-  const allRequiredCheckNames = [...new Set([...requiredContexts, ...requiredCheckNames])];
-  const reviewPolicy = protection?.required_pull_request_reviews ?? null;
-  const reviewCount = Number.isInteger(reviewPolicy?.required_approving_review_count)
-    ? reviewPolicy.required_approving_review_count
-    : 0;
+function rulesOfType(rules, type) {
+  return rules.filter((rule) => rule && rule.type === type);
+}
+
+function requiredContexts(rules) {
+  const contexts = [];
+  for (const rule of rulesOfType(rules, "required_status_checks")) {
+    const required = Array.isArray(rule.parameters?.required_status_checks)
+      ? rule.parameters.required_status_checks
+      : [];
+    for (const entry of required) {
+      if (typeof entry?.context === "string" && entry.context.trim()) {
+        contexts.push(entry.context.trim());
+      }
+    }
+  }
+  return [...new Set(contexts)];
+}
+
+/**
+ * Evaluate GitHub's effective rules for main. The regular stream gate is
+ * intentionally limited to the routine build and validation checks, one
+ * approving review, and protection against force-push and branch deletion.
+ * Deep specialist proofs and deployment evidence remain separate release
+ * work rather than global prerequisites for every feature PR.
+ */
+export function evaluateMainBranchProtection(effectiveRules) {
+  const rules = Array.isArray(effectiveRules) ? effectiveRules : [];
+  const contexts = requiredContexts(rules);
+  const statusRules = rulesOfType(rules, "required_status_checks");
+  const pullRules = rulesOfType(rules, "pull_request");
+
+  const reviewCount = pullRules.reduce((max, rule) => {
+    const count = Number(rule.parameters?.required_approving_review_count ?? 0);
+    return Number.isInteger(count) ? Math.max(max, count) : max;
+  }, 0);
+
+  const deploymentEnvironments = [...new Set(
+    rulesOfType(rules, "required_deployments")
+      .flatMap((rule) => Array.isArray(rule.parameters?.required_deployment_environments)
+        ? rule.parameters.required_deployment_environments
+        : [])
+      .filter((name) => typeof name === "string" && name.trim())
+      .map((name) => name.trim())
+  )];
 
   const checks = {
-    requiredStatusChecksEnabled: allRequiredCheckNames.length > 0,
-    sourceGuardRequired: allRequiredCheckNames.some(
-      (name) => name === 'source-guard' || name.endsWith('/source-guard')
-    ),
-    releaseEvidenceRequired: allRequiredCheckNames.includes('Build, validate, and smoke-test'),
-    strictStatusChecksEnabled: requiredStatusChecks?.strict === true,
+    effectiveRulesPresent: rules.length > 0,
+    requiredStatusChecksEnabled: statusRules.length > 0 && contexts.length > 0,
+    candidateBuildRequired: contexts.includes("test-and-build"),
+    validationRequired: contexts.includes("validate"),
+    strictStatusChecksEnabled: statusRules.length > 0 &&
+      statusRules.every((rule) => rule.parameters?.strict_required_status_checks_policy === true),
+    pullRequestRulePresent: pullRules.length > 0,
     pullRequestReviewRequired: reviewCount >= 1,
-    staleReviewsDismissed: reviewPolicy?.dismiss_stale_reviews === true,
-    conversationResolutionRequired: protection?.required_conversation_resolution?.enabled === true,
-    linearHistoryRequired: protection?.required_linear_history?.enabled === true,
-    adminEnforcementEnabled: protection?.enforce_admins?.enabled === true,
-    forcePushDisabled: protection?.allow_force_pushes?.enabled === false,
-    branchDeletionDisabled: protection?.allow_deletions?.enabled === false,
-    requiredApprovingReviewCount: reviewCount
+    requiredApprovingReviewCount: reviewCount,
+    forcePushDisabled: rulesOfType(rules, "non_fast_forward").length > 0,
+    branchDeletionDisabled: rulesOfType(rules, "deletion").length > 0,
+    requiredDeploymentEnvironments: deploymentEnvironments,
+    noUnrelatedDeploymentPrerequisites: deploymentEnvironments.length === 0
   };
 
-  const requiredBooleanChecks = [
-    'requiredStatusChecksEnabled',
-    'sourceGuardRequired',
-    'releaseEvidenceRequired',
-    'strictStatusChecksEnabled',
-    'pullRequestReviewRequired',
-    'staleReviewsDismissed',
-    'conversationResolutionRequired',
-    'linearHistoryRequired',
-    'adminEnforcementEnabled',
-    'forcePushDisabled',
-    'branchDeletionDisabled'
+  const required = [
+    "effectiveRulesPresent",
+    "requiredStatusChecksEnabled",
+    "candidateBuildRequired",
+    "validationRequired",
+    "strictStatusChecksEnabled",
+    "pullRequestRulePresent",
+    "pullRequestReviewRequired",
+    "forcePushDisabled",
+    "branchDeletionDisabled",
+    "noUnrelatedDeploymentPrerequisites"
   ];
-  const passed = requiredBooleanChecks.every((name) => checks[name] === true);
 
-  return { passed, checks };
+  return {
+    passed: required.every((key) => checks[key] === true),
+    checks
+  };
 }
