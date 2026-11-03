@@ -297,7 +297,7 @@ export default function CandidateWorkbenchPage() {
             </section>
 
             <section className={styles.section} aria-labelledby="parents-heading">
-              <div className={styles.sectionHeader}><div><h2 id="parents-heading">Parent applications</h2><p className={styles.muted}>The parent application is the Kingsmen application unit. Child programme choices do not each become separate parent applications.</p></div></div>
+              <div className={styles.sectionHeader}><div><h2 id="parents-heading">Parent applications</h2><p className={styles.muted}>The parent application is the Kingsmen application unit. Child programme choices do not each become separate parent applications.</p><p className={styles.muted}>For CAO, Kingsmen manages one parent application; programme choices are child choices linked to that parent, not separate Kingsmen applications.</p></div></div>
               {parents.length === 0 ? (
                 <div className={styles.empty}><h3>No parent application records were returned.</h3><p>Save a currently verified opportunity first, or reload after identity review and application preparation have completed.</p></div>
               ) : (
