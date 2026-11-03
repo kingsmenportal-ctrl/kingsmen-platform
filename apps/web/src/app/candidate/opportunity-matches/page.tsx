@@ -12,6 +12,18 @@ const PATHWAYS = [
   ["EMPLOYMENT", "Employment"]
 ] as const;
 
+const SERVER_PATHWAY_FOR_FEED: Record<string, string> = {
+  HIGHER_EDUCATION: "HIGHER_EDUCATION",
+  TVET: "TVET",
+  SETA_LEARNERSHIPS: "SETA_LEARNERSHIP",
+  SETA_LEARNERSHIP: "SETA_LEARNERSHIP",
+  INTERNSHIPS: "INTERNSHIP",
+  INTERNSHIP: "INTERNSHIP",
+  APPRENTICESHIPS: "APPRENTICESHIP",
+  APPRENTICESHIP: "APPRENTICESHIP",
+  EMPLOYMENT: "EMPLOYMENT"
+};
+
 type Opportunity = {
   match_ref: string;
   title: string;
@@ -53,6 +65,7 @@ function getAccessToken(): string | null {
 export default function CandidateOpportunityMatchesPage() {
   const [feed, setFeed] = useState<Feed | null>(null);
   const [pathway, setPathway] = useState("ALL");
+  const [selectedPathways, setSelectedPathways] = useState<Record<string, string>>({});
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
   const [saveState, setSaveState] = useState<Record<string, "saving" | "saved" | "partial">>({});
@@ -92,6 +105,12 @@ export default function CandidateOpportunityMatchesPage() {
 
   async function saveOpportunity(item: Opportunity) {
     setError("");
+    const pathwayType = selectedPathways[item.match_ref]
+      || (item.pathways.length === 1 ? SERVER_PATHWAY_FOR_FEED[item.pathways[0]] || "" : "");
+    if (!pathwayType) {
+      setSaveErrors(current => ({ ...current, [item.match_ref]: "Choose the Kingsmen application pathway for this opportunity before saving." }));
+      return;
+    }
     setSaveErrors(current => ({ ...current, [item.match_ref]: "" }));
     setSaveMessages(current => ({ ...current, [item.match_ref]: "" }));
     const url = process.env.NEXT_PUBLIC_SUPABASE_URL;
@@ -111,7 +130,7 @@ export default function CandidateOpportunityMatchesPage() {
       const response = await fetch(`${url.replace(/\/$/, "")}/functions/v1/candidate-save-verified-opportunity`, {
         method: "POST",
         headers: { apikey: anonKey, Authorization: `Bearer ${token}`, "Content-Type": "application/json" },
-        body: JSON.stringify({ action: "save", match_ref: item.match_ref }),
+        body: JSON.stringify({ action: "save", match_ref: item.match_ref, pathway_type: pathwayType }),
         cache: "no-store"
       });
       const result = await response.json() as SaveResponse;
@@ -217,6 +236,24 @@ export default function CandidateOpportunityMatchesPage() {
                       <div className={styles.fact}><dt className={styles.label}>Eligibility</dt><dd className={styles.value}>Requires candidate-specific review; not guaranteed.</dd></div>
                       <div className={styles.fact}><dt className={styles.label}>Evidence</dt><dd className={styles.value}>{item.source_evidence.length} source evidence reference(s) provided by feed.</dd></div>
                     </dl>
+                    {item.pathways.length > 1 && (
+                      <label className={styles.savePathwayLabel}>
+                        Save under pathway
+                        <select
+                          className={styles.savePathwaySelect}
+                          value={selectedPathways[item.match_ref] || ""}
+                          onChange={e => setSelectedPathways(current => ({ ...current, [item.match_ref]: e.target.value }))}
+                          aria-label={`Choose application pathway for ${item.title}`}
+                        >
+                          <option value="">Choose pathway…</option>
+                          {item.pathways.map(value => (
+                            <option key={value} value={SERVER_PATHWAY_FOR_FEED[value] || value}>
+                              {PATHWAYS.find(([code]) => code === value)?.[1] || value.replaceAll("_", " ")}
+                            </option>
+                          ))}
+                        </select>
+                      </label>
+                    )}
                     <div className={styles.cardActions}>
                       <a href={item.official_link} target="_blank" rel="noopener noreferrer" className={styles.officialLink}>Open official opportunity ↗</a>
                       <button type="button" onClick={() => void saveOpportunity(item)} disabled={saveState[item.match_ref] === "saving" || saveState[item.match_ref] === "saved"} className={styles.button}>
