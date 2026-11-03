@@ -29,6 +29,7 @@ const required = [
   'adminEnforcementEnabled',
   'forcePushDisabled',
   'branchDeletionDisabled',
+  'bypassActorsVisible',
   'unrestrictedBypassActorCount',
   'UNVERIFIED_PERMISSION_DENIED',
   'BLOCKED_RULES_NOT_FOUND_OR_NOT_VISIBLE',
