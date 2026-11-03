@@ -65,7 +65,7 @@ assert.ok(js.includes("Accommodation support available; routes verified separate
 }
 assert.ok(liveDashboard.includes("All six pathways") && liveDashboard.includes("provider-origin evidence"), "candidate dashboard scope/safety copy missing");
 assert.ok(liveDocuments.includes("Private upload requires verified candidate identity"), "Document Vault must disclose its identity gate");
-assert.ok(liveDocuments.includes("Payment checkout and provider submission are not connected"), "document and provider/payment status boundaries must remain separate");
+assert.ok(liveDocumentPreflight.includes("Payment checkout and provider submission are not connected"), "document and provider/payment status boundaries must remain separate");
 assert.ok(liveDocumentPreflight.includes("candidate-private-documents") && liveDocumentPreflight.includes('action: "create_upload"'), "Document Vault must request a signed private upload");
 assert.ok(liveDocumentPreflight.includes('action: "finalize_upload"') && liveDocumentPreflight.includes("sha256_hex"), "Document Vault must finalise and show server-recorded integrity");
 assert.ok(liveDocumentPreflight.includes('action: "create_download_url"') && liveDocumentPreflight.includes("expiresInSeconds"), "private read links must be short-lived and requested from the backend");
