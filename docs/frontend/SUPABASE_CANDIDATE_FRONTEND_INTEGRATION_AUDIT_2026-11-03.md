@@ -38,3 +38,24 @@ Do not fabricate SQL from a migration name. Recover the exact deployed schema ch
 - The existence of deployed Edge Functions and RLS policies does not prove candidate authentication, profile persistence, cross-session reload, Candidate A/B isolation or a successful opportunity-save action. Those require authorised staging test accounts and runtime evidence.
 - Private document upload/read, PayFast settlement, provider receipt and provider outcome remain independent tests. Do not infer them from profile/opportunity function success.
 - This audit makes no database schema changes and does not change active Edge Function versions.
+
+
+## Additional live service source synchronisation — 2026-11-03
+
+Three additional Edge Functions directly called by the candidate portal were retrieved from staging and copied byte-for-byte into this repository branch:
+
+| Function | Live status | Version | JWT verification | Deployed source SHA-256 | Tracked source |
+|---|---:|---:|---:|---|---|
+| `candidate-private-documents` | ACTIVE | 16 | true | `04ba536c2a7d4a30f02ed1f3d0449b150a7ca5fbc4daf113b1556e2a7d16eb10` | `supabase/functions/candidate-private-documents/index.ts` plus `document-signature.mjs` |
+| `candidate-application-preparation` | ACTIVE | 16 | true | `8636b7f75873f02aef0a1df0f402e28a9480d992ca460a0377a4daab4a55c739` | `supabase/functions/candidate-application-preparation/index.ts` |
+| `payfast-sandbox` | ACTIVE | 9 | false at gateway | `a4405200982d646cf195d5d894c7ce735b424529aba4ce1495a36fa9c8f9ff62` | `supabase/functions/payfast-sandbox/index.ts` |
+
+The private-document function manually verifies the Supabase bearer session and a VERIFIED candidate identity link. It checks that the configured storage bucket is private, caps uploads at 10 MiB, allows PDF/JPEG/PNG only, verifies file signatures, calculates SHA-256, and issues short-lived signed read URLs (60 seconds). Reviewer actions are authorized separately through the platform reviewer registry. This is source/configuration evidence, not a successful real-candidate upload/read test; the candidate-related tables were empty at the time of the database audit.
+
+The application-preparation function validates the caller session and verified candidate identity, then checks the approved N15 match, official provider/programme evidence, current source observation and closing/opening dates before allowing preparation/tracker writes. Candidate-submitted status remains candidate-reported; it is not provider-confirmed receipt or outcome. This function prepares/updates a Kingsmen application tracker and does not independently submit an application to an external provider.
+
+The PayFast gateway has `verify_jwt=false` because the same endpoint accepts PayFast's server-to-server ITN callback. Its checkout path manually validates the caller's bearer session through Supabase Auth, requires a confirmed email and verified candidate identity, and loads an active ZAR plan from the finance catalogue. The ITN handler verifies the request signature, asks PayFast sandbox to validate the ITN, checks source-IP allowlisting, merchant, reference, amount and COMPLETE status, and uses idempotent receipt/settlement handling before calling the sandbox settlement RPC. The source is marked sandbox-only. No completed PayFast transaction, configured merchant secrets or entitlement grant was proven in this audit.
+
+**Source-control result:** the five frontend-critical functions named in this audit (`candidate-master-profile`, `candidate-save-verified-opportunity`, `candidate-private-documents`, `candidate-application-preparation`, `payfast-sandbox`) are now tracked from the active staging source, with the two N15 services already present. Their versioned live source was not redeployed by this source-sync operation.
+
+The applied database migration history remains incomplete in Git as described above. Function source tracking does not replace the missing ordered DDL migrations, and it does not prove complete clean-environment reproducibility.
