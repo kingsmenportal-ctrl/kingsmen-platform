@@ -6,9 +6,9 @@ import styles from "./opportunity-matches.module.css";
 const PATHWAYS = [
   ["HIGHER_EDUCATION", "Higher Education"],
   ["TVET", "TVET"],
-  ["SETA_LEARNERSHIP", "SETA programmes & learnerships"],
-  ["INTERNSHIP", "Internships"],
-  ["APPRENTICESHIP", "Apprenticeships"],
+  ["SETA_LEARNERSHIPS", "SETA programmes & learnerships"],
+  ["INTERNSHIPS", "Internships"],
+  ["APPRENTICESHIPS", "Apprenticeships"],
   ["EMPLOYMENT", "Employment"]
 ] as const;
 
