@@ -93,6 +93,8 @@ export default function CandidateOpportunityMatchesPage() {
             {loading ? "Checking verified matches…" : "Load my verified matches"}
           </button>
           <a href="/candidate/dashboard" className="rounded-xl border border-slate-300 px-5 py-3 text-sm font-semibold text-slate-800">Candidate dashboard</a>
+          <a href="/candidate/login" className="rounded-xl border border-slate-300 px-5 py-3 text-sm font-semibold text-slate-800">Sign in</a>
+          <a href="/packages/" className="rounded-xl border border-slate-300 px-5 py-3 text-sm font-semibold text-slate-800">Packages</a>
         </div>
       </header>
 
@@ -137,7 +139,7 @@ export default function CandidateOpportunityMatchesPage() {
                   <dl className="mt-4 space-y-2 border-t border-slate-100 pt-4 text-sm">
                     <div><dt className="inline font-semibold text-slate-800">Source checked: </dt><dd className="inline text-slate-600">{new Date(item.source_checked_at).toLocaleString()}</dd></div>
                     <div><dt className="inline font-semibold text-slate-800">Deadline: </dt><dd className="inline text-slate-600">{item.deadline.closes_at ? new Date(item.deadline.closes_at).toLocaleString() : item.deadline.message || "Not verified — check the official page."}</dd></div>
-                    <div><dt className="inline font-semibold text-slate-800">Eligibility: </dt><dd className="inline text-slate-600">Requires candidate-specific review; not guaranteed.</dd></div>
+                    <div><dt className="inline font-semibold text-slate-800">Eligibility review: </dt><dd className="inline text-slate-600">{item.eligibility.status} — {item.eligibility.rules}</dd></div>
                   </dl>
                   <a href={item.official_link} target="_blank" rel="noopener noreferrer"
                     className="mt-5 inline-flex rounded-xl bg-slate-950 px-4 py-3 text-sm font-bold text-white">Open official opportunity ↗</a>
