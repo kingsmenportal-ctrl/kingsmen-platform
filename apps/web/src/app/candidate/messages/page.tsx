@@ -2,21 +2,24 @@ export default function CandidateMessagesPage() {
   return (
     <main>
       <h1>Kingsmen Messages</h1>
-      <p>Email is the primary tracked communication channel. Portal messages are safe copies for visibility.</p>
-      <p>WhatsApp is urgent-only. SMS is backup-only. Bulk WhatsApp reminders are not used.</p>
+      <p>Email is the enabled external communication channel. Application status, messages and required actions are also shown in your Kingsmen portal inbox.</p>
 
-      <section aria-label="Message Centre Boundary">
+      <section aria-label="Message Centre">
         <article>
-          <h2>Routine updates</h2>
-          <p>Sent by email and copied here.</p>
+          <h2>Application updates and reminders</h2>
+          <p>Kingsmen sends email notifications for relevant application events and keeps the related status and next action visible in your portal.</p>
         </article>
         <article>
-          <h2>Urgent alerts</h2>
-          <p>WhatsApp may be used only for urgent or ceremonial cases.</p>
+          <h2>Portal inbox</h2>
+          <p>Use Kingsmen to review messages, outstanding requirements, document corrections, deadlines and follow-up tasks.</p>
         </article>
         <article>
-          <h2>Evidence</h2>
-          <p>Every message requires a message evidence ledger record.</p>
+          <h2>Other channels</h2>
+          <p>WhatsApp and SMS notifications are currently disabled. Kingsmen will not ask you to monitor another messaging service for application progress.</p>
+        </article>
+        <article>
+          <h2>Evidence and privacy</h2>
+          <p>Messages are linked to application records and must follow consent, privacy, delivery-evidence and retention rules.</p>
         </article>
       </section>
     </main>

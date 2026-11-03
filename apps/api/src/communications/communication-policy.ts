@@ -1,11 +1,11 @@
 import type { CommunicationChannel, CommunicationUrgency, NotificationDraft } from "./communication-types";
 
 export const COMMUNICATION_DOCTRINE = {
-  EMAIL_PRIMARY: "Email is primary.",
-  WHATSAPP_URGENT_ONLY: "WhatsApp is urgent-only.",
-  SMS_BACKUP_ONLY: "SMS is backup-only.",
-  PORTAL_INBOX: "Candidate portal carries visible status and message history.",
-  NO_BULK_WHATSAPP: "No bulk WhatsApp reminders.",
+  EMAIL_PRIMARY: "Email is the enabled external candidate notification channel.",
+  WHATSAPP_DISABLED: "WhatsApp notifications are disabled until separately approved and released.",
+  SMS_DISABLED: "SMS notifications are disabled until separately approved and released.",
+  PORTAL_INBOX: "Candidate portal carries visible status, messages and required actions.",
+  NO_BULK_WHATSAPP: "WhatsApp is disabled; no bulk or urgent WhatsApp messages are permitted.",
   EVIDENCE_REQUIRED: "Every message must have evidence.",
   NO_STATE_MUTATION: "Notifications may inform but must not silently change application state."
 } as const;
@@ -30,32 +30,18 @@ export function assertValidChannelUse(draft: NotificationDraft): CommunicationPo
   }
 
   if (draft.channel === "WHATSAPP_URGENT_ONLY") {
-    if (!isUrgent(draft.urgency)) {
-      return {
-        allowed: false,
-        requiresHumanReview: true,
-        reason: "WHATSAPP_URGENT_ONLY blocked because urgency is not URGENT or EMERGENCY. No bulk WhatsApp reminders."
-      };
-    }
     return {
-      allowed: true,
+      allowed: false,
       requiresHumanReview: true,
-      reason: "WHATSAPP_URGENT_ONLY allowed only after urgent human-approved escalation."
+      reason: "WHATSAPP_DISABLED: WhatsApp is not an enabled candidate communication channel."
     };
   }
 
   if (draft.channel === "SMS_BACKUP_ONLY") {
-    if (draft.purpose !== "BACKUP_NOTICE" && !isUrgent(draft.urgency)) {
-      return {
-        allowed: false,
-        requiresHumanReview: true,
-        reason: "SMS_BACKUP_ONLY blocked because SMS is backup-only."
-      };
-    }
     return {
-      allowed: true,
+      allowed: false,
       requiresHumanReview: true,
-      reason: "SMS_BACKUP_ONLY allowed as backup or urgent fallback."
+      reason: "SMS_DISABLED: SMS is not an enabled candidate communication channel."
     };
   }
 

@@ -36,8 +36,8 @@ try {
 for (const token of [
   'COMMUNICATIONS_BOUNDARY_SOURCE_ONLY',
   'emailPrimary',
-  'whatsappUrgentOnly',
-  'smsBackupOnly',
+  'whatsappDisabled',
+  'smsDisabled',
   'bulkMarketingDenied',
   'providerSendRequiresStagingProof',
   'rawRecipientDataRedacted',
@@ -47,9 +47,10 @@ for (const token of [
 }
 
 for (const token of [
-  'foundation_built_pending_provider_staging_proof',
+  'email_and_portal_only_pending_provider_staging_proof',
   'transactional_email_queued_primary',
-  'whatsapp_non_urgent_denied',
+  'whatsapp_disabled',
+  'sms_disabled',
   'live_send_never_executed_by_source_proof'
 ]) {
   checks.push(check(`manifest_token:${token}`, manifestRaw.includes(token), token));
@@ -57,8 +58,7 @@ for (const token of [
 
 for (const token of [
   'Email is primary',
-  'WhatsApp is urgent-only',
-  'SMS is backup-only',
+  'WhatsApp and SMS are disabled',
   'No provider secret',
   'No raw candidate recipient data'
 ]) {
@@ -69,10 +69,8 @@ const scenarios = [
   { name: 'transactional_email_queued_primary', passed: boundary.includes('providerSendRequiresStagingProof') && boundary.includes('emailPrimary') },
   { name: 'marketing_email_without_consent_denied', passed: boundary.includes('marketingRequiresExplicitConsent') },
   { name: 'bulk_message_denied', passed: boundary.includes('bulkMarketingDenied') },
-  { name: 'whatsapp_non_urgent_denied', passed: boundary.includes('whatsappUrgentOnly') && boundary.includes('purpose !== "urgent"') },
-  { name: 'whatsapp_urgent_queued_only', passed: boundary.includes('queuedOnly') && boundary.includes('providerSendRequiresStagingProof') },
-  { name: 'sms_non_urgent_denied', passed: boundary.includes('smsBackupOnly') && boundary.includes('purpose !== "urgent"') },
-  { name: 'sms_urgent_backup_only', passed: boundary.includes('smsBackupOnly') && boundary.includes('providerSendRequiresStagingProof') },
+  { name: 'whatsapp_disabled', passed: boundary.includes('whatsappDisabled') && boundary.includes('request.channel === "whatsapp"') && boundary.includes('reason: "whatsappDisabled"') },
+  { name: 'sms_disabled', passed: boundary.includes('smsDisabled') && boundary.includes('request.channel === "sms"') && boundary.includes('reason: "smsDisabled"') },
   { name: 'provider_send_requires_staging_proof', passed: boundary.includes('providerStagingProofPresent') && boundary.includes('providerSendRequiresStagingProof') },
   { name: 'recipient_data_redacted', passed: boundary.includes('[redacted-recipient]') && boundary.includes('rawRecipientDataRedacted') },
   { name: 'live_send_never_executed_by_source_proof', passed: boundary.includes('liveSendExecuted: false') && manifest.liveMessagesSent === false }
@@ -88,8 +86,10 @@ for (const [field, expected] of [
   ['liveMessagesSent', false],
   ['bulkSendingAllowed', false],
   ['emailPrimary', true],
-  ['whatsappUrgentOnly', true],
-  ['smsBackupOnly', true],
+  ['whatsappUrgentOnly', false],
+  ['smsBackupOnly', false],
+  ['whatsappDisabled', true],
+  ['smsDisabled', true],
   ['providerSecretsMayBeLogged', false],
   ['rawRecipientDataInReportsAllowed', false]
 ]) {
@@ -124,14 +124,16 @@ const report = {
   publicLaunchAllowed: false,
   liveMessagesSent: false,
   emailPrimary: true,
-  whatsappUrgentOnly: true,
-  smsBackupOnly: true,
+  whatsappUrgentOnly: false,
+  smsBackupOnly: false,
+  whatsappDisabled: true,
+  smsDisabled: true,
   providerStagingProofPending: true,
   checks,
   failed,
   generatedAt: new Date().toISOString(),
   nextAction: failed.length === 0
-    ? 'Run provider staging send/receive, bounce, opt-out, WhatsApp urgent-only, and SMS fallback proof before candidate notifications.'
+    ? 'Run provider staging email send/receive, bounce, and opt-out proof before enabling candidate notifications.'
     : 'Repair communications source boundary.'
 };
 

@@ -20,8 +20,8 @@ export interface CommunicationBoundaryDecision {
   evidence: {
     policyRef: "COMMUNICATIONS_BOUNDARY_SOURCE_ONLY";
     emailPrimary: true;
-    whatsappUrgentOnly: true;
-    smsBackupOnly: true;
+    whatsappDisabled: true;
+    smsDisabled: true;
     bulkMarketingDenied: boolean;
     providerSendRequiresStagingProof: true;
     rawRecipientDataRedacted: true;
@@ -34,8 +34,8 @@ export const COMMUNICATIONS_BOUNDARY_POLICY = {
   productionReady: false,
   publicLaunchAllowed: false,
   emailPrimary: true,
-  whatsappUrgentOnly: true,
-  smsBackupOnly: true,
+  whatsappDisabled: true,
+  smsDisabled: true,
   bulkMarketingDenied: true,
   providerSendRequiresStagingProof: true,
   providerSecretsMayBeLogged: false,
@@ -51,8 +51,8 @@ export function decideCommunicationBoundary(request: CommunicationBoundaryReques
   const evidence = {
     policyRef: "COMMUNICATIONS_BOUNDARY_SOURCE_ONLY" as const,
     emailPrimary: true as const,
-    whatsappUrgentOnly: true as const,
-    smsBackupOnly: true as const,
+    whatsappDisabled: true as const,
+    smsDisabled: true as const,
     bulkMarketingDenied: request.purpose === "bulk" || request.recipientCount > 1,
     providerSendRequiresStagingProof: true as const,
     rawRecipientDataRedacted: true as const,
@@ -67,12 +67,12 @@ export function decideCommunicationBoundary(request: CommunicationBoundaryReques
     return { allowed: false, queuedOnly: true, reason: "marketingRequiresExplicitConsent", channel: request.channel, evidence };
   }
 
-  if (request.channel === "whatsapp" && request.purpose !== "urgent") {
-    return { allowed: false, queuedOnly: true, reason: "whatsappUrgentOnly", channel: request.channel, evidence };
+  if (request.channel === "whatsapp") {
+    return { allowed: false, queuedOnly: true, reason: "whatsappDisabled", channel: request.channel, evidence };
   }
 
-  if (request.channel === "sms" && request.purpose !== "urgent") {
-    return { allowed: false, queuedOnly: true, reason: "smsBackupOnly", channel: request.channel, evidence };
+  if (request.channel === "sms") {
+    return { allowed: false, queuedOnly: true, reason: "smsDisabled", channel: request.channel, evidence };
   }
 
   if (!request.providerStagingProofPresent) {

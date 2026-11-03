@@ -237,21 +237,21 @@ export default function CandidateOpportunityMatchesPage() {
                   <p className="mt-3 text-sm text-slate-700">{item.recommendation_summary}</p>
                   <dl className="mt-4 space-y-2 border-t border-slate-100 pt-4 text-sm">
                     <div><dt className="inline font-semibold text-slate-800">Source checked: </dt><dd className="inline text-slate-600">{new Date(item.source_checked_at).toLocaleString()}</dd></div>
-                    <div><dt className="inline font-semibold text-slate-800">Deadline: </dt><dd className="inline text-slate-600">{item.deadline.closes_at ? new Date(item.deadline.closes_at).toLocaleString() : item.deadline.message || "Not verified — check the official page."}</dd></div>
+                    <div><dt className="inline font-semibold text-slate-800">Deadline: </dt><dd className="inline text-slate-600">{item.deadline.closes_at ? new Date(item.deadline.closes_at).toLocaleString() : item.deadline.message || "Not verified — Kingsmen is checking the current provider window."}</dd></div>
                     <div><dt className="inline font-semibold text-slate-800">Eligibility: </dt><dd className="inline text-slate-600">Requires candidate-specific review; not guaranteed.</dd></div>
                   </dl>
                   <div className="mt-4">
                     <button type="button" aria-expanded={expanded[item.match_ref] === true}
                       onClick={() => setExpanded(old => ({ ...old, [item.match_ref]: !old[item.match_ref] }))}
                       className="rounded-xl border border-slate-300 px-4 py-2 text-sm font-semibold text-slate-800">
-                      {expanded[item.match_ref] ? "Hide source and eligibility details" : "View source and eligibility details"}
+                      {expanded[item.match_ref] ? "Hide verification and eligibility details" : "View verification and eligibility details"}
                     </button>
                     {expanded[item.match_ref] && <section className="mt-3 rounded-xl bg-slate-50 p-4 text-sm leading-6 text-slate-700">
                       <p><strong>Listing state:</strong> Open at the last source check shown above. Backend rechecks freshness and review status when saving.</p>
                       <p className="mt-2"><strong>Eligibility:</strong> {item.eligibility.rules || "Candidate-specific eligibility is unverified and needs review."}</p>
                       <p className="mt-2"><strong>Source evidence references:</strong> {item.source_evidence.length ? item.source_evidence.join(", ") : "Missing; the listing should not be published without evidence."}</p>
-                      <p className="mt-2"><strong>Deadline evidence:</strong> {item.deadline.evidence?.length ? item.deadline.evidence.join(", ") : item.deadline.message || "No current confirmed deadline evidence; check the official page."}</p>
-                      <p className="mt-2 break-all"><strong>Canonical official URL:</strong> {item.official_link}</p>
+                      <p className="mt-2"><strong>Deadline evidence:</strong> {item.deadline.evidence?.length ? item.deadline.evidence.join(", ") : item.deadline.message || "No current confirmed deadline evidence. Kingsmen must verify the deadline before preparation can proceed."}</p>
+                      <p className="mt-2"><strong>Source handling:</strong> Kingsmen retains the official source and its evidence internally. Candidates complete application tasks inside this workspace.</p>
                     </section>}
                   </div>
                   <label className="mt-4 block text-sm font-semibold text-slate-800">Prepare under pathway
@@ -266,8 +266,7 @@ export default function CandidateOpportunityMatchesPage() {
                       {saving===`save:${item.match_ref}`?"Checking source and preparing draft…":preparedApplications[item.match_ref]? `Draft ${preparedApplications[item.match_ref]} saved`:savedTargets[item.match_ref]?"Saved · retry preparation":"Save & prepare application"}
                     </button>
                     
-                    <a href={item.official_link} target="_blank" rel="noopener noreferrer"
-                      className="rounded-xl bg-slate-950 px-4 py-3 text-sm font-bold text-white">Open official opportunity ↗</a>
+                    
                   </div>
                 </article>
               ))}
