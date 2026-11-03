@@ -48,8 +48,8 @@ Foundational Accord includes 8 accommodation routes. Accommodation support is av
 
 These are not implemented by adding a frontend control, so they remain separate work:
 
-1. **Candidate profile persistence:** authenticated create/update/reload/re-login proof and verified mapping from Supabase Auth user to the authorised Kingsmen candidate record are still required.
-2. **Saved opportunities:** the candidate UI must not claim cross-session saved-item persistence until an authorised backend store is connected and tested.
+1. **Candidate profile persistence:** the frontend now calls the active `candidate-master-profile` Edge Function for load/save, consent withdrawal, and correction requests. It only reports saved state from the function response. Fresh authenticated browser tests across reload/re-login and Candidate A/B isolation still need staging runtime evidence.
+2. **Saved opportunities:** verified N15 match cards now call the active `candidate-save-verified-opportunity` Edge Function, which checks verified identity, active consent, approved/current source evidence, and prepares a parent application draft. The saved list loads only after verified identity and queries the RLS-protected `candidate_workspace_saved_opportunities` table. Cross-session persistence is implemented by contract but still needs a fresh staging runtime test.
 3. **Document Vault:** the existing upload/read URL routes are signer shells, not live signed URLs. Private storage, server-side MIME/size enforcement, expiring signed links, malware scanning where applicable, reviewer decisions and audit persistence remain unproven.
 4. **PayFast:** selecting a plan is not checkout. No entitlement may activate until a persisted order is reconciled with a verified, idempotent PayFast ITN / approved finance evidence. The receipt page is a design example, not a real receipt.
 5. **Opportunity feed and submissions:** only currently verified, eligible and fresh opportunities should appear as open. Candidate-reported submission remains distinct from provider-confirmed receipt and outcome.
@@ -95,3 +95,28 @@ The consolidated frontend branch was built and tested at commit `3687c2ca8426e55
 - Netlify inspection after the build still returned only a branch-version/permalink-shaped URL without a source SHA or deploy ID. The connected deploy-detail operation returned 404 for that surfaced short identifier, and independent HTTP verification was blocked by the current environment's DNS/network resolution. No current-head deployment or authenticated runtime is asserted.
 
 The latest known **build status is green; deployed status is unverified**. To finish release verification, Netlify must expose the Deploy Preview status/link or a successful deploy detail that names the exact PR #317 commit. The expected standard preview URL format is `https://deploy-preview-317--kingsmen-portal-staging.netlify.app`, but that URL remains a hypothesis until Netlify confirms the deploy is ready.
+
+
+## Final frontend/deployment checkpoint — 2026-11-03 17:59 UTC
+
+### Candidate workflows now connected to deployed backend contracts
+
+- `/candidate/profile/` uses the active Supabase Edge Function `candidate-master-profile`. It loads and saves the reusable profile and six-pathway preferences, displays consent state and candidate reference when returned, provides consent withdrawal and queues authorised profile-correction requests. A new profile may remain `PENDING_REVIEW`; profile creation does not silently link by email equality.
+- `/candidate/opportunity-matches/` calls the active `candidate-save-verified-opportunity` function on an explicit candidate action. The backend validates bearer session, verified candidate identity, active consent, current approved N15 match and official-source evidence before creating a parent application draft. Provider submission is explicitly not claimed.
+- `/candidate/saved-opportunities/` verifies identity through the profile service before reading `candidate_workspace_saved_opportunities` with the candidate JWT; the table's own-candidate policies remain the database access control.
+- `/auth/callback/` verifies the returned Supabase user session before storing the browser auth session and directing the candidate to profile setup.
+- The static prototype validator now asserts those integration boundaries and the draft-deploy workflow now smoke-tests profile/saved/matches/callback public routes.
+
+### Verified CI and deployment attempt
+
+- [Kingsmen CI / PR #317 run 41689085141](https://github.com/kingsmenportal-ctrl/kingsmen-platform/actions/runs/41689085141) passed the focused repository tests, the static frontend smoke checks, API build and Next.js production build at commit `880880f4bfaacbcf2ab416bf9ea4ca20e4697d05`.
+- [Kingsmen CI / push run 41689074200](https://github.com/kingsmenportal-ctrl/kingsmen-platform/actions/runs/41689074200) also passed the build/test job at the same SHA.
+- [Jarvis Live Runtime run 41689084517](https://github.com/kingsmenportal-ctrl/kingsmen-platform/actions/runs/41689084517) passed.
+- The guarded staging-draft job **failed before invoking Netlify CLI** because the GitHub Actions secret `NETLIFY_AUTH_TOKEN` was empty. The log says: `NETLIFY_AUTH_TOKEN is missing. No Netlify deployment was attempted.` No deployment URL, deploy ID or live runtime was produced.
+- This is an explicit credential blocker, not a failing application build and not evidence of a successful or failed Netlify deployment. The target Netlify site ID is `fb27d0db-b116-4890-8f7f-14e654c27dbc`. The workflow contains no `--prod` flag and is intended for a draft preview on this site.
+
+### Exact next deployment action
+
+An authorised repository administrator must add a **repository Actions secret** named `NETLIFY_AUTH_TOKEN` at https://github.com/kingsmenportal-ctrl/kingsmen-platform/settings/secrets/actions. Its value must be a Netlify personal access token permitted to deploy the existing `kingsmen-portal-staging` site. Do not paste the token into source, the PR body or conversation text. Once configured, re-run the failed staging-draft job in [run 41689074200](https://github.com/kingsmenportal-ctrl/kingsmen-platform/actions/runs/41689074200); that will retry the same tagged source commit, build the deploy-preview context, upload a **draft** (not production), and record the URL/deploy ID only after public-route smoke tests pass.
+
+**Current status:** exact-head tests and production build passed; a staging deploy was attempted as a guarded workflow but stopped at the missing secret before any deploy command ran. Actual deployment and live-route runtime verification remain pending that secret.
