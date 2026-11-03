@@ -49,6 +49,9 @@ for (const plan of ["Foundational Accord", "Collegiate Ordinance", "Chancellorâ€
 }
 for (const contract of ["priceCents: 16999", "applications: 5", "capacity: 4", "priceCents: 29999", "applications: 10", "capacity: 8", "priceCents: 39999", "capacity: 10", "priceCents: 46999", "capacity: 12", "priceCents: 14999", "capacity: 3", "priceCents: 19999", "capacity: 5", "priceCents: 4999"]) {
   assert.ok(livePackages.includes(contract), `live package contract missing: ${contract}`);
+
+assert.ok(livePackages.includes("Accommodation support available; routes verified separately"), "CV Revamp must retain accommodation support while exposing zero managed-route capacity");
+assert.ok(js.includes("Accommodation support available; routes verified separately"), "static CV Revamp accommodation wording missing");
 }
 assert.ok(liveDashboard.includes("All six pathways") && liveDashboard.includes("provider-origin evidence"), "candidate dashboard scope/safety copy missing");
 assert.ok(liveDocuments.includes("Nothing was uploaded") || liveDocuments.includes("not connected"), "document preview boundary missing");
