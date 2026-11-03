@@ -84,10 +84,12 @@ function evaluateRulesetProtection(branchRules, rulesets) {
   const requiredDeploymentEnvironments = Array.isArray(deploymentEnvironments)
     ? deploymentEnvironments.filter((value) => typeof value === 'string')
     : [];
-  const unrestrictedBypassActorCount = applicableRulesets.reduce((count, set) => {
-    const actors = Array.isArray(set.bypass_actors) ? set.bypass_actors : [];
-    return count + actors.filter((actor) => actor?.bypass_mode === 'always').length;
-  }, 0);
+  const bypassActorsVisible = applicableRulesets.length > 0 &&
+    applicableRulesets.every((set) => Array.isArray(set.bypass_actors));
+  const unrestrictedBypassActorCount = bypassActorsVisible
+    ? applicableRulesets.reduce((count, set) =>
+        count + set.bypass_actors.filter((actor) => actor?.bypass_mode === 'always').length, 0)
+    : null;
   const checks = {
     activeProtectionPresent: rules.length > 0 && applicableRulesets.length > 0,
     activeRulesPresent: rules.length > 0,
@@ -100,7 +102,8 @@ function evaluateRulesetProtection(branchRules, rulesets) {
     staleReviewsDismissed: pullRequestParameters.dismiss_stale_reviews_on_push === true,
     conversationResolutionRequired: pullRequestParameters.required_review_thread_resolution === true,
     linearHistoryRequired: Boolean(rule('required_linear_history')),
-    adminEnforcementEnabled: applicableRulesets.length > 0 && unrestrictedBypassActorCount === 0,
+    bypassActorsVisible,
+    adminEnforcementEnabled: bypassActorsVisible && unrestrictedBypassActorCount === 0,
     forcePushDisabled: Boolean(rule('non_fast_forward')),
     branchDeletionDisabled: Boolean(rule('deletion')),
     requiredApprovingReviewCount: reviewCount,
