@@ -17,6 +17,12 @@ const pathways = [
 
 const workspaceLinks = [
   {
+    href: "/candidate/profile",
+    title: "Candidate profile & consent",
+    description: "Load, update and reload your reusable profile through the consent-aware profile service. Identity verification remains separate.",
+    action: "Manage profile"
+  },
+  {
     href: "/candidate/workbench",
     title: "Application workbench",
     description: "Review readiness and organise your application journey across all six pathways.",
