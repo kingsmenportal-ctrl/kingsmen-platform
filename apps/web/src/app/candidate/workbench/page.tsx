@@ -26,7 +26,7 @@ export default async function CandidateWorkbenchPage({
 }) {
   const params = await searchParams;
   const requestedPlan = Array.isArray(params.plan) ? params.plan[0] : params.plan;
-  const selectedPlan = requestedPlan && Object.hasOwn(plans, requestedPlan)
+  const selectedPlan = requestedPlan && Object.prototype.hasOwnProperty.call(plans, requestedPlan)
     ? plans[requestedPlan as PlanId]
     : null;
 
