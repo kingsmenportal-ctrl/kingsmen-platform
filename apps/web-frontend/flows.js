@@ -1,5 +1,20 @@
 (function () {
   "use strict";
+  const navToggle = document.getElementById("menu-toggle");
+  const primaryNav = document.getElementById("primary-nav");
+  if (navToggle && primaryNav) {
+    navToggle.addEventListener("click", () => {
+      const open = primaryNav.classList.toggle("open");
+      navToggle.setAttribute("aria-expanded", String(open));
+      navToggle.setAttribute("aria-label", open ? "Close navigation" : "Open navigation");
+    });
+    primaryNav.querySelectorAll("a").forEach(anchor => anchor.addEventListener("click", () => {
+      primaryNav.classList.remove("open");
+      navToggle.setAttribute("aria-expanded", "false");
+      navToggle.setAttribute("aria-label", "Open navigation");
+    }));
+  }
+
   const fileInput = document.getElementById("demo-file");
   const fileSelection = document.getElementById("file-selection");
   if (fileInput && fileSelection) fileInput.addEventListener("change", () => {
