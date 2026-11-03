@@ -52,7 +52,8 @@ function blockedChecks(reason) {
     requiredApprovingReviewCount: 0,
     activeRuleCount: 0,
     matchingRulesetCount: 0,
-    unrestrictedBypassActorCount: 0,
+    bypassActorsVisible: false,
+    unrestrictedBypassActorCount: null,
     requiredDeploymentEnvironments: [],
     failure: reason
   };
