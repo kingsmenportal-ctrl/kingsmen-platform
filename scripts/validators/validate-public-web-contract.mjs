@@ -13,6 +13,8 @@ const documents = readFileSync(new URL("../../apps/web/src/app/candidate/documen
 const documentsStyles = readFileSync(new URL("../../apps/web/src/app/candidate/documents/documents.module.css", import.meta.url), "utf8");
 const savedOpportunities = readFileSync(new URL("../../apps/web/src/components/saved-opportunities-client.tsx", import.meta.url), "utf8");
 const savedOpportunitiesStyles = readFileSync(new URL("../../apps/web/src/components/saved-opportunities.module.css", import.meta.url), "utf8");
+const applicationTracker = readFileSync(new URL("../../apps/web/src/app/personal-job-desk/application-tracker/ApplicationTrackerClient.tsx", import.meta.url), "utf8");
+const applicationTrackerStyles = readFileSync(new URL("../../apps/web/src/app/personal-job-desk/application-tracker/application-tracker.module.css", import.meta.url), "utf8");
 
 const canonicalPathways = [
   "Higher Education",
@@ -114,5 +116,13 @@ assert.ok(documents.includes("SHA-256") && documents.includes("sha256_hex"), "Va
 assert.ok(documents.includes("Candidate actions cannot approve, reject or delete files"), "Candidate UI must not expose reviewer-only decisions.");
 assert.ok(!documents.includes("SUPABASE_SERVICE_ROLE_KEY"), "Privileged service-role credentials must not be present in browser code.");
 assert.ok(documentsStyles.includes("@media(max-width:560px)") && documentsStyles.includes(":focus-visible"), "Document vault must have responsive styles and keyboard focus.");
+
+
+assert.ok(applicationTracker.includes('functions/v1/candidate-application-preparation'), "Application tracker must use the authenticated unified application service.");
+assert.ok(applicationTracker.includes('action: "load"'), "Application tracker must load persisted candidate-scoped records.");
+assert.ok(!applicationTracker.includes("/api/personal-jobs/application-tracker"), "Candidate application tracker must not use the legacy local-file note endpoint.");
+assert.ok(applicationTracker.includes("applicationEvents") && applicationTracker.includes("masterEvents"), "Application tracker must expose server-returned audit event collections.");
+assert.match(applicationTracker, /Candidate-reported submission, provider-confirmed receipt and provider-issued outcome remain separate events/, "Application tracker must keep candidate claims separate from provider evidence.");
+assert.ok(applicationTrackerStyles.includes("@media(max-width:560px)") && applicationTrackerStyles.includes(":focus-visible"), "Application tracker must have responsive layout and keyboard focus.");
 
 console.log("Public web contract passed: six pathways, persisted workspace APIs, private document workflow, pricing and entitlement guards.");
