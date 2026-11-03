@@ -96,7 +96,7 @@ assert.ok(livePackages.includes("PayFastSandboxCheckout") && livePackages.includ
 assert.ok(liveCheckout.includes("/functions/v1/payfast-sandbox") && liveCheckout.includes("idempotency-key"), "checkout must call the authenticated, idempotent PayFast sandbox endpoint");
 assert.ok(liveCheckout.includes("sandbox.payfast.co.za") && liveCheckout.includes("window.location.origin"), "checkout must validate sandbox destination and restrict origin");
 assert.ok(liveCheckout.includes("verified PayFast ITN") && liveCheckout.includes("no order was created"), "checkout must preserve payment and preview-origin boundaries");
-assert.ok(livePaymentReturn.includes("This browser return is not proof of payment") && livePaymentReturn.includes("ITN"), "payment return page must not mark an order paid");
+assert.ok(livePaymentReturn.includes("This browser return is not proof of payment") && livePaymentReturn.includes("Instant Transaction Notification"), "payment return page must not mark an order paid");
 assert.ok(livePaymentCancel.includes("No payment success is recorded here") && livePaymentCancel.includes("does not change an order"), "payment cancellation must not mutate payment status");
 
 console.log("Kingsmen frontend preview smoke checks passed.");
