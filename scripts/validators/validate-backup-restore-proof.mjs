@@ -62,6 +62,18 @@ for (const [path, tokens] of requiredTokens.entries()) {
   }
 }
 
+if (exists('scripts/backup/Test-KingsmenTruthVaultRestore.ps1')) {
+  const restoreScript = read('scripts/backup/Test-KingsmenTruthVaultRestore.ps1');
+  check('restore_requires_source_database_url', restoreScript.includes('KINGSMEN_DATABASE_URL is required to prove restore isolation'), 'source database identity must be available before a restore can run', 'scripts/backup/Test-KingsmenTruthVaultRestore.ps1');
+  check('restore_compares_host_port_database', restoreScript.includes('Get-KingsmenDatabaseTargetIdentity') && restoreScript.includes('sourceTargetIdentity') && restoreScript.includes('restoreTargetIdentity') && restoreScript.includes('StringComparer]::Ordinal.Equals'), 'restore and source host, port and database identity must be compared', 'scripts/backup/Test-KingsmenTruthVaultRestore.ps1');
+  check('restore_fails_closed_on_count_errors', restoreScript.includes('$failedChecks += "count_query:$table"'), 'failed or invalid table counts must fail the drill', 'scripts/backup/Test-KingsmenTruthVaultRestore.ps1');
+  check('restore_dry_run_never_passes', restoreScript.includes('$passed = (-not $DryRun)'), 'dry run cannot be reported as a successful restore', 'scripts/backup/Test-KingsmenTruthVaultRestore.ps1');
+  check('restore_count_regex_complete', /\$countText -match '\^\\d\+\$'/.test(restoreScript), 'count verification regex must be complete', 'scripts/backup/Test-KingsmenTruthVaultRestore.ps1');
+  check('restore_no_truncated_count_block', !/\$countText\s+-match\s+'\^\\d+\s*\n\s*\}/.test(restoreScript), 'restore count block must not be truncated', 'scripts/backup/Test-KingsmenTruthVaultRestore.ps1');
+  check('restore_no_duplicate_tail', !/\n\)\s*\{\s*\$count\s*=\s*\$countText/.test(restoreScript), 'restore script must not contain duplicated partial code', 'scripts/backup/Test-KingsmenTruthVaultRestore.ps1');
+  check('restore_failed_run_exits_nonzero', restoreScript.includes('throw "RESTORE_DRILL_FAILED:'), 'failed or dry-run verification must exit nonzero', 'scripts/backup/Test-KingsmenTruthVaultRestore.ps1');
+}
+
 if (exists('manifests/ops/backup-restore-proof-v1.json')) {
   const manifest = JSON.parse(read('manifests/ops/backup-restore-proof-v1.json'));
   check('manifest_production_ready_false', manifest.productionReady === false, String(manifest.productionReady), 'manifests/ops/backup-restore-proof-v1.json');

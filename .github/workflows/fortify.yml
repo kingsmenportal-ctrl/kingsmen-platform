@@ -1,0 +1,34 @@
+name: Fortify AST Scan (manual)
+
+# This optional specialist scan is deliberately not a routine merge/deploy gate.
+# Run it manually after Fortify credentials and policy are configured.
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  security-events: write
+
+jobs:
+  Fortify-AST-Scan:
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+    steps:
+      - name: Check Out Source Code
+        uses: actions/checkout@v4
+
+      - name: Run Fortify Scan
+        uses: fortify/github-action@ef5539bf4bd9c45c0bd971978f635a69eae55297
+        with:
+          sast-scan: true
+          debricked-sca-scan: true
+        env:
+          FOD_URL: https://ams.fortify.com
+          FOD_TENANT: ${{secrets.FOD_TENANT}}
+          FOD_USER: ${{secrets.FOD_USER}}
+          FOD_PASSWORD: ${{secrets.FOD_PAT}}
+          SSC_URL: ${{vars.SSC_URL}}
+          SSC_TOKEN: ${{secrets.SSC_TOKEN}}
+          SC_SAST_TOKEN: ${{secrets.SC_CLIENT_AUTH_TOKEN}}
+          DEBRICKED_TOKEN: ${{secrets.DEBRICKED_TOKEN}}
+          SC_SAST_SENSOR_VERSION: 24.4.0
