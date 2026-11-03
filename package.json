@@ -9,6 +9,7 @@
   },
   "scripts": {
     "test": "node scripts/validators/validate-jarvis-core.mjs && node scripts/validators/validate-jarvis-live-pass-02.mjs && node scripts/staging/test-kingsmen-operating-evidence-reconciliation.mjs && npm run n14:connectors:check && npm run n15:sources:check && npm run n15:ingestion:check && node scripts/validators/validate-candidate-dashboard-contract.mjs",
+    "frontend:preview:check": "node apps/web-frontend/preview-check.mjs",
     "jarvis:validate": "node scripts/validators/validate-jarvis-connected-live.mjs",
     "jarvis:validate:core": "node scripts/validators/validate-jarvis-core.mjs",
     "jarvis:validate:live-pass-02": "node scripts/validators/validate-jarvis-live-pass-02.mjs",
