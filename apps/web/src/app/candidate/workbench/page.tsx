@@ -145,9 +145,13 @@ export default function CandidateWorkbenchPage() {
   }, [feed]);
 
   const targetTrackers = useMemo(() => {
-    const bySavedId = new Map<string, Tracker>();
-    for (const tracker of feed?.trackers ?? []) if (tracker.saved_opportunity_id) bySavedId.set(tracker.saved_opportunity_id, tracker);
-    return bySavedId;
+    const byOfficialUrl = new Map<string, Tracker>();
+    for (const tracker of feed?.trackers ?? []) {
+      const value = tracker.candidate_workspace_saved_opportunities;
+      const opportunity = Array.isArray(value) ? value[0] : value;
+      if (opportunity?.official_url) byOfficialUrl.set(opportunity.official_url, tracker);
+    }
+    return byOfficialUrl;
   }, [feed]);
 
   async function prepareTarget(target: ApplicationTarget) {
@@ -260,7 +264,7 @@ export default function CandidateWorkbenchPage() {
                   {targets.map((target, index) => {
                     const key = target.id || target.target_key || String(index);
                     const parent = target.application_id ? targetToApplication.get(target.application_id) : undefined;
-                    const tracker = target.saved_opportunity_id ? targetTrackers.get(target.saved_opportunity_id) : undefined;
+                    const tracker = target.provider_application_url ? targetTrackers.get(target.provider_application_url) : undefined;
                     return (
                       <article className={styles.card} key={key}>
                         <div className={styles.tags}>
