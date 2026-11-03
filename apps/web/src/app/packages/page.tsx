@@ -1,6 +1,9 @@
+import PayFastSandboxCheckout from "@/components/candidate/PayFastSandboxCheckout";
+
 const plans = [
   {
     id: "artisan_charter",
+    planCode: "ARTISAN_CHARTER_R149_99",
     name: "Artisan Charter",
     price: "R149.99",
     cents: 14999,
@@ -11,6 +14,7 @@ const plans = [
   },
   {
     id: "foundational_accord",
+    planCode: "FOUNDATIONAL_ACCORD_R169_99",
     name: "Foundational Accord",
     price: "R169.99",
     cents: 16999,
@@ -21,6 +25,7 @@ const plans = [
   },
   {
     id: "guildmasters_charter",
+    planCode: "GUILDMASTERS_CHARTER_R199_99",
     name: "Guildmasters Charter",
     price: "R199.99",
     cents: 19999,
@@ -31,6 +36,7 @@ const plans = [
   },
   {
     id: "collegiate_ordinance",
+    planCode: "COLLEGIATE_ORDINANCE_R299_99",
     name: "Collegiate Ordinance",
     price: "R299.99",
     cents: 29999,
@@ -41,6 +47,7 @@ const plans = [
   },
   {
     id: "chancellors_writ",
+    planCode: "CHANCELLORS_WRIT_R399_99",
     name: "Chancellor’s Writ",
     price: "R399.99",
     cents: 39999,
@@ -51,6 +58,7 @@ const plans = [
   },
   {
     id: "regency_mandate",
+    planCode: "REGENCY_MANDATE_R469_99",
     name: "Regency Mandate",
     price: "R469.99",
     cents: 46999,
@@ -85,6 +93,7 @@ function PlanCard({ plan, featured = false }: { plan: (typeof plans)[number]; fe
         {plan.id === "foundational_accord" && <li className="flex gap-2"><span aria-hidden="true" className="text-amber-600">✓</span><span>8 accommodation routes included</span></li>}
       </ul>
       <a href={`/candidate/workbench?plan=${plan.id}`} className={`mt-6 inline-flex min-h-11 items-center justify-center rounded-lg px-4 py-3 text-sm font-bold transition focus:outline-none focus:ring-2 focus:ring-amber-400 focus:ring-offset-2 ${featured ? "bg-amber-300 text-slate-950 hover:bg-amber-200" : "border border-slate-300 bg-white text-slate-900 hover:border-slate-500 hover:bg-slate-50"}`}>Continue to application workbench <span aria-hidden="true" className="ml-2">→</span></a>
+      <PayFastSandboxCheckout planCode={plan.planCode} />
     </article>
   );
 }
@@ -114,6 +123,7 @@ export default function PackagesPage() {
             <span className="rounded-full border border-slate-700 px-3 py-2 text-slate-200">South African rand (ZAR)</span>
             <span className="rounded-full border border-slate-700 px-3 py-2 text-slate-200">Accommodation support included with paid plans</span>
             <span className="rounded-full border border-slate-700 px-3 py-2 text-slate-200">No guaranteed outcomes</span>
+            <span className="rounded-full border border-slate-700 px-3 py-2 text-amber-200">PayFast sandbox only · no live charges</span>
           </div>
         </div>
       </section>
@@ -134,6 +144,7 @@ export default function PackagesPage() {
             <p className="mt-2 text-sm leading-6 text-slate-600">Target turnaround: 3 business days. Includes 15 CV versions and 15 motivation letters. It does not include managed-route capacity by itself.</p>
             <p className="mt-3 text-sm leading-6 text-slate-700">A +2 route bonus applies only after verified CV Revamp ownership and an eligible plan upgrade. It is not granted merely by selecting or mentioning this service.</p>
             <a href="/candidate/workbench?plan=cv_revamp" className="mt-5 inline-flex min-h-11 items-center rounded-lg border border-slate-300 px-4 py-3 text-sm font-bold hover:bg-slate-50 focus:outline-none focus:ring-2 focus:ring-amber-400">Continue to workbench <span aria-hidden="true" className="ml-2">→</span></a>
+            <PayFastSandboxCheckout planCode="CV_REVAMP_R49_99" />
           </article>
           <aside className="rounded-2xl border border-amber-200 bg-amber-50 p-6">
             <h2 className="font-bold">Free Destiny Map</h2>
@@ -143,7 +154,7 @@ export default function PackagesPage() {
         </div>
         <aside className="mt-6 rounded-xl border border-slate-200 bg-white p-5" aria-labelledby="important-details">
           <h2 id="important-details" className="font-semibold">Before you continue</h2>
-          <p className="mt-2 text-sm leading-6 text-slate-600">Selecting a plan does not charge you or activate entitlements. Checkout, payment confirmation, and plan activation must be handled by the connected backend and verified PayFast settlement. Opportunity availability, provider receipt, admission, funding, placement, and employment are never guaranteed.</p>
+          <p className="mt-2 text-sm leading-6 text-slate-600">Selecting a plan does not activate entitlements. The checkout control creates a sandbox intent and redirects to PayFast’s test environment only; no live charge is enabled. The return page does not mark an order paid. Entitlements can activate only after the backend accepts a verified PayFast ITN. Opportunity availability, provider receipt, admission, funding, placement, and employment are never guaranteed.</p>
         </aside>
       </section>
       <footer className="border-t border-slate-200 bg-white px-4 py-6 text-xs text-slate-500 sm:px-6 lg:px-8">
