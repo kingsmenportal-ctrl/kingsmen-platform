@@ -10,7 +10,7 @@ This is a read-only, point-in-time release audit. It distinguishes tracked imple
 
 ## 1. Canonical frontend integration
 
-PR #316 is the active integration stream, based on `main`. The production application remains the existing Next.js app under `apps/web/src/app`; the static `apps/web-frontend/` prototype surface is not a replacement portal.
+PR #316 is the only open frontend integration stream, based on `main`. Overlapping PRs #317 and #318 were closed as superseded (not merged); their branches and review history remain available. Selected functional code from #317 and the branch-protection verifier from #318 were reconciled into #316. The static prototype/preview files remain reference material, not the production application. The production application remains the existing Next.js app under `apps/web/src/app`; the static `apps/web-frontend/` prototype surface is not a replacement portal.
 
 The current PR includes:
 - Premium Kingsmen homepage and six universally accessible pathways.
@@ -27,14 +27,14 @@ The candidate save Edge Function persists a verified opportunity and master targ
 
 ## 2. GitHub CI and main branch protection
 
-**Latest inspected PR head:** `1022a354cf45bc7849f161844953e456137205fc`.
+**Latest inspected PR head:** `f0c8ee4e3e4012acc9d26ea817d1e699d434f70e`.
 
 Exact-head GitHub Actions evidence:
-- [Kingsmen CI run 41871744512](https://github.com/kingsmenportal-ctrl/kingsmen-platform/actions/runs/41871744512): `validate` succeeded and `test-and-build` succeeded, including repository validation, API build and Next.js production build.
-- [Main branch protection evidence run 41871744591](https://github.com/kingsmenportal-ctrl/kingsmen-platform/actions/runs/41871744591): succeeded and uploaded a redacted read-only ruleset artifact.
-- [Jarvis Live Runtime run 41871744536](https://github.com/kingsmenportal-ctrl/kingsmen-platform/actions/runs/41871744536): succeeded. This does not prove the candidate portal runtime.
+- [Kingsmen CI run 41872617599](https://github.com/kingsmenportal-ctrl/kingsmen-platform/actions/runs/41872617599): `validate` succeeded and `test-and-build` succeeded, including repository validation, API build and Next.js production build.
+- [Main branch protection evidence run 41872617847](https://github.com/kingsmenportal-ctrl/kingsmen-platform/actions/runs/41872617847): succeeded and uploaded a redacted read-only ruleset artifact.
+- [Jarvis Live Runtime run 41872617590](https://github.com/kingsmenportal-ctrl/kingsmen-platform/actions/runs/41872617590): succeeded. This does not prove the candidate portal runtime.
 
-The ruleset artifact `kingsmen-main-branch-protection-41871744591` reported, for `main`, on 4 November 2026 at 16:51:57 UTC:
+The latest ruleset artifact `kingsmen-main-branch-protection-41872617847` reported, for `main`, on 4 November 2026 at 16:57:01 UTC:
 - Active `main-branch-protection` ruleset, HTTP 200.
 - Main branch targeted and ruleset enforced.
 - Required status checks enabled: `validate` and `test-and-build`.
