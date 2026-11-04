@@ -43,9 +43,22 @@ The latest ruleset artifact `kingsmen-main-branch-protection-41872617847` report
 - No bypass actors.
 - Force-push disabled and branch deletion disabled.
 
-This supersedes the older 3 November protection snapshot that reported zero required reviews/checks. The active ruleset is now evidenced; the pull request still requires an actual approving review. PR #316 currently has a `COMMENTED` review from `ndabenhlemvelo-arch`, which is not an approval. The reviewer requested runtime evidence for Candidate A/B isolation, profile persistence, private document ownership/expiry, PayFast ITN replay/recovery and a deploy tied to the reviewed SHA.
+This supersedes the older 3 November protection snapshot that reported zero required reviews/checks. The active ruleset is now evidenced; the pull request still requires an actual approving review. PR #316 currently has a `COMMENTED` review from `ndabenhlemvelo-arch`, which is not an approval; a fresh review is requested.
+The live ruleset also reports `dismiss_stale_reviews_on_push=false` and `require_last_push_approval=false`. No approval currently exists on PR #316, but these settings should be hardened so a future approval cannot remain valid after a new push without review.
+The reviewer requested runtime evidence for Candidate A/B isolation, profile persistence, private document ownership/expiry, PayFast ITN replay/recovery and a deploy tied to the reviewed SHA.
 
 No direct-`main` commit or protection bypass was performed.
+
+## 2A. Live anonymous authorization smoke
+
+A new read-only staging workflow ran against Supabase staging on 4 November 2026:
+- Workflow: [Kingsmen Staging Read-only Authorization Smoke run 41872584250](https://github.com/kingsmenportal-ctrl/kingsmen-platform/actions/runs/41872584250).
+- Commit under test: `da78e9114d8e78a3370da255aa41747f02a137ba`.
+- Result: `STAGING_E2E_PASSED`, 6 cases, 6 passed, 0 failed, with mutations disabled.
+- Six anonymous requests to candidate master profile, private documents, application preparation, verified-opportunity save, N15 candidate opportunities and identity-review request each returned HTTP 401.
+- Redacted report artifact: [kingsmen-staging-anonymous-api-smoke-41872584250](https://github.com/kingsmenportal-ctrl/kingsmen-platform/actions/runs/41872584250/artifacts/13345970078).
+
+This proves anonymous requests are rejected by those staging API entry points. It does not prove authenticated Candidate A/B ownership, reviewer authorization or successful candidate operations.
 
 ## 3. Supabase Edge Function source alignment
 
@@ -88,9 +101,10 @@ The 17 no-policy tables were checked for table privileges. All 17 deny `anon` an
 
 The six authenticated-callable `SECURITY DEFINER` functions need individual security-owner review. The function bodies inspected contain candidate ownership/consent checks or reviewer-role/evidence checks, but blanket revocation could break legitimate flows and was not applied.
 
-The `system_runtime_config` row `KINGSMEN_CAP_ACTIVE_CANDIDATES` is set to **500**. This is a stored configuration value, not proof of an enforced limit. I found no candidate-cap check in the inspected candidate Edge Functions, no candidate-cap triggers on the candidate/identity-link tables, no matching entry in `control_plane_capacity_limits`, and no review rows in `growth_cap_reviews`. The 500-active-candidate guard therefore remains unproven and must be implemented/tested through a reconciled, reviewed migration before onboarding is scaled.
+The `system_runtime_config` row `KINGSMEN_CAP_ACTIVE_CANDIDATES` is set to **500**. The live control-plane capacity table and growth-cap review table each return 0 rows. This is a stored configuration value, not proof of an enforced limit. I found no candidate-cap check in the inspected candidate Edge Functions, no candidate-cap triggers on the candidate/identity-link tables, no matching entry in `control_plane_capacity_limits`, and no review rows in `growth_cap_reviews`. The 500-active-candidate guard therefore remains unproven and must be implemented/tested through a reconciled, reviewed migration before onboarding is scaled.
 
 Current staging counts:
+- `candidates`: 2
 - `candidate_auth_identity_links`: 0
 - `candidate_master_profiles`: 0
 - `candidate_workspace_saved_opportunities`: 0
@@ -106,6 +120,9 @@ The empty candidate state is why two-candidate isolation, reviewer runtime and p
 A fresh read-only staging query found:
 - `public.opportunity_programmes`: **0 rows**.
 - `public.candidate_opportunities`: **4 rows**; 2 are `STALE` and unpublished, 2 are `UNVERIFIED` and unpublished.
+- `public.current_verified_route_opportunities`: **0 rows**.
+- `public.route_programmes`: **14 rows**; 6 need review with unknown availability, 6 are closed, and 2 require manual availability checks.
+- `public.route_providers`: 120 records; 3 are both verified and public-safe, 115 need review, and 2 are blocked.
 - No candidate-facing verified/open opportunity is evidenced by these rows.
 - `public.n15_ingestion_runs`: **0 rows**.
 
