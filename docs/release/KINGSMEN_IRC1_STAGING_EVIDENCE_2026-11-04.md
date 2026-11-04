@@ -165,6 +165,16 @@ The repository `netlify.toml` specifies base `apps/web`, command `npm run build`
 
 The connected Netlify actions available in this workflow expose project/deployment reads and environment management, but do not provide Git repository linking or a deploy-trigger operation. I did not create another site, deploy unrelated content, or claim a staging deployment. The deployment must be tied to the reviewed PR SHA before authenticated browser tests can be run.
 
+## 7A. Official opportunity source review
+
+A national official-source retrieval pass on 4 November 2026 is recorded in:
+- `docs/opportunities/KINGSMEN_OFFICIAL_SOURCE_REVIEW_2026-11-04.md`
+- `docs/opportunities/KINGSMEN_OFFICIAL_SOURCE_REVIEW_2026-11-04.json`
+
+Current source leads include the Ekurhuleni 2027 Community Bursary, Funza Lushaka 2027, UCT 2027 Postgraduate Financial Aid, CPUT ABB Education Trust 2027 and The Presidency ICT Developer vacancy. The UCT NRF Honours entry has category/deadline ambiguity; DSBD and Department of Agriculture were recorded only as parent-page leads until the actual post adverts are extracted. Conflicting or stale NSFAS, Eskom, UMP, Parliament and Health pages are explicitly excluded.
+
+These are **source-review records only**. Every manifest entry is marked `candidate_facing_safe=false`; no opportunity record was imported, published or marked `OPEN`. The staging candidate-visible verified/open count remains zero until the full source/eligibility/route review and the migration/backup gates are accepted.
+
 ## 8. Release decision and remaining gates
 
 **IRC-1 is not release-approved.** Source integration and build validation have advanced, and main protection is now evidenced. These release gates remain:
