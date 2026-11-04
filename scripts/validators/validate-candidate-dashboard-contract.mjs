@@ -11,6 +11,7 @@ const applicationWorkbench = read("../../apps/web/src/components/candidate/Candi
 const applicationPreparationFunction = read("../../supabase/functions/candidate-application-preparation/index.ts");
 const saveVerifiedOpportunityFunction = read("../../supabase/functions/candidate-save-verified-opportunity/index.ts");
 const candidateTrackerPage = read("../../apps/web/src/app/candidate/tracker/page.tsx");
+const legacyApplicationTracker = read("../../apps/web/src/app/personal-job-desk/application-tracker/page.tsx");
 const candidateTracker = read("../../apps/web/src/components/candidate/CandidateApplicationTracker.tsx");
 const finance = read("../../apps/web/src/app/candidate/finance/page.tsx");
 const destinyPage = read("../../apps/web/src/app/free-destiny-map/page.tsx");
@@ -94,6 +95,7 @@ assert.match(workbench, /provider-confirmed receipt/i);
 assert.match(workbench, /verified PayFast ITN settlement/i);
 assert.match(workbench, /CAO remains one Kingsmen managed application/);
 assert.match(candidateTrackerPage, /CandidateApplicationTracker/);
+assert.match(legacyApplicationTracker, /redirect\("\/candidate\/tracker"\)/);
 assert.match(candidateTracker, /candidate-application-preparation/);
 assert.match(candidateTracker, /action: "load"/);
 assert.match(candidateTracker, /parentApplications/);
