@@ -1,0 +1,84 @@
+name: Kingsmen Netlify Staging Deploy
+
+on:
+  push:
+    branches:
+      - main
+  workflow_dispatch:
+    inputs:
+      confirm_staging_deploy:
+        description: Deploy the reviewed main commit to the existing Kingsmen staging site
+        type: boolean
+        required: true
+        default: false
+
+permissions:
+  contents: read
+
+concurrency:
+  group: kingsmen-netlify-staging
+  cancel-in-progress: false
+
+jobs:
+  deploy-staging:
+    name: Build, deploy and verify reviewed main
+    if: ${{ github.ref == 'refs/heads/main' && (github.event_name != 'workflow_dispatch' || inputs.confirm_staging_deploy == true) }}
+    runs-on: ubuntu-latest
+    timeout-minutes: 35
+    environment: kingsmen-staging
+    env:
+      NETLIFY_AUTH_TOKEN: ${{ secrets.NETLIFY_AUTH_TOKEN }}
+      NETLIFY_SITE_ID: fb27d0db-b116-4890-8f7f-14e654c27dbc
+      KINGSMEN_NETLIFY_SOURCE_SHA: ${{ github.sha }}
+    steps:
+      - name: Check out the reviewed main commit
+        uses: actions/checkout@v4
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: npm
+
+      - name: Fail closed when the Netlify deploy credential is missing
+        shell: bash
+        run: |
+          set -euo pipefail
+          if [[ -z "${NETLIFY_AUTH_TOKEN:-}" ]]; then
+            echo "::error::NETLIFY_AUTH_TOKEN is not configured as a GitHub Actions repository/environment secret. No deploy was attempted."
+            exit 1
+          fi
+          if [[ "${NETLIFY_SITE_ID}" != "fb27d0db-b116-4890-8f7f-14e654c27dbc" ]]; then
+            echo "::error::Unexpected Netlify staging site ID. No deploy was attempted."
+            exit 1
+          fi
+
+      - name: Install repository and web dependencies
+        run: |
+          npm ci
+          npm install --prefix apps/web --no-audit --no-fund
+
+      - name: Build with the repository Netlify configuration
+        run: npx --yes netlify-cli@27.16.2 build
+
+      - name: Capture deployment start timestamp
+        run: |
+          mkdir -p reports/staging
+          node -e "require('fs').writeFileSync('reports/staging/netlify-deploy-started-at.txt', new Date().toISOString() + '\n')"
+
+      - name: Deploy the built reviewed main commit to staging
+        run: npx --yes netlify-cli@27.16.2 deploy --prod --message="Kingsmen staging source ${GITHUB_SHA}"
+
+      - name: Verify deploy ID, source SHA and deployed route smoke
+        env:
+          KINGSMEN_NETLIFY_SITE_URL: https://kingsmen-portal-staging.netlify.app
+        run: node scripts/staging/verify-netlify-staging-deploy.mjs
+
+      - name: Upload staging deployment evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: kingsmen-netlify-staging-deploy-${{ github.run_id }}
+          path: reports/staging/netlify-deploy-evidence.json
+          if-no-files-found: error
+          retention-days: 30
