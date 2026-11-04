@@ -12,7 +12,8 @@ const workflow = existsSync(workflowPath) ? readFileSync(workflowPath, 'utf8') :
 
 const required = [
   'read_only_ruleset_verification',
-  '/rulesets?includes_parents=true&per_page=100',
+  '/rulesets?per_page=100',
+  '/rulesets/',
   'evaluateMainBranchProtection',
   'mainBranchTargeted',
   'rulesetEnforced',
