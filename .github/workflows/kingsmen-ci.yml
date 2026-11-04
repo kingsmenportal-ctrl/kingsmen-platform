@@ -1,12 +1,12 @@
 name: Kingsmen CI
 
-# Emit the two protected branch check contexts on every pull request.
+# One ordinary check for independently releasable streams.
 on:
   pull_request:
     branches: [main]
   push:
     branches: [main]
-  workflow_dispatch:
+  workflow_dispatch
 
 permissions:
   contents: read
@@ -16,8 +16,8 @@ concurrency:
   cancel-in-progress: true
 
 jobs:
-  validate:
-    name: validate
+  build-test:
+    name: test-and-build
     runs-on: ubuntu-latest
     timeout-minutes: 25
     steps:
@@ -35,24 +35,6 @@ jobs:
 
       - name: Run focused repository tests
         run: npm test
-
-  build-test:
-    name: test-and-build
-    needs: validate
-    runs-on: ubuntu-latest
-    timeout-minutes: 25
-    steps:
-      - name: Checkout
-        uses: actions/checkout@v4
-
-      - name: Setup Node.js
-        uses: actions/setup-node@v4
-        with:
-          node-version: 22
-          cache: npm
-
-      - name: Install root dependencies
-        run: npm ci
 
       - name: Install API dependencies
         run: npm install --prefix apps/api --no-audit --no-fund
