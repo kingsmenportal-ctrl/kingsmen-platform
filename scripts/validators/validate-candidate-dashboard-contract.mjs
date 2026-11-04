@@ -17,6 +17,7 @@ const destinyForm = read("../../apps/web/src/components/kingsmen/FreeDestinyMapA
 const destinyClient = read("../../apps/web/src/lib/kingsmen/free-destiny-map-client.ts");
 const documentsPage = read("../../apps/web/src/app/candidate/documents/page.tsx");
 const documentPreflight = read("../../apps/web/src/components/candidate/DocumentPreflightPanel.tsx");
+const privateDocumentFunction = read("../../supabase/functions/candidate-private-documents/index.ts");
 const candidateProfile = read("../../apps/web/src/components/candidate/CandidateMasterProfileForm.tsx");
 const savedOpportunities = read("../../apps/web/src/components/candidate/CandidateSavedOpportunitiesClient.tsx");
 const authCallback = read("../../apps/web/src/components/candidate/AuthCallbackClient.tsx");
@@ -145,11 +146,19 @@ assert.match(documentsPage, /UPLOADED_CANDIDATE_REPORTED/);
 assert.ok(documentPreflight.includes("10 * 1024 * 1024"));
 assert.match(documentPreflight, /SHA-256/);
 assert.match(documentPreflight, /candidate-private-documents/);
-assert.match(documentPreflight, /upload-url/);
-assert.match(documentPreflight, /finalize-upload/);
-assert.match(documentPreflight, /read-url/);
+assert.match(documentPreflight, /action: "create_upload"/);
+assert.match(documentPreflight, /action: "finalize_upload"/);
+assert.match(documentPreflight, /action: "create_download_url"/);
 assert.match(documentPreflight, /signedUploadUrl/);
-assert.match(documentPreflight, /60 seconds/);
+assert.match(documentPreflight, /signedUploadToken/);
+assert.match(documentPreflight, /target\.searchParams\.set\("token", signedToken\)/);
+assert.match(documentPreflight, /method: "PUT"/);
+assert.match(documentPreflight, /body: selectedFile/);
+assert.match(documentPreflight, /expiresInSeconds/);
+assert.match(documentPreflight, /not a verification decision/i);
+assert.match(privateDocumentFunction, /create_upload: "upload-url"/);
+assert.match(privateDocumentFunction, /finalize_upload: "finalize-upload"/);
+assert.match(privateDocumentFunction, /create_download_url: "read-url"/);
 
 assert.match(candidateProfile, /candidate-master-profile/);
 assert.match(candidateProfile, /revoke_consent/);
@@ -174,4 +183,4 @@ assert.match(authForm, /redirect_to=/);
 assert.match(signInPage, /CandidateAuthForm mode="login"/);
 assert.match(registerPage, /CandidateAuthForm mode="register"/);
 
-console.log("Candidate portal contract passed: six pathways, authenticated master-application workbench, verified-opportunity-to-parent-application persistence, tracker linkage, canonical pricing, Free Destiny Map boundary, private document preflight, auth entry points and evidence-bound status language.");
+console.log("Candidate portal contract passed: six pathways, authenticated master-application workbench, verified-opportunity-to-parent-application persistence, tracker linkage, raw signed private uploads, server-side document finalisation and expiring downloads, canonical pricing, Free Destiny Map boundary, auth entry points and evidence-bound status language.");
