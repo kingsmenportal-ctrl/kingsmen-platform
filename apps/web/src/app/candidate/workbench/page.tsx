@@ -43,7 +43,7 @@ const journey = [
     number: "05",
     title: "Track application evidence",
     description: "Candidate-reported progress, provider-confirmed receipt, provider decisions and outcomes remain separate evidence states.",
-    href: "/personal-job-desk/application-tracker",
+    href: "/candidate/tracker",
     action: "Track applications"
   },
   {
@@ -91,7 +91,7 @@ export default async function CandidateWorkbenchPage({
             <Link className="hover:text-amber-200" href="/candidate/profile">Profile</Link>
             <Link className="hover:text-amber-200" href="/candidate/opportunity-matches">Opportunities</Link>
             <Link className="hover:text-amber-200" href="/candidate/documents">Documents</Link>
-            <Link className="hover:text-amber-200" href="/personal-job-desk/application-tracker">Tracker</Link>
+            <Link className="hover:text-amber-200" href="/candidate/tracker">Tracker</Link>
             <Link className="hover:text-amber-200" href="/packages/">Packages</Link>
           </nav>
         </div>
