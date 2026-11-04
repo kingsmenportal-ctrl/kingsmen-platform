@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { CandidateApplicationWorkbench } from "../../../components/candidate/CandidateApplicationWorkbench";
 
 const gates = [
   ["higher_education", "Higher Education"],
@@ -148,6 +149,8 @@ export default async function CandidateWorkbenchPage({
             ))}
           </div>
         </section>
+
+        <CandidateApplicationWorkbench />
 
         <section className="mt-8 rounded-xl border border-slate-200 bg-white p-5" aria-labelledby="cao-parent-child">
           <h2 id="cao-parent-child" className="font-bold">CAO parent application</h2>
