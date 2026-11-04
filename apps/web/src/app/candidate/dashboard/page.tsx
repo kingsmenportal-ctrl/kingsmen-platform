@@ -16,7 +16,7 @@ const workspaceLinks = [
   { href: "/candidate/opportunity-matches", title: "Opportunity matches", description: "Explore matching routes. An item is not open until source, deadline and eligibility evidence are current.", action: "View matches" },
   { href: "/candidate/saved-opportunities", title: "Saved opportunities", description: "Review backend-saved opportunities after your candidate identity has been verified.", action: "View saved" },
   { href: "/candidate/documents", title: "Document vault", description: "Review requirements and the private-document handling boundary.", action: "Open documents" },
-  { href: "/personal-job-desk/application-tracker", title: "Application tracker", description: "Review candidate-reported progress and any available receipt evidence.", action: "Track applications" },
+  { href: "/candidate/tracker", title: "Application tracker", description: "Review candidate-reported progress and any available receipt evidence.", action: "Track applications" },
   { href: "/candidate/finance/", title: "Plans & finance", description: "Compare canonical products, allowances and payment-evidence rules.", action: "View plans" },
 ] as const;
 
