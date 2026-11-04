@@ -51,12 +51,11 @@ No direct-`main` commit or protection bypass was performed.
 
 ## 2A. Live anonymous authorization smoke
 
-A new read-only staging workflow ran against Supabase staging on 4 November 2026:
-- Workflow: [Kingsmen Staging Read-only Authorization Smoke run 41872584250](https://github.com/kingsmenportal-ctrl/kingsmen-platform/actions/runs/41872584250).
-- Commit under test: `da78e9114d8e78a3370da255aa41747f02a137ba`.
-- Result: `STAGING_E2E_PASSED`, 6 cases, 6 passed, 0 failed, with mutations disabled.
-- Six anonymous requests to candidate master profile, private documents, application preparation, verified-opportunity save, N15 candidate opportunities and identity-review request each returned HTTP 401.
-- Redacted report artifact: [kingsmen-staging-anonymous-api-smoke-41872584250](https://github.com/kingsmenportal-ctrl/kingsmen-platform/actions/runs/41872584250/artifacts/13345970078).
+Two read-only staging smoke runs executed against Supabase staging:
+- Initial six-case run: [41872584250](https://github.com/kingsmenportal-ctrl/kingsmen-platform/actions/runs/41872584250) — 6/6 passed.
+- Expanded identity-review run: [41874846811](https://github.com/kingsmenportal-ctrl/kingsmen-platform/actions/runs/41874846811), on commit `92e089c59a513dba6a96ef0ff59e3463a621eefc) — `STAGING_E2E_PASSED`, 8 cases, 8 passed, 0 failed, with mutations disabled.
+- The expanded plan verifies anonymous HTTP 401 responses from candidate master profile, private documents, application preparation, verified-opportunity save, N15 candidate opportunities, candidate identity-review request, candidate identity-review status, and the reviewer identity-review queue.
+- Redacted report artifact: [kingsmen-staging-anonymous-api-smoke-41874846811](https://github.com/kingsmenportal-ctrl/kingsmen-platform/actions/runs/41874846811/artifacts/13345089191).
 
 This proves anonymous requests are rejected by those staging API entry points. It does not prove authenticated Candidate A/B ownership, reviewer authorization or successful candidate operations.
 
@@ -87,6 +86,22 @@ The candidate portal now exposes a manual identity-review flow at `/candidate/id
 The seven identity-review Edge Function sources (request, status, evidence upload, evidence read, decision, queue and follow-up) were copied into PR #316 and compared byte-for-byte against their current deployed staging sources. All seven matched at inspection time.
 
 The staging identity-review request, evidence and audit tables still contain zero records. This is implemented and statically validated UI/API integration, not proof of an actual candidate identity submission or reviewer decision. No request, evidence object or identity link was created during this inspection.
+
+## 3B. Identity-review Edge Function source alignment
+
+The identity-review workflow's seven deployed sources were retrieved from Supabase staging and compared byte-for-byte with the copies tracked in PR #316:
+
+| Edge Function | Staging version | Source match |
+|---|---:|---|
+| `candidate-identity-review-request` | 3 | Exact |
+| `candidate-identity-review-status` | 1 | Exact |
+| `candidate-identity-review-evidence-upload` | 3 | Exact |
+| `candidate-identity-review-evidence-read` | 1 | Exact |
+| `candidate-identity-review-decision` | 3 | Exact |
+| `candidate-identity-review-queue` | 2 | Exact |
+| `candidate-identity-review-followup` | 1 | Exact |
+
+The candidate request/status/evidence upload/follow-up endpoints are JWT-authenticated and filter requests/evidence to the signed-in user. Reviewer queue, evidence read and decision endpoints require the active `IDENTITY_REVIEWER` role; approval requires reviewer-accepted evidence. Source equality and anonymous denial are not substitutes for a real candidate submission or authorised reviewer decision.
 
 ## 4. Migration provenance and recovery
 
