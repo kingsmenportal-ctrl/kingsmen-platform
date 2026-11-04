@@ -10,7 +10,7 @@ const workbench = read("../../apps/web/src/app/candidate/workbench/page.tsx");
 const applicationWorkbench = read("../../apps/web/src/components/candidate/CandidateApplicationWorkbench.tsx");
 const applicationPreparationFunction = read("../../supabase/functions/candidate-application-preparation/index.ts");
 const saveVerifiedOpportunityFunction = read("../../supabase/functions/candidate-save-verified-opportunity/index.ts");
-const applicationTracker = read("../../apps/web/src/app/personal-job-desk/application-tracker/page.tsx");
+const applicationTracker = read("../../apps/web/src/app/candidate/tracker/page.tsx");
 const finance = read("../../apps/web/src/app/candidate/finance/page.tsx");
 const destinyPage = read("../../apps/web/src/app/free-destiny-map/page.tsx");
 const destinyForm = read("../../apps/web/src/components/kingsmen/FreeDestinyMapApiForm.tsx");
@@ -52,7 +52,7 @@ const expectedRoutes = [
   "/candidate/opportunity-matches",
   "/candidate/saved-opportunities",
   "/candidate/documents",
-  "/personal-job-desk/application-tracker",
+  "/candidate/tracker",
   "/candidate/finance"
 ];
 
@@ -65,7 +65,7 @@ const expectedWorkbenchRoutes = [
   "/candidate/opportunity-matches",
   "/candidate/saved-opportunities",
   "/candidate/documents",
-  "/personal-job-desk/application-tracker",
+  "/candidate/tracker",
   "/candidate/finance"
 ];
 for (const route of expectedWorkbenchRoutes) {
