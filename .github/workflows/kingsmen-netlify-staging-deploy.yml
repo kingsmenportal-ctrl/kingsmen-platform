@@ -55,6 +55,11 @@ jobs:
             exit 1
           fi
 
+      - name: Initialize redacted staging deployment evidence
+        run: |
+          mkdir -p reports/staging
+          node -e "require('fs').writeFileSync('reports/staging/netlify-deploy-evidence.json', JSON.stringify({schema:'kingsmen.netlify.staging-deploy.v1',state:'BUILD_PENDING',source_sha:process.env.GITHUB_SHA,site_id:process.env.NETLIFY_SITE_ID,generated_at:new Date().toISOString()},null,2)+'\\n')"
+
       - name: Install repository and web dependencies
         run: |
           npm ci
