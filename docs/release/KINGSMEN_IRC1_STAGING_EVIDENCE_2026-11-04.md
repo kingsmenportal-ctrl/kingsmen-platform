@@ -12,16 +12,20 @@ This file records a point-in-time inspection. It deliberately distinguishes sour
 
 The active integration stream is PR #316, based on `main`. Its product surface remains the existing Next.js application under `apps/web/src/app`; the static `apps/web-frontend/` prototype/reference surface is not the production application.
 
-The candidate workbench route contains six-step navigation and the authenticated `CandidateApplicationWorkbench` component. The component calls the deployed `candidate-application-preparation` Edge Function to load saved parent targets, parent application records, preparation trackers and checklist items. Preparing a parent application is a backend action; it does not submit to a provider.
+The candidate workbench route contains six-step navigation and the authenticated `CandidateApplicationWorkbench` component. The PR now also tracks the exact staging source for all four candidate Edge Functions and the PayFast sandbox Edge Function; these were byte-compared against their currently deployed staging sources. The component calls the deployed `candidate-application-preparation` Edge Function to load saved parent targets, parent application records, preparation trackers and checklist items. Preparing a parent application is a backend action; it does not submit to a provider.
 
 The verified-opportunity save path calls `candidate-save-verified-opportunity`. Its implementation persists the candidate's saved opportunity, reconciles a master application target, invokes the guarded parent-application preparation RPC, and links a preparation tracker. It does not claim provider submission or receipt.
 
 **Exact-head CI history:**
-- PR head `fc994f42fc2763b37892ec666f998e13bfa1fe9d`: `validate` and `test-and-build` completed successfully; the web and API builds passed.
-- Subsequent commit `2f3dc33a98f642bcfcee84b92ccfb8ea43321267`: main branch protection evidence completed successfully. The CI run for this later head was pending at the time of this snapshot.
+- PR head Latest exact PR head at the time of this update: `1022a354cf45bc7849f161844953e456137205fc`.
+- `validate`: passed.
+- `test-and-build`: passed, including repository validation, API build, and Next.js production build.
+- `verify-main-branch-protection`: passed.
+- `Jarvis Live Runtime`: passed.
+- The release suite now also runs canonical finance catalogue checks, PayFast sandbox source-level proof/validation, migration source-integrity checks, and the review-table access contract.
 - The independent review record on PR #316 is a `COMMENTED` review, not an approval. The reviewer requested authenticated Candidate A/B, profile persistence, private document ownership/expiry, PayFast ITN replay/recovery, and deployment-tied browser evidence.
 
-The main protection verifier succeeded on the inspected head. No direct-`main` commit or protection bypass was used. A successful evidence workflow is not itself a substitute for an independent approving review.
+The main protection verifier succeeded on the latest exact head. The active main ruleset requires one approving review and the strict `validate` and `test-and-build` contexts; bypass actors are empty, force-push and branch deletion are disabled. No direct-`main` commit or protection bypass was used. A successful evidence workflow is not itself a substitute for an independent approving review.
 
 ## 2. Supabase source synchronisation
 
@@ -47,7 +51,7 @@ Two migration names have duplicate ledger entries:
 - `candidate_application_preparation_readiness_0078`: versions `20261019112452` and `20261019112511`.
 - `seed_verified_labour_vacancy_deadlines_0093`: versions `20261029180632` and `20261029180642`.
 
-The staging ledger has no recorded migration later than 0095. Do not apply later migrations or imports until repository migration files, historical provenance, checksums and live schema are reconciled. The duplicate entries require explanation; they must not be deleted or rewritten as a shortcut.
+The current `main` source tree contains numbered SQL migrations in `db/migrations` only through `0086`; `supabase/migrations` has only the timestamped PayFast finance migration and `.gitkeep`. This is not a one-to-one source map for the 130-row staging ledger through 0095. No source migration files 0096–0106 were found in the inspected tree. Do not apply later migrations or imports until repository migration files, historical provenance, checksums and live schema are reconciled. The duplicate entries require explanation; they must not be deleted or rewritten as a shortcut.
 
 A protected backup and an isolated restore drill have not been evidenced in this snapshot. No schema migration was applied during this inspection.
 
@@ -62,10 +66,13 @@ Candidate A/B isolation, reviewer authorization and private document ownership/e
 
 ## 5. Opportunity catalogue state
 
-A read-only staging query found:
+A fresh read-only staging query found:
 - `public.opportunity_programmes`: **0 rows**.
-- `public.candidate_opportunities`: **4 rows** total; 2 were `STALE` and unpublished, and 2 were `UNVERIFIED` and unpublished.
-- None of those four rows had a source check within the previous 24 hours.
+- `public.candidate_opportunities`: **4 rows**; 2 are `STALE` and unpublished, and 2 are `UNVERIFIED` and unpublished.
+- `public.current_verified_route_opportunities`: **0 rows**.
+- `public.route_programmes`: **14 rows** (6 `NEEDS_REVIEW / UNKNOWN`, 6 `VERIFIED / CLOSED`, 2 `VERIFIED / MANUAL_CHECK_REQUIRED`).
+- `public.route_providers`: 120 records; 3 are both `VERIFIED` and `public_safe`, 115 are `NEEDS_REVIEW`, and 2 are `BLOCKED`.
+- The 4 candidate-opportunity rows are all unpublished, so none is currently candidate-facing.
 
 Consequently, the staging candidate feed does not currently have a verified, published open opportunity evidenced by these tables. Provider directory entries and source-authority records must not be presented as live opportunities. Do not fabricate or promote a listing to `OPEN` without official-source, deadline, eligibility, freshness and human-review evidence.
 
@@ -89,5 +96,6 @@ The available Netlify connection exposes project/deployment reads but does not e
 4. Review the six authenticated-callable `SECURITY DEFINER` RPCs individually and enable leaked-password protection through the supported Supabase Auth control.
 5. Populate the N15 catalogue through official, current, human-reviewed evidence; current candidate-usable opportunity count remains zero.
 6. Obtain a Netlify deploy tied to the reviewed PR head, then run authenticated Candidate A/B, profile reload/re-login, private document upload/read/expiry and PayFast sandbox ITN/replay/recovery tests.
+7. The Netlify connection currently exposes project/environment reads but no deployment records or Git-link/deploy-trigger action. Neither the primary staging URL nor the current branch-version URL could be retrieved by the web runtime. No deploy ID or deployed SHA is claimed.
 
 No production release, production payment, provider submission, or successful staging runtime verification is asserted by this document.
