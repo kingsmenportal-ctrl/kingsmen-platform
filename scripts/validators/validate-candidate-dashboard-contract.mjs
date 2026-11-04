@@ -7,6 +7,7 @@ const dashboard = read("../../apps/web/src/app/candidate/dashboard/page.tsx");
 const homepage = read("../../apps/web/src/app/page.tsx");
 const packages = read("../../apps/web/src/app/packages/page.tsx");
 const workbench = read("../../apps/web/src/app/candidate/workbench/page.tsx");
+const applicationTracker = read("../../apps/web/src/app/personal-job-desk/application-tracker/page.tsx");
 const finance = read("../../apps/web/src/app/candidate/finance/page.tsx");
 const destinyPage = read("../../apps/web/src/app/free-destiny-map/page.tsx");
 const destinyForm = read("../../apps/web/src/components/kingsmen/FreeDestinyMapApiForm.tsx");
@@ -54,6 +55,24 @@ const expectedRoutes = [
 for (const route of expectedRoutes) {
   assert.ok(dashboard.includes(route), `Dashboard missing workspace route: ${route}`);
 }
+
+const expectedWorkbenchRoutes = [
+  "/candidate/profile",
+  "/candidate/opportunity-matches",
+  "/candidate/saved-opportunities",
+  "/candidate/documents",
+  "/personal-job-desk/application-tracker",
+  "/candidate/finance"
+];
+for (const route of expectedWorkbenchRoutes) {
+  assert.ok(workbench.includes(route), `Workbench journey missing route: ${route}`);
+}
+assert.match(workbench, /Your application journey/);
+assert.match(workbench, /not a provider submission/i);
+assert.match(workbench, /provider-confirmed receipt/i);
+assert.match(workbench, /verified PayFast ITN settlement/i);
+assert.match(workbench, /CAO remains one Kingsmen managed application/);
+assert.match(applicationTracker, /ApplicationTrackerClient/);
 
 assert.match(homepage, /title: "Higher Education"/);
 assert.match(homepage, /title: "TVET"/);
@@ -136,4 +155,4 @@ assert.match(authForm, /redirect_to=/);
 assert.match(signInPage, /CandidateAuthForm mode="login"/);
 assert.match(registerPage, /CandidateAuthForm mode="register"/);
 
-console.log("Candidate portal contract passed: six core pathways, canonical pricing, Free Destiny Map boundary, document preflight, auth entry points and evidence-bound status language.");
+console.log("Candidate portal contract passed: six pathways, candidate journey navigation, tracker route, canonical pricing, Free Destiny Map boundary, private document preflight, auth entry points and evidence-bound status language.");
