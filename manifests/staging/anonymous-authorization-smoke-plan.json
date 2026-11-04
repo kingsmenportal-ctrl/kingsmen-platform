@@ -1,0 +1,47 @@
+{
+  "schema": "kingsmen.staging-e2e-plan.v1",
+  "cases": [
+    {
+      "id": "anonymous-master-profile-denied",
+      "method": "GET",
+      "path": "/functions/v1/candidate-master-profile",
+      "role": "anonymous",
+      "expectedStatus": 401
+    },
+    {
+      "id": "anonymous-private-documents-denied",
+      "method": "GET",
+      "path": "/functions/v1/candidate-private-documents",
+      "role": "anonymous",
+      "expectedStatus": 401
+    },
+    {
+      "id": "anonymous-application-preparation-denied",
+      "method": "GET",
+      "path": "/functions/v1/candidate-application-preparation",
+      "role": "anonymous",
+      "expectedStatus": 401
+    },
+    {
+      "id": "anonymous-save-verified-opportunity-denied",
+      "method": "GET",
+      "path": "/functions/v1/candidate-save-verified-opportunity",
+      "role": "anonymous",
+      "expectedStatus": 401
+    },
+    {
+      "id": "anonymous-n15-candidate-opportunities-denied",
+      "method": "GET",
+      "path": "/functions/v1/n15-candidate-opportunities",
+      "role": "anonymous",
+      "expectedStatus": 401
+    },
+    {
+      "id": "anonymous-identity-review-request-denied",
+      "method": "GET",
+      "path": "/functions/v1/candidate-identity-review-request",
+      "role": "anonymous",
+      "expectedStatus": 401
+    }
+  ]
+}
