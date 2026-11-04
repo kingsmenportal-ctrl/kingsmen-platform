@@ -20,34 +20,41 @@ const journey = [
   },
   {
     number: "02",
+    title: "Confirm your candidate identity",
+    description: "When a candidate record needs matching, request a human review and provide supporting evidence privately. A request is not an identity decision.",
+    href: "/candidate/identity-review",
+    action: "Open identity review"
+  },
+  {
+    number: "03",
     title: "Discover verified opportunities",
     description: "Search the six pathways. An opportunity is presented as open only when its official source, deadline, eligibility and freshness evidence are current.",
     href: "/candidate/opportunity-matches",
     action: "Browse opportunities"
   },
   {
-    number: "03",
+    number: "04",
     title: "Prepare an application",
     description: "Save an eligible verified match to prepare a Kingsmen parent-application draft. Saving a draft is not a provider submission or receipt.",
     href: "/candidate/saved-opportunities",
     action: "Review saved routes"
   },
   {
-    number: "04",
+    number: "05",
     title: "Manage supporting documents",
     description: "Use the private Document Vault for supported files. A successful candidate-reported upload is not a human verification decision.",
     href: "/candidate/documents",
     action: "Open Document Vault"
   },
   {
-    number: "05",
+    number: "06",
     title: "Track application evidence",
     description: "Candidate-reported progress, provider-confirmed receipt, provider decisions and outcomes remain separate evidence states.",
     href: "/candidate/tracker",
     action: "Track applications"
   },
   {
-    number: "06",
+    number: "07",
     title: "Manage your service",
     description: "Review products, payment status and available service capacity. Entitlements activate only after verified PayFast ITN settlement.",
     href: "/candidate/finance",
@@ -89,6 +96,7 @@ export default async function CandidateWorkbenchPage({
           <nav aria-label="Candidate navigation" className="flex flex-wrap items-center gap-4 text-sm text-slate-200">
             <Link className="hover:text-amber-200" href="/candidate/dashboard">Dashboard</Link>
             <Link className="hover:text-amber-200" href="/candidate/profile">Profile</Link>
+            <Link className="hover:text-amber-200" href="/candidate/identity-review">Identity review</Link>
             <Link className="hover:text-amber-200" href="/candidate/opportunity-matches">Opportunities</Link>
             <Link className="hover:text-amber-200" href="/candidate/documents">Documents</Link>
             <Link className="hover:text-amber-200" href="/candidate/tracker">Tracker</Link>
