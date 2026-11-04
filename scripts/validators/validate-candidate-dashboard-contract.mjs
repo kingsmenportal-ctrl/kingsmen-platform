@@ -32,6 +32,16 @@ const callbackPage = read("../../apps/web/src/app/auth/callback/page.tsx");
 const authForm = read("../../apps/web/src/components/candidate/CandidateAuthForm.tsx");
 const signInPage = read("../../apps/web/src/app/candidate/login/page.tsx");
 const registerPage = read("../../apps/web/src/app/auth/register/page.tsx");
+const identityReviewPage = read("../../apps/web/src/app/candidate/identity-review/page.tsx");
+const identityReviewPortal = read("../../apps/web/src/components/candidate/CandidateIdentityReviewPortal.tsx");
+const identityReviewRequestFunction = read("../../supabase/functions/candidate-identity-review-request/index.ts");
+const identityReviewStatusFunction = read("../../supabase/functions/candidate-identity-review-status/index.ts");
+const identityReviewEvidenceUploadFunction = read("../../supabase/functions/candidate-identity-review-evidence-upload/index.ts");
+const identityReviewEvidenceReadFunction = read("../../supabase/functions/candidate-identity-review-evidence-read/index.ts");
+const identityReviewDecisionFunction = read("../../supabase/functions/candidate-identity-review-decision/index.ts");
+const identityReviewQueueFunction = read("../../supabase/functions/candidate-identity-review-queue/index.ts");
+const identityReviewFollowupFunction = read("../../supabase/functions/candidate-identity-review-followup/index.ts");
+
 
 const expectedPathways = [
   ["higher_education", "Higher Education"],
@@ -192,6 +202,41 @@ assert.match(payfastCheckout, /verified PayFast ITN/i);
 assert.match(paymentReturn, /browser return is not proof of payment/i);
 assert.match(paymentCancel, /No payment success is recorded here/);
 assert.match(profilePage, /CandidateMasterProfileForm/);
+
+assert.match(identityReviewPage, /CandidateIdentityReviewPortal/);
+assert.match(dashboard, /candidate\/identity-review/);
+assert.match(workbench, /candidate\/identity-review/);
+assert.match(documentsPage, /candidate\/identity-review/);
+assert.match(identityReviewPortal, /candidate-identity-review-request/);
+assert.match(identityReviewPortal, /candidate-identity-review-status/);
+assert.match(identityReviewPortal, /candidate-identity-review-evidence-upload/);
+assert.match(identityReviewPortal, /candidate-identity-review-followup/);
+assert.match(identityReviewPortal, /candidate-master-profile/);
+assert.match(identityReviewPortal, /candidate_reference/);
+assert.match(identityReviewPortal, /claimant_name/);
+assert.match(identityReviewPortal, /claimant_message/);
+assert.ok(identityReviewPortal.includes("8 * 1024 * 1024"), "Identity evidence upload must enforce the 8 MiB client-side limit.");
+assert.match(identityReviewPortal, /application\/pdf/);
+assert.match(identityReviewPortal, /image\/jpeg/);
+assert.match(identityReviewPortal, /image\/png/);
+assert.match(identityReviewPortal, /new FormData\(\)/);
+assert.match(identityReviewPortal, /does not verify identity/i);
+assert.match(identityReviewPortal, /does not create a new candidate reference/i);
+assert.match(identityReviewRequestFunction, /submit_candidate_identity_review_for_user/);
+assert.match(identityReviewRequestFunction, /p_candidate_reference: candidateReference/);
+assert.match(identityReviewStatusFunction, /eq\("supabase_user_id", authData.user.id\)/);
+assert.match(identityReviewStatusFunction, /eq\("supabase_user_id", authData.user.id\)/);
+assert.match(identityReviewEvidenceUploadFunction, /identity-review-evidence/);
+assert.match(identityReviewEvidenceUploadFunction, /eq\("supabase_user_id", authData.user.id\)/);
+assert.match(identityReviewEvidenceUploadFunction, /sha256_hex/);
+assert.match(identityReviewEvidenceUploadFunction, /createClient/);
+assert.match(identityReviewEvidenceReadFunction, /IDENTITY_REVIEWER/);
+assert.match(identityReviewEvidenceReadFunction, /createSignedUrl/);
+assert.match(identityReviewDecisionFunction, /IDENTITY_REVIEWER/);
+assert.match(identityReviewDecisionFunction, /IDENTITY_EVIDENCE_WORKFLOW_REQUIRED/);
+assert.match(identityReviewQueueFunction, /IDENTITY_REVIEWER/);
+assert.match(identityReviewFollowupFunction, /submit_candidate_identity_review_followup/);
+
 assert.match(callbackPage, /AuthCallbackClient/);
 assert.match(authForm, /\/auth\/v1\/signup/);
 assert.match(authForm, /grant_type=password/);
@@ -200,4 +245,4 @@ assert.match(authForm, /redirect_to=/);
 assert.match(signInPage, /CandidateAuthForm mode="login"/);
 assert.match(registerPage, /CandidateAuthForm mode="register"/);
 
-console.log("Candidate portal contract passed: six pathways, authenticated master-application workbench, verified-opportunity-to-parent-application persistence, tracker linkage, raw signed private uploads, server-side document finalisation and expiring downloads, canonical pricing, Free Destiny Map boundary, auth entry points and evidence-bound status language.");
+console.log("Candidate portal contract passed: six pathways, authenticated master-application workbench, verified-opportunity-to-parent-application persistence, tracker linkage, candidate identity-review request/status/private evidence and reviewer gate contracts, raw signed private uploads, server-side document finalisation and expiring downloads, canonical pricing, Free Destiny Map boundary, auth entry points and evidence-bound status language.");
