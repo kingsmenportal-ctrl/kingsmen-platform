@@ -42,6 +42,20 @@
       "path": "/functions/v1/candidate-identity-review-request",
       "role": "anonymous",
       "expectedStatus": 401
+    },
+    {
+      "id": "anonymous-identity-review-status-denied",
+      "method": "GET",
+      "path": "/functions/v1/candidate-identity-review-status",
+      "role": "anonymous",
+      "expectedStatus": 401
+    },
+    {
+      "id": "anonymous-identity-review-queue-denied",
+      "method": "GET",
+      "path": "/functions/v1/candidate-identity-review-queue",
+      "role": "anonymous",
+      "expectedStatus": 401
     }
   ]
 }
