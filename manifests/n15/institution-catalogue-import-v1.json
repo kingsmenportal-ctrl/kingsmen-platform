@@ -1,0 +1,136 @@
+{
+  "version": "1.0.0",
+  "phase": "N15-INSTITUTION-CATALOGUE-01",
+  "status": "seed-authored-not-applied",
+  "retrieved_on": "2026-11-02",
+  "purpose": "Populate the existing opportunity provider registry with public-university directory anchors while preserving the distinction between institution identity, programme availability, legal/accreditation evidence, and provider integration.",
+  "canonical_store": "Supabase PostgreSQL opportunity_providers",
+  "first_batch": {
+    "provider_type": "PUBLIC_HIGHER_EDUCATION_INSTITUTION",
+    "sector": "UNIVERSITY",
+    "expected_records": 26,
+    "source_registers": [
+      "https://www.education.gov.za/FurtherStudies/Universities/tabid/393/Default.aspx",
+      "https://www.dhet.gov.za/"
+    ],
+    "source_observed_on": "2026-11-02",
+    "initial_state": {
+      "accreditation_status": "NEEDS_REVIEW",
+      "source_confidence": "HIGH",
+      "safe_to_recommend": false,
+      "programme_availability": "not asserted",
+      "application_window": "not asserted",
+      "provider_integration": "not asserted"
+    }
+  },
+  "data_contract": [
+    "Use stable provider_ref values and idempotent upserts.",
+    "Never infer open programmes, closing dates, eligibility, fees, or guaranteed outcomes from an institution directory entry.",
+    "A directory anchor is searchable metadata, not a verified open opportunity.",
+    "Do not set safe_to_recommend=true until institution-specific evidence is reviewed and the record's source freshness is established.",
+    "Keep official application URL, institutional website, integration state, partnership state, accreditation evidence, and receipt/outcome evidence as separate concepts.",
+    "Do not create institution-specific application routes from a homepage URL.",
+    "Retain source register and institution homepage in evidence_refs; enrich with dated observations and record-level evidence in subsequent batches."
+  ],
+  "next_batches": [
+    {
+      "name": "Community Education and Training colleges",
+      "source": "https://www.dhet.gov.za/",
+      "publication_state": "directory-only until official list and campus records are reconciled"
+    },
+    {
+      "name": "Private higher education institutions",
+      "sources": [
+        "https://www.dhet.gov.za/Registers_DocLib/Register%20%20Private%20Higher%20Education%20Institutions.pdf",
+        "https://www.che.ac.za/",
+        "https://www.saqa.org.za/"
+      ],
+      "required_state_distinctions": [
+        "registered",
+        "provisional",
+        "cancelled",
+        "lapsed",
+        "unresolved"
+      ],
+      "publication_state": "not candidate-safe until register status and programme scope are reconciled"
+    },
+    {
+      "name": "Private colleges and occupational training providers",
+      "sources": [
+        "https://www.dhet.gov.za/",
+        "https://www.qcto.org.za/",
+        "https://www.saqa.org.za/"
+      ],
+      "publication_state": "not candidate-safe until applicable registration/accreditation evidence is reconciled"
+    },
+    {
+      "name": "Government departments, public agencies, employers, funders, accommodation providers",
+      "publication_state": "provider directory separate from programme/opening records and integration status"
+    },
+    {
+      "name": "Campus and alias reconciliation for universities and TVET colleges",
+      "required_fields": [
+        "canonical parent institution",
+        "campus/branch names",
+        "province/municipality",
+        "official URL evidence",
+        "source retrieval timestamp"
+      ],
+      "publication_state": "no campus-level application routing until confirmed"
+    },
+    {
+      "name": "Programme/opportunity imports",
+      "required_evidence": [
+        "official source URL",
+        "retrieved/checked timestamp",
+        "deadline when applicable",
+        "eligibility evidence",
+        "freshness boundary",
+        "human review state"
+      ],
+      "publication_state": "OPEN only when all required evidence passes"
+    }
+  ],
+  "release_gates": [
+    "Reconcile repository migrations against the actual staging schema and migration ledger.",
+    "Do not apply this seed to staging until migration provenance, backup/restore, and change-control gates are approved.",
+    "Run the catalogue validator and CI on the immutable implementation commit.",
+    "Verify idempotent import, duplicate handling, RLS/service-role boundaries, and candidate-safe filters in staging.",
+    "Founder review before promotion or publication."
+  ],
+  "second_batch": {
+    "provider_type": "PUBLIC_TVET_COLLEGE",
+    "sector": "TVET",
+    "expected_records": 50,
+    "source_registers": [
+      "https://nsfas.org.za/content/institutions.html",
+      "https://www.dhet.gov.za/"
+    ],
+    "source_observed_on": "2026-11-02",
+    "initial_state": {
+      "accreditation_status": "NEEDS_REVIEW",
+      "source_confidence": "HIGH",
+      "safe_to_recommend": false,
+      "official_url": "null until individually verified",
+      "programme_availability": "not asserted",
+      "campus_relationships": "not asserted"
+    }
+  },
+  "third_batch": {
+    "provider_type": "SECTOR_EDUCATION_AND_TRAINING_AUTHORITY",
+    "sector": "SETA",
+    "expected_records": 21,
+    "source_registers": [
+      "https://www.dhet.gov.za/",
+      "https://pseta.org.za/wp-content/uploads/2020/07/Final-PSETA-OFO-Mapping-Updated-Report-Feb-2021.pdf"
+    ],
+    "source_observed_on": "2026-11-02",
+    "initial_state": {
+      "accreditation_status": "NOT_APPLICABLE",
+      "source_confidence": "HIGH",
+      "safe_to_recommend": false,
+      "programme_availability": "not asserted",
+      "official_url": "homepage candidate only; verify ownership and redirects before use as authoritative source"
+    }
+  }
+}
