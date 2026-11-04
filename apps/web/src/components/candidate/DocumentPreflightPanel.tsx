@@ -3,20 +3,20 @@
 import { useCallback, useEffect, useState, type ChangeEvent } from "react";
 
 const MAX_BYTES = 10 * 1024 * 1024;
-const BUCKET_FUNCTION = "candidate-private-documents";
-const MIME_TYPES: Record<string, string> = {
-  "application/pdf": ".pdf",
-  "image/jpeg": ".jpg, .jpeg",
-  "image/png": ".png"
+const MIME_BY_EXTENSION: Record<string, string> = {
+  ".pdf": "application/pdf",
+  ".jpg": "image/jpeg",
+  ".jpeg": "image/jpeg",
+  ".png": "image/png"
 };
 const DOCUMENT_TYPES = [
-  ["CV", "CV / résumé"],
   ["ID_DOCUMENT", "Identity document"],
+  ["CV", "CV / résumé"],
   ["MATRIC_CERTIFICATE", "Matric certificate"],
   ["ACADEMIC_RECORD", "Academic record / qualification"],
   ["PROOF_OF_ADDRESS", "Proof of address"],
   ["BANK_LETTER", "Bank letter"],
-  ["PARENT_GUARDIAN_ID", "Parent / guardian identity document"],
+  ["PARENT_GUARDIAN_ID", "Parent / guardian ID"],
   ["PAYSLIP", "Payslip"],
   ["AFFIDAVIT", "Affidavit"],
   ["APPLICATION_PROOF", "Application proof"],
@@ -24,343 +24,323 @@ const DOCUMENT_TYPES = [
   ["OTHER", "Other supporting document"]
 ] as const;
 
-type AuthContext = { url: string; anonKey: string; token: string };
-type VaultDocument = {
+type DocumentType = (typeof DOCUMENT_TYPES)[number][0];
+type Preflight = { name: string; size: number; mime: string; sha256: string };
+type ServerDocument = {
   id: string;
   documentType?: string;
+  document_type?: string;
   filename?: string;
-  mimeType?: string;
+  original_filename?: string;
   sizeBytes?: number;
+  size_bytes?: number;
   status: string;
   sha256_hex?: string | null;
   uploadedAt?: string | null;
-  createdAt?: string;
-  latestReview?: { decision?: string; reviewer_note?: string; created_at?: string } | null;
+  uploaded_at?: string | null;
+  latestReview?: { decision?: string } | null;
 };
-
-function authContext(): AuthContext | null {
-  try {
-    const url = process.env.NEXT_PUBLIC_SUPABASE_URL?.replace(/\/$/, "");
-    const anonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
-    if (!url || !anonKey) return null;
-    const projectRef = new URL(url).hostname.split(".")[0];
-    const storageKey = projectRef ? "sb-" + projectRef + "-auth-token" : "sb-euhubhhnumtibbyufghm-auth-token";
-    const raw = window.localStorage.getItem(storageKey);
-    if (!raw) return null;
-    const session = JSON.parse(raw) as { access_token?: string; expires_at?: number };
-    if (typeof session.access_token !== "string") return null;
-    if (typeof session.expires_at === "number" && session.expires_at <= Math.floor(Date.now() / 1000)) return null;
-    return { url, anonKey, token: session.access_token };
-  } catch {
-    return null;
-  }
-}
+type ApiResponse = {
+  ok?: boolean;
+  status?: string;
+  detail?: string;
+  error?: string;
+  message?: string;
+  document?: { id?: string; status?: string; sha256_hex?: string | null };
+  documentId?: string;
+  document_id?: string;
+  signedUploadUrl?: string;
+  signedUploadToken?: string;
+  uploadPath?: string;
+  documents?: ServerDocument[];
+  signedReadUrl?: string;
+  expiresInSeconds?: number;
+  sha256Hex?: string;
+};
+type SessionConfig = { url: string; anonKey: string; token: string };
 
 function formatBytes(bytes: number) {
-  if (bytes < 1024) return bytes + " B";
-  if (bytes < 1024 * 1024) return (bytes / 1024).toFixed(1) + " KB";
-  return (bytes / (1024 * 1024)).toFixed(2) + " MB";
+  if (bytes < 1024) return `${bytes} B`;
+  if (bytes < 1024 * 1024) return `${(bytes / 1024).toFixed(1)} KB`;
+  return `${(bytes / (1024 * 1024)).toFixed(2)} MB`;
 }
-
-function statusLabel(status: string) {
-  const labels: Record<string, string> = {
-    UPLOAD_PENDING: "Awaiting upload",
-    UPLOADED_CANDIDATE_REPORTED: "Uploaded · awaiting review",
-    UNDER_REVIEW: "Under human review",
-    VERIFIED: "Verified by reviewer",
-    CORRECTION_REQUIRED: "Correction requested",
-    REJECTED: "Rejected by reviewer"
-  };
-  return labels[status] || status.replaceAll("_", " ").toLowerCase();
+function formatDate(value?: string | null) {
+  if (!value) return "Not recorded";
+  const date = new Date(value);
+  return Number.isNaN(date.getTime()) ? "Not recorded" : date.toLocaleString("en-ZA", { dateStyle: "medium", timeStyle: "short" });
 }
-
-async function responseJson(response: Response): Promise<Record<string, unknown>> {
-  try {
-    return await response.json() as Record<string, unknown>;
-  } catch {
-    return {};
+function statusText(status: string) {
+  switch (status) {
+    case "UPLOAD_PENDING": return "Upload pending finalisation";
+    case "UPLOADED_CANDIDATE_REPORTED": return "Uploaded · awaiting authorised review";
+    case "UNDER_REVIEW": return "Under review";
+    case "VERIFIED": return "Verified by an authorised reviewer";
+    case "REJECTED": return "Review requires correction";
+    case "UPLOAD_FAILED": return "Upload failed";
+    default: return status.replaceAll("_", " ").toLowerCase();
   }
+}
+function readSession(): SessionConfig {
+  const url = process.env.NEXT_PUBLIC_SUPABASE_URL?.replace(/\/$/, "");
+  const anonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
+  if (!url || !anonKey) throw new Error("Private document access is not configured for this deployment.");
+  let projectRef = "euhubhhnumtibbyufghm";
+  try { projectRef = new URL(url).hostname.split(".")[0] || projectRef; } catch {}
+  const raw = window.localStorage.getItem(`sb-${projectRef}-auth-token`);
+  if (!raw) throw new Error("Sign in before accessing your private Document Vault.");
+  let session: { access_token?: string; expires_at?: number };
+  try { session = JSON.parse(raw) as { access_token?: string; expires_at?: number }; }
+  catch { throw new Error("Your browser session could not be read. Sign in again."); }
+  if (!session.access_token) throw new Error("Sign in before accessing your private Document Vault.");
+  if (typeof session.expires_at === "number" && session.expires_at <= Math.floor(Date.now() / 1000)) {
+    throw new Error("Your session has expired. Sign in again to continue.");
+  }
+  return { url, anonKey, token: session.access_token };
+}
+function serverError(status: number, body: ApiResponse) {
+  const code = body.status || body.error || body.detail || body.message || `Request failed (HTTP ${status}).`;
+  if (status === 401 || code === "AUTHENTICATION_REQUIRED") return "Sign in to access your private documents.";
+  if (code === "IDENTITY_REVIEW_REQUIRED") return "An authorised Kingsmen reviewer must verify your candidate identity before private document upload or download can be enabled.";
+  if (code === "CONSENT_REQUIRED") return "Active profile-processing consent is required before this document action can continue.";
+  if (status === 403) return "This private document action is not authorised for the current account.";
+  if (code === "DOCUMENT_STORAGE_NOT_CONFIGURED" || code === "NOT_CONFIGURED") return "Private document storage is not correctly configured. No document was marked as received.";
+  if (code === "UPLOAD_NOT_AVAILABLE") return "Private storage did not return the uploaded object. The document has not been finalised as received.";
+  return `${code}. The server did not confirm this document operation.`;
+}
+async function documentApi(session: SessionConfig, action?: Record<string, unknown>, method: "GET" | "POST" = "POST"): Promise<ApiResponse> {
+  const response = await fetch(`${session.url}/functions/v1/candidate-private-documents`, {
+    method,
+    headers: {
+      apikey: session.anonKey,
+      Authorization: `Bearer ${session.token}`,
+      ...(action ? { "Content-Type": "application/json" } : {})
+    },
+    ...(action ? { body: JSON.stringify(action) } : {}),
+    cache: "no-store"
+  });
+  let body: ApiResponse = {};
+  try { body = await response.json() as ApiResponse; } catch {}
+  if (!response.ok || body.ok === false) throw new Error(serverError(response.status, body));
+  return body;
 }
 
 export function DocumentPreflightPanel() {
-  const [auth, setAuth] = useState<AuthContext | null>(null);
-  const [documents, setDocuments] = useState<VaultDocument[]>([]);
-  const [documentType, setDocumentType] = useState("OTHER");
-  const [file, setFile] = useState<File | null>(null);
-  const [busy, setBusy] = useState(false);
-  const [loading, setLoading] = useState(false);
-  const [openingId, setOpeningId] = useState<string | null>(null);
+  const [selectedFile, setSelectedFile] = useState<File | null>(null);
+  const [documentType, setDocumentType] = useState<DocumentType>("OTHER");
+  const [preflight, setPreflight] = useState<Preflight | null>(null);
+  const [preparing, setPreparing] = useState(false);
+  const [uploading, setUploading] = useState(false);
+  const [loadingDocuments, setLoadingDocuments] = useState(true);
   const [error, setError] = useState("");
   const [notice, setNotice] = useState("");
+  const [listError, setListError] = useState("");
+  const [documents, setDocuments] = useState<ServerDocument[]>([]);
+  const [inputVersion, setInputVersion] = useState(0);
+  const [download, setDownload] = useState<{ id: string; url: string; expiresAt: number } | null>(null);
 
-  const apiUrl = useCallback((context: AuthContext) => context.url + "/functions/v1/" + BUCKET_FUNCTION, []);
-
-  const loadDocuments = useCallback(async (context: AuthContext) => {
-    setLoading(true);
+  const loadDocuments = useCallback(async () => {
+    setLoadingDocuments(true);
+    setListError("");
     try {
-      const response = await fetch(apiUrl(context), {
-        method: "GET",
-        headers: {
-          apikey: context.anonKey,
-          Authorization: "Bearer " + context.token
-        },
-        cache: "no-store"
-      });
-      const body = await responseJson(response);
-      if (!response.ok || body.ok !== true || !Array.isArray(body.documents)) {
-        throw new Error(String(body.detail || body.status || body.error || "The private document list is not available for this account."));
-      }
-      setDocuments(body.documents as VaultDocument[]);
-      setError("");
+      const session = readSession();
+      const result = await documentApi(session, undefined, "GET");
+      setDocuments(Array.isArray(result.documents) ? result.documents : []);
     } catch (caught) {
-      setError(caught instanceof Error ? caught.message : "The private document list could not be loaded.");
+      setDocuments([]);
+      setListError(caught instanceof Error ? caught.message : "Could not load private document status.");
     } finally {
-      setLoading(false);
+      setLoadingDocuments(false);
     }
-  }, [apiUrl]);
+  }, []);
 
-  useEffect(() => {
-    const current = authContext();
-    setAuth(current);
-    if (current) void loadDocuments(current);
-  }, [loadDocuments]);
+  useEffect(() => { void loadDocuments(); }, [loadDocuments]);
 
-  function onChooseFile(event: ChangeEvent<HTMLInputElement>) {
+  async function onChooseFile(event: ChangeEvent<HTMLInputElement>) {
+    const file = event.currentTarget.files?.[0] ?? null;
+    setSelectedFile(file);
     setError("");
     setNotice("");
-    const selected = event.currentTarget.files?.[0] ?? null;
-    if (!selected) {
-      setFile(null);
+    setPreflight(null);
+    setDownload(null);
+    if (!file) return;
+
+    if (file.size < 1 || file.size > MAX_BYTES) {
+      setSelectedFile(null);
+      setError(file.size < 1 ? "This file is empty." : "This file exceeds the 10 MiB per-file limit.");
+      event.currentTarget.value = "";
       return;
     }
-    if (selected.size <= 0) {
-      setFile(null);
-      setError("This file is empty. Choose a non-empty PDF, JPEG or PNG file.");
+
+    const extension = file.name.includes(".") ? `.${file.name.split(".").pop()!.toLowerCase()}` : "";
+    const expectedMime = MIME_BY_EXTENSION[extension];
+    if (!expectedMime || (file.type && file.type.toLowerCase() !== expectedMime)) {
+      setSelectedFile(null);
+      setError("Choose a PDF, JPEG or PNG whose extension matches its browser-reported file type. The server independently checks content bytes.");
+      event.currentTarget.value = "";
       return;
     }
-    if (selected.size > MAX_BYTES) {
-      setFile(null);
-      setError("This file exceeds the 10 MiB per-file limit.");
-      return;
+
+    setPreparing(true);
+    try {
+      const digest = await crypto.subtle.digest("SHA-256", await file.arrayBuffer());
+      const sha256 = Array.from(new Uint8Array(digest), (byte) => byte.toString(16).padStart(2, "0")).join("");
+      setPreflight({ name: file.name, size: file.size, mime: expectedMime, sha256 });
+    } catch {
+      setSelectedFile(null);
+      setError("The file was not uploaded. This browser could not compute a local SHA-256 preflight digest.");
+      event.currentTarget.value = "";
+    } finally {
+      setPreparing(false);
     }
-    const extension = selected.name.includes(".") ? "." + selected.name.split(".").pop()!.toLowerCase() : "";
-    const allowedExtension = [".pdf", ".jpg", ".jpeg", ".png"].includes(extension);
-    const allowedMime = Object.prototype.hasOwnProperty.call(MIME_TYPES, selected.type);
-    if (!allowedExtension || (selected.type && !allowedMime)) {
-      setFile(null);
-      setError("Only PDF, JPEG and PNG files are supported. The server will validate the file signature again.");
-      return;
-    }
-    setFile(selected);
   }
 
   async function uploadDocument() {
-    const context = auth ?? authContext();
-    if (!context) {
-      setError("Sign in to your Kingsmen account before uploading a document.");
-      return;
-    }
-    if (!file) {
-      setError("Select a PDF, JPEG or PNG file first.");
-      return;
-    }
-    const extension = file.name.includes(".") ? "." + file.name.split(".").pop()!.toLowerCase() : "";
-    const mimeType = file.type || (extension === ".pdf" ? "application/pdf" : extension === ".png" ? "image/png" : "image/jpeg");
-    if (!Object.prototype.hasOwnProperty.call(MIME_TYPES, mimeType)) {
-      setError("The selected file type is not supported.");
-      return;
-    }
-
-    setBusy(true);
     setError("");
     setNotice("");
-    try {
-      const digest = await crypto.subtle.digest("SHA-256", await file.arrayBuffer());
-      const localSha256 = Array.from(new Uint8Array(digest), (byte) => byte.toString(16).padStart(2, "0")).join("");
+    setDownload(null);
+    if (!selectedFile || !preflight) {
+      setError("Select a valid file and complete the local preflight first.");
+      return;
+    }
 
-      const uploadRequest = await fetch(apiUrl(context), {
-        method: "POST",
-        headers: {
-          apikey: context.anonKey,
-          Authorization: "Bearer " + context.token,
-          "Content-Type": "application/json"
-        },
-        body: JSON.stringify({
-          action: "upload-url",
-          documentTypeCode: documentType,
-          filename: file.name,
-          mimeType,
-          sizeBytes: file.size,
-          evidencePurpose: "CANDIDATE_DOCUMENT"
-        }),
-        cache: "no-store"
+    setUploading(true);
+    let documentId = "";
+    try {
+      const session = readSession();
+      setNotice("Requesting a short-lived, candidate-scoped private upload capability…");
+      const uploadRequest = await documentApi(session, {
+        action: "create_upload",
+        documentTypeCode: documentType,
+        filename: selectedFile.name,
+        mimeType: preflight.mime,
+        sizeBytes: selectedFile.size,
+        evidencePurpose: "CANDIDATE_DOCUMENT"
       });
-      const uploadBody = await responseJson(uploadRequest);
-      const document = uploadBody.document as { id?: string } | undefined;
-      const signedUploadUrl = typeof uploadBody.signedUploadUrl === "string" ? uploadBody.signedUploadUrl : "";
-      if (!uploadRequest.ok || uploadBody.ok !== true || !document?.id || !signedUploadUrl) {
-        throw new Error(String(uploadBody.detail || uploadBody.status || uploadBody.error || "The secure upload request could not be created."));
+      documentId = uploadRequest.document?.id || uploadRequest.documentId || uploadRequest.document_id || "";
+      const signedUrl = uploadRequest.signedUploadUrl;
+      const signedToken = uploadRequest.signedUploadToken;
+      if (!documentId || !signedUrl || !signedToken) {
+        throw new Error("The private-document service did not return a complete signed-upload capability. No upload was attempted.");
       }
 
-      // Match Supabase Storage's signed-upload protocol: PUT the multipart body to the
-      // one-time signed URL. The URL itself carries the short-lived upload capability.
-      const multipart = new FormData();
-      multipart.append("cacheControl", "3600");
-      multipart.append("", file, file.name);
-      const storageResponse = await fetch(signedUploadUrl, {
+      setNotice("Uploading to private storage. The signed upload capability is temporary and is not saved in the browser.");
+      const target = new URL(signedUrl);
+      target.searchParams.set("token", signedToken);
+      const storageResponse = await fetch(target.toString(), {
         method: "PUT",
-        headers: { "x-upsert": "false" },
-        body: multipart,
+        headers: { apikey: session.anonKey, "Content-Type": preflight.mime, "x-upsert": "false" },
+        body: selectedFile,
         cache: "no-store"
       });
       if (!storageResponse.ok) {
-        const storageBody = await responseJson(storageResponse);
-        throw new Error(String(storageBody.message || storageBody.error || "The private file upload failed. The pending document record has not been marked as uploaded."));
+        throw new Error(`Private storage rejected the file (HTTP ${storageResponse.status}). It has not been marked as received. Document reference: ${documentId}`);
       }
 
-      const finalizeResponse = await fetch(apiUrl(context), {
-        method: "POST",
-        headers: {
-          apikey: context.anonKey,
-          Authorization: "Bearer " + context.token,
-          "Content-Type": "application/json"
-        },
-        body: JSON.stringify({ action: "finalize-upload", documentId: document.id }),
-        cache: "no-store"
-      });
-      const finalizeBody = await responseJson(finalizeResponse);
-      const finalized = finalizeBody.document as { status?: string; sha256_hex?: string } | undefined;
-      if (!finalizeResponse.ok || finalizeBody.ok !== true || !finalized) {
-        throw new Error(String(finalizeBody.detail || finalizeBody.status || finalizeBody.error || "The file reached storage but server-side finalisation could not be confirmed. Contact support before retrying."));
+      setNotice("Private storage received the file bytes. The server is checking content signature, size, SHA-256 and the document record…");
+      const finalised = await documentApi(session, { action: "finalize_upload", documentId });
+      if (finalised.status === "UPLOAD_FAILED" || finalised.document?.status === "UPLOAD_FAILED") {
+        throw new Error(`The server rejected this file after integrity checks. Document reference: ${documentId}`);
       }
-
-      const serverHash = finalized.sha256_hex || "";
-      setNotice(
-        "Upload recorded as " + statusLabel(finalized.status || "UPLOADED_CANDIDATE_REPORTED") +
-        ". Server-side file checks completed. The file is not marked verified; an authorised human reviewer must make that decision." +
-        (serverHash && serverHash !== localSha256 ? " The server checksum differs from the local preflight checksum; contact support." : "")
-      );
-      setFile(null);
-      const input = window.document.getElementById("kingsmen-private-document-file") as HTMLInputElement | null;
-      if (input) input.value = "";
-      await loadDocuments(context);
+      const serverDigest = finalised.document?.sha256_hex || finalised.sha256Hex;
+      const finalStatus = finalised.document?.status || finalised.status || "UPLOADED_CANDIDATE_REPORTED";
+      setNotice(serverDigest && serverDigest.toLowerCase() !== preflight.sha256.toLowerCase()
+        ? `The server recorded status ${statusText(finalStatus)}, but the local and server SHA-256 differ. Use the server digest and document reference ${documentId} for authorised review.`
+        : `Upload finalised in private storage. Current status: ${statusText(finalStatus)}. The server-recorded digest is authoritative; this is not a verification decision.`);
+      setSelectedFile(null);
+      setPreflight(null);
+      setInputVersion((value) => value + 1);
+      await loadDocuments();
     } catch (caught) {
-      setError(caught instanceof Error ? caught.message : "The private document upload could not be completed.");
+      setError(caught instanceof Error ? caught.message : "The private document operation could not be completed.");
+      if (documentId) setNotice(`Document reference: ${documentId}. If storage received the file, do not retry blindly; refresh the list or ask an authorised reviewer to inspect the record.`);
     } finally {
-      setBusy(false);
+      setUploading(false);
     }
   }
 
-  async function openDocument(documentId: string) {
-    const context = auth ?? authContext();
-    if (!context) {
-      setError("Sign in again before opening a private document.");
-      return;
-    }
-    const popup = window.open("about:blank", "_blank");
-    if (!popup) {
-      setError("Allow pop-ups for Kingsmen to open a private, expiring document link.");
-      return;
-    }
-    popup.opener = null;
-    setOpeningId(documentId);
+  async function requestDownload(documentId: string) {
     setError("");
+    setNotice("");
+    setDownload(null);
     try {
-      const response = await fetch(apiUrl(context), {
-        method: "POST",
-        headers: {
-          apikey: context.anonKey,
-          Authorization: "Bearer " + context.token,
-          "Content-Type": "application/json"
-        },
-        body: JSON.stringify({ action: "read-url", documentId }),
-        cache: "no-store"
-      });
-      const body = await responseJson(response);
-      const signedReadUrl = typeof body.signedReadUrl === "string" ? body.signedReadUrl : "";
-      if (!response.ok || body.ok !== true || !signedReadUrl) {
-        popup.close();
-        throw new Error(String(body.detail || body.status || body.error || "A private document link could not be issued."));
-      }
-      popup.location.href = signedReadUrl;
+      const session = readSession();
+      const result = await documentApi(session, { action: "create_download_url", documentId });
+      if (!result.signedReadUrl) throw new Error("No temporary download link was returned.");
+      const ttl = typeof result.expiresInSeconds === "number" && result.expiresInSeconds > 0 ? result.expiresInSeconds : 60;
+      setDownload({ id: documentId, url: result.signedReadUrl, expiresAt: Date.now() + ttl * 1000 });
+      setNotice(`A short-lived private download link was created. It expires in approximately ${ttl} seconds; do not share it.`);
     } catch (caught) {
-      popup.close();
-      setError(caught instanceof Error ? caught.message : "The private document could not be opened.");
-    } finally {
-      setOpeningId(null);
+      setError(caught instanceof Error ? caught.message : "Could not create a private document download link.");
     }
   }
 
   return (
     <section className="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm sm:p-6" aria-labelledby="document-preflight-title">
-      <p className="text-xs font-extrabold uppercase tracking-[0.16em] text-amber-700">Private document vault</p>
-      <h2 id="document-preflight-title" className="mt-2 text-xl font-bold text-slate-950">Upload a document securely.</h2>
-      <p className="mt-2 text-sm leading-6 text-slate-600">PDF, JPEG or PNG up to 10 MiB. Kingsmen creates a candidate-owned private record, uploads to private storage, then validates the file signature, type, size and SHA-256 on the server. Upload is not reviewer verification.</p>
+      <p className="text-xs font-extrabold uppercase tracking-[0.16em] text-amber-700">Secure document workflow</p>
+      <h2 id="document-preflight-title" className="mt-2 text-xl font-bold text-slate-950">Preflight, upload and track your documents.</h2>
+      <p className="mt-2 text-sm leading-6 text-slate-600">PDF, JPEG or PNG, up to 10 MiB per file. The browser computes an advisory SHA-256 digest; the private-document service independently validates file signatures and records the authoritative digest. Upload requires a live Supabase session and a reviewer-verified candidate identity.</p>
 
-      {!auth ? (
-        <div className="mt-4 rounded-xl border border-amber-200 bg-amber-50 p-4 text-sm leading-6 text-amber-950">
-          Sign in to access your private document vault. An authorised reviewer must verify your candidate identity before secure upload and download are available.
-          <a href="/candidate/login/" className="ml-1 font-bold underline">Sign in</a>
-        </div>
-      ) : null}
-
-      <div className="mt-5 grid gap-4 sm:grid-cols-[minmax(0,0.8fr)_minmax(0,1.2fr)]">
-        <label className="grid gap-2 text-sm font-semibold text-slate-800">
-          Document type
-          <select value={documentType} onChange={(event) => setDocumentType(event.target.value)} className="min-h-11 rounded-xl border border-slate-300 bg-white px-3 py-2">
+      <div className="mt-5 grid gap-4 sm:grid-cols-2">
+        <label className="block text-sm font-semibold text-slate-800">Document type
+          <select value={documentType} onChange={(event) => setDocumentType(event.target.value as DocumentType)} className="mt-2 w-full rounded-xl border border-slate-300 bg-white px-3.5 py-3 text-sm font-normal outline-none focus:border-amber-500 focus:ring-2 focus:ring-amber-200">
             {DOCUMENT_TYPES.map(([value, label]) => <option value={value} key={value}>{label}</option>)}
           </select>
         </label>
-        <label className="grid gap-2 text-sm font-semibold text-slate-800">
-          Select file
-          <input id="kingsmen-private-document-file" type="file" accept=".pdf,.jpg,.jpeg,.png,application/pdf,image/jpeg,image/png" onChange={onChooseFile} className="min-h-11 rounded-xl border border-slate-300 bg-white px-3 py-2 text-sm file:mr-3 file:rounded-lg file:border-0 file:bg-slate-950 file:px-3 file:py-2 file:font-bold file:text-white" />
-        </label>
-      </div>
-
-      {file ? <div className="mt-3 rounded-xl border border-slate-200 bg-slate-50 p-3 text-sm text-slate-800"><strong>{file.name}</strong><span className="ml-2 text-slate-500">{formatBytes(file.size)}</span></div> : null}
-      {error ? <p role="alert" className="mt-4 rounded-xl border border-red-200 bg-red-50 p-4 text-sm leading-6 text-red-900">{error}</p> : null}
-      {notice ? <p role="status" aria-live="polite" className="mt-4 rounded-xl border border-emerald-200 bg-emerald-50 p-4 text-sm leading-6 text-emerald-950">{notice}</p> : null}
-
-      <div className="mt-4 flex flex-wrap gap-3">
-        <button type="button" onClick={() => void uploadDocument()} disabled={!file || busy || !auth} className="inline-flex min-h-11 items-center rounded-xl bg-slate-950 px-5 py-3 text-sm font-bold text-white disabled:cursor-not-allowed disabled:opacity-50">
-          {busy ? "Uploading and validating…" : "Upload to private vault"}
-        </button>
-        <button type="button" onClick={() => auth && void loadDocuments(auth)} disabled={!auth || loading || busy} className="inline-flex min-h-11 items-center rounded-xl border border-slate-300 px-4 py-3 text-sm font-semibold text-slate-800 disabled:opacity-50">
-          {loading ? "Refreshing…" : "Refresh vault"}
-        </button>
-      </div>
-
-      <div className="mt-7 border-t border-slate-200 pt-5">
-        <div className="flex flex-wrap items-center justify-between gap-3">
-          <h3 className="text-base font-bold text-slate-950">Your private documents</h3>
-          <span className="text-xs text-slate-500">{documents.length} record(s)</span>
+        <div className="rounded-xl border border-slate-200 bg-slate-50 p-3 text-xs leading-5 text-slate-600">
+          <strong className="block text-slate-900">Security gate</strong>
+          Private upload signing is restricted to the signed-in candidate and a reviewer-verified identity link. Candidates cannot mark their own documents as verified or rejected.
         </div>
-        {documents.length === 0 ? (
-          <p className="mt-3 rounded-xl bg-slate-50 p-4 text-sm leading-6 text-slate-600">{loading ? "Loading your private document records…" : "No private document records were returned for this verified candidate identity."}</p>
-        ) : (
-          <div className="mt-3 grid gap-3">
-            {documents.map((doc) => (
-              <article key={doc.id} className="rounded-xl border border-slate-200 p-4">
-                <div className="flex flex-wrap items-start justify-between gap-3">
-                  <div className="min-w-0">
-                    <h4 className="break-words text-sm font-bold text-slate-950">{doc.filename || "Candidate document"}</h4>
-                    <p className="mt-1 text-xs text-slate-500">{doc.documentType || "OTHER"} · {formatBytes(Number(doc.sizeBytes || 0))}</p>
-                  </div>
-                  <span className="rounded-full border border-slate-300 px-3 py-1 text-xs font-semibold text-slate-700">{statusLabel(doc.status)}</span>
-                </div>
-                {doc.sha256_hex ? <p className="mt-2 break-all font-mono text-[10px] text-slate-500">SHA-256: {doc.sha256_hex}</p> : null}
-                {doc.latestReview?.reviewer_note ? <p className="mt-2 rounded-lg bg-amber-50 p-3 text-xs leading-5 text-amber-950">Reviewer note: {doc.latestReview.reviewer_note}</p> : null}
-                {["UPLOADED_CANDIDATE_REPORTED", "UNDER_REVIEW", "VERIFIED", "REJECTED"].includes(doc.status) ? (
-                  <button type="button" onClick={() => void openDocument(doc.id)} disabled={openingId === doc.id} className="mt-3 inline-flex min-h-10 items-center rounded-lg border border-slate-300 px-3 py-2 text-xs font-bold text-slate-800 disabled:opacity-50">
-                    {openingId === doc.id ? "Creating private link…" : "Open private document"}
-                  </button>
-                ) : null}
-              </article>
-            ))}
-          </div>
-        )}
-        <p className="mt-4 text-xs leading-5 text-slate-500">Private links expire after 60 seconds and are issued only through an authenticated, audited endpoint. Candidates cannot approve, reject or delete document records from this screen.</p>
       </div>
+
+      <label className="mt-4 block rounded-xl border-2 border-dashed border-slate-300 bg-slate-50 p-5 transition hover:border-amber-400 hover:bg-amber-50">
+        <span className="block text-sm font-bold text-slate-900">Select a document</span>
+        <span className="mt-1 block text-xs leading-5 text-slate-500">PDF, JPG, JPEG or PNG · maximum 10 MiB</span>
+        <input key={inputVersion} type="file" accept=".pdf,.jpg,.jpeg,.png,application/pdf,image/jpeg,image/png" onChange={onChooseFile} className="mt-4 block w-full text-sm text-slate-700 file:mr-3 file:rounded-lg file:border-0 file:bg-slate-950 file:px-4 file:py-2.5 file:text-sm file:font-bold file:text-white hover:file:bg-slate-800 focus:outline-none focus:ring-2 focus:ring-amber-500" />
+      </label>
+
+      {preparing ? <p role="status" aria-live="polite" className="mt-4 text-sm text-slate-600">Checking file and computing SHA-256 locally…</p> : null}
+      {preflight ? (
+        <div className="mt-4 rounded-xl border border-amber-200 bg-amber-50 p-4">
+          <p className="font-bold text-slate-950">Local preflight passed</p>
+          <dl className="mt-3 grid gap-3 text-sm sm:grid-cols-2">
+            <div><dt className="text-xs font-semibold uppercase tracking-wide text-slate-500">File</dt><dd className="mt-1 break-words font-medium text-slate-900">{preflight.name}</dd></div>
+            <div><dt className="text-xs font-semibold uppercase tracking-wide text-slate-500">Size / type</dt><dd className="mt-1 font-medium text-slate-900">{formatBytes(preflight.size)} · {preflight.mime}</dd></div>
+            <div className="sm:col-span-2"><dt className="text-xs font-semibold uppercase tracking-wide text-slate-500">Browser SHA-256 (preflight only)</dt><dd className="mt-1 break-all font-mono text-xs text-slate-800">{preflight.sha256}</dd></div>
+          </dl>
+          <button type="button" onClick={uploadDocument} disabled={uploading || preparing} className="mt-4 inline-flex min-h-11 items-center justify-center rounded-xl bg-gradient-to-r from-amber-300 to-amber-500 px-4 py-3 text-sm font-extrabold text-slate-950 transition hover:brightness-105 focus:outline-none focus:ring-2 focus:ring-amber-500 focus:ring-offset-2 disabled:cursor-wait disabled:opacity-60">
+            {uploading ? "Uploading and finalising…" : "Upload securely and finalise"} <span aria-hidden="true" className="ml-2">→</span>
+          </button>
+          <p className="mt-3 text-xs leading-5 text-slate-600">The selected file is sent only after you press the button. Server-side finalisation is required before a document is listed as received.</p>
+        </div>
+      ) : null}
+
+      {error ? <p role="alert" className="mt-4 rounded-xl border border-red-200 bg-red-50 p-4 text-sm leading-6 text-red-900">{error}</p> : null}
+      {notice ? <p role="status" aria-live="polite" className="mt-4 rounded-xl border border-slate-200 bg-slate-50 p-4 text-sm leading-6 text-slate-800">{notice}</p> : null}
+
+      <section className="mt-7 border-t border-slate-200 pt-5" aria-labelledby="server-documents-title">
+        <div className="flex flex-wrap items-center justify-between gap-3">
+          <div><h3 id="server-documents-title" className="font-bold text-slate-950">Documents recorded by the private service</h3><p className="mt-1 text-xs leading-5 text-slate-500">Candidate-reported upload remains distinct from authorised verification.</p></div>
+          <button type="button" onClick={() => void loadDocuments()} disabled={loadingDocuments || uploading} className="inline-flex min-h-10 items-center rounded-lg border border-slate-300 px-3 py-2 text-xs font-bold text-slate-800 hover:border-slate-500 hover:bg-slate-50 disabled:opacity-50">{loadingDocuments ? "Refreshing…" : "Refresh list"}</button>
+        </div>
+        {listError ? <div role="status" className="mt-3 rounded-xl border border-amber-200 bg-amber-50 p-4 text-sm leading-6 text-slate-800">{listError} <a href="/candidate/login/" className="font-bold underline">Sign in</a> or ask an authorised reviewer about identity verification if access remains blocked.</div> : null}
+        {!loadingDocuments && !listError && documents.length === 0 ? <p className="mt-4 rounded-xl border border-slate-200 bg-slate-50 p-4 text-sm leading-6 text-slate-600">No private-document records are available for this verified candidate identity.</p> : null}
+        <div className="mt-3 space-y-3">
+          {documents.map((doc) => (
+            <article key={doc.id} className="rounded-xl border border-slate-200 p-4">
+              <div className="flex flex-col gap-2 sm:flex-row sm:items-start sm:justify-between">
+                <div className="min-w-0"><h4 className="break-words font-semibold text-slate-950">{doc.filename || doc.original_filename || "Private document"}</h4><p className="mt-1 text-xs leading-5 text-slate-600">{doc.documentType || doc.document_type || "Document"} · {formatBytes(doc.sizeBytes || doc.size_bytes || 0)} · {formatDate(doc.uploadedAt || doc.uploaded_at)}</p></div>
+                <span className="self-start rounded-full border border-slate-200 bg-slate-50 px-3 py-1.5 text-xs font-semibold text-slate-700">{statusText(doc.status)}</span>
+              </div>
+              {doc.sha256_hex ? <p className="mt-3 break-all font-mono text-[11px] leading-5 text-slate-500">Server SHA-256: {doc.sha256_hex}</p> : null}
+              {doc.latestReview ? <p className="mt-2 text-xs leading-5 text-slate-600">Latest review: {String(doc.latestReview.decision ?? "pending")}.</p> : null}
+              {["UPLOADED_CANDIDATE_REPORTED", "UNDER_REVIEW", "VERIFIED", "REJECTED"].includes(doc.status) ? <button type="button" onClick={() => void requestDownload(doc.id)} className="mt-3 inline-flex min-h-10 items-center rounded-lg border border-slate-300 px-3 py-2 text-xs font-bold text-slate-800 hover:border-slate-500 hover:bg-slate-50 focus:outline-none focus:ring-2 focus:ring-amber-500">Request temporary private download</button> : null}
+              {download?.id === doc.id ? <div className="mt-3 rounded-lg border border-amber-200 bg-amber-50 p-3 text-sm"><p className="text-slate-700">This link expires at {new Date(download.expiresAt).toLocaleTimeString("en-ZA", { hour: "2-digit", minute: "2-digit" })}. Do not share it.</p><a href={download.url} target="_blank" rel="noopener noreferrer" className="mt-2 inline-block font-bold underline">Open private file</a></div> : null}
+            </article>
+          ))}
+        </div>
+      </section>
+
+      <p className="mt-5 text-xs leading-5 text-slate-500">Payment checkout and provider submission are not connected to this document screen. No public file URL is created, and a candidate cannot approve their own documents.</p>
     </section>
   );
 }
