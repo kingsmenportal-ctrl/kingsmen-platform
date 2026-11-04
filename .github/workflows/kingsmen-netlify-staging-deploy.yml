@@ -45,6 +45,8 @@ jobs:
         run: |
           set -euo pipefail
           if [[ -z "${NETLIFY_AUTH_TOKEN:-}" ]]; then
+            mkdir -p reports/staging
+            node -e "require('fs').writeFileSync('reports/staging/netlify-deploy-evidence.json', JSON.stringify({schema:'kingsmen.netlify.staging-deploy.v1',state:'BLOCKED_MISSING_DEPLOY_CREDENTIAL',source_sha:process.env.GITHUB_SHA,site_id:process.env.NETLIFY_SITE_ID,failures:['NETLIFY_AUTH_TOKEN is not configured as a GitHub Actions repository/environment secret. No deploy was attempted.'],generated_at:new Date().toISOString()},null,2)+'\\n')"
             echo "::error::NETLIFY_AUTH_TOKEN is not configured as a GitHub Actions repository/environment secret. No deploy was attempted."
             exit 1
           fi
@@ -59,7 +61,7 @@ jobs:
           npm install --prefix apps/web --no-audit --no-fund
 
       - name: Build with the repository Netlify configuration
-        run: npx --yes netlify-cli@27.16.2 build
+        run: npx --yes netlify-cli@27.16.2 build --context=production
 
       - name: Capture deployment start timestamp
         run: |
