@@ -12,6 +12,7 @@ const pathways = [
 
 const workspaceLinks = [
   { href: "/candidate/profile/", title: "Candidate profile", description: "Save one reusable profile and six-pathway preferences. Identity linkage may require authorised review.", action: "Edit profile" },
+  { href: "/candidate/identity-review", title: "Identity review", description: "Request human review of an existing candidate record and submit supporting evidence privately.", action: "Request review" },
   { href: "/candidate/workbench", title: "Application workbench", description: "Review pathway readiness and prepare your application journey.", action: "Open workbench" },
   { href: "/candidate/opportunity-matches", title: "Opportunity matches", description: "Explore matching routes. An item is not open until source, deadline and eligibility evidence are current.", action: "View matches" },
   { href: "/candidate/saved-opportunities", title: "Saved opportunities", description: "Review backend-saved opportunities after your candidate identity has been verified.", action: "View saved" },
