@@ -74,6 +74,20 @@ Staging is active on PostgreSQL 17.11. The tracked PR #316 source was byte-compa
 
 Source equality does not prove authenticated browser operation, reviewer authorization, document ownership/expiry, or successful payment settlement.
 
+## 3A. Candidate identity-review entry point
+
+The candidate portal now exposes a manual identity-review flow at `/candidate/identity-review` from the dashboard, workbench and Document Vault. The UI:
+- Loads the candidate's own review status through `candidate-identity-review-status`; the deployed function filters requests and evidence by the signed-in `auth.uid()`.
+- Prefills the reference/name from the existing candidate master-profile service when available. When there is no reference yet, it directs the candidate through consented profile setup or asks for the existing Kingsmen candidate reference; it does not generate a new link or match by email.
+- Submits a manual request through `candidate-identity-review-request`.
+- Uploads PDF/JPEG/PNG evidence up to 8 MiB through `candidate-identity-review-evidence-upload`, with private Storage, content-signature/type/size checks and server-side SHA-256.
+- Allows a candidate follow-up only when a request status is `NEEDS_INFORMATION`.
+- Does not approve evidence or create an identity link. Reviewer-only evidence read, queue and decision operations remain separate and require an active `IDENTITY_REVIEWER` role; approval requires an evidence item accepted by an authorised reviewer.
+
+The seven identity-review Edge Function sources (request, status, evidence upload, evidence read, decision, queue and follow-up) were copied into PR #316 and compared byte-for-byte against their current deployed staging sources. All seven matched at inspection time.
+
+The staging identity-review request, evidence and audit tables still contain zero records. This is implemented and statically validated UI/API integration, not proof of an actual candidate identity submission or reviewer decision. No request, evidence object or identity link was created during this inspection.
+
 ## 4. Migration provenance and recovery
 
 The staging migration ledger contains **130 rows**. The latest recorded entry is:
