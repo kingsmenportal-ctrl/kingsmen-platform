@@ -1,55 +1,82 @@
 import assert from 'node:assert/strict';
 import { evaluateMainBranchProtection } from './main-branch-protection-policy.mjs';
 
-function completeProtection() {
+function completeRuleset() {
   return {
-    required_status_checks: {
-      strict: true,
-      contexts: ['source-guard', 'Build, validate, and smoke-test']
+    id: 26323884,
+    name: 'main-branch-protection',
+    target: 'branch',
+    source_type: 'Repository',
+    source: 'kingsmenportal-ctrl/kingsmen-platform',
+    enforcement: 'active',
+    conditions: {
+      ref_name: {
+        exclude: [],
+        include: ['refs/heads/main']
+      }
     },
-    required_pull_request_reviews: {
-      required_approving_review_count: 1,
-      dismiss_stale_reviews: true
-    },
-    required_conversation_resolution: { enabled: true },
-    required_linear_history: { enabled: true },
-    enforce_admins: { enabled: true },
-    allow_force_pushes: { enabled: false },
-    allow_deletions: { enabled: false }
+    rules: [
+      { type: 'deletion' },
+      { type: 'creation' },
+      { type: 'update' },
+      {
+        type: 'pull_request',
+        parameters: { required_approving_review_count: 1 }
+      },
+      {
+        type: 'required_status_checks',
+        parameters: {
+          strict_required_status_checks_policy: true,
+          required_status_checks: [
+            { context: 'test-and-build', integration_id: 15368 },
+            { context: 'validate', integration_id: 15368 }
+          ]
+        }
+      },
+      { type: 'non_fast_forward' }
+    ],
+    bypass_actors: []
   };
 }
 
-const complete = evaluateMainBranchProtection(completeProtection());
-assert.equal(complete.passed, true, 'complete protection configuration should pass');
-assert.equal(complete.checks.sourceGuardRequired, true);
-assert.equal(complete.checks.releaseEvidenceRequired, true, 'the full release evidence check must be required');
+const complete = evaluateMainBranchProtection(completeRuleset());
+assert.equal(complete.passed, true, 'the active main ruleset should pass');
+assert.equal(complete.checks.mainBranchTargeted, true);
+assert.equal(complete.checks.testAndBuildRequired, true);
+assert.equal(complete.checks.validateRequired, true);
+assert.equal(complete.checks.strictStatusChecksEnabled, true);
 assert.equal(complete.checks.requiredApprovingReviewCount, 1);
+assert.equal(complete.checks.noBypassActors, true);
+assert.equal(complete.checks.forcePushDisabled, true);
+assert.equal(complete.checks.branchDeletionDisabled, true);
 
 const failures = [
-  ['required_status_checks', (value) => { value.required_status_checks = null; }],
-  ['source_guard', (value) => { value.required_status_checks.contexts = ['build']; }],
-  ['release_evidence_check', (value) => { value.required_status_checks.contexts = ['source-guard']; }],
-  ['strict_status_checks', (value) => { value.required_status_checks.strict = false; }],
-  ['pull_request_review', (value) => { value.required_pull_request_reviews.required_approving_review_count = 0; }],
-  ['stale_review_dismissal', (value) => { value.required_pull_request_reviews.dismiss_stale_reviews = false; }],
-  ['conversation_resolution', (value) => { value.required_conversation_resolution.enabled = false; }],
-  ['linear_history', (value) => { value.required_linear_history.enabled = false; }],
-  ['admin_enforcement', (value) => { value.enforce_admins.enabled = false; }],
-  ['force_push_block', (value) => { value.allow_force_pushes.enabled = true; }],
-  ['deletion_block', (value) => { value.allow_deletions.enabled = true; }]
+  ['inactive_enforcement', (value) => { value.enforcement = 'disabled'; }],
+  ['wrong_branch_scope', (value) => { value.conditions.ref_name.include = ['refs/heads/develop']; }],
+  ['wrong_target', (value) => { value.target = 'tag'; }],
+  ['required_status_checks', (value) => { value.rules = value.rules.filter((rule) => rule.type !== 'required_status_checks'); }],
+  ['test_and_build_check', (value) => { value.rules.find((rule) => rule.type === 'required_status_checks').parameters.required_status_checks = [{ context: 'validate' }]; }],
+  ['validate_check', (value) => { value.rules.find((rule) => rule.type === 'required_status_checks').parameters.required_status_checks = [{ context: 'test-and-build' }]; }],
+  ['strict_status_checks', (value) => { value.rules.find((rule) => rule.type === 'required_status_checks').parameters.strict_required_status_checks_policy = false; }],
+  ['pull_request_review', (value) => { value.rules = value.rules.filter((rule) => rule.type !== 'pull_request'); }],
+  ['approval_count', (value) => { value.rules.find((rule) => rule.type === 'pull_request').parameters.required_approving_review_count = 0; }],
+  ['bypass_actor', (value) => { value.bypass_actors = [{ actor_id: 1, actor_type: 'User', bypass_mode: 'always' }]; }],
+  ['force_push_block', (value) => { value.rules = value.rules.filter((rule) => rule.type !== 'non_fast_forward'); }],
+  ['deletion_block', (value) => { value.rules = value.rules.filter((rule) => rule.type !== 'deletion'); }]
 ];
 
 for (const [name, mutate] of failures) {
-  const protection = structuredClone(completeProtection());
-  mutate(protection);
-  const result = evaluateMainBranchProtection(protection);
-  assert.equal(result.passed, false, `missing ${name} requirement must block`);
+  const ruleset = structuredClone(completeRuleset());
+  mutate(ruleset);
+  const result = evaluateMainBranchProtection(ruleset);
+  assert.equal(result.passed, false, 'missing ' + name + ' requirement must block');
 }
 
 const unavailable = evaluateMainBranchProtection(null);
-assert.equal(unavailable.passed, false, 'missing protection response must block');
+assert.equal(unavailable.passed, false, 'missing ruleset response must block');
+
 console.log(JSON.stringify({
-  status: 'MAIN_BRANCH_PROTECTION_POLICY_TESTS_PASSED',
+  status: 'MAIN_BRANCH_RULESET_POLICY_TESTS_PASSED',
   passedConfiguration: true,
   negativeCases: failures.length,
   unavailableResponseBlocked: true
