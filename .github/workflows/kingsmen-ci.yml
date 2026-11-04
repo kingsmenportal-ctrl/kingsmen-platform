@@ -1,6 +1,6 @@
 name: Kingsmen CI
 
-# One ordinary check for independently releasable streams.
+# The two protected check contexts live in this workflow for a single unambiguous PR gate.
 on:
   pull_request:
     branches: [main]
@@ -16,8 +16,8 @@ concurrency:
   cancel-in-progress: true
 
 jobs:
-  build-test:
-    name: test-and-build
+  validate:
+    name: validate
     runs-on: ubuntu-latest
     timeout-minutes: 25
     steps:
@@ -33,8 +33,29 @@ jobs:
       - name: Install root dependencies
         run: npm ci
 
-      - name: Run focused repository tests
+      - name: Run repository validation suite
         run: npm test
+
+      - name: Verify main branch ruleset capture contract
+        run: npm run repo:validate:branch-protection-capture
+
+  build-test:
+    name: test-and-build
+    needs: validate
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+
+      - name: Install root dependencies
+        run: npm ci
 
       - name: Install API dependencies
         run: npm install --prefix apps/api --no-audit --no-fund
