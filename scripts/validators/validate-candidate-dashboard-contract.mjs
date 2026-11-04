@@ -1,8 +1,47 @@
 import assert from "node:assert/strict";
 import { readFileSync } from "node:fs";
 
-const dashboardPath = new URL("../../apps/web/src/app/candidate/dashboard/page.tsx", import.meta.url);
-const source = readFileSync(dashboardPath, "utf8");
+const read = (path) => readFileSync(new URL(path, import.meta.url), "utf8").replace(/^\uFEFF/, "");
+
+const dashboard = read("../../apps/web/src/app/candidate/dashboard/page.tsx");
+const homepage = read("../../apps/web/src/app/page.tsx");
+const packages = read("../../apps/web/src/app/packages/page.tsx");
+const workbench = read("../../apps/web/src/app/candidate/workbench/page.tsx");
+const applicationWorkbench = read("../../apps/web/src/components/candidate/CandidateApplicationWorkbench.tsx");
+const applicationPreparationFunction = read("../../supabase/functions/candidate-application-preparation/index.ts");
+const saveVerifiedOpportunityFunction = read("../../supabase/functions/candidate-save-verified-opportunity/index.ts");
+const candidateTrackerPage = read("../../apps/web/src/app/candidate/tracker/page.tsx");
+const legacyApplicationTracker = read("../../apps/web/src/app/personal-job-desk/application-tracker/page.tsx");
+const candidateTracker = read("../../apps/web/src/components/candidate/CandidateApplicationTracker.tsx");
+const finance = read("../../apps/web/src/app/candidate/finance/page.tsx");
+const destinyPage = read("../../apps/web/src/app/free-destiny-map/page.tsx");
+const destinyForm = read("../../apps/web/src/components/kingsmen/FreeDestinyMapApiForm.tsx");
+const destinyClient = read("../../apps/web/src/lib/kingsmen/free-destiny-map-client.ts");
+const documentsPage = read("../../apps/web/src/app/candidate/documents/page.tsx");
+const documentPreflight = read("../../apps/web/src/components/candidate/DocumentPreflightPanel.tsx");
+const privateDocumentFunction = read("../../supabase/functions/candidate-private-documents/index.ts");
+const candidateProfile = read("../../apps/web/src/components/candidate/CandidateMasterProfileForm.tsx");
+const savedOpportunities = read("../../apps/web/src/components/candidate/CandidateSavedOpportunitiesClient.tsx");
+const authCallback = read("../../apps/web/src/components/candidate/AuthCallbackClient.tsx");
+const opportunityMatches = read("../../apps/web/src/app/candidate/opportunity-matches/page.tsx");
+const payfastCheckout = read("../../apps/web/src/components/candidate/PayFastSandboxCheckout.tsx");
+const paymentReturn = read("../../apps/web/src/app/payment/return/page.tsx");
+const paymentCancel = read("../../apps/web/src/app/payment/cancel/page.tsx");
+const profilePage = read("../../apps/web/src/app/candidate/profile/page.tsx");
+const callbackPage = read("../../apps/web/src/app/auth/callback/page.tsx");
+const authForm = read("../../apps/web/src/components/candidate/CandidateAuthForm.tsx");
+const signInPage = read("../../apps/web/src/app/candidate/login/page.tsx");
+const registerPage = read("../../apps/web/src/app/auth/register/page.tsx");
+const identityReviewPage = read("../../apps/web/src/app/candidate/identity-review/page.tsx");
+const identityReviewPortal = read("../../apps/web/src/components/candidate/CandidateIdentityReviewPortal.tsx");
+const identityReviewRequestFunction = read("../../supabase/functions/candidate-identity-review-request/index.ts");
+const identityReviewStatusFunction = read("../../supabase/functions/candidate-identity-review-status/index.ts");
+const identityReviewEvidenceUploadFunction = read("../../supabase/functions/candidate-identity-review-evidence-upload/index.ts");
+const identityReviewEvidenceReadFunction = read("../../supabase/functions/candidate-identity-review-evidence-read/index.ts");
+const identityReviewDecisionFunction = read("../../supabase/functions/candidate-identity-review-decision/index.ts");
+const identityReviewQueueFunction = read("../../supabase/functions/candidate-identity-review-queue/index.ts");
+const identityReviewFollowupFunction = read("../../supabase/functions/candidate-identity-review-followup/index.ts");
+
 
 const expectedPathways = [
   ["higher_education", "Higher Education"],
@@ -14,24 +53,196 @@ const expectedPathways = [
 ];
 
 for (const [key, label] of expectedPathways) {
-  assert.ok(source.includes(key), `Missing pathway key: ${key}`);
-  assert.ok(source.includes(label), `Missing candidate-facing pathway label: ${label}`);
+  assert.ok(dashboard.includes(key), `Dashboard missing pathway key: ${key}`);
+  assert.ok(dashboard.includes(label), `Dashboard missing pathway label: ${label}`);
+  assert.ok(workbench.includes(key), `Workbench missing pathway key: ${key}`);
 }
 
 const expectedRoutes = [
+  "/candidate/profile",
   "/candidate/workbench",
   "/candidate/opportunity-matches",
   "/candidate/saved-opportunities",
   "/candidate/documents",
-  "/personal-job-desk/application-tracker"
+  "/candidate/tracker",
+  "/candidate/finance"
 ];
 
 for (const route of expectedRoutes) {
-  assert.ok(source.includes(route), `Missing dashboard route: ${route}`);
+  assert.ok(dashboard.includes(route), `Dashboard missing workspace route: ${route}`);
 }
 
-assert.match(source, /Provider receipt and outcomes require provider-origin evidence/);
-assert.match(source, /does not claim that a profile has been saved/);
-assert.match(source, /No admission, funding, placement, employment, or success is guaranteed/);
+const expectedWorkbenchRoutes = [
+  "/candidate/profile",
+  "/candidate/opportunity-matches",
+  "/candidate/saved-opportunities",
+  "/candidate/documents",
+  "/candidate/tracker",
+  "/candidate/finance"
+];
+for (const route of expectedWorkbenchRoutes) {
+  assert.ok(workbench.includes(route), `Workbench journey missing route: ${route}`);
+}
+assert.match(workbench, /Your application journey/);
+assert.match(workbench, /<CandidateApplicationWorkbench\s*\/>/);
+assert.match(applicationWorkbench, /candidate-application-preparation/);
+assert.match(applicationWorkbench, /Prepare parent application/);
+assert.match(applicationWorkbench, /parentApplications/);
+assert.match(applicationWorkbench, /trackers/);
+assert.ok(applicationWorkbench.includes('action: "load"'), "Application workbench must load persisted candidate records.");
+assert.ok(applicationWorkbench.includes('action: "prepare_master_application"'), "Application workbench must prepare a parent application through the backend.");
+assert.ok(applicationWorkbench.includes("/functions/v1/candidate-application-preparation"), "Application workbench must use the authorised preparation Edge Function.");
+assert.ok(applicationWorkbench.includes('Authorization: "Bearer " + session.token'), "Application workbench requests must be authenticated.");
+assert.ok(applicationPreparationFunction.includes('if(p.action==="load")'), "Preparation Edge Function must expose the persisted load action.");
+assert.ok(applicationPreparationFunction.includes('if(p.action==="prepare_master_application")'), "Preparation Edge Function must expose the parent-application preparation action.");
+assert.ok(applicationPreparationFunction.includes("candidate_auth_identity_links"), "Preparation Edge Function must verify the candidate identity link.");
+assert.ok(saveVerifiedOpportunityFunction.includes("candidate_master_application_targets"), "Verified opportunity saving must create or reconcile a master application target.");
+assert.ok(saveVerifiedOpportunityFunction.includes("candidate_workspace_saved_opportunities"), "Verified opportunity saving must persist the candidate's saved opportunity.");
+assert.ok(saveVerifiedOpportunityFunction.includes("candidate_application_tracker"), "Verified opportunity saving must link the preparation tracker.");
+assert.ok(saveVerifiedOpportunityFunction.includes("prepare_candidate_application_from_master_target"), "Verified opportunity saving must prepare the single Kingsmen parent application through the guarded RPC.");
+assert.match(workbench, /not a provider submission/i);
+assert.match(workbench, /provider-confirmed receipt/i);
+assert.match(workbench, /verified PayFast ITN settlement/i);
+assert.match(workbench, /CAO remains one Kingsmen managed application/);
+assert.match(candidateTrackerPage, /CandidateApplicationTracker/);
+assert.match(legacyApplicationTracker, /redirect\("\/candidate\/tracker"\)/);
+assert.match(candidateTracker, /candidate-application-preparation/);
+assert.match(candidateTracker, /action: "load"/);
+assert.match(candidateTracker, /parentApplications/);
+assert.match(candidateTracker, /applicationEvents/);
+assert.match(candidateTracker, /provider-confirmed receipt/i);
+assert.ok(!dashboard.includes("/personal-job-desk/application-tracker"), "Candidate dashboard must not link to the disconnected legacy Personal Job Desk tracker.");
+assert.ok(!workbench.includes("/personal-job-desk/application-tracker"), "Candidate workbench must not link to the disconnected legacy Personal Job Desk tracker.");
 
-console.log("Candidate dashboard contract passed: six pathways, five workspace routes, and evidence-bound status language.");
+assert.match(homepage, /title: "Higher Education"/);
+assert.match(homepage, /title: "TVET"/);
+assert.match(homepage, /title: "SETA programmes & learnerships"/);
+assert.match(homepage, /title: "Internships"/);
+assert.match(homepage, /title: "Apprenticeships"/);
+assert.match(homepage, /title: "Employment"/);
+
+assert.match(dashboard, /does not claim an opportunity is open/);
+assert.match(dashboard, /No admission, funding, placement, employment, or success is guaranteed/);
+assert.match(dashboard, /Provider receipt and outcomes require provider-origin evidence/);
+
+for (const [name, price] of [
+  ["Foundational Accord", "R169.99"],
+  ["Collegiate Ordinance", "R299.99"],
+  ["Chancellor’s Writ", "R399.99"],
+  ["Regency Mandate", "R469.99"],
+  ["Artisan Charter", "R149.99"],
+  ["Guildmasters Charter", "R199.99"],
+  ["CV Revamp", "R49.99"]
+]) {
+  assert.ok(packages.includes(name), `Package page missing ${name}`);
+  assert.ok(packages.includes(price), `Package page missing canonical price ${price}`);
+  assert.ok(finance.includes(name), `Finance view missing ${name}`);
+  assert.ok(finance.includes(price), `Finance view missing canonical price ${price}`);
+}
+
+assert.match(packages, /accommodation routes included/i);
+assert.match(packages, /15 CV versions and 15 motivation letters/);
+assert.match(packages, /does not activate entitlements/);
+assert.match(packages, /PayFast sandbox only/);
+assert.match(packages, /ARTISAN_CHARTER_R149_99/);
+assert.match(packages, /FOUNDATIONAL_ACCORD_R169_99/);
+assert.match(packages, /GUILDMASTERS_CHARTER_R199_99/);
+assert.match(packages, /COLLEGIATE_ORDINANCE_R299_99/);
+assert.match(packages, /CHANCELLORS_WRIT_R399_99/);
+assert.match(packages, /REGENCY_MANDATE_R469_99/);
+assert.match(packages, /CV_REVAMP_R49_99/);
+assert.match(packages, /PayFastSandboxCheckout/);
+assert.match(finance, /A return page is not payment proof/);
+
+assert.match(destinyPage, /FreeDestinyMapApiForm/);
+assert.match(destinyForm, /submitFreeDestinyMapClientPayload/);
+assert.match(destinyForm, /consentToBeContacted/);
+assert.match(destinyForm, /consentToProcessBasicInfo/);
+assert.match(destinyClient, /FREE_DESTINY_MAP_LOCAL_INTAKE_ENDPOINT/);
+assert.match(destinyClient, /application\/json/);
+
+assert.match(documentsPage, /DocumentPreflightPanel/);
+assert.match(documentsPage, /UPLOADED_CANDIDATE_REPORTED/);
+assert.ok(documentPreflight.includes("10 * 1024 * 1024"));
+assert.match(documentPreflight, /SHA-256/);
+assert.match(documentPreflight, /candidate-private-documents/);
+assert.match(documentPreflight, /action: "create_upload"/);
+assert.match(documentPreflight, /action: "finalize_upload"/);
+assert.match(documentPreflight, /action: "create_download_url"/);
+assert.match(documentPreflight, /signedUploadUrl/);
+assert.match(documentPreflight, /signedUploadToken/);
+assert.match(documentPreflight, /target\.searchParams\.set\("token", signedToken\)/);
+assert.match(documentPreflight, /method: "PUT"/);
+assert.match(documentPreflight, /body: selectedFile/);
+assert.match(documentPreflight, /expiresInSeconds/);
+assert.match(documentPreflight, /not a verification decision/i);
+assert.match(privateDocumentFunction, /create_upload: "upload-url"/);
+assert.match(privateDocumentFunction, /finalize_upload: "finalize-upload"/);
+assert.match(privateDocumentFunction, /create_download_url: "read-url"/);
+
+assert.match(candidateProfile, /candidate-master-profile/);
+assert.match(candidateProfile, /revoke_consent/);
+assert.match(candidateProfile, /request_correction/);
+assert.match(savedOpportunities, /candidate_workspace_saved_opportunities/);
+assert.ok(savedOpportunities.includes('gate.identityStatus !== "VERIFIED"'), "Saved opportunities must remain unavailable until candidate identity is verified.");
+assert.ok(authCallback.includes("auth/v1/user"));
+assert.match(opportunityMatches, /candidate-save-verified-opportunity/);
+assert.match(opportunityMatches, /AMBIGUOUS_SECTORS/);
+assert.match(opportunityMatches, /PATHWAY_API_CODES/);
+assert.match(opportunityMatches, /requiresPathwayChoice/);
+assert.match(opportunityMatches, /Choose the pathway this bursary, accommodation or college route should support before saving/);
+assert.ok(opportunityMatches.includes("pathway_type: PATHWAY_API_CODES[selectedPathway]"), "Cross-sector opportunity saves must use the candidate's explicit compatible pathway.");
+assert.ok(!opportunityMatches.includes("pathway_type: item.pathways[0]"), "Cross-sector support routes must not silently select the first pathway.");
+assert.match(saveVerifiedOpportunityFunction, /PATHWAY_REQUIRED/);
+assert.match(saveVerifiedOpportunityFunction, /const allowed:Record<string,string\[\]>/);
+assert.ok(payfastCheckout.includes("functions/v1/payfast-sandbox"));
+assert.match(payfastCheckout, /idempotency-key/);
+assert.match(payfastCheckout, /sandbox.payfast.co.za/);
+assert.match(payfastCheckout, /verified PayFast ITN/i);
+assert.match(paymentReturn, /browser return is not proof of payment/i);
+assert.match(paymentCancel, /No payment success is recorded here/);
+assert.match(profilePage, /CandidateMasterProfileForm/);
+
+assert.match(identityReviewPage, /CandidateIdentityReviewPortal/);
+assert.match(dashboard, /candidate\/identity-review/);
+assert.match(workbench, /candidate\/identity-review/);
+assert.match(documentsPage, /candidate\/identity-review/);
+assert.match(identityReviewPortal, /candidate-identity-review-request/);
+assert.match(identityReviewPortal, /candidate-identity-review-status/);
+assert.match(identityReviewPortal, /candidate-identity-review-evidence-upload/);
+assert.match(identityReviewPortal, /candidate-identity-review-followup/);
+assert.match(identityReviewPortal, /candidate-master-profile/);
+assert.match(identityReviewPortal, /candidate_reference/);
+assert.match(identityReviewPortal, /claimant_name/);
+assert.match(identityReviewPortal, /claimant_message/);
+assert.ok(identityReviewPortal.includes("8 * 1024 * 1024"), "Identity evidence upload must enforce the 8 MiB client-side limit.");
+assert.match(identityReviewPortal, /application\/pdf/);
+assert.match(identityReviewPortal, /image\/jpeg/);
+assert.match(identityReviewPortal, /image\/png/);
+assert.match(identityReviewPortal, /new FormData\(\)/);
+assert.match(identityReviewPortal, /does not verify identity/i);
+assert.match(identityReviewPortal, /does not create a new candidate reference/i);
+assert.match(identityReviewRequestFunction, /submit_candidate_identity_review_for_user/);
+assert.match(identityReviewRequestFunction, /p_candidate_reference: candidateReference/);
+assert.match(identityReviewStatusFunction, /eq\("supabase_user_id", authData.user.id\)/);
+assert.match(identityReviewStatusFunction, /eq\("supabase_user_id", authData.user.id\)/);
+assert.match(identityReviewEvidenceUploadFunction, /identity-review-evidence/);
+assert.match(identityReviewEvidenceUploadFunction, /eq\("supabase_user_id", authData.user.id\)/);
+assert.match(identityReviewEvidenceUploadFunction, /sha256_hex/);
+assert.match(identityReviewEvidenceUploadFunction, /createClient/);
+assert.match(identityReviewEvidenceReadFunction, /IDENTITY_REVIEWER/);
+assert.match(identityReviewEvidenceReadFunction, /createSignedUrl/);
+assert.match(identityReviewDecisionFunction, /IDENTITY_REVIEWER/);
+assert.match(identityReviewDecisionFunction, /IDENTITY_EVIDENCE_WORKFLOW_REQUIRED/);
+assert.match(identityReviewQueueFunction, /IDENTITY_REVIEWER/);
+assert.match(identityReviewFollowupFunction, /submit_candidate_identity_review_followup/);
+
+assert.match(callbackPage, /AuthCallbackClient/);
+assert.match(authForm, /\/auth\/v1\/signup/);
+assert.match(authForm, /grant_type=password/);
+assert.match(authForm, /sb-.*-auth-token/);
+assert.match(authForm, /redirect_to=/);
+assert.match(signInPage, /CandidateAuthForm mode="login"/);
+assert.match(registerPage, /CandidateAuthForm mode="register"/);
+
+console.log("Candidate portal contract passed: six pathways, authenticated master-application workbench, verified-opportunity-to-parent-application persistence, tracker linkage, candidate identity-review request/status/private evidence and reviewer gate contracts, raw signed private uploads, server-side document finalisation and expiring downloads, canonical pricing, Free Destiny Map boundary, auth entry points and evidence-bound status language.");

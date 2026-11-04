@@ -1,0 +1,45 @@
+name: Kingsmen Staging Read-only Authorization Smoke
+
+on:
+  push:
+    branches:
+      - feat/kingsmen-frontend-product-slice-2026-11-03
+    paths:
+      - 'manifests/staging/anonymous-authorization-smoke-plan.json'
+      - 'scripts/staging/run-kingsmen-authenticated-e2e.mjs'
+      - '.github/workflows/kingsmen-staging-readonly-smoke.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  anonymous-candidate-api-boundary:
+    name: anonymous-candidate-api-boundary
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+
+      - name: Verify anonymous access is denied by staging candidate APIs
+        env:
+          KINGSMEN_STAGING_BASE_URL: https://euhubhhnumtibbyufghm.supabase.co
+          KINGSMEN_E2E_PLAN: manifests/staging/anonymous-authorization-smoke-plan.json
+          KINGSMEN_E2E_REPORT: reports/staging/anonymous-authorization-smoke-latest.json
+          KINGSMEN_E2E_TIMEOUT_MS: '15000'
+        run: node scripts/staging/run-kingsmen-authenticated-e2e.mjs
+
+      - name: Upload redacted staging smoke evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: kingsmen-staging-anonymous-api-smoke-${{ github.run_id }}
+          path: reports/staging/anonymous-authorization-smoke-latest.json
+          if-no-files-found: error
+          retention-days: 14

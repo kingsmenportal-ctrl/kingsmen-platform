@@ -1,3 +1,6 @@
+# Netlify CLI local project state
+.netlify/
+
 # Logs
 logs
 *.log
