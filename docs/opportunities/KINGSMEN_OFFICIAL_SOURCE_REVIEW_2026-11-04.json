@@ -1,0 +1,233 @@
+{
+  "schema": "kingsmen.n15.official-source-review.v1",
+  "review_date": "2026-11-04",
+  "environment": "staging",
+  "publication_policy": {
+    "candidate_visible": false,
+    "imports_authorized": false,
+    "note": "These are official-source retrieval records for human review only. They are not imported into Supabase and must not be marked OPEN or candidate-facing until the N15 source, eligibility, freshness, deadline, exact route, and approval gates are satisfied."
+  },
+  "candidate_source_reviews": [
+    {
+      "source_ref": "ekurhuleni_community_bursary_2027",
+      "title": "City of Ekurhuleni 2027 Community Bursary Programme",
+      "pathway": [
+        "higher_education",
+        "tvet",
+        "apprenticeship"
+      ],
+      "programme_type": "COMMUNITY_BURSARY",
+      "authority": "City of Ekurhuleni",
+      "official_source_url": "https://www.ekurhuleni.gov.za/campaigns/applications-for-the-2027-community-bursary-programme-now-open/",
+      "application_url": "https://bursaries.ekurhuleni.gov.za",
+      "published_date": "2026-10-30",
+      "deadline": "2026-11-30",
+      "source_status_evidence": "Official City page says applications are currently open and close Monday 30 November 2026.",
+      "eligibility_summary": "South African citizens permanently resident in Ekurhuleni; age 18–35; Grade 12 completed; 2027 acceptance letter or registration proof; annual household income not above R600,000. Supports selected full-time undergraduate fields at accredited SA universities, universities of technology and TVET colleges, including listed technical/artisan/apprenticeship qualifications.",
+      "required_evidence": [
+        "Certified South African ID",
+        "2027 acceptance letter or proof of registration",
+        "Proof of Ekurhuleni residence not older than three months",
+        "Household income evidence"
+      ],
+      "application_method": "Register and activate a profile at the official City bursary portal, select Community Bursary, then Apply.",
+      "verification_state": "SOURCE_RETRIEVED_REVIEW_REQUIRED",
+      "source_verified": true,
+      "deadline_verified_from_official_source": true,
+      "eligibility_review_required": true,
+      "exact_application_route_review_required": false,
+      "candidate_facing_safe": false
+    },
+    {
+      "source_ref": "funza_lushaka_2027",
+      "title": "Funza Lushaka Bursary Programme — 2027 intake",
+      "pathway": [
+        "higher_education"
+      ],
+      "programme_type": "TEACHER_EDUCATION_BURSARY",
+      "authority": "Department of Basic Education / Department of Education",
+      "official_source_url": "https://www.education.gov.za/ArchivedDocuments/ArchivedArticles/2027FunzaLushakaBursaryProgramme.aspx",
+      "application_url": "https://www.eservices.gov.za",
+      "published_date": null,
+      "deadline": "2027-01-31",
+      "deadline_by_applicant_type": {
+        "first_time_applicants": "2027-01-31",
+        "returning_bursars": "2026-11-30"
+      },
+      "source_status_evidence": "Official Department article says 2027 applications opened 1 October 2026; first-time applications close 31 January 2027 and returning bursar applications close 30 November 2026.",
+      "eligibility_summary": "Targeted at youth below 30 with a matric Bachelor’s pass or who meet university entry requirements. Programme supports prospective teachers in priority areas; phase, subject, institution and other detailed eligibility must be checked against current programme guidelines before candidate matching.",
+      "benefits_summary": "Published programme description lists tuition, accommodation or transport, meals, learning materials, personal-care allowance and teaching-practice support.",
+      "application_method": "Apply online through the official eServices portal. The Department article says district officials can assist with online application issues.",
+      "verification_state": "SOURCE_RETRIEVED_REVIEW_REQUIRED",
+      "source_verified": true,
+      "deadline_verified_from_official_source": true,
+      "eligibility_review_required": true,
+      "exact_application_route_review_required": true,
+      "candidate_facing_safe": false
+    },
+    {
+      "source_ref": "uct_postgraduate_financial_aid_2027",
+      "title": "UCT Postgraduate Financial Aid Bursary — 2027",
+      "pathway": [
+        "higher_education"
+      ],
+      "programme_type": "POSTGRADUATE_BURSARY",
+      "authority": "University of Cape Town",
+      "official_source_url": "https://uct.ac.za/students/fees-funding-postgraduate-degree-funding-bursaries-scholarships/uct-merit-and-need-awards",
+      "application_url": null,
+      "published_date": null,
+      "deadline": "2026-11-10",
+      "source_status_evidence": "UCT official page says 2027 applications are open and the 2027 online funding application deadline is 10 November 2026.",
+      "eligibility_summary": "For South African citizens and permanent residents at Honours, Master’s or Doctoral level; all fields. First-year applicants must submit a 2027 UCT admissions application before applying for postgraduate funding. Selection is holistic, not based solely on academic merit; detailed criteria must be checked in UCT funding guidelines.",
+      "application_method": "UCT Postgraduate Online Funding Application in the PeopleSoft Student Portal. Late or incomplete applications are not considered.",
+      "verification_state": "SOURCE_RETRIEVED_REVIEW_REQUIRED",
+      "source_verified": true,
+      "deadline_verified_from_official_source": true,
+      "eligibility_review_required": true,
+      "exact_application_route_review_required": true,
+      "candidate_facing_safe": false
+    },
+    {
+      "source_ref": "uct_nrf_honours_general_2027",
+      "title": "2027 NRF Honours General Call — UCT funding noticeboard entry",
+      "pathway": [
+        "higher_education"
+      ],
+      "programme_type": "HONOURS_RESEARCH_BURSARY",
+      "authority": "National Research Foundation / University of Cape Town funding noticeboard",
+      "official_source_url": "https://uct.ac.za/students/fees-funding-postgraduate-degree-funding/postgraduate-degree-funding-noticeboard",
+      "application_url": "https://nrfconnect.nrf.ac.za/",
+      "published_date": null,
+      "deadline": "2026-11-15",
+      "source_status_evidence": "UCT funding noticeboard lists a 15 November 2026 internal closing date. UCT NRF guidance page contains a category-specific note that Honours applicants requiring ISFAP assessment must apply by 14 August 2026; this category distinction requires manual reconciliation.",
+      "eligibility_summary": "Honours funding. Full NRF call, discipline eligibility, ISFAP category and applicant requirements must be checked before publication. Do not treat all Honours applicants as eligible for the 15 November date.",
+      "application_method": "NRF Connect online application is stated in UCT’s NRF guidance; confirm exact category and internal UCT process.",
+      "verification_state": "SOURCE_CONFLICT_REVIEW_REQUIRED",
+      "source_verified": true,
+      "deadline_verified_from_official_source": false,
+      "eligibility_review_required": true,
+      "exact_application_route_review_required": true,
+      "candidate_facing_safe": false
+    },
+    {
+      "source_ref": "cput_abb_education_trust_2027",
+      "title": "ABB Education Trust Bursary — 2027",
+      "pathway": [
+        "higher_education"
+      ],
+      "programme_type": "ENGINEERING_BURSARY",
+      "authority": "Cape Peninsula University of Technology / ABB Education Trust",
+      "official_source_url": "https://www.cput.ac.za/student/quick-links/bursary-opportunities",
+      "application_url": null,
+      "published_date": null,
+      "opens_at": "2026-11-02T08:00:00",
+      "deadline": "2026-11-14T16:00:00",
+      "source_status_evidence": "Current CPUT Bursary Opportunities page search result lists applications opening 2 November 2026 at 08:00 and closing 14 November 2026 at 16:00.",
+      "eligibility_summary": "Mandatory criteria published by CPUT: Black female South African citizens; first year completed with at least 60% pass aggregate; household income below R600,000 per annum; repeat courses and outstanding balances are not funded. Disability inclusion is encouraged. Preference given to Electrical, Mechanical and Industrial Engineering degree or higher diploma streams.",
+      "application_method": "Official CPUT bursary page exposes an Online Application action, but the exact 2027 form URL was not resolved in this review. Reopen the official page and capture the direct form link before candidate-facing use.",
+      "verification_state": "SOURCE_RETRIEVED_REVIEW_REQUIRED",
+      "source_verified": true,
+      "deadline_verified_from_official_source": true,
+      "eligibility_review_required": true,
+      "exact_application_route_review_required": true,
+      "candidate_facing_safe": false
+    },
+    {
+      "source_ref": "presidency_ict_developer_2026",
+      "title": "Information and Communication Technology Developer — POST 38/236",
+      "pathway": [
+        "employment"
+      ],
+      "programme_type": "PUBLIC_SERVICE_VACANCY",
+      "authority": "The Presidency, Republic of South Africa",
+      "official_source_url": "https://thepresidency.gov.za/node/10523",
+      "application_url": "mailto:applications@presidency.gov.za",
+      "published_date": "2026-10-26",
+      "deadline": "2026-11-06",
+      "source_status_evidence": "Official Presidency vacancy page indexed 4 November 2026 says published 26 October 2026 and closing Friday 6 November 2026; it specifies email submissions by midnight and hand delivery by 16:30.",
+      "location": "Pretoria",
+      "remuneration": "R932,292 per annum (Level 11, all-inclusive package)",
+      "eligibility_summary": "Senior Certificate plus an appropriate Bachelor’s degree or National Diploma in Information Technology, or an equivalent NQF Level 6 qualification; 3–5 years’ relevant systems-development experience according to SDLC.",
+      "required_evidence": [
+        "Completed and signed current Z83 form",
+        "Detailed Curriculum Vitae"
+      ],
+      "application_method": "Email applications@presidency.gov.za for the attention of Ms L Mphahlele, or hand deliver to Government Avenue, Union Buildings, Pretoria. The advert says only the signed Z83 and detailed CV should be attached.",
+      "verification_state": "SOURCE_RETRIEVED_REVIEW_REQUIRED",
+      "source_verified": true,
+      "deadline_verified_from_official_source": true,
+      "eligibility_review_required": true,
+      "exact_application_route_review_required": false,
+      "candidate_facing_safe": false
+    }
+  ],
+  "source_leads_only": [
+    {
+      "source_ref": "dsbd_advert_2026_11_09",
+      "authority": "Department of Small Business Development",
+      "official_source_url": "https://www.dsbd.gov.za/vacancies/",
+      "published_date": "2026-10-23",
+      "deadline": "2026-11-09",
+      "evidence": "Official vacancy page lists a DSBD advert published 23 October and closing 9 November 2026. It says applications go to the email address for the relevant post, with the reference number in the subject line, and accepts MS Word/PDF.",
+      "missing_before_ingestion": [
+        "Download the advert and extract every post title/reference/location/grade",
+        "Per-post qualifications/experience/eligibility",
+        "Exact application email and supporting documents"
+      ],
+      "candidate_facing_safe": false
+    },
+    {
+      "source_ref": "department_agriculture_advert_2026_11_06",
+      "authority": "Department of Agriculture",
+      "official_source_url": "https://nda.gov.za/index.php/vacancies",
+      "deadline": "2026-11-06",
+      "evidence": "Official vacancy page lists a DOA advertisement with a 6 November 2026 closing date.",
+      "missing_before_ingestion": [
+        "Download the specific advert and extract every post title/reference/location/grade",
+        "Per-post requirements and eligibility",
+        "Exact post-level application method and required documents"
+      ],
+      "candidate_facing_safe": false
+    }
+  ],
+  "conflicting_or_stale_sources_excluded": [
+    {
+      "source_ref": "nsfas_2027_deadline_conflict",
+      "official_source_url": "https://www.nsfas.org.za/content/how-to-apply.html",
+      "note": "NSFAS official application page still showed 31 October 2026, while a government announcement reported a possible extension to 18 November. Excluded from open catalogue until NSFAS itself confirms an amended official deadline."
+    },
+    {
+      "source_ref": "eskom_careers_access_unavailable",
+      "official_source_url": "https://www.eskom.co.za/careers/",
+      "note": "Official recruitment page reported temporary unavailability / inability to access vacancies. Cached vacancy snippets are not enough to claim a current application route."
+    },
+    {
+      "source_ref": "ump_2027_applications_stale",
+      "official_source_url": "https://www.ump.ac.za/",
+      "note": "The inspected official admissions page still displayed the 2026 intake and historical deadlines. No 2027 open status was promoted."
+    },
+    {
+      "source_ref": "parliament_vacancies_stale",
+      "official_source_url": "https://www.parliament.gov.za/",
+      "note": "Search snippets showed newer vacancy dates, but the inspected official vacancy listing displayed older August 2026 vacancies. Exact iRecruitment records must be reconfirmed."
+    },
+    {
+      "source_ref": "health_department_vacancies_stale",
+      "official_source_url": "https://www.health.gov.za/",
+      "note": "Search snippets surfaced November dates, but the opened official vacancy page displayed older August vacancies. Exact official advert/detail pages are required before publication."
+    }
+  ],
+  "release_gate": {
+    "staging_imports_performed": 0,
+    "live_opportunity_records_created": 0,
+    "candidate_visible_records_created": 0,
+    "reason": "Issue #264 migration provenance and encrypted backup/isolated restore gate is unresolved. This review is a source-retrieval and evidence-curation artefact only.",
+    "next_manual_steps": [
+      "Validate full source content and any advert attachment for each item.",
+      "Complete per-opportunity eligibility, deadline, required-document and application-route review.",
+      "Check current availability again immediately before ingestion.",
+      "Independent source review and approval.",
+      "Apply through a separately reviewed N15 import only after the migration and backup/restore gates pass."
+    ]
+  }
+}
