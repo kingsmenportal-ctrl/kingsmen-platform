@@ -1,101 +1,135 @@
 # Kingsmen IRC-1 — staging evidence and release blockers
 
-**Snapshot date:** 4 November 2026  
+**Snapshot:** 4 November 2026  
 **Repository:** `kingsmenportal-ctrl/kingsmen-platform`  
-**Release review PR:** [#316 — integrated frontend product slice](https://github.com/kingsmenportal-ctrl/kingsmen-platform/pull/316)  
+**Canonical frontend review:** [PR #316](https://github.com/kingsmenportal-ctrl/kingsmen-platform/pull/316)  
 **Supabase staging:** `kingsmen-portal-staging` (`euhubhhnumtibbyufghm`)  
 **Netlify staging:** `kingsmen-portal-staging` (`fb27d0db-b116-4890-8f7f-14e654c27dbc`)
 
-This file records a point-in-time inspection. It deliberately distinguishes source implementation, CI evidence, live backend state, and runtime/deployment evidence. It is not a release approval.
+This is a read-only, point-in-time release audit. It distinguishes tracked implementation, CI evidence, live backend state, and authenticated runtime/deployment evidence. It is not a release approval.
 
-## 1. GitHub integration and controls
+## 1. Canonical frontend integration
 
-The active integration stream is PR #316, based on `main`. Its product surface remains the existing Next.js application under `apps/web/src/app`; the static `apps/web-frontend/` prototype/reference surface is not the production application.
+PR #316 is the active integration stream, based on `main`. The production application remains the existing Next.js app under `apps/web/src/app`; the static `apps/web-frontend/` prototype surface is not a replacement portal.
 
-The candidate workbench route contains six-step navigation and the authenticated `CandidateApplicationWorkbench` component. The PR now also tracks the exact staging source for all four candidate Edge Functions and the PayFast sandbox Edge Function; these were byte-compared against their currently deployed staging sources. The component calls the deployed `candidate-application-preparation` Edge Function to load saved parent targets, parent application records, preparation trackers and checklist items. Preparing a parent application is a backend action; it does not submit to a provider.
+The current PR includes:
+- Premium Kingsmen homepage and six universally accessible pathways.
+- Seven canonical paid products and plan-review handoff; a browser-selected plan is not an order or entitlement.
+- Registration, sign-in, auth callback, sign-out and the reusable candidate master-profile UI.
+- N15 opportunity matching/filtering and an evidence-labelled save action.
+- The authenticated candidate application workbench: one parent-application preparation flow, candidate-owned saved routes, parent records and preparation trackers.
+- Private Document Vault for PDF/JPEG/PNG up to 10 MiB. The current component uses a short-lived signed upload capability, raw file-body Storage PUT, server-side finalisation/integrity checks, candidate-reported status, and expiring private read links. It does not let a candidate verify their own document.
+- Cross-sector pathway choice for bursary, NSFAS, accommodation and private-college support. The browser must choose a compatible pathway; the save Edge Function validates the choice. It no longer silently picks the first pathway.
+- PayFast sandbox checkout and evidence-labelled return/cancel pages. A browser return is not proof of payment; verified ITN settlement is required before entitlement.
+- Application tracker route and evidence-bound status language.
 
-The verified-opportunity save path calls `candidate-save-verified-opportunity`. Its implementation persists the candidate's saved opportunity, reconciles a master application target, invokes the guarded parent-application preparation RPC, and links a preparation tracker. It does not claim provider submission or receipt.
+The candidate save Edge Function persists a verified opportunity and master target, calls the guarded parent-application preparation RPC, and links the preparation tracker. The application-preparation Edge Function loads saved targets, parent applications, trackers and checklist records. These are source-level/API integrations; actual candidate browser journeys remain to be proven.
 
-**Exact-head CI history:**
-- PR head Latest exact PR head at the time of this update: `1022a354cf45bc7849f161844953e456137205fc`.
-- `validate`: passed.
-- `test-and-build`: passed, including repository validation, API build, and Next.js production build.
-- `verify-main-branch-protection`: passed.
-- `Jarvis Live Runtime`: passed.
-- The release suite now also runs canonical finance catalogue checks, PayFast sandbox source-level proof/validation, migration source-integrity checks, and the review-table access contract.
-- The independent review record on PR #316 is a `COMMENTED` review, not an approval. The reviewer requested authenticated Candidate A/B, profile persistence, private document ownership/expiry, PayFast ITN replay/recovery, and deployment-tied browser evidence.
+## 2. GitHub CI and main branch protection
 
-The main protection verifier succeeded on the latest exact head. The active main ruleset requires one approving review and the strict `validate` and `test-and-build` contexts; bypass actors are empty, force-push and branch deletion are disabled. No direct-`main` commit or protection bypass was used. A successful evidence workflow is not itself a substitute for an independent approving review.
+**Latest inspected PR head:** `1022a354cf45bc7849f161844953e456137205fc`.
 
-## 2. Supabase source synchronisation
+Exact-head GitHub Actions evidence:
+- [Kingsmen CI run 41871744512](https://github.com/kingsmenportal-ctrl/kingsmen-platform/actions/runs/41871744512): `validate` succeeded and `test-and-build` succeeded, including repository validation, API build and Next.js production build.
+- [Main branch protection evidence run 41871744591](https://github.com/kingsmenportal-ctrl/kingsmen-platform/actions/runs/41871744591): succeeded and uploaded a redacted read-only ruleset artifact.
+- [Jarvis Live Runtime run 41871744536](https://github.com/kingsmenportal-ctrl/kingsmen-platform/actions/runs/41871744536): succeeded. This does not prove the candidate portal runtime.
 
-Staging is active and healthy on PostgreSQL 17.11. The following Edge Function source files in the PR #316 branch were compared byte-for-byte with the deployed staging function source; each pair was identical at inspection:
+The ruleset artifact `kingsmen-main-branch-protection-41871744591` reported, for `main`, on 4 November 2026 at 16:51:57 UTC:
+- Active `main-branch-protection` ruleset, HTTP 200.
+- Main branch targeted and ruleset enforced.
+- Required status checks enabled: `validate` and `test-and-build`.
+- Strict status checks enabled.
+- Pull-request review required with **one approving review**.
+- No bypass actors.
+- Force-push disabled and branch deletion disabled.
 
-| Function | Deployed version | Gateway JWT verification |
+This supersedes the older 3 November protection snapshot that reported zero required reviews/checks. The active ruleset is now evidenced; the pull request still requires an actual approving review. PR #316 currently has a `COMMENTED` review from `ndabenhlemvelo-arch`, which is not an approval. The reviewer requested runtime evidence for Candidate A/B isolation, profile persistence, private document ownership/expiry, PayFast ITN replay/recovery and a deploy tied to the reviewed SHA.
+
+No direct-`main` commit or protection bypass was performed.
+
+## 3. Supabase Edge Function source alignment
+
+Staging is active on PostgreSQL 17.11. The tracked PR #316 source was byte-compared with the currently deployed function source for all five dependencies below; each matched exactly at inspection time:
+
+| Edge Function | Staging version | Gateway JWT verification |
 |---|---:|---|
 | `candidate-application-preparation` | 16 | Enabled |
 | `candidate-master-profile` | 3 | Enabled |
 | `candidate-private-documents` | 16 | Enabled |
 | `candidate-save-verified-opportunity` | 3 | Enabled |
-| `payfast-sandbox` | 9 | Disabled at gateway; the function has its own request/ITN validation logic |
+| `payfast-sandbox` | 9 | Disabled at gateway; function performs its own bearer/ITN validation |
 
-Source equality proves that the tracked code matches the deployed function source. It does not prove authenticated browser execution or settlement outcomes.
+Source equality does not prove authenticated browser operation, reviewer authorization, document ownership/expiry, or successful payment settlement.
 
-## 3. Migration ledger and recovery gate
+## 4. Migration provenance and recovery
 
-The live staging migration ledger returned **130 rows**. Its latest recorded version is:
+The staging migration ledger contains **130 rows**. The latest recorded entry is:
 
 `20261029193124 — candidate_self_service_profile_bootstrap_0095`
 
-Two migration names have duplicate ledger entries:
-- `candidate_application_preparation_readiness_0078`: versions `20261019112452` and `20261019112511`.
-- `seed_verified_labour_vacancy_deadlines_0093`: versions `20261029180632` and `20261029180642`.
+The inspected repository migration directories contain 36 SQL files. By normalising the numeric migration suffix in the ledger names to the repository's numbered filenames, 32 ledger rows map to a source file; 98 do not have a matching source file under that convention. This shows that the current repository is not a complete, one-to-one source archive for the staging migration ledger. In particular, migration source files 0096–0106 were not present in the inspected `db/migrations` or `supabase/migrations` tree.
 
-The current `main` source tree contains numbered SQL migrations in `db/migrations` only through `0086`; `supabase/migrations` has only the timestamped PayFast finance migration and `.gitkeep`. This is not a one-to-one source map for the 130-row staging ledger through 0095. No source migration files 0096–0106 were found in the inspected tree. Do not apply later migrations or imports until repository migration files, historical provenance, checksums and live schema are reconciled. The duplicate entries require explanation; they must not be deleted or rewritten as a shortcut.
+Duplicate ledger entries:
+- `candidate_application_preparation_readiness_0078`: `20261019112452` and `20261019112511`.
+- `seed_verified_labour_vacancy_deadlines_0093`: `20261029180632` and `20261029180642`.
 
-A protected backup and an isolated restore drill have not been evidenced in this snapshot. No schema migration was applied during this inspection.
+The duplicate entries require historical provenance and checksum reconciliation. Do not delete ledger rows, invent missing SQL, mark migrations as applied, or apply imports as a shortcut. No schema migration was applied during this inspection.
 
-## 4. Security findings
+`public.backup_restore_drills` contains **0 rows**. No protected backup plus isolated restore drill with schema, row, object and checksum verification is evidenced. Database migrations and bulk imports remain gated.
 
-The Supabase Security Advisor returned these items:
-- Leaked-password protection is disabled.
-- Six public-schema `SECURITY DEFINER` functions are executable by `authenticated`. Their bodies were inspected and include caller/identity or reviewer checks; each function still requires individual security-owner approval of its exposure and intended role.
-- Seventeen tables have RLS enabled but no policies. Several are identity-review or founder/reviewer operational tables. These may intentionally be deny-by-default; do not add broad client policies to silence the advisor.
+## 5. Security and capacity
 
-Candidate A/B isolation, reviewer authorization and private document ownership/expiry were not proven by authenticated runtime tests in this snapshot. Leaked-password protection was not changed because the connected Supabase operations available to this workflow do not expose the Auth password-security setting.
+The Supabase Security Advisor reported:
+- Leaked-password protection disabled.
+- Six public-schema `SECURITY DEFINER` functions executable by `authenticated`.
+- Seventeen tables with RLS enabled but no policies.
 
-## 5. Opportunity catalogue state
+The 17 no-policy tables were checked for table privileges. All 17 deny `anon` and `authenticated` SELECT/INSERT/UPDATE; `service_role` has access. These appear to be backend/reviewer-only deny-by-default tables, not a reason to add broad client policies. Keep them restricted.
+
+The six authenticated-callable `SECURITY DEFINER` functions need individual security-owner review. The function bodies inspected contain candidate ownership/consent checks or reviewer-role/evidence checks, but blanket revocation could break legitimate flows and was not applied.
+
+The `system_runtime_config` row `KINGSMEN_CAP_ACTIVE_CANDIDATES` is set to **500**. This is a stored configuration value, not proof of an enforced limit. I found no candidate-cap check in the inspected candidate Edge Functions, no candidate-cap triggers on the candidate/identity-link tables, no matching entry in `control_plane_capacity_limits`, and no review rows in `growth_cap_reviews`. The 500-active-candidate guard therefore remains unproven and must be implemented/tested through a reconciled, reviewed migration before onboarding is scaled.
+
+Current staging counts:
+- `candidate_auth_identity_links`: 0
+- `candidate_master_profiles`: 0
+- `candidate_workspace_saved_opportunities`: 0
+- `candidate_private_documents` and `candidate_private_document_reviews`: 0
+- `candidate_application_tracker` and preparation items: 0
+- `candidate_payment_events` and `payfast_itn_receipts`: 0
+- `growth_cap_reviews`: 0
+
+The empty candidate state is why two-candidate isolation, reviewer runtime and persistence tests cannot be claimed from this snapshot. Leaked-password protection has not been changed because the connected Supabase actions expose no Auth password-security setting.
+
+## 6. Opportunity catalogue
 
 A fresh read-only staging query found:
 - `public.opportunity_programmes`: **0 rows**.
-- `public.candidate_opportunities`: **4 rows**; 2 are `STALE` and unpublished, and 2 are `UNVERIFIED` and unpublished.
-- `public.current_verified_route_opportunities`: **0 rows**.
-- `public.route_programmes`: **14 rows** (6 `NEEDS_REVIEW / UNKNOWN`, 6 `VERIFIED / CLOSED`, 2 `VERIFIED / MANUAL_CHECK_REQUIRED`).
-- `public.route_providers`: 120 records; 3 are both `VERIFIED` and `public_safe`, 115 are `NEEDS_REVIEW`, and 2 are `BLOCKED`.
-- The 4 candidate-opportunity rows are all unpublished, so none is currently candidate-facing.
+- `public.candidate_opportunities`: **4 rows**; 2 are `STALE` and unpublished, 2 are `UNVERIFIED` and unpublished.
+- No candidate-facing verified/open opportunity is evidenced by these rows.
+- `public.n15_ingestion_runs`: **0 rows**.
 
-Consequently, the staging candidate feed does not currently have a verified, published open opportunity evidenced by these tables. Provider directory entries and source-authority records must not be presented as live opportunities. Do not fabricate or promote a listing to `OPEN` without official-source, deadline, eligibility, freshness and human-review evidence.
+A provider directory, source-authority record or institution register is not a live opportunity. Candidate-facing publication requires official source evidence, current freshness, eligibility, a confirmed deadline where applicable, a valid application route and the required human review. No opportunity was fabricated or promoted during this inspection.
 
-## 6. Netlify deployment state
+## 7. Netlify deployment state
 
-The existing Netlify project and site ID were found. The deployment-list operation returned:
-- no deploy records;
-- no active deployment;
-- no deploy ID tied to a Git commit;
-- no exact deployed source SHA.
+The existing Netlify project and site ID were found. The connected deployment-list call returned no deploy records, no active deploy, no deploy ID and no commit SHA. There is therefore no exact deployed source revision to test.
 
-The available Netlify connection exposes project/deployment reads but does not expose a Git-repository linking or deployment-trigger operation. Therefore no staging deployment or authenticated browser smoke test is claimed here. The repository's `netlify.toml` points to `apps/web`, runs `npm run build`, publishes `.next`, and uses the Next.js plugin. The root `.gitignore` excludes `.netlify/`.
+The repository `netlify.toml` specifies base `apps/web`, command `npm run build`, publish directory `.next`, Node 22 and the Next.js plugin. The root `.gitignore` excludes local `.netlify/` state.
 
-## 7. Release decision
+The connected Netlify actions available in this workflow expose project/deployment reads and environment management, but do not provide Git repository linking or a deploy-trigger operation. I did not create another site, deploy unrelated content, or claim a staging deployment. The deployment must be tied to the reviewed PR SHA before authenticated browser tests can be run.
 
-**IRC-1 is not yet release-approved.** Source implementation and build validation have advanced, but these gates remain open:
+## 8. Release decision and remaining gates
 
-1. Latest-head CI must finish green after the most recent validator and ignore-file commits.
-2. Obtain the required independent approving review on PR #316.
-3. Reconcile migration provenance and duplicates; establish and verify backup/restore evidence before schema changes.
-4. Review the six authenticated-callable `SECURITY DEFINER` RPCs individually and enable leaked-password protection through the supported Supabase Auth control.
-5. Populate the N15 catalogue through official, current, human-reviewed evidence; current candidate-usable opportunity count remains zero.
-6. Obtain a Netlify deploy tied to the reviewed PR head, then run authenticated Candidate A/B, profile reload/re-login, private document upload/read/expiry and PayFast sandbox ITN/replay/recovery tests.
-7. The Netlify connection currently exposes project/environment reads but no deployment records or Git-link/deploy-trigger action. Neither the primary staging URL nor the current branch-version URL could be retrieved by the web runtime. No deploy ID or deployed SHA is claimed.
+**IRC-1 is not release-approved.** Source integration and build validation have advanced, and main protection is now evidenced. These release gates remain:
 
-No production release, production payment, provider submission, or successful staging runtime verification is asserted by this document.
+1. Obtain an independent approving review on PR #316; its current review is `COMMENTED`, not `APPROVED`.
+2. Reconcile the 130-row migration ledger to authoritative SQL history, including duplicate entries and 0096–0106 provenance; create a protected backup and complete an isolated restore drill.
+3. Individually review the six authenticated-callable `SECURITY DEFINER` functions; enable leaked-password protection using a supported Supabase Auth control.
+4. Implement and test the 500-active-candidate limit; run authenticated Candidate A/B isolation and reviewer authorization tests.
+5. Create test candidate identities and prove profile save/reload/re-login, private document upload/read ownership/expiry, application draft persistence and tracker status boundaries.
+6. Populate the N15 catalogue only from official current source evidence; current candidate-usable verified/open opportunity count is zero.
+7. Complete PayFast sandbox hosted checkout, ITN signature/merchant/amount/reference verification, duplicate/replay idempotency and failed-settlement recovery with runtime evidence.
+8. Link the existing Netlify staging project to the repository or use an authorised deploy mechanism; deploy the reviewed PR SHA, capture deploy ID/source SHA, and run browser smoke tests against that exact deploy.
+
+No production release, live payment, provider submission, successful authenticated candidate runtime test, or verified Netlify staging deployment is asserted by this document.
