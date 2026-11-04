@@ -18,6 +18,8 @@ assert.match(workflow, /netlify-cli@27\.16\.2 build/);
 assert.match(workflow, /netlify-cli@27\.16\.2 deploy --prod/);
 assert.match(workflow, /verify-netlify-staging-deploy\.mjs/);
 assert.match(workflow, /actions\/upload-artifact@v4/);
+assert.ok(workflow.includes("state:'BUILD_PENDING'"));
+assert.match(workflow, /if-no-files-found: warn/);
 assert.match(verifier, /api\.netlify\.com\/api\/v1\/sites/);
 assert.match(verifier, /message\.includes\(sourceSha\)/);
 assert.match(verifier, /DEPLOYED_AND_SMOKE_PASSED/);
