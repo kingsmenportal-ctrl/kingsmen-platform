@@ -156,8 +156,10 @@ export default function CandidateIdentityReviewPortal() {
       setSignedIn(true);
     } catch (caught) {
       setRequests([]);
-      setSignedIn(false);
-      setError(caught instanceof Error ? caught.message : "Identity-review status could not be loaded.");
+      const message = caught instanceof Error ? caught.message : "Identity-review status could not be loaded.";
+      const authenticationFailure = /sign in|session is invalid|session has expired|browser session/i.test(message);
+      setSignedIn(!authenticationFailure);
+      setError(message);
     } finally {
       setLoading(false);
     }
