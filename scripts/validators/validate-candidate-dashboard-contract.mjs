@@ -7,6 +7,7 @@ const dashboard = read("../../apps/web/src/app/candidate/dashboard/page.tsx");
 const homepage = read("../../apps/web/src/app/page.tsx");
 const packages = read("../../apps/web/src/app/packages/page.tsx");
 const workbench = read("../../apps/web/src/app/candidate/workbench/page.tsx");
+const applicationWorkbench = read("../../apps/web/src/components/candidate/CandidateApplicationWorkbench.tsx");
 const applicationTracker = read("../../apps/web/src/app/personal-job-desk/application-tracker/page.tsx");
 const finance = read("../../apps/web/src/app/candidate/finance/page.tsx");
 const destinyPage = read("../../apps/web/src/app/free-destiny-map/page.tsx");
@@ -68,6 +69,11 @@ for (const route of expectedWorkbenchRoutes) {
   assert.ok(workbench.includes(route), `Workbench journey missing route: ${route}`);
 }
 assert.match(workbench, /Your application journey/);
+assert.match(workbench, /<CandidateApplicationWorkbench\s*\/>/);
+assert.match(applicationWorkbench, /candidate-application-preparation/);
+assert.match(applicationWorkbench, /Prepare parent application/);
+assert.match(applicationWorkbench, /parentApplications/);
+assert.match(applicationWorkbench, /trackers/);
 assert.match(workbench, /not a provider submission/i);
 assert.match(workbench, /provider-confirmed receipt/i);
 assert.match(workbench, /verified PayFast ITN settlement/i);
