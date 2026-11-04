@@ -1,47 +1,44 @@
-export function evaluateMainBranchProtection(protection) {
-  const requiredStatusChecks = protection?.required_status_checks ?? null;
-  const requiredContexts = Array.isArray(requiredStatusChecks?.contexts)
-    ? requiredStatusChecks.contexts.filter((name) => typeof name === 'string' && name.length > 0)
+export function evaluateMainBranchProtection(ruleset) {
+  const rules = Array.isArray(ruleset?.rules) ? ruleset.rules : [];
+  const branchIncludes = ruleset?.conditions?.ref_name?.include;
+  const requiredStatusRule = rules.find((rule) => rule?.type === 'required_status_checks');
+  const requiredStatusParameters = requiredStatusRule?.parameters ?? null;
+  const requiredContexts = Array.isArray(requiredStatusParameters?.required_status_checks)
+    ? requiredStatusParameters.required_status_checks
+      .map((item) => item?.context)
+      .filter((name) => typeof name === 'string' && name.length > 0)
     : [];
-  const requiredCheckObjects = Array.isArray(requiredStatusChecks?.checks)
-    ? requiredStatusChecks.checks
-    : [];
-  const requiredCheckNames = requiredCheckObjects
-    .map((item) => item?.context)
-    .filter((name) => typeof name === 'string' && name.length > 0);
-  const allRequiredCheckNames = [...new Set([...requiredContexts, ...requiredCheckNames])];
-  const reviewPolicy = protection?.required_pull_request_reviews ?? null;
-  const reviewCount = Number.isInteger(reviewPolicy?.required_approving_review_count)
-    ? reviewPolicy.required_approving_review_count
+  const pullRequestRule = rules.find((rule) => rule?.type === 'pull_request');
+  const reviewCount = Number.isInteger(pullRequestRule?.parameters?.required_approving_review_count)
+    ? pullRequestRule.parameters.required_approving_review_count
     : 0;
+  const bypassActors = Array.isArray(ruleset?.bypass_actors) ? ruleset.bypass_actors : null;
 
   const checks = {
-    requiredStatusChecksEnabled: allRequiredCheckNames.length > 0,
-    sourceGuardRequired: allRequiredCheckNames.some(
-      (name) => name === 'source-guard' || name.endsWith('/source-guard')
-    ),
-    releaseEvidenceRequired: allRequiredCheckNames.includes('Build, validate, and smoke-test'),
-    strictStatusChecksEnabled: requiredStatusChecks?.strict === true,
+    mainBranchTargeted: ruleset?.target === 'branch'
+      && Array.isArray(branchIncludes)
+      && branchIncludes.includes('refs/heads/main'),
+    rulesetEnforced: ruleset?.enforcement === 'active',
+    requiredStatusChecksEnabled: requiredStatusRule !== undefined,
+    testAndBuildRequired: requiredContexts.includes('test-and-build'),
+    validateRequired: requiredContexts.includes('validate'),
+    strictStatusChecksEnabled: requiredStatusParameters?.strict_required_status_checks_policy === true,
     pullRequestReviewRequired: reviewCount >= 1,
-    staleReviewsDismissed: reviewPolicy?.dismiss_stale_reviews === true,
-    conversationResolutionRequired: protection?.required_conversation_resolution?.enabled === true,
-    linearHistoryRequired: protection?.required_linear_history?.enabled === true,
-    adminEnforcementEnabled: protection?.enforce_admins?.enabled === true,
-    forcePushDisabled: protection?.allow_force_pushes?.enabled === false,
-    branchDeletionDisabled: protection?.allow_deletions?.enabled === false,
-    requiredApprovingReviewCount: reviewCount
+    requiredApprovingReviewCount: reviewCount,
+    noBypassActors: bypassActors !== null && bypassActors.length === 0,
+    forcePushDisabled: rules.some((rule) => rule?.type === 'non_fast_forward'),
+    branchDeletionDisabled: rules.some((rule) => rule?.type === 'deletion')
   };
 
   const requiredBooleanChecks = [
+    'mainBranchTargeted',
+    'rulesetEnforced',
     'requiredStatusChecksEnabled',
-    'sourceGuardRequired',
-    'releaseEvidenceRequired',
+    'testAndBuildRequired',
+    'validateRequired',
     'strictStatusChecksEnabled',
     'pullRequestReviewRequired',
-    'staleReviewsDismissed',
-    'conversationResolutionRequired',
-    'linearHistoryRequired',
-    'adminEnforcementEnabled',
+    'noBypassActors',
     'forcePushDisabled',
     'branchDeletionDisabled'
   ];
