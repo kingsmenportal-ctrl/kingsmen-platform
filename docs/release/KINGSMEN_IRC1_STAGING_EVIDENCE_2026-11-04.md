@@ -175,6 +175,19 @@ Current source leads include the Ekurhuleni 2027 Community Bursary, Funza Lushak
 
 These are **source-review records only**. Every manifest entry is marked `candidate_facing_safe=false`; no opportunity record was imported, published or marked `OPEN`. The staging candidate-visible verified/open count remains zero until the full source/eligibility/route review and the migration/backup gates are accepted.
 
+## 7B. Netlify staging deployment automation
+
+The branch now contains a controlled CLI deployment workflow:
+- `.github/workflows/kingsmen-netlify-staging-deploy.yml`.
+- Automatic trigger: push to protected `main`, after PR review/merge. Optional manual dispatch also requires the explicit `confirm_staging_deploy=true` input and is restricted to `main`.
+- Uses the existing `netlify.toml` base/build configuration, the existing staging Site ID `fb27d0db-b116-4890-8f7f-14e654c27dbc`, and pinned Netlify CLI `27.16.2`.
+- Builds before calling `netlify deploy --prod` against the staging site. This path does not require Netlify Git continuous-deployment repository linking.
+- Uses the GitHub Actions secret `NETLIFY_AUTH_TOKEN`; the workflow fails closed and writes redacted blocked evidence if this secret is unavailable.
+- After deploy, the verifier requires a Netlify deploy record whose message contains the exact GitHub source SHA, a `ready` deploy state and a deploy ID, then performs anonymous HTTP 200 route checks for home, packages, sign-in, workbench and identity review.
+- Evidence is uploaded as a 30-day GitHub Actions artifact.
+
+**No deployment has yet been run.** This workflow is only on the unmerged PR branch. The first run can happen only after PR #316 is approved and merged to `main` (or manually dispatched on `main`) and the `NETLIFY_AUTH_TOKEN` GitHub Actions repository/environment secret is configured. The connected Netlify tool cannot create a deploy or expose a token. The project read still shows no deploy ID/deployment history.
+
 ## 8. Release decision and remaining gates
 
 **IRC-1 is not release-approved.** Source integration and build validation have advanced, and main protection is now evidenced. These release gates remain:
