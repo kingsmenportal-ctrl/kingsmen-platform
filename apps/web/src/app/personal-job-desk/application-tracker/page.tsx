@@ -1,7 +1,7 @@
-import ApplicationTrackerClient from "./ApplicationTrackerClient";
+import { redirect } from "next/navigation";
 
 export const dynamic = "force-dynamic";
 
-export default function ApplicationTrackerPage() {
-  return <ApplicationTrackerClient />;
+export default function LegacyApplicationTrackerPage() {
+  redirect("/candidate/tracker");
 }
