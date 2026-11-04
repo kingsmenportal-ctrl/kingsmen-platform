@@ -46,6 +46,7 @@ export default function CandidateDocumentsPage() {
             <span aria-hidden="true" className="grid h-10 w-10 place-items-center rounded-xl bg-slate-950 text-lg text-amber-300">✓</span>
             <h2 className="mt-4 font-bold">Human review</h2>
             <p className="mt-2 text-sm leading-6 text-slate-600">OCR may assist extraction, but identity and document decisions require authorised human-review rules where applicable.</p>
+            <a href="/candidate/identity-review" className="mt-3 inline-flex min-h-10 items-center rounded-lg border border-slate-300 px-3 py-2 text-sm font-bold text-slate-800 hover:border-amber-500 hover:bg-amber-50">Request identity review →</a>
           </article>
           <article className="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm">
             <span aria-hidden="true" className="grid h-10 w-10 place-items-center rounded-xl bg-slate-950 text-lg text-amber-300">≋</span>
