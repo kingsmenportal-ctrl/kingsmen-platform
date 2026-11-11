@@ -1,0 +1,82 @@
+name: Kingsmen Staging Truth Vault Runtime Proof
+
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: kingsmen-staging-truth-vault-runtime
+  cancel-in-progress: false
+
+jobs:
+  staging-postgres-runtime-proof:
+    name: staging-postgres-runtime-proof
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    env:
+      NODE_ENV: production
+      KINGSMEN_TRUTH_VAULT_MODE: postgres
+      KINGSMEN_DATABASE_URL: ${{ secrets.KINGSMEN_DATABASE_URL }}
+      KINGSMEN_API_SERVICE_TOKEN: ${{ secrets.KINGSMEN_API_SERVICE_TOKEN }}
+      KINGSMEN_DATABASE_SSL: "true"
+      KINGSMEN_API_HOST: 127.0.0.1
+      KINGSMEN_API_PORT: "8080"
+    steps:
+      - name: Checkout selected commit
+        uses: actions/checkout@v4
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+      - name: Require staging database secret
+        shell: bash
+        run: |
+          if [[ -z "${KINGSMEN_DATABASE_URL}" ]]; then
+            echo "::error::Add the Supabase staging connection string as the GitHub Actions secret KINGSMEN_DATABASE_URL. The value is never printed."
+            exit 2
+          fi
+      - name: Install API dependencies and build
+        run: |
+          npm install --prefix apps/api --no-audit --no-fund
+          npm run api:build
+      - name: Start PostgreSQL-backed API and run integration proof
+        shell: bash
+        run: |
+          set -euo pipefail
+          mkdir -p reports/staging
+          node apps/api/dist/server.js > /tmp/kingsmen-api-runtime.log 2>&1 &
+          API_PID=$!
+          cleanup() {
+            kill "$API_PID" 2>/dev/null || true
+            wait "$API_PID" 2>/dev/null || true
+          }
+          trap cleanup EXIT
+          ready=0
+          for attempt in $(seq 1 30); do
+            if curl --fail --silent http://127.0.0.1:8080/health > /tmp/kingsmen-health.json; then
+              ready=1
+              break
+            fi
+            if ! kill -0 "$API_PID" 2>/dev/null; then
+              cat /tmp/kingsmen-api-runtime.log
+              echo "::error::API exited before health became ready."
+              exit 1
+            fi
+            sleep 2
+          done
+          if [[ "$ready" != "1" ]]; then
+            cat /tmp/kingsmen-api-runtime.log
+            echo "::error::API health check timed out."
+            exit 1
+          fi
+          node apps/api/scripts/prove-truth-vault-runtime.mjs | tee reports/staging/truth-vault-runtime-integration-latest.json
+      - name: Upload runtime evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: kingsmen-staging-truth-vault-runtime-proof
+          path: reports/staging/truth-vault-runtime-integration-latest.json
+          if-no-files-found: warn
+          retention-days: 30
