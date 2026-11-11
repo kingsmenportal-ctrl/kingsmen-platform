@@ -1,0 +1,68 @@
+name: Kingsmen API Build and Smoke Tests
+
+on:
+  pull_request:
+    branches: [main]
+    paths:
+      - "apps/api/**"
+      - "scripts/validators/**"
+      - "package.json"
+      - "package-lock.json"
+      - ".github/workflows/api-build-test.yml"
+  push:
+    branches: [main]
+    paths:
+      - "apps/api/**"
+      - "scripts/validators/**"
+      - "package.json"
+      - "package-lock.json"
+      - ".github/workflows/api-build-test.yml"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: api-build-test-${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  api-build-and-smoke:
+    name: API build and runtime smoke tests
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+          cache-dependency-path: package-lock.json
+
+      - name: Install repository tools reproducibly
+        run: npm ci --ignore-scripts --no-audit --no-fund
+
+      - name: Require the committed API lockfile
+        run: |
+          if [ ! -f apps/api/package-lock.json ]; then
+            echo "::error file=apps/api/package-lock.json::API lockfile is missing. Generate and review it from apps/api/package.json in a trusted network-enabled environment; do not bypass this gate with npm install."
+            exit 1
+          fi
+
+      - name: Install API dependencies reproducibly
+        run: npm ci --prefix apps/api --ignore-scripts --no-audit --no-fund
+
+      - name: Build API and run runtime smoke tests
+        run: npm --prefix apps/api test
+
+      - name: Run repository regression suite
+        run: npm test
+
+      - name: Validate API Truth Vault persistence contract
+        run: npm run api:validate
+
+      - name: Validate web/backend security boundary
+        run: npm run web:validate:backend-boundary
