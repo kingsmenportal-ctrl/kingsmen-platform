@@ -50,6 +50,22 @@ if (matrix.allPassed !== true) failures.push("matrix allPassed must be true");
 if (!Array.isArray(matrix.rows) || matrix.rows.length !== 3) failures.push("matrix must have 3 rows");
 if (matrix.handoverTo !== "N08-FOUNDER-CONTROL") failures.push("matrix must hand over to N08-FOUNDER-CONTROL");
 
+const enqueueRoute = fs.existsSync("apps/web/src/app/api/founder/airtable/sync/enqueue/route.ts")
+  ? fs.readFileSync("apps/web/src/app/api/founder/airtable/sync/enqueue/route.ts", "utf8")
+  : "";
+
+for (const phrase of [
+  "QUEUE_ADAPTER_NOT_CONFIGURED",
+  "queued: false",
+  "status: 503",
+  "productionReady: false"
+]) {
+  if (!enqueueRoute.includes(phrase)) failures.push(`enqueue route must contain fail-closed marker: ${phrase}`);
+}
+if (enqueueRoute.includes("queued: true")) {
+  failures.push("enqueue route must never claim queued=true without a durable queue write");
+}
+
 const page = fs.existsSync("apps/web/src/app/founder/providers/airtable/page.tsx")
   ? fs.readFileSync("apps/web/src/app/founder/providers/airtable/page.tsx", "utf8")
   : "";
