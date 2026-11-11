@@ -4,7 +4,7 @@ const packages = [
   ["Chancellor's Writ", "R399.99"],
   ["Regency Mandate", "R469.99"],
   ["Artisan Charter", "R149.99"],
-  ["Guildmaster's Charter", "R199.99"],
+  ["Guildmasters Charter", "R199.99"],
   ["CV Revamp", "R49.99"]
 ] as const;
 

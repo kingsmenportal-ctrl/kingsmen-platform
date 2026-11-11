@@ -4,7 +4,7 @@ export const N04_OFFICIAL_PACKAGE_PRICES = {
   CHANCELLORS_WRIT: { name: "Chancellor's Writ", amountCents: 39999, displayPrice: "R399.99" },
   REGENCY_MANDATE: { name: "Regency Mandate", amountCents: 46999, displayPrice: "R469.99" },
   ARTISAN_CHARTER: { name: "Artisan Charter", amountCents: 14999, displayPrice: "R149.99" },
-  GUILDMASTERS_CHARTER: { name: "Guildmaster's Charter", amountCents: 19999, displayPrice: "R199.99" },
+  GUILDMASTERS_CHARTER: { name: "Guildmasters Charter", amountCents: 19999, displayPrice: "R199.99" },
   CV_REVAMP: { name: "CV Revamp", amountCents: 4999, displayPrice: "R49.99" }
 } as const;
 

@@ -138,7 +138,7 @@ try {
     "Chancellor's Writ": 399.99,
     "Regency Mandate": 469.99,
     "Artisan Charter": 149.99,
-    "Guildmaster's Charter": 199.99,
+    "Guildmasters Charter": 199.99,
     "CV Revamp": 49.99
   };
   for (const [name, price] of Object.entries(expectedPrices)) {
