@@ -10,11 +10,11 @@
   },
   "dependencies": {
     "mammoth": "^1.12.0",
-    "next": "latest",
+    "next": "15.5.19",
     "pdf-parse": "^2.4.5",
     "playwright": "^1.60.0",
-    "react": "latest",
-    "react-dom": "latest"
+    "react": "19.2.7",
+    "react-dom": "19.2.7"
   },
   "devDependencies": {
     "@netlify/plugin-nextjs": "latest",
