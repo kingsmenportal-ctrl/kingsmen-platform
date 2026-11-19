@@ -1,6 +1,6 @@
 name: Kingsmen CI
 
-# One ordinary check for independently releasable streams.
+# One ordinary check for independently releasable streams; includes verified candidate application planning.
 on:
   pull_request:
     branches: [main]
