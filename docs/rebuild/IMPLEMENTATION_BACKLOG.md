@@ -19,7 +19,7 @@
 - [ ] Pin/verify frontend dependency versions from a reproducible lockfile.
 - [ ] Verify Supabase Auth configuration and explicit verified identity linkage.
 - [x] Remove the duplicate profile Edge Function declaration, add source-level contract assertions, and deploy/read back the corrected function as active version 5 with `verify_jwt=true`.
-- [ ] Review and test the proposed verified-identity helper replacement in a disposable database before preparing an active migration.
+- [ ] Review and test the proposed verified-identity helper replacement in a disposable database before preparing an active migration. The helper must resolve from `candidate_auth_identity_links` directly; do not depend on `candidate_accounts` (currently empty in staging).
 - [ ] Build or consolidate the candidate registration/login/profile journey against real Supabase persistence.
 - [ ] Record consent version/text and ensure revocation prevents prohibited processing.
 - [ ] Prove save/reload/re-login persistence.
