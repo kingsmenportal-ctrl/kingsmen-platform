@@ -1,0 +1,35 @@
+name: One-off Kingsmen web lockfile refresh
+on:
+  push:
+    branches:
+      - rebuild/kingsmen-one-phase0-2026-11-19
+permissions:
+  contents: write
+jobs:
+  refresh-lockfile:
+    if: contains(github.event.head_commit.message, 'build(web): pin dependencies and patch Next.js 15') == false
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - name: Checkout rebuild branch
+        uses: actions/checkout@v4
+      - name: Set up Node.js 22
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - name: Generate npm lockfile from exact pins
+        run: npm install --prefix apps/web --package-lock-only --ignore-scripts --no-audit --no-fund
+      - name: Verify exact top-level resolutions
+        run: |
+          node --input-type=module -e 'import fs from "node:fs"; const p=JSON.parse(fs.readFileSync("apps/web/package.json","utf8")); const l=JSON.parse(fs.readFileSync("apps/web/package-lock.json","utf8")); for (const name of Object.keys(p.dependencies)) { if (l.packages[""].dependencies[name] !== p.dependencies[name]) throw new Error(`lock root mismatch for ${name}`); } if(l.packages["node_modules/next"]?.version!==p.dependencies.next) throw new Error("Next lock resolution differs"); if(l.packages["node_modules/@netlify/plugin-nextjs"]) throw new Error("manual Netlify adapter entry remains"); console.log("Web lockfile exact pins verified.");'
+      - name: Commit the generated lockfile on this rebuild branch only
+        run: |
+          if git diff --quiet -- apps/web/package-lock.json; then
+            echo 'The lockfile already matches package.json.'
+            exit 0
+          fi
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add apps/web/package-lock.json
+          git commit -m 'build(web): refresh exact dependency lockfile'
+          git push origin HEAD
