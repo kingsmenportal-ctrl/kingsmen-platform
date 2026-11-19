@@ -35,22 +35,7 @@ jobs:
           node-version: "22"
           cache: npm
           cache-dependency-path: apps/web/package-lock.json
-      - name: Generate synchronized web lockfile
-        run: npm install --prefix apps/web --package-lock-only --ignore-scripts --no-audit --no-fund
-      - name: Emit synchronized lockfile for repository repair
-        run: |
-          echo "===KINGSMEN_WEB_LOCK_START==="
-          cat apps/web/package-lock.json
-          echo "===KINGSMEN_WEB_LOCK_END==="
-      - name: Upload synchronized web lockfile for review
-        if: always()
-        uses: actions/upload-artifact@v4
-        with:
-          name: kingsmen-web-package-lock-generated
-          path: apps/web/package-lock.json
-          if-no-files-found: error
-          retention-days: 7
-      - name: Install web dependencies from synchronized lockfile
+      - name: Install web dependencies from committed lockfile
         run: npm ci --prefix apps/web
       - name: Validate candidate application draft contract
         run: node scripts/validators/validate-candidate-application-draft-persistence.mjs
