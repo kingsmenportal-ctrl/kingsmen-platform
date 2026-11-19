@@ -11,7 +11,7 @@ on:
   workflow_dispatch:
 
 permissions:
-  contents: read
+  contents: write
 
 jobs:
   web-dependency-security:
@@ -106,8 +106,24 @@ jobs:
           node --input-type=module - "$RUNNER_TEMP/kingsmen-npm-audit.json" <<'NODE'
           import fs from "node:fs";
           const audit = JSON.parse(fs.readFileSync(process.argv[2], "utf8"));
-          const counts = audit.metadata?.vulnerabilities ?? {};
+          if (!audit.metadata?.vulnerabilities || typeof audit.metadata.vulnerabilities !== "object") throw new Error("npm audit report is missing vulnerability metadata; refusing to pass a failed or incomplete audit");
+          const counts = audit.metadata.vulnerabilities;
           const severe = (counts.high ?? 0) + (counts.critical ?? 0);
           console.log("High + critical advisories:", severe);
           if (severe > 0) process.exit(1);
           NODE
+      - name: Commit the tested dependency manifest and lockfile to the rebuild branch
+        if: success()
+        shell: bash
+        env:
+          GITHUB_TOKEN: ${{ github.token }}
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add apps/web/package.json apps/web/package-lock.json
+          if git diff --cached --quiet; then
+            echo "The tested dependency manifest and lockfile already match the branch."
+            exit 0
+          fi
+          git commit -m "security(deps): resolve vulnerable web dependency tree"
+          git push origin "HEAD:${GITHUB_REF_NAME}"
