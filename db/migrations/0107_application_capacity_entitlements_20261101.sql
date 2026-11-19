@@ -132,7 +132,7 @@ REVOKE ALL ON TABLE public.candidate_application_capacity_events FROM PUBLIC,ano
 GRANT ALL ON TABLE public.candidate_application_capacity_reservations TO service_role;
 GRANT ALL ON TABLE public.candidate_application_capacity_events TO service_role;
 
-CREATE OR REPLACE FUNCTION kingsmen_security.current_verified_capacity_candidate_id()
+CREATE OR REPLACE FUNCTION kingsmen_security.current_verified_kingsmen_candidate_id()
 RETURNS uuid LANGUAGE plpgsql STABLE SECURITY DEFINER
 SET search_path TO 'pg_catalog','public','auth'
 AS $function$
@@ -149,7 +149,7 @@ BEGIN
   RETURN v_candidate;
 END;
 $function$;
-REVOKE ALL ON FUNCTION kingsmen_security.current_verified_capacity_candidate_id()
+REVOKE ALL ON FUNCTION kingsmen_security.current_verified_kingsmen_candidate_id()
  FROM PUBLIC,anon,authenticated,service_role;
 
 CREATE OR REPLACE FUNCTION public.get_candidate_application_capacity()
@@ -163,7 +163,7 @@ DECLARE
   v_reservations jsonb:='[]'::jsonb;
 BEGIN
   IF v_uid IS NULL THEN RAISE EXCEPTION 'AUTHENTICATED_CANDIDATE_REQUIRED' USING ERRCODE='42501'; END IF;
-  v_candidate:=kingsmen_security.current_verified_capacity_candidate_id();
+  v_candidate:=kingsmen_security.current_verified_kingsmen_candidate_id();
   IF v_candidate IS NULL THEN RAISE EXCEPTION 'VERIFIED_CANDIDATE_IDENTITY_REQUIRED' USING ERRCODE='42501'; END IF;
   v_candidate_ref:=v_candidate::text;
   SELECT c.public_ref::text INTO v_public_ref FROM public.candidates c
@@ -277,7 +277,7 @@ BEGIN
     RAISE EXCEPTION 'CAPACITY_RESERVATION_INPUT_INVALID' USING ERRCODE='22023';
   END IF;
 
-  v_candidate:=kingsmen_security.current_verified_capacity_candidate_id();
+  v_candidate:=kingsmen_security.current_verified_kingsmen_candidate_id();
   IF v_candidate IS NULL THEN RAISE EXCEPTION 'VERIFIED_CANDIDATE_IDENTITY_REQUIRED' USING ERRCODE='42501'; END IF;
   PERFORM l.id FROM public.candidate_auth_identity_links l
    WHERE l.supabase_user_id=v_uid AND l.candidate_id=v_candidate
@@ -416,7 +416,7 @@ BEGIN
   IF p_reservation_id IS NULL OR length(v_reason) NOT BETWEEN 5 AND 500 THEN
     RAISE EXCEPTION 'CAPACITY_RELEASE_INPUT_INVALID' USING ERRCODE='22023';
   END IF;
-  v_candidate:=kingsmen_security.current_verified_capacity_candidate_id();
+  v_candidate:=kingsmen_security.current_verified_kingsmen_candidate_id();
   IF v_candidate IS NULL THEN RAISE EXCEPTION 'VERIFIED_CANDIDATE_IDENTITY_REQUIRED' USING ERRCODE='42501'; END IF;
   PERFORM l.id FROM public.candidate_auth_identity_links l
    WHERE l.supabase_user_id=v_uid AND l.candidate_id=v_candidate
