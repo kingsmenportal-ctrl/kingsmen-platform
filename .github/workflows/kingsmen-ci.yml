@@ -1,6 +1,6 @@
 name: Kingsmen CI
 
-# One ordinary check for independently releasable streams; includes verified candidate application planning and Edge Function type-checking.
+# One ordinary check for independently releasable streams; includes candidate planning, pathway normalization and Edge Function type-checking.
 on:
   pull_request:
     branches: [main]
