@@ -95,6 +95,8 @@ jobs:
       - name: Install Chromium for browser smoke tests
         run: apps/web/node_modules/.bin/playwright install chromium
       - name: Test candidate draft browser save and resume
+        timeout-minutes: 3
         run: node scripts/staging/test-candidate-application-draft-ui.mjs
       - name: Test candidate profile save, reload and consent
+        timeout-minutes: 3
         run: node scripts/staging/test-candidate-profile-ui.mjs
