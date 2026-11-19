@@ -13,9 +13,11 @@
 - [ ] Complete the row-by-row map for all 130 ledger entries; resolve the 26 rows without a direct source filename match and independently compare both duplicate 0093 source bodies.
 - [x] Add a review-only official-opportunity research manifest from current Department of Employment and Labour pages and explicit closed-cycle records; do not seed or publish the records automatically.
 - [x] Correct the N15 source-ingestion operator's project-session handling, fix the internship matcher, configure origin-specific CORS and add a source-ingestion contract validator.
-- [ ] Deploy the N15 source scanner only after the approved portal origin is confirmed; run it with an authorised reviewer and preserve all observations as NEEDS_REVIEW until human verification.
+- [x] Deploy N15 source ingestion as active staging version 4 with JWT verification enabled and verify deployed source equality against the reviewed branch.
+- [ ] Configure/confirm the actual portal origin and register an authorised platform reviewer; the live reviewer count is 0, so the ingestion action has not been run. Preserve observations as NEEDS_REVIEW until human verification.
 - [ ] Decide repository visibility before adding proprietary or sensitive implementation detail.
 - [ ] Fix the branch-protection evidence secret: the live workflow returns 403 when reading main protection. Keep the evidence gate fail-closed; configure a fine-grained GitHub token with repository Administration: read for `KINGSMEN_BRANCH_PROTECTION_READ_TOKEN`.
+- [ ] Identify and configure the canonical Netlify Portal site in the connected Netlify account before publishing the candidate UI. The visible projects are the old Jarvis site and an empty unrelated site; do not use either as the Kingsmen Portal deployment target.
 - [ ] Capture a reviewed backup/restore path before any database mutation. No backup/restore drill has yet been performed.
 
 ## Stream 1 — Candidate foundation
