@@ -11,6 +11,21 @@ const page = read("apps/web/src/app/candidate/applications/[applicationId]/page.
 const tracker = read("apps/web/src/components/candidate/CandidateApplicationTracker.tsx");
 const workbench = read("apps/web/src/components/candidate/CandidateApplicationWorkbench.tsx");
 const workbenchBrowserTest = read("scripts/staging/test-candidate-workbench-ui.mjs");
+const webManifest = JSON.parse(read("apps/web/package.json"));
+const webLock = JSON.parse(read("apps/web/package-lock.json"));
+const webPackages = webLock.packages ?? {};
+function versionAtLeast(actual, expected) {
+  if (typeof actual !== "string") return false;
+  const a = actual.split(".").map(Number);
+  const e = expected.split(".").map(Number);
+  for (let i = 0; i < 3; i++) {
+    const av = Number.isFinite(a[i]) ? a[i] : 0;
+    const ev = Number.isFinite(e[i]) ? e[i] : 0;
+    if (av > ev) return true;
+    if (av < ev) return false;
+  }
+  return true;
+}
 const workflow = read(".github/workflows/kingsmen-application-draft-contract.yml");
 const auditStart = migration.indexOf("INSERT INTO public.candidate_application_events");
 const auditEnd = migration.indexOf("ON CONFLICT (event_ref) DO NOTHING", auditStart);
@@ -53,6 +68,9 @@ const checks = [
   ["application tracker links owned parent records to the resumable editor", /candidate\/applications\/\$\{application\.id\}/.test(tracker) && /Open \/ resume application draft/.test(tracker)],
   ["workbench links editable prepared parent applications to the same draft editor", /candidate\/applications\/\$\{parent\.id\}/.test(workbench) && /Open \/ resume application draft/.test(workbench) && /READY_TO_SUBMIT/.test(workbench)],
   ["workbench browser contract verifies preparation, resume link and no provider submission", /prepare_master_application/.test(workbenchBrowserTest) && /Open \/ resume application draft/.test(workbenchBrowserTest) && /provider submission endpoint/.test(workbenchBrowserTest) && /test-candidate-workbench-ui\.mjs/.test(workflow)],
+  ["web manifest and lock pin patched Next.js 15.5.29 across its runtime and SWC packages", webManifest.dependencies?.next === "15.5.29" && webPackages["node_modules/next"]?.version === "15.5.29" && webPackages["node_modules/@next/env"]?.version === "15.5.29" && Object.entries(webPackages).filter(([name]) => name.startsWith("node_modules/@next/swc-")).length > 0 && Object.entries(webPackages).filter(([name]) => name.startsWith("node_modules/@next/swc-")).every(([, item]) => item.version === "15.5.29")],
+  ["image optimization and PostCSS dependencies use patched Sharp 0.35.5 and PostCSS 8.5.33", webPackages["node_modules/sharp"]?.version === "0.35.5" && webManifest.overrides?.postcss === "8.5.33" && webPackages["node_modules/postcss"]?.version === "8.5.33"],
+  ["XML parser, Nano ID and source-map transitive dependencies meet patched minimums", versionAtLeast(webPackages["node_modules/@xmldom/xmldom"]?.version, "0.8.15") && versionAtLeast(webPackages["node_modules/nanoid"]?.version, "3.3.18") && versionAtLeast(webPackages["node_modules/source-map-js"]?.version, "1.2.2")],
   ["draft persistence contract runs in the isolated application-draft workflow", /validate-candidate-application-draft-persistence\.mjs/.test(workflow)]
 ];
 let failed = 0;
