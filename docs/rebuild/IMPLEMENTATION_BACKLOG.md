@@ -11,6 +11,9 @@
 - [x] Create an isolated rebuild branch.
 - [x] Recover 63 timestamped applied-migration body snapshots and seven late numbered SQL sources from historical branch evidence; preserve unverified 0087 outside active migration directories.
 - [ ] Complete the row-by-row map for all 130 ledger entries; resolve the 26 rows without a direct source filename match and independently compare both duplicate 0093 source bodies.
+- [x] Add a review-only official-opportunity research manifest from current Department of Employment and Labour pages and explicit closed-cycle records; do not seed or publish the records automatically.
+- [x] Correct the N15 source-ingestion operator's project-session handling, fix the internship matcher, configure origin-specific CORS and add a source-ingestion contract validator.
+- [ ] Deploy the N15 source scanner only after the approved portal origin is confirmed; run it with an authorised reviewer and preserve all observations as NEEDS_REVIEW until human verification.
 - [ ] Decide repository visibility before adding proprietary or sensitive implementation detail.
 - [ ] Fix the branch-protection evidence secret: the live workflow returns 403 when reading main protection. Keep the evidence gate fail-closed; configure a fine-grained GitHub token with repository Administration: read for `KINGSMEN_BRANCH_PROTECTION_READ_TOKEN`.
 - [ ] Capture a reviewed backup/restore path before any database mutation. No backup/restore drill has yet been performed.
@@ -20,6 +23,8 @@
 - [ ] Verify Supabase Auth configuration and explicit verified identity linkage.
 - [x] Remove the duplicate profile Edge Function declaration, add source-level contract assertions, and deploy/read back the corrected function as active version 5 with `verify_jwt=true`.
 - [ ] Review and test the proposed verified-identity helper replacement in a disposable database before preparing an active migration. The helper must resolve from `candidate_auth_identity_links` directly; do not depend on `candidate_accounts` (currently empty in staging).
+- [x] Build the candidate profile UI and correct the duplicate declaration in the existing profile Edge Function (active staging version 5; JWT verification remains enabled).
+- [ ] Complete first-time profile bootstrap, save/reload/re-login and consent withdrawal through an authenticated staging session.
 - [ ] Build or consolidate the candidate registration/login/profile journey against real Supabase persistence.
 - [ ] Record consent version/text and ensure revocation prevents prohibited processing.
 - [ ] Prove save/reload/re-login persistence.

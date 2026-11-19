@@ -15,6 +15,6 @@ assert.ok(edge.includes("ORIGIN_NOT_ALLOWED"), "Unrecognized origins must fail c
 assert.ok(edge.includes("intern\\b"), "Internship link discovery must use a valid word-boundary expression.");
 assert.ok(edge.includes('redirect: "manual"'), "Source fetching must not follow redirects outside the authority without review.");
 assert.ok(edge.includes("withinAuthority(canonical.hostname.toLowerCase(), authorityHost)"), "Discovered links must stay within the registered authority host.");
-assert.ok(!/Access-Control-Allow-Origin["']?\\s*:\\s*["']\\*["']/.test(edge), "N15 CORS must not be wildcarded.");
+assert.ok(!edge.includes('"Access-Control-Allow-Origin": "*"'), "N15 CORS must not be wildcarded.");
 
 console.log("Kingsmen source ingestion contract passed.");
