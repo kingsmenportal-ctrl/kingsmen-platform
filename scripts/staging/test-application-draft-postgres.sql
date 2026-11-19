@@ -48,6 +48,17 @@ DECLARE
   v_rejected boolean;
   v_count integer;
 BEGIN
+  -- The source database's existing event allowlist must be widened by migration 0109.
+  IF NOT EXISTS (
+    SELECT 1
+    FROM pg_constraint c
+    WHERE c.conrelid = 'public.candidate_application_events'::regclass
+      AND c.conname = 'candidate_application_events_event_type_check'
+      AND position('APPLICATION_DRAFT_SAVED' IN pg_get_constraintdef(c.oid)) > 0
+  ) THEN
+    RAISE EXCEPTION 'APPLICATION_DRAFT_SAVED event type is not allowed by the application event constraint';
+  END IF;
+
   -- ACL contract: RPCs are candidate-callable, draft storage is service-only.
   IF has_function_privilege('anon', 'public.get_candidate_application_draft(uuid)', 'EXECUTE') THEN
     RAISE EXCEPTION 'anon can execute get_candidate_application_draft';
