@@ -30,6 +30,8 @@
 - [ ] Verify Supabase Auth configuration and explicit verified identity linkage.
 - [x] Remove the duplicate profile Edge Function declaration, add source-level contract assertions, and verify the active version 6 function exactly matches the branch source with `verify_jwt=true`.
 - [ ] Review and test the proposed verified-identity helper replacement in a disposable database before preparing an active migration. The helper must resolve from `candidate_auth_identity_links` directly; do not depend on `candidate_accounts` (currently empty in staging).
+- [x] Add a seven-case pgTAP regression test specification for pending/revoked/future/mismatched/missing/verified links; the static source validator is wired into `npm test`.
+- [ ] Execute the pgTAP test only on a disposable database after the proposed helper is applied there. It has not been run against staging.
 - [x] Build the candidate profile UI, registration/login/password-recovery screens, project-scoped session and refresh helper; source checks and production web build pass. Authenticated runtime proof remains outstanding.
 - [ ] Complete first-time profile bootstrap, save/reload/re-login and consent withdrawal through an authenticated staging session. No authorised candidate session has been provided or exercised.
 - [x] Implement the registration/login/password-recovery/profile source flow against Supabase Auth and backend profile persistence.
@@ -128,3 +130,11 @@ No force-merges, fabricated approvals, production claims from CI alone, public c
 - [x] Add `validate-kingsmen-official-research-pack.mjs` to `npm test`; it rejects candidate-facing publication defaults and direct database import.
 - [ ] Obtain a source-reviewer role already allowed by N15, then refetch each exact official page through the deployed ingestion path and have an authorized reviewer approve any opening claim.
 - [ ] No live opportunity, provider, deadline or match rows were created from this pack.
+
+
+### Verified-identity gate test preparation — 2026-11-19
+
+- [x] Added `supabase/tests/20261119_verified_candidate_identity_gate.test.sql`: seven rollback-scoped tests for the helper replacement proposal.
+- [x] Added `validate-kingsmen-verified-identity-gate-proposal.mjs` to root `npm test` to check canonical-link resolution, verified status/freshness and rollback-only test guardrails.
+- [ ] The SQL test has not been run; no local PostgreSQL tooling or disposable Supabase branch was available in the current environment. Do not run it against live staging.
+- [ ] Before a live migration, recover the remaining source files, capture/test a restorable backup, and run the pgTAP test plus Candidate A/B RLS tests in a disposable database.
