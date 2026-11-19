@@ -76,7 +76,10 @@ function responseForLoad() {
   };
 }
 
-const server = spawn("npm", ["run", "start"], {
+const server = spawn(process.execPath, [
+  path.resolve(webDirectory, "node_modules/next/dist/bin/next"),
+  "start", "-H", "127.0.0.1", "-p", "3000"
+], {
   cwd: webDirectory,
   env: {
     ...process.env,
@@ -235,5 +238,8 @@ try {
   console.log("PASS: candidate requests use bearer authorization plus the public anon key only");
 } finally {
   if (browser) await browser.close().catch(() => {});
-  server.kill("SIGTERM");
+  if (server.pid) {
+    try { process.kill(-server.pid, "SIGTERM"); }
+    catch { try { server.kill("SIGTERM"); } catch {} }
+  }
 }
