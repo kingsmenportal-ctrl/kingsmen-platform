@@ -84,7 +84,7 @@ type PlanResponse = {
 
 async function requestJson<T>(path: string, init: RequestInit): Promise<T> {
   const config = getKingsmenSupabaseBrowserConfig();
-  const token = getKingsmenSupabaseAccessToken();
+  const token = await getKingsmenSupabaseAccessToken();
   if (!config) throw new Error("Kingsmen services are not configured for this deployment.");
   if (!token) throw new Error("Sign in to Kingsmen first. No session for the configured Supabase project was found.");
   const response = await fetch(`${config.url}${path}`, {

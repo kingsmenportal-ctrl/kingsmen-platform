@@ -47,7 +47,7 @@ type ProfileResponse = {
 
 async function callProfileAction(action: "load" | "save" | "revoke_consent", payload: Record<string, unknown> = {}): Promise<ProfileResponse> {
   const config = getKingsmenSupabaseBrowserConfig();
-  const token = getKingsmenSupabaseAccessToken();
+  const token = await getKingsmenSupabaseAccessToken();
   if (!config) throw new Error("Kingsmen profile service is not configured for this deployment.");
   if (!token) throw new Error("No signed-in Kingsmen session was found for this Supabase project. Sign in, then reload this page.");
 

@@ -85,7 +85,7 @@ export default function N15SourceReviewQueuePage() {
     setError("");
     try {
       const config = getKingsmenSupabaseBrowserConfig();
-      const token = getKingsmenSupabaseAccessToken();
+      const token = await getKingsmenSupabaseAccessToken();
       if (!config) throw new Error("Kingsmen source review is not configured for this deployment.");
       if (!token) throw new Error("Sign in with an authorised Kingsmen reviewer account first.");
       const response = await fetch(config.url + "/functions/v1/n15-source-review-queue", {

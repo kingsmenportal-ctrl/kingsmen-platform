@@ -45,7 +45,7 @@ export default function CandidateOpportunityMatchesPage() {
     setFeed(null);
     try {
       const config = getKingsmenSupabaseBrowserConfig();
-      const token = getKingsmenSupabaseAccessToken();
+      const token = await getKingsmenSupabaseAccessToken();
       if (!config) throw new Error("Candidate matching is not configured for this deployment.");
       if (!token) throw new Error("Please sign in first. Your authenticated session was not found for the configured Kingsmen Supabase project.");
       const response = await fetch(`${config.url}/functions/v1/n15-candidate-opportunities`, {
