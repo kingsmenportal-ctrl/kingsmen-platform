@@ -35,12 +35,12 @@ assert.ok(session.includes("sb-${projectRef}-auth-token"), "Session reads must b
 assert.ok(!session.includes("SUPABASE_SERVICE_ROLE_KEY"), "Browser session helper must not contain a service-role key.");
 assert.ok(dashboard.includes('href: "/candidate/profile"'), "Candidate dashboard must link to the profile page.");
 
-console.log("Kingsmen candidate profile contract passed.");
-
 const latestConsentDeclarations = edgeFunction.match(/const latestConsent = consentRows\?\.\[0\] \?\? null;/g) ?? [];
 assert.equal(latestConsentDeclarations.length, 1, "Profile Edge Function must declare the latest consent record only once in the request handler.");
 assert.ok(edgeFunction.includes("auth.auth.getUser(token)"), "Profile Edge Function must validate the bearer token with Supabase Auth.");
 assert.ok(edgeFunction.includes("candidate_auth_identity_links"), "Profile Edge Function must resolve profile access through the candidate Auth identity-link table.");
 assert.ok(edgeFunction.includes("bootstrap_candidate_self_profile"), "Initial profile creation must use the atomic, server-side bootstrap RPC.");
 assert.ok(edgeFunction.includes('action === "revoke_consent"'), "Profile Edge Function must implement consent withdrawal.");
-assert.ok(!/Access-Control-Allow-Origin["']?\\s*:\\s*["']\\*["']/.test(edgeFunction), "Profile Edge Function must not enable wildcard CORS.");
+assert.ok(!/Access-Control-Allow-Origin["']?\s*:\s*["']\*["']/.test(edgeFunction), "Profile Edge Function must not enable wildcard CORS.");
+
+console.log("Kingsmen candidate profile contract passed.");
