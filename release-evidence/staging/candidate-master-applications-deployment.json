@@ -4,13 +4,13 @@
   "observedAt": "2026-11-19",
   "projectRef": "euhubhhnumtibbyufghm",
   "functionSlug": "candidate-master-applications",
-  "version": 2,
+  "version": 3,
   "status": "ACTIVE",
   "verifyJwt": true,
   "deploymentId": "05c1bce5-f8df-410a-aa6b-a0fbe51ead2a",
   "sourcePath": "supabase/functions/candidate-master-applications/index.ts",
-  "sourceBlobSha": "233326276f171537811dc0acf96ce8b05cb13f7d",
-  "runtimeSha256": "c890aa09000fb5c4cacf7543def5712d7ea1dc81f162ae54855e41b820ea8340",
+  "sourceBlobSha": "c9e9b69b0a0e8024b3293a750775b8f6f9c4b22a",
+  "runtimeSha256": "dec9336477377ea4d25bd2efb26ccc4fc37be1af9df300bb7973710a40c8ec7d",
   "readbackMatchesBranchSource": true,
   "capabilities": {
     "listOwnTargets": true,
@@ -30,7 +30,9 @@
     "requiresConfirmedDeadlineStillOpen": true,
     "requiresOpportunityOpenNowIfOpensAtExists": true,
     "providerSubmissionImplemented": false,
-    "providerOutcomeWritesImplemented": false
+    "providerOutcomeWritesImplemented": false,
+    "listOwnActivityEvents": true,
+    "recordTargetPlannedEventIdempotently": true
   },
   "reviewSnapshot": {
     "candidateAccounts": 0,
@@ -48,5 +50,5 @@
   "authenticatedRequestVerified": false,
   "targetCreationVerified": false,
   "browserEndToEndVerified": false,
-  "note": "The endpoint is deployed with JWT verification enabled. Deployment and source read-back do not prove authenticated runtime behavior; no active verified candidate identity or canonical opportunity records were available to exercise the target-creation path."
+  "note": "Version 3 is active and read-back exactly matches the branch source after CI success. Adds candidate-scoped list_events plus idempotent TARGETS_PLANNED event persistence. Deployment only; no authenticated candidate request, target creation or browser E2E has been verified."
 }

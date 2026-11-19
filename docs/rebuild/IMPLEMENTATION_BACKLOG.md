@@ -17,7 +17,7 @@
 - [x] Deploy N15 source ingestion as active staging version 4 with JWT verification enabled and verify deployed source equality against the reviewed branch.
 - [x] Deploy N15 candidate-opportunity feed as active staging version 4, with JWT verification enabled, a valid verified-link actor/timestamp gate, and explicit configured CORS origins; read back the deployed source.
 - [x] Deploy candidate-master-profile version 6 with JWT verification enabled and read back the exact branch source.
-- [x] Deploy candidate-master-applications version 2 with JWT verification enabled and read back the exact branch source. It creates only internal application-plan targets; no provider submission capability is included. Authenticated runtime/E2E remains unverified.
+- [x] Deploy candidate-master-applications version 3 with JWT verification enabled and read back the exact branch source. It lists own targets/events and idempotently records `TARGETS_PLANNED`; provider submission is not implemented. Authenticated runtime/E2E remains unverified.
 - [x] Deploy N15 source review queue version 1 as a read-only reviewer-gated endpoint, with JWT verification enabled; read back the exact branch source.
 - [ ] Confirm the actual portal origin via KINGSMEN_PORTAL_ORIGINS and register an authorized N15 source reviewer. Live source-review allowlist roles are PLATFORM_ADMIN, PROVIDER_OPERATOR, APPLICATION_REVIEWER and EVIDENCE_VERIFIER; current reviewer table has one IDENTITY_REVIEWER but zero reviewers with an allowed N15 source role. Preserve findings as NEEDS_REVIEW until human verification. The review queue must remain forbidden to non-reviewers.
 - [ ] Decide repository visibility before adding proprietary or sensitive implementation detail.
@@ -112,8 +112,9 @@ No force-merges, fabricated approvals, production claims from CI alone, public c
 
 - [x] Supabase staging `candidate-master-profile` version 6 is active with JWT verification and matches its branch source exactly.
 - [x] Supabase staging `candidate-master-applications` version 2 is active with JWT verification and matches its branch source exactly.
-- [x] The first unified application-planning UI/function is present on PR #320; it supports all six pathways and only creates internal `PLANNING` targets from verified, current source evidence with a confirmed future deadline.
+- [x] The first unified application-planning UI/function is present on PR #320; it supports all six pathways, lists candidate-scoped activity events, and only creates internal `PLANNING` targets from verified, current source evidence with a confirmed future deadline.
 - [x] Exact frontend dependency pins and lockfile are checked in; Next.js is pinned to 15.5.29; the full CI run passed.
+- [x] Add six current official employment adverts to a review-only pack and wire a validator into `npm test`; no records were published or seeded.
 - [ ] Populate the canonical opportunity schema through the gated evidence/reviewer workflow. Counts at review time: 0 candidate opportunity matches, 0 opportunity programmes, 0 providers, 0 source observations, 0 confirmed deadlines and 0 plan targets.
 - [ ] Obtain authorized test-candidate sessions and activate an authorized platform reviewer; no verified candidate identity links or active reviewer accounts are present.
 - [ ] Confirm `KINGSMEN_PORTAL_ORIGINS` contains the actual portal staging origin before browser E2E; no Netlify portal deployment is claimed by this update.

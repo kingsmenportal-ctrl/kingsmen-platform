@@ -31,15 +31,15 @@
     },
     {
       "name": "candidate-master-applications",
-      "version": 2,
+      "version": 3,
       "status": "ACTIVE",
       "verifyJwt": true,
       "deploymentId": "05c1bce5-f8df-410a-aa6b-a0fbe51ead2a",
       "sourcePath": "supabase/functions/candidate-master-applications/index.ts",
-      "sourceBlobSha": "233326276f171537811dc0acf96ce8b05cb13f7d",
-      "runtimeSha256": "c890aa09000fb5c4cacf7543def5712d7ea1dc81f162ae54855e41b820ea8340",
+      "sourceBlobSha": "c9e9b69b0a0e8024b3293a750775b8f6f9c4b22a",
+      "runtimeSha256": "dec9336477377ea4d25bd2efb26ccc4fc37be1af9df300bb7973710a40c8ec7d",
       "readbackMatchesBranchSource": true,
-      "note": "Version 2 is active and read-back exactly matches the branch source. Lists targets and creates internal planning targets only after verified identity, active consent, approved match, fresh official-source observation and confirmed future deadline. No provider submission is implemented. Authenticated target creation and browser E2E are unverified."
+      "note": "Version 3 adds candidate-scoped list_events and idempotent TARGETS_PLANNED event persistence. Lists own targets and creates internal planning targets only after verified identity, active consent, approved match, fresh official-source observation and confirmed future deadline. Provider submission remains unimplemented. Authenticated target creation and browser E2E remain unverified."
     },
     {
       "name": "n15-source-ingestion",
@@ -77,7 +77,9 @@
     "candidateAccounts": 0,
     "candidateAuthIdentityLinks": 0,
     "candidateMasterProfiles": 0,
-    "candidateMasterApplicationTargets": 0
+    "candidateMasterApplicationTargets": 0,
+    "activeEligibleSourceReviewers": 0,
+    "activeIdentityReviewers": 1
   },
   "userFlowsVerified": {
     "authenticatedProfileSaveReload": false,
