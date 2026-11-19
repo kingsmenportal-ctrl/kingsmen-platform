@@ -27,6 +27,11 @@ for (const token of [
   "OPPORTUNITY_NOT_OPEN_YET",
   "deadline.opens_at",
   "candidate_master_application_targets",
+  "candidate_master_application_events",
+  'event_type: "TARGETS_PLANNED"',
+  "recordTargetPlannedEvent",
+  'action !== "list_events"',
+  "onConflict: \"candidate_id,event_type,idempotency_key\"",
   'source_confidence: "UNVERIFIED"',
   'planning_status: "PLANNING"',
   "provider_submission_sent: false",
@@ -50,6 +55,8 @@ assert.ok(page.includes("getKingsmenSupabaseAccessToken"), "Workbench must use p
 assert.ok(page.includes("candidate-master-applications"), "Workbench must call the server-side application planning endpoint.");
 assert.ok(page.includes("candidate-master-profile"), "Workbench must gate on saved profile and consent state.");
 assert.ok(page.includes("Load verified matches"), "Workbench must load the verified opportunity feed.");
+assert.ok(page.includes("My Kingsmen activity"), "Workbench must display the persisted activity timeline.");
+assert.ok(page.includes('callPlan({ action: "list_events" })'), "Workbench must load candidate-scoped events.");
 assert.ok(page.includes("SETA_LEARNERSHIPS: \"SETA_LEARNERSHIP\""), "Feed SETA pathway code must normalize to the canonical application pathway.");
 assert.ok(page.includes("INTERNSHIPS: \"INTERNSHIP\""), "Feed internship pathway code must normalize to the canonical application pathway.");
 assert.ok(page.includes("APPRENTICESHIPS: \"APPRENTICESHIP\""), "Feed apprenticeship pathway code must normalize to the canonical application pathway.");

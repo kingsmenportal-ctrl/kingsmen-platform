@@ -69,6 +69,13 @@ type Target = {
   updated_at: string;
 };
 
+type ApplicationEvent = {
+  id: string;
+  event_type: "PROFILE_SAVED" | "TARGETS_PLANNED";
+  details: Record<string, unknown>;
+  created_at: string;
+};
+
 type PlanResponse = {
   ok?: boolean;
   code?: string;
@@ -77,6 +84,7 @@ type PlanResponse = {
   status?: string;
   count?: number;
   targets?: Target[];
+  events?: ApplicationEvent[];
   target?: Target;
   created?: boolean;
   provider_submission_sent?: boolean;
@@ -144,6 +152,7 @@ function displayDate(value?: string | null): string {
 export default function CandidateWorkbenchPage() {
   const [profile, setProfile] = useState<ProfileResponse | null>(null);
   const [targets, setTargets] = useState<Target[]>([]);
+  const [events, setEvents] = useState<ApplicationEvent[]>([]);
   const [feed, setFeed] = useState<FeedResponse | null>(null);
   const [loading, setLoading] = useState(true);
   const [loadingMatches, setLoadingMatches] = useState(false);
@@ -161,10 +170,15 @@ export default function CandidateWorkbenchPage() {
       const result = await callProfile();
       setProfile(result);
       if (result.identityStatus === "VERIFIED" && result.consent?.status === "ACTIVE") {
-        const plan = await callPlan({ action: "list_targets" });
+        const [plan, timeline] = await Promise.all([
+          callPlan({ action: "list_targets" }),
+          callPlan({ action: "list_events" })
+        ]);
         setTargets(plan.targets ?? []);
+        setEvents(timeline.events ?? []);
       } else {
         setTargets([]);
+        setEvents([]);
       }
     } catch (cause) {
       setError(cause instanceof Error ? cause.message : "The application plan could not be loaded.");
@@ -343,6 +357,35 @@ export default function CandidateWorkbenchPage() {
               </article>
             ))}
           </div>
+        )}
+      </section>
+
+      <section className="rounded-2xl border border-slate-200 bg-white p-5 sm:p-6">
+        <div className="flex flex-wrap items-center justify-between gap-3">
+          <div>
+            <h2 className="text-xl font-bold text-slate-950">My Kingsmen activity</h2>
+            <p className="mt-1 text-sm text-slate-600">A persisted timeline of internal planning events, loaded from your candidate-scoped records.</p>
+          </div>
+          <span className="rounded-full border border-slate-200 bg-slate-50 px-3 py-1 text-xs font-semibold text-slate-700">{events.length} event(s)</span>
+        </div>
+        {events.length === 0 ? (
+          <p className="mt-4 rounded-xl border border-dashed border-slate-300 p-4 text-sm text-slate-600">No recorded application-planning events yet.</p>
+        ) : (
+          <ol className="mt-4 space-y-3">
+            {events.map(event => (
+              <li key={event.id} className="flex gap-3 rounded-xl border border-slate-100 p-4">
+                <span aria-hidden="true" className="mt-1 h-2.5 w-2.5 shrink-0 rounded-full bg-amber-500" />
+                <div className="min-w-0">
+                  <p className="font-semibold text-slate-900">{event.event_type === "TARGETS_PLANNED" ? "Opportunity added to application plan" : "Candidate profile saved"}</p>
+                  <p className="mt-1 text-xs text-slate-500">{displayDate(event.created_at)}</p>
+                  {typeof event.details.programme_or_role === "string" && (
+                    <p className="mt-1 text-sm text-slate-700">{event.details.programme_or_role}{typeof event.details.provider_name === "string" ? " · " + event.details.provider_name : ""}</p>
+                  )}
+                  {typeof event.details.pathway_type === "string" && <p className="mt-1 text-xs text-slate-500">{pathwayLabel(event.details.pathway_type)}</p>}
+                </div>
+              </li>
+            ))}
+          </ol>
         )}
       </section>
 

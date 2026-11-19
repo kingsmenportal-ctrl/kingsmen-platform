@@ -124,6 +124,32 @@ async function hasActiveConsent(admin: ReturnType<typeof createClient<any>>, pub
     grantedAt <= Date.now();
 }
 
+async function recordTargetPlannedEvent(
+  admin: ReturnType<typeof createClient<any>>,
+  candidateId: string,
+  authUserId: string,
+  target: Pick<Target, "id" | "target_key" | "pathway_type" | "provider_name" | "programme_or_role">,
+): Promise<void> {
+  const idempotencyKey = `target-planned:${target.id}`;
+  const { error } = await admin
+    .from("candidate_master_application_events")
+    .upsert({
+      candidate_id: candidateId,
+      actor_auth_user_id: authUserId,
+      event_type: "TARGETS_PLANNED",
+      idempotency_key: idempotencyKey,
+      details: {
+        target_id: target.id,
+        target_key: target.target_key,
+        pathway_type: target.pathway_type,
+        provider_name: target.provider_name,
+        programme_or_role: target.programme_or_role,
+        provider_submission_sent: false
+      }
+    }, { onConflict: "candidate_id,event_type,idempotency_key", ignoreDuplicates: true });
+  if (error) throw new Error("APPLICATION_EVENT_WRITE_FAILED");
+}
+
 async function verifyOpportunityMatch(
   admin: ReturnType<typeof createClient<any>>,
   candidateId: string,
@@ -261,8 +287,8 @@ Deno.serve(async (req: Request) => {
     return reply(400, { ok: false, code: "INVALID_BODY", error: "The request must be a JSON object." }, origin);
   }
   const action = payload.action;
-  if (action !== "list_targets" && action !== "create_draft") {
-    return reply(400, { ok: false, code: "ACTION_NOT_SUPPORTED", error: "Choose list_targets or create_draft." }, origin);
+  if (action !== "list_targets" && action !== "list_events" && action !== "create_draft") {
+    return reply(400, { ok: false, code: "ACTION_NOT_SUPPORTED", error: "Choose list_targets, list_events or create_draft." }, origin);
   }
 
   const admin = createClient(SUPABASE_URL, SUPABASE_SERVICE_ROLE_KEY, { auth: { persistSession: false, autoRefreshToken: false } });
@@ -294,6 +320,17 @@ Deno.serve(async (req: Request) => {
       return reply(200, { ok: true, status: "OK", count: targets?.length ?? 0, targets: (targets ?? []) as Target[] }, origin);
     }
 
+    if (action === "list_events") {
+      const { data: events, error } = await admin
+        .from("candidate_master_application_events")
+        .select("id,event_type,details,created_at")
+        .eq("candidate_id", identity.candidate.id)
+        .order("created_at", { ascending: false })
+        .limit(100);
+      if (error) throw new Error("APPLICATION_EVENT_LIST_FAILED");
+      return reply(200, { ok: true, status: "OK", count: events?.length ?? 0, events: events ?? [] }, origin);
+    }
+
     const matchRef = typeof payload.matchRef === "string" ? payload.matchRef.trim() : "";
     const pathwayType = typeof payload.pathwayType === "string" ? payload.pathwayType.trim() : "";
     if (!/^[A-Za-z0-9._:-]{1,80}$/.test(matchRef) || !PATHWAYS.has(pathwayType)) {
@@ -315,6 +352,7 @@ Deno.serve(async (req: Request) => {
       .maybeSingle();
     if (existingError) throw new Error("EXISTING_TARGET_LOOKUP_FAILED");
     if (existing) {
+      await recordTargetPlannedEvent(admin, identity.candidate.id, authData.user.id, existing);
       return reply(200, { ok: true, created: false, target: existing as Target, provider_submission_sent: false }, origin);
     }
     const providerName = typeof verified.provider.provider_name === "string"
@@ -356,6 +394,7 @@ Deno.serve(async (req: Request) => {
       console.error("candidate application target insert failed", insertError.code ?? "unknown");
       return reply(503, { ok: false, code: "TARGET_SAVE_FAILED", error: "The application plan could not be saved safely. Try again later." }, origin);
     }
+    await recordTargetPlannedEvent(admin, identity.candidate.id, authData.user.id, created);
     return reply(201, {
       ok: true,
       created: true,
