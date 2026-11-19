@@ -181,14 +181,14 @@ try {
   await page.getByRole("heading", { name: "Your profile, one place." }).waitFor();
   await page.getByText("No profile has been saved yet.", { exact: false }).waitFor();
 
-  const nameInput = page.getByLabel("Display name");
+  const nameInput = page.getByLabel("Display name", { exact: true });
   await nameInput.fill(persisted.displayName);
-  await page.getByLabel("Phone (optional)").fill(persisted.phone);
-  await page.getByLabel("Province").selectOption({ label: persisted.province });
-  await page.getByLabel("Highest qualification / grade").fill(persisted.highestQualification);
-  await page.getByLabel("Study interests (optional)").fill(persisted.studyInterests);
-  await page.getByLabel("Employment / skills interests (optional)").fill(persisted.employmentInterests);
-  await page.getByLabel("Preferred location (optional)").fill(persisted.preferredLocation);
+  await page.getByLabel("Phone (optional)", { exact: true }).fill(persisted.phone);
+  await page.getByLabel("Province", { exact: true }).selectOption({ label: persisted.province });
+  await page.getByLabel("Highest qualification / grade", { exact: true }).fill(persisted.highestQualification);
+  await page.getByLabel("Study interests (optional)", { exact: true }).fill(persisted.studyInterests);
+  await page.getByLabel("Employment / skills interests (optional)", { exact: true }).fill(persisted.employmentInterests);
+  await page.getByLabel("Preferred location (optional)", { exact: true }).fill(persisted.preferredLocation);
 
   for (const label of labels) {
     await page.getByRole("checkbox", { name: label }).check();
