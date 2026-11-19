@@ -18,6 +18,7 @@ on:
       - scripts/validators/validate-candidate-application-draft-persistence.mjs
       - scripts/staging/fixtures/application-draft-postgres-bootstrap.sql
       - scripts/staging/test-application-draft-postgres.sql
+      - scripts/staging/test-candidate-application-draft-ui.mjs
       - .github/workflows/kingsmen-application-draft-contract.yml
   workflow_dispatch:
 
@@ -48,6 +49,8 @@ jobs:
       PGUSER: postgres
       PGPASSWORD: postgres
       PGDATABASE: postgres
+      NEXT_PUBLIC_SUPABASE_URL: https://ci-project.supabase.test
+      NEXT_PUBLIC_SUPABASE_ANON_KEY: ci-only-not-a-real-anon-key
     steps:
       - name: Check out rebuild branch
         uses: actions/checkout@v4
@@ -71,5 +74,9 @@ jobs:
         run: psql -v ON_ERROR_STOP=1 -f db/migrations/0109_candidate_application_draft_persistence_20261101.sql
       - name: Test draft save, idempotency, consent and candidate isolation
         run: psql -v ON_ERROR_STOP=1 -f scripts/staging/test-application-draft-postgres.sql
-      - name: Build Next.js application
+      - name: Build Next.js application with CI-only Supabase config
         run: npm --prefix apps/web run build
+      - name: Install Chromium for browser smoke tests
+        run: apps/web/node_modules/.bin/playwright install --with-deps chromium
+      - name: Test candidate draft browser save and resume
+        run: node scripts/staging/test-candidate-application-draft-ui.mjs
