@@ -156,26 +156,20 @@ try {
       consentStatus = "ACTIVE";
       identityStatus = "PENDING_REVIEW";
       saved = true;
-      await route.fulfill({
-        status: 201,
-        json: {
-          ...responseForLoad(),
-          message: "CI fixture profile saved. Identity verification remains pending; no provider application was submitted."
-        }
+      await fulfillJson(201, {
+        ...responseForLoad(),
+        message: "CI fixture profile saved. Identity verification remains pending; no provider application was submitted."
       });
       return;
     }
 
     if (body.action === "revoke_consent") {
       consentStatus = "REVOKED";
-      await route.fulfill({
-        status: 200,
-        json: {
-          ok: true,
-          consent: { status: "REVOKED", version: "KINGSMEN_CI_CONSENT_V1" },
-          profilePreserved: true,
-          message: "CI fixture profile preserved; consent withdrawn."
-        }
+      await fulfillJson(200, {
+        ok: true,
+        consent: { status: "REVOKED", version: "KINGSMEN_CI_CONSENT_V1" },
+        profilePreserved: true,
+        message: "CI fixture profile preserved; consent withdrawn."
       });
       return;
     }
