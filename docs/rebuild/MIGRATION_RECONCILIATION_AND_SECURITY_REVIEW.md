@@ -15,15 +15,19 @@ Live `supabase_migrations.schema_migrations` currently reports:
 - Duplicate name `seed_verified_labour_vacancy_deadlines_0093` at versions `20261029180632` and `20261029180642`.
 - The ledger's timestamp ordering places the entry labelled `atomic_payfast_checkout_bundle_0092` (`20261029180233`) before `remove_duplicate_identity_review_open_request_index_0091` (`20261029180243`).
 
-The current repository tree contains **37 SQL files** across `db/migrations/`, `database/migrations/`, and `supabase/migrations/`. The `db/migrations/` directory has a tracked source file through the `0086` sequence, while the live ledger continues through `0095`; several later live migration names do not have matching source files in the tracked migration directories. The directory structure and naming conventions also differ, so a simple filename-to-version comparison cannot safely reconstruct which SQL was applied.
+Before the recovery commit, the tracked runnable migration directories contained 37 SQL files. From the historical audit branch `audit/institution-migration-and-coverage-reconciliation-2026-10-31` at `5d3dfda8bf1563436761a3aeb5b365013d99ac0b`, this rebuild branch now preserves 63 timestamped applied-migration body snapshots under `release-evidence/recovered-applied-migrations/` and restores seven late numbered SQL sources (`0088`, `0089`, `0091`–`0095`) into `db/migrations/`. The recovered README labels these files archival evidence and explicitly warns that Git blob fingerprints are not checksums of the original SQL bytes executed against staging.
 
-**Conclusion:** the live schema is not reproducible from the currently tracked migration directories alone. Do not reset, rebase, replay or renumber staging migrations. Do not treat the migration ledger as a substitute for the original SQL.
+Migration `0087_consolidate_redundant_rls_policies_and_index.sql` was preserved outside runnable migration directories because no matching live ledger row was found. No `0096`–`0106` proposal was added to active migration directories or applied. The original proposed CAO `0096` guard-only assertion remains documentation-only.
+
+A filename-based scan across seven current/historical branch snapshots found 26 of the 130 live ledger rows without a direct timestamp or normalized-name source match. Additional name-only candidates remain unverified, including the two duplicate `0093` ledger rows. The detailed outstanding rows are listed in `release-evidence/migration-reconciliation/LEDGER_ROWS_WITHOUT_DIRECT_SOURCE_MATCH.md`.
+
+**Conclusion:** the recovered source set is materially better but still does not prove an exact byte-for-byte reconstruction of the live schema history. Do not reset, rebase, replay or renumber staging migrations. Do not treat the ledger or a recovered Git blob SHA as a substitute for the original executed SQL/checksum.
 
 ### Required recovery before schema changes
 
 1. Capture a reviewed, restorable schema/data backup using the supported Supabase export path; record timestamp, project ref, and checksum in access-controlled evidence.
-2. Retrieve missing migration SQL from Git history, CI artefacts or trusted backups; label recovered files with provenance rather than fabricating replacement SQL.
-3. Produce a version-by-version mapping of ledger row, original SQL path and checksum. Mark unrecovered rows explicitly.
+2. Continue recovering missing migration SQL from historical PRs, CI artefacts or trusted backups; label recovered files with provenance rather than fabricating replacement SQL.
+3. Complete a version-by-version mapping of all 130 ledger rows, including exact source path, source-history provenance and any available checksum. Mark the 26 filename-unmatched rows explicitly; do not claim original-execution byte identity from archived Git blobs.
 4. Compare a schema-only dump of live staging against a fresh disposable database restored from the recovered sources. Do not use reset/rebase against staging as a test.
 5. Only after reconciliation, prepare a reviewed forward-only migration for any required change and verify it on a disposable/staging clone before applying.
 

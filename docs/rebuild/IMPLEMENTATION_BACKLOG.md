@@ -9,9 +9,10 @@
 - [x] Confirm current Supabase staging project state and read migration/schema metadata.
 - [x] Record migration duplication, empty core catalogue tables and security-advisor findings.
 - [x] Create an isolated rebuild branch.
-- [ ] Reconcile all migration files under source control with the live 130-entry ledger.
+- [x] Recover 63 timestamped applied-migration body snapshots and seven late numbered SQL sources from historical branch evidence; preserve unverified 0087 outside active migration directories.
+- [ ] Complete the row-by-row map for all 130 ledger entries; resolve the 26 rows without a direct source filename match and independently compare both duplicate 0093 source bodies.
 - [ ] Decide repository visibility before adding proprietary or sensitive implementation detail.
-- [ ] Capture a reviewed backup/restore path before any database mutation.
+- [ ] Capture a reviewed backup/restore path before any database mutation. No backup/restore drill has yet been performed.
 
 ## Stream 1 — Candidate foundation
 - [ ] Pin/verify frontend dependency versions from a reproducible lockfile.
