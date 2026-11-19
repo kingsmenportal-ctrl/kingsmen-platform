@@ -80,42 +80,6 @@ REVOKE ALL ON TABLE public.candidate_application_draft_answers
   FROM PUBLIC, anon, authenticated;
 GRANT ALL ON TABLE public.candidate_application_draft_answers TO service_role;
 
-CREATE OR REPLACE FUNCTION kingsmen_security.current_verified_application_candidate_id()
-RETURNS uuid
-LANGUAGE plpgsql
-STABLE
-SECURITY DEFINER
-SET search_path TO 'pg_catalog', 'public', 'auth'
-AS $function$
-DECLARE
-  v_auth_user_id uuid := auth.uid();
-  v_link_count bigint;
-  v_candidate_id uuid;
-BEGIN
-  IF v_auth_user_id IS NULL THEN
-    RETURN NULL;
-  END IF;
-
-  SELECT count(*), (array_agg(l.candidate_id ORDER BY l.id))[1]
-    INTO v_link_count, v_candidate_id
-  FROM public.candidate_auth_identity_links l
-  WHERE l.supabase_user_id = v_auth_user_id
-    AND l.link_status = 'VERIFIED'
-    AND l.verified_at IS NOT NULL
-    AND l.verified_at <= statement_timestamp()
-    AND l.verified_by IS NOT NULL;
-
-  IF v_link_count <> 1 THEN
-    RETURN NULL;
-  END IF;
-
-  RETURN v_candidate_id;
-END;
-$function$;
-
-REVOKE ALL ON FUNCTION kingsmen_security.current_verified_application_candidate_id()
-  FROM PUBLIC, anon, authenticated, service_role;
-
 CREATE OR REPLACE FUNCTION public.get_candidate_application_draft(p_application_id uuid)
 RETURNS jsonb
 LANGUAGE plpgsql
@@ -136,7 +100,7 @@ BEGIN
       USING ERRCODE = '42501';
   END IF;
 
-  v_candidate_id := kingsmen_security.current_verified_application_candidate_id();
+  v_candidate_id := kingsmen_security.current_verified_kingsmen_candidate_id();
   IF v_candidate_id IS NULL THEN
     RAISE EXCEPTION 'VERIFIED_CANDIDATE_IDENTITY_REQUIRED'
       USING ERRCODE = '42501';
@@ -253,7 +217,7 @@ BEGIN
       USING ERRCODE = '42501';
   END IF;
 
-  v_candidate_id := kingsmen_security.current_verified_application_candidate_id();
+  v_candidate_id := kingsmen_security.current_verified_kingsmen_candidate_id();
   IF v_candidate_id IS NULL THEN
     RAISE EXCEPTION 'VERIFIED_CANDIDATE_IDENTITY_REQUIRED'
       USING ERRCODE = '42501';
