@@ -77,6 +77,6 @@ jobs:
       - name: Build Next.js application with CI-only Supabase config
         run: npm --prefix apps/web run build
       - name: Install Chromium for browser smoke tests
-        run: apps/web/node_modules/.bin/playwright install --with-deps chromium
+        run: apps/web/node_modules/.bin/playwright install chromium
       - name: Test candidate draft browser save and resume
         run: node scripts/staging/test-candidate-application-draft-ui.mjs
