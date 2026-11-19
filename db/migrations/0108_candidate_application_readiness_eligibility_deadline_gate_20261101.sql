@@ -28,10 +28,21 @@ begin
   if v_auth_user_id is null then
     raise exception 'AUTHENTICATED_CANDIDATE_REQUIRED' using errcode = '42501';
   end if;
-  v_candidate_id := kingsmen_security.current_authenticated_candidate_id();
+  v_candidate_id := kingsmen_security.current_verified_kingsmen_candidate_id();
   if v_candidate_id is null then
     raise exception 'VERIFIED_CANDIDATE_IDENTITY_REQUIRED' using errcode = '42501';
   end if;
+
+  IF NOT EXISTS (
+    SELECT 1 FROM public.candidates c
+    WHERE c.id = v_candidate_id AND c.is_active IS TRUE
+  ) THEN
+    RETURN jsonb_build_object(
+      'ok', false, 'code', 'ACTIVE_CANDIDATE_REQUIRED',
+      'message', 'The linked candidate account is inactive. No application record was created.'
+    );
+  END IF;
+
   if p_target_key is null or length(trim(p_target_key)) not between 1 and 120 then
     raise exception 'VALID_TARGET_KEY_REQUIRED' using errcode = '22023';
   end if;
