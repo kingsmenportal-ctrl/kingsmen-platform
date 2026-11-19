@@ -69,3 +69,22 @@
 
 ## Guardrails
 No force-merges, fabricated approvals, production claims from CI alone, public candidate launch before the scoped release gates pass, or destructive schema/source changes before backup and review.
+
+
+## Implementation status — 2026-11-19
+
+### Landed on the rebuild branch (source only; not deployed)
+- [x] Record the Kingsmen One doctrine, Phase 0 read-only audit and staged implementation backlog.
+- [x] Correct the public homepage taxonomy to show the six canonical pathways as distinct routes.
+- [x] Add a canonical-pathway regression validator to `npm test`.
+- [x] Implement `/candidate/profile` against the existing authenticated `candidate-master-profile` Supabase Edge Function.
+- [x] Add project-scoped Supabase browser-session token access; do not scan for or use a token from another Supabase project.
+- [x] Build profile load/save, reusable candidate details, six pathway preferences, explicit consent acceptance, consent withdrawal and server-returned completeness / identity / persistence indicators.
+- [x] Add a candidate-profile contract validator to `npm test` and a dashboard link to the profile page.
+
+### Still required before this slice can be treated as release-ready
+- [ ] Observe the latest GitHub Actions test/build runs after all profile commits; earlier CI success applied to the earlier six-file PR head only.
+- [ ] Fix any fresh CI failures and re-run.
+- [ ] Run a real authenticated browser journey against the intended staging domain, including first profile bootstrap, save, reload, log out/re-login and a second candidate isolation test.
+- [ ] Confirm the current Netlify domain is in the deployed Edge Function CORS allowlist before using the profile page in a live staging browser.
+- [ ] Review consent wording and the applicable privacy/retention terms before a real candidate pilot.
