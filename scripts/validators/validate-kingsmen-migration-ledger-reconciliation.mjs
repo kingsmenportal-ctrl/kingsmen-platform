@@ -103,12 +103,14 @@ for (const header of requiredHeaders) {
 const allowedClasses = new Set([
   "EXACT_TIMESTAMP_RECOVERY_FILE",
   "FILENAME_MATCH_REQUIRES_CONTENT_REVIEW",
+  "HISTORICAL_BRANCH_SOURCE_REQUIRES_CONTENT_REVIEW",
   "NO_MATCHING_SQL_SOURCE_FOUND",
 ]);
 const expectedClasses = {
   EXACT_TIMESTAMP_RECOVERY_FILE: 62,
   FILENAME_MATCH_REQUIRES_CONTENT_REVIEW: 36,
-  NO_MATCHING_SQL_SOURCE_FOUND: 32,
+  HISTORICAL_BRANCH_SOURCE_REQUIRES_CONTENT_REVIEW: 30,
+  NO_MATCHING_SQL_SOURCE_FOUND: 2,
 };
 const errors = [];
 const seenVersions = new Set();
@@ -170,6 +172,36 @@ for (const [index, row] of records.entries()) {
     errors.push(`row ${rowNumber}: missing-source entry must retain the explicit inventory gap marker`);
   }
 
+  if (row.source_class === "HISTORICAL_BRANCH_SOURCE_REQUIRES_CONTENT_REVIEW") {
+    const knownHistoricalRefs = [
+      "303d692b60f36d6a5f26f6ba45e397d8500b1852",
+      "beb8638d0156bacaef2636d943ef5170702f255f",
+      "e3ca10238fe5a23566dc74dc0d59effc56508ce8",
+      "7da2d819fa46cb8de502580515a89825b2c9a07b",
+      "91864d3d4268f80d65c9ca109bf8113bf92e151d",
+      "09932ee911215d4fbf8439d950679c797f6390c4",
+      "baf7ddbd9fa0944974673416175207d7bd3e7ec1",
+      "9b256feb36d40d9581cd848264b5166d27ece327",
+      "38cdb13ffcbbca68f0cbc37cbd9e3aea52a03ec6",
+      "cc3df910cb47b9291d615239c0ea3b3adf0a7255",
+      "a430b684c339aa6787c13f74e1ff4c4ac053f9a5",
+      "7684c8bc45c56387c9756b7b676daf0a1f8294a6",
+      "18f71066ac8ff9fb88711c303a3df38833d873c5",
+    ];
+    if (!knownHistoricalRefs.some((ref) => row.source_ref.includes(ref))) {
+      errors.push(`row ${rowNumber}: historical source candidate must identify a known branch/commit`);
+    }
+    if (
+      !row.source_path.startsWith("db/migrations/") &&
+      !row.source_path.startsWith("supabase/migrations/")
+    ) {
+      errors.push(`row ${rowNumber}: historical candidate must point to a known migration directory`);
+    }
+    if (!/content parity not established/.test(row.source_ref)) {
+      errors.push(`row ${rowNumber}: historical candidate must state that applied-SQL parity is unproven`);
+    }
+  }
+
   if (
     row.source_class !== "NO_MATCHING_SQL_SOURCE_FOUND" &&
     !row.source_path
@@ -228,6 +260,8 @@ if (errors.length > 0) {
 
 console.log(`PASS: ${records.length} migration ledger entries are represented once.`);
 console.log(`PASS: recovery-source classifications = ${JSON.stringify(counts)}`);
-console.log(`PASS: source refs identify recovery snapshot, current-branch candidate, or explicit gap (${candidateRefsOnRebuild} current rebuild; ${candidateRefsOnOpenPullRequests} only on open PR branches)`);
+const historicalCandidateCount = counts.HISTORICAL_BRANCH_SOURCE_REQUIRES_CONTENT_REVIEW;
+console.log(`PASS: source refs classify historical branch candidates separately (${historicalCandidateCount}); applied-SQL parity is not claimed`);
+console.log(`PASS: source refs identify exact snapshots, current-branch candidates, open-PR candidates, historical branch candidates, or explicit gaps (${candidateRefsOnRebuild} current rebuild; ${candidateRefsOnOpenPullRequests} open PR branches)`);
 console.log(`PASS: duplicate ledger names are recorded explicitly = ${duplicateNames.length}`);
 console.log("LIMIT: static manifest validation only; this is not a live Supabase comparison or SQL byte-parity proof.");
