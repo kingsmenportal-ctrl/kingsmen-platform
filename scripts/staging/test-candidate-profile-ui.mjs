@@ -115,7 +115,18 @@ try {
   await page.route("**/functions/v1/candidate-master-profile", async route => {
     const request = route.request();
     const method = request.method();
+    const corsHeaders = {
+      "access-control-allow-origin": "http://127.0.0.1:3000",
+      "access-control-allow-methods": "POST, OPTIONS",
+      "access-control-allow-headers": "authorization, apikey, content-type",
+      "access-control-max-age": "0"
+    };
+    if (method === "OPTIONS") {
+      await route.fulfill({ status: 204, headers: corsHeaders });
+      return;
+    }
     const body = method === "POST" ? request.postDataJSON() : {};
+    const fulfillJson = (status, json) => route.fulfill({ status, json, headers: corsHeaders });
     requests.push({
       method,
       action: body.action,
@@ -125,12 +136,12 @@ try {
     });
 
     if (method !== "POST") {
-      await route.fulfill({ status: 405, json: { ok: false, code: "METHOD_NOT_ALLOWED" } });
+      await fulfillJson(405, { ok: false, code: "METHOD_NOT_ALLOWED" });
       return;
     }
 
     if (body.action === "load") {
-      await route.fulfill({ status: 200, json: responseForLoad() });
+      await fulfillJson(200, responseForLoad());
       return;
     }
 
@@ -169,7 +180,7 @@ try {
       return;
     }
 
-    await route.fulfill({ status: 400, json: { ok: false, code: "ACTION_NOT_SUPPORTED" } });
+    await fulfillJson(400, { ok: false, code: "ACTION_NOT_SUPPORTED" });
   });
 
   await page.goto(baseUrl + "/candidate/profile/", { waitUntil: "networkidle" });
