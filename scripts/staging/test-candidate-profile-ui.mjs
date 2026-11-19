@@ -184,7 +184,7 @@ try {
   const nameInput = page.getByLabel("Display name", { exact: true });
   await nameInput.fill(persisted.displayName);
   await page.getByLabel("Phone (optional)", { exact: true }).fill(persisted.phone);
-  await page.getByLabel("Province").selectOption({ label: persisted.province });
+  await page.locator("form.candidate-doc-panel select").selectOption({ label: persisted.province });
   await page.getByLabel("Highest qualification / grade", { exact: true }).fill(persisted.highestQualification);
   await page.getByLabel("Study interests (optional)", { exact: true }).fill(persisted.studyInterests);
   await page.getByLabel("Employment / skills interests (optional)", { exact: true }).fill(persisted.employmentInterests);
@@ -218,7 +218,7 @@ try {
     throw new Error("Reload did not restore the server-persisted display name.");
   });
   assert.equal(await page.getByLabel("Phone (optional)").inputValue(), persisted.phone);
-  assert.equal(await page.getByLabel("Province").inputValue(), "Gauteng");
+  assert.equal(await page.locator("form.candidate-doc-panel select").inputValue(), "Gauteng");
   for (const label of labels) assert.equal(await page.getByRole("checkbox", { name: label }).isChecked(), true);
 
   // Consent withdrawal is explicit and profile-preserving.
