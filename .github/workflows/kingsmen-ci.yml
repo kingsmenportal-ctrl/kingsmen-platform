@@ -41,7 +41,7 @@ jobs:
           deno-version: v2.x
 
       - name: Type-check candidate Supabase Edge Functions
-        run: deno check --node-modules-dir=auto supabase/functions/candidate-master-profile/index.ts supabase/functions/candidate-master-applications/index.ts supabase/functions/n15-source-ingestion/index.ts
+        run: deno check --node-modules-dir=auto supabase/functions/candidate-master-profile/index.ts supabase/functions/candidate-master-applications/index.ts supabase/functions/n15-source-ingestion/index.ts supabase/functions/n15-candidate-opportunities/index.ts
 
 
       - name: Install API dependencies

@@ -1,34 +1,60 @@
 import "jsr:@supabase/functions-js/edge-runtime.d.ts";
 import { createClient } from "npm:@supabase/supabase-js@2";
 
-const cors = {
-  "Access-Control-Allow-Origin": "https://kingsmen-portal-staging.netlify.app",
-  "Access-Control-Allow-Headers": "authorization, apikey, content-type",
-  "Access-Control-Allow-Methods": "GET, OPTIONS",
-  "Content-Type": "application/json; charset=utf-8"
-};
-function json(body: unknown, status = 200) { return new Response(JSON.stringify(body), { status, headers: cors }); }
+const AUTH_UUID = /^[0-9a-f]{8}-[0-9a-f]{4}-[1-8][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i;
+const DEFAULT_ORIGINS = new Set([
+  "https://kingsmen-portal-staging.netlify.app",
+  "http://localhost:8888",
+  "http://127.0.0.1:8888"
+]);
+function isAllowedOrigin(origin: string): boolean {
+  if (DEFAULT_ORIGINS.has(origin)) return true;
+  const configured = (Deno.env.get("KINGSMEN_PORTAL_ORIGINS") ?? "")
+    .split(",").map(value => value.trim()).filter(Boolean);
+  if (configured.includes(origin)) return true;
+  return /^https:\/\/[a-z0-9-]+--kingsmen-portal-staging\.netlify\.app$/i.test(origin);
+}
+function corsHeaders(origin: string | null): Record<string, string> {
+  const headers: Record<string, string> = {
+    "Access-Control-Allow-Headers": "authorization, apikey, content-type, x-client-info",
+    "Access-Control-Allow-Methods": "GET, OPTIONS",
+    "Access-Control-Max-Age": "600",
+    "Cache-Control": "no-store, max-age=0",
+    "Pragma": "no-cache",
+    "Vary": "Origin",
+    "Content-Type": "application/json; charset=utf-8"
+  };
+  if (origin && isAllowedOrigin(origin)) headers["Access-Control-Allow-Origin"] = origin;
+  return headers;
+}
+function json(body: unknown, status = 200, origin: string | null = null) {
+  return new Response(JSON.stringify(body), { status, headers: corsHeaders(origin) });
+}
 Deno.serve(async (req: Request) => {
-  if (req.method === "OPTIONS") return new Response("ok", { headers: cors });
-  if (req.method !== "GET") return json({ status: "METHOD_NOT_ALLOWED" }, 405);
+  const origin = req.headers.get("Origin");
+  if (origin && !isAllowedOrigin(origin)) return json({ status: "FORBIDDEN", reason: "ORIGIN_NOT_ALLOWED" }, 403, null);
+  if (req.method === "OPTIONS") return new Response(null, { status: 204, headers: corsHeaders(origin) });
+  if (req.method !== "GET") return json({ status: "METHOD_NOT_ALLOWED" }, 405, origin);
   const authorization = req.headers.get("authorization") ?? "";
   const token = authorization.replace(/^Bearer\s+/i, "");
-  if (!token) return json({ status: "UNAUTHENTICATED" }, 401);
+  if (!token) return json({ status: "UNAUTHENTICATED" }, 401, origin);
   const url = Deno.env.get("SUPABASE_URL");
   const anonKey = Deno.env.get("SUPABASE_ANON_KEY");
   const serviceKey = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY");
-  if (!url || !anonKey || !serviceKey) return json({ status: "CONFIGURATION_ERROR" }, 500);
+  if (!url || !anonKey || !serviceKey) return json({ status: "CONFIGURATION_ERROR" }, 500, origin);
 
   const authClient = createClient(url, anonKey, { auth: { persistSession: false, autoRefreshToken: false } });
   const { data: userData, error: authError } = await authClient.auth.getUser(token);
-  if (authError || !userData.user) return json({ status: "UNAUTHENTICATED" }, 401);
+  if (authError || !userData.user) return json({ status: "UNAUTHENTICATED" }, 401, origin);
 
   const admin = createClient(url, serviceKey, { auth: { persistSession: false, autoRefreshToken: false } });
   const { data: link, error: linkError } = await admin.from("candidate_auth_identity_links")
-    .select("candidate_id,link_status").eq("supabase_user_id", userData.user.id).maybeSingle();
-  if (linkError) return json({ status: "DATABASE_ERROR", reason: "IDENTITY_LINK_LOOKUP_FAILED" }, 500);
-  if (!link || link.link_status !== "VERIFIED") {
-    return json({ status: "IDENTITY_REVIEW_REQUIRED", message: "Your Kingsmen identity must be linked and authorised before personalised matching can be shown." }, 403);
+    .select("candidate_id,link_status,verified_at,verified_by").eq("supabase_user_id", userData.user.id).maybeSingle();
+  if (linkError) return json({ status: "DATABASE_ERROR", reason: "IDENTITY_LINK_LOOKUP_FAILED" }, 500, origin);
+  const verifiedAt = Date.parse(link?.verified_at ?? "");
+  if (!link || link.link_status !== "VERIFIED" || !Number.isFinite(verifiedAt) ||
+      verifiedAt > Date.now() || typeof link.verified_by !== "string" || !AUTH_UUID.test(link.verified_by)) {
+    return json({ status: "IDENTITY_REVIEW_REQUIRED", message: "Your Kingsmen identity must have an authorised, valid verification record before personalised matching can be shown." }, 403, origin);
   }
 
   const candidateRef = String(link.candidate_id);
@@ -38,7 +64,7 @@ Deno.serve(async (req: Request) => {
     .eq("source_confidence", "OFFICIAL_VERIFIED")
     .eq("human_review_required", false).eq("sealed_exact_target", false)
     .order("match_score", { ascending: false }).limit(100);
-  if (matchError) return json({ status: "DATABASE_ERROR", reason: "MATCH_LOOKUP_FAILED" }, 500);
+  if (matchError) return json({ status: "DATABASE_ERROR", reason: "MATCH_LOOKUP_FAILED" }, 500, origin);
 
   const now = new Date();
   const pathwayMap: Record<string, string[]> = {
@@ -106,5 +132,5 @@ Deno.serve(async (req: Request) => {
       candidate_submission_is_not_provider_confirmation: true
     },
     empty_reason: results.length ? null : "No opportunities currently satisfy every publication, identity, human-review, official-source and freshness gate. This is not proof that no opportunities exist."
-  });
+  }, 200, origin);
 });
