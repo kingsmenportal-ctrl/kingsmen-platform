@@ -17,7 +17,9 @@ New or staged source:
 - `apps/web/src/lib/candidate-session.ts` and `apps/web/src/lib/read-limited-json.ts` — shared session-token accessor and bounded JSON-body reader for this slice.
 - `apps/web/src/components/candidate/CandidateApplicationTracker.tsx` — editable parent applications now link to the draft editor.
 - `scripts/validators/validate-candidate-application-draft-persistence.mjs` — source-contract validator.
-- `.github/workflows/kingsmen-application-draft-contract.yml` — targeted validation and Next.js build workflow; no deploy step.
+- `scripts/staging/fixtures/application-draft-postgres-bootstrap.sql` and `scripts/staging/test-application-draft-postgres.sql` — disposable PostgreSQL 17 fixture and security/ownership integration checks for migration 0109.
+- `scripts/staging/test-candidate-application-draft-ui.mjs` — mocked Playwright save/reload/read-only browser smoke test.
+- `.github/workflows/kingsmen-application-draft-contract.yml` — targeted source validation, PostgreSQL fixture, Next.js build and browser smoke workflow; no deploy step.
 
 ## Source-contract review
 
@@ -25,7 +27,12 @@ The 30 checks were evaluated against the committed migration, API route, UI page
 
 They cover the owner-bound composite key, RLS and table grants, verified Auth-link identity, parent-application ownership, active consent, bounded and allowlisted answer data, optimistic concurrency, idempotent retries, readiness invalidation, minimal audit details, CAO child-record preservation, the bearer/anon-key boundary, absence of service-role use in the web API, all six pathway labels, and the prohibition on provider submission during draft save.
 
-**Verification boundary:** this was a source-contract inspection using the connected GitHub file contents. A GitHub Actions run result and Next.js build result have not been retrieved, so neither is marked passed. No authenticated browser E2E result exists yet.
+**Automated verification recorded:**
+- At commit `2422d5559328dee2244415e9ca5d8667899a1ab1`, the focused GitHub Actions run passed: strict web dependency install, 30 source-contract checks, fixture bootstrap, migration 0109 application to disposable PostgreSQL 17, all SQL integration assertions, and the Next.js production build. Run: https://github.com/kingsmenportal-ctrl/kingsmen-platform/actions/runs/44546554282
+- The SQL contract test covers first save, idempotent retry, idempotency-key content conflict, stale-version conflict, version increment, readiness invalidation, minimized audit details, reload, own-record access, cross-candidate read/write rejection, missing verified identity/profile rejection, locked submitted state, revoked consent rejection, and table/function grants.
+- A browser smoke test has been added. The first Chromium install failed because `ubuntu-latest` resolved to unsupported Ubuntu 26.04 for the pinned Playwright version. The runner is now pinned to Ubuntu 24.04 and the workflow uses its PostgreSQL service container's `psql` client. The latest run at time of this update is still in progress: https://github.com/kingsmenportal-ctrl/kingsmen-platform/actions/runs/44548477624. Do not mark the browser test passed until its final result is visible.
+
+**Verification boundary:** the SQL test applies migration 0109 against a minimal disposable schema contract; it does not establish that migrations 0107–0109 can safely be applied together to the live schema. There is still no authenticated live-staging browser E2E result.
 
 ## Live Supabase checks relevant to this slice
 
@@ -43,11 +50,11 @@ Do not apply migrations 0107–0109 yet. The migration source is explicitly revi
 1. Reconcile and approve migration provenance for the earlier 0096–0098 and source-history gaps.
 2. Review 0107–0109 together for dependencies, grants, constraints and security-definer ownership.
 3. Capture an approved backup and verify an isolated restore.
-4. Run the database migrations and adversarial tests against a disposable PostgreSQL 17 instance or approved isolated environment.
+4. Migration 0109 has passed a standalone disposable PostgreSQL 17 contract test. Before live application, test the full 0107–0109 dependency chain and its compatibility with the reconciled live schema in a disposable PostgreSQL 17 environment.
 5. Verify the target's migration state and the exact proposed migration set.
 6. Obtain the required staging change-control approval before any live schema mutation.
 7. Create approved synthetic test identities and test profile → verified opportunity → parent draft → saved answers → reload → tracker event with two-candidate isolation.
-8. Retrieve the actual GitHub Actions result and run an authenticated browser E2E against the intended staging build before release.
+8. Confirm the current Playwright workflow result, then run an authenticated browser E2E against the intended staging build after an approved synthetic Auth-to-candidate identity is available.
 
 The 0109 RPCs are SECURITY DEFINER and callable by authenticated candidates by design, so tests must prove positive owner access, negative cross-candidate access, stale/missing identity rejection, consent revocation, conflicting versions, idempotency-key content reuse rejection, and immutability of provider-receipt/outcome states.
 
