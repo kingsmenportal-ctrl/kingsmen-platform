@@ -44,11 +44,6 @@ jobs:
           --health-timeout 5s
           --health-retries 12
     env:
-      PGHOST: localhost
-      PGPORT: 5432
-      PGUSER: postgres
-      PGPASSWORD: postgres
-      PGDATABASE: postgres
       NEXT_PUBLIC_SUPABASE_URL: https://ci-project.supabase.test
       NEXT_PUBLIC_SUPABASE_ANON_KEY: ci-only-not-a-real-anon-key
     steps:
@@ -64,16 +59,22 @@ jobs:
         run: npm ci --prefix apps/web
       - name: Validate candidate application draft contract
         run: node scripts/validators/validate-candidate-application-draft-persistence.mjs
-      - name: Install PostgreSQL client
+      - name: Locate disposable PostgreSQL service container
+        shell: bash
         run: |
-          sudo apt-get update
-          sudo apt-get install -y postgresql-client
+          set -euo pipefail
+          container_id="$(docker ps --format '{{.ID}} {{.Image}}' | awk '$2 == "postgres:17" { print $1; exit }')"
+          if [[ -z "$container_id" ]]; then
+            echo "PostgreSQL 17 service container was not found." >&2
+            exit 1
+          fi
+          echo "KINGSMEN_POSTGRES_CONTAINER_ID=$container_id" >> "$GITHUB_ENV"
       - name: Bootstrap isolated PostgreSQL draft fixture
-        run: psql -v ON_ERROR_STOP=1 -f scripts/staging/fixtures/application-draft-postgres-bootstrap.sql
+        run: docker exec -i "$KINGSMEN_POSTGRES_CONTAINER_ID" psql -U postgres -d postgres -v ON_ERROR_STOP=1 < scripts/staging/fixtures/application-draft-postgres-bootstrap.sql
       - name: Apply draft-persistence migration to disposable PostgreSQL
-        run: psql -v ON_ERROR_STOP=1 -f db/migrations/0109_candidate_application_draft_persistence_20261101.sql
+        run: docker exec -i "$KINGSMEN_POSTGRES_CONTAINER_ID" psql -U postgres -d postgres -v ON_ERROR_STOP=1 < db/migrations/0109_candidate_application_draft_persistence_20261101.sql
       - name: Test draft save, idempotency, consent and candidate isolation
-        run: psql -v ON_ERROR_STOP=1 -f scripts/staging/test-application-draft-postgres.sql
+        run: docker exec -i "$KINGSMEN_POSTGRES_CONTAINER_ID" psql -U postgres -d postgres -v ON_ERROR_STOP=1 < scripts/staging/test-application-draft-postgres.sql
       - name: Build Next.js application with CI-only Supabase config
         run: npm --prefix apps/web run build
       - name: Install Chromium for browser smoke tests
