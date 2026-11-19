@@ -21,6 +21,7 @@ on:
       - scripts/staging/fixtures/application-lifecycle-postgres-bootstrap.sql
       - scripts/staging/test-application-lifecycle-postgres.sql
       - scripts/staging/test-candidate-application-draft-ui.mjs
+      - scripts/staging/test-candidate-profile-ui.mjs
       - .github/workflows/kingsmen-application-draft-contract.yml
   workflow_dispatch:
 
@@ -95,3 +96,5 @@ jobs:
         run: apps/web/node_modules/.bin/playwright install chromium
       - name: Test candidate draft browser save and resume
         run: node scripts/staging/test-candidate-application-draft-ui.mjs
+      - name: Test candidate profile save, reload and consent
+        run: node scripts/staging/test-candidate-profile-ui.mjs
