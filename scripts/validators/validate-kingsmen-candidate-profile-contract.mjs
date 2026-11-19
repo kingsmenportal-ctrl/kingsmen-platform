@@ -51,6 +51,7 @@ assert.ok(edgeFunction.includes("candidate_auth_identity_links"), "Profile Edge 
 assert.ok(edgeFunction.includes("bootstrap_candidate_self_profile"), "Initial profile creation must use the atomic, server-side bootstrap RPC.");
 assert.ok(edgeFunction.includes('action === "revoke_consent"'), "Profile Edge Function must implement consent withdrawal.");
 assert.ok(!/Access-Control-Allow-Origin["']?\s*:\s*["']\*["']/.test(edgeFunction), "Profile Edge Function must not enable wildcard CORS.");
+assert.ok(edgeFunction.includes("KINGSMEN_PORTAL_ORIGINS"), "Profile Edge Function must allow only explicitly configured portal origins.");
 
 assert.ok(opportunityMatches.includes("getKingsmenSupabaseAccessToken"), "Opportunity matches must use the shared project-scoped session helper.");
 assert.ok(opportunityMatches.includes("getKingsmenSupabaseBrowserConfig"), "Opportunity matches must use the shared Supabase browser configuration.");

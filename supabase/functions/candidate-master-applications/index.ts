@@ -50,8 +50,11 @@ function evidenceList(value: unknown): boolean {
 }
 
 function isAllowedOrigin(origin: string): boolean {
-  return ORIGINS.has(origin) ||
-    /^https:\/\/[a-z0-9-]+--kingsmen-portal-staging\.netlify\.app$/i.test(origin);
+  if (ORIGINS.has(origin)) return true;
+  const configured = (Deno.env.get("KINGSMEN_PORTAL_ORIGINS") ?? "")
+    .split(",").map(value => value.trim()).filter(Boolean);
+  if (configured.includes(origin)) return true;
+  return /^https:\/\/[a-z0-9-]+--kingsmen-portal-staging\.netlify\.app$/i.test(origin);
 }
 
 function reply(status: number, body: Record<string, unknown>, origin: string | null) {
@@ -314,14 +317,21 @@ Deno.serve(async (req: Request) => {
     if (existing) {
       return reply(200, { ok: true, created: false, target: existing as Target, provider_submission_sent: false }, origin);
     }
+    const providerName = typeof verified.provider.provider_name === "string"
+      ? verified.provider.provider_name.trim().slice(0, 180) : "";
+    const programmeName = typeof verified.programme.programme_name === "string"
+      ? verified.programme.programme_name.trim().slice(0, 240) : "";
+    if (!providerName || !programmeName) {
+      return reply(409, { ok: false, code: "VERIFIED_TARGET_DETAILS_REQUIRED", error: "The verified provider and programme names must be available before this target can be saved." }, origin);
+    }
     const { data: created, error: insertError } = await admin
       .from("candidate_master_application_targets")
       .insert({
         candidate_id: identity.candidate.id,
         target_key: targetKey,
         pathway_type: pathwayType,
-        provider_name: verified.provider.provider_name,
-        programme_or_role: verified.programme.programme_name,
+        provider_name: providerName,
+        programme_or_role: programmeName,
         provider_application_url: verified.programme.exact_link,
         source_reference: `N15 match reference: ${matchRef}`,
         source_confidence: "UNVERIFIED",

@@ -37,6 +37,9 @@ for (const token of [
 }
 assert.ok(!edge.includes("candidate_accounts"), "Candidate planning must resolve identity from the canonical identity-link table, not legacy candidate_accounts.");
 assert.ok(!edge.includes("SUPABASE_SERVICE_ROLE_KEY" + " = \"\""), "Service-role configuration must be read from the environment only.");
+assert.ok(edge.includes("KINGSMEN_PORTAL_ORIGINS"), "Application planning must allow only explicitly configured portal origins.");
+assert.ok(edge.includes('slice(0, 180)'), "Saved provider labels must respect the database's 180-character limit.");
+assert.ok(edge.includes('slice(0, 240)'), "Saved programme labels must respect the database's 240-character limit.");
 for (const pathway of [
   "HIGHER_EDUCATION", "TVET", "SETA_LEARNERSHIP",
   "INTERNSHIP", "APPRENTICESHIP", "EMPLOYMENT"

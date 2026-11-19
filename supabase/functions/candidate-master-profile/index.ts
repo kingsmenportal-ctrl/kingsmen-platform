@@ -24,7 +24,11 @@ const FIELD_LIMITS: Record<string, number> = {
 };
 type ProfileData = Record<string, string>;
 function isAllowedOrigin(origin: string): boolean {
-  return ORIGINS.has(origin) || /^https:\/\/[a-z0-9-]+--kingsmen-portal-staging\.netlify\.app$/i.test(origin);
+  if (ORIGINS.has(origin)) return true;
+  const configured = (Deno.env.get("KINGSMEN_PORTAL_ORIGINS") ?? "")
+    .split(",").map(value => value.trim()).filter(Boolean);
+  if (configured.includes(origin)) return true;
+  return /^https:\/\/[a-z0-9-]+--kingsmen-portal-staging\.netlify\.app$/i.test(origin);
 }
 function reply(status: number, body: Record<string, unknown>, origin: string | null) {
   const headers: Record<string, string> = {
