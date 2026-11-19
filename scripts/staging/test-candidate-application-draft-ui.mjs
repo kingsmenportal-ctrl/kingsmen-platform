@@ -51,8 +51,12 @@ const states = new Map([
 const providerRequests = [];
 const savedRequests = [];
 
-const server = spawn("npm", ["run", "start"], {
+const server = spawn(process.execPath, [
+  path.resolve(webDirectory, "node_modules/next/dist/bin/next"),
+  "start", "-H", "127.0.0.1", "-p", "3000"
+], {
   cwd: webDirectory,
+  detached: true,
   env: {
     ...process.env,
     NEXT_PUBLIC_SUPABASE_URL: "https://ci-project.supabase.test",
@@ -87,6 +91,8 @@ try {
   }, { ref: fakeSupabaseRef });
 
   const page = await context.newPage();
+  page.setDefaultTimeout(10_000);
+  page.setDefaultNavigationTimeout(15_000);
   await page.route("**/functions/v1/**", async route => {
     providerRequests.push(route.request().url());
     await route.abort();
@@ -197,5 +203,8 @@ try {
   console.log("PASS: no provider-submission endpoint was called");
 } finally {
   if (browser) await browser.close().catch(() => {});
-  server.kill("SIGTERM");
+  if (server.pid) {
+    try { process.kill(-server.pid, "SIGTERM"); }
+    catch { try { server.kill("SIGTERM"); } catch {} }
+  }
 }
