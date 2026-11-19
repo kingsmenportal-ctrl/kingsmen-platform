@@ -93,6 +93,7 @@ const requiredHeaders = [
   "source_class",
   "source_path",
   "all_candidate_paths",
+  "source_ref",
 ];
 const actualHeaders = Object.keys(records[0] ?? {});
 for (const header of requiredHeaders) {
@@ -142,6 +143,33 @@ for (const [index, row] of records.entries()) {
       `row ${rowNumber}: exact-timestamp class must reference a recovery file prefixed with ${row.version}_`,
     );
   }
+  if (!row.source_ref) {
+    errors.push(`row ${rowNumber}: source_ref is required to locate the cited source branch/commit or document the gap`);
+  }
+
+  if (
+    row.source_class === "EXACT_TIMESTAMP_RECOVERY_FILE" &&
+    !row.source_ref.includes("18f71066ac8ff9fb88711c303a3df38833d873c5")
+  ) {
+    errors.push(`row ${rowNumber}: exact-timestamp recovery evidence must identify the audited PR #254 source commit`);
+  }
+
+  if (
+    row.source_class === "FILENAME_MATCH_REQUIRES_CONTENT_REVIEW" &&
+    !(row.source_ref.includes("rebuild/kingsmen-one-foundation-2026-11-17") ||
+      row.source_ref.includes("PR #209 head") ||
+      row.source_ref.includes("PR #254 head"))
+  ) {
+    errors.push(`row ${rowNumber}: filename candidate must identify the branch/commit where it was found`);
+  }
+
+  if (
+    row.source_class === "NO_MATCHING_SQL_SOURCE_FOUND" &&
+    !row.source_ref.startsWith("NO_SOURCE_LOCATED_IN_RECORDED_INVENTORIES_2026-11-19")
+  ) {
+    errors.push(`row ${rowNumber}: missing-source entry must retain the explicit inventory gap marker`);
+  }
+
   if (
     row.source_class !== "NO_MATCHING_SQL_SOURCE_FOUND" &&
     !row.source_path
@@ -157,6 +185,18 @@ for (const [sourceClass, expected] of Object.entries(expectedClasses)) {
   if (counts[sourceClass] !== expected) {
     errors.push(`${sourceClass}: expected ${expected}, found ${counts[sourceClass]}`);
   }
+}
+
+const candidateRefsOnRebuild = records.filter(
+  (row) => row.source_class === "FILENAME_MATCH_REQUIRES_CONTENT_REVIEW" &&
+    row.source_ref.includes("rebuild/kingsmen-one-foundation-2026-11-17"),
+).length;
+const candidateRefsOnOpenPullRequests = records.filter(
+  (row) => row.source_class === "FILENAME_MATCH_REQUIRES_CONTENT_REVIEW" &&
+    (row.source_ref.includes("PR #209 head") || row.source_ref.includes("PR #254 head")),
+).length;
+if (candidateRefsOnRebuild !== 29 || candidateRefsOnOpenPullRequests !== 7) {
+  errors.push(`candidate-source refs differ from the 19 Nov inventory: current rebuild=${candidateRefsOnRebuild}, open PR branches=${candidateRefsOnOpenPullRequests}`);
 }
 
 const duplicateNames = [...versionsByName.entries()]
@@ -188,5 +228,6 @@ if (errors.length > 0) {
 
 console.log(`PASS: ${records.length} migration ledger entries are represented once.`);
 console.log(`PASS: recovery-source classifications = ${JSON.stringify(counts)}`);
+console.log(`PASS: source refs identify recovery snapshot, current-branch candidate, or explicit gap (${candidateRefsOnRebuild} current rebuild; ${candidateRefsOnOpenPullRequests} only on open PR branches)`);
 console.log(`PASS: duplicate ledger names are recorded explicitly = ${duplicateNames.length}`);
 console.log("LIMIT: static manifest validation only; this is not a live Supabase comparison or SQL byte-parity proof.");
