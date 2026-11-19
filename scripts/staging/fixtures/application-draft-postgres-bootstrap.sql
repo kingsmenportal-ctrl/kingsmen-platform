@@ -87,6 +87,28 @@ CREATE TABLE public.candidate_application_events (
   reason_code text,
   details jsonb NOT NULL DEFAULT '{}'::jsonb,
   created_at timestamptz NOT NULL DEFAULT now(),
+  CONSTRAINT candidate_application_events_event_type_check CHECK (event_type IN (
+    'APPLICATION_CREATED',
+    'READINESS_CHECKED',
+    'STATUS_CHANGED',
+    'EVIDENCE_ATTACHED',
+    'MANUAL_PACKAGE_CREATED',
+    'MANUAL_ACTION_RECORDED',
+    'EVIDENCE_VERIFIED',
+    'EVIDENCE_REJECTED',
+    'SUBMISSION_AUTHORIZED',
+    'SUBMISSION_ATTEMPT_CREATED',
+    'SUBMISSION_DISPATCHED',
+    'PROVIDER_ACKNOWLEDGED',
+    'PROVIDER_STATUS_RECORDED',
+    'PROVIDER_OUTCOME_RECORDED',
+    'REVIEW_DECISION_RECORDED',
+    'OUTCOME_RECORDED',
+    'OUTCOME_DISPUTED',
+    'OUTCOME_CORRECTION_DECIDED',
+    'OUTCOME_SUPERSEDED',
+    'CAO_CHOICES_UPDATED'
+  )),
   FOREIGN KEY (application_id, candidate_id)
     REFERENCES public.candidate_applications(id, candidate_id) ON DELETE RESTRICT
 );
