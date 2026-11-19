@@ -1,6 +1,10 @@
 "use client";
 
 import { useMemo, useState } from "react";
+import {
+  getKingsmenSupabaseAccessToken,
+  getKingsmenSupabaseBrowserConfig
+} from "../../../lib/kingsmen/supabase-session";
 
 const PATHWAYS = [
   ["HIGHER_EDUCATION", "Higher education"],
@@ -29,15 +33,6 @@ type Opportunity = {
 
 type Feed = { status: string; count?: number; opportunities?: Opportunity[]; message?: string; empty_reason?: string };
 
-function getAccessToken(): string | null {
-  try {
-    const stored = window.localStorage.getItem("sb-euhubhhnumtibbyufghm-auth-token");
-    if (!stored) return null;
-    const parsed = JSON.parse(stored);
-    return typeof parsed.access_token === "string" ? parsed.access_token : null;
-  } catch { return null; }
-}
-
 export default function CandidateOpportunityMatchesPage() {
   const [feed, setFeed] = useState<Feed | null>(null);
   const [pathway, setPathway] = useState("ALL");
@@ -49,14 +44,13 @@ export default function CandidateOpportunityMatchesPage() {
     setError("");
     setFeed(null);
     try {
-      const url = process.env.NEXT_PUBLIC_SUPABASE_URL;
-      const anonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
-      const token = getAccessToken();
-      if (!url || !anonKey) throw new Error("Candidate matching is not configured for this deployment.");
-      if (!token) throw new Error("Please sign in first. Your authenticated session was not found in this browser.");
-      const response = await fetch(`${url.replace(/\/$/, "")}/functions/v1/n15-candidate-opportunities`, {
+      const config = getKingsmenSupabaseBrowserConfig();
+      const token = await getKingsmenSupabaseAccessToken();
+      if (!config) throw new Error("Candidate matching is not configured for this deployment.");
+      if (!token) throw new Error("Please sign in first. Your authenticated session was not found for the configured Kingsmen Supabase project.");
+      const response = await fetch(`${config.url}/functions/v1/n15-candidate-opportunities`, {
         method: "GET",
-        headers: { apikey: anonKey, Authorization: `Bearer ${token}` },
+        headers: { apikey: config.anonKey, Authorization: `Bearer ${token}` },
         cache: "no-store"
       });
       const body = await response.json();

@@ -1,0 +1,19 @@
+{
+  "schema": "kingsmen.staging.edge-function-deployment-evidence.v1",
+  "evidenceType": "supabase_edge_function_deployment",
+  "projectRef": "euhubhhnumtibbyufghm",
+  "functionSlug": "candidate-master-profile",
+  "version": 6,
+  "status": "ACTIVE",
+  "verifyJwt": true,
+  "deploymentId": "2490578a-e08d-41cb-be5e-96eae495b0ee",
+  "sourcePath": "supabase/functions/candidate-master-profile/index.ts",
+  "sourceBlobSha": "73c9995c3f812edbb52e805189cd01b6b19a095a",
+  "runtimeSha256": "7a3fedd589941ba109f30641219e8743721d61ff375a17d69f792f8481858d1f",
+  "readbackMatchesBranchSource": true,
+  "change": "Active profile function read-back exactly matches current rebuild branch source; retains JWT verification and explicit portal-origin allowlisting.",
+  "databaseSchemaChanged": false,
+  "deploymentTimeDataWrites": false,
+  "authenticatedRequestVerified": false,
+  "browserEndToEndVerified": false
+}

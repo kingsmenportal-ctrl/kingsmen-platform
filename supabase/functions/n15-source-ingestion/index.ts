@@ -1,19 +1,40 @@
 import "jsr:@supabase/functions-js/edge-runtime.d.ts";
 import { createClient } from "npm:@supabase/supabase-js@2";
 
-const cors = {
-  "Access-Control-Allow-Origin": "https://kingsmen-portal-staging.netlify.app",
-  "Access-Control-Allow-Headers": "authorization, apikey, content-type",
-  "Access-Control-Allow-Methods": "POST, OPTIONS",
-  "Content-Type": "application/json; charset=utf-8"
-};
+const DEFAULT_ORIGINS = new Set([
+  "https://kingsmen-portal-staging.netlify.app",
+  "http://localhost:8888",
+  "http://127.0.0.1:8888"
+]);
+
+function isAllowedOrigin(origin: string): boolean {
+  if (DEFAULT_ORIGINS.has(origin)) return true;
+  const configured = (Deno.env.get("KINGSMEN_PORTAL_ORIGINS") ?? "")
+    .split(",").map(value => value.trim()).filter(Boolean);
+  if (configured.includes(origin)) return true;
+  return /^https:\/\/[a-z0-9-]+--kingsmen-portal-staging\.netlify\.app$/i.test(origin);
+}
+
+function corsHeaders(origin: string | null): Record<string, string> {
+  const headers: Record<string, string> = {
+    "Access-Control-Allow-Headers": "authorization, apikey, content-type, x-client-info",
+    "Access-Control-Allow-Methods": "POST, OPTIONS",
+    "Access-Control-Max-Age": "600",
+    "Cache-Control": "no-store, max-age=0",
+    "Pragma": "no-cache",
+    "Vary": "Origin",
+    "Content-Type": "application/json; charset=utf-8"
+  };
+  if (origin && isAllowedOrigin(origin)) headers["Access-Control-Allow-Origin"] = origin;
+  return headers;
+}
 const MAX_HTML_BYTES = 512_000;
 const MAX_LINKS_PER_SOURCE = 25;
 const FRESHNESS_HOURS = 24;
 const KEYWORDS = /opportunit|vacanc|career|job|learnership|internship|apprentice|bursar|funding|admission|apply|programme|program|scholarship|tvet|university|college/i;
 
-function json(body: unknown, status = 200) {
-  return new Response(JSON.stringify(body), { status, headers: cors });
+function json(body: unknown, status = 200, origin: string | null = null) {
+  return new Response(JSON.stringify(body), { status, headers: corsHeaders(origin) });
 }
 function tokenRole(req: Request): string {
   const token = (req.headers.get("authorization") ?? "").replace(/^Bearer\s+/i, "");
@@ -37,7 +58,7 @@ function withinAuthority(host: string, authority: string): boolean {
 function inferSector(text: string, authorityType = ""): string {
   const value = (text + " " + authorityType).toLowerCase();
   if (/nsfas|student aid|funding|bursar|scholarship/.test(value)) return "BURSARY";
-  if (/internship|intern/.test(value)) return "INTERNSHIP";
+  if (/internship|intern\b/.test(value)) return "INTERNSHIP";
   if (/apprentice/.test(value)) return "APPRENTICESHIP";
   if (/learnership|seta/.test(value)) return "LEARNERSHIP";
   if (/tvet|technical vocational/.test(value)) return "TVET";
@@ -161,26 +182,28 @@ async function inspectAuthority(authority: any, supabase: any) {
   }
 }
 Deno.serve(async (req: Request) => {
-  if (req.method === "OPTIONS") return new Response("ok", { headers: cors });
-  if (req.method !== "POST") return json({ status: "METHOD_NOT_ALLOWED" }, 405);
+  const origin = req.headers.get("Origin");
+  if (origin && !isAllowedOrigin(origin)) return json({ status: "FORBIDDEN", reason: "ORIGIN_NOT_ALLOWED" }, 403, null);
+  if (req.method === "OPTIONS") return new Response(null, { status: 204, headers: corsHeaders(origin) });
+  if (req.method !== "POST") return json({ status: "METHOD_NOT_ALLOWED" }, 405, origin);
   const url = Deno.env.get("SUPABASE_URL");
   const key = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY");
   const anonKey = Deno.env.get("SUPABASE_ANON_KEY");
-  if (!url || !key || !anonKey) return json({ status: "CONFIGURATION_ERROR", reason: "SUPABASE_SERVICE_CONFIGURATION_MISSING" }, 500);
+  if (!url || !key || !anonKey) return json({ status: "CONFIGURATION_ERROR", reason: "SUPABASE_SERVICE_CONFIGURATION_MISSING" }, 500, origin);
 
   const bearer = (req.headers.get("authorization") ?? "").replace(/^Bearer\s+/i, "");
   const callerRole = tokenRole(req);
   if (callerRole !== "service_role") {
     const authClient = createClient(url, anonKey, { auth: { persistSession: false, autoRefreshToken: false } });
     const { data: userData, error: authError } = await authClient.auth.getUser(bearer);
-    if (authError || !userData.user) return json({ status: "UNAUTHENTICATED" }, 401);
+    if (authError || !userData.user) return json({ status: "UNAUTHENTICATED" }, 401, origin);
     const reviewerClient = createClient(url, key, { auth: { persistSession: false, autoRefreshToken: false } });
     const { data: reviewer, error: reviewerError } = await reviewerClient.from("platform_reviewers")
       .select("role_code").eq("auth_user_id", userData.user.id).eq("is_active", true)
       .in("role_code", ["PLATFORM_ADMIN", "PROVIDER_OPERATOR", "APPLICATION_REVIEWER", "EVIDENCE_VERIFIER"])
       .limit(1).maybeSingle();
-    if (reviewerError) return json({ status: "DATABASE_ERROR", reason: "REVIEWER_AUTHORIZATION_LOOKUP_FAILED" }, 500);
-    if (!reviewer) return json({ status: "FORBIDDEN", reason: "ACTIVE_OPPORTUNITY_REVIEWER_REQUIRED" }, 403);
+    if (reviewerError) return json({ status: "DATABASE_ERROR", reason: "REVIEWER_AUTHORIZATION_LOOKUP_FAILED" }, 500, origin);
+    if (!reviewer) return json({ status: "FORBIDDEN", reason: "ACTIVE_OPPORTUNITY_REVIEWER_REQUIRED" }, 403, origin);
   }
   const supabase = createClient(url, key, { auth: { persistSession: false, autoRefreshToken: false } });
   const runRef = "n15_run_" + crypto.randomUUID();
@@ -188,13 +211,13 @@ Deno.serve(async (req: Request) => {
   const { error: runError } = await supabase.from("n15_ingestion_runs").insert({
     run_ref: runRef, status: "RUNNING", started_at: startedAt
   });
-  if (runError) return json({ status: "DATABASE_ERROR", reason: "INGESTION_RUN_CREATE_FAILED" }, 500);
+  if (runError) return json({ status: "DATABASE_ERROR", reason: "INGESTION_RUN_CREATE_FAILED" }, 500, origin);
   const { data: authorities, error: authorityError } = await supabase.from("opportunity_source_authorities")
     .select("authority_ref,authority_name,authority_type,base_url,active,sector_scope")
     .eq("active", true).order("authority_ref").limit(100);
   if (authorityError) {
     await supabase.from("n15_ingestion_runs").update({ status: "FAILED", finished_at: new Date().toISOString(), summary: { error: "AUTHORITY_READ_FAILED" } }).eq("run_ref", runRef);
-    return json({ status: "DATABASE_ERROR", reason: "AUTHORITY_READ_FAILED", run_ref: runRef }, 500);
+    return json({ status: "DATABASE_ERROR", reason: "AUTHORITY_READ_FAILED", run_ref: runRef }, 500, origin);
   }
   const results: any[] = [];
   for (let i = 0; i < (authorities ?? []).length; i += 4) {
@@ -216,6 +239,6 @@ Deno.serve(async (req: Request) => {
     observations_created: created, observations_updated: updated, observations_skipped: skipped,
     summary, finished_at: new Date().toISOString()
   }).eq("run_ref", runRef);
-  if (finishError) return json({ status: "DATABASE_ERROR", reason: "INGESTION_RUN_FINISH_FAILED", run_ref: runRef }, 500);
-  return json(summary, status === "FAILED" ? 502 : 200);
+  if (finishError) return json({ status: "DATABASE_ERROR", reason: "INGESTION_RUN_FINISH_FAILED", run_ref: runRef }, 500, origin);
+  return json(summary, status === "FAILED" ? 502 : 200, origin);
 });

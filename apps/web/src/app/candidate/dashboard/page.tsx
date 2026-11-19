@@ -9,6 +9,12 @@ const pathways = [
 
 const workspaceLinks = [
   {
+    href: "/candidate/profile",
+    title: "My profile",
+    description: "Save and reload your reusable candidate details and pathway preferences.",
+    action: "Manage profile"
+  },
+  {
     href: "/candidate/workbench",
     title: "Application workbench",
     description: "Review pathway readiness and manage your application journey.",

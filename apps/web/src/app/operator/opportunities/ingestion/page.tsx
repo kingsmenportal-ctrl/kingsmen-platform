@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { getKingsmenSupabaseAccessToken, getKingsmenSupabaseBrowserConfig } from "../../../../lib/kingsmen/supabase-session";
 
 type RunResult = {
   status: string;
@@ -14,15 +15,6 @@ type RunResult = {
   reason?: string;
 };
 
-function getAccessToken(): string | null {
-  try {
-    const stored = window.localStorage.getItem("sb-euhubhhnumtibbyufghm-auth-token");
-    if (!stored) return null;
-    const parsed = JSON.parse(stored);
-    return typeof parsed.access_token === "string" ? parsed.access_token : null;
-  } catch { return null; }
-}
-
 export default function N15IngestionOperatorPage() {
   const [result, setResult] = useState<RunResult | null>(null);
   const [error, setError] = useState("");
@@ -33,14 +25,13 @@ export default function N15IngestionOperatorPage() {
     setError("");
     setResult(null);
     try {
-      const url = process.env.NEXT_PUBLIC_SUPABASE_URL;
-      const anonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
-      const token = getAccessToken();
-      if (!url || !anonKey) throw new Error("N15 is not configured for this web deployment.");
+      const config = getKingsmenSupabaseBrowserConfig();
+      const token = await getKingsmenSupabaseAccessToken();
+      if (!config) throw new Error("N15 is not configured for this web deployment.");
       if (!token) throw new Error("Sign in with an authorised Kingsmen reviewer account first.");
-      const response = await fetch(`${url.replace(/\/$/, "")}/functions/v1/n15-source-ingestion`, {
+      const response = await fetch(`${config.url}/functions/v1/n15-source-ingestion`, {
         method: "POST",
-        headers: { apikey: anonKey, Authorization: `Bearer ${token}`, "Content-Type": "application/json" },
+        headers: { apikey: config.anonKey, Authorization: `Bearer ${token}`, "Content-Type": "application/json" },
         body: "{}",
         cache: "no-store"
       });
@@ -67,9 +58,14 @@ export default function N15IngestionOperatorPage() {
         <p className="mt-3 max-w-3xl text-sm leading-6 text-slate-600">
           Run a bounded scan of active registered HTTPS authority pages. Discovered links are saved as review-required observations only; this action never publishes an open opportunity or verifies deadlines, eligibility, accreditation or outcomes.
         </p>
-        <button onClick={runIngestion} disabled={busy} className="mt-5 rounded-xl bg-slate-950 px-5 py-3 text-sm font-bold text-white disabled:opacity-50">
-          {busy ? "Scanning registered sources…" : "Run source ingestion"}
-        </button>
+        <div className="mt-5 flex flex-wrap gap-3">
+          <button onClick={runIngestion} disabled={busy} className="rounded-xl bg-slate-950 px-5 py-3 text-sm font-bold text-white disabled:opacity-50">
+            {busy ? "Scanning registered sources…" : "Run source ingestion"}
+          </button>
+          <a href="/operator/opportunities/review" className="rounded-xl border border-slate-300 px-5 py-3 text-sm font-bold text-slate-800 hover:bg-slate-50">
+            Review source observations
+          </a>
+        </div>
       </header>
 
       {error && <section role="alert" className="rounded-2xl border border-amber-300 bg-amber-50 p-5 text-sm leading-6 text-amber-950">{error}</section>}

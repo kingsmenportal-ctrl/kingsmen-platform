@@ -12,6 +12,7 @@ import path from "node:path";
 const repoRoot = path.resolve(process.env.KINGSMEN_REPO_ROOT || process.cwd());
 const candidates = [
   path.join(repoRoot, "db", "migrations"),
+  path.join(repoRoot, "database", "migrations"),
   path.join(repoRoot, "supabase", "migrations"),
 ];
 const migrationDirs = candidates.filter((dir) => fs.existsSync(dir) && fs.statSync(dir).isDirectory());

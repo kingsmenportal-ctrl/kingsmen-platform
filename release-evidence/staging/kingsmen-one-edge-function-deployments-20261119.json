@@ -1,0 +1,93 @@
+{
+  "schema": "kingsmen.staging.edge-function-deployment-evidence.v1",
+  "observedAt": "2026-11-19",
+  "projectRef": "euhubhhnumtibbyufghm",
+  "databaseMutations": false,
+  "liveCatalogueWrites": false,
+  "deployments": [
+    {
+      "name": "candidate-master-profile",
+      "version": 6,
+      "status": "ACTIVE",
+      "verifyJwt": true,
+      "deploymentId": "2490578a-e08d-41cb-be5e-96eae495b0ee",
+      "sourcePath": "supabase/functions/candidate-master-profile/index.ts",
+      "sourceBlobSha": "73c9995c3f812edbb52e805189cd01b6b19a095a",
+      "runtimeSha256": "7a3fedd589941ba109f30641219e8743721d61ff375a17d69f792f8481858d1f",
+      "readbackMatchesBranchSource": true,
+      "note": "Removed duplicate latestConsent declaration previously deployed; CORS is now configurable by explicit portal origins."
+    },
+    {
+      "name": "n15-candidate-opportunities",
+      "version": 4,
+      "status": "ACTIVE",
+      "verifyJwt": true,
+      "deploymentId": "fff0531e-b1ea-463f-8c27-c8a794e9e9c6",
+      "sourcePath": "supabase/functions/n15-candidate-opportunities/index.ts",
+      "sourceBlobSha": "f377aafb1e533b65eba8146d6196b31c6a0da2c8",
+      "runtimeSha256": "0637d49bc7243e4b90bc31a9415be4d081a3854a6b70a4867411388e35390467",
+      "readbackMatchesBranchSource": true,
+      "note": "Explicit origin configuration and VERIFIED identity links must include a past verified_at and UUID-shaped verified_by."
+    },
+    {
+      "name": "candidate-master-applications",
+      "version": 3,
+      "status": "ACTIVE",
+      "verifyJwt": true,
+      "deploymentId": "05c1bce5-f8df-410a-aa6b-a0fbe51ead2a",
+      "sourcePath": "supabase/functions/candidate-master-applications/index.ts",
+      "sourceBlobSha": "c9e9b69b0a0e8024b3293a750775b8f6f9c4b22a",
+      "runtimeSha256": "dec9336477377ea4d25bd2efb26ccc4fc37be1af9df300bb7973710a40c8ec7d",
+      "readbackMatchesBranchSource": true,
+      "note": "Version 3 adds candidate-scoped list_events and idempotent TARGETS_PLANNED event persistence. Lists own targets and creates internal planning targets only after verified identity, active consent, approved match, fresh official-source observation and confirmed future deadline. Provider submission remains unimplemented. Authenticated target creation and browser E2E remain unverified."
+    },
+    {
+      "name": "n15-source-ingestion",
+      "version": 4,
+      "status": "ACTIVE",
+      "verifyJwt": true,
+      "deploymentId": "123abdba-680c-4299-b306-49503c3ae136",
+      "sourcePath": "supabase/functions/n15-source-ingestion/index.ts",
+      "sourceBlobSha": "05c99b07daeb9e252bd3aaf96d5fe80d615bf146",
+      "runtimeSha256": "47cb96487c0699d58feb180b1cad53891a8c27bdfc2edadea7471a0b274e587b",
+      "readbackMatchesBranchSource": true,
+      "note": "Source discovery persists NEEDS_REVIEW observations only; not invoked because no active platform reviewer is registered."
+    },
+    {
+      "name": "n15-source-review-queue",
+      "version": 1,
+      "status": "ACTIVE",
+      "verifyJwt": true,
+      "deploymentId": "1f2c10d3-a4d3-4e1e-87d5-b79b0ef2e222",
+      "sourcePath": "supabase/functions/n15-source-review-queue/index.ts",
+      "sourceBlobSha": "8baccb602bb29f7e62f63c365317a0214fcbe26d",
+      "runtimeSha256": "c44b04cd03c9845ef8b4de8f92b7bf7348737f3d9efa0e14a370fbce88989630",
+      "readbackMatchesBranchSource": true,
+      "note": "Read-only query of NEEDS_REVIEW/STALE observations, authorities, review history and ingestion runs. Requires active reviewer."
+    }
+  ],
+  "currentLiveCounts": {
+    "activePlatformReviewers": 0,
+    "n15IngestionRuns": 0,
+    "externalSourceObservations": 0,
+    "opportunityProgrammes": 0,
+    "opportunityProviders": 0,
+    "opportunityDeadlines": 0,
+    "candidateOpportunityMatches": 0,
+    "candidateAccounts": 0,
+    "candidateAuthIdentityLinks": 0,
+    "candidateMasterProfiles": 0,
+    "candidateMasterApplicationTargets": 0,
+    "activeEligibleSourceReviewers": 0,
+    "activeIdentityReviewers": 1
+  },
+  "userFlowsVerified": {
+    "authenticatedProfileSaveReload": false,
+    "consentWithdrawal": false,
+    "applicationPlanCreateWithVerifiedCandidate": false,
+    "candidateABIsolation": false,
+    "browserE2E": false
+  },
+  "mainBranchChanged": false,
+  "pullRequestMerged": false
+}

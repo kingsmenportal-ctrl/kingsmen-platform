@@ -1,0 +1,26 @@
+{
+  "schema": "kingsmen.staging.edge-function-deployment-evidence.v1",
+  "evidenceType": "supabase_edge_function_deployment",
+  "observedAt": "2026-11-19",
+  "projectRef": "euhubhhnumtibbyufghm",
+  "functionSlug": "n15-source-ingestion",
+  "version": 4,
+  "status": "ACTIVE",
+  "verifyJwt": true,
+  "deploymentId": "123abdba-680c-4299-b306-49503c3ae136",
+  "sourcePath": "supabase/functions/n15-source-ingestion/index.ts",
+  "sourceBlobSha": "05c99b07daeb9e252bd3aaf96d5fe80d615bf146",
+  "runtimeSha256": "47cb96487c0699d58feb180b1cad53891a8c27bdfc2edadea7471a0b274e587b",
+  "readbackMatchesBranchSource": true,
+  "fixes": [
+    "Replaced a corrupt backspace character in the internship word-boundary matcher",
+    "Replaced static-only CORS with explicit origin allowlist and KINGSMEN_PORTAL_ORIGINS configuration",
+    "Added Vary: Origin and no-store headers",
+    "Updated the operator page to use the shared project-scoped Supabase session helper"
+  ],
+  "ingestionInvoked": false,
+  "activePlatformReviewerCount": 0,
+  "candidateFacingOpportunityPublished": false,
+  "databaseRowsWrittenByDeployment": false,
+  "releaseState": "FUNCTION_DEPLOYED_BUT_INGESTION_BLOCKED_NO_ACTIVE_REVIEWER"
+}
