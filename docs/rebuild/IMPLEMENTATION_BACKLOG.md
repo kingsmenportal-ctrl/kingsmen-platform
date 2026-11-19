@@ -12,11 +12,14 @@
 - [x] Recover 63 timestamped applied-migration body snapshots and seven late numbered SQL sources from historical branch evidence; preserve unverified 0087 outside active migration directories.
 - [ ] Complete the row-by-row map for all 130 ledger entries; resolve the 26 rows without a direct source filename match and independently compare both duplicate 0093 source bodies.
 - [ ] Decide repository visibility before adding proprietary or sensitive implementation detail.
+- [ ] Fix the branch-protection evidence secret: the live workflow returns 403 when reading main protection. Keep the evidence gate fail-closed; configure a fine-grained GitHub token with repository Administration: read for `KINGSMEN_BRANCH_PROTECTION_READ_TOKEN`.
 - [ ] Capture a reviewed backup/restore path before any database mutation. No backup/restore drill has yet been performed.
 
 ## Stream 1 — Candidate foundation
 - [ ] Pin/verify frontend dependency versions from a reproducible lockfile.
 - [ ] Verify Supabase Auth configuration and explicit verified identity linkage.
+- [x] Remove the duplicate profile Edge Function declaration, add source-level contract assertions, and deploy/read back the corrected function as active version 5 with `verify_jwt=true`.
+- [ ] Review and test the proposed verified-identity helper replacement in a disposable database before preparing an active migration.
 - [ ] Build or consolidate the candidate registration/login/profile journey against real Supabase persistence.
 - [ ] Record consent version/text and ensure revocation prevents prohibited processing.
 - [ ] Prove save/reload/re-login persistence.

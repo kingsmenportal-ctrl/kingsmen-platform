@@ -1,0 +1,18 @@
+{
+  "schema": "kingsmen.staging.edge-function-deployment-evidence.v1",
+  "evidenceType": "supabase_edge_function_deployment",
+  "projectRef": "euhubhhnumtibbyufghm",
+  "functionSlug": "candidate-master-profile",
+  "version": 5,
+  "status": "ACTIVE",
+  "verifyJwt": true,
+  "deploymentId": "2490578a-e08d-41cb-be5e-96eae495b0ee",
+  "sourcePath": "supabase/functions/candidate-master-profile/index.ts",
+  "sourceBlobSha": "0fa93c048f95cea67052a9c4f6960b66f69ec05d",
+  "runtimeSha256": "9a0b80b30dcf4c034e4d07e20a98fb9a05ad15153be2d56da8132e928402f8b6",
+  "change": "Removed the duplicate latestConsent declaration only; deployed source read-back matches the corrected source file.",
+  "databaseSchemaChanged": false,
+  "liveDataWrites": false,
+  "authenticatedRequestVerified": false,
+  "browserEndToEndVerified": false
+}

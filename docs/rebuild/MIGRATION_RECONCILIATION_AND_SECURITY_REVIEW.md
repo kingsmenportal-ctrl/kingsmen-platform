@@ -3,7 +3,7 @@
 **Observed:** 2026-11-19  
 **Environment:** Supabase staging, project `euhubhhnumtibbyufghm`  
 **Source branch:** `rebuild/kingsmen-one-phase0-2026-11-19`  
-**Change posture:** read-only database review plus source-only changes on the rebuild branch. No database DDL, migration application, data writes, or live Edge Function deployment was performed by this review.
+**Change posture:** read-only database review plus source changes on the rebuild branch. One corrected Edge Function was deployed to staging as version 5 with JWT verification enabled. No database DDL, migration application, or live data writes were performed.
 
 ## 1. Migration history: do not replay
 
@@ -52,17 +52,15 @@ The six public functions flagged by the live advisor are:
 
 Inspection found explicit verified-link and candidate-ownership checks in the CAO read/write functions. The outcome function checks for an active application reviewer/admin role and reviewer-verified evidence. These functions should remain callable only through the intended role/identity model; the advisor warning alone is not a reason to revoke all six.
 
-**Release-blocking review item:** the two application-preparation RPCs call `kingsmen_security.current_authenticated_candidate_id()`, whose current implementation looks up `candidate_accounts.auth_user_id = auth.uid()` but does not itself require a matching `candidate_auth_identity_links` row with `link_status = 'VERIFIED'`. The preparation RPCs therefore rely on the integrity of the account mapping rather than repeating the verified-link predicate. Before candidate exposure, harden or wrap these RPCs so a missing, pending, or revoked identity link fails closed, and run negative tests for Candidate A attempting Candidate B's target/application. Confirm consent is enforced at each candidate action that processes profile data.
+**Release-blocking review item:** the two application-preparation RPCs and RLS policies for candidate master profiles/application targets call `kingsmen_security.current_authenticated_candidate_id()`, whose current implementation looks up `candidate_accounts.auth_user_id = auth.uid()` but does not require a matching `candidate_auth_identity_links` row with `link_status = 'VERIFIED'`. The live counts are currently **0 `candidate_accounts` rows and 0 identity-link rows**, so this is a latent authorization gap, not proof of current candidate data exposure. Add and test the proposed fail-closed helper replacement in `docs/rebuild/proposals/20261119_verified_candidate_identity_gate.md` only after migration source recovery, backup/restore preparation, and disposable-database tests. Run negative tests for pending/revoked links and Candidate A attempting Candidate B's profile, target, application and document.
 
 Do not apply this fix directly to the live database yet: the source migration history is incomplete. Recover and checksum the current function definitions, add a forward-only migration and regression cases, then test them on a disposable database before staging application.
 
 ## 4. Candidate profile stream: source correction
 
-The rebuild branch introduced the candidate profile page and uses the existing authenticated `candidate-master-profile` Edge Function. Review found that the tracked Edge Function source declared `latestConsent` twice in the request-handler scope. The duplicate declaration has been removed in source commit `1ee4ab97e210096cc428a1872d178726b3a7d7ae`.
+The rebuild branch introduced the candidate profile page and uses the existing authenticated `candidate-master-profile` Edge Function. Review found that the deployed/source function declared `latestConsent` twice in the request-handler scope. The duplicate declaration was removed in source commit `1ee4ab97e210096cc428a1872d178726b3a7d7ae`; the source contract validator now tests this plus bearer-token validation, identity-link lookup, server-side bootstrap, consent withdrawal and non-wildcard CORS. The root migration integrity validator also scans `database/migrations/`, and the migration integrity check is wired into `npm test`.
 
-The source contract validator has been extended to assert a single declaration, bearer-token validation through Supabase Auth, identity-link lookup, server-side bootstrap, consent withdrawal and non-wildcard CORS. The root migration integrity validator now also scans `database/migrations/`, and the migration integrity check is wired into `npm test`.
-
-These are **source changes only**. The new contract test has not yet been observed passing in CI at the time this report was authored. The corrected profile function has not been deployed to Supabase by this change, and no authenticated browser journey has been recorded. Do not expose the profile slice until CI is green and the staging runtime tests pass.
+The branch's `Kingsmen CI` and `Jarvis Live Runtime` workflows passed on `890d9745924bd3ceb7a34a75b6cfbdfae2d2719f`. The profile Edge Function is deployed as version **5**, status **ACTIVE**, `verify_jwt=true`, deployment ID `2490578a-e08d-41cb-be5e-96eae495b0ee`, and runtime SHA-256 `9a0b80b30dcf4c034e4d07e20a98fb9a05ad15153be2d56da8132e928402f8b6`. A read-back of version 5 confirmed one declaration and source equality with the corrected branch file. This is deployment evidence only: a successful authenticated request, first-time bootstrap, save/reload/re-login, consent revocation and Candidate A/B browser test have **not** been recorded. Do not expose the candidate slice to end users until those runtime tests pass.
 
 ## 5. Verification checklist for the next gate
 
