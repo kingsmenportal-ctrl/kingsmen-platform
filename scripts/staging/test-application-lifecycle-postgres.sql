@@ -82,7 +82,7 @@ INSERT INTO public.candidate_master_application_targets
    'A', 'PLANNING', 'target-fixture-idem-C',
    'cccccccc-0000-4000-8000-000000000003');
 
--- Call the candidate-facing security-definer functions as authenticated, not as postgres.
+-- Candidate-facing operations run as authenticated and must use RPCs only.
 SET ROLE authenticated;
 SELECT set_config('request.jwt.claim.sub', 'aaaaaaaa-0000-4000-8000-000000000001', true);
 
@@ -92,8 +92,6 @@ DECLARE
   v_saved jsonb;
   v_loaded jsonb;
   v_application_id uuid;
-  v_status text;
-  v_count integer;
   v_message text;
   v_rejected boolean := false;
   v_inactive jsonb;
@@ -115,11 +113,7 @@ BEGIN
   END IF;
 
   v_application_id := (v_prepared->>'application_id')::uuid;
-  SELECT status INTO v_status FROM public.candidate_applications WHERE id = v_application_id
-    AND candidate_id = '11111111-1111-4111-8111-111111111111';
-  IF v_status IS DISTINCT FROM 'DRAFT' THEN
-    RAISE EXCEPTION 'prepared parent application is not candidate-owned DRAFT';
-  END IF;
+  PERFORM set_config('kng_fixture.application_id', v_application_id::text, false);
 
   v_saved := public.save_candidate_application_draft(
     v_application_id,
@@ -141,6 +135,47 @@ BEGIN
      OR v_loaded#>>'{application,status}' IS DISTINCT FROM 'DRAFT'
      OR v_loaded->>'provider_submission_sent' IS DISTINCT FROM 'false' THEN
     RAISE EXCEPTION 'parent application and saved answers did not round-trip: %', v_loaded;
+  END IF;
+
+  -- An Auth user with no verified identity link must fail closed.
+  PERFORM set_config('request.jwt.claim.sub', 'cccccccc-0000-4000-8000-000000000003', true);
+  v_rejected := false;
+  BEGIN
+    PERFORM public.prepare_candidate_application_from_master_target('target-fixture-C-no-link');
+  EXCEPTION WHEN insufficient_privilege THEN
+    GET STACKED DIAGNOSTICS v_message = MESSAGE_TEXT;
+    v_rejected := v_message = 'VERIFIED_CANDIDATE_IDENTITY_REQUIRED';
+  END;
+  IF NOT v_rejected THEN
+    RAISE EXCEPTION 'application preparation did not reject an Auth user with no verified identity link';
+  END IF;
+
+  -- A verified but inactive candidate must not get a draft.
+  PERFORM set_config('request.jwt.claim.sub', 'dddddddd-0000-4000-8000-000000000004', true);
+  v_inactive := public.prepare_candidate_application_from_master_target('any-target-for-inactive-user');
+  IF v_inactive->>'ok' IS DISTINCT FROM 'false'
+     OR v_inactive->>'code' IS DISTINCT FROM 'ACTIVE_CANDIDATE_REQUIRED' THEN
+    RAISE EXCEPTION 'inactive candidate gate failed: %', v_inactive;
+  END IF;
+END
+$lifecycle$;
+
+RESET ROLE;
+
+-- As the disposable database owner, verify persisted rows without granting candidates
+-- direct table reads that the live product intentionally denies.
+DO $persisted_state$
+DECLARE
+  v_application_id uuid := current_setting('kng_fixture.application_id')::uuid;
+  v_status text;
+  v_count integer;
+BEGIN
+  SELECT status INTO v_status
+  FROM public.candidate_applications
+  WHERE id = v_application_id
+    AND candidate_id = '11111111-1111-4111-8111-111111111111';
+  IF v_status IS DISTINCT FROM 'DRAFT' THEN
+    RAISE EXCEPTION 'prepared parent application is not candidate-owned DRAFT';
   END IF;
 
   IF NOT EXISTS (
@@ -173,30 +208,8 @@ BEGIN
   ) THEN
     RAISE EXCEPTION 'preparation/draft save caused a provider submission side effect';
   END IF;
-
-  -- No verified Auth-to-candidate link must fail closed.
-  PERFORM set_config('request.jwt.claim.sub', 'cccccccc-0000-4000-8000-000000000003', true);
-  BEGIN
-    PERFORM public.prepare_candidate_application_from_master_target('target-fixture-C-no-link');
-  EXCEPTION WHEN insufficient_privilege THEN
-    GET STACKED DIAGNOSTICS v_message = MESSAGE_TEXT;
-    v_rejected := v_message = 'VERIFIED_CANDIDATE_IDENTITY_REQUIRED';
-  END;
-  IF NOT v_rejected THEN
-    RAISE EXCEPTION 'application preparation did not reject an Auth user with no verified identity link';
-  END IF;
-
-  -- A verified but inactive candidate must not get a draft.
-  PERFORM set_config('request.jwt.claim.sub', 'dddddddd-0000-4000-8000-000000000004', true);
-  v_inactive := public.prepare_candidate_application_from_master_target('any-target-for-inactive-user');
-  IF v_inactive->>'ok' IS DISTINCT FROM 'false'
-     OR v_inactive->>'code' IS DISTINCT FROM 'ACTIVE_CANDIDATE_REQUIRED' THEN
-    RAISE EXCEPTION 'inactive candidate gate failed: %', v_inactive;
-  END IF;
 END
-$lifecycle$;
-
-RESET ROLE;
+$persisted_state$;
 
 SELECT 'PASS: full 0107 -> 0108 -> 0109 application lifecycle contract' AS result;
 ROLLBACK;
