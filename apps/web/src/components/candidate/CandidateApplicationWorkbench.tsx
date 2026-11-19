@@ -262,7 +262,17 @@ export function CandidateApplicationWorkbench() {
                       <div className="mt-4 flex flex-wrap gap-2">
                         {target.provider_application_url && /^https:\/\//i.test(target.provider_application_url) ? <a href={target.provider_application_url} target="_blank" rel="noopener noreferrer" className="inline-flex min-h-10 items-center rounded-lg border border-slate-300 px-3 py-2 text-xs font-bold text-slate-800">Open official destination ↗</a> : null}
                         {parent ? (
-                          <span className="inline-flex min-h-10 items-center rounded-lg bg-emerald-50 px-3 py-2 text-xs font-bold text-emerald-900">Parent record: {parent.application_ref || parent.status}</span>
+                          <>
+                            <span className="inline-flex min-h-10 items-center rounded-lg bg-emerald-50 px-3 py-2 text-xs font-bold text-emerald-900">Parent record: {parent.application_ref || parent.status}</span>
+                            {["DRAFT", "READINESS_BLOCKED", "READY_FOR_REVIEW", "READY_TO_SUBMIT"].includes(parent.status) ? (
+                              <a
+                                href={`/candidate/applications/${parent.id}`}
+                                className="inline-flex min-h-10 items-center rounded-lg bg-amber-300 px-3 py-2 text-xs font-extrabold text-slate-950 hover:bg-amber-200 focus:outline-none focus:ring-2 focus:ring-amber-500"
+                              >
+                                Open / resume application draft
+                              </a>
+                            ) : null}
+                          </>
                         ) : (
                           <button type="button" onClick={() => void prepareParentApplication(target)} disabled={!!preparingTarget}
                             className="inline-flex min-h-10 items-center rounded-lg bg-slate-950 px-3 py-2 text-xs font-bold text-white disabled:cursor-wait disabled:opacity-60">
