@@ -1,0 +1,240 @@
+{
+  "schema": "kingsmen.opportunity-source-review-pack.v1",
+  "packId": "DEL-VACANCIES-2026-11-19",
+  "observedOn": "2026-11-19",
+  "timezone": "Africa/Johannesburg",
+  "authority": {
+    "name": "South African Department of Employment and Labour",
+    "baseUrl": "https://www.labour.gov.za/",
+    "listUrl": "https://www.labour.gov.za/vacancies/Pages/Vacancies-List.aspx"
+  },
+  "publicationState": "NOT_PUBLISHED",
+  "directDatabaseImportAllowed": false,
+  "liveSourceRefetchRequired": true,
+  "reviewerApprovalRecorded": false,
+  "requiredReviewerRoles": [
+    "PLATFORM_ADMIN",
+    "PROVIDER_OPERATOR",
+    "APPLICATION_REVIEWER",
+    "EVIDENCE_VERIFIER"
+  ],
+  "reviewerGateSnapshot": {
+    "eligibleSourceReviewers": 0,
+    "activeIdentityReviewers": 1,
+    "note": "IDENTITY_REVIEWER does not satisfy the current N15 ingestion/review role allowlist."
+  },
+  "deadlinePolicy": {
+    "date": "2026-11-27",
+    "timezone": "Africa/Johannesburg",
+    "channels": [
+      {
+        "type": "WALK_IN",
+        "closesAt": "16:00",
+        "sourceText": "Advert states 27 November 2026 at 16:00 (walk-in)."
+      },
+      {
+        "type": "ONLINE",
+        "closesAt": "23:59",
+        "sourceText": "Advert states 27 November 2026 at 23:59 (online)."
+      }
+    ],
+    "storeChannelsSeparately": true
+  },
+  "records": [
+    {
+      "id": "DEL-EMP-HR4-4-7-100",
+      "title": "Employment Service Practitioner",
+      "ref": "HR4/4/7/100",
+      "location": "Ermelo Labour Centre",
+      "salary": "R413 001 per annum",
+      "url": "https://www.labour.gov.za/employment-service-practitioner-%285%29",
+      "eligibility": [
+        "Three-year qualification in Social Science (Psychology/Industrial Psychology), Public Administration, Business Management or Public Management",
+        "Two years functional experience in a client-oriented environment",
+        "Valid driver's licence"
+      ],
+      "submission": "New completed and signed Z83 plus updated CV as one attachment; correct title/reference and exact advert-specific channel/address must be rechecked.",
+      "evidence": [
+        "https://www.labour.gov.za/employment-service-practitioner-%285%29",
+        "https://www.labour.gov.za/vacancies/Pages/Vacancies-List.aspx"
+      ]
+    },
+    {
+      "id": "DEL-EMP-HR4-4-4-10-16-18",
+      "title": "Admin Clerk Legal Services (X4 Posts)",
+      "refs": [
+        {
+          "ref": "HR4/4/4/10/16",
+          "location": "Johannesburg Labour Centre, stationed at Pretoria",
+          "posts": 2
+        },
+        {
+          "ref": "HR4/4/4/10/17",
+          "location": "Germiston Labour Centre, stationed at Pretoria",
+          "posts": 1
+        },
+        {
+          "ref": "HR4/4/4/10/18",
+          "location": "Vereeniging Labour Centre, stationed at Pretoria",
+          "posts": 1
+        }
+      ],
+      "salary": "R237 453 per annum",
+      "url": "https://www.labour.gov.za/admin-clerk-legal-services-%28x4-posts%29",
+      "eligibility": [
+        "Grade 12",
+        "No experience required"
+      ],
+      "submission": "New signed/initialled Z83 and CV as one attachment; each post requires the correct reference and its own exact email/submission address; extract separately during review.",
+      "evidence": [
+        "https://www.labour.gov.za/admin-clerk-legal-services-%28x4-posts%29",
+        "https://www.labour.gov.za/vacancies/Pages/Vacancies-List.aspx"
+      ]
+    },
+    {
+      "id": "DEL-EMP-HR4-4-4-10-26-28",
+      "title": "Records Administrator (X9 Posts)",
+      "refs": [
+        {
+          "ref": "HR 4/4/4/10/26",
+          "location": "Gauteng Provincial Office, Parktown, stationed at Pretoria Labour Centre",
+          "posts": 1
+        },
+        {
+          "ref": "HR 4/4/4/10/27",
+          "location": "Germiston Labour Centre",
+          "posts": 1
+        },
+        {
+          "ref": "HR 4/4/4/10/28",
+          "location": "Gauteng Provincial Office, Parktown",
+          "posts": 7
+        }
+      ],
+      "salary": "R280 278 per annum",
+      "url": "https://www.labour.gov.za/records-administrator-%28x9-posts%29",
+      "eligibility": [
+        "Grade 12/Senior Certificate or equivalent",
+        "No experience required"
+      ],
+      "submission": "Advert states ESSA Online and postal/hand-delivery options; new signed/initialled Z83 and CV. Recheck the exact current route.",
+      "evidence": [
+        "https://www.labour.gov.za/records-administrator-%28x9-posts%29",
+        "https://www.labour.gov.za/vacancies/Pages/Vacancies-List.aspx"
+      ],
+      "relatedPriorRecord": {
+        "id": "DEL-RECORDS-ADMIN-X4",
+        "instruction": "Do not merge with the older X4 advert; the source page and reference numbers differ."
+      }
+    },
+    {
+      "id": "DEL-EMP-HR4-4-4-10-09-14",
+      "title": "Claims Processors (X8 Posts)",
+      "refs": [
+        {
+          "ref": "HR4/4/4/10/09",
+          "location": "Johannesburg Labour Centre, stationed at Pretoria",
+          "posts": 1
+        },
+        {
+          "ref": "HR4/4/4/10/10",
+          "location": "Mamelodi Labour Centre",
+          "posts": 2
+        },
+        {
+          "ref": "HR4/4/4/10/11",
+          "location": "Vereeniging Labour Centre",
+          "posts": 1
+        },
+        {
+          "ref": "HR4/4/4/10/12",
+          "location": "Soshanguve Labour Centre",
+          "posts": 2
+        },
+        {
+          "ref": "HR4/4/4/10/13",
+          "location": "Krugersdorp Labour Centre",
+          "posts": 1
+        },
+        {
+          "ref": "HR4/4/4/10/14",
+          "location": "Kempton Park Labour Centre",
+          "posts": 1
+        }
+      ],
+      "salary": "R280 278 per annum",
+      "url": "https://www.labour.gov.za/claims-processors-%28x8-posts%29",
+      "eligibility": [
+        "NQF 6 undergraduate qualification recognised by SAQA in one of the advert's listed public-management, business, operations, management, HRM, nursing, law/LLB, BCom, finance or administration fields",
+        "Claims-processing experience is an added advantage, not stated as mandatory"
+      ],
+      "submission": "Advert states ESSA Online and postal/hand-delivery options; new signed/initialled Z83 and updated CV.",
+      "evidence": [
+        "https://www.labour.gov.za/claims-processors-%28x8-posts%29",
+        "https://www.labour.gov.za/vacancies/Pages/Vacancies-List.aspx"
+      ]
+    },
+    {
+      "id": "DEL-EMP-HR4-4-4-10-24-25",
+      "title": "Claims Credit Officer (X5 Posts)",
+      "refs": [
+        {
+          "ref": "HR4/4/4/10/24",
+          "location": "Gauteng Provincial Office, Parktown",
+          "posts": 3
+        },
+        {
+          "ref": "HR4/4/4/10/25",
+          "location": "Parktown, stationed at Pretoria Labour Centre",
+          "posts": 2
+        }
+      ],
+      "salary": "R280 278 per annum",
+      "url": "https://www.labour.gov.za/claims-credit-officer-%28x5-posts%29",
+      "eligibility": [
+        "Grade 12/Senior Certificate",
+        "0 to 6 months minimum experience as stated in the advert"
+      ],
+      "submission": "Advert states ESSA Online and postal/hand-delivery options; new signed/initialled Z83 and updated CV.",
+      "evidence": [
+        "https://www.labour.gov.za/claims-credit-officer-%28x5-posts%29",
+        "https://www.labour.gov.za/vacancies/Pages/Vacancies-List.aspx"
+      ]
+    },
+    {
+      "id": "DEL-EMP-HR4-4-11-27",
+      "title": "Client Service Officer: Paymaster",
+      "ref": "HR4/4/11/27",
+      "location": "KuGompo City Labour Centre",
+      "salary": "R280 278 per annum",
+      "url": "https://www.labour.gov.za/client-service-officer-paymaster",
+      "eligibility": [
+        "Grade 12/Senior Certificate",
+        "No experience required"
+      ],
+      "submission": "Advert gives a post-specific postal/hand-delivery address and email route; recheck exact contact and application channel from the live page.",
+      "evidence": [
+        "https://www.labour.gov.za/client-service-officer-paymaster",
+        "https://www.labour.gov.za/vacancies/Pages/Vacancies-List.aspx"
+      ]
+    }
+  ],
+  "perRecordDefaults": {
+    "pathway": "EMPLOYMENT",
+    "sectorForN15": "EMPLOYER",
+    "sourceConfidence": "HIGH",
+    "publicationReadiness": "NEEDS_REVIEW",
+    "openingStatusForDatabase": "MANUAL_CHECK_REQUIRED",
+    "candidateFacingSafe": false,
+    "liveRecheckRequired": true,
+    "deadlinePolicyRef": "deadlinePolicy"
+  },
+  "guardrails": [
+    "Do not mark a programme OPEN from this pack alone.",
+    "Do not promote source confidence to OFFICIAL_VERIFIED from page-domain recognition alone.",
+    "Create one deadline observation per submission channel if promotion is eventually approved.",
+    "Do not create provider/programme/deadline/match rows until N15 has refreshed source evidence and an authorized reviewer has decided the case.",
+    "Do not merge the current Records Administrator X9 advert with the older X4 advert.",
+    "Never submit applications externally from the discovery/ingestion workflow."
+  ]
+}

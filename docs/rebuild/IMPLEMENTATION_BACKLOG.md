@@ -12,13 +12,14 @@
 - [x] Recover 63 timestamped applied-migration body snapshots and seven late numbered SQL sources from historical branch evidence; preserve unverified 0087 outside active migration directories.
 - [ ] Complete the row-by-row map for all 130 ledger entries; resolve the 26 rows without a direct source filename match and independently compare both duplicate 0093 source bodies.
 - [x] Add a review-only official-opportunity research manifest from current Department of Employment and Labour pages and explicit closed-cycle records; do not seed or publish the records automatically.
+- [x] Prepare six official Department of Employment and Labour adverts in a structured review-only pack, keeping walk-in and online deadlines separate; add a regression validator that prevents premature publication.
 - [x] Correct the N15 source-ingestion operator's project-session handling, fix the internship matcher, configure origin-specific CORS and add a source-ingestion contract validator.
 - [x] Deploy N15 source ingestion as active staging version 4 with JWT verification enabled and verify deployed source equality against the reviewed branch.
 - [x] Deploy N15 candidate-opportunity feed as active staging version 4, with JWT verification enabled, a valid verified-link actor/timestamp gate, and explicit configured CORS origins; read back the deployed source.
 - [x] Deploy candidate-master-profile version 6 with JWT verification enabled and read back the exact branch source.
 - [x] Deploy candidate-master-applications version 2 with JWT verification enabled and read back the exact branch source. It creates only internal application-plan targets; no provider submission capability is included. Authenticated runtime/E2E remains unverified.
 - [x] Deploy N15 source review queue version 1 as a read-only reviewer-gated endpoint, with JWT verification enabled; read back the exact branch source.
-- [ ] Confirm the actual portal origin via KINGSMEN_PORTAL_ORIGINS and register an authorised platform reviewer; the live active reviewer count is 0, so ingestion has not been run. Preserve observations as NEEDS_REVIEW until human verification. The review queue is live but correctly returns FORBIDDEN to non-reviewers.
+- [ ] Confirm the actual portal origin via KINGSMEN_PORTAL_ORIGINS and register an authorized N15 source reviewer. Live source-review allowlist roles are PLATFORM_ADMIN, PROVIDER_OPERATOR, APPLICATION_REVIEWER and EVIDENCE_VERIFIER; current reviewer table has one IDENTITY_REVIEWER but zero reviewers with an allowed N15 source role. Preserve findings as NEEDS_REVIEW until human verification. The review queue must remain forbidden to non-reviewers.
 - [ ] Decide repository visibility before adding proprietary or sensitive implementation detail.
 - [ ] Fix the branch-protection evidence secret: the live workflow returns 403 when reading main protection. Keep the evidence gate fail-closed; configure a fine-grained GitHub token with repository Administration: read for `KINGSMEN_BRANCH_PROTECTION_READ_TOKEN`.
 - [ ] Identify and configure the canonical Netlify Portal site in the connected Netlify account before publishing the candidate UI. The visible projects are the old Jarvis site and an empty unrelated site; do not use either as the Kingsmen Portal deployment target.
@@ -117,3 +118,12 @@ No force-merges, fabricated approvals, production claims from CI alone, public c
 - [ ] Obtain authorized test-candidate sessions and activate an authorized platform reviewer; no verified candidate identity links or active reviewer accounts are present.
 - [ ] Confirm `KINGSMEN_PORTAL_ORIGINS` contains the actual portal staging origin before browser E2E; no Netlify portal deployment is claimed by this update.
 - [ ] Resolve the 403 in main-branch-protection evidence with a read-only fine-grained GitHub token, and complete migration-source reconciliation plus backup/restore review before any database migration.
+
+
+### Official opportunity source pack — 2026-11-19
+
+- [x] Add structured review-only records for Employment Service Practitioner, Admin Clerk Legal Services X4, Records Administrator X9, Claims Processors X8, Claims Credit Officer X5, and Client Service Officer: Paymaster.
+- [x] Preserve current advert references and locations, advertised eligibility, source URLs, and separate walk-in (16:00) and online (23:59) closing times for 27 November 2026 in Africa/Johannesburg.
+- [x] Add `validate-kingsmen-official-research-pack.mjs` to `npm test`; it rejects candidate-facing publication defaults and direct database import.
+- [ ] Obtain a source-reviewer role already allowed by N15, then refetch each exact official page through the deployed ingestion path and have an authorized reviewer approve any opening claim.
+- [ ] No live opportunity, provider, deadline or match rows were created from this pack.
