@@ -15,6 +15,15 @@ const PATHWAYS = [
   ["EMPLOYMENT", "Employment"]
 ] as const;
 
+const FEED_TO_APPLICATION_PATHWAY: Record<string, string> = {
+  HIGHER_EDUCATION: "HIGHER_EDUCATION",
+  TVET: "TVET",
+  SETA_LEARNERSHIPS: "SETA_LEARNERSHIP",
+  INTERNSHIPS: "INTERNSHIP",
+  APPRENTICESHIPS: "APPRENTICESHIP",
+  EMPLOYMENT: "EMPLOYMENT"
+};
+
 type ProfileResponse = {
   ok?: boolean;
   profile?: Record<string, unknown>;
@@ -120,6 +129,12 @@ function pathwayLabel(value: string): string {
   return PATHWAYS.find(([pathway]) => pathway === value)?.[1] ?? value;
 }
 
+function applicationPathways(item: Opportunity): string[] {
+  return Array.from(new Set(item.pathways
+    .map(pathway => FEED_TO_APPLICATION_PATHWAY[pathway])
+    .filter((pathway): pathway is string => typeof pathway === "string")));
+}
+
 function displayDate(value?: string | null): string {
   if (!value) return "Not available";
   const date = new Date(value);
@@ -199,8 +214,7 @@ export default function CandidateWorkbenchPage() {
     }
   }
 
-  const compatibleCount = (item: Opportunity) =>
-    item.pathways.filter(pathway => PATHWAYS.some(([value]) => value === pathway)).length;
+  const compatiblePathways = (item: Opportunity) => applicationPathways(item);
 
   return (
     <main className="mx-auto w-full max-w-6xl space-y-6 px-4 py-8 sm:px-6">
@@ -311,9 +325,9 @@ export default function CandidateWorkbenchPage() {
                   <div><dt className="inline font-semibold text-slate-800">Deadline: </dt><dd className="inline">{item.deadline.closes_at ? displayDate(item.deadline.closes_at) : "Not confirmed"}</dd></div>
                   <div><dt className="inline font-semibold text-slate-800">Eligibility: </dt><dd className="inline">Candidate-specific review required; not guaranteed.</dd></div>
                 </dl>
-                {compatibleCount(item) > 0 && (
+                {compatiblePathways(item).length > 0 && (
                   <div className="mt-4 flex flex-wrap gap-2">
-                    {item.pathways.filter(pathway => PATHWAYS.some(([value]) => value === pathway)).map(pathway => {
+                    {compatiblePathways(item).map(pathway => {
                       const key = `${item.match_ref}:${pathway}`;
                       return (
                         <button key={pathway} type="button" onClick={() => void addToPlan(item, pathway)}

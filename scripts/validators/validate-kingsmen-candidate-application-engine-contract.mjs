@@ -47,6 +47,10 @@ assert.ok(page.includes("getKingsmenSupabaseAccessToken"), "Workbench must use p
 assert.ok(page.includes("candidate-master-applications"), "Workbench must call the server-side application planning endpoint.");
 assert.ok(page.includes("candidate-master-profile"), "Workbench must gate on saved profile and consent state.");
 assert.ok(page.includes("Load verified matches"), "Workbench must load the verified opportunity feed.");
+assert.ok(page.includes("SETA_LEARNERSHIPS: \"SETA_LEARNERSHIP\""), "Feed SETA pathway code must normalize to the canonical application pathway.");
+assert.ok(page.includes("INTERNSHIPS: \"INTERNSHIP\""), "Feed internship pathway code must normalize to the canonical application pathway.");
+assert.ok(page.includes("APPRENTICESHIPS: \"APPRENTICESHIP\""), "Feed apprenticeship pathway code must normalize to the canonical application pathway.");
+assert.ok(page.includes("applicationPathways(item)"), "Workbench must add matches using normalized application pathway codes.");
 assert.ok(page.includes("Add ") && page.includes("to plan"), "Workbench must provide an internal add-to-plan action.");
 assert.ok(page.includes("does not submit an application"), "Workbench must clearly distinguish planning from provider submission.");
 assert.ok(!page.includes("window.location") && !page.includes("location.href"), "Workbench must not redirect candidates to providers as the primary workflow.");
