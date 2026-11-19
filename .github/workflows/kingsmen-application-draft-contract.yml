@@ -22,6 +22,8 @@ on:
       - scripts/staging/test-application-lifecycle-postgres.sql
       - scripts/staging/test-candidate-application-draft-ui.mjs
       - scripts/staging/test-candidate-profile-ui.mjs
+      - scripts/staging/test-candidate-workbench-ui.mjs
+      - apps/web/src/components/candidate/CandidateApplicationWorkbench.tsx
       - .github/workflows/kingsmen-application-draft-contract.yml
   workflow_dispatch:
 
@@ -100,3 +102,6 @@ jobs:
       - name: Test candidate profile save, reload and consent
         timeout-minutes: 3
         run: node scripts/staging/test-candidate-profile-ui.mjs
+      - name: Test saved target to parent application workbench journey
+        timeout-minutes: 3
+        run: node scripts/staging/test-candidate-workbench-ui.mjs
