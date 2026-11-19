@@ -24,27 +24,34 @@ New or staged source:
 - `scripts/staging/fixtures/application-lifecycle-postgres-bootstrap.sql` and `scripts/staging/test-application-lifecycle-postgres.sql` — expanded disposable schema and full `0107 → 0108 → 0109` candidate lifecycle integration test.
 - `scripts/staging/test-candidate-application-draft-ui.mjs` — mocked Playwright save/reload/read-only browser smoke test.
 - `.github/workflows/kingsmen-application-draft-contract.yml` — source validation, both PostgreSQL test paths, Next.js production build, and three browser smoke tests; no deploy step.
+- `.github/workflows/kingsmen-web-dependency-security.yml` — upgrades within Next.js 15, runs `npm audit fix`, requires a clean install/build and zero high/critical findings, then commits the tested manifest/lockfile only to the rebuild branch.
+- The committed web dependency tree is hardened to Next.js 15.5.29, Sharp 0.35.5, PostCSS 8.5.33 via a manifest override, `@xmldom/xmldom` 0.8.15, `nanoid` 3.3.20 and `source-map-js` 1.2.4.
 - The new migrations now share `kingsmen_security.current_verified_kingsmen_candidate_id()`: 0107 defines the fail-closed identity helper; 0108 uses and locks the verified link while preparing the parent application; 0109 uses the same helper for draft read/write.
 - Migration 0109 also extends the existing application-event allowlist to permit `APPLICATION_DRAFT_SAVED`, and fails closed if the live constraint is absent or has an unexpected shape.
 
 ## Source-contract review
 
-At commit `2805dd585eaa109be53fb339e328683c37ecd04d`, all **34 source-contract assertions passed** against the committed migrations, authenticated API route, draft editor, tracker, workbench links, browser tests and workflow.
+At commit `de7e3dd846b0e57ef6c06654957c8e2e078497c9`, all **37 source-contract assertions passed** against the committed migrations, authenticated API route, draft editor, tracker, workbench links, browser tests, dependency manifest and lockfile.
 
-The contract covers owner-bound parent/draft linkage, RLS and table grants, the shared verified Auth-link identity helper, parent application ownership, active consent, bounded and allowlisted answer data, optimistic concurrency, idempotent retries, readiness invalidation, minimal audit details, event-constraint extension, verified-link locking, CAO child-record preservation, the bearer/anon-key boundary, all six pathways, absence of service-role use in candidate web APIs, prohibition on provider submission during draft save, and the workbench resume link.
+In addition to ownership/RLS, consent, input bounds, idempotency/version control, readiness invalidation, audit minimisation, CAO child-record preservation, bearer/anon-key boundaries, six-pathway coverage and provider-submission prohibition, the contract now enforces:
+- Next.js `15.5.29` across the manifest, Next package, `@next/env` and all locked SWC packages.
+- Sharp `0.35.5` and the PostCSS `8.5.33` override.
+- Patched minimum versions for `@xmldom/xmldom`, `nanoid` and `source-map-js`.
 
 ## Automated verification — latest complete run
 
-**Passed:** [GitHub Actions run 44563246698](https://github.com/kingsmenportal-ctrl/kingsmen-platform/actions/runs/44563246698), commit `2805dd585eaa109be53fb339e328683c37ecd04d`.
+**Passed:** [GitHub Actions run 44565416891](https://github.com/kingsmenportal-ctrl/kingsmen-platform/actions/runs/44565416891), commit `de7e3dd846b0e57ef6c06654957c8e2e078497c9`.
 
-- Strict `npm ci` install from the committed web lockfile: passed.
-- Source-contract assertions: **34/34 passed**.
-- Standalone draft persistence PostgreSQL 17 test: passed, covering first save, idempotent retry, content conflict for re-used idempotency key, stale-version conflict, version increment, readiness invalidation, minimal audit details, reload, owner access, cross-candidate read/write rejection, missing identity/profile rejection, locked submission state, revoked-consent rejection and grants.
-- Full `0107 → 0108 → 0109` lifecycle chain on a fresh disposable PostgreSQL 17 schema: passed. A synthetic verified opportunity match prepares one Kingsmen parent DRAFT, saves application-specific answers and reloads them; target linkage, expected events and absence of a provider-submission side effect are asserted.
-- Next.js production build: passed.
-- Mocked Playwright candidate draft browser test: passed for load, edit, save, reload, submitted-state read-only behavior and no provider-submission request.
-- Mocked Playwright candidate profile browser test: passed for profile save/reload, all six pathway preferences, consent-required save, and consent withdrawal without deleting the profile.
-- Mocked Playwright workbench browser test: passed for preparing one parent application from a saved target, returning and displaying the DRAFT, opening the resume link and making no provider-submission call.
+- Strict `npm ci` from the **committed** web lockfile: passed.
+- Source-contract assertions: **37/37 passed**.
+- Standalone draft persistence PostgreSQL 17 test: passed, including idempotent retry and key-content conflict, stale-version conflict, version increment, readiness invalidation, minimal audit details, reload, ownership boundaries, cross-candidate read/write rejection, missing identity/profile rejection, locked submission states, revoked-consent rejection and grants.
+- Full `0107 → 0108 → 0109` lifecycle chain on a fresh disposable PostgreSQL 17 schema: passed. A synthetic verified opportunity match prepares one Kingsmen parent DRAFT, saves application-specific answers and reloads them; target linkage, expected events and no provider-submission side effect are asserted.
+- Next.js production build: passed on the patched dependency tree.
+- Mocked Playwright candidate draft browser test: passed for load, edit, save, reload, submitted-state read-only behaviour and no provider-submission request.
+- Mocked Playwright candidate profile test: passed for save/reload, all six pathway preferences, consent-required save and consent withdrawal without deleting the profile.
+- Mocked Playwright workbench test: passed for one saved target → one Kingsmen parent DRAFT → “Open / resume application draft”, with no provider-submission call.
+
+**Dependency security gate:** [GitHub Actions run 44565069909](https://github.com/kingsmenportal-ctrl/kingsmen-platform/actions/runs/44565069909) passed with an npm audit report of **0 vulnerabilities**: 0 info, 0 low, 0 moderate, 0 high and 0 critical. The resulting dependency manifest and lockfile were committed to the rebuild branch as `b347b2893961267f18e214b02fa223d6219e0320`; the subsequent full application contract passed at the commit linked above.
 
 **Verification limit:** database integration uses a deliberately constructed disposable schema fixture with representative constraints and dependencies; it is not a restored clone of the live staging schema. Browser API responses and Supabase configuration are mocked. This proves a green source/contract/full-chain test path, **not live authenticated candidate E2E or final migration safety against the exact staging schema**.
 
@@ -68,7 +75,7 @@ Do not apply migrations 0107–0109 yet. The migration source is explicitly revi
 5. Verify the target's migration state and the exact proposed migration set.
 6. Obtain the required staging change-control approval before any live schema mutation.
 7. Create approved synthetic test identities and test profile → verified opportunity → parent draft → saved answers → reload → tracker event with two-candidate isolation.
-8. The mocked Playwright draft, profile and workbench tests have passed. Next, run an authenticated browser E2E against an approved staging build after synthetic Auth-to-candidate identity links and reusable profiles are created through the authorised identity process.
+8. The mocked Playwright draft, profile and workbench tests have passed on the patched lockfile. Next, run an authenticated browser E2E against an approved staging build after synthetic Auth-to-candidate identity links and reusable profiles are created through the authorised identity process.
 
 The 0109 RPCs are SECURITY DEFINER and callable by authenticated candidates by design, so tests must prove positive owner access, negative cross-candidate access, stale/missing identity rejection, consent revocation, conflicting versions, idempotency-key content reuse rejection, and immutability of provider-receipt/outcome states.
 
