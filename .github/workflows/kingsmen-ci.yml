@@ -35,6 +35,14 @@ jobs:
 
       - name: Run focused repository tests
         run: npm test
+      - name: Set up Deno
+        uses: denoland/setup-deno@v2
+        with:
+          deno-version: v2.x
+
+      - name: Type-check candidate Supabase Edge Functions
+        run: deno check supabase/functions/candidate-master-profile/index.ts supabase/functions/candidate-master-applications/index.ts
+
 
       - name: Install API dependencies
         run: npm install --prefix apps/api --no-audit --no-fund
