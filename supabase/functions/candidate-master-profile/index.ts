@@ -66,7 +66,7 @@ type ProfileIdentityResolution = {
   identityStatus: "VERIFIED" | "PENDING_REVIEW" | null;
   hasLink: boolean;
 };
-async function resolveProfileCandidate(admin: ReturnType<typeof createClient>, userId: string): Promise<ProfileIdentityResolution> {
+async function resolveProfileCandidate(admin: ReturnType<typeof createClient<any>>, userId: string): Promise<ProfileIdentityResolution> {
   const { data: link, error: linkError } = await admin.from("candidate_auth_identity_links")
     .select("candidate_id,link_status,verified_at,verified_by")
     .eq("supabase_user_id", userId).maybeSingle();

@@ -72,7 +72,7 @@ function pathwayCompatible(sector: unknown, pathway: string): boolean {
     (SECTOR_PATHWAYS[sector] ?? []).includes(pathway);
 }
 
-async function resolveVerifiedCandidate(admin: ReturnType<typeof createClient>, userId: string) {
+async function resolveVerifiedCandidate(admin: ReturnType<typeof createClient<any>>, userId: string) {
   const { data: link, error: linkError } = await admin
     .from("candidate_auth_identity_links")
     .select("candidate_id,link_status,verified_at,verified_by")
@@ -100,7 +100,7 @@ async function resolveVerifiedCandidate(admin: ReturnType<typeof createClient>, 
   return { candidate: candidate as Candidate, code: null as string | null };
 }
 
-async function hasActiveConsent(admin: ReturnType<typeof createClient>, publicRef: string): Promise<boolean> {
+async function hasActiveConsent(admin: ReturnType<typeof createClient<any>>, publicRef: string): Promise<boolean> {
   const { data: consent, error } = await admin
     .from("privacy_consent_records")
     .select("consent_status,revoked_at,consent_text_snapshot,granted_at")
@@ -122,7 +122,7 @@ async function hasActiveConsent(admin: ReturnType<typeof createClient>, publicRe
 }
 
 async function verifyOpportunityMatch(
-  admin: ReturnType<typeof createClient>,
+  admin: ReturnType<typeof createClient<any>>,
   candidateId: string,
   matchRef: string,
   pathwayType: string
