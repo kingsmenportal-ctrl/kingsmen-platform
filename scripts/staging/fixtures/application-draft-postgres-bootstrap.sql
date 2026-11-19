@@ -32,8 +32,36 @@ CREATE TABLE public.candidate_auth_identity_links (
   candidate_id uuid NOT NULL REFERENCES public.candidates(id) ON DELETE RESTRICT,
   link_status text NOT NULL,
   verified_at timestamptz,
-  verified_by uuid
+  verified_by text
 );
+
+CREATE OR REPLACE FUNCTION kingsmen_security.current_verified_kingsmen_candidate_id()
+RETURNS uuid
+LANGUAGE plpgsql
+STABLE
+SECURITY DEFINER
+SET search_path TO 'pg_catalog', 'public', 'auth'
+AS $function$
+DECLARE
+  v_uid uuid := auth.uid();
+  v_count bigint;
+  v_candidate_id uuid;
+BEGIN
+  IF v_uid IS NULL THEN RETURN NULL; END IF;
+  SELECT count(*), (array_agg(l.candidate_id ORDER BY l.id))[1]
+    INTO v_count, v_candidate_id
+  FROM public.candidate_auth_identity_links l
+  WHERE l.supabase_user_id = v_uid
+    AND l.link_status = 'VERIFIED'
+    AND l.verified_at IS NOT NULL
+    AND l.verified_at <= statement_timestamp()
+    AND l.verified_by IS NOT NULL;
+  IF v_count <> 1 THEN RETURN NULL; END IF;
+  RETURN v_candidate_id;
+END;
+$function$;
+REVOKE ALL ON FUNCTION kingsmen_security.current_verified_kingsmen_candidate_id()
+  FROM PUBLIC, anon, authenticated, service_role;
 
 CREATE TABLE public.candidate_opportunities (
   id uuid PRIMARY KEY,
