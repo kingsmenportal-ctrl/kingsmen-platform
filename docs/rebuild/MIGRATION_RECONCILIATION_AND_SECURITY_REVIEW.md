@@ -3,7 +3,7 @@
 **Observed:** 2026-11-19  
 **Environment:** Supabase staging, project `euhubhhnumtibbyufghm`  
 **Source branch:** `rebuild/kingsmen-one-phase0-2026-11-19`  
-**Change posture:** read-only database review plus source changes on the rebuild branch. One corrected Edge Function was deployed to staging as version 5 with JWT verification enabled. No database DDL, migration application, or live data writes were performed.
+**Change posture:** read-only database review plus source changes on the rebuild branch. Candidate profile and internal application-planning Edge Functions were deployed and read back from Supabase staging. No database DDL, migration application, or live catalogue seeding was performed. The application-planning endpoint can create a Kingsmen plan target when all gates pass; no target rows were created during deployment or review.
 
 ## 1. Migration history: do not replay
 
@@ -56,11 +56,17 @@ Inspection found explicit verified-link and candidate-ownership checks in the CA
 
 Do not apply this fix directly to the live database yet: the source migration history is incomplete. Recover and checksum the current function definitions, add a forward-only migration and regression cases, then test them on a disposable database before staging application.
 
-## 4. Candidate profile stream: source correction
+## 4. Candidate profile and application-planning slices
 
-The rebuild branch introduced the candidate profile page and uses the existing authenticated `candidate-master-profile` Edge Function. Review found that the deployed/source function declared `latestConsent` twice in the request-handler scope. The duplicate declaration was removed in source commit `1ee4ab97e210096cc428a1872d178726b3a7d7ae`; the source contract validator now tests this plus bearer-token validation, identity-link lookup, server-side bootstrap, consent withdrawal and non-wildcard CORS. The root migration integrity validator also scans `database/migrations/`, and the migration integrity check is wired into `npm test`.
+The profile UI and authenticated `candidate-master-profile` Edge Function are in the rebuild branch. A duplicate `latestConsent` declaration was removed, and the source contract now checks bearer-token validation, verified identity-link lookup, atomic self-service bootstrap, consent withdrawal, non-wildcard CORS and origin configuration.
 
-The branch's `Kingsmen CI` and `Jarvis Live Runtime` workflows passed on `890d9745924bd3ceb7a34a75b6cfbdfae2d2719f`. The profile Edge Function is deployed as version **5**, status **ACTIVE**, `verify_jwt=true`, deployment ID `2490578a-e08d-41cb-be5e-96eae495b0ee`, and runtime SHA-256 `9a0b80b30dcf4c034e4d07e20a98fb9a05ad15153be2d56da8132e928402f8b6`. A read-back of version 5 confirmed one declaration and source equality with the corrected branch file. This is deployment evidence only: a successful authenticated request, first-time bootstrap, save/reload/re-login, consent revocation and Candidate A/B browser test have **not** been recorded. Do not expose the candidate slice to end users until those runtime tests pass.
+The currently active `candidate-master-profile` function is version **6**, status **ACTIVE**, `verify_jwt=true`, deployment ID `2490578a-e08d-41cb-be5e-96eae495b0ee`, source blob `73c9995c3f812edbb52e805189cd01b6b19a095a`, runtime SHA-256 `7a3fedd589941ba109f30641219e8743721d61ff375a17d69f792f8481858d1f`. The live source was read back and exactly matches the current branch source.
+
+The new unified workbench has an active `candidate-master-applications` Edge Function, version **2**, status **ACTIVE**, `verify_jwt=true`, deployment ID `05c1bce5-f8df-410a-aa6b-a0fbe51ead2a`, source blob `233326276f171537811dc0acf96ce8b05cb13f7d`, runtime SHA-256 `c890aa09000fb5c4cacf7543def5712d7ea1dc81f162ae54855e41b820ea8340`. The deployed source exactly matches the branch source. This slice lists a candidate's existing plan targets and can add a **planning-only** target from a current, human-approved match with official source evidence, freshness, a confirmed future deadline, an explicitly verified candidate identity and active profile-processing consent. It writes no provider submission, receipt or outcome. Provider submission is hard-disabled in the response contract.
+
+At the time of review, `candidate_accounts`, `candidate_auth_identity_links`, `candidate_master_profiles`, `candidate_opportunity_matches`, `opportunity_programmes`, `opportunity_providers`, `external_source_observations`, `opportunity_deadlines` and `candidate_master_application_targets` were all empty. Therefore the endpoint correctly fails closed for candidates without a verified identity link and cannot yet return an application-ready match from the canonical verified catalogue. A successful authenticated request, first-time profile bootstrap, save/reload/re-login, consent revocation, target creation and Candidate A/B browser isolation test have **not** been recorded.
+
+Kingsmen CI and Jarvis runtime validation passed on commit `7c5cc419e856e051f535c1d3b0a5f8bfa360175f`; the same CI run included repository contract tests, Deno Edge Function type-checks, API build and the Next.js production build. The branch-protection evidence workflow still fails with a 403 when it attempts to read main-branch protection. This gate remains fail-closed. Do not expose the candidate slice to end users until authenticated runtime and browser isolation tests pass.
 
 ## 5. Verification checklist for the next gate
 

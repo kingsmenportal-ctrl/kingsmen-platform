@@ -31,7 +31,7 @@
     },
     {
       "name": "candidate-master-applications",
-      "version": 1,
+      "version": 2,
       "status": "ACTIVE",
       "verifyJwt": true,
       "deploymentId": "05c1bce5-f8df-410a-aa6b-a0fbe51ead2a",
@@ -39,7 +39,7 @@
       "sourceBlobSha": "233326276f171537811dc0acf96ce8b05cb13f7d",
       "runtimeSha256": "c890aa09000fb5c4cacf7543def5712d7ea1dc81f162ae54855e41b820ea8340",
       "readbackMatchesBranchSource": true,
-      "note": "Internal plan create/list only, identity and consent gates, fresh official match and future confirmed deadline checks, provider submission explicitly false."
+      "note": "Version 2 is active and read-back exactly matches the branch source. Lists targets and creates internal planning targets only after verified identity, active consent, approved match, fresh official-source observation and confirmed future deadline. No provider submission is implemented. Authenticated target creation and browser E2E are unverified."
     },
     {
       "name": "n15-source-ingestion",
@@ -73,7 +73,11 @@
     "opportunityProgrammes": 0,
     "opportunityProviders": 0,
     "opportunityDeadlines": 0,
-    "candidateOpportunityMatches": 0
+    "candidateOpportunityMatches": 0,
+    "candidateAccounts": 0,
+    "candidateAuthIdentityLinks": 0,
+    "candidateMasterProfiles": 0,
+    "candidateMasterApplicationTargets": 0
   },
   "userFlowsVerified": {
     "authenticatedProfileSaveReload": false,

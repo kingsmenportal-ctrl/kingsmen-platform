@@ -16,7 +16,7 @@
 - [x] Deploy N15 source ingestion as active staging version 4 with JWT verification enabled and verify deployed source equality against the reviewed branch.
 - [x] Deploy N15 candidate-opportunity feed as active staging version 4, with JWT verification enabled, a valid verified-link actor/timestamp gate, and explicit configured CORS origins; read back the deployed source.
 - [x] Deploy candidate-master-profile version 6 with JWT verification enabled and read back the exact branch source.
-- [x] Deploy candidate-master-applications version 1 with JWT verification enabled and read back the exact branch source. The endpoint is fail-closed and has not been exercised against live candidate data.
+- [x] Deploy candidate-master-applications version 2 with JWT verification enabled and read back the exact branch source. It creates only internal application-plan targets; no provider submission capability is included. Authenticated runtime/E2E remains unverified.
 - [x] Deploy N15 source review queue version 1 as a read-only reviewer-gated endpoint, with JWT verification enabled; read back the exact branch source.
 - [ ] Confirm the actual portal origin via KINGSMEN_PORTAL_ORIGINS and register an authorised platform reviewer; the live active reviewer count is 0, so ingestion has not been run. Preserve observations as NEEDS_REVIEW until human verification. The review queue is live but correctly returns FORBIDDEN to non-reviewers.
 - [ ] Decide repository visibility before adding proprietary or sensitive implementation detail.
@@ -25,13 +25,14 @@
 - [ ] Capture a reviewed backup/restore path before any database mutation. No backup/restore drill has yet been performed.
 
 ## Stream 1 — Candidate foundation
-- [ ] Pin/verify frontend dependency versions from a reproducible lockfile.
+- [x] Pin frontend direct dependencies and regenerate the tracked npm lockfile; CI verifies exact top-level package-lock matches and runs `npm ci` for the web app.
 - [ ] Verify Supabase Auth configuration and explicit verified identity linkage.
-- [x] Remove the duplicate profile Edge Function declaration, add source-level contract assertions, and deploy/read back the corrected function as active version 5 with `verify_jwt=true`.
+- [x] Remove the duplicate profile Edge Function declaration, add source-level contract assertions, and verify the active version 6 function exactly matches the branch source with `verify_jwt=true`.
 - [ ] Review and test the proposed verified-identity helper replacement in a disposable database before preparing an active migration. The helper must resolve from `candidate_auth_identity_links` directly; do not depend on `candidate_accounts` (currently empty in staging).
-- [x] Build the candidate profile UI and correct the duplicate declaration in the existing profile Edge Function (active staging version 5; JWT verification remains enabled).
+- [x] Build the candidate profile UI, registration/login/password-recovery screens, project-scoped session and refresh helper; source checks and production web build pass. Authenticated runtime proof remains outstanding.
 - [ ] Complete first-time profile bootstrap, save/reload/re-login and consent withdrawal through an authenticated staging session. No authorised candidate session has been provided or exercised.
-- [ ] Build or consolidate the candidate registration/login/profile journey against real Supabase persistence.
+- [x] Implement the registration/login/password-recovery/profile source flow against Supabase Auth and backend profile persistence.
+- [ ] Complete the authenticated first-profile bootstrap, save/reload/re-login and Candidate A/B isolation proof; there are currently no authorized candidate sessions or verified identity-link rows.
 - [ ] Record consent version/text and ensure revocation prevents prohibited processing.
 - [ ] Prove save/reload/re-login persistence.
 - [ ] Prove Candidate A cannot read or modify Candidate B's profile, applications or documents.
@@ -45,6 +46,7 @@
 - **Exit:** candidates can search the verified sample; stale/unverified/unresolved records are not shown as open recommendations.
 
 ## Stream 3 — Unified application engine
+- [x] Add and deploy the first unified planning slice: verified-match-to-internal-target workflow across six pathways, list saved targets, active-consent and verified-identity gates. Live canonical catalogue tables remain empty, so this is not yet an end-to-end application lifecycle.
 - [ ] Use one candidate application lifecycle across all six pathways.
 - [ ] Save drafts and capture submission/event history durably.
 - [ ] Connect reusable candidate profile and private documents.
@@ -98,8 +100,20 @@ No force-merges, fabricated approvals, production claims from CI alone, public c
 - [x] Add a candidate-profile contract validator to `npm test` and a dashboard link to the profile page.
 
 ### Still required before this slice can be treated as release-ready
-- [ ] Observe the latest GitHub Actions test/build runs after all profile commits; earlier CI success applied to the earlier six-file PR head only.
-- [ ] Fix any fresh CI failures and re-run.
+- [x] Observe full Kingsmen CI and Jarvis runtime checks on commit `7c5cc419e856e051f535c1d3b0a5f8bfa360175f`; focused repository tests, Deno Edge Function type-checking, API build, and web production build passed.
+- [x] Fix the stale session-key validator assumption and re-run CI successfully. Main-branch-protection evidence still fails with HTTP 403 and is not bypassed.
 - [ ] Run a real authenticated browser journey against the intended staging domain, including first profile bootstrap, save, reload, log out/re-login and a second candidate isolation test.
 - [ ] Confirm the current Netlify domain is in the deployed Edge Function CORS allowlist before using the profile page in a live staging browser.
 - [ ] Review consent wording and the applicable privacy/retention terms before a real candidate pilot.
+
+
+### Latest scoped progress — 2026-11-19
+
+- [x] Supabase staging `candidate-master-profile` version 6 is active with JWT verification and matches its branch source exactly.
+- [x] Supabase staging `candidate-master-applications` version 2 is active with JWT verification and matches its branch source exactly.
+- [x] The first unified application-planning UI/function is present on PR #320; it supports all six pathways and only creates internal `PLANNING` targets from verified, current source evidence with a confirmed future deadline.
+- [x] Exact frontend dependency pins and lockfile are checked in; Next.js is pinned to 15.5.29; the full CI run passed.
+- [ ] Populate the canonical opportunity schema through the gated evidence/reviewer workflow. Counts at review time: 0 candidate opportunity matches, 0 opportunity programmes, 0 providers, 0 source observations, 0 confirmed deadlines and 0 plan targets.
+- [ ] Obtain authorized test-candidate sessions and activate an authorized platform reviewer; no verified candidate identity links or active reviewer accounts are present.
+- [ ] Confirm `KINGSMEN_PORTAL_ORIGINS` contains the actual portal staging origin before browser E2E; no Netlify portal deployment is claimed by this update.
+- [ ] Resolve the 403 in main-branch-protection evidence with a read-only fine-grained GitHub token, and complete migration-source reconciliation plus backup/restore review before any database migration.
