@@ -33,7 +33,7 @@ for (const token of [
   "Access-Control-Allow-Origin",
   "Cache-Control"
 ]) {
-  assert.ok(edge.includes(token), \`Application planning function must enforce \${token}.\`);
+  assert.ok(edge.includes(token), "Application planning function must enforce " + token + ".");
 }
 assert.ok(!edge.includes("candidate_accounts"), "Candidate planning must resolve identity from the canonical identity-link table, not legacy candidate_accounts.");
 assert.ok(!edge.includes("SUPABASE_SERVICE_ROLE_KEY" + " = \"\""), "Service-role configuration must be read from the environment only.");
@@ -41,7 +41,7 @@ for (const pathway of [
   "HIGHER_EDUCATION", "TVET", "SETA_LEARNERSHIP",
   "INTERNSHIP", "APPRENTICESHIP", "EMPLOYMENT"
 ]) {
-  assert.ok(edge.includes(pathway) && page.includes(pathway), \`Both server and UI must support \${pathway}.\`);
+  assert.ok(edge.includes(pathway) && page.includes(pathway), "Both server and UI must support " + pathway + ".");
 }
 assert.ok(page.includes("getKingsmenSupabaseAccessToken"), "Workbench must use project-scoped session helper.");
 assert.ok(page.includes("candidate-master-applications"), "Workbench must call the server-side application planning endpoint.");
