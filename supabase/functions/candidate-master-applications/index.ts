@@ -211,6 +211,10 @@ async function verifyOpportunityMatch(
   if (!deadline || !evidenceList(deadline.evidence_refs)) {
     return { ok: false as const, code: "CONFIRMED_DEADLINE_REQUIRED" };
   }
+  const opensAt = deadline.opens_at == null ? null : Date.parse(deadline.opens_at);
+  if (opensAt !== null && (!Number.isFinite(opensAt) || opensAt > now.getTime())) {
+    return { ok: false as const, code: "OPPORTUNITY_NOT_OPEN_YET" };
+  }
   return { ok: true as const, match, programme, provider, observation, deadline };
 }
 

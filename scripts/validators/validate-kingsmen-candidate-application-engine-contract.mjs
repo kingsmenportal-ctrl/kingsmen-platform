@@ -24,6 +24,8 @@ for (const token of [
   "opportunity_deadlines",
   "deadline_status",
   "CONFIRMED_DEADLINE_REQUIRED",
+  "OPPORTUNITY_NOT_OPEN_YET",
+  "deadline.opens_at",
   "candidate_master_application_targets",
   'source_confidence: "UNVERIFIED"',
   'planning_status: "PLANNING"',
