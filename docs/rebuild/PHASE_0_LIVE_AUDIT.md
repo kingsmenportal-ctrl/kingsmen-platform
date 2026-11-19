@@ -34,9 +34,11 @@ Supabase's security advisor reports 17 RLS-enabled public tables without policie
 
 Do not fix this by blindly adding broad policies or revoking all six RPCs. Some RPCs may support candidate CAO choices or application preparation and contain identity/ownership checks. The follow-up must review each exposed function, test Candidate A/B isolation and verify only the intended roles can execute privileged actions. The staging database was not mutated during this audit.
 
-## Product gap observed in frontend
+## Product gaps observed in frontend and rebuild-branch changes
 
-The homepage's current pathway array labels internships and apprenticeships together, and uses “Funding & support” as the sixth category. Kingsmen's canonical taxonomy requires six distinct pathways: Higher Education, TVET, SETA Programmes & Learnerships, Internships, Apprenticeships and Employment. The first source change on the rebuild branch will align the visible taxonomy and add a regression validator.
+At the baseline commit, the homepage pathway array labelled internships and apprenticeships together, and used “Funding & support” as the sixth category. On the rebuild branch, this has been corrected to the six distinct canonical pathways and a source contract validator is wired into the ordinary test command.
+
+The baseline had no candidate profile page route, despite an active `candidate-master-profile` Edge Function. The rebuild branch now adds `/candidate/profile`, calls that existing authenticated function for load/save/consent withdrawal, adds a dashboard link, and uses a project-scoped Supabase session reader. This is source-only. It has not been deployed, and authenticated browser persistence has not yet been proven. The observed Edge Function CORS allowlist must be checked against the actual staging hostname before runtime testing.
 
 ## Decisions intentionally not taken
 
