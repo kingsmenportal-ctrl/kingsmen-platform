@@ -14,7 +14,11 @@
 - [x] Add a review-only official-opportunity research manifest from current Department of Employment and Labour pages and explicit closed-cycle records; do not seed or publish the records automatically.
 - [x] Correct the N15 source-ingestion operator's project-session handling, fix the internship matcher, configure origin-specific CORS and add a source-ingestion contract validator.
 - [x] Deploy N15 source ingestion as active staging version 4 with JWT verification enabled and verify deployed source equality against the reviewed branch.
-- [ ] Configure/confirm the actual portal origin and register an authorised platform reviewer; the live reviewer count is 0, so the ingestion action has not been run. Preserve observations as NEEDS_REVIEW until human verification.
+- [x] Deploy N15 candidate-opportunity feed as active staging version 4, with JWT verification enabled, a valid verified-link actor/timestamp gate, and explicit configured CORS origins; read back the deployed source.
+- [x] Deploy candidate-master-profile version 6 with JWT verification enabled and read back the exact branch source.
+- [x] Deploy candidate-master-applications version 1 with JWT verification enabled and read back the exact branch source. The endpoint is fail-closed and has not been exercised against live candidate data.
+- [x] Deploy N15 source review queue version 1 as a read-only reviewer-gated endpoint, with JWT verification enabled; read back the exact branch source.
+- [ ] Confirm the actual portal origin via KINGSMEN_PORTAL_ORIGINS and register an authorised platform reviewer; the live active reviewer count is 0, so ingestion has not been run. Preserve observations as NEEDS_REVIEW until human verification. The review queue is live but correctly returns FORBIDDEN to non-reviewers.
 - [ ] Decide repository visibility before adding proprietary or sensitive implementation detail.
 - [ ] Fix the branch-protection evidence secret: the live workflow returns 403 when reading main protection. Keep the evidence gate fail-closed; configure a fine-grained GitHub token with repository Administration: read for `KINGSMEN_BRANCH_PROTECTION_READ_TOKEN`.
 - [ ] Identify and configure the canonical Netlify Portal site in the connected Netlify account before publishing the candidate UI. The visible projects are the old Jarvis site and an empty unrelated site; do not use either as the Kingsmen Portal deployment target.
@@ -26,7 +30,7 @@
 - [x] Remove the duplicate profile Edge Function declaration, add source-level contract assertions, and deploy/read back the corrected function as active version 5 with `verify_jwt=true`.
 - [ ] Review and test the proposed verified-identity helper replacement in a disposable database before preparing an active migration. The helper must resolve from `candidate_auth_identity_links` directly; do not depend on `candidate_accounts` (currently empty in staging).
 - [x] Build the candidate profile UI and correct the duplicate declaration in the existing profile Edge Function (active staging version 5; JWT verification remains enabled).
-- [ ] Complete first-time profile bootstrap, save/reload/re-login and consent withdrawal through an authenticated staging session.
+- [ ] Complete first-time profile bootstrap, save/reload/re-login and consent withdrawal through an authenticated staging session. No authorised candidate session has been provided or exercised.
 - [ ] Build or consolidate the candidate registration/login/profile journey against real Supabase persistence.
 - [ ] Record consent version/text and ensure revocation prevents prohibited processing.
 - [ ] Prove save/reload/re-login persistence.
