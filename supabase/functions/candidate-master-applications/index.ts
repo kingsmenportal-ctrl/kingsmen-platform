@@ -300,7 +300,7 @@ Deno.serve(async (req: Request) => {
     if (!verified.ok) {
       return reply(409, { ok: false, code: verified.code, error: "This match no longer passes Kingsmen's current official-source, deadline and pathway gates. Refresh verified matches and try again." }, origin);
     }
-    const targetKey = \`N15:\${pathwayType}:\${matchRef}\`;
+    const targetKey = `N15:${pathwayType}:${matchRef}`;
     if (targetKey.length > 120) {
       return reply(400, { ok: false, code: "MATCH_REFERENCE_TOO_LONG", error: "This match reference is too long to save safely." }, origin);
     }
@@ -323,7 +323,7 @@ Deno.serve(async (req: Request) => {
         provider_name: verified.provider.provider_name,
         programme_or_role: verified.programme.programme_name,
         provider_application_url: verified.programme.exact_link,
-        source_reference: \`N15 match reference: \${matchRef}\`,
+        source_reference: `N15 match reference: ${matchRef}`,
         source_confidence: "UNVERIFIED",
         planning_status: "PLANNING",
         idempotency_key: crypto.randomUUID(),

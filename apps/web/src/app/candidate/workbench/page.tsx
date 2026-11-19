@@ -78,11 +78,11 @@ async function requestJson<T>(path: string, init: RequestInit): Promise<T> {
   const token = getKingsmenSupabaseAccessToken();
   if (!config) throw new Error("Kingsmen services are not configured for this deployment.");
   if (!token) throw new Error("Sign in to Kingsmen first. No session for the configured Supabase project was found.");
-  const response = await fetch(\`\${config.url}\${path}\`, {
+  const response = await fetch(`${config.url}${path}`, {
     ...init,
     headers: {
       apikey: config.anonKey,
-      Authorization: \`Bearer \${token}\`,
+      Authorization: `Bearer ${token}`,
       "Content-Type": "application/json",
       ...(init.headers ?? {})
     },
@@ -91,7 +91,7 @@ async function requestJson<T>(path: string, init: RequestInit): Promise<T> {
   const data = await response.json().catch(() => null) as T | null;
   if (!response.ok || !data || (typeof data === "object" && "ok" in data && (data as { ok?: boolean }).ok === false)) {
     const errorBody = data as { error?: string; code?: string } | null;
-    throw new Error(errorBody?.error || errorBody?.code || \`Kingsmen request failed (\${response.status}).\`);
+    throw new Error(errorBody?.error || errorBody?.code || `Kingsmen request failed (${response.status}).`);
   }
   return data;
 }
@@ -182,7 +182,7 @@ export default function CandidateWorkbenchPage() {
   }
 
   async function addToPlan(item: Opportunity, pathwayType: string) {
-    const key = \`\${item.match_ref}:\${pathwayType}\`;
+    const key = `${item.match_ref}:${pathwayType}`;
     setBusyKey(key);
     setError("");
     setMessage("");
@@ -314,12 +314,12 @@ export default function CandidateWorkbenchPage() {
                 {compatibleCount(item) > 0 && (
                   <div className="mt-4 flex flex-wrap gap-2">
                     {item.pathways.filter(pathway => PATHWAYS.some(([value]) => value === pathway)).map(pathway => {
-                      const key = \`\${item.match_ref}:\${pathway}\`;
+                      const key = `${item.match_ref}:${pathway}`;
                       return (
                         <button key={pathway} type="button" onClick={() => void addToPlan(item, pathway)}
                           disabled={!ready || busyKey === key}
                           className="rounded-lg border border-amber-500 bg-amber-50 px-3 py-2 text-xs font-bold text-amber-950 disabled:cursor-not-allowed disabled:opacity-40">
-                          {busyKey === key ? "Saving…" : \`Add \${pathwayLabel(pathway)} to plan\`}
+                          {busyKey === key ? "Saving…" : `Add ${pathwayLabel(pathway)} to plan`}
                         </button>
                       );
                     })}
