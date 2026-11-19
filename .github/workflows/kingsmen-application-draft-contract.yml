@@ -1,0 +1,41 @@
+name: Kingsmen application draft contract
+
+on:
+  push:
+    branches:
+      - rebuild/kingsmen-one-foundation-2026-11-17
+    paths:
+      - db/migrations/0107_application_capacity_entitlements_20261101.sql
+      - db/migrations/0108_candidate_application_readiness_eligibility_deadline_gate_20261101.sql
+      - db/migrations/0109_candidate_application_draft_persistence_20261101.sql
+      - apps/web/src/app/api/candidate/application-draft/route.ts
+      - apps/web/src/app/candidate/applications/[applicationId]/page.tsx
+      - apps/web/src/components/candidate/CandidateApplicationTracker.tsx
+      - apps/web/src/lib/candidate-session.ts
+      - apps/web/src/lib/read-limited-json.ts
+      - scripts/validators/validate-candidate-application-draft-persistence.mjs
+      - .github/workflows/kingsmen-application-draft-contract.yml
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  application-draft-contract:
+    name: Validate draft security contract and web build
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out rebuild branch
+        uses: actions/checkout@v4
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+          cache: npm
+          cache-dependency-path: apps/web/package-lock.json
+      - name: Install web dependencies
+        run: npm ci --prefix apps/web
+      - name: Validate candidate application draft contract
+        run: node scripts/validators/validate-candidate-application-draft-persistence.mjs
+      - name: Build Next.js application
+        run: npm --prefix apps/web run build
