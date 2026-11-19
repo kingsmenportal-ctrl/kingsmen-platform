@@ -9,6 +9,8 @@ const readinessMigration = read("db/migrations/0108_candidate_application_readin
 const api = read("apps/web/src/app/api/candidate/application-draft/route.ts");
 const page = read("apps/web/src/app/candidate/applications/[applicationId]/page.tsx");
 const tracker = read("apps/web/src/components/candidate/CandidateApplicationTracker.tsx");
+const workbench = read("apps/web/src/components/candidate/CandidateApplicationWorkbench.tsx");
+const workbenchBrowserTest = read("scripts/staging/test-candidate-workbench-ui.mjs");
 const workflow = read(".github/workflows/kingsmen-application-draft-contract.yml");
 const auditStart = migration.indexOf("INSERT INTO public.candidate_application_events");
 const auditEnd = migration.indexOf("ON CONFLICT (event_ref) DO NOTHING", auditStart);
@@ -49,6 +51,8 @@ const checks = [
   ["CAO programme choices stay under one parent application", page.includes("CAO programme choices remain child records under one Kingsmen parent application") && readinessMigration.includes("CAO")],
   ["provider submission remains explicitly false throughout draft save", migration.includes(String.fromCharCode(39) + "provider_submission_sent" + String.fromCharCode(39) + ", false") && /does not submit to a provider/.test(page)],
   ["application tracker links owned parent records to the resumable editor", /candidate\/applications\/\$\{application\.id\}/.test(tracker) && /Open \/ resume application draft/.test(tracker)],
+  ["workbench links editable prepared parent applications to the same draft editor", /candidate\/applications\/\$\{parent\.id\}/.test(workbench) && /Open \/ resume application draft/.test(workbench) && /READY_TO_SUBMIT/.test(workbench)],
+  ["workbench browser contract verifies preparation, resume link and no provider submission", /prepare_master_application/.test(workbenchBrowserTest) && /Open \/ resume application draft/.test(workbenchBrowserTest) && /no provider-submission endpoint was called/.test(workbenchBrowserTest) && /test-candidate-workbench-ui\.mjs/.test(workflow)],
   ["draft persistence contract runs in the isolated application-draft workflow", /validate-candidate-application-draft-persistence\.mjs/.test(workflow)]
 ];
 let failed = 0;
