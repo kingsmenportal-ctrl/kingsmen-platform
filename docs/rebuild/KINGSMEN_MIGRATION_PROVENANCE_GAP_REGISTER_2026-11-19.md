@@ -123,3 +123,42 @@ The files need a dependency-ordered review against the live schema, active const
 - It does not assert SQL-content parity for any migration.
 - No live database schema or row was modified.
 - PR #209 and PR #254 remain unmerged source references; no changes were made to their state.
+
+
+## 8. Follow-up historical branch scan — 19 November 2026
+
+The original 32-entry “no source found” list in Section 4 was correct for the narrower inventory then checked, but it has been superseded by a broader read-only scan of 241 repository branches. **Thirty of those 32 entries now have historical filename/source candidates; two remain without a matching SQL source in the branches and directories inspected.** The source-ref-enriched CSV is the current machine-readable disposition.
+
+Current classification totals:
+
+| Source classification | Entries | Current disposition |
+|---|---:|---|
+| `EXACT_TIMESTAMP_RECOVERY_FILE` | 62 | Timestamp matches live ledger on historical PR #254 recovery snapshot; SQL byte parity not established |
+| `FILENAME_MATCH_REQUIRES_CONTENT_REVIEW` | 36 | Candidate file is present in current rebuild or one of PR #209/#254 source trees; content review remains open |
+| `HISTORICAL_BRANCH_SOURCE_REQUIRES_CONTENT_REVIEW` | 30 | Candidate filename is located on an additional historical branch; source provenance is recorded, but not accepted as applied-SQL parity |
+| `NO_MATCHING_SQL_SOURCE_FOUND` | 2 | No matching SQL source was identified in the wider branch scan |
+
+### Remaining two source gaps
+
+| Live ledger version | Live ledger name | Current finding |
+|---|---|---|
+| `20261029143144` | `canonical_package_benefits_universal_accommodation_20261029` | No matching SQL file located in the migration directories checked across the current branch, PR #209/#254 and the wider package/accommodation/finance branches. The older `0022_n10_commercial_schedule_v1.sql` is a related candidate, not a substitute for this later migration. |
+| `20261029143414` | `seed_canonical_public_package_cards_20261029` | No matching SQL file located in the migration directories checked across the current branch, PR #209/#254 and the wider package/accommodation/finance branches. Do not infer the seed SQL from current package rows or reconstruct the original as though recovered. |
+
+### Newly located historical source candidates
+
+The 30 candidate paths are recorded individually in `KINGSMEN_MIGRATION_LEDGER_RECONCILIATION_2026-11-17.csv` in the `source_path` and `source_ref` columns under `HISTORICAL_BRANCH_SOURCE_REQUIRES_CONTENT_REVIEW`. Notable source roots include:
+
+- `fix/staging-migration-rls-restore`: 0020 RLS helper search-path hardening and 0021 FK-index hardening.
+- `fix/accommodation-pricing-canonical`: 0022 commercial schedule.
+- `draft/pr-a-migration-review`: candidate identity binding and private-document migration group 0023–0030.
+- `n06-applications-pathway-execution-2026-10-17`, `n07-provider-review-operations-2026-10-17`, `n08-outcomes-progression-2026-10-17`, `n09-communications-follow-up-2026-10-17`, and `n10-packages-payments-refunds-2026-10-17`: application, outcome, communications and finance sources 0060–0070 and 0073.
+- `n02-n03-truth-vault-runtime-proof`: 0002 RLS hardening candidate.
+- `feat/authorised-document-review`: 0080 authorised document-review candidate.
+- `fix/private-schema-candidate-identity-helper-2026-10-22`: reviewer audit table and private candidate identity-helper migration candidates.
+- `feat/n16-worker-recovery-rc1-2026-10-31`: worker recovery sources 202610250001–202610250003.
+- PR #254 recovery branch: 0089 private document workflow candidate.
+
+These are migration-source leads, not accepted baselines. Before adopting any source, review file contents, dependency order, the exact live ledger name/version, execution evidence and compatibility with the current schema. Do not replay them.
+
+The updated manifest validator passed after this classification change: https://github.com/kingsmenportal-ctrl/kingsmen-platform/actions/runs/44553241494
