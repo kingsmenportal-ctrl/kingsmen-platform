@@ -184,7 +184,7 @@ try {
   const nameInput = page.getByLabel("Display name", { exact: true });
   await nameInput.fill(persisted.displayName);
   await page.getByLabel("Phone (optional)", { exact: true }).fill(persisted.phone);
-  await page.getByLabel("Province", { exact: true }).selectOption({ label: persisted.province });
+  await page.getByLabel("Province").selectOption({ label: persisted.province });
   await page.getByLabel("Highest qualification / grade", { exact: true }).fill(persisted.highestQualification);
   await page.getByLabel("Study interests (optional)", { exact: true }).fill(persisted.studyInterests);
   await page.getByLabel("Employment / skills interests (optional)", { exact: true }).fill(persisted.employmentInterests);
