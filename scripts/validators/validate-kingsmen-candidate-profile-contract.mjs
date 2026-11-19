@@ -4,13 +4,16 @@ import { existsSync, readFileSync } from "node:fs";
 const profilePath = "apps/web/src/app/candidate/profile/page.tsx";
 const sessionPath = "apps/web/src/lib/kingsmen/supabase-session.ts";
 const dashboardPath = "apps/web/src/app/candidate/dashboard/page.tsx";
+const edgeFunctionPath = "supabase/functions/candidate-master-profile/index.ts";
 
 assert.ok(existsSync(profilePath), "Candidate profile page must exist.");
 assert.ok(existsSync(sessionPath), "Project-scoped browser session helper must exist.");
+assert.ok(existsSync(edgeFunctionPath), "Source-controlled candidate profile Edge Function must exist.");
 
 const profile = readFileSync(profilePath, "utf8");
 const session = readFileSync(sessionPath, "utf8");
 const dashboard = readFileSync(dashboardPath, "utf8");
+const edgeFunction = readFileSync(edgeFunctionPath, "utf8");
 
 for (const action of ["load", "save", "revoke_consent"]) {
   assert.ok(profile.includes(`"${action}"`) || profile.includes(`(${action}`), `Profile UI must support the ${action} action.`);
@@ -33,3 +36,11 @@ assert.ok(!session.includes("SUPABASE_SERVICE_ROLE_KEY"), "Browser session helpe
 assert.ok(dashboard.includes('href: "/candidate/profile"'), "Candidate dashboard must link to the profile page.");
 
 console.log("Kingsmen candidate profile contract passed.");
+
+const latestConsentDeclarations = edgeFunction.match(/const latestConsent = consentRows\?\.\[0\] \?\? null;/g) ?? [];
+assert.equal(latestConsentDeclarations.length, 1, "Profile Edge Function must declare the latest consent record only once in the request handler.");
+assert.ok(edgeFunction.includes("auth.auth.getUser(token)"), "Profile Edge Function must validate the bearer token with Supabase Auth.");
+assert.ok(edgeFunction.includes("candidate_auth_identity_links"), "Profile Edge Function must resolve profile access through the candidate Auth identity-link table.");
+assert.ok(edgeFunction.includes("bootstrap_candidate_self_profile"), "Initial profile creation must use the atomic, server-side bootstrap RPC.");
+assert.ok(edgeFunction.includes('action === "revoke_consent"'), "Profile Edge Function must implement consent withdrawal.");
+assert.ok(!/Access-Control-Allow-Origin["']?\\s*:\\s*["']\\*["']/.test(edgeFunction), "Profile Edge Function must not enable wildcard CORS.");
