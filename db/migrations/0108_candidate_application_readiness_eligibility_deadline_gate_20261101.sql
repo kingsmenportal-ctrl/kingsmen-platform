@@ -33,6 +33,21 @@ begin
     raise exception 'VERIFIED_CANDIDATE_IDENTITY_REQUIRED' using errcode = '42501';
   end if;
 
+  -- Hold the verified identity link for the duration of target preparation so a
+  -- concurrent identity-review change cannot race creation of a new parent draft.
+  PERFORM l.id
+  FROM public.candidate_auth_identity_links l
+  WHERE l.supabase_user_id = v_auth_user_id
+    AND l.candidate_id = v_candidate_id
+    AND l.link_status = 'VERIFIED'
+    AND l.verified_at IS NOT NULL
+    AND l.verified_at <= clock_timestamp()
+    AND l.verified_by IS NOT NULL
+  FOR SHARE;
+  IF NOT FOUND THEN
+    RAISE EXCEPTION 'VERIFIED_CANDIDATE_IDENTITY_REQUIRED' USING ERRCODE = '42501';
+  END IF;
+
   IF NOT EXISTS (
     SELECT 1 FROM public.candidates c
     WHERE c.id = v_candidate_id AND c.is_active IS TRUE
