@@ -236,6 +236,19 @@ export default function CandidateApplicationTracker() {
                       <div><dt className="text-xs uppercase tracking-wide text-slate-500">Created</dt><dd className="mt-1">{formatDate(application.created_at)}</dd></div>
                       <div><dt className="text-xs uppercase tracking-wide text-slate-500">Updated</dt><dd className="mt-1">{formatDate(application.updated_at)}</dd></div>
                     </dl>
+                    {["DRAFT", "READINESS_BLOCKED", "READY_FOR_REVIEW", "READY_TO_SUBMIT"].includes(application.status) ? (
+                      <div className="mt-4">
+                        <Link
+                          href={`/candidate/applications/${application.id}`}
+                          className="inline-flex min-h-10 items-center rounded-lg bg-slate-950 px-4 py-2 text-sm font-semibold text-white hover:bg-slate-800 focus:outline-none focus:ring-2 focus:ring-amber-400"
+                        >
+                          Open / resume application draft
+                        </Link>
+                        <p className="mt-2 text-xs text-slate-500">
+                          Saves application-specific answers separately from your reusable profile. Opening this draft does not submit it to a provider.
+                        </p>
+                      </div>
+                    ) : null}
                     <div className="mt-5 border-t border-slate-100 pt-4">
                       <h4 className="text-sm font-bold">Recorded application events</h4>
                       {events.length ? (
