@@ -40,7 +40,7 @@ for (const pathway of [
 assert.ok(profile.includes("/functions/v1/candidate-master-profile"), "Profile UI must use the existing authenticated server workflow.");
 assert.ok(profile.includes("consentAccepted: true"), "A profile save must send the explicit consent acceptance flag.");
 assert.ok(profile.includes("Withdraw consent"), "Candidates must be able to withdraw profile-processing consent.");
-assert.ok(session.includes("sb-${projectRef}-auth-token"), "Session reads must be scoped to the configured Supabase project.");
+assert.ok(/storageKey:\s*(?:`sb-\\$\\{projectRef\\}-auth-token`|"sb-"\s*\+\s*projectRef\s*\+\s*"-auth-token")/.test(session), "Session reads must be scoped to the configured Supabase project.");
 assert.ok(!session.includes("SUPABASE_SERVICE_ROLE_KEY"), "Browser session helper must not contain a service-role key.");
 assert.ok(dashboard.includes('href: "/candidate/profile"'), "Candidate dashboard must link to the profile page.");
 
