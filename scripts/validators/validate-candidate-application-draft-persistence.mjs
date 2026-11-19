@@ -3,6 +3,7 @@ import path from "node:path";
 
 const root = process.cwd();
 const read = file => fs.readFileSync(path.join(root, file), "utf8");
+const capacityMigration = read("db/migrations/0107_application_capacity_entitlements_20261101.sql");
 const migration = read("db/migrations/0109_candidate_application_draft_persistence_20261101.sql");
 const readinessMigration = read("db/migrations/0108_candidate_application_readiness_eligibility_deadline_gate_20261101.sql");
 const api = read("apps/web/src/app/api/candidate/application-draft/route.ts");
@@ -19,10 +20,10 @@ const getFunction = getStart >= 0 && saveStart > getStart ? migration.slice(getS
 const checks = [
   ["one draft-answer row is bound to one parent application and its candidate", /application_id uuid PRIMARY KEY/.test(migration) && /FOREIGN KEY \(application_id, candidate_id\)/.test(migration) && /REFERENCES public\.candidate_applications\(id, candidate_id\)/.test(migration)],
   ["draft-answer table is RLS protected and inaccessible directly to client roles", /ENABLE ROW LEVEL SECURITY/.test(migration) && /FROM PUBLIC, anon, authenticated/.test(migration) && /TO service_role USING \(true\) WITH CHECK \(true\)/.test(migration)],
-  ["candidate identity is derived from exactly one verified Auth link", /auth\.uid\(\)/.test(migration) && /link_status = 'VERIFIED'/.test(migration) && /verified_by IS NOT NULL/.test(migration) && /v_link_count <> 1/.test(migration)],
+  ["shared identity helper derives exactly one verified Auth link", /CREATE OR REPLACE FUNCTION kingsmen_security\.current_verified_kingsmen_candidate_id/.test(capacityMigration) && /auth\.uid\(\)/.test(capacityMigration) && /link_status = 'VERIFIED'/.test(capacityMigration) && /verified_by IS NOT NULL/.test(capacityMigration) && /v_count <> 1/.test(capacityMigration)],
   ["draft load is restricted to the owned parent application", /WHERE a\.id = p_application_id[\s\S]*AND a\.candidate_id = v_candidate_id/.test(migration)],
   ["draft read selects the application status it returns", getFunction.includes("a.status") && getFunction.includes("'status', v_application.status")],
-  ["draft read and write hold verified Auth identity-link share locks", (migration.match(/FOR SHARE;/g) ?? []).length >= 3 && /candidate_auth_identity_links/.test(migration)],
+  ["draft read and write hold verified Auth identity-link share locks", (migration.match(/FOR SHARE;/g) ?? []).length >= 2 && /candidate_auth_identity_links/.test(migration)],
   ["draft save holds a row lock on the candidate-owned parent application", /WHERE a\.id = p_application_id[\s\S]*AND a\.candidate_id = v_candidate_id[\s\S]*FOR UPDATE/.test(migration)],
   ["draft answer save requires a saved reusable candidate profile", migration.includes("CANDIDATE_REUSABLE_PROFILE_REQUIRED") && migration.includes("candidate_master_profiles mp")],
   ["draft save requires the latest active profile-processing consent", /PROFILE_PROCESSING_CONSENT_REQUIRED/.test(migration) && /ORDER BY pc\.granted_at DESC, pc\.id DESC/.test(migration) === false && /newer\.granted_at, newer\.id/.test(migration) && /pc\.revoked_at IS NULL/.test(migration)],
@@ -35,6 +36,7 @@ const checks = [
   ["every edit invalidates prior readiness and requires recheck", /readiness_status = 'NOT_CHECKED'/.test(migration) && /readiness_recheck_required/.test(migration) && /SET status = 'DRAFT'/.test(migration)],
   ["draft save writes an append-only application audit event without answer content", /APPLICATION_DRAFT_SAVED/.test(auditInsert) && /answer_keys/.test(auditInsert) && !auditInsert.includes("'answer_data', p_answer_data") && !auditInsert.includes("'answers', p_answer_data")],
   ["migration widens the live event allowlist for APPLICATION_DRAFT_SAVED and fails closed on unknown constraint shapes", migration.includes("candidate_application_events_event_type_check") && /regexp_replace\([\s\S]*APPLICATION_DRAFT_SAVED/.test(migration) && migration.includes("APPLICATION_EVENT_TYPE_CONSTRAINT_SHAPE_UNRECOGNIZED")],
+  ["application preparation uses the shared verified identity helper and rejects inactive candidates", readinessMigration.includes("current_verified_kingsmen_candidate_id()") && readinessMigration.includes("ACTIVE_CANDIDATE_REQUIRED") && readinessMigration.includes("c.is_active IS TRUE")],
   ["profile stays in the reusable profile table and CAO choices remain child records", /candidate_master_profiles/.test(migration) && /CAO programme choices remain child rows/.test(migration)],
   ["application read/write RPCs are executable by authenticated only", /GRANT EXECUTE ON FUNCTION public\.get_candidate_application_draft/.test(migration) && /GRANT EXECUTE ON FUNCTION public\.save_candidate_application_draft/.test(migration) && /FROM PUBLIC, anon/.test(migration)],
   ["API forwards candidate bearer with public anon key and never uses service role", /Authorization: authorization/.test(api) && /apikey: config\.anonKey/.test(api) && !/SERVICE_ROLE/.test(api)],
