@@ -56,9 +56,9 @@ jobs:
           npm audit --json --prefix apps/web > "$RUNNER_TEMP/kingsmen-npm-audit.json"
           audit_exit=$?
           set -e
-          node --input-type=module "$RUNNER_TEMP/kingsmen-npm-audit.json" <<'NODE'
+          node --input-type=module - "$RUNNER_TEMP/kingsmen-npm-audit.json" "$audit_exit" <<'NODE'
           import fs from "node:fs";
-          const file = process.argv[1];
+          const file = process.argv[2];
           let audit;
           try { audit = JSON.parse(fs.readFileSync(file, "utf8")); }
           catch { throw new Error("npm audit did not produce valid JSON"); }
@@ -88,7 +88,7 @@ jobs:
           fs.copyFileSync("apps/web/package-lock.json", "security-refresh-output/package-lock.json");
           fs.writeFileSync("security-refresh-output/npm-audit.json", fsCopy);
           fs.writeFileSync("security-refresh-output/audit-summary.txt",
-            "npm audit exit code: " + ${audit_exit} + "\ncounts: " + JSON.stringify(counts) + "\n");
+            "npm audit exit code: " + process.argv[3] + "\ncounts: " + JSON.stringify(counts) + "\n");
           NODE
       - name: Upload generated lockfile and audit evidence
         if: always()
@@ -103,7 +103,7 @@ jobs:
         run: |
           node --input-type=module "$RUNNER_TEMP/kingsmen-npm-audit.json" <<'NODE'
           import fs from "node:fs";
-          const audit = JSON.parse(fs.readFileSync(process.argv[1], "utf8"));
+          const audit = JSON.parse(fs.readFileSync(process.argv[2], "utf8"));
           const counts = audit.metadata?.vulnerabilities ?? {};
           const severe = (counts.high ?? 0) + (counts.critical ?? 0);
           console.log("High + critical advisories:", severe);
