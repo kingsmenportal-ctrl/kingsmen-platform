@@ -28,7 +28,7 @@ permissions:
 jobs:
   application-draft-contract:
     name: Validate draft security contract and PostgreSQL integration
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     services:
       postgres:
         image: postgres:17
