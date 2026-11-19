@@ -1,10 +1,10 @@
 const pathways = [
-  { n: "01", title: "Higher education", detail: "Universities, Universities of Technology, CAO programme choices and application preparation.", tags: "UNIVERSITIES · UoTs · CAO" },
-  { n: "02", title: "TVET & college routes", detail: "TVET colleges, NC(V), NATED / Report 191 and accredited private-college pathways.", tags: "TVET · NC(V) · NATED" },
-  { n: "03", title: "Learnerships & SETAs", detail: "Skills programmes, learnerships and training opportunities with source and deadline checks.", tags: "SETA · QCTO · SKILLS" },
-  { n: "04", title: "Internships & apprenticeships", detail: "Work exposure, workplace learning, apprenticeships and WIL opportunities.", tags: "WIL · EXPERIENCE" },
-  { n: "05", title: "Employment", detail: "Vacancy discovery and application preparation for entry-level and experienced candidates.", tags: "CAREERS · VACANCIES" },
-  { n: "06", title: "Funding & support", detail: "Bursaries, sponsorships, NSFAS guidance and related accommodation or transport needs.", tags: "NSFAS · BURSARIES · SUPPORT" },
+  { n: "01", title: "Higher Education", detail: "Universities, Universities of Technology, CAO programme choices and application preparation.", tags: "UNIVERSITIES · UoTs · CAO" },
+  { n: "02", title: "TVET", detail: "TVET colleges, NC(V), NATED / Report 191 and accredited private-college pathways.", tags: "TVET · NC(V) · NATED" },
+  { n: "03", title: "SETA Programmes & Learnerships", detail: "SETA programmes, learnerships, skills programmes and verified eligibility requirements.", tags: "SETA · LEARNERSHIPS · SKILLS" },
+  { n: "04", title: "Internships", detail: "Internships, workplace exposure and work-integrated learning opportunities.", tags: "INTERNSHIPS · WIL" },
+  { n: "05", title: "Apprenticeships", detail: "Trade training, apprenticeship placements and related entry requirements.", tags: "APPRENTICESHIPS · TRADES" },
+  { n: "06", title: "Employment", detail: "Vacancy discovery, role requirements and application preparation for candidates.", tags: "CAREERS · VACANCIES" },
 ];
 
 const steps = [
