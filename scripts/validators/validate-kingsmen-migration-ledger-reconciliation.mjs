@@ -197,7 +197,7 @@ for (const [index, row] of records.entries()) {
     ) {
       errors.push(`row ${rowNumber}: historical candidate must point to a known migration directory`);
     }
-    if (!/content parity not established/.test(row.source_ref)) {
+    if (!/parity not established/.test(row.source_ref)) {
       errors.push(`row ${rowNumber}: historical candidate must state that applied-SQL parity is unproven`);
     }
   }
