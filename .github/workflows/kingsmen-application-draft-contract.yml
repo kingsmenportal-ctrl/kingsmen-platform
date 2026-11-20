@@ -32,6 +32,7 @@ on:
       - apps/web/src/components/founder/N15SourceReviewConsole.tsx
       - apps/web/src/app/founder/opportunity-sources/page.tsx
       - supabase/functions/n15-source-review-decision/index.ts
+      - supabase/functions/n15-source-ingestion/index.ts
       - .github/workflows/kingsmen-application-draft-contract.yml
   workflow_dispatch:
 
