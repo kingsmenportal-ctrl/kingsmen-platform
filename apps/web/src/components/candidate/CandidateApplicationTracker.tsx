@@ -238,7 +238,8 @@ export default function CandidateApplicationTracker() {
                       <div><dt className="text-xs uppercase tracking-wide text-slate-500">Created</dt><dd className="mt-1">{formatDate(application.created_at)}</dd></div>
                       <div><dt className="text-xs uppercase tracking-wide text-slate-500">Updated</dt><dd className="mt-1">{formatDate(application.updated_at)}</dd></div>
                     </dl>
-                    {["Draft", "Action required"].includes(application.kingsmen_status) ? (
+                    {["Draft", "Action required"].includes(application.kingsmen_status)
+                      && ["DRAFT", "READINESS_BLOCKED", "READY_FOR_REVIEW", "READY_TO_SUBMIT"].includes(application.status) ? (
                       <div className="mt-4">
                         <Link
                           href={`/candidate/applications/${application.id}`}
