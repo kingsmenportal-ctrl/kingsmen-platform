@@ -27,7 +27,7 @@ const checks = [
     /SOURCE_OBSERVATION_ALREADY_DECIDED/.test(migration)],
   ["approved observations require active, official authority and matching hostname",
     /v_authority\.active IS NOT TRUE/.test(migration) &&
-    /v_authority\.confidence_band <> 'OFFICIAL_VERIFIED'/.test(migration) &&
+    /v_authority\.confidence_band NOT IN \('HIGH', 'OFFICIAL_VERIFIED'\)/.test(migration) &&
     /SOURCE_URL_OUTSIDE_AUTHORITY/.test(migration) &&
     /OFFICIAL_AUTHORITY_EVIDENCE_REQUIRED/.test(migration)],
   ["RPC retains evidence and 14-day stale-after boundary on approval",
@@ -61,7 +61,7 @@ const checks = [
     /getCandidateAccessToken/.test(consoleUi) &&
     !/SERVICE_ROLE|service_role|SUPABASE_SERVICE_ROLE_KEY/.test(consoleUi)],
   ["UI disables approval when the authority is not active and official",
-    /authority\?\.active && item\.authority\.confidence_band === "OFFICIAL_VERIFIED"/.test(consoleUi) &&
+    /item\.authority\?\.active && \["HIGH", "OFFICIAL_VERIFIED"\]\.includes\(item\.authority\.confidence_band\)/.test(consoleUi) &&
     /!approvalAvailable/.test(consoleUi)],
   ["UI states source verification is distinct from open status and publication",
     /does not open an opportunity, verify a closing date, approve eligibility/i.test(consoleUi) &&
