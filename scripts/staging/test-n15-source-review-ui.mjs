@@ -283,6 +283,19 @@ try {
   console.log("PASS: authorized reviewer can invoke source discovery; results remain review-only");
   console.log("PASS: unauthorized reviewer receives an error and no decision request is sent");
 } finally {
-  if (browser) await browser.close().catch(() => {});
+  // Playwright can hang while closing Chromium after a page has been reloaded
+  // through mocked auth failures. Cleanup must never consume the entire CI step.
+  if (browser) {
+    await Promise.race([
+      browser.close().catch(() => {}),
+      delay(5000)
+    ]);
+  }
   server.kill("SIGTERM");
+  if (server.exitCode === null) {
+    await Promise.race([
+      new Promise(resolve => server.once("exit", resolve)),
+      delay(5000)
+    ]);
+  }
 }
