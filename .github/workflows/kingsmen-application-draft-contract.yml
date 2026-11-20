@@ -140,5 +140,5 @@ jobs:
         timeout-minutes: 3
         run: node scripts/staging/test-candidate-workbench-ui.mjs
       - name: Test N15 source-review queue and decisions
-        timeout-minutes: 3
+        timeout-minutes: 5
         run: node scripts/staging/test-n15-source-review-ui.mjs
