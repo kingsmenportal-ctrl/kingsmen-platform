@@ -104,6 +104,7 @@ export default function CandidateApplicationDraftPage() {
   const [answers, setAnswers] = useState<AnswerData>(EMPTY_ANSWERS);
   const [version, setVersion] = useState(0);
   const [profileAvailable, setProfileAvailable] = useState(false);
+  const [serverEditable, setServerEditable] = useState(false);
   const [profileUpdatedAt, setProfileUpdatedAt] = useState<string | null>(null);
   const [draftUpdatedAt, setDraftUpdatedAt] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
@@ -139,6 +140,7 @@ export default function CandidateApplicationDraftPage() {
       setAnswers(normalizeAnswers(body.draft));
       setVersion(Number.isInteger(body.draft_version) ? body.draft_version as number : 0);
       setProfileAvailable(body.shared_profile_available === true);
+      setServerEditable(body.is_editable === true);
       setProfileUpdatedAt(body.shared_profile_updated_at ?? null);
       setDraftUpdatedAt(body.draft_updated_at ?? null);
       setSaveIdempotencyKey("");
@@ -177,7 +179,7 @@ export default function CandidateApplicationDraftPage() {
   async function save(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
     if (!application || !applicationId) return;
-    if (!["Draft", "Action required"].includes(application.kingsmen_status)) {
+    if (!serverEditable || !["Draft", "Action required"].includes(application.kingsmen_status)) {
       setError("This application is no longer in a candidate-editable Kingsmen status.");
       return;
     }
@@ -242,9 +244,8 @@ export default function CandidateApplicationDraftPage() {
     }
   }
 
-  const isEditable = application
-    ? ["Draft", "Action required"].includes(application.kingsmen_status)
-    : false;
+  const isEditable = Boolean(serverEditable && application
+    && ["Draft", "Action required"].includes(application.kingsmen_status));
 
   return <main className="min-h-screen bg-slate-950 px-4 py-8 text-white sm:px-6">
     <div className="mx-auto max-w-5xl space-y-6">
