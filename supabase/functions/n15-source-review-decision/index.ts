@@ -225,7 +225,7 @@ Deno.serve(async (req: Request) => {
       console.error("N15 source decision authority lookup failed", authorityError.code ?? "unknown");
       return reply(503, { status: "DATABASE_ERROR", code: "SOURCE_AUTHORITY_LOOKUP_FAILED" }, origin);
     }
-    if (!authority || authority.active !== true || authority.confidence_band !== "OFFICIAL_VERIFIED") {
+    if (!authority || authority.active !== true || !["HIGH", "OFFICIAL_VERIFIED"].includes(authority.confidence_band)) {
       return reply(400, { status: "INVALID_REQUEST", code: "SOURCE_AUTHORITY_NOT_VERIFIED" }, origin);
     }
     const authorityUrl = canonicalHttps(authority.base_url);
