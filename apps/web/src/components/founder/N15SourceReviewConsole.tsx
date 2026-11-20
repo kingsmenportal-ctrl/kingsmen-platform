@@ -141,6 +141,9 @@ export default function N15SourceReviewConsole() {
         return next;
       });
     } catch (error) {
+      // Fail closed: never leave cached review controls visible after a failed or revoked authorization check.
+      setQueue(null);
+      setForms({});
       setLoadError(error instanceof Error ? error.message : "Source review queue could not be loaded.");
     } finally {
       if (initial) setLoading(false);
