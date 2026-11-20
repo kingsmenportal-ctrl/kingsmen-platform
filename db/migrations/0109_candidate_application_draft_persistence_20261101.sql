@@ -15,6 +15,8 @@ WHERE kingsmen_status IS NULL
   AND status = 'DRAFT';
 
 DO $candidate_status_migration$
+DECLARE
+  v_status_check text;
 BEGIN
   IF EXISTS (
     SELECT 1 FROM public.candidate_applications
@@ -23,12 +25,14 @@ BEGIN
     RAISE EXCEPTION 'APPLICATION_KINGSMEN_STATUS_MAPPING_REQUIRED: existing progressed applications require an explicit evidence-backed mapping';
   END IF;
 
-  IF NOT EXISTS (
-    SELECT 1 FROM pg_constraint
-    WHERE conrelid = 'public.candidate_applications'::regclass
-      AND conname = 'candidate_applications_kingsmen_status_check'
-      AND contype = 'c'
-  ) THEN
+  SELECT pg_get_constraintdef(c.oid)
+    INTO v_status_check
+  FROM pg_constraint c
+  WHERE c.conrelid = 'public.candidate_applications'::regclass
+    AND c.conname = 'candidate_applications_kingsmen_status_check'
+    AND c.contype = 'c';
+
+  IF v_status_check IS NULL THEN
     ALTER TABLE public.candidate_applications
       ADD CONSTRAINT candidate_applications_kingsmen_status_check
       CHECK (kingsmen_status IN (
@@ -40,6 +44,16 @@ BEGIN
         'Provider receipt confirmed',
         'Decision recorded'
       ));
+  ELSIF
+    position('Draft' IN v_status_check) = 0
+    OR position('Submitted to Kingsmen' IN v_status_check) = 0
+    OR position('Under review' IN v_status_check) = 0
+    OR position('Action required' IN v_status_check) = 0
+    OR position('Prepared for provider' IN v_status_check) = 0
+    OR position('Provider receipt confirmed' IN v_status_check) = 0
+    OR position('Decision recorded' IN v_status_check) = 0
+    OR regexp_count(v_status_check, '::text') <> 7 THEN
+    RAISE EXCEPTION 'APPLICATION_KINGSMEN_STATUS_CONSTRAINT_SHAPE_UNRECOGNIZED: %', v_status_check;
   END IF;
 END
 $candidate_status_migration$;
