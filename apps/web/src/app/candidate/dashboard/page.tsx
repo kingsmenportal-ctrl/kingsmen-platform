@@ -9,6 +9,13 @@ const pathways = [
 
 const workspaceLinks = [
   {
+    href: "/candidate/profile",
+    title: "My profile",
+    description: "Create, update, and reload your saved Kingsmen profile and consent state.",
+    action: "Manage profile"
+  },
+
+  {
     href: "/candidate/workbench",
     title: "Application workbench",
     description: "Review pathway readiness and manage your application journey.",
