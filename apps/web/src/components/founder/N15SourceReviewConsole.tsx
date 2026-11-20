@@ -266,7 +266,7 @@ export default function N15SourceReviewConsole() {
               <section className="mb-9 space-y-5" aria-label="Source observations to review">
                 {observations.map(item => {
                   const form = forms[item.observation_ref] ?? formFor(item);
-                  const approvalAvailable = Boolean(item.authority?.active && item.authority.confidence_band === "OFFICIAL_VERIFIED");
+                  const approvalAvailable = Boolean(item.authority?.active && ["HIGH", "OFFICIAL_VERIFIED"].includes(item.authority.confidence_band));
                   const disabled = busyRef !== null;
                   return (
                     <article key={item.observation_ref} className="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm sm:p-6">
@@ -323,7 +323,7 @@ export default function N15SourceReviewConsole() {
                         </label>
                       ) : null}
 
-                      {!approvalAvailable ? <p className="mt-3 text-sm leading-6 text-amber-800">Official-source approval is disabled because the authority is missing, inactive or not marked OFFICIAL_VERIFIED.</p> : null}
+                      {!approvalAvailable ? <p className="mt-3 text-sm leading-6 text-amber-800">Official-source approval is disabled because the authority is missing, inactive or below HIGH confidence.</p> : null}
 
                       <div className="mt-5 flex flex-wrap gap-2">
                         <button type="button" onClick={() => void decide(item, "APPROVE_OFFICIAL_SOURCE")} disabled={disabled || !approvalAvailable || !form.attestedOfficial} className="inline-flex min-h-10 items-center rounded-lg bg-slate-950 px-4 py-2 text-sm font-bold text-white disabled:cursor-not-allowed disabled:opacity-45">{busyRef === item.observation_ref && busyAction === "APPROVE_OFFICIAL_SOURCE" ? "Recording…" : "Approve official source"}</button>
