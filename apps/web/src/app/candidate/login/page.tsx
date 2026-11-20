@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, type FormEvent } from "react";
 import { saveSupabaseSession } from "@/lib/candidate-session";
 
 type Mode = "signin" | "signup" | "recover";
@@ -66,7 +66,7 @@ export default function CandidateLoginPage() {
   const [error, setError] = useState("");
   const [message, setMessage] = useState("");
 
-  async function submit(event: React.FormEvent<HTMLFormElement>) {
+  async function submit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
     setBusy(true);
     setError("");
