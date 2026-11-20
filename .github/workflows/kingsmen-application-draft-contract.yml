@@ -8,6 +8,7 @@ on:
       - db/migrations/0107_application_capacity_entitlements_20261101.sql
       - db/migrations/0108_candidate_application_readiness_eligibility_deadline_gate_20261101.sql
       - db/migrations/0109_candidate_application_draft_persistence_20261101.sql
+      - db/migrations/0110_n15_source_review_decision_atomicity.sql
       - apps/web/src/app/api/candidate/application-draft/route.ts
       - apps/web/src/app/candidate/applications/[applicationId]/page.tsx
       - apps/web/src/components/candidate/CandidateApplicationTracker.tsx
@@ -16,14 +17,21 @@ on:
       - apps/web/package.json
       - apps/web/package-lock.json
       - scripts/validators/validate-candidate-application-draft-persistence.mjs
+      - scripts/validators/validate-n15-source-review-decision.mjs
       - scripts/staging/fixtures/application-draft-postgres-bootstrap.sql
       - scripts/staging/test-application-draft-postgres.sql
       - scripts/staging/fixtures/application-lifecycle-postgres-bootstrap.sql
       - scripts/staging/test-application-lifecycle-postgres.sql
+      - scripts/staging/fixtures/n15-source-review-postgres-bootstrap.sql
+      - scripts/staging/test-n15-source-review-postgres.sql
+      - scripts/staging/test-n15-source-review-ui.mjs
       - scripts/staging/test-candidate-application-draft-ui.mjs
       - scripts/staging/test-candidate-profile-ui.mjs
       - scripts/staging/test-candidate-workbench-ui.mjs
       - apps/web/src/components/candidate/CandidateApplicationWorkbench.tsx
+      - apps/web/src/components/founder/N15SourceReviewConsole.tsx
+      - apps/web/src/app/founder/opportunity-sources/page.tsx
+      - supabase/functions/n15-source-review-decision/index.ts
       - .github/workflows/kingsmen-application-draft-contract.yml
   workflow_dispatch:
 
@@ -64,6 +72,8 @@ jobs:
         run: npm ci --prefix apps/web
       - name: Validate candidate application draft contract
         run: node scripts/validators/validate-candidate-application-draft-persistence.mjs
+      - name: Validate N15 source-review security contract
+        run: node scripts/validators/validate-n15-source-review-decision.mjs
       - name: Locate disposable PostgreSQL service container
         shell: bash
         run: |
@@ -92,6 +102,14 @@ jobs:
         run: docker exec -i "$KINGSMEN_POSTGRES_CONTAINER_ID" psql -U postgres -d kingsmen_lifecycle -v ON_ERROR_STOP=1 < db/migrations/0109_candidate_application_draft_persistence_20261101.sql
       - name: Test full verified-match to application-draft lifecycle
         run: docker exec -i "$KINGSMEN_POSTGRES_CONTAINER_ID" psql -U postgres -d kingsmen_lifecycle -v ON_ERROR_STOP=1 < scripts/staging/test-application-lifecycle-postgres.sql
+      - name: Create isolated N15 source-review database
+        run: docker exec "$KINGSMEN_POSTGRES_CONTAINER_ID" psql -U postgres -d postgres -v ON_ERROR_STOP=1 -c "CREATE DATABASE kingsmen_source_review"
+      - name: Bootstrap isolated source-review fixture
+        run: docker exec -i "$KINGSMEN_POSTGRES_CONTAINER_ID" psql -U postgres -d kingsmen_source_review -v ON_ERROR_STOP=1 < scripts/staging/fixtures/n15-source-review-postgres-bootstrap.sql
+      - name: Apply N15 source-review migration 0110
+        run: docker exec -i "$KINGSMEN_POSTGRES_CONTAINER_ID" psql -U postgres -d kingsmen_source_review -v ON_ERROR_STOP=1 < db/migrations/0110_n15_source_review_decision_atomicity.sql
+      - name: Test N15 source-review atomicity, authority and privileges
+        run: docker exec -i "$KINGSMEN_POSTGRES_CONTAINER_ID" psql -U postgres -d kingsmen_source_review -v ON_ERROR_STOP=1 < scripts/staging/test-n15-source-review-postgres.sql
       - name: Build Next.js application with CI-only Supabase config
         run: npm --prefix apps/web run build
       - name: Install Chromium for browser smoke tests
@@ -105,3 +123,6 @@ jobs:
       - name: Test saved target to parent application workbench journey
         timeout-minutes: 3
         run: node scripts/staging/test-candidate-workbench-ui.mjs
+      - name: Test N15 source-review queue and decisions
+        timeout-minutes: 3
+        run: node scripts/staging/test-n15-source-review-ui.mjs
