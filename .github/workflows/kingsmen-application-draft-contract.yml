@@ -1,6 +1,19 @@
 name: Kingsmen application draft contract
 
 on:
+  pull_request:
+    branches:
+      - rebuild/kingsmen-one-foundation-2026-11-17
+    paths:
+      - db/migrations/0109_candidate_application_draft_persistence_20261101.sql
+      - apps/web/src/app/candidate/applications/[applicationId]/page.tsx
+      - apps/web/src/app/candidate/applications/page.tsx
+      - apps/web/src/components/candidate/CandidateApplicationTracker.tsx
+      - supabase/functions/candidate-application-preparation/index.ts
+      - scripts/validators/validate-candidate-application-draft-persistence.mjs
+      - scripts/staging/test-application-draft-postgres.sql
+      - scripts/staging/test-candidate-application-draft-ui.mjs
+      - .github/workflows/kingsmen-application-draft-contract.yml
   push:
     branches:
       - rebuild/kingsmen-one-foundation-2026-11-17
