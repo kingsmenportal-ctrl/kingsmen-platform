@@ -90,7 +90,7 @@ BEGIN
       FROM public.opportunity_source_authorities
      WHERE authority_ref = v_observation.authority_ref
      FOR SHARE;
-    IF NOT FOUND OR v_authority.active IS NOT TRUE OR v_authority.confidence_band <> 'OFFICIAL_VERIFIED' THEN
+    IF NOT FOUND OR v_authority.active IS NOT TRUE OR v_authority.confidence_band NOT IN ('HIGH', 'OFFICIAL_VERIFIED') THEN
       RETURN jsonb_build_object('ok', false, 'code', 'SOURCE_AUTHORITY_NOT_VERIFIED');
     END IF;
 
