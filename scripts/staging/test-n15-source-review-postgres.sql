@@ -121,6 +121,18 @@ BEGIN
   END IF;
 
   v := public.record_n15_source_review_decision(
+    'obs-medium-authority',
+    'APPROVE_OFFICIAL_SOURCE',
+    'reviewer-ci-005b',
+    'Attempt approval under a medium confidence authority.',
+    NULL,
+    ARRAY['https://medium.example/opportunities/six']
+  );
+  IF v->>'code' IS DISTINCT FROM 'SOURCE_AUTHORITY_NOT_VERIFIED' THEN
+    RAISE EXCEPTION 'medium-confidence authority was not blocked: %', v;
+  END IF;
+
+  v := public.record_n15_source_review_decision(
     'obs-approve',
     'APPROVE_OFFICIAL_SOURCE',
     'reviewer-ci-006',
