@@ -15,6 +15,7 @@ const evidenceUrl = "https://dhet.example/opportunities/ci-source-one";
 const authorityUrl = "https://dhet.example/";
 const decisions = [];
 let queueForbidden = false;
+let discoveryCalled = false;
 
 const observationA = {
   observation_ref: "n15_ci_source_001",
@@ -68,11 +69,11 @@ function queuePayload() {
     observations,
     recent_reviews: [...recentReviews],
     recent_runs: [{
-      run_ref: "n15_ci_ingestion_001",
+      run_ref: discoveryCalled ? "n15_ci_ingestion_002" : "n15_ci_ingestion_001",
       status: "COMPLETED",
-      sources_checked: 1,
-      sources_succeeded: 1,
-      observations_created: observations.length,
+      sources_checked: discoveryCalled ? 3 : 1,
+      sources_succeeded: discoveryCalled ? 3 : 1,
+      observations_created: 0,
       observations_updated: 0,
       observations_skipped: 0,
       started_at: checkedAt,
@@ -152,6 +153,32 @@ try {
     await route.fulfill({ status: 200, json: queuePayload(), headers: corsHeaders });
   });
 
+  await page.route("**/functions/v1/n15-source-ingestion", async route => {
+    const request = route.request();
+    if (request.method() === "OPTIONS") {
+      await route.fulfill({ status: 204, headers: corsHeaders });
+      return;
+    }
+    assert.equal(request.method(), "POST");
+    assert.ok(request.headers().authorization?.startsWith("Bearer "));
+    assert.ok(request.headers().apikey);
+    discoveryCalled = true;
+    await route.fulfill({
+      status: 200,
+      json: {
+        status: "COMPLETED",
+        run_ref: "n15_ci_ingestion_002",
+        sources_checked: 3,
+        sources_succeeded: 3,
+        observations_created: 0,
+        observations_updated: 0,
+        observations_skipped: 0,
+        published_opportunities_created: 0
+      },
+      headers: corsHeaders
+    });
+  });
+
   await page.route("**/functions/v1/n15-source-review-decision", async route => {
     const request = route.request();
     if (request.method() === "OPTIONS") {
@@ -207,8 +234,13 @@ try {
     });
   });
 
-  await page.goto(baseUrl + "/founder/opportunity-sources/", { waitUntil: "networkidle" });
+  await page.goto(baseUrl + "/founder/opportunity-sources/", { waitUntil: "domcontentloaded" });
   await page.getByRole("heading", { name: "Opportunity source review" }).waitFor();
+  await page.getByRole("button", { name: "Run source discovery" }).click();
+  await page.getByRole("status").filter({ hasText: "Source discovery completed: 0 new, 0 updated, 0 skipped" }).waitFor();
+  assert.equal(discoveryCalled, true);
+  await page.getByText("n15_ci_ingestion_002").waitFor();
+
   const first = page.locator("article").filter({ hasText: "CI official-source candidate one" });
   await first.getByLabel("Review reason", { exact: true }).fill("The page is controlled by the declared authority.");
   await first.getByLabel("Decision notes (optional)", { exact: true }).fill("I inspected the candidate link and confirmed the host.");
@@ -232,9 +264,12 @@ try {
   assert.equal(recentReviews.length, 2);
   assert.ok(recentReviews.every(item => item.target_type === "SOURCE"));
 
-  // Unauthorized queue access exposes no decisions or mutation controls.
+  // Rehydrate one cached item, then prove a revoked role clears it on 403.
+  observations = [observationA];
+  await page.reload({ waitUntil: "domcontentloaded" });
+  await page.getByText("CI official-source candidate one", { exact: true }).waitFor();
   queueForbidden = true;
-  await page.reload({ waitUntil: "networkidle" });
+  await page.reload({ waitUntil: "domcontentloaded" });
   await page.getByRole("alert").filter({ hasText: "authorised platform reviewer role is required" }).waitFor();
   assert.equal(decisions.length, 2);
   assert.equal(await page.getByText("CI official-source candidate one", { exact: true }).count(), 0,
@@ -245,6 +280,7 @@ try {
   console.log("PASS: reviewer UI loads an authorized queue and records approve/reject decisions");
   console.log("PASS: approval requires explicit attestation and official-host evidence");
   console.log("PASS: UI explicitly separates source verification from opportunity publication");
+  console.log("PASS: authorized reviewer can invoke source discovery; results remain review-only");
   console.log("PASS: unauthorized reviewer receives an error and no decision request is sent");
 } finally {
   if (browser) await browser.close().catch(() => {});
