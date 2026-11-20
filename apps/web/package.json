@@ -10,17 +10,20 @@
   },
   "dependencies": {
     "mammoth": "^1.12.0",
-    "next": "latest",
+    "next": "15.5.29",
     "pdf-parse": "^2.4.5",
     "playwright": "^1.60.0",
-    "react": "latest",
-    "react-dom": "latest"
+    "react": "19.2.7",
+    "react-dom": "19.2.7"
   },
   "devDependencies": {
-    "@netlify/plugin-nextjs": "latest",
+    "@netlify/plugin-nextjs": "5.16.8",
     "@types/node": "^22.0.0",
     "@types/react": "^19.0.0",
     "@types/react-dom": "^19.0.0",
     "typescript": "^5.8.0"
+  },
+  "overrides": {
+    "postcss": "8.5.33"
   }
 }
