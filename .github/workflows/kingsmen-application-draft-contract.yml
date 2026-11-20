@@ -14,6 +14,7 @@ on:
       - scripts/staging/test-application-draft-postgres.sql
       - scripts/staging/test-candidate-application-draft-ui.mjs
       - scripts/staging/test-candidate-workbench-ui.mjs
+      - scripts/staging/test-n15-source-review-ui.mjs
       - .github/workflows/kingsmen-application-draft-contract.yml
   push:
     branches:
