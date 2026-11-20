@@ -239,7 +239,7 @@ try {
   await page.getByRole("button", { name: "Run source discovery" }).click();
   await page.getByRole("status").filter({ hasText: "Source discovery completed: 0 new, 0 updated, 0 skipped" }).waitFor();
   assert.equal(discoveryCalled, true);
-  await page.getByText("n15_ci_ingestion_002").waitFor();
+  await page.getByRole("cell", { name: "n15_ci_ingestion_002", exact: true }).waitFor();
 
   const first = page.locator("article").filter({ hasText: "CI official-source candidate one" });
   await first.getByLabel("Review reason", { exact: true }).fill("The page is controlled by the declared authority.");
