@@ -72,8 +72,9 @@ CREATE TABLE public.opportunity_verification_reviews (
 INSERT INTO public.opportunity_source_authorities
   (authority_ref, authority_name, authority_type, base_url, sector_scope, confidence_band, active, notes)
 VALUES
-  ('AUTH-DHET-CI', 'CI Department Authority', 'GOVERNMENT_REGISTER', 'https://dhet.example/', ARRAY['HIGHER_EDUCATION','TVET'], 'OFFICIAL_VERIFIED', true, 'Synthetic test fixture only'),
-  ('AUTH-INACTIVE-CI', 'Inactive CI Authority', 'GOVERNMENT_REGISTER', 'https://inactive.example/', ARRAY['EMPLOYMENT'], 'OFFICIAL_VERIFIED', false, 'Synthetic test fixture only');
+  ('AUTH-DHET-CI', 'CI Department Authority', 'GOVERNMENT_REGISTER', 'https://dhet.example/', ARRAY['HIGHER_EDUCATION','TVET'], 'HIGH', true, 'Synthetic test fixture only; each source observation needs human review'),
+  ('AUTH-INACTIVE-CI', 'Inactive CI Authority', 'GOVERNMENT_REGISTER', 'https://inactive.example/', ARRAY['EMPLOYMENT'], 'OFFICIAL_VERIFIED', false, 'Synthetic test fixture only'),
+  ('AUTH-MEDIUM-CI', 'Medium Confidence CI Authority', 'GOVERNMENT_REGISTER', 'https://medium.example/', ARRAY['EMPLOYMENT'], 'MEDIUM', true, 'Synthetic test fixture only');
 
 INSERT INTO public.external_source_observations
   (observation_ref, authority_ref, source_url, source_title, sector, observed_claim, source_confidence, observation_status, observed_at, last_checked_at, stale_after, evidence_refs, review_reason)
@@ -82,4 +83,5 @@ VALUES
   ('obs-reject', 'AUTH-DHET-CI', 'https://dhet.example/opportunities/two', 'CI Opportunity Two', 'TVET', 'Synthetic source-link observation.', 'HIGH', 'NEEDS_REVIEW', now() - interval '1 hour', now() - interval '1 hour', now() - interval '30 minutes', ARRAY['https://dhet.example/'], 'AUTOMATED_LINK_DISCOVERY_ONLY'),
   ('obs-stale', 'AUTH-DHET-CI', 'https://dhet.example/opportunities/three', 'CI Opportunity Three', 'TVET', 'Synthetic source-link observation.', 'MEDIUM', 'NEEDS_REVIEW', now() - interval '1 hour', now() - interval '1 hour', now() - interval '30 minutes', ARRAY['https://dhet.example/'], 'AUTOMATED_LINK_DISCOVERY_ONLY'),
   ('obs-off-domain', 'AUTH-DHET-CI', 'https://outside.example/opportunities/four', 'CI Off-Domain Link', 'EMPLOYMENT', 'Synthetic source-link observation.', 'HIGH', 'NEEDS_REVIEW', now() - interval '1 hour', now() - interval '1 hour', now() - interval '30 minutes', ARRAY['https://dhet.example/'], 'AUTOMATED_LINK_DISCOVERY_ONLY'),
-  ('obs-inactive-authority', 'AUTH-INACTIVE-CI', 'https://inactive.example/opportunities/five', 'CI Inactive Authority Link', 'EMPLOYMENT', 'Synthetic source-link observation.', 'HIGH', 'NEEDS_REVIEW', now() - interval '1 hour', now() - interval '1 hour', now() - interval '30 minutes', ARRAY['https://inactive.example/'], 'AUTOMATED_LINK_DISCOVERY_ONLY');
+  ('obs-inactive-authority', 'AUTH-INACTIVE-CI', 'https://inactive.example/opportunities/five', 'CI Inactive Authority Link', 'EMPLOYMENT', 'Synthetic source-link observation.', 'HIGH', 'NEEDS_REVIEW', now() - interval '1 hour', now() - interval '1 hour', now() - interval '30 minutes', ARRAY['https://inactive.example/'], 'AUTOMATED_LINK_DISCOVERY_ONLY'),
+  ('obs-medium-authority', 'AUTH-MEDIUM-CI', 'https://medium.example/opportunities/six', 'CI Medium Authority Link', 'EMPLOYMENT', 'Synthetic source-link observation.', 'HIGH', 'NEEDS_REVIEW', now() - interval '1 hour', now() - interval '1 hour', now() - interval '30 minutes', ARRAY['https://medium.example/'], 'AUTOMATED_LINK_DISCOVERY_ONLY');
