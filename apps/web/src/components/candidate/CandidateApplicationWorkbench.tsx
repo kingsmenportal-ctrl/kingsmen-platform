@@ -265,7 +265,8 @@ export function CandidateApplicationWorkbench() {
                         {parent ? (
                           <>
                             <span className="inline-flex min-h-10 items-center rounded-lg bg-emerald-50 px-3 py-2 text-xs font-bold text-emerald-900">Parent record: {parent.application_ref || "Kingsmen application"}</span>
-                            {["Draft", "Action required"].includes(parent.kingsmen_status) ? (
+                            {["Draft", "Action required"].includes(parent.kingsmen_status)
+                              && ["DRAFT", "READINESS_BLOCKED", "READY_FOR_REVIEW", "READY_TO_SUBMIT"].includes(parent.status) ? (
                               <a
                                 href={`/candidate/applications/${parent.id}`}
                                 className="inline-flex min-h-10 items-center rounded-lg bg-amber-300 px-3 py-2 text-xs font-extrabold text-slate-950 hover:bg-amber-200 focus:outline-none focus:ring-2 focus:ring-amber-500"
