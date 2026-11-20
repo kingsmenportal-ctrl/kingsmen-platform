@@ -159,7 +159,7 @@ Deno.serve(async(req:Request)=>{
   let parentApplications:any[]=[];
   if(applicationIds.length){
    const result=await admin.from("candidate_applications")
-    .select("id,application_ref,pathway_type,status,readiness_status,readiness_snapshot,created_at,updated_at")
+    .select("id,application_ref,pathway_type,status,kingsmen_status,readiness_status,readiness_snapshot,created_at,updated_at")
     .eq("candidate_id",candidateId).in("id",applicationIds).order("updated_at",{ascending:false});
    if(result.error){console.error("master applications load failed",result.error.code??"unknown");return reply(503,{error:"Could not load prepared application records."},origin);}
    parentApplications=result.data??[];

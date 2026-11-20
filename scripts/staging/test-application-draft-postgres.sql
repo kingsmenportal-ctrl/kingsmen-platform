@@ -33,13 +33,13 @@ INSERT INTO public.candidate_opportunities (id, title, provider_name, source_url
   ('eeeeeeee-eeee-4eee-8eee-eeeeeeeeeee3', 'Fixture opportunity C', 'Fixture provider', 'https://provider.example/c', now() + interval '30 days');
 
 INSERT INTO public.candidate_applications
-  (id, application_ref, candidate_id, opportunity_id, pathway_type, status, readiness_status, readiness_snapshot) VALUES
+  (id, application_ref, candidate_id, opportunity_id, pathway_type, status, kingsmen_status, readiness_status, readiness_snapshot) VALUES
   ('ffffffff-ffff-4fff-8fff-fffffffffff1', 'FIXTURE-A-1', '11111111-1111-4111-8111-111111111111',
-   'eeeeeeee-eeee-4eee-8eee-eeeeeeeeeee1', 'EMPLOYMENT', 'READY_TO_SUBMIT', 'READY', '{"fixture":true}'),
+   'eeeeeeee-eeee-4eee-8eee-eeeeeeeeeee1', 'EMPLOYMENT', 'READY_TO_SUBMIT', 'Draft', 'READY', '{"fixture":true}'),
   ('ffffffff-ffff-4fff-8fff-fffffffffff2', 'FIXTURE-B-1', '22222222-2222-4222-8222-222222222222',
-   'eeeeeeee-eeee-4eee-8eee-eeeeeeeeeee2', 'TVET', 'DRAFT', 'NOT_CHECKED', '{}'),
+   'eeeeeeee-eeee-4eee-8eee-eeeeeeeeeee2', 'TVET', 'DRAFT', 'Action required', 'NOT_CHECKED', '{}'),
   ('ffffffff-ffff-4fff-8fff-fffffffffff3', 'FIXTURE-C-1', '33333333-3333-4333-8333-333333333333',
-   'eeeeeeee-eeee-4eee-8eee-eeeeeeeeeee3', 'INTERNSHIP', 'DRAFT', 'NOT_CHECKED', '{}');
+   'eeeeeeee-eeee-4eee-8eee-eeeeeeeeeee3', 'INTERNSHIP', 'DRAFT', 'Draft', 'NOT_CHECKED', '{}');
 
 DO $test$
 DECLARE
@@ -49,6 +49,17 @@ DECLARE
   v_count integer;
 BEGIN
   -- The source database's existing event allowlist must be widened by migration 0109.
+  IF NOT EXISTS (
+    SELECT 1
+    FROM pg_constraint c
+    WHERE c.conrelid = 'public.candidate_applications'::regclass
+      AND c.conname = 'candidate_applications_kingsmen_status_check'
+      AND position('Provider receipt confirmed' IN pg_get_constraintdef(c.oid)) > 0
+      AND position('Decision recorded' IN pg_get_constraintdef(c.oid)) > 0
+  ) THEN
+    RAISE EXCEPTION 'canonical seven-value Kingsmen status contract is missing';
+  END IF;
+
   IF NOT EXISTS (
     SELECT 1
     FROM pg_constraint c
@@ -147,16 +158,20 @@ BEGIN
   END IF;
   IF NOT EXISTS (SELECT 1 FROM public.candidate_applications
                  WHERE id = 'ffffffff-ffff-4fff-8fff-fffffffffff1'
-                   AND status = 'DRAFT' AND readiness_status = 'NOT_CHECKED'
+                   AND status = 'READY_TO_SUBMIT'
+                   AND kingsmen_status = 'Draft'
+                   AND readiness_status = 'NOT_CHECKED'
                    AND readiness_snapshot->>'readiness_recheck_required' = 'true') THEN
-    RAISE EXCEPTION 'saving draft did not invalidate readiness';
+    RAISE EXCEPTION 'saving draft changed the internal workflow state, changed Kingsmen status or failed to invalidate readiness';
   END IF;
 
   v_result := public.get_candidate_application_draft('ffffffff-ffff-4fff-8fff-fffffffffff1');
   IF v_result->>'ok' IS DISTINCT FROM 'true'
      OR v_result#>>'{draft,motivation_statement}' IS DISTINCT FROM 'Version 2'
      OR v_result->>'provider_submission_sent' IS DISTINCT FROM 'false'
-     OR v_result->>'draft_version' <> '2' THEN
+     OR v_result->>'draft_version' <> '2'
+     OR v_result#>>'{application,kingsmen_status}' IS DISTINCT FROM 'Draft'
+     OR v_result#>>'{application,status}' IS DISTINCT FROM 'READY_TO_SUBMIT' THEN
     RAISE EXCEPTION 'candidate could not reload its latest saved draft: %', v_result;
   END IF;
 
@@ -165,6 +180,19 @@ BEGIN
   v_result := public.get_candidate_application_draft('ffffffff-ffff-4fff-8fff-fffffffffff2');
   IF v_result->>'ok' IS DISTINCT FROM 'true' OR v_result->>'draft_version' <> '0' THEN
     RAISE EXCEPTION 'candidate B cannot load its own draft shell: %', v_result;
+  END IF;
+
+  -- Action required remains candidate-editable without changing the candidate-facing label.
+  v_result := public.save_candidate_application_draft(
+    'ffffffff-ffff-4fff-8fff-fffffffffff2',
+    '{"motivation_statement":"Candidate B correction"}'::jsonb,
+    0,
+    'draft-key-B-own-001'
+  );
+  IF v_result->>'ok' IS DISTINCT FROM 'true'
+     OR v_result->>'kingsmen_status' IS DISTINCT FROM 'Action required'
+     OR (v_result->>'draft_version')::integer <> 1 THEN
+    RAISE EXCEPTION 'Action required application was not safely editable: %', v_result;
   END IF;
 
   v_rejected := false;
@@ -220,7 +248,8 @@ BEGIN
   -- Once the parent crosses into a submission state, draft editing is locked.
   PERFORM set_config('request.jwt.claim.sub', 'aaaaaaaa-0000-4000-8000-000000000001', true);
   UPDATE public.candidate_applications
-  SET status = 'SUBMITTED_CONFIRMED'
+  SET status = 'SUBMITTED_CONFIRMED',
+      kingsmen_status = 'Submitted to Kingsmen'
   WHERE id = 'ffffffff-ffff-4fff-8fff-fffffffffff1';
   v_rejected := false;
   BEGIN
@@ -237,7 +266,8 @@ BEGIN
   IF NOT v_rejected THEN RAISE EXCEPTION 'draft editing was not locked after submission state'; END IF;
 
   -- Revoked consent blocks any further draft save.
-  UPDATE public.candidate_applications SET status = 'DRAFT'
+  UPDATE public.candidate_applications
+  SET status = 'DRAFT', kingsmen_status = 'Draft'
   WHERE id = 'ffffffff-ffff-4fff-8fff-fffffffffff1';
   UPDATE public.privacy_consent_records
   SET consent_status = 'REVOKED', revoked_at = clock_timestamp()

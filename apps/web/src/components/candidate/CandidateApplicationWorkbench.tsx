@@ -22,6 +22,7 @@ type ParentApplication = {
   application_ref?: string | null;
   pathway_type: string;
   status: string;
+  kingsmen_status: string;
   readiness_status?: string | null;
   readiness_snapshot?: Record<string, unknown> | null;
   created_at?: string;
@@ -263,8 +264,9 @@ export function CandidateApplicationWorkbench() {
                         {target.provider_application_url && /^https:\/\//i.test(target.provider_application_url) ? <a href={target.provider_application_url} target="_blank" rel="noopener noreferrer" className="inline-flex min-h-10 items-center rounded-lg border border-slate-300 px-3 py-2 text-xs font-bold text-slate-800">Open official destination ↗</a> : null}
                         {parent ? (
                           <>
-                            <span className="inline-flex min-h-10 items-center rounded-lg bg-emerald-50 px-3 py-2 text-xs font-bold text-emerald-900">Parent record: {parent.application_ref || parent.status}</span>
-                            {["DRAFT", "READINESS_BLOCKED", "READY_FOR_REVIEW", "READY_TO_SUBMIT"].includes(parent.status) ? (
+                            <span className="inline-flex min-h-10 items-center rounded-lg bg-emerald-50 px-3 py-2 text-xs font-bold text-emerald-900">Parent record: {parent.application_ref || "Kingsmen application"}</span>
+                            {["Draft", "Action required"].includes(parent.kingsmen_status)
+                              && ["DRAFT", "READINESS_BLOCKED", "READY_FOR_REVIEW", "READY_TO_SUBMIT"].includes(parent.status) ? (
                               <a
                                 href={`/candidate/applications/${parent.id}`}
                                 className="inline-flex min-h-10 items-center rounded-lg bg-amber-300 px-3 py-2 text-xs font-extrabold text-slate-950 hover:bg-amber-200 focus:outline-none focus:ring-2 focus:ring-amber-500"
@@ -280,7 +282,7 @@ export function CandidateApplicationWorkbench() {
                           </button>
                         )}
                       </div>
-                      {parent ? <p className="mt-2 text-xs leading-5 text-slate-500">Application state: {parent.status} · Readiness: {parent.readiness_status || "Not assessed"}. This is a Kingsmen preparation record, not provider receipt.</p> : null}
+                      {parent ? <p className="mt-2 text-xs leading-5 text-slate-500">Kingsmen status: {parent.kingsmen_status || "Status not available"} · Readiness: {parent.readiness_status || "Not assessed"}. This is a Kingsmen preparation record, not provider receipt.</p> : null}
                     </article>
                   );
                 })}
