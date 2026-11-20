@@ -237,6 +237,10 @@ try {
   await page.reload({ waitUntil: "networkidle" });
   await page.getByRole("alert").filter({ hasText: "authorised platform reviewer role is required" }).waitFor();
   assert.equal(decisions.length, 2);
+  assert.equal(await page.getByText("CI official-source candidate one", { exact: true }).count(), 0,
+    "cached source-review cards must be removed when authorization fails");
+  assert.equal(await page.getByRole("button", { name: "Approve official source" }).count(), 0,
+    "stale source-decision controls must not remain available after a 403");
 
   console.log("PASS: reviewer UI loads an authorized queue and records approve/reject decisions");
   console.log("PASS: approval requires explicit attestation and official-host evidence");
