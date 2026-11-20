@@ -35,7 +35,7 @@ BEGIN
   IF p_observation_ref IS NULL OR length(btrim(p_observation_ref)) < 1 OR length(p_observation_ref) > 120 THEN
     RETURN jsonb_build_object('ok', false, 'code', 'OBSERVATION_REF_INVALID');
   END IF;
-  IF p_decision NOT IN ('APPROVE_OFFICIAL_SOURCE', 'REJECT_SOURCE', 'MARK_SOURCE_STALE') THEN
+  IF p_decision IS NULL OR p_decision NOT IN ('APPROVE_OFFICIAL_SOURCE', 'REJECT_SOURCE', 'MARK_SOURCE_STALE') THEN
     RETURN jsonb_build_object('ok', false, 'code', 'SOURCE_DECISION_INVALID');
   END IF;
   IF p_reviewer_ref IS NULL OR length(btrim(p_reviewer_ref)) < 1 OR length(p_reviewer_ref) > 128 THEN
