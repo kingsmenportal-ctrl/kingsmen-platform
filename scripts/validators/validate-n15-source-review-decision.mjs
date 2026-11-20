@@ -7,6 +7,7 @@ function read(path) {
 
 const migration = read("db/migrations/0110_n15_source_review_decision_atomicity.sql");
 const edge = read("supabase/functions/n15-source-review-decision/index.ts");
+const ingestion = read("supabase/functions/n15-source-ingestion/index.ts");
 const page = read("apps/web/src/app/founder/opportunity-sources/page.tsx");
 const consoleUi = read("apps/web/src/components/founder/N15SourceReviewConsole.tsx");
 const postgresTest = read("scripts/staging/test-n15-source-review-postgres.sql");
@@ -56,6 +57,20 @@ const checks = [
   ["edge writes through the atomic database RPC rather than direct table updates",
     /admin\.rpc\("record_n15_source_review_decision"/.test(edge) &&
     !/admin\.from\("external_source_observations"\)\s*\.update/.test(edge)],
+  ["source ingestion excludes inactive authority and weak source anchors",
+    /\.is\("revoked_at", null\)/.test(ingestion) &&
+    /\.in\("confidence_band", \["HIGH", "OFFICIAL_VERIFIED"\]\)/.test(ingestion)],
+  ["source discovery records only unreviewed observations",
+    /observation_status: "NEEDS_REVIEW"/.test(ingestion) &&
+    /published_opportunities_created: 0/.test(ingestion) &&
+    /none is published as an open opportunity/i.test(ingestion)],
+  ["UI can trigger controlled source discovery using the user's session",
+    /functions\/v1\/n15-source-ingestion/.test(consoleUi) &&
+    /method: "POST"/.test(consoleUi) &&
+    /Run source discovery/.test(consoleUi) &&
+    /All discovered links remain in review; no opportunity was published/.test(consoleUi)],
+  ["UI clears queued observations and controls when reviewer authorization fails",
+    /setQueue\(null\);\s*setForms\(\{\}\);\s*setLoadError/.test(consoleUi)],
   ["UI uses only public Supabase config and user bearer token",
     /getCandidateSupabaseConfig/.test(consoleUi) &&
     /getCandidateAccessToken/.test(consoleUi) &&
@@ -80,7 +95,9 @@ const checks = [
     /reviewed_official_source, true/.test(browserTest) &&
     /Approve official source/.test(browserTest) &&
     /Reject source/.test(browserTest) &&
-    /queueForbidden = true/.test(browserTest)],
+    /queueForbidden = true/.test(browserTest) &&
+    /Run source discovery/.test(browserTest) &&
+    /cached source-review cards must be removed/.test(browserTest)],
   ["focused CI workflow runs the source review validator and database test",
     /validate-n15-source-review-decision\.mjs/.test(workflow) &&
     /test-n15-source-review-postgres\.sql/.test(workflow) &&
