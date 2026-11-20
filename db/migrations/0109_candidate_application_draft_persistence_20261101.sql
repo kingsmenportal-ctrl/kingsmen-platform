@@ -3,6 +3,54 @@
 -- Review-only until the 0096-0098 provenance, 0107-0108 migrations, identity isolation,
 -- encrypted backup/restore and branch-protection release gates are approved.
 
+-- Candidate-facing lifecycle is deliberately separate from internal workflow/readiness.
+-- Never infer these labels by renaming internal machine states. Existing progressed rows
+-- require an explicit reviewed mapping before this contract can be installed.
+ALTER TABLE public.candidate_applications
+  ADD COLUMN IF NOT EXISTS kingsmen_status text;
+
+UPDATE public.candidate_applications
+SET kingsmen_status = 'Draft'
+WHERE kingsmen_status IS NULL
+  AND status = 'DRAFT';
+
+DO $candidate_status_migration$
+BEGIN
+  IF EXISTS (
+    SELECT 1 FROM public.candidate_applications
+    WHERE kingsmen_status IS NULL
+  ) THEN
+    RAISE EXCEPTION 'APPLICATION_KINGSMEN_STATUS_MAPPING_REQUIRED: existing progressed applications require an explicit evidence-backed mapping';
+  END IF;
+
+  IF NOT EXISTS (
+    SELECT 1 FROM pg_constraint
+    WHERE conrelid = 'public.candidate_applications'::regclass
+      AND conname = 'candidate_applications_kingsmen_status_check'
+      AND contype = 'c'
+  ) THEN
+    ALTER TABLE public.candidate_applications
+      ADD CONSTRAINT candidate_applications_kingsmen_status_check
+      CHECK (kingsmen_status IN (
+        'Draft',
+        'Submitted to Kingsmen',
+        'Under review',
+        'Action required',
+        'Prepared for provider',
+        'Provider receipt confirmed',
+        'Decision recorded'
+      ));
+  END IF;
+END
+$candidate_status_migration$;
+
+ALTER TABLE public.candidate_applications
+  ALTER COLUMN kingsmen_status SET DEFAULT 'Draft',
+  ALTER COLUMN kingsmen_status SET NOT NULL;
+
+COMMENT ON COLUMN public.candidate_applications.kingsmen_status IS
+  'Canonical candidate-facing Kingsmen lifecycle label. Kept separate from internal status and readiness_status; transitions require authorised audited workflow.';
+
 -- The existing application-event CHECK must allow the new audit event. Preserve the
 -- current allowlist and append only APPLICATION_DRAFT_SAVED. Fail closed if the
 -- canonical live constraint is absent or has a different shape; do not silently
@@ -127,7 +175,7 @@ BEGIN
   END IF;
 
   SELECT
-    a.id, a.application_ref, a.pathway_type, a.status,
+    a.id, a.application_ref, a.pathway_type, a.status, a.kingsmen_status,
     a.readiness_status, a.readiness_snapshot, a.created_at, a.updated_at,
     o.title, o.provider_name, o.source_url, o.closes_at
   INTO v_application
@@ -159,6 +207,7 @@ BEGIN
       'application_ref', v_application.application_ref,
       'pathway_type', v_application.pathway_type,
       'status', v_application.status,
+      'kingsmen_status', v_application.kingsmen_status,
       'readiness_status', v_application.readiness_status,
       'readiness_snapshot', v_application.readiness_snapshot,
       'title', v_application.title,
@@ -174,9 +223,11 @@ BEGIN
     'draft_saved_by_current_candidate', coalesce(v_draft.saved_by_auth_user_id = v_auth_user_id, false),
     'shared_profile_available', v_profile_updated_at IS NOT NULL,
     'shared_profile_updated_at', v_profile_updated_at,
-    'is_editable', v_application.status IN (
-      'DRAFT', 'READINESS_BLOCKED', 'READY_FOR_REVIEW', 'READY_TO_SUBMIT'
-    ),
+    'is_editable',
+      v_application.kingsmen_status IN ('Draft', 'Action required')
+      AND v_application.status IN (
+        'DRAFT', 'READINESS_BLOCKED', 'READY_FOR_REVIEW', 'READY_TO_SUBMIT'
+      ),
     'read_at', v_now,
     'provider_submission_sent', false
   );
@@ -324,7 +375,7 @@ BEGIN
 
   -- Lock the owned parent application before checking the optimistic version.
   -- This serializes simultaneous saves for the same candidate/application.
-  SELECT a.id, a.status
+  SELECT a.id, a.status, a.kingsmen_status
     INTO v_application
   FROM public.candidate_applications a
   WHERE a.id = p_application_id
@@ -336,9 +387,10 @@ BEGIN
       USING ERRCODE = '42501';
   END IF;
 
-  IF v_application.status NOT IN (
-    'DRAFT', 'READINESS_BLOCKED', 'READY_FOR_REVIEW', 'READY_TO_SUBMIT'
-  ) THEN
+  IF v_application.kingsmen_status NOT IN ('Draft', 'Action required')
+     OR v_application.status NOT IN (
+       'DRAFT', 'READINESS_BLOCKED', 'READY_FOR_REVIEW', 'READY_TO_SUBMIT'
+     ) THEN
     RAISE EXCEPTION 'APPLICATION_DRAFT_IS_LOCKED'
       USING ERRCODE = '55000';
   END IF;
@@ -403,8 +455,7 @@ BEGIN
   -- Any answer change invalidates a prior readiness result. It does not submit
   -- anything to a provider and never asserts a successful application outcome.
   UPDATE public.candidate_applications
-  SET status = 'DRAFT',
-      readiness_status = 'NOT_CHECKED',
+  SET readiness_status = 'NOT_CHECKED',
       readiness_snapshot = coalesce(readiness_snapshot, '{}'::jsonb)
         || jsonb_build_object(
           'draft_answers_version', v_new_version,
@@ -422,10 +473,11 @@ BEGIN
   ) VALUES (
     'application-draft-saved:' || p_application_id::text || ':' || v_new_version::text,
     p_application_id, v_candidate_id, v_auth_user_id,
-    'APPLICATION_DRAFT_SAVED', v_application.status, 'DRAFT',
+    'APPLICATION_DRAFT_SAVED', v_application.status, v_application.status,
     'CANDIDATE_ANSWER_SAVE',
     jsonb_build_object(
       'draft_version', v_new_version,
+      'kingsmen_status', v_application.kingsmen_status,
       'answer_keys', ARRAY(SELECT jsonb_object_keys(p_answer_data)),
       'provider_submission_sent', false,
       'profile_is_shared', true
@@ -435,6 +487,7 @@ BEGIN
   RETURN jsonb_build_object(
     'ok', true, 'reused', false,
     'application_id', p_application_id,
+    'kingsmen_status', v_application.kingsmen_status,
     'draft_version', v_new_version,
     'updated_at', v_now,
     'readiness_recheck_required', true,
