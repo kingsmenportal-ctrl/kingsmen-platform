@@ -65,10 +65,10 @@ const checks = [
     /!approvalAvailable/.test(consoleUi)],
   ["UI states source verification is distinct from open status and publication",
     /does not open an opportunity, verify a closing date, approve eligibility/i.test(consoleUi) &&
-    /does not submit an application to a provider/i.test(consoleUi)],
+    /never submits an application to a provider/i.test(consoleUi)],
   ["UI links into the existing Founder Control Plane codebase",
     /N15SourceReviewConsole/.test(page) &&
-    /Founder Control Plane/.test(consoleUi)],
+    /FOUNDER CONTROL PLANE/i.test(consoleUi)],
   ["PostgreSQL integration test covers least privilege, approval, rejection, stale, domain and replay",
     /has_function_privilege\('anon'/.test(postgresTest) &&
     /APPROVE_OFFICIAL_SOURCE/.test(postgresTest) &&
