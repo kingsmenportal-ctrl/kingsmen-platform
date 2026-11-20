@@ -13,6 +13,7 @@ const applicationService = read("supabase/functions/candidate-application-prepar
 const tracker = read("apps/web/src/components/candidate/CandidateApplicationTracker.tsx");
 const workbench = read("apps/web/src/components/candidate/CandidateApplicationWorkbench.tsx");
 const workbenchBrowserTest = read("scripts/staging/test-candidate-workbench-ui.mjs");
+const n15SourceReviewBrowserTest = read("scripts/staging/test-n15-source-review-ui.mjs");
 const webManifest = JSON.parse(read("apps/web/package.json"));
 const webLock = JSON.parse(read("apps/web/package-lock.json"));
 const webPackages = webLock.packages ?? {};
@@ -78,6 +79,7 @@ const checks = [
   ["workbench links only candidate-editable and internally pre-submission parent applications", /candidate\/applications\/\$\{parent\.id\}/.test(workbench) && /Open \/ resume application draft/.test(workbench) && /\["Draft", "Action required"\]/.test(workbench) && /READY_TO_SUBMIT/.test(workbench)],
   ["workbench displays candidate status without exposing internal workflow status", /parent\.kingsmen_status/.test(workbench) && !/Application state: \{parent\.status\}/.test(workbench)],
   ["workbench browser contract verifies preparation, canonical status, resume link and no provider submission", /prepare_master_application/.test(workbenchBrowserTest) && /Open \/ resume application draft/.test(workbenchBrowserTest) && /Kingsmen status: Draft/.test(workbenchBrowserTest) && /provider submission endpoint/.test(workbenchBrowserTest) && /test-candidate-workbench-ui\.mjs/.test(workflow)],
+  ["N15 source-review browser test uses a unique table-cell locator for the ingestion reference", /getByRole\("cell", \{ name: "n15_ci_ingestion_002", exact: true \}\)/.test(n15SourceReviewBrowserTest) && /test-n15-source-review-ui\.mjs/.test(workflow)],
   ["web manifest and lock pin patched Next.js 15.5.29 across its runtime and SWC packages", webManifest.dependencies?.next === "15.5.29" && webPackages["node_modules/next"]?.version === "15.5.29" && webPackages["node_modules/@next/env"]?.version === "15.5.29" && Object.entries(webPackages).filter(([name]) => name.startsWith("node_modules/@next/swc-")).length > 0 && Object.entries(webPackages).filter(([name]) => name.startsWith("node_modules/@next/swc-")).every(([, item]) => item.version === "15.5.29")],
   ["image optimization and PostCSS dependencies use patched Sharp 0.35.5 and PostCSS 8.5.33", webPackages["node_modules/sharp"]?.version === "0.35.5" && webManifest.overrides?.postcss === "8.5.33" && webPackages["node_modules/postcss"]?.version === "8.5.33"],
   ["XML parser, Nano ID and source-map transitive dependencies meet patched minimums", versionAtLeast(webPackages["node_modules/@xmldom/xmldom"]?.version, "0.8.15") && versionAtLeast(webPackages["node_modules/nanoid"]?.version, "3.3.18") && versionAtLeast(webPackages["node_modules/source-map-js"]?.version, "1.2.2")],
