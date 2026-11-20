@@ -52,6 +52,20 @@ type IngestionRun = {
   started_at: string;
   finished_at: string | null;
 };
+type IngestionResult = {
+  status?: string;
+  run_ref?: string;
+  sources_checked?: number;
+  sources_succeeded?: number;
+  observations_created?: number;
+  observations_updated?: number;
+  observations_skipped?: number;
+  review_required?: number;
+  published_opportunities_created?: number;
+  reason?: string;
+  code?: string;
+};
+
 type QueueResponse = {
   status?: string;
   mode?: string;
@@ -111,6 +125,8 @@ export default function N15SourceReviewConsole() {
   const [notice, setNotice] = useState("");
   const [busyRef, setBusyRef] = useState<string | null>(null);
   const [busyAction, setBusyAction] = useState<ReviewDecision | null>(null);
+  const [ingesting, setIngesting] = useState(false);
+  const [ingestionResult, setIngestionResult] = useState<IngestionResult | null>(null);
   const observations = queue?.observations ?? [];
   const reviews = queue?.recent_reviews ?? [];
   const runs = queue?.recent_runs ?? [];
@@ -161,6 +177,41 @@ export default function N15SourceReviewConsole() {
       ...current,
       [ref]: { ...(current[ref] ?? { reviewReason: "", decisionNotes: "", evidenceText: "", attestedOfficial: false }), ...patch }
     }));
+  }
+
+  async function runSourceDiscovery() {
+    setLoadError("");
+    setNotice("");
+    setIngestionResult(null);
+    setIngesting(true);
+    try {
+      const auth = session();
+      const response = await fetch(`${auth.url}/functions/v1/n15-source-ingestion`, {
+        method: "POST",
+        headers: { apikey: auth.anonKey, Authorization: `Bearer ${auth.token}` },
+        cache: "no-store"
+      });
+      let body: IngestionResult = {};
+      try { body = await response.json() as IngestionResult; } catch {}
+      if (!response.ok || !["COMPLETED", "PARTIAL"].includes(String(body.status))) {
+        if (response.status === 401 || response.status === 403) {
+          setQueue(null);
+          setForms({});
+        }
+        throw new Error(body.reason || body.code || (response.status === 403
+          ? "An active, authorised source-reviewer role is required to run source discovery."
+          : `Source discovery did not complete (${response.status}).`));
+      }
+      setIngestionResult(body);
+      setNotice(
+        `Source discovery ${body.status?.toLowerCase()}: ${body.observations_created ?? 0} new, ${body.observations_updated ?? 0} updated, ${body.observations_skipped ?? 0} skipped. All discovered links remain in review; no opportunity was published.`
+      );
+      await loadQueue(false);
+    } catch (error) {
+      setLoadError(error instanceof Error ? error.message : "Source discovery was not confirmed.");
+    } finally {
+      setIngesting(false);
+    }
   }
 
   async function decide(observation: Observation, decision: ReviewDecision) {
@@ -257,7 +308,10 @@ export default function N15SourceReviewConsole() {
 
             <div className="mb-4 flex flex-wrap items-center justify-between gap-3">
               <h2 className="text-xl font-extrabold">Review queue <span className="text-sm font-semibold text-slate-500">({reviewReady})</span></h2>
-              <button type="button" onClick={() => void loadQueue(false)} disabled={busyRef !== null} className="inline-flex min-h-10 items-center rounded-lg border border-slate-300 bg-white px-4 py-2 text-sm font-bold hover:border-slate-500 disabled:opacity-50">Refresh queue</button>
+              <div className="flex flex-wrap gap-2">
+                <button type="button" onClick={() => void loadQueue(false)} disabled={busyRef !== null || ingesting} className="inline-flex min-h-10 items-center rounded-lg border border-slate-300 bg-white px-4 py-2 text-sm font-bold hover:border-slate-500 disabled:opacity-50">Refresh queue</button>
+                <button type="button" onClick={() => void runSourceDiscovery()} disabled={busyRef !== null || ingesting} className="inline-flex min-h-10 items-center rounded-lg bg-slate-950 px-4 py-2 text-sm font-bold text-white hover:bg-slate-800 disabled:cursor-wait disabled:opacity-50">{ingesting ? "Discovering official-source links…" : "Run source discovery"}</button>
+              </div>
             </div>
 
             {observations.length === 0 ? (
@@ -341,6 +395,8 @@ export default function N15SourceReviewConsole() {
 
             <section className="mb-8 rounded-2xl border border-slate-200 bg-white p-5 sm:p-6">
               <h2 className="text-lg font-extrabold">Recent ingestion runs</h2>
+              <p className="mt-2 text-sm leading-6 text-slate-600">Discovery checks only active HIGH-confidence or OFFICIAL_VERIFIED source authorities. Links are recorded as NEEDS_REVIEW; this action does not determine whether any programme is open.</p>
+              {ingestionResult ? <p className="mt-3 rounded-lg bg-slate-50 p-3 text-xs leading-5 text-slate-700">Run {ingestionResult.run_ref || "recorded"} · Sources {ingestionResult.sources_succeeded ?? 0}/{ingestionResult.sources_checked ?? 0} · Created {ingestionResult.observations_created ?? 0} · Updated {ingestionResult.observations_updated ?? 0} · Skipped {ingestionResult.observations_skipped ?? 0} · Published 0</p> : null}
               {runs.length === 0 ? <p className="mt-2 text-sm text-slate-600">No ingestion runs are recorded yet.</p> : (
                 <div className="mt-3 overflow-x-auto">
                   <table className="min-w-full text-left text-sm">
