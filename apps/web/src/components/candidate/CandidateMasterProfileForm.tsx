@@ -1,5 +1,6 @@
 "use client";
 
+import { getCandidateSessionState } from "@/lib/candidate-session";
 import { useCallback, useEffect, useMemo, useState, type FormEvent } from "react";
 
 const PATHWAYS = [
@@ -64,37 +65,24 @@ const blankProfile: ProfileFields = {
   preferredLocation: ""
 };
 
-function config() {
-  const url = process.env.NEXT_PUBLIC_SUPABASE_URL?.replace(/\/$/, "");
-  const anonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
-  let storageKey = "sb-euhubhhnumtibbyufghm-auth-token";
-  try {
-    if (url) {
-      const ref = new URL(url).hostname.split(".")[0];
-      if (ref) storageKey = `sb-${ref}-auth-token`;
-    }
-  } catch {}
-  return { url, anonKey, storageKey };
-}
-
 function readToken() {
-  const settings = config();
-  if (!settings.url || !settings.anonKey) throw new Error("Candidate profile is not configured for this deployment.");
-  let raw: string | null = null;
-  try { raw = window.localStorage.getItem(settings.storageKey); } catch {}
-  if (!raw) throw new Error("Sign in before opening your candidate profile.");
-  try {
-    const session = JSON.parse(raw) as { access_token?: string; expires_at?: number };
-    if (!session.access_token) throw new Error("Sign in before opening your candidate profile.");
-    if (typeof session.expires_at === "number" && session.expires_at <= Math.floor(Date.now() / 1000)) {
-      throw new Error("Your session has expired. Sign in again to continue.");
-    }
-    return { ...settings, token: session.access_token };
-  } catch (error) {
-    if (error instanceof Error && error.message.startsWith("Sign in")) throw error;
-    if (error instanceof Error && error.message.startsWith("Your session")) throw error;
+  const state = getCandidateSessionState();
+  if (state.status === "not_configured") {
+    throw new Error("Candidate profile is not configured for this deployment.");
+  }
+  if (state.status === "missing") {
+    throw new Error("Sign in before opening your candidate profile.");
+  }
+  if (state.status === "expired") {
+    throw new Error("Your session has expired. Sign in again to continue.");
+  }
+  if (state.status === "unreadable") {
     throw new Error("Your browser session could not be read. Sign in again.");
   }
+  if (state.status !== "ready") {
+    throw new Error("Sign in before opening your candidate profile.");
+  }
+  return { url: state.url, anonKey: state.anonKey, token: state.token };
 }
 
 async function callProfile(payload: Record<string, unknown>): Promise<ApiState> {
@@ -274,7 +262,7 @@ export default function CandidateMasterProfileForm() {
       <div className="public-notice"><span aria-hidden="true" /> CANDIDATE PROFILE · Authenticated backend workflow</div>
       <header className="public-header"><div className="public-container public-header-inner">
         <a className="public-brand" href="/" aria-label="Kingsmen Portal home"><span className="public-crest" aria-hidden="true">K</span><span className="public-wordmark"><strong>KINGSMEN</strong><small>PORTAL</small></span></a>
-        <nav className="public-nav" aria-label="Candidate navigation"><a href="/candidate/dashboard/">Dashboard</a><a href="/candidate/saved-opportunities/">Saved opportunities</a><a href="/candidate/documents/">Documents</a><a className="public-nav-portal" href="/candidate/opportunity-matches/">Opportunities ↗</a></nav>
+        <nav className="public-nav" aria-label="Candidate navigation"><a href="/candidate/dashboard/">Dashboard</a><a href="/candidate/applications">Applications</a><a href="/candidate/saved-opportunities/">Saved opportunities</a><a href="/candidate/documents/">Documents</a><a className="public-nav-portal" href="/candidate/opportunity-matches/">Opportunities ↗</a></nav>
       </div></header>
 
       <div className="public-container candidate-page-body">
