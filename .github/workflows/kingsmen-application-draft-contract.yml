@@ -22,6 +22,7 @@ on:
       - apps/web/src/components/candidate/CandidateSavedOpportunitiesClient.tsx
       - apps/web/src/components/candidate/CandidateMasterProfileForm.tsx
       - scripts/staging/test-candidate-document-session-contract.mjs
+      - scripts/staging/test-candidate-document-vault-ui.mjs
       - apps/web/src/app/candidate/documents/page.tsx
       - apps/web/src/components/candidate/DocumentPreflightPanel.tsx
       - scripts/staging/test-candidate-application-status-contract.mjs
@@ -75,6 +76,7 @@ on:
       - apps/web/src/components/candidate/CandidateSavedOpportunitiesClient.tsx
       - apps/web/src/components/candidate/CandidateMasterProfileForm.tsx
       - scripts/staging/test-candidate-document-session-contract.mjs
+      - scripts/staging/test-candidate-document-vault-ui.mjs
       - apps/web/src/app/candidate/documents/page.tsx
       - apps/web/src/components/candidate/DocumentPreflightPanel.tsx
       - scripts/staging/test-candidate-application-status-contract.mjs
@@ -211,6 +213,9 @@ jobs:
       - name: Test application tracker and saved draft resume journey
         timeout-minutes: 3
         run: node scripts/staging/test-candidate-application-tracker-ui.mjs
+      - name: Test private document upload, finalisation and download journey
+        timeout-minutes: 3
+        run: node scripts/staging/test-candidate-document-vault-ui.mjs
       - name: Test candidate draft browser save and resume
         timeout-minutes: 3
         run: node scripts/staging/test-candidate-application-draft-ui.mjs
