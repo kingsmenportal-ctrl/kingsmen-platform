@@ -283,7 +283,7 @@
           "minimum": 0,
           "maximum": 0
         },
-        "status": "completed_in_this_batch",
+        "status": "completed",
         "exit": "Status register, manifest, validator and start-of-chat rule are committed and validated."
       },
       {
