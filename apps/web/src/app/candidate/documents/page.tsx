@@ -16,6 +16,7 @@ export default function CandidateDocumentsPage() {
           </a>
           <nav aria-label="Candidate navigation" className="flex flex-wrap items-center gap-4 text-sm text-slate-200">
             <a className="hover:text-amber-200" href="/candidate/dashboard">Dashboard</a>
+            <a className="hover:text-amber-200" href="/candidate/applications">Applications</a>
             <a className="hover:text-amber-200" href="/candidate/workbench">Application workbench</a>
             <a className="hover:text-amber-200" href="/packages/">Packages</a>
           </nav>
