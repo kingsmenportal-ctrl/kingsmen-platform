@@ -301,7 +301,8 @@
           "Browser-local Free Destiny Map readiness preview merged with passing UI test",
           "Captured read-only staging migration ledger vs source-file provenance report; 96 ledger entries remain unmapped for historical reconciliation.",
           "Merged PR #330 after focused tests, status-register validation, migration-provenance validation, API build and web build passed."
-        ]
+        ],
+        "targetWindow": "2026-11-26/2026-11-27"
       },
       {
         "id": 2,
@@ -316,7 +317,8 @@
           "Captured migration provenance across eight branches; exact migration-body lineage remains unproven.",
           "Captured security advisor details for 17 RLS tables, six SECURITY DEFINER RPCs, 16 policy overlaps, Auth leaked-password setting and 282 unused-index findings.",
           "No staging schema, candidate data, RLS policies, function grants, Auth settings, or indexes have been modified."
-        ]
+        ],
+        "targetWindow": "2026-11-30/2026-12-02"
       },
       {
         "id": 3,
@@ -326,7 +328,8 @@
           "maximum": 4
         },
         "status": "not_started",
-        "exit": "Authenticated candidate journey passes browser/API/database tests."
+        "exit": "Authenticated candidate journey passes browser/API/database tests.",
+        "targetWindow": "2026-12-03/2026-12-08"
       },
       {
         "id": 4,
@@ -336,7 +339,8 @@
           "maximum": 3
         },
         "status": "not_started",
-        "exit": "Saved opportunity, draft, status, manual fallback and provider receipt evidenced."
+        "exit": "Saved opportunity, draft, status, manual fallback and provider receipt evidenced.",
+        "targetWindow": "2026-12-09/2026-12-11"
       },
       {
         "id": 5,
@@ -346,7 +350,8 @@
           "maximum": 4
         },
         "status": "not_started",
-        "exit": "Document security, payment sandbox, messaging and audit tests pass."
+        "exit": "Document security, payment sandbox, messaging and audit tests pass.",
+        "targetWindow": "2026-12-14/2026-12-17"
       },
       {
         "id": 6,
@@ -356,7 +361,8 @@
           "maximum": 2
         },
         "status": "not_started",
-        "exit": "Founder control boundaries and responsive operational surfaces pass tests."
+        "exit": "Founder control boundaries and responsive operational surfaces pass tests.",
+        "targetWindow": "2026-12-18/2026-12-21"
       },
       {
         "id": 7,
@@ -366,7 +372,8 @@
           "maximum": 3
         },
         "status": "not_started",
-        "exit": "All 13 gates pass, final evidence bundle reviewed and founder approves beta."
+        "exit": "All 13 gates pass, final evidence bundle reviewed and founder approves beta.",
+        "targetWindow": "2026-12-22/2026-12-24 (external dependencies may extend overall target to 2027-01-06)"
       }
     ]
   },
@@ -425,7 +432,9 @@
     "Only update completion status when tests or runtime evidence actually pass.",
     "Keep this document, this manifest and the validation contract in sync after meaningful batches.",
     "Never describe source presence or a ready historical deployment as proof of a complete production journey.",
-    "Do not apply migrations or modify live staging data without a reviewed plan and explicit approval."
+    "Do not apply migrations or modify live staging data without a reviewed plan and explicit approval.",
+    "Every Kingsmen response must report frontend, backend/API, database/security, integrations/Jarvis, and CI/deployment status separately, even when some layers have not changed.",
+    "Tag implementation batches by layer and report actual files changed, tests run, evidence state, blockers and next acceptance test."
   ],
   "recentBatches": [
     {
@@ -549,5 +558,42 @@
       "unusedIndexes": 282
     },
     "nextAction": "Inspect the six function bodies/grants and test candidate A/B/operator/founder isolation before proposing any role, policy, or Auth change."
+  },
+  "conversationStatusReport": {
+    "protocolPath": "docs/rebuild/KINGSMEN_CHAT_STATUS_PROTOCOL.md",
+    "requiredSections": [
+      "overall",
+      "frontend",
+      "backend_api",
+      "database_security",
+      "integrations_jarvis_operations",
+      "ci_deployment",
+      "completed_batch",
+      "open_blockers",
+      "timeline",
+      "next_deliverable"
+    ],
+    "layerTags": [
+      "FRONTEND",
+      "BACKEND/API",
+      "DATABASE/SECURITY",
+      "INTEGRATION/JARVIS",
+      "INFRA/CI/DEPLOY",
+      "SHARED"
+    ],
+    "evidenceStates": [
+      "SOURCE_PRESENT",
+      "IMPLEMENTED_TEST_PENDING",
+      "SOURCE_TEST_PASSED",
+      "STAGING_VERIFIED",
+      "RELEASE_BLOCKED",
+      "PRODUCTION_VERIFIED"
+    ],
+    "planningWindowFrom": "2026-11-25",
+    "planningTargetWindow": {
+      "earliest": "2026-12-16",
+      "latest": "2027-01-06",
+      "kind": "provisional_estimate_not_release_commitment"
+    }
   }
 }
