@@ -8,7 +8,7 @@
     "doc": "docs"
   },
   "scripts": {
-    "test": "node scripts/validators/validate-jarvis-core.mjs && node scripts/validators/validate-jarvis-live-pass-02.mjs && node scripts/staging/test-kingsmen-operating-evidence-reconciliation.mjs && npm run n14:connectors:check && npm run n15:sources:check && npm run n15:ingestion:check && node scripts/validators/validate-candidate-dashboard-contract.mjs && node scripts/validators/validate-free-destiny-map-preview.mjs && node scripts/staging/test-candidate-document-session-contract.mjs && node scripts/staging/test-candidate-preparation-schema-compat.mjs && node scripts/staging/test-candidate-draft-runtime-preflight.mjs",
+    "test": "node scripts/validators/validate-jarvis-core.mjs && node scripts/validators/validate-jarvis-live-pass-02.mjs && node scripts/staging/test-kingsmen-operating-evidence-reconciliation.mjs && npm run n14:connectors:check && npm run n15:sources:check && npm run n15:ingestion:check && node scripts/validators/validate-candidate-dashboard-contract.mjs && node scripts/validators/validate-free-destiny-map-preview.mjs && node scripts/staging/test-candidate-document-session-contract.mjs && node scripts/staging/test-candidate-preparation-schema-compat.mjs && node scripts/staging/test-candidate-draft-runtime-preflight.mjs && node scripts/validators/validate-kingsmen-migration-body-provenance.mjs",
     "jarvis:validate": "node scripts/validators/validate-jarvis-connected-live.mjs",
     "jarvis:validate:core": "node scripts/validators/validate-jarvis-core.mjs",
     "jarvis:validate:live-pass-02": "node scripts/validators/validate-jarvis-live-pass-02.mjs",
@@ -102,7 +102,7 @@
     "n15:ingestion:check": "npm run n15:ingestion:test",
     "api:test:production-storage-guard": "npm run api:build && node scripts/tests/test-truth-vault-production-guard.mjs",
     "kingsmen:status:validate": "node scripts/validators/validate-kingsmen-simplified-status.mjs",
-    "kingsmen:migrations:provenance:validate": "node scripts/validators/validate-kingsmen-migration-provenance.mjs",
+    "kingsmen:migrations:provenance:validate": "node scripts/validators/validate-kingsmen-migration-provenance.mjs && node scripts/validators/validate-kingsmen-migration-body-provenance.mjs",
     "kingsmen:security-advisor:validate": "node scripts/validators/validate-kingsmen-staging-security-advisor.mjs",
     "security:probe:staging:rls": "node scripts/staging/probe-live-rls-api-boundary.mjs",
     "security:test:staging:rls": "node scripts/staging/test-live-rls-api-boundary.mjs",

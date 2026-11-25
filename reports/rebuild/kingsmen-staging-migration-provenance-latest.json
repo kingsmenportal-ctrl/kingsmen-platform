@@ -49,6 +49,11 @@
       "severity": "P1",
       "code": "CORE_ONLY_CANDIDATES",
       "finding": "27 ledger records have a semantic core-name candidate in a historical branch but no matching sequence. Treat these as alias candidates for manual review; do not authorize replay by this match."
+    },
+    {
+      "severity": "P0",
+      "code": "SQL_BODY_PROVENANCE_PARTIALLY_RECONCILED",
+      "finding": "A read-only SHA-1 Git-blob comparison against supabase_migrations.schema_migrations.statements found exact byte-for-byte source-body matches for 30 of 130 ledger records (29 distinct SQL bodies). For 37 additional records, filename candidates exist but their bodies differ; 63 have no filename or body candidate in the eight-branch source corpus. The 100 unmatched records still require historical commit, backup/deployment or schema evidence; migration replay remains unauthorized."
     }
   ],
   "exactMatches": 32,
@@ -838,5 +843,25 @@
     "coreAndSequence": 40,
     "coreOnlyOrSequenceDifferent": 27,
     "noHistoricalSourceNameCandidate": 63
+  },
+  "bodyLevelProvenance": {
+    "status": "PARTIAL_EXACT_BODY_MATCHES_RECONCILIATION_REQUIRED",
+    "evidencePath": "manifests/rebuild/kingsmen-staging-migration-body-provenance-2026-11-25.json",
+    "queryPath": "scripts/staging/kingsmen-staging-migration-body-provenance.sql",
+    "summary": {
+      "ledgerRecords": 130,
+      "recordsWithOneStatement": 130,
+      "recordsWithOtherStatementCardinality": 0,
+      "exactBodyMatchLedgerRecords": 30,
+      "exactBodyMatchDistinctSqlBodies": 29,
+      "noExactBodyMatchLedgerRecords": 100,
+      "filenameCandidateButDifferentBody": 37,
+      "noFilenameOrBodyCandidateInSearchedBranches": 63,
+      "sourceFileReferences": 127,
+      "distinctSourceGitBlobHashes": 86
+    },
+    "rawSqlBodiesIncluded": false,
+    "replayAuthorized": false,
+    "finding": "30 ledger records (29 distinct SQL bodies) match tracked source blobs byte-for-byte. Another 37 have filename candidates whose body differs; 63 have no filename or body candidate in the eight-branch source corpus. The 100 unmatched records remain unresolved."
   }
 }

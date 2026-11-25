@@ -54,7 +54,20 @@
     "lastRecordedReadyDeployId": "6a4d9382c91e49ab899318da",
     "lastRecordedReadyDeployDate": "2026-07-08",
     "lastRecordedReadyDeployBranch": "main",
-    "productionDeployRepresentsCurrentRebuildBranch": false
+    "productionDeployRepresentsCurrentRebuildBranch": false,
+    "migrationBodyProvenance": {
+      "capturedOn": "2026-11-25",
+      "evidencePath": "manifests/rebuild/kingsmen-staging-migration-body-provenance-2026-11-25.json",
+      "queryPath": "scripts/staging/kingsmen-staging-migration-body-provenance.sql",
+      "ledgerRecords": 130,
+      "recordsWithOneStatement": 130,
+      "exactBodyMatchLedgerRecords": 30,
+      "exactBodyMatchDistinctSqlBodies": 29,
+      "filenameCandidateButDifferentBody": 37,
+      "noFilenameOrBodyCandidateInSearchedBranches": 63,
+      "recordsWithoutExactBodyMatch": 100,
+      "replayAuthorized": false
+    }
   },
   "releaseGates": {
     "required": 13,
