@@ -61,7 +61,7 @@ Implemented in the branch:
 
 **Data boundary:** This preview only reads the current form values in the page and renders recommendations. It makes no backend request and does not write to localStorage or sessionStorage. It does not create a candidate profile, save an application, or claim that a real opportunity is open.
 
-**Validation actually performed:** A source-level structural check against GitHub-fetched branch files passed 16 of 16 checks before this E2E addition. This was not a Node test run. A Playwright browser E2E and workflow steps now exist, but no completed GitHub Actions result, successful Next.js build, real browser run, or deployment result has been observed in this session. Do not mark runtime validation as passing until evidence exists.
+**Validation actually performed:** The source-level structural check passed 16 of 16 checks. The actual GitHub Actions root regression suite passed, including the new source-level Free Destiny Map test. The repository's separate `Kingsmen CI` also completed successfully with its API and Next.js builds. The first focused preview workflow failed at the web dependency install because `npm ci` detected the missing Netlify plugin lock entry; the focused workflow was then aligned with the canonical `npm install --prefix apps/web --no-audit --no-fund` command. The updated focused workflow must still complete the browser E2E before this feature can be called runtime-verified.
 
 ## Public launch blockers
 
