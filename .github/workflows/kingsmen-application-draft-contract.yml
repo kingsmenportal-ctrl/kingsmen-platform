@@ -17,6 +17,9 @@ on:
       - scripts/staging/test-candidate-application-tracker-ui.mjs
       - apps/web/src/components/candidate/CandidateApplicationTracker.tsx
       - apps/web/src/lib/candidate-session.ts
+      - scripts/staging/test-candidate-document-session-contract.mjs
+      - apps/web/src/app/candidate/documents/page.tsx
+      - apps/web/src/components/candidate/DocumentPreflightPanel.tsx
       - scripts/staging/test-candidate-application-status-contract.mjs
       - docs/rebuild/proposals/CANDIDATE_APPLICATION_STATUS_CONTRACT_SQL_PROPOSAL.md
       - docs/rebuild/proposals/candidate-application-status-contract.proposal.sql
@@ -63,6 +66,9 @@ on:
       - scripts/staging/test-candidate-application-tracker-ui.mjs
       - apps/web/src/components/candidate/CandidateApplicationTracker.tsx
       - apps/web/src/lib/candidate-session.ts
+      - scripts/staging/test-candidate-document-session-contract.mjs
+      - apps/web/src/app/candidate/documents/page.tsx
+      - apps/web/src/components/candidate/DocumentPreflightPanel.tsx
       - scripts/staging/test-candidate-application-status-contract.mjs
       - docs/rebuild/proposals/CANDIDATE_APPLICATION_STATUS_CONTRACT_SQL_PROPOSAL.md
       - docs/rebuild/proposals/candidate-application-status-contract.proposal.sql
@@ -134,6 +140,8 @@ jobs:
         run: node scripts/validators/validate-candidate-application-draft-persistence.mjs
       - name: Test canonical candidate application status contract
         run: node scripts/staging/test-candidate-application-status-contract.mjs
+      - name: Test candidate document session and navigation contract
+        run: node scripts/staging/test-candidate-document-session-contract.mjs
       - name: Test canonical candidate applications entry route
         run: node scripts/staging/test-candidate-applications-entry-route.mjs
       - name: Validate N15 source-review security contract
