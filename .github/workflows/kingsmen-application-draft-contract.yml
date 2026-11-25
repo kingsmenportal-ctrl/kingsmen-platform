@@ -18,6 +18,9 @@ on:
       - apps/web/src/components/candidate/CandidateApplicationTracker.tsx
       - apps/web/src/lib/candidate-session.ts
       - scripts/staging/test-candidate-application-status-contract.mjs
+      - docs/rebuild/proposals/CANDIDATE_APPLICATION_STATUS_CONTRACT_SQL_PROPOSAL.md
+      - docs/rebuild/proposals/candidate-application-status-contract.proposal.sql
+      - scripts/staging/test-candidate-application-status-postgres.sql
       - apps/web/src/lib/candidate-application-status.ts
       - apps/web/src/lib/read-limited-json.ts
       - apps/web/package.json
@@ -61,6 +64,9 @@ on:
       - apps/web/src/components/candidate/CandidateApplicationTracker.tsx
       - apps/web/src/lib/candidate-session.ts
       - scripts/staging/test-candidate-application-status-contract.mjs
+      - docs/rebuild/proposals/CANDIDATE_APPLICATION_STATUS_CONTRACT_SQL_PROPOSAL.md
+      - docs/rebuild/proposals/candidate-application-status-contract.proposal.sql
+      - scripts/staging/test-candidate-application-status-postgres.sql
       - apps/web/src/lib/candidate-application-status.ts
       - apps/web/src/lib/read-limited-json.ts
       - apps/web/package.json
@@ -150,6 +156,18 @@ jobs:
         run: docker exec -i "$KINGSMEN_POSTGRES_CONTAINER_ID" psql -U postgres -d postgres -v ON_ERROR_STOP=1 < db/migrations/0109_candidate_application_draft_persistence_20261101.sql
       - name: Test draft save, idempotency, consent and candidate isolation
         run: docker exec -i "$KINGSMEN_POSTGRES_CONTAINER_ID" psql -U postgres -d postgres -v ON_ERROR_STOP=1 < scripts/staging/test-application-draft-postgres.sql
+      - name: Create isolated candidate status-contract database
+        run: docker exec "$KINGSMEN_POSTGRES_CONTAINER_ID" psql -U postgres -d postgres -v ON_ERROR_STOP=1 -c "CREATE DATABASE kingsmen_status_contract"
+      - name: Bootstrap candidate status-contract database
+        run: docker exec -i "$KINGSMEN_POSTGRES_CONTAINER_ID" psql -U postgres -d kingsmen_status_contract -v ON_ERROR_STOP=1 < scripts/staging/fixtures/application-lifecycle-postgres-bootstrap.sql
+      - name: Apply capacity migration 0107 for status-contract fixture
+        run: docker exec -i "$KINGSMEN_POSTGRES_CONTAINER_ID" psql -U postgres -d kingsmen_status_contract -v ON_ERROR_STOP=1 < db/migrations/0107_application_capacity_entitlements_20261101.sql
+      - name: Apply verified-readiness migration 0108 for status-contract fixture
+        run: docker exec -i "$KINGSMEN_POSTGRES_CONTAINER_ID" psql -U postgres -d kingsmen_status_contract -v ON_ERROR_STOP=1 < db/migrations/0108_candidate_application_readiness_eligibility_deadline_gate_20261101.sql
+      - name: Apply candidate status proposal to disposable PostgreSQL only
+        run: docker exec -i "$KINGSMEN_POSTGRES_CONTAINER_ID" psql -U postgres -d kingsmen_status_contract -v ON_ERROR_STOP=1 < docs/rebuild/proposals/candidate-application-status-contract.proposal.sql
+      - name: Test candidate status proposal database contract
+        run: docker exec -i "$KINGSMEN_POSTGRES_CONTAINER_ID" psql -U postgres -d kingsmen_status_contract -v ON_ERROR_STOP=1 < scripts/staging/test-candidate-application-status-postgres.sql
       - name: Create isolated lifecycle database
         run: docker exec "$KINGSMEN_POSTGRES_CONTAINER_ID" psql -U postgres -d postgres -v ON_ERROR_STOP=1 -c "CREATE DATABASE kingsmen_lifecycle"
       - name: Bootstrap full lifecycle dependency fixture
