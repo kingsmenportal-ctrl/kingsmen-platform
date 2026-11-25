@@ -467,6 +467,16 @@
       "head": "994df9c4d58858a3f096a6979a2031100462e8df",
       "mergeCommitSha": "aebd079f8072de96d13f675e065c891d2b0bae88",
       "role": "candidate applications entry, tracker/workbench, status labels, shared session and document UI; schema-compatible edge query; all four PR CI workflows passed; live staging draft runtime still blocked"
+    },
+    {
+      "number": 345,
+      "title": "Add candidate draft runtime preflight and clarify ruleset evidence",
+      "state": "merged",
+      "draft": false,
+      "base": "rebuild/kingsmen-one-foundation-2026-11-17",
+      "head": "766fb6689e7721dc86abbc3d67545ec27a803ccd",
+      "mergeCommitSha": "712be387cfd5bd2411ba5644e39440f9428df9b8",
+      "role": "read-only candidate draft runtime preflight, SELECT-only SQL guard, explicit list-vs-detail ruleset evidence fields; all four PR workflows passed; live ruleset settings unchanged"
     }
   ],
   "updateRules": [
@@ -530,9 +540,18 @@
     },
     {
       "id": "candidate-draft-runtime-preflight-and-ruleset-evidence",
-      "state": "implementation_pending_ci",
+      "state": "merged",
       "branch": "fix/staging-provenance-preflight-20261125",
-      "notes": "Added SELECT-only runtime preflight SQL + offline guard, documented current staging findings, and clarified list-endpoint versus detail-confirmed ruleset evidence. No staging data/schema or GitHub repository settings changed."
+      "notes": "PR #345 merged; SELECT-only live SQL preflight executed successfully; 4 PR workflows passed. Ruleset report labels clarified without changing repository settings; actual main ruleset remains incomplete.",
+      "mergeCommitSha": "712be387cfd5bd2411ba5644e39440f9428df9b8",
+      "ciResult": "success",
+      "ciRunIds": [
+        45696638529,
+        45696638409,
+        45696638393,
+        45696638408
+      ],
+      "liveSqlPreflightResult": "success_read_only"
     }
   ],
   "latestVerification": {
@@ -558,7 +577,7 @@
       "commit": "af25ba4ecf94fde40739332d7c15a24092874974"
     },
     "migrationProvenance": {
-      "status": "historical_sweep_captured_validator_passed",
+      "status": "historical_sweep_captured_live_ledger_tail_rechecked",
       "ciRunId": 45639316939,
       "currentBranchTrackedSourceFiles": 41,
       "historicalBranchesScanned": 8,
@@ -568,7 +587,9 @@
       "replayAuthorized": false,
       "liveLedgerTailAudit": {
         "checkedOn": "2026-11-25",
+        "exactPreflightSqlExecuted": true,
         "ledgerRecordCount": 130,
+        "distinctVersionCount": 130,
         "latestVersion": "20261029193124",
         "latestName": "candidate_self_service_profile_bootstrap_0095",
         "unmatchedMigrationIdentifiers": [
@@ -585,7 +606,8 @@
           "ledgerRowsWithoutSourceNameCandidate": 63,
           "exactSqlBodyProvenanceMatches": 0
         },
-        "releaseDecision": "RECONCILIATION_REQUIRED_DO_NOT_REPLAY"
+        "replayAuthorized": false,
+        "migrationStatus": "RECONCILIATION_REQUIRED_DO_NOT_REPLAY"
       }
     },
     "securityAdvisorAudit": {
@@ -623,7 +645,7 @@
       "reason": "Active ruleset is verified through the rulesets API; the project manifest asks for additional status checks and review/history requirements not yet present in the observed ruleset."
     },
     "branchProtectionVerifier": {
-      "status": "source_report_clarification_in_progress_live_policy_still_incomplete",
+      "status": "source_report_clarification_merged_live_policy_still_incomplete",
       "sourceScript": "scripts/ci/capture-main-branch-protection.mjs",
       "sourceValidator": "scripts/validators/validate-branch-protection-capture.mjs",
       "unitTests": "scripts/ci/test-main-branch-protection-policy.mjs",
@@ -656,7 +678,12 @@
           "adminEnforcementEnabled"
         ]
       },
-      "repoSettingsChanged": false
+      "repoSettingsChanged": false,
+      "mergeCommitSha": "712be387cfd5bd2411ba5644e39440f9428df9b8",
+      "postMergeEvidenceRun": {
+        "runId": 45697023473,
+        "status": "in_progress"
+      }
     },
     "candidateRuntimePreflight": {
       "statusDate": "2026-11-25",
@@ -836,25 +863,28 @@
       }
     },
     "candidateDraftRuntimePreflight": {
-      "status": "blocked_verified_by_read_only_live_queries",
+      "status": "blocked_verified_by_live_read_only_preflight_sql",
       "checkedOn": "2026-11-25",
+      "capturedAt": "2026-11-25T20:37:20.487695+00:00",
       "projectRef": "euhubhhnumtibbyufghm",
-      "method": "read_only_information_schema_and_schema_migrations_selects",
-      "ledger": {
-        "recordCount": 130,
-        "distinctVersionCount": 130,
-        "latestVersion": "20261029193124",
-        "latestName": "candidate_self_service_profile_bootstrap_0095",
-        "latestFifteenReadOnlyRowsCaptured": true,
-        "matchingLedgerRowsForMigrationIds": {
-          "0096": 0,
-          "0097": 0,
-          "0098": 0,
-          "0107": 0,
-          "0108": 0,
-          "0109": 0,
-          "0110": 0
-        }
+      "sourceQuery": "scripts/staging/kingsmen-candidate-draft-runtime-preflight.sql",
+      "queryBlobSha": "00d66511bbc425e99115b9eb9ca2deef2480af56",
+      "executionResult": "success",
+      "exactQueryRunAgainstStaging": true,
+      "recordCount": 130,
+      "distinctVersionCount": 130,
+      "latestLedgerRecord": {
+        "version": "20261029193124",
+        "name": "candidate_self_service_profile_bootstrap_0095"
+      },
+      "migrationIdNameMatches": {
+        "0096": 0,
+        "0097": 0,
+        "0098": 0,
+        "0107": 0,
+        "0108": 0,
+        "0109": 0,
+        "0110": 0
       },
       "runtimeObjects": {
         "candidateApplicationsTable": true,
@@ -866,6 +896,7 @@
         "applicationDraftSavedEventAllowed": false
       },
       "safety": {
+        "readOnly": true,
         "schemaChanged": false,
         "dataChanged": false,
         "migrationsApplied": false,
@@ -874,10 +905,10 @@
         "deploymentChanged": false,
         "migrationReplayAuthorized": false
       },
-      "repeatableReadOnlyQuery": "scripts/staging/kingsmen-candidate-draft-runtime-preflight.sql",
       "offlineContractTest": "scripts/staging/test-candidate-draft-runtime-preflight.mjs",
+      "offlineContractCi": "passed on PR #345",
       "instructions": "docs/rebuild/CANDIDATE_DRAFT_RUNTIME_PREFLIGHT.md",
-      "nextAction": "Reconcile exact applied-SQL provenance and approved backup/restore/security/change-control gates; do not apply draft/status migrations while any required schema object or migration lineage is unresolved."
+      "nextAction": "Reconcile exact applied-SQL provenance and approved backup/restore/security/change-control gates before considering any status/draft migration; do not replay migrations from this report."
     }
   },
   "migrationProvenance": {
@@ -1092,14 +1123,16 @@
         "API build passed in PR #335 CI run 45640042482",
         "PR #344 removes absent kingsmen_status from the live candidate-preparation SELECT and adds a schema-compatibility regression guard; the status SQL remains proposal-only.",
         "PR #344 removes the uninstalled kingsmen_status column from the live candidate-preparation query and adds a passing schema-compatibility guard; status/draft SQL remains proposal-only.",
-        "Added a read-only SELECT-only candidate draft runtime preflight SQL query and an offline contract test; it reports the live ledger tail and required table/column/RPC/helper/event prerequisites without changing staging."
+        "Added a read-only SELECT-only candidate draft runtime preflight SQL query and an offline contract test; it reports the live ledger tail and required table/column/RPC/helper/event prerequisites without changing staging.",
+        "PR #345 added and ran the exact read-only candidate draft runtime preflight SQL; returned 130 ledger records/latest 0095 and confirmed absence of draft table/read-save RPC/security helper/event allowance and candidate_applications.kingsmen_status column."
       ],
       "missing": [
         "Prove real PostgreSQL persistence and idempotency on staging",
         "Prove retry/worker lease/DLQ recovery, authorization boundaries and API/UI end-to-end",
         "Staging draft persistence remains blocked by missing table/RPC/security helper/event type and unavailable approved fixtures; do not promote migrations until provenance/restore/security/change control pass.",
         "Candidate draft runtime still lacks the draft-answer table, get/save RPCs, verified-candidate security helper and allowed APPLICATION_DRAFT_SAVED event; no approved actor/fixture dataset.",
-        "Migration provenance remains unresolved: staging ledger ends at candidate_self_service_profile_bootstrap_0095 and contains no name matches for 0096–0098 or 0107–0110; draft runtime objects are absent."
+        "Migration provenance remains unresolved: staging ledger ends at candidate_self_service_profile_bootstrap_0095 and contains no name matches for 0096–0098 or 0107–0110; draft runtime objects are absent.",
+        "Exact deployed-SQL lineage remains unproven for 63 ledger rows without any source-name candidate across the historical sweep; migrations 0107–0110 cannot be replayed based on names alone."
       ]
     },
     "databaseSecurity": {
@@ -1113,7 +1146,9 @@
         "PR #335 populated all 16 role/action/policy overlap combinations and security-advisor validator passed",
         "PR #343 merged at 4adb15d963363202cdc6e81715f25dcc3f163857; the GET-only staging RLS API probe, 65-check offline contract, Kingsmen CI, candidate application/PostgreSQL browser contract and Jarvis Live Runtime all passed on PR head 194bc01f442fdc18114314078c6e2f3d19f39bb5. This is source/CI proof only, not live staging role-isolation evidence.",
         "PR #344 merged at aebd079f8072de96d13f675e065c891d2b0bae88 after all four PR-head CI workflows passed; status-contract, schema-compat guard, isolated PostgreSQL and seven browser checks passed. These are source/CI proofs only; live candidate runtime and RLS actor isolation remain untested.",
-        "Direct read-only staging query on 2026-11-25: 130 migration ledger rows, latest entry candidate_self_service_profile_bootstrap_0095; no ledger name matches for 0096–0098 or 0107–0110. Candidate draft answers table, get/save RPCs, verified-candidate helper and APPLICATION_DRAFT_SAVED event allowance are absent; candidate_applications.kingsmen_status is absent."
+        "Direct read-only staging query on 2026-11-25: 130 migration ledger rows, latest entry candidate_self_service_profile_bootstrap_0095; no ledger name matches for 0096–0098 or 0107–0110. Candidate draft answers table, get/save RPCs, verified-candidate helper and APPLICATION_DRAFT_SAVED event allowance are absent; candidate_applications.kingsmen_status is absent.",
+        "PR #345 merged at 712be387cfd5bd2411ba5644e39440f9428df9b8. The exact SELECT-only runtime preflight SQL was executed successfully against staging and confirmed 130 distinct ledger entries ending at candidate_self_service_profile_bootstrap_0095, no ledger name matches for 0096–0098 or 0107–0110, and absent draft runtime objects. No mutation.",
+        "PR #345 clarifies ruleset evidence: list endpoint result count is reported separately from detail-confirmed selected ruleset applicability. The actual live main ruleset remains incomplete; no GitHub settings changed."
       ],
       "missing": [
         "Authenticated Candidate A/B, operator and founder runtime isolation tests",
