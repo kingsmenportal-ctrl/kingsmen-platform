@@ -91,6 +91,27 @@ The 16 findings are role/action overlap combinations, not 16 proven authorizatio
 
 First review priorities are candidate data and session tables, where overlapping candidate, founder/operator and backend policies must not be interpreted as granting a candidate cross-account access. Validate candidate A/B isolation with actual authenticated requests. Consolidation should preserve the same access semantics and must be tested before any policy change is applied.
 
+
+## 3A. Direct table grants and policy predicates — priority review
+
+A read-only PostgreSQL catalog query inspected 33 live policies on eight high-value tables, 4× privilege matrices for `anon`, `authenticated` and `service_role`, plus seven `kingsmen_security` helper definitions. **Five tables grant all four direct table privileges (SELECT/INSERT/UPDATE/DELETE) to both `anon` and `authenticated` even though RLS is enabled:**
+
+| Table | Anonymous direct grants | Authenticated direct grants | Current policy pattern | Priority |
+|---|---|---|---|---|
+| `candidate_credentials` | SELECT/INSERT/UPDATE/DELETE | SELECT/INSERT/UPDATE/DELETE | Two `PUBLIC`-scoped policies, guarded by founder/operator or backend-service-context helpers | P0 least-privilege review |
+| `candidate_sessions` | SELECT/INSERT/UPDATE/DELETE | SELECT/INSERT/UPDATE/DELETE | Candidate-own read, founder/operator read, backend-service-context ALL, all policy roles `PUBLIC` | P0 least-privilege review |
+| `evidence_ledger` | SELECT/INSERT/UPDATE/DELETE | SELECT/INSERT/UPDATE/DELETE | Candidate-safe read is authenticated-only; founder/operator and service-role policies | P0 negative access tests |
+| `route_sources` | SELECT/INSERT/UPDATE/DELETE | SELECT/INSERT/UPDATE/DELETE | Public read is restricted to VERIFIED status and confidence A/B; no anon write policy observed | P1 least-privilege review |
+| `workflow_runs` | SELECT/INSERT/UPDATE/DELETE | SELECT/INSERT/UPDATE/DELETE | Candidate-own and founder/operator reads; service-role ALL; no anon read policy observed | P0 negative access tests |
+
+The observed helper definitions are JWT-bound: `current_authenticated_candidate_id()` maps `auth.uid()` to `candidate_accounts.auth_user_id`; `current_candidate_public_ref()` reads JWT `app_metadata.candidate_public_ref`; `current_runtime_role()` reads `app_metadata.kingsmen_role` then JWT `role`; `is_founder_or_operator()` checks the resolved role; `is_backend_service_role()` requires both a service-role claim and `service_context=backend_api`. The helper functions deny direct `anon` EXECUTE in the live catalog. These predicates are useful controls, but direct table grants are broader than necessary and they are **not a substitute for real negative API tests**.
+
+The other three reviewed tables—`applications`, `candidate_profiles`, `candidates`—have no direct anon grants. Authenticated access is more narrowly granted and relies on candidate identity, permitted profile update and founder/operator predicates.
+
+**No live privileges, policies or functions were changed.** Do not apply blanket `REVOKE` statements until direct API callers are mapped; some current client flows may call PostgREST directly. The next backend acceptance batch must test anonymous requests, Candidate A against Candidate B records, operator/founder access, and service-role backend context against all five broad-grant tables. Then propose a reviewed forward-only least-privilege migration and apply it only after staging test evidence.
+
+The exact current policy predicates, table grants and helper definitions are stored in `livePolicyOverlapReview` in the machine-readable snapshot. The validator checks their counts and critical privilege findings.
+
 ## 4. Authentication setting
 
 Supabase reports leaked-password protection is disabled. Plan an explicit Auth configuration change, verify the setting after change, and test login/registration/password-reset behaviour. This change has not been applied by this audit.
