@@ -9,12 +9,12 @@
   "statusRegisterPath": "docs/rebuild/KINGSMEN_SIMPLIFIED_STATUS_AND_COMPLETION_ROADMAP.md",
   "validationCommand": "npm run kingsmen:status:validate",
   "inventory": {
-    "trackedFilesOnImplementationBranch": 3385,
+    "trackedFilesOnImplementationBranch": 3389,
     "webRoutePages": 78,
     "nextApiRouteHandlers": 73,
     "apiSourceFiles": 182,
     "webSourceFiles": 332,
-    "validatorFiles": 220,
+    "validatorFiles": 221,
     "candidateRoutePages": 15,
     "founderRoutePages": 10,
     "trackedSqlMigrationFiles": 41,
@@ -22,7 +22,9 @@
       "db/migrations",
       "database/migrations",
       "supabase/migrations"
-    ]
+    ],
+    "inventoryTreeSha": "58306af161766d597f5cf90dbcd0cad30b6c9759",
+    "inventoryCapturedOn": "2026-11-25"
   },
   "infrastructure": {
     "stagingProvider": "Supabase",
@@ -296,11 +298,9 @@
         "status": "in_progress",
         "exit": "Clean CI on the intended rebuild branch and release branch protection confirmed.",
         "currentProgress": [
-          "Status register and start-of-chat discipline merged",
-          "Rebuild branch now has CI triggers and a status contract step",
-          "Browser-local Free Destiny Map readiness preview merged with passing UI test",
-          "Captured read-only staging migration ledger vs source-file provenance report; 96 ledger entries remain unmapped for historical reconciliation.",
-          "Merged PR #330 after focused tests, status-register validation, migration-provenance validation, API build and web build passed."
+          "Status and completion register, README reference, mandatory reporting contract and validators are merged into the rebuild lane.",
+          "Free Destiny Map readiness preview is merged and its focused browser test passed.",
+          "Main-branch protection evidence is still failing to verify required protection; Phase 1 cannot be marked complete."
         ]
       },
       {
@@ -313,9 +313,10 @@
         "status": "in_progress_read_only_audit",
         "exit": "Migration map approved and RLS/authenticated role tests pass.",
         "currentProgress": [
-          "Captured migration provenance across eight branches; exact migration-body lineage remains unproven.",
-          "Captured security advisor details for 17 RLS tables, six SECURITY DEFINER RPCs, 16 policy overlaps, Auth leaked-password setting and 282 unused-index findings.",
-          "No staging schema, candidate data, RLS policies, function grants, Auth settings, or indexes have been modified."
+          "Eight-branch migration provenance snapshot captured: 67/130 ledger rows have filename-based candidates; 63 have none among branches searched; exact SQL deployment lineage is not yet proven.",
+          "Live security advisor details captured and validated: all six flagged function bodies match candidate historical source; no anon/PUBLIC execute; all 17 RLS/no-policy tables deny direct anon/authenticated table grants.",
+          "No live staging schema/data/policies/function privileges/Auth settings/indexes were changed.",
+          "Candidate A/B/operator/founder end-to-end isolation tests remain open."
         ]
       },
       {
@@ -474,12 +475,13 @@
       "url": "https://github.com/kingsmenportal-ctrl/kingsmen-platform/actions/runs/45635347893"
     },
     "releaseProtectionCheck": {
-      "runId": 45634928235,
+      "runId": 45638646955,
       "result": "failure",
-      "reason": "Branch-protection verifier returned HTTP 404 and could not verify protection; release remains blocked."
+      "reason": "Main branch protection evidence workflow failed to verify required protection settings; repository release governance remains a blocker."
     },
     "migrationProvenance": {
-      "status": "historical_sweep_captured_pending_ci_validation",
+      "status": "historical_sweep_captured_validator_passed",
+      "ciRunId": 45638646994,
       "currentBranchTrackedSourceFiles": 41,
       "historicalBranchesScanned": 8,
       "historicalNameCandidates": 67,
@@ -488,7 +490,8 @@
       "replayAuthorized": false
     },
     "securityAdvisorAudit": {
-      "status": "captured_pending_ci_validation",
+      "status": "live_acl_and_body_checks_captured_validator_passed",
+      "ciRunId": 45638646994,
       "securityAdvisorAuditPath": "docs/rebuild/KINGSMEN_STAGING_SECURITY_ADVISOR_AUDIT_2026-11-25.md",
       "counts": {
         "publicTables": 230,
@@ -498,7 +501,28 @@
         "multiplePermissivePolicies": 16,
         "leakedPasswordProtectionWarning": 1,
         "unusedIndexes": 282
-      }
+      },
+      "functionBodiesMatched": 6,
+      "anonOrPublicCanExecuteFlaggedFunction": 0,
+      "noPolicyTablesWithDirectAnonOrAuthenticatedGrant": 0
+    },
+    "lastKnownPassingIntegratedCi": {
+      "runId": 45637295249,
+      "result": "success",
+      "url": "https://github.com/kingsmenportal-ctrl/kingsmen-platform/actions/runs/45637295249",
+      "commit": "84978bb62981ef41997b1fd23aed47a3cce0de26"
+    },
+    "latestPostAuditCi": {
+      "runId": 45638710300,
+      "status": "pending",
+      "url": "https://github.com/kingsmenportal-ctrl/kingsmen-platform/actions/runs/45638710300",
+      "commit": "58306af161766d597f5cf90dbcd0cad30b6c9759"
+    },
+    "latestSecurityValidatorRun": {
+      "runId": 45638646994,
+      "result": "passed",
+      "url": "https://github.com/kingsmenportal-ctrl/kingsmen-platform/actions/runs/45638646994",
+      "commit": "f410c11daac91cc74af7babe2619b0f6460d3228"
     }
   },
   "migrationProvenance": {
@@ -538,7 +562,7 @@
     "validatorPath": "scripts/validators/validate-kingsmen-staging-security-advisor.mjs",
     "validatorCommand": "npm run kingsmen:security-advisor:validate",
     "captureType": "read_only",
-    "status": "CAPTURED_PENDING_CI_VALIDATION",
+    "status": "LIVE_BODY_AND_PRIVILEGE_CHECKS_CAPTURED_VALIDATOR_PASSED",
     "summary": {
       "publicTables": 230,
       "publicTablesWithRlsEnabled": 230,
@@ -546,8 +570,83 @@
       "authenticatedCallableSecurityDefinerFunctions": 6,
       "multiplePermissivePolicies": 16,
       "leakedPasswordProtectionWarning": 1,
-      "unusedIndexes": 282
+      "unusedIndexes": 282,
+      "liveFunctionBodiesMatchedHistoricalSource": 6,
+      "flaggedFunctionsExecutableByAnonOrPublic": 0,
+      "noPolicyTablesWithDirectAnonOrAuthenticatedGrants": 0,
+      "noPolicyTablesPrivilegedChecked": 17
     },
     "nextAction": "Inspect the six function bodies/grants and test candidate A/B/operator/founder isolation before proposing any role, policy, or Auth change."
+  },
+  "surfaceStatus": {
+    "frontend": {
+      "surface": "apps/web — Next.js App Router / React",
+      "status": "SOURCE_PRESENT_TARGETED_PREVIEW_TESTED_FULL_CANDIDATE_JOURNEY_PENDING",
+      "inventory": {
+        "routePages": 78,
+        "sourceFiles": 332,
+        "candidateRoutePages": 15,
+        "founderRoutePages": 10,
+        "nextApiRouteHandlers": 73
+      },
+      "builtOrVerified": [
+        "Candidate/dashboard, profile, identity, workbench, tracker, documents, finance, outcomes, messages and mobile route families exist in source.",
+        "PR #326 Free Destiny Map browser-local readiness preview merged; preview does not save or submit selections.",
+        "Free Destiny Map readiness-preview browser test passed in application draft contract workflow.",
+        "Next.js web build passed in PR #330 CI run 45637295249."
+      ],
+      "remaining": [
+        "Run current post-security-audit Next.js build to completion.",
+        "Prove one full authenticated candidate browser/API/database journey on staging.",
+        "Verify route-to-route connectivity and mobile/accessibility acceptance for the critical journey."
+      ],
+      "evidence": {
+        "readinessPreviewCi": "https://github.com/kingsmenportal-ctrl/kingsmen-platform/actions/runs/45634488651",
+        "lastKnownWebBuildPass": "https://github.com/kingsmenportal-ctrl/kingsmen-platform/actions/runs/45637295249",
+        "latestRebuildCi": "https://github.com/kingsmenportal-ctrl/kingsmen-platform/actions/runs/45638710300"
+      }
+    },
+    "backend": {
+      "surface": "apps/api + apps/workers + Supabase/PostgreSQL + Edge Functions",
+      "status": "API_BUILD_PASSED_STAGING_SECURITY_TRIAGED_RUNTIME_ACCEPTANCE_PENDING",
+      "inventory": {
+        "apiSourceFiles": 182,
+        "publicTables": 230,
+        "activeEdgeFunctions": 23,
+        "liveMigrationLedgerRecords": 130,
+        "trackedSqlMigrationFiles": 41
+      },
+      "builtOrVerified": [
+        "Separate apps/api and typed command/state-machine foundation exist.",
+        "API build passed in PR #330 CI run 45637295249.",
+        "Read-only live PostgreSQL comparison: all six flagged SECURITY DEFINER function bodies exactly match selected historical source bodies after whitespace normalization.",
+        "Live ACL check: anon and PUBLIC cannot execute any of the six flagged functions; authenticated and service_role can.",
+        "Live privileges: all 17 RLS-enabled/no-policy tables deny anon and authenticated direct SELECT/INSERT/UPDATE/DELETE."
+      ],
+      "remaining": [
+        "Reconcile exact migration body/version/commit provenance for the 130 live ledger records; historical filename candidate map is not deployment proof.",
+        "Run real Candidate A/B, operator and founder negative/positive authorization tests across API/RPC/table boundaries.",
+        "Review 16 policy-overlap findings and enable/verify leaked-password protection through a separate reviewed Auth change.",
+        "Prove durable state, retries, idempotency, worker lease recovery, backup/restore and payment/communication sandbox paths."
+      ],
+      "evidence": {
+        "migrationAudit": "docs/rebuild/KINGSMEN_MIGRATION_PROVENANCE_AUDIT_2026-11-25.md",
+        "securityAudit": "docs/rebuild/KINGSMEN_STAGING_SECURITY_ADVISOR_AUDIT_2026-11-25.md",
+        "lastKnownApiBuildPass": "https://github.com/kingsmenportal-ctrl/kingsmen-platform/actions/runs/45637295249"
+      }
+    },
+    "integration": {
+      "status": "REBUILD_BRANCH_CI_ACTIVE_PRODUCTION_DEPLOY_NOT_RECONCILED",
+      "buildTargetBranch": "rebuild/kingsmen-one-foundation-2026-11-17",
+      "lastKnownPassingIntegratedCi": "https://github.com/kingsmenportal-ctrl/kingsmen-platform/actions/runs/45637295249",
+      "latestCiRun": "https://github.com/kingsmenportal-ctrl/kingsmen-platform/actions/runs/45638710300",
+      "currentProductionDeploymentIsRebuildBranch": false,
+      "lastRecordedReadyDeploymentDate": "2026-07-08",
+      "topBlockers": [
+        "GitHub main-branch protection not verified by its evidence workflow (HTTP 404).",
+        "Latest post-change CI and web build must complete.",
+        "The rebuild branch is not proven deployed to the live Netlify site."
+      ]
+    }
   }
 }
