@@ -7,6 +7,8 @@ const routePath = "apps/web/src/app/candidate/applications/page.tsx";
 const route = fs.readFileSync(path.join(root, routePath), "utf8");
 const trackerPath = "apps/web/src/app/candidate/tracker/page.tsx";
 const tracker = fs.readFileSync(path.join(root, trackerPath), "utf8");
+const trackerComponentPath = "apps/web/src/components/candidate/CandidateApplicationTracker.tsx";
+const trackerComponent = fs.readFileSync(path.join(root, trackerComponentPath), "utf8");
 const sessionPath = "apps/web/src/lib/candidate-session.ts";
 const session = fs.readFileSync(path.join(root, sessionPath), "utf8");
 const dashboardPath = "apps/web/src/app/candidate/dashboard/page.tsx";
@@ -22,7 +24,7 @@ assert.match(session, /export function getCandidateSessionState\(\)/,
   "Candidate application screens must share one session-reading boundary.");
 assert.match(session, /session\.expires_at[\s\S]*Date\.now\(\)/,
   "Expired candidate sessions must be rejected before application data requests.");
-assert.match(tracker, /getCandidateSessionState/,
+assert.match(trackerComponent, /getCandidateSessionState/,
   "The application tracker must use the shared candidate session helper.");
 assert.doesNotMatch(tracker, /window\.localStorage|JSON\.parse\(raw\)/,
   "The tracker must not maintain a second implementation of browser session parsing.");
