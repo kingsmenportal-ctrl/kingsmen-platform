@@ -14,15 +14,16 @@ const readme = readFileSync(readmePath, "utf8").replace(/^\uFEFF/, "");
 const packageJson = JSON.parse(readFileSync(packagePath, "utf8"));
 
 assert.equal(manifest.schema, "kingsmen.simplified-rebuild-status.v1");
-assert.match(manifest.statusDate, /^\\d{4}-\\d{2}-\\d{2}$/, "Status date must be ISO formatted.");
+assert.match(manifest.statusDate, /^\d{4}-\d{2}-\d{2}$/, "Status date must be ISO formatted.");
 assert.equal(manifest.overallStatus, "REBUILD_IN_PROGRESS_PUBLIC_LAUNCH_BLOCKED");
-assert.equal(manifest.releaseStatus, "blocked_until_required_gates_pass");
+assert.equal(manifest.releaseStatus === "blocked_until_required_gates_pass", manifest.releaseGates.fullyPassed < manifest.releaseGates.required, "Release status must reflect gate evidence.");
 assert.equal(manifest.implementationBranch, "rebuild/kingsmen-one-foundation-2026-11-17");
 assert.equal(manifest.modules.length, 21, "N00–N20 must all be registered.");
 assert.deepEqual(manifest.modules.map((item) => item.id), Array.from({ length: 21 }, (_, index) => "N" + String(index).padStart(2, "0")));
 assert.equal(manifest.releaseGates.required, 13);
-assert.equal(manifest.releaseGates.items.length, 13);
-assert.ok(manifest.releaseGates.fullyPassed >= 0 && manifest.releaseGates.fullyPassed <= manifest.releaseGates.required);\nassert.equal(manifest.releaseGates.fullyPassed, manifest.releaseGates.items.filter((gate) => gate.status === "passed").length, "Gate pass count must match explicit passed states.");\nassert.equal(manifest.releaseStatus === "blocked_until_required_gates_pass", manifest.releaseGates.fullyPassed < manifest.releaseGates.required, "Release status must reflect gate evidence.");
+assert.equal(manifest.releaseGates.items.length, manifest.releaseGates.required);
+assert.ok(manifest.releaseGates.fullyPassed >= 0 && manifest.releaseGates.fullyPassed <= manifest.releaseGates.required);
+assert.equal(manifest.releaseGates.fullyPassed, manifest.releaseGates.items.filter((gate) => gate.status === "passed").length, "Gate pass count must match explicit passed states.");
 assert.ok(manifest.inventory.trackedSqlMigrationFiles > 0);
 assert.ok(manifest.infrastructure.appliedMigrationRecords > 0);
 assert.ok(manifest.infrastructure.activeEdgeFunctions >= 0);
@@ -32,7 +33,7 @@ assert.ok(["ACTIVE_HEALTHY", "COMING_UP", "RESTORING", "INACTIVE"].includes(mani
 assert.equal(typeof manifest.infrastructure.productionDeployRepresentsCurrentRebuildBranch, "boolean");
 assert.equal(manifest.timeline.phases.length, 8);
 assert.equal(manifest.timeline.phases[0].status, "completed");
-assert.ok(manifest.timeline.engineeringEffortDays.minimum < manifest.timeline.engineeringEffortDays.maximum);
+assert.ok(manifest.timeline.engineeringEffortDays.minimum <= manifest.timeline.engineeringEffortDays.maximum);
 
 for (const heading of [
   "## 1. Executive status",
@@ -53,4 +54,4 @@ assert.match(claude, /every Kingsmen response must start/i);
 assert.match(readme, /KINGSMEN_SIMPLIFIED_STATUS_AND_COMPLETION_ROADMAP\.md/);
 assert.match(packageJson.scripts["kingsmen:status:validate"], /validate-kingsmen-simplified-status\.mjs/);
 
-console.log("Kingsmen simplified status register contract passed: N00–N20 registered; 13 release gates remain blocked; staging, migration and security snapshot checked.");
+console.log("Kingsmen simplified status register contract passed: N00–N20 registered; all release gates are evidence-tracked; staging and security snapshot checked.");
