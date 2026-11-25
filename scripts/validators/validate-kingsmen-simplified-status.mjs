@@ -49,7 +49,7 @@ assert.match(doc, /ACTIVE_HEALTHY/);
 assert.match(doc, /SECURITY DEFINER/);
 assert.match(doc, /3–6 calendar weeks/);
 assert.match(claude, /KINGSMEN_SIMPLIFIED_STATUS_AND_COMPLETION_ROADMAP\.md/);
-assert.match(claude, /every Kingsmen response begins/i);
+assert.match(claude, /every Kingsmen response must start/i);
 assert.match(readme, /KINGSMEN_SIMPLIFIED_STATUS_AND_COMPLETION_ROADMAP\.md/);
 assert.match(packageJson.scripts["kingsmen:status:validate"], /validate-kingsmen-simplified-status\.mjs/);
 assert.match(packageJson.scripts.test, /validate-kingsmen-simplified-status\.mjs/);
