@@ -1,0 +1,63 @@
+name: Free Destiny Map Preview Check
+
+on:
+  push:
+    branches:
+      - main
+      - feat/free-destiny-map-interactive-preview-20261125
+    paths:
+      - "apps/web/src/app/free-destiny-map/page.tsx"
+      - "scripts/staging/test-free-destiny-map-local-preview.mjs"
+      - "package.json"
+      - "package-lock.json"
+      - "apps/web/package.json"
+      - "apps/web/package-lock.json"
+      - ".github/workflows/free-destiny-map-preview-check.yml"
+  pull_request:
+    branches: [main]
+    paths:
+      - "apps/web/src/app/free-destiny-map/page.tsx"
+      - "scripts/staging/test-free-destiny-map-local-preview.mjs"
+      - "package.json"
+      - "package-lock.json"
+      - "apps/web/package.json"
+      - "apps/web/package-lock.json"
+      - ".github/workflows/free-destiny-map-preview-check.yml"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: free-destiny-map-preview-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  verify:
+    name: Route preview and web build
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+          cache: npm
+          cache-dependency-path: |
+            package-lock.json
+            apps/web/package-lock.json
+
+      - name: Install root dependencies
+        run: npm ci --no-audit --no-fund
+
+      - name: Run Kingsmen regression suite
+        run: npm test
+
+      - name: Install web dependencies
+        run: npm ci --prefix apps/web --no-audit --no-fund
+
+      - name: Build the Next.js web application
+        run: npm run build --prefix apps/web
