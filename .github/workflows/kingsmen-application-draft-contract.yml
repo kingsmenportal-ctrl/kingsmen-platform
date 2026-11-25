@@ -28,6 +28,8 @@ on:
       - scripts/staging/test-candidate-application-status-contract.mjs
       - scripts/staging/test-candidate-preparation-schema-compat.mjs
       - scripts/staging/test-candidate-draft-runtime-preflight.mjs
+      - scripts/staging/proposals/candidate-application-verified-identity-rpc-alignment.proposal.sql
+      - scripts/staging/test-candidate-application-verified-identity-rpc-alignment.mjs
       - scripts/staging/kingsmen-candidate-draft-runtime-preflight.sql
       - supabase/functions/candidate-application-preparation/index.ts
       - docs/rebuild/proposals/CANDIDATE_APPLICATION_STATUS_CONTRACT_SQL_PROPOSAL.md
@@ -86,6 +88,8 @@ on:
       - scripts/staging/test-candidate-application-status-contract.mjs
       - scripts/staging/test-candidate-preparation-schema-compat.mjs
       - scripts/staging/test-candidate-draft-runtime-preflight.mjs
+      - scripts/staging/proposals/candidate-application-verified-identity-rpc-alignment.proposal.sql
+      - scripts/staging/test-candidate-application-verified-identity-rpc-alignment.mjs
       - scripts/staging/kingsmen-candidate-draft-runtime-preflight.sql
       - supabase/functions/candidate-application-preparation/index.ts
       - docs/rebuild/proposals/CANDIDATE_APPLICATION_STATUS_CONTRACT_SQL_PROPOSAL.md
@@ -158,6 +162,8 @@ jobs:
         run: node scripts/validators/validate-candidate-application-draft-persistence.mjs
       - name: Test canonical candidate application status contract
         run: node scripts/staging/test-candidate-application-status-contract.mjs
+      - name: Test candidate verified-identity RPC alignment proposal
+        run: npm run candidate:identity:rpc-alignment:test
       - name: Guard candidate preparation against an uninstalled status column
         run: node scripts/staging/test-candidate-preparation-schema-compat.mjs
       - name: Test read-only candidate draft runtime preflight contract
