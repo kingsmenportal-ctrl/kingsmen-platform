@@ -4,6 +4,8 @@
 **Scope:** read-only comparison of the live Supabase migration ledger with the selected rebuild branch and seven relevant historical feature/release branches.  
 **Result:** **RECONCILIATION REQUIRED — DO NOT REPLAY MIGRATIONS FROM THIS REPORT**
 
+The historical sweep covers eight relevant current/historical feature/release branches. In that sweep, **63 have no source-name candidate** among the branches searched.
+
 ## Executive findings
 
 | Evidence item | Count | Interpretation |
