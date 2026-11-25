@@ -95,16 +95,33 @@ function mockFetchFactory(options = {}) {
     let fixture = fixtures.find(item => item.table === table && item.idColumn === column && item.id === requestedId);
 
     if (options.hideOwnSessionA && table === "candidate_sessions" && requestedId === ids.sessionAId) fixture = null;
-    const protectedFilter = url.searchParams.get("protected_data");
     const accessOverride = options.forceExposeSessionBToCandidateA &&
       table === "candidate_sessions" &&
       requestedId === ids.sessionBId &&
       actor === "candidateA";
+    const extraFiltersMatch = fixture && [...url.searchParams.entries()]
+      .filter(([key]) => !["select", "limit", "id", "candidate_id"].includes(key))
+      .every(([key, value]) => {
+        const expected = value.startsWith("eq.") ? value.slice(3) : value;
+        return String(fixture[key]) === expected;
+      });
+    const ownerFilter = url.searchParams.get("candidate_id");
+    const ownershipMatches = !ownerFilter || ownerFilter === `eq.${String(fixture?.candidate_id)}`;
+    if (table === "route_sources") {
+      const expectedRoute = requestedId === ids.routeSourceVerifiedId
+        ? ["VERIFIED", "A"]
+        : requestedId === ids.routeSourceUnverifiedId
+          ? ["DRAFT", "A"]
+          : ["VERIFIED", "C"];
+      assert.equal(url.searchParams.get("status"), `eq.${expectedRoute[0]}`);
+      assert.equal(url.searchParams.get("confidence_band"), `eq.${expectedRoute[1]}`);
+    }
+    if (["candidate_sessions", "evidence_ledger", "workflow_runs"].includes(table)) {
+      assert.ok(ownerFilter, `${table} probes must constrain the fixture to its expected candidate_id.`);
+    }
     const visible = fixture && (
       fixture.visibleTo.includes(actor) || accessOverride
-    ) && (
-      !protectedFilter || protectedFilter === `eq.${String(fixture.protected_data)}`
-    );
+    ) && extraFiltersMatch && ownershipMatches;
 
     const rows = visible
       ? [Object.fromEntries(select.map(field => [field, fixture[field]]))]
