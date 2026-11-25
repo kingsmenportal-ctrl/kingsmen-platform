@@ -48,7 +48,7 @@ try {
   await preview.waitFor({ state: "visible" });
   const fundingText = await preview.innerText();
   assert.ok(fundingText.includes("Funding and support route"), "Changing the route should generate funding-specific guidance.");
-  assert.ok(fundingText.includes("official funder"), "Funding guidance should instruct candidates to verify the funder.");
+  assert.ok(fundingText.includes("funder's own site"), "Funding guidance should direct candidates to verify information on the funder's own site.");
 
   const storageAfter = await page.evaluate(() => ({
     localStorage: window.localStorage.length,
