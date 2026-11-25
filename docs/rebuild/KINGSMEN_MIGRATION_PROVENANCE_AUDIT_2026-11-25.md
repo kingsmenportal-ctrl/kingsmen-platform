@@ -30,7 +30,7 @@ The historical sweep covers eight relevant current/historical feature/release br
 
 ## Why simple migration matching is unsafe
 
-Kingsmen's historical branches reuse numeric migration sequences for different SQL files/features, especially within the 0087–0096 range. For example, some branches use that range for unified master-application lifecycle changes, while other branches use it for database security, PayFast checkout and document workflows. The same sequence number is therefore not a safe migration identity.
+Numeric migration identifiers are not globally unique across Kingsmen's historical branch set. Historical branches reuse numeric migration sequences for different SQL files/features, especially within the 0087–0096 range. For example, some branches use that range for unified master-application lifecycle changes, while other branches use it for database security, PayFast checkout and document workflows. The same sequence number is therefore not a safe migration identity.
 
 Other name differences are consistent with renames: Git history shows `0009_n11_ai_decision_matching.sql` was renamed to `0084_n11_ai_decision_matching.sql`. Timestamp-prefixed Supabase migration filenames may also differ by several minutes from the migration ledger's recorded version. Those observations provide useful lineage candidates, not proof of exact deployment equivalence.
 
