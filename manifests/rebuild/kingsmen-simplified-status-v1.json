@@ -1,0 +1,391 @@
+{
+  "schema": "kingsmen.simplified-rebuild-status.v1",
+  "statusDate": "2026-11-25",
+  "overallStatus": "REBUILD_IN_PROGRESS_PUBLIC_LAUNCH_BLOCKED",
+  "releaseStatus": "blocked_until_required_gates_pass",
+  "canonicalRepository": "kingsmenportal-ctrl/kingsmen-platform",
+  "defaultBranch": "main",
+  "implementationBranch": "rebuild/kingsmen-one-foundation-2026-11-17",
+  "statusRegisterPath": "docs/rebuild/KINGSMEN_SIMPLIFIED_STATUS_AND_COMPLETION_ROADMAP.md",
+  "validationCommand": "npm run kingsmen:status:validate",
+  "inventory": {
+    "trackedFilesOnImplementationBranch": 3374,
+    "webRoutePages": 78,
+    "nextApiRouteHandlers": 73,
+    "apiSourceFiles": 182,
+    "webSourceFiles": 332,
+    "validatorFiles": 217,
+    "candidateRoutePages": 15,
+    "founderRoutePages": 10,
+    "trackedSqlMigrationFiles": 41,
+    "migrationSourceDirectories": [
+      "db/migrations",
+      "database/migrations",
+      "supabase/migrations"
+    ]
+  },
+  "infrastructure": {
+    "stagingProvider": "Supabase",
+    "stagingProjectName": "kingsmen-portal-staging",
+    "stagingProjectRef": "euhubhhnumtibbyufghm",
+    "stagingStatus": "ACTIVE_HEALTHY",
+    "stagingRegion": "eu-west-1",
+    "postgresVersion": "17.11.0.003",
+    "appliedMigrationRecords": 130,
+    "publicTables": 230,
+    "publicTablesWithRlsEnabled": 230,
+    "tableInventoryReportedZeroRowsForEveryPublicTable": true,
+    "activeEdgeFunctions": 23,
+    "edgeFunctionsWithJwtVerification": 22,
+    "edgeFunctionsWithoutJwtVerification": [
+      "payfast-sandbox"
+    ],
+    "securityAdvisorFindings": {
+      "rlsEnabledWithoutPolicyInfo": 17,
+      "authenticatedSecurityDefinerCallableWarning": 6,
+      "multiplePermissivePolicyWarning": 16,
+      "leakedPasswordProtectionWarning": 1,
+      "unusedIndexInfo": 282
+    },
+    "netlifyProjectName": "kingsmen-jarvis-command-zungu",
+    "netlifyProjectId": "b739ffe9-3e8d-4aef-8616-701cdb163395",
+    "lastRecordedReadyDeployId": "6a4d9382c91e49ab899318da",
+    "lastRecordedReadyDeployDate": "2026-07-08",
+    "lastRecordedReadyDeployBranch": "main",
+    "productionDeployRepresentsCurrentRebuildBranch": false
+  },
+  "releaseGates": {
+    "required": 13,
+    "fullyPassed": 0,
+    "status": "blocked",
+    "items": [
+      {
+        "key": "repo_protection",
+        "status": "foundation_built_pending_github_apply"
+      },
+      {
+        "key": "api_runtime",
+        "status": "foundation_built"
+      },
+      {
+        "key": "truth_vault_persistence",
+        "status": "foundation_built_pending_staging_proof"
+      },
+      {
+        "key": "tenant_security_rls",
+        "status": "foundation_built_pending_staging_proof"
+      },
+      {
+        "key": "web_runtime_boundary",
+        "status": "foundation_built_pending_staging_proof"
+      },
+      {
+        "key": "payments",
+        "status": "foundation_built_pending_real_sandbox_evidence"
+      },
+      {
+        "key": "backup_restore",
+        "status": "foundation_built_pending_staging_drill"
+      },
+      {
+        "key": "secrets_wiring",
+        "status": "foundation_built_pending_runtime_secret_health_proof"
+      },
+      {
+        "key": "communications",
+        "status": "foundation_built_pending_provider_staging_proof"
+      },
+      {
+        "key": "observability_incident",
+        "status": "foundation_built_pending_staging_monitoring_proof"
+      },
+      {
+        "key": "legal_privacy",
+        "status": "foundation_built_pending_legal_review_and_publication_proof"
+      },
+      {
+        "key": "staging_runtime_proof_pack",
+        "status": "foundation_built_pending_staging_evidence_capture"
+      },
+      {
+        "key": "final_assembly_evidence_capture",
+        "status": "foundation_built_pending_final_evidence_capture_review"
+      }
+    ]
+  },
+  "modules": [
+    {
+      "id": "N00",
+      "name": "Constitution / doctrine lock",
+      "source": "present",
+      "runtimeAcceptance": "pending",
+      "next": "Preserve one authoritative product and release doctrine."
+    },
+    {
+      "id": "N01",
+      "name": "Foundation / monorepo / runtime",
+      "source": "present",
+      "runtimeAcceptance": "pending",
+      "next": "Consolidate package/build workflow and protect branches."
+    },
+    {
+      "id": "N02",
+      "name": "Backend API kernel",
+      "source": "present",
+      "runtimeAcceptance": "pending",
+      "next": "Prove API health, persistence, idempotency and retry behaviour."
+    },
+    {
+      "id": "N03",
+      "name": "Truth Vault / PostgreSQL",
+      "source": "present",
+      "runtimeAcceptance": "pending",
+      "next": "Reconcile source migration files with 130 live migration records."
+    },
+    {
+      "id": "N04",
+      "name": "Candidate core / portal",
+      "source": "present",
+      "runtimeAcceptance": "pending",
+      "next": "Prove authenticated candidate A/B isolation and profile persistence."
+    },
+    {
+      "id": "N05",
+      "name": "Document vault",
+      "source": "present",
+      "runtimeAcceptance": "pending",
+      "next": "Prove private ownership, upload validation, signed-link expiry and review controls."
+    },
+    {
+      "id": "N06",
+      "name": "Route universe / workbench",
+      "source": "present",
+      "runtimeAcceptance": "pending",
+      "next": "Prove application lifecycle from draft through evidence-backed outcome."
+    },
+    {
+      "id": "N07",
+      "name": "Airtable sync / mirror",
+      "source": "present",
+      "runtimeAcceptance": "pending",
+      "next": "Prove durable outbox retries and keep PostgreSQL authoritative."
+    },
+    {
+      "id": "N08",
+      "name": "Operator command room",
+      "source": "present",
+      "runtimeAcceptance": "pending",
+      "next": "Prove operator roles, queues, audit and approval boundaries."
+    },
+    {
+      "id": "N09",
+      "name": "Notifications / communications",
+      "source": "present",
+      "runtimeAcceptance": "pending",
+      "next": "Prove provider send/receive, bounce, opt-out and channel rules."
+    },
+    {
+      "id": "N10",
+      "name": "Finance / PayFast",
+      "source": "present",
+      "runtimeAcceptance": "pending",
+      "next": "Prove provider sandbox ITN, replay, amount/signature and refund-review cases."
+    },
+    {
+      "id": "N11",
+      "name": "AI decision engine",
+      "source": "present",
+      "runtimeAcceptance": "pending",
+      "next": "Test source confidence and prevent unsupported match/outcome claims."
+    },
+    {
+      "id": "N12",
+      "name": "Governance / tribunal",
+      "source": "present",
+      "runtimeAcceptance": "pending",
+      "next": "Close or justify policy/security advisor findings and run role tests."
+    },
+    {
+      "id": "N13",
+      "name": "Observability / incidents",
+      "source": "present",
+      "runtimeAcceptance": "pending",
+      "next": "Prove staging alerts, redacted traces, DLQ recovery and incident drill."
+    },
+    {
+      "id": "N14",
+      "name": "Integrations registry",
+      "source": "present",
+      "runtimeAcceptance": "pending",
+      "next": "Capture runtime/auth evidence for each provider marked live."
+    },
+    {
+      "id": "N15",
+      "name": "Opportunity engine / source intelligence",
+      "source": "present",
+      "runtimeAcceptance": "pending",
+      "next": "Prove current source, opening, eligibility, deadline and review status."
+    },
+    {
+      "id": "N16",
+      "name": "Execution orchestrator",
+      "source": "present",
+      "runtimeAcceptance": "pending",
+      "next": "Prove leases, retries, idempotency and manual fallback."
+    },
+    {
+      "id": "N17",
+      "name": "Founder control plane",
+      "source": "present",
+      "runtimeAcceptance": "pending",
+      "next": "Prove founder-only access, approvals and auditable risk decisions."
+    },
+    {
+      "id": "N18",
+      "name": "Public website / front door",
+      "source": "present",
+      "runtimeAcceptance": "pending",
+      "next": "Deploy and smoke-test the selected rebuild commit; publish approved legal surfaces."
+    },
+    {
+      "id": "N19",
+      "name": "Mobile PWA / candidate experience",
+      "source": "present",
+      "runtimeAcceptance": "pending",
+      "next": "Prove responsive authenticated flows and accessibility."
+    },
+    {
+      "id": "N20",
+      "name": "Final assembly / production lock",
+      "source": "present",
+      "runtimeAcceptance": "blocked",
+      "next": "Close all 13 release gates and capture founder-reviewed evidence bundle."
+    }
+  ],
+  "timeline": {
+    "engineeringEffortDays": {
+      "minimum": 12,
+      "maximum": 21
+    },
+    "externalDependencyExtraWorkingDays": {
+      "minimum": 3,
+      "maximum": 10
+    },
+    "planningCalendarWeeks": {
+      "minimum": 3,
+      "maximum": 6
+    },
+    "phases": [
+      {
+        "id": 0,
+        "name": "Project control baseline",
+        "estimateDays": {
+          "minimum": 0,
+          "maximum": 0
+        },
+        "status": "completed",
+        "exit": "Status register, manifest, validator and start-of-chat rule are committed and validated."
+      },
+      {
+        "id": 1,
+        "name": "Repository and architecture consolidation",
+        "estimateDays": {
+          "minimum": 1,
+          "maximum": 2
+        },
+        "status": "not_started",
+        "exit": "Clean CI on the intended rebuild branch and release branch protection confirmed."
+      },
+      {
+        "id": 2,
+        "name": "Database provenance and security",
+        "estimateDays": {
+          "minimum": 2,
+          "maximum": 3
+        },
+        "status": "not_started",
+        "exit": "Migration map approved and RLS/authenticated role tests pass."
+      },
+      {
+        "id": 3,
+        "name": "Candidate foundation journey",
+        "estimateDays": {
+          "minimum": 2,
+          "maximum": 4
+        },
+        "status": "not_started",
+        "exit": "Authenticated candidate journey passes browser/API/database tests."
+      },
+      {
+        "id": 4,
+        "name": "Opportunity and application lifecycle",
+        "estimateDays": {
+          "minimum": 2,
+          "maximum": 3
+        },
+        "status": "not_started",
+        "exit": "Saved opportunity, draft, status, manual fallback and provider receipt evidenced."
+      },
+      {
+        "id": 5,
+        "name": "Documents, finance and communications",
+        "estimateDays": {
+          "minimum": 2,
+          "maximum": 4
+        },
+        "status": "not_started",
+        "exit": "Document security, payment sandbox, messaging and audit tests pass."
+      },
+      {
+        "id": 6,
+        "name": "Founder operations, Jarvis and mobile",
+        "estimateDays": {
+          "minimum": 1,
+          "maximum": 2
+        },
+        "status": "not_started",
+        "exit": "Founder control boundaries and responsive operational surfaces pass tests."
+      },
+      {
+        "id": 7,
+        "name": "Staging release and private beta",
+        "estimateDays": {
+          "minimum": 2,
+          "maximum": 3
+        },
+        "status": "not_started",
+        "exit": "All 13 gates pass, final evidence bundle reviewed and founder approves beta."
+      }
+    ]
+  },
+  "currentPullRequests": [
+    {
+      "number": 326,
+      "title": "Add browser-local readiness preview to Free Destiny Map intake",
+      "state": "open",
+      "draft": true,
+      "base": "rebuild/kingsmen-one-foundation-2026-11-17"
+    },
+    {
+      "number": 324,
+      "title": "Implement canonical Kingsmen candidate application status contract",
+      "state": "open",
+      "draft": true,
+      "base": "rebuild/kingsmen-one-foundation-2026-11-17"
+    },
+    {
+      "number": 323,
+      "title": "Add read-only staging preflight for candidate application runtime",
+      "state": "open",
+      "draft": true,
+      "base": "rebuild/kingsmen-one-foundation-2026-11-17"
+    }
+  ],
+  "updateRules": [
+    "Every Kingsmen response begins with overall status, implementation phase, current branch/PR, last verified evidence, highest-priority blocker and next deliverable.",
+    "Only update completion status when tests or runtime evidence actually pass.",
+    "Keep this document, this manifest and the validation contract in sync after meaningful batches.",
+    "Never describe source presence or a ready historical deployment as proof of a complete production journey.",
+    "Do not apply migrations or modify live staging data without a reviewed plan and explicit approval."
+  ]
+}

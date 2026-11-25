@@ -1,3 +1,5 @@
+> **Current project status (25 November 2026):** Read the [Simplified Rebuild Status and Completion Roadmap](docs/rebuild/KINGSMEN_SIMPLIFIED_STATUS_AND_COMPLETION_ROADMAP.md) and [machine-readable manifest](manifests/rebuild/kingsmen-simplified-status-v1.json) first. The rebuild branch is the current implementation lane. Public launch is blocked until the 13 release gates pass. Historical sections below may describe an earlier branch or state.
+
 # Kingsmen Platform
 
 Kingsmen is being built as a South African admissions, opportunities, document, finance, communications, and automation platform.
