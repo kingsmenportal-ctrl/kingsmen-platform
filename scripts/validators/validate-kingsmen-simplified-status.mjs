@@ -23,8 +23,8 @@ assert.deepEqual(manifest.modules.map((item) => item.id), Array.from({ length: 2
 assert.equal(manifest.releaseGates.required, 13);
 assert.equal(manifest.releaseGates.items.length, 13);
 assert.equal(manifest.releaseGates.fullyPassed, 0, "Do not claim launch acceptance before runtime gates pass.");
-assert.equal(manifest.infrastructure.appliedMigrationRecords, 130);
 assert.equal(manifest.inventory.trackedSqlMigrationFiles, 41);
+assert.equal(manifest.infrastructure.appliedMigrationRecords, 130);
 assert.equal(manifest.infrastructure.activeEdgeFunctions, 23);
 assert.equal(manifest.infrastructure.publicTables, 230);
 assert.equal(manifest.infrastructure.publicTablesWithRlsEnabled, 230);
@@ -51,5 +51,6 @@ assert.match(doc, /3–6 calendar weeks/);
 assert.match(claude, /KINGSMEN_SIMPLIFIED_STATUS_AND_COMPLETION_ROADMAP\.md/);
 assert.match(claude, /every Kingsmen response must start/i);
 assert.match(readme, /KINGSMEN_SIMPLIFIED_STATUS_AND_COMPLETION_ROADMAP\.md/);
-assert.match(packageJson.scripts["kingsmen:status:validate"], /validate-kingsmen-simplified-status\.mjs/);\n
+assert.match(packageJson.scripts["kingsmen:status:validate"], /validate-kingsmen-simplified-status\.mjs/);
+
 console.log("Kingsmen simplified status register contract passed: N00–N20 registered; 13 release gates remain blocked; staging, migration and security snapshot checked.");
