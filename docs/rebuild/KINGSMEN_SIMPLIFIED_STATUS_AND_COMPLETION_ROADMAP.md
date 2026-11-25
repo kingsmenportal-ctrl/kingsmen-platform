@@ -28,7 +28,7 @@ The rebuild strategy remains: preserve the repository and its history; consolida
 
 | Area | Current evidence | Status |
 |---|---|---|
-| Source repository | 3,374 tracked files on the selected rebuild branch; 78 app route pages; 73 Next.js API route handlers; 217 validator files | Built, needs consolidation and runtime acceptance |
+| Source repository | 3,385 tracked files on the selected rebuild branch at the latest inventory snapshot; 78 app route pages; 73 Next.js API route handlers; 220 validator files | Built, needs consolidation and runtime acceptance |
 | Candidate experience | Candidate dashboard, profile, identity review, workbench, tracker, saved opportunities, documents, finance, outcomes, messages and mobile routes exist in source | UI/routes exist; full journey not yet accepted |
 | API | Separate apps/api package and typed command/state-machine code exist | Buildable foundation; persistent staging behaviour must be proved |
 | Database | kingsmen-portal-staging is ACTIVE_HEALTHY; PostgreSQL 17.11; 230 public tables; RLS reported enabled on all public tables | Database is available; schema/migration/security reconciliation remains open |
