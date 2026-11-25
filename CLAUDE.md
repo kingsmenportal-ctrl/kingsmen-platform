@@ -2,7 +2,7 @@
 
 Before any Kingsmen work, read docs/rebuild/KINGSMEN_SIMPLIFIED_STATUS_AND_COMPLETION_ROADMAP.md and manifests/rebuild/kingsmen-simplified-status-v1.json. They are the current project-status source of truth for scope, module inventory, completion gates, open blockers and timeline. If an older report or chat conflicts, verify live evidence and update the status register rather than guessing.
 
-Every Kingsmen response must start with overall status, active phase, implementation branch/current PR, last verified evidence, highest-priority blocker and next deliverable. Every meaningful implementation batch must update the status document and manifest, then run npm run kingsmen:status:validate. Never equate route/file/function existence with end-to-end acceptance. Do not apply staging migrations, modify live candidate data, enable live payments or deploy production without a reviewed plan and required approval.
+Every Kingsmen response must follow `docs/rebuild/KINGSMEN_CHAT_STATUS_PROTOCOL.md`: report overall status and separately report frontend, backend/API, database/security, integrations/Jarvis and CI/deployment, including actual changes, test evidence, blockers and timeline. Tag each implementation batch by layer. Every meaningful batch must update the status document and manifest, then run `npm run kingsmen:status:validate`. Never equate route/file/function existence with end-to-end acceptance. Do not apply staging migrations, modify live candidate data, enable live payments or deploy production without a reviewed plan and required approval.
 
 # CLAUDE START HERE — KINGSMEN / JARVIS
 
