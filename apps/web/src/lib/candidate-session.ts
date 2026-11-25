@@ -11,7 +11,7 @@ export function getCandidateSupabaseConfig(): { url: string; anonKey: string } |
   try {
     const parsed = new URL(url);
     if (parsed.protocol !== "https:" && parsed.hostname !== "localhost" && parsed.hostname !== "127.0.0.1") return null;
-    return { url: parsed.toString().replace(/\\/+$/, ""), anonKey };
+    return { url: parsed.toString().replace(/\/+$/, ""), anonKey };
   } catch {
     return null;
   }
