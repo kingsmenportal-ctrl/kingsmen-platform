@@ -28,7 +28,7 @@ const required = [
   'BLOCKED_MISSING_READ_TOKEN',
   'KINGSMEN_BRANCH_PROTECTION_READ_TOKEN',
   'Administration: read',
-  'BLOCKED_PROTECTION_NOT_FOUND_OR_NOT_VISIBLE',
+  'BLOCKED_RULESET_NOT_FOUND_OR_NOT_VISIBLE',
   'rulesets?includes_parents=true&per_page=100',
   'repository_rulesets',
   'BLOCKED_RULESET_NOT_FOUND_OR_NOT_VISIBLE',
