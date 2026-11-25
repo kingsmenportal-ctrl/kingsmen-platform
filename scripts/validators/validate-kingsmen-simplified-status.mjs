@@ -45,7 +45,7 @@ for (const heading of [
 ]) assert.ok(doc.includes(heading), "Missing mandatory status section: " + heading);
 
 assert.match(doc, /13 required release gates/);
-assert.match(doc, /130 migration records/);
+assert.match(doc, /130 (?:(?:staging|live) )?ledger records|130 (?:live )?migration records/, "Migration evidence count must be present with an accepted ledger/source description.");
 assert.match(doc, /ACTIVE_HEALTHY/);
 assert.match(doc, /SECURITY DEFINER/);
 assert.match(doc, /3–6 calendar weeks/);
