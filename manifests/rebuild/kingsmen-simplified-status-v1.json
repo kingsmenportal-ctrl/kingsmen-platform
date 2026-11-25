@@ -9,12 +9,12 @@
   "statusRegisterPath": "docs/rebuild/KINGSMEN_SIMPLIFIED_STATUS_AND_COMPLETION_ROADMAP.md",
   "validationCommand": "npm run kingsmen:status:validate",
   "inventory": {
-    "trackedFilesOnImplementationBranch": 3374,
+    "trackedFilesOnImplementationBranch": 3385,
     "webRoutePages": 78,
     "nextApiRouteHandlers": 73,
     "apiSourceFiles": 182,
     "webSourceFiles": 332,
-    "validatorFiles": 217,
+    "validatorFiles": 220,
     "candidateRoutePages": 15,
     "founderRoutePages": 10,
     "trackedSqlMigrationFiles": 41,
@@ -452,6 +452,15 @@
       "runId": 45634928235,
       "result": "failure",
       "reason": "Branch-protection verifier returned HTTP 404 and could not verify protection; release remains blocked."
+    },
+    "migrationProvenance": {
+      "status": "historical_sweep_captured_pending_ci_validation",
+      "currentBranchTrackedSourceFiles": 41,
+      "historicalBranchesScanned": 8,
+      "historicalNameCandidates": 67,
+      "historicalRecordsWithoutNameCandidate": 63,
+      "duplicateLedgerNames": 2,
+      "replayAuthorized": false
     }
   },
   "migrationProvenance": {
@@ -461,22 +470,27 @@
     "validatorPath": "scripts/validators/validate-kingsmen-migration-provenance.mjs",
     "validatorCommand": "npm run kingsmen:migrations:provenance:validate",
     "captureType": "read_only",
-    "status": "CAPTURED_PENDING_CI_VALIDATION",
-    "summary": {
-      "liveLedgerRecords": 130,
+    "status": "HISTORICAL_SWEEP_CAPTURED_PENDING_CI_VALIDATION",
+    "currentBranchSummary": {
       "trackedSourceFiles": 41,
       "normalizedExactMatches": 32,
-      "coreOnlyReviewCandidates": 2,
-      "ledgerRecordsWithoutSourceNameMatch": 96,
-      "sourceFilesWithoutLedgerNameMatch": 7,
-      "duplicateLedgerNames": 2,
-      "possiblePendingSourceMigrations": [
-        "db/migrations/0107_application_capacity_entitlements_20261101.sql",
-        "db/migrations/0108_candidate_application_readiness_eligibility_deadline_gate_20261101.sql",
-        "db/migrations/0109_candidate_application_draft_persistence_20261101.sql",
-        "db/migrations/0110_n15_source_review_decision_atomicity.sql"
-      ]
+      "coreOnlyCandidateMatches": 2,
+      "ledgerRecordsWithoutCurrentBranchNameMatch": 96,
+      "sourceFilesWithoutLedgerNameMatch": 7
     },
-    "nextAction": "Run and pass snapshot validator; reconcile unmapped ledger records and duplicate names using Git/deployment history. No migrations may be replayed from name matching alone."
+    "historicalBranchSweep": {
+      "branchesScanned": 8,
+      "rawBranchSourceEntries": 414,
+      "uniqueSourcePathHashEntries": 86,
+      "uniqueSourcePaths": 83,
+      "ledgerRecordsWithCoreAndSequenceCandidate": 40,
+      "ledgerRecordsWithCoreOnlyCandidates": 27,
+      "ledgerRecordsWithoutHistoricalSourceNameCandidate": 63,
+      "candidateSourceRecords": 67,
+      "duplicateLedgerNames": 2,
+      "exactSqlBodyProvenanceMatches": 0,
+      "replayAuthorized": false
+    },
+    "nextAction": "Reconcile exact SQL body/commit/deployment provenance for all 130 ledger records; resolve duplicates and branch-sequence collisions before any schema change."
   }
 }
