@@ -58,8 +58,8 @@ jobs:
       - name: Run Kingsmen regression suite
         run: npm test
 
-      - name: Install web dependencies
-        run: npm ci --prefix apps/web --no-audit --no-fund
+      - name: Install web dependencies (match canonical Kingsmen CI)
+        run: npm install --prefix apps/web --no-audit --no-fund
 
       - name: Install Chromium for browser test
         run: npx playwright install --with-deps chromium
