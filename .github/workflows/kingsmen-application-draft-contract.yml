@@ -12,6 +12,7 @@ on:
       - apps/web/src/app/api/candidate/application-draft/route.ts
       - apps/web/src/app/candidate/applications/[applicationId]/page.tsx
       - apps/web/src/app/candidate/applications/page.tsx
+      - apps/web/src/app/candidate/dashboard/page.tsx
       - scripts/staging/test-candidate-applications-entry-route.mjs
       - apps/web/src/components/candidate/CandidateApplicationTracker.tsx
       - apps/web/src/lib/candidate-session.ts
@@ -51,6 +52,7 @@ on:
       - apps/web/src/app/api/candidate/application-draft/route.ts
       - apps/web/src/app/candidate/applications/[applicationId]/page.tsx
       - apps/web/src/app/candidate/applications/page.tsx
+      - apps/web/src/app/candidate/dashboard/page.tsx
       - scripts/staging/test-candidate-applications-entry-route.mjs
       - apps/web/src/components/candidate/CandidateApplicationTracker.tsx
       - apps/web/src/lib/candidate-session.ts
