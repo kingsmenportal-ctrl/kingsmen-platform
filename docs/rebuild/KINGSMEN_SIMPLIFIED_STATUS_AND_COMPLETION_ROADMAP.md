@@ -180,6 +180,8 @@ The schedule is expressed as engineering effort plus explicit gates, not as a cl
 
 **Working estimate:** 12–21 engineering days assuming code reuse and prompt decisions. External provider accounts, runtime credentials, security remediation, legal review and retesting may add roughly 3–10 working days. A realistic planning window is therefore **about 3–6 calendar weeks**, revisited after Phase 2 and the first full candidate journey. Every phase still has an explicit pass/fail exit condition.
 
+**Provisional calendar target windows (planning only; not release promises):** Phase 1, 26–27 November 2026; Phase 2, 30 November–2 December; Phase 3, 3–8 December; Phase 4, 9–11 December; Phase 5, 14–17 December; Phase 6, 18–21 December; Phase 7 staging/private-beta window, 22–24 December. External approvals, credentials, provider sandbox access, legal review and security rework may move the overall target into the **16 December 2026–6 January 2027** planning range. Reforecast after Phase 2 and the first authenticated candidate journey; never shorten the schedule by bypassing a gate.
+
 ### What “complete” means
 
 Kingsmen is complete for a release only when:
@@ -214,15 +216,11 @@ No new production database should be created. Do not modify staging data, migrat
 
 ## 8. Required status format for every Kingsmen work chat
 
-Every Kingsmen reply must start with a compact status line that names:
+Every Kingsmen reply must follow [the mandatory chat status protocol](KINGSMEN_CHAT_STATUS_PROTOCOL.md). The first report must include an overall project state and separate rows for **frontend**, **backend/API**, **database/security**, **integrations/Jarvis**, and **CI/deployment**. Each row must name what exists, what was changed in the current batch, the last test/runtime evidence, what remains unverified and its next acceptance check.
 
-1. overall status and active phase;
-2. implementation branch and current PR/commit;
-3. what was actually built and which tests actually passed;
-4. the highest-priority open blocker;
-5. the next deliverable and its acceptance test.
+Use the layer tags `[FRONTEND]`, `[BACKEND/API]`, `[DATABASE/SECURITY]`, `[INTEGRATION/JARVIS]`, `[INFRA/CI/DEPLOY]` or `[SHARED]`. Include the implementation branch and current PR/commit, last verified test links, highest-priority blockers, current phase timeline and the next deliverable. Do not omit unchanged layers; state their current evidence status. Do not equate source presence, a compile or a historical deployment with an end-to-end accepted feature.
 
-Then perform work in small, verifiable batches. At the end of a batch, update this file and the manifest when the project's state has actually changed. Never say “complete” without evidence. Do not propose a fresh architecture unless the current architecture is demonstrably wrong and the change is recorded.
+After each meaningful batch, update this document and the manifest together and run `npm run kingsmen:status:validate`. Continue from the existing implementation lane and next open milestone; do not spin up another disconnected architecture or ask the Commander to repeat already-recorded decisions. Never say “complete” without evidence.
 
 ## 9. Commands and links
 
