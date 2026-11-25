@@ -2,11 +2,11 @@ import assert from "node:assert/strict";
 import fs from "node:fs";
 import path from "node:path";
 import { createRequire } from "node:module";
-import { pathToFileURL } from "node:url";
 
 const root = process.cwd();
 const read = relativePath => fs.readFileSync(path.join(root, relativePath), "utf8");
-const require = createRequire(pathToFileURL(path.join(root, "package.json")));
+const webDirectory = path.resolve(root, "apps/web");
+const require = createRequire(path.join(webDirectory, "package.json"));
 const ts = require("typescript");
 
 const statusPath = "apps/web/src/lib/candidate-application-status.ts";
