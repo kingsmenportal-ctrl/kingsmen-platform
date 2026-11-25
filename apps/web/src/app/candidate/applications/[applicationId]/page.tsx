@@ -14,15 +14,6 @@ type AnswerData = {
   preferred_campus: string;
   additional_answers: AdditionalAnswer[];
 };
-type CandidateFacingApplicationStatus =
-  | "Draft"
-  | "Submitted to Kingsmen"
-  | "Under review"
-  | "Action required"
-  | "Prepared for provider"
-  | "Provider receipt confirmed"
-  | "Decision recorded";
-
 type Application = {
   id: string;
   application_ref: string;
