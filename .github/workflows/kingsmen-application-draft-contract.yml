@@ -11,6 +11,7 @@ on:
       - db/migrations/0110_n15_source_review_decision_atomicity.sql
       - apps/web/src/app/api/candidate/application-draft/route.ts
       - apps/web/src/app/candidate/applications/[applicationId]/page.tsx
+      - apps/web/src/app/candidate/applications/page.tsx
       - apps/web/src/components/candidate/CandidateApplicationTracker.tsx
       - apps/web/src/lib/candidate-session.ts
       - apps/web/src/lib/read-limited-json.ts
@@ -48,6 +49,7 @@ on:
       - db/migrations/0110_n15_source_review_decision_atomicity.sql
       - apps/web/src/app/api/candidate/application-draft/route.ts
       - apps/web/src/app/candidate/applications/[applicationId]/page.tsx
+      - apps/web/src/app/candidate/applications/page.tsx
       - apps/web/src/components/candidate/CandidateApplicationTracker.tsx
       - apps/web/src/lib/candidate-session.ts
       - apps/web/src/lib/read-limited-json.ts
