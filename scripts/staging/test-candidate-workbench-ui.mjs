@@ -16,6 +16,7 @@ const parentId = "22222222-2222-4222-8222-222222222222";
 const now = "2026-11-19T15:30:00.000Z";
 const requests = [];
 let prepared = false;
+let candidateStatus = "Draft";
 
 function loadState() {
   return {
@@ -42,7 +43,7 @@ function loadState() {
       application_ref: "KM-CI-PARENT-001",
       pathway_type: "EMPLOYMENT",
       status: "READY_TO_SUBMIT",
-      kingsmen_status: "Draft",
+      kingsmen_status: candidateStatus,
       readiness_status: "NOT_CHECKED",
       readiness_snapshot: { ci_fixture: true },
       created_at: now,
@@ -164,11 +165,21 @@ try {
   await prepareButton.click();
   await page.getByText("Parent record: KM-CI-PARENT-001", { exact: true }).waitFor();
   await page.getByText("Kingsmen status: Draft", { exact: false }).waitFor();
+  await page.getByRole("heading", { name: "Next step: continue your draft" }).waitFor();
+  await page.getByText("Draft editing is available only when the server confirms that this record is editable.", { exact: false }).waitFor();
   assert.equal(await page.getByText("Application state: READY_TO_SUBMIT", { exact: true }).count(), 0,
     "internal workflow status must not be rendered as the candidate-facing application status");
   const draftLink = page.getByRole("link", { name: "Open / resume application draft", exact: true });
   await draftLink.waitFor();
   assert.equal(await draftLink.getAttribute("href"), `/candidate/applications/${parentId}`);
+
+  // Unknown status values must remain unavailable and must not expose draft resume.
+  candidateStatus = null;
+  await page.getByRole("button", { name: "Refresh records", exact: true }).click();
+  await page.getByText("Kingsmen status: Status not available", { exact: false }).waitFor();
+  await page.getByRole("heading", { name: "Next step unavailable" }).waitFor();
+  assert.equal(await page.getByRole("link", { name: "Open / resume application draft", exact: true }).count(), 0,
+    "Unknown candidate status must not expose draft resume in the workbench.");
 
   const prepareRequests = requests.filter(item => item.action === "prepare_master_application");
   assert.equal(prepareRequests.length, 1, "one target should produce one parent-preparation request");
@@ -182,6 +193,7 @@ try {
   console.log("PASS: verified saved target prepares one Kingsmen parent application draft");
   console.log("PASS: parent Draft is linked back to the saved target and opens its Kingsmen draft editor");
   console.log("PASS: workbench displays the canonical Kingsmen status, not the internal workflow state");
+  console.log("PASS: missing candidate status remains unavailable and blocks draft resume");
   console.log("PASS: preparation request uses bearer authorization and the public anon key");
   console.log("PASS: no provider submission endpoint was called");
 } finally {

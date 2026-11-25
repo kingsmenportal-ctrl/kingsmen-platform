@@ -146,6 +146,8 @@ try {
   await page.goto(baseUrl + "/candidate/applications", { waitUntil: "networkidle" });
   await page.getByRole("heading", { name: "Application tracker" }).waitFor();
   await page.getByText("CI-APPLICATION-001", { exact: false }).waitFor();
+  await page.getByRole("heading", { name: "Next step: continue your draft" }).waitFor();
+  await page.getByText("Draft editing is available only when the server confirms that this record is editable.", { exact: false }).waitFor();
   assert.ok(fixtureRequests.some(item =>
     item.url.endsWith("/functions/v1/candidate-application-preparation")
       && item.method === "POST" && item.body.action === "load"),
@@ -175,6 +177,31 @@ try {
   console.log("PASS: canonical applications entry loads the authenticated application tracker");
   console.log("PASS: tracker opens the correct parent application draft and resumes saved answers");
   console.log("PASS: expired candidate session is rejected before candidate-data requests");
+
+  // Unknown or missing candidate-facing status must never expose a resume link;
+  // the tracker should explain the fail-closed behavior and offer safe preparation.
+  const unavailableContext = await browser.newContext();
+  await installAuth(unavailableContext, Math.floor(Date.now() / 1000) + 3600);
+  const unavailablePage = await unavailableContext.newPage();
+  await unavailablePage.route("**/functions/v1/candidate-application-preparation", async route => {
+    if (route.request().method() === "OPTIONS") {
+      await route.fulfill({ status: 204, headers: { "access-control-allow-origin": baseUrl, "access-control-allow-methods": "POST, OPTIONS", "access-control-allow-headers": "authorization, apikey, content-type" } });
+      return;
+    }
+    await route.fulfill({
+      status: 200,
+      headers: { "access-control-allow-origin": baseUrl },
+      json: { ...trackerPayload, parentApplications: [{ ...application, kingsmen_status: null }] }
+    });
+  });
+  await unavailablePage.goto(baseUrl + "/candidate/applications", { waitUntil: "networkidle" });
+  await unavailablePage.getByText("Status not available", { exact: true }).waitFor();
+  await unavailablePage.getByText("Draft editing is not available for this record yet.", { exact: true }).waitFor();
+  assert.equal(await unavailablePage.getByRole("link", { name: "Open / resume application draft" }).count(), 0,
+    "Unknown candidate status must not expose draft resume.");
+  assert.equal(await unavailablePage.getByRole("link", { name: "Continue in workbench" }).getAttribute("href"), "/candidate/workbench");
+  await unavailableContext.close();
+  console.log("PASS: unknown candidate status blocks draft resume and explains the safe next step");
 } finally {
   if (expiredContext) await expiredContext.close().catch(() => {});
   if (context) await context.close().catch(() => {});

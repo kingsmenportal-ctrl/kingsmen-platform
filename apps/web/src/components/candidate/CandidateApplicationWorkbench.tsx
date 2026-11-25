@@ -1,7 +1,7 @@
 "use client";
 
 import { getCandidateSessionState } from "@/lib/candidate-session";
-import { canResumeCandidateApplicationDraft, candidateFacingApplicationStatusLabel, type CandidateFacingApplicationStatus } from "@/lib/candidate-application-status";
+import { canResumeCandidateApplicationDraft, candidateApplicationStatusGuidance, candidateFacingApplicationStatusLabel, type CandidateFacingApplicationStatus } from "@/lib/candidate-application-status";
 import { useCallback, useEffect, useMemo, useState } from "react";
 
 type Session = { url: string; anonKey: string; token: string };
@@ -249,6 +249,7 @@ export function CandidateApplicationWorkbench() {
               <div className="mt-3 grid gap-3 lg:grid-cols-2">
                 {targets.map((target) => {
                   const parent = target.application_id ? applicationById.get(target.application_id) : undefined;
+                  const statusGuidance = parent ? candidateApplicationStatusGuidance(parent.kingsmen_status) : null;
                   const isPreparing = preparingTarget === target.target_key;
                   return (
                     <article key={target.id} className="rounded-xl border border-slate-200 p-4">
@@ -284,7 +285,24 @@ export function CandidateApplicationWorkbench() {
                           </button>
                         )}
                       </div>
-                      {parent ? <p className="mt-2 text-xs leading-5 text-slate-500">Kingsmen status: {candidateFacingApplicationStatusLabel(parent.kingsmen_status)} · Readiness: {parent.readiness_status || "Not assessed"}. This is a Kingsmen preparation record, not provider receipt.</p> : null}
+                      {parent ? (
+                        <>
+                          <p className="mt-2 text-xs leading-5 text-slate-500">Kingsmen status: {candidateFacingApplicationStatusLabel(parent.kingsmen_status)} · Readiness: {parent.readiness_status || "Not assessed"}. This is a Kingsmen preparation record, not provider receipt.</p>
+                          <aside className="mt-3 rounded-lg border border-slate-200 bg-slate-50 p-3" aria-label="Application next step">
+                            {statusGuidance ? (
+                              <>
+                                <h5 className="text-xs font-bold text-slate-900">{statusGuidance.heading}</h5>
+                                <p className="mt-1 text-xs leading-5 text-slate-700">{statusGuidance.detail}</p>
+                              </>
+                            ) : (
+                              <>
+                                <h5 className="text-xs font-bold text-slate-900">Next step unavailable</h5>
+                                <p className="mt-1 text-xs leading-5 text-slate-700">Kingsmen cannot determine a safe action from this status yet. Draft editing remains unavailable until the approved candidate-facing status is returned by the service.</p>
+                              </>
+                            )}
+                          </aside>
+                        </>
+                      ) : null}
                     </article>
                   );
                 })}
