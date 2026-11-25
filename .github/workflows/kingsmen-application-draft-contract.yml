@@ -14,6 +14,7 @@ on:
       - apps/web/src/app/candidate/applications/page.tsx
       - apps/web/src/app/candidate/dashboard/page.tsx
       - scripts/staging/test-candidate-applications-entry-route.mjs
+      - scripts/staging/test-candidate-application-tracker-ui.mjs
       - apps/web/src/components/candidate/CandidateApplicationTracker.tsx
       - apps/web/src/lib/candidate-session.ts
       - apps/web/src/lib/read-limited-json.ts
@@ -54,6 +55,7 @@ on:
       - apps/web/src/app/candidate/applications/page.tsx
       - apps/web/src/app/candidate/dashboard/page.tsx
       - scripts/staging/test-candidate-applications-entry-route.mjs
+      - scripts/staging/test-candidate-application-tracker-ui.mjs
       - apps/web/src/components/candidate/CandidateApplicationTracker.tsx
       - apps/web/src/lib/candidate-session.ts
       - apps/web/src/lib/read-limited-json.ts
@@ -122,6 +124,9 @@ jobs:
         run: node scripts/validators/validate-candidate-application-draft-persistence.mjs
       - name: Test canonical candidate applications entry route
         run: node scripts/staging/test-candidate-applications-entry-route.mjs
+      - name: Test application tracker and saved draft resume journey
+        timeout-minutes: 3
+        run: node scripts/staging/test-candidate-application-tracker-ui.mjs
       - name: Validate N15 source-review security contract
         run: node scripts/validators/validate-n15-source-review-decision.mjs
       - name: Validate Free Destiny Map browser-local readiness preview
