@@ -54,13 +54,14 @@ The GitHub repository is accessible. The default branch at the start of this bat
 Implemented in the branch:
 
 - `apps/web/src/app/free-destiny-map/page.tsx` — made the page a client component; wired form submission; required the core selections; added a result panel; supplied distinct next-step guidance for university, TVET, SETA/learnership, internship/apprenticeship, employment, funding and undecided routes.
-- `scripts/staging/test-free-destiny-map-local-preview.mjs` — added a regression contract for required fields, handler wiring, accessible output, the seven guidance branches and the no-send/no-persist boundary.
+- `scripts/staging/test-free-destiny-map-local-preview.mjs` — added a source-level regression contract for required fields, handler wiring, accessible output, seven guidance branches and the no-send/no-persist boundary.
+- `scripts/staging/e2e-free-destiny-map-preview.mjs` — added a Playwright browser E2E that fills the form, generates university and funding previews, checks the visible result, verifies the local-only disclosure, and asserts that previewing does not issue app write requests or change browser storage.
 - `package.json` — registered `test:free-destiny-map-preview` and included the test in the root `npm test` command.
-- `.github/workflows/free-destiny-map-preview-check.yml` — added a GitHub Actions workflow to run the root regression suite and Next.js build for relevant changes.
+- `.github/workflows/free-destiny-map-preview-check.yml` — added a GitHub Actions workflow to run the root regression suite, build Next.js, start the production build, and run Playwright browser E2E on relevant push and PR changes.
 
 **Data boundary:** This preview only reads the current form values in the page and renders recommendations. It makes no backend request and does not write to localStorage or sessionStorage. It does not create a candidate profile, save an application, or claim that a real opportunity is open.
 
-**Validation actually performed:** A source-level structural check against the GitHub-fetched branch content passed 16 of 16 checks. This was not a Node test run. No completed GitHub Actions result, successful Next.js build, browser run, or deployment result was available when this record was written. Do not mark runtime validation as passing until evidence exists.
+**Validation actually performed:** A source-level structural check against GitHub-fetched branch files passed 16 of 16 checks before this E2E addition. This was not a Node test run. A Playwright browser E2E and workflow steps now exist, but no completed GitHub Actions result, successful Next.js build, real browser run, or deployment result has been observed in this session. Do not mark runtime validation as passing until evidence exists.
 
 ## Public launch blockers
 
