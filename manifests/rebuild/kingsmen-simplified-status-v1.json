@@ -556,6 +556,33 @@
       "policyWasChanged": false,
       "rulesetId": 26323884,
       "activeRulesetCurrentStatus": "partial_ruleset_active_spec_gaps"
+    },
+    "candidateRuntimePreflight": {
+      "statusDate": "2026-11-25",
+      "environment": "Supabase staging",
+      "projectRef": "euhubhhnumtibbyufghm",
+      "method": "Read-only SQL; no schema or data changes",
+      "result": "BLOCKED_RUNTIME_PREREQUISITES_MISSING",
+      "present": [
+        "public.candidate_applications",
+        "public.candidate_application_events"
+      ],
+      "missing": [
+        "public.candidate_application_draft_answers",
+        "public.get_candidate_application_draft(uuid)",
+        "public.save_candidate_application_draft(uuid,jsonb,integer,text)",
+        "kingsmen_security.current_verified_kingsmen_candidate_id()"
+      ],
+      "additionalBlockers": [
+        "candidate_application_events_event_type_check does not allow APPLICATION_DRAFT_SAVED",
+        "no candidate_auth_identity_links rows",
+        "no candidate_master_profiles rows",
+        "no candidate_applications fixture rows",
+        "migration ledger lookups for 0096, 0097 and 0098 returned no matching entries",
+        "no current_verified_kingsmen_candidate_id helper found in public/private/kingsmen_security"
+      ],
+      "migrationOrDeploymentAuthorized": false,
+      "notes": "Preflight confirms the candidate application draft runtime is not deployable on current staging. Do not apply migrations 0107–0109 until exact migration provenance, restore rehearsal, schema compatibility, security review and change-control approval are complete."
     }
   },
   "migrationProvenance": {
