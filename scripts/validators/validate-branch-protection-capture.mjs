@@ -56,7 +56,7 @@ const policyRequirements = [
 const testRequirements = [
   'complete classic protection configuration should pass',
   'complete active repository ruleset should pass',
-  'observed active but incomplete ruleset detected',
+  'the observed active ruleset does not meet every release policy requirement',
   'strict_status_checks',
   'stale_review_dismissal',
   'conversation_resolution',
