@@ -61,7 +61,7 @@ Implemented in the branch:
 
 **Data boundary:** This preview only reads the current form values in the page and renders recommendations. It makes no backend request and does not write to localStorage or sessionStorage. It does not create a candidate profile, save an application, or claim that a real opportunity is open.
 
-**Validation actually performed:** The source-level structural check passed 16 of 16 checks. The actual GitHub Actions root regression suite passed, including the new source-level Free Destiny Map test. The repository's separate `Kingsmen CI` also completed successfully with its API and Next.js builds. The first focused preview workflow failed at the web dependency install because `npm ci` detected the missing Netlify plugin lock entry; the focused workflow was then aligned with the canonical `npm install --prefix apps/web --no-audit --no-fund` command. The updated focused workflow must still complete the browser E2E before this feature can be called runtime-verified.
+**Validation actually performed:** The source-level structural check passed 16 of 16 checks. The actual GitHub Actions root regression suite passed, including the new source-level Free Destiny Map test. The repository's separate `Kingsmen CI` completed successfully with API and Next.js builds. The focused workflow's web install then passed using the canonical `npm install` command, but Chromium installation failed because the runner was Ubuntu 26.04, unsupported by Playwright 1.60. The browser job is now pinned to Ubuntu 24.04. The follow-up run must pass dependency installation, build and browser E2E before this feature can be called runtime-verified.
 
 ## Public launch blockers
 
