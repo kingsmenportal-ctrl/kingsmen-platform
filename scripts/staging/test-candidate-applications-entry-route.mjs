@@ -26,7 +26,7 @@ assert.match(session, /session\.expires_at[\s\S]*Date\.now\(\)/,
   "Expired candidate sessions must be rejected before application data requests.");
 assert.match(trackerComponent, /getCandidateSessionState/,
   "The application tracker must use the shared candidate session helper.");
-assert.doesNotMatch(tracker, /window\.localStorage|JSON\.parse\(raw\)/,
+assert.doesNotMatch(trackerComponent, /window\.localStorage|JSON\.parse\(raw\)/,
   "The tracker must not maintain a second implementation of browser session parsing.");
 assert.match(tracker, /CandidateApplicationTracker/,
   "The destination must render the existing authenticated tracker rather than a second data path.");
