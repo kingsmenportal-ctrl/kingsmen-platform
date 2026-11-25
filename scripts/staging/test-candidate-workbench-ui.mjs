@@ -41,7 +41,8 @@ function loadState() {
       id: parentId,
       application_ref: "KM-CI-PARENT-001",
       pathway_type: "EMPLOYMENT",
-      status: "DRAFT",
+      status: "READY_TO_SUBMIT",
+      kingsmen_status: "Draft",
       readiness_status: "NOT_CHECKED",
       readiness_snapshot: { ci_fixture: true },
       created_at: now,
@@ -162,6 +163,9 @@ try {
   const prepareButton = page.getByRole("button", { name: "Prepare parent application" });
   await prepareButton.click();
   await page.getByText("Parent record: KM-CI-PARENT-001", { exact: true }).waitFor();
+  await page.getByText("Kingsmen status: Draft", { exact: false }).waitFor();
+  assert.equal(await page.getByText("Application state: READY_TO_SUBMIT", { exact: true }).count(), 0,
+    "internal workflow status must not be rendered as the candidate-facing application status");
   const draftLink = page.getByRole("link", { name: "Open / resume application draft", exact: true });
   await draftLink.waitFor();
   assert.equal(await draftLink.getAttribute("href"), `/candidate/applications/${parentId}`);
@@ -176,7 +180,8 @@ try {
   assert.ok(requests.some(item => item.action === "load"), "workbench should reload persisted records after preparing the parent");
 
   console.log("PASS: verified saved target prepares one Kingsmen parent application draft");
-  console.log("PASS: parent DRAFT is linked back to the saved target and opens its Kingsmen draft editor");
+  console.log("PASS: parent Draft is linked back to the saved target and opens its Kingsmen draft editor");
+  console.log("PASS: workbench displays the canonical Kingsmen status, not the internal workflow state");
   console.log("PASS: preparation request uses bearer authorization and the public anon key");
   console.log("PASS: no provider submission endpoint was called");
 } finally {
