@@ -22,23 +22,33 @@
   "findings": [
     {
       "severity": "P0",
-      "code": "LEDGER_SOURCE_RECONCILIATION_GAP",
-      "finding": "96 of 130 applied ledger records have no normalized name match among the 41 tracked SQL migration files in the three scanned source directories. This is an unmapped-source finding, not proof that every record has been deleted; source aliases, older commits or other migration histories may explain it."
+      "code": "MIGRATION_PROVENANCE_RECONCILIATION_REQUIRED",
+      "finding": "Current rebuild branch has 41 tracked SQL files and 96 live-ledger records without a matching source name on that branch. This current-branch gap must not be misreported as proof that all such source files are deleted."
+    },
+    {
+      "severity": "P0",
+      "code": "HISTORICAL_SOURCE_GAP",
+      "finding": "A read-only sweep of eight relevant current/historical feature and release branches found name-based source candidates for 67 of 130 ledger records: 40 with normalized core+sequence candidates and 27 with core-only / sequence-different candidates. The remaining 63 have no source-name candidate among the branches searched. These are filename candidates only, not proof of the exact SQL body that ran."
+    },
+    {
+      "severity": "P0",
+      "code": "NUMERIC_MIGRATION_SEQUENCE_COLLISIONS",
+      "finding": "Historical branches reuse numeric migration identifiers across different features. In particular, the 0087–0096 range differs between branches, so sequence number alone is not a safe provenance key. Match the exact source path, body/hash, migration version, commit, and schema evidence before any migration strategy is approved."
     },
     {
       "severity": "P1",
       "code": "DUPLICATE_LEDGER_NAMES",
-      "finding": "2 migration names occur more than once in the live ledger. Review the duplicate versions and deployment history before relying on any replay or reconstruction."
+      "finding": "Two migration names each occur twice in the live ledger; review both versions and the deployment history before reconstructing a canonical migration chain."
     },
     {
       "severity": "P1",
-      "code": "SOURCE_WITHOUT_LEDGER_MATCH",
-      "finding": "7 tracked migration files have no normalized name match in the live ledger. Files 0107–0110 appear to be candidate source migrations newer than the latest recorded 0095-era sequence; verify staging status explicitly."
+      "code": "SOURCE_ONLY_FILES_ON_REBUILD_BRANCH",
+      "finding": "Seven tracked migration files on the current rebuild branch have no matching ledger name; the 0107–0110 application/source-review files are explicit review candidates and should not be applied without the documented chain/provenance review."
     },
     {
       "severity": "P1",
-      "code": "CORE_ONLY_MATCHES",
-      "finding": "2 records match only after ignoring sequence numbering, including AI-decision and RLS-boundary migrations. Treat these as ambiguous candidates, not authoritative matches."
+      "code": "CORE_ONLY_CANDIDATES",
+      "finding": "27 ledger records have a semantic core-name candidate in a historical branch but no matching sequence. Treat these as alias candidates for manual review; do not authorize replay by this match."
     }
   ],
   "exactMatches": 32,
@@ -502,7 +512,331 @@
     "schemaChanged": false,
     "dataChanged": false,
     "migrationsApplied": false,
+    "edgeFunctionsDeployed": false,
     "releaseGateOpened": false
   },
-  "nextAction": "Reconcile every unmapped live ledger record against deployment commits and any archived source. Review duplicate names and core-only matches; produce a reviewed alias/lineage map before future schema changes."
+  "nextAction": "Create a reviewed migration lineage map for the 130 ledger records using historical source files, Git commits, exact SQL-body hashes and available deployment/schema evidence. Keep schema changes blocked until this is approved.",
+  "currentBranchSummary": {
+    "trackedSourceFiles": 41,
+    "normalizedExactMatches": 32,
+    "coreOnlyCandidateMatches": 2,
+    "ledgerRecordsWithoutCurrentBranchNameMatch": 96,
+    "sourceFilesWithoutLedgerNameMatch": 7
+  },
+  "historicalBranchSweep": {
+    "branchesScanned": 8,
+    "rawBranchSourceEntries": 414,
+    "uniqueSourcePathHashEntries": 86,
+    "uniqueSourcePaths": 83,
+    "ledgerRecordsWithCoreAndSequenceCandidate": 40,
+    "ledgerRecordsWithCoreOnlyCandidates": 27,
+    "ledgerRecordsWithoutHistoricalSourceNameCandidate": 63,
+    "ledgerRecordsWithMultipleDistinctSourceCandidates": 0,
+    "duplicateLedgerNames": 2,
+    "candidateSourceRecords": 67,
+    "ledgerWithoutAnyHistoricalSourceNameCandidate": 63,
+    "exactSqlBodyProvenanceMatches": 0,
+    "replayAuthorized": false
+  },
+  "historicalBranches": [
+    {
+      "branch": "rebuild/kingsmen-one-foundation-2026-11-17",
+      "treeSha": "392d7c68e662eb76ce1e07efd769e603e016adaa",
+      "migrationFiles": 41
+    },
+    {
+      "branch": "ops/backup-restore-safety-current-rc-2026-10-30",
+      "treeSha": "85e937ae43ff537765fd4b4ed36c7785e34966fd",
+      "migrationFiles": 52
+    },
+    {
+      "branch": "release/kingsmen-2026-10-25-rc1",
+      "treeSha": "edb8b857fd213fe774c90369cbb757eec341977c",
+      "migrationFiles": 57
+    },
+    {
+      "branch": "feat/candidate-application-draft-persistence-2026-11-01",
+      "treeSha": "8a36eef83e57e82113f5f47198084d0f27ddbb15",
+      "migrationFiles": 49
+    },
+    {
+      "branch": "feat/candidate-experience-closeout-2026-10-30",
+      "treeSha": "9db3d0425c4fdb21dc3867c1393682bb6ded9f40",
+      "migrationFiles": 46
+    },
+    {
+      "branch": "integration/payfast-sandbox-rc1-2026-10-27",
+      "treeSha": "1713bdfc72899059fb15bb05dc4f80b6c4e30e29",
+      "migrationFiles": 58
+    },
+    {
+      "branch": "integration/identity-review-ui-e2e-rc1",
+      "treeSha": "1cd36b730e3d704b11de47b3c4dd873781246208",
+      "migrationFiles": 60
+    },
+    {
+      "branch": "feat/national-institution-network-source-coverage-2026-10-31",
+      "treeSha": "1d8b20f26704982e803731ad959ecfb6f9d8e23b",
+      "migrationFiles": 51
+    }
+  ],
+  "historicalUnmappedLedgerRecords": [
+    {
+      "version": "20261012155914",
+      "name": "rls_helper_search_path_hardening_0020"
+    },
+    {
+      "version": "20261012160432",
+      "name": "foreign_key_index_hardening_0021"
+    },
+    {
+      "version": "20261012173518",
+      "name": "n10_commercial_schedule_v1_0022"
+    },
+    {
+      "version": "20261015151555",
+      "name": "candidate_auth_private_storage_0023"
+    },
+    {
+      "version": "20261015151630",
+      "name": "candidate_owned_application_document_reads_0024"
+    },
+    {
+      "version": "20261015152102",
+      "name": "explicit_candidate_identity_binding"
+    },
+    {
+      "version": "20261015152345",
+      "name": "require_verified_candidate_identity"
+    },
+    {
+      "version": "20261015152529",
+      "name": "candidate_portal_durable_state"
+    },
+    {
+      "version": "20261015152933",
+      "name": "harden_candidate_document_storage"
+    },
+    {
+      "version": "20261015153626",
+      "name": "revoke_anon_candidate_data_access_0029"
+    },
+    {
+      "version": "20261015153651",
+      "name": "revoke_unneeded_candidate_mutations_0030"
+    },
+    {
+      "version": "20261017062557",
+      "name": "n11_payfast_provider_idempotency_0036"
+    },
+    {
+      "version": "20261017062602",
+      "name": "n11_payfast_retryable_rejected_itn_0037"
+    },
+    {
+      "version": "20261017062700",
+      "name": "candidate_sessions_0038_legacy_compatible"
+    },
+    {
+      "version": "20261017062706",
+      "name": "candidate_credentials_0039"
+    },
+    {
+      "version": "20261017062711",
+      "name": "candidate_auth_identity_link_0040"
+    },
+    {
+      "version": "20261017082458",
+      "name": "kingsmen_ecosystem_marketplace_0041"
+    },
+    {
+      "version": "20261017082554",
+      "name": "public_verified_opportunity_read_0042"
+    },
+    {
+      "version": "20261017082751",
+      "name": "marketplace_rls_performance_hardening_0043"
+    },
+    {
+      "version": "20261017083209",
+      "name": "candidate_saved_routes_0044"
+    },
+    {
+      "version": "20261017084704",
+      "name": "marketplace_review_event_audit_0056"
+    },
+    {
+      "version": "20261017085001",
+      "name": "marketplace_https_url_constraints_0057"
+    },
+    {
+      "version": "20261017085438",
+      "name": "marketplace_public_dns_url_constraints_0058"
+    },
+    {
+      "version": "20261017155008",
+      "name": "0060_n06_application_pathway_runtime"
+    },
+    {
+      "version": "20261017155013",
+      "name": "0061_n07_provider_review_operations"
+    },
+    {
+      "version": "20261017155018",
+      "name": "0062_n08_outcomes_progression"
+    },
+    {
+      "version": "20261017155024",
+      "name": "0063_n09_communications_follow_up"
+    },
+    {
+      "version": "20261017155029",
+      "name": "0064_n10_packages_payments_refunds"
+    },
+    {
+      "version": "20261017155618",
+      "name": "n10_finance_privilege_hardening"
+    },
+    {
+      "version": "20261017160630",
+      "name": "n10_atomic_payfast_payment_confirmation"
+    },
+    {
+      "version": "20261017160636",
+      "name": "n10_payfast_refund_reconciliation"
+    },
+    {
+      "version": "20261017160641",
+      "name": "n10_atomic_finance_workflows"
+    },
+    {
+      "version": "20261017160751",
+      "name": "n10_finance_rpc_only_writes"
+    },
+    {
+      "version": "20261017174940",
+      "name": "n03_truth_vault_0002_rls_hardening"
+    },
+    {
+      "version": "20261019082917",
+      "name": "n06_application_privilege_hardening_0073"
+    },
+    {
+      "version": "20261019095926",
+      "name": "candidate_workspace_persistence_v1"
+    },
+    {
+      "version": "20261019101601",
+      "name": "candidate_identity_review_requests_v1"
+    },
+    {
+      "version": "20261019112437",
+      "name": "candidate_identity_review_decision_workflow_0076"
+    },
+    {
+      "version": "20261019112445",
+      "name": "candidate_application_tracker_0077"
+    },
+    {
+      "version": "20261019112452",
+      "name": "candidate_application_preparation_readiness_0078"
+    },
+    {
+      "version": "20261019112511",
+      "name": "candidate_application_preparation_readiness_0078"
+    },
+    {
+      "version": "20261019112516",
+      "name": "candidate_private_document_vault_0079"
+    },
+    {
+      "version": "20261019112521",
+      "name": "authorised_candidate_document_review_0080"
+    },
+    {
+      "version": "20261019112627",
+      "name": "candidate_document_preparation_detach_and_fk_indexes_0081"
+    },
+    {
+      "version": "20261020031028",
+      "name": "n12_candidate_private_document_review"
+    },
+    {
+      "version": "20261022194413",
+      "name": "expand_sa_official_source_catalog"
+    },
+    {
+      "version": "20261022202953",
+      "name": "n09_communications_backend_only"
+    },
+    {
+      "version": "20261023040341",
+      "name": "cross_module_application_outcome_truth_guards"
+    },
+    {
+      "version": "20261023132336",
+      "name": "revoke_client_execute_application_outcome_guard_functions"
+    },
+    {
+      "version": "20261023133631",
+      "name": "20261023170000_application_linked_private_document_evidence"
+    },
+    {
+      "version": "20261023135605",
+      "name": "20261023180000_seed_verified_labour_vacancies"
+    },
+    {
+      "version": "20261023142155",
+      "name": "20261023190000_route_availability_expiry_guards"
+    },
+    {
+      "version": "20261023142549",
+      "name": "20261023200000_route_availability_sa_timezone"
+    },
+    {
+      "version": "20261023144551",
+      "name": "n15_current_verified_opportunity_feed"
+    },
+    {
+      "version": "20261023145002",
+      "name": "n15_public_safe_opportunity_feed"
+    },
+    {
+      "version": "20261023145908",
+      "name": "n05_document_application_owner_index"
+    },
+    {
+      "version": "20261023152823",
+      "name": "n11_ai_evidence_and_review_guards"
+    },
+    {
+      "version": "20261023164135",
+      "name": "0020_n07_durable_outbox_leases_retry"
+    },
+    {
+      "version": "20261025090643",
+      "name": "n17_founder_brief_access_hardening"
+    },
+    {
+      "version": "20261025090832",
+      "name": "n17_founder_report_access_hardening"
+    },
+    {
+      "version": "20261029143144",
+      "name": "canonical_package_benefits_universal_accommodation_20261029"
+    },
+    {
+      "version": "20261029143414",
+      "name": "seed_canonical_public_package_cards_20261029"
+    },
+    {
+      "version": "20261029174204",
+      "name": "candidate_private_document_vault_workflows_0089"
+    }
+  ],
+  "historicalMatchCounts": {
+    "coreAndSequence": 40,
+    "coreOnlyOrSequenceDifferent": 27,
+    "noHistoricalSourceNameCandidate": 63
+  }
 }
