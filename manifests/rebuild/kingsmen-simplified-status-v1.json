@@ -63,7 +63,8 @@
     "items": [
       {
         "key": "repo_protection",
-        "status": "foundation_built_pending_github_apply"
+        "status": "partial_ruleset_active_spec_gaps",
+        "remainingConstraint": "An active ruleset protects main, but its current strict checks are test-and-build and validate; the approved manifest additionally requires source-guard and Build, validate, and smoke-test plus stale-review dismissal, conversation resolution and linear history. Verify real CI contexts and reconcile this policy before release."
       },
       {
         "key": "api_runtime",
@@ -300,7 +301,7 @@
         "currentProgress": [
           "Status and completion register, README reference, mandatory reporting contract and validators are merged into the rebuild lane.",
           "Free Destiny Map readiness preview is merged and its focused browser test passed.",
-          "Main-branch protection evidence is still failing to verify required protection; Phase 1 cannot be marked complete."
+          "Read-only GitHub ruleset inspection confirmed an active main-branch ruleset, but found gaps versus the stricter project protection manifest; governance gate remains partial."
         ]
       },
       {
@@ -476,8 +477,13 @@
     },
     "releaseProtectionCheck": {
       "runId": 45638646955,
-      "result": "failure",
-      "reason": "Main branch protection evidence workflow failed to verify required protection settings; repository release governance remains a blocker."
+      "workflowResult": "failure",
+      "classicEndpointHttpStatus": 404,
+      "observedRulesetId": 26323884,
+      "observedRulesetName": "main-branch-protection",
+      "observedRulesetEnforcement": "active",
+      "result": "partial_ruleset_active_spec_gaps",
+      "reason": "Protection is implemented via an active repository ruleset, but the classic endpoint verifier reports 404. The observed ruleset does not yet satisfy all stricter controls listed in the repo's protection manifest."
     },
     "migrationProvenance": {
       "status": "historical_sweep_captured_validator_passed",
@@ -648,5 +654,43 @@
         "The rebuild branch is not proven deployed to the live Netlify site."
       ]
     }
+  },
+  "githubRulesetObservation": {
+    "capturedOn": "2026-11-25",
+    "method": "Read-only GitHub REST repository ruleset query; classic branch-protection endpoint is not accessible through the integration and returns 403; the dedicated Actions verifier receives HTTP 404 on that endpoint because the repository uses a ruleset.",
+    "rulesetId": 26323884,
+    "name": "main-branch-protection",
+    "target": "branch",
+    "sourceType": "Repository",
+    "source": "kingsmenportal-ctrl/kingsmen-platform",
+    "enforcement": "active",
+    "refInclude": [
+      "refs/heads/main"
+    ],
+    "bypassActors": [],
+    "currentUserCanBypass": "never",
+    "observedRules": {
+      "deletionBlocked": true,
+      "creationBlocked": true,
+      "updateRestricted": true,
+      "pullRequestRequired": true,
+      "requiredApprovingReviewCount": 1,
+      "dismissStaleReviewsOnPush": false,
+      "strictStatusChecks": true,
+      "requiredStatusChecks": [
+        "test-and-build",
+        "validate"
+      ],
+      "nonFastForwardBlocked": true
+    },
+    "requiredByProjectManifestButNotObserved": [
+      "source-guard required status check",
+      "Build, validate, and smoke-test required status check",
+      "dismiss stale reviews",
+      "require conversation resolution",
+      "require linear history"
+    ],
+    "status": "partial_ruleset_active_spec_gaps",
+    "nextAction": "Update the read-only evidence script to support rulesets, then have an authorized maintainer decide/apply the full required policy without requiring non-existent status contexts. Reverify the actual ruleset and check names."
   }
 }
