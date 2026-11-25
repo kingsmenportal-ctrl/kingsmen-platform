@@ -355,9 +355,6 @@ export function FreeDestinyMapApiForm() {
             {isSubmitting ? "Sending intake request…" : "Submit Free Destiny Map request"} <span aria-hidden="true" className="ml-2">→</span>
           </button>
         </div>
- className="inline-flex min-h-12 w-full items-center justify-center rounded-xl bg-gradient-to-r from-amber-300 to-amber-500 px-5 py-3 text-sm font-extrabold text-slate-950 shadow-sm transition hover:brightness-105 focus:outline-none focus:ring-2 focus:ring-amber-500 focus:ring-offset-2 disabled:cursor-wait disabled:opacity-60 sm:w-fit">
-          {isSubmitting ? "Sending intake request…" : "Submit Free Destiny Map request"} <span aria-hidden="true" className="ml-2">→</span>
-        </div>
         {previewError ? (
           <div data-kingsmen-readiness-preview-error="true" role="alert" className="rounded-xl border border-red-200 bg-red-50 p-4 text-sm leading-6 text-red-900">
             {previewError}
