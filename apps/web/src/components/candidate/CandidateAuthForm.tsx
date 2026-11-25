@@ -2,6 +2,7 @@
 
 import { useState, type FormEvent } from "react";
 import { useRouter } from "next/navigation";
+import { getCandidateSupabaseConfig } from "@/lib/candidate-session";
 
 type Mode = "login" | "register";
 
@@ -19,19 +20,8 @@ type AuthResult = {
 };
 
 function getAuthConfig() {
-  const url = process.env.NEXT_PUBLIC_SUPABASE_URL?.replace(/\/$/, "");
-  const anonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
-  if (!url || !anonKey) return null;
-  let storageKey = "sb-euhubhhnumtibbyufghm-auth-token";
-  try {
-    const projectRef = new URL(url).hostname.split(".")[0];
-    if (projectRef) storageKey = `sb-${projectRef}-auth-token`;
-  } catch {
-    // The request below will surface an invalid URL configuration.
-  }
-  return { url, anonKey, storageKey };
+  return getCandidateSupabaseConfig();
 }
-
 export function CandidateAuthForm({ mode }: { mode: Mode }) {
   const router = useRouter();
   const isRegister = mode === "register";
