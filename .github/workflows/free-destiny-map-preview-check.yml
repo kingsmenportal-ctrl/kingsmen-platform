@@ -4,7 +4,6 @@ on:
   push:
     branches:
       - main
-      - feat/free-destiny-map-interactive-preview-20261125
     paths:
       - "apps/web/src/app/free-destiny-map/page.tsx"
       - "scripts/staging/test-free-destiny-map-local-preview.mjs"
@@ -28,7 +27,7 @@ on:
   workflow_dispatch:
 
 permissions:
-  contents: read
+  contents: write
 
 concurrency:
   group: free-destiny-map-preview-${{ github.ref }}
@@ -58,8 +57,26 @@ jobs:
       - name: Run Kingsmen regression suite
         run: npm test
 
-      - name: Install web dependencies (match canonical Kingsmen CI)
-        run: npm install --prefix apps/web --no-audit --no-fund
+      - name: Regenerate web lockfile for this feature PR
+        if: github.event_name == 'pull_request' && github.head_ref == 'feat/free-destiny-map-interactive-preview-20261125'
+        run: npm install --prefix apps/web --package-lock-only --no-audit --no-fund
+
+      - name: Commit corrected web lockfile to the feature PR
+        if: github.event_name == 'pull_request' && github.head_ref == 'feat/free-destiny-map-interactive-preview-20261125'
+        run: |
+          set -euo pipefail
+          if git diff --quiet -- apps/web/package-lock.json; then
+            echo "Web dependency lockfile is already synchronized."
+            exit 0
+          fi
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add apps/web/package-lock.json
+          git commit -m "fix(deps): synchronize web package lockfile"
+          git push origin "HEAD:${GITHUB_HEAD_REF}"
+
+      - name: Verify clean web dependency installation
+        run: npm ci --prefix apps/web --no-audit --no-fund
 
       - name: Install Chromium for browser test
         run: npx playwright install --with-deps chromium
