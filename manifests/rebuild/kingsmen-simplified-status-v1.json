@@ -319,7 +319,8 @@
           "All 17 RLS/no-policy tables deny direct anon/authenticated SELECT/INSERT/UPDATE/DELETE; authenticated Candidate A/B/operator/founder role-level E2E tests remain open.",
           "No staging schema, data, policies, function privileges, Auth settings or indexes were modified.",
           "Re-queried live overlap findings and pg_policies read-only; populated the actual role/action/policy names for all 16 advisor overlap combinations without changing policies.",
-          "Live policy/grant review captured 33 policies and seven JWT-bound helper definitions across eight sensitive tables; five tables grant all direct CRUD to anon and authenticated, so P0 negative API tests are required before least-privilege changes."
+          "Live policy/grant review captured 33 policies and seven JWT-bound helper definitions across eight sensitive tables; five tables grant all direct CRUD to anon and authenticated, so P0 negative API tests are required before least-privilege changes.",
+          "Merged PR #335 after root tests, status-register validation, migration-provenance validation, security-advisor validation, API build and web build passed; no live database policy changed."
         ]
       },
       {
@@ -422,6 +423,16 @@
       "mergeCommitSha": "84978bb62981ef41997b1fd23aed47a3cce0de26",
       "ciRunId": 45637295249,
       "ciResult": "success"
+    },
+    {
+      "number": 335,
+      "title": "Populate live security advisor overlap evidence",
+      "state": "merged",
+      "draft": false,
+      "base": "rebuild/kingsmen-one-foundation-2026-11-17",
+      "mergeCommitSha": "9a9e8d0e7d3f00e88a60f7fbbc0d744524f77cda",
+      "ciRunId": 45640042482,
+      "ciResult": "success"
     }
   ],
   "updateRules": [
@@ -461,9 +472,12 @@
     },
     {
       "id": "security-advisor-overlap-detail-reconciliation",
-      "state": "prepared_for_review",
-      "ciResult": "pending",
-      "notes": "Read-only Supabase advisor and pg_policies requery populated actual role/action/policy names for all 16 overlap combinations; validator now rejects unknown placeholders. No schema, policy, privilege, Auth setting, data or release gate changed."
+      "state": "merged",
+      "ciResult": "success",
+      "notes": "Merged PR #335. Read-only Supabase advisor and pg_policies requery populated all 16 role/action/policy combinations; validator rejects unknown placeholders. Root tests, status validator, migration provenance validator, security advisor validator, API build and web build passed. No database/schema/policy/Auth/candidate-data change.",
+      "pr": 335,
+      "mergeCommitSha": "9a9e8d0e7d3f00e88a60f7fbbc0d744524f77cda",
+      "ciRunId": 45640042482
     }
   ],
   "latestVerification": {
@@ -719,5 +733,76 @@
     ],
     "status": "partial_ruleset_active_spec_gaps",
     "nextAction": "Update the read-only evidence script to support rulesets, then have an authorized maintainer decide/apply the full required policy without requiring non-existent status contexts. Reverify the actual ruleset and check names."
+  },
+  "currentLayerStatus": {
+    "statusDate": "2026-11-25",
+    "frontend": {
+      "layer": "FRONTEND",
+      "sourceStatus": "present",
+      "evidenceStatus": "SOURCE_TEST_PASSED",
+      "currentEvidence": [
+        "apps/web contains 78 route pages in the recorded inventory",
+        "Free Destiny Map browser-local readiness preview merged in PR #326; targeted browser test passed",
+        "Next.js production build passed in PR #335 CI run 45640042482"
+      ],
+      "missing": [
+        "Full authenticated candidate journey through account/profile/documents/application tracker has not passed staging end-to-end",
+        "Current rebuild branch is not the recorded Netlify production deployment"
+      ]
+    },
+    "backendApi": {
+      "layer": "BACKEND/API",
+      "sourceStatus": "present",
+      "evidenceStatus": "SOURCE_TEST_PASSED",
+      "currentEvidence": [
+        "Separate apps/api package, typed command/state-machine and PostgreSQL Truth Vault foundation exist",
+        "API build passed in PR #335 CI run 45640042482"
+      ],
+      "missing": [
+        "Prove real PostgreSQL persistence and idempotency on staging",
+        "Prove retry/worker lease/DLQ recovery, authorization boundaries and API/UI end-to-end"
+      ]
+    },
+    "databaseSecurity": {
+      "layer": "DATABASE/SECURITY",
+      "sourceStatus": "present",
+      "evidenceStatus": "READ_ONLY_AUDIT_RECONCILED_RUNTIME_TESTS_PENDING",
+      "currentEvidence": [
+        "Supabase staging ACTIVE_HEALTHY, PostgreSQL 17.11, 230 public tables with RLS enabled",
+        "Read-only migration lineage audit: 130 migration ledger records; 63 lack source-name candidates across eight branches; exact applied SQL body/deployment lineage remains unresolved",
+        "Six SECURITY DEFINER bodies match selected historical source candidates; anon/PUBLIC execution denied; 17 no-policy tables deny direct anon/authenticated privileges",
+        "PR #335 populated all 16 role/action/policy overlap combinations and security-advisor validator passed"
+      ],
+      "missing": [
+        "Authenticated Candidate A/B, operator and founder runtime isolation tests",
+        "Five tables have direct anon/authenticated table grants and rely on RLS predicates; verify least-privilege negative API access",
+        "Leaked-password protection disabled; requires reviewed Auth-setting change",
+        "Migration lineage/restore/change-control approval before any migration changes"
+      ]
+    },
+    "integrationsJarvis": {
+      "layer": "INTEGRATION/JARVIS",
+      "evidenceStatus": "SOURCE_PRESENT_RUNTIME_PARTIAL",
+      "currentEvidence": [
+        "Jarvis core, policy gate, tool registry and evidence ledger exist",
+        "Jarvis Live Runtime workflow has recently passed"
+      ],
+      "missing": [
+        "Provider integrations, queues/worker recovery, email/payment sandbox and every claimed live action need provider/runtime evidence"
+      ]
+    },
+    "infraCiDeploy": {
+      "layer": "INFRA/CI/DEPLOY",
+      "evidenceStatus": "PR_CI_PASSED_PRODUCTION_REBUILD_NOT_DEPLOYED",
+      "currentEvidence": [
+        "PR #335 CI run 45640042482 passed focused tests, all three validators, API build and web build",
+        "Active main-branch-protection ruleset `main-branch-protection` ID 26323884 exists"
+      ],
+      "missing": [
+        "Ruleset is partially compliant: source-guard and release-evidence checks, stale-review dismissal, conversation resolution and linear-history requirement are absent",
+        "Netlify's last recorded production deployment is 8 July 2026 on main, not the selected rebuild branch",
+        "All 13 canonical release gates remain open/pending; no public launch"
+      ]
+    }
   }
 }
