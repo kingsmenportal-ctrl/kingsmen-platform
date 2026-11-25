@@ -54,4 +54,18 @@ assert.match(claude, /every Kingsmen response must start/i);
 assert.match(readme, /KINGSMEN_SIMPLIFIED_STATUS_AND_COMPLETION_ROADMAP\.md/);
 assert.match(packageJson.scripts["kingsmen:status:validate"], /validate-kingsmen-simplified-status\.mjs/);
 
+
+assert.ok(manifest.surfaceStatus, "Every status record must separate frontend and backend.");
+assert.ok(manifest.surfaceStatus.frontend.status, "Frontend status is mandatory.");
+assert.ok(manifest.surfaceStatus.backend.status, "Backend/data status is mandatory.");
+assert.ok(manifest.surfaceStatus.integration.status, "Integration/deployment status is mandatory.");
+assert.ok(Array.isArray(manifest.surfaceStatus.frontend.remaining) && manifest.surfaceStatus.frontend.remaining.length > 0);
+assert.ok(Array.isArray(manifest.surfaceStatus.backend.remaining) && manifest.surfaceStatus.backend.remaining.length > 0);
+assert.match(doc, /Frontend \/ backend \/ integration status/);
+assert.match(doc, /Every response concerning Kingsmen must start with a dated status report/);
+assert.match(doc, /This batch/);
+assert.match(claude, /Mandatory Kingsmen reporting contract/);
+assert.match(claude, /\*\*Frontend:\*\*/);
+assert.match(claude, /\*\*Backend\/data:\*\*/);
+
 console.log("Kingsmen simplified status register contract passed: N00–N20 registered; all release gates are evidence-tracked; staging and security snapshot checked.");
