@@ -27,6 +27,7 @@ on:
       - apps/web/src/components/candidate/DocumentPreflightPanel.tsx
       - scripts/staging/test-candidate-application-status-contract.mjs
       - scripts/staging/test-candidate-preparation-schema-compat.mjs
+      - scripts/staging/test-candidate-application-preparation-identity-boundary.mjs
       - scripts/staging/test-candidate-draft-runtime-preflight.mjs
       - scripts/staging/test-candidate-application-draft-api-boundary.mjs
       - scripts/staging/kingsmen-candidate-draft-runtime-preflight.sql
@@ -162,6 +163,8 @@ jobs:
         run: node scripts/staging/test-candidate-application-status-contract.mjs
       - name: Guard candidate preparation against an uninstalled status column
         run: node scripts/staging/test-candidate-preparation-schema-compat.mjs
+      - name: Test candidate preparation verified identity boundary
+        run: node scripts/staging/test-candidate-application-preparation-identity-boundary.mjs
       - name: Test read-only candidate draft runtime preflight contract
         run: npm run db:preflight:candidate-draft:validate
       - name: Test candidate document session and navigation contract
