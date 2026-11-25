@@ -77,6 +77,19 @@ try {
   assert.equal(invalidJson.status, 400, "POST must reject malformed JSON without invoking the upstream RPC.");
   assert.equal((await invalidJson.json()).code, "INVALID_JSON");
 
+  const oversizedPayload = await fetch(baseUrl + "/api/candidate/application-draft", {
+    method: "POST",
+    headers: { Authorization: "Bearer ci-test-token", "Content-Type": "application/json" },
+    body: JSON.stringify({
+      application_id: validApplicationId,
+      answer_data: { motivation_statement: "x".repeat(80 * 1024) },
+      expected_version: 0,
+      idempotency_key: "ci-boundary-test-oversized"
+    })
+  });
+  assert.equal(oversizedPayload.status, 413, "POST must reject bodies above the configured 72 KiB limit.");
+  assert.equal((await oversizedPayload.json()).code, "REQUEST_TOO_LARGE");
+
   const missingFields = await fetch(baseUrl + "/api/candidate/application-draft", {
     method: "POST",
     headers: { Authorization: "Bearer ci-test-token", "Content-Type": "application/json" },
@@ -85,7 +98,7 @@ try {
   assert.equal(missingFields.status, 400, "POST must validate version and idempotency fields.");
   assert.equal((await missingFields.json()).code, "APPLICATION_DRAFT_INPUT_INVALID");
 
-  for (const response of [invalidId, missingAuthGet, missingAuthPost, wrongContentType, invalidJson, missingFields]) {
+  for (const response of [invalidId, missingAuthGet, missingAuthPost, wrongContentType, invalidJson, oversizedPayload, missingFields]) {
     assert.match(response.headers.get("cache-control") || "", /no-store/i,
       "Candidate draft responses must not be cacheable.");
     assert.match(response.headers.get("vary") || "", /authorization/i,
