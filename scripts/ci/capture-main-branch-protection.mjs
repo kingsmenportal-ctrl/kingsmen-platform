@@ -2,7 +2,7 @@
 import { createHash } from 'node:crypto';
 import { mkdir, writeFile } from 'node:fs/promises';
 import { dirname } from 'node:path';
-import { evaluateMainBranchProtection } from './main-branch-protection-policy.mjs';
+import { evaluateMainBranchProtection, protectionActiveFromEvidence } from './main-branch-protection-policy.mjs';
 
 const repository = process.env.GITHUB_REPOSITORY;
 const token = process.env.GITHUB_TOKEN;
@@ -24,7 +24,7 @@ async function finish(status, checks, httpStatus = null, extra = {}) {
     repository: repository ?? null,
     branch,
     checkedAt,
-    protectionActive: checks?.rulesetActiveForMain === true || httpStatus === 200,
+    protectionActive: protectionActiveFromEvidence(checks, httpStatus, extra.verificationEndpoint ?? checks?.verificationEndpoint ?? null),
     httpStatus,
     verificationEndpoint: extra.verificationEndpoint ?? null,
     checks,
@@ -144,7 +144,7 @@ if (classicResponse.ok) {
   if (!preferred) {
     const report = await finish(
       'BLOCKED_RULESET_NOT_FOUND_OR_NOT_VISIBLE',
-      { ...blockedChecks('Classic protection returned 404 and no active repository ruleset applying to main was found.') },
+      { ...blockedChecks('Classic protection returned 404 and the rulesets endpoint returned no visible active ruleset applying to main; verify ruleset visibility/token permission and repository settings.') },
       rulesetsResponse.status,
       {
         verificationEndpoint: 'repository_rulesets',
