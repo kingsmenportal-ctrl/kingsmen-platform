@@ -318,7 +318,8 @@
           "Live security checks confirm all six flagged SECURITY DEFINER function bodies match candidate historical source bodies; anon/PUBLIC execution is denied.",
           "All 17 RLS/no-policy tables deny direct anon/authenticated SELECT/INSERT/UPDATE/DELETE; authenticated Candidate A/B/operator/founder role-level E2E tests remain open.",
           "No staging schema, data, policies, function privileges, Auth settings or indexes were modified.",
-          "Re-queried live overlap findings and pg_policies read-only; populated the actual role/action/policy names for all 16 advisor overlap combinations without changing policies."
+          "Re-queried live overlap findings and pg_policies read-only; populated the actual role/action/policy names for all 16 advisor overlap combinations without changing policies.",
+          "Merged PR #335 after root tests, status-register validation, migration-provenance validation, security-advisor validation, API build and web build passed; no live database policy changed."
         ]
       },
       {
@@ -421,6 +422,16 @@
       "mergeCommitSha": "84978bb62981ef41997b1fd23aed47a3cce0de26",
       "ciRunId": 45637295249,
       "ciResult": "success"
+    },
+    {
+      "number": 335,
+      "title": "Populate live security advisor overlap evidence",
+      "state": "merged",
+      "draft": false,
+      "base": "rebuild/kingsmen-one-foundation-2026-11-17",
+      "mergeCommitSha": "9a9e8d0e7d3f00e88a60f7fbbc0d744524f77cda",
+      "ciRunId": 45640042482,
+      "ciResult": "success"
     }
   ],
   "updateRules": [
@@ -460,9 +471,12 @@
     },
     {
       "id": "security-advisor-overlap-detail-reconciliation",
-      "state": "prepared_for_review",
-      "ciResult": "pending",
-      "notes": "Read-only Supabase advisor and pg_policies requery populated actual role/action/policy names for all 16 overlap combinations; validator now rejects unknown placeholders. No schema, policy, privilege, Auth setting, data or release gate changed."
+      "state": "merged",
+      "ciResult": "success",
+      "notes": "Merged PR #335. Read-only Supabase advisor and pg_policies requery populated all 16 role/action/policy combinations; security advisor validator rejects unknown placeholders. Root tests, status validator, migration provenance validator, security advisor validator, API build and web build passed. No database/schema/policy/Auth/candidate-data change.",
+      "pr": 335,
+      "mergeCommitSha": "9a9e8d0e7d3f00e88a60f7fbbc0d744524f77cda",
+      "ciRunId": 45640042482
     }
   ],
   "latestVerification": {
