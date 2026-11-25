@@ -446,11 +446,12 @@
     {
       "number": 343,
       "title": "Add read-only staging RLS API boundary probe",
-      "state": "open",
-      "draft": true,
+      "state": "merged",
+      "draft": false,
       "base": "rebuild/kingsmen-one-foundation-2026-11-17",
-      "head": "security/staging-rls-api-boundary-20261125",
-      "role": "read-only staging RLS/API negative-access probe; initial offline contract passed; fixture filter refinements await fresh CI; live actor/fixture proof pending"
+      "head": "194bc01f442fdc18114314078c6e2f3d19f39bb5",
+      "mergeCommitSha": "4adb15d963363202cdc6e81715f25dcc3f163857",
+      "role": "read-only staging RLS/API negative-access probe, offline contract and all PR CI workflows passed; live actor/fixture proof pending"
     }
   ],
   "updateRules": [
@@ -603,15 +604,41 @@
       "notes": "Preflight confirms the candidate application draft runtime is not deployable on current staging. Do not apply migrations 0107–0109 until exact migration provenance, restore rehearsal, schema compatibility, security review and change-control approval are complete."
     },
     "rlsApiBoundaryProbe": {
-      "status": "initial_offline_contract_passed_followup_code_validation_pending_live_staging_pending",
+      "status": "offline_contract_and_integrated_ci_passed_live_staging_pending",
       "pullRequest": 343,
       "branch": "security/staging-rls-api-boundary-20261125",
       "implementationCommit": "3b2139f7ab91d1e9e2b2aac16f0276f1ec9f400a",
-      "testedCommit": "22c543ed6eea70748ddc0f8f8ef00711732f471d",
+      "validatedPullRequestHead": "194bc01f442fdc18114314078c6e2f3d19f39bb5",
+      "mergeCommit": "4adb15d963363202cdc6e81715f25dcc3f163857",
+      "workflows": [
+        {
+          "name": "Kingsmen staging RLS API boundary",
+          "runId": 45693309444,
+          "result": "success",
+          "url": "https://github.com/kingsmenportal-ctrl/kingsmen-platform/actions/runs/45693309444"
+        },
+        {
+          "name": "Kingsmen CI",
+          "runId": 45693309467,
+          "result": "success",
+          "url": "https://github.com/kingsmenportal-ctrl/kingsmen-platform/actions/runs/45693309467"
+        },
+        {
+          "name": "Kingsmen application draft contract",
+          "runId": 45693309777,
+          "result": "success",
+          "url": "https://github.com/kingsmenportal-ctrl/kingsmen-platform/actions/runs/45693309777"
+        },
+        {
+          "name": "Jarvis Live Runtime",
+          "runId": 45693309886,
+          "result": "success",
+          "url": "https://github.com/kingsmenportal-ctrl/kingsmen-platform/actions/runs/45693309886"
+        }
+      ],
       "offlineContract": {
-        "result": "success_on_initial_commit_only",
-        "runId": 45692768450,
-        "url": "https://github.com/kingsmenportal-ctrl/kingsmen-platform/actions/runs/45692768450",
+        "result": "passed",
+        "runId": 45693309444,
         "checks": 65,
         "tables": [
           "candidate_credentials",
@@ -628,11 +655,6 @@
           "founder"
         ]
       },
-      "codeRefinementsAfterLastPassingRun": [
-        "Candidate-owned session, evidence and workflow probes now constrain the target row by candidate_id.",
-        "Route-source probes now constrain status and confidence_band as well as row ID."
-      ],
-      "currentCodeValidation": "pending_fresh_ci_evidence",
       "liveStaging": {
         "result": "not_run_fixture_and_actor_prerequisites_missing",
         "liveApiNegativeRoleTestsRun": 0,
@@ -880,7 +902,7 @@
         "Read-only migration lineage audit: 130 migration ledger records; 63 lack source-name candidates across eight branches; exact applied SQL body/deployment lineage remains unresolved",
         "Six SECURITY DEFINER bodies match selected historical source candidates; anon/PUBLIC execution denied; 17 no-policy tables deny direct anon/authenticated privileges",
         "PR #335 populated all 16 role/action/policy overlap combinations and security-advisor validator passed",
-        "PR #343 adds a GET-only staging RLS API probe; the initial offline mock contract passed on commit 22c543ed6eea70748ddc0f8f8ef00711732f471d (run 45692768450); later fixture-filter hardening is awaiting fresh CI."
+        "PR #343 merged at 4adb15d963363202cdc6e81715f25dcc3f163857; the GET-only staging RLS API probe, 65-check offline contract, Kingsmen CI, candidate application/PostgreSQL browser contract and Jarvis Live Runtime all passed on PR head 194bc01f442fdc18114314078c6e2f3d19f39bb5. This is source/CI proof only, not live staging role-isolation evidence."
       ],
       "missing": [
         "Authenticated Candidate A/B, operator and founder runtime isolation tests",
