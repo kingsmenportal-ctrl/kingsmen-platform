@@ -94,6 +94,7 @@ export default function CandidateApplicationDraftPage() {
   const applicationId = typeof params.applicationId === "string" ? params.applicationId : "";
   const [application, setApplication] = useState<Application | null>(null);
   const [answers, setAnswers] = useState<AnswerData>(EMPTY_ANSWERS);
+  const [savedAnswers, setSavedAnswers] = useState<AnswerData>(EMPTY_ANSWERS);
   const [version, setVersion] = useState(0);
   const [profileAvailable, setProfileAvailable] = useState(false);
   const [serverEditable, setServerEditable] = useState(false);
@@ -129,7 +130,9 @@ export default function CandidateApplicationDraftPage() {
         throw new Error(message(body));
       }
       setApplication(body.application);
-      setAnswers(normalizeAnswers(body.draft));
+      const loadedAnswers = normalizeAnswers(body.draft);
+      setAnswers(loadedAnswers);
+      setSavedAnswers(loadedAnswers);
       setVersion(Number.isInteger(body.draft_version) ? body.draft_version as number : 0);
       setProfileAvailable(body.shared_profile_available === true);
       setServerEditable(body.is_editable === true);
@@ -220,6 +223,7 @@ export default function CandidateApplicationDraftPage() {
         return;
       }
       setAnswers(cleanedAnswers);
+      setSavedAnswers(cleanedAnswers);
       setVersion(Number.isInteger(body.draft_version) ? body.draft_version as number : version + 1);
       setDraftUpdatedAt(body.updated_at ?? new Date().toISOString());
       setSaveIdempotencyKey("");
@@ -238,6 +242,17 @@ export default function CandidateApplicationDraftPage() {
 
   const isEditable = Boolean(serverEditable && application
     && isCandidateEditableApplicationStatus(application.kingsmen_status));
+  const hasUnsavedChanges = isEditable && JSON.stringify(answers) !== JSON.stringify(savedAnswers);
+
+  useEffect(() => {
+    if (!hasUnsavedChanges) return;
+    const warnBeforeLeaving = (event: BeforeUnloadEvent) => {
+      event.preventDefault();
+      event.returnValue = "";
+    };
+    window.addEventListener("beforeunload", warnBeforeLeaving);
+    return () => window.removeEventListener("beforeunload", warnBeforeLeaving);
+  }, [hasUnsavedChanges]);
 
   return <main className="min-h-screen bg-slate-950 px-4 py-8 text-white sm:px-6">
     <div className="mx-auto max-w-5xl space-y-6">
@@ -251,7 +266,10 @@ export default function CandidateApplicationDraftPage() {
           <a href="/candidate/dashboard" className="rounded-xl border border-slate-700 px-4 py-2">Dashboard</a>
           <a href="/candidate/profile" className="rounded-xl border border-slate-700 px-4 py-2">Reusable profile</a>
           <a href="/candidate/applications" className="rounded-xl border border-slate-700 px-4 py-2">My applications</a>
-          <button type="button" disabled={loading || saving} onClick={() => void load()} className="rounded-xl bg-cyan-300 px-4 py-2 font-bold text-slate-950 disabled:opacity-50">{loading ? "Reloading…" : "Reload saved draft"}</button>
+          <button type="button" disabled={loading || saving} onClick={() => {
+            if (hasUnsavedChanges && !window.confirm("You have unsaved changes. Reloading will discard them. Continue?")) return;
+            void load();
+          }} className="rounded-xl bg-cyan-300 px-4 py-2 font-bold text-slate-950 disabled:opacity-50">{loading ? "Reloading…" : "Reload saved draft"}</button>
         </nav>
       </header>
 
@@ -287,6 +305,9 @@ export default function CandidateApplicationDraftPage() {
               <p className="font-semibold">Draft persistence</p>
               <p className="mt-2 text-sm text-slate-300">Latest saved version: {version}. Last saved: {formatDate(draftUpdatedAt)}.</p>
               <p className="mt-2 text-xs text-slate-500">Saving updates the draft version and requires readiness checks to be refreshed. It does not submit to a provider.</p>
+              <p data-testid="draft-save-state" aria-live="polite" className={`mt-3 text-xs font-semibold ${hasUnsavedChanges ? "text-amber-300" : "text-emerald-300"}`}>
+                {hasUnsavedChanges ? "Unsaved changes. Save your draft before leaving this page." : "All changes saved."}
+              </p>
             </div>
           </div>
           {!isEditable && <p className="mt-5 rounded-xl border border-amber-800 bg-amber-950/40 p-4 text-sm text-amber-100">This application is in a Kingsmen status that does not allow candidate editing. The answer form is read-only.</p>}
