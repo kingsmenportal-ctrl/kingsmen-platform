@@ -20,6 +20,16 @@ assert.equal(f.authenticatedSecurityDefinerFunctionExecutable.count,f.authentica
 assert.equal(f.authenticatedSecurityDefinerFunctionExecutable.count,6);
 assert.equal(f.multiplePermissivePolicies.count,f.multiplePermissivePolicies.policies.length);
 assert.equal(f.multiplePermissivePolicies.count,16);
+for (const finding of f.multiplePermissivePolicies.policies) {
+  assert.ok(finding.table, "Overlap finding must name its table.");
+  assert.ok(finding.role, "Overlap finding must name the role.");
+  assert.ok(finding.action, "Overlap finding must name the action.");
+  assert.ok(finding.policies.length >= 2, "Overlap finding must name the overlapping policies.");
+  assert.ok(finding.observedAt, "Overlap finding must include the advisor observation time.");
+}
+assert.ok(f.multiplePermissivePolicies.recheckedAt, "Overlap findings must carry a refresh timestamp.");
+assert.doesNotMatch(doc, /\| unknown \| unknown \|/i, "Do not publish unknown role/action placeholders.");
+
 assert.equal(f.leakedPasswordProtection.count,1);
 assert.equal(f.unusedIndexes.count,f.unusedIndexes.indexes.length);
 assert.equal(f.unusedIndexes.count,282);
