@@ -433,6 +433,20 @@
       "mergeCommitSha": "9a9e8d0e7d3f00e88a60f7fbbc0d744524f77cda",
       "ciRunId": 45640042482,
       "ciResult": "success"
+    },
+    {
+      "number": 342,
+      "title": "Canonical candidate applications entry route and candidate-facing status contract",
+      "state": "open",
+      "draft": true,
+      "base": "rebuild/kingsmen-one-foundation-2026-11-17",
+      "headBranch": "feat/candidate-applications-entry-route-20261125",
+      "testedHeadSha": "5a54342cd693d28881d05e278c5adfaa72b02079",
+      "ciRunId": 45689088959,
+      "ciResult": "success",
+      "kingsmenCiRunId": 45689088947,
+      "kingsmenCiResult": "success",
+      "notes": "Frontend application journey and isolated PostgreSQL status-contract proposal; no staging or production mutation."
     }
   ],
   "updateRules": [
@@ -478,6 +492,17 @@
       "pr": 335,
       "mergeCommitSha": "9a9e8d0e7d3f00e88a60f7fbbc0d744524f77cda",
       "ciRunId": 45640042482
+    },
+    {
+      "id": "candidate-application-entry-status-contract",
+      "pr": 342,
+      "state": "open-ci-passed-not-deployed",
+      "headSha": "5a54342cd693d28881d05e278c5adfaa72b02079",
+      "ciRunId": 45689088959,
+      "ciResult": "success",
+      "kingsmenCiRunId": 45689088947,
+      "kingsmenCiResult": "success",
+      "notes": "Canonical candidate applications entry route, dashboard navigation, shared session/expiry helper, seven-label status contract across tracker/workbench/editor, browser-flow regressions, disposable PostgreSQL proposal test. Staging migration and deployment remain unauthorized."
     }
   ],
   "latestVerification": {
@@ -583,6 +608,53 @@
       ],
       "migrationOrDeploymentAuthorized": false,
       "notes": "Preflight confirms the candidate application draft runtime is not deployable on current staging. Do not apply migrations 0107–0109 until exact migration provenance, restore rehearsal, schema compatibility, security review and change-control approval are complete."
+    },
+    "candidateApplicationJourney": {
+      "statusDate": "2026-11-25",
+      "branch": "feat/candidate-applications-entry-route-20261125",
+      "pullRequest": 342,
+      "testedHeadSha": "5a54342cd693d28881d05e278c5adfaa72b02079",
+      "latestImplementedHeadSha": "5a54342cd693d28881d05e278c5adfaa72b02079",
+      "result": "CI_PASSED_NOT_MERGED_NOT_DEPLOYED",
+      "applicationContractWorkflow": {
+        "runId": 45689088959,
+        "result": "success",
+        "url": "https://github.com/kingsmenportal-ctrl/kingsmen-platform/actions/runs/45689088959"
+      },
+      "kingsmenCi": {
+        "runId": 45689088947,
+        "result": "success",
+        "url": "https://github.com/kingsmenportal-ctrl/kingsmen-platform/actions/runs/45689088947"
+      },
+      "checksPassed": [
+        "candidate application route/status/security source validator",
+        "canonical seven-label candidate application status contract",
+        "isolated PostgreSQL candidate status proposal contract",
+        "Next.js production build",
+        "candidate applications entry -> tracker -> draft resume browser flow",
+        "expired-session rejection before candidate-data request",
+        "candidate draft save and resume browser flow",
+        "candidate profile save/reload/consent browser flow",
+        "candidate workbench browser flow",
+        "Free Destiny Map browser test",
+        "N15 source-review browser test"
+      ],
+      "frontendChanges": [
+        "canonical /candidate/applications server redirect",
+        "dashboard workspace card and header navigation",
+        "shared candidate browser session validation including expiry handling",
+        "canonical seven-label candidate-facing application status and editability rules",
+        "tracker/workbench/draft editor status display and draft-resume constraints"
+      ],
+      "backendChanges": [
+        "candidate application preparation response contract consumes kingsmen_status",
+        "isolated CI-only SQL proposal for candidate status mapping, draft lock and readiness invalidation"
+      ],
+      "productionChanges": [],
+      "stagingMutations": [],
+      "migrationPromotionAuthorized": false,
+      "deploymentAuthorized": false,
+      "notes": "All tests were executed in GitHub CI and the isolated PostgreSQL fixture. The SQL status implementation is outside db/migrations and is not approved for staging. The latest passing head is not deployed to the intended Netlify site."
     }
   },
   "migrationProvenance": {
