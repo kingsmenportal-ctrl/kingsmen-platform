@@ -262,7 +262,7 @@ export default function CandidateMasterProfileForm() {
       <div className="public-notice"><span aria-hidden="true" /> CANDIDATE PROFILE · Authenticated backend workflow</div>
       <header className="public-header"><div className="public-container public-header-inner">
         <a className="public-brand" href="/" aria-label="Kingsmen Portal home"><span className="public-crest" aria-hidden="true">K</span><span className="public-wordmark"><strong>KINGSMEN</strong><small>PORTAL</small></span></a>
-        <nav className="public-nav" aria-label="Candidate navigation"><a href="/candidate/dashboard/">Dashboard</a><a href="/candidate/saved-opportunities/">Saved opportunities</a><a href="/candidate/documents/">Documents</a><a className="public-nav-portal" href="/candidate/opportunity-matches/">Opportunities ↗</a></nav>
+        <nav className="public-nav" aria-label="Candidate navigation"><a href="/candidate/dashboard/">Dashboard</a><a href="/candidate/applications">Applications</a><a href="/candidate/saved-opportunities/">Saved opportunities</a><a href="/candidate/documents/">Documents</a><a className="public-nav-portal" href="/candidate/opportunity-matches/">Opportunities ↗</a></nav>
       </div></header>
 
       <div className="public-container candidate-page-body">
