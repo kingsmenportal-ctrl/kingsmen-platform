@@ -68,4 +68,15 @@ assert.match(claude, /Mandatory Kingsmen reporting contract/);
 assert.match(claude, /\*\*Frontend:\*\*/);
 assert.match(claude, /\*\*Backend\/data:\*\*/);
 
+
+assert.ok(manifest.githubRulesetObservation, "The observed main ruleset must be recorded.");
+assert.equal(manifest.githubRulesetObservation.enforcement, "active");
+assert.equal(manifest.githubRulesetObservation.rulesetId, 26323884);
+assert.equal(manifest.githubRulesetObservation.status, "partial_ruleset_active_spec_gaps");
+assert.deepEqual(manifest.githubRulesetObservation.observedRules.requiredStatusChecks, ["test-and-build", "validate"]);
+assert.equal(manifest.releaseGates.items.find((gate) => gate.key === "repo_protection")?.status, "partial_ruleset_active_spec_gaps");
+assert.match(doc, /main-branch-protection/);
+assert.match(doc, /active ruleset/i);
+assert.match(doc, /stricter project protection manifest|stricter manifest/i);
+
 console.log("Kingsmen simplified status register contract passed: N00–N20 registered; all release gates are evidence-tracked; staging and security snapshot checked.");
