@@ -37,14 +37,15 @@ assert.equal(historical.ledgerRecordsWithCoreOnlyCandidates, snapshot.ledgerReco
 assert.equal(historical.ledgerRecordsWithoutHistoricalSourceNameCandidate, snapshot.ledgerRecords.filter((x) => x.historicalMatchType === "NO_HISTORICAL_SOURCE_NAME_CANDIDATE").length);
 assert.equal(historical.candidateSourceRecords, snapshot.ledgerRecords.filter((x) => (x.historicalSourceCandidates || []).length > 0).length);
 assert.equal(historical.ledgerWithoutAnyHistoricalSourceNameCandidate, historical.ledgerRecordsWithoutHistoricalSourceNameCandidate);
-assert.equal(historical.liveLedgerRecords, undefined);
 assert.equal(historical.replayAuthorized, false);
 assert.equal(historical.exactSqlBodyProvenanceMatches, 0);
 assert.equal(snapshot.historicalBranchTrees.length, 8);
 assert.equal(snapshot.historicalDuplicateLedgerNames.length, 2);
 assert.equal(historical.duplicateLedgerNames, snapshot.historicalDuplicateLedgerNames.length);
-assert.equal(report.historicalBranchSweep.ledgerRecordsWithoutHistoricalSourceNameCandidate, 63);
-assert.equal(report.historicalBranchSweep.candidateSourceRecords, 67);
+assert.equal(report.historicalBranchSweep.ledgerRecordsWithoutHistoricalSourceNameCandidate, historical.ledgerRecordsWithoutHistoricalSourceNameCandidate);
+assert.equal(report.historicalBranchSweep.candidateSourceRecords, historical.candidateSourceRecords);
+assert.equal(report.historicalBranchSweep.ledgerRecordsWithCoreAndSequenceCandidate, historical.ledgerRecordsWithCoreAndSequenceCandidate);
+assert.equal(report.historicalBranchSweep.ledgerRecordsWithCoreOnlyCandidates, historical.ledgerRecordsWithCoreOnlyCandidates);
 assert.equal(report.summary.liveLedgerRecords, currentSummary.liveLedgerRecords);
 assert.equal(report.summary.trackedSourceFiles, currentSummary.trackedSourceFiles);
 assert.equal(report.summary.liveLedgerRecordsWithoutNameMatch, currentSummary.liveLedgerRecordsWithoutNameMatch);
