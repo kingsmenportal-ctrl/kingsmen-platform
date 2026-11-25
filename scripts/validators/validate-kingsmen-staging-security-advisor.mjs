@@ -34,4 +34,30 @@ assert.match(doc,/get_candidate_cao_choices/);
 assert.match(doc,/candidate_identity_review_audit/);
 assert.match(doc,/leaked-password protection/);
 assert.match(doc,/Do not batch-drop these indexes/);
+
+assert.equal(snapshot.liveDatabaseVerification.findings.securityDefinerBodiesExactlyMatchCandidateHistoricalSource,6);
+assert.equal(snapshot.liveDatabaseVerification.findings.flaggedFunctionsWithAnonExecute,0);
+assert.equal(snapshot.liveDatabaseVerification.findings.flaggedFunctionsWithPublicExecute,0);
+assert.equal(snapshot.liveDatabaseVerification.findings.flaggedFunctionsCallableByAuthenticated,6);
+assert.equal(snapshot.liveDatabaseVerification.findings.noPolicyTablesWithAnonOrAuthenticatedTableGrant,0);
+assert.equal(snapshot.liveDatabaseVerification.findings.noPolicyTablesChecked,17);
+assert.equal(snapshot.liveDatabaseVerification.functionBodyAndPrivilegeChecks.length,6);
+for(const fn of snapshot.liveDatabaseVerification.functionBodyAndPrivilegeChecks){
+  assert.equal(fn.normalizedBodyMatches,true,"Live function body differs from candidate source: "+fn.name);
+  assert.equal(fn.anonCanExecute,false,"Anon must not execute function: "+fn.name);
+  assert.equal(fn.publicCanExecute,false,"PUBLIC must not execute function: "+fn.name);
+  assert.equal(fn.authenticatedCanExecute,true,"Authenticated execute is intentionally enabled but still needs role tests: "+fn.name);
+}
+assert.equal(snapshot.liveDatabaseVerification.noPolicyTablePrivilegeChecks.length,17);
+for(const table of snapshot.liveDatabaseVerification.noPolicyTablePrivilegeChecks){
+  assert.equal(table.policyCount,0,"Expected no policies in this snapshot: "+table.table);
+  for(const privilege of ["select","insert","update","delete"]){
+    assert.equal(table.anon[privilege],false,"Unexpected anon privilege: "+table.table+" "+privilege);
+    assert.equal(table.authenticated[privilege],false,"Unexpected authenticated privilege: "+table.table+" "+privilege);
+  }
+}
+assert.match(doc,/Live check completed/);
+assert.match(doc,/all six deployed bodies match/i);
+assert.match(doc,/deny all eight direct client-role privileges/i);
+
 console.log("Kingsmen staging security-advisor snapshot contract passed: 17 RLS tables, 6 SECURITY DEFINER RPCs, 16 policy overlaps and 282 index candidates captured; no live changes made.");
