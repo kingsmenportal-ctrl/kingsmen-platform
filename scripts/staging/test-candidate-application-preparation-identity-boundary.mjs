@@ -6,6 +6,7 @@ const root = process.cwd();
 const read = relativePath => fs.readFileSync(path.join(root, relativePath), "utf8");
 const edge = read("supabase/functions/candidate-application-preparation/index.ts");
 const capacityMigration = read("db/migrations/0107_application_capacity_entitlements_20261101.sql");
+const readinessMigration = read("db/migrations/0108_candidate_application_readiness_eligibility_deadline_gate_20261101.sql");
 
 const lookupStart = edge.indexOf("const identityCheckedAt = new Date().toISOString();");
 const lookupEnd = edge.indexOf('if(p.action==="save_n15_match")', lookupStart);
@@ -52,11 +53,11 @@ for (const invariant of [
   assert.match(helper, invariant, "The Edge Function must match every database helper identity invariant.");
 }
 
-const prepareRpcStart = capacityMigration.indexOf("CREATE OR REPLACE FUNCTION public.prepare_candidate_application_from_master_target");
+const prepareRpcStart = readinessMigration.indexOf("CREATE OR REPLACE FUNCTION public.prepare_candidate_application_from_master_target");
 assert.ok(prepareRpcStart >= 0,
   "Parent application preparation must use the canonical database-owned identity boundary.");
-const prepareRpcEnd = capacityMigration.indexOf("$function$;", prepareRpcStart);
-const prepareRpc = capacityMigration.slice(prepareRpcStart, prepareRpcEnd);
+const prepareRpcEnd = readinessMigration.indexOf("$function$;", prepareRpcStart);
+const prepareRpc = readinessMigration.slice(prepareRpcStart, prepareRpcEnd);
 assert.match(prepareRpc, /current_verified_kingsmen_candidate_id\(\)/);
 assert.match(prepareRpc, /verified_by IS NOT NULL/);
 assert.match(prepareRpc, /FOR SHARE;/);
