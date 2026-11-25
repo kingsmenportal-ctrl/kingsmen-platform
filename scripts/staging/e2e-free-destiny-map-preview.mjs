@@ -75,7 +75,7 @@ try {
     "/personal-job-desk/application-tracker"
   ];
   for (const route of workspaceRoutes) {
-    assert.equal(await page.locator("a[href=\"" + route + "\"]").count(), 1, "Dashboard should expose one navigation link to " + route + ".");
+    assert.ok(await page.locator("a[href=\"" + route + "\"]").count() >= 1, "Dashboard should expose at least one navigation link to " + route + "; responsive desktop/mobile layouts may intentionally duplicate links.");
     const response = await page.request.get(new URL(route, origin).toString());
     assert.equal(response.status(), 200, "Dashboard destination " + route + " should return HTTP 200.");
   }
