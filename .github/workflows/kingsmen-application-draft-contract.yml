@@ -5,7 +5,6 @@ on:
     branches:
       - rebuild/kingsmen-one-foundation-2026-11-17
     paths:
-      - rebuild/kingsmen-one-foundation-2026-11-17
       - db/migrations/0107_application_capacity_entitlements_20261101.sql
       - db/migrations/0108_candidate_application_readiness_eligibility_deadline_gate_20261101.sql
       - db/migrations/0109_candidate_application_draft_persistence_20261101.sql
@@ -42,7 +41,6 @@ on:
     branches:
       - rebuild/kingsmen-one-foundation-2026-11-17
     paths:
-      - rebuild/kingsmen-one-foundation-2026-11-17
       - db/migrations/0107_application_capacity_entitlements_20261101.sql
       - db/migrations/0108_candidate_application_readiness_eligibility_deadline_gate_20261101.sql
       - db/migrations/0109_candidate_application_draft_persistence_20261101.sql
