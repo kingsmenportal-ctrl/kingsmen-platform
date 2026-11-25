@@ -159,7 +159,7 @@ if (classicResponse.ok) {
       {
         verificationEndpoint: 'repository_rulesets',
         classicEndpointStatus: classicResponse.status,
-        applicableActiveRulesetCount: candidates.length
+        listedRulesetsMatchingMainInListPayloadCount: candidates.length
       }
     );
     console.log(JSON.stringify(report, null, 2));
@@ -206,7 +206,9 @@ if (classicResponse.ok) {
         classicEndpointStatus: classicResponse.status,
         rulesetId: detailedRuleset.id ?? preferred.id ?? null,
         rulesetName: detailedRuleset.name ?? preferred.name ?? null,
-        applicableActiveRulesetCount: candidates.length
+        selectedRulesetVerifiedApplicable: false,
+        detailVerifiedApplicableRuleSetCount: 0,
+        listedRulesetsMatchingMainInListPayloadCount: candidates.length
       }
     );
     console.log(JSON.stringify(report, null, 2));
@@ -220,7 +222,7 @@ if (classicResponse.ok) {
       verificationEndpoint: 'repository_rulesets_detail',
       classicEndpointStatus: classicResponse.status,
       rulesetListStatus: rulesetsResponse.status,
-      applicableActiveRulesetCount: candidates.length
+      listedRulesetsMatchingMainInListPayloadCount: candidates.length
     },
     detailResponse.status,
     {
@@ -229,7 +231,9 @@ if (classicResponse.ok) {
       rulesetListStatus: rulesetsResponse.status,
       rulesetId: detailedRuleset.id ?? preferred.id ?? null,
       rulesetName: detailedRuleset.name ?? preferred.name ?? null,
-      applicableActiveRulesetCount: candidates.length
+      selectedRulesetVerifiedApplicable: true,
+      detailVerifiedApplicableRuleSetCount: 1,
+      listedRulesetsMatchingMainInListPayloadCount: candidates.length
     }
   );
   console.log(JSON.stringify(report, null, 2));
