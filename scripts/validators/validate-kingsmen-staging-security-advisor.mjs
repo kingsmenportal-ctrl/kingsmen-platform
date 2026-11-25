@@ -56,7 +56,7 @@ for(const table of snapshot.liveDatabaseVerification.noPolicyTablePrivilegeCheck
     assert.equal(table.authenticated[privilege],false,"Unexpected authenticated privilege: "+table.table+" "+privilege);
   }
 }
-assert.match(doc,/Live check completed/);
+assert.match(doc,/live check completed/i);
 assert.match(doc,/all six deployed bodies match/i);
 assert.match(doc,/deny all eight direct client-role privileges/i);
 
