@@ -15,13 +15,14 @@ const appB = "22222222-2222-4222-8222-222222222222";
 const fakeSupabaseRef = "ci-project";
 const timestamp = "2026-11-19T12:00:00.000Z";
 
-function createState(id, status, version, motivation) {
+function createState(id, status, kingsmenStatus, version, motivation) {
   return {
     application: {
       id,
       application_ref: id === appA ? "CI-DRAFT-A" : "CI-LOCKED-B",
       pathway_type: "EMPLOYMENT",
       status,
+      kingsmen_status: kingsmenStatus,
       readiness_status: status === "READY_TO_SUBMIT" ? "READY" : "NOT_CHECKED",
       readiness_snapshot: {},
       title: id === appA ? "CI fixture employment opportunity" : "CI locked application",
@@ -45,8 +46,8 @@ function createState(id, status, version, motivation) {
 }
 
 const states = new Map([
-  [appA, createState(appA, "DRAFT", 1, "Saved motivation")],
-  [appB, createState(appB, "SUBMITTED_CONFIRMED", 2, "Locked motivation")]
+  [appA, createState(appA, "READY_TO_SUBMIT", "Draft", 1, "Saved motivation")],
+  [appB, createState(appB, "SUBMITTED_CONFIRMED", "Submitted to Kingsmen", 2, "Locked motivation")]
 ]);
 const providerRequests = [];
 const savedRequests = [];
@@ -120,14 +121,14 @@ try {
     }
 
     if (method === "POST") {
-      if (applicationId !== appA || state.application.status !== "DRAFT") {
+      if (applicationId !== appA || !["Draft", "Action required"].includes(state.application.kingsmen_status)
+        || !["DRAFT", "READINESS_BLOCKED", "READY_FOR_REVIEW", "READY_TO_SUBMIT"].includes(state.application.status)) {
         await route.fulfill({ status: 409, json: { ready: false, ok: false, code: "APPLICATION_DRAFT_IS_LOCKED" } });
         return;
       }
       state.version += 1;
       state.draft = incoming.answer_data;
       state.updatedAt = "2026-11-19T12:05:00.000Z";
-      state.application.status = "DRAFT";
       state.application.readiness_status = "NOT_CHECKED";
       state.application.updated_at = state.updatedAt;
       await route.fulfill({
@@ -157,7 +158,8 @@ try {
         draft_updated_at: state.updatedAt,
         shared_profile_available: true,
         shared_profile_updated_at: timestamp,
-        is_editable: ["DRAFT", "READINESS_BLOCKED", "READY_FOR_REVIEW", "READY_TO_SUBMIT"].includes(state.application.status),
+        is_editable: ["Draft", "Action required"].includes(state.application.kingsmen_status)
+          && ["DRAFT", "READINESS_BLOCKED", "READY_FOR_REVIEW", "READY_TO_SUBMIT"].includes(state.application.status),
         provider_submission_sent: false
       }
     });
@@ -178,6 +180,9 @@ try {
   assert.match(savedRequests[0].idempotency_key, /^application-draft-/);
   assert.equal(savedRequests[0].answer_data.motivation_statement, "Updated motivation through the Kingsmen draft editor");
   assert.equal(await page.getByText("Draft version 2", { exact: true }).count(), 1);
+  assert.equal(await page.getByText("Draft", { exact: true }).count(), 1);
+  assert.equal(states.get(appA).application.status, "READY_TO_SUBMIT",
+    "saving answers must not rewrite the backend workflow state");
 
   // Reload must read the server-saved version, not merely preserve the React state.
   await page.getByRole("button", { name: "Reload saved draft" }).click();
@@ -193,12 +198,14 @@ try {
   // A submission-state application is read-only in the candidate editor.
   await page.goto(baseUrl + "/candidate/applications/" + appB, { waitUntil: "networkidle" });
   await page.getByRole("heading", { name: "Application draft" }).waitFor();
-  await page.getByText("This application has moved beyond the editable draft states. The answer form is read-only.").waitFor();
+  await page.getByText("This application is in a Kingsmen status that does not allow candidate editing. The answer form is read-only.").waitFor();
+  await page.getByText("Submitted to Kingsmen", { exact: true }).waitFor();
   assert.equal(await page.getByRole("button", { name: "Save application draft" }).isDisabled(), true);
   assert.equal(savedRequests.length, 1, "locked application must not send a save request");
   assert.deepEqual(providerRequests, [], "draft UI must not make a provider-submission request");
 
   console.log("PASS: browser loads, saves, reloads and locks candidate application drafts");
+  console.log("PASS: candidate-facing statuses remain separate from internal workflow/readiness states");
   console.log("PASS: save uses parent application id, expected version and idempotency key");
   console.log("PASS: no provider-submission endpoint was called");
 } finally {
