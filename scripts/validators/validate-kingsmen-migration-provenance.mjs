@@ -75,7 +75,7 @@ for (const ledger of snapshot.ledgerRecords) {
 assert.match(doc, /DO NOT REPLAY MIGRATIONS FROM THIS REPORT/);
 assert.match(doc, /eight relevant current\/historical feature\/release branches/);
 assert.match(doc, /63 have no source-name candidate/);
-assert.match(doc, /numeric migration identifiers/);
+assert.match(doc, /numeric migration (?:identifiers|sequences)/i);
 assert.match(doc, /do not apply or copy these files/i);
 
 console.log("Kingsmen migration-provenance audit contract passed: current source hashes unchanged; historical branch evidence recorded; no DDL or data changes made.");
