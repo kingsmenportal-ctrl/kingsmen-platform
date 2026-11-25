@@ -49,10 +49,10 @@ The GitHub repository is accessible. The default branch at the start of this bat
 **Branch:** `feat/free-destiny-map-interactive-preview-20261125`  
 **Pull request:** [#340](https://github.com/kingsmenportal-ctrl/kingsmen-platform/pull/340)  
 **Base branch:** `main`  
-**Latest PR head:** `9d2cd9dfc7f8be4d3727cbf73016bd5c5cd06c2e`  
+**Latest PR head:** `8ef4cd53e8fb80b06dc453021f4221bceccd04a1`  
 **Focused workflow:** [Run #24 — passed](https://github.com/kingsmenportal-ctrl/kingsmen-platform/actions/runs/45647547967)  
 **Kingsmen CI:** [Run #647 — passed](https://github.com/kingsmenportal-ctrl/kingsmen-platform/actions/runs/45647548413)  
-**Expanded candidate-navigation workflow:** [Run #25 — pending at last check](https://github.com/kingsmenportal-ctrl/kingsmen-platform/actions/runs/45649631829)
+**Expanded candidate-navigation workflow:** [Run #25 — failed on an overly strict duplicate-link assertion](https://github.com/kingsmenportal-ctrl/kingsmen-platform/actions/runs/45649631829); fix committed as `8ef4cd53e8fb80b06dc453021f4221bceccd04a1`, rerun not yet verified.
 
 Implemented in the branch:
 
@@ -64,7 +64,7 @@ Implemented in the branch:
 
 **Data boundary:** This preview only reads the current form values in the page and renders recommendations. It makes no backend request and does not write to localStorage or sessionStorage. It does not create a candidate profile, save an application, or claim that a real opportunity is open.
 
-**Validation actually performed:** The source-level structural inspection passed 16/16 checks. Root `npm test` passed, including the candidate dashboard contract and Free Destiny Map local-preview contract. Focused preview workflow #24 passed strict clean installs (`npm ci` at root and `npm ci --prefix apps/web`), Chromium setup, Next.js production build, and the production-preview browser E2E for the Free Destiny Map. Kingsmen CI #647 passed. The browser test verifies university and funding guidance, the local-only disclosure, no app write requests, and unchanged browser storage. The web lockfile was regenerated and committed in the PR branch to include the missing `@netlify/plugin-nextjs@5.16.9` entry; the workflow now uses read-only permissions and strict `npm ci`. The next E2E extension adds checks for all six candidate dashboard pathways and HTTP 200 responses for all five linked workspace routes. Workflow #25 was queued/in progress at the time of this update, so those additional checks are not yet reported as passed. Playwright is pinned to Ubuntu 24.04 because v1.60 does not support Ubuntu 26.04.
+**Validation actually performed:** The source-level structural inspection passed 16/16 checks. Root `npm test` passed, including the candidate dashboard contract and Free Destiny Map local-preview contract. Focused preview workflow #24 passed strict clean installs (`npm ci` at root and `npm ci --prefix apps/web`), Chromium setup, Next.js production build, and the production-preview browser E2E for the Free Destiny Map. Kingsmen CI #647 passed. The browser test verifies university and funding guidance, the local-only disclosure, no app write requests, and unchanged browser storage. The web lockfile was regenerated and committed in the PR branch to include the missing `@netlify/plugin-nextjs@5.16.9` entry; the workflow now uses read-only permissions and strict `npm ci`. The expanded E2E checks all six candidate dashboard pathways and HTTP 200 responses for all five linked workspace routes. Workflow #25 reached the Next.js production build successfully but failed because the dashboard exposed two links to `/candidate/workbench` (consistent with separate responsive navigation layouts) while the test incorrectly required exactly one. The test now requires at least one link while still checking the destination returns HTTP 200. Fix commit `8ef4cd53e8fb80b06dc453021f4221bceccd04a1`; rerun and browser E2E remain unverified. Playwright is pinned to Ubuntu 24.04 because v1.60 does not support Ubuntu 26.04.
 
 ## Additional repository protection finding
 
@@ -91,7 +91,7 @@ The official launch gate remains the authoritative list; this status record does
 
 ## Next implementation sequence
 
-1. PR #340's local-preview feature passed strict install, regression tests, production build and browser E2E in workflow #24. The expanded dashboard route test in workflow #25 must also pass; keep the PR unmerged until normal review and merge requirements are satisfied.
+1. PR #340's local-preview feature passed strict install, regression tests, production build and the original browser E2E in workflow #24. Expanded workflow #25 exposed a brittle assertion that expected exactly one responsive dashboard link; a fix is committed, but its rerun must pass before considering the expanded test accepted. Keep the PR unmerged until normal review and merge requirements are satisfied.
 2. Resolve `main` branch protection: run #3467 could not verify active protection (HTTP 404/not found or not visible); inspect repository settings with admin authority, apply the checked-in script only after confirming its exact scope, and rerun the read-only evidence workflow.
 3. Review workflow #25's expanded dashboard navigation checks; investigate any missing or broken candidate workspace route revealed by the browser test.
 4. Confirm which Netlify site is the actual public candidate portal, and verify deployment repository/build settings and deployed commit.
