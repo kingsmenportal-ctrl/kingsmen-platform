@@ -7,6 +7,10 @@ const read = relativePath => fs.readFileSync(path.join(root, relativePath), "utf
 const panel = read("apps/web/src/components/candidate/DocumentPreflightPanel.tsx");
 const session = read("apps/web/src/lib/candidate-session.ts");
 const documentsPage = read("apps/web/src/app/candidate/documents/page.tsx");
+const profile = read("apps/web/src/components/candidate/CandidateMasterProfileForm.tsx");
+const savedOpportunities = read("apps/web/src/components/candidate/CandidateSavedOpportunitiesClient.tsx");
+const sessionControl = read("apps/web/src/components/candidate/CandidateSessionControl.tsx");
+const authForm = read("apps/web/src/components/candidate/CandidateAuthForm.tsx");
 
 assert.match(panel, /import \{ getCandidateSessionState \} from ["']@\/lib\/candidate-session["']/,
   "Document upload and download must use the shared candidate session boundary.");
@@ -29,7 +33,28 @@ assert.match(session, /session\.expires_at[\s\S]*Date\.now\(\)/,
   "Shared session validation must enforce token expiry.");
 assert.match(documentsPage, /href=["']\/candidate\/applications["']>Applications<\/a>/,
   "The document vault must link back to the canonical applications journey.");
+assert.match(profile, /getCandidateSessionState\(\)/,
+  "Candidate profile persistence must use the shared candidate session boundary.");
+assert.match(savedOpportunities, /getCandidateSessionState\(\)/,
+  "Saved-opportunity reads must use the shared candidate session boundary.");
+assert.match(sessionControl, /getCandidateSessionState\(\)/);
+assert.match(sessionControl, /getCandidateSupabaseConfig\(\)/);
+assert.match(authForm, /getCandidateSupabaseConfig\(\)/,
+  "Login/signup must use the same validated Supabase config as authenticated candidate requests.");
+for (const [name, source] of [
+  ["profile", profile],
+  ["saved opportunities", savedOpportunities],
+  ["session control", sessionControl],
+  ["auth form", authForm]
+]) {
+  assert.doesNotMatch(source, /euhubhhnumtibbyufghm|JSON\.parse\(raw\)|let storageKey\s*=\s*["']/,
+    name + " must not keep a hard-coded project fallback or a duplicate browser-session parser.");
+}
+assert.match(session, /storageKey:\s*`sb-\$\{projectRef\}-auth-token`/,
+  "The shared config must derive the auth storage key from the validated project URL.");
+
 console.log("PASS: document upload/download share the fail-closed candidate session boundary");
 console.log("PASS: no hard-coded project fallback or duplicate browser-token parser remains");
 console.log("PASS: document vault navigation connects to canonical applications");
-console.log("Candidate document session contract: 3/3 groups passed");
+console.log("PASS: profile, saved opportunities, auth and sign-out share the same session boundary");
+console.log("Candidate session boundary contract passed.");
