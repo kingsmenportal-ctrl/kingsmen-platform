@@ -1,7 +1,7 @@
 "use client";
 
 import { getCandidateAccessToken } from "../../../../lib/candidate-session";
-import { isCandidateEditableApplicationStatus, type CandidateFacingApplicationStatus } from "@/lib/candidate-application-status";
+import { candidateFacingApplicationStatusLabel, isCandidateEditableApplicationStatus, type CandidateFacingApplicationStatus } from "@/lib/candidate-application-status";
 import { useParams } from "next/navigation";
 import { FormEvent, useCallback, useEffect, useState } from "react";
 
@@ -180,7 +180,7 @@ export default function CandidateApplicationDraftPage() {
   async function save(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
     if (!application || !applicationId) return;
-    if (!serverEditable || !["Draft", "Action required"].includes(application.kingsmen_status)) {
+    if (!serverEditable || !isCandidateEditableApplicationStatus(application.kingsmen_status)) {
       setError("This application is no longer in a candidate-editable Kingsmen status.");
       return;
     }
@@ -246,7 +246,7 @@ export default function CandidateApplicationDraftPage() {
   }
 
   const isEditable = Boolean(serverEditable && application
-    && ["Draft", "Action required"].includes(application.kingsmen_status));
+    && isCandidateEditableApplicationStatus(application.kingsmen_status));
 
   return <main className="min-h-screen bg-slate-950 px-4 py-8 text-white sm:px-6">
     <div className="mx-auto max-w-5xl space-y-6">
@@ -281,7 +281,7 @@ export default function CandidateApplicationDraftPage() {
             </div>
             <div className="rounded-xl border border-slate-700 px-3 py-2 text-sm">
               <p className="text-xs text-slate-400">Application status</p>
-              <p className="mt-1 font-semibold">{application.kingsmen_status}</p>
+              <p className="mt-1 font-semibold">{candidateFacingApplicationStatusLabel(application.kingsmen_status)}</p>
               <p className="mt-1 text-xs text-slate-400">Draft version {version}</p>
             </div>
           </div>
